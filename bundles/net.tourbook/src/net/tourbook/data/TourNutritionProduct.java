@@ -32,6 +32,7 @@ import javax.persistence.Transient;
 import net.tourbook.Messages;
 import net.tourbook.OtherMessages;
 import net.tourbook.common.UI;
+import net.tourbook.common.util.StringUtils;
 import net.tourbook.common.util.Util;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.nutrition.QuantityType;
@@ -472,28 +473,21 @@ public class TourNutritionProduct {
       if (this.getCalories_Serving() != updatedProduct.getCalories_Serving()) {
          this.setCalories_Serving(updatedProduct.getCalories_Serving());
 
-         previousData.add(UI.EMPTY_STRING
-
-               + this.getCalories_Serving() + UI.UNIT_VOLT + UI.SPACE
-               + updatedProduct.getCalories_Serving() + UI.UNIT_VOLT);
-
-         newData.add(UI.EMPTY_STRING
-
-               + this.getCalories_Serving() + UI.UNIT_VOLT + UI.SPACE
-               + updatedProduct.getCalories_Serving() + UI.UNIT_VOLT);
+         buildProductInfoDifference(
+               String.valueOf(updatedProduct.getCalories_Serving()),
+               String.valueOf(this.getCalories_Serving()),
+               previousData,
+               newData,
+               OtherMessages.VALUE_UNIT_K_CALORIES);
       }
       if (this.getCarbohydrates() != updatedProduct.getCarbohydrates()) {
 
-         this.setCarbohydrates(updatedProduct.getCarbohydrates());
-         previousData.add(UI.EMPTY_STRING
-
-               + this.getCarbohydrates() + UI.UNIT_VOLT + UI.SPACE
-               + updatedProduct.getCarbohydrates() + UI.UNIT_VOLT);
-
-         newData.add(UI.EMPTY_STRING
-
-               + this.getCarbohydrates() + UI.UNIT_VOLT + UI.SPACE
-               + updatedProduct.getCarbohydrates() + UI.UNIT_VOLT);
+         buildProductInfoDifference(
+               String.valueOf(updatedProduct.getCarbohydrates()),
+               String.valueOf(this.getCarbohydrates()),
+               previousData,
+               newData,
+               UI.UNIT_WEIGHT_G);
       }
       if (this.getCarbohydrates_Serving() != updatedProduct.getCarbohydrates_Serving()) {
          this.setCarbohydrates_Serving(updatedProduct.getCarbohydrates_Serving());
@@ -504,18 +498,30 @@ public class TourNutritionProduct {
       if (!Objects.equals(this.getSodium_Serving(), updatedProduct.getSodium_Serving())) {
          this.setSodium_Serving(updatedProduct.getSodium_Serving());
       }
-      for (int index = 0; index < previousData.size(); ++index) {
 
-         //todo fb
-         //it should look like this
-         // Updating the following Tour Nutrition Products:
-         // PRODUCTNAME → Previous data: PRODUCTNAME 504.0kcal XXg..... - Current data: NEWNAME 504.0kcal YYg....
-         // PRODUCTNAME2 → Previous data: PRODUCTNAME 504.0kcal XXg..... - Current data: NEWNAME 504.0kcal YYg....
-         //Updated in 0.347 s
-         TourLogManager.subLog_INFO(NLS.bind(
-               Messages.Log_ModifiedTour_Old_Data_Vs_New_Data,
-               previousData.get(index),
-               newData.get(index)));
+      if (previousData.isEmpty() && newData.isEmpty()) {
+         return;
       }
+
+      final String previousDataJoined = StringUtils
+            .join(previousData.stream().toArray(String[]::new), UI.COMMA_SPACE);
+
+      final String newDataJoined = StringUtils
+            .join(newData.stream().toArray(String[]::new), UI.COMMA_SPACE);
+
+      TourLogManager.subLog_INFO(
+            this.getName() + UI.SPACE + "→" + UI.SPACE +
+                  NLS.bind(
+                        Messages.Log_ModifiedTour_Old_Data_Vs_New_Data,
+                        previousDataJoined,
+                        newDataJoined));
+
+      //todo fb
+      //it should look like this
+      // Updating the following Tour Nutrition Products:
+      // PRODUCTNAME → Previous data: PRODUCTNAME 504.0kcal XXg..... - Current data: NEWNAME 504.0kcal YYg....
+      // PRODUCTNAME2 → Previous data: PRODUCTNAME 504.0kcal XXg..... - Current data: NEWNAME 504.0kcal YYg....
+      //Updated in 0.347 s
+
    }
 }

@@ -62,6 +62,8 @@ import net.tourbook.tour.TourEvent;
 import net.tourbook.tour.TourEventId;
 import net.tourbook.tour.TourLogManager;
 import net.tourbook.tour.TourLogManager.AutoOpenEvent;
+import net.tourbook.tour.TourLogState;
+import net.tourbook.tour.TourLogView;
 import net.tourbook.tour.TourManager;
 
 import org.apache.commons.lang3.StringUtils;
@@ -90,6 +92,7 @@ import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerCell;
 import org.eclipse.jface.viewers.ViewerComparator;
 import org.eclipse.jface.window.Window;
+import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.BusyIndicator;
 import org.eclipse.swt.events.ControlListener;
@@ -860,8 +863,34 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
          _btnUpdateProducts = new Button(container, SWT.NONE);
          _btnUpdateProducts.setText(Messages.Tour_Nutrition_Button_UpdateProducts);
          _btnUpdateProducts.setToolTipText(Messages.Tour_Nutrition_Button_UpdateProducts_Tooltip);
-         _btnUpdateProducts.addSelectionListener(widgetSelectedAdapter(selectionEvent -> BusyIndicator.showWhile(Display.getCurrent(),
-               () -> onUpdateProducts())));
+         _btnUpdateProducts.addSelectionListener(widgetSelectedAdapter(selectionEvent ->
+
+         {
+            // update all products
+            _isInUpdate = true;
+
+            TourLogManager.showLogView(AutoOpenEvent.TOUR_ADJUSTMENTS);
+
+            final String logMessage = NLS.bind(
+                  Messages.Log_ModifiedTour_Combined_Values,
+                  Messages.Log_Updating_Text);
+            TourLogManager.addLog(
+                  TourLogState.DEFAULT,
+                  logMessage,
+                  TourLogView.CSS_LOG_TITLE);
+
+            final long start = System.currentTimeMillis();
+
+            // show busy indicator
+            BusyIndicator.showWhile(Display.getCurrent(), () -> onUpdateProducts());
+
+            TourLogManager.log_DEFAULT(String.format(
+                  Messages.Log_UpdateTour_End,
+                  (System.currentTimeMillis() - start) / 1000.0));
+
+            // hide busy indicator
+            _isInUpdate = false;
+         }));
          _btnUpdateProducts.setImage(_imageRefreshAll);
          GridDataFactory.fillDefaults().align(SWT.BEGINNING, SWT.CENTER).applyTo(_btnUpdateProducts);
       }
@@ -1325,6 +1354,10 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
 
    private void enableControls() {
 
+      if (_tourData == null) {
+         return;
+      }
+
       final int numberOfProducts = _productsViewer.getTable().getItemCount();
 
       final Set<TourNutritionProduct> tourNutritionProducts = _tourData.getTourNutritionProducts();
@@ -1585,8 +1618,6 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
 
    private void onUpdateProducts() {
 
-      TourLogManager.showLogView(AutoOpenEvent.TOUR_ADJUSTMENTS);
-
       final Set<TourNutritionProduct> tourNutritionProducts = _tourData.getTourNutritionProducts();
       final Set<TourNutritionProduct> updatedTourNutritionProducts = new HashSet<>();
       for (final TourNutritionProduct tourNutritionProduct : tourNutritionProducts) {
@@ -1615,16 +1646,16 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
 //
 //         if (isUpdateProduct) {
 
-            updatedTourNutritionProducts.add(updatedTourNutritionProduct);
-         }
-         //  }
+         updatedTourNutritionProducts.add(updatedTourNutritionProduct);
+      }
+      //  }
 
+      _tourData.updateTourNutritionProducts(updatedTourNutritionProducts);
+      _tourData = TourManager.saveModifiedTour(_tourData);
+      // ??? _tourData.setTourNutritionProducts(_tourData.getTourNutritionProducts());
 
-         _tourData.updateTourNutritionProducts(updatedTourNutritionProducts);
-         _tourData = TourManager.saveModifiedTour(_tourData);
-         // ??? _tourData.setTourNutritionProducts(_tourData.getTourNutritionProducts());
+      // todo display the changes in the log view
 
-         // todo display the changes in the log view
    }
 
    @Override
