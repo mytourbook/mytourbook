@@ -1635,25 +1635,13 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
          final TourNutritionProduct updatedTourNutritionProduct = new TourNutritionProduct(
                _tourData,
                updatedProduct);
-//         // if carbohydrates or calories are different, then we update the product
-//
-//         boolean isUpdateProduct = false;
-//         if (updatedTourNutritionProduct.getCarbohydrates_Serving() != tourNutritionProduct.getCarbohydrates_Serving() ||
-//               updatedTourNutritionProduct.getCalories_Serving() != tourNutritionProduct.getCalories_Serving()) {
-//
-//            isUpdateProduct = true;
-//         }
-//
-//         if (isUpdateProduct) {
 
          updatedTourNutritionProducts.add(updatedTourNutritionProduct);
       }
-      //  }
 
       _tourData.updateTourNutritionProducts(updatedTourNutritionProducts);
       _tourData = TourManager.saveModifiedTour(_tourData);
-      //TODO FB the tour data fire event is not fired
-
+      reloadViewer();
    }
 
    @Override
