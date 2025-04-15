@@ -1827,18 +1827,19 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
 
             // Search for a nutrition product with the same product code and
             // for which no beverage container is assigned.
-            final Optional<TourNutritionProduct> identicalProduct = _tourData.getTourNutritionProducts()
-                  .stream()
-                  .filter(tourNutritionProduct -> tourNutritionProduct
-                        .getProductCode()
-                        .equals(((TourNutritionProduct) element).getProductCode()) &&
-                        tourNutritionProduct.getTourBeverageContainer() == null)
-                  .findFirst();
+            final Optional<TourNutritionProduct> identicalProductWithNoContainer =
+                  _tourData.getTourNutritionProducts()
+                        .stream()
+                        .filter(tourNutritionProduct -> tourNutritionProduct
+                              .getProductCode()
+                              .equals(((TourNutritionProduct) element).getProductCode()) &&
+                              tourNutritionProduct.getTourBeverageContainer() == null)
+                        .findFirst();
 
             // If the user wants to set the beverage to empty and another identical
             // product (with no beverage assigned) exists, we ignore the action.
 
-            if (identicalProduct.isPresent() && beverageContainerIndex == 0) {
+            if (identicalProductWithNoContainer.isPresent() && beverageContainerIndex == 0) {
                return;
             }
 
