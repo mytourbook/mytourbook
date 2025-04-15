@@ -22,6 +22,7 @@ import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Stream;
 
@@ -126,9 +127,6 @@ import cop.swt.widgets.viewers.table.celleditors.SpinnerCellEditor;
 public class TourNutritionView extends ViewPart implements ITourViewer {
 
    // todo fb
-
-   //when 2 identical products are present, the modificaiton of its beverage can't be done
-   // if the other identical product doesn't have a beverage container
 
    // slideout with ignore 1h
    // add group with 2 radio buttons "Use the last most added items", "Use the most used items for all the tours"
@@ -1827,8 +1825,23 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
                   ? null
                   : _tourBeverageContainers.get(beverageContainerIndex - 1);
 
-            //todo fb Here, if the user wants to set the beverage to null, we
-            // need to check if the same product is not already set to something empty
+            // Search for a nutrition product with the same product code and
+            // for which no beverage container is assigned.
+            final Optional<TourNutritionProduct> identicalProduct = _tourData.getTourNutritionProducts()
+                  .stream()
+                  .filter(tourNutritionProduct -> tourNutritionProduct
+                        .getProductCode()
+                        .equals(((TourNutritionProduct) element).getProductCode()) &&
+                        tourNutritionProduct.getTourBeverageContainer() == null)
+                  .findFirst();
+
+            // If the user wants to set the beverage to empty and another identical
+            // product (with no beverage assigned) exists, we ignore the action.
+
+            if (identicalProduct.isPresent() && beverageContainerIndex == 0) {
+               return;
+            }
+
             final TourNutritionProduct tourNutritionProduct = (TourNutritionProduct) element;
             tourNutritionProduct.setTourBeverageContainer(selectedTourBeverageContainer);
             tourNutritionProduct.setContainersConsumed(1);
