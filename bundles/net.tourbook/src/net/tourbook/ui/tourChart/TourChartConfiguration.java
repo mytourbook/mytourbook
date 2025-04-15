@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2025 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -60,9 +60,9 @@ public class TourChartConfiguration {
 
       GRAPH_BACKGROUND_SOURCE_TYPE = new GraphBgSourceType[] {
 
-            new GraphBgSourceType(GraphBackgroundSource.DEFAULT,           Messages.TourChart_GraphBackgroundSource_Default),
-            new GraphBgSourceType(GraphBackgroundSource.HR_ZONE,           Messages.TourChart_GraphBackgroundSource_HrZone),
-            new GraphBgSourceType(GraphBackgroundSource.SWIMMING_STYLE,    Messages.TourChart_GraphBackgroundSource_SwimmingStyle),
+            new GraphBgSourceType(GraphBackgroundSource.DEFAULT,              Messages.TourChart_GraphBackgroundSource_Default),
+            new GraphBgSourceType(GraphBackgroundSource.HR_ZONE,              Messages.TourChart_GraphBackgroundSource_HrZone),
+            new GraphBgSourceType(GraphBackgroundSource.SWIMMING_STYLE,       Messages.TourChart_GraphBackgroundSource_SwimmingStyle),
       };
 
       GRAPH_BACKGROUND_STYLE_TYPE = new GraphBgStyleType[] {
@@ -251,24 +251,30 @@ public class TourChartConfiguration {
    /**
     * Source which is used to draw the graph background
     */
-   public GraphBackgroundSource graphBackground_Source      = GRAPH_BACKGROUND_SOURCE_DEFAULT;
+   public GraphBackgroundSource graphBackground_Source = GRAPH_BACKGROUND_SOURCE_DEFAULT;
 
    /**
     * Graph style which is used to draw the graph background
     */
-   public GraphBackgroundStyle  graphBackground_Style       = GRAPH_BACKGROUND_STYLE_DEFAULT;
+   public GraphBackgroundStyle  graphBackground_Style  = GRAPH_BACKGROUND_STYLE_DEFAULT;
 
    /**
     * Is <code>true</code> when HR zones can be displayed, which requires that pulse values are
     * available and the person has defined HR zones.
     */
-   public boolean               canShowBackground_HrZones   = false;
+   public boolean               canShowBackground_HrZones;
 
    /**
     * Is <code>true</code> when swim style can be displayed, this requires that swim data are
     * available .
     */
-   public boolean               canShowBackground_SwimStyle = false;
+   public boolean               canShowBackground_SwimStyle;
+
+   /**
+    * Is <code>true</code> when values are missing, e.g. when there is not always a geo position in
+    * the recorded tour
+    */
+   public boolean               canShowBackground_InterpolatedValues;
 
    /**
     * When <code>true</code> then night sections are displayed when tour time is between sunset and
@@ -425,11 +431,18 @@ public class TourChartConfiguration {
    }
 
    public boolean isBackgroundStyle_Default() {
+
       return GraphBackgroundSource.DEFAULT.name().equals(graphBackground_Source.name());
    }
 
    public boolean isBackgroundStyle_HrZone() {
+
       return GraphBackgroundSource.HR_ZONE.name().equals(graphBackground_Source.name());
+   }
+
+   public boolean isBackgroundStyle_InterpolatedValues() {
+
+      return GraphBackgroundSource.INTERPOLATED_VALUES.name().equals(graphBackground_Source.name());
    }
 
    public boolean isBackgroundStyle_SwimmingStyle() {

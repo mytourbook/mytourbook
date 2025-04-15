@@ -3015,6 +3015,10 @@ public class Messages extends NLS {
    public static String        TourEditor_Action_ComputeDistanceValuesFromGeoPosition;
    public static String        TourEditor_Action_DeleteDistanceValues;
    public static String        TourEditor_Action_EditTimeSlicesValues;
+   public static String        TourEditor_Action_InterpolatedValues_ReImport;
+   public static String        TourEditor_Action_InterpolatedValues_ReImport_Tooltip;
+   public static String        TourEditor_Action_InterpolatedValues_Remove;
+   public static String        TourEditor_Action_InterpolatedValues_Remove_Tooltip;
    public static String        TourEditor_Action_RemoveSwimStyle;
    public static String        TourEditor_Action_SetAltitudeValuesFromSRTM;
    public static String        TourEditor_Action_SetStartDistanceTo0;
@@ -3705,6 +3709,7 @@ public class Messages extends NLS {
 
    public static String        Tour_SubMenu_Cadence;
    public static String        Tour_SubMenu_Elevation;
+   public static String        Tour_SubMenu_InterpolatedValues;
 
    public static String        Tour_Tags_Action_Layout_Flat_Tooltip;
    public static String        Tour_Tags_Action_Layout_Hierarchical_Tooltip;

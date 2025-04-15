@@ -162,6 +162,7 @@ import net.tourbook.tour.photo.TourPhotoLinkSelection;
 import net.tourbook.tour.photo.TourPhotoManager;
 import net.tourbook.ui.ITourProvider;
 import net.tourbook.ui.ValuePoint_ToolTip_UI;
+import net.tourbook.ui.action.SubMenu_SetGeoPosition;
 import net.tourbook.ui.action.SubMenu_SetTourMarkerType;
 import net.tourbook.ui.tourChart.HoveredValueData;
 import net.tourbook.ui.tourChart.TourChart;
@@ -558,6 +559,7 @@ public class Map2View extends ViewPart implements
    private ActionShowValuePoint                 _actionShowValuePoint;
    private ActionZoomLevelAdjustment            _actionZoomLevelAdjustment;
    //
+   private SubMenu_SetGeoPosition               _actionSubMenu_SetGeoPosition;
    private SubMenu_SetTourMarkerType            _actionSubMenu_SetTourMarkerType;
    //
    private ActionSyncMap                        _actionMap2Slideout_SyncMap;
@@ -2484,7 +2486,6 @@ public class Map2View extends ViewPart implements
       _actionRunExternalApp3                 = new ActionRunExternalApp();
 
       _actionCopyLocation                    = new ActionCopyLocation();
-      _actionSetGeoPositions                 = new ActionSetGeoPosition();
       _actionCreateTourMarkerFromMap         = new ActionCreateTourMarkerFromMap(this);
       _actionGotoLocation                    = new ActionGotoLocation();
       _actionLookupTourLocation              = new ActionLookupCommonLocation(this);
@@ -2510,6 +2511,7 @@ public class Map2View extends ViewPart implements
       _actionShowAllFilteredPhotos           = new ActionShowAllFilteredPhotos(this);
       _actionShowLegendInMap                 = new ActionShowLegendInMap(this);
       _actionMap2Slideout_PhotoOptions       = new ActionMap2_PhotoOptions();
+      _actionSetGeoPositions                 = new ActionSetGeoPosition();
       _actionShowScaleInMap                  = new ActionShowScaleInMap(this);
       _actionShowSliderInMap                 = new ActionShowSliderInMap(this);
       _actionShowSliderInLegend              = new ActionShowSliderInLegend(this);
@@ -2519,6 +2521,7 @@ public class Map2View extends ViewPart implements
       _actionShowTour                        = new ActionShowTour();
       _actionShowTourInfoInMap               = new ActionShowTourInfoInMap(this);
       _actionShowTourWeatherInMap            = new ActionShowTourWeatherInMap(this);
+      _actionSubMenu_SetGeoPosition          = new SubMenu_SetGeoPosition();
       _actionSubMenu_SetTourMarkerType       = new SubMenu_SetTourMarkerType();
       _actionZoomLevelAdjustment             = new ActionZoomLevelAdjustment();
 
@@ -2817,6 +2820,8 @@ public class Map2View extends ViewPart implements
       /*
        * Set geo positions
        */
+      final GeoPosition currentMouseGeoPosition = _map.getMouseMove_GeoPosition();
+
       String actionGeoPositionLabel = Messages.Map_Action_GeoPositions_Set;
       boolean canCreateGeoPositions = false;
 
@@ -2827,13 +2832,19 @@ public class Map2View extends ViewPart implements
          canCreateGeoPositions = true;
          actionGeoPositionLabel = (Messages.Map_Action_GeoPositions_SetInto.formatted(TourManager.getTourTitle(tourData)));
 
-         final GeoPosition geoPosition = _map.getMouseMove_GeoPosition();
-
-         _actionSetGeoPositions.setData(tourData, geoPosition);
+         _actionSetGeoPositions.setData(tourData, currentMouseGeoPosition);
       }
 
       _actionSetGeoPositions.setEnabled(canCreateGeoPositions);
       _actionSetGeoPositions.setText(actionGeoPositionLabel);
+
+      /*
+       * Set geo positions into tour geo marker
+       */
+      final List<TourMarker> allGeoMarker = getTourMarkersWhereGeoPositionsCanBeSet();
+
+      _actionSubMenu_SetGeoPosition.setContextData(allGeoMarker, currentMouseGeoPosition);
+      _actionSubMenu_SetGeoPosition.setEnabled(allGeoMarker != null && allGeoMarker.size() > 0);
 
 // SET_FORMATTING_OFF
 
@@ -3100,6 +3111,7 @@ public class Map2View extends ViewPart implements
          menuMgr.add(_actionCreateTourMarkerFromMap);
          menuMgr.add(_actionLookupTourLocation);
          menuMgr.add(_actionSetGeoPositions);
+         menuMgr.add(_actionSubMenu_SetGeoPosition);
 
          /*
           * Show tour features
@@ -3699,6 +3711,43 @@ public class Map2View extends ViewPart implements
       final double longitudeCenter = longitudeMin + (longitudeMax - longitudeMin) / 2;
 
       return new GeoPosition(latitudeCenter, longitudeCenter);
+   }
+
+   /**
+    * @return Returns {@link TourData} where the geo position can be set, otherwise
+    *         <code>null</code>
+    */
+   private List<TourMarker> getTourMarkersWhereGeoPositionsCanBeSet() {
+
+      if (_allTourData.size() != 1) {
+
+         return null;
+      }
+
+      final TourData tourData = _allTourData.get(0);
+
+      final double[] latitudeSerie = tourData.latitudeSerie;
+
+      if (latitudeSerie == null || latitudeSerie.length == 0) {
+
+         return null;
+      }
+
+      final String geoMarkerPrefix = SubMenu_SetGeoPosition.GEO_MARKER_PREFIX.toLowerCase();
+      final List<TourMarker> allGeoMarker = new ArrayList<>();
+
+      final Set<TourMarker> allTourMarkers = tourData.getTourMarkers();
+      for (final TourMarker tourMarker : allTourMarkers) {
+
+         final String label = tourMarker.getLabel();
+
+         if (label.trim().toLowerCase().startsWith(geoMarkerPrefix)) {
+
+            allGeoMarker.add(tourMarker);
+         }
+      }
+
+      return allGeoMarker;
    }
 
    private Set<GeoPosition> getXSliderGeoPositions(final TourData tourData,

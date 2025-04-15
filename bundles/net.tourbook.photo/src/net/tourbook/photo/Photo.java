@@ -1208,13 +1208,17 @@ public class Photo implements Serializable {
     *         Returns 0 when the value is not set !!! </b>
     */
    public double getTourLatitude() {
-      return _tourLatitude != 0 //
+
+      return _tourLatitude != 0
+
             ? _tourLatitude
             : _exifLatitude;
    }
 
    public double getTourLongitude() {
-      return _tourLongitude != 0 //
+
+      return _tourLongitude != 0
+
             ? _tourLongitude
             : _exifLongitude;
    }
@@ -1414,6 +1418,9 @@ public class Photo implements Serializable {
       _linkLongitude = linkLongitude;
 
       isLinkPhotoWithGps = true;
+
+      // it took me some hours to find/fix this issue
+      _linkWorldPosition.clear();
    }
 
    public void setLinkTourId(final long photoLinkTourId) {
@@ -1503,6 +1510,9 @@ public class Photo implements Serializable {
       _tourLongitude = longitude;
 
       isTourPhotoWithGps = true;
+
+      // it took me some hours to find/fix this issue
+      _tourWorldPosition.clear();
    }
 
    private void setupPhoto(final File photoImageFile, final IPath photoImagePath) {
@@ -1572,23 +1582,26 @@ public class Photo implements Serializable {
 //            : _orientation == 3 ? "180" //
 //                  : _orientation == 6 ? "90" : "0";
 
+      final String sep = UI.NEW_LINE1;
+
       return UI.EMPTY_STRING
 
-            + "Photo" // //$NON-NLS-1$
-            + " " + imageFileName //$NON-NLS-1$
-            + " adjustedTime_Tour " + adjustedTime_Tour //$NON-NLS-1$
-            + " _exifDateTime " + _exifDateTime //$NON-NLS-1$
+            + "Photo" //                                                //$NON-NLS-1$
+
+            + " " + imageFileName + sep //                              //$NON-NLS-1$
+
+//            + " adjustedTime_Tour " + adjustedTime_Tour + sep //        //$NON-NLS-1$
+//            + " _exifDateTime " + _exifDateTime + sep //                //$NON-NLS-1$
 
 //            + (_exifDateTime == null ? "-no date-" : "\t" + _exifDateTime)
 //            + ("\trotate:" + rotateDegree)
 //            + (_imageWidth == Integer.MIN_VALUE ? "-no size-" : "\t" + _imageWidth + "x" + _imageHeight)
 
-//            + ("\tEXIF GPS: " + _exifLatitude + " - " + _exifLongitude) //$NON-NLS-1$ //$NON-NLS-2$
-//            + ("\tLink GPS: " + _linkLatitude + " - " + _linkLongitude) //$NON-NLS-1$ //$NON-NLS-2$
-//            + ("\tTour GPS: " + _tourLatitude + " - " + _tourLongitude) //$NON-NLS-1$ //$NON-NLS-2$
-      //
+            + " EXIF GPS: %8.5f %8.5f".formatted(_exifLatitude, _exifLongitude) + sep //$NON-NLS-1$
+            + " Link GPS: %8.5f %8.5f".formatted(_linkLatitude, _linkLongitude) + sep //$NON-NLS-1$
+            + " Tour GPS: %8.5f %8.5f".formatted(_tourLatitude, _tourLongitude) + sep //$NON-NLS-1$
 
-//            + UI.NEW_LINE
+            + sep
 
       ;
    }

@@ -84,6 +84,10 @@ public class Messages extends NLS {
    public static String Map_Action_ExternalApp_DoubleClickStart;
    public static String Map_Action_ExternalApp_OpenPhotoImage;
    public static String Map_Action_ExternalApp_Setup;
+   public static String Map_Action_GeoMarkerPosition_RemoveAll;
+   public static String Map_Action_GeoMarkerPosition_RemoveAll_Tooltip;
+   public static String Map_Action_GeoMarkerPosition_SetIntoMarker;
+   public static String Map_Action_GeoMarkerPosition_SetIntoMarker_Tooltip;
    public static String Map_Action_GeoPositions_Delete;
    public static String Map_Action_GeoPositions_Set;
    public static String Map_Action_GeoPositions_SetInto;

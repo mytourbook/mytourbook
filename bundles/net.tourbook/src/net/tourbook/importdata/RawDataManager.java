@@ -34,6 +34,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Optional;
 import java.util.Scanner;
 import java.util.Set;
 import java.util.concurrent.ArrayBlockingQueue;
@@ -3028,6 +3029,39 @@ public class RawDataManager {
                   : 0;
    }
 
+   public TourData reimportTour(final TourData oldTourData,
+                                final ImportState_Process importState_Process) {
+
+      final String osFilePath = oldTourData.getImportFilePathName();
+
+      if (osFilePath == null) {
+         return null;
+      }
+
+      final File importFile = new File(osFilePath);
+
+      final Map<Long, TourData> allImportedToursFromOneFile = new HashMap<>();
+
+      final ImportState_File importState_File = RawDataManager.getInstance().importTours_FromOneFile(
+
+            importFile, //                   importFile
+            null, //                         destinationPath
+            null, //                         fileCollision
+            false, //                        isBuildNewFileNames
+            false, //                        isTourDisplayedInImportView
+            allImportedToursFromOneFile,
+            importState_Process //
+      );
+
+      if (importState_File.isFileImportedWithValidData == false) {
+         return null;
+      }
+
+      final Optional<TourData> firstTourData = allImportedToursFromOneFile.values().stream().findFirst();
+
+      return firstTourData.get();
+   }
+
    /**
     * Re-imports a tour and specifically the data specified.
     *
@@ -3430,7 +3464,13 @@ public class RawDataManager {
                 */
                final TourData savedTourData = TourDatabase.saveTour_Concurrent(updatedTourData, true);
 
+               // keep transient values
+               final boolean[] interpolatedValueSerie = updatedTourData.interpolatedValueSerie;
+
                updatedTourData = savedTourData;
+
+               // set transient values
+               updatedTourData.interpolatedValueSerie = interpolatedValueSerie;
             }
 
             if (importState_Process.isLog_OK()) {

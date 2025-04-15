@@ -1756,7 +1756,7 @@ public class DialogMarker extends TitleAreaDialog implements ITourMarkerSelectio
          _txtUrlAddress.setText(isTourMarker ? _selectedTourMarker.getUrlAddress() : UI.EMPTY_STRING);
          _txtUrlText.setText(isTourMarker ? _selectedTourMarker.getUrlText() : UI.EMPTY_STRING);
 
-         _tableMarkerType.select(getMarkerTypeIndex(_selectedTourMarker));
+         _tableMarkerType.select(isTourMarker ? getMarkerTypeIndex(_selectedTourMarker) : 0);
       }
       _isUpdateUI = false;
    }

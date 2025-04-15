@@ -3083,7 +3083,7 @@ public class TourManager {
     * @return Returns a list with all persisted {@link TourData}
     */
    public static ArrayList<TourData> saveModifiedTours(final List<TourData> modifiedTours) {
-      
+
       return saveModifiedTours(modifiedTours, true, null);
    }
 
@@ -4615,40 +4615,51 @@ public class TourManager {
       // swim style can be displayed when they are available
       final boolean canShowBackground_SwimStyle = tcc.canShowBackground_SwimStyle = tourData.swim_Time != null;
 
-      final String prefGraphBgSource = _prefStore.getString(ITourbookPreferences.GRAPH_BACKGROUND_SOURCE);
-      final String prefGraphBgStyle = _prefStore.getString(ITourbookPreferences.GRAPH_BACKGROUND_STYLE);
+      final boolean canShowBackground_InterpolatedValues = tcc.canShowBackground_InterpolatedValues = tourData.interpolatedValueSerie != null;
 
-      GraphBackgroundSource graphBgSource = (GraphBackgroundSource) Util.getEnumValue(prefGraphBgSource,
-            TourChartConfiguration.GRAPH_BACKGROUND_SOURCE_DEFAULT);
-      final GraphBackgroundStyle graphBgStyle = (GraphBackgroundStyle) Util.getEnumValue(prefGraphBgStyle,
-            TourChartConfiguration.GRAPH_BACKGROUND_STYLE_DEFAULT);
+// SET_FORMATTING_OFF
 
-      final boolean prefShow_HrZone = GraphBackgroundSource.HR_ZONE.name().equals(prefGraphBgSource);
-      final boolean prefShow_SwimStyle = GraphBackgroundSource.SWIMMING_STYLE.name().equals(prefGraphBgSource);
+      final String prefGraphBgSource   = _prefStore.getString(ITourbookPreferences.GRAPH_BACKGROUND_SOURCE);
+      final String prefGraphBgStyle    = _prefStore.getString(ITourbookPreferences.GRAPH_BACKGROUND_STYLE);
 
-      // check if data are available for the requested background source
-      if (prefShow_HrZone) {
+      GraphBackgroundSource graphBgSource       = (GraphBackgroundSource) Util.getEnumValue(prefGraphBgSource, TourChartConfiguration.GRAPH_BACKGROUND_SOURCE_DEFAULT);
+      final GraphBackgroundStyle graphBgStyle   = (GraphBackgroundStyle)  Util.getEnumValue(prefGraphBgStyle,  TourChartConfiguration.GRAPH_BACKGROUND_STYLE_DEFAULT);
 
-         if (canShowBackground_HrZones == false) {
+      final boolean prefIsShow_HrZone           = GraphBackgroundSource.HR_ZONE.name().equals(prefGraphBgSource);
+      final boolean prefIsShow_SwimStyle        = GraphBackgroundSource.SWIMMING_STYLE.name().equals(prefGraphBgSource);
+
+// SET_FORMATTING_ON
+
+      if (canShowBackground_InterpolatedValues) {
+
+         // interpolated values are forced to be displayed when available
+
+         graphBgSource = GraphBackgroundSource.INTERPOLATED_VALUES;
+
+      } else {
+
+         // check if data are available for the requested background source
+         if (prefIsShow_HrZone && canShowBackground_HrZones == false) {
 
             // hr zones cannot be displayed -> show default
             graphBgSource = GraphBackgroundSource.DEFAULT;
+
+         } else if (prefIsShow_SwimStyle && canShowBackground_SwimStyle == false) {
+
+            // swimming style cannot be displayed -> show default
+            graphBgSource = GraphBackgroundSource.DEFAULT;
          }
-
-      } else if (prefShow_SwimStyle && canShowBackground_SwimStyle == false) {
-
-         // swimming style cannot be displayed -> show default
-         graphBgSource = GraphBackgroundSource.DEFAULT;
       }
 
       tcc.graphBackground_Source = graphBgSource;
       tcc.graphBackground_Style = graphBgStyle;
 
-      final boolean isHrZoneDisplayed = canShowBackground_HrZones && tcc.isBackgroundStyle_HrZone();
-      final boolean isSwimStyleDisplayed = canShowBackground_SwimStyle && tcc.isBackgroundStyle_SwimmingStyle();
-      final boolean useCustomBackground = isHrZoneDisplayed || isSwimStyleDisplayed;
-
 // SET_FORMATTING_OFF
+
+      final boolean isHrZoneDisplayed              = canShowBackground_HrZones            && tcc.isBackgroundStyle_HrZone();
+      final boolean isInterpolatedValueDisplayed   = canShowBackground_InterpolatedValues;
+      final boolean isSwimStyleDisplayed           = canShowBackground_SwimStyle          && tcc.isBackgroundStyle_SwimmingStyle();
+      final boolean useCustomBackground            = isHrZoneDisplayed || isInterpolatedValueDisplayed || isSwimStyleDisplayed;
 
       final ChartDataYSerie yDataElevation         = createModelData_Elevation(        tourData, chartDataModel, chartType, useCustomBackground, tcc);
       final ChartDataYSerie yDataPulse             = createModelData_Heartbeat(        tourData, chartDataModel, chartType, useCustomBackground, tcc, isShowTimeOnXAxis);
@@ -6478,9 +6489,9 @@ public class TourManager {
 
       // notify listener to reload the tours
       /*
-       * !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! this is not
-       * working because the tour data editor does not reload the tour
-       * !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+       * !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+       * this is not working because the tour data editor does not reload the tour
+       * !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
        */
 //      fireEvent(TourEventId.TOUR_CHANGED, new TourEvent(modifiedTour));
    }

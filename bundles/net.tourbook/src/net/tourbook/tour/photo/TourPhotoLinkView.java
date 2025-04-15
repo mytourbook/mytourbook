@@ -48,6 +48,7 @@ import net.tourbook.data.TourData;
 import net.tourbook.data.TourPhoto;
 import net.tourbook.photo.Camera;
 import net.tourbook.photo.Photo;
+import net.tourbook.photo.PhotoCache;
 import net.tourbook.photo.PhotoEventId;
 import net.tourbook.photo.PhotoManager;
 import net.tourbook.photo.PhotoSelection;
@@ -535,11 +536,12 @@ public class TourPhotoLinkView extends ViewPart implements ITourProvider, ITourV
                            tourPhoto = new TourPhoto(tourData, galleryPhoto);
                         }
 
+                        final double linkLatitude = galleryPhoto.getLinkLatitude();
+                        final double linkLongitude = galleryPhoto.getLinkLongitude();
+
                         // set adjusted time / geo location
                         tourPhoto.setAdjustedTime(galleryPhoto.adjustedTime_Camera);
-                        tourPhoto.setGeoLocation(
-                              galleryPhoto.getLinkLatitude(),
-                              galleryPhoto.getLinkLongitude());
+                        tourPhoto.setGeoLocation(linkLatitude, linkLongitude);
 
                         allNewTourPhotos.add(tourPhoto);
 

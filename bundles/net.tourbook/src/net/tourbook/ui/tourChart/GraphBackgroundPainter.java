@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2025 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -23,6 +23,7 @@ import net.tourbook.chart.Chart;
 import net.tourbook.chart.ChartDataModel;
 import net.tourbook.chart.GraphDrawingData;
 import net.tourbook.chart.IFillPainter;
+import net.tourbook.common.UI;
 import net.tourbook.common.swimming.SwimStroke;
 import net.tourbook.common.swimming.SwimStrokeManager;
 import net.tourbook.data.HrZoneContext;
@@ -32,21 +33,20 @@ import net.tourbook.data.TourPersonHRZone;
 import net.tourbook.tour.TourManager;
 import net.tourbook.training.TrainingManager;
 
-import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.RGB;
-import org.eclipse.swt.widgets.Display;
 
 /**
- * Draws background color into the graph, e.g. HR zone, swim style
+ * Draws background color into the graph, e.g. HR zone, swim style, interpolated values
  */
 public class GraphBackgroundPainter implements IFillPainter {
 
+   private Color[]               _interpolated_Colors;
    private Color[]               _hrZone_Colors;
    private HashMap<Short, Color> _strokeStyle_Colors;
 
-   private void createColors_HrZone(final GC gcGraph, final TourPerson tourPerson) {
+   private void createColors_HrZone(final TourPerson tourPerson) {
 
       final ArrayList<TourPersonHRZone> personHrZones = tourPerson.getHrZonesSorted();
 
@@ -61,7 +61,16 @@ public class GraphBackgroundPainter implements IFillPainter {
       }
    }
 
-   private void createColors_SwimStyle(final GC gcGraph) {
+   private void createColors_InterpolatedValues() {
+
+      _interpolated_Colors = new Color[] {
+
+            new Color(0xff, 0x80, 0), // not interpolated
+            new Color(0xff, 0xff, 0xff) // interpolated
+      };
+   }
+
+   private void createColors_SwimStyle() {
 
       _strokeStyle_Colors = new HashMap<>();
 
@@ -85,6 +94,7 @@ public class GraphBackgroundPainter implements IFillPainter {
       final TourChartConfiguration tcc = (TourChartConfiguration) dataModel.getCustomData(TourManager.CUSTOM_DATA_TOUR_CHART_CONFIGURATION);
 
       final boolean useGraphBgStyle_HrZone = tcc.isBackgroundStyle_HrZone();
+      final boolean useGraphBgStyle_InterpolatedValues = tcc.isBackgroundStyle_InterpolatedValues();
       final boolean useGraphBgStyle_SwimStyle = tcc.isBackgroundStyle_SwimmingStyle();
 
       HrZoneContext hrZoneContext = null;
@@ -112,11 +122,15 @@ public class GraphBackgroundPainter implements IFillPainter {
             return;
          }
 
-         createColors_HrZone(gcGraph, tourPerson);
+         createColors_HrZone(tourPerson);
 
       } else if (useGraphBgStyle_SwimStyle) {
 
-         createColors_SwimStyle(gcGraph);
+         createColors_SwimStyle();
+
+      } else if (useGraphBgStyle_InterpolatedValues) {
+
+         createColors_InterpolatedValues();
       }
 
       boolean isGradient = false;
@@ -155,7 +169,7 @@ public class GraphBackgroundPainter implements IFillPainter {
       }
 
       if (isWhite) {
-         gcGraph.setForeground(Display.getCurrent().getSystemColor(SWT.COLOR_WHITE));
+         gcGraph.setForeground(UI.SYS_COLOR_WHITE);
       }
 
       final int devCanvasHeight = graphDrawingData.devGraphHeight;
@@ -210,6 +224,49 @@ public class GraphBackgroundPainter implements IFillPainter {
             }
          }
 
+      } else if (useGraphBgStyle_InterpolatedValues) {
+
+         final boolean[] dataSerie = tourData.interpolatedValueSerie;
+
+         boolean prevValue = dataSerie[xPos_FirstIndex];
+
+         for (int valueIndex = xPos_FirstIndex + 1; valueIndex <= xPos_LastIndex; valueIndex++) {
+
+            final long devXCurrent = devXPositions[valueIndex];
+            final boolean isLastIndex = valueIndex == xPos_LastIndex;
+
+            // ignore same position
+            if (devXCurrent == devXPrev && isLastIndex == false) {
+               continue;
+            }
+
+            // check if stroke style has changed
+            final boolean currentValue = dataSerie[valueIndex];
+            if (currentValue == prevValue && isLastIndex == false) {
+               continue;
+            }
+
+            final int devWidth = (int) (devXCurrent - devXStart);
+
+            final Color color = _interpolated_Colors[prevValue ? 1 : 0];
+
+            if (isBgColor) {
+               gcGraph.setBackground(color);
+            } else {
+               gcGraph.setForeground(color);
+            }
+
+            if (isGradient) {
+               gcGraph.fillGradientRectangle((int) devXStart, 0, devWidth, devCanvasHeight, true);
+            } else {
+               gcGraph.fillRectangle((int) devXStart, 0, devWidth, devCanvasHeight);
+            }
+
+            // set start for the next stroke
+            devXStart = devXCurrent;
+            prevValue = currentValue;
+         }
+
       } else if (useGraphBgStyle_SwimStyle) {
 
          final float[] allStrokeStyles = tourData.getSwim_StrokeStyle();
@@ -254,7 +311,7 @@ public class GraphBackgroundPainter implements IFillPainter {
                }
             }
 
-            // set start for the next HR zone
+            // set start for the next stroke
             devXStart = devXCurrent;
             prevStrokeStyle = currentStrokeStyle;
          }

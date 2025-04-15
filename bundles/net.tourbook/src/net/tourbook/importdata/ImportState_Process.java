@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2021 Wolfgang Schramm and Contributors
+ * Copyright (C) 2021, 2025 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -70,6 +70,13 @@ public class ImportState_Process {
     * <code>false</code>
     */
    private boolean                                 isJUnitTest;
+
+   /**
+    * IN state:
+    * <p>
+    * Is <code>true</code> when interpolation should be skipped for lat/lon values
+    */
+   private boolean                                 isSkipGeoInterpolation;
 
    /**
     * INTERNAL state:
@@ -191,6 +198,10 @@ public class ImportState_Process {
       return isSilentError;
    }
 
+   public boolean isSkipGeoInterpolation() {
+      return isSkipGeoInterpolation;
+   }
+
    public boolean isSkipToursWithFileNotFound() {
       return isSkipToursWithFileNotFound;
    }
@@ -219,6 +230,7 @@ public class ImportState_Process {
     * IN state:
     *
     * @param isEasyImport
+    *
     * @return
     */
    public ImportState_Process setIsEasyImport(final boolean isEasyImport) {
@@ -232,6 +244,7 @@ public class ImportState_Process {
     * IN state:
     *
     * @param isTest
+    *
     * @return
     */
    public ImportState_Process setIsJUnitTest(final boolean isTest) {
@@ -245,6 +258,7 @@ public class ImportState_Process {
     * IN state:
     *
     * @param isLog
+    *
     * @return
     */
    public ImportState_Process setIsLog_DEFAULT(final boolean isLog) {
@@ -258,6 +272,7 @@ public class ImportState_Process {
     * IN state:
     *
     * @param isLog
+    *
     * @return
     */
    public ImportState_Process setIsLog_INFO(final boolean isLog) {
@@ -271,6 +286,7 @@ public class ImportState_Process {
     * IN state:
     *
     * @param isLog
+    *
     * @return
     */
    public ImportState_Process setIsLog_OK(final boolean isLog) {
@@ -284,6 +300,7 @@ public class ImportState_Process {
     * IN state:
     *
     * @param isSilentError
+    *
     * @return
     */
    public ImportState_Process setIsSilentError(final boolean isSilentError) {
@@ -293,10 +310,16 @@ public class ImportState_Process {
       return this;
    }
 
+   public void setIsSkipGeoInterpolation(final boolean isSkipGeoInterpolation) {
+
+      this.isSkipGeoInterpolation = isSkipGeoInterpolation;
+   }
+
    /**
     * IN state:
     *
     * @param isSkipToursWithFileNotFound
+    *
     * @return
     */
    public ImportState_Process setIsSkipToursWithFileNotFound(final boolean isSkipToursWithFileNotFound) {

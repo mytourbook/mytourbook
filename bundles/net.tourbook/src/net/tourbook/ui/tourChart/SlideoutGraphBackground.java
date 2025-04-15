@@ -315,7 +315,6 @@ public class SlideoutGraphBackground extends ToolbarSlideout implements IActionR
                _comboGraphBgSource.add(bgSourceType.label);
             }
          }
-
       }
 
       for (final GraphBgStyleType bgStyleType : TourChartConfiguration.GRAPH_BACKGROUND_STYLE_TYPE) {

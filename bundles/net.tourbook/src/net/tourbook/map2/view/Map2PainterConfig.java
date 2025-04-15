@@ -145,7 +145,9 @@ public class Map2PainterConfig {
     * @param isShowPhoto
     * @param isLinkPhoto
     */
-   public static void setPhotos(final ArrayList<Photo> allPhotos, final boolean isShowPhoto, final boolean isLinkPhoto) {
+   public static void setPhotos(final ArrayList<Photo> allPhotos,
+                                final boolean isShowPhoto,
+                                final boolean isLinkPhoto) {
 
       _allPhotos.clear();
 

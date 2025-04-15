@@ -12,6 +12,9 @@ New
     - Display tour markers with different colors
     - Filter tour markers  
 
+* 2D Map
+  - Customize interpolated geo positions
+    https://github.com/mytourbook/mytourbook/issues/1475
 
 Improvements
 ============

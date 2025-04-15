@@ -88,6 +88,7 @@ import net.tourbook.common.util.Util;
 import net.tourbook.common.weather.IWeather;
 import net.tourbook.database.FIELD_VALIDATION;
 import net.tourbook.database.TourDatabase;
+import net.tourbook.importdata.ImportState_Process;
 import net.tourbook.importdata.RawDataManager;
 import net.tourbook.importdata.TourbookDevice;
 import net.tourbook.math.Smooth;
@@ -2091,6 +2092,12 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
    @Transient
    private List<TourPause>    _allTourPauses;
 
+   /**
+    * When a value is <code>true</code> then this value is interpolated
+    */
+   @Transient
+   public boolean[]            interpolatedValueSerie;
+
 
 // SET_FORMATTING_ON
 
@@ -2151,8 +2158,10 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
 
    /**
     * Removed data series when the sum of all values is 0.
+    *
+    * @param importState_Process
     */
-   public void cleanupDataSeries() {
+   public void cleanupDataSeries(final ImportState_Process importState_Process) {
 
       if (timeSerie == null) {
          return;
@@ -2251,12 +2260,19 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
             final double latitude = latitudeSerie[serieIndex];
             final double longitude = longitudeSerie[serieIndex];
 
-            if ((latitude == Double.MIN_VALUE) || (longitude == Double.MIN_VALUE)) {
-               latitudeSerie[serieIndex] = lastValidLatitude;
-               longitudeSerie[serieIndex] = lastValidLongitude;
+            if (importState_Process != null && importState_Process.isSkipGeoInterpolation()) {
+
+               // skip geo interpolation
+
             } else {
-               latitudeSerie[serieIndex] = lastValidLatitude = latitude;
-               longitudeSerie[serieIndex] = lastValidLongitude = longitude;
+
+               if ((latitude == Double.MIN_VALUE) || (longitude == Double.MIN_VALUE)) {
+                  latitudeSerie[serieIndex] = lastValidLatitude;
+                  longitudeSerie[serieIndex] = lastValidLongitude;
+               } else {
+                  latitudeSerie[serieIndex] = lastValidLatitude = latitude;
+                  longitudeSerie[serieIndex] = lastValidLongitude = longitude;
+               }
             }
 
             // optimized performance for Math.min/max
@@ -7356,6 +7372,13 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
     */
    public void createTimeSeries(final List<TimeData> timeDataList, final boolean isCreateMarker) {
 
+      createTimeSeries(timeDataList, isCreateMarker, null);
+   }
+
+   public void createTimeSeries(final List<TimeData> timeDataList,
+                                final boolean isCreateMarker,
+                                final ImportState_Process importState_Process) {
+
       final int serieSize = timeDataList.size();
       if (serieSize == 0) {
          return;
@@ -7645,7 +7668,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
          }
       }
 
-      createTimeSeries_10_DataCompleting();
+      createTimeSeries_10_InterpolateMissingValues(importState_Process);
       createTimeSeries_50_PulseTimes(timeDataSerie);
 
       tourDistance = isDistance ? distanceSerie[serieSize - 1] : 0;
@@ -7657,7 +7680,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
          setGears(gearSerie);
       }
 
-      cleanupDataSeries();
+      cleanupDataSeries(importState_Process);
 
       /*
        * Try to get distance values from lat/long values, this must be done after the cleanup which
@@ -7713,20 +7736,29 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
    }
 
    /**
-    * Interpolations of missing data
+    * Interpolate missing values
+    *
+    * @param importState_Process
     */
-   private void createTimeSeries_10_DataCompleting() {
+   private void createTimeSeries_10_InterpolateMissingValues(final ImportState_Process importState_Process) {
 
       createTimeSeries_12_RemoveInvalidDistanceValues();
       createTimeSeries_14_RemoveInvalidDistanceValues();
 
-      createTimeSeries_20_data_completing(latitudeSerie, timeSerie);
-      createTimeSeries_20_data_completing(longitudeSerie, timeSerie);
+      if (importState_Process != null && importState_Process.isSkipGeoInterpolation()) {
 
-      createTimeSeries_30_data_completing(altitudeSerie, timeSerie);
-      createTimeSeries_30_data_completing(distanceSerie, timeSerie);
-      createTimeSeries_30_data_completing(temperatureSerie, timeSerie);
-      createTimeSeries_30_data_completing(pulseSerie, timeSerie);
+         // skip lat/lon interpolation
+
+      } else {
+
+         createTimeSeries_20_InterpolateMissingValues(latitudeSerie, timeSerie, true);
+         createTimeSeries_20_InterpolateMissingValues(longitudeSerie, timeSerie, false);
+      }
+
+      createTimeSeries_30_InterpolateMissingValues(altitudeSerie, timeSerie);
+      createTimeSeries_30_InterpolateMissingValues(distanceSerie, timeSerie);
+      createTimeSeries_30_InterpolateMissingValues(temperatureSerie, timeSerie);
+      createTimeSeries_30_InterpolateMissingValues(pulseSerie, timeSerie);
    }
 
    private void createTimeSeries_12_RemoveInvalidDistanceValues() {
@@ -7798,54 +7830,64 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
       }
    }
 
-   private void createTimeSeries_20_data_completing(final double[] field, final int[] time) {
+   public void createTimeSeries_20_InterpolateMissingValues(final double[] allTourValues,
+                                                            final int[] time,
+                                                            final boolean isLogInterpolatedValues) {
 
-      if (field == null) {
+      if (allTourValues == null) {
          return;
       }
 
-      final int size = time.length;
+      final int numTimeSlices = time.length;
 
-      for (int serieIndex = 0; serieIndex < size; serieIndex++) {
+      if (isLogInterpolatedValues) {
+         interpolatedValueSerie = new boolean[numTimeSlices];
+      }
 
-         if (field[serieIndex] == Double.MIN_VALUE) {
+      for (int serieIndex = 0; serieIndex < numTimeSlices; serieIndex++) {
+
+         if (allTourValues[serieIndex] == Double.MIN_VALUE) {
 
             // search forward to the next valid data
             int invalidIndex = serieIndex;
-            while (field[invalidIndex] == Double.MIN_VALUE && invalidIndex < size - 1) {
+            while (allTourValues[invalidIndex] == Double.MIN_VALUE && invalidIndex < numTimeSlices - 1) {
                invalidIndex++;
             }
 
             final int nextValidIndex = invalidIndex;
 
-            if (field[nextValidIndex] == Double.MIN_VALUE) {
+            if (allTourValues[nextValidIndex] == Double.MIN_VALUE) {
 
                double lastValidValue;
                if (serieIndex - 1 < 0) {
                   // ??????????????????
                   lastValidValue = 0;
                } else {
-                  lastValidValue = field[serieIndex - 1];
+                  lastValidValue = allTourValues[serieIndex - 1];
                }
 
-               field[nextValidIndex] = lastValidValue;
+               allTourValues[nextValidIndex] = lastValidValue;
             }
 
             final int time1 = time[serieIndex - 1];
             final int time2 = time[nextValidIndex];
-            final double val1 = field[serieIndex - 1];
-            final double val2 = field[nextValidIndex];
+            final double val1 = allTourValues[serieIndex - 1];
+            final double val2 = allTourValues[nextValidIndex];
 
             for (int interpolationIndex = serieIndex; interpolationIndex < nextValidIndex; interpolationIndex++) {
 
-               final double interpolationValue = createTimeSeries_40_linear_interpolation(
+               final double interpolationValue = createTimeSeries_40_LinearInterpolation(
                      time1,
                      time2,
                      val1,
                      val2,
                      time[interpolationIndex]);
 
-               field[interpolationIndex] = interpolationValue;
+               allTourValues[interpolationIndex] = interpolationValue;
+
+               if (isLogInterpolatedValues) {
+                  interpolatedValueSerie[interpolationIndex] = true;
+               }
             }
 
             serieIndex = nextValidIndex - 1;
@@ -7853,7 +7895,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
       }
    }
 
-   private void createTimeSeries_30_data_completing(final float[] field, final int[] time) {
+   private void createTimeSeries_30_InterpolateMissingValues(final float[] field, final int[] time) {
 
       if (field == null) {
          return;
@@ -7877,7 +7919,6 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
 
                float lastValidValue;
                if (serieIndex - 1 < 0) {
-                  // ??????????????????
                   lastValidValue = 0;
                } else {
                   lastValidValue = field[serieIndex - 1];
@@ -7895,7 +7936,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
 
             for (int interpolationIndex = serieIndex; interpolationIndex < nextValidIndex; interpolationIndex++) {
 
-               final double linearInterpolation = createTimeSeries_40_linear_interpolation(
+               final double linearInterpolation = createTimeSeries_40_LinearInterpolation(
                      time1,
                      time2,
                      val1,
@@ -7910,14 +7951,17 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
       }
    }
 
-   private double createTimeSeries_40_linear_interpolation(final double time1,
-                                                           final double time2,
-                                                           final double val1,
-                                                           final double val2,
-                                                           final double time) {
+   private double createTimeSeries_40_LinearInterpolation(final double time1,
+                                                          final double time2,
+                                                          final double val1,
+                                                          final double val2,
+                                                          final double time) {
       if (time2 == time1) {
+
          return ((val1 + val2) / 2.);
+
       } else {
+
          return (val1 + (val2 - val1) / (time2 - time1) * (time - time1));
       }
    }

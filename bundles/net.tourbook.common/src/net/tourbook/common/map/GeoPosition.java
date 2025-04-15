@@ -33,6 +33,11 @@ public class GeoPosition implements Serializable {
    public double             longitude;
 
    /**
+    * This contructor is needed for the JSON parser
+    */
+   public GeoPosition() {}
+
+   /**
     * Creates a new instance of GeoPosition from the specified latitude and longitude. These are
     * double values in decimal degrees, not degrees, minutes, and seconds. Use the other
     * constructor for those.
