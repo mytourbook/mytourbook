@@ -657,18 +657,34 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
    private void createOrEditCustomTourNutritionProduct(final boolean isEditMode,
                                                        final TourNutritionProduct product) {
 
-      final DialogCustomTourNutritionProduct dialogTourNutritionProduct = new DialogCustomTourNutritionProduct(Display.getCurrent()
-            .getActiveShell(), isEditMode, product);
+      final DialogCustomTourNutritionProduct dialogTourNutritionProduct =
+            new DialogCustomTourNutritionProduct(
+                  Display.getCurrent().getActiveShell(),
+                  isEditMode,
+                  product);
 
       if (dialogTourNutritionProduct.open() != Window.OK) {
          return;
       }
 
-      final Set<TourNutritionProduct> tourNutritionProducts = _tourData.getTourNutritionProducts();
-      tourNutritionProducts.add(dialogTourNutritionProduct.getTourNutritionProduct(_tourData));
-      _tourData.setTourNutritionProducts(tourNutritionProducts);
-      _tourData = TourManager.saveModifiedTour(_tourData);
-      _tourData.setTourNutritionProducts(_tourData.getTourNutritionProducts());
+      if (isEditMode) {
+
+         // update product
+         final TourNutritionProduct updatedProduct = dialogTourNutritionProduct.getTourNutritionProduct(_tourData);
+         _tourData.getTourNutritionProducts().remove(product);
+         _tourData.getTourNutritionProducts().add(updatedProduct);
+
+         reloadViewer();
+
+      } else {
+
+         // add new product
+         final Set<TourNutritionProduct> tourNutritionProducts = _tourData.getTourNutritionProducts();
+         tourNutritionProducts.add(dialogTourNutritionProduct.getTourNutritionProduct(_tourData));
+         _tourData.setTourNutritionProducts(tourNutritionProducts);
+         _tourData = TourManager.saveModifiedTour(_tourData);
+         _tourData.setTourNutritionProducts(_tourData.getTourNutritionProducts());
+      }
    }
 
    @Override

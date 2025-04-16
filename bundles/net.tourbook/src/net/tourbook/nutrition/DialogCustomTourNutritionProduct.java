@@ -51,21 +51,21 @@ public class DialogCustomTourNutritionProduct extends Dialog {
    /*
     * UI controls
     */
-   private boolean        _isInUIInit;
-   private boolean        _isEditMode;
-   private PixelConverter _pc;
+   private boolean              _isInUIInit;
+   private boolean              _isEditMode;
+   private PixelConverter       _pc;
 
-   private Button         _checkIsBeverage;
+   private Button               _checkIsBeverage;
 
    private TourNutritionProduct _product;
 
-   private Spinner        _spinnerNumServings;
-   private Spinner        _spinnerBeverageQuantity;
+   private Spinner              _spinnerNumServings;
+   private Spinner              _spinnerBeverageQuantity;
 
-   private Text           _txtCalories;
-   private Text           _txtCarbohydrates;
-   private Text           _txtName;
-   private Text           _txtSodium;
+   private Text                 _txtCalories;
+   private Text                 _txtCarbohydrates;
+   private Text                 _txtName;
+   private Text                 _txtSodium;
 
    public DialogCustomTourNutritionProduct(final Shell parentShell,
                                            final boolean isEditMode,
@@ -141,11 +141,11 @@ public class DialogCustomTourNutritionProduct extends Dialog {
             });
             GridDataFactory.fillDefaults().hint(_pc.convertWidthInCharsToPixels(5), SWT.DEFAULT).span(2, 1).align(SWT.BEGINNING, SWT.CENTER).applyTo(
                   _spinnerNumServings);
-//            if (_isEditMode) {
-//               _spinnerNumServings.setSelection(_product.getQuantityType() == QuantityType.Servings
-//                     ? 100
-//                     : _product.get() * 100);
-//            }
+            if (_isEditMode) {
+               _spinnerNumServings.setSelection(_product.getQuantityType() == QuantityType.Servings
+                     ? 100
+                     : (_product.getCalories() / _product.getCalories_Serving()) * 100);
+            }
          }
          {
             // Label: calories
@@ -231,6 +231,7 @@ public class DialogCustomTourNutritionProduct extends Dialog {
                   .align(SWT.BEGINNING, SWT.CENTER)
                   .applyTo(_spinnerBeverageQuantity);
             if (_isEditMode) {
+               _spinnerBeverageQuantity.setEnabled(_product.isBeverage());
                _spinnerBeverageQuantity.setSelection(_product.getBeverageQuantity());
             }
 
