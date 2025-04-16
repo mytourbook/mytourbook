@@ -10973,7 +10973,6 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
       final int timeSerieLength = timeSerie.length;
       for (int index = 0; index < timeSerieLength; ++index) {
 
-         //todo fb support when multiple tours (cf. -0 below)
          final ZonedDateTime currentZonedDateTime = getTourStartTime().plusSeconds(timeSerie[index] - 0);
 
          //If the current time is in the next day, we need to recalculate the sunrise/sunset times for this new day.
