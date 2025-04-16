@@ -234,6 +234,7 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
    private Menu                      _tableContextMenu;
 
    private ActionDeleteProducts      _actionDeleteProducts;
+   private ActionEditCustomProduct   _actionEditCustomProduct;
    private ActionOpenProductsWebsite _actionOpenProductsWebsite;
 
    private class ActionDeleteProducts extends Action {
@@ -247,6 +248,20 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
       @Override
       public void run() {
          onDeleteProducts();
+      }
+   }
+
+   private class ActionEditCustomProduct extends Action {
+
+      public ActionEditCustomProduct() {
+
+         super(Messages.Tour_Nutrition_Button_EditCustomProduct, AS_PUSH_BUTTON);
+         setToolTipText(Messages.Tour_Nutrition_Button_EditCustomProduct_Tooltip);
+      }
+
+      @Override
+      public void run() {
+         //todo fb  onEditCustomProduct();
       }
    }
 
@@ -627,6 +642,7 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
    private void createActions() {
 
       _actionDeleteProducts = new ActionDeleteProducts();
+      _actionEditCustomProduct = new ActionEditCustomProduct();
       _actionOpenProductsWebsite = new ActionOpenProductsWebsite();
 
    }
@@ -1348,6 +1364,9 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
 
       _actionOpenProductsWebsite.setEnabled(selectedProductsCodes.size() > 0);
 
+      final List<TourNutritionProduct> selectedTourNutritionProducts = getSelectedProducts();
+      _actionEditCustomProduct.setEnabled(selectedTourNutritionProducts.size() == 1 &&
+            selectedTourNutritionProducts.stream().anyMatch(TourNutritionProduct::isCustomProduct));
    }
 
    private void enableControls() {
@@ -1370,7 +1389,7 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
 
       _actionOpenProductsWebsite.setTourNutritionProducts(getSelectedProductsCodes());
       menuMgr.add(_actionOpenProductsWebsite);
-
+      menuMgr.add(_actionEditCustomProduct);
       menuMgr.add(_actionDeleteProducts);
 
       //todo fb add the recent tour nutrition products when not selecting existing products
@@ -1642,11 +1661,11 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
 
       if (tourNutritionProductsUpdated) {
 
-      _tourData = TourManager.saveModifiedTour(_tourData);
-      reloadViewer();
-   } else {
-      TourLogManager.subLog_INFO(Messages.Log_ModifiedTour_No_New_Data);
-   }
+         _tourData = TourManager.saveModifiedTour(_tourData);
+         reloadViewer();
+      } else {
+         TourLogManager.subLog_INFO(Messages.Log_ModifiedTour_No_New_Data);
+      }
 
    }
 
