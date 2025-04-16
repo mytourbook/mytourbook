@@ -142,9 +142,8 @@ public class DialogCustomTourNutritionProduct extends Dialog {
             GridDataFactory.fillDefaults().hint(_pc.convertWidthInCharsToPixels(5), SWT.DEFAULT).span(2, 1).align(SWT.BEGINNING, SWT.CENTER).applyTo(
                   _spinnerNumServings);
             if (_isEditMode) {
-               _spinnerNumServings.setSelection(_product.getQuantityType() == QuantityType.Servings
-                     ? 100
-                     : (_product.getCalories() / _product.getCalories_Serving()) * 100);
+               final int numServings = Math.floorDiv(_product.getCalories(), _product.getCalories_Serving());
+               _spinnerNumServings.setSelection(numServings * 100);
             }
          }
          {
