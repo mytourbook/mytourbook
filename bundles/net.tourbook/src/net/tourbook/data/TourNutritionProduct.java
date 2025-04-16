@@ -452,8 +452,10 @@ public class TourNutritionProduct {
     *
     * @param updatedProduct
     *           The updated product information.
+    *
+    * @return
     */
-   void updateProductInfo(final TourNutritionProduct updatedProduct) {
+   boolean updateProductInfo(final TourNutritionProduct updatedProduct) {
 
       final List<String> previousData = new ArrayList<>();
       final List<String> newData = new ArrayList<>();
@@ -510,7 +512,8 @@ public class TourNutritionProduct {
       }
 
       if (previousData.isEmpty() && newData.isEmpty()) {
-         return;
+
+         return false;
       }
 
       final String previousDataJoined = StringUtils
@@ -525,5 +528,7 @@ public class TourNutritionProduct {
                         Messages.Log_ModifiedTour_Old_Data_Vs_New_Data,
                         previousDataJoined,
                         newDataJoined));
+
+      return true;
    }
 }

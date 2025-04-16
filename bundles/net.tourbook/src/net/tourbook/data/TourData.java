@@ -14096,22 +14096,33 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
       }
    }
 
-   public void updateTourNutritionProducts(final Set<TourNutritionProduct> updatedTourNutritionProducts) {
+   public boolean updateTourNutritionProducts(final Set<TourNutritionProduct> updatedTourNutritionProducts) {
+
+      boolean tourNutritionProductsUpdated = false;
 
       if (tourNutritionProducts == null || updatedTourNutritionProducts == null) {
-         return;
+
+         return tourNutritionProductsUpdated;
       }
 
       // Map existing products by their unique identifier (barcode)
       final Map<String, TourNutritionProduct> existingProductsMap = tourNutritionProducts.stream()
             .filter(product -> StringUtils.hasContent(product.getProductCode()))
-            .collect(Collectors.toMap(TourNutritionProduct::getProductCode, product -> product));
+            .collect(Collectors.toMap(
+                  TourNutritionProduct::getProductCode,
+                  product -> product,
+                  (existing, duplicate) -> existing // Keep the first product and ignore duplicates
+            ));
 
       for (final TourNutritionProduct updatedProduct : updatedTourNutritionProducts) {
 
          final TourNutritionProduct existingProduct = existingProductsMap.get(updatedProduct.getProductCode());
 
-         existingProduct.updateProductInfo(updatedProduct);
+         if (existingProduct.updateProductInfo(updatedProduct)) {
+            tourNutritionProductsUpdated = true;
+         }
       }
+
+      return tourNutritionProductsUpdated;
    }
 }

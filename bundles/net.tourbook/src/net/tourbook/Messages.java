@@ -1364,6 +1364,7 @@ public class Messages extends NLS {
    public static String        Log_Import_Tour_Imported;
    public static String        Log_ModifiedTour_Combined_Values;
    public static String        Log_ModifiedTour_Old_Data_Vs_New_Data;
+   public static String        Log_ModifiedTour_No_New_Data;
    public static String        Log_Reimport_ManualTour;
    public static String        Log_Reimport_PreviousFiles;
    public static String        Log_Reimport_PreviousFiles_End;
