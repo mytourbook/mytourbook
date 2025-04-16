@@ -445,10 +445,11 @@ public class TourNutritionProduct {
    }
 
    /**
-    * Updates the product information with the new values.
+    * Updates the product information with the new values, if any.
     * <p>
-    * The method compares the existing product information with the updated product information
-    * and updates the fields accordingly. It also logs the changes made to the product information.
+    * The method compares the existing product information with the
+    * updated product information and updates the fields accordingly. It also
+    * logs the changes made to the product information.
     *
     * @param updatedProduct
     *           The updated product information.
@@ -523,7 +524,7 @@ public class TourNutritionProduct {
             .join(newData.stream().toArray(String[]::new), UI.COMMA_SPACE);
 
       TourLogManager.subLog_INFO(
-            this.getName() + UI.SPACE + "→" + UI.SPACE +
+            this.getName() + UI.SPACE + "→" + UI.SPACE + //$NON-NLS-1$
                   NLS.bind(
                         Messages.Log_ModifiedTour_Old_Data_Vs_New_Data,
                         previousDataJoined,
