@@ -52,9 +52,12 @@ public class DialogCustomTourNutritionProduct extends Dialog {
     * UI controls
     */
    private boolean        _isInUIInit;
+   private boolean        _isEditMode;
    private PixelConverter _pc;
 
    private Button         _checkIsBeverage;
+
+   private TourNutritionProduct _product;
 
    private Spinner        _spinnerNumServings;
    private Spinner        _spinnerBeverageQuantity;
@@ -64,8 +67,13 @@ public class DialogCustomTourNutritionProduct extends Dialog {
    private Text           _txtName;
    private Text           _txtSodium;
 
-   public DialogCustomTourNutritionProduct(final Shell parentShell) {
+   public DialogCustomTourNutritionProduct(final Shell parentShell,
+                                           final boolean isEditMode,
+                                           final TourNutritionProduct product) {
+
       super(parentShell);
+      _isEditMode = isEditMode;
+      _product = product;
    }
 
    @Override
@@ -73,7 +81,9 @@ public class DialogCustomTourNutritionProduct extends Dialog {
 
       super.create();
 
-      getShell().setText(Messages.Dialog_CustomTourNutritionProduct_Title);
+      getShell().setText(_isEditMode
+            ? Messages.Dialog_CustomTourNutritionProduct_Title
+            : Messages.Dialog_EditCustomTourNutritionProduct_Title);
 
       validateFields();
    }
@@ -111,6 +121,9 @@ public class DialogCustomTourNutritionProduct extends Dialog {
                   .span(2, 1)
                   .align(SWT.BEGINNING, SWT.CENTER)
                   .applyTo(_txtName);
+            if (_isEditMode) {
+               _txtName.setText(_product.getName());
+            }
          }
          {
             // Label: number of servings
@@ -128,6 +141,11 @@ public class DialogCustomTourNutritionProduct extends Dialog {
             });
             GridDataFactory.fillDefaults().hint(_pc.convertWidthInCharsToPixels(5), SWT.DEFAULT).span(2, 1).align(SWT.BEGINNING, SWT.CENTER).applyTo(
                   _spinnerNumServings);
+//            if (_isEditMode) {
+//               _spinnerNumServings.setSelection(_product.getQuantityType() == QuantityType.Servings
+//                     ? 100
+//                     : _product.get() * 100);
+//            }
          }
          {
             // Label: calories
@@ -141,6 +159,9 @@ public class DialogCustomTourNutritionProduct extends Dialog {
 
             // Unit: kcal
             UI.createLabel(container, net.tourbook.ui.Messages.Value_Unit_KCalories);
+            if (_isEditMode) {
+               _txtCalories.setText(String.valueOf(_product.getCalories()));
+            }
          }
          {
             // Label: carbohydrates
@@ -151,6 +172,9 @@ public class DialogCustomTourNutritionProduct extends Dialog {
                   .hint(HINT_TEXT_COLUMN_WIDTH, SWT.DEFAULT)
                   .align(SWT.BEGINNING, SWT.CENTER)
                   .applyTo(_txtCarbohydrates);
+            if (_isEditMode) {
+               _txtCarbohydrates.setText(String.valueOf(_product.getCarbohydrates()));
+            }
 
             // Unit: g
             UI.createLabel(container, UI.UNIT_WEIGHT_G);
@@ -165,6 +189,9 @@ public class DialogCustomTourNutritionProduct extends Dialog {
                   .hint(HINT_TEXT_COLUMN_WIDTH, SWT.DEFAULT)
                   .align(SWT.BEGINNING, SWT.CENTER)
                   .applyTo(_txtSodium);
+            if (_isEditMode) {
+               _txtSodium.setText(String.valueOf(_product.getSodium()));
+            }
 
             // Unit: mg
             UI.createLabel(container, UI.UNIT_WEIGHT_MG);
@@ -178,6 +205,9 @@ public class DialogCustomTourNutritionProduct extends Dialog {
                   .span(3, 1)
                   .align(SWT.BEGINNING, SWT.CENTER)
                   .applyTo(_checkIsBeverage);
+            if (_isEditMode) {
+               _checkIsBeverage.setSelection(_product.isBeverage());
+            }
          }
          {
             // Label: Beverage quantity
@@ -200,6 +230,9 @@ public class DialogCustomTourNutritionProduct extends Dialog {
                   .hint(_pc.convertWidthInCharsToPixels(5), SWT.DEFAULT)
                   .align(SWT.BEGINNING, SWT.CENTER)
                   .applyTo(_spinnerBeverageQuantity);
+            if (_isEditMode) {
+               _spinnerBeverageQuantity.setSelection(_product.getBeverageQuantity());
+            }
 
             // Unit: L
             UI.createLabel(container, UI.UNIT_FLUIDS_L);

@@ -566,6 +566,7 @@ public class Messages extends NLS {
    public static String        Dialog_DoubleClickAction_NoAction_Message;
    public static String        Dialog_DoubleClickAction_NoAction_Title;
 
+   public static String        Dialog_EditCustomTourNutritionProduct_Title;
    public static String        Dialog_EditTimeslicesValues_Area_Title;
    public static String        Dialog_EditTimeslicesValues_Checkbox_Altitude;
    public static String        Dialog_EditTimeslicesValues_Checkbox_Altitude_Tooltip;

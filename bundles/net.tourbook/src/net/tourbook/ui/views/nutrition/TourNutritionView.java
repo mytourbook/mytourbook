@@ -261,7 +261,7 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
 
       @Override
       public void run() {
-         //todo fb  onEditCustomProduct();
+         onEditCustomProduct();
       }
    }
 
@@ -654,6 +654,23 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
       _viewerMenuManager.addMenuListener(manager -> fillContextMenu(manager));
    }
 
+   private void createOrEditCustomTourNutritionProduct(final boolean isEditMode,
+                                                       final TourNutritionProduct product) {
+
+      final DialogCustomTourNutritionProduct dialogTourNutritionProduct = new DialogCustomTourNutritionProduct(Display.getCurrent()
+            .getActiveShell(), isEditMode, product);
+
+      if (dialogTourNutritionProduct.open() != Window.OK) {
+         return;
+      }
+
+      final Set<TourNutritionProduct> tourNutritionProducts = _tourData.getTourNutritionProducts();
+      tourNutritionProducts.add(dialogTourNutritionProduct.getTourNutritionProduct(_tourData));
+      _tourData.setTourNutritionProducts(tourNutritionProducts);
+      _tourData = TourManager.saveModifiedTour(_tourData);
+      _tourData.setTourNutritionProducts(_tourData.getTourNutritionProducts());
+   }
+
    @Override
    public void createPartControl(final Composite parent) {
 
@@ -855,22 +872,7 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
          final Button btnAddCustomProduct = new Button(container, SWT.NONE);
          btnAddCustomProduct.setText(Messages.Tour_Nutrition_Button_AddCustomProduct);
          btnAddCustomProduct.setToolTipText(Messages.Tour_Nutrition_Button_AddCustomProduct_Tooltip);
-         btnAddCustomProduct.addSelectionListener(widgetSelectedAdapter(selectionEvent -> {
-
-            final DialogCustomTourNutritionProduct dialogTourNutritionProduct = new DialogCustomTourNutritionProduct(Display.getCurrent()
-                  .getActiveShell());
-
-            if (dialogTourNutritionProduct.open() != Window.OK) {
-               return;
-            }
-
-            final Set<TourNutritionProduct> tourNutritionProducts = _tourData.getTourNutritionProducts();
-            tourNutritionProducts.add(dialogTourNutritionProduct.getTourNutritionProduct(_tourData));
-            _tourData.setTourNutritionProducts(tourNutritionProducts);
-            _tourData = TourManager.saveModifiedTour(_tourData);
-            _tourData.setTourNutritionProducts(_tourData.getTourNutritionProducts());
-
-         }));
+         btnAddCustomProduct.addSelectionListener(widgetSelectedAdapter(selectionEvent -> createOrEditCustomTourNutritionProduct(false, null)));
          btnAddCustomProduct.setImage(_imageAdd);
          GridDataFactory.fillDefaults().align(SWT.BEGINNING, SWT.CENTER).applyTo(btnAddCustomProduct);
 
@@ -1414,6 +1416,11 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
       return selectedTourNutritionProducts;
    }
 
+   @Override
+   public ColumnManager getColumnManager() {
+      return _columnManager;
+   }
+
 //   private List<String> getAllProducts() {
 //
 //      final List<TourNutritionProduct> selectedTourNutritionProducts = getSelectedProducts();
@@ -1430,11 +1437,6 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
 //
 //      return selectedTourNutritionProductsCodes;
 //   }
-
-   @Override
-   public ColumnManager getColumnManager() {
-      return _columnManager;
-   }
 
    private List<TourNutritionProduct> getSelectedProducts() {
 
@@ -1526,6 +1528,14 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
 
       _tourData.setTourNutritionProducts(tourNutritionProducts);
       _tourData = TourManager.saveModifiedTour(_tourData);
+   }
+
+   private void onEditCustomProduct() {
+
+      final TourNutritionProduct TourNutritionProduct =
+            getSelectedProducts().get(0);
+
+      createOrEditCustomTourNutritionProduct(true, TourNutritionProduct);
    }
 
    private void onOpenProductsWebsite() {
