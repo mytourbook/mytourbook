@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2024 Frédéric Bard
+ * Copyright (C) 2024, 2025 Frédéric Bard
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -109,6 +109,9 @@ public class TourNutritionViewTests extends UITest {
 
       // Make sure that the table now contains 4 products
       assertEquals(initialTableRowCount + 4, productsTable.rowCount());
+
+      // Act - Update all the products
+      bot.button(Messages.Tour_Nutrition_Button_UpdateProducts).click();
 
       // Act - Add a manual product
       bot.button(Messages.Tour_Nutrition_Button_AddCustomProduct).click();

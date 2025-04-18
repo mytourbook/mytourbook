@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2024 Frédéric Bard
+ * Copyright (C) 2024, 2025 Frédéric Bard
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -85,6 +85,15 @@ public class NutritionUtils {
       final String averageCaloriesPerHourFormatted = FormatManager.formatNumber_0(averageCaloriesPerHour);
 
       return averageCaloriesPerHourFormatted;
+   }
+
+   public static String computeAverageCarbohydratesPerHour(final TourData tourData) {
+
+      final int totalCarbohydrates = getTotalCarbohydrates(tourData.getTourNutritionProducts());
+      final float averageCarbohydratesPerHour = computeAveragePerHour(tourData, totalCarbohydrates);
+      final String averageCarbohydratesPerHourFormatted = FormatManager.formatNumber_0(averageCarbohydratesPerHour);
+
+      return averageCarbohydratesPerHourFormatted;
    }
 
    public static String computeAverageFluidsPerHour(final TourData tourData) {
@@ -179,6 +188,29 @@ public class NutritionUtils {
       return totalCalories;
    }
 
+   public static int getTotalCarbohydrates(final Set<TourNutritionProduct> tourNutritionProducts) {
+
+      int totalCarbohydrates = 0;
+
+      for (final TourNutritionProduct tourNutritionProduct : tourNutritionProducts) {
+
+         switch (tourNutritionProduct.getQuantityType()) {
+
+         case Servings:
+
+            totalCarbohydrates += tourNutritionProduct.getCarbohydrates_Serving() * tourNutritionProduct.getConsumedQuantity();
+            break;
+
+         case Products:
+
+            totalCarbohydrates += tourNutritionProduct.getCarbohydrates() * tourNutritionProduct.getConsumedQuantity();
+            break;
+         }
+      }
+
+      return totalCarbohydrates;
+   }
+
    /**
     * Computes the total amount of fluids consumed for a given list of {@link TourNutritionProduct}
     *
@@ -246,7 +278,7 @@ public class NutritionUtils {
       }
    }
 
-   static List<Product> searchProduct(final String searchText, final ProductSearchType productSearchType) {
+   public static List<Product> searchProduct(final String searchText, final ProductSearchType productSearchType) {
 
       String searchUrl = UI.EMPTY_STRING;
 

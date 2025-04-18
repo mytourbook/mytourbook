@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2024 Frédéric Bard
+ * Copyright (C) 2024, 2025 Frédéric Bard
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -26,6 +26,12 @@ public class Nutriments {
 
    @JsonProperty("energy-kcal_serving")
    public float energyKcalServing;
+
+   @JsonProperty("carbohydrates_100g")
+   public float carbohydrates100g;
+
+   @JsonProperty("carbohydrates_serving")
+   public float carbohydratesServing;
 
    @JsonProperty("sodium_100g")
    public float sodium100g;

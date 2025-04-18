@@ -41,13 +41,19 @@ Experimental
 New
 ===
 
-* 
+* Tour Info Tooltip (Frederic):
+  - New fields: elapsed time at night and during the day for tours that also happen during the night
 
+* Tour Nutrition (Frederic):
+  - Support for the carbohydrates
+  - New button to update the nutrition facts of (a) product(s)
+  - Edit an existing custom nutrition product
 
 Improvements
 ============
 
-* 
+* Tour Nutrition (Frederic):
+  - Add duplicated products when they are contained in a beverage container
 
 
 Changes

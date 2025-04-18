@@ -531,6 +531,7 @@ public class Messages extends NLS {
 
    public static String        Dialog_CustomTourNutritionProduct_Label_BeverageQuantity;
    public static String        Dialog_CustomTourNutritionProduct_Label_Calories;
+   public static String        Dialog_CustomTourNutritionProduct_Label_Carbohydrates;
    public static String        Dialog_CustomTourNutritionProduct_Label_IsBeverage;
    public static String        Dialog_CustomTourNutritionProduct_Label_Name;
    public static String        Dialog_CustomTourNutritionProduct_Label_NumberServings;
@@ -565,6 +566,7 @@ public class Messages extends NLS {
    public static String        Dialog_DoubleClickAction_NoAction_Message;
    public static String        Dialog_DoubleClickAction_NoAction_Title;
 
+   public static String        Dialog_EditCustomTourNutritionProduct_Title;
    public static String        Dialog_EditTimeslicesValues_Area_Title;
    public static String        Dialog_EditTimeslicesValues_Checkbox_Altitude;
    public static String        Dialog_EditTimeslicesValues_Checkbox_Altitude_Tooltip;
@@ -1338,6 +1340,18 @@ public class Messages extends NLS {
    public static String        Log_EasyImport_100_DeleteTourFiles;
    public static String        Log_EasyImport_101_TurnWatchingOff;
    public static String        Log_EasyImport_999_ImportEnd;
+   public static String        Log_HistoricalWeatherRetriever_001_WeatherData_AirQuality;
+   public static String        Log_HistoricalWeatherRetriever_001_WeatherData_Humidity;
+   public static String        Log_HistoricalWeatherRetriever_001_WeatherData_Precipitation;
+   public static String        Log_HistoricalWeatherRetriever_001_WeatherData_Pressure;
+   public static String        Log_HistoricalWeatherRetriever_001_WeatherData_Snowfall;
+   public static String        Log_HistoricalWeatherRetriever_001_WeatherData_Temperature_FeelsLike;
+   public static String        Log_HistoricalWeatherRetriever_001_WeatherData_Temperature_Max;
+   public static String        Log_HistoricalWeatherRetriever_001_WeatherData_Temperature_Min;
+   public static String        Log_HistoricalWeatherRetriever_001_WeatherData_WeatherStation_Link;
+   public static String        Log_HistoricalWeatherRetriever_001_WeatherData_WindDirection;
+   public static String        Log_HistoricalWeatherRetriever_002_RetrievalError;
+   public static String        Log_HistoricalWeatherRetriever_003_RetrievalLimitReached;
    public static String        Log_Import_DeleteTourFiles;
    public static String        Log_Import_DeleteTourFiles_End;
    public static String        Log_Import_Failed;
@@ -1351,6 +1365,7 @@ public class Messages extends NLS {
    public static String        Log_Import_Tour_Imported;
    public static String        Log_ModifiedTour_Combined_Values;
    public static String        Log_ModifiedTour_Old_Data_Vs_New_Data;
+   public static String        Log_ModifiedTour_No_New_Data;
    public static String        Log_Reimport_ManualTour;
    public static String        Log_Reimport_PreviousFiles;
    public static String        Log_Reimport_PreviousFiles_End;
@@ -1404,18 +1419,8 @@ public class Messages extends NLS {
    public static String        Log_Tour_SaveTours_End;
    public static String        Log_TourLocation_Retrieve_End;
    public static String        Log_TourLocation_Retrieve_LocationPoint;
-   public static String        Log_HistoricalWeatherRetriever_001_WeatherData_AirQuality;
-   public static String        Log_HistoricalWeatherRetriever_001_WeatherData_Humidity;
-   public static String        Log_HistoricalWeatherRetriever_001_WeatherData_Precipitation;
-   public static String        Log_HistoricalWeatherRetriever_001_WeatherData_Pressure;
-   public static String        Log_HistoricalWeatherRetriever_001_WeatherData_Snowfall;
-   public static String        Log_HistoricalWeatherRetriever_001_WeatherData_Temperature_FeelsLike;
-   public static String        Log_HistoricalWeatherRetriever_001_WeatherData_Temperature_Max;
-   public static String        Log_HistoricalWeatherRetriever_001_WeatherData_Temperature_Min;
-   public static String        Log_HistoricalWeatherRetriever_001_WeatherData_WeatherStation_Link;
-   public static String        Log_HistoricalWeatherRetriever_001_WeatherData_WindDirection;
-   public static String        Log_HistoricalWeatherRetriever_002_RetrievalError;
-   public static String        Log_HistoricalWeatherRetriever_003_RetrievalLimitReached;
+   public static String        Log_Updating_Text;
+   public static String        Log_UpdateTour_End;
 
    public static String        Map25_Config_ClusterAlgorithm_FirstMarker_Distance;
    public static String        Map25_Config_ClusterAlgorithm_FirstMarker_Grid;
@@ -3572,9 +3577,13 @@ public class Messages extends NLS {
    public static String        Tour_Nutrition_Button_AddCustomProduct_Tooltip;
    public static String        Tour_Nutrition_Button_DeleteProduct;
    public static String        Tour_Nutrition_Button_DeleteProduct_Tooltip;
+   public static String        Tour_Nutrition_Button_EditCustomProduct;
+   public static String        Tour_Nutrition_Button_EditCustomProduct_Tooltip;
    public static String        Tour_Nutrition_Button_OpenProductsWebsite;
    public static String        Tour_Nutrition_Button_SearchProduct;
    public static String        Tour_Nutrition_Button_SearchProduct_Tooltip;
+   public static String        Tour_Nutrition_Button_UpdateProducts;
+   public static String        Tour_Nutrition_Button_UpdateProducts_Tooltip;
    public static String        Tour_Nutrition_Column_BeverageContainer;
    public static String        Tour_Nutrition_Column_BeverageQuantity;
    public static String        Tour_Nutrition_Column_BeverageQuantity_Tooltip;
@@ -3595,6 +3604,8 @@ public class Messages extends NLS {
    public static String        Tour_Nutrition_Label_Averages_Tooltip;
    public static String        Tour_Nutrition_Label_Calories;
    public static String        Tour_Nutrition_Label_Calories_Tooltip;
+   public static String        Tour_Nutrition_Label_Carbohydrates;
+   public static String        Tour_Nutrition_Label_Carbohydrates_Tooltip;
    public static String        Tour_Nutrition_Label_Fluids;
    public static String        Tour_Nutrition_Label_QuantityType_Products;
    public static String        Tour_Nutrition_Label_QuantityType_Servings;
