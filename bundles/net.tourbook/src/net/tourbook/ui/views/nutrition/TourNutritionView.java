@@ -125,11 +125,6 @@ import cop.swt.widgets.viewers.table.celleditors.SpinnerCellEditor;
 
 public class TourNutritionView extends ViewPart implements ITourViewer {
 
-   // todo fb
-
-   // add group with 2 radio buttons "Use the last most added items", "Use the most used items for all the tours"
-   // in that group, add a spinner for the number of items to show 1 to 15
-
    public static final String            ID                             = "net.tourbook.ui.views.nutrition.TourNutritionView"; //$NON-NLS-1$
 
    private static final String           STATE_PRODUCT_SEARCHES_HISTORY = "products.searchesHistory";                          //$NON-NLS-1$
