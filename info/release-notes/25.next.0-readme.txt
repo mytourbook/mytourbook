@@ -47,7 +47,6 @@ New
 * Tour Nutrition (Frederic):
   - Support for the carbohydrates
   - New button to update the nutrition facts of (a) product(s)
-  - Select a product from a list of the most recent products used
   - Edit an existing custom nutrition product
 
 Improvements

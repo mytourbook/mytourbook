@@ -18,6 +18,7 @@ package net.tourbook.nutrition;
 import static org.eclipse.swt.events.SelectionListener.widgetSelectedAdapter;
 
 import net.tourbook.Messages;
+import net.tourbook.OtherMessages;
 import net.tourbook.common.UI;
 import net.tourbook.common.util.StringUtils;
 import net.tourbook.data.TourData;
@@ -157,7 +158,7 @@ public class DialogCustomTourNutritionProduct extends Dialog {
                   .applyTo(_txtCalories);
 
             // Unit: kcal
-            UI.createLabel(container, net.tourbook.ui.Messages.Value_Unit_KCalories);
+            UI.createLabel(container, OtherMessages.VALUE_UNIT_K_CALORIES);
             if (_isEditMode) {
                _txtCalories.setText(String.valueOf(_product.getCalories()));
             }
