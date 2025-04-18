@@ -51,7 +51,6 @@ import net.tourbook.nutrition.DialogCustomTourNutritionProduct;
 import net.tourbook.nutrition.NutritionUtils;
 import net.tourbook.nutrition.ProductSearchType;
 import net.tourbook.nutrition.QuantityType;
-import net.tourbook.nutrition.TourNutritionProductMenuManager;
 import net.tourbook.nutrition.openfoodfacts.Product;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.tour.ITourEventListener;
@@ -1406,9 +1405,6 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
       menuMgr.add(_actionOpenProductsWebsite);
       menuMgr.add(_actionEditCustomProduct);
       menuMgr.add(_actionDeleteProducts);
-
-      //todo fb add the recent tour nutrition products when not selecting existing products
-      TourNutritionProductMenuManager.fillMenuWithRecentTourNutritionProducts(menuMgr, true);
 
       enableActions();
    }
