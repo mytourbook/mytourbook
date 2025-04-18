@@ -493,7 +493,7 @@ public class TourNutritionProduct {
                String.valueOf(this.getCarbohydrates()),
                previousData,
                newData,
-               UI.UNIT_WEIGHT_G);
+               UI.UNIT_WEIGHT_G + UI.SPACE + Messages.Tour_Nutrition_Label_Carbohydrates);
 
          this.setCarbohydrates(updatedProduct.getCarbohydrates());
          this.setCarbohydrates_Serving(updatedProduct.getCarbohydrates_Serving());
@@ -506,7 +506,7 @@ public class TourNutritionProduct {
                String.valueOf(this.getSodium()),
                previousData,
                newData,
-               UI.UNIT_WEIGHT_MG);
+               UI.UNIT_WEIGHT_MG + UI.SPACE + Messages.Tour_Nutrition_Label_Sodium);
 
          this.setSodium(updatedProduct.getSodium());
          this.setSodium_Serving(updatedProduct.getSodium_Serving());
