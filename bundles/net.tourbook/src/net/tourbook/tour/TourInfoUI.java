@@ -174,6 +174,7 @@ public class TourInfoUI implements ICanHideTooltip {
 
    private boolean                        _areTourActionsVisible;
    private boolean                        _isShowBodyValues;
+   private boolean                        _isShowDayVsNightTimes;
    private boolean                        _isShowHRZones;
    private boolean                        _isShowRunDyn;
    private boolean                        _isShowSensorValues;
@@ -743,7 +744,8 @@ public class TourInfoUI implements ICanHideTooltip {
       }
 
       final long tourTime_Night = _tourData.getTourDeviceTime_Elapsed_Night();
-      if (tourTime_Night > 0) {
+      if (_isShowDayVsNightTimes && tourTime_Night > 0) {
+
          createUI_Spacer(container);
          {
             /*
@@ -1925,6 +1927,7 @@ public class TourInfoUI implements ICanHideTooltip {
       if (isShowCustomValues) {
 
          _isShowBodyValues          = Util.getStateBoolean(_state, SlideoutTourInfoOptions.STATE_IS_SHOW_BODY_VALUES,         true);
+         _isShowDayVsNightTimes = Util.getStateBoolean(_state, SlideoutTourInfoOptions.STATE_IS_SHOW_DAYVSNIGHT_TIMES, true);
          _isShowHRZones             = Util.getStateBoolean(_state, SlideoutTourInfoOptions.STATE_IS_SHOW_HEART_RATE_ZONES,    true);
          _isShowRunDyn              = Util.getStateBoolean(_state, SlideoutTourInfoOptions.STATE_IS_SHOW_RUNNING_DYNAMICS,    true);
          _isShowSensorValues        = Util.getStateBoolean(_state, SlideoutTourInfoOptions.STATE_IS_SHOW_SENSOR_VALUES,       true);
@@ -2187,7 +2190,7 @@ public class TourInfoUI implements ICanHideTooltip {
        * Time during the day and night
        */
       final long tourTime_Night = _tourData.getTourDeviceTime_Elapsed_Night();
-      if (tourTime_Night > 0) {
+      if (_isShowDayVsNightTimes && tourTime_Night > 0) {
          _lblTimeDuringDay_Value.setText(FormatManager.formatElapsedTime(elapsedTime - tourTime_Night));
          _lblTimeDuringNight_Value.setText(FormatManager.formatElapsedTime(tourTime_Night));
       }

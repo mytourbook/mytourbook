@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2024 Wolfgang Schramm and Contributors
+ * Copyright (C) 2024, 2025 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -48,6 +48,7 @@ import org.eclipse.swt.widgets.ToolBar;
 public class SlideoutTourInfoOptions extends ToolbarSlideout implements IColorSelectorListener, IActionResetToDefault {
 
    static final String                    STATE_IS_SHOW_BODY_VALUES         = "STATE_IS_SHOW_BODY_VALUES";         //$NON-NLS-1$
+   static final String                    STATE_IS_SHOW_DAYVSNIGHT_TIMES    = "STATE_IS_SHOW_DAYVSNIGHT_TIMES";    //$NON-NLS-1$
    static final String                    STATE_IS_SHOW_CUSTOM_VALUES       = "STATE_IS_SHOW_CUSTOM_VALUES";       //$NON-NLS-1$
    static final String                    STATE_IS_SHOW_HEART_RATE_ZONES    = "STATE_IS_SHOW_HEART_RATE_ZONES";    //$NON-NLS-1$
    static final String                    STATE_IS_SHOW_RUNNING_DYNAMICS    = "STATE_IS_SHOW_RUNNING_DYNAMICS";    //$NON-NLS-1$
@@ -86,6 +87,7 @@ public class SlideoutTourInfoOptions extends ToolbarSlideout implements IColorSe
    private Composite        _shellContainer;
 
    private Button           _chkShowBodyValues;
+   private Button           _chkShowDayVsNightTimes;
    private Button           _chkShowHRZones;
    private Button           _chkShowRunDyn;
    private Button           _chkShowSensorValues;
@@ -252,6 +254,15 @@ public class SlideoutTourInfoOptions extends ToolbarSlideout implements IColorSe
          }
          {
             /*
+             * Show day vs night times values
+             */
+            _chkShowDayVsNightTimes = new Button(container, SWT.CHECK);
+            _chkShowDayVsNightTimes.setText(Messages.Tour_TooltipOptions_Checkbox_ShowDayVsNightTimes);
+            _chkShowDayVsNightTimes.addSelectionListener(_defaultSelectionListener);
+            gdSpan2.applyTo(_chkShowDayVsNightTimes);
+         }
+         {
+            /*
              * Show heartrate zones
              */
             _chkShowHRZones = new Button(container, SWT.CHECK);
@@ -370,6 +381,7 @@ public class SlideoutTourInfoOptions extends ToolbarSlideout implements IColorSe
 // SET_FORMATTING_OFF
 
       _chkShowBodyValues         .setEnabled(_isShowCustomValues);
+      _chkShowDayVsNightTimes    .setEnabled(_isShowCustomValues);
       _chkShowHRZones            .setEnabled(_isShowCustomValues);
       _chkShowRunDyn             .setEnabled(_isShowCustomValues);
       _chkShowSensorValues       .setEnabled(_isShowCustomValues);
@@ -490,6 +502,7 @@ public class SlideoutTourInfoOptions extends ToolbarSlideout implements IColorSe
       _isShowCustomValues                    = Util.getStateBoolean(_state, STATE_IS_SHOW_CUSTOM_VALUES,          true);
 
       final boolean isShowBodyValues         = Util.getStateBoolean(_state, STATE_IS_SHOW_BODY_VALUES,            true);
+      final boolean isShowDayVsNightTimes    = Util.getStateBoolean(_state, STATE_IS_SHOW_DAYVSNIGHT_TIMES,       true);
       final boolean isShowHRZones            = Util.getStateBoolean(_state, STATE_IS_SHOW_HEART_RATE_ZONES,       true);
       final boolean isShowRunDyn             = Util.getStateBoolean(_state, STATE_IS_SHOW_RUNNING_DYNAMICS,       true);
       final boolean isShowSensorValues       = Util.getStateBoolean(_state, STATE_IS_SHOW_SENSOR_VALUES,          true);
@@ -501,6 +514,7 @@ public class SlideoutTourInfoOptions extends ToolbarSlideout implements IColorSe
       final int uiWidth_SizeIndex            = Util.getStateInt(_state, SlideoutTourInfoOptions.STATE_UI_WIDTH_SIZE_INDEX, 0);
 
       _chkShowBodyValues         .setSelection(isShowBodyValues);
+      _chkShowDayVsNightTimes    .setSelection(isShowDayVsNightTimes);
       _chkShowHRZones            .setSelection(isShowHRZones);
       _chkShowRunDyn             .setSelection(isShowRunDyn);
       _chkShowSensorValues       .setSelection(isShowSensorValues);
@@ -527,6 +541,7 @@ public class SlideoutTourInfoOptions extends ToolbarSlideout implements IColorSe
       _state.put(STATE_IS_SHOW_CUSTOM_VALUES,         _rdoShowCustomValues       .getSelection());
 
       _state.put(STATE_IS_SHOW_BODY_VALUES,           _chkShowBodyValues         .getSelection());
+      _state.put(STATE_IS_SHOW_DAYVSNIGHT_TIMES,      _chkShowDayVsNightTimes    .getSelection());
       _state.put(STATE_IS_SHOW_HEART_RATE_ZONES,      _chkShowHRZones            .getSelection());
       _state.put(STATE_IS_SHOW_RUNNING_DYNAMICS,      _chkShowRunDyn             .getSelection());
       _state.put(STATE_IS_SHOW_SENSOR_VALUES,         _chkShowSensorValues       .getSelection());
