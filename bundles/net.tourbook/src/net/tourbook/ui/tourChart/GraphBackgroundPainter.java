@@ -65,8 +65,8 @@ public class GraphBackgroundPainter implements IFillPainter {
 
       _interpolated_Colors = new Color[] {
 
-            new Color(0xff, 0x80, 0), // not interpolated
-            new Color(0xff, 0xff, 0xff) // interpolated
+            new Color(0xff, 0x80, 0), // not interpolated, orange
+            new Color(0xff, 0xff, 0xff) // interpolated, white
       };
    }
 

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2024 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2025 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -1625,12 +1625,16 @@ public class TourMapPainter extends Map2Painter {
       if (_legendProvider instanceof IGradientColorProvider) {
 
          if (tourData.interpolatedValueSerie != null) {
-            
+
             // interpolated values are forced when available
 
             final boolean isInterpolated = tourData.interpolatedValueSerie[serieIndex];
 
-            colorValue = isInterpolated ? 0xffffff : 0x000080ff;
+            colorValue = isInterpolated
+
+                  ? 0xff_ff_ff // white
+                  : 0x00_80_ff // orange
+            ;
 
          } else {
 

@@ -239,7 +239,23 @@ public class FitData {
          _tourData.setTourStartTime_YYMMDD(tourStartTime_FromLatLon);
       }
 
-      if (_alreadyImportedTours.containsKey(tourId) == false) {
+      if (_alreadyImportedTours.containsKey(tourId)) {
+
+         // this can happen when interpolated values are reimported
+
+         if (_tourData.interpolatedValueSerie != null) {
+
+            // -> update just the interpolated values
+
+            final TourData tourData = _alreadyImportedTours.get(tourId);
+
+            tourData.interpolatedValueSerie = _tourData.interpolatedValueSerie;
+
+            // this is needed to update the UI
+            _newlyImportedTours.put(tourId, tourData);
+         }
+
+      } else {
 
          // add new tour to the map
          _newlyImportedTours.put(tourId, _tourData);

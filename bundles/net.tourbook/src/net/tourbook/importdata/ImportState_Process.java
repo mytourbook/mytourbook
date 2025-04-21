@@ -310,9 +310,11 @@ public class ImportState_Process {
       return this;
    }
 
-   public void setIsSkipGeoInterpolation(final boolean isSkipGeoInterpolation) {
+   public ImportState_Process setIsSkipGeoInterpolation(final boolean isSkipGeoInterpolation) {
 
       this.isSkipGeoInterpolation = isSkipGeoInterpolation;
+
+      return this;
    }
 
    /**
