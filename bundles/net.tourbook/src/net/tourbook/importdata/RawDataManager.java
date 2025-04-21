@@ -34,7 +34,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Optional;
 import java.util.Scanner;
 import java.util.Set;
 import java.util.concurrent.ArrayBlockingQueue;
@@ -3063,9 +3062,13 @@ public class RawDataManager {
          return null;
       }
 
-      final Optional<TourData> firstTourData = allImportedToursFromOneFile.values().stream().findFirst();
+      final Collection<TourData> allValues = allImportedToursFromOneFile.values();
 
-      return firstTourData.get();
+      for (final TourData tourData : allValues) {
+         return tourData;
+      }
+
+      return null;
    }
 
    /**
