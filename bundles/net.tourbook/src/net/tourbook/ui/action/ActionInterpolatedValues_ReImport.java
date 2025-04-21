@@ -48,7 +48,11 @@ public class ActionInterpolatedValues_ReImport extends Action {
       final ArrayList<TourData> selectedTours = _tourProvider.getSelectedTours();
 
       final TourData providerTourData = selectedTours.get(0);
-      final ImportState_Process importState_Process = new ImportState_Process();
+
+      final ImportState_Process importState_Process = new ImportState_Process()
+
+            // do not interpolate geo positions during the reimport
+            .setIsSkipGeoInterpolation(true);
 
       final TourData importedTourData = RawDataManager.getInstance().reimportTour(providerTourData, importState_Process);
 
@@ -56,7 +60,7 @@ public class ActionInterpolatedValues_ReImport extends Action {
          return;
       }
 
-      // set interpolated values
+      // set flags for interpolated values
       providerTourData.interpolatedValueSerie = importedTourData.interpolatedValueSerie;
 
       /*

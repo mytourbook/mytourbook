@@ -3029,6 +3029,12 @@ public class RawDataManager {
                   : 0;
    }
 
+   /**
+    * @param oldTourData
+    * @param importState_Process
+    *
+    * @return Return the imported {@link TourData} or <code>null</code> when the reimport failed
+    */
    public TourData reimportTour(final TourData oldTourData,
                                 final ImportState_Process importState_Process) {
 

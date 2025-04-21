@@ -109,12 +109,16 @@ public class SubMenu_SetGeoPosition extends SubMenu {
          return;
       }
 
-      final ImportState_Process importState_Process = new ImportState_Process();
+      final ImportState_Process importState_Process = new ImportState_Process()
 
-      // do not interpolate geo positions during the reimport
-      importState_Process.setIsSkipGeoInterpolation(true);
+            // do not interpolate geo positions during the reimport
+            .setIsSkipGeoInterpolation(true);
 
       final TourData reimportedTourData = RawDataManager.getInstance().reimportTour(tourData, importState_Process);
+
+      if (reimportedTourData == null) {
+         return;
+      }
 
       final int[] timeSerie = reimportedTourData.timeSerie;
       final double[] reimportedLatitudeSerie = reimportedTourData.latitudeSerie;
@@ -143,12 +147,16 @@ public class SubMenu_SetGeoPosition extends SubMenu {
 
       final TourData tourData = geoMarker.getTourData();
 
-      final ImportState_Process importState_Process = new ImportState_Process();
+      final ImportState_Process importState_Process = new ImportState_Process()
 
-      // do not interpolate geo positions during the reimport
-      importState_Process.setIsSkipGeoInterpolation(true);
+            // do not interpolate geo positions during the reimport
+            .setIsSkipGeoInterpolation(true);
 
       final TourData reimportedTourData = RawDataManager.getInstance().reimportTour(tourData, importState_Process);
+
+      if (reimportedTourData == null) {
+         return;
+      }
 
       final int[] timeSerie = tourData.timeSerie;
       final double[] reimportedLatitudeSerie = reimportedTourData.latitudeSerie;
