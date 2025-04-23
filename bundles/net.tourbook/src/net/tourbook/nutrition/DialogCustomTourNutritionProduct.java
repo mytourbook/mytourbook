@@ -102,7 +102,7 @@ public class DialogCustomTourNutritionProduct extends Dialog {
       }
       _isInUIInit = false;
 
-      updateUI();
+      fillUI();
 
       return container;
    }
@@ -233,6 +233,28 @@ public class DialogCustomTourNutritionProduct extends Dialog {
       }
    }
 
+   private void fillUI() {
+
+      if (!_isEditMode) {
+         return;
+      }
+
+      _txtName.setText(_product.getName());
+
+      if (_product.getCalories_Serving() != 0) {
+
+         final int numServings = Math.floorDiv(_product.getCalories(), _product.getCalories_Serving());
+         _spinnerNumServings.setSelection(numServings * 100);
+      }
+
+      _txtCarbohydrates.setText(String.valueOf(_product.getCarbohydrates()));
+      _txtCalories.setText(String.valueOf(_product.getCalories()));
+      _txtSodium.setText(String.valueOf(_product.getSodium()));
+      _spinnerBeverageQuantity.setSelection(_product.getBeverageQuantity());
+      _spinnerBeverageQuantity.setEnabled(_product.isBeverage());
+      _checkIsBeverage.setSelection(_product.isBeverage());
+   }
+
    public TourNutritionProduct getTourNutritionProduct(final TourData tourData) {
 
       final TourNutritionProduct product = new TourNutritionProduct(tourData, true);
@@ -342,25 +364,6 @@ public class DialogCustomTourNutritionProduct extends Dialog {
       }
 
       validateFields();
-   }
-
-   private void updateUI() {
-
-      if (!_isEditMode) {
-         return;
-      }
-
-      _txtName.setText(_product.getName());
-
-      final int numServings = Math.floorDiv(_product.getCalories(), _product.getCalories_Serving());
-      _spinnerNumServings.setSelection(numServings * 100);
-
-      _txtCarbohydrates.setText(String.valueOf(_product.getCarbohydrates()));
-      _txtCalories.setText(String.valueOf(_product.getCalories()));
-      _txtSodium.setText(String.valueOf(_product.getSodium()));
-      _spinnerBeverageQuantity.setEnabled(_product.isBeverage());
-      _spinnerBeverageQuantity.setSelection(_product.getBeverageQuantity());
-      _checkIsBeverage.setSelection(_product.isBeverage());
    }
 
    private void validateFields() {
