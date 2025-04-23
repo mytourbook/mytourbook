@@ -7130,6 +7130,12 @@ public class Map2 extends Canvas {
          );
       };
 
+      /*
+       * With Eclipse 4.35 this must be run in the UI thread otherwise this exception occurs
+       * org.eclipse.swt.SWTException: Invalid thread access
+       */
+      setupPainting_SWT();
+
       _mapPointPainter_Task = _mapPointPainter_Executor.submit(mapPointTask);
    }
 
@@ -11415,7 +11421,20 @@ public class Map2 extends Canvas {
       final String labelFontName = _mapConfig.labelFontName;
       final int labelFontSize = _mapConfig.labelFontSize;
 
-      if (labelFontName.equals(_labelFontName) == false || labelFontSize != _labelFontSize) {
+      _labelFontAWT = new java.awt.Font(labelFontName, java.awt.Font.PLAIN, labelFontSize);
+      _clusterFontAWT = new java.awt.Font(labelFontName, java.awt.Font.PLAIN, _mapConfig.clusterSymbol_Size * 2);
+
+      g2d.setFont(_labelFontAWT);
+   }
+
+   private void setupPainting_SWT() {
+
+      final String labelFontName = _mapConfig.labelFontName;
+      final int labelFontSize = _mapConfig.labelFontSize;
+
+      final int labelFontSizeScaled = (int) (labelFontSize / _deviceScaling);
+
+      if (labelFontName.equals(_labelFontName) == false || labelFontSizeScaled != _labelFontSize) {
 
          // font is changed -> recreate it
 
@@ -11429,11 +11448,6 @@ public class Map2 extends Canvas {
 
          _labelFontSWT = new Font(_display, _labelFontName, swtFontSize, SWT.NORMAL);
       }
-
-      _labelFontAWT = new java.awt.Font(labelFontName, java.awt.Font.PLAIN, labelFontSize);
-      _clusterFontAWT = new java.awt.Font(labelFontName, java.awt.Font.PLAIN, _mapConfig.clusterSymbol_Size * 2);
-
-      g2d.setFont(_labelFontAWT);
    }
 
    /**
