@@ -664,17 +664,14 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
          _tourData.getTourNutritionProducts().remove(product);
          _tourData.getTourNutritionProducts().add(updatedProduct);
 
-         reloadViewer();
-
       } else {
 
          // add new product
-         final Set<TourNutritionProduct> tourNutritionProducts = _tourData.getTourNutritionProducts();
-         tourNutritionProducts.add(dialogTourNutritionProduct.getTourNutritionProduct(_tourData));
-         _tourData.setTourNutritionProducts(tourNutritionProducts);
-         _tourData = TourManager.saveModifiedTour(_tourData);
-         _tourData.setTourNutritionProducts(_tourData.getTourNutritionProducts());
+         _tourData.getTourNutritionProducts().add(dialogTourNutritionProduct.getTourNutritionProduct(_tourData));
       }
+
+      _tourData = TourManager.saveModifiedTour(_tourData);
+      _tourData.setTourNutritionProducts(_tourData.getTourNutritionProducts());
    }
 
    @Override

@@ -99,10 +99,9 @@ public class DialogCustomTourNutritionProduct extends Dialog {
       _isInUIInit = true;
       {
          createUI(container);
+         fillUI();
       }
       _isInUIInit = false;
-
-      fillUI();
 
       return container;
    }
