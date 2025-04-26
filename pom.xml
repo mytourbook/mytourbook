@@ -194,7 +194,7 @@
       </plugin>
       
       <plugin>
-        <artifactId>maven-compiler-plugin</artifactId>         <groupId>org.apache.maven.plugins</groupId>
+         <artifactId>maven-compiler-plugin</artifactId>        <groupId>org.apache.maven.plugins</groupId>
                                                                <version>3.14.0</version>
          <executions>
             <execution>
@@ -207,6 +207,27 @@
          </executions>
          <configuration>
                <release>17</release>
+         </configuration>
+      </plugin>
+      
+      <plugin>
+         <artifactId>maven-toolchains-plugin</artifactId>      <groupId>org.apache.maven.plugins</groupId>
+                                                               <version>1.1</version>
+         <executions>
+            <execution>
+               <goals>
+                  <goal>toolchain</goal>
+               </goals>
+            </execution>
+         </executions>
+        
+         <configuration>
+            <toolchains>
+               <jdk>
+                  <version>17</version>
+                  <vendor>openjdk</vendor>
+               </jdk>
+            </toolchains>
          </configuration>
       </plugin>
       
