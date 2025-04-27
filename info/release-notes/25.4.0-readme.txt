@@ -1,4 +1,4 @@
-25.4.0                                                 ?. April 2025
+25.4.0                                                 26. April 2025
 
 
 New
@@ -15,6 +15,7 @@ New
 * 2D Map
   - Customize interpolated geo positions
     https://github.com/mytourbook/mytourbook/issues/1475
+
 
 Improvements
 ============
