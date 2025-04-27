@@ -55,7 +55,6 @@ public class DialogCustomTourNutritionProduct extends Dialog {
    private boolean              _isInUIInit;
    private boolean              _isEditMode;
    private PixelConverter       _pc;
-
    private Button               _checkIsBeverage;
 
    private TourNutritionProduct _product;
