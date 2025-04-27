@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2024 Frédéric Bard
+ * Copyright (C) 2024, 2025 Frédéric Bard
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -842,7 +842,10 @@ public class DialogSearchProduct extends TitleAreaDialog implements ITourViewer,
          final Set<TourNutritionProduct> tourNutritionProducts = tourData.getTourNutritionProducts();
 
          // Before adding the selected product, we need to check if it doesn't already exist
-         if (tourNutritionProducts.stream().anyMatch(tourNutritionProduct -> tourNutritionProduct.getProductCode().equals(selectedProduct.code))) {
+         // An existing product can only be added when the existing ones are
+         // attached to a beverage container
+         if (tourNutritionProducts.stream().anyMatch(tourNutritionProduct -> tourNutritionProduct.getProductCode().equals(selectedProduct.code) &&
+               tourNutritionProduct.getTourBeverageContainer() == null)) {
 
             setErrorMessage(Messages.Dialog_SearchProduct_Label_AlreadyExists);
             return;
@@ -896,7 +899,7 @@ public class DialogSearchProduct extends TitleAreaDialog implements ITourViewer,
       // start product search
       final ProductSearchType productSearchType = getProductSearchType();
       if (productSearchType == ProductSearchType.ByCode &&
-            searchText.length() < 12) {
+            searchText.length() == 11) {
          searchText = StringUtils.leftPad(searchText, 12, '0');
       }
       _nutritionQuery.asyncFind(searchText, productSearchType);
@@ -1042,7 +1045,8 @@ public class DialogSearchProduct extends TitleAreaDialog implements ITourViewer,
    }
 
    @Override
-   public void updateColumnHeader(final ColumnDefinition colDef) {}
+   public void updateColumnHeader(final ColumnDefinition colDef) { // Not implemented because the format can't change
+   }
 
    private void validateFields() {
 
