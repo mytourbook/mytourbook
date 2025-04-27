@@ -1,7 +1,7 @@
 name: Build
 on:
-  schedule:
-  - cron: "20 7 * * *"
+  pull_request:
+    types: [opened, reopened, synchronize]
 jobs:
   build:
     needs: check_date
@@ -19,6 +19,21 @@ jobs:
         with:
           distribution: 'temurin'
           java-version: 17
+      - name: Configure Toolchains
+        run: |
+          mkdir -p ~/.m2
+          echo '<toolchains>
+             <toolchain>
+               <type>jdk</type>
+               <provides>
+                 <version>17</version>
+                 <vendor>openjdk</vendor>
+               </provides>
+               <configuration>
+                 <jdkHome>C:\Program Files\Eclipse Adoptium\jdk-17</jdkHome>
+               </configuration>
+             </toolchain>
+           </toolchains>' > ~/.m2/toolchains.xml
       - name: Cache SonarCloud packages
         uses: actions/cache@v4
         with:
