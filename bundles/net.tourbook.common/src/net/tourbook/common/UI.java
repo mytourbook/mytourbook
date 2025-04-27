@@ -1592,13 +1592,9 @@ public class UI {
     */
    public static Cursor createCursorFromImage(final ImageDescriptor imageDescriptor) {
 
-      Cursor cursor;
+      final ImageData imageData = imageDescriptor.getImageData(100);
 
-      final Image cursorImage = imageDescriptor.createImage();
-      {
-         cursor = new Cursor(Display.getDefault(), cursorImage.getImageData(), 0, 0);
-      }
-      cursorImage.dispose();
+      final Cursor cursor = new Cursor(Display.getDefault(), imageData, 0, 0);
 
       return cursor;
    }
