@@ -21,19 +21,19 @@ jobs:
           java-version: 17
       - name: Configure Toolchains
         run: |
-          mkdir -p ~/.m2
+          if not exist "%USERPROFILE%\.m2" mkdir "%USERPROFILE%\.m2"
           echo '<toolchains>
-             <toolchain>
-               <type>jdk</type>
-               <provides>
-                 <version>17</version>
-                 <vendor>openjdk</vendor>
-               </provides>
-               <configuration>
-                 <jdkHome>C:\Program Files\Eclipse Adoptium\jdk-17</jdkHome>
-               </configuration>
-             </toolchain>
-           </toolchains>' > ~/.m2/toolchains.xml
+       <toolchain>
+         <type>jdk</type>
+         <provides>
+           <version>17</version>
+           <vendor>openjdk</vendor>
+         </provides>
+         <configuration>
+           <jdkHome>C:\Program Files\Eclipse Adoptium\jdk-17</jdkHome>
+         </configuration>
+       </toolchain>
+     </toolchains>' > "%USERPROFILE%\.m2\toolchains.xml"
       - name: Cache SonarCloud packages
         uses: actions/cache@v4
         with:
