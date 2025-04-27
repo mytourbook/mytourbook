@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2024 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2025 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -174,6 +174,7 @@ public class TourInfoUI implements ICanHideTooltip {
 
    private boolean                        _areTourActionsVisible;
    private boolean                        _isShowBodyValues;
+   private boolean                        _isShowDayVsNightTimes;
    private boolean                        _isShowHRZones;
    private boolean                        _isShowRunDyn;
    private boolean                        _isShowSensorValues;
@@ -212,8 +213,7 @@ public class TourInfoUI implements ICanHideTooltip {
    /*
     * UI resources
     */
-   private Font _boldFont = JFaceResources.getFontRegistry().getBold(JFaceResources.DIALOG_FONT);
-
+   private Font             _boldFont = JFaceResources.getFontRegistry().getBold(JFaceResources.DIALOG_FONT);
    /*
     * UI controls
     */
@@ -293,6 +293,8 @@ public class TourInfoUI implements ICanHideTooltip {
    private Label            _lblRestPulse;
    private Label            _lblTemperature_Part1;
    private Label            _lblTemperature_Part2;
+   private Label            _lblTimeDuringDay_Value;
+   private Label            _lblTimeDuringNight_Value;
    private Label            _lblTimeZone_Value;
    private Label            _lblTimeZoneDifference;
    private Label            _lblTimeZoneDifference_Value;
@@ -738,6 +740,28 @@ public class TourInfoUI implements ICanHideTooltip {
 
             // hour
             createUI_Label(container, Messages.Tour_Tooltip_Label_Hour);
+         }
+      }
+
+      final long tourTime_Night = _tourData.getTourDeviceTime_Elapsed_Night();
+      if (_isShowDayVsNightTimes && tourTime_Night > 0) {
+
+         createUI_Spacer(container);
+         {
+            /*
+             * Time during the day
+             */
+            createUI_Label(container, Messages.Tour_Tooltip_Label_ElapsedTimeDuringDay);
+            _lblTimeDuringDay_Value = createUI_LabelValue(container, SWT.LEAD);
+            GridDataFactory.fillDefaults().span(2, 1).applyTo(_lblTimeDuringDay_Value);
+         }
+         {
+            /*
+             * Time during the night
+             */
+            createUI_Label(container, Messages.Tour_Tooltip_Label_ElapsedTimeDuringNight);
+            _lblTimeDuringNight_Value = createUI_LabelValue(container, SWT.LEAD);
+            GridDataFactory.fillDefaults().span(2, 1).applyTo(_lblTimeDuringNight_Value);
          }
       }
    }
@@ -1903,6 +1927,7 @@ public class TourInfoUI implements ICanHideTooltip {
       if (isShowCustomValues) {
 
          _isShowBodyValues          = Util.getStateBoolean(_state, SlideoutTourInfoOptions.STATE_IS_SHOW_BODY_VALUES,         true);
+         _isShowDayVsNightTimes = Util.getStateBoolean(_state, SlideoutTourInfoOptions.STATE_IS_SHOW_DAYVSNIGHT_TIMES, true);
          _isShowHRZones             = Util.getStateBoolean(_state, SlideoutTourInfoOptions.STATE_IS_SHOW_HEART_RATE_ZONES,    true);
          _isShowRunDyn              = Util.getStateBoolean(_state, SlideoutTourInfoOptions.STATE_IS_SHOW_RUNNING_DYNAMICS,    true);
          _isShowSensorValues        = Util.getStateBoolean(_state, SlideoutTourInfoOptions.STATE_IS_SHOW_SENSOR_VALUES,       true);
@@ -2159,6 +2184,15 @@ public class TourInfoUI implements ICanHideTooltip {
          _lblPausedTime.setText(pausedPeriod.toString(UI.DEFAULT_DURATION_FORMATTER_SHORT));
          _lblMovingTime.setText(movingPeriod.toString(UI.DEFAULT_DURATION_FORMATTER_SHORT));
          _lblBreakTime.setText(breakPeriod.toString(UI.DEFAULT_DURATION_FORMATTER_SHORT));
+      }
+
+      /*
+       * Time during the day and night
+       */
+      final long tourTime_Night = _tourData.getTourDeviceTime_Elapsed_Night();
+      if (_isShowDayVsNightTimes && tourTime_Night > 0) {
+         _lblTimeDuringDay_Value.setText(FormatManager.formatElapsedTime(elapsedTime - tourTime_Night));
+         _lblTimeDuringNight_Value.setText(FormatManager.formatElapsedTime(tourTime_Night));
       }
 
       /*

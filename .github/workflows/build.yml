@@ -19,6 +19,26 @@ jobs:
         with:
           distribution: 'temurin'
           java-version: 17
+      - name: Configure Toolchains
+        run: |
+          $jdkHome = $Env:JAVA_HOME
+          if (-not (Test-Path "$env:USERPROFILE\.m2")) {
+            New-Item -ItemType Directory -Path "$env:USERPROFILE\.m2"
+            }
+            Set-Content -Path "$env:USERPROFILE\.m2\toolchains.xml" -Value @"
+            <toolchains>
+              <toolchain>
+                <type>jdk</type>
+                <provides>
+                  <version>17</version>
+                  <vendor>openjdk</vendor>
+                </provides>
+                <configuration>
+                  <jdkHome>$jdkHome</jdkHome>
+                </configuration>
+              </toolchain>
+            </toolchains>
+          "@
       - name: Cache SonarCloud packages
         uses: actions/cache@v4
         with:

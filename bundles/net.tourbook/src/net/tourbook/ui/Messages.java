@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2024 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2025 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -786,6 +786,8 @@ public class Messages extends NLS {
    public static String        Tour_Tooltip_Label_DefaultTitle;
    public static String        Tour_Tooltip_Label_Description;
    public static String        Tour_Tooltip_Label_Distance;
+   public static String        Tour_Tooltip_Label_ElapsedTimeDuringDay;
+   public static String        Tour_Tooltip_Label_ElapsedTimeDuringNight;
    public static String        Tour_Tooltip_Label_GearShifts;
    public static String        Tour_Tooltip_Label_Hour;
    public static String        Tour_Tooltip_Label_MaxAltitude;
@@ -828,6 +830,7 @@ public class Messages extends NLS {
    public static String        Tour_Tooltip_Spinner_TextWidth_Tooltip;
 
    public static String        Tour_TooltipOptions_Checkbox_ShowBodyValues;
+   public static String        Tour_TooltipOptions_Checkbox_ShowDayVsNightTimes;
    public static String        Tour_TooltipOptions_Checkbox_ShowHeartrateZones;
    public static String        Tour_TooltipOptions_Checkbox_ShowRunningDynamics;
    public static String        Tour_TooltipOptions_Checkbox_ShowSensorValues;
