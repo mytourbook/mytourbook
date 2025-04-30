@@ -7750,7 +7750,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
       if (importState_Process != null && importState_Process.isSkipGeoInterpolation()) {
 
          // skip lat/lon interpolation but import interpolated flags
-         
+
          // the lat values will be interpolated but afterwards they are not used
 
          createTimeSeries_20_InterpolateMissingValues(latitudeSerie, timeSerie, true);
@@ -10970,6 +10970,11 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
     * @return Returns the total elapsed time spent during the night (in seconds).
     */
    public long getTourDeviceTime_Elapsed_Night() {
+
+      if (hasGeoData() == false) {
+         // the time zone needs a geo position
+         return 0;
+      }
 
       long tourTime_Night = 0;
       ZonedDateTime sunsetTimes = null;
