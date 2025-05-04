@@ -7213,9 +7213,10 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
       });
    }
 
-   private float[] createSwimUI_DataSerie(final short[] swimDataSerie) {
+   private float[] createSwimUI_DataSerie(final short[] allSwimStrokes) {
 
-      if (timeSerie == null || swim_Time == null || swim_Time.length == 0 || swimDataSerie == null) {
+      if (timeSerie == null || swim_Time == null || swim_Time.length < 2 || allSwimStrokes == null) {
+
          return null;
       }
 
@@ -7223,10 +7224,10 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
 
       float[] swimUIValues = null;
 
-      final int timeSerieSize = timeSerie.length;
-      final int swimSerieSize = swimDataSerie.length;
+      final int numTimeSlices = timeSerie.length;
+      final int numSwimStrokes = allSwimStrokes.length;
 
-      swimUIValues = new float[timeSerieSize];
+      swimUIValues = new float[numTimeSlices];
 
       if (isMultipleTours) {
 
@@ -7239,14 +7240,14 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
             final int timeSerieStartIndex = multipleTourStartIndex[tourIndex];
             final int swimSerieStartIndex = multipleSwimStartIndex[tourIndex];
 
-            if (swimSerieStartIndex >= swimSerieSize) {
+            if (swimSerieStartIndex >= numSwimStrokes) {
 
                // there are no further swim data, this can occur when the last tour(s) have no swim data
                break;
             }
 
-            final int timeSerieEndIndex = tourIndex < numTours - 1 ? multipleTourStartIndex[tourIndex + 1] : timeSerieSize;
-            final int swimSerieEndIndex = tourIndex < numTours - 1 ? multipleSwimStartIndex[tourIndex + 1] : swimSerieSize;
+            final int timeSerieEndIndex = tourIndex < numTours - 1 ? multipleTourStartIndex[tourIndex + 1] : numTimeSlices;
+            final int swimSerieEndIndex = tourIndex < numTours - 1 ? multipleSwimStartIndex[tourIndex + 1] : numSwimStrokes;
 
             final long swimTourStartTime = tourStartTime + (timeSerie[timeSerieStartIndex] * 1000);
             long swimTime = tourStartTime + (swim_Time[swimSerieStartIndex] * 1000);
@@ -7267,7 +7268,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
                   // check bounds
                   if (swimSerieIndex < swimSerieEndIndex) {
 
-                     swimValue = swimDataSerie[swimSerieIndex];
+                     swimValue = allSwimStrokes[swimSerieIndex];
 
                      if (swimValue == Short.MIN_VALUE) {
 
@@ -7287,38 +7288,46 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
 
          // tour data contains 1 tour
 
+         int swimTimeIndex = 1;
+         int swimStrokeIndex = 0;
+
          // set values for 1st swim slice
-         long swimTime = tourStartTime + (swim_Time[0] * 1000);
-         short swimValue = swimDataSerie[0];
+         long swimTime = tourStartTime + (swim_Time[swimTimeIndex] * 1000);
+         short swimStrokes = allSwimStrokes[swimStrokeIndex];
 
-         int swimSerieIndex = 0;
-
-         for (int timeSerieIndex = 0; timeSerieIndex < timeSerieSize; timeSerieIndex++) {
+         for (int timeSerieIndex = 0; timeSerieIndex < numTimeSlices; timeSerieIndex++) {
 
             final long tourTime = tourStartTime + (timeSerie[timeSerieIndex] * 1000);
 
-            if (tourTime >= swimTime) {
+            final boolean isInNextSwimTime = tourTime > swimTime;
+
+            if (isInNextSwimTime) {
 
                // advance to the next swim slice, swim slices are less frequent than tour slices
 
-               swimSerieIndex++;
+               swimTimeIndex++;
+               swimStrokeIndex++;
 
                // check bounds
-               if (swimSerieIndex < swimSerieSize) {
+               if (swimStrokeIndex < numSwimStrokes) {
 
-                  swimValue = swimDataSerie[swimSerieIndex];
+                  swimStrokes = allSwimStrokes[swimStrokeIndex];
 
-                  if (swimValue == Short.MIN_VALUE) {
+                  if (swimStrokes == Short.MIN_VALUE) {
 
                      // use MIN_VALUE that the original color is displayed which makes a rest time more visible
                      //   swimValue = 0;
                   }
 
-                  swimTime = tourStartTime + (swim_Time[swimSerieIndex] * 1000);
+                  if (swimTimeIndex >= numSwimStrokes) {
+                     swimTimeIndex--;
+                  }
+
+                  swimTime = tourStartTime + (swim_Time[swimTimeIndex] * 1000);
                }
             }
 
-            swimUIValues[timeSerieIndex] = swimValue;
+            swimUIValues[timeSerieIndex] = swimStrokes;
          }
 
       }
@@ -7340,24 +7349,51 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
          return null;
       }
 
-      final int swimSerieSize = swim_Time.length;
+      /**
+       * SWOLF score is (number of strokes) + (number of seconds) for a pool length
+       */
 
-      final short[] swolfData = new short[swimSerieSize];
+      /**
+       *
+       * Your swolf score is the sum of the time for one pool length and the number of strokes for
+       * that length. For example, 30 seconds plus 15 strokes equals a swolf score of 45. For open
+       * water swimming, swolf is calculated over 25 meters. Swolf is a measurement of swimming
+       * efficiency and, like golf, a lower score is better.
+       */
+
+      final int numSwimSlices = swim_Time.length;
+
+      final short[] swolfData = new short[numSwimSlices];
 
       int prevSwimTime = swim_Time[0];
 
-      for (int swimIndex = 0; swimIndex < swim_Time.length; swimIndex++) {
+      for (int swimIndex = 0; swimIndex < numSwimSlices; swimIndex++) {
 
-         final int currentSwimTime = swim_Time[swimIndex];
-         final short strokes = swim_Strokes[swimIndex];
+         int nextSwimIndex = swimIndex + 1;
 
-         final int timeDiff = currentSwimTime - prevSwimTime;
+         int swimTime;
+         int timeDiff;
 
-         swolfData[swimIndex] = (short) (strokes == Short.MIN_VALUE || strokes == 0
+         if (nextSwimIndex >= numSwimSlices) {
+
+            nextSwimIndex--;
+
+            swimTime = swim_Time[nextSwimIndex];
+            timeDiff = swimTime - swim_Time[nextSwimIndex - 1];
+
+         } else {
+
+            swimTime = swim_Time[nextSwimIndex];
+            timeDiff = swimTime - prevSwimTime;
+         }
+
+         final short numStrokes = swim_Strokes[swimIndex];
+
+         swolfData[swimIndex] = (short) (numStrokes == Short.MIN_VALUE || numStrokes == 0
                ? 0
-               : strokes + timeDiff);
+               : numStrokes + timeDiff);
 
-         prevSwimTime = currentSwimTime;
+         prevSwimTime = swimTime;
       }
 
       return createSwimUI_DataSerie(swolfData);
