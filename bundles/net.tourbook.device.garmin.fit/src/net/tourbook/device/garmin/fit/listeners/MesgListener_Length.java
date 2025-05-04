@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
+ * Copyright (C) 2019, 2025 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -48,7 +48,7 @@ public class MesgListener_Length extends AbstractMesgListener implements LengthM
       _swimData.add(swimData);
 
       // convert garmin time into java time
-      final long javaTime = mesg.getTimestamp().getDate().getTime();
+      final long javaTime = mesg.getStartTime().getDate().getTime();
 
       final Short avgSwimmingCadence = mesg.getAvgSwimmingCadence();
       final LengthType lengthType = mesg.getLengthType();
