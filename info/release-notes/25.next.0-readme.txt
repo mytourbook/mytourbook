@@ -41,20 +41,26 @@ Experimental
 New
 ===
 
-* Tour Info Tooltip (Frederic):
+* Tour Info Tooltip (Frederic)
   - New fields: elapsed time at night and during the day for tours that also happen during the night
 
-* Tour Nutrition (Frederic):
+* Tour Nutrition (Frederic)
   - Support for the carbohydrates
   - New button to update the nutrition facts of (a) product(s)
   - Edit an existing custom nutrition product
+  
+* Fit Import
+  - Import distance values for swimming and display
+    - Speed in the tour chart
+    - Distance values in different locations  
+    https://github.com/mytourbook/mytourbook/issues/1485
 
 Improvements
 ============
 
-* Tour Nutrition (Frederic):
+* Tour Nutrition (Frederic)
   - Add duplicated products when they are contained in a beverage container
-
+  
 
 Changes
 =======
