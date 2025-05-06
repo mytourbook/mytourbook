@@ -8394,7 +8394,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
    }
 
    /**
-    * Fill swim data into tourdata.
+    * Fill swim data into {@link TourData}
     *
     * @param tourData
     * @param allTourSwimData
@@ -8408,13 +8408,13 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
 
       final long tourStartTime = tourData.getTourStartTimeMS();
 
-      final int swimDataSize = allTourSwimData.size();
+      final int numSwimValues = allTourSwimData.size();
 
-      final short[] lengthType = new short[swimDataSize];
-      final short[] cadence = new short[swimDataSize];
-      final short[] strokes = new short[swimDataSize];
-      final short[] strokeStyle = new short[swimDataSize];
-      final int[] swimTime = new int[swimDataSize];
+      final short[] lengthType = new short[numSwimValues];
+      final short[] cadence = new short[numSwimValues];
+      final short[] strokes = new short[numSwimValues];
+      final short[] strokeStyle = new short[numSwimValues];
+      final int[] swimTime = new int[numSwimValues];
 
       tourData.swim_LengthType = lengthType;
       tourData.swim_Cadence = cadence;
@@ -8428,7 +8428,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
       boolean isSwimStrokeStyle = false;
       boolean isSwimTime = false;
 
-      for (int swimSerieIndex = 0; swimSerieIndex < allTourSwimData.size(); swimSerieIndex++) {
+      for (int swimSerieIndex = 0; swimSerieIndex < numSwimValues; swimSerieIndex++) {
 
          final SwimData swimData = allTourSwimData.get(swimSerieIndex);
 
@@ -8511,6 +8511,12 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
       } else {
          tourData.swim_Cadence = null;
       }
+
+      if (poolLength > 0) {
+
+         tourDistance = poolLength / 1000f * numSwimValues;
+      }
+
    }
 
    /**
