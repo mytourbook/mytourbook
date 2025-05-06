@@ -122,6 +122,7 @@ public class TourDatabase {
     */
    private static final int TOURBOOK_DB_VERSION = 58;
 
+//   private static final int TOURBOOK_DB_VERSION = 57; // 25.4
 //   private static final int TOURBOOK_DB_VERSION = 56; // 24.11.3
 //   private static final int TOURBOOK_DB_VERSION = 55; // 24.5
 //   private static final int TOURBOOK_DB_VERSION = 54; // 24.1 fixed db data update bug 47 -> 48
@@ -4807,6 +4808,12 @@ public class TourDatabase {
             + "   tourLocationEnd_LocationID             BIGINT,                       " + NL //$NON-NLS-1$
 
             // version 52 end
+
+            // version 58 start  -  25.x
+
+            + "   poolLength                             INTEGER DEFAULT 0,            " + NL //$NON-NLS-1$
+
+            // version 58 end
 
             // version 5 start
             /**
@@ -10964,8 +10971,10 @@ public class TourDatabase {
 
 // SET_FORMATTING_OFF
 
-         SQL.addColumn_Int          (stmt, TABLE_TOUR_NUTRITION_PRODUCT, "carbohydrates",  DEFAULT_0);   //$NON-NLS-1$
-         SQL.addColumn_Int          (stmt, TABLE_TOUR_NUTRITION_PRODUCT, "carbohydrates_Serving",  DEFAULT_0);   //$NON-NLS-1$
+         SQL.addColumn_Int    (stmt, TABLE_TOUR_DATA,              "poolLength",             DEFAULT_0);    //$NON-NLS-1$
+
+         SQL.addColumn_Int    (stmt, TABLE_TOUR_NUTRITION_PRODUCT, "carbohydrates",          DEFAULT_0);    //$NON-NLS-1$
+         SQL.addColumn_Int    (stmt, TABLE_TOUR_NUTRITION_PRODUCT, "carbohydrates_Serving",  DEFAULT_0);    //$NON-NLS-1$
 
 // SET_FORMATTING_ON
 

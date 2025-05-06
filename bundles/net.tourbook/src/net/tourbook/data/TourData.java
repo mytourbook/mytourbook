@@ -935,6 +935,15 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
    private short                 battery_Percentage_End        = -1;
 
 
+   // ############################################# SWIMMING #############################################
+
+   /**
+    * Swim pool length in mm that feets can also be saved correctly.
+    *
+    * When this value is not 0 then there should also be swimming data
+    */
+   private int                   poolLength;
+
    // ############################################# UNUSED FIELDS - START #############################################
    /**
     * ssss distance msw
@@ -5720,7 +5729,6 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
 
             && paceSerie_Seconds != null
             && paceSerie_Seconds_Imperial != null
-
             && paceSerie_Minute != null
             && paceSerie_Minute_Imperial != null
 
@@ -5734,6 +5742,12 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
          // speed is from the device
 
          computeSpeedSeries_FromDevice();
+
+      } else if (poolLength != 0) {
+
+         // compute speed series for swimming
+
+         computeSpeedSeries_FromSwimming();
 
       } else {
 
@@ -5804,6 +5818,101 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
 
       computeSpeedPaceSeries_Interval(numTimeSlices, distanceSerie);
       computeSpeedPaceSeries_Summarized(numTimeSlices, distanceSerie);
+   }
+
+   private void computeSpeedSeries_FromSwimming() {
+
+      if (poolLength == 0
+
+            || swim_Time == null || swim_Time.length < 2
+            || swim_Strokes == null || swim_Strokes.length < 2) {
+
+         return;
+      }
+
+      final float poolLengthMeter = poolLength / 1000;
+
+      final int numTimeSlices = timeSerie.length;
+      final int numSwimValues = swim_Strokes.length;
+
+      speedSerie = new float[numTimeSlices];
+      speedSerie_Mile = new float[numTimeSlices];
+      speedSerie_NauticalMile = new float[numTimeSlices];
+
+      paceSerie_Seconds = new float[numTimeSlices];
+      paceSerie_Seconds_Imperial = new float[numTimeSlices];
+      paceSerie_Minute = new float[numTimeSlices];
+      paceSerie_Minute_Imperial = new float[numTimeSlices];
+
+      maxSpeed = maxPace = 0;
+
+      int swimTimeIndex = 1;
+      int swimStrokeIndex = 0;
+
+      // set values for 1st swim slice
+      int relativeSwimTimeSec = swim_Time[swimTimeIndex];
+      int lengthTimeSec = relativeSwimTimeSec;
+      int prevSwimTimeSec = 0;
+      long swimTimeAbsolute = tourStartTime + (relativeSwimTimeSec * 1000);
+
+      float speedMetric = poolLengthMeter / lengthTimeSec * 3.6f;
+
+      for (int timeSerieIndex = 0; timeSerieIndex < numTimeSlices; timeSerieIndex++) {
+
+         final long tourTimeAbsolute = tourStartTime + (timeSerie[timeSerieIndex] * 1000);
+
+         final boolean isInNextSwimTime = tourTimeAbsolute > swimTimeAbsolute;
+
+         if (isInNextSwimTime) {
+
+            // advance to the next swim slice, swim slices are less frequent than tour slices
+
+            swimTimeIndex++;
+            swimStrokeIndex++;
+
+            // check bounds
+            if (swimStrokeIndex < numSwimValues) {
+
+               // check bounds
+               if (swimTimeIndex >= numSwimValues) {
+                  swimTimeIndex = numSwimValues - 1;
+               }
+
+               prevSwimTimeSec = relativeSwimTimeSec;
+
+               relativeSwimTimeSec = swim_Time[swimTimeIndex];
+               swimTimeAbsolute = tourStartTime + (relativeSwimTimeSec * 1000);
+
+               lengthTimeSec = relativeSwimTimeSec - prevSwimTimeSec;
+
+               if (lengthTimeSec != 0) {
+
+                  speedMetric = poolLengthMeter / lengthTimeSec * 3.6f;
+               }
+            }
+         }
+
+         final float speedMile = speedMetric / UI.UNIT_MILE;
+
+// SET_FORMATTING_OFF
+
+         final float paceMetricSeconds    = speedMetric < 1.0 ? 0 : (float) (3600.0 / speedMetric);
+         final float paceImperialSeconds  = speedMetric < 0.6 ? 0 : (float) (3600.0 / speedMile);
+
+         speedSerie[timeSerieIndex]                   = speedMetric;
+         speedSerie_Mile[timeSerieIndex]              = speedMile;
+         speedSerie_NauticalMile[timeSerieIndex]      = speedMetric / UI.UNIT_NAUTICAL_MILE;
+
+         paceSerie_Seconds[timeSerieIndex]            = paceMetricSeconds;
+         paceSerie_Seconds_Imperial[timeSerieIndex]   = paceImperialSeconds;
+
+         paceSerie_Minute[timeSerieIndex]             = paceMetricSeconds / 60;
+         paceSerie_Minute_Imperial[timeSerieIndex]    = paceImperialSeconds / 60;
+
+// SET_FORMATTING_ON
+
+         maxSpeed = Math.max(maxSpeed, speedMetric);
+      }
    }
 
    /**
@@ -7213,21 +7322,27 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
       });
    }
 
-   private float[] createSwimUI_DataSerie(final short[] allSwimStrokes) {
+   /**
+    * Expand swim value slices into time serie slices
+    *
+    * @param allSwimValues
+    *           Can contain different swim values
+    *
+    * @return
+    */
+   private float[] createSwimUI_DataSerie(final short[] allSwimValues) {
 
-      if (timeSerie == null || swim_Time == null || swim_Time.length < 2 || allSwimStrokes == null) {
+      if (timeSerie == null || swim_Time == null || swim_Time.length < 2 || allSwimValues == null) {
 
          return null;
       }
 
       // create UI data serie
 
-      float[] swimUIValues = null;
-
       final int numTimeSlices = timeSerie.length;
-      final int numSwimStrokes = allSwimStrokes.length;
+      final int numSwimValues = allSwimValues.length;
 
-      swimUIValues = new float[numTimeSlices];
+      final float[] swimUIValues = new float[numTimeSlices];
 
       if (isMultipleTours) {
 
@@ -7240,19 +7355,19 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
             final int timeSerieStartIndex = multipleTourStartIndex[tourIndex];
             final int swimSerieStartIndex = multipleSwimStartIndex[tourIndex];
 
-            if (swimSerieStartIndex >= numSwimStrokes) {
+            if (swimSerieStartIndex >= numSwimValues) {
 
                // there are no further swim data, this can occur when the last tour(s) have no swim data
                break;
             }
 
             final int timeSerieEndIndex = tourIndex < numTours - 1 ? multipleTourStartIndex[tourIndex + 1] : numTimeSlices;
-            final int swimSerieEndIndex = tourIndex < numTours - 1 ? multipleSwimStartIndex[tourIndex + 1] : numSwimStrokes;
+            final int swimSerieEndIndex = tourIndex < numTours - 1 ? multipleSwimStartIndex[tourIndex + 1] : numSwimValues;
 
             final long swimTourStartTime = tourStartTime + (timeSerie[timeSerieStartIndex] * 1000);
             long swimTime = tourStartTime + (swim_Time[swimSerieStartIndex] * 1000);
 
-            short swimValue = 0;
+            short swimStrokes = 0;
             int swimSerieIndex = swimSerieStartIndex;
 
             for (int timeSerieIndex = timeSerieStartIndex; timeSerieIndex < timeSerieEndIndex; timeSerieIndex++) {
@@ -7268,9 +7383,9 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
                   // check bounds
                   if (swimSerieIndex < swimSerieEndIndex) {
 
-                     swimValue = allSwimStrokes[swimSerieIndex];
+                     swimStrokes = allSwimValues[swimSerieIndex];
 
-                     if (swimValue == Short.MIN_VALUE) {
+                     if (swimStrokes == Short.MIN_VALUE) {
 
                         // use MIN_VALUE that the original color is displayed which makes a rest time more visible
                         //   swimValue = 0;
@@ -7280,7 +7395,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
                   }
                }
 
-               swimUIValues[timeSerieIndex] = swimValue;
+               swimUIValues[timeSerieIndex] = swimStrokes;
             }
          }
 
@@ -7293,7 +7408,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
 
          // set values for 1st swim slice
          long swimTime = tourStartTime + (swim_Time[swimTimeIndex] * 1000);
-         short swimStrokes = allSwimStrokes[swimStrokeIndex];
+         short swimStrokes = allSwimValues[swimStrokeIndex];
 
          for (int timeSerieIndex = 0; timeSerieIndex < numTimeSlices; timeSerieIndex++) {
 
@@ -7309,9 +7424,9 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
                swimStrokeIndex++;
 
                // check bounds
-               if (swimStrokeIndex < numSwimStrokes) {
+               if (swimStrokeIndex < numSwimValues) {
 
-                  swimStrokes = allSwimStrokes[swimStrokeIndex];
+                  swimStrokes = allSwimValues[swimStrokeIndex];
 
                   if (swimStrokes == Short.MIN_VALUE) {
 
@@ -7319,8 +7434,8 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
                      //   swimValue = 0;
                   }
 
-                  if (swimTimeIndex >= numSwimStrokes) {
-                     swimTimeIndex--;
+                  if (swimTimeIndex >= numSwimValues) {
+                     swimTimeIndex = numSwimValues - 1;
                   }
 
                   swimTime = tourStartTime + (swim_Time[swimTimeIndex] * 1000);
@@ -9707,6 +9822,10 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
       return _allPhotoTimeAdjustments;
    }
 
+   public int getPoolLength() {
+      return poolLength;
+   }
+
    public float getPower_Avg() {
       return power_Avg;
    }
@@ -10462,6 +10581,13 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
    public float[] getSpeedSerie() {
 
       if (isSpeedSerieFromDevice) {
+
+         return getSpeedSerieInternal();
+
+      } else if (poolLength != 0 && speedSerie != null) {
+
+         // speed is from swimming
+
          return getSpeedSerieInternal();
       }
 
@@ -12745,6 +12871,10 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
       _allPhotoTimeAdjustments = null;
    }
 
+   public void setPoolLength(final int poolLength) {
+      this.poolLength = poolLength;
+   }
+
    public void setPower_Avg(final float avgPower) {
       this.power_Avg = avgPower;
    }
@@ -12967,6 +13097,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
     * @param speedSerie
     */
    public void setSpeedSerie(final float[] speedSerie) {
+
       this.speedSerie = speedSerie;
       this.isSpeedSerieFromDevice = speedSerie != null;
    }

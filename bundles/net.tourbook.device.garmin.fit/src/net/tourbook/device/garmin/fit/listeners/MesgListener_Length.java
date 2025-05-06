@@ -50,10 +50,14 @@ public class MesgListener_Length extends AbstractMesgListener implements LengthM
       // convert garmin time into java time
       final long javaTime = mesg.getStartTime().getDate().getTime();
 
-      final Short avgSwimmingCadence = mesg.getAvgSwimmingCadence();
-      final LengthType lengthType = mesg.getLengthType();
-      final SwimStroke swimStrokeStyle = mesg.getSwimStroke();
-      final Integer numStrokes = mesg.getTotalStrokes();
+// SET_FORMATTING_OFF
+
+      final Short       avgSwimmingCadence   = mesg.getAvgSwimmingCadence();
+      final LengthType  lengthType           = mesg.getLengthType();
+      final SwimStroke  swimStrokeStyle      = mesg.getSwimStroke();
+      final Integer     numStrokes           = mesg.getTotalStrokes();
+
+// SET_FORMATTING_ON
 
       swimData.absoluteTime = javaTime;
 
