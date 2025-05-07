@@ -831,6 +831,14 @@ public class TourPhotoManager implements IPhotoServiceProvider {
             final long photoID = photoRef.photoId;
 
             final TourData tourData = TourManager.getInstance().getTourData(photoRef.tourId);
+
+            if (tourData == null) {
+
+               // this happened when a tour was deleted
+
+               continue;
+            }
+
             final Set<TourPhoto> allTourPhotos = tourData.getTourPhotos();
 
             for (final TourPhoto tourPhoto : allTourPhotos) {
