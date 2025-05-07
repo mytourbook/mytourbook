@@ -2739,11 +2739,13 @@ public class Messages extends NLS {
    public static String        Slideout_TourFilter_Action_Apply;
    public static String        Slideout_TourFilter_Action_CopyProfile;
    public static String        Slideout_TourFilter_Action_CopyProfile_Tooltip;
+
    public static String        Slideout_TourFilter_Action_DeactivateAll;
    public static String        Slideout_TourFilter_Action_DeactivateAll_Tooltip;
    public static String        Slideout_TourFilter_Action_DeleteProfile;
    public static String        Slideout_TourFilter_Action_DeleteProfile_Tooltip;
    public static String        Slideout_TourFilter_Action_DeleteProperty_Tooltip;
+   public static String        Slideout_TourFilter_Action_DuplicateProperty_Tooltip;
    public static String        Slideout_TourFilter_Action_MovePropertyDown_Tooltip;
    public static String        Slideout_TourFilter_Action_MovePropertyUp_Tooltip;
    public static String        Slideout_TourFilter_Checkbox_IsLiveUpdate;

@@ -54,6 +54,10 @@ New
     - Speed in the tour chart
     - Distance values in different locations  
     https://github.com/mytourbook/mytourbook/issues/1485
+    
+* Tour Filter
+  - Duplicate filter property, this makes it easier to create a similar filter    
+    https://github.com/mytourbook/mytourbook/issues/1487
 
 Improvements
 ============

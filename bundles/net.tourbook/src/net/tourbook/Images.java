@@ -39,6 +39,7 @@ public class Images {
    public static final String App_Add                                    = "app-add.png";                                         //$NON-NLS-1$
    public static final String App_Add_2x                                 = "app-add-2x.png";                                      //$NON-NLS-1$
    public static final String App_Cancel_2                               = "16px-Crystal_Clear_action_button_cancel.png";         //$NON-NLS-1$
+   public static final String App_Copy_Themed                            = "copy-blue.png";                                       //$NON-NLS-1$
    public static final String App_Delete                                 = "delete.png";                                          //$NON-NLS-1$
    public static final String App_Delete_Disabled                        = "delete-disabled.png";                                 //$NON-NLS-1$
    public static final String App_Directory_CollatedTours                = "collated-tours.png";                                  //$NON-NLS-1$
