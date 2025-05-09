@@ -2146,22 +2146,16 @@ public class TourDataEditorView extends ViewPart implements
             // set tour start/end date/time
             final long tourStartTime = newTourContext.tourStartTime;
             final long tourEndTime = newTourContext.tourEndTime;
+
             final long elapsedTime = tourEndTime - tourStartTime;
-
             final long elapsedTimeSeconds = elapsedTime / 1000;
-
-            newTourData.timeSerie = new int[] {
-
-                  0,
-                  (int) (elapsedTimeSeconds / 2),
-                  (int) elapsedTimeSeconds,
-            };
 
             newTourData.setTourTitle(newTourContext.title);
             newTourData.setTourStartTime(TimeTools.getZonedDateTime(tourStartTime));
             newTourData.setTourDeviceTime_Elapsed(elapsedTimeSeconds);
+            newTourData.timeSerie = newTourContext.timeSerie;
 
-            // prevent that this is a manual tour
+            // prevent that this is a manual tour and to identify it as a photo tour
             newTourData.setDeviceId(TourData.DEVICE_ID_FOR_PHOTO_TOUR);
 
          } else {
@@ -2455,7 +2449,9 @@ public class TourDataEditorView extends ViewPart implements
     * @param isRemoveDistance
     * @param isAdjustTourStartTime
     */
-   void actionDelete_TimeSlices(final boolean isRemoveTime, final boolean isRemoveDistance, final boolean isAdjustTourStartTime) {
+   void actionDelete_TimeSlices(final boolean isRemoveTime,
+                                final boolean isRemoveDistance,
+                                final boolean isAdjustTourStartTime) {
 
       // a tour with reference tours is currently not supported
       if (_isReferenceTourAvailable) {
@@ -2543,7 +2539,14 @@ public class TourDataEditorView extends ViewPart implements
       Arrays.sort(selectionIndices);
       final int lastTopIndex = selectionIndices[0];
 
-      TourManager.removeTimeSlices(_tourData, firstIndex, lastIndex, isRemoveTime, isRemoveDistance, isAdjustTourStartTime);
+      TourManager.removeTimeSlices(
+            
+            _tourData,
+            firstIndex,
+            lastIndex,
+            isRemoveTime,
+            isRemoveDistance,
+            isAdjustTourStartTime);
 
       getDataSeriesFromTourData();
 
@@ -9513,17 +9516,17 @@ public class TourDataEditorView extends ViewPart implements
          if (_isManualTour || _isPhotoTour) {
 
 // SET_FORMATTING_OFF
-            
+
             _tourData.setTourDeviceTime_Elapsed    (_deviceTime_Elapsed.getTime());
             _tourData.setTourDeviceTime_Recorded   (_deviceTime_Recorded.getTime());
             _tourData.setTourDeviceTime_Paused     (_deviceTime_Paused.getTime());
             _tourData.setTourComputedTime_Moving   (_computedTime_Moving.getTime());
-            
+
 // SET_FORMATTING_ON
          }
 
-         if (_isPhotoTour) {
-            
+         if (_isPhotoTour && _tourData.timeSerie == null) {
+
             // create a time serie
 
             final long elapsedTime = _tourData.getTourDeviceTime_Elapsed();

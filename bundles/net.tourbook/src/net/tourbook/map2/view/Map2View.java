@@ -101,7 +101,8 @@ import net.tourbook.map2.action.ActionMap2_PhotoFilter;
 import net.tourbook.map2.action.ActionReloadFailedMapImages;
 import net.tourbook.map2.action.ActionSaveDefaultPosition;
 import net.tourbook.map2.action.ActionSetDefaultPosition;
-import net.tourbook.map2.action.ActionSetGeoPosition;
+import net.tourbook.map2.action.ActionSetGeoPositionForGeoMarker;
+import net.tourbook.map2.action.ActionSetGeoPositionForPhotoTours;
 import net.tourbook.map2.action.ActionShowAllFilteredPhotos;
 import net.tourbook.map2.action.ActionShowLegendInMap;
 import net.tourbook.map2.action.ActionShowPOI;
@@ -162,7 +163,6 @@ import net.tourbook.tour.photo.TourPhotoLinkSelection;
 import net.tourbook.tour.photo.TourPhotoManager;
 import net.tourbook.ui.ITourProvider;
 import net.tourbook.ui.ValuePoint_ToolTip_UI;
-import net.tourbook.ui.action.SubMenu_SetGeoPosition;
 import net.tourbook.ui.action.SubMenu_SetTourMarkerType;
 import net.tourbook.ui.tourChart.HoveredValueData;
 import net.tourbook.ui.tourChart.TourChart;
@@ -545,7 +545,8 @@ public class Map2View extends ViewPart implements
    private ActionSaveDefaultPosition            _actionSaveDefaultPosition;
    private ActionSearchTourByLocation           _actionSearchTourByLocation;
    private ActionSetDefaultPosition             _actionSetDefaultPosition;
-   private ActionSetGeoPosition                 _actionSetGeoPositions;
+   private ActionSetGeoPositionForGeoMarker     _actionSetGeoPositionForGeoMarker;
+   private ActionSetGeoPositionForPhotoTours    _actionSetGeoPositionForPhotoTours;
    private ActionShowAllFilteredPhotos          _actionShowAllFilteredPhotos;
    private ActionShowLegendInMap                _actionShowLegendInMap;
    private ActionShowPOI                        _actionShowPOI;
@@ -559,7 +560,6 @@ public class Map2View extends ViewPart implements
    private ActionShowValuePoint                 _actionShowValuePoint;
    private ActionZoomLevelAdjustment            _actionZoomLevelAdjustment;
    //
-   private SubMenu_SetGeoPosition               _actionSubMenu_SetGeoPosition;
    private SubMenu_SetTourMarkerType            _actionSubMenu_SetTourMarkerType;
    //
    private ActionSyncMap                        _actionMap2Slideout_SyncMap;
@@ -2511,7 +2511,8 @@ public class Map2View extends ViewPart implements
       _actionShowAllFilteredPhotos           = new ActionShowAllFilteredPhotos(this);
       _actionShowLegendInMap                 = new ActionShowLegendInMap(this);
       _actionMap2Slideout_PhotoOptions       = new ActionMap2_PhotoOptions();
-      _actionSetGeoPositions                 = new ActionSetGeoPosition();
+      _actionSetGeoPositionForGeoMarker      = new ActionSetGeoPositionForGeoMarker();
+      _actionSetGeoPositionForPhotoTours     = new ActionSetGeoPositionForPhotoTours();
       _actionShowScaleInMap                  = new ActionShowScaleInMap(this);
       _actionShowSliderInMap                 = new ActionShowSliderInMap(this);
       _actionShowSliderInLegend              = new ActionShowSliderInLegend(this);
@@ -2521,7 +2522,6 @@ public class Map2View extends ViewPart implements
       _actionShowTour                        = new ActionShowTour();
       _actionShowTourInfoInMap               = new ActionShowTourInfoInMap(this);
       _actionShowTourWeatherInMap            = new ActionShowTourWeatherInMap(this);
-      _actionSubMenu_SetGeoPosition          = new SubMenu_SetGeoPosition();
       _actionSubMenu_SetTourMarkerType       = new SubMenu_SetTourMarkerType();
       _actionZoomLevelAdjustment             = new ActionZoomLevelAdjustment();
 
@@ -2832,19 +2832,19 @@ public class Map2View extends ViewPart implements
          canCreateGeoPositions = true;
          actionGeoPositionLabel = (Messages.Map_Action_GeoPositions_SetInto.formatted(TourManager.getTourTitle(tourData)));
 
-         _actionSetGeoPositions.setData(tourData, currentMouseGeoPosition);
+         _actionSetGeoPositionForPhotoTours.setData(tourData, currentMouseGeoPosition);
       }
 
-      _actionSetGeoPositions.setEnabled(canCreateGeoPositions);
-      _actionSetGeoPositions.setText(actionGeoPositionLabel);
+      _actionSetGeoPositionForPhotoTours.setEnabled(canCreateGeoPositions);
+      _actionSetGeoPositionForPhotoTours.setText(actionGeoPositionLabel);
 
       /*
        * Set geo positions into tour geo marker
        */
       final List<TourMarker> allGeoMarker = getTourMarkersWhereGeoPositionsCanBeSet();
 
-      _actionSubMenu_SetGeoPosition.setContextData(allGeoMarker, currentMouseGeoPosition);
-      _actionSubMenu_SetGeoPosition.setEnabled(allGeoMarker != null && allGeoMarker.size() > 0);
+      _actionSetGeoPositionForGeoMarker.setContextData(allGeoMarker, currentMouseGeoPosition);
+      _actionSetGeoPositionForGeoMarker.setEnabled(allGeoMarker != null && allGeoMarker.size() > 0);
 
 // SET_FORMATTING_OFF
 
@@ -3110,8 +3110,8 @@ public class Map2View extends ViewPart implements
          menuMgr.add(_actionSearchTourByLocation);
          menuMgr.add(_actionCreateTourMarkerFromMap);
          menuMgr.add(_actionLookupTourLocation);
-         menuMgr.add(_actionSetGeoPositions);
-         menuMgr.add(_actionSubMenu_SetGeoPosition);
+         menuMgr.add(_actionSetGeoPositionForPhotoTours);
+         menuMgr.add(_actionSetGeoPositionForGeoMarker);
 
          /*
           * Show tour features
@@ -3653,6 +3653,8 @@ public class Map2View extends ViewPart implements
 
       if (_lastTourWithoutLatLon != null) {
 
+         // tour do not have geo positions
+
          return _lastTourWithoutLatLon;
       }
 
@@ -3660,9 +3662,7 @@ public class Map2View extends ViewPart implements
 
          final TourData tourData = _allTourData.get(0);
 
-         final double[] latitudeSerie = tourData.latitudeSerie;
-
-         if (latitudeSerie == null || latitudeSerie.length <= 3) {
+         if (tourData.isPhotoTour()) {
 
             return tourData;
          }
@@ -3733,7 +3733,7 @@ public class Map2View extends ViewPart implements
          return null;
       }
 
-      final String geoMarkerPrefix = SubMenu_SetGeoPosition.GEO_MARKER_PREFIX.toLowerCase();
+      final String geoMarkerPrefix = ActionSetGeoPositionForGeoMarker.GEO_MARKER_PREFIX.toLowerCase();
       final List<TourMarker> allGeoMarker = new ArrayList<>();
 
       final Set<TourMarker> allTourMarkers = tourData.getTourMarkers();

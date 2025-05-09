@@ -13,7 +13,7 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
-package net.tourbook.ui.action;
+package net.tourbook.map2.action;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -39,7 +39,7 @@ import org.eclipse.swt.widgets.Menu;
 
 /**
  */
-public class SubMenu_SetGeoPosition extends SubMenu {
+public class ActionSetGeoPositionForGeoMarker extends SubMenu {
 
    public static final String GEO_MARKER_PREFIX = "#Geo"; //$NON-NLS-1$
 
@@ -80,7 +80,7 @@ public class SubMenu_SetGeoPosition extends SubMenu {
       }
    }
 
-   public SubMenu_SetGeoPosition() {
+   public ActionSetGeoPositionForGeoMarker() {
 
       super(Messages.Map_Action_GeoMarkerPosition_SetIntoMarker.formatted(GEO_MARKER_PREFIX), AS_DROP_DOWN_MENU);
 

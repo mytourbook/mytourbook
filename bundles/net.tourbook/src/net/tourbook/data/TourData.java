@@ -6727,7 +6727,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
          _galleryPhotos.add(galleryPhoto);
       }
 
-      Collections.sort(_galleryPhotos, TourPhotoManager.AdjustTimeComparatorTour);
+      Collections.sort(_galleryPhotos, TourPhotoManager.AdjustTimeComparator_Tour);
    }
 
    public void createHistoryTimeSerie(final ArrayList<HistoryData> historySlices) {

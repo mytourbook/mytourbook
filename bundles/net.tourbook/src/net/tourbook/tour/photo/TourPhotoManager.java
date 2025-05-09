@@ -101,20 +101,20 @@ public class TourPhotoManager implements IPhotoServiceProvider {
    private static final TourManager              _tourManager                 = TourManager.getInstance();
 
    /**
-    * Contains all cameras which are every used, key is the camera name.
+    * Contains all cameras which are everwhere used, key is the camera name
     */
    private static HashMap<String, Camera>        _allAvailableCameras         = new HashMap<>();
    private static String                         _replaceImageFolder;
 
    /**
-    * Compares 2 photos by the adjusted time.
+    * Compares 2 photos by the adjusted time
     */
-   public static final Comparator<? super Photo> AdjustTimeComparatorLink;
-   public static final Comparator<? super Photo> AdjustTimeComparatorTour;
+   public static final Comparator<? super Photo> AdjustTimeComparator_Link;
+   public static final Comparator<? super Photo> AdjustTimeComparator_Tour;
 
    static {
 
-      AdjustTimeComparatorLink = new Comparator<>() {
+      AdjustTimeComparator_Link = new Comparator<>() {
 
          @Override
          public int compare(final Photo photo1, final Photo photo2) {
@@ -127,7 +127,7 @@ public class TourPhotoManager implements IPhotoServiceProvider {
          }
       };
 
-      AdjustTimeComparatorTour = new Comparator<>() {
+      AdjustTimeComparator_Tour = new Comparator<>() {
 
          @Override
          public int compare(final Photo photo1, final Photo photo2) {

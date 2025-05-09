@@ -48,7 +48,6 @@ import net.tourbook.data.TourData;
 import net.tourbook.data.TourPhoto;
 import net.tourbook.photo.Camera;
 import net.tourbook.photo.Photo;
-import net.tourbook.photo.PhotoCache;
 import net.tourbook.photo.PhotoEventId;
 import net.tourbook.photo.PhotoManager;
 import net.tourbook.photo.PhotoSelection;
@@ -404,20 +403,47 @@ public class TourPhotoLinkView extends ViewPart implements ITourProvider, ITourV
          return;
       }
 
-      final TourPhotoLink selectedPhotoLink = _allSelectedPhotoLinks.get(0);
-
       final TourDataEditorView tourEditor = TourManager.openTourEditor(true);
 
-      if (tourEditor != null) {
-
-         final NewTourContext newTourContext = new NewTourContext();
-
-         newTourContext.title = Messages.Photos_AndTours_TourTitle_PhotoTour;
-         newTourContext.tourStartTime = selectedPhotoLink.historyStartTime - 1000;
-         newTourContext.tourEndTime = selectedPhotoLink.historyEndTime + 1000;
-
-         tourEditor.actionCreateTour(null, newTourContext);
+      if (tourEditor == null) {
+         return;
       }
+
+      final TourPhotoLink selectedPhotoLink = _allSelectedPhotoLinks.get(0);
+
+      final long tourStartTime = selectedPhotoLink.historyStartTime - 10_000;
+      final long tourEndTime = selectedPhotoLink.historyEndTime + 10_000;
+
+      final long elapsedTime = tourEndTime - tourStartTime;
+      final long elapsedTimeSeconds = elapsedTime / 1000;
+
+      final ArrayList<Photo> allLinkPhotos = selectedPhotoLink.linkPhotos;
+
+      final int numPhotos = allLinkPhotos.size();
+      final int[] timeSerie = new int[numPhotos + 2];
+
+      for (int photoIndex = 0; photoIndex < numPhotos; photoIndex++) {
+
+         final Photo photo = allLinkPhotos.get(photoIndex);
+
+         final long adjustedTime_Camera = photo.adjustedTime_Camera;
+
+         final int relativeTime = (int) ((adjustedTime_Camera - tourStartTime) / 1000);
+
+         timeSerie[photoIndex + 1] = relativeTime;
+      }
+
+      timeSerie[0] = 0;
+      timeSerie[numPhotos + 1] = (int) elapsedTimeSeconds;
+
+      final NewTourContext newTourContext = new NewTourContext();
+
+      newTourContext.title = Messages.Photos_AndTours_TourTitle_PhotoTour;
+      newTourContext.tourStartTime = tourStartTime;
+      newTourContext.tourEndTime = tourEndTime;
+      newTourContext.timeSerie = timeSerie;
+
+      tourEditor.actionCreateTour(null, newTourContext);
    }
 
    void actionFilter_NotSavedPhotos() {
@@ -2248,7 +2274,8 @@ public class TourPhotoLinkView extends ViewPart implements ITourProvider, ITourV
          photo.resetLinkWorldPosition();
       }
 
-      Collections.sort(_allPhotos, TourPhotoManager.AdjustTimeComparatorLink);
+      // sort photos by time
+      Collections.sort(_allPhotos, TourPhotoManager.AdjustTimeComparator_Link);
 
 //    dumpPhotos();
    }

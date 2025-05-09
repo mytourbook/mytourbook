@@ -21,4 +21,6 @@ public class NewTourContext {
 
    public long   tourStartTime;
    public long   tourEndTime;
+
+   public int[]  timeSerie;
 }
