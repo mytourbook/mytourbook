@@ -443,7 +443,30 @@ public class TourPhotoLinkView extends ViewPart implements ITourProvider, ITourV
       newTourContext.tourEndTime = tourEndTime;
       newTourContext.timeSerie = timeSerie;
 
+      /*
+       * Create a new tour
+       */
       tourEditor.actionCreateTour(null, newTourContext);
+
+      final TourData newTourData = newTourContext.newTourData;
+      if (newTourData == null) {
+         return;
+      }
+
+      /*
+       * Set all photos into the new tour
+       */
+
+      // contains all photos, modified and not modified
+      final HashSet<Photo> allPhotos = new HashSet<>();
+
+      setAllPhotosInTour(newTourData, allLinkPhotos, allPhotos);
+
+// I DON'T KNOW IF THIS IS NEEDED
+//
+//      PhotoManager.firePhotoEvent(this,
+//            PhotoEventId.PHOTO_ATTRIBUTES_ARE_MODIFIED,
+//            new ArrayList<>(allPhotos));
    }
 
    void actionFilter_NotSavedPhotos() {
@@ -510,8 +533,8 @@ public class TourPhotoLinkView extends ViewPart implements ITourProvider, ITourV
       // contains all photos, modified and not modified
       final HashSet<Photo> allPhotos = new HashSet<>();
 
-      final ArrayList<TourData> modifiedTours = new ArrayList<>();
-      final ArrayList<TourPhotoLink> modifiedLinks = new ArrayList<>();
+      final ArrayList<TourData> allModifiedTours = new ArrayList<>();
+      final ArrayList<TourPhotoLink> allModifiedLinks = new ArrayList<>();
 
       final Object[] allSelectedPhotoLinks = ((IStructuredSelection) _tourViewer.getSelection()).toArray();
 
@@ -536,49 +559,10 @@ public class TourPhotoLinkView extends ViewPart implements ITourProvider, ITourV
 
                      numRealTours++;
 
-                     final HashMap<String, TourPhoto> allOldTourPhotos = new HashMap<>();
-                     final Set<TourPhoto> tourPhotosSet = tourData.getTourPhotos();
-                     for (final TourPhoto tourPhoto : tourPhotosSet) {
-                        allOldTourPhotos.put(tourPhoto.getImageFilePathName(), tourPhoto);
-                     }
+                     setAllPhotosInTour(tourData, allLinkPhotos, allPhotos);
 
-                     // keep existing photos
-                     final ArrayList<Photo> allOldGalleryPhotos = tourData.getGalleryPhotos();
-                     if (allOldGalleryPhotos != null) {
-                        allPhotos.addAll(allOldGalleryPhotos);
-                     }
-
-                     final HashSet<TourPhoto> allNewTourPhotos = new HashSet<>();
-
-                     for (final Photo galleryPhoto : allLinkPhotos) {
-
-                        // get existing tour photo
-                        TourPhoto tourPhoto = allOldTourPhotos.get(galleryPhoto.imageFilePathName);
-
-                        if (tourPhoto == null) {
-
-                           // gallery photo is not in tour -> create new tour photo
-
-                           tourPhoto = new TourPhoto(tourData, galleryPhoto);
-                        }
-
-                        final double linkLatitude = galleryPhoto.getLinkLatitude();
-                        final double linkLongitude = galleryPhoto.getLinkLongitude();
-
-                        // set adjusted time / geo location
-                        tourPhoto.setAdjustedTime(galleryPhoto.adjustedTime_Camera);
-                        tourPhoto.setGeoLocation(linkLatitude, linkLongitude);
-
-                        allNewTourPhotos.add(tourPhoto);
-
-                        // add new/old photos
-                        allPhotos.add(galleryPhoto);
-                     }
-
-                     tourData.setTourPhotos(allNewTourPhotos, allLinkPhotos);
-
-                     modifiedTours.add(tourData);
-                     modifiedLinks.add(photoLink);
+                     allModifiedTours.add(tourData);
+                     allModifiedLinks.add(photoLink);
                   }
                }
 
@@ -638,17 +622,17 @@ public class TourPhotoLinkView extends ViewPart implements ITourProvider, ITourV
 
       }
 
-      final ArrayList<TourData> savedTours = TourManager.saveModifiedTours(modifiedTours);
+      final ArrayList<TourData> savedTours = TourManager.saveModifiedTours(allModifiedTours);
 
       /*
-       * after saving tour + photos, update the photos and put them into the photo cache
+       * After saving tour + photos, update the photos and put them into the photo cache
        */
       for (final TourData savedTourData : savedTours) {
          savedTourData.createGalleryPhotos();
       }
 
       // update viewer data
-      for (final TourPhotoLink photoLink : modifiedLinks) {
+      for (final TourPhotoLink photoLink : allModifiedLinks) {
 
          final TourData tourData = tourManager.getTourData(photoLink.tourId);
 
@@ -661,7 +645,7 @@ public class TourPhotoLinkView extends ViewPart implements ITourProvider, ITourV
       }
 
       // update viewer UI
-      _tourViewer.update(modifiedLinks.toArray(), null);
+      _tourViewer.update(allModifiedLinks.toArray(), null);
 
       PhotoManager.firePhotoEvent(this,
             PhotoEventId.PHOTO_ATTRIBUTES_ARE_MODIFIED,
@@ -2014,7 +1998,7 @@ public class TourPhotoLinkView extends ViewPart implements ITourProvider, ITourV
 
       final TourManager tourManager = TourManager.getInstance();
 
-      final ArrayList<TourPhotoLink> modifiedLinks = new ArrayList<>();
+      final ArrayList<TourPhotoLink> allModifiedLinks = new ArrayList<>();
 
       // update viewer data
       for (final TourPhotoLink photoLink : _allVisibleTourPhotoLinks) {
@@ -2033,7 +2017,7 @@ public class TourPhotoLinkView extends ViewPart implements ITourProvider, ITourV
                   photoLink.photoTimeAdjustment = tourData.getPhotoTimeAdjustment();
                   photoLink.photoFilePath = getPhotoFilePath(tourData);
 
-                  modifiedLinks.add(photoLink);
+                  allModifiedLinks.add(photoLink);
 
                   // proceed with the next photo link
                   break;
@@ -2043,8 +2027,12 @@ public class TourPhotoLinkView extends ViewPart implements ITourProvider, ITourV
       }
 
       // update viewer UI
-      if (modifiedLinks.size() > 0) {
-         _tourViewer.update(modifiedLinks.toArray(), null);
+      if (allModifiedLinks.size() > 0) {
+
+         // update number of photos with/without GPS
+         TourPhotoManager.getInstance().setTourGpsIntoPhotos(allModifiedLinks);
+
+         _tourViewer.update(allModifiedLinks.toArray(), null);
       }
    }
 
@@ -2247,6 +2235,59 @@ public class TourPhotoLinkView extends ViewPart implements ITourProvider, ITourV
       table.setSelection(table.getSelectionIndex());
    }
 
+   /**
+    * @param tourData
+    * @param allLinkPhotos
+    * @param allPhotos
+    *           Out: Contains all photos which are "touched"
+    */
+   private void setAllPhotosInTour(final TourData tourData,
+                                   final ArrayList<Photo> allLinkPhotos,
+                                   final HashSet<Photo> allPhotos) {
+
+      final HashMap<String, TourPhoto> allOldTourPhotos = new HashMap<>();
+      final Set<TourPhoto> allExistingTourPhotos = tourData.getTourPhotos();
+
+      for (final TourPhoto tourPhoto : allExistingTourPhotos) {
+         allOldTourPhotos.put(tourPhoto.getImageFilePathName(), tourPhoto);
+      }
+
+      // keep existing photos
+      final ArrayList<Photo> allOldGalleryPhotos = tourData.getGalleryPhotos();
+      if (allOldGalleryPhotos != null) {
+         allPhotos.addAll(allOldGalleryPhotos);
+      }
+
+      final HashSet<TourPhoto> allNewTourPhotos = new HashSet<>();
+
+      for (final Photo linkPhoto : allLinkPhotos) {
+
+         // get existing tour photo
+         TourPhoto tourPhoto = allOldTourPhotos.get(linkPhoto.imageFilePathName);
+
+         if (tourPhoto == null) {
+
+            // gallery photo is not in tour -> create new tour photo
+
+            tourPhoto = new TourPhoto(tourData, linkPhoto);
+         }
+
+         final double linkLatitude = linkPhoto.getLinkLatitude();
+         final double linkLongitude = linkPhoto.getLinkLongitude();
+
+         // set adjusted time / geo location
+         tourPhoto.setAdjustedTime(linkPhoto.adjustedTime_Camera);
+         tourPhoto.setGeoLocation(linkLatitude, linkLongitude);
+
+         allNewTourPhotos.add(tourPhoto);
+
+         // add new/old photos
+         allPhotos.add(linkPhoto);
+      }
+
+      tourData.setTourPhotos(allNewTourPhotos, allLinkPhotos);
+   }
+
    private void setBgColor(final ViewerCell cell, final TourPhotoLink linkTour) {
 
 //		if (linkTour.isHistoryTour()) {
@@ -2284,9 +2325,9 @@ public class TourPhotoLinkView extends ViewPart implements ITourProvider, ITourV
     * Entry point in this view to show tours for the provided photos
     *
     * @param allPhotos
-    * @param isFromAll
+    * @param isSelectAllPhotos
     */
-   void showPhotosAndTours(final ArrayList<Photo> allPhotos, final boolean isFromAll) {
+   void showPhotosAndTours(final ArrayList<Photo> allPhotos, final boolean isSelectAllPhotos) {
 
       _allPrevPhotos = allPhotos;
 
@@ -2318,13 +2359,13 @@ public class TourPhotoLinkView extends ViewPart implements ITourProvider, ITourV
          BusyIndicator.showWhile(_pageBook.getDisplay(), new Runnable() {
             @Override
             public void run() {
-               updateUI(null, _allVisibleTourPhotoLinks, isFromAll);
+               updateUI(null, _allVisibleTourPhotoLinks, isSelectAllPhotos);
             }
          });
 
       } else {
 
-         updateUI(null, _allVisibleTourPhotoLinks, isFromAll);
+         updateUI(null, _allVisibleTourPhotoLinks, isSelectAllPhotos);
       }
    }
 
@@ -2341,7 +2382,7 @@ public class TourPhotoLinkView extends ViewPart implements ITourProvider, ITourV
 
    private void updateUI(final ArrayList<TourPhotoLink> tourPhotoLinksWhichShouldBeSelected,
                          final ArrayList<TourPhotoLink> allLinksWhichShouldBeSelected,
-                         final boolean isFromAll) {
+                         final boolean isSelectAllPhotos) {
 
       if (_allPhotos.isEmpty()) {
 
@@ -2398,7 +2439,7 @@ public class TourPhotoLinkView extends ViewPart implements ITourProvider, ITourV
          // update annotations in PicDirView
          PhotoManager.updatePicDirGallery();
 
-         if (isFromAll == false) {
+         if (isSelectAllPhotos == false) {
 
             /*
              * Prevent that all tour photo links are selected -> this can cause performance and

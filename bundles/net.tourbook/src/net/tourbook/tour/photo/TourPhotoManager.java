@@ -1716,7 +1716,7 @@ public class TourPhotoManager implements IPhotoServiceProvider {
       }
    }
 
-   private void setTourGpsIntoPhotos(final List<TourPhotoLink> tourPhotoLinksWithGps) {
+   void setTourGpsIntoPhotos(final List<TourPhotoLink> tourPhotoLinksWithGps) {
 
       for (final TourPhotoLink tourPhotoLink : tourPhotoLinksWithGps) {
 
@@ -1724,7 +1724,7 @@ public class TourPhotoManager implements IPhotoServiceProvider {
          setTourGPSIntoPhotos_10(tourPhotoLink);
 
          /*
-          * update number of photos
+          * Update number of photos
           */
          tourPhotoLink.numGPSPhotos = 0;
          tourPhotoLink.numNoGPSPhotos = 0;

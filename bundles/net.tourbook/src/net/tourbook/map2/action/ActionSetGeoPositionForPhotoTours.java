@@ -15,6 +15,7 @@
  *******************************************************************************/
 package net.tourbook.map2.action;
 
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Set;
@@ -41,26 +42,30 @@ public class ActionSetGeoPositionForPhotoTours extends SubMenu {
 
    private class ActionSetGeoPosition extends Action {
 
-      private int _geoTime;
-      private int _timeIndex;
+      private int       _geoTime;
+      private int       _timeIndex;
 
-      public ActionSetGeoPosition(final int timeIndex, final int geoTime, final String photoLabel) {
+      /**
+       * Can be <code>null</code> when this action/time slice has not a photo
+       */
+      private TourPhoto _tourPhoto;
 
-         super(photoLabel != null
+      public ActionSetGeoPosition(final int timeIndex,
+                                  final int geoTime,
+                                  final String photoLabel,
+                                  final TourPhoto tourPhoto) {
 
-               ? photoLabel
-               : Integer.toString(geoTime),
-
-               AS_PUSH_BUTTON);
+         super(photoLabel, AS_PUSH_BUTTON);
 
          _timeIndex = timeIndex;
          _geoTime = geoTime;
+         _tourPhoto = tourPhoto;
       }
 
       @Override
       public void run() {
 
-         setGeoPosition(_timeIndex, _geoTime);
+         setGeoPosition(_timeIndex, _geoTime, _tourPhoto);
       }
    }
 
@@ -74,9 +79,7 @@ public class ActionSetGeoPositionForPhotoTours extends SubMenu {
       }
 
       @Override
-      public void run() {
-//         setGeoPositions(false, false);
-      }
+      public void run() {}
    }
 
    private class SubAction_SetEndPosition extends Action {
@@ -86,9 +89,7 @@ public class ActionSetGeoPositionForPhotoTours extends SubMenu {
       }
 
       @Override
-      public void run() {
-//         setGeoPositions(false, true);
-      }
+      public void run() {}
    }
 
    private class SubAction_SetStartEndPosition extends Action {
@@ -98,9 +99,7 @@ public class ActionSetGeoPositionForPhotoTours extends SubMenu {
       }
 
       @Override
-      public void run() {
-//         setGeoPositions(true, true);
-      }
+      public void run() {}
    }
 
    private class SubAction_SetStartPosition extends Action {
@@ -110,9 +109,7 @@ public class ActionSetGeoPositionForPhotoTours extends SubMenu {
       }
 
       @Override
-      public void run() {
-//         setGeoPositions(true, false);
-      }
+      public void run() {}
    }
 
    public ActionSetGeoPositionForPhotoTours() {
@@ -135,7 +132,9 @@ public class ActionSetGeoPositionForPhotoTours extends SubMenu {
    }
 
    @Override
-   public void enableActions() {}
+   public void enableActions() {
+
+   }
 
    @Override
    public void fillMenu(final Menu menu) {
@@ -143,8 +142,10 @@ public class ActionSetGeoPositionForPhotoTours extends SubMenu {
       final int[] timeSerie = _tourData.timeSerie;
 
       final Set<TourPhoto> allTourPhotos = _tourData.getTourPhotos();
-      final ArrayList<TourPhoto> allSortedPhotos = new ArrayList<>(allTourPhotos);
+      final Set<Long> allTourPhotosWithGeoPosition = _tourData.getTourPhotosWithGeoPosition();
 
+      // sort photos by time
+      final ArrayList<TourPhoto> allSortedPhotos = new ArrayList<>(allTourPhotos);
       Collections.sort(allSortedPhotos, (tourPhoto1, tourPhoto2) -> {
 
          return Long.compare(tourPhoto1.getImageExifTime(), tourPhoto2.getImageExifTime());
@@ -154,23 +155,45 @@ public class ActionSetGeoPositionForPhotoTours extends SubMenu {
       final int numTimeSlices = Math.min(50, timeSerie.length);
       final int numPhotos = allSortedPhotos.size();
 
+      final ZonedDateTime tourStartTime = _tourData.getTourStartTime();
+
       for (int timeIndex = 0; timeIndex < numTimeSlices; timeIndex++) {
 
          String photoLabel = null;
+         TourPhoto tourPhoto = null;
 
          final int relativeTime = timeSerie[timeIndex];
 
          if (timeIndex > 0 && (timeIndex - 1) < numPhotos) {
 
-            final TourPhoto tourPhoto = allSortedPhotos.get(timeIndex - 1);
+            tourPhoto = allSortedPhotos.get(timeIndex - 1);
 
-            final String photoTime = TimeTools.getZonedDateTime(tourPhoto.getImageExifTime()).format(TimeTools.Formatter_Time_M);
+            final long photoExifTime = tourPhoto.getImageExifTime();
+            final String photoTime = TimeTools.getZonedDateTime(photoExifTime).format(TimeTools.Formatter_Time_M);
             final String imageFileName = tourPhoto.getImageFileName();
+            final long tourPhotoId = tourPhoto.getPhotoId();
 
-            photoLabel = photoTime + UI.DASH_WITH_DOUBLE_SPACE + imageFileName;
+            String photoGeoInfo = UI.EMPTY_STRING;
+
+            final boolean isPhotoWithGeoPosition = allTourPhotosWithGeoPosition.contains(tourPhotoId);
+            if (isPhotoWithGeoPosition) {
+
+               photoGeoInfo = UI.DASH_WITH_DOUBLE_SPACE + "%8.4f %8.4f".formatted(
+
+                     tourPhoto.getLatitude(),
+                     tourPhoto.getLongitude());
+            }
+
+            photoLabel = photoTime
+                  + UI.DASH_WITH_DOUBLE_SPACE + imageFileName
+                  + photoGeoInfo;
+
+         } else {
+
+            photoLabel = tourStartTime.plusSeconds(relativeTime).format(TimeTools.Formatter_Time_M);
          }
 
-         final ActionSetGeoPosition action = new ActionSetGeoPosition(timeIndex, relativeTime, photoLabel);
+         final ActionSetGeoPosition action = new ActionSetGeoPosition(timeIndex, relativeTime, photoLabel, tourPhoto);
 
          new ActionContributionItem(action).fill(menu, -1);
       }
@@ -182,7 +205,7 @@ public class ActionSetGeoPositionForPhotoTours extends SubMenu {
       _currentMouseGeoPosition = currentMouseGeoPosition;
    }
 
-   private void setGeoPosition(final int timeIndex, final int geoTime) {
+   private void setGeoPosition(final int timeIndex, final int geoTime, final TourPhoto tourPhoto) {
 
       // make sure the tour editor does not contain a modified tour
       if (TourManager.isTourEditorModified()) {
@@ -193,9 +216,9 @@ public class ActionSetGeoPositionForPhotoTours extends SubMenu {
       double[] latSerie = _tourData.latitudeSerie;
       double[] lonSerie = _tourData.longitudeSerie;
 
-      final int numTimeSlices = timeSerie.length;
-
       if (latSerie == null) {
+
+         final int numTimeSlices = timeSerie.length;
 
          latSerie = new double[numTimeSlices];
          lonSerie = new double[numTimeSlices];
@@ -205,8 +228,19 @@ public class ActionSetGeoPositionForPhotoTours extends SubMenu {
       }
 
       // update tour values
-      latSerie[timeIndex] = _currentMouseGeoPosition.latitude;
-      lonSerie[timeIndex] = _currentMouseGeoPosition.longitude;
+      final double latitude = _currentMouseGeoPosition.latitude;
+      final double longitude = _currentMouseGeoPosition.longitude;
+
+      latSerie[timeIndex] = latitude;
+      lonSerie[timeIndex] = longitude;
+
+      // keep info which photo got a geo position
+      if (tourPhoto != null) {
+
+         tourPhoto.setGeoLocation(latitude, longitude);
+
+         _tourData.getTourPhotosWithGeoPosition().add(tourPhoto.getPhotoId());
+      }
 
       TourManager.saveModifiedTour(_tourData);
    }

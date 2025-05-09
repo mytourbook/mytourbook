@@ -2143,6 +2143,7 @@ public class TourDataEditorView extends ViewPart implements
 
             // set values from the provided tour context
 
+
             // set tour start/end date/time
             final long tourStartTime = newTourContext.tourStartTime;
             final long tourEndTime = newTourContext.tourEndTime;
@@ -2157,6 +2158,9 @@ public class TourDataEditorView extends ViewPart implements
 
             // prevent that this is a manual tour and to identify it as a photo tour
             newTourData.setDeviceId(TourData.DEVICE_ID_FOR_PHOTO_TOUR);
+
+            // return the created tour
+            newTourContext.newTourData = newTourData;
 
          } else {
 
@@ -2540,7 +2544,7 @@ public class TourDataEditorView extends ViewPart implements
       final int lastTopIndex = selectionIndices[0];
 
       TourManager.removeTimeSlices(
-            
+
             _tourData,
             firstIndex,
             lastIndex,
