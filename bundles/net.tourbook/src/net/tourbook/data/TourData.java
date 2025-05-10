@@ -5088,13 +5088,6 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
          return;
       }
 
-      if (tourPhotosWithPositionedGeo == null || tourPhotosWithPositionedGeo.size() == 0) {
-
-         // there are no applied geo positions for photos
-
-         return;
-      }
-
       // sort photos by time
       final ArrayList<TourPhoto> allSortedPhotos = new ArrayList<>(tourPhotos);
       Collections.sort(allSortedPhotos, (tourPhoto1, tourPhoto2) -> {
@@ -5105,61 +5098,114 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
       final int numTimeSlices = timeSerie.length;
       final int numPhotos = allSortedPhotos.size();
 
-      double nextLatitude = 0;
-      double nextLongitude = 0;
+//      latitudeE6_Normalized = latitudeE6 + 90_000_000;
+//      longitudeE6_Normalized = longitudeE6 + 180_000_000;
 
-      int lastTimeIndexWithLatLon = 0;
-      int nextTimeIndexWithLatLon = -1;
+      final double[] allLatitude = new double[numTimeSlices];
+      final double[] allLongitude = new double[numTimeSlices];
+
+      boolean isGeoPositioned = false;
 
       for (int timeIndex = 0; timeIndex < numTimeSlices; timeIndex++) {
 
+         final double latitude = latitudeSerie[timeIndex];
+         final double longitude = longitudeSerie[timeIndex];
+
+         TourPhoto tourPhoto = null;
+
          if (timeIndex > 0 && (timeIndex - 1) < numPhotos) {
 
-            TourPhoto tourPhoto = allSortedPhotos.get(timeIndex - 1);
+            if (tourPhotosWithPositionedGeo == null || tourPhotosWithPositionedGeo.size() == 0) {
+
+               // there are no applied geo positions for photos
+
+               continue;
+            }
+
+            tourPhoto = allSortedPhotos.get(timeIndex - 1);
 
             final boolean isPhotoWithPositionedGeo = tourPhotosWithPositionedGeo.contains(tourPhoto.getPhotoId());
 
             if (isPhotoWithPositionedGeo) {
 
-               nextLatitude = latitudeSerie[timeIndex];
-               nextLongitude = longitudeSerie[timeIndex];
+               allLatitude[timeIndex] = latitude;
+               allLongitude[timeIndex] = longitude;
 
-               nextTimeIndexWithLatLon = timeIndex;
+               isGeoPositioned = true;
             }
 
-            if (nextTimeIndexWithLatLon >= lastTimeIndexWithLatLon) {
+         } else {
 
-               // set lat/lon into the previous time slices/photos
+            // this is for the first/last time slice which has not photo
 
-               for (int prevTimeIndex = lastTimeIndexWithLatLon; prevTimeIndex < nextTimeIndexWithLatLon; prevTimeIndex++) {
+            if (latitude != 0) {
 
-                  latitudeSerie[prevTimeIndex] = nextLatitude;
-                  longitudeSerie[prevTimeIndex] = nextLongitude;
+               allLatitude[timeIndex] = latitude;
+               allLongitude[timeIndex] = longitude;
 
-                  tourPhoto = allSortedPhotos.get(timeIndex - 1);
-
-                  tourPhoto.setGeoLocation(nextLatitude, nextLongitude);
-               }
-
-               lastTimeIndexWithLatLon = timeIndex;
+               isGeoPositioned = true;
             }
          }
       }
+
+      if (isGeoPositioned == false) {
+
+         // there are no geo positions
+
+         return;
+      }
+
+      int lastIndexWithGeo = 0;
+      int nextIndexWithGeo = -1;
+
+      for (int timeIndex = 0; timeIndex < numTimeSlices; timeIndex++) {
+
+         final double latitude = allLatitude[timeIndex];
+
+         if (latitude != 0) {
+
+            nextIndexWithGeo = timeIndex;
+
+            computeGeo_Photos_Interpolate(lastIndexWithGeo, nextIndexWithGeo);
+
+            lastIndexWithGeo = timeIndex + 1;
+         }
+      }
+
+      nextIndexWithGeo = numTimeSlices - 1;
+
+      computeGeo_Photos_Interpolate(lastIndexWithGeo, nextIndexWithGeo);
 
       // set lat/lon into the remaining time slices
 
-      for (int timeIndex = lastTimeIndexWithLatLon; timeIndex < numTimeSlices; timeIndex++) {
+//      final double latNormalized = latitude + 90;
+//      final double lonNormalized = longitude + 180;
 
-         latitudeSerie[timeIndex] = nextLatitude;
-         longitudeSerie[timeIndex] = nextLongitude;
+//      for (int timeIndex = lastTimeIndexWithLatLon; timeIndex < numTimeSlices; timeIndex++) {
+//
+//         latitudeSerie[timeIndex] = nextLatitude;
+//         longitudeSerie[timeIndex] = nextLongitude;
+//
+//         if (timeIndex > 0 && (timeIndex - 1) < numPhotos) {
+//
+//            final TourPhoto tourPhoto = allSortedPhotos.get(timeIndex - 1);
+//
+//            tourPhoto.setGeoLocation(nextLatitude, nextLongitude);
+//         }
+//      }
 
-         if (timeIndex > 0 && (timeIndex - 1) < numPhotos) {
+      System.out.println();
+// TODO remove SYSTEM.OUT.PRINTLN
+   }
 
-            final TourPhoto tourPhoto = allSortedPhotos.get(timeIndex - 1);
+   private void computeGeo_Photos_Interpolate(final int lastIndexWithGeo, final int nextIndexWithGeo) {
 
-            tourPhoto.setGeoLocation(nextLatitude, nextLongitude);
-         }
-      }
+      // TODO Auto-generated method stub
+
+
+      System.out.println(UI.timeStamp() + " : " + lastIndexWithGeo + " - " + nextIndexWithGeo);
+// TODO remove SYSTEM.OUT.PRINTLN
+
    }
 
    /**
