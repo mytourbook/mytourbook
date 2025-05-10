@@ -20,8 +20,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Set;
 
-import net.tourbook.Images;
-import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.UI;
 import net.tourbook.common.map.GeoPosition;
 import net.tourbook.common.time.TimeTools;
@@ -37,8 +35,10 @@ import org.eclipse.swt.widgets.Menu;
 
 public class ActionSetGeoPositionForPhotoTours extends SubMenu {
 
-   private TourData    _tourData;
-   private GeoPosition _currentMouseGeoPosition;
+   private static final String LAT_LON = "%8.4f %8.4f"; //$NON-NLS-1$
+
+   private TourData            _tourData;
+   private GeoPosition         _currentMouseGeoPosition;
 
    private class ActionSetGeoPosition extends Action {
 
@@ -67,49 +67,6 @@ public class ActionSetGeoPositionForPhotoTours extends SubMenu {
 
          setGeoPosition(_timeIndex, _geoTime, _tourPhoto);
       }
-   }
-
-   private class SubAction_DeletePositions extends Action {
-
-      public SubAction_DeletePositions() {
-
-         super(Messages.Map_Action_GeoPositions_Delete, AS_PUSH_BUTTON);
-
-         setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.App_Delete));
-      }
-
-      @Override
-      public void run() {}
-   }
-
-   private class SubAction_SetEndPosition extends Action {
-
-      public SubAction_SetEndPosition() {
-         super(Messages.Map_Action_GeoPositions_Set_End, AS_PUSH_BUTTON);
-      }
-
-      @Override
-      public void run() {}
-   }
-
-   private class SubAction_SetStartEndPosition extends Action {
-
-      public SubAction_SetStartEndPosition() {
-         super(Messages.Map_Action_GeoPositions_Set_StartAndEnd, AS_PUSH_BUTTON);
-      }
-
-      @Override
-      public void run() {}
-   }
-
-   private class SubAction_SetStartPosition extends Action {
-
-      public SubAction_SetStartPosition() {
-         super(Messages.Map_Action_GeoPositions_Set_Start, AS_PUSH_BUTTON);
-      }
-
-      @Override
-      public void run() {}
    }
 
    public ActionSetGeoPositionForPhotoTours() {
@@ -142,7 +99,7 @@ public class ActionSetGeoPositionForPhotoTours extends SubMenu {
       final int[] timeSerie = _tourData.timeSerie;
 
       final Set<TourPhoto> allTourPhotos = _tourData.getTourPhotos();
-      final Set<Long> allTourPhotosWithGeoPosition = _tourData.getTourPhotosWithGeoPosition();
+      final Set<Long> allTourPhotosWithPositionedGeo = _tourData.getTourPhotosWithPositionedGeo();
 
       // sort photos by time
       final ArrayList<TourPhoto> allSortedPhotos = new ArrayList<>(allTourPhotos);
@@ -152,19 +109,22 @@ public class ActionSetGeoPositionForPhotoTours extends SubMenu {
       });
 
       // prevent too many actions
-      final int numTimeSlices = Math.min(50, timeSerie.length);
+      final int numTimeSlices = Math.min(100, timeSerie.length);
       final int numPhotos = allSortedPhotos.size();
 
       final ZonedDateTime tourStartTime = _tourData.getTourStartTime();
 
       for (int timeIndex = 0; timeIndex < numTimeSlices; timeIndex++) {
 
+         String photoGeoInfo = UI.EMPTY_STRING;
          String photoLabel = null;
          TourPhoto tourPhoto = null;
 
          final int relativeTime = timeSerie[timeIndex];
 
          if (timeIndex > 0 && (timeIndex - 1) < numPhotos) {
+
+            // these are photos
 
             tourPhoto = allSortedPhotos.get(timeIndex - 1);
 
@@ -173,12 +133,10 @@ public class ActionSetGeoPositionForPhotoTours extends SubMenu {
             final String imageFileName = tourPhoto.getImageFileName();
             final long tourPhotoId = tourPhoto.getPhotoId();
 
-            String photoGeoInfo = UI.EMPTY_STRING;
-
-            final boolean isPhotoWithGeoPosition = allTourPhotosWithGeoPosition.contains(tourPhotoId);
+            final boolean isPhotoWithGeoPosition = allTourPhotosWithPositionedGeo.contains(tourPhotoId);
             if (isPhotoWithGeoPosition) {
 
-               photoGeoInfo = UI.DASH_WITH_DOUBLE_SPACE + "%8.4f %8.4f".formatted(
+               photoGeoInfo = UI.DASH_WITH_DOUBLE_SPACE + LAT_LON.formatted(
 
                      tourPhoto.getLatitude(),
                      tourPhoto.getLongitude());
@@ -190,7 +148,27 @@ public class ActionSetGeoPositionForPhotoTours extends SubMenu {
 
          } else {
 
-            photoLabel = tourStartTime.plusSeconds(relativeTime).format(TimeTools.Formatter_Time_M);
+            // these are beginning/end slices
+
+            final double[] latitudeSerie = _tourData.latitudeSerie;
+            final double[] longitudeSerie = _tourData.longitudeSerie;
+
+            if (latitudeSerie != null && latitudeSerie.length > 0) {
+
+               final double latitude = latitudeSerie[timeIndex];
+               final double longitude = longitudeSerie[timeIndex];
+
+               if (latitude != 0) {
+
+                  photoGeoInfo = UI.DASH_WITH_DOUBLE_SPACE + LAT_LON.formatted(
+
+                        latitude,
+                        longitude);
+               }
+            }
+
+            photoLabel = tourStartTime.plusSeconds(relativeTime).format(TimeTools.Formatter_Time_M)
+                  + photoGeoInfo;
          }
 
          final ActionSetGeoPosition action = new ActionSetGeoPosition(timeIndex, relativeTime, photoLabel, tourPhoto);
@@ -234,15 +212,67 @@ public class ActionSetGeoPositionForPhotoTours extends SubMenu {
       latSerie[timeIndex] = latitude;
       lonSerie[timeIndex] = longitude;
 
-      // keep info which photo got a geo position
       if (tourPhoto != null) {
 
          tourPhoto.setGeoLocation(latitude, longitude);
 
-         _tourData.getTourPhotosWithGeoPosition().add(tourPhoto.getPhotoId());
+         // keep info which photo got a geo position
+         _tourData.getTourPhotosWithPositionedGeo().add(tourPhoto.getPhotoId());
+
+         // interpolate geo positions
+         _tourData.computeGeo_Photos();
       }
 
       TourManager.saveModifiedTour(_tourData);
    }
+
+// DELETE TEXTS !!!
+// DELETE TEXTS !!!
+// DELETE TEXTS !!!
+// DELETE TEXTS !!!
+// DELETE TEXTS !!!
+
+// private class SubAction_DeletePositions extends Action {
+//
+//    public SubAction_DeletePositions() {
+//
+//       super(Messages.Map_Action_GeoPositions_Delete, AS_PUSH_BUTTON);
+//
+//       setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.App_Delete));
+//    }
+//
+//    @Override
+//    public void run() {}
+// }
+//
+// private class SubAction_SetEndPosition extends Action {
+//
+//    public SubAction_SetEndPosition() {
+//       super(Messages.Map_Action_GeoPositions_Set_End, AS_PUSH_BUTTON);
+//    }
+//
+//    @Override
+//    public void run() {}
+// }
+//
+// private class SubAction_SetStartEndPosition extends Action {
+//
+//    public SubAction_SetStartEndPosition() {
+//       super(Messages.Map_Action_GeoPositions_Set_StartAndEnd, AS_PUSH_BUTTON);
+//    }
+//
+//    @Override
+//    public void run() {}
+// }
+//
+// private class SubAction_SetStartPosition extends Action {
+//
+//    public SubAction_SetStartPosition() {
+//       super(Messages.Map_Action_GeoPositions_Set_Start, AS_PUSH_BUTTON);
+//    }
+//
+//    @Override
+//    public void run() {}
+// }
 
 }

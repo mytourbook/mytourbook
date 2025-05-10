@@ -1717,7 +1717,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
     * Contains {@link TourPhoto} ID's which geo position was set
     */
    @Transient
-   private Set<Long>             tourPhotosWithGeoPosition;
+   private Set<Long>             tourPhotosWithPositionedGeo;
 
    /**
     * Contains photos which are displayed in photo galleries.
@@ -5074,6 +5074,92 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
       returnData.normalizedDistance = normalizedDistance - measureStartDistance;
 
       return returnData;
+   }
+
+   /**
+    * Interpolate geo positions when lat/lon is 0
+    */
+   public void computeGeo_Photos() {
+
+      // TODO Auto-generated method stub
+
+      if (isPhotoTour() == false) {
+
+         return;
+      }
+
+      if (tourPhotosWithPositionedGeo == null || tourPhotosWithPositionedGeo.size() == 0) {
+
+         // there are no applied geo positions for photos
+
+         return;
+      }
+
+      // sort photos by time
+      final ArrayList<TourPhoto> allSortedPhotos = new ArrayList<>(tourPhotos);
+      Collections.sort(allSortedPhotos, (tourPhoto1, tourPhoto2) -> {
+
+         return Long.compare(tourPhoto1.getImageExifTime(), tourPhoto2.getImageExifTime());
+      });
+
+      final int numTimeSlices = timeSerie.length;
+      final int numPhotos = allSortedPhotos.size();
+
+      double nextLatitude = 0;
+      double nextLongitude = 0;
+
+      int lastTimeIndexWithLatLon = 0;
+      int nextTimeIndexWithLatLon = -1;
+
+      for (int timeIndex = 0; timeIndex < numTimeSlices; timeIndex++) {
+
+         if (timeIndex > 0 && (timeIndex - 1) < numPhotos) {
+
+            TourPhoto tourPhoto = allSortedPhotos.get(timeIndex - 1);
+
+            final boolean isPhotoWithPositionedGeo = tourPhotosWithPositionedGeo.contains(tourPhoto.getPhotoId());
+
+            if (isPhotoWithPositionedGeo) {
+
+               nextLatitude = latitudeSerie[timeIndex];
+               nextLongitude = longitudeSerie[timeIndex];
+
+               nextTimeIndexWithLatLon = timeIndex;
+            }
+
+            if (nextTimeIndexWithLatLon >= lastTimeIndexWithLatLon) {
+
+               // set lat/lon into the previous time slices/photos
+
+               for (int prevTimeIndex = lastTimeIndexWithLatLon; prevTimeIndex < nextTimeIndexWithLatLon; prevTimeIndex++) {
+
+                  latitudeSerie[prevTimeIndex] = nextLatitude;
+                  longitudeSerie[prevTimeIndex] = nextLongitude;
+
+                  tourPhoto = allSortedPhotos.get(timeIndex - 1);
+
+                  tourPhoto.setGeoLocation(nextLatitude, nextLongitude);
+               }
+
+               lastTimeIndexWithLatLon = timeIndex;
+            }
+         }
+      }
+
+      // set lat/lon into the remaining time slices
+
+      for (int timeIndex = lastTimeIndexWithLatLon; timeIndex < numTimeSlices; timeIndex++) {
+
+         latitudeSerie[timeIndex] = nextLatitude;
+         longitudeSerie[timeIndex] = nextLongitude;
+
+         if (timeIndex > 0 && (timeIndex - 1) < numPhotos) {
+
+            final TourPhoto tourPhoto = allSortedPhotos.get(timeIndex - 1);
+
+            tourPhoto.setGeoLocation(nextLatitude, nextLongitude);
+         }
+      }
    }
 
    /**
@@ -11355,9 +11441,9 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
    /**
     * @return Returns {@link TourPhoto} ID's which geo position was set
     */
-   public Set<Long> getTourPhotosWithGeoPosition() {
+   public Set<Long> getTourPhotosWithPositionedGeo() {
 
-      return tourPhotosWithGeoPosition;
+      return tourPhotosWithPositionedGeo;
    }
 
    public Collection<TourReference> getTourReferences() {
@@ -12055,6 +12141,8 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
          latitudeSerie        = Util.convertDoubleSeries_FromE6(serieData.latitudeE6);
          longitudeSerie       = Util.convertDoubleSeries_FromE6(serieData.longitudeE6);
       }
+
+      computeGeo_Photos();
       computeGeo_Grid();
 
       gearSerie               = serieData.gears;
@@ -12095,7 +12183,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
       battery_Time                  = serieData.battery_Time;
 
       // photo
-      tourPhotosWithGeoPosition     = serieData.getTourPhotosWithGeoPosition();
+      tourPhotosWithPositionedGeo   = serieData.getTourPhotosWithPositionedGeo();
 
 // SET_FORMATTING_ON
 
@@ -12186,7 +12274,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
 // SET_FORMATTING_ON
 
       // photo
-      serieData.setToursPhotoWithGeoPosition(tourPhotosWithGeoPosition);
+      serieData.setTourPhotosWithPositionedGeo(tourPhotosWithPositionedGeo);
 
       // time serie size
       numberOfTimeSlices = timeSerie == null ? 0 : timeSerie.length;

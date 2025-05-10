@@ -201,7 +201,7 @@ public class SerieData implements Serializable {
     *
     * @since 25.x
     */
-   public long[]               tourPhotosWithGeoPosition;
+   public long[]               tourPhotosWithPositionedGeo;
 
    private String dataSerieValues(final boolean[] dataSerie) {
 
@@ -278,13 +278,13 @@ public class SerieData implements Serializable {
       return formattedText.substring(0, Math.min(formattedText.length(), VALUE_TEXT_MAX_LENGTH));
    }
 
-   public Set<Long> getTourPhotosWithGeoPosition() {
+   public Set<Long> getTourPhotosWithPositionedGeo() {
 
       final Set<Long> all = new HashSet<>();
 
-      if (tourPhotosWithGeoPosition != null) {
+      if (tourPhotosWithPositionedGeo != null) {
 
-         for (final long value : tourPhotosWithGeoPosition) {
+         for (final long value : tourPhotosWithPositionedGeo) {
             all.add(value);
          }
       }
@@ -292,11 +292,11 @@ public class SerieData implements Serializable {
       return all;
    }
 
-   public void setToursPhotoWithGeoPosition(final Set<Long> tourPhotosWithGeoPositionSet) {
+   public void setTourPhotosWithPositionedGeo(final Set<Long> tourPhotosWithPositionedGeoSet) {
 
-      if (tourPhotosWithGeoPositionSet != null) {
+      if (tourPhotosWithPositionedGeoSet != null) {
 
-         tourPhotosWithGeoPosition = tourPhotosWithGeoPositionSet
+         tourPhotosWithPositionedGeo = tourPhotosWithPositionedGeoSet
 
                .stream()
                .mapToLong(value -> value.longValue())
@@ -348,7 +348,7 @@ public class SerieData implements Serializable {
 
             + "   visiblePoints_Surfing         " + dataSerieValues(visiblePoints_Surfing)         + NL //$NON-NLS-1$
 
-            + "   tourPhotosWithGeoPosition     " + dataSerieValues(tourPhotosWithGeoPosition)     + NL //$NON-NLS-1$
+            + "   tourPhotosWithGeoPosition     " + dataSerieValues(tourPhotosWithPositionedGeo)   + NL //$NON-NLS-1$
 
             ;
    }

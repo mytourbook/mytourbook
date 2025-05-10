@@ -481,7 +481,6 @@ public abstract class TableColumnFactory {
 
    public static final TableColumnFactory TOUR_DESCRIPTION;
    public static final String             TOUR_DESCRIPTION_ID                                = "TOUR_DESCRIPTION";                                //$NON-NLS-1$
-   public static final TableColumnFactory TOUR_MARKER;
    public static final TableColumnFactory TOUR_LOCATION_START;
    public static final String             TOUR_LOCATION_START_ID                             = "TOUR_LOCATION_START";                             //$NON-NLS-1$
    public static final TableColumnFactory TOUR_LOCATION_END;
@@ -490,10 +489,13 @@ public abstract class TableColumnFactory {
    public static final String             TOUR_LOCATION_ID_START_ID                          = "TOUR_LOCATION_ID_START";                          //$NON-NLS-1$
    public static final TableColumnFactory TOUR_LOCATION_ID_END;
    public static final String             TOUR_LOCATION_ID_END_ID                            = "TOUR_LOCATION_ID_END";                            //$NON-NLS-1$
+   public static final TableColumnFactory TOUR_MARKER;
    public static final TableColumnFactory TOUR_NUM_MARKERS;
    public static final String             TOUR_NUM_MARKERS_ID                                = "TOUR_NUM_MARKERS";                                //$NON-NLS-1$
    public static final TableColumnFactory TOUR_NUM_PHOTOS;
    public static final String             TOUR_NUM_PHOTOS_ID                                 = "TOUR_NUM_PHOTOS";                                 //$NON-NLS-1$
+   public static final TableColumnFactory TOUR_POSITIONED_PHOTO;
+   public static final String             TOUR_POSITIONED_PHOTO_ID                           = "TOUR_POSITIONED_PHOTO";                           //$NON-NLS-1$
    public static final TableColumnFactory TOUR_TAGS;
    public static final String             TOUR_TAGS_ID                                       = "TOUR_TAGS";                                       //$NON-NLS-1$
    public static final TableColumnFactory TOUR_TITLE;
@@ -4807,6 +4809,25 @@ public abstract class TableColumnFactory {
             colDef.setColumnLabel(              Messages.ColumnFactory_NumberOfPhotos_Label);
             colDef.setColumnHeaderText(         Messages.ColumnFactory_NumberOfPhotos_Header);
             colDef.setColumnHeaderToolTipText(  Messages.ColumnFactory_NumberOfPhotos_Tooltip);
+
+            colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(8));
+
+            return colDef;
+         }
+      };
+
+      TOUR_POSITIONED_PHOTO = new TableColumnFactory() {
+         @Override
+         public TableColumnDefinition createColumn(final ColumnManager columnManager,
+                                                   final PixelConverter pixelConverter) {
+
+            final TableColumnDefinition colDef = new TableColumnDefinition(columnManager, TOUR_POSITIONED_PHOTO_ID, SWT.LEAD);
+
+            colDef.setColumnCategory(           Messages.ColumnFactory_Category_Tour);
+
+            colDef.setColumnLabel(              Messages.ColumnFactory_Photo_Positioned_Label);
+            colDef.setColumnHeaderText(         Messages.ColumnFactory_Photo_Positioned_Header);
+            colDef.setColumnHeaderToolTipText(  Messages.ColumnFactory_Photo_Positioned_Tooltip);
 
             colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(8));
 

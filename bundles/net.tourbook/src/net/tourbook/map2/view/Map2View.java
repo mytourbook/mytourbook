@@ -3590,17 +3590,17 @@ public class Map2View extends ViewPart implements
             continue;
          }
 
-         final GeoPosition[] geoPosition = tourData.getGeoBounds();
+         final GeoPosition[] geoBounds = tourData.getGeoBounds();
 
-         if (geoPosition == null) {
+         if (geoBounds == null) {
             continue;
          }
 
-         final double tourMinLatitude = geoPosition[0].latitude;
-         final double tourMinLongitude = geoPosition[0].longitude;
+         final double tourMinLatitude = geoBounds[0].latitude;
+         final double tourMinLongitude = geoBounds[0].longitude;
 
-         final double tourMaxLatitude = geoPosition[1].latitude;
-         final double tourMaxLongitude = geoPosition[1].longitude;
+         final double tourMaxLatitude = geoBounds[1].latitude;
+         final double tourMaxLongitude = geoBounds[1].longitude;
 
          if (tourMinLatitude == 0
                && tourMaxLatitude == 0

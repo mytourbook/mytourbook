@@ -73,6 +73,7 @@ import net.tourbook.common.weather.IWeather;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourMarker;
 import net.tourbook.data.TourPerson;
+import net.tourbook.data.TourPhoto;
 import net.tourbook.data.TourReference;
 import net.tourbook.data.TourTag;
 import net.tourbook.data.TourType;
@@ -416,135 +417,136 @@ public class TourDataEditorView extends ViewPart implements
       _nf3NoGroup.setGroupingUsed(false);
    }
    //
-   private long                               _timeSlice_ViewerTourId = -1;
-   private long                               _swimSlice_ViewerTourId = -1;
+   private long                             _timeSlice_ViewerTourId = -1;
+   private long                             _swimSlice_ViewerTourId = -1;
    //
    /**
     * <code>true</code>: rows can be selected in the viewer<br>
     * <code>false</code>: cell can be selected in the viewer
     */
-   private boolean                            _isRowEditMode          = true;
-   private boolean                            _isEditMode;
-   private boolean                            _isTourDirty;
-   private boolean                            _isTourWithSwimData;
+   private boolean                          _isRowEditMode          = true;
+   private boolean                          _isEditMode;
+   private boolean                          _isTourDirty;
+   private boolean                          _isTourWithSwimData;
    //
-   private boolean                            _canScrollFieldContent;
-   private ScrollFieldContent                 _scrollFieldContent;
+   private boolean                          _canScrollFieldContent;
+   private ScrollFieldContent               _scrollFieldContent;
    //
    /**
     * Is <code>true</code> when the tour is currently being saved to prevent a modify event or the
     * onSelectionChanged event
     */
-   private boolean                            _isSavingInProgress;
+   private boolean                          _isSavingInProgress;
 
    /**
     * When <code>true</code> then data are loaded into fields
     */
-   private boolean                            _isSetField;
+   private boolean                          _isSetField;
 
    /**
     * Contains the tour id from the last selection event
     */
-   private Long                               _selectionTourId;
+   private Long                             _selectionTourId;
    //
-   private FocusListener                      _focusListener_ScrollField;
-   private ModifyListener                     _modifyListener;
-   private ModifyListener                     _modifyListener_Temperature;
-   private MouseWheelListener                 _mouseWheelListener;
-   private Listener                           _mouseWheelListener_ScrollField;
-   private MouseWheelListener                 _mouseWheelListener_Temperature;
-   private SelectionListener                  _selectionListener;
-   private SelectionListener                  _selectionListener_Temperature;
-   private SelectionListener                  _columnSortListener;
-   private SelectionListener                  _tourTimeListener;
-   private ModifyListener                     _verifyFloatValue;
-   private ModifyListener                     _verifyIntValue;
+   private FocusListener                    _focusListener_ScrollField;
+   private ModifyListener                   _modifyListener;
+   private ModifyListener                   _modifyListener_Temperature;
+   private MouseWheelListener               _mouseWheelListener;
+   private Listener                         _mouseWheelListener_ScrollField;
+   private MouseWheelListener               _mouseWheelListener_Temperature;
+   private SelectionListener                _selectionListener;
+   private SelectionListener                _selectionListener_Temperature;
+   private SelectionListener                _columnSortListener;
+   private SelectionListener                _tourTimeListener;
+   private ModifyListener                   _verifyFloatValue;
+   private ModifyListener                   _verifyIntValue;
    //
-   private PixelConverter                     _pc;
-   private int                                _hintValueFieldWidth;
-   private int                                _hintDefaultSpinnerWidth;
+   private PixelConverter                   _pc;
+   private int                              _hintValueFieldWidth;
+   private int                              _hintDefaultSpinnerWidth;
 
    /**
     * is <code>true</code> when {@link #_tourChart} contains reference tours
     */
-   private boolean                            _isReferenceTourAvailable;
+   private boolean                          _isReferenceTourAvailable;
 
    /**
     * range for the reference tours, is <code>null</code> when reference tours are not available<br>
     * 1st index = ref tour<br>
     * 2nd index: 0:start, 1:end
     */
-   private int[][]                            _refTourRange;
+   private int[][]                          _refTourRange;
 
-   private boolean                            _isPartVisible;
+   private boolean                          _isPartVisible;
 
    /**
     * when <code>true</code> additional info is displayed in the title area
     */
-   private boolean                            _isInfoInTitle;
+   private boolean                          _isInfoInTitle;
 
    /**
     * Is <code>true</code> when a cell editor is active, otherwise <code>false</code>
     */
-   private boolean                            _isCellEditorActive;
+   private boolean                          _isCellEditorActive;
 
    /**
     * Current combobox cell editor or <code>null</code> when a cell editor is not active.
     */
-   private CellEditor_ComboBox_Customized     _currentComboBox_CellEditor;
+   private CellEditor_ComboBox_Customized   _currentComboBox_CellEditor;
 
    /**
     * Current text cell editor or <code>null</code> when a cell editor is not active.
     */
-   private CellEditor_Text_Customized         _currentTextEditor_CellEditor;
+   private CellEditor_Text_Customized       _currentTextEditor_CellEditor;
 
    /**
     * every requested UI update increased this counter
     */
-   private int                                _uiUpdateCounter;
+   private int                              _uiUpdateCounter;
 
    /**
     * counter when the UI update runnable is run, this will optimize performance to not update the
     * UI when the part is hidden
     */
-   private int                                _uiRunnableCounter      = 0;
-   private int                                _uiUpdateTitleCounter   = 0;
-   private TourData                           _uiRunnableTourData;
-   private boolean                            _uiRunnableForce_TimeSliceReload;
-   private boolean                            _uiRunnableForce_SwimSliceReload;
-   private boolean                            _uiRunnableIsDirtyDisabled;
+   private int                              _uiRunnableCounter      = 0;
+   private int                              _uiUpdateTitleCounter   = 0;
+   private TourData                         _uiRunnableTourData;
+   private boolean                          _uiRunnableForce_TimeSliceReload;
+   private boolean                          _uiRunnableForce_SwimSliceReload;
+   private boolean                          _uiRunnableIsDirtyDisabled;
    //
-   private SliceEditingSupport_Float          _timeSlice_AltitudeEditingSupport;
-   private SliceEditingSupport_Float          _timeSlice_PulseEditingSupport;
-   private SliceEditingSupport_Float          _timeSlice_TemperatureEditingSupport;
-   private SliceEditingSupport_Float          _timeSlice_CadenceEditingSupport;
-   private SliceEditingSupport_Double         _timeSlice_LatitudeEditingSupport;
-   private SliceEditingSupport_Double         _timeSlice_LongitudeEditingSupport;
+   private SliceEditingSupport_Float        _timeSlice_AltitudeEditingSupport;
+   private SliceEditingSupport_Float        _timeSlice_PulseEditingSupport;
+   private SliceEditingSupport_Float        _timeSlice_TemperatureEditingSupport;
+   private SliceEditingSupport_Float        _timeSlice_CadenceEditingSupport;
+   private SliceEditingSupport_Double       _timeSlice_LatitudeEditingSupport;
+   private SliceEditingSupport_Double       _timeSlice_LongitudeEditingSupport;
    //
-   private SliceEditingSupport_Short          _swimSlice_StrokeRateEditingSupport;
-   private SliceEditingSupport_Short          _swimSlice_StrokesEditingSupport;
-   private SliceEditor_ComboBox_StrokeStyle   _swimSlice_StrokeStyleEditingSupport;
+   private SliceEditingSupport_Short        _swimSlice_StrokeRateEditingSupport;
+   private SliceEditingSupport_Short        _swimSlice_StrokesEditingSupport;
+   private SliceEditor_ComboBox_StrokeStyle _swimSlice_StrokeStyleEditingSupport;
    //
-   private int                                _enableActionCounter    = 0;
+   private int                              _enableActionCounter    = 0;
 
    /**
-    * contains all markers with the data serie index as key
+    * Contains all markers with the data serie index as key
     */
-   private final HashMap<Integer, TourMarker> _markerMap              = new HashMap<>();
+   private final Map<Integer, TourMarker>   _markerMap              = new HashMap<>();
+   private final Map<Integer, TourPhoto>    _allPositionedPhotos    = new HashMap<>();
 
    /**
     * When <code>true</code> the tour is created with the tour editor
     */
-   private boolean                            _isManualTour;
-   private boolean                            _isPhotoTour;
-   private boolean                            _isTitleModified;
-   private boolean                            _isAltitudeManuallyModified;
-   private boolean                            _isDistManuallyModified;
-   private boolean                            _isLocationStartModified;
-   private boolean                            _isLocationEndModified;
-   private boolean                            _isTimeZoneManuallyModified;
-   private boolean                            _isTemperatureManuallyModified;
-   private boolean                            _isWindSpeedManuallyModified;
+   private boolean                          _isManualTour;
+   private boolean                          _isPhotoTour;
+   private boolean                          _isTitleModified;
+   private boolean                          _isAltitudeManuallyModified;
+   private boolean                          _isDistManuallyModified;
+   private boolean                          _isLocationStartModified;
+   private boolean                          _isLocationEndModified;
+   private boolean                          _isTimeZoneManuallyModified;
+   private boolean                          _isTemperatureManuallyModified;
+   private boolean                          _isWindSpeedManuallyModified;
 
    /*
     * Measurement unit values
@@ -2142,7 +2144,6 @@ public class TourDataEditorView extends ViewPart implements
          if (newTourContext != null) {
 
             // set values from the provided tour context
-
 
             // set tour start/end date/time
             final long tourStartTime = newTourContext.tourStartTime;
@@ -5552,6 +5553,7 @@ public class TourDataEditorView extends ViewPart implements
       defineColumn_TimeSlice_Body_Heartbeat_RR_Index();
 
       defineColumn_TimeSlice_Tour_Marker();
+      defineColumn_TimeSlice_Tour_Photo();
 
       defineColumn_TimeSlice_Weather_Temperature();
 
@@ -6490,7 +6492,7 @@ public class TourDataEditorView extends ViewPart implements
    }
 
    /**
-    * column: marker
+    * Column: Tour marker
     */
    private void defineColumn_TimeSlice_Tour_Marker() {
 
@@ -6514,6 +6516,35 @@ public class TourDataEditorView extends ViewPart implements
                }
 
             } else {
+               cell.setText(UI.EMPTY_STRING);
+            }
+         }
+      });
+   }
+
+   /**
+    * Column: Tour photo
+    */
+   private void defineColumn_TimeSlice_Tour_Photo() {
+
+      ColumnDefinition colDef;
+      colDef = TableColumnFactory.TOUR_POSITIONED_PHOTO.createColumn(_timeSlice_ColumnManager, _pc);
+
+      colDef.setIsDefaultColumn();
+      colDef.setLabelProvider(new CellLabelProvider() {
+         @Override
+         public void update(final ViewerCell cell) {
+
+            final TimeSlice timeSlice = (TimeSlice) cell.getElement();
+
+            final TourPhoto tourPhoto = _allPositionedPhotos.get(timeSlice.serieIndex);
+
+            if (tourPhoto != null) {
+
+               cell.setText(tourPhoto.getImageFileName());
+
+            } else {
+
                cell.setText(UI.EMPTY_STRING);
             }
          }
@@ -8871,6 +8902,7 @@ public class TourDataEditorView extends ViewPart implements
          setupTourData(TourDatabase.saveTour(_tourData, true));
 
          updateMarkerMap();
+         updatePositionedPhotos();
 
          // refresh combos
 
@@ -9359,6 +9391,7 @@ public class TourDataEditorView extends ViewPart implements
       for (final TourMarker tourMarker : tourMarkers) {
          _markerMap.put(tourMarker.getSerieIndex(), tourMarker);
       }
+
    }
 
    /**
@@ -9554,6 +9587,45 @@ public class TourDataEditorView extends ViewPart implements
       }
    }
 
+   private void updatePositionedPhotos() {
+
+      _allPositionedPhotos.clear();
+
+      final Set<Long> tourPhotosWithGeoPosition = _tourData.getTourPhotosWithPositionedGeo();
+
+      if (tourPhotosWithGeoPosition == null) {
+         return;
+      }
+
+      // sort photos by time
+      final Set<TourPhoto> allTourPhotos = _tourData.getTourPhotos();
+      final ArrayList<TourPhoto> allSortedPhotos = new ArrayList<>(allTourPhotos);
+      Collections.sort(allSortedPhotos, (tourPhoto1, tourPhoto2) -> {
+
+         return Long.compare(tourPhoto1.getImageExifTime(), tourPhoto2.getImageExifTime());
+      });
+
+      final int numPhotos = allSortedPhotos.size();
+
+      for (int photoIndex = 0; photoIndex < numPhotos; photoIndex++) {
+
+         final TourPhoto tourPhoto = allSortedPhotos.get(photoIndex);
+
+         if (tourPhoto == null) {
+            continue;
+         }
+
+         final long photoId = tourPhoto.getPhotoId();
+
+         if (tourPhotosWithGeoPosition.contains(photoId)) {
+
+            final int timeIndex = photoIndex + 1;
+
+            _allPositionedPhotos.put(timeIndex, tourPhoto);
+         }
+      }
+   }
+
    private void updateStatusLine() {
 
       final boolean isVisible = _timeSlice_Label.isVisible();
@@ -9726,6 +9798,7 @@ public class TourDataEditorView extends ViewPart implements
       _isPhotoTour = tourData.isPhotoTour();
 
       updateMarkerMap();
+      updatePositionedPhotos();
 
       Display.getDefault().asyncExec(new Runnable() {
 
@@ -9780,6 +9853,7 @@ public class TourDataEditorView extends ViewPart implements
       _isTourWithSwimData = _tourData.swim_Time != null;
 
       updateMarkerMap();
+      updatePositionedPhotos();
 
       // a tour which is not saved has no tour references
       _isReferenceTourAvailable = _tourData.isContainReferenceTour();
