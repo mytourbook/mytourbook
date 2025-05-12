@@ -8860,6 +8860,9 @@ public class Map2 extends Canvas {
       java.awt.Color fillColor;
       java.awt.Color outlineColor;
 
+      final java.awt.Color positionedFillColor = java.awt.Color.YELLOW;
+      final java.awt.Color positionedOutlineColor = java.awt.Color.RED;
+
       if (_isMarkerClusterSelected) {
 
          // all other labels are disable -> display grayed out
@@ -8885,6 +8888,13 @@ public class Map2 extends Canvas {
 
          final Map2Point mapPoint = (Map2Point) distribLabel.data;
 
+         final Photo photo = mapPoint.photo;
+         final List<TourPhoto> allTourPhotos = TourPhotoManager.getInstance().getTourPhotos(photo);
+         final TourPhoto tourPhoto = allTourPhotos.get(0);
+         final TourData tourData = tourPhoto.getTourData();
+         final Set<Long> tourPhotosWithPositionedGeo = tourData.getTourPhotosWithPositionedGeo();
+         final boolean isPositionedPhoto = tourPhotosWithPositionedGeo.contains(tourPhoto.getPhotoId());
+
          final int mapPointDevX = mapPoint.geoPointDevX;
          final int mapPointDevY = mapPoint.geoPointDevY;
 
@@ -8897,14 +8907,14 @@ public class Map2 extends Canvas {
                _mapPointSymbolSize,
                _mapPointSymbolSize);
 
-         g2d.setColor(fillColor);
+         g2d.setColor(isPositionedPhoto ? positionedFillColor : fillColor);
          g2d.fillOval(
                symbolRectangle.x + 1, // fill a smaller shape that antialiasing do not show a light border !!!
                symbolRectangle.y + 1,
                _mapPointSymbolSize - 2,
                _mapPointSymbolSize - 2);
 
-         g2d.setColor(outlineColor);
+         g2d.setColor(isPositionedPhoto ? positionedOutlineColor : outlineColor);
          g2d.drawOval(
                symbolRectangle.x + lineWidth2,
                symbolRectangle.y + lineWidth2,

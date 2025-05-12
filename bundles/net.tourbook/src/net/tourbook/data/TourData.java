@@ -5171,8 +5171,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
 
       computeGeo_Photos_Interpolate("post", lastIndexWithGeo - 1, lastIndexWithGeo + 0, numTimeSlices - 1, allSortedPhotos);
 
-      System.out.println();
-// TODO remove SYSTEM.OUT.PRINTLN
+      TourManager.computeDistanceValuesFromGeoPosition(this);
    }
 
    private void computeGeo_Photos_Interpolate(final String label,
@@ -5181,24 +5180,12 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
                                               final int lastIndex,
                                               final List<TourPhoto> allSortedPhotos) {
 
-      // TODO Auto-generated method stub
-
       if (lastIndex < firstIndex) {
 
          // this happens when only the first slice is set
 
          return;
       }
-
-      System.out.println(UI.timeStamp()
-
-            + " - " + label
-            + " - from " + fromIndex
-            + " - first " + firstIndex
-            + " - last " + lastIndex
-
-      );
-// TODO remove SYSTEM.OUT.PRINTLN
 
       final int numPhotos = allSortedPhotos.size();
       final int numTimeSlices = timeSerie.length;
@@ -5233,9 +5220,6 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
 
                tourPhoto.setGeoLocation(fromLatitude, fromLongitude);
             }
-
-            System.out.println(UI.timeStamp() + " first/last : " + timeIndex);
-// TODO remove SYSTEM.OUT.PRINTLN
          }
 
       } else {
@@ -5277,12 +5261,6 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
             latitudeSerie[timeIndex] = sliceLatitude;
             longitudeSerie[timeIndex] = sliceLongitude;
 
-            if (timeIndex == 17) {
-
-               int a = 0;
-               a++;
-            }
-
             if (timeIndex > 0 && (timeIndex - 1) < numPhotos) {
 
                final int photoIndex = timeIndex - 1;
@@ -5291,18 +5269,8 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
 
                tourPhoto.setGeoLocation(sliceLatitude, sliceLongitude);
             }
-
-            System.out.println(UI.timeStamp()
-
-                  + " other : " + timeIndex
-
-                  + " - " + proportionalDiff
-
-            );
-// TODO remove SYSTEM.OUT.PRINTLN
          }
       }
-
    }
 
    /**
@@ -12285,7 +12253,6 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
          longitudeSerie       = Util.convertDoubleSeries_FromE6(serieData.longitudeE6);
       }
 
-      computeGeo_Photos();
       computeGeo_Grid();
 
       gearSerie               = serieData.gears;
@@ -12327,6 +12294,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
 
       // photo
       tourPhotosWithPositionedGeo   = serieData.getTourPhotosWithPositionedGeo();
+      computeGeo_Photos();
 
 // SET_FORMATTING_ON
 

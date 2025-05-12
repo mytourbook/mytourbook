@@ -317,6 +317,11 @@ public class TourPhoto implements Serializable {
       return ratingStars;
    }
 
+   public TourData getTourData() {
+
+      return tourData;
+   }
+
    public Long getTourId() {
 
       return tourData.getTourId();
