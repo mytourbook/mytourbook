@@ -6537,7 +6537,9 @@ public class TourDataEditorView extends ViewPart implements
 
             final TimeSlice timeSlice = (TimeSlice) cell.getElement();
 
-            final TourPhoto tourPhoto = _allPositionedPhotos.get(timeSlice.serieIndex);
+            final int serieIndex = timeSlice.serieIndex;
+
+            final TourPhoto tourPhoto = _allPositionedPhotos.get(serieIndex);
 
             if (tourPhoto != null) {
 
@@ -6545,7 +6547,17 @@ public class TourDataEditorView extends ViewPart implements
 
             } else {
 
-               cell.setText(UI.EMPTY_STRING);
+               final int lastIndex = _tourData.timeSerie.length - 1;
+
+               if (serieIndex == 0 && _allPositionedPhotos.containsKey(Integer.MIN_VALUE)
+                     || serieIndex == lastIndex && _allPositionedPhotos.containsKey(Integer.MAX_VALUE)) {
+
+                  cell.setText(UI.SYMBOL_FULL_BLOCK);
+
+               } else {
+
+                  cell.setText(UI.EMPTY_STRING);
+               }
             }
          }
       });
@@ -7078,7 +7090,9 @@ public class TourDataEditorView extends ViewPart implements
          }
       }
 
-      final boolean canDeleteTimeSliced = _isEditMode && isTourInDb && isSliceSelected && isNoSwimData;
+      final boolean isNoPhotoTour = _tourData.isPhotoTour() == false;
+
+      final boolean canDeleteTimeSliced = _isEditMode && isTourInDb && isSliceSelected && isNoSwimData && isNoPhotoTour;
 
       _actionCreateTourMarker.setEnabled(_isEditMode && isTourInDb && isOneSliceSelected && canCreateMarker);
       _actionOpenMarkerDialog.setEnabled(_isEditMode && isTourInDb && isOneSliceSelected && selectedMarker != null);
@@ -9591,9 +9605,9 @@ public class TourDataEditorView extends ViewPart implements
 
       _allPositionedPhotos.clear();
 
-      final Set<Long> tourPhotosWithGeoPosition = _tourData.getTourPhotosWithPositionedGeo();
+      final Set<Long> allTourPhotosWithGeoPosition = _tourData.getTourPhotosWithPositionedGeo();
 
-      if (tourPhotosWithGeoPosition == null) {
+      if (allTourPhotosWithGeoPosition == null) {
          return;
       }
 
@@ -9617,12 +9631,26 @@ public class TourDataEditorView extends ViewPart implements
 
          final long photoId = tourPhoto.getPhotoId();
 
-         if (tourPhotosWithGeoPosition.contains(photoId)) {
+         if (allTourPhotosWithGeoPosition.contains(photoId)) {
 
             final int timeIndex = photoIndex + 1;
 
             _allPositionedPhotos.put(timeIndex, tourPhoto);
          }
+      }
+
+      if (allTourPhotosWithGeoPosition.contains(Long.MIN_VALUE)) {
+
+         // geo position is set on the first time slice
+
+         _allPositionedPhotos.put(Integer.MIN_VALUE, null);
+      }
+
+      if (allTourPhotosWithGeoPosition.contains(Long.MAX_VALUE)) {
+
+         // geo position is set on the last time slice
+
+         _allPositionedPhotos.put(Integer.MAX_VALUE, null);
       }
    }
 

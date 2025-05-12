@@ -245,6 +245,13 @@ public class ActionSetGeoPositionForGeoMarker extends SubMenu {
    @Override
    public void fillMenu(final Menu menu) {
 
+      if (_allGeoMarker == null) {
+
+         // this happened during debugging
+
+         return;
+      }
+
       for (final TourMarker tourMarker : _allGeoMarker) {
 
          final ActionSetGeoPosition action = new ActionSetGeoPosition(tourMarker);

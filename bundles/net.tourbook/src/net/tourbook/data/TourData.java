@@ -5083,13 +5083,13 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
 
       // TODO Auto-generated method stub
 
-      if (isPhotoTour() == false) {
+      if (isPhotoTour() == false || latitudeSerie == null) {
 
          return;
       }
 
       // sort photos by time
-      final ArrayList<TourPhoto> allSortedPhotos = new ArrayList<>(tourPhotos);
+      final List<TourPhoto> allSortedPhotos = new ArrayList<>(tourPhotos);
       Collections.sort(allSortedPhotos, (tourPhoto1, tourPhoto2) -> {
 
          return Long.compare(tourPhoto1.getImageExifTime(), tourPhoto2.getImageExifTime());
@@ -5098,18 +5098,11 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
       final int numTimeSlices = timeSerie.length;
       final int numPhotos = allSortedPhotos.size();
 
-//      latitudeE6_Normalized = latitudeE6 + 90_000_000;
-//      longitudeE6_Normalized = longitudeE6 + 180_000_000;
-
-      final double[] allLatitude = new double[numTimeSlices];
-      final double[] allLongitude = new double[numTimeSlices];
+      final boolean[] allIsGeoPositioned = new boolean[numTimeSlices];
 
       boolean isGeoPositioned = false;
 
       for (int timeIndex = 0; timeIndex < numTimeSlices; timeIndex++) {
-
-         final double latitude = latitudeSerie[timeIndex];
-         final double longitude = longitudeSerie[timeIndex];
 
          TourPhoto tourPhoto = null;
 
@@ -5128,22 +5121,28 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
 
             if (isPhotoWithPositionedGeo) {
 
-               allLatitude[timeIndex] = latitude;
-               allLongitude[timeIndex] = longitude;
+               allIsGeoPositioned[timeIndex] = true;
 
                isGeoPositioned = true;
             }
 
          } else {
 
-            // this is for the first/last time slice which has not photo
+            // this is for the first/last time slice which has no photo
 
-            if (latitude != 0) {
+            if (tourPhotosWithPositionedGeo != null) {
 
-               allLatitude[timeIndex] = latitude;
-               allLongitude[timeIndex] = longitude;
+               if (timeIndex == 0 && tourPhotosWithPositionedGeo.contains(Long.MIN_VALUE)) {
 
-               isGeoPositioned = true;
+                  allIsGeoPositioned[timeIndex] = true;
+                  isGeoPositioned = true;
+               }
+
+               if (timeIndex == numTimeSlices - 1 && tourPhotosWithPositionedGeo.contains(Long.MAX_VALUE)) {
+
+                  allIsGeoPositioned[timeIndex] = true;
+                  isGeoPositioned = true;
+               }
             }
          }
       }
@@ -5160,51 +5159,149 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
 
       for (int timeIndex = 0; timeIndex < numTimeSlices; timeIndex++) {
 
-         final double latitude = allLatitude[timeIndex];
-
-         if (latitude != 0) {
+         if (allIsGeoPositioned[timeIndex]) {
 
             nextIndexWithGeo = timeIndex;
 
-            computeGeo_Photos_Interpolate(lastIndexWithGeo, nextIndexWithGeo);
+            computeGeo_Photos_Interpolate("rev ", timeIndex, lastIndexWithGeo, nextIndexWithGeo - 1, allSortedPhotos);
 
             lastIndexWithGeo = timeIndex + 1;
          }
       }
 
-      nextIndexWithGeo = numTimeSlices - 1;
-
-      computeGeo_Photos_Interpolate(lastIndexWithGeo, nextIndexWithGeo);
-
-      // set lat/lon into the remaining time slices
-
-//      final double latNormalized = latitude + 90;
-//      final double lonNormalized = longitude + 180;
-
-//      for (int timeIndex = lastTimeIndexWithLatLon; timeIndex < numTimeSlices; timeIndex++) {
-//
-//         latitudeSerie[timeIndex] = nextLatitude;
-//         longitudeSerie[timeIndex] = nextLongitude;
-//
-//         if (timeIndex > 0 && (timeIndex - 1) < numPhotos) {
-//
-//            final TourPhoto tourPhoto = allSortedPhotos.get(timeIndex - 1);
-//
-//            tourPhoto.setGeoLocation(nextLatitude, nextLongitude);
-//         }
-//      }
+      computeGeo_Photos_Interpolate("post", lastIndexWithGeo - 1, lastIndexWithGeo + 0, numTimeSlices - 1, allSortedPhotos);
 
       System.out.println();
 // TODO remove SYSTEM.OUT.PRINTLN
    }
 
-   private void computeGeo_Photos_Interpolate(final int lastIndexWithGeo, final int nextIndexWithGeo) {
+   private void computeGeo_Photos_Interpolate(final String label,
+                                              final int fromIndex,
+                                              final int firstIndex,
+                                              final int lastIndex,
+                                              final List<TourPhoto> allSortedPhotos) {
 
       // TODO Auto-generated method stub
 
+      if (lastIndex < firstIndex) {
 
-      System.out.println(UI.timeStamp() + " : " + lastIndexWithGeo + " - " + nextIndexWithGeo);
+         // this happens when only the first slice is set
+
+         return;
+      }
+
+      System.out.println(UI.timeStamp()
+
+            + " - " + label
+            + " - from " + fromIndex
+            + " - first " + firstIndex
+            + " - last " + lastIndex
+
+      );
 // TODO remove SYSTEM.OUT.PRINTLN
+
+      final int numPhotos = allSortedPhotos.size();
+      final int numTimeSlices = timeSerie.length;
+
+      final int lastTimeSliceIndex = numTimeSlices - 1;
+
+      final boolean isOnlyFirstIndex = fromIndex == 0 && firstIndex == 1 && lastIndex == lastTimeSliceIndex;
+      final boolean isOnlyLastIndex = fromIndex == lastTimeSliceIndex && firstIndex == 0 && lastIndex == lastTimeSliceIndex - 1;
+
+      if (
+      // only the first or last time slice has a position
+      isOnlyFirstIndex || isOnlyLastIndex
+
+      // there is no position from the start to x or from x to the last
+            || firstIndex == 0 || lastIndex == lastTimeSliceIndex) {
+
+         // there is no interpolation between 2 slices
+
+         final double fromLatitude = latitudeSerie[fromIndex];
+         final double fromLongitude = longitudeSerie[fromIndex];
+
+         for (int timeIndex = firstIndex; timeIndex <= lastIndex; timeIndex++) {
+
+            latitudeSerie[timeIndex] = fromLatitude;
+            longitudeSerie[timeIndex] = fromLongitude;
+
+            if (timeIndex > 0 && (timeIndex - 1) < numPhotos) {
+
+               final int photoIndex = timeIndex - 1;
+
+               final TourPhoto tourPhoto = allSortedPhotos.get(photoIndex);
+
+               tourPhoto.setGeoLocation(fromLatitude, fromLongitude);
+            }
+
+            System.out.println(UI.timeStamp() + " first/last : " + timeIndex);
+// TODO remove SYSTEM.OUT.PRINTLN
+         }
+
+      } else {
+
+         // these are all other cases which have slices with lat/lon -> interpolated
+
+         final int beforeIndex = firstIndex - 1;
+         final int afterIndex = lastIndex + 1;
+
+         final int timeBefore = timeSerie[beforeIndex];
+         final int timeAfter = timeSerie[afterIndex];
+
+         final int timeDiff = timeAfter - timeBefore;
+
+         final double latBeforeNormalized = latitudeSerie[beforeIndex] + 90;
+         final double latAfterNormalized = latitudeSerie[afterIndex] + 90;
+         final double lonBeforeNormalized = longitudeSerie[beforeIndex] + 180;
+         final double lonAfterNormalized = longitudeSerie[afterIndex] + 180;
+
+         final double latDiff = latAfterNormalized - latBeforeNormalized;
+         final double lonDiff = lonAfterNormalized - lonBeforeNormalized;
+
+         for (int timeIndex = firstIndex; timeIndex <= lastIndex; timeIndex++) {
+
+            final float sliceTime = timeSerie[timeIndex];
+
+            final float sliceDiff = sliceTime - timeBefore;
+            final float proportionalDiff = sliceDiff / timeDiff;
+
+            final double latSliceDiff = latDiff * proportionalDiff;
+            final double lonSliceDiff = lonDiff * proportionalDiff;
+
+            final double sliceLatitudeNormalized = latBeforeNormalized + latSliceDiff;
+            final double sliceLongitudeNormalized = lonBeforeNormalized + lonSliceDiff;
+
+            final double sliceLatitude = sliceLatitudeNormalized - 90;
+            final double sliceLongitude = sliceLongitudeNormalized - 180;
+
+            latitudeSerie[timeIndex] = sliceLatitude;
+            longitudeSerie[timeIndex] = sliceLongitude;
+
+            if (timeIndex == 17) {
+
+               int a = 0;
+               a++;
+            }
+
+            if (timeIndex > 0 && (timeIndex - 1) < numPhotos) {
+
+               final int photoIndex = timeIndex - 1;
+
+               final TourPhoto tourPhoto = allSortedPhotos.get(photoIndex);
+
+               tourPhoto.setGeoLocation(sliceLatitude, sliceLongitude);
+            }
+
+            System.out.println(UI.timeStamp()
+
+                  + " other : " + timeIndex
+
+                  + " - " + proportionalDiff
+
+            );
+// TODO remove SYSTEM.OUT.PRINTLN
+         }
+      }
 
    }
 
