@@ -335,6 +335,11 @@ public class Photo implements Serializable {
    private ToneCurvesFilter              _toneCurvesFilter;
 
    /**
+    * Position of this photo in the painted photo list
+    */
+   public int                            photoIndex;
+
+   /**
     */
    public Photo(final File photoImageFile) {
 

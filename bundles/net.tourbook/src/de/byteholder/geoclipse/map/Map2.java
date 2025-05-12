@@ -394,6 +394,10 @@ public class Map2 extends Canvas {
    private boolean                       _canPanMap;
    private boolean                       _isMapPanned;
 
+   private boolean                       _canPanPhoto;
+   private boolean                       _isPhotoPanned;
+   private Photo                         _pannedPhoto;
+
    private boolean                       _isMouseDown;
    private Point                         _mouseDownPosition;
    private GeoPosition                   _mouseDown_ContextMenu_GeoPosition;
@@ -467,6 +471,7 @@ public class Map2 extends Canvas {
    private PaintedMarkerCluster            _hoveredMarkerCluster;
    private PaintedMapPoint                 _hoveredMapPoint;
    private PaintedMapPoint                 _hoveredMapPoint_Previous;
+   private boolean                         _isHoveredMapPointSymbol;
    private Photo                           _selectedPhoto;
    private PaintedMapPoint                 _selectedPhotoMapPoint;
    private boolean                         _isInHoveredRatingStar;
@@ -2301,10 +2306,14 @@ public class Map2 extends Canvas {
       final List<Photo> allVisiblePhotos = new ArrayList<>();
       final List<java.awt.Point> allWorldPixel = new ArrayList<>();
 
-      /*
-       * Get all visible photos
-       */
-      for (final Photo photo : allPhotosCloned) {
+      final int numPhotos = allPhotosCloned.size();
+
+      for (int photoIndex = 0; photoIndex < numPhotos; photoIndex++) {
+
+         final Photo photo = allPhotosCloned.get(photoIndex);
+
+         // keep serie indices for the photos
+         photo.photoIndex = photoIndex;
 
          final java.awt.Point photoWorldPixel = photo.getWorldPosition(
                _mp,
@@ -4472,6 +4481,7 @@ public class Map2 extends Canvas {
 
          // prevent map panning, this is happening
          _canPanMap = false;
+         _canPanPhoto = false;
 
          fireEvent_RunExternalApp(1, _hoveredMapPoint.mapPoint.photo);
 
@@ -4663,7 +4673,23 @@ public class Map2 extends Canvas {
                   selectPhoto(photo, _hoveredMapPoint);
                }
 
-               isCanPanMap = true;
+               if (_isHoveredMapPointSymbol) {
+
+                  // when a photo symbol is hovered, then the photo can be panned, otherwise the map
+
+                  isCanPanMap = false;
+
+                  _canPanPhoto = true;
+                  _pannedPhoto = _hoveredMapPoint.mapPoint.photo;
+
+                  _mouseDownPosition = devMousePosition;
+
+                  setCursorOptimized(_cursorPan);
+
+               } else {
+
+                  isCanPanMap = true;
+               }
             }
          }
 
@@ -4944,6 +4970,7 @@ public class Map2 extends Canvas {
        */
       _hoveredMapPoint_Previous = _hoveredMapPoint;
       _hoveredMapPoint = null;
+      _isHoveredMapPointSymbol = false;
 
       // use a local ref otherwise the list could be modified in another thread which caused exceptions
       final List<PaintedMapPoint> allPaintedClusterMarkers = _allPaintedClusterMarkers;
@@ -5075,6 +5102,15 @@ public class Map2 extends Canvas {
       // ensure that the old map point is hidden
       if (_hoveredMapPoint_Previous != null) {
          redraw();
+      }
+
+      if (_canPanPhoto) {
+
+         // pan photo
+
+         panPhoto(mouseEvent);
+
+         return;
       }
 
       if (_canPanMap) {
@@ -5257,6 +5293,8 @@ public class Map2 extends Canvas {
 
             _hoveredMapPoint = paintedMapPoint;
 
+            _isHoveredMapPointSymbol = true;
+
             break;
          }
       }
@@ -5417,14 +5455,22 @@ public class Map2 extends Canvas {
                redraw();
             }
 
+            if (_isPhotoPanned) {
+               _isPhotoPanned = false;
+               redraw();
+            }
+
             _mouseDownPosition = null;
+
             _canPanMap = false;
+            _canPanPhoto = false;
 
             setCursorOptimized(_cursorDefault);
 
          } else if (mouseEvent.button == 2) {
+
             // if the middle mouse button is clicked, recenter the view
-//            recenterMap(event.x, event.y);
+            // recenterMap(event.x, event.y);
          }
       }
 
@@ -10225,6 +10271,40 @@ public class Map2 extends Canvas {
       paint();
 
       fireEvent_MapPosition(false);
+   }
+
+   private void panPhoto(final MouseEvent mouseEvent) {
+
+      final List<TourPhoto> allTourPhotos = TourPhotoManager.getTourPhotos(_pannedPhoto);
+
+      final TourPhoto tourPhoto = allTourPhotos.get(0);
+      final TourData tourData = tourPhoto.getTourData();
+
+      final GeoPosition mouseMove_GeoPosition = getMouseMove_GeoPosition();
+
+      final double latitude = mouseMove_GeoPosition.latitude;
+      final double longitude = mouseMove_GeoPosition.longitude;
+
+      // getting the serie index is very tricky
+      final int serieIndex = _pannedPhoto.photoIndex + 1;
+
+      tourData.latitudeSerie[serieIndex] = latitude;
+      tourData.longitudeSerie[serieIndex] = longitude;
+
+      tourPhoto.setGeoLocation(latitude, longitude);
+
+      if (tourPhoto != null) {
+
+         tourPhoto.setGeoLocation(latitude, longitude);
+
+         // keep state for which photo a geo position was set
+         tourData.getTourPhotosWithPositionedGeo().add(tourPhoto.getPhotoId());
+      }
+
+      // interpolate all geo positions
+      tourData.computeGeo_Photos();
+
+      TourManager.saveModifiedTour(tourData);
    }
 
    /**
