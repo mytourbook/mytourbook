@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2025 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -32,10 +32,11 @@ public class PhotoCategory {
 
    Point[]                           photoPositions;
 
+   boolean[]                         allGeoPositionedPhotos;
+
    public PhotoCategory(final ArrayList<ChartPhoto> chartPhotos, final ChartPhotoType photoType) {
 
       this.chartPhotos = chartPhotos;
       this.photoType = photoType;
    }
-
 }

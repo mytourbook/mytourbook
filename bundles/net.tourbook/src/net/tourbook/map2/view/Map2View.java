@@ -1579,7 +1579,7 @@ public class Map2View extends ViewPart implements
       final Map2Point mapPoint = _contextMenu_HoveredMapPoint.mapPoint;
       final Photo hoveredPhoto = mapPoint.photo;
 
-      final List<TourPhoto> allTourPhotos = TourPhotoManager.getInstance().getTourPhotos(hoveredPhoto);
+      final List<TourPhoto> allTourPhotos = TourPhotoManager.getTourPhotos(hoveredPhoto);
 
       if (allTourPhotos.size() < 1) {
          return;

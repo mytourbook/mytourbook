@@ -163,6 +163,7 @@ import org.eclipse.jface.viewers.ComboBoxCellEditor;
 import org.eclipse.jface.viewers.EditingSupport;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredContentProvider;
+import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TableViewer;
@@ -560,8 +561,6 @@ public class TourDataEditorView extends ViewPart implements
    private IContextMenuProvider                       _swimViewer_ContextMenuProvider = new SwimSlice_ViewerContextMenuProvider();
    private IContextMenuProvider                       _timeViewer_ContextMenuProvider = new TimeSlice_ViewerContextMenuProvider();
    //
-   private Action_RemoveSwimStyle                     _action_RemoveSwimStyle;
-   private Action_SetSwimStyle_Header                 _action_SetSwimStyle_Header;
    private ActionComputeDistanceValues                _actionComputeDistanceValues;
    private ActionCreateTourMarker                     _actionCreateTourMarker;
    private ActionCSVTimeSliceExport                   _actionCsvTimeSliceExport;
@@ -575,7 +574,10 @@ public class TourDataEditorView extends ViewPart implements
    private ActionExtractTour                          _actionExtractTour;
    private ActionOpenAdjustAltitudeDialog             _actionOpenAdjustAltitudeDialog;
    private ActionOpenMarkerDialog                     _actionOpenMarkerDialog;
+   private ActionRemovePhotoPosition                  _actionRemovePhotoPosition;
+   private ActionRemoveSwimStyle                      _action_RemoveSwimStyle;
    private ActionSetStartDistanceTo0                  _actionSetStartDistanceTo_0;
+   private ActionSetSwimStyle_Header                  _action_SetSwimStyle_Header;
    private ActionSplitTour                            _actionSplitTour;
    private ActionTourStartEndLocation                 _actionStartLocation;
    private ActionTourStartEndLocation                 _actionEndLocation;
@@ -767,9 +769,27 @@ public class TourDataEditorView extends ViewPart implements
 
    private Widget                    _focusField;
 
-   private class Action_RemoveSwimStyle extends Action {
+   private class ActionRemovePhotoPosition extends Action {
 
-      public Action_RemoveSwimStyle() {
+      public ActionRemovePhotoPosition() {
+
+         super("Remove &photo position");
+
+         setToolTipText("This removes the association between the photo and it geo position");
+
+         setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.App_Remove));
+         setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Images.App_Remove_Disabled));
+      }
+
+      @Override
+      public void run() {
+         actionRemovePhotoPosition();
+      }
+   }
+
+   private class ActionRemoveSwimStyle extends Action {
+
+      public ActionRemoveSwimStyle() {
 
          super(Messages.TourEditor_Action_RemoveSwimStyle);
 
@@ -786,9 +806,9 @@ public class TourDataEditorView extends ViewPart implements
    /**
     * Swim style menu header item without action
     */
-   private class Action_SetSwimStyle_Header extends Action {
+   private class ActionSetSwimStyle_Header extends Action {
 
-      public Action_SetSwimStyle_Header() {
+      public ActionSetSwimStyle_Header() {
 
          super(Messages.TourEditor_Action_SetSwimStyle, AS_PUSH_BUTTON);
          setEnabled(false);
@@ -2603,6 +2623,44 @@ public class TourDataEditorView extends ViewPart implements
       }
    }
 
+   private void actionRemovePhotoPosition() {
+
+      final IStructuredSelection sliceSelection = _timeSlice_Viewer.getStructuredSelection();
+      final TimeSlice timeSlice = (TimeSlice) sliceSelection.getFirstElement();
+
+      final int serieIndex = timeSlice.serieIndex;
+      final int lastIndex = _tourData.timeSerie.length - 1;
+
+      final Set<Long> allTourPhotosWithGeoPosition = _tourData.getTourPhotosWithPositionedGeo();
+
+      if (serieIndex == 0 && _allPositionedPhotos.containsKey(Integer.MIN_VALUE)) {
+
+         allTourPhotosWithGeoPosition.remove(Long.MIN_VALUE);
+
+      } else if (serieIndex == lastIndex && _allPositionedPhotos.containsKey(Integer.MAX_VALUE)) {
+
+         allTourPhotosWithGeoPosition.remove(Long.MAX_VALUE);
+
+      } else {
+
+         final TourPhoto tourPhoto = _allPositionedPhotos.get(serieIndex);
+
+         if (tourPhoto != null) {
+
+            allTourPhotosWithGeoPosition.remove(tourPhoto.getPhotoId());
+         }
+      }
+
+      updatePositionedPhotos();
+
+      // recompute geo positions
+      _tourData.computeGeo_Photos();
+
+      _timeSlice_Viewer.refresh();
+
+      setTourDirty();
+   }
+
    void actionSetStartDistanceTo_0000() {
 
       // it is already checked if a valid data serie is available and first distance is > 0
@@ -3193,23 +3251,20 @@ public class TourDataEditorView extends ViewPart implements
 
 // SET_FORMATTING_OFF
 
-      _actionEditTimeSlicesValues      = new ActionEditTimeSlicesValues(this);
-
-      _actionDeleteDistanceValues      = new ActionDeleteDistanceValues(this);
       _actionComputeDistanceValues     = new ActionComputeDistanceValues(this);
-      _actionToggleRowSelectMode       = new ActionToggleRowSelectMode(this);
-      _actionToggleReadEditMode        = new ActionToggleReadEditMode(this);
-      _actionSetStartDistanceTo_0      = new ActionSetStartDistanceTo0(this);
-
+      _actionCreateTourMarker          = new ActionCreateTourMarker(this);
+      _actionCsvTimeSliceExport        = new ActionCSVTimeSliceExport(this);
+      _actionDeleteDistanceValues      = new ActionDeleteDistanceValues(this);
+      _actionEditTimeSlicesValues      = new ActionEditTimeSlicesValues(this);
+      _actionExtractTour               = new ActionExtractTour(this);
+      _actionExportTour                = new ActionExport(this);
       _actionOpenAdjustAltitudeDialog  = new ActionOpenAdjustAltitudeDialog(this, true);
       _actionOpenMarkerDialog          = new ActionOpenMarkerDialog(this, false);
-
-      _actionCreateTourMarker          = new ActionCreateTourMarker(this);
-      _actionExportTour                = new ActionExport(this);
-      _actionCsvTimeSliceExport        = new ActionCSVTimeSliceExport(this);
+      _actionRemovePhotoPosition       = new ActionRemovePhotoPosition();
+      _actionSetStartDistanceTo_0      = new ActionSetStartDistanceTo0(this);
       _actionSplitTour                 = new ActionSplitTour(this);
-      _actionExtractTour               = new ActionExtractTour(this);
-
+      _actionToggleReadEditMode        = new ActionToggleReadEditMode(this);
+      _actionToggleRowSelectMode       = new ActionToggleRowSelectMode(this);
       _actionViewSettings              = new ActionViewSettings();
 
       _actionDeleteTimeSlices_AdjustTourStartTime  = new ActionDeleteTimeSlices_AdjustTourStartTime(this);
@@ -3222,12 +3277,12 @@ public class TourDataEditorView extends ViewPart implements
       _tagMenuMgr = new TagMenuManager(this, false);
 
       // swim style actions
-      _action_SetSwimStyle_Header = new Action_SetSwimStyle_Header();
+      _action_SetSwimStyle_Header = new ActionSetSwimStyle_Header();
       _allSwimStyleActions = new ArrayList<>();
       for (final StrokeStyle strokeStyle : SwimStrokeManager.DEFAULT_STROKE_STYLES) {
          _allSwimStyleActions.add(new Action_SetSwimStyle(this, strokeStyle));
       }
-      _action_RemoveSwimStyle = new Action_RemoveSwimStyle();
+      _action_RemoveSwimStyle = new ActionRemoveSwimStyle();
 
    }
 
@@ -7059,16 +7114,18 @@ public class TourDataEditorView extends ViewPart implements
    }
 
    /**
-    * enable actions
+    * Enable actions
     */
    private void enableActions_TimeSlices() {
 
-      final StructuredSelection sliceSelection = (StructuredSelection) _timeSlice_Viewer.getSelection();
+      final IStructuredSelection sliceSelection = _timeSlice_Viewer.getStructuredSelection();
+      final TimeSlice oneTimeSlice = (TimeSlice) sliceSelection.getFirstElement();
 
-      final int numberOfSelectedSlices = sliceSelection.size();
+      final int numSelectedSlices = sliceSelection.size();
 
-      final boolean isSliceSelected = numberOfSelectedSlices > 0;
-      final boolean isOneSliceSelected = numberOfSelectedSlices == 1;
+      final boolean isSliceSelected = numSelectedSlices > 0;
+      final boolean isOneSliceSelected = numSelectedSlices == 1;
+      final boolean isPhotoTour = _tourData.isPhotoTour();
       final boolean isTourInDb = isTourInDb();
 
       // deleting time slices with swim data is very complex
@@ -7077,9 +7134,19 @@ public class TourDataEditorView extends ViewPart implements
       // check if a marker can be created
       boolean canCreateMarker = false;
       if (isOneSliceSelected) {
-         final TimeSlice oneTimeSlice = (TimeSlice) sliceSelection.getFirstElement();
+
          canCreateMarker = _markerMap.containsKey(oneTimeSlice.serieIndex) == false;
       }
+
+      // remove photo position
+      boolean canRemovePhotoPosition = false;
+      if (isOneSliceSelected && isPhotoTour) {
+
+         final TourPhoto tourPhoto = _allPositionedPhotos.get(oneTimeSlice.serieIndex);
+
+         canRemovePhotoPosition = tourPhoto != null;
+      }
+
       // get selected Marker
       TourMarker selectedMarker = null;
       for (final Object name : sliceSelection) {
@@ -7102,20 +7169,22 @@ public class TourDataEditorView extends ViewPart implements
 
 // SET_FORMATTING_OFF
 
-      _actionDeleteTimeSlices_AdjustTourStartTime  .setEnabled(canDeleteTimeSliced);
-      _actionDeleteTimeSlices_KeepTime             .setEnabled(canDeleteTimeSliced);
-      _actionDeleteTimeSlices_KeepTimeAndDistance  .setEnabled(canDeleteTimeSliced);
-      _actionDeleteTimeSlices_RemoveTime           .setEnabled(canDeleteTimeSliced);
+      _actionRemovePhotoPosition .setEnabled(canRemovePhotoPosition);
 
       _actionExportTour          .setEnabled(true);
       _actionCsvTimeSliceExport  .setEnabled(isSliceSelected);
 
       _actionSplitTour           .setEnabled(isOneSliceSelected);
-      _actionExtractTour         .setEnabled(numberOfSelectedSlices >= 2);
+      _actionExtractTour         .setEnabled(numSelectedSlices >= 2);
+
+      _actionDeleteTimeSlices_AdjustTourStartTime  .setEnabled(canDeleteTimeSliced);
+      _actionDeleteTimeSlices_KeepTime             .setEnabled(canDeleteTimeSliced);
+      _actionDeleteTimeSlices_KeepTimeAndDistance  .setEnabled(canDeleteTimeSliced);
+      _actionDeleteTimeSlices_RemoveTime           .setEnabled(canDeleteTimeSliced);
 
 // SET_FORMATTING_ON
 
-      // set start/end position into the actions
+      // set start/end positions into the actions
       if (isSliceSelected) {
 
          final Object[] selectedSliceArray = sliceSelection.toArray();
@@ -7314,6 +7383,7 @@ public class TourDataEditorView extends ViewPart implements
       menuManager.add(_actionDeleteTimeSlices_KeepTime);
       menuManager.add(_actionDeleteTimeSlices_KeepTimeAndDistance);
       menuManager.add(_actionDeleteTimeSlices_AdjustTourStartTime);
+      menuManager.add(_actionRemovePhotoPosition);
 
       menuManager.add(new Separator());
       menuManager.add(_actionSetStartDistanceTo_0);

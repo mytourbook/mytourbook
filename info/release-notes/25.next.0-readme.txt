@@ -38,17 +38,9 @@ Experimental
 * 
 
 
-New
-===
+New / Improvements
+==================
 
-* Tour Info Tooltip (Frederic)
-  - New fields: elapsed time at night and during the day for tours that also happen during the night
-
-* Tour Nutrition (Frederic)
-  - Support for the carbohydrates
-  - New button to update the nutrition facts of (a) product(s)
-  - Edit an existing custom nutrition product
-  
 * Fit Import
   - Import distance values for swimming and display
     - Speed in the tour chart
@@ -59,17 +51,36 @@ New
   - Duplicate filter property, this makes it easier to create a similar filter    
     https://github.com/mytourbook/mytourbook/issues/1487
 
-Improvements
-============
+    
+* Tour Info Tooltip (Frederic)
+  - New fields: elapsed time at night and during the day for tours that also happen during the night
+
+
+* Tour Chart
+  - Visualize positioned photos with a different map point color
+
+* 2D Map
+  - Create geo positions for each photo in a photo tour
+    https://github.com/mytourbook/mytourbook/issues/1488 
+    
+* Tour Editor
+  - Remove photo geo position    
 
 * Tour Nutrition (Frederic)
+  - Support for the carbohydrates
+  - New button to update the nutrition facts of (a) product(s)
+  - Edit an existing custom nutrition product
   - Add duplicated products when they are contained in a beverage container
   
+
+
 
 Changes
 =======
 
-* 
+* 2D Map
+  Replaced actions to set tour start/end positions https://github.com/mytourbook/mytourbook/issues/1457 with https://github.com/mytourbook/mytourbook/issues/1488 which creates geo positions for each photo
+   
 
 
 

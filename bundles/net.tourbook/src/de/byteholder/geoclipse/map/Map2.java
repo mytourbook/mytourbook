@@ -8889,7 +8889,7 @@ public class Map2 extends Canvas {
          final Map2Point mapPoint = (Map2Point) distribLabel.data;
 
          final Photo photo = mapPoint.photo;
-         final List<TourPhoto> allTourPhotos = TourPhotoManager.getInstance().getTourPhotos(photo);
+         final List<TourPhoto> allTourPhotos = TourPhotoManager.getTourPhotos(photo);
          final TourPhoto tourPhoto = allTourPhotos.get(0);
          final TourData tourData = tourPhoto.getTourData();
          final Set<Long> tourPhotosWithPositionedGeo = tourData.getTourPhotosWithPositionedGeo();
@@ -9062,7 +9062,7 @@ public class Map2 extends Canvas {
 
    private void paint_MpImage_PhotoLabel(final Graphics2D g2d, final Photo photo, final Map2Point mapPoint) {
 
-      final List<TourPhoto> allTourPhotos = TourPhotoManager.getInstance().getTourPhotos(photo);
+      final List<TourPhoto> allTourPhotos = TourPhotoManager.getTourPhotos(photo);
       if (allTourPhotos.size() < 1) {
          return;
       }
