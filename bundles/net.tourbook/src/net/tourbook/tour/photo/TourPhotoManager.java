@@ -213,6 +213,10 @@ public class TourPhotoManager implements IPhotoServiceProvider {
 
       final List<TourPhoto> allTourPhotos = getTourPhotos(photo);
 
+      if (allTourPhotos == null || allTourPhotos.size() == 0) {
+         return false;
+      }
+
       final TourPhoto tourPhoto = allTourPhotos.get(0);
       final TourData tourData = tourPhoto.getTourData();
 
