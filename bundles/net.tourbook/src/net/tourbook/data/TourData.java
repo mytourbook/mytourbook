@@ -5077,11 +5077,9 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
    }
 
    /**
-    * Interpolate geo positions when lat/lon is 0
+    * Interpolate geo positions
     */
    public void computeGeo_Photos() {
-
-      // TODO Auto-generated method stub
 
       if (isPhotoTour() == false || latitudeSerie == null) {
 
@@ -5096,8 +5094,6 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
       });
 
       final int numTimeSlices = timeSerie.length;
-      final int numPhotos = allSortedPhotos.size();
-
       final boolean[] allIsGeoPositioned = new boolean[numTimeSlices];
 
       boolean isGeoPositioned = false;
@@ -5106,44 +5102,22 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
 
          TourPhoto tourPhoto = null;
 
-         if (timeIndex > 0 && (timeIndex - 1) < numPhotos) {
+         if (tourPhotosWithPositionedGeo == null || tourPhotosWithPositionedGeo.size() == 0) {
 
-            if (tourPhotosWithPositionedGeo == null || tourPhotosWithPositionedGeo.size() == 0) {
+            // there are no applied geo positions for photos
 
-               // there are no applied geo positions for photos
+            continue;
+         }
 
-               continue;
-            }
+         tourPhoto = allSortedPhotos.get(timeIndex);
 
-            tourPhoto = allSortedPhotos.get(timeIndex - 1);
+         final boolean isPhotoWithPositionedGeo = tourPhotosWithPositionedGeo.contains(tourPhoto.getPhotoId());
 
-            final boolean isPhotoWithPositionedGeo = tourPhotosWithPositionedGeo.contains(tourPhoto.getPhotoId());
+         if (isPhotoWithPositionedGeo) {
 
-            if (isPhotoWithPositionedGeo) {
+            allIsGeoPositioned[timeIndex] = true;
 
-               allIsGeoPositioned[timeIndex] = true;
-
-               isGeoPositioned = true;
-            }
-
-         } else {
-
-            // this is for the first/last time slice which has no photo
-
-            if (tourPhotosWithPositionedGeo != null) {
-
-               if (timeIndex == 0 && tourPhotosWithPositionedGeo.contains(Long.MIN_VALUE)) {
-
-                  allIsGeoPositioned[timeIndex] = true;
-                  isGeoPositioned = true;
-               }
-
-               if (timeIndex == numTimeSlices - 1 && tourPhotosWithPositionedGeo.contains(Long.MAX_VALUE)) {
-
-                  allIsGeoPositioned[timeIndex] = true;
-                  isGeoPositioned = true;
-               }
-            }
+            isGeoPositioned = true;
          }
       }
 
@@ -5163,18 +5137,18 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
 
             nextIndexWithGeo = timeIndex;
 
-            computeGeo_Photos_Interpolate("rev ", timeIndex, lastIndexWithGeo, nextIndexWithGeo - 1, allSortedPhotos);
+            computeGeo_Photos_Interpolate(timeIndex, lastIndexWithGeo, nextIndexWithGeo - 1, allSortedPhotos);
 
             lastIndexWithGeo = timeIndex + 1;
          }
       }
 
-      computeGeo_Photos_Interpolate("post", lastIndexWithGeo - 1, lastIndexWithGeo + 0, numTimeSlices - 1, allSortedPhotos);
+      computeGeo_Photos_Interpolate(lastIndexWithGeo - 1, lastIndexWithGeo + 0, numTimeSlices - 1, allSortedPhotos);
 
       TourManager.computeDistanceValuesFromGeoPosition(this);
    }
 
-   private void computeGeo_Photos_Interpolate(final String label,
+   private void computeGeo_Photos_Interpolate(
                                               final int fromIndex,
                                               final int firstIndex,
                                               final int lastIndex,
@@ -5187,7 +5161,6 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
          return;
       }
 
-      final int numPhotos = allSortedPhotos.size();
       final int numTimeSlices = timeSerie.length;
 
       final int lastTimeSliceIndex = numTimeSlices - 1;
@@ -5212,19 +5185,14 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
             latitudeSerie[timeIndex] = fromLatitude;
             longitudeSerie[timeIndex] = fromLongitude;
 
-            if (timeIndex > 0 && (timeIndex - 1) < numPhotos) {
+            final TourPhoto tourPhoto = allSortedPhotos.get(timeIndex);
 
-               final int photoIndex = timeIndex - 1;
-
-               final TourPhoto tourPhoto = allSortedPhotos.get(photoIndex);
-
-               tourPhoto.setGeoLocation(fromLatitude, fromLongitude);
-            }
+            tourPhoto.setGeoLocation(fromLatitude, fromLongitude);
          }
 
       } else {
 
-         // these are all other cases which have slices with lat/lon -> interpolated
+         // these are all other cases which have slices with lat/lon -> interpolate it
 
          final int beforeIndex = firstIndex - 1;
          final int afterIndex = lastIndex + 1;
@@ -5261,14 +5229,9 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
             latitudeSerie[timeIndex] = sliceLatitude;
             longitudeSerie[timeIndex] = sliceLongitude;
 
-            if (timeIndex > 0 && (timeIndex - 1) < numPhotos) {
+            final TourPhoto tourPhoto = allSortedPhotos.get(timeIndex);
 
-               final int photoIndex = timeIndex - 1;
-
-               final TourPhoto tourPhoto = allSortedPhotos.get(photoIndex);
-
-               tourPhoto.setGeoLocation(sliceLatitude, sliceLongitude);
-            }
+            tourPhoto.setGeoLocation(sliceLatitude, sliceLongitude);
          }
       }
    }

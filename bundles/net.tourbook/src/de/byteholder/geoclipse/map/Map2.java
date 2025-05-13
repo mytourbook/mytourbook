@@ -8936,6 +8936,11 @@ public class Map2 extends Canvas {
 
          final Photo photo = mapPoint.photo;
          final List<TourPhoto> allTourPhotos = TourPhotoManager.getTourPhotos(photo);
+
+         if (allTourPhotos.size() == 0) {
+            continue;
+         }
+
          final TourPhoto tourPhoto = allTourPhotos.get(0);
          final TourData tourData = tourPhoto.getTourData();
          final Set<Long> tourPhotosWithPositionedGeo = tourData.getTourPhotosWithPositionedGeo();
@@ -10286,7 +10291,7 @@ public class Map2 extends Canvas {
       final double longitude = mouseMove_GeoPosition.longitude;
 
       // getting the serie index is very tricky
-      final int serieIndex = _pannedPhoto.photoIndex + 1;
+      final int serieIndex = _pannedPhoto.photoIndex;
 
       tourData.latitudeSerie[serieIndex] = latitude;
       tourData.longitudeSerie[serieIndex] = longitude;

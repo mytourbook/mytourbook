@@ -773,7 +773,7 @@ public class TourDataEditorView extends ViewPart implements
 
       public ActionRemovePhotoPosition() {
 
-         super("Remove &photo position");
+         super("Remove p&hoto position");
 
          setToolTipText("This removes the association between the photo and it geo position");
 
@@ -2629,26 +2629,13 @@ public class TourDataEditorView extends ViewPart implements
       final TimeSlice timeSlice = (TimeSlice) sliceSelection.getFirstElement();
 
       final int serieIndex = timeSlice.serieIndex;
-      final int lastIndex = _tourData.timeSerie.length - 1;
+      final TourPhoto tourPhoto = _allPositionedPhotos.get(serieIndex);
 
-      final Set<Long> allTourPhotosWithGeoPosition = _tourData.getTourPhotosWithPositionedGeo();
+      if (tourPhoto != null) {
 
-      if (serieIndex == 0 && _allPositionedPhotos.containsKey(Integer.MIN_VALUE)) {
+         final Set<Long> allTourPhotosWithGeoPosition = _tourData.getTourPhotosWithPositionedGeo();
 
-         allTourPhotosWithGeoPosition.remove(Long.MIN_VALUE);
-
-      } else if (serieIndex == lastIndex && _allPositionedPhotos.containsKey(Integer.MAX_VALUE)) {
-
-         allTourPhotosWithGeoPosition.remove(Long.MAX_VALUE);
-
-      } else {
-
-         final TourPhoto tourPhoto = _allPositionedPhotos.get(serieIndex);
-
-         if (tourPhoto != null) {
-
-            allTourPhotosWithGeoPosition.remove(tourPhoto.getPhotoId());
-         }
+         allTourPhotosWithGeoPosition.remove(tourPhoto.getPhotoId());
       }
 
       updatePositionedPhotos();
@@ -9703,24 +9690,8 @@ public class TourDataEditorView extends ViewPart implements
 
          if (allTourPhotosWithGeoPosition.contains(photoId)) {
 
-            final int timeIndex = photoIndex + 1;
-
-            _allPositionedPhotos.put(timeIndex, tourPhoto);
+            _allPositionedPhotos.put(photoIndex, tourPhoto);
          }
-      }
-
-      if (allTourPhotosWithGeoPosition.contains(Long.MIN_VALUE)) {
-
-         // geo position is set on the first time slice
-
-         _allPositionedPhotos.put(Integer.MIN_VALUE, null);
-      }
-
-      if (allTourPhotosWithGeoPosition.contains(Long.MAX_VALUE)) {
-
-         // geo position is set on the last time slice
-
-         _allPositionedPhotos.put(Integer.MAX_VALUE, null);
       }
    }
 

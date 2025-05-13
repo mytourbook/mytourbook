@@ -411,16 +411,13 @@ public class TourPhotoLinkView extends ViewPart implements ITourProvider, ITourV
 
       final TourPhotoLink selectedPhotoLink = _allSelectedPhotoLinks.get(0);
 
-      final long tourStartTime = selectedPhotoLink.historyStartTime - 10_000;
-      final long tourEndTime = selectedPhotoLink.historyEndTime + 10_000;
-
-      final long elapsedTime = tourEndTime - tourStartTime;
-      final long elapsedTimeSeconds = elapsedTime / 1000;
+      final long tourStartTime = selectedPhotoLink.historyStartTime;
+      final long tourEndTime = selectedPhotoLink.historyEndTime;
 
       final ArrayList<Photo> allLinkPhotos = selectedPhotoLink.linkPhotos;
 
       final int numPhotos = allLinkPhotos.size();
-      final int[] timeSerie = new int[numPhotos + 2];
+      final int[] timeSerie = new int[numPhotos];
 
       for (int photoIndex = 0; photoIndex < numPhotos; photoIndex++) {
 
@@ -430,11 +427,8 @@ public class TourPhotoLinkView extends ViewPart implements ITourProvider, ITourV
 
          final int relativeTime = (int) ((adjustedTime_Camera - tourStartTime) / 1000);
 
-         timeSerie[photoIndex + 1] = relativeTime;
+         timeSerie[photoIndex] = relativeTime;
       }
-
-      timeSerie[0] = 0;
-      timeSerie[numPhotos + 1] = (int) elapsedTimeSeconds;
 
       final NewTourContext newTourContext = new NewTourContext();
 
@@ -1613,6 +1607,7 @@ public class TourPhotoLinkView extends ViewPart implements ITourProvider, ITourV
       super.dispose();
    }
 
+   @SuppressWarnings("unused")
    private void dumpPhotos() {
 
       System.out.println();
