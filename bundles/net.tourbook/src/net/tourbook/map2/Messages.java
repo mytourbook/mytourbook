@@ -88,12 +88,10 @@ public class Messages extends NLS {
    public static String Map_Action_GeoMarkerPosition_RemoveAll_Tooltip;
    public static String Map_Action_GeoMarkerPosition_SetIntoMarker;
    public static String Map_Action_GeoMarkerPosition_SetIntoMarker_Tooltip;
-   public static String Map_Action_GeoPositions_Delete;
    public static String Map_Action_GeoPositions_Set;
    public static String Map_Action_GeoPositions_SetInto;
    public static String Map_Action_GeoPositions_Set_End;
    public static String Map_Action_GeoPositions_Set_Start;
-   public static String Map_Action_GeoPositions_Set_StartAndEnd;
    public static String Map_Action_GeoPositions_Tooltip;
    public static String Map_Action_GotoLocation;
    public static String Map_Action_LookupCommonLocation;

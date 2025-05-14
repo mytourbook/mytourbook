@@ -20,8 +20,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
-import net.tourbook.Images;
-import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.UI;
 import net.tourbook.common.map.GeoPosition;
 import net.tourbook.common.time.TimeTools;
@@ -48,19 +46,6 @@ public class ActionSetGeoPositionForPhotoTours extends SubMenu {
    private GeoPosition         _currentMouseGeoPosition;
 
    private List<TourPhoto>     _allSortedPhotos;
-
-   private class ActionDeletePositions extends Action {
-
-      public ActionDeletePositions() {
-
-         super(Messages.Map_Action_GeoPositions_Delete, AS_PUSH_BUTTON);
-
-         setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.App_Delete));
-      }
-
-      @Override
-      public void run() {}
-   }
 
    private class ActionSetEndPosition extends Action {
 
@@ -109,16 +94,6 @@ public class ActionSetGeoPositionForPhotoTours extends SubMenu {
 
          setGeoPosition(_serieIndex, _tourPhoto);
       }
-   }
-
-   private class ActionSetStartEndPosition extends Action {
-
-      public ActionSetStartEndPosition() {
-         super(Messages.Map_Action_GeoPositions_Set_StartAndEnd, AS_PUSH_BUTTON);
-      }
-
-      @Override
-      public void run() {}
    }
 
    private class ActionSetStartPosition extends Action {
