@@ -1548,6 +1548,9 @@ public class PrefPageTourType_Definitions extends PreferencePage implements IWor
 
       _isTourTypeModified = false;
 
+      // reselect current tour type, otherwise when the same tour type is modified again and saved -> this do not work !!!
+      _tourTypeViewer.setSelection(new StructuredSelection(tourTypeColorDef), true);
+
       enableControls();
 
       setFocusToViewer();
