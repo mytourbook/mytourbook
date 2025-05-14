@@ -2352,11 +2352,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
       }
 
       if (isLatitudeValid == false) {
-         latitudeSerie = null;
-         longitudeSerie = null;
-         _rasterizedLatLon = null;
-         geoGrid = null;
-         hasGeoData = false;
+         cleanupGeoPositions();
       }
 
       if (sumRunDyn_StanceTime == 0) {
@@ -2378,6 +2374,20 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
       if (sumRunDyn_VerticalRatio == 0) {
          clear_RunDyn_VerticalRatio();
       }
+   }
+
+   /**
+    * Remove all geo position values
+    */
+   private void cleanupGeoPositions() {
+
+      latitudeSerie = null;
+      longitudeSerie = null;
+
+      _rasterizedLatLon = null;
+
+      geoGrid = null;
+      hasGeoData = false;
    }
 
    public void clear_RunDyn_StanceTime() {
@@ -5094,11 +5104,12 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
       });
 
       final int numTimeSlices = timeSerie.length;
+
       final boolean[] allIsGeoPositioned = new boolean[numTimeSlices];
 
       boolean isGeoPositioned = false;
 
-      for (int timeIndex = 0; timeIndex < numTimeSlices; timeIndex++) {
+      for (int serieIndex = 0; serieIndex < numTimeSlices; serieIndex++) {
 
          TourPhoto tourPhoto = null;
 
@@ -5109,13 +5120,13 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
             continue;
          }
 
-         tourPhoto = allSortedPhotos.get(timeIndex);
+         tourPhoto = allSortedPhotos.get(serieIndex);
 
          final boolean isPhotoWithPositionedGeo = tourPhotosWithPositionedGeo.contains(tourPhoto.getPhotoId());
 
          if (isPhotoWithPositionedGeo) {
 
-            allIsGeoPositioned[timeIndex] = true;
+            allIsGeoPositioned[serieIndex] = true;
 
             isGeoPositioned = true;
          }
@@ -5123,7 +5134,19 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
 
       if (isGeoPositioned == false) {
 
-         // there are no geo positions
+         // there are no geo positions -> remove all existing geo positions
+
+         cleanupGeoPositions();
+
+         // num photos can be different than num time slices, this happened during debugging
+         final int numPhotos = tourPhotos.size();
+
+         for (int serieIndex = 0; serieIndex < numPhotos; serieIndex++) {
+
+            final TourPhoto tourPhoto = allSortedPhotos.get(serieIndex);
+
+            tourPhoto.setGeoLocation(0, 0);
+         }
 
          return;
       }
@@ -5131,15 +5154,15 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
       int lastIndexWithGeo = 0;
       int nextIndexWithGeo = -1;
 
-      for (int timeIndex = 0; timeIndex < numTimeSlices; timeIndex++) {
+      for (int serieIndex = 0; serieIndex < numTimeSlices; serieIndex++) {
 
-         if (allIsGeoPositioned[timeIndex]) {
+         if (allIsGeoPositioned[serieIndex]) {
 
-            nextIndexWithGeo = timeIndex;
+            nextIndexWithGeo = serieIndex;
 
-            computeGeo_Photos_Interpolate(timeIndex, lastIndexWithGeo, nextIndexWithGeo - 1, allSortedPhotos);
+            computeGeo_Photos_Interpolate(serieIndex, lastIndexWithGeo, nextIndexWithGeo - 1, allSortedPhotos);
 
-            lastIndexWithGeo = timeIndex + 1;
+            lastIndexWithGeo = serieIndex + 1;
          }
       }
 

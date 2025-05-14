@@ -388,7 +388,14 @@ public class TourPhoto implements Serializable {
       imageFilePathName = filePathName;
    }
 
+   /**
+    * The geo location can be reseted by setting lat/lon = 0
+    *
+    * @param latitude
+    * @param longitude
+    */
    public void setGeoLocation(final double latitude, final double longitude) {
+
       this.latitude = latitude;
       this.longitude = longitude;
    }
