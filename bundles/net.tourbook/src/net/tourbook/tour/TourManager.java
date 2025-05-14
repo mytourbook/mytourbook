@@ -3293,6 +3293,18 @@ public class TourManager {
          savedTour.mapZoomLevel = tourData.mapZoomLevel;
          savedTour.mapCenterPositionLatitude = tourData.mapCenterPositionLatitude;
          savedTour.mapCenterPositionLongitude = tourData.mapCenterPositionLongitude;
+
+//         System.out.println(UI.timeStamp()
+//
+//               + UI.NEW_LINE
+//               + "   tourData Before Save " + System.identityHashCode(tourData)
+//
+//               + UI.NEW_LINE
+//               + "   tourData Saved       " + System.identityHashCode(savedTour)
+//
+//               + UI.NEW_LINE
+//
+//         );
       }
    }
 

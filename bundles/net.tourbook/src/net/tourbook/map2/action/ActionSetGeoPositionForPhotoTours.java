@@ -29,6 +29,7 @@ import net.tourbook.common.ui.SubMenu;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourPhoto;
 import net.tourbook.map2.Messages;
+import net.tourbook.map2.view.Map2View;
 import net.tourbook.tour.TourManager;
 
 import org.eclipse.jface.action.Action;
@@ -40,7 +41,10 @@ public class ActionSetGeoPositionForPhotoTours extends SubMenu {
 
    private static final String LAT_LON = "%8.4f %8.4f"; //$NON-NLS-1$
 
+   private Map2View            _map2View;
+
    private TourData            _tourData;
+
    private GeoPosition         _currentMouseGeoPosition;
 
    private List<TourPhoto>     _allSortedPhotos;
@@ -137,9 +141,11 @@ public class ActionSetGeoPositionForPhotoTours extends SubMenu {
       }
    }
 
-   public ActionSetGeoPositionForPhotoTours() {
+   public ActionSetGeoPositionForPhotoTours(final Map2View map2View) {
 
       super(UI.EMPTY_STRING, AS_DROP_DOWN_MENU);
+
+      _map2View = map2View;
 
       /**
        * <pre>
@@ -157,12 +163,12 @@ public class ActionSetGeoPositionForPhotoTours extends SubMenu {
    }
 
    @Override
-   public void enableActions() {
-
-   }
+   public void enableActions() {}
 
    @Override
    public void fillMenu(final Menu menu) {
+
+      _tourData = _map2View.getTourDataWhereGeoPositionsCanBeSet();
 
       final Set<TourPhoto> allTourPhotos = _tourData.getTourPhotos();
 
@@ -232,9 +238,8 @@ public class ActionSetGeoPositionForPhotoTours extends SubMenu {
       }
    }
 
-   public void setData(final TourData tourData, final GeoPosition currentMouseGeoPosition) {
+   public void setData(final GeoPosition currentMouseGeoPosition) {
 
-      _tourData = tourData;
       _currentMouseGeoPosition = currentMouseGeoPosition;
    }
 

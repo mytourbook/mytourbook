@@ -10293,6 +10293,13 @@ public class Map2 extends Canvas {
       // getting the serie index is very tricky
       final int serieIndex = _pannedPhoto.photoIndex;
 
+      if (serieIndex >= tourData.latitudeSerie.length) {
+
+         // this happened, propably a wrong tour was set
+
+         return;
+      }
+
       tourData.latitudeSerie[serieIndex] = latitude;
       tourData.longitudeSerie[serieIndex] = longitude;
 

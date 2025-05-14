@@ -2512,7 +2512,7 @@ public class Map2View extends ViewPart implements
       _actionShowLegendInMap                 = new ActionShowLegendInMap(this);
       _actionMap2Slideout_PhotoOptions       = new ActionMap2_PhotoOptions();
       _actionSetGeoPositionForGeoMarker      = new ActionSetGeoPositionForGeoMarker();
-      _actionSetGeoPositionForPhotoTours     = new ActionSetGeoPositionForPhotoTours();
+      _actionSetGeoPositionForPhotoTours     = new ActionSetGeoPositionForPhotoTours(this);
       _actionShowScaleInMap                  = new ActionShowScaleInMap(this);
       _actionShowSliderInMap                 = new ActionShowSliderInMap(this);
       _actionShowSliderInLegend              = new ActionShowSliderInLegend(this);
@@ -2832,7 +2832,7 @@ public class Map2View extends ViewPart implements
          canCreateGeoPositions = true;
          actionGeoPositionLabel = (Messages.Map_Action_GeoPositions_SetInto.formatted(TourManager.getTourTitle(tourData)));
 
-         _actionSetGeoPositionForPhotoTours.setData(tourData, currentMouseGeoPosition);
+         _actionSetGeoPositionForPhotoTours.setData(currentMouseGeoPosition);
       }
 
       _actionSetGeoPositionForPhotoTours.setEnabled(canCreateGeoPositions);
@@ -3649,7 +3649,7 @@ public class Map2View extends ViewPart implements
     * @return Returns {@link TourData} where the geo position can be set, otherwise
     *         <code>null</code>
     */
-   private TourData getTourDataWhereGeoPositionsCanBeSet() {
+   public TourData getTourDataWhereGeoPositionsCanBeSet() {
 
       if (_lastTourWithoutLatLon != null) {
 
@@ -4910,6 +4910,9 @@ public class Map2View extends ViewPart implements
    private void paintTours_20_One(final TourData tourData, final boolean forceRedraw) {
 
       _isTourPainted = true;
+
+      // this can return the wrong tourdata when it is not reset !!!
+      _lastTourWithoutLatLon = null;
 
       if (TourManager.isLatLonAvailable(tourData) == false) {
 
