@@ -747,6 +747,11 @@ public class SlideoutMap2_PhotoHistogram extends AdvancedSlideout implements
                 * Update tour photo
                 */
                final TourData tourData = TourManager.getInstance().getTourData(photoRef.tourId);
+
+               if (tourData == null) {
+                  continue;
+               }
+
                final Set<TourPhoto> allTourPhotos = tourData.getTourPhotos();
 
                for (final TourPhoto tourPhoto : allTourPhotos) {
