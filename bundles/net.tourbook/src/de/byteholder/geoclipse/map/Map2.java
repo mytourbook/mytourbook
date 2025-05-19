@@ -387,6 +387,7 @@ public class Map2 extends Canvas {
    private final Cursor                  _cursorSearchTour;
    private final Cursor                  _cursorSearchTour_Scroll;
    private final Cursor                  _cursorSelect;
+   private final Cursor                  _cursorSelectPhoto;
 
    private final AtomicInteger           _redrawMapCounter          = new AtomicInteger();
    private final AtomicInteger           _overlayRunnableCounter    = new AtomicInteger();
@@ -940,6 +941,7 @@ public class Map2 extends Canvas {
       _cursorSearchTour                = createCursorFromImage(Images.SearchTours_ByLocation);
       _cursorSearchTour_Scroll         = createCursorFromImage(Images.SearchTours_ByLocation_Scroll);
       _cursorSelect                    = createCursorFromImage(Images.Cursor_Select);
+      _cursorSelectPhoto               = createCursorFromImage(Images.Cursor_Select_Photo);
 
       _imageMapLocation_Common         = ImageUtils.createAWTImage(TourbookPlugin.getImageDescriptor(Images.MapLocationMarker_Common).createImage());
       _imageMapLocation_Tour           = ImageUtils.createAWTImage(TourbookPlugin.getImageDescriptor(Images.MapLocationMarker_Tour).createImage());
@@ -4340,6 +4342,7 @@ public class Map2 extends Canvas {
       UI.disposeResource(_cursorSearchTour);
       UI.disposeResource(_cursorSearchTour_Scroll);
       UI.disposeResource(_cursorSelect);
+      UI.disposeResource(_cursorSelectPhoto);
 
       PhotoLoadManager.stopImageLoading(true);
 
@@ -5086,6 +5089,12 @@ public class Map2 extends Canvas {
 
                selectPhoto(photo, _hoveredMapPoint);
             }
+
+         }
+
+         if (_hoveredMapPoint != null) {
+
+            setCursorOptimized(_cursorSelectPhoto);
          }
       }
 
