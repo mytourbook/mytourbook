@@ -73,12 +73,12 @@
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
      inkscape:zoom="11.313708"
-     inkscape:cx="154.23767"
-     inkscape:cy="317.40257"
+     inkscape:cx="93.824235"
+     inkscape:cy="312.09927"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
      showgrid="true"
-     inkscape:window-width="2457"
+     inkscape:window-width="3170"
      inkscape:window-height="2104"
      inkscape:window-x="138"
      inkscape:window-y="0"
@@ -677,7 +677,7 @@
        height="25"
        x="80"
        y="270"
-       inkscape:export-filename="..\icons\cursor-select-photo.png"
+       inkscape:export-filename="..\icons\cursor-photo-select.png"
        inkscape:export-xdpi="96"
        inkscape:export-ydpi="96" />
     <path
@@ -2032,7 +2032,7 @@
        height="24.995922"
        x="80.0037"
        y="310.00403"
-       inkscape:export-filename="..\icons\cursor-select-photo-4k.png"
+       inkscape:export-filename="..\icons\cursor-photo-select-4k.png"
        inkscape:export-xdpi="192"
        inkscape:export-ydpi="192" />
     <path
@@ -2285,7 +2285,7 @@
        height="25"
        x="120"
        y="270"
-       inkscape:export-filename="..\icons\cursor-move-photo.png"
+       inkscape:export-filename="..\icons\cursor-photo-move.png"
        inkscape:export-xdpi="96"
        inkscape:export-ydpi="96" />
     <rect
@@ -2295,7 +2295,7 @@
        height="24.995922"
        x="120.0037"
        y="310.00403"
-       inkscape:export-filename="..\icons\cursor-move-photo-4k.png"
+       inkscape:export-filename="..\icons\cursor-photo-move-4k.png"
        inkscape:export-xdpi="192"
        inkscape:export-ydpi="192" />
     <rect

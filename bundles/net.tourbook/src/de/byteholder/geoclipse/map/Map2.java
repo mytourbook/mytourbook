@@ -384,11 +384,11 @@ public class Map2 extends Canvas {
    private final Cursor                  _cursorDefault;
    private final Cursor                  _cursorHand;
    private final Cursor                  _cursorPan;
+   private final Cursor                  _cursorPhoto_Move;
+   private final Cursor                  _cursorPhoto_Select;
    private final Cursor                  _cursorSearchTour;
    private final Cursor                  _cursorSearchTour_Scroll;
    private final Cursor                  _cursorSelect;
-   private final Cursor                  _cursorSelectPhoto;
-   private final Cursor                  _cursorMovePhoto;
 
    private final AtomicInteger           _redrawMapCounter          = new AtomicInteger();
    private final AtomicInteger           _overlayRunnableCounter    = new AtomicInteger();
@@ -939,11 +939,11 @@ public class Map2 extends Canvas {
       _cursorHand                      = new Cursor(_display, SWT.CURSOR_HAND);
       _cursorPan                       = new Cursor(_display, SWT.CURSOR_SIZEALL);
 
+      _cursorPhoto_Move                = createCursorFromImage(Images.Cursor_Photo_Move);
+      _cursorPhoto_Select              = createCursorFromImage(Images.Cursor_Photo_Select);
       _cursorSearchTour                = createCursorFromImage(Images.SearchTours_ByLocation);
       _cursorSearchTour_Scroll         = createCursorFromImage(Images.SearchTours_ByLocation_Scroll);
       _cursorSelect                    = createCursorFromImage(Images.Cursor_Select);
-      _cursorSelectPhoto               = createCursorFromImage(Images.Cursor_Select_Photo);
-      _cursorMovePhoto                 = createCursorFromImage(Images.Cursor_Move_Photo);
 
       _imageMapLocation_Common         = ImageUtils.createAWTImage(TourbookPlugin.getImageDescriptor(Images.MapLocationMarker_Common).createImage());
       _imageMapLocation_Tour           = ImageUtils.createAWTImage(TourbookPlugin.getImageDescriptor(Images.MapLocationMarker_Tour).createImage());
@@ -4341,11 +4341,11 @@ public class Map2 extends Canvas {
       UI.disposeResource(_cursorDefault);
       UI.disposeResource(_cursorHand);
       UI.disposeResource(_cursorPan);
+      UI.disposeResource(_cursorPhoto_Move);
+      UI.disposeResource(_cursorPhoto_Select);
       UI.disposeResource(_cursorSearchTour);
       UI.disposeResource(_cursorSearchTour_Scroll);
       UI.disposeResource(_cursorSelect);
-      UI.disposeResource(_cursorMovePhoto);
-      UI.disposeResource(_cursorSelectPhoto);
 
       PhotoLoadManager.stopImageLoading(true);
 
@@ -4690,7 +4690,7 @@ public class Map2 extends Canvas {
 
                   _mouseDownPosition = devMousePosition;
 
-                  setCursorOptimized(_cursorMovePhoto);
+                  setCursorOptimized(_cursorPhoto_Move);
 
                } else {
 
@@ -5098,11 +5098,11 @@ public class Map2 extends Canvas {
 
             if (_canPanPhoto) {
 
-               setCursorOptimized(_cursorMovePhoto);
+               setCursorOptimized(_cursorPhoto_Move);
 
             } else {
 
-               setCursorOptimized(_cursorSelectPhoto);
+               setCursorOptimized(_cursorPhoto_Select);
             }
          }
       }
