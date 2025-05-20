@@ -375,10 +375,11 @@ public class TourDataEditorView extends ViewPart implements
    //
    private ColumnDefinition        _timeSlice_ColDef_Altitude;
    private ColumnDefinition        _timeSlice_ColDef_Cadence;
-   private ColumnDefinition        _timeSlice_ColDef_Pulse;
-   private ColumnDefinition        _timeSlice_ColDef_Temperature;
    private ColumnDefinition        _timeSlice_ColDef_Latitude;
    private ColumnDefinition        _timeSlice_ColDef_Longitude;
+   private ColumnDefinition        _timeSlice_ColDef_Power;
+   private ColumnDefinition        _timeSlice_ColDef_Pulse;
+   private ColumnDefinition        _timeSlice_ColDef_Temperature;
    //
    private ColumnDefinition        _swimSlice_ColDef_StrokeRate;
    private ColumnDefinition        _swimSlice_ColDef_Strokes;
@@ -517,11 +518,12 @@ public class TourDataEditorView extends ViewPart implements
    private boolean                          _uiRunnableIsDirtyDisabled;
    //
    private SliceEditingSupport_Float        _timeSlice_AltitudeEditingSupport;
-   private SliceEditingSupport_Float        _timeSlice_PulseEditingSupport;
-   private SliceEditingSupport_Float        _timeSlice_TemperatureEditingSupport;
    private SliceEditingSupport_Float        _timeSlice_CadenceEditingSupport;
    private SliceEditingSupport_Double       _timeSlice_LatitudeEditingSupport;
    private SliceEditingSupport_Double       _timeSlice_LongitudeEditingSupport;
+   private SliceEditingSupport_Float        _timeSlice_PowerEditingSupport;
+   private SliceEditingSupport_Float        _timeSlice_PulseEditingSupport;
+   private SliceEditingSupport_Float        _timeSlice_TemperatureEditingSupport;
    //
    private SliceEditingSupport_Short        _swimSlice_StrokeRateEditingSupport;
    private SliceEditingSupport_Short        _swimSlice_StrokesEditingSupport;
@@ -775,7 +777,7 @@ public class TourDataEditorView extends ViewPart implements
 
          super("Remove p&hoto position");
 
-         setToolTipText("This removes the association between the photo and it geo position");
+         setToolTipText("This removes the association between the photo and its geo position");
 
          setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.App_Remove));
          setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Images.App_Remove_Disabled));
@@ -5396,18 +5398,20 @@ public class TourDataEditorView extends ViewPart implements
 // SET_FORMATTING_OFF
 
       _timeSlice_AltitudeEditingSupport      = new SliceEditingSupport_Float(textCellEditor,    _serieAltitude);
+      _timeSlice_CadenceEditingSupport       = new SliceEditingSupport_Float(textCellEditor,    _serieCadence);
+      _timeSlice_PowerEditingSupport         = new SliceEditingSupport_Float(textCellEditor,    _seriePower);
       _timeSlice_PulseEditingSupport         = new SliceEditingSupport_Float(textCellEditor,    _seriePulse);
       _timeSlice_TemperatureEditingSupport   = new SliceEditingSupport_Float(textCellEditor,    _serieTemperature);
-      _timeSlice_CadenceEditingSupport       = new SliceEditingSupport_Float(textCellEditor,    _serieCadence);
       _timeSlice_LatitudeEditingSupport      = new SliceEditingSupport_Double(textCellEditor,   _serieLatitude);
       _timeSlice_LongitudeEditingSupport     = new SliceEditingSupport_Double(textCellEditor,   _serieLongitude);
 
       _timeSlice_ColDef_Altitude    .setEditingSupport(_timeSlice_AltitudeEditingSupport);
-      _timeSlice_ColDef_Pulse       .setEditingSupport(_timeSlice_PulseEditingSupport);
-      _timeSlice_ColDef_Temperature .setEditingSupport(_timeSlice_TemperatureEditingSupport);
       _timeSlice_ColDef_Cadence     .setEditingSupport(_timeSlice_CadenceEditingSupport);
       _timeSlice_ColDef_Latitude    .setEditingSupport(_timeSlice_LatitudeEditingSupport);
       _timeSlice_ColDef_Longitude   .setEditingSupport(_timeSlice_LongitudeEditingSupport);
+      _timeSlice_ColDef_Power       .setEditingSupport(_timeSlice_PowerEditingSupport);
+      _timeSlice_ColDef_Pulse       .setEditingSupport(_timeSlice_PulseEditingSupport);
+      _timeSlice_ColDef_Temperature .setEditingSupport(_timeSlice_TemperatureEditingSupport);
 
 // SET_FORMATTING_ON
 
@@ -6278,7 +6282,9 @@ public class TourDataEditorView extends ViewPart implements
     */
    private void defineColumn_TimeSlice_Power() {
 
-      final ColumnDefinition colDef = TableColumnFactory.POWER_TIME_SLICE.createColumn(_timeSlice_ColumnManager, _pc);
+      TableColumnDefinition colDef;
+
+      _timeSlice_ColDef_Power = colDef = TableColumnFactory.POWER_TIME_SLICE.createColumn(_timeSlice_ColumnManager, _pc);
       colDef.setColumnSelectionListener(_columnSortListener);
 
       colDef.setLabelProvider(new CellLabelProvider() {
@@ -6905,130 +6911,156 @@ public class TourDataEditorView extends ViewPart implements
       if (selection.isEmpty()) {
          return;
       }
-      final Object[] selectedTimeSlices = selection.toArray();
 
       final DialogEditTimeSlicesValues dialogEditTimeSlicesValues = new DialogEditTimeSlicesValues(Display.getCurrent().getActiveShell(), _tourData);
 
-      if (dialogEditTimeSlicesValues.open() == Window.OK) {
-
-         BusyIndicator.showWhile(Display.getCurrent(), () -> {
-
-            final float newAltitudeValue = dialogEditTimeSlicesValues.getNewAltitudeValue();
-            final float newCadenceValue = dialogEditTimeSlicesValues.getNewCadenceValue();
-            final float newPulseValue = dialogEditTimeSlicesValues.getNewPulseValue();
-            final float newTemperatureValue = dialogEditTimeSlicesValues.getNewTemperatureValue();
-
-            final boolean isAltitudeValueOffset = dialogEditTimeSlicesValues.getIsAltitudeValueOffset();
-            final boolean isCadenceValueOffset = dialogEditTimeSlicesValues.getIsCadenceValueOffset();
-            final boolean isPulseValueOffset = dialogEditTimeSlicesValues.getIsPulseValueOffset();
-            final boolean isTemperatureValueOffset = dialogEditTimeSlicesValues.getIsTemperatureValueOffset();
-
-            final int[] selectedRows = new int[selectedTimeSlices.length];
-            boolean tourDataModified = false;
-            for (int index = 0; index < selectedTimeSlices.length; ++index) {
-
-               final int currentTimeSliceIndex = ((TimeSlice) selectedTimeSlices[index]).serieIndex;
-
-               selectedRows[index] = currentTimeSliceIndex;
-
-               if (newAltitudeValue != Float.MIN_VALUE && _serieAltitude != null) {
-
-                  if (isAltitudeValueOffset) {
-                     _serieAltitude[currentTimeSliceIndex] += newAltitudeValue;
-                  } else {
-                     _serieAltitude[currentTimeSliceIndex] = newAltitudeValue;
-                  }
-
-                  tourDataModified = true;
-               }
-
-               if (newPulseValue != Integer.MIN_VALUE && _seriePulse != null) {
-
-                  if (isPulseValueOffset) {
-                     _seriePulse[currentTimeSliceIndex] += newPulseValue;
-                  } else {
-                     _seriePulse[currentTimeSliceIndex] = newPulseValue;
-                  }
-
-                  tourDataModified = true;
-               }
-
-               if (newCadenceValue != Integer.MIN_VALUE && _serieCadence != null) {
-
-                  if (isCadenceValueOffset) {
-                     _serieCadence[currentTimeSliceIndex] += newCadenceValue;
-                  } else {
-                     _serieCadence[currentTimeSliceIndex] = newCadenceValue;
-                  }
-
-                  _tourData.setCadenceSerie(_serieCadence);
-                  tourDataModified = true;
-               }
-
-               if (newTemperatureValue != Float.MIN_VALUE && _serieTemperature != null) {
-                  if (isTemperatureValueOffset) {
-
-                     //If we are currently in imperial system, we can't just convert the offset as it will lead to errors.
-                     // For example : If the user has asked for an offset of 1°F, then it could offset the metric temperature to -17.22222 °C!!!
-
-                     if (UI.UNIT_IS_TEMPERATURE_FAHRENHEIT) {
-
-                        final float currentTemperatureMetric = _serieTemperature[currentTimeSliceIndex];
-                        float currentTemperatureFahrenheit = (currentTemperatureMetric * UI.UNIT_FAHRENHEIT_MULTI) + UI.UNIT_FAHRENHEIT_ADD;
-
-                        currentTemperatureFahrenheit += newTemperatureValue;
-                        final float newTemperatureMetric = UI.convertTemperatureToMetric(currentTemperatureFahrenheit);
-
-                        _serieTemperature[currentTimeSliceIndex] = newTemperatureMetric;
-
-                     } else {
-                        _serieTemperature[currentTimeSliceIndex] += newTemperatureValue;
-                     }
-
-                  } else {
-                     _serieTemperature[currentTimeSliceIndex] = newTemperatureValue;
-                  }
-                  tourDataModified = true;
-               }
-            }
-
-            if (!tourDataModified) {
-               return;
-            }
-
-            // force recompute values, e.g. gradient
-            _tourData.clearComputedSeries();
-
-            // recompute min/max values
-            getDataSeriesFromTourData();
-
-            // update UI
-            updateUI_Tab_1_Tour();
-            updateUI_ReferenceTourRanges();
-
-            _timeSlice_Viewer.getControl().setRedraw(false);
-            {
-               _timeSlice_Viewer.refresh(true);
-            }
-            _timeSlice_Viewer.getControl().setRedraw(true);
-
-            setTourDirty();
-
-            // notify other viewers
-            fireTourIsModified();
-
-            /*
-             * Select back the previously selected indices
-             */
-            final int[] mappedTimeSlicesIndices = mapTimeSlicesIndicesWithRows(selectedRows);
-            final Table table = (Table) _timeSlice_Viewer.getControl();
-
-            table.setSelection(mappedTimeSlicesIndices);
-            table.showSelection();
-
-         });
-
+      if (dialogEditTimeSlicesValues.open() != Window.OK) {
+         return;
       }
+
+      BusyIndicator.showWhile(Display.getCurrent(), () -> {
+
+// SET_FORMATTING_OFF
+
+         final boolean isAltitudeValueOffset       = dialogEditTimeSlicesValues.getIsAltitudeValueOffset();
+         final boolean isCadenceValueOffset        = dialogEditTimeSlicesValues.getIsCadenceValueOffset();
+         final boolean isPowerValueOffset          = dialogEditTimeSlicesValues.getIsPowerValueOffset();
+         final boolean isPulseValueOffset          = dialogEditTimeSlicesValues.getIsPulseValueOffset();
+         final boolean isTemperatureValueOffset    = dialogEditTimeSlicesValues.getIsTemperatureValueOffset();
+
+         final float replaceAltitudeValue          = dialogEditTimeSlicesValues.getReplaceAltitudeValue();
+         final float replaceCadenceValue           = dialogEditTimeSlicesValues.getReplaceCadenceValue();
+         final float replacePowerValue             = dialogEditTimeSlicesValues.getReplacePowerValue();
+         final float replacePulseValue             = dialogEditTimeSlicesValues.getReplacePulseValue();
+         final float replaceTemperatureValue       = dialogEditTimeSlicesValues.getReplaceTemperatureValue();
+
+// SET_FORMATTING_ON
+
+         final Object[] allSelectedTimeSlices = selection.toArray();
+         final int numTimeSlices = allSelectedTimeSlices.length;
+
+         final int[] allSelectedSliceIndices = new int[numTimeSlices];
+
+         boolean isModified = false;
+
+         for (int sliceIndex = 0; sliceIndex < numTimeSlices; ++sliceIndex) {
+
+            final TimeSlice timeSlice = (TimeSlice) allSelectedTimeSlices[sliceIndex];
+
+            final int currentTimeSliceIndex = timeSlice.serieIndex;
+
+            allSelectedSliceIndices[sliceIndex] = currentTimeSliceIndex;
+
+            if (replaceAltitudeValue != Float.MIN_VALUE && _serieAltitude != null) {
+
+               if (isAltitudeValueOffset) {
+                  _serieAltitude[currentTimeSliceIndex] += replaceAltitudeValue;
+               } else {
+                  _serieAltitude[currentTimeSliceIndex] = replaceAltitudeValue;
+               }
+
+               isModified = true;
+            }
+
+            if (replaceCadenceValue != Integer.MIN_VALUE && _serieCadence != null) {
+
+               if (isCadenceValueOffset) {
+                  _serieCadence[currentTimeSliceIndex] += replaceCadenceValue;
+               } else {
+                  _serieCadence[currentTimeSliceIndex] = replaceCadenceValue;
+               }
+
+               _tourData.setCadenceSerie(_serieCadence);
+               isModified = true;
+            }
+
+            if (replacePowerValue != Integer.MIN_VALUE && _seriePower != null) {
+
+               if (isPowerValueOffset) {
+                  _seriePower[currentTimeSliceIndex] += replacePowerValue;
+               } else {
+                  _seriePower[currentTimeSliceIndex] = replacePowerValue;
+               }
+
+               isModified = true;
+            }
+
+            if (replacePulseValue != Integer.MIN_VALUE && _seriePulse != null) {
+
+               if (isPulseValueOffset) {
+                  _seriePulse[currentTimeSliceIndex] += replacePulseValue;
+               } else {
+                  _seriePulse[currentTimeSliceIndex] = replacePulseValue;
+               }
+
+               isModified = true;
+            }
+
+            if (replaceTemperatureValue != Float.MIN_VALUE && _serieTemperature != null) {
+
+               if (isTemperatureValueOffset) {
+
+                  //If we are currently in imperial system, we can't just convert the offset as it will lead to errors.
+                  // For example : If the user has asked for an offset of 1°F, then it could offset the metric temperature to -17.22222 °C!!!
+
+                  if (UI.UNIT_IS_TEMPERATURE_FAHRENHEIT) {
+
+                     final float currentTemperatureMetric = _serieTemperature[currentTimeSliceIndex];
+                     float currentTemperatureFahrenheit = (currentTemperatureMetric * UI.UNIT_FAHRENHEIT_MULTI) + UI.UNIT_FAHRENHEIT_ADD;
+
+                     currentTemperatureFahrenheit += replaceTemperatureValue;
+                     final float newTemperatureMetric = UI.convertTemperatureToMetric(currentTemperatureFahrenheit);
+
+                     _serieTemperature[currentTimeSliceIndex] = newTemperatureMetric;
+
+                  } else {
+
+                     _serieTemperature[currentTimeSliceIndex] += replaceTemperatureValue;
+                  }
+
+               } else {
+
+                  _serieTemperature[currentTimeSliceIndex] = replaceTemperatureValue;
+               }
+
+               isModified = true;
+            }
+         }
+
+         if (isModified == false) {
+            return;
+         }
+
+         // force recompute values, e.g. gradient
+         _tourData.clearComputedSeries();
+
+         // recompute min/max values
+         getDataSeriesFromTourData();
+
+         // update UI
+         updateUI_Tab_1_Tour();
+         updateUI_ReferenceTourRanges();
+
+         _timeSlice_Viewer.getControl().setRedraw(false);
+         {
+            _timeSlice_Viewer.refresh(true);
+         }
+         _timeSlice_Viewer.getControl().setRedraw(true);
+
+         setTourDirty();
+
+         // notify other viewers
+         fireTourIsModified();
+
+         /*
+          * Select back the previously selected indices
+          */
+         final int[] mappedTimeSlicesIndices = mapTimeSlicesIndicesWithRows(allSelectedSliceIndices);
+         final Table table = (Table) _timeSlice_Viewer.getControl();
+
+         table.setSelection(mappedTimeSlicesIndices);
+         table.showSelection();
+      });
    }
 
    private void enableActions() {
@@ -7584,51 +7616,56 @@ public class TourDataEditorView extends ViewPart implements
 
    private void getDataSeriesFromTourData() {
 
-      _serieTime = _tourData.timeSerie;
+// SET_FORMATTING_OFF
 
-      _serieDistance = _tourData.distanceSerie;
-      _serieAltitude = _tourData.altitudeSerie;
+      _serieTime                    = _tourData.timeSerie;
 
-      _serieCadence = _tourData.getCadenceSerie();
-      _serieGears = _tourData.getGears();
-      _seriePulse = _tourData.pulseSerie;
+      _serieDistance                = _tourData.distanceSerie;
+      _serieAltitude                = _tourData.altitudeSerie;
 
-      _seriePulse_RR_Bpm = _tourData.getPulse_AvgBpmFromRRIntervals();
-      _seriePulse_RR_Intervals = _tourData.getPulse_RRIntervals();
+      _serieCadence                 = _tourData.getCadenceSerie();
+      _serieGears                   = _tourData.getGears();
+      _seriePulse                   = _tourData.pulseSerie;
+
+      _seriePulse_RR_Bpm            = _tourData.getPulse_AvgBpmFromRRIntervals();
+      _seriePulse_RR_Intervals      = _tourData.getPulse_RRIntervals();
 
       // time serie which is containing the index for the first slice in the RR serie
-      _seriePulse_RR_Index = _tourData.pulseTime_TimeIndex;
+      _seriePulse_RR_Index          = _tourData.pulseTime_TimeIndex;
 
-      _serieLatitude = _tourData.latitudeSerie;
-      _serieLongitude = _tourData.longitudeSerie;
+      _serieLatitude                = _tourData.latitudeSerie;
+      _serieLongitude               = _tourData.longitudeSerie;
 
-      _serieBreakTime = _tourData.getBreakTimeSerie();
-      _seriePausedTime = _tourData.getPausedTimeSerie();
+      _serieBreakTime               = _tourData.getBreakTimeSerie();
+      _seriePausedTime              = _tourData.getPausedTimeSerie();
 
-      _serieGradient = _tourData.getGradientSerie();
-      _serieSpeed = _tourData.getSpeedSerie();
-      _seriePace = _tourData.getPaceSerieSeconds();
-      _seriePower = _tourData.getPowerSerie();
+      _serieGradient                = _tourData.getGradientSerie();
+      _serieSpeed                   = _tourData.getSpeedSerie();
+      _seriePace                    = _tourData.getPaceSerieSeconds();
+      _seriePower                   = _tourData.getPowerSerie();
 
-      _serieTemperature = _tourData.temperatureSerie;
+      _serieTemperature             = _tourData.temperatureSerie;
 
-      _swimSerie_StrokeRate = _tourData.swim_Cadence;
-      _swimSerie_StrokesPerlength = _tourData.swim_Strokes;
-      _swimSerie_StrokeStyle = _tourData.swim_StrokeStyle;
-      _swimSerie_Time = _tourData.swim_Time;
+      _swimSerie_StrokeRate         = _tourData.swim_Cadence;
+      _swimSerie_StrokesPerlength   = _tourData.swim_Strokes;
+      _swimSerie_StrokeStyle        = _tourData.swim_StrokeStyle;
+      _swimSerie_Time               = _tourData.swim_Time;
 
-      _swimSlice_StrokeRateEditingSupport.setDataSerie(_swimSerie_StrokeRate);
-      _swimSlice_StrokesEditingSupport.setDataSerie(_swimSerie_StrokesPerlength);
-      _swimSlice_StrokeStyleEditingSupport.setDataSerie(_swimSerie_StrokeStyle);
+      _swimSlice_StrokeRateEditingSupport    .setDataSerie(_swimSerie_StrokeRate);
+      _swimSlice_StrokesEditingSupport       .setDataSerie(_swimSerie_StrokesPerlength);
+      _swimSlice_StrokeStyleEditingSupport   .setDataSerie(_swimSerie_StrokeStyle);
 
-      _timeSlice_AltitudeEditingSupport.setDataSerie(_serieAltitude);
-      _timeSlice_TemperatureEditingSupport.setDataSerie(_serieTemperature);
-      _timeSlice_PulseEditingSupport.setDataSerie(_seriePulse);
-      _timeSlice_CadenceEditingSupport.setDataSerie(_serieCadence);
-      _timeSlice_LatitudeEditingSupport.setDataSerie(_serieLatitude);
-      _timeSlice_LongitudeEditingSupport.setDataSerie(_serieLongitude);
+      _timeSlice_AltitudeEditingSupport      .setDataSerie(_serieAltitude);
+      _timeSlice_CadenceEditingSupport       .setDataSerie(_serieCadence);
+      _timeSlice_LatitudeEditingSupport      .setDataSerie(_serieLatitude);
+      _timeSlice_LongitudeEditingSupport     .setDataSerie(_serieLongitude);
+      _timeSlice_PowerEditingSupport         .setDataSerie(_seriePower);
+      _timeSlice_PulseEditingSupport         .setDataSerie(_seriePulse);
+      _timeSlice_TemperatureEditingSupport   .setDataSerie(_serieTemperature);
 
       _tourStartTime = _tourData.getTourStartTime();
+
+// SET_FORMATTING_ON
 
       if (_isManualTour == false) {
 
@@ -8087,30 +8124,36 @@ public class TourDataEditorView extends ViewPart implements
    /**
     * For each time slice index, we retrieve the index in the _timeSlice_Viewer viewer table.
     *
-    * @param selectedRows
+    * @param allSelectedSliceIndices
     *           An array containing the index of several time slices.
     */
-   private int[] mapTimeSlicesIndicesWithRows(final int[] selectedRows) {
+   private int[] mapTimeSlicesIndicesWithRows(final int[] allSelectedSliceIndices) {
 
-      final int[] mappedTimeSlicesIndices = new int[selectedRows.length];
+      final int numSlices = allSelectedSliceIndices.length;
 
-      for (int index = 0; index < selectedRows.length; ++index) {
+      final int[] allMappedTimeSlicesIndices = new int[numSlices];
+
+      final TableItem[] allTableItems = ((Table) _timeSlice_Viewer.getControl()).getItems();
+
+      for (int sliceIndex = 0; sliceIndex < numSlices; ++sliceIndex) {
 
          //The time slice index of a given row
-         final int currentTimeSliceIndex = selectedRows[index];
+         final int currentTimeSliceIndex = allSelectedSliceIndices[sliceIndex];
 
-         final TableItem[] tableItems = ((Table) _timeSlice_Viewer.getControl()).getItems();
-         for (int tableIndex = 0; index < tableItems.length; ++tableIndex) {
+         for (int tableIndex = 0; sliceIndex < allTableItems.length; ++tableIndex) {
 
-            final TimeSlice timeSlice = (TimeSlice) tableItems[tableIndex].getData();
+            final TimeSlice timeSlice = (TimeSlice) allTableItems[tableIndex].getData();
+
             if (timeSlice.serieIndex == currentTimeSliceIndex) {
-               mappedTimeSlicesIndices[index] = tableIndex;
+
+               allMappedTimeSlicesIndices[sliceIndex] = tableIndex;
+
                break;
             }
          }
       }
 
-      return mappedTimeSlicesIndices;
+      return allMappedTimeSlicesIndices;
    }
 
    private void onDispose() {
@@ -9945,10 +9988,11 @@ public class TourDataEditorView extends ViewPart implements
       enableActions();
       enableControls();
 
-      /*
-       * Cadence is edited in swim slices, cadence in time slices cannot be edited
-       */
+      // cadence is edited in swim slices, cadence in time slices cannot be edited
       _timeSlice_CadenceEditingSupport.setCanEditSlices(_isTourWithSwimData == false);
+
+      // only power data from a device can be edited
+      _timeSlice_PowerEditingSupport.setCanEditSlices(_tourData.isPowerSerieFromDevice());
 
       // this action displays selected unit label
       _actionSetStartDistanceTo_0.setText(NLS.bind(Messages.TourEditor_Action_SetStartDistanceTo0, UI.UNIT_LABEL_DISTANCE));
