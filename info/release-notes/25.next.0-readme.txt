@@ -59,12 +59,14 @@ New / Improvements
 * Tour Chart
   - Visualize positioned photos with a different map point color
 
-* 2D Map Photos
-  - Create geo positions for each photo in a photo tour
+* Photos + Tours
+  - Create a photo tour which creates geo positions for each photo
     https://github.com/mytourbook/mytourbook/issues/1488
+
+* 2D Map Photos
   - Set photo geo position with an action
-  - Move a photo geo position with the mouse
-  - Replace photo geo position with its default
+  - Relocate a photo geo position with the mouse
+  - Replace photo geo position with its default position
 	
 * Tour Editor
   - Remove photo geo position    

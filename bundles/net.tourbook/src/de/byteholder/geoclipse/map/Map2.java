@@ -388,6 +388,7 @@ public class Map2 extends Canvas {
    private final Cursor                  _cursorSearchTour_Scroll;
    private final Cursor                  _cursorSelect;
    private final Cursor                  _cursorSelectPhoto;
+   private final Cursor                  _cursorMovePhoto;
 
    private final AtomicInteger           _redrawMapCounter          = new AtomicInteger();
    private final AtomicInteger           _overlayRunnableCounter    = new AtomicInteger();
@@ -942,6 +943,7 @@ public class Map2 extends Canvas {
       _cursorSearchTour_Scroll         = createCursorFromImage(Images.SearchTours_ByLocation_Scroll);
       _cursorSelect                    = createCursorFromImage(Images.Cursor_Select);
       _cursorSelectPhoto               = createCursorFromImage(Images.Cursor_Select_Photo);
+      _cursorMovePhoto                 = createCursorFromImage(Images.Cursor_Move_Photo);
 
       _imageMapLocation_Common         = ImageUtils.createAWTImage(TourbookPlugin.getImageDescriptor(Images.MapLocationMarker_Common).createImage());
       _imageMapLocation_Tour           = ImageUtils.createAWTImage(TourbookPlugin.getImageDescriptor(Images.MapLocationMarker_Tour).createImage());
@@ -4342,6 +4344,7 @@ public class Map2 extends Canvas {
       UI.disposeResource(_cursorSearchTour);
       UI.disposeResource(_cursorSearchTour_Scroll);
       UI.disposeResource(_cursorSelect);
+      UI.disposeResource(_cursorMovePhoto);
       UI.disposeResource(_cursorSelectPhoto);
 
       PhotoLoadManager.stopImageLoading(true);
@@ -4687,7 +4690,7 @@ public class Map2 extends Canvas {
 
                   _mouseDownPosition = devMousePosition;
 
-                  setCursorOptimized(_cursorPan);
+                  setCursorOptimized(_cursorMovePhoto);
 
                } else {
 
@@ -5086,7 +5089,6 @@ public class Map2 extends Canvas {
 
             // select photo only when it is not yet selected
             if (_selectedPhoto != photo) {
-
                selectPhoto(photo, _hoveredMapPoint);
             }
 
@@ -5094,7 +5096,14 @@ public class Map2 extends Canvas {
 
          if (_hoveredMapPoint != null) {
 
-            setCursorOptimized(_cursorSelectPhoto);
+            if (_canPanPhoto) {
+
+               setCursorOptimized(_cursorMovePhoto);
+
+            } else {
+
+               setCursorOptimized(_cursorSelectPhoto);
+            }
          }
       }
 
@@ -5328,7 +5337,8 @@ public class Map2 extends Canvas {
                final Photo photo = paintedMapPoint.mapPoint.photo;
 
                if (photo != null) {
-                  onMouse_Move_CheckMapPoints_Photo(photo, photo.paintedRatingStars);
+
+                  onMouse_Move_CheckMapPoints_PhotoRatingStars(photo, photo.paintedRatingStars);
                }
 
                break;
@@ -5350,7 +5360,8 @@ public class Map2 extends Canvas {
                final Photo photo = _hoveredMapPoint.mapPoint.photo;
 
                if (photo != null) {
-                  onMouse_Move_CheckMapPoints_Photo(photo, photo.paintedRatingStars);
+
+                  onMouse_Move_CheckMapPoints_PhotoRatingStars(photo, photo.paintedRatingStars);
                }
 
                break;
@@ -5359,7 +5370,7 @@ public class Map2 extends Canvas {
       }
    }
 
-   private void onMouse_Move_CheckMapPoints_Photo(final Photo photo, final Rectangle paintedRatingStars) {
+   private void onMouse_Move_CheckMapPoints_PhotoRatingStars(final Photo photo, final Rectangle paintedRatingStars) {
 
       int hoveredStars = 0;
       _isInHoveredRatingStar = false;

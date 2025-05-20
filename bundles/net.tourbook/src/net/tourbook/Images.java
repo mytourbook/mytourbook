@@ -98,6 +98,7 @@ public class Images {
    public static final String CSVFormat_Disabled                         = "app-csv-format-disabled.png";                         //$NON-NLS-1$
    public static final String Cursor_Select                              = "cursor-select.png";                                   //$NON-NLS-1$
    public static final String Cursor_Select_Photo                        = "cursor-select-photo.png";                             //$NON-NLS-1$
+   public static final String Cursor_Move_Photo                          = "cursor-move-photo.png";                               //$NON-NLS-1$
    public static final String EasyImport_Harddrive                       = "hard-drive.png";                                      //$NON-NLS-1$
    public static final String EditRow                                    = "edit-row.png";                                        //$NON-NLS-1$
    public static final String EditRow_Disabled                           = "edit-row-disabled.png";                               //$NON-NLS-1$
