@@ -70,9 +70,10 @@ New / Improvements
 	
 * Tour Editor
   - Remove photo geo position  
-  - Edit power values in the time slice viewer
-  - Edit power values in the time slice dialog
-    https://github.com/mytourbook/mytourbook/issues/1492
+  - Edit power values in 
+    - Time slice viewer
+    - Time slice replace/offset dialog
+      https://github.com/mytourbook/mytourbook/issues/1492
 
 * Tour Nutrition (Frederic)
   - Support for the carbohydrates
