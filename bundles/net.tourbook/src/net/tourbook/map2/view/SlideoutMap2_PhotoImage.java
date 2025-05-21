@@ -834,7 +834,7 @@ public class SlideoutMap2_PhotoImage extends AdvancedSlideout implements IAction
 
    public void onImageIsLoaded() {
 
-      if (_containerPhotoOptions.isDisposed()) {
+      if (_containerPhotoOptions == null || _containerPhotoOptions.isDisposed()) {
          return;
       }
 
