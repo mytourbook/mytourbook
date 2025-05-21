@@ -24,7 +24,6 @@ import java.io.Writer;
 import java.nio.charset.StandardCharsets;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
-import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
@@ -605,7 +604,6 @@ public class TourDataEditorView extends ViewPart implements
    private final NumberFormat                         _nfLatLon                       = NumberFormat.getNumberInstance();
    //
    private TourData                                   _tourData;
-   private LocalDate                                  _lastDuplicateTourDateCheck;
    //
    private Color                                      _foregroundColor_Default;
    private Color                                      _backgroundColor_Default;
@@ -2119,39 +2117,6 @@ public class TourDataEditorView extends ViewPart implements
       if (copyFromOtherTour != null) {
 
          // clone other tour
-
-         /*
-          * Show warning that this feature is experimental, show once a day or when this view is
-          * reopened
-          */
-         final LocalDate today = LocalDate.now();
-
-         if (today.equals(_lastDuplicateTourDateCheck) == false) {
-
-            _lastDuplicateTourDateCheck = today;
-
-            // needs a timer otherwise it could not be displayed
-            currentDisplay.timerExec(1000, () -> {
-
-               MessageDialog.openWarning(activeShell,
-
-                     "Experimental Feature", //$NON-NLS-1$
-
-                     UI.EMPTY_STRING
-
-                           + "Duplicating a tour is a new experimental feature in MyTourbook 23.3" + NL //$NON-NLS-1$
-                           + NL
-                           + "Use this feature with care, mainly the duplicated tours, as it is not yet fully tested." + NL //$NON-NLS-1$
-                           + NL
-                           + "One issue could be that when a duplicated tour is selected then its data are not displayed " //$NON-NLS-1$
-                           + "because the original tour was selected before. " //$NON-NLS-1$
-                           + "This issue happened in the flat \"Tour Book\" view and is fixed. " + NL //$NON-NLS-1$
-                           + NL
-                           + "There are so many possibilities in MyTourbook that not all of them are tested now." //$NON-NLS-1$
-
-               );
-            });
-         }
 
          newTourData = copyFromOtherTour.createDeepCopy();
 

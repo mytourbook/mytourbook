@@ -16,10 +16,6 @@ TODO's
   "Code should always ask the workbench for the display rather than rely on Display.getDefault()"
   http://help.eclipse.org/helios/topic/org.eclipse.platform.doc.isv/reference/api/org/eclipse/ui/IWorkbench.html#getDisplay%28%29
 
-* Tour Editor     - Remove experimental message box: net.tourbook.ui.views.tourDataEditor.TourDataEditorView.actionCreateTour(TourData)
-                    Released: 23.3
-
-
 * Website         - IDE pref page: Save action must not be done manually, they are saved in e.g. net.tourbook/.settings/org.eclipse.jdt.ui.prefs with the "sp_cleanup" key prefix
                     Need to check how to apply it to all projects, must maybe be done with the already existing ant script
 
