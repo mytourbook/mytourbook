@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2023 Frédéric Bard
+ * Copyright (C) 2023, 2025 Frédéric Bard
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -15,6 +15,8 @@
  *******************************************************************************/
 package net.tourbook.database;
 
+import java.util.List;
+
 import net.tourbook.common.util.StringUtils;
 import net.tourbook.common.weather.IWeather;
 import net.tourbook.data.TourData;
@@ -25,6 +27,11 @@ public class TourDataUpdate_051_to_052 implements ITourDataUpdate {
    public int getDatabaseVersion() {
 
       return 52;
+   }
+
+   @Override
+   public List<Long> getTourIDs() {
+      return null;
    }
 
    /**

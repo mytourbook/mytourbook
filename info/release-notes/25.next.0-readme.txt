@@ -84,9 +84,9 @@ Changes
 =======
 
 * 2D Map
-  Replaced actions to set tour start/end positions https://github.com/mytourbook/mytourbook/issues/1457 with https://github.com/mytourbook/mytourbook/issues/1488 which creates geo positions for each photo
-   
-
+  - Replaced actions to set tour start/end positions https://github.com/mytourbook/mytourbook/issues/1457 with https://github.com/mytourbook/mytourbook/issues/1488 which creates geo positions for each photo
+  - For any photo tour: Created a time slice for each photo which are positioned slightly different
+  
 
 
 Changes that require Tour Re-import

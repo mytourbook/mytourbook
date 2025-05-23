@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2024 Wolfgang Schramm and Contributors
+ * Copyright (C) 2024, 2025 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -15,6 +15,7 @@
  *******************************************************************************/
 package net.tourbook.ui.action;
 
+import java.util.List;
 import java.util.Set;
 
 import net.tourbook.Messages;
@@ -45,6 +46,11 @@ public class ActionComputeTourBreakTimes extends Action implements ITourDataUpda
       // this is not needed
 
       return 0;
+   }
+
+   @Override
+   public List<Long> getTourIDs() {
+      return null;
    }
 
    @Override

@@ -199,9 +199,10 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
     */
    public static final double            MAX_GEO_DIFF                      = 0.0001;
 
-   private static final double           NORMALIZED_LATITUDE_OFFSET        = 90.0;
+   public static final double            NORMALIZED_LATITUDE_OFFSET        = 90.0;
    public static final int               NORMALIZED_LATITUDE_OFFSET_E2     = 9000;
-   private static final double           NORMALIZED_LONGITUDE_OFFSET       = 180.0;
+
+   public static final double            NORMALIZED_LONGITUDE_OFFSET       = 180.0;
    public static final int               NORMALIZED_LONGITUDE_OFFSET_E2    = 18000;
 
    private static final String           TIME_ZONE_ID_EUROPE_BERLIN        = "Europe/Berlin";                         //$NON-NLS-1$
@@ -1714,7 +1715,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
    public TourPhotoLink          tourPhotoLink;
 
    /**
-    * Contains {@link TourPhoto} ID's which geo position was set
+    * Contains {@link TourPhoto} ID's which geo position was set with the mouse
     */
    @Transient
    private Set<Long>             tourPhotosWithPositionedGeo;
@@ -5105,30 +5106,26 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
 
       final int numTimeSlices = timeSerie.length;
 
-      final boolean[] allIsGeoPositioned = new boolean[numTimeSlices];
+      final boolean[] allPhotosWhichAreGeoPositioned = new boolean[numTimeSlices];
 
       boolean isGeoPositioned = false;
 
-      for (int serieIndex = 0; serieIndex < numTimeSlices; serieIndex++) {
+      if (tourPhotosWithPositionedGeo != null && tourPhotosWithPositionedGeo.size() > 0) {
 
-         TourPhoto tourPhoto = null;
+         // there are applied geo positions for photos
 
-         if (tourPhotosWithPositionedGeo == null || tourPhotosWithPositionedGeo.size() == 0) {
+         for (int serieIndex = 0; serieIndex < numTimeSlices; serieIndex++) {
 
-            // there are no applied geo positions for photos
+            final TourPhoto tourPhoto = allSortedPhotos.get(serieIndex);
 
-            continue;
-         }
+            final boolean isPhotoWithPositionedGeo = tourPhotosWithPositionedGeo.contains(tourPhoto.getPhotoId());
 
-         tourPhoto = allSortedPhotos.get(serieIndex);
+            if (isPhotoWithPositionedGeo) {
 
-         final boolean isPhotoWithPositionedGeo = tourPhotosWithPositionedGeo.contains(tourPhoto.getPhotoId());
+               allPhotosWhichAreGeoPositioned[serieIndex] = true;
 
-         if (isPhotoWithPositionedGeo) {
-
-            allIsGeoPositioned[serieIndex] = true;
-
-            isGeoPositioned = true;
+               isGeoPositioned = true;
+            }
          }
       }
 
@@ -5136,17 +5133,17 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
 
          // there are no geo positions -> remove all existing geo positions
 
-         cleanupGeoPositions();
-
-         // num photos can be different than num time slices, this happened during debugging
-         final int numPhotos = tourPhotos.size();
-
-         for (int serieIndex = 0; serieIndex < numPhotos; serieIndex++) {
-
-            final TourPhoto tourPhoto = allSortedPhotos.get(serieIndex);
-
-            tourPhoto.setGeoLocation(0, 0);
-         }
+//         cleanupGeoPositions();
+//
+//         // num photos can be different than num time slices, this happened during debugging
+//         final int numPhotos = tourPhotos.size();
+//
+//         for (int serieIndex = 0; serieIndex < numPhotos; serieIndex++) {
+//
+//            final TourPhoto tourPhoto = allSortedPhotos.get(serieIndex);
+//
+//            tourPhoto.setGeoLocation(0, 0);
+//         }
 
          return;
       }
@@ -5156,7 +5153,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
 
       for (int serieIndex = 0; serieIndex < numTimeSlices; serieIndex++) {
 
-         if (allIsGeoPositioned[serieIndex]) {
+         if (allPhotosWhichAreGeoPositioned[serieIndex]) {
 
             nextIndexWithGeo = serieIndex;
 
@@ -5166,13 +5163,19 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
          }
       }
 
-      computeGeo_Photos_Interpolate(lastIndexWithGeo - 1, lastIndexWithGeo + 0, numTimeSlices - 1, allSortedPhotos);
+      // interpolate the last slices
+      computeGeo_Photos_Interpolate(lastIndexWithGeo - 1, lastIndexWithGeo, numTimeSlices - 1, allSortedPhotos);
 
       TourManager.computeDistanceValuesFromGeoPosition(this);
    }
 
-   private void computeGeo_Photos_Interpolate(
-                                              final int fromIndex,
+   /**
+    * @param fromIndex
+    * @param firstIndex
+    * @param lastIndex
+    * @param allSortedPhotos
+    */
+   private void computeGeo_Photos_Interpolate(final int fromIndex,
                                               final int firstIndex,
                                               final int lastIndex,
                                               final List<TourPhoto> allSortedPhotos) {
@@ -13428,7 +13431,8 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
    }
 
    /**
-    * Set total elapsed time in seconds
+    * Set total elapsed time in seconds, this will also set the tour end time, it requires that the
+    * tour start time is already set
     *
     * @param tourElapsedTime
     */

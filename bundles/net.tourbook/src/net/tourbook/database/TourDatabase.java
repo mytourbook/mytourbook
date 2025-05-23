@@ -46,6 +46,7 @@ import java.util.Set;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.ConcurrentSkipListSet;
 import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.ThreadPoolExecutor;
 
@@ -477,8 +478,18 @@ public class TourDatabase {
       SQL_DOUBLE_MIN_VALUE = Double.toString(DEFAULT_DOUBLE);
    }
 
-   private static final String                   SYS_PROP__SILENT_DATABASE_UPDATE = "silentDatabaseUpdate";                                      //$NON-NLS-1$
-   private static final boolean                  _isSilentDatabaseUpdate          = System.getProperty(SYS_PROP__SILENT_DATABASE_UPDATE) != null;
+   private static final String  SYS_PROP__SILENT_DATABASE_UPDATE = "silentDatabaseUpdate";                                      //$NON-NLS-1$
+   private static final boolean _isSilentDatabaseUpdate          = System.getProperty(SYS_PROP__SILENT_DATABASE_UPDATE) != null;
+
+   static {
+
+      if (_isSilentDatabaseUpdate) {
+
+         Util.logSystemProperty_IsEnabled(TourDatabase.class,
+               SYS_PROP__SILENT_DATABASE_UPDATE,
+               "A database update is done silently"); //$NON-NLS-1$
+      }
+   }
 
    private boolean                               _isDbInitialized;
    private boolean                               _isDbInDataUpdate;
@@ -490,10 +501,10 @@ public class TourDatabase {
    private int                                   _dbDesignVersion_New;
    private int                                   _dbDesignVersion_Old;
 
-   private final ListenerList<IPropertyListener> _propertyListeners               = new ListenerList<>(ListenerList.IDENTITY);
+   private final ListenerList<IPropertyListener> _propertyListeners      = new ListenerList<>(ListenerList.IDENTITY);
 
-   private boolean                               _isSQLDesignUpdateError          = false;
-   private boolean                               _isSQLDataUpdateError            = false;
+   private boolean                               _isSQLDesignUpdateError = false;
+   private boolean                               _isSQLDataUpdateError   = false;
 
    /**
     * Database version before a db design update is performed
@@ -6915,6 +6926,7 @@ public class TourDatabase {
          updateDb_050_To_051_DataUpdate(conn, splashManager); //                                   51 - 23.8
          updateDb__3_Data_Concurrent(conn, splashManager, new TourDataUpdate_051_to_052()); //     52 - 24.1
          updateDb__3_Data_Concurrent(conn, splashManager, new TourDataUpdate_053_to_054()); //     54 - 24.1
+         updateDb__3_Data_Concurrent(conn, splashManager, new TourDataUpdate_057_to_058()); //     58 - 25.??? after 25.4
 
       } catch (final SQLException e) {
 
@@ -6948,10 +6960,21 @@ public class TourDatabase {
       int lastUpdateNumItems = 1;
       int sumUpdatedTours = 0;
 
-      final List<Long> allTourIds = getAllTourIds();
-      final int numAllTourIds = allTourIds.size();
+      List<Long> allTourIDs = tourDataUpdater.getTourIDs();
 
-      for (final Long tourId : allTourIds) {
+      if (allTourIDs == null) {
+         
+         // use default -> all
+         
+         allTourIDs = getAllTourIds();
+      }
+
+      final int numAllTourIds = allTourIDs.size();
+      final Future<?>[] allUpdateTasks = new Future[numAllTourIds];
+
+      for (int taskIndex = 0; taskIndex < numAllTourIds; taskIndex++) {
+
+         final Long tourId = allTourIDs.get(taskIndex);
 
          if (splashManager != null) {
 
@@ -6984,8 +7007,11 @@ public class TourDatabase {
             tourIndex++;
          }
 
-         updateDb__4_Data_Concurrent_OneTour(tourId, tourDataUpdater);
+         allUpdateTasks[taskIndex] = updateDb__4_Data_Concurrent_OneTour(tourId, tourDataUpdater);
       }
+
+      // wait until all tasks are processed
+      Util.waitTasks(allUpdateTasks);
 
       updateVersionNumber_20_AfterDataUpdate(connection, dbDataVersion, startTime);
    }
@@ -6999,10 +7025,10 @@ public class TourDatabase {
     * @param tourId
     *           Tour ID of the tour to be updated
     *
-    * @return
+    * @return Returns the submitted task
     */
-   private void updateDb__4_Data_Concurrent_OneTour(final long tourId,
-                                                    final ITourDataUpdate tourDataUpdater) {
+   private Future<?> updateDb__4_Data_Concurrent_OneTour(final long tourId,
+                                                         final ITourDataUpdate tourDataUpdater) {
 
       try {
 
@@ -7018,7 +7044,7 @@ public class TourDatabase {
          Thread.currentThread().interrupt();
       }
 
-      _dbUpdateExecutor.submit(() -> {
+      final Future<?> updateTask = _dbUpdateExecutor.submit(() -> {
 
          // get last added item
          final Long queueItem_TourId = _dbUpdateQueue.poll();
@@ -7041,7 +7067,8 @@ public class TourDatabase {
              * Tour update
              */
             final boolean isTourUpdated = tourDataUpdater.updateTourData(tourData);
-            if (!isTourUpdated) {
+
+            if (isTourUpdated == false) {
                return;
             }
 
@@ -7078,6 +7105,8 @@ public class TourDatabase {
             entityManager.close();
          }
       });
+
+      return updateTask;
    }
 
    private void updateDb_001_To_002(final Connection conn) throws SQLException {

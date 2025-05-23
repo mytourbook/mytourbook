@@ -670,14 +670,16 @@ public class TourManager {
          return false;
       }
 
-      final float[] distanceSerie = new float[latSerie.length];
+      final int numTimeSlices = latSerie.length;
+
+      final float[] distanceSerie = new float[numTimeSlices];
 
       double distance = 0;
       double latStart = latSerie[0];
       double lonStart = lonSerie[0];
 
       // compute distance for every time slice
-      for (int serieIndex = 1; serieIndex < latSerie.length; serieIndex++) {
+      for (int serieIndex = 1; serieIndex < numTimeSlices; serieIndex++) {
 
          final double latEnd = latSerie[serieIndex];
          final double lonEnd = lonSerie[serieIndex];
@@ -685,7 +687,7 @@ public class TourManager {
          /*
           * vincenty algorithm is much more accurate compared with haversine
           */
-//         final double distDiff = Util.distanceHaversine(latStart, lonStart, latEnd, lonEnd);
+//       final double distDiff = Util.distanceHaversine(latStart, lonStart, latEnd, lonEnd);
          final double distDiff = MtMath.distanceVincenty(latStart, lonStart, latEnd, lonEnd);
 
          distance += distDiff;
@@ -703,7 +705,18 @@ public class TourManager {
       if (allTourMarker != null) {
 
          for (final TourMarker tourMarker : allTourMarker) {
-            final float markerDistance = distanceSerie[tourMarker.getSerieIndex()];
+
+            int markerSerieIndex = tourMarker.getSerieIndex();
+
+            if (markerSerieIndex >= numTimeSlices) {
+
+               // this happened during the db data update 057 -> 058 because the data series where adjusted
+
+               markerSerieIndex = numTimeSlices - 1;
+            }
+
+            final float markerDistance = distanceSerie[markerSerieIndex];
+
             tourMarker.setDistance(markerDistance);
          }
       }

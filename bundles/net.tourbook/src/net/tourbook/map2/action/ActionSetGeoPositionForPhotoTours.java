@@ -251,13 +251,13 @@ public class ActionSetGeoPositionForPhotoTours extends SubMenu {
       latSerie[timeIndex] = latitude;
       lonSerie[timeIndex] = longitude;
 
-      final Set<Long> allTourPhotosWithPositionedGeo = _tourData.getTourPhotosWithPositionedGeo();
-
       if (tourPhoto != null) {
 
          tourPhoto.setGeoLocation(latitude, longitude);
 
          // keep state for which photo a geo position was set
+         final Set<Long> allTourPhotosWithPositionedGeo = _tourData.getTourPhotosWithPositionedGeo();
+
          allTourPhotosWithPositionedGeo.add(tourPhoto.getPhotoId());
       }
 

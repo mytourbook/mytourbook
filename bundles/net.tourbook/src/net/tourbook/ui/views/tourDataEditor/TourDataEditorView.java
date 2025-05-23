@@ -575,7 +575,7 @@ public class TourDataEditorView extends ViewPart implements
    private ActionExtractTour                          _actionExtractTour;
    private ActionOpenAdjustAltitudeDialog             _actionOpenAdjustAltitudeDialog;
    private ActionOpenMarkerDialog                     _actionOpenMarkerDialog;
-   private ActionRemovePhotoPosition                  _actionRemovePhotoPosition;
+   private ActionRemovePhotoGeoPosition               _actionRemovePhotoGeoPosition;
    private ActionRemoveSwimStyle                      _action_RemoveSwimStyle;
    private ActionSetStartDistanceTo0                  _actionSetStartDistanceTo_0;
    private ActionSetSwimStyle_Header                  _action_SetSwimStyle_Header;
@@ -769,13 +769,13 @@ public class TourDataEditorView extends ViewPart implements
 
    private Widget                    _focusField;
 
-   private class ActionRemovePhotoPosition extends Action {
+   private class ActionRemovePhotoGeoPosition extends Action {
 
-      public ActionRemovePhotoPosition() {
+      public ActionRemovePhotoGeoPosition() {
 
-         super("Remove p&hoto position");
+         super("Remove p&hoto geo position");
 
-         setToolTipText("This removes the association between the photo and its geo position");
+         setToolTipText("This removes the association between the photo and its geo position which was moved with the mouse");
 
          setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.App_Remove));
          setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Images.App_Remove_Disabled));
@@ -3214,7 +3214,7 @@ public class TourDataEditorView extends ViewPart implements
       _actionExportTour                = new ActionExport(this);
       _actionOpenAdjustAltitudeDialog  = new ActionOpenAdjustAltitudeDialog(this, true);
       _actionOpenMarkerDialog          = new ActionOpenMarkerDialog(this, false);
-      _actionRemovePhotoPosition       = new ActionRemovePhotoPosition();
+      _actionRemovePhotoGeoPosition    = new ActionRemovePhotoGeoPosition();
       _actionSetStartDistanceTo_0      = new ActionSetStartDistanceTo0(this);
       _actionSplitTour                 = new ActionSplitTour(this);
       _actionToggleReadEditMode        = new ActionToggleReadEditMode(this);
@@ -7153,13 +7153,13 @@ public class TourDataEditorView extends ViewPart implements
 
 // SET_FORMATTING_OFF
 
-      _actionRemovePhotoPosition .setEnabled(canRemovePhotoPosition);
+      _actionRemovePhotoGeoPosition .setEnabled(canRemovePhotoPosition);
 
-      _actionExportTour          .setEnabled(true);
-      _actionCsvTimeSliceExport  .setEnabled(isSliceSelected);
-
-      _actionSplitTour           .setEnabled(isOneSliceSelected);
-      _actionExtractTour         .setEnabled(numSelectedSlices >= 2);
+      _actionExportTour             .setEnabled(true);
+      _actionCsvTimeSliceExport     .setEnabled(isSliceSelected);
+                                    
+      _actionSplitTour              .setEnabled(isOneSliceSelected);
+      _actionExtractTour            .setEnabled(numSelectedSlices >= 2);
 
       _actionDeleteTimeSlices_AdjustTourStartTime  .setEnabled(canDeleteTimeSliced);
       _actionDeleteTimeSlices_KeepTime             .setEnabled(canDeleteTimeSliced);
@@ -7367,7 +7367,7 @@ public class TourDataEditorView extends ViewPart implements
       menuManager.add(_actionDeleteTimeSlices_KeepTime);
       menuManager.add(_actionDeleteTimeSlices_KeepTimeAndDistance);
       menuManager.add(_actionDeleteTimeSlices_AdjustTourStartTime);
-      menuManager.add(_actionRemovePhotoPosition);
+      menuManager.add(_actionRemovePhotoGeoPosition);
 
       menuManager.add(new Separator());
       menuManager.add(_actionSetStartDistanceTo_0);
