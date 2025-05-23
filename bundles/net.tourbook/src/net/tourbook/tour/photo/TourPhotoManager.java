@@ -168,34 +168,37 @@ public class TourPhotoManager implements IPhotoServiceProvider {
     */
    public static List<TourPhoto> getTourPhotos(final Photo photo) {
 
-      final ArrayList<TourPhoto> allPhotoTourPhotos = new ArrayList<>();
+      final List<TourPhoto> allPhotoTourPhotos = new ArrayList<>();
 
-      final Collection<TourPhotoReference> photoRefs = photo.getTourPhotoReferences().values();
+      if (photo != null) {
 
-      if (photoRefs.size() > 0) {
+         final Collection<TourPhotoReference> photoRefs = photo.getTourPhotoReferences().values();
 
-         for (final TourPhotoReference photoRef : photoRefs) {
+         if (photoRefs.size() > 0) {
 
-            final long photoID = photoRef.photoId;
+            for (final TourPhotoReference photoRef : photoRefs) {
 
-            final TourData tourData = TourManager.getInstance().getTourData(photoRef.tourId);
+               final long photoID = photoRef.photoId;
 
-            if (tourData == null) {
+               final TourData tourData = TourManager.getInstance().getTourData(photoRef.tourId);
 
-               // this happened when a tour was deleted
+               if (tourData == null) {
 
-               continue;
-            }
+                  // this happened when a tour was deleted
 
-            final Set<TourPhoto> allTourPhotos = tourData.getTourPhotos();
+                  continue;
+               }
 
-            for (final TourPhoto tourPhoto : allTourPhotos) {
+               final Set<TourPhoto> allTourPhotos = tourData.getTourPhotos();
 
-               if (tourPhoto.getPhotoId() == photoID) {
+               for (final TourPhoto tourPhoto : allTourPhotos) {
 
-                  allPhotoTourPhotos.add(tourPhoto);
+                  if (tourPhoto.getPhotoId() == photoID) {
 
-                  break;
+                     allPhotoTourPhotos.add(tourPhoto);
+
+                     break;
+                  }
                }
             }
          }

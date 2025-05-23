@@ -3807,6 +3807,25 @@ public class Map2 extends Canvas {
       return _mapPointPainter_Task == null || _mapPointPainter_Task.isCancelled();
    }
 
+   private boolean isPhotoTour(final Photo photo) {
+
+      final List<TourPhoto> allTourPhotos = TourPhotoManager.getTourPhotos(photo);
+
+      if (allTourPhotos.size() > 0) {
+
+         final TourPhoto tourPhoto = allTourPhotos.get(0);
+
+         if (tourPhoto != null) {
+
+            final TourData tourData = tourPhoto.getTourData();
+
+            return tourData.isPhotoTour();
+         }
+      }
+
+      return false;
+   }
+
    /**
     * @return Returns <code>true</code> when 'Search tour by location' is active
     */
@@ -4679,14 +4698,18 @@ public class Map2 extends Canvas {
                   selectPhoto(photo, _hoveredMapPoint);
                }
 
-               if (_isHoveredMapPointSymbol) {
+               if (_isHoveredMapPointSymbol 
+                     
+                     
+                     // it is not yet supported to move photos when it is not a photo tour
+                     && isPhotoTour(photo)) {
 
                   // when a photo symbol is hovered, then the photo can be panned, otherwise the map
 
                   isCanPanMap = false;
 
                   _canPanPhoto = true;
-                  _pannedPhoto = _hoveredMapPoint.mapPoint.photo;
+                  _pannedPhoto = photo;
 
                   _mouseDownPosition = devMousePosition;
 

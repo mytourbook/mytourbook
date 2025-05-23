@@ -5133,6 +5133,8 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
 
          // there are no geo positions -> remove all existing geo positions
 
+         // !!! This cleanup do not work because the 057->058 db data update needs the old geo positions !!!
+
 //         cleanupGeoPositions();
 //
 //         // num photos can be different than num time slices, this happened during debugging
