@@ -252,8 +252,8 @@ public class DialogEditTimeSlicesValues extends TitleAreaDialog {
 
    private void createUI_10_Values(final Composite parent) {
 
-      final String labelReplaceValues = Messages.Dialog_EditTimeslicesValues_Label_NewValues;
       final String labelOffsetValues = Messages.Dialog_EditTimeslicesValues_Label_OffsetValues;
+      final String labelReplaceValues = Messages.Dialog_EditTimeslicesValues_Label_ReplaceValues;
 
       final int hintDefaultTextWidth = _isLinux
             ? SWT.DEFAULT
