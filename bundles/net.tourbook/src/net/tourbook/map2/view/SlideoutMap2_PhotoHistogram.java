@@ -54,12 +54,14 @@ import net.tourbook.photo.PhotoManager;
 import net.tourbook.photo.TourPhotoReference;
 import net.tourbook.tour.TourManager;
 
+import org.eclipse.jface.action.Action;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.resource.ColorRegistry;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.MouseWheelListener;
 import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
@@ -68,6 +70,8 @@ import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Spinner;
+import org.eclipse.swt.widgets.Widget;
 import org.eclipse.ui.part.PageBook;
 
 /**
@@ -90,6 +94,13 @@ public class SlideoutMap2_PhotoHistogram extends AdvancedSlideout implements
    private PaintedMapPoint              _previousHoveredMapPoint;
    private Photo                        _photo;
 
+   private SelectionListener            _defaultSelectionListener;
+   private MouseWheelListener           _defaultMouseWheelListener;
+
+   private Action_ResetValue            _actionReset0;
+   private Action_ResetValue            _actionReset50;
+   private Action_ResetValue            _actionReset100;
+
    /*
     * UI controls
     */
@@ -101,10 +112,40 @@ public class SlideoutMap2_PhotoHistogram extends AdvancedSlideout implements
 
    private Button    _chkAdjustTonality;
 
+   private Label     _label1;
+   private Label     _label2;
+   private Label     _label3;
    private Label     _labelMessage;
    private Label     _labelWarning;
 
    private Histogram _histogram;
+
+   private Spinner   _spinner0;
+   private Spinner   _spinner50;
+   private Spinner   _spinner100;
+
+   /**
+    * Reset spinner value
+    */
+   private class Action_ResetValue extends Action {
+
+      private Spinner _spinner;
+
+      public Action_ResetValue(final Spinner spinner) {
+
+         super(UI.RESET_LABEL, AS_PUSH_BUTTON);
+
+         setToolTipText("Reset value to its default");
+
+         _spinner = spinner;
+      }
+
+      @Override
+      public void run() {
+
+         onResetValue(_spinner);
+      }
+   }
 
    public SlideoutMap2_PhotoHistogram(final Map2 map2) {
 
@@ -132,12 +173,11 @@ public class SlideoutMap2_PhotoHistogram extends AdvancedSlideout implements
    @Override
    protected void createSlideoutContent(final Composite parent) {
 
-      initUI(parent);
-      createActions();
+      initUI();
 
       createUI(parent);
 
-      updateActions();
+      createActions();
       fillUI();
 
       setupPhoto_UI(_hoveredMapPoint);
@@ -145,10 +185,14 @@ public class SlideoutMap2_PhotoHistogram extends AdvancedSlideout implements
       restoreState();
 
       // show dialog with dark colors, this looks better for photos with the bright theme
-      final ColorRegistry colorRegistry = JFaceResources.getColorRegistry();
-      UI.setChildColors(parent.getShell(),
-            colorRegistry.get(IPhotoPreferences.PHOTO_VIEWER_COLOR_FOREGROUND),
-            colorRegistry.get(IPhotoPreferences.PHOTO_VIEWER_COLOR_BACKGROUND));
+      if (UI.IS_BRIGHT_THEME) {
+
+         final ColorRegistry colorRegistry = JFaceResources.getColorRegistry();
+
+         UI.setChildColors(parent.getShell(),
+               colorRegistry.get(IPhotoPreferences.PHOTO_VIEWER_COLOR_FOREGROUND),
+               colorRegistry.get(IPhotoPreferences.PHOTO_VIEWER_COLOR_BACKGROUND));
+      }
    }
 
    private void createUI(final Composite parent) {
@@ -156,23 +200,24 @@ public class SlideoutMap2_PhotoHistogram extends AdvancedSlideout implements
       _pageBook = new PageBook(parent, SWT.NONE);
       GridDataFactory.fillDefaults().grab(true, true).applyTo(_pageBook);
 
-      _pagePhoto = createUI_10_WithPhoto(_pageBook);
-      _pageNoPhoto = createUI_90_NoPhoto(_pageBook);
+      _pagePhoto = createUI_10_PageWithPhoto(_pageBook);
+      _pageNoPhoto = createUI_90_PageNoPhoto(_pageBook);
 
       _pageBook.showPage(_pageNoPhoto);
    }
 
-   private Composite createUI_10_WithPhoto(final Composite parent) {
+   private Composite createUI_10_PageWithPhoto(final Composite parent) {
 
       final Composite container = new Composite(parent, SWT.NONE);
       GridDataFactory.fillDefaults().grab(true, true).applyTo(container);
       GridLayoutFactory.fillDefaults()
             .numColumns(1)
-            .spacing(0, 0)
+            .spacing(0, 5)
             .applyTo(container);
-      container.setBackground(UI.SYS_COLOR_GREEN);
+//      container.setBackground(UI.SYS_COLOR_GREEN);
       {
          createUI_20_Histogram(container);
+         createUI_30_Options(container);
       }
 
       return container;
@@ -200,7 +245,7 @@ public class SlideoutMap2_PhotoHistogram extends AdvancedSlideout implements
                 */
                _chkAdjustTonality = new Button(_pageBookAdjustment, SWT.CHECK);
                _chkAdjustTonality.setText(Messages.Slideout_PhotoHistogram_Checkbox_AdjustTonality);
-               _chkAdjustTonality.addSelectionListener(SelectionListener.widgetSelectedAdapter(selectionEvent -> onAdjustTonality()));
+               _chkAdjustTonality.addSelectionListener(SelectionListener.widgetSelectedAdapter(selectionEvent -> onSelectTonality()));
                GridDataFactory.fillDefaults()
                      .align(SWT.FILL, SWT.BEGINNING)
                      .applyTo(_chkAdjustTonality);
@@ -226,7 +271,84 @@ public class SlideoutMap2_PhotoHistogram extends AdvancedSlideout implements
       }
    }
 
-   private Composite createUI_90_NoPhoto(final Composite parent) {
+   private void createUI_30_Options(final Composite parent) {
+
+      final String labelDistance = UI.SPACE3;
+
+      final Composite container = new Composite(parent, SWT.NONE);
+      GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
+      GridLayoutFactory.fillDefaults()
+            .numColumns(10)
+            .spacing(0, 0)
+            .applyTo(container);
+//      container.setBackground(UI.SYS_COLOR_CYAN);
+      {
+         {
+            {
+               _label1 = UI.createLabel(container, "&1" + labelDistance);
+            }
+            {
+               _spinner0 = new Spinner(container, SWT.BORDER);
+               _spinner0.setToolTipText("Adjust horizontal position for the left tonality");
+               _spinner0.setMinimum(0);
+               _spinner0.setMaximum(100);
+               _spinner0.addMouseWheelListener(_defaultMouseWheelListener);
+               _spinner0.addSelectionListener(_defaultSelectionListener);
+            }
+            {
+               _actionReset0 = new Action_ResetValue(_spinner0);
+               UI.createToolbarAction(container, _actionReset0);
+            }
+         }
+         {
+            {
+               _label2 = UI.createLabel(container, "&2" + labelDistance);
+               GridDataFactory.fillDefaults()
+                     .grab(true, false)
+                     .align(SWT.END, SWT.FILL)
+                     .applyTo(_label2);
+            }
+            {
+               _spinner50 = new Spinner(container, SWT.BORDER);
+               _spinner50.setToolTipText("Adjust horizontal position for the center tonality");
+               _spinner50.setMinimum(0);
+               _spinner50.setMaximum(100);
+               _spinner50.addMouseWheelListener(_defaultMouseWheelListener);
+               _spinner50.addSelectionListener(_defaultSelectionListener);
+            }
+            {
+               _actionReset50 = new Action_ResetValue(_spinner50);
+               UI.createToolbarAction(container, _actionReset50);
+            }
+         }
+         {
+            {
+               _label3 = UI.createLabel(container, "&3" + labelDistance);
+               GridDataFactory.fillDefaults()
+                     .grab(true, false)
+                     .align(SWT.END, SWT.FILL)
+                     .applyTo(_label3);
+            }
+            {
+               _spinner100 = new Spinner(container, SWT.BORDER);
+               _spinner100.setToolTipText("Adjust horizontal position for the right tonality");
+               _spinner100.setMinimum(0);
+               _spinner100.setMaximum(100);
+               _spinner100.addMouseWheelListener(_defaultMouseWheelListener);
+               _spinner100.addSelectionListener(_defaultSelectionListener);
+               GridDataFactory.fillDefaults()
+                     .align(SWT.END, SWT.FILL)
+                     .applyTo(_spinner100);
+            }
+            {
+               _actionReset100 = new Action_ResetValue(_spinner100);
+               UI.createToolbarAction(container, _actionReset100);
+            }
+         }
+      }
+   }
+
+   private Composite createUI_90_PageNoPhoto(final Composite parent) {
 
       final Composite container = new Composite(parent, SWT.NONE);
       GridDataFactory.fillDefaults().grab(true, true).applyTo(container);
@@ -244,10 +366,25 @@ public class SlideoutMap2_PhotoHistogram extends AdvancedSlideout implements
 
    private void enableControls() {
 
-// SET_FORMATTING_OFF
+      final CurveValues curveValues = _photo.getToneCurvesFilter().getCurves().getActiveCurve().curveValues;
+      final float[] allValuesX = curveValues.allValuesX;
 
+      final int numValuesX = allValuesX.length;
+      final boolean isCenterValue = numValuesX == 3;
 
-// SET_FORMATTING_ON
+      final boolean isAdjustTonality = _chkAdjustTonality.getSelection();
+
+      _label1.setEnabled(isAdjustTonality);
+      _label2.setEnabled(isAdjustTonality && isCenterValue);
+      _label3.setEnabled(isAdjustTonality);
+
+      _spinner0.setEnabled(isAdjustTonality);
+      _spinner50.setEnabled(isAdjustTonality && isCenterValue);
+      _spinner100.setEnabled(isAdjustTonality);
+
+      _actionReset0.setEnabled(isAdjustTonality);
+      _actionReset50.setEnabled(isAdjustTonality && isCenterValue);
+      _actionReset100.setEnabled(isAdjustTonality);
    }
 
    private void fillUI() {
@@ -449,38 +586,14 @@ public class SlideoutMap2_PhotoHistogram extends AdvancedSlideout implements
       return fixedDisplayBounds;
    }
 
-   private void initUI(final Composite parent) {
+   private void initUI() {
 
-//      _keepOpenListener = new FocusListener() {
-//
-//         @Override
-//         public void focusGained(final FocusEvent e) {
-//
-//            /*
-//             * This will fix the problem that when the list of a combobox is displayed, then the
-//             * slideout will disappear :-(((
-//             */
-//            setIsAnotherDialogOpened(true);
-//         }
-//
-//         @Override
-//         public void focusLost(final FocusEvent e) {
-//            setIsAnotherDialogOpened(false);
-//         }
-//      };
-   }
+      _defaultSelectionListener = SelectionListener.widgetSelectedAdapter(selectionEvent -> onSelect_XValuePosition(selectionEvent.widget));
 
-   private void onAdjustTonality() {
-
-      final boolean isAdjustTonality = _chkAdjustTonality.getSelection();
-
-      _photo.isSetTonality = isAdjustTonality;
-
-      _histogram.updateCurvesFilter(_photo);
-
-      enableControls();
-
-      updateModelAndUI();
+      _defaultMouseWheelListener = mouseEvent -> {
+         net.tourbook.common.UI.adjustSpinnerValueOnMouseScroll(mouseEvent);
+         onSelect_XValuePosition(mouseEvent.widget);
+      };
    }
 
    @Override
@@ -516,10 +629,107 @@ public class SlideoutMap2_PhotoHistogram extends AdvancedSlideout implements
       });
    }
 
+   private void onResetValue(final Spinner spinner) {
+
+      if (spinner == _spinner0) {
+
+         // left most x position
+
+         spinner.setSelection(0);
+
+      } else if (spinner == _spinner50) {
+
+         // center x position
+
+         spinner.setSelection(50);
+
+      } else if (spinner == _spinner100) {
+
+         // right most x position
+
+         spinner.setSelection(100);
+      }
+
+      spinner.setFocus();
+
+      onSelect_XValuePosition(spinner);
+   }
+
+   private void onSelect_XValuePosition(final Widget selectedWidget) {
+
+      final float selectedValue = ((Spinner) (selectedWidget)).getSelection();
+      final float newValueX = selectedValue / 100;
+
+      final CurveValues curveValues = _photo.getToneCurvesFilter().getCurves().getActiveCurve().curveValues;
+      final float[] allValuesX = curveValues.allValuesX;
+
+      if (selectedWidget == _spinner0) {
+
+         // left most x position
+
+         allValuesX[0] = newValueX;
+
+      } else if (selectedWidget == _spinner50) {
+
+         // centered x position
+
+         // adjust y position
+
+//         final float[] allValuesY = curveValues.allValuesY;
+//
+//         final float x0 = allValuesX[0];
+//         final float y0 = allValuesY[0];
+//
+//         final float x1 = allValuesX[1];
+//         final float y1 = allValuesY[1];
+//
+//         final float a = x1 - x0;
+//         final float b = y1 - y0;
+//
+//         final float x1_new = newValueX;
+//
+//         float a2 = x1_new - x0;
+//
+//         if (a2 <= 0) {
+//            a2 = 0.001f;
+//         }
+//
+//         final float newValueY1 = a2 * b / a;
+
+         allValuesX[1] = newValueX;
+//         allValuesY[1] = newValueY1;
+
+      } else if (selectedWidget == _spinner100) {
+
+         // right most x position
+
+         allValuesX[allValuesX.length - 1] = newValueX;
+      }
+
+      updateModelAndUI();
+   }
+
+   private void onSelectTonality() {
+
+      final boolean isAdjustTonality = _chkAdjustTonality.getSelection();
+
+      _photo.isSetTonality = isAdjustTonality;
+
+      _histogram.updateCurvesFilter(_photo);
+
+      enableControls();
+
+      updateModelAndUI();
+   }
+
    @Override
    public void pointIsModified() {
 
       updateModelAndUI();
+
+      updateUI_HorizontalTonality();
+
+      enableControls();
    }
 
    @Override
@@ -641,7 +851,6 @@ public class SlideoutMap2_PhotoHistogram extends AdvancedSlideout implements
 
       // update tonality
       _chkAdjustTonality.setSelection(_photo.isSetTonality);
-      updateUI_ShowHide3PointActions();
 
       final Image photoImage = getPhotoImage(_photo);
       final Float relCropArea = _photo.isCropped ? _photo.getValidCropArea() : null;
@@ -651,6 +860,8 @@ public class SlideoutMap2_PhotoHistogram extends AdvancedSlideout implements
 
       updateAdjustedImage();
       _histogram.redraw();
+
+      updateUI_HorizontalTonality();
 
       if (photoImage == null || photoImage.isDisposed()) {
 
@@ -662,10 +873,6 @@ public class SlideoutMap2_PhotoHistogram extends AdvancedSlideout implements
       }
 
       enableControls();
-   }
-
-   private void updateActions() {
-
    }
 
    private void updateAdjustedImage() {
@@ -706,8 +913,6 @@ public class SlideoutMap2_PhotoHistogram extends AdvancedSlideout implements
       _photo.isAdjustmentModified = true;
 
       updateTourPhotoInDB(_photo);
-
-      updateUI_ShowHide3PointActions();
 
       _histogram.redraw();
    }
@@ -809,6 +1014,21 @@ public class SlideoutMap2_PhotoHistogram extends AdvancedSlideout implements
       }
    }
 
+   private void updateUI_HorizontalTonality() {
+
+      final CurveValues curveValues = _photo.getToneCurvesFilter().getCurves().getActiveCurve().curveValues;
+      final float[] allValuesX = curveValues.allValuesX;
+
+      final int numValuesX = allValuesX.length;
+
+      _spinner0.setSelection((int) (allValuesX[0] * 100));
+      _spinner100.setSelection((int) (allValuesX[numValuesX - 1] * 100));
+
+      if (numValuesX == 3) {
+         _spinner50.setSelection((int) (allValuesX[1] * 100));
+      }
+   }
+
    private void updateUI_LoadingMessage() {
 
       if (_hoveredMapPoint == null) {
@@ -825,19 +1045,6 @@ public class SlideoutMap2_PhotoHistogram extends AdvancedSlideout implements
       }
 
       _pageBook.showPage(_pageNoPhoto);
-   }
-
-   private void updateUI_ShowHide3PointActions() {
-
-//      final boolean isDarkDefaultValue = _photo.threePoint_Dark == THREE_POINT_DEFAULT_DARK;
-//      final boolean isBrightDefaultValue = _photo.threePoint_Bright == THREE_POINT_DEFAULT_BRIGHT;
-//      final boolean isMiddleXDefaultValue = _photo.threePoint_MiddleX == THREE_POINT_DEFAULT_MIDDLE;
-//      final boolean isMiddleYDefaultValue = _photo.threePoint_MiddleY == THREE_POINT_DEFAULT_MIDDLE;
-//
-//      _toolbarReset3Point_Dark.setVisible(isDarkDefaultValue == false);
-//      _toolbarReset3Point_Bright.setVisible(isBrightDefaultValue == false);
-//      _toolbarReset3Point_MiddleX.setVisible(isMiddleXDefaultValue == false);
-//      _toolbarReset3Point_MiddleY.setVisible(isMiddleYDefaultValue == false);
    }
 
 }
