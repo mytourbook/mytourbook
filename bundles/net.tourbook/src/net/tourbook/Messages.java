@@ -2556,14 +2556,27 @@ public class Messages extends NLS {
    public static String        Slideout_MapModel_ImportDialog_Title;
    public static String        Slideout_MapModel_Label_Title;
 
+   public static String        Slideout_PhotoHistogram_Action_Reset_Tooltip;
+   public static String        Slideout_PhotoHistogram_Checkbox_AdjustTonality;
+   public static String        Slideout_PhotoHistogram_Spinner_CenterTonality_Tooltip;
+   public static String        Slideout_PhotoHistogram_Spinner_LeftTonality_Tooltip;
+   public static String        Slideout_PhotoHistogram_Spinner_RightTonality_Tooltip;
+
    public static String        Slideout_PhotoImage_Checkbox_CropPhoto;
    public static String        Slideout_PhotoImage_Combo_TooltipSize_Tooltip;
    public static String        Slideout_PhotoImage_Label_AdjustmentIsDisabled;
    public static String        Slideout_PhotoImage_Label_AdjustmentIsDisabled_Tooltip;
    public static String        Slideout_PhotoImage_Label_LoadingMessage;
    public static String        Slideout_PhotoImage_Label_PhotoIsNotSelected;
+   public static String        Slideout_PhotoImage_Link_CropSize_Tooltip;
    public static String        Slideout_PhotoImage_Link_ResizeTooltip2;
    public static String        Slideout_PhotoImage_Link_ResizeTooltip2_Tooltip;
+   public static String        Slideout_PhotoImage_Radio_OrientationHorizontal;
+   public static String        Slideout_PhotoImage_Radio_OrientationHorizontal_Tooltip;
+   public static String        Slideout_PhotoImage_Radio_OrientationSquare;
+   public static String        Slideout_PhotoImage_Radio_OrientationSquare_Tooltip;
+   public static String        Slideout_PhotoImage_Radio_OrientationVertical;
+   public static String        Slideout_PhotoImage_Radio_OrientationVertical_Tooltip;
 
    public static String        Slideout_RefTour_Checkbox_Altimeter_Avg;
    public static String        Slideout_RefTour_Checkbox_Pace_Avg;
@@ -2877,8 +2890,6 @@ public class Messages extends NLS {
 
    public static String        Slideout_TrainingOptions_Label_Title;
 
-   public static String        Slideout_PhotoHistogram_Checkbox_AdjustTonality;
-
    public static String        SRTM_Download_Dialog_SRTMDownloadValidation_Title;
    public static String        SRTM_Download_Info_NoDownloadValidation;
    public static String        SRTM_Download_Info_UsernamePasswordIsEmpty;
@@ -3015,26 +3026,7 @@ public class Messages extends NLS {
    public static String        TourChart_Smoothing_Link_PrefBreakTime;
    public static String        TourChart_Smoothing_Link_SmoothingOnlineDocumentation;
 
-   public static String        TourDataEditorView_tour_editor_status_tour_contains_ref_tour;
    public static String        TourData_Label_new_marker;
-
-   public static String        TourEditor_Action_ComputeDistanceValuesFromGeoPosition;
-   public static String        TourEditor_Action_DeleteDistanceValues;
-   public static String        TourEditor_Action_EditTimeSlicesValues;
-   public static String        TourEditor_Action_InterpolatedValues_ReImport;
-   public static String        TourEditor_Action_InterpolatedValues_ReImport_Tooltip;
-   public static String        TourEditor_Action_InterpolatedValues_Remove;
-   public static String        TourEditor_Action_InterpolatedValues_Remove_Tooltip;
-   public static String        TourEditor_Action_RemoveSwimStyle;
-   public static String        TourEditor_Action_SetAltitudeValuesFromSRTM;
-   public static String        TourEditor_Action_SetStartDistanceTo0;
-   public static String        TourEditor_Action_SetSwimStyle;
-   public static String        TourEditor_Dialog_ComputeDistanceValues_Message;
-   public static String        TourEditor_Dialog_ComputeDistanceValues_Title;
-   public static String        TourEditor_Dialog_DeleteDistanceValues_Message;
-   public static String        TourEditor_Dialog_DeleteDistanceValues_Title;
-   public static String        TourEditor_Dialog_SetAltitudeFromSRTM_Message;
-   public static String        TourEditor_Dialog_SetAltitudeFromSRTM_Title;
 
    public static String        TourGeoFilter_Loader_Loading;
    public static String        TourGeoFilter_Loader_LoadingError;
@@ -3246,8 +3238,30 @@ public class Messages extends NLS {
    public static String        Tour_Data_Text_TourTimerPauses;
    public static String        Tour_Data_Text_TrainingValues;
 
+   public static String        TourDataEditorView_tour_editor_status_tour_contains_ref_tour;
+
+   public static String        TourEditor_Action_ComputeDistanceValuesFromGeoPosition;
+   public static String        TourEditor_Action_DeleteDistanceValues;
+   public static String        TourEditor_Action_EditTimeSlicesValues;
+   public static String        TourEditor_Action_InterpolatedValues_ReImport;
+   public static String        TourEditor_Action_InterpolatedValues_ReImport_Tooltip;
+   public static String        TourEditor_Action_InterpolatedValues_Remove;
+   public static String        TourEditor_Action_InterpolatedValues_Remove_Tooltip;
+   public static String        TourEditor_Action_RemoveSwimStyle;
+   public static String        TourEditor_Action_SetAltitudeValuesFromSRTM;
+   public static String        TourEditor_Action_SetStartDistanceTo0;
+   public static String        TourEditor_Action_SetSwimStyle;
+   public static String        TourEditor_Dialog_ComputeDistanceValues_Message;
+   public static String        TourEditor_Dialog_ComputeDistanceValues_Title;
+   public static String        TourEditor_Dialog_DeleteDistanceValues_Message;
+   public static String        TourEditor_Dialog_DeleteDistanceValues_Title;
+   public static String        TourEditor_Dialog_SetAltitudeFromSRTM_Message;
+   public static String        TourEditor_Dialog_SetAltitudeFromSRTM_Title;
+
    public static String        Tour_Editor_Action_DeleteTimeSlices_AdjustTourStartTime;
    public static String        Tour_Editor_Action_DeleteTimeSlices_AdjustTourStartTime_Tooltip;
+   public static String        Tour_Editor_Action_RemovePhotoGeoPosition;
+   public static String        Tour_Editor_Action_RemovePhotoGeoPosition_Tooltip;
    public static String        Tour_Editor_Button_DiscardModifications;
    public static String        Tour_Editor_Button_SaveTour;
    public static String        tour_editor_csvTimeSliceExport;

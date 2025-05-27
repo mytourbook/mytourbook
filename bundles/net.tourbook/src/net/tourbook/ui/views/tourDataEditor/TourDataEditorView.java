@@ -773,9 +773,9 @@ public class TourDataEditorView extends ViewPart implements
 
       public ActionRemovePhotoGeoPosition() {
 
-         super("Remove p&hoto geo position");
+         super(Messages.Tour_Editor_Action_RemovePhotoGeoPosition);
 
-         setToolTipText("This removes the association between the photo and its geo position which was moved with the mouse");
+         setToolTipText(Messages.Tour_Editor_Action_RemovePhotoGeoPosition_Tooltip);
 
          setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.App_Remove));
          setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Images.App_Remove_Disabled));

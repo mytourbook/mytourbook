@@ -541,7 +541,7 @@ public class SlideoutMap2_PhotoImage extends AdvancedSlideout implements IAction
     */
    private Composite createUI_30_CropOptions(final Composite parent) {
 
-      final String cropToolTipText = "Set crop size to %d %% of the original size";
+      final String cropToolTipText = Messages.Slideout_PhotoImage_Link_CropSize_Tooltip;
 
       final SelectionListener cropListener = SelectionListener.widgetSelectedAdapter(selectionEvent -> onSelect_CropSize(_currentCropSize));
 
@@ -561,7 +561,7 @@ public class SlideoutMap2_PhotoImage extends AdvancedSlideout implements IAction
                    * Crop size: 10%
                    */
                   _link10 = new Link(containerSizes, SWT.NONE);
-                  _link10.setText(UI.createLinkText("10 %"));
+                  _link10.setText(UI.createLinkText("10 %")); //$NON-NLS-1$
                   _link10.setToolTipText(cropToolTipText.formatted(10));
                   _link10.addSelectionListener(SelectionListener.widgetSelectedAdapter(selectionEvent -> onSelect_CropSize(10)));
                }
@@ -570,7 +570,7 @@ public class SlideoutMap2_PhotoImage extends AdvancedSlideout implements IAction
                    * Crop size: 20%
                    */
                   _link20 = new Link(containerSizes, SWT.NONE);
-                  _link20.setText(UI.createLinkText("20 %"));
+                  _link20.setText(UI.createLinkText("20 %")); //$NON-NLS-1$
                   _link20.setToolTipText(cropToolTipText.formatted(20));
                   _link20.addSelectionListener(SelectionListener.widgetSelectedAdapter(selectionEvent -> onSelect_CropSize(20)));
                }
@@ -579,7 +579,7 @@ public class SlideoutMap2_PhotoImage extends AdvancedSlideout implements IAction
                    * Crop size: 40%
                    */
                   _link40 = new Link(containerSizes, SWT.NONE);
-                  _link40.setText(UI.createLinkText("40 %"));
+                  _link40.setText(UI.createLinkText("40 %")); //$NON-NLS-1$
                   _link40.setToolTipText(cropToolTipText.formatted(40));
                   _link40.addSelectionListener(SelectionListener.widgetSelectedAdapter(selectionEvent -> onSelect_CropSize(40)));
                }
@@ -588,7 +588,7 @@ public class SlideoutMap2_PhotoImage extends AdvancedSlideout implements IAction
                    * Crop size: 60%
                    */
                   _link60 = new Link(containerSizes, SWT.NONE);
-                  _link60.setText(UI.createLinkText("60 %"));
+                  _link60.setText(UI.createLinkText("60 %")); //$NON-NLS-1$
                   _link60.setToolTipText(cropToolTipText.formatted(60));
                   _link60.addSelectionListener(SelectionListener.widgetSelectedAdapter(selectionEvent -> onSelect_CropSize(60)));
                }
@@ -597,7 +597,7 @@ public class SlideoutMap2_PhotoImage extends AdvancedSlideout implements IAction
                    * Crop size: 80%
                    */
                   _link80 = new Link(containerSizes, SWT.NONE);
-                  _link80.setText(UI.createLinkText("80 %"));
+                  _link80.setText(UI.createLinkText("80 %")); //$NON-NLS-1$
                   _link80.setToolTipText(cropToolTipText.formatted(80));
                   _link80.addSelectionListener(SelectionListener.widgetSelectedAdapter(selectionEvent -> onSelect_CropSize(80)));
                }
@@ -606,7 +606,7 @@ public class SlideoutMap2_PhotoImage extends AdvancedSlideout implements IAction
                    * Crop size: 100%
                    */
                   _link100 = new Link(containerSizes, SWT.NONE);
-                  _link100.setText(UI.createLinkText("100 %"));
+                  _link100.setText(UI.createLinkText("100 %")); //$NON-NLS-1$
                   _link100.setToolTipText(cropToolTipText.formatted(100));
                   _link100.addSelectionListener(SelectionListener.widgetSelectedAdapter(selectionEvent -> onSelect_CropSize(100)));
                }
@@ -621,8 +621,8 @@ public class SlideoutMap2_PhotoImage extends AdvancedSlideout implements IAction
                       * Orientation: Horizontal
                       */
                      _radioOrientation_Horizontal = new Button(containerOrientation, SWT.RADIO);
-                     _radioOrientation_Horizontal.setText("&Ratio");
-                     _radioOrientation_Horizontal.setToolTipText("Set crop size according to the image ratio");
+                     _radioOrientation_Horizontal.setText(Messages.Slideout_PhotoImage_Radio_OrientationHorizontal);
+                     _radioOrientation_Horizontal.setToolTipText(Messages.Slideout_PhotoImage_Radio_OrientationHorizontal_Tooltip);
                      _radioOrientation_Horizontal.addSelectionListener(cropListener);
                   }
                   {
@@ -630,8 +630,8 @@ public class SlideoutMap2_PhotoImage extends AdvancedSlideout implements IAction
                       * Orientation: Vertical
                       */
                      _radioOrientation_Vertical = new Button(containerOrientation, SWT.RADIO);
-                     _radioOrientation_Vertical.setText("Re&verse");
-                     _radioOrientation_Vertical.setToolTipText("Set crop size according to the reverted image ratio");
+                     _radioOrientation_Vertical.setText(Messages.Slideout_PhotoImage_Radio_OrientationVertical);
+                     _radioOrientation_Vertical.setToolTipText(Messages.Slideout_PhotoImage_Radio_OrientationVertical_Tooltip);
                      _radioOrientation_Vertical.addSelectionListener(cropListener);
                   }
                   {
@@ -639,8 +639,8 @@ public class SlideoutMap2_PhotoImage extends AdvancedSlideout implements IAction
                       * Orientation: Square
                       */
                      _radioOrientation_Square = new Button(containerOrientation, SWT.RADIO);
-                     _radioOrientation_Square.setText("&Square");
-                     _radioOrientation_Square.setToolTipText("Set square crop size");
+                     _radioOrientation_Square.setText(Messages.Slideout_PhotoImage_Radio_OrientationSquare);
+                     _radioOrientation_Square.setToolTipText(Messages.Slideout_PhotoImage_Radio_OrientationSquare_Tooltip);
                      _radioOrientation_Square.addSelectionListener(cropListener);
                   }
                }

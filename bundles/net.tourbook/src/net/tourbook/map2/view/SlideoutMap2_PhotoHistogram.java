@@ -120,7 +120,7 @@ public class SlideoutMap2_PhotoHistogram extends AdvancedSlideout implements
 
          super(UI.RESET_LABEL, AS_PUSH_BUTTON);
 
-         setToolTipText("Reset value to its default");
+         setToolTipText(Messages.Slideout_PhotoHistogram_Action_Reset_Tooltip);
 
          _spinner = spinner;
       }
@@ -270,11 +270,11 @@ public class SlideoutMap2_PhotoHistogram extends AdvancedSlideout implements
       {
          {
             {
-               _label1 = UI.createLabel(container, "&1" + labelDistance);
+               _label1 = UI.createLabel(container, "&1" + labelDistance); //$NON-NLS-1$
             }
             {
                _spinner0 = new Spinner(container, SWT.BORDER);
-               _spinner0.setToolTipText("Adjust horizontal position for the left tonality");
+               _spinner0.setToolTipText(Messages.Slideout_PhotoHistogram_Spinner_LeftTonality_Tooltip);
                _spinner0.setMinimum(0);
                _spinner0.setMaximum(100);
                _spinner0.addMouseWheelListener(_defaultMouseWheelListener);
@@ -287,7 +287,7 @@ public class SlideoutMap2_PhotoHistogram extends AdvancedSlideout implements
          }
          {
             {
-               _label2 = UI.createLabel(container, "&2" + labelDistance);
+               _label2 = UI.createLabel(container, "&2" + labelDistance); //$NON-NLS-1$
                GridDataFactory.fillDefaults()
                      .grab(true, false)
                      .align(SWT.END, SWT.FILL)
@@ -295,7 +295,7 @@ public class SlideoutMap2_PhotoHistogram extends AdvancedSlideout implements
             }
             {
                _spinner50 = new Spinner(container, SWT.BORDER);
-               _spinner50.setToolTipText("Adjust horizontal position for the center tonality");
+               _spinner50.setToolTipText(Messages.Slideout_PhotoHistogram_Spinner_CenterTonality_Tooltip);
                _spinner50.setMinimum(0);
                _spinner50.setMaximum(100);
                _spinner50.addMouseWheelListener(_defaultMouseWheelListener);
@@ -308,7 +308,7 @@ public class SlideoutMap2_PhotoHistogram extends AdvancedSlideout implements
          }
          {
             {
-               _label3 = UI.createLabel(container, "&3" + labelDistance);
+               _label3 = UI.createLabel(container, "&3" + labelDistance); //$NON-NLS-1$
                GridDataFactory.fillDefaults()
                      .grab(true, false)
                      .align(SWT.END, SWT.FILL)
@@ -316,7 +316,7 @@ public class SlideoutMap2_PhotoHistogram extends AdvancedSlideout implements
             }
             {
                _spinner100 = new Spinner(container, SWT.BORDER);
-               _spinner100.setToolTipText("Adjust horizontal position for the right tonality");
+               _spinner100.setToolTipText(Messages.Slideout_PhotoHistogram_Spinner_RightTonality_Tooltip);
                _spinner100.setMinimum(0);
                _spinner100.setMaximum(100);
                _spinner100.addMouseWheelListener(_defaultMouseWheelListener);

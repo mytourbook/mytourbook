@@ -69,6 +69,9 @@ public class Messages extends NLS {
    public static String Map_Action_AutoSelectPhoto;
    public static String Map_Action_CenterMapToMapPointPosition;
    public static String Map_Action_CopyLocation;
+   public static String Map_Action_CopyTonality;
+   public static String Map_Action_CopyTonality_StatusLine;
+   public static String Map_Action_CopyTonality_Tooltip;
    public static String Map_Action_CreateTourMarkerFromMap;
    public static String Map_Action_DeselectPhoto;
    public static String Map_Action_DeselectPhoto_Tooltip;
@@ -96,9 +99,13 @@ public class Messages extends NLS {
    public static String Map_Action_GotoLocation;
    public static String Map_Action_LookupCommonLocation;
    public static String Map_Action_ManageMapProviders;
+   public static String Map_Action_PasteTonality;
+   public static String Map_Action_PasteTonality_Tooltip;
    public static String Map_Action_PhotoFilter2_Tooltip;
    public static String Map_Action_POI;
    public static String Map_Action_POI_Tooltip;
+   public static String Map_Action_ReplacePhotoGeoPosition;
+   public static String Map_Action_ReplacePhotoGeoPosition_Tooltip;
    public static String Map_Action_SearchTourByLocation;
    public static String Map_Action_SearchTourByLocation_Tooltip;
    public static String Map_Action_ShowAllFilteredPhotos_Tooltip;

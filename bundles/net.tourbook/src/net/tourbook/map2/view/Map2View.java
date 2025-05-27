@@ -854,9 +854,9 @@ public class Map2View extends ViewPart implements
 
       public ActionMapPoint_Photo_ReplaceGeoPosition() {
 
-         super("Replace photo geo position with its default", Action.AS_PUSH_BUTTON);
+         super(Messages.Map_Action_ReplacePhotoGeoPosition, Action.AS_PUSH_BUTTON);
 
-         setToolTipText("This photo was relocated with the mouse,\nrecompute the geo position to its default position");
+         setToolTipText(Messages.Map_Action_ReplacePhotoGeoPosition_Tooltip);
       }
 
       @Override
@@ -941,9 +941,9 @@ public class Map2View extends ViewPart implements
 
       public ActionMapPoint_Photo_Tonality_Copy() {
 
-         super("C&opy Tonality", Action.AS_PUSH_BUTTON);
+         super(Messages.Map_Action_CopyTonality, Action.AS_PUSH_BUTTON);
 
-         setToolTipText("Copy all tonality settings into the clipboard");
+         setToolTipText(Messages.Map_Action_CopyTonality_Tooltip);
          setImageDescriptor(CommonActivator.getThemedImageDescriptor(CommonImages.App_Copy));
       }
 
@@ -958,9 +958,9 @@ public class Map2View extends ViewPart implements
 
       public ActionMapPoint_Photo_Tonality_Paste() {
 
-         super("&Paste Tonality", Action.AS_PUSH_BUTTON);
+         super(Messages.Map_Action_PasteTonality, Action.AS_PUSH_BUTTON);
 
-         setToolTipText("Paste all tonality settings from the clipboard into the hovered/selected photo");
+         setToolTipText(Messages.Map_Action_PasteTonality_Tooltip);
          setImageDescriptor(CommonActivator.getThemedImageDescriptor(CommonImages.App_Paste));
       }
 
@@ -1924,7 +1924,7 @@ public class Map2View extends ViewPart implements
       }
       clipboard.dispose();
 
-      UI.showStatusLineMessage("Photo tonality were copied to the clipboard");
+      UI.showStatusLineMessage(Messages.Map_Action_CopyTonality_StatusLine);
    }
 
    private void actionPhoto_Tonality_Paste() {
