@@ -65,7 +65,7 @@ public class TourDataUpdate_057_to_058 implements ITourDataUpdate {
 
                + "SELECT tourId" + NL //                                                           //$NON-NLS-1$
                + " FROM " + TourDatabase.TABLE_TOUR_DATA + NL //                                   //$NON-NLS-1$
-               + " WHERE devicePluginId = '" + TourData.DEVICE_ID_FOR_PHOTO_TOUR + "'" + NL //     //$NON-NLS-1$
+               + " WHERE devicePluginId = '" + TourData.DEVICE_ID_FOR_PHOTO_TOUR + "'" + NL //     //$NON-NLS-1$ //$NON-NLS-2$
                + " ORDER BY TourStartTime" + NL //                                                 //$NON-NLS-1$
          ;
 
@@ -117,7 +117,7 @@ public class TourDataUpdate_057_to_058 implements ITourDataUpdate {
 
       if (numOriginalTimeSlices != 3) {
 
-         StatusUtil.log("Photo tour '%s' do not contain 3 time slices".formatted(TourManager.getTourTitle(tourData)), new Exception());
+         StatusUtil.log("Photo tour '%s' do not contain 3 time slices".formatted(TourManager.getTourTitle(tourData)), new Exception()); //$NON-NLS-1$
       }
 
       final List<TourPhoto> allSortedPhotos = new ArrayList<>(allTourPhotos);

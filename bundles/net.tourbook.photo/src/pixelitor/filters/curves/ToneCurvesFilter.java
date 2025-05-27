@@ -79,10 +79,10 @@ public class ToneCurvesFilter extends Filter /* extends FilterWithGUI */ {
 
       return UI.EMPTY_STRING
 
-            + "ToneCurvesFilter" + NL
+            + "ToneCurvesFilter" + NL //$NON-NLS-1$
 
-            + " _curvesFilter = " + _curvesFilter + NL
-            + " _toneCurves   = " + _toneCurves + NL
+            + " _curvesFilter = " + _curvesFilter + NL //$NON-NLS-1$
+            + " _toneCurves   = " + _toneCurves + NL //$NON-NLS-1$
 
       ;
    }
