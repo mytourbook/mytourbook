@@ -38,8 +38,8 @@ public class ActionInterpolatedValues_ReImport extends Action {
 
       _tourProvider = tourDataEditor;
 
-      setText(Messages.TourEditor_Action_InterpolatedValues_ReImport);
-      setToolTipText(Messages.TourEditor_Action_InterpolatedValues_ReImport_Tooltip);
+      setText(Messages.Tour_Action_InterpolatedValues_ReImport);
+      setToolTipText(Messages.Tour_Action_InterpolatedValues_ReImport_Tooltip);
    }
 
    @Override

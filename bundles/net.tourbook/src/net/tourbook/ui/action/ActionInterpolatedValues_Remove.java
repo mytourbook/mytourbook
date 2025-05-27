@@ -36,8 +36,8 @@ public class ActionInterpolatedValues_Remove extends Action {
 
       _tourProvider = tourDataEditor;
 
-      setText(Messages.TourEditor_Action_InterpolatedValues_Remove);
-      setToolTipText(Messages.TourEditor_Action_InterpolatedValues_Remove_Tooltip);
+      setText(Messages.Tour_Action_InterpolatedValues_Remove);
+      setToolTipText(Messages.Tour_Action_InterpolatedValues_Remove_Tooltip);
    }
 
    @Override
