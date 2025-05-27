@@ -30,6 +30,7 @@ import javax.persistence.ManyToOne;
 import javax.persistence.Transient;
 
 import net.tourbook.common.UI;
+import net.tourbook.common.time.TimeTools;
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.photo.Photo;
@@ -476,30 +477,34 @@ public class TourPhoto implements Serializable {
    @Override
    public String toString() {
 
+      final String formattedDateTime = TimeTools.Formatter_DateTime_SM.format(TimeTools.getZonedDateTime(adjustedTime));
+
       return UI.EMPTY_STRING
 
             + "TourPhoto" + NL //                                             //$NON-NLS-1$
 
-            + "[" + NL //                                                     //$NON-NLS-1$
 
-            + "   photoId                 =" + photoId + NL //                //$NON-NLS-1$
-            + "   imageFileName           =" + imageFileName + NL //          //$NON-NLS-1$
-            + "   imageFileExt            =" + imageFileExt + NL //           //$NON-NLS-1$
-            + "   imageFilePath           =" + imageFilePath + NL //          //$NON-NLS-1$
-            + "   imageFilePathName       =" + imageFilePathName + NL //      //$NON-NLS-1$
-            + "   imageExifTime           =" + imageExifTime + NL //          //$NON-NLS-1$
-            + "   imageFileLastModified   =" + imageFileLastModified + NL //  //$NON-NLS-1$
-            + "   adjustedTime            =" + adjustedTime + NL //           //$NON-NLS-1$
-            + "   isGeoFromPhoto          =" + isGeoFromPhoto + NL //         //$NON-NLS-1$
-            + "   ratingStars             =" + ratingStars + NL //            //$NON-NLS-1$
-            + "   latitude                =" + latitude + NL //               //$NON-NLS-1$
-            + "   longitude               =" + longitude + NL //              //$NON-NLS-1$
+            + " photoId                 = " + photoId + NL //                  //$NON-NLS-1$
+            + " mageFileName            = " + imageFileName + NL //             //$NON-NLS-1$
+//          + " imageFileExt            = " + imageFileExt + NL //             //$NON-NLS-1$
+//          + " imageFilePath           = " + imageFilePath + NL //            //$NON-NLS-1$
+//          + " imageFilePathName       = " + imageFilePathName + NL //        //$NON-NLS-1$
+//          + " imageExifTime           = " + imageExifTime + NL //            //$NON-NLS-1$
+//          + " imageFileLastModified   = " + imageFileLastModified + NL //    //$NON-NLS-1$
+//          + " adjustedTime            = " + adjustedTime + NL //             //$NON-NLS-1$
+            + " adjustedTime            = " + formattedDateTime + NL //        //$NON-NLS-1$
+            + " isGeoFromPhoto          = " + isGeoFromPhoto + NL //           //$NON-NLS-1$
+            + " ratingStars             = " + ratingStars + NL //              //$NON-NLS-1$
+            + " latitude                = " + latitude + NL //                 //$NON-NLS-1$
+            + " longitude               = " + longitude + NL //                //$NON-NLS-1$
 
-            + "   _createId               =" + _createId + NL //              //$NON-NLS-1$
+            + " _photoAdjustments       = " + _photoAdjustments + NL //        //$NON-NLS-1$
+            + " photoAdjustmentsJSON    = " + photoAdjustmentsJSON + NL //     //$NON-NLS-1$
 
-//          + "   tourData                =" + tourData + NL //               //$NON-NLS-1$
+//          + " _createId               =" + _createId + NL //                //$NON-NLS-1$
 
-            + "]" + NL //                                                     //$NON-NLS-1$
+//          + " tourData                =" + tourData + NL //                 //$NON-NLS-1$
+
       ;
    }
 

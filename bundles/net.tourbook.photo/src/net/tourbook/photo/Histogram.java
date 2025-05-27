@@ -56,7 +56,8 @@ public class Histogram extends Canvas implements PaintListener {
 
    public static final int                        NUM_BINS               = 256;
 
-   private Color                                  _adjustedColor         = new Color(0x0, 0xff, 0xff);
+   private Color                                  _adjustedColor         = new Color(0x0, 0xff, 0xff);               // yellow
+   private Color                                  _adjustedColorMinMax   = new Color(0xff, 0x0, 0x0);                // red
 
    private int                                    _maxLuminance_Default;
    private int                                    _maxLuminanceAdjusted;
@@ -77,6 +78,7 @@ public class Histogram extends Canvas implements PaintListener {
    private int                                    _graphWidth;
    private int                                    _graphHeight;
    private float                                  _xUnitWidth;
+   private Float                                  _relCropArea;
 
    private final ListenerList<IHistogramListener> _allHistogramListener  = new ListenerList<>(ListenerList.IDENTITY);
 
@@ -85,8 +87,6 @@ public class Histogram extends Canvas implements PaintListener {
     */
    private Cursor _currentCursor;
    private Cursor _cursor_Size_All;
-
-   private Float  _relCropArea;
 
    public Histogram(final Composite parent) {
 
@@ -486,12 +486,24 @@ public class Histogram extends Canvas implements PaintListener {
       int barWidth;
 
       final int darkGrey = 0x66;
-      gc.setBackground(new Color(darkGrey, darkGrey, darkGrey));
 
       int maxLuminance = _maxLuminance_Default == 0 ? 1 : _maxLuminance_Default;
 
-      for (final int luminance : _luminancesDefault) {
+      final int numBarsDefault = _luminancesDefault.length;
 
+      for (int barIndexDefault = 0; barIndexDefault < numBarsDefault; barIndexDefault++) {
+
+         if (barIndexDefault <= 1 || barIndexDefault >= numBarsDefault - 2) {
+
+            // draw with highlighting color
+            gc.setBackground(UI.SYS_COLOR_BLUE);
+
+         } else {
+
+            gc.setBackground(new Color(darkGrey, darkGrey, darkGrey));
+         }
+
+         final int luminance = _luminancesDefault[barIndexDefault];
          final int barHeight = _graphHeight * luminance / maxLuminance;
 
          final float diffX = devX1 - devX0;
@@ -506,18 +518,33 @@ public class Histogram extends Canvas implements PaintListener {
          devX1 += _xUnitWidth;
       }
 
+      /*
+       * Adjusted luminance
+       */
       if (_isSetTonality && _isEnabled) {
 
          gc.setAlpha(0x80);
-         gc.setBackground(_adjustedColor);
 
          devX0 = 0;
          devX1 = _xUnitWidth;
 
          maxLuminance = _maxLuminanceAdjusted == 0 ? 1 : _maxLuminanceAdjusted;
 
-         for (final int luminance : _luminancesAdjusted) {
+         final int numBars = _luminancesAdjusted.length;
 
+         for (int barIndex = 0; barIndex < numBars; barIndex++) {
+
+            if (barIndex <= 1 || barIndex >= numBars - 2) {
+
+               // draw with highlighting color
+               gc.setBackground(_adjustedColorMinMax);
+
+            } else {
+
+               gc.setBackground(_adjustedColor);
+            }
+
+            final int luminance = _luminancesAdjusted[barIndex];
             final int barHeight = _graphHeight * luminance / maxLuminance;
             final float diffX = devX1 - devX0;
             barWidth = (int) (diffX);

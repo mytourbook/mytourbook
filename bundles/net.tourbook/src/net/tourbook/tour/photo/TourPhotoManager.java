@@ -15,6 +15,8 @@
  *******************************************************************************/
 package net.tourbook.tour.photo;
 
+import com.jhlabs.image.CurveValues;
+
 import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -46,6 +48,7 @@ import net.tourbook.photo.Camera;
 import net.tourbook.photo.IPhotoServiceProvider;
 import net.tourbook.photo.ImagePathReplacement;
 import net.tourbook.photo.Photo;
+import net.tourbook.photo.PhotoAdjustments;
 import net.tourbook.photo.PhotoCache;
 import net.tourbook.photo.PhotoEventId;
 import net.tourbook.photo.PhotoImageMetadata;
@@ -366,6 +369,102 @@ public class TourPhotoManager implements IPhotoServiceProvider {
       }
 
       photoLink.tourCameras = sb.toString();
+   }
+
+   /**
+    * Update tour photo in the db and fire an modify event
+    *
+    * @param photo
+    */
+   public static void updatePhotoAdjustmentsInDB(final Photo photo) {
+
+      final String sql = UI.EMPTY_STRING
+
+            + "UPDATE " + TourDatabase.TABLE_TOUR_PHOTO + NL //$NON-NLS-1$
+
+            + " SET" + NL //                                   //$NON-NLS-1$
+
+            + " photoAdjustmentsJSON = ?  " + NL //            //$NON-NLS-1$
+
+            + " WHERE photoId = ?         " + NL //            //$NON-NLS-1$
+      ;
+
+      try (final Connection conn = TourDatabase.getInstance().getConnection();
+            final PreparedStatement sqlUpdate = conn.prepareStatement(sql)) {
+
+         final ArrayList<Photo> updatedPhotos = new ArrayList<>();
+
+         final Collection<TourPhotoReference> allPhotoRefs = photo.getTourPhotoReferences().values();
+
+         if (allPhotoRefs.size() > 0) {
+
+            for (final TourPhotoReference photoRef : allPhotoRefs) {
+
+               TourPhoto dbTourPhoto = null;
+
+               /*
+                * Update tour photo
+                */
+               final TourData tourData = TourManager.getInstance().getTourData(photoRef.tourId);
+
+               if (tourData == null) {
+                  continue;
+               }
+
+               final Set<TourPhoto> allTourPhotos = tourData.getTourPhotos();
+
+               for (final TourPhoto tourPhoto : allTourPhotos) {
+
+                  if (tourPhoto.getPhotoId() == photoRef.photoId) {
+
+                     dbTourPhoto = tourPhoto;
+
+                     /*
+                      * Set photo adjustments from the photo into the tour photo
+                      */
+                     final CurveValues curveValues = photo.getToneCurvesFilter().getCurves().getActiveCurve().curveValues;
+
+                     final PhotoAdjustments photoAdjustments = tourPhoto.getPhotoAdjustments(true);
+
+                     photoAdjustments.isSetTonality = photo.isSetTonality;
+
+                     photoAdjustments.curveValuesX = curveValues.allValuesX;
+                     photoAdjustments.curveValuesY = curveValues.allValuesY;
+
+                     break;
+                  }
+               }
+
+               /*
+                * Update db
+                */
+               if (dbTourPhoto != null) {
+
+                  // update json
+                  dbTourPhoto.updateAllPhotoAdjustments();
+
+                  final String photoAdjustmentsJSON = dbTourPhoto.getPhotoAdjustmentsJSON();
+
+                  sqlUpdate.setString(1, photoAdjustmentsJSON);
+                  sqlUpdate.setLong(2, photoRef.photoId);
+
+                  sqlUpdate.executeUpdate();
+               }
+            }
+
+            updatedPhotos.add(photo);
+         }
+
+         if (updatedPhotos.size() > 0) {
+
+            // fire notification to update all galleries with the modified crop size
+
+            PhotoManager.firePhotoEvent(null, PhotoEventId.PHOTO_ATTRIBUTES_ARE_MODIFIED, updatedPhotos);
+         }
+
+      } catch (final SQLException e) {
+         net.tourbook.ui.UI.showSQLException(e);
+      }
    }
 
    @Override

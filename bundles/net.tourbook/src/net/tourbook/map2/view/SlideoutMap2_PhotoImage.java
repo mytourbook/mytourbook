@@ -256,6 +256,7 @@ public class SlideoutMap2_PhotoImage extends AdvancedSlideout implements IAction
    private Cursor           _photoCursor_Size_NS;
    private Cursor           _photoCursor_Size_WE;
 
+   private Link             _link10;
    private Link             _link20;
    private Link             _link40;
    private Link             _link60;
@@ -552,12 +553,21 @@ public class SlideoutMap2_PhotoImage extends AdvancedSlideout implements IAction
          {
             final Composite containerSizes = new Composite(container, SWT.NONE);
             GridDataFactory.fillDefaults().grab(true, false).indent(16, 0).applyTo(containerSizes);
-            GridLayoutFactory.fillDefaults().numColumns(6).applyTo(containerSizes);
+            GridLayoutFactory.fillDefaults().numColumns(7).applyTo(containerSizes);
 //            containerSizes.setBackground(UI.SYS_COLOR_CYAN);
             {
                {
                   /*
                    * Crop size: 10%
+                   */
+                  _link10 = new Link(containerSizes, SWT.NONE);
+                  _link10.setText(UI.createLinkText("10 %"));
+                  _link10.setToolTipText(cropToolTipText.formatted(10));
+                  _link10.addSelectionListener(SelectionListener.widgetSelectedAdapter(selectionEvent -> onSelect_CropSize(10)));
+               }
+               {
+                  /*
+                   * Crop size: 20%
                    */
                   _link20 = new Link(containerSizes, SWT.NONE);
                   _link20.setText(UI.createLinkText("20 %"));
@@ -670,6 +680,7 @@ public class SlideoutMap2_PhotoImage extends AdvancedSlideout implements IAction
 
       final boolean isCropped = _chkCropPhoto.getSelection();
 
+      _link10.setEnabled(isCropped);
       _link20.setEnabled(isCropped);
       _link40.setEnabled(isCropped);
       _link60.setEnabled(isCropped);
@@ -2210,6 +2221,8 @@ public class SlideoutMap2_PhotoImage extends AdvancedSlideout implements IAction
 
          _pageBook.showPage(_pagePhoto);
       }
+
+      enableControls();
    }
 
    private void setupPhotoCanvasListener() {

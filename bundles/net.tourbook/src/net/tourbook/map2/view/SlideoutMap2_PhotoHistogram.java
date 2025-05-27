@@ -23,13 +23,7 @@ import de.byteholder.geoclipse.map.PaintedMapPoint;
 import java.awt.geom.Rectangle2D;
 import java.awt.geom.Rectangle2D.Float;
 import java.awt.image.BufferedImage;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
 import java.time.ZonedDateTime;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Set;
 
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
@@ -37,22 +31,15 @@ import net.tourbook.common.UI;
 import net.tourbook.common.action.IActionResetToDefault;
 import net.tourbook.common.time.TimeTools;
 import net.tourbook.common.tooltip.AdvancedSlideout;
-import net.tourbook.data.TourData;
-import net.tourbook.data.TourPhoto;
-import net.tourbook.database.TourDatabase;
 import net.tourbook.photo.Histogram;
 import net.tourbook.photo.IHistogramListener;
 import net.tourbook.photo.IPhotoPreferences;
 import net.tourbook.photo.ImageQuality;
 import net.tourbook.photo.Photo;
-import net.tourbook.photo.PhotoAdjustments;
-import net.tourbook.photo.PhotoEventId;
 import net.tourbook.photo.PhotoImageCache;
 import net.tourbook.photo.PhotoLoadManager;
 import net.tourbook.photo.PhotoLoadingState;
-import net.tourbook.photo.PhotoManager;
-import net.tourbook.photo.TourPhotoReference;
-import net.tourbook.tour.TourManager;
+import net.tourbook.tour.photo.TourPhotoManager;
 
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.dialogs.IDialogSettings;
@@ -83,8 +70,6 @@ public class SlideoutMap2_PhotoHistogram extends AdvancedSlideout implements
       IHistogramListener {
 
    private static final String          ID     = "net.tourbook.map2.view.SlideoutMap2_PhotoHistogram"; //$NON-NLS-1$
-
-   private static final char            NL     = UI.NEW_LINE;
 
    private final static IDialogSettings _state = TourbookPlugin.getState(ID);
 
@@ -912,106 +897,9 @@ public class SlideoutMap2_PhotoHistogram extends AdvancedSlideout implements
       // set flag that the map photo is recomputed
       _photo.isAdjustmentModified = true;
 
-      updateTourPhotoInDB(_photo);
+      TourPhotoManager.updatePhotoAdjustmentsInDB(_photo);
 
       _histogram.redraw();
-   }
-
-   /**
-    * Update tour photo in the db and fire an modify event
-    *
-    * @param photo
-    */
-   private void updateTourPhotoInDB(final Photo photo) {
-
-      final String sql = UI.EMPTY_STRING
-
-            + "UPDATE " + TourDatabase.TABLE_TOUR_PHOTO + NL //$NON-NLS-1$
-
-            + " SET" + NL //                                   //$NON-NLS-1$
-
-            + " photoAdjustmentsJSON = ?  " + NL //            //$NON-NLS-1$
-
-            + " WHERE photoId = ?         " + NL //            //$NON-NLS-1$
-      ;
-
-      try (final Connection conn = TourDatabase.getInstance().getConnection();
-            final PreparedStatement sqlUpdate = conn.prepareStatement(sql)) {
-
-         final ArrayList<Photo> updatedPhotos = new ArrayList<>();
-
-         final Collection<TourPhotoReference> photoRefs = photo.getTourPhotoReferences().values();
-
-         if (photoRefs.size() > 0) {
-
-            for (final TourPhotoReference photoRef : photoRefs) {
-
-               TourPhoto dbTourPhoto = null;
-
-               /*
-                * Update tour photo
-                */
-               final TourData tourData = TourManager.getInstance().getTourData(photoRef.tourId);
-
-               if (tourData == null) {
-                  continue;
-               }
-
-               final Set<TourPhoto> allTourPhotos = tourData.getTourPhotos();
-
-               for (final TourPhoto tourPhoto : allTourPhotos) {
-
-                  if (tourPhoto.getPhotoId() == photoRef.photoId) {
-
-                     dbTourPhoto = tourPhoto;
-
-                     /*
-                      * Set photo adjustments from the photo into the tour photo
-                      */
-
-                     final CurveValues curveValues = photo.getToneCurvesFilter().getCurves().getActiveCurve().curveValues;
-
-                     final PhotoAdjustments photoAdjustments = tourPhoto.getPhotoAdjustments(true);
-
-                     photoAdjustments.isSetTonality = photo.isSetTonality;
-
-                     photoAdjustments.curveValuesX = curveValues.allValuesX;
-                     photoAdjustments.curveValuesY = curveValues.allValuesY;
-
-                     break;
-                  }
-               }
-
-               /*
-                * Update db
-                */
-               if (dbTourPhoto != null) {
-
-                  // update json
-                  dbTourPhoto.updateAllPhotoAdjustments();
-
-                  final String photoAdjustmentsJSON = dbTourPhoto.getPhotoAdjustmentsJSON();
-
-                  sqlUpdate.setString(1, photoAdjustmentsJSON);
-                  sqlUpdate.setLong(2, photoRef.photoId);
-
-                  sqlUpdate.executeUpdate();
-               }
-            }
-
-            updatedPhotos.add(photo);
-         }
-
-         if (updatedPhotos.size() > 0) {
-
-            // fire notification to update all galleries with the modified crop size
-
-            PhotoManager.firePhotoEvent(null, PhotoEventId.PHOTO_ATTRIBUTES_ARE_MODIFIED, updatedPhotos);
-         }
-
-      } catch (final SQLException e) {
-         net.tourbook.ui.UI.showSQLException(e);
-      }
    }
 
    private void updateUI_HorizontalTonality() {

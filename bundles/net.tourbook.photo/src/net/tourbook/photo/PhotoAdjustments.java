@@ -17,34 +17,59 @@ package net.tourbook.photo;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
+import java.util.Arrays;
+
+import net.tourbook.common.UI;
+
 /**
  * Adjustments for a photo, e.g. cropping, tonality...
  */
-// ignore fields which are not defined, this is helpful when field names are changed to prevent exceptions
-@JsonIgnoreProperties(ignoreUnknown = true)
+@JsonIgnoreProperties(ignoreUnknown = true) // ignore fields which are not defined, this is helpful when field names are changed to prevent exceptions
 public class PhotoAdjustments {
 
-   public boolean isPhotoCropped;
+   private static final char NL = UI.NEW_LINE;
+
+   public boolean            isPhotoCropped;
 
    /**
     * Relative position 0...1 of the crop area top left x position
     */
-   public float   cropAreaX1;
-   public float   cropAreaY1;
+   public float              cropAreaX1;
+   public float              cropAreaY1;
 
-   public float   cropAreaX2;
-   public float   cropAreaY2;
+   public float              cropAreaX2;
+   public float              cropAreaY2;
 
-   public boolean isSetTonality;
+   public boolean            isSetTonality;
 
    /**
     * X values 0...1
     */
-   public float   curveValuesX[];
+   public float              curveValuesX[];
 
    /**
     * Y values 0...1
     */
-   public float   curveValuesY[];
+   public float              curveValuesY[];
+
+   @Override
+   public String toString() {
+
+      return UI.EMPTY_STRING
+
+            + "PhotoAdjustments" + NL //                                                                       //$NON-NLS-1$
+
+//            + " isPhotoCropped   = " + isPhotoCropped + NL //                                                  //$NON-NLS-1$
+//            + " cropAreaX1       = " + cropAreaX1 + NL //                                                      //$NON-NLS-1$
+//            + " cropAreaY1       = " + cropAreaY1 + NL //                                                      //$NON-NLS-1$
+//            + " cropAreaX2       = " + cropAreaX2 + NL //                                                      //$NON-NLS-1$
+//            + " cropAreaY2       = " + cropAreaY2 + NL //                                                      //$NON-NLS-1$
+
+            + " isSetTonality    = " + isSetTonality + NL //                                                   //$NON-NLS-1$
+            + " curveValuesX     = " + (curveValuesX != null ? Arrays.toString(curveValuesX) : null) + NL //   //$NON-NLS-1$
+            + " curveValuesY     = " + (curveValuesY != null ? Arrays.toString(curveValuesY) : null) + NL //   //$NON-NLS-1$
+
+      ;
+   }
 
 }

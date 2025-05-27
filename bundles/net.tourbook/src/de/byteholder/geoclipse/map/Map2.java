@@ -4698,9 +4698,8 @@ public class Map2 extends Canvas {
                   selectPhoto(photo, _hoveredMapPoint);
                }
 
-               if (_isHoveredMapPointSymbol 
-                     
-                     
+               if (_isHoveredMapPointSymbol
+
                      // it is not yet supported to move photos when it is not a photo tour
                      && isPhotoTour(photo)) {
 

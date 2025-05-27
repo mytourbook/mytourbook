@@ -65,7 +65,10 @@ New / Improvements
   - Replace photo geo position with its default position
   - Crop photo with fixed sizes
     https://github.com/mytourbook/mytourbook/issues/1494
-  - Adjust tonality with slider controls
+  - Set tonality
+    - Adjust with slider controls
+    - Copy and paste from one photo to another
+  - Draw under- and overexposed values with a different color in the histogram
 	
 * Tour Editor
   - Remove photo geo position  

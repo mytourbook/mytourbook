@@ -15,6 +15,8 @@
  *******************************************************************************/
 package net.tourbook.map2.view;
 
+import com.jhlabs.image.CurveValues;
+
 import de.byteholder.geoclipse.map.ActionManageOfflineImages;
 import de.byteholder.geoclipse.map.CenterMapBy;
 import de.byteholder.geoclipse.map.IMapContextMenuProvider;
@@ -30,6 +32,11 @@ import de.byteholder.geoclipse.mapprovider.MapProviderManager;
 import de.byteholder.gpx.PointOfInterest;
 
 import java.awt.Point;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -131,6 +138,7 @@ import net.tourbook.photo.IPhotoEventListener;
 import net.tourbook.photo.IPhotoPreferences;
 import net.tourbook.photo.Photo;
 import net.tourbook.photo.PhotoActivator;
+import net.tourbook.photo.PhotoAdjustments;
 import net.tourbook.photo.PhotoEventId;
 import net.tourbook.photo.PhotoManager;
 import net.tourbook.photo.PhotoRatingStarOperator;
@@ -194,6 +202,10 @@ import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.window.Window;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.dnd.ByteArrayTransfer;
+import org.eclipse.swt.dnd.Clipboard;
+import org.eclipse.swt.dnd.Transfer;
+import org.eclipse.swt.dnd.TransferData;
 import org.eclipse.swt.events.ControlEvent;
 import org.eclipse.swt.events.ControlListener;
 import org.eclipse.swt.events.SelectionEvent;
@@ -427,6 +439,10 @@ public class Map2View extends ViewPart implements
    private int                               _photoFilter_RatingStars;
    private Enum<PhotoRatingStarOperator>     _photoFilter_RatingStar_Operator;
    //
+   private SlideoutMap2_PhotoOptions         _slideoutPhotoOptions;
+   private PhotoAdjustments                  _copyPaste_PhotoAdjustments;
+   private CopyPasteTonalityTransfer         _copyPaste_Transfer         = new CopyPasteTonalityTransfer();
+   //
    private boolean                           _isInSelectBookmark;
    private boolean                           _isShowLegend;
    private boolean                           _isShowMapPoints;
@@ -535,6 +551,8 @@ public class Map2View extends ViewPart implements
    private ActionMapPoint_Photo_ShowLabel          _actionMapPoint_Photo_ShowLabel;
    private ActionMapPoint_Photo_ShowRating         _actionMapPoint_Photo_ShowRating;
    private ActionMapPoint_Photo_ShowTooltip        _actionMapPoint_Photo_ShowTooltip;
+   private ActionMapPoint_Photo_Tonality_Copy      _actionMapPoint_Photo_Tonality_Copy;
+   private ActionMapPoint_Photo_Tonality_Paste     _actionMapPoint_Photo_Tonality_Paste;
    private ActionMapPoint_ShowOnlyThisTour         _actionMapPoint_ShowOnlyThisTour;
    private ActionMapPoint_ZoomIn                   _actionMapPoint_ZoomIn;
    private ActionReloadFailedMapImages             _actionReloadFailedMapImages;
@@ -585,8 +603,6 @@ public class Map2View extends ViewPart implements
    private AtomicInteger                           _geoFilter_RunningId  = new AtomicInteger();
    //
    private PaintedMapPoint                         _contextMenu_HoveredMapPoint;
-   //
-   private SlideoutMap2_PhotoOptions               _slideoutPhotoOptions;
    //
    /*
     * UI controls
@@ -921,6 +937,40 @@ public class Map2View extends ViewPart implements
       }
    }
 
+   private class ActionMapPoint_Photo_Tonality_Copy extends Action {
+
+      public ActionMapPoint_Photo_Tonality_Copy() {
+
+         super("C&opy Tonality", Action.AS_PUSH_BUTTON);
+
+         setToolTipText("Copy all tonality settings into the clipboard");
+         setImageDescriptor(CommonActivator.getThemedImageDescriptor(CommonImages.App_Copy));
+      }
+
+      @Override
+      public void run() {
+
+         actionPhoto_Tonality_Copy();
+      }
+   }
+
+   private class ActionMapPoint_Photo_Tonality_Paste extends Action {
+
+      public ActionMapPoint_Photo_Tonality_Paste() {
+
+         super("&Paste Tonality", Action.AS_PUSH_BUTTON);
+
+         setToolTipText("Paste all tonality settings from the clipboard into the hovered/selected photo");
+         setImageDescriptor(CommonActivator.getThemedImageDescriptor(CommonImages.App_Paste));
+      }
+
+      @Override
+      public void run() {
+
+         actionPhoto_Tonality_Paste();
+      }
+   }
+
    private class ActionMapPoint_ShowOnlyThisTour extends Action {
 
       public ActionMapPoint_ShowOnlyThisTour() {
@@ -1107,6 +1157,98 @@ public class Map2View extends ViewPart implements
       @Override
       public void run() {
          action_SyncWith_TourLocation();
+      }
+   }
+
+   private class CopyPasteCurveValues {
+
+      float[] allCurveValuesX;
+      float[] allCurveValuesY;
+   }
+
+   private class CopyPasteTonalityTransfer extends ByteArrayTransfer {
+
+      private static final String TYPE_NAME = "net.tourbook.map2.view.Map2View.CopyPasteTonalityTransfer"; //$NON-NLS-1$
+      private final int           TYPE_ID   = registerType(TYPE_NAME);
+
+      private CopyPasteTonalityTransfer() {}
+
+      @Override
+      protected int[] getTypeIds() {
+         return new int[] { TYPE_ID };
+      }
+
+      @Override
+      protected String[] getTypeNames() {
+         return new String[] { TYPE_NAME };
+      }
+
+      @Override
+      protected void javaToNative(final Object data, final TransferData transferData) {
+
+         try (final ByteArrayOutputStream out = new ByteArrayOutputStream();
+               final DataOutputStream dataOut = new DataOutputStream(out)) {
+
+            if (_copyPaste_PhotoAdjustments != null) {
+
+               final float[] allCurveValuesX = _copyPaste_PhotoAdjustments.curveValuesX;
+               final float[] allCurveValuesY = _copyPaste_PhotoAdjustments.curveValuesY;
+
+               // write number of values
+               dataOut.writeInt(allCurveValuesX.length);
+
+               // write all values
+               for (int valueIndex = 0; valueIndex < allCurveValuesX.length; valueIndex++) {
+
+                  dataOut.writeFloat(allCurveValuesX[valueIndex]);
+                  dataOut.writeFloat(allCurveValuesY[valueIndex]);
+               }
+            }
+
+            super.javaToNative(out.toByteArray(), transferData);
+
+         } catch (final IOException e) {
+
+            StatusUtil.log(e);
+         }
+      }
+
+      @Override
+      protected Object nativeToJava(final TransferData transferData) {
+
+         final byte[] bytes = (byte[]) super.nativeToJava(transferData);
+
+         try (final ByteArrayInputStream in = new ByteArrayInputStream(bytes);
+               final DataInputStream dataIn = new DataInputStream(in)) {
+
+            // read number of values
+            final int numValues = dataIn.readInt();
+
+            final float[] allCurveValuesX = new float[numValues];
+            final float[] allCurveValuesY = new float[numValues];
+
+            for (int valueIndex = 0; valueIndex < numValues; valueIndex++) {
+
+               allCurveValuesX[valueIndex] = dataIn.readFloat();
+               allCurveValuesY[valueIndex] = dataIn.readFloat();
+            }
+
+            /*
+             * Return clipboard values
+             */
+            final CopyPasteCurveValues copyPasteCurveValues = new CopyPasteCurveValues();
+
+            copyPasteCurveValues.allCurveValuesX = allCurveValuesX;
+            copyPasteCurveValues.allCurveValuesY = allCurveValuesY;
+
+            return copyPasteCurveValues;
+
+         } catch (final IOException e) {
+
+            StatusUtil.log(e);
+         }
+
+         return null;
       }
    }
 
@@ -1754,6 +1896,66 @@ public class Map2View extends ViewPart implements
          // hide photo tooltip
 
          _map.photoTooltip_Close();
+      }
+   }
+
+   private void actionPhoto_Tonality_Copy() {
+
+      final TourPhoto tourPhoto = getHoveredTourPhoto();
+
+      if (tourPhoto == null) {
+         return;
+      }
+
+      final PhotoAdjustments photoAdjustments = tourPhoto.getPhotoAdjustments(false);
+
+      if (photoAdjustments.isSetTonality == false) {
+         return;
+      }
+
+      _copyPaste_PhotoAdjustments = photoAdjustments;
+
+      final Clipboard clipboard = new Clipboard(_map.getDisplay());
+      {
+         clipboard.setContents(
+
+               new Object[] { new Object() },
+               new Transfer[] { _copyPaste_Transfer });
+      }
+      clipboard.dispose();
+
+      UI.showStatusLineMessage("Photo tonality were copied to the clipboard");
+   }
+
+   private void actionPhoto_Tonality_Paste() {
+
+      Object contents;
+
+      final Clipboard clipboard = new Clipboard(_map.getDisplay());
+      {
+         contents = clipboard.getContents(_copyPaste_Transfer);
+      }
+      clipboard.dispose();
+
+      if (contents instanceof final CopyPasteCurveValues copyPasteValues) {
+
+         final Photo photo = _contextMenu_HoveredMapPoint.mapPoint.photo;
+         photo.isSetTonality = true;
+
+         // set flag that the map photo is recomputed
+         photo.isAdjustmentModified = true;
+
+         final int numValues = copyPasteValues.allCurveValuesX.length;
+
+         final CurveValues photoCurveValues = photo.getToneCurvesFilter().getCurves().getActiveCurve().curveValues;
+
+         photoCurveValues.allValuesX = Arrays.copyOf(copyPasteValues.allCurveValuesX, numValues);
+         photoCurveValues.allValuesY = Arrays.copyOf(copyPasteValues.allCurveValuesY, numValues);
+
+         TourPhotoManager.updatePhotoAdjustmentsInDB(photo);
+
+         // select photo
+         _map.selectPhoto(photo, _contextMenu_HoveredMapPoint);
       }
    }
 
@@ -2551,6 +2753,8 @@ public class Map2View extends ViewPart implements
       _actionMapPoint_Photo_ShowLabel           = new ActionMapPoint_Photo_ShowLabel();
       _actionMapPoint_Photo_ShowRating          = new ActionMapPoint_Photo_ShowRating();
       _actionMapPoint_Photo_ShowTooltip         = new ActionMapPoint_Photo_ShowTooltip();
+      _actionMapPoint_Photo_Tonality_Copy       = new ActionMapPoint_Photo_Tonality_Copy();
+      _actionMapPoint_Photo_Tonality_Paste      = new ActionMapPoint_Photo_Tonality_Paste();
       _actionMapPoint_ShowOnlyThisTour          = new ActionMapPoint_ShowOnlyThisTour();
       _actionMapPoint_ZoomIn                    = new ActionMapPoint_ZoomIn();
       _actionReloadFailedMapImages              = new ActionReloadFailedMapImages(this);
@@ -3008,6 +3212,7 @@ public class Map2View extends ViewPart implements
 
       boolean isGeoPositionSet = false;
       boolean isPhotoTour = false;
+      final boolean isPhotoAdjustTonality = hoveredPhoto.isSetTonality;
 
       final List<TourPhoto> allTourPhotos = TourPhotoManager.getTourPhotos(hoveredPhoto);
 
@@ -3029,18 +3234,40 @@ public class Map2View extends ViewPart implements
          }
       }
 
+      boolean canPasteTonality = false;
+
+      final Clipboard clipboard = new Clipboard(_map.getDisplay());
+      {
+         final String[] allTypeNames = clipboard.getAvailableTypeNames();
+
+         for (final String typeName : allTypeNames) {
+
+            if (typeName.equals(CopyPasteTonalityTransfer.TYPE_NAME)) {
+
+               canPasteTonality = true;
+
+               break;
+            }
+         }
+      }
+      clipboard.dispose();
+
 // SET_FORMATTING_OFF
 
 
       final int      numTours          = _allTourData.size();
 
       final boolean  isMultipleTours   = numTours > 1;
+      final boolean  isOneTour         = numTours == 1;
       final boolean  isTourMarker      = pointType.equals(MapPointType.TOUR_MARKER);
       final boolean  isTourAvailable   = isTourMarker || pointType.equals(MapPointType.TOUR_PAUSE);
 
       _actionMapPoint_EditTourMarker            .setEnabled(isTourMarker);
       _actionMapPoint_ShowOnlyThisTour          .setEnabled(isMultipleTours && isTourAvailable);
       _actionMapPoint_Photo_ReplaceGeoPosition  .setEnabled(isGeoPositionSet);
+
+      _actionMapPoint_Photo_Tonality_Copy       .setEnabled(isOneTour && isPhotoAdjustTonality);
+      _actionMapPoint_Photo_Tonality_Paste      .setEnabled(canPasteTonality);
 
       // currently it is not supported to remove photos from a photo tour
       _actionMapPoint_Photo_RemoveFromTour      .setEnabled(isPhotoTour == false);
@@ -3164,6 +3391,8 @@ public class Map2View extends ViewPart implements
             menuMgr.add(_actionMapPoint_Photo_ShowLabel);
             menuMgr.add(_actionMapPoint_Photo_EditLabel);
             menuMgr.add(_actionSubMenu_SetTourMarkerType);
+            menuMgr.add(_actionMapPoint_Photo_Tonality_Copy);
+            menuMgr.add(_actionMapPoint_Photo_Tonality_Paste);
             menuMgr.add(_actionMapPoint_Photo_ReplaceGeoPosition);
             menuMgr.add(_actionMapPoint_Photo_RemoveFromTour);
 
@@ -3503,6 +3732,29 @@ public class Map2View extends ViewPart implements
    public Long getHoveredTourId() {
 
       return _map.getHoveredTourId();
+   }
+
+   private TourPhoto getHoveredTourPhoto() {
+
+      if (_contextMenu_HoveredMapPoint == null) {
+         return null;
+      }
+
+      final Map2Point mapPoint = _contextMenu_HoveredMapPoint.mapPoint;
+
+      if (mapPoint == null) {
+         return null;
+      }
+
+      final Photo photo = mapPoint.photo;
+
+      final List<TourPhoto> allTourPhotos = TourPhotoManager.getTourPhotos(photo);
+
+      if (allTourPhotos.size() == 0) {
+         return null;
+      }
+
+      return allTourPhotos.get(0);
    }
 
    public Map2 getMap() {
