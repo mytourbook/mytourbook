@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2024 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2025 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -1235,11 +1235,7 @@ public class TourBookView extends ViewPart implements
 
             tree.setRedraw(false);
             {
-               _isInSelection = true;
-               {
-                  _tourViewer_Tree.setSelection(treeSelection, true);
-               }
-               _isInSelection = false;
+               _tourViewer_Tree.setSelection(treeSelection, true);
             }
             tree.setRedraw(true);
          });
@@ -1254,7 +1250,8 @@ public class TourBookView extends ViewPart implements
     *
     * @return
     */
-   private TreeViewerItem actionGotoToday_GetLastChild(final TreeViewerItem parentItem, final List<TreeViewerItem> allLastChildren) {
+   private TreeViewerItem actionGotoToday_GetLastChild(final TreeViewerItem parentItem,
+                                                       final List<TreeViewerItem> allLastChildren) {
 
       final List<TreeViewerItem> allChildren = parentItem.getFetchedChildren();
 
