@@ -4,9 +4,6 @@
 TODO's
 ======
 
-* [Tour Location] Automatically create tour locations for longer pauses in a tour 
-   https://github.com/mytourbook/mytourbook/issues/1306 
- 
 * Support column width = 0
   This is now (17.3.2024) set but needs more testing
 
@@ -37,62 +34,13 @@ Experimental
 New / Improvements
 ==================
 
-* Fit Import
-  - Import distance values for swimming and display
-    - Speed in the tour chart
-    - Distance values in different locations  
-    https://github.com/mytourbook/mytourbook/issues/1485
-    
-* Tour Filter
-  - Duplicate filter property, this makes it easier to create a similar filter    
-    https://github.com/mytourbook/mytourbook/issues/1487
-
-    
-* Tour Info Tooltip (Frederic)
-  - New fields: elapsed time at night and during the day for tours that also happen during the night
-
-
-* Tour Chart
-  - Visualize positioned photos with a different map point color
-
-* Photos + Tours
-  - Create a photo tour which creates geo positions for each photo
-    https://github.com/mytourbook/mytourbook/issues/1488
-
-* 2D Map Photos
-  - Set photo geo position with an action
-  - Relocate a photo geo position with the mouse
-  - Replace photo geo position with its default position
-  - Crop photo with fixed sizes
-    https://github.com/mytourbook/mytourbook/issues/1494
-  - Set tonality
-    - Adjust with slider controls
-    - Copy and paste from one photo to another
-  - Draw under- and overexposed values with a different color in the histogram
-	
-* Tour Editor
-  - Remove photo geo position  
-  - Edit power values in 
-    - Time slice viewer
-    - Time slice replace/offset dialog
-      https://github.com/mytourbook/mytourbook/issues/1492
-
-* Tour Nutrition (Frederic)
-  - Support for the carbohydrates
-  - New button to update the nutrition facts of (a) product(s)
-  - Edit an existing custom nutrition product
-  - Add duplicated products when they are contained in a beverage container
-  
-
+* 
 
 
 Changes
 =======
 
-* 2D Map
-  - Replaced actions to set tour start/end positions https://github.com/mytourbook/mytourbook/issues/1457 with https://github.com/mytourbook/mytourbook/issues/1488 which creates geo positions for each photo
-  - For any photo tour: Created a time slice for each photo which are positioned slightly different
-  
+* 
 
 
 Changes that require Tour Re-import
