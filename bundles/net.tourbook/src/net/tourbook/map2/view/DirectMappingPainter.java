@@ -22,6 +22,9 @@ import de.byteholder.geoclipse.map.MapLegend;
 import de.byteholder.geoclipse.map.PaintedMapPoint;
 import de.byteholder.geoclipse.mapprovider.MP;
 
+import java.util.List;
+import java.util.Set;
+
 import net.tourbook.Images;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.UI;
@@ -29,11 +32,13 @@ import net.tourbook.common.color.ColorProviderConfig;
 import net.tourbook.common.map.GeoPosition;
 import net.tourbook.common.util.NoAutoScalingImageDataProvider;
 import net.tourbook.data.TourData;
+import net.tourbook.data.TourPhoto;
 import net.tourbook.map2.Messages;
 import net.tourbook.photo.IPhotoPreferences;
 import net.tourbook.photo.Photo;
 import net.tourbook.photo.PhotoUI;
 import net.tourbook.photo.RatingStars;
+import net.tourbook.tour.photo.TourPhotoManager;
 
 import org.eclipse.jface.resource.ColorRegistry;
 import org.eclipse.jface.resource.ImageDescriptor;
@@ -327,6 +332,24 @@ public class DirectMappingPainter implements IDirectPainter {
                (int) (symbolSize / deviceScaling));
 
          if (mapPointType.equals(MapPointType.TOUR_PHOTO)) {
+
+            final Photo photo = mapPoint.photo;
+            final List<TourPhoto> allTourPhotos = TourPhotoManager.getTourPhotos(photo);
+
+            // set different color for positioned photos
+            if (allTourPhotos.size() > 0) {
+
+               final TourPhoto tourPhoto = allTourPhotos.get(0);
+               final TourData tourData = tourPhoto.getTourData();
+               final Set<Long> tourPhotosWithPositionedGeo = tourData.getTourPhotosWithPositionedGeo();
+               final boolean isPositionedPhoto = tourPhotosWithPositionedGeo.contains(tourPhoto.getPhotoId());
+
+               if (isPositionedPhoto) {
+
+                  gc.setForeground(UI.SYS_COLOR_YELLOW);
+                  gc.setBackground(UI.SYS_COLOR_RED);
+               }
+            }
 
             gc.fillOval(
                   symbolRectangle.x + 1, // fill a larger shape to hide the antialiasing which looks like a light border !!!
