@@ -3206,30 +3206,35 @@ public class Map2View extends ViewPart implements
 
    private void enableActions_MapPoint(final PaintedMapPoint hoveredMapPoint) {
 
+      boolean isGeoPositionSet = false;
+      boolean isPhotoTour = false;
+      boolean isPhotoAdjustTonality = false;
+
       final Map2Point mapPoint = hoveredMapPoint.mapPoint;
       final MapPointType pointType = mapPoint.pointType;
       final Photo hoveredPhoto = mapPoint.photo;
 
-      boolean isGeoPositionSet = false;
-      boolean isPhotoTour = false;
-      final boolean isPhotoAdjustTonality = hoveredPhoto.isSetTonality;
+      if (hoveredPhoto != null) {
 
-      final List<TourPhoto> allTourPhotos = TourPhotoManager.getTourPhotos(hoveredPhoto);
+         isPhotoAdjustTonality = hoveredPhoto.isSetTonality;
 
-      if (allTourPhotos.size() > 0) {
+         final List<TourPhoto> allTourPhotos = TourPhotoManager.getTourPhotos(hoveredPhoto);
 
-         final TourPhoto tourPhoto = allTourPhotos.get(0);
-         if (tourPhoto != null) {
+         if (allTourPhotos.size() > 0) {
 
-            final TourData tourData = tourPhoto.getTourData();
+            final TourPhoto tourPhoto = allTourPhotos.get(0);
+            if (tourPhoto != null) {
 
-            isPhotoTour = tourData.isPhotoTour();
+               final TourData tourData = tourPhoto.getTourData();
 
-            if (isPhotoTour) {
+               isPhotoTour = tourData.isPhotoTour();
 
-               final Set<Long> allTourPhotosWithGeoPosition = tourData.getTourPhotosWithPositionedGeo();
+               if (isPhotoTour) {
 
-               isGeoPositionSet = allTourPhotosWithGeoPosition.contains(tourPhoto.getPhotoId());
+                  final Set<Long> allTourPhotosWithGeoPosition = tourData.getTourPhotosWithPositionedGeo();
+
+                  isGeoPositionSet = allTourPhotosWithGeoPosition.contains(tourPhoto.getPhotoId());
+               }
             }
          }
       }
