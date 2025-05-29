@@ -2,7 +2,7 @@
 <feature
       id="feature.net.tourbook.app"
       label="MyTourbook Application"
-      version="25.4.0.qualifier"
+      version="25.6.0.qualifier"
       provider-name="MyTourbook"
       plugin="net.tourbook.branding">
 
@@ -23,7 +23,7 @@
    </url>
 
    <requires>
-      <import feature="feature.net.tourbook.app.version" version="25.4.0" match="equivalent"/>
+      <import feature="feature.net.tourbook.app.version" version="25.6.0" match="equivalent"/>
       <import plugin="org.eclipse.ui"/>
       <import plugin="org.eclipse.core.runtime"/>
       <import plugin="org.eclipse.core.expressions"/>
