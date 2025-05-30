@@ -398,6 +398,7 @@ public class Messages extends NLS {
    public static String        Slideout_Dialog_Action_DragSlideout_ToolTip;
    public static String        Slideout_Dialog_Action_KeepSlideoutOpen_Tooltip;
    public static String        Slideout_Dialog_Action_PinSlideoutLocation_Tooltip;
+   public static String        Slideout_Dialog_Action_ResetSlideoutLocation_Tooltip;
 
    public static String        Slideout_Map_TrackColors_Label_Title;
    public static String        Slideout_Map_TrackColors_Label_VisibleColorProfiles;

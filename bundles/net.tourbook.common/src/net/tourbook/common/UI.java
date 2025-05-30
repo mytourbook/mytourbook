@@ -2590,6 +2590,19 @@ public class UI {
       return isShiftKey;
    }
 
+   public static boolean isShiftKey(final SelectionEvent selectionEvent) {
+
+      boolean isShiftKey;
+
+      if (IS_OSX) {
+         isShiftKey = (selectionEvent.stateMask & SWT.MOD3) > 0;
+      } else {
+         isShiftKey = (selectionEvent.stateMask & SWT.MOD2) > 0;
+      }
+
+      return isShiftKey;
+   }
+
    /**
     * Log RGB values as Java code:
     * <p>

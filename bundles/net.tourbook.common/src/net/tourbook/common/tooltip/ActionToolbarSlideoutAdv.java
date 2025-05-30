@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017, 2023 Wolfgang Schramm and Contributors
+ * Copyright (C) 2017, 2025 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -17,6 +17,7 @@ package net.tourbook.common.tooltip;
 
 import net.tourbook.common.CommonActivator;
 import net.tourbook.common.CommonImages;
+import net.tourbook.common.Messages;
 import net.tourbook.common.UI;
 
 import org.eclipse.jface.action.ContributionItem;
@@ -177,6 +178,7 @@ public abstract class ActionToolbarSlideoutAdv extends ContributionItem implemen
 
    @Override
    public void hideDialog() {
+
       _toolbarSlideout.hideNow();
    }
 
@@ -258,6 +260,11 @@ public abstract class ActionToolbarSlideoutAdv extends ContributionItem implemen
 
       updateUI_ToolItem_Image();
       updateUI_ToolItem_Tooltip();
+
+      if (UI.isCtrlKey(selectionEvent)) {
+
+         _toolbarSlideout.resetLocation();
+      }
 
       if (_toolbarSlideout.isVisible() == false) {
 
@@ -353,7 +360,15 @@ public abstract class ActionToolbarSlideoutAdv extends ContributionItem implemen
 
       } else {
 
-         _actionToolItem.setToolTipText(notSelectedTooltip);
+         String tooltipText = notSelectedTooltip;
+
+         // append <Ctrl> key hint
+         if (isToggleAction) {
+
+            tooltipText += UI.NEW_LINE2 + Messages.Slideout_Dialog_Action_ResetSlideoutLocation_Tooltip;
+         }
+
+         _actionToolItem.setToolTipText(tooltipText);
       }
    }
 }

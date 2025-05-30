@@ -2354,6 +2354,25 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements
    }
 
    @Override
+   protected void onResetLocation() {
+
+      // show expanded, there is a bug in Linux where the tooltip header actions could not be selected
+      _isSlideoutExpanded = true;
+
+      // ensure that this is also set when the slideout was not yet open
+      _state_Slideout.put(STATE_IS_SLIDEOUT_EXPANDED, _isSlideoutExpanded);
+
+      if (_tabContainer != null && _tabContainer.isDisposed() == false) {
+
+         // slideout was created
+
+         updateUI_ExpandCollapse();
+
+         onTTShellResize(null);
+      }
+   }
+
+   @Override
    protected Point onResize(final int contentWidth, final int contentHeight) {
 
       if (_tabContainer.isDisposed()) {
