@@ -82,7 +82,6 @@ import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.RGB;
-import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
@@ -353,7 +352,7 @@ public class PrefPageTourType_Definitions extends PreferencePage implements IWor
       final Composite container = new Composite(parent, SWT.NONE);
       GridDataFactory.fillDefaults().grab(true, true).applyTo(container);
       GridLayoutFactory.fillDefaults().numColumns(2).applyTo(container);
-//		container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_YELLOW));
+//      container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_YELLOW));
       {
          createUI_10_ColorViewer(container);
          createUI_20_Actions(container);
@@ -546,30 +545,6 @@ public class PrefPageTourType_Definitions extends PreferencePage implements IWor
             }));
             setButtonLayoutData(_btnDelete);
          }
-         {
-            /*
-             * Button: Save/update
-             */
-            _btnTourType_Save = new Button(container, SWT.NONE);
-            _btnTourType_Save.setText(Messages.App_Action_Save);
-            _btnTourType_Save.addSelectionListener(SelectionListener.widgetSelectedAdapter(selectionEvent -> onTourTypeOptions_Save()));
-
-            setButtonLayoutData(_btnTourType_Save);
-
-            // align at the bottom
-            final GridData gd = (GridData) _btnTourType_Save.getLayoutData();
-            gd.verticalAlignment = SWT.BOTTOM;
-            gd.grabExcessVerticalSpace = true;
-         }
-         {
-            /*
-             * Button: Cancel
-             */
-            _btnTourType_Cancel = new Button(container, SWT.NONE);
-            _btnTourType_Cancel.setText(Messages.App_Action_Cancel);
-            _btnTourType_Cancel.addSelectionListener(SelectionListener.widgetSelectedAdapter(selectionEvent -> onTourTypeOptions_Cancel()));
-            setButtonLayoutData(_btnTourType_Cancel);
-         }
       }
    }
 
@@ -583,7 +558,7 @@ public class PrefPageTourType_Definitions extends PreferencePage implements IWor
 
       final Group group = new Group(parent, SWT.NONE);
       group.setText(Messages.Pref_TourTypes_Group_SelectedTourType);
-      GridDataFactory.fillDefaults().grab(true, false).span(2, 1).applyTo(group);
+      GridDataFactory.fillDefaults().grab(true, false).applyTo(group);
       GridLayoutFactory.fillDefaults().numColumns(2).margins(5, 5).applyTo(group);
       {
          {
@@ -635,6 +610,30 @@ public class PrefPageTourType_Definitions extends PreferencePage implements IWor
             GridDataFactory.fillDefaults().grab(true, false).applyTo(_txtImportSubCategory);
          }
       }
+
+      final Composite container = new Composite(parent, SWT.NONE);
+      GridDataFactory.fillDefaults().align(SWT.FILL, SWT.BEGINNING).applyTo(container);
+      GridLayoutFactory.fillDefaults().numColumns(1).applyTo(container);
+      {
+         {
+            /*
+             * Button: Save/update
+             */
+            _btnTourType_Save = new Button(container, SWT.NONE);
+            _btnTourType_Save.setText(Messages.App_Action_Save);
+            _btnTourType_Save.addSelectionListener(SelectionListener.widgetSelectedAdapter(selectionEvent -> onTourTypeOptions_Save()));
+            setButtonLayoutData(_btnTourType_Save);
+         }
+         {
+            /*
+             * Button: Cancel
+             */
+            _btnTourType_Cancel = new Button(container, SWT.NONE);
+            _btnTourType_Cancel.setText(Messages.App_Action_Cancel);
+            _btnTourType_Cancel.addSelectionListener(SelectionListener.widgetSelectedAdapter(selectionEvent -> onTourTypeOptions_Cancel()));
+            setButtonLayoutData(_btnTourType_Cancel);
+         }
+      }
    }
 
    private void createUI_50_ImageLayout(final Composite parent) {
@@ -662,7 +661,7 @@ public class PrefPageTourType_Definitions extends PreferencePage implements IWor
 
       final Group group = new Group(parent, SWT.NONE);
       group.setText(Messages.Pref_TourTypes_Group_CommonLayout);
-      GridDataFactory.fillDefaults().grab(true, false).indent(0, 20).span(2, 1).applyTo(group);
+      GridDataFactory.fillDefaults().grab(true, false).indent(0, 10).applyTo(group);
       GridLayoutFactory.fillDefaults().numColumns(2).margins(5, 5).applyTo(group);
       {
          {
