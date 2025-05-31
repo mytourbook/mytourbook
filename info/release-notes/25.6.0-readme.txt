@@ -1,4 +1,4 @@
-25.next.0                                                 ?. June 2025
+25.6.0                                                 ?. June 2025
 
 
 New / Improvements
@@ -6,8 +6,8 @@ New / Improvements
 
 * Fit Import
   - Import distance values for swimming and display
-    - Speed in the tour chart
-    - Distance values in different locations  
+    - Show speed graph in the tour chart
+    - Show distance values in different locations  
     https://github.com/mytourbook/mytourbook/issues/1485
     
 * Tour Filter
@@ -15,7 +15,7 @@ New / Improvements
     https://github.com/mytourbook/mytourbook/issues/1487
 
 * Tour Info Tooltip (Frederic)
-  - New fields: elapsed time at night and during the day for tours that also happen during the night
+  - New fields: Elapsed time at night and during the day for tours that also happen during the night
 
 * Tour Nutrition (Frederic)
   - Support for the carbohydrates
@@ -24,12 +24,13 @@ New / Improvements
   - Add duplicated products when they are contained in a beverage container
 
 * 2D Map Photos
-  - Relocate a photo geo position with the mouse
-  - Replace photo geo position with its default position
+  - Photo Tour
+    - Relocate a photo geo position with the mouse
+    - Replace photo geo position with its default position
   - Crop photo with fixed sizes
     https://github.com/mytourbook/mytourbook/issues/1494
   - Set tonality
-    - Adjust with slider controls
+    - Adjust tonality values with slider controls
     - Copy and paste from one photo to another
   - Draw under- and overexposed values with a different color in the histogram
 
@@ -39,9 +40,12 @@ New / Improvements
 * Tour Editor
   - Remove photo geo position  
   - Edit power values in 
+    https://github.com/mytourbook/mytourbook/issues/1492
     - Time slice viewer
     - Time slice replace/offset dialog
-      https://github.com/mytourbook/mytourbook/issues/1492
+      
+* Positionable Slideouts
+  - Reset slideout position by pressing <Ctrl> when the action is selected      
 
 
 Changes
@@ -49,7 +53,7 @@ Changes
 
 * 2D Map
   - Replaced actions to set tour start/end positions https://github.com/mytourbook/mytourbook/issues/1457 with https://github.com/mytourbook/mytourbook/issues/1488
-  - When creating a photo tour, a time slice is created for each photo which is positioned slightly different when the first position is set
+  - When creating a photo tour, a time slice is created for each photo which is positioned slightly different than other photos when the first position is set
 
 
 Bugfix
