@@ -247,7 +247,8 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
       public ActionEditCustomProduct() {
 
          super(Messages.Tour_Nutrition_Button_EditCustomProduct, AS_PUSH_BUTTON);
-         setToolTipText(Messages.Tour_Nutrition_Button_EditCustomProduct_Tooltip);
+
+//       setToolTipText(Messages.Tour_Nutrition_Button_EditCustomProduct_Tooltip);
       }
 
       @Override
