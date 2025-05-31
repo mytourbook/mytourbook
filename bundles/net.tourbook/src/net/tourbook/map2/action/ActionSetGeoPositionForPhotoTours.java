@@ -99,7 +99,7 @@ public class ActionSetGeoPositionForPhotoTours extends SubMenu {
        * </pre>
        */
 
-      setToolTipText(Messages.Map_Action_GeoPositions_Tooltip);
+      setToolTipText(Messages.Map_Action_GeoPositions_Tooltip2);
    }
 
    @Override
@@ -109,6 +109,10 @@ public class ActionSetGeoPositionForPhotoTours extends SubMenu {
    public void fillMenu(final Menu menu) {
 
       _tourData = _map2View.getTourDataWhereGeoPositionsCanBeSet();
+
+      if (_tourData == null) {
+         return;
+      }
 
       final Set<TourPhoto> allTourPhotos = _tourData.getTourPhotos();
 
