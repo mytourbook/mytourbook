@@ -556,69 +556,70 @@ public class TourDataEditorView extends ViewPart implements
    /*
     * Measurement unit values
     */
-   private float                                      _unitValueDistance;
-   private float                                      _unitValueElevation;
-   private int[]                                      _unitValueWindSpeed;
+   private float                                                      _unitValueDistance;
+   private float                                                      _unitValueElevation;
+   private int[]                                                      _unitValueWindSpeed;
    //
-   private MenuManager                                _swimViewer_MenuManager;
-   private MenuManager                                _timeViewer_MenuManager;
-   private IContextMenuProvider                       _swimViewer_ContextMenuProvider = new SwimSlice_ViewerContextMenuProvider();
-   private IContextMenuProvider                       _timeViewer_ContextMenuProvider = new TimeSlice_ViewerContextMenuProvider();
+   private MenuManager                                                _swimViewer_MenuManager;
+   private MenuManager                                                _timeViewer_MenuManager;
+   private IContextMenuProvider                                       _swimViewer_ContextMenuProvider = new SwimSlice_ViewerContextMenuProvider();
+   private IContextMenuProvider                                       _timeViewer_ContextMenuProvider = new TimeSlice_ViewerContextMenuProvider();
    //
-   private ActionComputeDistanceValues                _actionComputeDistanceValues;
-   private ActionCreateTourMarker                     _actionCreateTourMarker;
-   private ActionCSVTimeSliceExport                   _actionCsvTimeSliceExport;
-   private ActionDeleteDistanceValues                 _actionDeleteDistanceValues;
-   private ActionDeleteTimeSlices_AdjustTourStartTime _actionDeleteTimeSlices_AdjustTourStartTime;
-   private ActionDeleteTimeSlices_KeepTime            _actionDeleteTimeSlices_KeepTime;
-   private ActionDeleteTimeSlices_KeepTimeAndDistance _actionDeleteTimeSlices_KeepTimeAndDistance;
-   private ActionDeleteTimeSlices_RemoveTime          _actionDeleteTimeSlices_RemoveTime;
-   private ActionEditTimeSlicesValues                 _actionEditTimeSlicesValues;
-   private ActionExport                               _actionExportTour;
-   private ActionExtractTour                          _actionExtractTour;
-   private ActionOpenAdjustAltitudeDialog             _actionOpenAdjustAltitudeDialog;
-   private ActionOpenMarkerDialog                     _actionOpenMarkerDialog;
-   private ActionRemovePhotoGeoPosition               _actionRemovePhotoGeoPosition;
-   private ActionRemoveSwimStyle                      _action_RemoveSwimStyle;
-   private ActionSetStartDistanceTo0                  _actionSetStartDistanceTo_0;
-   private ActionSetSwimStyle_Header                  _action_SetSwimStyle_Header;
-   private ActionSplitTour                            _actionSplitTour;
-   private ActionTourStartEndLocation                 _actionStartLocation;
-   private ActionTourStartEndLocation                 _actionEndLocation;
-   private ActionToggleReadEditMode                   _actionToggleReadEditMode;
-   private ActionToggleRowSelectMode                  _actionToggleRowSelectMode;
-   private ActionViewSettings                         _actionViewSettings;
+   private ActionComputeDistanceValues                                _actionComputeDistanceValues;
+   private ActionCreateTourMarker                                     _actionCreateTourMarker;
+   private ActionCSVTimeSliceExport                                   _actionCsvTimeSliceExport;
+   private ActionDeleteDistanceValues                                 _actionDeleteDistanceValues;
+   private ActionDeleteTimeSlices_AdjustTourStartTime                 _actionDeleteTimeSlices_AdjustTourStartTime;
+   private ActionDeleteTimeSlices_AdjustTourStartTime_KeepOtherValues _actionDeleteTimeSlices_AdjustTourStartTime_KeepOtherValues;
+   private ActionDeleteTimeSlices_KeepTime                            _actionDeleteTimeSlices_KeepTime;
+   private ActionDeleteTimeSlices_KeepTimeAndDistance                 _actionDeleteTimeSlices_KeepTimeAndDistance;
+   private ActionDeleteTimeSlices_RemoveTime                          _actionDeleteTimeSlices_RemoveTime;
+   private ActionEditTimeSlicesValues                                 _actionEditTimeSlicesValues;
+   private ActionExport                                               _actionExportTour;
+   private ActionExtractTour                                          _actionExtractTour;
+   private ActionOpenAdjustAltitudeDialog                             _actionOpenAdjustAltitudeDialog;
+   private ActionOpenMarkerDialog                                     _actionOpenMarkerDialog;
+   private ActionRemovePhotoGeoPosition                               _actionRemovePhotoGeoPosition;
+   private ActionRemoveSwimStyle                                      _action_RemoveSwimStyle;
+   private ActionSetStartDistanceTo0                                  _actionSetStartDistanceTo_0;
+   private ActionSetSwimStyle_Header                                  _action_SetSwimStyle_Header;
+   private ActionSplitTour                                            _actionSplitTour;
+   private ActionTourStartEndLocation                                 _actionStartLocation;
+   private ActionTourStartEndLocation                                 _actionEndLocation;
+   private ActionToggleReadEditMode                                   _actionToggleReadEditMode;
+   private ActionToggleRowSelectMode                                  _actionToggleRowSelectMode;
+   private ActionViewSettings                                         _actionViewSettings;
    //
-   private ArrayList<Action_SetSwimStyle>             _allSwimStyleActions;
+   private ArrayList<Action_SetSwimStyle>                             _allSwimStyleActions;
    //
-   private TagMenuManager                             _tagMenuMgr;
+   private TagMenuManager                                             _tagMenuMgr;
    //
    /**
     * Number of digits for the lat/lon columns.
     */
-   private int                                        _latLonDigits;
+   private int                                                        _latLonDigits;
    //
    /** Number of lines for the tour's description text */
-   private int                                        _numLines_TourDescription;
+   private int                                                        _numLines_TourDescription;
    //
    /** Number of lines for the weather's description text */
-   private int                                        _numLines_WeatherDescription;
+   private int                                                        _numLines_WeatherDescription;
    //
-   private final NumberFormat                         _nfLatLon                       = NumberFormat.getNumberInstance();
+   private final NumberFormat                                         _nfLatLon                       = NumberFormat.getNumberInstance();
    //
-   private TourData                                   _tourData;
+   private TourData                                                   _tourData;
    //
-   private Color                                      _foregroundColor_Default;
-   private Color                                      _backgroundColor_Default;
-   private Color                                      _foregroundColor_1stColumn_RefTour;
-   private Color                                      _backgroundColor_1stColumn_RefTour;
-   private Color                                      _foregroundColor_1stColumn_NoRefTour;
-   private Color                                      _backgroundColor_1stColumn_NoRefTour;
+   private Color                                                      _foregroundColor_Default;
+   private Color                                                      _backgroundColor_Default;
+   private Color                                                      _foregroundColor_1stColumn_RefTour;
+   private Color                                                      _backgroundColor_1stColumn_RefTour;
+   private Color                                                      _foregroundColor_1stColumn_NoRefTour;
+   private Color                                                      _backgroundColor_1stColumn_NoRefTour;
    //
-   private ToolBarManager                             _toolbarManager_StartLocation;
-   private ToolBarManager                             _toolbarManager_EndLocation;
+   private ToolBarManager                                             _toolbarManager_StartLocation;
+   private ToolBarManager                                             _toolbarManager_EndLocation;
    //
-   private GridDataFactory                            _gridData_GrabHorizontal_CenterVertical;
+   private GridDataFactory                                            _gridData_GrabHorizontal_CenterVertical;
 
    //
    // ################################################## UI controls ##################################################
@@ -2438,7 +2439,7 @@ public class TourDataEditorView extends ViewPart implements
    }
 
    /**
-    * delete selected time slices
+    * Delete selected time slices
     *
     * @param isRemoveTime
     * @param isRemoveDistance
@@ -3224,10 +3225,11 @@ public class TourDataEditorView extends ViewPart implements
       _actionToggleRowSelectMode       = new ActionToggleRowSelectMode(this);
       _actionViewSettings              = new ActionViewSettings();
 
-      _actionDeleteTimeSlices_AdjustTourStartTime  = new ActionDeleteTimeSlices_AdjustTourStartTime(this);
-      _actionDeleteTimeSlices_KeepTime             = new ActionDeleteTimeSlices_KeepTime(this);
-      _actionDeleteTimeSlices_KeepTimeAndDistance  = new ActionDeleteTimeSlices_KeepTimeAndDistance(this);
-      _actionDeleteTimeSlices_RemoveTime           = new ActionDeleteTimeSlices_RemoveTime(this);
+      _actionDeleteTimeSlices_AdjustTourStartTime                 = new ActionDeleteTimeSlices_AdjustTourStartTime(this);
+      _actionDeleteTimeSlices_AdjustTourStartTime_KeepOtherValues = new ActionDeleteTimeSlices_AdjustTourStartTime_KeepOtherValues(this);
+      _actionDeleteTimeSlices_KeepTime                            = new ActionDeleteTimeSlices_KeepTime(this);
+      _actionDeleteTimeSlices_KeepTimeAndDistance                 = new ActionDeleteTimeSlices_KeepTimeAndDistance(this);
+      _actionDeleteTimeSlices_RemoveTime                          = new ActionDeleteTimeSlices_RemoveTime(this);
 
 // SET_FORMATTING_ON
 
@@ -3236,6 +3238,7 @@ public class TourDataEditorView extends ViewPart implements
       // swim style actions
       _action_SetSwimStyle_Header = new ActionSetSwimStyle_Header();
       _allSwimStyleActions = new ArrayList<>();
+
       for (final StrokeStyle strokeStyle : SwimStrokeManager.DEFAULT_STROKE_STYLES) {
          _allSwimStyleActions.add(new Action_SetSwimStyle(this, strokeStyle));
       }
@@ -7183,10 +7186,11 @@ public class TourDataEditorView extends ViewPart implements
       _actionSplitTour              .setEnabled(isOneSliceSelected);
       _actionExtractTour            .setEnabled(numSelectedSlices >= 2);
 
-      _actionDeleteTimeSlices_AdjustTourStartTime  .setEnabled(canDeleteTimeSliced || isEditablePhotoTour);
-      _actionDeleteTimeSlices_KeepTime             .setEnabled(canDeleteTimeSliced);
-      _actionDeleteTimeSlices_KeepTimeAndDistance  .setEnabled(canDeleteTimeSliced);
-      _actionDeleteTimeSlices_RemoveTime           .setEnabled(canDeleteTimeSliced);
+      _actionDeleteTimeSlices_AdjustTourStartTime                 .setEnabled(canDeleteTimeSliced);
+      _actionDeleteTimeSlices_AdjustTourStartTime_KeepOtherValues .setEnabled(canDeleteTimeSliced || isEditablePhotoTour);
+      _actionDeleteTimeSlices_KeepTime                            .setEnabled(canDeleteTimeSliced);
+      _actionDeleteTimeSlices_KeepTimeAndDistance                 .setEnabled(canDeleteTimeSliced);
+      _actionDeleteTimeSlices_RemoveTime                          .setEnabled(canDeleteTimeSliced);
 
 // SET_FORMATTING_ON
 
@@ -7389,6 +7393,7 @@ public class TourDataEditorView extends ViewPart implements
       menuManager.add(_actionDeleteTimeSlices_KeepTime);
       menuManager.add(_actionDeleteTimeSlices_KeepTimeAndDistance);
       menuManager.add(_actionDeleteTimeSlices_AdjustTourStartTime);
+      menuManager.add(_actionDeleteTimeSlices_AdjustTourStartTime_KeepOtherValues);
       menuManager.add(_actionRemovePhotoGeoPosition);
 
       menuManager.add(new Separator());

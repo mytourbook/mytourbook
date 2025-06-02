@@ -340,7 +340,7 @@ public class SlideoutTourEditor_Options extends ToolbarSlideout implements IColo
             {
                // Adjust tour start time
                _chkDelete_AdjustTourStartTime = new Button(container, SWT.CHECK);
-               _chkDelete_AdjustTourStartTime.setText("Ad&just tour start time");
+               _chkDelete_AdjustTourStartTime.setText(Messages.Slideout_TourEditor_Checkbox_AdjustTourStartTime);
                _chkDelete_AdjustTourStartTime.addSelectionListener(_defaultSelectionListener);
                GridDataFactory.fillDefaults().indent(16, 0).span(2, 1).applyTo(_chkDelete_AdjustTourStartTime);
             }

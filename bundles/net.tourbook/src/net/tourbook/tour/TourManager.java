@@ -2759,11 +2759,16 @@ public class TourManager {
          return;
       }
 
+      // it is complicate to remove time slices and/or adjust tour start time
+      final boolean isRemovePhotoSlices = isAdjustTourStartTime && firstIndex == 0;
+
+      final boolean isRemoveTimeValues = isRemoveTime || isRemovePhotoSlices;
+
       final int timeFirstIndex = timeSerie[firstIndex];
       final int timeNextIndex = timeSerie[lastIndex + 1];
 
       int timeDiff = 0;
-      if (isRemoveTime) {
+      if (isRemoveTimeValues) {
          timeDiff = timeNextIndex - timeFirstIndex;
       }
 
@@ -2775,7 +2780,7 @@ public class TourManager {
       // update remaining time and distance data series
       for (int serieIndex = lastIndex + 1; serieIndex < timeSerie.length; serieIndex++) {
 
-         if (isRemoveTime) {
+         if (isRemoveTimeValues) {
             timeSerie[serieIndex] = timeSerie[serieIndex] - timeDiff;
          }
 
@@ -2784,10 +2789,7 @@ public class TourManager {
          }
       }
 
-      if (isRemoveTime && isAdjustTourStartTime
-
-            // it is complicate to remove and/or adjust tour start time
-            || isAdjustTourStartTime && firstIndex == 0) {
+      if (isRemoveTimeValues && isAdjustTourStartTime || isRemovePhotoSlices) {
 
          final ZonedDateTime tourStartTime = tourData.getTourStartTime();
          final ZonedDateTime newTourStartTime = tourStartTime.plusSeconds(timeDiff);

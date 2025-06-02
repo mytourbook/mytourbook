@@ -19,7 +19,7 @@ import org.eclipse.osgi.util.NLS;
 
 public class Messages extends NLS {
 
-   private static final String BUNDLE_NAME = "net.tourbook.messages";                                        //$NON-NLS-1$
+   private static final String BUNDLE_NAME = "net.tourbook.messages";                                          //$NON-NLS-1$
 
    public static String        Action_Cadence_Set;
    public static String        Action_Cadence_Set_None;
@@ -93,10 +93,6 @@ public class Messages extends NLS {
    public static String        Action_TourType_AddRecentTourTypes;
    public static String        Action_TourType_ModifyTourTypeFilter;
    public static String        action_tourType_modify_tourTypes;
-
-   public static String        action_tour_editor_delete_time_slices_keep_time;
-   public static String        action_tour_editor_delete_time_slices_keep_time_and_distance;
-   public static String        action_tour_editor_delete_time_slices_remove_time;
 
    public static String        adjust_altitude_action_create_spline_point;
    public static String        adjust_altitude_btn_reset_altitude;
@@ -1443,18 +1439,18 @@ public class Messages extends NLS {
    public static String        Map_Bookmark_Action_Bookmark_Rename;
    public static String        Map_Bookmark_Button_Add;
    public static String        Map_Bookmark_Button_Rename;
-   public static String        Map_Bookmark_Column_Bearing2;                                                 //2, because of refactoring
-   public static String        Map_Bookmark_Column_Bearing2_Tooltip;                                         //2, because of refactoring
+   public static String        Map_Bookmark_Column_Bearing2;                                                   //2, because of refactoring
+   public static String        Map_Bookmark_Column_Bearing2_Tooltip;                                           //2, because of refactoring
    public static String        Map_Bookmark_Column_Latitude;
    public static String        Map_Bookmark_Column_Latitude_Tooltip2;
    public static String        Map_Bookmark_Column_Longitude;
    public static String        Map_Bookmark_Column_Longitude_Tooltip2;
    public static String        Map_Bookmark_Column_Name;
    public static String        Map_Bookmark_Column_Scale;
-   public static String        Map_Bookmark_Column_Tilt2;                                                    //2, because of refactoring
-   public static String        Map_Bookmark_Column_Tilt2_Tooltip;                                            //2, because of refactoring
-   public static String        Map_Bookmark_Column_ZoomLevel2;                                               //2, because of refactoring
-   public static String        Map_Bookmark_Column_ZoomLevel2_Tooltip;                                       //2, because of refactoring
+   public static String        Map_Bookmark_Column_Tilt2;                                                      //2, because of refactoring
+   public static String        Map_Bookmark_Column_Tilt2_Tooltip;                                              //2, because of refactoring
+   public static String        Map_Bookmark_Column_ZoomLevel2;                                                 //2, because of refactoring
+   public static String        Map_Bookmark_Column_ZoomLevel2_Tooltip;                                         //2, because of refactoring
    public static String        Map_Bookmark_Dialog_AddBookmark_Message;
    public static String        Map_Bookmark_Dialog_AddBookmark_Title;
    public static String        Map_Bookmark_Dialog_RenameBookmark_Message;
@@ -2720,6 +2716,7 @@ public class Messages extends NLS {
    public static String        Slideout_TourCollectionFilter_Radio_ShowCollectedTours;
    public static String        Slideout_TourCollectionFilter_Radio_ShowNotCollectedTours;
 
+   public static String        Slideout_TourEditor_Checkbox_AdjustTourStartTime;
    public static String        Slideout_TourEditor_Checkbox_KeepDistance;
    public static String        Slideout_TourEditor_Checkbox_KeepDistance_Tooltip;
    public static String        Slideout_TourEditor_Checkbox_KeepTime;
@@ -3258,7 +3255,13 @@ public class Messages extends NLS {
    public static String        TourEditor_Dialog_SetAltitudeFromSRTM_Message;
    public static String        TourEditor_Dialog_SetAltitudeFromSRTM_Title;
 
+   public static String        action_tour_editor_delete_time_slices_keep_time;
+   public static String        action_tour_editor_delete_time_slices_keep_time_and_distance;
+   public static String        action_tour_editor_delete_time_slices_remove_time;
+
    public static String        Tour_Editor_Action_DeleteTimeSlices_AdjustTourStartTime;
+   public static String        Tour_Editor_Action_DeleteTimeSlices_AdjustTourStartTime_KeepOtherValues;
+   public static String        Tour_Editor_Action_DeleteTimeSlices_AdjustTourStartTime_KeepOtherValues_Tooltip;
    public static String        Tour_Editor_Action_DeleteTimeSlices_AdjustTourStartTime_Tooltip;
    public static String        Tour_Editor_Action_RemovePhotoGeoPosition;
    public static String        Tour_Editor_Action_RemovePhotoGeoPosition_Tooltip;
