@@ -95,7 +95,6 @@ public class Messages extends NLS {
    public static String Map_Action_GeoPositions_SetInto;
    public static String Map_Action_GeoPositions_Set_End;
    public static String Map_Action_GeoPositions_Set_Start;
-
    public static String Map_Action_GeoPositions_Tooltip2;
    public static String Map_Action_GotoLocation;
    public static String Map_Action_LookupCommonLocation;
