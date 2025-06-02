@@ -280,6 +280,8 @@ public class TourDataEditorView extends ViewPart implements
    //
    static final String                   STATE_DESCRIPTION_NUMBER_OF_LINES                = "STATE_DESCRIPTION_NUMBER_OF_LINES";              //$NON-NLS-1$
    static final int                      STATE_DESCRIPTION_NUMBER_OF_LINES_DEFAULT        = 3;
+   static final String                   STATE_IS_ADJUST_TOUR_START_TIME                  = "STATE_IS_ADJUST_TOUR_START_TIME";                //$NON-NLS-1$
+   static final boolean                  STATE_IS_ADJUST_TOUR_START_TIME_DEFAULT          = true;
    static final String                   STATE_IS_DELETE_KEEP_DISTANCE                    = "STATE_IS_DELETE_KEEP_DISTANCE";                  //$NON-NLS-1$
    static final boolean                  STATE_IS_DELETE_KEEP_DISTANCE_DEFAULT            = false;
    static final String                   STATE_IS_DELETE_KEEP_TIME                        = "STATE_IS_DELETE_KEEP_TIME";                      //$NON-NLS-1$
@@ -343,6 +345,7 @@ public class TourDataEditorView extends ViewPart implements
    private DecimalFormat                 _temperatureFormat                               = new DecimalFormat("###.0");                       //$NON-NLS-1$
    //
    private ZonedDateTime                 _tourStartTime;
+   private int                           _tourStartTime_Seconds;
    //
    /*
     * Data series which are displayed in the viewer, all are metric system
@@ -5334,6 +5337,10 @@ public class TourDataEditorView extends ViewPart implements
 
          if (keyEvent.keyCode == SWT.DEL) {
 
+            final boolean isAdjustTourStartTime = Util.getStateBoolean(_state,
+                  STATE_IS_ADJUST_TOUR_START_TIME,
+                  STATE_IS_ADJUST_TOUR_START_TIME_DEFAULT);
+
             final boolean isKeepDistance = Util.getStateBoolean(_state,
                   STATE_IS_DELETE_KEEP_DISTANCE,
                   STATE_IS_DELETE_KEEP_DISTANCE_DEFAULT);
@@ -5345,7 +5352,7 @@ public class TourDataEditorView extends ViewPart implements
             final boolean isRemoveDistance = isKeepDistance == false;
             final boolean isRemoveTime = isKeepTime == false;
 
-            actionDelete_TimeSlices(isRemoveTime, isRemoveDistance, false);
+            actionDelete_TimeSlices(isRemoveTime, isRemoveDistance, isAdjustTourStartTime);
          }
       }));
 
@@ -6470,9 +6477,12 @@ public class TourDataEditorView extends ViewPart implements
          public void update(final ViewerCell cell) {
 
             if (_serieTime != null) {
+
                final TimeSlice timeSlice = (TimeSlice) cell.getElement();
                final int serieIndex = timeSlice.serieIndex;
+
                cell.setText(Integer.toString(_serieTime[serieIndex]));
+
             } else {
                cell.setText(UI.EMPTY_STRING);
             }
@@ -6492,13 +6502,25 @@ public class TourDataEditorView extends ViewPart implements
          public void update(final ViewerCell cell) {
 
             if (_serieTime == null) {
+
                cell.setText(UI.EMPTY_STRING);
+
             } else {
 
                final int serieIndex = ((TimeSlice) cell.getElement()).serieIndex;
                final int timeSliceSeconds = _serieTime[serieIndex];
+               final ZonedDateTime timeSliceDateTime = _tourStartTime.plusSeconds(timeSliceSeconds);
 
-               cell.setText(_tourStartTime.plusSeconds(timeSliceSeconds).format(TimeTools.Formatter_Time_M));
+               if (_tourStartTime_Seconds + timeSliceSeconds > TimeTools.DAY_SECONDS) {
+
+                  // this time is not on the same tour start day, show also the day
+
+                  cell.setText(timeSliceDateTime.format(TimeTools.Formatter_DateTime_SM));
+
+               } else {
+
+                  cell.setText(timeSliceDateTime.format(TimeTools.Formatter_Time_M));
+               }
             }
          }
       });
@@ -7110,6 +7132,7 @@ public class TourDataEditorView extends ViewPart implements
       final boolean isSliceSelected = numSelectedSlices > 0;
       final boolean isOneSliceSelected = numSelectedSlices == 1;
       final boolean isPhotoTour = _tourData.isPhotoTour();
+      final boolean isNoPhotoTour = isPhotoTour == false;
       final boolean isTourInDb = isTourInDb();
 
       // deleting time slices with swim data is very complex
@@ -7141,9 +7164,8 @@ public class TourDataEditorView extends ViewPart implements
          }
       }
 
-      final boolean isNoPhotoTour = _tourData.isPhotoTour() == false;
-
       final boolean canDeleteTimeSliced = _isEditMode && isTourInDb && isSliceSelected && isNoSwimData && isNoPhotoTour;
+      final boolean isEditablePhotoTour = _isEditMode && isPhotoTour && isSliceSelected && isNoSwimData;
 
       _actionCreateTourMarker.setEnabled(_isEditMode && isTourInDb && isOneSliceSelected && canCreateMarker);
       _actionOpenMarkerDialog.setEnabled(_isEditMode && isTourInDb && isOneSliceSelected && selectedMarker != null);
@@ -7157,11 +7179,11 @@ public class TourDataEditorView extends ViewPart implements
 
       _actionExportTour             .setEnabled(true);
       _actionCsvTimeSliceExport     .setEnabled(isSliceSelected);
-                                    
+
       _actionSplitTour              .setEnabled(isOneSliceSelected);
       _actionExtractTour            .setEnabled(numSelectedSlices >= 2);
 
-      _actionDeleteTimeSlices_AdjustTourStartTime  .setEnabled(canDeleteTimeSliced);
+      _actionDeleteTimeSlices_AdjustTourStartTime  .setEnabled(canDeleteTimeSliced || isEditablePhotoTour);
       _actionDeleteTimeSlices_KeepTime             .setEnabled(canDeleteTimeSliced);
       _actionDeleteTimeSlices_KeepTimeAndDistance  .setEnabled(canDeleteTimeSliced);
       _actionDeleteTimeSlices_RemoveTime           .setEnabled(canDeleteTimeSliced);
@@ -7628,7 +7650,11 @@ public class TourDataEditorView extends ViewPart implements
       _timeSlice_PulseEditingSupport         .setDataSerie(_seriePulse);
       _timeSlice_TemperatureEditingSupport   .setDataSerie(_serieTemperature);
 
-      _tourStartTime = _tourData.getTourStartTime();
+      _tourStartTime                = _tourData.getTourStartTime();
+
+      _tourStartTime_Seconds        = _tourStartTime.getHour()   * 3600
+                                    + _tourStartTime.getMinute() * 60
+                                    + _tourStartTime.getSecond();
 
 // SET_FORMATTING_ON
 
@@ -10558,7 +10584,7 @@ public class TourDataEditorView extends ViewPart implements
       final ZonedDateTime tourStartTime = _tourData.getTourStartTime();
       final ZonedDateTime tourStartTimeUTC = tourStartTime.withZoneSameInstant(ZoneOffset.UTC);
 
-      final String tourStartTooltip = NLS.bind( //
+      final String tourStartTooltip = NLS.bind(
             Messages.Tour_Editor_Label_TourStartTime_Tooltip,
             tourStartTimeUTC.format(TimeTools.Formatter_DateTime_SM));
 

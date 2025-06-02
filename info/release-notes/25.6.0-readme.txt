@@ -39,6 +39,9 @@ New / Improvements
 	
 * Tour Editor
   - Remove photo geo position  
+  - Delete time slices
+    - Added option to adjust the tour start time when pressing the DEL key
+  - Display tour date in the column "Daytime" when the time is on a different day than the tour start, this can happen when a photo tour is created
   - Edit power values in 
     https://github.com/mytourbook/mytourbook/issues/1492
     - Time slice viewer

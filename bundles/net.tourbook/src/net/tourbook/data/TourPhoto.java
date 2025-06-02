@@ -483,7 +483,6 @@ public class TourPhoto implements Serializable {
 
             + "TourPhoto" + NL //                                             //$NON-NLS-1$
 
-
             + " photoId                 = " + photoId + NL //                  //$NON-NLS-1$
             + " mageFileName            = " + imageFileName + NL //             //$NON-NLS-1$
 //          + " imageFileExt            = " + imageFileExt + NL //             //$NON-NLS-1$
@@ -491,15 +490,15 @@ public class TourPhoto implements Serializable {
 //          + " imageFilePathName       = " + imageFilePathName + NL //        //$NON-NLS-1$
 //          + " imageExifTime           = " + imageExifTime + NL //            //$NON-NLS-1$
 //          + " imageFileLastModified   = " + imageFileLastModified + NL //    //$NON-NLS-1$
-//          + " adjustedTime            = " + adjustedTime + NL //             //$NON-NLS-1$
+            + " adjustedTime            = " + adjustedTime + NL //             //$NON-NLS-1$
             + " adjustedTime            = " + formattedDateTime + NL //        //$NON-NLS-1$
-            + " isGeoFromPhoto          = " + isGeoFromPhoto + NL //           //$NON-NLS-1$
-            + " ratingStars             = " + ratingStars + NL //              //$NON-NLS-1$
-            + " latitude                = " + latitude + NL //                 //$NON-NLS-1$
-            + " longitude               = " + longitude + NL //                //$NON-NLS-1$
+//            + " isGeoFromPhoto          = " + isGeoFromPhoto + NL //           //$NON-NLS-1$
+//            + " ratingStars             = " + ratingStars + NL //              //$NON-NLS-1$
+//            + " latitude                = " + latitude + NL //                 //$NON-NLS-1$
+//            + " longitude               = " + longitude + NL //                //$NON-NLS-1$
 
-            + " _photoAdjustments       = " + _photoAdjustments + NL //        //$NON-NLS-1$
-            + " photoAdjustmentsJSON    = " + photoAdjustmentsJSON + NL //     //$NON-NLS-1$
+//            + " _photoAdjustments       = " + _photoAdjustments + NL //        //$NON-NLS-1$
+//            + " photoAdjustmentsJSON    = " + photoAdjustmentsJSON + NL //     //$NON-NLS-1$
 
 //          + " _createId               =" + _createId + NL //                //$NON-NLS-1$
 

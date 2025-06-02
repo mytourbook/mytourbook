@@ -81,9 +81,14 @@ public class TimeTools {
    private static final int                      SECONDS_PER_HOUR      = SECONDS_PER_MINUTE * MINUTES_PER_HOUR;
 
    /**
-    * Number of millisecond for one day
+    * Number of seconds for one day
     */
-   public static final int                       DAY_MILLISECONDS      = 86400_000;
+   public static final int                       DAY_SECONDS           = 86400;
+
+   /**
+    * Number of milliseconds for one day
+    */
+   public static final int                       DAY_MILLISECONDS      = DAY_SECONDS * 1000;
 
    private static final PeriodFormatter          DURATION_FORMATTER;
 

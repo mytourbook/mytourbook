@@ -856,7 +856,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
    private int                   numberOfPhotos;
 
    /**
-    * Time adjustment in seconds, this is an average value for all photos.
+    * Time adjustment in seconds, this is an average value for all photos
     */
    private int                   photoTimeAdjustment;
 
@@ -5448,6 +5448,9 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
       }
    }
 
+   /**
+    * Time adjustment in seconds, this is an average value for all photos
+    */
    private void computePhotoTimeAdjustment() {
 
       _allPhotoTimeAdjustments = new HashMap<>();
@@ -12396,6 +12399,65 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
          currentTourPhotos.removeAll(allRemovedTourPhotos);
 
          saveTourPhotos(currentTourPhotos);
+      }
+   }
+
+   public void removePhotos(final int firstSerieIndex,
+                            final int lastSerieIndex) {
+
+      final long tourStartTimeMS = tourStartTime;
+
+      final long firstTimeMS = tourStartTimeMS + (timeSerie[firstSerieIndex] * 1000);
+      final long lastTimeMS = tourStartTimeMS + (timeSerie[lastSerieIndex] * 1000);
+
+      final String dtStart = TimeTools.Formatter_DateTime_SM.format(TimeTools.getZonedDateTime(tourStartTimeMS));
+      final String dtFirst = TimeTools.Formatter_DateTime_SM.format(TimeTools.getZonedDateTime(firstTimeMS));
+      final String dtLast = TimeTools.Formatter_DateTime_SM.format(TimeTools.getZonedDateTime(lastTimeMS));
+
+      System.out.println(dtStart + " ### " + firstSerieIndex + ":" + dtFirst + " - " + lastSerieIndex + ":" + dtLast);
+// TODO remove SYSTEM.OUT.PRINTLN
+
+      final Set<TourPhoto> allTourPhotos = tourPhotos;
+      final ArrayList<TourPhoto> allSortedPhotos = new ArrayList<>(allTourPhotos);
+      Collections.sort(allSortedPhotos, (tourPhoto1, tourPhoto2) -> {
+
+         return Long.compare(tourPhoto1.getImageExifTime(), tourPhoto2.getImageExifTime());
+      });
+
+      final Collection<TourPhoto> allRemovedPhotos = new ArrayList<>();
+
+      for (final TourPhoto tourPhoto : allSortedPhotos) {
+
+         final long photoTimeMS = tourPhoto.getAdjustedTime();
+
+         final String dtPhoto = TimeTools.Formatter_DateTime_SM.format(TimeTools.getZonedDateTime(photoTimeMS));
+
+         final boolean isInRange_Begin = photoTimeMS >= firstTimeMS;
+         final boolean isInRange_End = photoTimeMS <= lastTimeMS;
+
+         if (isInRange_Begin && isInRange_End) {
+
+            System.out.println(" removed " + dtPhoto);
+// TODO remove SYSTEM.OUT.PRINTLN
+
+            allRemovedPhotos.add(tourPhoto);
+
+         } else {
+
+//            System.out.println(" not removed " + dtPhoto);
+//// TODO remove SYSTEM.OUT.PRINTLN
+         }
+      }
+
+      final int numPhotos = allRemovedPhotos.size();
+
+      if (numPhotos > 0) {
+
+         tourPhotos.removeAll(allRemovedPhotos);
+
+         numberOfPhotos = tourPhotos.size();
+
+         computePhotoTimeAdjustment();
       }
    }
 

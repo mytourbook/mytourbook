@@ -2445,6 +2445,9 @@ public class TourManager {
                                        final boolean isRemoveDistance,
                                        final boolean isAdjustTourStartTime) {
 
+      // this must be done before the time series are modified
+      tourData.removePhotos(firstIndex, lastIndex);
+
       // this must be done with the original timeSerie
       removeTourPauses(tourData, firstIndex, lastIndex, isRemoveTime);
 
@@ -2562,7 +2565,7 @@ public class TourManager {
       tourData.segmentSerieIndex = null;
       tourData.segmentSerieIndex2nd = null;
 
-      removeTourMarkers(tourData, firstIndex, lastIndex, isRemoveTime);
+      removeTimeSlices_TourMarkers(tourData, firstIndex, lastIndex, isRemoveTime);
    }
 
    private static double[] removeTimeSlices_Double(final double[] dataSerie,
@@ -2781,7 +2784,10 @@ public class TourManager {
          }
       }
 
-      if (isRemoveTime && isAdjustTourStartTime) {
+      if (isRemoveTime && isAdjustTourStartTime
+
+            // it is complicate to remove and/or adjust tour start time
+            || isAdjustTourStartTime && firstIndex == 0) {
 
          final ZonedDateTime tourStartTime = tourData.getTourStartTime();
          final ZonedDateTime newTourStartTime = tourStartTime.plusSeconds(timeDiff);
@@ -2799,10 +2805,10 @@ public class TourManager {
     * @param lastSerieIndex
     * @param isRemoveTime
     */
-   private static void removeTourMarkers(final TourData tourData,
-                                         final int firstSerieIndex,
-                                         final int lastSerieIndex,
-                                         final boolean isRemoveTime) {
+   private static void removeTimeSlices_TourMarkers(final TourData tourData,
+                                                    final int firstSerieIndex,
+                                                    final int lastSerieIndex,
+                                                    final boolean isRemoveTime) {
 
       // check if markers are available
       final Set<TourMarker> allTourMarkers = tourData.getTourMarkers();
