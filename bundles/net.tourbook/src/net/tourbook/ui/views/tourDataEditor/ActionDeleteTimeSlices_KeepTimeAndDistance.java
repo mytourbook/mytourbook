@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2023 Wolfgang Schramm and Contributors
+ * Copyright (C) 2023, 2025 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -27,7 +27,7 @@ class ActionDeleteTimeSlices_KeepTimeAndDistance extends Action {
 
    public ActionDeleteTimeSlices_KeepTimeAndDistance(final TourDataEditorView tourDataEditorView) {
 
-      super(Messages.action_tour_editor_delete_time_slices_keep_time_and_distance, AS_PUSH_BUTTON);
+      super(Messages.Tour_Editor_Action_DeleteTimeSlices_KeepTimeAndDistance, AS_PUSH_BUTTON);
 
       setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.App_Delete));
       setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Images.App_Delete_Disabled));

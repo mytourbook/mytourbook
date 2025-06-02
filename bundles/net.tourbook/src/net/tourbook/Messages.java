@@ -3255,14 +3255,13 @@ public class Messages extends NLS {
    public static String        TourEditor_Dialog_SetAltitudeFromSRTM_Message;
    public static String        TourEditor_Dialog_SetAltitudeFromSRTM_Title;
 
-   public static String        action_tour_editor_delete_time_slices_keep_time;
-   public static String        action_tour_editor_delete_time_slices_keep_time_and_distance;
-   public static String        action_tour_editor_delete_time_slices_remove_time;
-
-   public static String        Tour_Editor_Action_DeleteTimeSlices_AdjustTourStartTime;
    public static String        Tour_Editor_Action_DeleteTimeSlices_AdjustTourStartTime_KeepOtherValues;
    public static String        Tour_Editor_Action_DeleteTimeSlices_AdjustTourStartTime_KeepOtherValues_Tooltip;
+   public static String        Tour_Editor_Action_DeleteTimeSlices_AdjustTourStartTime;
    public static String        Tour_Editor_Action_DeleteTimeSlices_AdjustTourStartTime_Tooltip;
+   public static String        Tour_Editor_Action_DeleteTimeSlices_KeepTime;
+   public static String        Tour_Editor_Action_DeleteTimeSlices_KeepTimeAndDistance;
+   public static String        Tour_Editor_Action_DeleteTimeSlices_RemoveTime;
    public static String        Tour_Editor_Action_RemovePhotoGeoPosition;
    public static String        Tour_Editor_Action_RemovePhotoGeoPosition_Tooltip;
    public static String        Tour_Editor_Button_DiscardModifications;

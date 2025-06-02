@@ -97,11 +97,11 @@ public class TourDataEditorViewTests extends UITest {
 
       timeSlicesTable.select(3);
 
-      timeSlicesTable.contextMenu(Messages.action_tour_editor_delete_time_slices_keep_time).click();
+      timeSlicesTable.contextMenu(Messages.Tour_Editor_Action_DeleteTimeSlices_KeepTime).click();
       Utils.clickOkButton(bot);
 
       timeSlicesTable = tourEditorViewBot.table();
-      timeSlicesTable.contextMenu(Messages.action_tour_editor_delete_time_slices_keep_time).click();
+      timeSlicesTable.contextMenu(Messages.Tour_Editor_Action_DeleteTimeSlices_KeepTime).click();
 
       bot.toolbarButtonWithTooltip(Utils.SAVE_MODIFIED_TOUR).click();
 
