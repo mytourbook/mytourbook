@@ -12413,13 +12413,6 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
       final long firstTimeMS = tourStartTimeMS + (timeSerie[firstSerieIndex] * 1000L);
       final long lastTimeMS = tourStartTimeMS + (timeSerie[lastSerieIndex] * 1000L);
 
-//      final String dtStart = TimeTools.Formatter_DateTime_SM.format(TimeTools.getZonedDateTime(tourStartTimeMS));
-//      final String dtFirst = TimeTools.Formatter_DateTime_SM.format(TimeTools.getZonedDateTime(firstTimeMS));
-//      final String dtLast = TimeTools.Formatter_DateTime_SM.format(TimeTools.getZonedDateTime(lastTimeMS));
-//
-//      System.out.println(dtStart + " ### " + firstSerieIndex + ":" + dtFirst + " - " + lastSerieIndex + ":" + dtLast);
-//// TODO remove SYSTEM.OUT.PRINTLN
-
       final Set<TourPhoto> allTourPhotos = tourPhotos;
       final ArrayList<TourPhoto> allSortedPhotos = new ArrayList<>(allTourPhotos);
       Collections.sort(allSortedPhotos, (tourPhoto1, tourPhoto2) -> {
@@ -12433,31 +12426,18 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
 
          final long photoTimeMS = tourPhoto.getAdjustedTime();
 
-//         final String dtPhoto = TimeTools.Formatter_DateTime_SM.format(TimeTools.getZonedDateTime(photoTimeMS));
-
          final boolean isInRange_Begin = photoTimeMS >= firstTimeMS;
          final boolean isInRange_End = photoTimeMS <= lastTimeMS;
 
          if (isInRange_Begin && isInRange_End) {
 
-//            System.out.println(" removed " + dtPhoto);
-//// TODO remove SYSTEM.OUT.PRINTLN
-
             allRemovedPhotos.add(tourPhoto);
-
-         } else {
-
-//            System.out.println(" not removed " + dtPhoto);
-//// TODO remove SYSTEM.OUT.PRINTLN
          }
       }
 
       final int numRemovedPhotos = allRemovedPhotos.size();
 
       if (numRemovedPhotos > 0) {
-
-//         System.out.println(" removed " + numRemovedPhotos);
-//// TODO remove SYSTEM.OUT.PRINTLN
 
          tourPhotos.removeAll(allRemovedPhotos);
 
