@@ -171,13 +171,14 @@ Remove debug code
      Enable   "<win32>config-win.ini</win32>"
 
 
-Copy/Merge app files to build folder
---------------------------
-   Run ant script "CREATE_MT_BuildFiles.xml" in project "build.net.tourbook"
-
-
+#############
 Build Product
---------------
+#############
+
+   Copy/Merge app files to build folder
+   
+      Run ant script "CREATE_MT_BuildFiles.xml" in project "build.net.tourbook"
+
    Open cmd
    
       - Select folder "C:\DAT\MT\mytourbook"
