@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2012, 2023 Wolfgang Schramm and Contributors
+ * Copyright (C) 2012, 2025 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -20,10 +20,11 @@ public interface ICommonPreferences {
    /*
     * Appearance, is mainly used for debugging purposes
     */
-   public static final String APPEARANCE_IS_SHOW_MEMORY_MONITOR_IN_APP       = "APPEARANCE_IS_SHOW_MEMORY_MONITOR_IN_APP";       //$NON-NLS-1$
-   public static final String APPEARANCE_IS_SHOW_RESTART_APP_ACTION_IN_APP   = "APPEARANCE_IS_SHOW_RESTART_APP_ACTION_IN_APP";   //$NON-NLS-1$
-   public static final String APPEARANCE_IS_SHOW_SCRAMBLE_DATA_ACTION_IN_APP = "APPEARANCE_IS_SHOW_SCRAMBLE_DATA_ACTION_IN_APP"; //$NON-NLS-1$
-   public static final String APPEARANCE_NOTIFICATION_MESSAGES_DURATION      = "APPEARANCE_NOTIFICATION_MESSAGES_DURATION";      //$NON-NLS-1$
+   public static final String APPEARANCE_IS_SHOW_EXTENDED_VERSION_IN_APP_TITLE = "APPEARANCE_IS_SHOW_EXTENDED_VERSION_IN_APP_TITLE"; //$NON-NLS-1$
+   public static final String APPEARANCE_IS_SHOW_MEMORY_MONITOR_IN_APP         = "APPEARANCE_IS_SHOW_MEMORY_MONITOR_IN_APP";         //$NON-NLS-1$
+   public static final String APPEARANCE_IS_SHOW_RESTART_APP_ACTION_IN_APP     = "APPEARANCE_IS_SHOW_RESTART_APP_ACTION_IN_APP";     //$NON-NLS-1$
+   public static final String APPEARANCE_IS_SHOW_SCRAMBLE_DATA_ACTION_IN_APP   = "APPEARANCE_IS_SHOW_SCRAMBLE_DATA_ACTION_IN_APP";   //$NON-NLS-1$
+   public static final String APPEARANCE_NOTIFICATION_MESSAGES_DURATION        = "APPEARANCE_NOTIFICATION_MESSAGES_DURATION";        //$NON-NLS-1$
 
    /*
     * Theme
@@ -100,6 +101,6 @@ public interface ICommonPreferences {
    /*
     * Autocomplete
     */
-   public static final String AUTO_COMPLETE_PREFIX  = "AUTO_COMPLETE_PREFIX";  //$NON-NLS-1$
+   public static final String AUTO_COMPLETE_PREFIX = "AUTO_COMPLETE_PREFIX"; //$NON-NLS-1$
 
 }

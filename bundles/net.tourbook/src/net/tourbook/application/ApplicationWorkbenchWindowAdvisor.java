@@ -115,6 +115,7 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
    private String                            _lastPartTitle    = UI.EMPTY_STRING;
 
    private String                            _appTitle;
+   private String                            _appTitle_Extended;
 
    private final ApplicationWorkbenchAdvisor _wbAdvisor;
 
@@ -128,6 +129,10 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
 
       _appTitle = Messages.App_Title + UI.DASH_WITH_SPACE
             + ApplicationVersion.getVersionSimple()
+            + ApplicationVersion.getDevelopmentId();
+
+      _appTitle_Extended = Messages.App_Title + UI.DASH_WITH_SPACE
+            + ApplicationVersion.getVersionFull()
             + ApplicationVersion.getDevelopmentId();
    }
 
@@ -174,7 +179,9 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
 //			title = UI.EMPTY_STRING;
 //		}
 
-      String title = _appTitle;
+      final boolean isShowExtendedAppVersion = _prefStore_Common.getBoolean(ICommonPreferences.APPEARANCE_IS_SHOW_EXTENDED_VERSION_IN_APP_TITLE);
+
+      String title = isShowExtendedAppVersion ? _appTitle_Extended : _appTitle;
 
       if (currentPage != null) {
 

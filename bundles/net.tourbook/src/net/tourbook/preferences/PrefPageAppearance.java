@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2008, 2024 Wolfgang Schramm and Contributors
+ * Copyright (C) 2008, 2025 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -93,6 +93,7 @@ public class PrefPageAppearance extends PreferencePage implements IWorkbenchPref
    private Button  _btnResetAllToggleDialogs;
 
    private Button  _chkAutoOpenTagging;
+   private Button  _chkShowInApp_ExtendedVersion;
    private Button  _chkShowInApp_MemoryMonitor;
    private Button  _chkShowInApp_RestartApp;
    private Button  _chkShowInApp_ScrambleData;
@@ -302,6 +303,13 @@ public class PrefPageAppearance extends PreferencePage implements IWorkbenchPref
 
       {
          /*
+          * Extended version in app title
+          */
+         _chkShowInApp_ExtendedVersion = new Button(parent, SWT.CHECK);
+         _chkShowInApp_ExtendedVersion.setText("Show app version &qualifier in the app title bar");
+      }
+      {
+         /*
           * Checkbox: Show restart app action in app toolbar
           */
          _chkShowInApp_RestartApp = new Button(parent, SWT.CHECK);
@@ -320,7 +328,6 @@ public class PrefPageAppearance extends PreferencePage implements IWorkbenchPref
           */
          _chkShowInApp_MemoryMonitor = new Button(parent, SWT.CHECK);
          _chkShowInApp_MemoryMonitor.setText(Messages.pref_appearance_showMemoryMonitor);
-//         GridDataFactory.fillDefaults().indent(0, 10).applyTo(_chkMemMonitor);
       }
       {
          /*
@@ -357,7 +364,6 @@ public class PrefPageAppearance extends PreferencePage implements IWorkbenchPref
          _btnResetAllToggleDialogs.setToolTipText(Messages.Pref_Appearance_Button_ResetAllToggleDialogs_Tooltip);
          _btnResetAllToggleDialogs.addSelectionListener(SelectionListener.widgetSelectedAdapter(selectionEvent -> onResetAllToggleDialogs()));
          GridDataFactory.fillDefaults()
-//               .indent(0, 10)
                .align(SWT.BEGINNING, SWT.FILL)
                .applyTo(_btnResetAllToggleDialogs);
       }
@@ -519,6 +525,7 @@ public class PrefPageAppearance extends PreferencePage implements IWorkbenchPref
       _chkTaggingAnimation                .setSelection(_prefStore.getDefaultBoolean(ITourbookPreferences.APPEARANCE_IS_TAGGING_ANIMATION));
       _spinnerAutoOpenDelay               .setSelection(_prefStore.getDefaultInt(ITourbookPreferences.APPEARANCE_TAGGING_AUTO_OPEN_DELAY));
 
+      _chkShowInApp_ExtendedVersion       .setSelection(false);
       _chkShowInApp_MemoryMonitor         .setSelection(false);
       _chkShowInApp_RestartApp            .setSelection(false);
       _chkShowInApp_ScrambleData          .setSelection(false);
@@ -660,6 +667,8 @@ public class PrefPageAppearance extends PreferencePage implements IWorkbenchPref
        */
 // SET_FORMATTING_OFF
 
+      final boolean isShowExtendedVersion = _prefStore_Common.getBoolean(ICommonPreferences.APPEARANCE_IS_SHOW_EXTENDED_VERSION_IN_APP_TITLE);
+
       _isShowInApp_MemoryMonitor = _prefStore_Common.getBoolean(ICommonPreferences.APPEARANCE_IS_SHOW_MEMORY_MONITOR_IN_APP);
       _isShowInApp_RestartApp    = _prefStore_Common.getBoolean(ICommonPreferences.APPEARANCE_IS_SHOW_RESTART_APP_ACTION_IN_APP);
       _isShowInApp_ScrambleData  = _prefStore_Common.getBoolean(ICommonPreferences.APPEARANCE_IS_SHOW_SCRAMBLE_DATA_ACTION_IN_APP);
@@ -667,6 +676,7 @@ public class PrefPageAppearance extends PreferencePage implements IWorkbenchPref
 
       _spinnerNotificationMessagesDuration.setSelection(_prefStore_Common.getInt(ICommonPreferences.APPEARANCE_NOTIFICATION_MESSAGES_DURATION));
 
+      _chkShowInApp_ExtendedVersion       .setSelection(isShowExtendedVersion);
       _chkShowInApp_MemoryMonitor         .setSelection(_isShowInApp_MemoryMonitor);
       _chkShowInApp_RestartApp            .setSelection(_isShowInApp_RestartApp);
       _chkShowInApp_ScrambleData          .setSelection(_isShowInApp_ScrambleData);
@@ -689,11 +699,12 @@ public class PrefPageAppearance extends PreferencePage implements IWorkbenchPref
       _prefStore.setValue(ITourbookPreferences.APPEARANCE_IS_TAGGING_ANIMATION,     _chkTaggingAnimation.getSelection());
       _prefStore.setValue(ITourbookPreferences.APPEARANCE_TAGGING_AUTO_OPEN_DELAY,  _spinnerAutoOpenDelay.getSelection());
 
-      _prefStore_Common.setValue(ICommonPreferences.APPEARANCE_IS_SHOW_MEMORY_MONITOR_IN_APP,         _chkShowInApp_MemoryMonitor.getSelection());
-      _prefStore_Common.setValue(ICommonPreferences.APPEARANCE_IS_SHOW_RESTART_APP_ACTION_IN_APP,     _chkShowInApp_RestartApp.getSelection());
-      _prefStore_Common.setValue(ICommonPreferences.APPEARANCE_IS_SHOW_SCRAMBLE_DATA_ACTION_IN_APP,   _chkShowInApp_ScrambleData.getSelection());
-      _prefStore_Common.setValue(ICommonPreferences.APPEARANCE_NOTIFICATION_MESSAGES_DURATION,        _spinnerNotificationMessagesDuration.getSelection());
-      _prefStore_Common.setValue(ICommonPreferences.THEME_IS_SHOW_THEME_SELECTOR_IN_APP,              _chkShowInApp_ThemeSelector.getSelection());
+      _prefStore_Common.setValue(ICommonPreferences.APPEARANCE_IS_SHOW_EXTENDED_VERSION_IN_APP_TITLE, _chkShowInApp_ExtendedVersion          .getSelection());
+      _prefStore_Common.setValue(ICommonPreferences.APPEARANCE_IS_SHOW_MEMORY_MONITOR_IN_APP,         _chkShowInApp_MemoryMonitor            .getSelection());
+      _prefStore_Common.setValue(ICommonPreferences.APPEARANCE_IS_SHOW_RESTART_APP_ACTION_IN_APP,     _chkShowInApp_RestartApp               .getSelection());
+      _prefStore_Common.setValue(ICommonPreferences.APPEARANCE_IS_SHOW_SCRAMBLE_DATA_ACTION_IN_APP,   _chkShowInApp_ScrambleData             .getSelection());
+      _prefStore_Common.setValue(ICommonPreferences.APPEARANCE_NOTIFICATION_MESSAGES_DURATION,        _spinnerNotificationMessagesDuration   .getSelection());
+      _prefStore_Common.setValue(ICommonPreferences.THEME_IS_SHOW_THEME_SELECTOR_IN_APP,              _chkShowInApp_ThemeSelector            .getSelection());
 
 // SET_FORMATTING_ON
    }
