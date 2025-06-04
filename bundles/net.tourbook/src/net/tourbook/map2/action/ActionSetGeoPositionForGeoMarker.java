@@ -18,6 +18,7 @@ package net.tourbook.map2.action;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import java.util.Collections;
 import java.util.List;
 
 import net.tourbook.common.UI;
@@ -341,6 +342,18 @@ public class ActionSetGeoPositionForGeoMarker extends SubMenu {
     * @param currentMouseGeoPosition
     */
    public void setContextData(final List<TourMarker> allGeoMarker, final GeoPosition currentMouseGeoPosition) {
+
+      if (allGeoMarker == null) {
+
+         // this happened during app startup
+
+         return;
+      }
+
+      // sort geo marker by name
+      Collections.sort(
+            allGeoMarker,
+            (tourMarker1, tourMarker2) -> tourMarker1.getLabel().compareTo(tourMarker2.getLabel()));
 
       _allGeoMarker = allGeoMarker;
       _currentMouseGeoPosition = currentMouseGeoPosition;

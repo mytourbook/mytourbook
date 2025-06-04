@@ -5197,6 +5197,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
       final boolean isOnlyLastIndex = fromIndex == lastTimeSliceIndex && firstIndex == 0 && lastIndex == lastTimeSliceIndex - 1;
 
       if (
+
       // only the first or last time slice has a position
       isOnlyFirstIndex || isOnlyLastIndex
 
