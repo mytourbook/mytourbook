@@ -18,8 +18,10 @@ package net.tourbook.map2.action;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 
 import net.tourbook.common.UI;
 import net.tourbook.common.map.GeoPosition;
@@ -27,11 +29,13 @@ import net.tourbook.common.ui.SubMenu;
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourMarker;
+import net.tourbook.data.TourPhoto;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.importdata.ImportState_Process;
 import net.tourbook.importdata.RawDataManager;
 import net.tourbook.map2.Messages;
 import net.tourbook.tour.TourManager;
+import net.tourbook.tour.photo.TourPhotoManager;
 
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.ActionContributionItem;
@@ -192,6 +196,8 @@ public class ActionSetGeoPositionForGeoMarker extends SubMenu {
       // keep geo position in the marker
       geoMarker.setGeoPosition(geoMarkerLatitude, geoMarkerLongitude);
       geoMarker.setDescription(getGeoMarkerJSON(_currentMouseGeoPosition));
+
+      setTourGPSIntoPhotos(tourData);
 
       TourManager.saveModifiedTour(tourData);
    }
@@ -359,4 +365,140 @@ public class ActionSetGeoPositionForGeoMarker extends SubMenu {
       _currentMouseGeoPosition = currentMouseGeoPosition;
    }
 
+   /**
+    * This is partly copied from
+    * {@link TourPhotoManager#setTourGPSIntoPhotos_10(net.tourbook.tour.photo.TourPhotoLink)}
+    *
+    * @param tourData
+    */
+   private void setTourGPSIntoPhotos(final TourData tourData) {
+
+      final double[] latitudeSerie = tourData.latitudeSerie;
+      final double[] longitudeSerie = tourData.longitudeSerie;
+
+      if (latitudeSerie == null) {
+         // no geo positions
+         return;
+      }
+
+      final Set<TourPhoto> allTourPhotos = tourData.getTourPhotos();
+
+      final int numPhotos = allTourPhotos.size();
+      if (numPhotos == 0) {
+         // no photos are available for this tour
+         return;
+      }
+
+      // sort photos by time
+      final List<TourPhoto> allSortedPhotos = new ArrayList<>(allTourPhotos);
+      Collections.sort(allSortedPhotos, (tourPhoto1, tourPhoto2) -> {
+         return Long.compare(tourPhoto1.getImageExifTime(), tourPhoto2.getImageExifTime());
+      });
+
+      final int[] timeSerie = tourData.timeSerie;
+      final int numTimeSlices = timeSerie.length;
+
+      final long tourStartSec = tourData.getTourStartTime().toInstant().getEpochSecond();
+
+      long timeSliceEndSec;
+
+      if (numTimeSlices > 1) {
+         timeSliceEndSec = tourStartSec + (long) (timeSerie[1] / 2.0);
+      } else {
+         // tour contains only 1 time slice
+         timeSliceEndSec = tourStartSec;
+      }
+
+      int timeIndex = 0;
+      int photoIndex = 0;
+
+      // get first photo
+      TourPhoto tourPhoto = allSortedPhotos.get(photoIndex);
+
+      // loop: time serie
+      while (true) {
+
+         // loop: photo serie, check if a photo is in the current time slice
+         while (true) {
+
+            final long imageAdjustedTime = tourPhoto.getAdjustedTime();
+            long imageTime = 0;
+
+            if (imageAdjustedTime != Long.MIN_VALUE) {
+               imageTime = imageAdjustedTime;
+            } else {
+               imageTime = tourPhoto.getImageExifTime();
+            }
+
+            final long photoTimeSec = imageTime / 1000;
+
+            if (photoTimeSec <= timeSliceEndSec) {
+
+               // photo is contained within the current time slice
+
+               final double tourLatitude = latitudeSerie[timeIndex];
+               final double tourLongitude = longitudeSerie[timeIndex];
+
+               tourPhoto.setGeoLocation(tourLatitude, tourLongitude);
+
+               photoIndex++;
+
+            } else {
+
+               // advance to the next time slice
+
+               break;
+            }
+
+            if (photoIndex < numPhotos) {
+               tourPhoto = allSortedPhotos.get(photoIndex);
+            } else {
+               break;
+            }
+         }
+
+         if (photoIndex >= numPhotos) {
+            // no more photos
+            break;
+         }
+
+         /*
+          * Photos are still available
+          */
+
+         // advance to the next time slice on the x-axis
+         timeIndex++;
+
+         if (timeIndex >= numTimeSlices - 1) {
+
+            /*
+             * end of tour is reached but there are still photos available, set remaining photos
+             * at the end of the tour
+             */
+
+            while (true) {
+
+               final double tourLatitude = latitudeSerie[timeIndex];
+               final double tourLongitude = longitudeSerie[timeIndex];
+
+               tourPhoto.setGeoLocation(tourLatitude, tourLongitude);
+
+               photoIndex++;
+
+               if (photoIndex < numPhotos) {
+                  tourPhoto = allSortedPhotos.get(photoIndex);
+               } else {
+                  break;
+               }
+            }
+
+         } else {
+
+            final long valuePointTime = timeSerie[timeIndex];
+            final long sliceDuration = timeSerie[timeIndex + 1] - valuePointTime;
+
+            timeSliceEndSec = tourStartSec + valuePointTime + (sliceDuration / 2);
+         }
+      }
+   }
 }
