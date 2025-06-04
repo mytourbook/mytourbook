@@ -120,19 +120,21 @@ public class ActionSetGeoPositionForGeoMarker extends SubMenu {
          return;
       }
 
+      cleanupGeoPositions(reimportedTourData);
+
       final int[] timeSerie = reimportedTourData.timeSerie;
       final double[] reimportedLatitudeSerie = reimportedTourData.latitudeSerie;
-      final double[] reimportedlongitudeSerie = reimportedTourData.longitudeSerie;
+      final double[] reimportedLongitudeSerie = reimportedTourData.longitudeSerie;
 
       // interpolate lat/lon
       reimportedTourData.createTimeSeries_20_InterpolateMissingValues(reimportedLatitudeSerie, timeSerie, false);
-      reimportedTourData.createTimeSeries_20_InterpolateMissingValues(reimportedlongitudeSerie, timeSerie, false);
+      reimportedTourData.createTimeSeries_20_InterpolateMissingValues(reimportedLongitudeSerie, timeSerie, false);
 
       // adjust distance/speed values
       TourManager.computeDistanceValuesFromGeoPosition(reimportedTourData);
 
       tourData.latitudeSerie = reimportedLatitudeSerie;
-      tourData.longitudeSerie = reimportedlongitudeSerie;
+      tourData.longitudeSerie = reimportedLongitudeSerie;
       tourData.distanceSerie = reimportedTourData.distanceSerie;
 
       TourManager.saveModifiedTour(tourData);
@@ -158,9 +160,11 @@ public class ActionSetGeoPositionForGeoMarker extends SubMenu {
          return;
       }
 
+      cleanupGeoPositions(reimportedTourData);
+
       final int[] timeSerie = tourData.timeSerie;
       final double[] reimportedLatitudeSerie = reimportedTourData.latitudeSerie;
-      final double[] reimportedlongitudeSerie = reimportedTourData.longitudeSerie;
+      final double[] reimportedLongitudeSerie = reimportedTourData.longitudeSerie;
 
       final int geoMarkerSerieIndex = geoMarker.getSerieIndex();
       final double geoMarkerLatitude = _currentMouseGeoPosition.latitude;
@@ -168,20 +172,20 @@ public class ActionSetGeoPositionForGeoMarker extends SubMenu {
 
       // insert current geo position with the current geo marker position into the lat/lon values
       reimportedLatitudeSerie[geoMarkerSerieIndex] = geoMarkerLatitude;
-      reimportedlongitudeSerie[geoMarkerSerieIndex] = geoMarkerLongitude;
+      reimportedLongitudeSerie[geoMarkerSerieIndex] = geoMarkerLongitude;
 
       // set lat/lon for all other geo markers
-      createOtherGeoPositions(geoMarker, tourData, reimportedLatitudeSerie, reimportedlongitudeSerie);
+      createOtherGeoPositions(geoMarker, tourData, reimportedLatitudeSerie, reimportedLongitudeSerie);
 
       // interpolate lat/lon
       tourData.createTimeSeries_20_InterpolateMissingValues(reimportedLatitudeSerie, timeSerie, false);
-      tourData.createTimeSeries_20_InterpolateMissingValues(reimportedlongitudeSerie, timeSerie, false);
+      tourData.createTimeSeries_20_InterpolateMissingValues(reimportedLongitudeSerie, timeSerie, false);
 
       // adjust distance/speed values
       TourManager.computeDistanceValuesFromGeoPosition(reimportedTourData);
 
       tourData.latitudeSerie = reimportedLatitudeSerie;
-      tourData.longitudeSerie = reimportedlongitudeSerie;
+      tourData.longitudeSerie = reimportedLongitudeSerie;
       tourData.distanceSerie = reimportedTourData.distanceSerie;
 
       // keep geo position in the marker
@@ -191,17 +195,54 @@ public class ActionSetGeoPositionForGeoMarker extends SubMenu {
       TourManager.saveModifiedTour(tourData);
    }
 
+   /**
+    * The import state with
+    * <p>
+    * <code>new ImportState_Process().setIsSkipGeoInterpolation(true);</code>
+    * <p>
+    * is creating interpolated values for latitude, cleanup these values that they are interpolated
+    * correctly with #geo positions
+    *
+    * @param reimportedTourData
+    */
+   private void cleanupGeoPositions(final TourData reimportedTourData) {
+
+      final boolean[] allInterpolatedValueSerie = reimportedTourData.interpolatedValueSerie;
+
+      final double[] latitudeSerie = reimportedTourData.latitudeSerie;
+      final double[] longitudeSerie = reimportedTourData.longitudeSerie;
+
+      for (int serieIndex = 0; serieIndex < allInterpolatedValueSerie.length; serieIndex++) {
+
+         final boolean isInterpolated = allInterpolatedValueSerie[serieIndex];
+
+         if (isInterpolated) {
+
+            latitudeSerie[serieIndex] = Double.MIN_VALUE;
+            longitudeSerie[serieIndex] = Double.MIN_VALUE;
+         }
+      }
+   }
+
    private void createOtherGeoPositions(final TourMarker currentGeoMarker,
                                         final TourData tourData,
-                                        final double[] latitudeSerie,
-                                        final double[] longitudeSerie) {
+                                        final double[] reimportedLatitudeSerie,
+                                        final double[] reimportedLongitudeSerie) {
 
       final String geoPrefix = GEO_MARKER_PREFIX.toLowerCase();
 
-      for (final TourMarker tourMarker : tourData.getTourMarkers()) {
+      final List<TourMarker> allSortedTourMarkers = tourData.getTourMarkersSorted();
+      final int numTourMarkers = allSortedTourMarkers.size();
+
+      for (int markerIndex = 0; markerIndex < numTourMarkers; markerIndex++) {
+
+         final TourMarker tourMarker = allSortedTourMarkers.get(markerIndex);
+
+         final int serieIndex = tourMarker.getSerieIndex();
 
          // skip current geo marker
          if (tourMarker.equals(currentGeoMarker)) {
+
             continue;
          }
 
@@ -209,11 +250,17 @@ public class ActionSetGeoPositionForGeoMarker extends SubMenu {
 
          if (label.trim().toLowerCase().startsWith(geoPrefix)) {
 
-            // this is a geo marker
+            // this is a geo marker with a #geo prefix
 
             final String markerDescription = tourMarker.getDescription();
 
-            if (markerDescription != null) {
+            if (markerDescription != null
+
+                  /*
+                   * Ensure that the geo position is set in the description, it is possible that a
+                   * geo position it set later
+                   */
+                  && markerDescription.trim().length() > 0) {
 
                try {
 
@@ -224,10 +271,8 @@ public class ActionSetGeoPositionForGeoMarker extends SubMenu {
 
                   if (markerGeoPos != null) {
 
-                     final int serieIndex = tourMarker.getSerieIndex();
-
-                     latitudeSerie[serieIndex] = markerGeoPos.latitude;
-                     longitudeSerie[serieIndex] = markerGeoPos.longitude;
+                     reimportedLatitudeSerie[serieIndex] = markerGeoPos.latitude;
+                     reimportedLongitudeSerie[serieIndex] = markerGeoPos.longitude;
                   }
 
                } catch (final JsonProcessingException e) {

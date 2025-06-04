@@ -35,9 +35,9 @@ import net.tourbook.tour.TourManager;
  */
 public class ImportState_Process {
 
-   private boolean                                 isLog_DEFAULT;
-   private boolean                                 isLog_INFO;
-   private boolean                                 isLog_OK;
+   private boolean                                 _isLog_DEFAULT;
+   private boolean                                 _isLog_INFO;
+   private boolean                                 _isLog_OK;
 
    /**
     * IN state:
@@ -45,7 +45,7 @@ public class ImportState_Process {
     * When <code>true</code> then errors are not displayed to the user, default is
     * <code>false</code>
     */
-   private boolean                                 isSilentError;
+   private boolean                                 _isSilentError;
 
    /**
     * IN state:
@@ -53,7 +53,7 @@ public class ImportState_Process {
     * When <code>true</code> then tours will be skipped when the import file is not defined or not
     * available, default is <code>false</code>
     */
-   private boolean                                 isSkipToursWithFileNotFound;
+   private boolean                                 _isSkipToursWithFileNotFound;
 
    /**
     * IN state:
@@ -61,7 +61,7 @@ public class ImportState_Process {
     * Is <code>true</code> when the import is started from easy import, default is
     * <code>false</code>
     */
-   private boolean                                 isEasyImport;
+   private boolean                                 _isEasyImport;
 
    /**
     * IN state:
@@ -69,35 +69,35 @@ public class ImportState_Process {
     * Is <code>true</code> when the current import is run within a JUnit test, default is
     * <code>false</code>
     */
-   private boolean                                 isJUnitTest;
+   private boolean                                 _isJUnitTest;
 
    /**
     * IN state:
     * <p>
     * Is <code>true</code> when interpolation should be skipped for lat/lon values
     */
-   private boolean                                 isSkipGeoInterpolation;
+   private boolean                                 _isSkipGeoInterpolation;
 
    /**
     * INTERNAL state:
     * <p>
     * Contains a unique id so that each import can be identified.
     */
-   private long                                    importId                      = System.currentTimeMillis();
+   private long                                    _importId                      = System.currentTimeMillis();
 
    /**
     * OUT state:
     * <p>
     * Is <code>true</code> when the import was canceled by the user
     */
-   private AtomicBoolean                           isImportCanceled_ByMonitor    = new AtomicBoolean();
+   private AtomicBoolean                           _isImportCanceled_ByMonitor    = new AtomicBoolean();
 
    /**
     * OUT state:
     * <p>
     * Is <code>true</code> when the import was canceled after a dialog was displayed to the user
     */
-   private AtomicBoolean                           isImportCanceled_ByUserDialog = new AtomicBoolean();
+   private AtomicBoolean                           _isImportCanceled_ByUserDialog = new AtomicBoolean();
 
    /**
     * OUT state:
@@ -105,7 +105,7 @@ public class ImportState_Process {
     * When set to <code>true</code> then {@link #runPostProcess()} should be run AFTER all is
     * imported.
     */
-   private AtomicBoolean                           isCreated_NewTag              = new AtomicBoolean();
+   private AtomicBoolean                           _isCreated_NewTag              = new AtomicBoolean();
 
    /**
     * OUT state:
@@ -113,7 +113,7 @@ public class ImportState_Process {
     * When set to <code>true</code> then {@link #runPostProcess()} should be run AFTER all is
     * imported.
     */
-   private AtomicBoolean                           isCreated_NewTourType         = new AtomicBoolean();
+   private AtomicBoolean                           _isCreated_NewTourType         = new AtomicBoolean();
 
    /**
     * OUT state:
@@ -139,7 +139,7 @@ public class ImportState_Process {
    }
 
    public long getImportId() {
-      return importId;
+      return _importId;
    }
 
    /**
@@ -151,7 +151,7 @@ public class ImportState_Process {
     * @return
     */
    public AtomicBoolean isCreated_NewTag() {
-      return isCreated_NewTag;
+      return _isCreated_NewTag;
    }
 
    /**
@@ -163,47 +163,47 @@ public class ImportState_Process {
     * @return
     */
    public AtomicBoolean isCreated_NewTourType() {
-      return isCreated_NewTourType;
+      return _isCreated_NewTourType;
    }
 
    public boolean isEasyImport() {
-      return isEasyImport;
+      return _isEasyImport;
    }
 
    public AtomicBoolean isImportCanceled_ByMonitor() {
-      return isImportCanceled_ByMonitor;
+      return _isImportCanceled_ByMonitor;
    }
 
    public AtomicBoolean isImportCanceled_ByUserDialog() {
-      return isImportCanceled_ByUserDialog;
+      return _isImportCanceled_ByUserDialog;
    }
 
    public boolean isJUnitTest() {
-      return isJUnitTest;
+      return _isJUnitTest;
    }
 
    public boolean isLog_DEFAULT() {
-      return isLog_DEFAULT;
+      return _isLog_DEFAULT;
    }
 
    public boolean isLog_INFO() {
-      return isLog_INFO;
+      return _isLog_INFO;
    }
 
    public boolean isLog_OK() {
-      return isLog_OK;
+      return _isLog_OK;
    }
 
    public boolean isSilentError() {
-      return isSilentError;
+      return _isSilentError;
    }
 
    public boolean isSkipGeoInterpolation() {
-      return isSkipGeoInterpolation;
+      return _isSkipGeoInterpolation;
    }
 
    public boolean isSkipToursWithFileNotFound() {
-      return isSkipToursWithFileNotFound;
+      return _isSkipToursWithFileNotFound;
    }
 
    /**
@@ -215,12 +215,12 @@ public class ImportState_Process {
          updateSensors();
       }
 
-      if (isCreated_NewTourType.get()) {
+      if (_isCreated_NewTourType.get()) {
 
          TourbookPlugin.getPrefStore().setValue(ITourbookPreferences.TOUR_TYPE_LIST_IS_MODIFIED, Math.random());
       }
 
-      if (isCreated_NewTag.get()) {
+      if (_isCreated_NewTag.get()) {
 
          TourManager.fireEvent(TourEventId.TAG_STRUCTURE_CHANGED);
       }
@@ -235,7 +235,7 @@ public class ImportState_Process {
     */
    public ImportState_Process setIsEasyImport(final boolean isEasyImport) {
 
-      this.isEasyImport = isEasyImport;
+      _isEasyImport = isEasyImport;
 
       return this;
    }
@@ -249,7 +249,7 @@ public class ImportState_Process {
     */
    public ImportState_Process setIsJUnitTest(final boolean isTest) {
 
-      isJUnitTest = isTest;
+      _isJUnitTest = isTest;
 
       return this;
    }
@@ -263,7 +263,7 @@ public class ImportState_Process {
     */
    public ImportState_Process setIsLog_DEFAULT(final boolean isLog) {
 
-      isLog_DEFAULT = isLog;
+      _isLog_DEFAULT = isLog;
 
       return this;
    }
@@ -277,7 +277,7 @@ public class ImportState_Process {
     */
    public ImportState_Process setIsLog_INFO(final boolean isLog) {
 
-      isLog_INFO = isLog;
+      _isLog_INFO = isLog;
 
       return this;
    }
@@ -291,7 +291,7 @@ public class ImportState_Process {
     */
    public ImportState_Process setIsLog_OK(final boolean isLog) {
 
-      isLog_OK = isLog;
+      _isLog_OK = isLog;
 
       return this;
    }
@@ -305,14 +305,14 @@ public class ImportState_Process {
     */
    public ImportState_Process setIsSilentError(final boolean isSilentError) {
 
-      this.isSilentError = isSilentError;
+      _isSilentError = isSilentError;
 
       return this;
    }
 
    public ImportState_Process setIsSkipGeoInterpolation(final boolean isSkipGeoInterpolation) {
 
-      this.isSkipGeoInterpolation = isSkipGeoInterpolation;
+      _isSkipGeoInterpolation = isSkipGeoInterpolation;
 
       return this;
    }
@@ -326,7 +326,7 @@ public class ImportState_Process {
     */
    public ImportState_Process setIsSkipToursWithFileNotFound(final boolean isSkipToursWithFileNotFound) {
 
-      this.isSkipToursWithFileNotFound = isSkipToursWithFileNotFound;
+      _isSkipToursWithFileNotFound = isSkipToursWithFileNotFound;
 
       return this;
    }
@@ -334,11 +334,11 @@ public class ImportState_Process {
    public void transferCreateStates(final ImportState_Process importState_Process) {
 
       if (importState_Process.isCreated_NewTag().get()) {
-         isCreated_NewTag.set(true);
+         _isCreated_NewTag.set(true);
       }
 
-      if (importState_Process.isCreated_NewTourType.get()) {
-         isCreated_NewTourType.set(true);
+      if (importState_Process._isCreated_NewTourType.get()) {
+         _isCreated_NewTourType.set(true);
       }
    }
 

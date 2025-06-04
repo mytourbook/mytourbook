@@ -4058,7 +4058,6 @@ public class Map2View extends ViewPart implements
    private List<TourMarker> getTourMarkersWhereGeoPositionsCanBeSet() {
 
       if (_allTourData.size() != 1) {
-
          return null;
       }
 
@@ -4067,15 +4066,15 @@ public class Map2View extends ViewPart implements
       final double[] latitudeSerie = tourData.latitudeSerie;
 
       if (latitudeSerie == null || latitudeSerie.length == 0) {
-
          return null;
       }
 
       final String geoMarkerPrefix = ActionSetGeoPositionForGeoMarker.GEO_MARKER_PREFIX.toLowerCase();
-      final List<TourMarker> allGeoMarker = new ArrayList<>();
 
-      final Set<TourMarker> allTourMarkers = tourData.getTourMarkers();
-      for (final TourMarker tourMarker : allTourMarkers) {
+      final List<TourMarker> allGeoMarker = new ArrayList<>();
+      final List<TourMarker> allSortedTourMarkers = tourData.getTourMarkersSorted();
+
+      for (final TourMarker tourMarker : allSortedTourMarkers) {
 
          final String label = tourMarker.getLabel();
 

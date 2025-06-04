@@ -8184,17 +8184,28 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
       }
    }
 
+   /**
+    * @param allTourValues
+    *           This could be latitude/longitude values
+    * @param timeSerie
+    * @param isLogInterpolatedValues
+    *           When <code>true</code> then the interpolated values are logged into
+    *           {@link #interpolatedValueSerie}
+    */
    public void createTimeSeries_20_InterpolateMissingValues(final double[] allTourValues,
-                                                            final int[] time,
+                                                            final int[] timeSerie,
                                                             final boolean isLogInterpolatedValues) {
 
       if (allTourValues == null) {
          return;
       }
 
-      final int numTimeSlices = time.length;
+      final int numTimeSlices = timeSerie.length;
 
       if (isLogInterpolatedValues) {
+
+         // "interpolatedValueSerie" must be only created when logging is set to indicate this logging
+
          interpolatedValueSerie = new boolean[numTimeSlices];
       }
 
@@ -8222,8 +8233,8 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
                allTourValues[nextValidIndex] = lastValidValue;
             }
 
-            final int time1 = time[serieIndex - 1];
-            final int time2 = time[nextValidIndex];
+            final int time1 = timeSerie[serieIndex - 1];
+            final int time2 = timeSerie[nextValidIndex];
             final double val1 = allTourValues[serieIndex - 1];
             final double val2 = allTourValues[nextValidIndex];
 
@@ -8234,7 +8245,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
                      time2,
                      val1,
                      val2,
-                     time[interpolationIndex]);
+                     timeSerie[interpolationIndex]);
 
                allTourValues[interpolationIndex] = interpolationValue;
 
@@ -9760,8 +9771,8 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
     * @param geoAccuracy
     * @param distanceAccuracy
     *
-    * @return Returns tour lat/lon data multiplied by {@link #NORMALIZED_GEO_DATA_FACTOR} and
-    *         normalized (removed duplicates), or <code>null</code> when not available
+    * @return Returns tour lat/lon data which are turned into positive values with
+    *         {@link #NORMALIZED_LATITUDE_OFFSET} / {@link #NORMALIZED_LONGITUDE_OFFSET}
     */
    public NormalizedGeoData getNormalizedLatLon(final int geoAccuracy, final int distanceAccuracy) {
 
