@@ -22,7 +22,10 @@
    </dependencies>	
 
    <properties>
+      <tycho.version>4.0.13</tycho.version>
+<!-- 
       <tycho.version>3.0.5</tycho.version>
+ -->      
       <surefire.version>3.5.3</surefire.version>
       <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>  
    </properties>
@@ -71,11 +74,13 @@
       <!-- Eclipse E4 web repository -->
       
       <repository>
-         <id>eclipse.platform.4.28</id>                                 <layout>p2</layout>
-         
-         <url>https://download.eclipse.org/releases/2023-06</url>
+         <id>eclipse.platform.4.36</id>                                 <layout>p2</layout>
+         <url>https://download.eclipse.org/releases/2025-06/202506111000/</url>
          
 <!-- 
+         <id>eclipse.platform.4.28</id>                                 <layout>p2</layout>
+         <url>https://download.eclipse.org/releases/2023-06</url>
+         
          <url>https://download.eclipse.org/eclipse/updates/4.24-I-builds/I20220525-1800/</url>
          <url>https://download.eclipse.org/eclipse/updates/4.23-I-builds/I20220308-0310</url>
  -->
@@ -91,8 +96,9 @@
          <url>https://download.eclipse.org/nebula/releases/3.0.0/</url>
       </repository> 
       
-      <!-- IMPORTANT: Keep that tag in a single line as it is commented out during the GitHub build -->
+      <!-- IMPORTANT: Keep that tag in a single line as it is commented out during the GitHub build 
       <repository> <id>eclipse.4.23.nl</id> <layout>p2</layout> <url>file:build/build.eclipse.4.23.nl.repo</url> </repository>
+      -->
 
    </repositories>
 
