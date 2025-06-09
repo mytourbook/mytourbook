@@ -24,6 +24,18 @@
       <import plugin="org.eclipse.core.expressions"/>
       <import plugin="org.eclipse.core.jobs"/>
       <import plugin="org.eclipse.core.net"/>
+      <import plugin="org.eclipse.core.runtime"/>
+      <import plugin="org.eclipse.equinox.p2.artifact.repository"/>
+      <import plugin="org.eclipse.equinox.p2.director"/>
+      <import plugin="org.eclipse.equinox.p2.engine"/>
+      <import plugin="org.eclipse.equinox.p2.garbagecollector"/>
+      <import plugin="org.eclipse.equinox.p2.jarprocessor"/>
+      <import plugin="org.eclipse.equinox.p2.metadata"/>
+      <import plugin="org.eclipse.equinox.p2.operations"/>
+      <import plugin="org.eclipse.equinox.p2.repository"/>
+      <import plugin="org.eclipse.equinox.p2.touchpoint.eclipse"/>
+      <import plugin="org.eclipse.equinox.p2.transport.ecf"/>
+      <import plugin="org.eclipse.equinox.p2.ui"/>
       <import plugin="org.eclipse.help"/>
       <import plugin="org.eclipse.jface.databinding"/>
       <import plugin="org.eclipse.jface"/>
@@ -32,7 +44,6 @@
       <import plugin="org.eclipse.ui.workbench"/>
       <import plugin="org.eclipse.ui"/>
       <import plugin="org.eclipse.ui.views.log"/>
-      <import plugin="org.eclipse.core.runtime"/>
    </requires>
 
    <plugin

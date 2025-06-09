@@ -96,8 +96,13 @@
          <url>https://download.eclipse.org/nebula/releases/3.0.0/</url>
       </repository> 
       
-      <!-- IMPORTANT: Keep that tag in a single line as it is commented out during the GitHub build 
-      <repository> <id>eclipse.4.23.nl</id> <layout>p2</layout> <url>file:build/build.eclipse.4.23.nl.repo</url> </repository>
+      <!-- IMPORTANT: Keep that tag in a single line as it is commented out during the GitHub build       -->
+      <repository>   <id>eclipse.4.26.nl</id>   <layout>p2</layout>   <url>https://download.eclipse.org/technology/babel/update-site/R0.20.0/2022-12/</url>   </repository> 
+
+      <!-- 
+      <repository>   <id>eclipse.4.26.nl</id>   <layout>p2</layout>   <url>file:build/build.eclipse.4.26.nl.repo</url>                             </repository>
+      <repository>   <id>eclipse.4.26.nl</id>   <layout>p2</layout>   <url>file:build/build.eclipse.4.26.nl.repo/babel-R0.20.0-2022-12.zip</url>   </repository>
+      <repository>   <id>eclipse.4.23.nl</id>   <layout>p2</layout>   <url>file:build/build.eclipse.4.23.nl.repo</url>                             </repository>
       -->
 
    </repositories>

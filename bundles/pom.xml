@@ -36,7 +36,7 @@
       <module>net.tourbook.printing</module>
       <module>net.tourbook.statistics</module>
       <module>net.tourbook.web</module>
-
+      
       <module>net.tourbook.tests</module>
       <module>net.tourbook.ui.tests</module>
       
@@ -45,19 +45,19 @@
       <module>net.tourbook.ext.geoclipse</module>
       <module>net.tourbook.ext.jars</module>
       <module>net.tourbook.ext.jars.printing</module>
+      <module>net.tourbook.ext.rxtx_2.2</module>
       <module>net.tourbook.ext.rxtx.linux64_2.2</module>
       <module>net.tourbook.ext.rxtx.macosx_2.2</module>
       <module>net.tourbook.ext.rxtx.win64_2.2</module>
-      <module>net.tourbook.ext.rxtx_2.2</module>
       <module>net.tourbook.ext.velocity</module>
       <module>net.tourbook.ext.vtm</module>
       <module>net.tourbook.ext.vtm.linux</module>
       <module>net.tourbook.ext.vtm.macosx</module>
       <module>net.tourbook.ext.vtm.windows</module>
+      <module>net.tourbook.ext.worldwind</module>
       <module>net.tourbook.ext.worldwind.linux64</module>
       <module>net.tourbook.ext.worldwind.macosx</module>
       <module>net.tourbook.ext.worldwind.win64</module>
-      <module>net.tourbook.ext.worldwind</module>
 
    </modules>
 
