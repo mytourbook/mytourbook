@@ -1,0 +1,6 @@
+
+- read/replace pom.xml in git repo "mytourbook-mirror-p2-for-eclipse-nl" 
+
+- run "mvn install" in git repo "mytourbook-mirror-p2-for-eclipse-nl" 
+
+- replace created repo into this folder

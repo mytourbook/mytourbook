@@ -96,14 +96,26 @@
          <url>https://download.eclipse.org/nebula/releases/3.0.0/</url>
       </repository> 
       
-      <!-- IMPORTANT: Keep that tag in a single line as it is commented out during the GitHub build       -->
-      <repository>   <id>eclipse.4.26.nl</id>   <layout>p2</layout>   <url>https://download.eclipse.org/technology/babel/update-site/R0.20.0/2022-12/</url>   </repository> 
-
+      <!-- IMPORTANT: Keep that tag in a single line as it is commented out during the GitHub build -->
       <!-- 
-      <repository>   <id>eclipse.4.26.nl</id>   <layout>p2</layout>   <url>file:build/build.eclipse.4.26.nl.repo</url>                             </repository>
-      <repository>   <id>eclipse.4.26.nl</id>   <layout>p2</layout>   <url>file:build/build.eclipse.4.26.nl.repo/babel-R0.20.0-2022-12.zip</url>   </repository>
-      <repository>   <id>eclipse.4.23.nl</id>   <layout>p2</layout>   <url>file:build/build.eclipse.4.23.nl.repo</url>                             </repository>
+         !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! 
+         I was not able to use a relative path for the p2 repo, only the absolute path worked :-((( 
+         !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! 
       -->
+      <repository>   <id>eclipse.4.26.nl</id>   <layout>p2</layout>   <url>file:/DAT/MT/mytourbook/build/build.eclipse.4.26.nl.repo</url>   </repository>
+
+<!-- 
+   OK <repository>   <id>eclipse.4.26.nl</id>   <layout>p2</layout>   <url>file:/DAT/MT/mytourbook/build/build.eclipse.4.26.nl.repo</url>   </repository>
+   OK <repository>   <id>eclipse.4.26.nl</id>   <layout>p2</layout>   <url>file:/build.eclipse.4.26.nl.repo</url>                           </repository>
+   OK <repository>   <id>eclipse.4.26.nl</id>   <layout>p2</layout>   <url>file:/eclipse-nl-repo-SMALL</url>                                </repository>
+
+      <repository>   <id>eclipse.4.26.nl</id>   <layout>p2</layout>   <url>file:build/build.eclipse.4.26.nl.repo</url>   </repository>
+      
+      This works but it is veeeery slow
+      <repository>   <id>eclipse.4.26.nl</id>   <layout>p2</layout>   <url>https://download.eclipse.org/technology/babel/update-site/R0.20.0/2022-12/</url>   </repository> 
+      
+      <repository>   <id>eclipse.4.23.nl</id>   <layout>p2</layout>   <url>file:build/build.eclipse.4.23.nl.repo</url>                             </repository>
+-->
 
    </repositories>
 
