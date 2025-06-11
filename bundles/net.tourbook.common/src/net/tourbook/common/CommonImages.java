@@ -97,16 +97,16 @@ public class CommonImages {
    public static final String TourOptions                  = "tour-options.png";                          //$NON-NLS-1$
    public static final String TourOptions_Disabled         = "tour-options-disabled.png";                 //$NON-NLS-1$
 
-   public static final String Weather_Clouds               = "weather-clouds.png";                        //$NON-NLS-1$
-   public static final String Weather_Cloudy               = "weather-cloudy.png";                        //$NON-NLS-1$
-   public static final String Weather_Drizzle              = "weather-drizzle.png";                       //$NON-NLS-1$
-   public static final String Weather_Fog                  = "weather-fog.png";                           //$NON-NLS-1$
-   public static final String Weather_Lightning            = "weather-lightning.png";                     //$NON-NLS-1$
-   public static final String Weather_Rain                 = "weather-rain.png";                          //$NON-NLS-1$
-   public static final String Weather_ScatteredShowers     = "weather-scattered-showers.png";             //$NON-NLS-1$
-   public static final String Weather_Severe               = "weather-severe-alert.png";                  //$NON-NLS-1$
-   public static final String Weather_Snow                 = "weather-snow.png";                          //$NON-NLS-1$
-   public static final String Weather_Sunny                = "weather-sunny.png";                         //$NON-NLS-1$
+   public static final String Weather_Clouds               = "weather-clouds.svg";                        //$NON-NLS-1$
+   public static final String Weather_Cloudy               = "weather-cloudy.svg";                        //$NON-NLS-1$
+   public static final String Weather_Drizzle              = "weather-drizzle.svg";                       //$NON-NLS-1$
+   public static final String Weather_Fog                  = "weather-fog.svg";                           //$NON-NLS-1$
+   public static final String Weather_Lightning            = "weather-lightning.svg";                     //$NON-NLS-1$
+   public static final String Weather_Rain                 = "weather-rain.svg";                          //$NON-NLS-1$
+   public static final String Weather_ScatteredShowers     = "weather-scattered-showers.svg";             //$NON-NLS-1$
+   public static final String Weather_Severe               = "weather-severe-alert.svg";                  //$NON-NLS-1$
+   public static final String Weather_Snow                 = "weather-snow.svg";                          //$NON-NLS-1$
+   public static final String Weather_Sunny                = "weather-sunny.svg";                         //$NON-NLS-1$
 
    private CommonImages() {}
 }
