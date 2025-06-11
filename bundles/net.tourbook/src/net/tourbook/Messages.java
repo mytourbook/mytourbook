@@ -1642,6 +1642,7 @@ public class Messages extends NLS {
    public static String        Pref_Appearance_Button_ResetAllToggleDialogs_Tooltip;
    public static String        Pref_Appearance_Check_AutoOpenTagging;
    public static String        Pref_Appearance_Check_RestartAppInAppToolbar;
+   public static String        Pref_Appearance_Check_ShowAppVersionQualifierInAppTitle;
    public static String        Pref_Appearance_Check_ShowInAppToolbar_ScrambleData;
    public static String        Pref_Appearance_Check_ShowThemeSelectorInAppToolbar;
    public static String        Pref_Appearance_Check_TaggingAnimation;
