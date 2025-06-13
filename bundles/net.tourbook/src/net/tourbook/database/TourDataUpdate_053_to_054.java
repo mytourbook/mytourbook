@@ -17,6 +17,7 @@ package net.tourbook.database;
 
 import java.util.List;
 
+import net.tourbook.common.util.StringUtils;
 import net.tourbook.common.weather.IWeather;
 import net.tourbook.data.TourData;
 import net.tourbook.tour.TourManager;
@@ -46,7 +47,8 @@ public class TourDataUpdate_053_to_054 implements ITourDataUpdate {
       // convert weather-showers-scatterd
       //    into weather-showers-scattered
 
-      if (tourData.getWeather_Clouds().equalsIgnoreCase("weather-showers-scatterd")) { //$NON-NLS-1$
+      if (StringUtils.hasContent(tourData.getWeather_Clouds()) &&
+            tourData.getWeather_Clouds().equalsIgnoreCase("weather-showers-scatterd")) { //$NON-NLS-1$
 
          /**
           * If the weather cloud has the old value (with the typo) for the scattered showers,
