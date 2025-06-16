@@ -269,9 +269,7 @@ public class TourBookViewTests extends UITest {
 
       // Activate the tour photo filter
       final SWTBotToolbarToggleButton tourPhotoFilterButton = bot.toolbarToggleButtonWithTooltip(
-            PluginProperties.getText("Action_TourPhotoFilter_Tooltip") + //$NON-NLS-1$
-                  UI.NEW_LINE2 +
-                  net.tourbook.common.Messages.Slideout_Dialog_Action_ResetSlideoutLocation_Tooltip);
+            PluginProperties.getText("Action_TourPhotoFilter_Tooltip")); //$NON-NLS-1$
       assertNotNull(tourPhotoFilterButton);
       tourPhotoFilterButton.click();
 
