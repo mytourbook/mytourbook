@@ -229,8 +229,8 @@ public class TourNutritionProduct {
 
          final int numberOfServings = Math.round(productQuantity / servingQuantity);
 
-         setCalories(Math.round(nutriments.carbohydratesServing * numberOfServings));
-         setCalories_Serving(Math.round(nutriments.carbohydratesServing));
+         setCalories(Math.round(nutriments.energyKcalServing * numberOfServings));
+         setCalories_Serving(Math.round(nutriments.energyKcalServing));
 
          setCarbohydrates(Math.round(nutriments.carbohydratesServing * numberOfServings));
          setCarbohydrates_Serving(Math.round(nutriments.carbohydratesServing));
