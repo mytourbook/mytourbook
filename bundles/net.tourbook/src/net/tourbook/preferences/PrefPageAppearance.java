@@ -306,7 +306,7 @@ public class PrefPageAppearance extends PreferencePage implements IWorkbenchPref
           * Extended version in app title
           */
          _chkShowInApp_ExtendedVersion = new Button(parent, SWT.CHECK);
-         _chkShowInApp_ExtendedVersion.setText("Show app version &qualifier in the app title bar");
+         _chkShowInApp_ExtendedVersion.setText(Messages.Pref_Appearance_Check_ShowAppVersionQualifierInAppTitle);
       }
       {
          /*

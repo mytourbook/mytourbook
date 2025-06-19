@@ -14,6 +14,12 @@ jobs:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0  # Shallow clones should be disabled for a better relevancy of analysis
+      - name: Set DRIVE_LETTER environment variable
+        id: drive
+        shell: pwsh
+        run: |
+          $drive = Split-Path -Qualifier $PWD
+          echo "DRIVE_LETTER=$drive" | Out-File -FilePath $env:GITHUB_ENV -Append    
       - name: Set up JDK 17
         uses: actions/setup-java@v4
         with:
@@ -66,9 +72,9 @@ jobs:
         with:
           name: Tests-Failures
           path: |
-            D:\a\mytourbook-BUILD-autocreated\core\net.tourbook.ui.tests\target\*.png
-            D:\a\mytourbook-BUILD-autocreated\core\net.tourbook.ui.tests\workspace\.metadata\.log
-            D:\a\mytourbook-BUILD-autocreated\core\net.tourbook.tests\**\*-GeneratedFromTests.*
+            ${{ env.DRIVE_LETTER }}\a\mytourbook-BUILD-autocreated\core\net.tourbook.ui.tests\target\*.png
+            ${{ env.DRIVE_LETTER }}\a\mytourbook-BUILD-autocreated\core\net.tourbook.ui.tests\workspace\.metadata\.log
+            ${{ env.DRIVE_LETTER }}\a\mytourbook-BUILD-autocreated\core\net.tourbook.tests\**\*-GeneratedFromTests.*
           retention-days: 5
       - name: Generate artifact name
         id: generate-artifact-name
@@ -80,14 +86,14 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: ${{ env.artifactFileName }}
-          path: D:\a\mytourbook\mytourbook\mergedJaCoCoReport.exec
+          path: ${{ env.DRIVE_LETTER }}\a\mytourbook\mytourbook\mergedJaCoCoReport.exec
           retention-days: 5
       - name: Test Report
         uses: dorny/test-reporter@v2
         if: success() || failure()
         with:
           name: Tests Report
-          path: 'D:/a/**/surefire-reports/*.xml'
+          path: '${{ env.DRIVE_LETTER }}/a/**/surefire-reports/*.xml'
           reporter: java-junit
           
   check_date:

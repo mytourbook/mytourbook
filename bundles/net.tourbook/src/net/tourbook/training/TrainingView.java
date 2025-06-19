@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2024 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2025 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -308,7 +308,7 @@ public class TrainingView extends ViewPart {
                || property.equals(GRID_VERTICAL_DISTANCE)
                || property.equals(GRID_IS_SHOW_HORIZONTAL_GRIDLINES)
                || property.equals(GRID_IS_SHOW_VERTICAL_GRIDLINES)
-         //
+
          ) {
 
             setChartProperties();
@@ -1419,7 +1419,7 @@ public class TrainingView extends ViewPart {
          }
 
          final double zoneTime = tourHrZoneTimes[tourZoneIndex];
-         final double zoneTimePercent = movingTime == 0 //
+         final double zoneTimePercent = movingTime == 0
                ? 0
                : zoneTime * 100.0 / movingTime;
 
@@ -1433,51 +1433,53 @@ public class TrainingView extends ViewPart {
          final TourPersonHRZone hrZone = _personHrZones.get(tourZoneIndex);
 
          final int zoneMaxValue = hrZone.getZoneMaxValue();
-         final String zoneMaxValueText = zoneMaxValue == Integer.MAX_VALUE //
+         final String zoneMaxValueText = zoneMaxValue == Integer.MAX_VALUE
                ? Messages.App_Label_max
                : Integer.toString(zoneMaxValue);
 
          final float zoneMinBpm = zoneContext.zoneMinBpm[tourZoneIndex];
          final float zoneMaxBmp = zoneContext.zoneMaxBpm[tourZoneIndex];
 
-         final String zoneMaxBpmText = zoneMaxBmp == Integer.MAX_VALUE //
+         final String zoneMaxBpmText = zoneMaxBmp == Integer.MAX_VALUE
                ? Messages.App_Label_max
                : Integer.toString((int) zoneMaxBmp);
 
-         final int ageYears = zoneContext.age;
-         final String ageText = UI.SPACE + ageYears + UI.SPACE2 + Messages.Pref_People_Label_Years;
+         final String ageText = "%s %d %s".formatted( //$NON-NLS-1$
+
+               Messages.Pref_People_Label_Age,
+               zoneContext.age,
+               Messages.Pref_People_Label_Years);
 
          final String hrZoneTooltip =
-               //
+
                hrZone.getNameLongShortcutFirst()
-                     //
+
                      + UI.NEW_LINE
                      + UI.NEW_LINE
-                     //
+
                      + hrZone.getZoneMinValue()
                      + UI.DASH
                      + zoneMaxValueText
                      + UI.SPACE
                      + UI.SYMBOL_PERCENTAGE
-                     //
+
                      + UI.SPACE
                      + UI.SYMBOL_EQUAL
                      + UI.SPACE
-                     //
+
                      + Integer.toString((int) zoneMinBpm)
                      + UI.DASH
                      + zoneMaxBpmText
                      + UI.SPACE
                      + OtherMessages.GRAPH_LABEL_HEARTBEAT_UNIT
-                     //
+
                      + UI.NEW_LINE
                      + UI.NEW_LINE
-                     //
-                     + Messages.Pref_People_Label_Age
+
                      + ageText
-                     //
+
                      + UI.DASH_WITH_DOUBLE_SPACE
-                     //
+
                      + Messages.HRMax_Label
                      + UI.SPACE
                      + zoneContext.hrMax

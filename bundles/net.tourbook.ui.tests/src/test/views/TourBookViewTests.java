@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2022, 2024 Frédéric Bard
+ * Copyright (C) 2022, 2025 Frédéric Bard
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -27,6 +27,7 @@ import java.util.List;
 
 import net.tourbook.Messages;
 import net.tourbook.application.PluginProperties;
+import net.tourbook.common.UI;
 import net.tourbook.common.util.FileUtils;
 import net.tourbook.common.util.StringUtils;
 import net.tourbook.tour.TourLogManager;
@@ -234,7 +235,10 @@ public class TourBookViewTests extends UITest {
    void testTourFilters() {
 
       // Activate the tour filter
-      final SWTBotToolbarToggleButton tourFilterButton = bot.toolbarToggleButtonWithTooltip(Messages.Tour_Filter_Action_Tooltip);
+      final SWTBotToolbarToggleButton tourFilterButton = bot.toolbarToggleButtonWithTooltip(
+            Messages.Tour_Filter_Action_Tooltip +
+                  UI.NEW_LINE2 +
+                  net.tourbook.common.Messages.Slideout_Dialog_Action_ResetSlideoutLocation_Tooltip);
       assertNotNull(tourFilterButton);
       tourFilterButton.click();
 
@@ -242,7 +246,10 @@ public class TourBookViewTests extends UITest {
       tourFilterButton.click();
 
       // Activate the tour geo filter
-      final SWTBotToolbarToggleButton tourGeoFilterButton = bot.toolbarToggleButtonWithTooltip(Messages.Tour_GeoFilter_Action_Tooltip);
+      final SWTBotToolbarToggleButton tourGeoFilterButton = bot.toolbarToggleButtonWithTooltip(
+            Messages.Tour_GeoFilter_Action_Tooltip +
+                  UI.NEW_LINE2 +
+                  net.tourbook.common.Messages.Slideout_Dialog_Action_ResetSlideoutLocation_Tooltip);
       assertNotNull(tourGeoFilterButton);
       tourGeoFilterButton.click();
 
@@ -250,7 +257,10 @@ public class TourBookViewTests extends UITest {
       tourGeoFilterButton.click();
 
       // Activate the tour tag filter
-      final SWTBotToolbarToggleButton tourTagFilterButton = bot.toolbarToggleButtonWithTooltip(Messages.Tour_Tag_Filter_Action_Tooltip);
+      final SWTBotToolbarToggleButton tourTagFilterButton = bot.toolbarToggleButtonWithTooltip(
+            Messages.Tour_Tag_Filter_Action_Tooltip +
+                  UI.NEW_LINE2 +
+                  net.tourbook.common.Messages.Slideout_Dialog_Action_ResetSlideoutLocation_Tooltip);
       assertNotNull(tourTagFilterButton);
       tourTagFilterButton.click();
 
@@ -258,8 +268,8 @@ public class TourBookViewTests extends UITest {
       tourTagFilterButton.click();
 
       // Activate the tour photo filter
-      final SWTBotToolbarToggleButton tourPhotoFilterButton = bot.toolbarToggleButtonWithTooltip(PluginProperties.getText(
-            "Action_TourPhotoFilter_Tooltip")); //$NON-NLS-1$
+      final SWTBotToolbarToggleButton tourPhotoFilterButton = bot.toolbarToggleButtonWithTooltip(
+            PluginProperties.getText("Action_TourPhotoFilter_Tooltip")); //$NON-NLS-1$
       assertNotNull(tourPhotoFilterButton);
       tourPhotoFilterButton.click();
 

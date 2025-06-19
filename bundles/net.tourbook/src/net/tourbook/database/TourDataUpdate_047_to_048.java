@@ -40,7 +40,7 @@ public class TourDataUpdate_047_to_048 implements ITourDataUpdate {
       // convert weather-showers-scatterd
       //    into weather-showers-scattered
 
-      if (tourData.getWeather_Clouds().equalsIgnoreCase("weather-showers-scatterd")) { //$NON-NLS-1$
+      if ("weather-showers-scatterd".equalsIgnoreCase(tourData.getWeather_Clouds())) { //$NON-NLS-1$
 
          /**
           * If the weather cloud has the old value (with the typo) for the scattered showers,
