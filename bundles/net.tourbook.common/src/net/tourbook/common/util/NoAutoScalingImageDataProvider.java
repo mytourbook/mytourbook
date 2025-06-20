@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2024 Wolfgang Schramm and Contributors
+ * Copyright (C) 2024, 2025 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -19,6 +19,7 @@ import java.awt.image.BufferedImage;
 
 import org.eclipse.swt.graphics.ImageData;
 import org.eclipse.swt.graphics.ImageDataProvider;
+import org.eclipse.swt.internal.DPIUtil;
 
 /**
  * With helpful hints from Heiko Klare
@@ -39,6 +40,7 @@ import org.eclipse.swt.graphics.ImageDataProvider;
 public class NoAutoScalingImageDataProvider implements ImageDataProvider {
 
    private ImageData _imageData;
+   private ImageData _imageData_WithNoDeviceZoom;
 
    public NoAutoScalingImageDataProvider(final BufferedImage awtImage) {
 
@@ -50,9 +52,31 @@ public class NoAutoScalingImageDataProvider implements ImageDataProvider {
       _imageData = imageData;
    }
 
+   /**
+    * This code is using hints from
+    * {@link https://github.com/eclipse-platform/eclipse.platform.ui/issues/3050} to solve Eclipse
+    * 4.36 image scaling issues
+    */
    @Override
    public ImageData getImageData(final int zoom) {
 
-      return _imageData;
+      final int deviceZoom = DPIUtil.getDeviceZoom();
+
+      if (zoom == deviceZoom) {
+
+         return _imageData;
+      }
+
+      if (_imageData_WithNoDeviceZoom == null) {
+
+         final float noDeviceZoom = zoom / (float) deviceZoom;
+
+         final int width = (int) (_imageData.width * noDeviceZoom);
+         final int height = (int) (_imageData.height * noDeviceZoom);
+
+         _imageData_WithNoDeviceZoom = _imageData.scaledTo(width, height);
+      }
+
+      return _imageData_WithNoDeviceZoom;
    }
 }
