@@ -3339,9 +3339,9 @@
      showgrid="true"
      inkscape:current-layer="layer1"
      inkscape:document-units="px"
-     inkscape:cy="502.43748"
-     inkscape:cx="174.68749"
-     inkscape:zoom="32.000002"
+     inkscape:cy="306.62498"
+     inkscape:cx="168.24999"
+     inkscape:zoom="16.000001"
      inkscape:pageshadow="2"
      inkscape:pageopacity="0.0"
      borderopacity="1.0"
@@ -10089,7 +10089,7 @@
     <rect
        inkscape:export-ydpi="96"
        inkscape:export-xdpi="96"
-       inkscape:export-filename="C:\DAT\MT\mytourbook\bundles\net.tourbook.photo\icons\photo-rating-star.png"
+       inkscape:export-filename="..\..\net.tourbook.photo\icons\photo-rating-star.svg"
        y="304"
        x="160"
        height="16.000042"
@@ -12379,47 +12379,6 @@
        x="160"
        y="354"
        inkscape:export-filename="C:\DAT\MT\mytourbook\bundles\net.tourbook.photo\icons\photo-rating-star-action-disabled-dark.png"
-       inkscape:export-xdpi="96"
-       inkscape:export-ydpi="96" />
-    <rect
-       inkscape:export-ydpi="192"
-       inkscape:export-xdpi="192"
-       inkscape:export-filename="..\..\net.tourbook.photo\icons\photo-rating-star@2x.png"
-       y="304"
-       x="180"
-       height="16.000042"
-       width="16"
-       id="rect6561-8-1-5-8"
-       style="opacity:0.99;fill:none;stroke:none" />
-    <path
-       id="path4358-84-37"
-       inkscape:export-ydpi="96"
-       inkscape:export-xdpi="96"
-       inkscape:export-filename="C:\DAT\MT\mytourbook\bundles\net.tourbook.photo\icons\photo-rating-star.png"
-       inkscape:transform-center-y="-0.6846886"
-       inkscape:randomized="0"
-       inkscape:rounded="0"
-       inkscape:flatsided="false"
-       sodipodi:arg2="-0.9424778"
-       sodipodi:arg1="-1.5707963"
-       sodipodi:r2="3.4755507"
-       sodipodi:r1="6.9511013"
-       sodipodi:cy="357.34061"
-       sodipodi:cx="82.999992"
-       sodipodi:sides="5"
-       style="color:#000000;display:inline;overflow:visible;visibility:visible;fill:#fae000;fill-opacity:1;stroke:#818181;stroke-width:0.497757;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;marker:none;enable-background:accumulate"
-       sodipodi:type="star"
-       transform="matrix(0.97807968,0,0,1.031649,106.81641,-55.91267)"
-       d="m 82.999993,350.38951 2.042877,4.13932 4.568013,0.66377 -3.305446,3.22201 0.78031,4.54956 -4.085755,-2.14801 -4.085755,2.14801 0.78031,-4.54956 -3.305445,-3.22201 4.568013,-0.66377 z"
-       inkscape:transform-center-x="-6.7922661e-06" />
-    <rect
-       style="opacity:0.99;fill:none;stroke:none"
-       id="rect6791-2-0"
-       width="16"
-       height="16.000042"
-       x="180"
-       y="304"
-       inkscape:export-filename="C:\DAT\MT\mytourbook\bundles\net.tourbook.photo\icons\photo-rating-star.png"
        inkscape:export-xdpi="96"
        inkscape:export-ydpi="96" />
     <rect
@@ -16651,19 +16610,9 @@
        height="7.9999514"
        x="160"
        y="491.99997"
-       inkscape:export-filename="..\..\net.tourbook.photo\icons\photo-annotation-cropped.png"
+       inkscape:export-filename="..\..\net.tourbook.photo\icons\photo-annotation-cropped.svg"
        inkscape:export-xdpi="95.999863"
        inkscape:export-ydpi="95.999863" />
-    <rect
-       style="fill:#969696;fill-opacity:1;stroke:none;stroke-width:0.733804;stroke-miterlimit:3;paint-order:markers fill stroke"
-       id="rect1-5-3-9"
-       width="10"
-       height="7.9999695"
-       x="185"
-       y="491.99997"
-       inkscape:export-filename="..\..\net.tourbook.photo\icons\photo-annotation-cropped@2x.png"
-       inkscape:export-xdpi="192"
-       inkscape:export-ydpi="192" />
     <path
        style="fill:#303030;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
        d="m 431,532 v 1 h -2 v 2 l -3,-2.5 3,-2.5 v 2"
@@ -16840,13 +16789,6 @@
        inkscape:export-ydpi="96" />
     <rect
        style="fill:#969696;fill-opacity:1;stroke:#ffffff;stroke-width:1;stroke-linecap:square;stroke-miterlimit:3;stroke-dasharray:none;stroke-opacity:1;paint-order:markers fill stroke"
-       id="rect3-7-1"
-       width="6.0000095"
-       height="4.0000048"
-       x="186.5"
-       y="494.49997" />
-    <rect
-       style="fill:#969696;fill-opacity:1;stroke:#ffffff;stroke-width:1;stroke-linecap:square;stroke-miterlimit:3;stroke-dasharray:none;stroke-opacity:1;paint-order:markers fill stroke"
        id="rect3-7-1-4"
        width="6.0000095"
        height="4.0000048"
@@ -16857,29 +16799,14 @@
        id="rect1-7-7-1"
        width="10"
        height="7.9999514"
-       x="210"
+       x="180"
        y="491.99997"
-       inkscape:export-filename="..\..\net.tourbook.photo\icons\photo-annotation-tonality.png"
+       inkscape:export-filename="..\..\net.tourbook.photo\icons\photo-annotation-tonality.svg"
        inkscape:export-xdpi="95.999863"
        inkscape:export-ydpi="95.999863" />
-    <rect
-       style="fill:#969696;fill-opacity:1;stroke:none;stroke-width:0.733804;stroke-miterlimit:3;paint-order:markers fill stroke"
-       id="rect1-5-3-9-5"
-       width="10"
-       height="7.9999695"
-       x="235"
-       y="491.99997"
-       inkscape:export-filename="..\..\net.tourbook.photo\icons\photo-annotation-tonality@2x.png"
-       inkscape:export-xdpi="192"
-       inkscape:export-ydpi="192" />
     <path
        style="fill:#ffffff;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
-       d="m 236,498.99996 1,-6 1,4 2,-2 1,2 2,-3 0.99999,4.99999 z"
-       id="path2-6"
-       sodipodi:nodetypes="cccccccc" />
-    <path
-       style="fill:#ffffff;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
-       d="m 211,498.99996 1,-6 1,4 2,-2 1,2 2,-3 0.99999,4.99999 z"
+       d="m 181,498.99996 1,-6 1,4 2,-2 1,2 2,-3 0.99999,4.99999 z"
        id="path2-6-7"
        sodipodi:nodetypes="cccccccc" />
   </g>
