@@ -5,7 +5,6 @@
  */
 package de.byteholder.geoclipse.map;
 
-import de.byteholder.geoclipse.mapprovider.ImageDataResources;
 import de.byteholder.geoclipse.mapprovider.MP;
 
 import java.util.ArrayList;
@@ -15,12 +14,10 @@ import java.util.concurrent.Future;
 import java.util.concurrent.locks.ReentrantLock;
 
 import net.tourbook.common.UI;
-import net.tourbook.common.util.StatusUtil;
 
 import org.eclipse.collections.impl.list.mutable.primitive.IntArrayList;
 import org.eclipse.collections.impl.list.mutable.primitive.LongArrayList;
 import org.eclipse.collections.impl.set.mutable.primitive.IntHashSet;
-import org.eclipse.swt.graphics.Device;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.ImageData;
 import org.eclipse.swt.graphics.Rectangle;
@@ -39,8 +36,6 @@ public class Tile {
 //   private static final double            MAX_LATITUDE_85_05112877   = 85.05112877;
 
    private static final String             NL                           = "\n";                                //$NON-NLS-1$
-
-   private static final ReentrantLock      TILE_LOCK                    = new ReentrantLock();
 
    private OverlayTourState                _overlayTourState            = OverlayTourState.TILE_IS_NOT_CHECKED;
 
@@ -88,10 +83,6 @@ public class Tile {
     * Image for the overlay tile, NOT the surrounding part tiles
     */
    private Image                           _overlayImage;
-   /**
-    * contains overlay the image data for this tile
-    */
-   private ImageDataResources              _overlayImageDataResources;
 
    private final String                    _tileKey;
 
@@ -293,72 +284,6 @@ public class Tile {
 
          _tileImageLoaderCallback.update(this);
       }
-   }
-
-   public synchronized Image createOverlayImage(final Device display) {
-
-      if (_overlayImageDataResources == null) {
-         return null;
-      }
-
-      try {
-
-         // it is synchronized because this object can be set to null in another thread
-         synchronized (_overlayImageDataResources) {
-
-            // check _overlayImageDataResources again, it could be null at this time
-            if (_overlayImageDataResources == null) {
-               return null;
-            }
-
-            final ImageData tileImageData = _overlayImageDataResources.getTileImageData();
-            final ImageData neighborImageData = _overlayImageDataResources.getNeighborImageData();
-
-            if ((tileImageData == null) && (neighborImageData == null)) {
-               return null;
-            }
-
-            final int tileSize = _mp.getTileSize();
-            final ImageData finalImageData = MapUtils.createTransparentImageData(tileSize);
-
-            // draw neighbor first
-            if (neighborImageData != null) {
-
-               // check _overlayImageDataResources again, it could be null at this time
-               if (_overlayImageDataResources == null) {
-                  return null;
-               }
-               _overlayImageDataResources.drawImageData(
-                     finalImageData,
-                     neighborImageData,
-                     0,
-                     0,
-                     tileSize,
-                     tileSize);
-            }
-
-            // draw tile last to overwrite neighbor image data,
-            if (tileImageData != null) {
-
-               // check _overlayImageDataResources again, it could be null at this time
-               if (_overlayImageDataResources == null) {
-                  return null;
-               }
-               _overlayImageDataResources.drawImageData(finalImageData, tileImageData, 0, 0, tileSize, tileSize);
-            }
-
-            // create image from image data
-            _overlayImage = new Image(display, finalImageData);
-
-            return _overlayImage;
-         }
-
-      } catch (final Exception e) {
-         // log it but don't show because it happened too often
-         StatusUtil.log(e);
-      }
-
-      return null;
    }
 
    /**
@@ -567,31 +492,6 @@ public class Tile {
       return _overlayImage;
    }
 
-   public ImageDataResources getOverlayImageDataResources() {
-
-      if (_overlayImageDataResources != null) {
-         return _overlayImageDataResources;
-      }
-
-      TILE_LOCK.lock();
-      {
-         try {
-
-            // check again
-            if (_overlayImageDataResources != null) {
-               return _overlayImageDataResources;
-            }
-
-            _overlayImageDataResources = new ImageDataResources(_mp.getTileSize());
-
-         } finally {
-            TILE_LOCK.unlock();
-         }
-      }
-
-      return _overlayImageDataResources;
-   }
-
    public OverlayImageState getOverlayImageState() {
       return _overlayImageState;
    }
@@ -733,8 +633,6 @@ public class Tile {
       _overlayImageState = OverlayImageState.NOT_SET;
 
       _overlayContent = 0;
-
-      _overlayImageDataResources = null;
    }
 
    /**

@@ -9619,17 +9619,21 @@ public class Map2 extends Canvas {
 
       boolean isOverlayPainted = false;
 
-      // create 1 part image/gc
-      final ImageData transparentImageData = MapUtils.createTransparentImageData(_tilePixelSize);
+      final float scaledTilePixelSize = _tilePixelSize * UI.HIDPI_SCALING * 2;
+      final ImageData transparentImageData = MapUtils.createTransparentImageData((int) scaledTilePixelSize);
 
-      final Image overlayImage = new Image(_display, transparentImageData);
+      final NoAutoScalingImageDataProvider imageDataProvider = new NoAutoScalingImageDataProvider(transparentImageData);
+
+      final Image overlayImage = new Image(_display, imageDataProvider);
       final GC gcTile = new GC(overlayImage);
       {
          /*
           * Ubuntu 12.04 fails, when background is not filled, it draws a black background
           */
+         final Rectangle bounds = overlayImage.getBounds();
+
          gcTile.setBackground(_mapTransparentColor);
-         gcTile.fillRectangle(overlayImage.getBounds());
+         gcTile.fillRectangle(0, 0, bounds.width, bounds.height);
 
          // paint all overlays for the current tile
          final boolean isPainted = _mapPainter.doPaint(
@@ -9639,6 +9643,10 @@ public class Map2 extends Canvas {
                1,
                _isFastMapPainting && _isFastMapPainting_Active,
                _fastMapPainting_skippedValues);
+
+         final ImageData imageDataAfterPainting = overlayImage.getImageData();
+
+         imageDataProvider.setImageData(imageDataAfterPainting);
 
          isOverlayPainted = isOverlayPainted || isPainted;
       }
@@ -10123,7 +10131,7 @@ public class Map2 extends Canvas {
 
       // create dimmed image
       final Rectangle imageBounds = tileImage.getBounds();
-      final Image dimmedImage = new Image(_display, imageBounds);
+      final Image dimmedImage = new Image(_display, imageBounds.width, imageBounds.height);
 
       final GC gcDimmedImage = new GC(dimmedImage);
       {

@@ -79,4 +79,10 @@ public class NoAutoScalingImageDataProvider implements ImageDataProvider {
 
       return _imageData_WithNoDeviceZoom;
    }
+
+   public void setImageData(final ImageData imageDataAfterPainting) {
+
+      _imageData = imageDataAfterPainting;
+      _imageData_WithNoDeviceZoom = null;
+   }
 }
