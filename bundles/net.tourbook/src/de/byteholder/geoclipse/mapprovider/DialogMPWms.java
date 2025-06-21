@@ -215,13 +215,13 @@ public class DialogMPWms extends DialogMP implements ITileListener, IMapDefaultA
 
    @Override
    public void actionZoomIn() {
-      _map.setZoom(_map.getZoom() + 1);
+      _map.setZoom(_map.getZoomLevel() + 1);
       _map.paint();
    }
 
    @Override
    public void actionZoomOut() {
-      _map.setZoom(_map.getZoom() - 1);
+      _map.setZoom(_map.getZoomLevel() - 1);
       _map.paint();
    }
 
@@ -1180,7 +1180,7 @@ public class DialogMPWms extends DialogMP implements ITileListener, IMapDefaultA
 
       // keep current position and zoom-level
       final GeoPosition center = _map.getMapGeoCenter();
-      final int zoom = _map.getZoom();
+      final int zoom = _map.getZoomLevel();
 
       // set image format
       _mpWms.setImageFormat(newValue);
@@ -1199,7 +1199,7 @@ public class DialogMPWms extends DialogMP implements ITileListener, IMapDefaultA
 
       // keep current position and zoom-level
       final GeoPosition center = _map.getMapGeoCenter();
-      final int zoom = _map.getZoom();
+      final int zoom = _map.getZoomLevel();
 
       // set image size and initialize tile factory
       _mpWms.setTileSize(newValue);
@@ -1615,7 +1615,7 @@ public class DialogMPWms extends DialogMP implements ITileListener, IMapDefaultA
     * keep zoom+position
     */
    private void updateMapPosition() {
-      _mpWms.setLastUsedZoom(_map.getZoom());
+      _mpWms.setLastUsedZoom(_map.getZoomLevel());
       _mpWms.setLastUsedPosition(_map.getMapGeoCenter());
    }
 
@@ -1627,7 +1627,7 @@ public class DialogMPWms extends DialogMP implements ITileListener, IMapDefaultA
       final int factoryMinZoom = mp.getMinimumZoomLevel();
       final int factoryMaxZoom = mp.getMaximumZoomLevel();
 
-      final int mapZoom = _map.getZoom();
+      final int mapZoom = _map.getZoomLevel();
       final GeoPosition mapCenter = _map.getMapGeoCenter();
 
       if (mapZoom < factoryMinZoom) {

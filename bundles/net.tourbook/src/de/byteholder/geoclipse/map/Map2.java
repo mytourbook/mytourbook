@@ -3122,7 +3122,7 @@ public class Map2 extends Canvas {
       }
 
       final MP mp = getMapProvider();
-      final int zoomLevel = getZoom();
+      final int zoomLevel = getZoomLevel();
 
       // paint with much less points to speed it up
       final int numMaxSegments = 1000;
@@ -3239,7 +3239,7 @@ public class Map2 extends Canvas {
     *
     * @return Returns the current zoom level of the map
     */
-   public int getZoom() {
+   public int getZoomLevel() {
       return _mapZoomLevel;
    }
 
@@ -4751,7 +4751,7 @@ public class Map2 extends Canvas {
          setCursorOptimized(_cursorDefault);
 
          _geoGrid_TourGeoFilter.mapGeoCenter = _geoGrid_MapGeoCenter = getMapGeoCenter();
-         _geoGrid_TourGeoFilter.mapZoomLevel = _geoGrid_MapZoomLevel = getZoom();
+         _geoGrid_TourGeoFilter.mapZoomLevel = _geoGrid_MapZoomLevel = getZoomLevel();
 
       } else if (_allHoveredTourIds.size() > 0) {
 
@@ -6984,7 +6984,7 @@ public class Map2 extends Canvas {
       gc.setAntialias(SWT.ON);
 
       final MP mp = getMapProvider();
-      final int zoomLevel = getZoom();
+      final int zoomLevel = getZoomLevel();
 
       final double[] latitudeSerie = tourData.latitudeSerie;
       final double[] longitudeSerie = tourData.longitudeSerie;

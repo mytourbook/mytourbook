@@ -904,7 +904,7 @@ public class TourMapPainter extends Map2Painter {
       }
 
       final MP mp = map.getMapProvider();
-      final int zoomLevel = map.getZoom();
+      final int zoomLevel = map.getZoomLevel();
       final int tileSize = mp.getTileSize();
       final int devPartOffset = ((parts - 1) / 2) * tileSize;
 
@@ -949,7 +949,7 @@ public class TourMapPainter extends Map2Painter {
 
       final MP mp = map.getMapProvider();
       final int projectionHash = mp.getProjection().getId().hashCode();
-      final int mapZoomLevel = map.getZoom();
+      final int mapZoomLevel = map.getZoomLevel();
 
       if (numParts == 1) {
 
@@ -1759,7 +1759,7 @@ public class TourMapPainter extends Map2Painter {
       }
 
       final MP mp = map.getMapProvider();
-      final int mapZoomLevel = map.getZoom();
+      final int mapZoomLevel = map.getZoomLevel();
       final int projectionHash = mp.getProjection().getId().hashCode();
 
       if (Map2PainterConfig.isShowTours

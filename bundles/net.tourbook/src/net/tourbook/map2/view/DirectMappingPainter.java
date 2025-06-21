@@ -545,7 +545,7 @@ public class DirectMappingPainter implements IDirectPainter {
                                    final boolean isYPosCenter) {
 
       final MP mp = _map2.getMapProvider();
-      final int zoomLevel = _map2.getZoom();
+      final int zoomLevel = _map2.getZoomLevel();
 
       final double[] latitudeSerie = _tourData.latitudeSerie;
       final double[] longitudeSerie = _tourData.longitudeSerie;
@@ -639,7 +639,7 @@ public class DirectMappingPainter implements IDirectPainter {
    private void drawSliderPath_Multiple(final GC gc, final DirectPainterContext painterContext) {
 
       final MP mp = _map2.getMapProvider();
-      final int zoomLevel = _map2.getZoom();
+      final int zoomLevel = _map2.getZoomLevel();
 
       final double[] latitudeSerie = _tourData.latitudeSerie;
       final double[] longitudeSerie = _tourData.longitudeSerie;
@@ -771,7 +771,7 @@ public class DirectMappingPainter implements IDirectPainter {
    private void drawSliderPath_One(final GC gc, final DirectPainterContext painterContext) {
 
       final MP mp = _map2.getMapProvider();
-      final int zoomLevel = _map2.getZoom();
+      final int zoomLevel = _map2.getZoomLevel();
 
       final double[] latitudeSerie = _tourData.latitudeSerie;
       final double[] longitudeSerie = _tourData.longitudeSerie;

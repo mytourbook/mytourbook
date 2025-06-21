@@ -1966,7 +1966,7 @@ public class Map2View extends ViewPart implements
       _map.setShowPOI(isShowPOI);
 
       if (isShowPOI) {
-         _map.setPoi(_poiPosition, _map.getZoom(), _poiName);
+         _map.setPoi(_poiPosition, _map.getZoomLevel(), _poiName);
       }
    }
 
@@ -1978,7 +1978,7 @@ public class Map2View extends ViewPart implements
 
    public void actionSaveDefaultPosition() {
 
-      _defaultZoom = _map.getZoom();
+      _defaultZoom = _map.getZoomLevel();
       _defaultPosition = _map.getMapGeoCenter();
    }
 
@@ -2208,12 +2208,12 @@ public class Map2View extends ViewPart implements
 
    public void actionZoomIn() {
 
-      _map.setZoom(_map.getZoom() + 1, _map.getCenterMapBy());
+      _map.setZoom(_map.getZoomLevel() + 1, _map.getCenterMapBy());
    }
 
    public void actionZoomOut() {
 
-      _map.setZoom(_map.getZoom() - 1, _map.getCenterMapBy());
+      _map.setZoom(_map.getZoomLevel() - 1, _map.getCenterMapBy());
    }
 
    public void actionZoomShowAllPhotos() {
@@ -2567,7 +2567,7 @@ public class Map2View extends ViewPart implements
          return;
       }
 
-      final int zoom = _map.getZoom();
+      final int zoom = _map.getZoomLevel();
 
       final Rectangle positionRect = _map.getWorldPixelFromGeoPositions(positionBounds, zoom);
 
@@ -2589,7 +2589,7 @@ public class Map2View extends ViewPart implements
     */
    private void centerTour() {
 
-      final int zoom = _map.getZoom();
+      final int zoom = _map.getZoomLevel();
 
       Set<GeoPosition> positionBounds = null;
 
@@ -3770,7 +3770,7 @@ public class Map2View extends ViewPart implements
    public MapPosition getMapPosition() {
 
       final GeoPosition mapPosition = _map.getMapGeoCenter();
-      final int mapZoomLevel = _map.getZoom() - 1;
+      final int mapZoomLevel = _map.getZoomLevel() - 1;
 
       return new MapPosition(
             mapPosition.latitude,
@@ -4159,7 +4159,7 @@ public class Map2View extends ViewPart implements
 
       final GeoPosition centerPosition = _map.getMapGeoCenter();
 
-      tourData.mapZoomLevel = _map.getZoom();
+      tourData.mapZoomLevel = _map.getZoomLevel();
       tourData.mapCenterPositionLatitude = centerPosition.latitude;
       tourData.mapCenterPositionLongitude = centerPosition.longitude;
    }
@@ -4882,13 +4882,13 @@ public class Map2View extends ViewPart implements
 
          final String boundingBox = poi.getBoundingBox();
          if (boundingBox == null) {
-            _poiZoomLevel = _map.getZoom();
+            _poiZoomLevel = _map.getZoomLevel();
          } else {
             _poiZoomLevel = _map.setZoomToBoundingBox(boundingBox);
          }
 
          if (_poiZoomLevel == -1) {
-            _poiZoomLevel = _map.getZoom();
+            _poiZoomLevel = _map.getZoomLevel();
          }
 
          _map.setPoi(_poiPosition, _poiZoomLevel, _poiName);
@@ -6537,7 +6537,7 @@ public class Map2View extends ViewPart implements
                final int mapZoomLevel = zoomLevel == ModelPlayerManager.MAP_ZOOM_LEVEL_IS_NOT_AVAILABLE
 
                      // use current zoom
-                     ? _map.getZoom()
+                     ? _map.getZoomLevel()
 
                      // use provided zoom
                      : zoomLevel + 1;
