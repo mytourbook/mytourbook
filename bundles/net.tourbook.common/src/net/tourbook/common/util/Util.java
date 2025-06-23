@@ -2155,7 +2155,9 @@ public class Util {
       return file.isDirectory();
    }
 
-   public static void logSystemProperty_IsEnabled(final Class<?> clazz, final String propertyName, final String propertyDescription) {
+   public static void logSystemProperty_IsEnabled(final Class<?> clazz,
+                                                  final String propertyName,
+                                                  final String propertyDescription) {
 
       StatusUtil.logInfo(String.format("%s [System Property - %s] - \"%s\" is enabled -> %s", //$NON-NLS-1$
             UI.timeStampNano(),

@@ -211,13 +211,15 @@ public class PrefPageAppearance extends PreferencePage implements IWorkbenchPref
             GridLayoutFactory.swtDefaults().numColumns(1).applyTo(fontContainer);
 //            fontContainer.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_GREEN));
             {
-               _uiFontEditor = new FontFieldEditorExtended(ITourbookPreferences.UI_DRAWING_FONT,
+               _uiFontEditor = new FontFieldEditorExtended(
+
+                     ICommonPreferences.UI_DRAWING_FONT,
                      UI.EMPTY_STRING,
                      Messages.Pref_Appearance_Label_UIFontExample,
                      fontContainer);
 
                _uiFontEditor.setTooltipText(Messages.Pref_Appearance_Group_UIDrawingFont_Tooltip);
-               _uiFontEditor.setPropertyChangeListener(propertyChangeEvent -> onChangeFontInEditor_UIFontSize());
+               _uiFontEditor.setPropertyChangeListener(propertyChangeEvent -> onChangeFontInEditor_UIDrawingFont());
             }
          }
       }
@@ -454,9 +456,9 @@ public class PrefPageAppearance extends PreferencePage implements IWorkbenchPref
       _logMessageFontEditor.store();
    }
 
-   private void onChangeFontInEditor_UIFontSize() {
+   private void onChangeFontInEditor_UIDrawingFont() {
 
-      // update state, this will fire IMappingPreferences.THEME_FONT_LOGGING event which will recreate the font
+      // this will fire the pref value
       _uiFontEditor.store();
    }
 
@@ -729,7 +731,7 @@ public class PrefPageAppearance extends PreferencePage implements IWorkbenchPref
 
       _logMessageFontEditor   .setPreferenceStore(_prefStore);
       _logMessageFontEditor   .load();
-      _uiFontEditor           .setPreferenceStore(_prefStore);
+      _uiFontEditor           .setPreferenceStore(_prefStore_Common);
       _uiFontEditor           .load();
    }
 

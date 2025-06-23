@@ -1246,6 +1246,12 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 
                final ActionXAxisDistance tourAction = (ActionXAxisDistance) _allTourChartActions.get(ACTION_ID_X_AXIS_DISTANCE);
                tourAction.setImages();
+
+            } else if (property.equals(ICommonPreferences.UI_DRAWING_FONT_IS_MODIFIED)) {
+
+               getChartComponents().updateFontScale();
+
+               updateTourChart();
             }
 
             isChartModified |= setMinMaxDefaultValue(property, isChartModified);
@@ -1255,6 +1261,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
             }
 
          } finally {
+
             setIsInUpdateUI(false);
          }
       };

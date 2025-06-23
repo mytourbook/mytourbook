@@ -47,6 +47,7 @@ import net.tourbook.common.util.StringUtils;
 import net.tourbook.common.util.Util;
 import net.tourbook.common.weather.IWeather;
 
+import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.ContributionItem;
@@ -59,6 +60,7 @@ import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.preference.IPreferenceStore;
+import org.eclipse.jface.preference.PreferenceConverter;
 import org.eclipse.jface.preference.StringFieldEditor;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.resource.ImageRegistry;
@@ -591,62 +593,78 @@ public class UI {
    /*
     * Labels for the different measurement systems
     */
-   public static final String          UNIT_ALTIMETER_M_H         = "m/h";                      //$NON-NLS-1$
-   public static final String          UNIT_ALTIMETER_FT_H        = "ft/h";                     //$NON-NLS-1$
-   public static final String          UNIT_DISTANCE_KM           = "km";                       //$NON-NLS-1$
-   public static final String          UNIT_DISTANCE_MI           = "mi";                       //$NON-NLS-1$
-   public static final String          UNIT_DISTANCE_NMI          = "nmi";                      //$NON-NLS-1$
-   public static final String          UNIT_DISTANCE_YARD         = "yd";                       //$NON-NLS-1$
-   public static final String          UNIT_DISTANCE_INCH         = "inch";                     //$NON-NLS-1$
-   public static final String          UNIT_ELEVATION_M           = "m";                        //$NON-NLS-1$
-   public static final String          UNIT_ELEVATION_FT          = "ft";                       //$NON-NLS-1$
-   public static final String          UNIT_FLUIDS_ML             = "mL";                       //$NON-NLS-1$
-   public static final String          UNIT_FLUIDS_L              = "L";                        //$NON-NLS-1$
-   public static final String          UNIT_HEIGHT_FT             = "ft";                       //$NON-NLS-1$
-   public static final String          UNIT_HEIGHT_IN             = "in";                       //$NON-NLS-1$
-   public static final String          UNIT_JOULE                 = "J";                        //$NON-NLS-1$
-   public static final String          UNIT_JOULE_KILO            = "kJ";                       //$NON-NLS-1$
-   public static final String          UNIT_JOULE_MEGA            = "MJ";                       //$NON-NLS-1$
-   public static final String          UNIT_KBYTE                 = "kByte";                    //$NON-NLS-1$
-   public static final String          UNIT_MBYTE                 = "MByte";                    //$NON-NLS-1$
-   public static final String          UNIT_METER                 = "m";                        //$NON-NLS-1$
-   public static final String          UNIT_MM                    = "mm";                       //$NON-NLS-1$
-   public static final String          UNIT_MS                    = "ms";                       //$NON-NLS-1$
-   public static final String          UNIT_PERCENT               = "%";                        //$NON-NLS-1$
-   public static final String          UNIT_POWER                 = "Watt";                     //$NON-NLS-1$
-   public static final String          UNIT_POWER_SHORT           = "W";                        //$NON-NLS-1$
-   public static final String          UNIT_POWER_TO_WEIGHT_RATIO = "W/Kg";                     //$NON-NLS-1$
-   public static final String          UNIT_PACE_MIN_P_KM         = "min/km";                   //$NON-NLS-1$
-   public static final String          UNIT_PACE_MIN_P_MILE       = "min/mi";                   //$NON-NLS-1$
-   public static final String          UNIT_PRESSURE_MBAR         = "mbar";                     //$NON-NLS-1$
-   public static final String          UNIT_PRESSURE_INHG         = "inHg";                     //$NON-NLS-1$
-   public static final String          UNIT_SPEED_KM_H            = "km/h";                     //$NON-NLS-1$
-   public static final String          UNIT_SPEED_KNOT            = "knot";                     //$NON-NLS-1$
-   public static final String          UNIT_SPEED_MPH             = "mph";                      //$NON-NLS-1$
-   public static final String          UNIT_TEMPERATURE_C         = "\u00B0C";                  //$NON-NLS-1$
-   public static final String          UNIT_TEMPERATURE_F         = "\u00B0F";                  //$NON-NLS-1$
-   public static final String          UNIT_VOLT                  = "V";                        //$NON-NLS-1$
-   public static final String          UNIT_VOLTAGE               = "Volt";                     //$NON-NLS-1$
-   public static final String          UNIT_WEIGHT_G              = "g";                        //$NON-NLS-1$
-   public static final String          UNIT_WEIGHT_KG             = "kg";                       //$NON-NLS-1$
-   public static final String          UNIT_WEIGHT_LBS            = "lbs";                      //$NON-NLS-1$
-   public static final String          UNIT_WEIGHT_MG             = "mg";                       //$NON-NLS-1$
+   public static final String                   UNIT_ALTIMETER_M_H             = "m/h";                                       //$NON-NLS-1$
+   public static final String                   UNIT_ALTIMETER_FT_H            = "ft/h";                                      //$NON-NLS-1$
+   public static final String                   UNIT_DISTANCE_KM               = "km";                                        //$NON-NLS-1$
+   public static final String                   UNIT_DISTANCE_MI               = "mi";                                        //$NON-NLS-1$
+   public static final String                   UNIT_DISTANCE_NMI              = "nmi";                                       //$NON-NLS-1$
+   public static final String                   UNIT_DISTANCE_YARD             = "yd";                                        //$NON-NLS-1$
+   public static final String                   UNIT_DISTANCE_INCH             = "inch";                                      //$NON-NLS-1$
+   public static final String                   UNIT_ELEVATION_M               = "m";                                         //$NON-NLS-1$
+   public static final String                   UNIT_ELEVATION_FT              = "ft";                                        //$NON-NLS-1$
+   public static final String                   UNIT_FLUIDS_ML                 = "mL";                                        //$NON-NLS-1$
+   public static final String                   UNIT_FLUIDS_L                  = "L";                                         //$NON-NLS-1$
+   public static final String                   UNIT_HEIGHT_FT                 = "ft";                                        //$NON-NLS-1$
+   public static final String                   UNIT_HEIGHT_IN                 = "in";                                        //$NON-NLS-1$
+   public static final String                   UNIT_JOULE                     = "J";                                         //$NON-NLS-1$
+   public static final String                   UNIT_JOULE_KILO                = "kJ";                                        //$NON-NLS-1$
+   public static final String                   UNIT_JOULE_MEGA                = "MJ";                                        //$NON-NLS-1$
+   public static final String                   UNIT_KBYTE                     = "kByte";                                     //$NON-NLS-1$
+   public static final String                   UNIT_MBYTE                     = "MByte";                                     //$NON-NLS-1$
+   public static final String                   UNIT_METER                     = "m";                                         //$NON-NLS-1$
+   public static final String                   UNIT_MM                        = "mm";                                        //$NON-NLS-1$
+   public static final String                   UNIT_MS                        = "ms";                                        //$NON-NLS-1$
+   public static final String                   UNIT_PERCENT                   = "%";                                         //$NON-NLS-1$
+   public static final String                   UNIT_POWER                     = "Watt";                                      //$NON-NLS-1$
+   public static final String                   UNIT_POWER_SHORT               = "W";                                         //$NON-NLS-1$
+   public static final String                   UNIT_POWER_TO_WEIGHT_RATIO     = "W/Kg";                                      //$NON-NLS-1$
+   public static final String                   UNIT_PACE_MIN_P_KM             = "min/km";                                    //$NON-NLS-1$
+   public static final String                   UNIT_PACE_MIN_P_MILE           = "min/mi";                                    //$NON-NLS-1$
+   public static final String                   UNIT_PRESSURE_MBAR             = "mbar";                                      //$NON-NLS-1$
+   public static final String                   UNIT_PRESSURE_INHG             = "inHg";                                      //$NON-NLS-1$
+   public static final String                   UNIT_SPEED_KM_H                = "km/h";                                      //$NON-NLS-1$
+   public static final String                   UNIT_SPEED_KNOT                = "knot";                                      //$NON-NLS-1$
+   public static final String                   UNIT_SPEED_MPH                 = "mph";                                       //$NON-NLS-1$
+   public static final String                   UNIT_TEMPERATURE_C             = "\u00B0C";                                   //$NON-NLS-1$
+   public static final String                   UNIT_TEMPERATURE_F             = "\u00B0F";                                   //$NON-NLS-1$
+   public static final String                   UNIT_VOLT                      = "V";                                         //$NON-NLS-1$
+   public static final String                   UNIT_VOLTAGE                   = "Volt";                                      //$NON-NLS-1$
+   public static final String                   UNIT_WEIGHT_G                  = "g";                                         //$NON-NLS-1$
+   public static final String                   UNIT_WEIGHT_KG                 = "kg";                                        //$NON-NLS-1$
+   public static final String                   UNIT_WEIGHT_LBS                = "lbs";                                       //$NON-NLS-1$
+   public static final String                   UNIT_WEIGHT_MG                 = "mg";                                        //$NON-NLS-1$
 
-   private static final String         DISTANCE_MILES_1_8         = "1/8";                      //$NON-NLS-1$
-   private static final String         DISTANCE_MILES_1_4         = "1/4";                      //$NON-NLS-1$
-   private static final String         DISTANCE_MILES_3_8         = "3/8";                      //$NON-NLS-1$
-   private static final String         DISTANCE_MILES_1_2         = "1/2";                      //$NON-NLS-1$
-   private static final String         DISTANCE_MILES_5_8         = "5/8";                      //$NON-NLS-1$
-   private static final String         DISTANCE_MILES_3_4         = "3/4";                      //$NON-NLS-1$
-   private static final String         DISTANCE_MILES_7_8         = "7/8";                      //$NON-NLS-1$
+   private static final String                  DISTANCE_MILES_1_8             = "1/8";                                       //$NON-NLS-1$
+   private static final String                  DISTANCE_MILES_1_4             = "1/4";                                       //$NON-NLS-1$
+   private static final String                  DISTANCE_MILES_3_8             = "3/8";                                       //$NON-NLS-1$
+   private static final String                  DISTANCE_MILES_1_2             = "1/2";                                       //$NON-NLS-1$
+   private static final String                  DISTANCE_MILES_5_8             = "5/8";                                       //$NON-NLS-1$
+   private static final String                  DISTANCE_MILES_3_4             = "3/4";                                       //$NON-NLS-1$
+   private static final String                  DISTANCE_MILES_7_8             = "7/8";                                       //$NON-NLS-1$
    //
-   public static final PeriodFormatter DEFAULT_DURATION_FORMATTER;
-   public static final PeriodFormatter DEFAULT_DURATION_FORMATTER_SHORT;
+   public static final PeriodFormatter          DEFAULT_DURATION_FORMATTER;
+   public static final PeriodFormatter          DEFAULT_DURATION_FORMATTER_SHORT;
 
-   private static StringBuilder        _formatterSB               = new StringBuilder();
-   private static Formatter            _formatter                 = new Formatter(_formatterSB);
+   private static StringBuilder                 _formatterSB                   = new StringBuilder();
+   private static Formatter                     _formatter                     = new Formatter(_formatterSB);
 
-   private static FontMetrics          _dialogFont_Metrics;
+   private static FontMetrics                   _dialogFont_Metrics;
+   private static org.eclipse.swt.graphics.Font _swtUIDrawingFont;
+
+   /**
+    * This is an eclipse parameter
+    */
+   private static final String                  SYS_PROP__SWT_AUTO_SCALE       = "swt.autoScale";                             //$NON-NLS-1$
+
+   /**
+    * When <code>true</code> then the commandline parameter <code>-DautoScale=nnn</code> is set.
+    * This will force to use the font in {@link ITourbookPreferences.UI_DRAWING_FONT} for text
+    * drawing, e.g. the tour chart texts
+    * <p>
+    * Commandline parameter: <code>-Dswt.autoScale=nnn</code>
+    */
+   private static String                        SYS_PROP__SWT_AUTO_SCALE_VALUE = System.getProperty(SYS_PROP__SWT_AUTO_SCALE);
+   private static boolean                       IS_SWT_AUTO_SCALE              = SYS_PROP__SWT_AUTO_SCALE_VALUE != NULL;
 
 // SET_FORMATTING_OFF
 
@@ -781,8 +799,9 @@ public class UI {
       IS_4K_DISPLAY = deviceZoom >= 140;
       HIDPI_SCALING = deviceZoom / 100f;
 
-      setupUI_FontMetrics();
-      setupUI_AWTFonts();
+      setupFonts_SWTDrawingFonts();
+      setupFonts_SWTFontMetrics();
+      setupFonts_AWTFonts();
 
       IMAGE_REGISTRY = CommonActivator.getDefault().getImageRegistry();
 
@@ -927,6 +946,15 @@ public class UI {
    public static boolean       IS_SCRAMBLE_DATA                = System.getProperty(SYS_PROP__SCRAMBLE_DATA) != null;
 
    static {
+
+      if (IS_SWT_AUTO_SCALE) {
+
+         Util.logSystemProperty_Value(UI.class,
+               SYS_PROP__SWT_AUTO_SCALE,
+               SYS_PROP__SWT_AUTO_SCALE_VALUE,
+               "MyTourbook is auto scaled" //$NON-NLS-1$
+         );
+      }
 
       if (IS_SCRAMBLE_DATA) {
 
@@ -1308,7 +1336,7 @@ public class UI {
     */
    private static int convertHorizontalDLUsToPixels(final int dlus) {
 
-      if (setupUI_FontMetrics() == false) {
+      if (setupFonts_SWTFontMetrics() == false) {
 
          // create default
          return dlus * 4;
@@ -2350,7 +2378,7 @@ public class UI {
    public static FontMetrics getDialogFontMetrics() {
 
       // ensure that font metrics are setup
-      setupUI_FontMetrics();
+      setupFonts_SWTFontMetrics();
 
       return _dialogFont_Metrics;
    }
@@ -2484,6 +2512,11 @@ public class UI {
       }
 
       return null;
+   }
+
+   public static org.eclipse.swt.graphics.Font getUIDrawingFont() {
+
+      return _swtUIDrawingFont;
    }
 
    public static GridDataFactory gridLayoutData_AlignBeginningFill() {
@@ -3417,6 +3450,118 @@ public class UI {
       uiElement.setIcon(CommonActivator.getThemedImageDescriptor(imageName));
    }
 
+   private static void setupFonts_AWTFonts() {
+
+      if (IS_WIN) {
+
+         final Font winFont = (Font) Toolkit.getDefaultToolkit().getDesktopProperty("win.messagebox.font"); //$NON-NLS-1$
+
+         if (winFont != null) {
+            AWT_DIALOG_FONT = winFont;
+         }
+
+      } else if (IS_OSX) {
+
+      } else if (IS_LINUX) {
+
+      }
+
+      if (AWT_DIALOG_FONT == null) {
+
+         AWT_DIALOG_FONT = AWT_FONT_ARIAL_12;
+      }
+   }
+
+   private static void setupFonts_SWTDrawingFonts() {
+
+      final Display display = Display.getCurrent();
+      Assert.isNotNull(display);
+
+      // hookup dispose
+      display.disposeExec(() -> {
+         if (_swtUIDrawingFont != null) {
+            _swtUIDrawingFont.dispose();
+         }
+      });
+
+      _swtUIDrawingFont = setupFonts_SWTDrawingFonts_10(display);
+
+      // update font after it is modified
+      _prefStore_Common.addPropertyChangeListener(propertyChangeEvent -> {
+
+         final String property = propertyChangeEvent.getProperty();
+
+         if (property.equals(ICommonPreferences.UI_DRAWING_FONT)) {
+
+            if (_swtUIDrawingFont != null) {
+
+               /**
+                * Delay old font disposal because org.eclipse.swt.custom.StyledTextRenderer is
+                * using the old font in setFont(...) before the new font is initialized
+                * -> really bad behavior !!!
+                */
+               final org.eclipse.swt.graphics.Font oldFont = _swtUIDrawingFont;
+
+               display.timerExec(10_000, () -> oldFont.dispose());
+            }
+
+            _swtUIDrawingFont = setupFonts_SWTDrawingFonts_10(display);
+
+            // fire event after the font is recreated to update the UI
+            _prefStore_Common.setValue(ICommonPreferences.UI_DRAWING_FONT_IS_MODIFIED, Math.random());
+         }
+      });
+
+   }
+
+   private static org.eclipse.swt.graphics.Font setupFonts_SWTDrawingFonts_10(final Display display) {
+
+      if (IS_SWT_AUTO_SCALE) {
+
+         final FontData[] allFontData = PreferenceConverter.getFontDataArray(
+               _prefStore_Common,
+               ICommonPreferences.UI_DRAWING_FONT);
+
+// rescaling the font is not working smoothly
+//
+//         final FontData fontData = allFontData[0];
+//
+//         final float height = fontData.getHeight();
+//         final float unscaledHeight = height / (DPIUtil.getDeviceZoom() / 100);
+//
+//         fontData.setHeight((int) unscaledHeight);
+
+         return new org.eclipse.swt.graphics.Font(display, allFontData);
+
+      } else {
+
+         return JFaceResources.getDialogFont();
+      }
+   }
+
+   private static boolean setupFonts_SWTFontMetrics() {
+
+      if (_dialogFont_Metrics != null) {
+         return true;
+      }
+
+      // Compute and keep a font metric
+
+      final Display display = Display.getDefault();
+      final Shell shell = new Shell(display);
+      final GC gc = new GC(shell);
+      {
+         final org.eclipse.swt.graphics.Font dialogFont = JFaceResources.getDialogFont();
+         gc.setFont(dialogFont);
+
+         _dialogFont_Metrics = gc.getFontMetrics();
+      }
+      gc.dispose();
+      shell.dispose();
+
+      return true;
+   }
+
    public static void setupThemedImages() {
 
 // SET_FORMATTING_OFF
@@ -3439,50 +3584,6 @@ public class UI {
       IMAGE_REGISTRY.put(IMAGE_ACTION_PHOTO_FILTER_WITH_PHOTOS,      CommonActivator.getThemedImageDescriptor(CommonImages.PhotoFilter_WithPhotos));
 
 // SET_FORMATTING_ON
-   }
-
-   private static void setupUI_AWTFonts() {
-
-      if (IS_WIN) {
-
-         final Font winFont = (Font) Toolkit.getDefaultToolkit().getDesktopProperty("win.messagebox.font"); //$NON-NLS-1$
-
-         if (winFont != null) {
-            AWT_DIALOG_FONT = winFont;
-         }
-
-      } else if (IS_OSX) {
-
-      } else if (IS_LINUX) {
-
-      }
-
-      if (AWT_DIALOG_FONT == null) {
-
-         AWT_DIALOG_FONT = AWT_FONT_ARIAL_12;
-      }
-   }
-
-   private static boolean setupUI_FontMetrics() {
-
-      if (_dialogFont_Metrics != null) {
-         return true;
-      }
-
-      // Compute and keep a font metric
-
-      final Display display = Display.getDefault();
-      final Shell shell = new Shell(display);
-      final GC gc = new GC(shell);
-      {
-         gc.setFont(JFaceResources.getDialogFont());
-
-         _dialogFont_Metrics = gc.getFontMetrics();
-      }
-      gc.dispose();
-      shell.dispose();
-
-      return true;
    }
 
    /**

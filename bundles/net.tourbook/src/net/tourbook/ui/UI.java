@@ -122,7 +122,7 @@ public class UI {
     * Date subcategory, e.g. month
     */
    public static final String            VIEW_COLOR_DATE_SUB_CATEGORY    = "VIEW_COLOR_DATE_SUB_CATEGORY";    //$NON-NLS-1$
-   
+
    /**
     * Color for disabled items
     */
@@ -713,6 +713,7 @@ public class UI {
    }
 
    public static Font getLogFont() {
+
       return _fontForLogging;
    }
 
@@ -756,6 +757,8 @@ public class UI {
 
       return EMPTY_STRING;
    }
+
+
 
    public static ImageData rotate(final ImageData srcData, final int direction) {
 
@@ -913,7 +916,7 @@ public class UI {
                 */
                final Font oldFont = _fontForLogging;
 
-               display.timerExec(10_000, oldFont::dispose);
+               display.timerExec(10_000, () -> oldFont.dispose());
 
                _fontForLogging = null;
             }

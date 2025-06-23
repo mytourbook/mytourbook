@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2024 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2025 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -187,6 +187,8 @@ public class ChartComponentAxis extends Canvas {
 
          final GC gc = new GC(_axisImage);
          {
+            gc.setFont(UI.getUIDrawingFont());
+
             gc.setBackground(backgroundColor);
             gc.fillRectangle(_axisImage.getBounds());
 

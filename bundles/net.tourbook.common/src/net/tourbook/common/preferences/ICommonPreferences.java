@@ -101,6 +101,15 @@ public interface ICommonPreferences {
    /*
     * Autocomplete
     */
-   public static final String AUTO_COMPLETE_PREFIX = "AUTO_COMPLETE_PREFIX"; //$NON-NLS-1$
+   public static final String AUTO_COMPLETE_PREFIX        = "AUTO_COMPLETE_PREFIX";        //$NON-NLS-1$
+
+   /**
+    * UI font size which is used when painting a text, e.g. in the tour chart.
+    * <p>
+    * This was needed in Eclipse 4.36 because now all fonts are scaled when autoScale=xxx was set
+    * :-(((
+    */
+   public static final String UI_DRAWING_FONT             = "UI_DRAWING_FONT";             //$NON-NLS-1$
+   public static final String UI_DRAWING_FONT_IS_MODIFIED = "UI_DRAWING_FONT_IS_MODIFIED"; //$NON-NLS-1$
 
 }

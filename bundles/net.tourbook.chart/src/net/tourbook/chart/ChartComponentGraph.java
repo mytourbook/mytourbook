@@ -47,7 +47,6 @@ import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Cursor;
-import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.LineAttributes;
@@ -449,11 +448,6 @@ public class ChartComponentGraph extends Canvas {
    boolean                            _isChartOverlapped;
 
    /**
-    * Cache font to improve performance.
-    */
-   private Font                       _uiFont;
-
-   /**
     * Configuration how the chart title segment is displayed.
     */
    ChartTitleSegmentConfig            chartTitleSegmentConfig      = new ChartTitleSegmentConfig();
@@ -476,7 +470,6 @@ public class ChartComponentGraph extends Canvas {
       final Display display = getDisplay();
 
       _chart = chartWidget;
-      _uiFont = _chart.getFont();
 
       _pc = new PixelConverter(_chart);
 
@@ -1601,7 +1594,7 @@ public class ChartComponentGraph extends Canvas {
       final GC gcChart = new GC(_chartImage_20_Chart);
       final GC gcGraph = new GC(_chartImage_10_Graphs);
       {
-         gcChart.setFont(_uiFont);
+         gcChart.setFont(UI.getUIDrawingFont());
 
          // fill background
 

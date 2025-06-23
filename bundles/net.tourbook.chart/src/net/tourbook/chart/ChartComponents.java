@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2024 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2025 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -29,6 +29,7 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ControlListener;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Rectangle;
+import org.eclipse.swt.internal.DPIUtil;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
@@ -155,16 +156,16 @@ public class ChartComponents extends Composite {
    /**
     * Width of the vertical axis
     */
-   private final int         _yAxisWidthLeft             = 50;
+   private int               _yAxisWidthLeft             = 50;
 
    private int               _yAxisWidthLeftWithTitle    = _yAxisWidthLeft;
 
-   private final int         _yAxisWidthRight            = 50;
+   private int               _yAxisWidthRight            = 50;
 
    /**
     * Vertical distance between two graphs
     */
-   private final int         _graphVerticalDistance      = 15;
+   private int               _graphVerticalDistance      = 15;
 
    /**
     * Contains the {@link SynchConfiguration} for the current chart and will be used from the chart
@@ -2701,6 +2702,76 @@ public class ChartComponents extends Composite {
       }
 
       componentGraph.updateCustomLayers();
+   }
+
+   public void updateFontScale() {
+
+// TODO Auto-generated method stub
+
+      final int deviceZoom = DPIUtil.getDeviceZoom();
+
+      if (deviceZoom == 100) {
+
+         // there is nothing to scale
+
+         return;
+      }
+
+//      final Font uiDrawingFont = UI.getUIDrawingFont();
+//      final FontData drawingFontData = uiDrawingFont.getFontData()[0];
+//      final float drawingFontHeight = drawingFontData.getHeight();
+//
+//      final Font dialogFont = JFaceResources.getDialogFont();
+//      final FontData dialogFontData = dialogFont.getFontData()[0];
+//      final float defaultHeight = dialogFontData.getHeight();
+//
+//      final float deviceZoomRatio = deviceZoom / 100f;
+//      final float heightRatio = drawingFontHeight / defaultHeight;
+//
+//      DIALOG_FONT_HEIGHT = UI.getDialogFontMetrics().getHeight();
+//
+//      SLIDER_BAR_HEIGHT = DIALOG_FONT_HEIGHT - 5;
+//      TITLE_BAR_HEIGHT = DIALOG_FONT_HEIGHT + 3;
+//
+//      /**
+//       * Top margin of the chart (and all it's components)
+//       */
+//      _devMarginTop = 10;
+//
+//      /**
+//       * Height of the slider bar, 0 indicates that the slider is not visible.
+//       * <p>
+//       * Use a default height that the graph title do not cover the upper graph. After the slider
+//       * label is painted in the graph, this field is probably not needed any more but now it is
+//       * used
+//       * for additional space for the graph title.
+//       */
+//      devSliderBarHeight = SLIDER_BAR_HEIGHT;
+//
+//      /**
+//       * Height of the title bar, 0 indicates that the title is not visible
+//       */
+//      _devXTitleBarHeight = 0;
+//
+//      /**
+//       * Height of the horizontal axis
+//       */
+//      _devXAxisHeight = DIALOG_FONT_HEIGHT + 10;
+//
+//      /**
+//       * Width of the vertical axis
+//       */
+//      _yAxisWidthLeft = 50;
+//
+//      _yAxisWidthLeftWithTitle = _yAxisWidthLeft;
+//
+//      _yAxisWidthRight = 50;
+//
+//      /**
+//       * Vertical distance between two graphs
+//       */
+//      _graphVerticalDistance = 15;
+
    }
 
 }

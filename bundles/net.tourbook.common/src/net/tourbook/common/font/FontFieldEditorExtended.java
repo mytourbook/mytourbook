@@ -78,7 +78,7 @@ public class FontFieldEditorExtended extends FieldEditor {
    /**
     * Font data for the chosen font button, or <code>null</code> if none.
     */
-   private FontData[]       chosenFont;
+   private FontData[]       _chosenFont;
 
    /**
     * The label that displays the selected font, or <code>null</code> if none.
@@ -87,13 +87,10 @@ public class FontFieldEditorExtended extends FieldEditor {
 
    private Label            _lblFontSize;
 
-   /**
-    * The previewer, or <code>null</code> if none.
-    */
-   private DefaultPreviewer _fontPreviewer;
-
    private Composite        _containerFontSize;
    private Spinner          _spinFontSize;
+
+   private DefaultPreviewer _fontPreviewer;
 
    /**
     * Internal font previewer implementation.
@@ -210,8 +207,8 @@ public class FontFieldEditorExtended extends FieldEditor {
    @Override
    protected void applyFont() {
 
-      if (chosenFont != null && _fontPreviewer != null) {
-         _fontPreviewer.setFont(chosenFont);
+      if (_chosenFont != null && _fontPreviewer != null) {
+         _fontPreviewer.setFont(_chosenFont);
       }
    }
 
@@ -253,21 +250,6 @@ public class FontFieldEditorExtended extends FieldEditor {
       {
          {
             /*
-             * Button: Change font
-             */
-            _btnChangeFont = createUI_20_ChangeButton(container);
-
-            final int widthHint = convertHorizontalDLUsToPixels(_btnChangeFont, IDialogConstants.BUTTON_WIDTH);
-            final int defaultWidth = _btnChangeFont.computeSize(SWT.DEFAULT, SWT.DEFAULT, true).x;
-
-            final GridData gd = new GridData();
-            gd.widthHint = Math.max(widthHint, defaultWidth);
-            gd.verticalAlignment = SWT.BEGINNING;
-            gd.horizontalSpan = 2;
-            _btnChangeFont.setLayoutData(gd);
-         }
-         {
-            /*
              * Font size
              */
             _containerFontSize = new Composite(container, SWT.NONE);
@@ -277,7 +259,7 @@ public class FontFieldEditorExtended extends FieldEditor {
             {
                // Label
                _lblFontSize = new Label(_containerFontSize, SWT.NONE);
-               GridDataFactory.fillDefaults()//
+               GridDataFactory.fillDefaults()
                      .align(SWT.FILL, SWT.CENTER)
                      .applyTo(_lblFontSize);
                _lblFontSize.setText(Messages.Font_Editor_Label_FontSize);
@@ -303,6 +285,28 @@ public class FontFieldEditorExtended extends FieldEditor {
                });
             }
          }
+         {
+            /*
+             * Button: Change font
+             */
+            _btnChangeFont = createUI_20_ChangeButton(container);
+
+            final int widthHint = convertHorizontalDLUsToPixels(_btnChangeFont, IDialogConstants.BUTTON_WIDTH);
+            final int defaultWidth = _btnChangeFont.computeSize(SWT.DEFAULT, SWT.DEFAULT, true).x;
+
+//            final GridData gd = new GridData();
+//            gd.widthHint = Math.max(widthHint, defaultWidth);
+//            gd.verticalAlignment = SWT.BEGINNING;
+//            gd.horizontalSpan = 2;
+//            _btnChangeFont.setLayoutData(gd);
+
+            GridDataFactory.fillDefaults()
+//                  .grab(true, false)
+                  .span(2, 1)
+//                  .hint(Math.max(widthHint, defaultWidth), SWT.DEFAULT)
+                  .applyTo(_btnChangeFont);
+
+         }
       }
    }
 
@@ -326,8 +330,8 @@ public class FontFieldEditorExtended extends FieldEditor {
 
             final FontDialog fontDialog = new FontDialog(_btnChangeFont.getShell());
 
-            if (chosenFont != null) {
-               fontDialog.setFontList(chosenFont);
+            if (_chosenFont != null) {
+               fontDialog.setFontList(_chosenFont);
             }
 
             fontDialog.setEffectsVisible(false);
@@ -379,14 +383,14 @@ public class FontFieldEditorExtended extends FieldEditor {
    @Override
    protected void doStore() {
 
-      if (chosenFont != null) {
-         PreferenceConverter.setValue(getPreferenceStore(), getPreferenceName(), chosenFont);
+      if (_chosenFont != null) {
+         PreferenceConverter.setValue(getPreferenceStore(), getPreferenceName(), _chosenFont);
       }
    }
 
    private void fireFontChanged(final FontData font) {
 
-      FontData[] oldFont = chosenFont;
+      FontData[] oldFont = _chosenFont;
       if (oldFont == null) {
          oldFont = JFaceResources.getDefaultFont().getFontData();
       }
@@ -437,7 +441,7 @@ public class FontFieldEditorExtended extends FieldEditor {
 
    private void onChangeFontSize() {
 
-      final FontData[] selectedFont = chosenFont;
+      final FontData[] selectedFont = _chosenFont;
 
       final FontData font = selectedFont[0];
       font.setHeight(_spinFontSize.getSelection());
@@ -531,10 +535,10 @@ public class FontFieldEditorExtended extends FieldEditor {
       }
 
       //Now cache this value in the receiver
-      this.chosenFont = bestFont;
+      _chosenFont = bestFont;
 
       if (_lblSelectedFont != null) {
-         _lblSelectedFont.setText(StringConverter.asString(chosenFont[0]));
+         _lblSelectedFont.setText(StringConverter.asString(_chosenFont[0]));
       }
       if (_fontPreviewer != null) {
          _fontPreviewer.setFont(bestFont);
