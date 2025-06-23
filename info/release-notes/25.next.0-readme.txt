@@ -40,7 +40,9 @@ New / Improvements
 Changes
 =======
 
-* 
+* UI Font
+  When MyTourbook is started with an -DautoScale=nnn parameter, then this font will be used when painting a text, e.g. all texts in the tour chart.
+  This was needed because since Eclipse 4.36 the font is scaled when painting a text which could make the font too small or too large.
 
 
 Changes that require Tour Re-import

@@ -85,6 +85,7 @@ public class PrefPageAppearance extends PreferencePage implements IWorkbenchPref
    private ComboViewer                   _comboViewerTheme;
    private ControlDecoration             _comboDecorator_Theme;
 
+   private FontFieldEditorExtended       _uiFontEditor;
    private FontFieldEditorExtended       _logMessageFontEditor;
 
    /*
@@ -144,9 +145,10 @@ public class PrefPageAppearance extends PreferencePage implements IWorkbenchPref
       GridLayoutFactory.fillDefaults().applyTo(container);
       {
          createUI_10_Theme(container);
-         createUI_20_Tagging(container);
+         createUI_20_UIFont(container);
          createUI_30_LogFont(container);
-         createUI_40_OtherOptions(container);
+         createUI_50_Tagging(container);
+         createUI_80_OtherOptions(container);
       }
 
       return container;
@@ -192,7 +194,63 @@ public class PrefPageAppearance extends PreferencePage implements IWorkbenchPref
       }
    }
 
-   private void createUI_20_Tagging(final Composite parent) {
+   private void createUI_20_UIFont(final Composite parent) {
+
+      final Group group = new Group(parent, SWT.NONE);
+      group.setText(Messages.Pref_Appearance_Group_UIDrawingFont);
+      group.setToolTipText(Messages.Pref_Appearance_Group_UIDrawingFont_Tooltip);
+      GridDataFactory.fillDefaults().grab(true, false).applyTo(group);
+      GridLayoutFactory.swtDefaults().numColumns(1).applyTo(group);
+      {
+         {
+            /*
+             * Font editor
+             */
+            final Composite fontContainer = new Composite(group, SWT.NONE);
+            GridDataFactory.fillDefaults().grab(true, false).applyTo(fontContainer);
+            GridLayoutFactory.swtDefaults().numColumns(1).applyTo(fontContainer);
+//            fontContainer.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_GREEN));
+            {
+               _uiFontEditor = new FontFieldEditorExtended(ITourbookPreferences.UI_DRAWING_FONT,
+                     UI.EMPTY_STRING,
+                     Messages.Pref_Appearance_Label_UIFontExample,
+                     fontContainer);
+
+               _uiFontEditor.setTooltipText(Messages.Pref_Appearance_Group_UIDrawingFont_Tooltip);
+               _uiFontEditor.setPropertyChangeListener(propertyChangeEvent -> onChangeFontInEditor_UIFontSize());
+            }
+         }
+      }
+   }
+
+   private void createUI_30_LogFont(final Composite parent) {
+
+      final Group group = new Group(parent, SWT.NONE);
+      group.setText(OtherMessages.THEME_FONT_LOGGING);
+      GridDataFactory.fillDefaults().grab(true, false).applyTo(group);
+      GridLayoutFactory.swtDefaults().numColumns(1).applyTo(group);
+      {
+         {
+            /*
+             * Font editor
+             */
+            final Composite fontContainer = new Composite(group, SWT.NONE);
+            GridDataFactory.fillDefaults().grab(true, false).applyTo(fontContainer);
+            GridLayoutFactory.swtDefaults().numColumns(1).applyTo(fontContainer);
+//            fontContainer.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_GREEN));
+            {
+               _logMessageFontEditor = new FontFieldEditorExtended(IMappingPreferences.THEME_FONT_LOGGING,
+                     UI.EMPTY_STRING,
+                     OtherMessages.THEME_FONT_LOGGING_PREVIEW_TEXT,
+                     fontContainer);
+
+               _logMessageFontEditor.setPropertyChangeListener(propertyChangeEvent -> onChangeFontInEditor_LogMessages());
+            }
+         }
+      }
+   }
+
+   private void createUI_50_Tagging(final Composite parent) {
 
       final Group group = new Group(parent, SWT.NONE);
       GridDataFactory.fillDefaults().grab(true, false).applyTo(group);
@@ -272,34 +330,7 @@ public class PrefPageAppearance extends PreferencePage implements IWorkbenchPref
       }
    }
 
-   private void createUI_30_LogFont(final Composite parent) {
-
-      final Group group = new Group(parent, SWT.NONE);
-      group.setText(OtherMessages.THEME_FONT_LOGGING);
-      GridDataFactory.fillDefaults().grab(true, false).applyTo(group);
-      GridLayoutFactory.swtDefaults().numColumns(1).applyTo(group);
-      {
-         {
-            /*
-             * Font editor
-             */
-            final Composite fontContainer = new Composite(group, SWT.NONE);
-            GridDataFactory.fillDefaults().grab(true, false).applyTo(fontContainer);
-            GridLayoutFactory.swtDefaults().numColumns(1).applyTo(fontContainer);
-//            fontContainer.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_GREEN));
-            {
-               _logMessageFontEditor = new FontFieldEditorExtended(IMappingPreferences.THEME_FONT_LOGGING,
-                     UI.EMPTY_STRING,
-                     OtherMessages.THEME_FONT_LOGGING_PREVIEW_TEXT,
-                     fontContainer);
-
-               _logMessageFontEditor.setPropertyChangeListener(propertyChangeEvent -> onChangeFontInEditor());
-            }
-         }
-      }
-   }
-
-   private void createUI_40_OtherOptions(final Composite parent) {
+   private void createUI_80_OtherOptions(final Composite parent) {
 
       {
          /*
@@ -417,10 +448,16 @@ public class PrefPageAppearance extends PreferencePage implements IWorkbenchPref
       _defaultMouseWheelListener = mouseEvent -> UI.adjustSpinnerValueOnMouseScroll(mouseEvent);
    }
 
-   private void onChangeFontInEditor() {
+   private void onChangeFontInEditor_LogMessages() {
 
       // update state, this will fire IMappingPreferences.THEME_FONT_LOGGING event which will recreate the font
       _logMessageFontEditor.store();
+   }
+
+   private void onChangeFontInEditor_UIFontSize() {
+
+      // update state, this will fire IMappingPreferences.THEME_FONT_LOGGING event which will recreate the font
+      _uiFontEditor.store();
    }
 
    private void onResetAllToggleDialogs() {
@@ -536,6 +573,9 @@ public class PrefPageAppearance extends PreferencePage implements IWorkbenchPref
       // set font editor default values
       _logMessageFontEditor.loadDefault();
       _logMessageFontEditor.store();
+
+      _uiFontEditor.loadDefault();
+      _uiFontEditor.store();
 
       super.performDefaults();
 
@@ -687,8 +727,10 @@ public class PrefPageAppearance extends PreferencePage implements IWorkbenchPref
       _spinnerAutoOpenDelay               .setSelection(_prefStore.getInt(ITourbookPreferences.APPEARANCE_TAGGING_AUTO_OPEN_DELAY));
       _spinnerRecentTags                  .setSelection(_prefStore.getInt(ITourbookPreferences.APPEARANCE_NUMBER_OF_RECENT_TAGS));
 
-      _logMessageFontEditor.setPreferenceStore(_prefStore);
-      _logMessageFontEditor.load();
+      _logMessageFontEditor   .setPreferenceStore(_prefStore);
+      _logMessageFontEditor   .load();
+      _uiFontEditor           .setPreferenceStore(_prefStore);
+      _uiFontEditor           .load();
    }
 
    private void saveState() {

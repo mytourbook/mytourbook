@@ -652,4 +652,12 @@ public interface ITourbookPreferences {
     */
    public static final String NUTRITION_BEVERAGECONTAINERS_HAVE_CHANGED = "NUTRITION_BEVERAGECONTAINERS_HAVE_CHANGED"; //$NON-NLS-1$
    public static final String NUTRITION_IGNORE_FIRST_HOUR               = "NUTRITION_IGNORE_FIRST_HOUR";               //$NON-NLS-1$
+
+   /**
+    * UI font size which is used when painting a text, e.g. in the tour chart.
+    * <p>
+    * This was needed in Eclipse 4.36 because now all fonts are scaled when autoScale=xxx was set
+    * :-(((
+    */
+   public static final String UI_DRAWING_FONT                           = "UI_DRAWING_FONT";                           //$NON-NLS-1$
 }
