@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2022 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2025 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -20,11 +20,14 @@ import java.util.Collections;
 
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
+import net.tourbook.common.CommonActivator;
 import net.tourbook.common.UI;
 import net.tourbook.common.action.ActionOpenPrefDialog;
 import net.tourbook.common.action.ActionResetToDefaults;
 import net.tourbook.common.action.IActionResetToDefault;
+import net.tourbook.common.font.FontFieldEditorExtended;
 import net.tourbook.common.font.MTFont;
+import net.tourbook.common.preferences.ICommonPreferences;
 import net.tourbook.common.tooltip.ToolbarSlideout;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.preferences.PrefPageAppearanceTourChart;
@@ -61,25 +64,26 @@ import org.eclipse.ui.dialogs.PreferencesUtil;
  */
 public class SlideoutTourChartOptions extends ToolbarSlideout implements IActionResetToDefault {
 
-   private final IPreferenceStore _prefStore           = TourbookPlugin.getPrefStore();
+   private static final IPreferenceStore _prefStore           = TourbookPlugin.getPrefStore();
+   private static final IPreferenceStore _prefStore_Common    = CommonActivator.getPrefStore();
 
-   private SelectionListener      _defaultSelectionListener;
-   private MouseWheelListener     _defaultMouseWheelListener;
-   private FocusListener          _keepOpenListener;
+   private SelectionListener             _defaultSelectionListener;
+   private MouseWheelListener            _defaultMouseWheelListener;
+   private FocusListener                 _keepOpenListener;
 
-   private ActionOpenPrefDialog   _actionPrefDialog;
-   private ActionResetToDefaults  _actionRestoreDefaults;
+   private ActionOpenPrefDialog          _actionPrefDialog;
+   private ActionResetToDefaults         _actionRestoreDefaults;
 
-   private ChartOptions_Grid      _gridUI;
+   private ChartOptions_Grid             _gridUI;
 
-   private boolean                _isNeededToRecomputeValues;
+   private boolean                       _isNeededToRecomputeValues;
 
-   private int                    _speedDistanceIntervalBackup;
+   private int                           _speedDistanceIntervalBackup;
 
    /**
     * Pulse graph values MUST be in sync with pulse graph labels
     */
-   private PulseGraph[]           _allPulseGraph_Value = {
+   private PulseGraph[]                  _allPulseGraph_Value = {
 
          PulseGraph.DEVICE_BPM___2ND_RR_AVERAGE,
          PulseGraph.DEVICE_BPM_ONLY,
@@ -94,7 +98,7 @@ public class SlideoutTourChartOptions extends ToolbarSlideout implements IAction
    /**
     * Pulse graph labels MUST be in sync with pulse graph values
     */
-   private String[]               _allPulseGraph_Label = {
+   private String[]                      _allPulseGraph_Label = {
 
          Messages.TourChart_PulseGraph_DeviceBpm_2nd_RRAverage,
          Messages.TourChart_PulseGraph_DeviceBpm_Only,
@@ -105,33 +109,35 @@ public class SlideoutTourChartOptions extends ToolbarSlideout implements IAction
          Messages.TourChart_PulseGraph_RRAverage_2nd_DeviceBpm,
    };
 
-   private ArrayList<PulseGraph>  _possiblePulseGraph_Values;
+   private ArrayList<PulseGraph>         _possiblePulseGraph_Values;
 
    /*
     * UI controls
     */
-   private TourChart _tourChart;
+   private TourChart               _tourChart;
 
-   private Button    _chkGraphAntialiasing;
-   private Button    _chkInvertPaceGraph;
-   private Button    _chkSelectInbetweenTimeSlices;
-   private Button    _chkShowBreaktimeValues;
-   private Button    _chkShowNightSections;
-   private Button    _chkShowSrtmData;
-   private Button    _chkShowStartTimeOnXAxis;
-   private Button    _chkShowValuePointTooltip;
-   private Button    _chkShowValuePointValue;
+   private Button                  _chkGraphAntialiasing;
+   private Button                  _chkInvertPaceGraph;
+   private Button                  _chkSelectInbetweenTimeSlices;
+   private Button                  _chkShowBreaktimeValues;
+   private Button                  _chkShowNightSections;
+   private Button                  _chkShowSrtmData;
+   private Button                  _chkShowStartTimeOnXAxis;
+   private Button                  _chkShowValuePointTooltip;
+   private Button                  _chkShowValuePointValue;
 
-   private Button    _rdoShowSrtm1Values;
-   private Button    _rdoShowSrtm3Values;
+   private Button                  _rdoShowSrtm1Values;
+   private Button                  _rdoShowSrtm3Values;
 
-   private Label     _lblNightSectionsOpacity;
+   private Label                   _lblNightSectionsOpacity;
 
-   private Spinner   _spinnerGraphLineOpacity;
-   private Spinner   _spinnerNightSectionsOpacity;
-   private Spinner   _spinnerSpeedDistanceInterval;
+   private Spinner                 _spinnerGraphLineOpacity;
+   private Spinner                 _spinnerNightSectionsOpacity;
+   private Spinner                 _spinnerSpeedDistanceInterval;
 
-   private Combo     _comboPulseValueGraph;
+   private Combo                   _comboPulseValueGraph;
+
+   private FontFieldEditorExtended _uiFontEditor;
 
    /**
     * @param ownerControl
@@ -192,6 +198,7 @@ public class SlideoutTourChartOptions extends ToolbarSlideout implements IAction
                createUI_10_Title(titleContainer);
                createUI_12_Actions(titleContainer);
             }
+            createUI_20_UIFont(container);
             createUI_20_Options(container);
             createUI_30_Graph(container);
 
@@ -352,6 +359,45 @@ public class SlideoutTourChartOptions extends ToolbarSlideout implements IAction
             _chkSelectInbetweenTimeSlices.setText(Messages.Tour_Action_Select_Inbetween_Timeslices);
             _chkSelectInbetweenTimeSlices.setToolTipText(Messages.Tour_Action_Select_Inbetween_Timeslices_Tooltip);
             _chkSelectInbetweenTimeSlices.addSelectionListener(_defaultSelectionListener);
+         }
+      }
+   }
+
+   private void createUI_20_UIFont(final Composite parent) {
+
+      final Label label = new Label(parent, SWT.NONE);
+      label.setFont(JFaceResources.getFontRegistry().getBold(JFaceResources.DIALOG_FONT));
+      label.setText("REMOVE createUI_20_UIFont in SlideoutTourChartOptions");
+
+      final Group group = new Group(parent, SWT.NONE);
+      group.setText(Messages.Pref_Appearance_Group_UIDrawingFont);
+      group.setToolTipText(Messages.Pref_Appearance_Group_UIDrawingFont_Tooltip);
+      GridDataFactory.fillDefaults().grab(true, false).applyTo(group);
+      GridLayoutFactory.swtDefaults().numColumns(1).applyTo(group);
+      {
+         {
+            /*
+             * Font editor
+             */
+            final Composite fontContainer = new Composite(group, SWT.NONE);
+            GridDataFactory.fillDefaults().grab(true, false).applyTo(fontContainer);
+            GridLayoutFactory.swtDefaults().numColumns(1).applyTo(fontContainer);
+//            fontContainer.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_GREEN));
+            {
+               _uiFontEditor = new FontFieldEditorExtended(
+
+                     ICommonPreferences.UI_DRAWING_FONT,
+                     UI.EMPTY_STRING,
+                     Messages.Pref_Appearance_Label_UIFontExample,
+                     fontContainer);
+
+               _uiFontEditor.setTooltipText(Messages.Pref_Appearance_Group_UIDrawingFont_Tooltip);
+               _uiFontEditor.setPropertyChangeListener(propertyChangeEvent -> {
+
+                  // this will fire the pref value
+                  _uiFontEditor.store();
+               });
+            }
          }
       }
    }
@@ -668,6 +714,9 @@ public class SlideoutTourChartOptions extends ToolbarSlideout implements IAction
 
       _gridUI.resetToDefaults();
 
+      _uiFontEditor.loadDefault();
+      _uiFontEditor.store();
+
       onChangeUI();
    }
 
@@ -716,6 +765,9 @@ public class SlideoutTourChartOptions extends ToolbarSlideout implements IAction
             tcc.isShowTimeOnXAxis);
 
       _gridUI.restoreState();
+
+      _uiFontEditor           .setPreferenceStore(_prefStore_Common);
+      _uiFontEditor           .load();
    }
 
    private void saveState() {

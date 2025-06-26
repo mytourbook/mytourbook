@@ -44,7 +44,10 @@ public class ChartComponentAxis extends Canvas {
    private static final String         ZOOM_TEXT_0             = "0";                             //$NON-NLS-1$
    private static final String         ZOOM_TEXT_LARGER_THEN_0 = "> 0";                           //$NON-NLS-1$
 
-   private static final int            UNIT_OFFSET             = 7;
+   /**
+    * Offset between the unit label and unit tick
+    */
+   private static final int            UNIT_HORIZONTAL_OFFSET  = 6;
 
    private final Chart                 _chart;
 
@@ -308,7 +311,7 @@ public class ChartComponentAxis extends Canvas {
       final int devX = _isLeft ? axisRect.width - 1 : 0;
 
       // loop: all graphs
-      for (final GraphDrawingData drawingData : _graphDrawingData) {
+      for (final GraphDrawingData graphDrawingData : _graphDrawingData) {
 
          graphNo++;
 
@@ -331,66 +334,45 @@ public class ChartComponentAxis extends Canvas {
             continue;
          }
 
-         final ArrayList<ChartUnit> yUnits = drawingData.getYUnits();
+         final ArrayList<ChartUnit> yUnits = graphDrawingData.getYUnits();
          final int numberOfUnits = yUnits.size();
 
-         final double scaleY = drawingData.getScaleY();
-         final ChartDataYSerie yData = drawingData.getYData();
+         final double scaleY = graphDrawingData.getScaleY();
+         final ChartDataYSerie yData = graphDrawingData.getYData();
 
          final String title = yData.getYTitle();
          final String unitLabel = yData.getUnitLabel();
          final boolean isBottomUp = yData.isYAxis_Bottom2Top();
 
-         final float graphYBottom = drawingData.getGraphYBottom();
-         final int devGraphHeight = drawingData.devGraphHeight;
+         final float graphYBottom = graphDrawingData.getGraphYBottom();
+         final int devGraphHeight = graphDrawingData.devGraphHeight;
 
-         final int devYBottom = drawingData.getDevYBottom();
+         final int devYBottom = graphDrawingData.getDevYBottom();
          final int devYTop = devYBottom - devGraphHeight;
 
          /*
-          * Draw y-axis title
+          * Draw y-axis title which is the unit label
           */
          if (_isLeft && title != null) {
 
-            // create title with unit label
-//				final StringBuilder sbTitle = new StringBuilder(title);
-//				if (unitLabel.length() > 0) {
-//					sbTitle.append(Util.DASH_WITH_SPACE);
-//					sbTitle.append(unitLabel);
-//				}
-//
-//				String yTitle = sbTitle.toString();
-            final String yTitle = unitLabel;
-            final Point labelExtend = gc.textExtent(yTitle);
+            final Point labelExtend = gc.textExtent(unitLabel);
 
-            final int devChartHeight = devYBottom - devYTop;
+            final int unitWidth = labelExtend.x;
 
-            // draw only the unit text and not the title when there is not
-            // enough space
-//				if (labelExtend.x > devChartHeight) {
-//					yTitle = unitLabel;
-//					labelExtend = gc.textExtent(yTitle);
-//				}
-
-            final int xPos = labelExtend.y / 2;
-            final int yPos = devYTop + (devChartHeight / 2) + (labelExtend.x / 2);
+            final int xPos = 0;
+            final int yPos = devYTop + (devGraphHeight / 2) + (unitWidth / 2);
 
             gc.setForeground(new Color(yData.getRgbGraph_Text()));
 
             final Transform tr = new Transform(_display);
             {
-               /**
-                * Have no idea why this scaling needs now to be disabled otherwise the labels are
-                * not displayed correctly
-                */
-//               xPos = DPIUtil.autoScaleUp(xPos);
-//               yPos = DPIUtil.autoScaleUp(yPos);
-
                tr.translate(xPos, yPos);
                tr.rotate(-90f);
 
                gc.setTransform(tr);
-               gc.drawText(yTitle, 0, 0, true);
+               {
+                  gc.drawText(unitLabel, 0, 0, true);
+               }
                gc.setTransform(null);
             }
             tr.dispose();
@@ -420,9 +402,9 @@ public class ChartComponentAxis extends Canvas {
             if (valueLabel.length() > 0) {
 
                if (_isLeft) {
-                  gc.drawLine(devX - 5, devY, devX, devY);
+                  gc.drawLine(devX - ChartComponents.UNIT_TICK_SIZE, devY, devX, devY);
                } else {
-                  gc.drawLine(devX, devY, devX + 5, devY);
+                  gc.drawLine(devX, devY, devX + ChartComponents.UNIT_TICK_SIZE, devY);
                }
             }
 
@@ -431,9 +413,9 @@ public class ChartComponentAxis extends Canvas {
 
             // draw the unit label centered at the unit tick
             if (_isLeft) {
-               gc.drawText(valueLabel, (devX - (unitExtend.x + UNIT_OFFSET)), devYUnitLabel, true);
+               gc.drawText(valueLabel, (devX - (unitExtend.x + UNIT_HORIZONTAL_OFFSET)), devYUnitLabel, true);
             } else {
-               gc.drawText(valueLabel, (devX + UNIT_OFFSET), devYUnitLabel, true);
+               gc.drawText(valueLabel, (devX + UNIT_HORIZONTAL_OFFSET), devYUnitLabel, true);
             }
          }
 

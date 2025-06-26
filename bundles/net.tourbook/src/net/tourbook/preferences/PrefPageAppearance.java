@@ -219,7 +219,11 @@ public class PrefPageAppearance extends PreferencePage implements IWorkbenchPref
                      fontContainer);
 
                _uiFontEditor.setTooltipText(Messages.Pref_Appearance_Group_UIDrawingFont_Tooltip);
-               _uiFontEditor.setPropertyChangeListener(propertyChangeEvent -> onChangeFontInEditor_UIDrawingFont());
+               _uiFontEditor.setPropertyChangeListener(propertyChangeEvent -> {
+
+                  // this will fire the pref value
+               	_uiFontEditor.store();
+               });
             }
          }
       }
@@ -454,12 +458,6 @@ public class PrefPageAppearance extends PreferencePage implements IWorkbenchPref
 
       // update state, this will fire IMappingPreferences.THEME_FONT_LOGGING event which will recreate the font
       _logMessageFontEditor.store();
-   }
-
-   private void onChangeFontInEditor_UIDrawingFont() {
-
-      // this will fire the pref value
-      _uiFontEditor.store();
    }
 
    private void onResetAllToggleDialogs() {

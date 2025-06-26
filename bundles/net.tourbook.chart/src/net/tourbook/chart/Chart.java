@@ -707,7 +707,7 @@ public class Chart extends ViewForm {
     *         title height and/or horizontal slider label height.
     */
    public int getMarginTop() {
-      return _chartComponents.getDevChartMarginTop();
+      return _chartComponents.getDevChartMargin_Top();
    }
 
    public MouseWheelMode getMouseWheelMode() {
@@ -813,13 +813,6 @@ public class Chart extends ViewForm {
       return _isInUpdateUI;
    }
 
-   /**
-    * @return Returns <code>true</code> when the x-sliders are visible
-    */
-   public boolean isXSliderVisible() {
-      return _chartComponents.devSliderBarHeight != 0;
-   }
-
    void onExecuteMouseWheelMode(final MouseWheelMode mouseWheelMode) {
       setMouseWheelMode(mouseWheelMode);
    }
@@ -845,11 +838,17 @@ public class Chart extends ViewForm {
 
    void onExecuteZoomIn(final double accelerator) {
 
-      if (_chartComponents.devSliderBarHeight == 0) {
-         _chartComponents.getChartComponentGraph().zoomInWithoutSlider();
-         _chartComponents.onResize();
+      final ChartComponentGraph chartComponentGraph = _chartComponents.getChartComponentGraph();
+
+      if (chartComponentGraph.isXSliderVisible()) {
+
+         chartComponentGraph.zoomInWithMouse(Integer.MIN_VALUE, accelerator);
+
       } else {
-         _chartComponents.getChartComponentGraph().zoomInWithMouse(Integer.MIN_VALUE, accelerator);
+
+         chartComponentGraph.zoomInWithoutSlider();
+
+         _chartComponents.onResize();
       }
    }
 

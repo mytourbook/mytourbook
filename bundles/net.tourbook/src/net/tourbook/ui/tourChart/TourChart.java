@@ -1249,7 +1249,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 
             } else if (property.equals(ICommonPreferences.UI_DRAWING_FONT_IS_MODIFIED)) {
 
-               getChartComponents().updateFontScale();
+               getChartComponents().updateFontScaling();
 
                updateTourChart();
             }
@@ -2420,6 +2420,9 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 
    private void createLayer_Photo() {
 
+      // ensure that sliders are displayed for real tours
+      setShowSlider(true);
+
       while (true) {
 
          if (_tcc.isShowTourPhotos == false) {
@@ -2471,6 +2474,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
          }
 
          if (chartPhotoGroups.isEmpty()) {
+
             // there are no photos
             break;
          }
@@ -2495,11 +2499,9 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
          }
 
          if (isTimeSerie == false && isHistorySerie) {
+
             // hide x slider in history chart
             setShowSlider(false);
-         } else {
-            // ensure sliders are displayed for real tours
-            setShowSlider(true);
          }
 
          return;
