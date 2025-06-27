@@ -34,6 +34,7 @@ import net.tourbook.preferences.PrefPageAppearanceTourChart;
 import net.tourbook.srtm.IPreferences;
 import net.tourbook.srtm.PrefPageSRTMData;
 import net.tourbook.ui.ChartOptions_Grid;
+import net.tourbook.ui.ChartOptions_Layout;
 
 import org.eclipse.jface.action.ToolBarManager;
 import org.eclipse.jface.dialogs.MessageDialog;
@@ -69,13 +70,13 @@ public class SlideoutTourChartOptions extends ToolbarSlideout implements IAction
 
    private SelectionListener             _defaultSelectionListener;
    private MouseWheelListener            _defaultMouseWheelListener;
-   private MouseWheelListener            _defaultMouseWheelListener_10;
    private FocusListener                 _keepOpenListener;
 
    private ActionOpenPrefDialog          _actionPrefDialog;
    private ActionResetToDefaults         _actionRestoreDefaults;
 
    private ChartOptions_Grid             _gridUI;
+   private ChartOptions_Layout           _layoutUI;
 
    private boolean                       _isNeededToRecomputeValues;
 
@@ -135,7 +136,6 @@ public class SlideoutTourChartOptions extends ToolbarSlideout implements IAction
    private Spinner                 _spinnerGraphLineOpacity;
    private Spinner                 _spinnerNightSectionsOpacity;
    private Spinner                 _spinnerSpeedDistanceInterval;
-   private Spinner                 _spinnerYAxisWidth;
 
    private Combo                   _comboPulseValueGraph;
 
@@ -150,13 +150,15 @@ public class SlideoutTourChartOptions extends ToolbarSlideout implements IAction
    public SlideoutTourChartOptions(final Control ownerControl,
                                    final ToolBar toolBar,
                                    final TourChart tourChart,
-                                   final String gridPrefPrefix) {
+                                   final String gridPrefPrefix,
+                                   final String layoutPrefPrefix) {
 
       super(ownerControl, toolBar);
 
       _tourChart = tourChart;
 
       _gridUI = new ChartOptions_Grid(gridPrefPrefix);
+      _layoutUI = new ChartOptions_Layout(layoutPrefPrefix);
    }
 
    private void createActions() {
@@ -200,11 +202,13 @@ public class SlideoutTourChartOptions extends ToolbarSlideout implements IAction
                createUI_10_Title(titleContainer);
                createUI_12_Actions(titleContainer);
             }
+
             createUI_20_UIFont(container);
             createUI_20_Options(container);
             createUI_30_Graph(container);
 
             _gridUI.createUI(container);
+            _layoutUI.createUI(container);
          }
       }
 
@@ -371,6 +375,9 @@ public class SlideoutTourChartOptions extends ToolbarSlideout implements IAction
       label.setFont(JFaceResources.getFontRegistry().getBold(JFaceResources.DIALOG_FONT));
       label.setText("REMOVE createUI_20_UIFont in SlideoutTourChartOptions");
 
+      int a = 0;
+      a++;
+
       final Group group = new Group(parent, SWT.NONE);
       group.setText(Messages.Pref_Appearance_Group_UIDrawingFont);
       group.setToolTipText(Messages.Pref_Appearance_Group_UIDrawingFont_Tooltip);
@@ -521,37 +528,6 @@ public class SlideoutTourChartOptions extends ToolbarSlideout implements IAction
                GridDataFactory.fillDefaults().grab(true, false).applyTo(spacer);
             }
          }
-         {
-            /*
-             * Y axis width
-             */
-
-            final String tooltipText = "Width of the y-axis";
-
-            {
-               final Label label = new Label(group, SWT.NONE);
-               label.setText("&Y-axis width");
-               label.setToolTipText(tooltipText);
-               GridDataFactory.fillDefaults()
-                     .align(SWT.FILL, SWT.CENTER)
-                     .applyTo(label);
-            }
-            {
-               _spinnerYAxisWidth = new Spinner(group, SWT.BORDER);
-               _spinnerYAxisWidth.setMinimum(0);
-               _spinnerYAxisWidth.setMaximum(1000);
-               _spinnerYAxisWidth.setIncrement(1);
-               _spinnerYAxisWidth.setPageIncrement(10);
-               _spinnerYAxisWidth.setToolTipText(tooltipText);
-               _spinnerYAxisWidth.addMouseWheelListener(_defaultMouseWheelListener_10);
-               _spinnerYAxisWidth.addSelectionListener(_defaultSelectionListener);
-               GridDataFactory.fillDefaults().applyTo(_spinnerYAxisWidth);
-            }
-            {
-               final Label spacer = UI.createSpacer_Horizontal(group, 1);
-               GridDataFactory.fillDefaults().grab(true, false).applyTo(spacer);
-            }
-         }
       }
    }
 
@@ -587,12 +563,6 @@ public class SlideoutTourChartOptions extends ToolbarSlideout implements IAction
       _defaultMouseWheelListener = mouseEvent -> {
 
          UI.adjustSpinnerValueOnMouseScroll(mouseEvent);
-         onChangeUI();
-      };
-
-      _defaultMouseWheelListener_10 = mouseEvent -> {
-
-         UI.adjustSpinnerValueOnMouseScroll(mouseEvent, 10);
          onChangeUI();
       };
 
@@ -711,7 +681,6 @@ public class SlideoutTourChartOptions extends ToolbarSlideout implements IAction
 
       final int nightSectionsOpacity               = _prefStore.getDefaultInt(ITourbookPreferences.GRAPH_NIGHT_SECTIONS_OPACITY);
       final int graphLineOpacity                   = _prefStore.getDefaultInt(ITourbookPreferences.GRAPH_TRANSPARENCY_LINE);
-      final int yAxisWidth                         = _prefStore.getDefaultInt(ITourbookPreferences.GRAPH_Y_AXIS_WIDTH);
 
       final float speedDistanceInterval            = _prefStore.getDefaultInt(ITourbookPreferences.GRAPH_SPEED_PACE_DISTANCE_INTERVAL);
 
@@ -742,7 +711,6 @@ public class SlideoutTourChartOptions extends ToolbarSlideout implements IAction
       _spinnerGraphLineOpacity      .setSelection(UI.transformOpacity_WhenRestored(graphLineOpacity));
       _spinnerNightSectionsOpacity  .setSelection(UI.transformOpacity_WhenRestored(nightSectionsOpacity));
       _spinnerSpeedDistanceInterval .setSelection((int) (UI.convertSpeed_FromMetric(speedDistanceInterval) / 100));
-      _spinnerYAxisWidth            .setSelection(yAxisWidth);
 
       setSelection_PulseGraph(TourChart.PULSE_GRAPH_DEFAULT,
             tcc.canShowPulseSerie,
@@ -753,6 +721,7 @@ public class SlideoutTourChartOptions extends ToolbarSlideout implements IAction
       _prefStore.setValue(ITourbookPreferences.VALUE_POINT_TOOL_TIP_IS_VISIBLE_CHART, isShowValuePointTooltip);
 
       _gridUI.resetToDefaults();
+      _layoutUI.resetToDefaults();
 
       _uiFontEditor.loadDefault();
       _uiFontEditor.store();
@@ -793,7 +762,6 @@ public class SlideoutTourChartOptions extends ToolbarSlideout implements IAction
 
       _chkGraphAntialiasing         .setSelection(_prefStore.getBoolean(ITourbookPreferences.GRAPH_ANTIALIASING));
       _spinnerGraphLineOpacity      .setSelection(UI.transformOpacity_WhenRestored(graphLineOpacity));
-      _spinnerYAxisWidth            .setSelection(_prefStore.getInt(ITourbookPreferences.GRAPH_Y_AXIS_WIDTH));
 
       _rdoShowSrtm1Values           .setSelection(isShowSrtm1Values);
       _rdoShowSrtm3Values           .setSelection(isShowSrtm1Values == false);
@@ -806,6 +774,7 @@ public class SlideoutTourChartOptions extends ToolbarSlideout implements IAction
             tcc.isShowTimeOnXAxis);
 
       _gridUI.restoreState();
+      _layoutUI.restoreState();
 
       _uiFontEditor           .setPreferenceStore(_prefStore_Common);
       _uiFontEditor           .load();
@@ -827,7 +796,6 @@ public class SlideoutTourChartOptions extends ToolbarSlideout implements IAction
 
       final int graphLineOpacity                   = _spinnerGraphLineOpacity.getSelection();
       final int nightSectionsOpacity               = _spinnerNightSectionsOpacity.getSelection();
-      final int yAxisWidth                         = _spinnerYAxisWidth.getSelection();
 
       final int speedDistanceIntervalSelection     = _spinnerSpeedDistanceInterval.getSelection() * 100;
       final int speedDistanceInterval              = (int) UI.convertSpeed_ToMetric(speedDistanceIntervalSelection);
@@ -862,9 +830,9 @@ public class SlideoutTourChartOptions extends ToolbarSlideout implements IAction
       _prefStore.setValue(ITourbookPreferences.GRAPH_SPEED_PACE_DISTANCE_INTERVAL,     speedDistanceInterval);
       _prefStore.setValue(ITourbookPreferences.GRAPH_TRANSPARENCY_LINE,                UI.transformOpacity_WhenSaved(graphLineOpacity));
       _prefStore.setValue(ITourbookPreferences.GRAPH_X_AXIS_STARTTIME,                 isTourStartTime);
-      _prefStore.setValue(ITourbookPreferences.GRAPH_Y_AXIS_WIDTH,                     yAxisWidth);
 
       _gridUI.saveState();
+      _layoutUI.saveState();
 
       _tourChart.setupChartConfig();
 

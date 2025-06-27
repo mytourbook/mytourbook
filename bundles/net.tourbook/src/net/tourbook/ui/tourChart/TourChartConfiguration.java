@@ -320,11 +320,6 @@ public class TourChartConfiguration {
     */
    public boolean    isShowValuePointValue;
 
-   /**
-    * Width of the y-axis
-    */
-   public boolean    yAxisWidth;
-
    @SuppressWarnings("unused")
    private TourChartConfiguration() {}
 
@@ -350,8 +345,6 @@ public class TourChartConfiguration {
       isShowBreaktimeValues         = _prefStore.getBoolean(ITourbookPreferences.GRAPH_IS_BREAKTIME_VALUES_VISIBLE);
       isShowNightSections           = _prefStore.getBoolean(ITourbookPreferences.GRAPH_IS_SHOW_NIGHT_SECTIONS);
       isShowValuePointValue         = _prefStore.getBoolean(ITourbookPreferences.GRAPH_IS_SHOW_VALUE_POINT_VALUE);
-
-      yAxisWidth                    = _prefStore.getBoolean(ITourbookPreferences.GRAPH_Y_AXIS_WIDTH);
 
       /*
        * Initialize tour marker settings from the pref store
