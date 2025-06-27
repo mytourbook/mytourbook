@@ -23,6 +23,7 @@ import java.util.ArrayList;
 
 import net.tourbook.common.UI;
 import net.tourbook.common.time.TimeTools;
+import net.tourbook.common.util.StringUtils;
 import net.tourbook.common.util.Util;
 
 import org.eclipse.jface.layout.GridDataFactory;
@@ -2439,32 +2440,32 @@ public class ChartComponents extends Composite {
 
       final ArrayList<ChartDataYSerie> allYData = _chartDataModel.getYData();
 
-      boolean isYTitle = false;
+      boolean isYUnitLabel = false;
 
-      // loop all graphs - find the title for the y-axis
+      // loop all graphs - find labels for the y-axis
       for (final ChartDataYSerie yData : allYData) {
 
-         if (yData.getYTitle() != null || yData.getUnitLabel().length() > 0) {
+         if (StringUtils.hasContent(yData.getUnitLabel())) {
 
-            isYTitle = true;
+            isYUnitLabel = true;
             break;
          }
       }
 
       int yAxisWidthLeft = _chart.yAxisWidth;
 
-      if (isYTitle) {
+      if (isYUnitLabel) {
 
          // add font "width"
          yAxisWidthLeft += _gcFontHeight;
       }
-      
+
       final GridData gdLeft = (GridData) _componentAxisLeft.getLayoutData();
       final GridData gdRight = (GridData) _componentAxisRight.getLayoutData();
-      
+
       gdLeft.widthHint = yAxisWidthLeft;
       gdRight.widthHint = _chart.yAxisWidth;
-      
+
       // relayout after the layout size has been changed
       layout();
 

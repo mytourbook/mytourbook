@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import net.tourbook.common.UI;
 import net.tourbook.common.color.ThemeUtil;
 import net.tourbook.common.util.ITourToolTipProvider;
+import net.tourbook.common.util.StringUtils;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.MouseEvent;
@@ -340,7 +341,6 @@ public class ChartComponentAxis extends Canvas {
          final double scaleY = graphDrawingData.getScaleY();
          final ChartDataYSerie yData = graphDrawingData.getYData();
 
-         final String title = yData.getYTitle();
          final String unitLabel = yData.getUnitLabel();
          final boolean isBottomUp = yData.isYAxis_Bottom2Top();
 
@@ -353,7 +353,7 @@ public class ChartComponentAxis extends Canvas {
          /*
           * Draw y-axis title which is the unit label
           */
-         if (_isLeft && title != null) {
+         if (_isLeft && StringUtils.hasContent(unitLabel)) {
 
             final Point labelExtend = gc.textExtent(unitLabel);
 

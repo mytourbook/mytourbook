@@ -95,7 +95,7 @@ public class ChartOptions_Layout {
                _spinnerYAxisWidth.setMinimum(0);
                _spinnerYAxisWidth.setMaximum(1000);
                _spinnerYAxisWidth.setIncrement(1);
-               _spinnerYAxisWidth.setPageIncrement(10);
+               _spinnerYAxisWidth.setPageIncrement(5);
                _spinnerYAxisWidth.setToolTipText(tooltipText);
                _spinnerYAxisWidth.addMouseWheelListener(_defaultMouseWheelListener_10);
                _spinnerYAxisWidth.addSelectionListener(_defaultSelectionListener);
@@ -115,7 +115,7 @@ public class ChartOptions_Layout {
 
       _defaultMouseWheelListener_10 = mouseEvent -> {
 
-         UI.adjustSpinnerValueOnMouseScroll(mouseEvent, 10);
+         UI.adjustSpinnerValueOnMouseScroll(mouseEvent, 5);
          onChangeUI();
       };
    }
