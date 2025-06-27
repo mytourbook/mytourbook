@@ -295,10 +295,7 @@ public class SlideoutHRVOptions extends ToolbarSlideout implements IActionResetT
       _spinner2xErrorTolerance.setSelection(_prefStore.getDefaultInt(ITourbookPreferences.HRV_OPTIONS_2X_ERROR_TOLERANCE));
 
       _gridUI.resetToDefaults();
-      _gridUI.saveState();
-
       _layoutUI.resetToDefaults();
-      _layoutUI.saveState();
 
       onChangeUI();
    }

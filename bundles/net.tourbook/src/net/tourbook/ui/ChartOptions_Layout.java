@@ -137,7 +137,7 @@ public class ChartOptions_Layout {
       _spinnerYAxisWidth.setSelection(Util.getPrefixPref_Int(_prefStore, _prefStorePrefix, ITourbookPreferences.CHART_Y_AXIS_WIDTH));
    }
 
-   public void saveState() {
+   private void saveState() {
 
       _prefStore.setValue(_prefStorePrefix + ITourbookPreferences.CHART_Y_AXIS_WIDTH, _spinnerYAxisWidth.getSelection());
    }

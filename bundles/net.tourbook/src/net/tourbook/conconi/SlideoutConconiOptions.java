@@ -123,10 +123,7 @@ public class SlideoutConconiOptions extends ToolbarSlideout implements IActionRe
    public void resetToDefaults() {
 
       _gridUI.resetToDefaults();
-      _gridUI.saveState();
-
       _layoutUI.resetToDefaults();
-      _layoutUI.saveState();
    }
 
    private void restoreState() {

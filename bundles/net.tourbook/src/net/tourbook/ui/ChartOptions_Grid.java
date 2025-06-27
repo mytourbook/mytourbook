@@ -250,7 +250,7 @@ public class ChartOptions_Grid {
       _spinnerGridVerticalDistance.setSelection(   Util.getPrefixPref_Int(     _prefStore, _prefStorePrefix, ITourbookPreferences.CHART_GRID_VERTICAL_DISTANCE));
    }
 
-   public void saveState() {
+   private void saveState() {
 
       _prefStore.setValue(_prefStorePrefix + ITourbookPreferences.CHART_GRID_IS_SHOW_HORIZONTAL_GRIDLINES,  _chkShowGrid_HorizontalLines.getSelection());
       _prefStore.setValue(_prefStorePrefix + ITourbookPreferences.CHART_GRID_IS_SHOW_VERTICAL_GRIDLINES,    _chkShowGrid_VerticalLines.getSelection());

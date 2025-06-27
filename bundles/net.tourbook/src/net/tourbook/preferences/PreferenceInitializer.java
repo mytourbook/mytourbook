@@ -266,7 +266,7 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
       store.setDefault(ITourbookPreferences.CHART_GRID_IS_SHOW_VERTICAL_GRIDLINES, false);
 
       // chart layout
-      store.setDefault(ITourbookPreferences.CHART_Y_AXIS_WIDTH, 50);
+      store.setDefault(ITourbookPreferences.CHART_Y_AXIS_WIDTH, 40);
 
       /*
        * Min/Max values

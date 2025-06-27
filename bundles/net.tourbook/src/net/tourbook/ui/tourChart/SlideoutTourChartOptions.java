@@ -831,9 +831,6 @@ public class SlideoutTourChartOptions extends ToolbarSlideout implements IAction
       _prefStore.setValue(ITourbookPreferences.GRAPH_TRANSPARENCY_LINE,                UI.transformOpacity_WhenSaved(graphLineOpacity));
       _prefStore.setValue(ITourbookPreferences.GRAPH_X_AXIS_STARTTIME,                 isTourStartTime);
 
-      _gridUI.saveState();
-      _layoutUI.saveState();
-
       _tourChart.setupChartConfig();
 
       /*

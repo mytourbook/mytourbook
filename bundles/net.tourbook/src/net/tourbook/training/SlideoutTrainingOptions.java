@@ -135,10 +135,7 @@ public class SlideoutTrainingOptions extends ToolbarSlideout implements IActionR
    public void resetToDefaults() {
 
       _gridUI.resetToDefaults();
-      _gridUI.saveState();
-
       _layoutUI.resetToDefaults();
-      _layoutUI.saveState();
    }
 
    private void restoreState() {

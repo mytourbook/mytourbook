@@ -313,10 +313,7 @@ public class SlideoutReferenceTimelineOptions extends ToolbarSlideout implements
 // SET_FORMATTING_OFF
 
       _gridUI.resetToDefaults();
-      _gridUI.saveState();
-
       _layoutUI.resetToDefaults();
-      _layoutUI.saveState();
 
       _chkShowAltimeter_Avg   .setSelection(STATE_SHOW_ALTIMETER_AVG_DEFAULT);
       _chkShowPace_Avg        .setSelection(STATE_SHOW_PACE_AVG_DEFAULT);
@@ -356,9 +353,6 @@ public class SlideoutReferenceTimelineOptions extends ToolbarSlideout implements
    }
 
    private void saveState() {
-
-      _gridUI.saveState();
-      _layoutUI.saveState();
 
       _prefStore.setValue(ITourbookPreferences.GRAPH_IS_SHOW_PACE_GRAPH_INVERTED, _chkInvertPaceGraph.getSelection());
 

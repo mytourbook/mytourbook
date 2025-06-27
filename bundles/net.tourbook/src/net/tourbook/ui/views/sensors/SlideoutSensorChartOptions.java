@@ -243,9 +243,6 @@ public class SlideoutSensorChartOptions extends ToolbarSlideout implements IActi
       _state.put(STATE_IS_SHOW_BATTERY_LEVEL, _checkboxBatteryLevel.getSelection());
       _state.put(STATE_IS_SHOW_BATTERY_STATUS, _checkboxBatteryStatus.getSelection());
       _state.put(STATE_IS_SHOW_BATTERY_VOLTAGE, _checkboxBatteryVoltage.getSelection());
-
-      _gridUI.saveState();
-      _layoutUI.saveState();
    }
 
 }

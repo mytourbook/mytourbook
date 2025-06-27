@@ -148,10 +148,7 @@ public class SlideoutStatisticOptions extends ToolbarSlideout implements IAction
    public void resetToDefaults() {
 
       _gridUI.resetToDefaults();
-      _gridUI.saveState();
-
       _layoutUI.resetToDefaults();
-      _layoutUI.saveState();
 
       if (_statisticOptions != null) {
          _statisticOptions.resetToDefaults();

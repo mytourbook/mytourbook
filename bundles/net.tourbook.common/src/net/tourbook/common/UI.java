@@ -654,7 +654,7 @@ public class UI {
    /**
     * This is an eclipse parameter
     */
-   private static final String                  SYS_PROP__SWT_AUTO_SCALE       = "swt.autoScale";                             //$NON-NLS-1$
+// private static final String                  SYS_PROP__SWT_AUTO_SCALE       = "swt.autoScale";                             //$NON-NLS-1$
 
    /**
     * When <code>true</code> then the commandline parameter <code>-DautoScale=nnn</code> is set.
@@ -663,8 +663,11 @@ public class UI {
     * <p>
     * Commandline parameter: <code>-Dswt.autoScale=nnn</code>
     */
-   private static String                        SYS_PROP__SWT_AUTO_SCALE_VALUE = System.getProperty(SYS_PROP__SWT_AUTO_SCALE);
-   private static boolean                       IS_SWT_AUTO_SCALE              = SYS_PROP__SWT_AUTO_SCALE_VALUE != NULL;
+// private static String                        SYS_PROP__SWT_AUTO_SCALE_VALUE = System.getProperty(SYS_PROP__SWT_AUTO_SCALE);
+// private static boolean                       IS_SWT_AUTO_SCALE              = SYS_PROP__SWT_AUTO_SCALE_VALUE != NULL;
+
+   // this feature is enabled always !!!
+   private static boolean                       IS_SWT_AUTO_SCALE          = true;
 
 // SET_FORMATTING_OFF
 
@@ -947,14 +950,14 @@ public class UI {
 
    static {
 
-      if (IS_SWT_AUTO_SCALE) {
-
-         Util.logSystemProperty_Value(UI.class,
-               SYS_PROP__SWT_AUTO_SCALE,
-               SYS_PROP__SWT_AUTO_SCALE_VALUE,
-               "MyTourbook is auto scaled" //$NON-NLS-1$
-         );
-      }
+//    if (IS_SWT_AUTO_SCALE) {
+//
+//      Util.logSystemProperty_Value(UI.class,
+//            SYS_PROP__SWT_AUTO_SCALE,
+//            SYS_PROP__SWT_AUTO_SCALE_VALUE,
+//            "MyTourbook is auto scaled" //$NON-NLS-1$
+//      );
+//    }
 
       if (IS_SCRAMBLE_DATA) {
 
