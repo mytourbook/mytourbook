@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2025 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -116,6 +116,11 @@ public class StatisticWeek_Summary extends StatisticWeek {
    @Override
    protected String getGridPrefPrefix() {
       return GRID_WEEK_SUMMARY;
+   }
+
+   @Override
+   protected String getLayoutPrefPrefix() {
+      return LAYOUT_WEEK_SUMMARY;
    }
 
    private void getPreferences() {

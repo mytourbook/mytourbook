@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2021, 2024 Wolfgang Schramm and Contributors
+ * Copyright (C) 2021, 2025 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -82,12 +82,15 @@ public class SensorChartView extends ViewPart implements ITourProvider {
 
 // SET_FORMATTING_OFF
 
-   private static final String      GRID_PREF_PREFIX                    = "GRID_SENSOR_CHART__";                                            //$NON-NLS-1$
+   private static final String   GRID_PREF_PREFIX                    = "GRID_SENSOR_CHART__";                                            //$NON-NLS-1$
 
-   private static final String      GRID_IS_SHOW_VERTICAL_GRIDLINES     = (GRID_PREF_PREFIX  + ITourbookPreferences.CHART_GRID_IS_SHOW_VERTICAL_GRIDLINES);
-   private static final String      GRID_IS_SHOW_HORIZONTAL_GRIDLINES   = (GRID_PREF_PREFIX  + ITourbookPreferences.CHART_GRID_IS_SHOW_HORIZONTAL_GRIDLINES);
-   private static final String      GRID_VERTICAL_DISTANCE              = (GRID_PREF_PREFIX  + ITourbookPreferences.CHART_GRID_VERTICAL_DISTANCE);
-   private static final String      GRID_HORIZONTAL_DISTANCE            = (GRID_PREF_PREFIX  + ITourbookPreferences.CHART_GRID_HORIZONTAL_DISTANCE);
+   private static final String   GRID_IS_SHOW_VERTICAL_GRIDLINES     = GRID_PREF_PREFIX  + ITourbookPreferences.CHART_GRID_IS_SHOW_VERTICAL_GRIDLINES;
+   private static final String   GRID_IS_SHOW_HORIZONTAL_GRIDLINES   = GRID_PREF_PREFIX  + ITourbookPreferences.CHART_GRID_IS_SHOW_HORIZONTAL_GRIDLINES;
+   private static final String   GRID_VERTICAL_DISTANCE              = GRID_PREF_PREFIX  + ITourbookPreferences.CHART_GRID_VERTICAL_DISTANCE;
+   private static final String   GRID_HORIZONTAL_DISTANCE            = GRID_PREF_PREFIX  + ITourbookPreferences.CHART_GRID_HORIZONTAL_DISTANCE;
+
+   private static final String   LAYOUT_PREF_PREFIX                  = "LAYOUT_SENSOR_CHART__";                                             //$NON-NLS-1$
+   private static final String   LAYOUT_GRAPH_Y_AXIS_WIDTH           = LAYOUT_PREF_PREFIX   + ITourbookPreferences.CHART_Y_AXIS_WIDTH;
 
 // SET_FORMATTING_ON
 
@@ -139,7 +142,12 @@ public class SensorChartView extends ViewPart implements ITourProvider {
       @Override
       protected ToolbarSlideout createSlideout(final ToolBar toolbar) {
 
-         return new SlideoutSensorChartOptions(_parent, toolbar, SensorChartView.this, _state, GRID_PREF_PREFIX);
+         return new SlideoutSensorChartOptions(_parent,
+               toolbar,
+               SensorChartView.this,
+               _state,
+               GRID_PREF_PREFIX,
+               LAYOUT_PREF_PREFIX);
       }
 
       @Override
@@ -196,7 +204,11 @@ public class SensorChartView extends ViewPart implements ITourProvider {
          } else if (property.equals(GRID_HORIZONTAL_DISTANCE)
                || property.equals(GRID_VERTICAL_DISTANCE)
                || property.equals(GRID_IS_SHOW_HORIZONTAL_GRIDLINES)
-               || property.equals(GRID_IS_SHOW_VERTICAL_GRIDLINES)) {
+               || property.equals(GRID_IS_SHOW_VERTICAL_GRIDLINES)
+
+               || property.equals(LAYOUT_GRAPH_Y_AXIS_WIDTH)
+
+         ) {
 
             // grid has changed, update chart
             updateChartProperties();
@@ -817,6 +829,6 @@ public class SensorChartView extends ViewPart implements ITourProvider {
 
    private void updateChartProperties() {
 
-      net.tourbook.ui.UI.updateChartProperties(_sensorChart, GRID_PREF_PREFIX);
+      net.tourbook.ui.UI.updateChartProperties(_sensorChart, GRID_PREF_PREFIX, LAYOUT_PREF_PREFIX);
    }
 }

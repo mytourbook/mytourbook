@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2021, 2024 Wolfgang Schramm and Contributors
+ * Copyright (C) 2021, 2025 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -289,6 +289,11 @@ public class StatisticBattery extends TourbookStatistic implements IBarSelection
    }
 
    @Override
+   protected String getLayoutPrefPrefix() {
+      return LAYOUT_BATTERY;
+   }
+
+   @Override
    public String getRawStatisticValues(final boolean isShowSequenceNumbers) {
       return _batteryDataProvider.getRawStatisticValues(isShowSequenceNumbers);
    }
@@ -472,7 +477,7 @@ public class StatisticBattery extends TourbookStatistic implements IBarSelection
          _minMaxKeeper.setMinMaxValues(chartModel);
       }
 
-      StatisticServices.updateChartProperties(_chart, getGridPrefPrefix());
+      StatisticServices.updateChartProperties(_chart, getGridPrefPrefix(), getLayoutPrefPrefix());
 
       // show the data in the chart
       _chart.updateChart(chartModel, false, true);

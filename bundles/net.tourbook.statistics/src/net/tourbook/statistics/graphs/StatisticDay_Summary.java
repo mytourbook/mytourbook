@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2016 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2025 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -135,6 +135,11 @@ public class StatisticDay_Summary extends StatisticDay {
    @Override
    protected String getGridPrefPrefix() {
       return GRID_DAY_SUMMARY;
+   }
+
+   @Override
+   protected String getLayoutPrefPrefix() {
+      return LAYOUT_DAY_SUMMARY;
    }
 
    private void getPreferences() {

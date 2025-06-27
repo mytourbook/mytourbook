@@ -152,15 +152,15 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
    public static final String    ACTION_ID_IS_SHOW_TOUR_PHOTOS             = "ACTION_ID_IS_SHOW_TOUR_PHOTOS";                                                           //$NON-NLS-1$
    public static final String    ACTION_ID_X_AXIS_DISTANCE                 = "ACTION_ID_X_AXIS_DISTANCE";                                                               //$NON-NLS-1$
    public static final String    ACTION_ID_X_AXIS_TIME                     = "ACTION_ID_X_AXIS_TIME";                                                                   //$NON-NLS-1$
-                                                                                                                                                                        
-   private static final String   GRID_PREF_PREFIX                          = "GRID_TOUR_CHART__";                                                                       //$NON-NLS-1$
-   private static final String   GRID_IS_SHOW_VERTICAL_GRIDLINES           = (GRID_PREF_PREFIX   + ITourbookPreferences.CHART_GRID_IS_SHOW_VERTICAL_GRIDLINES);
-   private static final String   GRID_IS_SHOW_HORIZONTAL_GRIDLINES         = (GRID_PREF_PREFIX   + ITourbookPreferences.CHART_GRID_IS_SHOW_HORIZONTAL_GRIDLINES);
-   private static final String   GRID_VERTICAL_DISTANCE                    = (GRID_PREF_PREFIX   + ITourbookPreferences.CHART_GRID_VERTICAL_DISTANCE);
-   private static final String   GRID_HORIZONTAL_DISTANCE                  = (GRID_PREF_PREFIX   + ITourbookPreferences.CHART_GRID_HORIZONTAL_DISTANCE);
 
-   private static final String   LAYOUT_PREF_PREFIX                        = "LAYOUT_PREF_PREFIX__";                                                           //$NON-NLS-1$
-   private static final String   LAYOUT_GRAPH_Y_AXIS_WIDTH                 = (LAYOUT_PREF_PREFIX   + ITourbookPreferences.GRAPH_Y_AXIS_WIDTH);
+   private static final String   GRID_PREF_PREFIX                          = "GRID_TOUR_CHART__";                                                                       //$NON-NLS-1$
+   private static final String   GRID_IS_SHOW_VERTICAL_GRIDLINES           = GRID_PREF_PREFIX   + ITourbookPreferences.CHART_GRID_IS_SHOW_VERTICAL_GRIDLINES;
+   private static final String   GRID_IS_SHOW_HORIZONTAL_GRIDLINES         = GRID_PREF_PREFIX   + ITourbookPreferences.CHART_GRID_IS_SHOW_HORIZONTAL_GRIDLINES;
+   private static final String   GRID_VERTICAL_DISTANCE                    = GRID_PREF_PREFIX   + ITourbookPreferences.CHART_GRID_VERTICAL_DISTANCE;
+   private static final String   GRID_HORIZONTAL_DISTANCE                  = GRID_PREF_PREFIX   + ITourbookPreferences.CHART_GRID_HORIZONTAL_DISTANCE;
+
+   private static final String   LAYOUT_PREF_PREFIX                        = "LAYOUT_TOUR_CHART__";                                                           //$NON-NLS-1$
+   private static final String   LAYOUT_GRAPH_Y_AXIS_WIDTH                 = LAYOUT_PREF_PREFIX   + ITourbookPreferences.CHART_Y_AXIS_WIDTH;
 
    static final String  STATE_IS_SHOW_IN_CHART_TOOLBAR_ALTITUDE                              = "STATE_IS_SHOW_IN_CHART_TOOLBAR_ALTITUDE";                      //$NON-NLS-1$
    static final String  STATE_IS_SHOW_IN_CHART_TOOLBAR_ALTIMETER                             = "STATE_IS_SHOW_IN_CHART_TOOLBAR_ALTIMETER";                     //$NON-NLS-1$
@@ -5583,7 +5583,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
       gridVerticalDistance          = Util.getPrefixPref_Int(_prefStore, GRID_PREF_PREFIX, ITourbookPreferences.CHART_GRID_VERTICAL_DISTANCE);
       gridHorizontalDistance        = Util.getPrefixPref_Int(_prefStore, GRID_PREF_PREFIX, ITourbookPreferences.CHART_GRID_HORIZONTAL_DISTANCE);
 
-      yAxisWidth                    = Util.getPrefixPref_Int(_prefStore, LAYOUT_PREF_PREFIX, ITourbookPreferences.GRAPH_Y_AXIS_WIDTH);
+      yAxisWidth                    = Util.getPrefixPref_Int(_prefStore, LAYOUT_PREF_PREFIX, ITourbookPreferences.CHART_Y_AXIS_WIDTH);
 
 // SET_FORMATTING_ON
    }

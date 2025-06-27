@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2024 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2025 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -293,6 +293,11 @@ public class StatisticTour_Time extends TourbookStatistic implements IBarSelecti
    }
 
    @Override
+   protected String getLayoutPrefPrefix() {
+      return LAYOUT_TOUR_TIME;
+   }
+
+   @Override
    public String getRawStatisticValues(final boolean isShowSequenceNumbers) {
       return _tourTime_DataProvider.getRawStatisticValues(isShowSequenceNumbers);
    }
@@ -475,7 +480,7 @@ public class StatisticTour_Time extends TourbookStatistic implements IBarSelecti
          _minMaxKeeper.setMinMaxValues(chartModel);
       }
 
-      StatisticServices.updateChartProperties(_chart, getGridPrefPrefix());
+      StatisticServices.updateChartProperties(_chart, getGridPrefPrefix(), getLayoutPrefPrefix());
 
       // show the data in the chart
       _chart.updateChart(chartModel, false, true);
@@ -536,5 +541,4 @@ public class StatisticTour_Time extends TourbookStatistic implements IBarSelecti
    public void updateToolBar() {
       _chart.fillToolbar(true);
    }
-
 }

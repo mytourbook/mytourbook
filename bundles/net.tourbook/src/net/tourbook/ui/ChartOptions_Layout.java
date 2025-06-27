@@ -127,18 +127,18 @@ public class ChartOptions_Layout {
 
    public void resetToDefaults() {
 
-      _spinnerYAxisWidth.setSelection(_prefStore.getDefaultInt(ITourbookPreferences.GRAPH_Y_AXIS_WIDTH));
+      _spinnerYAxisWidth.setSelection(_prefStore.getDefaultInt(ITourbookPreferences.CHART_Y_AXIS_WIDTH));
 
       onChangeUI();
    }
 
    public void restoreState() {
 
-      _spinnerYAxisWidth.setSelection(Util.getPrefixPref_Int(_prefStore, _prefStorePrefix, ITourbookPreferences.GRAPH_Y_AXIS_WIDTH));
+      _spinnerYAxisWidth.setSelection(Util.getPrefixPref_Int(_prefStore, _prefStorePrefix, ITourbookPreferences.CHART_Y_AXIS_WIDTH));
    }
 
    public void saveState() {
 
-      _prefStore.setValue(_prefStorePrefix + ITourbookPreferences.GRAPH_Y_AXIS_WIDTH, _spinnerYAxisWidth.getSelection());
+      _prefStore.setValue(_prefStorePrefix + ITourbookPreferences.CHART_Y_AXIS_WIDTH, _spinnerYAxisWidth.getSelection());
    }
 }

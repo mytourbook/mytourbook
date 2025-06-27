@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2024 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2025 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -524,6 +524,11 @@ public class StatisticTour_Frequency extends TourbookStatistic {
    }
 
    @Override
+   protected String getLayoutPrefPrefix() {
+      return LAYOUT_TOUR_FREQUENCY;
+   }
+
+   @Override
    public String getRawStatisticValues(final boolean isShowSequenceNumbers) {
       return _tourDay_DataProvider.getRawStatisticValues(isShowSequenceNumbers);
    }
@@ -615,7 +620,7 @@ public class StatisticTour_Frequency extends TourbookStatistic {
          statDistanceMinMaxKeeper.setMinMaxValues(chartDataModel);
       }
 
-      StatisticServices.updateChartProperties(statDistanceChart, getGridPrefPrefix());
+      StatisticServices.updateChartProperties(statDistanceChart, getGridPrefPrefix(), getLayoutPrefPrefix());
 
       // show the new data fDataModel in the chart
       statDistanceChart.updateChart(chartDataModel, true);
@@ -663,7 +668,7 @@ public class StatisticTour_Frequency extends TourbookStatistic {
          statElevationMinMaxKeeper.setMinMaxValues(chartDataModel);
       }
 
-      StatisticServices.updateChartProperties(chart, getGridPrefPrefix());
+      StatisticServices.updateChartProperties(chart, getGridPrefPrefix(), getLayoutPrefPrefix());
 
       // show the new data in the chart
       chart.updateChart(chartDataModel, true);
@@ -712,7 +717,7 @@ public class StatisticTour_Frequency extends TourbookStatistic {
          statDurationMinMaxKeeper.setMinMaxValues(chartDataModel);
       }
 
-      StatisticServices.updateChartProperties(statDurationChart, getGridPrefPrefix());
+      StatisticServices.updateChartProperties(statDurationChart, getGridPrefPrefix(), getLayoutPrefPrefix());
 
       // show the new data data model in the chart
       statDurationChart.updateChart(chartDataModel, true);
@@ -808,5 +813,4 @@ public class StatisticTour_Frequency extends TourbookStatistic {
 
    @Override
    public void updateToolBar() {}
-
 }

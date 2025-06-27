@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2025 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -62,45 +62,88 @@ public abstract class TourbookStatistic {
    /*
     * Grid prefixes
     */
-   protected static final String    GRID_BATTERY              = "GRID_BATTERY__";              //$NON-NLS-1$
-   protected static final String    GRID_SENSOR               = "GRID_SENSOR__";               //$NON-NLS-1$
+   protected static final String GRID_BATTERY              = "GRID_BATTERY__";              //$NON-NLS-1$
+   protected static final String GRID_SENSOR               = "GRID_SENSOR__";               //$NON-NLS-1$
 
-   protected static final String    GRID_DAY_DISTANCE         = "GRID_DAY_DISTANCE__";         //$NON-NLS-1$
-   protected static final String    GRID_DAY_ELEVATION_UP     = "GRID_DAY_ELEVATION_UP__";     //$NON-NLS-1$
-   protected static final String    GRID_DAY_ELEVATION_DOWN   = "GRID_DAY_ELEVATION_DOWN__";   //$NON-NLS-1$
-   protected static final String    GRID_DAY_SUMMARY          = "GRID_DAY_SUMMARY__";          //$NON-NLS-1$
-   protected static final String    GRID_DAY_TIME             = "GRID_DAY_TIME__";             //$NON-NLS-1$
-   protected static final String    GRID_DAY_ATHLETE_DATA     = "GRID_DAY_ATHLETE_DATA__";     //$NON-NLS-1$
+   protected static final String GRID_DAY_DISTANCE         = "GRID_DAY_DISTANCE__";         //$NON-NLS-1$
+   protected static final String GRID_DAY_ELEVATION_UP     = "GRID_DAY_ELEVATION_UP__";     //$NON-NLS-1$
+   protected static final String GRID_DAY_ELEVATION_DOWN   = "GRID_DAY_ELEVATION_DOWN__";   //$NON-NLS-1$
+   protected static final String GRID_DAY_SUMMARY          = "GRID_DAY_SUMMARY__";          //$NON-NLS-1$
+   protected static final String GRID_DAY_TIME             = "GRID_DAY_TIME__";             //$NON-NLS-1$
+   protected static final String GRID_DAY_ATHLETE_DATA     = "GRID_DAY_ATHLETE_DATA__";     //$NON-NLS-1$
 
-   protected static final String    GRID_WEEK_DISTANCE        = "GRID_WEEK_DISTANCE__";        //$NON-NLS-1$
-   protected static final String    GRID_WEEK_ELEVATION_UP    = "GRID_WEEK_ELEVATION_UP__";    //$NON-NLS-1$
-   protected static final String    GRID_WEEK_ELEVATION_DOWN  = "GRID_WEEK_ELEVATION_DOWN__";  //$NON-NLS-1$
-   protected static final String    GRID_WEEK_SUMMARY         = "GRID_WEEK_SUMMARY__";         //$NON-NLS-1$
-   protected static final String    GRID_WEEK_TIME            = "GRID_WEEK_TIME__";            //$NON-NLS-1$
-   protected static final String    GRID_WEEK_ATHLETE_DATA    = "GRID_WEEK_ATHLETE_DATA__";    //$NON-NLS-1$
+   protected static final String GRID_WEEK_DISTANCE        = "GRID_WEEK_DISTANCE__";        //$NON-NLS-1$
+   protected static final String GRID_WEEK_ELEVATION_UP    = "GRID_WEEK_ELEVATION_UP__";    //$NON-NLS-1$
+   protected static final String GRID_WEEK_ELEVATION_DOWN  = "GRID_WEEK_ELEVATION_DOWN__";  //$NON-NLS-1$
+   protected static final String GRID_WEEK_SUMMARY         = "GRID_WEEK_SUMMARY__";         //$NON-NLS-1$
+   protected static final String GRID_WEEK_TIME            = "GRID_WEEK_TIME__";            //$NON-NLS-1$
+   protected static final String GRID_WEEK_ATHLETE_DATA    = "GRID_WEEK_ATHLETE_DATA__";    //$NON-NLS-1$
 
-   protected static final String    GRID_MONTH_DISTANCE       = "GRID_MONTH_DISTANCE__";       //$NON-NLS-1$
-   protected static final String    GRID_MONTH_ELEVATION_UP   = "GRID_MONTH_ELEVATION_UP__";   //$NON-NLS-1$
-   protected static final String    GRID_MONTH_ELEVATION_DOWN = "GRID_MONTH_ELEVATION_DOWN__"; //$NON-NLS-1$
-   protected static final String    GRID_MONTH_SUMMARY        = "GRID_MONTH_SUMMARY__";        //$NON-NLS-1$
-   protected static final String    GRID_MONTH_TIME           = "GRID_MONTH_TIME__";           //$NON-NLS-1$
-   protected static final String    GRID_MONTH_ATHLETE_DATA   = "GRID_MONTH_ATHLETE_DATA__";   //$NON-NLS-1$
+   protected static final String GRID_MONTH_DISTANCE       = "GRID_MONTH_DISTANCE__";       //$NON-NLS-1$
+   protected static final String GRID_MONTH_ELEVATION_UP   = "GRID_MONTH_ELEVATION_UP__";   //$NON-NLS-1$
+   protected static final String GRID_MONTH_ELEVATION_DOWN = "GRID_MONTH_ELEVATION_DOWN__"; //$NON-NLS-1$
+   protected static final String GRID_MONTH_SUMMARY        = "GRID_MONTH_SUMMARY__";        //$NON-NLS-1$
+   protected static final String GRID_MONTH_TIME           = "GRID_MONTH_TIME__";           //$NON-NLS-1$
+   protected static final String GRID_MONTH_ATHLETE_DATA   = "GRID_MONTH_ATHLETE_DATA__";   //$NON-NLS-1$
 
-   protected static final String    GRID_YEAR_DISTANCE        = "GRID_YEAR_DISTANCE__";        //$NON-NLS-1$
-   protected static final String    GRID_YEAR_ELEVATION_UP    = "GRID_YEAR_ELEVATION_UP__";    //$NON-NLS-1$
-   protected static final String    GRID_YEAR_ELEVATION_DOWN  = "GRID_YEAR_ELEVATION_DOWN__";  //$NON-NLS-1$
-   protected static final String    GRID_YEAR_SUMMARY         = "GRID_YEAR_SUMMARY__";         //$NON-NLS-1$
-   protected static final String    GRID_YEAR_TIME            = "GRID_YEAR_TIME__";            //$NON-NLS-1$
-   protected static final String    GRID_YEAR_ATHLETE_DATA    = "GRID_YEAR_ATHLETE_DATA__";    //$NON-NLS-1$
+   protected static final String GRID_YEAR_DISTANCE        = "GRID_YEAR_DISTANCE__";        //$NON-NLS-1$
+   protected static final String GRID_YEAR_ELEVATION_UP    = "GRID_YEAR_ELEVATION_UP__";    //$NON-NLS-1$
+   protected static final String GRID_YEAR_ELEVATION_DOWN  = "GRID_YEAR_ELEVATION_DOWN__";  //$NON-NLS-1$
+   protected static final String GRID_YEAR_SUMMARY         = "GRID_YEAR_SUMMARY__";         //$NON-NLS-1$
+   protected static final String GRID_YEAR_TIME            = "GRID_YEAR_TIME__";            //$NON-NLS-1$
+   protected static final String GRID_YEAR_ATHLETE_DATA    = "GRID_YEAR_ATHLETE_DATA__";    //$NON-NLS-1$
 
-   protected static final String    GRID_WEEK_HR_ZONE         = "GRID_WEEK_HR_ZONE__";         //$NON-NLS-1$
-   protected static final String    GRID_MONTH_HR_ZONE        = "GRID_MONTH_HR_ZONE__";        //$NON-NLS-1$
+   protected static final String GRID_WEEK_HR_ZONE         = "GRID_WEEK_HR_ZONE__";         //$NON-NLS-1$
+   protected static final String GRID_MONTH_HR_ZONE        = "GRID_MONTH_HR_ZONE__";        //$NON-NLS-1$
 
-   protected static final String    GRID_TOUR_FREQUENCY       = "GRID_TOUR_FREQUENCY__";       //$NON-NLS-1$
-   protected static final String    GRID_TOUR_TIME            = "GRID_TOUR_TIME__";            //$NON-NLS-1$
+   protected static final String GRID_TOUR_FREQUENCY       = "GRID_TOUR_FREQUENCY__";       //$NON-NLS-1$
+   protected static final String GRID_TOUR_TIME            = "GRID_TOUR_TIME__";            //$NON-NLS-1$
 
-   protected static final String    GRID_TRAINING_BAR         = "GRID_TRAINING_BAR__";         //$NON-NLS-1$
-   protected static final String    GRID_TRAINING_LINE        = "GRID_TRAINING_LINE__";        //$NON-NLS-1$
+   protected static final String GRID_TRAINING_BAR         = "GRID_TRAINING_BAR__";         //$NON-NLS-1$
+   protected static final String GRID_TRAINING_LINE        = "GRID_TRAINING_LINE__";        //$NON-NLS-1$
+
+   /*
+    * Layout prefixes
+    */
+   protected static final String    LAYOUT_BATTERY              = "LAYOUT_BATTERY__";              //$NON-NLS-1$
+   protected static final String    LAYOUT_SENSOR               = "LAYOUT_SENSOR__";               //$NON-NLS-1$
+
+   protected static final String    LAYOUT_DAY_DISTANCE         = "LAYOUT_DAY_DISTANCE__";         //$NON-NLS-1$
+   protected static final String    LAYOUT_DAY_ELEVATION_UP     = "LAYOUT_DAY_ELEVATION_UP__";     //$NON-NLS-1$
+   protected static final String    LAYOUT_DAY_ELEVATION_DOWN   = "LAYOUT_DAY_ELEVATION_DOWN__";   //$NON-NLS-1$
+   protected static final String    LAYOUT_DAY_SUMMARY          = "LAYOUT_DAY_SUMMARY__";          //$NON-NLS-1$
+   protected static final String    LAYOUT_DAY_TIME             = "LAYOUT_DAY_TIME__";             //$NON-NLS-1$
+   protected static final String    LAYOUT_DAY_ATHLETE_DATA     = "LAYOUT_DAY_ATHLETE_DATA__";     //$NON-NLS-1$
+
+   protected static final String    LAYOUT_WEEK_DISTANCE        = "LAYOUT_WEEK_DISTANCE__";        //$NON-NLS-1$
+   protected static final String    LAYOUT_WEEK_ELEVATION_UP    = "LAYOUT_WEEK_ELEVATION_UP__";    //$NON-NLS-1$
+   protected static final String    LAYOUT_WEEK_ELEVATION_DOWN  = "LAYOUT_WEEK_ELEVATION_DOWN__";  //$NON-NLS-1$
+   protected static final String    LAYOUT_WEEK_SUMMARY         = "LAYOUT_WEEK_SUMMARY__";         //$NON-NLS-1$
+   protected static final String    LAYOUT_WEEK_TIME            = "LAYOUT_WEEK_TIME__";            //$NON-NLS-1$
+   protected static final String    LAYOUT_WEEK_ATHLETE_DATA    = "LAYOUT_WEEK_ATHLETE_DATA__";    //$NON-NLS-1$
+
+   protected static final String    LAYOUT_MONTH_DISTANCE       = "LAYOUT_MONTH_DISTANCE__";       //$NON-NLS-1$
+   protected static final String    LAYOUT_MONTH_ELEVATION_UP   = "LAYOUT_MONTH_ELEVATION_UP__";   //$NON-NLS-1$
+   protected static final String    LAYOUT_MONTH_ELEVATION_DOWN = "LAYOUT_MONTH_ELEVATION_DOWN__"; //$NON-NLS-1$
+   protected static final String    LAYOUT_MONTH_SUMMARY        = "LAYOUT_MONTH_SUMMARY__";        //$NON-NLS-1$
+   protected static final String    LAYOUT_MONTH_TIME           = "LAYOUT_MONTH_TIME__";           //$NON-NLS-1$
+   protected static final String    LAYOUT_MONTH_ATHLETE_DATA   = "LAYOUT_MONTH_ATHLETE_DATA__";   //$NON-NLS-1$
+
+   protected static final String    LAYOUT_YEAR_DISTANCE        = "LAYOUT_YEAR_DISTANCE__";        //$NON-NLS-1$
+   protected static final String    LAYOUT_YEAR_ELEVATION_UP    = "LAYOUT_YEAR_ELEVATION_UP__";    //$NON-NLS-1$
+   protected static final String    LAYOUT_YEAR_ELEVATION_DOWN  = "LAYOUT_YEAR_ELEVATION_DOWN__";  //$NON-NLS-1$
+   protected static final String    LAYOUT_YEAR_SUMMARY         = "LAYOUT_YEAR_SUMMARY__";         //$NON-NLS-1$
+   protected static final String    LAYOUT_YEAR_TIME            = "LAYOUT_YEAR_TIME__";            //$NON-NLS-1$
+   protected static final String    LAYOUT_YEAR_ATHLETE_DATA    = "LAYOUT_YEAR_ATHLETE_DATA__";    //$NON-NLS-1$
+
+   protected static final String    LAYOUT_WEEK_HR_ZONE         = "LAYOUT_WEEK_HR_ZONE__";         //$NON-NLS-1$
+   protected static final String    LAYOUT_MONTH_HR_ZONE        = "LAYOUT_MONTH_HR_ZONE__";        //$NON-NLS-1$
+
+   protected static final String    LAYOUT_TOUR_FREQUENCY       = "LAYOUT_TOUR_FREQUENCY__";       //$NON-NLS-1$
+   protected static final String    LAYOUT_TOUR_TIME            = "LAYOUT_TOUR_TIME__";            //$NON-NLS-1$
+
+   protected static final String    LAYOUT_TRAINING_BAR         = "LAYOUT_TRAINING_BAR__";         //$NON-NLS-1$
+   protected static final String    LAYOUT_TRAINING_LINE        = "LAYOUT_TRAINING_LINE__";        //$NON-NLS-1$
 
    /** ID from plugin.xml */
    public String                    plugin_StatisticId;
@@ -116,8 +159,8 @@ public abstract class TourbookStatistic {
 
    private boolean                  _isDataDirty;
 
-   protected final IPreferenceStore _prefStore                = TourbookPlugin.getPrefStore();
-   protected final IPreferenceStore _prefStore_Common         = CommonActivator.getPrefStore();
+   protected final IPreferenceStore _prefStore                  = TourbookPlugin.getPrefStore();
+   protected final IPreferenceStore _prefStore_Common           = CommonActivator.getPrefStore();
 
    private IPropertyChangeListener  _prefChangeListener;
 
@@ -136,11 +179,7 @@ public abstract class TourbookStatistic {
    private void addPrefListener() {
 
       final String gridPrefix = getGridPrefPrefix();
-
-      final String gridHDistance = gridPrefix + ITourbookPreferences.CHART_GRID_HORIZONTAL_DISTANCE;
-      final String gridVDistance = gridPrefix + ITourbookPreferences.CHART_GRID_VERTICAL_DISTANCE;
-      final String gridIsHGridline = gridPrefix + ITourbookPreferences.CHART_GRID_IS_SHOW_HORIZONTAL_GRIDLINES;
-      final String gridIsVGridline = gridPrefix + ITourbookPreferences.CHART_GRID_IS_SHOW_VERTICAL_GRIDLINES;
+      final String layoutPrefix = getLayoutPrefPrefix();
 
       // create pref listener
       _prefChangeListener = propertyChangeEvent -> {
@@ -150,10 +189,12 @@ public abstract class TourbookStatistic {
          // test if the color or statistic data have changed
          if (property.equals(ITourbookPreferences.GRAPH_COLORS_HAS_CHANGED)
 
-               || property.equals(gridHDistance)
-               || property.equals(gridVDistance)
-               || property.equals(gridIsHGridline)
-               || property.equals(gridIsVGridline)
+               || property.equals(gridPrefix + ITourbookPreferences.CHART_GRID_HORIZONTAL_DISTANCE)
+               || property.equals(gridPrefix + ITourbookPreferences.CHART_GRID_VERTICAL_DISTANCE)
+               || property.equals(gridPrefix + ITourbookPreferences.CHART_GRID_IS_SHOW_HORIZONTAL_GRIDLINES)
+               || property.equals(gridPrefix + ITourbookPreferences.CHART_GRID_IS_SHOW_VERTICAL_GRIDLINES)
+
+               || property.equals(layoutPrefix + ITourbookPreferences.CHART_Y_AXIS_WIDTH)
 
                || property.equals(ITourbookPreferences.GRAPH_IS_SEGMENT_ALTERNATE_COLOR)
                || property.equals(ITourbookPreferences.GRAPH_SEGMENT_ALTERNATE_COLOR)
@@ -237,6 +278,7 @@ public abstract class TourbookStatistic {
     * Convert 'old' chart type format into 'new' format.
     *
     * @param chartType
+    *
     * @return
     */
    protected int getChartType(final String chartType) {
@@ -263,13 +305,19 @@ public abstract class TourbookStatistic {
    }
 
    /**
-    * @return Returns a prefix which is used to access the grid preferences in the pref store.
+    * @return Returns a prefix which is used to access the grid preferences in the pref store
     */
    protected abstract String getGridPrefPrefix();
 
    /**
+    * @return Returns a prefix which is used to access the layout preferences in the pref store
+    */
+   protected abstract String getLayoutPrefPrefix();
+
+   /**
     * @param isShowSequenceNumbers
     *           Show sequence numbers in the first column
+    *
     * @return Returns the statistic values, these values are created on demand because they can use
     *         some 100 ms, depending on the statistic.
     */

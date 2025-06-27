@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2025 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -261,7 +261,8 @@ public class WizardPage_10_CompareTour extends WizardPage {
 
             net.tourbook.ui.UI.updateChartProperties(
                   _compareTourChart,
-                  WizardTourComparer.GRID_PREFIX_REF_TOUR_COMPARE_TOUR);
+                  WizardTourComparer.GRID_PREF_PREFIX_TOUR_COMPARE_TOUR,
+                  WizardTourComparer.LAYOUT_PREF_PREFIX);
 
             // show title
             _compareTourChart.getChartTitleSegmentConfig().isShowSegmentTitle = true;

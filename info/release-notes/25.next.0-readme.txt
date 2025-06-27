@@ -38,7 +38,7 @@ New / Improvements
   - The font can be customized for all drawn texts 
     This was needed because since Eclipse 4.36 and MyTourbook is started with an -Dswt.autoScale=nnn parameter, then the font is scaled when drawing a text which could make the font too small or too large :-(
 
-* Tour Chart
+* All Charts
   - Customize y-axis width
 
 

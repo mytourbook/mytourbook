@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2025 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -138,6 +138,11 @@ public class StatisticMonth_Summary extends StatisticMonth {
       return GRID_MONTH_SUMMARY;
    }
 
+   @Override
+   protected String getLayoutPrefPrefix() {
+      return LAYOUT_MONTH_SUMMARY;
+   }
+
    private void getPreferences() {
 
       _isShowElevationUp = _prefStore.getBoolean(ITourbookPreferences.STAT_MONTH_IS_SHOW_ELEVATION_UP);
@@ -152,5 +157,4 @@ public class StatisticMonth_Summary extends StatisticMonth {
 
       slideout.setStatisticOptions(new ChartOptions_MonthSummary());
    }
-
 }

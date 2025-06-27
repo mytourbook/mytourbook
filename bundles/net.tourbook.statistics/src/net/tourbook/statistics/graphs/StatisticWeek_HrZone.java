@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2024 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2025 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -221,6 +221,11 @@ public class StatisticWeek_HrZone extends TourbookStatistic {
    @Override
    protected String getGridPrefPrefix() {
       return GRID_WEEK_HR_ZONE;
+   }
+
+   @Override
+   protected String getLayoutPrefPrefix() {
+      return LAYOUT_WEEK_HR_ZONE;
    }
 
    @Override
@@ -469,7 +474,7 @@ public class StatisticWeek_HrZone extends TourbookStatistic {
          _minMaxKeeper.setMinMaxValues(chartDataModel);
       }
 
-      StatisticServices.updateChartProperties(_chart, getGridPrefPrefix());
+      StatisticServices.updateChartProperties(_chart, getGridPrefPrefix(), getLayoutPrefPrefix());
 
       // show the data model in the chart
       _chart.updateChart(chartDataModel, true);
@@ -479,5 +484,4 @@ public class StatisticWeek_HrZone extends TourbookStatistic {
    public void updateToolBar() {
       _chart.fillToolbar(true);
    }
-
 }

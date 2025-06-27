@@ -236,7 +236,6 @@ public interface ITourbookPreferences {
    public static final String GRAPH_TRANSPARENCY_LINE               = "Graph_Transparency_Line";               //$NON-NLS-1$
    public static final String GRAPH_X_AXIS                          = "graphs.x-axis";                         //$NON-NLS-1$
    public static final String GRAPH_X_AXIS_STARTTIME                = "graphs.x-axis.starttime";               //$NON-NLS-1$
-   public static final String GRAPH_Y_AXIS_WIDTH                    = "GRAPH_Y_AXIS_WIDTH";                    //$NON-NLS-1$
    public static final String GRAPH_ZOOM_AUTO_ZOOM_TO_SLIDER        = "graphs.zoom.autozoom-to-slider";        //$NON-NLS-1$
 
    public static final String GRAPH_IS_SHOW_NIGHT_SECTIONS          = "GRAPH_IS_SHOW_NIGHT_SECTIONS";          //$NON-NLS-1$
@@ -365,65 +364,70 @@ public interface ITourbookPreferences {
    /*
     * Chart grid
     */
-   public static final String CHART_GRID_VERTICAL_DISTANCE            = "CHART_GRID_VERTICAL_DISTANCE";               //$NON-NLS-1$
-   public static final String CHART_GRID_HORIZONTAL_DISTANCE          = "CHART_GRID_HORIZONTAL_DISTANCE";             //$NON-NLS-1$
-   public static final String CHART_GRID_IS_SHOW_HORIZONTAL_GRIDLINES = "CHART_GRID_IS_SHOW_HORIZONTAL_GRIDLINES";    //$NON-NLS-1$
-   public static final String CHART_GRID_IS_SHOW_VERTICAL_GRIDLINES   = "CHART_GRID_IS_SHOW_VERTICAL_GRIDLINES";      //$NON-NLS-1$
+   public static final String CHART_GRID_VERTICAL_DISTANCE            = "CHART_GRID_VERTICAL_DISTANCE";            //$NON-NLS-1$
+   public static final String CHART_GRID_HORIZONTAL_DISTANCE          = "CHART_GRID_HORIZONTAL_DISTANCE";          //$NON-NLS-1$
+   public static final String CHART_GRID_IS_SHOW_HORIZONTAL_GRIDLINES = "CHART_GRID_IS_SHOW_HORIZONTAL_GRIDLINES"; //$NON-NLS-1$
+   public static final String CHART_GRID_IS_SHOW_VERTICAL_GRIDLINES   = "CHART_GRID_IS_SHOW_VERTICAL_GRIDLINES";   //$NON-NLS-1$
+
+   /*
+    * Chart layout
+    */
+   public static final String CHART_Y_AXIS_WIDTH                 = "CHART_Y_AXIS_WIDTH";                         //$NON-NLS-1$
 
    /**
     * Tour type
     */
-   public static final String TOUR_TYPE_IMPORT_DEFAUL_ID              = "TourType_ImportDefaultID";                   //$NON-NLS-1$
-   public static final String TOUR_TYPE_LIST_IS_MODIFIED              = "tourtype.list.is-modified";                  //$NON-NLS-1$
-   public static final String TOUR_TYPE_FILTER_LIST                   = "tourtype.filter.list";                       //$NON-NLS-1$
+   public static final String TOUR_TYPE_IMPORT_DEFAUL_ID         = "TourType_ImportDefaultID";                   //$NON-NLS-1$
+   public static final String TOUR_TYPE_LIST_IS_MODIFIED         = "tourtype.list.is-modified";                  //$NON-NLS-1$
+   public static final String TOUR_TYPE_FILTER_LIST              = "tourtype.filter.list";                       //$NON-NLS-1$
 
-   public static final String TOUR_BIKE_LIST_IS_MODIFIED              = "tourbike.list.is-modified";                  //$NON-NLS-1$
-   public static final String TOUR_PERSON_LIST_IS_MODIFIED            = "tourperson.list.is-modified";                //$NON-NLS-1$
+   public static final String TOUR_BIKE_LIST_IS_MODIFIED         = "tourbike.list.is-modified";                  //$NON-NLS-1$
+   public static final String TOUR_PERSON_LIST_IS_MODIFIED       = "tourperson.list.is-modified";                //$NON-NLS-1$
 
-   public static final String APP_LAST_SELECTED_PERSON_ID             = "application.last-selected-person-id";        //$NON-NLS-1$
-   public static final String APP_LAST_SELECTED_TOUR_TYPE_FILTER      = "application.last-selected-tourtypefilter";   //$NON-NLS-1$
+   public static final String APP_LAST_SELECTED_PERSON_ID        = "application.last-selected-person-id";        //$NON-NLS-1$
+   public static final String APP_LAST_SELECTED_TOUR_TYPE_FILTER = "application.last-selected-tourtypefilter";   //$NON-NLS-1$
 
    /**
     * event is fired when a person or a tour type is modified
     */
-   public static final String APP_DATA_FILTER_IS_MODIFIED             = "application.data-filter-is-modified";        //$NON-NLS-1$
+   public static final String APP_DATA_FILTER_IS_MODIFIED        = "application.data-filter-is-modified";        //$NON-NLS-1$
 
-   public static final String APP_DATA_SPEED_MIN_TIMESLICE_VALUE      = "application.data-speed-min-timeslice-value"; //$NON-NLS-1$
+   public static final String APP_DATA_SPEED_MIN_TIMESLICE_VALUE = "application.data-speed-min-timeslice-value"; //$NON-NLS-1$
 
-   public static final String APP_TOUR_GEO_FILTER_IS_SELECTED         = "APP_TOUR_DATA_FILTER_IS_SELECTED";           //$NON-NLS-1$
-   public static final String APP_TOUR_DATA_FILTER_IS_SELECTED        = "APP_TOUR_GEO_FILTER_IS_SELECTED";            //$NON-NLS-1$
-   public static final String APP_TOUR_TAG_FILTER_IS_SELECTED         = "APP_TOUR_TAG_FILTER_IS_SELECTED";            //$NON-NLS-1$
+   public static final String APP_TOUR_GEO_FILTER_IS_SELECTED    = "APP_TOUR_DATA_FILTER_IS_SELECTED";           //$NON-NLS-1$
+   public static final String APP_TOUR_DATA_FILTER_IS_SELECTED   = "APP_TOUR_GEO_FILTER_IS_SELECTED";            //$NON-NLS-1$
+   public static final String APP_TOUR_TAG_FILTER_IS_SELECTED    = "APP_TOUR_TAG_FILTER_IS_SELECTED";            //$NON-NLS-1$
 
    /**
     * initially this was an int value, with 2 it's a string
     */
-   public static final String BREAK_TIME_METHOD2                      = "BreakTime_Method2";                          //$NON-NLS-1$
+   public static final String BREAK_TIME_METHOD2                 = "BreakTime_Method2";                          //$NON-NLS-1$
 
-   public static final String BREAK_TIME_IS_MODIFIED                  = "BreakTime_IsModified";                       //$NON-NLS-1$
-   public static final String BREAK_TIME_MIN_AVG_SPEED_AS             = "BreakTime_MinAvgSpeedAS";                    //$NON-NLS-1$
-   public static final String BREAK_TIME_MIN_SLICE_SPEED_AS           = "BreakTime_MinSliceSpeedAS";                  //$NON-NLS-1$
-   public static final String BREAK_TIME_MIN_SLICE_TIME_AS            = "BreakTime_MinSliceTimeAS";                   //$NON-NLS-1$
-   public static final String BREAK_TIME_MIN_AVG_SPEED                = "BreakTime_MinAvgSpeed";                      //$NON-NLS-1$
-   public static final String BREAK_TIME_MIN_SLICE_SPEED              = "BreakTime_MinSliceSpeed";                    //$NON-NLS-1$
-   public static final String BREAK_TIME_SHORTEST_TIME                = "BreakTime_ShortestTime";                     //$NON-NLS-1$
-   public static final String BREAK_TIME_MAX_DISTANCE                 = "BreakTime_MaxDistance";                      //$NON-NLS-1$
-   public static final String BREAK_TIME_SLICE_DIFF                   = "BreakTime_SliceDiff";                        //$NON-NLS-1$
+   public static final String BREAK_TIME_IS_MODIFIED             = "BreakTime_IsModified";                       //$NON-NLS-1$
+   public static final String BREAK_TIME_MIN_AVG_SPEED_AS        = "BreakTime_MinAvgSpeedAS";                    //$NON-NLS-1$
+   public static final String BREAK_TIME_MIN_SLICE_SPEED_AS      = "BreakTime_MinSliceSpeedAS";                  //$NON-NLS-1$
+   public static final String BREAK_TIME_MIN_SLICE_TIME_AS       = "BreakTime_MinSliceTimeAS";                   //$NON-NLS-1$
+   public static final String BREAK_TIME_MIN_AVG_SPEED           = "BreakTime_MinAvgSpeed";                      //$NON-NLS-1$
+   public static final String BREAK_TIME_MIN_SLICE_SPEED         = "BreakTime_MinSliceSpeed";                    //$NON-NLS-1$
+   public static final String BREAK_TIME_SHORTEST_TIME           = "BreakTime_ShortestTime";                     //$NON-NLS-1$
+   public static final String BREAK_TIME_MAX_DISTANCE            = "BreakTime_MaxDistance";                      //$NON-NLS-1$
+   public static final String BREAK_TIME_SLICE_DIFF              = "BreakTime_SliceDiff";                        //$NON-NLS-1$
 
    /**
     * DP tolerance and gradient when computing flat, gain and loss areas
     */
-   public static final String FLAT_GAIN_LOSS_DP_TOLERANCE             = "FlatGainLoss_DPTolerance";                   //$NON-NLS-1$
-   public static final String FLAT_GAIN_LOSS_FLAT_GRADIENT            = "FlatGainLoss_FlatGradient";                  //$NON-NLS-1$
+   public static final String FLAT_GAIN_LOSS_DP_TOLERANCE        = "FlatGainLoss_DPTolerance";                   //$NON-NLS-1$
+   public static final String FLAT_GAIN_LOSS_FLAT_GRADIENT       = "FlatGainLoss_FlatGradient";                  //$NON-NLS-1$
 
    /**
     * DP tolerance when computing elevation gain/loss
     */
-   public static final String COMPUTED_ALTITUDE_DP_TOLERANCE          = "COMPUTED_ALTITUDE_DP_TOLERANCE";             //$NON-NLS-1$
+   public static final String COMPUTED_ALTITUDE_DP_TOLERANCE     = "COMPUTED_ALTITUDE_DP_TOLERANCE";             //$NON-NLS-1$
 
    /**
     * Cadence value differentiating slow from fast
     */
-   public static final String CADENCE_ZONES_DELIMITER                 = "CADENCE_ZONES_DELIMITER";                    //$NON-NLS-1$
+   public static final String CADENCE_ZONES_DELIMITER            = "CADENCE_ZONES_DELIMITER";                    //$NON-NLS-1$
 
    /*
     * map settings

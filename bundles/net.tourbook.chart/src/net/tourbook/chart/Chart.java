@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2025 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -1464,7 +1464,8 @@ public class Chart extends ViewForm {
                                 final boolean isVGridVisible,
                                 final boolean isAlternateColor,
                                 final RGB rgbAlternateColor_Light,
-                                final RGB rgbAlternateColor_Dark) {
+                                final RGB rgbAlternateColor_Dark,
+                                final int yAxisWidth_Value) {
 
       gridHorizontalDistance = horizontalGrid;
       gridVerticalDistance = verticalGrid;
@@ -1475,6 +1476,8 @@ public class Chart extends ViewForm {
       isShowSegmentAlternateColor = isAlternateColor;
       segmentAlternateColor_Light = rgbAlternateColor_Light;
       segmentAlternateColor_Dark = rgbAlternateColor_Dark;
+
+      yAxisWidth = yAxisWidth_Value;
 
       _chartComponents.onResize();
    }

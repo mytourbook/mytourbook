@@ -172,7 +172,6 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
       store.setDefault(ITourbookPreferences.GRAPH_TRANSPARENCY_LINE, 0xff);
       store.setDefault(ITourbookPreferences.GRAPH_TRANSPARENCY_FILLING, 70);
       store.setDefault(ITourbookPreferences.GRAPH_TRANSPARENCY_FILLING_DARK, 20);
-      store.setDefault(ITourbookPreferences.GRAPH_Y_AXIS_WIDTH, 50);
 
       // chart/tour segment alternate color
       store.setDefault(ITourbookPreferences.GRAPH_IS_SEGMENT_ALTERNATE_COLOR, false);
@@ -257,14 +256,17 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
       store.setDefault(ITourbookPreferences.GRAPH_IS_SHOW_NIGHT_SECTIONS, true);
       store.setDefault(ITourbookPreferences.GRAPH_NIGHT_SECTIONS_OPACITY, 0x80);
 
+      // speed/pace interval graph, unit is meters
+      store.setDefault(ITourbookPreferences.GRAPH_SPEED_PACE_DISTANCE_INTERVAL, 1000);
+
       // graph grid
       store.setDefault(ITourbookPreferences.CHART_GRID_VERTICAL_DISTANCE, 80);
       store.setDefault(ITourbookPreferences.CHART_GRID_HORIZONTAL_DISTANCE, 80);
       store.setDefault(ITourbookPreferences.CHART_GRID_IS_SHOW_HORIZONTAL_GRIDLINES, false);
       store.setDefault(ITourbookPreferences.CHART_GRID_IS_SHOW_VERTICAL_GRIDLINES, false);
 
-      // speed/pace interval graph, unit is meters
-      store.setDefault(ITourbookPreferences.GRAPH_SPEED_PACE_DISTANCE_INTERVAL, 1000);
+      // chart layout
+      store.setDefault(ITourbookPreferences.CHART_Y_AXIS_WIDTH, 50);
 
       /*
        * Min/Max values

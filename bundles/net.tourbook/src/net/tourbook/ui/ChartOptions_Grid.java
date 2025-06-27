@@ -204,7 +204,8 @@ public class ChartOptions_Grid {
       };
 
       _defaultMouseWheelListener = mouseEvent -> {
-         net.tourbook.common.UI.adjustSpinnerValueOnMouseScroll(mouseEvent);
+
+         net.tourbook.common.UI.adjustSpinnerValueOnMouseScroll(mouseEvent, 10);
          onChangeUI();
       };
    }

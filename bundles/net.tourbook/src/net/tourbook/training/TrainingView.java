@@ -111,14 +111,17 @@ public class TrainingView extends ViewPart {
    private static final String STATE_IS_SHOW_ALL_PULSE_VALUES       = "IsShowAllPulseValues";               //$NON-NLS-1$
    private static final String STATE_IS_SYNC_VERTICAL_CHART_SCALING = "IsSyncVerticalChartScaling";         //$NON-NLS-1$
 
-   private static final String GRID_PREF_PREFIX                     = "GRID_TRAINING__";                    //$NON-NLS-1$
-
 // SET_FORMATTING_OFF
 
-   private static final String         GRID_IS_SHOW_VERTICAL_GRIDLINES     = (GRID_PREF_PREFIX + ITourbookPreferences.CHART_GRID_IS_SHOW_VERTICAL_GRIDLINES);
-   private static final String         GRID_IS_SHOW_HORIZONTAL_GRIDLINES   = (GRID_PREF_PREFIX + ITourbookPreferences.CHART_GRID_IS_SHOW_HORIZONTAL_GRIDLINES);
-   private static final String         GRID_VERTICAL_DISTANCE              = (GRID_PREF_PREFIX + ITourbookPreferences.CHART_GRID_VERTICAL_DISTANCE);
-   private static final String         GRID_HORIZONTAL_DISTANCE            = (GRID_PREF_PREFIX + ITourbookPreferences.CHART_GRID_HORIZONTAL_DISTANCE);
+   private static final String   GRID_PREF_PREFIX                    = "GRID_TRAINING__";                   //$NON-NLS-1$
+
+   private static final String   GRID_IS_SHOW_VERTICAL_GRIDLINES     = GRID_PREF_PREFIX + ITourbookPreferences.CHART_GRID_IS_SHOW_VERTICAL_GRIDLINES;
+   private static final String   GRID_IS_SHOW_HORIZONTAL_GRIDLINES   = GRID_PREF_PREFIX + ITourbookPreferences.CHART_GRID_IS_SHOW_HORIZONTAL_GRIDLINES;
+   private static final String   GRID_VERTICAL_DISTANCE              = GRID_PREF_PREFIX + ITourbookPreferences.CHART_GRID_VERTICAL_DISTANCE;
+   private static final String   GRID_HORIZONTAL_DISTANCE            = GRID_PREF_PREFIX + ITourbookPreferences.CHART_GRID_HORIZONTAL_DISTANCE;
+
+   private static final String   LAYOUT_PREF_PREFIX                  = "LAYOUT_TRAINING__";                 //$NON-NLS-1$
+   private static final String   LAYOUT_GRAPH_Y_AXIS_WIDTH           = LAYOUT_PREF_PREFIX   + ITourbookPreferences.CHART_Y_AXIS_WIDTH;
 
 // SET_FORMATTING_ON
 
@@ -213,7 +216,11 @@ public class TrainingView extends ViewPart {
       @Override
       protected ToolbarSlideout createSlideout(final ToolBar toolbar) {
 
-         return new SlideoutTrainingOptions(_pageBook, toolbar, GRID_PREF_PREFIX, TrainingView.this);
+         return new SlideoutTrainingOptions(_pageBook,
+               toolbar,
+               GRID_PREF_PREFIX,
+               LAYOUT_PREF_PREFIX,
+               TrainingView.this);
       }
    }
 
@@ -308,6 +315,8 @@ public class TrainingView extends ViewPart {
                || property.equals(GRID_VERTICAL_DISTANCE)
                || property.equals(GRID_IS_SHOW_HORIZONTAL_GRIDLINES)
                || property.equals(GRID_IS_SHOW_VERTICAL_GRIDLINES)
+
+               || property.equals(LAYOUT_GRAPH_Y_AXIS_WIDTH)
 
          ) {
 
@@ -1049,7 +1058,7 @@ public class TrainingView extends ViewPart {
 
    private void setChartProperties() {
 
-      net.tourbook.ui.UI.updateChartProperties(_chartHrTime, GRID_PREF_PREFIX);
+      net.tourbook.ui.UI.updateChartProperties(_chartHrTime, GRID_PREF_PREFIX, LAYOUT_PREF_PREFIX);
 
       // show title
       _chartHrTime.getChartTitleSegmentConfig().isShowSegmentTitle = true;

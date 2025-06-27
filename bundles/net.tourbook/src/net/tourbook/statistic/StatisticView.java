@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2024 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2025 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -1223,9 +1223,11 @@ public class StatisticView extends ViewPart implements ITourProvider {
       final int preferredWidth = _comboBarVerticalOrder.computeSize(SWT.DEFAULT, SWT.DEFAULT, true).x;
 
       final GridData gd = (GridData) _comboBarVerticalOrder.getLayoutData();
-      gd.widthHint = preferredWidth > _maximumComboWidth //
+      gd.widthHint = preferredWidth > _maximumComboWidth
+
             ? _maximumComboWidth
-            : preferredWidth < _minimumComboWidth //
+            : preferredWidth < _minimumComboWidth
+
                   ? _minimumComboWidth
                   : preferredWidth;
 
@@ -1263,6 +1265,7 @@ public class StatisticView extends ViewPart implements ITourProvider {
       _activeStatistic.setupStatisticSlideout(_slideoutStatisticOptions);
       _slideoutStatisticOptions.setupGrid(
             _activeStatistic.getGridPrefPrefix(),
+            _activeStatistic.getLayoutPrefPrefix(),
             _activeStatistic.getEnabledGridOptions());
    }
 
