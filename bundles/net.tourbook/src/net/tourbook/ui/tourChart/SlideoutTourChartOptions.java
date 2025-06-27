@@ -69,6 +69,7 @@ public class SlideoutTourChartOptions extends ToolbarSlideout implements IAction
 
    private SelectionListener             _defaultSelectionListener;
    private MouseWheelListener            _defaultMouseWheelListener;
+   private MouseWheelListener            _defaultMouseWheelListener_10;
    private FocusListener                 _keepOpenListener;
 
    private ActionOpenPrefDialog          _actionPrefDialog;
@@ -134,6 +135,7 @@ public class SlideoutTourChartOptions extends ToolbarSlideout implements IAction
    private Spinner                 _spinnerGraphLineOpacity;
    private Spinner                 _spinnerNightSectionsOpacity;
    private Spinner                 _spinnerSpeedDistanceInterval;
+   private Spinner                 _spinnerYAxisWidth;
 
    private Combo                   _comboPulseValueGraph;
 
@@ -512,8 +514,38 @@ public class SlideoutTourChartOptions extends ToolbarSlideout implements IAction
                _spinnerGraphLineOpacity.setToolTipText(tooltipText);
                _spinnerGraphLineOpacity.addMouseWheelListener(_defaultMouseWheelListener);
                _spinnerGraphLineOpacity.addSelectionListener(_defaultSelectionListener);
+               GridDataFactory.fillDefaults().applyTo(_spinnerGraphLineOpacity);
+            }
+            {
+               final Label spacer = UI.createSpacer_Horizontal(group, 1);
+               GridDataFactory.fillDefaults().grab(true, false).applyTo(spacer);
+            }
+         }
+         {
+            /*
+             * Y axis width
+             */
+
+            final String tooltipText = "Width of the y-axis";
+
+            {
+               final Label label = new Label(group, SWT.NONE);
+               label.setText("&Y-axis width");
+               label.setToolTipText(tooltipText);
                GridDataFactory.fillDefaults()
-                     .applyTo(_spinnerGraphLineOpacity);
+                     .align(SWT.FILL, SWT.CENTER)
+                     .applyTo(label);
+            }
+            {
+               _spinnerYAxisWidth = new Spinner(group, SWT.BORDER);
+               _spinnerYAxisWidth.setMinimum(0);
+               _spinnerYAxisWidth.setMaximum(1000);
+               _spinnerYAxisWidth.setIncrement(1);
+               _spinnerYAxisWidth.setPageIncrement(10);
+               _spinnerYAxisWidth.setToolTipText(tooltipText);
+               _spinnerYAxisWidth.addMouseWheelListener(_defaultMouseWheelListener_10);
+               _spinnerYAxisWidth.addSelectionListener(_defaultSelectionListener);
+               GridDataFactory.fillDefaults().applyTo(_spinnerYAxisWidth);
             }
             {
                final Label spacer = UI.createSpacer_Horizontal(group, 1);
@@ -555,6 +587,12 @@ public class SlideoutTourChartOptions extends ToolbarSlideout implements IAction
       _defaultMouseWheelListener = mouseEvent -> {
 
          UI.adjustSpinnerValueOnMouseScroll(mouseEvent);
+         onChangeUI();
+      };
+
+      _defaultMouseWheelListener_10 = mouseEvent -> {
+
+         UI.adjustSpinnerValueOnMouseScroll(mouseEvent, 10);
          onChangeUI();
       };
 
@@ -673,6 +711,7 @@ public class SlideoutTourChartOptions extends ToolbarSlideout implements IAction
 
       final int nightSectionsOpacity               = _prefStore.getDefaultInt(ITourbookPreferences.GRAPH_NIGHT_SECTIONS_OPACITY);
       final int graphLineOpacity                   = _prefStore.getDefaultInt(ITourbookPreferences.GRAPH_TRANSPARENCY_LINE);
+      final int yAxisWidth                         = _prefStore.getDefaultInt(ITourbookPreferences.GRAPH_Y_AXIS_WIDTH);
 
       final float speedDistanceInterval            = _prefStore.getDefaultInt(ITourbookPreferences.GRAPH_SPEED_PACE_DISTANCE_INTERVAL);
 
@@ -703,6 +742,7 @@ public class SlideoutTourChartOptions extends ToolbarSlideout implements IAction
       _spinnerGraphLineOpacity      .setSelection(UI.transformOpacity_WhenRestored(graphLineOpacity));
       _spinnerNightSectionsOpacity  .setSelection(UI.transformOpacity_WhenRestored(nightSectionsOpacity));
       _spinnerSpeedDistanceInterval .setSelection((int) (UI.convertSpeed_FromMetric(speedDistanceInterval) / 100));
+      _spinnerYAxisWidth            .setSelection(yAxisWidth);
 
       setSelection_PulseGraph(TourChart.PULSE_GRAPH_DEFAULT,
             tcc.canShowPulseSerie,
@@ -753,6 +793,7 @@ public class SlideoutTourChartOptions extends ToolbarSlideout implements IAction
 
       _chkGraphAntialiasing         .setSelection(_prefStore.getBoolean(ITourbookPreferences.GRAPH_ANTIALIASING));
       _spinnerGraphLineOpacity      .setSelection(UI.transformOpacity_WhenRestored(graphLineOpacity));
+      _spinnerYAxisWidth            .setSelection(_prefStore.getInt(ITourbookPreferences.GRAPH_Y_AXIS_WIDTH));
 
       _rdoShowSrtm1Values           .setSelection(isShowSrtm1Values);
       _rdoShowSrtm3Values           .setSelection(isShowSrtm1Values == false);
@@ -786,6 +827,7 @@ public class SlideoutTourChartOptions extends ToolbarSlideout implements IAction
 
       final int graphLineOpacity                   = _spinnerGraphLineOpacity.getSelection();
       final int nightSectionsOpacity               = _spinnerNightSectionsOpacity.getSelection();
+      final int yAxisWidth                         = _spinnerYAxisWidth.getSelection();
 
       final int speedDistanceIntervalSelection     = _spinnerSpeedDistanceInterval.getSelection() * 100;
       final int speedDistanceInterval              = (int) UI.convertSpeed_ToMetric(speedDistanceIntervalSelection);
@@ -820,6 +862,7 @@ public class SlideoutTourChartOptions extends ToolbarSlideout implements IAction
       _prefStore.setValue(ITourbookPreferences.GRAPH_SPEED_PACE_DISTANCE_INTERVAL,     speedDistanceInterval);
       _prefStore.setValue(ITourbookPreferences.GRAPH_TRANSPARENCY_LINE,                UI.transformOpacity_WhenSaved(graphLineOpacity));
       _prefStore.setValue(ITourbookPreferences.GRAPH_X_AXIS_STARTTIME,                 isTourStartTime);
+      _prefStore.setValue(ITourbookPreferences.GRAPH_Y_AXIS_WIDTH,                     yAxisWidth);
 
       _gridUI.saveState();
 

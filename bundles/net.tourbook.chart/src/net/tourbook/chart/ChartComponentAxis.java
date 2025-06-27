@@ -334,8 +334,8 @@ public class ChartComponentAxis extends Canvas {
             continue;
          }
 
-         final ArrayList<ChartUnit> yUnits = graphDrawingData.getYUnits();
-         final int numberOfUnits = yUnits.size();
+         final ArrayList<ChartUnit> allYUnits = graphDrawingData.getYUnits();
+         final int numberOfUnits = allYUnits.size();
 
          final double scaleY = graphDrawingData.getScaleY();
          final ChartDataYSerie yData = graphDrawingData.getYData();
@@ -359,7 +359,7 @@ public class ChartComponentAxis extends Canvas {
 
             final int unitWidth = labelExtend.x;
 
-            final int xPos = 0;
+            final int xPos = 3;
             final int yPos = devYTop + (devGraphHeight / 2) + (unitWidth / 2);
 
             gc.setForeground(new Color(yData.getRgbGraph_Text()));
@@ -385,7 +385,7 @@ public class ChartComponentAxis extends Canvas {
 
          int devY;
 
-         for (final ChartUnit yUnit : yUnits) {
+         for (final ChartUnit yUnit : allYUnits) {
 
             final double unitValue = yUnit.value;
             final double devYUnit = (((unitValue - graphYBottom) * scaleY) + .5);

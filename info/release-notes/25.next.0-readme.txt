@@ -34,15 +34,16 @@ Experimental
 New / Improvements
 ==================
 
-* 
+* UI Font
+  - The font can be customized for all drawn texts 
+    This was needed because since Eclipse 4.36 and MyTourbook is started with an -Dswt.autoScale=nnn parameter, then the font is scaled when drawing a text which could make the font too small or too large :-(
+
+* Tour Chart
+  - Customize y-axis width
 
 
 Changes
 =======
-
-* UI Font
-  When MyTourbook is started with an -DautoScale=nnn parameter, then this font will be used when painting a text, e.g. all texts in the tour chart.
-  This was needed because since Eclipse 4.36 the font is scaled when painting a text which could make the font too small or too large.
 
 
 Changes that require Tour Re-import

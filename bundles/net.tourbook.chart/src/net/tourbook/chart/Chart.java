@@ -147,6 +147,11 @@ public class Chart extends ViewForm {
     */
    public int                                        graphAntialiasing                = SWT.OFF;
 
+   /**
+    * Width of the vertical axis
+    */
+   public int                                        yAxisWidth                       = 50;
+
    /*
     * Segment alternate color
     */

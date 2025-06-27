@@ -236,6 +236,7 @@ public interface ITourbookPreferences {
    public static final String GRAPH_TRANSPARENCY_LINE               = "Graph_Transparency_Line";               //$NON-NLS-1$
    public static final String GRAPH_X_AXIS                          = "graphs.x-axis";                         //$NON-NLS-1$
    public static final String GRAPH_X_AXIS_STARTTIME                = "graphs.x-axis.starttime";               //$NON-NLS-1$
+   public static final String GRAPH_Y_AXIS_WIDTH                    = "GRAPH_Y_AXIS_WIDTH";                    //$NON-NLS-1$
    public static final String GRAPH_ZOOM_AUTO_ZOOM_TO_SLIDER        = "graphs.zoom.autozoom-to-slider";        //$NON-NLS-1$
 
    public static final String GRAPH_IS_SHOW_NIGHT_SECTIONS          = "GRAPH_IS_SHOW_NIGHT_SECTIONS";          //$NON-NLS-1$

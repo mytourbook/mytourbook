@@ -172,6 +172,7 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
       store.setDefault(ITourbookPreferences.GRAPH_TRANSPARENCY_LINE, 0xff);
       store.setDefault(ITourbookPreferences.GRAPH_TRANSPARENCY_FILLING, 70);
       store.setDefault(ITourbookPreferences.GRAPH_TRANSPARENCY_FILLING_DARK, 20);
+      store.setDefault(ITourbookPreferences.GRAPH_Y_AXIS_WIDTH, 50);
 
       // chart/tour segment alternate color
       store.setDefault(ITourbookPreferences.GRAPH_IS_SEGMENT_ALTERNATE_COLOR, false);

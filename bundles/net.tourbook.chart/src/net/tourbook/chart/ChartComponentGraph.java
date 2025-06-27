@@ -462,7 +462,7 @@ public class ChartComponentGraph extends Canvas {
     * @param style
     *           the style of this control.
     */
-   ChartComponentGraph(final Chart chartWidget, final Composite parent, final int style) {
+   ChartComponentGraph(final Chart chartWidget, final Composite parent) {
 
       // create composite with horizontal scrollbars
       super(parent, SWT.H_SCROLL | SWT.NO_BACKGROUND);

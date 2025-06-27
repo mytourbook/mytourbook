@@ -1187,12 +1187,15 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
                disposeColors();
 
             } else if (property.equals(ITourbookPreferences.GRAPH_ANTIALIASING)
+
                   || property.equals(ITourbookPreferences.GRAPH_IS_SEGMENT_ALTERNATE_COLOR)
                   || property.equals(ITourbookPreferences.GRAPH_SEGMENT_ALTERNATE_COLOR)
                   || property.equals(ITourbookPreferences.GRAPH_SEGMENT_ALTERNATE_COLOR_DARK)
+
                   || property.equals(ITourbookPreferences.GRAPH_TRANSPARENCY_LINE)
                   || property.equals(ITourbookPreferences.GRAPH_TRANSPARENCY_FILLING)
                   || property.equals(ITourbookPreferences.GRAPH_TRANSPARENCY_FILLING_DARK)
+                  || property.equals(ITourbookPreferences.GRAPH_Y_AXIS_WIDTH)
 
                   || property.equals(GRID_IS_SHOW_HORIZONTAL_GRIDLINES)
                   || property.equals(GRID_IS_SHOW_VERTICAL_GRIDLINES)
@@ -5545,6 +5548,9 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
       }
    }
 
+   /**
+    * Setup values in the {@link Chart}
+    */
    void setupChartConfig() {
 
 // SET_FORMATTING_OFF
@@ -5553,15 +5559,14 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
       final int prefGraphTransparencyFilling_Dark   = _prefStore.getInt(ITourbookPreferences.GRAPH_TRANSPARENCY_FILLING_DARK);
 
       graphAntialiasing             = _prefStore.getBoolean(ITourbookPreferences.GRAPH_ANTIALIASING) ? SWT.ON : SWT.OFF;
+      graphTransparency_Line        = _prefStore.getInt(ITourbookPreferences.GRAPH_TRANSPARENCY_LINE);
+      graphTransparency_Filling     = UI.isDarkTheme()   ? prefGraphTransparencyFilling_Dark
+                                                         : prefGraphTransparencyFilling_Light;
+      yAxisWidth                    = _prefStore.getInt(ITourbookPreferences.GRAPH_Y_AXIS_WIDTH) ;
 
       isShowSegmentAlternateColor   = _prefStore.getBoolean(ITourbookPreferences.GRAPH_IS_SEGMENT_ALTERNATE_COLOR);
       segmentAlternateColor_Light   = PreferenceConverter.getColor(_prefStore, ITourbookPreferences.GRAPH_SEGMENT_ALTERNATE_COLOR);
       segmentAlternateColor_Dark    = PreferenceConverter.getColor(_prefStore, ITourbookPreferences.GRAPH_SEGMENT_ALTERNATE_COLOR_DARK);
-
-      graphTransparency_Line        = _prefStore.getInt(ITourbookPreferences.GRAPH_TRANSPARENCY_LINE);
-      graphTransparency_Filling     = UI.isDarkTheme()
-            ? prefGraphTransparencyFilling_Dark
-            : prefGraphTransparencyFilling_Light;
 
       isShowHorizontalGridLines     = Util.getPrefixPref_Boolean(_prefStore, GRID_PREF_PREFIX, ITourbookPreferences.CHART_GRID_IS_SHOW_HORIZONTAL_GRIDLINES);
       isShowVerticalGridLines       = Util.getPrefixPref_Boolean(_prefStore, GRID_PREF_PREFIX, ITourbookPreferences.CHART_GRID_IS_SHOW_VERTICAL_GRIDLINES);
