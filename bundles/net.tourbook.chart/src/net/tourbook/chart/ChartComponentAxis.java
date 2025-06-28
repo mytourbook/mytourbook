@@ -30,6 +30,7 @@ import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseListener;
 import org.eclipse.swt.events.MouseTrackListener;
 import org.eclipse.swt.graphics.Color;
+import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
@@ -350,7 +351,17 @@ public class ChartComponentAxis extends Canvas {
          final int devYBottom = graphDrawingData.getDevYBottom();
          final int devYTop = devYBottom - devGraphHeight;
 
-         /*
+         /**
+          * !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+          *
+          * VERY IMPORTANT
+          * <p>
+          *
+          * The y-asix title MUST be painted after the unit because a "Transform" is modifying the
+          * font and I did not find out how to fix this
+          *
+          * !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+          *
           * Draw y-axis title which is the unit label
           */
          if (_isLeft && StringUtils.hasContent(unitLabel)) {

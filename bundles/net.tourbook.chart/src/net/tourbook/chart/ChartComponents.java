@@ -251,8 +251,6 @@ public class ChartComponents extends Composite {
 
       addListener();
 
-      getMonthLabelWidth();
-
       updateFontScaling();
    }
 
@@ -2021,7 +2019,7 @@ public class ChartComponents extends Composite {
          allDays += yearDays[yearIndex];
       }
 
-      final ArrayList<ChartUnit> xUnits = drawingData.getXUnits();
+      final ArrayList<ChartUnit> allXUnits = drawingData.getXUnits();
 
       /*
        * Create month labels depending on the available width for a unit
@@ -2035,7 +2033,7 @@ public class ChartComponents extends Composite {
 
             final int unitValue = daysForAllUnits[monthIndex];
 
-            xUnits.add(new ChartUnit(unitValue, _monthLabels[monthIndex % 12]));
+            allXUnits.add(new ChartUnit(unitValue, _monthLabels[monthIndex % 12]));
 
             isDrawUnits[monthIndex] = true;
          }
@@ -2052,7 +2050,7 @@ public class ChartComponents extends Composite {
 
             final int unitValue = daysForAllUnits[monthIndex];
 
-            xUnits.add(new ChartUnit(unitValue, monthLabel));
+            allXUnits.add(new ChartUnit(unitValue, monthLabel));
 
 //            isDrawUnits[monthIndex] = monthIndex % 3 == 0;
             isDrawUnits[monthIndex] = true;
@@ -2068,7 +2066,7 @@ public class ChartComponents extends Composite {
                   ? _monthShortLabels[monthIndex % 12]
                   : UI.EMPTY_STRING;
 
-            xUnits.add(new ChartUnit(daysForAllUnits[monthIndex], monthLabel));
+            allXUnits.add(new ChartUnit(daysForAllUnits[monthIndex], monthLabel));
             isDrawUnits[monthIndex] = monthIndex % 3 == 0;
          }
 
@@ -2082,7 +2080,7 @@ public class ChartComponents extends Composite {
                   ? _monthShortLabels[monthIndex % 12]
                   : UI.EMPTY_STRING;
 
-            xUnits.add(new ChartUnit(daysForAllUnits[monthIndex], monthLabel));
+            allXUnits.add(new ChartUnit(daysForAllUnits[monthIndex], monthLabel));
             isDrawUnits[monthIndex] = monthIndex % 3 == 0;
          }
 
@@ -2091,7 +2089,7 @@ public class ChartComponents extends Composite {
          // width is too small to display month labels, display nothing
 
          for (int monthIndex = 0; monthIndex < numberOfMonths; monthIndex++) {
-            xUnits.add(new ChartUnit(daysForAllUnits[monthIndex], UI.EMPTY_STRING));
+            allXUnits.add(new ChartUnit(daysForAllUnits[monthIndex], UI.EMPTY_STRING));
          }
       }
 
@@ -2255,27 +2253,6 @@ public class ChartComponents extends Composite {
 
       return _visibleAllGraphRect.height
             - _devMarginBottom;
-   }
-
-   /**
-    * Get size in pixel for the month labels and shortcuts
-    */
-   private void getMonthLabelWidth() {
-
-      final GC gc = new GC(this);
-      {
-         _devAllMonthLabelWidth = 0;
-         _devAllMonthShortLabelWidth = 0;
-
-         for (int monthIndex = 0; monthIndex < _monthLabels.length; monthIndex++) {
-
-            _devAllMonthLabelWidth += gc.stringExtent(_monthLabels[monthIndex]).x + 6;
-            _devAllMonthShortLabelWidth += gc.stringExtent(_monthShortLabels[monthIndex]).x + 12;
-         }
-
-         _devYearLabelWidth += gc.stringExtent("2222").x + 0;//$NON-NLS-1$
-      }
-      gc.dispose();
    }
 
    int getYAxisWidthLeft() {
@@ -2740,9 +2717,27 @@ public class ChartComponents extends Composite {
          final Point stringExtent = gc.stringExtent("0123456789");
 
          _gcFontHeight = stringExtent.y;
+
+         updateLabelWidth(gc);
       }
       gc.dispose();
       gcImage.dispose();
    }
 
+   /**
+    * Get size in pixel for the month labels and shortcuts
+    */
+   private void updateLabelWidth(final GC gc) {
+
+      _devAllMonthLabelWidth = 0;
+      _devAllMonthShortLabelWidth = 0;
+
+      for (int monthIndex = 0; monthIndex < _monthLabels.length; monthIndex++) {
+
+         _devAllMonthLabelWidth += gc.stringExtent(_monthLabels[monthIndex]).x + 6;
+         _devAllMonthShortLabelWidth += gc.stringExtent(_monthShortLabels[monthIndex]).x + 12;
+      }
+
+      _devYearLabelWidth += gc.stringExtent("2222").x + 0;//$NON-NLS-1$
+   }
 }
