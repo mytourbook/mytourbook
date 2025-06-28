@@ -1678,6 +1678,8 @@ public class ChartComponentGraph extends Canvas {
             gcGraph_WithOSXFix = gcGraph;
          }
 
+         gcGraph_WithOSXFix.setLineWidth(0);
+
          final boolean isFirstGraph = graphNo == 1;
          final boolean isLastGraph = graphNo == lastGraphNo;
 
@@ -2532,7 +2534,7 @@ public class ChartComponentGraph extends Canvas {
        * setLineWidth() MUST be set AFTER setLineAttributes() otherwise the line width is growing
        * every time on a 4k display !!!
        */
-      gcGraph.setLineWidth(1);
+      gcGraph.setLineWidth(0);
 
       gcGraph.setForeground(display.getSystemColor(SWT.COLOR_GRAY));
 
@@ -3647,11 +3649,18 @@ public class ChartComponentGraph extends Canvas {
 
                   devShapeBarWidth = 3;
 
-                  gcGraph.setLineWidth(3);
+                  if (UI.IS_4K_DISPLAY) {
+
+                     gcGraph.setLineWidth(0);
+
+                  } else {
+
+                     gcGraph.setLineWidth(1);
+                  }
 
                } else {
 
-                  gcGraph.setLineWidth(1);
+                  gcGraph.setLineWidth(0);
                }
 
                if (devBarHeight < 3) {
@@ -3660,7 +3669,7 @@ public class ChartComponentGraph extends Canvas {
 
             } else {
 
-               gcGraph.setLineWidth(1);
+               gcGraph.setLineWidth(0);
             }
 
             /*
@@ -3714,6 +3723,9 @@ public class ChartComponentGraph extends Canvas {
 
       // reset clipping
       gcGraph.setClipping((Rectangle) null);
+
+      // reset line width
+      gcGraph.setLineWidth(0);
    }
 
    /**
@@ -6729,7 +6741,7 @@ public class ChartComponentGraph extends Canvas {
       final int devOffsetPoint = _pc.convertHorizontalDLUsToPixels(2);// 3;
 
       gcOverlay.setAntialias(SWT.ON);
-      gcOverlay.setLineWidth(1);
+      gcOverlay.setLineWidth(0);
 
       // loop: all graphs
       for (final GraphDrawingData drawingData : _allGraphDrawingData) {
