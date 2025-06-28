@@ -276,15 +276,15 @@ public class ChartComponents extends Composite {
 
       chartDrawingData.chartDataModel = _chartDataModel;
 
-      final ArrayList<ChartDataYSerie> yDataList = _chartDataModel.getYData();
+      final ArrayList<ChartDataYSerie> allYData = _chartDataModel.getYData();
       final ChartDataXSerie xData = _chartDataModel.getXData();
       final ChartDataXSerie xData2nd = _chartDataModel.getXData2nd();
 
-      final int numGraphs = yDataList.size();
+      final int numGraphs = allYData.size();
       int graphNumber = 1;
 
       // loop all graphs
-      for (final ChartDataYSerie yData : yDataList) {
+      for (final ChartDataYSerie yData : allYData) {
 
          final GraphDrawingData graphDrawingData = new GraphDrawingData(chartDrawingData, yData.getChartType());
 
@@ -293,19 +293,22 @@ public class ChartComponents extends Composite {
          // set chart title above the first graph
          if (graphNumber == 1) {
 
-            final String title = _chartDataModel.getTitle();
+            final String chartTitle = _chartDataModel.getTitle();
 
-            graphDrawingData.setXTitle(title);
+            graphDrawingData.setXTitle(chartTitle);
 
-            // set the chart title height and margin
+            // set the chart title height
+            final int xAxisUnit = xData.getAxisUnit();
             final ChartStatisticSegments chartSegments = xData.getChartSegments();
 
-            final boolean isShowTitle = componentGraph.chartTitleSegmentConfig.isShowSegmentTitle;
+            final boolean isHistoryTitle = xAxisUnit == ChartDataSerie.X_AXIS_UNIT_HISTORY;
 
-            final boolean isTitleAvailable = title != null && title.length() > 0;
+            final boolean isShowTitle = componentGraph.chartTitleSegmentConfig.isShowSegmentTitle;
+            final boolean isChartTitleAvailable = chartTitle != null && chartTitle.trim().length() > 0;
             final boolean isSegmentTitleAvailable = chartSegments != null && chartSegments.segmentTitle != null;
 
-            if (isShowTitle && (isTitleAvailable || isSegmentTitleAvailable)) {
+            if (isHistoryTitle
+                  || isShowTitle && (isChartTitleAvailable || isSegmentTitleAvailable)) {
 
                _devChartTitleHeight = _gcFontHeight;
 
