@@ -26,8 +26,10 @@ import net.tourbook.common.formatter.ValueFormat;
 import org.eclipse.core.runtime.preferences.AbstractPreferenceInitializer;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.preference.PreferenceConverter;
-import org.eclipse.jface.resource.JFaceResources;
+import org.eclipse.swt.SWT;
+import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.FontData;
+import org.eclipse.swt.widgets.Display;
 
 /**
  * Initialize default preference values.
@@ -150,9 +152,13 @@ public class CommonPreferenceInitializer extends AbstractPreferenceInitializer {
 // SET_FORMATTING_ON
 
       /*
-       * UI drawing font
+       * UI drawing font, set "ugly" font that users are "forced" to select a more modern font :-)
        */
-      final FontData[] defaultFontData = JFaceResources.getFontRegistry().defaultFont().getFontData();
-      PreferenceConverter.setDefault(store, ICommonPreferences.UI_DRAWING_FONT, defaultFontData);
+      final Font defaultFont = new Font(Display.getDefault(), "Courier", 9, SWT.NORMAL); //$NON-NLS-1$
+      {
+         final FontData[] defaultFontData = defaultFont.getFontData();
+         PreferenceConverter.setDefault(store, ICommonPreferences.UI_DRAWING_FONT, defaultFontData);
+      }
+      defaultFont.dispose();
    }
 }
