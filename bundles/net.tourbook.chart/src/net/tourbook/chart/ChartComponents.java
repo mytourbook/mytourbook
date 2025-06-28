@@ -2727,6 +2727,9 @@ public class ChartComponents extends Composite {
       componentGraph.updateCustomLayers();
    }
 
+   /**
+    * This will set the chart default font which is used to calculate different margin values
+    */
    public void updateFontScaling() {
 
       // the font size is differently scaled on an image than on "this" (the current canvas)

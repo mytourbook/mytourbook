@@ -298,9 +298,12 @@ public class StatisticView extends ViewPart implements ITourProvider {
 
             updateStatistic();
 
-         } else if (property.equals(ICommonPreferences.MEASUREMENT_SYSTEM)) {
+         } else if (
 
-            // measurement system has changed
+         // measurement system has changed
+         property.equals(ICommonPreferences.MEASUREMENT_SYSTEM)
+
+               || property.equals(ICommonPreferences.UI_DRAWING_FONT_IS_MODIFIED)) {
 
             updateStatistic();
          }
@@ -547,6 +550,7 @@ public class StatisticView extends ViewPart implements ITourProvider {
 
    /**
     * @param defaultYear
+    *
     * @return Returns the index for the active year or <code>-1</code> when there are no years
     *         available
     */

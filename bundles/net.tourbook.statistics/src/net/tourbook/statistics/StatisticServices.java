@@ -290,6 +290,8 @@ public class StatisticServices {
                                             final String prefGridPrefix,
                                             final String prefLayoutPrefix) {
 
+      chart.getChartComponents().updateFontScaling();
+
       net.tourbook.ui.UI.updateChartProperties(chart, prefGridPrefix, prefLayoutPrefix);
 
       /*
