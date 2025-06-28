@@ -30,7 +30,6 @@ import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseListener;
 import org.eclipse.swt.events.MouseTrackListener;
 import org.eclipse.swt.graphics.Color;
-import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
@@ -351,44 +350,6 @@ public class ChartComponentAxis extends Canvas {
          final int devYBottom = graphDrawingData.getDevYBottom();
          final int devYTop = devYBottom - devGraphHeight;
 
-         /**
-          * !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-          *
-          * VERY IMPORTANT
-          * <p>
-          *
-          * The y-asix title MUST be painted after the unit because a "Transform" is modifying the
-          * font and I did not find out how to fix this
-          *
-          * !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-          *
-          * Draw y-axis title which is the unit label
-          */
-         if (_isLeft && StringUtils.hasContent(unitLabel)) {
-
-            final Point labelExtend = gc.textExtent(unitLabel);
-
-            final int unitWidth = labelExtend.x;
-
-            final int xPos = 3;
-            final int yPos = devYTop + (devGraphHeight / 2) + (unitWidth / 2);
-
-            gc.setForeground(new Color(yData.getRgbGraph_Text()));
-
-            final Transform tr = new Transform(_display);
-            {
-               tr.translate(xPos, yPos);
-               tr.rotate(-90f);
-
-               gc.setTransform(tr);
-               {
-                  gc.drawText(unitLabel, 0, 0, true);
-               }
-               gc.setTransform(null);
-            }
-            tr.dispose();
-         }
-
          /*
           * Draw y units
           */
@@ -435,6 +396,44 @@ public class ChartComponentAxis extends Canvas {
             // draw unit line only when units are available
 
             gc.drawLine(devX, devYBottom, devX, devYTop);
+         }
+
+         /**
+          * !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+          *
+          * VERY IMPORTANT
+          * <p>
+          *
+          * The y-asix title MUST be painted after the unit because a "Transform" is modifying the
+          * font and I did not find out how to fix this
+          *
+          * !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+          *
+          * Draw y-axis title which is the unit label
+          */
+         if (_isLeft && StringUtils.hasContent(unitLabel)) {
+
+            final Point labelExtend = gc.textExtent(unitLabel);
+
+            final int unitWidth = labelExtend.x;
+
+            final int xPos = 3;
+            final int yPos = devYTop + (devGraphHeight / 2) + (unitWidth / 2);
+
+            gc.setForeground(new Color(yData.getRgbGraph_Text()));
+
+            final Transform tr = new Transform(_display);
+            {
+               tr.translate(xPos, yPos);
+               tr.rotate(-90f);
+
+               gc.setTransform(tr);
+               {
+                  gc.drawText(unitLabel, 0, 0, true);
+               }
+               gc.setTransform(null);
+            }
+            tr.dispose();
          }
       }
    }
