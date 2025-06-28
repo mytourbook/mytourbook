@@ -126,6 +126,15 @@ public class SlideoutSensorChartOptions extends ToolbarSlideout implements IActi
          }
 
          _gridUI.createUI(container);
+         _gridUI.enableGridOptions(0
+
+               // this is disabled because the x-axis displays history values
+               // | ChartOptions_Grid.GRID_HORIZONTAL_DISTANCE
+
+               | ChartOptions_Grid.GRID_VERTICAL_DISTANCE
+               | ChartOptions_Grid.GRID_IS_SHOW_HORIZONTAL_LINE
+               | ChartOptions_Grid.GRID_IS_SHOW_VERTICAL_LINE);
+
          _layoutUI.createUI(container);
       }
 

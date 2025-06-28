@@ -349,6 +349,9 @@ public class SensorChartView extends ViewPart implements ITourProvider {
 
       _sensorChart = createUI_10_Chart();
 
+      // set chart properties, this must be done after _sensorChart is created
+      updateChartProperties();
+
       _pageBook.showPage(_pageNoData);
    }
 
@@ -395,9 +398,6 @@ public class SensorChartView extends ViewPart implements ITourProvider {
 
       sensorChart.setTourInfoIconToolTipProvider(_tourInfoToolTipProvider);
       _tourInfoToolTipProvider.setActionsEnabled(true);
-
-      // set chart properties
-      updateChartProperties();
 
       return sensorChart;
    }
