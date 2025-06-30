@@ -508,7 +508,7 @@
 
          <command
             commandId   ="net.tourbook.command.device.importFromFile"
-            icon        ="icons/import-get-tours.png"
+            icon        ="icons/import-get-tours.svg"
             label       ="%command_device_importFromFile"
             mnemonic    ="%command_device_importFromFile_mnemonic"/>
 
@@ -609,14 +609,14 @@
             <!-- Calendar -->
             <command 
                commandId   ="command.net.tourbook.views.calendar.CalendarView"
-               icon        ="icons/calendar.png"
+               icon        ="icons/calendar.svg"
                label       ="%view_name_Calendar"
                mnemonic    ="%view_name_Calendar_Mnemonic"/>
 
             <!-- Statistics -->
             <command 
                commandId   ="command.net.tourbook.statistic.StatisticView"
-               icon        ="icons/statistics.png"
+               icon        ="icons/statistics.svg"
                label       ="%view_name_Statistics"
                mnemonic    ="%view_name_Statistics_Mnemonic"/>
 
@@ -637,7 +637,7 @@
                <!-- Tour Comparison Timeline -->
                <command 
                   commandId   ="command.net.tourbook.views.tourCatalog.yearStatisticView"
-                  icon        ="icons/tour-map-statistic.png"
+                  icon        ="icons/tour-map-statistic.svg"
                   label       ="%View_Name_TourComparisonTimeline"
                   mnemonic    ="%View_Name_TourComparisonTimeline_Mnemonic"/>
 
@@ -730,7 +730,7 @@
          <!-- Tour Blog -->
          <command
             commandId   ="command.net.tourbook.views.TourBlogView"
-            icon        ="icons/tour-blog.png"
+            icon        ="icons/tour-blog.svg"
             label       ="%View_Name_TourBlog"
             mnemonic    ="%View_Name_TourBlog_Mnemonic"/>
 
@@ -955,14 +955,14 @@
          <!-- Tour Log-->
          <command
             commandId   ="command.net.tourbook.tour.TourLogView"
-            icon        ="icons/tour-log.png"
+            icon        ="icons/tour-log.svg"
             label       ="%Command_TourLog_View"
             mnemonic    ="%Command_TourLog_View_Mnemonic"/>
 
          <!-- Error Log -->
          <command
             commandId   ="org.eclipse.ui.views.showView"
-            icon        ="icons/error_log.gif"
+            icon        ="icons/error_log.svg"
             label       ="%command_error_view"
             mnemonic    ="%command_error_view_mnemonic"
             style       ="push">
@@ -1039,14 +1039,14 @@
             <!-- Calendar -->
             <command 
                commandId   ="command.net.tourbook.views.calendar.CalendarView"
-               icon        ="icons/calendar.png"
+               icon        ="icons/calendar.svg"
                label       ="%view_name_Calendar"
                mnemonic    ="%view_name_Calendar_Mnemonic"/>
 
             <!-- Statistics -->
             <command 
                commandId   ="command.net.tourbook.statistic.StatisticView"
-               icon        ="icons/statistics.png"
+               icon        ="icons/statistics.svg"
                label       ="%view_name_Statistics"
                mnemonic    ="%view_name_Statistics_Mnemonic"/>
             
@@ -1166,7 +1166,7 @@
       
          <command
             commandId   ="net.tourbook.command.device.importFromFile"
-            icon        ="icons/import-get-tours.png"
+            icon        ="icons/import-get-tours.svg"
             label       ="%command_device_importFromFile"
             mnemonic    ="%command_device_importFromFile_mnemonic"/>
 
@@ -1642,7 +1642,7 @@
             category    ="net.tourbook.category.Tour_Directory"
             id          ="net.tourbook.views.calendar.CalendarView"
             class       ="net.tourbook.ui.views.calendar.CalendarView"
-            icon        ="icons/calendar.png"
+            icon        ="icons/calendar.svg"
             name        ="%view_name_Calendar"/>
 
          <view
@@ -1670,14 +1670,14 @@
             category    ="net.tourbook.category.Tour_Directory"
             id          ="net.tourbook.views.tourCatalog.yearStatisticView"
             class       ="net.tourbook.ui.views.referenceTour.ReferenceTimelineView"
-            icon        ="icons/tour-map-statistic.png"
+            icon        ="icons/tour-map-statistic.svg"
             name        ="%View_Name_TourComparisonTimeline"/>
 
          <view
             category    ="net.tourbook.category.Tour_Directory"
             id          ="net.tourbook.statistic.StatisticView"
             class       ="net.tourbook.statistic.StatisticView"
-            icon        ="icons/statistics.png"
+            icon        ="icons/statistics.svg"
             name        ="%view_name_Statistics"/>
 
          <view
@@ -1747,7 +1747,7 @@
             category    ="net.tourbook.category.Tour_Properties"
             id          ="net.tourbook.ui.views.TourBlogView"
             class       ="net.tourbook.ui.views.TourBlogView"
-            icon        ="icons/tour-blog.png"
+            icon        ="icons/tour-blog.svg"
             name        ="%View_Name_TourBlog"/>
 
          <view
@@ -1855,7 +1855,7 @@
             category    ="net.tourbook.category.Tools"
             id          ="net.tourbook.tour.TourLogView"
             class       ="net.tourbook.tour.TourLogView"
-            icon        ="icons/tour-log.png"
+            icon        ="icons/tour-log.svg"
             name        ="%View_Name_TourLog"/>
 
          <view
