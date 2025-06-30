@@ -125,38 +125,39 @@ public class TrainingView extends ViewPart {
 
 // SET_FORMATTING_ON
 
-   private final IPreferenceStore      _prefStore        = TourbookPlugin.getPrefStore();
-   private final IPreferenceStore      _prefStore_Common = CommonActivator.getPrefStore();
-   private final IDialogSettings       _state            = TourbookPlugin.getState(ID);
+   private static final IDialogSettings  _state            = TourbookPlugin.getState(ID);
+   private static final IPreferenceStore _prefStore        = TourbookPlugin.getPrefStore();
+   private static final IPreferenceStore _prefStore_Common = CommonActivator.getPrefStore();
 
-   private IPartListener2              _partListener;
-   private ISelectionListener          _postSelectionListener;
-   private IPropertyChangeListener     _prefChangeListener;
-   private ITourEventListener          _tourEventListener;
+   private IPartListener2                _partListener;
+   private ISelectionListener            _postSelectionListener;
+   private IPropertyChangeListener       _prefChangeListener;
+   private IPropertyChangeListener       _prefChangeListener_Common;
+   private ITourEventListener            _tourEventListener;
 
-   private ModifyListener              _defaultSpinnerModifyListener;
-   private SelectionListener           _defaultSpinnerSelectionListener;
-   private MouseWheelListener          _defaultSpinnerMouseWheelListener;
+   private ModifyListener                _defaultSpinnerModifyListener;
+   private SelectionListener             _defaultSpinnerSelectionListener;
+   private MouseWheelListener            _defaultSpinnerMouseWheelListener;
 
-   private TourPerson                  _currentPerson;
-   private TourData                    _tourData;
+   private TourPerson                    _currentPerson;
+   private TourData                      _tourData;
 
-   private boolean                     _isUpdateUI;
-   private boolean                     _isShowAllValues;
-   private boolean                     _isSynchChartVerticalValues;
+   private boolean                       _isUpdateUI;
+   private boolean                       _isShowAllValues;
+   private boolean                       _isSynchChartVerticalValues;
 
-   private ToolBarManager              _headerToolbarManager;
+   private ToolBarManager                _headerToolbarManager;
 
-   private ActionShowAllPulseValues    _actionShowAllPulseValues;
-   private ActionSynchChartScale       _actionSynchVerticalChartScaling;
-   private ActionTrainingOptions       _actionTrainingOptions;
+   private ActionShowAllPulseValues      _actionShowAllPulseValues;
+   private ActionSynchChartScale         _actionSynchVerticalChartScaling;
+   private ActionTrainingOptions         _actionTrainingOptions;
 
-   private double[]                    _xSeriePulse;
+   private double[]                      _xSeriePulse;
 
-   private ArrayList<TourPersonHRZone> _personHrZones    = new ArrayList<>();
-   private final MinMaxKeeper_YData    _minMaxKeeper     = new MinMaxKeeper_YData();
+   private ArrayList<TourPersonHRZone>   _personHrZones    = new ArrayList<>();
+   private final MinMaxKeeper_YData      _minMaxKeeper     = new MinMaxKeeper_YData();
 
-   private final NumberFormat          _nf1              = NumberFormat.getNumberInstance();
+   private final NumberFormat            _nf1              = NumberFormat.getNumberInstance();
    {
       _nf1.setMinimumFractionDigits(1);
       _nf1.setMaximumFractionDigits(1);
@@ -327,7 +328,20 @@ public class TrainingView extends ViewPart {
          }
       };
 
+      _prefChangeListener_Common = propertyChangeEvent -> {
+
+         final String property = propertyChangeEvent.getProperty();
+
+         if (property.equals(ICommonPreferences.UI_DRAWING_FONT_IS_MODIFIED)) {
+
+            _chartHrTime.getChartComponents().updateFontScaling();
+
+            updateUI_30_HrZonesFromModel();
+         }
+      };
+
       _prefStore.addPropertyChangeListener(_prefChangeListener);
+      _prefStore_Common.addPropertyChangeListener(_prefChangeListener_Common);
    }
 
    /**
@@ -820,6 +834,7 @@ public class TrainingView extends ViewPart {
       TourManager.getInstance().removeTourEventListener(_tourEventListener);
 
       _prefStore.removePropertyChangeListener(_prefChangeListener);
+      _prefStore_Common.removePropertyChangeListener(_prefChangeListener_Common);
 
       super.dispose();
    }

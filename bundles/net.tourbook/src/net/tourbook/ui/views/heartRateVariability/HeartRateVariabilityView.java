@@ -100,40 +100,41 @@ public class HeartRateVariabilityView extends ViewPart {
 
 // SET_FORMATTING_ON
 
-   private static final int         ADJUST_PULSE_VALUE  = 50;
+   private static final int              ADJUST_PULSE_VALUE  = 50;
 
-   private static final int         HRV_TIME_MIN_BORDER = 0;                                         // ms
-   private static final int         HRV_TIME_MAX_BORDER = 9999;                                      //ms
+   private static final int              HRV_TIME_MIN_BORDER = 0;                                         // ms
+   private static final int              HRV_TIME_MAX_BORDER = 9999;                                      // ms
 
-   private final IPreferenceStore   _prefStore          = TourbookPlugin.getPrefStore();
-   private final IPreferenceStore   _prefStore_Common   = CommonActivator.getPrefStore();
-   private final IDialogSettings    _state              = TourbookPlugin.getState(ID);
+   private static final IDialogSettings  _state              = TourbookPlugin.getState(ID);
+   private static final IPreferenceStore _prefStore          = TourbookPlugin.getPrefStore();
+   private static final IPreferenceStore _prefStore_Common   = CommonActivator.getPrefStore();
 
-   private ModifyListener           _defaultSpinnerModifyListener;
-   private MouseWheelListener       _defaultSpinnerMouseWheelListener;
-   private SelectionListener        _defaultSpinnerSelectionListener;
-   private ISelectionListener       _postSelectionListener;
-   private IPropertyChangeListener  _prefChangeListener;
-   private ITourEventListener       _tourEventListener;
+   private ModifyListener                _defaultSpinnerModifyListener;
+   private MouseWheelListener            _defaultSpinnerMouseWheelListener;
+   private SelectionListener             _defaultSpinnerSelectionListener;
+   private ISelectionListener            _postSelectionListener;
+   private IPropertyChangeListener       _prefChangeListener;
+   private IPropertyChangeListener       _prefChangeListener_Common;
+   private ITourEventListener            _tourEventListener;
 
-   private List<TourData>           _hrvTours;
+   private List<TourData>                _hrvTours;
 
-   private ActionToolbarSlideout    _actionHrvOptions;
-   private ActionSynchChartScale    _actionSynchChartScaling;
-   private ActionShowAllValues      _actionShowAllValues;
+   private ActionToolbarSlideout         _actionHrvOptions;
+   private ActionSynchChartScale         _actionSynchChartScaling;
+   private ActionShowAllValues           _actionShowAllValues;
 
-   private boolean                  _isUpdateUI;
-   private boolean                  _isSynchChartScaling;
-   private boolean                  _isShowAllValues;
+   private boolean                       _isUpdateUI;
+   private boolean                       _isSynchChartScaling;
+   private boolean                       _isShowAllValues;
 
-   private final MinMaxKeeper_XData _xMinMaxKeeper      = new MinMaxKeeper_XData(ADJUST_PULSE_VALUE);
-   private final MinMaxKeeper_YData _yMinMaxKeeper      = new MinMaxKeeper_YData(ADJUST_PULSE_VALUE);
+   private final MinMaxKeeper_XData      _xMinMaxKeeper      = new MinMaxKeeper_XData(ADJUST_PULSE_VALUE);
+   private final MinMaxKeeper_YData      _yMinMaxKeeper      = new MinMaxKeeper_YData(ADJUST_PULSE_VALUE);
 
-   private int                      _fixed2xErrors_0;
-   private int                      _fixed2xErrors_1;
+   private int                           _fixed2xErrors_0;
+   private int                           _fixed2xErrors_1;
 
-   private ToolBarManager           _toolbarManager;
-   private FormToolkit              _tk;
+   private ToolBarManager                _toolbarManager;
+   private FormToolkit                   _tk;
 
    /*
     * UI controls
@@ -263,7 +264,20 @@ public class HeartRateVariabilityView extends ViewPart {
          }
       };
 
+      _prefChangeListener_Common = propertyChangeEvent -> {
+
+         final String property = propertyChangeEvent.getProperty();
+
+         if (property.equals(ICommonPreferences.UI_DRAWING_FONT_IS_MODIFIED)) {
+
+            _chartHRV.getChartComponents().updateFontScaling();
+
+            updateChart_50_CurrentTours(true);
+         }
+      };
+
       _prefStore.addPropertyChangeListener(_prefChangeListener);
+      _prefStore_Common.addPropertyChangeListener(_prefChangeListener_Common);
    }
 
    /**
@@ -643,6 +657,7 @@ public class HeartRateVariabilityView extends ViewPart {
       TourManager.getInstance().removeTourEventListener(_tourEventListener);
 
       _prefStore.removePropertyChangeListener(_prefChangeListener);
+      _prefStore_Common.removePropertyChangeListener(_prefChangeListener_Common);
 
       super.dispose();
    }

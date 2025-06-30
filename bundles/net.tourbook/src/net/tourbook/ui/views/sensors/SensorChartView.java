@@ -34,6 +34,7 @@ import net.tourbook.common.CommonActivator;
 import net.tourbook.common.CommonImages;
 import net.tourbook.common.UI;
 import net.tourbook.common.color.GraphColorManager;
+import net.tourbook.common.preferences.ICommonPreferences;
 import net.tourbook.common.tooltip.ActionToolbarSlideout;
 import net.tourbook.common.tooltip.ICanHideTooltip;
 import net.tourbook.common.tooltip.IOpeningDialog;
@@ -94,10 +95,12 @@ public class SensorChartView extends ViewPart implements ITourProvider {
 
 // SET_FORMATTING_ON
 
-   private final IPreferenceStore          _prefStore               = TourbookPlugin.getPrefStore();
-   private final IDialogSettings           _state                   = TourbookPlugin.getState(ID);
+   private static final IDialogSettings    _state                   = TourbookPlugin.getState(ID);
+   private static final IPreferenceStore   _prefStore               = TourbookPlugin.getPrefStore();
+   private static final IPreferenceStore   _prefStore_Common        = CommonActivator.getPrefStore();
 
    private IPropertyChangeListener         _prefChangeListener;
+   private IPropertyChangeListener         _prefChangeListener_Common;
    private ITourEventListener              _tourEventListener;
 
    private FormToolkit                     _tk;
@@ -215,7 +218,20 @@ public class SensorChartView extends ViewPart implements ITourProvider {
          }
       };
 
+      _prefChangeListener_Common = propertyChangeEvent -> {
+
+         final String property = propertyChangeEvent.getProperty();
+
+         if (property.equals(ICommonPreferences.UI_DRAWING_FONT_IS_MODIFIED)) {
+
+            _sensorChart.getChartComponents().updateFontScaling();
+
+            updateChartProperties();
+         }
+      };
+
       _prefStore.addPropertyChangeListener(_prefChangeListener);
+      _prefStore_Common.addPropertyChangeListener(_prefChangeListener_Common);
    }
 
    private void addTourEventListener() {
@@ -412,6 +428,7 @@ public class SensorChartView extends ViewPart implements ITourProvider {
       }
 
       _prefStore.removePropertyChangeListener(_prefChangeListener);
+      _prefStore_Common.removePropertyChangeListener(_prefChangeListener_Common);
 
       TourManager.getInstance().removeTourEventListener(_tourEventListener);
 

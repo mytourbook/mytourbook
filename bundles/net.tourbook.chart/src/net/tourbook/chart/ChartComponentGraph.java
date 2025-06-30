@@ -5836,6 +5836,8 @@ public class ChartComponentGraph extends Canvas {
           */
          gcCustom.drawImage(_chartImage_20_Chart, 0, 0);
 
+         gcCustom.setFont(UI.getUIDrawingFont());
+
          for (int graphIndex = 0; graphIndex < _allGraphDrawingData.size(); graphIndex++) {
 
             final GraphDrawingData graphDrawingData = _allGraphDrawingData.get(graphIndex);
@@ -5911,10 +5913,12 @@ public class ChartComponentGraph extends Canvas {
       final GC gcOverlay = new GC(_chartImage_40_Overlay);
       {
          /*
-          * copy the graph image into the slider image, the slider will be drawn on top of the graph
+          * Copy the graph image into the slider image, the slider will be drawn on top of the graph
           */
          gcOverlay.fillRectangle(graphImageRect);
          gcOverlay.drawImage(_chartImage_30_Custom, 0, 0);
+
+         gcOverlay.setFont(UI.getUIDrawingFont());
 
          /*
           * draw x/y-sliders

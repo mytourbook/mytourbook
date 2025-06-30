@@ -339,6 +339,12 @@ public class ReferenceTimelineView extends ViewPart implements IGeoCompareListen
             _pageYearChart.layout();
 
             updateUI_TimelineChart();
+
+         } else if (property.equals(ICommonPreferences.UI_DRAWING_FONT_IS_MODIFIED)) {
+
+            _timelineChart.getChartComponents().updateFontScaling();
+
+            updateUI_TimelineChart();
          }
       };
 

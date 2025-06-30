@@ -102,32 +102,33 @@ public class ConconiView extends ViewPart {
 
 // SET_FORMATTING_ON
 
-   private final IPreferenceStore  _prefStore              = TourbookPlugin.getPrefStore();
-   private final IPreferenceStore  _prefStore_Common       = CommonActivator.getPrefStore();
-   private final IDialogSettings   _state                  = TourbookPlugin.getState(ID);
+   private static final IDialogSettings  _state                  = TourbookPlugin.getState(ID);
+   private static final IPreferenceStore _prefStore              = TourbookPlugin.getPrefStore();
+   private static final IPreferenceStore _prefStore_Common       = CommonActivator.getPrefStore();
 
-   private ISelectionListener      _postSelectionListener;
-   private IPropertyChangeListener _prefChangeListener;
-   private ITourEventListener      _tourEventListener;
+   private ISelectionListener            _postSelectionListener;
+   private IPropertyChangeListener       _prefChangeListener;
+   private IPropertyChangeListener       _prefChangeListener_Common;
+   private ITourEventListener            _tourEventListener;
 
-   private ChartDataYSerie         _yDataPulse;
-   private ConconiData             _conconiDataForSelectedTour;
+   private ChartDataYSerie               _yDataPulse;
+   private ConconiData                   _conconiDataForSelectedTour;
 
-   private boolean                 _isUpdateUI             = false;
-   private boolean                 _isSelectionDisabled    = true;
-   private boolean                 _isSaving;
+   private boolean                       _isUpdateUI             = false;
+   private boolean                       _isSelectionDisabled    = true;
+   private boolean                       _isSaving;
 
-   private TourData                _selectedTour;
+   private TourData                      _selectedTour;
 
-   private int                     _originalTourDeflection = -1;
-   private int                     _modifiedTourDeflection = -1;
+   private int                           _originalTourDeflection = -1;
+   private int                           _modifiedTourDeflection = -1;
 
-   private PixelConverter          _pc;
-   private FormToolkit             _tk;
+   private PixelConverter                _pc;
+   private FormToolkit                   _tk;
 
-   private ActionConconiOptions    _actionConconiOptions;
+   private ActionConconiOptions          _actionConconiOptions;
 
-   private int                     _hintDefaultSpinnerWidth;
+   private int                           _hintDefaultSpinnerWidth;
 
    /*
     * UI controls
@@ -187,7 +188,20 @@ public class ConconiView extends ViewPart {
          }
       };
 
+      _prefChangeListener_Common = propertyChangeEvent -> {
+
+         final String property = propertyChangeEvent.getProperty();
+
+         if (property.equals(ICommonPreferences.UI_DRAWING_FONT_IS_MODIFIED)) {
+
+            _chartConconiTest.getChartComponents().updateFontScaling();
+
+            updateChartProperties();
+         }
+      };
+
       _prefStore.addPropertyChangeListener(_prefChangeListener);
+      _prefStore_Common.addPropertyChangeListener(_prefChangeListener_Common);
    }
 
    /**
@@ -769,7 +783,9 @@ public class ConconiView extends ViewPart {
 
       getSite().getPage().removeSelectionListener(_postSelectionListener);
       TourManager.getInstance().removeTourEventListener(_tourEventListener);
+
       _prefStore.removePropertyChangeListener(_prefChangeListener);
+      _prefStore_Common.removePropertyChangeListener(_prefChangeListener_Common);
 
       super.dispose();
    }
