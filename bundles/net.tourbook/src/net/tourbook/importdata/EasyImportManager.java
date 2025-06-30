@@ -1252,7 +1252,9 @@ public class EasyImportManager {
 
          // retrieve tour locations
          xmlConfig.putBoolean(ATTR_IL_IS_RETRIEVE_TOUR_LOCATIONS,       importLauncher.isRetrieveTourLocation);
-         xmlConfig.putString(ATTR_IL_TOUR_LOCATION_PROFILE_NAME,        importLauncher.tourLocationProfile.getName());
+         if (importLauncher.tourLocationProfile != null) {
+            xmlConfig.putString(ATTR_IL_TOUR_LOCATION_PROFILE_NAME,     importLauncher.tourLocationProfile.getName());
+         }
 
          // retrieve tour tag group
          xmlConfig.putBoolean(ATTR_IL_IS_SET_TOUR_TAG_GROUP,            importLauncher.isSetTourTagGroup);
