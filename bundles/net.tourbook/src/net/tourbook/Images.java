@@ -241,8 +241,8 @@ public class Images {
    public static final String RawData_DeviceFolder_Error                 = "device-folder-error.png";                             //$NON-NLS-1$
    public static final String RawData_DeviceFolder_IsChecking            = "device-folder-is-checking.png";                       //$NON-NLS-1$
    public static final String RawData_DeviceFolder_NotSetup              = "device-folder-not-setup.png";                         //$NON-NLS-1$
-   public static final String RawData_Device_TurnOff                     = "device-turn-off.png";                                 //$NON-NLS-1$
-   public static final String RawData_Device_TurnOn                      = "device-turn-on.png";                                  //$NON-NLS-1$
+   public static final String RawData_Device_TurnOff                     = "device-turn-off.svg";                                 //$NON-NLS-1$
+   public static final String RawData_Device_TurnOn                      = "device-turn-on.svg";                                  //$NON-NLS-1$
    public static final String RawData_Transfer                           = "device-synchronize.png";                              //$NON-NLS-1$
    public static final String RawData_TransferDirect                     = "device-synchronize-direct.png";                       //$NON-NLS-1$
    public static final String RefTour                                    = "tour-map-reftour.png";                                //$NON-NLS-1$
