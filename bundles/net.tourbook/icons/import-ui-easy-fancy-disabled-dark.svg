@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <svg
    width="16"
-   height="16"
+   height="16.000061"
    id="svg2985"
    version="1.1"
    xmlns="http://www.w3.org/2000/svg"
@@ -55,34 +55,29 @@
   <g
      id="layer1"
      style="display:inline"
-     transform="translate(-685,-848.99999)">
+     transform="translate(-730.00024,-578.99999)">
     <rect
-       y="849"
-       x="685"
+       y="579"
+       x="730.00024"
        height="15.999999"
        width="15.999977"
-       id="rect4471-81-5-8-1-8-9-4-0-6-8-6-9"
-       style="color:#000000;display:inline;overflow:visible;visibility:visible;fill:none;fill-opacity:1;stroke:none;stroke-width:0;stroke-linecap:round;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;marker:none;enable-background:accumulate" />
-    <rect
-       y="855.99957"
-       x="692.00024"
-       height="5.0004272"
-       width="2.0000012"
-       id="rect5678-9-0-5-0-0"
-       style="display:inline;fill:#ffd95c;fill-opacity:1;stroke:none;stroke-width:0.999998;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;paint-order:normal" />
-    <rect
-       y="854.00122"
-       x="686.00024"
-       height="4.9987793"
-       width="2.0000012"
-       id="rect5678-9-0-5-0-4-3"
-       style="display:inline;fill:#ffd95c;fill-opacity:1;stroke:none;stroke-width:0.999993;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;paint-order:normal" />
-    <rect
-       y="852"
-       x="698.00024"
-       height="5"
-       width="2.0000012"
-       id="rect5678-9-0-5-0-6-7"
-       style="display:inline;fill:#ffd95c;fill-opacity:1;stroke:none;stroke-width:0.999995;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;paint-order:normal" />
+       id="rect4471-81-5-8-1-8-4-3-0-4-5-3-4"
+       style="color:#000000;display:inline;overflow:visible;visibility:visible;fill:none;stroke:#158cf7;stroke-width:0;stroke-linecap:round;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;marker:none;enable-background:accumulate" />
+    <path
+       id="path5651-4-1-7-5-6"
+       d="m 730.00025,588.00004 h 7 v 7 h -7 z"
+       style="display:inline;fill:#666666;fill-opacity:1;stroke:none;stroke-width:1.41421px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
+    <path
+       id="path5651-4-1-7-4-5-4"
+       d="m 739.00025,588.00004 h 7.00001 v 7 h -7.00001 z"
+       style="display:inline;fill:#666666;fill-opacity:1;stroke:none;stroke-width:1.41421px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
+    <path
+       id="path5651-4-1-7-3-9-1"
+       d="m 730.00025,579.00004 h 7 v 7 h -7 z"
+       style="display:inline;fill:#666666;fill-opacity:1;stroke:none;stroke-width:1.41421px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
+    <path
+       id="path5651-4-1-7-8-2-2"
+       d="m 739.00025,579.00004 h 7.00001 v 7 h -7.00001 z"
+       style="display:inline;fill:#666666;fill-opacity:1;stroke:none;stroke-width:1.41421px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
   </g>
 </svg>

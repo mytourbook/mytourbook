@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <svg
-   width="16.001465"
+   width="16.001709"
    height="16"
    id="svg2985"
    version="1.1"
@@ -55,25 +55,10 @@
   <g
      id="layer1"
      style="display:inline"
-     transform="translate(-685.00024,-823.99999)">
-    <rect
-       transform="scale(1,-1)"
-       y="-840"
-       x="685.00024"
-       height="16.000015"
-       width="15.999993"
-       id="rect6561-8-1-9-9-5-5-9-9-1-3-94-1-6-6-4-5-3-6-8-3-8-9"
-       style="display:inline;opacity:0.99;fill:none;stroke:none" />
+     transform="translate(-685,-823.99999)">
     <rect
        y="824"
-       x="685.00024"
-       height="15.999999"
-       width="15.999977"
-       id="rect4471-81-5-8-1-8-9-4-6-0-9"
-       style="color:#000000;display:inline;overflow:visible;visibility:visible;fill:none;stroke:#158cf7;stroke-width:0;stroke-linecap:round;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;marker:none;enable-background:accumulate" />
-    <rect
-       y="824"
-       x="685.00024"
+       x="685"
        height="15.999999"
        width="15.999977"
        id="rect4471-81-5-8-1-8-9-4-0-6-8-6"

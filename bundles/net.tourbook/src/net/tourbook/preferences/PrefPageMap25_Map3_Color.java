@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2024 Wolfgang Schramm and Contributors
+ * Copyright (C) 2013, 2025 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -428,7 +428,7 @@ public class PrefPageMap25_Map3_Color extends PreferencePage implements IWorkben
 
       final Composite container = new Composite(parent, SWT.NONE);
       GridDataFactory.fillDefaults().grab(true, true).applyTo(container);
-      GridLayoutFactory.fillDefaults()//
+      GridLayoutFactory.fillDefaults()
             .spacing(LayoutConstants.getSpacing().x, 2)
             .numColumns(2)
             .applyTo(container);
@@ -455,7 +455,7 @@ public class PrefPageMap25_Map3_Color extends PreferencePage implements IWorkben
          // label: title
          final Label label = new Label(container, SWT.WRAP);
          label.setText(Messages.Pref_Map3Color_Label_Title);
-         GridDataFactory.fillDefaults()//
+         GridDataFactory.fillDefaults()
                .grab(true, true)
                .align(SWT.FILL, SWT.CENTER)
                .applyTo(label);
@@ -475,7 +475,7 @@ public class PrefPageMap25_Map3_Color extends PreferencePage implements IWorkben
       defineAllColumns();
 
       _viewerContainer = new Composite(parent, SWT.NONE);
-      GridDataFactory.fillDefaults()//
+      GridDataFactory.fillDefaults()
             .grab(true, true)
             .applyTo(_viewerContainer);
       GridLayoutFactory.fillDefaults().applyTo(_viewerContainer);
@@ -494,8 +494,8 @@ public class PrefPageMap25_Map3_Color extends PreferencePage implements IWorkben
       /*
        * Create tree
        */
-      final Tree tree = new Tree(parent, //
-            SWT.CHECK //
+      final Tree tree = new Tree(parent,
+            SWT.CHECK
                   | SWT.H_SCROLL
                   | SWT.V_SCROLL
 //                  | SWT.BORDER
@@ -637,7 +637,7 @@ public class PrefPageMap25_Map3_Color extends PreferencePage implements IWorkben
 
       final Composite container = new Composite(parent, SWT.NONE);
       GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
-      GridLayoutFactory.fillDefaults()//
+      GridLayoutFactory.fillDefaults()
 //            .margins(0, 5)
             .extendedMargins(0, 0, 5, 20)
             .numColumns(2)
@@ -681,7 +681,7 @@ public class PrefPageMap25_Map3_Color extends PreferencePage implements IWorkben
 
       colDef.setColumnLabel(Messages.Pref_Map3Color_Column_ProfileName);
       colDef.setColumnHeaderText(Messages.Pref_Map3Color_Column_ProfileName);
-      colDef.setDefaultColumnWidth(_pc.convertWidthInCharsToPixels(20));
+      colDef.setDefaultColumnWidth(_pc.convertWidthInCharsToPixels(10));
       colDef.setIsDefaultColumn();
       colDef.setIsColumnMoveable(false);
       colDef.setCanModifyVisibility(false);
@@ -739,7 +739,7 @@ public class PrefPageMap25_Map3_Color extends PreferencePage implements IWorkben
       colDef.setColumnLabel(Messages.Pref_Map3Color_Column_MinValue_Label);
       colDef.setColumnHeaderText(Messages.Pref_Map3Color_Column_MinValue_Header);
       colDef.setColumnHeaderToolTipText(Messages.Pref_Map3Color_Column_MinValue_Label);
-      colDef.setDefaultColumnWidth(_pc.convertWidthInCharsToPixels(8));
+      colDef.setDefaultColumnWidth(_pc.convertWidthInCharsToPixels(6));
       colDef.setIsDefaultColumn();
       colDef.setLabelProvider(new CellLabelProvider() {
          @Override
@@ -775,7 +775,7 @@ public class PrefPageMap25_Map3_Color extends PreferencePage implements IWorkben
 
       colDef.setColumnLabel(Messages.Pref_Map3Color_Column_Colors);
       colDef.setColumnHeaderText(Messages.Pref_Map3Color_Column_Colors);
-      colDef.setDefaultColumnWidth(_pc.convertWidthInCharsToPixels(20));
+      colDef.setDefaultColumnWidth(_pc.convertWidthInCharsToPixels(10));
       colDef.setIsDefaultColumn();
       colDef.setIsColumnMoveable(false);
       colDef.setCanModifyVisibility(false);
@@ -797,7 +797,7 @@ public class PrefPageMap25_Map3_Color extends PreferencePage implements IWorkben
       colDef.setColumnLabel(Messages.Pref_Map3Color_Column_MaxValue_Label);
       colDef.setColumnHeaderText(Messages.Pref_Map3Color_Column_MaxValue_Header);
       colDef.setColumnHeaderToolTipText(Messages.Pref_Map3Color_Column_MaxValue_Label);
-      colDef.setDefaultColumnWidth(_pc.convertWidthInCharsToPixels(8));
+      colDef.setDefaultColumnWidth(_pc.convertWidthInCharsToPixels(6));
       colDef.setIsDefaultColumn();
       colDef.setLabelProvider(new CellLabelProvider() {
          @Override
@@ -905,7 +905,7 @@ public class PrefPageMap25_Map3_Color extends PreferencePage implements IWorkben
       colDef.setColumnLabel(Messages.Pref_Map3Color_Column_Id_Label);
       colDef.setColumnHeaderText(Messages.Pref_Map3Color_Column_Id_Header);
       colDef.setColumnHeaderToolTipText(Messages.Pref_Map3Color_Column_Id_Tooltip);
-      colDef.setDefaultColumnWidth(_pc.convertWidthInCharsToPixels(10));
+      colDef.setDefaultColumnWidth(_pc.convertWidthInCharsToPixels(6));
 
       colDef.setLabelProvider(new CellLabelProvider() {
          @Override

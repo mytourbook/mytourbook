@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2021 Wolfgang Schramm and Contributors
+ * Copyright (C) 2021, 2025 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -41,15 +41,15 @@ public class ChartImages {
 
    public static final String MouseWheelMode_Selection          = "mouse-wheel-mode-selection.png";          //$NON-NLS-1$
    public static final String MouseWheelMode_Selection_Disabled = "mouse-wheel-mode-selection-disabled.png"; //$NON-NLS-1$
-   public static final String MouseWheelMode_Zoom               = "mouse-wheel-mode-zoom.png";               //$NON-NLS-1$
-   public static final String MouseWheelMode_Zoom_Disabled      = "mouse-wheel-mode-zoom-disabled.png";      //$NON-NLS-1$
+   public static final String MouseWheelMode_Zoom               = "mouse-wheel-mode-zoom.svg";               //$NON-NLS-1$
+   public static final String MouseWheelMode_Zoom_Disabled      = "mouse-wheel-mode-zoom-disabled.svg";      //$NON-NLS-1$
 
    public static final String Zoom_FitToWindow                  = "zoom-fit-to-window.png";                  //$NON-NLS-1$
    public static final String Zoom_FitToWindow_Disabled         = "zoom-fit-to-window-disabled.png";         //$NON-NLS-1$
-   public static final String Zoom_In                           = "zoom-in.png";                             //$NON-NLS-1$
-   public static final String Zoom_In_Disabled                  = "zoom-in-disabled.png";                    //$NON-NLS-1$
-   public static final String Zoom_Out                          = "zoom-out.png";                            //$NON-NLS-1$
-   public static final String Zoom_Out_Disabled                 = "zoom-out-disabled.png";                   //$NON-NLS-1$
+   public static final String Zoom_In                           = "zoom-in.svg";                             //$NON-NLS-1$
+   public static final String Zoom_In_Disabled                  = "zoom-in-disabled.svg";                    //$NON-NLS-1$
+   public static final String Zoom_Out                          = "zoom-out.svg";                            //$NON-NLS-1$
+   public static final String Zoom_Out_Disabled                 = "zoom-out-disabled.svt";                   //$NON-NLS-1$
 
    private ChartImages() {}
 }

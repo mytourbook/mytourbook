@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2023 Wolfgang Schramm and Contributors
+ * Copyright (C) 2023, 2025 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -25,13 +25,13 @@ public class CommonImages {
    public static final String App_Close                    = "app-close.png";                             //$NON-NLS-1$
    public static final String App_Copy                     = "app-copy.png";                              //$NON-NLS-1$
    public static final String App_Copy_Disabled            = "app-copy-disabled.png";                     //$NON-NLS-1$
-   public static final String App_CollapseAll              = "collapseall.png";                           //$NON-NLS-1$
-   public static final String App_CollapseAll_Disabled     = "collapseall-disabled.png";                  //$NON-NLS-1$
+   public static final String App_CollapseAll              = "collapseall.svg";                           //$NON-NLS-1$
+   public static final String App_CollapseAll_Disabled     = "collapseall-disabled.svg";                  //$NON-NLS-1$
    public static final String App_Download                 = "app-download.png";                          //$NON-NLS-1$
    public static final String App_Download_Disabled        = "app-download-disabled.png";                 //$NON-NLS-1$
    public static final String App_EmptyIcon_Placeholder    = "_empty16.png";                              //$NON-NLS-1$
-   public static final String App_ExpandAll                = "expandall.png";                             //$NON-NLS-1$
-   public static final String App_ExpandAll_Disabled       = "expandall-disabled.png";                    //$NON-NLS-1$
+   public static final String App_ExpandAll                = "expandall.svg";                             //$NON-NLS-1$
+   public static final String App_ExpandAll_Disabled       = "expandall-disabled.svg";                    //$NON-NLS-1$
    public static final String App_Filter                   = "app-filter.png";                            //$NON-NLS-1$
    public static final String App_Filter_Disabled          = "app-filter-disabled.png";                   //$NON-NLS-1$
    public static final String App_KeepOpen                 = "app-keep-open.png";                         //$NON-NLS-1$
