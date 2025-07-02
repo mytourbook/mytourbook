@@ -72,15 +72,15 @@
      borderopacity="1.0"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="11.313708"
-     inkscape:cx="93.824235"
-     inkscape:cy="312.09927"
+     inkscape:zoom="2.828427"
+     inkscape:cx="166.1701"
+     inkscape:cy="399.8689"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
      showgrid="true"
-     inkscape:window-width="3170"
+     inkscape:window-width="2198"
      inkscape:window-height="2104"
-     inkscape:window-x="138"
+     inkscape:window-x="236"
      inkscape:window-y="0"
      inkscape:window-maximized="0"
      inkscape:document-rotation="0"
@@ -2637,5 +2637,101 @@
          inkscape:export-xdpi="96"
          inkscape:export-ydpi="96" />
     </g>
+    <rect
+       style="fill:none;stroke:#ff0000;stroke-width:1;stroke-linecap:square;stroke-miterlimit:3;stroke-opacity:1;paint-order:markers fill stroke"
+       id="rect2"
+       width="39"
+       height="39"
+       x="35.5"
+       y="365.5"
+       inkscape:export-filename="test-cursor-1.png"
+       inkscape:export-xdpi="96"
+       inkscape:export-ydpi="96" />
+    <rect
+       style="fill:none;stroke:#ff0000;stroke-width:1;stroke-linecap:square;stroke-miterlimit:3;stroke-opacity:1;paint-order:markers fill stroke"
+       id="rect3"
+       width="0.99999905"
+       height="1"
+       x="54.5"
+       y="384.5" />
+    <ellipse
+       style="fill:none;stroke:#ff0000;stroke-width:0.999999;stroke-linecap:square;stroke-miterlimit:3;stroke-opacity:1;paint-order:markers fill stroke"
+       id="path3"
+       cx="55"
+       cy="385"
+       rx="14.500001"
+       ry="14.5" />
+    <rect
+       style="display:inline;fill:none;stroke:#0011ff;stroke-width:1;stroke-linecap:square;stroke-miterlimit:3;stroke-opacity:1;paint-order:markers fill stroke"
+       id="rect2-4"
+       width="39"
+       height="39"
+       x="100.5"
+       y="365.5"
+       inkscape:export-filename="test-cursor-2.png"
+       inkscape:export-xdpi="96"
+       inkscape:export-ydpi="96" />
+    <rect
+       style="display:inline;fill:none;stroke:#0011ff;stroke-width:1;stroke-linecap:square;stroke-miterlimit:3;stroke-opacity:1;paint-order:markers fill stroke"
+       id="rect3-0"
+       width="0.99999905"
+       height="1"
+       x="119.5"
+       y="384.5" />
+    <ellipse
+       style="display:inline;fill:none;stroke:#0011ff;stroke-width:0.999999;stroke-linecap:square;stroke-miterlimit:3;stroke-opacity:1;paint-order:markers fill stroke"
+       id="path3-9"
+       cx="120"
+       cy="385"
+       ry="14.5"
+       rx="14.500001" />
+    <rect
+       style="display:inline;fill:none;stroke:#09a90b;stroke-width:1;stroke-linecap:square;stroke-miterlimit:3;stroke-opacity:1;paint-order:markers fill stroke"
+       id="rect2-8"
+       width="39"
+       height="39"
+       x="165.5"
+       y="365.5"
+       inkscape:export-filename="test-cursor-3.png"
+       inkscape:export-xdpi="96"
+       inkscape:export-ydpi="96" />
+    <rect
+       style="display:inline;fill:none;stroke:#09a90b;stroke-width:1;stroke-linecap:square;stroke-miterlimit:3;stroke-opacity:1;paint-order:markers fill stroke"
+       id="rect3-8"
+       width="0.99999905"
+       height="1"
+       x="184.5"
+       y="384.5" />
+    <ellipse
+       style="display:inline;fill:none;stroke:#09a90b;stroke-width:0.999999;stroke-linecap:square;stroke-miterlimit:3;stroke-opacity:1;paint-order:markers fill stroke"
+       id="path3-2"
+       cx="185"
+       cy="385"
+       rx="14.500001"
+       ry="14.5" />
+    <rect
+       style="display:inline;fill:none;stroke:#ff00bc;stroke-width:1;stroke-linecap:square;stroke-miterlimit:3;stroke-opacity:1;paint-order:markers fill stroke"
+       id="rect2-55"
+       width="39"
+       height="39"
+       x="230.5"
+       y="365.5"
+       inkscape:export-filename="test-cursor-4.png"
+       inkscape:export-xdpi="96"
+       inkscape:export-ydpi="96" />
+    <rect
+       style="display:inline;fill:none;stroke:#ff00bc;stroke-width:1;stroke-linecap:square;stroke-miterlimit:3;stroke-opacity:1;paint-order:markers fill stroke"
+       id="rect3-1"
+       width="0.99999905"
+       height="1"
+       x="249.5"
+       y="384.5" />
+    <ellipse
+       style="display:inline;fill:none;stroke:#ff00bc;stroke-width:0.999999;stroke-linecap:square;stroke-miterlimit:3;stroke-opacity:1;paint-order:markers fill stroke"
+       id="path3-7"
+       cx="250"
+       cy="385"
+       rx="14.500001"
+       ry="14.5" />
   </g>
 </svg>
