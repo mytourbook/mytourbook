@@ -42,7 +42,10 @@ public class ActionTourColor extends Action {
       setToolTipText(toolTipText);
 
       setImageDescriptor(TourbookPlugin.getThemedImageDescriptor(imageEnabled));
-      setDisabledImageDescriptor(TourbookPlugin.getThemedImageDescriptor(imageDisabled));
+
+      if (imageDisabled != null) {
+         setDisabledImageDescriptor(TourbookPlugin.getThemedImageDescriptor(imageDisabled));
+      }
    }
 
    @Override

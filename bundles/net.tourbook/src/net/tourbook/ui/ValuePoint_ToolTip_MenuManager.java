@@ -117,21 +117,21 @@ public class ValuePoint_ToolTip_MenuManager {
    private ActionValueItem               _actionValue_TimeSlices;
    private ActionValueItem               _actionValue_TourCompare_Result;
 
-   private ActionValueItem   _actionValue_RunDyn_StanceTime;
-   private ActionValueItem   _actionValue_RunDyn_StanceTimeBalance;
-   private ActionValueItem   _actionValue_RunDyn_StepLength;
-   private ActionValueItem   _actionValue_RunDyn_VerticalOscillation;
-   private ActionValueItem   _actionValue_RunDyn_VerticalRatio;
+   private ActionValueItem               _actionValue_RunDyn_StanceTime;
+   private ActionValueItem               _actionValue_RunDyn_StanceTimeBalance;
+   private ActionValueItem               _actionValue_RunDyn_StepLength;
+   private ActionValueItem               _actionValue_RunDyn_VerticalOscillation;
+   private ActionValueItem               _actionValue_RunDyn_VerticalRatio;
 
-   private Action            _actionPinLocation_Header;
-   private ActionPinLocation _actionPinLocation_Screen;
-   private ActionPinLocation _actionPinLocation_TopRight;
-   private ActionPinLocation _actionPinLocation_TopLeft;
-   private ActionPinLocation _actionPinLocation_BottomLeft;
-   private ActionPinLocation _actionPinLocation_BottomRight;
-   private ActionPinLocation _actionPinLocation_MouseXPosition;
+   private Action                        _actionPinLocation_Header;
+   private ActionPinLocation             _actionPinLocation_Screen;
+   private ActionPinLocation             _actionPinLocation_TopRight;
+   private ActionPinLocation             _actionPinLocation_TopLeft;
+   private ActionPinLocation             _actionPinLocation_BottomLeft;
+   private ActionPinLocation             _actionPinLocation_BottomRight;
+   private ActionPinLocation             _actionPinLocation_MouseXPosition;
 
-   public boolean            canBeDisplayed_ChartZoomFactor = true;
+   public boolean                        canBeDisplayed_ChartZoomFactor           = true;
 
    private final class ActionCloseTTContextMenu extends Action {
 
@@ -245,12 +245,10 @@ public class ValuePoint_ToolTip_MenuManager {
       private long            _graphId;
 
       private ImageDescriptor _graphImage;
-      private ImageDescriptor _graphImageDisabled;
 
       public ActionValueItem(final long graphId,
                              final String name,
-                             final String graphImageName,
-                             final String graphImageNameDisabled) {
+                             final String graphImageName) {
 
          super(name, AS_CHECK_BOX);
 
@@ -258,10 +256,6 @@ public class ValuePoint_ToolTip_MenuManager {
 
          if (graphImageName != null) {
             _graphImage = TourbookPlugin.getThemedImageDescriptor(graphImageName);
-         }
-
-         if (graphImageNameDisabled != null) {
-            _graphImageDisabled = TourbookPlugin.getThemedImageDescriptor(graphImageNameDisabled);
          }
       }
 
@@ -277,7 +271,7 @@ public class ValuePoint_ToolTip_MenuManager {
          // show checked state only when also enabled
          setChecked(isChecked && isEnabled);
 
-         setImageDescriptor(isEnabled ? _graphImage : _graphImageDisabled);
+         setImageDescriptor(_graphImage);
       }
    }
 
@@ -355,158 +349,132 @@ public class ValuePoint_ToolTip_MenuManager {
       _actionValue_Header = new ActionValueItem(
             -1,
             Messages.Tooltip_ValuePoint_Action_Value_Header,
-            null,
             null);
 
       _actionValue_TimeSlices = new ActionValueItem(
             VALUE_ID_TIME_SLICES,
             Messages.Tooltip_ValuePoint_Action_Value_TimeSlices,
-            null,
             null);
 
       _actionValue_ChartZoomFactor = new ActionValueItem(
             VALUE_ID_CHART_ZOOM_FACTOR,
             Messages.Tooltip_ValuePoint_Action_Value_ChartZoomFactor,
-            null,
             null);
 
       _actionValue_TimeDuration = new ActionValueItem(
             VALUE_ID_TIME_DURATION,
             Messages.Tooltip_ValuePoint_Action_Value_TimeDuration,
-            null,
             null);
 
       _actionValue_TimeMoving = new ActionValueItem(
             VALUE_ID_TIME_MOVING,
             Messages.Tooltip_ValuePoint_Action_Value_TimeMoving,
-            null,
             null);
 
       _actionValue_TimeRecorded = new ActionValueItem(
             VALUE_ID_TIME_RECORDED,
             Messages.Tooltip_ValuePoint_Action_Value_TimeRecorded,
-            null,
             null);
 
       _actionValue_TimeOfDay = new ActionValueItem(
             VALUE_ID_TIME_OF_DAY,
             Messages.Tooltip_ValuePoint_Action_Value_TimeOfDay,
-            null,
             null);
 
       _actionValue_Distance = new ActionValueItem(
             VALUE_ID_DISTANCE,
             Messages.Tooltip_ValuePoint_Action_Value_Distance,
-            null,
             null);
 
       _actionValue_Altitude = new ActionValueItem(
             VALUE_ID_ALTITUDE,
             Messages.Tooltip_ValuePoint_Action_Value_Altitude,
-            Images.Graph_Elevation,
-            Images.Graph_Elevation_Disabled);
+            Images.Graph_Elevation);
 
       _actionValue_Altimeter = new ActionValueItem(
             VALUE_ID_ALTIMETER,
             Messages.Tooltip_ValuePoint_Action_Value_Altimeter,
-            Images.Graph_Altimeter,
-            Images.Graph_Altimeter_Disabled);
+            Images.Graph_Altimeter);
 
       _actionValue_Cadence = new ActionValueItem(
             VALUE_ID_CADENCE,
             Messages.Tooltip_ValuePoint_Action_Value_Cadence,
-            Images.Graph_Cadence,
-            Images.Graph_Cadence_Disabled);
+            Images.Graph_Cadence);
 
       _actionValue_Gears = new ActionValueItem(
             VALUE_ID_GEARS,
             Messages.Tooltip_ValuePoint_Action_Value_Gears,
-            Images.Graph_Gears,
-            Images.Graph_Gears_Disabled);
+            Images.Graph_Gears);
 
       _actionValue_Gradient = new ActionValueItem(
             VALUE_ID_GRADIENT,
             Messages.Tooltip_ValuePoint_Action_Value_Gradient,
-            Images.Graph_Gradient,
-            Images.Graph_Gradient_Disabled);
+            Images.Graph_Gradient);
 
       _actionValue_Pace = new ActionValueItem(
             VALUE_ID_PACE,
             Messages.Tooltip_ValuePoint_Action_Value_Pace,
-            Images.Graph_Pace,
-            Images.Graph_Pace_Disabled);
+            Images.Graph_Pace);
 
       _actionValue_Pace_Summarized = new ActionValueItem(
             VALUE_ID_PACE_SUMMARIZED,
             Messages.Tooltip_ValuePoint_Action_Value_Pace_Summarized,
-            Images.Graph_Pace_Summarized,
-            Images.Graph_Pace_Summarized_Disabled);
+            Images.Graph_Pace_Summarized);
 
       _actionValue_Power = new ActionValueItem(
             VALUE_ID_POWER,
             Messages.Tooltip_ValuePoint_Action_Value_Power,
-            Images.Graph_Power,
-            Images.Graph_Power_Disabled);
+            Images.Graph_Power);
 
       _actionValue_Pulse = new ActionValueItem(
             VALUE_ID_PULSE,
             Messages.Tooltip_ValuePoint_Action_Value_Pulse,
-            Images.Graph_Heartbeat,
-            Images.Graph_Heartbeat_Disabled);
+            Images.Graph_Heartbeat);
 
       _actionValue_Speed = new ActionValueItem(
             VALUE_ID_SPEED,
             Messages.Tooltip_ValuePoint_Action_Value_Speed,
-            Images.Graph_Speed,
-            Images.Graph_Speed_Disabled);
+            Images.Graph_Speed);
 
       _actionValue_Speed_Summarized = new ActionValueItem(
             VALUE_ID_SPEED_SUMMARIZED,
             Messages.Tooltip_ValuePoint_Action_Value_Speed_Summarized,
-            Images.Graph_Speed_Summarized,
-            Images.Graph_Speed_Summarized_Disabled);
+            Images.Graph_Speed_Summarized);
 
       _actionValue_Temperature = new ActionValueItem(
             VALUE_ID_TEMPERATURE,
             Messages.Tooltip_ValuePoint_Action_Value_Temperature,
-            Images.Graph_Temperature,
-            Images.Graph_Temperature_Disabled);
+            Images.Graph_Temperature);
 
       _actionValue_TourCompare_Result = new ActionValueItem(
             VALUE_ID_TOUR_COMPARE_RESULT,
             Messages.Tooltip_ValuePoint_Action_Value_TourCompareResult,
-            Images.Graph_TourCompare_ByElevation,
-            Images.Graph_TourCompare_Disabled);
+            Images.Graph_TourCompare_ByElevation);
 
       _actionValue_RunDyn_StanceTime = new ActionValueItem(
             VALUE_ID_RUN_DYN_STANCE_TIME,
             Messages.Tooltip_ValuePoint_Action_Value_RunDyn_StanceTime,
-            Images.Graph_RunDyn_StanceTime,
-            Images.Graph_RunDyn_StanceTime_Disabled);
+            Images.Graph_RunDyn_StanceTime);
 
       _actionValue_RunDyn_StanceTimeBalance = new ActionValueItem(
             VALUE_ID_RUN_DYN_STANCE_TIME_BALANCED,
             Messages.Tooltip_ValuePoint_Action_Value_RunDyn_StanceTimeBalance,
-            Images.Graph_RunDyn_StanceTimeBalance,
-            Images.Graph_RunDyn_StanceTimeBalance_Disabled);
+            Images.Graph_RunDyn_StanceTimeBalance);
 
       _actionValue_RunDyn_StepLength = new ActionValueItem(
             VALUE_ID_RUN_DYN_STEP_LENGTH,
             Messages.Tooltip_ValuePoint_Action_Value_RunDyn_StepLength,
-            Images.Graph_RunDyn_StepLength,
-            Images.Graph_RunDyn_StepLength_Disabled);
+            Images.Graph_RunDyn_StepLength);
 
       _actionValue_RunDyn_VerticalOscillation = new ActionValueItem(
             VALUE_ID_RUN_DYN_VERTICAL_OSCILLATION,
             Messages.Tooltip_ValuePoint_Action_Value_RunDyn_VerticalOscillation,
-            Images.Graph_RunDyn_VerticalOscillation,
-            Images.Graph_RunDyn_VerticalOscillation_Disabled);
+            Images.Graph_RunDyn_VerticalOscillation);
 
       _actionValue_RunDyn_VerticalRatio = new ActionValueItem(
             VALUE_ID_RUN_DYN_VERTICAL_RATIO,
             Messages.Tooltip_ValuePoint_Action_Value_RunDyn_VerticalRatio,
-            Images.Graph_RunDyn_VerticalRatio,
-            Images.Graph_RunDyn_VerticalRatio_Disabled);
+            Images.Graph_RunDyn_VerticalRatio);
    }
 
    private void createPinActions() {

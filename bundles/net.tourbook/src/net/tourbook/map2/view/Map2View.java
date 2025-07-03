@@ -646,7 +646,7 @@ public class Map2View extends ViewPart implements
       public ActionMap2_Graphs() {
 
          super(TourbookPlugin.getImageDescriptor(Images.Graph),
-               TourbookPlugin.getImageDescriptor(Images.Graph_Disabled));
+               null);
 
          setId(GRAPH_CONTRIBUTION_ID_SLIDEOUT);
       }
@@ -2652,49 +2652,49 @@ public class Map2View extends ViewPart implements
             MapGraphId.Altitude,
             Messages.map_action_tour_color_altitude_tooltip,
             Images.Graph_Elevation,
-            Images.Graph_Elevation_Disabled);
+            null);
 
       _actionTourColor_Gradient = new ActionTourColor(
             this,
             MapGraphId.Gradient,
             Messages.map_action_tour_color_gradient_tooltip,
             Images.Graph_Gradient,
-            Images.Graph_Gradient_Disabled);
+            null);
 
       _actionTourColor_Power = new ActionTourColor(
             this,
             MapGraphId.Power,
             Messages.map_action_tour_color_power_tooltip,
             Images.Graph_Power,
-            Images.Graph_Power_Disabled);
+            null);
 
       _actionTourColor_Pulse = new ActionTourColor(
             this,
             MapGraphId.Pulse,
             Messages.map_action_tour_color_pulse_tooltip,
             Images.Graph_Heartbeat,
-            Images.Graph_Heartbeat_Disabled);
+            null);
 
       _actionTourColor_Speed = new ActionTourColor(
             this,
             MapGraphId.Speed,
             Messages.map_action_tour_color_speed_tooltip,
             Images.Graph_Speed,
-            Images.Graph_Speed_Disabled);
+            null);
 
       _actionTourColor_Pace = new ActionTourColor(
             this,
             MapGraphId.Pace,
             Messages.map_action_tour_color_pace_tooltip,
             Images.Graph_Pace,
-            Images.Graph_Pace_Disabled);
+            null);
 
       _actionTourColor_RunDyn_StepLength = new ActionTourColor(
             this,
             MapGraphId.RunDyn_StepLength,
             Messages.Tour_Action_RunDyn_StepLength_Tooltip,
             Images.Graph_RunDyn_StepLength,
-            Images.Graph_RunDyn_StepLength_Disabled);
+            null);
 
       _actionTourColor_HrZone = new ActionTourColor(
             this,

@@ -593,60 +593,60 @@ public class UI {
    /*
     * Labels for the different measurement systems
     */
-   public static final String                   UNIT_ALTIMETER_M_H             = "m/h";                                       //$NON-NLS-1$
-   public static final String                   UNIT_ALTIMETER_FT_H            = "ft/h";                                      //$NON-NLS-1$
-   public static final String                   UNIT_DISTANCE_KM               = "km";                                        //$NON-NLS-1$
-   public static final String                   UNIT_DISTANCE_MI               = "mi";                                        //$NON-NLS-1$
-   public static final String                   UNIT_DISTANCE_NMI              = "nmi";                                       //$NON-NLS-1$
-   public static final String                   UNIT_DISTANCE_YARD             = "yd";                                        //$NON-NLS-1$
-   public static final String                   UNIT_DISTANCE_INCH             = "inch";                                      //$NON-NLS-1$
-   public static final String                   UNIT_ELEVATION_M               = "m";                                         //$NON-NLS-1$
-   public static final String                   UNIT_ELEVATION_FT              = "ft";                                        //$NON-NLS-1$
-   public static final String                   UNIT_FLUIDS_ML                 = "mL";                                        //$NON-NLS-1$
-   public static final String                   UNIT_FLUIDS_L                  = "L";                                         //$NON-NLS-1$
-   public static final String                   UNIT_HEIGHT_FT                 = "ft";                                        //$NON-NLS-1$
-   public static final String                   UNIT_HEIGHT_IN                 = "in";                                        //$NON-NLS-1$
-   public static final String                   UNIT_JOULE                     = "J";                                         //$NON-NLS-1$
-   public static final String                   UNIT_JOULE_KILO                = "kJ";                                        //$NON-NLS-1$
-   public static final String                   UNIT_JOULE_MEGA                = "MJ";                                        //$NON-NLS-1$
-   public static final String                   UNIT_KBYTE                     = "kByte";                                     //$NON-NLS-1$
-   public static final String                   UNIT_MBYTE                     = "MByte";                                     //$NON-NLS-1$
-   public static final String                   UNIT_METER                     = "m";                                         //$NON-NLS-1$
-   public static final String                   UNIT_MM                        = "mm";                                        //$NON-NLS-1$
-   public static final String                   UNIT_MS                        = "ms";                                        //$NON-NLS-1$
-   public static final String                   UNIT_PERCENT                   = "%";                                         //$NON-NLS-1$
-   public static final String                   UNIT_POWER                     = "Watt";                                      //$NON-NLS-1$
-   public static final String                   UNIT_POWER_SHORT               = "W";                                         //$NON-NLS-1$
-   public static final String                   UNIT_POWER_TO_WEIGHT_RATIO     = "W/Kg";                                      //$NON-NLS-1$
-   public static final String                   UNIT_PACE_MIN_P_KM             = "min/km";                                    //$NON-NLS-1$
-   public static final String                   UNIT_PACE_MIN_P_MILE           = "min/mi";                                    //$NON-NLS-1$
-   public static final String                   UNIT_PRESSURE_MBAR             = "mbar";                                      //$NON-NLS-1$
-   public static final String                   UNIT_PRESSURE_INHG             = "inHg";                                      //$NON-NLS-1$
-   public static final String                   UNIT_SPEED_KM_H                = "km/h";                                      //$NON-NLS-1$
-   public static final String                   UNIT_SPEED_KNOT                = "knot";                                      //$NON-NLS-1$
-   public static final String                   UNIT_SPEED_MPH                 = "mph";                                       //$NON-NLS-1$
-   public static final String                   UNIT_TEMPERATURE_C             = "\u00B0C";                                   //$NON-NLS-1$
-   public static final String                   UNIT_TEMPERATURE_F             = "\u00B0F";                                   //$NON-NLS-1$
-   public static final String                   UNIT_VOLT                      = "V";                                         //$NON-NLS-1$
-   public static final String                   UNIT_VOLTAGE                   = "Volt";                                      //$NON-NLS-1$
-   public static final String                   UNIT_WEIGHT_G                  = "g";                                         //$NON-NLS-1$
-   public static final String                   UNIT_WEIGHT_KG                 = "kg";                                        //$NON-NLS-1$
-   public static final String                   UNIT_WEIGHT_LBS                = "lbs";                                       //$NON-NLS-1$
-   public static final String                   UNIT_WEIGHT_MG                 = "mg";                                        //$NON-NLS-1$
+   public static final String                   UNIT_ALTIMETER_M_H         = "m/h";                      //$NON-NLS-1$
+   public static final String                   UNIT_ALTIMETER_FT_H        = "ft/h";                     //$NON-NLS-1$
+   public static final String                   UNIT_DISTANCE_KM           = "km";                       //$NON-NLS-1$
+   public static final String                   UNIT_DISTANCE_MI           = "mi";                       //$NON-NLS-1$
+   public static final String                   UNIT_DISTANCE_NMI          = "nmi";                      //$NON-NLS-1$
+   public static final String                   UNIT_DISTANCE_YARD         = "yd";                       //$NON-NLS-1$
+   public static final String                   UNIT_DISTANCE_INCH         = "inch";                     //$NON-NLS-1$
+   public static final String                   UNIT_ELEVATION_M           = "m";                        //$NON-NLS-1$
+   public static final String                   UNIT_ELEVATION_FT          = "ft";                       //$NON-NLS-1$
+   public static final String                   UNIT_FLUIDS_ML             = "mL";                       //$NON-NLS-1$
+   public static final String                   UNIT_FLUIDS_L              = "L";                        //$NON-NLS-1$
+   public static final String                   UNIT_HEIGHT_FT             = "ft";                       //$NON-NLS-1$
+   public static final String                   UNIT_HEIGHT_IN             = "in";                       //$NON-NLS-1$
+   public static final String                   UNIT_JOULE                 = "J";                        //$NON-NLS-1$
+   public static final String                   UNIT_JOULE_KILO            = "kJ";                       //$NON-NLS-1$
+   public static final String                   UNIT_JOULE_MEGA            = "MJ";                       //$NON-NLS-1$
+   public static final String                   UNIT_KBYTE                 = "kByte";                    //$NON-NLS-1$
+   public static final String                   UNIT_MBYTE                 = "MByte";                    //$NON-NLS-1$
+   public static final String                   UNIT_METER                 = "m";                        //$NON-NLS-1$
+   public static final String                   UNIT_MM                    = "mm";                       //$NON-NLS-1$
+   public static final String                   UNIT_MS                    = "ms";                       //$NON-NLS-1$
+   public static final String                   UNIT_PERCENT               = "%";                        //$NON-NLS-1$
+   public static final String                   UNIT_POWER                 = "Watt";                     //$NON-NLS-1$
+   public static final String                   UNIT_POWER_SHORT           = "W";                        //$NON-NLS-1$
+   public static final String                   UNIT_POWER_TO_WEIGHT_RATIO = "W/Kg";                     //$NON-NLS-1$
+   public static final String                   UNIT_PACE_MIN_P_KM         = "min/km";                   //$NON-NLS-1$
+   public static final String                   UNIT_PACE_MIN_P_MILE       = "min/mi";                   //$NON-NLS-1$
+   public static final String                   UNIT_PRESSURE_MBAR         = "mbar";                     //$NON-NLS-1$
+   public static final String                   UNIT_PRESSURE_INHG         = "inHg";                     //$NON-NLS-1$
+   public static final String                   UNIT_SPEED_KM_H            = "km/h";                     //$NON-NLS-1$
+   public static final String                   UNIT_SPEED_KNOT            = "knot";                     //$NON-NLS-1$
+   public static final String                   UNIT_SPEED_MPH             = "mph";                      //$NON-NLS-1$
+   public static final String                   UNIT_TEMPERATURE_C         = "\u00B0C";                  //$NON-NLS-1$
+   public static final String                   UNIT_TEMPERATURE_F         = "\u00B0F";                  //$NON-NLS-1$
+   public static final String                   UNIT_VOLT                  = "V";                        //$NON-NLS-1$
+   public static final String                   UNIT_VOLTAGE               = "Volt";                     //$NON-NLS-1$
+   public static final String                   UNIT_WEIGHT_G              = "g";                        //$NON-NLS-1$
+   public static final String                   UNIT_WEIGHT_KG             = "kg";                       //$NON-NLS-1$
+   public static final String                   UNIT_WEIGHT_LBS            = "lbs";                      //$NON-NLS-1$
+   public static final String                   UNIT_WEIGHT_MG             = "mg";                       //$NON-NLS-1$
 
-   private static final String                  DISTANCE_MILES_1_8             = "1/8";                                       //$NON-NLS-1$
-   private static final String                  DISTANCE_MILES_1_4             = "1/4";                                       //$NON-NLS-1$
-   private static final String                  DISTANCE_MILES_3_8             = "3/8";                                       //$NON-NLS-1$
-   private static final String                  DISTANCE_MILES_1_2             = "1/2";                                       //$NON-NLS-1$
-   private static final String                  DISTANCE_MILES_5_8             = "5/8";                                       //$NON-NLS-1$
-   private static final String                  DISTANCE_MILES_3_4             = "3/4";                                       //$NON-NLS-1$
-   private static final String                  DISTANCE_MILES_7_8             = "7/8";                                       //$NON-NLS-1$
+   private static final String                  DISTANCE_MILES_1_8         = "1/8";                      //$NON-NLS-1$
+   private static final String                  DISTANCE_MILES_1_4         = "1/4";                      //$NON-NLS-1$
+   private static final String                  DISTANCE_MILES_3_8         = "3/8";                      //$NON-NLS-1$
+   private static final String                  DISTANCE_MILES_1_2         = "1/2";                      //$NON-NLS-1$
+   private static final String                  DISTANCE_MILES_5_8         = "5/8";                      //$NON-NLS-1$
+   private static final String                  DISTANCE_MILES_3_4         = "3/4";                      //$NON-NLS-1$
+   private static final String                  DISTANCE_MILES_7_8         = "7/8";                      //$NON-NLS-1$
    //
    public static final PeriodFormatter          DEFAULT_DURATION_FORMATTER;
    public static final PeriodFormatter          DEFAULT_DURATION_FORMATTER_SHORT;
 
-   private static StringBuilder                 _formatterSB                   = new StringBuilder();
-   private static Formatter                     _formatter                     = new Formatter(_formatterSB);
+   private static StringBuilder                 _formatterSB               = new StringBuilder();
+   private static Formatter                     _formatter                 = new Formatter(_formatterSB);
 
    private static FontMetrics                   _dialogFont_Metrics;
    private static org.eclipse.swt.graphics.Font _swtUIDrawingFont;
@@ -667,7 +667,7 @@ public class UI {
 // private static boolean                       IS_SWT_AUTO_SCALE              = SYS_PROP__SWT_AUTO_SCALE_VALUE != NULL;
 
    // this feature is enabled always !!!
-   private static boolean                       IS_SWT_AUTO_SCALE          = true;
+   private static boolean IS_SWT_AUTO_SCALE = true;
 
 // SET_FORMATTING_OFF
 
@@ -805,6 +805,26 @@ public class UI {
       setupFonts_SWTDrawingFonts();
       setupFonts_SWTFontMetrics();
       setupFonts_AWTFonts();
+
+      /**
+       * In addition, the algorithm for the calculation of disabled versions of icons became
+       * configurable. The algorithm can be changed via the system property
+       * org.eclipse.swt.image.disablement with the following options:
+       *
+       * grayed (default): produces a gray-scaled version of the icon, which is aligned with the
+       * existing, pre-generated disabled versions of icons for Eclipse bundles
+       *
+       * desaturated (preview): produces a desaturated version of the icon, comparable to the grayed
+       * version but still keeping some color in it; the configuration of this option may be subject
+       * to change in future releases of Eclipse
+       *
+       * gtk: produces an icon version that conforms with the default disablement algorithm of GTK
+       *
+       * https://eclipse.dev/eclipse/markdown/?f=news/4.36/platform.md#themes-and-styling
+       */
+      System.setProperty("org.eclipse.swt.image.disablement", "grayed");
+//      System.setProperty("org.eclipse.swt.image.disablement", "desaturated");
+//      System.setProperty("org.eclipse.swt.image.disablement", "gtk");
 
       IMAGE_REGISTRY = CommonActivator.getDefault().getImageRegistry();
 

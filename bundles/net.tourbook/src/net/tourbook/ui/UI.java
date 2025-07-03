@@ -180,16 +180,16 @@ public class UI {
       /*
        * Chart and map graphs.
        */
-      createGraphImageInRegistry(MapGraphId.Altimeter,   Images.Graph_Altimeter,    Images.Graph_Altimeter_Disabled);
-      createGraphImageInRegistry(MapGraphId.Altitude,    Images.Graph_Elevation,    Images.Graph_Elevation_Disabled);
-      createGraphImageInRegistry(MapGraphId.Cadence,     Images.Graph_Cadence,      Images.Graph_Cadence_Disabled);
-      createGraphImageInRegistry(MapGraphId.Gradient,    Images.Graph_Gradient,     Images.Graph_Gradient_Disabled);
-      createGraphImageInRegistry(MapGraphId.HrZone,      Images.PulseZones,         Images.PulseZones_Disabled);
-      createGraphImageInRegistry(MapGraphId.Pace,        Images.Graph_Pace,         Images.Graph_Pace_Disabled);
-      createGraphImageInRegistry(MapGraphId.Power,       Images.Graph_Power,        Images.Graph_Power_Disabled);
-      createGraphImageInRegistry(MapGraphId.Pulse,       Images.Graph_Heartbeat,    Images.Graph_Heartbeat_Disabled);
-      createGraphImageInRegistry(MapGraphId.Speed,       Images.Graph_Speed,        Images.Graph_Speed_Disabled);
-      createGraphImageInRegistry(MapGraphId.Temperature, Images.Graph_Temperature,  Images.Graph_Temperature_Disabled);
+      createGraphImageInRegistry(MapGraphId.Altimeter,   Images.Graph_Altimeter);
+      createGraphImageInRegistry(MapGraphId.Altitude,    Images.Graph_Elevation);
+      createGraphImageInRegistry(MapGraphId.Cadence,     Images.Graph_Cadence);
+      createGraphImageInRegistry(MapGraphId.Gradient,    Images.Graph_Gradient);
+      createGraphImageInRegistry(MapGraphId.HrZone,      Images.PulseZones);
+      createGraphImageInRegistry(MapGraphId.Pace,        Images.Graph_Pace);
+      createGraphImageInRegistry(MapGraphId.Power,       Images.Graph_Power);
+      createGraphImageInRegistry(MapGraphId.Pulse,       Images.Graph_Heartbeat);
+      createGraphImageInRegistry(MapGraphId.Speed,       Images.Graph_Speed);
+      createGraphImageInRegistry(MapGraphId.Temperature, Images.Graph_Temperature);
 
       // tour type images
       IMAGE_REGISTRY.put(IMAGE_TOUR_TYPE_FILTER,               TourbookPlugin.getThemedImageDescriptor(Images.TourType_Filter));
@@ -419,16 +419,11 @@ public class UI {
    }
 
    private static void createGraphImageInRegistry(final MapGraphId graphId,
-                                                  final String graphImageName,
-                                                  final String graphImageName_Disabled) {
+                                                  final String graphImageName) {
 
       // create enabled image
       IMAGE_REGISTRY.put(createGraphImage_Name(graphId),
             TourbookPlugin.getThemedImageDescriptor(graphImageName));
-
-      // create disabled image
-      IMAGE_REGISTRY.put(createGraphImage_NameDisabled(graphId),
-            TourbookPlugin.getThemedImageDescriptor(graphImageName_Disabled));
    }
 
    /**
@@ -658,32 +653,6 @@ public class UI {
 
       default:
          return TourbookPlugin.getThemedImageDescriptor(Images.Graph_Elevation);
-      }
-   }
-
-   public static ImageDescriptor getGraphImageDescriptor_Disabled(final MapGraphId graphId) {
-
-      switch (graphId) {
-      case Altitude:
-         return TourbookPlugin.getThemedImageDescriptor(Images.Graph_Elevation_Disabled);
-
-      case Gradient:
-         return TourbookPlugin.getThemedImageDescriptor(Images.Graph_Gradient_Disabled);
-
-      case Pace:
-         return TourbookPlugin.getThemedImageDescriptor(Images.Graph_Pace_Disabled);
-
-      case Pulse:
-         return TourbookPlugin.getThemedImageDescriptor(Images.Graph_Heartbeat_Disabled);
-
-      case Speed:
-         return TourbookPlugin.getThemedImageDescriptor(Images.Graph_Speed_Disabled);
-
-      case HrZone:
-         return TourbookPlugin.getThemedImageDescriptor(Images.PulseZones_Disabled);
-
-      default:
-         return TourbookPlugin.getThemedImageDescriptor(Images.Graph_Elevation_Disabled);
       }
    }
 
