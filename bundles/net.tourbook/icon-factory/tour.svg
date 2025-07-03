@@ -5813,15 +5813,15 @@
      inkscape:snap-grids="true"
      inkscape:window-maximized="0"
      inkscape:window-y="1"
-     inkscape:window-x="128"
+     inkscape:window-x="271"
      inkscape:window-height="2104"
      inkscape:window-width="2315"
      showgrid="true"
      inkscape:current-layer="layer1"
      inkscape:document-units="px"
-     inkscape:cy="817.74998"
-     inkscape:cx="313.87499"
-     inkscape:zoom="4.0000001"
+     inkscape:cy="1257.3125"
+     inkscape:cx="264.84374"
+     inkscape:zoom="16"
      inkscape:pageshadow="2"
      inkscape:pageopacity="0.0"
      borderopacity="1.0"
@@ -32118,7 +32118,7 @@
        rx="0"
        inkscape:export-xdpi="95.999863"
        inkscape:export-ydpi="95.999863"
-       inkscape:export-filename="..\icons\copy-blue.png" />
+       inkscape:export-filename="..\icons\copy-blue.svg" />
     <path
        style="display:inline;fill:#c6e3fd;fill-opacity:1;stroke:none;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
        d="m 265.99936,1258.9838 h -10.99873 v 10.9989 h 10.99873 z"
@@ -32178,7 +32178,7 @@
        rx="0"
        inkscape:export-xdpi="95.999863"
        inkscape:export-ydpi="95.999863"
-       inkscape:export-filename="..\icons\copy-blue-dark.png" />
+       inkscape:export-filename="..\icons\copy-blue-dark.svg" />
     <path
        style="display:inline;fill:none;fill-opacity:1;stroke:none;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
        d="m 265.99936,1288.9838 h -10.99873 v 10.9989 h 10.99873 z"
