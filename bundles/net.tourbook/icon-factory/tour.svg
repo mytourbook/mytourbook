@@ -5769,9 +5769,9 @@
      showgrid="true"
      inkscape:current-layer="layer1"
      inkscape:document-units="px"
-     inkscape:cy="304"
-     inkscape:cx="411.5"
-     inkscape:zoom="1"
+     inkscape:cy="556.375"
+     inkscape:cx="326.5"
+     inkscape:zoom="8"
      inkscape:pageshadow="2"
      inkscape:pageopacity="0.0"
      borderopacity="1.0"
@@ -15109,7 +15109,7 @@
     <rect
        inkscape:export-ydpi="96.000092"
        inkscape:export-xdpi="96.000092"
-       inkscape:export-filename="C:\DAT\MT\mytourbook\bundles\net.tourbook\icons\statistics.png"
+       inkscape:export-filename="..\icons\statistics.png"
        y="528.98322"
        x="310"
        height="15.999999"
@@ -15149,7 +15149,7 @@
     <rect
        inkscape:export-ydpi="96.000092"
        inkscape:export-xdpi="96.000092"
-       inkscape:export-filename="C:\DAT\MT\mytourbook\bundles\net.tourbook\icons\statistics-dark.png"
+       inkscape:export-filename="..\icons\statistics-dark.png"
        y="553.9801"
        x="310"
        height="15.999999"
@@ -24946,7 +24946,7 @@
        height="15.999999"
        width="16.000004"
        id="rect4471-81-5-8-1-8-4-3-2-3-0-6"
-       style="color:#000000;display:inline;overflow:visible;visibility:visible;fill:none;fill-opacity:1;stroke:#158cf7;stroke-width:0;stroke-linecap:round;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;marker:none;enable-background:accumulate" />
+       style="color:#000000;display:inline;overflow:visible;visibility:visible;fill:none;fill-opacity:1;stroke:none;stroke-width:0;stroke-linecap:round;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;marker:none;enable-background:accumulate" />
     <path
        inkscape:export-ydpi="96"
        inkscape:export-xdpi="96"
@@ -24964,7 +24964,7 @@
        height="15.999999"
        width="16.000004"
        id="rect4471-81-5-8-1-8-4-3-2-3-1-8-1"
-       style="color:#000000;display:inline;overflow:visible;visibility:visible;fill:none;fill-opacity:1;stroke:#158cf7;stroke-width:0;stroke-linecap:round;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;marker:none;enable-background:accumulate" />
+       style="color:#000000;display:inline;overflow:visible;visibility:visible;fill:none;fill-opacity:1;stroke:none;stroke-width:0;stroke-linecap:round;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;marker:none;enable-background:accumulate" />
     <path
        id="rect8923-8-8-11"
        style="display:inline;fill:#6bb0ff;fill-opacity:1;stroke-width:1;stroke-linecap:round"
@@ -25046,7 +25046,7 @@
        height="15.999999"
        width="16.000004"
        id="rect4471-81-5-8-1-8-4-3-2-3-1-8-1-4"
-       style="color:#000000;display:inline;overflow:visible;visibility:visible;fill:none;fill-opacity:1;stroke:#158cf7;stroke-width:0;stroke-linecap:round;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;marker:none;enable-background:accumulate" />
+       style="color:#000000;display:inline;overflow:visible;visibility:visible;fill:none;fill-opacity:1;stroke:none;stroke-width:0;stroke-linecap:round;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;marker:none;enable-background:accumulate" />
     <path
        id="rect8923-8-8-11-8"
        style="display:inline;fill:#6bb0ff;fill-opacity:1;stroke-width:1;stroke-linecap:round"
@@ -25128,7 +25128,7 @@
        height="15.999999"
        width="16.000004"
        id="rect4471-81-5-8-1-8-4-3-2-3-1-8-1-4-1"
-       style="color:#000000;display:inline;overflow:visible;visibility:visible;fill:none;fill-opacity:1;stroke:#158cf7;stroke-width:0;stroke-linecap:round;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;marker:none;enable-background:accumulate" />
+       style="color:#000000;display:inline;overflow:visible;visibility:visible;fill:none;fill-opacity:1;stroke:none;stroke-width:0;stroke-linecap:round;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;marker:none;enable-background:accumulate" />
     <path
        inkscape:export-ydpi="96"
        inkscape:export-xdpi="96"

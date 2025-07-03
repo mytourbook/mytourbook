@@ -36,8 +36,8 @@ public class Images {
    /*
     * These images are not translated
     */
-   public static final String App_Add                                    = "app-add.png";                                         //$NON-NLS-1$
-   public static final String App_Add_2x                                 = "app-add-2x.png";                                      //$NON-NLS-1$
+   public static final String App_Add                                    = "app-add.svg";                                         //$NON-NLS-1$
+   public static final String App_Add_2x                                 = "app-add-2x.svg";                                      //$NON-NLS-1$
    public static final String App_Cancel_2                               = "16px-Crystal_Clear_action_button_cancel.png";         //$NON-NLS-1$
    public static final String App_Copy_Themed                            = "copy-blue.svg";                                       //$NON-NLS-1$
    public static final String App_Delete                                 = "delete.png";                                          //$NON-NLS-1$
