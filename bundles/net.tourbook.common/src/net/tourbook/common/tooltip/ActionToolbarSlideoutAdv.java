@@ -34,7 +34,7 @@ import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.swt.widgets.ToolItem;
 
 /**
- * Action to open a slideout in a toolbar.
+ * Action to open a slideout in a toolbar
  */
 public abstract class ActionToolbarSlideoutAdv extends ContributionItem implements IOpeningDialog {
 
@@ -76,10 +76,24 @@ public abstract class ActionToolbarSlideoutAdv extends ContributionItem implemen
       _isImageCreated_EnabledDisabled = true;
    }
 
+   public ActionToolbarSlideoutAdv(final Image actionImage) {
+
+      _imageEnabled = actionImage;
+      _imageDisabled = new Image(actionImage.getDevice(), actionImage, SWT.IMAGE_DISABLE);
+   }
+
    public ActionToolbarSlideoutAdv(final Image actionImage, final Image actionImageDisabled) {
 
       _imageEnabled = actionImage;
       _imageDisabled = actionImageDisabled;
+   }
+
+   public ActionToolbarSlideoutAdv(final ImageDescriptor actionImageDescriptor) {
+
+      _imageEnabled = actionImageDescriptor.createImage();
+      _imageDisabled = new Image(_imageEnabled.getDevice(), _imageEnabled, SWT.IMAGE_DISABLE);
+
+      _isImageCreated_EnabledDisabled = true;
    }
 
    public ActionToolbarSlideoutAdv(final ImageDescriptor actionImage, final ImageDescriptor actionImageDisabled) {

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017, 2024 Wolfgang Schramm and Contributors
+ * Copyright (C) 2017, 2025 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -353,8 +353,7 @@ public class Map25View extends ViewPart implements
 
       public ActionShowPhotoOptions() {
 
-         super(TourbookPlugin.getThemedImageDescriptor(Images.ShowPhotos_InMap),
-               TourbookPlugin.getThemedImageDescriptor(Images.ShowAllPhotos_InMap_Disabled));
+         super(TourbookPlugin.getThemedImageDescriptor(Images.ShowPhotos_InMap));
 
          isToggleAction = true;
          notSelectedTooltip = Messages.Tour_Action_TourPhotos;

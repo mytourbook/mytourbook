@@ -92,6 +92,11 @@ public abstract class ActionToolbarSlideout extends ContributionItem implements 
       _canDisposeActionImages = false;
    }
 
+   public ActionToolbarSlideout(final ImageDescriptor actionImageDescriptor) {
+
+      _actionImageDescriptor_Enabled = actionImageDescriptor;
+   }
+
    public ActionToolbarSlideout(final ImageDescriptor actionImageDescriptor,
                                 final ImageDescriptor actionImageDescriptor_Disabled) {
 

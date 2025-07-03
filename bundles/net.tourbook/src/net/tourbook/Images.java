@@ -205,7 +205,7 @@ public class Images {
    public static final String PhotoGallery_Horizontal                    = "photo-gallery-horizontal.png";                        //$NON-NLS-1$
    public static final String PhotoGallery_Vertical                      = "photo-gallery-vertical.png";                          //$NON-NLS-1$
    public static final String PhotoImage                                 = "photo-image.png";                                     //$NON-NLS-1$
-   public static final String PhotoPhotos                                = "photo-photos.png";                                    //$NON-NLS-1$
+   public static final String PhotoPhotos                                = "photo-photos.svg";                                    //$NON-NLS-1$
    public static final String PhotoLinkWithTour                          = "photo-link-photo-with-tour.png";                      //$NON-NLS-1$
    public static final String PhotoSyncTour                              = "photo-sync-tour.png";                                 //$NON-NLS-1$
    public static final String PhotoTourPhotos                            = "photo-tour-photos.png";                               //$NON-NLS-1$
@@ -255,10 +255,8 @@ public class Images {
    public static final String SensorChart_Disabled                       = "sensor-chart-disabled.png";                           //$NON-NLS-1$
    public static final String SetFavoritePosition                        = "map-set-favorite-position.png";                       //$NON-NLS-1$
    public static final String ShowFavoritePosition                       = "map-show-favorite-position.png";                      //$NON-NLS-1$
-   public static final String ShowAllPhotos_InMap                        = "photo-show-all-photos.png";                           //$NON-NLS-1$
-   public static final String ShowAllPhotos_InMap_Disabled               = "photo-show-all-photos-disabled.png";                  //$NON-NLS-1$
-   public static final String ShowPhotos_InMap                           = "photo-photos.png";                                    //$NON-NLS-1$
-   public static final String ShowPhotos_InMap_Disabled                  = "photo-photos-disabled.png";                           //$NON-NLS-1$
+   public static final String ShowAllPhotos_InMap                        = "photo-show-all-photos.svg";                           //$NON-NLS-1$
+   public static final String ShowPhotos_InMap                           = "photo-photos.svg";                                    //$NON-NLS-1$
    public static final String ShowValuePoint                             = "map-marker-value-point-action.png";                   //$NON-NLS-1$
    public static final String Show_POI                                   = "show-poi.png";                                        //$NON-NLS-1$
    public static final String Smoothing                                  = "smooth.png";                                          //$NON-NLS-1$

@@ -79,10 +79,9 @@ public class CommonImages {
    public static final String MapProvider_Transparent      = "map-provider-transparent.png";              //$NON-NLS-1$
    public static final String MapProvider_Transparent_Hill = "map-provider-transparent-hill.png";         //$NON-NLS-1$
 
-   public static final String PhotoFilter                  = "photo-filter-rating-stars.png";             //$NON-NLS-1$
-   public static final String PhotoFilter_Disabled         = "photo-filter-rating-stars-disabled.png";    //$NON-NLS-1$
-   public static final String PhotoFilter_NoPhotos         = "photo-filter-rating-stars-no-photos.png";   //$NON-NLS-1$
-   public static final String PhotoFilter_WithPhotos       = "photo-filter-rating-stars-with-photos.png"; //$NON-NLS-1$
+   public static final String PhotoFilter                  = "photo-filter-rating-stars.svg";             //$NON-NLS-1$
+   public static final String PhotoFilter_NoPhotos         = "photo-filter-rating-stars-no-photos.svg";   //$NON-NLS-1$
+   public static final String PhotoFilter_WithPhotos       = "photo-filter-rating-stars-with-photos.svg"; //$NON-NLS-1$
 
    public static final String PlayControl_Loop             = "play-control-loop.png";                     //$NON-NLS-1$
    public static final String PlayControl_Loop_Disabled    = "play-control-loop-disabled.png";            //$NON-NLS-1$

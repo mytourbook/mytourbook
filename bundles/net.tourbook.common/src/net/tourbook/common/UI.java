@@ -744,7 +744,6 @@ public class UI {
    public static final String    IMAGE_ACTION_PHOTO_FILTER              = "IMAGE_ACTION_PHOTO_FILTER";               //$NON-NLS-1$
    public static final String    IMAGE_ACTION_PHOTO_FILTER_NO_PHOTOS    = "IMAGE_ACTION_PHOTO_FILTER_NO_PHOTOS";     //$NON-NLS-1$
    public static final String    IMAGE_ACTION_PHOTO_FILTER_WITH_PHOTOS  = "IMAGE_ACTION_PHOTO_FILTER_WITH_PHOTOS";   //$NON-NLS-1$
-   public static final String    IMAGE_ACTION_PHOTO_FILTER_DISABLED     = "IMAGE_ACTION_PHOTO_FILTER_DISABLED";      //$NON-NLS-1$
    public static final String    IMAGE_CONFIGURE_COLUMNS                = "IMAGE_CONFIGURE_COLUMNS";                 //$NON-NLS-1$
    public static final String    IMAGE_EMPTY_16                         = "_empty16";                                //$NON-NLS-1$
 
@@ -3602,7 +3601,6 @@ public class UI {
       IMAGE_REGISTRY.put(IWeather.WEATHER_ID_SEVERE_WEATHER_ALERT,   CommonActivator.getThemedImageDescriptor(CommonImages.Weather_Severe));
 
       IMAGE_REGISTRY.put(IMAGE_ACTION_PHOTO_FILTER,                  CommonActivator.getThemedImageDescriptor(CommonImages.PhotoFilter));
-      IMAGE_REGISTRY.put(IMAGE_ACTION_PHOTO_FILTER_DISABLED,         CommonActivator.getThemedImageDescriptor(CommonImages.PhotoFilter_Disabled));
       IMAGE_REGISTRY.put(IMAGE_ACTION_PHOTO_FILTER_NO_PHOTOS,        CommonActivator.getThemedImageDescriptor(CommonImages.PhotoFilter_NoPhotos));
       IMAGE_REGISTRY.put(IMAGE_ACTION_PHOTO_FILTER_WITH_PHOTOS,      CommonActivator.getThemedImageDescriptor(CommonImages.PhotoFilter_WithPhotos));
 
