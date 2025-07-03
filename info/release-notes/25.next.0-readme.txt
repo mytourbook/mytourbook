@@ -45,6 +45,9 @@ New / Improvements
 Changes
 =======
 
+* Disabled Action Icons
+  They are now better "disabled" with Eclipse than before. Some disabled icons are replaced and can be looking differently than before
+
 
 Changes that require Tour Re-import
 ===================================
