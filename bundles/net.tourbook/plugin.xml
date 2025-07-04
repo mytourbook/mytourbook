@@ -2274,7 +2274,7 @@
          category    ="net.tourbook.category.map"
          id          ="net.tourbook.map25.Map25DebugView"
          class       ="net.tourbook.map25.Map25DebugView"
-         icon        ="icons/map25-debug-view.png"
+         icon        ="icons/map25-debug-view.svg"
          name        ="%View_Name_TourMap25Debug"
       />
    
