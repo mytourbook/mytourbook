@@ -259,7 +259,7 @@ public class Images {
    public static final String Smoothing                                  = "smooth.png";                                          //$NON-NLS-1$
    public static final String Smoothing_Disabled                         = "smooth-disabled.png";                                 //$NON-NLS-1$
    public static final String SplinePoint                                = "spline-point.png";                                    //$NON-NLS-1$
-   public static final String State_AdjustTemperature                    = "state-temperature.png";                               //$NON-NLS-1$
+   public static final String State_AdjustTemperature                    = "state-temperature.svg";                               //$NON-NLS-1$
    public static final String State_Copy                                 = "state-copy.png";                                      //$NON-NLS-1$
    public static final String State_Delete                               = "state-delete.png";                                    //$NON-NLS-1$
    public static final String State_DeletedTour_View                     = "state-deleted-tour-view.png";                         //$NON-NLS-1$
@@ -271,13 +271,13 @@ public class Images {
    public static final String State_MovedTour_View                       = "state-moved-tour-view.png";                           //$NON-NLS-1$
    public static final String State_NotSavedInTour                       = "state-not-saved-in-tour.png";                         //$NON-NLS-1$
    public static final String State_OK                                   = "state-ok.png";                                        //$NON-NLS-1$
-   public static final String State_RetrieveTourLocation                 = "state-tour-location.png";                             //$NON-NLS-1$
-   public static final String State_RetrieveWeatherData                  = "state-weather.png";                                   //$NON-NLS-1$
+   public static final String State_RetrieveTourLocation                 = "state-tour-location.svg";                             //$NON-NLS-1$
+   public static final String State_RetrieveWeatherData                  = "state-weather.svg";                                   //$NON-NLS-1$
    public static final String State_Save                                 = "state-save.png";                                      //$NON-NLS-1$
-   public static final String State_SaveTour                             = "state-save-tour.png";                                 //$NON-NLS-1$
+   public static final String State_SaveTour                             = "state-save-tour.svg";                                 //$NON-NLS-1$
    public static final String State_SavedInTour                          = "state-saved-in-tour.png";                             //$NON-NLS-1$
-   public static final String State_TourMarker                           = "state-tour-marker.png";                               //$NON-NLS-1$
-   public static final String State_TourTags                             = "state-tour-tags.png";                                 //$NON-NLS-1$
+   public static final String State_TourMarker                           = "state-tour-marker.svg";                               //$NON-NLS-1$
+   public static final String State_TourTags                             = "state-tour-tags.svg";                                 //$NON-NLS-1$
    public static final String Statistic                                  = "statistics.svg";                                      //$NON-NLS-1$
    public static final String StatisticValues                            = "statistic-values.png";                                //$NON-NLS-1$
    public static final String SyncGeoGraph_ByScale                       = "synch-geo-graph-byScale.png";                         //$NON-NLS-1$
