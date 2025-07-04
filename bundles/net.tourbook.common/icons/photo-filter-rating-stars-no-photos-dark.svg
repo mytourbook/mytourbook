@@ -51,7 +51,7 @@
      transform="translate(-35,-328.99963)">
     <path
        id="path5771-6-9-5-5-5-36-36-4"
-       style="fill:#cccccc;fill-opacity:1;stroke:none;stroke-width:0.5;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       style="fill:#d0ec86;fill-opacity:1;stroke:none;stroke-width:0.5;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
        d="m 38,338.99961 4,3.83984 v 2.16016 h 2 v -2.16016 l 4,-3.83984 z" />
     <rect
        y="328.99963"
@@ -62,7 +62,7 @@
        style="opacity:0.99;fill:none;stroke:none;stroke-width:0.999997" />
     <path
        id="path4358-2-55-2-4"
-       style="color:#000000;display:inline;overflow:visible;visibility:visible;fill:#fc4d00;fill-opacity:1;stroke:none;stroke-width:0.310817;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;marker:none;enable-background:accumulate"
+       style="color:#000000;display:inline;overflow:visible;visibility:visible;fill:#f4724c;fill-opacity:1;stroke:none;stroke-width:0.310817;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;marker:none;enable-background:accumulate"
        transform="matrix(1,0,0,0.99999361,-320.01226,215.3493)"
        d="m 363.01227,113.65105 1.2979,2.62983 2.90219,0.42171 -2.10005,2.04704 0.49576,2.89047 -2.5958,-1.3647 -2.5958,1.3647 0.49575,-2.89047 -2.10004,-2.04704 2.90219,-0.42171 z" />
   </g>

@@ -168,10 +168,10 @@ public class Images {
    public static final String MapBookmark_New                            = "map-bookmark-new.png";                                //$NON-NLS-1$
    public static final String MapLayer                                   = "map-layer.png";                                       //$NON-NLS-1$
    public static final String MapLayer_Dark                              = "map-layer-dark.png";                                  //$NON-NLS-1$
-   public static final String MapLocation_BoundingBox                    = "map-location-boundingbox.png";                        //$NON-NLS-1$
+   public static final String MapLocation_BoundingBox                    = "map-location-boundingbox.svg";                        //$NON-NLS-1$
    public static final String MapLocation_Common                         = "map-location-common.png";                             //$NON-NLS-1$
    public static final String MapLocation_MapPoint                       = "map-location-map-point.png";                          //$NON-NLS-1$
-   public static final String MapLocation_Tour                           = "map-location-tour.png";                               //$NON-NLS-1$
+   public static final String MapLocation_Tour                           = "map-location-tour.svg";                               //$NON-NLS-1$
    public static final String MapLocationMarker_Disabled                 = "map-location-marker-disabled.png";                    //$NON-NLS-1$
    public static final String MapLocationMarker_Disabled_Dark            = "map-location-marker-disabled-dark.png";               //$NON-NLS-1$
    public static final String MapLocationMarker_Hovered                  = "map-location-marker-hovered.png";                     //$NON-NLS-1$
@@ -204,7 +204,7 @@ public class Images {
    public static final String PhotoDirectoryView                         = "photo-directory.png";                                 //$NON-NLS-1$
    public static final String PhotoGallery_Horizontal                    = "photo-gallery-horizontal.png";                        //$NON-NLS-1$
    public static final String PhotoGallery_Vertical                      = "photo-gallery-vertical.png";                          //$NON-NLS-1$
-   public static final String PhotoImage                                 = "photo-image.png";                                     //$NON-NLS-1$
+   public static final String PhotoImage                                 = "photo-image.svg";                                     //$NON-NLS-1$
    public static final String PhotoPhotos                                = "photo-photos.svg";                                    //$NON-NLS-1$
    public static final String PhotoLinkWithTour                          = "photo-link-photo-with-tour.png";                      //$NON-NLS-1$
    public static final String PhotoSyncTour                              = "photo-sync-tour.png";                                 //$NON-NLS-1$
@@ -364,7 +364,7 @@ public class Images {
    public static final String TourMarker_All                             = "tour-marker-all.png";                                 //$NON-NLS-1$
    public static final String TourMarker_Disabled                        = "tour-marker-disabled.png";                            //$NON-NLS-1$
    public static final String TourMarker_Cluster                         = "tour-marker-cluster.png";                             //$NON-NLS-1$
-   public static final String TourMarker_Group                           = "tour-marker-group.png";                               //$NON-NLS-1$
+   public static final String TourMarker_Group                           = "tour-marker-group.svg";                               //$NON-NLS-1$
    public static final String TourMarker_New                             = "tour-marker-new.png";                                 //$NON-NLS-1$
    public static final String TourMarker_New_Disabled                    = "tour-marker-new-disabled.png";                        //$NON-NLS-1$
    public static final String TourNew                                    = "tour-new.png";                                        //$NON-NLS-1$

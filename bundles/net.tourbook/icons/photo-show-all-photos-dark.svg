@@ -52,7 +52,7 @@
     <path
        id="path11669-6-7-9-8-5-1-4-6"
        d="m 228.00001,555.00016 c -3.86607,10e-6 -7.00001,3.13396 -7.00001,7.00002 0,3.86604 3.13394,7 7.00001,7.00001 3.86603,-10e-6 6.99998,-3.13397 6.99999,-7.00001 0,-3.86606 -3.13396,-7.00001 -6.99999,-7.00002 z m -0.0681,3.13962 c 2.16968,10e-6 3.92861,1.75901 3.92861,3.92872 -1e-5,2.1697 -1.75893,3.92866 -3.92861,3.92867 -2.16977,0 -3.9287,-1.75897 -3.9287,-3.92867 -1e-5,-2.16971 1.75892,-3.92872 3.9287,-3.92872 z"
-       style="fill:#cccccc;fill-opacity:1;stroke:none;stroke-width:0.8;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;paint-order:normal" />
+       style="fill:#d0ec86;fill-opacity:1;stroke:none;stroke-width:0.8;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;paint-order:normal" />
     <path
        id="rect6561-8-1-9-9-5-5-9-9-1-3-94-1-6-6-4-5-8-7-3-1-1-1"
        d="m 220.5,567.00017 v 2.50002 h 2.5"
@@ -70,19 +70,19 @@
        d="M 232.99998,569.50019 H 235.5 v -2.5"
        style="opacity:0.99;fill:none;stroke:#cccccc;stroke-width:1;stroke-opacity:1" />
     <path
-       style="opacity:0.99;fill:none;stroke:#cccccc;stroke-width:1;stroke-opacity:1"
+       style="opacity:0.99;fill:none;stroke:#d0ec86;stroke-width:1;stroke-opacity:1"
        d="m 220.5,567.00017 v 2.50002 h 2.5"
        id="path7027-6" />
     <path
-       style="opacity:0.99;fill:none;stroke:#cccccc;stroke-width:1;stroke-opacity:1"
+       style="opacity:0.99;fill:none;stroke:#d0ec86;stroke-width:1;stroke-opacity:1"
        d="M 223.00002,554.50019 H 220.5 v 2.5"
        id="path7039-0" />
     <path
-       style="opacity:0.99;fill:none;stroke:#cccccc;stroke-width:1;stroke-opacity:1"
+       style="opacity:0.99;fill:none;stroke:#d0ec86;stroke-width:1;stroke-opacity:1"
        d="m 235.5,557.00021 v -2.50002 H 233"
        id="path7041-5" />
     <path
-       style="opacity:0.99;fill:none;stroke:#cccccc;stroke-width:1;stroke-opacity:1"
+       style="opacity:0.99;fill:none;stroke:#d0ec86;stroke-width:1;stroke-opacity:1"
        d="M 232.99998,569.50019 H 235.5 v -2.5"
        id="path7043-6" />
   </g>

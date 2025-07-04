@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   width="16"
+   height="16"
+   id="svg2985"
+   version="1.1"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:dc="http://purl.org/dc/elements/1.1/">
+  <defs
+     id="defs2987">
+    <linearGradient
+       id="linearGradient5090">
+      <stop
+         style="stop-color:#435800;stop-opacity:1;"
+         offset="0"
+         id="stop5088" />
+    </linearGradient>
+    <linearGradient
+       id="linearGradient6402">
+      <stop
+         id="stop6404"
+         offset="0"
+         style="stop-color:#000000;stop-opacity:1;" />
+      <stop
+         id="stop6406"
+         offset="1"
+         style="stop-color:#000000;stop-opacity:0;" />
+    </linearGradient>
+    <linearGradient
+       id="linearGradient3816">
+      <stop
+         id="stop3818"
+         offset="0"
+         style="stop-color:#ffa576;stop-opacity:1;" />
+      <stop
+         style="stop-color:#f45400;stop-opacity:1;"
+         offset="1"
+         id="stop3782" />
+    </linearGradient>
+  </defs>
+  <metadata
+     id="metadata2990">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <g
+     id="layer1"
+     style="display:inline"
+     transform="translate(-850.00116,-448.99999)">
+    <g
+       id="g1"
+       transform="translate(266,284.00006)">
+      <rect
+         y="168"
+         x="590.00085"
+         height="9.9999752"
+         width="0.99914211"
+         id="rect3899-5-2-3-7-63-2-5"
+         style="color:#000000;display:inline;overflow:visible;visibility:visible;fill:#cccccc;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:0.7;stroke-miterlimit:4;stroke-dasharray:none;marker:none;enable-background:accumulate" />
+      <rect
+         y="167"
+         x="590"
+         height="5.9999995"
+         width="8"
+         id="rect3307-8-4-3-6"
+         style="display:inline;fill:#d0ec86;fill-opacity:1;stroke:none;stroke-width:1;stroke-linecap:square;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;paint-order:normal" />
+      <path
+         id="rect3901-3-5-1-5-0-2-5"
+         d="M 590.5,172.49996 V 167.5 h 6.99915 v 4.99996 z"
+         style="color:#000000;display:inline;overflow:visible;visibility:visible;fill:#d0ec86;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:1;stroke-linecap:square;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;marker:none;enable-background:accumulate" />
+    </g>
+    <g
+       id="g2"
+       transform="translate(262,286.00006)"
+       style="display:inline">
+      <rect
+         y="168"
+         x="590.00085"
+         height="9.9999752"
+         width="0.99914211"
+         id="rect3899-5-2-3-7-63-2-5-2"
+         style="color:#000000;display:inline;overflow:visible;visibility:visible;fill:#cccccc;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:0.7;stroke-miterlimit:4;stroke-dasharray:none;marker:none;enable-background:accumulate" />
+      <rect
+         y="167"
+         x="590"
+         height="5.9999995"
+         width="8"
+         id="rect3307-8-4-3-6-1"
+         style="display:inline;fill:#d0ec86;fill-opacity:1;stroke:none;stroke-width:1;stroke-linecap:square;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;paint-order:normal" />
+      <path
+         id="rect3901-3-5-1-5-0-2-5-3"
+         d="m 590.5,167.5 h 6.99915 l -1.5e-4,4.99996"
+         style="color:#000000;display:inline;overflow:visible;visibility:visible;fill:#d0ec86;fill-opacity:1;fill-rule:nonzero;stroke:#999999;stroke-width:1;stroke-linecap:square;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;marker:none;enable-background:accumulate" />
+    </g>
+    <rect
+       transform="scale(1,-1)"
+       y="-465"
+       x="850.00116"
+       height="16.000015"
+       width="16"
+       id="rect6561-8-1-9-9-5-5-9-9-1-3-94-1-6-6-4-5-85-3-8-1-8-8"
+       style="display:inline;opacity:0.99;fill:none;stroke:none" />
+  </g>
+</svg>
