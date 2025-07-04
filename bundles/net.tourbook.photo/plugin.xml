@@ -35,7 +35,7 @@
       <menuContribution locationURI="menu:m_Directory?after=net.tourbook.separator.OtherDirectories" >
                   
          <command commandId="command.net.tourbook.photo.PicDirView"
-            icon="icons/photo-directory.png"
+            icon="icons/photo-directory.svg"
             label="%View_Name_Photos"
             mnemonic="%View_Name_Photos_Mnemonic"/>
       
@@ -60,7 +60,7 @@
          <toolbar id="mc_tb_Directory">
          
             <command commandId="command.net.tourbook.photo.PicDirView"
-               icon="icons/photo-directory.png"
+               icon="icons/photo-directory.svg"
                label="%View_Name_Photos"
                mnemonic="%View_Name_Photos_Mnemonic"/>
          
@@ -146,7 +146,7 @@
       <view
          category="net.tourbook.category.photo"
          class="net.tourbook.photo.PicDirView"
-         icon="icons/photo-directory.png"
+         icon="icons/photo-directory.svg"
          id="net.tourbook.photo.PicDirView"
          name="%View_Name_Photos"/>
    

@@ -455,7 +455,6 @@ public class Map25View extends ViewPart implements
          setToolTipText(OtherMessages.TOUR_ACTION_SHOW_HR_ZONES_TOOLTIP);
 
          setImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.PulseZones));
-         setDisabledImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.PulseZones_Disabled));
       }
 
       @Override

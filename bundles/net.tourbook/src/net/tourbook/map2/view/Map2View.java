@@ -2650,57 +2650,49 @@ public class Map2View extends ViewPart implements
             this,
             MapGraphId.Altitude,
             Messages.map_action_tour_color_altitude_tooltip,
-            Images.Graph_Elevation,
-            null);
+            Images.Graph_Elevation);
 
       _actionTourColor_Gradient = new ActionTourColor(
             this,
             MapGraphId.Gradient,
             Messages.map_action_tour_color_gradient_tooltip,
-            Images.Graph_Gradient,
-            null);
+            Images.Graph_Gradient);
 
       _actionTourColor_Power = new ActionTourColor(
             this,
             MapGraphId.Power,
             Messages.map_action_tour_color_power_tooltip,
-            Images.Graph_Power,
-            null);
+            Images.Graph_Power);
 
       _actionTourColor_Pulse = new ActionTourColor(
             this,
             MapGraphId.Pulse,
             Messages.map_action_tour_color_pulse_tooltip,
-            Images.Graph_Heartbeat,
-            null);
+            Images.Graph_Heartbeat);
 
       _actionTourColor_Speed = new ActionTourColor(
             this,
             MapGraphId.Speed,
             Messages.map_action_tour_color_speed_tooltip,
-            Images.Graph_Speed,
-            null);
+            Images.Graph_Speed);
 
       _actionTourColor_Pace = new ActionTourColor(
             this,
             MapGraphId.Pace,
             Messages.map_action_tour_color_pace_tooltip,
-            Images.Graph_Pace,
-            null);
+            Images.Graph_Pace);
 
       _actionTourColor_RunDyn_StepLength = new ActionTourColor(
             this,
             MapGraphId.RunDyn_StepLength,
             Messages.Tour_Action_RunDyn_StepLength_Tooltip,
-            Images.Graph_RunDyn_StepLength,
-            null);
+            Images.Graph_RunDyn_StepLength);
 
       _actionTourColor_HrZone = new ActionTourColor(
             this,
             MapGraphId.HrZone,
             Messages.Tour_Action_ShowHrZones_Tooltip,
-            Images.PulseZones,
-            Images.PulseZones_Disabled);
+            Images.PulseZones);
 
 // SET_FORMATTING_OFF
 

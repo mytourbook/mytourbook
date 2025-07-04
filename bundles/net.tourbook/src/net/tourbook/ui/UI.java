@@ -40,6 +40,8 @@ import net.tourbook.data.TourData;
 import net.tourbook.data.TourType;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.photo.IPhotoPreferences;
+import net.tourbook.photo.PhotoActivator;
+import net.tourbook.photo.PhotoImages;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.preferences.PrefPageViewColors;
 import net.tourbook.tour.SelectionTourId;
@@ -196,8 +198,9 @@ public class UI {
       IMAGE_REGISTRY.put(IMAGE_TOUR_TYPE_FILTER_SYSTEM,        TourbookPlugin.getThemedImageDescriptor(Images.TourType_Filter_System));
 
       // photo
-      IMAGE_REGISTRY.put(TourPhotoLinkView.IMAGE_PIC_DIR_VIEW, TourbookPlugin.getImageDescriptor(Images.PhotoDirectoryView));
       IMAGE_REGISTRY.put(TourPhotoLinkView.IMAGE_PHOTO_PHOTO,  TourbookPlugin.getImageDescriptor(Images.PhotoPhotos));
+
+      IMAGE_REGISTRY.put(TourPhotoLinkView.IMAGE_PIC_DIR_VIEW, PhotoActivator.getImageDescriptor(PhotoImages.PhotoDirectoryView));
 
       /*
        * Set stylers for the view colors, the color is retrieved every time from the color registry

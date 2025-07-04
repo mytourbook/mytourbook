@@ -31,7 +31,7 @@ public class PhotoImages {
    public static final String PhotoAnnotation_TourGPS             = "photo-annotation-tour-gps.png";                //$NON-NLS-1$
    public static final String PhotoAnnotation_SavedInTour         = "photo-annotation-saved-in-tour.png";           //$NON-NLS-1$
    public static final String PhotoAnnotation_SavedInTour_Hovered = "photo-annotation-saved-in-tour-hovered.png";   //$NON-NLS-1$
-   public static final String PhotoDirectoryView                  = "photo-directory.png";                          //$NON-NLS-1$
+   public static final String PhotoDirectoryView                  = "photo-directory.svg";                          //$NON-NLS-1$
    public static final String PhotoEnlargeSmallPhotos             = "photo-enlarge-small-photos.png";               //$NON-NLS-1$
    public static final String PhotoFilter_GPS                     = "photo-filter-gps.png";                         //$NON-NLS-1$
    public static final String PhotoFilter_GPS_Disabled            = "photo-filter-gps-disabled.png";                //$NON-NLS-1$

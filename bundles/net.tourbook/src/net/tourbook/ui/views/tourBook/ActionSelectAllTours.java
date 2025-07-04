@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2025 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -34,7 +34,6 @@ public class ActionSelectAllTours extends Action {
       setText(Messages.action_tourbook_select_year_month_tours);
 
       setImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.TourBook_SelectAll));
-      setDisabledImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.TourBook_SelectAll_Disabled));
    }
 
    @Override

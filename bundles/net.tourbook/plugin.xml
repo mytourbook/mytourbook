@@ -139,7 +139,7 @@
 
       <perspective
             class="net.tourbook.application.PerspectiveFactoryPhoto"
-            icon="icons/photo-merge-perspective.png"
+            icon="icons/photo-merge-perspective.svg"
             id="net.tourbook.perspective.TourPhotoLinks"
             name="%Perspective_Name_ToursAndPhotos"/>
 
@@ -900,7 +900,7 @@
             <!-- Training -->
             <command
                commandId   ="command.net.tourbook.training.Training"
-               icon        ="icons/pulse-zones.png"
+               icon        ="icons/pulse-zones.svg"
                label       ="%View_Name_Training"
                mnemonic    ="%View_Name_Training_Mnemonic"/>
             
@@ -1862,7 +1862,7 @@
             category    ="net.tourbook.category.Tools"
             id          ="net.tourbook.training.TrainingView"
             class       ="net.tourbook.training.TrainingView"
-            icon        ="icons/pulse-zones.png"
+            icon        ="icons/pulse-zones.svg"
             name        ="%View_Name_Training"/>
 
 
