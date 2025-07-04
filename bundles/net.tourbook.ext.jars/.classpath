@@ -19,7 +19,7 @@
 			<attribute name="javadoc_location" value="https://www.javadoc.io/doc/joda-time/joda-time/2.14.0"/>
 		</attributes>
 	</classpathentry>
-   <classpathentry exported="true" kind="lib" path="json-20250107.jar"/>                              <!-- https://mvnrepository.com/artifact/org.json/json -->
+   <classpathentry exported="true" kind="lib" path="json-20250517.jar"/>                              <!-- https://mvnrepository.com/artifact/org.json/json -->
    <classpathentry exported="true" kind="lib" path="lat-lon-timezone-converter-2019-04-30.jar" />     <!-- https://github.com/drtimcooper/LatLongToTimezone/blob/master/src/main/java/com/skedgo/converter/TimezoneMapper.java -->
    <classpathentry exported="true" kind="lib" path="simplelatlng-1.4.0.jar"                           sourcepath="jar-sources/simplelatlng-1.4.0-sources.jar"/>      <!-- https://mvnrepository.com/artifact/com.javadocmd/simplelatlng -->
    <classpathentry exported="true" kind="lib" path="commons-suncalc-3.11.jar"/>                        <!-- https://mvnrepository.com/artifact/org.shredzone.commons/commons-suncalc -->
