@@ -108,7 +108,7 @@ jobs:
         run: echo ${{ github.sha }}
 
      - id: should_run
-       continue-on-error: true
+        continue-on-error: true
         name: check latest commit is less than a day
         if: ${{ github.event_name == 'schedule' }}
         run: |
