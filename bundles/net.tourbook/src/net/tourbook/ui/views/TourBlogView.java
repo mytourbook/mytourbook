@@ -680,6 +680,7 @@ public class TourBlogView extends ViewPart {
 
          // show dark scrollbar
          htmlCss = htmlCss.replace(WEB.CSS_TAG__BODY_SCROLLBAR, WEB.CSS_CONTENT__BODY_SCROLLBAR__DARK);
+         htmlCss = htmlCss.replace(WEB.CSS_TAG__BODY_SCROLLBAR_EXTENDED, WEB.CSS_CONTENT__BODY_SCROLLBAR__DARK_EXTENDED);
       }
 
       final String html = UI.EMPTY_STRING
@@ -1224,9 +1225,9 @@ public class TourBlogView extends ViewPart {
           * load css from file
           */
          final File cssFile = WEB.getFile(TOUR_BLOG_CSS);
-         final String cssContent = Util.readContentFromFile(cssFile.getAbsolutePath());
+         final String cssFileContent = Util.readContentFromFile(cssFile.getAbsolutePath());
 
-         _htmlCss = "<style>" + cssContent + "</style>"; //$NON-NLS-1$ //$NON-NLS-2$
+         _htmlCss = "<style>" + cssFileContent + "</style>"; //$NON-NLS-1$ //$NON-NLS-2$
 
          /*
           * set image urls

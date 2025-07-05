@@ -10,6 +10,8 @@ body
    $BODY__SCROLLBAR$
 }
 
+$BODY_SCROLLBAR_EXTENDED$
+
 table
 {
    border-collapse:        collapse;

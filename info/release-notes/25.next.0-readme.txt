@@ -46,8 +46,10 @@ Changes
 =======
 
 * Disabled Action Icons
-  They are now better "disabled" with Eclipse than before. Some disabled icons are replaced and can be looking differently than before
+  They are now better "disabled" with Eclipse than before. Some disabled icons are replaced and can be looking a bit differently than before
 
+* Eclipse on Windows is now using Edge as default browser which needed a few adjustments
+  https://github.com/mytourbook/mytourbook/issues/1512
 
 Changes that require Tour Re-import
 ===================================
