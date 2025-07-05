@@ -66,8 +66,7 @@ public class PhotoImages {
    public static final String PhotoSort_ByDate_Disabled           = "photo-sort-by-date-disabled.png";              //$NON-NLS-1$
    public static final String PhotoSort_ByName                    = "photo-sort-by-name.png";                       //$NON-NLS-1$
    public static final String PhotoSort_ByName_Disabled           = "photo-sort-by-name-disabled.png";              //$NON-NLS-1$
-   public static final String PhotoTooltip                        = "photo-tooltip.png";                            //$NON-NLS-1$
-   public static final String PhotoTooltip_Disabled               = "photo-tooltip-disabled.png";                   //$NON-NLS-1$
+   public static final String PhotoTooltip                        = "photo-tooltip.svg";                            //$NON-NLS-1$
 
    private PhotoImages() {}
 }

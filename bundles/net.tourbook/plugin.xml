@@ -559,7 +559,7 @@
    
             <command
                commandId   ="command.net.tourbook.search.SearchView"
-               icon        ="icons/search.png"
+               icon        ="icons/search.svg"
                label       ="%View_Name_SearchAll"
                mnemonic    ="%View_Name_SearchAll_Mnemonic"/>
    
@@ -1108,7 +1108,7 @@
 
             <command
                commandId   ="command.net.tourbook.search.SearchView"
-               icon        ="icons/search.png"
+               icon        ="icons/search.svg"
                label       ="%View_Name_SearchAll"
                tooltip     ="%View_Name_SearchAll_Tooltip"/>
 
@@ -1121,7 +1121,7 @@
             <!-- Preferences -->
             <command
                commandId   ="command.net.tourbook.preferences"
-               icon        ="icons/options.png"
+               icon        ="icons/options.svg"
                label       ="%command_general_preferences"
                style       ="push"/>
 
@@ -1799,7 +1799,7 @@
             category    ="net.tourbook.category.Tools"
             id          ="net.tourbook.search.SearchView"
             class       ="net.tourbook.search.SearchView"
-            icon        ="icons/search.png"
+            icon        ="icons/search.svg"
             name        ="%View_Name_SearchAll"/>
 
          <view

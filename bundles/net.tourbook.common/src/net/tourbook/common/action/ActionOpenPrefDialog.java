@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2025 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -44,7 +44,6 @@ public class ActionOpenPrefDialog extends Action {
       setText(text);
 
       setImageDescriptor(CommonActivator.getThemedImageDescriptor(CommonImages.App_Options));
-      setDisabledImageDescriptor(CommonActivator.getThemedImageDescriptor(CommonImages.App_Options_Disabled));
 
       _prefPageId = prefPageId;
    }
@@ -65,6 +64,7 @@ public class ActionOpenPrefDialog extends Action {
     * This tooltip will be closed when the pref dialog is opened.
     *
     * @param openedAdvancedSlideout
+    *
     * @return
     */
    public ActionOpenPrefDialog closeThisTooltip(final AdvancedSlideout openedAdvancedSlideout) {
@@ -78,6 +78,7 @@ public class ActionOpenPrefDialog extends Action {
     * This tooltip will be closed when the pref dialog is opened.
     *
     * @param openedTooltip
+    *
     * @return
     */
    public ActionOpenPrefDialog closeThisTooltip(final AnimatedToolTipShell openedTooltip) {
@@ -117,6 +118,7 @@ public class ActionOpenPrefDialog extends Action {
     *
     * @param pageId
     * @param data
+    *
     * @return
     */
    public ActionOpenPrefDialog setPrefData(final String pageId, final Object data) {

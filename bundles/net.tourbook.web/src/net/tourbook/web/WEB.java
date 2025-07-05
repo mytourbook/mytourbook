@@ -55,7 +55,7 @@ public class WEB {
     * {@value #WEB_CONTENT_DEVELOPMENT_FOLDER} folder otherwise it is delivered from the
     * {@value #WEB_CONTENT_RELEASE_FOLDER} folder.
     */
-   static boolean IS_DEBUG = false;
+   static boolean IS_DEBUG = true;
 
    /*
     * It is very complicated to support testing for language translators, therefore it is currently
@@ -127,6 +127,7 @@ public class WEB {
    private static final String          CONTENT_TYPE_IMAGE_GIF                    = "image/gif";                               //$NON-NLS-1$
    private static final String          CONTENT_TYPE_IMAGE_JPG                    = "image/jpeg";                              //$NON-NLS-1$
    private static final String          CONTENT_TYPE_IMAGE_PNG                    = "image/png";                               //$NON-NLS-1$
+   private static final String          CONTENT_TYPE_IMAGE_SVG                    = "image/svg+xml";                           //$NON-NLS-1$
    private static final String          CONTENT_TYPE_IMAGE_X_ICO                  = "image/x-icon";                            //$NON-NLS-1$
    private static final String          CONTENT_TYPE_TEXT_CSS                     = "text/css";                                //$NON-NLS-1$
    private static final String          CONTENT_TYPE_TEXT_HTML                    = "text/html";                               //$NON-NLS-1$
@@ -141,6 +142,7 @@ public class WEB {
    private static final String          FILE_EXTENSION_JS                         = "js";                                      //$NON-NLS-1$
    private static final String          FILE_EXTENSION_MAP                        = "map";                                     //$NON-NLS-1$
    private static final String          FILE_EXTENSION_PNG                        = "png";                                     //$NON-NLS-1$
+   private static final String          FILE_EXTENSION_SVG                        = "svg";                                     //$NON-NLS-1$
 
    /**
     * This file extension is for HTML pages which contain variable replacements, processed in
@@ -783,6 +785,10 @@ public class WEB {
 
          case FILE_EXTENSION_PNG:
             contentType = CONTENT_TYPE_IMAGE_PNG;
+            break;
+
+         case FILE_EXTENSION_SVG:
+            contentType = CONTENT_TYPE_IMAGE_SVG;
             break;
          }
       }
