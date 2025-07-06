@@ -1400,22 +1400,6 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
       enableActions();
    }
 
-   private List<TourNutritionProduct> getAllProducts() {
-
-      final StructuredSelection selection = (StructuredSelection) _productsViewer.getSelection();
-
-      final List<TourNutritionProduct> selectedTourNutritionProducts = new ArrayList<>();
-
-      for (final Object object : selection.toList()) {
-
-         if (object instanceof final TourNutritionProduct tourNutritionProduct) {
-            selectedTourNutritionProducts.add(tourNutritionProduct);
-         }
-      }
-
-      return selectedTourNutritionProducts;
-   }
-
    @Override
    public ColumnManager getColumnManager() {
       return _columnManager;
