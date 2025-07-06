@@ -1,5 +1,5 @@
 /*******************************************************************************
- *  Copyright (C) 2008, 2024 Michael Kanis, Veit Edunjobi and others
+ *  Copyright (C) 2008, 2025 Michael Kanis, Veit Edunjobi and others
  *
  *  This file is part of Geoclipse.
  *
@@ -102,7 +102,7 @@ public class PoiView extends ViewPart implements PropertyChangeListener {
    private Button      _btnSearch;
 
    private Combo       _comboSearchQuery;
-   
+
    private ComboViewer _queryViewer;
 
    public class SearchContentProvider implements IStructuredContentProvider {
@@ -193,10 +193,7 @@ public class PoiView extends ViewPart implements PropertyChangeListener {
       @Override
       public Image getImage(final Object obj) {
 
-         if (obj instanceof PointOfInterest) {
-
-            Image img;
-            final PointOfInterest poi = (PointOfInterest) obj;
+         if (obj instanceof final PointOfInterest poi) {
 
             // TODO find/make better matching icons
 
@@ -205,19 +202,19 @@ public class PoiView extends ViewPart implements PropertyChangeListener {
 
 // SET_FORMATTING_OFF
 
-            if (       poiCategory.equals("highway")) {  img = imageRegistry.get(IMG_KEY_CAR);     //$NON-NLS-1$
-            } else if (poiCategory.equals("place")) {    img = imageRegistry.get(IMG_KEY_HOUSE);   //$NON-NLS-1$
-            } else if (poiCategory.equals("waterway")) { img = imageRegistry.get(IMG_KEY_ANCHOR);  //$NON-NLS-1$
-            } else if (poiCategory.equals("amenity")) {  img = imageRegistry.get(IMG_KEY_CART);    //$NON-NLS-1$
-            } else if (poiCategory.equals("leisure")) {  img = imageRegistry.get(IMG_KEY_STAR);    //$NON-NLS-1$
-            } else if (poiCategory.equals("sport")) {    img = imageRegistry.get(IMG_KEY_SOCCER);  //$NON-NLS-1$
-            } else {                                     img = imageRegistry.get(IMG_KEY_FLAG);
+            if (       poiCategory.equals("highway")) {  return imageRegistry.get(IMG_KEY_CAR);     //$NON-NLS-1$
+            } else if (poiCategory.equals("place")) {    return imageRegistry.get(IMG_KEY_HOUSE);   //$NON-NLS-1$
+            } else if (poiCategory.equals("waterway")) { return imageRegistry.get(IMG_KEY_ANCHOR);  //$NON-NLS-1$
+            } else if (poiCategory.equals("amenity")) {  return imageRegistry.get(IMG_KEY_CART);    //$NON-NLS-1$
+            } else if (poiCategory.equals("leisure")) {  return imageRegistry.get(IMG_KEY_STAR);    //$NON-NLS-1$
+            } else if (poiCategory.equals("sport")) {    return imageRegistry.get(IMG_KEY_SOCCER);  //$NON-NLS-1$
+            } else {                                     return imageRegistry.get(IMG_KEY_FLAG);
             }
 
 // SET_FORMATTING_ON
 
-            return img;
          } else {
+
             return null;
          }
       }
