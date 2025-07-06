@@ -157,8 +157,7 @@ public class Images {
    public static final String Map_ValuePoint                             = "map-marker-value-point.png";                          //$NON-NLS-1$
    public static final String Map_WayPoint                               = "waypoint-large.png";                                  //$NON-NLS-1$
    public static final String Map_WayPoint_Hovered                       = "waypoint-large-hovered.png";                          //$NON-NLS-1$
-   public static final String Map3_DirectionArrow                        = "map3-direction-arrow.png";                            //$NON-NLS-1$
-   public static final String Map3_DirectionArrow_Disabled               = "map3-direction-arrow-disabled.png";                   //$NON-NLS-1$
+   public static final String Map3_DirectionArrow                        = "map3-direction-arrow.svg";                            //$NON-NLS-1$
    public static final String Map3_Map3PropertiesView                    = "map3-properties.png";                                 //$NON-NLS-1$
    public static final String Map3_OpenGL_Version                        = "map3-opengl-version.png";                             //$NON-NLS-1$
    public static final String Map3_StatisticsView                        = "map3-statistics.png";                                 //$NON-NLS-1$
@@ -166,7 +165,7 @@ public class Images {
    public static final String MapBookmark_Disabled                       = "map-bookmark-disabled.png";                           //$NON-NLS-1$
    public static final String MapBookmark_Location                       = "map-bookmark-location.png";                           //$NON-NLS-1$
    public static final String MapBookmark_New                            = "map-bookmark-new.svg";                                //$NON-NLS-1$
-   public static final String MapLayer                                   = "map-layer.png";                                       //$NON-NLS-1$
+   public static final String MapLayer                                   = "map-layer.svg";                                       //$NON-NLS-1$
    public static final String MapLayer_Dark                              = "map-layer-dark.png";                                  //$NON-NLS-1$
    public static final String MapLocation_BoundingBox                    = "map-location-boundingbox.svg";                        //$NON-NLS-1$
    public static final String MapLocation_Common                         = "map-location-common.png";                             //$NON-NLS-1$
