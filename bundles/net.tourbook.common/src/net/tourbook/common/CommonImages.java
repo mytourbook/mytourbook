@@ -27,6 +27,7 @@ public class CommonImages {
    public static final String App_Copy_Disabled            = "app-copy-disabled.png";                     //$NON-NLS-1$
    public static final String App_CollapseAll              = "collapseall.svg";                           //$NON-NLS-1$
    public static final String App_CollapseAll_Disabled     = "collapseall-disabled.svg";                  //$NON-NLS-1$
+   public static final String App_Delete                   = "app-delete.svg";                            //$NON-NLS-1$
    public static final String App_Download                 = "app-download.png";                          //$NON-NLS-1$
    public static final String App_Download_Disabled        = "app-download-disabled.png";                 //$NON-NLS-1$
    public static final String App_EmptyIcon_Placeholder    = "_empty16.png";                              //$NON-NLS-1$

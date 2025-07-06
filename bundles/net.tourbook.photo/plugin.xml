@@ -49,7 +49,7 @@
          </separator>
 
          <command commandId="command.net.tourbook.photo.RefreshFolder"
-            icon="icons/refresh.png"
+            icon="icons/refresh.svg"
             label="%Action_PhotoDirectory_RefreshFolder"
             mnemonic="%Action_PhotoDirectory_RefreshFolder_Mnemonic"/>
          

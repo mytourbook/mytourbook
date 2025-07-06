@@ -20,8 +20,7 @@ package net.tourbook.photo;
  */
 public class PhotoImages {
 
-   public static final String App_Delete                          = "delete.png";                                   //$NON-NLS-1$
-   public static final String App_Refresh                         = "refresh.png";                                  //$NON-NLS-1$
+   public static final String App_Refresh                         = "refresh.svg";                                  //$NON-NLS-1$
 
    public static final String Photo_ShowAnnotation                = "photo-action-show-annotation.png";             //$NON-NLS-1$
    public static final String Photo_ShowAnnotation_Disabled       = "photo-action-show-annotation-disabled.png";    //$NON-NLS-1$
