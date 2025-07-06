@@ -821,8 +821,8 @@ public class UI {
        *
        * https://eclipse.dev/eclipse/markdown/?f=news/4.36/platform.md#themes-and-styling
        */
-      System.setProperty("org.eclipse.swt.image.disablement", "grayed");
-//      System.setProperty("org.eclipse.swt.image.disablement", "desaturated");
+//      System.setProperty("org.eclipse.swt.image.disablement", "grayed");
+      System.setProperty("org.eclipse.swt.image.disablement", "desaturated");
 //      System.setProperty("org.eclipse.swt.image.disablement", "gtk");
 
       IMAGE_REGISTRY = CommonActivator.getDefault().getImageRegistry();

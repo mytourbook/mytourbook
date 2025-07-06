@@ -326,10 +326,10 @@ public class Images {
    public static final String TourCompare_Timeline_Elevation             = "tour-compare-timeline-elevation.svg";                 //$NON-NLS-1$
    public static final String TourCompare_Timeline_Geo                   = "tour-compare-timeline-geo.svg";                       //$NON-NLS-1$
    public static final String TourCompare_ElevationCompare_Tool          = "tour-map-compare-result.png";                         //$NON-NLS-1$
-   public static final String TourCompare_ElevationCompare_Tour          = "tour-compare-elevation-compared-tour.png";            //$NON-NLS-1$
+   public static final String TourCompare_ElevationCompare_Tour          = "tour-compare-elevation-compared-tour.svg";            //$NON-NLS-1$
    public static final String TourCompare_GeoCompare_Tool                = "geo-parts.png";                                       //$NON-NLS-1$
    public static final String TourCompare_GeoCompare_Tool_Disabled       = "tour-compare-geo-compare-tool-disabled.png";          //$NON-NLS-1$
-   public static final String TourCompare_GeoCompare_Tour                = "tour-compare-geo-compared-tour.png";                  //$NON-NLS-1$
+   public static final String TourCompare_GeoCompare_Tour                = "tour-compare-geo-compared-tour.svg";                  //$NON-NLS-1$
    public static final String TourCompare_GeoCompare_RefTour             = "tour-compare-geo-tour.png";                           //$NON-NLS-1$
    public static final String TourData                                   = "tour-data.png";                                       //$NON-NLS-1$
    public static final String TourElevationCompareFilter                 = "tour-elevation-compare-filter.png";                   //$NON-NLS-1$

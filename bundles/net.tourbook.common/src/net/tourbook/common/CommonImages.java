@@ -50,22 +50,17 @@ public class CommonImages {
    public static final String App_Pin                      = "app-pin.png";                               //$NON-NLS-1$
    public static final String App_ResetToDefault           = "app-default.png";                           //$NON-NLS-1$
    public static final String App_ReStart                  = "app-restart.png";                           //$NON-NLS-1$
-   public static final String App_Save                     = "app-save.png";                              //$NON-NLS-1$
-   public static final String App_Save_Disabled            = "app-save-disabled.png";                     //$NON-NLS-1$
-   public static final String App_SaveAndNext              = "app-save-and-next.png";                     //$NON-NLS-1$
-   public static final String App_SaveAndNext_Disabled     = "app-save-and-next-disabled.png";            //$NON-NLS-1$
+   public static final String App_Save                     = "app-save.svg";                              //$NON-NLS-1$
+   public static final String App_SaveAndNext              = "app-save-and-next.svg";                     //$NON-NLS-1$
    public static final String App_ScrambleData             = "app-scramble-data.png";                     //$NON-NLS-1$
    public static final String App_Turn_On                  = "app-turn-on.png";                           //$NON-NLS-1$
    public static final String App_Turn_Off                 = "app-turn-off.png";                          //$NON-NLS-1$
-   public static final String App_Undo                     = "app-undo.png";                              //$NON-NLS-1$
-   public static final String App_Undo_Disabled            = "app-undo-disabled.png";                     //$NON-NLS-1$
+   public static final String App_Undo                     = "app-undo.svg";                              //$NON-NLS-1$
    public static final String App_Yes                      = "app-yes.png";                               //$NON-NLS-1$
    public static final String App_No                       = "app-no.png";                                //$NON-NLS-1$
 
-   public static final String Arrow_Left                   = "arrow-left.png";                            //$NON-NLS-1$
-   public static final String Arrow_Left_Disabled          = "arrow-left-disabled.png";                   //$NON-NLS-1$
-   public static final String Arrow_Right                  = "arrow-right.png";                           //$NON-NLS-1$
-   public static final String Arrow_Right_Disabled         = "arrow-right-disabled.png";                  //$NON-NLS-1$
+   public static final String Arrow_Left                   = "arrow-left.svg";                            //$NON-NLS-1$
+   public static final String Arrow_Right                  = "arrow-right.svg";                           //$NON-NLS-1$
    public static final String ColumnCategory               = "column-category.png";                       //$NON-NLS-1$
    public static final String CustomizeProfilesColumns     = "customize-profiles-columns.png";            //$NON-NLS-1$
    public static final String Lock_Closed                  = "lock-closed.png";                           //$NON-NLS-1$

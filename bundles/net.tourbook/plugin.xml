@@ -133,7 +133,7 @@
 
       <perspective
             class="net.tourbook.application.PerspectiveFactoryCompareTours"
-            icon="icons/tour-compare-perspective.png"
+            icon="icons/tour-compare-perspective.svg"
             id="net.tourbook.perspective.CompareTours"
             name="%perspective_name_CompareTours"/>
 
@@ -1890,7 +1890,7 @@
             category    ="net.tourbook.category.compareTours"
             id          ="net.tourbook.views.tourCatalog.comparedTourView"
             class       ="net.tourbook.ui.views.referenceTour.ComparedTourChartView"
-            icon        ="icons/tour-map-comparetour.png"
+            icon        ="icons/tour-map-comparetour.svg"
             name        ="%View_Name_RefTour_ComparedTour"/>
 
          <view
