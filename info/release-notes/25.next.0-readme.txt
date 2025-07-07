@@ -37,6 +37,9 @@ New / Improvements
 * UI Font
   - The font can be customized for all drawn texts 
     This was needed because since Eclipse 4.36 and MyTourbook is started with an -Dswt.autoScale=nnn parameter, then the font is scaled when drawing a text which could make the font too small or too large :-(
+    
+* Disabled Icons    
+  - Select an algorithm how disabled icons should be converted
 
 * All Charts
   - Customize y-axis width
@@ -45,7 +48,7 @@ New / Improvements
 Changes
 =======
 
-* Disabled Action Icons
+* Disabled Icons
   They are now better "disabled" with Eclipse than before. Some disabled icons are replaced and can be looking a bit differently than before
 
 * Eclipse on Windows is now using Edge as default browser which needed a few adjustments

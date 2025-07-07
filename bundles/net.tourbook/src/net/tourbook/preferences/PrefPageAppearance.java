@@ -17,6 +17,9 @@ package net.tourbook.preferences;
 
 import de.byteholder.geoclipse.preferences.IMappingPreferences;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import net.tourbook.Messages;
 import net.tourbook.OtherMessages;
 import net.tourbook.application.TourbookPlugin;
@@ -82,7 +85,9 @@ public class PrefPageAppearance extends PreferencePage implements IWorkbenchPref
    private String                        _defaultThemeId;
    private IThemeEngine                  _themeEngine;
 
+   private ComboViewer                   _comboDisabledIcons;
    private ComboViewer                   _comboViewerTheme;
+   private ControlDecoration             _comboDecorator_DisabledIcons;
    private ControlDecoration             _comboDecorator_Theme;
 
    private FontFieldEditorExtended       _uiFontEditor;
@@ -107,6 +112,19 @@ public class PrefPageAppearance extends PreferencePage implements IWorkbenchPref
    private Spinner _spinnerAutoOpenDelay;
    private Spinner _spinnerNotificationMessagesDuration;
    private Spinner _spinnerRecentTags;
+
+   // TODO Auto-generated method stub
+   public class DisabledIcon {
+
+      private String label;
+      private String property;
+
+      public DisabledIcon(final String label, final String property) {
+
+         this.label = label;
+         this.property = property;
+      }
+   }
 
    public PrefPageAppearance() {
 
@@ -144,8 +162,7 @@ public class PrefPageAppearance extends PreferencePage implements IWorkbenchPref
 //      GridDataFactory.fillDefaults().grab(true, false).applyTo(_uiContainer);
       GridLayoutFactory.fillDefaults().applyTo(container);
       {
-         createUI_10_Theme(container);
-         createUI_20_UIFont(container);
+         createUI_10_UI(container);
          createUI_30_LogFont(container);
          createUI_50_Tagging(container);
          createUI_80_OtherOptions(container);
@@ -154,77 +171,102 @@ public class PrefPageAppearance extends PreferencePage implements IWorkbenchPref
       return container;
    }
 
-   private void createUI_10_Theme(final Composite parent) {
+   private void createUI_10_UI(final Composite parent) {
+
+      final int verticalSpacing = 10;
 
       final Group group = new Group(parent, SWT.NONE);
-      group.setText(Messages.Pref_Appearance_Group_Theme);
+      group.setText(Messages.Pref_Appearance_Group_UI);
       GridDataFactory.fillDefaults().grab(true, false).applyTo(group);
       GridLayoutFactory.swtDefaults()
+
             .numColumns(2)
 
             // more horizontal space is needed that the decorator is not clipped
             .spacing(10, 5)
 
             .applyTo(group);
-      {
-         UI.createLabel(group, Messages.Pref_Appearance_Label_Theme);
-
-         _comboViewerTheme = new ComboViewer(group, SWT.READ_ONLY);
-
-         final Combo combo = _comboViewerTheme.getCombo();
-         combo.setToolTipText(Messages.Pref_Appearance_Combo_Theme_Tooltip);
-
-         _comboViewerTheme.setLabelProvider(LabelProvider.createTextProvider(element -> ((ITheme) element).getLabel()));
-         _comboViewerTheme.setContentProvider(ArrayContentProvider.getInstance());
-         _comboViewerTheme.setInput(ThemeUtil.getAllThemes());
-         _comboViewerTheme.addSelectionChangedListener(selectionChangedEvent -> onSelectTheme());
-
-         _comboDecorator_Theme = new ControlDecoration(combo, SWT.TOP | SWT.LEFT);
-      }
-
-      {
-         /*
-          * Checkbox: Show theme selector in app toolbar
-          */
-         _chkShowInApp_ThemeSelector = new Button(group, SWT.CHECK);
-         _chkShowInApp_ThemeSelector.setText(Messages.Pref_Appearance_Check_ShowThemeSelectorInAppToolbar);
-         GridDataFactory.fillDefaults()
-               .span(2, 1)
-               .applyTo(_chkShowInApp_ThemeSelector);
-      }
-   }
-
-   private void createUI_20_UIFont(final Composite parent) {
-
-      final Group group = new Group(parent, SWT.NONE);
-      group.setText(Messages.Pref_Appearance_Group_UIDrawingFont);
-      group.setToolTipText(Messages.Pref_Appearance_Group_UIDrawingFont_Tooltip);
-      GridDataFactory.fillDefaults().grab(true, false).applyTo(group);
-      GridLayoutFactory.swtDefaults().numColumns(1).applyTo(group);
+//      group.setBackground(UI.SYS_COLOR_MAGENTA);
       {
          {
             /*
-             * Font editor
+             * Theme
              */
-            final Composite fontContainer = new Composite(group, SWT.NONE);
-            GridDataFactory.fillDefaults().grab(true, false).applyTo(fontContainer);
-            GridLayoutFactory.swtDefaults().numColumns(1).applyTo(fontContainer);
-//            fontContainer.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_GREEN));
+
+            {
+               UI.createLabel(group, Messages.Pref_Appearance_Label_Theme);
+
+               _comboViewerTheme = new ComboViewer(group, SWT.READ_ONLY);
+
+               final Combo combo = _comboViewerTheme.getCombo();
+               combo.setToolTipText(Messages.Pref_Appearance_Combo_Theme_Tooltip);
+
+               _comboViewerTheme.setLabelProvider(LabelProvider.createTextProvider(element -> ((ITheme) element).getLabel()));
+               _comboViewerTheme.setContentProvider(ArrayContentProvider.getInstance());
+               _comboViewerTheme.setInput(ThemeUtil.getAllThemes());
+               _comboViewerTheme.addSelectionChangedListener(selectionChangedEvent -> onSelectTheme());
+
+               _comboDecorator_Theme = new ControlDecoration(combo, SWT.TOP | SWT.LEFT);
+            }
+            {
+               /*
+                * Checkbox: Show theme selector in app toolbar
+                */
+               UI.createSpacer_Horizontal(group);
+
+               _chkShowInApp_ThemeSelector = new Button(group, SWT.CHECK);
+               _chkShowInApp_ThemeSelector.setText(Messages.Pref_Appearance_Check_ShowThemeSelectorInAppToolbar);
+               GridDataFactory.fillDefaults().applyTo(_chkShowInApp_ThemeSelector);
+            }
+         }
+         {
+            /*
+             * Font
+             */
+
+            final Label label = UI.createLabel(group, Messages.Pref_Appearance_Label_UIFont);
+            GridDataFactory.fillDefaults().align(SWT.FILL, SWT.BEGINNING).indent(0, verticalSpacing).applyTo(label);
+
+            final Composite container = new Composite(group, SWT.NONE);
+            GridDataFactory.fillDefaults().grab(true, false).indent(0, verticalSpacing).applyTo(container);
+            GridLayoutFactory.swtDefaults().numColumns(1).applyTo(container);
+//            container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_GREEN));
             {
                _uiFontEditor = new FontFieldEditorExtended(
 
                      ICommonPreferences.UI_DRAWING_FONT,
                      UI.EMPTY_STRING,
                      Messages.Pref_Appearance_Label_UIFontExample,
-                     fontContainer);
+                     container);
 
-               _uiFontEditor.setTooltipText(Messages.Pref_Appearance_Group_UIDrawingFont_Tooltip);
+               _uiFontEditor.setTooltipText(Messages.Pref_Appearance_FontEditor_Tooltip);
                _uiFontEditor.setPropertyChangeListener(propertyChangeEvent -> {
 
                   // this will fire the pref value
-               	_uiFontEditor.store();
+                  _uiFontEditor.store();
                });
             }
+         }
+         {
+            /*
+             * Disabled icons
+             */
+
+            final Label label = UI.createLabel(group, Messages.Pref_Appearance_Label_DisabledIcons);
+            GridDataFactory.fillDefaults().align(SWT.FILL, SWT.BEGINNING).indent(0, verticalSpacing).applyTo(label);
+
+            _comboDisabledIcons = new ComboViewer(group, SWT.READ_ONLY);
+
+            final Combo combo = _comboDisabledIcons.getCombo();
+            combo.setToolTipText(Messages.Pref_Appearance_Label_DisabledIcons_Tooltip);
+            GridDataFactory.fillDefaults().align(SWT.BEGINNING, SWT.BEGINNING).indent(0, verticalSpacing).applyTo(combo);
+
+            _comboDisabledIcons.setLabelProvider(LabelProvider.createTextProvider(element -> ((DisabledIcon) element).label));
+            _comboDisabledIcons.setContentProvider(ArrayContentProvider.getInstance());
+            _comboDisabledIcons.addSelectionChangedListener(selectionChangedEvent -> onSelectDisabledIcons());
+            _comboDisabledIcons.setInput(getAllDisabledIconSettings());
+
+            _comboDecorator_DisabledIcons = new ControlDecoration(combo, SWT.TOP | SWT.LEFT);
          }
       }
    }
@@ -420,10 +462,50 @@ public class PrefPageAppearance extends PreferencePage implements IWorkbenchPref
       _spinnerAutoOpenDelay.setEnabled(isEnabled && isTagAutoOpen);
    }
 
+   private Object getAllDisabledIconSettings() {
+
+      /**
+       * In addition, the algorithm for the calculation of disabled versions of icons became
+       * configurable. The algorithm can be changed via the system property
+       * org.eclipse.swt.image.disablement with the following options:
+       *
+       * grayed (default): produces a gray-scaled version of the icon, which is aligned with the
+       * existing, pre-generated disabled versions of icons for Eclipse bundles
+       *
+       * desaturated (preview): produces a desaturated version of the icon, comparable to the grayed
+       * version but still keeping some color in it; the configuration of this option may be subject
+       * to change in future releases of Eclipse
+       *
+       * gtk: produces an icon version that conforms with the default disablement algorithm of GTK
+       *
+       * https://eclipse.dev/eclipse/markdown/?f=news/4.36/platform.md#themes-and-styling
+       */
+//      System.setProperty("org.eclipse.swt.image.disablement", "grayed");
+//      System.setProperty("org.eclipse.swt.image.disablement", "desaturated");
+//      System.setProperty("org.eclipse.swt.image.disablement", "gtk");
+
+      final List<DisabledIcon> allSettings = new ArrayList<>();
+
+      allSettings.add(new DisabledIcon(Messages.Pref_Appearance_DisabledIcons_Grayed, "grayed"));
+      allSettings.add(new DisabledIcon(Messages.Pref_Appearance_DisabledIconsDesaturated, "desaturated"));
+      allSettings.add(new DisabledIcon(Messages.Pref_Appearance_DisabledIconsGTK, "gtk"));
+
+      return allSettings;
+   }
+
    /**
-    * @return the currently selected theme or null if there are no themes
+    * @return the currently selected disabled icon
+    */
+   private DisabledIcon getSelectedDisabledIcon() {
+
+      return (DisabledIcon) (_comboDisabledIcons.getStructuredSelection().getFirstElement());
+   }
+
+   /**
+    * @return the currently selected theme or <code>null</code> if there are no themes
     */
    private ITheme getSelectedTheme() {
+
       return (ITheme) (_comboViewerTheme.getStructuredSelection().getFirstElement());
    }
 
@@ -476,6 +558,10 @@ public class PrefPageAppearance extends PreferencePage implements IWorkbenchPref
 
             Messages.Pref_Appearance_Dialog_ResetAllToggleDialogs_Title,
             Messages.Pref_Appearance_Dialog_ResetAllToggleDialogs_Message);
+   }
+
+   private void onSelectDisabledIcons() {
+      // TODO Auto-generated method stub
    }
 
    private void onSelectTheme() {
