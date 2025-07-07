@@ -85,8 +85,12 @@ public class PrefPageAppearance extends PreferencePage implements IWorkbenchPref
    private String                        _defaultThemeId;
    private IThemeEngine                  _themeEngine;
 
-   private ComboViewer                   _comboDisabledIcons;
-   private ComboViewer                   _comboViewerTheme;
+   private DisabledIcons                 _currentDisabledIcons;
+   private DisabledIcons                 _prefDisabledIcons;
+   private List<DisabledIcons>           _allDisabledIcons;
+
+   private ComboViewer                   _comboViewer_DisabledIcons;
+   private ComboViewer                   _comboViewer_Theme;
    private ControlDecoration             _comboDecorator_DisabledIcons;
    private ControlDecoration             _comboDecorator_Theme;
 
@@ -113,13 +117,12 @@ public class PrefPageAppearance extends PreferencePage implements IWorkbenchPref
    private Spinner _spinnerNotificationMessagesDuration;
    private Spinner _spinnerRecentTags;
 
-   // TODO Auto-generated method stub
-   public class DisabledIcon {
+   public class DisabledIcons {
 
       private String label;
       private String property;
 
-      public DisabledIcon(final String label, final String property) {
+      public DisabledIcons(final String label, final String property) {
 
          this.label = label;
          this.property = property;
@@ -173,7 +176,7 @@ public class PrefPageAppearance extends PreferencePage implements IWorkbenchPref
 
    private void createUI_10_UI(final Composite parent) {
 
-      final int verticalSpacing = 10;
+      final int verticalSpacing = 5;
 
       final Group group = new Group(parent, SWT.NONE);
       group.setText(Messages.Pref_Appearance_Group_UI);
@@ -196,15 +199,15 @@ public class PrefPageAppearance extends PreferencePage implements IWorkbenchPref
             {
                UI.createLabel(group, Messages.Pref_Appearance_Label_Theme);
 
-               _comboViewerTheme = new ComboViewer(group, SWT.READ_ONLY);
+               _comboViewer_Theme = new ComboViewer(group, SWT.READ_ONLY);
 
-               final Combo combo = _comboViewerTheme.getCombo();
+               final Combo combo = _comboViewer_Theme.getCombo();
                combo.setToolTipText(Messages.Pref_Appearance_Combo_Theme_Tooltip);
 
-               _comboViewerTheme.setLabelProvider(LabelProvider.createTextProvider(element -> ((ITheme) element).getLabel()));
-               _comboViewerTheme.setContentProvider(ArrayContentProvider.getInstance());
-               _comboViewerTheme.setInput(ThemeUtil.getAllThemes());
-               _comboViewerTheme.addSelectionChangedListener(selectionChangedEvent -> onSelectTheme());
+               _comboViewer_Theme.setLabelProvider(LabelProvider.createTextProvider(element -> ((ITheme) element).getLabel()));
+               _comboViewer_Theme.setContentProvider(ArrayContentProvider.getInstance());
+               _comboViewer_Theme.setInput(ThemeUtil.getAllThemes());
+               _comboViewer_Theme.addSelectionChangedListener(selectionChangedEvent -> onSelectTheme());
 
                _comboDecorator_Theme = new ControlDecoration(combo, SWT.TOP | SWT.LEFT);
             }
@@ -218,6 +221,27 @@ public class PrefPageAppearance extends PreferencePage implements IWorkbenchPref
                _chkShowInApp_ThemeSelector.setText(Messages.Pref_Appearance_Check_ShowThemeSelectorInAppToolbar);
                GridDataFactory.fillDefaults().applyTo(_chkShowInApp_ThemeSelector);
             }
+         }
+         {
+            /*
+             * Disabled icons
+             */
+
+            final Label label = UI.createLabel(group, Messages.Pref_Appearance_Label_DisabledIcons);
+            GridDataFactory.fillDefaults().align(SWT.FILL, SWT.BEGINNING).indent(0, verticalSpacing).applyTo(label);
+
+            _comboViewer_DisabledIcons = new ComboViewer(group, SWT.READ_ONLY);
+
+            final Combo combo = _comboViewer_DisabledIcons.getCombo();
+            combo.setToolTipText(Messages.Pref_Appearance_Label_DisabledIcons_Tooltip);
+            GridDataFactory.fillDefaults().align(SWT.BEGINNING, SWT.BEGINNING).indent(0, verticalSpacing).applyTo(combo);
+
+            _comboViewer_DisabledIcons.setLabelProvider(LabelProvider.createTextProvider(element -> ((DisabledIcons) element).label));
+            _comboViewer_DisabledIcons.setContentProvider(ArrayContentProvider.getInstance());
+            _comboViewer_DisabledIcons.addSelectionChangedListener(selectionChangedEvent -> onSelectDisabledIcons());
+            _comboViewer_DisabledIcons.setInput(_allDisabledIcons);
+
+            _comboDecorator_DisabledIcons = new ControlDecoration(combo, SWT.TOP | SWT.LEFT);
          }
          {
             /*
@@ -246,27 +270,6 @@ public class PrefPageAppearance extends PreferencePage implements IWorkbenchPref
                   _uiFontEditor.store();
                });
             }
-         }
-         {
-            /*
-             * Disabled icons
-             */
-
-            final Label label = UI.createLabel(group, Messages.Pref_Appearance_Label_DisabledIcons);
-            GridDataFactory.fillDefaults().align(SWT.FILL, SWT.BEGINNING).indent(0, verticalSpacing).applyTo(label);
-
-            _comboDisabledIcons = new ComboViewer(group, SWT.READ_ONLY);
-
-            final Combo combo = _comboDisabledIcons.getCombo();
-            combo.setToolTipText(Messages.Pref_Appearance_Label_DisabledIcons_Tooltip);
-            GridDataFactory.fillDefaults().align(SWT.BEGINNING, SWT.BEGINNING).indent(0, verticalSpacing).applyTo(combo);
-
-            _comboDisabledIcons.setLabelProvider(LabelProvider.createTextProvider(element -> ((DisabledIcon) element).label));
-            _comboDisabledIcons.setContentProvider(ArrayContentProvider.getInstance());
-            _comboDisabledIcons.addSelectionChangedListener(selectionChangedEvent -> onSelectDisabledIcons());
-            _comboDisabledIcons.setInput(getAllDisabledIconSettings());
-
-            _comboDecorator_DisabledIcons = new ControlDecoration(combo, SWT.TOP | SWT.LEFT);
          }
       }
    }
@@ -462,43 +465,30 @@ public class PrefPageAppearance extends PreferencePage implements IWorkbenchPref
       _spinnerAutoOpenDelay.setEnabled(isEnabled && isTagAutoOpen);
    }
 
-   private Object getAllDisabledIconSettings() {
+   private DisabledIcons getPrefDisabledIcons(final boolean isDefault) {
 
-      /**
-       * In addition, the algorithm for the calculation of disabled versions of icons became
-       * configurable. The algorithm can be changed via the system property
-       * org.eclipse.swt.image.disablement with the following options:
-       *
-       * grayed (default): produces a gray-scaled version of the icon, which is aligned with the
-       * existing, pre-generated disabled versions of icons for Eclipse bundles
-       *
-       * desaturated (preview): produces a desaturated version of the icon, comparable to the grayed
-       * version but still keeping some color in it; the configuration of this option may be subject
-       * to change in future releases of Eclipse
-       *
-       * gtk: produces an icon version that conforms with the default disablement algorithm of GTK
-       *
-       * https://eclipse.dev/eclipse/markdown/?f=news/4.36/platform.md#themes-and-styling
-       */
-//      System.setProperty("org.eclipse.swt.image.disablement", "grayed");
-//      System.setProperty("org.eclipse.swt.image.disablement", "desaturated");
-//      System.setProperty("org.eclipse.swt.image.disablement", "gtk");
+      final String prefDisabledIcons = isDefault
 
-      final List<DisabledIcon> allSettings = new ArrayList<>();
+            ? _prefStore_Common.getDefaultString(ICommonPreferences.UI_DISABLED_ICONS)
+            : _prefStore_Common.getString(ICommonPreferences.UI_DISABLED_ICONS);
 
-      allSettings.add(new DisabledIcon(Messages.Pref_Appearance_DisabledIcons_Grayed, "grayed"));
-      allSettings.add(new DisabledIcon(Messages.Pref_Appearance_DisabledIconsDesaturated, "desaturated"));
-      allSettings.add(new DisabledIcon(Messages.Pref_Appearance_DisabledIconsGTK, "gtk"));
+      for (final DisabledIcons disabledIcons : _allDisabledIcons) {
 
-      return allSettings;
+         if (disabledIcons.property.equals(prefDisabledIcons)) {
+
+            return disabledIcons;
+         }
+      }
+
+      return _allDisabledIcons.get(0);
    }
 
    /**
     * @return the currently selected disabled icon
     */
-   private DisabledIcon getSelectedDisabledIcon() {
+   private DisabledIcons getSelectedDisabledIcon() {
 
-      return (DisabledIcon) (_comboDisabledIcons.getStructuredSelection().getFirstElement());
+      return (DisabledIcons) (_comboViewer_DisabledIcons.getStructuredSelection().getFirstElement());
    }
 
    /**
@@ -506,7 +496,7 @@ public class PrefPageAppearance extends PreferencePage implements IWorkbenchPref
     */
    private ITheme getSelectedTheme() {
 
-      return (ITheme) (_comboViewerTheme.getStructuredSelection().getFirstElement());
+      return (ITheme) (_comboViewer_Theme.getStructuredSelection().getFirstElement());
    }
 
    @Override
@@ -534,6 +524,17 @@ public class PrefPageAppearance extends PreferencePage implements IWorkbenchPref
       _defaultSelectionListener = SelectionListener.widgetSelectedAdapter(selectionEvent -> enableControls());
 
       _defaultMouseWheelListener = mouseEvent -> UI.adjustSpinnerValueOnMouseScroll(mouseEvent);
+
+// SET_FORMATTING_OFF
+
+      // https://eclipse.dev/eclipse/markdown/?f=news/4.36/platform.md#themes-and-styling
+      _allDisabledIcons = new ArrayList<>();
+
+      _allDisabledIcons.add(new DisabledIcons(Messages.Pref_Appearance_DisabledIcons_Grayed,        UI.DISABLED_ICONS_GRAYED));
+      _allDisabledIcons.add(new DisabledIcons(Messages.Pref_Appearance_DisabledIcons_Desaturated,   UI.DISABLED_ICONS_DESATURATED));
+      _allDisabledIcons.add(new DisabledIcons(Messages.Pref_Appearance_DisabledIcons_GTK,           UI.DISABLED_ICONS_GTK));
+
+// SET_FORMATTING_ON
    }
 
    private void onChangeFontInEditor_LogMessages() {
@@ -561,14 +562,35 @@ public class PrefPageAppearance extends PreferencePage implements IWorkbenchPref
    }
 
    private void onSelectDisabledIcons() {
-      // TODO Auto-generated method stub
+
+      final DisabledIcons selectedDisabledIcon = getSelectedDisabledIcon();
+
+      if (selectedDisabledIcon != _prefDisabledIcons) {
+
+         // another disabled icons is selected
+
+         _currentDisabledIcons = selectedDisabledIcon;
+
+         final Image decorationImage = FieldDecorationRegistry.getDefault()
+               .getFieldDecoration(FieldDecorationRegistry.DEC_WARNING)
+               .getImage();
+
+         // a restart is required for the theme change to take full effect
+         _comboDecorator_DisabledIcons.setDescriptionText("A restart is required for the disabled icons change to take full effect");
+         _comboDecorator_DisabledIcons.setImage(decorationImage);
+         _comboDecorator_DisabledIcons.show();
+
+      } else {
+
+         _comboDecorator_DisabledIcons.hide();
+      }
    }
 
    private void onSelectTheme() {
 
       final ITheme selectedTheme = getSelectedTheme();
 
-      if (!selectedTheme.equals(_currentTheme)) {
+      if (selectedTheme.equals(_currentTheme) == false) {
 
          // another theme is selected
 
@@ -631,13 +653,11 @@ public class PrefPageAppearance extends PreferencePage implements IWorkbenchPref
          // update UI
          final ITheme activeTheme = _themeEngine.getActiveTheme();
          if (activeTheme != null) {
-            _comboViewerTheme.setSelection(new StructuredSelection(activeTheme));
+            _comboViewer_Theme.setSelection(new StructuredSelection(activeTheme));
          }
       }
 
-      /*
-       * Other
-       */
+      _currentDisabledIcons = getPrefDisabledIcons(true);
 
 // SET_FORMATTING_OFF
 
@@ -653,6 +673,8 @@ public class PrefPageAppearance extends PreferencePage implements IWorkbenchPref
       _chkShowInApp_RestartApp            .setSelection(false);
       _chkShowInApp_ScrambleData          .setSelection(false);
       _chkShowInApp_ThemeSelector         .setSelection(false);
+
+      _comboViewer_DisabledIcons          .setSelection(new StructuredSelection(_currentDisabledIcons));
 
 // SET_FORMATTING_ON
 
@@ -713,6 +735,21 @@ public class PrefPageAppearance extends PreferencePage implements IWorkbenchPref
          // field is modified, ask for restart
 
          isRestartNow = requestForRestart(Messages.Pref_Appearance_Dialog_RestartAfterThemeSelectorIsInToolbar_Message);
+      }
+
+      /*
+       * Disabled icons
+       */
+      if (_currentDisabledIcons != _prefDisabledIcons) {
+
+         _prefStore_Common.setValue(ICommonPreferences.UI_DISABLED_ICONS, _currentDisabledIcons.property);
+
+         // an app restart is required for the disabled icons change to take full effect
+
+         if (isRestartNow == false) {
+
+            isRestartNow = requestForRestart("A restart is required for the disabled icons change to take full effect");
+         }
       }
 
       /*
@@ -785,12 +822,11 @@ public class PrefPageAppearance extends PreferencePage implements IWorkbenchPref
        */
       _currentTheme = _themeEngine.getActiveTheme();
       if (_currentTheme != null) {
-         _comboViewerTheme.setSelection(new StructuredSelection(_currentTheme));
+         _comboViewer_Theme.setSelection(new StructuredSelection(_currentTheme));
       }
 
-      /*
-       * Other
-       */
+      _currentDisabledIcons = _prefDisabledIcons = getPrefDisabledIcons(false);
+
 // SET_FORMATTING_OFF
 
       final boolean isShowExtendedVersion = _prefStore_Common.getBoolean(ICommonPreferences.APPEARANCE_IS_SHOW_EXTENDED_VERSION_IN_APP_TITLE);
@@ -812,6 +848,8 @@ public class PrefPageAppearance extends PreferencePage implements IWorkbenchPref
       _chkTaggingAnimation                .setSelection(_prefStore.getBoolean(ITourbookPreferences.APPEARANCE_IS_TAGGING_ANIMATION));
       _spinnerAutoOpenDelay               .setSelection(_prefStore.getInt(ITourbookPreferences.APPEARANCE_TAGGING_AUTO_OPEN_DELAY));
       _spinnerRecentTags                  .setSelection(_prefStore.getInt(ITourbookPreferences.APPEARANCE_NUMBER_OF_RECENT_TAGS));
+
+      _comboViewer_DisabledIcons          .setSelection(new StructuredSelection(_currentDisabledIcons));
 
       _logMessageFontEditor   .setPreferenceStore(_prefStore);
       _logMessageFontEditor   .load();

@@ -1653,9 +1653,9 @@ public class Messages extends NLS {
    public static String        Pref_Appearance_Dialog_RestartAfterThemeChange_Message;
    public static String        Pref_Appearance_Dialog_RestartAfterThemeSelectorIsInToolbar_Message;
    public static String        Pref_Appearance_Dialog_ScrambleData_Message;
+   public static String        Pref_Appearance_DisabledIcons_Desaturated;
    public static String        Pref_Appearance_DisabledIcons_Grayed;
-   public static String        Pref_Appearance_DisabledIconsDesaturated;
-   public static String        Pref_Appearance_DisabledIconsGTK;
+   public static String        Pref_Appearance_DisabledIcons_GTK;
    public static String        Pref_Appearance_FontEditor_Tooltip;
    public static String        Pref_Appearance_Group_PaceAndSpeedDisplay;
    public static String        Pref_Appearance_Group_Tagging;

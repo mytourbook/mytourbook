@@ -342,6 +342,11 @@ public class UI {
     */
    public static boolean       IS_BRIGHT_THEME;
 
+   // https://eclipse.dev/eclipse/markdown/?f=news/4.36/platform.md#themes-and-styling
+   public static String        DISABLED_ICONS_DESATURATED     = "desaturated";               //$NON-NLS-1$
+   public static String        DISABLED_ICONS_GTK             = "gtk";                       //$NON-NLS-1$
+   public static String        DISABLED_ICONS_GRAYED          = "grayed";                    //$NON-NLS-1$
+
    /**
     * Is <code>true</code> when a 4k display is used
     */
@@ -821,9 +826,7 @@ public class UI {
        *
        * https://eclipse.dev/eclipse/markdown/?f=news/4.36/platform.md#themes-and-styling
        */
-//      System.setProperty("org.eclipse.swt.image.disablement", "grayed");
-      System.setProperty("org.eclipse.swt.image.disablement", "desaturated");
-//      System.setProperty("org.eclipse.swt.image.disablement", "gtk");
+      System.setProperty("org.eclipse.swt.image.disablement", _prefStore_Common.getString(ICommonPreferences.UI_DISABLED_ICONS)); //$NON-NLS-1$
 
       IMAGE_REGISTRY = CommonActivator.getDefault().getImageRegistry();
 

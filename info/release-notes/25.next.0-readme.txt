@@ -40,6 +40,7 @@ New / Improvements
     
 * Disabled Icons    
   - Select an algorithm how disabled icons should be converted
+    https://github.com/mytourbook/mytourbook/issues/1513
 
 * All Charts
   - Customize y-axis width
@@ -53,6 +54,7 @@ Changes
 
 * Eclipse on Windows is now using Edge as default browser which needed a few adjustments
   https://github.com/mytourbook/mytourbook/issues/1512
+  
 
 Changes that require Tour Re-import
 ===================================
