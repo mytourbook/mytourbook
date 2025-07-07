@@ -48,6 +48,10 @@ public class CommonImages {
    public static final String App_Paste                    = "app-paste.png";                             //$NON-NLS-1$
    public static final String App_Paste_Disabled           = "app-paste-disabled.png";                    //$NON-NLS-1$
    public static final String App_Pin                      = "app-pin.png";                               //$NON-NLS-1$
+   public static final String App_Refresh                  = "refresh.svg";                               //$NON-NLS-1$
+   public static final String App_Refresh_All              = "refresh-all.svg";                           //$NON-NLS-1$
+   public static final String App_Refresh_NotAssessed      = "refresh-not-assessed.svg";                  //$NON-NLS-1$
+   public static final String App_Refresh_Selected         = "refresh-selected.svg";                      //$NON-NLS-1$
    public static final String App_ResetToDefault           = "app-default.png";                           //$NON-NLS-1$
    public static final String App_ReStart                  = "app-restart.png";                           //$NON-NLS-1$
    public static final String App_Save                     = "app-save.svg";                              //$NON-NLS-1$

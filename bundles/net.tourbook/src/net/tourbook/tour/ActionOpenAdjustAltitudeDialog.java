@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2025 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -41,7 +41,6 @@ public class ActionOpenAdjustAltitudeDialog extends Action {
       setText(Messages.app_action_edit_adjust_altitude);
 
       setImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.AdjustElevation));
-      setDisabledImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.AdjustElevation_Disabled));
 
       setEnabled(false);
    }

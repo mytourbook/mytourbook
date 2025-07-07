@@ -776,7 +776,6 @@ public class Map2View extends ViewPart implements
          setText(Messages.Map_Action_EditTourMarker);
 
          setImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.App_Edit));
-         setDisabledImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.App_Edit_Disabled));
       }
 
       @Override
@@ -823,7 +822,6 @@ public class Map2View extends ViewPart implements
          super(Messages.Map_Action_EditPhotoLabel, Action.AS_PUSH_BUTTON);
 
          setImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.App_Edit));
-         setDisabledImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.App_Edit_Disabled));
       }
 
       @Override

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2024 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2025 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -178,7 +178,6 @@ public class SlideoutTourGeoFilter extends AdvancedSlideout implements ITourView
          setToolTipText(Messages.Slideout_TourGeoFilter_Action_ToggleReadEditMode_Tooltip);
 
          setImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.App_Edit));
-         setDisabledImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.App_Edit_Disabled));
 
          setEnabled(false);
       }

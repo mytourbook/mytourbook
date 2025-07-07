@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2024 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2025 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -181,7 +181,7 @@ public class DialogMergeTours extends TitleAreaDialog implements ITourProvider2,
    private final NumberFormat            _nf              = NumberFormat.getNumberInstance();
 
    private final Image                   _iconPlaceholder = TourbookPlugin.getImageDescriptor(Images.App_EmptyIcon_Placeholder).createImage();
-   private final Image                   _imageDialog     = TourbookPlugin.getImageDescriptor(Images.MergeTours).createImage();
+   private final Image                   _imageDialog     = TourbookPlugin.getThemedImageDescriptor(Images.MergeTours).createImage();
    private final HashMap<Integer, Image> _graphImages     = new HashMap<>();
 
    private final int                     _tourStartTimeSynchOffset;

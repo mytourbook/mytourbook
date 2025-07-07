@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <svg
-   width="16"
+   width="16.000031"
    height="16"
    id="svg2985"
    version="1.1"
@@ -34,17 +34,17 @@
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" /></cc:Work></rdf:RDF></metadata><g
      id="layer1"
      style="display:inline"
-     transform="translate(-420,-718.99999)"><rect
+     transform="translate(-420,-748.98321)"><rect
        transform="scale(1,-1)"
-       y="-735"
+       y="-764.98322"
        x="420"
        height="16.000015"
        width="15.999993"
-       id="rect6561-8-1-9-9-5-5-9-9-1-3-94-1-6-6-4-5-3-6-9-5-2-8"
+       id="rect6561-8-1-9-9-5-5-9-9-1-3-94-1-6-6-4-5-3-6-9-5-2-8-2"
        style="display:inline;opacity:0.99;fill:none;stroke:none" /><path
-       id="path5150-9-29-2-8-7-2-3-69-0-09"
-       d="m 440,734.98321 c -0.032,-4.05378 -3.04588,-8.96858 -8.00001,-9 -4.93989,0 -7.95599,5.00325 -7.99999,9"
-       style="display:inline;fill:#ff5757;fill-opacity:1;stroke:#d90000;stroke-width:0.7;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" /><path
-       id="path5150-9-29-2-8-7-2-3-69-2-2-7-4"
-       d="m 435.65002,734.98031 c -0.0306,-3.8944 -2.91262,-8.61597 -7.65003,-8.64618 -4.7238,0 -7.60793,4.80656 -7.65,8.64618"
-       style="display:inline;fill:#91c7ff;fill-opacity:0.696493;stroke:#0063c9;stroke-width:0.7;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:0.698039" /></g></svg>
+       id="path5150-9-29-2-8-7-2-3-69-0-09-7"
+       d="m 440.00192,764.98194 c -0.032,-4.0532 -3.04661,-8.9673 -8.00192,-8.99872 -4.94108,0 -7.9579,5.00254 -8.00191,8.99872"
+       style="display:inline;fill:#ff5757;fill-opacity:1;stroke:none;stroke-width:0.7;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" /><path
+       id="path5150-9-29-2-8-7-2-3-69-2-2-7-4-7"
+       d="m 436.00002,764.97938 c -0.032,-4.05205 -3.04588,-8.96475 -8.00002,-8.99616 -4.93991,0 -7.956,5.00112 -8,8.99616"
+       style="display:inline;fill:#91c7ff;fill-opacity:0.696493;stroke:none;stroke-width:0.7;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" /></g></svg>

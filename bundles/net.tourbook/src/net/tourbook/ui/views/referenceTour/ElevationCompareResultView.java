@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2024 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2025 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -257,8 +257,7 @@ public class ElevationCompareResultView extends ViewPart implements
 
          setToolTipText(Messages.Elevation_Compare_Action_ReRunComparison_Tooltip);
 
-         setImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.App_Refresh));
-         setDisabledImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.App_Refresh_Disabled));
+         setImageDescriptor(CommonActivator.getThemedImageDescriptor(CommonImages.App_Refresh));
       }
 
       @Override

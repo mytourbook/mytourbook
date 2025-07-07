@@ -48,20 +48,11 @@ public class Images {
    public static final String App_Directory_TourBook                     = "tourbook-tours.png";                                  //$NON-NLS-1$
    public static final String App_Directory_TourComparisonTimeline       = "tour-map-statistic.svg";                              //$NON-NLS-1$
    public static final String App_Directory_TourImport                   = "imported-tours.png";                                  //$NON-NLS-1$
-   public static final String App_Edit                                   = "quick-edit.png";                                      //$NON-NLS-1$
-   public static final String App_Edit_Disabled                          = "quick-edit-disabled.png";                             //$NON-NLS-1$
+   public static final String App_Edit                                   = "quick-edit.svg";                                      //$NON-NLS-1$
    public static final String App_EmptyIcon_Placeholder                  = "icon-placeholder.gif";                                //$NON-NLS-1$
    public static final String App_Hide                                   = "app-hide.png";                                        //$NON-NLS-1$
    public static final String App_OK                                     = "16px-Crystal_Clear_action_apply.png";                 //$NON-NLS-1$
    public static final String App_Placeholder16                          = "placeholder16.png";                                   //$NON-NLS-1$
-   public static final String App_Refresh                                = "refresh.png";                                         //$NON-NLS-1$
-   public static final String App_Refresh_Disabled                       = "refresh-disabled.png";                                //$NON-NLS-1$
-   public static final String App_Refresh_All                            = "refresh-all.png";                                     //$NON-NLS-1$
-   public static final String App_Refresh_All_Disabled                   = "refresh-all_disabled.png";                            //$NON-NLS-1$
-   public static final String App_Refresh_NotAssessed                    = "refresh-not-assessed.png";                            //$NON-NLS-1$
-   public static final String App_Refresh_NotAssessed_Disabled           = "refresh-not-assessed_disabled.png";                   //$NON-NLS-1$
-   public static final String App_Refresh_Selected                       = "refresh-selected.png";                                //$NON-NLS-1$
-   public static final String App_Refresh_Selected_Disabled              = "refresh-selected_disabled.png";                       //$NON-NLS-1$
    public static final String App_Remove                                 = "remove.png";                                          //$NON-NLS-1$
    public static final String App_Remove_Disabled                        = "remove-disabled.png";                                 //$NON-NLS-1$
    public static final String App_RemoveAll                              = "remove-all.png";                                      //$NON-NLS-1$
@@ -77,8 +68,7 @@ public class Images {
    public static final String App_Trash_Disabled                         = "trash-disabled.png";                                  //$NON-NLS-1$
    public static final String App_Trash_Themed                           = "trash-blue.png";                                      //$NON-NLS-1$
 
-   public static final String AdjustElevation                            = "adjust-altitude.png";                                 //$NON-NLS-1$
-   public static final String AdjustElevation_Disabled                   = "adjust-altitude-disabled.png";                        //$NON-NLS-1$
+   public static final String AdjustElevation                            = "adjust-altitude.svg";                                 //$NON-NLS-1$
    public static final String ArrowDown                                  = "arrow-down.png";                                      //$NON-NLS-1$
    public static final String ArrowDown_Blue                             = "arrow-down-blue.png";                                 //$NON-NLS-1$
    public static final String ArrowDown_Blue_Disabled                    = "arrow-down-blue-disabled.png";                        //$NON-NLS-1$
@@ -94,8 +84,7 @@ public class Images {
    public static final String Checkbox_Uncheck                           = "checkbox-unchecked.png";                              //$NON-NLS-1$
    public static final String Checkbox_Uncheck_Disabled                  = "checkbox-unchecked-disabled.png";                     //$NON-NLS-1$
    public static final String ConconiChart                               = "conconi-chart.png";                                   //$NON-NLS-1$
-   public static final String CSVFormat                                  = "app-csv-format.png";                                  //$NON-NLS-1$
-   public static final String CSVFormat_Disabled                         = "app-csv-format-disabled.png";                         //$NON-NLS-1$
+   public static final String CSVFormat                                  = "app-csv-format.svg";                                  //$NON-NLS-1$
    public static final String Cursor_Photo_Move                          = "cursor-photo-move.png";                               //$NON-NLS-1$
    public static final String Cursor_Photo_Select                        = "cursor-photo-select.png";                             //$NON-NLS-1$
    public static final String Cursor_Select                              = "cursor-select.png";                                   //$NON-NLS-1$
@@ -260,7 +249,7 @@ public class Images {
    public static final String SplinePoint                                = "spline-point.png";                                    //$NON-NLS-1$
    public static final String State_AdjustTemperature                    = "state-temperature.svg";                               //$NON-NLS-1$
    public static final String State_Copy                                 = "state-copy.png";                                      //$NON-NLS-1$
-   public static final String State_Delete                               = "state-delete.png";                                    //$NON-NLS-1$
+   public static final String State_Delete                               = "state-delete.svg";                                    //$NON-NLS-1$
    public static final String State_DeletedTour_View                     = "state-deleted-tour-view.png";                         //$NON-NLS-1$
    public static final String State_Deleted_Backup                       = "state-delete-backup.png";                             //$NON-NLS-1$
    public static final String State_Deleted_Device                       = "state-delete-device.png";                             //$NON-NLS-1$
@@ -312,8 +301,7 @@ public class Images {
    public static final String TagLayout_Hierarchical_Disabled            = "tag-layout-hierarchical-disabled.svg";                //$NON-NLS-1$
    public static final String TagsChecked                                = "tags-checked.png";                                    //$NON-NLS-1$
    public static final String TagsChecked_Disabled                       = "tags-checked-disabled.png";                           //$NON-NLS-1$
-   public static final String Tour_Duplicate                             = "tour-duplicate.png";                                  //$NON-NLS-1$
-   public static final String Tour_Duplicate_Disabled                    = "tour-duplicate-disabled.png";                         //$NON-NLS-1$
+   public static final String Tour_Duplicate                             = "tour-duplicate.svg";                                  //$NON-NLS-1$
    public static final String Tour_StartEnd                              = "tour-start-end.svg";                                  //$NON-NLS-1$
    public static final String TourAnalyzer                               = "tour-analyzer.png";                                   //$NON-NLS-1$
    public static final String TourBlog                                   = "tour-blog.svg";                                       //$NON-NLS-1$
