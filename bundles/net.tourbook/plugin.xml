@@ -758,7 +758,7 @@
          <!-- Tour Marker -->
          <command
             commandId   ="command.net.tourbook.views.TourMarkerView"
-            icon        ="icons/tour-marker.png"
+            icon        ="icons/tour-marker.svg"
             label       ="%view_name_Marker"
             mnemonic    ="%view_name_Marker_Mnemonic"/>
 
@@ -1733,7 +1733,7 @@
              category   ="net.tourbook.category.Tour_Properties"
              id         ="net.tourbook.views.TourMarkerView"
              class      ="net.tourbook.ui.views.tourMarker.TourMarkerView"
-             icon       ="icons/tour-marker.png"
+             icon       ="icons/tour-marker.svg"
              name       ="%view_name_Marker"/>
 
          <view

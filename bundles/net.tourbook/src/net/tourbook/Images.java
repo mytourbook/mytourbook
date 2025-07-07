@@ -342,9 +342,8 @@ public class Images {
    public static final String TourLog                                    = "tour-log.svg";                                        //$NON-NLS-1$
    public static final String TourLog_Layout_Color                       = "tour-log-layout-color.png";                           //$NON-NLS-1$
    public static final String TourLog_Layout_Simple                      = "tour-log-layout-simple.png";                          //$NON-NLS-1$
-   public static final String TourMarker                                 = "tour-marker.png";                                     //$NON-NLS-1$
+   public static final String TourMarker                                 = "tour-marker.svg";                                     //$NON-NLS-1$
    public static final String TourMarker_All                             = "tour-marker-all.png";                                 //$NON-NLS-1$
-   public static final String TourMarker_Disabled                        = "tour-marker-disabled.png";                            //$NON-NLS-1$
    public static final String TourMarker_Cluster                         = "tour-marker-cluster.png";                             //$NON-NLS-1$
    public static final String TourMarker_Group                           = "tour-marker-group.svg";                               //$NON-NLS-1$
    public static final String TourMarker_New                             = "tour-marker-new.png";                                 //$NON-NLS-1$

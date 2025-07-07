@@ -144,7 +144,7 @@ public class TourActionManager {
             ActionOpenMarkerDialog.class.getName(),
             Messages.app_action_edit_tour_marker,
             TourbookPlugin.getThemedImageDescriptor(Images.TourMarker),
-            TourbookPlugin.getThemedImageDescriptor(Images.TourMarker_Disabled),
+            null,
             TourActionCategory.EDIT);
 
       final TourAction actionOpenAdjustAltitudeDialog    = new TourAction(
