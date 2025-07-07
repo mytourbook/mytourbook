@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2022 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2025 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -29,6 +29,7 @@ import net.tourbook.ui.IInfoToolTipProvider;
 import net.tourbook.ui.ITourProvider;
 
 import org.eclipse.jface.resource.ImageRegistry;
+import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
@@ -49,17 +50,20 @@ public class TourInfoIconToolTipProvider implements ITourToolTipProvider, IInfoT
 
    static {
 
+// SET_FORMATTING_OFF
+
       final ImageRegistry imageRegistry = TourbookPlugin.getDefault().getImageRegistry();
 
-      imageRegistry.put(Images.TourInfo, TourbookPlugin.getImageDescriptor(Images.TourInfo));
-      imageRegistry.put(Images.TourInfo_Disabled, TourbookPlugin.getImageDescriptor(Images.TourInfo_Disabled));
-      imageRegistry.put(Images.TourInfo_Hovered, TourbookPlugin.getImageDescriptor(Images.TourInfo_Hovered));
+      imageRegistry.put(Images.TourInfo,           TourbookPlugin.getImageDescriptor(Images.TourInfo));
+      imageRegistry.put(Images.TourInfo_Hovered,   TourbookPlugin.getImageDescriptor(Images.TourInfo_Hovered));
 
-      _tourInfoImage = imageRegistry.get(Images.TourInfo);
-      _tourInfoImage_Disabled = imageRegistry.get(Images.TourInfo_Disabled);
-      _tourInfoImage_Hovered = imageRegistry.get(Images.TourInfo_Hovered);
+      _tourInfoImage             = imageRegistry.get(Images.TourInfo);
+      _tourInfoImage_Hovered     = imageRegistry.get(Images.TourInfo_Hovered);
+      _tourInfoImage_Disabled    = new Image(_tourInfoImage.getDevice(), _tourInfoImage, SWT.IMAGE_DISABLE);
 
-      _tourInfoImageSize = _tourInfoImage.getBounds();
+      _tourInfoImageSize         = _tourInfoImage.getBounds();
+
+// SET_FORMATTING_ON
    }
 
    private TourToolTip        _tourToolTip;
