@@ -105,7 +105,7 @@ public class ApplicationTools {
    }
 
    /**
-    * Fix "closable" attributes in workbench.xmi. Sometime this attribute disappear and a view
+    * Fix "closable" attributes in workbench.xmi. Sometimes this attribute disappear and a view
     * cannot be closed anymore with the mouse.
     *
     * @param workbenchFolderPath
@@ -199,7 +199,7 @@ public class ApplicationTools {
                StatusUtil.log(e);
             }
 
-            // use a secon try/catch to close files before they are renamed
+            // use a second try/catch to close files before they are renamed
 
             try {
 

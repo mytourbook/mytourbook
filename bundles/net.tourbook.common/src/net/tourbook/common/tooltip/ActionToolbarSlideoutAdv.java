@@ -79,7 +79,8 @@ public abstract class ActionToolbarSlideoutAdv extends ContributionItem implemen
       _imageEnabled = actionImage;
    }
 
-   public ActionToolbarSlideoutAdv(final Image actionImage, final Image actionImageDisabled) {
+   public ActionToolbarSlideoutAdv(final Image actionImage,
+                                   final Image actionImageDisabled) {
 
       _imageEnabled = actionImage;
    }
@@ -91,7 +92,8 @@ public abstract class ActionToolbarSlideoutAdv extends ContributionItem implemen
       _isImageCreated_EnabledDisabled = true;
    }
 
-   public ActionToolbarSlideoutAdv(final ImageDescriptor actionImage, final ImageDescriptor actionImageDisabled) {
+   public ActionToolbarSlideoutAdv(final ImageDescriptor actionImage,
+                                   final ImageDescriptor actionImageDisabled) {
 
       _imageEnabled = actionImage.createImage();
 

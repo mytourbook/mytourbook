@@ -76,8 +76,8 @@ import org.eclipse.ui.part.PageBook;
  *
  * <pre>
  *
- * net.tourbook.Images.GeoCompare_Tool          geo-parts.png                  ->    tour-compare-geo-compare-tool.png
- * net.tourbook.Images.ElevationCompare_Tool    tour-map-compare-result.png    ->    tour-compare-elevation-compare-tool.png
+ * net.tourbook.Images.GeoCompare_Tool          geo-parts.png                  ->    tour-compare-geo-compare-tool.svg
+ * net.tourbook.Images.ElevationCompare_Tool    tour-map-compare-result.png    ->    tour-compare-elevation-compare-tool.svg
  * </pre>
  */
 public class ComparedTourChartView extends TourChartViewPart implements ISynchedChart, ITourChartViewer {

@@ -94,7 +94,7 @@
    <extension	point="org.eclipse.ui.editors">
       <editor
             class="net.tourbook.tour.TourEditor"
-            icon="icons/tour-viewer.png"
+            icon="icons/tour-viewer.svg"
             id="net.tourbook.tour.TourEditor"
             name="%command_view_tourViewer">
       </editor>
@@ -517,14 +517,14 @@
 
          <command
             commandId   ="net.tourbook.command.device.synchronize"
-            icon        ="icons/device-synchronize.png"
+            icon        ="icons/device-synchronize.svg"
             label       ="%Command_Device_ReceiveFromSerialPort_Configured"
             mnemonic    ="%Command_Device_ReceiveFromSerialPort_Configured_Mnemonic"
             tooltip     ="%Command_Device_ReceiveFromSerialPort_Configured_Tooltip"/>
 
          <command
             commandId   ="net.tourbook.command.device.synchronize.direct"
-            icon        ="icons/device-synchronize-direct.png"
+            icon        ="icons/device-synchronize-direct.svg"
             label       ="%Command_Device_ReceiveFromSerialPort_Directly"
             mnemonic    ="%Command_Device_ReceiveFromSerialPort_Directly_Mnemonic"
             tooltip     ="%Command_Device_ReceiveFromSerialPort_Directly_Tooltip"/>
@@ -535,7 +535,7 @@
 
          <command
             commandId   ="net.tourbook.command.createNewTour"
-            icon        ="icons/tour-new.png"
+            icon        ="icons/tour-new.svg"
             label       ="%Command_App_CreateNewTour"
             mnemonic    ="%Command_App_CreateNewTour_Mnemonic"/>
             
@@ -654,7 +654,7 @@
                <!-- All Tour Marker -->
                <command
                   commandId   ="command.net.tourbook.ui.views.TourMarkerAllView"
-                  icon        ="icons/tour-marker-all.png"
+                  icon        ="icons/tour-marker-all.svg"
                   label       ="%View_Name_AllTourMarkers"
                   mnemonic    ="%View_Name_AllTourMarkers_Mnemonic"/>
 
@@ -668,7 +668,7 @@
                <!-- All Common Locations -->
                <command
                   commandId   ="command.net.tourbook.tour.location.CommonLocationView"
-                  icon        ="icons/map-location-common.png"
+                  icon        ="icons/map-location-common.svg"
                   label       ="%View_Name_CommonLocations"
                   mnemonic    ="%View_Name_CommonLocations_Mnemonic"/>
 
@@ -682,14 +682,14 @@
                <!-- Sensors -->
                <command
                   commandId   ="command.net.tourbook.ui.views.sensors.SensorView"
-                  icon        ="icons/sensor.png"
+                  icon        ="icons/sensor.svg"
                   label       ="%View_Name_Sensor"
                   mnemonic    ="%View_Name_Sensor_Mnemonic"/>
    
                <!-- Sensor Chart -->
                <command
                   commandId   ="command.net.tourbook.ui.views.sensors.SensorChartView"
-                  icon        ="icons/sensor-chart.png"
+                  icon        ="icons/sensor-chart.svg"
                   label       ="%View_Name_SensorChart"
                   mnemonic    ="%View_Name_SensorChart_Mnemonic"/>
 
@@ -725,7 +725,7 @@
          <!-- Tour Editor - this command is displayed in the "Tour" and the "Tools" menu -->
          <command
             commandId   ="net.tourbook.command.tourDataEditor"
-            icon        ="icons/tour-editor.png"
+            icon        ="icons/tour-editor.svg"
             label       ="%command_view_tourEditor"
             mnemonic    ="%command_view_tourEditor_mnemonic"
             tooltip     ="%command_view_tourEditor_tooltip"/>
@@ -747,7 +747,7 @@
          <!-- Tour Pauses -->
          <command
             commandId   ="command.net.tourbook.views.TourPausesView"
-            icon        ="icons/tour-pauses.png"
+            icon        ="icons/tour-pauses.svg"
             label       ="%View_Name_TourPauses"
             mnemonic    ="%View_Name_TourPauses_Mnemonic"/>
 
@@ -768,27 +768,27 @@
          <!-- Tour Tags -->
          <command
             commandId   ="command.net.tourbook.ui.views.tagging.TourTags_View"
-            icon        ="icons/tour-tags.png"
+            icon        ="icons/tour-tags.svg"
             label       ="%View_Name_TourTags"
             mnemonic    ="%View_Name_TourTags_Mnemonic"/>
           
          <!-- Waypoints -->
          <command
             commandId   ="command.net.tourbook.views.TourWaypointView"
-            icon        ="icons/tour-waypoint.png"
+            icon        ="icons/tour-waypoint.svg"
             label       ="%View_Name_Waypoint"
             mnemonic    ="%View_Name_Waypoint_Mnemonic"/>
 
          <!-- Tour Data -->
          <command
             commandId   ="command.net.tourbook.views.TourData_View"
-            icon        ="icons/tour-data.png"
+            icon        ="icons/tour-data.svg"
             label       ="%View_Name_TourData"
             mnemonic    ="%View_Name_TourData_Mnemonic"/>
             
          <command
             commandId   ="command.net.tourbook.views.nutrition.TourNutritionView"
-            icon        ="icons/tour-nutrition.png"
+            icon        ="icons/tour-nutrition.svg"
             label       ="%View_Name_TourNutrition"
             mnemonic    ="%View_Name_TourNutrition_Mnemonic"/>
 
@@ -855,14 +855,14 @@
             <!-- Tour Editor - is displayed in the "Tour" and the "Tools" menu -->
             <command
                commandId   ="net.tourbook.command.tourDataEditor"
-               icon        ="icons/tour-editor.png"
+               icon        ="icons/tour-editor.svg"
                label       ="%command_view_tourEditor"
                mnemonic    ="%command_view_tourEditor_mnemonic"
                tooltip     ="%command_view_tourEditor_tooltip"/>
 
             <command
                commandId   ="net.tourbook.command.tourChart.tool.tourSegmenter"
-               icon        ="icons/tour-segmenter.png"
+               icon        ="icons/tour-segmenter.svg"
                label       ="%command_tourChart_tool_tourSegmenter"
                mnemonic    ="%command_tourChart_tool_tourSegmenter_mnemonic"
                style       ="push"
@@ -870,7 +870,7 @@
 
             <command
                commandId   ="net.tourbook.command.tourChart.tool.graphAnalyzer"
-               icon        ="icons/tour-analyzer.png"
+               icon        ="icons/tour-analyzer.svg"
                label       ="%command_tourChart_tool_graphAnalyzer"
                mnemonic    ="%command_tourChart_tool_graphAnalyzer_mnemonic"
                style       ="push"
@@ -884,13 +884,13 @@
                
             <command
                commandId   ="command.net.tourbook.ui.views.TourChartSmoothingView"
-               icon        ="icons/smooth.png"
+               icon        ="icons/smooth.svg"
                label       ="%View_Name_TourChartSmoothing"
                mnemonic    ="%View_Name_TourChartSmoothing_Mnemonic"/>
                
             <command
                commandId   ="command.net.tourbook.statistic.StatisticValuesView"
-               icon        ="icons/statistic-values.png"
+               icon        ="icons/statistic-values.svg"
                label       ="%View_Name_StatisticValues"
                mnemonic    ="%View_Name_StatisticValues_Mnemonic"/>
 
@@ -910,14 +910,14 @@
             <!-- Conconi Test -->
             <command
                commandId   ="command.net.tourbook.views.ConconiChart"
-               icon        ="icons/conconi-chart.png"
+               icon        ="icons/conconi-chart.svg"
                label       ="%View_Name_ConconiChart"
                mnemonic    ="%View_Name_ConconiChart_Mnemonic"/>
             
             <!-- Heart Rate Variability -->
             <command
                commandId   ="command.net.tourbook.views.HeartRateVariabilityChart"
-               icon        ="icons/heart-rate-variability.png"
+               icon        ="icons/heart-rate-variability.svg"
                label       ="%View_Name_HeartRateVariabilityChart"
                mnemonic    ="%View_Name_HeartRateVariabilityChart_Mnemonic"/>
       
@@ -1089,13 +1089,13 @@
 
             <command
                commandId      ="net.tourbook.command.tourDataEditor"
-               icon           ="icons/tour-editor.png"
+               icon           ="icons/tour-editor.svg"
                label          ="%command_view_tourEditor"
                tooltip        ="%command_view_tourEditor_tooltip"/>
 
             <command
                commandId      ="net.tourbook.command.createNewTour"
-               icon           ="icons/tour-new.png"
+               icon           ="icons/tour-new.svg"
                tooltip        ="%Command_App_CreateNewTour_Tooltip"/>
 
          </toolbar>
@@ -1175,7 +1175,7 @@
 
          <command
             commandId   ="net.tourbook.command.device.synchronize"
-            icon        ="icons/device-synchronize.png"
+            icon        ="icons/device-synchronize.svg"
             label       ="%Command_Device_ReceiveFromSerialPort_Configured"
             mnemonic    ="%Command_Device_ReceiveFromSerialPort_Configured_Mnemonic"
             style       ="push"
@@ -1183,7 +1183,7 @@
             
          <command
             commandId   ="net.tourbook.command.device.synchronize.direct"
-            icon        ="icons/device-synchronize-direct.png"
+            icon        ="icons/device-synchronize-direct.svg"
             label       ="%Command_Device_ReceiveFromSerialPort_Directly"
             mnemonic    ="%Command_Device_ReceiveFromSerialPort_Directly_Mnemonic"
             style       ="push"
@@ -1687,7 +1687,7 @@
             category    ="net.tourbook.category.Tour_Directory"
             id          ="net.tourbook.ui.views.TourMarkerAllView"
             class       ="net.tourbook.ui.views.tourMarker.TourMarkerAllView"
-            icon        ="icons/tour-marker-all.png"
+            icon        ="icons/tour-marker-all.svg"
             name        ="%View_Name_AllTourMarkers"/>
 
          <view
@@ -1701,7 +1701,7 @@
             category    ="net.tourbook.category.Tour_Directory"
             id          ="net.tourbook.tour.location.CommonLocationView"
             class       ="net.tourbook.tour.location.CommonLocationView"
-            icon        ="icons/map-location-common.png"
+            icon        ="icons/map-location-common.svg"
             name        ="%View_Name_CommonLocations"/>
 
 
@@ -1722,14 +1722,14 @@
             category    ="net.tourbook.category.Tour_Properties"
             id          ="net.tourbook.views.TourDataEditorView"
             class       ="net.tourbook.ui.views.tourDataEditor.TourDataEditorView"
-            icon        ="icons/tour-editor.png"
+            icon        ="icons/tour-editor.svg"
             name        ="%command_view_tourEditor"/>
 
          <view
              category   ="net.tourbook.category.Tour_Properties"
              id         ="net.tourbook.ui.views.TourPausesView"
              class      ="net.tourbook.ui.views.TourPausesView"
-             icon       ="icons/tour-pauses.png"
+             icon       ="icons/tour-pauses.svg"
              name       ="%View_Name_TourPauses"/>
 
          <view
@@ -1743,7 +1743,7 @@
             category    ="net.tourbook.category.Tour_Properties"
             id          ="net.tourbook.ui.views.tagging.TourTags_View"
             class       ="net.tourbook.ui.views.tagging.TourTags_View"
-            icon        ="icons/tour-tags.png"
+            icon        ="icons/tour-tags.svg"
             name        ="%View_Name_TourTags"/>
 
          <view
@@ -1764,21 +1764,21 @@
             category    ="net.tourbook.category.Tour_Properties"
             id          ="net.tourbook.views.TourWaypointView"
             class       ="net.tourbook.ui.views.TourWaypointView"
-            icon        ="icons/tour-waypoint.png"
+            icon        ="icons/tour-waypoint.svg"
             name        ="%View_Name_Waypoint"/>
 
          <view
             category    ="net.tourbook.category.Tour_Properties"
             id          ="net.tourbook.ui.views.TourDataView"
             class       ="net.tourbook.ui.views.TourDataView"
-            icon        ="icons/tour-data.png"
+            icon        ="icons/tour-data.svg"
             name        ="%View_Name_TourData"/>
 
          <view
             category    ="net.tourbook.category.Tour_Properties"
             id          ="net.tourbook.ui.views.nutrition.TourNutritionView"
             class       ="net.tourbook.ui.views.nutrition.TourNutritionView"
-            icon        ="icons/tour-nutrition.png"
+            icon        ="icons/tour-nutrition.svg"
             name        ="%View_Name_TourNutrition"/>
 
          <!--
@@ -1816,42 +1816,42 @@
             category    ="net.tourbook.category.Tools"
             id          ="net.tourbook.ui.views.heartRateVariability.HeartRateVariabilityView"
             class       ="net.tourbook.ui.views.heartRateVariability.HeartRateVariabilityView"
-            icon        ="icons/heart-rate-variability.png"
+            icon        ="icons/heart-rate-variability.svg"
             name        ="%View_Name_HeartRateVariabilityChart"/>
 
          <view
             category    ="net.tourbook.category.Tools"
             id          ="net.tourbook.conconi.ConconiView"
             class       ="net.tourbook.conconi.ConconiView"
-            icon        ="icons/conconi-chart.png"
+            icon        ="icons/conconi-chart.svg"
             name        ="%View_Name_ConconiChart"/>
 
          <view
             category    ="net.tourbook.category.Tools"
             id          ="net.tourbook.views.TourChartAnalyzer"
             class       ="net.tourbook.ui.views.TourChartAnalyzerView"
-            icon        ="icons/tour-analyzer.png"
+            icon        ="icons/tour-analyzer.svg"
             name        ="%view_name_Analyzer"/>
 
          <view
             category    ="net.tourbook.category.Tools"
             id          ="net.tourbook.views.TourSegmenter"
             class       ="net.tourbook.ui.views.tourSegmenter.TourSegmenterView"
-            icon        ="icons/tour-segmenter.png"
+            icon        ="icons/tour-segmenter.svg"
             name        ="%view_name_Segmenter"/>
 
          <view
             category    ="net.tourbook.category.Tools"
             id          ="net.tourbook.ui.views.TourChartSmoothingView"
             class       ="net.tourbook.ui.views.TourChartSmoothingView"
-            icon        ="icons/smooth.png"
+            icon        ="icons/smooth.svg"
             name        ="%View_Name_TourChartSmoothing"/>
 
          <view
             category    ="net.tourbook.category.Tools"
             id          ="net.tourbook.statistic.StatisticValuesView"
             class       ="net.tourbook.statistic.StatisticValuesView"
-            icon        ="icons/statistic-values.png"
+            icon        ="icons/statistic-values.svg"
             name        ="%View_Name_StatisticValues"/>
 
          <view
@@ -1949,14 +1949,14 @@
             category    ="net.tourbook.category.Equipment"
             id          ="net.tourbook.ui.views.sensors.SensorView.ID"
             class       ="net.tourbook.ui.views.sensors.SensorView"
-            icon        ="icons/sensor.png"
+            icon        ="icons/sensor.svg"
             name        ="%View_Name_Sensor"/>
 
          <view
             category    ="net.tourbook.category.Equipment"
             id          ="net.tourbook.ui.views.sensors.SensorChartView.ID"
             class       ="net.tourbook.ui.views.sensors.SensorChartView"
-            icon        ="icons/sensor-chart.png"
+            icon        ="icons/sensor-chart.svg"
             name        ="%View_Name_SensorChart"/>
 
 
@@ -2384,7 +2384,7 @@
       <menuContribution locationURI="menu:m_Map?endof=sep_Bookmarks" >
                   
          <command commandId="net.tourbook.map.bookmark.command.MapBookmarkView"
-            icon="icons/map-bookmark.png"
+            icon="icons/map-bookmark.svg"
             label="%View_Name_MapBookmark"
             mnemonic="%View_Name_MapBookmark_Mnemonic"/>
       
@@ -2396,7 +2396,7 @@
                   
             <command
                commandId="net.tourbook.map.bookmark.command.MapBookmarkView"
-               icon="icons/map-bookmark.png"
+               icon="icons/map-bookmark.svg"
                label="%View_Name_MapBookmark"
                tooltip="%View_Name_MapBookmark_Tooltip"/>
 
@@ -2416,7 +2416,7 @@
          category    ="net.tourbook.category.map"
          id          ="net.tourbook.map.bookmark.MapBookmarkView"
          class       ="net.tourbook.map.bookmark.MapBookmarkView"
-         icon        ="icons/map-bookmark.png"
+         icon        ="icons/map-bookmark.svg"
          name        ="%View_Name_MapBookmark"
       />
 
@@ -2436,7 +2436,7 @@
          category    ="net.tourbook.category.map"
          id          ="net.tourbook.map.player.ModelPlayerView"
          class       ="net.tourbook.map.player.ModelPlayerView"
-         icon        ="icons/model-player.png"
+         icon        ="icons/model-player.svg"
          name        ="%View_Name_ModelPlayer"/>
    
    </extension>
@@ -2456,7 +2456,7 @@
                   
          <command 
             commandId   ="net.tourbook.map.command.ModelPlayerView"
-            icon        ="icons/model-player.png"
+            icon        ="icons/model-player.svg"
             label       ="%View_Name_ModelPlayer"
             mnemonic    ="%View_Name_ModelPlayer_Mnemonic"/>
       
