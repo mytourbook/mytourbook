@@ -565,7 +565,7 @@
    
             <command
                commandId   ="command.de.byteholder.geoclipse.poi.ShowPOI"
-               icon        ="icons/search-poi.png"
+               icon        ="icons/search-poi.svg"
                label       ="%View_Name_SearchPOI"
                mnemonic    ="%View_Name_SearchPOI_Mnemonic"/>
    
@@ -1114,7 +1114,7 @@
 
             <command
                commandId   ="command.de.byteholder.geoclipse.poi.ShowPOI"
-               icon        ="icons/search-poi.png"
+               icon        ="icons/search-poi.svg"
                label       ="%View_Name_SearchPOI"
                tooltip     ="%View_Name_SearchPOI_Tooltip"/>
 
@@ -1806,7 +1806,7 @@
             category    ="net.tourbook.category.Tools"
             id          ="de.byteholder.geoclipse.poi.poiView"
             class       ="de.byteholder.geoclipse.poi.PoiView"
-            icon        ="icons/search-poi.png"
+            icon        ="icons/search-poi.svg"
             name        ="%View_Name_SearchPOI"/>
 
          <view

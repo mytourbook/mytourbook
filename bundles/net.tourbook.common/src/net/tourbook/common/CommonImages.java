@@ -92,8 +92,7 @@ public class CommonImages {
    public static final String Slideout_Collapse            = "slideout-collapse.png";                     //$NON-NLS-1$
    public static final String Slideout_Expand              = "slideout-expand.png";                       //$NON-NLS-1$
 
-   public static final String TourOptions                  = "tour-options.png";                          //$NON-NLS-1$
-   public static final String TourOptions_Disabled         = "tour-options-disabled.png";                 //$NON-NLS-1$
+   public static final String TourOptions                  = "tour-options.svg";                          //$NON-NLS-1$
 
    public static final String Weather_Clouds               = "weather-clouds.svg";                        //$NON-NLS-1$
    public static final String Weather_Cloudy               = "weather-cloudy.svg";                        //$NON-NLS-1$

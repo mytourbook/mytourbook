@@ -333,8 +333,7 @@ public class Map25View extends ViewPart implements
 
       public ActionMap25_Options() {
 
-         super(TourbookPlugin.getThemedImageDescriptor(Images.MapOptions),
-               TourbookPlugin.getThemedImageDescriptor(Images.MapOptions_Disabled));
+         super(TourbookPlugin.getThemedImageDescriptor(Images.MapOptions));
       }
 
       @Override

@@ -173,9 +173,8 @@ public class Images {
    public static final String MapModelCursor_Disabled                    = "map-model-cursor-disabled.png";                       //$NON-NLS-1$
    public static final String MapModelList                               = "map-model-list.png";                                  //$NON-NLS-1$
    public static final String MapModelList_Disabled                      = "map-model-list-disabled.png";                         //$NON-NLS-1$
-   public static final String MapOptions                                 = "map-options.png";                                     //$NON-NLS-1$
+   public static final String MapOptions                                 = "map-options.svg";                                     //$NON-NLS-1$
    public static final String MapOptions_Dark                            = "map-options-dark.png";                                //$NON-NLS-1$
-   public static final String MapOptions_Disabled                        = "map-options-disabled.png";                            //$NON-NLS-1$
    public static final String MapProvider                                = "change-map-provider.png";                             //$NON-NLS-1$
    public static final String MergeTours                                 = "merge-tours.svg";                                     //$NON-NLS-1$
    public static final String ModelPlayer                                = "model-player.png";                                    //$NON-NLS-1$
@@ -230,7 +229,7 @@ public class Images {
    public static final String Saved_Tour_OtherPerson                     = "database-other-person.png";                           //$NON-NLS-1$
    public static final String SearchExternal                             = "search-external.png";                                 //$NON-NLS-1$
    public static final String SearchExternal_Disabled                    = "search-external-disabled.png";                        //$NON-NLS-1$
-   public static final String SearchPOI                                  = "search-poi.png";                                      //$NON-NLS-1$
+   public static final String SearchPOI                                  = "search-poi.svg";                                      //$NON-NLS-1$
    public static final String SearchTours                                = "search.svg";                                          //$NON-NLS-1$
    public static final String SearchTours_ByLocation                     = "map-search-tour-by-location.png";                     //$NON-NLS-1$
    public static final String SearchTours_ByLocation_Scroll              = "map-search-tour-by-location-scroll.png";              //$NON-NLS-1$
