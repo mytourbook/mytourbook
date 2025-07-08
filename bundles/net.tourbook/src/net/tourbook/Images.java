@@ -178,7 +178,7 @@ public class Images {
    public static final String MapProvider                                = "change-map-provider.png";                             //$NON-NLS-1$
    public static final String MergeTours                                 = "merge-tours.svg";                                     //$NON-NLS-1$
    public static final String ModelPlayer                                = "model-player.png";                                    //$NON-NLS-1$
-   public static final String MyTourbook16                               = "tourbook16.png";                                      //$NON-NLS-1$
+   public static final String MyTourbook                                 = "tourbook.svg";                                        //$NON-NLS-1$
    public static final String PhotoGallery_Horizontal                    = "photo-gallery-horizontal.png";                        //$NON-NLS-1$
    public static final String PhotoGallery_Vertical                      = "photo-gallery-vertical.png";                          //$NON-NLS-1$
    public static final String PhotoImage                                 = "photo-image.svg";                                     //$NON-NLS-1$

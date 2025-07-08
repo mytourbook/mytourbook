@@ -219,7 +219,7 @@ public class DialogExtractTour extends TitleAreaDialog implements ITourProvider2
 
    private Text                             _txtTourTitle;
 
-   private Image                            _imageDialog = TourbookPlugin.getImageDescriptor(Images.MyTourbook16).createImage();
+   private Image                            _imageDialog = TourbookPlugin.getImageDescriptor(Images.MyTourbook).createImage();
 
    /**
     * Split or extract a tour
