@@ -579,21 +579,21 @@
             <!-- Tour Import -->
             <command 
                commandId   ="command.net.tourbook.views.rawData.RawDataView"
-               icon        ="icons/imported-tours.png"
+               icon        ="icons/imported-tours.svg"
                label       ="%view_name_Data_Import"
                mnemonic    ="%view_name_Data_Import_Mnemonic"/>
                   
             <!-- Tour Book -->
             <command 
                commandId   ="command.net.tourbook.views.tourListView"
-               icon        ="icons/tourbook-tours.png"
+               icon        ="icons/tourbook-tours.svg"
                label       ="%view_name_Book"
                mnemonic    ="%view_name_Book_Mnemonic"/>
 
             <!-- Tagged Tours -->
             <command 
                commandId   ="command.net.tourbook.views.tagViewID"
-               icon        ="icons/tagged-tours.png"
+               icon        ="icons/tagged-tours.svg"
                label       ="%command_tagging_name"
                mnemonic    ="%command_tagging_name_Mnemonic"
                tooltip     ="%command_tagging_name_tooltip"/>
@@ -601,7 +601,7 @@
             <!-- Collated Tours -->
             <command 
                commandId   ="command.net.tourbook.views.collatedToursViewID"
-               icon        ="icons/collated-tours.png"
+               icon        ="icons/collated-tours.svg"
                label       ="%View_Name_CollatedTours"
                mnemonic    ="%View_Name_CollatedTours_Mnemonic"
                tooltip     ="%View_Name_CollatedTours_Tooltip"/>
@@ -630,7 +630,7 @@
                <!-- Reference Tours -->
                <command 
                   commandId   ="command.net.tourbook.views.tourCatalog.TourCatalogView"
-                  icon        ="icons/reference-tours.png"
+                  icon        ="icons/reference-tours.svg"
                   label       ="%View_Name_ReferenceTours"
                   mnemonic    ="%View_Name_ReferenceTours_Mnemonic"/>
 
@@ -827,7 +827,7 @@
          <!-- 2D map -->
          <command
             commandId   ="net.tourbook.mapping.command.tourMap"
-            icon        ="icons/map2-view.png"
+            icon        ="icons/map2-view.svg"
             label       ="%command_tour_map_name"
             mnemonic    ="%command_tour_map_name_Mnemonic"
             tooltip     ="%command_tour_map_name_tooltip"/>
@@ -1025,14 +1025,14 @@
             <!-- Tour Import -->
             <command 
                commandId   ="command.net.tourbook.views.rawData.RawDataView"
-               icon        ="icons/imported-tours.png"
+               icon        ="icons/imported-tours.svg"
                label       ="%view_name_Data_Import"
                mnemonic    ="%view_name_Data_Import_Mnemonic"/>
             
             <!-- Tour Book -->
             <command 
                commandId   ="command.net.tourbook.views.tourListView"
-               icon        ="icons/tourbook-tours.png"
+               icon        ="icons/tourbook-tours.svg"
                label       ="%view_name_Book"
                mnemonic    ="%view_name_Book_Mnemonic"/>
                
@@ -1068,7 +1068,7 @@
             <!-- 2D Map -->
             <command
                commandId   ="net.tourbook.mapping.command.tourMap"
-               icon        ="icons/map2-view.png"
+               icon        ="icons/map2-view.svg"
                label       ="%command_tour_map_name"
                tooltip     ="%command_tour_map_name_tooltip"/>
             
@@ -1628,14 +1628,14 @@
             category    ="net.tourbook.category.Tour_Directory"
             id          ="net.tourbook.views.rawData.RawDataView"
             class       ="net.tourbook.ui.views.rawData.RawDataView"
-            icon        ="icons/imported-tours.png"
+            icon        ="icons/imported-tours.svg"
             name        ="%view_name_Data_Import"/>
             
          <view
             category    ="net.tourbook.category.Tour_Directory"
             id          ="net.tourbook.views.tourListView"
             class       ="net.tourbook.ui.views.tourBook.TourBookView"
-            icon        ="icons/tourbook-tours.png"
+            icon        ="icons/tourbook-tours.svg"
             name        ="%view_name_Book"/>
 
          <view
@@ -1649,21 +1649,21 @@
             category    ="net.tourbook.category.Tour_Directory"
             id          ="net.tourbook.views.tagViewID"
             class       ="net.tourbook.ui.views.tagging.TaggingView"
-            icon        ="icons/tagged-tours.png"
+            icon        ="icons/tagged-tours.svg"
             name        ="%view_name_tagView"/>
 
          <view
             category    ="net.tourbook.category.Tour_Directory"
             id          ="net.tourbook.ui.views.collateTours.CollatedToursView"
             class       ="net.tourbook.ui.views.collateTours.CollatedToursView"
-            icon        ="icons/collated-tours.png"
+            icon        ="icons/collated-tours.svg"
             name        ="%View_Name_CollatedTours"/>
 
          <view
             category    ="net.tourbook.category.Tour_Directory"
             id          ="net.tourbook.views.tourCatalog.TourCatalogView"
             class       ="net.tourbook.ui.views.referenceTour.ReferenceTourView"
-            icon        ="icons/reference-tours.png"
+            icon        ="icons/reference-tours.svg"
             name        ="%View_Name_ReferenceTours"/>
 
          <view
@@ -1932,7 +1932,7 @@
             category    ="net.tourbook.category.map"
             id          ="net.tourbook.map2.view.Map2ViewId"
             class       ="net.tourbook.map2.view.Map2View"
-            icon        ="icons/map2-view.png"
+            icon        ="icons/map2-view.svg"
             name        ="%view_name_tour_map"/>
 
 
@@ -2203,7 +2203,7 @@
                   
          <command
             commandId	="net.tourbook.map25.command.TourMap25"
-            icon			="icons/map25-view.png"
+            icon			="icons/map25-view.svg"
             label			="%View_Name_TourMap25"
             mnemonic		="%View_Name_TourMap25_Mnemonic"
          >
@@ -2230,7 +2230,7 @@
                   
             <command
                commandId	="net.tourbook.map25.command.TourMap25"
-               icon			="icons/map25-view.png"
+               icon			="icons/map25-view.svg"
                label			="%View_Name_TourMap25"
                tooltip		="%View_Name_TourMap25_Tooltip"
             >
@@ -2266,7 +2266,7 @@
          category    ="net.tourbook.category.map"
          id          ="net.tourbook.map25.Map25View"
          class       ="net.tourbook.map25.Map25View"
-         icon        ="icons/map25-view.png"
+         icon        ="icons/map25-view.svg"
          name        ="%View_Name_TourMap25"
       />
 
@@ -2310,7 +2310,7 @@
       <menuContribution locationURI="menu:m_Map?after=sep_Map" >
                   
          <command commandId="net.tourbook.map3.command.TourMap3"
-            icon="icons/map3-view.png"
+            icon="icons/map3-view.svg"
             label="%View_Name_TourMap3"
             mnemonic="%View_Name_TourMap3_Mnemonic"/>
       
@@ -2322,7 +2322,7 @@
                   
             <command
                commandId="net.tourbook.map3.command.TourMap3"
-               icon="icons/map3-view.png"
+               icon="icons/map3-view.svg"
                label="%View_Name_TourMap3"
                tooltip="%View_Name_TourMap3_Tooltip"/>
 
@@ -2342,7 +2342,7 @@
          category    ="net.tourbook.category.map"
          id          ="net.tourbook.map3.view.Map3ViewId"
          class       ="net.tourbook.map3.view.Map3View"
-         icon        ="icons/map3-view.png"
+         icon        ="icons/map3-view.svg"
          name        ="%View_Name_TourMap3"
       />
 
