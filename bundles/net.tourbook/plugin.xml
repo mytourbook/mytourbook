@@ -32,7 +32,10 @@
 
          <property   name="appName"                   value="MyTourbook"/>
          <property   name="aboutText"                 value="%Product_about"/>
+
+         <!-- with eclipse 4.36, a svg image seems to be not supported -->
          <property   name="aboutImage"                value="icons/application/tourbook-about.png"/>
+
          <property   name="windowImages"              value="icons/application/tourbook.svg"/>
          
          <property   name="preferenceCustomization"   value="plugin_customization.ini"/>
