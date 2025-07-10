@@ -48,6 +48,8 @@ import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 
+import net.tourbook.common.UI;
+
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
@@ -60,22 +62,38 @@ import org.w3c.dom.NodeList;
  */
 public class ApplicationTools {
 
-   private static final String  WORKBENCH_XMI                          = "workbench.xmi";                     //$NON-NLS-1$
+   public static final String   WORKBENCH_XMI                          = "workbench.xmi";                     //$NON-NLS-1$
+
    private static final String  WORKBENCH_XMI_BACKUP                   = "workbench-BACKUP.xmi";              //$NON-NLS-1$
    private static final String  WORKBENCH_XMI_ADJUSTED                 = "workbench-ADJUSTED.xmi";            //$NON-NLS-1$
-
    private static final String  TRUE                                   = "true";                              //$NON-NLS-1$
 
    private static final String  PART_ORG_ECLIPSE_UI_EDITORSS           = "org.eclipse.ui.editorss";           //$NON-NLS-1$
-   private static final String  PART_ORG_ECLIPSE_UI_INTERNAL_INTROVIEW = "org.eclipse.ui.internal.introview"; //$NON-NLS-1$
 
+   private static final String  PART_ORG_ECLIPSE_UI_INTERNAL_INTROVIEW = "org.eclipse.ui.internal.introview"; //$NON-NLS-1$
    private static final String  ATTR_CLOSEABLE                         = "closeable";                         //$NON-NLS-1$
+
    private static final String  ATTR_ELEMENT_ID                        = "elementId";                         //$NON-NLS-1$
    private static final String  ATTR_ICON_URI                          = "iconURI";                           //$NON-NLS-1$
 
-   private static final boolean IS_DEBUGGING                           = true;
-
    private static StringBuilder _logger                                = new StringBuilder();
+   private static StringBuilder _stateLogger                           = new StringBuilder();
+
+   public static class FixState {
+
+      public String stateText;
+      private int   numFixed_CloseButtons;
+      private int   numFixed_IconImages;
+
+      public FixState(int numFixed_CloseButtons,
+                      int numFixed_IconImages,
+                      String stateText) {
+
+         this.numFixed_CloseButtons = numFixed_CloseButtons;
+         this.numFixed_IconImages = numFixed_IconImages;
+         stateText = stateText;
+      }
+   }
 
    /**
     * Source: https://howtodoinjava.com/java/xml/xpath-namespace-resolution-example/
@@ -143,17 +161,14 @@ public class ApplicationTools {
       }
    }
 
-   /**
-    * Fix "closable" attributes in workbench.xmi. Sometimes this attribute disappear and a view
-    * cannot be closed anymore with the mouse.
-    *
-    * @param workbenchFolderPath
-    */
-   static void fixClosableAttribute(final File workbenchFolderPath) {
+   public static FixState fixAllIssues(File workbenchFolderPath,
+                                       boolean isFixViewCloseButton,
+                                       boolean isFixViewIconImage) {
 
-      log("fixClosableAttribute()"); //$NON-NLS-1$
-      log("Setting all views closeable=\"true\" in workbench.xmi"); //$NON-NLS-1$
-      log("workbenchFolderPath:    %s".formatted(workbenchFolderPath)); //$NON-NLS-1$
+      resetLogger();
+
+      int numFixed_CloseButtons = 0;
+      int numFixed_IconImages = 0;
 
       final File fileWorkbenchXMI = new File(workbenchFolderPath, WORKBENCH_XMI);
       final File fileWorkbenchXMI_Adjusted = new File(workbenchFolderPath, WORKBENCH_XMI_ADJUSTED);
@@ -172,50 +187,19 @@ public class ApplicationTools {
          final NamespaceResolver nsContext = new NamespaceResolver(domDocument);
          xpath.setNamespaceContext(nsContext);
 
-         final NodeList allNodes = (NodeList) xpath.evaluate(
-               "//children[@xsi:type='advanced:Placeholder']", //$NON-NLS-1$
-               domDocument,
-               XPathConstants.NODESET);
-
-         final int numViews = allNodes.getLength();
-
-         log("numViews: %d".formatted(numViews)); //$NON-NLS-1$
-
-         int numAdjustments = 0;
-
-         // Updated the selected nodes
-         for (int nodeIndex = 0; nodeIndex < numViews; nodeIndex++) {
-
-            final Element domElement = (Element) allNodes.item(nodeIndex);
-
-            final String attrCloseable = domElement.getAttribute(ATTR_CLOSEABLE);
-            final String attrElementId = domElement.getAttribute(ATTR_ELEMENT_ID);
-
-            if (PART_ORG_ECLIPSE_UI_EDITORSS.equals(attrElementId)
-                  || PART_ORG_ECLIPSE_UI_INTERNAL_INTROVIEW.equals(attrElementId)) {
-
-               // skip parts which do not have a closeable attribute
-
-               if (IS_DEBUGGING) {
-                  log("Skipped view            %s".formatted(attrElementId)); //$NON-NLS-1$
-               }
-
-               continue;
-            }
-
-            if (TRUE.equals(attrCloseable) == false) {
-
-               domElement.setAttribute(ATTR_CLOSEABLE, TRUE);
-
-               numAdjustments++;
-
-               log("closeable='true' in %s".formatted(attrElementId)); //$NON-NLS-1$
-            }
+         if (isFixViewCloseButton) {
+            numFixed_CloseButtons = fixViewCloseButtons(
+                  domDocument,
+                  xpath,
+                  workbenchFolderPath);
          }
 
-         log("closeable='true' is set in %d views".formatted(numAdjustments)); //$NON-NLS-1$
+         if (isFixViewIconImage) {
 
-         if (numAdjustments > 0) {
+            numFixed_IconImages = fixViewIcons(domDocument, xpath, workbenchFolderPath);
+         }
+
+         if ((numFixed_CloseButtons > 0 || numFixed_IconImages > 0)) {
 
             replaceXmiFile(domDocument, fileWorkbenchXMI, fileWorkbenchXMI_Adjusted);
          }
@@ -228,82 +212,135 @@ public class ApplicationTools {
 
          logInfo(_logger.toString());
       }
+
+      return new FixState(numFixed_CloseButtons, numFixed_IconImages, _stateLogger.toString());
    }
 
-   static void fixIconURI(File workbenchFolderFilePath) {
+   /**
+    * Fix "closable" attributes in workbench.xmi. Sometimes this attribute disappear and a view
+    * cannot be closed anymore with the mouse.
+    *
+    * @param workbenchFolderPath
+    * @param isUpdateWorkbenchXmiFile
+    *
+    * @return Returns the state
+    */
+   private static int fixViewCloseButtons(final Document domDocument,
+                                          final XPath xpath,
+                                          File workbenchFolderPath) throws XPathExpressionException {
 
-      log("fixIconURI()"); //$NON-NLS-1$
-      log("Fixing iconURI in all views in workbench.xmi"); //$NON-NLS-1$
-      log("workbenchFolderPath:    %s".formatted(workbenchFolderFilePath)); //$NON-NLS-1$
+      logAll("fixClosableAttribute()"); //$NON-NLS-1$
+      logAll("Setting all views closeable=\"true\" in workbench.xmi"); //$NON-NLS-1$
+      logAll("workbenchFolderPath:    %s".formatted(workbenchFolderPath)); //$NON-NLS-1$
 
-      final File fileWorkbenchXMI = new File(workbenchFolderFilePath, WORKBENCH_XMI);
-      final File fileWorkbenchXMI_Adjusted = new File(workbenchFolderFilePath, WORKBENCH_XMI_ADJUSTED);
+      final NodeList allNodes = (NodeList) xpath.evaluate(
+            "//children[@xsi:type='advanced:Placeholder']", //$NON-NLS-1$
+            domDocument,
+            XPathConstants.NODESET);
 
-      try (FileInputStream fromInputStream = new FileInputStream(fileWorkbenchXMI)) {
+      final int numViews = allNodes.getLength();
 
-         // Load the document
-         final DocumentBuilderFactory domFactory = DocumentBuilderFactory.newInstance();
-         domFactory.setNamespaceAware(true);
-         final Document domDocument = domFactory.newDocumentBuilder().parse(fromInputStream);
+      logAll("numViews: %d".formatted(numViews)); //$NON-NLS-1$
 
-         // Select the node(s) with XPath
-         final XPath xpath = XPathFactory.newInstance().newXPath();
+      int numAdjustments = 0;
 
-         // MUST set a name space context otherwise xsi:type is ignored !!!
-         final NamespaceResolver nsContext = new NamespaceResolver(domDocument);
-         xpath.setNamespaceContext(nsContext);
+      // Updated the selected nodes
+      for (int nodeIndex = 0; nodeIndex < numViews; nodeIndex++) {
 
-         List<Workbench_SharedElement> allSharedElements = getAllSharedElements(domDocument, xpath);
-         Map<String, Workbench_Descriptor> allDescriptors = getAllDescriptors(domDocument, xpath);
+         final Element domElement = (Element) allNodes.item(nodeIndex);
 
-         Collections.sort(
-               allSharedElements,
-               (element1, element2) -> element1.elementID.compareTo(element2.elementID));
+         final String attrCloseable = domElement.getAttribute(ATTR_CLOSEABLE);
+         final String attrElementId = domElement.getAttribute(ATTR_ELEMENT_ID);
 
-         int numAdjustments = 0;
+         if (PART_ORG_ECLIPSE_UI_EDITORSS.equals(attrElementId)
+               || PART_ORG_ECLIPSE_UI_INTERNAL_INTROVIEW.equals(attrElementId)) {
 
-         for (Workbench_SharedElement sharedElement : allSharedElements) {
+            // skip parts which do not have a closeable attribute
 
-            String sharedElementID = sharedElement.elementID;
-            Workbench_Descriptor descriptor = allDescriptors.get(sharedElementID);
+            logAll("Skipped view            %s".formatted(attrElementId)); //$NON-NLS-1$
 
-            if (descriptor == null) {
-               continue;
-            }
-
-            String sharedIconURI = sharedElement.iconURI;
-            String descriptorIconURI = descriptor.iconURI;
-
-            if (sharedIconURI.equals(descriptorIconURI) == false) {
-
-               // update shared element
-
-               sharedElement.domElement.setAttribute(ATTR_ICON_URI, descriptorIconURI);
-
-               numAdjustments++;
-
-               log("Replaced in %-70s from %-70s with %-70s".formatted( //$NON-NLS-1$
-                     sharedElementID,
-                     sharedIconURI,
-                     descriptorIconURI));
-            }
+            continue;
          }
 
-         log("Fixed %d images ".formatted(numAdjustments)); //$NON-NLS-1$
+         if (TRUE.equals(attrCloseable) == false) {
 
-         if (numAdjustments > 0) {
+            domElement.setAttribute(ATTR_CLOSEABLE, TRUE);
 
-            replaceXmiFile(domDocument, fileWorkbenchXMI, fileWorkbenchXMI_Adjusted);
+            numAdjustments++;
+
+            logAll("closeable='true' in %s".formatted(attrElementId)); //$NON-NLS-1$
          }
-
-      } catch (final Exception e) {
-
-         logException(e);
-
-      } finally {
-
-         logInfo(_logger.toString());
       }
+
+      logAll("closeable='true' is set in %d views".formatted(numAdjustments)); //$NON-NLS-1$
+
+      return numAdjustments;
+   }
+
+   private static int fixViewIcons(final Document domDocument,
+                                   final XPath xpath,
+                                   File workbenchFolderFilePath)
+         throws XPathExpressionException {
+
+      logAll("fixIconURI()"); //$NON-NLS-1$
+      logAll("Fixing iconURI in all views in workbench.xmi"); //$NON-NLS-1$
+      logAll("workbenchFolderPath:    %s".formatted(workbenchFolderFilePath)); //$NON-NLS-1$
+
+      List<Workbench_SharedElement> allSharedElements = getAllSharedElements(domDocument, xpath);
+      Map<String, Workbench_Descriptor> allDescriptors = getAllDescriptors(domDocument, xpath);
+
+      Collections.sort(
+            allSharedElements,
+            (element1, element2) -> element1.elementID.compareTo(element2.elementID));
+
+      logAll(UI.EMPTY_STRING);
+      logAll("Replacing icons"); //$NON-NLS-1$
+
+      int numAdjustments = 0;
+
+      for (Workbench_SharedElement sharedElement : allSharedElements) {
+
+         String sharedElementID = sharedElement.elementID;
+         Workbench_Descriptor descriptor = allDescriptors.get(sharedElementID);
+
+         if (descriptor == null) {
+            continue;
+         }
+
+         String sharedIconURI = sharedElement.iconURI;
+         String descriptorIconURI = descriptor.iconURI;
+
+         if (sharedIconURI.equals(descriptorIconURI) == false) {
+
+            // update shared element
+
+            sharedElement.domElement.setAttribute(ATTR_ICON_URI, descriptorIconURI);
+
+            numAdjustments++;
+
+            String logText = "Replaced in %-70s from %-70s with %-70s".formatted( //$NON-NLS-1$
+                  sharedElementID,
+                  sharedIconURI,
+                  descriptorIconURI);
+
+            // limit log items otherwise they are not displayed in a tooltip
+            if (numAdjustments <= 6) {
+
+               if (numAdjustments == 6) {
+                  _stateLogger.append("...\n"); //$NON-NLS-1$
+               } else {
+                  logAll(logText);
+               }
+
+            } else {
+               log1(logText);
+            }
+         }
+      }
+
+      logAll("Fixed %d images ".formatted(numAdjustments)); //$NON-NLS-1$
+
+      return numAdjustments;
    }
 
    /**
@@ -318,10 +355,10 @@ public class ApplicationTools {
                                                                       final XPath xpath)
          throws XPathExpressionException {
 
-      String xPathExpression = "//descriptors";
+      String xPathExpression = "//descriptors"; //$NON-NLS-1$
 
-      log("");
-      log("XPath: %s".formatted(xPathExpression));
+      logAll(UI.EMPTY_STRING);
+      logAll("XPath: %s".formatted(xPathExpression)); //$NON-NLS-1$
 
       NodeList allNodes = (NodeList) xpath.evaluate(xPathExpression, domDocument, XPathConstants.NODESET);
 
@@ -336,13 +373,13 @@ public class ApplicationTools {
 
          if (attrIconURI != null && attrIconURI.length() > 0) {
 
-            log("%-70s %s".formatted(attrElementID, attrIconURI)); //$NON-NLS-1$
+            log1("%-70s %s".formatted(attrElementID, attrIconURI)); //$NON-NLS-1$
 
             allDescriptors.put(attrElementID, new Workbench_Descriptor(attrIconURI));
          }
       }
 
-      log("Descriptors: %d".formatted(allDescriptors.size())); //$NON-NLS-1$
+      logAll("Descriptors: %d".formatted(allDescriptors.size())); //$NON-NLS-1$
 
       return allDescriptors;
    }
@@ -351,10 +388,10 @@ public class ApplicationTools {
                                                                      final XPath xpath)
          throws XPathExpressionException {
 
-      String xPathExpression = "//sharedElements";
+      String xPathExpression = "//sharedElements"; //$NON-NLS-1$
 
-      log("");
-      log("XPath: %s".formatted(xPathExpression));
+      logAll(UI.EMPTY_STRING);
+      logAll("XPath: %s".formatted(xPathExpression)); //$NON-NLS-1$
 
       NodeList allNodes = (NodeList) xpath.evaluate(xPathExpression, domDocument, XPathConstants.NODESET);
 
@@ -369,20 +406,26 @@ public class ApplicationTools {
 
          if (attrIconURI != null && attrIconURI.length() > 0) {
 
-            log("%-70s %s".formatted(attrElementID, attrIconURI)); //$NON-NLS-1$
+            log1("%-70s %s".formatted(attrElementID, attrIconURI)); //$NON-NLS-1$
 
             allSharedElements.add(new Workbench_SharedElement(domElement, attrElementID, attrIconURI));
          }
       }
 
-      log("SharedElements: %d".formatted(allSharedElements.size())); //$NON-NLS-1$
+      logAll("SharedElements: %d".formatted(allSharedElements.size())); //$NON-NLS-1$
 
       return allSharedElements;
    }
 
-   private static void log(String logText) {
+   private static void log1(String logText) {
 
-      _logger.append("%-30s %s\n".formatted(LocalDateTime.now(), logText));
+      _logger.append("%-30s %s\n".formatted(LocalDateTime.now(), logText)); //$NON-NLS-1$
+   }
+
+   private static void logAll(String logText) {
+
+      _stateLogger.append("%s\n".formatted(logText)); //$NON-NLS-1$
+      _logger.append("%-30s %s\n".formatted(LocalDateTime.now(), logText)); //$NON-NLS-1$
    }
 
    private static void logException(Exception logText) {
@@ -404,10 +447,10 @@ public class ApplicationTools {
       final String workbenchFolderPath = "C:/DAT/runtime-net.mytourbook/workspace/.metadata/.plugins/org.eclipse.e4.workbench"; //$NON-NLS-1$
       final File workbenchFolderFilePath = new File(workbenchFolderPath);
 
-//      ApplicationTools.fixClosableAttribute(workbenchFolderFilePath);
+      boolean isUpdateFile = false;
 
-      ApplicationTools.fixIconURI(workbenchFolderFilePath);
-
+//      fixViewCloseButtons(workbenchFolderFilePath, isUpdateFile);
+//      fixViewIcons(workbenchFolderFilePath, isUpdateFile);
    }
 
    /**
@@ -424,7 +467,7 @@ public class ApplicationTools {
                                       final File fileWorkbenchXMI_Adjusted) throws TransformerFactoryConfigurationError {
 
       try (FileOutputStream intoFileOutputStream = new FileOutputStream(fileWorkbenchXMI_Adjusted);
-            OutputStreamWriter intoOutputStreamWriter = new OutputStreamWriter(intoFileOutputStream, Charset.forName("UTF-8"));
+            OutputStreamWriter intoOutputStreamWriter = new OutputStreamWriter(intoFileOutputStream, Charset.forName("UTF-8")); //$NON-NLS-1$
             Writer intoCopyWriter = new BufferedWriter(intoOutputStreamWriter)) {
 
          // Write result into the output file
@@ -446,17 +489,23 @@ public class ApplicationTools {
          // rename original workbench.xmi -> workbench-BACKUP.xmi
          final Path originalWorkbenchXMI = Paths.get(fileWorkbenchXMI.getAbsolutePath());
          Files.move(originalWorkbenchXMI, originalWorkbenchXMI.resolveSibling(WORKBENCH_XMI_BACKUP), StandardCopyOption.REPLACE_EXISTING);
-         log("Renamed workbench.xmi -> workbench-BACKUP.xmi"); //$NON-NLS-1$
+         logAll("Renamed workbench.xmi -> workbench-BACKUP.xmi"); //$NON-NLS-1$
 
          // rename workbench-ADJUSTED.xmi -> workbench.xmi
          final Path newWorkbenchXMI = Paths.get(fileWorkbenchXMI_Adjusted.getAbsolutePath());
          Files.move(newWorkbenchXMI, newWorkbenchXMI.resolveSibling(WORKBENCH_XMI), StandardCopyOption.REPLACE_EXISTING);
-         log("Replaced old workbench.xmi with new workbench.xmi"); //$NON-NLS-1$
+         logAll("Replaced old workbench.xmi with new workbench.xmi"); //$NON-NLS-1$
 
       } catch (final IOException e) {
 
          logException(e);
       }
+   }
+
+   private static void resetLogger() {
+
+      _logger.setLength(0);
+      _stateLogger.setLength(0);
    }
 
 }

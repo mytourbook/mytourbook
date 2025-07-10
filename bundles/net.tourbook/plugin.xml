@@ -169,24 +169,34 @@
    <extension point="org.eclipse.ui.preferencePages">
 
       <page
-         name="%preference_page_general"
-         id="net.tourbook.preferences.PrefPageGeneralId"
-         class="net.tourbook.preferences.PrefPageGeneral"
+         name     ="%preference_page_general"
+         id       ="net.tourbook.preferences.PrefPageGeneralId"
+         class    ="net.tourbook.preferences.PrefPageGeneral"
       />
-         <page category    ="net.tourbook.preferences.PrefPageGeneralId"
-            class="net.tourbook.preferences.PrefPageComputedValues"
-            id="net.tourbook.preferences.PrefPageComputedValues"
-            name="%preference_page_computedValues">
-         </page>
+         <page 
+            name        ="%preference_page_computedValues"
+            id          ="net.tourbook.preferences.PrefPageComputedValues"
+            class       ="net.tourbook.preferences.PrefPageComputedValues"
+            category    ="net.tourbook.preferences.PrefPageGeneralId"
+         />
    
-         <page category    ="net.tourbook.preferences.PrefPageGeneralId"
-            class="net.tourbook.preferences.PrefPageTour"
-            id="net.tourbook.preferences.PrefPageTour"
-            name="%Pref_Page_Tour">
+         <page 
+            name        ="%Pref_Page_Tour"
+            id          ="net.tourbook.preferences.PrefPageTour"
+            class       ="net.tourbook.preferences.PrefPageTour"
+            category    ="net.tourbook.preferences.PrefPageGeneralId"
+         >
             <keywordReference
                id="net.tourbook.keywordReference.PrefPageTour">
             </keywordReference>
          </page>
+   
+         <page 
+            name        ="%Pref_Page_Workspace"
+            id          ="net.tourbook.preferences.PrefPageWorkspace"
+            class       ="net.tourbook.preferences.PrefPageWorkspace"
+            category    ="net.tourbook.preferences.PrefPageGeneralId"
+         />
 
 
       <!--

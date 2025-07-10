@@ -329,18 +329,18 @@ public class UI {
 
 // SET_FORMATTING_ON
 
-   public static final String  TRUE                           = Boolean.toString(true);
-   public static final String  FALSE                          = Boolean.toString(false);
+   public static final String TRUE  = Boolean.toString(true);
+   public static final String FALSE = Boolean.toString(false);
 
    /**
     * Is <code>true</code> when the dark theme in the UI is selected
     */
-   public static boolean       IS_DARK_THEME;
+   public static boolean      IS_DARK_THEME;
 
    /**
     * Is <code>true</code> when the bright theme in the UI is selected
     */
-   public static boolean       IS_BRIGHT_THEME;
+   public static boolean      IS_BRIGHT_THEME;
 
    // https://eclipse.dev/eclipse/markdown/?f=news/4.36/platform.md#themes-and-styling
    public static String        DISABLED_ICONS_DESATURATED     = "desaturated";               //$NON-NLS-1$
@@ -765,6 +765,7 @@ public class UI {
 
    public static Color           SYS_COLOR_DARK_GRAY;
    public static Color           SYS_COLOR_DARK_GREEN;
+   public static Color           SYS_COLOR_DARK_RED;
 
    public static Color           SYS_COLOR_LIST_BACKGROUND;
 
@@ -849,6 +850,7 @@ public class UI {
 
       SYS_COLOR_DARK_GRAY           = display.getSystemColor(SWT.COLOR_DARK_GRAY);
       SYS_COLOR_DARK_GREEN          = display.getSystemColor(SWT.COLOR_DARK_GREEN);
+      SYS_COLOR_DARK_RED            = display.getSystemColor(SWT.COLOR_DARK_RED);
 
       SYS_COLOR_LIST_BACKGROUND     = display.getSystemColor(SWT.COLOR_LIST_BACKGROUND);
       SYS_COLOR_WIDGET_BACKGROUND   = display.getSystemColor(SWT.COLOR_WIDGET_BACKGROUND);
