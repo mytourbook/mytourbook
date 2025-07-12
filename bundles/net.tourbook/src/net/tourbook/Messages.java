@@ -2054,8 +2054,6 @@ public class Messages extends NLS {
    public static String        Pref_Weather_Radio_WeatherDescription_Append;
    public static String        Pref_Weather_Radio_WeatherDescription_Replace;
 
-   public static String        Pref_Workspace_Button_ApplyAndRestart;
-   public static String        Pref_Workspace_Button_ApplyAndRestart_Tooltip;
    public static String        Pref_Workspace_Check_FixViewCloseButton;
    public static String        Pref_Workspace_Check_FixViewIconImage;
    public static String        Pref_Workspace_Label_FixViewCloseButton;

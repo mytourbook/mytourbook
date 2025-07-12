@@ -55,14 +55,11 @@ public class PrefPageWorkspace extends PreferencePage implements IWorkbenchPrefe
 
    private SelectionListener      _defaultSelectionListener;
 
-   private FixState               _stateCloseButtons;
-   private FixState               _stateIconURIs;
+   private FixState               _stateFixAllIssues;
 
    /*
     * UI controls
     */
-   private Button _btnApply;
-
    private Button _chkFixViewCloseButton;
    private Button _chkFixViewIconURI;
 
@@ -70,6 +67,8 @@ public class PrefPageWorkspace extends PreferencePage implements IWorkbenchPrefe
    private Label  _lblFixCloseButton_State;
    private Label  _lblFixIconURI;
    private Label  _lblFixIconURI_State;
+
+   private Label  _lblRestartInfo;
 
    public PrefPageWorkspace() {
 
@@ -95,7 +94,7 @@ public class PrefPageWorkspace extends PreferencePage implements IWorkbenchPrefe
       final int textDefaultWidth = _pc.convertWidthInCharsToPixels(40);
 
       final Composite container = new Composite(parent, SWT.NONE);
-      GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
+      GridDataFactory.fillDefaults().grab(true, true).applyTo(container);
       GridLayoutFactory.fillDefaults()
 //            .spacing(5, 15)
 //            .numColumns(2)
@@ -167,16 +166,16 @@ public class PrefPageWorkspace extends PreferencePage implements IWorkbenchPrefe
          }
          {
             /*
-             * Button: Apply & Restart
+             * Restart info
              */
-            _btnApply = new Button(container, SWT.PUSH);
-            _btnApply.setText(Messages.Pref_Workspace_Button_ApplyAndRestart);
-            _btnApply.setToolTipText(Messages.Pref_Workspace_Button_ApplyAndRestart_Tooltip);
-            _btnApply.addSelectionListener(SelectionListener.widgetSelectedAdapter(selectionEvent -> onApplyAndRestart()));
+            _lblRestartInfo = new Label(container, SWT.WRAP);
+            _lblRestartInfo.setText("MyTourbook will be restarted when these fixes are applied");
             GridDataFactory.fillDefaults()
-                  .align(SWT.BEGINNING, SWT.FILL)
-                  .indent(0, 20)
-                  .applyTo(_btnApply);
+                  .grab(true, true)
+                  .align(SWT.FILL, SWT.END)
+                  .applyTo(_lblRestartInfo);
+
+            UI.createSpacer_Horizontal(container);
          }
       }
 
@@ -185,21 +184,19 @@ public class PrefPageWorkspace extends PreferencePage implements IWorkbenchPrefe
 
    private void enableControls() {
 
-      final boolean isCloseButtonInvalid = _stateCloseButtons.numIssues > 0;
-      final boolean isIconImageInvalid = _stateIconURIs.numIssues > 0;
+      final boolean canFixCloseButton = _stateFixAllIssues.numFixed_CloseButtons > 0;
+      final boolean canFixIconImage = _stateFixAllIssues.numFixed_IconImages > 0;
 
-      final boolean isFixCloseButton = _chkFixViewCloseButton.getSelection() && isCloseButtonInvalid;
-      final boolean isFixIconURI = _chkFixViewIconURI.getSelection() && isIconImageInvalid;
+      final boolean canApplyFixCloseButton = _chkFixViewCloseButton.getSelection() && canFixCloseButton;
+      final boolean canApplyFixIconURI = _chkFixViewIconURI.getSelection() && canFixIconImage;
 
-      final boolean isFixSelected = isFixCloseButton || isFixIconURI;
+      _chkFixViewCloseButton.setEnabled(canFixCloseButton);
+      _chkFixViewIconURI.setEnabled(canFixIconImage);
 
-      _btnApply.setEnabled(isFixSelected);
+      _lblFixCloseButton.setEnabled(canApplyFixCloseButton);
+      _lblFixIconURI.setEnabled(canApplyFixIconURI);
 
-      _chkFixViewCloseButton.setEnabled(isCloseButtonInvalid);
-      _chkFixViewIconURI.setEnabled(isIconImageInvalid);
-
-      _lblFixCloseButton.setEnabled(isFixCloseButton);
-      _lblFixIconURI.setEnabled(isFixIconURI);
+      _lblRestartInfo.setEnabled(canApplyFixCloseButton || canApplyFixIconURI);
    }
 
    @Override
@@ -213,7 +210,6 @@ public class PrefPageWorkspace extends PreferencePage implements IWorkbenchPrefe
       _pc = new PixelConverter(parent);
 
       _defaultSelectionListener = SelectionListener.widgetSelectedAdapter(selectionEvent -> enableControls());
-
    }
 
    private void onApplyAndRestart() {
@@ -230,23 +226,11 @@ public class PrefPageWorkspace extends PreferencePage implements IWorkbenchPrefe
    }
 
    @Override
-   protected void performApply() {
-
-      saveState();
-
-      super.performApply();
-   }
-
-   @Override
    public boolean performOk() {
 
-      saveState();
+      onApplyAndRestart();
 
       return true;
-   }
-
-   private void saveState() {
-
    }
 
    private void updateUI() {
@@ -254,22 +238,21 @@ public class PrefPageWorkspace extends PreferencePage implements IWorkbenchPrefe
       final Color colorOK = UI.IS_DARK_THEME ? UI.SYS_COLOR_GREEN : UI.SYS_COLOR_DARK_GREEN;
       final Color colorInvalid = UI.IS_DARK_THEME ? new Color(0xff, 0x40, 0x40) : UI.SYS_COLOR_RED;
 
-      _stateCloseButtons = ApplicationTools.fixViewCloseButtons(_workbenchFolderPath, false);
-      _stateIconURIs = ApplicationTools.fixViewIcons(_workbenchFolderPath, false);
+      _stateFixAllIssues = ApplicationTools.fixAllIssues(false, _workbenchFolderPath, true, true);
 
-      final int numIssuesViewIcons = _stateCloseButtons.numIssues;
-      final int numIssuesViewButtons = _stateIconURIs.numIssues;
+      final int numIssues_ViewButtons = _stateFixAllIssues.numFixed_CloseButtons;
+      final int numIssues_ViewIconImages = _stateFixAllIssues.numFixed_IconImages;
 
-      final String stateViewButton_Text = "Number of hidden close buttons: %d".formatted(numIssuesViewIcons);
-      final String stateViewIcon_Text = "Number of invalid icon images: %d".formatted(numIssuesViewButtons);
+      final String stateViewButton_Text = "Number of hidden close buttons: %d".formatted(numIssues_ViewButtons);
+      final String stateViewIcon_Text = "Number of invalid icon images: %d".formatted(numIssues_ViewIconImages);
 
-      final String stateViewButton_Tooltip = _stateCloseButtons.stateText;
-      final String stateViewIcon_Tooltip = _stateIconURIs.stateText;
+      final String stateViewButton_Tooltip = _stateFixAllIssues.stateText_CloseButton;
+      final String stateViewIcon_Tooltip = _stateFixAllIssues.stateText_IconImages;
 
-      final boolean isViewIconIssue = numIssuesViewIcons > 0;
-      final boolean isViewButtonIssue = numIssuesViewButtons > 0;
+      final boolean isViewIconIssue = numIssues_ViewIconImages > 0;
+      final boolean isViewButtonIssue = numIssues_ViewButtons > 0;
 
-      _btnApply.getDisplay().asyncExec(() -> {
+      _lblFixCloseButton.getDisplay().asyncExec(() -> {
 
          // must be run async otherwise the color is not set in dark theme
 

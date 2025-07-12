@@ -49,6 +49,7 @@ import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 
 import net.tourbook.common.UI;
+import net.tourbook.common.util.StatusUtil;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -77,21 +78,30 @@ public class ApplicationTools {
    private static final String  ATTR_ICON_URI                          = "iconURI";                           //$NON-NLS-1$
 
    private static StringBuilder _logger                                = new StringBuilder();
-   private static StringBuilder _stateLogger                           = new StringBuilder();
+   private static StringBuilder _stateLogger_CloseButtons              = new StringBuilder();
+   private static StringBuilder _stateLogger_IconImages                = new StringBuilder();
+
+   private static boolean       _isApplyToFile;
 
    public static class FixState {
 
-      public String stateText;
-      private int   numFixed_CloseButtons;
-      private int   numFixed_IconImages;
+      public String stateText_CloseButton;
+      public String stateText_IconImages;
+
+      public int    numFixed_CloseButtons;
+      public int    numFixed_IconImages;
 
       public FixState(int numFixed_CloseButtons,
+                      String stateText_CloseButton,
                       int numFixed_IconImages,
-                      String stateText) {
+                      String stateText_IconImages) {
 
          this.numFixed_CloseButtons = numFixed_CloseButtons;
+         this.stateText_CloseButton = stateText_CloseButton;
+
          this.numFixed_IconImages = numFixed_IconImages;
-         stateText = stateText;
+         this.stateText_IconImages = stateText_IconImages;
+
       }
    }
 
@@ -161,9 +171,22 @@ public class ApplicationTools {
       }
    }
 
-   public static FixState fixAllIssues(File workbenchFolderPath,
+   /**
+    * @param isApplyToFile
+    *           When <code>false</code> then the fixes are not applied to workbench.xmi only the
+    *           logs are created
+    * @param workbenchFolderPath
+    * @param isFixViewCloseButton
+    * @param isFixViewIconImage
+    *
+    * @return
+    */
+   public static FixState fixAllIssues(boolean isApplyToFile,
+                                       File workbenchFolderPath,
                                        boolean isFixViewCloseButton,
                                        boolean isFixViewIconImage) {
+
+      _isApplyToFile = isApplyToFile;
 
       resetLogger();
 
@@ -188,18 +211,16 @@ public class ApplicationTools {
          xpath.setNamespaceContext(nsContext);
 
          if (isFixViewCloseButton) {
-            numFixed_CloseButtons = fixViewCloseButtons(
-                  domDocument,
-                  xpath,
-                  workbenchFolderPath);
+
+            numFixed_CloseButtons = fixViewCloseButtons(domDocument, xpath, workbenchFolderPath);
          }
 
          if (isFixViewIconImage) {
 
-            numFixed_IconImages = fixViewIcons(domDocument, xpath, workbenchFolderPath);
+            numFixed_IconImages = fixViewIconImage(domDocument, xpath, workbenchFolderPath);
          }
 
-         if ((numFixed_CloseButtons > 0 || numFixed_IconImages > 0)) {
+         if (isApplyToFile && (numFixed_CloseButtons > 0 || numFixed_IconImages > 0)) {
 
             replaceXmiFile(domDocument, fileWorkbenchXMI, fileWorkbenchXMI_Adjusted);
          }
@@ -213,7 +234,13 @@ public class ApplicationTools {
          logInfo(_logger.toString());
       }
 
-      return new FixState(numFixed_CloseButtons, numFixed_IconImages, _stateLogger.toString());
+      return new FixState(
+
+            numFixed_CloseButtons,
+            _stateLogger_CloseButtons.toString(),
+
+            numFixed_IconImages,
+            _stateLogger_IconImages.toString());
    }
 
    /**
@@ -229,18 +256,18 @@ public class ApplicationTools {
                                           final XPath xpath,
                                           File workbenchFolderPath) throws XPathExpressionException {
 
-      logAll("fixClosableAttribute()"); //$NON-NLS-1$
-      logAll("Setting all views closeable=\"true\" in workbench.xmi"); //$NON-NLS-1$
-      logAll("workbenchFolderPath:    %s".formatted(workbenchFolderPath)); //$NON-NLS-1$
+      String xPathExpression = "//children[@xsi:type='advanced:Placeholder']"; //$NON-NLS-1$
 
-      final NodeList allNodes = (NodeList) xpath.evaluate(
-            "//children[@xsi:type='advanced:Placeholder']", //$NON-NLS-1$
-            domDocument,
-            XPathConstants.NODESET);
+      logIssue_CloseButtons("fixViewCloseButtons()"); //$NON-NLS-1$
+      logIssue_CloseButtons("Set all views closeable=\"true\" in workbench.xmi"); //$NON-NLS-1$
+      logIssue_CloseButtons("workbenchFolderPath: %s".formatted(workbenchFolderPath)); //$NON-NLS-1$
+      logIssue_CloseButtons("XPath %s".formatted(xPathExpression));
+
+      final NodeList allNodes = (NodeList) xpath.evaluate(xPathExpression, domDocument, XPathConstants.NODESET);
 
       final int numViews = allNodes.getLength();
 
-      logAll("numViews: %d".formatted(numViews)); //$NON-NLS-1$
+      logIssue_CloseButtons("Number of views: %d".formatted(numViews)); //$NON-NLS-1$
 
       int numAdjustments = 0;
 
@@ -257,7 +284,7 @@ public class ApplicationTools {
 
             // skip parts which do not have a closeable attribute
 
-            logAll("Skipped view            %s".formatted(attrElementId)); //$NON-NLS-1$
+            logIssue_CloseButtons("Skipped view\t%s".formatted(attrElementId)); //$NON-NLS-1$
 
             continue;
          }
@@ -268,23 +295,26 @@ public class ApplicationTools {
 
             numAdjustments++;
 
-            logAll("closeable='true' in %s".formatted(attrElementId)); //$NON-NLS-1$
+            logIssue_CloseButtons("Set closeable='true' in %s".formatted(attrElementId)); //$NON-NLS-1$
          }
       }
 
-      logAll("closeable='true' is set in %d views".formatted(numAdjustments)); //$NON-NLS-1$
+      if (_isApplyToFile) {
+         logIssue_CloseButtons("closeable='true' is set in %d views".formatted(numAdjustments)); //$NON-NLS-1$
+      }
 
       return numAdjustments;
    }
 
-   private static int fixViewIcons(final Document domDocument,
-                                   final XPath xpath,
-                                   File workbenchFolderFilePath)
+   private static int fixViewIconImage(final Document domDocument,
+                                       final XPath xpath,
+                                       final File workbenchFolderFilePath)
+
          throws XPathExpressionException {
 
-      logAll("fixIconURI()"); //$NON-NLS-1$
-      logAll("Fixing iconURI in all views in workbench.xmi"); //$NON-NLS-1$
-      logAll("workbenchFolderPath:    %s".formatted(workbenchFolderFilePath)); //$NON-NLS-1$
+      logIssue_IconImage("fixViewIconImage()"); //$NON-NLS-1$
+      logIssue_IconImage("Fixing iconURI in all views in workbench.xmi"); //$NON-NLS-1$
+      logIssue_IconImage("workbenchFolderPath:    %s".formatted(workbenchFolderFilePath)); //$NON-NLS-1$
 
       List<Workbench_SharedElement> allSharedElements = getAllSharedElements(domDocument, xpath);
       Map<String, Workbench_Descriptor> allDescriptors = getAllDescriptors(domDocument, xpath);
@@ -293,8 +323,8 @@ public class ApplicationTools {
             allSharedElements,
             (element1, element2) -> element1.elementID.compareTo(element2.elementID));
 
-      logAll(UI.EMPTY_STRING);
-      logAll("Replacing icons"); //$NON-NLS-1$
+      logIssue_IconImage(UI.EMPTY_STRING);
+      logIssue_IconImage("Replacing icons"); //$NON-NLS-1$
 
       int numAdjustments = 0;
 
@@ -327,18 +357,20 @@ public class ApplicationTools {
             if (numAdjustments <= 6) {
 
                if (numAdjustments == 6) {
-                  _stateLogger.append("...\n"); //$NON-NLS-1$
+                  _stateLogger_IconImages.append("...\n"); //$NON-NLS-1$
                } else {
-                  logAll(logText);
+                  logIssue_IconImage(logText);
                }
 
             } else {
-               log1(logText);
+               logDetails(logText);
             }
          }
       }
 
-      logAll("Fixed %d images ".formatted(numAdjustments)); //$NON-NLS-1$
+      if (_isApplyToFile) {
+         logIssue_IconImage("Fixed %d images ".formatted(numAdjustments)); //$NON-NLS-1$
+      }
 
       return numAdjustments;
    }
@@ -357,8 +389,8 @@ public class ApplicationTools {
 
       String xPathExpression = "//descriptors"; //$NON-NLS-1$
 
-      logAll(UI.EMPTY_STRING);
-      logAll("XPath: %s".formatted(xPathExpression)); //$NON-NLS-1$
+      logIssue_IconImage(UI.EMPTY_STRING);
+      logIssue_IconImage("XPath: %s".formatted(xPathExpression)); //$NON-NLS-1$
 
       NodeList allNodes = (NodeList) xpath.evaluate(xPathExpression, domDocument, XPathConstants.NODESET);
 
@@ -373,13 +405,13 @@ public class ApplicationTools {
 
          if (attrIconURI != null && attrIconURI.length() > 0) {
 
-            log1("%-70s %s".formatted(attrElementID, attrIconURI)); //$NON-NLS-1$
+            logDetails("%-70s %s".formatted(attrElementID, attrIconURI)); //$NON-NLS-1$
 
             allDescriptors.put(attrElementID, new Workbench_Descriptor(attrIconURI));
          }
       }
 
-      logAll("Descriptors: %d".formatted(allDescriptors.size())); //$NON-NLS-1$
+      logIssue_IconImage("Descriptors: %d".formatted(allDescriptors.size())); //$NON-NLS-1$
 
       return allDescriptors;
    }
@@ -390,8 +422,8 @@ public class ApplicationTools {
 
       String xPathExpression = "//sharedElements"; //$NON-NLS-1$
 
-      logAll(UI.EMPTY_STRING);
-      logAll("XPath: %s".formatted(xPathExpression)); //$NON-NLS-1$
+      logIssue_IconImage(UI.EMPTY_STRING);
+      logIssue_IconImage("XPath: %s".formatted(xPathExpression)); //$NON-NLS-1$
 
       NodeList allNodes = (NodeList) xpath.evaluate(xPathExpression, domDocument, XPathConstants.NODESET);
 
@@ -406,40 +438,56 @@ public class ApplicationTools {
 
          if (attrIconURI != null && attrIconURI.length() > 0) {
 
-            log1("%-70s %s".formatted(attrElementID, attrIconURI)); //$NON-NLS-1$
+            logDetails("%-70s %s".formatted(attrElementID, attrIconURI)); //$NON-NLS-1$
 
             allSharedElements.add(new Workbench_SharedElement(domElement, attrElementID, attrIconURI));
          }
       }
 
-      logAll("SharedElements: %d".formatted(allSharedElements.size())); //$NON-NLS-1$
+      logIssue_IconImage("SharedElements: %d".formatted(allSharedElements.size())); //$NON-NLS-1$
 
       return allSharedElements;
    }
 
-   private static void log1(String logText) {
+   private static void logAll(String logText) {
+
+      _stateLogger_CloseButtons.append("%s\n".formatted(logText)); //$NON-NLS-1$
+      _stateLogger_IconImages.append("%s\n".formatted(logText)); //$NON-NLS-1$
 
       _logger.append("%-30s %s\n".formatted(LocalDateTime.now(), logText)); //$NON-NLS-1$
    }
 
-   private static void logAll(String logText) {
+   private static void logDetails(String logText) {
 
-      _stateLogger.append("%s\n".formatted(logText)); //$NON-NLS-1$
       _logger.append("%-30s %s\n".formatted(LocalDateTime.now(), logText)); //$NON-NLS-1$
    }
 
    private static void logException(Exception logText) {
 
-      System.out.println(logText);
+//      System.out.println(logText);
 
-//      StatusUtil.log(logText);
+      StatusUtil.log(logText);
    }
 
    private static void logInfo(String logText) {
 
-      System.out.println(logText);
+//      System.out.println(logText);
 
-//      StatusUtil.logInfo(logText);
+      StatusUtil.logInfo(logText);
+   }
+
+   private static void logIssue_CloseButtons(String logText) {
+
+      _stateLogger_CloseButtons.append("%s\n".formatted(logText)); //$NON-NLS-1$
+
+      _logger.append("%-30s %s\n".formatted(LocalDateTime.now(), logText)); //$NON-NLS-1$
+   }
+
+   private static void logIssue_IconImage(String logText) {
+
+      _stateLogger_IconImages.append("%s\n".formatted(logText)); //$NON-NLS-1$
+
+      _logger.append("%-30s %s\n".formatted(LocalDateTime.now(), logText)); //$NON-NLS-1$
    }
 
    public static void main(final String[] args) {
@@ -505,7 +553,9 @@ public class ApplicationTools {
    private static void resetLogger() {
 
       _logger.setLength(0);
-      _stateLogger.setLength(0);
+
+      _stateLogger_CloseButtons.setLength(0);
+      _stateLogger_IconImages.setLength(0);
    }
 
 }
