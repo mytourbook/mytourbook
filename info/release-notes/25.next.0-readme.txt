@@ -44,6 +44,10 @@ New / Improvements
 
 * All Charts
   - Customize y-axis width
+  
+* workbench.xmi
+  - Fix 2 issues in workbench.xmi
+    https://github.com/mytourbook/mytourbook/issues/1516  
 
 
 Changes
