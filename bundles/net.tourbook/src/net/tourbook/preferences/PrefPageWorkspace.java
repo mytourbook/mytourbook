@@ -219,10 +219,16 @@ public class PrefPageWorkspace extends PreferencePage implements IWorkbenchPrefe
          return;
       }
 
-      ApplicationWorkbenchAdvisor.isFixViewCloseButton = _chkFixViewCloseButton.getSelection();
-      ApplicationWorkbenchAdvisor.isFixViewIconImage = _chkFixViewIconURI.getSelection();
+      final boolean isFixViewCloseButton = _chkFixViewCloseButton.getSelection();
+      final boolean isFixViewIconImage = _chkFixViewIconURI.getSelection();
 
-      Display.getCurrent().asyncExec(() -> PlatformUI.getWorkbench().restart());
+      ApplicationWorkbenchAdvisor.isFixViewCloseButton = isFixViewCloseButton;
+      ApplicationWorkbenchAdvisor.isFixViewIconImage = isFixViewIconImage;
+
+      if (isFixViewCloseButton || isFixViewIconImage) {
+
+         Display.getCurrent().asyncExec(() -> PlatformUI.getWorkbench().restart());
+      }
    }
 
    @Override
