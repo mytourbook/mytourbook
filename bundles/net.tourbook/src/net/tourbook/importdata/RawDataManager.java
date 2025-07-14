@@ -57,6 +57,7 @@ import net.tourbook.common.time.TimeTools;
 import net.tourbook.common.util.FileUtils;
 import net.tourbook.common.util.ITourViewer3;
 import net.tourbook.common.util.StatusUtil;
+import net.tourbook.common.util.StringUtils;
 import net.tourbook.common.util.Util;
 import net.tourbook.common.weather.IWeather;
 import net.tourbook.common.widgets.ComboEnumEntry;
@@ -1259,7 +1260,6 @@ public class RawDataManager {
                                   final String importSubCategory) {
 
       if (tourData == null || importCategory == null && importSubCategory == null) {
-
          return;
       }
 
@@ -1269,20 +1269,26 @@ public class RawDataManager {
 
       for (final TourType tourType : allTourTypes) {
 
-         boolean isCategoryOK = false;
-         boolean isSubCategoryOK = false;
-
          final String ttCategory = tourType.getImportCategory();
          final String ttSubCategory = tourType.getImportSubCategory();
 
-         final boolean hasCategory = importCategory != null && ttCategory != null;
-         final boolean hasSubCategory = importSubCategory != null && ttSubCategory != null;
+         final boolean hasCategory = StringUtils.hasContent(importCategory) && StringUtils.hasContent(ttCategory);
+         final boolean hasSubCategory = StringUtils.hasContent(importSubCategory) && StringUtils.hasContent(ttSubCategory);
 
-         if (hasCategory && importCategory.trim().equals(ttCategory.trim())) {
+         if (hasCategory == false && hasSubCategory == false) {
+            
+            // skip tour types without category
+            continue;
+         }
+
+         boolean isCategoryOK = false;
+         boolean isSubCategoryOK = false;
+
+         if (hasCategory && importCategory.trim().equalsIgnoreCase(ttCategory.trim())) {
             isCategoryOK = true;
          }
 
-         if (hasSubCategory && importSubCategory.trim().equals(ttSubCategory.trim())) {
+         if (hasSubCategory && importSubCategory.trim().equalsIgnoreCase(ttSubCategory.trim())) {
             isSubCategoryOK = true;
          }
 
