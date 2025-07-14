@@ -299,10 +299,10 @@ public class Images {
    public static final String Tour_StartEnd                              = "tour-start-end.svg";                                  //$NON-NLS-1$
    public static final String TourAnalyzer                               = "tour-analyzer.svg";                                   //$NON-NLS-1$
    public static final String TourBlog                                   = "tour-blog.svg";                                       //$NON-NLS-1$
-   public static final String TourBook_Month                             = "tourbook-month.png";                                  //$NON-NLS-1$
-   public static final String TourBook_NatTable                          = "tourbook-nattable.png";                               //$NON-NLS-1$
+   public static final String TourBook_Month                             = "tourbook-month.svg";                                  //$NON-NLS-1$
+   public static final String TourBook_NatTable                          = "tourbook-nattable.svg";                               //$NON-NLS-1$
    public static final String TourBook_SelectAll                         = "tourbook-select-all.svg";                             //$NON-NLS-1$
-   public static final String TourBook_Week                              = "tourbook-week.png";                                   //$NON-NLS-1$
+   public static final String TourBook_Week                              = "tourbook-week.svg";                                   //$NON-NLS-1$
    public static final String TourChart                                  = "tour-chart.svg";                                      //$NON-NLS-1$
    public static final String TourCompare_Timeline_Elevation             = "tour-compare-timeline-elevation.svg";                 //$NON-NLS-1$
    public static final String TourCompare_Timeline_Geo                   = "tour-compare-timeline-geo.svg";                       //$NON-NLS-1$
