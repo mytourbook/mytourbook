@@ -585,6 +585,8 @@ public class Messages extends NLS {
    public static String        Dialog_Export_Checkbox_SurfingWaves_Tooltip;
    public static String        Dialog_Export_Checkbox_TourFields;
    public static String        Dialog_Export_Checkbox_TourFields_Tooltip;
+   public static String        Dialog_Export_Checkbox_TrackpointsWithSameTime;
+   public static String        Dialog_Export_Checkbox_TrackpointsWithSameTime_Tooltip;
    public static String        Dialog_Export_Checkbox_WithBarometer;
    public static String        Dialog_Export_Checkbox_WithBarometer_Tooltip;
    public static String        dialog_export_chk_camouflageSpeed;
