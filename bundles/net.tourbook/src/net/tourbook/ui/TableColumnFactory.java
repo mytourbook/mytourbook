@@ -429,9 +429,11 @@ public abstract class TableColumnFactory {
    public static final TableColumnFactory SURFING_NUMBER_OF_EVENTS;
    public static final String             SURFING_NUMBER_OF_EVENTS_ID                        = "SURFING_NUMBER_OF_EVENTS";                        //$NON-NLS-1$
 
-   public static final TableColumnFactory SWIM__SWIM_STROKE_RATE;
-   public static final TableColumnFactory SWIM__SWIM_STROKES_PER_LENGTH;
-   public static final TableColumnFactory SWIM__SWIM_STROKE_STYLE;
+   public static final TableColumnFactory SWIM_LENGTH_TYPE;
+   public static final String             SWIM_LENGTH_TYPE_ID                                = "SWIM_LENGTH_TYPE";                                //$NON-NLS-1$
+   public static final TableColumnFactory SWIM_STROKE_RATE;
+   public static final TableColumnFactory SWIM_STROKES_PER_LENGTH;
+   public static final TableColumnFactory SWIM_STROKE_STYLE;
 
    public static final TableColumnFactory SWIM__TIME_TOUR_TIME_DIFF;
    public static final TableColumnFactory SWIM__TIME_TOUR_TIME_HH_MM_SS;
@@ -3956,7 +3958,27 @@ public abstract class TableColumnFactory {
       /*
        * Swimming
        */
-      SWIM__SWIM_STROKE_RATE = new TableColumnFactory() {
+      SWIM_LENGTH_TYPE = new TableColumnFactory() {
+
+         @Override
+         public TableColumnDefinition createColumn(final ColumnManager columnManager,
+                                                   final PixelConverter pixelConverter) {
+
+            final TableColumnDefinition colDef = new TableColumnDefinition(columnManager, SWIM_LENGTH_TYPE_ID, SWT.TRAIL);
+
+            colDef.setColumnCategory(           Messages.ColumnFactory_Category_Swimming);
+
+            colDef.setColumnLabel(              Messages.ColumnFactory_Swim_LengthType_Label);
+            colDef.setColumnHeaderText(         Messages.ColumnFactory_Swim_LengthType_Header);
+            colDef.setColumnHeaderToolTipText(  Messages.ColumnFactory_Swim_LengthType_Tooltip);
+
+            colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(4));
+
+            return colDef;
+         }
+      };
+
+      SWIM_STROKE_RATE = new TableColumnFactory() {
 
          @Override
          public TableColumnDefinition createColumn(final ColumnManager columnManager,
@@ -3977,7 +3999,7 @@ public abstract class TableColumnFactory {
          }
       };
 
-      SWIM__SWIM_STROKES_PER_LENGTH = new TableColumnFactory() {
+      SWIM_STROKES_PER_LENGTH = new TableColumnFactory() {
 
          @Override
          public TableColumnDefinition createColumn(final ColumnManager columnManager,
@@ -3998,7 +4020,7 @@ public abstract class TableColumnFactory {
          }
       };
 
-      SWIM__SWIM_STROKE_STYLE = new TableColumnFactory() {
+      SWIM_STROKE_STYLE = new TableColumnFactory() {
 
          @Override
          public TableColumnDefinition createColumn(final ColumnManager columnManager,

@@ -369,8 +369,8 @@ public class TourDataEditorView extends ViewPart implements
    private boolean[]               _serieBreakTime;
    private boolean[]               _seriePausedTime;
    //
+   private short[]                 _swimSerie_LengthType;
    private short[]                 _swimSerie_StrokeRate;
-// private short[]                 _swimSerie_LengthType;
    private short[]                 _swimSerie_StrokesPerlength;
    private short[]                 _swimSerie_StrokeStyle;
    private int[]                   _swimSerie_Time;
@@ -5543,6 +5543,7 @@ public class TourDataEditorView extends ViewPart implements
       defineColumn_SwimSlice_Swim_StrokesPerLength();
       defineColumn_SwimSlice_Swim_StrokeRate();
       defineColumn_SwimSlice_Swim_StrokeStyle();
+      defineColumn_SwimSlice_Swim_LengthType();
    }
 
    private void defineAllColumns_TimeSlices() {
@@ -5630,11 +5631,36 @@ public class TourDataEditorView extends ViewPart implements
    /**
     * Stroke Rate or number of strokes per minute.
     */
+   private void defineColumn_SwimSlice_Swim_LengthType() {
+
+      final TableColumnDefinition colDef = TableColumnFactory.SWIM_LENGTH_TYPE.createColumn(_swimSlice_ColumnManager, _pc);
+
+      colDef.setLabelProvider(new CellLabelProvider() {
+         @Override
+         public void update(final ViewerCell cell) {
+
+            if (_swimSerie_LengthType != null) {
+
+               final SwimSlice timeSlice = (SwimSlice) cell.getElement();
+               final short value = _swimSerie_LengthType[timeSlice.serieIndex];
+
+               cell.setText(Short.toString(value));
+
+            } else {
+               cell.setText(UI.EMPTY_STRING);
+            }
+         }
+      });
+   }
+
+   /**
+    * Stroke Rate or number of strokes per minute.
+    */
    private void defineColumn_SwimSlice_Swim_StrokeRate() {
 
       TableColumnDefinition colDef;
 
-      _swimSlice_ColDef_StrokeRate = colDef = TableColumnFactory.SWIM__SWIM_STROKE_RATE.createColumn(_swimSlice_ColumnManager, _pc);
+      _swimSlice_ColDef_StrokeRate = colDef = TableColumnFactory.SWIM_STROKE_RATE.createColumn(_swimSlice_ColumnManager, _pc);
 
       colDef.setIsDefaultColumn();
 
@@ -5663,7 +5689,7 @@ public class TourDataEditorView extends ViewPart implements
 
       final ColumnDefinition colDef;
 
-      _swimSlice_ColDef_Strokes = colDef = TableColumnFactory.SWIM__SWIM_STROKES_PER_LENGTH.createColumn(_swimSlice_ColumnManager, _pc);
+      _swimSlice_ColDef_Strokes = colDef = TableColumnFactory.SWIM_STROKES_PER_LENGTH.createColumn(_swimSlice_ColumnManager, _pc);
 
       colDef.setIsDefaultColumn();
 
@@ -5692,7 +5718,7 @@ public class TourDataEditorView extends ViewPart implements
 
       final ColumnDefinition colDef;
 
-      _swimSlice_ColDef_StrokeStyle = colDef = TableColumnFactory.SWIM__SWIM_STROKE_STYLE.createColumn(_swimSlice_ColumnManager, _pc);
+      _swimSlice_ColDef_StrokeStyle = colDef = TableColumnFactory.SWIM_STROKE_STYLE.createColumn(_swimSlice_ColumnManager, _pc);
 
       colDef.setIsDefaultColumn();
 
@@ -7649,6 +7675,7 @@ public class TourDataEditorView extends ViewPart implements
 
       _serieTemperature             = _tourData.temperatureSerie;
 
+      _swimSerie_LengthType         = _tourData.swim_LengthType;
       _swimSerie_StrokeRate         = _tourData.swim_Cadence;
       _swimSerie_StrokesPerlength   = _tourData.swim_Strokes;
       _swimSerie_StrokeStyle        = _tourData.swim_StrokeStyle;
@@ -7855,7 +7882,7 @@ public class TourDataEditorView extends ViewPart implements
          return 0;
 
       } else if (swimSerieIndex >= _swimSerie_Time.length) {
-         
+
          // the last swim slice is reached
 
          return numTimeSlices - 1;
