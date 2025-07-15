@@ -348,13 +348,10 @@ public class Images {
    public static final String TourType_Filter_System                     = "tour-type-filter-system.svg";                         //$NON-NLS-1$
    public static final String TourViewer                                 = "tour-viewer.svg";                                     //$NON-NLS-1$
    public static final String TourWayPoint                               = "tour-waypoint.svg";                                   //$NON-NLS-1$
-   public static final String XAxis_ShowDistance                         = "x-axis-distance.png";                                 //$NON-NLS-1$
-   public static final String XAxis_ShowDistance_Disabled                = "x-axis-distance-disabled.png";                        //$NON-NLS-1$
-   public static final String XAxis_ShowDistance_Imperial                = "x-axis-distance-imperial.png";                        //$NON-NLS-1$
-   public static final String XAxis_ShowDistance_Imperial_Disabled       = "x-axis-distance-imperial-disabled.png";               //$NON-NLS-1$
-   public static final String XAxis_ShowDistance_NauticMile              = "x-axis-distance-nautical-mile.png";                   //$NON-NLS-1$
-   public static final String XAxis_ShowDistance_NauticMile_Disabled     = "x-axis-distance-nautical-mile-disabled.png";          //$NON-NLS-1$
-   public static final String XAxis_ShowTime                             = "x-axis-time.png";                                     //$NON-NLS-1$
+   public static final String XAxis_ShowDistance                         = "x-axis-distance.svg";                                 //$NON-NLS-1$
+   public static final String XAxis_ShowDistance_Imperial                = "x-axis-distance-imperial.svg";                        //$NON-NLS-1$
+   public static final String XAxis_ShowDistance_NauticMile              = "x-axis-distance-nautical-mile.svg";                   //$NON-NLS-1$
+   public static final String XAxis_ShowTime                             = "x-axis-time.svg";                                     //$NON-NLS-1$
    public static final String ZeroValues                                 = "app-zero-values.png";                                 //$NON-NLS-1$
    public static final String ZeroValues_Disabled                        = "app-zero-values-disabled.png";                        //$NON-NLS-1$
    public static final String Zoom_CenterBy_Map                          = "zoom-center-map.png";                                 //$NON-NLS-1$

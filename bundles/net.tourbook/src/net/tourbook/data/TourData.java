@@ -8619,17 +8619,17 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
 
       final int numSwimValues = allTourSwimData.size();
 
-      final short[] lengthType = new short[numSwimValues];
-      final short[] cadence = new short[numSwimValues];
-      final short[] strokes = new short[numSwimValues];
-      final short[] strokeStyle = new short[numSwimValues];
-      final int[] swimTime = new int[numSwimValues];
+      final short[] allLengthTypes = new short[numSwimValues];
+      final short[] allCadenceValues = new short[numSwimValues];
+      final short[] allStrokes = new short[numSwimValues];
+      final short[] allStrokeStyles = new short[numSwimValues];
+      final int[] allSwimTimes = new int[numSwimValues];
 
-      tourData.swim_LengthType = lengthType;
-      tourData.swim_Cadence = cadence;
-      tourData.swim_Strokes = strokes;
-      tourData.swim_StrokeStyle = strokeStyle;
-      tourData.swim_Time = swimTime;
+      tourData.swim_LengthType = allLengthTypes;
+      tourData.swim_Cadence = allCadenceValues;
+      tourData.swim_Strokes = allStrokes;
+      tourData.swim_StrokeStyle = allStrokeStyles;
+      tourData.swim_Time = allSwimTimes;
 
       boolean isSwimLengthType = false;
       boolean isSwimCadence = false;
@@ -8690,11 +8690,11 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
             isSwimTime = true;
          }
 
-         lengthType[swimSerieIndex] = swimLengthType;
-         cadence[swimSerieIndex] = swimCadence;
-         strokes[swimSerieIndex] = swimStrokes;
-         strokeStyle[swimSerieIndex] = swimStrokeStyle;
-         swimTime[swimSerieIndex] = relativeSwimTime;
+         allLengthTypes[swimSerieIndex] = swimLengthType;
+         allCadenceValues[swimSerieIndex] = swimCadence;
+         allStrokes[swimSerieIndex] = swimStrokes;
+         allStrokeStyles[swimSerieIndex] = swimStrokeStyle;
+         allSwimTimes[swimSerieIndex] = relativeSwimTime;
       }
 
       /*
@@ -8723,9 +8723,51 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
 
       if (poolLength > 0) {
 
-         tourDistance = poolLength / 1000f * numSwimValues;
-      }
+         final float poolLengthMeters = poolLength / 1000f;
 
+         int swimIndex = 0;
+
+         int swimTimePrev = 0;
+         int swimTimeNext = allSwimTimes[++swimIndex];
+         int swimTimePoolLengthSec = swimTimeNext - swimTimePrev;
+
+         float timeSliceDistance = poolLengthMeters / swimTimePoolLengthSec;
+         float serieDistance = 0;
+
+         tourDistance = getSwim_Distance(allLengthTypes, poolLengthMeters);
+
+         final int numTimeSlices = timeSerie.length;
+         distanceSerie = new float[numTimeSlices];
+
+         for (int serieIndex = 0; serieIndex < numTimeSlices; serieIndex++) {
+
+            final int tourTimeSec = timeSerie[serieIndex];
+
+            if (tourTimeSec > swimTimeNext && swimIndex < numSwimValues - 1) {
+
+               swimIndex++;
+
+               swimTimePrev = swimTimeNext;
+               swimTimeNext = allSwimTimes[swimIndex];
+
+               final short lengthType = allLengthTypes[swimIndex];
+
+               if (lengthType == 0) {
+
+                  // this happens when swimming is paused
+
+                  continue;
+               }
+
+               swimTimePoolLengthSec = swimTimeNext - swimTimePrev;
+               timeSliceDistance = poolLengthMeters / swimTimePoolLengthSec;
+            }
+
+            distanceSerie[serieIndex] = serieDistance;
+
+            serieDistance += timeSliceDistance;
+         }
+      }
    }
 
    /**
@@ -11063,6 +11105,25 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
       }
 
       return _swim_Cadence_UI;
+   }
+
+   private int getSwim_Distance(final short[] allLengthTypes, final float poolLengthMeters) {
+
+      int swimDistance = 0;
+
+      final int numStrokeValues = allLengthTypes.length;
+
+      for (int strokeIndex = 0; strokeIndex < numStrokeValues; strokeIndex++) {
+
+         if (allLengthTypes[strokeIndex] == 1) {
+            
+            // this length type is set when the user is swimming and not pausing
+
+            swimDistance += poolLengthMeters;
+         }
+      }
+
+      return swimDistance;
    }
 
    /**
