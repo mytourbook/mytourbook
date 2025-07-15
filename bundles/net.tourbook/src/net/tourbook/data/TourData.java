@@ -8650,8 +8650,14 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
                swimTimeNext = allSwimTimes[swimIndex];
 
                final short lengthType = allLengthTypes[swimIndex - 1];
+               final short lengthStroke = allStrokes[swimIndex - 1];
 
-               if (lengthType == 0) {
+               if (lengthType == 0
+
+                     // this can happen even when lengthType == 1
+                     || lengthStroke == 0
+
+               ) {
 
                   // this happens when swimming is paused
 
