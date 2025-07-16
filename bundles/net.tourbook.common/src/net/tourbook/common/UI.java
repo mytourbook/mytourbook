@@ -590,6 +590,7 @@ public class UI {
    public static String       UNIT_LABEL_TEMPERATURE;
    public static String       UNIT_LABEL_SPEED;
    public static String       UNIT_LABEL_PACE;
+   public static String       UNIT_LABEL_PACE_SWIMMING;
    public static String       UNIT_LABEL_WEIGHT;
 
    public static final String UNIT_LABEL_TIME      = "h";      //$NON-NLS-1$
@@ -623,6 +624,8 @@ public class UI {
    public static final String                   UNIT_POWER                 = "Watt";                     //$NON-NLS-1$
    public static final String                   UNIT_POWER_SHORT           = "W";                        //$NON-NLS-1$
    public static final String                   UNIT_POWER_TO_WEIGHT_RATIO = "W/Kg";                     //$NON-NLS-1$
+   public static final String                   UNIT_PACE_MIN_P_100M       = "min/100m";                 //$NON-NLS-1$
+   public static final String                   UNIT_PACE_MIN_P_100YARD    = "min/100yd";                //$NON-NLS-1$
    public static final String                   UNIT_PACE_MIN_P_KM         = "min/km";                   //$NON-NLS-1$
    public static final String                   UNIT_PACE_MIN_P_MILE       = "min/mi";                   //$NON-NLS-1$
    public static final String                   UNIT_PRESSURE_MBAR         = "mbar";                     //$NON-NLS-1$
@@ -4073,6 +4076,8 @@ public class UI {
 
          UNIT_IS_PACE_MIN_PER_MILE        = true;
          UNIT_LABEL_PACE                  = UNIT_PACE_MIN_P_MILE;
+         UNIT_LABEL_PACE_SWIMMING         = UNIT_PACE_MIN_P_100YARD;
+
 
       } else {
 
@@ -4080,6 +4085,7 @@ public class UI {
 
          UNIT_IS_PACE_MIN_PER_KILOMETER   = true;
          UNIT_LABEL_PACE                  = UNIT_PACE_MIN_P_KM;
+         UNIT_LABEL_PACE_SWIMMING         = UNIT_PACE_MIN_P_100M;
       }
 
       /*

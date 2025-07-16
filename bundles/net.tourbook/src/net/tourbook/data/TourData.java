@@ -939,7 +939,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
    // ############################################# SWIMMING #############################################
 
    /**
-    * Swim pool length in mm that feets can also be saved correctly.
+    * Swim pool length in mm that a length in feets can also be saved correctly.
     *
     * When this value is not 0 then there should also be swimming data
     */
@@ -4262,7 +4262,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
    public void computeComputedValues() {
 
       computePulseSmoothed();
-      computeDataSeries_Smoothed();
+      computeDataSeries();
 
       computeMaxAltitude();
       computeMaxPulse();
@@ -4278,6 +4278,24 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
 
       computeGeo_Bounds();
       computeGeo_Grid();
+   }
+
+   private void computeDataSeries() {
+
+      final String smoothingAlgo = _prefStore.getString(ITourbookPreferences.GRAPH_SMOOTHING_SMOOTHING_ALGORITHM);
+
+      if (smoothingAlgo.equals(ISmoothingAlgorithm.SMOOTHING_ALGORITHM_JAMET)) {
+
+         computeDataSeries_Smoothed();
+
+      } else if (smoothingAlgo.equals(ISmoothingAlgorithm.SMOOTHING_ALGORITHM_NO_SMOOTHING)) {
+
+         computeDataSeries_NotSmoothed();
+
+      } else {
+
+         computeDataSeries_NotSmoothed();
+      }
    }
 
    private void computeDataSeries_NotSmoothed() {
@@ -4410,6 +4428,8 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
 
       }
 
+      final boolean isSwimming = isSwimming();
+
       maxSpeed = 0.0f;
 
       for (int serieIndex = 1; serieIndex < serieLength; serieIndex++) {
@@ -4435,21 +4455,37 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
 
          } else {
 
-            final double speedMetric = distanceDiff / timeDiff * 3.6;
-            final double speed_Mile = speedMetric / UI.UNIT_MILE;
-            final double speed_NauticalMile = speedMetric / UI.UNIT_NAUTICAL_MILE;
+            final double speed_Metric = distanceDiff / timeDiff * 3.6;
+            final double speed_Mile = speed_Metric / UI.UNIT_MILE;
+            final double speed_NauticalMile = speed_Metric / UI.UNIT_NAUTICAL_MILE;
 
-            speedSerie[serieIndex] = (float) speedMetric;
-            speedSerie_Mile[serieIndex] = (float) speed_Mile;
-            speedSerie_NauticalMile[serieIndex] = (float) speed_NauticalMile;
+            float paceMetricSeconds;
+            float paceImperialSeconds;
 
-            final float paceMetricSeconds = speedMetric < 1.0 ? 0 : (float) (3600.0 / speedMetric);
-            final float paceImperialSeconds = speedMetric < 0.6 ? 0 : (float) (3600.0 / speed_Mile);
+            if (isSwimming) {
 
-            if (speedMetric > maxSpeed) {
-               maxSpeed = (float) speedMetric;
+               // adjust pace to 100 m/min or 100 yard/min
+
+               final double speed_MetricWithSwim = speed_Metric * 10;
+               final double speed_MileWithSwim = speed_Metric * (10 / UI.UNIT_YARD);
+
+               paceMetricSeconds = speed_MetricWithSwim < 0.1 ? 0 : (float) (3600.0 / speed_MetricWithSwim);
+               paceImperialSeconds = speed_MetricWithSwim < 0.06 ? 0 : (float) (3600.0 / speed_MileWithSwim);
+
+            } else {
+
+               paceMetricSeconds = speed_Metric < 1.0 ? 0 : (float) (3600.0 / speed_Metric);
+               paceImperialSeconds = speed_Metric < 0.6 ? 0 : (float) (3600.0 / speed_Mile);
+            }
+
+            if (speed_Metric > maxSpeed) {
+               maxSpeed = (float) speed_Metric;
                maxPace = paceMetricSeconds;
             }
+
+            speedSerie[serieIndex] = (float) speed_Metric;
+            speedSerie_Mile[serieIndex] = (float) speed_Mile;
+            speedSerie_NauticalMile[serieIndex] = (float) speed_NauticalMile;
 
             paceSerie_Seconds[serieIndex] = paceMetricSeconds;
             paceSerie_Seconds_Imperial[serieIndex] = paceImperialSeconds;
@@ -4697,6 +4733,8 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
          }
       }
 
+      final boolean isSwimming = isSwimming();
+
       maxSpeed = maxPace = 0.0f;
 
       for (int serieIndex = 0; serieIndex < numTimeSlices; serieIndex++) {
@@ -4705,8 +4743,24 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
          final double speed_Mile = speed_Metric / UI.UNIT_MILE;
          final double speed_NauticalMile = speed_Metric / UI.UNIT_NAUTICAL_MILE;
 
-         final float paceMetricSeconds = speed_Metric < 1.0 ? 0 : (float) (3600.0 / speed_Metric);
-         final float paceImperialSeconds = speed_Metric < 0.6 ? 0 : (float) (3600.0 / speed_Mile);
+         float paceMetricSeconds;
+         float paceImperialSeconds;
+
+         if (isSwimming) {
+
+            // adjust pace to 100 m/min or 100 yard/min
+
+            final double speed_MetricWithSwim = speed_Metric * 10;
+            final double speed_MileWithSwim = speed_Metric * (10 / UI.UNIT_YARD);
+
+            paceMetricSeconds = speed_MetricWithSwim < 0.1 ? 0 : (float) (3600.0 / speed_MetricWithSwim);
+            paceImperialSeconds = speed_MetricWithSwim < 0.06 ? 0 : (float) (3600.0 / speed_MileWithSwim);
+
+         } else {
+
+            paceMetricSeconds = speed_Metric < 1.0 ? 0 : (float) (3600.0 / speed_Metric);
+            paceImperialSeconds = speed_Metric < 0.6 ? 0 : (float) (3600.0 / speed_Mile);
+         }
 
          if (speed_Metric > maxSpeed) {
             maxSpeed = (float) speed_Metric;
@@ -5445,7 +5499,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
    private void computeMaxSpeed() {
 
       if (distanceSerie != null) {
-         computeDataSeries_Smoothed();
+         computeDataSeries();
       }
    }
 
@@ -8541,7 +8595,14 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
          final SwimData swimData = allTourSwimData.get(swimSerieIndex);
 
          final long absoluteSwimTime = swimData.absoluteTime;
-         final short relativeSwimTime = (short) ((absoluteSwimTime - tourStartTime) / 1000);
+         short relativeSwimTime = (short) ((absoluteSwimTime - tourStartTime) / 1000);
+
+         if (relativeSwimTime == -1) {
+
+            // this happened
+
+            relativeSwimTime = 0;
+         }
 
          final short swimLengthType = swimData.swim_LengthType;
          short swimCadence = swimData.swim_Cadence;
@@ -8620,7 +8681,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
          tourData.swim_Cadence = null;
       }
 
-      if (poolLength > 0) {
+      if (isSwimming()) {
 
          final float poolLengthMeters = poolLength / 1000f;
 
@@ -10072,7 +10133,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
       }
 
       if (speedSerie == null || gradientSerie == null) {
-         computeDataSeries_Smoothed();
+         computeDataSeries();
       }
 
       // check if required data series are available
@@ -10768,7 +10829,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
 
          return getSpeedSerieInternal();
 
-      } else if (poolLength != 0 && speedSerie != null) {
+      } else if (isSwimming() && speedSerie != null) {
 
          // speed is from swimming
 
@@ -12033,6 +12094,14 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
 
    public boolean isSurfing_IsMinDistance() {
       return surfing_IsMinDistance;
+   }
+
+   /**
+    * @return Returns <code>true</code> when this is a swimming tour
+    */
+   public boolean isSwimming() {
+
+      return poolLength > 0;
    }
 
    public boolean isTemperatureAvailable() {
@@ -13342,8 +13411,26 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
 
       maxSpeed = Math.max(maxSpeed, speed_Metric);
 
-      final float paceMetricSeconds = speed_Metric < 1.0 ? 0 : (float) (3600.0 / speed_Metric);
-      final float paceImperialSeconds = speed_Metric < 0.6 ? 0 : (float) (3600.0 / speed_Mile);
+      final boolean isSwimming = isSwimming();
+
+      float paceMetricSeconds;
+      float paceImperialSeconds;
+
+      if (isSwimming) {
+
+         // adjust pace to 100 m/min or 100 yard/min
+
+         final double speed_MetricWithSwim = speed_Metric * 10;
+         final double speed_MileWithSwim = speed_Metric * (10 / UI.UNIT_YARD);
+
+         paceMetricSeconds = speed_MetricWithSwim < 0.1 ? 0 : (float) (3600.0 / speed_MetricWithSwim);
+         paceImperialSeconds = speed_MetricWithSwim < 0.06 ? 0 : (float) (3600.0 / speed_MileWithSwim);
+
+      } else {
+
+         paceMetricSeconds = speed_Metric < 1.0 ? 0 : (float) (3600.0 / speed_Metric);
+         paceImperialSeconds = speed_Metric < 0.6 ? 0 : (float) (3600.0 / speed_Mile);
+      }
 
       //Convert the max speed to max pace
       maxPace = maxSpeed < 1.0 ? 0 : (float) (3600.0 / maxSpeed);

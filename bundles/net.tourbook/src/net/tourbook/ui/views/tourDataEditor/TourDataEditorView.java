@@ -5641,8 +5641,8 @@ public class TourDataEditorView extends ViewPart implements
 
             if (_swimSerie_LengthType != null) {
 
-               final SwimSlice timeSlice = (SwimSlice) cell.getElement();
-               final short value = _swimSerie_LengthType[timeSlice.serieIndex];
+               final SwimSlice swimSlice = (SwimSlice) cell.getElement();
+               final short value = _swimSerie_LengthType[swimSlice.serieIndex];
 
                cell.setText(Short.toString(value));
 
@@ -5669,8 +5669,8 @@ public class TourDataEditorView extends ViewPart implements
          public void update(final ViewerCell cell) {
             if (_swimSerie_StrokeRate != null) {
 
-               final SwimSlice timeSlice = (SwimSlice) cell.getElement();
-               final short value = _swimSerie_StrokeRate[timeSlice.serieIndex];
+               final SwimSlice swimSlice = (SwimSlice) cell.getElement();
+               final short value = _swimSerie_StrokeRate[swimSlice.serieIndex];
 
                if (value == 0) {
                   cell.setText(UI.EMPTY_STRING);
@@ -5698,8 +5698,8 @@ public class TourDataEditorView extends ViewPart implements
          public void update(final ViewerCell cell) {
             if (_swimSerie_StrokesPerlength != null) {
 
-               final SwimSlice timeSlice = (SwimSlice) cell.getElement();
-               final short value = _swimSerie_StrokesPerlength[timeSlice.serieIndex];
+               final SwimSlice swimSlice = (SwimSlice) cell.getElement();
+               final short value = _swimSerie_StrokesPerlength[swimSlice.serieIndex];
 
                if (value == 0) {
                   cell.setText(UI.EMPTY_STRING);
@@ -5819,8 +5819,8 @@ public class TourDataEditorView extends ViewPart implements
          public void update(final ViewerCell cell) {
 
             if (_swimSerie_Time != null) {
-               final SwimSlice timeSlice = (SwimSlice) cell.getElement();
-               final int serieIndex = timeSlice.serieIndex;
+               final SwimSlice swimSlice = (SwimSlice) cell.getElement();
+               final int serieIndex = swimSlice.serieIndex;
                cell.setText(Integer.toString(_swimSerie_Time[serieIndex]));
             } else {
                cell.setText(UI.EMPTY_STRING);
@@ -5845,9 +5845,9 @@ public class TourDataEditorView extends ViewPart implements
             } else {
 
                final int serieIndex = ((SwimSlice) cell.getElement()).serieIndex;
-               final int timeSliceSeconds = _swimSerie_Time[serieIndex];
+               final int swimSliceSeconds = _swimSerie_Time[serieIndex];
 
-               cell.setText(_tourStartTime.plusSeconds(timeSliceSeconds).format(TimeTools.Formatter_Time_M));
+               cell.setText(_tourStartTime.plusSeconds(swimSliceSeconds).format(TimeTools.Formatter_Time_M));
             }
          }
       });
@@ -6136,11 +6136,14 @@ public class TourDataEditorView extends ViewPart implements
                   distanceDiff = distance - distancePrevious;
                }
 
-               if (distanceDiff < 0.001) {
+               if (distanceDiff == 0) {
                   cell.setText(UI.EMPTY_STRING);
+               } else if (distanceDiff < 0.001) {
+                  cell.setText(_nf6.format(distanceDiff));
                } else {
                   cell.setText(_nf3.format(distanceDiff));
                }
+
             } else {
                cell.setText(UI.EMPTY_STRING);
             }

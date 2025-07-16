@@ -5640,7 +5640,7 @@ public class TourManager {
          yDataPace = createChartDataSerieNoZero(paceSerie, chartType);
 
          yDataPace.setYTitle(OtherMessages.GRAPH_LABEL_PACE);
-         yDataPace.setUnitLabel(UI.UNIT_LABEL_PACE);
+         yDataPace.setUnitLabel(tourData.isSwimming() ? UI.UNIT_LABEL_PACE_SWIMMING : UI.UNIT_LABEL_PACE);
          yDataPace.setShowYSlider(true);
          yDataPace.setAxisUnit(ChartDataSerie.AXIS_UNIT_MINUTE_SECOND);
          yDataPace.setSliderLabelFormat(ChartDataYSerie.SLIDER_LABEL_FORMAT_MM_SS);
