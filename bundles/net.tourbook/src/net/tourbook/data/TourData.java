@@ -8630,27 +8630,44 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
          int swimTimeNext = allSwimTimes[++swimIndex];
          int swimTimePoolLengthSec = swimTimeNext - swimTimePrev;
 
-         float timeSliceDistance = poolLengthMeters / swimTimePoolLengthSec;
+         float timeSlice_Distance = 0;
+
+         short lengthType = allLengthTypes[0];
+         short lengthStroke = allStrokes[0];
+
+         if (lengthType != 0 && lengthStroke != 0) {
+            timeSlice_Distance = poolLengthMeters / swimTimePoolLengthSec;
+         }
+
          float serieDistance = 0;
+         final int numTimeSlices = timeSerie.length;
 
          tourDistance = getSwim_Distance(allLengthTypes, poolLengthMeters);
-
-         final int numTimeSlices = timeSerie.length;
          distanceSerie = new float[numTimeSlices];
 
          for (int timeSerieIndex = 0; timeSerieIndex < numTimeSlices; timeSerieIndex++) {
 
             final int tourTimeSec = timeSerie[timeSerieIndex];
 
-            if (tourTimeSec > swimTimeNext && swimIndex < numSwimValues - 1) {
+            if (tourTimeSec > swimTimeNext && swimIndex < numSwimValues) {
 
-               swimIndex++;
+               if (swimIndex == numSwimValues - 1) {
 
-               swimTimePrev = swimTimeNext;
-               swimTimeNext = allSwimTimes[swimIndex];
+                  // this is the last swim length
 
-               final short lengthType = allLengthTypes[swimIndex - 1];
-               final short lengthStroke = allStrokes[swimIndex - 1];
+                  lengthType = allLengthTypes[swimIndex];
+                  lengthStroke = allStrokes[swimIndex];
+
+               } else {
+
+                  swimIndex++;
+
+                  swimTimePrev = swimTimeNext;
+                  swimTimeNext = allSwimTimes[swimIndex];
+
+                  lengthType = allLengthTypes[swimIndex - 1];
+                  lengthStroke = allStrokes[swimIndex - 1];
+               }
 
                if (lengthType == 0
 
@@ -8664,18 +8681,18 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
                   // set same distance as before
                   distanceSerie[timeSerieIndex] = serieDistance;
 
-                  timeSliceDistance = 0;
+                  timeSlice_Distance = 0;
 
                   continue;
                }
 
                swimTimePoolLengthSec = swimTimeNext - swimTimePrev;
-               timeSliceDistance = poolLengthMeters / swimTimePoolLengthSec;
+               timeSlice_Distance = poolLengthMeters / swimTimePoolLengthSec;
             }
 
             distanceSerie[timeSerieIndex] = serieDistance;
 
-            serieDistance += timeSliceDistance;
+            serieDistance += timeSlice_Distance;
          }
       }
    }
