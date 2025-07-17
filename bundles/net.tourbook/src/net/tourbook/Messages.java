@@ -1033,6 +1033,8 @@ public class Messages extends NLS {
    public static String        Dlg_AdjustAltitude_Radio_keep_start_altitude;
    public static String        Dlg_AdjustAltitude_Radio_keep_start_altitude_tooltip;
 
+   public static String        Dlg_TourMarker_Action_CreateLeadingNumbers;
+   public static String        Dlg_TourMarker_Action_RemoveLeadingNumbers;
    public static String        Dlg_TourMarker_Button_delete;
    public static String        Dlg_TourMarker_Button_delete_tooltip;
    public static String        Dlg_TourMarker_Button_HideAllMarker;
