@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2025 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -27,21 +27,26 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
 
       final IPreferenceStore store = Activator.getDefault().getPreferenceStore();
 
-      store.setDefault(IPreferences.FIT_IS_IGNORE_SPEED_VALUES, true);
+// SET_FORMATTING_OFF
 
-      store.setDefault(IPreferences.FIT_TEMPERATURE_ADJUSTMENT, 0.0f);
+      store.setDefault(IPreferences.FIT_IS_IGNORE_SPEED_VALUES,            true);
+      store.setDefault(IPreferences.FIT_IS_SET_TOUR_TITLE_FROM_FILE_NAME,  false);
 
-      store.setDefault(IPreferences.FIT_IS_IGNORE_LAST_MARKER, false);
-      store.setDefault(IPreferences.FIT_IGNORE_LAST_MARKER_TIME_SLICES, 5);
+      store.setDefault(IPreferences.FIT_TEMPERATURE_ADJUSTMENT,            0.0f);
 
-      store.setDefault(IPreferences.FIT_IS_REPLACE_EXCEEDED_TIME_SLICE, false);
-      store.setDefault(IPreferences.FIT_EXCEEDED_TIME_SLICE_DURATION, 365 * 24 * 60 * 60);
+      store.setDefault(IPreferences.FIT_IS_IGNORE_LAST_MARKER,             false);
+      store.setDefault(IPreferences.FIT_IGNORE_LAST_MARKER_TIME_SLICES,    5);
 
-      store.setDefault(IPreferences.FIT_PREFERRED_POWER_DATA_SOURCE, 0);
+      store.setDefault(IPreferences.FIT_IS_REPLACE_EXCEEDED_TIME_SLICE,    false);
+      store.setDefault(IPreferences.FIT_EXCEEDED_TIME_SLICE_DURATION,      365 * 24 * 60 * 60);
 
-      store.setDefault(IPreferences.FIT_IS_SET_TOURTYPE_DURING_IMPORT, false);
+      store.setDefault(IPreferences.FIT_PREFERRED_POWER_DATA_SOURCE,       0);
 
-      store.setDefault(IPreferences.FIT_IMPORT_TOURTYPE_MODE, IPreferences.FIT_IMPORT_TOURTYPE_MODE_SPORT);
+      store.setDefault(IPreferences.FIT_IS_SET_TOURTYPE_DURING_IMPORT,     false);
+
+      store.setDefault(IPreferences.FIT_IMPORT_TOURTYPE_MODE,              IPreferences.FIT_IMPORT_TOURTYPE_MODE_SPORT);
+
+// SET_FORMATTING_ON
    }
 
 }

@@ -50,12 +50,13 @@ public class PrefPageImportFit extends PreferencePage implements IWorkbenchPrefe
 
    private static final float    TEMPERATURE_DIGITS            = 10.0f;
 
-   private static final int      TAB_FOLDER_SPEED              = 0;
-   private static final int      TAB_FOLDER_TEMPERATURE        = 1;
-   private static final int      TAB_FOLDER_MARKER_FILTER      = 2;
-   private static final int      TAB_FOLDER_TIME_SLIZE         = 3;
-   private static final int      TAB_FOLDER_POWER              = 4;
-   private static final int      TAB_FOLDER_TOURTYPE           = 5;
+   private static final int      TAB_FOLDER_COMMON             = 0;
+   private static final int      TAB_FOLDER_SPEED              = 1;
+   private static final int      TAB_FOLDER_TEMPERATURE        = 2;
+   private static final int      TAB_FOLDER_MARKER_FILTER      = 3;
+   private static final int      TAB_FOLDER_TIME_SLIZE         = 4;
+   private static final int      TAB_FOLDER_POWER              = 5;
+   private static final int      TAB_FOLDER_TOURTYPE           = 6;
 
    private static PeriodType     _tourPeriodTemplate           = PeriodType.yearMonthDayTime()
 
@@ -76,10 +77,13 @@ public class PrefPageImportFit extends PreferencePage implements IWorkbenchPrefe
    /*
     * UI controls
     */
+   private CTabFolder _tabFolder;
+
+   private Button     _chkFitImportTourType;
    private Button     _chkIgnoreLastMarker;
    private Button     _chkIgnoreSpeedValues;
    private Button     _chkRemoveExceededDuration;
-   private Button     _chkFitImportTourType;
+   private Button     _chkSetTourTitleFromFileName;
 
    private Combo      _comboPowerDataSource;
 
@@ -101,8 +105,6 @@ public class PrefPageImportFit extends PreferencePage implements IWorkbenchPrefe
    private Spinner    _spinnerIgnorLastMarker_TimeSlices;
    private Spinner    _spinnerExceededDuration;
    private Spinner    _spinnerTemperatureAdjustment;
-
-   private CTabFolder _tabFolder;
 
    @Override
    protected Control createContents(final Composite parent) {
@@ -128,21 +130,25 @@ public class PrefPageImportFit extends PreferencePage implements IWorkbenchPrefe
                .applyTo(_tabFolder);
          {
 
-            final CTabItem tabMeasurementSystem = new CTabItem(_tabFolder, SWT.NONE);
-            tabMeasurementSystem.setControl(createUI_20_Speed(_tabFolder));
-            tabMeasurementSystem.setText(Messages.PrefPage_Fit_Group_Speed);
+            final CTabItem tabCommon = new CTabItem(_tabFolder, SWT.NONE);
+            tabCommon.setControl(createUI_10_Common(_tabFolder));
+            tabCommon.setText(Messages.PrefPage_Fit_Group_Common);
 
-            final CTabItem tabBreakTime = new CTabItem(_tabFolder, SWT.NONE);
-            tabBreakTime.setControl(createUI_30_Temperature(_tabFolder));
-            tabBreakTime.setText(Messages.PrefPage_Fit_Group_AdjustTemperature);
+            final CTabItem tabSpeed = new CTabItem(_tabFolder, SWT.NONE);
+            tabSpeed.setControl(createUI_20_Speed(_tabFolder));
+            tabSpeed.setText(Messages.PrefPage_Fit_Group_Speed);
 
-            final CTabItem tabElevation = new CTabItem(_tabFolder, SWT.NONE);
-            tabElevation.setControl(createUI_50_IgnoreLastMarker(_tabFolder));
-            tabElevation.setText(Messages.PrefPage_Fit_Group_IgnoreLastMarker);
+            final CTabItem tabTemperature = new CTabItem(_tabFolder, SWT.NONE);
+            tabTemperature.setControl(createUI_30_Temperature(_tabFolder));
+            tabTemperature.setText(Messages.PrefPage_Fit_Group_AdjustTemperature);
 
-            final CTabItem tabNotes = new CTabItem(_tabFolder, SWT.NONE);
-            tabNotes.setControl(createUI_70_SplitTour(_tabFolder));
-            tabNotes.setText(Messages.PrefPage_Fit_Group_ReplaceTimeSlice);
+            final CTabItem tabMarker = new CTabItem(_tabFolder, SWT.NONE);
+            tabMarker.setControl(createUI_50_IgnoreLastMarker(_tabFolder));
+            tabMarker.setText(Messages.PrefPage_Fit_Group_IgnoreLastMarker);
+
+            final CTabItem tabTimeSlice = new CTabItem(_tabFolder, SWT.NONE);
+            tabTimeSlice.setControl(createUI_70_SplitTour(_tabFolder));
+            tabTimeSlice.setText(Messages.PrefPage_Fit_Group_ReplaceTimeSlice);
 
             final CTabItem tabPower = new CTabItem(_tabFolder, SWT.NONE);
             tabPower.setControl(createUI_80_Power(_tabFolder));
@@ -155,6 +161,29 @@ public class PrefPageImportFit extends PreferencePage implements IWorkbenchPrefe
       }
 
       return _tabFolder;
+   }
+
+   private Control createUI_10_Common(final Composite parent) {
+
+      final Composite container = new Composite(parent, SWT.NONE);
+      GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
+      GridLayoutFactory.fillDefaults()
+            .numColumns(1)
+            .extendedMargins(5, 5, 15, 5)
+            .spacing(20, 5)
+            .applyTo(container);
+      {
+         {
+            /*
+             * Set tour title from file name
+             */
+            _chkSetTourTitleFromFileName = new Button(container, SWT.CHECK);
+            _chkSetTourTitleFromFileName.setText(Messages.PrefPage_Fit_Checkbox_SetTourTitleFromImportFileName);
+            _chkSetTourTitleFromFileName.addSelectionListener(_defaultSelectionListener);
+         }
+      }
+
+      return container;
    }
 
    private Composite createUI_20_Speed(final Composite parent) {
@@ -176,7 +205,6 @@ public class PrefPageImportFit extends PreferencePage implements IWorkbenchPrefe
          _chkIgnoreSpeedValues.setText(Messages.PrefPage_Fit_Checkbox_IgnoreSpeedValues);
          _chkIgnoreSpeedValues.addSelectionListener(_defaultSelectionListener);
       }
-
       {
          // label: info
          _lblIgnorSpeedValues_Info = createUI_InfoLabel(container, 3);
@@ -530,7 +558,11 @@ public class PrefPageImportFit extends PreferencePage implements IWorkbenchPrefe
 
       final int selectedTab = _tabFolder.getSelectionIndex();
 
-      if (selectedTab == TAB_FOLDER_SPEED) {
+      if (selectedTab == TAB_FOLDER_COMMON) {
+
+         _chkSetTourTitleFromFileName.setSelection(_prefStore.getDefaultBoolean(IPreferences.FIT_IS_SET_TOUR_TITLE_FROM_FILE_NAME));
+
+      } else if (selectedTab == TAB_FOLDER_SPEED) {
 
          _chkIgnoreSpeedValues.setSelection(_prefStore.getDefaultBoolean(IPreferences.FIT_IS_IGNORE_SPEED_VALUES));
 
@@ -590,6 +622,9 @@ public class PrefPageImportFit extends PreferencePage implements IWorkbenchPrefe
 
    private void restoreState() {
 
+      // common
+      _chkSetTourTitleFromFileName.setSelection(_prefStore.getBoolean(IPreferences.FIT_IS_SET_TOUR_TITLE_FROM_FILE_NAME));
+
       // speed
       _chkIgnoreSpeedValues.setSelection(_prefStore.getBoolean(IPreferences.FIT_IS_IGNORE_SPEED_VALUES));
 
@@ -618,6 +653,7 @@ public class PrefPageImportFit extends PreferencePage implements IWorkbenchPrefe
 
       // Mode for Tour Type during FIT import
       final String tourTypeMode = _prefStore.getString(IPreferences.FIT_IMPORT_TOURTYPE_MODE);
+
       _rdoTourTypeFrom_Profile                  .setSelection(tourTypeMode.equals(IPreferences.FIT_IMPORT_TOURTYPE_MODE_PROFILE));
       _rdoTourTypeFrom_ProfileElseSport         .setSelection(tourTypeMode.equals(IPreferences.FIT_IMPORT_TOURTYPE_MODE_TRY_PROFILE));
       _rdoTourTypeFrom_SessionSportProfileName  .setSelection(tourTypeMode.equals(IPreferences.FIT_IMPORT_TOURTYPE_MODE_SESSION_SPORT_PROFILE_NAME));
@@ -631,6 +667,9 @@ public class PrefPageImportFit extends PreferencePage implements IWorkbenchPrefe
    }
 
    private void saveState() {
+
+      // common
+      _prefStore.setValue(IPreferences.FIT_IS_SET_TOUR_TITLE_FROM_FILE_NAME, _chkSetTourTitleFromFileName.getSelection());
 
       // speed
       _prefStore.setValue(IPreferences.FIT_IS_IGNORE_SPEED_VALUES, _chkIgnoreSpeedValues.getSelection());
