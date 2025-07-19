@@ -68,7 +68,8 @@ Changes
 Changes that require Tour Re-import
 ===================================
 
-*  
+* Fit Import
+  Swimming tours should be re-imported that fixes are applied to already saved tours.
 
 
 Bugfix
