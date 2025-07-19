@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2025 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -16,6 +16,7 @@
 package net.tourbook.ui;
 
 import java.text.NumberFormat;
+import java.util.List;
 
 import net.tourbook.Messages;
 import net.tourbook.OtherMessages;
@@ -33,6 +34,7 @@ import net.tourbook.common.tooltip.IPinned_Tooltip_Owner;
 import net.tourbook.common.tooltip.Pinned_ToolTip_Shell;
 import net.tourbook.common.util.Util;
 import net.tourbook.data.TourData;
+import net.tourbook.data.TourMarker;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.tour.TourManager;
 import net.tourbook.ui.tourChart.PulseGraph;
@@ -86,13 +88,15 @@ public class ValuePoint_ToolTip_UI extends Pinned_ToolTip_Shell implements IPinn
     * Global state if the tooltip is visible.
     */
    private boolean                        _isToolTipVisible;
+   private boolean                        _isHorizontalOrientation;
+   private boolean                        _isShowValuesSinceLastTourMarker;
+
    private int                            _currentValueIndex;
    private int                            _valueUnitDistance;
    private double                         _chartZoomFactor;
 
    private int[]                          _updateCounter = new int[] { 0 };
    private long                           _lastUpdateUITime;
-   private boolean                        _isHorizontalOrientation;
 
    private final NumberFormat             _nf0           = NumberFormat.getNumberInstance();
    private final NumberFormat             _nf1           = NumberFormat.getNumberInstance();
@@ -172,6 +176,7 @@ public class ValuePoint_ToolTip_UI extends Pinned_ToolTip_Shell implements IPinn
     * UI controls
     */
    private Composite _shellContainer;
+   private Composite _valuesContainer;
 
    private ToolBar   _toolbarControl;
 
@@ -298,6 +303,8 @@ public class ValuePoint_ToolTip_UI extends Pinned_ToolTip_Shell implements IPinn
       _isHorizontalOrientation = ValuePoint_ToolTip_Orientation.valueOf(
             stateOrientation) == ValuePoint_ToolTip_Orientation.Horizontal;
 
+      _isShowValuesSinceLastTourMarker = state.getBoolean(ValuePoint_ToolTip_MenuManager.STATE_VALUE_POINT_TOOLTIP_IS_SHOW_VALUES_SINCE_LAST_MARKER);
+
       addPrefListener();
    }
 
@@ -319,14 +326,31 @@ public class ValuePoint_ToolTip_UI extends Pinned_ToolTip_Shell implements IPinn
       }
    }
 
-   void actionSetDefaults(final long allVisibleValues, final ValuePoint_ToolTip_Orientation orientation) {
+   void actionSetDefaults(final long allVisibleValues,
+                          final ValuePoint_ToolTip_Orientation orientation,
+                          final boolean isShowValuesSinceLastMarker) {
 
       actionOrientation(orientation, false);
       actionVisibleValues(allVisibleValues);
+      actionShowValuesSinceLastTourMarker(isShowValuesSinceLastMarker);
 
       state.put(STATE_PINNED_TOOLTIP_PIN_LOCATION, DEFAULT_PIN_LOCATION.name());
 
       setPinLocation(DEFAULT_PIN_LOCATION);
+   }
+
+   void actionShowValuesSinceLastTourMarker(final boolean isShowValuesSinceLastTourMarker) {
+
+      _isShowValuesSinceLastTourMarker = isShowValuesSinceLastTourMarker;
+
+      updateUI_Units();
+
+      final int currentValueIndexBackup = _currentValueIndex;
+
+      // force an update
+      _currentValueIndex = -1;
+
+      updateUI(currentValueIndexBackup);
    }
 
    ToolItem actionVisibleValues(final long visibleValues) {
@@ -528,11 +552,11 @@ public class ValuePoint_ToolTip_UI extends Pinned_ToolTip_Shell implements IPinn
 
    private void createUI_099_AllValues(final Composite parent) {
 
-      final Composite container = new Composite(parent, SWT.NONE);
+      _valuesContainer = new Composite(parent, SWT.NONE);
       GridDataFactory.fillDefaults()
             .align(SWT.CENTER, SWT.CENTER)
             .grab(true, false)
-            .applyTo(container);
+            .applyTo(_valuesContainer);
 
       if (_isHorizontalOrientation) {
 
@@ -542,7 +566,7 @@ public class ValuePoint_ToolTip_UI extends Pinned_ToolTip_Shell implements IPinn
                .numColumns(_allVisibleAndAvailable_ValueCounter)
                .spacing(5, 0)
                .extendedMargins(3, 2, 0, 0)
-               .applyTo(container);
+               .applyTo(_valuesContainer);
       } else {
 
          // vertical orientation
@@ -550,36 +574,36 @@ public class ValuePoint_ToolTip_UI extends Pinned_ToolTip_Shell implements IPinn
          GridLayoutFactory.fillDefaults()
                .numColumns(2)
                .spacing(5, 0)
-               .applyTo(container);
+               .applyTo(_valuesContainer);
       }
 
 //      container.setBackground(UI.SYS_COLOR_MAGENTA);
       {
-         createUI_100_TimeSlices(container);
-         createUI_110_TimeDuration(container);
-         createUI_112_TimeMoving(container);
-         createUI_114_TimeRecorded(container);
-         createUI_120_TimeOfDay(container);
-         createUI_200_Distance(container);
-         createUI_210_Altitude(container);
-         createUI_220_Pulse(container);
-         createUI_230_Speed(container);
-         createUI_232_Speed_Summarized(container);
-         createUI_240_Pace(container);
-         createUI_242_Pace_Summarized(container);
-         createUI_250_Power(container);
-         createUI_260_Temperature(container);
-         createUI_270_Gradient(container);
-         createUI_280_Altimeter(container);
-         createUI_290_Cadence(container);
-         createUI_300_Gears(container);
-         createUI_310_TourCompareResult(container);
-         createUI_400_RunDyn_StanceTime(container);
-         createUI_410_RunDyn_StanceTimeBalance(container);
-         createUI_420_RunDyn_StepLength(container);
-         createUI_430_RunDyn_VerticalOscillation(container);
-         createUI_440_RunDyn_VerticalRatio(container);
-         createUI_500_ChartZoomFactor(container);
+         createUI_100_TimeSlices(_valuesContainer);
+         createUI_110_TimeDuration(_valuesContainer);
+         createUI_112_TimeMoving(_valuesContainer);
+         createUI_114_TimeRecorded(_valuesContainer);
+         createUI_120_TimeOfDay(_valuesContainer);
+         createUI_200_Distance(_valuesContainer);
+         createUI_210_Altitude(_valuesContainer);
+         createUI_220_Pulse(_valuesContainer);
+         createUI_230_Speed(_valuesContainer);
+         createUI_232_Speed_Summarized(_valuesContainer);
+         createUI_240_Pace(_valuesContainer);
+         createUI_242_Pace_Summarized(_valuesContainer);
+         createUI_250_Power(_valuesContainer);
+         createUI_260_Temperature(_valuesContainer);
+         createUI_270_Gradient(_valuesContainer);
+         createUI_280_Altimeter(_valuesContainer);
+         createUI_290_Cadence(_valuesContainer);
+         createUI_300_Gears(_valuesContainer);
+         createUI_310_TourCompareResult(_valuesContainer);
+         createUI_400_RunDyn_StanceTime(_valuesContainer);
+         createUI_410_RunDyn_StanceTimeBalance(_valuesContainer);
+         createUI_420_RunDyn_StepLength(_valuesContainer);
+         createUI_430_RunDyn_VerticalOscillation(_valuesContainer);
+         createUI_440_RunDyn_VerticalRatio(_valuesContainer);
+         createUI_500_ChartZoomFactor(_valuesContainer);
       }
    }
 
@@ -1172,6 +1196,7 @@ public class ValuePoint_ToolTip_UI extends Pinned_ToolTip_Shell implements IPinn
     * @param labelText
     * @param tooltip
     * @param colorId
+    *
     * @return Returns created label.
     */
    private Label createUI_Label(final Composite parent,
@@ -1204,6 +1229,7 @@ public class ValuePoint_ToolTip_UI extends Pinned_ToolTip_Shell implements IPinn
     * @param tooltip
     * @param colorId
     *           Can be <code>null</code>.
+    *
     * @return
     */
    private Label createUI_Label_Value(final Composite parent,
@@ -1426,9 +1452,9 @@ public class ValuePoint_ToolTip_UI extends Pinned_ToolTip_Shell implements IPinn
       if (_tourData != null && tourData != null
             && _tourData.getTourId().equals(tourData.getTourId())) {
 
-         // the same tour is already set
-
-         return;
+// UI must be update otherwise a new/deleted tour marker could display wrong values
+//
+//         return;
       }
 
       _tourData = tourData;
@@ -1751,16 +1777,44 @@ public class ValuePoint_ToolTip_UI extends Pinned_ToolTip_Shell implements IPinn
          valueIndex = timeSerie.length - 1;
       }
 
+      String tooltip;
+
       _currentValueIndex = valueIndex;
 
-      final int durationTime = timeSerie[valueIndex];
+      final List<TourMarker> tourMarkersSorted = _tourData.getTourMarkersSorted();
+      final boolean isTourMarkerAvailable = tourMarkersSorted.size() > 0;
+      int lastTourMarkerIndex = 0;
+
+      if (isTourMarkerAvailable) {
+
+         for (final TourMarker tourMarker : tourMarkersSorted) {
+
+            final int tourMarkerSerieIndex = tourMarker.getSerieIndex();
+
+            if (valueIndex > tourMarkerSerieIndex) {
+
+               lastTourMarkerIndex = tourMarkerSerieIndex;
+            }
+         }
+      }
 
       if (_isVisible_And_Available_Altimeter) {
          _lblAltimeter.setText(Integer.toString((int) _tourData.getAltimeterSerie()[valueIndex]));
       }
 
       if (_isVisible_And_Available_Elevation) {
-         _lblElevation.setText(_nf1NoGroup.format(_tourData.getAltitudeSmoothedSerie(false)[valueIndex]));
+
+         final float[] elevationSerie = _tourData.getAltitudeSmoothedSerie(false);
+         float elevationValue = elevationSerie[valueIndex];
+
+         if (_isShowValuesSinceLastTourMarker && isTourMarkerAvailable) {
+
+            final float elevationValue_Marker = elevationSerie[lastTourMarkerIndex];
+
+            elevationValue = elevationValue - elevationValue_Marker;
+         }
+
+         _lblElevation.setText(_nf1NoGroup.format(elevationValue));
       }
 
       if (_isVisible_And_Available_Cadence) {
@@ -1875,18 +1929,40 @@ public class ValuePoint_ToolTip_UI extends Pinned_ToolTip_Shell implements IPinn
          _lblTemperature.setText(_nf1.format(temperature));
       }
 
+      /*
+       * Time
+       */
+      int durationTime = timeSerie[valueIndex];
+      if (_isShowValuesSinceLastTourMarker && isTourMarkerAvailable) {
+
+         final int durationTime_TourMarker = timeSerie[lastTourMarkerIndex];
+
+         durationTime -= durationTime_TourMarker;
+      }
+
       if (_isVisible_And_Available_TimeDuration) {
+
          _lblTimeDuration.setText(UI.format_hhh_mm_ss(durationTime));
       }
 
       if (_isVisible_And_Available_TimeMoving) {
 
-         final int movingTime = _tourData.getMovingTimeSerie()[valueIndex];
+         final int[] movingTimeSerie = _tourData.getMovingTimeSerie();
+
+         int movingTime = movingTimeSerie[valueIndex];
+
+         if (_isShowValuesSinceLastTourMarker && isTourMarkerAvailable) {
+            movingTime -= movingTimeSerie[lastTourMarkerIndex];
+         }
+
          final int breakTime = durationTime - movingTime;
 
-         final String tooltip = String.format(
-               Messages.Tooltip_ValuePoint_Label_MovingTime_Tooltip,
-               UI.format_hhh_mm_ss(breakTime));
+         tooltip = Messages.Tooltip_ValuePoint_Label_MovingTime_Tooltip.formatted(UI.format_hhh_mm_ss(breakTime));
+
+         if (_isVisible_And_Available_TimeMoving && _isShowValuesSinceLastTourMarker) {
+
+            tooltip += UI.NEW_LINE2 + Messages.Tooltip_ValuePoint_LastTourMarker_TimeMoving;
+         }
 
          _lblTimeMoving.setText(UI.format_hhh_mm_ss(movingTime));
          _lblTimeMoving.setToolTipText(tooltip);
@@ -1896,12 +1972,21 @@ public class ValuePoint_ToolTip_UI extends Pinned_ToolTip_Shell implements IPinn
 
       if (_isVisible_And_Available_TimeRecorded) {
 
-         final int recordedTime = _tourData.getRecordedTimeSerie()[valueIndex];
+         final int[] recordedTimeSerie = _tourData.getRecordedTimeSerie();
+         int recordedTime = recordedTimeSerie[valueIndex];
+
+         if (_isShowValuesSinceLastTourMarker && isTourMarkerAvailable) {
+            recordedTime -= recordedTimeSerie[lastTourMarkerIndex];
+         }
+
          final int pauseTime = durationTime - recordedTime;
 
-         final String tooltip = String.format(
-               Messages.Tooltip_ValuePoint_Label_RecordedTime_Tooltip,
-               UI.format_hhh_mm_ss(pauseTime));
+         tooltip = Messages.Tooltip_ValuePoint_Label_RecordedTime_Tooltip.formatted(UI.format_hhh_mm_ss(pauseTime));
+
+         if (_isVisible_And_Available_TimeRecorded && _isShowValuesSinceLastTourMarker) {
+
+            tooltip += UI.NEW_LINE2 + Messages.Tooltip_ValuePoint_LastTourMarker_TimeRecorded;
+         }
 
          _lblTimeRecorded.setText(UI.format_hhh_mm_ss(recordedTime));
          _lblTimeRecorded.setToolTipText(tooltip);
@@ -1910,6 +1995,7 @@ public class ValuePoint_ToolTip_UI extends Pinned_ToolTip_Shell implements IPinn
       }
 
       if (_isVisible_And_Available_TimeOfDay) {
+
          _lblTimeOfDay.setText(UI.format_hhh_mm_ss((_tourData.getStartTimeOfDay() + durationTime) % 86400));
       }
 
@@ -1960,6 +2046,7 @@ public class ValuePoint_ToolTip_UI extends Pinned_ToolTip_Shell implements IPinn
             return;
          }
 
+         updateUI_Units();
          updateUI_Runnable_Colors();
       });
    }
@@ -2087,6 +2174,81 @@ public class ValuePoint_ToolTip_UI extends Pinned_ToolTip_Shell implements IPinn
       if (_isVisible_And_Available_RunDyn_VerticalRatio) {
          updateUI_Color(_lblRunDyn_VerticalRatio, GraphColorManager.PREF_GRAPH_RUN_DYN_VERTICAL_RATIO);
          updateUI_Color(_lblRunDyn_VerticalRatio_Unit, GraphColorManager.PREF_GRAPH_RUN_DYN_VERTICAL_RATIO);
+      }
+   }
+
+   private void updateUI_Units() {
+
+      final String markerHint = UI.SPACE + UI.SYMBOL_STAR;
+
+      boolean isRelayout = false;
+
+      if (_isVisible_And_Available_TimeDuration) {
+
+         if (_isShowValuesSinceLastTourMarker) {
+
+            _lblTimeDuration_Unit.setText(UI.UNIT_LABEL_TIME + markerHint);
+            _lblTimeDuration_Unit.setToolTipText(OtherMessages.GRAPH_LABEL_TIME_DURATION
+                  + UI.NEW_LINE2
+                  + Messages.Tooltip_ValuePoint_LastTourMarker_TimeDuration);
+
+         } else {
+
+            _lblTimeDuration_Unit.setText(UI.UNIT_LABEL_TIME);
+            _lblTimeDuration_Unit.setToolTipText(OtherMessages.GRAPH_LABEL_TIME_DURATION);
+         }
+
+         isRelayout = true;
+      }
+
+      if (_isVisible_And_Available_TimeMoving) {
+
+         if (_isShowValuesSinceLastTourMarker) {
+
+            _lblTimeMoving_Unit.setText(UI.UNIT_LABEL_TIME + markerHint);
+
+         } else {
+
+            _lblTimeMoving_Unit.setText(UI.UNIT_LABEL_TIME);
+         }
+
+         isRelayout = true;
+      }
+
+      if (_isVisible_And_Available_TimeRecorded) {
+
+         if (_isShowValuesSinceLastTourMarker) {
+
+            _lblTimeRecorded_Unit.setText(UI.UNIT_LABEL_TIME + markerHint);
+
+         } else {
+
+            _lblTimeRecorded_Unit.setText(UI.UNIT_LABEL_TIME);
+         }
+
+         isRelayout = true;
+      }
+
+      if (_isVisible_And_Available_Elevation) {
+
+         if (_isShowValuesSinceLastTourMarker) {
+
+            _lblElevation_Unit.setText(UI.UNIT_LABEL_ELEVATION + markerHint);
+            _lblElevation_Unit.setToolTipText(OtherMessages.GRAPH_LABEL_ALTITUDE
+                  + UI.NEW_LINE2
+                  + Messages.Tooltip_ValuePoint_LastTourMarker_Elevation);
+
+         } else {
+
+            _lblElevation_Unit.setText(UI.UNIT_LABEL_ELEVATION);
+            _lblElevation_Unit.setToolTipText(OtherMessages.GRAPH_LABEL_ALTITUDE);
+         }
+
+         isRelayout = true;
+      }
+
+      if (isRelayout) {
+         _valuesContainer.layout(true, true);
       }
    }
 

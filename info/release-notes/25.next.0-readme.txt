@@ -45,6 +45,10 @@ New / Improvements
 * All Charts
   - Customize y-axis width
 
+* Tour Chart
+  - Display values since the last tour marker in the value tooltip
+    https://github.com/mytourbook/mytourbook/issues/1473
+
 * Tour Markers
   - Create or remove tour marker label numbering
     https://github.com/mytourbook/mytourbook/issues/1496

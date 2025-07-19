@@ -2948,6 +2948,8 @@ public class Messages extends NLS {
    public static String        Tooltip_ValuePoint_Action_PinLocation_Screen;
    public static String        Tooltip_ValuePoint_Action_PinLocation_TopLeft;
    public static String        Tooltip_ValuePoint_Action_PinLocation_TopRight;
+   public static String        Tooltip_ValuePoint_Action_ShowValuesSinceLastMarker;
+   public static String        Tooltip_ValuePoint_Action_ShowValuesSinceLastMarker_Tooltip;
    public static String        Tooltip_ValuePoint_Action_Value_Altimeter;
    public static String        Tooltip_ValuePoint_Action_Value_Altitude;
    public static String        Tooltip_ValuePoint_Action_Value_Cadence;
@@ -2982,7 +2984,10 @@ public class Messages extends NLS {
    public static String        Tooltip_ValuePoint_Label_RecordedTime_Tooltip;
    public static String        Tooltip_ValuePoint_Label_SlicesCurrent_Tooltip;
    public static String        Tooltip_ValuePoint_Label_SlicesMax_Tooltip;
-
+   public static String        Tooltip_ValuePoint_LastTourMarker_Elevation;
+   public static String        Tooltip_ValuePoint_LastTourMarker_TimeDuration;
+   public static String        Tooltip_ValuePoint_LastTourMarker_TimeMoving;
+   public static String        Tooltip_ValuePoint_LastTourMarker_TimeRecorded;
    public static String        TourAnalyzer_Label_average;
    public static String        TourAnalyzer_Label_difference;
    public static String        TourAnalyzer_Label_left;

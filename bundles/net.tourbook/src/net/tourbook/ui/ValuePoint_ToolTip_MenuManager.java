@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2022 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2025 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -38,38 +38,43 @@ import org.eclipse.swt.widgets.Widget;
 
 public class ValuePoint_ToolTip_MenuManager {
 
-   static final String                   STATE_VALUE_POINT_TOOLTIP_VISIBLE_GRAPHS = "ValuePoint_ToolTip_VisibleGraphs";       //$NON-NLS-1$
-   static final String                   STATE_VALUE_POINT_TOOLTIP_ORIENTATION    = "ValuePoint_ToolTip_Orientation";         //$NON-NLS-1$
+// SET_FORMATTING_OFF
 
-   static ValuePoint_ToolTip_Orientation DEFAULT_ORIENTATION                      = ValuePoint_ToolTip_Orientation.Horizontal;
+   static final String  STATE_VALUE_POINT_TOOLTIP_VISIBLE_GRAPHS                   = "ValuePoint_ToolTip_VisibleGraphs";                              //$NON-NLS-1$
+   static final String  STATE_VALUE_POINT_TOOLTIP_ORIENTATION                      = "ValuePoint_ToolTip_Orientation";                                //$NON-NLS-1$
+   static final String  STATE_VALUE_POINT_TOOLTIP_IS_SHOW_VALUES_SINCE_LAST_MARKER = "STATE_VALUE_POINT_TOOLTIP_IS_SHOW_VALUES_SINCE_LAST_MARKER";    //$NON-NLS-1$
 
-   static final long                     VALUE_ID_ALTIMETER                       = 1 << 1;
-   static final long                     VALUE_ID_ALTITUDE                        = 1 << 2;
-   static final long                     VALUE_ID_CADENCE                         = 1 << 3;
-   static final long                     VALUE_ID_DISTANCE                        = 1 << 4;
-   static final long                     VALUE_ID_GRADIENT                        = 1 << 5;
-   static final long                     VALUE_ID_PACE                            = 1 << 6;
-   static final long                     VALUE_ID_POWER                           = 1 << 7;
-   static final long                     VALUE_ID_PULSE                           = 1 << 8;
-   static final long                     VALUE_ID_SPEED                           = 1 << 9;
-   static final long                     VALUE_ID_TEMPERATURE                     = 1 << 10;
-   static final long                     VALUE_ID_TIME_DURATION                   = 1 << 11;
-   static final long                     VALUE_ID_TIME_OF_DAY                     = 1 << 12;
-   static final long                     VALUE_ID_TIME_SLICES                     = 1 << 13;
-   static final long                     VALUE_ID_CHART_ZOOM_FACTOR               = 1 << 14;
-   static final long                     VALUE_ID_GEARS                           = 1 << 15;
-   static final long                     VALUE_ID_TOUR_COMPARE_RESULT             = 1 << 16;
-   static final long                     VALUE_ID_RUN_DYN_STANCE_TIME             = 1 << 17;
-   static final long                     VALUE_ID_RUN_DYN_STANCE_TIME_BALANCED    = 1 << 18;
-   static final long                     VALUE_ID_RUN_DYN_STEP_LENGTH             = 1 << 19;
-   static final long                     VALUE_ID_RUN_DYN_VERTICAL_OSCILLATION    = 1 << 20;
-   static final long                     VALUE_ID_RUN_DYN_VERTICAL_RATIO          = 1 << 21;
-   static final long                     VALUE_ID_PACE_SUMMARIZED                 = 1 << 22;
-   static final long                     VALUE_ID_SPEED_SUMMARIZED                = 1 << 23;
-   static final long                     VALUE_ID_TIME_MOVING                     = 1 << 24;
-   static final long                     VALUE_ID_TIME_RECORDED                   = 1 << 25;
+// SET_FORMATTING_ON
 
-   static final long                     DEFAULT_GRAPHS                           =
+   static ValuePoint_ToolTip_Orientation       DEFAULT_ORIENTATION                   = ValuePoint_ToolTip_Orientation.Horizontal;
+
+   static final long                           VALUE_ID_ALTIMETER                    = 1 << 1;
+   static final long                           VALUE_ID_ALTITUDE                     = 1 << 2;
+   static final long                           VALUE_ID_CADENCE                      = 1 << 3;
+   static final long                           VALUE_ID_DISTANCE                     = 1 << 4;
+   static final long                           VALUE_ID_GRADIENT                     = 1 << 5;
+   static final long                           VALUE_ID_PACE                         = 1 << 6;
+   static final long                           VALUE_ID_POWER                        = 1 << 7;
+   static final long                           VALUE_ID_PULSE                        = 1 << 8;
+   static final long                           VALUE_ID_SPEED                        = 1 << 9;
+   static final long                           VALUE_ID_TEMPERATURE                  = 1 << 10;
+   static final long                           VALUE_ID_TIME_DURATION                = 1 << 11;
+   static final long                           VALUE_ID_TIME_OF_DAY                  = 1 << 12;
+   static final long                           VALUE_ID_TIME_SLICES                  = 1 << 13;
+   static final long                           VALUE_ID_CHART_ZOOM_FACTOR            = 1 << 14;
+   static final long                           VALUE_ID_GEARS                        = 1 << 15;
+   static final long                           VALUE_ID_TOUR_COMPARE_RESULT          = 1 << 16;
+   static final long                           VALUE_ID_RUN_DYN_STANCE_TIME          = 1 << 17;
+   static final long                           VALUE_ID_RUN_DYN_STANCE_TIME_BALANCED = 1 << 18;
+   static final long                           VALUE_ID_RUN_DYN_STEP_LENGTH          = 1 << 19;
+   static final long                           VALUE_ID_RUN_DYN_VERTICAL_OSCILLATION = 1 << 20;
+   static final long                           VALUE_ID_RUN_DYN_VERTICAL_RATIO       = 1 << 21;
+   static final long                           VALUE_ID_PACE_SUMMARIZED              = 1 << 22;
+   static final long                           VALUE_ID_SPEED_SUMMARIZED             = 1 << 23;
+   static final long                           VALUE_ID_TIME_MOVING                  = 1 << 24;
+   static final long                           VALUE_ID_TIME_RECORDED                = 1 << 25;
+
+   static final long                           DEFAULT_GRAPHS                        =
 
          VALUE_ID_TIME_SLICES
                | VALUE_ID_TIME_DURATION
@@ -77,61 +82,62 @@ public class ValuePoint_ToolTip_MenuManager {
 
    ;
 
-   private long                          _allVisibleValueIds;
+   private long                                _allVisibleValueIds;
 
-   private IDialogSettings               _state;
-   private TourData                      _tourData;
+   private IDialogSettings                     _state;
+   private TourData                            _tourData;
 
-   private ValuePoint_ToolTip_UI         _valuePointToolTipUI;
+   private ValuePoint_ToolTip_UI               _valuePointToolTipUI;
 
-   private Menu                          _menu;
+   private Menu                                _menu;
 
-   private boolean                       _isHorizontal;
+   private boolean                             _isHorizontal;
 
-   private ActionHideToolTip             _actionHideToolTip;
-   private ActionSetDefaults             _actionSetDefaults;
-   private ActionCloseTTContextMenu      _actionCloseTTContextMenu;
+   private ActionHideToolTip                   _actionHideToolTip;
+   private ActionSetDefaults                   _actionSetDefaults;
+   private ActionShowValuesSinceLastTourMarker _actionShowValuesSinceLastTourMarker;
+   private ActionCloseTTContextMenu            _actionCloseTTContextMenu;
 
-   private ActionOrientation             _actionHorizontalOrientation;
-   private ActionOrientation             _actionVerticalOrientation;
+   private ActionOrientation                   _actionOrientation_Horizontal;
+   private ActionOrientation                   _actionOrientation_Vertical;
 
-   private ActionValueItem               _actionValue_Altimeter;
-   private ActionValueItem               _actionValue_Altitude;
-   private ActionValueItem               _actionValue_Cadence;
-   private ActionValueItem               _actionValue_ChartZoomFactor;
-   private ActionValueItem               _actionValue_Distance;
-   private ActionValueItem               _actionValue_Gears;
-   private ActionValueItem               _actionValue_Gradient;
-   private ActionValueItem               _actionValue_Header;
-   private ActionValueItem               _actionValue_Pace;
-   private ActionValueItem               _actionValue_Pace_Summarized;
-   private ActionValueItem               _actionValue_Power;
-   private ActionValueItem               _actionValue_Pulse;
-   private ActionValueItem               _actionValue_Speed;
-   private ActionValueItem               _actionValue_Speed_Summarized;
-   private ActionValueItem               _actionValue_Temperature;
-   private ActionValueItem               _actionValue_TimeDuration;
-   private ActionValueItem               _actionValue_TimeOfDay;
-   private ActionValueItem               _actionValue_TimeMoving;
-   private ActionValueItem               _actionValue_TimeRecorded;
-   private ActionValueItem               _actionValue_TimeSlices;
-   private ActionValueItem               _actionValue_TourCompare_Result;
+   private ActionValueItem                     _actionValue_Altimeter;
+   private ActionValueItem                     _actionValue_Altitude;
+   private ActionValueItem                     _actionValue_Cadence;
+   private ActionValueItem                     _actionValue_ChartZoomFactor;
+   private ActionValueItem                     _actionValue_Distance;
+   private ActionValueItem                     _actionValue_Gears;
+   private ActionValueItem                     _actionValue_Gradient;
+   private ActionValueItem                     _actionValue_Header;
+   private ActionValueItem                     _actionValue_Pace;
+   private ActionValueItem                     _actionValue_Pace_Summarized;
+   private ActionValueItem                     _actionValue_Power;
+   private ActionValueItem                     _actionValue_Pulse;
+   private ActionValueItem                     _actionValue_Speed;
+   private ActionValueItem                     _actionValue_Speed_Summarized;
+   private ActionValueItem                     _actionValue_Temperature;
+   private ActionValueItem                     _actionValue_TimeDuration;
+   private ActionValueItem                     _actionValue_TimeOfDay;
+   private ActionValueItem                     _actionValue_TimeMoving;
+   private ActionValueItem                     _actionValue_TimeRecorded;
+   private ActionValueItem                     _actionValue_TimeSlices;
+   private ActionValueItem                     _actionValue_TourCompare_Result;
 
-   private ActionValueItem               _actionValue_RunDyn_StanceTime;
-   private ActionValueItem               _actionValue_RunDyn_StanceTimeBalance;
-   private ActionValueItem               _actionValue_RunDyn_StepLength;
-   private ActionValueItem               _actionValue_RunDyn_VerticalOscillation;
-   private ActionValueItem               _actionValue_RunDyn_VerticalRatio;
+   private ActionValueItem                     _actionValue_RunDyn_StanceTime;
+   private ActionValueItem                     _actionValue_RunDyn_StanceTimeBalance;
+   private ActionValueItem                     _actionValue_RunDyn_StepLength;
+   private ActionValueItem                     _actionValue_RunDyn_VerticalOscillation;
+   private ActionValueItem                     _actionValue_RunDyn_VerticalRatio;
 
-   private Action                        _actionPinLocation_Header;
-   private ActionPinLocation             _actionPinLocation_Screen;
-   private ActionPinLocation             _actionPinLocation_TopRight;
-   private ActionPinLocation             _actionPinLocation_TopLeft;
-   private ActionPinLocation             _actionPinLocation_BottomLeft;
-   private ActionPinLocation             _actionPinLocation_BottomRight;
-   private ActionPinLocation             _actionPinLocation_MouseXPosition;
+   private Action                              _actionPinLocation_Header;
+   private ActionPinLocation                   _actionPinLocation_Screen;
+   private ActionPinLocation                   _actionPinLocation_TopRight;
+   private ActionPinLocation                   _actionPinLocation_TopLeft;
+   private ActionPinLocation                   _actionPinLocation_BottomLeft;
+   private ActionPinLocation                   _actionPinLocation_BottomRight;
+   private ActionPinLocation                   _actionPinLocation_MouseXPosition;
 
-   public boolean                        canBeDisplayed_ChartZoomFactor           = true;
+   private boolean                             _canBeDisplayed_ChartZoomFactor       = true;
 
    private final class ActionCloseTTContextMenu extends Action {
 
@@ -227,7 +233,7 @@ public class ValuePoint_ToolTip_MenuManager {
       public void run() {
 
          /*
-          * set defaults into the state
+          * Set defaults into the state
           */
          final ValuePoint_ToolTip_Orientation orientation = ValuePoint_ToolTip_MenuManager.DEFAULT_ORIENTATION;
          _state.put(STATE_VALUE_POINT_TOOLTIP_ORIENTATION, orientation.name());
@@ -235,8 +241,30 @@ public class ValuePoint_ToolTip_MenuManager {
          _allVisibleValueIds = DEFAULT_GRAPHS;
          _state.put(STATE_VALUE_POINT_TOOLTIP_VISIBLE_GRAPHS, _allVisibleValueIds);
 
+         _state.put(STATE_VALUE_POINT_TOOLTIP_IS_SHOW_VALUES_SINCE_LAST_MARKER, false);
+
          // update tooltip with default values
-         _valuePointToolTipUI.actionSetDefaults(_allVisibleValueIds, orientation);
+         _valuePointToolTipUI.actionSetDefaults(_allVisibleValueIds, orientation, false);
+      }
+   }
+
+   private final class ActionShowValuesSinceLastTourMarker extends Action {
+
+      public ActionShowValuesSinceLastTourMarker() {
+
+         super(Messages.Tooltip_ValuePoint_Action_ShowValuesSinceLastMarker, AS_CHECK_BOX);
+
+         setToolTipText(Messages.Tooltip_ValuePoint_Action_ShowValuesSinceLastMarker_Tooltip);
+      }
+
+      @Override
+      public void run() {
+
+         final boolean isChecked = isChecked();
+
+         _state.put(STATE_VALUE_POINT_TOOLTIP_IS_SHOW_VALUES_SINCE_LAST_MARKER, isChecked);
+
+         _valuePointToolTipUI.actionShowValuesSinceLastTourMarker(isChecked);
       }
    }
 
@@ -328,23 +356,30 @@ public class ValuePoint_ToolTip_MenuManager {
    }
 
    private void addItem(final Action action) {
+
       final ActionContributionItem item = new ActionContributionItem(action);
+
       item.fill(_menu, -1);
    }
 
    private void createActions() {
 
-      _actionHideToolTip = new ActionHideToolTip();
-      _actionSetDefaults = new ActionSetDefaults();
-      _actionCloseTTContextMenu = new ActionCloseTTContextMenu();
-      _actionHorizontalOrientation = new ActionOrientation(ValuePoint_ToolTip_Orientation.Horizontal);
-      _actionVerticalOrientation = new ActionOrientation(ValuePoint_ToolTip_Orientation.Vertical);
+// SET_FORMATTING_OFF
 
-      createPinActions();
-      createGraphActions();
+      _actionHideToolTip                     = new ActionHideToolTip();
+      _actionSetDefaults                     = new ActionSetDefaults();
+      _actionCloseTTContextMenu              = new ActionCloseTTContextMenu();
+      _actionOrientation_Horizontal          = new ActionOrientation(ValuePoint_ToolTip_Orientation.Horizontal);
+      _actionOrientation_Vertical            = new ActionOrientation(ValuePoint_ToolTip_Orientation.Vertical);
+      _actionShowValuesSinceLastTourMarker   = new ActionShowValuesSinceLastTourMarker();
+
+// SET_FORMATTING_ON
+
+      createActions_PinLocation();
+      createActions_Graph();
    }
 
-   private void createGraphActions() {
+   private void createActions_Graph() {
 
       _actionValue_Header = new ActionValueItem(
             -1,
@@ -477,7 +512,7 @@ public class ValuePoint_ToolTip_MenuManager {
             Images.Graph_RunDyn_VerticalRatio);
    }
 
-   private void createPinActions() {
+   private void createActions_PinLocation() {
 
       _actionPinLocation_Header = new Action(Messages.Tooltip_ValuePoint_Action_PinLocation_Header) {};
 
@@ -507,57 +542,11 @@ public class ValuePoint_ToolTip_MenuManager {
    }
 
    void dispose() {
+
       if (_menu != null) {
          _menu.dispose();
          _menu = null;
       }
-   }
-
-   private void enableActions() {
-
-      final Pinned_ToolTip_PinLocation pinnedLocation = _valuePointToolTipUI.getPinnedLocation();
-
-      _actionPinLocation_Header.setEnabled(false);
-
-// SET_FORMATTING_OFF
-
-      _actionPinLocation_Screen                 .setChecked(pinnedLocation == Pinned_ToolTip_PinLocation.Screen);
-      _actionPinLocation_TopLeft                .setChecked(pinnedLocation == Pinned_ToolTip_PinLocation.TopLeft);
-      _actionPinLocation_TopRight               .setChecked(pinnedLocation == Pinned_ToolTip_PinLocation.TopRight);
-      _actionPinLocation_BottomLeft             .setChecked(pinnedLocation == Pinned_ToolTip_PinLocation.BottomLeft);
-      _actionPinLocation_BottomRight            .setChecked(pinnedLocation == Pinned_ToolTip_PinLocation.BottomRight);
-      _actionPinLocation_MouseXPosition         .setChecked(pinnedLocation == Pinned_ToolTip_PinLocation.MouseXPosition);
-
-      _actionValue_Header                       .setEnabled(false);
-
-      _actionValue_Altimeter                    .setState((_allVisibleValueIds & VALUE_ID_ALTIMETER) > 0,            _tourData.getAltimeterSerie()          != null);
-      _actionValue_Altitude                     .setState((_allVisibleValueIds & VALUE_ID_ALTITUDE) > 0,             _tourData.getAltitudeSerie()           != null);
-      _actionValue_Cadence                      .setState((_allVisibleValueIds & VALUE_ID_CADENCE) > 0,              _tourData.getCadenceSerie()            != null);
-      _actionValue_ChartZoomFactor              .setState((_allVisibleValueIds & VALUE_ID_CHART_ZOOM_FACTOR) > 0,    true);
-      _actionValue_Distance                     .setState((_allVisibleValueIds & VALUE_ID_DISTANCE) > 0,             _tourData.distanceSerie                != null);
-      _actionValue_Gears                        .setState((_allVisibleValueIds & VALUE_ID_GEARS) > 0,                _tourData.getGears()                   != null);
-      _actionValue_Gradient                     .setState((_allVisibleValueIds & VALUE_ID_GRADIENT) > 0,             _tourData.getGradientSerie()           != null);
-      _actionValue_Pace                         .setState((_allVisibleValueIds & VALUE_ID_PACE) > 0,                 _tourData.getPaceSerie()               != null);
-      _actionValue_Pace_Summarized              .setState((_allVisibleValueIds & VALUE_ID_PACE_SUMMARIZED) > 0,      _tourData.getPaceSerie_Summarized_Seconds() != null);
-      _actionValue_Power                        .setState((_allVisibleValueIds & VALUE_ID_POWER) > 0,                _tourData.getPowerSerie()              != null);
-      _actionValue_Pulse                        .setState((_allVisibleValueIds & VALUE_ID_PULSE) > 0,                _tourData.pulseSerie                   != null);
-      _actionValue_Speed                        .setState((_allVisibleValueIds & VALUE_ID_SPEED) > 0,                _tourData.getSpeedSerie()              != null);
-      _actionValue_Speed_Summarized             .setState((_allVisibleValueIds & VALUE_ID_SPEED_SUMMARIZED) > 0,     _tourData.getSpeedSerie_Summarized()   != null);
-      _actionValue_Temperature                  .setState((_allVisibleValueIds & VALUE_ID_TEMPERATURE) > 0,          _tourData.temperatureSerie             != null);
-      _actionValue_TimeDuration                 .setState((_allVisibleValueIds & VALUE_ID_TIME_DURATION) > 0,        _tourData.timeSerie                    != null);
-      _actionValue_TimeOfDay                    .setState((_allVisibleValueIds & VALUE_ID_TIME_OF_DAY) > 0,          _tourData.timeSerie                    != null);
-      _actionValue_TimeMoving                   .setState((_allVisibleValueIds & VALUE_ID_TIME_MOVING) > 0,          _tourData.getMovingTimeSerie()         != null);
-      _actionValue_TimeRecorded                 .setState((_allVisibleValueIds & VALUE_ID_TIME_RECORDED) > 0,        _tourData.timeSerie                    != null);
-      _actionValue_TimeSlices                   .setState((_allVisibleValueIds & VALUE_ID_TIME_SLICES) > 0,          true);
-      _actionValue_TourCompare_Result           .setState((_allVisibleValueIds & VALUE_ID_TOUR_COMPARE_RESULT) > 0,  _tourData.tourCompare_DiffSerie        != null && _tourData.tourCompare_DiffSerie.length > 0);
-
-      _actionValue_RunDyn_StanceTime            .setState((_allVisibleValueIds & VALUE_ID_RUN_DYN_STANCE_TIME) > 0,           _tourData.getRunDyn_StanceTime()          != null);
-      _actionValue_RunDyn_StanceTimeBalance     .setState((_allVisibleValueIds & VALUE_ID_RUN_DYN_STANCE_TIME_BALANCED) > 0,  _tourData.getRunDyn_StanceTimeBalance()   != null);
-      _actionValue_RunDyn_StepLength            .setState((_allVisibleValueIds & VALUE_ID_RUN_DYN_STEP_LENGTH) > 0,           _tourData.getRunDyn_StepLength()          != null);
-      _actionValue_RunDyn_VerticalOscillation   .setState((_allVisibleValueIds & VALUE_ID_RUN_DYN_VERTICAL_OSCILLATION) > 0,  _tourData.getRunDyn_VerticalOscillation() != null);
-      _actionValue_RunDyn_VerticalRatio         .setState((_allVisibleValueIds & VALUE_ID_RUN_DYN_VERTICAL_RATIO) > 0,        _tourData.getRunDyn_VerticalRatio()       != null);
-
-// SET_FORMATTING_ON
    }
 
    private Menu getMenu(final Control parent) {
@@ -568,7 +557,7 @@ public class ValuePoint_ToolTip_MenuManager {
       }
 
       // !!! actions must be checked before they are added otherwise they are not checked
-      enableActions();
+      restoreAndEnableActions();
 
       _menu = new Menu(parent);
 
@@ -600,7 +589,7 @@ public class ValuePoint_ToolTip_MenuManager {
       addItem(_actionValue_RunDyn_VerticalRatio);
       addItem(_actionValue_TourCompare_Result);
 
-      if (canBeDisplayed_ChartZoomFactor) {
+      if (_canBeDisplayed_ChartZoomFactor) {
          addItem(_actionValue_ChartZoomFactor);
       }
       addItem(_actionCloseTTContextMenu);
@@ -618,10 +607,11 @@ public class ValuePoint_ToolTip_MenuManager {
 
       // show the other orientation
       if (_isHorizontal) {
-         addItem(_actionVerticalOrientation);
+         addItem(_actionOrientation_Vertical);
       } else {
-         addItem(_actionHorizontalOrientation);
+         addItem(_actionOrientation_Horizontal);
       }
+      addItem(_actionShowValuesSinceLastTourMarker);
       addItem(_actionSetDefaults);
       addItem(_actionHideToolTip);
 
@@ -689,8 +679,57 @@ public class ValuePoint_ToolTip_MenuManager {
       menu.setVisible(true);
    }
 
+   private void restoreAndEnableActions() {
+
+      final Pinned_ToolTip_PinLocation pinnedLocation = _valuePointToolTipUI.getPinnedLocation();
+
+      _actionPinLocation_Header.setEnabled(false);
+
+// SET_FORMATTING_OFF
+
+      _actionPinLocation_Screen                 .setChecked(pinnedLocation == Pinned_ToolTip_PinLocation.Screen);
+      _actionPinLocation_TopLeft                .setChecked(pinnedLocation == Pinned_ToolTip_PinLocation.TopLeft);
+      _actionPinLocation_TopRight               .setChecked(pinnedLocation == Pinned_ToolTip_PinLocation.TopRight);
+      _actionPinLocation_BottomLeft             .setChecked(pinnedLocation == Pinned_ToolTip_PinLocation.BottomLeft);
+      _actionPinLocation_BottomRight            .setChecked(pinnedLocation == Pinned_ToolTip_PinLocation.BottomRight);
+      _actionPinLocation_MouseXPosition         .setChecked(pinnedLocation == Pinned_ToolTip_PinLocation.MouseXPosition);
+
+      _actionValue_Header                       .setEnabled(false);
+
+      _actionValue_Altimeter                    .setState((_allVisibleValueIds & VALUE_ID_ALTIMETER) > 0,            _tourData.getAltimeterSerie()          != null);
+      _actionValue_Altitude                     .setState((_allVisibleValueIds & VALUE_ID_ALTITUDE) > 0,             _tourData.getAltitudeSerie()           != null);
+      _actionValue_Cadence                      .setState((_allVisibleValueIds & VALUE_ID_CADENCE) > 0,              _tourData.getCadenceSerie()            != null);
+      _actionValue_ChartZoomFactor              .setState((_allVisibleValueIds & VALUE_ID_CHART_ZOOM_FACTOR) > 0,    true);
+      _actionValue_Distance                     .setState((_allVisibleValueIds & VALUE_ID_DISTANCE) > 0,             _tourData.distanceSerie                != null);
+      _actionValue_Gears                        .setState((_allVisibleValueIds & VALUE_ID_GEARS) > 0,                _tourData.getGears()                   != null);
+      _actionValue_Gradient                     .setState((_allVisibleValueIds & VALUE_ID_GRADIENT) > 0,             _tourData.getGradientSerie()           != null);
+      _actionValue_Pace                         .setState((_allVisibleValueIds & VALUE_ID_PACE) > 0,                 _tourData.getPaceSerie()               != null);
+      _actionValue_Pace_Summarized              .setState((_allVisibleValueIds & VALUE_ID_PACE_SUMMARIZED) > 0,      _tourData.getPaceSerie_Summarized_Seconds() != null);
+      _actionValue_Power                        .setState((_allVisibleValueIds & VALUE_ID_POWER) > 0,                _tourData.getPowerSerie()              != null);
+      _actionValue_Pulse                        .setState((_allVisibleValueIds & VALUE_ID_PULSE) > 0,                _tourData.pulseSerie                   != null);
+      _actionValue_Speed                        .setState((_allVisibleValueIds & VALUE_ID_SPEED) > 0,                _tourData.getSpeedSerie()              != null);
+      _actionValue_Speed_Summarized             .setState((_allVisibleValueIds & VALUE_ID_SPEED_SUMMARIZED) > 0,     _tourData.getSpeedSerie_Summarized()   != null);
+      _actionValue_Temperature                  .setState((_allVisibleValueIds & VALUE_ID_TEMPERATURE) > 0,          _tourData.temperatureSerie             != null);
+      _actionValue_TimeDuration                 .setState((_allVisibleValueIds & VALUE_ID_TIME_DURATION) > 0,        _tourData.timeSerie                    != null);
+      _actionValue_TimeOfDay                    .setState((_allVisibleValueIds & VALUE_ID_TIME_OF_DAY) > 0,          _tourData.timeSerie                    != null);
+      _actionValue_TimeMoving                   .setState((_allVisibleValueIds & VALUE_ID_TIME_MOVING) > 0,          _tourData.getMovingTimeSerie()         != null);
+      _actionValue_TimeRecorded                 .setState((_allVisibleValueIds & VALUE_ID_TIME_RECORDED) > 0,        _tourData.timeSerie                    != null);
+      _actionValue_TimeSlices                   .setState((_allVisibleValueIds & VALUE_ID_TIME_SLICES) > 0,          true);
+      _actionValue_TourCompare_Result           .setState((_allVisibleValueIds & VALUE_ID_TOUR_COMPARE_RESULT) > 0,  _tourData.tourCompare_DiffSerie        != null && _tourData.tourCompare_DiffSerie.length > 0);
+
+      _actionValue_RunDyn_StanceTime            .setState((_allVisibleValueIds & VALUE_ID_RUN_DYN_STANCE_TIME) > 0,           _tourData.getRunDyn_StanceTime()          != null);
+      _actionValue_RunDyn_StanceTimeBalance     .setState((_allVisibleValueIds & VALUE_ID_RUN_DYN_STANCE_TIME_BALANCED) > 0,  _tourData.getRunDyn_StanceTimeBalance()   != null);
+      _actionValue_RunDyn_StepLength            .setState((_allVisibleValueIds & VALUE_ID_RUN_DYN_STEP_LENGTH) > 0,           _tourData.getRunDyn_StepLength()          != null);
+      _actionValue_RunDyn_VerticalOscillation   .setState((_allVisibleValueIds & VALUE_ID_RUN_DYN_VERTICAL_OSCILLATION) > 0,  _tourData.getRunDyn_VerticalOscillation() != null);
+      _actionValue_RunDyn_VerticalRatio         .setState((_allVisibleValueIds & VALUE_ID_RUN_DYN_VERTICAL_RATIO) > 0,        _tourData.getRunDyn_VerticalRatio()       != null);
+
+      _actionShowValuesSinceLastTourMarker      .setChecked(_state.getBoolean(STATE_VALUE_POINT_TOOLTIP_IS_SHOW_VALUES_SINCE_LAST_MARKER));
+
+// SET_FORMATTING_ON
+   }
+
    void setCanBeDisplayed_ChartZoomFactor(final boolean canBeDisplayed_ChartZoomFactor) {
 
-      this.canBeDisplayed_ChartZoomFactor = canBeDisplayed_ChartZoomFactor;
+      _canBeDisplayed_ChartZoomFactor = canBeDisplayed_ChartZoomFactor;
    }
 }
