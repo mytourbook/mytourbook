@@ -112,4 +112,5 @@ public interface ICommonPreferences {
    public static final String UI_DRAWING_FONT             = "UI_DRAWING_FONT";             //$NON-NLS-1$
    public static final String UI_DRAWING_FONT_IS_MODIFIED = "UI_DRAWING_FONT_IS_MODIFIED"; //$NON-NLS-1$
 
+   public static final String UI_DISABLED_ICONS           = "UI_DISABLED_ICONS";           //$NON-NLS-1$
 }

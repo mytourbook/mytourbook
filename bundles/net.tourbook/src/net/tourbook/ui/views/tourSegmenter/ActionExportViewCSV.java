@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2022 Frédéric Bard
+ * Copyright (C) 2022, 2025 Frédéric Bard
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -35,7 +35,6 @@ public class ActionExportViewCSV extends Action {
       setToolTipText(Messages.Tour_Segmenter_Action_ExportViewCSV_Tooltip);
 
       setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.CSVFormat));
-      setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Images.CSVFormat_Disabled));
    }
 
    @Override

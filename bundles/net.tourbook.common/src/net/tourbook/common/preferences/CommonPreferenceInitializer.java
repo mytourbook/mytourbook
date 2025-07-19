@@ -19,6 +19,7 @@ import java.time.DayOfWeek;
 import java.time.ZoneId;
 
 import net.tourbook.common.CommonActivator;
+import net.tourbook.common.UI;
 import net.tourbook.common.color.ColorDefinition;
 import net.tourbook.common.color.GraphColorManager;
 import net.tourbook.common.formatter.ValueFormat;
@@ -147,12 +148,13 @@ public class CommonPreferenceInitializer extends AbstractPreferenceInitializer {
       /*
        * Appearance
        */
-      store.setDefault(ICommonPreferences.APPEARANCE_NOTIFICATION_MESSAGES_DURATION, 3);
+      store.setDefault(ICommonPreferences.APPEARANCE_NOTIFICATION_MESSAGES_DURATION,   3);
+      store.setDefault(ICommonPreferences.UI_DISABLED_ICONS,                           UI.DISABLED_ICONS_GRAYED);
 
 // SET_FORMATTING_ON
 
       /*
-       * UI drawing font, set "ugly" font that users are "forced" to select a more modern font :-)
+       * UI drawing font, set a "ugly" font that users are "forced" to select a more modern font :-)
        */
       final Font defaultFont = new Font(Display.getDefault(), "Courier", 9, SWT.NORMAL); //$NON-NLS-1$
       {

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2020, 2024 Frédéric Bard
+ * Copyright (C) 2020, 2025 Frédéric Bard
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -115,6 +115,7 @@ public class TourExporter {
    }
 
    private String          _activityType;
+
    /**
     * The speed is in meters/second
     */
@@ -127,6 +128,7 @@ public class TourExporter {
    private boolean         _isCourse;
    private boolean         _isExportAllTourData;
    private boolean         _isExportSurfingWaves;
+   private boolean         _isExportTrackPointsWithSameTime;
    private boolean         _isExportWithBarometer;
    private boolean         _isRange;
    private TourData        _tourData;
@@ -610,14 +612,15 @@ public class TourExporter {
    }
 
    /**
-    * @param tourData
     * @param trackDateTime
-    * @param _mergedDistance2
-    * @param _mergedTime2
+    * @param mergedTime
+    * @param mergedDistance
     *
     * @return Returns a track or <code>null</code> when tour data cannot be exported.
     */
-   public GarminTrack doExport_60_TrackPoints(final ZonedDateTime trackDateTime, final ZonedDateTime[] mergedTime, final int[] mergedDistance) {
+   public GarminTrack doExport_60_TrackPoints(final ZonedDateTime trackDateTime,
+                                              final ZonedDateTime[] mergedTime,
+                                              final int[] mergedDistance) {
 
       final int[] timeSerie = _tourData.timeSerie;
 
@@ -637,7 +640,7 @@ public class TourExporter {
       final float[] speedSerie = _tourData.getSpeedSerieMetric();
 
       final boolean isAltitude = (altitudeSerie != null) && (altitudeSerie.length > 0);
-      final boolean isCadence = (cadenceSerie != null) && (cadenceSerie.length > 0);
+      final boolean isCadence = isDataSerieWithValues(cadenceSerie);
       final boolean isDistance = (distanceSerie != null) && (distanceSerie.length > 0);
       final boolean isGear = (gearSerie != null) && (gearSerie.length > 0);
       final boolean isPulse = (pulseSerie != null) && (pulseSerie.length > 0);
@@ -828,8 +831,10 @@ public class TourExporter {
             tpExt.setSpeed(speedValue);
          }
 
-         // ignore trackpoints which have the same time
-         if (relativeTime != prevTime) {
+         if (_isExportTrackPointsWithSameTime
+
+               // ignore trackpoints which have the same time
+               || relativeTime != prevTime) {
 
             lastTrackDateTime = trackDateTime.plusSeconds(relativeTime);
 
@@ -1022,6 +1027,21 @@ public class TourExporter {
       return exportStatus;
    }
 
+   private boolean isDataSerieWithValues(final float[] dataSerie) {
+
+      if (dataSerie == null || dataSerie.length == 0) {
+         return false;
+      }
+
+      for (final float value : dataSerie) {
+         if (value != 0) {
+            return true;
+         }
+      }
+
+      return false;
+   }
+
    public void setActivityType(final String activityType) {
       _activityType = activityType;
    }
@@ -1048,6 +1068,13 @@ public class TourExporter {
 
    public void setIsExportSurfingWaves(final boolean isExportSurfingWaves) {
       _isExportSurfingWaves = isExportSurfingWaves;
+   }
+
+   public TourExporter setIsExportTrackpointsWithSameTime(final boolean isExportTrackpointsWithSameTime) {
+
+      _isExportTrackPointsWithSameTime = isExportTrackpointsWithSameTime;
+
+      return this;
    }
 
    public void setIsExportWithBarometer(final boolean isExportWithBarometer) {

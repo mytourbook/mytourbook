@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2021 Wolfgang Schramm and Contributors
+ * Copyright (C) 2021, 2025 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -152,7 +152,6 @@ public class StatisticValuesView extends ViewPart {
          setToolTipText(Messages.Tour_StatisticValues_Action_CSVFormat_Tooltip);
 
          setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.CSVFormat));
-         setDisabledImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.CSVFormat_Disabled));
       }
 
       @Override
@@ -317,7 +316,6 @@ public class StatisticValuesView extends ViewPart {
 
       _action_PrefDialog = new ActionOpenPrefDialog(Messages.Tour_StatisticValues_Action_OpenPreferences_Tooltip, PrefPageAppearance.ID, ID);
       _action_PrefDialog.setImageDescriptor(CommonActivator.getThemedImageDescriptor(CommonImages.TourOptions));
-      _action_PrefDialog.setDisabledImageDescriptor(CommonActivator.getImageDescriptor(CommonImages.TourOptions_Disabled));
 
       _action_CopyIntoClipboard = new Action_CopyStatValuesIntoClipboard();
       _action_ShowCSVFormat = new Action_ShowCSVFormat();

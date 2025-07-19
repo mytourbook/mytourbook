@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2025 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -55,7 +55,6 @@ public class ActionTourInfo extends ContributionItem implements IOpeningDialog {
    private Control _parent;
 
    private Image   _imageEnabled;
-   private Image   _imageDisabled;
 
    public ActionTourInfo(final CalendarView calendarView, final Control parent) {
 
@@ -63,7 +62,6 @@ public class ActionTourInfo extends ContributionItem implements IOpeningDialog {
       _parent = parent;
 
       _imageEnabled = TourbookPlugin.getImageDescriptor(Images.TourInfo).createImage();
-      _imageDisabled = TourbookPlugin.getImageDescriptor(Images.TourInfo_Disabled).createImage();
 
       parent.addDisposeListener(disposeEvent -> onDispose());
    }
@@ -85,7 +83,6 @@ public class ActionTourInfo extends ContributionItem implements IOpeningDialog {
 
          _actionToolItem = new ToolItem(toolbar, SWT.CHECK);
          _actionToolItem.setImage(_imageEnabled);
-         _actionToolItem.setDisabledImage(_imageDisabled);
          _actionToolItem.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(final SelectionEvent e) {
@@ -155,10 +152,6 @@ public class ActionTourInfo extends ContributionItem implements IOpeningDialog {
 
       if (_imageEnabled != null) {
          _imageEnabled.dispose();
-      }
-
-      if (_imageDisabled != null) {
-         _imageDisabled.dispose();
       }
    }
 

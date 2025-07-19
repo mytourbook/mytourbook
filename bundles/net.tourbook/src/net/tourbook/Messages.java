@@ -585,6 +585,8 @@ public class Messages extends NLS {
    public static String        Dialog_Export_Checkbox_SurfingWaves_Tooltip;
    public static String        Dialog_Export_Checkbox_TourFields;
    public static String        Dialog_Export_Checkbox_TourFields_Tooltip;
+   public static String        Dialog_Export_Checkbox_TrackpointsWithSameTime;
+   public static String        Dialog_Export_Checkbox_TrackpointsWithSameTime_Tooltip;
    public static String        Dialog_Export_Checkbox_WithBarometer;
    public static String        Dialog_Export_Checkbox_WithBarometer_Tooltip;
    public static String        dialog_export_chk_camouflageSpeed;
@@ -1031,6 +1033,8 @@ public class Messages extends NLS {
    public static String        Dlg_AdjustAltitude_Radio_keep_start_altitude;
    public static String        Dlg_AdjustAltitude_Radio_keep_start_altitude_tooltip;
 
+   public static String        Dlg_TourMarker_Action_CreateLeadingNumbers;
+   public static String        Dlg_TourMarker_Action_RemoveLeadingNumbers;
    public static String        Dlg_TourMarker_Button_delete;
    public static String        Dlg_TourMarker_Button_delete_tooltip;
    public static String        Dlg_TourMarker_Button_HideAllMarker;
@@ -1653,18 +1657,23 @@ public class Messages extends NLS {
    public static String        Pref_Appearance_Dialog_RestartAfterThemeChange_Message;
    public static String        Pref_Appearance_Dialog_RestartAfterThemeSelectorIsInToolbar_Message;
    public static String        Pref_Appearance_Dialog_ScrambleData_Message;
+   public static String        Pref_Appearance_DisabledIcons_Desaturated;
+   public static String        Pref_Appearance_DisabledIcons_Grayed;
+   public static String        Pref_Appearance_DisabledIcons_GTK;
+   public static String        Pref_Appearance_FontEditor_Tooltip;
    public static String        Pref_Appearance_Group_PaceAndSpeedDisplay;
    public static String        Pref_Appearance_Group_Tagging;
-   public static String        Pref_Appearance_Group_Theme;
-   public static String        Pref_Appearance_Group_UIDrawingFont;
-   public static String        Pref_Appearance_Group_UIDrawingFont_Tooltip;
+   public static String        Pref_Appearance_Group_UI;
    public static String        Pref_Appearance_Label_AutoOpenTaggingDelay;
    public static String        Pref_Appearance_Label_AutoOpenTagging_Tooltip;
+   public static String        Pref_Appearance_Label_DisabledIcons;
+   public static String        Pref_Appearance_Label_DisabledIcons_Tooltip;
    public static String        Pref_Appearance_Label_NotificationMessagesDuration;
    public static String        Pref_Appearance_Label_NotificationMessagesDuration_Tooltip;
    public static String        Pref_Appearance_Label_PaceAndSpeed_ComputationOption;
    public static String        Pref_Appearance_Label_PaceAndSpeed_ComputationOption_Tooltip;
    public static String        Pref_Appearance_Label_Theme;
+   public static String        Pref_Appearance_Label_UIFont;
    public static String        Pref_Appearance_Label_UIFontExample;
    public static String        Pref_Appearance_NumberOfRecent_TourTypes;
    public static String        Pref_Appearance_NumberOfRecent_TourTypes_Tooltip;
@@ -2048,6 +2057,12 @@ public class Messages extends NLS {
    public static String        Pref_Weather_Provider_None;
    public static String        Pref_Weather_Radio_WeatherDescription_Append;
    public static String        Pref_Weather_Radio_WeatherDescription_Replace;
+
+   public static String        Pref_Workspace_Check_FixViewCloseButton;
+   public static String        Pref_Workspace_Check_FixViewIconImage;
+   public static String        Pref_Workspace_Label_FixViewCloseButton;
+   public static String        Pref_Workspace_Label_FixViewIconImage;
+   public static String        Pref_Workspace_Label_Info;
 
    public static String        Reference_Timeline_Action_ShowAllValues_Tooltip;
    public static String        Reference_Timeline_Action_SyncMinMaxValues_Tooltip;
@@ -2933,6 +2948,8 @@ public class Messages extends NLS {
    public static String        Tooltip_ValuePoint_Action_PinLocation_Screen;
    public static String        Tooltip_ValuePoint_Action_PinLocation_TopLeft;
    public static String        Tooltip_ValuePoint_Action_PinLocation_TopRight;
+   public static String        Tooltip_ValuePoint_Action_ShowValuesSinceLastMarker;
+   public static String        Tooltip_ValuePoint_Action_ShowValuesSinceLastMarker_Tooltip;
    public static String        Tooltip_ValuePoint_Action_Value_Altimeter;
    public static String        Tooltip_ValuePoint_Action_Value_Altitude;
    public static String        Tooltip_ValuePoint_Action_Value_Cadence;
@@ -2967,7 +2984,10 @@ public class Messages extends NLS {
    public static String        Tooltip_ValuePoint_Label_RecordedTime_Tooltip;
    public static String        Tooltip_ValuePoint_Label_SlicesCurrent_Tooltip;
    public static String        Tooltip_ValuePoint_Label_SlicesMax_Tooltip;
-
+   public static String        Tooltip_ValuePoint_LastTourMarker_Elevation;
+   public static String        Tooltip_ValuePoint_LastTourMarker_TimeDuration;
+   public static String        Tooltip_ValuePoint_LastTourMarker_TimeMoving;
+   public static String        Tooltip_ValuePoint_LastTourMarker_TimeRecorded;
    public static String        TourAnalyzer_Label_average;
    public static String        TourAnalyzer_Label_difference;
    public static String        TourAnalyzer_Label_left;

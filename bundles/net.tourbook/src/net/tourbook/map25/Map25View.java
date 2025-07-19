@@ -333,8 +333,7 @@ public class Map25View extends ViewPart implements
 
       public ActionMap25_Options() {
 
-         super(TourbookPlugin.getThemedImageDescriptor(Images.MapOptions),
-               TourbookPlugin.getThemedImageDescriptor(Images.MapOptions_Disabled));
+         super(TourbookPlugin.getThemedImageDescriptor(Images.MapOptions));
       }
 
       @Override
@@ -383,8 +382,7 @@ public class Map25View extends ViewPart implements
 
       public ActionShowTour() {
 
-         super(TourbookPlugin.getThemedImageDescriptor(Images.TourChart),
-               TourbookPlugin.getThemedImageDescriptor(Images.TourChart_Disabled));
+         super(TourbookPlugin.getThemedImageDescriptor(Images.TourChart), null);
 
          isToggleAction = true;
          notSelectedTooltip = OtherMessages.MAP_ACTION_SHOW_TOUR_IN_MAP;

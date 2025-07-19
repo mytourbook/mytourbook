@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2016 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2025 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -30,7 +30,7 @@ public class ActionOpenTourLogView extends Action {
       setText(Messages.Import_Data_Action_OpenLogView);
       setToolTipText(Messages.Import_Data_Action_OpenLogView_Tooltip);
 
-      setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.TourLog));
+      setImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.TourLog));
    }
 
    @Override

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2025 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -35,8 +35,7 @@ public class ActionTourTagFilter extends ActionToolbarSlideoutAdv {
 
    public ActionTourTagFilter() {
 
-      super(TourbookPlugin.getThemedImageDescriptor(Images.TourTagFilter),
-            TourbookPlugin.getImageDescriptor(Images.TourTagFilter_Disabled));
+      super(TourbookPlugin.getThemedImageDescriptor(Images.TourTagFilter));
 
       isToggleAction = true;
       notSelectedTooltip = Messages.Tour_Tag_Filter_Action_Tooltip;

@@ -705,8 +705,7 @@ public class Map2View extends ViewPart implements
 
       public ActionMap2_Options() {
 
-         super(TourbookPlugin.getThemedImageDescriptor(Images.MapOptions),
-               TourbookPlugin.getImageDescriptor(Images.MapOptions_Disabled));
+         super(TourbookPlugin.getThemedImageDescriptor(Images.MapOptions), null);
       }
 
       @Override
@@ -776,7 +775,6 @@ public class Map2View extends ViewPart implements
          setText(Messages.Map_Action_EditTourMarker);
 
          setImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.App_Edit));
-         setDisabledImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.App_Edit_Disabled));
       }
 
       @Override
@@ -823,7 +821,6 @@ public class Map2View extends ViewPart implements
          super(Messages.Map_Action_EditPhotoLabel, Action.AS_PUSH_BUTTON);
 
          setImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.App_Edit));
-         setDisabledImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.App_Edit_Disabled));
       }
 
       @Override
@@ -1055,8 +1052,7 @@ public class Map2View extends ViewPart implements
 
       public ActionShowTour() {
 
-         super(TourbookPlugin.getThemedImageDescriptor(Images.TourChart),
-               TourbookPlugin.getThemedImageDescriptor(Images.TourChart_Disabled));
+         super(TourbookPlugin.getThemedImageDescriptor(Images.TourChart), null);
 
          isToggleAction = true;
          notSelectedTooltip = Messages.map_action_show_tour_in_map;

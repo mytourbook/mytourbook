@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2010  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2025 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -15,28 +15,27 @@
  *******************************************************************************/
 package de.byteholder.geoclipse.preferences;
 
-import net.tourbook.Images;
-import net.tourbook.application.TourbookPlugin;
+import net.tourbook.common.CommonActivator;
+import net.tourbook.common.CommonImages;
 
 import org.eclipse.jface.action.Action;
 
 public class ActionRefreshOfflineInfoNotAssessed extends Action {
 
-	private PrefPage_Map2_Providers	_prefPageMapFactories;
+   private PrefPage_Map2_Providers _prefPageMapFactories;
 
-	public ActionRefreshOfflineInfoNotAssessed(final PrefPage_Map2_Providers prefPageMapFactories) {
+   public ActionRefreshOfflineInfoNotAssessed(final PrefPage_Map2_Providers prefPageMapFactories) {
 
-		setToolTipText(Messages.Pref_Map_Button_RefreshTileInfoNotAssessed_Tooltip);
+      setToolTipText(Messages.Pref_Map_Button_RefreshTileInfoNotAssessed_Tooltip);
 
-      setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.App_Refresh_NotAssessed));
-      setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Images.App_Refresh_NotAssessed_Disabled));
+      setImageDescriptor(CommonActivator.getThemedImageDescriptor(CommonImages.App_Refresh_NotAssessed));
 
-		_prefPageMapFactories = prefPageMapFactories;
-	}
+      _prefPageMapFactories = prefPageMapFactories;
+   }
 
-	@Override
-	public void run() {
-		_prefPageMapFactories.actionRefreshOfflineInfoNotAssessed();
-	}
+   @Override
+   public void run() {
+      _prefPageMapFactories.actionRefreshOfflineInfoNotAssessed();
+   }
 
 }

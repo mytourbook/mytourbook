@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2024 Wolfgang Schramm and Contributors
+ * Copyright (C) 2024, 2025 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -130,7 +130,7 @@ public class TourActionManager {
             ActionEditQuick.class.getName(),
             Messages.app_action_quick_edit,
             TourbookPlugin.getThemedImageDescriptor(Images.App_Edit),
-            TourbookPlugin.getThemedImageDescriptor(Images.App_Edit_Disabled),
+            null,
             TourActionCategory.EDIT);
 
       final TourAction actionEditTour                    = new TourAction(
@@ -144,14 +144,14 @@ public class TourActionManager {
             ActionOpenMarkerDialog.class.getName(),
             Messages.app_action_edit_tour_marker,
             TourbookPlugin.getThemedImageDescriptor(Images.TourMarker),
-            TourbookPlugin.getThemedImageDescriptor(Images.TourMarker_Disabled),
+            null,
             TourActionCategory.EDIT);
 
       final TourAction actionOpenAdjustAltitudeDialog    = new TourAction(
             ActionOpenAdjustAltitudeDialog.class.getName(),
             Messages.app_action_edit_adjust_altitude,
             TourbookPlugin.getThemedImageDescriptor(Images.AdjustElevation),
-            TourbookPlugin.getThemedImageDescriptor(Images.AdjustElevation_Disabled),
+            null,
             TourActionCategory.EDIT);
 
       final TourAction actionSetStartEndLocation         = new TourAction(
@@ -171,14 +171,14 @@ public class TourActionManager {
       final TourAction actionDuplicateTour               = new TourAction(
             ActionDuplicateTour.class.getName(),
             Messages.Tour_Action_DuplicateTour,
-            TourbookPlugin.getImageDescriptor(Images.Tour_Duplicate),
-            TourbookPlugin.getImageDescriptor(Images.Tour_Duplicate_Disabled),
+            TourbookPlugin.getThemedImageDescriptor(Images.Tour_Duplicate),
+            null,
             TourActionCategory.EDIT);
 
       final TourAction actionMergeTour                   = new TourAction(
             ActionMergeTour.class.getName(),
             Messages.app_action_merge_tour,
-            TourbookPlugin.getImageDescriptor(Images.MergeTours),
+            TourbookPlugin.getThemedImageDescriptor(Images.MergeTours),
             null,
             TourActionCategory.EDIT);
 
@@ -361,7 +361,7 @@ public class TourActionManager {
             ActionExportViewCSV.class.getName(),
             Messages.App_Action_ExportViewCSV,
             TourbookPlugin.getImageDescriptor(Images.CSVFormat),
-            TourbookPlugin.getThemedImageDescriptor(Images.CSVFormat_Disabled),
+            null,
             TourActionCategory.EXPORT);
 
       final TourAction actionPrintTour                   = new TourAction(

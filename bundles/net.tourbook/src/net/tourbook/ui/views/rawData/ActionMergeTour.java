@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2010  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2025 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -31,15 +31,15 @@ import org.eclipse.swt.widgets.Display;
 
 public class ActionMergeTour extends Action {
 
-   private ITourProvider   _tourProvider;
+   private ITourProvider _tourProvider;
 
-   private TourData     _mergeTargetTour;
-   private TourData     _mergeSourceTour;
+   private TourData      _mergeTargetTour;
+   private TourData      _mergeSourceTour;
 
    public ActionMergeTour(final ITourProvider tourProvider) {
 
       setText(Messages.app_action_merge_tour);
-      setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.MergeTours));
+      setImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.MergeTours));
 
       _tourProvider = tourProvider;
    }

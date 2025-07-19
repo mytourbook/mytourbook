@@ -173,11 +173,19 @@ public class TourType implements Comparable<Object>, Serializable {
       return _createId;
    }
 
+   /**
+    * @return This name is used to apply a tour type during the tour import to a tour when this name
+    *         fits
+    */
    public String getImportCategory() {
 
       return importCategory;
    }
 
+   /**
+    * @return This name is used to apply a tour type during the tour import to a tour when this name
+    *         fits
+    */
    public String getImportSubCategory() {
 
       return importSubCategory;

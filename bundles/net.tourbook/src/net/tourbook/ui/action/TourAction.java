@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2024 Wolfgang Schramm and Contributors
+ * Copyright (C) 2024, 2025 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -20,6 +20,7 @@ import java.util.Objects;
 import net.tourbook.common.UI;
 
 import org.eclipse.jface.resource.ImageDescriptor;
+import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Image;
 
 public class TourAction implements Cloneable {
@@ -145,6 +146,18 @@ public class TourAction implements Cloneable {
       if (_imageDescriptor_Disabled != null && _image_Disabled == null) {
 
          _image_Disabled = _imageDescriptor_Disabled.createImage();
+      }
+
+      if (_image_Disabled == null) {
+
+         // create disabled image from the enabled image
+
+         final Image image = getImage();
+
+         if (image != null && image.isDisposed() == false) {
+
+            _image_Disabled = new Image(_image.getDevice(), _image, SWT.IMAGE_DISABLE);
+         }
       }
 
       return _image_Disabled;

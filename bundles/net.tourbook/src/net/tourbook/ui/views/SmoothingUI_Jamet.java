@@ -75,10 +75,10 @@ public class SmoothingUI_Jamet implements ISmoothingAlgorithm {
     */
    private PixelConverter _pc;
 
-   private Image          _imageAltitude = TourbookPlugin.getImageDescriptor(Images.Graph_Elevation).createImage();
-   private Image          _imageGradient = TourbookPlugin.getImageDescriptor(Images.Graph_Gradient).createImage();
-   private Image          _imagePulse    = TourbookPlugin.getImageDescriptor(Images.Graph_Heartbeat).createImage();
-   private Image          _imageSpeed    = TourbookPlugin.getImageDescriptor(Images.Graph_Speed).createImage();
+   private Image          _imageAltitude = TourbookPlugin.getThemedImageDescriptor(Images.Graph_Elevation).createImage();
+   private Image          _imageGradient = TourbookPlugin.getThemedImageDescriptor(Images.Graph_Gradient).createImage();
+   private Image          _imagePulse    = TourbookPlugin.getThemedImageDescriptor(Images.Graph_Heartbeat).createImage();
+   private Image          _imageSpeed    = TourbookPlugin.getThemedImageDescriptor(Images.Graph_Speed).createImage();
 
    /*
     * UI controls

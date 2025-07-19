@@ -329,18 +329,23 @@ public class UI {
 
 // SET_FORMATTING_ON
 
-   public static final String  TRUE                           = Boolean.toString(true);
-   public static final String  FALSE                          = Boolean.toString(false);
+   public static final String TRUE  = Boolean.toString(true);
+   public static final String FALSE = Boolean.toString(false);
 
    /**
     * Is <code>true</code> when the dark theme in the UI is selected
     */
-   public static boolean       IS_DARK_THEME;
+   public static boolean      IS_DARK_THEME;
 
    /**
     * Is <code>true</code> when the bright theme in the UI is selected
     */
-   public static boolean       IS_BRIGHT_THEME;
+   public static boolean      IS_BRIGHT_THEME;
+
+   // https://eclipse.dev/eclipse/markdown/?f=news/4.36/platform.md#themes-and-styling
+   public static String        DISABLED_ICONS_DESATURATED     = "desaturated";               //$NON-NLS-1$
+   public static String        DISABLED_ICONS_GTK             = "gtk";                       //$NON-NLS-1$
+   public static String        DISABLED_ICONS_GRAYED          = "grayed";                    //$NON-NLS-1$
 
    /**
     * Is <code>true</code> when a 4k display is used
@@ -585,6 +590,7 @@ public class UI {
    public static String       UNIT_LABEL_TEMPERATURE;
    public static String       UNIT_LABEL_SPEED;
    public static String       UNIT_LABEL_PACE;
+   public static String       UNIT_LABEL_PACE_SWIMMING;
    public static String       UNIT_LABEL_WEIGHT;
 
    public static final String UNIT_LABEL_TIME      = "h";      //$NON-NLS-1$
@@ -618,6 +624,8 @@ public class UI {
    public static final String                   UNIT_POWER                 = "Watt";                     //$NON-NLS-1$
    public static final String                   UNIT_POWER_SHORT           = "W";                        //$NON-NLS-1$
    public static final String                   UNIT_POWER_TO_WEIGHT_RATIO = "W/Kg";                     //$NON-NLS-1$
+   public static final String                   UNIT_PACE_MIN_P_100M       = "min/100m";                 //$NON-NLS-1$
+   public static final String                   UNIT_PACE_MIN_P_100YARD    = "min/100yd";                //$NON-NLS-1$
    public static final String                   UNIT_PACE_MIN_P_KM         = "min/km";                   //$NON-NLS-1$
    public static final String                   UNIT_PACE_MIN_P_MILE       = "min/mi";                   //$NON-NLS-1$
    public static final String                   UNIT_PRESSURE_MBAR         = "mbar";                     //$NON-NLS-1$
@@ -760,6 +768,7 @@ public class UI {
 
    public static Color           SYS_COLOR_DARK_GRAY;
    public static Color           SYS_COLOR_DARK_GREEN;
+   public static Color           SYS_COLOR_DARK_RED;
 
    public static Color           SYS_COLOR_LIST_BACKGROUND;
 
@@ -821,9 +830,7 @@ public class UI {
        *
        * https://eclipse.dev/eclipse/markdown/?f=news/4.36/platform.md#themes-and-styling
        */
-      System.setProperty("org.eclipse.swt.image.disablement", "grayed");
-//      System.setProperty("org.eclipse.swt.image.disablement", "desaturated");
-//      System.setProperty("org.eclipse.swt.image.disablement", "gtk");
+      System.setProperty("org.eclipse.swt.image.disablement", _prefStore_Common.getString(ICommonPreferences.UI_DISABLED_ICONS)); //$NON-NLS-1$
 
       IMAGE_REGISTRY = CommonActivator.getDefault().getImageRegistry();
 
@@ -846,6 +853,7 @@ public class UI {
 
       SYS_COLOR_DARK_GRAY           = display.getSystemColor(SWT.COLOR_DARK_GRAY);
       SYS_COLOR_DARK_GREEN          = display.getSystemColor(SWT.COLOR_DARK_GREEN);
+      SYS_COLOR_DARK_RED            = display.getSystemColor(SWT.COLOR_DARK_RED);
 
       SYS_COLOR_LIST_BACKGROUND     = display.getSystemColor(SWT.COLOR_LIST_BACKGROUND);
       SYS_COLOR_WIDGET_BACKGROUND   = display.getSystemColor(SWT.COLOR_WIDGET_BACKGROUND);
@@ -4068,6 +4076,8 @@ public class UI {
 
          UNIT_IS_PACE_MIN_PER_MILE        = true;
          UNIT_LABEL_PACE                  = UNIT_PACE_MIN_P_MILE;
+         UNIT_LABEL_PACE_SWIMMING         = UNIT_PACE_MIN_P_100YARD;
+
 
       } else {
 
@@ -4075,6 +4085,7 @@ public class UI {
 
          UNIT_IS_PACE_MIN_PER_KILOMETER   = true;
          UNIT_LABEL_PACE                  = UNIT_PACE_MIN_P_KM;
+         UNIT_LABEL_PACE_SWIMMING         = UNIT_PACE_MIN_P_100M;
       }
 
       /*

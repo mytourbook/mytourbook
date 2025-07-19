@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2025 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -76,9 +76,8 @@ import org.eclipse.ui.part.PageBook;
  *
  * <pre>
  *
- * net.tourbook.Images.GeoCompare_Tool          geo-parts.png                  ->    tour-compare-geo-compare-tool.png
- * net.tourbook.Images.ElevationCompare_Tool    tour-map-compare-result.png    ->    tour-compare-elevation-compare-tool.png
- *                                              tour-map-comparetour.png       ->    tour-compare-compared-tour.png
+ * net.tourbook.Images.GeoCompare_Tool          geo-parts.png                  ->    tour-compare-geo-compare-tool.svg
+ * net.tourbook.Images.ElevationCompare_Tool    tour-map-compare-result.png    ->    tour-compare-elevation-compare-tool.svg
  * </pre>
  */
 public class ComparedTourChartView extends TourChartViewPart implements ISynchedChart, ITourChartViewer {
@@ -182,7 +181,6 @@ public class ComparedTourChartView extends TourChartViewPart implements ISynched
          setToolTipText(Messages.RefTour_Action_NavigateNextTour_Tooltip2);
 
          setImageDescriptor(CommonActivator.getThemedImageDescriptor(CommonImages.Arrow_Right));
-         setDisabledImageDescriptor(CommonActivator.getThemedImageDescriptor(CommonImages.Arrow_Right_Disabled));
       }
 
       @Override
@@ -200,7 +198,6 @@ public class ComparedTourChartView extends TourChartViewPart implements ISynched
          setToolTipText(Messages.RefTour_Action_NavigatePrevTour_Tooltip2);
 
          setImageDescriptor(CommonActivator.getThemedImageDescriptor(CommonImages.Arrow_Left));
-         setDisabledImageDescriptor(CommonActivator.getThemedImageDescriptor(CommonImages.Arrow_Left_Disabled));
       }
 
       @Override
@@ -218,7 +215,6 @@ public class ComparedTourChartView extends TourChartViewPart implements ISynched
          setToolTipText(Messages.RefTour_Action_SaveAndNext);
 
          setImageDescriptor(CommonActivator.getThemedImageDescriptor(CommonImages.App_SaveAndNext));
-         setDisabledImageDescriptor(CommonActivator.getThemedImageDescriptor(CommonImages.App_SaveAndNext_Disabled));
 
          setEnabled(false);
       }
@@ -241,7 +237,6 @@ public class ComparedTourChartView extends TourChartViewPart implements ISynched
          setToolTipText(Messages.RefTour_Action_SaveMarker);
 
          setImageDescriptor(CommonActivator.getThemedImageDescriptor(CommonImages.App_Save));
-         setDisabledImageDescriptor(CommonActivator.getThemedImageDescriptor(CommonImages.App_Save_Disabled));
 
          setEnabled(false);
       }
@@ -300,7 +295,6 @@ public class ComparedTourChartView extends TourChartViewPart implements ISynched
          setToolTipText(Messages.RefTour_Action_UndoMarkerPosition);
 
          setImageDescriptor(CommonActivator.getThemedImageDescriptor(CommonImages.App_Undo));
-         setDisabledImageDescriptor(CommonActivator.getThemedImageDescriptor(CommonImages.App_Undo_Disabled));
 
          setEnabled(false);
       }
@@ -1085,6 +1079,7 @@ public class ComparedTourChartView extends TourChartViewPart implements ISynched
 
    /**
     * @param isGeoComparedTourChecked
+    *
     * @return Returns <code>false</code> when the compared tour is not displayed
     */
    private boolean updateTourChart(final Boolean isGeoComparedTourChecked) {

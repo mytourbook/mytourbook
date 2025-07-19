@@ -81,11 +81,8 @@ import org.eclipse.swt.custom.BusyIndicator;
 import org.eclipse.swt.events.MouseAdapter;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.graphics.Color;
-import org.eclipse.swt.graphics.GC;
-import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
-import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Tree;
 import org.eclipse.swt.widgets.TreeColumn;
@@ -390,7 +387,7 @@ public class PicDirFolder {
       if (UI.IS_WIN) {
 
          final String[] commandsWin = {
-         
+
                UI.SYMBOL_QUOTATION_MARK + extApp + UI.SYMBOL_QUOTATION_MARK,
                UI.SYMBOL_QUOTATION_MARK + folder + UI.SYMBOL_QUOTATION_MARK
          };
@@ -524,31 +521,6 @@ public class PicDirFolder {
          public void mouseDown(final MouseEvent e) {
             _doAutoCollapseExpand = true;
             _isMouseContextMenu = e.button == 3;
-         }
-      });
-
-      final Display display = parent.getDisplay();
-      final Color listBackgroundColor = display.getSystemColor(SWT.COLOR_LIST_BACKGROUND);
-
-      tree.addListener(SWT.EraseItem, event -> {
-
-         if ((event.detail & SWT.SELECTED) != 0 && (event.detail & SWT.HOT) != 0) {
-
-            // item is selected + hovered
-
-            paintFolderBackground(event, tree, listBackgroundColor, 0xff);
-
-         } else if ((event.detail & SWT.SELECTED) != 0) {
-
-            // item is selected
-
-            paintFolderBackground(event, tree, listBackgroundColor, 0xb0);
-
-         } else if ((event.detail & SWT.HOT) != 0) {
-
-            // item is hovered
-
-            paintFolderBackground(event, tree, listBackgroundColor, 0x40);
          }
       });
 
@@ -1035,22 +1007,6 @@ public class PicDirFolder {
       displayFolderImages(selectedFolderItem, isFromNavigationHistory, false);
    }
 
-   private void paintFolderBackground(final Event event, final Tree tree, final Color listBackgroundColor, final int alpha) {
-
-      final GC gc = event.gc;
-      final Color bgColorBackup = gc.getBackground();
-
-      final Rectangle clientArea = tree.getClientArea();
-      final Rectangle eventBounds = event.getBounds();
-
-      gc.setAlpha(alpha);
-      gc.setBackground(listBackgroundColor);
-      gc.fillRectangle(0, eventBounds.y, clientArea.width, eventBounds.height);
-
-      // restore colors for subsequent drawing
-      gc.setBackground(bgColorBackup);
-   }
-
    private void putFolderInWaitingQueue(final TVIFolderFolder queueFolderItem, final boolean isExpandFolder) {
 
       // get and set queue state
@@ -1385,8 +1341,7 @@ public class PicDirFolder {
 
    private void updateColors(final boolean isRestore) {
 
-      _isStateShowFileFolderInFolderItem = _prefStore.getBoolean(//
-            IPhotoPreferences.PHOTO_VIEWER_IS_SHOW_FILE_FOLDER);
+      _isStateShowFileFolderInFolderItem = _prefStore.getBoolean(IPhotoPreferences.PHOTO_VIEWER_IS_SHOW_FILE_FOLDER);
 
       final ColorRegistry colorRegistry = JFaceResources.getColorRegistry();
       final Color fgColor = colorRegistry.get(IPhotoPreferences.PHOTO_VIEWER_COLOR_FOREGROUND);
@@ -1394,10 +1349,6 @@ public class PicDirFolder {
       final Color selectionFgColor = colorRegistry.get(IPhotoPreferences.PHOTO_VIEWER_COLOR_SELECTION_FOREGROUND);
 
       final Color noFocusSelectionFgColor = Display.getCurrent().getSystemColor(SWT.COLOR_TITLE_INACTIVE_BACKGROUND);
-
-      final Tree tree = _folderViewer.getTree();
-      tree.setForeground(fgColor);
-      tree.setBackground(bgColor);
 
       _picDirImages.updateColors(fgColor, bgColor, selectionFgColor, noFocusSelectionFgColor, isRestore);
    }

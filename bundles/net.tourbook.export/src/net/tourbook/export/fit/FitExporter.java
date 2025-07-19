@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2023, 2024 Frédéric Bard and Contributors
+ * Copyright (C) 2023, 2025 Frédéric Bard and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -613,38 +613,43 @@ public class FitExporter {
 
    private void setValues(final SessionMesg sessionMesg) {
 
-      final Sport sport = FitSportMapper.mapTourTypeToSport(_tourData.getTourType());
-      sessionMesg.setSport(sport);
+// SET_FORMATTING_OFF
+
+      final Sport sport       = FitSportMapper.mapTourTypeToSport(_tourData.getTourType());
       final SubSport subSport = FitSportMapper.mapTourTypeToSubSport(_tourData.getTourType());
+
+      sessionMesg.setSport(sport);
       sessionMesg.setSubSport(subSport);
 
       // Totals
-      sessionMesg.setTotalCalories(_tourData.getCalories() / 1000);
-      sessionMesg.setTotalDistance(_tourData.getTourDistance());
-      sessionMesg.setTotalAscent(_tourData.getTourAltUp());
-      sessionMesg.setTotalDescent(_tourData.getTourAltDown());
-      sessionMesg.setTotalWork(_tourData.getPower_TotalWork());
-      sessionMesg.setTotalAnaerobicTrainingEffect(_tourData.getTraining_TrainingEffect_Anaerob());
+      sessionMesg.setTotalCalories(                _tourData.getCalories() / 1000);
+      sessionMesg.setTotalDistance(                _tourData.getTourDistance());
+      sessionMesg.setTotalAscent(                  _tourData.getTourAltUp());
+      sessionMesg.setTotalDescent(                 _tourData.getTourAltDown());
+      sessionMesg.setTotalWork(                    _tourData.getPower_TotalWork());
+      sessionMesg.setTotalAnaerobicTrainingEffect( _tourData.getTraining_TrainingEffect_Anaerob());
 
       //Averages
-      sessionMesg.setAvgCadence((short) _tourData.getAvgCadence());
-      sessionMesg.setAvgHeartRate((short) _tourData.getAvgPulse());
-      sessionMesg.setAvgPower((int) _tourData.getPower_Avg());
-      sessionMesg.setAvgTemperature((byte) _tourData.getWeather_Temperature_Average_Device());
+      sessionMesg.setAvgCadence(           (short) _tourData.getAvgCadence());
+      sessionMesg.setAvgHeartRate(         (short) _tourData.getAvgPulse());
+      sessionMesg.setAvgPower(             (int)   _tourData.getPower_Avg());
+      sessionMesg.setAvgTemperature(       (byte)  _tourData.getWeather_Temperature_Average_Device());
 
       // Maximums
-      sessionMesg.setMaxPower(_tourData.getPower_Max());
+      sessionMesg.setMaxPower(                     _tourData.getPower_Max());
 
       // Misc
-      sessionMesg.setNormalizedPower(_tourData.getPower_Normalized());
-      sessionMesg.setLeftRightBalance(_tourData.getPower_PedalLeftRightBalance());
-      sessionMesg.setAvgLeftTorqueEffectiveness(_tourData.getPower_AvgLeftTorqueEffectiveness());
-      sessionMesg.setAvgRightTorqueEffectiveness(_tourData.getPower_AvgRightTorqueEffectiveness());
-      sessionMesg.setAvgLeftPedalSmoothness(_tourData.getPower_AvgLeftPedalSmoothness());
-      sessionMesg.setAvgRightPedalSmoothness(_tourData.getPower_AvgRightPedalSmoothness());
-      sessionMesg.setTrainingStressScore(_tourData.getPower_TrainingStressScore());
-      sessionMesg.setIntensityFactor(_tourData.getPower_IntensityFactor());
-      sessionMesg.setThresholdPower(_tourData.getPower_FTP());
-      sessionMesg.setTotalTrainingEffect(_tourData.getTraining_TrainingEffect_Aerob());
+      sessionMesg.setNormalizedPower(              _tourData.getPower_Normalized());
+      sessionMesg.setLeftRightBalance(             _tourData.getPower_PedalLeftRightBalance());
+      sessionMesg.setAvgLeftTorqueEffectiveness(   _tourData.getPower_AvgLeftTorqueEffectiveness());
+      sessionMesg.setAvgRightTorqueEffectiveness(  _tourData.getPower_AvgRightTorqueEffectiveness());
+      sessionMesg.setAvgLeftPedalSmoothness(       _tourData.getPower_AvgLeftPedalSmoothness());
+      sessionMesg.setAvgRightPedalSmoothness(      _tourData.getPower_AvgRightPedalSmoothness());
+      sessionMesg.setTrainingStressScore(          _tourData.getPower_TrainingStressScore());
+      sessionMesg.setIntensityFactor(              _tourData.getPower_IntensityFactor());
+      sessionMesg.setThresholdPower(               _tourData.getPower_FTP());
+      sessionMesg.setTotalTrainingEffect(          _tourData.getTraining_TrainingEffect_Aerob());
+
+// SET_FORMATTING_ON
    }
 }

@@ -62,7 +62,6 @@ public abstract class ActionToolbarSlideoutAdv extends ContributionItem implemen
     * UI controls
     */
    private Image _imageEnabled;
-   private Image _imageDisabled;
    private Image _imageSelected;
 
    /**
@@ -71,7 +70,6 @@ public abstract class ActionToolbarSlideoutAdv extends ContributionItem implemen
    public ActionToolbarSlideoutAdv() {
 
       _imageEnabled = CommonActivator.getThemedImageDescriptor(CommonImages.TourOptions).createImage();
-      _imageDisabled = CommonActivator.getThemedImageDescriptor(CommonImages.TourOptions_Disabled).createImage();
 
       _isImageCreated_EnabledDisabled = true;
    }
@@ -79,27 +77,25 @@ public abstract class ActionToolbarSlideoutAdv extends ContributionItem implemen
    public ActionToolbarSlideoutAdv(final Image actionImage) {
 
       _imageEnabled = actionImage;
-      _imageDisabled = new Image(actionImage.getDevice(), actionImage, SWT.IMAGE_DISABLE);
    }
 
-   public ActionToolbarSlideoutAdv(final Image actionImage, final Image actionImageDisabled) {
+   public ActionToolbarSlideoutAdv(final Image actionImage,
+                                   final Image actionImageDisabled) {
 
       _imageEnabled = actionImage;
-      _imageDisabled = actionImageDisabled;
    }
 
    public ActionToolbarSlideoutAdv(final ImageDescriptor actionImageDescriptor) {
 
       _imageEnabled = actionImageDescriptor.createImage();
-      _imageDisabled = new Image(_imageEnabled.getDevice(), _imageEnabled, SWT.IMAGE_DISABLE);
 
       _isImageCreated_EnabledDisabled = true;
    }
 
-   public ActionToolbarSlideoutAdv(final ImageDescriptor actionImage, final ImageDescriptor actionImageDisabled) {
+   public ActionToolbarSlideoutAdv(final ImageDescriptor actionImage,
+                                   final ImageDescriptor actionImageDisabled) {
 
       _imageEnabled = actionImage.createImage();
-      _imageDisabled = actionImageDisabled.createImage();
 
       _isImageCreated_EnabledDisabled = true;
    }
@@ -109,7 +105,6 @@ public abstract class ActionToolbarSlideoutAdv extends ContributionItem implemen
                                    final ImageDescriptor actionImage_Selected) {
 
       _imageEnabled = actionImage_Enabled.createImage();
-      _imageDisabled = actionImage_Disabled.createImage();
       _imageSelected = actionImage_Selected.createImage();
 
       _isImageCreated_EnabledDisabled = true;
@@ -121,8 +116,7 @@ public abstract class ActionToolbarSlideoutAdv extends ContributionItem implemen
    @Override
    public void fill(final ToolBar toolbar, final int index) {
 
-      if (_imageEnabled == null || _imageEnabled.isDisposed()
-            || _imageDisabled == null || _imageDisabled.isDisposed()) {
+      if (_imageEnabled == null || _imageEnabled.isDisposed()) {
 
          return;
       }
@@ -138,7 +132,6 @@ public abstract class ActionToolbarSlideoutAdv extends ContributionItem implemen
          }
 
          _actionToolItem.setImage(_imageEnabled);
-         _actionToolItem.setDisabledImage(_imageDisabled);
          _actionToolItem.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(final SelectionEvent e) {
@@ -219,11 +212,6 @@ public abstract class ActionToolbarSlideoutAdv extends ContributionItem implemen
       if (_isImageCreated_EnabledDisabled && _imageEnabled != null && _imageEnabled.isDisposed() == false) {
 
          _imageEnabled.dispose();
-      }
-
-      if (_isImageCreated_EnabledDisabled && _imageDisabled != null && _imageDisabled.isDisposed() == false) {
-
-         _imageDisabled.dispose();
       }
 
       if (_isImageCreated_Selected && _imageSelected != null && _imageSelected.isDisposed() == false) {

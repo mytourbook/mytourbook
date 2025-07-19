@@ -488,6 +488,9 @@ public class Messages extends NLS {
    public static String        ColumnFactory_Surfing_NumberOfEvents_Header;
    public static String        ColumnFactory_Surfing_NumberOfEvents_Label;
 
+   public static String        ColumnFactory_Swim_LengthType_Header;
+   public static String        ColumnFactory_Swim_LengthType_Label;
+   public static String        ColumnFactory_Swim_LengthType_Tooltip;
    public static String        ColumnFactory_Swim_StrokeRate_Label;
    public static String        ColumnFactory_Swim_StrokeRate_Tooltip;
    public static String        ColumnFactory_Swim_StrokesPerLength_Label;

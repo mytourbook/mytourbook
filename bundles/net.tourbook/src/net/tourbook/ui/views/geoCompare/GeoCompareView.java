@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2018, 2024 Wolfgang Schramm and Contributors
+ * Copyright (C) 2018, 2025 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -365,7 +365,6 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
    private Image      _imageCompareType_RefTour     = TourbookPlugin.getImageDescriptor(Images.RefTour).createImage();
    private Image      _imageCompareType_PlaceHolder = TourbookPlugin.getImageDescriptor(Images.App_EmptyIcon_Placeholder).createImage();
    private Image      _imageOptions_Enabled         = CommonActivator.getThemedImageDescriptor(CommonImages.TourOptions).createImage();
-   private Image      _imageOptions_Disabled        = CommonActivator.getThemedImageDescriptor(CommonImages.TourOptions_Disabled).createImage();
 
    private CLabel     _iconCompareType;
 
@@ -397,7 +396,7 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
           * images !!!
           */
 
-         super(_imageOptions_Enabled, _imageOptions_Disabled);
+         super(_imageOptions_Enabled);
       }
 
       @Override
@@ -2405,7 +2404,6 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
       UI.disposeResource(_imageCompareType_PlaceHolder);
       UI.disposeResource(_imageCompareType_RefTour);
       UI.disposeResource(_imageOptions_Enabled);
-      UI.disposeResource(_imageOptions_Disabled);
 
       getSite().getPage().removePostSelectionListener(_postSelectionListener);
       getSite().getPage().removePartListener(_partListener);

@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   width="15.090694"
+   height="14.999878"
+   id="svg2985"
+   version="1.1"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:dc="http://purl.org/dc/elements/1.1/">
+  <defs
+     id="defs2987">
+    <linearGradient
+       id="linearGradient5090">
+      <stop
+         style="stop-color:#435800;stop-opacity:1;"
+         offset="0"
+         id="stop5088" />
+    </linearGradient>
+    <linearGradient
+       id="linearGradient6402">
+      <stop
+         id="stop6404"
+         offset="0"
+         style="stop-color:#000000;stop-opacity:1;" />
+      <stop
+         id="stop6406"
+         offset="1"
+         style="stop-color:#000000;stop-opacity:0;" />
+    </linearGradient>
+    <linearGradient
+       id="linearGradient3816">
+      <stop
+         id="stop3818"
+         offset="0"
+         style="stop-color:#ffa576;stop-opacity:1;" />
+      <stop
+         style="stop-color:#f45400;stop-opacity:1;"
+         offset="1"
+         id="stop3782" />
+    </linearGradient>
+  </defs>
+  <metadata
+     id="metadata2990">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <g
+     id="layer1"
+     style="display:inline"
+     transform="translate(-70.000276,-1035.0001)">
+    <g
+       transform="matrix(1.0547456,0,0,1.0547373,-122.46761,499.86626)"
+       id="g2331">
+      <g
+         id="g2320"
+         transform="matrix(1.0518359,0,0,0.93850266,-10.173538,31.342358)">
+        <path
+           id="path1409"
+           d="m 187.49919,522.25008 c 2.3436,-7.06249 2.3436,-7.06249 2.3436,-7.06249"
+           style="fill:#000000;fill-opacity:0;stroke:#a3a3a3;stroke-width:0.731964;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:5.75;stroke-dasharray:none;stroke-opacity:1" />
+        <path
+           id="path1409-0"
+           d="m 192.18639,522.25008 c -2.3436,-7.06249 -2.3436,-7.06249 -2.3436,-7.06249"
+           style="fill:#000000;fill-opacity:0;stroke:#a3a3a3;stroke-width:0.731964;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:5.75;stroke-dasharray:none;stroke-opacity:1" />
+        <path
+           id="path1409-9"
+           d="m 189.84278,515.18759 c 0.008,-4.82132 0.008,-4.82132 0.008,-4.82132"
+           style="fill:#000000;fill-opacity:0;stroke:#a3a3a3;stroke-width:0.583867;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:5.75;stroke-dasharray:none;stroke-opacity:1" />
+        <ellipse
+           ry="1.7329688"
+           rx="1.6530513"
+           cy="514.31042"
+           cx="185.27248"
+           id="path1449"
+           style="fill:#000000;fill-opacity:0;stroke:#a3a3a3;stroke-width:0.924;stroke-linecap:square;stroke-linejoin:miter;stroke-miterlimit:5.75;stroke-dasharray:none;stroke-opacity:1;paint-order:normal" />
+        <ellipse
+           ry="1.7329688"
+           rx="1.6530513"
+           cy="509.40698"
+           cx="186.39568"
+           id="path1449-5"
+           style="fill:#000000;fill-opacity:0;stroke:#a3a3a3;stroke-width:0.924;stroke-linecap:square;stroke-linejoin:miter;stroke-miterlimit:5.75;stroke-dasharray:none;stroke-opacity:1;paint-order:normal" />
+        <ellipse
+           ry="1.7329688"
+           rx="1.6530513"
+           cy="510.23929"
+           cx="194.64471"
+           id="path1449-8"
+           style="fill:#000000;fill-opacity:0;stroke:#a3a3a3;stroke-width:0.924;stroke-linecap:square;stroke-linejoin:miter;stroke-miterlimit:5.75;stroke-dasharray:none;stroke-opacity:1;paint-order:normal" />
+        <path
+           id="path1409-9-6"
+           d="m 193.01042,510.38801 c -5.27504,-0.007 -5.27504,-0.007 -5.27504,-0.007"
+           style="fill:#000000;fill-opacity:0;stroke:#a3a3a3;stroke-width:0.593865;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:5.75;stroke-dasharray:none;stroke-opacity:1" />
+      </g>
+      <path
+         style="fill:#000000;fill-opacity:0;stroke:#a3a3a3;stroke-width:0.65685;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:5.75;stroke-dasharray:none;stroke-opacity:1"
+         d="m 189.86393,510.35336 c -3.17267,3.28755 -3.17267,3.28755 -3.17267,3.28755"
+         id="path1409-9-6-0" />
+    </g>
+  </g>
+</svg>

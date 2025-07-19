@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2025 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -236,6 +236,7 @@ public class WebContentServer {
    /**
     * @param xhrKey
     * @param xhrHandler
+    *
     * @return Returns the previous handler or <code>null</code> when a handler is not available.
     */
    public static XHRHandler addXHRHandler(final String xhrKey, final XHRHandler xhrHandler) {
@@ -618,6 +619,7 @@ public class WebContentServer {
 
    /**
     * @param xhrKey
+    *
     * @return Returns the previous handler or <code>null</code> when a handler is not available.
     */
    public static XHRHandler removeXHRHandler(final String xhrKey) {
@@ -647,27 +649,31 @@ public class WebContentServer {
 
 // SET_FORMATTING_OFF
 
-      _cssReplacementValues.put("A__COLOR",                                UI.IS_DARK_THEME ? "749DFF" : "24f");           //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-      _cssReplacementValues.put("BODY__COLOR",                             ThemeUtil.getThemedCss_DefaultForeground());    //$NON-NLS-1$
-      _cssReplacementValues.put("BODY__BACKGROUND_COLOR",                  ThemeUtil.getThemedCss_DefaultBackground());    //$NON-NLS-1$
-      _cssReplacementValues.put("BODY__SCROLLBAR",                         UI.IS_DARK_THEME                                //$NON-NLS-1$
-                                                                              ? WEB.CSS_CONTENT__BODY_SCROLLBAR__DARK
-                                                                              : UI.EMPTY_STRING);
+      _cssReplacementValues.put("A__COLOR",                                UI.IS_DARK_THEME ? "749DFF" : "24f");              //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+      _cssReplacementValues.put("BODY__COLOR",                             ThemeUtil.getThemedCss_DefaultForeground());       //$NON-NLS-1$
+      _cssReplacementValues.put("BODY__BACKGROUND_COLOR",                  ThemeUtil.getThemedCss_DefaultBackground());       //$NON-NLS-1$
+      _cssReplacementValues.put("BODY__SCROLLBAR",                         UI.EMPTY_STRING);
+//    _cssReplacementValues.put("BODY__SCROLLBAR",                         UI.IS_DARK_THEME                                   //$NON-NLS-1$
+//                               ? WEB.CSS_CONTENT__BODY_SCROLLBAR__DARK
+//                               : UI.EMPTY_STRING);
+      _cssReplacementValues.put("BODY_SCROLLBAR_EXTENDED",                 UI.IS_DARK_THEME                                   //$NON-NLS-1$
+                                 ? WEB.CSS_CONTENT__BODY_SCROLLBAR__DARK_EXTENDED
+                                 : UI.EMPTY_STRING);
 
-      _cssReplacementValues.put("DRGID_CONTENT__COLOR",                    ThemeUtil.getThemedCss_DefaultForeground());    //$NON-NLS-1$
-      _cssReplacementValues.put("DRGID_CONTENT__BACKGROUND_COLOR",         ThemeUtil.getThemedCss_DefaultBackground());    //$NON-NLS-1$
+      _cssReplacementValues.put("DRGID_CONTENT__COLOR",                    ThemeUtil.getThemedCss_DefaultForeground());       //$NON-NLS-1$
+      _cssReplacementValues.put("DRGID_CONTENT__BACKGROUND_COLOR",         ThemeUtil.getThemedCss_DefaultBackground());       //$NON-NLS-1$
 
-      _cssReplacementValues.put("DRGID_ROW__BACKGROUND_COLOR",             UI.IS_DARK_THEME ? "444" : "eee");              //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-      _cssReplacementValues.put("DRGID_SELECTED__BACKGROUND_COLOR",        UI.IS_DARK_THEME ? "555" : "ddd");              //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-      _cssReplacementValues.put("DRGID_SELECTED_HOVER__BACKGROUND_COLOR",  UI.IS_DARK_THEME ? "666" : "ccc");              //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+      _cssReplacementValues.put("DRGID_ROW__BACKGROUND_COLOR",             UI.IS_DARK_THEME ? "444" : "eee");                 //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+      _cssReplacementValues.put("DRGID_SELECTED__BACKGROUND_COLOR",        UI.IS_DARK_THEME ? "555" : "ddd");                 //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+      _cssReplacementValues.put("DRGID_SELECTED_HOVER__BACKGROUND_COLOR",  UI.IS_DARK_THEME ? "666" : "ccc");                 //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 
-      _cssReplacementValues.put("DIJIT_BUTTON_HOVER__COLOR",               UI.IS_DARK_THEME ? "ddd" : "666");              //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-      _cssReplacementValues.put("DIJIT_BUTTON_HOVER__BACKGROUND_COLOR",    UI.IS_DARK_THEME ? "666" : "ddd");              //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+      _cssReplacementValues.put("DIJIT_BUTTON_HOVER__COLOR",               UI.IS_DARK_THEME ? "ddd" : "666");                 //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+      _cssReplacementValues.put("DIJIT_BUTTON_HOVER__BACKGROUND_COLOR",    UI.IS_DARK_THEME ? "666" : "ddd");                 //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 
-      _cssReplacementValues.put("DOM_SEARCH_INPUT_CONTAINER",              UI.IS_DARK_THEME ? "444" : "f4f4f4");           //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-      _cssReplacementValues.put("DOM_APP_STATUS",                          UI.IS_DARK_THEME ? "aaa" : "666");              //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+      _cssReplacementValues.put("DOM_SEARCH_INPUT_CONTAINER",              UI.IS_DARK_THEME ? "444" : "f4f4f4");              //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+      _cssReplacementValues.put("DOM_APP_STATUS",                          UI.IS_DARK_THEME ? "aaa" : "666");                 //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 
-      _cssReplacementValues.put("CSS_TAG__IS_THEMED",                      UI.IS_DARK_THEME                                //$NON-NLS-1$
+      _cssReplacementValues.put("CSS_TAG__IS_THEMED",                      UI.IS_DARK_THEME                                   //$NON-NLS-1$
                                                                               ? ThemeUtil.DARK_THEME_POSTFIX
                                                                               : UI.EMPTY_STRING);
 // SET_FORMATTING_ON

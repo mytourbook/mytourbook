@@ -17,6 +17,8 @@ package net.tourbook.device.garmin.fit;
 
 import com.garmin.fit.SessionMesg;
 
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -26,6 +28,7 @@ import java.util.Set;
 
 import net.tourbook.common.UI;
 import net.tourbook.common.time.TimeTools;
+import net.tourbook.common.util.FileUtils;
 import net.tourbook.common.util.Util;
 import net.tourbook.data.DeviceSensorValue;
 import net.tourbook.data.GearData;
@@ -50,10 +53,11 @@ public class FitData {
 
    private IPreferenceStore              _prefStore               = Activator.getDefault().getPreferenceStore();
 
+   private String                        _fitImportTourTypeMode;
+   private boolean                       _isFitImportTourType;
    private boolean                       _isIgnoreLastMarker;
    private boolean                       _isSetLastMarker;
-   private boolean                       _isFitImportTourType;
-   private String                        _fitImportTourTypeMode;
+   private boolean                       _isSetTourTitleFromFileName;
    private int                           _lastMarkerTimeSlices;
 
    public boolean                        isComputeAveragePower;
@@ -114,11 +118,12 @@ public class FitData {
       _newlyImportedTours     = newlyImportedTours;
       _importState_Process    = importState_Process;
 
-      _isIgnoreLastMarker     = _prefStore.getBoolean(IPreferences.FIT_IS_IGNORE_LAST_MARKER);
-      _isSetLastMarker        = _isIgnoreLastMarker == false;
-      _lastMarkerTimeSlices   = _prefStore.getInt(IPreferences.FIT_IGNORE_LAST_MARKER_TIME_SLICES);
-      _isFitImportTourType    = _prefStore.getBoolean(IPreferences.FIT_IS_SET_TOURTYPE_DURING_IMPORT);
-      _fitImportTourTypeMode  = _prefStore.getString(IPreferences.FIT_IMPORT_TOURTYPE_MODE);
+      _isIgnoreLastMarker           = _prefStore.getBoolean(IPreferences.FIT_IS_IGNORE_LAST_MARKER);
+      _isSetLastMarker              = _isIgnoreLastMarker == false;
+      _lastMarkerTimeSlices         = _prefStore.getInt(IPreferences.FIT_IGNORE_LAST_MARKER_TIME_SLICES);
+      _isFitImportTourType          = _prefStore.getBoolean(IPreferences.FIT_IS_SET_TOURTYPE_DURING_IMPORT);
+      _fitImportTourTypeMode        = _prefStore.getString(IPreferences.FIT_IMPORT_TOURTYPE_MODE);
+      _isSetTourTitleFromFileName   = _prefStore.getBoolean(IPreferences.FIT_IS_SET_TOUR_TITLE_FROM_FILE_NAME);
 
 // SET_FORMATTING_ON
    }
@@ -275,6 +280,7 @@ public class FitData {
             }
          }
 
+         finalizeTour_Title(_tourData);
          finalizeTour_Elevation(_tourData);
          finalizeTour_Battery(_tourData);
          finalizeTour_Sensors(_tourData);
@@ -545,66 +551,81 @@ public class FitData {
       allTourData_SensorValues.addAll(_allDeviceSensorValues);
    }
 
+   private void finalizeTour_Title(final TourData tourData) {
+
+      if (_isSetTourTitleFromFileName == false) {
+         return;
+      }
+
+      final Path importFilePath = Paths.get(_importFilePathName);
+
+      final String filename = importFilePath.getFileName().toString();
+      final String tourTitle = FileUtils.removeExtensions(filename);
+
+      tourData.setTourTitle(tourTitle);
+   }
+
    private void finalizeTour_Type(final TourData tourData) {
 
       // If enabled, set Tour Type using FIT file data
-      if (_isFitImportTourType) {
+      if (_isFitImportTourType == false) {
+         return;
+      }
 
-         TourLogManager.subLog_INFO(UI.EMPTY_STRING
+      TourLogManager.subLog_INFO(UI.EMPTY_STRING
 
-               + " . . . Set tour type from '%s'".formatted(_fitImportTourTypeMode) //$NON-NLS-1$
+            + " . . . Set tour type from '%s'".formatted(_fitImportTourTypeMode) //$NON-NLS-1$
 
-               + " - 'sport'  '%-10s'".formatted(_sportName) //$NON-NLS-1$
-               + " - 'sub-sport' '%-10s'".formatted(_subSportName) //$NON-NLS-1$
+            + " - 'sport'  '%-10s'".formatted(_sportName) //$NON-NLS-1$
+            + " - 'sub-sport' '%-10s'".formatted(_subSportName) //$NON-NLS-1$
 
-               + " - 'profile' '%-10s'".formatted(_profileName) //$NON-NLS-1$
-               + " - 'session profile' '%-10s'".formatted(_sessionSportProfileName)); //$NON-NLS-1$
+            + " - 'profile' '%-10s'".formatted(_profileName) //$NON-NLS-1$
+            + " - 'session profile' '%-10s'".formatted(_sessionSportProfileName)); //$NON-NLS-1$
 
-         switch (_fitImportTourTypeMode) {
+      switch (_fitImportTourTypeMode) {
 
-         case IPreferences.FIT_IMPORT_TOURTYPE_MODE_SPORT:
+      case IPreferences.FIT_IMPORT_TOURTYPE_MODE_SPORT:
 
-            applyTour_Type(tourData, _sportName);
-            break;
+         applyTour_Type(tourData, _sportName);
+         break;
 
-         case IPreferences.FIT_IMPORT_TOURTYPE_MODE_PROFILE:
+      case IPreferences.FIT_IMPORT_TOURTYPE_MODE_PROFILE:
 
+         applyTour_Type(tourData, _profileName);
+         break;
+
+      case IPreferences.FIT_IMPORT_TOURTYPE_MODE_TRY_PROFILE:
+
+         if (!UI.EMPTY_STRING.equals(_profileName)) {
             applyTour_Type(tourData, _profileName);
-            break;
-
-         case IPreferences.FIT_IMPORT_TOURTYPE_MODE_TRY_PROFILE:
-
-            if (!UI.EMPTY_STRING.equals(_profileName)) {
-               applyTour_Type(tourData, _profileName);
-            } else {
-               applyTour_Type(tourData, _sportName);
-            }
-            break;
-
-         case IPreferences.FIT_IMPORT_TOURTYPE_MODE_SPORT_AND_PROFILE:
-
-            String spacerText = UI.EMPTY_STRING;
-
-            // Insert spacer character if Sport Name is present
-            if ((!UI.EMPTY_STRING.equals(_sportName)) && (!UI.EMPTY_STRING.equals(_profileName))) {
-               spacerText = UI.DASH_WITH_SPACE;
-            }
-
-            applyTour_Type(tourData, _sportName + spacerText + _profileName);
-            break;
-
-         case IPreferences.FIT_IMPORT_TOURTYPE_MODE_SESSION_SPORT_PROFILE_NAME:
-
-            applyTour_Type(tourData, _sessionSportProfileName);
-
-            break;
-
-         case IPreferences.FIT_IMPORT_TOURTYPE_MODE_LOOKUP_SPORT_AND_SUB_SPORT:
-
-            RawDataManager.setTourType(tourData, _sportName, _subSportName);
-
-            break;
+         } else {
+            applyTour_Type(tourData, _sportName);
          }
+         break;
+
+      case IPreferences.FIT_IMPORT_TOURTYPE_MODE_SPORT_AND_PROFILE:
+
+         String spacerText = UI.EMPTY_STRING;
+
+         // Insert spacer character if Sport Name is present
+         if ((!UI.EMPTY_STRING.equals(_sportName)) && (!UI.EMPTY_STRING.equals(_profileName))) {
+            spacerText = UI.DASH_WITH_SPACE;
+         }
+
+         applyTour_Type(tourData, _sportName + spacerText + _profileName);
+         break;
+
+      case IPreferences.FIT_IMPORT_TOURTYPE_MODE_SESSION_SPORT_PROFILE_NAME:
+
+         applyTour_Type(tourData, _sessionSportProfileName);
+
+         break;
+
+      case IPreferences.FIT_IMPORT_TOURTYPE_MODE_LOOKUP_SPORT_AND_SUB_SPORT:
+
+         RawDataManager.setTourType(tourData, _sportName, _subSportName);
+
+         break;
       }
    }
 

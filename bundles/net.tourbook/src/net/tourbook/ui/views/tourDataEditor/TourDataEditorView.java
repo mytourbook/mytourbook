@@ -369,8 +369,8 @@ public class TourDataEditorView extends ViewPart implements
    private boolean[]               _serieBreakTime;
    private boolean[]               _seriePausedTime;
    //
+   private short[]                 _swimSerie_LengthType;
    private short[]                 _swimSerie_StrokeRate;
-// private short[]                 _swimSerie_LengthType;
    private short[]                 _swimSerie_StrokesPerlength;
    private short[]                 _swimSerie_StrokeStyle;
    private int[]                   _swimSerie_Time;
@@ -5543,6 +5543,7 @@ public class TourDataEditorView extends ViewPart implements
       defineColumn_SwimSlice_Swim_StrokesPerLength();
       defineColumn_SwimSlice_Swim_StrokeRate();
       defineColumn_SwimSlice_Swim_StrokeStyle();
+      defineColumn_SwimSlice_Swim_LengthType();
    }
 
    private void defineAllColumns_TimeSlices() {
@@ -5630,11 +5631,36 @@ public class TourDataEditorView extends ViewPart implements
    /**
     * Stroke Rate or number of strokes per minute.
     */
+   private void defineColumn_SwimSlice_Swim_LengthType() {
+
+      final TableColumnDefinition colDef = TableColumnFactory.SWIM_LENGTH_TYPE.createColumn(_swimSlice_ColumnManager, _pc);
+
+      colDef.setLabelProvider(new CellLabelProvider() {
+         @Override
+         public void update(final ViewerCell cell) {
+
+            if (_swimSerie_LengthType != null) {
+
+               final SwimSlice swimSlice = (SwimSlice) cell.getElement();
+               final short value = _swimSerie_LengthType[swimSlice.serieIndex];
+
+               cell.setText(Short.toString(value));
+
+            } else {
+               cell.setText(UI.EMPTY_STRING);
+            }
+         }
+      });
+   }
+
+   /**
+    * Stroke Rate or number of strokes per minute.
+    */
    private void defineColumn_SwimSlice_Swim_StrokeRate() {
 
       TableColumnDefinition colDef;
 
-      _swimSlice_ColDef_StrokeRate = colDef = TableColumnFactory.SWIM__SWIM_STROKE_RATE.createColumn(_swimSlice_ColumnManager, _pc);
+      _swimSlice_ColDef_StrokeRate = colDef = TableColumnFactory.SWIM_STROKE_RATE.createColumn(_swimSlice_ColumnManager, _pc);
 
       colDef.setIsDefaultColumn();
 
@@ -5643,8 +5669,8 @@ public class TourDataEditorView extends ViewPart implements
          public void update(final ViewerCell cell) {
             if (_swimSerie_StrokeRate != null) {
 
-               final SwimSlice timeSlice = (SwimSlice) cell.getElement();
-               final short value = _swimSerie_StrokeRate[timeSlice.serieIndex];
+               final SwimSlice swimSlice = (SwimSlice) cell.getElement();
+               final short value = _swimSerie_StrokeRate[swimSlice.serieIndex];
 
                if (value == 0) {
                   cell.setText(UI.EMPTY_STRING);
@@ -5663,7 +5689,7 @@ public class TourDataEditorView extends ViewPart implements
 
       final ColumnDefinition colDef;
 
-      _swimSlice_ColDef_Strokes = colDef = TableColumnFactory.SWIM__SWIM_STROKES_PER_LENGTH.createColumn(_swimSlice_ColumnManager, _pc);
+      _swimSlice_ColDef_Strokes = colDef = TableColumnFactory.SWIM_STROKES_PER_LENGTH.createColumn(_swimSlice_ColumnManager, _pc);
 
       colDef.setIsDefaultColumn();
 
@@ -5672,8 +5698,8 @@ public class TourDataEditorView extends ViewPart implements
          public void update(final ViewerCell cell) {
             if (_swimSerie_StrokesPerlength != null) {
 
-               final SwimSlice timeSlice = (SwimSlice) cell.getElement();
-               final short value = _swimSerie_StrokesPerlength[timeSlice.serieIndex];
+               final SwimSlice swimSlice = (SwimSlice) cell.getElement();
+               final short value = _swimSerie_StrokesPerlength[swimSlice.serieIndex];
 
                if (value == 0) {
                   cell.setText(UI.EMPTY_STRING);
@@ -5692,7 +5718,7 @@ public class TourDataEditorView extends ViewPart implements
 
       final ColumnDefinition colDef;
 
-      _swimSlice_ColDef_StrokeStyle = colDef = TableColumnFactory.SWIM__SWIM_STROKE_STYLE.createColumn(_swimSlice_ColumnManager, _pc);
+      _swimSlice_ColDef_StrokeStyle = colDef = TableColumnFactory.SWIM_STROKE_STYLE.createColumn(_swimSlice_ColumnManager, _pc);
 
       colDef.setIsDefaultColumn();
 
@@ -5724,7 +5750,7 @@ public class TourDataEditorView extends ViewPart implements
    }
 
    /**
-    * column: time difference in seconds to previous slice
+    * Column: time difference in seconds to previous slice
     */
    private void defineColumn_SwimSlice_Time_TimeDiff() {
 
@@ -5735,14 +5761,25 @@ public class TourDataEditorView extends ViewPart implements
          public void update(final ViewerCell cell) {
 
             if (_swimSerie_Time != null) {
-               final SwimSlice timeSlice = (SwimSlice) cell.getElement();
-               final int serieIndex = timeSlice.serieIndex;
-               if (serieIndex == 0) {
+
+               final SwimSlice swimSlice = (SwimSlice) cell.getElement();
+               final int swimSerieIndex = swimSlice.serieIndex;
+
+               final int numSlices = _swimSerie_Time.length;
+
+               if (swimSerieIndex == numSlices - 1) {
+
+                  // the last time slice is displayed-> there is no difference to the next slice
+
                   cell.setText(Integer.toString(0));
+
                } else {
-                  cell.setText(Integer.toString(_swimSerie_Time[serieIndex] - _swimSerie_Time[serieIndex - 1]));
+
+                  cell.setText(Integer.toString(_swimSerie_Time[swimSerieIndex + 1] - _swimSerie_Time[swimSerieIndex]));
                }
+
             } else {
+
                cell.setText(UI.EMPTY_STRING);
             }
          }
@@ -5782,8 +5819,8 @@ public class TourDataEditorView extends ViewPart implements
          public void update(final ViewerCell cell) {
 
             if (_swimSerie_Time != null) {
-               final SwimSlice timeSlice = (SwimSlice) cell.getElement();
-               final int serieIndex = timeSlice.serieIndex;
+               final SwimSlice swimSlice = (SwimSlice) cell.getElement();
+               final int serieIndex = swimSlice.serieIndex;
                cell.setText(Integer.toString(_swimSerie_Time[serieIndex]));
             } else {
                cell.setText(UI.EMPTY_STRING);
@@ -5808,9 +5845,9 @@ public class TourDataEditorView extends ViewPart implements
             } else {
 
                final int serieIndex = ((SwimSlice) cell.getElement()).serieIndex;
-               final int timeSliceSeconds = _swimSerie_Time[serieIndex];
+               final int swimSliceSeconds = _swimSerie_Time[serieIndex];
 
-               cell.setText(_tourStartTime.plusSeconds(timeSliceSeconds).format(TimeTools.Formatter_Time_M));
+               cell.setText(_tourStartTime.plusSeconds(swimSliceSeconds).format(TimeTools.Formatter_Time_M));
             }
          }
       });
@@ -6099,11 +6136,14 @@ public class TourDataEditorView extends ViewPart implements
                   distanceDiff = distance - distancePrevious;
                }
 
-               if (distanceDiff < 0.001) {
+               if (distanceDiff == 0) {
                   cell.setText(UI.EMPTY_STRING);
+               } else if (distanceDiff < 0.001) {
+                  cell.setText(_nf6.format(distanceDiff));
                } else {
                   cell.setText(_nf3.format(distanceDiff));
                }
+
             } else {
                cell.setText(UI.EMPTY_STRING);
             }
@@ -7454,14 +7494,14 @@ public class TourDataEditorView extends ViewPart implements
          }
       }
 
-      final int numSlices = _tourData.timeSerie.length;
+      final int numTimeSlices = _tourData.timeSerie.length;
 
       final int numSelectedSlices = selectedSlices.length;
       final Object firstSelectedSlice = selectedSlices[0];
 
-      int serieIndex0 = SelectionChartXSliderPosition.IGNORE_SLIDER_POSITION;
-      int serieIndex1 = SelectionChartXSliderPosition.IGNORE_SLIDER_POSITION;
-      int serieIndex2 = SelectionChartXSliderPosition.IGNORE_SLIDER_POSITION;
+      int sliderSerieIndex0 = SelectionChartXSliderPosition.IGNORE_SLIDER_POSITION;
+      int sliderSerieIndex1 = SelectionChartXSliderPosition.IGNORE_SLIDER_POSITION;
+      int sliderSerieIndex2 = SelectionChartXSliderPosition.IGNORE_SLIDER_POSITION;
 
       if (numSelectedSlices == 1) {
 
@@ -7470,40 +7510,40 @@ public class TourDataEditorView extends ViewPart implements
          if (firstSelectedSlice instanceof final SwimSlice swimSlice) {
 
             /*
-             * position slider at the beginning of the slice so that each slice borders has an
+             * Position slider at the beginning of the slice so that each slice borders has an
              * slider
              */
-            final int swimSerieIndex1 = swimSlice.serieIndex;
-            final int timeSerieIndex1 = getSerieIndexFromSwimTime(swimSerieIndex1);
+            final int swimSerieIndex1 = swimSlice.serieIndex + 1;
+            final int timeSerieIndex1 = getTimeSerieIndexFromSwimTime(swimSerieIndex1);
 
             if (timeSerieIndex1 > 1) {
 
                final int swimSerieIndex0 = swimSerieIndex1 - 1;
-               final int timeSerieIndex0 = getSerieIndexFromSwimTime(swimSerieIndex0);
+               final int timeSerieIndex0 = getTimeSerieIndexFromSwimTime(swimSerieIndex0);
 
-               serieIndex0 = timeSerieIndex0;
+               sliderSerieIndex0 = timeSerieIndex0;
             }
 
-            serieIndex1 = timeSerieIndex1 == numSlices - 1
+            sliderSerieIndex1 = timeSerieIndex1 == numTimeSlices - 1
 
                   // keep slider at the end of the chart
-                  ? numSlices - 1
+                  ? numTimeSlices - 1
 
                   // adjust slider to the same stroke/swolf value as the left slider
-                  : timeSerieIndex1 - 1;
+                  : timeSerieIndex1;
 
-            serieIndex2 = SelectionChartXSliderPosition.IGNORE_SLIDER_POSITION;
+            sliderSerieIndex2 = SelectionChartXSliderPosition.IGNORE_SLIDER_POSITION;
 
          } else if (firstSelectedSlice instanceof final TimeSlice timeSlice) {
 
             final int sliceSerieIndex = timeSlice.serieIndex;
 
-            serieIndex0 = sliceSerieIndex;
-            serieIndex1 = sliceSerieIndex < numSlices - 1
+            sliderSerieIndex0 = sliceSerieIndex;
+            sliderSerieIndex1 = sliceSerieIndex < numTimeSlices - 1
                   ? sliceSerieIndex + 1
                   : sliceSerieIndex;
 
-            serieIndex2 = SelectionChartXSliderPosition.IGNORE_SLIDER_POSITION;
+            sliderSerieIndex2 = SelectionChartXSliderPosition.IGNORE_SLIDER_POSITION;
          }
 
       } else if (numSelectedSlices > 1) {
@@ -7515,22 +7555,22 @@ public class TourDataEditorView extends ViewPart implements
             final int swimSerieIndex1 = swimSlice.serieIndex;
             final int swimSerieIndex2 = ((SwimSlice) selectedSlices[numSelectedSlices - 1]).serieIndex;
 
-            final int timeSerieIndex2 = getSerieIndexFromSwimTime(swimSerieIndex2);
+            final int timeSerieIndex2 = getTimeSerieIndexFromSwimTime(swimSerieIndex2);
 
             /*
              * Position slider at the beginning of the first slice
              */
-            serieIndex1 = 0;
+            sliderSerieIndex1 = 0;
 
             if (swimSerieIndex1 > 0) {
-               final int timeSerieIndex1 = getSerieIndexFromSwimTime(swimSerieIndex1 - 1);
-               serieIndex1 = timeSerieIndex1;
+               final int timeSerieIndex1 = getTimeSerieIndexFromSwimTime(swimSerieIndex1 - 1);
+               sliderSerieIndex1 = timeSerieIndex1;
             }
 
-            serieIndex2 = timeSerieIndex2 == numSlices - 1
+            sliderSerieIndex2 = timeSerieIndex2 == numTimeSlices - 1
 
                   // keep slider at the end of the chart
-                  ? numSlices - 1
+                  ? numTimeSlices - 1
 
                   // adjust slider to the same stroke/swolf value as the left slider
                   : timeSerieIndex2 - 1;
@@ -7542,14 +7582,14 @@ public class TourDataEditorView extends ViewPart implements
             /*
              * Position slider at the beginning of the first slice
              */
-            serieIndex1 = serieIndexFirst;
-            serieIndex2 = ((TimeSlice) selectedSlices[numSelectedSlices - 1]).serieIndex;
+            sliderSerieIndex1 = serieIndexFirst;
+            sliderSerieIndex2 = ((TimeSlice) selectedSlices[numSelectedSlices - 1]).serieIndex;
 
          }
       }
 
       ISelection sliderSelection = null;
-      if (serieIndex1 != -1) {
+      if (sliderSerieIndex1 != -1) {
 
          if (_tourChart == null) {
 
@@ -7559,16 +7599,16 @@ public class TourDataEditorView extends ViewPart implements
 
                // map position is available
 
-               sliderSelection = new SelectionMapPosition(_tourData, serieIndex1, serieIndex2, true);
+               sliderSelection = new SelectionMapPosition(_tourData, sliderSerieIndex1, sliderSerieIndex2, true);
             }
 
          } else {
 
             final SelectionChartXSliderPosition xSliderSelection = new SelectionChartXSliderPosition(
                   _tourChart,
-                  serieIndex0,
-                  serieIndex1,
-                  serieIndex2);
+                  sliderSerieIndex0,
+                  sliderSerieIndex1,
+                  sliderSerieIndex2);
 
             xSliderSelection.setCenterSliderPosition(true);
 
@@ -7638,6 +7678,7 @@ public class TourDataEditorView extends ViewPart implements
 
       _serieTemperature             = _tourData.temperatureSerie;
 
+      _swimSerie_LengthType         = _tourData.swim_LengthType;
       _swimSerie_StrokeRate         = _tourData.swim_Cadence;
       _swimSerie_StrokesPerlength   = _tourData.swim_Strokes;
       _swimSerie_StrokeStyle        = _tourData.swim_StrokeStyle;
@@ -7798,30 +7839,6 @@ public class TourDataEditorView extends ViewPart implements
       return tourDataList;
    }
 
-   /**
-    * Get time serie index from swim time
-    */
-   private int getSerieIndexFromSwimTime(final int swimSerieIndex) {
-
-      // check bounds
-      if (swimSerieIndex < 0 || swimSerieIndex >= _swimSerie_Time.length) {
-         return 0;
-      }
-
-      final int swimTime = _swimSerie_Time[swimSerieIndex];
-
-      for (int serieIndex = 0; serieIndex < _serieTime.length; serieIndex++) {
-
-         final int serieTime = _serieTime[serieIndex];
-
-         if (serieTime >= swimTime) {
-            return serieIndex;
-         }
-      }
-
-      return 0;
-   }
-
    TableViewer getSliceViewer() {
       return _timeSlice_Viewer;
    }
@@ -7853,6 +7870,40 @@ public class TourDataEditorView extends ViewPart implements
       }
 
       return new SliceViewerItems(timeSlice_ViewerItems, swimSlice_ViewerItems);
+   }
+
+   /**
+    * Get time serie index from swim time
+    */
+   private int getTimeSerieIndexFromSwimTime(final int swimSerieIndex) {
+
+      final int numTimeSlices = _serieTime.length;
+
+      // check bounds
+      if (swimSerieIndex < 0) {
+
+         return 0;
+
+      } else if (swimSerieIndex >= _swimSerie_Time.length) {
+
+         // the last swim slice is reached
+
+         return numTimeSlices - 1;
+      }
+
+      final int swimTime = _swimSerie_Time[swimSerieIndex];
+
+      for (int timeSerieIndex = 0; timeSerieIndex < numTimeSlices; timeSerieIndex++) {
+
+         final int serieTime = _serieTime[timeSerieIndex];
+
+         if (serieTime >= swimTime) {
+
+            return timeSerieIndex;
+         }
+      }
+
+      return 0;
    }
 
    /**
