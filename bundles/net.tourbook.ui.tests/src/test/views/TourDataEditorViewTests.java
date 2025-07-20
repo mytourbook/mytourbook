@@ -18,6 +18,7 @@ package views;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
+import java.util.Arrays;
 import java.util.GregorianCalendar;
 
 import net.tourbook.Messages;
@@ -26,6 +27,7 @@ import net.tourbook.common.UI;
 import org.eclipse.swtbot.swt.finder.SWTBot;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotCombo;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotDateTime;
+import org.eclipse.swtbot.swt.finder.widgets.SWTBotShell;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotSpinner;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTable;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
@@ -97,11 +99,14 @@ public class TourDataEditorViewTests extends UITest {
 
       timeSlicesTable.select(3);
 
-      //timeSlicesTable.contextMenu(Messages.Tour_Editor_Action_DeleteTimeSlices_KeepTime).click();
-      //Utils.clickOkButton(bot);
-
-      timeSlicesTable = tourEditorViewBot.table();
       timeSlicesTable.contextMenu(Messages.Tour_Editor_Action_DeleteTimeSlices_KeepTime).click();
+      final SWTBotShell[] currentShells = bot.shells();
+      if (Arrays.stream(currentShells).anyMatch(shell -> shell.getText().equals(Messages.tour_editor_dlg_delete_rows_title))) {
+
+         Utils.clickOkButton(bot);
+         timeSlicesTable = tourEditorViewBot.table();
+         timeSlicesTable.contextMenu(Messages.Tour_Editor_Action_DeleteTimeSlices_KeepTime).click();
+      }
 
       bot.toolbarButtonWithTooltip(Utils.SAVE_MODIFIED_TOUR).click();
 
