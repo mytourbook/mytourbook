@@ -1452,7 +1452,7 @@ public class ValuePoint_ToolTip_UI extends Pinned_ToolTip_Shell implements IPinn
       if (_tourData != null && tourData != null
             && _tourData.getTourId().equals(tourData.getTourId())) {
 
-// UI must be update otherwise a new/deleted tour marker could display wrong values
+// UI must be updated otherwise a new/deleted tour marker could display wrong values
 //
 //         return;
       }
