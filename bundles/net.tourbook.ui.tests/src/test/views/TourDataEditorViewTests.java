@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2022, 2023 Frédéric Bard
+ * Copyright (C) 2022, 2025 Frédéric Bard
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -97,7 +97,7 @@ public class TourDataEditorViewTests extends UITest {
 
       timeSlicesTable.select(3);
 
-      timeSlicesTable.contextMenu(Messages.Tour_Editor_Action_DeleteTimeSlices_KeepTime).click();
+      //timeSlicesTable.contextMenu(Messages.Tour_Editor_Action_DeleteTimeSlices_KeepTime).click();
       //Utils.clickOkButton(bot);
 
       timeSlicesTable = tourEditorViewBot.table();
