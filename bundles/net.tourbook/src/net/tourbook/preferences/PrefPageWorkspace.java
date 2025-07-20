@@ -169,7 +169,7 @@ public class PrefPageWorkspace extends PreferencePage implements IWorkbenchPrefe
              * Restart info
              */
             _lblRestartInfo = new Label(container, SWT.WRAP);
-            _lblRestartInfo.setText("MyTourbook will be restarted when these fixes are applied");
+            _lblRestartInfo.setText(Messages.Pref_Workspace_Label_RestartInfo);
             GridDataFactory.fillDefaults()
                   .grab(true, true)
                   .align(SWT.FILL, SWT.END)
@@ -249,8 +249,8 @@ public class PrefPageWorkspace extends PreferencePage implements IWorkbenchPrefe
       final int numIssues_ViewButtons = _stateFixAllIssues.numFixed_CloseButtons;
       final int numIssues_ViewIconImages = _stateFixAllIssues.numFixed_IconImages;
 
-      final String stateViewButton_Text = "Number of hidden close buttons: %d".formatted(numIssues_ViewButtons);
-      final String stateViewIcon_Text = "Number of invalid icon images: %d".formatted(numIssues_ViewIconImages);
+      final String stateViewButton_Text = Messages.Pref_Workspace_Label_NumberOfHiddenCloseButtons.formatted(numIssues_ViewButtons);
+      final String stateViewIcon_Text = Messages.Pref_Workspace_Label_NumberOfInvalidIconImages.formatted(numIssues_ViewIconImages);
 
       final String stateViewButton_Tooltip = _stateFixAllIssues.stateText_CloseButton;
       final String stateViewIcon_Tooltip = _stateFixAllIssues.stateText_IconImages;

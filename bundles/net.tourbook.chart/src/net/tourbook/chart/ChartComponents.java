@@ -2714,7 +2714,7 @@ public class ChartComponents extends Composite {
       final GC gc = new GC(gcImage);
       {
          gc.setFont(UI.getUIDrawingFont());
-         final Point stringExtent = gc.stringExtent("0123456789");
+         final Point stringExtent = gc.stringExtent("0123456789"); //$NON-NLS-1$
 
          _gcFontHeight = stringExtent.y;
 

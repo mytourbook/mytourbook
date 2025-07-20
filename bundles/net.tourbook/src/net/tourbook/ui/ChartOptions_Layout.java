@@ -67,7 +67,7 @@ public class ChartOptions_Layout {
    private void createUI_10_Grid(final Composite parent) {
 
       final Group group = new Group(parent, SWT.NONE);
-      group.setText("Layout");
+      group.setText(Messages.ChartOptions_Layout_Group_Layout);
       GridDataFactory.fillDefaults().grab(true, false).span(2, 1).applyTo(group);
       GridLayoutFactory.swtDefaults()
             .extendedMargins(0, 0, -5, 0)
@@ -80,11 +80,11 @@ public class ChartOptions_Layout {
              * Y axis width
              */
 
-            final String tooltipText = "Width of the y-axis";
+            final String tooltipText = Messages.ChartOptions_Layout_Label_VerticalAxisWidth_Tooltip;
 
             {
                final Label label = new Label(group, SWT.NONE);
-               label.setText("Vertical a&xis width");
+               label.setText(Messages.ChartOptions_Layout_Label_VerticalAxisWidth);
                label.setToolTipText(tooltipText);
                GridDataFactory.fillDefaults()
                      .align(SWT.FILL, SWT.CENTER)

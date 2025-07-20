@@ -18,8 +18,6 @@
  *******************************************************************************/
 package de.byteholder.geoclipse.poi;
 
-import static org.eclipse.swt.events.SelectionListener.widgetSelectedAdapter;
-
 import de.byteholder.gpx.PointOfInterest;
 import de.byteholder.gpx.Waypoint;
 
@@ -52,6 +50,8 @@ import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerComparator;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.KeyListener;
+import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Combo;
@@ -302,10 +302,18 @@ public class PoiView extends ViewPart implements PropertyChangeListener {
              */
             _comboSearchQuery = new Combo(queryContainer, SWT.NONE);
             _comboSearchQuery.setVisibleItemCount(30);
-            _comboSearchQuery.addSelectionListener(widgetSelectedAdapter(selectionEvent -> {
+            _comboSearchQuery.addSelectionListener(SelectionListener.widgetSelectedAdapter(selectionEvent -> {
                // start searching when ENTER is pressed
                onSearchPoi();
             }));
+
+            _comboSearchQuery.addKeyListener(KeyListener.keyPressedAdapter(keyEvent -> {
+
+               if (keyEvent.keyCode == SWT.CR) {
+                  onSearchPoi();
+               }
+            }));
+
             GridDataFactory.fillDefaults()
                   .align(SWT.FILL, SWT.CENTER)
                   .grab(true, false)
@@ -317,7 +325,7 @@ public class PoiView extends ViewPart implements PropertyChangeListener {
              */
             _btnSearch = new Button(queryContainer, SWT.PUSH);
             _btnSearch.setText(Messages.Poi_View_Button_Search);
-            _btnSearch.addSelectionListener(widgetSelectedAdapter(selectionEvent -> onSearchPoi()));
+            _btnSearch.addSelectionListener(SelectionListener.widgetSelectedAdapter(selectionEvent -> onSearchPoi()));
          }
       }
 
