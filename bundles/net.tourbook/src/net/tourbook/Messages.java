@@ -1653,6 +1653,7 @@ public class Messages extends NLS {
    public static String        Pref_Appearance_Combo_Theme_Tooltip;
    public static String        Pref_Appearance_Dialog_ResetAllToggleDialogs_Message;
    public static String        Pref_Appearance_Dialog_ResetAllToggleDialogs_Title;
+   public static String        Pref_Appearance_Dialog_RestartAfter_ChangeDisabledIcons_Message;
    public static String        Pref_Appearance_Dialog_RestartAfterRestartApp_Message;
    public static String        Pref_Appearance_Dialog_RestartAfterThemeChange_Message;
    public static String        Pref_Appearance_Dialog_RestartAfterThemeSelectorIsInToolbar_Message;
@@ -2063,6 +2064,9 @@ public class Messages extends NLS {
    public static String        Pref_Workspace_Label_FixViewCloseButton;
    public static String        Pref_Workspace_Label_FixViewIconImage;
    public static String        Pref_Workspace_Label_Info;
+   public static String        Pref_Workspace_Label_NumberOfHiddenCloseButtons;
+   public static String        Pref_Workspace_Label_NumberOfInvalidIconImages;
+   public static String        Pref_Workspace_Label_RestartInfo;
 
    public static String        Reference_Timeline_Action_ShowAllValues_Tooltip;
    public static String        Reference_Timeline_Action_SyncMinMaxValues_Tooltip;

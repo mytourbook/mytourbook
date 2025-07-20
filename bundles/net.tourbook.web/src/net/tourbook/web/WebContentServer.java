@@ -652,7 +652,7 @@ public class WebContentServer {
       _cssReplacementValues.put("A__COLOR",                                UI.IS_DARK_THEME ? "749DFF" : "24f");              //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
       _cssReplacementValues.put("BODY__COLOR",                             ThemeUtil.getThemedCss_DefaultForeground());       //$NON-NLS-1$
       _cssReplacementValues.put("BODY__BACKGROUND_COLOR",                  ThemeUtil.getThemedCss_DefaultBackground());       //$NON-NLS-1$
-      _cssReplacementValues.put("BODY__SCROLLBAR",                         UI.EMPTY_STRING);
+      _cssReplacementValues.put("BODY__SCROLLBAR",                         UI.EMPTY_STRING); //$NON-NLS-1$
 //    _cssReplacementValues.put("BODY__SCROLLBAR",                         UI.IS_DARK_THEME                                   //$NON-NLS-1$
 //                               ? WEB.CSS_CONTENT__BODY_SCROLLBAR__DARK
 //                               : UI.EMPTY_STRING);

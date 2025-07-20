@@ -261,7 +261,7 @@ public class ApplicationTools {
       logIssue_CloseButtons("fixViewCloseButtons()"); //$NON-NLS-1$
       logIssue_CloseButtons("Set all views closeable=\"true\" in workbench.xmi"); //$NON-NLS-1$
       logIssue_CloseButtons("workbenchFolderPath: %s".formatted(workbenchFolderPath)); //$NON-NLS-1$
-      logIssue_CloseButtons("XPath %s".formatted(xPathExpression));
+      logIssue_CloseButtons("XPath %s".formatted(xPathExpression)); //$NON-NLS-1$
 
       final NodeList allNodes = (NodeList) xpath.evaluate(xPathExpression, domDocument, XPathConstants.NODESET);
 

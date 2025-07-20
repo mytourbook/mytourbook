@@ -576,7 +576,7 @@ public class PrefPageAppearance extends PreferencePage implements IWorkbenchPref
                .getImage();
 
          // a restart is required for the theme change to take full effect
-         _comboDecorator_DisabledIcons.setDescriptionText("A restart is required for the disabled icons change to take full effect");
+         _comboDecorator_DisabledIcons.setDescriptionText(Messages.Pref_Appearance_Dialog_RestartAfter_ChangeDisabledIcons_Message);
          _comboDecorator_DisabledIcons.setImage(decorationImage);
          _comboDecorator_DisabledIcons.show();
 
@@ -748,7 +748,7 @@ public class PrefPageAppearance extends PreferencePage implements IWorkbenchPref
 
          if (isRestartNow == false) {
 
-            isRestartNow = requestForRestart("A restart is required for the disabled icons change to take full effect");
+            isRestartNow = requestForRestart(Messages.Pref_Appearance_Dialog_RestartAfter_ChangeDisabledIcons_Message);
          }
       }
 
