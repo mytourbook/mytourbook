@@ -2,7 +2,7 @@
 <feature
       id="feature.net.tourbook.app.nl"
       label="MyTourbook Translation Test"
-      version="25.6.0.qualifier">
+      version="25.8.0.qualifier">
 
    <description>
       Test translated texts.

@@ -1,0 +1,79 @@
+25.8.0                                                 ?. August 2025
+
+
+New / Improvements
+==================
+
+* UI Font
+  - The font can be customized for all drawn texts 
+    This was needed because since Eclipse 4.36 and MyTourbook is started with an -Dswt.autoScale=nnn parameter, then the font is scaled when drawing a text which could make the font too small or too large :-(
+    
+* Disabled Icons    
+  - Select an algorithm how disabled icons should be converted
+    https://github.com/mytourbook/mytourbook/issues/1513
+
+* All Charts
+  - Customize y-axis width
+
+* Tour Chart
+  - Display values since the last tour marker in the value tooltip
+    https://github.com/mytourbook/mytourbook/issues/1473
+
+* Tour Markers
+  - Create or remove tour marker label numbering
+    https://github.com/mytourbook/mytourbook/issues/1496
+
+  
+* workbench.xmi
+  - Fix 2 issues in workbench.xmi
+    https://github.com/mytourbook/mytourbook/issues/1516  
+
+
+Changes
+=======
+
+* Disabled Icons
+  They are now better "disabled" with Eclipse than before. Some disabled icons are replaced and can be looking a bit differently than before
+
+* Eclipse on Windows is now using Edge as default browser which needed a few adjustments
+  https://github.com/mytourbook/mytourbook/issues/1512
+  
+
+Changes that require Tour Re-import
+===================================
+
+* Fit Import
+  Swimming tours should be re-imported that fixes are applied to already saved tours.
+
+
+Bugfix
+======
+  
+* Swimming
+  - Fixed slider position issues in the swim slices in the tour editor and tour chart
+ 
+
+
+See also milestone 25.8 https://github.com/mytourbook/mytourbook/milestone/26?closed=1
+ 
+
+
+Translation    
+===========
+
+- Dutch (Maarten)
+- French (Frederic)
+- German
+- Italian (Doriano)
+
+ 
+System   
+======
+
+* MyTourbook Milestone 25.8   https://github.com/mytourbook/mytourbook/milestone/26?closed=1
+* Java 17                     https://adoptium.net/temurin/releases/?version=17
+* Eclipse 2025-06 (4.36)      https://archive.eclipse.org/eclipse/downloads/drops4/R-4.36-202505281830/
+* NatTable 2.5.0              https://eclipse.dev/nattable/download
+* Nebula Widgets              https://download.eclipse.org/nebula/releases/latest
+* FIT SDK 21.171.0            https://forums.garmin.com/developer/fit-sdk/b/news-announcements
+* WorldWind 2.2.1             https://github.com/NASAWorldWind/WorldWindJava/releases/tag/v2.2.1
