@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2022, 2024 Frédéric Bard
+ * Copyright (C) 2022, 2025 Frédéric Bard
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -532,7 +532,8 @@ public class Utils {
 
    public static SWTBotView showView(final SWTWorkbenchBot bot, final String viewName) {
 
-      final SWTBotView view = bot.viewByTitle(viewName);
+      final String sanitizedViewName = viewName.replace("\"", ""); //$NON-NLS-1$ //$NON-NLS-2$
+      final SWTBotView view = bot.viewByTitle(sanitizedViewName);
       assertNotNull(view);
       view.show();
 
