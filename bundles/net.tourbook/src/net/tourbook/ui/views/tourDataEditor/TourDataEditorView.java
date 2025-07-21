@@ -3594,7 +3594,13 @@ public class TourDataEditorView extends ViewPart implements
                                  final FormToolkit tk,
                                  final String title) {
 
-      final Section section = tk.createSection(parent, ExpandableComposite.TWISTIE | ExpandableComposite.TITLE_BAR);
+      final Section section = tk.createSection(parent,
+
+            ExpandableComposite.TWISTIE
+                  | ExpandableComposite.SHORT_TITLE_BAR
+//                | ExpandableComposite.TITLE_BAR
+
+      );
 
       section.setText(title);
       section.addExpansionListener(IExpansionListener.expansionStateChangedAdapter(expansionEvent -> onExpandSection()));
