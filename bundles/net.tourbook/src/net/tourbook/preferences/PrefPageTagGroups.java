@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2024 Wolfgang Schramm and Contributors
+ * Copyright (C) 2024, 2025 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -1440,7 +1440,6 @@ public class PrefPageTagGroups extends PreferencePage implements IWorkbenchPrefe
          _actionTag_Layout.setToolTipText(Messages.Tour_Tags_Action_Layout_Flat_Tooltip);
 
          _actionTag_Layout.setImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.TagLayout_Flat));
-         _actionTag_Layout.setDisabledImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.TagLayout_Flat_Disabled));
 
       } else {
 
@@ -1449,7 +1448,6 @@ public class PrefPageTagGroups extends PreferencePage implements IWorkbenchPrefe
          _actionTag_Layout.setToolTipText(Messages.Tour_Tags_Action_Layout_Hierarchical_Tooltip);
 
          _actionTag_Layout.setImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.TagLayout_Hierarchical));
-         _actionTag_Layout.setDisabledImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.TagLayout_Hierarchical_Disabled));
       }
    }
 

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2024 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2025 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -23,7 +23,6 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
-import net.tourbook.Images;
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.UI;
@@ -57,7 +56,6 @@ import org.eclipse.swt.custom.CLabel;
 import org.eclipse.swt.events.MenuEvent;
 import org.eclipse.swt.events.MenuListener;
 import org.eclipse.swt.events.SelectionListener;
-import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Button;
@@ -219,8 +217,6 @@ public class DialogExtractTour extends TitleAreaDialog implements ITourProvider2
 
    private Text                             _txtTourTitle;
 
-   private Image                            _imageDialog = TourbookPlugin.getImageDescriptor(Images.MyTourbook).createImage();
-
    /**
     * Split or extract a tour
     *
@@ -248,8 +244,6 @@ public class DialogExtractTour extends TitleAreaDialog implements ITourProvider2
       _tourDataEditor = tourDataEditor;
       _tourDataSource = tourData;
 
-      setDefaultImage(_imageDialog);
-
       _canRemoveTimeSlices = _tourDataEditor.getTourData().isContainReferenceTour() == false;
 
       // make dialog resizable
@@ -258,8 +252,6 @@ public class DialogExtractTour extends TitleAreaDialog implements ITourProvider2
 
    @Override
    public boolean close() {
-
-      UI.disposeResource(_imageDialog);
 
       return super.close();
    }

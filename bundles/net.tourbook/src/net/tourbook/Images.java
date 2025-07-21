@@ -36,6 +36,7 @@ public class Images {
    /*
     * These images are not translated
     */
+
    public static final String App_Add                                    = "app-add.svg";                                         //$NON-NLS-1$
    public static final String App_Add_2x                                 = "app-add-2x.svg";                                      //$NON-NLS-1$
    public static final String App_Cancel_2                               = "16px-Crystal_Clear_action_button_cancel.png";         //$NON-NLS-1$
@@ -90,7 +91,6 @@ public class Images {
    public static final String EditRow                                    = "edit-row.png";                                        //$NON-NLS-1$
    public static final String EditRow_Disabled                           = "edit-row-disabled.png";                               //$NON-NLS-1$
    public static final String EditTour                                   = "tour-editor.svg";                                     //$NON-NLS-1$
-   public static final String EditTour_Disabled                          = "write_obj_disabled.gif";                              //$NON-NLS-1$
    public static final String GeoCompare_PinComparedTour                 = "geo-compare-pin-compared-tour.png";                   //$NON-NLS-1$
    public static final String GeoCompare_PinComparedTour_Disabled        = "geo-compare-pin-compared-tour-disabled.png";          //$NON-NLS-1$
    public static final String GeoCompare_SelectComparedTour              = "geo-compare-select-compared-tour.svg";                //$NON-NLS-1$
@@ -132,11 +132,8 @@ public class Images {
    public static final String Import_DashboardUI                         = "import-dashboard.png";                                //$NON-NLS-1$
    public static final String Import_Files                               = "import-get-tours.svg";                                //$NON-NLS-1$
    public static final String Import_UI_Easy_Fancy                       = "import-ui-easy-fancy.svg";                            //$NON-NLS-1$
-   public static final String Import_UI_Easy_Fancy_Disabled              = "import-ui-easy-fancy-disabled.svg";                   //$NON-NLS-1$
    public static final String Import_UI_Easy_Simple                      = "import-ui-easy-simple.svg";                           //$NON-NLS-1$
-   public static final String Import_UI_Easy_Simple_Disabled             = "import-ui-easy-simple-disabled.svg";                  //$NON-NLS-1$
    public static final String Import_UI_Fossil                           = "import-ui-fossil.svg";                                //$NON-NLS-1$
-   public static final String Import_UI_Fossil_Disabled                  = "import-ui-fossil-disabled.svg";                       //$NON-NLS-1$
    public static final String Map                                        = "map.png";                                             //$NON-NLS-1$
    public static final String Map2                                       = "map2-view.svg";                                       //$NON-NLS-1$
    public static final String Map25                                      = "map25-view.svg";                                      //$NON-NLS-1$
@@ -175,7 +172,6 @@ public class Images {
    public static final String MapProvider                                = "change-map-provider.png";                             //$NON-NLS-1$
    public static final String MergeTours                                 = "merge-tours.svg";                                     //$NON-NLS-1$
    public static final String ModelPlayer                                = "model-player.svg";                                    //$NON-NLS-1$
-   public static final String MyTourbook                                 = "tourbook.svg";                                        //$NON-NLS-1$
    public static final String PhotoGallery_Horizontal                    = "photo-gallery-horizontal.png";                        //$NON-NLS-1$
    public static final String PhotoGallery_Vertical                      = "photo-gallery-vertical.png";                          //$NON-NLS-1$
    public static final String PhotoImage                                 = "photo-image.svg";                                     //$NON-NLS-1$
@@ -206,9 +202,7 @@ public class Images {
    public static final String RawData_TransferDirect                     = "device-synchronize-direct.svg";                       //$NON-NLS-1$
    public static final String RefTour                                    = "tour-map-reftour.png";                                //$NON-NLS-1$
    public static final String RefTour_Layout_Flat                        = "reftour-layout-flat.svg";                             //$NON-NLS-1$
-   public static final String RefTour_Layout_Flat_Disabled               = "reftour-layout-flat-disabled.svg";                    //$NON-NLS-1$
    public static final String RefTour_Layout_Hierarchical                = "reftour-layout-hierarchical.svg";                     //$NON-NLS-1$
-   public static final String RefTour_Layout_Hierarchical_Disabled       = "reftour-layout-hierarchical-disabled.svg";            //$NON-NLS-1$
    public static final String RefTour_New                                = "reftour-new.svg";                                     //$NON-NLS-1$
    public static final String RefTour_Statistic_Show_All_Values          = "ref-tour-statistic-show-all-values.png";              //$NON-NLS-1$
    public static final String RestoreTags                                = "restore-tour.png";                                    //$NON-NLS-1$
@@ -290,9 +284,7 @@ public class Images {
    public static final String Tag_Root                                   = "tag-root.svg";                                        //$NON-NLS-1$
    public static final String TagFilter_NoTours                          = "tour-tag-filter-no-tags.png";                         //$NON-NLS-1$
    public static final String TagLayout_Flat                             = "tag-layout-flat.svg";                                 //$NON-NLS-1$
-   public static final String TagLayout_Flat_Disabled                    = "tag-layout-flat-disabled.svg";                        //$NON-NLS-1$
    public static final String TagLayout_Hierarchical                     = "tag-layout-hierarchical.svg";                         //$NON-NLS-1$
-   public static final String TagLayout_Hierarchical_Disabled            = "tag-layout-hierarchical-disabled.svg";                //$NON-NLS-1$
    public static final String TagsChecked                                = "tags-checked.png";                                    //$NON-NLS-1$
    public static final String TagsChecked_Disabled                       = "tags-checked-disabled.png";                           //$NON-NLS-1$
    public static final String Tour_Duplicate                             = "tour-duplicate.svg";                                  //$NON-NLS-1$
@@ -355,15 +347,10 @@ public class Images {
    public static final String ZeroValues                                 = "app-zero-values.png";                                 //$NON-NLS-1$
    public static final String ZeroValues_Disabled                        = "app-zero-values-disabled.png";                        //$NON-NLS-1$
    public static final String Zoom_CenterBy_Map                          = "zoom-center-map.png";                                 //$NON-NLS-1$
-   public static final String Zoom_CenterBy_Map_Disabled                 = "zoom-center-map-disabled.png";                        //$NON-NLS-1$
    public static final String Zoom_CenterBy_Mouse                        = "zoom-center-mouse.png";                               //$NON-NLS-1$
-   public static final String Zoom_CenterBy_Mouse_Disabled               = "zoom-center-mouse-disabled.png";                      //$NON-NLS-1$
    public static final String Zoom_CenterBy_Tour                         = "zoom-center-tour.png";                                //$NON-NLS-1$
-   public static final String Zoom_CenterBy_Tour_Disabled                = "zoom-center-tour-disabled.png";                       //$NON-NLS-1$
    public static final String Zoom_In                                    = "zoom-in.svg";                                         //$NON-NLS-1$
-   public static final String Zoom_In_Disabled                           = "zoom-in-disabled.svg";                                //$NON-NLS-1$
    public static final String Zoom_Out                                   = "zoom-out.svg";                                        //$NON-NLS-1$
-   public static final String Zoom_Out_Disabled                          = "zoom-out-disabled.svg";                               //$NON-NLS-1$
    public static final String Zoom_ShowEntireLayer                       = "map-show-entire-layer.png";                           //$NON-NLS-1$
    public static final String Zoom_ShowEntireMap                         = "zoom-show-entire-map.png";                            //$NON-NLS-1$
    public static final String Zoom_ShowEntireTour                        = "zoom-show-entire-tour.png";                           //$NON-NLS-1$

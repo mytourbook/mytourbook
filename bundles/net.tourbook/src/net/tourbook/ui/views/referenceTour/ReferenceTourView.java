@@ -2350,7 +2350,6 @@ public class ReferenceTourView extends ViewPart implements
          _action_ToggleRefTourLayout.setToolTipText(Messages.Elevation_Compare_Action_Layout_WithoutYearCategories_Tooltip);
 
          _action_ToggleRefTourLayout.setImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.RefTour_Layout_Flat));
-         _action_ToggleRefTourLayout.setDisabledImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.RefTour_Layout_Flat_Disabled));
 
       } else {
 
@@ -2359,7 +2358,6 @@ public class ReferenceTourView extends ViewPart implements
          _action_ToggleRefTourLayout.setToolTipText(Messages.Elevation_Compare_Action_Layout_WithYearCategories_Tooltip);
 
          _action_ToggleRefTourLayout.setImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.RefTour_Layout_Hierarchical));
-         _action_ToggleRefTourLayout.setDisabledImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.RefTour_Layout_Hierarchical_Disabled));
       }
    }
 

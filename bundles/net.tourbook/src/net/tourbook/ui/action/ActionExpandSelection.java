@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2024 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2025 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -42,7 +42,6 @@ public class ActionExpandSelection extends Action {
       setText(Messages.app_action_expand_selection_tooltip);
 
       setImageDescriptor(CommonActivator.getThemedImageDescriptor(CommonImages.App_ExpandAll));
-      setDisabledImageDescriptor(CommonActivator.getThemedImageDescriptor(CommonImages.App_ExpandAll_Disabled));
    }
 
    /**

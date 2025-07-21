@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2025 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -35,7 +35,6 @@ public class ActionZoomIn extends Action {
       setToolTipText(Messages.Map_Action_ZoomIn_Tooltip);
 
       setImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.Zoom_In));
-      setDisabledImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.Zoom_In_Disabled));
    }
 
    @Override

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2024 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2025 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -7568,14 +7568,12 @@ public class RawDataView extends ViewPart implements
       case EASY_IMPORT_FANCY:
 
          _actionToggleImportUI.setImageDescriptor(          TourbookPlugin.getThemedImageDescriptor(Images.Import_UI_Easy_Fancy));
-         _actionToggleImportUI.setDisabledImageDescriptor(  TourbookPlugin.getThemedImageDescriptor(Images.Import_UI_Easy_Fancy_Disabled));
 
          break;
 
       case EASY_IMPORT_SIMPLE:
 
          _actionToggleImportUI.setImageDescriptor(          TourbookPlugin.getThemedImageDescriptor(Images.Import_UI_Easy_Simple));
-         _actionToggleImportUI.setDisabledImageDescriptor(  TourbookPlugin.getThemedImageDescriptor(Images.Import_UI_Easy_Simple_Disabled));
 
          break;
 
@@ -7583,7 +7581,6 @@ public class RawDataView extends ViewPart implements
       default:
 
          _actionToggleImportUI.setImageDescriptor(          TourbookPlugin.getThemedImageDescriptor(Images.Import_UI_Fossil));
-         _actionToggleImportUI.setDisabledImageDescriptor(  TourbookPlugin.getThemedImageDescriptor(Images.Import_UI_Fossil_Disabled));
 
          break;
       }

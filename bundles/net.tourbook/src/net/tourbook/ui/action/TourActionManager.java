@@ -137,7 +137,7 @@ public class TourActionManager {
             ActionEditTour.class.getName(),
             Messages.App_Action_edit_tour,
             TourbookPlugin.getThemedImageDescriptor(Images.EditTour),
-            TourbookPlugin.getImageDescriptor(Images.EditTour_Disabled),
+            null,
             TourActionCategory.EDIT);
 
       final TourAction actionOpenMarkerDialog            = new TourAction(

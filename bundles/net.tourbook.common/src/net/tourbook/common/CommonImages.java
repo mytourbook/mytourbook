@@ -26,13 +26,11 @@ public class CommonImages {
    public static final String App_Copy                     = "app-copy.png";                              //$NON-NLS-1$
    public static final String App_Copy_Disabled            = "app-copy-disabled.png";                     //$NON-NLS-1$
    public static final String App_CollapseAll              = "collapseall.svg";                           //$NON-NLS-1$
-   public static final String App_CollapseAll_Disabled     = "collapseall-disabled.svg";                  //$NON-NLS-1$
    public static final String App_Delete                   = "app-delete.svg";                            //$NON-NLS-1$
    public static final String App_Download                 = "app-download.png";                          //$NON-NLS-1$
    public static final String App_Download_Disabled        = "app-download-disabled.png";                 //$NON-NLS-1$
    public static final String App_EmptyIcon_Placeholder    = "_empty16.png";                              //$NON-NLS-1$
    public static final String App_ExpandAll                = "expandall.svg";                             //$NON-NLS-1$
-   public static final String App_ExpandAll_Disabled       = "expandall-disabled.svg";                    //$NON-NLS-1$
    public static final String App_Filter                   = "app-filter.png";                            //$NON-NLS-1$
    public static final String App_Filter_Disabled          = "app-filter-disabled.png";                   //$NON-NLS-1$
    public static final String App_KeepOpen                 = "app-keep-open.svg";                         //$NON-NLS-1$
@@ -46,7 +44,6 @@ public class CommonImages {
    public static final String App_Move_Down_2x             = "app-move-down-2x.png";                      //$NON-NLS-1$
    public static final String App_Options                  = "options.svg";                               //$NON-NLS-1$
    public static final String App_Paste                    = "app-paste.png";                             //$NON-NLS-1$
-   public static final String App_Paste_Disabled           = "app-paste-disabled.png";                    //$NON-NLS-1$
    public static final String App_Pin                      = "app-pin.svg";                               //$NON-NLS-1$
    public static final String App_Refresh                  = "refresh.svg";                               //$NON-NLS-1$
    public static final String App_Refresh_All              = "refresh-all.svg";                           //$NON-NLS-1$
