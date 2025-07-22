@@ -74,26 +74,18 @@
       <!-- Eclipse E4 web repository -->
       
       <repository>
-         <id>eclipse.platform.4.36</id>                                 <layout>p2</layout>
+         <id>eclipse.platform.4.36</id>                                                <layout>p2</layout>
          <url>https://download.eclipse.org/releases/2025-06/202506111000/</url>
-         
-<!-- 
-         <id>eclipse.platform.4.28</id>                                 <layout>p2</layout>
-         <url>https://download.eclipse.org/releases/2023-06</url>
-         
-         <url>https://download.eclipse.org/eclipse/updates/4.24-I-builds/I20220525-1800/</url>
-         <url>https://download.eclipse.org/eclipse/updates/4.23-I-builds/I20220308-0310</url>
- -->
       </repository>   
 
       <repository>
-         <id>eclipse.nattable.2.5.0</id>                                <layout>p2</layout>
+         <id>eclipse.nattable.2.5.0</id>                                               <layout>p2</layout>
          <url>http://download.eclipse.org/nattable/releases/2.5.0/repository/</url>
       </repository> 
       
       <repository>
-         <id>eclipse.nebula.3.0.0</id>                                  <layout>p2</layout>
-         <url>https://download.eclipse.org/nebula/releases/3.0.0/</url>
+         <id>eclipse.nebula.3.1.1</id>                                                 <layout>p2</layout>
+         <url>https://download.eclipse.org/nebula/updates/release/3.1.1</url>
       </repository> 
       
       <!-- IMPORTANT: Keep that tag in a single line as it is commented out during the GitHub build -->
@@ -181,13 +173,14 @@
                <resolver>p2</resolver>
                <environments>
                   
-                  <environment>   <os>win32</os>      <ws>win32</ws>    <arch>x86_64</arch>      </environment>
+                  <environment>   <os>win32</os>      <ws>win32</ws>    <arch>x86_64</arch>     </environment>
+                  <environment>   <os>win32</os>      <ws>win32</ws>    <arch>aarch64</arch>    </environment>
 
-                  <environment>   <os>linux</os>      <ws>gtk</ws>      <arch>x86_64</arch>      </environment>
-                  <environment>   <os>linux</os>      <ws>gtk</ws>      <arch>aarch64</arch>     </environment>
+                  <environment>   <os>linux</os>      <ws>gtk</ws>      <arch>x86_64</arch>     </environment>
+                  <environment>   <os>linux</os>      <ws>gtk</ws>      <arch>aarch64</arch>    </environment>
                   
-                  <environment>   <os>macosx</os>     <ws>cocoa</ws>    <arch>x86_64</arch>      </environment>
-                  <environment>   <os>macosx</os>     <ws>cocoa</ws>    <arch>aarch64</arch>     </environment>
+                  <environment>   <os>macosx</os>     <ws>cocoa</ws>    <arch>x86_64</arch>     </environment>
+                  <environment>   <os>macosx</os>     <ws>cocoa</ws>    <arch>aarch64</arch>    </environment>
 
                </environments>
             </configuration>

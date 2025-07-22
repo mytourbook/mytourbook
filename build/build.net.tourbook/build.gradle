@@ -138,7 +138,7 @@ task mt_40_ExtractWinFiles {
 
       println 'Extracting from ' + _dirProductArchive
 
-      file(_dirProductArchive).eachFileMatch(~/.*win.*.zip/) { winZipFile->
+      file(_dirProductArchive).eachFileMatch(~/.*win.*x86.*.zip/) { winZipFile->
 
          def winZipFileName   = winZipFile.name
          def winZipName       = winZipFileName.take(winZipFileName.lastIndexOf('.'))
@@ -200,9 +200,7 @@ task mt_60_CleanupFiles {
       */
       println 'Deleting extracted files'
       
-      def hiddenDir = file(_pathProductArchive + '/hidden')
-      
-      file(_dirProductArchive).eachFileMatch(~/.*win.*.zip/) { winZipFile->
+      file(_dirProductArchive).eachFileMatch(~/.*win.*x86.zip/) { winZipFile->
          
          def winZipFileName   = winZipFile.name
          def winZipName       = winZipFileName.take(winZipFileName.lastIndexOf('.'))
