@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2024 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2025 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -186,11 +186,22 @@ public abstract class AbstractRRShell {
       /*
        * copy NoResize shell image into the resize shell, to prevent flickering
        */
-      _otherShellImage = new Image(_display, otherClientAreaBounds);
+      _otherShellImage = new Image(
 
-      final GC gc = new GC(otherShell);
-      gc.copyArea(_otherShellImage, 0, 0);
-      gc.dispose();
+            _display,
+            otherClientAreaBounds.width,
+            otherClientAreaBounds.height);
+
+      final String propertyDisableImage = System.getProperty("debug.disable.reparent.image");
+
+      if (propertyDisableImage == null) {
+
+         // MT on Linux can crash
+
+         final GC gc = new GC(otherShell);
+         gc.copyArea(_otherShellImage, 0, 0);
+         gc.dispose();
+      }
 
       _shellBook.showPage(_pageReparentableImage);
 
