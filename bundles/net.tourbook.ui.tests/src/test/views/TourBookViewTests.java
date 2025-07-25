@@ -35,8 +35,11 @@ import net.tourbook.tour.TourLogManager;
 import org.eclipse.nebula.widgets.nattable.NatTable;
 import org.eclipse.nebula.widgets.nattable.viewport.command.ShowColumnInViewportCommand;
 import org.eclipse.swtbot.nebula.nattable.finder.widgets.SWTBotNatTable;
+import org.eclipse.swtbot.swt.finder.utils.SWTBotPreferences;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotToolbarToggleButton;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
+import org.junit.AfterClass;
+import org.junit.BeforeClass;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
@@ -45,6 +48,23 @@ import utils.UITest;
 import utils.Utils;
 
 public class TourBookViewTests extends UITest {
+
+   @AfterClass
+   public static void afterClass() {
+
+      // Reset the SWTBot timeout to the default value
+      SWTBotPreferences.TIMEOUT = 5000;
+   }
+
+   @BeforeClass
+   public static void beforeClass() {
+
+      // Because the https://render.com/ cloud subscription is free, we can experience
+      // the below caveat which can make the weather data retrieval tests fail:
+      // "Your free instance will spin down with inactivity, which can delay requests
+      // by 50 seconds or more"
+      SWTBotPreferences.TIMEOUT = 60000;
+   }
 
    @Test
    void adjustTourValues_RetrieveWeatherData_OpenWeatherMap() {
