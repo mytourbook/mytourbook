@@ -2,7 +2,7 @@
 <feature
       id       ="feature.net.tourbook.jre"
       label    ="Eclipse Temurin by Adoptium - OpenJDK 17"
-      version  ="17.0.8.qualifier"
+      version  ="21.0.8.qualifier"
       plugin   ="net.tourbook.branding">
 
    <description url="https://adoptium.net/">

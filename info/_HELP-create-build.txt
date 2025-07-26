@@ -15,7 +15,7 @@ AND REVIEW IT MANUALLY IN ALL MODIFIED FILES, subversions must not be modified e
 
 
 #####################################
- One Click build process (since 18.1)
+ Java Update
 #####################################
 
 * Set java path in C:\Users\Wolfgang\.gradle\gradle.properties
