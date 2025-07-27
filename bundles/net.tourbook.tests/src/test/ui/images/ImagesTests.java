@@ -34,7 +34,7 @@ public class ImagesTests {
    @Test
    void checkImages_Common() throws IllegalAccessException {
 
-      System.out.println("\nMissing image files in %s\n".formatted(CommonImages.class.getName()));
+      System.out.println("\nMissing image files in %s\n".formatted(CommonImages.class.getName())); //$NON-NLS-1$
 
       String assertMessage = null;
 
@@ -53,7 +53,7 @@ public class ImagesTests {
                 * The created java code makes it easier to find failures when this code is copied
                 * into the java class
                 */
-               final String message = "   public static final String %-40s = \"%s\";".formatted(fieldName, imageFileName);
+               final String message = "   public static final String %-40s = \"%s\";".formatted(fieldName, imageFileName); //$NON-NLS-1$
 
                if (assertMessage == null) {
                   assertMessage = message;
@@ -74,7 +74,7 @@ public class ImagesTests {
    @Test
    void checkImages_Tourbook() throws IllegalAccessException {
 
-      System.out.println("\nMissing image files in %s\n".formatted(Images.class.getName()));
+      System.out.println("\nMissing image files in %s\n".formatted(Images.class.getName())); //$NON-NLS-1$
 
       String assertMessage = null;
 
@@ -93,7 +93,7 @@ public class ImagesTests {
                 * The created java code makes it easier to find failures when this code is copied
                 * into the java class
                 */
-               final String message = "   public static final String %-40s = \"%s\";".formatted(fieldName, imageFileName);
+               final String message = "   public static final String %-40s = \"%s\";".formatted(fieldName, imageFileName); //$NON-NLS-1$
 
                if (assertMessage == null) {
                   assertMessage = message;
