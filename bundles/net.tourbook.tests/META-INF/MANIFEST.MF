@@ -19,7 +19,7 @@ Bundle-ClassPath: .,
  HttpClientMock-1.0.0.jar,
  hamcrest-3.0.jar
 Bundle-Vendor: MyTourbook
-Bundle-RequiredExecutionEnvironment: JavaSE-17
+Bundle-RequiredExecutionEnvironment: JavaSE-21
 Import-Package: com.fasterxml.jackson.core.type,
  com.fasterxml.jackson.databind,
  net.tourbook.cloud.oauth2,

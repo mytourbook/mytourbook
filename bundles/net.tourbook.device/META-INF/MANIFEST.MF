@@ -24,7 +24,7 @@ Export-Package: net.tourbook.device,
  net.tourbook.device.suunto,
  net.tourbook.device.tur
 Bundle-Vendor: MyTourbook
-Bundle-RequiredExecutionEnvironment: JavaSE-17
+Bundle-RequiredExecutionEnvironment: JavaSE-21
 Import-Package: de.byteholder.geoclipse.map,
  net.tourbook,
  net.tourbook.application,

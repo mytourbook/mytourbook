@@ -7,6 +7,6 @@ Bundle-ClassPath: RXTXcomm.jar
 Bundle-Localization: plugin
 Export-Package: gnu.io
 Bundle-Vendor: %Bundle-Vendor
-Bundle-RequiredExecutionEnvironment: JavaSE-17
+Bundle-RequiredExecutionEnvironment: JavaSE-21
 Bundle-ActivationPolicy: lazy
 Automatic-Module-Name: net.tourbook.ext.rxtx_2.2

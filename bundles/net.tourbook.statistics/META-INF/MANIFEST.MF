@@ -12,7 +12,7 @@ Require-Bundle: org.eclipse.ui,
  net.tourbook.common
 Bundle-ActivationPolicy: lazy
 Bundle-Vendor: %Bundle-Vendor
-Bundle-RequiredExecutionEnvironment: JavaSE-17
+Bundle-RequiredExecutionEnvironment: JavaSE-21
 Import-Package: net.tourbook,
  net.tourbook.application,
  net.tourbook.chart,

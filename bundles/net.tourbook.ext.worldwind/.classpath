@@ -3,9 +3,9 @@
 	<classpathentry exported="true" kind="lib" path="gdal.jar"/>
 	<classpathentry exported="true" kind="lib" path="gluegen-rt.jar"/>
 	<classpathentry exported="true" kind="lib" path="jogl-all.jar"/>
-	<classpathentry exported="true" kind="lib" path="worldwind.jar" sourcepath="/WorldWindJava/src"/>
-	<classpathentry exported="true" kind="lib" path="worldwindx.jar" sourcepath="/net.tourbook.ext.worldwind_src/src"/>
+	<classpathentry exported="true" kind="lib" path="worldwind.jar"		sourcepath="/WorldWindJava/src"/>
+	<classpathentry exported="true" kind="lib" path="worldwindx.jar" 		sourcepath="/net.tourbook.ext.worldwind_src/src"/>
 	<classpathentry kind="con" path="org.eclipse.pde.core.requiredPlugins"/>
-	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-17"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-21"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

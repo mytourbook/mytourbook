@@ -12,7 +12,7 @@ Require-Bundle: org.eclipse.core.runtime,
  net.tourbook
 Bundle-ActivationPolicy: lazy
 Bundle-Vendor: MyTourbook
-Bundle-RequiredExecutionEnvironment: JavaSE-17
+Bundle-RequiredExecutionEnvironment: JavaSE-21
 Bundle-ClassPath: .,
  dropbox-core-sdk-7.0.0.jar,
  java-fs-dropbox-0.1.0.jar,

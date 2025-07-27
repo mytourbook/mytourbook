@@ -182,5 +182,5 @@ Export-Package: com.fasterxml.jackson.annotation,
  org.json,
  org.shredzone.commons.suncalc,
  org.shredzone.commons.suncalc.param
-Bundle-RequiredExecutionEnvironment: JavaSE-17
+Bundle-RequiredExecutionEnvironment: JavaSE-21
 Automatic-Module-Name: net.tourbook.ext.jars
