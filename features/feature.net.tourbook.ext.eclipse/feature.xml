@@ -23,9 +23,7 @@
       <import plugin="org.eclipse.e4.ui.css.swt"/>
       <import plugin="org.eclipse.equinox.common"/>
       <import plugin="org.eclipse.equinox.preferences"/>
-      <import plugin="org.eclipse.equinox.security"/>
       <import plugin="org.eclipse.equinox.registry"/>
-      <import plugin="org.eclipse.equinox.security.ui"/>
       <import plugin="org.eclipse.jface"/>
       <import plugin="org.eclipse.osgi"/>
       <import plugin="org.eclipse.ui"/>
@@ -40,13 +38,6 @@
 
    <plugin
          id="org.eclipse.core.net"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
-
-   <plugin
-         id="org.eclipse.equinox.security"
          download-size="0"
          install-size="0"
          version="0.0.0"
