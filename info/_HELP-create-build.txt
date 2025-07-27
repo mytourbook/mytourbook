@@ -37,6 +37,28 @@ Setup the graddle wrapper in the build folder:
    gradlew wrapper --gradle-version 8.2.1
 
 
+
+
+#############
+Build Product
+#############
+
+   Copy/Merge app files to build folder
+   
+      Run ant script "CREATE_MT_BuildFiles.xml" in project "build.net.tourbook"
+
+   Open cmd
+   
+      - Select folder "C:\DAT\MT\mytourbook"
+   
+      - Run "mvn verify -P build-release"
+   
+      - Run "mvn verify -P build-release -X --log-file ../log.txt"      this will log into a file
+
+        OR run "build-MT-with-log-file.cmd" in "C:\DAT\MT\mytourbook\build\build.net.tourbook"
+
+
+
 #################
  Build VTM Plugin
 #################
@@ -88,6 +110,9 @@ Setup the graddle wrapper in the build folder:
 
 
 ###########################
+ 
+ OUTDATED 27.7.2025
+ 
  Update Eclipse NL repo
 ###########################
 
@@ -169,25 +194,6 @@ Remove debug code
    
      Disable   "<win32>config-win-DEBUG.ini</win32>"
      Enable   "<win32>config-win.ini</win32>"
-
-
-#############
-Build Product
-#############
-
-   Copy/Merge app files to build folder
-   
-      Run ant script "CREATE_MT_BuildFiles.xml" in project "build.net.tourbook"
-
-   Open cmd
-   
-      - Select folder "C:\DAT\MT\mytourbook"
-   
-      - Run "mvn verify -P build-release"
-   
-      - Run "mvn verify -P build-release -X --log-file ../log.txt"      this will log into a file
-
-        OR run "build-MT-with-log-file.cmd" in "C:\DAT\MT\mytourbook\build\build.net.tourbook"
 
 
 #################

@@ -17,14 +17,22 @@
    <properties>
 
 <!-- 
-      These file url was found in https://github.com/adoptium/api.adoptium.net/blob/main/docs/cookbook.adoc      
+      These file url was found in 
+      https://github.com/adoptium/api.adoptium.net/blob/main/docs/cookbook.adoc      
       
+      The file url can be create in
+      https://api.adoptium.net/q/swagger-ui/
+      
+      See also wiki https://github.com/mytourbook/mytourbook/wiki/Download-JRE-for-Maven
+      
+      <url.win32.x86_64>https://api.adoptium.net/v3/binary/latest/21/ga/windows/x64/jre/hotspot/normal/eclipse</url.win32.x86_64>
+
       <url.win32.x86_64>https://api.adoptium.net/v3/binary/version/21.0.8%2B9/windows/x64/jre/hotspot/normal/eclipse</url.win32.x86_64>
  -->
       
       <java-version>21.0.8+9</java-version>
 
-      <url.win32.x86_64>https://api.adoptium.net/v3/binary/latest/21/ga/windows/x64/jre/hotspot/normal/eclipse</url.win32.x86_64>
+      <url.win32.x86_64>https://api.adoptium.net/v3/binary/version/jdk-21.0.8%2B9/windows/x64/jre/hotspot/normal/eclipse</url.win32.x86_64>
       
    </properties>
 

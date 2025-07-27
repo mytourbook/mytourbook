@@ -1,6 +1,9 @@
 25.8.0                                                 ?. August 2025
 
 
+!!! Jave 21 is required !!!
+
+
 New / Improvements
 ==================
 
