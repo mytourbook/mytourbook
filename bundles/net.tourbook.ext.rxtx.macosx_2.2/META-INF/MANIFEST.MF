@@ -6,4 +6,4 @@ Bundle-Version: 2.2.2.pre2
 Fragment-Host: net.tourbook.ext.rxtx_2.2;bundle-version="2.2.2"
 Bundle-Localization: plugin
 Bundle-Vendor: %Bundle-Vendor
-Bundle-RequiredExecutionEnvironment: JavaSE-17
+Bundle-RequiredExecutionEnvironment: JavaSE-21

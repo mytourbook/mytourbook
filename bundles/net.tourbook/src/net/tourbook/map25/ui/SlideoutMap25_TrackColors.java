@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2022 Wolfgang Schramm and Contributors
+ * Copyright (C) 2022, 2025 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -243,7 +243,7 @@ public class SlideoutMap25_TrackColors extends ToolbarSlideout implements IMap3C
             }
          };
 
-         _actionAddColor.setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.App_Add));
+         _actionAddColor.setImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.App_Add));
          _actionAddColor.setToolTipText(MAP3_SELECT_COLOR_DIALOG_ACTION_ADD_COLOR_TOOLTIP);
       }
       {

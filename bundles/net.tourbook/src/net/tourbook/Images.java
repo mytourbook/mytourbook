@@ -61,12 +61,9 @@ public class Images {
    public static final String App_SequenceNumber                         = "app-sequence-number.png";                             //$NON-NLS-1$
    public static final String App_SequenceNumber_Disabled                = "app-sequence-number-disabled.png";                    //$NON-NLS-1$
    public static final String App_Show                                   = "app-show.png";                                        //$NON-NLS-1$
-   public static final String App_Sort                                   = "app-sort.png";                                        //$NON-NLS-1$
-   public static final String App_Sort_Disabled                          = "app-sort-disabled.png";                               //$NON-NLS-1$
-   public static final String App_Today                                  = "today.png";                                           //$NON-NLS-1$
-   public static final String App_Today_Disabled                         = "today-disabled.png";                                  //$NON-NLS-1$
-   public static final String App_Trash                                  = "trash.png";                                           //$NON-NLS-1$
-   public static final String App_Trash_Disabled                         = "trash-disabled.png";                                  //$NON-NLS-1$
+   public static final String App_Sort                                   = "app-sort.svg";                                        //$NON-NLS-1$
+   public static final String App_Today                                  = "today.svg";                                           //$NON-NLS-1$
+   public static final String App_Trash                                  = "trash.svg";                                           //$NON-NLS-1$
    public static final String App_Trash_Themed                           = "trash-blue.svg";                                      //$NON-NLS-1$
 
    public static final String AdjustElevation                            = "adjust-altitude.svg";                                 //$NON-NLS-1$
@@ -237,7 +234,6 @@ public class Images {
    public static final String SplinePoint                                = "spline-point.png";                                    //$NON-NLS-1$
    public static final String State_AdjustTemperature                    = "state-temperature.svg";                               //$NON-NLS-1$
    public static final String State_Copy                                 = "state-copy.png";                                      //$NON-NLS-1$
-   public static final String State_Delete                               = "state-delete.svg";                                    //$NON-NLS-1$
    public static final String State_DeletedTour_View                     = "state-deleted-tour-view.png";                         //$NON-NLS-1$
    public static final String State_Deleted_Backup                       = "state-delete-backup.png";                             //$NON-NLS-1$
    public static final String State_Deleted_Device                       = "state-delete-device.png";                             //$NON-NLS-1$
@@ -293,8 +289,8 @@ public class Images {
    public static final String TourBlog                                   = "tour-blog.svg";                                       //$NON-NLS-1$
    public static final String TourBook_Month                             = "tourbook-month.svg";                                  //$NON-NLS-1$
    public static final String TourBook_NatTable                          = "tourbook-nattable.svg";                               //$NON-NLS-1$
-   public static final String TourBook_SelectAll                         = "tourbook-select-all.svg";                             //$NON-NLS-1$
    public static final String TourBook_Week                              = "tourbook-week.svg";                                   //$NON-NLS-1$
+   public static final String TourBook_SelectAll                         = "tourbook-select-all.svg";                             //$NON-NLS-1$
    public static final String TourChart                                  = "tour-chart.svg";                                      //$NON-NLS-1$
    public static final String TourCompare_Timeline_Elevation             = "tour-compare-timeline-elevation.svg";                 //$NON-NLS-1$
    public static final String TourCompare_Timeline_Geo                   = "tour-compare-timeline-geo.svg";                       //$NON-NLS-1$

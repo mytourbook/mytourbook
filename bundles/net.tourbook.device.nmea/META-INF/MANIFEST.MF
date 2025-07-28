@@ -8,7 +8,7 @@ Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.ui,
  net.tourbook
 Bundle-ActivationPolicy: lazy
-Bundle-RequiredExecutionEnvironment: JavaSE-17
+Bundle-RequiredExecutionEnvironment: JavaSE-21
 Bundle-Vendor: MyTourbook
 Import-Package: com.skedgo.converter,
  net.tourbook.common.util,

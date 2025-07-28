@@ -15,6 +15,7 @@
  *******************************************************************************/
 package net.tourbook.application;
 
+import java.lang.reflect.Method;
 import java.net.Authenticator;
 import java.net.PasswordAuthentication;
 import java.net.ProxySelector;
@@ -70,7 +71,9 @@ import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.equinox.internal.p2.ui.sdk.P2_Activator;
 import org.eclipse.jface.dialogs.MessageDialog;
+import org.eclipse.jface.preference.IPreferenceNode;
 import org.eclipse.jface.preference.IPreferenceStore;
+import org.eclipse.jface.preference.PreferenceManager;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.graphics.Point;
@@ -491,6 +494,70 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
       });
    }
 
+   private IPreferenceNode prefPages_GetRoot(final PreferenceManager pm) {
+
+      try {
+
+         final Method method = PreferenceManager.class.getDeclaredMethod("getRoot", (Class[]) null); //$NON-NLS-1$
+
+         method.setAccessible(true);
+
+         return (IPreferenceNode) method.invoke(pm);
+
+      } catch (final Exception e) {
+
+         StatusUtil.log("Could not get the root node for the preferences, and will not be able to prune unwanted prefs pages", e); //$NON-NLS-1$
+      }
+
+      return null;
+   }
+
+   private void prefPages_LogPrefsNode(final IPreferenceNode prefNode, final int level) {
+
+      final StringBuilder sbIndent = new StringBuilder();
+      for (int i = 0; i < level; i++) {
+         sbIndent.append(UI.SPACE3);
+      }
+
+      System.out.println(UI.timeStamp() + " %-70s  %s%s ".formatted( //$NON-NLS-1$
+
+            prefNode.getId(),
+            sbIndent.toString(),
+            prefNode.getLabelText()
+
+      ));
+   }
+
+   private void prefPages_Remove(final IPreferenceNode root, final String id, final int level) {
+
+      for (final IPreferenceNode node : root.getSubNodes()) {
+
+         prefPages_LogPrefsNode(node, level);
+
+         if (node.getId().equals(id)) {
+
+            root.remove(node);
+
+            StatusUtil.logInfo("Removed preference page '%s' (ID:%s)".formatted(node.getLabelText(), node.getId())); //$NON-NLS-1$
+
+         } else {
+
+            prefPages_Remove(node, id, level + 1);
+         }
+      }
+   }
+
+   /**
+    * Source: https://hirt.se/blog/?p=171
+    */
+   private void prefPages_RemoveUnwantedPreferencesPages() {
+
+      final PreferenceManager pm = PlatformUI.getWorkbench().getPreferenceManager();
+      final IPreferenceNode root = prefPages_GetRoot(pm);
+
+      prefPages_Remove(root, "org.eclipse.equinox.security.ui.category", 0); //$NON-NLS-1$
+   }
+
    @Override
    public void preWindowOpen() {
 
@@ -506,6 +573,8 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
 //		configurer.setShowStatusLine(false);
 
       configurer.setTitle(_appTitle);
+
+      prefPages_RemoveUnwantedPreferencesPages();
 
       final IPreferenceStore uiPrefStore = PlatformUI.getPreferenceStore();
 

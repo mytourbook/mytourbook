@@ -29,9 +29,8 @@
          id="feature.net.tourbook.ext.eclipse"
          version="0.0.0"/>
 
-   <!-- IMPORTANT: Keep that tag in a single line as it is commented out during the GitHub build 
+   <!-- IMPORTANT: Keep that tag in a single line as it is commented out during the GitHub build -->
    <includes id="feature.net.tourbook.ext.eclipse.nl" version="0.0.0"/>
-   -->
 
    <includes
          id="feature.net.tourbook.app"

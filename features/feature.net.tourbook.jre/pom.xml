@@ -5,7 +5,7 @@
    <modelVersion>4.0.0</modelVersion>
    
    <artifactId>feature.net.tourbook.jre</artifactId>           <groupId>net.tourbook</groupId>
-                                                               <version>17.0.8-SNAPSHOT</version>
+                                                               <version>21.0.8-SNAPSHOT</version>
    <packaging>eclipse-feature</packaging>
 
    <parent>
@@ -15,18 +15,25 @@
    </parent>
 
    <properties>
+
 <!-- 
-      <url.linux.x86_64> https://github.com/AdoptOpenJDK/openjdk11-binaries/releases/download/jdk-11.0.7%2B10/OpenJDK11U-jre_x64_linux_hotspot_11.0.7_10.tar.gz</url.linux.x86_64>
-      <url.macosx.x86_64>https://github.com/AdoptOpenJDK/openjdk11-binaries/releases/download/jdk-11.0.7%2B10/OpenJDK11U-jre_x64_mac_hotspot_11.0.7_10.tar.gz</url.macosx.x86_64>
-      <url.win32.x86_64> https://github.com/adoptium/temurin11-binaries/releases/download/jdk-11.0.13%2B8/OpenJDK11U-jre_x64_windows_hotspot_11.0.13_8.zip</url.win32.x86_64>
-
-      These file url's are retrieved from the adoptium download site by closing the download save dialog
+      These file url was found in 
+      https://github.com/adoptium/api.adoptium.net/blob/main/docs/cookbook.adoc      
       
+      The file url can be create in
+      https://api.adoptium.net/q/swagger-ui/
+      
+      See also wiki https://github.com/mytourbook/mytourbook/wiki/Download-JRE-for-Maven
+      
+      <url.win32.x86_64>https://api.adoptium.net/v3/binary/latest/21/ga/windows/x64/jre/hotspot/normal/eclipse</url.win32.x86_64>
+
+      <url.win32.x86_64>https://api.adoptium.net/v3/binary/version/21.0.8%2B9/windows/x64/jre/hotspot/normal/eclipse</url.win32.x86_64>
  -->
-
-      <url.win32.x86_64>https://github.com/adoptium/temurin17-binaries/releases/download/jdk-17.0.8%2B7/OpenJDK17U-jre_x64_windows_hotspot_17.0.8_7.zip</url.win32.x86_64>
       
-      <dir-version>17.0.8+7</dir-version>
+      <java-version>21.0.8+9</java-version>
+
+      <url.win32.x86_64>https://api.adoptium.net/v3/binary/version/jdk-21.0.8%2B9/windows/x64/jre/hotspot/normal/eclipse</url.win32.x86_64>
+      
    </properties>
 
    <build>
@@ -87,6 +94,10 @@
                   <configuration>
                      <url>${url.win32.x86_64}</url>
                      <unpack>true</unpack>
+
+                     <!--  This name must be set, otherwise the archive has no extension and is not recognized as an archive -->
+                     <outputFileName>jre-latest.zip</outputFileName> 
+
                      <outputDirectory>${project.basedir}/win64</outputDirectory>
                      <overwrite>true</overwrite>
                   </configuration>
@@ -135,10 +146,10 @@
                   </goals>
                   <configuration>
                      <target>
-                        <move file="win64/jdk-${dir-version}-jre"    tofile="win64/jre" />
+                        <move file="win64/jdk-${java-version}-jre"    tofile="win64/jre" />
 <!-- 
-                        <move file="lnx64/jdk-${dir-version}-jre"    tofile="lnx64/jre" />
-                        <move file="osx64/jdk-${dir-version}-jre"    tofile="osx64/jre" />
+                        <move file="lnx64/jdk-${java-version}-jre"    tofile="lnx64/jre" />
+                        <move file="osx64/jdk-${java-version}-jre"    tofile="osx64/jre" />
  -->
                      </target>
                   </configuration>

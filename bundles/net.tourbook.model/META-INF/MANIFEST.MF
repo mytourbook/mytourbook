@@ -6,7 +6,7 @@ Bundle-Version: 25.8.0.qualifier
 Bundle-Activator: net.tourbook.model.ModelActivator
 Require-Bundle: org.eclipse.ui,
  org.eclipse.core.runtime
-Bundle-RequiredExecutionEnvironment: JavaSE-17
+Bundle-RequiredExecutionEnvironment: JavaSE-21
 Automatic-Module-Name: net.tourbook.model
 Bundle-ActivationPolicy: lazy
 Bundle-Vendor: MyTourbook

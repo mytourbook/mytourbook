@@ -1,6 +1,9 @@
 25.8.0                                                 ?. August 2025
 
 
+!!! Jave 21 is required !!!
+
+
 New / Improvements
 ==================
 
@@ -71,7 +74,7 @@ System
 ======
 
 * MyTourbook Milestone 25.8   https://github.com/mytourbook/mytourbook/milestone/26?closed=1
-* Java 17                     https://adoptium.net/temurin/releases/?version=17
+* Java 21                     https://adoptium.net/temurin/releases?version=21
 * Eclipse 2025-06 (4.36)      https://archive.eclipse.org/eclipse/downloads/drops4/R-4.36-202505281830/
 * NatTable 2.5.0              https://eclipse.dev/nattable/download
 * Nebula Widgets              https://download.eclipse.org/nebula/releases/latest

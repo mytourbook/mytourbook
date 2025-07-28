@@ -13,7 +13,7 @@ Require-Bundle: org.eclipse.core.runtime,
  net.tourbook.ext.jars.printing
 Bundle-ActivationPolicy: lazy
 Bundle-Vendor: MyTourbook
-Bundle-RequiredExecutionEnvironment: JavaSE-17
+Bundle-RequiredExecutionEnvironment: JavaSE-21
 Bundle-ClassPath: .
 Import-Package: net.tourbook.common,
  net.tourbook.common.util,

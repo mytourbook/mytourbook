@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2024 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2025 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -270,7 +270,7 @@ public class DialogSelectMap3Color extends AnimatedToolTipShell implements IMap3
             actionAddColor();
          }
       };
-      _actionAddColor.setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.App_Add));
+      _actionAddColor.setImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.App_Add));
       _actionAddColor.setToolTipText(Messages.Map3SelectColor_Dialog_Action_AddColor_Tooltip);
 
       /*

@@ -4,7 +4,7 @@ Bundle-Name: External jar's for printing
 Bundle-SymbolicName: net.tourbook.ext.jars.printing;singleton:=true
 Bundle-Version: 25.8.0.qualifier
 Bundle-Vendor: MyTourbook
-Bundle-RequiredExecutionEnvironment: JavaSE-17
+Bundle-RequiredExecutionEnvironment: JavaSE-21
 Bundle-ClassPath: 
  batik-all-1.15.jar,
  fop-2.8.jar,
