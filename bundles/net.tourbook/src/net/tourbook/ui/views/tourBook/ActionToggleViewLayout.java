@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2025 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -34,7 +34,7 @@ class ActionToggleViewLayout extends Action {
       super(null, AS_PUSH_BUTTON);
 
       setToolTipText(Messages.Tour_Book_Action_ToggleViewLayout_Tooltip);
-      setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.TourBook_Month));
+      setImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.TourBook_Month));
 
       _tourBookView = tourBookView;
    }

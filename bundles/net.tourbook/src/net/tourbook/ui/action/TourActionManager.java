@@ -418,7 +418,7 @@ public class TourActionManager {
       final TourAction actionDeleteTourMenu              = new TourAction(
             ActionDeleteTourMenu.class.getName(),
             Messages.Tour_Book_Action_delete_selected_tours_menu,
-            TourbookPlugin.getImageDescriptor(Images.State_Delete),
+            TourbookPlugin.getImageDescriptor(Images.App_Trash),
             null,
             TourActionCategory.ADJUST);
 

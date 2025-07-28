@@ -391,7 +391,7 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements IActionRe
          super(null, AS_PUSH_BUTTON);
 
          setToolTipText(Messages.Dialog_ImportConfig_Action_AddSpeed_Tooltip);
-         setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.App_Add));
+         setImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.App_Add));
       }
 
       @Override
@@ -411,7 +411,6 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements IActionRe
          setToolTipText(Messages.Dialog_ImportConfig_Action_RemoveSpeed_Tooltip);
 
          setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.App_Trash));
-         setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Images.App_Trash_Disabled));
       }
 
       @Override
@@ -468,7 +467,6 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements IActionRe
          setToolTipText(Messages.Dialog_ImportConfig_Action_SortBySpeed_Tooltip);
 
          setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.App_Sort));
-         setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Images.App_Sort_Disabled));
       }
 
       @Override
@@ -1897,7 +1895,7 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements IActionRe
                .grab(true, true)
                .span(2, 1)
                .indent(_leftPadding, 0)
-               
+
                // force minimum height
                .hint(SWT.DEFAULT, convertHeightInCharsToPixels(6))
                .applyTo(_pagebookTourType);
