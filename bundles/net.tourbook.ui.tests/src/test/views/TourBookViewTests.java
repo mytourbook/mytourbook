@@ -97,7 +97,7 @@ public class TourBookViewTests extends UITest {
 
       //Assert
       tour = Utils.selectDuplicatedTour(bot);
-      assertEquals("12:00 PM", tour.cell(tourBookView_StartTime_Column_Index)); //$NON-NLS-1$
+      assertEquals("12:00 PM", tour.cell(tourBookView_StartTime_Column_Index)); //$NON-NLS-1$
       assertEquals("US/Mountain", tour.cell(tourBookView_TimeZone_Column_Index)); //$NON-NLS-1$
 
       //Adjust the tour time zone to the default value set in the preferences
@@ -107,7 +107,7 @@ public class TourBookViewTests extends UITest {
 
       //Assert
       tour = Utils.selectDuplicatedTour(bot);
-      assertEquals("8:00 PM", tour.cell(tourBookView_StartTime_Column_Index)); //$NON-NLS-1$
+      assertEquals("8:00 PM", tour.cell(tourBookView_StartTime_Column_Index)); //$NON-NLS-1$
       assertEquals("Europe/Paris", tour.cell(tourBookView_TimeZone_Column_Index)); //$NON-NLS-1$
 
       Utils.deleteTour(bot, tour);
