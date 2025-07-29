@@ -161,7 +161,7 @@ public class StravaUploaderTests extends UITest {
             .called();
       final List<?> logs = TourLogManager.getLogs();
       assertTrue(logs.stream().map(log -> log.toString()).anyMatch(log -> log.contains(
-            "message      = 1/1/2005, 5:00 AM -> Uploaded Activity Link: <br><a href=\"https://www.strava.com/activities/6468063624\">https://www.strava.com/activities/6468063624</a></br>\n"))); //$NON-NLS-1$
+            "message      = 1/1/2005, 5:00 AM -> Uploaded Activity Link: <br><a href=\"https://www.strava.com/activities/6468063624\">https://www.strava.com/activities/6468063624</a></br>"))); //$NON-NLS-1$
 
       // Cleanup
       tour = Utils.selectManualTour(bot);
