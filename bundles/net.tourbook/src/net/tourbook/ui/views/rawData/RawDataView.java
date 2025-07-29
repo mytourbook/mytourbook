@@ -205,6 +205,7 @@ import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.ImageData;
 import org.eclipse.swt.graphics.PaletteData;
 import org.eclipse.swt.graphics.Rectangle;
+import org.eclipse.swt.internal.DPIUtil;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
@@ -4580,6 +4581,119 @@ public class RawDataView extends ViewPart implements
    }
 
    public Image getImportConfigImage(final ImportLauncher importConfig, final boolean isDarkTransparentColor) {
+
+      final int configImageWidth = (int) (importConfig.imageWidth * UI.HIDPI_SCALING);
+      final int ttImageSize = (int) (TourType.TOUR_TYPE_IMAGE_SIZE * UI.HIDPI_SCALING);
+
+      if (configImageWidth == 0) {
+         return null;
+      }
+
+      final long configId = importConfig.getId();
+      final String configImageId = Long.toString(configId) + UI.SPACE + Boolean.toString(isDarkTransparentColor);
+
+      Image configImage = _configImages.get(configImageId);
+
+      if (isConfigImageValid(configImage, importConfig, configImageId)) {
+         return configImage;
+      }
+
+      final Display display = _parent.getDisplay();
+
+      final Enum<TourTypeConfig> tourTypeConfig = importConfig.tourTypeConfig;
+
+      if (TourTypeConfig.TOUR_TYPE_CONFIG_BY_SPEED.equals(tourTypeConfig)) {
+
+         final ArrayList<SpeedTourType> speedVertices = importConfig.speedTourTypes;
+
+         final ImageData swtImageData = new ImageData(
+               configImageWidth,
+               ttImageSize,
+               24,
+               new PaletteData(0xFF0000, 0xFF00, 0xFF));
+
+         swtImageData.alphaData = new byte[configImageWidth * ttImageSize];
+
+         final Image tempImage = new Image(display, new NoAutoScalingImageDataProvider(swtImageData));
+         {
+            final GC gcTempImage = new GC(tempImage);
+            {
+               for (int speedIndex = 0; speedIndex < speedVertices.size(); speedIndex++) {
+
+                  final SpeedTourType vertex = speedVertices.get(speedIndex);
+
+                  final Image ttImage = TourTypeImage.getTourTypeImage(vertex.tourTypeId);
+
+                  gcTempImage.drawImage(ttImage,
+
+                        (int) ((ttImageSize * speedIndex)
+
+                              // fix autoscaling
+                              / UI.HIDPI_SCALING),
+                        0);
+               }
+            }
+            gcTempImage.dispose();
+
+            // convert into image data, the trick is to use the device zoom otherwise it is not working !!!
+            final ImageData tempImageData = tempImage.getImageData(DPIUtil.getDeviceZoom());
+
+            configImage = new Image(display, new NoAutoScalingImageDataProvider(tempImageData));
+         }
+         tempImage.dispose();
+
+      } else if (TourTypeConfig.TOUR_TYPE_CONFIG_ONE_FOR_ALL.equals(tourTypeConfig)) {
+
+         final TourType tourType = importConfig.oneTourType;
+
+         if (tourType != null) {
+
+            final ImageData swtImageData = new ImageData(
+                  ttImageSize,
+                  ttImageSize,
+                  24,
+                  new PaletteData(0xFF0000, 0xFF00, 0xFF));
+
+            swtImageData.alphaData = new byte[ttImageSize * ttImageSize];
+
+            final Image tempImage = new Image(display, new NoAutoScalingImageDataProvider(swtImageData));
+            {
+               /*
+                * Paint tour type image into the displayed image
+                */
+
+               final GC gcTempImage = new GC(tempImage);
+               {
+                  final Image ttImage = TourTypeImage.getTourTypeImage(tourType.getTypeId());
+                  gcTempImage.drawImage(ttImage, 0, 0);
+               }
+               gcTempImage.dispose();
+
+               // convert into image data, the trick is to use the device zoom otherwise it is not working !!!
+               final ImageData tempImageData = tempImage.getImageData(DPIUtil.getDeviceZoom());
+
+               configImage = new Image(display, new NoAutoScalingImageDataProvider(tempImageData));
+
+            }
+            tempImage.dispose();
+         }
+
+      } else {
+
+         // this is the default or TourTypeConfig.TOUR_TYPE_CONFIG_NOT_USED
+      }
+
+      // keep image in the cache
+      final Image oldImage = _configImages.put(configImageId, configImage);
+
+      UI.disposeResource(oldImage);
+
+      _configImageHash.put(configImageId, importConfig.imageHash);
+
+      return configImage;
+   }
+
+   public Image getImportConfigImage_NEW(final ImportLauncher importConfig, final boolean isDarkTransparentColor) {
 
       final int configImageWidth = importConfig.imageWidth;
       final int configImageWidthScaled = (int) (configImageWidth * UI.HIDPI_SCALING * UI.HIDPI_SCALING);
