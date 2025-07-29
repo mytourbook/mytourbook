@@ -192,6 +192,6 @@ public class StravaUploaderTests extends UITest {
       // Assert
       final List<?> logs = TourLogManager.getLogs();
       assertTrue(logs.stream().map(log -> log.toString()).anyMatch(log -> log.contains(
-            "message      = 1/31/2021, 7:15 AM -> Upload Id: \"6877121234\". Creation Activity Status: \"Your activity is still being processed.\"\n")));//$NON-NLS-1$
+            "message      = 1/31/2021, 7:15 AM -> Upload Id: \"6877121234\". Creation Activity Status: \"Your activity is still being processed.\"")));//$NON-NLS-1$
    }
 }
