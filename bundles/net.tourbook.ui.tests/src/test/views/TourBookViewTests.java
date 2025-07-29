@@ -87,7 +87,7 @@ public class TourBookViewTests extends UITest {
    void adjustTourValues_SetTimeZone_AllChoices() {
 
       SWTBotTreeItem tour = Utils.duplicateAndGetTour(bot);
-      assertEquals("11:00 AM", tour.cell(tourBookView_StartTime_Column_Index)); //$NON-NLS-1$
+      assertEquals("11:00 AM", tour.cell(tourBookView_StartTime_Column_Index)); //$NON-NLS-1$
       assertEquals("America/Los_Angeles", tour.cell(tourBookView_TimeZone_Column_Index)); //$NON-NLS-1$
 
       //Adjust the tour time zone
