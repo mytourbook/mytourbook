@@ -156,7 +156,6 @@ public class StatisticView extends ViewPart implements ITourProvider {
          setToolTipText(Messages.Tour_StatisticValues_Action_CopyIntoClipboard_Tooltip);
 
          setImageDescriptor(CommonActivator.getThemedImageDescriptor(CommonImages.App_Copy));
-         setDisabledImageDescriptor(CommonActivator.getThemedImageDescriptor(CommonImages.App_Copy_Disabled));
       }
 
       @Override

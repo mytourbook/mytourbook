@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2024 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2025 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -56,7 +56,6 @@ public class ActionMergeIntoMenu extends Action implements IMenuCreator {
       fRawDataView = rawDataView;
 
       setImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.Saved_MergedTour));
-      setDisabledImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.Saved_MergedTour_Disabled));
    }
 
    private void addActionToMenu(final Action action, final Menu menu) {

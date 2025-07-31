@@ -2701,16 +2701,16 @@ public class RawDataView extends ViewPart implements
       /*
        * Import state
        */
-      _images.put(IMAGE_STATE_DELETE,              TourbookPlugin.getImageDescriptor(Images.State_DeletedTour_View));
-      _images.put(IMAGE_STATE_MOVED,               TourbookPlugin.getImageDescriptor(Images.State_MovedTour_View));
+      _images.put(IMAGE_STATE_DELETE,              TourbookPlugin.getImageDescriptor      (Images.State_DeletedTour_View));
+      _images.put(IMAGE_STATE_MOVED,               TourbookPlugin.getImageDescriptor      (Images.State_MovedTour_View));
 
       /*
        * Data transfer
        */
-      _images.put(IMAGE_DATA_TRANSFER,             TourbookPlugin.getImageDescriptor(Images.RawData_Transfer));
-      _images.put(IMAGE_DATA_TRANSFER_DIRECT,      TourbookPlugin.getImageDescriptor(Images.RawData_TransferDirect));
-      _images.put(IMAGE_IMPORT_FROM_FILES,         TourbookPlugin.getImageDescriptor(Images.Import_Files));
-      _images.put(IMAGE_NEW_UI,                    TourbookPlugin.getImageDescriptor(Images.Import_DashboardUI));
+      _images.put(IMAGE_DATA_TRANSFER,             TourbookPlugin.getImageDescriptor      (Images.RawData_Transfer));
+      _images.put(IMAGE_DATA_TRANSFER_DIRECT,      TourbookPlugin.getImageDescriptor      (Images.RawData_TransferDirect));
+      _images.put(IMAGE_IMPORT_FROM_FILES,         TourbookPlugin.getImageDescriptor      (Images.Import_Files));
+      _images.put(IMAGE_NEW_UI,                    TourbookPlugin.getThemedImageDescriptor(Images.Import_DashboardUI));
 
       /*
        * Simple easy UI
@@ -2899,7 +2899,7 @@ public class RawDataView extends ViewPart implements
       final Composite container = new Composite(parent, SWT.NONE);
       GridDataFactory.fillDefaults().grab(true, true).applyTo(container);
       GridLayoutFactory.swtDefaults().numColumns(2).applyTo(container);
-//      container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_BLUE));
+//      container.setBackground(UI.SYS_COLOR_GREEN);
       {
          {
             /*
@@ -2994,8 +2994,9 @@ public class RawDataView extends ViewPart implements
             label.setText(Messages.Import_Data_OldUI_Label_Hint);
             GridDataFactory.fillDefaults()
                   .hint(defaultWidth, SWT.DEFAULT)
-                  .grab(true, false)
-                  .indent(0, 20)
+                  .grab(true, true)
+                  .align(SWT.FILL, SWT.END)
+                  .indent(0, 10)
                   .span(2, 1)
                   .applyTo(label);
          }
@@ -4582,10 +4583,25 @@ public class RawDataView extends ViewPart implements
 
    public Image getImportConfigImage(final ImportLauncher importConfig, final boolean isDarkTransparentColor) {
 
-      final int configImageWidth = (int) (importConfig.imageWidth * UI.HIDPI_SCALING);
-      final int ttImageSize = (int) (TourType.TOUR_TYPE_IMAGE_SIZE * UI.HIDPI_SCALING);
+      final int configWidth = importConfig.imageWidth;
 
-      if (configImageWidth == 0) {
+      int configWidthScaled;
+      int imageSizeScaled;
+
+      if (UI.IS_WIN) {
+
+         configWidthScaled = (int) (configWidth * UI.HIDPI_SCALING * UI.HIDPI_SCALING);
+
+         imageSizeScaled = (int) (TourType.TOUR_TYPE_IMAGE_SIZE * UI.HIDPI_SCALING * UI.HIDPI_SCALING);
+
+      } else {
+
+         configWidthScaled = (int) (configWidth * UI.HIDPI_SCALING);
+
+         imageSizeScaled = (int) (TourType.TOUR_TYPE_IMAGE_SIZE * UI.HIDPI_SCALING);
+      }
+
+      if (configWidthScaled == 0) {
          return null;
       }
 
@@ -4598,45 +4614,59 @@ public class RawDataView extends ViewPart implements
          return configImage;
       }
 
+      /*
+       * Config image is not yet created
+       */
+
       final Display display = _parent.getDisplay();
 
       final Enum<TourTypeConfig> tourTypeConfig = importConfig.tourTypeConfig;
 
       if (TourTypeConfig.TOUR_TYPE_CONFIG_BY_SPEED.equals(tourTypeConfig)) {
 
-         final ArrayList<SpeedTourType> speedVertices = importConfig.speedTourTypes;
+         // draw multiple tour types in one image
+
+         final ArrayList<SpeedTourType> allSpeedVertices = importConfig.speedTourTypes;
 
          final ImageData swtImageData = new ImageData(
-               configImageWidth,
-               ttImageSize,
+               configWidthScaled,
+               imageSizeScaled,
                24,
                new PaletteData(0xFF0000, 0xFF00, 0xFF));
 
-         swtImageData.alphaData = new byte[configImageWidth * ttImageSize];
+         swtImageData.alphaData = new byte[configWidthScaled * imageSizeScaled];
 
          final Image tempImage = new Image(display, new NoAutoScalingImageDataProvider(swtImageData));
          {
             final GC gcTempImage = new GC(tempImage);
             {
-               for (int speedIndex = 0; speedIndex < speedVertices.size(); speedIndex++) {
+//               gcTempImage.setBackground(UI.SYS_COLOR_GREEN);
+//               gcTempImage.fillRectangle(tempImage.getBounds());
 
-                  final SpeedTourType vertex = speedVertices.get(speedIndex);
+               for (int speedIndex = 0; speedIndex < allSpeedVertices.size(); speedIndex++) {
+
+                  final SpeedTourType vertex = allSpeedVertices.get(speedIndex);
 
                   final Image ttImage = TourTypeImage.getTourTypeImage(vertex.tourTypeId);
 
-                  gcTempImage.drawImage(ttImage,
+                  final float devX = TourType.TOUR_TYPE_IMAGE_SIZE * speedIndex;
 
-                        (int) ((ttImageSize * speedIndex)
-
-                              // fix autoscaling
-                              / UI.HIDPI_SCALING),
-                        0);
+                  gcTempImage.drawImage(ttImage, (int) devX, 0);
                }
             }
             gcTempImage.dispose();
 
-            // convert into image data, the trick is to use the device zoom otherwise it is not working !!!
-            final ImageData tempImageData = tempImage.getImageData(DPIUtil.getDeviceZoom());
+            ImageData tempImageData;
+
+            if (UI.IS_WIN) {
+
+               tempImageData = tempImage.getImageData();
+
+            } else {
+
+               // convert into image data, the trick is to use the device zoom otherwise it is not working !!!
+               tempImageData = tempImage.getImageData(DPIUtil.getDeviceZoom());
+            }
 
             configImage = new Image(display, new NoAutoScalingImageDataProvider(tempImageData));
          }
@@ -4644,17 +4674,19 @@ public class RawDataView extends ViewPart implements
 
       } else if (TourTypeConfig.TOUR_TYPE_CONFIG_ONE_FOR_ALL.equals(tourTypeConfig)) {
 
+         // draw one tour type in an image
+
          final TourType tourType = importConfig.oneTourType;
 
          if (tourType != null) {
 
             final ImageData swtImageData = new ImageData(
-                  ttImageSize,
-                  ttImageSize,
+                  configWidthScaled,
+                  imageSizeScaled,
                   24,
                   new PaletteData(0xFF0000, 0xFF00, 0xFF));
 
-            swtImageData.alphaData = new byte[ttImageSize * ttImageSize];
+            swtImageData.alphaData = new byte[configWidthScaled * imageSizeScaled];
 
             final Image tempImage = new Image(display, new NoAutoScalingImageDataProvider(swtImageData));
             {
@@ -4664,13 +4696,25 @@ public class RawDataView extends ViewPart implements
 
                final GC gcTempImage = new GC(tempImage);
                {
+//                  gcTempImage.setBackground(UI.SYS_COLOR_GREEN);
+//                  gcTempImage.fillRectangle(tempImage.getBounds());
+
                   final Image ttImage = TourTypeImage.getTourTypeImage(tourType.getTypeId());
                   gcTempImage.drawImage(ttImage, 0, 0);
                }
                gcTempImage.dispose();
 
-               // convert into image data, the trick is to use the device zoom otherwise it is not working !!!
-               final ImageData tempImageData = tempImage.getImageData(DPIUtil.getDeviceZoom());
+               ImageData tempImageData;
+
+               if (UI.IS_WIN) {
+
+                  tempImageData = tempImage.getImageData();
+
+               } else {
+
+                  // convert into image data, the trick is to use the device zoom otherwise it is not working !!!
+                  tempImageData = tempImage.getImageData(DPIUtil.getDeviceZoom());
+               }
 
                configImage = new Image(display, new NoAutoScalingImageDataProvider(tempImageData));
 

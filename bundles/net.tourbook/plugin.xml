@@ -671,7 +671,7 @@
                <!-- All Tour Locations -->
                <command
                   commandId   ="command.net.tourbook.tour.location.TourLocationView"
-                  icon        ="icons/tour-locations.png"
+                  icon        ="icons/tour-locations.svg"
                   label       ="%View_Name_TourLocations2"
                   mnemonic    ="%View_Name_TourLocations2_Mnemonic"/>
 
@@ -1704,7 +1704,7 @@
             category    ="net.tourbook.category.Tour_Directory"
             id          ="net.tourbook.tour.location.TourLocationView"
             class       ="net.tourbook.tour.location.TourLocationView"
-            icon        ="icons/tour-locations.png"
+            icon        ="icons/tour-locations.svg"
             name        ="%View_Name_TourLocations2"/>
 
          <view
