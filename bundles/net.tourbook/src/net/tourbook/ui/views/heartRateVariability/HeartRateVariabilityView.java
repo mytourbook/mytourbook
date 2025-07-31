@@ -195,7 +195,6 @@ public class HeartRateVariabilityView extends ViewPart {
          setToolTipText(Messages.HRV_View_Action_SynchChartScale);
 
          setImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.SyncStatistics));
-         setDisabledImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.SyncStatistics_Disabled));
       }
 
       @Override

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2024 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2025 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -148,7 +148,6 @@ public class TourLogView extends ViewPart {
          setText(Messages.Tour_Log_Action_Clear_Tooltip);
 
          setImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.App_RemoveAll));
-         setDisabledImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.App_RemoveAll_Disabled));
       }
 
       @Override
@@ -167,7 +166,6 @@ public class TourLogView extends ViewPart {
          setToolTipText(Messages.Tour_Log_Action_CopyTourLogIntoClipboard_Tooltip);
 
          setImageDescriptor(CommonActivator.getThemedImageDescriptor(CommonImages.App_Copy));
-         setDisabledImageDescriptor(CommonActivator.getThemedImageDescriptor(CommonImages.App_Copy_Disabled));
       }
 
       @Override

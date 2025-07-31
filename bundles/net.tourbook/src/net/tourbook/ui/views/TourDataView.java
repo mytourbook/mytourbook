@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2025 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -159,7 +159,6 @@ public class TourDataView extends ViewPart {
          setToolTipText(Messages.App_Action_CopyDataIntoClipboard_Tooltip);
 
          setImageDescriptor(CommonActivator.getThemedImageDescriptor(CommonImages.App_Copy));
-         setDisabledImageDescriptor(CommonActivator.getThemedImageDescriptor(CommonImages.App_Copy_Disabled));
       }
 
       @Override
@@ -860,7 +859,7 @@ public class TourDataView extends ViewPart {
 // SET_FORMATTING_OFF
 
       switch (keyEvent.keyCode) {
-      
+
       case SWT.ARROW_UP ->    verticalScoll = -lineHeight;
       case SWT.ARROW_DOWN ->  verticalScoll = lineHeight;
 

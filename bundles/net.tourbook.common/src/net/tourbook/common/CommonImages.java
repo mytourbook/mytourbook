@@ -23,8 +23,7 @@ public class CommonImages {
    public static final String App_Cancel                   = "app-cancel.png";                            //$NON-NLS-1$
    public static final String App_Cancel_Disabled          = "app-cancel-disabled.png";                   //$NON-NLS-1$
    public static final String App_Close                    = "app-close.svg";                             //$NON-NLS-1$
-   public static final String App_Copy                     = "app-copy.png";                              //$NON-NLS-1$
-   public static final String App_Copy_Disabled            = "app-copy-disabled.png";                     //$NON-NLS-1$
+   public static final String App_Copy                     = "app-copy.svg";                              //$NON-NLS-1$
    public static final String App_CollapseAll              = "collapseall.svg";                           //$NON-NLS-1$
    public static final String App_Delete                   = "app-delete.svg";                            //$NON-NLS-1$
    public static final String App_Download                 = "app-download.png";                          //$NON-NLS-1$
@@ -67,13 +66,13 @@ public class CommonImages {
    public static final String Lock_Closed                  = "lock-closed.png";                           //$NON-NLS-1$
    public static final String Lock_Open                    = "lock-open.png";                             //$NON-NLS-1$
 
-   public static final String MapProvider_Custom           = "map-provider-custom.png";                   //$NON-NLS-1$
-   public static final String MapProvider_Custom_Hill      = "map-provider-custom-hill.png";              //$NON-NLS-1$
-   public static final String MapProvider_Internal         = "map-provider-internal.png";                 //$NON-NLS-1$
-   public static final String MapProvider_Profile          = "map-provider-profile.png";                  //$NON-NLS-1$
-   public static final String MapProvider_Profile_Hill     = "map-provider-profile-hill.png";             //$NON-NLS-1$
-   public static final String MapProvider_Transparent      = "map-provider-transparent.png";              //$NON-NLS-1$
-   public static final String MapProvider_Transparent_Hill = "map-provider-transparent-hill.png";         //$NON-NLS-1$
+   public static final String MapProvider_Custom           = "map-provider-custom.svg";                   //$NON-NLS-1$
+   public static final String MapProvider_Custom_Hill      = "map-provider-custom-hill.svg";              //$NON-NLS-1$
+   public static final String MapProvider_Internal         = "map-provider-internal.svg";                 //$NON-NLS-1$
+   public static final String MapProvider_Profile          = "map-provider-profile.svg";                  //$NON-NLS-1$
+   public static final String MapProvider_Profile_Hill     = "map-provider-profile-hill.svg";             //$NON-NLS-1$
+   public static final String MapProvider_Transparent      = "map-provider-transparent.svg";              //$NON-NLS-1$
+   public static final String MapProvider_Transparent_Hill = "map-provider-transparent-hill.svg";         //$NON-NLS-1$
 
    public static final String PhotoFilter                  = "photo-filter-rating-stars.svg";             //$NON-NLS-1$
    public static final String PhotoFilter_NoPhotos         = "photo-filter-rating-stars-no-photos.svg";   //$NON-NLS-1$
@@ -86,8 +85,8 @@ public class CommonImages {
    public static final String PlayControl_Play             = "play-control-play.png";                     //$NON-NLS-1$
    public static final String PlayControl_Play_Disabled    = "play-control-play-disabled.png";            //$NON-NLS-1$
 
-   public static final String Slideout_Collapse            = "slideout-collapse.png";                     //$NON-NLS-1$
-   public static final String Slideout_Expand              = "slideout-expand.png";                       //$NON-NLS-1$
+   public static final String Slideout_Collapse            = "slideout-collapse.svg";                     //$NON-NLS-1$
+   public static final String Slideout_Expand              = "slideout-expand.svg";                       //$NON-NLS-1$
 
    public static final String TourOptions                  = "tour-options.svg";                          //$NON-NLS-1$
 

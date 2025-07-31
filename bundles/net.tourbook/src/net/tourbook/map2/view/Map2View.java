@@ -617,7 +617,6 @@ public class Map2View extends ViewPart implements
          setText(Messages.Map_Action_CopyLocation);
 
          setImageDescriptor(CommonActivator.getThemedImageDescriptor(CommonImages.App_Copy));
-         setDisabledImageDescriptor(CommonActivator.getThemedImageDescriptor(CommonImages.App_Copy_Disabled));
       }
 
       @Override

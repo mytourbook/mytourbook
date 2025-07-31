@@ -2701,16 +2701,16 @@ public class RawDataView extends ViewPart implements
       /*
        * Import state
        */
-      _images.put(IMAGE_STATE_DELETE,              TourbookPlugin.getImageDescriptor(Images.State_DeletedTour_View));
-      _images.put(IMAGE_STATE_MOVED,               TourbookPlugin.getImageDescriptor(Images.State_MovedTour_View));
+      _images.put(IMAGE_STATE_DELETE,              TourbookPlugin.getImageDescriptor      (Images.State_DeletedTour_View));
+      _images.put(IMAGE_STATE_MOVED,               TourbookPlugin.getImageDescriptor      (Images.State_MovedTour_View));
 
       /*
        * Data transfer
        */
-      _images.put(IMAGE_DATA_TRANSFER,             TourbookPlugin.getImageDescriptor(Images.RawData_Transfer));
-      _images.put(IMAGE_DATA_TRANSFER_DIRECT,      TourbookPlugin.getImageDescriptor(Images.RawData_TransferDirect));
-      _images.put(IMAGE_IMPORT_FROM_FILES,         TourbookPlugin.getImageDescriptor(Images.Import_Files));
-      _images.put(IMAGE_NEW_UI,                    TourbookPlugin.getImageDescriptor(Images.Import_DashboardUI));
+      _images.put(IMAGE_DATA_TRANSFER,             TourbookPlugin.getImageDescriptor      (Images.RawData_Transfer));
+      _images.put(IMAGE_DATA_TRANSFER_DIRECT,      TourbookPlugin.getImageDescriptor      (Images.RawData_TransferDirect));
+      _images.put(IMAGE_IMPORT_FROM_FILES,         TourbookPlugin.getImageDescriptor      (Images.Import_Files));
+      _images.put(IMAGE_NEW_UI,                    TourbookPlugin.getThemedImageDescriptor(Images.Import_DashboardUI));
 
       /*
        * Simple easy UI
@@ -2899,7 +2899,7 @@ public class RawDataView extends ViewPart implements
       final Composite container = new Composite(parent, SWT.NONE);
       GridDataFactory.fillDefaults().grab(true, true).applyTo(container);
       GridLayoutFactory.swtDefaults().numColumns(2).applyTo(container);
-//      container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_BLUE));
+//      container.setBackground(UI.SYS_COLOR_GREEN);
       {
          {
             /*
@@ -2994,8 +2994,9 @@ public class RawDataView extends ViewPart implements
             label.setText(Messages.Import_Data_OldUI_Label_Hint);
             GridDataFactory.fillDefaults()
                   .hint(defaultWidth, SWT.DEFAULT)
-                  .grab(true, false)
-                  .indent(0, 20)
+                  .grab(true, true)
+                  .align(SWT.FILL, SWT.END)
+                  .indent(0, 10)
                   .span(2, 1)
                   .applyTo(label);
          }

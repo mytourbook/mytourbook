@@ -156,9 +156,7 @@ public class Map25View extends ViewPart implements
 // SET_FORMATTING_OFF
 
    private static final ImageDescriptor   _imageSyncWithSlider                         = TourbookPlugin.getThemedImageDescriptor(Images.SyncWith_Slider);
-   private static final ImageDescriptor   _imageSyncWithSlider_Disabled                = TourbookPlugin.getThemedImageDescriptor(Images.SyncWith_Slider_Disabled);
    private static final ImageDescriptor   _imageSyncWithSlider_Centered                = TourbookPlugin.getThemedImageDescriptor(Images.SyncWith_Slider_Centered);
-   private static final ImageDescriptor   _imageSyncWithSlider_Centered_Disabled       = TourbookPlugin.getThemedImageDescriptor(Images.SyncWith_Slider_Centered_Disabled);
 
 // SET_FORMATTING_ON
 
@@ -2474,7 +2472,6 @@ public class Map25View extends ViewPart implements
 
       String toolTip;
       ImageDescriptor imageDescriptor;
-      ImageDescriptor imageDescriptorDisabled;
 
       final boolean isSync = _mapSynchedWith == MapSync.WITH_SLIDER;
       final boolean isCenter = _mapSynchedWith == MapSync.WITH_SLIDER_CENTERED;
@@ -2484,19 +2481,16 @@ public class Map25View extends ViewPart implements
          toolTip = OtherMessages.MAP_ACTION_SYNCH_WITH_SLIDER_CENTERED;
 
          imageDescriptor = _imageSyncWithSlider_Centered;
-         imageDescriptorDisabled = _imageSyncWithSlider_Centered_Disabled;
 
       } else {
 
          toolTip = OtherMessages.MAP_ACTION_SYNCH_WITH_SLIDER;
 
          imageDescriptor = _imageSyncWithSlider;
-         imageDescriptorDisabled = _imageSyncWithSlider_Disabled;
       }
 
       _actionSyncMap_WithChartSlider.setToolTipText(toolTip);
       _actionSyncMap_WithChartSlider.setImageDescriptor(imageDescriptor);
-      _actionSyncMap_WithChartSlider.setDisabledImageDescriptor(imageDescriptorDisabled);
       _actionSyncMap_WithChartSlider.setChecked(isSync || isCenter);
    }
 
