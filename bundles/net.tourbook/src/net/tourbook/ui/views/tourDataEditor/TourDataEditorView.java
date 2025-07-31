@@ -9909,8 +9909,6 @@ public class TourDataEditorView extends ViewPart implements
 
       // SET_FORMATTING_ON
 
-      _containerTags_Content.setBackground(_backgroundColor_Default);
-
       _parent.setRedraw(true);
    }
 
