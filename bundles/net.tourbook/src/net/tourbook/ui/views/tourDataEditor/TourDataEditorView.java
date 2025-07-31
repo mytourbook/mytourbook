@@ -3631,7 +3631,7 @@ public class TourDataEditorView extends ViewPart implements
 
       final Composite formBody = _page_EditorForm.getBody();
       GridLayoutFactory.fillDefaults().applyTo(formBody);
-      formBody.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_LIST_BACKGROUND));
+//      formBody.setBackground(UI.SYS_COLOR_BLUE);
 
       _tabFolder = new CTabFolder(formBody, SWT.FLAT | SWT.BOTTOM);
       GridDataFactory.fillDefaults().grab(true, true).applyTo(_tabFolder);
@@ -3917,7 +3917,7 @@ public class TourDataEditorView extends ViewPart implements
             .numColumns(2)
             .spacing(COLUMN_SPACING, 5)
             .applyTo(container);
-//    container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_RED));
+//      container.setBackground(UI.SYS_COLOR_RED);
       {
          createUI_Section_122_DateTime_Col1(container);
          createUI_Section_123_DateTime_Col2(container);
@@ -4150,7 +4150,6 @@ public class TourDataEditorView extends ViewPart implements
       GridLayoutFactory.fillDefaults()
             .numColumns(2)
             .applyTo(container);
-//    container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_MAGENTA));
       {
          /*
           * Time zone
@@ -5245,7 +5244,7 @@ public class TourDataEditorView extends ViewPart implements
          GridDataFactory.fillDefaults().applyTo(_tourContainer);
          GridLayoutFactory.swtDefaults().applyTo(_tourContainer);
          _tk.adapt(_tourContainer);
-//       _tourContainer.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_DARK_BLUE));
+//         _tourContainer.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_DARK_BLUE));
 
          // set content for scrolled composite
          _tab1Container.setContent(_tourContainer);
@@ -9901,11 +9900,16 @@ public class TourDataEditorView extends ViewPart implements
          _linkWeather            .setBackground(_backgroundColor_Default);
       }
 
-// SET_FORMATTING_ON
+
+      // fixing https://github.com/mytourbook/mytourbook/issues/1532
+      UI.setColorForAllChildren(_sectionTitle,           _foregroundColor_Default, _backgroundColor_Default);
+      UI.setColorForAllChildren(_sectionDateTime,        _foregroundColor_Default, _backgroundColor_Default);
+      UI.setColorForAllChildren(_sectionCharacteristics, _foregroundColor_Default, _backgroundColor_Default);
+      UI.setColorForAllChildren(_sectionWeather,         _foregroundColor_Default, _backgroundColor_Default);
+
+      // SET_FORMATTING_ON
 
       _containerTags_Content.setBackground(_backgroundColor_Default);
-
-//    _containerTags_Content.setBackground(UI.SYS_COLOR_BLUE);
 
       _parent.setRedraw(true);
    }
