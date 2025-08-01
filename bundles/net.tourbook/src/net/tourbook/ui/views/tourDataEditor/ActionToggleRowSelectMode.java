@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2025 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -34,7 +34,6 @@ class ActionToggleRowSelectMode extends Action {
       setToolTipText(Messages.app_action_edit_rows_tooltip);
 
       setImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.EditRow));
-      setDisabledImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.EditRow_Disabled));
 
       setEnabled(false);
    }

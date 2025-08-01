@@ -88,7 +88,6 @@ public class ActionTourStartEndLocation extends ContributionItem {
     * UI controls
     */
    private Image    _actionImage_Download;
-   private Image    _actionImage_Download_Disabled;
    private Image    _actionImage_Options;
    //
    private Menu     _contextMenu;
@@ -414,8 +413,6 @@ public class ActionTourStartEndLocation extends ContributionItem {
 // SET_FORMATTING_OFF
 
       _actionImage_Download          = CommonActivator.getThemedImageDescriptor(CommonImages.App_Download).createImage();
-      _actionImage_Download_Disabled = CommonActivator.getThemedImageDescriptor(CommonImages.App_Download_Disabled).createImage();
-
       _actionImage_Options           = CommonActivator.getThemedImageDescriptor(CommonImages.TourOptions).createImage();
 
 // SET_FORMATTING_ON
@@ -638,7 +635,6 @@ public class ActionTourStartEndLocation extends ContributionItem {
    private void onDispose() {
 
       _actionImage_Download.dispose();
-      _actionImage_Download_Disabled.dispose();
       _actionImage_Options.dispose();
 
       _toolItem.dispose();
@@ -689,7 +685,6 @@ public class ActionTourStartEndLocation extends ContributionItem {
          // download location data
 
          _toolItem.setImage(_actionImage_Download);
-         _toolItem.setDisabledImage(_actionImage_Download_Disabled);
 
          _toolItem.setToolTipText(createDownloadTooltip());
       }

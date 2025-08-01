@@ -163,8 +163,7 @@ public class SensorChartView extends ViewPart implements ITourProvider {
 
       public ActionTourFilter() {
 
-         super(CommonActivator.getThemedImageDescriptor(CommonImages.App_Filter),
-               CommonActivator.getThemedImageDescriptor(CommonImages.App_Filter_Disabled));
+         super(CommonActivator.getThemedImageDescriptor(CommonImages.App_Filter));
 
          isToggleAction = true;
          notSelectedTooltip = Messages.Sensor_Chart_Action_TourQuickFilter_Tooltip;

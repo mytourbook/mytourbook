@@ -1611,13 +1611,11 @@
    
       <image   
          commandId      ="command.net.tourbook.tour.RestoreTour"
-         icon           ="icons/restore-tour.png"
-         disabledIcon   ="icons/restore-tour-disabled.png"
+         icon           ="icons/restore-tour.svg"
       />
       <image   
          commandId      ="command.net.tourbook.tour.SaveTour"
-         icon           ="icons/save-tour.png"
-         disabledIcon   ="icons/save-tour-disabled.png"
+         icon           ="icons/save-tour.svg"
       />
 
    </extension>
@@ -1889,14 +1887,14 @@
             category    ="net.tourbook.category.compareTours"
             id          ="net.tourbook.views.tourCatalog.CompareResultView"
             class       ="net.tourbook.ui.views.referenceTour.ElevationCompareResultView"
-            icon        ="icons/tour-map-compare-result.png"
+            icon        ="icons/tour-map-compare-result.svg"
             name        ="%View_Name_Compare_ByElevation"/>
 
          <view
             category    ="net.tourbook.category.compareTours"
             id          ="net.tourbook.views.tourCatalog.referenceTourView"
             class       ="net.tourbook.ui.views.referenceTour.ReferenceTourChartView"
-            icon        ="icons/tour-map-reftour.png"
+            icon        ="icons/tour-map-reftour.svg"
             name        ="%View_Name_RefTour_ReferenceTour"/>
 
          <view

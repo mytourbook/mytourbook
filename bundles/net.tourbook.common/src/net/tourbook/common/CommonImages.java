@@ -26,12 +26,10 @@ public class CommonImages {
    public static final String App_Copy                     = "app-copy.svg";                              //$NON-NLS-1$
    public static final String App_CollapseAll              = "collapseall.svg";                           //$NON-NLS-1$
    public static final String App_Delete                   = "app-delete.svg";                            //$NON-NLS-1$
-   public static final String App_Download                 = "app-download.png";                          //$NON-NLS-1$
-   public static final String App_Download_Disabled        = "app-download-disabled.png";                 //$NON-NLS-1$
+   public static final String App_Download                 = "app-download.svg";                          //$NON-NLS-1$
    public static final String App_EmptyIcon_Placeholder    = "_empty16.png";                              //$NON-NLS-1$
    public static final String App_ExpandAll                = "expandall.svg";                             //$NON-NLS-1$
-   public static final String App_Filter                   = "app-filter.png";                            //$NON-NLS-1$
-   public static final String App_Filter_Disabled          = "app-filter-disabled.png";                   //$NON-NLS-1$
+   public static final String App_Filter                   = "app-filter.svg";                            //$NON-NLS-1$
    public static final String App_KeepOpen                 = "app-keep-open.svg";                         //$NON-NLS-1$
    public static final String App_Move_Left                = "app-move-left.png";                         //$NON-NLS-1$
    public static final String App_Move_Left_2x             = "app-move-left-2x.png";                      //$NON-NLS-1$

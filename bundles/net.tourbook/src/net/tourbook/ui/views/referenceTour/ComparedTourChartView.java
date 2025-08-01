@@ -257,7 +257,6 @@ public class ComparedTourChartView extends TourChartViewPart implements ISynched
          setToolTipText(Messages.RefTour_Action_SyncChartsByScale_Tooltip);
 
          setImageDescriptor(imageDescriptor_SyncByScale_ElevationCompare);
-         setDisabledImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.SyncGraph_ByScale_Disabled));
       }
 
       @Override
@@ -276,7 +275,6 @@ public class ComparedTourChartView extends TourChartViewPart implements ISynched
          setToolTipText(Messages.RefTour_Action_SyncChartsBySize_Tooltip);
 
          setImageDescriptor(imageDescriptor_SyncBySize_ElevationCompare);
-         setDisabledImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.SyncGraph_BySize_Disabled));
       }
 
       @Override

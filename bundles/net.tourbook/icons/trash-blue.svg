@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <svg
    width="16"
-   height="16"
+   height="16.000366"
    id="svg2985"
    version="1.1"
    xml:space="preserve"
@@ -34,25 +34,25 @@
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" /></cc:Work></rdf:RDF></metadata><g
      id="layer1"
      style="display:inline"
-     transform="translate(-145,-1253.9832)"><rect
-       y="1253.9833"
-       x="145"
+     transform="translate(-175,-1228.9833)"><rect
+       y="1228.9833"
+       x="175"
        height="15.999983"
        width="15.99999"
        id="rect4471-8-4-0-5"
-       style="color:#000000;display:inline;overflow:visible;visibility:visible;fill:none;stroke:#3a9ff7;stroke-width:0;stroke-linecap:round;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;marker:none;enable-background:accumulate" /><path
+       style="color:#000000;display:inline;overflow:visible;visibility:visible;fill:none;stroke:none;stroke-width:0;stroke-linecap:round;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;marker:none;enable-background:accumulate" /><path
        id="path5040-51"
-       d="m 150.99997,1254.4832 h 4 z"
+       d="m 180.99996,1229.4837 h 4 z"
        style="display:inline;fill:none;fill-rule:evenodd;stroke:#3a9ff7;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" /><path
        id="rect5042-71"
-       d="m 148.49998,1257.4832 h 8.99999 v 12 h -8.99999 z"
+       d="m 178.49997,1232.4837 h 8.99999 v 12 h -8.99999 z"
        style="color:#000000;display:inline;overflow:visible;visibility:visible;fill:none;fill-opacity:1;fill-rule:nonzero;stroke:#3a9ff7;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;marker:none;enable-background:accumulate" /><path
        id="rect5042-8-1"
-       d="m 147.49998,1255.4832 h 10.99999 v 2 h -10.99999 z"
+       d="m 177.49997,1230.4837 h 10.99999 v 2 h -10.99999 z"
        style="color:#000000;display:inline;overflow:visible;visibility:visible;fill:none;fill-opacity:1;fill-rule:nonzero;stroke:#3a9ff7;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;marker:none;enable-background:accumulate" /><path
        id="path5040-6-5"
-       d="m 151.49997,1258.9832 v 9 z"
+       d="m 181.49996,1233.9837 v 9 z"
        style="display:inline;fill:none;fill-rule:evenodd;stroke:#3a9ff7;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" /><path
        id="path5040-6-4-27"
-       d="m 154.49997,1258.9832 v 9 z"
+       d="m 184.49996,1233.9837 v 9 z"
        style="display:inline;fill:none;fill-rule:evenodd;stroke:#3a9ff7;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" /></g></svg>
