@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2025 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -34,7 +34,6 @@ import org.eclipse.ui.menus.UIElement;
 public class SaveTour_Handler extends AbstractHandler implements IElementUpdater {
 
    private static final ImageDescriptor _iconSaveTour          = TourbookPlugin.getThemedImageDescriptor(Images.SaveTour);
-   private static final ImageDescriptor _iconSaveTour_Disabled = TourbookPlugin.getThemedImageDescriptor(Images.SaveTour_Disabled);
 
    @Override
    public Object execute(final ExecutionEvent event) throws ExecutionException {
@@ -76,7 +75,6 @@ public class SaveTour_Handler extends AbstractHandler implements IElementUpdater
        * -> Higly complicated
        */
 
-      uiElement.setDisabledIcon(_iconSaveTour_Disabled);
       uiElement.setIcon(_iconSaveTour);
    }
 
