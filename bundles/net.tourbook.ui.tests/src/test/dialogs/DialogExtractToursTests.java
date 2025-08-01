@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2022, 2023 Frédéric Bard
+ * Copyright (C) 2022, 2025 Frédéric Bard
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -76,6 +76,6 @@ public class DialogExtractToursTests extends UITest {
 
       final List<?> logs = TourLogManager.getLogs();
       assertTrue(logs.stream().map(log -> log.toString()).anyMatch(log -> log.contains(
-            "2/1/2021, 7:15 AM")));//$NON-NLS-1$
+            "2/1/2021, 7:15 AM")));//$NON-NLS-1$
    }
 }

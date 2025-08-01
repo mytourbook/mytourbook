@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2022, 2023 Frédéric Bard
+ * Copyright (C) 2022, 2025 Frédéric Bard
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -140,7 +140,7 @@ public class DialogJoinToursTests extends UITest {
             .getNode("Feb   1").expand().select().getNode("1").select(); //$NON-NLS-1$ //$NON-NLS-2$
       assertNotNull(tour);
 
-      assertEquals("3:47 PM", tour.cell(tourBookView_StartTime_Column_Index)); //$NON-NLS-1$
+      assertEquals("3:47 PM", tour.cell(tourBookView_StartTime_Column_Index)); //$NON-NLS-1$
       assertEquals("0:57", tour.cell(tourBookView_ElapsedTime_Column_Index)); //$NON-NLS-1$
       assertEquals("0:57", tour.cell(tourBookView_RecordedTime_Column_Index)); //$NON-NLS-1$
       assertEquals("", tour.cell(tourBookView_PausedTime_Column_Index)); //$NON-NLS-1$
