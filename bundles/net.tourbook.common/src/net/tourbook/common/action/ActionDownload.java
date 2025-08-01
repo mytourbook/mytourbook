@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2023 Wolfgang Schramm and Contributors
+ * Copyright (C) 2023, 2025 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -39,7 +39,6 @@ public abstract class ActionDownload extends SubMenu {
       setToolTipText(downloadTooltip);
 
       setImageDescriptor(CommonActivator.getThemedImageDescriptor(CommonImages.App_Download));
-      setDisabledImageDescriptor(CommonActivator.getThemedImageDescriptor(CommonImages.App_Download_Disabled));
    }
 
    public ToolBar createUI(final Composite parent) {

@@ -377,7 +377,6 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
          setToolTipText(Messages.GeoCompare_View_Action_AppFilter_Tooltip);
 
          setImageDescriptor(CommonActivator.getThemedImageDescriptor(CommonImages.App_Filter));
-         setDisabledImageDescriptor(CommonActivator.getThemedImageDescriptor(CommonImages.App_Filter_Disabled));
       }
 
       @Override
