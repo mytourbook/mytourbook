@@ -323,6 +323,9 @@ public class ChartLayerSegmentAltitude implements IChartLayer, IChartOverlay {
 
             if (_isShowSegmenterLine /* && isShowValueText */) {
 
+               // fix https://github.com/mytourbook/mytourbook/issues/1533
+               defaultLineAttributes.width = 1;
+
                gc.setAlpha(_lineOpacity);
                gc.setForeground(textAndLineColor);
                gc.setLineAttributes(defaultLineAttributes);
@@ -360,6 +363,9 @@ public class ChartLayerSegmentAltitude implements IChartLayer, IChartOverlay {
                } else {
                   devYLine = devYSegment + 1 * textHeight;
                }
+
+               // fix https://github.com/mytourbook/mytourbook/issues/1533
+               markerLineAttribute.width = 1f;
 
                gc.setAlpha(0xff);
                gc.setForeground(textAndLineColor);
