@@ -2361,7 +2361,7 @@
          category    ="net.tourbook.category.map"
          id          ="net.tourbook.map3.Map3StatisticsView"
          class       ="net.tourbook.map3.view.Map3StatisticsView"
-         icon        ="icons/map3-statistics.png"
+         icon        ="icons/map3-statistics.svg"
          name        ="%View_Name_Map3Statistics"
       />
    

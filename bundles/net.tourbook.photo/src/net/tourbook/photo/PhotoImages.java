@@ -35,16 +35,13 @@ public class PhotoImages {
    public static final String PhotoFilter_NoGPS                   = "photo-filter-no-gps.svg";                    //$NON-NLS-1$
    public static final String PhotoFilter_Tour                    = "photo-filter-photo-with-tour.svg";           //$NON-NLS-1$
    public static final String PhotoFilter_NoTour                  = "photo-filter-photo-without-tour.svg";        //$NON-NLS-1$
-   public static final String PhotoFilter_OneHistoryTour          = "photo-filter-one-history-tour.png";          //$NON-NLS-1$
+   public static final String PhotoFilter_OneHistoryTour          = "photo-filter-one-history-tour.svg";          //$NON-NLS-1$
    public static final String PhotoFolderGallery                  = "photo-folder-gallery.svg";                   //$NON-NLS-1$
    public static final String PhotoFolderGallery_OnlyPhotos       = "photo-folder-gallery-only-photos.svg";       //$NON-NLS-1$
-   public static final String PhotoFullsize_ShellImage128         = "photo-shell-128.png";                        //$NON-NLS-1$
-   public static final String PhotoGallery_Details                = "photo-gallery-details.png";                  //$NON-NLS-1$
-   public static final String PhotoGallery_Thumbnail              = "photo-gallery-thumbnail.png";                //$NON-NLS-1$
    public static final String PhotoInfo_Date                      = "photo-info-date.svg";                        //$NON-NLS-1$
    public static final String PhotoInfo_Name                      = "photo-info-name.svg";                        //$NON-NLS-1$
-   public static final String PhotoInvalid_PhotoImage             = "photo-invalid-photo-image.png";              //$NON-NLS-1$
-   public static final String PhotoInvalid_PhotoImage_Hovered     = "photo-invalid-photo-image-hovered.png";      //$NON-NLS-1$
+   public static final String PhotoInvalid_PhotoImage             = "photo-invalid-photo-image.svg";              //$NON-NLS-1$
+   public static final String PhotoInvalid_PhotoImage_Hovered     = "photo-invalid-photo-image-hovered.svg";      //$NON-NLS-1$
    public static final String PhotoRatingStar                     = "photo-rating-star.svg";                      //$NON-NLS-1$
    public static final String PhotoRatingStar_AndHovered          = "photo-rating-star-and-hovered.svg";          //$NON-NLS-1$
    public static final String PhotoRatingStar_Delete              = "photo-rating-star-delete.svg";               //$NON-NLS-1$
@@ -55,6 +52,12 @@ public class PhotoImages {
    public static final String PhotoSort_ByDate                    = "photo-sort-by-date.svg";                     //$NON-NLS-1$
    public static final String PhotoSort_ByName                    = "photo-sort-by-name.svg";                     //$NON-NLS-1$
    public static final String PhotoTooltip                        = "photo-tooltip.svg";                          //$NON-NLS-1$
+
+   public static final String PhotoFullsize_ShellImage128         = "photo-shell-128.png";                        //$NON-NLS-1$
+
+   // these are currently not used, see comment for _actionPhotoGalleryType
+   public static final String PhotoGallery_Details                = "photo-gallery-details.png";                  //$NON-NLS-1$
+   public static final String PhotoGallery_Thumbnail              = "photo-gallery-thumbnail.png";                //$NON-NLS-1$
 
    private PhotoImages() {}
 }

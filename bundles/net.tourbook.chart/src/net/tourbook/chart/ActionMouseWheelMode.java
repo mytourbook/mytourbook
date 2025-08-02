@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2025 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -32,7 +32,6 @@ public class ActionMouseWheelMode extends Action {
       setToolTipText(Messages.Action_mouse_mode_tooltip);
 
       setImageDescriptor(ChartActivator.getThemedImageDescriptor(ChartImages.MouseWheelMode_Zoom));
-      setDisabledImageDescriptor(ChartActivator.getThemedImageDescriptor(ChartImages.MouseWheelMode_Zoom_Disabled));
    }
 
    public MouseWheelMode getMouseWheelMode() {
@@ -62,11 +61,6 @@ public class ActionMouseWheelMode extends Action {
 
             ? ChartActivator.getThemedImageDescriptor(ChartImages.MouseWheelMode_Zoom)
             : ChartActivator.getThemedImageDescriptor(ChartImages.MouseWheelMode_Selection));
-
-      setDisabledImageDescriptor(isZoomMode
-
-            ? ChartActivator.getThemedImageDescriptor(ChartImages.MouseWheelMode_Zoom_Disabled)
-            : ChartActivator.getThemedImageDescriptor(ChartImages.MouseWheelMode_Selection_Disabled));
    }
 
    public void setMouseWheelMode(final MouseWheelMode mouseWheelMode) {

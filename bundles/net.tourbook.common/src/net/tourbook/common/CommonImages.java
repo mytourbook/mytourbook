@@ -76,12 +76,9 @@ public class CommonImages {
    public static final String PhotoFilter_NoPhotos         = "photo-filter-rating-stars-no-photos.svg";   //$NON-NLS-1$
    public static final String PhotoFilter_WithPhotos       = "photo-filter-rating-stars-with-photos.svg"; //$NON-NLS-1$
 
-   public static final String PlayControl_Loop             = "play-control-loop.png";                     //$NON-NLS-1$
-   public static final String PlayControl_Loop_Disabled    = "play-control-loop-disabled.png";            //$NON-NLS-1$
-   public static final String PlayControl_Pause            = "play-control-pause.png";                    //$NON-NLS-1$
-   public static final String PlayControl_Pause_Disabled   = "play-control-pause-disabled.png";           //$NON-NLS-1$
-   public static final String PlayControl_Play             = "play-control-play.png";                     //$NON-NLS-1$
-   public static final String PlayControl_Play_Disabled    = "play-control-play-disabled.png";            //$NON-NLS-1$
+   public static final String PlayControl_Loop             = "play-control-loop.svg";                     //$NON-NLS-1$
+   public static final String PlayControl_Pause            = "play-control-pause.svg";                    //$NON-NLS-1$
+   public static final String PlayControl_Play             = "play-control-play.svg";                     //$NON-NLS-1$
 
    public static final String Slideout_Collapse            = "slideout-collapse.svg";                     //$NON-NLS-1$
    public static final String Slideout_Expand              = "slideout-expand.svg";                       //$NON-NLS-1$
