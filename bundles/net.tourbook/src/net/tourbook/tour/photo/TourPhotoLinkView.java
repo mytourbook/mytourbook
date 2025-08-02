@@ -314,7 +314,6 @@ public class TourPhotoLinkView extends ViewPart implements ITourProvider, ITourV
          setToolTipText(Messages.Photos_AndTours_Action_SetToSavedAdjustment_Tooltip);
 
          setImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.PhotoTimeAdjustment));
-         setDisabledImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.PhotoTimeAdjustment_Disabled));
       }
 
       @Override

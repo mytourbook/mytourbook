@@ -51,11 +51,11 @@ public class CommonImages {
    public static final String App_Save                     = "app-save.svg";                              //$NON-NLS-1$
    public static final String App_SaveAndNext              = "app-save-and-next.svg";                     //$NON-NLS-1$
    public static final String App_ScrambleData             = "app-scramble-data.svg";                     //$NON-NLS-1$
-   public static final String App_Turn_On                  = "app-turn-on.png";                           //$NON-NLS-1$
-   public static final String App_Turn_Off                 = "app-turn-off.png";                          //$NON-NLS-1$
+   public static final String App_Turn_On                  = "app-turn-on.svg";                           //$NON-NLS-1$
+   public static final String App_Turn_Off                 = "app-turn-off.svg";                          //$NON-NLS-1$
    public static final String App_Undo                     = "app-undo.svg";                              //$NON-NLS-1$
-   public static final String App_Yes                      = "app-yes.png";                               //$NON-NLS-1$
-   public static final String App_No                       = "app-no.png";                                //$NON-NLS-1$
+   public static final String App_Yes                      = "app-yes.svg";                               //$NON-NLS-1$
+   public static final String App_No                       = "app-no.svg";                                //$NON-NLS-1$
 
    public static final String Arrow_Left                   = "arrow-left.svg";                            //$NON-NLS-1$
    public static final String Arrow_Right                  = "arrow-right.svg";                           //$NON-NLS-1$

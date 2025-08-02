@@ -888,7 +888,7 @@
 
             <command
                commandId   ="net.tourbook.command.GeoParts"
-               icon        ="icons/geo-parts.png"
+               icon        ="icons/tour-compare-geo-compare-tool.svg"
                label       ="%Command_GeoParts"
                mnemonic    ="%Command_GeoParts_Mnemonic"/>
                
@@ -1210,7 +1210,7 @@
       
          <command
             commandId	="command.net.tourbook.PicDir.SyncPhotoWithTour"
-            icon			="icons/photo-sync-tour.png"
+            icon			="icons/photo-sync-tour.svg"
             style			="toggle"
             tooltip		="%Command_PicDir_SyncPhotoWithTour_Tooltip" />
 <!--
@@ -1225,7 +1225,7 @@
                   
          <command
             commandId	="command.net.tourbook.photo.LinkPhotoWithTourInFolder"
-            icon			="icons/photo-link-photo-with-tour.png"
+            icon			="icons/photo-link-photo-with-tour.svg"
             label			="%Action_PhotoDirectory_LinkPhotoWithTourInFolder"
             mnemonic		="%Action_PhotoDirectory_LinkPhotoWithTourInFolder_Mnemonic"/>
 
@@ -1247,13 +1247,13 @@
                   
          <command
             commandId   ="command.net.tourbook.photo.LinkPhotoWithTourInGalleryAll"
-            icon        ="icons/photo-link-photo-with-tour.png"
+            icon        ="icons/photo-link-photo-with-tour.svg"
             label       ="%Action_PhotoDirectory_LinkPhotoWithTourInGalleryAll"
             mnemonic    ="%Action_PhotoDirectory_LinkPhotoWithTourInGalleryAll_Mnemonic"/>
 
          <command
             commandId   ="command.net.tourbook.photo.LinkPhotoWithTourInGallerySelected"
-            icon        ="icons/photo-link-photo-with-tour.png"
+            icon        ="icons/photo-link-photo-with-tour.svg"
             label       ="%Action_PhotoDirectory_LinkPhotoWithTourInGallerySelected"
             mnemonic    ="%Action_PhotoDirectory_LinkPhotoWithTourInGallerySelected_Mnemonic"/>
             
@@ -1908,7 +1908,7 @@
             category    ="net.tourbook.category.compareTours"
             id          ="net.tourbook.ui.views.geoCompare.GeoCompareView"
             class       ="net.tourbook.ui.views.geoCompare.GeoCompareView"
-            icon        ="icons/geo-parts.png"
+            icon        ="icons/tour-compare-geo-compare-tool.svg"
             name        ="%View_Name_Compare_ByGeoParts"/>
 
 
@@ -1922,7 +1922,7 @@
             category    ="net.tourbook.category.photo"
             id          ="net.tourbook.photo.PhotosAndToursView.ID"
             class       ="net.tourbook.tour.photo.TourPhotoLinkView"
-            icon        ="icons/photo-and-tours-view.png"
+            icon        ="icons/photo-and-tours-view.svg"
             name        ="%View_Name_PhotosAndTours"/>
 
          <view

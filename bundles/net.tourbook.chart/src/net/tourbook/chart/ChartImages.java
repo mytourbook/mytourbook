@@ -20,11 +20,6 @@ package net.tourbook.chart;
  */
 public class ChartImages {
 
-   public static final String Arrow_Left                        = "arrow-left.gif";                          //$NON-NLS-1$
-   public static final String Arrow_Left_Disabled               = "arrow-left-disabled.gif";                 //$NON-NLS-1$
-   public static final String Arrow_Right                       = "arrow-right.gif";                         //$NON-NLS-1$
-   public static final String Arrow_Right_Disabled              = "arrow-right-disabled.gif";                //$NON-NLS-1$
-
    public static final String Cursor_DragXSlider_ModeSlider     = "cursor-drag-x-slider-mode-slider.png";    //$NON-NLS-1$
    public static final String Cursor_DragXSlider_ModeZoom       = "cursor-drag-x-slider-mode-zoom.png";      //$NON-NLS-1$
    public static final String Cursor_Move1x                     = "cursor-move-x-slider-1x.png";             //$NON-NLS-1$

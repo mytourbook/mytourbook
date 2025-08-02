@@ -465,7 +465,6 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
          super(UI.EMPTY_STRING, AS_CHECK_BOX);
 
          setImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.GeoCompare_PinComparedTour));
-         setDisabledImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.GeoCompare_PinComparedTour_Disabled));
 
          setToolTipText(Messages.GeoCompare_View_Action_PinTourWhichIsCompared_Tooltip);
       }
@@ -486,7 +485,6 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
          super(UI.EMPTY_STRING, AS_PUSH_BUTTON);
 
          setImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.GeoCompare_SelectComparedTour));
-         setDisabledImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.GeoCompare_SelectComparedTour_Disabled));
 
          setToolTipText(Messages.GeoCompare_View_Action_SelectTourWhichIsCompared_Tooltip);
       }
