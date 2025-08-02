@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2022, 2023 Wolfgang Schramm and Contributors
+ * Copyright (C) 2022, 2025 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -70,11 +70,8 @@ public class ModelPlayerView extends ViewPart implements ICloseOpenedDialogs {
 // SET_FORMATTING_OFF
 
    private static final ImageDescriptor _imageDescriptor_Loop              = CommonActivator.getThemedImageDescriptor(CommonImages.PlayControl_Loop);
-   private static final ImageDescriptor _imageDescriptor_Loop_Disabled     = CommonActivator.getThemedImageDescriptor(CommonImages.PlayControl_Loop_Disabled);
    private static final ImageDescriptor _imageDescriptor_Pause             = CommonActivator.getThemedImageDescriptor(CommonImages.PlayControl_Pause);
-   private static final ImageDescriptor _imageDescriptor_Pause_Disabled    = CommonActivator.getThemedImageDescriptor(CommonImages.PlayControl_Pause_Disabled);
    private static final ImageDescriptor _imageDescriptor_Play              = CommonActivator.getThemedImageDescriptor(CommonImages.PlayControl_Play);
-   private static final ImageDescriptor _imageDescriptor_Play_Disabled     = CommonActivator.getThemedImageDescriptor(CommonImages.PlayControl_Play_Disabled);
 
    // SET_FORMATTING_ON
    //
@@ -135,7 +132,6 @@ public class ModelPlayerView extends ViewPart implements ICloseOpenedDialogs {
          setToolTipText(Messages.Model_Player_Button_PlayLoop_Tooltip);
 
          setImageDescriptor(_imageDescriptor_Loop);
-         setDisabledImageDescriptor(_imageDescriptor_Loop_Disabled);
       }
 
       @Override
@@ -151,7 +147,6 @@ public class ModelPlayerView extends ViewPart implements ICloseOpenedDialogs {
          super(null, AS_PUSH_BUTTON);
 
          setImageDescriptor(_imageDescriptor_Play);
-         setDisabledImageDescriptor(_imageDescriptor_Play_Disabled);
       }
 
       @Override
@@ -169,7 +164,6 @@ public class ModelPlayerView extends ViewPart implements ICloseOpenedDialogs {
          setToolTipText(Messages.Model_Player_Button_MapModel_Tooltip);
 
          setImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.MapModel));
-         setDisabledImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.MapModel_Disabled));
       }
 
       @Override
@@ -191,7 +185,6 @@ public class ModelPlayerView extends ViewPart implements ICloseOpenedDialogs {
          setToolTipText(Messages.Model_Player_Button_MapModelCursor_Tooltip);
 
          setImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.MapModelCursor));
-         setDisabledImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.MapModelCursor_Disabled));
       }
 
       @Override
@@ -210,14 +203,16 @@ public class ModelPlayerView extends ViewPart implements ICloseOpenedDialogs {
 
       public Action_SlideoutMapModel() {
 
-         super(TourbookPlugin.getThemedImageDescriptor(Images.MapModelList),
-               TourbookPlugin.getThemedImageDescriptor(Images.MapModelList_Disabled));
+         super(TourbookPlugin.getThemedImageDescriptor(Images.MapModelList));
+
       }
 
       @Override
       protected AdvancedSlideout createSlideout(final ToolItem toolItem) {
 
          __slideoutMapModel = new SlideoutMapModel(toolItem, _state);
+
+         notSelectedTooltip = Messages.Model_Player_Button_SelectMapModel_Tooltip;
 
          return __slideoutMapModel;
       }
@@ -1196,14 +1191,12 @@ public class ModelPlayerView extends ViewPart implements ICloseOpenedDialogs {
          _actionPlayControl_PlayAndPause.setToolTipText(Messages.Model_Player_Button_Pause_Tooltip);
 
          _actionPlayControl_PlayAndPause.setImageDescriptor(_imageDescriptor_Pause);
-         _actionPlayControl_PlayAndPause.setDisabledImageDescriptor(_imageDescriptor_Pause_Disabled);
 
       } else {
 
          _actionPlayControl_PlayAndPause.setToolTipText(Messages.Model_Player_Button_Play_Tooltip);
 
          _actionPlayControl_PlayAndPause.setImageDescriptor(_imageDescriptor_Play);
-         _actionPlayControl_PlayAndPause.setDisabledImageDescriptor(_imageDescriptor_Play_Disabled);
       }
    }
 
