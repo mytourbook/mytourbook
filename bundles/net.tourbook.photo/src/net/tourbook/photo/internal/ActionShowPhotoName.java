@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2025 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -34,7 +34,6 @@ public class ActionShowPhotoName extends Action {
       setToolTipText(Messages.Pic_Dir_Action_ShowPhotoFileName_Tooltip);
 
       setImageDescriptor(PhotoActivator.getThemedImageDescriptor(PhotoImages.PhotoInfo_Name));
-      setDisabledImageDescriptor(PhotoActivator.getThemedImageDescriptor(PhotoImages.PhotoInfo_Name_Disabled));
    }
 
    @Override

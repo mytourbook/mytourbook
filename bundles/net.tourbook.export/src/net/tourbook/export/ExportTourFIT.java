@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2023, 2024 Frédéric Bard and Contributors
+ * Copyright (C) 2023, 2025 Frédéric Bard and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -17,7 +17,6 @@ package net.tourbook.export;
 
 import java.util.List;
 
-import net.tourbook.common.UI;
 import net.tourbook.data.TourData;
 import net.tourbook.extension.export.ExportTourExtension;
 
@@ -33,9 +32,7 @@ public class ExportTourFIT extends ExportTourExtension {
     */
    public ExportTourFIT() {
 
-      setImageDescriptor(Activator.getImageDescriptor(UI.IS_DARK_THEME
-            ? ExportImages.Export_FIT_Logo_Dark
-            : ExportImages.Export_FIT_Logo));
+      setImageDescriptor(Activator.getThemedImageDescriptor(ExportImages.Export_FIT_Logo));
    }
 
    @Override

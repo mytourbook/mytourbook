@@ -180,7 +180,7 @@ public class DialogMergeTours extends TitleAreaDialog implements ITourProvider2,
 
    private final NumberFormat            _nf              = NumberFormat.getNumberInstance();
 
-   private final Image                   _iconPlaceholder = TourbookPlugin.getImageDescriptor(Images.App_EmptyIcon_Placeholder).createImage();
+   private final Image                   _iconPlaceholder = TourbookPlugin.getImageDescriptor(Images.App_IconPlaceholder).createImage();
    private final Image                   _imageDialog     = TourbookPlugin.getThemedImageDescriptor(Images.MergeTours).createImage();
    private final HashMap<Integer, Image> _graphImages     = new HashMap<>();
 
