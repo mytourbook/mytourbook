@@ -781,8 +781,7 @@ public class TourDataEditorView extends ViewPart implements
 
          setToolTipText(Messages.Tour_Editor_Action_RemovePhotoGeoPosition_Tooltip);
 
-         setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.App_Remove));
-         setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Images.App_Remove_Disabled));
+         setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.App_RemoveAll));
       }
 
       @Override
@@ -797,8 +796,7 @@ public class TourDataEditorView extends ViewPart implements
 
          super(Messages.TourEditor_Action_RemoveSwimStyle);
 
-         setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.App_Remove));
-         setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Images.App_Remove_Disabled));
+         setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.App_RemoveAll));
       }
 
       @Override

@@ -363,7 +363,7 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
 
    private Image      _imageCompareType_GeoCompare  = TourbookPlugin.getImageDescriptor(Images.TourCompare_GeoCompare_RefTour).createImage();
    private Image      _imageCompareType_RefTour     = TourbookPlugin.getImageDescriptor(Images.RefTour).createImage();
-   private Image      _imageCompareType_PlaceHolder = TourbookPlugin.getImageDescriptor(Images.App_EmptyIcon_Placeholder).createImage();
+   private Image      _imageCompareType_PlaceHolder = TourbookPlugin.getImageDescriptor(Images.App_IconPlaceholder).createImage();
    private Image      _imageOptions_Enabled         = CommonActivator.getThemedImageDescriptor(CommonImages.TourOptions).createImage();
 
    private CLabel     _iconCompareType;

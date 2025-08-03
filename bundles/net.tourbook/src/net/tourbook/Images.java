@@ -39,9 +39,8 @@ public class Images {
 
    public static final String App_Add                              = "app-add.svg";                                 //$NON-NLS-1$
    public static final String App_Add_2x                           = "app-add-2x.svg";                              //$NON-NLS-1$
-   public static final String App_Cancel_2                         = "16px-Crystal_Clear_action_button_cancel.png"; //$NON-NLS-1$
    public static final String App_Copy_Themed                      = "copy-blue.svg";                               //$NON-NLS-1$
-   public static final String App_Delete                           = "delete.svg";                                  //$NON-NLS-1$
+   public static final String App_Delete                           = "app-delete.svg";                              //$NON-NLS-1$
    public static final String App_Directory_CollatedTours          = "collated-tours.svg";                          //$NON-NLS-1$
    public static final String App_Directory_ReferenceTours         = "reference-tours.svg";                         //$NON-NLS-1$
    public static final String App_Directory_TaggedTours            = "tagged-tours.svg";                            //$NON-NLS-1$
@@ -49,15 +48,11 @@ public class Images {
    public static final String App_Directory_TourComparisonTimeline = "tour-map-statistic.svg";                      //$NON-NLS-1$
    public static final String App_Directory_TourImport             = "imported-tours.svg";                          //$NON-NLS-1$
    public static final String App_Edit                             = "quick-edit.svg";                              //$NON-NLS-1$
-   public static final String App_EmptyIcon_Placeholder            = "icon-placeholder.gif";                        //$NON-NLS-1$
-   public static final String App_Hide                             = "app-hide.png";                                //$NON-NLS-1$
-   public static final String App_OK                               = "16px-Crystal_Clear_action_apply.png";         //$NON-NLS-1$
-   public static final String App_Placeholder16                    = "placeholder16.png";                           //$NON-NLS-1$
-   public static final String App_Remove                           = "remove.png";                                  //$NON-NLS-1$
-   public static final String App_Remove_Disabled                  = "remove-disabled.png";                         //$NON-NLS-1$
+   public static final String App_Hide                             = "app-hide.svg";                                //$NON-NLS-1$
+   public static final String App_IconPlaceholder                  = "icon-placeholder.png";                        //$NON-NLS-1$
    public static final String App_RemoveAll                        = "remove-all.svg";                              //$NON-NLS-1$
    public static final String App_SequenceNumber                   = "app-sequence-number.svg";                     //$NON-NLS-1$
-   public static final String App_Show                             = "app-show.png";                                //$NON-NLS-1$
+   public static final String App_Show                             = "app-show.svg";                                //$NON-NLS-1$
    public static final String App_Sort                             = "app-sort.svg";                                //$NON-NLS-1$
    public static final String App_Today                            = "today.svg";                                   //$NON-NLS-1$
    public static final String App_Trash                            = "trash.svg";                                   //$NON-NLS-1$
