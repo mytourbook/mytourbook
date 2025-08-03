@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2023 Frédéric Bard
+ * Copyright (C) 2023, 2025 Frédéric Bard
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -20,12 +20,10 @@ package net.tourbook.export;
  */
 public class ExportImages {
 
-   public static final String Export_FIT_Logo        = "fit-logo.png";        //$NON-NLS-1$
-   public static final String Export_FIT_Logo_Dark   = "fit-logo-dark.png";   //$NON-NLS-1$
-   public static final String Export_Garmin_Logo     = "garmin-logo.png";     //$NON-NLS-1$
-   public static final String Export_GPX_Logo        = "gpx-logo.png";        //$NON-NLS-1$
-   public static final String Export_GPX_Logo_Dark   = "gpx-logo-dark.png";   //$NON-NLS-1$
-   public static final String Export_MyTourbook_Logo = "mytourbook-logo.png"; //$NON-NLS-1$
+   public static final String Export_FIT_Logo        = "fit-logo.svg";        //$NON-NLS-1$
+   public static final String Export_Garmin_Logo     = "garmin-logo.svg";     //$NON-NLS-1$
+   public static final String Export_GPX_Logo        = "gpx-logo.svg";        //$NON-NLS-1$
+   public static final String Export_MyTourbook_Logo = "mytourbook-logo.svg"; //$NON-NLS-1$
 
    private ExportImages() {}
 }

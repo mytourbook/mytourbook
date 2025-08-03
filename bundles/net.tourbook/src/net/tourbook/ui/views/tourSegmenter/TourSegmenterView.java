@@ -4975,7 +4975,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
       _spinnerWidth = _pc.convertWidthInCharsToPixels(_isOSX ? 10 : 5);
 
       _imageSurfing_SaveState = TourbookPlugin.getImageDescriptor(Images.State_SavedInTour).createImage(true);
-      _imageSurfing_NotSaveState = TourbookPlugin.getImageDescriptor(Images.State_NotSavedInTour).createImage(true);
+      _imageSurfing_NotSaveState = TourbookPlugin.getImageDescriptor(Images.State_SavedInTour_Not).createImage(true);
 
       _defaultCreateSegments_SelectionListener = SelectionListener.widgetSelectedAdapter(selectionEvent -> onSelect_CreateSegments());
       _defaultCreateSegments_MouseWheelListener = mouseEvent -> {

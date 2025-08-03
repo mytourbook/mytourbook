@@ -20,8 +20,7 @@ package net.tourbook.common;
  */
 public class CommonImages {
 
-   public static final String App_Cancel                   = "app-cancel.png";                            //$NON-NLS-1$
-   public static final String App_Cancel_Disabled          = "app-cancel-disabled.png";                   //$NON-NLS-1$
+   public static final String App_Cancel                   = "app-cancel.svg";                            //$NON-NLS-1$
    public static final String App_Close                    = "app-close.svg";                             //$NON-NLS-1$
    public static final String App_Copy                     = "app-copy.svg";                              //$NON-NLS-1$
    public static final String App_CollapseAll              = "collapseall.svg";                           //$NON-NLS-1$
@@ -40,7 +39,7 @@ public class CommonImages {
    public static final String App_Move_Down                = "app-move-down.png";                         //$NON-NLS-1$
    public static final String App_Move_Down_2x             = "app-move-down-2x.png";                      //$NON-NLS-1$
    public static final String App_Options                  = "options.svg";                               //$NON-NLS-1$
-   public static final String App_Paste                    = "app-paste.png";                             //$NON-NLS-1$
+   public static final String App_Paste                    = "app-paste.svg";                             //$NON-NLS-1$
    public static final String App_Pin                      = "app-pin.svg";                               //$NON-NLS-1$
    public static final String App_Refresh                  = "refresh.svg";                               //$NON-NLS-1$
    public static final String App_Refresh_All              = "refresh-all.svg";                           //$NON-NLS-1$
@@ -59,10 +58,10 @@ public class CommonImages {
 
    public static final String Arrow_Left                   = "arrow-left.svg";                            //$NON-NLS-1$
    public static final String Arrow_Right                  = "arrow-right.svg";                           //$NON-NLS-1$
-   public static final String ColumnCategory               = "column-category.png";                       //$NON-NLS-1$
-   public static final String CustomizeProfilesColumns     = "customize-profiles-columns.png";            //$NON-NLS-1$
-   public static final String Lock_Closed                  = "lock-closed.png";                           //$NON-NLS-1$
-   public static final String Lock_Open                    = "lock-open.png";                             //$NON-NLS-1$
+   public static final String ColumnCategory               = "column-category.svg";                       //$NON-NLS-1$
+   public static final String CustomizeProfilesColumns     = "customize-profiles-columns.svg";            //$NON-NLS-1$
+   public static final String Lock_Closed                  = "lock-closed.svg";                           //$NON-NLS-1$
+   public static final String Lock_Open                    = "lock-open.svg";                             //$NON-NLS-1$
 
    public static final String MapProvider_Custom           = "map-provider-custom.svg";                   //$NON-NLS-1$
    public static final String MapProvider_Custom_Hill      = "map-provider-custom-hill.svg";              //$NON-NLS-1$

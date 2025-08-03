@@ -37,8 +37,7 @@ public class ChartImages {
    public static final String MouseWheelMode_Selection      = "mouse-wheel-mode-selection.svg";       //$NON-NLS-1$
    public static final String MouseWheelMode_Zoom           = "mouse-wheel-mode-zoom.svg";            //$NON-NLS-1$
 
-   public static final String Zoom_FitToWindow              = "zoom-fit-to-window.png";               //$NON-NLS-1$
-   public static final String Zoom_FitToWindow_Disabled     = "zoom-fit-to-window-disabled.png";      //$NON-NLS-1$
+   public static final String Zoom_FitToWindow              = "zoom-fit-to-window.svg";               //$NON-NLS-1$
    public static final String Zoom_In                       = "zoom-in.svg";                          //$NON-NLS-1$
    public static final String Zoom_Out                      = "zoom-out.svg";                         //$NON-NLS-1$
 

@@ -703,15 +703,6 @@
                   label       ="%View_Name_SensorChart"
                   mnemonic    ="%View_Name_SensorChart_Mnemonic"/>
 
-
-            <!-- Sign Images 
-            <command
-               commandId="command.net.tourbook.ui.views.signImages.TourSignView"
-               icon="icons/sign-image.png"
-               label="%View_Name_SignImage"
-               mnemonic="%View_Name_SignImage_Mnemonic"/>
-            -->
-                  
       </menuContribution>
       
 
@@ -1788,16 +1779,6 @@
             class       ="net.tourbook.ui.views.nutrition.TourNutritionView"
             icon        ="icons/tour-nutrition.svg"
             name        ="%View_Name_TourNutrition"/>
-
-         <!--
-            <view
-               category    ="net.tourbook.category.Tour_Properties"
-               id          ="net.tourbook.ui.views.signImages.TourSignView"
-               class       ="net.tourbook.ui.views.signImages.TourSignView"
-               icon        ="icons/sign-image.png"
-               name        ="%View_Name_SignImage">
-            </view>
-         -->
 
 
       <!-- 3. Tools -->

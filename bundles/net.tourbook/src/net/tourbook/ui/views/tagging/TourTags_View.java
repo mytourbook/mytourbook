@@ -240,7 +240,6 @@ public class TourTags_View extends ViewPart implements ITreeViewer, ITourViewer 
          setToolTipText(Messages.Action_Tag_Save_Tooltip);
 
          setImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.SaveTags));
-         setDisabledImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.SaveTags_Disabled));
       }
 
       @Override
