@@ -121,8 +121,6 @@ public class Images {
    public static final String Map25                                = "map25-view.svg";                              //$NON-NLS-1$
    public static final String Map3                                 = "map3-view.svg";                               //$NON-NLS-1$
    public static final String Map_ValuePoint                       = "map-marker-value-point.svg";                  //$NON-NLS-1$
-   public static final String Map_WayPoint                         = "waypoint-large.png";                          //$NON-NLS-1$
-   public static final String Map_WayPoint_Hovered                 = "waypoint-large-hovered.png";                  //$NON-NLS-1$
    public static final String Map3_DirectionArrow                  = "map3-direction-arrow.svg";                    //$NON-NLS-1$
    public static final String Map3_Map3PropertiesView              = "map3-properties.png";                         //$NON-NLS-1$
    public static final String Map3_OpenGL_Version                  = "map3-opengl-version.png";                     //$NON-NLS-1$

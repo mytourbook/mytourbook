@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2024 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2025 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -28,19 +28,14 @@ import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 import javax.persistence.Transient;
 
-import net.tourbook.Images;
 import net.tourbook.Messages;
-import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.UI;
 import net.tourbook.common.map.GeoPosition;
-import net.tourbook.common.util.IHoveredArea;
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.database.FIELD_VALIDATION;
 import net.tourbook.database.TourDatabase;
 
 import org.eclipse.collections.impl.map.mutable.primitive.IntObjectHashMap;
-import org.eclipse.jface.resource.ImageRegistry;
-import org.eclipse.swt.graphics.Image;
 
 /**
  * A waypoint is associated with a tour but the way point position is independently from a tour, it
@@ -49,36 +44,31 @@ import org.eclipse.swt.graphics.Image;
 @Entity
 @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "wayPointId")
 
-public class TourWayPoint implements Cloneable, Comparable<Object>, IHoveredArea, Serializable {
+public class TourWayPoint implements Cloneable, Comparable<Object>, Serializable {
 
-   private static final long                serialVersionUID            = 1L;
+   private static final long                serialVersionUID      = 1L;
 
-   private static final char                NL                          = UI.NEW_LINE;
+   private static final char                NL                    = UI.NEW_LINE;
 
-   private static final String              IMAGE_MAP_WAY_POINT_HOVERED = Images.Map_WayPoint_Hovered;
-
-   public static final int                  DB_LENGTH_NAME              = 1024;
-   public static final int                  DB_LENGTH_DESCRIPTION       = 4096;
-   public static final int                  DB_LENGTH_COMMENT           = 4096;
-   public static final int                  DB_LENGTH_SYMBOL            = 1024;
-   public static final int                  DB_LENGTH_CATEGORY          = 1024;
-
-   @Transient
-   private static Image                     _twpHoveredImage;
+   public static final int                  DB_LENGTH_NAME        = 1024;
+   public static final int                  DB_LENGTH_DESCRIPTION = 4096;
+   public static final int                  DB_LENGTH_COMMENT     = 4096;
+   public static final int                  DB_LENGTH_SYMBOL      = 1024;
+   public static final int                  DB_LENGTH_CATEGORY    = 1024;
 
    /**
     * Manually created way points or imported way points need a unique id to identify them, saved
     * way points are compared with the way point id.
     */
    @Transient
-   private static final AtomicInteger       _createCounter              = new AtomicInteger();
+   private static final AtomicInteger       _createCounter        = new AtomicInteger();
 
    /**
     * Unique id for the {@link TourWayPoint} entity
     */
    @Id
    @GeneratedValue(strategy = GenerationType.IDENTITY)
-   private long                             wayPointId                  = TourDatabase.ENTITY_IS_NOT_SAVED;
+   private long                             wayPointId            = TourDatabase.ENTITY_IS_NOT_SAVED;
 
    @ManyToOne(optional = false)
    private TourData                         tourData;
@@ -86,8 +76,8 @@ public class TourWayPoint implements Cloneable, Comparable<Object>, IHoveredArea
    /**
     * Initialize with invalid values
     */
-   private double                           longitude                   = Double.MIN_VALUE;
-   private double                           latitude                    = Double.MIN_VALUE;
+   private double                           longitude             = Double.MIN_VALUE;
+   private double                           latitude              = Double.MIN_VALUE;
 
    /**
     * Absolute time in milliseconds since 1970-01-01T00:00:00Z with the default time zone.
@@ -97,7 +87,7 @@ public class TourWayPoint implements Cloneable, Comparable<Object>, IHoveredArea
    /**
     * Altitude in meters or {@link Float#MIN_VALUE} when not available.
     */
-   private float                            altitude                    = Float.MIN_VALUE;
+   private float                            altitude              = Float.MIN_VALUE;
 
    private String                           name;
    private String                           description;
@@ -129,7 +119,7 @@ public class TourWayPoint implements Cloneable, Comparable<Object>, IHoveredArea
     * waypoint is not persisted.
     */
    @Transient
-   private long                             _createId                   = _createCounter.incrementAndGet();
+   private long                             _createId             = _createCounter.incrementAndGet();
 
    /**
     * Caches the world positions for the pause lat/long values for each zoom level
@@ -298,22 +288,6 @@ public class TourWayPoint implements Cloneable, Comparable<Object>, IHoveredArea
 
    public String getDescription() {
       return description;
-   }
-
-   @Override
-   public Image getHoveredImage() {
-
-      if (_twpHoveredImage != null) {
-         return _twpHoveredImage;
-      }
-
-      final ImageRegistry imageRegistry = TourbookPlugin.getDefault().getImageRegistry();
-
-      imageRegistry.put(IMAGE_MAP_WAY_POINT_HOVERED, TourbookPlugin.getImageDescriptor(IMAGE_MAP_WAY_POINT_HOVERED));
-
-      _twpHoveredImage = imageRegistry.get(IMAGE_MAP_WAY_POINT_HOVERED);
-
-      return _twpHoveredImage;
    }
 
    public double getLatitude() {
