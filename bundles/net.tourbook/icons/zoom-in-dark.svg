@@ -2,8 +2,8 @@
 <svg
    version="1.1"
    id="svg2985"
-   height="16"
-   width="15.999992"
+   height="8.8999939"
+   width="9"
    xml:space="preserve"
    xmlns="http://www.w3.org/2000/svg"
    xmlns:svg="http://www.w3.org/2000/svg"
@@ -30,15 +30,15 @@
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" /></cc:Work></rdf:RDF></metadata><g
      style="display:inline"
      id="layer1"
-     transform="translate(-75.000061,-404.00012)"><rect
+     transform="translate(-78.000031,-293.1001)"><rect
        rx="0"
        ry="0"
-       y="404.00012"
-       x="75.000061"
+       y="289"
+       x="75.000015"
        height="16"
        width="15.99999"
-       id="rect4525-1-0-2-33-0-3-9"
+       id="rect4525-1-0-2-33-0-3-9-0"
        style="color:#000000;display:inline;overflow:visible;visibility:visible;opacity:0.99;fill:none;fill-opacity:1;stroke:none;stroke-width:0;stroke-opacity:1;marker:none;enable-background:accumulate" /><path
-       id="path6856-4-0"
-       d="m 78.000072,412.00003 h 4 v -3.9 h 1 v 3.9 h 4 v 1.00011 h -4 v 3.99989 h -1 v -3.99989 h -4 z"
-       style="display:inline;fill:#e5e5e5;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" /></g></svg>
+       id="path6856-4-0-9"
+       d="m 78.000034,297.00009 h 4 v -3.9 h 1 v 3.9 h 4 v 1.00011 h -4 v 3.99989 h -1 v -3.99989 h -4 z"
+       style="display:inline;fill:#6d6d6d;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" /></g></svg>
