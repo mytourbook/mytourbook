@@ -195,7 +195,6 @@ public class Images {
    public static final String SearchTours_ByLocation               = "map-search-tour-by-location.svg";             //$NON-NLS-1$
    public static final String SearchTours_ByLocation_Scroll        = "map-search-tour-by-location-scroll.svg";      //$NON-NLS-1$
    public static final String Sensor                               = "sensor.svg";                                  //$NON-NLS-1$
-   public static final String Sensor_Disabled                      = "sensor-disabled.png";                         //$NON-NLS-1$
    public static final String SensorChart                          = "sensor-chart.svg";                            //$NON-NLS-1$
    public static final String SetFavoritePosition                  = "map-set-favorite-position.png";               //$NON-NLS-1$
    public static final String ShowFavoritePosition                 = "map-show-favorite-position.png";              //$NON-NLS-1$

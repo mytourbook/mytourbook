@@ -512,6 +512,7 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
       return null;
    }
 
+   @SuppressWarnings("unused")
    private void prefPages_LogPrefsNode(final IPreferenceNode prefNode, final int level) {
 
       final StringBuilder sbIndent = new StringBuilder();
@@ -532,7 +533,9 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
 
       for (final IPreferenceNode node : root.getSubNodes()) {
 
-         prefPages_LogPrefsNode(node, level);
+// log pref page names
+//
+//       prefPages_LogPrefsNode(node, level);
 
          if (node.getId().equals(id)) {
 
