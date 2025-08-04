@@ -122,7 +122,6 @@ public class Images {
    public static final String Map3                                 = "map3-view.svg";                               //$NON-NLS-1$
    public static final String Map_ValuePoint                       = "map-marker-value-point.svg";                  //$NON-NLS-1$
    public static final String Map3_DirectionArrow                  = "map3-direction-arrow.svg";                    //$NON-NLS-1$
-   public static final String Map3_OpenGL_Version                  = "map3-opengl-version.png";                     //$NON-NLS-1$
    public static final String Map3_StatisticsView                  = "map3-statistics.svg";                         //$NON-NLS-1$
    public static final String MapBookmark                          = "map-bookmark.svg";                            //$NON-NLS-1$
    public static final String MapBookmark_Location                 = "map-bookmark-location.svg";                   //$NON-NLS-1$
