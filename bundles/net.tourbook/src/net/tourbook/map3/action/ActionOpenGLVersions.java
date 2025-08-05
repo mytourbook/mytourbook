@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2020  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2025 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -33,7 +33,6 @@ import java.awt.BorderLayout;
 import java.awt.Frame;
 import java.util.List;
 
-import net.tourbook.Images;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.UI;
 import net.tourbook.map3.Messages;
@@ -58,8 +57,7 @@ import org.eclipse.ui.forms.widgets.FormToolkit;
 
 public class ActionOpenGLVersions extends Action {
 
-   private final IDialogSettings _state = TourbookPlugin.getState(   //
-         getClass().getCanonicalName());
+   private final IDialogSettings _state = TourbookPlugin.getState(getClass().getCanonicalName());
 
    private GLProfile             _glProfile;
    private GLCapabilities        _glCaps;
@@ -188,8 +186,6 @@ public class ActionOpenGLVersions extends Action {
    public ActionOpenGLVersions() {
 
       super(Messages.Map3_Action_ShowOpenGLVersion_Tooltip, AS_PUSH_BUTTON);
-
-      setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.Map3_OpenGL_Version));
    }
 
    private Control createUI(final Composite parent) {

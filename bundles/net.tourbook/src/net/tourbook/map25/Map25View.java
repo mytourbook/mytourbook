@@ -288,8 +288,7 @@ public class Map25View extends ViewPart implements
 
       public ActionMap25_Layer() {
 
-         super(TourbookPlugin.getThemedImageDescriptor(Images.MapLayer),
-               TourbookPlugin.getThemedImageDescriptor(Images.MapLayer));
+         super(TourbookPlugin.getThemedImageDescriptor(Images.MapLayer));
       }
 
       @Override
@@ -309,8 +308,7 @@ public class Map25View extends ViewPart implements
 
       public ActionMap25_MapProvider() {
 
-         super(TourbookPlugin.getThemedImageDescriptor(Images.MapProvider),
-               TourbookPlugin.getThemedImageDescriptor(Images.MapProvider));
+         super(TourbookPlugin.getThemedImageDescriptor(Images.MapProvider));
       }
 
       @Override

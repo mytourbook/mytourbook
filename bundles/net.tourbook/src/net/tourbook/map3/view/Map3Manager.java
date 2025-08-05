@@ -57,7 +57,6 @@ import net.tourbook.map3.layer.TourInfoLayer;
 import net.tourbook.map3.layer.TourLegendLayer;
 import net.tourbook.map3.layer.TrackSliderLayer;
 import net.tourbook.map3.layer.tourtrack.TourTrackLayer;
-import net.tourbook.map3.ui.DialogMap3Layer;
 import net.tourbook.map3.ui.DialogTerrainProfileConfig;
 import net.tourbook.map3.ui.SlideoutMap3Layer;
 
@@ -836,7 +835,7 @@ public class Map3Manager {
    }
 
    /**
-    * @return Returns an instance of {@link DialogMap3Layer} or <code>null</code> when view is not
+    * @return Returns an instance of {@link SlideoutMap3Layer} or <code>null</code> when view is not
     *         created.
     */
    public static SlideoutMap3Layer getMap3LayerSlideout() {
@@ -871,6 +870,7 @@ public class Map3Manager {
     *
     * @param wwd
     * @param newWWLayer
+    *
     * @return
     */
    private static TVIMap3Layer insertBeforeCompass(final WorldWindow wwd, final TVIMap3Layer newUILayer) {
@@ -911,6 +911,7 @@ public class Map3Manager {
     * @param tviParent
     * @param newWWLayer
     * @param newUILayer
+    *
     * @return
     */
    private static TVIMap3Layer insertBeforeCompass_10(final TVIMap3Item tviParent, final TVIMap3Layer newUILayer) {
@@ -948,6 +949,7 @@ public class Map3Manager {
     *
     * @param wwd
     * @param newWWLayer
+    *
     * @return
     */
    private static TVIMap3Layer insertBeforePlaceNames(final WorldWindow wwd, final TVIMap3Layer newUILayer) {
@@ -988,6 +990,7 @@ public class Map3Manager {
     * @param tviParent
     * @param newWWLayer
     * @param newUILayer
+    *
     * @return
     */
    private static TVIMap3Layer insertBeforePlaceNames_10(final TVIMap3Item tviParent, final TVIMap3Layer newUILayer) {

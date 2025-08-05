@@ -18,6 +18,7 @@ import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.ImageData;
 import org.eclipse.swt.graphics.PaletteData;
 import org.eclipse.swt.graphics.RGB;
+import org.eclipse.swt.internal.DPIUtil;
 import org.eclipse.swt.widgets.Display;
 
 /**
@@ -43,7 +44,9 @@ public class ImageConverter {
     */
    public static BufferedImage convertIntoAWT(final Image srcImage) {
 
-      final ImageData imageData = srcImage.getImageData();
+//    final ImageData imageData = srcImage.getImageData();
+      final ImageData imageData = srcImage.getImageData(DPIUtil.getDeviceZoom());
+
       final int width = imageData.width;
       final int height = imageData.height;
       ImageData maskData = null;
