@@ -3765,6 +3765,13 @@ public class Map2 extends Canvas {
       return gridGeoPos;
    }
 
+   private void hideHoveredTours() {
+
+      _allHoveredTourIds.clear();
+      _allHoveredDevPoints.clear();
+      _allHoveredSerieIndices.clear();
+   }
+
    private void hideTourTooltipHoveredArea() {
 
       if (_tourTooltip == null) {
@@ -3958,9 +3965,7 @@ public class Map2 extends Canvas {
          numPrevHoveredTours = _allHoveredTourIds.size();
 
          // reset hovered data
-         _allHoveredDevPoints.clear();
-         _allHoveredTourIds.clear();
-         _allHoveredSerieIndices.clear();
+         hideHoveredTours();
 
          if (hoveredTile == null) {
 
@@ -4164,7 +4169,7 @@ public class Map2 extends Canvas {
 
       for (final PaintedMarkerCluster paintedCluster : _allPaintedMarkerClusters) {
 
-         final Rectangle paintedRect = paintedCluster.clusterSymbolRectangle;
+         final Rectangle paintedRect = paintedCluster.clusterSymbolRectangle_Unscaled;
 
          // increase hovered rectangle to prevent flickering when moving too fast
 
@@ -4198,7 +4203,8 @@ public class Map2 extends Canvas {
             || oldHoveredCluster != null && newHoveredCluster == null
 
             // now both should be NOT null -> compare cluster rectangles
-            || oldHoveredCluster.clusterSymbolRectangle.equals(newHoveredCluster.clusterSymbolRectangle) == false) {
+            || oldHoveredCluster.clusterSymbolRectangle_Unscaled.equals(
+                  newHoveredCluster.clusterSymbolRectangle_Unscaled) == false) {
 
          // another cluster is hovered
 
@@ -4211,9 +4217,7 @@ public class Map2 extends Canvas {
          // the same cluster is hovered
 
          // hide hovered tours
-         _allHoveredDevPoints.clear();
-         _allHoveredTourIds.clear();
-         _allHoveredSerieIndices.clear();
+         hideHoveredTours();
 
          return true;
       }
@@ -4920,9 +4924,7 @@ public class Map2 extends Canvas {
          _tourBreadcrumb.onMouseExit();
 
          // reset hovered data to hide hovered tour background
-         _allHoveredTourIds.clear();
-         _allHoveredDevPoints.clear();
-         _allHoveredSerieIndices.clear();
+         hideHoveredTours();
       }
 
       setCursorOptimized(_cursorDefault);
@@ -5028,8 +5030,8 @@ public class Map2 extends Canvas {
 
                for (final PaintedMapPoint paintedMarker : allPaintedClusterMarkers) {
 
-                  final Rectangle paintedLabelRect = paintedMarker.labelRectangle;
-                  final Rectangle paintedSymbolRect = paintedMarker.symbolRectangle;
+                  final Rectangle paintedLabelRect = paintedMarker.labelRectangle_Unscaled;
+                  final Rectangle paintedSymbolRect = paintedMarker.symbolRectangle_Unscaled;
 
                   if (true
                         && (mouseMoveDevX > paintedLabelRect.x)
@@ -5053,6 +5055,8 @@ public class Map2 extends Canvas {
                   }
                }
             }
+
+            hideHoveredTours();
 
             redraw();
 
@@ -5134,9 +5138,7 @@ public class Map2 extends Canvas {
          isSomethingHit = true;
 
          // reset hovered data
-         _allHoveredDevPoints.clear();
-         _allHoveredTourIds.clear();
-         _allHoveredSerieIndices.clear();
+         hideHoveredTours();
       }
 
       // ensure that the old map point is hidden
@@ -5276,9 +5278,7 @@ public class Map2 extends Canvas {
             // breadcrumb is hovered
 
             // do not show hovered tour info -> reset hovered data
-            _allHoveredTourIds.clear();
-            _allHoveredDevPoints.clear();
-            _allHoveredSerieIndices.clear();
+            hideHoveredTours();
 
             if (_tourBreadcrumb.isCrumbHovered()) {
                setCursorOptimized(_cursorHand);
@@ -5620,7 +5620,7 @@ public class Map2 extends Canvas {
       }
 
       // paint info AFTER hovered/selected tour
-      if (isPaintTourInfo) {
+      if (isPaintTourInfo && _isMarkerClusterSelected == false) {
          paint_HoveredTour_50_TourInfo(gc);
       }
 
@@ -7833,27 +7833,34 @@ public class Map2 extends Canvas {
       devX = devX - circleSize2;
       devY = devY - circleSize2;
 
-      final int ovalDevX = devX;
-      final int ovalDevY = devY;
+      final int circleDevX = devX;
+      final int circleDevY = devY;
 
       final int clusterLabelDevX = devX + circleSize2 - textWidth2;
       final int clusterLabelDevY = devY + circleSize2 + textAscent2 - textDescent2;
 
       final Rectangle paintedClusterRectangle = new Rectangle(
 
-            ovalDevX,
-            ovalDevY,
+            circleDevX,
+            circleDevY,
 
             circleSize,
             circleSize);
 
+      final Rectangle paintedClusterRectangle_Unscaled = new Rectangle(
+            (int) (circleDevX / _deviceScaling),
+            (int) (circleDevY / _deviceScaling),
+            (int) (circleSize / _deviceScaling),
+            (int) (circleSize / _deviceScaling));
+
       final PaintedMarkerCluster paintedCluster = new PaintedMarkerCluster(
 
             markerCluster,
+
             paintedClusterRectangle,
+            paintedClusterRectangle_Unscaled,
 
             clusterLabel,
-
             clusterLabelDevX,
             clusterLabelDevY);
 
@@ -8467,7 +8474,14 @@ public class Map2 extends Canvas {
             g2d.drawString(text, devX, devY);
 
             // keep painted positions
-            allPaintedMarkerPoints.add(new PaintedMapPoint(mapPoint, markerLabelRectangle));
+            final Rectangle markerLabelRectangle_Unscaled = new Rectangle(
+
+                  (int) (markerLabelRectangle.x / _deviceScaling),
+                  (int) (markerLabelRectangle.y / _deviceScaling),
+                  (int) (markerLabelRectangle.width / _deviceScaling),
+                  (int) (markerLabelRectangle.height / _deviceScaling));
+
+            allPaintedMarkerPoints.add(new PaintedMapPoint(mapPoint, markerLabelRectangle, markerLabelRectangle_Unscaled));
 
          } else {
 
@@ -8550,8 +8564,16 @@ public class Map2 extends Canvas {
                symbolRectangle.height - lineWidth);
 
          // keep painted symbol position
+         final Rectangle symbolRectangle_Unscaled = new Rectangle(
+
+               (int) (symbolRectangle.x / _deviceScaling),
+               (int) (symbolRectangle.y / _deviceScaling),
+               (int) (symbolRectangle.width / _deviceScaling),
+               (int) (symbolRectangle.height / _deviceScaling));
+
          final PaintedMapPoint paintedMarker = allPaintedMarkerPoints.get(paintedMarkerIndex++);
          paintedMarker.symbolRectangle = symbolRectangle;
+         paintedMarker.symbolRectangle_Unscaled = symbolRectangle_Unscaled;
       }
    }
 
@@ -8909,7 +8931,14 @@ public class Map2 extends Canvas {
          }
 
          // keep position
-         final PaintedMapPoint paintedMapPoint = new PaintedMapPoint(mapPoint, photoRectangle);
+         final Rectangle photoRectangle_Unscaled = new Rectangle(
+
+               (int) (photoRectangle.x / _deviceScaling),
+               (int) (photoRectangle.y / _deviceScaling),
+               (int) (photoRectangle.width / _deviceScaling),
+               (int) (photoRectangle.height / _deviceScaling));
+
+         final PaintedMapPoint paintedMapPoint = new PaintedMapPoint(mapPoint, photoRectangle, photoRectangle_Unscaled);
 
          allPaintedPhotos.add(paintedMapPoint);
       }
@@ -9111,7 +9140,14 @@ public class Map2 extends Canvas {
       g2d.drawString(labelText, devX, devY);
 
       // keep position
-      allPaintedMapPoints.add(new PaintedMapPoint(mapPoint, labelRectangle));
+      final Rectangle labelRectangle_Unscaled = new Rectangle(
+
+            (int) (labelRectangle.x / _deviceScaling),
+            (int) (labelRectangle.y / _deviceScaling),
+            (int) (labelRectangle.width / _deviceScaling),
+            (int) (labelRectangle.height / _deviceScaling));
+
+      allPaintedMapPoints.add(new PaintedMapPoint(mapPoint, labelRectangle, labelRectangle_Unscaled));
    }
 
    private void paint_MpImage_Annotations(final Graphics2D g2d, final Photo photo) {
@@ -10766,9 +10802,7 @@ public class Map2 extends Canvas {
 
       _hoveredMapPoint = null;
 
-      _allHoveredTourIds.clear();
-      _allHoveredDevPoints.clear();
-      _allHoveredSerieIndices.clear();
+      hideHoveredTours();
 
       if (_allPaintedTiles != null) {
 
