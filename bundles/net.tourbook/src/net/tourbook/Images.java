@@ -200,9 +200,9 @@ public class Images {
    public static final String Smoothing                            = "smooth.svg";                                  //$NON-NLS-1$
    public static final String SplinePoint                          = "spline-point.svg";                            //$NON-NLS-1$
    public static final String State_AdjustTemperature              = "state-temperature.svg";                       //$NON-NLS-1$
-   public static final String State_Copy                           = "state-copy.png";                              //$NON-NLS-1$
+   public static final String State_Copy                           = "state-copy.svg";                              //$NON-NLS-1$
    public static final String State_Deleted_Backup                 = "state-delete-backup.svg";                     //$NON-NLS-1$
-   public static final String State_Deleted_Device                 = "state-delete-device.png";                     //$NON-NLS-1$
+   public static final String State_Deleted_Device                 = "state-delete-device.svg";                     //$NON-NLS-1$
    public static final String State_Error                          = "state-error.svg";                             //$NON-NLS-1$
    public static final String State_Info                           = "state-info.svg";                              //$NON-NLS-1$
    public static final String State_MovedTour                      = "state-moved-tour.svg";                        //$NON-NLS-1$
@@ -210,7 +210,7 @@ public class Images {
    public static final String State_OK                             = "state-ok.svg";                                //$NON-NLS-1$
    public static final String State_RetrieveTourLocation           = "state-tour-location.svg";                     //$NON-NLS-1$
    public static final String State_RetrieveWeatherData            = "state-weather.svg";                           //$NON-NLS-1$
-   public static final String State_Save                           = "state-save.png";                              //$NON-NLS-1$
+   public static final String State_Save                           = "state-save.svg";                              //$NON-NLS-1$
    public static final String State_SaveTour                       = "state-save-tour.svg";                         //$NON-NLS-1$
    public static final String State_SavedInTour                    = "state-saved-in-tour.svg";                     //$NON-NLS-1$
    public static final String State_SavedInTour_Not                = "state-saved-in-tour-not.svg";                 //$NON-NLS-1$
@@ -268,8 +268,8 @@ public class Images {
    public static final String TourInfo                             = "tour-info.svg";                               //$NON-NLS-1$
    public static final String TourInfo_Hovered                     = "tour-info-hovered.svg";                       //$NON-NLS-1$
    public static final String TourLog                              = "tour-log.svg";                                //$NON-NLS-1$
-   public static final String TourLog_Layout_Color                 = "tour-log-layout-color.png";                   //$NON-NLS-1$
-   public static final String TourLog_Layout_Simple                = "tour-log-layout-simple.png";                  //$NON-NLS-1$
+   public static final String TourLog_Layout_Color                 = "tour-log-layout-color.svg";                   //$NON-NLS-1$
+   public static final String TourLog_Layout_Simple                = "tour-log-layout-simple.svg";                  //$NON-NLS-1$
    public static final String TourMarker                           = "tour-marker.svg";                             //$NON-NLS-1$
    public static final String TourMarker_All                       = "tour-marker-all.svg";                         //$NON-NLS-1$
    public static final String TourMarker_Cluster                   = "tour-marker-cluster.svg";                     //$NON-NLS-1$
@@ -296,7 +296,7 @@ public class Images {
    public static final String Zoom_CenterBy_Tour                   = "zoom-center-tour.svg";                        //$NON-NLS-1$
    public static final String Zoom_In                              = "zoom-in.svg";                                 //$NON-NLS-1$
    public static final String Zoom_Out                             = "zoom-out.svg";                                //$NON-NLS-1$
-   public static final String Zoom_ShowEntireLayer                 = "map-show-entire-layer.png";                   //$NON-NLS-1$
+   public static final String Zoom_ShowEntireLayer                 = "map-show-entire-layer.svg";                   //$NON-NLS-1$
    public static final String Zoom_ShowEntireMap                   = "zoom-show-entire-map.svg";                    //$NON-NLS-1$
    public static final String Zoom_ShowEntireTour                  = "zoom-show-entire-tour.svg";                   //$NON-NLS-1$
 
