@@ -198,14 +198,13 @@ public class Images {
    public static final String ShowValuePoint                       = "map-marker-value-point-action.svg";           //$NON-NLS-1$
    public static final String Show_POI                             = "show-poi.svg";                                //$NON-NLS-1$
    public static final String Smoothing                            = "smooth.svg";                                  //$NON-NLS-1$
-   public static final String SplinePoint                          = "spline-point.png";                            //$NON-NLS-1$
+   public static final String SplinePoint                          = "spline-point.svg";                            //$NON-NLS-1$
    public static final String State_AdjustTemperature              = "state-temperature.svg";                       //$NON-NLS-1$
    public static final String State_Copy                           = "state-copy.png";                              //$NON-NLS-1$
-   public static final String State_DeletedTour_View               = "state-deleted-tour-view.png";                 //$NON-NLS-1$
-   public static final String State_Deleted_Backup                 = "state-delete-backup.png";                     //$NON-NLS-1$
+   public static final String State_Deleted_Backup                 = "state-delete-backup.svg";                     //$NON-NLS-1$
    public static final String State_Deleted_Device                 = "state-delete-device.png";                     //$NON-NLS-1$
    public static final String State_Error                          = "state-error.svg";                             //$NON-NLS-1$
-   public static final String State_Info                           = "state-info.png";                              //$NON-NLS-1$
+   public static final String State_Info                           = "state-info.svg";                              //$NON-NLS-1$
    public static final String State_MovedTour                      = "state-moved-tour.svg";                        //$NON-NLS-1$
    public static final String State_MovedTour_View                 = "state-moved-tour-view.png";                   //$NON-NLS-1$
    public static final String State_OK                             = "state-ok.svg";                                //$NON-NLS-1$

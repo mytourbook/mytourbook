@@ -2701,7 +2701,7 @@ public class RawDataView extends ViewPart implements
       /*
        * Import state
        */
-      _images.put(IMAGE_STATE_DELETE,              TourbookPlugin.getImageDescriptor      (Images.State_DeletedTour_View));
+      _images.put(IMAGE_STATE_DELETE,              TourbookPlugin.getImageDescriptor      (Images.App_Trash));
       _images.put(IMAGE_STATE_MOVED,               TourbookPlugin.getImageDescriptor      (Images.State_MovedTour_View));
 
       /*
