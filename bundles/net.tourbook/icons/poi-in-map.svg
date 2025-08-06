@@ -2,8 +2,8 @@
 <svg
    version="1.1"
    id="svg2985"
-   height="16"
-   width="16"
+   height="35.998596"
+   width="25"
    xml:space="preserve"
    xmlns="http://www.w3.org/2000/svg"
    xmlns:svg="http://www.w3.org/2000/svg"
@@ -27,14 +27,7 @@
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" /></cc:Work></rdf:RDF></metadata><g
      id="layer1"
      style="display:inline"
-     transform="translate(-225,-429.00009)"><rect
-       transform="scale(1,-1)"
-       y="-445.00009"
-       x="225"
-       height="15.999999"
-       width="16"
-       id="rect6561-8-1-9-9-5-5-9-9-1-3-94-1-1-1-3-1-1-7-1"
-       style="opacity:0.99;fill:none;stroke:none" /><path
-       style="fill:#8fffd1;fill-opacity:1;stroke:none;stroke-width:0.999995px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
-       d="m 233.05504,445.00009 c -2.23687,-8.70228 -6.05506,-6.45547 -6.05506,-11.02691 0,-4.57142 4.94171,-4.97309 6.05506,-4.97309 1.11333,0 5.94495,0.40167 5.94495,4.97309 0,4.57144 -2.72727,2.32463 -5.94495,11.02691 z"
-       id="path1887-2" /></g></svg>
+     transform="translate(-275,-469.00003)"><path
+       id="path1887-0-4-7"
+       style="display:inline;fill:#8fffd1;fill-opacity:1;stroke:#00b269;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="m 287.5,469.50003 c -2.22669,0 -12,0.84805 -12,10.49609 0,9.64809 6.39003,5.04241 12,23.27149 5.38999,-18.22908 12,-13.6234 12,-23.27149 0,-9.64804 -9.77336,-10.49609 -12,-10.49609 z m 0,6 a 5,4.9999981 0 0 1 5,5 5,4.9999981 0 0 1 -5,5 5,4.9999981 0 0 1 -5,-5 5,4.9999981 0 0 1 5,-5 z" /></g></svg>
