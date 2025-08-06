@@ -154,7 +154,7 @@ public class Images {
    public static final String PhotoSyncTour                        = "photo-sync-tour.svg";                         //$NON-NLS-1$
    public static final String PhotoTourPhotos                      = "photo-tour-photos.svg";                       //$NON-NLS-1$
    public static final String PhotoTimeAdjustment                  = "photo-time-adjustment.svg";                   //$NON-NLS-1$
-   public static final String POI_InMap                            = "poi-in-map.png";                              //$NON-NLS-1$
+   public static final String POI_InMap                            = "poi-in-map.svg";                              //$NON-NLS-1$
    public static final String POI_Anchor                           = "poi-anchor.svg";                              //$NON-NLS-1$
    public static final String POI_Car                              = "poi-car.svg";                                 //$NON-NLS-1$
    public static final String POI_Cart                             = "poi-cart.svg";                                //$NON-NLS-1$
