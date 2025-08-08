@@ -91,7 +91,7 @@ public class SuuntoCloudDownloader extends TourbookCloudDownloader {
    private CompletableFuture<WorkoutDownload> downloadFile(final Payload workoutPayload) {
 
       final HttpRequest request = HttpRequest.newBuilder()
-            .uri(OAuth2Utils.createOAuthPasseurUri("/suunto/workout/exportFit?workoutKey=" + workoutPayload.workoutKey()))//$NON-NLS-1$
+            .uri(OAuth2Utils.createOAuthPasseurUri("/suunto/workouts/" + workoutPayload.workoutKey() + "/fit"))//$NON-NLS-1$ //$NON-NLS-2$
             .header(OAuth2Constants.AUTHORIZATION, OAuth2Constants.BEARER + getAccessToken())
             .GET()
             .build();
