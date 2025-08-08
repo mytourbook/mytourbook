@@ -68,13 +68,17 @@ public class TourBookViewTests extends UITest {
             .menu(Messages.tour_editor_section_weather)
             .menu(Messages.Tour_Action_RetrieveWeatherData).click();
 
-      bot.sleep(5000);
+      // Because the https://render.com/ cloud subscription is free, we can experience
+      // the below caveat which can make the weather data retrieval tests fail:
+      // "Your free instance will spin down with inactivity, which can delay requests
+      // by 50 seconds or more"
+      bot.sleep(60000);
 
       final List<?> logs = TourLogManager.getLogs();
       assertTrue(logs.stream().map(log -> log.toString()).anyMatch(log -> log.contains(
             "Data retrieved in ")));//$NON-NLS-1$
       assertTrue(logs.stream().map(log -> log.toString()).anyMatch(log -> log.contains(
-            "1/31/2021, 7:15 AM:")));//$NON-NLS-1$
+            "1/31/2021, 7:15 AM:")));//$NON-NLS-1$
       assertTrue(logs.stream().map(log -> log.toString()).anyMatch(log -> log.contains(
             "air quality Fair")));//$NON-NLS-1$
    }
@@ -83,7 +87,7 @@ public class TourBookViewTests extends UITest {
    void adjustTourValues_SetTimeZone_AllChoices() {
 
       SWTBotTreeItem tour = Utils.duplicateAndGetTour(bot);
-      assertEquals("11:00 AM", tour.cell(tourBookView_StartTime_Column_Index)); //$NON-NLS-1$
+      assertEquals("11:00 AM", tour.cell(tourBookView_StartTime_Column_Index)); //$NON-NLS-1$
       assertEquals("America/Los_Angeles", tour.cell(tourBookView_TimeZone_Column_Index)); //$NON-NLS-1$
 
       //Adjust the tour time zone
@@ -93,7 +97,7 @@ public class TourBookViewTests extends UITest {
 
       //Assert
       tour = Utils.selectDuplicatedTour(bot);
-      assertEquals("12:00 PM", tour.cell(tourBookView_StartTime_Column_Index)); //$NON-NLS-1$
+      assertEquals("12:00 PM", tour.cell(tourBookView_StartTime_Column_Index)); //$NON-NLS-1$
       assertEquals("US/Mountain", tour.cell(tourBookView_TimeZone_Column_Index)); //$NON-NLS-1$
 
       //Adjust the tour time zone to the default value set in the preferences
@@ -103,7 +107,7 @@ public class TourBookViewTests extends UITest {
 
       //Assert
       tour = Utils.selectDuplicatedTour(bot);
-      assertEquals("8:00 PM", tour.cell(tourBookView_StartTime_Column_Index)); //$NON-NLS-1$
+      assertEquals("8:00 PM", tour.cell(tourBookView_StartTime_Column_Index)); //$NON-NLS-1$
       assertEquals("Europe/Paris", tour.cell(tourBookView_TimeZone_Column_Index)); //$NON-NLS-1$
 
       Utils.deleteTour(bot, tour);
