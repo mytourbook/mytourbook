@@ -357,7 +357,6 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements
          setToolTipText(Messages.Slideout_MapPoints_Action_MarkerTypes_SelectAll_Tooltip);
 
          setImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.Checkbox_Checked));
-         setDisabledImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.Checkbox_Checked_Disabled));
       }
 
       @Override
@@ -376,7 +375,6 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements
          setToolTipText(Messages.Slideout_MapPoints_Action_MarkerTypes_InverteSelection_Tooltip);
 
          setImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.Checkbox_Inverse));
-         setDisabledImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.Checkbox_Inverse_Disabled));
       }
 
       @Override
@@ -395,7 +393,6 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements
          setToolTipText(Messages.Slideout_MapPoints_Action_MarkerTypes_DeselectAll_Tooltip);
 
          setImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.Checkbox_Uncheck));
-         setDisabledImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.Checkbox_Uncheck_Disabled));
       }
 
       @Override

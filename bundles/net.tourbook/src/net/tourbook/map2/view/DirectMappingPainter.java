@@ -52,6 +52,7 @@ import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.ImageData;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
+import org.eclipse.swt.internal.DPIUtil;
 import org.eclipse.swt.widgets.Display;
 
 public class DirectMappingPainter implements IDirectPainter {
@@ -121,9 +122,9 @@ public class DirectMappingPainter implements IDirectPainter {
       final ImageDescriptor imageDescriptor = TourbookPlugin.getImageDescriptor(Images.MapLocationMarker_Hovered);
 
 // THIS NEEDS TO BE USED WHEN THE LOCATION ICON IS UNSCALES
-//      final ImageData imageData = imageDescriptor.getImageData(deviceZoom);
+      final ImageData imageData = imageDescriptor.getImageData(DPIUtil.getDeviceZoom());
 
-      final ImageData imageData = imageDescriptor.getImageData(100);
+//    final ImageData imageData = imageDescriptor.getImageData(100);
 
       _imageMapLocation_Hovered = new Image(Display.getDefault(), new NoAutoScalingImageDataProvider(imageData));
 

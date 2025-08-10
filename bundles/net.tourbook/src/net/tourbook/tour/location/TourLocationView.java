@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2023, 2024 Wolfgang Schramm and Contributors
+ * Copyright (C) 2023, 2025 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -273,7 +273,6 @@ public class TourLocationView extends ViewPart implements ITourViewer {
          setText(Messages.Tour_Location_Action_DeleteLocation);
 
          setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.App_Delete));
-         setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Images.App_Delete_Disabled));
       }
 
       @Override
@@ -318,8 +317,7 @@ public class TourLocationView extends ViewPart implements ITourViewer {
 
       public ActionLocationFilter() {
 
-         super(TourbookPlugin.getThemedImageDescriptor(Images.TourFilter_Collected_All),
-               TourbookPlugin.getThemedImageDescriptor(Images.TourFilter_Collected_All_Disabled));
+         super(TourbookPlugin.getThemedImageDescriptor(Images.TourFilter_Collected_All));
 
          isToggleAction = true;
          isShowSlideoutAlways = true;

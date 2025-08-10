@@ -187,7 +187,6 @@ public class PrefPageTagGroups extends PreferencePage implements IWorkbenchPrefe
          setToolTipText(Messages.Tour_Tags_Action_TagCheckFilter_OnlyTaggedTours_Tooltip);
 
          setImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.TagsChecked));
-         setDisabledImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.TagsChecked_Disabled));
       }
 
       @Override

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2024 Wolfgang Schramm and Contributors
+ * Copyright (C) 2024, 2025 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -27,9 +27,10 @@ public class PaintedMarkerCluster {
 
    private static final char NL = UI.NEW_LINE;
 
-   public Map2Point[]       allClusterMarker;
+   public Map2Point[]        allClusterMarker;
 
    public Rectangle          clusterSymbolRectangle;
+   public Rectangle          clusterSymbolRectangle_Unscaled;
 
    public String             clusterLabel;
    public int                clusterLabelDevX;
@@ -37,12 +38,14 @@ public class PaintedMarkerCluster {
 
    public PaintedMarkerCluster(final StaticCluster<?> staticCluster,
                                final Rectangle clusterSymbolRectangle,
+                               final Rectangle clusterSymbolRectangle_Unscaled,
 
                                final String clusterLabel,
                                final int clusterLabelDevX,
                                final int clusterLabelDevY) {
 
       this.clusterSymbolRectangle = clusterSymbolRectangle;
+      this.clusterSymbolRectangle_Unscaled = clusterSymbolRectangle_Unscaled;
 
       this.clusterLabel = clusterLabel;
       this.clusterLabelDevX = clusterLabelDevX;

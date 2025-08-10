@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2025 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -28,7 +28,6 @@ public class ActionZoomToSlider extends Action {
       setText(Messages.Action_zoom_to_slider);
 
       setImageDescriptor(ChartActivator.getThemedImageDescriptor(ChartImages.Zoom_In));
-      setDisabledImageDescriptor(ChartActivator.getThemedImageDescriptor(ChartImages.Zoom_In_Disabled));
    }
 
    @Override

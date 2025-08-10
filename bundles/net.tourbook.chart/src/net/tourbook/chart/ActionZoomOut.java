@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2025 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -29,7 +29,6 @@ public class ActionZoomOut extends Action {
       setToolTipText(Messages.Action_zoom_out_tooltip);
 
       setImageDescriptor(ChartActivator.getThemedImageDescriptor(ChartImages.Zoom_Out));
-      setDisabledImageDescriptor(ChartActivator.getThemedImageDescriptor(ChartImages.Zoom_Out_Disabled));
    }
 
    @Override

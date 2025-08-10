@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2025 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -29,7 +29,6 @@ public class ActionCancelRefreshOfflineInfo extends Action {
       setToolTipText(Messages.Pref_Map_Button_CancelTileInfo_Tooltip);
 
       setImageDescriptor(CommonActivator.getImageDescriptor(CommonImages.App_Cancel));
-      setDisabledImageDescriptor(CommonActivator.getThemedImageDescriptor(CommonImages.App_Cancel_Disabled));
 
       _prefPageMapFactories = prefPageMapFactories;
    }

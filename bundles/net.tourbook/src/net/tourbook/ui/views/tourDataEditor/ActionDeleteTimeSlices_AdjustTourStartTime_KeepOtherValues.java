@@ -34,7 +34,6 @@ class ActionDeleteTimeSlices_AdjustTourStartTime_KeepOtherValues extends Action 
       setToolTipText(Messages.Tour_Editor_Action_DeleteTimeSlices_AdjustTourStartTime_KeepOtherValues_Tooltip);
 
       setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.App_Delete));
-      setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Images.App_Delete_Disabled));
 
       _tourDataEditorView = tourDataEditorView;
    }

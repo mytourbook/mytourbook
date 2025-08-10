@@ -2695,13 +2695,13 @@ public class RawDataView extends ViewPart implements
       _images.put(IMAGE_DATABASE,                  TourbookPlugin.getImageDescriptor      (Images.Saved_Tour));
       _images.put(IMAGE_DATABASE_OTHER_PERSON,     TourbookPlugin.getThemedImageDescriptor(Images.Saved_Tour_OtherPerson));
       _images.put(IMAGE_ASSIGN_MERGED_TOUR,        TourbookPlugin.getThemedImageDescriptor(Images.Saved_MergedTour));
-      _images.put(IMAGE_ICON_PLACEHOLDER,          TourbookPlugin.getImageDescriptor      (Images.App_EmptyIcon_Placeholder));
+      _images.put(IMAGE_ICON_PLACEHOLDER,          TourbookPlugin.getImageDescriptor      (Images.App_IconPlaceholder));
       _images.put(IMAGE_DELETE,                    TourbookPlugin.getImageDescriptor      (Images.App_Delete));
 
       /*
        * Import state
        */
-      _images.put(IMAGE_STATE_DELETE,              TourbookPlugin.getImageDescriptor      (Images.State_DeletedTour_View));
+      _images.put(IMAGE_STATE_DELETE,              TourbookPlugin.getImageDescriptor      (Images.App_Trash));
       _images.put(IMAGE_STATE_MOVED,               TourbookPlugin.getImageDescriptor      (Images.State_MovedTour_View));
 
       /*

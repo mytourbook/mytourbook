@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2024 Wolfgang Schramm and Contributors
+ * Copyright (C) 2024, 2025 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -124,7 +124,6 @@ public class CommonLocationView extends ViewPart implements ITourViewer {
          setText(Messages.Tour_Location_Action_DeleteCommonLocation);
 
          setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.App_Delete));
-         setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Images.App_Delete_Disabled));
       }
 
       @Override

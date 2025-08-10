@@ -1083,8 +1083,7 @@ public class Map2View extends ViewPart implements
 
       public ActionSyncMap() {
 
-         super(TourbookPlugin.getThemedImageDescriptor(Images.SyncMap),
-               TourbookPlugin.getThemedImageDescriptor(Images.SyncMap_Disabled));
+         super(TourbookPlugin.getThemedImageDescriptor(Images.SyncWith_Tour));
 
          isToggleAction = true;
          isShowSlideoutAlways = true;

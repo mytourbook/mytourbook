@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2022 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2025 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -46,7 +46,6 @@ public class ActionTourChartSegmenterConfig extends ContributionItem {
    private Control _parent;
 
    private Image   _imageEnabled;
-   private Image   _imageDisabled;
 
    private Boolean _initialIsSelected = null;
 
@@ -56,12 +55,10 @@ public class ActionTourChartSegmenterConfig extends ContributionItem {
       _parent = parent;
 
       _imageEnabled = TourbookPlugin.getThemedImageDescriptor(Images.TourSegments).createImage();
-      _imageDisabled = TourbookPlugin.getThemedImageDescriptor(Images.TourSegments_Disabled).createImage();
 
       _parent.addDisposeListener(disposeEvent -> {
 
          _imageEnabled.dispose();
-         _imageDisabled.dispose();
       });
    }
 
@@ -79,7 +76,6 @@ public class ActionTourChartSegmenterConfig extends ContributionItem {
 
          _actionToolItem = new ToolItem(toolbar, SWT.CHECK);
          _actionToolItem.setImage(_imageEnabled);
-         _actionToolItem.setDisabledImage(_imageDisabled);
          _actionToolItem.addSelectionListener(widgetSelectedAdapter(selectionEvent -> onAction()));
 
          toolbar.addMouseMoveListener(mouseEvent -> {

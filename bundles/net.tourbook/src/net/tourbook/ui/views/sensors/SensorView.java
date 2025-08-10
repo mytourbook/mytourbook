@@ -143,7 +143,6 @@ public class SensorView extends ViewPart implements ITourViewer {
          setText(Messages.Sensor_View_Action_DeleteSensor);
 
          setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.App_Delete));
-         setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Images.App_Delete_Disabled));
       }
 
       @Override
@@ -160,7 +159,6 @@ public class SensorView extends ViewPart implements ITourViewer {
          setText(Messages.Sensor_View_Action_EditSensor);
 
          setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.Sensor));
-         setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Images.Sensor_Disabled));
       }
 
       @Override

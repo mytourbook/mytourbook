@@ -1482,6 +1482,7 @@ public class Messages extends NLS {
    public static String        Model_Player_Button_Pause_Tooltip;
    public static String        Model_Player_Button_Play_Tooltip;
    public static String        Model_Player_Button_PlayLoop_Tooltip;
+   public static String        Model_Player_Button_SelectMapModel_Tooltip;
    public static String        Model_Player_Checkbox_ReLivePlaying;
    public static String        Model_Player_Error_InvalidModelFilepath;
    public static String        Model_Player_Label_ModelCursorSize;

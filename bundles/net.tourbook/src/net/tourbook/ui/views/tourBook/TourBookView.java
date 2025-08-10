@@ -555,8 +555,7 @@ public class TourBookView extends ViewPart implements
 
       public ActionTourCollectionFilter() {
 
-         super(TourbookPlugin.getThemedImageDescriptor(Images.TourFilter_Collected_All),
-               TourbookPlugin.getThemedImageDescriptor(Images.TourFilter_Collected_All_Disabled));
+         super(TourbookPlugin.getThemedImageDescriptor(Images.TourFilter_Collected_All));
 
          isToggleAction = true;
          isShowSlideoutAlways = true;

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2024 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2025 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -47,7 +47,6 @@ public class ActionDeleteMarkerDialog extends Action {
 
       setText(Messages.App_Action_DeleteTourMarker);
       setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.App_Delete));
-      setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Images.App_Delete_Disabled));
 
       setEnabled(false);
    }
@@ -70,7 +69,7 @@ public class ActionDeleteMarkerDialog extends Action {
             if (StringUtils.hasContent(markersNames.toString())) {
                markersNames.append(UI.COMMA_SPACE);
             }
-            markersNames.append(UI.SYMBOL_QUOTATION_MARK + tourMarker.getLabel() + UI.SYMBOL_QUOTATION_MARK); //$NON-NLS-1$ //$NON-NLS-2$
+            markersNames.append(UI.SYMBOL_QUOTATION_MARK + tourMarker.getLabel() + UI.SYMBOL_QUOTATION_MARK);
          }
          dialogMessage = NLS.bind(Messages.Dlg_TourMarker_MsgBox_delete_markers_message, markersNames.toString());
       }
