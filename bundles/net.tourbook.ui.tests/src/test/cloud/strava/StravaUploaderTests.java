@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2022, 2023 Frédéric Bard
+ * Copyright (C) 2022, 2025 Frédéric Bard
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -161,7 +161,7 @@ public class StravaUploaderTests extends UITest {
             .called();
       final List<?> logs = TourLogManager.getLogs();
       assertTrue(logs.stream().map(log -> log.toString()).anyMatch(log -> log.contains(
-            "message      = 1/1/2005, 5:00 AM -> Uploaded Activity Link: <br><a href=\"https://www.strava.com/activities/6468063624\">https://www.strava.com/activities/6468063624</a></br>\n"))); //$NON-NLS-1$
+            "message      = 1/1/2005, 5:00 AM -> Uploaded Activity Link: <br><a href=\"https://www.strava.com/activities/6468063624\">https://www.strava.com/activities/6468063624</a></br>"))); //$NON-NLS-1$
 
       // Cleanup
       tour = Utils.selectManualTour(bot);
@@ -192,6 +192,6 @@ public class StravaUploaderTests extends UITest {
       // Assert
       final List<?> logs = TourLogManager.getLogs();
       assertTrue(logs.stream().map(log -> log.toString()).anyMatch(log -> log.contains(
-            "message      = 1/31/2021, 7:15 AM -> Upload Id: \"6877121234\". Creation Activity Status: \"Your activity is still being processed.\"\n")));//$NON-NLS-1$
+            "message      = 1/31/2021, 7:15 AM -> Upload Id: \"6877121234\". Creation Activity Status: \"Your activity is still being processed.\"")));//$NON-NLS-1$
    }
 }
