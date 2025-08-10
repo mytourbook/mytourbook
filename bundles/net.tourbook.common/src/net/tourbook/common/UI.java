@@ -809,6 +809,11 @@ public class UI {
       updateUnits();
 
       final int deviceZoom = DPIUtil.getDeviceZoom();
+      final int monitorZoom = DPIUtil.getNativeDeviceZoom();
+
+      // log UI scaling
+      StatusUtil.logInfo("App zoom = %d".formatted(deviceZoom));//$NON-NLS-1$
+      StatusUtil.logInfo("Monitor zoom = %d".formatted(monitorZoom));//$NON-NLS-1$
 
       IS_4K_DISPLAY = deviceZoom >= 140;
       HIDPI_SCALING = deviceZoom / 100f;
