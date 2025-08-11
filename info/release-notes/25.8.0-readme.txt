@@ -1,11 +1,15 @@
-25.8.0                                                 ?. August 2025
+25.8.0                                                 11. August 2025
 
+New
+===
 
-!!! Jave 21 is required !!!
+* Java 21
+  - Java 21 is the new required Java platform for MyTourbook
+    For Windows users, install MyTourbook with the embedded Java and you don't have to care about it, which is the authors preferred way.
+    
 
-
-New / Improvements
-==================
+Improvements
+============
 
 * UI Font
   - The font can be customized for all drawn texts 
@@ -46,7 +50,7 @@ Changes that require Tour Re-import
 ===================================
 
 * Fit Import
-  Swimming tours should be re-imported that fixes are applied to already saved tours.
+  Swimming tours should be re-imported that fixes are applied to already saved tours
 
 
 Bugfix
