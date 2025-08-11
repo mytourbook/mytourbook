@@ -93,7 +93,7 @@ task mt_20_BuildProduct() {
 
       // run: mvn clean verify -P build-release
 
-      exec {
+      project.exec {
 
          workingDir  "../.."
 
@@ -170,7 +170,7 @@ task mt_50_CreateExeFiles {
       def configFilename_Win64Setup        = file(winInnoSetupDirName + '/mytourbook-create-setup-exe.iss').absolutePath
       def configFilename_Win64SetupWithJRE = file(winInnoSetupDirName + '/mytourbook-create-setup-exe-with-jre.iss').absolutePath
       
-      exec {
+      project.exec {
       
          println '\tWin 64'
       
@@ -178,7 +178,7 @@ task mt_50_CreateExeFiles {
          args        configFilename_Win64Setup
       }
 
-      exec {
+      project.exec {
       
          println '\tWin 64 with Java runtime'
       
