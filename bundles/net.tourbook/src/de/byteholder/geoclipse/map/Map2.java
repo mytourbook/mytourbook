@@ -96,13 +96,13 @@ import net.tourbook.common.color.ThemeUtil;
 import net.tourbook.common.formatter.FormatManager;
 import net.tourbook.common.map.GeoPosition;
 import net.tourbook.common.time.TimeTools;
+import net.tourbook.common.util.CustomScalingImageDataProvider;
 import net.tourbook.common.util.HoveredAreaContext;
 import net.tourbook.common.util.IToolTipProvider;
 import net.tourbook.common.util.ITourToolTipProvider;
 import net.tourbook.common.util.ImageConverter;
 import net.tourbook.common.util.ImageUtils;
 import net.tourbook.common.util.MtMath;
-import net.tourbook.common.util.CustomScalingImageDataProvider;
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.StringUtils;
 import net.tourbook.common.util.TourToolTip;
@@ -6082,7 +6082,7 @@ public class Map2 extends Canvas {
 
       // show different color when adjusted
       if (isAdjusted) {
-         gc.setForeground(_display.getSystemColor(SWT.COLOR_RED));
+         gc.setForeground(_display.getSystemColor(SWT.COLOR_BLUE));
       } else {
          gc.setForeground(UI.SYS_COLOR_DARK_GRAY);
       }
@@ -10130,6 +10130,7 @@ public class Map2 extends Canvas {
       if (_isShowDebug_TileBorder) {
 
          // draw tile border
+         gc.setLineWidth(1);
          gc.setForeground(_isMapBackgroundDark ? UI.SYS_COLOR_YELLOW : UI.SYS_COLOR_RED);
          gc.drawRectangle(devTileViewport.x, devTileViewport.y, _tilePixelSize, _tilePixelSize);
       }

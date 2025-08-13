@@ -40,8 +40,9 @@ New / Improvements
 Changes
 =======
 
-* 
-  
+* Map Properties View
+  This view is removed, its options are now available directly in the 2D map options slideout
+  https://github.com/mytourbook/mytourbook/issues/1543
 
 Changes that require Tour Re-import
 ===================================

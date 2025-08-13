@@ -203,6 +203,9 @@ public class OtherMessages {
    public static final String MAP_ACTION_TOUR_COLOR_SPEED_TOOLTIP          = net.tourbook.map2.Messages.map_action_tour_color_speed_tooltip;
    public static final String MAP_ACTION_SYNCH_WITH_SLIDER                 = net.tourbook.map2.Messages.Map_Action_SynchWith_TourPosition;
    public static final String MAP_ACTION_SYNCH_WITH_SLIDER_CENTERED        = net.tourbook.map2.Messages.Map_Action_SynchWithSlider_Centered;
+   public static final String MAP_PROPERTIES_SHOW_GEO_GRID                 = net.tourbook.map2.Messages.Map_Properties_ShowGeoGrid;
+   public static final String MAP_PROPERTIES_SHOW_TILE_BORDER              = net.tourbook.map2.Messages.Map_Properties_ShowTileBorder;
+   public static final String MAP_PROPERTIES_SHOW_TILE_INFO                = net.tourbook.map2.Messages.Map_Properties_ShowTileInfo;
    public static final String TOUR_ACTION_SHOW_HR_ZONES_TOOLTIP            = net.tourbook.map2.Messages.Tour_Action_ShowHrZones_Tooltip;
 
    //
