@@ -30,7 +30,7 @@ import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.UI;
 import net.tourbook.common.color.ColorProviderConfig;
 import net.tourbook.common.map.GeoPosition;
-import net.tourbook.common.util.NoAutoScalingImageDataProvider;
+import net.tourbook.common.util.CustomScalingImageDataProvider;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourPhoto;
 import net.tourbook.map2.Messages;
@@ -126,7 +126,7 @@ public class DirectMappingPainter implements IDirectPainter {
 
 //    final ImageData imageData = imageDescriptor.getImageData(100);
 
-      _imageMapLocation_Hovered = new Image(Display.getDefault(), new NoAutoScalingImageDataProvider(imageData));
+      _imageMapLocation_Hovered = new Image(Display.getDefault(), new CustomScalingImageDataProvider(imageData));
 
 // SET_FORMATTING_OFF
 

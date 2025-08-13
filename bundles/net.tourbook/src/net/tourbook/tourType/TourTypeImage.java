@@ -26,7 +26,7 @@ import java.util.HashMap;
 
 import net.tourbook.common.UI;
 import net.tourbook.common.color.ThemeUtil;
-import net.tourbook.common.util.NoAutoScalingImageDataProvider;
+import net.tourbook.common.util.CustomScalingImageDataProvider;
 import net.tourbook.data.TourType;
 import net.tourbook.database.TourDatabase;
 
@@ -90,7 +90,7 @@ public class TourTypeImage {
 
          drawTourTypeImage(typeId, g2d);
 
-         final Image newImageSWT = new Image(Display.getCurrent(), new NoAutoScalingImageDataProvider(awtImage));
+         final Image newImageSWT = new Image(Display.getCurrent(), new CustomScalingImageDataProvider(awtImage));
 
          if (existingImageSWT == null) {
 

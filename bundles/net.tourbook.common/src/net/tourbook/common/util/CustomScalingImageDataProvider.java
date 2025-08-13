@@ -37,19 +37,19 @@ import org.eclipse.swt.internal.DPIUtil;
  * <p>
  * https://github.com/eclipse-platform/eclipse.platform.swt/issues/1411
  */
-public class NoAutoScalingImageDataProvider implements ImageDataProvider {
+public class CustomScalingImageDataProvider implements ImageDataProvider {
 
    private ImageData _imageData;
    private ImageData _imageData_Scaled;
 
    private float     _imageScale;
 
-   public NoAutoScalingImageDataProvider(final BufferedImage awtImage) {
+   public CustomScalingImageDataProvider(final BufferedImage awtImage) {
 
       _imageData = ImageConverter.convertIntoSWTImageData(awtImage);
    }
 
-   public NoAutoScalingImageDataProvider(final ImageData imageData) {
+   public CustomScalingImageDataProvider(final ImageData imageData) {
 
       _imageData = imageData;
    }

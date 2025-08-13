@@ -92,7 +92,7 @@ public class ImageConverter {
       final ImageData imageData = imageDescriptor.getImageData(deviceZoom);
 
       BufferedImage awtImage;
-      final Image swtImage = new Image(Display.getDefault(), new NoAutoScalingImageDataProvider(imageData));
+      final Image swtImage = new Image(Display.getDefault(), new CustomScalingImageDataProvider(imageData));
       {
          awtImage = convertIntoAWT(swtImage);
       }

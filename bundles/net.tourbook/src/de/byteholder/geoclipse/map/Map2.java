@@ -102,7 +102,7 @@ import net.tourbook.common.util.ITourToolTipProvider;
 import net.tourbook.common.util.ImageConverter;
 import net.tourbook.common.util.ImageUtils;
 import net.tourbook.common.util.MtMath;
-import net.tourbook.common.util.NoAutoScalingImageDataProvider;
+import net.tourbook.common.util.CustomScalingImageDataProvider;
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.StringUtils;
 import net.tourbook.common.util.TourToolTip;
@@ -7334,7 +7334,7 @@ public class Map2 extends Canvas {
             g2d.dispose();
          }
 
-         final Image swtImage = new Image(getDisplay(), new NoAutoScalingImageDataProvider(awtImage));
+         final Image swtImage = new Image(getDisplay(), new CustomScalingImageDataProvider(awtImage));
 
          /*
           * This may be needed to be synchronized ?
@@ -9658,7 +9658,7 @@ public class Map2 extends Canvas {
       final float scaledTilePixelSize = _tilePixelSize * UI.HIDPI_SCALING * 2;
       final ImageData transparentImageData = MapUtils.createTransparentImageData((int) scaledTilePixelSize);
 
-      final NoAutoScalingImageDataProvider imageDataProvider = new NoAutoScalingImageDataProvider(transparentImageData);
+      final CustomScalingImageDataProvider imageDataProvider = new CustomScalingImageDataProvider(transparentImageData);
 
       final Image overlayImage = new Image(_display, imageDataProvider);
       final GC gcTile = new GC(overlayImage);

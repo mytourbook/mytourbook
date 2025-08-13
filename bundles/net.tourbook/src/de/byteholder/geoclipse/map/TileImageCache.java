@@ -29,7 +29,7 @@ import java.util.concurrent.locks.ReentrantLock;
 
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.UI;
-import net.tourbook.common.util.NoAutoScalingImageDataProvider;
+import net.tourbook.common.util.CustomScalingImageDataProvider;
 import net.tourbook.common.util.StatusUtil;
 
 import org.eclipse.core.runtime.IPath;
@@ -158,7 +158,7 @@ public class TileImageCache {
 
          // create adjusted scaled image
 
-         final NoAutoScalingImageDataProvider imageDataProvider = new NoAutoScalingImageDataProvider(imageData);
+         final CustomScalingImageDataProvider imageDataProvider = new CustomScalingImageDataProvider(imageData);
 
          final int deviceZoom = DPIUtil.getDeviceZoom();
          final float deviceScale = deviceZoom / 100.0f;

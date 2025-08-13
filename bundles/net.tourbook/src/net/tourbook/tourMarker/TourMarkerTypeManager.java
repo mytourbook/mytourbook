@@ -33,7 +33,7 @@ import javax.persistence.EntityTransaction;
 import javax.persistence.Query;
 
 import net.tourbook.common.UI;
-import net.tourbook.common.util.NoAutoScalingImageDataProvider;
+import net.tourbook.common.util.CustomScalingImageDataProvider;
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.data.TourMarker;
 import net.tourbook.data.TourMarkerType;
@@ -122,7 +122,7 @@ public class TourMarkerTypeManager {
 
          drawMarkerTypeImage(typeId, g2d, imageSize);
 
-         return new Image(Display.getCurrent(), new NoAutoScalingImageDataProvider(awtImage));
+         return new Image(Display.getCurrent(), new CustomScalingImageDataProvider(awtImage));
 
       } finally {
 

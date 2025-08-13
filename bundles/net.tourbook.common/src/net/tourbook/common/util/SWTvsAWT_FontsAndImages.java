@@ -210,7 +210,7 @@ public class SWTvsAWT_FontsAndImages {
       final Image swtImage = createSWTImage();
       final BufferedImage awtImage = createAWTImage();
 
-      final NoAutoScalingImageDataProvider imageDataProvider = new NoAutoScalingImageDataProvider(awtImage);
+      final CustomScalingImageDataProvider imageDataProvider = new CustomScalingImageDataProvider(awtImage);
 
       final Image swtImageFromAwt = new Image(_swtDisplay, imageDataProvider);
 

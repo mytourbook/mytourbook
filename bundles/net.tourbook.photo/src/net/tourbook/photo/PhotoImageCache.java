@@ -28,7 +28,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import net.tourbook.common.UI;
-import net.tourbook.common.util.NoAutoScalingImageDataProvider;
+import net.tourbook.common.util.CustomScalingImageDataProvider;
 import net.tourbook.common.util.SWT2Dutil;
 import net.tourbook.photo.internal.manager.ImageCacheWrapper;
 
@@ -250,7 +250,7 @@ public class PhotoImageCache {
 
                // image could be converted
 
-               swtImage = new Image(Display.getDefault(), new NoAutoScalingImageDataProvider(swtImageData));
+               swtImage = new Image(Display.getDefault(), new CustomScalingImageDataProvider(swtImageData));
 
                cacheWrapper.swtImage = swtImage;
             }
