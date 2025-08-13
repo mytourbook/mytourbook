@@ -121,8 +121,9 @@ public class TourDatabase {
     * <li>/net.tourbook.export/format-templates/mt-1.0.vm</li>
     * <li>net.tourbook.device.mt.MT_StAXHandler</li>
     */
-   private static final int TOURBOOK_DB_VERSION = 58;
+   private static final int TOURBOOK_DB_VERSION = 59;
 
+//   private static final int TOURBOOK_DB_VERSION = 58; // 25.6
 //   private static final int TOURBOOK_DB_VERSION = 57; // 25.4
 //   private static final int TOURBOOK_DB_VERSION = 56; // 24.11.3
 //   private static final int TOURBOOK_DB_VERSION = 55; // 24.5
@@ -6854,14 +6855,19 @@ public class TourDatabase {
             currentDbVersion = _dbDesignVersion_New = updateDb_055_To_056(conn, splashManager);
          }
 
-         // 56 -> 57    25.?
+         // 56 -> 57    25.4
          if (currentDbVersion == 56) {
             currentDbVersion = _dbDesignVersion_New = updateDb_056_To_057(conn, splashManager);
          }
 
-         // 57 -> 58    25.XX
+         // 57 -> 58    25.6
          if (currentDbVersion == 57) {
             currentDbVersion = _dbDesignVersion_New = updateDb_057_To_058(conn, splashManager);
+         }
+
+         // 58 -> 59    25.6+++
+         if (currentDbVersion == 58) {
+            currentDbVersion = _dbDesignVersion_New = updateDb_058_To_059(splashManager);
          }
 
          // update db design version number
@@ -6926,7 +6932,8 @@ public class TourDatabase {
          updateDb_050_To_051_DataUpdate(conn, splashManager); //                                   51 - 23.8
          updateDb__3_Data_Concurrent(conn, splashManager, new TourDataUpdate_051_to_052()); //     52 - 24.1
          updateDb__3_Data_Concurrent(conn, splashManager, new TourDataUpdate_053_to_054()); //     54 - 24.1
-         updateDb__3_Data_Concurrent(conn, splashManager, new TourDataUpdate_057_to_058()); //     58 - 25.??? after 25.4
+         updateDb__3_Data_Concurrent(conn, splashManager, new TourDataUpdate_057_to_058()); //     58 - 25.6
+         updateDb__3_Data_Concurrent(conn, splashManager, new TourDataUpdate_058_to_059()); //     59 - 25.??? after 25.6
 
       } catch (final SQLException e) {
 
@@ -6963,9 +6970,9 @@ public class TourDatabase {
       List<Long> allTourIDs = tourDataUpdater.getTourIDs();
 
       if (allTourIDs == null) {
-         
+
          // use default -> all
-         
+
          allTourIDs = getAllTourIds();
       }
 
@@ -11009,6 +11016,30 @@ public class TourDatabase {
 
       }
       stmt.close();
+
+      logDbUpdate_End(newDbVersion);
+
+      return newDbVersion;
+   }
+
+   /**
+    * Dummy update that {@link net.tourbook.database.TourDataUpdate_058_to_059} works
+    *
+    * @param conn
+    * @param splashManager
+    *
+    * @return
+    *
+    * @throws SQLException
+    */
+   private int updateDb_058_To_059(final SplashManager splashManager) {
+
+      final int newDbVersion = 59;
+
+      logDbUpdate_Start(newDbVersion);
+      updateMonitor(splashManager, newDbVersion);
+
+      // this is a dummy db design update that the db data update works
 
       logDbUpdate_End(newDbVersion);
 
