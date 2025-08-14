@@ -49,9 +49,11 @@ public class TourDataUpdate_058_to_059 implements ITourDataUpdate {
       if (pausedTime > 0 && pausedTime == breakTime * 1000) {
 
          tourData.setTourDeviceTime_Paused(breakTime);
+
+         return true;
       }
 
-      return true;
+      return false;
    }
 
 }
