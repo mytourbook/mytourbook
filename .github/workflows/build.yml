@@ -1,5 +1,6 @@
 name: Build
 on:
+  schedule:
   - cron: "20 7 * * *"
 jobs:
   build:
