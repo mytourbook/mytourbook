@@ -4,7 +4,8 @@ plugins {
 }
 
 // get MT version and remove quotes
-def _mtVersionRaw                = project(':mytourbook').ext.myTourbookVersion      // '18.2.0'
+// Note: This was originally from a multi-project build, now configured for single project
+def _mtVersionRaw                = project.hasProperty('myTourbookVersion') ? project.myTourbookVersion : '1.0.0'      // '18.2.0'
 def _mtVersion                   = _mtVersionRaw.replaceAll('\'', '')                //  18.2.0
 
 def _dirProductBuilt             = file('../build.net.tourbook.product/target/products')
@@ -88,17 +89,12 @@ task mt_10_CreateBuildFiles {
 /*
 * 2. Build product with maven/tycho
 */
-task mt_20_BuildProduct {
+task mt_20_BuildProduct(type: Exec) {
    group = 'build'
    description = 'Build product with Maven/Tycho'
 
-   doLast {
-      // run: mvn clean verify -P build-release
-      exec {
-         workingDir  "../.."
-         commandLine 'cmd', '/c', 'mvn clean verify -P build-release'
-      }
-   }
+   workingDir = "../.."
+   commandLine 'cmd', '/c', 'mvn clean verify -P build-release'
 }
 
 /*
@@ -135,9 +131,9 @@ task mt_40_ExtractWinFiles {
    doLast {
       println 'Extracting from ' + _dirProductArchive
 
-      file(_dirProductArchive).eachFileMatch(~/.*win.*x86.*.zip/) { winZipFile->
+      fileTree(_dirProductArchive).matching { include '**/*win*x86*.zip' }.each { winZipFile->
          def winZipFileName   = winZipFile.name
-         def winZipName       = winZipFileName.take(winZipFileName.lastIndexOf('.'))
+         def winZipName       = winZipFileName.substring(0, winZipFileName.lastIndexOf('.'))
 
          def outputDir        = file(_pathProductArchive + '/' + winZipName)
 
@@ -154,29 +150,35 @@ task mt_40_ExtractWinFiles {
 /*
  Create win exe files
 */
+// Create separate Exec tasks for each setup file
+task createWin64Setup(type: Exec) {
+   group = 'build'
+   description = 'Create Windows 64 setup file'
+   
+   workingDir = _dirWinInnoSetup.absolutePath
+   commandLine 'cmd', '/c', '"'+_pathInnoSetupCompilerApp+'"'
+   args = [file(_dirWinInnoSetup.absolutePath + '/mytourbook-create-setup-exe.iss').absolutePath]
+}
+
+task createWin64SetupWithJRE(type: Exec) {
+   group = 'build'
+   description = 'Create Windows 64 setup file with JRE'
+   
+   workingDir = _dirWinInnoSetup.absolutePath
+   commandLine 'cmd', '/c', '"'+_pathInnoSetupCompilerApp+'"'
+   args = [file(_dirWinInnoSetup.absolutePath + '/mytourbook-create-setup-exe-with-jre.iss').absolutePath]
+}
+
 task mt_50_CreateExeFiles {
    group = 'build'
    description = 'Create Windows executable setup files'
-        
+   
+   dependsOn createWin64Setup, createWin64SetupWithJRE
+   
    doLast {
       println 'Creating Windows setup files'
-      
-      def winInnoSetupDirName = _dirWinInnoSetup.absolutePath
-      
-      def configFilename_Win64Setup        = file(winInnoSetupDirName + '/mytourbook-create-setup-exe.iss').absolutePath
-      def configFilename_Win64SetupWithJRE = file(winInnoSetupDirName + '/mytourbook-create-setup-exe-with-jre.iss').absolutePath
-      
-      exec {
-         println '\tWin 64'
-         commandLine 'cmd', '/c', '"'+_pathInnoSetupCompilerApp+'"'
-         args        configFilename_Win64Setup
-      }
-
-      exec {
-         println '\tWin 64 with Java runtime'
-         commandLine 'cmd', '/c', '"'+_pathInnoSetupCompilerApp+'"'
-         args        configFilename_Win64SetupWithJRE
-      }
+      println '\tWin 64'
+      println '\tWin 64 with Java runtime'
    }
 }
 
@@ -193,13 +195,13 @@ task mt_60_CleanupFiles {
       */
       println 'Deleting extracted files'
       
-      file(_dirProductArchive).eachFileMatch(~/.*win.*x86.zip/) { winZipFile->
+      fileTree(_dirProductArchive).matching { include '**/*win*x86.zip' }.each { winZipFile->
          def winZipFileName   = winZipFile.name
-         def winZipName       = winZipFileName.take(winZipFileName.lastIndexOf('.'))
+         def winZipName       = winZipFileName.substring(0, winZipFileName.lastIndexOf('.'))
          
          def outputDir        = file(_pathProductArchive + '/' + winZipName)
 
-         println '\tdelete folder\t\t' + outputDir
+         println '\tdelete folder\t\t' + winZipName
          
          // delete extracted files
          outputDir.deleteDir()
@@ -211,12 +213,12 @@ task mt_60_CleanupFiles {
       println '' 
       println 'Deleting JRE files'
       
-      file(_dirProductArchive).eachFileMatch(~/.*-jre-.*.zip/) { jreFile->
+      fileTree(_dirProductArchive).matching { include '**/*-jre-*.zip' }.each { jreFile->
          println '\tdelete file\t\t' + jreFile
          jreFile.delete()
       }
       
-      file(_dirProductArchive).eachFileMatch(~/.*-jre-.*.tar.gz/) { jreFile->
+      fileTree(_dirProductArchive).matching { include '**/*-jre-*.tar.gz' }.each { jreFile->
          println '\tdelete file\t\t' + jreFile
          jreFile.delete()
       }
