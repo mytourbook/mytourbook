@@ -1,5 +1,4 @@
 plugins {
-
    id 'org.sonarqube' version '6.2.0.5505'
    id 'jacoco'
 }
@@ -16,16 +15,14 @@ def _pathProductArchive          = _dirProductArchive.absolutePath
 def _dirWinInnoSetup             = file('../../INSTALL-UPDATES/installer-net.tourbook/win-Inno.Setup')
 def _pathInnoSetupCompilerApp    = file('c:/Program Files (x86)/Inno Setup 6/iscc.exe').absolutePath
 
-
+// Use the new Gradle 9 compatible task graph API
 gradle.taskGraph.beforeTask { Task task ->
-
     // show a task indicator
    println '---------------------------------------------------------------------------------------'
    println ''
 }
 
-gradle.taskGraph.afterTask { Task task ->
-
+gradle.taskGraph.afterTask { Task task, TaskState state ->
     // show more space
    println ''
    println ''
@@ -33,9 +30,12 @@ gradle.taskGraph.afterTask { Task task ->
 
 defaultTasks 'mt_0_Build'
 
-task mt_0_Build          
-mt_0_Build.dependsOn( 
+task mt_0_Build {
+    group = 'build'
+    description = 'Main build task for MyTourbook'
+}
 
+mt_0_Build.dependsOn( 
    'mt_10_CreateBuildFiles', 
    'mt_20_BuildProduct', 
    'mt_30_CopyProduct',
@@ -47,8 +47,8 @@ mt_0_Build.dependsOn(
 
 sonarqube {
   properties {
-    property 'sonar.projectKey',                     'FJBDev_mytourbook'
-    property 'sonar.organization',                   'fjbdev'
+    property 'sonar.projectKey',                     'wolfgang-ch_mytourbook'
+    property 'sonar.organization',                   'wolfgang-ch'
     property 'sonar.host.url',                       'https://sonarcloud.io'
     property 'sonar.projectVersion',                            _mtVersion
     property 'sonar.projectName',                               'MyTourbook'
@@ -76,64 +76,66 @@ sonarqube {
 * 1. Copy all MT files into a temp folder, it is using task/target 'create-build-files' from the Ant script
 */
 task mt_10_CreateBuildFiles {
-
+   group = 'build'
+   description = 'Create build files using Ant script'
+   
    // import Ant build, every target will be a task
    ant.importBuild 'CREATE_MT_BuildFiles.xml'
 
    dependsOn('create-build-files')
 }
 
-
 /*
 * 2. Build product with maven/tycho
 */
-task mt_20_BuildProduct() {
+task mt_20_BuildProduct {
+   group = 'build'
+   description = 'Build product with Maven/Tycho'
 
+   doLast {
       // run: mvn clean verify -P build-release
-
+      exec {
          workingDir  "../.."
-
          commandLine 'cmd', '/c', 'mvn clean verify -P build-release'
+      }
+   }
 }
-
 
 /*
 * Copy generated product file into product archive folder
 */
 task mt_30_CopyProduct {
+   group = 'build'
+   description = 'Copy generated product files to archive folder'
 
    doLast {
-
-//    From:   C:\DAT\MT\mytourbook\build\build.net.tourbook
-//    Into:   C:\DAT\MT\mytourbook\build\build.net.tourbook.product\target\products
+      //    From:   C:\DAT\MT\mytourbook\build\build.net.tourbook
+      //    Into:   C:\DAT\MT\mytourbook\build\build.net.tourbook.product\target\products
 
       println '\tFrom ' + _dirProductBuilt       
       println '\tInto ' + _dirProductArchive
 
       // copy into archive folder
       copy {
-
          from (_dirProductBuilt) {
             include '*' + _mtVersion + '*'
          }
-
          into _dirProductArchive
       }
    }
 }
 
-
 /*
  Extract win archives in separate dirs that the exe files can be compiled
 */
 task mt_40_ExtractWinFiles {
+   group = 'build'
+   description = 'Extract Windows archives for exe compilation'
 
    doLast {
-
       println 'Extracting from ' + _dirProductArchive
 
       file(_dirProductArchive).eachFileMatch(~/.*win.*x86.*.zip/) { winZipFile->
-
          def winZipFileName   = winZipFile.name
          def winZipName       = winZipFileName.take(winZipFileName.lastIndexOf('.'))
 
@@ -149,44 +151,49 @@ task mt_40_ExtractWinFiles {
    }
 }
 
-
 /*
  Create win exe files
 */
-task mt_50_CreateExeFiles(winInnoSetupDirName + '/mytourbook-create-setup-exe.iss') {
+task mt_50_CreateExeFiles {
+   group = 'build'
+   description = 'Create Windows executable setup files'
         
+   doLast {
       println 'Creating Windows setup files'
       
       def winInnoSetupDirName = _dirWinInnoSetup.absolutePath
       
-      def configFilename_Win64Setup        = file.absolutePath
+      def configFilename_Win64Setup        = file(winInnoSetupDirName + '/mytourbook-create-setup-exe.iss').absolutePath
       def configFilename_Win64SetupWithJRE = file(winInnoSetupDirName + '/mytourbook-create-setup-exe-with-jre.iss').absolutePath
       
+      exec {
          println '\tWin 64'
-      
          commandLine 'cmd', '/c', '"'+_pathInnoSetupCompilerApp+'"'
          args        configFilename_Win64Setup
-      
+      }
+
+      exec {
          println '\tWin 64 with Java runtime'
-      
          commandLine 'cmd', '/c', '"'+_pathInnoSetupCompilerApp+'"'
          args        configFilename_Win64SetupWithJRE
+      }
+   }
 }
 
 /*
  Cleanup win zip files
 */
 task mt_60_CleanupFiles {
+   group = 'build'
+   description = 'Clean up extracted files and JRE files'
         
    doLast {
-       
       /*
          Deleting extracted files
       */
       println 'Deleting extracted files'
       
       file(_dirProductArchive).eachFileMatch(~/.*win.*x86.zip/) { winZipFile->
-         
          def winZipFileName   = winZipFile.name
          def winZipName       = winZipFileName.take(winZipFileName.lastIndexOf('.'))
          
@@ -205,29 +212,25 @@ task mt_60_CleanupFiles {
       println 'Deleting JRE files'
       
       file(_dirProductArchive).eachFileMatch(~/.*-jre-.*.zip/) { jreFile->
-         
          println '\tdelete file\t\t' + jreFile
-         
          jreFile.delete()
       }
       
       file(_dirProductArchive).eachFileMatch(~/.*-jre-.*.tar.gz/) { jreFile->
-         
          println '\tdelete file\t\t' + jreFile
-         
          jreFile.delete()
       }
    }
 }
 
-
 /*
-* Copy realease notes into product archive folder
+* Copy release notes into product archive folder
 */
 task mt_70_CopyReleaseNotes {
+   group = 'build'
+   description = 'Copy release notes to product archive folder'
 
    doLast {
-
       def releaseNotesFilename = _mtVersion + '-readme.txt'
       
       def fileReleaseNotesFrom = file(_dirProductReleaseNotes.absolutePath + '/' + releaseNotesFilename)
@@ -237,7 +240,6 @@ task mt_70_CopyReleaseNotes {
 
       // copy into archive folder
       if (fileReleaseNotesFrom.exists()) {
-      
          println "\tFile ${releaseNotesFilename} copied"
 
          copy {
@@ -245,7 +247,6 @@ task mt_70_CopyReleaseNotes {
             into _dirProductArchive
          }
       } else {
-
          println "\tFile \"${fileReleaseNotesFrom}\" is not available"
       }
    }
