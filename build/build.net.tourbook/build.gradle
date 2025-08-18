@@ -242,6 +242,7 @@ task mt_70_CopyReleaseNotes {
 
       // copy into archive folder
       if (fileReleaseNotesFrom.exists()) {
+      
          println "\tFile ${releaseNotesFilename} copied"
 
          copy {
@@ -249,6 +250,7 @@ task mt_70_CopyReleaseNotes {
             into _dirProductArchive
          }
       } else {
+      
          println "\tFile \"${fileReleaseNotesFrom}\" is not available"
       }
    }
