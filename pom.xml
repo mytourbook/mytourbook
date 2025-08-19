@@ -19,6 +19,11 @@
                                                                         <version>5.13.3</version>
          <scope>test</scope>
       </dependency>
+      <dependency>
+         <artifactId>junit-platform-launcher</artifactId>               <groupId>org.junit.platform</groupId>
+                                                                        <version>1.13.3</version>
+         <scope>test</scope>
+      </dependency>
    </dependencies>	
 
    <properties>
