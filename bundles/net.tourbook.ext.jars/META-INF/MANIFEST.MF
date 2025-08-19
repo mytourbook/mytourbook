@@ -15,7 +15,7 @@ Bundle-ClassPath:
  commons-imaging-1.0-alpha2.jar,
  commons-lang3-3.18.0.jar,
  commons-suncalc-3.11.jar,
- commons-text-1.13.1.jar,
+ commons-text-1.14.0.jar,
  json-20250517.jar,
  lat-lon-timezone-converter-2019-04-30.jar,
  simplelatlng-1.4.0.jar,
