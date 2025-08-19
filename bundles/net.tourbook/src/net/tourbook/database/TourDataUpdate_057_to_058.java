@@ -40,8 +40,7 @@ import net.tourbook.tour.TourManager;
  */
 public class TourDataUpdate_057_to_058 implements ITourDataUpdate {
 
-   private static final char NL = UI.NEW_LINE //
-   ;
+   private static final char NL = UI.NEW_LINE;
 
    @Override
    public int getDatabaseVersion() {

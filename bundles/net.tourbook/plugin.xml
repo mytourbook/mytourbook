@@ -1969,13 +1969,6 @@
                icon        ="icons/tourchart-properties.gif"
                name        ="%view_name_ChartProperty"/>
 
-         <view
-               category    ="net.tourbook.category.system"
-               id          ="net.tourbook.map2.view.Map2DebugView"
-               class       ="net.tourbook.map2.view.Map2DebugView"
-               icon        ="icons/tour-map-properties.png"
-               name        ="%view_name_map_properties"/>
-
    </extension>
    
    

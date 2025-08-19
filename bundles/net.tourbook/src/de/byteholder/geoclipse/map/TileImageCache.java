@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2024 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2025 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -29,7 +29,7 @@ import java.util.concurrent.locks.ReentrantLock;
 
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.UI;
-import net.tourbook.common.util.NoAutoScalingImageDataProvider;
+import net.tourbook.common.util.CustomScalingImageDataProvider;
 import net.tourbook.common.util.StatusUtil;
 
 import org.eclipse.core.runtime.IPath;
@@ -42,6 +42,7 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.ImageData;
 import org.eclipse.swt.graphics.ImageLoader;
+import org.eclipse.swt.internal.DPIUtil;
 import org.eclipse.swt.widgets.Display;
 
 /**
@@ -144,6 +145,46 @@ public class TileImageCache {
 
          _osTileCachePath = tileCachePath.toOSString();
       }
+   }
+
+   private Image createTileImage(final Tile tile, final ImageData imageData) {
+
+      final int loadedImageWidth = imageData.width;
+      final float tileSize = tile.getMP().getTileSize();
+
+      Image tileImage;
+
+      if (tileSize != loadedImageWidth) {
+
+         // create adjusted scaled image
+
+         final CustomScalingImageDataProvider imageDataProvider = new CustomScalingImageDataProvider(imageData);
+
+         final int deviceZoom = DPIUtil.getDeviceZoom();
+         final float deviceScale = deviceZoom / 100.0f;
+
+         final float tileSizeScaled = tileSize * deviceScale;
+         final float imageScale = tileSizeScaled / loadedImageWidth;
+
+         if (tileSizeScaled == loadedImageWidth) {
+
+            // nothing to do, the image has the correct size
+
+         } else {
+
+            imageDataProvider.setImageScale(imageScale);
+         }
+
+         tileImage = new Image(_display, imageDataProvider);
+
+      } else {
+
+         // create OS scaled image
+
+         tileImage = new Image(_display, imageData);
+      }
+
+      return tileImage;
    }
 
    /**
@@ -295,35 +336,20 @@ public class TileImageCache {
             try {
 
                /*
-                * load image with the constructor which is 20 times faster than loading the
+                * Load image with the constructor which is 20 times faster than loading the
                 * image with an imageloader
                 */
+               final ImageData imageData = new ImageData(osTileImagePath);
 
-               Image loadedImage;
-
-               if (osTileImagePath.contains(UI.HIDPI_NAME_2x)
-                     || osTileImagePath.contains(UI.HIDPI_NAME_15x)) {
-
-                  // create unscaled image
-
-                  final ImageData imageData = new ImageData(osTileImagePath);
-
-                  loadedImage = new Image(_display, new NoAutoScalingImageDataProvider(imageData));
-
-               } else {
-
-                  // create scaled image
-
-                  loadedImage = new Image(_display, osTileImagePath);
-               }
+               final Image tileImage = createTileImage(tile, imageData);
 
                /*
                 * It can happen that these images are not in the image cache. Keep all created
                 * images in an separated image list.
                 */
-               _allImages.add(loadedImage);
+               _allImages.add(tileImage);
 
-               return loadedImage;
+               return tileImage;
 
             } catch (final Exception e) {
 
@@ -344,71 +370,6 @@ public class TileImageCache {
 
       return null;
    }
-
-//	/**
-//	 * Loads the tile image from the offline image file
-//	 *
-//	 * @param tile
-//	 * @return Returns image data from the offline image file or <code>null</code> otherwise
-//	 */
-//	ImageData getOfflineTileImageData_OLD(final Tile tile) {
-//
-//		if (_useOffLineCache == false) {
-//			return null;
-//		}
-//
-//		/*
-//		 * try to get the image from the offline image files
-//		 */
-//		try {
-//
-//			final IPath tileImagePath = getTileImagePath(tile);
-//			if (tileImagePath == null) {
-//				// offline image path is not available
-//				return null;
-//			}
-//
-//			final File tileImageFile = tileImagePath.toFile();
-//			if (tileImageFile.exists()) {
-//
-//				// get image for this tile
-//
-//				final String osTilePath = tileImagePath.toOSString();
-//
-//				tile.setOfflinePath(osTilePath);
-//
-//				try {
-//
-//					// load image
-//
-//					final ImageData[] loadedImageData = new ImageLoader().load(osTilePath);
-//
-//					if (loadedImageData != null && loadedImageData.length > 0 && loadedImageData[0] != null) {
-//
-//						// loading image data was successful
-//
-//						return loadedImageData[0];
-//					}
-//
-//				} catch (final Exception e) {
-//
-//					// this file seems to be corrupted
-//
-//					tile.setOfflineError(true);
-//
-//					/*
-//					 * it happened too often when zooming fast in/out
-//					 */
-////					StatusUtil.logStatus("Error loading image from file: " + osTilePath, e);//$NON-NLS-1$
-//				}
-//			}
-//
-//		} catch (final Exception e) {
-//			StatusUtil.log(e);
-//		}
-//
-//		return null;
-//	}
 
    /**
     * @param tile
@@ -748,25 +709,25 @@ public class TileImageCache {
 
       } else {
 
-         if (
-
          // ckeck offline image
-         (tile.getOfflinePath() != null
-               && (tile.getOfflinePath().contains(UI.HIDPI_NAME_2x)
-                     || tile.getOfflinePath().contains(UI.HIDPI_NAME_15x)))
+         final String osTileImagePath = tile.getOfflinePath();
+         if (osTileImagePath != null) {
 
-               // check map provider
-               || tile.getMP().getHiDPI() != 1.0) {
+            // create custom scaled image
 
-            // create unscaled image
+            /*
+             * Load image with the constructor which is 20 times faster than loading the
+             * image with an imageloader
+             */
+            final ImageData imageData = new ImageData(osTileImagePath);
 
-            tileImage = new Image(_display, new NoAutoScalingImageDataProvider(loadedImageData));
+            tileImage = createTileImage(tile, imageData);
 
          } else {
 
-            // create scaled image
+            // create default scaled image
 
-            tileImage = new Image(_display, loadedImageData);
+            tileImage = createTileImage(tile, loadedImageData);
          }
       }
 

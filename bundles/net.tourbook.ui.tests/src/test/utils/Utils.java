@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2022, 2024 Frédéric Bard
+ * Copyright (C) 2022, 2025 Frédéric Bard
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -61,7 +61,6 @@ public class Utils {
    public static final String VIEW_NAME_GEOCOMPARE             = PluginProperties.getText("View_Name_Compare_ByGeoParts");        //$NON-NLS-1$
    public static final String VIEW_NAME_HEARTRATEVARIABILITY   = PluginProperties.getText("View_Name_HeartRateVariabilityChart"); //$NON-NLS-1$
    public static final String VIEW_NAME_MAPBOOKMARK            = PluginProperties.getText("View_Name_MapBookmark");               //$NON-NLS-1$
-   public static final String VIEW_NAME_MAPPROPERTIES          = PluginProperties.getText("view_name_map_properties");            //$NON-NLS-1$
    public static final String VIEW_NAME_MODELPLAYER            = PluginProperties.getText("View_Name_ModelPlayer");               //$NON-NLS-1$
    public static final String VIEW_NAME_PHOTOSANDTOURS         = PluginProperties.getText("View_Name_PhotosAndTours");            //$NON-NLS-1$
    public static final String VIEW_NAME_PHOTOSTOURSPHOTOS      = PluginProperties.getText("View_Name_PhotoTourPhotos");           //$NON-NLS-1$

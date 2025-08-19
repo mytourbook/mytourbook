@@ -37,17 +37,19 @@ import org.eclipse.swt.internal.DPIUtil;
  * <p>
  * https://github.com/eclipse-platform/eclipse.platform.swt/issues/1411
  */
-public class NoAutoScalingImageDataProvider implements ImageDataProvider {
+public class CustomScalingImageDataProvider implements ImageDataProvider {
 
    private ImageData _imageData;
-   private ImageData _imageData_WithNoDeviceZoom;
+   private ImageData _imageData_Scaled;
 
-   public NoAutoScalingImageDataProvider(final BufferedImage awtImage) {
+   private float     _imageScale;
+
+   public CustomScalingImageDataProvider(final BufferedImage awtImage) {
 
       _imageData = ImageConverter.convertIntoSWTImageData(awtImage);
    }
 
-   public NoAutoScalingImageDataProvider(final ImageData imageData) {
+   public CustomScalingImageDataProvider(final ImageData imageData) {
 
       _imageData = imageData;
    }
@@ -58,31 +60,54 @@ public class NoAutoScalingImageDataProvider implements ImageDataProvider {
     * 4.36 image scaling issues
     */
    @Override
-   public ImageData getImageData(final int zoom) {
+   public ImageData getImageData(final int requestedZoom) {
 
       final int deviceZoom = DPIUtil.getDeviceZoom();
 
-      if (zoom == deviceZoom) {
+      if (_imageScale == 0) {
 
-         return _imageData;
+         // a scaled image is not requested
+
+         if (requestedZoom == deviceZoom) {
+
+            return _imageData;
+         }
       }
 
-      if (_imageData_WithNoDeviceZoom == null) {
+      if (_imageData_Scaled == null) {
 
-         final float noDeviceZoom = zoom / (float) deviceZoom;
+         // create scaled image
 
-         final int width = (int) (_imageData.width * noDeviceZoom);
-         final int height = (int) (_imageData.height * noDeviceZoom);
+         float imageScale;
 
-         _imageData_WithNoDeviceZoom = _imageData.scaledTo(width, height);
+         if (_imageScale != 0) {
+
+            // use custom scaling
+
+            imageScale = _imageScale;
+
+         } else {
+
+            imageScale = requestedZoom / (float) deviceZoom;
+         }
+
+         final int width = (int) (_imageData.width * imageScale);
+         final int height = (int) (_imageData.height * imageScale);
+
+         _imageData_Scaled = _imageData.scaledTo(width, height);
       }
 
-      return _imageData_WithNoDeviceZoom;
+      return _imageData_Scaled;
    }
 
    public void setImageData(final ImageData imageDataAfterPainting) {
 
       _imageData = imageDataAfterPainting;
-      _imageData_WithNoDeviceZoom = null;
+      _imageData_Scaled = null;
+   }
+
+   public void setImageScale(final float imageScale) {
+
+      _imageScale = imageScale;
    }
 }

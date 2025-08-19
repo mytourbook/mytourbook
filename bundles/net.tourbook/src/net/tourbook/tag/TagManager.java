@@ -35,7 +35,7 @@ import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.UI;
 import net.tourbook.common.util.ImageUtils;
-import net.tourbook.common.util.NoAutoScalingImageDataProvider;
+import net.tourbook.common.util.CustomScalingImageDataProvider;
 import net.tourbook.common.util.SQL;
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.StringUtils;
@@ -278,7 +278,7 @@ public class TagManager {
       }
 
       final Image swtImage = new Image(PlatformUI.getWorkbench().getDisplay(),
-            new NoAutoScalingImageDataProvider(awtImage));
+            new CustomScalingImageDataProvider(awtImage));
 
       awtImage.flush();
 

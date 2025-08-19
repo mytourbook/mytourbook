@@ -29,7 +29,7 @@ import javax.imageio.ImageIO;
 
 import net.tourbook.common.UI;
 import net.tourbook.common.time.TimeTools;
-import net.tourbook.common.util.NoAutoScalingImageDataProvider;
+import net.tourbook.common.util.CustomScalingImageDataProvider;
 import net.tourbook.common.util.SWT2Dutil;
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.photo.ILoadCallBack;
@@ -238,7 +238,7 @@ public class PhotoImageLoader {
 
          // image could be converted
 
-         return new Image(_display, new NoAutoScalingImageDataProvider(swtImageData));
+         return new Image(_display, new CustomScalingImageDataProvider(swtImageData));
       }
 
       /*
@@ -608,7 +608,7 @@ public class PhotoImageLoader {
 
          final BufferedImage awtImage = ImageIO.read(new File(imageStoreFilePath));
 
-         swtImage = new Image(Display.getCurrent(), new NoAutoScalingImageDataProvider(awtImage));
+         swtImage = new Image(Display.getCurrent(), new CustomScalingImageDataProvider(awtImage));
 
          loadImageProperties(requestedStoreImageFilePath);
 

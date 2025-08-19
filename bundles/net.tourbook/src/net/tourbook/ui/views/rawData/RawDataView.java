@@ -82,7 +82,7 @@ import net.tourbook.common.util.ColumnProfile;
 import net.tourbook.common.util.IContextMenuProvider;
 import net.tourbook.common.util.ITourViewer;
 import net.tourbook.common.util.ITourViewer3;
-import net.tourbook.common.util.NoAutoScalingImageDataProvider;
+import net.tourbook.common.util.CustomScalingImageDataProvider;
 import net.tourbook.common.util.PostSelectionProvider;
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.TableColumnDefinition;
@@ -4636,7 +4636,7 @@ public class RawDataView extends ViewPart implements
 
          swtImageData.alphaData = new byte[configWidthScaled * imageSizeScaled];
 
-         final Image tempImage = new Image(display, new NoAutoScalingImageDataProvider(swtImageData));
+         final Image tempImage = new Image(display, new CustomScalingImageDataProvider(swtImageData));
          {
             final GC gcTempImage = new GC(tempImage);
             {
@@ -4668,7 +4668,7 @@ public class RawDataView extends ViewPart implements
                tempImageData = tempImage.getImageData(DPIUtil.getDeviceZoom());
             }
 
-            configImage = new Image(display, new NoAutoScalingImageDataProvider(tempImageData));
+            configImage = new Image(display, new CustomScalingImageDataProvider(tempImageData));
          }
          tempImage.dispose();
 
@@ -4688,7 +4688,7 @@ public class RawDataView extends ViewPart implements
 
             swtImageData.alphaData = new byte[configWidthScaled * imageSizeScaled];
 
-            final Image tempImage = new Image(display, new NoAutoScalingImageDataProvider(swtImageData));
+            final Image tempImage = new Image(display, new CustomScalingImageDataProvider(swtImageData));
             {
                /*
                 * Paint tour type image into the displayed image
@@ -4716,7 +4716,7 @@ public class RawDataView extends ViewPart implements
                   tempImageData = tempImage.getImageData(DPIUtil.getDeviceZoom());
                }
 
-               configImage = new Image(display, new NoAutoScalingImageDataProvider(tempImageData));
+               configImage = new Image(display, new CustomScalingImageDataProvider(tempImageData));
 
             }
             tempImage.dispose();
