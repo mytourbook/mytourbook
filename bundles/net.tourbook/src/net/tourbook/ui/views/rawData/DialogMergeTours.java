@@ -285,15 +285,15 @@ public class DialogMergeTours extends TitleAreaDialog implements ITourProvider2,
 
       final float[] newSourceAltitudeSerie = tourMerger.getNewSourceAltitudeSerie();
       if (isSourceAltitude) {
-         _sourceTour.dataSerie2ndAlti = newSourceAltitudeSerie;
+         _sourceTour.dataSerie2nd = newSourceAltitudeSerie;
       } else {
-         _sourceTour.dataSerie2ndAlti = null;
+         _sourceTour.dataSerie2nd = null;
       }
 
       if (isSourceAltitude && isTargetAltitude) {
-         _sourceTour.dataSerieDiffTo2ndAlti = tourMerger.getNewSourceAltitudeDifferencesSerie();
+         _sourceTour.dataSerieDiffTo2nd = tourMerger.getNewSourceAltitudeDifferencesSerie();
       } else {
-         _sourceTour.dataSerieDiffTo2ndAlti = null;
+         _sourceTour.dataSerieDiffTo2nd = null;
       }
 
       if (_chkMergeCadence.getSelection()) {

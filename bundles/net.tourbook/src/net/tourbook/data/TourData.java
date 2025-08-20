@@ -1639,13 +1639,13 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
     * or the adjusted altitude
     */
    @Transient
-   public float[]             dataSerie2ndAlti;
+   public float[]             dataSerie2nd;
 
    /**
     * altitude difference between this tour and the merge tour with metric measurement
     */
    @Transient
-   public float[]             dataSerieDiffTo2ndAlti;
+   public float[]             dataSerieDiffTo2nd;
 
    /**
     * Contains the adjusted elevation serie in the current measurement system
