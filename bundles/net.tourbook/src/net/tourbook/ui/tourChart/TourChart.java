@@ -384,19 +384,19 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
    /*
     * UI controls
     */
-   private Composite                 _parent;
+   private Composite                       _parent;
    //
-   private I2ndAltiLayer             _layer2ndAlti;
-   private ChartLayer2ndAltiSerie    _layer2ndAltiSerie;
-   private ChartLayerMarker          _layerMarker;
-   private ChartLayerNight           _layerNightSections;
-   private ChartLayerPause           _layerPause;
-   private ChartLayerPhoto           _layerPhoto;
-   private ChartLayerSegmentAltitude _layerTourSegmenterAltitude;
-   private ChartLayerSegmentValue    _layerTourSegmenterOther;
+   private I2ndAltiLayer                   _layer2ndAlti;
+   private ChartLayerAdditionalValueSeries _layer2ndAltiSerie;
+   private ChartLayerMarker                _layerMarker;
+   private ChartLayerNight                 _layerNightSections;
+   private ChartLayerPause                 _layerPause;
+   private ChartLayerPhoto                 _layerPhoto;
+   private ChartLayerSegmentAltitude       _layerTourSegmenterAltitude;
+   private ChartLayerSegmentValue          _layerTourSegmenterOther;
    //
-   private Color                     _photoOverlayBGColorLink;
-   private Color                     _photoOverlayBGColorTour;
+   private Color                           _photoOverlayBGColorLink;
+   private Color                           _photoOverlayBGColorTour;
 
    private class Action_AllGraphs extends ActionToolbarSlideout {
 

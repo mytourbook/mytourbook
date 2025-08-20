@@ -38,7 +38,7 @@ import net.tourbook.tour.TourEventId;
 import net.tourbook.tour.TourManager;
 import net.tourbook.ui.ITourProvider2;
 import net.tourbook.ui.action.ActionSetTourTypeMenu;
-import net.tourbook.ui.tourChart.ChartLayer2ndAltiSerie;
+import net.tourbook.ui.tourChart.ChartLayerAdditionalValueSeries;
 import net.tourbook.ui.tourChart.I2ndAltiLayer;
 import net.tourbook.ui.tourChart.TourChart;
 import net.tourbook.ui.tourChart.TourChartConfiguration;
@@ -529,7 +529,7 @@ public class DialogMergeTours extends TitleAreaDialog implements ITourProvider2,
    }
 
    @Override
-   public ChartLayer2ndAltiSerie create2ndAltiLayer() {
+   public ChartLayerAdditionalValueSeries create2ndAltiLayer() {
 
       if (_targetTour == null) {
          return null;
@@ -557,7 +557,7 @@ public class DialogMergeTours extends TitleAreaDialog implements ITourProvider2,
             _targetTour.getTimeSerieDouble()
             : _targetTour.getDistanceSerieDouble();
 
-      return new ChartLayer2ndAltiSerie(layerTourData, xDataSerie, _tourChartConfig, null);
+      return new ChartLayerAdditionalValueSeries(layerTourData, xDataSerie, _tourChartConfig, null);
    }
 
    private void createActions() {

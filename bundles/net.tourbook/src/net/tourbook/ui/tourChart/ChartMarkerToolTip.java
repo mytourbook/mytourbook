@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2024 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2025 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -388,7 +388,7 @@ public class ChartMarkerToolTip extends AnimatedToolTipShell implements ITourPro
                final boolean isAvailableAltitude = _tourData.getAltitudeSerie() != null;
                if (isAvailableAltitude) {
 
-                  final float value = _tourData.getAltitudeSmoothedSerie(false)[valueIndex];
+                  final float value = _tourData.getAltitudeSmoothedSerie()[valueIndex];
 
                   createUI_72_ValueField(
                         container,

@@ -1804,7 +1804,7 @@ public class ValuePoint_ToolTip_UI extends Pinned_ToolTip_Shell implements IPinn
 
       if (_isVisible_And_Available_Elevation) {
 
-         final float[] elevationSerie = _tourData.getAltitudeSmoothedSerie(false);
+         final float[] elevationSerie = _tourData.getAltitudeSmoothedSerie();
          float elevationValue = elevationSerie[valueIndex];
 
          if (_isShowValuesSinceLastTourMarker && isTourMarkerAvailable) {

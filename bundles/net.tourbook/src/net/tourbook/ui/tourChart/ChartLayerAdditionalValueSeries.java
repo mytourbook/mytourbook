@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2025 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -37,10 +37,10 @@ import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Display;
 
-public class ChartLayer2ndAltiSerie implements IChartLayer {
+public class ChartLayerAdditionalValueSeries implements IChartLayer {
 
    /**
-    * contains tour which is displayed in the chart
+    * Contains tour which is displayed in the chart
     */
    private TourData               _tourData;
    private double[]               _xDataSerie;
@@ -61,10 +61,10 @@ public class ChartLayer2ndAltiSerie implements IChartLayer {
       _nf3.setMaximumFractionDigits(3);
    }
 
-   public ChartLayer2ndAltiSerie(final TourData tourData,
-                                 final double[] xDataSerie,
-                                 final TourChartConfiguration tourChartConfig,
-                                 final SplineData splineData) {
+   public ChartLayerAdditionalValueSeries(final TourData tourData,
+                                          final double[] xDataSerie,
+                                          final TourChartConfiguration tourChartConfig,
+                                          final SplineData splineData) {
 
       _tourData = tourData;
       _tourChartConfig = tourChartConfig;
@@ -254,7 +254,6 @@ public class ChartLayer2ndAltiSerie implements IChartLayer {
       // draw the line of the graph
       gc.setAntialias(SWT.OFF);
       gc.setLineStyle(SWT.LINE_SOLID);
-      gc.setLineWidth(1);
       gc.setClipping(graphRect);
 
       /*
@@ -276,6 +275,7 @@ public class ChartLayer2ndAltiSerie implements IChartLayer {
          gc.setClipping(graphRect);
 
          // draw graph
+         gc.setLineWidth(1);
          gc.drawPath(pathAdjustValue);
 
          gc.setAlpha(0xff);
@@ -289,6 +289,8 @@ public class ChartLayer2ndAltiSerie implements IChartLayer {
          gc.setForeground(UI.IS_DARK_THEME
                ? new Color(245, 245, 245, 0xff)
                : display.getSystemColor(SWT.COLOR_BLACK));
+
+         gc.setLineWidth(0);
          gc.drawPath(pathValueDiff);
       }
 
@@ -327,6 +329,7 @@ public class ChartLayer2ndAltiSerie implements IChartLayer {
        */
       if (is2ndYValues) {
          gc.setForeground(display.getSystemColor(SWT.COLOR_RED));
+         gc.setLineWidth(1);
          gc.drawPath(path2ndSerie);
       }
 
