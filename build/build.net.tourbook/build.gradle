@@ -16,8 +16,9 @@ def _pathProductArchive          = _dirProductArchive.absolutePath
 def _dirWinInnoSetup             = file('../../INSTALL-UPDATES/installer-net.tourbook/win-Inno.Setup')
 def _pathInnoSetupCompilerApp    = file('c:/Program Files (x86)/Inno Setup 6/iscc.exe').absolutePath
 
+
 gradle.taskGraph.beforeTask { Task task ->
-   
+
     // show a task indicator
    println '---------------------------------------------------------------------------------------'
    println ''
