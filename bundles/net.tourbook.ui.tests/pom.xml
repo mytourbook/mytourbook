@@ -21,7 +21,7 @@
 
       <repository>
          <id>swtbot</id>                                  <layout>p2</layout>
-         <url>https://download.eclipse.org/technology/swtbot/releases/4.3.0/</url>
+         <url>https://download.eclipse.org/technology/swtbot/releases/latest/</url>
       </repository>  
       
    </repositories>
@@ -45,7 +45,7 @@
              <!-- Not supported yet by Junit 5, see https://issues.apache.org/jira/browse/SUREFIRE-1710 -->
              <skipAfterFailureCount>1</skipAfterFailureCount> 
 	     
-	     <osgiDataDirectory>${project.basedir}/workspace</osgiDataDirectory>
+             <osgiDataDirectory>${project.basedir}/workspace</osgiDataDirectory>
              <deleteOsgiDataDirectory>false</deleteOsgiDataDirectory>
              <argLine>${tycho.testArgLine} -Djunit.jupiter.extensions.autodetection.enabled=true -DsilentDatabaseUpdate -DlogCalendarProfile</argLine>
          </configuration>
