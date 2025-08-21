@@ -194,7 +194,7 @@ task mt_60_CleanupFiles {
          
          def winZipFileName   = winZipFile.name
          def winZipName       = winZipFileName.take(winZipFileName.lastIndexOf('.'))
-
+         
          def outputDir        = file(_pathProductArchive + '/' + winZipName)
 
          println '\tdelete folder\t\t' + outputDir
@@ -209,12 +209,15 @@ task mt_60_CleanupFiles {
       println '' 
       println 'Deleting JRE files'
       
-      fileTree(_dirProductArchive).matching { include '**/*-jre-*.zip' }.each { jreFile->
+      file(_dirProductArchive).eachFileMatch(~/.*-jre-.*.zip/) { jreFile->
+         
          println '\tdelete file\t\t' + jreFile
+         
          jreFile.delete()
       }
-      
-      fileTree(_dirProductArchive).matching { include '**/*-jre-*.tar.gz' }.each { jreFile->
+
+      file(_dirProductArchive).eachFileMatch(~/.*-jre-.*.tar.gz/) { jreFile->
+         
          println '\tdelete file\t\t' + jreFile
          
          jreFile.delete()
