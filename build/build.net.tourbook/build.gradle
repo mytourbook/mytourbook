@@ -214,10 +214,12 @@ task mt_60_CleanupFiles {
       
       fileTree(_dirProductArchive).matching { include '**/*-jre-*.tar.gz' }.each { jreFile->
          println '\tdelete file\t\t' + jreFile
+         
          jreFile.delete()
       }
    }
 }
+
 
 /*
 * Copy release notes into product archive folder
