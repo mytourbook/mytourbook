@@ -1,5 +1,5 @@
 plugins {
-   
+
    id 'org.sonarqube' version '6.2.0.5505'
    id 'jacoco'
 }
@@ -16,8 +16,8 @@ def _pathProductArchive          = _dirProductArchive.absolutePath
 def _dirWinInnoSetup             = file('../../INSTALL-UPDATES/installer-net.tourbook/win-Inno.Setup')
 def _pathInnoSetupCompilerApp    = file('c:/Program Files (x86)/Inno Setup 6/iscc.exe').absolutePath
 
-// Use the new Gradle 9 compatible task graph API
 gradle.taskGraph.beforeTask { Task task ->
+   
     // show a task indicator
    println '---------------------------------------------------------------------------------------'
    println ''
