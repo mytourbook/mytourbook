@@ -737,7 +737,6 @@ public class TourMapPainter extends Map2Painter {
    public boolean doPaint(final GC gcTile,
                           final Map2 map,
                           final Tile tile,
-                          final int parts,
                           final boolean isFastPainting,
                           final int fastPainting_SkippedValues) {
 
@@ -825,7 +824,6 @@ public class TourMapPainter extends Map2Painter {
                   map,
                   tile,
                   tourData,
-                  parts,
                   systemColorBlue,
                   isGeoCompareRefTour,
                   refTourStartIndex,
@@ -862,8 +860,7 @@ public class TourMapPainter extends Map2Painter {
                      tile,
                      latitudeSerie[latitudeSerie.length - 1],
                      longitudeSerie[longitudeSerie.length - 1],
-                     _tourEndMarker,
-                     parts)) {
+                     _tourEndMarker)) {
 
                   staticMarkerCounter++;
                }
@@ -875,8 +872,7 @@ public class TourMapPainter extends Map2Painter {
                      tile,
                      latitudeSerie[0],
                      longitudeSerie[0],
-                     _tourStartMarker,
-                     parts)) {
+                     _tourStartMarker)) {
 
                   staticMarkerCounter++;
                }
@@ -896,8 +892,7 @@ public class TourMapPainter extends Map2Painter {
                                     final Tile tile,
                                     final double latitude,
                                     final double longitude,
-                                    final Image markerImage,
-                                    final int parts) {
+                                    final Image markerImage) {
 
       if (markerImage == null) {
          return false;
@@ -906,7 +901,6 @@ public class TourMapPainter extends Map2Painter {
       final MP mp = map.getMapProvider();
       final int zoomLevel = map.getZoomLevel();
       final int tileSize = mp.getTileSize();
-      final int devPartOffset = ((parts - 1) / 2) * tileSize;
 
       // get world viewport for the current tile
       final int worldPixelTileX = tile.getX() * tileSize;
@@ -930,8 +924,8 @@ public class TourMapPainter extends Map2Painter {
 
          gcTile.drawImage(
                markerImage,
-               devMarkerPosX - markerWidth2 + devPartOffset,
-               devMarkerPosY - markerHeight + devPartOffset);
+               devMarkerPosX - markerWidth2,
+               devMarkerPosY - markerHeight);
       }
 
       return isMarkerInTile;
@@ -941,7 +935,6 @@ public class TourMapPainter extends Map2Painter {
                                       final Map2 map,
                                       final Tile tile,
                                       final TourData tourData,
-                                      final int numParts,
                                       final Color systemColorBlue,
                                       final boolean isGeoCompareRefTour,
                                       final int refTourStartIndex,
@@ -951,19 +944,15 @@ public class TourMapPainter extends Map2Painter {
       final int projectionHash = mp.getProjection().getId().hashCode();
       final int mapZoomLevel = map.getZoomLevel();
 
-      if (numParts == 1) {
+      // basic drawing method is used -> optimize performance
 
-         // basic drawing method is used -> optimize performance
-
-         if (isInTile_Tour(tourData, mp, mapZoomLevel, tile, projectionHash) == false) {
-            return false;
-         }
+      if (isInTile_Tour(tourData, mp, mapZoomLevel, tile, projectionHash) == false) {
+         return false;
       }
 
       boolean isTourInTile = false;
 
       final int tileSize = mp.getTileSize();
-      final int devPartOffset = ((numParts - 1) / 2) * tileSize;
 
       // get viewport for the current tile
       final int tileWorldPixelX = tile.getX() * tileSize;
@@ -1067,8 +1056,8 @@ public class TourMapPainter extends Map2Painter {
 
          gcTile.setLineWidth(_symbolSize);
 
-         int devFrom_WithOffsetX = 0;
-         int devFrom_WithOffsetY = 0;
+         int devFrom_X = 0;
+         int devFrom_Y = 0;
 
          Color lastVisibleColor = null;
 
@@ -1087,8 +1076,8 @@ public class TourMapPainter extends Map2Painter {
             final int tourWorldPixelX = tourWorldPixel.x;
             final int tourWorldPixelY = tourWorldPixel.y;
 
-            int devX = tourWorldPixelX - tileWorldPixelX;
-            int devY = tourWorldPixelY - tileWorldPixelY;
+            final int devX = tourWorldPixelX - tileWorldPixelX;
+            final int devY = tourWorldPixelY - tileWorldPixelY;
 
             boolean isInRefTourPart = false;
 
@@ -1104,14 +1093,14 @@ public class TourMapPainter extends Map2Painter {
                // draw as a line
 
                // get positions with the part offset
-               final int devTo_WithOffsetX = devX + devPartOffset;
-               final int devTo_WithOffsetY = devY + devPartOffset;
+               final int devTo_X = devX;
+               final int devTo_Y = devY;
 
                if (serieIndex == 0) {
 
                   // keep position
-                  devFrom_WithOffsetX = devTo_WithOffsetX;
-                  devFrom_WithOffsetY = devTo_WithOffsetY;
+                  devFrom_X = devTo_X;
+                  devFrom_Y = devTo_Y;
 
                   continue;
                }
@@ -1176,7 +1165,7 @@ public class TourMapPainter extends Map2Painter {
                   // current position is inside the tile
 
                   // check if position has changed
-                  if (devTo_WithOffsetX != devFrom_WithOffsetX || devTo_WithOffsetY != devFrom_WithOffsetY) {
+                  if (devTo_X != devFrom_X || devTo_Y != devFrom_Y) {
 
                      isTourInTile = true;
 
@@ -1197,8 +1186,8 @@ public class TourMapPainter extends Map2Painter {
                            // draw starting point after a pause/break
 
                            drawTour_40_Dot(gcTile,
-                                 devFrom_WithOffsetX,
-                                 devFrom_WithOffsetY,
+                                 devFrom_X,
+                                 devFrom_Y,
                                  color,
                                  tile,
                                  tourId,
@@ -1210,10 +1199,10 @@ public class TourMapPainter extends Map2Painter {
 
                         drawTour_20_Line(
                               gcTile,
-                              devFrom_WithOffsetX,
-                              devFrom_WithOffsetY,
-                              devTo_WithOffsetX,
-                              devTo_WithOffsetY,
+                              devFrom_X,
+                              devFrom_Y,
+                              devTo_X,
+                              devTo_Y,
                               color,
                               tile,
                               tourId,
@@ -1246,8 +1235,8 @@ public class TourMapPainter extends Map2Painter {
                      }
 
                      drawTour_40_Dot(gcTile,
-                           devFrom_WithOffsetX,
-                           devFrom_WithOffsetY,
+                           devFrom_X,
+                           devFrom_Y,
                            lastVisibleColor,
                            tile,
                            tourId,
@@ -1259,10 +1248,10 @@ public class TourMapPainter extends Map2Painter {
 
                   drawTour_20_Line(
                         gcTile,
-                        devFrom_WithOffsetX,
-                        devFrom_WithOffsetY,
-                        devTo_WithOffsetX,
-                        devTo_WithOffsetY,
+                        devFrom_X,
+                        devFrom_Y,
+                        devTo_X,
+                        devTo_Y,
                         lastVisibleColor,
                         tile,
                         tourId,
@@ -1270,8 +1259,8 @@ public class TourMapPainter extends Map2Painter {
                }
 
                // keep positions
-               devFrom_WithOffsetX = devTo_WithOffsetX;
-               devFrom_WithOffsetY = devTo_WithOffsetY;
+               devFrom_X = devTo_X;
+               devFrom_Y = devTo_Y;
 
                isPreviousVisibleDataPoint = isVisibleDataPoint;
 
@@ -1289,7 +1278,7 @@ public class TourMapPainter extends Map2Painter {
                   // current position is inside the tile
 
                   // optimize drawing: check if position has changed
-                  if (!(devX == devFrom_WithOffsetX && devY == devFrom_WithOffsetY)) {
+                  if (!(devX == devFrom_X && devY == devFrom_Y)) {
 
                      /*
                       * Check visible points
@@ -1327,10 +1316,6 @@ public class TourMapPainter extends Map2Painter {
                            }
                         }
 
-                        // adjust positions with the part offset
-                        devX += devPartOffset;
-                        devY += devPartOffset;
-
                         final Color color = getTourColor(
                               tourData,
                               serieIndex,
@@ -1346,8 +1331,8 @@ public class TourMapPainter extends Map2Painter {
                         }
 
                         // set previous pixel
-                        devFrom_WithOffsetX = devX;
-                        devFrom_WithOffsetY = devY;
+                        devFrom_X = devX;
+                        devFrom_Y = devY;
                      }
 
                   } else {

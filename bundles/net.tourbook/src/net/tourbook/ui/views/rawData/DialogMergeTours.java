@@ -38,7 +38,7 @@ import net.tourbook.tour.TourEventId;
 import net.tourbook.tour.TourManager;
 import net.tourbook.ui.ITourProvider2;
 import net.tourbook.ui.action.ActionSetTourTypeMenu;
-import net.tourbook.ui.tourChart.ChartLayer2ndAltiSerie;
+import net.tourbook.ui.tourChart.ChartLayerAdditionalValueSeries;
 import net.tourbook.ui.tourChart.I2ndAltiLayer;
 import net.tourbook.ui.tourChart.TourChart;
 import net.tourbook.ui.tourChart.TourChartConfiguration;
@@ -285,15 +285,15 @@ public class DialogMergeTours extends TitleAreaDialog implements ITourProvider2,
 
       final float[] newSourceAltitudeSerie = tourMerger.getNewSourceAltitudeSerie();
       if (isSourceAltitude) {
-         _sourceTour.dataSerie2ndAlti = newSourceAltitudeSerie;
+         _sourceTour.dataSerie2nd = newSourceAltitudeSerie;
       } else {
-         _sourceTour.dataSerie2ndAlti = null;
+         _sourceTour.dataSerie2nd = null;
       }
 
       if (isSourceAltitude && isTargetAltitude) {
-         _sourceTour.dataSerieDiffTo2ndAlti = tourMerger.getNewSourceAltitudeDifferencesSerie();
+         _sourceTour.dataSerieDiffTo2nd = tourMerger.getNewSourceAltitudeDifferencesSerie();
       } else {
-         _sourceTour.dataSerieDiffTo2ndAlti = null;
+         _sourceTour.dataSerieDiffTo2nd = null;
       }
 
       if (_chkMergeCadence.getSelection()) {
@@ -529,7 +529,7 @@ public class DialogMergeTours extends TitleAreaDialog implements ITourProvider2,
    }
 
    @Override
-   public ChartLayer2ndAltiSerie create2ndAltiLayer() {
+   public ChartLayerAdditionalValueSeries create2ndAltiLayer() {
 
       if (_targetTour == null) {
          return null;
@@ -557,7 +557,7 @@ public class DialogMergeTours extends TitleAreaDialog implements ITourProvider2,
             _targetTour.getTimeSerieDouble()
             : _targetTour.getDistanceSerieDouble();
 
-      return new ChartLayer2ndAltiSerie(layerTourData, xDataSerie, _tourChartConfig, null);
+      return new ChartLayerAdditionalValueSeries(layerTourData, xDataSerie, _tourChartConfig, null);
    }
 
    private void createActions() {

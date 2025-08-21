@@ -358,7 +358,7 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
       store.setDefault(ITourbookPreferences.VALUE_POINT_TOOL_TIP_IS_VISIBLE_MAP2, true);
 
       /*
-       * graph smoothing
+       * Graph smoothing
        */
       // algorithm
       store.setDefault(ITourbookPreferences.GRAPH_SMOOTHING_SMOOTHING_ALGORITHM, ISmoothingAlgorithm.SMOOTHING_ALGORITHM_JAMET);
@@ -379,6 +379,13 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
 
       // speed
       store.setDefault(ITourbookPreferences.GRAPH_JAMET_SMOOTHING_SPEED_TAU, 10.0);
+
+      /*
+       * Elevation adjustment smoothing
+       */
+      store.setDefault(ITourbookPreferences.ADJUST_ELEVATION_GRAPH_JAMET_SMOOTHING_REPEATED_SMOOTHING, 1);
+      store.setDefault(ITourbookPreferences.ADJUST_ELEVATION_GRAPH_JAMET_SMOOTHING_REPEATED_TAU, 1.0);
+      store.setDefault(ITourbookPreferences.ADJUST_ELEVATION_GRAPH_JAMET_SMOOTHING_GRADIENT_TAU, 10.0);
 
       /*
        * Display formats

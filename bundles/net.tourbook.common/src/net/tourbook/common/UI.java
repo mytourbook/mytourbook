@@ -772,6 +772,7 @@ public class UI {
    public static Color           SYS_COLOR_DARK_GRAY;
    public static Color           SYS_COLOR_DARK_GREEN;
    public static Color           SYS_COLOR_DARK_RED;
+   public static Color           SYS_COLOR_DARK_YELLOW;
 
    public static Color           SYS_COLOR_LIST_BACKGROUND;
 
@@ -862,6 +863,7 @@ public class UI {
       SYS_COLOR_DARK_GRAY           = display.getSystemColor(SWT.COLOR_DARK_GRAY);
       SYS_COLOR_DARK_GREEN          = display.getSystemColor(SWT.COLOR_DARK_GREEN);
       SYS_COLOR_DARK_RED            = display.getSystemColor(SWT.COLOR_DARK_RED);
+      SYS_COLOR_DARK_YELLOW         = display.getSystemColor(SWT.COLOR_DARK_YELLOW);
 
       SYS_COLOR_LIST_BACKGROUND     = display.getSystemColor(SWT.COLOR_LIST_BACKGROUND);
       SYS_COLOR_WIDGET_BACKGROUND   = display.getSystemColor(SWT.COLOR_WIDGET_BACKGROUND);

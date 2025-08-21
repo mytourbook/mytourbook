@@ -110,7 +110,7 @@ import net.tourbook.tour.location.TourLocationData;
 import net.tourbook.tour.photo.TourPhotoLink;
 import net.tourbook.tour.photo.TourPhotoManager;
 import net.tourbook.ui.tourChart.ChartLabelMarker;
-import net.tourbook.ui.tourChart.ChartLayer2ndAltiSerie;
+import net.tourbook.ui.tourChart.ChartLayerAdditionalValueSeries;
 import net.tourbook.ui.tourChart.TourChart;
 import net.tourbook.ui.views.ISmoothingAlgorithm;
 import net.tourbook.ui.views.tourDataEditor.TourDataEditorView;
@@ -1635,17 +1635,17 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
    public boolean             isTourDeleted;
 
    /**
-    * 2nd data serie, this is used in the {@link ChartLayer2ndAltiSerie} to display the merged tour
+    * 2nd data serie, this is used in the {@link ChartLayerAdditionalValueSeries} to display the merged tour
     * or the adjusted altitude
     */
    @Transient
-   public float[]             dataSerie2ndAlti;
+   public float[]             dataSerie2nd;
 
    /**
     * altitude difference between this tour and the merge tour with metric measurement
     */
    @Transient
-   public float[]             dataSerieDiffTo2ndAlti;
+   public float[]             dataSerieDiffTo2nd;
 
    /**
     * Contains the adjusted elevation serie in the current measurement system
@@ -4531,14 +4531,20 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
 
       final int numTimeSlices = timeSerie.length;
 
-      final double[] altitude = new double[numTimeSlices];
-      final double[] altitude_sc = new double[numTimeSlices];
+      final double[] elevationIn = new double[numTimeSlices];
+      final double[] elevationOUT = new double[numTimeSlices];
 
-      final double tauGradient = _prefStore.getDouble(ITourbookPreferences.GRAPH_JAMET_SMOOTHING_GRADIENT_TAU);
-      final double tauSpeed = _prefStore.getDouble(ITourbookPreferences.GRAPH_JAMET_SMOOTHING_SPEED_TAU);
+// SET_FORMATTING_OFF
 
-      final int repeatedSmoothing = _prefStore.getInt(ITourbookPreferences.GRAPH_JAMET_SMOOTHING_REPEATED_SMOOTHING);
-      final double repeatedTau = _prefStore.getDouble(ITourbookPreferences.GRAPH_JAMET_SMOOTHING_REPEATED_TAU);
+      final double tauGradient            = _prefStore.getDouble( ITourbookPreferences.GRAPH_JAMET_SMOOTHING_GRADIENT_TAU);
+      final double tauSpeed               = _prefStore.getDouble( ITourbookPreferences.GRAPH_JAMET_SMOOTHING_SPEED_TAU);
+
+      final int repeatedSmoothing         = _prefStore.getInt(    ITourbookPreferences.GRAPH_JAMET_SMOOTHING_REPEATED_SMOOTHING);
+      final double repeatedTau            = _prefStore.getDouble( ITourbookPreferences.GRAPH_JAMET_SMOOTHING_REPEATED_TAU);
+
+      final boolean isElevationSmoothed   = _prefStore.getBoolean(ITourbookPreferences.GRAPH_JAMET_SMOOTHING_IS_ALTITUDE);
+
+// SET_FORMATTING_ON
 
       /*
        * Smooth elevation
@@ -4546,16 +4552,13 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
 
       if (isElevationAvailable) {
 
-         final boolean isAltitudeSmoothed = _prefStore.getBoolean(
-               ITourbookPreferences.GRAPH_JAMET_SMOOTHING_IS_ALTITUDE);
-
          // convert altitude into double
          for (int serieIndex = 0; serieIndex < numTimeSlices; serieIndex++) {
-            altitude[serieIndex] = altitudeSerie[serieIndex];
+            elevationIn[serieIndex] = altitudeSerie[serieIndex];
          }
 
-         // altitude MUST be smoothed because the values are used in the vertical speed
-         Smooth.smoothing(timeSerie, altitude, altitude_sc, tauGradient, false, repeatedSmoothing, repeatedTau);
+         // elevation MUST be smoothed because the values are used in the vertical speed
+         Smooth.smoothing(timeSerie, elevationIn, elevationOUT, tauGradient, false, repeatedSmoothing, repeatedTau);
 
          altitudeSerieSmoothed = new float[numTimeSlices];
          altitudeSerieImperialSmoothed = new float[numTimeSlices];
@@ -4563,12 +4566,13 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
          altimeterSerie = new float[numTimeSlices];
          altimeterSerieImperial = new float[numTimeSlices];
 
-         if (isAltitudeSmoothed) {
+         if (isElevationSmoothed) {
 
             for (int serieIndex = 0; serieIndex < numTimeSlices; serieIndex++) {
-               altitudeSerieSmoothed[serieIndex] = (float) altitude_sc[serieIndex];
-               altitudeSerieImperialSmoothed[serieIndex] = (float) (altitude_sc[serieIndex] / UI.UNIT_FOOT);
+               altitudeSerieSmoothed[serieIndex] = (float) elevationOUT[serieIndex];
+               altitudeSerieImperialSmoothed[serieIndex] = (float) (elevationOUT[serieIndex] / UI.UNIT_FOOT);
             }
+
          } else {
 
             // altitude is NOT smoothed, copy original values
@@ -4659,7 +4663,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
                   / (timeSerie[serieIndex + 1] - timeSerie[serieIndex]);
 
             if (isElevationAvailable) {
-               Vv_ini[serieIndex] = (altitude[serieIndex + 1] - altitude[serieIndex])
+               Vv_ini[serieIndex] = (elevationIn[serieIndex + 1] - elevationIn[serieIndex])
                      / (timeSerie[serieIndex + 1] - timeSerie[serieIndex]);
             }
          }
@@ -4695,7 +4699,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
                   / (timeSerie[serieIndex + 1] - timeSerie[serieIndex]);
 
             if (isElevationAvailable) {
-               Vv[serieIndex] = (altitude_sc[serieIndex + 1] - altitude_sc[serieIndex])
+               Vv[serieIndex] = (elevationOUT[serieIndex + 1] - elevationOUT[serieIndex])
                      / (timeSerie[serieIndex + 1] - timeSerie[serieIndex]);
             }
          }
@@ -6449,7 +6453,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
       final FlatGainLoss flatGainLoss = computeAltitudeUpDown_20_Algorithm_DP(
             -1,
             -1,
-            getAltitudeSmoothedSerie(false),
+            getAltitudeSmoothedSerie(),
             prefDPTolerance,
             prefFlatGradient);
 
@@ -8859,26 +8863,17 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
    }
 
    /**
-    * @param isForceSmoothing
     *
     * @return Returns smoothed altitude values (according to the measurement system) when they are
     *         set to be smoothed otherwise it returns normal altitude values or <code>null</code>
     *         when altitude is not available.
     */
-   public float[] getAltitudeSmoothedSerie(final boolean isForceSmoothing) {
+   public float[] getAltitudeSmoothedSerie() {
 
       if (altitudeSerie == null) {
          return null;
       }
 
-// ??? HAVE NO IDEA WHY THIS IS USED ???
-//      if (isForceSmoothing) {
-//
-//         // smooth altitude
-//         computeSmoothedDataSeries();
-//
-//      } else {
-//
       if (altitudeSerieSmoothed != null) {
 
          // return already smoothed altitude values
@@ -8890,6 +8885,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
             return altitudeSerieImperialSmoothed;
 
          } else {
+
             return altitudeSerieSmoothed;
          }
       }
@@ -8909,6 +8905,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
             return altitudeSerieImperialSmoothed;
 
          } else {
+
             return altitudeSerieSmoothed;
          }
       }
@@ -12516,7 +12513,21 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
       }
    }
 
-   public boolean replaceAltitudeWithSRTM(final boolean isUseSRTM1Values) {
+   public void replaceElevationSerie_WithSmoothed(final float[] elevationSerieSmoothed,
+                                                  final float[] elevationSerieImperialSmoothed) {
+
+      altitudeSerie = Arrays.copyOf(elevationSerieSmoothed, elevationSerieSmoothed.length);
+      altitudeSerieImperial = Arrays.copyOf(elevationSerieImperialSmoothed, elevationSerieImperialSmoothed.length);
+
+      altitudeSerieSmoothed = null;
+      altitudeSerieImperialSmoothed = null;
+
+      // adjust computed altitude values
+      computeAltitudeUpDown();
+      computeMaxAltitude();
+   }
+
+   public boolean replaceElevationWithSRTM(final boolean isUseSRTM1Values) {
 
       if (getSRTMSerie(isUseSRTM1Values) == null) {
          return false;

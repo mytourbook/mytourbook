@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2019 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2025 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -51,17 +51,9 @@ public class SmoothingUI {
 
    private static final SmoothingAlgorithm[] SMOOTHING_ALGORITHM = {
 
-         new SmoothingAlgorithm(
-               ISmoothingAlgorithm.SMOOTHING_ALGORITHM_INITIAL,
-               Messages.TourChart_Smoothing_Algorithm_Initial),
-
-         new SmoothingAlgorithm(
-               ISmoothingAlgorithm.SMOOTHING_ALGORITHM_JAMET,
-               Messages.TourChart_Smoothing_Algorithm_Jamet),
-
-         new SmoothingAlgorithm(
-               ISmoothingAlgorithm.SMOOTHING_ALGORITHM_NO_SMOOTHING,
-               Messages.TourChart_Smoothing_Algorithm_NoSmoothing),
+         new SmoothingAlgorithm(ISmoothingAlgorithm.SMOOTHING_ALGORITHM_INITIAL, Messages.TourChart_Smoothing_Algorithm_Initial),
+         new SmoothingAlgorithm(ISmoothingAlgorithm.SMOOTHING_ALGORITHM_JAMET, Messages.TourChart_Smoothing_Algorithm_Jamet),
+         new SmoothingAlgorithm(ISmoothingAlgorithm.SMOOTHING_ALGORITHM_NO_SMOOTHING, Messages.TourChart_Smoothing_Algorithm_NoSmoothing),
    };
 
    private final IPreferenceStore            _prefStore          = TourbookPlugin.getPrefStore();
@@ -366,8 +358,7 @@ public class SmoothingUI {
 
    public void performDefaults() {
 
-      final String defaultSmoothingId = _prefStore.getDefaultString(//
-            ITourbookPreferences.GRAPH_SMOOTHING_SMOOTHING_ALGORITHM);
+      final String defaultSmoothingId = _prefStore.getDefaultString(ITourbookPreferences.GRAPH_SMOOTHING_SMOOTHING_ALGORITHM);
 
       _prefStore.setValue(ITourbookPreferences.GRAPH_SMOOTHING_SMOOTHING_ALGORITHM, defaultSmoothingId);
 

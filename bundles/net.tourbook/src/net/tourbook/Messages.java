@@ -113,9 +113,11 @@ public class Messages extends NLS {
    public static String        Adjust_Altitude_Group_GeoPosition;
    public static String        adjust_altitude_label_adjustment_type;
    public static String        Adjust_Altitude_Label_GeoPosition_Slices;
+
    public static String        adjust_altitude_type_adjust_end;
    public static String        adjust_altitude_type_adjust_height;
    public static String        adjust_altitude_type_adjust_whole_tour;
+   public static String        Adjust_Altitude_Type_ElevationSmoothing;
    public static String        Adjust_Altitude_Type_HorizontalGeoPosition;
    public static String        adjust_altitude_type_srtm;
    public static String        adjust_altitude_type_srtm_spline;

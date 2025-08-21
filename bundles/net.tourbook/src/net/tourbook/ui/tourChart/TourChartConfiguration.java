@@ -76,16 +76,16 @@ public class TourChartConfiguration {
 
 // SET_FORMATTING_ON
 
-   private final IPreferenceStore _prefStore              = TourbookPlugin.getPrefStore();
+   private final IPreferenceStore _prefStore            = TourbookPlugin.getPrefStore();
 
    /**
     * true: show time on the x-axis
     * <p>
     * false: show distance on the x-axis
     */
-   public boolean                 isShowTimeOnXAxis       = false;
+   public boolean                 isShowTimeOnXAxis;
 
-   public boolean                 isShowTimeOnXAxisBackup = false;
+   public boolean                 isShowTimeOnXAxisBackup;
 
    /**
     * is <code>true</code> when the distance is not available and the time must be displayed on the
@@ -98,13 +98,13 @@ public class TourChartConfiguration {
     * <p>
     * false: show the tour time which starts at 0
     */
-   public X_AXIS_START_TIME       xAxisTime               = X_AXIS_START_TIME.START_WITH_0;
+   public X_AXIS_START_TIME       xAxisTime             = X_AXIS_START_TIME.START_WITH_0;
 
    /**
     * contains a list for all graphs which are displayed, the sequence of the list is the sequence
     * in which the graphs will be displayed
     */
-   private ArrayList<Integer>     _visibleGraphSequence   = new ArrayList<>();
+   private ArrayList<Integer>     _visibleGraphSequence = new ArrayList<>();
 
    /**
     * contains the min/max keeper or <code>null</code> when min/max is not kept
@@ -114,18 +114,18 @@ public class TourChartConfiguration {
    /**
     * when <code>true</code> the sliders are moved when the chart is zoomed
     */
-   public boolean                 moveSlidersWhenZoomed   = false;
+   public boolean                 moveSlidersWhenZoomed;
 
    /**
     * the graph is automatically zoomed to the slider position when the slider is moved
     */
-   public boolean                 autoZoomToSlider        = false;
+   public boolean                 autoZoomToSlider;
 
    /**
     * when <code>true</code> the action button is displayed to show/hide the tour compare result
     * graph
     */
-   public boolean                 canShowTourCompareGraph = false;
+   public boolean                 canShowTourCompareGraph;
 
    /**
     * is <code>true</code> when the altitude diff scaling in the merge layer is relative
@@ -135,7 +135,7 @@ public class TourChartConfiguration {
    /**
     * when <code>true</code> the SRTM data are visible in the altitude graph
     */
-   public boolean                 isSRTMDataVisible       = false;
+   public boolean                 isSRTMDataVisible;
 
    /**
     * When <code>true</code> then SRTM 1 values are displayed, when they are available, otherwise
@@ -151,7 +151,7 @@ public class TourChartConfiguration {
    /**
     * Is <code>true</code> when tour markers are displayed.
     */
-   public boolean                 isShowTourMarker        = true;
+   public boolean                 isShowTourMarker      = true;
 
    /**
     * When <code>true</code>, hidden markers are also visible.
@@ -185,7 +185,7 @@ public class TourChartConfiguration {
    /**
     * Is <code>true</code> when tour pauses are displayed.
     */
-   public boolean                 isShowTourPauses        = true;
+   public boolean                 isShowTourPauses      = true;
    public boolean                 isShowPauseTooltip;
    public boolean                 isFilterTourPauses;
    public boolean                 isFilterPauseDuration;
@@ -196,9 +196,9 @@ public class TourChartConfiguration {
 
    public boolean                 isShowAbsoluteValues;
 
-   public int                     markerTooltipPosition   = ChartMarkerToolTip.DEFAULT_TOOLTIP_POSITION;
+   public int                     markerTooltipPosition = ChartMarkerToolTip.DEFAULT_TOOLTIP_POSITION;
 
-   public int                     pauseTooltipPosition    = ChartPauseToolTip.DEFAULT_TOOLTIP_POSITION;
+   public int                     pauseTooltipPosition  = ChartPauseToolTip.DEFAULT_TOOLTIP_POSITION;
 
    public boolean                 isShowMarkerPoint;
    public boolean                 isShowSignImage;
@@ -242,7 +242,7 @@ public class TourChartConfiguration {
     * Is <code>true</code> when graph values are displayed when they are recorded when a break time
     * is detected.
     */
-   public boolean                 isShowBreaktimeValues   = true;
+   public boolean                 isShowBreaktimeValues = true;
 
    /*
     * Graph background

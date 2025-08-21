@@ -9676,7 +9676,6 @@ public class Map2 extends Canvas {
                gcTile,
                Map2.this,
                tile,
-               1,
                _isFastMapPainting && _isFastMapPainting_Active,
                _fastMapPainting_skippedValues);
 

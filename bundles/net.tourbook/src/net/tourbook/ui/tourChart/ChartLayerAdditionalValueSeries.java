@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2025 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -30,17 +30,17 @@ import net.tourbook.data.TourData;
 import org.eclipse.jface.layout.PixelConverter;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Color;
+import org.eclipse.swt.graphics.Device;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Path;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.graphics.Rectangle;
-import org.eclipse.swt.widgets.Display;
 
-public class ChartLayer2ndAltiSerie implements IChartLayer {
+public class ChartLayerAdditionalValueSeries implements IChartLayer {
 
    /**
-    * contains tour which is displayed in the chart
+    * Contains tour which is displayed in the chart
     */
    private TourData               _tourData;
    private double[]               _xDataSerie;
@@ -61,10 +61,10 @@ public class ChartLayer2ndAltiSerie implements IChartLayer {
       _nf3.setMaximumFractionDigits(3);
    }
 
-   public ChartLayer2ndAltiSerie(final TourData tourData,
-                                 final double[] xDataSerie,
-                                 final TourChartConfiguration tourChartConfig,
-                                 final SplineData splineData) {
+   public ChartLayerAdditionalValueSeries(final TourData tourData,
+                                          final double[] xDataSerie,
+                                          final TourChartConfiguration tourChartConfig,
+                                          final SplineData splineData) {
 
       _tourData = tourData;
       _tourChartConfig = tourChartConfig;
@@ -82,12 +82,12 @@ public class ChartLayer2ndAltiSerie implements IChartLayer {
 
       final double[] xValues = _xDataSerie;
 
-      final float[] yValues2ndSerie = _tourData.dataSerie2ndAlti;
-      final float[] yDiffTo2ndSerie = _tourData.dataSerieDiffTo2ndAlti;
+      final float[] yValues2ndSerie = _tourData.dataSerie2nd;
+      final float[] yDiffTo2ndSerie = _tourData.dataSerieDiffTo2nd;
       final float[] yAdjustedSerie = _tourData.dataSerieAdjustedAlti;
 
       final boolean is2ndYValues = yValues2ndSerie != null;
-      final boolean isDiffValues = yDiffTo2ndSerie != null;
+      final boolean isDiffTo2ndValues = yDiffTo2ndSerie != null;
       final boolean isAdjustedValues = yAdjustedSerie != null;
 
       final boolean isSplinePointInGraph = _splineData != null && _splineData.splinePoint_DataSerieIndex != null;
@@ -106,11 +106,11 @@ public class ChartLayer2ndAltiSerie implements IChartLayer {
       _xxDevViewPortLeftBorder = chart.getXXDevViewPortLeftBorder();
       _graphXValueOffset = (Math.max(0, _xxDevViewPortLeftBorder) / _scaleX);
 
-      final Display display = Display.getCurrent();
+      final Device device = gc.getDevice();
 
-      final Path path2ndSerie = new Path(display);
-      final Path pathValueDiff = new Path(display);
-      final Path pathAdjustValue = new Path(display);
+      final Path path2ndSerie = new Path(device);
+      final Path pathValueDiff = new Path(device);
+      final Path pathAdjustValue = new Path(device);
 
       final float graphYBottom = drawingData.getGraphYBottom();
 
@@ -126,7 +126,7 @@ public class ChartLayer2ndAltiSerie implements IChartLayer {
        */
       float[] diffValues = null;
       double scaleValueDiff = _scaleY;
-      if (isDiffValues) {
+      if (isDiffTo2ndValues) {
 
          int valueIndex = 0;
          float maxValueDiff = 0;
@@ -177,7 +177,7 @@ public class ChartLayer2ndAltiSerie implements IChartLayer {
          final int devXInt = (int) devX;
 
          /*
-          * draw adjusted value graph
+          * Draw adjusted value graph
           */
          if (isAdjustedValues) {
 
@@ -207,7 +207,7 @@ public class ChartLayer2ndAltiSerie implements IChartLayer {
          }
 
          /*
-          * draw value graph
+          * Draw 2nd value graph
           */
          if (is2ndYValues) {
 
@@ -228,9 +228,9 @@ public class ChartLayer2ndAltiSerie implements IChartLayer {
          }
 
          /*
-          * draw diff values
+          * Draw diff values
           */
-         if (isDiffValues) {
+         if (isDiffTo2ndValues) {
 
             final float graphValueDiff = (diffValues[xValueIndex]);
             final float devLayerValueDiff = (float) (graphValueDiff * scaleValueDiff);
@@ -254,7 +254,6 @@ public class ChartLayer2ndAltiSerie implements IChartLayer {
       // draw the line of the graph
       gc.setAntialias(SWT.OFF);
       gc.setLineStyle(SWT.LINE_SOLID);
-      gc.setLineWidth(1);
       gc.setClipping(graphRect);
 
       /*
@@ -276,6 +275,7 @@ public class ChartLayer2ndAltiSerie implements IChartLayer {
          gc.setClipping(graphRect);
 
          // draw graph
+         gc.setLineWidth(1);
          gc.drawPath(pathAdjustValue);
 
          gc.setAlpha(0xff);
@@ -284,11 +284,13 @@ public class ChartLayer2ndAltiSerie implements IChartLayer {
       /*
        * Paint value diff graph
        */
-      if (isDiffValues) {
+      if (isDiffTo2ndValues) {
 
          gc.setForeground(UI.IS_DARK_THEME
                ? new Color(245, 245, 245, 0xff)
-               : display.getSystemColor(SWT.COLOR_BLACK));
+               : UI.SYS_COLOR_BLACK);
+
+         gc.setLineWidth(0);
          gc.drawPath(pathValueDiff);
       }
 
@@ -326,7 +328,12 @@ public class ChartLayer2ndAltiSerie implements IChartLayer {
        * Paint data graph
        */
       if (is2ndYValues) {
-         gc.setForeground(display.getSystemColor(SWT.COLOR_RED));
+
+         gc.setForeground(UI.IS_DARK_THEME
+               ? UI.SYS_COLOR_YELLOW
+               : UI.SYS_COLOR_DARK_YELLOW);
+
+         gc.setLineWidth(0);
          gc.drawPath(path2ndSerie);
       }
 
@@ -394,7 +401,7 @@ public class ChartLayer2ndAltiSerie implements IChartLayer {
          /*
           * Paint movable points
           */
-         gc.setBackground(display.getSystemColor(SWT.COLOR_RED));
+         gc.setBackground(UI.SYS_COLOR_RED);
          for (int pointIndex = 0; pointIndex < numSplinePoints; pointIndex++) {
 
             if (isPointMovable[pointIndex] == false) {
@@ -428,7 +435,7 @@ public class ChartLayer2ndAltiSerie implements IChartLayer {
 
          gc.setForeground(UI.IS_DARK_THEME
                ? new Color(245, 245, 245, 0xff)
-               : display.getSystemColor(SWT.COLOR_BLACK));
+               : UI.SYS_COLOR_BLACK);
 
          final int[] graphSerieIndex = _splineData.splinePoint_DataSerieIndex;
 
