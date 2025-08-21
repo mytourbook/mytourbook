@@ -35,6 +35,7 @@ defaultTasks 'mt_0_Build'
 
 task mt_0_Build
 mt_0_Build.dependsOn( 
+   
    'mt_10_CreateBuildFiles', 
    'mt_20_BuildProduct', 
    'mt_30_CopyProduct',
@@ -88,6 +89,8 @@ task mt_10_CreateBuildFiles {
 */
 task mt_20_BuildProduct(type: Exec) {
 
+   // run: mvn clean verify -P build-release
+   
    workingDir = "../.."
    commandLine 'cmd', '/c', 'mvn clean verify -P build-release'
 }
