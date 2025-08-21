@@ -99,7 +99,7 @@ task mt_20_BuildProduct(type: Exec) {
 /*
 * Copy generated product file into product archive folder
 */
-task mt_30_CopyProduct(type: Exec) {
+task mt_30_CopyProduct(type: Copy) {
 
 //    From:   C:\DAT\MT\mytourbook\build\build.net.tourbook
 //    Into:   C:\DAT\MT\mytourbook\build\build.net.tourbook.product\target\products
@@ -108,21 +108,19 @@ task mt_30_CopyProduct(type: Exec) {
    println '\tInto ' + _dirProductArchive
 
    // copy into archive folder
-    copy {
 
         from (_dirProductBuilt) {
           include '*' + _mtVersion + '*'
         }
 
        into _dirProductArchive
-    }
 }
 
 
 /*
  Extract win archives in separate dirs that the exe files can be compiled
 */
-task mt_40_ExtractWinFiles(type: Exec) {
+task mt_40_ExtractWinFiles(type: Copy) {
 
       println 'Extracting from ' + _dirProductArchive
 
@@ -135,12 +133,9 @@ task mt_40_ExtractWinFiles(type: Exec) {
 
          println '\t' + outputDir
          
-         copy {
             from zipTree(winZipFile)
             into outputDir
-         }
       }
-   }
 }
 
 
@@ -168,7 +163,6 @@ task mt_50_CreateExeFiles(type: Exec) {
          commandLine 'cmd', '/c', '"'+_pathInnoSetupCompilerApp+'"'
          args        configFilename_Win64SetupWithJRE
    }
-}
 
 /*
  Cleanup win zip files
