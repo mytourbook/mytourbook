@@ -3296,6 +3296,10 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
             final int segmentBreakTime = getBreakTime(segmentStartIndex, segmentEndIndex, breakTimeConfig);
             final int segmentMovingTime = segmentFullTime - segmentBreakTime;
 
+            if (segmentBreakTime > 0) {
+               int a = 0;
+               a++;
+            }
             segmentTime = segmentMovingTime;
          }
 
