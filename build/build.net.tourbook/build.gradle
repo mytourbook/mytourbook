@@ -152,29 +152,32 @@ task mt_40_ExtractWinFiles {
 /*
  Create win exe files
 */
-// Create separate Exec tasks for each setup file
-task createWin64Setup(type: Exec) {
-   
-   workingDir = _dirWinInnoSetup.absolutePath
-   commandLine 'cmd', '/c', '"'+_pathInnoSetupCompilerApp+'"'
-   args = [file(_dirWinInnoSetup.absolutePath + '/mytourbook-create-setup-exe.iss').absolutePath]
-}
-
-task createWin64SetupWithJRE(type: Exec) {
-   
-   workingDir = _dirWinInnoSetup.absolutePath
-   commandLine 'cmd', '/c', '"'+_pathInnoSetupCompilerApp+'"'
-   args = [file(_dirWinInnoSetup.absolutePath + '/mytourbook-create-setup-exe-with-jre.iss').absolutePath]
-}
-
 task mt_50_CreateExeFiles {
-   
-   dependsOn createWin64Setup, createWin64SetupWithJRE
-   
+        
    doLast {
+       
       println 'Creating Windows setup files'
-      println '\tWin 64'
-      println '\tWin 64 with Java runtime'
+      
+      def winInnoSetupDirName = _dirWinInnoSetup.absolutePath
+      
+      def configFilename_Win64Setup        = file(winInnoSetupDirName + '/mytourbook-create-setup-exe.iss').absolutePath
+      def configFilename_Win64SetupWithJRE = file(winInnoSetupDirName + '/mytourbook-create-setup-exe-with-jre.iss').absolutePath
+      
+      exec {
+      
+         println '\tWin 64'
+      
+         commandLine 'cmd', '/c', '"'+_pathInnoSetupCompilerApp+'"'
+         args        configFilename_Win64Setup
+      }
+
+      exec {
+      
+         println '\tWin 64 with Java runtime'
+      
+         commandLine 'cmd', '/c', '"'+_pathInnoSetupCompilerApp+'"'
+         args        configFilename_Win64SetupWithJRE
+      }
    }
 }
 
