@@ -77,8 +77,6 @@ sonarqube {
 * 1. Copy all MT files into a temp folder, it is using task/target 'create-build-files' from the Ant script
 */
 task mt_10_CreateBuildFiles {
-   group = 'build'
-   description = 'Create build files using Ant script'
    
    // import Ant build, every target will be a task
    ant.importBuild 'CREATE_MT_BuildFiles.xml'
