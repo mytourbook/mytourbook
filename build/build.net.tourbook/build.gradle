@@ -33,11 +33,7 @@ gradle.taskGraph.afterTask { Task task, TaskState state ->
 
 defaultTasks 'mt_0_Build'
 
-task mt_0_Build {
-    group = 'build'
-    description = 'Main build task for MyTourbook'
-}
-
+task mt_0_Build
 mt_0_Build.dependsOn( 
    'mt_10_CreateBuildFiles', 
    'mt_20_BuildProduct', 
