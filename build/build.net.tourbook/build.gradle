@@ -79,7 +79,7 @@ sonarqube {
 * 1. Copy all MT files into a temp folder, it is using task/target 'create-build-files' from the Ant script
 */
 task mt_10_CreateBuildFiles {
-   
+
    // import Ant build, every target will be a task
    ant.importBuild 'CREATE_MT_BuildFiles.xml'
 
@@ -101,8 +101,6 @@ task mt_20_BuildProduct(type: Exec) {
 * Copy generated product file into product archive folder
 */
 task mt_30_CopyProduct {
-   group = 'build'
-   description = 'Copy generated product files to archive folder'
 
    doLast {
       //    From:   C:\DAT\MT\mytourbook\build\build.net.tourbook
@@ -125,8 +123,6 @@ task mt_30_CopyProduct {
  Extract win archives in separate dirs that the exe files can be compiled
 */
 task mt_40_ExtractWinFiles {
-   group = 'build'
-   description = 'Extract Windows archives for exe compilation'
 
    doLast {
       println 'Extracting from ' + _dirProductArchive
@@ -152,8 +148,6 @@ task mt_40_ExtractWinFiles {
 */
 // Create separate Exec tasks for each setup file
 task createWin64Setup(type: Exec) {
-   group = 'build'
-   description = 'Create Windows 64 setup file'
    
    workingDir = _dirWinInnoSetup.absolutePath
    commandLine 'cmd', '/c', '"'+_pathInnoSetupCompilerApp+'"'
@@ -161,8 +155,6 @@ task createWin64Setup(type: Exec) {
 }
 
 task createWin64SetupWithJRE(type: Exec) {
-   group = 'build'
-   description = 'Create Windows 64 setup file with JRE'
    
    workingDir = _dirWinInnoSetup.absolutePath
    commandLine 'cmd', '/c', '"'+_pathInnoSetupCompilerApp+'"'
@@ -170,8 +162,6 @@ task createWin64SetupWithJRE(type: Exec) {
 }
 
 task mt_50_CreateExeFiles {
-   group = 'build'
-   description = 'Create Windows executable setup files'
    
    dependsOn createWin64Setup, createWin64SetupWithJRE
    
@@ -186,8 +176,6 @@ task mt_50_CreateExeFiles {
  Cleanup win zip files
 */
 task mt_60_CleanupFiles {
-   group = 'build'
-   description = 'Clean up extracted files and JRE files'
         
    doLast {
       /*
@@ -229,8 +217,6 @@ task mt_60_CleanupFiles {
 * Copy release notes into product archive folder
 */
 task mt_70_CopyReleaseNotes {
-   group = 'build'
-   description = 'Copy release notes to product archive folder'
 
    doLast {
       def releaseNotesFilename = _mtVersion + '-readme.txt'
