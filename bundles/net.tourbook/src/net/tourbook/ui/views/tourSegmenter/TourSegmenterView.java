@@ -5061,8 +5061,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
          return;
       }
 
-      _tourData.setTourAltUp(_elevationGain);
-      _tourData.setTourAltDown(_elevationLoss);
+      _tourData.setElevationGainLoss(_elevationGain, _elevationLoss);
 
       // update tolerance into the tour data
       _tourData.setDpTolerance((short) (_dpToleranceElevation * 10));
@@ -6540,7 +6539,6 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
          _lblDistanceValue.setText(UI.UNIT_LABEL_DISTANCE);
       }
    }
-
 
    /**
     * Update ascending altitude computed value

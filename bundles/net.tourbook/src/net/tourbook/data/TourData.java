@@ -3062,8 +3062,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
          elevationGain -= flatGainLoss.elevationGain_InBreakTime;
          elevationLoss -= flatGainLoss.elevationLoss_InBreakTime;
 
-         setTourAltUp(elevationGain);
-         setTourAltDown(elevationLoss);
+         setElevationGainLoss(elevationGain, elevationLoss);
       }
 
       return flatGainLoss != null;
@@ -3616,8 +3615,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
 
       final FlatGainLoss elevationUpDown = computeAltitudeUpDown(srtmSerie);
 
-      setTourAltUp(elevationUpDown.elevationGain);
-      setTourAltDown(elevationUpDown.elevationLoss);
+      setElevationGainLoss(elevationUpDown.elevationGain, elevationUpDown.elevationLoss);
 
       return elevationUpDown;
    }
@@ -13584,21 +13582,19 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
       _zonedEndTime = null;
    }
 
-   public void setTourAltDown(final float tourAltDown) {
+   /**
+    * Set tour elevation gain and loss
+    * 
+    * @param elevationGain
+    * @param elevationLoss
+    */
+   public void setElevationGainLoss(final float elevationGain, final float elevationLoss) {
 
-      this.tourAltDown = (int) (tourAltDown + 0.5);
+      this.tourAltUp = (int) (elevationGain + 0.5);
+      this.tourAltDown = (int) (elevationLoss + 0.5);
 
       // We update the average elevation change
-      // Note : We only do it here since most of the call to the function
-      // setTourAltDown() is performed AFTER setTourAltUp()
-      // Hence, we know that at this point, we will be able to compute the
-      // average elevation change with the latest values of tourAltUp and tourAltDown.
       computeAvg_AltitudeChange();
-   }
-
-   public void setTourAltUp(final float tourAltUp) {
-
-      this.tourAltUp = (int) (tourAltUp + 0.5);
    }
 
    public void setTourBike(final TourBike tourBike) {

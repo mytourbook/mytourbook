@@ -100,15 +100,20 @@ public class MesgListener_Session extends AbstractMesgListener implements Sessio
          tourData.setTourDistance(Math.round(totalDistance));
       }
 
+      float elevationGain = 0;
+      float elevationLoss = 0;
+
       final Integer totalAscent = mesg.getTotalAscent();
       if (totalAscent != null) {
-         tourData.setTourAltUp(totalAscent);
+         elevationGain = totalAscent;
       }
 
       final Integer totalDescent = mesg.getTotalDescent();
       if (totalDescent != null) {
-         tourData.setTourAltDown(totalDescent);
+         elevationLoss = totalDescent;
       }
+
+      tourData.setElevationGainLoss(elevationGain, elevationLoss);
 
       final Float totalElapsedTime = mesg.getTotalElapsedTime();
       if (totalElapsedTime != null) {

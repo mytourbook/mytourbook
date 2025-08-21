@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2024 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2025 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -273,9 +273,9 @@ public class TurDeviceReader extends TourbookDevice {
                timeData.distance = distance - oldDistance;
                oldDistance = distance;
 
-               tourData.setTourAltUp(tourData.getTourAltUp() + ((timeData.altitude > 0) ? timeData.altitude : 0));
-               tourData.setTourAltDown(tourData.getTourAltDown()
-                     + ((timeData.altitude < 0) ? -timeData.altitude : 0));
+               tourData.setElevationGainLoss(
+                     tourData.getTourAltUp() + ((timeData.altitude > 0) ? timeData.altitude : 0),
+                     tourData.getTourAltDown() + ((timeData.altitude < 0) ? -timeData.altitude : 0));
             }
             timeDataList.add(timeData);
 

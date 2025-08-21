@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2022 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2025 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -316,6 +316,8 @@ public class GPX_SAX_Handler extends DefaultHandler {
    private boolean                       _isTourMarkerImported;
 
    private float                         _absoluteDistance;
+   private float                         _tourElevationGain;
+   private float                         _tourElevationLoss;
 
    private boolean                       _isError;
 
@@ -636,12 +638,12 @@ public class GPX_SAX_Handler extends DefaultHandler {
 
       } else if (name.equals(TAG_MT_TOUR_ALTITUDE_DOWN)) {
 
-         _tourData.setTourAltDown(getFloatValue(charData));
+         _tourElevationLoss = getFloatValue(charData);
          _isInMT_Tour = false;
 
       } else if (name.equals(TAG_MT_TOUR_ALTITUDE_UP)) {
 
-         _tourData.setTourAltUp(getFloatValue(charData));
+         _tourElevationGain = getFloatValue(charData);
          _isInMT_Tour = false;
 
       } else if (name.equals(TAG_MT_TOUR_DISTANCE)) {
@@ -1034,6 +1036,8 @@ public class GPX_SAX_Handler extends DefaultHandler {
          _tourData.setTourStartTime(dtTourStart);
       }
 
+      _tourData.setElevationGainLoss(_tourElevationGain, _tourElevationLoss);
+
       _tourData.setDeviceTimeInterval((short) -1);
 
       _tourData.setImportFilePath(_importFilePath);
@@ -1328,6 +1332,9 @@ public class GPX_SAX_Handler extends DefaultHandler {
 
       _absoluteDistance = 0;
       _gpxAbsoluteDistance = 0;
+
+      _tourElevationGain = 0;
+      _tourElevationLoss = 0;
 
       _prevTimeSlice = null;
       _trkName = null;

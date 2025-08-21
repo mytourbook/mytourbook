@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2024 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2025 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -439,8 +439,10 @@ public class HAC4DeviceReader extends TourbookDevice {
                   // adjust altitude from relative to absolute
                   absoluteAltitude += timeData.altitude;
 
-                  tourData.setTourAltUp(tourData.getTourAltUp() + ((timeData.altitude > 0) ? timeData.altitude : 0));
-                  tourData.setTourAltDown(tourData.getTourAltDown() + ((timeData.altitude < 0) ? -timeData.altitude : 0));
+                  final float elevationGain = tourData.getTourAltUp() + ((timeData.altitude > 0) ? timeData.altitude : 0);
+                  final float elevationLoss = tourData.getTourAltDown() + ((timeData.altitude < 0) ? -timeData.altitude : 0);
+
+                  tourData.setElevationGainLoss(elevationGain, elevationLoss);
 
                   sumDistance += timeData.distance;
                   sumAltitude += Math.abs(absoluteAltitude);
