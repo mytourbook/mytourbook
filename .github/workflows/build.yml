@@ -21,7 +21,7 @@ jobs:
           $drive = Split-Path -Qualifier $PWD
           echo "DRIVE_LETTER=$drive" | Out-File -FilePath $env:GITHUB_ENV -Append    
       - name: Set up JDK 21
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@v5
         with:
           distribution: 'temurin'
           java-version: 21
