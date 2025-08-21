@@ -220,6 +220,7 @@ task mt_60_CleanupFiles {
 task mt_70_CopyReleaseNotes {
 
    doLast {
+
       def releaseNotesFilename = _mtVersion + '-readme.txt'
       
       def fileReleaseNotesFrom = file(_dirProductReleaseNotes.absolutePath + '/' + releaseNotesFilename)
