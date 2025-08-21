@@ -1,11 +1,11 @@
 plugins {
+   
    id 'org.sonarqube' version '6.2.0.5505'
    id 'jacoco'
 }
 
 // get MT version and remove quotes
-// Note: This was originally from a multi-project build, now configured for single project
-def _mtVersionRaw                = project.hasProperty('myTourbookVersion') ? project.myTourbookVersion : '1.0.0'      // '18.2.0'
+def _mtVersionRaw                = project(':mytourbook').ext.myTourbookVersion      // '18.2.0'
 def _mtVersion                   = _mtVersionRaw.replaceAll('\'', '')                //  18.2.0
 
 def _dirProductBuilt             = file('../build.net.tourbook.product/target/products')
