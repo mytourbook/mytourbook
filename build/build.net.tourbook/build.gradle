@@ -190,13 +190,14 @@ task mt_60_CleanupFiles {
       */
       println 'Deleting extracted files'
       
-      fileTree(_dirProductArchive).matching { include '**/*win*x86.zip' }.each { winZipFile->
-         def winZipFileName   = winZipFile.name
-         def winZipName       = winZipFileName.substring(0, winZipFileName.lastIndexOf('.'))
+      file(_dirProductArchive).eachFileMatch(~/.*win.*x86.zip/) { winZipFile->
          
+         def winZipFileName   = winZipFile.name
+         def winZipName       = winZipFileName.take(winZipFileName.lastIndexOf('.'))
+
          def outputDir        = file(_pathProductArchive + '/' + winZipName)
 
-         println '\tdelete folder\t\t' + winZipName
+         println '\tdelete folder\t\t' + outputDir
          
          // delete extracted files
          outputDir.deleteDir()
