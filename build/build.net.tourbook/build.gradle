@@ -99,28 +99,35 @@ task mt_20_BuildProduct(type: Exec) {
 /*
 * Copy generated product file into product archive folder
 */
-task mt_30_CopyProduct(type: Copy) {
+task mt_30_CopyProduct {
+
+   doLast {
 
 //    From:   C:\DAT\MT\mytourbook\build\build.net.tourbook
 //    Into:   C:\DAT\MT\mytourbook\build\build.net.tourbook.product\target\products
 
-   println '\tFrom ' + _dirProductBuilt       
-   println '\tInto ' + _dirProductArchive
+      println '\tFrom ' + _dirProductBuilt       
+      println '\tInto ' + _dirProductArchive
 
-   // copy into archive folder
+      // copy into archive folder
+      copy {
 
-        from (_dirProductBuilt) {
-          include '*' + _mtVersion + '*'
-        }
+         from (_dirProductBuilt) {
+            include '*' + _mtVersion + '*'
+         }
 
-       into _dirProductArchive
+         into _dirProductArchive
+      }
+   }
 }
 
 
 /*
  Extract win archives in separate dirs that the exe files can be compiled
 */
-task mt_40_ExtractWinFiles(type: Copy) {
+task mt_40_ExtractWinFiles {
+
+   doLast {
 
       println 'Extracting from ' + _dirProductArchive
 
@@ -133,43 +140,54 @@ task mt_40_ExtractWinFiles(type: Copy) {
 
          println '\t' + outputDir
          
+         copy {
             from zipTree(winZipFile)
             into outputDir
+         }
       }
+   }
 }
 
 
 /*
  Create win exe files
 */
-task mt_50_CreateExeFiles(type: Exec) {
+task mt_50_CreateExeFiles {
+        
+   doLast {
        
-   println 'Creating Windows setup files'
+      println 'Creating Windows setup files'
       
-   def winInnoSetupDirName = _dirWinInnoSetup.absolutePath
+      def winInnoSetupDirName = _dirWinInnoSetup.absolutePath
       
-   def configFilename_Win64Setup        = file(winInnoSetupDirName + '/mytourbook-create-setup-exe.iss').absolutePath
- def configFilename_Win64SetupWithJRE = file(winInnoSetupDirName + '/mytourbook-create-setup-exe-with-jre.iss').absolutePath
+      def configFilename_Win64Setup        = file(winInnoSetupDirName + '/mytourbook-create-setup-exe.iss').absolutePath
+      def configFilename_Win64SetupWithJRE = file(winInnoSetupDirName + '/mytourbook-create-setup-exe-with-jre.iss').absolutePath
       
+      exec {
       
-      println '\tWin 64'
+         println '\tWin 64'
       
-      commandLine 'cmd', '/c', '"'+_pathInnoSetupCompilerApp+'"'
-      args        configFilename_Win64Setup
+         commandLine 'cmd', '/c', '"'+_pathInnoSetupCompilerApp+'"'
+         args        configFilename_Win64Setup
+      }
 
+      exec {
       
          println '\tWin 64 with Java runtime'
       
          commandLine 'cmd', '/c', '"'+_pathInnoSetupCompilerApp+'"'
          args        configFilename_Win64SetupWithJRE
+      }
    }
+}
 
 /*
  Cleanup win zip files
 */
-task mt_60_CleanupFiles(type: Exec) {
+task mt_60_CleanupFiles {
         
-
+   doLast {
+       
       /*
          Deleting extracted files
       */
@@ -207,14 +225,16 @@ task mt_60_CleanupFiles(type: Exec) {
          
          jreFile.delete()
       }
+   }
 }
 
 
 /*
 * Copy release notes into product archive folder
 */
-task mt_70_CopyReleaseNotes(type: Copy) {
+task mt_70_CopyReleaseNotes {
 
+   doLast {
 
       def releaseNotesFilename = _mtVersion + '-readme.txt'
       
@@ -228,10 +248,13 @@ task mt_70_CopyReleaseNotes(type: Copy) {
       
          println "\tFile ${releaseNotesFilename} copied"
 
-         from fileReleaseNotesFrom
-         into _dirProductArchive
+         copy {
+            from fileReleaseNotesFrom
+            into _dirProductArchive
+         }
       } else {
 
          println "\tFile \"${fileReleaseNotesFrom}\" is not available"
       }
+   }
 }
