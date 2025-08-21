@@ -135,6 +135,7 @@ task mt_40_ExtractWinFiles {
 
          def winZipFileName   = winZipFile.name
          def winZipName       = winZipFileName.take(winZipFileName.lastIndexOf('.'))
+
          def outputDir        = file(_pathProductArchive + '/' + winZipName)
 
          println '\t' + outputDir
