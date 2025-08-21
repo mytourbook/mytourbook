@@ -90,8 +90,6 @@ task mt_10_CreateBuildFiles {
 * 2. Build product with maven/tycho
 */
 task mt_20_BuildProduct(type: Exec) {
-   group = 'build'
-   description = 'Build product with Maven/Tycho'
 
    workingDir = "../.."
    commandLine 'cmd', '/c', 'mvn clean verify -P build-release'
@@ -111,13 +109,16 @@ task mt_30_CopyProduct {
 
       // copy into archive folder
       copy {
+         
          from (_dirProductBuilt) {
             include '*' + _mtVersion + '*'
          }
+         
          into _dirProductArchive
       }
    }
 }
+
 
 /*
  Extract win archives in separate dirs that the exe files can be compiled
@@ -236,7 +237,7 @@ task mt_70_CopyReleaseNotes {
             into _dirProductArchive
          }
       } else {
-      
+
          println "\tFile \"${fileReleaseNotesFrom}\" is not available"
       }
    }
