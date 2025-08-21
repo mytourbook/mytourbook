@@ -184,7 +184,7 @@ task mt_50_CreateExeFiles {
 task mt_60_CleanupFiles {
         
    doLast {
-
+       
       /*
          Deleting extracted files
       */
