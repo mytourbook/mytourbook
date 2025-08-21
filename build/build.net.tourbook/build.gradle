@@ -25,6 +25,7 @@ gradle.taskGraph.beforeTask { Task task ->
 }
 
 gradle.taskGraph.afterTask { Task task, TaskState state ->
+   
     // show more space
    println ''
    println ''
