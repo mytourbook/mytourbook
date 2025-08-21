@@ -213,7 +213,7 @@ task mt_60_CleanupFiles(type: Exec) {
 /*
 * Copy release notes into product archive folder
 */
-task mt_70_CopyReleaseNotes(type: Exec) {
+task mt_70_CopyReleaseNotes(type: Copy) {
 
 
       def releaseNotesFilename = _mtVersion + '-readme.txt'
@@ -228,10 +228,8 @@ task mt_70_CopyReleaseNotes(type: Exec) {
       
          println "\tFile ${releaseNotesFilename} copied"
 
-         copy {
-            from fileReleaseNotesFrom
-            into _dirProductArchive
-         }
+         from fileReleaseNotesFrom
+         into _dirProductArchive
       } else {
 
          println "\tFile \"${fileReleaseNotesFrom}\" is not available"
