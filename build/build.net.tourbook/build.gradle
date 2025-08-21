@@ -82,6 +82,7 @@ task mt_10_CreateBuildFiles {
    dependsOn('create-build-files')
 }
 
+
 /*
 * 2. Build product with maven/tycho
 */
