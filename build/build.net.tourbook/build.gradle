@@ -128,6 +128,7 @@ task mt_30_CopyProduct {
 task mt_40_ExtractWinFiles {
 
    doLast {
+
       println 'Extracting from ' + _dirProductArchive
 
       fileTree(_dirProductArchive).matching { include '**/*win*x86*.zip' }.each { winZipFile->
@@ -182,6 +183,7 @@ task mt_50_CreateExeFiles {
 task mt_60_CleanupFiles {
         
    doLast {
+
       /*
          Deleting extracted files
       */
