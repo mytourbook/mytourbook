@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2022 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2025 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -507,8 +507,7 @@ public class CRPDataReader extends TourbookDevice {
 
       tourData.createTimeSeries(timeDataList, false);
 
-      tourData.setTourAltUp(tourAltUp);
-      tourData.setTourAltDown(tourAltDown);
+      tourData.setElevationGainLoss(tourAltUp, tourAltDown);
    }
 
    /**

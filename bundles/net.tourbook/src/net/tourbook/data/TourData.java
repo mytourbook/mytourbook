@@ -3051,14 +3051,21 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
          return false;
       }
 
-      final FlatGainLoss altiUpDown = computeAltitudeUpDown(elevationSerie);
+      final FlatGainLoss flatGainLoss = computeAltitudeUpDown(elevationSerie);
 
-      if (altiUpDown != null) {
-         setTourAltUp(altiUpDown.elevationGain);
-         setTourAltDown(altiUpDown.elevationLoss);
+      if (flatGainLoss != null) {
+
+         float elevationGain = flatGainLoss.elevationGain;
+         float elevationLoss = flatGainLoss.elevationLoss;
+
+         // remove elevation gain/loss which occurred within a break time
+         elevationGain -= flatGainLoss.elevationGain_InBreakTime;
+         elevationLoss -= flatGainLoss.elevationLoss_InBreakTime;
+
+         setElevationGainLoss(elevationGain, elevationLoss);
       }
 
-      return altiUpDown != null;
+      return flatGainLoss != null;
    }
 
    /**
@@ -3345,6 +3352,39 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
          segmentStartElevation = segmentEndElevation;
       }
 
+      /*
+       * Computes elevation gain/loss in break times
+       */
+      float elevationGain_InBreak = 0;
+      float elevationLoss_InBreak = 0;
+
+      float elevationPrev = altitudeSerie[0];
+
+      for (int serieIndex = 1; serieIndex < breakTimeSerie.length; serieIndex++) {
+
+         final float elevation = altitudeSerie[serieIndex];
+         final boolean isBreakTime = breakTimeSerie[serieIndex];
+
+         if (isBreakTime) {
+
+            final float elevationDiff = elevation - elevationPrev;
+
+            if (elevationDiff >= 0) {
+
+               elevationGain_InBreak += elevationDiff;
+
+            } else {
+
+               elevationLoss_InBreak += -elevationDiff;
+            }
+         }
+
+         elevationPrev = elevation;
+      }
+
+      /*
+       * Set return values
+       */
       final FlatGainLoss flatGainLoss = new FlatGainLoss();
 
       flatGainLoss.timeFlat = timeFlatTotal;
@@ -3357,6 +3397,9 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
 
       flatGainLoss.elevationGain = elevationGainTotal;
       flatGainLoss.elevationLoss = -elevationLossTotal;
+
+      flatGainLoss.elevationGain_InBreakTime = elevationGain_InBreak;
+      flatGainLoss.elevationLoss_InBreakTime = elevationLoss_InBreak;
 
       return flatGainLoss;
    }
@@ -3572,8 +3615,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
 
       final FlatGainLoss elevationUpDown = computeAltitudeUpDown(srtmSerie);
 
-      setTourAltUp(elevationUpDown.elevationGain);
-      setTourAltDown(elevationUpDown.elevationLoss);
+      setElevationGainLoss(elevationUpDown.elevationGain, elevationUpDown.elevationLoss);
 
       return elevationUpDown;
    }
@@ -13540,21 +13582,19 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
       _zonedEndTime = null;
    }
 
-   public void setTourAltDown(final float tourAltDown) {
+   /**
+    * Set tour elevation gain and loss
+    * 
+    * @param elevationGain
+    * @param elevationLoss
+    */
+   public void setElevationGainLoss(final float elevationGain, final float elevationLoss) {
 
-      this.tourAltDown = (int) (tourAltDown + 0.5);
+      this.tourAltUp = (int) (elevationGain + 0.5);
+      this.tourAltDown = (int) (elevationLoss + 0.5);
 
       // We update the average elevation change
-      // Note : We only do it here since most of the call to the function
-      // setTourAltDown() is performed AFTER setTourAltUp()
-      // Hence, we know that at this point, we will be able to compute the
-      // average elevation change with the latest values of tourAltUp and tourAltDown.
       computeAvg_AltitudeChange();
-   }
-
-   public void setTourAltUp(final float tourAltUp) {
-
-      this.tourAltUp = (int) (tourAltUp + 0.5);
    }
 
    public void setTourBike(final TourBike tourBike) {

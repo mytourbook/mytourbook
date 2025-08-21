@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2014, 2025 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -58,62 +58,61 @@ public class ActionComputeElevationGain extends Action {
       setText(Messages.Action_Compute_ElevationGain);
    }
 
-   private String getElevationDifferenceString(final int elevationDifference) {
-
-      final StringBuilder differenceResult = new StringBuilder();
-      if (elevationDifference > 0) {
-         differenceResult.append(net.tourbook.common.UI.SYMBOL_PLUS);
-      }
-
-      differenceResult.append(_nf0.format((elevationDifference) / UI.UNIT_VALUE_ELEVATION));
-      return differenceResult.toString();
-   }
-
    @Override
    public void run() {
 
       final ArrayList<Long> tourIds = new ArrayList<>(_tourProvider.getSelectedTourIDs());
 
-      final float prefDPTolerance = TourbookPlugin.getPrefStore().getFloat(
-            ITourbookPreferences.COMPUTED_ALTITUDE_DP_TOLERANCE);
+      final float prefDPTolerance = TourbookPlugin.getPrefStore().getFloat(ITourbookPreferences.COMPUTED_ALTITUDE_DP_TOLERANCE);
 
       final String dpToleranceWithUnit = _nf1.format(prefDPTolerance / UI.UNIT_VALUE_ELEVATION) + UI.SPACE1 + UI.UNIT_LABEL_ELEVATION;
+
+      final String message = NLS.bind(
+            Messages.Compute_TourValue_ElevationGain_Message,
+            tourIds.size(),
+            dpToleranceWithUnit);
 
       if (MessageDialog.openConfirm(
             Display.getCurrent().getActiveShell(),
             Messages.Compute_TourValue_ElevationGain_Title,
-            NLS.bind(//
-                  Messages.Compute_TourValue_ElevationGain_Message,
-                  tourIds.size(),
-                  dpToleranceWithUnit)) == false) {
+            message) == false) {
+
          return;
       }
 
-      final int[] elevationOld = new int[] { 0 };
-      final int[] elevationNew = new int[] { 0 };
+      final int[] elevationUp_Old = new int[] { 0 };
+      final int[] elevationUp_New = new int[] { 0 };
+      final int[] elevationDown_Old = new int[] { 0 };
+      final int[] elevationDown_New = new int[] { 0 };
 
       final IComputeNoDataserieValues configComputeTourValue = new IComputeNoDataserieValues() {
 
          @Override
-         public boolean computeTourValues(final TourData originalTourData, final PreparedStatement sqlUpdateStatement) throws SQLException {
+         public boolean computeTourValues(final TourData tourData,
+                                          final PreparedStatement sqlUpdateStatement) throws SQLException {
 
             // keep old value
-            elevationOld[0] += originalTourData.getTourAltUp();
+            elevationUp_Old[0] += tourData.getTourAltUp();
+            elevationDown_Old[0] += tourData.getTourAltDown();
 
-            if (originalTourData.computeAltitudeUpDown() == false) {
+            // compute new values
+            if (tourData.computeAltitudeUpDown() == false) {
 
                // altitude up/down values could not be computed
                return false;
             }
 
-            final int newAltitudeUp = originalTourData.getTourAltUp();
-            elevationNew[0] += newAltitudeUp;
+            final int newAltitudeUp = tourData.getTourAltUp();
+            final int newAltitudeDown = tourData.getTourAltDown();
 
-            sqlUpdateStatement.setShort(1, originalTourData.getDpTolerance());
+            elevationUp_New[0] += newAltitudeUp;
+            elevationDown_New[0] += newAltitudeDown;
+
+            sqlUpdateStatement.setShort(1, tourData.getDpTolerance());
             sqlUpdateStatement.setInt(2, newAltitudeUp);
-            sqlUpdateStatement.setInt(3, originalTourData.getTourAltDown());
-            sqlUpdateStatement.setInt(4, originalTourData.getAvgAltitudeChange());
-            sqlUpdateStatement.setLong(5, originalTourData.getTourId());
+            sqlUpdateStatement.setInt(3, newAltitudeDown);
+            sqlUpdateStatement.setInt(4, tourData.getAvgAltitudeChange());
+            sqlUpdateStatement.setLong(5, tourData.getTourId());
 
             return true;
          }
@@ -121,14 +120,22 @@ public class ActionComputeElevationGain extends Action {
          @Override
          public String getResultText() {
 
-            final int elevationDifference = elevationNew[0] - elevationOld[0];
-            final String differenceResult = getElevationDifferenceString(elevationDifference);
+            final int elevationDiff_Up = Math.abs(elevationUp_New[0] - elevationUp_Old[0]);
+            final int elevationDiff_Down = Math.abs(elevationDown_New[0] - elevationDown_Old[0]);
+
+            final String diffText = "+%5.1f %s    -%5.1f %s".formatted( //$NON-NLS-1$
+
+                  elevationDiff_Up / UI.UNIT_VALUE_ELEVATION,
+                  UI.UNIT_LABEL_ELEVATION,
+
+                  elevationDiff_Down / UI.UNIT_VALUE_ELEVATION,
+                  UI.UNIT_LABEL_ELEVATION);
 
             return NLS.bind(Messages.Compute_TourValue_ElevationGain_ResultText,
                   new Object[] {
                         dpToleranceWithUnit,
-                        differenceResult,
-                        UI.UNIT_LABEL_ELEVATION
+                        diffText,
+                        UI.EMPTY_STRING
                   });
          }
 
@@ -141,12 +148,12 @@ public class ActionComputeElevationGain extends Action {
 
                   + " SET" //                                     //$NON-NLS-1$
 
-                  + " dpTolerance=?, " //                         //$NON-NLS-1$
-                  + " tourAltUp=?, " //                           //$NON-NLS-1$
-                  + " tourAltDown=?, " //                         //$NON-NLS-1$
-                  + " avgAltitudeChange=? " //                    //$NON-NLS-1$
+                  + " dpTolerance         = ?, " //   1           //$NON-NLS-1$
+                  + " tourAltUp           = ?, " //   2           //$NON-NLS-1$
+                  + " tourAltDown         = ?, " //   3           //$NON-NLS-1$
+                  + " avgAltitudeChange   = ? " //    4           //$NON-NLS-1$
 
-                  + " WHERE tourId=?"; //                         //$NON-NLS-1$
+                  + " WHERE tourId        = ?"; //    5           //$NON-NLS-1$
 
             return sql;
          }

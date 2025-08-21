@@ -9709,8 +9709,7 @@ public class TourDataEditorView extends ViewPart implements
                altitudeDownValue = Math.round(noneMetricValue * _unitValueElevation);
             }
 
-            _tourData.setTourAltUp((int) altitudeUpValue);
-            _tourData.setTourAltDown((int) altitudeDownValue);
+            _tourData.setElevationGainLoss((int) altitudeUpValue, (int) altitudeDownValue);
          }
 
          // manual/photo tour

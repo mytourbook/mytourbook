@@ -1323,8 +1323,7 @@ public class TourManager {
       joinedTourData.setTourDistance(tourDistance);
 
       // computing these values is VERY CPU intensive because of the DP algorithm
-      joinedTourData.setTourAltUp(tourAltUp);
-      joinedTourData.setTourAltDown(tourAltDown);
+      joinedTourData.setElevationGainLoss(tourAltUp, tourAltDown);
 
       joinedTourData.computeTourMovingTime();
       joinedTourData.computeComputedValues();
