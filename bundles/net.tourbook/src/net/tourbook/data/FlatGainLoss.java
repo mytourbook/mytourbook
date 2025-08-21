@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
+ * Copyright (C) 2009, 2025 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -31,6 +31,9 @@ public class FlatGainLoss {
 
    public float                elevationGain;
    public float                elevationLoss;
+
+   public float                elevationGain_InBreakTime;
+   public float                elevationLoss_InBreakTime;
 
    public FlatGainLoss() {}
 
