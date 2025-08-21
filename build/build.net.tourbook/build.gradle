@@ -109,11 +109,11 @@ task mt_30_CopyProduct {
 
       // copy into archive folder
       copy {
-         
+
          from (_dirProductBuilt) {
             include '*' + _mtVersion + '*'
          }
-         
+
          into _dirProductArchive
       }
    }
