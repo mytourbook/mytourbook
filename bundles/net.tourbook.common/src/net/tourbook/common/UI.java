@@ -3330,7 +3330,39 @@ public class UI {
     * @param backgroundColor
     *           Background color
     */
-   public static void setColorForAllChildren(final Control parent, final Color foregroundColor, final Color backgroundColor) {
+   public static void setColorForAllChildren(final Control parent,
+                                             final Color foregroundColor,
+                                             final Color backgroundColor) {
+
+      setColorForAllChildren(parent, foregroundColor, backgroundColor, null);
+   }
+
+   /**
+    * Set color for all children controls of the parent.
+    *
+    * @param parent
+    * @param foregroundColor
+    *           Foreground color
+    * @param backgroundColor
+    *           Background color
+    * @param allSkipedControls
+    *           Contains all constrols which must be skipped
+    *
+    */
+   public static void setColorForAllChildren(final Control parent,
+                                             final Color foregroundColor,
+                                             final Color backgroundColor,
+                                             final Object[] allSkipedControls) {
+
+      if (allSkipedControls != null) {
+
+         for (final Object skipedControl : allSkipedControls) {
+
+            if (parent == skipedControl) {
+               return;
+            }
+         }
+      }
 
       parent.setForeground(foregroundColor);
       parent.setBackground(backgroundColor);
@@ -3342,15 +3374,15 @@ public class UI {
          for (final Control child : children) {
 
             if (child != null
-                  && child.isDisposed() == false //
+                  && child.isDisposed() == false
 
                   // exclude controls which look ugly
                   && !child.getClass().equals(Combo.class)
                   && !child.getClass().equals(Spinner.class)
-            //
+
             ) {
 
-               setColorForAllChildren(child, foregroundColor, backgroundColor);
+               setColorForAllChildren(child, foregroundColor, backgroundColor, allSkipedControls);
             }
          }
       }

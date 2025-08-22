@@ -12788,6 +12788,21 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
       this.dpTolerance = dpTolerance;
    }
 
+   /**
+    * Set tour elevation gain and loss
+    *
+    * @param elevationGain
+    * @param elevationLoss
+    */
+   public void setElevationGainLoss(final float elevationGain, final float elevationLoss) {
+
+      this.tourAltUp = (int) (elevationGain + 0.5);
+      this.tourAltDown = (int) (elevationLoss + 0.5);
+
+      // We update the average elevation change
+      computeAvg_AltitudeChange();
+   }
+
    public void setFrontShiftCount(final int frontShiftCount) {
       this.frontShiftCount = frontShiftCount;
    }
@@ -13580,21 +13595,6 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
       // reset cached date time with time zone to recognize the new time zone
       _zonedStartTime = null;
       _zonedEndTime = null;
-   }
-
-   /**
-    * Set tour elevation gain and loss
-    * 
-    * @param elevationGain
-    * @param elevationLoss
-    */
-   public void setElevationGainLoss(final float elevationGain, final float elevationLoss) {
-
-      this.tourAltUp = (int) (elevationGain + 0.5);
-      this.tourAltDown = (int) (elevationLoss + 0.5);
-
-      // We update the average elevation change
-      computeAvg_AltitudeChange();
    }
 
    public void setTourBike(final TourBike tourBike) {
@@ -14512,7 +14512,13 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
       this.weather = weather;
    }
 
+   /**
+    * Set weather air quality which is a value from {@link IWeather#AIR_QUALITY_IDS}
+    *
+    * @param weather_AirQuality
+    */
    public void setWeather_AirQuality(final String weather_AirQuality) {
+
       this.weather_AirQuality = weather_AirQuality;
    }
 
