@@ -2290,12 +2290,12 @@ public class RawDataManager {
 
          final List<ImportFile> allImportFilePaths = new ArrayList<>();
 
-         final List<OSFile> notSkipedFiles = skipFitLogFiles(allImportFiles);
+         final List<OSFile> notSkippedFiles = skipFitLogFiles(allImportFiles);
 
          /*
           * Convert to IPath because NIO Path DO NOT SUPPORT EXTENSIONS :-(((
           */
-         for (final OSFile osFile : notSkipedFiles) {
+         for (final OSFile osFile : notSkippedFiles) {
 
             final String absolutePath = osFile.getPath().toString();
             final org.eclipse.core.runtime.Path iPath = new org.eclipse.core.runtime.Path(absolutePath);
@@ -4179,7 +4179,7 @@ public class RawDataManager {
 
                new ProgressMonitorDialog(Display.getDefault().getActiveShell()).run(
                      true, // fork
-                     false, // cancelable
+                     false, // cancellable
                      monitor1 -> updateTourData_InImportView_FromDb_Runnable(monitor1));
 
             } else {
