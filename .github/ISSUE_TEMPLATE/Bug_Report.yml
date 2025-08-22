@@ -25,7 +25,7 @@ body:
     id: how-to-reproduce
     attributes:
       label: How to reproduce ?
-      description: Tell us if and how to reproduce the bug in order to accelerate its resolution
+      description: Tell us, if possible, how to reproduce the bug in order to accelerate its resolution
       placeholder: Tell us how we can reproduce it!
     validations:
       required: true
