@@ -419,9 +419,9 @@ public class CM4XXMDeviceReader extends TourbookDevice {
                   // adjust altitude from relative to absolute
                   absoluteAltitude += timeData.altitude;
 
-                  tourData.setElevationGainLoss(
-                        tourData.getTourAltUp() + ((timeData.altitude > 0) ? timeData.altitude : 0),
-                        tourData.getTourAltDown() + ((timeData.altitude < 0) ? -timeData.altitude : 0));
+                  final float elevationGain = tourData.getTourAltUp() + ((timeData.altitude > 0) ? timeData.altitude : 0);
+                  final float elevationLoss = tourData.getTourAltDown() + ((timeData.altitude < 0) ? -timeData.altitude : 0);
+                  tourData.setElevationGainLoss(elevationGain, elevationLoss);
 
                   sumDistance += timeData.distance;
                   sumAltitude += Math.abs(absoluteAltitude);

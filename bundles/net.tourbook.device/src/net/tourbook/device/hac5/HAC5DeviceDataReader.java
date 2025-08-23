@@ -634,9 +634,9 @@ public class HAC5DeviceDataReader extends TourbookDevice {
       // 14 1 ?
       // 15 1 0xFF
 
-      tourData.setElevationGainLoss(
-            DeviceReaderTools.get2ByteData(buffer, 10),
-            DeviceReaderTools.get2ByteData(buffer, 12));
+      int elevationGain = DeviceReaderTools.get2ByteData(buffer, 10);
+      int elevationLoss = DeviceReaderTools.get2ByteData(buffer, 12);
+      tourData.setElevationGainLoss(elevationGain, elevationLoss);
 
 // System.out.println("UP: "+DeviceReaderTools.get2ByteData(buffer, 10));
    }

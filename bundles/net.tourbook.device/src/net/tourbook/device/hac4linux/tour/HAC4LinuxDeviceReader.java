@@ -328,6 +328,10 @@ public class HAC4LinuxDeviceReader extends TourbookDevice {
          int tourDay = 0;
 
          int friends = -1;
+
+         float elevationGain = 0;
+         float elevationLoss = 0;
+
          while ((line = fileHac4LinuxData.readLine()) != null) {
             if (line.length() <= 0 || line.charAt(0) == '#') {
                continue;
@@ -468,9 +472,6 @@ public class HAC4LinuxDeviceReader extends TourbookDevice {
                   break;
                }
 
-               float elevationGain = 0;
-               float elevationLoss = 0;
-
                if (fields[0].equals("Rosen")) { //$NON-NLS-1$
                   elevationGain = (Integer.parseInt(fields[1]));
                }
@@ -478,8 +479,6 @@ public class HAC4LinuxDeviceReader extends TourbookDevice {
                if (fields[0].equals("Fallen")) { //$NON-NLS-1$
                   elevationLoss = (Integer.parseInt(fields[1]));
                }
-
-               tourData.setElevationGainLoss(elevationGain, elevationLoss);
 
                //if(fields[0].equals("Altitude")) //Altitude=147;90;69
                if (fields[0].equals("Temperature")) { //Temperature=24;22;20 //$NON-NLS-1$
@@ -622,6 +621,8 @@ public class HAC4LinuxDeviceReader extends TourbookDevice {
 
          tourData.setDeviceId(deviceId);
          tourData.setDeviceName(visibleName);
+
+         tourData.setElevationGainLoss(elevationGain, elevationLoss);
 
          /*
           * disable data series when no data are available

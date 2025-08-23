@@ -1674,7 +1674,9 @@ public class RawDataManager {
 
             if (isEntireTour_OR_AllTimeSlices || tourValueType == TourValueType.TIME_SLICES__ELEVATION) {
 
-               tourDataDummyClone.setElevationGainLoss(oldTourData.getTourAltUp(), oldTourData.getTourAltDown());
+               int elevationGain = oldTourData.getTourAltUp();
+               int elevationLoss = oldTourData.getTourAltDown();
+               tourDataDummyClone.setElevationGainLoss(elevationGain, elevationLoss);
             }
 
             if (isEntireTour_OR_AllTimeSlices || tourValueType == TourValueType.TIME_SLICES__GEAR) {
@@ -1968,7 +1970,9 @@ public class RawDataManager {
 
             case TIME_SLICES__ELEVATION:
 
-               clonedTourData.setElevationGainLoss(tourData.getTourAltUp(), tourData.getTourAltDown());
+               int elevationGain = tourData.getTourAltUp();
+               int elevationLoss = tourData.getTourAltDown();
+               clonedTourData.setElevationGainLoss(elevationGain, elevationLoss);
 
                tourData.altitudeSerie = null;
                tourData.setElevationGainLoss(0, 0);
@@ -3748,9 +3752,12 @@ public class RawDataManager {
       if (isAllTimeSlices || allTourValueTypes.contains(TourValueType.TIME_SLICES__ELEVATION)) {
 
          // re-import elevation only
+         
+         int elevationGain = reimportedTourData.getTourAltUp();
+         int elevationLoss = reimportedTourData.getTourAltDown();
 
          oldTourData.altitudeSerie = reimportedTourData.altitudeSerie;
-         oldTourData.setElevationGainLoss(reimportedTourData.getTourAltUp(), reimportedTourData.getTourAltDown());
+         oldTourData.setElevationGainLoss(elevationGain, elevationLoss);
       }
 
       // Gear
