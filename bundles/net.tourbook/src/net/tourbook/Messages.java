@@ -1891,6 +1891,8 @@ public class Messages extends NLS {
    public static String        Pref_People_Column_height;
    public static String        Pref_People_Column_last_name;
    public static String        Pref_People_Dialog_ComputeHrZonesForAllToursIsCanceled_Message;
+   public static String        Pref_People_Dialog_ComputeHrZonesForAllToursIsCanceled_Message_Cancel;
+   public static String        Pref_People_Dialog_ComputeHrZonesForAllToursIsCanceled_Message_OK;
    public static String        Pref_People_Dialog_ComputeHrZonesForAllTours_Message;
    public static String        Pref_People_Dialog_SaveModifiedPerson_Message;
    public static String        Pref_People_Dialog_SaveModifiedPerson_Title;
