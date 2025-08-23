@@ -273,9 +273,9 @@ public class TurDeviceReader extends TourbookDevice {
                timeData.distance = distance - oldDistance;
                oldDistance = distance;
 
-               tourData.setElevationGainLoss(
-                     tourData.getTourAltUp() + ((timeData.altitude > 0) ? timeData.altitude : 0),
-                     tourData.getTourAltDown() + ((timeData.altitude < 0) ? -timeData.altitude : 0));
+               float elevationGain = tourData.getTourAltUp() + ((timeData.altitude > 0) ? timeData.altitude : 0);
+               float elevationLoss = tourData.getTourAltDown() + ((timeData.altitude < 0) ? -timeData.altitude : 0);
+               tourData.setElevationGainLoss(elevationGain, elevationLoss);
             }
             timeDataList.add(timeData);
 

@@ -5462,7 +5462,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
       hrZone9 = zoneSize > 9 ? hrZones[9] : -1;
 
       _hrZones = new int[] {
-            hrZone0, //
+            hrZone0,
             hrZone1,
             hrZone2,
             hrZone3,

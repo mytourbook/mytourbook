@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2024 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2025 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -24,6 +24,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import javax.persistence.Basic;
@@ -61,6 +62,7 @@ public class TourPerson implements Comparable<Object>, Serializable {
          0,
          0,
          TimeTools.getDefaultTimeZone());
+
    public static final int                 DB_LENGTH_LAST_NAME        = 80;
    public static final int                 DB_LENGTH_FIRST_NAME       = 80;
    public static final int                 DB_LENGTH_RAW_DATA_PATH    = 255;
@@ -304,13 +306,15 @@ public class TourPerson implements Comparable<Object>, Serializable {
    }
 
    /**
-    * @param dateTime
+    * @param persondBirthDay
+    * @param tourDateTime
     *
-    * @return Returns age for this person at a specific day
+    * @return Returns the age for this person at a specific day, this is used to get the persons age
+    *         when a tour was created
     */
-   private int getAge(final ZonedDateTime zonedBirthDay, final ZonedDateTime dateTime) {
+   private int getAge(final ZonedDateTime persondBirthDay, final ZonedDateTime tourDateTime) {
 
-      final Period age = Period.between(zonedBirthDay.toLocalDate(), dateTime.toLocalDate());
+      final Period age = Period.between(persondBirthDay.toLocalDate(), tourDateTime.toLocalDate());
 
       return age.getYears();
    }
@@ -363,7 +367,7 @@ public class TourPerson implements Comparable<Object>, Serializable {
    /**
     * @param hrMaxFormulaKey
     * @param hrMaxPulse
-    * @param dateTime
+    * @param tourDateTime
     *           Date when the HR zones should be computed, this is the tour date.
     *
     * @return Returns HR zone min/max bpm values or <code>null</code> when hr zones are not
@@ -371,17 +375,18 @@ public class TourPerson implements Comparable<Object>, Serializable {
     */
    public HrZoneContext getHrZoneContext(final int hrMaxFormulaKey,
                                          final int hrMaxPulse,
-                                         final ZonedDateTime birthDay,
-                                         final ZonedDateTime dateTime) {
+                                         final ZonedDateTime personBirthDay,
+                                         final ZonedDateTime tourDateTime) {
 
       if (hrZones == null || hrZones.isEmpty()) {
          return null;
       }
 
-      final int age = getAge(birthDay, dateTime);
+      final int age = getAge(personBirthDay, tourDateTime);
       final HrZoneContext hrZoneMinMax = _hrZoneMinMaxBpm.get(age);
 
       if (hrZoneMinMax != null) {
+
          // hr zones for the age is already available
          return hrZoneMinMax;
       }
@@ -392,15 +397,15 @@ public class TourPerson implements Comparable<Object>, Serializable {
       final float[] zoneMinBmps = new float[zoneSize];
       final float[] zoneMaxBmps = new float[zoneSize];
 
-      final ArrayList<TourPersonHRZone> hrZonesList = new ArrayList<>(hrZones);
-      Collections.sort(hrZonesList);
+      final List<TourPersonHRZone> allHrZones = new ArrayList<>(hrZones);
+      Collections.sort(allHrZones);
 
       int prevMaxBpm = -1;
 
       // fill zone min/max values
       for (int zoneIndex = 0; zoneIndex < hrZones.size(); zoneIndex++) {
 
-         final TourPersonHRZone hrZone = hrZonesList.get(zoneIndex);
+         final TourPersonHRZone hrZone = allHrZones.get(zoneIndex);
 
          final int zoneMaxValue = hrZone.getZoneMaxValue();
 
@@ -411,6 +416,7 @@ public class TourPerson implements Comparable<Object>, Serializable {
                : (zoneMaxValue * hrMax / 100);
 
          if (prevMaxBpm != -1) {
+
             // make sure that "min" is last "max + 1"
             minBpm = prevMaxBpm + 1;
          }

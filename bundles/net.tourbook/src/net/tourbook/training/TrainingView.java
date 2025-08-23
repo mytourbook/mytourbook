@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2025 Wolfgang Schramm and Contributors
+ * Copyright (C) 2011, 2025 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -741,25 +741,25 @@ public class TrainingView extends ViewPart {
 
    private void createUI_58_HrZoneFields(final Composite parent) {
 
-      final int hrZoneSize = _personHrZones.size();
+      final int numHrZones = _personHrZones.size();
 
       /*
        * fields
        */
-      _lblTourMinMaxValue = new Label[hrZoneSize];
-      _lblTourMinMaxHours = new Label[hrZoneSize];
-      _lblHRZoneName = new Label[hrZoneSize];
-      _lblHRZoneColor = new Label[hrZoneSize];
-      _lblHrZonePercent = new Label[hrZoneSize];
+      _lblTourMinMaxValue = new Label[numHrZones];
+      _lblTourMinMaxHours = new Label[numHrZones];
+      _lblHRZoneName = new Label[numHrZones];
+      _lblHRZoneColor = new Label[numHrZones];
+      _lblHrZonePercent = new Label[numHrZones];
 
       // set hr zone colors
       disposeHrZoneResources();
-      _hrZoneColors = new Color[hrZoneSize];
-      _hrZoneColorsBright = new Color[hrZoneSize];
-      _hrZoneColorsDark = new Color[hrZoneSize];
+      _hrZoneColors = new Color[numHrZones];
+      _hrZoneColorsBright = new Color[numHrZones];
+      _hrZoneColorsDark = new Color[numHrZones];
 
       // the sequence of the zones are inverted
-      for (int zoneIndex = hrZoneSize - 1; zoneIndex >= 0; zoneIndex--) {
+      for (int zoneIndex = numHrZones - 1; zoneIndex >= 0; zoneIndex--) {
 
          final TourPersonHRZone hrZone = _personHrZones.get(zoneIndex);
          _hrZoneColors[zoneIndex] = new Color(hrZone.getColor());
@@ -1256,7 +1256,7 @@ public class TrainingView extends ViewPart {
 
       final String prefGraphName = ICommonPreferences.GRAPH_COLORS + GraphColorManager.PREF_GRAPH_TIME + UI.SYMBOL_DOT;
 
-      final String prefColorText = net.tourbook.common.UI.IS_DARK_THEME
+      final String prefColorText = UI.IS_DARK_THEME
             ? GraphColorManager.PREF_COLOR_TEXT_DARK
             : GraphColorManager.PREF_COLOR_TEXT_LIGHT;
 
@@ -1420,6 +1420,7 @@ public class TrainingView extends ViewPart {
 
       // create hr zones when not yet done or disposed
       if (_hrZoneDataContainerContent == null || _hrZoneDataContainerContent.isDisposed()) {
+
          createUI_52_HrZoneData_ContainerContent();
       }
 
@@ -1429,9 +1430,9 @@ public class TrainingView extends ViewPart {
 
       _tourHrZonePercent = new double[personZoneSize];
 
-      final int tourHrZoneSize = tourHrZoneTimes.length;
+      final int numHrZones = tourHrZoneTimes.length;
 
-      for (int tourZoneIndex = 0; tourZoneIndex < tourHrZoneSize; tourZoneIndex++) {
+      for (int tourZoneIndex = 0; tourZoneIndex < numHrZones; tourZoneIndex++) {
 
          if (tourZoneIndex >= personZoneSize) {
 
@@ -1517,9 +1518,7 @@ public class TrainingView extends ViewPart {
          _lblTourMinMaxValue[tourZoneIndex].setText(((int) zoneMinBpm) + UI.DASH + zoneMaxBpmText);
          _lblTourMinMaxValue[tourZoneIndex].setToolTipText(hrZoneTooltip);
 
-         _lblTourMinMaxHours[tourZoneIndex].setText(net.tourbook.common.UI
-               .format_hh_mm((long) (zoneTime + 30))
-               .toString());
+         _lblTourMinMaxHours[tourZoneIndex].setText(UI.format_hh_mm((long) (zoneTime + 30)).toString());
          _lblTourMinMaxHours[tourZoneIndex].setToolTipText(hrZoneTooltip);
 
          _lblHRZoneName[tourZoneIndex].setToolTipText(hrZoneTooltip);

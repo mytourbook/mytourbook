@@ -1386,6 +1386,10 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 
             final Label label = allHrZoneColorLabel[zoneIndex];
 
+            if (label.isDisposed()) {
+               continue;
+            }
+
             final TourPersonHRZone hrZone = allHrZones.get(zoneIndex);
             final Color hrZoneColor = new Color(hrZone.getColor());
 
@@ -1584,7 +1588,7 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
                final int heightFeet = (int) Math.floor(heightFeetRaw);
                final int heightInch = (int) (heightInchRaw % 12);
 
-               final String heightString = UI.EMPTY_STRING + heightFeet + "'" + heightInch + UI.SYMBOL_QUOTATION_MARK; //$NON-NLS-1$ //$NON-NLS-2$
+               final String heightString = UI.EMPTY_STRING + heightFeet + "'" + heightInch + UI.SYMBOL_QUOTATION_MARK; //$NON-NLS-1$
 
                cell.setText(heightString);
             }
@@ -2184,16 +2188,33 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
          return true;
       }
 
-      if (MessageDialog.openQuestion(
+      final int messageDialogResult = new MessageDialog(
+
             getShell(),
+
             Messages.Compute_HrZones_Dialog_ComputeAllTours_Title,
-            Messages.Pref_People_Dialog_ComputeHrZonesForAllTours_Message)) {
+            null,
+
+            Messages.Pref_People_Dialog_ComputeHrZonesForAllTours_Message,
+            MessageDialog.QUESTION,
+
+            // default index
+            0,
+
+            Messages.Pref_People_Dialog_ComputeHrZonesForAllToursIsCanceled_Message_OK,
+            Messages.Pref_People_Dialog_ComputeHrZonesForAllToursIsCanceled_Message_Cancel
+
+      ).open();
+
+      if (messageDialogResult == 0) {
 
          return computeHrZonesForAllTours(true);
-      }
 
-      // user has canceled and the user is informed that hr zones can be inconsistent
-      return true;
+      } else {
+
+         // user has canceled and the user is informed that hr zones can be inconsistent
+         return true;
+      }
    }
 
    /**
