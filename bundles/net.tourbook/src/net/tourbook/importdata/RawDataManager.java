@@ -104,7 +104,12 @@ import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.WorkbenchException;
 
+import jmtp.PortableDevice;
+import jmtp.PortableDeviceManager;
+
 public class RawDataManager {
+
+   private static final char   NL                                  = UI.NEW_LINE;
 
    /**
     * This can be useful that the logged import events have a defined sequence instead of
@@ -1370,10 +1375,113 @@ public class RawDataManager {
       }
    }
 
+   public void actionImportFromFile() {
+// TODO remove SYSTEM.OUT.PRINTLN
+
+//      PortableDeviceManager manager;
+//      PortableDevice device;
+//      PortableDeviceImplWin32 device32;
+//      PortableDeviceValuesImplWin32 input;
+//      PortableDeviceValuesImplWin32 results;
+//      COMException wpdError;
+//      long driverError;
+//
+//      manager = new PortableDeviceManager();
+//      device = manager.getDevices()[0];
+//      device.open();
+//
+//      final PropertyKey commandKey = Win32WPDDefines.WPD_COMMAND_COMMON_RESET_DEVICE;
+//
+//      device32 = (PortableDeviceImplWin32) device;
+//      try {
+//         input = new PortableDeviceValuesImplWin32();
+//         input.setGuidValue(Win32WPDDefines.WPD_PROPERTY_COMMON_COMMAND_CATEGORY, commandKey.getFmtid());
+//         input.setUnsignedIntegerValue(Win32WPDDefines.WPD_PROPERTY_COMMON_COMMAND_ID, commandKey.getPid());
+//
+//         results = device32.sendCommand(input);
+//
+//         //check for success or failure to carry out the command
+//         try {
+//            wpdError = results.getErrorValue(Win32WPDDefines.WPD_PROPERTY_COMMON_HRESULT);
+//         } catch (final COMException e) {
+//            //ignore exception if "ERROR_NOT_FOUND" -> item not in collection
+//            if (e.getHresult() != Win32WPDDefines.ERROR_NOT_FOUND) {
+//               System.out.println("Error: " + e.getErrorCode());
+//            }
+//         }
+//
+//         //check driver-specific error code
+//         try {
+//            driverError = results.getUnsignedIntegerValue(Win32WPDDefines.WPD_PROPERTY_COMMON_DRIVER_ERROR_CODE);
+//            System.out.println("Driver Error Code: " + driverError);
+//         } catch (final COMException e) {
+//            //ignore exception if "ERROR_NOT_FOUND" -> item not in collection
+//            if (e.getHresult() != Win32WPDDefines.ERROR_NOT_FOUND) {
+//               System.out.println("Error: " + e.getErrorCode());
+//            }
+//         }
+//      } catch (final COMException e) {
+//         System.out.println("Error: " + e.getErrorCode());
+//      }
+
+      final StringBuilder sb = new StringBuilder();
+
+      final PortableDeviceManager devManager = new PortableDeviceManager();
+
+      final PortableDevice[] allDevices = devManager.getDevices();
+
+      for (final PortableDevice portableDevice : devManager) {
+
+         sb.append(portableDevice.getDescription() + NL);
+      }
+
+      System.out.println();
+      System.out.println(sb.toString());
+
+
+//      Getting Started with jMTP 
+//      The first thing you need to do, is create a new PortableDeviceManager object to handle all the 
+//      connected media players.  You can then iterate over all the devices: 
+
+//      PortableDeviceManager manager = new PortableDeviceManager();
+//      for(PortableDevice device : manager) { 
+//       //do something with the device … 
+//      } 
+
+//      If you want to access a device it is important that you open a connection to it first: 
+//
+//      device.open() 
+//
+//      Optionally you can use a special open version that allows you to authenticate you application to the 
+//      device. 
+//
+//      Next you can iterate over the files: 
+//
+//      for(PortableDeviceObject object : device.getRootObjects()) { 
+//       //do something with the root objects… 
+//      } 
+//
+//      A PortableDeviceObject can always be of a more specialized type such as a storage: these are the 
+//      root storage objects, most of the other root objects are virtual setting objects (for more information, 
+//      please see the MSDN), you can check if an object is an storage object with: 
+//
+//      If(object instanceof PortableDeviceStorageObject) { 
+//       PortableDeviceStorageObject storage = (PortableDeviceStorageObject)object; 
+//       //…. 
+//      } 
+//
+//      You can then retrieve the childobjects of the storage with the method getChildObjects(), child’s can 
+//      be all kind of objects (folders, audio, unspecified objets, …) you can always use the instanceof to 
+//      check the exact type of an object on the device. 
+//
+//      If you encounter a problem or a bug: don't be afraid you may always contact me on: 
+//      phd[]ryc[]ke’at’gm][ail’dot’com (remove all the [ and ] and change ‘at’ to @ and ‘dot’ to .) 
+   }
+
    /**
     * Import tours from files which are selected in a file selection dialog.
     */
-   public void actionImportFromFile() {
+   public void actionImportFromFile_HIDDEN() {
 
       final List<TourbookDevice> allDevices = DeviceManager.getDeviceList();
 
@@ -1674,8 +1782,8 @@ public class RawDataManager {
 
             if (isEntireTour_OR_AllTimeSlices || tourValueType == TourValueType.TIME_SLICES__ELEVATION) {
 
-               int elevationGain = oldTourData.getTourAltUp();
-               int elevationLoss = oldTourData.getTourAltDown();
+               final int elevationGain = oldTourData.getTourAltUp();
+               final int elevationLoss = oldTourData.getTourAltDown();
                tourDataDummyClone.setElevationGainLoss(elevationGain, elevationLoss);
             }
 
@@ -1970,8 +2078,8 @@ public class RawDataManager {
 
             case TIME_SLICES__ELEVATION:
 
-               int elevationGain = tourData.getTourAltUp();
-               int elevationLoss = tourData.getTourAltDown();
+               final int elevationGain = tourData.getTourAltUp();
+               final int elevationLoss = tourData.getTourAltDown();
                clonedTourData.setElevationGainLoss(elevationGain, elevationLoss);
 
                tourData.altitudeSerie = null;
@@ -3752,9 +3860,9 @@ public class RawDataManager {
       if (isAllTimeSlices || allTourValueTypes.contains(TourValueType.TIME_SLICES__ELEVATION)) {
 
          // re-import elevation only
-         
-         int elevationGain = reimportedTourData.getTourAltUp();
-         int elevationLoss = reimportedTourData.getTourAltDown();
+
+         final int elevationGain = reimportedTourData.getTourAltUp();
+         final int elevationLoss = reimportedTourData.getTourAltDown();
 
          oldTourData.altitudeSerie = reimportedTourData.altitudeSerie;
          oldTourData.setElevationGainLoss(elevationGain, elevationLoss);

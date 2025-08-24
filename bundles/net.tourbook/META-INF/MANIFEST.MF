@@ -41,7 +41,8 @@ Require-Bundle: org.eclipse.ui,
  net.tourbook.ext.geoclipse,
  net.tourbook.ext.vtm,
  org.opentest4j,
- org.eclipse.swt
+ org.eclipse.swt,
+ jMTPe
 Export-Package: de.byteholder.geoclipse,
  de.byteholder.geoclipse.map,
  de.byteholder.geoclipse.map.event,
