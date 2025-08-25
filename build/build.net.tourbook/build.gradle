@@ -1,6 +1,6 @@
 plugins {
 
-   id 'org.sonarqube' version '5.1.0.4882'
+   id 'org.sonarqube' version '6.2.0.5505'
    id 'jacoco'
 }
 
@@ -87,19 +87,12 @@ task mt_10_CreateBuildFiles {
 /*
 * 2. Build product with maven/tycho
 */
-task mt_20_BuildProduct() {
+task mt_20_BuildProduct(type: Exec) {
 
-   doLast {
-
-      // run: mvn clean verify -P build-release
-
-      exec {
-
-         workingDir  "../.."
-
-         commandLine 'cmd', '/c', 'mvn clean verify -P build-release'
-      }
-   }
+   // run: mvn clean verify -P build-release
+   
+   workingDir = "../.."
+   commandLine 'cmd', '/c', 'mvn clean verify -P build-release'
 }
 
 
@@ -159,33 +152,26 @@ task mt_40_ExtractWinFiles {
 /*
  Create win exe files
 */
-task mt_50_CreateExeFiles {
-        
-   doLast {
-       
-      println 'Creating Windows setup files'
+task mt_50_CreateExeFiles(type: Exec) {
       
-      def winInnoSetupDirName = _dirWinInnoSetup.absolutePath
+   println 'Creating Windows setup files'
       
-      def configFilename_Win64Setup        = file(winInnoSetupDirName + '/mytourbook-create-setup-exe.iss').absolutePath
-      def configFilename_Win64SetupWithJRE = file(winInnoSetupDirName + '/mytourbook-create-setup-exe-with-jre.iss').absolutePath
+   def winInnoSetupDirName = _dirWinInnoSetup.absolutePath
       
-      exec {
+   def configFilename_Win64Setup        = file(winInnoSetupDirName + '/mytourbook-create-setup-exe.iss').absolutePath
+   def configFilename_Win64SetupWithJRE = file(winInnoSetupDirName + '/mytourbook-create-setup-exe-with-jre.iss').absolutePath
       
-         println '\tWin 64'
       
-         commandLine 'cmd', '/c', '"'+_pathInnoSetupCompilerApp+'"'
-         args        configFilename_Win64Setup
-      }
+   println '\tWin 64'
+      
+   commandLine 'cmd', '/c', '"'+_pathInnoSetupCompilerApp+'"'
+   args        configFilename_Win64Setup
 
-      exec {
       
-         println '\tWin 64 with Java runtime'
+   println '\tWin 64 with Java runtime'
       
-         commandLine 'cmd', '/c', '"'+_pathInnoSetupCompilerApp+'"'
-         args        configFilename_Win64SetupWithJRE
-      }
-   }
+   commandLine 'cmd', '/c', '"'+_pathInnoSetupCompilerApp+'"'
+   args        configFilename_Win64SetupWithJRE
 }
 
 /*
@@ -237,7 +223,7 @@ task mt_60_CleanupFiles {
 
 
 /*
-* Copy realease notes into product archive folder
+* Copy release notes into product archive folder
 */
 task mt_70_CopyReleaseNotes {
 

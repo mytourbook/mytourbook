@@ -721,7 +721,7 @@ public class ModelPlayerView extends ViewPart implements ICloseOpenedDialogs {
             && ModelPlayerManager.isPlayerRunning() == false
             && ModelPlayerManager.isLastFrame()) {
 
-         // start new anmimation
+         // start new animation
 
          setTimelineSelection(0);
          setMapAndModelPosition(0);
@@ -1059,7 +1059,7 @@ public class ModelPlayerView extends ViewPart implements ICloseOpenedDialogs {
 
       if (isPlayerRunning == false && ModelPlayerManager.isLastFrame()) {
 
-         // start new anmimation
+         // start new animation
 
          _scaleTimeline.setSelection(0);
 

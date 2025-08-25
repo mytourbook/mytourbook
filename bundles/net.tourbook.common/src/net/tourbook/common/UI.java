@@ -3345,20 +3345,20 @@ public class UI {
     *           Foreground color
     * @param backgroundColor
     *           Background color
-    * @param allSkipedControls
-    *           Contains all constrols which must be skipped
+    * @param allSkippedControls
+    *           Contains all controls which must be skipped
     *
     */
    public static void setColorForAllChildren(final Control parent,
                                              final Color foregroundColor,
                                              final Color backgroundColor,
-                                             final Object[] allSkipedControls) {
+                                             final Object[] allSkippedControls) {
 
-      if (allSkipedControls != null) {
+      if (allSkippedControls != null) {
 
-         for (final Object skipedControl : allSkipedControls) {
+         for (final Object skippedControl : allSkippedControls) {
 
-            if (parent == skipedControl) {
+            if (parent == skippedControl) {
                return;
             }
          }
@@ -3382,7 +3382,7 @@ public class UI {
 
             ) {
 
-               setColorForAllChildren(child, foregroundColor, backgroundColor, allSkipedControls);
+               setColorForAllChildren(child, foregroundColor, backgroundColor, allSkippedControls);
             }
          }
       }
