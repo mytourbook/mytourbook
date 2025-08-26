@@ -6,7 +6,7 @@ Bundle-Version: 25.8.0.qualifier
 Eclipse-BuddyPolicy: registered
 Bundle-Vendor: MyTourbook
 Bundle-ClassPath: 
- jc3p0-0.11.2.jar,
+ c3p0-0.11.2.jar,
  caffeine-3.2.2.jar,
  commons-imaging-1.0-alpha2.jar,
  commons-lang3-3.18.0.jar,
@@ -23,7 +23,7 @@ Bundle-ClassPath:
  lat-lon-timezone-converter-2019-04-30.jar,
  mchange-commons-java-0.3.2.jar,
  simplelatlng-1.4.0.jar,
- url-detector-0.1.23.jar,
+ url-detector-0.1.23.jar
 Export-Package: com.fasterxml.jackson.annotation,
  com.fasterxml.jackson.core,
  com.fasterxml.jackson.core.async,
