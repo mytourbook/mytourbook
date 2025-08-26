@@ -1674,8 +1674,8 @@ public class RawDataManager {
 
             if (isEntireTour_OR_AllTimeSlices || tourValueType == TourValueType.TIME_SLICES__ELEVATION) {
 
-               int elevationGain = oldTourData.getTourAltUp();
-               int elevationLoss = oldTourData.getTourAltDown();
+               final int elevationGain = oldTourData.getTourAltUp();
+               final int elevationLoss = oldTourData.getTourAltDown();
                tourDataDummyClone.setElevationGainLoss(elevationGain, elevationLoss);
             }
 
@@ -1970,8 +1970,8 @@ public class RawDataManager {
 
             case TIME_SLICES__ELEVATION:
 
-               int elevationGain = tourData.getTourAltUp();
-               int elevationLoss = tourData.getTourAltDown();
+               final int elevationGain = tourData.getTourAltUp();
+               final int elevationLoss = tourData.getTourAltDown();
                clonedTourData.setElevationGainLoss(elevationGain, elevationLoss);
 
                tourData.altitudeSerie = null;
@@ -3752,9 +3752,9 @@ public class RawDataManager {
       if (isAllTimeSlices || allTourValueTypes.contains(TourValueType.TIME_SLICES__ELEVATION)) {
 
          // re-import elevation only
-         
-         int elevationGain = reimportedTourData.getTourAltUp();
-         int elevationLoss = reimportedTourData.getTourAltDown();
+
+         final int elevationGain = reimportedTourData.getTourAltUp();
+         final int elevationLoss = reimportedTourData.getTourAltDown();
 
          oldTourData.altitudeSerie = reimportedTourData.altitudeSerie;
          oldTourData.setElevationGainLoss(elevationGain, elevationLoss);
@@ -4186,7 +4186,7 @@ public class RawDataManager {
 
                new ProgressMonitorDialog(Display.getDefault().getActiveShell()).run(
                      true, // fork
-                     false, // cancellable
+                     false, // cancelable
                      monitor1 -> updateTourData_InImportView_FromDb_Runnable(monitor1));
 
             } else {
