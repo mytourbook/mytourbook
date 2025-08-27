@@ -202,9 +202,10 @@ public class StatisticBattery extends TourbookStatistic implements IBarSelection
          public void keyTraversed(final TraverseEvent event) {
 
             if (event.detail == SWT.TRAVERSE_RETURN) {
+               
                final ISelection selection = _chart.getSelection();
-               if (selection instanceof SelectionBarChart) {
-                  final SelectionBarChart barChartSelection = (SelectionBarChart) selection;
+               
+               if (selection instanceof final SelectionBarChart barChartSelection) {
 
                   if (barChartSelection.serieIndex != -1) {
 
@@ -353,9 +354,9 @@ public class StatisticBattery extends TourbookStatistic implements IBarSelection
       if (_batteryData != null
             && _batteryData.allTourIds != null
             && _batteryData.allTourIds.length > 0
-            && selection instanceof SelectionBarChart) {
+            && selection instanceof final SelectionBarChart barChartSelection) {
 
-         final Long selectedTourId = _batteryData.allTourIds[((SelectionBarChart) selection).valueIndex];
+         final Long selectedTourId = _batteryData.allTourIds[barChartSelection.valueIndex];
 
          viewState.put(STATE_SELECTED_TOUR_ID, Long.toString(selectedTourId));
       }
@@ -505,8 +506,7 @@ public class StatisticBattery extends TourbookStatistic implements IBarSelection
           * Get currently selected tour id
           */
          final ISelection selection = _chart.getSelection();
-         if (selection instanceof SelectionBarChart) {
-            final SelectionBarChart barChartSelection = (SelectionBarChart) selection;
+         if (selection instanceof final SelectionBarChart barChartSelection) {
 
             if (barChartSelection.serieIndex != -1 && _batteryData != null) {
 
