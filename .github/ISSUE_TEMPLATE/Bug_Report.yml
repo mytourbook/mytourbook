@@ -21,6 +21,12 @@ body:
       label: What happened ?
       description: Also tell us, what did you expect to happen?
       placeholder: Tell us what you see!
+  - type: textarea
+    id: how-to-reproduce
+    attributes:
+      label: How to reproduce ?
+      description: Tell us, if possible, how to reproduce the bug in order to accelerate its resolution
+      placeholder: Tell us how we can reproduce it!
     validations:
       required: true
   - type: input
