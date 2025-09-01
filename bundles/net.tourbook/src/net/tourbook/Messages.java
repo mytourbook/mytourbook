@@ -225,6 +225,8 @@ public class Messages extends NLS {
    public static String        app_db_consistencyCheck_checkIsOK;
    public static String        app_db_consistencyCheck_dlgTitle;
 
+   public static String        App_Default_BikeManufacturer;
+
    public static String        App_Default_PersonFirstName;
 
    public static String        App_Dialog_FirstStartupTip_Message;
@@ -1693,6 +1695,19 @@ public class Messages extends NLS {
    public static String        Pref_Appearance_ShowTourTypeContextMenu_Tooltip;
 
    public static String        Pref_App_Label_TourEditorIsModified;
+
+   public static String        Pref_Bikes_Action_add_bike;
+   public static String        Pref_Bikes_Column_bike_brand;
+   public static String        Pref_Bikes_Column_bike_model;
+   public static String        Pref_Bikes_Column_bike_purchase_date;
+   public static String        Pref_Bikes_Dialog_SaveModifiedBike_Message;
+   public static String        Pref_Bikes_Dialog_SaveModifiedBike_Title;
+   public static String        Pref_Bikes_Error_bike_brand_required;
+   public static String        Pref_Bikes_Label_bike_brand;
+   public static String        Pref_Bikes_Label_bike_model;
+   public static String        Pref_Bikes_Label_bike_weight;
+   public static String        Pref_Bikes_Label_purchase_date;
+   public static String        Pref_Bikes_Title;
 
    public static String        Pref_ChartColors_btn_legend;
    public static String        Pref_ChartColors_unit_high;

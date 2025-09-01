@@ -15,7 +15,9 @@
  *******************************************************************************/
 package net.tourbook.data;
 
+import java.io.Serial;
 import java.io.Serializable;
+import java.time.ZonedDateTime;
 
 import javax.persistence.Basic;
 import javax.persistence.Entity;
@@ -25,23 +27,45 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 
+import net.tourbook.common.time.TimeTools;
+import net.tourbook.database.TourBikeManager;
 import net.tourbook.database.TourDatabase;
 
 @Entity
 public class TourBike implements Serializable {
 
-   private static final long serialVersionUID    = 1L;
+   @Serial
+   private static final long serialVersionUID     = 1L;
 
-   public static final int   DB_LENGTH_NAME      = 255;
+   public static final int   DB_LENGTH_BRAND      = 255;
 
-   public static final int   BIKE_ID_NOT_DEFINED = -1;
+   public static final int   DB_LENGTH_MODEL      = 255;
+
+   public static final int   BIKE_ID_NOT_DEFINED  = -1;
+
+   public static final ZonedDateTime DEFAULT_PURCHASE_DATE = ZonedDateTime.of(
+      1990,
+      9,
+      9,
+      0,
+      0,
+      0,
+      0,
+      TimeTools.getDefaultTimeZone());
 
    @Id
    @GeneratedValue(strategy = GenerationType.IDENTITY)
    private long              bikeId              = BIKE_ID_NOT_DEFINED;
 
    @Basic(optional = false)
-   private String            name;
+   private String            brand;
+
+   private String            model;
+
+   /**
+    * date of purchase
+    */
+   private long              purchaseDate;
 
    /**
     * weight in kg
@@ -53,9 +77,6 @@ public class TourBike implements Serializable {
     */
    private int               typeId;
 
-   private int               frontTyreId;
-
-   private int               rearTyreId;
 
    /**
     * default constructor used in ejb
@@ -66,17 +87,18 @@ public class TourBike implements Serializable {
       return bikeId;
    }
 
-   public int getFrontTyreId() {
-      return frontTyreId;
+   public String getBrand() {
+      return brand;
    }
 
-   public String getName() {
-      return name;
+   public String getModel() {
+      return model;
    }
 
-   public int getRearTyreId() {
-      return rearTyreId;
+   public long getPurchaseDate() {
+      return purchaseDate;
    }
+
 
    public int getTypeId() {
       return typeId;
@@ -84,6 +106,10 @@ public class TourBike implements Serializable {
 
    public float getWeight() {
       return weight;
+   }
+
+   public ZonedDateTime getZonedPurchaseDateWithDefault() {
+      return (purchaseDate == 0) ? DEFAULT_PURCHASE_DATE : TimeTools.getZonedDateTime(purchaseDate);
    }
 
    public boolean persist() {
@@ -117,19 +143,42 @@ public class TourBike implements Serializable {
          }
          em.close();
       }
+      if (isSaved) {
+         TourBikeManager.refreshBikes();
+      }
       return isSaved;
    }
 
-   public void setFrontTyreId(final int frontTyre) {
-      this.frontTyreId = frontTyre;
+   public boolean remove() {
+      final EntityManager em = net.tourbook.database.TourDatabase.getInstance().getEntityManager();
+      final EntityTransaction tx = em.getTransaction();
+      try {
+         tx.begin();
+         final TourBike bike = em.merge(this);
+         em.remove(bike);
+         tx.commit();
+      } catch (final Exception ex) {
+         ex.printStackTrace();
+         if (tx.isActive()) {
+            tx.rollback();
+         }
+         return false;
+      } finally {
+         em.close();
+      }
+      return true;
    }
 
-   public void setName(final String name) {
-      this.name = name;
+   public void setBrand(final String brand) {
+      this.brand = brand;
    }
 
-   public void setRearTyreId(final int rearTyre) {
-      this.rearTyreId = rearTyre;
+   public void setModel(final String model) {
+      this.model = model;
+   }
+
+   public void setPurchaseDate(final long purchaseDate) {
+      this.purchaseDate = purchaseDate;
    }
 
    public void setTypeId(final int typeId) {

@@ -121,8 +121,9 @@ public class TourDatabase {
     * <li>/net.tourbook.export/format-templates/mt-1.0.vm</li>
     * <li>net.tourbook.device.mt.MT_StAXHandler</li>
     */
-   private static final int TOURBOOK_DB_VERSION = 59;
+   private static final int TOURBOOK_DB_VERSION = 60;
 
+//   private static final int TOURBOOK_DB_VERSION = 59; // 25.8
 //   private static final int TOURBOOK_DB_VERSION = 58; // 25.6
 //   private static final int TOURBOOK_DB_VERSION = 57; // 25.4
 //   private static final int TOURBOOK_DB_VERSION = 56; // 24.11.3
@@ -2254,32 +2255,6 @@ public class TourDatabase {
    }
 
    /**
-    * @return Returns all tour types in the db sorted by name
-    */
-   @SuppressWarnings("unchecked")
-   public static ArrayList<TourBike> getTourBikes() {
-
-      ArrayList<TourBike> bikeList = new ArrayList<>();
-
-      final EntityManager em = TourDatabase.getInstance().getEntityManager();
-
-      if (em != null) {
-
-         final Query emQuery = em.createQuery(UI.EMPTY_STRING
-
-               + "SELECT tourBike" //$NON-NLS-1$
-               + " FROM TourBike AS tourBike " //$NON-NLS-1$
-               + " ORDER  BY tourBike.name"); //$NON-NLS-1$
-
-         bikeList = (ArrayList<TourBike>) emQuery.getResultList();
-
-         em.close();
-      }
-
-      return bikeList;
-   }
-
-   /**
     * Get a tour from the database
     *
     * @param tourId
@@ -4385,11 +4360,14 @@ public class TourDatabase {
       //
             + SQL.createField_EntityId(ENTITY_ID_BIKE, true)
 
-            + "   Name                       VARCHAR(" + TourBike.DB_LENGTH_NAME + "), " + NL //$NON-NLS-1$ //$NON-NLS-2$
+         // version 60 start
+            + "   Brand                      VARCHAR(" + TourBike.DB_LENGTH_BRAND + "), " + NL //$NON-NLS-1$ //$NON-NLS-2$
+            + "   Model                      VARCHAR(" + TourBike.DB_LENGTH_BRAND + "), " + NL //$NON-NLS-1$ //$NON-NLS-2$
+            + "   PurchaseDate               BIGINT DEFAULT 0,                         " + NL //$NON-NLS-1$
+         // version 60 end
+
             + "   Weight                     FLOAT,                                    " + NL //$NON-NLS-1$ // kg
-            + "   TypeId                     INTEGER,                                  " + NL //$NON-NLS-1$
-            + "   FrontTyreId                INTEGER,                                  " + NL //$NON-NLS-1$
-            + "   RearTyreId                 INTEGER                                   " + NL //$NON-NLS-1$
+            + "   TypeId                     INTEGER DEFAULT 0,                        " + NL //$NON-NLS-1$
 
             + ")");//$NON-NLS-1$
    }
@@ -6868,6 +6846,11 @@ public class TourDatabase {
          // 58 -> 59    25.6+++
          if (currentDbVersion == 58) {
             currentDbVersion = _dbDesignVersion_New = updateDb_058_To_059(splashManager);
+         }
+
+         // 59 -> 60    25.8+++
+         if (currentDbVersion == 59) {
+            currentDbVersion = _dbDesignVersion_New = updateDb_059_To_060(conn, splashManager);
          }
 
          // update db design version number
@@ -11040,6 +11023,38 @@ public class TourDatabase {
       updateMonitor(splashManager, newDbVersion);
 
       // this is a dummy db design update that the db data update works
+
+      logDbUpdate_End(newDbVersion);
+
+      return newDbVersion;
+   }
+
+
+   private int updateDb_059_To_060(final Connection conn, final SplashManager splashManager) throws SQLException {
+
+      final int newDbVersion = 60;
+
+      logDbUpdate_Start(newDbVersion);
+      updateMonitor(splashManager, newDbVersion);
+
+      final Statement stmt = conn.createStatement();
+      {
+         // modify columns
+
+// SET_FORMATTING_OFF
+
+         SQL.renameCol          (stmt, TABLE_TOUR_BIKE,"Name", "Brand");    //$NON-NLS-1$ //$NON-NLS-2$
+         SQL.addColumn_VarCar   (stmt, TABLE_TOUR_BIKE,"Model", TourBike.DB_LENGTH_MODEL);   //$NON-NLS-1$
+
+         SQL.addColumn_BigInt   (stmt, TABLE_TOUR_BIKE,"purchaseDate", DEFAULT_0);  //$NON-NLS-1$
+
+         SQL.cleanup_DropColumn (stmt, TABLE_TOUR_BIKE,"FrontTyreId");    //$NON-NLS-1$
+         SQL.cleanup_DropColumn (stmt, TABLE_TOUR_BIKE,"RearTyreId");     //$NON-NLS-1$
+
+// SET_FORMATTING_ON
+
+      }
+      stmt.close();
 
       logDbUpdate_End(newDbVersion);
 
