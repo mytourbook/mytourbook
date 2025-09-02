@@ -2146,6 +2146,8 @@ public class Messages extends NLS {
    public static String        Sensor_Chart_Label_SensorWithBatteryValuesIsNotSelected;
 
    public static String        Sensor_Type_GearShifting;
+   public static String        Sensor_Type_LightFront;
+   public static String        Sensor_Type_LightRear;
    public static String        Sensor_Type_Other;
    public static String        Sensor_Type_PowerMeter;
    public static String        Sensor_Type_Radar;

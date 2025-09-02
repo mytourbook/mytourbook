@@ -266,13 +266,13 @@ public class MesgListener_Record extends AbstractMesgListener implements RecordM
 
       /**
        * Running dynamics data <code>
-      
+
       //	|| fieldName.equals("stance_time") //				     253.0  ms
       //	|| fieldName.equals("stance_time_balance") //		   51.31 percent
       //	|| fieldName.equals("step_length") //				    1526.0  mm
       // || fieldName.equals("vertical_oscillation") //       105.2  mm          //$NON-NLS-1$
       // || fieldName.equals("vertical_ratio") //               8.96 percent     //$NON-NLS-1$
-      
+
        * </code>
        */
       final Float stanceTime = mesg.getStanceTime();

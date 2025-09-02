@@ -38,4 +38,7 @@ public enum DeviceSensorType {
    RADAR, //
    SPEED, //
    WIND, //
+
+   LIGHT_FRONT, //
+   LIGHT_REAR, //
 }

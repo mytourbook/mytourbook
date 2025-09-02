@@ -21,6 +21,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -30,12 +31,14 @@ import net.tourbook.common.UI;
 import net.tourbook.common.time.TimeTools;
 import net.tourbook.common.util.FileUtils;
 import net.tourbook.common.util.Util;
+import net.tourbook.data.DeviceSensorImport;
 import net.tourbook.data.DeviceSensorValue;
 import net.tourbook.data.GearData;
 import net.tourbook.data.SwimData;
 import net.tourbook.data.TimeData;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourMarker;
+import net.tourbook.device.garmin.fit.listeners.MesgListener_DeviceInfo;
 import net.tourbook.importdata.ImportState_Process;
 import net.tourbook.importdata.RawDataManager;
 import net.tourbook.importdata.TourTypeWrapper;
@@ -49,60 +52,70 @@ import org.eclipse.jface.preference.IPreferenceStore;
  */
 public class FitData {
 
-   private static final Integer          DEFAULT_MESSAGE_INDEX    = Integer.valueOf(0);
+   private static final Integer                 DEFAULT_MESSAGE_INDEX    = Integer.valueOf(0);
 
-   private IPreferenceStore              _prefStore               = Activator.getDefault().getPreferenceStore();
+   private IPreferenceStore                     _prefStore               = Activator.getDefault().getPreferenceStore();
 
-   private String                        _fitImportTourTypeMode;
-   private boolean                       _isFitImportTourType;
-   private boolean                       _isIgnoreLastMarker;
-   private boolean                       _isSetLastMarker;
-   private boolean                       _isSetTourTitleFromFileName;
-   private int                           _lastMarkerTimeSlices;
+   private String                               _fitImportTourTypeMode;
+   private boolean                              _isFitImportTourType;
+   private boolean                              _isIgnoreLastMarker;
+   private boolean                              _isSetLastMarker;
+   private boolean                              _isSetTourTitleFromFileName;
+   private int                                  _lastMarkerTimeSlices;
 
-   public boolean                        isComputeAveragePower;
+   public boolean                               isComputeAveragePower;
 
-   private FitDataReader                 _fitDataReader;
-   private String                        _importFilePathName;
+   private FitDataReader                        _fitDataReader;
+   private String                               _importFilePathName;
 
-   private Map<Long, TourData>           _alreadyImportedTours;
-   private Map<Long, TourData>           _newlyImportedTours;
+   private Map<Long, TourData>                  _alreadyImportedTours;
+   private Map<Long, TourData>                  _newlyImportedTours;
 
-   private TourData                      _tourData                = new TourData();
+   private TourData                             _tourData                = new TourData();
 
-   private String                        _deviceId;
-   private String                        _manufacturer;
-   private String                        _garminProduct;
-   private String                        _softwareVersion;
+   private String                               _deviceId;
+   private String                               _manufacturer;
+   private String                               _garminProduct;
+   private String                               _softwareVersion;
 
-   private String                        _sessionIndex;
-   private ZonedDateTime                 _sessionStartTime;
+   private String                               _sessionIndex;
+   private ZonedDateTime                        _sessionStartTime;
 
-   private String                        _profileName             = UI.EMPTY_STRING;
-   private String                        _sessionSportProfileName = UI.EMPTY_STRING;
-   private String                        _sportName               = UI.EMPTY_STRING;
-   private String                        _subSportName            = UI.EMPTY_STRING;
+   private String                               _profileName             = UI.EMPTY_STRING;
+   private String                               _sessionSportProfileName = UI.EMPTY_STRING;
+   private String                               _sportName               = UI.EMPTY_STRING;
+   private String                               _subSportName            = UI.EMPTY_STRING;
 
-   private final List<TimeData>          _allTimeData             = new ArrayList<>();
-   private final List<Long>              _pausedTime_Start        = new ArrayList<>();
-   private final List<Long>              _pausedTime_End          = new ArrayList<>();
-   private final List<Long>              _pausedTime_Data         = new ArrayList<>();
+   private final List<TimeData>                 _allTimeData             = new ArrayList<>();
+   private final List<Long>                     _pausedTime_Start        = new ArrayList<>();
+   private final List<Long>                     _pausedTime_End          = new ArrayList<>();
+   private final List<Long>                     _pausedTime_Data         = new ArrayList<>();
 
-   private final List<Long>              _allBatteryTime          = new ArrayList<>();
-   private final List<Short>             _allBatteryPercentage    = new ArrayList<>();
-   private final List<DeviceSensorValue> _allDeviceSensorValues   = new ArrayList<>();
-   private final List<GearData>          _allGearData             = new ArrayList<>();
-   private final List<SwimData>          _allSwimData             = new ArrayList<>();
-   private final List<TourMarker>        _allTourMarker           = new ArrayList<>();
+   private final List<Long>                     _allBatteryTime          = new ArrayList<>();
+   private final List<Short>                    _allBatteryPercentage    = new ArrayList<>();
+   private final List<DeviceSensorValue>        _allDeviceSensorValues   = new ArrayList<>();
+   private final List<GearData>                 _allGearData             = new ArrayList<>();
+   private final List<SwimData>                 _allSwimData             = new ArrayList<>();
+   private final List<TourMarker>               _allTourMarker           = new ArrayList<>();
 
-   private TimeData                      _current_TimeData;
-   private TimeData                      _lastAdded_TimeData;
-   private TimeData                      _previous_TimeData;
+   /**
+    * All collected devices and sensor data from the import file, key is the device index.
+    * <p>
+    * Some sensor values, e.g. serial number are not always available in the first device info
+    * message
+    */
+   private final Map<Short, DeviceSensorImport> _allDeviceSensorImported = new HashMap<>();
 
-   private TourMarker                    _current_TourMarker;
-   private long                          _timeDiffMS;
+   private TimeData                             _current_TimeData;
+   private TimeData                             _lastAdded_TimeData;
+   private TimeData                             _previous_TimeData;
 
-   private ImportState_Process           _importState_Process;
+   private TourMarker                           _current_TourMarker;
+   private long                                 _timeDiffMS;
+
+   private ImportState_Process                  _importState_Process;
+
+   private MesgListener_DeviceInfo              _deviceInfoListener;
 
    public FitData(final FitDataReader fitDataReader,
                   final String importFilePath,
@@ -149,6 +162,10 @@ public class FitData {
    }
 
    public void finalizeTour() {
+
+      if (_deviceInfoListener != null) {
+         _deviceInfoListener.logDeviceData();
+      }
 
       // reset speed at first position
       if (_allTimeData.size() > 0) {
@@ -629,6 +646,11 @@ public class FitData {
       }
    }
 
+   public Map<Short, DeviceSensorImport> getAllDeviceSensors() {
+
+      return _allDeviceSensorImported;
+   }
+
    public List<Short> getBattery_Percentage() {
       return _allBatteryPercentage;
    }
@@ -654,6 +676,11 @@ public class FitData {
       }
 
       return _current_TourMarker;
+   }
+
+   public MesgListener_DeviceInfo getDeviceInfoListener() {
+      
+      return _deviceInfoListener;
    }
 
    private String getDeviceName() {
@@ -822,6 +849,10 @@ public class FitData {
 
    public void setDeviceId(final String deviceId) {
       _deviceId = deviceId;
+   }
+
+   public void setDeviceInfoListener(final MesgListener_DeviceInfo deviceInfoListener) {
+      _deviceInfoListener = deviceInfoListener;
    }
 
    public void setGarminProduct(final String garminProduct) {

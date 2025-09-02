@@ -194,7 +194,7 @@ public class TourInfoUI implements ICanHideTooltip {
     */
    private TourData                       _tourData;
 
-   private ArrayList<DeviceSensorValue>   _allSensorValuesWithData;
+   private List<DeviceSensorValue>        _allSensorValuesWithData;
 
    private String                         _noTourTooltipText = Messages.Tour_Tooltip_Label_NoTour;
 

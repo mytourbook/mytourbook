@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2023 Wolfgang Schramm and Contributors
+ * Copyright (C) 2023, 2025 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -46,6 +46,9 @@ public class SensorManager {
             new ComboEnumEntry<>(Messages.Sensor_Type_Wind,             DeviceSensorType.WIND),
             new ComboEnumEntry<>(Messages.Sensor_Type_Radar,            DeviceSensorType.RADAR),
 
+            new ComboEnumEntry<>(Messages.Sensor_Type_LightFront,       DeviceSensorType.LIGHT_FRONT),
+            new ComboEnumEntry<>(Messages.Sensor_Type_LightRear,        DeviceSensorType.LIGHT_REAR),
+
             new ComboEnumEntry<>(Messages.Sensor_Type_Other,            DeviceSensorType.OTHER),
       };
 
@@ -75,6 +78,7 @@ public class SensorManager {
 
    /**
     * @param requestedSensorType
+    *
     * @return Returns a UI name of the sensor type
     */
    public static String getSensorTypeName(final Enum<DeviceSensorType> requestedSensorType) {

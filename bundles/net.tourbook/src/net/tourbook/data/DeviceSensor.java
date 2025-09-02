@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2024 Wolfgang Schramm and Contributors
+ * Copyright (C) 2021, 2025 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -453,7 +453,6 @@ public class DeviceSensor implements Cloneable, Serializable {
             + "      productNumber        = " + productNumber + NL //         //$NON-NLS-1$
             + "      productName          = " + productName + NL //           //$NON-NLS-1$
             + "      serialNumber         = " + serialNumber + NL //          //$NON-NLS-1$
-            + "      _sensorKeyByName     = " + _sensorKeyByName + NL //      //$NON-NLS-1$
             + "      _label               = " + getLabel() + NL //            //$NON-NLS-1$
 
 //            + "]" + NL //                                                   //$NON-NLS-1$
