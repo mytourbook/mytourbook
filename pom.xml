@@ -15,17 +15,14 @@
    
    <dependencies>
       <dependency>
-         <artifactId>junit-jupiter-engine</artifactId>                  <groupId>org.junit.jupiter</groupId>
-                                                                        <version>5.9.3</version>
+         <artifactId>junit-jupiter</artifactId>                  <groupId>org.junit.jupiter</groupId>
+                                                                 <version>6.0.0-RC2</version>
          <scope>test</scope>
       </dependency>
    </dependencies>	
 
    <properties>
-      <tycho.version>4.0.13</tycho.version>
-<!-- 
-      <tycho.version>3.0.5</tycho.version>
- -->      
+      <tycho.version>5.0.0</tycho.version>     
       <surefire.version>3.5.3</surefire.version>
       <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>  
    </properties>
@@ -228,7 +225,7 @@
       
       <plugin>
          <artifactId>maven-toolchains-plugin</artifactId>      <groupId>org.apache.maven.plugins</groupId>
-                                                               <version>1.1</version>
+                                                               <version>3.2.0</version>
          <executions>
             <execution>
                <goals>

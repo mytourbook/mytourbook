@@ -84,8 +84,8 @@ public class DialogCustomTourNutritionProduct extends Dialog {
       super.create();
 
       getShell().setText(_isEditMode
-            ? Messages.Dialog_CustomTourNutritionProduct_Title
-            : Messages.Dialog_EditCustomTourNutritionProduct_Title);
+            ? Messages.Dialog_EditCustomTourNutritionProduct_Title
+            : Messages.Dialog_CustomTourNutritionProduct_Title);
 
       validateFields();
    }
