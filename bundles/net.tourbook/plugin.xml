@@ -349,19 +349,16 @@
          id       ="net.tourbook.preferences.PrefPageCloud"
          name     ="%preference_page_cloud"
       />
-      
-      
-      <!-- 
-      
-         Bicycle
-      
-         pref page for bikes is disabled since version 11.07 because bikes 
-         are currently not used and is confusing the user
-         
-         I set a comment around the page tag but OSX still displayed the page, this must be a bug in OSX
-            
-      -->
 
+
+      <!--
+         Bicycle
+      -->
+	  <page
+        name     ="%preference_page_Bikes"
+        id       ="net.tourbook.preferences.PrefPageBikes"
+        class    ="net.tourbook.preferences.PrefPageBikes"
+  	  />
 
       <!--
          People

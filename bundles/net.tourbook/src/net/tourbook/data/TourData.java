@@ -1085,7 +1085,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
    private TourPerson                  tourPerson;
 
    /**
-    * plugin id for the device which was used for this tour Bike used for this tour
+    * Bike used for this tour (optional)
     */
    @ManyToOne
    private TourBike                    tourBike;
