@@ -37,13 +37,13 @@ defaultTasks 'mt_0_Build'
 task mt_0_Build          
 mt_0_Build.dependsOn( 
 
-  'mt_10_CreateBuildFiles', 
-  'mt_20_BuildProduct', 
-  'mt_30_CopyProduct',
-  'mt_40_ExtractWinFiles',
-  'mt_50_CreateExeFiles',
-  'mt_60_CleanupFiles',
-  'mt_70_CopyReleaseNotes',
+   'mt_10_CreateBuildFiles', 
+   'mt_20_BuildProduct', 
+   'mt_30_CopyProduct',
+   'mt_40_ExtractWinFiles',
+   'mt_50_CreateExeFiles',
+   'mt_60_CleanupFiles',
+   'mt_70_CopyReleaseNotes',
 )
 
 sonarqube {
