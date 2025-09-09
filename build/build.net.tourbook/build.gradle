@@ -214,7 +214,7 @@ task mt_60_CleanupFiles {
          
          jreFile.delete()
       }
-
+      
       file(_dirProductArchive).eachFileMatch(~/.*-jre-.*.tar.gz/) { jreFile->
          
          println '\tdelete file\t\t' + jreFile
