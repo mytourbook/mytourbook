@@ -451,10 +451,10 @@ public class PhotoRenderer extends AbstractGalleryMT20ItemRenderer {
          try {
 
             final Rectangle imageBounds = paintedImage.getBounds();
-            
+
             _paintedImageWidth = imageBounds.width;
             _paintedImageHeight = imageBounds.height;
-            
+
          } catch (final Exception e1) {
             StatusUtil.log(e1);
          }
@@ -814,14 +814,50 @@ public class PhotoRenderer extends AbstractGalleryMT20ItemRenderer {
             galleryItem.imagePaintedWidth = _paintedDest_Width;
             galleryItem.imagePaintedHeight = _paintedDest_Height;
 
+         } catch (final IllegalArgumentException e) {
+
+            // this can happen with a scaled image
+
+            /**
+             * <code>
+             *
+             *    Rectangle src = DPIUtil.scaleUp(drawable, new Rectangle(srcX, srcY, srcWidth, srcHeight), scaledImageZoom);
+             *    Rectangle dest = DPIUtil.scaleUp(drawable, new Rectangle(destX, destY, destWidth, destHeight), imageZoom);
+             *    if (scaledImageZoom != 100) {
+             *
+             *       /*
+             *        * This is a HACK! Due to rounding errors at fractional scale factors,
+             *        * the coordinates may be slightly off. The workaround is to restrict
+             *        * coordinates to the allowed bounds.
+             *        *
+             *
+             *       Rectangle b = image.getBounds(scaledImageZoom);
+             *       int errX = src.x + src.width - b.width;
+             *       int errY = src.y + src.height - b.height;
+             *       if (errX != 0 || errY != 0) {
+             *          if (errX <= scaledImageZoom / 100 && errY <= scaledImageZoom / 100) {
+             *             src.intersect(b);
+             *          } else {
+             *             SWT.error (SWT.ERROR_INVALID_ARGUMENT);
+             *          }
+             *       }
+             *
+             * </code>
+             */
+            System.out.println("IllegalArgumentException: %s".formatted(e.getMessage()));
+            System.out.println("Photo: %s".formatted(photo.imageFilePathName)); //$NON-NLS-1$
+
+            return false;
+
          } catch (final Exception e) {
 
-            System.out.println("SWT exception occurred when painting valid image " //$NON-NLS-1$
+            PhotoLoadManager.putPhotoInLoadingErrorMap(photo.imageFilePathName);
+
+            System.out.println("SWT exception occurred when painting valid image (2) " //$NON-NLS-1$
                   + photo.imageFilePathName
                   + " it's potentially this bug: https://bugs.eclipse.org/bugs/show_bug.cgi?id=375845"); //$NON-NLS-1$
 
-            // ensure image is valid after reloading
-//             photoImage.dispose();
+            System.out.println(e);
 
             PhotoImageCache.disposeAll();
 

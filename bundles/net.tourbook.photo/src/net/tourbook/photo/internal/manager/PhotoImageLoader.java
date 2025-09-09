@@ -43,7 +43,6 @@ import net.tourbook.photo.PhotoImageMetadata;
 import net.tourbook.photo.PhotoLoadManager;
 import net.tourbook.photo.PhotoLoadingState;
 
-import org.apache.commons.imaging.ImageReadException;
 import org.apache.commons.imaging.common.ImageMetadata;
 import org.apache.commons.imaging.formats.jpeg.JpegImageMetadata;
 import org.eclipse.core.runtime.IPath;
@@ -355,9 +354,9 @@ public class PhotoImageLoader {
             return null;
          }
 
-         if (metadata instanceof JpegImageMetadata) {
+         if (metadata instanceof final JpegImageMetadata jpegImageMetadata) {
 
-            awtBufferedImage = ((JpegImageMetadata) metadata).getEXIFThumbnail();
+            awtBufferedImage = jpegImageMetadata.getExifThumbnail();
 
             _trackedAWTImages.add(awtBufferedImage);
 
@@ -383,7 +382,7 @@ public class PhotoImageLoader {
             }
          }
 
-      } catch (final ImageReadException | IOException e) {
+      } catch (final IOException e) {
 
          StatusUtil.log(e);
 
@@ -458,9 +457,9 @@ public class PhotoImageLoader {
 // this will print out all metadata
 //         System.out.println(metadata);
 
-         if (metadata instanceof JpegImageMetadata) {
+         if (metadata instanceof final JpegImageMetadata jpegImageMetadata) {
 
-            awtBufferedImage = ((JpegImageMetadata) metadata).getEXIFThumbnail();
+            awtBufferedImage = jpegImageMetadata.getExifThumbnail();
 
             _trackedAWTImages.add(awtBufferedImage);
 
@@ -472,7 +471,7 @@ public class PhotoImageLoader {
             try {
 
                /*
-                * transform EXIF image and save it in the thumb store
+                * Transform EXIF image and save it in the thumb store
                 */
                try {
 
@@ -480,9 +479,11 @@ public class PhotoImageLoader {
                   awtBufferedImage = transformImageRotate(awtBufferedImage);
 
                } catch (final Exception e) {
+
                   StatusUtil.log(NLS.bind(
                         "Image \"{0}\" cannot be resized", //$NON-NLS-1$
                         _photo.imageFilePathName), e);
+
                   return null;
                }
 
@@ -509,7 +510,7 @@ public class PhotoImageLoader {
                }
             }
          }
-      } catch (final ImageReadException | IOException e) {
+      } catch (final IOException e) {
          StatusUtil.log(e);
       }
 

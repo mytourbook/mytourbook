@@ -37,7 +37,6 @@ import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.Util;
 
 import org.apache.commons.imaging.Imaging;
-import org.apache.commons.imaging.ImagingConstants;
 import org.apache.commons.imaging.common.GenericImageMetadata.GenericImageMetadataItem;
 import org.apache.commons.imaging.common.ImageMetadata;
 import org.apache.commons.imaging.common.ImageMetadata.ImageMetadataItem;
@@ -46,6 +45,7 @@ import org.apache.commons.imaging.formats.jpeg.JpegPhotoshopMetadata;
 import org.apache.commons.imaging.formats.jpeg.iptc.IptcTypes;
 import org.apache.commons.imaging.formats.tiff.TiffField;
 import org.apache.commons.imaging.formats.tiff.TiffImageMetadata;
+import org.apache.commons.imaging.formats.tiff.TiffImageMetadata.GpsInfo;
 import org.apache.commons.imaging.formats.tiff.constants.ExifTagConstants;
 import org.apache.commons.imaging.formats.tiff.constants.GpsTagConstants;
 import org.apache.commons.imaging.formats.tiff.constants.TiffTagConstants;
@@ -482,12 +482,15 @@ public class Photo implements Serializable {
          if (exifMetadata != null) {
 
             try {
-               final TiffImageMetadata.GPSInfo gpsInfo = exifMetadata.getGPS();
+
+               final GpsInfo gpsInfo = exifMetadata.getGpsInfo();
+
                if (gpsInfo != null) {
 
                   photoMetadata.latitude = gpsInfo.getLatitudeAsDegreesNorth();
                   photoMetadata.longitude = gpsInfo.getLongitudeAsDegreesEast();
                }
+
             } catch (final Exception e) {
                // ignore
             }
@@ -687,14 +690,13 @@ public class Photo implements Serializable {
 
       try {
 
-         final TiffField exifDate = jpegMetadata.findEXIFValueWithExactMatch(//
-               ExifTagConstants.EXIF_TAG_DATE_TIME_ORIGINAL);
+         final TiffField exifDate = jpegMetadata.findExifValueWithExactMatch(ExifTagConstants.EXIF_TAG_DATE_TIME_ORIGINAL);
 
          if (exifDate != null) {
             return LocalDateTime.parse(exifDate.getStringValue(), _dtParser);
          }
 
-         final TiffField tiffDate = jpegMetadata.findEXIFValueWithExactMatch(TiffTagConstants.TIFF_TAG_DATE_TIME);
+         final TiffField tiffDate = jpegMetadata.findExifValueWithExactMatch(TiffTagConstants.TIFF_TAG_DATE_TIME);
 
          if (tiffDate != null) {
             return LocalDateTime.parse(tiffDate.getStringValue(), _dtParser);
@@ -714,7 +716,7 @@ public class Photo implements Serializable {
     */
    private double getExifValueDouble(final JpegImageMetadata jpegMetadata, final TagInfo tagInfo) {
       try {
-         final TiffField field = jpegMetadata.findEXIFValueWithExactMatch(tagInfo);
+         final TiffField field = jpegMetadata.findExifValueWithExactMatch(tagInfo);
          if (field != null) {
             return field.getDoubleValue();
          }
@@ -731,8 +733,7 @@ public class Photo implements Serializable {
    private String getExifValueGpsArea(final JpegImageMetadata jpegMetadata) {
 
       try {
-         final TiffField field = jpegMetadata
-               .findEXIFValueWithExactMatch(GpsTagConstants.GPS_TAG_GPS_AREA_INFORMATION);
+         final TiffField field = jpegMetadata.findExifValueWithExactMatch(GpsTagConstants.GPS_TAG_GPS_AREA_INFORMATION);
          if (field != null) {
             final Object fieldValue = field.getValue();
             if (fieldValue != null) {
@@ -793,7 +794,7 @@ public class Photo implements Serializable {
    private int getExifValueInt(final JpegImageMetadata jpegMetadata, final TagInfo tiffTag, final int defaultValue) {
 
       try {
-         final TiffField field = jpegMetadata.findEXIFValueWithExactMatch(tiffTag);
+         final TiffField field = jpegMetadata.findExifValueWithExactMatch(tiffTag);
          if (field != null) {
             return field.getIntValue();
          }
@@ -807,7 +808,7 @@ public class Photo implements Serializable {
    private String getExifValueString(final JpegImageMetadata jpegMetadata, final TagInfo tagInfo) {
 
       try {
-         final TiffField field = jpegMetadata.findEXIFValueWithExactMatch(tagInfo);
+         final TiffField field = jpegMetadata.findExifValueWithExactMatch(tagInfo);
          if (field != null) {
             return field.getStringValue();
          }
@@ -908,12 +909,12 @@ public class Photo implements Serializable {
           * read metadata WITH thumbnail image info, this is the default when the parameter is
           * omitted
           */
-         final HashMap<String, Object> params = new HashMap<>();
-         params.put(ImagingConstants.PARAM_KEY_READ_THUMBNAILS, isReadThumbnail);
+//         final HashMap<String, Object> params = new HashMap<>();
+//         params.put(ImagingConstants.PARAM_KEY_READ_THUMBNAILS, isReadThumbnail);
 
 //         final long start = System.currentTimeMillis();
 
-         imageFileMetadata = Imaging.getMetadata(imageFile, params);
+         imageFileMetadata = Imaging.getMetadata(imageFile);
 
 //         System.out.println(UI.timeStamp()
 //               + Thread.currentThread().getName()
