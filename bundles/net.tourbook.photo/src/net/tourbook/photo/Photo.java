@@ -60,6 +60,8 @@ import pixelitor.filters.curves.ToneCurvesFilter;
 
 public class Photo implements Serializable {
 
+   private static final String                         NL                             = UI.NEW_LINE1;
+
    private static final long                           serialVersionUID               = 1L;
 
    public static final int                             MAP_IMAGE_DEFAULT_WIDTH_HEIGHT = 80;
@@ -1583,30 +1585,29 @@ public class Photo implements Serializable {
    @Override
    public String toString() {
 
-//      final String rotateDegree = _orientation == 8 ? "270" //
-//            : _orientation == 3 ? "180" //
-//                  : _orientation == 6 ? "90" : "0";
-
-      final String sep = UI.NEW_LINE1;
+      final String rotateDegree = _orientation == 8 ? "270" //                               //$NON-NLS-1$
+            : _orientation == 3 ? "180" //                                                   //$NON-NLS-1$
+                  : _orientation == 6 ? "90" : "0"; //                                       //$NON-NLS-1$ //$NON-NLS-2$
 
       return UI.EMPTY_STRING
 
-            + "Photo" //                                                //$NON-NLS-1$
+            + "Photo" //                                                                     //$NON-NLS-1$
 
-            + " " + imageFileName + sep //                              //$NON-NLS-1$
+            + " " + imageFileName + NL //                                                    //$NON-NLS-1$
 
-//            + " adjustedTime_Tour " + adjustedTime_Tour + sep //        //$NON-NLS-1$
-//            + " _exifDateTime " + _exifDateTime + sep //                //$NON-NLS-1$
+//          + " adjustedTime_Tour " + adjustedTime_Tour + sep //                             //$NON-NLS-1$
+//          + " _exifDateTime " + _exifDateTime + sep //                                     //$NON-NLS-1$
 
-//            + (_exifDateTime == null ? "-no date-" : "\t" + _exifDateTime)
-//            + ("\trotate:" + rotateDegree)
-//            + (_imageWidth == Integer.MIN_VALUE ? "-no size-" : "\t" + _imageWidth + "x" + _imageHeight)
+//          + (_exifDateTime == null ? "-no date-" : "\t" + _exifDateTime)
 
-            + " EXIF GPS: %8.5f %8.5f".formatted(_exifLatitude, _exifLongitude) + sep //$NON-NLS-1$
-            + " Link GPS: %8.5f %8.5f".formatted(_linkLatitude, _linkLongitude) + sep //$NON-NLS-1$
-            + " Tour GPS: %8.5f %8.5f".formatted(_tourLatitude, _tourLongitude) + sep //$NON-NLS-1$
+            + " orientation   " + _orientation + NL //                                       //$NON-NLS-1$
+            + " rotate        " + rotateDegree + NL //                                       //$NON-NLS-1$
 
-            + sep
+            + " EXIF GPS      %8.5f %8.5f".formatted(_exifLatitude, _exifLongitude) + NL //  //$NON-NLS-1$
+            + " Link GPS      %8.5f %8.5f".formatted(_linkLatitude, _linkLongitude) + NL //  //$NON-NLS-1$
+            + " Tour GPS      %8.5f %8.5f".formatted(_tourLatitude, _tourLongitude) + NL //  //$NON-NLS-1$
+
+            + NL
 
       ;
    }

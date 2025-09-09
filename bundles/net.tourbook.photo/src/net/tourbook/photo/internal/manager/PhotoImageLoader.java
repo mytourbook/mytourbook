@@ -840,6 +840,7 @@ public class PhotoImageLoader {
 
                // rotate image according to the EXIF flag
                if (isRotated == false) {
+
                   isRotated = true;
 
                   scaledHQImage = transformImageRotate(scaledHQImage);
@@ -882,7 +883,22 @@ public class PhotoImageLoader {
 
          } else {
 
-            awtHQImage = awtOriginalImage;
+            // rotate image according to the EXIF flag
+            if (isRotated == false) {
+
+               isRotated = true;
+
+               final BufferedImage rotatedHQImage = transformImageRotate(awtOriginalImage);
+
+               imageWidth = rotatedHQImage.getWidth();
+               imageHeight = rotatedHQImage.getHeight();
+
+               awtHQImage = rotatedHQImage;
+
+            } else {
+
+               awtHQImage = awtOriginalImage;
+            }
          }
 
          /*
@@ -894,7 +910,7 @@ public class PhotoImageLoader {
          if (imageWidth >= thumbSize || imageHeight >= thumbSize) {
 
             /*
-             * image is larger than thumb image -> resize to thumb
+             * Image is larger than thumb image -> resize to thumb
              */
 
             if (isHQCreated == false) {
@@ -902,7 +918,7 @@ public class PhotoImageLoader {
                // image size is between thumb and HQ
 
                if (_requestedImageQuality == ImageQuality.HQ) {
-                  requestedSWTImage = createSWTimageFromAWTimage(awtOriginalImage, originalImagePathName);
+                  requestedSWTImage = createSWTimageFromAWTimage(awtHQImage, originalImagePathName);
                }
             }
 
@@ -2017,8 +2033,6 @@ public class PhotoImageLoader {
       final int orientation = _photo.getOrientation();
 
       if (orientation > 1) {
-
-         // see here http://www.impulseadventure.com/photo/exif-orientation.html
 
          Rotation correction = null;
 
