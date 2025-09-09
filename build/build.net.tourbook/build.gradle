@@ -14,6 +14,7 @@ def _dirProductReleaseNotes      = file('../../info/release-notes')
 def _pathProductArchive          = _dirProductArchive.absolutePath
                                  
 def _dirWinInnoSetup             = file('../../INSTALL-UPDATES/installer-net.tourbook/win-Inno.Setup')
+def _winInnoSetupDirName         = _dirWinInnoSetup.absolutePath
 def _pathInnoSetupCompilerApp    = file('c:/Program Files (x86)/Inno Setup 6/iscc.exe').absolutePath
 
 
@@ -36,13 +37,13 @@ defaultTasks 'mt_0_Build'
 task mt_0_Build          
 mt_0_Build.dependsOn( 
 
-   'mt_10_CreateBuildFiles', 
-   'mt_20_BuildProduct', 
-   'mt_30_CopyProduct',
-   'mt_40_ExtractWinFiles',
-   'mt_50_CreateExeFiles',
-   'mt_60_CleanupFiles',
-   'mt_70_CopyReleaseNotes',
+  'mt_10_CreateBuildFiles', 
+  'mt_20_BuildProduct', 
+  'mt_30_CopyProduct',
+  'mt_40_ExtractWinFiles',
+  'mt_50_CreateExeFiles',
+  'mt_60_CleanupFiles',
+  'mt_70_CopyReleaseNotes',
 )
 
 sonarqube {
@@ -155,27 +156,25 @@ task mt_40_ExtractWinFiles {
 // Create separate Exec tasks for each setup file
 task createWin64Setup(type: Exec) {
    
-   workingDir = _dirWinInnoSetup.absolutePath
+   println '\tWin 64'
+   def configFilename_Win64Setup = file(_winInnoSetupDirName + '/mytourbook-create-setup-exe.iss').absolutePath
    commandLine 'cmd', '/c', '"'+_pathInnoSetupCompilerApp+'"'
-   args = [file(_dirWinInnoSetup.absolutePath + '/mytourbook-create-setup-exe.iss').absolutePath]
+   args        configFilename_Win64Setup
 }
 
 task createWin64SetupWithJRE(type: Exec) {
    
-   workingDir = _dirWinInnoSetup.absolutePath
+   println '\tWin 64 with Java runtime'
+   def configFilename_Win64SetupWithJRE = file(_winInnoSetupDirName + '/mytourbook-create-setup-exe-with-jre.iss').absolutePath
    commandLine 'cmd', '/c', '"'+_pathInnoSetupCompilerApp+'"'
-   args = [file(_dirWinInnoSetup.absolutePath + '/mytourbook-create-setup-exe-with-jre.iss').absolutePath]
+   args        configFilename_Win64SetupWithJRE
 }
 
 task mt_50_CreateExeFiles {
    
+   println 'Creating Windows setup files'
+
    dependsOn createWin64Setup, createWin64SetupWithJRE
-   
-   doLast {
-      println 'Creating Windows setup files'
-      println '\tWin 64'
-      println '\tWin 64 with Java runtime'
-   }
 }
 
 /*
