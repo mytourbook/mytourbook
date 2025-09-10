@@ -153,10 +153,8 @@ task mt_40_ExtractWinFiles {
 }
 
 /*
- Create win exe files
+ Create win exe files, create separate Exec tasks for each setup file
 */
-
-// Create separate Exec tasks for each setup file
 task mt_52_CreateWin64Setup(type: Exec) {
    
    println 'Creating Windows setup files: Win 64'
