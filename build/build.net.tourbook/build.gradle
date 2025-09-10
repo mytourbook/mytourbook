@@ -5,17 +5,20 @@ plugins {
 }
 
 // get MT version and remove quotes
-def _mtVersionRaw                = project(':mytourbook').ext.myTourbookVersion      // '18.2.0'
-def _mtVersion                   = _mtVersionRaw.replaceAll('\'', '')                //  18.2.0
+def _mtVersionRaw                   = project(':mytourbook').ext.myTourbookVersion      // '18.2.0'
+def _mtVersion                      = _mtVersionRaw.replaceAll('\'', '')                //  18.2.0
+                                    
+def _dirProductBuilt                = file('../build.net.tourbook.product/target/products')
+def _dirProductArchive              = file('../../../../mytourbook-PRODUCT/' + _mtVersion)
+def _dirProductReleaseNotes         = file('../../info/release-notes')
+def _pathProductArchive             = _dirProductArchive.absolutePath
+                                    
+def _dirWinInnoSetup                = file('../../INSTALL-UPDATES/installer-net.tourbook/win-Inno.Setup')
+def _pathInnoSetupCompilerApp       = file('c:/Program Files (x86)/Inno Setup 6/iscc.exe').absolutePath
 
-def _dirProductBuilt             = file('../build.net.tourbook.product/target/products')
-def _dirProductArchive           = file('../../../../mytourbook-PRODUCT/' + _mtVersion)
-def _dirProductReleaseNotes      = file('../../info/release-notes')
-def _pathProductArchive          = _dirProductArchive.absolutePath
-                                 
-def _dirWinInnoSetup             = file('../../INSTALL-UPDATES/installer-net.tourbook/win-Inno.Setup')
-def _winInnoSetupDirName         = _dirWinInnoSetup.absolutePath
-def _pathInnoSetupCompilerApp    = file('c:/Program Files (x86)/Inno Setup 6/iscc.exe').absolutePath
+def _pathWinInnoSetup               = _dirWinInnoSetup.absolutePath
+def _pathConfig_Win64Setup          = file(_pathWinInnoSetup + '/mytourbook-create-setup-exe.iss').absolutePath
+def _pathConfig_Win64SetupWithJRE   = file(_pathWinInnoSetup + '/mytourbook-create-setup-exe-with-jre.iss').absolutePath
 
 
 gradle.taskGraph.beforeTask { Task task ->
@@ -90,10 +93,10 @@ task mt_10_CreateBuildFiles {
 */
 task mt_20_BuildProduct(type: Exec) {
 
-   // run: mvn clean verify -P build-release
+   // run: mvn clean verify -P build-release -V
    
    workingDir = "../.."
-   commandLine 'cmd', '/c', 'mvn clean verify -P build-release'
+   commandLine 'cmd', '/c', 'mvn clean verify -P build-release -V'
 }
 
 
@@ -149,32 +152,31 @@ task mt_40_ExtractWinFiles {
    }
 }
 
-
 /*
  Create win exe files
 */
+
 // Create separate Exec tasks for each setup file
-task createWin64Setup(type: Exec) {
+task mt_52_CreateWin64Setup(type: Exec) {
    
-   println '\tWin 64'
-   def configFilename_Win64Setup = file(_winInnoSetupDirName + '/mytourbook-create-setup-exe.iss').absolutePath
+   println 'Creating Windows setup files: Win 64'
+   
    commandLine 'cmd', '/c', '"'+_pathInnoSetupCompilerApp+'"'
-   args        configFilename_Win64Setup
+   args        _pathConfig_Win64Setup
 }
 
-task createWin64SetupWithJRE(type: Exec) {
+task mt_54_CreateWin64Setup_WithJRE(type: Exec) {
    
-   println '\tWin 64 with Java runtime'
-   def configFilename_Win64SetupWithJRE = file(_winInnoSetupDirName + '/mytourbook-create-setup-exe-with-jre.iss').absolutePath
+   println 'Creating Windows setup files: Win 64 with Java runtime'
+   
    commandLine 'cmd', '/c', '"'+_pathInnoSetupCompilerApp+'"'
-   args        configFilename_Win64SetupWithJRE
+   args        _pathConfig_Win64SetupWithJRE
 }
 
 task mt_50_CreateExeFiles {
    
-   println 'Creating Windows setup files'
-
-   dependsOn createWin64Setup, createWin64SetupWithJRE
+   dependsOn mt_52_CreateWin64Setup, 
+             mt_54_CreateWin64Setup_WithJRE
 }
 
 /*
