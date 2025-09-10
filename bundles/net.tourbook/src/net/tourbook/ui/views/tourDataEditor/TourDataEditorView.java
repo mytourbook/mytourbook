@@ -9922,7 +9922,7 @@ public class TourDataEditorView extends ViewPart implements
       }
 
 
-      final Object[] allSkipedControls = new Object[] {
+      final Object[] allSkippedControls = new Object[] {
 
             _tableComboWeather_AirQuality,
             _lblWeather_AirQuality
@@ -9933,7 +9933,7 @@ public class TourDataEditorView extends ViewPart implements
       UI.setColorForAllChildren(_sectionTitle,           _foregroundColor_Default, _backgroundColor_Default);
       UI.setColorForAllChildren(_sectionDateTime,        _foregroundColor_Default, _backgroundColor_Default);
       UI.setColorForAllChildren(_sectionCharacteristics, _foregroundColor_Default, _backgroundColor_Default);
-      UI.setColorForAllChildren(_sectionWeather,         _foregroundColor_Default, _backgroundColor_Default, allSkipedControls);
+      UI.setColorForAllChildren(_sectionWeather,         _foregroundColor_Default, _backgroundColor_Default, allSkippedControls);
 
 // SET_FORMATTING_ON
 

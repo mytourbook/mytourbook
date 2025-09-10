@@ -1674,8 +1674,8 @@ public class RawDataManager {
 
             if (isEntireTour_OR_AllTimeSlices || tourValueType == TourValueType.TIME_SLICES__ELEVATION) {
 
-               int elevationGain = oldTourData.getTourAltUp();
-               int elevationLoss = oldTourData.getTourAltDown();
+               final int elevationGain = oldTourData.getTourAltUp();
+               final int elevationLoss = oldTourData.getTourAltDown();
                tourDataDummyClone.setElevationGainLoss(elevationGain, elevationLoss);
             }
 
@@ -1970,8 +1970,8 @@ public class RawDataManager {
 
             case TIME_SLICES__ELEVATION:
 
-               int elevationGain = tourData.getTourAltUp();
-               int elevationLoss = tourData.getTourAltDown();
+               final int elevationGain = tourData.getTourAltUp();
+               final int elevationLoss = tourData.getTourAltDown();
                clonedTourData.setElevationGainLoss(elevationGain, elevationLoss);
 
                tourData.altitudeSerie = null;
@@ -2294,12 +2294,12 @@ public class RawDataManager {
 
          final List<ImportFile> allImportFilePaths = new ArrayList<>();
 
-         final List<OSFile> notSkipedFiles = skipFitLogFiles(allImportFiles);
+         final List<OSFile> notSkippedFiles = skipFitLogFiles(allImportFiles);
 
          /*
           * Convert to IPath because NIO Path DO NOT SUPPORT EXTENSIONS :-(((
           */
-         for (final OSFile osFile : notSkipedFiles) {
+         for (final OSFile osFile : notSkippedFiles) {
 
             final String absolutePath = osFile.getPath().toString();
             final org.eclipse.core.runtime.Path iPath = new org.eclipse.core.runtime.Path(absolutePath);
@@ -3752,9 +3752,9 @@ public class RawDataManager {
       if (isAllTimeSlices || allTourValueTypes.contains(TourValueType.TIME_SLICES__ELEVATION)) {
 
          // re-import elevation only
-         
-         int elevationGain = reimportedTourData.getTourAltUp();
-         int elevationLoss = reimportedTourData.getTourAltDown();
+
+         final int elevationGain = reimportedTourData.getTourAltUp();
+         final int elevationLoss = reimportedTourData.getTourAltDown();
 
          oldTourData.altitudeSerie = reimportedTourData.altitudeSerie;
          oldTourData.setElevationGainLoss(elevationGain, elevationLoss);
