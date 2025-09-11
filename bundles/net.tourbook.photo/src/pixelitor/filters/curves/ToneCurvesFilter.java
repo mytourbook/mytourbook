@@ -21,6 +21,8 @@ import com.jhlabs.image.CurvesFilter;
 
 import java.awt.image.BufferedImage;
 
+import net.tourbook.common.UI;
+
 import pixelitor.filters.Filter;
 import pixelitor.filters.levels.Channel;
 
@@ -31,8 +33,10 @@ import pixelitor.filters.levels.Channel;
  */
 public class ToneCurvesFilter extends Filter /* extends FilterWithGUI */ {
 
-   private CurvesFilter     _curvesFilter; // jhlabs curves filter
-   private final ToneCurves _toneCurves;   // the curve adjustments
+   private static final char NL = UI.NEW_LINE;
+
+   private CurvesFilter      _curvesFilter;   // jhlabs curves filter
+   private final ToneCurves  _toneCurves;     // the curve adjustments
 
    public ToneCurvesFilter() {
 
@@ -68,5 +72,18 @@ public class ToneCurvesFilter extends Filter /* extends FilterWithGUI */ {
       _curvesFilter.setCurve(curveValues);
 
       return _curvesFilter.filter(src, dest);
+   }
+
+   @Override
+   public String toString() {
+
+      return UI.EMPTY_STRING
+
+            + "ToneCurvesFilter" + NL //$NON-NLS-1$
+
+            + " _curvesFilter = " + _curvesFilter + NL //$NON-NLS-1$
+            + " _toneCurves   = " + _toneCurves + NL //$NON-NLS-1$
+
+      ;
    }
 }

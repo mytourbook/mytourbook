@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2025 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -29,8 +29,7 @@ public class ActionTourColor extends Action {
    public ActionTourColor(final Map2View mapView,
                           final MapGraphId colorId,
                           final String toolTipText,
-                          final String imageEnabled,
-                          final String imageDisabled) {
+                          final String imageEnabled) {
 
       super(null, AS_RADIO_BUTTON);
 
@@ -42,7 +41,6 @@ public class ActionTourColor extends Action {
       setToolTipText(toolTipText);
 
       setImageDescriptor(TourbookPlugin.getThemedImageDescriptor(imageEnabled));
-      setDisabledImageDescriptor(TourbookPlugin.getThemedImageDescriptor(imageDisabled));
    }
 
    @Override

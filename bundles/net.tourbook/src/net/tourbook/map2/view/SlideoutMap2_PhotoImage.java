@@ -116,6 +116,8 @@ public class SlideoutMap2_PhotoImage extends AdvancedSlideout implements IAction
 
    private final static IDialogSettings _state                            = TourbookPlugin.getState(ID);
 
+   private static final String          STATE_CROP_ORIENTATION            = "STATE_CROP_ORIENTATION";                       //$NON-NLS-1$
+   private static final String          STATE_CROP_SIZE                   = "STATE_CROP_SIZE";                              //$NON-NLS-1$
    private static final String          STATE_IS_TOOLTIP_EXPANDED         = "STATE_IS_TOOLTIP_EXPANDED";                    //$NON-NLS-1$
 
    private Map2                         _map2;
@@ -215,23 +217,32 @@ public class SlideoutMap2_PhotoImage extends AdvancedSlideout implements IAction
    private MouseTrackListener    _photoMouseExitListener;
    private ControlListener       _photoResizeListener;
 
+   private CropOrientation       _currentCropOrientation;
+   private int                   _currentCropSize;
+
    /*
     * UI controls
     */
    private PageBook         _pageBook;
    private PageBook         _pageBookAdjustment;
+   private PageBook         _pageBookCropOptions;
 
    private Button           _chkCropPhoto;
+   private Button           _radioOrientation_Horizontal;
+   private Button           _radioOrientation_Vertical;
+   private Button           _radioOrientation_Square;
 
    private Composite        _containerPhotoOptions;
    private Composite        _containerHeader_1;
    private Composite        _containerHeader_2;
+   private Composite        _pageCropOptions;
    private Composite        _pageNoPhoto;
    private Composite        _pagePhoto;
 
    private Combo            _comboTooltipSize;
 
    private Label            _labelMessage;
+   private Label            _labelEmpty;
    private Label            _labelWarning;
 
    private PhotoImageCanvas _photoImageCanvas;
@@ -244,6 +255,13 @@ public class SlideoutMap2_PhotoImage extends AdvancedSlideout implements IAction
    private Cursor           _photoCursor_Size_NESW;
    private Cursor           _photoCursor_Size_NS;
    private Cursor           _photoCursor_Size_WE;
+
+   private Link             _link10;
+   private Link             _link20;
+   private Link             _link40;
+   private Link             _link60;
+   private Link             _link80;
+   private Link             _link100;
 
    private class ActionExpandSlideout extends Action {
 
@@ -258,6 +276,13 @@ public class SlideoutMap2_PhotoImage extends AdvancedSlideout implements IAction
 
          actionExpandCollapseSlideout();
       }
+   }
+
+   private enum CropOrientation {
+
+      IMAGE_RATIO, //
+      IMAGE_RATIO_INVERSE, //
+      SQUARE, //
    }
 
    private class PhotoImageCanvas extends ImageCanvas {
@@ -330,16 +355,21 @@ public class SlideoutMap2_PhotoImage extends AdvancedSlideout implements IAction
 
       restoreState();
 
+      enableControls();
+
       updateUI_ExpandedCollapsed_Action();
       updateUI_ExpandedCollapsed_Layout();
 
       updateUI_Toolbar();
 
       // show dialog with dark colors, this looks better for photos with the bright theme
-      final ColorRegistry colorRegistry = JFaceResources.getColorRegistry();
-      UI.setChildColors(parent.getShell(),
-            colorRegistry.get(IPhotoPreferences.PHOTO_VIEWER_COLOR_FOREGROUND),
-            colorRegistry.get(IPhotoPreferences.PHOTO_VIEWER_COLOR_BACKGROUND));
+      if (UI.IS_BRIGHT_THEME) {
+
+         final ColorRegistry colorRegistry = JFaceResources.getColorRegistry();
+         UI.setChildColors(parent.getShell(),
+               colorRegistry.get(IPhotoPreferences.PHOTO_VIEWER_COLOR_FOREGROUND),
+               colorRegistry.get(IPhotoPreferences.PHOTO_VIEWER_COLOR_BACKGROUND));
+      }
    }
 
    @Override
@@ -419,7 +449,7 @@ public class SlideoutMap2_PhotoImage extends AdvancedSlideout implements IAction
             .numColumns(1)
             .spacing(0, 0)
             .applyTo(container);
-      container.setBackground(UI.SYS_COLOR_GREEN);
+//      container.setBackground(UI.SYS_COLOR_GREEN);
       {
          createUI_20_PhotoOptions(container);
          createUI_50_PhotoImage(container);
@@ -436,6 +466,7 @@ public class SlideoutMap2_PhotoImage extends AdvancedSlideout implements IAction
             .applyTo(_containerPhotoOptions);
       GridLayoutFactory.fillDefaults().numColumns(1)
             .extendedMargins(0, 0, 0, 5)
+            .spacing(0, 0)
             .numColumns(3)
             .applyTo(_containerPhotoOptions);
 //      _containerPhotoOptions.setBackground(UI.SYS_COLOR_YELLOW);
@@ -443,43 +474,181 @@ public class SlideoutMap2_PhotoImage extends AdvancedSlideout implements IAction
          {
             _pageBookAdjustment = new PageBook(_containerPhotoOptions, SWT.NONE);
             GridDataFactory.fillDefaults()
-                  .grab(true, false)
+                  .grab(true, true)
                   .applyTo(_pageBookAdjustment);
             {
-               /*
-                * Crop photo
-                */
-               _chkCropPhoto = new Button(_pageBookAdjustment, SWT.CHECK);
-               _chkCropPhoto.setText(Messages.Slideout_PhotoImage_Checkbox_CropPhoto);
-               _chkCropPhoto.addSelectionListener(SelectionListener.widgetSelectedAdapter(selectionEvent -> onPhoto_Crop()));
-
-            }
-            {
-               /*
-                * Warning
-                */
-               _labelWarning = new Label(_pageBookAdjustment, SWT.WRAP);
-               _labelWarning.setText(Messages.Slideout_PhotoImage_Label_AdjustmentIsDisabled);
-               _labelWarning.setToolTipText(Messages.Slideout_PhotoImage_Label_AdjustmentIsDisabled_Tooltip);
+               {
+                  /*
+                   * Crop photo
+                   */
+                  _chkCropPhoto = new Button(_pageBookAdjustment, SWT.CHECK);
+                  _chkCropPhoto.setText(Messages.Slideout_PhotoImage_Checkbox_CropPhoto);
+                  _chkCropPhoto.addSelectionListener(SelectionListener.widgetSelectedAdapter(selectionEvent -> onPhoto_Crop()));
+               }
+               {
+                  /*
+                   * Warning
+                   */
+                  _labelWarning = new Label(_pageBookAdjustment, SWT.WRAP);
+                  _labelWarning.setText(Messages.Slideout_PhotoImage_Label_AdjustmentIsDisabled);
+                  _labelWarning.setToolTipText(Messages.Slideout_PhotoImage_Label_AdjustmentIsDisabled_Tooltip);
+               }
             }
          }
          {
+            /*
+             * Resize tooltip
+             */
             final Link link = new Link(_containerPhotoOptions, SWT.NONE);
             link.setText(UI.createLinkText(Messages.Slideout_PhotoImage_Link_ResizeTooltip2));
             link.setToolTipText(Messages.Slideout_PhotoImage_Link_ResizeTooltip2_Tooltip);
             link.addSelectionListener(SelectionListener.widgetSelectedAdapter(selectionEvent -> onSelect_TooltipResize()));
             GridDataFactory.fillDefaults()
-//                  .grab(true, false)
-                  .align(SWT.END, SWT.CENTER)
+                  .align(SWT.END, SWT.BEGINNING)
                   .applyTo(link);
          }
          {
             /*
              * Expand/collapse slideout
              */
-            UI.createToolbarAction(_containerPhotoOptions, _actionRestoreDefaults);
+            final ToolBar toolbarAction = UI.createToolbarAction(_containerPhotoOptions, _actionRestoreDefaults);
+            GridDataFactory.fillDefaults()
+                  .align(SWT.END, SWT.BEGINNING)
+                  .applyTo(toolbarAction);
+         }
+         {
+            _pageBookCropOptions = new PageBook(_containerPhotoOptions, SWT.NONE);
+            GridDataFactory.fillDefaults()
+                  .grab(true, true)
+                  .span(3, 1)
+                  .applyTo(_pageBookCropOptions);
+            {
+               {
+                  _pageCropOptions = createUI_30_CropOptions(_pageBookCropOptions);
+               }
+               {
+                  _labelEmpty = UI.createLabel(_pageBookCropOptions);
+               }
+            }
          }
       }
+   }
+
+   /**
+    * Crop photo
+    *
+    * @return
+    */
+   private Composite createUI_30_CropOptions(final Composite parent) {
+
+      final String cropToolTipText = Messages.Slideout_PhotoImage_Link_CropSize_Tooltip;
+
+      final SelectionListener cropListener = SelectionListener.widgetSelectedAdapter(selectionEvent -> onSelect_CropSize(_currentCropSize));
+
+      final Composite container = new Composite(parent, SWT.NONE);
+      GridDataFactory.fillDefaults().grab(true, true).applyTo(container);
+      GridLayoutFactory.fillDefaults().numColumns(1).applyTo(container);
+//      container.setBackground(UI.SYS_COLOR_MAGENTA);
+      {
+         {
+            final Composite containerSizes = new Composite(container, SWT.NONE);
+            GridDataFactory.fillDefaults().grab(true, false).indent(16, 0).applyTo(containerSizes);
+            GridLayoutFactory.fillDefaults().numColumns(7).applyTo(containerSizes);
+//            containerSizes.setBackground(UI.SYS_COLOR_CYAN);
+            {
+               {
+                  /*
+                   * Crop size: 10%
+                   */
+                  _link10 = new Link(containerSizes, SWT.NONE);
+                  _link10.setText(UI.createLinkText("10 %")); //$NON-NLS-1$
+                  _link10.setToolTipText(cropToolTipText.formatted(10));
+                  _link10.addSelectionListener(SelectionListener.widgetSelectedAdapter(selectionEvent -> onSelect_CropSize(10)));
+               }
+               {
+                  /*
+                   * Crop size: 20%
+                   */
+                  _link20 = new Link(containerSizes, SWT.NONE);
+                  _link20.setText(UI.createLinkText("20 %")); //$NON-NLS-1$
+                  _link20.setToolTipText(cropToolTipText.formatted(20));
+                  _link20.addSelectionListener(SelectionListener.widgetSelectedAdapter(selectionEvent -> onSelect_CropSize(20)));
+               }
+               {
+                  /*
+                   * Crop size: 40%
+                   */
+                  _link40 = new Link(containerSizes, SWT.NONE);
+                  _link40.setText(UI.createLinkText("40 %")); //$NON-NLS-1$
+                  _link40.setToolTipText(cropToolTipText.formatted(40));
+                  _link40.addSelectionListener(SelectionListener.widgetSelectedAdapter(selectionEvent -> onSelect_CropSize(40)));
+               }
+               {
+                  /*
+                   * Crop size: 60%
+                   */
+                  _link60 = new Link(containerSizes, SWT.NONE);
+                  _link60.setText(UI.createLinkText("60 %")); //$NON-NLS-1$
+                  _link60.setToolTipText(cropToolTipText.formatted(60));
+                  _link60.addSelectionListener(SelectionListener.widgetSelectedAdapter(selectionEvent -> onSelect_CropSize(60)));
+               }
+               {
+                  /*
+                   * Crop size: 80%
+                   */
+                  _link80 = new Link(containerSizes, SWT.NONE);
+                  _link80.setText(UI.createLinkText("80 %")); //$NON-NLS-1$
+                  _link80.setToolTipText(cropToolTipText.formatted(80));
+                  _link80.addSelectionListener(SelectionListener.widgetSelectedAdapter(selectionEvent -> onSelect_CropSize(80)));
+               }
+               {
+                  /*
+                   * Crop size: 100%
+                   */
+                  _link100 = new Link(containerSizes, SWT.NONE);
+                  _link100.setText(UI.createLinkText("100 %")); //$NON-NLS-1$
+                  _link100.setToolTipText(cropToolTipText.formatted(100));
+                  _link100.addSelectionListener(SelectionListener.widgetSelectedAdapter(selectionEvent -> onSelect_CropSize(100)));
+               }
+            }
+            {
+               final Composite containerOrientation = new Composite(containerSizes, SWT.NONE);
+               GridDataFactory.fillDefaults().grab(true, false).indent(10, 0).applyTo(containerOrientation);
+               GridLayoutFactory.fillDefaults().numColumns(3).applyTo(containerOrientation);
+               {
+                  {
+                     /*
+                      * Orientation: Horizontal
+                      */
+                     _radioOrientation_Horizontal = new Button(containerOrientation, SWT.RADIO);
+                     _radioOrientation_Horizontal.setText(Messages.Slideout_PhotoImage_Radio_OrientationHorizontal);
+                     _radioOrientation_Horizontal.setToolTipText(Messages.Slideout_PhotoImage_Radio_OrientationHorizontal_Tooltip);
+                     _radioOrientation_Horizontal.addSelectionListener(cropListener);
+                  }
+                  {
+                     /*
+                      * Orientation: Vertical
+                      */
+                     _radioOrientation_Vertical = new Button(containerOrientation, SWT.RADIO);
+                     _radioOrientation_Vertical.setText(Messages.Slideout_PhotoImage_Radio_OrientationVertical);
+                     _radioOrientation_Vertical.setToolTipText(Messages.Slideout_PhotoImage_Radio_OrientationVertical_Tooltip);
+                     _radioOrientation_Vertical.addSelectionListener(cropListener);
+                  }
+                  {
+                     /*
+                      * Orientation: Square
+                      */
+                     _radioOrientation_Square = new Button(containerOrientation, SWT.RADIO);
+                     _radioOrientation_Square.setText(Messages.Slideout_PhotoImage_Radio_OrientationSquare);
+                     _radioOrientation_Square.setToolTipText(Messages.Slideout_PhotoImage_Radio_OrientationSquare_Tooltip);
+                     _radioOrientation_Square.addSelectionListener(cropListener);
+                  }
+               }
+            }
+         }
+      }
+
+      return container;
    }
 
    private void createUI_50_PhotoImage(final Composite parent) {
@@ -505,6 +674,22 @@ public class SlideoutMap2_PhotoImage extends AdvancedSlideout implements IAction
       }
 
       return container;
+   }
+
+   private void enableControls() {
+
+      final boolean isCropped = _chkCropPhoto.getSelection();
+
+      _link10.setEnabled(isCropped);
+      _link20.setEnabled(isCropped);
+      _link40.setEnabled(isCropped);
+      _link60.setEnabled(isCropped);
+      _link80.setEnabled(isCropped);
+      _link100.setEnabled(isCropped);
+
+      _radioOrientation_Horizontal.setEnabled(isCropped);
+      _radioOrientation_Vertical.setEnabled(isCropped);
+      _radioOrientation_Square.setEnabled(isCropped);
    }
 
    private void fillUI() {
@@ -706,6 +891,22 @@ public class SlideoutMap2_PhotoImage extends AdvancedSlideout implements IAction
       return new Point2D.Float(relCropX, relCropY);
    }
 
+   private CropOrientation getSelectedCropOrientation() {
+
+      if (_radioOrientation_Vertical.getSelection()) {
+
+         return CropOrientation.IMAGE_RATIO_INVERSE;
+
+      } else if (_radioOrientation_Square.getSelection()) {
+
+         return CropOrientation.SQUARE;
+
+      } else {
+
+         return CropOrientation.IMAGE_RATIO;
+      }
+   }
+
    private int getSelectedTooltipSizeIndex() {
 
       final int selectionIndex = _comboTooltipSize.getSelectionIndex();
@@ -834,7 +1035,7 @@ public class SlideoutMap2_PhotoImage extends AdvancedSlideout implements IAction
 
    public void onImageIsLoaded() {
 
-      if (_containerPhotoOptions.isDisposed()) {
+      if (_containerPhotoOptions == null || _containerPhotoOptions.isDisposed()) {
          return;
       }
 
@@ -874,6 +1075,8 @@ public class SlideoutMap2_PhotoImage extends AdvancedSlideout implements IAction
       _photoImageCanvas.redraw();
 
       _map2.photoHistogram_UpdateCropArea(getHistogramCropArea());
+
+      enableControls();
    }
 
    private void onPhoto_Mouse_10_Down(final MouseEvent mouseEvent) {
@@ -1684,6 +1887,103 @@ public class SlideoutMap2_PhotoImage extends AdvancedSlideout implements IAction
       tooltipSize.y = newHeight;
    }
 
+   private void onSelect_CropSize(final int absoluteZoom) {
+
+      _currentCropSize = absoluteZoom;
+
+      boolean isRotate = false;
+      boolean isSquared = false;
+
+      _currentCropOrientation = getSelectedCropOrientation();
+
+      if (_currentCropOrientation.equals(CropOrientation.IMAGE_RATIO_INVERSE)) {
+
+         isRotate = true;
+
+      } else if (_currentCropOrientation.equals(CropOrientation.SQUARE)) {
+
+         isSquared = true;
+      }
+
+      float relCropX1;
+      float relCropY1;
+      float relCropX2;
+      float relCropY2;
+
+      final float relativeZoom = absoluteZoom / 100f;
+      final float relativeZoom2 = relativeZoom / 2;
+
+      final float photoWidth = _photo.getAvailableImageWidth();
+      final float photoHeight = _photo.getAvailableImageHeight();
+
+      final float photoRatioWith = photoWidth / photoHeight;
+      final float photoRatioHeight = photoHeight / photoWidth;
+
+      /*
+       * This math was created experimental until it matched
+       */
+      if (isRotate) {
+
+         // vertical
+
+         if (photoRatioWith > 1) {
+
+            relCropX1 = 0.5f - relativeZoom2 * photoRatioHeight * photoRatioHeight;
+            relCropY1 = 0.5f - relativeZoom2 * photoRatioWith * photoRatioHeight;
+
+            relCropX2 = 0.5f + relativeZoom2 * photoRatioHeight * photoRatioHeight;
+            relCropY2 = 0.5f + relativeZoom2 * photoRatioWith * photoRatioHeight;
+
+         } else {
+
+            relCropX1 = 0.5f - relativeZoom2 * photoRatioHeight * photoRatioWith;
+            relCropY1 = 0.5f - relativeZoom2 * photoRatioWith * photoRatioWith;
+
+            relCropX2 = 0.5f + relativeZoom2 * photoRatioHeight * photoRatioWith;
+            relCropY2 = 0.5f + relativeZoom2 * photoRatioWith * photoRatioWith;
+         }
+
+      } else if (isSquared) {
+
+         if (photoRatioWith > 1) {
+
+            relCropX1 = 0.5f - relativeZoom2 * photoRatioHeight;
+            relCropY1 = 0.5f - relativeZoom2 * photoRatioWith * photoRatioHeight;
+
+            relCropX2 = 0.5f + relativeZoom2 * photoRatioHeight;
+            relCropY2 = 0.5f + relativeZoom2 * photoRatioWith * photoRatioHeight;
+
+         } else {
+
+            relCropX1 = 0.5f - relativeZoom2 * photoRatioHeight * photoRatioWith;
+            relCropY1 = 0.5f - relativeZoom2 * photoRatioWith;
+
+            relCropX2 = 0.5f + relativeZoom2 * photoRatioHeight * photoRatioWith;
+            relCropY2 = 0.5f + relativeZoom2 * photoRatioWith;
+         }
+
+      } else {
+
+         // horizontal
+
+         relCropX1 = 0.5f - relativeZoom2;
+         relCropY1 = 0.5f - relativeZoom2;
+
+         relCropX2 = 0.5f + relativeZoom2;
+         relCropY2 = 0.5f + relativeZoom2;
+      }
+
+      _relPhoto_CropArea.x = relCropX1;
+      _relPhoto_CropArea.y = relCropY1;
+      _relPhoto_CropArea.width = relCropX2;
+      _relPhoto_CropArea.height = relCropY2;
+
+      updateCropArea_FromRelative(_photoImageBounds);
+      updateCropArea_InPhoto();
+
+      _photoImageCanvas.redraw();
+   }
+
    private void onSelect_TooltipResize() {
 
       _isAutoResizeTooltip = true;
@@ -1723,8 +2023,12 @@ public class SlideoutMap2_PhotoImage extends AdvancedSlideout implements IAction
 
 // SET_FORMATTING_OFF
 
+      _currentCropSize           = Util.getStateInt(_state, STATE_CROP_SIZE, 60);
       final int tooltipSizeIndex = Util.getStateInt(_state, STATE_TOOLTIP_SIZE_INDEX, 0);
+
       _isTooltipExpanded         = Util.getStateBoolean(_state, STATE_IS_TOOLTIP_EXPANDED, false);
+
+      _currentCropOrientation    = (CropOrientation) Util.getStateEnum(_state, STATE_CROP_ORIENTATION, CropOrientation.IMAGE_RATIO);
 
 // SET_FORMATTING_ON
 
@@ -1732,6 +2036,7 @@ public class SlideoutMap2_PhotoImage extends AdvancedSlideout implements IAction
 
       setupPhotoCanvasListener();
       setTooltipSize();
+      selectCropOrientation(_currentCropOrientation);
 
       setShowPhotoAdjustements(_map2.isShowPhotoAdjustments());
    }
@@ -1739,7 +2044,10 @@ public class SlideoutMap2_PhotoImage extends AdvancedSlideout implements IAction
    @Override
    protected void saveState() {
 
+      _state.put(STATE_CROP_SIZE, _currentCropSize);
       _state.put(STATE_IS_TOOLTIP_EXPANDED, _isTooltipExpanded);
+
+      Util.setStateEnum(_state, STATE_CROP_ORIENTATION, _currentCropOrientation);
 
       super.saveState();
    }
@@ -1758,17 +2066,41 @@ public class SlideoutMap2_PhotoImage extends AdvancedSlideout implements IAction
       }
    }
 
+   private void selectCropOrientation(final Enum<CropOrientation> cropOrientation) {
+
+      if (cropOrientation.equals(CropOrientation.IMAGE_RATIO_INVERSE)) {
+
+         _radioOrientation_Vertical.setSelection(true);
+
+      } else if (cropOrientation.equals(CropOrientation.SQUARE)) {
+
+         _radioOrientation_Square.setSelection(true);
+
+      } else {
+
+         _radioOrientation_Horizontal.setSelection(true);
+      }
+   }
+
    public void setShowPhotoAdjustements(final boolean isShowPhotoAdjustments) {
 
       if (_chkCropPhoto != null) {
 
          _pageBookAdjustment.showPage(isShowPhotoAdjustments
 
-               // display checkbox
+               // display crop options
                ? _chkCropPhoto
 
                // display warning
                : _labelWarning);
+
+         _pageBookCropOptions.showPage(isShowPhotoAdjustments
+
+               // display crop options
+               ? _pageCropOptions
+
+               // display nothing
+               : _labelEmpty);
       }
 
       _isAdjustmentEnabled = isShowPhotoAdjustments;
@@ -1889,6 +2221,8 @@ public class SlideoutMap2_PhotoImage extends AdvancedSlideout implements IAction
 
          _pageBook.showPage(_pagePhoto);
       }
+
+      enableControls();
    }
 
    private void setupPhotoCanvasListener() {
@@ -2208,6 +2542,11 @@ public class SlideoutMap2_PhotoImage extends AdvancedSlideout implements IAction
                 * Update tour photo
                 */
                final TourData tourData = TourManager.getInstance().getTourData(photoRef.tourId);
+
+               if (tourData == null) {
+                  continue;
+               }
+
                final Set<TourPhoto> allTourPhotos = tourData.getTourPhotos();
 
                for (final TourPhoto tourPhoto : allTourPhotos) {

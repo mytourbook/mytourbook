@@ -11,7 +11,7 @@ AppCopyright         = MyTourbook Contributors 2005, {#AppYear}
 AppID                = {{A20227AD-322E-4B3D-B67A-9C1FECF7B4A6}
 
 OutputDir            = {#ProductRoot}{#AppVersion}
-OutputBaseFilename   = mytourbook-{#AppVersion}{#AppSubVersion}-win-setup-with-java-runtime
+OutputBaseFilename   = mytourbook-{#AppVersion}{#AppSubVersion}-win.x86-setup-with-java-runtime
 
 DefaultGroupName     = MyTourbook
 DefaultDirName       = {pf}\MyTourbook
@@ -34,4 +34,4 @@ ArchitecturesAllowed=x64
 ArchitecturesInstallIn64BitMode=x64
 
 [Files]
-Source: {#ProductRoot}{#AppVersion}\mytourbook-jre-{#AppVersion}{#AppSubVersion}-win\mytourbook\*; DestDir: {app}; Flags: recursesubdirs; Tasks: ; Languages:
+Source: {#ProductRoot}{#AppVersion}\mytourbook-jre-{#AppVersion}{#AppSubVersion}-win.x86\mytourbook\*; DestDir: {app}; Flags: recursesubdirs; Tasks: ; Languages:

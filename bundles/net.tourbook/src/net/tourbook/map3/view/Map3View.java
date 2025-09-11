@@ -94,6 +94,7 @@ import net.tourbook.map2.view.SelectionMapPosition;
 import net.tourbook.map25.Map25FPSManager;
 import net.tourbook.map3.Messages;
 import net.tourbook.map3.action.ActionMap3Color;
+import net.tourbook.map3.action.ActionOpenGLVersions;
 import net.tourbook.map3.action.ActionOpenMap3StatisticsView;
 import net.tourbook.map3.action.ActionSetTrackSliderPositionLeft;
 import net.tourbook.map3.action.ActionSetTrackSliderPositionRight;
@@ -201,7 +202,7 @@ public class Map3View extends ViewPart implements ITourProvider, IMapBookmarks, 
    private ActionMap3Color                   _actionMap3Color;
    private ActionOpenPrefDialog              _actionMap3Colors;
    private ActionMapBookmarks                _actionMapBookmarks;
-   //	private ActionOpenGLVersions					_actionOpenGLVersions;
+   private ActionOpenGLVersions              _actionOpenGLVersions;
    private ActionOpenMap3StatisticsView      _actionOpenMap3StatisticsView;
    private ActionSetTrackSliderPositionLeft  _actionSetTrackSliderLeft;
    private ActionSetTrackSliderPositionRight _actionSetTrackSliderRight;
@@ -865,7 +866,7 @@ public class Map3View extends ViewPart implements ITourProvider, IMapBookmarks, 
 
       _actionExportMap_SubMenu = new Action_ExportMap_SubMenu(this);
 
-//		_actionOpenGLVersions = new ActionOpenGLVersions();
+      _actionOpenGLVersions = new ActionOpenGLVersions();
       _actionOpenMap3StatisticsView = new ActionOpenMap3StatisticsView();
 
       _actionMap3Color = new ActionMap3Color();
@@ -1272,9 +1273,7 @@ public class Map3View extends ViewPart implements ITourProvider, IMapBookmarks, 
       final IMenuManager menuMgr = actionBars.getMenuManager();
 
       menuMgr.add(_actionOpenMap3StatisticsView);
-
-// this is NOT working any more :-(((
-//		menuMgr.add(_actionOpenGLVersions);
+      menuMgr.add(_actionOpenGLVersions);
    }
 
    private void fillContextMenu(final Menu menu) {

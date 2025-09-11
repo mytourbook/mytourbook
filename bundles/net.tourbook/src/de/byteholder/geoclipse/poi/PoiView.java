@@ -1,5 +1,5 @@
 /*******************************************************************************
- *  Copyright (C) 2008, 2024 Michael Kanis, Veit Edunjobi and others
+ *  Copyright (C) 2008, 2025 Michael Kanis, Veit Edunjobi and others
  *
  *  This file is part of Geoclipse.
  *
@@ -17,8 +17,6 @@
  *  along with Geoclipse.  If not, see <http://www.gnu.org/licenses/>.
  *******************************************************************************/
 package de.byteholder.geoclipse.poi;
-
-import static org.eclipse.swt.events.SelectionListener.widgetSelectedAdapter;
 
 import de.byteholder.gpx.PointOfInterest;
 import de.byteholder.gpx.Waypoint;
@@ -52,6 +50,8 @@ import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerComparator;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.KeyListener;
+import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Combo;
@@ -102,7 +102,7 @@ public class PoiView extends ViewPart implements PropertyChangeListener {
    private Button      _btnSearch;
 
    private Combo       _comboSearchQuery;
-   
+
    private ComboViewer _queryViewer;
 
    public class SearchContentProvider implements IStructuredContentProvider {
@@ -193,10 +193,7 @@ public class PoiView extends ViewPart implements PropertyChangeListener {
       @Override
       public Image getImage(final Object obj) {
 
-         if (obj instanceof PointOfInterest) {
-
-            Image img;
-            final PointOfInterest poi = (PointOfInterest) obj;
+         if (obj instanceof final PointOfInterest poi) {
 
             // TODO find/make better matching icons
 
@@ -205,19 +202,19 @@ public class PoiView extends ViewPart implements PropertyChangeListener {
 
 // SET_FORMATTING_OFF
 
-            if (       poiCategory.equals("highway")) {  img = imageRegistry.get(IMG_KEY_CAR);     //$NON-NLS-1$
-            } else if (poiCategory.equals("place")) {    img = imageRegistry.get(IMG_KEY_HOUSE);   //$NON-NLS-1$
-            } else if (poiCategory.equals("waterway")) { img = imageRegistry.get(IMG_KEY_ANCHOR);  //$NON-NLS-1$
-            } else if (poiCategory.equals("amenity")) {  img = imageRegistry.get(IMG_KEY_CART);    //$NON-NLS-1$
-            } else if (poiCategory.equals("leisure")) {  img = imageRegistry.get(IMG_KEY_STAR);    //$NON-NLS-1$
-            } else if (poiCategory.equals("sport")) {    img = imageRegistry.get(IMG_KEY_SOCCER);  //$NON-NLS-1$
-            } else {                                     img = imageRegistry.get(IMG_KEY_FLAG);
+            if (       poiCategory.equals("highway")) {  return imageRegistry.get(IMG_KEY_CAR);     //$NON-NLS-1$
+            } else if (poiCategory.equals("place")) {    return imageRegistry.get(IMG_KEY_HOUSE);   //$NON-NLS-1$
+            } else if (poiCategory.equals("waterway")) { return imageRegistry.get(IMG_KEY_ANCHOR);  //$NON-NLS-1$
+            } else if (poiCategory.equals("amenity")) {  return imageRegistry.get(IMG_KEY_CART);    //$NON-NLS-1$
+            } else if (poiCategory.equals("leisure")) {  return imageRegistry.get(IMG_KEY_STAR);    //$NON-NLS-1$
+            } else if (poiCategory.equals("sport")) {    return imageRegistry.get(IMG_KEY_SOCCER);  //$NON-NLS-1$
+            } else {                                     return imageRegistry.get(IMG_KEY_FLAG);
             }
 
 // SET_FORMATTING_ON
 
-            return img;
          } else {
+
             return null;
          }
       }
@@ -305,10 +302,18 @@ public class PoiView extends ViewPart implements PropertyChangeListener {
              */
             _comboSearchQuery = new Combo(queryContainer, SWT.NONE);
             _comboSearchQuery.setVisibleItemCount(30);
-            _comboSearchQuery.addSelectionListener(widgetSelectedAdapter(selectionEvent -> {
+            _comboSearchQuery.addSelectionListener(SelectionListener.widgetSelectedAdapter(selectionEvent -> {
                // start searching when ENTER is pressed
                onSearchPoi();
             }));
+
+            _comboSearchQuery.addKeyListener(KeyListener.keyPressedAdapter(keyEvent -> {
+
+               if (keyEvent.keyCode == SWT.CR) {
+                  onSearchPoi();
+               }
+            }));
+
             GridDataFactory.fillDefaults()
                   .align(SWT.FILL, SWT.CENTER)
                   .grab(true, false)
@@ -320,7 +325,7 @@ public class PoiView extends ViewPart implements PropertyChangeListener {
              */
             _btnSearch = new Button(queryContainer, SWT.PUSH);
             _btnSearch.setText(Messages.Poi_View_Button_Search);
-            _btnSearch.addSelectionListener(widgetSelectedAdapter(selectionEvent -> onSearchPoi()));
+            _btnSearch.addSelectionListener(SelectionListener.widgetSelectedAdapter(selectionEvent -> onSearchPoi()));
          }
       }
 

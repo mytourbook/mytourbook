@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2024 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2025 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -457,7 +457,6 @@ public class TourBookView extends ViewPart implements
          super(Messages.Tour_Action_CreateTourMarkers, AS_PUSH_BUTTON);
 
          setImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.TourMarker_New));
-         setDisabledImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.TourMarker_New_Disabled));
       }
 
       @Override
@@ -478,7 +477,6 @@ public class TourBookView extends ViewPart implements
          super(Messages.Tour_Book_Action_GoToLastTour_Tooltip2, AS_PUSH_BUTTON);
 
          setImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.App_Today));
-         setDisabledImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.App_Today_Disabled));
       }
 
       @Override
@@ -557,8 +555,7 @@ public class TourBookView extends ViewPart implements
 
       public ActionTourCollectionFilter() {
 
-         super(TourbookPlugin.getThemedImageDescriptor(Images.TourFilter_Collected_All),
-               TourbookPlugin.getThemedImageDescriptor(Images.TourFilter_Collected_All_Disabled));
+         super(TourbookPlugin.getThemedImageDescriptor(Images.TourFilter_Collected_All));
 
          isToggleAction = true;
          isShowSlideoutAlways = true;
@@ -1235,11 +1232,7 @@ public class TourBookView extends ViewPart implements
 
             tree.setRedraw(false);
             {
-               _isInSelection = true;
-               {
-                  _tourViewer_Tree.setSelection(treeSelection, true);
-               }
-               _isInSelection = false;
+               _tourViewer_Tree.setSelection(treeSelection, true);
             }
             tree.setRedraw(true);
          });
@@ -1254,7 +1247,8 @@ public class TourBookView extends ViewPart implements
     *
     * @return
     */
-   private TreeViewerItem actionGotoToday_GetLastChild(final TreeViewerItem parentItem, final List<TreeViewerItem> allLastChildren) {
+   private TreeViewerItem actionGotoToday_GetLastChild(final TreeViewerItem parentItem,
+                                                       final List<TreeViewerItem> allLastChildren) {
 
       final List<TreeViewerItem> allChildren = parentItem.getFetchedChildren();
 
@@ -4159,7 +4153,7 @@ public class TourBookView extends ViewPart implements
          break;
       }
 
-      _actionToggleViewLayout.setImageDescriptor(TourbookPlugin.getImageDescriptor(viewLayoutImage));
+      _actionToggleViewLayout.setImageDescriptor(TourbookPlugin.getThemedImageDescriptor(viewLayoutImage));
 
       /*
        * View options
@@ -4568,7 +4562,7 @@ public class TourBookView extends ViewPart implements
 
       _viewLayout = TourBookViewLayout.CATEGORY_MONTH;
 
-      _actionToggleViewLayout.setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.TourBook_Month));
+      _actionToggleViewLayout.setImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.TourBook_Month));
 
       _isLayoutNatTable = false;
    }
@@ -4577,7 +4571,7 @@ public class TourBookView extends ViewPart implements
 
       _viewLayout = TourBookViewLayout.CATEGORY_WEEK;
 
-      _actionToggleViewLayout.setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.TourBook_Week));
+      _actionToggleViewLayout.setImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.TourBook_Week));
 
       _isLayoutNatTable = false;
    }
@@ -4586,7 +4580,7 @@ public class TourBookView extends ViewPart implements
 
       _viewLayout = TourBookViewLayout.NAT_TABLE;
 
-      _actionToggleViewLayout.setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.TourBook_NatTable));
+      _actionToggleViewLayout.setImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.TourBook_NatTable));
 
       _isLayoutNatTable = true;
    }

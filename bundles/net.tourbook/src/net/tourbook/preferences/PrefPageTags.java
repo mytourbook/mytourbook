@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2024 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2025 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -179,7 +179,6 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
          super(Messages.Action_Tag_Delete, AS_PUSH_BUTTON);
 
          setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.App_Delete));
-         setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Images.App_Delete_Disabled));
       }
 
       @Override
@@ -195,7 +194,6 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
          super(Messages.Action_Tag_DeleteCategory, AS_PUSH_BUTTON);
 
          setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.App_Delete));
-         setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Images.App_Delete_Disabled));
       }
 
       @Override

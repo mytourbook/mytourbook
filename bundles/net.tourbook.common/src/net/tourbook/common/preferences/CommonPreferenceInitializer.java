@@ -19,6 +19,7 @@ import java.time.DayOfWeek;
 import java.time.ZoneId;
 
 import net.tourbook.common.CommonActivator;
+import net.tourbook.common.UI;
 import net.tourbook.common.color.ColorDefinition;
 import net.tourbook.common.color.GraphColorManager;
 import net.tourbook.common.formatter.ValueFormat;
@@ -26,6 +27,10 @@ import net.tourbook.common.formatter.ValueFormat;
 import org.eclipse.core.runtime.preferences.AbstractPreferenceInitializer;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.preference.PreferenceConverter;
+import org.eclipse.swt.SWT;
+import org.eclipse.swt.graphics.Font;
+import org.eclipse.swt.graphics.FontData;
+import org.eclipse.swt.widgets.Display;
 
 /**
  * Initialize default preference values.
@@ -143,8 +148,19 @@ public class CommonPreferenceInitializer extends AbstractPreferenceInitializer {
       /*
        * Appearance
        */
-      store.setDefault(ICommonPreferences.APPEARANCE_NOTIFICATION_MESSAGES_DURATION, 3);
+      store.setDefault(ICommonPreferences.APPEARANCE_NOTIFICATION_MESSAGES_DURATION,   3);
+      store.setDefault(ICommonPreferences.UI_DISABLED_ICONS,                           UI.DISABLED_ICONS_GRAYED);
 
 // SET_FORMATTING_ON
+
+      /*
+       * UI drawing font, set a "ugly" font that users are "forced" to select a more modern font :-)
+       */
+      final Font defaultFont = new Font(Display.getDefault(), "Courier", 9, SWT.NORMAL); //$NON-NLS-1$
+      {
+         final FontData[] defaultFontData = defaultFont.getFontData();
+         PreferenceConverter.setDefault(store, ICommonPreferences.UI_DRAWING_FONT, defaultFontData);
+      }
+      defaultFont.dispose();
    }
 }

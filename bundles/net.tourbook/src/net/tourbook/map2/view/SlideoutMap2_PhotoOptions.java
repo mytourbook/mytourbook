@@ -536,6 +536,13 @@ public class SlideoutMap2_PhotoOptions extends AdvancedSlideout implements
    @Override
    protected Point onResize(final int newContentWidth, final int newContentHeight) {
 
+      if (_shellContainer.isDisposed()) {
+
+         // this happened during debugging
+
+         return null;
+      }
+
       // there is no need to resize this dialog
       final Point defaultSize = _shellContainer.getShell().computeSize(SWT.DEFAULT, SWT.DEFAULT);
 

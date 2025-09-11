@@ -10,19 +10,19 @@
    <name>MyTourbook App</name>
 
    <artifactId>mytourbook-app</artifactId>   <groupId>net.tourbook</groupId>
-                                             <version>25.4.0-SNAPSHOT</version>
+                                             <version>25.8.0-SNAPSHOT</version>
    <packaging>pom</packaging>
    
    <dependencies>
       <dependency>
-         <artifactId>junit-jupiter-engine</artifactId>                  <groupId>org.junit.jupiter</groupId>
-                                                                        <version>5.9.3</version>
+         <artifactId>junit-jupiter</artifactId>                  <groupId>org.junit.jupiter</groupId>
+                                                                 <version>6.0.0-RC2</version>
          <scope>test</scope>
       </dependency>
    </dependencies>	
 
    <properties>
-      <tycho.version>3.0.5</tycho.version>
+      <tycho.version>5.0.0</tycho.version>     
       <surefire.version>3.5.3</surefire.version>
       <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>  
    </properties>
@@ -71,28 +71,40 @@
       <!-- Eclipse E4 web repository -->
       
       <repository>
-         <id>eclipse.platform.4.28</id>                                 <layout>p2</layout>
-         
-         <url>https://download.eclipse.org/releases/2023-06</url>
-         
-<!-- 
-         <url>https://download.eclipse.org/eclipse/updates/4.24-I-builds/I20220525-1800/</url>
-         <url>https://download.eclipse.org/eclipse/updates/4.23-I-builds/I20220308-0310</url>
- -->
+         <id>eclipse.platform.4.36</id>                                                <layout>p2</layout>
+         <url>https://download.eclipse.org/releases/2025-06/202506111000/</url>
       </repository>   
 
       <repository>
-         <id>eclipse.nattable.2.5.0</id>                                <layout>p2</layout>
+         <id>eclipse.nattable.2.5.0</id>                                               <layout>p2</layout>
          <url>http://download.eclipse.org/nattable/releases/2.5.0/repository/</url>
       </repository> 
       
       <repository>
-         <id>eclipse.nebula.3.0.0</id>                                  <layout>p2</layout>
-         <url>https://download.eclipse.org/nebula/releases/3.0.0/</url>
+         <id>eclipse.nebula.3.1.1</id>                                                 <layout>p2</layout>
+         <url>https://download.eclipse.org/nebula/updates/release/3.1.1</url>
       </repository> 
       
       <!-- IMPORTANT: Keep that tag in a single line as it is commented out during the GitHub build -->
-      <repository> <id>eclipse.4.23.nl</id> <layout>p2</layout> <url>file:build/build.eclipse.4.23.nl.repo</url> </repository>
+      <!-- 
+         !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! 
+         I was not able to use a relative path for the p2 repo, only the absolute path worked :-((( 
+         !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! 
+      -->
+      <repository>   <id>eclipse.4.26.nl</id>   <layout>p2</layout>   <url>file:/DAT/MT/mytourbook/build/build.eclipse.4.26.nl.repo</url>   </repository>
+
+<!-- 
+   OK <repository>   <id>eclipse.4.26.nl</id>   <layout>p2</layout>   <url>file:/DAT/MT/mytourbook/build/build.eclipse.4.26.nl.repo</url>   </repository>
+   OK <repository>   <id>eclipse.4.26.nl</id>   <layout>p2</layout>   <url>file:/build.eclipse.4.26.nl.repo</url>                           </repository>
+   OK <repository>   <id>eclipse.4.26.nl</id>   <layout>p2</layout>   <url>file:/eclipse-nl-repo-SMALL</url>                                </repository>
+
+      <repository>   <id>eclipse.4.26.nl</id>   <layout>p2</layout>   <url>file:build/build.eclipse.4.26.nl.repo</url>   </repository>
+      
+      This works but it is veeeery slow
+      <repository>   <id>eclipse.4.26.nl</id>   <layout>p2</layout>   <url>https://download.eclipse.org/technology/babel/update-site/R0.20.0/2022-12/</url>   </repository> 
+      
+      <repository>   <id>eclipse.4.23.nl</id>   <layout>p2</layout>   <url>file:build/build.eclipse.4.23.nl.repo</url>                             </repository>
+-->
 
    </repositories>
 
@@ -158,13 +170,14 @@
                <resolver>p2</resolver>
                <environments>
                   
-                  <environment>   <os>win32</os>      <ws>win32</ws>    <arch>x86_64</arch>      </environment>
+                  <environment>   <os>win32</os>      <ws>win32</ws>    <arch>x86_64</arch>     </environment>
+                  <environment>   <os>win32</os>      <ws>win32</ws>    <arch>aarch64</arch>    </environment>
 
-                  <environment>   <os>linux</os>      <ws>gtk</ws>      <arch>x86_64</arch>      </environment>
-                  <environment>   <os>linux</os>      <ws>gtk</ws>      <arch>aarch64</arch>     </environment>
+                  <environment>   <os>linux</os>      <ws>gtk</ws>      <arch>x86_64</arch>     </environment>
+                  <environment>   <os>linux</os>      <ws>gtk</ws>      <arch>aarch64</arch>    </environment>
                   
-                  <environment>   <os>macosx</os>     <ws>cocoa</ws>    <arch>x86_64</arch>      </environment>
-                  <environment>   <os>macosx</os>     <ws>cocoa</ws>    <arch>aarch64</arch>     </environment>
+                  <environment>   <os>macosx</os>     <ws>cocoa</ws>    <arch>x86_64</arch>     </environment>
+                  <environment>   <os>macosx</os>     <ws>cocoa</ws>    <arch>aarch64</arch>    </environment>
 
                </environments>
             </configuration>
@@ -194,7 +207,7 @@
       </plugin>
       
       <plugin>
-        <artifactId>maven-compiler-plugin</artifactId>         <groupId>org.apache.maven.plugins</groupId>
+         <artifactId>maven-compiler-plugin</artifactId>        <groupId>org.apache.maven.plugins</groupId>
                                                                <version>3.14.0</version>
          <executions>
             <execution>
@@ -207,6 +220,27 @@
          </executions>
          <configuration>
                <release>17</release>
+         </configuration>
+      </plugin>
+      
+      <plugin>
+         <artifactId>maven-toolchains-plugin</artifactId>      <groupId>org.apache.maven.plugins</groupId>
+                                                               <version>3.2.0</version>
+         <executions>
+            <execution>
+               <goals>
+                  <goal>toolchain</goal>
+               </goals>
+            </execution>
+         </executions>
+        
+         <configuration>
+            <toolchains>
+               <jdk>
+                  <version>21</version>
+                  <vendor>openjdk</vendor>
+               </jdk>
+            </toolchains>
          </configuration>
       </plugin>
       

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2025 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -32,7 +32,6 @@ public class ActionPhotoFilterTour extends Action {
       setToolTipText(Messages.Photo_Gallery_Action_PhotoFilter_Tour_Tooltip);
 
       setImageDescriptor(PhotoActivator.getThemedImageDescriptor(PhotoImages.PhotoFilter_Tour));
-      setDisabledImageDescriptor(PhotoActivator.getThemedImageDescriptor(PhotoImages.PhotoFilter_Tour_Disabled));
 
       _photoGallery = photoGallery;
    }

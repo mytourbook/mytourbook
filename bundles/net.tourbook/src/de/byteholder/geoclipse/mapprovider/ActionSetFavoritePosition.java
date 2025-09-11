@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2025 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -24,19 +24,19 @@ import org.eclipse.jface.action.Action;
 
 public class ActionSetFavoritePosition extends Action {
 
-	private DialogMP	_dlgMapConfig;
+   private DialogMP _dlgMapConfig;
 
-	public ActionSetFavoritePosition(final DialogMP dialogMapConfiguration) {
+   public ActionSetFavoritePosition(final DialogMP dialogMapConfiguration) {
 
-		_dlgMapConfig = dialogMapConfiguration;
+      _dlgMapConfig = dialogMapConfiguration;
 
-		setToolTipText(Messages.Map_Action_SetFavoritePosition_Tooltip);
-      setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.SetFavoritePosition));
-	}
+      setToolTipText(Messages.Map_Action_SetFavoritePosition_Tooltip);
+      setImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.SetFavoritePosition));
+   }
 
-	@Override
-	public void run() {
-		_dlgMapConfig.actionSetFavoritePosition();
-	}
+   @Override
+   public void run() {
+      _dlgMapConfig.actionSetFavoritePosition();
+   }
 
 }

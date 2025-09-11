@@ -22,18 +22,23 @@ import de.byteholder.geoclipse.map.MapLegend;
 import de.byteholder.geoclipse.map.PaintedMapPoint;
 import de.byteholder.geoclipse.mapprovider.MP;
 
+import java.util.List;
+import java.util.Set;
+
 import net.tourbook.Images;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.UI;
 import net.tourbook.common.color.ColorProviderConfig;
 import net.tourbook.common.map.GeoPosition;
-import net.tourbook.common.util.NoAutoScalingImageDataProvider;
+import net.tourbook.common.util.CustomScalingImageDataProvider;
 import net.tourbook.data.TourData;
+import net.tourbook.data.TourPhoto;
 import net.tourbook.map2.Messages;
 import net.tourbook.photo.IPhotoPreferences;
 import net.tourbook.photo.Photo;
 import net.tourbook.photo.PhotoUI;
 import net.tourbook.photo.RatingStars;
+import net.tourbook.tour.photo.TourPhotoManager;
 
 import org.eclipse.jface.resource.ColorRegistry;
 import org.eclipse.jface.resource.ImageDescriptor;
@@ -47,6 +52,7 @@ import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.ImageData;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
+import org.eclipse.swt.internal.DPIUtil;
 import org.eclipse.swt.widgets.Display;
 
 public class DirectMappingPainter implements IDirectPainter {
@@ -116,11 +122,11 @@ public class DirectMappingPainter implements IDirectPainter {
       final ImageDescriptor imageDescriptor = TourbookPlugin.getImageDescriptor(Images.MapLocationMarker_Hovered);
 
 // THIS NEEDS TO BE USED WHEN THE LOCATION ICON IS UNSCALES
-//      final ImageData imageData = imageDescriptor.getImageData(deviceZoom);
+      final ImageData imageData = imageDescriptor.getImageData(DPIUtil.getDeviceZoom());
 
-      final ImageData imageData = imageDescriptor.getImageData(100);
+//    final ImageData imageData = imageDescriptor.getImageData(100);
 
-      _imageMapLocation_Hovered = new Image(Display.getDefault(), new NoAutoScalingImageDataProvider(imageData));
+      _imageMapLocation_Hovered = new Image(Display.getDefault(), new CustomScalingImageDataProvider(imageData));
 
 // SET_FORMATTING_OFF
 
@@ -328,6 +334,24 @@ public class DirectMappingPainter implements IDirectPainter {
 
          if (mapPointType.equals(MapPointType.TOUR_PHOTO)) {
 
+            final Photo photo = mapPoint.photo;
+            final List<TourPhoto> allTourPhotos = TourPhotoManager.getTourPhotos(photo);
+
+            // set different color for positioned photos
+            if (allTourPhotos.size() > 0) {
+
+               final TourPhoto tourPhoto = allTourPhotos.get(0);
+               final TourData tourData = tourPhoto.getTourData();
+               final Set<Long> tourPhotosWithPositionedGeo = tourData.getTourPhotosWithPositionedGeo();
+               final boolean isPositionedPhoto = tourPhotosWithPositionedGeo.contains(tourPhoto.getPhotoId());
+
+               if (isPositionedPhoto) {
+
+                  gc.setForeground(UI.SYS_COLOR_YELLOW);
+                  gc.setBackground(UI.SYS_COLOR_RED);
+               }
+            }
+
             gc.fillOval(
                   symbolRectangle.x + 1, // fill a larger shape to hide the antialiasing which looks like a light border !!!
                   symbolRectangle.y + 1,
@@ -522,7 +546,7 @@ public class DirectMappingPainter implements IDirectPainter {
                                    final boolean isYPosCenter) {
 
       final MP mp = _map2.getMapProvider();
-      final int zoomLevel = _map2.getZoom();
+      final int zoomLevel = _map2.getZoomLevel();
 
       final double[] latitudeSerie = _tourData.latitudeSerie;
       final double[] longitudeSerie = _tourData.longitudeSerie;
@@ -616,7 +640,7 @@ public class DirectMappingPainter implements IDirectPainter {
    private void drawSliderPath_Multiple(final GC gc, final DirectPainterContext painterContext) {
 
       final MP mp = _map2.getMapProvider();
-      final int zoomLevel = _map2.getZoom();
+      final int zoomLevel = _map2.getZoomLevel();
 
       final double[] latitudeSerie = _tourData.latitudeSerie;
       final double[] longitudeSerie = _tourData.longitudeSerie;
@@ -748,7 +772,7 @@ public class DirectMappingPainter implements IDirectPainter {
    private void drawSliderPath_One(final GC gc, final DirectPainterContext painterContext) {
 
       final MP mp = _map2.getMapProvider();
-      final int zoomLevel = _map2.getZoom();
+      final int zoomLevel = _map2.getZoomLevel();
 
       final double[] latitudeSerie = _tourData.latitudeSerie;
       final double[] longitudeSerie = _tourData.longitudeSerie;

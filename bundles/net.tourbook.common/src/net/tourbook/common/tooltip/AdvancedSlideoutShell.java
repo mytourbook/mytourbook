@@ -24,7 +24,6 @@ import org.eclipse.jface.resource.ColorRegistry;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.window.ToolTip;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.ControlAdapter;
 import org.eclipse.swt.events.ControlEvent;
 import org.eclipse.swt.events.ControlListener;
 import org.eclipse.swt.graphics.Color;
@@ -1033,6 +1032,15 @@ public abstract class AdvancedSlideoutShell {
    protected abstract void onReparentShell(Shell reparentedShell);
 
    /**
+    * This is called when the location was reseted by selecting the action with the
+    * <code>Ctrl</code> key
+    */
+   protected void onResetLocation() {
+
+      // nothing to do, this can be overwritten
+   }
+
+   /**
     * Customize shell size, this is used to collapse/expand a slideout
     *
     * @param newContentWidth
@@ -1330,7 +1338,7 @@ public abstract class AdvancedSlideoutShell {
 
       final Shell resizeShell = _rrShellWithResize.getShell();
 
-      if (resizeShell == null) {
+      if (resizeShell == null || resizeShell.isDisposed()) {
 
          // fixed NPE which happened during debugging
 
@@ -1546,6 +1554,20 @@ public abstract class AdvancedSlideoutShell {
          _shellStartLocation = new Point(shellStartX, shellStartY);
          _shellEndLocation = new Point(shellEndX, shellEndY);
       }
+   }
+
+   /**
+    * Unpin location and don't keep it open
+    */
+   public void resetLocation() {
+
+      _isKeepSlideoutOpen = false;
+      _isSlideoutPinned = false;
+
+      restoreState_SlideoutIsPinned(_isSlideoutPinned);
+      restoreState_KeepSlideoutOpen(_isKeepSlideoutOpen);
+
+      onResetLocation();
    }
 
    private void restoreState(final int[] defaultSize) {

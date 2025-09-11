@@ -1,0 +1,88 @@
+25.6.0                                                 19. June 2025
+
+
+New / Improvements
+==================
+
+* Fit Import
+  - Import distance values for swimming to display
+    https://github.com/mytourbook/mytourbook/issues/1485
+    - Speed graph in the tour chart
+    - Distance values in different locations  
+    
+* Tour Filter
+  - Duplicate filter property, this makes it easier to create a similar filter    
+    https://github.com/mytourbook/mytourbook/issues/1487
+
+* Tour Info Tooltip (Frederic)
+  - New fields: Elapsed time at night and during the day for tours that also happen during the night
+
+* Tour Nutrition (Frederic)
+  - Support for the carbohydrates
+  - New button to update the nutrition facts of (a) product(s)
+  - Edit an existing custom nutrition product
+  - Add duplicated products when they are contained in a beverage container
+
+* 2D Map Photos
+  - Photo Tour
+    - Relocate a photo geo position with the mouse
+    - Replace photo geo position with its default position
+  - Crop photo with fixed sizes
+    https://github.com/mytourbook/mytourbook/issues/1494
+  - Set tonality
+    - Adjust tonality values with slider controls
+    - Copy and paste from one photo to another
+  - Draw under- and overexposed values with a different color in the histogram
+
+* Tour Chart
+  - Visualize positioned photos with a different photo point color
+	
+* Tour Editor
+  - Remove photo geo position  
+  - Delete time slices
+    - Added option to adjust the tour start time when pressing the DEL key
+    - New context menu action: Delete time slices and adjust tour start time and keep other values
+  - Display tour date in the column "Daytime" when the time is on a different day than the tour start, this can happen when a photo tour is created
+  - Edit power values in 
+    https://github.com/mytourbook/mytourbook/issues/1492
+    - Time slice viewer
+    - Time slice replace/offset dialog
+      
+* Positionable Slideouts
+  - Reset slideout position by pressing <Ctrl> when the action is selected      
+
+
+Changes
+=======
+
+* 2D Map
+  - Replaced actions to set tour start/end positions https://github.com/mytourbook/mytourbook/issues/1457 with https://github.com/mytourbook/mytourbook/issues/1488
+  - When creating a photo tour, a time slice is created for each photo which is positioned slightly different than other photos when the first position is set
+
+
+Bugfix
+======
+  
+See also milestone 25.6 https://github.com/mytourbook/mytourbook/milestone/25?closed=1
+ 
+
+
+Translation    
+===========
+
+- Dutch (Maarten)
+- French (Frederic)
+- German
+- Italian (Doriano)
+
+ 
+System   
+======
+
+* MyTourbook Milestone 25.6   https://github.com/mytourbook/mytourbook/milestone/25?closed=1
+* Java 17                     https://adoptium.net/temurin/releases/?version=17
+* Eclipse 2023-06 (4.28)      https://download.eclipse.org/eclipse/downloads/drops4/R-4.31-202402290520/
+* NatTable 2.5.0              https://eclipse.dev/nattable/download
+* Nebula Widgets              https://download.eclipse.org/nebula/releases/latest
+* FIT SDK 21.171.0            https://forums.garmin.com/developer/fit-sdk/b/news-announcements
+* WorldWind 2.2.1             https://github.com/NASAWorldWind/WorldWindJava/releases/tag/v2.2.1

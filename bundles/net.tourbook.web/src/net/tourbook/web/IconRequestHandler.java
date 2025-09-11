@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2025 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -24,7 +24,7 @@ import net.tourbook.common.CommonActivator;
 public interface IconRequestHandler {
 
    /**
-    * Handle icon image requests, e.g. /$MT-ICON$/photo-tooltip.png
+    * Handle icon image requests, e.g. /$MT-ICON$/photo-tooltip.svg
     *
     * @param httpExchange
     * @param requestUriPath
@@ -32,6 +32,7 @@ public interface IconRequestHandler {
     * @param isIconCommonRequest
     *           When <code>true</code> the the request is for a resource from the
     *           {@link CommonActivator} plugin, otherwise from {@link TourbookPlugin}
+    *
     * @throws IOException
     */
    public void handleIconRequest(HttpExchange httpExchange,

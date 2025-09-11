@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2024 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2025 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -16,6 +16,7 @@
 package net.tourbook.map2.view;
 
 import net.tourbook.Messages;
+import net.tourbook.OtherMessages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.UI;
 import net.tourbook.common.action.ActionResetToDefaults;
@@ -67,10 +68,13 @@ public class SlideoutMap2_Options extends ToolbarSlideout implements
    /*
     * UI controls
     */
+   private Button                _chkIsDimMap;
    private Button                _chkIsToggleKeyboardPanning;
    private Button                _chkSelectInbetweenTimeSlices;
+   private Button                _chkShowGeoGridBorder;
+   private Button                _chkShowTileInfo;
+   private Button                _chkShowTileBorder;
    private Button                _chkShowValuePointTooltip;
-   private Button                _chkIsDimMap;
    private Button                _chkUseMapDimColor;
 
    private Spinner               _spinnerMapDimValue;
@@ -261,8 +265,35 @@ public class SlideoutMap2_Options extends ToolbarSlideout implements
                _chkUseMapDimColor = new Button(container, SWT.CHECK);
                _chkUseMapDimColor.setText(Messages.Slideout_MapPoints_Checkbox_UseMapDimColor);
                _chkUseMapDimColor.addSelectionListener(_defaultSelectionListener);
-               gdSpan2.indent(16, 0).applyTo(_chkUseMapDimColor);
+               GridDataFactory.fillDefaults().span(2, 1).indent(16, 0).applyTo(_chkUseMapDimColor);
             }
+         }
+         {
+            /*
+             * Tile info
+             */
+            _chkShowTileInfo = new Button(container, SWT.CHECK);
+            _chkShowTileInfo.setText(OtherMessages.MAP_PROPERTIES_SHOW_TILE_INFO);
+            _chkShowTileInfo.addSelectionListener(_defaultSelectionListener);
+            gdSpan2.applyTo(_chkShowTileInfo);
+         }
+         {
+            /*
+             * Tile border
+             */
+            _chkShowTileBorder = new Button(container, SWT.CHECK);
+            _chkShowTileBorder.setText(OtherMessages.MAP_PROPERTIES_SHOW_TILE_BORDER);
+            _chkShowTileBorder.addSelectionListener(_defaultSelectionListener);
+            gdSpan2.applyTo(_chkShowTileBorder);
+         }
+         {
+            /*
+             * Geo grid border
+             */
+            _chkShowGeoGridBorder = new Button(container, SWT.CHECK);
+            _chkShowGeoGridBorder.setText(OtherMessages.MAP_PROPERTIES_SHOW_GEO_GRID);
+            _chkShowGeoGridBorder.addSelectionListener(_defaultSelectionListener);
+            gdSpan2.applyTo(_chkShowGeoGridBorder);
          }
       }
    }
@@ -345,6 +376,11 @@ public class SlideoutMap2_Options extends ToolbarSlideout implements
       _chkSelectInbetweenTimeSlices .setSelection( _prefStore.getBoolean(ITourbookPreferences.GRAPH_IS_SELECT_INBETWEEN_TIME_SLICES));
       _chkShowValuePointTooltip     .setSelection( _prefStore.getBoolean(ITourbookPreferences.VALUE_POINT_TOOL_TIP_IS_VISIBLE_MAP2));
 
+      // tile debug info/border
+      _chkShowGeoGridBorder             .setSelection(_prefStore.getBoolean(Map2View.PREF_DEBUG_MAP_SHOW_GEO_GRID));
+      _chkShowTileInfo                  .setSelection(_prefStore.getBoolean(Map2View.PREF_SHOW_TILE_INFO));
+      _chkShowTileBorder                .setSelection(_prefStore.getBoolean(Map2View.PREF_SHOW_TILE_BORDER));
+
       /*
        * Map dimming & transparency
        */
@@ -366,6 +402,11 @@ public class SlideoutMap2_Options extends ToolbarSlideout implements
       _state.put(Map2View.STATE_IS_TOGGLE_KEYBOARD_PANNING,       _chkIsToggleKeyboardPanning.getSelection());
 
       _prefStore.setValue(ITourbookPreferences.GRAPH_IS_SELECT_INBETWEEN_TIME_SLICES, _chkSelectInbetweenTimeSlices.getSelection());
+
+      // tile debug info/border
+      _prefStore.setValue(Map2View.PREF_DEBUG_MAP_SHOW_GEO_GRID,  _chkShowGeoGridBorder.getSelection());
+      _prefStore.setValue(Map2View.PREF_SHOW_TILE_BORDER,         _chkShowTileBorder.getSelection());
+      _prefStore.setValue(Map2View.PREF_SHOW_TILE_INFO,           _chkShowTileInfo.getSelection());
 
       /*
        * Map dimming & transparency

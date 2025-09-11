@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2024 Wolfgang Schramm and Contributors
+ * Copyright (C) 2024, 2025 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -34,21 +34,16 @@ import org.eclipse.ui.PlatformUI;
 
 public class ThemeUtil {
 
-   public static final String  DEFAULT_BACKGROUND_LIGHT_THEME = "fff";   //$NON-NLS-1$
-   public static final String  DEFAULT_FOREGROUND_LIGHT_THEME = "333";   //$NON-NLS-1$
+   public static final String DEFAULT_BACKGROUND_LIGHT_THEME = "fff";   //$NON-NLS-1$
+   public static final String DEFAULT_FOREGROUND_LIGHT_THEME = "333";   //$NON-NLS-1$
 
-   public static final String  DEFAULT_FOREGROUND_DARK_THEME  = "ddd";   //$NON-NLS-1$
-   public static final String  DEFAULT_BACKGROUND_DARK_THEME  = "333";   //$NON-NLS-1$
-
-   /**
-    * Currently only .png files are supported for themed images !!!
-    */
-   private static final String IMAGE_NAME_EXTENSION_PNG       = ".png";  //$NON-NLS-1$
+   public static final String DEFAULT_FOREGROUND_DARK_THEME  = "ddd";   //$NON-NLS-1$
+   public static final String DEFAULT_BACKGROUND_DARK_THEME  = "333";   //$NON-NLS-1$
 
    /**
     * All images for the dark theme should have this postfix before the file extension
     */
-   public static final String  DARK_THEME_POSTFIX             = "-dark"; //$NON-NLS-1$
+   public static final String DARK_THEME_POSTFIX             = "-dark"; //$NON-NLS-1$
 
    /*
     * Copied from org.eclipse.e4.ui.internal.workbench.swt.E4Application
@@ -253,7 +248,10 @@ public class ThemeUtil {
 
       if (UI.IS_DARK_THEME) {
 
-         imageNameThemed = imageName.substring(0, imageName.length() - 4) + DARK_THEME_POSTFIX + IMAGE_NAME_EXTENSION_PNG;
+         final int nameLength = imageName.length();
+         final String nameExtension = imageName.substring(nameLength - 4, nameLength);
+
+         imageNameThemed = imageName.substring(0, nameLength - 4) + DARK_THEME_POSTFIX + nameExtension;
 
       } else {
          imageNameThemed = imageName;
@@ -270,7 +268,10 @@ public class ThemeUtil {
     */
    public static String getThemedImageName_Dark(final String imageName) {
 
-      return imageName.substring(0, imageName.length() - 4) + DARK_THEME_POSTFIX + IMAGE_NAME_EXTENSION_PNG;
+      final int nameLength = imageName.length();
+      final String nameExtension = imageName.substring(nameLength - 4, nameLength);
+
+      return imageName.substring(0, nameLength - 4) + DARK_THEME_POSTFIX + nameExtension;
    }
 
    /**

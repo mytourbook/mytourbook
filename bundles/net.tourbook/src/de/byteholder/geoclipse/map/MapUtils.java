@@ -212,32 +212,6 @@ public class MapUtils {
       return createTransparentImageData_10(transparentImageData);
    }
 
-   /**
-    * Create a transparent image
-    *
-    * @param imageWidth
-    * @param imageHeight
-    *
-    * @return
-    */
-   public static ImageData createTransparentImageData(final int imageWidth, final int imageHeight) {
-
-      ImageData transparentImageData;
-
-      if (net.tourbook.common.UI.IS_OSX) {
-
-         // OSX
-         transparentImageData = new ImageData(imageWidth, imageHeight, 32, getPaletteData());
-
-      } else {
-
-         // Win & Linux
-         transparentImageData = new ImageData(imageWidth, imageHeight, 24, getPaletteData());
-      }
-
-      return createTransparentImageData_10(transparentImageData);
-   }
-
    private static ImageData createTransparentImageData_10(final ImageData transparentImageData) {
 
       final RGB transparentRGB = Map2.getTransparentRGB();

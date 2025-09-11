@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2024 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2025 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -27,6 +27,8 @@ import net.tourbook.chart.GraphDrawingData;
 import net.tourbook.chart.IChartLayer;
 import net.tourbook.chart.IChartOverlay;
 import net.tourbook.common.UI;
+import net.tourbook.photo.Photo;
+import net.tourbook.tour.photo.TourPhotoManager;
 
 import org.eclipse.jface.layout.PixelConverter;
 import org.eclipse.swt.SWT;
@@ -324,11 +326,14 @@ public class ChartLayerPhoto implements IChartLayer, IChartOverlay {
          yPhotoCategoryOffset -= PHOTO_ICON_SIZE + PHOTO_ICON_SPACING;
 
          final ArrayList<ChartPhoto> chartPhotos = photoCategorie.chartPhotos;
+         final int numPhotos = chartPhotos.size();
 
-         int photoIndex = 0;
-         final Point[] photoPositions = photoCategorie.photoPositions = new Point[chartPhotos.size()];
+         final Point[] allPhotoPositions = photoCategorie.photoPositions = new Point[numPhotos];
+         final boolean[] allGeoPositionedPhotos = photoCategorie.allGeoPositionedPhotos = new boolean[numPhotos];
 
-         for (final ChartPhoto chartPhoto : chartPhotos) {
+         for (int photoIndex = 0; photoIndex < numPhotos; photoIndex++) {
+
+            final ChartPhoto chartPhoto = chartPhotos.get(photoIndex);
 
             final double devXPhotoValue = scaleX * chartPhoto.xValue;
             final int devXPhoto = (int) (devXPhotoValue - devGraphImageOffset);
@@ -337,8 +342,6 @@ public class ChartLayerPhoto implements IChartLayer, IChartOverlay {
             if (devXPhoto < groupHGrid) {
 
                // skip invisible photos
-
-               photoIndex++;
 
                continue;
             }
@@ -379,8 +382,12 @@ public class ChartLayerPhoto implements IChartLayer, IChartOverlay {
                }
             }
 
+            final Photo photo = chartPhoto.photo;
+            final boolean isGeoPositioned = TourPhotoManager.isPhotoGeoPositioned(photo);
+
             // keep photo position which is used when tooltip is displayed
-            photoPositions[photoIndex++] = new Point(devXPhoto, devYPhoto);
+            allPhotoPositions[photoIndex] = new Point(devXPhoto, devYPhoto);
+            allGeoPositionedPhotos[photoIndex] = isGeoPositioned;
          }
       }
 
@@ -533,16 +540,16 @@ public class ChartLayerPhoto implements IChartLayer, IChartOverlay {
 
             drawPhotoAndGroup(gc, paintGroup, photoCategory);
 
-//				/*
-//				 * Debug: draw grid
-//				 */
-//				final int yHitHeight = groupY + groupHeight;// + 2 * GROUP_Y_HIT_BORDER;
-//				gc.setLineWidth(1);
-//				gc.setForeground(_display.getSystemColor(SWT.COLOR_RED));
-//				gc.drawLine(paintGroup.hGridStart, groupY, paintGroup.hGridStart, yHitHeight);
+//            /*
+//             * Debug: draw grid
+//             */
+//            final int yHitHeight = groupY + groupHeight;// + 2 * GROUP_Y_HIT_BORDER;
+//            gc.setLineWidth(1);
+//            gc.setForeground(UI.SYS_COLOR_RED);
+//            gc.drawLine(paintGroup.hGridStart, groupY, paintGroup.hGridStart, yHitHeight);
 //
-//				gc.setForeground(_display.getSystemColor(SWT.COLOR_DARK_BLUE));
-//				gc.drawLine(paintGroup.hGridEnd, groupY, paintGroup.hGridEnd, yHitHeight);
+//            gc.setForeground(UI.SYS_COLOR_BLUE);
+//            gc.drawLine(paintGroup.hGridEnd, groupY, paintGroup.hGridEnd, yHitHeight);
          }
       }
    }
@@ -565,6 +572,7 @@ public class ChartLayerPhoto implements IChartLayer, IChartOverlay {
    private void drawPhotoAndGroup(final GC gc, final PhotoPaintGroup paintGroup, final PhotoCategory photoCategory) {
 
       final Point[] photoPositions = photoCategory.photoPositions;
+      final boolean[] allGeoPositionedPhotos = photoCategory.allGeoPositionedPhotos;
 
       int prevDevYPhoto = Integer.MIN_VALUE;
       int prevDevXPhoto = Integer.MIN_VALUE;
@@ -589,6 +597,15 @@ public class ChartLayerPhoto implements IChartLayer, IChartOverlay {
          // optimize painting
          if (devXPhoto == prevDevXPhoto && devYPhoto == prevDevYPhoto) {
             continue;
+         }
+
+         if (allGeoPositionedPhotos[photoIndex]) {
+
+            gc.setBackground(UI.IS_DARK_THEME ? UI.SYS_COLOR_GREEN : UI.SYS_COLOR_RED);
+
+         } else {
+
+            gc.setBackground(_photoPointColor);
          }
 
          gc.fillRectangle(

@@ -22,15 +22,19 @@
 
       <move 
          file     ="${tycho-path}\products\mytourbook-${tycho-version}-macosx.cocoa.x86_64.tar.gz"
-         tofile   ="${tycho-path}\products\mytourbook-${tycho-version}-macos_x86_THIS_IS_NOT_SUPPORTED.tar.gz"/>
+         tofile   ="${tycho-path}\products\mytourbook-${tycho-version}-macos_x86.tar.gz"/>
 
       <move 
          file     ="${tycho-path}\products\mytourbook-${tycho-version}-macosx.cocoa.aarch64.tar.gz"
-         tofile   ="${tycho-path}\products\mytourbook-${tycho-version}-macos_arm_THIS_IS_NOT_SUPPORTED.tar.gz"/>
+         tofile   ="${tycho-path}\products\mytourbook-${tycho-version}-macos_arm.tar.gz"/>
 
       <move 
          file     ="${tycho-path}\products\mytourbook-${tycho-version}-win32.win32.x86_64.zip"
-         tofile   ="${tycho-path}\products\mytourbook-${tycho-version}-win.zip"/>
+         tofile   ="${tycho-path}\products\mytourbook-${tycho-version}-win.x86.zip"/>
+
+      <move 
+         file     ="${tycho-path}\products\mytourbook-${tycho-version}-win32.win32.aarch64.zip"
+         tofile   ="${tycho-path}\products\mytourbook-${tycho-version}-win.arm.zip"/>
 
    	<!-- 
    	
@@ -39,7 +43,7 @@
    	-->
       <move 
          file     ="${tycho-path}\products\mytourbook-jre-${tycho-version}-win32.win32.x86_64.zip"
-         tofile   ="${tycho-path}\products\mytourbook-jre-${tycho-version}-win.zip"/>
+         tofile   ="${tycho-path}\products\mytourbook-jre-${tycho-version}-win.x86.zip"/>
    
    </target>
    

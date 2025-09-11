@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2022, 2023 Frédéric Bard
+ * Copyright (C) 2022, 2025 Frédéric Bard
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -128,7 +128,7 @@ public class SuuntoCloudDownloaderTests extends UITest {
 
       final String filename = "2011-01-13.fit"; //$NON-NLS-1$
       httpClientMock.onGet(
-            OAuth2Utils.createOAuthPasseurUri("/suunto/workout/exportFit?workoutKey=601227a563c46e612c20b579").toString()) //$NON-NLS-1$
+            OAuth2Utils.createOAuthPasseurUri("/suunto/workouts/601227a563c46e612c20b579/fit").toString()) //$NON-NLS-1$
             .doReturn(UI.EMPTY_STRING)
             .withHeader("Content-Disposition", "attachment; filename=\"" + filename + "\"") //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
             .withStatus(200);
@@ -140,7 +140,7 @@ public class SuuntoCloudDownloaderTests extends UITest {
 
       // Assert
       httpClientMock.verify().get(OAuth2Utils.createOAuthPasseurUri("/suunto/workouts?since=1293840000000&until=1295049600000").toString()).called(); //$NON-NLS-1$
-      httpClientMock.verify().get(OAuth2Utils.createOAuthPasseurUri("/suunto/workout/exportFit?workoutKey=601227a563c46e612c20b579").toString()) //$NON-NLS-1$
+      httpClientMock.verify().get(OAuth2Utils.createOAuthPasseurUri("/suunto/workouts/601227a563c46e612c20b579/fit").toString()) //$NON-NLS-1$
             .called();
 
       List<?> logs = TourLogManager.getLogs();

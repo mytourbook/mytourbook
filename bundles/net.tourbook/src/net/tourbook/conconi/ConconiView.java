@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2024 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2025 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -92,39 +92,43 @@ public class ConconiView extends ViewPart {
 
 	private static final String		GRID_PREF_PREFIX							= "GRID_CONCONI__";															//$NON-NLS-1$
 
-	private static final String		GRID_IS_SHOW_VERTICAL_GRIDLINES		= (GRID_PREF_PREFIX	+ ITourbookPreferences.CHART_GRID_IS_SHOW_VERTICAL_GRIDLINES);
-	private static final String		GRID_IS_SHOW_HORIZONTAL_GRIDLINES	= (GRID_PREF_PREFIX	+ ITourbookPreferences.CHART_GRID_IS_SHOW_HORIZONTAL_GRIDLINES);
-	private static final String		GRID_VERTICAL_DISTANCE					= (GRID_PREF_PREFIX + ITourbookPreferences.CHART_GRID_VERTICAL_DISTANCE);
-	private static final String		GRID_HORIZONTAL_DISTANCE				= (GRID_PREF_PREFIX + ITourbookPreferences.CHART_GRID_HORIZONTAL_DISTANCE);
+	private static final String		GRID_IS_SHOW_VERTICAL_GRIDLINES		= GRID_PREF_PREFIX   + ITourbookPreferences.CHART_GRID_IS_SHOW_VERTICAL_GRIDLINES;
+	private static final String		GRID_IS_SHOW_HORIZONTAL_GRIDLINES	= GRID_PREF_PREFIX	+ ITourbookPreferences.CHART_GRID_IS_SHOW_HORIZONTAL_GRIDLINES;
+	private static final String		GRID_VERTICAL_DISTANCE					= GRID_PREF_PREFIX   + ITourbookPreferences.CHART_GRID_VERTICAL_DISTANCE;
+	private static final String		GRID_HORIZONTAL_DISTANCE				= GRID_PREF_PREFIX   + ITourbookPreferences.CHART_GRID_HORIZONTAL_DISTANCE;
+
+	private static final String		LAYOUT_PREF_PREFIX						= "LAYOUT_CONCONI__";														//$NON-NLS-1$
+   private static final String      LAYOUT_GRAPH_Y_AXIS_WIDTH           = LAYOUT_PREF_PREFIX + ITourbookPreferences.CHART_Y_AXIS_WIDTH;
 
 // SET_FORMATTING_ON
 
-   private final IPreferenceStore  _prefStore              = TourbookPlugin.getPrefStore();
-   private final IPreferenceStore  _prefStore_Common       = CommonActivator.getPrefStore();
-   private final IDialogSettings   _state                  = TourbookPlugin.getState(ID);
+   private static final IDialogSettings  _state                  = TourbookPlugin.getState(ID);
+   private static final IPreferenceStore _prefStore              = TourbookPlugin.getPrefStore();
+   private static final IPreferenceStore _prefStore_Common       = CommonActivator.getPrefStore();
 
-   private ISelectionListener      _postSelectionListener;
-   private IPropertyChangeListener _prefChangeListener;
-   private ITourEventListener      _tourEventListener;
+   private ISelectionListener            _postSelectionListener;
+   private IPropertyChangeListener       _prefChangeListener;
+   private IPropertyChangeListener       _prefChangeListener_Common;
+   private ITourEventListener            _tourEventListener;
 
-   private ChartDataYSerie         _yDataPulse;
-   private ConconiData             _conconiDataForSelectedTour;
+   private ChartDataYSerie               _yDataPulse;
+   private ConconiData                   _conconiDataForSelectedTour;
 
-   private boolean                 _isUpdateUI             = false;
-   private boolean                 _isSelectionDisabled    = true;
-   private boolean                 _isSaving;
+   private boolean                       _isUpdateUI             = false;
+   private boolean                       _isSelectionDisabled    = true;
+   private boolean                       _isSaving;
 
-   private TourData                _selectedTour;
+   private TourData                      _selectedTour;
 
-   private int                     _originalTourDeflection = -1;
-   private int                     _modifiedTourDeflection = -1;
+   private int                           _originalTourDeflection = -1;
+   private int                           _modifiedTourDeflection = -1;
 
-   private PixelConverter          _pc;
-   private FormToolkit             _tk;
+   private PixelConverter                _pc;
+   private FormToolkit                   _tk;
 
-   private ActionConconiOptions    _actionConconiOptions;
+   private ActionConconiOptions          _actionConconiOptions;
 
-   private int                     _hintDefaultSpinnerWidth;
+   private int                           _hintDefaultSpinnerWidth;
 
    /*
     * UI controls
@@ -152,7 +156,12 @@ public class ConconiView extends ViewPart {
       @Override
       protected ToolbarSlideout createSlideout(final ToolBar toolbar) {
 
-         return new SlideoutConconiOptions(_pageBook, toolbar, GRID_PREF_PREFIX, ConconiView.this);
+         return new SlideoutConconiOptions(
+               _pageBook,
+               toolbar,
+               GRID_PREF_PREFIX,
+               LAYOUT_PREF_PREFIX,
+               ConconiView.this);
       }
    }
 
@@ -169,7 +178,9 @@ public class ConconiView extends ViewPart {
                || property.equals(GRID_VERTICAL_DISTANCE)
                || property.equals(GRID_IS_SHOW_HORIZONTAL_GRIDLINES)
                || property.equals(GRID_IS_SHOW_VERTICAL_GRIDLINES)
-         //
+
+               || property.equals(LAYOUT_GRAPH_Y_AXIS_WIDTH)
+
          ) {
 
             // grid has changed, update chart
@@ -177,7 +188,20 @@ public class ConconiView extends ViewPart {
          }
       };
 
+      _prefChangeListener_Common = propertyChangeEvent -> {
+
+         final String property = propertyChangeEvent.getProperty();
+
+         if (property.equals(ICommonPreferences.UI_DRAWING_FONT_IS_MODIFIED)) {
+
+            _chartConconiTest.getChartComponents().updateFontScaling();
+
+            updateChartProperties();
+         }
+      };
+
       _prefStore.addPropertyChangeListener(_prefChangeListener);
+      _prefStore_Common.addPropertyChangeListener(_prefChangeListener_Common);
    }
 
    /**
@@ -759,7 +783,9 @@ public class ConconiView extends ViewPart {
 
       getSite().getPage().removeSelectionListener(_postSelectionListener);
       TourManager.getInstance().removeTourEventListener(_tourEventListener);
+
       _prefStore.removePropertyChangeListener(_prefChangeListener);
+      _prefStore_Common.removePropertyChangeListener(_prefChangeListener_Common);
 
       super.dispose();
    }
@@ -1023,7 +1049,7 @@ public class ConconiView extends ViewPart {
 
    private void updateChartProperties() {
 
-      net.tourbook.ui.UI.updateChartProperties(_chartConconiTest, GRID_PREF_PREFIX);
+      net.tourbook.ui.UI.updateChartProperties(_chartConconiTest, GRID_PREF_PREFIX, LAYOUT_PREF_PREFIX);
    }
 
    private void updateUI_10_SetupConconi() {

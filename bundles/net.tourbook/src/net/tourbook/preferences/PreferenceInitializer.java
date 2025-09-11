@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2024 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2025 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -256,14 +256,17 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
       store.setDefault(ITourbookPreferences.GRAPH_IS_SHOW_NIGHT_SECTIONS, true);
       store.setDefault(ITourbookPreferences.GRAPH_NIGHT_SECTIONS_OPACITY, 0x80);
 
+      // speed/pace interval graph, unit is meters
+      store.setDefault(ITourbookPreferences.GRAPH_SPEED_PACE_DISTANCE_INTERVAL, 1000);
+
       // graph grid
       store.setDefault(ITourbookPreferences.CHART_GRID_VERTICAL_DISTANCE, 80);
       store.setDefault(ITourbookPreferences.CHART_GRID_HORIZONTAL_DISTANCE, 80);
       store.setDefault(ITourbookPreferences.CHART_GRID_IS_SHOW_HORIZONTAL_GRIDLINES, false);
       store.setDefault(ITourbookPreferences.CHART_GRID_IS_SHOW_VERTICAL_GRIDLINES, false);
 
-      // speed/pace interval graph, unit is meters
-      store.setDefault(ITourbookPreferences.GRAPH_SPEED_PACE_DISTANCE_INTERVAL, 1000);
+      // chart layout
+      store.setDefault(ITourbookPreferences.CHART_Y_AXIS_WIDTH, 50);
 
       /*
        * Min/Max values
@@ -355,7 +358,7 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
       store.setDefault(ITourbookPreferences.VALUE_POINT_TOOL_TIP_IS_VISIBLE_MAP2, true);
 
       /*
-       * graph smoothing
+       * Graph smoothing
        */
       // algorithm
       store.setDefault(ITourbookPreferences.GRAPH_SMOOTHING_SMOOTHING_ALGORITHM, ISmoothingAlgorithm.SMOOTHING_ALGORITHM_JAMET);
@@ -376,6 +379,13 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
 
       // speed
       store.setDefault(ITourbookPreferences.GRAPH_JAMET_SMOOTHING_SPEED_TAU, 10.0);
+
+      /*
+       * Elevation adjustment smoothing
+       */
+      store.setDefault(ITourbookPreferences.ADJUST_ELEVATION_GRAPH_JAMET_SMOOTHING_REPEATED_SMOOTHING, 1);
+      store.setDefault(ITourbookPreferences.ADJUST_ELEVATION_GRAPH_JAMET_SMOOTHING_REPEATED_TAU, 1.0);
+      store.setDefault(ITourbookPreferences.ADJUST_ELEVATION_GRAPH_JAMET_SMOOTHING_GRADIENT_TAU, 10.0);
 
       /*
        * Display formats
@@ -563,8 +573,6 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
        * Tour Nutrition
        */
       store.setDefault(ITourbookPreferences.NUTRITION_IGNORE_FIRST_HOUR, false);
-
-      // SET_FORMATTING_ON
    }
 
 }

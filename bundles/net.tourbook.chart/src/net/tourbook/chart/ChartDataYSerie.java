@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2025 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -292,6 +292,7 @@ public class ChartDataYSerie extends ChartDataSerie {
 
    /**
     * @param valueSeries
+    *
     * @return Returns first value of a dataseries.
     */
    private float getFirstMinMax(final float[][] valueSeries) {
@@ -431,10 +432,6 @@ public class ChartDataYSerie extends ChartDataSerie {
 
    public int getSymbolSize() {
       return _symbolSize;
-   }
-
-   public String getXTitle() {
-      return null;
    }
 
    /**

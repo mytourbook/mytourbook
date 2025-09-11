@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2025 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -15,8 +15,8 @@
  *******************************************************************************/
 package net.tourbook.map2.action;
 
-import net.tourbook.Images;
-import net.tourbook.application.TourbookPlugin;
+import net.tourbook.common.CommonActivator;
+import net.tourbook.common.CommonImages;
 import net.tourbook.map2.Messages;
 import net.tourbook.map2.view.Map2View;
 
@@ -34,7 +34,7 @@ public class ActionReloadFailedMapImages extends Action {
 
       setText(Messages.map_action_reload_map);
 
-      setImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.App_Refresh));
+      setImageDescriptor(CommonActivator.getThemedImageDescriptor(CommonImages.App_Refresh));
    }
 
    @Override

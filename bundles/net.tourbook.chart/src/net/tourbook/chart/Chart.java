@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2025 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -146,6 +146,11 @@ public class Chart extends ViewForm {
     * Antialiasing for the graph, can be {@link SWT#ON} or {@link SWT#OFF}.
     */
    public int                                        graphAntialiasing                = SWT.OFF;
+
+   /**
+    * Width of the vertical axis
+    */
+   public int                                        yAxisWidth                       = 50;
 
    /*
     * Segment alternate color
@@ -707,7 +712,7 @@ public class Chart extends ViewForm {
     *         title height and/or horizontal slider label height.
     */
    public int getMarginTop() {
-      return _chartComponents.getDevChartMarginTop();
+      return _chartComponents.getDevChartMargin_Top();
    }
 
    public MouseWheelMode getMouseWheelMode() {
@@ -813,13 +818,6 @@ public class Chart extends ViewForm {
       return _isInUpdateUI;
    }
 
-   /**
-    * @return Returns <code>true</code> when the x-sliders are visible
-    */
-   public boolean isXSliderVisible() {
-      return _chartComponents.devSliderBarHeight != 0;
-   }
-
    void onExecuteMouseWheelMode(final MouseWheelMode mouseWheelMode) {
       setMouseWheelMode(mouseWheelMode);
    }
@@ -845,11 +843,17 @@ public class Chart extends ViewForm {
 
    void onExecuteZoomIn(final double accelerator) {
 
-      if (_chartComponents.devSliderBarHeight == 0) {
-         _chartComponents.getChartComponentGraph().zoomInWithoutSlider();
-         _chartComponents.onResize();
+      final ChartComponentGraph chartComponentGraph = _chartComponents.getChartComponentGraph();
+
+      if (chartComponentGraph.isXSliderVisible()) {
+
+         chartComponentGraph.zoomInWithMouse(Integer.MIN_VALUE, accelerator);
+
       } else {
-         _chartComponents.getChartComponentGraph().zoomInWithMouse(Integer.MIN_VALUE, accelerator);
+
+         chartComponentGraph.zoomInWithoutSlider();
+
+         _chartComponents.onResize();
       }
    }
 
@@ -1460,7 +1464,8 @@ public class Chart extends ViewForm {
                                 final boolean isVGridVisible,
                                 final boolean isAlternateColor,
                                 final RGB rgbAlternateColor_Light,
-                                final RGB rgbAlternateColor_Dark) {
+                                final RGB rgbAlternateColor_Dark,
+                                final int yAxisWidth_Value) {
 
       gridHorizontalDistance = horizontalGrid;
       gridVerticalDistance = verticalGrid;
@@ -1471,6 +1476,8 @@ public class Chart extends ViewForm {
       isShowSegmentAlternateColor = isAlternateColor;
       segmentAlternateColor_Light = rgbAlternateColor_Light;
       segmentAlternateColor_Dark = rgbAlternateColor_Dark;
+
+      yAxisWidth = yAxisWidth_Value;
 
       _chartComponents.onResize();
    }

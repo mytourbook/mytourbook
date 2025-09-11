@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2022 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2025 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -40,19 +40,19 @@ import org.eclipse.swt.widgets.ToolItem;
 
 public class ActionShowTourInMap3 extends ContributionItem implements IOpeningDialog {
 
-   private static final String   ID        = "ACTION_TRACK_LAYER_PROPERTIES_ID"; //$NON-NLS-1$
+   private static final String         ID        = "ACTION_TRACK_LAYER_PROPERTIES_ID"; //$NON-NLS-1$
 
-   private Map3View              _map3View;
+   private Map3View                    _map3View;
 
    private SlideoutMap3TourTrackConfig _tourTrackConfigDialog;
 
-   private ToolBar               _toolBar;
-   private ToolItem              _actionTrackLayer;
+   private ToolBar                     _toolBar;
+   private ToolItem                    _actionTrackLayer;
 
-   private boolean               _isActionEnabled;
-   private boolean               _isActionSelected;
+   private boolean                     _isActionEnabled;
+   private boolean                     _isActionSelected;
 
-   private String                _dialogId = getClass().getCanonicalName();
+   private String                      _dialogId = getClass().getCanonicalName();
 
    /*
     * UI controls
@@ -63,7 +63,6 @@ public class ActionShowTourInMap3 extends ContributionItem implements IOpeningDi
     * UI resources
     */
    private Image _actionImage;
-   private Image _actionImageDisabled;
 
    public ActionShowTourInMap3(final Map3View map3View, final Control parent) {
 
@@ -74,7 +73,6 @@ public class ActionShowTourInMap3 extends ContributionItem implements IOpeningDi
       _parent = parent;
 
       _actionImage = TourbookPlugin.getThemedImageDescriptor(Images.TourChart).createImage();
-      _actionImageDisabled = TourbookPlugin.getThemedImageDescriptor(Images.TourChart_Disabled).createImage();
    }
 
    @Override
@@ -108,7 +106,6 @@ public class ActionShowTourInMap3 extends ContributionItem implements IOpeningDi
 
          // !!! image must be set before enable state is set
          _actionTrackLayer.setImage(_actionImage);
-         _actionTrackLayer.setDisabledImage(_actionImageDisabled);
 
          _actionTrackLayer.setSelection(_isActionSelected);
          _actionTrackLayer.setEnabled(_isActionEnabled);
@@ -143,7 +140,6 @@ public class ActionShowTourInMap3 extends ContributionItem implements IOpeningDi
    private void onDispose() {
 
       _actionImage.dispose();
-      _actionImageDisabled.dispose();
 
       _actionTrackLayer.dispose();
       _actionTrackLayer = null;

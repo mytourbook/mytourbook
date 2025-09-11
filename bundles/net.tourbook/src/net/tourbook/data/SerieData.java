@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2025 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -17,6 +17,8 @@ package net.tourbook.data;
 
 import java.io.Serializable;
 import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
 
 import net.tourbook.common.UI;
 
@@ -169,7 +171,8 @@ public class SerieData implements Serializable {
    public long[]               pausedTime_End;
 
    /**
-    * An auto-pause happened when a value is 1, otherwise the pause was triggered by the user with a device button
+    * An auto-pause happened when a value is 1, otherwise the pause was triggered by the user with a
+    * device button
     */
    public long[]               pausedTime_Data;
 
@@ -191,6 +194,14 @@ public class SerieData implements Serializable {
     * @since 21.9
     */
    public short[]              battery_Percentage;
+
+   /**
+    * Contains the {@link TourPhoto} ID's where the geo position was set for photos, the other photo
+    * geo positions will be interpolated
+    *
+    * @since 25.x
+    */
+   public long[]               tourPhotosWithPositionedGeo;
 
    private String dataSerieValues(final boolean[] dataSerie) {
 
@@ -267,6 +278,32 @@ public class SerieData implements Serializable {
       return formattedText.substring(0, Math.min(formattedText.length(), VALUE_TEXT_MAX_LENGTH));
    }
 
+   public Set<Long> getTourPhotosWithPositionedGeo() {
+
+      final Set<Long> all = new HashSet<>();
+
+      if (tourPhotosWithPositionedGeo != null) {
+
+         for (final long value : tourPhotosWithPositionedGeo) {
+            all.add(value);
+         }
+      }
+
+      return all;
+   }
+
+   public void setTourPhotosWithPositionedGeo(final Set<Long> tourPhotosWithPositionedGeoSet) {
+
+      if (tourPhotosWithPositionedGeoSet != null) {
+
+         tourPhotosWithPositionedGeo = tourPhotosWithPositionedGeoSet
+
+               .stream()
+               .mapToLong(value -> value.longValue())
+               .toArray();
+      }
+   }
+
    @Override
    public String toString() {
 
@@ -276,40 +313,42 @@ public class SerieData implements Serializable {
 
       return NL + NL
 
-            + "   timeSerie                  " + dataSerieValues(timeSerie)                     + NL //$NON-NLS-1$
-            + "   pausedTime_Start           " + dataSerieValues(pausedTime_Start)              + NL //$NON-NLS-1$
-            + "   pausedTime_End             " + dataSerieValues(pausedTime_End)                + NL //$NON-NLS-1$
-            + "   pulseTimes                 " + dataSerieValues(pulseTimes)                    + NL //$NON-NLS-1$
+            + "   timeSerie                     " + dataSerieValues(timeSerie)                     + NL //$NON-NLS-1$
+            + "   pausedTime_Start              " + dataSerieValues(pausedTime_Start)              + NL //$NON-NLS-1$
+            + "   pausedTime_End                " + dataSerieValues(pausedTime_End)                + NL //$NON-NLS-1$
+            + "   pulseTimes                    " + dataSerieValues(pulseTimes)                    + NL //$NON-NLS-1$
 
-            + "   altitudeSerie20            " + dataSerieValues(altitudeSerie20)               + NL //$NON-NLS-1$
-            + "   cadenceSerie20             " + dataSerieValues(cadenceSerie20)                + NL //$NON-NLS-1$
-            + "   distanceSerie20            " + dataSerieValues(distanceSerie20)               + NL //$NON-NLS-1$
-            + "   powerSerie20               " + dataSerieValues(powerSerie20)                  + NL //$NON-NLS-1$
-            + "   pulseSerie20               " + dataSerieValues(pulseSerie20)                  + NL //$NON-NLS-1$
-            + "   speedSerie20               " + dataSerieValues(speedSerie20)                  + NL //$NON-NLS-1$
-            + "   temperatureSerie20         " + dataSerieValues(temperatureSerie20)            + NL //$NON-NLS-1$
+            + "   altitudeSerie20               " + dataSerieValues(altitudeSerie20)               + NL //$NON-NLS-1$
+            + "   cadenceSerie20                " + dataSerieValues(cadenceSerie20)                + NL //$NON-NLS-1$
+            + "   distanceSerie20               " + dataSerieValues(distanceSerie20)               + NL //$NON-NLS-1$
+            + "   powerSerie20                  " + dataSerieValues(powerSerie20)                  + NL //$NON-NLS-1$
+            + "   pulseSerie20                  " + dataSerieValues(pulseSerie20)                  + NL //$NON-NLS-1$
+            + "   speedSerie20                  " + dataSerieValues(speedSerie20)                  + NL //$NON-NLS-1$
+            + "   temperatureSerie20            " + dataSerieValues(temperatureSerie20)            + NL //$NON-NLS-1$
 
-            + "   gears                      " + dataSerieValues(gears)                         + NL //$NON-NLS-1$
+            + "   gears                         " + dataSerieValues(gears)                         + NL //$NON-NLS-1$
 
-            + "   latitudeE6                 " + dataSerieValues(latitudeE6)                    + NL //$NON-NLS-1$
-            + "   longitudeE6                " + dataSerieValues(longitudeE6)                   + NL //$NON-NLS-1$
+            + "   latitudeE6                    " + dataSerieValues(latitudeE6)                    + NL //$NON-NLS-1$
+            + "   longitudeE6                   " + dataSerieValues(longitudeE6)                   + NL //$NON-NLS-1$
 
-            + "   runDyn_StanceTime          " + dataSerieValues(runDyn_StanceTime)             + NL //$NON-NLS-1$
-            + "   runDyn_StanceTimeBalance   " + dataSerieValues(runDyn_StanceTimeBalance)      + NL //$NON-NLS-1$
-            + "   runDyn_StepLength          " + dataSerieValues(runDyn_StepLength)             + NL //$NON-NLS-1$
-            + "   runDyn_VerticalOscillation " + dataSerieValues(runDyn_VerticalOscillation)    + NL //$NON-NLS-1$
-            + "   runDyn_VerticalRatio       " + dataSerieValues(runDyn_VerticalRatio)          + NL //$NON-NLS-1$
+            + "   runDyn_StanceTime             " + dataSerieValues(runDyn_StanceTime)             + NL //$NON-NLS-1$
+            + "   runDyn_StanceTimeBalance      " + dataSerieValues(runDyn_StanceTimeBalance)      + NL //$NON-NLS-1$
+            + "   runDyn_StepLength             " + dataSerieValues(runDyn_StepLength)             + NL //$NON-NLS-1$
+            + "   runDyn_VerticalOscillation    " + dataSerieValues(runDyn_VerticalOscillation)    + NL //$NON-NLS-1$
+            + "   runDyn_VerticalRatio          " + dataSerieValues(runDyn_VerticalRatio)          + NL //$NON-NLS-1$
 
-            + "   swim_LengthType            " + dataSerieValues(swim_LengthType)               + NL //$NON-NLS-1$
-            + "   swim_Cadence               " + dataSerieValues(swim_Cadence)                  + NL //$NON-NLS-1$
-            + "   swim_Strokes               " + dataSerieValues(swim_Strokes)                  + NL //$NON-NLS-1$
-            + "   swim_StrokeStyle           " + dataSerieValues(swim_StrokeStyle)              + NL //$NON-NLS-1$
-            + "   swim_Time                  " + dataSerieValues(swim_Time)                     + NL //$NON-NLS-1$
+            + "   swim_LengthType               " + dataSerieValues(swim_LengthType)               + NL //$NON-NLS-1$
+            + "   swim_Cadence                  " + dataSerieValues(swim_Cadence)                  + NL //$NON-NLS-1$
+            + "   swim_Strokes                  " + dataSerieValues(swim_Strokes)                  + NL //$NON-NLS-1$
+            + "   swim_StrokeStyle              " + dataSerieValues(swim_StrokeStyle)              + NL //$NON-NLS-1$
+            + "   swim_Time                     " + dataSerieValues(swim_Time)                     + NL //$NON-NLS-1$
 
-            + "   battery_Time               " + dataSerieValues(battery_Time)                  + NL //$NON-NLS-1$
-            + "   battery_Percentage         " + dataSerieValues(battery_Percentage)            + NL //$NON-NLS-1$
+            + "   battery_Time                  " + dataSerieValues(battery_Time)                  + NL //$NON-NLS-1$
+            + "   battery_Percentage            " + dataSerieValues(battery_Percentage)            + NL //$NON-NLS-1$
 
-            + "   visiblePoints_Surfing      " + dataSerieValues(visiblePoints_Surfing)         + NL //$NON-NLS-1$
+            + "   visiblePoints_Surfing         " + dataSerieValues(visiblePoints_Surfing)         + NL //$NON-NLS-1$
+
+            + "   tourPhotosWithGeoPosition     " + dataSerieValues(tourPhotosWithPositionedGeo)   + NL //$NON-NLS-1$
 
             ;
    }

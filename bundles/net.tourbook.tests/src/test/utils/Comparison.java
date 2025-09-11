@@ -87,14 +87,14 @@ public class Comparison {
          controlFileContentArray.replaceAll(line -> line = line.replace("application_version,\"2411\"", genericApplicationVersion)); //$NON-NLS-1$
 
          // Regular expression to match the version pattern
-         String regex = "(software_version,)\\" + "\"\\d+\\.\\d+\\" + "\"";
+         String regex = "(software_version,)\\" + "\"\\d+\\.\\d+\\" + "\""; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
          Pattern pattern = Pattern.compile(regex);
 
          for (int index = 0; index < testFileContentArray.size(); index++) {
 
             String line = testFileContentArray.get(index);
             Matcher matcher = pattern.matcher(line);
-            String result = matcher.replaceAll("$1");
+            String result = matcher.replaceAll("$1"); //$NON-NLS-1$
             testFileContentArray.set(index, result);
          }
          testFileContentArray.replaceAll(line -> line.replaceFirst("application_version,\"\\d\\d\\d\\d\"", genericApplicationVersion)); //$NON-NLS-1$

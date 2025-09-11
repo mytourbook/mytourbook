@@ -82,8 +82,8 @@ public class DialogCustomTourNutritionProduct extends Dialog {
       super.create();
 
       getShell().setText(_isEditMode
-            ? Messages.Dialog_CustomTourNutritionProduct_Title
-            : Messages.Dialog_EditCustomTourNutritionProduct_Title);
+            ? Messages.Dialog_EditCustomTourNutritionProduct_Title
+            : Messages.Dialog_CustomTourNutritionProduct_Title);
 
       validateFields();
    }
@@ -98,6 +98,7 @@ public class DialogCustomTourNutritionProduct extends Dialog {
       _isInUIInit = true;
       {
          createUI(container);
+         fillUI();
       }
       _isInUIInit = false;
 
@@ -251,6 +252,28 @@ public class DialogCustomTourNutritionProduct extends Dialog {
       if (okButton != null) {
          okButton.setEnabled(isEnabled);
       }
+   }
+
+   private void fillUI() {
+
+      if (!_isEditMode) {
+         return;
+      }
+
+      _txtName.setText(_product.getName());
+
+      if (_product.getCalories_Serving() != 0) {
+
+         final int numServings = Math.floorDiv(_product.getCalories(), _product.getCalories_Serving());
+         _spinnerNumServings.setSelection(numServings * 100);
+      }
+
+      _txtCarbohydrates.setText(String.valueOf(_product.getCarbohydrates()));
+      _txtCalories.setText(String.valueOf(_product.getCalories()));
+      _txtSodium.setText(String.valueOf(_product.getSodium()));
+      _spinnerBeverageQuantity.setSelection(_product.getBeverageQuantity());
+      _spinnerBeverageQuantity.setEnabled(_product.isBeverage());
+      _checkIsBeverage.setSelection(_product.isBeverage());
    }
 
    public TourNutritionProduct getTourNutritionProduct(final TourData tourData) {

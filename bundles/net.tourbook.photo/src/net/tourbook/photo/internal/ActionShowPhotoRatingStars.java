@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2025 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -35,7 +35,6 @@ public class ActionShowPhotoRatingStars extends Action {
       setToolTipText(Messages.Photo_Gallery_Action_ShowPhotoRatingStars_Tooltip);
 
       setImageDescriptor(PhotoActivator.getImageDescriptor(PhotoImages.PhotoRatingStar));
-      setDisabledImageDescriptor(PhotoActivator.getThemedImageDescriptor(PhotoImages.PhotoRatingStarAction_Disabled));
    }
 
    @Override

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2024 Wolfgang Schramm, Markus Stipp
+ * Copyright (C) 2005, 2025 Wolfgang Schramm, Markus Stipp
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -419,10 +419,9 @@ public class CM4XXMDeviceReader extends TourbookDevice {
                   // adjust altitude from relative to absolute
                   absoluteAltitude += timeData.altitude;
 
-                  tourData.setTourAltUp(tourData.getTourAltUp()
-                        + ((timeData.altitude > 0) ? timeData.altitude : 0));
-                  tourData.setTourAltDown(tourData.getTourAltDown()
-                        + ((timeData.altitude < 0) ? -timeData.altitude : 0));
+                  final float elevationGain = tourData.getTourAltUp() + ((timeData.altitude > 0) ? timeData.altitude : 0);
+                  final float elevationLoss = tourData.getTourAltDown() + ((timeData.altitude < 0) ? -timeData.altitude : 0);
+                  tourData.setElevationGainLoss(elevationGain, elevationLoss);
 
                   sumDistance += timeData.distance;
                   sumAltitude += Math.abs(absoluteAltitude);
@@ -580,6 +579,7 @@ public class CM4XXMDeviceReader extends TourbookDevice {
    /**
     * @param timeData
     * @param rawData
+    *
     * @throws IOException
     */
    public void readTimeSlice(final RandomAccessFile file, final TimeData timeData) throws IOException {

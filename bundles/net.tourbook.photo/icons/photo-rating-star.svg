@@ -1,0 +1,169 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   inkscape:export-ydpi="96.041077"
+   inkscape:export-xdpi="96.041077"
+   inkscape:export-filename="C:\DAT\MT\mytourbook\bundles\net.tourbook.photo\icons\photo-info-date-dark.png"
+   width="16"
+   height="16.000031"
+   id="svg2985"
+   version="1.1"
+   inkscape:version="1.4 (86a8ad7, 2024-10-11)"
+   sodipodi:docname="photo.svg"
+   viewBox="0 0 16 16.000032"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:dc="http://purl.org/dc/elements/1.1/">
+  <defs
+     id="defs2987">
+    <linearGradient
+       id="linearGradient6402"
+       inkscape:swatch="gradient">
+      <stop
+         id="stop6404"
+         offset="0"
+         style="stop-color:#000000;stop-opacity:1;" />
+      <stop
+         id="stop6406"
+         offset="1"
+         style="stop-color:#000000;stop-opacity:0;" />
+    </linearGradient>
+    <linearGradient
+       id="linearGradient3816"
+       inkscape:swatch="gradient">
+      <stop
+         id="stop3818"
+         offset="0"
+         style="stop-color:#ffa576;stop-opacity:1;" />
+      <stop
+         style="stop-color:#f45400;stop-opacity:1;"
+         offset="1"
+         id="stop3782" />
+    </linearGradient>
+  </defs>
+  <sodipodi:namedview
+     scale-x="1"
+     units="px"
+     inkscape:document-rotation="0"
+     inkscape:object-paths="true"
+     inkscape:snap-intersection-paths="true"
+     inkscape:bbox-nodes="true"
+     inkscape:bbox-paths="true"
+     inkscape:snap-bbox="true"
+     inkscape:snap-others="false"
+     inkscape:snap-nodes="false"
+     inkscape:snap-to-guides="true"
+     inkscape:snap-page="false"
+     inkscape:snap-grids="true"
+     inkscape:window-maximized="0"
+     inkscape:window-y="0"
+     inkscape:window-x="134"
+     inkscape:window-height="2104"
+     inkscape:window-width="2312"
+     showgrid="true"
+     inkscape:current-layer="layer1"
+     inkscape:document-units="px"
+     inkscape:cy="459.99997"
+     inkscape:cx="179.49999"
+     inkscape:zoom="8.0000005"
+     inkscape:pageshadow="2"
+     inkscape:pageopacity="0.0"
+     borderopacity="1.0"
+     bordercolor="#666666"
+     pagecolor="#ffffff"
+     id="base"
+     inkscape:pagecheckerboard="false"
+     inkscape:showpageshadow="true"
+     inkscape:snap-global="true"
+     inkscape:snap-object-midpoints="false"
+     inkscape:snap-center="true"
+     inkscape:object-nodes="false"
+     inkscape:snap-bbox-midpoints="true"
+     inkscape:snap-bbox-edge-midpoints="true"
+     inkscape:snap-smooth-nodes="true"
+     inkscape:snap-midpoints="true"
+     inkscape:snap-text-baseline="true"
+     inkscape:deskcolor="#d1d1d1">
+    <inkscape:grid
+       snapvisiblegridlinesonly="true"
+       enabled="true"
+       visible="true"
+       empspacing="5"
+       id="grid2993"
+       type="xygrid"
+       originx="-160"
+       originy="-304.00002"
+       spacingy="1"
+       spacingx="1"
+       units="px" />
+    <inkscape:page
+       x="0"
+       y="0"
+       width="16"
+       height="16.000032"
+       id="page2"
+       margin="0"
+       bleed="0" />
+  </sodipodi:namedview>
+  <metadata
+     id="metadata2990">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <g
+     id="layer1"
+     inkscape:groupmode="layer"
+     inkscape:label="Layer 1"
+     transform="translate(-160,-304)">
+    <rect
+       inkscape:export-ydpi="96"
+       inkscape:export-xdpi="96"
+       inkscape:export-filename="C:\DAT\MT\mytourbook\bundles\net.tourbook.photo\icons\photo-rating-star.png"
+       y="304"
+       x="160"
+       height="16.000042"
+       width="16"
+       id="rect6561-8-1-5"
+       style="opacity:0.99;fill:none;stroke:none" />
+    <path
+       id="path4358-84"
+       inkscape:export-ydpi="96"
+       inkscape:export-xdpi="96"
+       inkscape:export-filename="C:\DAT\MT\mytourbook\bundles\net.tourbook.photo\icons\photo-rating-star.png"
+       inkscape:transform-center-y="-0.6846886"
+       inkscape:randomized="0"
+       inkscape:rounded="0"
+       inkscape:flatsided="false"
+       sodipodi:arg2="-0.9424778"
+       sodipodi:arg1="-1.5707963"
+       sodipodi:r2="3.4755507"
+       sodipodi:r1="6.9511013"
+       sodipodi:cy="357.34061"
+       sodipodi:cx="82.999992"
+       sodipodi:sides="5"
+       style="color:#000000;display:inline;overflow:visible;visibility:visible;fill:#fae000;fill-opacity:1;stroke:#818181;stroke-width:0.497757;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;marker:none;enable-background:accumulate"
+       sodipodi:type="star"
+       transform="matrix(0.97807968,0,0,1.031649,86.81641,-55.91267)"
+       d="m 82.999993,350.38951 2.042877,4.13932 4.568013,0.66377 -3.305446,3.22201 0.78031,4.54956 -4.085755,-2.14801 -4.085755,2.14801 0.78031,-4.54956 -3.305445,-3.22201 4.568013,-0.66377 z"
+       inkscape:transform-center-x="-6.7922661e-06" />
+    <rect
+       style="opacity:0.99;fill:none;stroke:none"
+       id="rect6791-2"
+       width="16"
+       height="16.000042"
+       x="160"
+       y="304"
+       inkscape:export-filename="C:\DAT\MT\mytourbook\bundles\net.tourbook.photo\icons\photo-rating-star.png"
+       inkscape:export-xdpi="96"
+       inkscape:export-ydpi="96" />
+  </g>
+</svg>

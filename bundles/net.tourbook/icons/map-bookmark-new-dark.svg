@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   version="1.1"
+   id="svg2985"
+   height="16"
+   width="16"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:dc="http://purl.org/dc/elements/1.1/">
+  <defs
+     id="defs2987">
+    <linearGradient
+       id="swatch22">
+      <stop
+         style="stop-color:#000000;stop-opacity:1;"
+         offset="0"
+         id="stop22" />
+    </linearGradient>
+    <linearGradient
+       id="linearGradient3816">
+      <stop
+         id="stop3818"
+         offset="0"
+         style="stop-color:#ffa576;stop-opacity:1;" />
+      <stop
+         style="stop-color:#f45400;stop-opacity:1;"
+         offset="1"
+         id="stop3782" />
+    </linearGradient>
+  </defs>
+  <metadata
+     id="metadata2990">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title />
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <g
+     id="layer1"
+     style="display:inline"
+     transform="translate(-285.00031,-129.03796)">
+    <path
+       id="path10416-4"
+       d="m 285.00032,131.03796 h 2 v -2 h 1 v 2 h 2 v 1 h -2 v 2 h -1 v -2 h -2 z"
+       style="fill:#cccccc;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
+    <rect
+       y="129.03796"
+       x="285.00031"
+       height="15.999999"
+       width="16"
+       id="rect6561-8-1-9-9-5-5-9-9-1-3-6-8-5"
+       style="opacity:0.99;fill:none;fill-opacity:0.0883721;stroke:none;stroke-width:0.6;stroke-miterlimit:4;stroke-dasharray:none" />
+    <path
+       transform="matrix(0.88440382,0,0,0.88363618,84.3547,68.374728)"
+       id="path17034-7-1"
+       style="fill:#91c7ff;fill-opacity:1;stroke:none;stroke-width:0.678718;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       d="m 242.12945,86.715861 -4.35959,-2.371354 -4.42498,2.246964 0.90811,-4.879 -3.50439,-3.514056 4.92083,-0.644034 2.25915,-4.41877 2.13313,4.480965 4.90062,0.783106 -3.60248,3.413422 z" />
+  </g>
+</svg>

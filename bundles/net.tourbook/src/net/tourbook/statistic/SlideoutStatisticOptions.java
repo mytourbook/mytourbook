@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2025 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -23,6 +23,7 @@ import net.tourbook.common.font.MTFont;
 import net.tourbook.common.tooltip.ToolbarSlideout;
 import net.tourbook.preferences.PrefPageStatistic;
 import net.tourbook.ui.ChartOptions_Grid;
+import net.tourbook.ui.ChartOptions_Layout;
 
 import org.eclipse.jface.action.ToolBarManager;
 import org.eclipse.jface.layout.GridDataFactory;
@@ -40,8 +41,10 @@ public class SlideoutStatisticOptions extends ToolbarSlideout implements IAction
    private ActionResetToDefaults _actionRestoreDefaults;
 
    private String                _gridPrefPrefix;
+   private String                _layoutPrefPrefix;
 
    private ChartOptions_Grid     _gridUI;
+   private ChartOptions_Layout   _layoutUI;
 
    /*
     * UI controls
@@ -76,6 +79,7 @@ public class SlideoutStatisticOptions extends ToolbarSlideout implements IAction
       createActions();
 
       _gridUI = new ChartOptions_Grid(_gridPrefPrefix);
+      _layoutUI = new ChartOptions_Layout(_layoutPrefPrefix);
 
       final Composite ui = createUI(parent);
 
@@ -105,6 +109,8 @@ public class SlideoutStatisticOptions extends ToolbarSlideout implements IAction
 
             _gridUI.createUI(container);
             _gridUI.enableGridOptions(_gridOptions_Enabled);
+
+            _layoutUI.createUI(container);
          }
       }
 
@@ -125,8 +131,7 @@ public class SlideoutStatisticOptions extends ToolbarSlideout implements IAction
    private void createUI_12_Actions(final Composite parent) {
 
       final ToolBar toolbar = new ToolBar(parent, SWT.FLAT);
-      GridDataFactory
-            .fillDefaults()//
+      GridDataFactory.fillDefaults()
             .grab(true, false)
             .align(SWT.END, SWT.BEGINNING)
             .applyTo(toolbar);
@@ -143,7 +148,7 @@ public class SlideoutStatisticOptions extends ToolbarSlideout implements IAction
    public void resetToDefaults() {
 
       _gridUI.resetToDefaults();
-      _gridUI.saveState();
+      _layoutUI.resetToDefaults();
 
       if (_statisticOptions != null) {
          _statisticOptions.resetToDefaults();
@@ -154,6 +159,7 @@ public class SlideoutStatisticOptions extends ToolbarSlideout implements IAction
    private void restoreState() {
 
       _gridUI.restoreState();
+      _layoutUI.restoreState();
 
       if (_statisticOptions != null) {
          _statisticOptions.restoreState();
@@ -165,9 +171,12 @@ public class SlideoutStatisticOptions extends ToolbarSlideout implements IAction
       _statisticOptions = statisticOptions;
    }
 
-   public void setupGrid(final String gridPrefPrefix, final int enabledGridOptions) {
+   public void setupGrid(final String gridPrefPrefix,
+                         final String layoutPrefPrefix,
+                         final int enabledGridOptions) {
 
       _gridPrefPrefix = gridPrefPrefix;
+      _layoutPrefPrefix = layoutPrefPrefix;
       _gridOptions_Enabled = enabledGridOptions;
    }
 }

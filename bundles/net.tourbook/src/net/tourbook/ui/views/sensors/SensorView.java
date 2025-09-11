@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2021, 2024 Wolfgang Schramm and Contributors
+ * Copyright (C) 2021, 2025 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -143,7 +143,6 @@ public class SensorView extends ViewPart implements ITourViewer {
          setText(Messages.Sensor_View_Action_DeleteSensor);
 
          setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.App_Delete));
-         setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Images.App_Delete_Disabled));
       }
 
       @Override
@@ -160,7 +159,6 @@ public class SensorView extends ViewPart implements ITourViewer {
          setText(Messages.Sensor_View_Action_EditSensor);
 
          setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.Sensor));
-         setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Images.Sensor_Disabled));
       }
 
       @Override
@@ -177,7 +175,6 @@ public class SensorView extends ViewPart implements ITourViewer {
          setText(Messages.Sensor_View_Action_OpenSensorChart);
 
          setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.SensorChart));
-         setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Images.SensorChart_Disabled));
       }
 
       @Override

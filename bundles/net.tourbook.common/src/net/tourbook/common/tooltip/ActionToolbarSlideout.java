@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2024 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2025 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -69,13 +69,11 @@ public abstract class ActionToolbarSlideout extends ContributionItem implements 
    private boolean         _canDisposeActionImages = true;
 
    private ImageDescriptor _actionImageDescriptor_Enabled;
-   private ImageDescriptor _actionImageDescriptor_Disabled;
 
    /*
     * UI controls
     */
    private Image _actionImage_Enabled;
-   private Image _actionImage_Disabled;
 
    // additional enabled images
    private ArrayList<Image>           _allOtherEnabledImages             = new ArrayList<>();
@@ -84,23 +82,25 @@ public abstract class ActionToolbarSlideout extends ContributionItem implements 
    public ActionToolbarSlideout() {
 
       _actionImageDescriptor_Enabled = CommonActivator.getThemedImageDescriptor(CommonImages.TourOptions);
-      _actionImageDescriptor_Disabled = CommonActivator.getThemedImageDescriptor(CommonImages.TourOptions_Disabled);
    }
 
    public ActionToolbarSlideout(final Image graphImage, final Image graphImage_Disabled) {
 
       _actionImage_Enabled = graphImage;
-      _actionImage_Disabled = graphImage_Disabled;
 
       // prevent to dispose the provided images
       _canDisposeActionImages = false;
+   }
+
+   public ActionToolbarSlideout(final ImageDescriptor actionImageDescriptor) {
+
+      _actionImageDescriptor_Enabled = actionImageDescriptor;
    }
 
    public ActionToolbarSlideout(final ImageDescriptor actionImageDescriptor,
                                 final ImageDescriptor actionImageDescriptor_Disabled) {
 
       _actionImageDescriptor_Enabled = actionImageDescriptor;
-      _actionImageDescriptor_Disabled = actionImageDescriptor_Disabled;
    }
 
    public void addOtherEnabledImage(final ImageDescriptor imageDescriptor) {
@@ -120,7 +120,6 @@ public abstract class ActionToolbarSlideout extends ContributionItem implements 
       if (_canDisposeActionImages) {
 
          UI.disposeResource(_actionImage_Enabled);
-         UI.disposeResource(_actionImage_Disabled);
       }
 
       for (final Image image : _allOtherEnabledImages) {
@@ -130,7 +129,6 @@ public abstract class ActionToolbarSlideout extends ContributionItem implements 
       _allOtherEnabledImages.clear();
 
       _actionImage_Enabled = null;
-      _actionImage_Disabled = null;
    }
 
    private void dispose_Toolbar() {
@@ -147,7 +145,6 @@ public abstract class ActionToolbarSlideout extends ContributionItem implements 
       if (_canDisposeActionImages) {
 
          UI.disposeResource(_actionImage_Enabled);
-         UI.disposeResource(_actionImage_Disabled);
       }
    }
 
@@ -171,7 +168,6 @@ public abstract class ActionToolbarSlideout extends ContributionItem implements 
          }
 
          _actionToolItem.setImage(getActionImage_Enabled());
-         _actionToolItem.setDisabledImage(getActionImage_Disabled());
 
          _actionToolItem.addSelectionListener(SelectionListener.widgetSelectedAdapter(selectionEvent -> onSelect()));
 
@@ -187,21 +183,6 @@ public abstract class ActionToolbarSlideout extends ContributionItem implements 
 
          updateUI_Tooltip();
       }
-   }
-
-   public Image getActionImage_Disabled() {
-
-      if (_actionImage_Disabled != null && _actionImage_Disabled.isDisposed() == false) {
-
-         return _actionImage_Disabled;
-      }
-
-      if (_actionImageDescriptor_Disabled != null) {
-
-         _actionImage_Disabled = _actionImageDescriptor_Disabled.createImage(true);
-      }
-
-      return _actionImage_Disabled;
    }
 
    public Image getActionImage_Enabled() {

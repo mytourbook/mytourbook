@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2025 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -33,7 +33,6 @@ class ActionSaveComparedTours extends Action {
       setToolTipText(Messages.Compare_Result_Action_save_checked_tours_tooltip);
 
       setImageDescriptor(CommonActivator.getThemedImageDescriptor(CommonImages.App_Save));
-      setDisabledImageDescriptor(CommonActivator.getThemedImageDescriptor(CommonImages.App_Save_Disabled));
    }
 
    @Override

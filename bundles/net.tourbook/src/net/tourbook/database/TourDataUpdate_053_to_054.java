@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2022, 2024 Frédéric Bard
+ * Copyright (C) 2022, 2025 Frédéric Bard
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -14,6 +14,8 @@
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
 package net.tourbook.database;
+
+import java.util.List;
 
 import net.tourbook.common.weather.IWeather;
 import net.tourbook.data.TourData;
@@ -34,12 +36,17 @@ public class TourDataUpdate_053_to_054 implements ITourDataUpdate {
    }
 
    @Override
+   public List<Long> getTourIDs() {
+      return null;
+   }
+
+   @Override
    public boolean updateTourData(final TourData tourData) {
 
       // convert weather-showers-scatterd
       //    into weather-showers-scattered
 
-      if (tourData.getWeather_Clouds().equalsIgnoreCase("weather-showers-scatterd")) { //$NON-NLS-1$
+      if ("weather-showers-scatterd".equalsIgnoreCase(tourData.getWeather_Clouds())) { //$NON-NLS-1$
 
          /**
           * If the weather cloud has the old value (with the typo) for the scattered showers,
@@ -56,5 +63,4 @@ public class TourDataUpdate_053_to_054 implements ITourDataUpdate {
 
       return false;
    }
-
 }

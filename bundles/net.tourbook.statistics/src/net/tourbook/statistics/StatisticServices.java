@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2025 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -37,6 +37,7 @@ public class StatisticServices {
    /**
     * @param serieIndex
     * @param activeTourTypeFilter
+    *
     * @return Returns the tour type id or -1 when type id is not set
     */
    public static long getTourTypeId(final int serieIndex, final TourTypeFilter activeTourTypeFilter) {
@@ -277,15 +278,21 @@ public class StatisticServices {
    }
 
    /**
-    * Set chart properties from the pref store.
+    * Set chart properties from the pref store
     *
     * @param chart
     * @param prefGridPrefix
-    *           Prefix for grid preferences.
+    *           Prefix for grid preferences
+    * @param prefLayoutPrefix
+    *           Prefix for layout preferences
     */
-   public static void updateChartProperties(final Chart chart, final String prefGridPrefix) {
+   public static void updateChartProperties(final Chart chart,
+                                            final String prefGridPrefix,
+                                            final String prefLayoutPrefix) {
 
-      net.tourbook.ui.UI.updateChartProperties(chart, prefGridPrefix);
+      chart.getChartComponents().updateFontScaling();
+
+      net.tourbook.ui.UI.updateChartProperties(chart, prefGridPrefix, prefLayoutPrefix);
 
       /*
        * These settings are currently static, a UI to modify it is not yet implemented.

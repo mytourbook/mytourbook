@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2024 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2025 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -113,14 +113,17 @@ public class ReferenceTimelineView extends ViewPart implements IGeoCompareListen
 
 // SET_FORMATTING_OFF
 
-   private static final String   PREF_PREFIX                         = "GRID_REF_TOUR_YEAR_STATISTIC__";                   //$NON-NLS-1$
+   private static final String   GRID_PREF_PREFIX                    = "GRID_REF_TOUR_YEAR_STATISTIC__";                   //$NON-NLS-1$
 
-   private static final String   GRID_IS_SHOW_VERTICAL_GRIDLINES     = PREF_PREFIX + ITourbookPreferences.CHART_GRID_IS_SHOW_VERTICAL_GRIDLINES;
-   private static final String   GRID_IS_SHOW_HORIZONTAL_GRIDLINES   = PREF_PREFIX + ITourbookPreferences.CHART_GRID_IS_SHOW_HORIZONTAL_GRIDLINES;
-   private static final String   GRID_VERTICAL_DISTANCE              = PREF_PREFIX + ITourbookPreferences.CHART_GRID_VERTICAL_DISTANCE;
-   private static final String   GRID_HORIZONTAL_DISTANCE            = PREF_PREFIX + ITourbookPreferences.CHART_GRID_HORIZONTAL_DISTANCE;
+   private static final String   GRID_IS_SHOW_VERTICAL_GRIDLINES     = GRID_PREF_PREFIX + ITourbookPreferences.CHART_GRID_IS_SHOW_VERTICAL_GRIDLINES;
+   private static final String   GRID_IS_SHOW_HORIZONTAL_GRIDLINES   = GRID_PREF_PREFIX + ITourbookPreferences.CHART_GRID_IS_SHOW_HORIZONTAL_GRIDLINES;
+   private static final String   GRID_VERTICAL_DISTANCE              = GRID_PREF_PREFIX + ITourbookPreferences.CHART_GRID_VERTICAL_DISTANCE;
+   private static final String   GRID_HORIZONTAL_DISTANCE            = GRID_PREF_PREFIX + ITourbookPreferences.CHART_GRID_HORIZONTAL_DISTANCE;
 
-// SET_FORMATTING_ON
+   private static final String   LAYOUT_PREF_PREFIX                  = "LAYOUT_REF_TOUR_YEAR_STATISTIC__";                                             //$NON-NLS-1$
+   private static final String   LAYOUT_GRAPH_Y_AXIS_WIDTH           = LAYOUT_PREF_PREFIX   + ITourbookPreferences.CHART_Y_AXIS_WIDTH;
+
+   // SET_FORMATTING_ON
 
    private static final IDialogSettings  _state            = TourbookPlugin.getState(ID);
    private static final IPreferenceStore _prefStore        = TourbookPlugin.getPrefStore();
@@ -236,7 +239,6 @@ public class ReferenceTimelineView extends ViewPart implements IGeoCompareListen
          setToolTipText(Messages.Tour_StatisticValues_Action_CopyIntoClipboard_Tooltip);
 
          setImageDescriptor(CommonActivator.getThemedImageDescriptor(CommonImages.App_Copy));
-         setDisabledImageDescriptor(CommonActivator.getThemedImageDescriptor(CommonImages.App_Copy_Disabled));
       }
 
       @Override
@@ -290,7 +292,12 @@ public class ReferenceTimelineView extends ViewPart implements IGeoCompareListen
       @Override
       protected ToolbarSlideout createSlideout(final ToolBar toolbar) {
 
-         return new SlideoutReferenceTimelineOptions(ReferenceTimelineView.this, _pageBook, toolbar, PREF_PREFIX, _state);
+         return new SlideoutReferenceTimelineOptions(ReferenceTimelineView.this,
+               _pageBook,
+               toolbar,
+               GRID_PREF_PREFIX,
+               LAYOUT_PREF_PREFIX,
+               _state);
       }
    }
 
@@ -307,7 +314,11 @@ public class ReferenceTimelineView extends ViewPart implements IGeoCompareListen
                || property.equals(GRID_HORIZONTAL_DISTANCE)
                || property.equals(GRID_VERTICAL_DISTANCE)
                || property.equals(GRID_IS_SHOW_HORIZONTAL_GRIDLINES)
-               || property.equals(GRID_IS_SHOW_VERTICAL_GRIDLINES)) {
+               || property.equals(GRID_IS_SHOW_VERTICAL_GRIDLINES)
+
+               || property.equals(LAYOUT_GRAPH_Y_AXIS_WIDTH)
+
+         ) {
 
             updateUI_TimelineChart();
          }
@@ -325,6 +336,12 @@ public class ReferenceTimelineView extends ViewPart implements IGeoCompareListen
             createUI_30_Chart(_pageYearChart);
 
             _pageYearChart.layout();
+
+            updateUI_TimelineChart();
+
+         } else if (property.equals(ICommonPreferences.UI_DRAWING_FONT_IS_MODIFIED)) {
+
+            _timelineChart.getChartComponents().updateFontScaling();
 
             updateUI_TimelineChart();
          }
@@ -958,6 +975,7 @@ public class ReferenceTimelineView extends ViewPart implements IGeoCompareListen
          updateUI_TimelineChart();
 
          break;
+
       default:
          break;
       }
@@ -972,6 +990,7 @@ public class ReferenceTimelineView extends ViewPart implements IGeoCompareListen
    /**
     * @param currentYear
     * @param numberOfYears
+    *
     * @return Returns the number of days between {@link #fLastYear} and currentYear
     */
    int getYearDOYs(final int selectedYear) {
@@ -1774,7 +1793,7 @@ public class ReferenceTimelineView extends ViewPart implements IGeoCompareListen
          }
       });
 
-      net.tourbook.ui.UI.updateChartProperties(_timelineChart, PREF_PREFIX);
+      net.tourbook.ui.UI.updateChartProperties(_timelineChart, GRID_PREF_PREFIX, LAYOUT_PREF_PREFIX);
 
       final ChartTitleSegmentConfig ctsConfig = _timelineChart.getChartTitleSegmentConfig();
       ctsConfig.isShowSegmentTitle = true;

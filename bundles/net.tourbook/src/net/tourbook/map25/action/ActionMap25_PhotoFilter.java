@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2022 Wolfgang Schramm and Contributors
+ * Copyright (C) 2022, 2025 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -38,8 +38,6 @@ public class ActionMap25_PhotoFilter extends ActionToolbarSlideoutAdv {
 // SET_FORMATTING_OFF
 
    private static Image _imageEnabled              = UI.IMAGE_REGISTRY.get(UI.IMAGE_ACTION_PHOTO_FILTER);
-   private static Image _imageDisabled             = UI.IMAGE_REGISTRY.get(UI.IMAGE_ACTION_PHOTO_FILTER_DISABLED);
-
    private static Image _imageEnabled_NoPhotos     = UI.IMAGE_REGISTRY.get(UI.IMAGE_ACTION_PHOTO_FILTER_NO_PHOTOS);
    private static Image _imageEnabled_WithPhotos   = UI.IMAGE_REGISTRY.get(UI.IMAGE_ACTION_PHOTO_FILTER_WITH_PHOTOS);
 
@@ -52,7 +50,7 @@ public class ActionMap25_PhotoFilter extends ActionToolbarSlideoutAdv {
 
    public ActionMap25_PhotoFilter(final Map25View map2View, final IDialogSettings state) {
 
-      super(_imageEnabled, _imageDisabled);
+      super(_imageEnabled);
 
       _map25View = map2View;
       _state = state;

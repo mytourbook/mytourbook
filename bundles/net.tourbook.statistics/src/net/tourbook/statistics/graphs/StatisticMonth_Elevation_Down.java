@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2025 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -41,5 +41,10 @@ public class StatisticMonth_Elevation_Down extends StatisticMonth {
    public String getGridPrefPrefix() {
 
       return GRID_MONTH_ELEVATION_DOWN;
+   }
+
+   @Override
+   protected String getLayoutPrefPrefix() {
+      return LAYOUT_MONTH_ELEVATION_DOWN;
    }
 }

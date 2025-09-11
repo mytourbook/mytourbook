@@ -20,7 +20,7 @@ package net.tourbook.printing;
  */
 public class PrintImages {
 
-   public static final String Print_PDF_Logo = "pdf-logo.png"; //$NON-NLS-1$
+   public static final String Print_PDF_Logo = "pdf-logo.svg"; //$NON-NLS-1$
 
    private PrintImages() {}
 }

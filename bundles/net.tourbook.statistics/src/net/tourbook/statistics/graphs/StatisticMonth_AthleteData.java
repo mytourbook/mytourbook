@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2020 Frédéric Bard
+ * Copyright (C) 2020, 2025 Frédéric Bard
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -40,5 +40,10 @@ public class StatisticMonth_AthleteData extends StatisticMonth {
    @Override
    protected String getGridPrefPrefix() {
       return GRID_MONTH_ATHLETE_DATA;
+   }
+
+   @Override
+   protected String getLayoutPrefPrefix() {
+      return LAYOUT_MONTH_ATHLETE_DATA;
    }
 }

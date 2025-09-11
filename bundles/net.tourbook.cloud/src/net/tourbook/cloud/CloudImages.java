@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2021, 2024 Wolfgang Schramm and Contributors
+ * Copyright (C) 2021, 2025 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -26,7 +26,7 @@ public class CloudImages {
    public static final String Cloud_Dropbox_Parentfolder = "dropbox-parentfolder.png";         //$NON-NLS-1$
    public static final String Cloud_Strava_Logo          = "strava-logo.png";                  //$NON-NLS-1$
    public static final String Cloud_Strava_Connect       = "btn_strava_connectwith_light.png"; //$NON-NLS-1$
-   public static final String Cloud_Suunto_Logo          = "suunto-logo.png";                  //$NON-NLS-1$
+   public static final String Cloud_Suunto_Logo          = "suunto-logo.svg";                  //$NON-NLS-1$
 
    private CloudImages() {}
 }

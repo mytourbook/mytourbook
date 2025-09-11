@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2024 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2025 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -244,7 +244,6 @@ public class SlideoutTourTagFilter extends AdvancedSlideout implements ITreeView
          setToolTipText(Messages.Slideout_TourTagFilter_Action_CheckAllTags_Tooltip);
 
          setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.Checkbox_Checked));
-         setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Images.Checkbox_Checked_Disabled));
       }
 
       @Override
@@ -262,7 +261,6 @@ public class SlideoutTourTagFilter extends AdvancedSlideout implements ITreeView
          setToolTipText(Messages.Slideout_TourTagFilter_Action_UncheckAllTags_Tooltip);
 
          setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.Checkbox_Uncheck));
-         setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Images.Checkbox_Uncheck_Disabled));
       }
 
       @Override

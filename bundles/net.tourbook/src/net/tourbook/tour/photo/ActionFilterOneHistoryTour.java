@@ -34,7 +34,6 @@ public class ActionFilterOneHistoryTour extends Action {
       setToolTipText(Messages.Action_PhotosAndTours_FilterNoTours_Tooltip);
 
       setImageDescriptor(PhotoActivator.getThemedImageDescriptor(PhotoImages.PhotoFilter_OneHistoryTour));
-      setDisabledImageDescriptor(PhotoActivator.getThemedImageDescriptor(PhotoImages.PhotoFilter_OneHistoryTour_Disabled));
    }
 
    @Override

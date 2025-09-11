@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2024 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2025 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -136,7 +136,7 @@ public class ActionAddTourTag_SubMenu extends Action implements IMenuCreator, IA
 
          super(Messages.Action_Tag_AutoOpenOK);
 
-         setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.App_OK));
+         setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.State_OK));
       }
 
       @Override
@@ -469,7 +469,7 @@ public class ActionAddTourTag_SubMenu extends Action implements IMenuCreator, IA
           */
          _actionOK.setEnabled(isModifiedTags);
          _actionOK.setImageDescriptor(isModifiedTags
-               ? TourbookPlugin.getImageDescriptor(Images.App_OK)
+               ? TourbookPlugin.getImageDescriptor(Images.State_OK)
                : null);
       }
    }

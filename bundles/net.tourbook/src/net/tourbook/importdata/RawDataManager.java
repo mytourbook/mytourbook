@@ -34,7 +34,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Optional;
 import java.util.Scanner;
 import java.util.Set;
 import java.util.concurrent.ArrayBlockingQueue;
@@ -58,6 +57,7 @@ import net.tourbook.common.time.TimeTools;
 import net.tourbook.common.util.FileUtils;
 import net.tourbook.common.util.ITourViewer3;
 import net.tourbook.common.util.StatusUtil;
+import net.tourbook.common.util.StringUtils;
 import net.tourbook.common.util.Util;
 import net.tourbook.common.weather.IWeather;
 import net.tourbook.common.widgets.ComboEnumEntry;
@@ -1260,7 +1260,6 @@ public class RawDataManager {
                                   final String importSubCategory) {
 
       if (tourData == null || importCategory == null && importSubCategory == null) {
-
          return;
       }
 
@@ -1270,20 +1269,26 @@ public class RawDataManager {
 
       for (final TourType tourType : allTourTypes) {
 
-         boolean isCategoryOK = false;
-         boolean isSubCategoryOK = false;
-
          final String ttCategory = tourType.getImportCategory();
          final String ttSubCategory = tourType.getImportSubCategory();
 
-         final boolean hasCategory = importCategory != null && ttCategory != null;
-         final boolean hasSubCategory = importSubCategory != null && ttSubCategory != null;
+         final boolean hasCategory = StringUtils.hasContent(importCategory) && StringUtils.hasContent(ttCategory);
+         final boolean hasSubCategory = StringUtils.hasContent(importSubCategory) && StringUtils.hasContent(ttSubCategory);
 
-         if (hasCategory && importCategory.trim().equals(ttCategory.trim())) {
+         if (hasCategory == false && hasSubCategory == false) {
+
+            // skip tour types without category
+            continue;
+         }
+
+         boolean isCategoryOK = false;
+         boolean isSubCategoryOK = false;
+
+         if (hasCategory && importCategory.trim().equalsIgnoreCase(ttCategory.trim())) {
             isCategoryOK = true;
          }
 
-         if (hasSubCategory && importSubCategory.trim().equals(ttSubCategory.trim())) {
+         if (hasSubCategory && importSubCategory.trim().equalsIgnoreCase(ttSubCategory.trim())) {
             isSubCategoryOK = true;
          }
 
@@ -1669,9 +1674,9 @@ public class RawDataManager {
 
             if (isEntireTour_OR_AllTimeSlices || tourValueType == TourValueType.TIME_SLICES__ELEVATION) {
 
-               tourDataDummyClone.setTourAltDown(oldTourData.getTourAltDown());
-               tourDataDummyClone.setTourAltUp(oldTourData.getTourAltUp());
-
+               final int elevationGain = oldTourData.getTourAltUp();
+               final int elevationLoss = oldTourData.getTourAltDown();
+               tourDataDummyClone.setElevationGainLoss(elevationGain, elevationLoss);
             }
 
             if (isEntireTour_OR_AllTimeSlices || tourValueType == TourValueType.TIME_SLICES__GEAR) {
@@ -1965,12 +1970,12 @@ public class RawDataManager {
 
             case TIME_SLICES__ELEVATION:
 
-               clonedTourData.setTourAltDown(tourData.getTourAltDown());
-               clonedTourData.setTourAltUp(tourData.getTourAltUp());
+               final int elevationGain = tourData.getTourAltUp();
+               final int elevationLoss = tourData.getTourAltDown();
+               clonedTourData.setElevationGainLoss(elevationGain, elevationLoss);
 
                tourData.altitudeSerie = null;
-               tourData.setTourAltUp(0);
-               tourData.setTourAltDown(0);
+               tourData.setElevationGainLoss(0, 0);
                break;
 
             case TIME_SLICES__GEAR:
@@ -2289,12 +2294,12 @@ public class RawDataManager {
 
          final List<ImportFile> allImportFilePaths = new ArrayList<>();
 
-         final List<OSFile> notSkipedFiles = skipFitLogFiles(allImportFiles);
+         final List<OSFile> notSkippedFiles = skipFitLogFiles(allImportFiles);
 
          /*
           * Convert to IPath because NIO Path DO NOT SUPPORT EXTENSIONS :-(((
           */
-         for (final OSFile osFile : notSkipedFiles) {
+         for (final OSFile osFile : notSkippedFiles) {
 
             final String absolutePath = osFile.getPath().toString();
             final org.eclipse.core.runtime.Path iPath = new org.eclipse.core.runtime.Path(absolutePath);
@@ -3029,6 +3034,12 @@ public class RawDataManager {
                   : 0;
    }
 
+   /**
+    * @param oldTourData
+    * @param importState_Process
+    *
+    * @return Return the imported {@link TourData} or <code>null</code> when the reimport failed
+    */
    public TourData reimportTour(final TourData oldTourData,
                                 final ImportState_Process importState_Process) {
 
@@ -3057,9 +3068,13 @@ public class RawDataManager {
          return null;
       }
 
-      final Optional<TourData> firstTourData = allImportedToursFromOneFile.values().stream().findFirst();
+      final Collection<TourData> allValues = allImportedToursFromOneFile.values();
 
-      return firstTourData.get();
+      for (final TourData tourData : allValues) {
+         return tourData;
+      }
+
+      return null;
    }
 
    /**
@@ -3738,9 +3753,11 @@ public class RawDataManager {
 
          // re-import elevation only
 
+         final int elevationGain = reimportedTourData.getTourAltUp();
+         final int elevationLoss = reimportedTourData.getTourAltDown();
+
          oldTourData.altitudeSerie = reimportedTourData.altitudeSerie;
-         oldTourData.setTourAltUp(reimportedTourData.getTourAltUp());
-         oldTourData.setTourAltDown(reimportedTourData.getTourAltDown());
+         oldTourData.setElevationGainLoss(elevationGain, elevationLoss);
       }
 
       // Gear
@@ -3829,11 +3846,20 @@ public class RawDataManager {
 
          // re-import only swimming
 
-         oldTourData.swim_LengthType = reimportedTourData.swim_LengthType;
-         oldTourData.swim_Cadence = reimportedTourData.swim_Cadence;
-         oldTourData.swim_Strokes = reimportedTourData.swim_Strokes;
-         oldTourData.swim_StrokeStyle = reimportedTourData.swim_StrokeStyle;
-         oldTourData.swim_Time = reimportedTourData.swim_Time;
+// SET_FORMATTING_OFF
+
+         oldTourData.swim_LengthType      = reimportedTourData.swim_LengthType;
+         oldTourData.swim_Cadence         = reimportedTourData.swim_Cadence;
+         oldTourData.swim_Strokes         = reimportedTourData.swim_Strokes;
+         oldTourData.swim_StrokeStyle     = reimportedTourData.swim_StrokeStyle;
+         oldTourData.swim_Time            = reimportedTourData.swim_Time;
+
+         oldTourData.distanceSerie        = reimportedTourData.distanceSerie;
+
+         oldTourData.setPoolLength        (reimportedTourData.getPoolLength());
+         oldTourData.setTourDistance      (reimportedTourData.getTourDistance());
+
+// SET_FORMATTING_ON
       }
 
       // Temperature from device

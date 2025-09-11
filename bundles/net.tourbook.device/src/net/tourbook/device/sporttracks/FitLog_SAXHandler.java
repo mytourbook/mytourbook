@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2024 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2025 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -585,8 +585,7 @@ public class FitLog_SAXHandler extends DefaultHandler {
          tourData.setTourDeviceTime_Elapsed(_currentActivity.duration);
          tourData.setTourComputedTime_Moving(_currentActivity.duration);
 
-         tourData.setTourAltUp(_currentActivity.elevationUp);
-         tourData.setTourAltDown(_currentActivity.elevationDown);
+         tourData.setElevationGainLoss(_currentActivity.elevationUp, _currentActivity.elevationDown);
 
          // We set the tour as manual since it was a manual tour created in SportTracks in the first place.
          tourData.setDeviceId(TourData.DEVICE_ID_FOR_MANUAL_TOUR);

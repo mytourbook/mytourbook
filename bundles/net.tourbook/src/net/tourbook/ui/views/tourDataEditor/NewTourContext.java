@@ -15,10 +15,19 @@
  *******************************************************************************/
 package net.tourbook.ui.views.tourDataEditor;
 
+import net.tourbook.data.TourData;
+
 public class NewTourContext {
 
-   public String title;
+   /**
+    * Contains {@link TourData} of the newly created tour
+    */
+   public TourData newTourData;
 
-   public long   tourStartTime;
-   public long   tourEndTime;
+   public String   title;
+
+   public long     tourStartTime;
+   public long     tourEndTime;
+
+   public int[]    timeSerie;
 }

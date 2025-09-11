@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2025 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -70,6 +70,7 @@ public class HAC4ProDeviceDataReader extends TourbookDevice {
    /**
     * @param timeData
     * @param rawData
+    *
     * @throws IOException
     */
    public static void readTimeSlice(final int data, final TimeData timeData) {
@@ -106,6 +107,7 @@ public class HAC4ProDeviceDataReader extends TourbookDevice {
     * Adjust the offset for the DD record so it's within the tour data area
     *
     * @param offsetNextDDRecord
+    *
     * @return
     */
    private int adjustDDRecordOffset(final int offsetNextDDRecord) {
@@ -199,8 +201,7 @@ public class HAC4ProDeviceDataReader extends TourbookDevice {
          lastAltitude2 = altitude;
       }
 
-      tourData.setTourAltUp(altUp);
-      tourData.setTourAltDown(altDown);
+      tourData.setElevationGainLoss(altUp, altDown);
 
       // System.out.println("Up: " + logUp + " Down: " + logDown);
    }
@@ -608,6 +609,7 @@ public class HAC4ProDeviceDataReader extends TourbookDevice {
    /**
     * @param buffer
     * @param tourData
+    *
     * @return
     */
    private StartBlock readAARecord(final byte[] buffer, final TourData tourData) {

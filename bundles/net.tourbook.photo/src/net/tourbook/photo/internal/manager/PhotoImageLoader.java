@@ -29,7 +29,7 @@ import javax.imageio.ImageIO;
 
 import net.tourbook.common.UI;
 import net.tourbook.common.time.TimeTools;
-import net.tourbook.common.util.NoAutoScalingImageDataProvider;
+import net.tourbook.common.util.CustomScalingImageDataProvider;
 import net.tourbook.common.util.SWT2Dutil;
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.photo.ILoadCallBack;
@@ -43,7 +43,6 @@ import net.tourbook.photo.PhotoImageMetadata;
 import net.tourbook.photo.PhotoLoadManager;
 import net.tourbook.photo.PhotoLoadingState;
 
-import org.apache.commons.imaging.ImageReadException;
 import org.apache.commons.imaging.common.ImageMetadata;
 import org.apache.commons.imaging.formats.jpeg.JpegImageMetadata;
 import org.eclipse.core.runtime.IPath;
@@ -238,7 +237,7 @@ public class PhotoImageLoader {
 
          // image could be converted
 
-         return new Image(_display, new NoAutoScalingImageDataProvider(swtImageData));
+         return new Image(_display, new CustomScalingImageDataProvider(swtImageData));
       }
 
       /*
@@ -355,9 +354,9 @@ public class PhotoImageLoader {
             return null;
          }
 
-         if (metadata instanceof JpegImageMetadata) {
+         if (metadata instanceof final JpegImageMetadata jpegImageMetadata) {
 
-            awtBufferedImage = ((JpegImageMetadata) metadata).getEXIFThumbnail();
+            awtBufferedImage = jpegImageMetadata.getExifThumbnail();
 
             _trackedAWTImages.add(awtBufferedImage);
 
@@ -383,7 +382,7 @@ public class PhotoImageLoader {
             }
          }
 
-      } catch (final ImageReadException | IOException e) {
+      } catch (final IOException e) {
 
          StatusUtil.log(e);
 
@@ -458,9 +457,9 @@ public class PhotoImageLoader {
 // this will print out all metadata
 //         System.out.println(metadata);
 
-         if (metadata instanceof JpegImageMetadata) {
+         if (metadata instanceof final JpegImageMetadata jpegImageMetadata) {
 
-            awtBufferedImage = ((JpegImageMetadata) metadata).getEXIFThumbnail();
+            awtBufferedImage = jpegImageMetadata.getExifThumbnail();
 
             _trackedAWTImages.add(awtBufferedImage);
 
@@ -472,7 +471,7 @@ public class PhotoImageLoader {
             try {
 
                /*
-                * transform EXIF image and save it in the thumb store
+                * Transform EXIF image and save it in the thumb store
                 */
                try {
 
@@ -480,9 +479,11 @@ public class PhotoImageLoader {
                   awtBufferedImage = transformImageRotate(awtBufferedImage);
 
                } catch (final Exception e) {
+
                   StatusUtil.log(NLS.bind(
                         "Image \"{0}\" cannot be resized", //$NON-NLS-1$
                         _photo.imageFilePathName), e);
+
                   return null;
                }
 
@@ -509,7 +510,7 @@ public class PhotoImageLoader {
                }
             }
          }
-      } catch (final ImageReadException | IOException e) {
+      } catch (final IOException e) {
          StatusUtil.log(e);
       }
 
@@ -608,7 +609,7 @@ public class PhotoImageLoader {
 
          final BufferedImage awtImage = ImageIO.read(new File(imageStoreFilePath));
 
-         swtImage = new Image(Display.getCurrent(), new NoAutoScalingImageDataProvider(awtImage));
+         swtImage = new Image(Display.getCurrent(), new CustomScalingImageDataProvider(awtImage));
 
          loadImageProperties(requestedStoreImageFilePath);
 
@@ -839,6 +840,7 @@ public class PhotoImageLoader {
 
                // rotate image according to the EXIF flag
                if (isRotated == false) {
+
                   isRotated = true;
 
                   scaledHQImage = transformImageRotate(scaledHQImage);
@@ -881,7 +883,22 @@ public class PhotoImageLoader {
 
          } else {
 
-            awtHQImage = awtOriginalImage;
+            // rotate image according to the EXIF flag
+            if (isRotated == false) {
+
+               isRotated = true;
+
+               final BufferedImage rotatedHQImage = transformImageRotate(awtOriginalImage);
+
+               imageWidth = rotatedHQImage.getWidth();
+               imageHeight = rotatedHQImage.getHeight();
+
+               awtHQImage = rotatedHQImage;
+
+            } else {
+
+               awtHQImage = awtOriginalImage;
+            }
          }
 
          /*
@@ -893,7 +910,7 @@ public class PhotoImageLoader {
          if (imageWidth >= thumbSize || imageHeight >= thumbSize) {
 
             /*
-             * image is larger than thumb image -> resize to thumb
+             * Image is larger than thumb image -> resize to thumb
              */
 
             if (isHQCreated == false) {
@@ -901,7 +918,7 @@ public class PhotoImageLoader {
                // image size is between thumb and HQ
 
                if (_requestedImageQuality == ImageQuality.HQ) {
-                  requestedSWTImage = createSWTimageFromAWTimage(awtOriginalImage, originalImagePathName);
+                  requestedSWTImage = createSWTimageFromAWTimage(awtHQImage, originalImagePathName);
                }
             }
 
@@ -2016,8 +2033,6 @@ public class PhotoImageLoader {
       final int orientation = _photo.getOrientation();
 
       if (orientation > 1) {
-
-         // see here http://www.impulseadventure.com/photo/exif-orientation.html
 
          Rotation correction = null;
 

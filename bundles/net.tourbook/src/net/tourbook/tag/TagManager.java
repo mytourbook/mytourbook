@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2024 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2025 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -34,8 +34,8 @@ import javax.imageio.ImageIO;
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.UI;
+import net.tourbook.common.util.CustomScalingImageDataProvider;
 import net.tourbook.common.util.ImageUtils;
-import net.tourbook.common.util.NoAutoScalingImageDataProvider;
 import net.tourbook.common.util.SQL;
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.StringUtils;
@@ -51,7 +51,6 @@ import net.tourbook.tour.TourLogManager.AutoOpenEvent;
 import net.tourbook.tour.TourManager;
 import net.tourbook.ui.views.tourDataEditor.TourDataEditorView;
 
-import org.apache.commons.imaging.ImageReadException;
 import org.apache.commons.imaging.Imaging;
 import org.apache.commons.imaging.common.ImageMetadata;
 import org.apache.commons.imaging.formats.jpeg.JpegImageMetadata;
@@ -278,7 +277,7 @@ public class TagManager {
       }
 
       final Image swtImage = new Image(PlatformUI.getWorkbench().getDisplay(),
-            new NoAutoScalingImageDataProvider(awtImage));
+            new CustomScalingImageDataProvider(awtImage));
 
       awtImage.flush();
 
@@ -624,11 +623,11 @@ public class TagManager {
       try {
 
          // load metadata
-         final ImageMetadata imageMetadata = Imaging.getMetadata(new File(imageFilePath), null);
+         final ImageMetadata imageMetadata = Imaging.getMetadata(new File(imageFilePath));
          if (imageMetadata instanceof JpegImageMetadata) {
 
             final JpegImageMetadata jpegMetadata = (JpegImageMetadata) imageMetadata;
-            final TiffField field = jpegMetadata.findEXIFValueWithExactMatch(TiffTagConstants.TIFF_TAG_ORIENTATION);
+            final TiffField field = jpegMetadata.findExifValueWithExactMatch(TiffTagConstants.TIFF_TAG_ORIENTATION);
 
             if (field != null) {
 
@@ -645,7 +644,7 @@ public class TagManager {
             }
          }
 
-      } catch (ImageReadException | IOException e) {
+      } catch (IOException e) {
 
          StatusUtil.log(e);
       }

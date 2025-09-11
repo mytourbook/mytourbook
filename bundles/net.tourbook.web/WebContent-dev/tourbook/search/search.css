@@ -10,6 +10,8 @@ body
    $BODY__SCROLLBAR$
 }
 
+$BODY_SCROLLBAR_EXTENDED$
+
 table
 {
    border-collapse:        collapse;
@@ -106,7 +108,7 @@ a
    width:                  16px              !important;
    height:                 16px              !important;
    border:                 0px;
-   background:             url("/§MT-ICON-COMMON§/app-close$CSS_TAG__IS_THEMED$.png")     !important;
+   background:             url("/§MT-ICON-COMMON§/app-close$CSS_TAG__IS_THEMED$.svg")     !important;
 }
 
 .dijitDialogCloseIconHover 

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2024 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2025 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -26,7 +26,8 @@ import org.eclipse.swt.graphics.Rectangle;
  */
 public class GraphDrawingData {
 
-   private static final char  NL                     = UI.NEW_LINE;
+   private static final char NL = UI.NEW_LINE;
+
    // position for the x-axis unit text
    protected static final int X_UNIT_TEXT_POS_LEFT   = 0;
    protected static final int X_UNIT_TEXT_POS_CENTER = 1;
@@ -96,8 +97,6 @@ public class GraphDrawingData {
     * graph height in dev (pixel) units, each graph has the same height
     */
    public int        devGraphHeight;
-
-   private int       _devSliderHeight;
 
    /**
     * graph value for the bottom of the graph
@@ -177,26 +176,11 @@ public class GraphDrawingData {
       return _devBarRectangleXPos;
    }
 
-   public int getDevSliderHeight() {
-      return _devSliderHeight;
-   }
-
    /**
-    * @return Returns the bottom of the chart in dev units
+    * @return Returns the bottom of the graph in dev units
     */
    public int getDevYBottom() {
       return _devYBottom;
-   }
-
-   /**
-    * @return Returns the y position for the title
-    */
-   public int getDevYTitle() {
-
-      return getDevYBottom()
-            - devGraphHeight
-            - _chartDrawingData.devSliderBarHeight
-            - _chartDrawingData.devXTitleBarHeight;
    }
 
    /**
@@ -360,10 +344,6 @@ public class GraphDrawingData {
     */
    public void setDevBarRectangleXPos(final int barRectanglePos) {
       _devBarRectangleXPos = barRectanglePos;
-   }
-
-   public void setDevSliderHeight(final int devSliderHeight) {
-      _devSliderHeight = devSliderHeight;
    }
 
    public void setDevYBottom(final int devY) {

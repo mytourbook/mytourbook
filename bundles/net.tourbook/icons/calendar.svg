@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   width="16"
+   height="16"
+   id="svg2985"
+   version="1.1"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:dc="http://purl.org/dc/elements/1.1/">
+  <defs
+     id="defs2987">
+    <linearGradient
+       id="linearGradient5090">
+      <stop
+         style="stop-color:#435800;stop-opacity:1;"
+         offset="0"
+         id="stop5088" />
+    </linearGradient>
+    <linearGradient
+       id="linearGradient6402">
+      <stop
+         id="stop6404"
+         offset="0"
+         style="stop-color:#000000;stop-opacity:1;" />
+      <stop
+         id="stop6406"
+         offset="1"
+         style="stop-color:#000000;stop-opacity:0;" />
+    </linearGradient>
+    <linearGradient
+       id="linearGradient3816">
+      <stop
+         id="stop3818"
+         offset="0"
+         style="stop-color:#ffa576;stop-opacity:1;" />
+      <stop
+         style="stop-color:#f45400;stop-opacity:1;"
+         offset="1"
+         id="stop3782" />
+    </linearGradient>
+  </defs>
+  <metadata
+     id="metadata2990">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <g
+     id="layer1"
+     style="display:inline"
+     transform="translate(-665,-528.98321)">
+    <path
+       id="rect8923-8-8-11-8"
+       style="display:inline;fill:#6bb0ff;fill-opacity:1;stroke-width:1;stroke-linecap:round"
+       d="m 666.00009,540 v 3 h 3.99981 v -3 z" />
+    <path
+       id="rect8923-8-8-2-3"
+       style="display:inline;fill:#6bb0ff;fill-opacity:1;stroke-width:1;stroke-linecap:round"
+       d="m 671.00009,532 v 3 h 3.99981 v -3 z" />
+    <path
+       id="rect8923-8-8-4-1"
+       style="display:inline;fill:#6bb0ff;fill-opacity:1;stroke-width:1;stroke-linecap:round"
+       d="m 676.00009,532 v 3 h 3.99981 v -3 z" />
+    <path
+       id="rect8923-8-8-24-6"
+       style="display:inline;fill:#6bb0ff;fill-opacity:1;stroke-width:1;stroke-linecap:round"
+       d="m 671.00009,536 v 3 h 3.99981 v -3 z" />
+    <path
+       id="rect8923-8-8-17-3"
+       style="display:inline;fill:#6bb0ff;fill-opacity:1;stroke-width:1;stroke-linecap:round"
+       d="m 671.00009,540 v 3 h 3.99981 v -3 z" />
+    <path
+       id="rect8923-8-8-9-1"
+       style="display:inline;fill:#6bb0ff;fill-opacity:1;stroke-width:1;stroke-linecap:round"
+       d="m 676.00009,540 v 3 h 3.99981 v -3 z" />
+    <path
+       id="rect8923-8-8-1-2"
+       style="display:inline;fill:#6bb0ff;fill-opacity:1;stroke-width:1;stroke-linecap:round"
+       d="m 666.00018,532.01679 v 3 h 3.99981 v -3 z" />
+    <path
+       id="rect8923-8-8-19-6"
+       style="display:inline;fill:#6bb0ff;fill-opacity:1;stroke-width:1;stroke-linecap:round"
+       d="m 666.00018,536.01679 v 3 h 3.99981 v -3 z" />
+    <path
+       id="path5651-4-4-8-2-5-9"
+       d="m 675.99999,536 h 4 v 3 h -4 z"
+       style="display:inline;fill:#005289;fill-opacity:1;stroke:none;stroke-width:1.41421px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
+    <rect
+       y="528.98322"
+       x="665"
+       height="15.999999"
+       width="16.000004"
+       id="rect4471-81-5-8-1-8-4-3-2-3-1-8-1-4-1"
+       style="color:#000000;display:inline;overflow:visible;visibility:visible;fill:none;fill-opacity:1;stroke:none;stroke-width:0;stroke-linecap:round;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;marker:none;enable-background:accumulate" />
+  </g>
+</svg>

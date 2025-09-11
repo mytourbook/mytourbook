@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2022 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2025 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -31,6 +31,7 @@ import net.tourbook.preferences.PrefPageAppearanceTourChart;
 import net.tourbook.srtm.IPreferences;
 import net.tourbook.srtm.PrefPageSRTMData;
 import net.tourbook.ui.ChartOptions_Grid;
+import net.tourbook.ui.ChartOptions_Layout;
 
 import org.eclipse.jface.action.ToolBarManager;
 import org.eclipse.jface.dialogs.MessageDialog;
@@ -61,25 +62,26 @@ import org.eclipse.ui.dialogs.PreferencesUtil;
  */
 public class SlideoutTourChartOptions extends ToolbarSlideout implements IActionResetToDefault {
 
-   private final IPreferenceStore _prefStore           = TourbookPlugin.getPrefStore();
+   private static final IPreferenceStore _prefStore           = TourbookPlugin.getPrefStore();
 
-   private SelectionListener      _defaultSelectionListener;
-   private MouseWheelListener     _defaultMouseWheelListener;
-   private FocusListener          _keepOpenListener;
+   private SelectionListener             _defaultSelectionListener;
+   private MouseWheelListener            _defaultMouseWheelListener;
+   private FocusListener                 _keepOpenListener;
 
-   private ActionOpenPrefDialog   _actionPrefDialog;
-   private ActionResetToDefaults  _actionRestoreDefaults;
+   private ActionOpenPrefDialog          _actionPrefDialog;
+   private ActionResetToDefaults         _actionRestoreDefaults;
 
-   private ChartOptions_Grid      _gridUI;
+   private ChartOptions_Grid             _gridUI;
+   private ChartOptions_Layout           _layoutUI;
 
-   private boolean                _isNeededToRecomputeValues;
+   private boolean                       _isNeededToRecomputeValues;
 
-   private int                    _speedDistanceIntervalBackup;
+   private int                           _speedDistanceIntervalBackup;
 
    /**
     * Pulse graph values MUST be in sync with pulse graph labels
     */
-   private PulseGraph[]           _allPulseGraph_Value = {
+   private PulseGraph[]                  _allPulseGraph_Value = {
 
          PulseGraph.DEVICE_BPM___2ND_RR_AVERAGE,
          PulseGraph.DEVICE_BPM_ONLY,
@@ -94,7 +96,7 @@ public class SlideoutTourChartOptions extends ToolbarSlideout implements IAction
    /**
     * Pulse graph labels MUST be in sync with pulse graph values
     */
-   private String[]               _allPulseGraph_Label = {
+   private String[]                      _allPulseGraph_Label = {
 
          Messages.TourChart_PulseGraph_DeviceBpm_2nd_RRAverage,
          Messages.TourChart_PulseGraph_DeviceBpm_Only,
@@ -105,7 +107,7 @@ public class SlideoutTourChartOptions extends ToolbarSlideout implements IAction
          Messages.TourChart_PulseGraph_RRAverage_2nd_DeviceBpm,
    };
 
-   private ArrayList<PulseGraph>  _possiblePulseGraph_Values;
+   private ArrayList<PulseGraph>         _possiblePulseGraph_Values;
 
    /*
     * UI controls
@@ -142,13 +144,15 @@ public class SlideoutTourChartOptions extends ToolbarSlideout implements IAction
    public SlideoutTourChartOptions(final Control ownerControl,
                                    final ToolBar toolBar,
                                    final TourChart tourChart,
-                                   final String gridPrefPrefix) {
+                                   final String gridPrefPrefix,
+                                   final String layoutPrefPrefix) {
 
       super(ownerControl, toolBar);
 
       _tourChart = tourChart;
 
       _gridUI = new ChartOptions_Grid(gridPrefPrefix);
+      _layoutUI = new ChartOptions_Layout(layoutPrefPrefix);
    }
 
    private void createActions() {
@@ -192,10 +196,12 @@ public class SlideoutTourChartOptions extends ToolbarSlideout implements IAction
                createUI_10_Title(titleContainer);
                createUI_12_Actions(titleContainer);
             }
+
             createUI_20_Options(container);
             createUI_30_Graph(container);
 
             _gridUI.createUI(container);
+            _layoutUI.createUI(container);
          }
       }
 
@@ -466,8 +472,7 @@ public class SlideoutTourChartOptions extends ToolbarSlideout implements IAction
                _spinnerGraphLineOpacity.setToolTipText(tooltipText);
                _spinnerGraphLineOpacity.addMouseWheelListener(_defaultMouseWheelListener);
                _spinnerGraphLineOpacity.addSelectionListener(_defaultSelectionListener);
-               GridDataFactory.fillDefaults()
-                     .applyTo(_spinnerGraphLineOpacity);
+               GridDataFactory.fillDefaults().applyTo(_spinnerGraphLineOpacity);
             }
             {
                final Label spacer = UI.createSpacer_Horizontal(group, 1);
@@ -667,6 +672,8 @@ public class SlideoutTourChartOptions extends ToolbarSlideout implements IAction
       _prefStore.setValue(ITourbookPreferences.VALUE_POINT_TOOL_TIP_IS_VISIBLE_CHART, isShowValuePointTooltip);
 
       _gridUI.resetToDefaults();
+      _layoutUI.resetToDefaults();
+
 
       onChangeUI();
    }
@@ -716,6 +723,7 @@ public class SlideoutTourChartOptions extends ToolbarSlideout implements IAction
             tcc.isShowTimeOnXAxis);
 
       _gridUI.restoreState();
+      _layoutUI.restoreState();
    }
 
    private void saveState() {
@@ -768,8 +776,6 @@ public class SlideoutTourChartOptions extends ToolbarSlideout implements IAction
       _prefStore.setValue(ITourbookPreferences.GRAPH_SPEED_PACE_DISTANCE_INTERVAL,     speedDistanceInterval);
       _prefStore.setValue(ITourbookPreferences.GRAPH_TRANSPARENCY_LINE,                UI.transformOpacity_WhenSaved(graphLineOpacity));
       _prefStore.setValue(ITourbookPreferences.GRAPH_X_AXIS_STARTTIME,                 isTourStartTime);
-
-      _gridUI.saveState();
 
       _tourChart.setupChartConfig();
 

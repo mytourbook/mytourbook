@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2022 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2025 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -26,11 +26,12 @@ import org.eclipse.jface.wizard.Wizard;
 
 public class WizardTourComparer extends Wizard {
 
-   public static final String        DIALOG_SETTINGS_SECTION           = "WizardTourComparer";                            //$NON-NLS-1$
+   public static final String        DIALOG_SETTINGS_SECTION            = "WizardTourComparer";                            //$NON-NLS-1$
 
-   static final String               GRID_PREFIX_REF_TOUR_COMPARE_TOUR = "GRID_PREFIX_REF_TOUR_COMPARE_TOUR";             //$NON-NLS-1$
+   static final String               GRID_PREF_PREFIX_TOUR_COMPARE_TOUR = "GRID_PREFIX_REF_TOUR_COMPARE_TOUR";             //$NON-NLS-1$
+   static final String               LAYOUT_PREF_PREFIX                 = "LAYOUT_TOUR_COMPARE__";                         //$NON-NLS-1$
 
-   private final IDialogSettings     _state                            = TourbookPlugin.getState(DIALOG_SETTINGS_SECTION);
+   private final IDialogSettings     _state                             = TourbookPlugin.getState(DIALOG_SETTINGS_SECTION);
 
    private WizardPage_10_CompareTour _pageCompareTour;
 

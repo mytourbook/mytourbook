@@ -14,6 +14,8 @@ body
    $BODY_SCROLLBAR$
 }
 
+$BODY_SCROLLBAR_EXTENDED$
+
 p,td,ul 
 {
    line-height:            130%;

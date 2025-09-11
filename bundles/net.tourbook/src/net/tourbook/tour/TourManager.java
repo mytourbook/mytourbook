@@ -670,14 +670,16 @@ public class TourManager {
          return false;
       }
 
-      final float[] distanceSerie = new float[latSerie.length];
+      final int numTimeSlices = latSerie.length;
+
+      final float[] distanceSerie = new float[numTimeSlices];
 
       double distance = 0;
       double latStart = latSerie[0];
       double lonStart = lonSerie[0];
 
       // compute distance for every time slice
-      for (int serieIndex = 1; serieIndex < latSerie.length; serieIndex++) {
+      for (int serieIndex = 1; serieIndex < numTimeSlices; serieIndex++) {
 
          final double latEnd = latSerie[serieIndex];
          final double lonEnd = lonSerie[serieIndex];
@@ -685,7 +687,7 @@ public class TourManager {
          /*
           * vincenty algorithm is much more accurate compared with haversine
           */
-//         final double distDiff = Util.distanceHaversine(latStart, lonStart, latEnd, lonEnd);
+//       final double distDiff = Util.distanceHaversine(latStart, lonStart, latEnd, lonEnd);
          final double distDiff = MtMath.distanceVincenty(latStart, lonStart, latEnd, lonEnd);
 
          distance += distDiff;
@@ -703,7 +705,18 @@ public class TourManager {
       if (allTourMarker != null) {
 
          for (final TourMarker tourMarker : allTourMarker) {
-            final float markerDistance = distanceSerie[tourMarker.getSerieIndex()];
+
+            int markerSerieIndex = tourMarker.getSerieIndex();
+
+            if (markerSerieIndex >= numTimeSlices) {
+
+               // this happened during the db data update 057 -> 058 because the data series where adjusted
+
+               markerSerieIndex = numTimeSlices - 1;
+            }
+
+            final float markerDistance = distanceSerie[markerSerieIndex];
+
             tourMarker.setDistance(markerDistance);
          }
       }
@@ -1310,8 +1323,7 @@ public class TourManager {
       joinedTourData.setTourDistance(tourDistance);
 
       // computing these values is VERY CPU intensive because of the DP algorithm
-      joinedTourData.setTourAltUp(tourAltUp);
-      joinedTourData.setTourAltDown(tourAltDown);
+      joinedTourData.setElevationGainLoss(tourAltUp, tourAltDown);
 
       joinedTourData.computeTourMovingTime();
       joinedTourData.computeComputedValues();
@@ -2432,6 +2444,9 @@ public class TourManager {
                                        final boolean isRemoveDistance,
                                        final boolean isAdjustTourStartTime) {
 
+      // this must be done before the time series are modified
+      tourData.removePhotos(firstIndex, lastIndex);
+
       // this must be done with the original timeSerie
       removeTourPauses(tourData, firstIndex, lastIndex, isRemoveTime);
 
@@ -2549,7 +2564,7 @@ public class TourManager {
       tourData.segmentSerieIndex = null;
       tourData.segmentSerieIndex2nd = null;
 
-      removeTourMarkers(tourData, firstIndex, lastIndex, isRemoveTime);
+      removeTimeSlices_TourMarkers(tourData, firstIndex, lastIndex, isRemoveTime);
    }
 
    private static double[] removeTimeSlices_Double(final double[] dataSerie,
@@ -2743,11 +2758,16 @@ public class TourManager {
          return;
       }
 
+      // it is complicate to remove time slices and/or adjust tour start time
+      final boolean isRemovePhotoSlices = isAdjustTourStartTime && firstIndex == 0;
+
+      final boolean isRemoveTimeValues = isRemoveTime || isRemovePhotoSlices;
+
       final int timeFirstIndex = timeSerie[firstIndex];
       final int timeNextIndex = timeSerie[lastIndex + 1];
 
       int timeDiff = 0;
-      if (isRemoveTime) {
+      if (isRemoveTimeValues) {
          timeDiff = timeNextIndex - timeFirstIndex;
       }
 
@@ -2759,7 +2779,7 @@ public class TourManager {
       // update remaining time and distance data series
       for (int serieIndex = lastIndex + 1; serieIndex < timeSerie.length; serieIndex++) {
 
-         if (isRemoveTime) {
+         if (isRemoveTimeValues) {
             timeSerie[serieIndex] = timeSerie[serieIndex] - timeDiff;
          }
 
@@ -2768,7 +2788,7 @@ public class TourManager {
          }
       }
 
-      if (isRemoveTime && isAdjustTourStartTime) {
+      if (isRemoveTimeValues && isAdjustTourStartTime || isRemovePhotoSlices) {
 
          final ZonedDateTime tourStartTime = tourData.getTourStartTime();
          final ZonedDateTime newTourStartTime = tourStartTime.plusSeconds(timeDiff);
@@ -2786,10 +2806,10 @@ public class TourManager {
     * @param lastSerieIndex
     * @param isRemoveTime
     */
-   private static void removeTourMarkers(final TourData tourData,
-                                         final int firstSerieIndex,
-                                         final int lastSerieIndex,
-                                         final boolean isRemoveTime) {
+   private static void removeTimeSlices_TourMarkers(final TourData tourData,
+                                                    final int firstSerieIndex,
+                                                    final int lastSerieIndex,
+                                                    final boolean isRemoveTime) {
 
       // check if markers are available
       final Set<TourMarker> allTourMarkers = tourData.getTourMarkers();
@@ -3285,10 +3305,26 @@ public class TourManager {
 
          savedTours.add(savedTour);
 
+         /*
+          * Preserve transient values
+          */
+
          // keep the current map position that a saved tour is not centered with default size
          savedTour.mapZoomLevel = tourData.mapZoomLevel;
          savedTour.mapCenterPositionLatitude = tourData.mapCenterPositionLatitude;
          savedTour.mapCenterPositionLongitude = tourData.mapCenterPositionLongitude;
+
+//         System.out.println(UI.timeStamp()
+//
+//               + UI.NEW_LINE
+//               + "   tourData Before Save " + System.identityHashCode(tourData)
+//
+//               + UI.NEW_LINE
+//               + "   tourData Saved       " + System.identityHashCode(savedTour)
+//
+//               + UI.NEW_LINE
+//
+//         );
       }
    }
 
@@ -3358,7 +3394,7 @@ public class TourManager {
 
             TourLogManager.subLog_OK(TourManager.getTourDateTimeShort(tourData));
 
-            final boolean isReplaced = tourData.replaceAltitudeWithSRTM(true);
+            final boolean isReplaced = tourData.replaceElevationWithSRTM(true);
 
             RawDataManager.displayTourModifiedDataDifferences(
                   TourValueType.TIME_SLICES__ELEVATION,
@@ -5072,7 +5108,7 @@ public class TourManager {
                                                      final TourChartConfiguration tcc) {
       ChartDataYSerie yDataElevation = null;
 
-      final float[] altitudeSerie = tourData.getAltitudeSmoothedSerie(true);
+      final float[] altitudeSerie = tourData.getAltitudeSmoothedSerie();
       if (altitudeSerie != null) {
 
          if (tourData.isSRTMAvailable()) {
@@ -5603,7 +5639,7 @@ public class TourManager {
          yDataPace = createChartDataSerieNoZero(paceSerie, chartType);
 
          yDataPace.setYTitle(OtherMessages.GRAPH_LABEL_PACE);
-         yDataPace.setUnitLabel(UI.UNIT_LABEL_PACE);
+         yDataPace.setUnitLabel(tourData.isSwimming() ? UI.UNIT_LABEL_PACE_SWIMMING : UI.UNIT_LABEL_PACE);
          yDataPace.setShowYSlider(true);
          yDataPace.setAxisUnit(ChartDataSerie.AXIS_UNIT_MINUTE_SECOND);
          yDataPace.setSliderLabelFormat(ChartDataYSerie.SLIDER_LABEL_FORMAT_MM_SS);

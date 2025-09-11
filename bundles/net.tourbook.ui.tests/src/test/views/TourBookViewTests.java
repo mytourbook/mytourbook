@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2022, 2024 Frédéric Bard
+ * Copyright (C) 2022, 2025 Frédéric Bard
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -27,6 +27,7 @@ import java.util.List;
 
 import net.tourbook.Messages;
 import net.tourbook.application.PluginProperties;
+import net.tourbook.common.UI;
 import net.tourbook.common.util.FileUtils;
 import net.tourbook.common.util.StringUtils;
 import net.tourbook.tour.TourLogManager;
@@ -67,13 +68,17 @@ public class TourBookViewTests extends UITest {
             .menu(Messages.tour_editor_section_weather)
             .menu(Messages.Tour_Action_RetrieveWeatherData).click();
 
-      bot.sleep(5000);
+      // Because the https://render.com/ cloud subscription is free, we can experience
+      // the below caveat which can make the weather data retrieval tests fail:
+      // "Your free instance will spin down with inactivity, which can delay requests
+      // by 50 seconds or more"
+      bot.sleep(60000);
 
       final List<?> logs = TourLogManager.getLogs();
       assertTrue(logs.stream().map(log -> log.toString()).anyMatch(log -> log.contains(
             "Data retrieved in ")));//$NON-NLS-1$
       assertTrue(logs.stream().map(log -> log.toString()).anyMatch(log -> log.contains(
-            "1/31/2021, 7:15 AM:")));//$NON-NLS-1$
+            "1/31/2021, 7:15 AM:")));//$NON-NLS-1$
       assertTrue(logs.stream().map(log -> log.toString()).anyMatch(log -> log.contains(
             "air quality Fair")));//$NON-NLS-1$
    }
@@ -82,7 +87,7 @@ public class TourBookViewTests extends UITest {
    void adjustTourValues_SetTimeZone_AllChoices() {
 
       SWTBotTreeItem tour = Utils.duplicateAndGetTour(bot);
-      assertEquals("11:00 AM", tour.cell(tourBookView_StartTime_Column_Index)); //$NON-NLS-1$
+      assertEquals("11:00 AM", tour.cell(tourBookView_StartTime_Column_Index)); //$NON-NLS-1$
       assertEquals("America/Los_Angeles", tour.cell(tourBookView_TimeZone_Column_Index)); //$NON-NLS-1$
 
       //Adjust the tour time zone
@@ -92,7 +97,7 @@ public class TourBookViewTests extends UITest {
 
       //Assert
       tour = Utils.selectDuplicatedTour(bot);
-      assertEquals("12:00 PM", tour.cell(tourBookView_StartTime_Column_Index)); //$NON-NLS-1$
+      assertEquals("12:00 PM", tour.cell(tourBookView_StartTime_Column_Index)); //$NON-NLS-1$
       assertEquals("US/Mountain", tour.cell(tourBookView_TimeZone_Column_Index)); //$NON-NLS-1$
 
       //Adjust the tour time zone to the default value set in the preferences
@@ -102,7 +107,7 @@ public class TourBookViewTests extends UITest {
 
       //Assert
       tour = Utils.selectDuplicatedTour(bot);
-      assertEquals("8:00 PM", tour.cell(tourBookView_StartTime_Column_Index)); //$NON-NLS-1$
+      assertEquals("8:00 PM", tour.cell(tourBookView_StartTime_Column_Index)); //$NON-NLS-1$
       assertEquals("Europe/Paris", tour.cell(tourBookView_TimeZone_Column_Index)); //$NON-NLS-1$
 
       Utils.deleteTour(bot, tour);
@@ -234,7 +239,10 @@ public class TourBookViewTests extends UITest {
    void testTourFilters() {
 
       // Activate the tour filter
-      final SWTBotToolbarToggleButton tourFilterButton = bot.toolbarToggleButtonWithTooltip(Messages.Tour_Filter_Action_Tooltip);
+      final SWTBotToolbarToggleButton tourFilterButton = bot.toolbarToggleButtonWithTooltip(
+            Messages.Tour_Filter_Action_Tooltip +
+                  UI.NEW_LINE2 +
+                  net.tourbook.common.Messages.Slideout_Dialog_Action_ResetSlideoutLocation_Tooltip);
       assertNotNull(tourFilterButton);
       tourFilterButton.click();
 
@@ -242,7 +250,10 @@ public class TourBookViewTests extends UITest {
       tourFilterButton.click();
 
       // Activate the tour geo filter
-      final SWTBotToolbarToggleButton tourGeoFilterButton = bot.toolbarToggleButtonWithTooltip(Messages.Tour_GeoFilter_Action_Tooltip);
+      final SWTBotToolbarToggleButton tourGeoFilterButton = bot.toolbarToggleButtonWithTooltip(
+            Messages.Tour_GeoFilter_Action_Tooltip +
+                  UI.NEW_LINE2 +
+                  net.tourbook.common.Messages.Slideout_Dialog_Action_ResetSlideoutLocation_Tooltip);
       assertNotNull(tourGeoFilterButton);
       tourGeoFilterButton.click();
 
@@ -250,7 +261,10 @@ public class TourBookViewTests extends UITest {
       tourGeoFilterButton.click();
 
       // Activate the tour tag filter
-      final SWTBotToolbarToggleButton tourTagFilterButton = bot.toolbarToggleButtonWithTooltip(Messages.Tour_Tag_Filter_Action_Tooltip);
+      final SWTBotToolbarToggleButton tourTagFilterButton = bot.toolbarToggleButtonWithTooltip(
+            Messages.Tour_Tag_Filter_Action_Tooltip +
+                  UI.NEW_LINE2 +
+                  net.tourbook.common.Messages.Slideout_Dialog_Action_ResetSlideoutLocation_Tooltip);
       assertNotNull(tourTagFilterButton);
       tourTagFilterButton.click();
 
@@ -258,8 +272,8 @@ public class TourBookViewTests extends UITest {
       tourTagFilterButton.click();
 
       // Activate the tour photo filter
-      final SWTBotToolbarToggleButton tourPhotoFilterButton = bot.toolbarToggleButtonWithTooltip(PluginProperties.getText(
-            "Action_TourPhotoFilter_Tooltip")); //$NON-NLS-1$
+      final SWTBotToolbarToggleButton tourPhotoFilterButton = bot.toolbarToggleButtonWithTooltip(
+            PluginProperties.getText("Action_TourPhotoFilter_Tooltip")); //$NON-NLS-1$
       assertNotNull(tourPhotoFilterButton);
       tourPhotoFilterButton.click();
 

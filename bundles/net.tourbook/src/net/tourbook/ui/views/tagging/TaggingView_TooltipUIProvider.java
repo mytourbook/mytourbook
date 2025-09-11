@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2025 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -100,7 +100,6 @@ public class TaggingView_TooltipUIProvider implements ITooltipUIProvider {
          setToolTipText(Messages.Action_Tag_Edit_Tooltip);
 
          setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.App_Edit));
-         setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Images.EditTour_Disabled));
       }
 
       @Override

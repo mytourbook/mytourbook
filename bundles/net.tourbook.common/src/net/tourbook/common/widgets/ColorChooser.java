@@ -27,7 +27,7 @@ import java.io.Writer;
 
 import net.tourbook.common.Messages;
 import net.tourbook.common.UI;
-import net.tourbook.common.util.NoAutoScalingImageDataProvider;
+import net.tourbook.common.util.CustomScalingImageDataProvider;
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.Util;
 import net.tourbook.common.widgets.actions.ActionColorChooserAddColorsFromProfile;
@@ -811,7 +811,7 @@ public class ColorChooser extends Composite {
          }
       }
 
-      final Image swtImage = new Image(Display.getCurrent(), new NoAutoScalingImageDataProvider(awtImage));
+      final Image swtImage = new Image(Display.getCurrent(), new CustomScalingImageDataProvider(awtImage));
 
       _hexagonCanvas.setImage(swtImage);
    }

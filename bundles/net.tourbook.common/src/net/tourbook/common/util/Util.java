@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2024 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2025 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -49,6 +49,8 @@ import java.util.Calendar;
 import java.util.Collections;
 import java.util.List;
 import java.util.StringTokenizer;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
 
 import javax.imageio.ImageIO;
 
@@ -2153,7 +2155,9 @@ public class Util {
       return file.isDirectory();
    }
 
-   public static void logSystemProperty_IsEnabled(final Class<?> clazz, final String propertyName, final String propertyDescription) {
+   public static void logSystemProperty_IsEnabled(final Class<?> clazz,
+                                                  final String propertyName,
+                                                  final String propertyDescription) {
 
       StatusUtil.logInfo(String.format("%s [System Property - %s] - \"%s\" is enabled -> %s", //$NON-NLS-1$
             UI.timeStampNano(),
@@ -3391,6 +3395,26 @@ public class Util {
    public static int sizeof(final Object object) {
 
       return serializeObject(object).length;
+   }
+
+   /**
+    * Waits until all task are done
+    *
+    * @param allTasks
+    */
+   public static void waitTasks(final Future<?>[] allTasks) {
+
+      for (final Future<?> future : allTasks) {
+
+         try {
+
+            future.get();
+
+         } catch (InterruptedException | ExecutionException e) {
+
+            StatusUtil.showStatus(e);
+         }
+      }
    }
 
    /**

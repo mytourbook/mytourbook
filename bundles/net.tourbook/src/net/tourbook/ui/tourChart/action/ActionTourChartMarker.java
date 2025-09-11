@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2025 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -51,7 +51,6 @@ public class ActionTourChartMarker extends ContributionItem implements IOpeningD
    private Control _parent;
 
    private Image   _imageEnabled;
-   private Image   _imageDisabled;
 
    public ActionTourChartMarker(final TourChart tourChart, final Control parent) {
 
@@ -59,7 +58,6 @@ public class ActionTourChartMarker extends ContributionItem implements IOpeningD
       _parent = parent;
 
       _imageEnabled = TourbookPlugin.getThemedImageDescriptor(Images.TourMarker).createImage();
-      _imageDisabled = TourbookPlugin.getImageDescriptor(Images.TourMarker_Disabled).createImage();
 
       parent.addDisposeListener(disposeEvent -> onDispose());
    }
@@ -78,7 +76,6 @@ public class ActionTourChartMarker extends ContributionItem implements IOpeningD
 
          _actionToolItem = new ToolItem(toolbar, SWT.CHECK);
          _actionToolItem.setImage(_imageEnabled);
-         _actionToolItem.setDisabledImage(_imageDisabled);
          _actionToolItem.addSelectionListener(widgetSelectedAdapter(selectionEvent -> onAction()));
 
          toolbar.addMouseMoveListener(mouseEvent -> {
@@ -134,10 +131,6 @@ public class ActionTourChartMarker extends ContributionItem implements IOpeningD
 
       if (_imageEnabled != null) {
          _imageEnabled.dispose();
-      }
-
-      if (_imageDisabled != null) {
-         _imageDisabled.dispose();
       }
    }
 

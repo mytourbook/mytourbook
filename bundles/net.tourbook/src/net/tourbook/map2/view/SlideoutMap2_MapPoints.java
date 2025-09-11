@@ -357,7 +357,6 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements
          setToolTipText(Messages.Slideout_MapPoints_Action_MarkerTypes_SelectAll_Tooltip);
 
          setImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.Checkbox_Checked));
-         setDisabledImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.Checkbox_Checked_Disabled));
       }
 
       @Override
@@ -376,7 +375,6 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements
          setToolTipText(Messages.Slideout_MapPoints_Action_MarkerTypes_InverteSelection_Tooltip);
 
          setImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.Checkbox_Inverse));
-         setDisabledImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.Checkbox_Inverse_Disabled));
       }
 
       @Override
@@ -395,7 +393,6 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements
          setToolTipText(Messages.Slideout_MapPoints_Action_MarkerTypes_DeselectAll_Tooltip);
 
          setImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.Checkbox_Uncheck));
-         setDisabledImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.Checkbox_Uncheck_Disabled));
       }
 
       @Override
@@ -2351,6 +2348,25 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements
 // SET_FORMATTING_ON
 
       onModifyConfig(true, null);
+   }
+
+   @Override
+   protected void onResetLocation() {
+
+      // show expanded, there is a bug in Linux where the tooltip header actions could not be selected
+      _isSlideoutExpanded = true;
+
+      // ensure that this is also set when the slideout was not yet open
+      _state_Slideout.put(STATE_IS_SLIDEOUT_EXPANDED, _isSlideoutExpanded);
+
+      if (_tabContainer != null && _tabContainer.isDisposed() == false) {
+
+         // slideout was created
+
+         updateUI_ExpandCollapse();
+
+         onTTShellResize(null);
+      }
    }
 
    @Override

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2012  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2025 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -15,8 +15,8 @@
  *******************************************************************************/
 package net.tourbook.photo.internal;
 
-import net.tourbook.photo.PhotoActivator;
-import net.tourbook.photo.PhotoImages;
+import net.tourbook.common.CommonActivator;
+import net.tourbook.common.CommonImages;
 
 import org.eclipse.jface.action.Action;
 
@@ -30,7 +30,7 @@ public class ActionClearNavigationHistory extends Action {
 
       _picDirImages = picDirImages;
 
-      setImageDescriptor(PhotoActivator.getImageDescriptor(PhotoImages.App_Delete));
+      setImageDescriptor(CommonActivator.getImageDescriptor(CommonImages.App_Delete));
    }
 
    @Override

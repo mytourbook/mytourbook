@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2024 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2025 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -291,7 +291,6 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer,
          super(Messages.Action_Tag_Delete, AS_PUSH_BUTTON);
 
          setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.App_Delete));
-         setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Images.App_Delete_Disabled));
       }
 
       @Override
@@ -307,7 +306,6 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer,
          super(Messages.Action_Tag_DeleteCategory, AS_PUSH_BUTTON);
 
          setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.App_Delete));
-         setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Images.App_Delete_Disabled));
       }
 
       @Override
@@ -745,7 +743,6 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer,
             PrefPageTags.ID);
 
       _action_PrefDialog.setImageDescriptor(CommonActivator.getThemedImageDescriptor(CommonImages.TourOptions));
-      _action_PrefDialog.setDisabledImageDescriptor(CommonActivator.getImageDescriptor(CommonImages.TourOptions_Disabled));
    }
 
    private void createMenuManager() {
@@ -3091,7 +3088,6 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer,
 
          _action_ToggleTagLayout.setToolTipText(Messages.Tour_Tags_Action_Layout_Flat_Tooltip);
          _action_ToggleTagLayout.setImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.TagLayout_Flat));
-         _action_ToggleTagLayout.setDisabledImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.TagLayout_Flat_Disabled));
 
       } else {
 
@@ -3099,7 +3095,6 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer,
 
          _action_ToggleTagLayout.setToolTipText(Messages.Tour_Tags_Action_Layout_Hierarchical_Tooltip);
          _action_ToggleTagLayout.setImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.TagLayout_Hierarchical));
-         _action_ToggleTagLayout.setDisabledImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.TagLayout_Hierarchical_Disabled));
       }
    }
 

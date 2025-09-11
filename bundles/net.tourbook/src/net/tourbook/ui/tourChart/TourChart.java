@@ -145,19 +145,22 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 
    private static final int      PAGE_NAVIGATION_SEGMENTS                  = 10;
 
-   public static final String    ACTION_ID_CAN_AUTO_ZOOM_TO_SLIDER         = "ACTION_ID_CAN_AUTO_ZOOM_TO_SLIDER";       //$NON-NLS-1$
-   public static final String    ACTION_ID_CAN_MOVE_SLIDERS_WHEN_ZOOMED    = "ACTION_ID_CAN_MOVE_SLIDERS_WHEN_ZOOMED";  //$NON-NLS-1$
-   public static final String    ACTION_ID_EDIT_CHART_PREFERENCES          = "ACTION_ID_EDIT_CHART_PREFERENCES";        //$NON-NLS-1$
-   private static final String   ACTION_ID_IS_GRAPH_OVERLAPPED             = "ACTION_ID_IS_GRAPH_OVERLAPPED";           //$NON-NLS-1$
-   public static final String    ACTION_ID_IS_SHOW_TOUR_PHOTOS             = "ACTION_ID_IS_SHOW_TOUR_PHOTOS";           //$NON-NLS-1$
-   public static final String    ACTION_ID_X_AXIS_DISTANCE                 = "ACTION_ID_X_AXIS_DISTANCE";               //$NON-NLS-1$
-   public static final String    ACTION_ID_X_AXIS_TIME                     = "ACTION_ID_X_AXIS_TIME";                   //$NON-NLS-1$
+   public static final String    ACTION_ID_CAN_AUTO_ZOOM_TO_SLIDER         = "ACTION_ID_CAN_AUTO_ZOOM_TO_SLIDER";                                                       //$NON-NLS-1$
+   public static final String    ACTION_ID_CAN_MOVE_SLIDERS_WHEN_ZOOMED    = "ACTION_ID_CAN_MOVE_SLIDERS_WHEN_ZOOMED";                                                  //$NON-NLS-1$
+   public static final String    ACTION_ID_EDIT_CHART_PREFERENCES          = "ACTION_ID_EDIT_CHART_PREFERENCES";                                                        //$NON-NLS-1$
+   private static final String   ACTION_ID_IS_GRAPH_OVERLAPPED             = "ACTION_ID_IS_GRAPH_OVERLAPPED";                                                           //$NON-NLS-1$
+   public static final String    ACTION_ID_IS_SHOW_TOUR_PHOTOS             = "ACTION_ID_IS_SHOW_TOUR_PHOTOS";                                                           //$NON-NLS-1$
+   public static final String    ACTION_ID_X_AXIS_DISTANCE                 = "ACTION_ID_X_AXIS_DISTANCE";                                                               //$NON-NLS-1$
+   public static final String    ACTION_ID_X_AXIS_TIME                     = "ACTION_ID_X_AXIS_TIME";                                                                   //$NON-NLS-1$
 
-   private static final String   GRID_PREF_PREFIX                          = "GRID_TOUR_CHART__";                       //$NON-NLS-1$
-   private static final String   GRID_IS_SHOW_VERTICAL_GRIDLINES           = (GRID_PREF_PREFIX   + ITourbookPreferences.CHART_GRID_IS_SHOW_VERTICAL_GRIDLINES);
-   private static final String   GRID_IS_SHOW_HORIZONTAL_GRIDLINES         = (GRID_PREF_PREFIX   + ITourbookPreferences.CHART_GRID_IS_SHOW_HORIZONTAL_GRIDLINES);
-   private static final String   GRID_VERTICAL_DISTANCE                    = (GRID_PREF_PREFIX   + ITourbookPreferences.CHART_GRID_VERTICAL_DISTANCE);
-   private static final String   GRID_HORIZONTAL_DISTANCE                  = (GRID_PREF_PREFIX   + ITourbookPreferences.CHART_GRID_HORIZONTAL_DISTANCE);
+   private static final String   GRID_PREF_PREFIX                          = "GRID_TOUR_CHART__";                                                                       //$NON-NLS-1$
+   private static final String   GRID_IS_SHOW_VERTICAL_GRIDLINES           = GRID_PREF_PREFIX   + ITourbookPreferences.CHART_GRID_IS_SHOW_VERTICAL_GRIDLINES;
+   private static final String   GRID_IS_SHOW_HORIZONTAL_GRIDLINES         = GRID_PREF_PREFIX   + ITourbookPreferences.CHART_GRID_IS_SHOW_HORIZONTAL_GRIDLINES;
+   private static final String   GRID_VERTICAL_DISTANCE                    = GRID_PREF_PREFIX   + ITourbookPreferences.CHART_GRID_VERTICAL_DISTANCE;
+   private static final String   GRID_HORIZONTAL_DISTANCE                  = GRID_PREF_PREFIX   + ITourbookPreferences.CHART_GRID_HORIZONTAL_DISTANCE;
+
+   private static final String   LAYOUT_PREF_PREFIX                        = "LAYOUT_TOUR_CHART__";                                                           //$NON-NLS-1$
+   private static final String   LAYOUT_GRAPH_Y_AXIS_WIDTH                 = LAYOUT_PREF_PREFIX   + ITourbookPreferences.CHART_Y_AXIS_WIDTH;
 
    static final String  STATE_IS_SHOW_IN_CHART_TOOLBAR_ALTITUDE                              = "STATE_IS_SHOW_IN_CHART_TOOLBAR_ALTITUDE";                      //$NON-NLS-1$
    static final String  STATE_IS_SHOW_IN_CHART_TOOLBAR_ALTIMETER                             = "STATE_IS_SHOW_IN_CHART_TOOLBAR_ALTIMETER";                     //$NON-NLS-1$
@@ -165,12 +168,12 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
    static final String  STATE_IS_SHOW_IN_CHART_TOOLBAR_GEARS                                 = "STATE_IS_SHOW_IN_CHART_TOOLBAR_GEARS";                         //$NON-NLS-1$
    static final String  STATE_IS_SHOW_IN_CHART_TOOLBAR_GRADIENT                              = "STATE_IS_SHOW_IN_CHART_TOOLBAR_GRADIENT";                      //$NON-NLS-1$
    static final String  STATE_IS_SHOW_IN_CHART_TOOLBAR_PACE                                  = "STATE_IS_SHOW_IN_CHART_TOOLBAR_PACE";                          //$NON-NLS-1$
-   static final String  STATE_IS_SHOW_IN_CHART_TOOLBAR_PACE_INTERVAL                         = "STATE_IS_SHOW_IN_CHART_TOOLBAR_PACE_INTERVAL";               //$NON-NLS-1$
+   static final String  STATE_IS_SHOW_IN_CHART_TOOLBAR_PACE_INTERVAL                         = "STATE_IS_SHOW_IN_CHART_TOOLBAR_PACE_INTERVAL";                 //$NON-NLS-1$
    static final String  STATE_IS_SHOW_IN_CHART_TOOLBAR_PACE_SUMMARIZED                       = "STATE_IS_SHOW_IN_CHART_TOOLBAR_PACE_SUMMARIZED";               //$NON-NLS-1$
    static final String  STATE_IS_SHOW_IN_CHART_TOOLBAR_POWER                                 = "STATE_IS_SHOW_IN_CHART_TOOLBAR_POWER";                         //$NON-NLS-1$
    static final String  STATE_IS_SHOW_IN_CHART_TOOLBAR_PULSE                                 = "STATE_IS_SHOW_IN_CHART_TOOLBAR_PULSE";                         //$NON-NLS-1$
    static final String  STATE_IS_SHOW_IN_CHART_TOOLBAR_SPEED                                 = "STATE_IS_SHOW_IN_CHART_TOOLBAR_SPEED";                         //$NON-NLS-1$
-   static final String  STATE_IS_SHOW_IN_CHART_TOOLBAR_SPEED_INTERVAL                        = "STATE_IS_SHOW_IN_CHART_TOOLBAR_SPEED_INTERVAL";                         //$NON-NLS-1$
+   static final String  STATE_IS_SHOW_IN_CHART_TOOLBAR_SPEED_INTERVAL                        = "STATE_IS_SHOW_IN_CHART_TOOLBAR_SPEED_INTERVAL";                //$NON-NLS-1$
    static final String  STATE_IS_SHOW_IN_CHART_TOOLBAR_SPEED_SUMMARIZED                      = "STATE_IS_SHOW_IN_CHART_TOOLBAR_SPEED_SUMMARIZED";              //$NON-NLS-1$
    static final String  STATE_IS_SHOW_IN_CHART_TOOLBAR_TEMPERATURE                           = "STATE_IS_SHOW_IN_CHART_TOOLBAR_TEMPERATURE";                   //$NON-NLS-1$
    static final String  STATE_IS_SHOW_IN_CHART_TOOLBAR_RUN_DYN_STANCE_TIME                   = "STATE_IS_SHOW_IN_CHART_TOOLBAR_RUN_DYN_STANCE_TIME";           //$NON-NLS-1$
@@ -381,26 +384,25 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
    /*
     * UI controls
     */
-   private Composite                 _parent;
+   private Composite                       _parent;
    //
-   private I2ndAltiLayer             _layer2ndAlti;
-   private ChartLayer2ndAltiSerie    _layer2ndAltiSerie;
-   private ChartLayerMarker          _layerMarker;
-   private ChartLayerNight           _layerNightSections;
-   private ChartLayerPause           _layerPause;
-   private ChartLayerPhoto           _layerPhoto;
-   private ChartLayerSegmentAltitude _layerTourSegmenterAltitude;
-   private ChartLayerSegmentValue    _layerTourSegmenterOther;
+   private I2ndAltiLayer                   _layer2ndAlti;
+   private ChartLayerAdditionalValueSeries _layer2ndAltiSerie;
+   private ChartLayerMarker                _layerMarker;
+   private ChartLayerNight                 _layerNightSections;
+   private ChartLayerPause                 _layerPause;
+   private ChartLayerPhoto                 _layerPhoto;
+   private ChartLayerSegmentAltitude       _layerTourSegmenterAltitude;
+   private ChartLayerSegmentValue          _layerTourSegmenterOther;
    //
-   private Color                     _photoOverlayBGColorLink;
-   private Color                     _photoOverlayBGColorTour;
+   private Color                           _photoOverlayBGColorLink;
+   private Color                           _photoOverlayBGColorTour;
 
    private class Action_AllGraphs extends ActionToolbarSlideout {
 
       public Action_AllGraphs() {
 
-         super(TourbookPlugin.getThemedImageDescriptor(Images.Graph),
-               TourbookPlugin.getImageDescriptor(Images.Graph_Disabled));
+         super(TourbookPlugin.getThemedImageDescriptor(Images.Graph), null);
 
          setId(GRAPH_CONTRIBUTION_ID_SLIDEOUT);
       }
@@ -421,8 +423,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 
       public Action_GraphBackground_Slideout() {
 
-         super(TourbookPlugin.getThemedImageDescriptor(Images.Graph_Background),
-               TourbookPlugin.getImageDescriptor(Images.Graph_Background_Disabled));
+         super(TourbookPlugin.getThemedImageDescriptor(Images.Graph_Background), null);
       }
 
       @Override
@@ -442,7 +443,13 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
       @Override
       protected ToolbarSlideout createSlideout(final ToolBar toolbar) {
 
-         return new SlideoutTourChartOptions(_parent, toolbar, TourChart.this, GRID_PREF_PREFIX);
+         return new SlideoutTourChartOptions(
+
+               _parent,
+               toolbar,
+               TourChart.this,
+               GRID_PREF_PREFIX,
+               LAYOUT_PREF_PREFIX);
       }
 
       @Override
@@ -455,8 +462,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 
       public Action_TourChart_Smoothing() {
 
-         super(TourbookPlugin.getThemedImageDescriptor(Images.Smoothing),
-               TourbookPlugin.getImageDescriptor(Images.Smoothing_Disabled));
+         super(TourbookPlugin.getThemedImageDescriptor(Images.Smoothing));
       }
 
       @Override
@@ -478,7 +484,6 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
          super(Messages.Tour_Action_GeoCompare_Tooltip, AS_CHECK_BOX);
 
          setImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.TourCompare_GeoCompare_Tool));
-         setDisabledImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.TourCompare_GeoCompare_Tool_Disabled));
       }
 
       @Override
@@ -506,8 +511,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 
       public ActionGraphMinMax() {
 
-         super(TourbookPlugin.getThemedImageDescriptor(Images.GraphMinMax),
-               TourbookPlugin.getImageDescriptor(Images.GraphMinMax_Disabled));
+         super(TourbookPlugin.getThemedImageDescriptor(Images.GraphMinMax));
       }
 
       @Override
@@ -1187,9 +1191,11 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
                disposeColors();
 
             } else if (property.equals(ITourbookPreferences.GRAPH_ANTIALIASING)
+
                   || property.equals(ITourbookPreferences.GRAPH_IS_SEGMENT_ALTERNATE_COLOR)
                   || property.equals(ITourbookPreferences.GRAPH_SEGMENT_ALTERNATE_COLOR)
                   || property.equals(ITourbookPreferences.GRAPH_SEGMENT_ALTERNATE_COLOR_DARK)
+
                   || property.equals(ITourbookPreferences.GRAPH_TRANSPARENCY_LINE)
                   || property.equals(ITourbookPreferences.GRAPH_TRANSPARENCY_FILLING)
                   || property.equals(ITourbookPreferences.GRAPH_TRANSPARENCY_FILLING_DARK)
@@ -1198,6 +1204,8 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
                   || property.equals(GRID_IS_SHOW_VERTICAL_GRIDLINES)
                   || property.equals(GRID_HORIZONTAL_DISTANCE)
                   || property.equals(GRID_VERTICAL_DISTANCE)
+
+                  || property.equals(LAYOUT_GRAPH_Y_AXIS_WIDTH)
             //
             ) {
 
@@ -1246,6 +1254,12 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 
                final ActionXAxisDistance tourAction = (ActionXAxisDistance) _allTourChartActions.get(ACTION_ID_X_AXIS_DISTANCE);
                tourAction.setImages();
+
+            } else if (property.equals(ICommonPreferences.UI_DRAWING_FONT_IS_MODIFIED)) {
+
+               getChartComponents().updateFontScaling();
+
+               updateTourChart();
             }
 
             isChartModified |= setMinMaxDefaultValue(property, isChartModified);
@@ -1255,6 +1269,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
             }
 
          } finally {
+
             setIsInUpdateUI(false);
          }
       };
@@ -1358,7 +1373,6 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
             OtherMessages.GRAPH_LABEL_ALTITUDE,
             Messages.Tour_Action_graph_altitude_tooltip,
             ThemeUtil.getThemedImageName(Images.Graph_Elevation),
-            ThemeUtil.getThemedImageName(Images.Graph_Elevation_Disabled),
             GRAPH_CONTRIBUTION_ID_ALTITUDE);
 
       createActions_12_GraphAction(
@@ -1366,7 +1380,6 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
             OtherMessages.GRAPH_LABEL_SPEED,
             Messages.Tour_Action_graph_speed_tooltip,
             ThemeUtil.getThemedImageName(Images.Graph_Speed),
-            ThemeUtil.getThemedImageName(Images.Graph_Speed_Disabled),
             GRAPH_CONTRIBUTION_ID_SPEED);
 
       createActions_12_GraphAction(
@@ -1374,7 +1387,6 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
             OtherMessages.GRAPH_LABEL_SPEED,
             Messages.Tour_Action_Graph_SpeedInterval_Tooltip,
             ThemeUtil.getThemedImageName(Images.Graph_Speed_Interval),
-            ThemeUtil.getThemedImageName(Images.Graph_Speed_Interval_Disabled),
             GRAPH_CONTRIBUTION_ID_SPEED_INTERVAL);
 
       createActions_12_GraphAction(
@@ -1382,7 +1394,6 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
             OtherMessages.GRAPH_LABEL_SPEED,
             Messages.Tour_Action_Graph_SpeedSummarized_Tooltip,
             ThemeUtil.getThemedImageName(Images.Graph_Speed_Summarized),
-            ThemeUtil.getThemedImageName(Images.Graph_Speed_Summarized_Disabled),
             GRAPH_CONTRIBUTION_ID_SPEED_SUMMARIZED);
 
       createActions_12_GraphAction(
@@ -1390,7 +1401,6 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
             OtherMessages.GRAPH_LABEL_PACE,
             Messages.Tour_Action_graph_pace_tooltip,
             ThemeUtil.getThemedImageName(Images.Graph_Pace),
-            ThemeUtil.getThemedImageName(Images.Graph_Pace_Disabled),
             GRAPH_CONTRIBUTION_ID_PACE);
 
       createActions_12_GraphAction(
@@ -1398,7 +1408,6 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
             OtherMessages.GRAPH_LABEL_PACE,
             Messages.Tour_Action_Graph_PaceInterval_Tooltip,
             ThemeUtil.getThemedImageName(Images.Graph_Pace_Interval),
-            ThemeUtil.getThemedImageName(Images.Graph_Pace_Interval_Disabled),
             GRAPH_CONTRIBUTION_ID_PACE_INTERVAL);
 
       createActions_12_GraphAction(
@@ -1406,7 +1415,6 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
             OtherMessages.GRAPH_LABEL_PACE,
             Messages.Tour_Action_Graph_PaceSummarized_Tooltip,
             ThemeUtil.getThemedImageName(Images.Graph_Pace_Summarized),
-            ThemeUtil.getThemedImageName(Images.Graph_Pace_Summarized_Disabled),
             GRAPH_CONTRIBUTION_ID_PACE_SUMMARIZED);
 
       createActions_12_GraphAction(
@@ -1414,7 +1422,6 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
             OtherMessages.GRAPH_LABEL_POWER,
             Messages.Tour_Action_graph_power_tooltip,
             ThemeUtil.getThemedImageName(Images.Graph_Power),
-            ThemeUtil.getThemedImageName(Images.Graph_Power_Disabled),
             GRAPH_CONTRIBUTION_ID_POWER);
 
       createActions_12_GraphAction(
@@ -1422,7 +1429,6 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
             OtherMessages.GRAPH_LABEL_ALTIMETER,
             Messages.Tour_Action_graph_altimeter_tooltip,
             ThemeUtil.getThemedImageName(Images.Graph_Altimeter),
-            ThemeUtil.getThemedImageName(Images.Graph_Altimeter_Disabled),
             GRAPH_CONTRIBUTION_ID_ALTIMETER);
 
       createActions_12_GraphAction(
@@ -1430,7 +1436,6 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
             OtherMessages.GRAPH_LABEL_HEARTBEAT,
             Messages.Tour_Action_graph_heartbeat_tooltip,
             ThemeUtil.getThemedImageName(Images.Graph_Heartbeat),
-            ThemeUtil.getThemedImageName(Images.Graph_Heartbeat_Disabled),
             GRAPH_CONTRIBUTION_ID_PULSE);
 
       createActions_12_GraphAction(
@@ -1438,7 +1443,6 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
             OtherMessages.GRAPH_LABEL_TEMPERATURE,
             Messages.Tour_Action_graph_temperature_tooltip,
             ThemeUtil.getThemedImageName(Images.Graph_Temperature),
-            ThemeUtil.getThemedImageName(Images.Graph_Temperature_Disabled),
             GRAPH_CONTRIBUTION_ID_TEMPERATURE);
 
       createActions_12_GraphAction(
@@ -1446,7 +1450,6 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
             OtherMessages.GRAPH_LABEL_CADENCE,
             Messages.Tour_Action_graph_cadence_tooltip,
             ThemeUtil.getThemedImageName(Images.Graph_Cadence),
-            ThemeUtil.getThemedImageName(Images.Graph_Cadence_Disabled),
             GRAPH_CONTRIBUTION_ID_CADENCE);
 
       createActions_12_GraphAction(
@@ -1454,7 +1457,6 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
             OtherMessages.GRAPH_LABEL_GEARS,
             Messages.Tour_Action_GraphGears,
             ThemeUtil.getThemedImageName(Images.Graph_Gears),
-            ThemeUtil.getThemedImageName(Images.Graph_Gears_Disabled),
             GRAPH_CONTRIBUTION_ID_GEARS);
 
       createActions_12_GraphAction(
@@ -1462,7 +1464,6 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
             OtherMessages.GRAPH_LABEL_GRADIENT,
             Messages.Tour_Action_graph_gradient_tooltip,
             ThemeUtil.getThemedImageName(Images.Graph_Gradient),
-            ThemeUtil.getThemedImageName(Images.Graph_Gradient_Disabled),
             GRAPH_CONTRIBUTION_ID_GRADIENT);
 
       createActions_12_GraphAction(
@@ -1470,7 +1471,6 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
             OtherMessages.GRAPH_LABEL_TOUR_COMPARE,
             Messages.Tour_Action_graph_tour_compare_tooltip,
             ThemeUtil.getThemedImageName(Images.Graph_TourCompare_ByElevation),
-            ThemeUtil.getThemedImageName(Images.Graph_TourCompare_Disabled),
             GRAPH_CONTRIBUTION_ID_TOUR_COMPARE);
 
       createActions_12_GraphAction(
@@ -1478,7 +1478,6 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
             OtherMessages.GRAPH_LABEL_TOUR_COMPARE_REFERENCE_TOUR,
             Messages.Tour_Action_Graph_TourCompareReferenceTour_Tooltip,
             ThemeUtil.getThemedImageName(Images.Graph_TourCompare),
-            ThemeUtil.getThemedImageName(Images.Graph_TourCompare_Disabled),
             GRAPH_CONTRIBUTION_ID_TOUR_COMPARE_REF_TOUR);
 
       /*
@@ -1489,7 +1488,6 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
             OtherMessages.GRAPH_LABEL_RUN_DYN_STANCE_TIME,
             Messages.Tour_Action_RunDyn_StanceTime_Tooltip,
             ThemeUtil.getThemedImageName(Images.Graph_RunDyn_StanceTime),
-            ThemeUtil.getThemedImageName(Images.Graph_RunDyn_StanceTime_Disabled),
             GRAPH_CONTRIBUTION_ID_RUN_DYN_STANCE_TIME);
 
       createActions_12_GraphAction(
@@ -1497,7 +1495,6 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
             OtherMessages.GRAPH_LABEL_RUN_DYN_STANCE_TIME_BALANCE,
             Messages.Tour_Action_RunDyn_StanceTimeBalance_Tooltip,
             ThemeUtil.getThemedImageName(Images.Graph_RunDyn_StanceTimeBalance),
-            ThemeUtil.getThemedImageName(Images.Graph_RunDyn_StanceTimeBalance_Disabled),
             GRAPH_CONTRIBUTION_ID_RUN_DYN_STANCE_TIME_BALANCED);
 
       createActions_12_GraphAction(
@@ -1505,7 +1502,6 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
             OtherMessages.GRAPH_LABEL_RUN_DYN_STEP_LENGTH,
             Messages.Tour_Action_RunDyn_StepLength_Tooltip,
             ThemeUtil.getThemedImageName(Images.Graph_RunDyn_StepLength),
-            ThemeUtil.getThemedImageName(Images.Graph_RunDyn_StepLength_Disabled),
             GRAPH_CONTRIBUTION_ID_RUN_DYN_STEP_LENGTH);
 
       createActions_12_GraphAction(
@@ -1513,7 +1509,6 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
             OtherMessages.GRAPH_LABEL_RUN_DYN_VERTICAL_OSCILLATION,
             Messages.Tour_Action_RunDyn_VerticalOscillation_Tooltip,
             ThemeUtil.getThemedImageName(Images.Graph_RunDyn_VerticalOscillation),
-            ThemeUtil.getThemedImageName(Images.Graph_RunDyn_VerticalOscillation_Disabled),
             GRAPH_CONTRIBUTION_ID_RUN_DYN_VERTICAL_OSCILLATION);
 
       createActions_12_GraphAction(
@@ -1521,7 +1516,6 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
             OtherMessages.GRAPH_LABEL_RUN_DYN_VERTICAL_RATIO,
             Messages.Tour_Action_RunDyn_VerticalRatio_Tooltip,
             ThemeUtil.getThemedImageName(Images.Graph_RunDyn_VerticalRatio),
-            ThemeUtil.getThemedImageName(Images.Graph_RunDyn_VerticalRatio_Disabled),
             GRAPH_CONTRIBUTION_ID_RUN_DYN_VERTICAL_RATIO);
 
       /*
@@ -1532,7 +1526,6 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
             OtherMessages.GRAPH_LABEL_SWIM_STROKES,
             Messages.Tour_Action_Swim_Strokes_Tooltip,
             ThemeUtil.getThemedImageName(Images.Graph_Swim_Strokes),
-            ThemeUtil.getThemedImageName(Images.Graph_Swim_Strokes_Disabled),
             GRAPH_CONTRIBUTION_ID_SWIM_STROKES);
 
       createActions_12_GraphAction(
@@ -1540,7 +1533,6 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
             OtherMessages.GRAPH_LABEL_SWIM_SWOLF,
             Messages.Tour_Action_Swim_Swolf_Tooltip,
             ThemeUtil.getThemedImageName(Images.Graph_Swim_Swolf),
-            ThemeUtil.getThemedImageName(Images.Graph_Swim_Swolf_Disabled),
             GRAPH_CONTRIBUTION_ID_SWIM_SWOLF);
    }
 
@@ -1558,10 +1550,9 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
                                              final String label,
                                              final String toolTip,
                                              final String imageEnabled,
-                                             final String imageDisabled,
                                              final String contributionId) {
 
-      final ActionGraph graphAction = new ActionGraph(this, graphId, label, toolTip, imageEnabled, imageDisabled);
+      final ActionGraph graphAction = new ActionGraph(this, graphId, label, toolTip, imageEnabled);
 
       graphAction.setId(contributionId);
 
@@ -2413,6 +2404,9 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 
    private void createLayer_Photo() {
 
+      // ensure that sliders are displayed for real tours
+      setShowSlider(true);
+
       while (true) {
 
          if (_tcc.isShowTourPhotos == false) {
@@ -2464,6 +2458,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
          }
 
          if (chartPhotoGroups.isEmpty()) {
+
             // there are no photos
             break;
          }
@@ -2488,11 +2483,9 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
          }
 
          if (isTimeSerie == false && isHistorySerie) {
+
             // hide x slider in history chart
             setShowSlider(false);
-         } else {
-            // ensure sliders are displayed for real tours
-            setShowSlider(true);
          }
 
          return;
@@ -5536,6 +5529,9 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
       }
    }
 
+   /**
+    * Set config values into the {@link Chart}
+    */
    void setupChartConfig() {
 
 // SET_FORMATTING_OFF
@@ -5544,21 +5540,21 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
       final int prefGraphTransparencyFilling_Dark   = _prefStore.getInt(ITourbookPreferences.GRAPH_TRANSPARENCY_FILLING_DARK);
 
       graphAntialiasing             = _prefStore.getBoolean(ITourbookPreferences.GRAPH_ANTIALIASING) ? SWT.ON : SWT.OFF;
+      graphTransparency_Line        = _prefStore.getInt(ITourbookPreferences.GRAPH_TRANSPARENCY_LINE);
+      graphTransparency_Filling     = UI.isDarkTheme()   ? prefGraphTransparencyFilling_Dark
+                                                         : prefGraphTransparencyFilling_Light;
 
       isShowSegmentAlternateColor   = _prefStore.getBoolean(ITourbookPreferences.GRAPH_IS_SEGMENT_ALTERNATE_COLOR);
       segmentAlternateColor_Light   = PreferenceConverter.getColor(_prefStore, ITourbookPreferences.GRAPH_SEGMENT_ALTERNATE_COLOR);
       segmentAlternateColor_Dark    = PreferenceConverter.getColor(_prefStore, ITourbookPreferences.GRAPH_SEGMENT_ALTERNATE_COLOR_DARK);
-
-      graphTransparency_Line        = _prefStore.getInt(ITourbookPreferences.GRAPH_TRANSPARENCY_LINE);
-      graphTransparency_Filling     = UI.isDarkTheme()
-            ? prefGraphTransparencyFilling_Dark
-            : prefGraphTransparencyFilling_Light;
 
       isShowHorizontalGridLines     = Util.getPrefixPref_Boolean(_prefStore, GRID_PREF_PREFIX, ITourbookPreferences.CHART_GRID_IS_SHOW_HORIZONTAL_GRIDLINES);
       isShowVerticalGridLines       = Util.getPrefixPref_Boolean(_prefStore, GRID_PREF_PREFIX, ITourbookPreferences.CHART_GRID_IS_SHOW_VERTICAL_GRIDLINES);
 
       gridVerticalDistance          = Util.getPrefixPref_Int(_prefStore, GRID_PREF_PREFIX, ITourbookPreferences.CHART_GRID_VERTICAL_DISTANCE);
       gridHorizontalDistance        = Util.getPrefixPref_Int(_prefStore, GRID_PREF_PREFIX, ITourbookPreferences.CHART_GRID_HORIZONTAL_DISTANCE);
+
+      yAxisWidth                    = Util.getPrefixPref_Int(_prefStore, LAYOUT_PREF_PREFIX, ITourbookPreferences.CHART_Y_AXIS_WIDTH);
 
 // SET_FORMATTING_ON
    }

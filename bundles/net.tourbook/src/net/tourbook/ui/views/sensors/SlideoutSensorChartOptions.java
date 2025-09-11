@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2021 Wolfgang Schramm and Contributors
+ * Copyright (C) 2021, 2025 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -24,6 +24,7 @@ import net.tourbook.common.font.MTFont;
 import net.tourbook.common.tooltip.ToolbarSlideout;
 import net.tourbook.common.util.Util;
 import net.tourbook.ui.ChartOptions_Grid;
+import net.tourbook.ui.ChartOptions_Layout;
 
 import org.eclipse.jface.action.ToolBarManager;
 import org.eclipse.jface.dialogs.IDialogSettings;
@@ -56,7 +57,9 @@ public class SlideoutSensorChartOptions extends ToolbarSlideout implements IActi
    private ActionResetToDefaults  _actionRestoreDefaults;
 
    private SensorChartView        _sensorChartView;
+
    private ChartOptions_Grid      _gridUI;
+   private ChartOptions_Layout    _layoutUI;
 
    /*
     * UI controls
@@ -69,7 +72,8 @@ public class SlideoutSensorChartOptions extends ToolbarSlideout implements IActi
                                      final ToolBar toolbar,
                                      final SensorChartView sensorChartView,
                                      final IDialogSettings state,
-                                     final String gridPrefPrefix) {
+                                     final String gridPrefPrefix,
+                                     final String layoutPrefPrefix) {
 
       super(ownerControl, toolbar);
 
@@ -77,6 +81,7 @@ public class SlideoutSensorChartOptions extends ToolbarSlideout implements IActi
       _state = state;
 
       _gridUI = new ChartOptions_Grid(gridPrefPrefix);
+      _layoutUI = new ChartOptions_Layout(layoutPrefPrefix);
    }
 
    private void createActions() {
@@ -121,6 +126,16 @@ public class SlideoutSensorChartOptions extends ToolbarSlideout implements IActi
          }
 
          _gridUI.createUI(container);
+         _gridUI.enableGridOptions(0
+
+               // this is disabled because the x-axis displays history values
+               // | ChartOptions_Grid.GRID_HORIZONTAL_DISTANCE
+
+               | ChartOptions_Grid.GRID_VERTICAL_DISTANCE
+               | ChartOptions_Grid.GRID_IS_SHOW_HORIZONTAL_LINE
+               | ChartOptions_Grid.GRID_IS_SHOW_VERTICAL_LINE);
+
+         _layoutUI.createUI(container);
       }
 
       return shellContainer;
@@ -217,6 +232,7 @@ public class SlideoutSensorChartOptions extends ToolbarSlideout implements IActi
       _checkboxBatteryVoltage.setSelection(STATE_IS_SHOW_BATTERY_VOLTAGE_DEFAULT);
 
       _gridUI.resetToDefaults();
+      _layoutUI.resetToDefaults();
 
       onChangeUI();
    }
@@ -228,6 +244,7 @@ public class SlideoutSensorChartOptions extends ToolbarSlideout implements IActi
       _checkboxBatteryVoltage.setSelection(Util.getStateBoolean(_state, STATE_IS_SHOW_BATTERY_VOLTAGE, STATE_IS_SHOW_BATTERY_VOLTAGE_DEFAULT));
 
       _gridUI.restoreState();
+      _layoutUI.restoreState();
    }
 
    private void saveState() {
@@ -235,8 +252,6 @@ public class SlideoutSensorChartOptions extends ToolbarSlideout implements IActi
       _state.put(STATE_IS_SHOW_BATTERY_LEVEL, _checkboxBatteryLevel.getSelection());
       _state.put(STATE_IS_SHOW_BATTERY_STATUS, _checkboxBatteryStatus.getSelection());
       _state.put(STATE_IS_SHOW_BATTERY_VOLTAGE, _checkboxBatteryVoltage.getSelection());
-
-      _gridUI.saveState();
    }
 
 }

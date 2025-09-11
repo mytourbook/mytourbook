@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2025 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -24,6 +24,7 @@ import net.tourbook.common.font.MTFont;
 import net.tourbook.common.tooltip.ToolbarSlideout;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.ui.ChartOptions_Grid;
+import net.tourbook.ui.ChartOptions_Layout;
 
 import org.eclipse.jface.action.ToolBarManager;
 import org.eclipse.jface.layout.GridDataFactory;
@@ -52,6 +53,7 @@ public class SlideoutHRVOptions extends ToolbarSlideout implements IActionResetT
    private ActionResetToDefaults    _actionRestoreDefaults;
 
    private ChartOptions_Grid        _gridUI;
+   private ChartOptions_Layout      _layoutUI;
 
    private MouseWheelListener       _defaultMouseWheelListener;
    private SelectionAdapter         _defaultSelectionListener;
@@ -70,9 +72,11 @@ public class SlideoutHRVOptions extends ToolbarSlideout implements IActionResetT
 
    private Spinner _spinner2xErrorTolerance;
 
+
    public SlideoutHRVOptions(final Control ownerControl,
                              final ToolBar toolBar,
                              final String prefStoreGridPrefix,
+                             final String layoutPrefPrefix,
                              final HeartRateVariabilityView heartRateVariabilityView) {
 
       super(ownerControl, toolBar);
@@ -80,6 +84,7 @@ public class SlideoutHRVOptions extends ToolbarSlideout implements IActionResetT
       _heartRateVariabilityView = heartRateVariabilityView;
 
       _gridUI = new ChartOptions_Grid(prefStoreGridPrefix);
+      _layoutUI = new ChartOptions_Layout(layoutPrefPrefix);
    }
 
    private void createActions() {
@@ -122,6 +127,7 @@ public class SlideoutHRVOptions extends ToolbarSlideout implements IActionResetT
             createUI_20_Options(container);
 
             _gridUI.createUI(container);
+            _layoutUI.createUI(container);
          }
       }
 
@@ -289,7 +295,7 @@ public class SlideoutHRVOptions extends ToolbarSlideout implements IActionResetT
       _spinner2xErrorTolerance.setSelection(_prefStore.getDefaultInt(ITourbookPreferences.HRV_OPTIONS_2X_ERROR_TOLERANCE));
 
       _gridUI.resetToDefaults();
-      _gridUI.saveState();
+      _layoutUI.resetToDefaults();
 
       onChangeUI();
    }
@@ -300,6 +306,7 @@ public class SlideoutHRVOptions extends ToolbarSlideout implements IActionResetT
       _spinner2xErrorTolerance.setSelection(_prefStore.getInt(ITourbookPreferences.HRV_OPTIONS_2X_ERROR_TOLERANCE));
 
       _gridUI.restoreState();
+      _layoutUI.restoreState();
    }
 
    private void saveState() {

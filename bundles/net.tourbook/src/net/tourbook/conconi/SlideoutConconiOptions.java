@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2025 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -21,6 +21,7 @@ import net.tourbook.common.action.IActionResetToDefault;
 import net.tourbook.common.font.MTFont;
 import net.tourbook.common.tooltip.ToolbarSlideout;
 import net.tourbook.ui.ChartOptions_Grid;
+import net.tourbook.ui.ChartOptions_Layout;
 
 import org.eclipse.jface.action.ToolBarManager;
 import org.eclipse.jface.layout.GridDataFactory;
@@ -37,20 +38,19 @@ public class SlideoutConconiOptions extends ToolbarSlideout implements IActionRe
 
    private ActionResetToDefaults _actionRestoreDefaults;
 
-   private ChartOptions_Grid _gridUI;
-
-   /*
-    * UI controls
-    */
+   private ChartOptions_Grid     _gridUI;
+   private ChartOptions_Layout   _layoutUI;
 
    public SlideoutConconiOptions(final Control ownerControl,
                                  final ToolBar toolBar,
-                                 final String prefStoreGridPrefix,
+                                 final String gridPrefPrefix,
+                                 final String layoutPrefPrefix,
                                  final ConconiView conconiView) {
 
       super(ownerControl, toolBar);
 
-      _gridUI = new ChartOptions_Grid(prefStoreGridPrefix);
+      _gridUI = new ChartOptions_Grid(gridPrefPrefix);
+      _layoutUI = new ChartOptions_Layout(layoutPrefPrefix);
    }
 
    private void createActions() {
@@ -86,6 +86,7 @@ public class SlideoutConconiOptions extends ToolbarSlideout implements IActionRe
             createUI_12_Actions(container);
 
             _gridUI.createUI(container);
+            _layoutUI.createUI(container);
          }
       }
 
@@ -122,12 +123,13 @@ public class SlideoutConconiOptions extends ToolbarSlideout implements IActionRe
    public void resetToDefaults() {
 
       _gridUI.resetToDefaults();
-      _gridUI.saveState();
+      _layoutUI.resetToDefaults();
    }
 
    private void restoreState() {
 
       _gridUI.restoreState();
+      _layoutUI.restoreState();
    }
 
 }

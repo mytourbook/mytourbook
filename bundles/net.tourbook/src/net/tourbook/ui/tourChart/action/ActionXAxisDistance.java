@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2025 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -50,25 +50,20 @@ public class ActionXAxisDistance extends Action {
    public void setImages() {
 
       String imageName;
-      String disabledImageName;
 
       if (UI.UNIT_IS_DISTANCE_MILE) {
 
          imageName = Images.XAxis_ShowDistance_Imperial;
-         disabledImageName = Images.XAxis_ShowDistance_Imperial_Disabled;
 
       } else if (UI.UNIT_IS_DISTANCE_NAUTICAL_MILE) {
 
          imageName = Images.XAxis_ShowDistance_NauticMile;
-         disabledImageName = Images.XAxis_ShowDistance_NauticMile_Disabled;
 
       } else {
 
          imageName = Images.XAxis_ShowDistance;
-         disabledImageName = Images.XAxis_ShowDistance_Disabled;
       }
 
       setImageDescriptor(TourbookPlugin.getThemedImageDescriptor(imageName));
-      setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(disabledImageName));
    }
 }

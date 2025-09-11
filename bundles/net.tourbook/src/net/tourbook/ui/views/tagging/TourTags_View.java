@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2024 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2025 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -221,8 +221,7 @@ public class TourTags_View extends ViewPart implements ITreeViewer, ITourViewer 
 
          setToolTipText(Messages.Action_Tag_Restore_Tooltip);
 
-         setImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.RestoreTags));
-         setDisabledImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.RestoreTags_Disabled));
+         setImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.RestoreTour));
       }
 
       @Override
@@ -241,7 +240,6 @@ public class TourTags_View extends ViewPart implements ITreeViewer, ITourViewer 
          setToolTipText(Messages.Action_Tag_Save_Tooltip);
 
          setImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.SaveTags));
-         setDisabledImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.SaveTags_Disabled));
       }
 
       @Override
@@ -272,7 +270,6 @@ public class TourTags_View extends ViewPart implements ITreeViewer, ITourViewer 
          setToolTipText(Messages.Tour_Tags_Action_TagCheckFilter_OnlyTaggedTours_Tooltip);
 
          setImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.TagsChecked));
-         setDisabledImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.TagsChecked_Disabled));
       }
 
       @Override
@@ -2054,7 +2051,6 @@ public class TourTags_View extends ViewPart implements ITreeViewer, ITourViewer 
          _action_TagLayout.setToolTipText(Messages.Tour_Tags_Action_Layout_Flat_Tooltip);
 
          _action_TagLayout.setImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.TagLayout_Flat));
-         _action_TagLayout.setDisabledImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.TagLayout_Flat_Disabled));
 
       } else {
 
@@ -2063,7 +2059,6 @@ public class TourTags_View extends ViewPart implements ITreeViewer, ITourViewer 
          _action_TagLayout.setToolTipText(Messages.Tour_Tags_Action_Layout_Hierarchical_Tooltip);
 
          _action_TagLayout.setImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.TagLayout_Hierarchical));
-         _action_TagLayout.setDisabledImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.TagLayout_Hierarchical_Disabled));
       }
    }
 

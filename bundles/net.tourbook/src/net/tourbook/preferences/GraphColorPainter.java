@@ -25,7 +25,7 @@ import net.tourbook.common.color.ColorProviderConfig;
 import net.tourbook.common.color.ColorUtil;
 import net.tourbook.common.color.GraphColorItem;
 import net.tourbook.common.color.IGradientColorProvider;
-import net.tourbook.common.util.NoAutoScalingImageDataProvider;
+import net.tourbook.common.util.CustomScalingImageDataProvider;
 import net.tourbook.map2.view.TourMapPainter;
 
 import org.eclipse.swt.graphics.Color;
@@ -174,7 +174,7 @@ public class GraphColorPainter {
             g2d.dispose();
          }
 
-         swtImage = new Image(Display.getCurrent(), new NoAutoScalingImageDataProvider(awtImage));
+         swtImage = new Image(Display.getCurrent(), new CustomScalingImageDataProvider(awtImage));
 
          _imageCache.put(colorDefinitionId, swtImage);
       }
@@ -273,7 +273,7 @@ public class GraphColorPainter {
             g2d.dispose();
          }
 
-         swtImage = new Image(Display.getCurrent(), new NoAutoScalingImageDataProvider(awtImage));
+         swtImage = new Image(Display.getCurrent(), new CustomScalingImageDataProvider(awtImage));
 
          _imageCache.put(colorId, swtImage);
       }

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017, 2024 Wolfgang Schramm and Contributors
+ * Copyright (C) 2017, 2025 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -156,9 +156,7 @@ public class Map25View extends ViewPart implements
 // SET_FORMATTING_OFF
 
    private static final ImageDescriptor   _imageSyncWithSlider                         = TourbookPlugin.getThemedImageDescriptor(Images.SyncWith_Slider);
-   private static final ImageDescriptor   _imageSyncWithSlider_Disabled                = TourbookPlugin.getThemedImageDescriptor(Images.SyncWith_Slider_Disabled);
    private static final ImageDescriptor   _imageSyncWithSlider_Centered                = TourbookPlugin.getThemedImageDescriptor(Images.SyncWith_Slider_Centered);
-   private static final ImageDescriptor   _imageSyncWithSlider_Centered_Disabled       = TourbookPlugin.getThemedImageDescriptor(Images.SyncWith_Slider_Centered_Disabled);
 
 // SET_FORMATTING_ON
 
@@ -290,8 +288,7 @@ public class Map25View extends ViewPart implements
 
       public ActionMap25_Layer() {
 
-         super(TourbookPlugin.getThemedImageDescriptor(Images.MapLayer),
-               TourbookPlugin.getThemedImageDescriptor(Images.MapLayer));
+         super(TourbookPlugin.getThemedImageDescriptor(Images.MapLayer));
       }
 
       @Override
@@ -311,8 +308,7 @@ public class Map25View extends ViewPart implements
 
       public ActionMap25_MapProvider() {
 
-         super(TourbookPlugin.getThemedImageDescriptor(Images.MapProvider),
-               TourbookPlugin.getThemedImageDescriptor(Images.MapProvider));
+         super(TourbookPlugin.getThemedImageDescriptor(Images.MapProvider));
       }
 
       @Override
@@ -333,8 +329,7 @@ public class Map25View extends ViewPart implements
 
       public ActionMap25_Options() {
 
-         super(TourbookPlugin.getThemedImageDescriptor(Images.MapOptions),
-               TourbookPlugin.getThemedImageDescriptor(Images.MapOptions_Disabled));
+         super(TourbookPlugin.getThemedImageDescriptor(Images.MapOptions));
       }
 
       @Override
@@ -353,8 +348,7 @@ public class Map25View extends ViewPart implements
 
       public ActionShowPhotoOptions() {
 
-         super(TourbookPlugin.getThemedImageDescriptor(Images.ShowPhotos_InMap),
-               TourbookPlugin.getThemedImageDescriptor(Images.ShowAllPhotos_InMap_Disabled));
+         super(TourbookPlugin.getThemedImageDescriptor(Images.ShowPhotos_InMap));
 
          isToggleAction = true;
          notSelectedTooltip = Messages.Tour_Action_TourPhotos;
@@ -384,8 +378,7 @@ public class Map25View extends ViewPart implements
 
       public ActionShowTour() {
 
-         super(TourbookPlugin.getThemedImageDescriptor(Images.TourChart),
-               TourbookPlugin.getThemedImageDescriptor(Images.TourChart_Disabled));
+         super(TourbookPlugin.getThemedImageDescriptor(Images.TourChart), null);
 
          isToggleAction = true;
          notSelectedTooltip = OtherMessages.MAP_ACTION_SHOW_TOUR_IN_MAP;
@@ -456,7 +449,6 @@ public class Map25View extends ViewPart implements
          setToolTipText(OtherMessages.TOUR_ACTION_SHOW_HR_ZONES_TOOLTIP);
 
          setImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.PulseZones));
-         setDisabledImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.PulseZones_Disabled));
       }
 
       @Override
@@ -2478,7 +2470,6 @@ public class Map25View extends ViewPart implements
 
       String toolTip;
       ImageDescriptor imageDescriptor;
-      ImageDescriptor imageDescriptorDisabled;
 
       final boolean isSync = _mapSynchedWith == MapSync.WITH_SLIDER;
       final boolean isCenter = _mapSynchedWith == MapSync.WITH_SLIDER_CENTERED;
@@ -2488,19 +2479,16 @@ public class Map25View extends ViewPart implements
          toolTip = OtherMessages.MAP_ACTION_SYNCH_WITH_SLIDER_CENTERED;
 
          imageDescriptor = _imageSyncWithSlider_Centered;
-         imageDescriptorDisabled = _imageSyncWithSlider_Centered_Disabled;
 
       } else {
 
          toolTip = OtherMessages.MAP_ACTION_SYNCH_WITH_SLIDER;
 
          imageDescriptor = _imageSyncWithSlider;
-         imageDescriptorDisabled = _imageSyncWithSlider_Disabled;
       }
 
       _actionSyncMap_WithChartSlider.setToolTipText(toolTip);
       _actionSyncMap_WithChartSlider.setImageDescriptor(imageDescriptor);
-      _actionSyncMap_WithChartSlider.setDisabledImageDescriptor(imageDescriptorDisabled);
       _actionSyncMap_WithChartSlider.setChecked(isSync || isCenter);
    }
 

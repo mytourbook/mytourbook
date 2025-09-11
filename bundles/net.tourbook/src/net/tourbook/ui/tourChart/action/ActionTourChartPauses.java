@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2021 Frédéric Bard
+ * Copyright (C) 2021, 2025 Frédéric Bard
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -35,8 +35,7 @@ public class ActionTourChartPauses extends ActionToolbarSlideout {
 
    public ActionTourChartPauses(final TourChart tourChart, final Control ownerControl, final IDialogSettings state) {
 
-      super(TourbookPlugin.getThemedImageDescriptor(Images.TourPauses),
-            TourbookPlugin.getThemedImageDescriptor(Images.TourPauses_Disabled));
+      super(TourbookPlugin.getThemedImageDescriptor(Images.TourPauses));
 
       notSelectedTooltip = Messages.Tour_Action_ShowTourPauses_Tooltip;
 

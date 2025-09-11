@@ -56,7 +56,6 @@ import org.eclipse.swt.custom.BusyIndicator;
 import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.RGB;
-import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
@@ -276,27 +275,6 @@ public class PrefPageTourMarkerTypes extends PreferencePage implements IWorkbenc
             _btnMarkerType_Delete.addSelectionListener(SelectionListener.widgetSelectedAdapter(selectionEvent -> onMarkerType_Delete()));
             setButtonLayoutData(_btnMarkerType_Delete);
          }
-         {
-            /*
-             * Button: Save/update
-             */
-            _btnMarkerType_Save = new Button(container, SWT.NONE);
-            _btnMarkerType_Save.setText(Messages.App_Action_Save);
-            _btnMarkerType_Save.addSelectionListener(SelectionListener.widgetSelectedAdapter(selectionEvent -> onMarkerType_Save()));
-            setButtonLayoutData(_btnMarkerType_Save);
-            final GridData gd = (GridData) _btnMarkerType_Save.getLayoutData();
-            gd.verticalAlignment = SWT.BOTTOM;
-            gd.grabExcessVerticalSpace = true;
-         }
-         {
-            /*
-             * Button: Cancel
-             */
-            _btnMarkerType_Cancel = new Button(container, SWT.NONE);
-            _btnMarkerType_Cancel.setText(Messages.App_Action_Cancel);
-            _btnMarkerType_Cancel.addSelectionListener(SelectionListener.widgetSelectedAdapter(selectionEvent -> onMarkerType_Cancel()));
-            setButtonLayoutData(_btnMarkerType_Cancel);
-         }
       }
    }
 
@@ -305,10 +283,8 @@ public class PrefPageTourMarkerTypes extends PreferencePage implements IWorkbenc
       final int defaultTextWidth = convertWidthInCharsToPixels(20);
 
       final Composite container = new Composite(parent, SWT.NONE);
-      GridDataFactory.fillDefaults().span(2, 1).applyTo(container);
-      GridLayoutFactory.swtDefaults()
-            .numColumns(2)
-            .applyTo(container);
+      GridDataFactory.fillDefaults().applyTo(container);
+      GridLayoutFactory.swtDefaults().numColumns(2).applyTo(container);
 //      container.setBackground(UI.SYS_COLOR_GREEN);
       {
          {
@@ -375,6 +351,30 @@ public class PrefPageTourMarkerTypes extends PreferencePage implements IWorkbenc
                   .hint(defaultTextWidth, convertHeightInCharsToPixels(6))
                   .grab(true, false)
                   .applyTo(_txtDescription);
+         }
+      }
+      final Composite containerActions = new Composite(parent, SWT.NONE);
+      GridDataFactory.fillDefaults().applyTo(containerActions);
+      GridLayoutFactory.fillDefaults().numColumns(1).applyTo(containerActions);
+//    container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_BLUE));
+      {
+         {
+            /*
+             * Button: Save/update
+             */
+            _btnMarkerType_Save = new Button(containerActions, SWT.NONE);
+            _btnMarkerType_Save.setText(Messages.App_Action_Save);
+            _btnMarkerType_Save.addSelectionListener(SelectionListener.widgetSelectedAdapter(selectionEvent -> onMarkerType_Save()));
+            setButtonLayoutData(_btnMarkerType_Save);
+         }
+         {
+            /*
+             * Button: Cancel
+             */
+            _btnMarkerType_Cancel = new Button(containerActions, SWT.NONE);
+            _btnMarkerType_Cancel.setText(Messages.App_Action_Cancel);
+            _btnMarkerType_Cancel.addSelectionListener(SelectionListener.widgetSelectedAdapter(selectionEvent -> onMarkerType_Cancel()));
+            setButtonLayoutData(_btnMarkerType_Cancel);
          }
       }
    }

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2023, 2024 Wolfgang Schramm and Contributors
+ * Copyright (C) 2023, 2025 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -64,33 +64,31 @@ import org.eclipse.swt.widgets.ToolItem;
  */
 public class ActionTourStartEndLocation extends ContributionItem {
 
-   private static IDialogSettings         _state;
+   private static IDialogSettings           _state;
 
    /**
     * This set is used to prevent duplicated action names
     */
-   private static final Set<String>       _usedDisplayNames = new HashSet<>();
+   private static final Set<String>         _usedDisplayNames = new HashSet<>();
    //
-   private boolean                        _isStartLocation;
-   private boolean                        _hasLocationData;
+   private boolean                          _isStartLocation;
+   private boolean                          _hasLocationData;
    //
-   private Action                         _actionProfileTitle;
-   private ActionLocationPart             _actionLocationPart;
-   private ActionSlideoutLocationProfiles _actionSlideoutLocationProfiles;
+   private Action                           _actionProfileTitle;
+   private ActionLocationPart               _actionLocationPart;
+   private ActionSlideoutLocationProfiles   _actionSlideoutLocationProfiles;
    //
-   private SlideoutStartEndLocationProfiles       _slideoutLocationProfiles;
+   private SlideoutStartEndLocationProfiles _slideoutLocationProfiles;
    //
-   private ITourLocationConsumer          _tourLocationConsumer;
+   private ITourLocationConsumer            _tourLocationConsumer;
    //
-   private TourData                       _tourData;
+   private TourData                         _tourData;
    //
    /*
     * UI controls
     */
    private Image    _actionImage_Download;
-   private Image    _actionImage_Download_Disabled;
    private Image    _actionImage_Options;
-   private Image    _actionImage_Options_Disabled;
    //
    private Menu     _contextMenu;
    //
@@ -210,8 +208,8 @@ public class ActionTourStartEndLocation extends ContributionItem {
     * @param stateId
     */
    public ActionTourStartEndLocation(final ITourLocationConsumer tourLocationConsumer,
-                             final boolean isStartLocation,
-                             final String stateId) {
+                                     final boolean isStartLocation,
+                                     final String stateId) {
 
       _tourLocationConsumer = tourLocationConsumer;
 
@@ -415,10 +413,7 @@ public class ActionTourStartEndLocation extends ContributionItem {
 // SET_FORMATTING_OFF
 
       _actionImage_Download          = CommonActivator.getThemedImageDescriptor(CommonImages.App_Download).createImage();
-      _actionImage_Download_Disabled = CommonActivator.getThemedImageDescriptor(CommonImages.App_Download_Disabled).createImage();
-
       _actionImage_Options           = CommonActivator.getThemedImageDescriptor(CommonImages.TourOptions).createImage();
-      _actionImage_Options_Disabled  = CommonActivator.getThemedImageDescriptor(CommonImages.TourOptions_Disabled).createImage();
 
 // SET_FORMATTING_ON
 
@@ -640,9 +635,7 @@ public class ActionTourStartEndLocation extends ContributionItem {
    private void onDispose() {
 
       _actionImage_Download.dispose();
-      _actionImage_Download_Disabled.dispose();
       _actionImage_Options.dispose();
-      _actionImage_Options_Disabled.dispose();
 
       _toolItem.dispose();
       _toolItem = null;
@@ -682,7 +675,6 @@ public class ActionTourStartEndLocation extends ContributionItem {
          // set location data
 
          _toolItem.setImage(_actionImage_Options);
-         _toolItem.setDisabledImage(_actionImage_Options_Disabled);
 
          _toolItem.setToolTipText(_isStartLocation
                ? Messages.Tour_Location_Action_Customize_Start_Tooltip
@@ -693,7 +685,6 @@ public class ActionTourStartEndLocation extends ContributionItem {
          // download location data
 
          _toolItem.setImage(_actionImage_Download);
-         _toolItem.setDisabledImage(_actionImage_Download_Disabled);
 
          _toolItem.setToolTipText(createDownloadTooltip());
       }

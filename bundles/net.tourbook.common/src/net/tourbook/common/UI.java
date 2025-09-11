@@ -47,6 +47,7 @@ import net.tourbook.common.util.StringUtils;
 import net.tourbook.common.util.Util;
 import net.tourbook.common.weather.IWeather;
 
+import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.ContributionItem;
@@ -59,6 +60,7 @@ import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.preference.IPreferenceStore;
+import org.eclipse.jface.preference.PreferenceConverter;
 import org.eclipse.jface.preference.StringFieldEditor;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.resource.ImageRegistry;
@@ -327,24 +329,32 @@ public class UI {
 
 // SET_FORMATTING_ON
 
-   public static final String  TRUE                           = Boolean.toString(true);
-   public static final String  FALSE                          = Boolean.toString(false);
+   public static final String TRUE  = Boolean.toString(true);
+   public static final String FALSE = Boolean.toString(false);
 
    /**
     * Is <code>true</code> when the dark theme in the UI is selected
     */
-   public static boolean       IS_DARK_THEME;
+   public static boolean      IS_DARK_THEME;
 
    /**
     * Is <code>true</code> when the bright theme in the UI is selected
     */
-   public static boolean       IS_BRIGHT_THEME;
+   public static boolean      IS_BRIGHT_THEME;
+
+   // https://eclipse.dev/eclipse/markdown/?f=news/4.36/platform.md#themes-and-styling
+   public static String        DISABLED_ICONS_DESATURATED     = "desaturated";               //$NON-NLS-1$
+   public static String        DISABLED_ICONS_GTK             = "gtk";                       //$NON-NLS-1$
+   public static String        DISABLED_ICONS_GRAYED          = "grayed";                    //$NON-NLS-1$
 
    /**
     * Is <code>true</code> when a 4k display is used
     */
    public static boolean       IS_4K_DISPLAY;
 
+   /**
+    * e.g. 1.0, 1.5 or 2.0
+    */
    public static float         HIDPI_SCALING;
    public static String        HIDPI_NAME_15x                 = "@1.5x";                     //$NON-NLS-1$
    public static String        HIDPI_NAME_2x                  = "@2x";                       //$NON-NLS-1$
@@ -583,6 +593,7 @@ public class UI {
    public static String       UNIT_LABEL_TEMPERATURE;
    public static String       UNIT_LABEL_SPEED;
    public static String       UNIT_LABEL_PACE;
+   public static String       UNIT_LABEL_PACE_SWIMMING;
    public static String       UNIT_LABEL_WEIGHT;
 
    public static final String UNIT_LABEL_TIME      = "h";      //$NON-NLS-1$
@@ -591,62 +602,83 @@ public class UI {
    /*
     * Labels for the different measurement systems
     */
-   public static final String          UNIT_ALTIMETER_M_H         = "m/h";                      //$NON-NLS-1$
-   public static final String          UNIT_ALTIMETER_FT_H        = "ft/h";                     //$NON-NLS-1$
-   public static final String          UNIT_DISTANCE_KM           = "km";                       //$NON-NLS-1$
-   public static final String          UNIT_DISTANCE_MI           = "mi";                       //$NON-NLS-1$
-   public static final String          UNIT_DISTANCE_NMI          = "nmi";                      //$NON-NLS-1$
-   public static final String          UNIT_DISTANCE_YARD         = "yd";                       //$NON-NLS-1$
-   public static final String          UNIT_DISTANCE_INCH         = "inch";                     //$NON-NLS-1$
-   public static final String          UNIT_ELEVATION_M           = "m";                        //$NON-NLS-1$
-   public static final String          UNIT_ELEVATION_FT          = "ft";                       //$NON-NLS-1$
-   public static final String          UNIT_FLUIDS_ML             = "mL";                       //$NON-NLS-1$
-   public static final String          UNIT_FLUIDS_L              = "L";                        //$NON-NLS-1$
-   public static final String          UNIT_HEIGHT_FT             = "ft";                       //$NON-NLS-1$
-   public static final String          UNIT_HEIGHT_IN             = "in";                       //$NON-NLS-1$
-   public static final String          UNIT_JOULE                 = "J";                        //$NON-NLS-1$
-   public static final String          UNIT_JOULE_KILO            = "kJ";                       //$NON-NLS-1$
-   public static final String          UNIT_JOULE_MEGA            = "MJ";                       //$NON-NLS-1$
-   public static final String          UNIT_KBYTE                 = "kByte";                    //$NON-NLS-1$
-   public static final String          UNIT_MBYTE                 = "MByte";                    //$NON-NLS-1$
-   public static final String          UNIT_METER                 = "m";                        //$NON-NLS-1$
-   public static final String          UNIT_MM                    = "mm";                       //$NON-NLS-1$
-   public static final String          UNIT_MS                    = "ms";                       //$NON-NLS-1$
-   public static final String          UNIT_PERCENT               = "%";                        //$NON-NLS-1$
-   public static final String          UNIT_POWER                 = "Watt";                     //$NON-NLS-1$
-   public static final String          UNIT_POWER_SHORT           = "W";                        //$NON-NLS-1$
-   public static final String          UNIT_POWER_TO_WEIGHT_RATIO = "W/Kg";                     //$NON-NLS-1$
-   public static final String          UNIT_PACE_MIN_P_KM         = "min/km";                   //$NON-NLS-1$
-   public static final String          UNIT_PACE_MIN_P_MILE       = "min/mi";                   //$NON-NLS-1$
-   public static final String          UNIT_PRESSURE_MBAR         = "mbar";                     //$NON-NLS-1$
-   public static final String          UNIT_PRESSURE_INHG         = "inHg";                     //$NON-NLS-1$
-   public static final String          UNIT_SPEED_KM_H            = "km/h";                     //$NON-NLS-1$
-   public static final String          UNIT_SPEED_KNOT            = "knot";                     //$NON-NLS-1$
-   public static final String          UNIT_SPEED_MPH             = "mph";                      //$NON-NLS-1$
-   public static final String          UNIT_TEMPERATURE_C         = "\u00B0C";                  //$NON-NLS-1$
-   public static final String          UNIT_TEMPERATURE_F         = "\u00B0F";                  //$NON-NLS-1$
-   public static final String          UNIT_VOLT                  = "V";                        //$NON-NLS-1$
-   public static final String          UNIT_VOLTAGE               = "Volt";                     //$NON-NLS-1$
-   public static final String          UNIT_WEIGHT_G              = "g";                        //$NON-NLS-1$
-   public static final String          UNIT_WEIGHT_KG             = "kg";                       //$NON-NLS-1$
-   public static final String          UNIT_WEIGHT_LBS            = "lbs";                      //$NON-NLS-1$
-   public static final String          UNIT_WEIGHT_MG             = "mg";                       //$NON-NLS-1$
+   public static final String                   UNIT_ALTIMETER_M_H         = "m/h";                      //$NON-NLS-1$
+   public static final String                   UNIT_ALTIMETER_FT_H        = "ft/h";                     //$NON-NLS-1$
+   public static final String                   UNIT_DISTANCE_KM           = "km";                       //$NON-NLS-1$
+   public static final String                   UNIT_DISTANCE_MI           = "mi";                       //$NON-NLS-1$
+   public static final String                   UNIT_DISTANCE_NMI          = "nmi";                      //$NON-NLS-1$
+   public static final String                   UNIT_DISTANCE_YARD         = "yd";                       //$NON-NLS-1$
+   public static final String                   UNIT_DISTANCE_INCH         = "inch";                     //$NON-NLS-1$
+   public static final String                   UNIT_ELEVATION_M           = "m";                        //$NON-NLS-1$
+   public static final String                   UNIT_ELEVATION_FT          = "ft";                       //$NON-NLS-1$
+   public static final String                   UNIT_FLUIDS_ML             = "mL";                       //$NON-NLS-1$
+   public static final String                   UNIT_FLUIDS_L              = "L";                        //$NON-NLS-1$
+   public static final String                   UNIT_HEIGHT_FT             = "ft";                       //$NON-NLS-1$
+   public static final String                   UNIT_HEIGHT_IN             = "in";                       //$NON-NLS-1$
+   public static final String                   UNIT_JOULE                 = "J";                        //$NON-NLS-1$
+   public static final String                   UNIT_JOULE_KILO            = "kJ";                       //$NON-NLS-1$
+   public static final String                   UNIT_JOULE_MEGA            = "MJ";                       //$NON-NLS-1$
+   public static final String                   UNIT_KBYTE                 = "kByte";                    //$NON-NLS-1$
+   public static final String                   UNIT_MBYTE                 = "MByte";                    //$NON-NLS-1$
+   public static final String                   UNIT_METER                 = "m";                        //$NON-NLS-1$
+   public static final String                   UNIT_MM                    = "mm";                       //$NON-NLS-1$
+   public static final String                   UNIT_MS                    = "ms";                       //$NON-NLS-1$
+   public static final String                   UNIT_PERCENT               = "%";                        //$NON-NLS-1$
+   public static final String                   UNIT_POWER                 = "Watt";                     //$NON-NLS-1$
+   public static final String                   UNIT_POWER_SHORT           = "W";                        //$NON-NLS-1$
+   public static final String                   UNIT_POWER_TO_WEIGHT_RATIO = "W/Kg";                     //$NON-NLS-1$
+   public static final String                   UNIT_PACE_MIN_P_100M       = "min/100m";                 //$NON-NLS-1$
+   public static final String                   UNIT_PACE_MIN_P_100YARD    = "min/100yd";                //$NON-NLS-1$
+   public static final String                   UNIT_PACE_MIN_P_KM         = "min/km";                   //$NON-NLS-1$
+   public static final String                   UNIT_PACE_MIN_P_MILE       = "min/mi";                   //$NON-NLS-1$
+   public static final String                   UNIT_PRESSURE_MBAR         = "mbar";                     //$NON-NLS-1$
+   public static final String                   UNIT_PRESSURE_INHG         = "inHg";                     //$NON-NLS-1$
+   public static final String                   UNIT_SPEED_KM_H            = "km/h";                     //$NON-NLS-1$
+   public static final String                   UNIT_SPEED_KNOT            = "knot";                     //$NON-NLS-1$
+   public static final String                   UNIT_SPEED_MPH             = "mph";                      //$NON-NLS-1$
+   public static final String                   UNIT_TEMPERATURE_C         = "\u00B0C";                  //$NON-NLS-1$
+   public static final String                   UNIT_TEMPERATURE_F         = "\u00B0F";                  //$NON-NLS-1$
+   public static final String                   UNIT_VOLT                  = "V";                        //$NON-NLS-1$
+   public static final String                   UNIT_VOLTAGE               = "Volt";                     //$NON-NLS-1$
+   public static final String                   UNIT_WEIGHT_G              = "g";                        //$NON-NLS-1$
+   public static final String                   UNIT_WEIGHT_KG             = "kg";                       //$NON-NLS-1$
+   public static final String                   UNIT_WEIGHT_LBS            = "lbs";                      //$NON-NLS-1$
+   public static final String                   UNIT_WEIGHT_MG             = "mg";                       //$NON-NLS-1$
 
-   private static final String         DISTANCE_MILES_1_8         = "1/8";                      //$NON-NLS-1$
-   private static final String         DISTANCE_MILES_1_4         = "1/4";                      //$NON-NLS-1$
-   private static final String         DISTANCE_MILES_3_8         = "3/8";                      //$NON-NLS-1$
-   private static final String         DISTANCE_MILES_1_2         = "1/2";                      //$NON-NLS-1$
-   private static final String         DISTANCE_MILES_5_8         = "5/8";                      //$NON-NLS-1$
-   private static final String         DISTANCE_MILES_3_4         = "3/4";                      //$NON-NLS-1$
-   private static final String         DISTANCE_MILES_7_8         = "7/8";                      //$NON-NLS-1$
+   private static final String                  DISTANCE_MILES_1_8         = "1/8";                      //$NON-NLS-1$
+   private static final String                  DISTANCE_MILES_1_4         = "1/4";                      //$NON-NLS-1$
+   private static final String                  DISTANCE_MILES_3_8         = "3/8";                      //$NON-NLS-1$
+   private static final String                  DISTANCE_MILES_1_2         = "1/2";                      //$NON-NLS-1$
+   private static final String                  DISTANCE_MILES_5_8         = "5/8";                      //$NON-NLS-1$
+   private static final String                  DISTANCE_MILES_3_4         = "3/4";                      //$NON-NLS-1$
+   private static final String                  DISTANCE_MILES_7_8         = "7/8";                      //$NON-NLS-1$
    //
-   public static final PeriodFormatter DEFAULT_DURATION_FORMATTER;
-   public static final PeriodFormatter DEFAULT_DURATION_FORMATTER_SHORT;
+   public static final PeriodFormatter          DEFAULT_DURATION_FORMATTER;
+   public static final PeriodFormatter          DEFAULT_DURATION_FORMATTER_SHORT;
 
-   private static StringBuilder        _formatterSB               = new StringBuilder();
-   private static Formatter            _formatter                 = new Formatter(_formatterSB);
+   private static StringBuilder                 _formatterSB               = new StringBuilder();
+   private static Formatter                     _formatter                 = new Formatter(_formatterSB);
 
-   private static FontMetrics          _dialogFont_Metrics;
+   private static FontMetrics                   _dialogFont_Metrics;
+   private static org.eclipse.swt.graphics.Font _swtUIDrawingFont;
+
+   /**
+    * This is an eclipse parameter
+    */
+// private static final String                  SYS_PROP__SWT_AUTO_SCALE       = "swt.autoScale";                             //$NON-NLS-1$
+
+   /**
+    * When <code>true</code> then the commandline parameter <code>-DautoScale=nnn</code> is set.
+    * This will force to use the font in {@link ITourbookPreferences.UI_DRAWING_FONT} for text
+    * drawing, e.g. the tour chart texts
+    * <p>
+    * Commandline parameter: <code>-Dswt.autoScale=nnn</code>
+    */
+// private static String                        SYS_PROP__SWT_AUTO_SCALE_VALUE = System.getProperty(SYS_PROP__SWT_AUTO_SCALE);
+// private static boolean                       IS_SWT_AUTO_SCALE              = SYS_PROP__SWT_AUTO_SCALE_VALUE != NULL;
+
+   // this feature is enabled always !!!
+   private static boolean IS_SWT_AUTO_SCALE = true;
 
 // SET_FORMATTING_OFF
 
@@ -723,7 +755,6 @@ public class UI {
    public static final String    IMAGE_ACTION_PHOTO_FILTER              = "IMAGE_ACTION_PHOTO_FILTER";               //$NON-NLS-1$
    public static final String    IMAGE_ACTION_PHOTO_FILTER_NO_PHOTOS    = "IMAGE_ACTION_PHOTO_FILTER_NO_PHOTOS";     //$NON-NLS-1$
    public static final String    IMAGE_ACTION_PHOTO_FILTER_WITH_PHOTOS  = "IMAGE_ACTION_PHOTO_FILTER_WITH_PHOTOS";   //$NON-NLS-1$
-   public static final String    IMAGE_ACTION_PHOTO_FILTER_DISABLED     = "IMAGE_ACTION_PHOTO_FILTER_DISABLED";      //$NON-NLS-1$
    public static final String    IMAGE_CONFIGURE_COLUMNS                = "IMAGE_CONFIGURE_COLUMNS";                 //$NON-NLS-1$
    public static final String    IMAGE_EMPTY_16                         = "_empty16";                                //$NON-NLS-1$
 
@@ -740,6 +771,8 @@ public class UI {
 
    public static Color           SYS_COLOR_DARK_GRAY;
    public static Color           SYS_COLOR_DARK_GREEN;
+   public static Color           SYS_COLOR_DARK_RED;
+   public static Color           SYS_COLOR_DARK_YELLOW;
 
    public static Color           SYS_COLOR_LIST_BACKGROUND;
 
@@ -777,12 +810,36 @@ public class UI {
       updateUnits();
 
       final int deviceZoom = DPIUtil.getDeviceZoom();
+      final int monitorZoom = DPIUtil.getNativeDeviceZoom();
+
+      // log UI scaling
+      StatusUtil.logInfo("App zoom = %d".formatted(deviceZoom));//$NON-NLS-1$
+      StatusUtil.logInfo("Monitor zoom = %d".formatted(monitorZoom));//$NON-NLS-1$
 
       IS_4K_DISPLAY = deviceZoom >= 140;
       HIDPI_SCALING = deviceZoom / 100f;
 
-      setupUI_FontMetrics();
-      setupUI_AWTFonts();
+      setupFonts_SWTDrawingFonts();
+      setupFonts_SWTFontMetrics();
+      setupFonts_AWTFonts();
+
+      /**
+       * In addition, the algorithm for the calculation of disabled versions of icons became
+       * configurable. The algorithm can be changed via the system property
+       * org.eclipse.swt.image.disablement with the following options:
+       *
+       * grayed (default): produces a gray-scaled version of the icon, which is aligned with the
+       * existing, pre-generated disabled versions of icons for Eclipse bundles
+       *
+       * desaturated (preview): produces a desaturated version of the icon, comparable to the grayed
+       * version but still keeping some color in it; the configuration of this option may be subject
+       * to change in future releases of Eclipse
+       *
+       * gtk: produces an icon version that conforms with the default disablement algorithm of GTK
+       *
+       * https://eclipse.dev/eclipse/markdown/?f=news/4.36/platform.md#themes-and-styling
+       */
+      System.setProperty("org.eclipse.swt.image.disablement", _prefStore_Common.getString(ICommonPreferences.UI_DISABLED_ICONS)); //$NON-NLS-1$
 
       IMAGE_REGISTRY = CommonActivator.getDefault().getImageRegistry();
 
@@ -805,6 +862,8 @@ public class UI {
 
       SYS_COLOR_DARK_GRAY           = display.getSystemColor(SWT.COLOR_DARK_GRAY);
       SYS_COLOR_DARK_GREEN          = display.getSystemColor(SWT.COLOR_DARK_GREEN);
+      SYS_COLOR_DARK_RED            = display.getSystemColor(SWT.COLOR_DARK_RED);
+      SYS_COLOR_DARK_YELLOW         = display.getSystemColor(SWT.COLOR_DARK_YELLOW);
 
       SYS_COLOR_LIST_BACKGROUND     = display.getSystemColor(SWT.COLOR_LIST_BACKGROUND);
       SYS_COLOR_WIDGET_BACKGROUND   = display.getSystemColor(SWT.COLOR_WIDGET_BACKGROUND);
@@ -927,6 +986,15 @@ public class UI {
    public static boolean       IS_SCRAMBLE_DATA                = System.getProperty(SYS_PROP__SCRAMBLE_DATA) != null;
 
    static {
+
+//    if (IS_SWT_AUTO_SCALE) {
+//
+//      Util.logSystemProperty_Value(UI.class,
+//            SYS_PROP__SWT_AUTO_SCALE,
+//            SYS_PROP__SWT_AUTO_SCALE_VALUE,
+//            "MyTourbook is auto scaled" //$NON-NLS-1$
+//      );
+//    }
 
       if (IS_SCRAMBLE_DATA) {
 
@@ -1308,7 +1376,7 @@ public class UI {
     */
    private static int convertHorizontalDLUsToPixels(final int dlus) {
 
-      if (setupUI_FontMetrics() == false) {
+      if (setupFonts_SWTFontMetrics() == false) {
 
          // create default
          return dlus * 4;
@@ -1592,13 +1660,9 @@ public class UI {
     */
    public static Cursor createCursorFromImage(final ImageDescriptor imageDescriptor) {
 
-      Cursor cursor;
+      final ImageData imageData = imageDescriptor.getImageData(100);
 
-      final Image cursorImage = imageDescriptor.createImage();
-      {
-         cursor = new Cursor(Display.getDefault(), cursorImage.getImageData(), 0, 0);
-      }
-      cursorImage.dispose();
+      final Cursor cursor = new Cursor(Display.getDefault(), imageData, 0, 0);
 
       return cursor;
    }
@@ -2354,7 +2418,7 @@ public class UI {
    public static FontMetrics getDialogFontMetrics() {
 
       // ensure that font metrics are setup
-      setupUI_FontMetrics();
+      setupFonts_SWTFontMetrics();
 
       return _dialogFont_Metrics;
    }
@@ -2490,6 +2554,11 @@ public class UI {
       return null;
    }
 
+   public static org.eclipse.swt.graphics.Font getUIDrawingFont() {
+
+      return _swtUIDrawingFont;
+   }
+
    public static GridDataFactory gridLayoutData_AlignBeginningFill() {
 
       return GridDataFactory.fillDefaults().align(SWT.BEGINNING, SWT.FILL);
@@ -2589,6 +2658,19 @@ public class UI {
          isShiftKey = (mouseEvent.stateMask & SWT.MOD3) > 0;
       } else {
          isShiftKey = (mouseEvent.stateMask & SWT.MOD2) > 0;
+      }
+
+      return isShiftKey;
+   }
+
+   public static boolean isShiftKey(final SelectionEvent selectionEvent) {
+
+      boolean isShiftKey;
+
+      if (IS_OSX) {
+         isShiftKey = (selectionEvent.stateMask & SWT.MOD3) > 0;
+      } else {
+         isShiftKey = (selectionEvent.stateMask & SWT.MOD2) > 0;
       }
 
       return isShiftKey;
@@ -3248,7 +3330,39 @@ public class UI {
     * @param backgroundColor
     *           Background color
     */
-   public static void setColorForAllChildren(final Control parent, final Color foregroundColor, final Color backgroundColor) {
+   public static void setColorForAllChildren(final Control parent,
+                                             final Color foregroundColor,
+                                             final Color backgroundColor) {
+
+      setColorForAllChildren(parent, foregroundColor, backgroundColor, null);
+   }
+
+   /**
+    * Set color for all children controls of the parent.
+    *
+    * @param parent
+    * @param foregroundColor
+    *           Foreground color
+    * @param backgroundColor
+    *           Background color
+    * @param allSkippedControls
+    *           Contains all controls which must be skipped
+    *
+    */
+   public static void setColorForAllChildren(final Control parent,
+                                             final Color foregroundColor,
+                                             final Color backgroundColor,
+                                             final Object[] allSkippedControls) {
+
+      if (allSkippedControls != null) {
+
+         for (final Object skippedControl : allSkippedControls) {
+
+            if (parent == skippedControl) {
+               return;
+            }
+         }
+      }
 
       parent.setForeground(foregroundColor);
       parent.setBackground(backgroundColor);
@@ -3260,15 +3374,15 @@ public class UI {
          for (final Control child : children) {
 
             if (child != null
-                  && child.isDisposed() == false //
+                  && child.isDisposed() == false
 
                   // exclude controls which look ugly
                   && !child.getClass().equals(Combo.class)
                   && !child.getClass().equals(Spinner.class)
-            //
+
             ) {
 
-               setColorForAllChildren(child, foregroundColor, backgroundColor);
+               setColorForAllChildren(child, foregroundColor, backgroundColor, allSkippedControls);
             }
          }
       }
@@ -3408,31 +3522,7 @@ public class UI {
       uiElement.setIcon(CommonActivator.getThemedImageDescriptor(imageName));
    }
 
-   public static void setupThemedImages() {
-
-// SET_FORMATTING_OFF
-
-      // weather images
-      IMAGE_REGISTRY.put(IWeather.WEATHER_ID_CLEAR,                  CommonActivator.getThemedImageDescriptor(CommonImages.Weather_Sunny));
-      IMAGE_REGISTRY.put(IWeather.WEATHER_ID_PART_CLOUDS,            CommonActivator.getThemedImageDescriptor(CommonImages.Weather_Cloudy));
-      IMAGE_REGISTRY.put(IWeather.WEATHER_ID_OVERCAST,               CommonActivator.getThemedImageDescriptor(CommonImages.Weather_Clouds));
-      IMAGE_REGISTRY.put(IWeather.WEATHER_ID_FOG,                    CommonActivator.getThemedImageDescriptor(CommonImages.Weather_Fog));
-      IMAGE_REGISTRY.put(IWeather.WEATHER_ID_LIGHTNING,              CommonActivator.getThemedImageDescriptor(CommonImages.Weather_Lightning));
-      IMAGE_REGISTRY.put(IWeather.WEATHER_ID_RAIN,                   CommonActivator.getThemedImageDescriptor(CommonImages.Weather_Rain));
-      IMAGE_REGISTRY.put(IWeather.WEATHER_ID_DRIZZLE,                CommonActivator.getThemedImageDescriptor(CommonImages.Weather_Drizzle));
-      IMAGE_REGISTRY.put(IWeather.WEATHER_ID_SNOW,                   CommonActivator.getThemedImageDescriptor(CommonImages.Weather_Snow));
-      IMAGE_REGISTRY.put(IWeather.WEATHER_ID_SCATTERED_SHOWERS,      CommonActivator.getThemedImageDescriptor(CommonImages.Weather_ScatteredShowers));
-      IMAGE_REGISTRY.put(IWeather.WEATHER_ID_SEVERE_WEATHER_ALERT,   CommonActivator.getThemedImageDescriptor(CommonImages.Weather_Severe));
-
-      IMAGE_REGISTRY.put(IMAGE_ACTION_PHOTO_FILTER,                  CommonActivator.getThemedImageDescriptor(CommonImages.PhotoFilter));
-      IMAGE_REGISTRY.put(IMAGE_ACTION_PHOTO_FILTER_DISABLED,         CommonActivator.getThemedImageDescriptor(CommonImages.PhotoFilter_Disabled));
-      IMAGE_REGISTRY.put(IMAGE_ACTION_PHOTO_FILTER_NO_PHOTOS,        CommonActivator.getThemedImageDescriptor(CommonImages.PhotoFilter_NoPhotos));
-      IMAGE_REGISTRY.put(IMAGE_ACTION_PHOTO_FILTER_WITH_PHOTOS,      CommonActivator.getThemedImageDescriptor(CommonImages.PhotoFilter_WithPhotos));
-
-// SET_FORMATTING_ON
-   }
-
-   private static void setupUI_AWTFonts() {
+   private static void setupFonts_AWTFonts() {
 
       if (IS_WIN) {
 
@@ -3454,7 +3544,74 @@ public class UI {
       }
    }
 
-   private static boolean setupUI_FontMetrics() {
+   private static void setupFonts_SWTDrawingFonts() {
+
+      final Display display = Display.getCurrent();
+      Assert.isNotNull(display);
+
+      // hookup dispose
+      display.disposeExec(() -> {
+         if (_swtUIDrawingFont != null) {
+            _swtUIDrawingFont.dispose();
+         }
+      });
+
+      _swtUIDrawingFont = setupFonts_SWTDrawingFonts_10(display);
+
+      // update font after it is modified
+      _prefStore_Common.addPropertyChangeListener(propertyChangeEvent -> {
+
+         final String property = propertyChangeEvent.getProperty();
+
+         if (property.equals(ICommonPreferences.UI_DRAWING_FONT)) {
+
+            if (_swtUIDrawingFont != null) {
+
+               /**
+                * Delay old font disposal because org.eclipse.swt.custom.StyledTextRenderer is
+                * using the old font in setFont(...) before the new font is initialized
+                * -> really bad behavior !!!
+                */
+               final org.eclipse.swt.graphics.Font oldFont = _swtUIDrawingFont;
+
+               display.timerExec(10_000, () -> oldFont.dispose());
+            }
+
+            _swtUIDrawingFont = setupFonts_SWTDrawingFonts_10(display);
+
+            // fire event after the font is recreated to update the UI
+            _prefStore_Common.setValue(ICommonPreferences.UI_DRAWING_FONT_IS_MODIFIED, Math.random());
+         }
+      });
+
+   }
+
+   private static org.eclipse.swt.graphics.Font setupFonts_SWTDrawingFonts_10(final Display display) {
+
+      if (IS_SWT_AUTO_SCALE) {
+
+         final FontData[] allFontData = PreferenceConverter.getFontDataArray(
+               _prefStore_Common,
+               ICommonPreferences.UI_DRAWING_FONT);
+
+// rescaling the font is not working smoothly
+//
+//         final FontData fontData = allFontData[0];
+//
+//         final float height = fontData.getHeight();
+//         final float unscaledHeight = height / (DPIUtil.getDeviceZoom() / 100);
+//
+//         fontData.setHeight((int) unscaledHeight);
+
+         return new org.eclipse.swt.graphics.Font(display, allFontData);
+
+      } else {
+
+         return JFaceResources.getDialogFont();
+      }
+   }
+
+   private static boolean setupFonts_SWTFontMetrics() {
 
       if (_dialogFont_Metrics != null) {
          return true;
@@ -3466,7 +3623,8 @@ public class UI {
       final Shell shell = new Shell(display);
       final GC gc = new GC(shell);
       {
-         gc.setFont(JFaceResources.getDialogFont());
+         final org.eclipse.swt.graphics.Font dialogFont = JFaceResources.getDialogFont();
+         gc.setFont(dialogFont);
 
          _dialogFont_Metrics = gc.getFontMetrics();
       }
@@ -3474,6 +3632,29 @@ public class UI {
       shell.dispose();
 
       return true;
+   }
+
+   public static void setupThemedImages() {
+
+// SET_FORMATTING_OFF
+
+      // weather images
+      IMAGE_REGISTRY.put(IWeather.WEATHER_ID_CLEAR,                  CommonActivator.getThemedImageDescriptor(CommonImages.Weather_Sunny));
+      IMAGE_REGISTRY.put(IWeather.WEATHER_ID_PART_CLOUDS,            CommonActivator.getThemedImageDescriptor(CommonImages.Weather_Cloudy));
+      IMAGE_REGISTRY.put(IWeather.WEATHER_ID_OVERCAST,               CommonActivator.getThemedImageDescriptor(CommonImages.Weather_Clouds));
+      IMAGE_REGISTRY.put(IWeather.WEATHER_ID_FOG,                    CommonActivator.getThemedImageDescriptor(CommonImages.Weather_Fog));
+      IMAGE_REGISTRY.put(IWeather.WEATHER_ID_LIGHTNING,              CommonActivator.getThemedImageDescriptor(CommonImages.Weather_Lightning));
+      IMAGE_REGISTRY.put(IWeather.WEATHER_ID_RAIN,                   CommonActivator.getThemedImageDescriptor(CommonImages.Weather_Rain));
+      IMAGE_REGISTRY.put(IWeather.WEATHER_ID_DRIZZLE,                CommonActivator.getThemedImageDescriptor(CommonImages.Weather_Drizzle));
+      IMAGE_REGISTRY.put(IWeather.WEATHER_ID_SNOW,                   CommonActivator.getThemedImageDescriptor(CommonImages.Weather_Snow));
+      IMAGE_REGISTRY.put(IWeather.WEATHER_ID_SCATTERED_SHOWERS,      CommonActivator.getThemedImageDescriptor(CommonImages.Weather_ScatteredShowers));
+      IMAGE_REGISTRY.put(IWeather.WEATHER_ID_SEVERE_WEATHER_ALERT,   CommonActivator.getThemedImageDescriptor(CommonImages.Weather_Severe));
+
+      IMAGE_REGISTRY.put(IMAGE_ACTION_PHOTO_FILTER,                  CommonActivator.getThemedImageDescriptor(CommonImages.PhotoFilter));
+      IMAGE_REGISTRY.put(IMAGE_ACTION_PHOTO_FILTER_NO_PHOTOS,        CommonActivator.getThemedImageDescriptor(CommonImages.PhotoFilter_NoPhotos));
+      IMAGE_REGISTRY.put(IMAGE_ACTION_PHOTO_FILTER_WITH_PHOTOS,      CommonActivator.getThemedImageDescriptor(CommonImages.PhotoFilter_WithPhotos));
+
+// SET_FORMATTING_ON
    }
 
    /**
@@ -3937,6 +4118,8 @@ public class UI {
 
          UNIT_IS_PACE_MIN_PER_MILE        = true;
          UNIT_LABEL_PACE                  = UNIT_PACE_MIN_P_MILE;
+         UNIT_LABEL_PACE_SWIMMING         = UNIT_PACE_MIN_P_100YARD;
+
 
       } else {
 
@@ -3944,6 +4127,7 @@ public class UI {
 
          UNIT_IS_PACE_MIN_PER_KILOMETER   = true;
          UNIT_LABEL_PACE                  = UNIT_PACE_MIN_P_KM;
+         UNIT_LABEL_PACE_SWIMMING         = UNIT_PACE_MIN_P_100M;
       }
 
       /*

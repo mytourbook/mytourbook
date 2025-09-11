@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2024 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2025 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -17,7 +17,6 @@ package net.tourbook.common.weather;
 
 import net.tourbook.common.Messages;
 import net.tourbook.common.UI;
-import net.tourbook.common.color.ThemeUtil;
 
 import org.eclipse.swt.graphics.Color;
 
@@ -264,9 +263,8 @@ public interface IWeather {
     */
    public static final Color[]  AIR_QUALITY_COLORS_BRIGHT_THEME = new Color[] {
 
-         // not defined
-         ThemeUtil.getDefaultForegroundColor_Combo(),
-         ThemeUtil.getDefaultBackgroundColor_Combo(),
+         // <not defined>
+         UI.SYS_COLOR_BLACK, UI.SYS_COLOR_WHITE,
 
          // 1 Good - green
          UI.SYS_COLOR_WHITE, new Color(0, 175, 0),
@@ -290,11 +288,8 @@ public interface IWeather {
     */
    public static final Color[]  AIR_QUALITY_COLORS_DARK_THEME   = new Color[] {
 
-         // not defined
-//         ThemeUtil.getDefaultForegroundColor_Combo(),
-//         ThemeUtil.getDefaultBackgroundColor_Combo(),
-         null,
-         null,
+         // <not defined>
+         UI.SYS_COLOR_WHITE, new Color(63, 68, 71),
 
          // 1 Good - green
          UI.SYS_COLOR_WHITE, new Color(0, 175, 0),

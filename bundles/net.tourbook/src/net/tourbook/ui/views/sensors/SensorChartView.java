@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2021, 2024 Wolfgang Schramm and Contributors
+ * Copyright (C) 2021, 2025 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -34,6 +34,7 @@ import net.tourbook.common.CommonActivator;
 import net.tourbook.common.CommonImages;
 import net.tourbook.common.UI;
 import net.tourbook.common.color.GraphColorManager;
+import net.tourbook.common.preferences.ICommonPreferences;
 import net.tourbook.common.tooltip.ActionToolbarSlideout;
 import net.tourbook.common.tooltip.ICanHideTooltip;
 import net.tourbook.common.tooltip.IOpeningDialog;
@@ -82,19 +83,24 @@ public class SensorChartView extends ViewPart implements ITourProvider {
 
 // SET_FORMATTING_OFF
 
-   private static final String      GRID_PREF_PREFIX                    = "GRID_SENSOR_CHART__";                                            //$NON-NLS-1$
+   private static final String   GRID_PREF_PREFIX                    = "GRID_SENSOR_CHART__";                                            //$NON-NLS-1$
 
-   private static final String      GRID_IS_SHOW_VERTICAL_GRIDLINES     = (GRID_PREF_PREFIX  + ITourbookPreferences.CHART_GRID_IS_SHOW_VERTICAL_GRIDLINES);
-   private static final String      GRID_IS_SHOW_HORIZONTAL_GRIDLINES   = (GRID_PREF_PREFIX  + ITourbookPreferences.CHART_GRID_IS_SHOW_HORIZONTAL_GRIDLINES);
-   private static final String      GRID_VERTICAL_DISTANCE              = (GRID_PREF_PREFIX  + ITourbookPreferences.CHART_GRID_VERTICAL_DISTANCE);
-   private static final String      GRID_HORIZONTAL_DISTANCE            = (GRID_PREF_PREFIX  + ITourbookPreferences.CHART_GRID_HORIZONTAL_DISTANCE);
+   private static final String   GRID_IS_SHOW_VERTICAL_GRIDLINES     = GRID_PREF_PREFIX  + ITourbookPreferences.CHART_GRID_IS_SHOW_VERTICAL_GRIDLINES;
+   private static final String   GRID_IS_SHOW_HORIZONTAL_GRIDLINES   = GRID_PREF_PREFIX  + ITourbookPreferences.CHART_GRID_IS_SHOW_HORIZONTAL_GRIDLINES;
+   private static final String   GRID_VERTICAL_DISTANCE              = GRID_PREF_PREFIX  + ITourbookPreferences.CHART_GRID_VERTICAL_DISTANCE;
+   private static final String   GRID_HORIZONTAL_DISTANCE            = GRID_PREF_PREFIX  + ITourbookPreferences.CHART_GRID_HORIZONTAL_DISTANCE;
+
+   private static final String   LAYOUT_PREF_PREFIX                  = "LAYOUT_SENSOR_CHART__";                                             //$NON-NLS-1$
+   private static final String   LAYOUT_GRAPH_Y_AXIS_WIDTH           = LAYOUT_PREF_PREFIX   + ITourbookPreferences.CHART_Y_AXIS_WIDTH;
 
 // SET_FORMATTING_ON
 
-   private final IPreferenceStore          _prefStore               = TourbookPlugin.getPrefStore();
-   private final IDialogSettings           _state                   = TourbookPlugin.getState(ID);
+   private static final IDialogSettings    _state                   = TourbookPlugin.getState(ID);
+   private static final IPreferenceStore   _prefStore               = TourbookPlugin.getPrefStore();
+   private static final IPreferenceStore   _prefStore_Common        = CommonActivator.getPrefStore();
 
    private IPropertyChangeListener         _prefChangeListener;
+   private IPropertyChangeListener         _prefChangeListener_Common;
    private ITourEventListener              _tourEventListener;
 
    private FormToolkit                     _tk;
@@ -139,7 +145,12 @@ public class SensorChartView extends ViewPart implements ITourProvider {
       @Override
       protected ToolbarSlideout createSlideout(final ToolBar toolbar) {
 
-         return new SlideoutSensorChartOptions(_parent, toolbar, SensorChartView.this, _state, GRID_PREF_PREFIX);
+         return new SlideoutSensorChartOptions(_parent,
+               toolbar,
+               SensorChartView.this,
+               _state,
+               GRID_PREF_PREFIX,
+               LAYOUT_PREF_PREFIX);
       }
 
       @Override
@@ -152,8 +163,7 @@ public class SensorChartView extends ViewPart implements ITourProvider {
 
       public ActionTourFilter() {
 
-         super(CommonActivator.getThemedImageDescriptor(CommonImages.App_Filter),
-               CommonActivator.getThemedImageDescriptor(CommonImages.App_Filter_Disabled));
+         super(CommonActivator.getThemedImageDescriptor(CommonImages.App_Filter));
 
          isToggleAction = true;
          notSelectedTooltip = Messages.Sensor_Chart_Action_TourQuickFilter_Tooltip;
@@ -196,14 +206,31 @@ public class SensorChartView extends ViewPart implements ITourProvider {
          } else if (property.equals(GRID_HORIZONTAL_DISTANCE)
                || property.equals(GRID_VERTICAL_DISTANCE)
                || property.equals(GRID_IS_SHOW_HORIZONTAL_GRIDLINES)
-               || property.equals(GRID_IS_SHOW_VERTICAL_GRIDLINES)) {
+               || property.equals(GRID_IS_SHOW_VERTICAL_GRIDLINES)
+
+               || property.equals(LAYOUT_GRAPH_Y_AXIS_WIDTH)
+
+         ) {
 
             // grid has changed, update chart
             updateChartProperties();
          }
       };
 
+      _prefChangeListener_Common = propertyChangeEvent -> {
+
+         final String property = propertyChangeEvent.getProperty();
+
+         if (property.equals(ICommonPreferences.UI_DRAWING_FONT_IS_MODIFIED)) {
+
+            _sensorChart.getChartComponents().updateFontScaling();
+
+            updateChartProperties();
+         }
+      };
+
       _prefStore.addPropertyChangeListener(_prefChangeListener);
+      _prefStore_Common.addPropertyChangeListener(_prefChangeListener_Common);
    }
 
    private void addTourEventListener() {
@@ -337,6 +364,9 @@ public class SensorChartView extends ViewPart implements ITourProvider {
 
       _sensorChart = createUI_10_Chart();
 
+      // set chart properties, this must be done after _sensorChart is created
+      updateChartProperties();
+
       _pageBook.showPage(_pageNoData);
    }
 
@@ -384,9 +414,6 @@ public class SensorChartView extends ViewPart implements ITourProvider {
       sensorChart.setTourInfoIconToolTipProvider(_tourInfoToolTipProvider);
       _tourInfoToolTipProvider.setActionsEnabled(true);
 
-      // set chart properties
-      updateChartProperties();
-
       return sensorChart;
    }
 
@@ -400,6 +427,7 @@ public class SensorChartView extends ViewPart implements ITourProvider {
       }
 
       _prefStore.removePropertyChangeListener(_prefChangeListener);
+      _prefStore_Common.removePropertyChangeListener(_prefChangeListener_Common);
 
       TourManager.getInstance().removeTourEventListener(_tourEventListener);
 
@@ -817,6 +845,6 @@ public class SensorChartView extends ViewPart implements ITourProvider {
 
    private void updateChartProperties() {
 
-      net.tourbook.ui.UI.updateChartProperties(_sensorChart, GRID_PREF_PREFIX);
+      net.tourbook.ui.UI.updateChartProperties(_sensorChart, GRID_PREF_PREFIX, LAYOUT_PREF_PREFIX);
    }
 }

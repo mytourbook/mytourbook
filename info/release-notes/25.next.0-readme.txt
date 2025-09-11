@@ -4,9 +4,6 @@
 TODO's
 ======
 
-* [Tour Location] Automatically create tour locations for longer pauses in a tour 
-   https://github.com/mytourbook/mytourbook/issues/1306 
- 
 * Support column width = 0
   This is now (17.3.2024) set but needs more testing
 
@@ -15,10 +12,6 @@ TODO's
 * Maybe replace "Display.getDefault()" with "PlatformUI.getWorkbench().getDisplay()"
   "Code should always ask the workbench for the display rather than rely on Display.getDefault()"
   http://help.eclipse.org/helios/topic/org.eclipse.platform.doc.isv/reference/api/org/eclipse/ui/IWorkbench.html#getDisplay%28%29
-
-* Tour Editor     - Remove experimental message box: net.tourbook.ui.views.tourDataEditor.TourDataEditorView.actionCreateTour(TourData)
-                    Released: 23.3
-
 
 * Website         - IDE pref page: Save action must not be done manually, they are saved in e.g. net.tourbook/.settings/org.eclipse.jdt.ui.prefs with the "sp_cleanup" key prefix
                     Need to check how to apply it to all projects, must maybe be done with the already existing ant script
@@ -37,21 +30,12 @@ Experimental
 
 * 
 
-
-New
-===
-
-* Tour Info Tooltip (Frederic):
-  - New fields: elapsed time at night and during the day for tours that also happen during the night
+New / Improvements
+==================
 
 * Tour Nutrition (Frederic):
-  - Support for the carbohydrates
-  - New button to update the nutrition facts of (a) product(s)
   - Select a product from a list of the most recent products used
-  - Edit an existing custom nutrition product
 
-Improvements
-============
 
 * Tour Nutrition (Frederic):
   - Add duplicated products when they are contained in a beverage container
@@ -60,20 +44,21 @@ Improvements
 Changes
 =======
 
-* 
-
-
+* Map Properties View
+  This view is removed, its options are now available directly in the 2D map options slideout
+  https://github.com/mytourbook/mytourbook/issues/1543
 
 Changes that require Tour Re-import
 ===================================
 
-*  
+* 
 
 
 Bugfix
 ======
   
 * 
+
 
 
 See also milestone 25.x https://github.com/mytourbook/mytourbook/milestone/16?closed=1
@@ -97,5 +82,5 @@ System
 * Eclipse 2024-03 (4.31)      https://download.eclipse.org/eclipse/downloads/drops4/R-4.31-202402290520/
 * NatTable 2.5.0              https://eclipse.dev/nattable/download
 * Nebula Widgets              https://download.eclipse.org/nebula/releases/latest
-* FIT SDK 21.158.0            https://forums.garmin.com/developer/fit-sdk/b/news-announcements
+* FIT SDK 21.176.0            https://forums.garmin.com/developer/fit-sdk/b/news-announcements
 * WorldWind 2.2.1             https://github.com/NASAWorldWind/WorldWindJava/releases/tag/v2.2.1

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2025 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -37,6 +37,7 @@ import net.tourbook.common.tooltip.ToolbarSlideout;
 import net.tourbook.common.util.Util;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.ui.ChartOptions_Grid;
+import net.tourbook.ui.ChartOptions_Layout;
 
 import org.eclipse.jface.action.ToolBarManager;
 import org.eclipse.jface.dialogs.IDialogSettings;
@@ -64,6 +65,7 @@ public class SlideoutReferenceTimelineOptions extends ToolbarSlideout implements
    private ActionResetToDefaults         _actionRestoreDefaults;
 
    private ChartOptions_Grid             _gridUI;
+   private ChartOptions_Layout           _layoutUI;
 
    private SelectionListener             _defaultSelectionListener;
 
@@ -83,6 +85,7 @@ public class SlideoutReferenceTimelineOptions extends ToolbarSlideout implements
                                            final Control ownerControl,
                                            final ToolBar toolBar,
                                            final String prefStoreGridPrefix,
+                                           final String layoutPrefPrefix,
                                            final IDialogSettings state) {
 
       super(ownerControl, toolBar);
@@ -91,6 +94,7 @@ public class SlideoutReferenceTimelineOptions extends ToolbarSlideout implements
       _state = state;
 
       _gridUI = new ChartOptions_Grid(prefStoreGridPrefix);
+      _layoutUI = new ChartOptions_Layout(layoutPrefPrefix);
    }
 
    private void createActions() {
@@ -135,10 +139,11 @@ public class SlideoutReferenceTimelineOptions extends ToolbarSlideout implements
             createUI_20_Graphs(container);
 
             _gridUI.createUI(container);
-
             _gridUI.enableGridOptions(ChartOptions_Grid.GRID_VERTICAL_DISTANCE
                   | ChartOptions_Grid.GRID_IS_SHOW_HORIZONTAL_LINE
                   | ChartOptions_Grid.GRID_IS_SHOW_VERTICAL_LINE);
+
+            _layoutUI.createUI(container);
          }
       }
 
@@ -308,7 +313,7 @@ public class SlideoutReferenceTimelineOptions extends ToolbarSlideout implements
 // SET_FORMATTING_OFF
 
       _gridUI.resetToDefaults();
-      _gridUI.saveState();
+      _layoutUI.resetToDefaults();
 
       _chkShowAltimeter_Avg   .setSelection(STATE_SHOW_ALTIMETER_AVG_DEFAULT);
       _chkShowPace_Avg        .setSelection(STATE_SHOW_PACE_AVG_DEFAULT);
@@ -326,6 +331,7 @@ public class SlideoutReferenceTimelineOptions extends ToolbarSlideout implements
    private void restoreState() {
 
       _gridUI.restoreState();
+      _layoutUI.restoreState();
 
       _chkInvertPaceGraph.setSelection(_prefStore.getBoolean(ITourbookPreferences.GRAPH_IS_SHOW_PACE_GRAPH_INVERTED));
 
@@ -347,8 +353,6 @@ public class SlideoutReferenceTimelineOptions extends ToolbarSlideout implements
    }
 
    private void saveState() {
-
-      _gridUI.saveState();
 
       _prefStore.setValue(ITourbookPreferences.GRAPH_IS_SHOW_PACE_GRAPH_INVERTED, _chkInvertPaceGraph.getSelection());
 

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2024 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2025 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -47,7 +47,6 @@ import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Cursor;
-import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.LineAttributes;
@@ -449,11 +448,6 @@ public class ChartComponentGraph extends Canvas {
    boolean                            _isChartOverlapped;
 
    /**
-    * Cache font to improve performance.
-    */
-   private Font                       _uiFont;
-
-   /**
     * Configuration how the chart title segment is displayed.
     */
    ChartTitleSegmentConfig            chartTitleSegmentConfig      = new ChartTitleSegmentConfig();
@@ -468,7 +462,7 @@ public class ChartComponentGraph extends Canvas {
     * @param style
     *           the style of this control.
     */
-   ChartComponentGraph(final Chart chartWidget, final Composite parent, final int style) {
+   ChartComponentGraph(final Chart chartWidget, final Composite parent) {
 
       // create composite with horizontal scrollbars
       super(parent, SWT.H_SCROLL | SWT.NO_BACKGROUND);
@@ -476,7 +470,6 @@ public class ChartComponentGraph extends Canvas {
       final Display display = getDisplay();
 
       _chart = chartWidget;
-      _uiFont = _chart.getFont();
 
       _pc = new PixelConverter(_chart);
 
@@ -565,13 +558,11 @@ public class ChartComponentGraph extends Canvas {
 //               final long start = System.nanoTime();
 //               System.out.println();
 //               System.out.println("onPaint\tstart\t");
-//               // TODO remove SYSTEM.OUT.PRINTLN
 
             drawSync_000_onPaint(paintEvent.gc, paintEvent.time & 0xFFFFFFFFL);
 
 //               System.out.println("onPaint\tend\t" + (((double) System.nanoTime() - start) / 1000000) + "ms");
 //               System.out.println();
-//               // TODO remove SYSTEM.OUT.PRINTLN
          }
       });
 
@@ -1533,7 +1524,6 @@ public class ChartComponentGraph extends Canvas {
    private void drawAsync_101_DoPainting() {
 
 //      final long startTime = System.nanoTime();
-//      // TODO remove SYSTEM.OUT.PRINTLN
 
       if (isDisposed()) {
          // this widget is disposed
@@ -1601,10 +1591,9 @@ public class ChartComponentGraph extends Canvas {
       final GC gcChart = new GC(_chartImage_20_Chart);
       final GC gcGraph = new GC(_chartImage_10_Graphs);
       {
-         gcChart.setFont(_uiFont);
+         gcChart.setFont(UI.getUIDrawingFont());
 
          // fill background
-
          gcChart.setBackground(_backgroundColor);
          gcChart.fillRectangle(_chartImage_20_Chart.getBounds());
 
@@ -1638,7 +1627,6 @@ public class ChartComponentGraph extends Canvas {
 //            + (((double) endTime - startTime) / 1000000)
 //            + " ms   #:"
 //            + _drawAsyncCounter[0]);
-//      // TODO remove SYSTEM.OUT.PRINTLN
    }
 
    /**
@@ -1689,6 +1677,8 @@ public class ChartComponentGraph extends Canvas {
 
             gcGraph_WithOSXFix = gcGraph;
          }
+
+         gcGraph_WithOSXFix.setLineWidth(0);
 
          final boolean isFirstGraph = graphNo == 1;
          final boolean isLastGraph = graphNo == lastGraphNo;
@@ -2082,6 +2072,7 @@ public class ChartComponentGraph extends Canvas {
          }
 
          final Point textExtent = gc.textExtent(title);
+
          final int titleWidth = textExtent.x;
          final int titleHeight = textExtent.y;
 
@@ -2188,6 +2179,7 @@ public class ChartComponentGraph extends Canvas {
           */
          int devXUnitTick;
          ChartUnit xUnit = null;
+
          if (nextXUnit != null) {
 
             xUnit = nextXUnit;
@@ -2257,13 +2249,14 @@ public class ChartComponentGraph extends Canvas {
                   && (isDrawUnits == null || isDrawUnits[unitCounter])) {
 
                gcChart.setLineStyle(SWT.LINE_SOLID);
-               gcChart.drawLine(devXUnitTick, devYBottom, devXUnitTick, devYBottom + 5);
+               gcChart.drawLine(devXUnitTick, devYBottom, devXUnitTick, devYBottom + ChartComponents.UNIT_TICK_SIZE);
             }
 
             /*
              * Draw unit value
              */
             final int devUnitValueWidth = gcChart.textExtent(xUnit.valueLabel).x;
+            final int devYUnit = devYBottom + ChartComponents.UNIT_TICK_SIZE;
 
             if (devUnitWidth != 0 && xUnitTextPos == GraphDrawingData.X_UNIT_TEXT_POS_CENTER) {
 
@@ -2285,7 +2278,7 @@ public class ChartComponentGraph extends Canvas {
 
                } else {
 
-                  gcChart.drawText(xUnit.valueLabel, devXUnitLabelPosition, devYBottom + 7, true);
+                  gcChart.drawText(xUnit.valueLabel, devXUnitLabelPosition, devYUnit, true);
 
                   devXLastUnitRightPosition = devXUnitLabelPosition + devUnitValueWidth + 0;
                }
@@ -2320,18 +2313,14 @@ public class ChartComponentGraph extends Canvas {
                      devXUnit = 0;
                   }
 
-                  gcChart.drawText(xUnit.valueLabel, devXUnit, devYBottom + 7, true);
+                  gcChart.drawText(xUnit.valueLabel, devXUnit, devYUnit, true);
 
                   /*
                    * Draw unit label (km, mi, h)
                    */
                   final int devXUnitLabel = devXUnit + devUnitValueWidth + 2;
 
-                  gcChart.drawText(
-                        unitLabel,
-                        devXUnitLabel,
-                        devYBottom + 7,
-                        true);
+                  gcChart.drawText(unitLabel, devXUnitLabel, devYUnit, true);
 
                   devXLastUnitRightPosition = devXUnitLabel + devUnitLabelWidth + 2;
 
@@ -2358,7 +2347,7 @@ public class ChartComponentGraph extends Canvas {
 
                      if (devXUnitValueDefaultPosition > devXLastUnitRightPosition) {
 
-                        gcChart.drawText(xUnit.valueLabel, devXUnitValueDefaultPosition, devYBottom + 7, true);
+                        gcChart.drawText(xUnit.valueLabel, devXUnitValueDefaultPosition, devYUnit, true);
 
                         devXLastUnitRightPosition = devXUnitValueDefaultPosition + devUnitValueWidth + 2;
                      }
@@ -2545,7 +2534,7 @@ public class ChartComponentGraph extends Canvas {
        * setLineWidth() MUST be set AFTER setLineAttributes() otherwise the line width is growing
        * every time on a 4k display !!!
        */
-      gcGraph.setLineWidth(1);
+      gcGraph.setLineWidth(0);
 
       gcGraph.setForeground(display.getSystemColor(SWT.COLOR_GRAY));
 
@@ -2588,7 +2577,7 @@ public class ChartComponentGraph extends Canvas {
       final int devYTop = drawingData.getDevYTop() - labelHeight;
 
       gcGraph.setForeground(new Color(yData.getRgbGraph_Text()));
-      gcGraph.drawString(graphTitle, 0, devYTop, true);
+      gcGraph.drawText(graphTitle, 0, devYTop, true);
    }
 
    private void drawAsync_500_LineGraph(final GC gcGraph,
@@ -3575,12 +3564,21 @@ public class ChartComponentGraph extends Canvas {
             }
 
             final float valueYHigh = yHighValues[valueIndex];
-            final float barHeight = (Math.max(valueYHigh, valueYLow) - Math.min(valueYHigh, valueYLow));
+            float barHeight = (Math.max(valueYHigh, valueYLow) - Math.min(valueYHigh, valueYLow));
 
-// DISABLED, that these bars are not totally hidden
-// Reverted, otherwise a line is painted when a bar is not available
             if (barHeight == 0) {
-               continue;
+
+               if (valueYHigh != 0) {
+
+                  // min and max values are the same but the value is not 0 -> make bar visible
+
+                  // use a value > 1 that it is not (int) clipped to 0
+                  barHeight = (float) (1.1 / scaleY);
+
+               } else {
+
+                  continue;
+               }
             }
 
             int devBarHeight = (int) (barHeight * scaleY);
@@ -3660,11 +3658,18 @@ public class ChartComponentGraph extends Canvas {
 
                   devShapeBarWidth = 3;
 
-                  gcGraph.setLineWidth(3);
+                  if (UI.IS_4K_DISPLAY) {
+
+                     gcGraph.setLineWidth(0);
+
+                  } else {
+
+                     gcGraph.setLineWidth(1);
+                  }
 
                } else {
 
-                  gcGraph.setLineWidth(1);
+                  gcGraph.setLineWidth(0);
                }
 
                if (devBarHeight < 3) {
@@ -3673,7 +3678,7 @@ public class ChartComponentGraph extends Canvas {
 
             } else {
 
-               gcGraph.setLineWidth(1);
+               gcGraph.setLineWidth(0);
             }
 
             /*
@@ -3727,6 +3732,9 @@ public class ChartComponentGraph extends Canvas {
 
       // reset clipping
       gcGraph.setClipping((Rectangle) null);
+
+      // reset line width
+      gcGraph.setLineWidth(0);
    }
 
    /**
@@ -5274,7 +5282,6 @@ public class ChartComponentGraph extends Canvas {
 ////                  + ("\t: " + )
 ////                  + ("\t: " + )
 //            );
-//// TODO remove SYSTEM.OUT.PRINTLN
 
             /*
              * this is the last point for a filled graph
@@ -5625,10 +5632,8 @@ public class ChartComponentGraph extends Canvas {
    private void drawSync_000_onPaint(final GC gc, final long eventTime) {
 
 //      final long startTime = System.nanoTime();
-//      // TODO remove SYSTEM.OUT.PRINTLN
 //
 //      System.out.println(UI.timeStampNano() + " drawSync_000_onPaint: START");
-//      // TODO remove SYSTEM.OUT.PRINTLN
 
       if (_allGraphDrawingData == null || _allGraphDrawingData.isEmpty()) {
 
@@ -5709,7 +5714,6 @@ public class ChartComponentGraph extends Canvas {
          if (isPaintedDirectly) {
 
 //            System.out.println("isPaintedDirectly\t");
-//            // TODO remove SYSTEM.OUT.PRINTLN
          }
 
          drawSync_300_Image30Custom();
@@ -5724,7 +5728,6 @@ public class ChartComponentGraph extends Canvas {
 //            + _drawAsyncCounter[0]);
 //      System.out.println(UI.timeStampNano() + " \t");
 //      System.out.println(UI.timeStampNano() + " \t");
-//      // TODO remove SYSTEM.OUT.PRINTLN
    }
 
    private Image drawSync_010_ImageChart(final GC gc, final long eventTime) {
@@ -5741,7 +5744,6 @@ public class ChartComponentGraph extends Canvas {
 
          if (_chartImage_40_Overlay != null) {
 //            System.out.println("gc <- 40\tdrawSync010ImageChart");
-//            // TODO remove SYSTEM.OUT.PRINTLN
 
             gc.drawImage(_chartImage_40_Overlay, 0, 0);
          }
@@ -5751,7 +5753,6 @@ public class ChartComponentGraph extends Canvas {
 
          if (_chartImage_20_Chart != null) {
 //            System.out.println("gc <- 20");
-//            // TODO remove SYSTEM.OUT.PRINTLN
 
             gc.drawImage(_chartImage_20_Chart, 0, 0);
          }
@@ -5844,6 +5845,8 @@ public class ChartComponentGraph extends Canvas {
           */
          gcCustom.drawImage(_chartImage_20_Chart, 0, 0);
 
+         gcCustom.setFont(UI.getUIDrawingFont());
+
          for (int graphIndex = 0; graphIndex < _allGraphDrawingData.size(); graphIndex++) {
 
             final GraphDrawingData graphDrawingData = _allGraphDrawingData.get(graphIndex);
@@ -5857,7 +5860,6 @@ public class ChartComponentGraph extends Canvas {
             }
          }
 //         System.out.println((UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ") + ("\t"));
-//         // TODO remove SYSTEM.OUT.PRINTLN
 
       } finally {
          gcCustom.dispose();
@@ -5916,15 +5918,16 @@ public class ChartComponentGraph extends Canvas {
 
 //      System.out.println((UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ")
 //            + ("\tdrawSync_400_OverlayImage"));
-//      // TODO remove SYSTEM.OUT.PRINTLN
 
       final GC gcOverlay = new GC(_chartImage_40_Overlay);
       {
          /*
-          * copy the graph image into the slider image, the slider will be drawn on top of the graph
+          * Copy the graph image into the slider image, the slider will be drawn on top of the graph
           */
          gcOverlay.fillRectangle(graphImageRect);
          gcOverlay.drawImage(_chartImage_30_Custom, 0, 0);
+
+         gcOverlay.setFont(UI.getUIDrawingFont());
 
          /*
           * draw x/y-sliders
@@ -5982,7 +5985,6 @@ public class ChartComponentGraph extends Canvas {
       gcOverlay.dispose();
 
 //      System.out.println("time\t" + ((float) (System.nanoTime() - start) / 1000000) + " ms");
-//      // TODO remove SYSTEM.OUT.PRINTLN
    }
 
    /**
@@ -6245,7 +6247,7 @@ public class ChartComponentGraph extends Canvas {
 
             // draw label text
             gcGraph.setForeground(_foregroundColor);
-            gcGraph.drawString(label, labelX + 3, labelY - 0, true);
+            gcGraph.drawText(label, labelX + 3, labelY - 0, true);
 
             // draw slider line
             gcGraph.setForeground(colorLine);
@@ -6752,7 +6754,7 @@ public class ChartComponentGraph extends Canvas {
       final int devOffsetPoint = _pc.convertHorizontalDLUsToPixels(2);// 3;
 
       gcOverlay.setAntialias(SWT.ON);
-      gcOverlay.setLineWidth(1);
+      gcOverlay.setLineWidth(0);
 
       // loop: all graphs
       for (final GraphDrawingData drawingData : _allGraphDrawingData) {
@@ -7425,6 +7427,11 @@ public class ChartComponentGraph extends Canvas {
       return xSlider;
    }
 
+   boolean isXSliderVisible() {
+
+      return _isXSliderVisible;
+   }
+
    /**
     * check if the mouse hit an y-slider and returns the hit slider
     *
@@ -7550,7 +7557,7 @@ public class ChartComponentGraph extends Canvas {
       /*
        * adjust left slider
        */
-      final long xxDevLeftPosition = _xxDevViewPortLeftBorder + 2;
+      final long xxDevLeftPosition = _xxDevViewPortLeftBorder;
 
       setXSliderValue_FromHoveredValuePoint(leftSlider);
       leftSlider.moveToXXDevPosition(xxDevLeftPosition, true, true, false);
@@ -7558,7 +7565,7 @@ public class ChartComponentGraph extends Canvas {
       /*
        * adjust right slider
        */
-      final long xxDevRightPosition = _xxDevViewPortLeftBorder + getDevVisibleChartWidth() - 2;
+      final long xxDevRightPosition = _xxDevViewPortLeftBorder + getDevVisibleChartWidth() - 1;
 
       setXSliderValue_FromHoveredValuePoint(rightSlider);
       rightSlider.moveToXXDevPosition(xxDevRightPosition, true, true, false);
@@ -9990,6 +9997,7 @@ public class ChartComponentGraph extends Canvas {
     * @param isXSliderVisible
     */
    void setXSliderVisible(final boolean isSliderVisible) {
+
       _isXSliderVisible = isSliderVisible;
    }
 
@@ -10089,8 +10097,8 @@ public class ChartComponentGraph extends Canvas {
          return;
       }
 
-      final int marginTop = _chartComponents.getDevChartMarginTop();
-      final int marginBottom = _chartComponents.getDevChartMarginBottom();
+      final int marginTop = _chartComponents.getDevChartMargin_Top();
+      final int marginBottom = _chartComponents.getDevChartMargin_Bottom();
 
       valuePointToolTip.setSnapBorder(marginTop, marginBottom);
 
@@ -10119,7 +10127,6 @@ public class ChartComponentGraph extends Canvas {
       }
 
 //      System.out.println((UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ") + ("\tupdateDraggedChart"));
-//      // TODO remove SYSTEM.OUT.PRINTLN
 
       final int devVisibleChartWidth = getDevVisibleChartWidth();
 

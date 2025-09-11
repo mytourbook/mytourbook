@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2025 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -42,4 +42,9 @@ public class StatisticYear_Elevation_Up extends StatisticYear {
 
       return GRID_YEAR_ELEVATION_UP;
 	}
+
+   @Override
+   protected String getLayoutPrefPrefix() {
+      return LAYOUT_YEAR_ELEVATION_UP;
+   }
 }

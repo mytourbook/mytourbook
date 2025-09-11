@@ -58,6 +58,12 @@
          <name>pom-50-LANGUAGE-FRAGMENTS.xml</name>   <locationURI>PARENT-2-PROJECT_LOC/LANGUAGE-FRAGMENTS/pom.xml</locationURI>
          <type>1</type>
       </link>
+      
+      <link>
+         <name>toolchains.xml</name>                  <location>C:/Users/Wolfgang/.m2/toolchains.xml</location>
+         <type>1</type>
+      </link>
+
 
    </linkedResources>
 </projectDescription>

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2025 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -36,12 +36,10 @@ public class ActionShowPOI extends Action {
       setToolTipText(Messages.Map_Action_POI_Tooltip);
 
       setImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.Show_POI));
-      setDisabledImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.POI_Disabled));
    }
 
    @Override
    public void run() {
       _mapView.actionPOI();
    }
-
 }

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
+ * Copyright (C) 2016, 2025 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -85,8 +85,11 @@ public class ChartOptions_Grid {
       final Group group = new Group(parent, SWT.NONE);
       group.setText(Messages.Pref_Graphs_Group_Grid);
       GridDataFactory.fillDefaults().grab(true, false).span(2, 1).applyTo(group);
-      GridLayoutFactory.swtDefaults().numColumns(3).applyTo(group);
-//      group.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_GREEN));
+      GridLayoutFactory.swtDefaults()
+            .extendedMargins(0, 0, -8, 0)
+            .numColumns(3)
+            .applyTo(group);
+//      group.setBackground(UI.SYS_COLOR_GREEN);
       {
          {
             Label label = new Label(group, SWT.NONE);
@@ -201,7 +204,8 @@ public class ChartOptions_Grid {
       };
 
       _defaultMouseWheelListener = mouseEvent -> {
-         net.tourbook.common.UI.adjustSpinnerValueOnMouseScroll(mouseEvent);
+
+         net.tourbook.common.UI.adjustSpinnerValueOnMouseScroll(mouseEvent, 10);
          onChangeUI();
       };
    }
@@ -246,7 +250,7 @@ public class ChartOptions_Grid {
       _spinnerGridVerticalDistance.setSelection(   Util.getPrefixPref_Int(     _prefStore, _prefStorePrefix, ITourbookPreferences.CHART_GRID_VERTICAL_DISTANCE));
    }
 
-   public void saveState() {
+   private void saveState() {
 
       _prefStore.setValue(_prefStorePrefix + ITourbookPreferences.CHART_GRID_IS_SHOW_HORIZONTAL_GRIDLINES,  _chkShowGrid_HorizontalLines.getSelection());
       _prefStore.setValue(_prefStorePrefix + ITourbookPreferences.CHART_GRID_IS_SHOW_VERTICAL_GRIDLINES,    _chkShowGrid_VerticalLines.getSelection());

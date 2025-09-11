@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2024 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2025 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -17,7 +17,6 @@ package net.tourbook.export;
 
 import java.util.List;
 
-import net.tourbook.common.UI;
 import net.tourbook.data.TourData;
 import net.tourbook.extension.export.ExportTourExtension;
 
@@ -35,9 +34,7 @@ public class ExportTourGPX extends ExportTourExtension {
     */
    public ExportTourGPX() {
 
-      setImageDescriptor(Activator.getImageDescriptor(UI.IS_DARK_THEME
-            ? ExportImages.Export_GPX_Logo_Dark
-            : ExportImages.Export_GPX_Logo));
+      setImageDescriptor(Activator.getImageDescriptor(ExportImages.Export_GPX_Logo));
    }
 
    @Override

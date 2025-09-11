@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2025 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -72,6 +72,7 @@ public class HAC5DeviceDataReader extends TourbookDevice {
     * Adjust the offset for the DD record so it's within the tour data area
     *
     * @param offsetNextDDRecord
+    *
     * @return
     */
    private int adjustDDRecordOffset(final int offsetNextDDRecord) {
@@ -557,6 +558,7 @@ public class HAC5DeviceDataReader extends TourbookDevice {
    /**
     * @param buffer
     * @param tourData
+    *
     * @return
     */
    private StartBlock readAARecord(final byte[] buffer, final TourData tourData) {
@@ -632,8 +634,9 @@ public class HAC5DeviceDataReader extends TourbookDevice {
       // 14 1 ?
       // 15 1 0xFF
 
-      tourData.setTourAltUp(DeviceReaderTools.get2ByteData(buffer, 10));
-      tourData.setTourAltDown(DeviceReaderTools.get2ByteData(buffer, 12));
+      int elevationGain = DeviceReaderTools.get2ByteData(buffer, 10);
+      int elevationLoss = DeviceReaderTools.get2ByteData(buffer, 12);
+      tourData.setElevationGainLoss(elevationGain, elevationLoss);
 
 // System.out.println("UP: "+DeviceReaderTools.get2ByteData(buffer, 10));
    }

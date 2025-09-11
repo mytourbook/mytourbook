@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2022 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2025 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -36,7 +36,6 @@ public class ActionZoomCenterBy extends Action {
       _mapView = mapView;
 
       setImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.Zoom_CenterBy_Tour));
-      setDisabledImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.Zoom_CenterBy_Tour_Disabled));
    }
 
    @Override
@@ -57,18 +56,14 @@ public class ActionZoomCenterBy extends Action {
       case Map:
 
          setToolTipText(Messages.Map_Action_Zoom_CenteredBy_Map_Tooltip);
-
          setImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.Zoom_CenterBy_Map));
-         setDisabledImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.Zoom_CenterBy_Map_Disabled));
 
          break;
 
       case Tour:
 
          setToolTipText(Messages.Map_Action_Zoom_CenteredBy_Tour_Tooltip);
-
          setImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.Zoom_CenterBy_Tour));
-         setDisabledImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.Zoom_CenterBy_Tour_Disabled));
 
          break;
 
@@ -76,9 +71,7 @@ public class ActionZoomCenterBy extends Action {
       default:
 
          setToolTipText(Messages.Map_Action_Zoom_CenteredBy_Mouse_Tooltip);
-
          setImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.Zoom_CenterBy_Mouse));
-         setDisabledImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.Zoom_CenterBy_Mouse_Disabled));
 
          break;
       }

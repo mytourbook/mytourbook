@@ -253,97 +253,101 @@ public interface ITourbookPreferences {
    /*
     * Min/Max values
     */
-   public static final String GRAPH_IS_MIN_MAX_ENABLED                          = "GRAPH_IS_MIN_MAX_ENABLED";                          //$NON-NLS-1$
+   public static final String GRAPH_IS_MIN_MAX_ENABLED                                  = "GRAPH_IS_MIN_MAX_ENABLED";                                  //$NON-NLS-1$
 
-   public static final String GRAPH_ALTIMETER_IS_MIN_ENABLED                    = "GRAPH_ALTIMETER_IS_MIN_ENABLED";                    //$NON-NLS-1$
-   public static final String GRAPH_ALTIMETER_IS_MAX_ENABLED                    = "GRAPH_ALTIMETER_IS_MAX_ENABLED";                    //$NON-NLS-1$
-   public static final String GRAPH_ALTIMETER_MIN_VALUE                         = "GRAPH_ALTIMETER_MIN_VALUE";                         //$NON-NLS-1$
-   public static final String GRAPH_ALTIMETER_MAX_VALUE                         = "GRAPH_ALTIMETER_MAX_VALUE";                         //$NON-NLS-1$
+   public static final String GRAPH_ALTIMETER_IS_MIN_ENABLED                            = "GRAPH_ALTIMETER_IS_MIN_ENABLED";                            //$NON-NLS-1$
+   public static final String GRAPH_ALTIMETER_IS_MAX_ENABLED                            = "GRAPH_ALTIMETER_IS_MAX_ENABLED";                            //$NON-NLS-1$
+   public static final String GRAPH_ALTIMETER_MIN_VALUE                                 = "GRAPH_ALTIMETER_MIN_VALUE";                                 //$NON-NLS-1$
+   public static final String GRAPH_ALTIMETER_MAX_VALUE                                 = "GRAPH_ALTIMETER_MAX_VALUE";                                 //$NON-NLS-1$
 
-   public static final String GRAPH_ALTITUDE_IS_MIN_ENABLED                     = "GRAPH_ALTITUDE_IS_MIN_ENABLED";                     //$NON-NLS-1$
-   public static final String GRAPH_ALTITUDE_IS_MAX_ENABLED                     = "GRAPH_ALTITUDE_IS_MAX_ENABLED";                     //$NON-NLS-1$
-   public static final String GRAPH_ALTITUDE_MIN_VALUE                          = "GRAPH_ALTITUDE_MIN_VALUE";                          //$NON-NLS-1$
-   public static final String GRAPH_ALTITUDE_MAX_VALUE                          = "GRAPH_ALTITUDE_MAX_VALUE";                          //$NON-NLS-1$
+   public static final String GRAPH_ALTITUDE_IS_MIN_ENABLED                             = "GRAPH_ALTITUDE_IS_MIN_ENABLED";                             //$NON-NLS-1$
+   public static final String GRAPH_ALTITUDE_IS_MAX_ENABLED                             = "GRAPH_ALTITUDE_IS_MAX_ENABLED";                             //$NON-NLS-1$
+   public static final String GRAPH_ALTITUDE_MIN_VALUE                                  = "GRAPH_ALTITUDE_MIN_VALUE";                                  //$NON-NLS-1$
+   public static final String GRAPH_ALTITUDE_MAX_VALUE                                  = "GRAPH_ALTITUDE_MAX_VALUE";                                  //$NON-NLS-1$
 
-   public static final String GRAPH_CADENCE_IS_MIN_ENABLED                      = "GRAPH_CADENCE_IS_MIN_ENABLED";                      //$NON-NLS-1$
-   public static final String GRAPH_CADENCE_IS_MAX_ENABLED                      = "GRAPH_CADENCE_IS_MAX_ENABLED";                      //$NON-NLS-1$
-   public static final String GRAPH_CADENCE_MIN_VALUE                           = "GRAPH_CADENCE_MIN_VALUE";                           //$NON-NLS-1$
-   public static final String GRAPH_CADENCE_MAX_VALUE                           = "GRAPH_CADENCE_MAX_VALUE";                           //$NON-NLS-1$
+   public static final String GRAPH_CADENCE_IS_MIN_ENABLED                              = "GRAPH_CADENCE_IS_MIN_ENABLED";                              //$NON-NLS-1$
+   public static final String GRAPH_CADENCE_IS_MAX_ENABLED                              = "GRAPH_CADENCE_IS_MAX_ENABLED";                              //$NON-NLS-1$
+   public static final String GRAPH_CADENCE_MIN_VALUE                                   = "GRAPH_CADENCE_MIN_VALUE";                                   //$NON-NLS-1$
+   public static final String GRAPH_CADENCE_MAX_VALUE                                   = "GRAPH_CADENCE_MAX_VALUE";                                   //$NON-NLS-1$
 
-   public static final String GRAPH_GRADIENT_IS_MIN_ENABLED                     = "GRAPH_GRADIENT_IS_MIN_ENABLED";                     //$NON-NLS-1$
-   public static final String GRAPH_GRADIENT_IS_MAX_ENABLED                     = "GRAPH_GRADIENT_IS_MAX_ENABLED";                     //$NON-NLS-1$
-   public static final String GRAPH_GRADIENT_MIN_VALUE                          = "GRAPH_GRADIENT_MIN_VALUE";                          //$NON-NLS-1$
-   public static final String GRAPH_GRADIENT_MAX_VALUE                          = "GRAPH_GRADIENT_MAX_VALUE";                          //$NON-NLS-1$
+   public static final String GRAPH_GRADIENT_IS_MIN_ENABLED                             = "GRAPH_GRADIENT_IS_MIN_ENABLED";                             //$NON-NLS-1$
+   public static final String GRAPH_GRADIENT_IS_MAX_ENABLED                             = "GRAPH_GRADIENT_IS_MAX_ENABLED";                             //$NON-NLS-1$
+   public static final String GRAPH_GRADIENT_MIN_VALUE                                  = "GRAPH_GRADIENT_MIN_VALUE";                                  //$NON-NLS-1$
+   public static final String GRAPH_GRADIENT_MAX_VALUE                                  = "GRAPH_GRADIENT_MAX_VALUE";                                  //$NON-NLS-1$
 
-   public static final String GRAPH_PACE_IS_MIN_ENABLED                         = "GRAPH_PACE_IS_MIN_ENABLED";                         //$NON-NLS-1$
-   public static final String GRAPH_PACE_IS_MAX_ENABLED                         = "GRAPH_PACE_IS_MAX_ENABLED";                         //$NON-NLS-1$
-   public static final String GRAPH_PACE_MIN_VALUE                              = "GRAPH_PACE_MIN_VALUE";                              //$NON-NLS-1$
-   public static final String GRAPH_PACE_MAX_VALUE                              = "GRAPH_PACE_MAX_VALUE";                              //$NON-NLS-1$
+   public static final String GRAPH_PACE_IS_MIN_ENABLED                                 = "GRAPH_PACE_IS_MIN_ENABLED";                                 //$NON-NLS-1$
+   public static final String GRAPH_PACE_IS_MAX_ENABLED                                 = "GRAPH_PACE_IS_MAX_ENABLED";                                 //$NON-NLS-1$
+   public static final String GRAPH_PACE_MIN_VALUE                                      = "GRAPH_PACE_MIN_VALUE";                                      //$NON-NLS-1$
+   public static final String GRAPH_PACE_MAX_VALUE                                      = "GRAPH_PACE_MAX_VALUE";                                      //$NON-NLS-1$
 
-   public static final String GRAPH_POWER_IS_MIN_ENABLED                        = "GRAPH_POWER_IS_MIN_ENABLED";                        //$NON-NLS-1$
-   public static final String GRAPH_POWER_IS_MAX_ENABLED                        = "GRAPH_POWER_IS_MAX_ENABLED";                        //$NON-NLS-1$
-   public static final String GRAPH_POWER_MIN_VALUE                             = "GRAPH_POWER_MIN_VALUE";                             //$NON-NLS-1$
-   public static final String GRAPH_POWER_MAX_VALUE                             = "GRAPH_POWER_MAX_VALUE";                             //$NON-NLS-1$
+   public static final String GRAPH_POWER_IS_MIN_ENABLED                                = "GRAPH_POWER_IS_MIN_ENABLED";                                //$NON-NLS-1$
+   public static final String GRAPH_POWER_IS_MAX_ENABLED                                = "GRAPH_POWER_IS_MAX_ENABLED";                                //$NON-NLS-1$
+   public static final String GRAPH_POWER_MIN_VALUE                                     = "GRAPH_POWER_MIN_VALUE";                                     //$NON-NLS-1$
+   public static final String GRAPH_POWER_MAX_VALUE                                     = "GRAPH_POWER_MAX_VALUE";                                     //$NON-NLS-1$
 
-   public static final String GRAPH_PULSE_IS_MIN_ENABLED                        = "GRAPH_PULSE_IS_MIN_ENABLED";                        //$NON-NLS-1$
-   public static final String GRAPH_PULSE_IS_MAX_ENABLED                        = "GRAPH_PULSE_IS_MAX_ENABLED";                        //$NON-NLS-1$
-   public static final String GRAPH_PULSE_MIN_VALUE                             = "GRAPH_PULSE_MIN_VALUE";                             //$NON-NLS-1$
-   public static final String GRAPH_PULSE_MAX_VALUE                             = "GRAPH_PULSE_MAX_VALUE";                             //$NON-NLS-1$
+   public static final String GRAPH_PULSE_IS_MIN_ENABLED                                = "GRAPH_PULSE_IS_MIN_ENABLED";                                //$NON-NLS-1$
+   public static final String GRAPH_PULSE_IS_MAX_ENABLED                                = "GRAPH_PULSE_IS_MAX_ENABLED";                                //$NON-NLS-1$
+   public static final String GRAPH_PULSE_MIN_VALUE                                     = "GRAPH_PULSE_MIN_VALUE";                                     //$NON-NLS-1$
+   public static final String GRAPH_PULSE_MAX_VALUE                                     = "GRAPH_PULSE_MAX_VALUE";                                     //$NON-NLS-1$
 
-   public static final String GRAPH_SPEED_IS_MIN_ENABLED                        = "GRAPH_SPEED_IS_MIN_ENABLED";                        //$NON-NLS-1$
-   public static final String GRAPH_SPEED_IS_MAX_ENABLED                        = "GRAPH_SPEED_IS_MAX_ENABLED";                        //$NON-NLS-1$
-   public static final String GRAPH_SPEED_MIN_VALUE                             = "GRAPH_SPEED_MIN_VALUE";                             //$NON-NLS-1$
-   public static final String GRAPH_SPEED_MAX_VALUE                             = "GRAPH_SPEED_MAX_VALUE";                             //$NON-NLS-1$
+   public static final String GRAPH_SPEED_IS_MIN_ENABLED                                = "GRAPH_SPEED_IS_MIN_ENABLED";                                //$NON-NLS-1$
+   public static final String GRAPH_SPEED_IS_MAX_ENABLED                                = "GRAPH_SPEED_IS_MAX_ENABLED";                                //$NON-NLS-1$
+   public static final String GRAPH_SPEED_MIN_VALUE                                     = "GRAPH_SPEED_MIN_VALUE";                                     //$NON-NLS-1$
+   public static final String GRAPH_SPEED_MAX_VALUE                                     = "GRAPH_SPEED_MAX_VALUE";                                     //$NON-NLS-1$
 
-   public static final String GRAPH_TEMPERATURE_IS_MIN_ENABLED                  = "GRAPH_TEMPERATURE_IS_MIN_ENABLED";                  //$NON-NLS-1$
-   public static final String GRAPH_TEMPERATURE_IS_MAX_ENABLED                  = "GRAPH_TEMPERATURE_IS_MAX_ENABLED";                  //$NON-NLS-1$
-   public static final String GRAPH_TEMPERATURE_MIN_VALUE                       = "GRAPH_TEMPERATURE_MIN_VALUE";                       //$NON-NLS-1$
-   public static final String GRAPH_TEMPERATURE_MAX_VALUE                       = "GRAPH_TEMPERATURE_MAX_VALUE";                       //$NON-NLS-1$
+   public static final String GRAPH_TEMPERATURE_IS_MIN_ENABLED                          = "GRAPH_TEMPERATURE_IS_MIN_ENABLED";                          //$NON-NLS-1$
+   public static final String GRAPH_TEMPERATURE_IS_MAX_ENABLED                          = "GRAPH_TEMPERATURE_IS_MAX_ENABLED";                          //$NON-NLS-1$
+   public static final String GRAPH_TEMPERATURE_MIN_VALUE                               = "GRAPH_TEMPERATURE_MIN_VALUE";                               //$NON-NLS-1$
+   public static final String GRAPH_TEMPERATURE_MAX_VALUE                               = "GRAPH_TEMPERATURE_MAX_VALUE";                               //$NON-NLS-1$
 
-   public static final String GRAPH_RUN_DYN_STANCE_TIME_IS_MIN_ENABLED          = "GRAPH_RUN_DYN_STANCE_TIME_IS_MIN_ENABLED";          //$NON-NLS-1$
-   public static final String GRAPH_RUN_DYN_STANCE_TIME_IS_MAX_ENABLED          = "GRAPH_RUN_DYN_STANCE_TIME_IS_MAX_ENABLED";          //$NON-NLS-1$
-   public static final String GRAPH_RUN_DYN_STANCE_TIME_MIN_VALUE               = "GRAPH_RUN_DYN_STANCE_TIME_MIN_VALUE";               //$NON-NLS-1$
-   public static final String GRAPH_RUN_DYN_STANCE_TIME_MAX_VALUE               = "GRAPH_RUN_DYN_STANCE_TIME_MAX_VALUE";               //$NON-NLS-1$
+   public static final String GRAPH_RUN_DYN_STANCE_TIME_IS_MIN_ENABLED                  = "GRAPH_RUN_DYN_STANCE_TIME_IS_MIN_ENABLED";                  //$NON-NLS-1$
+   public static final String GRAPH_RUN_DYN_STANCE_TIME_IS_MAX_ENABLED                  = "GRAPH_RUN_DYN_STANCE_TIME_IS_MAX_ENABLED";                  //$NON-NLS-1$
+   public static final String GRAPH_RUN_DYN_STANCE_TIME_MIN_VALUE                       = "GRAPH_RUN_DYN_STANCE_TIME_MIN_VALUE";                       //$NON-NLS-1$
+   public static final String GRAPH_RUN_DYN_STANCE_TIME_MAX_VALUE                       = "GRAPH_RUN_DYN_STANCE_TIME_MAX_VALUE";                       //$NON-NLS-1$
 
-   public static final String GRAPH_RUN_DYN_STANCE_TIME_BALANCE_IS_MIN_ENABLED  = "GRAPH_RUN_DYN_STANCE_TIME_BALANCE_IS_MIN_ENABLED";  //$NON-NLS-1$
-   public static final String GRAPH_RUN_DYN_STANCE_TIME_BALANCE_IS_MAX_ENABLED  = "GRAPH_RUN_DYN_STANCE_TIME_BALANCE_IS_MAX_ENABLED";  //$NON-NLS-1$
-   public static final String GRAPH_RUN_DYN_STANCE_TIME_BALANCE_MIN_VALUE       = "GRAPH_RUN_DYN_STANCE_TIME_BALANCE_MIN_VALUE";       //$NON-NLS-1$
-   public static final String GRAPH_RUN_DYN_STANCE_TIME_BALANCE_MAX_VALUE       = "GRAPH_RUN_DYN_STANCE_TIME_BALANCE_MAX_VALUE";       //$NON-NLS-1$
+   public static final String GRAPH_RUN_DYN_STANCE_TIME_BALANCE_IS_MIN_ENABLED          = "GRAPH_RUN_DYN_STANCE_TIME_BALANCE_IS_MIN_ENABLED";          //$NON-NLS-1$
+   public static final String GRAPH_RUN_DYN_STANCE_TIME_BALANCE_IS_MAX_ENABLED          = "GRAPH_RUN_DYN_STANCE_TIME_BALANCE_IS_MAX_ENABLED";          //$NON-NLS-1$
+   public static final String GRAPH_RUN_DYN_STANCE_TIME_BALANCE_MIN_VALUE               = "GRAPH_RUN_DYN_STANCE_TIME_BALANCE_MIN_VALUE";               //$NON-NLS-1$
+   public static final String GRAPH_RUN_DYN_STANCE_TIME_BALANCE_MAX_VALUE               = "GRAPH_RUN_DYN_STANCE_TIME_BALANCE_MAX_VALUE";               //$NON-NLS-1$
 
-   public static final String GRAPH_RUN_DYN_STEP_LENGTH_IS_MIN_ENABLED          = "GRAPH_RUN_DYN_STEP_LENGTH_IS_MIN_ENABLED";          //$NON-NLS-1$
-   public static final String GRAPH_RUN_DYN_STEP_LENGTH_IS_MAX_ENABLED          = "GRAPH_RUN_DYN_STEP_LENGTH_IS_MAX_ENABLED";          //$NON-NLS-1$
-   public static final String GRAPH_RUN_DYN_STEP_LENGTH_MIN_VALUE               = "GRAPH_RUN_DYN_STEP_LENGTH_MIN_VALUE";               //$NON-NLS-1$
-   public static final String GRAPH_RUN_DYN_STEP_LENGTH_MAX_VALUE               = "GRAPH_RUN_DYN_STEP_LENGTH_MAX_VALUE";               //$NON-NLS-1$
+   public static final String GRAPH_RUN_DYN_STEP_LENGTH_IS_MIN_ENABLED                  = "GRAPH_RUN_DYN_STEP_LENGTH_IS_MIN_ENABLED";                  //$NON-NLS-1$
+   public static final String GRAPH_RUN_DYN_STEP_LENGTH_IS_MAX_ENABLED                  = "GRAPH_RUN_DYN_STEP_LENGTH_IS_MAX_ENABLED";                  //$NON-NLS-1$
+   public static final String GRAPH_RUN_DYN_STEP_LENGTH_MIN_VALUE                       = "GRAPH_RUN_DYN_STEP_LENGTH_MIN_VALUE";                       //$NON-NLS-1$
+   public static final String GRAPH_RUN_DYN_STEP_LENGTH_MAX_VALUE                       = "GRAPH_RUN_DYN_STEP_LENGTH_MAX_VALUE";                       //$NON-NLS-1$
 
-   public static final String GRAPH_RUN_DYN_VERTICAL_OSCILLATION_IS_MIN_ENABLED = "GRAPH_RUN_DYN_VERTICAL_OSCILLATION_IS_MIN_ENABLED"; //$NON-NLS-1$
-   public static final String GRAPH_RUN_DYN_VERTICAL_OSCILLATION_IS_MAX_ENABLED = "GRAPH_RUN_DYN_VERTICAL_OSCILLATION_IS_MAX_ENABLED"; //$NON-NLS-1$
-   public static final String GRAPH_RUN_DYN_VERTICAL_OSCILLATION_MIN_VALUE      = "GRAPH_RUN_DYN_VERTICAL_OSCILLATION_MIN_VALUE";      //$NON-NLS-1$
-   public static final String GRAPH_RUN_DYN_VERTICAL_OSCILLATION_MAX_VALUE      = "GRAPH_RUN_DYN_VERTICAL_OSCILLATION_MAX_VALUE";      //$NON-NLS-1$
+   public static final String GRAPH_RUN_DYN_VERTICAL_OSCILLATION_IS_MIN_ENABLED         = "GRAPH_RUN_DYN_VERTICAL_OSCILLATION_IS_MIN_ENABLED";         //$NON-NLS-1$
+   public static final String GRAPH_RUN_DYN_VERTICAL_OSCILLATION_IS_MAX_ENABLED         = "GRAPH_RUN_DYN_VERTICAL_OSCILLATION_IS_MAX_ENABLED";         //$NON-NLS-1$
+   public static final String GRAPH_RUN_DYN_VERTICAL_OSCILLATION_MIN_VALUE              = "GRAPH_RUN_DYN_VERTICAL_OSCILLATION_MIN_VALUE";              //$NON-NLS-1$
+   public static final String GRAPH_RUN_DYN_VERTICAL_OSCILLATION_MAX_VALUE              = "GRAPH_RUN_DYN_VERTICAL_OSCILLATION_MAX_VALUE";              //$NON-NLS-1$
 
-   public static final String GRAPH_RUN_DYN_VERTICAL_RATIO_IS_MIN_ENABLED       = "GRAPH_RUN_DYN_VERTICAL_RATIO_IS_MIN_ENABLED";       //$NON-NLS-1$
-   public static final String GRAPH_RUN_DYN_VERTICAL_RATIO_IS_MAX_ENABLED       = "GRAPH_RUN_DYN_VERTICAL_RATIO_IS_MAX_ENABLED";       //$NON-NLS-1$
-   public static final String GRAPH_RUN_DYN_VERTICAL_RATIO_MIN_VALUE            = "GRAPH_RUN_DYN_VERTICAL_RATIO_MIN_VALUE";            //$NON-NLS-1$
-   public static final String GRAPH_RUN_DYN_VERTICAL_RATIO_MAX_VALUE            = "GRAPH_RUN_DYN_VERTICAL_RATIO_MAX_VALUE";            //$NON-NLS-1$
+   public static final String GRAPH_RUN_DYN_VERTICAL_RATIO_IS_MIN_ENABLED               = "GRAPH_RUN_DYN_VERTICAL_RATIO_IS_MIN_ENABLED";               //$NON-NLS-1$
+   public static final String GRAPH_RUN_DYN_VERTICAL_RATIO_IS_MAX_ENABLED               = "GRAPH_RUN_DYN_VERTICAL_RATIO_IS_MAX_ENABLED";               //$NON-NLS-1$
+   public static final String GRAPH_RUN_DYN_VERTICAL_RATIO_MIN_VALUE                    = "GRAPH_RUN_DYN_VERTICAL_RATIO_MIN_VALUE";                    //$NON-NLS-1$
+   public static final String GRAPH_RUN_DYN_VERTICAL_RATIO_MAX_VALUE                    = "GRAPH_RUN_DYN_VERTICAL_RATIO_MAX_VALUE";                    //$NON-NLS-1$
 
-   public static final String GRAPH_SWIM_STROKES_IS_MIN_ENABLED                 = "GRAPH_SWIM_STROKES_IS_MIN_ENABLED";                 //$NON-NLS-1$
-   public static final String GRAPH_SWIM_STROKES_IS_MAX_ENABLED                 = "GRAPH_SWIM_STROKES_IS_MAX_ENABLED";                 //$NON-NLS-1$
-   public static final String GRAPH_SWIM_STROKES_MIN_VALUE                      = "GRAPH_SWIM_STROKES_MIN_VALUE";                      //$NON-NLS-1$
-   public static final String GRAPH_SWIM_STROKES_MAX_VALUE                      = "GRAPH_SWIM_STROKES_MAX_VALUE";                      //$NON-NLS-1$
+   public static final String GRAPH_SWIM_STROKES_IS_MIN_ENABLED                         = "GRAPH_SWIM_STROKES_IS_MIN_ENABLED";                         //$NON-NLS-1$
+   public static final String GRAPH_SWIM_STROKES_IS_MAX_ENABLED                         = "GRAPH_SWIM_STROKES_IS_MAX_ENABLED";                         //$NON-NLS-1$
+   public static final String GRAPH_SWIM_STROKES_MIN_VALUE                              = "GRAPH_SWIM_STROKES_MIN_VALUE";                              //$NON-NLS-1$
+   public static final String GRAPH_SWIM_STROKES_MAX_VALUE                              = "GRAPH_SWIM_STROKES_MAX_VALUE";                              //$NON-NLS-1$
 
-   public static final String GRAPH_SWIM_SWOLF_IS_MIN_ENABLED                   = "GRAPH_SWIM_SWOLF_IS_MIN_ENABLED";                   //$NON-NLS-1$
-   public static final String GRAPH_SWIM_SWOLF_IS_MAX_ENABLED                   = "GRAPH_SWIM_SWOLF_IS_MAX_ENABLED";                   //$NON-NLS-1$
-   public static final String GRAPH_SWIM_SWOLF_MIN_VALUE                        = "GRAPH_SWIM_SWOLF_MIN_VALUE";                        //$NON-NLS-1$
-   public static final String GRAPH_SWIM_SWOLF_MAX_VALUE                        = "GRAPH_SWIM_SWOLF_MAX_VALUE";                        //$NON-NLS-1$
+   public static final String GRAPH_SWIM_SWOLF_IS_MIN_ENABLED                           = "GRAPH_SWIM_SWOLF_IS_MIN_ENABLED";                           //$NON-NLS-1$
+   public static final String GRAPH_SWIM_SWOLF_IS_MAX_ENABLED                           = "GRAPH_SWIM_SWOLF_IS_MAX_ENABLED";                           //$NON-NLS-1$
+   public static final String GRAPH_SWIM_SWOLF_MIN_VALUE                                = "GRAPH_SWIM_SWOLF_MIN_VALUE";                                //$NON-NLS-1$
+   public static final String GRAPH_SWIM_SWOLF_MAX_VALUE                                = "GRAPH_SWIM_SWOLF_MAX_VALUE";                                //$NON-NLS-1$
 
-   public static final String GRAPH_SMOOTHING_SMOOTHING_ALGORITHM               = "GraphSmoothing_SmoothingAlgorithm";                 //$NON-NLS-1$
-   public static final String GRAPH_JAMET_SMOOTHING_IS_SYNCH_SMOOTHING          = "GraphJametSmoothing_IsSynchSmoothing";              //$NON-NLS-1$
-   public static final String GRAPH_JAMET_SMOOTHING_IS_ALTITUDE                 = "GraphJametSmoothing_IsAltitudeSmoothing";           //$NON-NLS-1$
-   public static final String GRAPH_JAMET_SMOOTHING_IS_PULSE                    = "GraphJametSmoothing_IsPulseSmoothing";              //$NON-NLS-1$
-   public static final String GRAPH_JAMET_SMOOTHING_GRADIENT_TAU                = "GraphJametSmoothing_GradientSmoothingTau";          //$NON-NLS-1$
-   public static final String GRAPH_JAMET_SMOOTHING_PULSE_TAU                   = "GraphJametSmoothing_PulseSmoothingTau";             //$NON-NLS-1$
-   public static final String GRAPH_JAMET_SMOOTHING_SPEED_TAU                   = "GraphJametSmoothing_SpeedSmoothingTau";             //$NON-NLS-1$
-   public static final String GRAPH_JAMET_SMOOTHING_REPEATED_SMOOTHING          = "GraphJametSmoothing_RepeatedSmoothing";             //$NON-NLS-1$
-   public static final String GRAPH_JAMET_SMOOTHING_REPEATED_TAU                = "GraphJametSmoothing_RepeatedTau";                   //$NON-NLS-1$
+   public static final String GRAPH_SMOOTHING_SMOOTHING_ALGORITHM                       = "GraphSmoothing_SmoothingAlgorithm";                         //$NON-NLS-1$
+   public static final String GRAPH_JAMET_SMOOTHING_IS_SYNCH_SMOOTHING                  = "GraphJametSmoothing_IsSynchSmoothing";                      //$NON-NLS-1$
+   public static final String GRAPH_JAMET_SMOOTHING_IS_ALTITUDE                         = "GraphJametSmoothing_IsAltitudeSmoothing";                   //$NON-NLS-1$
+   public static final String GRAPH_JAMET_SMOOTHING_IS_PULSE                            = "GraphJametSmoothing_IsPulseSmoothing";                      //$NON-NLS-1$
+   public static final String GRAPH_JAMET_SMOOTHING_GRADIENT_TAU                        = "GraphJametSmoothing_GradientSmoothingTau";                  //$NON-NLS-1$
+   public static final String GRAPH_JAMET_SMOOTHING_PULSE_TAU                           = "GraphJametSmoothing_PulseSmoothingTau";                     //$NON-NLS-1$
+   public static final String GRAPH_JAMET_SMOOTHING_SPEED_TAU                           = "GraphJametSmoothing_SpeedSmoothingTau";                     //$NON-NLS-1$
+   public static final String GRAPH_JAMET_SMOOTHING_REPEATED_SMOOTHING                  = "GraphJametSmoothing_RepeatedSmoothing";                     //$NON-NLS-1$
+   public static final String GRAPH_JAMET_SMOOTHING_REPEATED_TAU                        = "GraphJametSmoothing_RepeatedTau";                           //$NON-NLS-1$
+
+   public static final String ADJUST_ELEVATION_GRAPH_JAMET_SMOOTHING_REPEATED_SMOOTHING = "ADJUST_ELEVATION_GRAPH_JAMET_SMOOTHING_REPEATED_SMOOTHING"; //$NON-NLS-1$
+   public static final String ADJUST_ELEVATION_GRAPH_JAMET_SMOOTHING_REPEATED_TAU       = "ADJUST_ELEVATION_GRAPH_JAMET_SMOOTHING_REPEATED_TAU";       //$NON-NLS-1$
+   public static final String ADJUST_ELEVATION_GRAPH_JAMET_SMOOTHING_GRADIENT_TAU       = "ADJUST_ELEVATION_GRAPH_JAMET_SMOOTHING_GRADIENT_TAU";       //$NON-NLS-1$
 
    /**
     * Graph color change flag.
@@ -351,78 +355,83 @@ public interface ITourbookPreferences {
     * Graph colors are set in the {@link CommonActivator} pref store, but the change flag is hosted
     * in the {@link TourbookPlugin} pref store.
     */
-   public static final String GRAPH_COLORS_HAS_CHANGED                          = "graph.colors.has-changed";                          //$NON-NLS-1$
+   public static final String GRAPH_COLORS_HAS_CHANGED                                  = "graph.colors.has-changed";                                  //$NON-NLS-1$
 
-   public static final String GRAPH_PROPERTY_CHARTTYPE                          = "graph.property.chartType";                          //$NON-NLS-1$
+   public static final String GRAPH_PROPERTY_CHARTTYPE                                  = "graph.property.chartType";                                  //$NON-NLS-1$
 
-   public static final String GRAPH_PROPERTY_IS_VALUE_CLIPPING                  = "graph.property.is.value_clipping";                  //$NON-NLS-1$
-   public static final String GRAPH_PROPERTY_VALUE_CLIPPING_TIMESLICE           = "graph.property.timeslice.value_clipping";           //$NON-NLS-1$
+   public static final String GRAPH_PROPERTY_IS_VALUE_CLIPPING                          = "graph.property.is.value_clipping";                          //$NON-NLS-1$
+   public static final String GRAPH_PROPERTY_VALUE_CLIPPING_TIMESLICE                   = "graph.property.timeslice.value_clipping";                   //$NON-NLS-1$
 
-   public static final String GRAPH_PROPERTY_IS_PACE_CLIPPING                   = "graph.property.is.pace_clipping";                   //$NON-NLS-1$
-   public static final String GRAPH_PROPERTY_PACE_CLIPPING_VALUE                = "graph.property.is.pace_clipping.value";             //$NON-NLS-1$
+   public static final String GRAPH_PROPERTY_IS_PACE_CLIPPING                           = "graph.property.is.pace_clipping";                           //$NON-NLS-1$
+   public static final String GRAPH_PROPERTY_PACE_CLIPPING_VALUE                        = "graph.property.is.pace_clipping.value";                     //$NON-NLS-1$
 
    /*
     * Chart grid
     */
-   public static final String CHART_GRID_VERTICAL_DISTANCE            = "CHART_GRID_VERTICAL_DISTANCE";               //$NON-NLS-1$
-   public static final String CHART_GRID_HORIZONTAL_DISTANCE          = "CHART_GRID_HORIZONTAL_DISTANCE";             //$NON-NLS-1$
-   public static final String CHART_GRID_IS_SHOW_HORIZONTAL_GRIDLINES = "CHART_GRID_IS_SHOW_HORIZONTAL_GRIDLINES";    //$NON-NLS-1$
-   public static final String CHART_GRID_IS_SHOW_VERTICAL_GRIDLINES   = "CHART_GRID_IS_SHOW_VERTICAL_GRIDLINES";      //$NON-NLS-1$
+   public static final String CHART_GRID_VERTICAL_DISTANCE            = "CHART_GRID_VERTICAL_DISTANCE";            //$NON-NLS-1$
+   public static final String CHART_GRID_HORIZONTAL_DISTANCE          = "CHART_GRID_HORIZONTAL_DISTANCE";          //$NON-NLS-1$
+   public static final String CHART_GRID_IS_SHOW_HORIZONTAL_GRIDLINES = "CHART_GRID_IS_SHOW_HORIZONTAL_GRIDLINES"; //$NON-NLS-1$
+   public static final String CHART_GRID_IS_SHOW_VERTICAL_GRIDLINES   = "CHART_GRID_IS_SHOW_VERTICAL_GRIDLINES";   //$NON-NLS-1$
+
+   /*
+    * Chart layout
+    */
+   public static final String CHART_Y_AXIS_WIDTH                 = "CHART_Y_AXIS_WIDTH";                         //$NON-NLS-1$
 
    /**
     * Tour type
     */
-   public static final String TOUR_TYPE_IMPORT_DEFAUL_ID              = "TourType_ImportDefaultID";                   //$NON-NLS-1$
-   public static final String TOUR_TYPE_LIST_IS_MODIFIED              = "tourtype.list.is-modified";                  //$NON-NLS-1$
-   public static final String TOUR_TYPE_FILTER_LIST                   = "tourtype.filter.list";                       //$NON-NLS-1$
+   public static final String TOUR_TYPE_IMPORT_DEFAUL_ID         = "TourType_ImportDefaultID";                   //$NON-NLS-1$
+   public static final String TOUR_TYPE_LIST_IS_MODIFIED         = "tourtype.list.is-modified";                  //$NON-NLS-1$
+   public static final String TOUR_TYPE_FILTER_LIST              = "tourtype.filter.list";                       //$NON-NLS-1$
 
-   public static final String TOUR_BIKE_LIST_IS_MODIFIED              = "tourbike.list.is-modified";                  //$NON-NLS-1$
-   public static final String TOUR_PERSON_LIST_IS_MODIFIED            = "tourperson.list.is-modified";                //$NON-NLS-1$
+   public static final String TOUR_BIKE_LIST_IS_MODIFIED         = "tourbike.list.is-modified";                  //$NON-NLS-1$
+   public static final String TOUR_PERSON_LIST_IS_MODIFIED       = "tourperson.list.is-modified";                //$NON-NLS-1$
 
-   public static final String APP_LAST_SELECTED_PERSON_ID             = "application.last-selected-person-id";        //$NON-NLS-1$
-   public static final String APP_LAST_SELECTED_TOUR_TYPE_FILTER      = "application.last-selected-tourtypefilter";   //$NON-NLS-1$
+   public static final String APP_LAST_SELECTED_PERSON_ID        = "application.last-selected-person-id";        //$NON-NLS-1$
+   public static final String APP_LAST_SELECTED_TOUR_TYPE_FILTER = "application.last-selected-tourtypefilter";   //$NON-NLS-1$
 
    /**
     * event is fired when a person or a tour type is modified
     */
-   public static final String APP_DATA_FILTER_IS_MODIFIED             = "application.data-filter-is-modified";        //$NON-NLS-1$
+   public static final String APP_DATA_FILTER_IS_MODIFIED        = "application.data-filter-is-modified";        //$NON-NLS-1$
 
-   public static final String APP_DATA_SPEED_MIN_TIMESLICE_VALUE      = "application.data-speed-min-timeslice-value"; //$NON-NLS-1$
+   public static final String APP_DATA_SPEED_MIN_TIMESLICE_VALUE = "application.data-speed-min-timeslice-value"; //$NON-NLS-1$
 
-   public static final String APP_TOUR_GEO_FILTER_IS_SELECTED         = "APP_TOUR_DATA_FILTER_IS_SELECTED";           //$NON-NLS-1$
-   public static final String APP_TOUR_DATA_FILTER_IS_SELECTED        = "APP_TOUR_GEO_FILTER_IS_SELECTED";            //$NON-NLS-1$
-   public static final String APP_TOUR_TAG_FILTER_IS_SELECTED         = "APP_TOUR_TAG_FILTER_IS_SELECTED";            //$NON-NLS-1$
+   public static final String APP_TOUR_GEO_FILTER_IS_SELECTED    = "APP_TOUR_DATA_FILTER_IS_SELECTED";           //$NON-NLS-1$
+   public static final String APP_TOUR_DATA_FILTER_IS_SELECTED   = "APP_TOUR_GEO_FILTER_IS_SELECTED";            //$NON-NLS-1$
+   public static final String APP_TOUR_TAG_FILTER_IS_SELECTED    = "APP_TOUR_TAG_FILTER_IS_SELECTED";            //$NON-NLS-1$
 
    /**
     * initially this was an int value, with 2 it's a string
     */
-   public static final String BREAK_TIME_METHOD2                      = "BreakTime_Method2";                          //$NON-NLS-1$
+   public static final String BREAK_TIME_METHOD2                 = "BreakTime_Method2";                          //$NON-NLS-1$
 
-   public static final String BREAK_TIME_IS_MODIFIED                  = "BreakTime_IsModified";                       //$NON-NLS-1$
-   public static final String BREAK_TIME_MIN_AVG_SPEED_AS             = "BreakTime_MinAvgSpeedAS";                    //$NON-NLS-1$
-   public static final String BREAK_TIME_MIN_SLICE_SPEED_AS           = "BreakTime_MinSliceSpeedAS";                  //$NON-NLS-1$
-   public static final String BREAK_TIME_MIN_SLICE_TIME_AS            = "BreakTime_MinSliceTimeAS";                   //$NON-NLS-1$
-   public static final String BREAK_TIME_MIN_AVG_SPEED                = "BreakTime_MinAvgSpeed";                      //$NON-NLS-1$
-   public static final String BREAK_TIME_MIN_SLICE_SPEED              = "BreakTime_MinSliceSpeed";                    //$NON-NLS-1$
-   public static final String BREAK_TIME_SHORTEST_TIME                = "BreakTime_ShortestTime";                     //$NON-NLS-1$
-   public static final String BREAK_TIME_MAX_DISTANCE                 = "BreakTime_MaxDistance";                      //$NON-NLS-1$
-   public static final String BREAK_TIME_SLICE_DIFF                   = "BreakTime_SliceDiff";                        //$NON-NLS-1$
+   public static final String BREAK_TIME_IS_MODIFIED             = "BreakTime_IsModified";                       //$NON-NLS-1$
+   public static final String BREAK_TIME_MIN_AVG_SPEED_AS        = "BreakTime_MinAvgSpeedAS";                    //$NON-NLS-1$
+   public static final String BREAK_TIME_MIN_SLICE_SPEED_AS      = "BreakTime_MinSliceSpeedAS";                  //$NON-NLS-1$
+   public static final String BREAK_TIME_MIN_SLICE_TIME_AS       = "BreakTime_MinSliceTimeAS";                   //$NON-NLS-1$
+   public static final String BREAK_TIME_MIN_AVG_SPEED           = "BreakTime_MinAvgSpeed";                      //$NON-NLS-1$
+   public static final String BREAK_TIME_MIN_SLICE_SPEED         = "BreakTime_MinSliceSpeed";                    //$NON-NLS-1$
+   public static final String BREAK_TIME_SHORTEST_TIME           = "BreakTime_ShortestTime";                     //$NON-NLS-1$
+   public static final String BREAK_TIME_MAX_DISTANCE            = "BreakTime_MaxDistance";                      //$NON-NLS-1$
+   public static final String BREAK_TIME_SLICE_DIFF              = "BreakTime_SliceDiff";                        //$NON-NLS-1$
 
    /**
     * DP tolerance and gradient when computing flat, gain and loss areas
     */
-   public static final String FLAT_GAIN_LOSS_DP_TOLERANCE             = "FlatGainLoss_DPTolerance";                   //$NON-NLS-1$
-   public static final String FLAT_GAIN_LOSS_FLAT_GRADIENT            = "FlatGainLoss_FlatGradient";                  //$NON-NLS-1$
+   public static final String FLAT_GAIN_LOSS_DP_TOLERANCE        = "FlatGainLoss_DPTolerance";                   //$NON-NLS-1$
+   public static final String FLAT_GAIN_LOSS_FLAT_GRADIENT       = "FlatGainLoss_FlatGradient";                  //$NON-NLS-1$
 
    /**
     * DP tolerance when computing elevation gain/loss
     */
-   public static final String COMPUTED_ALTITUDE_DP_TOLERANCE          = "COMPUTED_ALTITUDE_DP_TOLERANCE";             //$NON-NLS-1$
+   public static final String COMPUTED_ALTITUDE_DP_TOLERANCE     = "COMPUTED_ALTITUDE_DP_TOLERANCE";             //$NON-NLS-1$
 
    /**
     * Cadence value differentiating slow from fast
     */
-   public static final String CADENCE_ZONES_DELIMITER                 = "CADENCE_ZONES_DELIMITER";                    //$NON-NLS-1$
+   public static final String CADENCE_ZONES_DELIMITER            = "CADENCE_ZONES_DELIMITER";                    //$NON-NLS-1$
 
    /*
     * map settings

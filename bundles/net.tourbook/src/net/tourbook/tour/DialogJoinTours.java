@@ -1555,8 +1555,10 @@ public class DialogJoinTours extends TitleAreaDialog implements ITourProvider2 {
          final int tourAltUp = _joinedTourData.getTourAltUp();
          final int tourAltDown = _joinedTourData.getTourAltDown();
 
-         _joinedTourData.setTourAltUp(tourAltUp - joinedElevationDiffUp);
-         _joinedTourData.setTourAltDown(tourAltDown - joinedElevationDiffDown);
+         float elevationGain = tourAltUp - joinedElevationDiffUp;
+         float elevationLoss = tourAltDown - joinedElevationDiffDown;
+         
+         _joinedTourData.setElevationGainLoss(elevationGain, elevationLoss);
       }
 
       _joinedTourData.computeComputedValues();

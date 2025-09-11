@@ -15,6 +15,8 @@
  *******************************************************************************/
 package net.tourbook.map2.view;
 
+import com.jhlabs.image.CurveValues;
+
 import de.byteholder.geoclipse.map.ActionManageOfflineImages;
 import de.byteholder.geoclipse.map.CenterMapBy;
 import de.byteholder.geoclipse.map.IMapContextMenuProvider;
@@ -30,6 +32,11 @@ import de.byteholder.geoclipse.mapprovider.MapProviderManager;
 import de.byteholder.gpx.PointOfInterest;
 
 import java.awt.Point;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -101,7 +108,8 @@ import net.tourbook.map2.action.ActionMap2_PhotoFilter;
 import net.tourbook.map2.action.ActionReloadFailedMapImages;
 import net.tourbook.map2.action.ActionSaveDefaultPosition;
 import net.tourbook.map2.action.ActionSetDefaultPosition;
-import net.tourbook.map2.action.ActionSetGeoPosition;
+import net.tourbook.map2.action.ActionSetGeoPositionForGeoMarker;
+import net.tourbook.map2.action.ActionSetGeoPositionForPhotoTours;
 import net.tourbook.map2.action.ActionShowAllFilteredPhotos;
 import net.tourbook.map2.action.ActionShowLegendInMap;
 import net.tourbook.map2.action.ActionShowPOI;
@@ -130,6 +138,7 @@ import net.tourbook.photo.IPhotoEventListener;
 import net.tourbook.photo.IPhotoPreferences;
 import net.tourbook.photo.Photo;
 import net.tourbook.photo.PhotoActivator;
+import net.tourbook.photo.PhotoAdjustments;
 import net.tourbook.photo.PhotoEventId;
 import net.tourbook.photo.PhotoManager;
 import net.tourbook.photo.PhotoRatingStarOperator;
@@ -162,7 +171,6 @@ import net.tourbook.tour.photo.TourPhotoLinkSelection;
 import net.tourbook.tour.photo.TourPhotoManager;
 import net.tourbook.ui.ITourProvider;
 import net.tourbook.ui.ValuePoint_ToolTip_UI;
-import net.tourbook.ui.action.SubMenu_SetGeoPosition;
 import net.tourbook.ui.action.SubMenu_SetTourMarkerType;
 import net.tourbook.ui.tourChart.HoveredValueData;
 import net.tourbook.ui.tourChart.TourChart;
@@ -194,6 +202,10 @@ import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.window.Window;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.dnd.ByteArrayTransfer;
+import org.eclipse.swt.dnd.Clipboard;
+import org.eclipse.swt.dnd.Transfer;
+import org.eclipse.swt.dnd.TransferData;
 import org.eclipse.swt.events.ControlEvent;
 import org.eclipse.swt.events.ControlListener;
 import org.eclipse.swt.events.SelectionEvent;
@@ -427,6 +439,10 @@ public class Map2View extends ViewPart implements
    private int                               _photoFilter_RatingStars;
    private Enum<PhotoRatingStarOperator>     _photoFilter_RatingStar_Operator;
    //
+   private SlideoutMap2_PhotoOptions         _slideoutPhotoOptions;
+   private PhotoAdjustments                  _copyPaste_PhotoAdjustments;
+   private CopyPasteTonalityTransfer         _copyPaste_Transfer         = new CopyPasteTonalityTransfer();
+   //
    private boolean                           _isInSelectBookmark;
    private boolean                           _isShowLegend;
    private boolean                           _isShowMapPoints;
@@ -454,138 +470,139 @@ public class Map2View extends ViewPart implements
    /*
     * Current position for the x-sliders and value point
     */
-   private int                                  _currentSliderValueIndex_Left;
-   private int                                  _currentSliderValueIndex_Right;
-   private int                                  _currentSliderValueIndex_Selected;
-   private int                                  _externalValuePointIndex;
+   private int                                     _currentSliderValueIndex_Left;
+   private int                                     _currentSliderValueIndex_Right;
+   private int                                     _currentSliderValueIndex_Selected;
+   private int                                     _externalValuePointIndex;
    //
-   private MapLegend                            _mapLegend;
+   private MapLegend                               _mapLegend;
    //
-   private long                                 _previousOverlayKey;
+   private long                                    _previousOverlayKey;
    //
-   private int                                  _selectedProfileKey   = 0;
+   private int                                     _selectedProfileKey   = 0;
    //
-   private MapGraphId                           _tourColorId;
+   private MapGraphId                              _tourColorId;
    //
-   private int                                  _hash_AllTourIds;
-   private int                                  _hash_AllTourData;
-   private long                                 _hash_TourOverlayKey;
-   private int                                  _hash_AllPhotos;
+   private int                                     _hash_AllTourIds;
+   private int                                     _hash_AllTourData;
+   private long                                    _hash_TourOverlayKey;
+   private int                                     _hash_AllPhotos;
    //
-   private final AtomicInteger                  _asyncCounter         = new AtomicInteger();
+   private final AtomicInteger                     _asyncCounter         = new AtomicInteger();
    //
    /**
     * Is <code>true</code> when a link photo is displayed, otherwise a tour photo (photo which is
     * save in a tour) is displayed.
     */
-   private boolean                              _isLinkPhotoDisplayed;
+   private boolean                                 _isLinkPhotoDisplayed;
    //
-   private SliderPathPaintingData               _sliderPathPaintingData;
-   private OpenDialogManager                    _openDlgMgr           = new OpenDialogManager();
+   private SliderPathPaintingData                  _sliderPathPaintingData;
+   private OpenDialogManager                       _openDlgMgr           = new OpenDialogManager();
    //
    /**
     * Keep map sync mode when map sync action get's unchecked
     */
-   private MapSyncMode                          _currentMapSyncMode   = MapSyncMode.IsSyncWith_Tour;
-   private boolean                              _isMapSyncActive;
-   private boolean                              _isInMapSync;
-   private long                                 _lastFiredMapSyncEventTime;
+   private MapSyncMode                             _currentMapSyncMode   = MapSyncMode.IsSyncWith_Tour;
+   private boolean                                 _isMapSyncActive;
+   private boolean                                 _isInMapSync;
+   private long                                    _lastFiredMapSyncEventTime;
    //
-   private boolean                              _isMapSyncWith_MapLocation;
-   private boolean                              _isMapSyncWith_OtherMap;
-   private boolean                              _isMapSyncWith_Photo;
-   private boolean                              _isMapSyncWith_Slider_Centered;
-   private boolean                              _isMapSyncWith_Slider_One;
-   private boolean                              _isMapSyncWith_Tour;
-   private boolean                              _isMapSyncWith_ValuePoint;
+   private boolean                                 _isMapSyncWith_MapLocation;
+   private boolean                                 _isMapSyncWith_OtherMap;
+   private boolean                                 _isMapSyncWith_Photo;
+   private boolean                                 _isMapSyncWith_Slider_Centered;
+   private boolean                                 _isMapSyncWith_Slider_One;
+   private boolean                                 _isMapSyncWith_Tour;
+   private boolean                                 _isMapSyncWith_ValuePoint;
    //
-   private EnumMap<MapGraphId, Action>          _allTourColor_Actions = new EnumMap<>(MapGraphId.class);
-   private ActionTourColor                      _actionTourColor_Elevation;
-   private ActionTourColor                      _actionTourColor_Gradient;
-   private ActionTourColor                      _actionTourColor_Power;
-   private ActionTourColor                      _actionTourColor_Pulse;
-   private ActionTourColor                      _actionTourColor_Speed;
-   private ActionTourColor                      _actionTourColor_Pace;
-   private ActionTourColor                      _actionTourColor_HrZone;
-   private ActionTourColor                      _actionTourColor_RunDyn_StepLength;
+   private EnumMap<MapGraphId, Action>             _allTourColor_Actions = new EnumMap<>(MapGraphId.class);
+   private ActionTourColor                         _actionTourColor_Elevation;
+   private ActionTourColor                         _actionTourColor_Gradient;
+   private ActionTourColor                         _actionTourColor_Power;
+   private ActionTourColor                         _actionTourColor_Pulse;
+   private ActionTourColor                         _actionTourColor_Speed;
+   private ActionTourColor                         _actionTourColor_Pace;
+   private ActionTourColor                         _actionTourColor_HrZone;
+   private ActionTourColor                         _actionTourColor_RunDyn_StepLength;
    //
-   private ActionCopyLocation                   _actionCopyLocation;
-   private ActionCreateTourMarkerFromMap        _actionCreateTourMarkerFromMap;
-   private Action_ExportMap_SubMenu             _actionExportMap_SubMenu;
-   private ActionGotoLocation                   _actionGotoLocation;
-   private ActionLookupCommonLocation           _actionLookupTourLocation;
-   private ActionManageMapProviders             _actionManageMapProvider;
-   private ActionMapBookmarks                   _actionMap2Slideout_Bookmarks;
-   private ActionMap2Color                      _actionMap2Slideout_Color;
-   private ActionMap2_MapPoints                 _actionMap2Slideout_MapPoints;
-   private ActionMap2_MapProvider               _actionMap2Slideout_MapProvider;
-   private ActionMap2_Options                   _actionMap2Slideout_Options;
-   private ActionMap2_PhotoFilter               _actionMap2Slideout_PhotoFilter;
-   private ActionMap2_PhotoOptions              _actionMap2Slideout_PhotoOptions;
-   private ActionMap2_Graphs                    _actionMap2Slideout_TourColors;
-   private ActionMapPoint_CenterMap             _actionMapPoint_CenterMap;
-   private ActionMapPoint_EditTourMarker        _actionMapPoint_EditTourMarker;
-   private ActionMapPoint_Photo_AutoSelect      _actionMapPoint_Photo_AutoSelect;
-   private ActionMapPoint_Photo_Deselect        _actionMapPoint_Photo_Deselect;
-   private ActionMapPoint_Photo_EditLabel       _actionMapPoint_Photo_EditLabel;
-   private ActionMapPoint_Photo_Remove          _actionMapPoint_Photo_Remove;
-   private ActionMapPoint_Photo_ShowAnnotations _actionMapPoint_Photo_ShowAnnotations;
-   private ActionMapPoint_Photo_ShowHistogram   _actionMapPoint_Photo_ShowHistogram;
-   private ActionMapPoint_Photo_ShowLabel       _actionMapPoint_Photo_ShowLabel;
-   private ActionMapPoint_Photo_ShowRating      _actionMapPoint_Photo_ShowRating;
-   private ActionMapPoint_Photo_ShowTooltip     _actionMapPoint_Photo_ShowTooltip;
-   private ActionMapPoint_ShowOnlyThisTour      _actionMapPoint_ShowOnlyThisTour;
-   private ActionMapPoint_ZoomIn                _actionMapPoint_ZoomIn;
-   private ActionReloadFailedMapImages          _actionReloadFailedMapImages;
-   private ActionRunExternalApp                 _actionRunExternalApp1;
-   private ActionRunExternalApp                 _actionRunExternalApp2;
-   private ActionRunExternalApp                 _actionRunExternalApp3;
-   private ActionRunExternalAppPrefPage         _actionRunExternalAppPrefPage;
-   private ActionRunExternalAppTitle            _actionRunExternalAppTitle;
-   private ActionSaveDefaultPosition            _actionSaveDefaultPosition;
-   private ActionSearchTourByLocation           _actionSearchTourByLocation;
-   private ActionSetDefaultPosition             _actionSetDefaultPosition;
-   private ActionSetGeoPosition                 _actionSetGeoPositions;
-   private ActionShowAllFilteredPhotos          _actionShowAllFilteredPhotos;
-   private ActionShowLegendInMap                _actionShowLegendInMap;
-   private ActionShowPOI                        _actionShowPOI;
-   private ActionShowScaleInMap                 _actionShowScaleInMap;
-   private ActionShowSliderInMap                _actionShowSliderInMap;
-   private ActionShowSliderInLegend             _actionShowSliderInLegend;
-   private ActionShowStartEndInMap              _actionShowStartEndInMap;
-   private ActionShowTour                       _actionShowTour;
-   private ActionShowTourInfoInMap              _actionShowTourInfoInMap;
-   private ActionShowTourWeatherInMap           _actionShowTourWeatherInMap;
-   private ActionShowValuePoint                 _actionShowValuePoint;
-   private ActionZoomLevelAdjustment            _actionZoomLevelAdjustment;
+   private ActionCopyLocation                      _actionCopyLocation;
+   private ActionCreateTourMarkerFromMap           _actionCreateTourMarkerFromMap;
+   private Action_ExportMap_SubMenu                _actionExportMap_SubMenu;
+   private ActionGotoLocation                      _actionGotoLocation;
+   private ActionLookupCommonLocation              _actionLookupTourLocation;
+   private ActionManageMapProviders                _actionManageMapProvider;
+   private ActionMapBookmarks                      _actionMap2Slideout_Bookmarks;
+   private ActionMap2Color                         _actionMap2Slideout_Color;
+   private ActionMap2_MapPoints                    _actionMap2Slideout_MapPoints;
+   private ActionMap2_MapProvider                  _actionMap2Slideout_MapProvider;
+   private ActionMap2_Options                      _actionMap2Slideout_Options;
+   private ActionMap2_PhotoFilter                  _actionMap2Slideout_PhotoFilter;
+   private ActionMap2_PhotoOptions                 _actionMap2Slideout_PhotoOptions;
+   private ActionMap2_Graphs                       _actionMap2Slideout_TourColors;
+   private ActionMapPoint_CenterMap                _actionMapPoint_CenterMap;
+   private ActionMapPoint_EditTourMarker           _actionMapPoint_EditTourMarker;
+   private ActionMapPoint_Photo_AutoSelect         _actionMapPoint_Photo_AutoSelect;
+   private ActionMapPoint_Photo_Deselect           _actionMapPoint_Photo_Deselect;
+   private ActionMapPoint_Photo_EditLabel          _actionMapPoint_Photo_EditLabel;
+   private ActionMapPoint_Photo_RemoveFromTour     _actionMapPoint_Photo_RemoveFromTour;
+   private ActionMapPoint_Photo_ReplaceGeoPosition _actionMapPoint_Photo_ReplaceGeoPosition;
+   private ActionMapPoint_Photo_ShowAnnotations    _actionMapPoint_Photo_ShowAnnotations;
+   private ActionMapPoint_Photo_ShowHistogram      _actionMapPoint_Photo_ShowHistogram;
+   private ActionMapPoint_Photo_ShowLabel          _actionMapPoint_Photo_ShowLabel;
+   private ActionMapPoint_Photo_ShowRating         _actionMapPoint_Photo_ShowRating;
+   private ActionMapPoint_Photo_ShowTooltip        _actionMapPoint_Photo_ShowTooltip;
+   private ActionMapPoint_Photo_Tonality_Copy      _actionMapPoint_Photo_Tonality_Copy;
+   private ActionMapPoint_Photo_Tonality_Paste     _actionMapPoint_Photo_Tonality_Paste;
+   private ActionMapPoint_ShowOnlyThisTour         _actionMapPoint_ShowOnlyThisTour;
+   private ActionMapPoint_ZoomIn                   _actionMapPoint_ZoomIn;
+   private ActionReloadFailedMapImages             _actionReloadFailedMapImages;
+   private ActionRunExternalApp                    _actionRunExternalApp1;
+   private ActionRunExternalApp                    _actionRunExternalApp2;
+   private ActionRunExternalApp                    _actionRunExternalApp3;
+   private ActionRunExternalAppPrefPage            _actionRunExternalAppPrefPage;
+   private ActionRunExternalAppTitle               _actionRunExternalAppTitle;
+   private ActionSaveDefaultPosition               _actionSaveDefaultPosition;
+   private ActionSearchTourByLocation              _actionSearchTourByLocation;
+   private ActionSetDefaultPosition                _actionSetDefaultPosition;
+   private ActionSetGeoPositionForGeoMarker        _actionSetGeoPositionForGeoMarker;
+   private ActionSetGeoPositionForPhotoTours       _actionSetGeoPositionForPhotoTours;
+   private ActionShowAllFilteredPhotos             _actionShowAllFilteredPhotos;
+   private ActionShowLegendInMap                   _actionShowLegendInMap;
+   private ActionShowPOI                           _actionShowPOI;
+   private ActionShowScaleInMap                    _actionShowScaleInMap;
+   private ActionShowSliderInMap                   _actionShowSliderInMap;
+   private ActionShowSliderInLegend                _actionShowSliderInLegend;
+   private ActionShowStartEndInMap                 _actionShowStartEndInMap;
+   private ActionShowTour                          _actionShowTour;
+   private ActionShowTourInfoInMap                 _actionShowTourInfoInMap;
+   private ActionShowTourWeatherInMap              _actionShowTourWeatherInMap;
+   private ActionShowValuePoint                    _actionShowValuePoint;
+   private ActionZoomLevelAdjustment               _actionZoomLevelAdjustment;
    //
-   private SubMenu_SetGeoPosition               _actionSubMenu_SetGeoPosition;
-   private SubMenu_SetTourMarkerType            _actionSubMenu_SetTourMarkerType;
+   private SubMenu_SetTourMarkerType               _actionSubMenu_SetTourMarkerType;
    //
-   private ActionSyncMap                        _actionMap2Slideout_SyncMap;
-   private ActionSyncMapWith_Photo              _actionSyncMapWith_Photo;
-   private ActionSyncMapWith_Slider_One         _actionSyncMapWith_Slider_One;
-   private ActionSyncMapWith_Slider_Centered    _actionSyncMapWith_Slider_Centered;
-   private ActionSyncMapWith_OtherMap           _actionSyncMapWith_OtherMap;
-   private ActionSyncMapWith_Tour               _actionSyncMapWith_Tour;
-   private ActionSyncMapWith_TourLocation       _actionSyncMapWith_TourLocation;
-   private ActionSyncMapWith_ValuePoint         _actionSyncMapWith_ValuePoint;
-   private EnumMap<MapSyncId, Action>           _allSyncMapActions    = new EnumMap<>(MapSyncId.class);
+   private ActionSyncMap                           _actionMap2Slideout_SyncMap;
+   private ActionSyncMapWith_Photo                 _actionSyncMapWith_Photo;
+   private ActionSyncMapWith_Slider_One            _actionSyncMapWith_Slider_One;
+   private ActionSyncMapWith_Slider_Centered       _actionSyncMapWith_Slider_Centered;
+   private ActionSyncMapWith_OtherMap              _actionSyncMapWith_OtherMap;
+   private ActionSyncMapWith_Tour                  _actionSyncMapWith_Tour;
+   private ActionSyncMapWith_TourLocation          _actionSyncMapWith_TourLocation;
+   private ActionSyncMapWith_ValuePoint            _actionSyncMapWith_ValuePoint;
+   private EnumMap<MapSyncId, Action>              _allSyncMapActions    = new EnumMap<>(MapSyncId.class);
    //
-   private ActionZoomIn                         _actionZoom_In;
-   private ActionZoomOut                        _actionZoom_Out;
-   private ActionZoomCenterBy                   _actionZoom_CenterMapBy;
-   private ActionZoomShowEntireMap              _actionZoom_ShowEntireMap;
-   private ActionZoomShowEntireTour             _actionZoom_ShowEntireTour;
+   private ActionZoomIn                            _actionZoom_In;
+   private ActionZoomOut                           _actionZoom_Out;
+   private ActionZoomCenterBy                      _actionZoom_CenterMapBy;
+   private ActionZoomShowEntireMap                 _actionZoom_ShowEntireMap;
+   private ActionZoomShowEntireTour                _actionZoom_ShowEntireTour;
    //
-   private org.eclipse.swt.graphics.Point       _geoFilter_Loaded_TopLeft_E2;
-   private org.eclipse.swt.graphics.Point       _geoFilter_Loaded_BottomRight_E2;
-   private GeoFilter_LoaderData                 _geoFilter_PreviousGeoLoaderItem;
-   private AtomicInteger                        _geoFilter_RunningId  = new AtomicInteger();
+   private org.eclipse.swt.graphics.Point          _geoFilter_Loaded_TopLeft_E2;
+   private org.eclipse.swt.graphics.Point          _geoFilter_Loaded_BottomRight_E2;
+   private GeoFilter_LoaderData                    _geoFilter_PreviousGeoLoaderItem;
+   private AtomicInteger                           _geoFilter_RunningId  = new AtomicInteger();
    //
-   private PaintedMapPoint                      _contextMenu_HoveredMapPoint;
-   //
-   private SlideoutMap2_PhotoOptions            _slideoutPhotoOptions;
+   private PaintedMapPoint                         _contextMenu_HoveredMapPoint;
    //
    /*
     * UI controls
@@ -600,7 +617,6 @@ public class Map2View extends ViewPart implements
          setText(Messages.Map_Action_CopyLocation);
 
          setImageDescriptor(CommonActivator.getThemedImageDescriptor(CommonImages.App_Copy));
-         setDisabledImageDescriptor(CommonActivator.getThemedImageDescriptor(CommonImages.App_Copy_Disabled));
       }
 
       @Override
@@ -629,7 +645,7 @@ public class Map2View extends ViewPart implements
       public ActionMap2_Graphs() {
 
          super(TourbookPlugin.getImageDescriptor(Images.Graph),
-               TourbookPlugin.getImageDescriptor(Images.Graph_Disabled));
+               null);
 
          setId(GRAPH_CONTRIBUTION_ID_SLIDEOUT);
       }
@@ -688,8 +704,7 @@ public class Map2View extends ViewPart implements
 
       public ActionMap2_Options() {
 
-         super(TourbookPlugin.getThemedImageDescriptor(Images.MapOptions),
-               TourbookPlugin.getImageDescriptor(Images.MapOptions_Disabled));
+         super(TourbookPlugin.getThemedImageDescriptor(Images.MapOptions), null);
       }
 
       @Override
@@ -708,8 +723,7 @@ public class Map2View extends ViewPart implements
 
       public ActionMap2_PhotoOptions() {
 
-         super(TourbookPlugin.getThemedImageDescriptor(Images.ShowPhotos_InMap),
-               TourbookPlugin.getThemedImageDescriptor(Images.ShowPhotos_InMap_Disabled));
+         super(TourbookPlugin.getThemedImageDescriptor(Images.ShowPhotos_InMap));
 
          isToggleAction = true;
          notSelectedTooltip = Messages.Map_Action_ShowPhotos_Tooltip;
@@ -760,7 +774,6 @@ public class Map2View extends ViewPart implements
          setText(Messages.Map_Action_EditTourMarker);
 
          setImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.App_Edit));
-         setDisabledImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.App_Edit_Disabled));
       }
 
       @Override
@@ -807,7 +820,6 @@ public class Map2View extends ViewPart implements
          super(Messages.Map_Action_EditPhotoLabel, Action.AS_PUSH_BUTTON);
 
          setImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.App_Edit));
-         setDisabledImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.App_Edit_Disabled));
       }
 
       @Override
@@ -817,9 +829,9 @@ public class Map2View extends ViewPart implements
       }
    }
 
-   private class ActionMapPoint_Photo_Remove extends Action {
+   private class ActionMapPoint_Photo_RemoveFromTour extends Action {
 
-      public ActionMapPoint_Photo_Remove() {
+      public ActionMapPoint_Photo_RemoveFromTour() {
 
          super(OtherMessages.ACTION_PHOTOS_AND_TOURS_REMOVE_PHOTO, Action.AS_PUSH_BUTTON);
 
@@ -830,6 +842,22 @@ public class Map2View extends ViewPart implements
       public void run() {
 
          TourManager.tourPhoto_Remove(_contextMenu_HoveredMapPoint);
+      }
+   }
+
+   private class ActionMapPoint_Photo_ReplaceGeoPosition extends Action {
+
+      public ActionMapPoint_Photo_ReplaceGeoPosition() {
+
+         super(Messages.Map_Action_ReplacePhotoGeoPosition, Action.AS_PUSH_BUTTON);
+
+         setToolTipText(Messages.Map_Action_ReplacePhotoGeoPosition_Tooltip);
+      }
+
+      @Override
+      public void run() {
+
+         actionPhoto_ResetGeoPosition();
       }
    }
 
@@ -901,6 +929,40 @@ public class Map2View extends ViewPart implements
       public void run() {
 
          actionPhoto_ShowTooltip();
+      }
+   }
+
+   private class ActionMapPoint_Photo_Tonality_Copy extends Action {
+
+      public ActionMapPoint_Photo_Tonality_Copy() {
+
+         super(Messages.Map_Action_CopyTonality, Action.AS_PUSH_BUTTON);
+
+         setToolTipText(Messages.Map_Action_CopyTonality_Tooltip);
+         setImageDescriptor(CommonActivator.getThemedImageDescriptor(CommonImages.App_Copy));
+      }
+
+      @Override
+      public void run() {
+
+         actionPhoto_Tonality_Copy();
+      }
+   }
+
+   private class ActionMapPoint_Photo_Tonality_Paste extends Action {
+
+      public ActionMapPoint_Photo_Tonality_Paste() {
+
+         super(Messages.Map_Action_PasteTonality, Action.AS_PUSH_BUTTON);
+
+         setToolTipText(Messages.Map_Action_PasteTonality_Tooltip);
+         setImageDescriptor(CommonActivator.getThemedImageDescriptor(CommonImages.App_Paste));
+      }
+
+      @Override
+      public void run() {
+
+         actionPhoto_Tonality_Paste();
       }
    }
 
@@ -989,8 +1051,7 @@ public class Map2View extends ViewPart implements
 
       public ActionShowTour() {
 
-         super(TourbookPlugin.getThemedImageDescriptor(Images.TourChart),
-               TourbookPlugin.getThemedImageDescriptor(Images.TourChart_Disabled));
+         super(TourbookPlugin.getThemedImageDescriptor(Images.TourChart), null);
 
          isToggleAction = true;
          notSelectedTooltip = Messages.map_action_show_tour_in_map;
@@ -1022,8 +1083,7 @@ public class Map2View extends ViewPart implements
 
       public ActionSyncMap() {
 
-         super(TourbookPlugin.getThemedImageDescriptor(Images.SyncMap),
-               TourbookPlugin.getThemedImageDescriptor(Images.SyncMap_Disabled));
+         super(TourbookPlugin.getThemedImageDescriptor(Images.SyncWith_Tour));
 
          isToggleAction = true;
          isShowSlideoutAlways = true;
@@ -1090,6 +1150,98 @@ public class Map2View extends ViewPart implements
       @Override
       public void run() {
          action_SyncWith_TourLocation();
+      }
+   }
+
+   private class CopyPasteCurveValues {
+
+      float[] allCurveValuesX;
+      float[] allCurveValuesY;
+   }
+
+   private class CopyPasteTonalityTransfer extends ByteArrayTransfer {
+
+      private static final String TYPE_NAME = "net.tourbook.map2.view.Map2View.CopyPasteTonalityTransfer"; //$NON-NLS-1$
+      private final int           TYPE_ID   = registerType(TYPE_NAME);
+
+      private CopyPasteTonalityTransfer() {}
+
+      @Override
+      protected int[] getTypeIds() {
+         return new int[] { TYPE_ID };
+      }
+
+      @Override
+      protected String[] getTypeNames() {
+         return new String[] { TYPE_NAME };
+      }
+
+      @Override
+      protected void javaToNative(final Object data, final TransferData transferData) {
+
+         try (final ByteArrayOutputStream out = new ByteArrayOutputStream();
+               final DataOutputStream dataOut = new DataOutputStream(out)) {
+
+            if (_copyPaste_PhotoAdjustments != null) {
+
+               final float[] allCurveValuesX = _copyPaste_PhotoAdjustments.curveValuesX;
+               final float[] allCurveValuesY = _copyPaste_PhotoAdjustments.curveValuesY;
+
+               // write number of values
+               dataOut.writeInt(allCurveValuesX.length);
+
+               // write all values
+               for (int valueIndex = 0; valueIndex < allCurveValuesX.length; valueIndex++) {
+
+                  dataOut.writeFloat(allCurveValuesX[valueIndex]);
+                  dataOut.writeFloat(allCurveValuesY[valueIndex]);
+               }
+            }
+
+            super.javaToNative(out.toByteArray(), transferData);
+
+         } catch (final IOException e) {
+
+            StatusUtil.log(e);
+         }
+      }
+
+      @Override
+      protected Object nativeToJava(final TransferData transferData) {
+
+         final byte[] bytes = (byte[]) super.nativeToJava(transferData);
+
+         try (final ByteArrayInputStream in = new ByteArrayInputStream(bytes);
+               final DataInputStream dataIn = new DataInputStream(in)) {
+
+            // read number of values
+            final int numValues = dataIn.readInt();
+
+            final float[] allCurveValuesX = new float[numValues];
+            final float[] allCurveValuesY = new float[numValues];
+
+            for (int valueIndex = 0; valueIndex < numValues; valueIndex++) {
+
+               allCurveValuesX[valueIndex] = dataIn.readFloat();
+               allCurveValuesY[valueIndex] = dataIn.readFloat();
+            }
+
+            /*
+             * Return clipboard values
+             */
+            final CopyPasteCurveValues copyPasteCurveValues = new CopyPasteCurveValues();
+
+            copyPasteCurveValues.allCurveValuesX = allCurveValuesX;
+            copyPasteCurveValues.allCurveValuesY = allCurveValuesY;
+
+            return copyPasteCurveValues;
+
+         } catch (final IOException e) {
+
+            StatusUtil.log(e);
+         }
+
+         return null;
       }
    }
 
@@ -1579,7 +1731,7 @@ public class Map2View extends ViewPart implements
       final Map2Point mapPoint = _contextMenu_HoveredMapPoint.mapPoint;
       final Photo hoveredPhoto = mapPoint.photo;
 
-      final List<TourPhoto> allTourPhotos = TourPhotoManager.getInstance().getTourPhotos(hoveredPhoto);
+      final List<TourPhoto> allTourPhotos = TourPhotoManager.getTourPhotos(hoveredPhoto);
 
       if (allTourPhotos.size() < 1) {
          return;
@@ -1626,6 +1778,38 @@ public class Map2View extends ViewPart implements
 
          // update UI
          _map.paint();
+      }
+   }
+
+   private void actionPhoto_ResetGeoPosition() {
+
+      final Map2Point mapPoint = _contextMenu_HoveredMapPoint.mapPoint;
+      final Photo hoveredPhoto = mapPoint.photo;
+
+      final List<TourPhoto> allTourPhotos = TourPhotoManager.getTourPhotos(hoveredPhoto);
+
+      if (allTourPhotos.size() < 1) {
+         return;
+      }
+
+      final TourPhoto tourPhoto = allTourPhotos.get(0);
+
+      if (tourPhoto != null) {
+
+         final TourData tourData = tourPhoto.getTourData();
+
+         if (tourData.isPhotoTour() == false) {
+            return;
+         }
+
+         final Set<Long> allTourPhotosWithGeoPosition = tourData.getTourPhotosWithPositionedGeo();
+
+         allTourPhotosWithGeoPosition.remove(tourPhoto.getPhotoId());
+
+         // recompute geo positions
+         tourData.computeGeo_Photos();
+
+         TourManager.saveModifiedTour(tourData);
       }
    }
 
@@ -1708,6 +1892,66 @@ public class Map2View extends ViewPart implements
       }
    }
 
+   private void actionPhoto_Tonality_Copy() {
+
+      final TourPhoto tourPhoto = getHoveredTourPhoto();
+
+      if (tourPhoto == null) {
+         return;
+      }
+
+      final PhotoAdjustments photoAdjustments = tourPhoto.getPhotoAdjustments(false);
+
+      if (photoAdjustments.isSetTonality == false) {
+         return;
+      }
+
+      _copyPaste_PhotoAdjustments = photoAdjustments;
+
+      final Clipboard clipboard = new Clipboard(_map.getDisplay());
+      {
+         clipboard.setContents(
+
+               new Object[] { new Object() },
+               new Transfer[] { _copyPaste_Transfer });
+      }
+      clipboard.dispose();
+
+      UI.showStatusLineMessage(Messages.Map_Action_CopyTonality_StatusLine);
+   }
+
+   private void actionPhoto_Tonality_Paste() {
+
+      Object contents;
+
+      final Clipboard clipboard = new Clipboard(_map.getDisplay());
+      {
+         contents = clipboard.getContents(_copyPaste_Transfer);
+      }
+      clipboard.dispose();
+
+      if (contents instanceof final CopyPasteCurveValues copyPasteValues) {
+
+         final Photo photo = _contextMenu_HoveredMapPoint.mapPoint.photo;
+         photo.isSetTonality = true;
+
+         // set flag that the map photo is recomputed
+         photo.isAdjustmentModified = true;
+
+         final int numValues = copyPasteValues.allCurveValuesX.length;
+
+         final CurveValues photoCurveValues = photo.getToneCurvesFilter().getCurves().getActiveCurve().curveValues;
+
+         photoCurveValues.allValuesX = Arrays.copyOf(copyPasteValues.allCurveValuesX, numValues);
+         photoCurveValues.allValuesY = Arrays.copyOf(copyPasteValues.allCurveValuesY, numValues);
+
+         TourPhotoManager.updatePhotoAdjustmentsInDB(photo);
+
+         // select photo
+         _map.selectPhoto(photo, _contextMenu_HoveredMapPoint);
+      }
+   }
+
    public void actionPOI() {
 
       final boolean isShowPOI = _actionShowPOI.isChecked();
@@ -1715,7 +1959,7 @@ public class Map2View extends ViewPart implements
       _map.setShowPOI(isShowPOI);
 
       if (isShowPOI) {
-         _map.setPoi(_poiPosition, _map.getZoom(), _poiName);
+         _map.setPoi(_poiPosition, _map.getZoomLevel(), _poiName);
       }
    }
 
@@ -1727,7 +1971,7 @@ public class Map2View extends ViewPart implements
 
    public void actionSaveDefaultPosition() {
 
-      _defaultZoom = _map.getZoom();
+      _defaultZoom = _map.getZoomLevel();
       _defaultPosition = _map.getMapGeoCenter();
    }
 
@@ -1957,12 +2201,12 @@ public class Map2View extends ViewPart implements
 
    public void actionZoomIn() {
 
-      _map.setZoom(_map.getZoom() + 1, _map.getCenterMapBy());
+      _map.setZoom(_map.getZoomLevel() + 1, _map.getCenterMapBy());
    }
 
    public void actionZoomOut() {
 
-      _map.setZoom(_map.getZoom() - 1, _map.getCenterMapBy());
+      _map.setZoom(_map.getZoomLevel() - 1, _map.getCenterMapBy());
    }
 
    public void actionZoomShowAllPhotos() {
@@ -2316,7 +2560,7 @@ public class Map2View extends ViewPart implements
          return;
       }
 
-      final int zoom = _map.getZoom();
+      final int zoom = _map.getZoomLevel();
 
       final Rectangle positionRect = _map.getWorldPixelFromGeoPositions(positionBounds, zoom);
 
@@ -2338,7 +2582,7 @@ public class Map2View extends ViewPart implements
     */
    private void centerTour() {
 
-      final int zoom = _map.getZoom();
+      final int zoom = _map.getZoomLevel();
 
       Set<GeoPosition> positionBounds = null;
 
@@ -2400,57 +2644,49 @@ public class Map2View extends ViewPart implements
             this,
             MapGraphId.Altitude,
             Messages.map_action_tour_color_altitude_tooltip,
-            Images.Graph_Elevation,
-            Images.Graph_Elevation_Disabled);
+            Images.Graph_Elevation);
 
       _actionTourColor_Gradient = new ActionTourColor(
             this,
             MapGraphId.Gradient,
             Messages.map_action_tour_color_gradient_tooltip,
-            Images.Graph_Gradient,
-            Images.Graph_Gradient_Disabled);
+            Images.Graph_Gradient);
 
       _actionTourColor_Power = new ActionTourColor(
             this,
             MapGraphId.Power,
             Messages.map_action_tour_color_power_tooltip,
-            Images.Graph_Power,
-            Images.Graph_Power_Disabled);
+            Images.Graph_Power);
 
       _actionTourColor_Pulse = new ActionTourColor(
             this,
             MapGraphId.Pulse,
             Messages.map_action_tour_color_pulse_tooltip,
-            Images.Graph_Heartbeat,
-            Images.Graph_Heartbeat_Disabled);
+            Images.Graph_Heartbeat);
 
       _actionTourColor_Speed = new ActionTourColor(
             this,
             MapGraphId.Speed,
             Messages.map_action_tour_color_speed_tooltip,
-            Images.Graph_Speed,
-            Images.Graph_Speed_Disabled);
+            Images.Graph_Speed);
 
       _actionTourColor_Pace = new ActionTourColor(
             this,
             MapGraphId.Pace,
             Messages.map_action_tour_color_pace_tooltip,
-            Images.Graph_Pace,
-            Images.Graph_Pace_Disabled);
+            Images.Graph_Pace);
 
       _actionTourColor_RunDyn_StepLength = new ActionTourColor(
             this,
             MapGraphId.RunDyn_StepLength,
             Messages.Tour_Action_RunDyn_StepLength_Tooltip,
-            Images.Graph_RunDyn_StepLength,
-            Images.Graph_RunDyn_StepLength_Disabled);
+            Images.Graph_RunDyn_StepLength);
 
       _actionTourColor_HrZone = new ActionTourColor(
             this,
             MapGraphId.HrZone,
             Messages.Tour_Action_ShowHrZones_Tooltip,
-            Images.PulseZones,
-            Images.PulseZones_Disabled);
+            Images.PulseZones);
 
 // SET_FORMATTING_OFF
 
@@ -2464,75 +2700,78 @@ public class Map2View extends ViewPart implements
       _allTourColor_Actions.put(MapGraphId.RunDyn_StepLength,  _actionTourColor_RunDyn_StepLength);
 
       // actions with slideouts
-      _actionMap2Slideout_Bookmarks          = new ActionMapBookmarks(this._parent, this);
-      _actionMap2Slideout_Color              = new ActionMap2Color();
-      _actionMap2Slideout_MapPoints          = new ActionMap2_MapPoints();
-      _actionMap2Slideout_MapProvider        = new ActionMap2_MapProvider(this, _state_MapProvider);
-      _actionMap2Slideout_PhotoFilter        = new ActionMap2_PhotoFilter(this, _state_PhotoFilter);
-      _actionMap2Slideout_Options            = new ActionMap2_Options();
-      _actionMap2Slideout_SyncMap            = new ActionSyncMap();
-      _actionMap2Slideout_TourColors         = new ActionMap2_Graphs();
+      _actionMap2Slideout_Bookmarks             = new ActionMapBookmarks(this._parent, this);
+      _actionMap2Slideout_Color                 = new ActionMap2Color();
+      _actionMap2Slideout_MapPoints             = new ActionMap2_MapPoints();
+      _actionMap2Slideout_MapProvider           = new ActionMap2_MapProvider(this, _state_MapProvider);
+      _actionMap2Slideout_PhotoFilter           = new ActionMap2_PhotoFilter(this, _state_PhotoFilter);
+      _actionMap2Slideout_Options               = new ActionMap2_Options();
+      _actionMap2Slideout_SyncMap               = new ActionSyncMap();
+      _actionMap2Slideout_TourColors            = new ActionMap2_Graphs();
 
-      _actionZoom_CenterMapBy                = new ActionZoomCenterBy(this);
-      _actionZoom_In                         = new ActionZoomIn(this);
-      _actionZoom_Out                        = new ActionZoomOut(this);
-      _actionZoom_ShowEntireMap              = new ActionZoomShowEntireMap(this);
-      _actionZoom_ShowEntireTour             = new ActionZoomShowEntireTour(this);
+      _actionZoom_CenterMapBy                   = new ActionZoomCenterBy(this);
+      _actionZoom_In                            = new ActionZoomIn(this);
+      _actionZoom_Out                           = new ActionZoomOut(this);
+      _actionZoom_ShowEntireMap                 = new ActionZoomShowEntireMap(this);
+      _actionZoom_ShowEntireTour                = new ActionZoomShowEntireTour(this);
 
-      _actionRunExternalAppTitle             = new ActionRunExternalAppTitle();
-      _actionRunExternalAppPrefPage          = new ActionRunExternalAppPrefPage();
-      _actionRunExternalApp1                 = new ActionRunExternalApp();
-      _actionRunExternalApp2                 = new ActionRunExternalApp();
-      _actionRunExternalApp3                 = new ActionRunExternalApp();
+      _actionRunExternalAppTitle                = new ActionRunExternalAppTitle();
+      _actionRunExternalAppPrefPage             = new ActionRunExternalAppPrefPage();
+      _actionRunExternalApp1                    = new ActionRunExternalApp();
+      _actionRunExternalApp2                    = new ActionRunExternalApp();
+      _actionRunExternalApp3                    = new ActionRunExternalApp();
 
-      _actionCopyLocation                    = new ActionCopyLocation();
-      _actionCreateTourMarkerFromMap         = new ActionCreateTourMarkerFromMap(this);
-      _actionGotoLocation                    = new ActionGotoLocation();
-      _actionLookupTourLocation              = new ActionLookupCommonLocation(this);
-      _actionManageMapProvider               = new ActionManageMapProviders(this);
-      _actionMapPoint_CenterMap              = new ActionMapPoint_CenterMap();
-      _actionMapPoint_EditTourMarker         = new ActionMapPoint_EditTourMarker();
-      _actionMapPoint_Photo_AutoSelect       = new ActionMapPoint_Photo_AutoSelect();
-      _actionMapPoint_Photo_Deselect         = new ActionMapPoint_Photo_Deselect();
-      _actionMapPoint_Photo_EditLabel        = new ActionMapPoint_Photo_EditLabel();
-      _actionMapPoint_Photo_Remove           = new ActionMapPoint_Photo_Remove();
-      _actionMapPoint_Photo_ShowAnnotations  = new ActionMapPoint_Photo_ShowAnnotations();
-      _actionMapPoint_Photo_ShowHistogram    = new ActionMapPoint_Photo_ShowHistogram();
-      _actionMapPoint_Photo_ShowLabel        = new ActionMapPoint_Photo_ShowLabel();
-      _actionMapPoint_Photo_ShowRating       = new ActionMapPoint_Photo_ShowRating();
-      _actionMapPoint_Photo_ShowTooltip      = new ActionMapPoint_Photo_ShowTooltip();
-      _actionMapPoint_ShowOnlyThisTour       = new ActionMapPoint_ShowOnlyThisTour();
-      _actionMapPoint_ZoomIn                 = new ActionMapPoint_ZoomIn();
-      _actionReloadFailedMapImages           = new ActionReloadFailedMapImages(this);
-      _actionSaveDefaultPosition             = new ActionSaveDefaultPosition(this);
-      _actionExportMap_SubMenu               = new Action_ExportMap_SubMenu(this);
-      _actionSearchTourByLocation            = new ActionSearchTourByLocation();
-      _actionSetDefaultPosition              = new ActionSetDefaultPosition(this);
-      _actionShowAllFilteredPhotos           = new ActionShowAllFilteredPhotos(this);
-      _actionShowLegendInMap                 = new ActionShowLegendInMap(this);
-      _actionMap2Slideout_PhotoOptions       = new ActionMap2_PhotoOptions();
-      _actionSetGeoPositions                 = new ActionSetGeoPosition();
-      _actionShowScaleInMap                  = new ActionShowScaleInMap(this);
-      _actionShowSliderInMap                 = new ActionShowSliderInMap(this);
-      _actionShowSliderInLegend              = new ActionShowSliderInLegend(this);
-      _actionShowStartEndInMap               = new ActionShowStartEndInMap(this);
-      _actionShowValuePoint                  = new ActionShowValuePoint(this);
-      _actionShowPOI                         = new ActionShowPOI(this);
-      _actionShowTour                        = new ActionShowTour();
-      _actionShowTourInfoInMap               = new ActionShowTourInfoInMap(this);
-      _actionShowTourWeatherInMap            = new ActionShowTourWeatherInMap(this);
-      _actionSubMenu_SetGeoPosition          = new SubMenu_SetGeoPosition();
-      _actionSubMenu_SetTourMarkerType       = new SubMenu_SetTourMarkerType();
-      _actionZoomLevelAdjustment             = new ActionZoomLevelAdjustment();
+      _actionCopyLocation                       = new ActionCopyLocation();
+      _actionCreateTourMarkerFromMap            = new ActionCreateTourMarkerFromMap(this);
+      _actionGotoLocation                       = new ActionGotoLocation();
+      _actionLookupTourLocation                 = new ActionLookupCommonLocation(this);
+      _actionManageMapProvider                  = new ActionManageMapProviders(this);
+      _actionMapPoint_CenterMap                 = new ActionMapPoint_CenterMap();
+      _actionMapPoint_EditTourMarker            = new ActionMapPoint_EditTourMarker();
+      _actionMapPoint_Photo_AutoSelect          = new ActionMapPoint_Photo_AutoSelect();
+      _actionMapPoint_Photo_Deselect            = new ActionMapPoint_Photo_Deselect();
+      _actionMapPoint_Photo_EditLabel           = new ActionMapPoint_Photo_EditLabel();
+      _actionMapPoint_Photo_RemoveFromTour      = new ActionMapPoint_Photo_RemoveFromTour();
+      _actionMapPoint_Photo_ReplaceGeoPosition  = new ActionMapPoint_Photo_ReplaceGeoPosition();
+      _actionMapPoint_Photo_ShowAnnotations     = new ActionMapPoint_Photo_ShowAnnotations();
+      _actionMapPoint_Photo_ShowHistogram       = new ActionMapPoint_Photo_ShowHistogram();
+      _actionMapPoint_Photo_ShowLabel           = new ActionMapPoint_Photo_ShowLabel();
+      _actionMapPoint_Photo_ShowRating          = new ActionMapPoint_Photo_ShowRating();
+      _actionMapPoint_Photo_ShowTooltip         = new ActionMapPoint_Photo_ShowTooltip();
+      _actionMapPoint_Photo_Tonality_Copy       = new ActionMapPoint_Photo_Tonality_Copy();
+      _actionMapPoint_Photo_Tonality_Paste      = new ActionMapPoint_Photo_Tonality_Paste();
+      _actionMapPoint_ShowOnlyThisTour          = new ActionMapPoint_ShowOnlyThisTour();
+      _actionMapPoint_ZoomIn                    = new ActionMapPoint_ZoomIn();
+      _actionReloadFailedMapImages              = new ActionReloadFailedMapImages(this);
+      _actionSaveDefaultPosition                = new ActionSaveDefaultPosition(this);
+      _actionExportMap_SubMenu                  = new Action_ExportMap_SubMenu(this);
+      _actionSearchTourByLocation               = new ActionSearchTourByLocation();
+      _actionSetDefaultPosition                 = new ActionSetDefaultPosition(this);
+      _actionShowAllFilteredPhotos              = new ActionShowAllFilteredPhotos(this);
+      _actionShowLegendInMap                    = new ActionShowLegendInMap(this);
+      _actionMap2Slideout_PhotoOptions          = new ActionMap2_PhotoOptions();
+      _actionSetGeoPositionForGeoMarker         = new ActionSetGeoPositionForGeoMarker();
+      _actionSetGeoPositionForPhotoTours        = new ActionSetGeoPositionForPhotoTours(this);
+      _actionShowScaleInMap                     = new ActionShowScaleInMap(this);
+      _actionShowSliderInMap                    = new ActionShowSliderInMap(this);
+      _actionShowSliderInLegend                 = new ActionShowSliderInLegend(this);
+      _actionShowStartEndInMap                  = new ActionShowStartEndInMap(this);
+      _actionShowValuePoint                     = new ActionShowValuePoint(this);
+      _actionShowPOI                            = new ActionShowPOI(this);
+      _actionShowTour                           = new ActionShowTour();
+      _actionShowTourInfoInMap                  = new ActionShowTourInfoInMap(this);
+      _actionShowTourWeatherInMap               = new ActionShowTourWeatherInMap(this);
+      _actionSubMenu_SetTourMarkerType          = new SubMenu_SetTourMarkerType();
+      _actionZoomLevelAdjustment                = new ActionZoomLevelAdjustment();
 
       // map sync actions
-      _actionSyncMapWith_OtherMap            = new ActionSyncMapWith_OtherMap(this);
-      _actionSyncMapWith_Photo               = new ActionSyncMapWith_Photo(this);
-      _actionSyncMapWith_Slider_Centered     = new ActionSyncMapWith_Slider_Centered(this);
-      _actionSyncMapWith_Slider_One          = new ActionSyncMapWith_Slider_One(this);
-      _actionSyncMapWith_Tour                = new ActionSyncMapWith_Tour(this);
-      _actionSyncMapWith_TourLocation        = new ActionSyncMapWith_TourLocation();
-      _actionSyncMapWith_ValuePoint          = new ActionSyncMapWith_ValuePoint(this);
+      _actionSyncMapWith_OtherMap               = new ActionSyncMapWith_OtherMap(this);
+      _actionSyncMapWith_Photo                  = new ActionSyncMapWith_Photo(this);
+      _actionSyncMapWith_Slider_Centered        = new ActionSyncMapWith_Slider_Centered(this);
+      _actionSyncMapWith_Slider_One             = new ActionSyncMapWith_Slider_One(this);
+      _actionSyncMapWith_Tour                   = new ActionSyncMapWith_Tour(this);
+      _actionSyncMapWith_TourLocation           = new ActionSyncMapWith_TourLocation();
+      _actionSyncMapWith_ValuePoint             = new ActionSyncMapWith_ValuePoint(this);
 
       _allSyncMapActions.put(MapSyncId.SyncMapWith_OtherMap,            _actionSyncMapWith_OtherMap);
       _allSyncMapActions.put(MapSyncId.SyncMapWith_Photo,               _actionSyncMapWith_Photo);
@@ -2832,19 +3071,19 @@ public class Map2View extends ViewPart implements
          canCreateGeoPositions = true;
          actionGeoPositionLabel = (Messages.Map_Action_GeoPositions_SetInto.formatted(TourManager.getTourTitle(tourData)));
 
-         _actionSetGeoPositions.setData(tourData, currentMouseGeoPosition);
+         _actionSetGeoPositionForPhotoTours.setData(currentMouseGeoPosition);
       }
 
-      _actionSetGeoPositions.setEnabled(canCreateGeoPositions);
-      _actionSetGeoPositions.setText(actionGeoPositionLabel);
+      _actionSetGeoPositionForPhotoTours.setEnabled(canCreateGeoPositions);
+      _actionSetGeoPositionForPhotoTours.setText(actionGeoPositionLabel);
 
       /*
        * Set geo positions into tour geo marker
        */
       final List<TourMarker> allGeoMarker = getTourMarkersWhereGeoPositionsCanBeSet();
 
-      _actionSubMenu_SetGeoPosition.setContextData(allGeoMarker, currentMouseGeoPosition);
-      _actionSubMenu_SetGeoPosition.setEnabled(allGeoMarker != null && allGeoMarker.size() > 0);
+      _actionSetGeoPositionForGeoMarker.setContextData(allGeoMarker, currentMouseGeoPosition);
+      _actionSetGeoPositionForGeoMarker.setEnabled(allGeoMarker != null && allGeoMarker.size() > 0);
 
 // SET_FORMATTING_OFF
 
@@ -2952,19 +3191,76 @@ public class Map2View extends ViewPart implements
 
    private void enableActions_MapPoint(final PaintedMapPoint hoveredMapPoint) {
 
+      boolean isGeoPositionSet = false;
+      boolean isPhotoTour = false;
+      boolean isPhotoAdjustTonality = false;
+
+      final Map2Point mapPoint = hoveredMapPoint.mapPoint;
+      final MapPointType pointType = mapPoint.pointType;
+      final Photo hoveredPhoto = mapPoint.photo;
+
+      if (hoveredPhoto != null) {
+
+         isPhotoAdjustTonality = hoveredPhoto.isSetTonality;
+
+         final List<TourPhoto> allTourPhotos = TourPhotoManager.getTourPhotos(hoveredPhoto);
+
+         if (allTourPhotos.size() > 0) {
+
+            final TourPhoto tourPhoto = allTourPhotos.get(0);
+            if (tourPhoto != null) {
+
+               final TourData tourData = tourPhoto.getTourData();
+
+               isPhotoTour = tourData.isPhotoTour();
+
+               if (isPhotoTour) {
+
+                  final Set<Long> allTourPhotosWithGeoPosition = tourData.getTourPhotosWithPositionedGeo();
+
+                  isGeoPositionSet = allTourPhotosWithGeoPosition.contains(tourPhoto.getPhotoId());
+               }
+            }
+         }
+      }
+
+      boolean canPasteTonality = false;
+
+      final Clipboard clipboard = new Clipboard(_map.getDisplay());
+      {
+         final String[] allTypeNames = clipboard.getAvailableTypeNames();
+
+         for (final String typeName : allTypeNames) {
+
+            if (typeName.equals(CopyPasteTonalityTransfer.TYPE_NAME)) {
+
+               canPasteTonality = true;
+
+               break;
+            }
+         }
+      }
+      clipboard.dispose();
+
 // SET_FORMATTING_OFF
 
-      final Map2Point      mapPoint    = hoveredMapPoint.mapPoint;
-      final MapPointType   pointType   = mapPoint.pointType;
 
       final int      numTours          = _allTourData.size();
 
       final boolean  isMultipleTours   = numTours > 1;
+      final boolean  isOneTour         = numTours == 1;
       final boolean  isTourMarker      = pointType.equals(MapPointType.TOUR_MARKER);
       final boolean  isTourAvailable   = isTourMarker || pointType.equals(MapPointType.TOUR_PAUSE);
 
-      _actionMapPoint_EditTourMarker   .setEnabled(isTourMarker);
-      _actionMapPoint_ShowOnlyThisTour .setEnabled(isMultipleTours && isTourAvailable);
+      _actionMapPoint_EditTourMarker            .setEnabled(isTourMarker);
+      _actionMapPoint_ShowOnlyThisTour          .setEnabled(isMultipleTours && isTourAvailable);
+      _actionMapPoint_Photo_ReplaceGeoPosition  .setEnabled(isGeoPositionSet);
+
+      _actionMapPoint_Photo_Tonality_Copy       .setEnabled(isOneTour && isPhotoAdjustTonality);
+      _actionMapPoint_Photo_Tonality_Paste      .setEnabled(canPasteTonality);
+
+      // currently it is not supported to remove photos from a photo tour
+      _actionMapPoint_Photo_RemoveFromTour      .setEnabled(isPhotoTour == false);
 
 // SET_FORMATTING_ON
 
@@ -2999,13 +3295,17 @@ public class Map2View extends ViewPart implements
             SlideoutMap2_PhotoOptions.STATE_IS_SHOW_PHOTO_ADJUSTMENTS,
             SlideoutMap2_PhotoOptions.STATE_IS_SHOW_PHOTO_ADJUSTMENTS_DEFAULT);
 
-      _actionMapPoint_Photo_ShowAnnotations.setChecked(isShowPhotoAnnotations);
-      _actionMapPoint_Photo_ShowHistogram.setChecked(isShowPhotoHistogram);
-      _actionMapPoint_Photo_ShowLabel.setChecked(isShowPhotoLabel);
-      _actionMapPoint_Photo_ShowRating.setChecked(isShowPhotoRating);
-      _actionMapPoint_Photo_ShowTooltip.setChecked(isShowPhotoTooltip);
+// SET_FORMATTING_OFF
 
-      _actionMapPoint_Photo_ShowAnnotations.setEnabled(isShowHQPhotoImages && isShowPhotoAdjustments);
+      _actionMapPoint_Photo_ShowAnnotations  .setChecked(isShowPhotoAnnotations);
+      _actionMapPoint_Photo_ShowHistogram    .setChecked(isShowPhotoHistogram);
+      _actionMapPoint_Photo_ShowLabel        .setChecked(isShowPhotoLabel);
+      _actionMapPoint_Photo_ShowRating       .setChecked(isShowPhotoRating);
+      _actionMapPoint_Photo_ShowTooltip      .setChecked(isShowPhotoTooltip);
+
+      _actionMapPoint_Photo_ShowAnnotations  .setEnabled(isShowHQPhotoImages && isShowPhotoAdjustments);
+
+// SET_FORMATTING_ON
    }
 
    private void fillActionBars() {
@@ -3081,14 +3381,14 @@ public class Map2View extends ViewPart implements
             menuMgr.add(_actionMapPoint_Photo_ShowLabel);
             menuMgr.add(_actionMapPoint_Photo_EditLabel);
             menuMgr.add(_actionSubMenu_SetTourMarkerType);
+            menuMgr.add(_actionMapPoint_Photo_Tonality_Copy);
+            menuMgr.add(_actionMapPoint_Photo_Tonality_Paste);
+            menuMgr.add(_actionMapPoint_Photo_ReplaceGeoPosition);
+            menuMgr.add(_actionMapPoint_Photo_RemoveFromTour);
 
             menuMgr.add(new Separator());
 
             fillExternalApp(menuMgr);
-
-            menuMgr.add(new Separator());
-
-            menuMgr.add(_actionMapPoint_Photo_Remove);
          }
 
          menuMgr.add(new Separator());
@@ -3110,8 +3410,8 @@ public class Map2View extends ViewPart implements
          menuMgr.add(_actionSearchTourByLocation);
          menuMgr.add(_actionCreateTourMarkerFromMap);
          menuMgr.add(_actionLookupTourLocation);
-         menuMgr.add(_actionSetGeoPositions);
-         menuMgr.add(_actionSubMenu_SetGeoPosition);
+         menuMgr.add(_actionSetGeoPositionForPhotoTours);
+         menuMgr.add(_actionSetGeoPositionForGeoMarker);
 
          /*
           * Show tour features
@@ -3424,6 +3724,29 @@ public class Map2View extends ViewPart implements
       return _map.getHoveredTourId();
    }
 
+   private TourPhoto getHoveredTourPhoto() {
+
+      if (_contextMenu_HoveredMapPoint == null) {
+         return null;
+      }
+
+      final Map2Point mapPoint = _contextMenu_HoveredMapPoint.mapPoint;
+
+      if (mapPoint == null) {
+         return null;
+      }
+
+      final Photo photo = mapPoint.photo;
+
+      final List<TourPhoto> allTourPhotos = TourPhotoManager.getTourPhotos(photo);
+
+      if (allTourPhotos.size() == 0) {
+         return null;
+      }
+
+      return allTourPhotos.get(0);
+   }
+
    public Map2 getMap() {
       return _map;
    }
@@ -3432,7 +3755,7 @@ public class Map2View extends ViewPart implements
    public MapPosition getMapPosition() {
 
       final GeoPosition mapPosition = _map.getMapGeoCenter();
-      final int mapZoomLevel = _map.getZoom() - 1;
+      final int mapZoomLevel = _map.getZoomLevel() - 1;
 
       return new MapPosition(
             mapPosition.latitude,
@@ -3590,17 +3913,17 @@ public class Map2View extends ViewPart implements
             continue;
          }
 
-         final GeoPosition[] geoPosition = tourData.getGeoBounds();
+         final GeoPosition[] geoBounds = tourData.getGeoBounds();
 
-         if (geoPosition == null) {
+         if (geoBounds == null) {
             continue;
          }
 
-         final double tourMinLatitude = geoPosition[0].latitude;
-         final double tourMinLongitude = geoPosition[0].longitude;
+         final double tourMinLatitude = geoBounds[0].latitude;
+         final double tourMinLongitude = geoBounds[0].longitude;
 
-         final double tourMaxLatitude = geoPosition[1].latitude;
-         final double tourMaxLongitude = geoPosition[1].longitude;
+         final double tourMaxLatitude = geoBounds[1].latitude;
+         final double tourMaxLongitude = geoBounds[1].longitude;
 
          if (tourMinLatitude == 0
                && tourMaxLatitude == 0
@@ -3649,9 +3972,11 @@ public class Map2View extends ViewPart implements
     * @return Returns {@link TourData} where the geo position can be set, otherwise
     *         <code>null</code>
     */
-   private TourData getTourDataWhereGeoPositionsCanBeSet() {
+   public TourData getTourDataWhereGeoPositionsCanBeSet() {
 
       if (_lastTourWithoutLatLon != null) {
+
+         // tour do not have geo positions
 
          return _lastTourWithoutLatLon;
       }
@@ -3660,9 +3985,7 @@ public class Map2View extends ViewPart implements
 
          final TourData tourData = _allTourData.get(0);
 
-         final double[] latitudeSerie = tourData.latitudeSerie;
-
-         if (latitudeSerie == null || latitudeSerie.length <= 3) {
+         if (tourData.isPhotoTour()) {
 
             return tourData;
          }
@@ -3720,7 +4043,6 @@ public class Map2View extends ViewPart implements
    private List<TourMarker> getTourMarkersWhereGeoPositionsCanBeSet() {
 
       if (_allTourData.size() != 1) {
-
          return null;
       }
 
@@ -3729,15 +4051,15 @@ public class Map2View extends ViewPart implements
       final double[] latitudeSerie = tourData.latitudeSerie;
 
       if (latitudeSerie == null || latitudeSerie.length == 0) {
-
          return null;
       }
 
-      final String geoMarkerPrefix = SubMenu_SetGeoPosition.GEO_MARKER_PREFIX.toLowerCase();
-      final List<TourMarker> allGeoMarker = new ArrayList<>();
+      final String geoMarkerPrefix = ActionSetGeoPositionForGeoMarker.GEO_MARKER_PREFIX.toLowerCase();
 
-      final Set<TourMarker> allTourMarkers = tourData.getTourMarkers();
-      for (final TourMarker tourMarker : allTourMarkers) {
+      final List<TourMarker> allGeoMarker = new ArrayList<>();
+      final List<TourMarker> allSortedTourMarkers = tourData.getTourMarkersSorted();
+
+      for (final TourMarker tourMarker : allSortedTourMarkers) {
 
          final String label = tourMarker.getLabel();
 
@@ -3822,7 +4144,7 @@ public class Map2View extends ViewPart implements
 
       final GeoPosition centerPosition = _map.getMapGeoCenter();
 
-      tourData.mapZoomLevel = _map.getZoom();
+      tourData.mapZoomLevel = _map.getZoomLevel();
       tourData.mapCenterPositionLatitude = centerPosition.latitude;
       tourData.mapCenterPositionLongitude = centerPosition.longitude;
    }
@@ -4545,13 +4867,13 @@ public class Map2View extends ViewPart implements
 
          final String boundingBox = poi.getBoundingBox();
          if (boundingBox == null) {
-            _poiZoomLevel = _map.getZoom();
+            _poiZoomLevel = _map.getZoomLevel();
          } else {
             _poiZoomLevel = _map.setZoomToBoundingBox(boundingBox);
          }
 
          if (_poiZoomLevel == -1) {
-            _poiZoomLevel = _map.getZoom();
+            _poiZoomLevel = _map.getZoomLevel();
          }
 
          _map.setPoi(_poiPosition, _poiZoomLevel, _poiName);
@@ -4910,6 +5232,9 @@ public class Map2View extends ViewPart implements
    private void paintTours_20_One(final TourData tourData, final boolean forceRedraw) {
 
       _isTourPainted = true;
+
+      // this can return the wrong tourdata when it is not reset !!!
+      _lastTourWithoutLatLon = null;
 
       if (TourManager.isLatLonAvailable(tourData) == false) {
 
@@ -6197,7 +6522,7 @@ public class Map2View extends ViewPart implements
                final int mapZoomLevel = zoomLevel == ModelPlayerManager.MAP_ZOOM_LEVEL_IS_NOT_AVAILABLE
 
                      // use current zoom
-                     ? _map.getZoom()
+                     ? _map.getZoomLevel()
 
                      // use provided zoom
                      : zoomLevel + 1;

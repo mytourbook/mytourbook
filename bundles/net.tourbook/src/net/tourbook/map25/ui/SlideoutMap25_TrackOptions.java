@@ -168,7 +168,6 @@ public class SlideoutMap25_TrackOptions extends ToolbarSlideout implements IColo
          super(UI.EMPTY_STRING, AS_CHECK_BOX);
 
          setImageDescriptor(net.tourbook.ui.UI.getGraphImageDescriptor(graphId));
-         setDisabledImageDescriptor(net.tourbook.ui.UI.getGraphImageDescriptor_Disabled(graphId));
 
          _graphId = graphId;
       }

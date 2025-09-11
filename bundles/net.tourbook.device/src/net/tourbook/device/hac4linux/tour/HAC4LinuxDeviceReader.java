@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2024 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2025 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -328,6 +328,10 @@ public class HAC4LinuxDeviceReader extends TourbookDevice {
          int tourDay = 0;
 
          int friends = -1;
+
+         float elevationGain = 0;
+         float elevationLoss = 0;
+
          while ((line = fileHac4LinuxData.readLine()) != null) {
             if (line.length() <= 0 || line.charAt(0) == '#') {
                continue;
@@ -350,6 +354,7 @@ public class HAC4LinuxDeviceReader extends TourbookDevice {
                   continue; // FileVersion "0.1.0"
                }
                break;
+
             case SECTION_INFO:
                fields = line.split("="); //$NON-NLS-1$
                if (fields.length < 2) {
@@ -405,6 +410,7 @@ public class HAC4LinuxDeviceReader extends TourbookDevice {
                   tourData.setTourEndPlace(fields[1]);
                }
                break;
+
             case SECTION_NOTES:
                index = line.indexOf('=');
                if (index < 0) {
@@ -412,6 +418,7 @@ public class HAC4LinuxDeviceReader extends TourbookDevice {
                }
                tourDescription.append(line.substring(index + 1) + "\n"); //$NON-NLS-1$
                break;
+
             case SECTION_FRIENDS:
                index = line.indexOf('=');
                if (index < 0) {
@@ -423,6 +430,7 @@ public class HAC4LinuxDeviceReader extends TourbookDevice {
                friends++;
                tourDescription.append(line.substring(index + 1) + "\n"); //$NON-NLS-1$
                break;
+
             case SECTION_PERSON:
                fields = line.split("="); //$NON-NLS-1$
                if (fields.length < 2) {
@@ -457,17 +465,21 @@ public class HAC4LinuxDeviceReader extends TourbookDevice {
 //						tourPerson.setWeight(Float.parseFloat(fields[1]));
                }
                break;
+
             case SECTION_STATISTICS:
                fields = line.split("="); //$NON-NLS-1$
                if (fields.length < 2) {
                   break;
                }
+
                if (fields[0].equals("Rosen")) { //$NON-NLS-1$
-                  tourData.setTourAltUp(Integer.parseInt(fields[1]));
+                  elevationGain = (Integer.parseInt(fields[1]));
                }
+
                if (fields[0].equals("Fallen")) { //$NON-NLS-1$
-                  tourData.setTourAltDown(Integer.parseInt(fields[1]));
+                  elevationLoss = (Integer.parseInt(fields[1]));
                }
+
                //if(fields[0].equals("Altitude")) //Altitude=147;90;69
                if (fields[0].equals("Temperature")) { //Temperature=24;22;20 //$NON-NLS-1$
                   final String[] sTemps = fields[1].split(";"); //$NON-NLS-1$
@@ -483,6 +495,7 @@ public class HAC4LinuxDeviceReader extends TourbookDevice {
                 * SkiSpeed=19.20;3.05;0.00
                 */
                break;
+
             case SECTION_SETTINGS:
                fields = line.split("="); //$NON-NLS-1$
                if (fields.length < 2) {
@@ -510,17 +523,20 @@ public class HAC4LinuxDeviceReader extends TourbookDevice {
                   deviceTotals(tourData.getDeviceName(), modeId, line, tourData);
                }
                break;
+
             case SECTION_POLAREXTS:
                //	ActiveLimit=0
                //	MaxVO2=0
                //	StartDelay=0
                break;
+
             case SECTION_COACH:
                fields = line.split("="); //$NON-NLS-1$
                if (fields.length < 2) {
                   break;
                }
                continue;
+
             //if(fields[0].equals("AverageHR"))
             //if(fields[0].equals("Flag")) tourData.set
             //if(fields[0].equals("IntervalAverageHR")) tourData.set //0
@@ -559,6 +575,7 @@ public class HAC4LinuxDeviceReader extends TourbookDevice {
                }
                timeDataList.add(timeData);
                break;
+
             case SECTION_MARKS:
                // 0Label	1Number	2Time relativ	3Time absolut
                //!Abzw._Rieseberg	157	00:52:17.64	17:16:17.00
@@ -604,6 +621,8 @@ public class HAC4LinuxDeviceReader extends TourbookDevice {
 
          tourData.setDeviceId(deviceId);
          tourData.setDeviceName(visibleName);
+
+         tourData.setElevationGainLoss(elevationGain, elevationLoss);
 
          /*
           * disable data series when no data are available

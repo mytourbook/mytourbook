@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2024 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2025 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -75,8 +75,7 @@ public class ActionDeleteTour extends Action {
 
       setText(Messages.Tour_Book_Action_delete_selected_tours);
 
-      setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.State_Delete));
-      setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Images.App_Delete_Disabled));
+      setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.App_Trash));
    }
 
    private void deleteTours(final ArrayList<Long> selectedTourIDs,

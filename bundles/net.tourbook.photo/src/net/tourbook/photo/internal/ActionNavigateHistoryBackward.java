@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2025 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -32,7 +32,6 @@ public class ActionNavigateHistoryBackward extends Action {
       setToolTipText(Messages.Pic_Dir_Action_NavigateHistoryBackward_Tooltip);
 
       setImageDescriptor(CommonActivator.getThemedImageDescriptor(CommonImages.Arrow_Left));
-      setDisabledImageDescriptor(CommonActivator.getThemedImageDescriptor(CommonImages.Arrow_Left_Disabled));
 
       setActionDefinitionId(ACTION_ID);
 

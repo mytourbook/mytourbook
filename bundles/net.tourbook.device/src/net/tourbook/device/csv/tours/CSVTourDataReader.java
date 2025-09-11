@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2025 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -137,6 +137,7 @@ public class CSVTourDataReader extends TourbookDevice {
 
    /**
     * @param string
+    *
     * @return Returns parsed integer value or 0 when the string argument do not contain a valid
     *         value.
     */
@@ -152,6 +153,7 @@ public class CSVTourDataReader extends TourbookDevice {
    /**
     * @param tourData
     * @param tagToken
+    *
     * @return <code>true</code> when a new tag is created
     */
    private boolean parseTags(final TourData tourData, final String tagToken) {
@@ -195,6 +197,7 @@ public class CSVTourDataReader extends TourbookDevice {
    /**
     * @param tourData
     * @param parsedTourTypeLabel
+    *
     * @return Returns <code>true</code> when a new {@link TourType} was created
     */
    private boolean parseTourType(final TourData tourData, final String parsedTourTypeLabel) {
@@ -276,8 +279,11 @@ public class CSVTourDataReader extends TourbookDevice {
                isNewTag |= parseTags(tourData, allToken[8]);//                9 Tags;
 
                if (isId3) {
-                  tourData.setTourAltUp(parseInteger(allToken[9]));//         10 Altitude Up (m);
-                  tourData.setTourAltDown(parseInteger(allToken[10]));//      11 Altitude Down (m);
+
+                  final int elevationGain = parseInteger(allToken[9]); //     10 Altitude Up (m);
+                  final int elevationLoss = parseInteger(allToken[10]); //    11 Altitude Down (m);
+
+                  tourData.setElevationGainLoss(elevationGain, elevationLoss);
                }
 
             } catch (final NoSuchElementException e) {

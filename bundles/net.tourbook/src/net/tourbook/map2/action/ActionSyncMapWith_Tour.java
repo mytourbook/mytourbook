@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2025 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -35,7 +35,6 @@ public class ActionSyncMapWith_Tour extends Action {
       setToolTipText(Messages.map_action_synch_with_tour);
 
       setImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.SyncWith_Tour));
-      setDisabledImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.SyncWith_Tour_Disabled));
    }
 
    @Override

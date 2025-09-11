@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2021, 2024 Frédéric Bard
+ * Copyright (C) 2021, 2025 Frédéric Bard
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -91,7 +91,7 @@ public class SuuntoCloudDownloader extends TourbookCloudDownloader {
    private CompletableFuture<WorkoutDownload> downloadFile(final Payload workoutPayload) {
 
       final HttpRequest request = HttpRequest.newBuilder()
-            .uri(OAuth2Utils.createOAuthPasseurUri("/suunto/workout/exportFit?workoutKey=" + workoutPayload.workoutKey()))//$NON-NLS-1$
+            .uri(OAuth2Utils.createOAuthPasseurUri("/suunto/workouts/" + workoutPayload.workoutKey() + "/fit"))//$NON-NLS-1$ //$NON-NLS-2$
             .header(OAuth2Constants.AUTHORIZATION, OAuth2Constants.BEARER + getAccessToken())
             .GET()
             .build();

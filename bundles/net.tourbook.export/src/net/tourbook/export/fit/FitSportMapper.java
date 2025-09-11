@@ -19,6 +19,7 @@ import com.garmin.fit.Sport;
 import com.garmin.fit.SubSport;
 
 import net.tourbook.common.UI;
+import net.tourbook.common.util.StringUtils;
 import net.tourbook.data.TourType;
 
 public class FitSportMapper {
@@ -33,11 +34,29 @@ public class FitSportMapper {
          return sport;
       }
 
+      final String importCategory = tourType.getImportCategory();
+
+      if (StringUtils.hasContent(importCategory)) {
+
+         try {
+
+            final String importCategoryCleaned = importCategory.trim().toUpperCase().replace(UI.SPACE, UI.SYMBOL_UNDERSCORE.charAt(0));
+
+            sport = Sport.valueOf(importCategoryCleaned);
+
+            return sport;
+
+         } catch (IllegalArgumentException | NullPointerException e) {
+            //ignore
+         }
+      }
+
       final String tourTypeName = tourType.getName().trim();
 
       try {
 
          sport = Sport.valueOf(tourTypeName.toUpperCase().replace(UI.SPACE, UI.SYMBOL_UNDERSCORE.charAt(0)));
+
          return sport;
 
       } catch (IllegalArgumentException | NullPointerException e) {
@@ -81,11 +100,29 @@ public class FitSportMapper {
          return subSport;
       }
 
+      final String importSubCategory = tourType.getImportSubCategory();
+
+      if (StringUtils.hasContent(importSubCategory)) {
+
+         try {
+
+            final String importSubCategoryCleaned = importSubCategory.trim().toUpperCase().replace(UI.SPACE, UI.SYMBOL_UNDERSCORE.charAt(0));
+
+            subSport = SubSport.valueOf(importSubCategoryCleaned);
+
+            return subSport;
+
+         } catch (IllegalArgumentException | NullPointerException e) {
+            //ignore
+         }
+      }
+
       final String tourTypeName = tourType.getName().trim();
 
       try {
 
          subSport = SubSport.valueOf(tourTypeName.toUpperCase().replace(UI.SPACE, UI.SYMBOL_UNDERSCORE.charAt(0)));
+
          return subSport;
 
       } catch (IllegalArgumentException | NullPointerException e) {

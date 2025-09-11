@@ -46,6 +46,7 @@ import java.util.Set;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.ConcurrentSkipListSet;
 import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.ThreadPoolExecutor;
 
@@ -120,8 +121,10 @@ public class TourDatabase {
     * <li>/net.tourbook.export/format-templates/mt-1.0.vm</li>
     * <li>net.tourbook.device.mt.MT_StAXHandler</li>
     */
-   private static final int TOURBOOK_DB_VERSION = 58;
+   private static final int TOURBOOK_DB_VERSION = 59;
 
+//   private static final int TOURBOOK_DB_VERSION = 58; // 25.6
+//   private static final int TOURBOOK_DB_VERSION = 57; // 25.4
 //   private static final int TOURBOOK_DB_VERSION = 56; // 24.11.3
 //   private static final int TOURBOOK_DB_VERSION = 55; // 24.5
 //   private static final int TOURBOOK_DB_VERSION = 54; // 24.1 fixed db data update bug 47 -> 48
@@ -476,8 +479,18 @@ public class TourDatabase {
       SQL_DOUBLE_MIN_VALUE = Double.toString(DEFAULT_DOUBLE);
    }
 
-   private static final String                   SYS_PROP__SILENT_DATABASE_UPDATE = "silentDatabaseUpdate";                                      //$NON-NLS-1$
-   private static final boolean                  _isSilentDatabaseUpdate          = System.getProperty(SYS_PROP__SILENT_DATABASE_UPDATE) != null;
+   private static final String  SYS_PROP__SILENT_DATABASE_UPDATE = "silentDatabaseUpdate";                                      //$NON-NLS-1$
+   private static final boolean _isSilentDatabaseUpdate          = System.getProperty(SYS_PROP__SILENT_DATABASE_UPDATE) != null;
+
+   static {
+
+      if (_isSilentDatabaseUpdate) {
+
+         Util.logSystemProperty_IsEnabled(TourDatabase.class,
+               SYS_PROP__SILENT_DATABASE_UPDATE,
+               "A database update is done silently"); //$NON-NLS-1$
+      }
+   }
 
    private boolean                               _isDbInitialized;
    private boolean                               _isDbInDataUpdate;
@@ -489,10 +502,10 @@ public class TourDatabase {
    private int                                   _dbDesignVersion_New;
    private int                                   _dbDesignVersion_Old;
 
-   private final ListenerList<IPropertyListener> _propertyListeners               = new ListenerList<>(ListenerList.IDENTITY);
+   private final ListenerList<IPropertyListener> _propertyListeners      = new ListenerList<>(ListenerList.IDENTITY);
 
-   private boolean                               _isSQLDesignUpdateError          = false;
-   private boolean                               _isSQLDataUpdateError            = false;
+   private boolean                               _isSQLDesignUpdateError = false;
+   private boolean                               _isSQLDataUpdateError   = false;
 
    /**
     * Database version before a db design update is performed
@@ -4808,6 +4821,12 @@ public class TourDatabase {
 
             // version 52 end
 
+            // version 58 start  -  25.x
+
+            + "   poolLength                             INTEGER DEFAULT 0,            " + NL //$NON-NLS-1$
+
+            // version 58 end
+
             // version 5 start
             /**
              * Disabled because when two blob object's are deserialized then the error occurs:
@@ -6836,14 +6855,19 @@ public class TourDatabase {
             currentDbVersion = _dbDesignVersion_New = updateDb_055_To_056(conn, splashManager);
          }
 
-         // 56 -> 57    25.?
+         // 56 -> 57    25.4
          if (currentDbVersion == 56) {
             currentDbVersion = _dbDesignVersion_New = updateDb_056_To_057(conn, splashManager);
          }
 
-         // 57 -> 58    25.XX
+         // 57 -> 58    25.6
          if (currentDbVersion == 57) {
             currentDbVersion = _dbDesignVersion_New = updateDb_057_To_058(conn, splashManager);
+         }
+
+         // 58 -> 59    25.6+++
+         if (currentDbVersion == 58) {
+            currentDbVersion = _dbDesignVersion_New = updateDb_058_To_059(splashManager);
          }
 
          // update db design version number
@@ -6908,6 +6932,8 @@ public class TourDatabase {
          updateDb_050_To_051_DataUpdate(conn, splashManager); //                                   51 - 23.8
          updateDb__3_Data_Concurrent(conn, splashManager, new TourDataUpdate_051_to_052()); //     52 - 24.1
          updateDb__3_Data_Concurrent(conn, splashManager, new TourDataUpdate_053_to_054()); //     54 - 24.1
+         updateDb__3_Data_Concurrent(conn, splashManager, new TourDataUpdate_057_to_058()); //     58 - 25.6
+         updateDb__3_Data_Concurrent(conn, splashManager, new TourDataUpdate_058_to_059()); //     59 - 25.??? after 25.6
 
       } catch (final SQLException e) {
 
@@ -6941,10 +6967,21 @@ public class TourDatabase {
       int lastUpdateNumItems = 1;
       int sumUpdatedTours = 0;
 
-      final List<Long> allTourIds = getAllTourIds();
-      final int numAllTourIds = allTourIds.size();
+      List<Long> allTourIDs = tourDataUpdater.getTourIDs();
 
-      for (final Long tourId : allTourIds) {
+      if (allTourIDs == null) {
+
+         // use default -> all
+
+         allTourIDs = getAllTourIds();
+      }
+
+      final int numAllTourIds = allTourIDs.size();
+      final Future<?>[] allUpdateTasks = new Future[numAllTourIds];
+
+      for (int taskIndex = 0; taskIndex < numAllTourIds; taskIndex++) {
+
+         final Long tourId = allTourIDs.get(taskIndex);
 
          if (splashManager != null) {
 
@@ -6977,8 +7014,11 @@ public class TourDatabase {
             tourIndex++;
          }
 
-         updateDb__4_Data_Concurrent_OneTour(tourId, tourDataUpdater);
+         allUpdateTasks[taskIndex] = updateDb__4_Data_Concurrent_OneTour(tourId, tourDataUpdater);
       }
+
+      // wait until all tasks are processed
+      Util.waitTasks(allUpdateTasks);
 
       updateVersionNumber_20_AfterDataUpdate(connection, dbDataVersion, startTime);
    }
@@ -6992,10 +7032,10 @@ public class TourDatabase {
     * @param tourId
     *           Tour ID of the tour to be updated
     *
-    * @return
+    * @return Returns the submitted task
     */
-   private void updateDb__4_Data_Concurrent_OneTour(final long tourId,
-                                                    final ITourDataUpdate tourDataUpdater) {
+   private Future<?> updateDb__4_Data_Concurrent_OneTour(final long tourId,
+                                                         final ITourDataUpdate tourDataUpdater) {
 
       try {
 
@@ -7011,7 +7051,7 @@ public class TourDatabase {
          Thread.currentThread().interrupt();
       }
 
-      _dbUpdateExecutor.submit(() -> {
+      final Future<?> updateTask = _dbUpdateExecutor.submit(() -> {
 
          // get last added item
          final Long queueItem_TourId = _dbUpdateQueue.poll();
@@ -7034,7 +7074,8 @@ public class TourDatabase {
              * Tour update
              */
             final boolean isTourUpdated = tourDataUpdater.updateTourData(tourData);
-            if (!isTourUpdated) {
+
+            if (isTourUpdated == false) {
                return;
             }
 
@@ -7071,6 +7112,8 @@ public class TourDatabase {
             entityManager.close();
          }
       });
+
+      return updateTask;
    }
 
    private void updateDb_001_To_002(final Connection conn) throws SQLException {
@@ -10964,13 +11007,39 @@ public class TourDatabase {
 
 // SET_FORMATTING_OFF
 
-         SQL.addColumn_Int          (stmt, TABLE_TOUR_NUTRITION_PRODUCT, "carbohydrates",  DEFAULT_0);   //$NON-NLS-1$
-         SQL.addColumn_Int          (stmt, TABLE_TOUR_NUTRITION_PRODUCT, "carbohydrates_Serving",  DEFAULT_0);   //$NON-NLS-1$
+         SQL.addColumn_Int    (stmt, TABLE_TOUR_DATA,              "poolLength",             DEFAULT_0);    //$NON-NLS-1$
+
+         SQL.addColumn_Int    (stmt, TABLE_TOUR_NUTRITION_PRODUCT, "carbohydrates",          DEFAULT_0);    //$NON-NLS-1$
+         SQL.addColumn_Int    (stmt, TABLE_TOUR_NUTRITION_PRODUCT, "carbohydrates_Serving",  DEFAULT_0);    //$NON-NLS-1$
 
 // SET_FORMATTING_ON
 
       }
       stmt.close();
+
+      logDbUpdate_End(newDbVersion);
+
+      return newDbVersion;
+   }
+
+   /**
+    * Dummy update that {@link net.tourbook.database.TourDataUpdate_058_to_059} works
+    *
+    * @param conn
+    * @param splashManager
+    *
+    * @return
+    *
+    * @throws SQLException
+    */
+   private int updateDb_058_To_059(final SplashManager splashManager) {
+
+      final int newDbVersion = 59;
+
+      logDbUpdate_Start(newDbVersion);
+      updateMonitor(splashManager, newDbVersion);
+
+      // this is a dummy db design update that the db data update works
 
       logDbUpdate_End(newDbVersion);
 
