@@ -37,10 +37,6 @@ New / Improvements
   - Select a product from a list of the most recent products used
 
 
-* Tour Nutrition (Frederic):
-  - Add duplicated products when they are contained in a beverage container
-
-
 Changes
 =======
 
