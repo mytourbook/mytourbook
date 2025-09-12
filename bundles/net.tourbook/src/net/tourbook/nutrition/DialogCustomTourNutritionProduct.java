@@ -53,6 +53,7 @@ public class DialogCustomTourNutritionProduct extends Dialog {
     */
    private boolean              _isInUIInit;
    private boolean              _isEditMode;
+
    private PixelConverter       _pc;
 
    private Button               _checkIsBeverage;
@@ -122,9 +123,6 @@ public class DialogCustomTourNutritionProduct extends Dialog {
                   .span(2, 1)
                   .align(SWT.BEGINNING, SWT.CENTER)
                   .applyTo(_txtName);
-            if (_isEditMode) {
-               _txtName.setText(_product.getName());
-            }
          }
          {
             // Label: number of servings
@@ -142,10 +140,6 @@ public class DialogCustomTourNutritionProduct extends Dialog {
             });
             GridDataFactory.fillDefaults().hint(_pc.convertWidthInCharsToPixels(5), SWT.DEFAULT).span(2, 1).align(SWT.BEGINNING, SWT.CENTER).applyTo(
                   _spinnerNumServings);
-            if (_isEditMode) {
-               final int numServings = Math.floorDiv(_product.getCalories(), _product.getCalories_Serving());
-               _spinnerNumServings.setSelection(numServings * 100);
-            }
          }
          {
             // Label: calories
