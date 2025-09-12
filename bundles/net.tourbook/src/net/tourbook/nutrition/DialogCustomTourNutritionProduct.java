@@ -159,9 +159,6 @@ public class DialogCustomTourNutritionProduct extends Dialog {
 
             // Unit: kcal
             UI.createLabel(container, net.tourbook.ui.Messages.Value_Unit_KCalories);
-            if (_isEditMode) {
-               _txtCalories.setText(String.valueOf(_product.getCalories()));
-            }
          }
          {
             // Label: carbohydrates
@@ -172,9 +169,6 @@ public class DialogCustomTourNutritionProduct extends Dialog {
                   .hint(HINT_TEXT_COLUMN_WIDTH, SWT.DEFAULT)
                   .align(SWT.BEGINNING, SWT.CENTER)
                   .applyTo(_txtCarbohydrates);
-            if (_isEditMode) {
-               _txtCarbohydrates.setText(String.valueOf(_product.getCarbohydrates()));
-            }
 
             // Unit: g
             UI.createLabel(container, UI.UNIT_WEIGHT_G);
@@ -189,9 +183,6 @@ public class DialogCustomTourNutritionProduct extends Dialog {
                   .hint(HINT_TEXT_COLUMN_WIDTH, SWT.DEFAULT)
                   .align(SWT.BEGINNING, SWT.CENTER)
                   .applyTo(_txtSodium);
-            if (_isEditMode) {
-               _txtSodium.setText(String.valueOf(_product.getSodium()));
-            }
 
             // Unit: mg
             UI.createLabel(container, UI.UNIT_WEIGHT_MG);
@@ -205,9 +196,6 @@ public class DialogCustomTourNutritionProduct extends Dialog {
                   .span(3, 1)
                   .align(SWT.BEGINNING, SWT.CENTER)
                   .applyTo(_checkIsBeverage);
-            if (_isEditMode) {
-               _checkIsBeverage.setSelection(_product.isBeverage());
-            }
          }
          {
             // Label: Beverage quantity
@@ -230,10 +218,6 @@ public class DialogCustomTourNutritionProduct extends Dialog {
                   .hint(_pc.convertWidthInCharsToPixels(5), SWT.DEFAULT)
                   .align(SWT.BEGINNING, SWT.CENTER)
                   .applyTo(_spinnerBeverageQuantity);
-            if (_isEditMode) {
-               _spinnerBeverageQuantity.setEnabled(_product.isBeverage());
-               _spinnerBeverageQuantity.setSelection(_product.getBeverageQuantity());
-            }
 
             // Unit: L
             UI.createLabel(container, UI.UNIT_FLUIDS_L);
