@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2023 Wolfgang Schramm and Contributors
+ * Copyright (C) 2023, 2025 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -326,10 +326,10 @@ public class DeviceSensorValue implements Serializable {
 
             && batteryVoltage_End > batteryVoltage_Start) {
 
-         final float batteryVoltage_StartBackup = batteryVoltage_Start;
+         final float swapValue = batteryVoltage_Start;
 
          batteryVoltage_Start = batteryVoltage_End;
-         batteryVoltage_End = batteryVoltage_StartBackup;
+         batteryVoltage_End = swapValue;
 
       }
    }

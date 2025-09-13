@@ -19,25 +19,29 @@ import net.tourbook.common.UI;
 
 public class DeviceSensorImport {
 
-   private static final char NL = UI.NEW_LINE;
+   private static final char      NL = UI.NEW_LINE;
+
+   public long                    dateTime;
 
    /**
     * Device index number in the import file, subsequent messages for the same device have the same
     * index number
     */
-   public Short              deviceIndex;
+   public Short                   deviceIndex;
+   public Short                   deviceType;
+   public Short                   antPlusDeviceType;
 
-   public String             manufacturerName;
-   public int                manufacturerNumber;
+   public String                  manufacturerName;
+   public Integer                 manufacturerNumber;
 
-   public String             productName;
-   public int                productNumber;
+   public String                  productName;
+   public Integer                 productNumber;
+   public Integer                 garminProductNumber;
 
-   public int                garminProductNumber;
+   public String                  serialNumber;
+   public Float                   softwareVersion;
 
-   public String             serialNumber;
-
-   public String             antPlusDeviceType;
+   public DeviceSensorValueImport sensorValues;
 
    public DeviceSensorImport(final Short deviceIndex) {
 

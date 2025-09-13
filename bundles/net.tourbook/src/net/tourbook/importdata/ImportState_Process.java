@@ -118,9 +118,9 @@ public class ImportState_Process {
    /**
     * OUT state:
     * <p>
-    * Device sensors which must be updated in the db, key is the serial number
+    * Device sensors which must be updated in the db, key is the device key
     */
-   private ConcurrentHashMap<String, DeviceSensor> _allDeviceSensorToBeUpdated   = new ConcurrentHashMap<>();
+   private ConcurrentHashMap<String, DeviceSensor> _allDeviceSensorToBeUpdated    = new ConcurrentHashMap<>();
 
    /**
     * IN and OUT states for the whole import/re-import process.
@@ -134,6 +134,9 @@ public class ImportState_Process {
       setIsLog_OK(true);
    }
 
+   /**
+    * @return Returns {@link #_allDeviceSensorToBeUpdated}
+    */
    public ConcurrentHashMap<String, DeviceSensor> getAllDeviceSensorsToBeUpdated() {
       return _allDeviceSensorToBeUpdated;
    }

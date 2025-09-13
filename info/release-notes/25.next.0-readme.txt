@@ -34,7 +34,8 @@ Experimental
 New / Improvements
 ==================
 
-* 
+* Fit Import
+  - Log all device sensor values, e.g. battery voltage or soft-/hardware versions
 
 
 Changes
@@ -43,6 +44,11 @@ Changes
 * Map Properties View
   This view is removed, its options are now available directly in the 2D map options slideout
   https://github.com/mytourbook/mytourbook/issues/1543
+  
+* Elevation gain/loss
+  The elevation gain/loss values may have to be recomputed because these values will now be ignored during break times.  
+  https://github.com/mytourbook/mytourbook/issues/1545  
+
 
 Changes that require Tour Re-import
 ===================================

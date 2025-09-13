@@ -261,7 +261,7 @@ public class SensorView extends ViewPart implements ITourViewer {
 
                // secondly sort by sensor key
 
-               rc = sensor1.getSensorKeyByName().compareTo(sensor2.getSensorKeyByName());
+               rc = sensor1.getSensorKey().compareTo(sensor2.getSensorKey());
             }
 
             break;
@@ -363,7 +363,7 @@ public class SensorView extends ViewPart implements ITourViewer {
             break;
 
          case TableColumnFactory.SENSOR_NAME_KEY_ID:
-            rc = item1.sensor.getSensorKeyByName().compareTo(item2.sensor.getSensorKeyByName());
+            rc = item1.sensor.getSensorKey().compareTo(item2.sensor.getSensorKey());
             break;
 
          case TableColumnFactory.SENSOR_NAME_ID:
@@ -722,6 +722,7 @@ public class SensorView extends ViewPart implements ITourViewer {
 
       defineColumn_Sensor_Name();
       defineColumn_Sensor_Type();
+      defineColumn_FitDeviceType();
       defineColumn_BatteryState_Level();
       defineColumn_BatteryState_Status();
       defineColumn_BatteryState_Voltage();
@@ -803,6 +804,25 @@ public class SensorView extends ViewPart implements ITourViewer {
    }
 
    /**
+    * Column: Fit data: device type
+    */
+   private void defineColumn_FitDeviceType() {
+
+      final ColumnDefinition colDef = TableColumnFactory.SENSOR_FIT_DEVICE_TYPE.createColumn(_columnManager, _pc);
+
+      colDef.setColumnSelectionListener(_columnSortListener);
+
+      colDef.setLabelProvider(new CellLabelProvider() {
+         @Override
+         public void update(final ViewerCell cell) {
+
+            final SensorItem sensorItem = (SensorItem) cell.getElement();
+            cell.setText(Short.toString(sensorItem.sensor.getDeviceType()));
+         }
+      });
+   }
+
+   /**
     * Column: Manufacturer name
     */
    private void defineColumn_Manufacturer_Name() {
@@ -855,7 +875,7 @@ public class SensorView extends ViewPart implements ITourViewer {
          public void update(final ViewerCell cell) {
 
             final SensorItem sensorItem = (SensorItem) cell.getElement();
-            cell.setText(sensorItem.sensor.getSensorKeyByName());
+            cell.setText(sensorItem.sensor.getSensorKey());
          }
       });
    }

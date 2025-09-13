@@ -123,6 +123,7 @@ public class TourDatabase {
     */
    private static final int TOURBOOK_DB_VERSION = 59;
 
+//   private static final int TOURBOOK_DB_VERSION = 59; // after 25.8
 //   private static final int TOURBOOK_DB_VERSION = 58; // 25.6
 //   private static final int TOURBOOK_DB_VERSION = 57; // 25.4
 //   private static final int TOURBOOK_DB_VERSION = 56; // 24.11.3
@@ -370,11 +371,9 @@ public class TourDatabase {
    private static volatile Map<Long, DeviceSensor>        _allDbDeviceSensors_BySensorID;
 
    /**
-    * This collection contains <b>ONLY</b> sensors which have a serial number.
-    * <P>
-    * Key is the serial number in UPPERCASE
+    * Key is a combination of manufacturer/product/device type
     */
-   private static volatile Map<String, DeviceSensor>      _allDbDeviceSensors_BySerialNum;
+   private static volatile Map<String, DeviceSensor>      _allDbDeviceSensors_BySensorKey;
 
    private static volatile List<TourMarkerType>           _allDbTourMarkerTypes;
 
@@ -914,16 +913,16 @@ public class TourDatabase {
     */
    public static synchronized void clearDeviceSensors() {
 
-      if (_allDbDeviceSensors_BySerialNum != null) {
-
-         _allDbDeviceSensors_BySerialNum.clear();
-         _allDbDeviceSensors_BySerialNum = null;
-      }
-
       if (_allDbDeviceSensors_BySensorID != null) {
 
          _allDbDeviceSensors_BySensorID.clear();
          _allDbDeviceSensors_BySensorID = null;
+      }
+
+      if (_allDbDeviceSensors_BySensorKey != null) {
+
+         _allDbDeviceSensors_BySensorKey.clear();
+         _allDbDeviceSensors_BySensorKey = null;
       }
    }
 
@@ -1493,18 +1492,18 @@ public class TourDatabase {
    }
 
    /**
-    * @return Returns a map with all {@link DeviceSensor} which have a serial number and are stored
-    *         in the database, key is the serial number in UPPERCASE
+    * @return Returns a map with all {@link DeviceSensor} which are stored in the database, key is a
+    *         combination of manufacturer/product/device type
     */
-   public static Map<String, DeviceSensor> getAllDeviceSensors_BySerialNum() {
+   public static Map<String, DeviceSensor> getAllDeviceSensors_BySensorKey() {
 
-      if (_allDbDeviceSensors_BySerialNum != null) {
-         return _allDbDeviceSensors_BySerialNum;
+      if (_allDbDeviceSensors_BySensorKey != null) {
+         return _allDbDeviceSensors_BySensorKey;
       }
 
       loadAllDeviceSensors();
 
-      return _allDbDeviceSensors_BySerialNum;
+      return _allDbDeviceSensors_BySensorKey;
    }
 
    /**
@@ -2737,12 +2736,12 @@ public class TourDatabase {
       synchronized (DB_LOCK) {
 
          // check again, field must be volatile to work correctly
-         if (_allDbDeviceSensors_BySerialNum != null) {
+         if (_allDbDeviceSensors_BySensorKey != null) {
             return;
          }
 
          final Map<Long, DeviceSensor> allDbDeviceSensors_BySensorID = new HashMap<>();
-         final Map<String, DeviceSensor> allDbDeviceSensors_BySerialNo = new HashMap<>();
+         final Map<String, DeviceSensor> allDbDeviceSensors_BySensorKey = new HashMap<>();
 
          final EntityManager em = TourDatabase.getInstance().getEntityManager();
          if (em != null) {
@@ -2761,11 +2760,11 @@ public class TourDatabase {
 
                   allDbDeviceSensors_BySensorID.put(sensor.getSensorId(), sensor);
 
-                  final String serialNumber = sensor.getSerialNumber();
+                  final String sensorKey = sensor.getSensorKey();
 
-                  if (StringUtils.hasContent(serialNumber)) {
+                  if (StringUtils.hasContent(sensorKey)) {
 
-                     allDbDeviceSensors_BySerialNo.put(serialNumber.toUpperCase(), sensor);
+                     allDbDeviceSensors_BySensorKey.put(sensorKey, sensor);
                   }
                }
             }
@@ -2774,7 +2773,7 @@ public class TourDatabase {
          }
 
          _allDbDeviceSensors_BySensorID = allDbDeviceSensors_BySensorID;
-         _allDbDeviceSensors_BySerialNum = allDbDeviceSensors_BySerialNo;
+         _allDbDeviceSensors_BySensorKey = allDbDeviceSensors_BySensorKey;
       }
    }
 
@@ -3520,17 +3519,17 @@ public class TourDatabase {
       synchronized (TRANSIENT_LOCK) {
 
          HashMap<Long, DeviceSensor> allDbSensors_BySensorID = new HashMap<>(getAllDeviceSensors_BySensorID());
-         HashMap<String, DeviceSensor> allDbSensors_BySerialNum = new HashMap<>(getAllDeviceSensors_BySerialNum());
+         HashMap<String, DeviceSensor> allDbSensors_BySensorKey = new HashMap<>(getAllDeviceSensors_BySensorKey());
 
          for (final DeviceSensor notSavedSensor : allNotSavedSensors) {
 
-            final String serialNumber = notSavedSensor.getSerialNumber();
+            final String sensorKey = notSavedSensor.getSensorKey();
 
-            if (StringUtils.hasContent(serialNumber)) {
+            if (StringUtils.hasContent(sensorKey)) {
 
-               // sensor WITH serial #
+               // sensor WITH sensor key #
 
-               final DeviceSensor dbSensor = allDbSensors_BySerialNum.get(serialNumber.toUpperCase());
+               final DeviceSensor dbSensor = allDbSensors_BySensorKey.get(sensorKey.toUpperCase());
 
                if (dbSensor == null) {
 
@@ -3541,15 +3540,15 @@ public class TourDatabase {
 
             } else {
 
-               // sensor WITHOUT serial #
+               // sensor WITHOUT sensor key
 
-               final String tourData_SensorKey = notSavedSensor.getSensorKeyByName();
+               final String tourData_SensorKey = notSavedSensor.getSensorKey();
 
                boolean isSensorInDb = false;
 
                for (final DeviceSensor dbSensor : allDbSensors_BySensorID.values()) {
 
-                  if (dbSensor.getSensorKeyByName().equals(tourData_SensorKey)) {
+                  if (dbSensor.getSensorKey().equals(tourData_SensorKey)) {
 
                      isSensorInDb = true;
 
@@ -3574,36 +3573,36 @@ public class TourDatabase {
          clearDeviceSensors();
          TourManager.getInstance().clearTourDataCache();
 
-         // reload db sensors
+         // RELOAD db sensors
          allDbSensors_BySensorID = new HashMap<>(getAllDeviceSensors_BySensorID());
-         allDbSensors_BySerialNum = new HashMap<>(getAllDeviceSensors_BySerialNum());
+         allDbSensors_BySensorKey = new HashMap<>(getAllDeviceSensors_BySensorKey());
 
          // loop: all sensor values in a tour -> set sensor which is saved in the db
          for (final DeviceSensorValue tourData_SensorValue : allTourData_SensorValues) {
 
             final DeviceSensor tourData_Sensor = tourData_SensorValue.getDeviceSensor();
 
-            final String serialNumber = tourData_Sensor.getSerialNumber();
+            final String sensorKey = tourData_Sensor.getSensorKey();
 
             DeviceSensor dbSensor = null;
 
-            if (StringUtils.hasContent(serialNumber)) {
+            if (StringUtils.hasContent(sensorKey)) {
 
-               // sensor WITH serial #
+               // sensor WITH sensor key
 
-               final String serialNumberKey = serialNumber.toUpperCase();
+               final String serialNumberKey = sensorKey.toUpperCase();
 
-               dbSensor = allDbSensors_BySerialNum.get(serialNumberKey);
+               dbSensor = allDbSensors_BySensorKey.get(serialNumberKey);
 
             } else {
 
-               // sensor WITHOUT serial #
+               // sensor WITHOUT sensor key
 
-               final String tourData_SensorKey = tourData_Sensor.getSensorKeyByName();
+               final String tourData_SensorKey = tourData_Sensor.getSensorKey();
 
                for (final DeviceSensor dbSensorByID : allDbSensors_BySensorID.values()) {
 
-                  if (dbSensorByID.getSensorKeyByName().equals(tourData_SensorKey)) {
+                  if (dbSensorByID.getSensorKey().equals(tourData_SensorKey)) {
 
                      dbSensor = dbSensorByID;
 
@@ -4279,24 +4278,30 @@ public class TourDatabase {
     */
    private void createTable_DeviceSensor(final Statement stmt) throws SQLException {
 
-      exec(stmt, "CREATE TABLE " + TABLE_DEVICE_SENSOR + "   (                                        " + NL //$NON-NLS-1$ //$NON-NLS-2$
+      exec(stmt, "CREATE TABLE " + TABLE_DEVICE_SENSOR + "   (                                  " + NL //$NON-NLS-1$ //$NON-NLS-2$
       //
             + SQL.createField_EntityId(ENTITY_ID_DEVICE_SENSOR, true)
 
             // version 46 start
 
-            + "   SensorType                 VARCHAR(" + DeviceSensor.DB_LENGTH_NAME + "),            " + NL //$NON-NLS-1$ //$NON-NLS-2$
-            + "   SensorName                 VARCHAR(" + DeviceSensor.DB_LENGTH_NAME + "),            " + NL //$NON-NLS-1$ //$NON-NLS-2$
-            + "   Description                VARCHAR(" + DeviceSensor.DB_LENGTH_DESCRIPTION + "),     " + NL //$NON-NLS-1$ //$NON-NLS-2$
-            + "   ManufacturerNumber         INTEGER,                                                 " + NL //$NON-NLS-1$
-            + "   ManufacturerName           VARCHAR(" + DeviceSensor.DB_LENGTH_NAME + "),            " + NL //$NON-NLS-1$ //$NON-NLS-2$
-            + "   ProductNumber              INTEGER,                                                 " + NL //$NON-NLS-1$
-            + "   ProductName                VARCHAR(" + DeviceSensor.DB_LENGTH_NAME + "),            " + NL //$NON-NLS-1$ //$NON-NLS-2$
-            + "   SerialNumber               VARCHAR(" + DeviceSensor.DB_LENGTH_NAME + ")             " + NL //$NON-NLS-1$ //$NON-NLS-2$
+            + "   SensorType           VARCHAR(" + DeviceSensor.DB_LENGTH_NAME + "),            " + NL //$NON-NLS-1$ //$NON-NLS-2$
+            + "   SensorName           VARCHAR(" + DeviceSensor.DB_LENGTH_NAME + "),            " + NL //$NON-NLS-1$ //$NON-NLS-2$
+            + "   Description          VARCHAR(" + DeviceSensor.DB_LENGTH_DESCRIPTION + "),     " + NL //$NON-NLS-1$ //$NON-NLS-2$
+            + "   ManufacturerNumber   INTEGER,                                                 " + NL //$NON-NLS-1$
+            + "   ManufacturerName     VARCHAR(" + DeviceSensor.DB_LENGTH_NAME + "),            " + NL //$NON-NLS-1$ //$NON-NLS-2$
+            + "   ProductNumber        INTEGER,                                                 " + NL //$NON-NLS-1$
+            + "   ProductName          VARCHAR(" + DeviceSensor.DB_LENGTH_NAME + "),            " + NL //$NON-NLS-1$ //$NON-NLS-2$
+            + "   SerialNumber         VARCHAR(" + DeviceSensor.DB_LENGTH_NAME + "),            " + NL //$NON-NLS-1$ //$NON-NLS-2$
 
             // version 46 end
 
-            + ")" //                                                                          //$NON-NLS-1$
+            // version 59 start
+
+            + "   DeviceType           SMALLINT DEFAULT -1                                      " + NL //$NON-NLS-1$
+
+            // version 59 end
+
+            + ")" //                                                                                  //$NON-NLS-1$
       );
 
       SQL.createIndex(stmt, TABLE_DEVICE_SENSOR, "SerialNumber"); //$NON-NLS-1$
@@ -6867,7 +6872,7 @@ public class TourDatabase {
 
          // 58 -> 59    25.6+++
          if (currentDbVersion == 58) {
-            currentDbVersion = _dbDesignVersion_New = updateDb_058_To_059(splashManager);
+            currentDbVersion = _dbDesignVersion_New = updateDb_058_To_059(conn, splashManager);
          }
 
          // update db design version number
@@ -11026,13 +11031,15 @@ public class TourDatabase {
     * Dummy update that {@link net.tourbook.database.TourDataUpdate_058_to_059} works
     *
     * @param conn
+    *
+    * @param conn
     * @param splashManager
     *
     * @return
     *
     * @throws SQLException
     */
-   private int updateDb_058_To_059(final SplashManager splashManager) {
+   private int updateDb_058_To_059(final Connection conn, final SplashManager splashManager) throws SQLException {
 
       final int newDbVersion = 59;
 
@@ -11040,6 +11047,18 @@ public class TourDatabase {
       updateMonitor(splashManager, newDbVersion);
 
       // this is a dummy db design update that the db data update works
+      final Statement stmt = conn.createStatement();
+      {
+         // alter columns
+
+// SET_FORMATTING_OFF
+
+         SQL.addColumn_SmallInt(stmt, TABLE_DEVICE_SENSOR,     "deviceType",     DEFAULT_IGNORED);    //$NON-NLS-1$
+
+// SET_FORMATTING_ON
+
+      }
+      stmt.close();
 
       logDbUpdate_End(newDbVersion);
 

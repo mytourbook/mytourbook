@@ -30,6 +30,7 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
 // SET_FORMATTING_OFF
 
       store.setDefault(IPreferences.FIT_IS_IGNORE_SPEED_VALUES,            true);
+      store.setDefault(IPreferences.FIT_IS_LOG_SENSOR_VALUES,              false);
       store.setDefault(IPreferences.FIT_IS_SET_TOUR_TITLE_FROM_FILE_NAME,  false);
 
       store.setDefault(IPreferences.FIT_TEMPERATURE_ADJUSTMENT,            0.0f);

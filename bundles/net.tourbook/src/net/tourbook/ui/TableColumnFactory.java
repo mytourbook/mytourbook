@@ -390,6 +390,8 @@ public abstract class TableColumnFactory {
    public static final String             SENSOR_NAME_ID                                     = "SENSOR_NAME";                                     //$NON-NLS-1$
    public static final TableColumnFactory SENSOR_NAME_KEY;
    public static final String             SENSOR_NAME_KEY_ID                                 = "SENSOR_NAME_KEY";                                 //$NON-NLS-1$
+   public static final TableColumnFactory SENSOR_FIT_DEVICE_TYPE;
+   public static final String             SENSOR_FIT_DEVICE_TYPE_ID                          = "SENSOR_FIT_DEVICE_TYPE";                          //$NON-NLS-1$
    public static final TableColumnFactory SENSOR_DESCRIPTION;
    public static final String             SENSOR_DESCRIPTION_ID                              = "SENSOR_DESCRIPTION";                              //$NON-NLS-1$
    public static final TableColumnFactory SENSOR_MANUFACTURER_NAME;
@@ -3800,6 +3802,27 @@ public abstract class TableColumnFactory {
             return colDef;
          }
       };
+
+      SENSOR_FIT_DEVICE_TYPE = new TableColumnFactory() {
+
+         @Override
+         public TableColumnDefinition createColumn(final ColumnManager columnManager,
+                                                   final PixelConverter pixelConverter) {
+
+            final TableColumnDefinition colDef = new TableColumnDefinition(columnManager, SENSOR_FIT_DEVICE_TYPE_ID, SWT.TRAIL);
+
+            colDef.setColumnCategory(           Messages.ColumnFactory_Category_Sensor);
+
+            colDef.setColumnLabel(              Messages.ColumnFactory_Sensor_FitDeviceType_Label);
+            colDef.setColumnHeaderText(         Messages.ColumnFactory_Sensor_FitDeviceType_Header);
+            colDef.setColumnHeaderToolTipText(  Messages.ColumnFactory_Sensor_FitDeviceType_Tooltip);
+
+            colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(10));
+
+            return colDef;
+         }
+      };
+
 
       /*
        * States

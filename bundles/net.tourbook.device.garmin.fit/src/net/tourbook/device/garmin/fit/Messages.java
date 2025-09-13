@@ -12,6 +12,8 @@ public class Messages extends NLS {
    public static String        PrefPage_Fit_Checkbox_IgnoreSpeedValues;
    public static String        PrefPage_Fit_Checkbox_ReplaceTimeSlice;
    public static String        PrefPage_Fit_Checkbox_FitImportTourType;
+   public static String        PrefPage_Fit_Checkbox_LogSensorData;
+   public static String        PrefPage_Fit_Checkbox_LogSensorData_Tooltip;
    public static String        PrefPage_Fit_Checkbox_SetTourTitleFromImportFileName;
    public static String        PrefPage_Fit_Group_AdjustTemperature;
    public static String        PrefPage_Fit_Group_Common;
