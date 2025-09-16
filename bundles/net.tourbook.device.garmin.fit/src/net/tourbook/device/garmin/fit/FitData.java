@@ -15,7 +15,6 @@
  *******************************************************************************/
 package net.tourbook.device.garmin.fit;
 
-import com.garmin.fit.AntplusDeviceType;
 import com.garmin.fit.GarminProduct;
 import com.garmin.fit.Manufacturer;
 import com.garmin.fit.SessionMesg;
@@ -30,6 +29,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 import net.tourbook.common.UI;
 import net.tourbook.common.time.TimeTools;
@@ -39,6 +39,7 @@ import net.tourbook.common.util.Util;
 import net.tourbook.data.DeviceSensor;
 import net.tourbook.data.DeviceSensorImport;
 import net.tourbook.data.DeviceSensorValue;
+import net.tourbook.data.DeviceSensorValueImport;
 import net.tourbook.data.GearData;
 import net.tourbook.data.SwimData;
 import net.tourbook.data.TimeData;
@@ -101,7 +102,6 @@ public class FitData {
 
    private final List<Long>                     _allBatteryTime           = new ArrayList<>();
    private final List<Short>                    _allBatteryPercentage     = new ArrayList<>();
-   private final List<DeviceSensorValue>        _allDeviceSensorValues    = new ArrayList<>();
    private final List<GearData>                 _allGearData              = new ArrayList<>();
    private final List<SwimData>                 _allSwimData              = new ArrayList<>();
    private final List<TourMarker>               _allTourMarker            = new ArrayList<>();
@@ -308,7 +308,7 @@ public class FitData {
          finalizeTour_Title(_tourData);
          finalizeTour_Elevation(_tourData);
          finalizeTour_Battery(_tourData);
-         finalizeTour_Sensors(_tourData);
+         finalizeTour_Sensor(_tourData);
 
          // must be called after time series are created
          finalizeTour_Gears(_tourData);
@@ -559,9 +559,33 @@ public class FitData {
       tourData.setTourMarkers(tourTourMarkers);
    }
 
-   private void finalizeTour_SensorImports() {
+   private void finalizeTour_Sensor(final TourData tourData) {
 
-      final List<DeviceSensorImport> allValidSensors = new ArrayList<>();
+      final List<DeviceSensorValue> allDeviceSensorValues = new ArrayList<>();
+
+      finalizeTour_Sensor_10_ImportedSensors(allDeviceSensorValues);
+
+      /*
+       * Set tour values into the sensor values
+       */
+      for (final DeviceSensorValue deviceSensorValue : allDeviceSensorValues) {
+
+         deviceSensorValue.setTourTime_Start(tourData.getTourStartTimeMS());
+         deviceSensorValue.setTourTime_End(tourData.getTourEndTimeMS());
+
+         deviceSensorValue.setTourData(tourData);
+      }
+
+      /*
+       * Set sensor values into the tour data
+       */
+      final Set<DeviceSensorValue> tourData_SensorValues = tourData.getDeviceSensorValues();
+
+      tourData_SensorValues.clear();
+      tourData_SensorValues.addAll(allDeviceSensorValues);
+   }
+
+   private void finalizeTour_Sensor_10_ImportedSensors(final List<DeviceSensorValue> allDeviceSensorValues) {
 
       final List<DeviceSensorImport> allImportedSensors = new ArrayList<>(_allImportedDeviceSensors.values());
 
@@ -577,22 +601,63 @@ public class FitData {
          return compareDeviceIndex;
       });
 
-      final int numSensors = allImportedSensors.size();
-
       /**
-       * Garmin sensors with device index 0 (CREATOR) and 1 are the same when manufacturer, product
-       * and software version are equal
+       * Garmin sensors with device index 0 (CREATOR) and 1 are the same, when the manufacturer,
+       * product and software version are equal
        */
+      DeviceSensorImport importedSensor = finalizeTour_Sensor_20_CreateMergedSensor(allImportedSensors);
+
+      // loop: all imported sensors
+      for (int sensorIndex = 0; sensorIndex < allImportedSensors.size(); sensorIndex++) {
+
+         if (importedSensor == null) {
+
+            importedSensor = allImportedSensors.get(sensorIndex);
+
+         } else {
+
+            // use merged sensor -> skip the second of the merged sensors
+
+            sensorIndex = 1;
+         }
+
+         final DeviceSensor deviceSensor = RawDataManager.getDeviceSensor(importedSensor);
+
+         finalizeTour_Sensor_30_UpdateSensorKeyValues(deviceSensor, importedSensor);
+
+         /*
+          * Set sensor values
+          */
+         final DeviceSensorValueImport importedSensorValues = importedSensor.sensorValues;
+
+         final DeviceSensorValue sensorValue = new DeviceSensorValue(deviceSensor);
+
+         sensorValue.setBatteryLevel_Start(importedSensorValues.batteryLevel_Start);
+         sensorValue.setBatteryLevel_End(importedSensorValues.batteryLevel_End);
+
+         sensorValue.setBatteryStatus_Start(importedSensorValues.batteryStatus_Start);
+         sensorValue.setBatteryStatus_End(importedSensorValues.batteryLevel_End);
+
+         sensorValue.setBatteryVoltage_Start(importedSensorValues.batteryVoltage_Start);
+         sensorValue.setBatteryVoltage_End(importedSensorValues.batteryVoltage_End);
+
+         allDeviceSensorValues.add(sensorValue);
+
+         // reset sensor that a merged sensor can be identified
+         importedSensor = null;
+      }
+   }
+
+   private DeviceSensorImport finalizeTour_Sensor_20_CreateMergedSensor(final List<DeviceSensorImport> allImportedSensors) {
+
+      DeviceSensorImport importedSensor = null;
+
 // SET_FORMATTING_OFF
 
-      DeviceSensorImport sensor     = null;
-      DeviceSensorImport sensor_0   = null;
-      DeviceSensorImport sensor_1;
+      if (allImportedSensors.size() > 1) {
 
-      if (numSensors > 0) {
-
-         sensor_0 = allImportedSensors.get(0);
-         sensor_1 = allImportedSensors.get(1);
+         final DeviceSensorImport sensor_0      = allImportedSensors.get(0);
+         final DeviceSensorImport sensor_1      = allImportedSensors.get(1);
 
          final Integer  manufacturerNumber_0    = sensor_0.manufacturerNumber;
          final Integer  manufacturerNumber_1    = sensor_1.manufacturerNumber;
@@ -608,11 +673,9 @@ public class FitData {
           && productNumber_0      != null && productNumber_0      .equals(productNumber_1)
           && softwareVersion_0    != null && softwareVersion_0    .equals(softwareVersion_1)) {
 
-            // these are the same sensors
+            // these are the same sensors -> merge sensor 0 and 1 into sensor_0
 
-            // merge sensors into sensor_0
-
-            sensor = sensor_0;
+            importedSensor = sensor_0;
 
             final Short deviceType_0      = sensor_0.deviceType;
             final Short deviceType_1      = sensor_1.deviceType;
@@ -621,95 +684,117 @@ public class FitData {
             final String  serialNumber_1  = sensor_1.serialNumber;
 
             if (deviceType_0 == null && deviceType_1 != null) {
-               sensor.deviceType = deviceType_1;
+               importedSensor.deviceType = deviceType_1;
             }
 
             if (StringUtils.hasContent(serialNumber_0) == false && StringUtils.hasContent(serialNumber_1)) {
-               sensor.serialNumber = serialNumber_1;
+               importedSensor.serialNumber = serialNumber_1;
             }
-
-         } else {
-
-            sensor_0 = null;
-            sensor_1 = null;
          }
       }
-
-      final Map<String, DeviceSensor> allDbSensors = TourDatabase.getAllDeviceSensors_BySensorKey();
-
-      for (int sensorIndex = 0; sensorIndex < numSensors; sensorIndex++) {
-
-         if (sensor != null) {
-
-            // use merged sensor -> skip the second of the merged sensors
-
-            sensorIndex = 1;
-
-         } else {
-
-            sensor = allImportedSensors.get(sensorIndex);
-         }
-
-         final Short    deviceIndex             = sensor.deviceIndex;
-         final Short    deviceType              = sensor.deviceType;
-         final Integer  productNumber           = sensor.productNumber;
-         final String   productName             = sensor.productName;
-         final Integer  garminProductNumber     = sensor.garminProductNumber;
-         final Integer  manufacturerNumber      = sensor.manufacturerNumber;
-         final Short    antPlusDeviceType       = sensor.antPlusDeviceType;
-         final String   serialNumber            = sensor.serialNumber;
-         final Float    softwareVersion         = sensor.softwareVersion;
-
-         final String   antPlusDeviceTypeName   = AntplusDeviceType  .getStringFromValue(antPlusDeviceType);
-         final String   manufacturerName        = Manufacturer       .getStringFromValue(manufacturerNumber);
-         final String   garminProductName       = GarminProduct      .getStringFromValue(garminProductNumber);
 
 // SET_FORMATTING_ON
 
-         // create a unique key to identify a device sensor
-
-         final String sensorKey = DeviceSensor.createSensorKey(
-
-               manufacturerNumber,
-               manufacturerName,
-
-               productNumber,
-               productName,
-
-               serialNumber,
-               deviceType);
-
-         for (final DeviceSensorImport deviceSensorImport : allImportedSensors) {
-
-         }
-
-         // reset sensor that a merged sensor can be identified
-         sensor = null;
-      }
+      return importedSensor;
    }
 
-   private void finalizeTour_Sensors(final TourData tourData) {
+   private void finalizeTour_Sensor_30_UpdateSensorKeyValues(final DeviceSensor deviceSensor,
+                                                             final DeviceSensorImport importedSensor) {
+      // TODO Auto-generated method stub
 
-      finalizeTour_SensorImports();
+// SET_FORMATTING_OFF
 
-      /*
-       * Set tour values into the sensor values
-       */
-      for (final DeviceSensorValue deviceSensorValue : _allDeviceSensorValues) {
+      final Short    deviceType              = importedSensor.deviceType;
+      final Integer  productNumber           = importedSensor.productNumber;
+      final String   productName             = importedSensor.productName;
+      final Integer  manufacturerNumber      = importedSensor.manufacturerNumber;
+      final String   serialNumber            = importedSensor.serialNumber;
 
-         deviceSensorValue.setTourTime_Start(tourData.getTourStartTimeMS());
-         deviceSensorValue.setTourTime_End(tourData.getTourEndTimeMS());
+      final String   manufacturerName        = Manufacturer .getStringFromValue(manufacturerNumber);
 
-         deviceSensorValue.setTourData(tourData);
+// SET_FORMATTING_ON
+
+   }
+
+   /**
+    * It is possible that a manufacturer/product number is null/-1, try to set the sensor
+    * manufacturer/product number/name from another tour
+    *
+    * @param sensor
+    * @param mesgManufacturerNumber
+    * @param mesgProductNumber
+    * @param mesgProductName
+    * @param mesgGarminProductNumber
+    * @param antplusDeviceTypeName
+    */
+   private void finalizeTour_Sensor_41_UpdateSensorKeyValues(final DeviceSensor sensor,
+                                                             final Integer mesgManufacturerNumber,
+                                                             final Integer mesgProductNumber,
+                                                             final String mesgProductName,
+                                                             final Integer mesgGarminProductNumber,
+                                                             final String antplusDeviceTypeName) {
+
+      boolean isProductUpdated = false;
+      boolean isManufacturerUpdated = false;
+
+      if (true
+
+            // manufacturer number is available
+            && mesgManufacturerNumber != null &&
+
+            // manufacturer number is not yet set in the sensor
+            sensor.getManufacturerNumber() == -1) {
+
+         /*
+          * Update sensor (saved or not saved) entity
+          */
+         sensor.setManufacturerNumber(mesgManufacturerNumber);
+         sensor.setManufacturerName(getManufacturerName(mesgManufacturerNumber));
+
+         isManufacturerUpdated = true;
       }
 
-      /*
-       * Set sensor values into the tour data
-       */
-      final Set<DeviceSensorValue> allTourData_SensorValues = tourData.getDeviceSensorValues();
+      if (true
 
-      allTourData_SensorValues.clear();
-      allTourData_SensorValues.addAll(_allDeviceSensorValues);
+            // product number is available
+            && mesgProductNumber != null &&
+
+            // product number is not yet set in the sensor
+            sensor.getProductNumber() == -1) {
+
+         /*
+          * Update sensor (saved or not saved) entity
+          */
+         sensor.setProductNumber(mesgProductNumber);
+         sensor.setProductName(getProductNameCombined(
+
+               mesgProductNumber,
+               mesgProductName,
+               mesgGarminProductNumber,
+               antplusDeviceTypeName));
+
+         isProductUpdated = true;
+      }
+
+      if (isProductUpdated || isManufacturerUpdated) {
+
+         if (sensor.getSensorId() == TourDatabase.ENTITY_IS_NOT_SAVED) {
+
+            /**
+             * Nothing to do, sensor will be saved when a tour is saved which contains this sensor
+             * in net.tourbook.database.TourDatabase.checkUnsavedTransientInstances_Sensors()
+             */
+
+         } else {
+
+            /*
+             * Notify post process to update the sensor in the db
+             */
+            final ConcurrentHashMap<String, DeviceSensor> allDeviceSensorsToBeUpdated = _importState_Process.getAllDeviceSensorsToBeUpdated();
+
+            allDeviceSensorsToBeUpdated.put(sensor.getSerialNumber(), sensor);
+         }
+      }
    }
 
    private void finalizeTour_Title(final TourData tourData) {
@@ -795,7 +880,6 @@ public class FitData {
     *
     */
    public Map<Short, DeviceSensorImport> getAllDeviceSensorImports() {
-
       return _allImportedDeviceSensors;
    }
 
@@ -846,10 +930,6 @@ public class FitData {
       return deviceName.toString();
    }
 
-   public List<DeviceSensorValue> getDeviceSensorValues() {
-      return _allDeviceSensorValues;
-   }
-
    public List<GearData> getGearData() {
       return _allGearData;
    }
@@ -866,6 +946,21 @@ public class FitData {
       return _lastAdded_TimeData;
    }
 
+   public String getManufacturerName(final Integer manufacturerNumber) {
+
+      String manufacturerName = UI.EMPTY_STRING;
+
+      if (manufacturerNumber != null) {
+         manufacturerName = Manufacturer.getStringFromValue(manufacturerNumber);
+      }
+
+      if (manufacturerName.length() == 0 && manufacturerNumber != null) {
+         manufacturerName = manufacturerNumber.toString();
+      }
+
+      return manufacturerName;
+   }
+
    public List<Long> getPausedTime_Data() {
       return _pausedTime_Data;
    }
@@ -876,6 +971,37 @@ public class FitData {
 
    public List<Long> getPausedTime_Start() {
       return _pausedTime_Start;
+   }
+
+   public String getProductNameCombined(final Integer productNumber,
+                                        final String productName,
+                                        final Integer garminProductNumber,
+                                        final String antplusDeviceTypeName) {
+
+      final StringBuilder sb = new StringBuilder();
+
+      if (garminProductNumber != null) {
+         sb.append(GarminProduct.getStringFromValue(garminProductNumber));
+      }
+
+      if (sb.isEmpty() && productName != null) {
+         sb.append(productName);
+      }
+
+      if (sb.isEmpty() && productNumber != null) {
+         sb.append(productNumber.toString());
+      }
+
+      if (antplusDeviceTypeName != null && antplusDeviceTypeName.length() > 0) {
+
+         if (sb.isEmpty() == false) {
+            sb.append(UI.DASH_WITH_SPACE);
+         }
+
+         sb.append(antplusDeviceTypeName);
+      }
+
+      return sb.toString();
    }
 
    public List<SwimData> getSwimData() {

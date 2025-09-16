@@ -1054,7 +1054,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
    private Set<TourTag>                tourTags                            = new HashSet<>();
 
    /**
-    * Sensors
+    * Sensor values
     */
    @OneToMany(fetch = EAGER, cascade = ALL, mappedBy = "tourData")
    @Cascade(org.hibernate.annotations.CascadeType.DELETE_ORPHAN)

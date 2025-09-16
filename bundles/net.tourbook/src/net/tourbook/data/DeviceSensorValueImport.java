@@ -17,6 +17,9 @@ package net.tourbook.data;
 
 import net.tourbook.common.UI;
 
+/**
+ * Is contained in {@link DeviceSensorImport} to keep the battery values
+ */
 public class DeviceSensorValueImport {
 
    private static final char NL                   = UI.NEW_LINE;
@@ -30,17 +33,17 @@ public class DeviceSensorValueImport {
    /**
     * Battery level: 0...100%
     */
-   private short             batteryLevel_Start   = -1;
-   private short             batteryLevel_End     = -1;
+   public short              batteryLevel_Start   = -1;
+   public short              batteryLevel_End     = -1;
 
    /**
     * Defined in {@link com.garmin.fit.BatteryStatus}
     */
-   private short             batteryStatus_Start  = -1;
-   private short             batteryStatus_End    = -1;
+   public short              batteryStatus_Start  = -1;
+   public short              batteryStatus_End    = -1;
 
-   private float             batteryVoltage_Start = -1;
-   private float             batteryVoltage_End   = -1;
+   public float              batteryVoltage_Start = -1;
+   public float              batteryVoltage_End   = -1;
 
    /**
     * Set battery level start and/or end
@@ -71,10 +74,10 @@ public class DeviceSensorValueImport {
 
             && batteryLevel_End > batteryLevel_Start) {
 
-         final short batteryLevel_StartBackup = batteryLevel_Start;
+         final short swapValue = batteryLevel_Start;
 
          batteryLevel_Start = batteryLevel_End;
-         batteryLevel_End = batteryLevel_StartBackup;
+         batteryLevel_End = swapValue;
       }
    }
 
@@ -131,10 +134,10 @@ public class DeviceSensorValueImport {
 
             && batteryVoltage_End > batteryVoltage_Start) {
 
-         final float batteryVoltage_StartBackup = batteryVoltage_Start;
+         final float swapValue = batteryVoltage_Start;
 
          batteryVoltage_Start = batteryVoltage_End;
-         batteryVoltage_End = batteryVoltage_StartBackup;
+         batteryVoltage_End = swapValue;
       }
    }
 

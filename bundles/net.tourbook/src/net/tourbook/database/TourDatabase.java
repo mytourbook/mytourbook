@@ -366,14 +366,20 @@ public class TourDatabase {
    private static HashMap<Long, TagCollection>            _tagCollections = new HashMap<>();
 
    /**
-    * Key is sensor ID
+    * Key is sensor entity ID
     */
    private static volatile Map<Long, DeviceSensor>        _allDbDeviceSensors_BySensorID;
 
    /**
-    * Key is a combination of manufacturer/product/device type
+    * Key is a combination of manufacturer/product/device type/serial number. The device type was
+    * introduced later because a sensor can have multiple device types
     */
-   private static volatile Map<String, DeviceSensor>      _allDbDeviceSensors_BySensorKey;
+   private static volatile Map<String, DeviceSensor>      _allDbDeviceSensors_BySensorKey_WithDevType;
+
+   /**
+    * Key is a combination of manufacturer/product/serial number but without a device type
+    */
+   private static volatile Map<String, DeviceSensor>      _allDbDeviceSensors_BySensorKey_NoDevType;
 
    private static volatile List<TourMarkerType>           _allDbTourMarkerTypes;
 
@@ -919,10 +925,16 @@ public class TourDatabase {
          _allDbDeviceSensors_BySensorID = null;
       }
 
-      if (_allDbDeviceSensors_BySensorKey != null) {
+      if (_allDbDeviceSensors_BySensorKey_WithDevType != null) {
 
-         _allDbDeviceSensors_BySensorKey.clear();
-         _allDbDeviceSensors_BySensorKey = null;
+         _allDbDeviceSensors_BySensorKey_WithDevType.clear();
+         _allDbDeviceSensors_BySensorKey_WithDevType = null;
+      }
+
+      if (_allDbDeviceSensors_BySensorKey_NoDevType != null) {
+
+         _allDbDeviceSensors_BySensorKey_NoDevType.clear();
+         _allDbDeviceSensors_BySensorKey_NoDevType = null;
       }
    }
 
@@ -1493,17 +1505,33 @@ public class TourDatabase {
 
    /**
     * @return Returns a map with all {@link DeviceSensor} which are stored in the database, key is a
-    *         combination of manufacturer/product/device type
+    *         combination of manufacturer/product and serial number but without a device type
+    *         {@link #_allDbDeviceSensors_BySensorKey_NoDevType}
     */
-   public static Map<String, DeviceSensor> getAllDeviceSensors_BySensorKey() {
+   public static Map<String, DeviceSensor> getAllDeviceSensors_BySensorKey_NoDevType() {
 
-      if (_allDbDeviceSensors_BySensorKey != null) {
-         return _allDbDeviceSensors_BySensorKey;
+      if (_allDbDeviceSensors_BySensorKey_NoDevType != null) {
+         return _allDbDeviceSensors_BySensorKey_NoDevType;
       }
 
       loadAllDeviceSensors();
 
-      return _allDbDeviceSensors_BySensorKey;
+      return _allDbDeviceSensors_BySensorKey_NoDevType;
+   }
+
+   /**
+    * @return Returns a map with all {@link DeviceSensor} which are stored in the database, key is a
+    *         combination of manufacturer/product/device type and serial number
+    */
+   public static Map<String, DeviceSensor> getAllDeviceSensors_BySensorKey_WithDevType() {
+
+      if (_allDbDeviceSensors_BySensorKey_WithDevType != null) {
+         return _allDbDeviceSensors_BySensorKey_WithDevType;
+      }
+
+      loadAllDeviceSensors();
+
+      return _allDbDeviceSensors_BySensorKey_WithDevType;
    }
 
    /**
@@ -2736,12 +2764,13 @@ public class TourDatabase {
       synchronized (DB_LOCK) {
 
          // check again, field must be volatile to work correctly
-         if (_allDbDeviceSensors_BySensorKey != null) {
+         if (_allDbDeviceSensors_BySensorKey_WithDevType != null) {
             return;
          }
 
          final Map<Long, DeviceSensor> allDbDeviceSensors_BySensorID = new HashMap<>();
-         final Map<String, DeviceSensor> allDbDeviceSensors_BySensorKey = new HashMap<>();
+         final Map<String, DeviceSensor> allDbDeviceSensors_BySensorKey_NoDevType = new HashMap<>();
+         final Map<String, DeviceSensor> allDbDeviceSensors_BySensorKey_WithDevType = new HashMap<>();
 
          final EntityManager em = TourDatabase.getInstance().getEntityManager();
          if (em != null) {
@@ -2760,11 +2789,15 @@ public class TourDatabase {
 
                   allDbDeviceSensors_BySensorID.put(sensor.getSensorId(), sensor);
 
-                  final String sensorKey = sensor.getSensorKey();
+                  final String sensorKey_WithDevType = sensor.getSensorKey_WithDevType();
+                  final String sensorKey_NoDevType = sensor.getSensorKey_NoDevType();
 
-                  if (StringUtils.hasContent(sensorKey)) {
+                  if (StringUtils.hasContent(sensorKey_WithDevType)) {
+                     allDbDeviceSensors_BySensorKey_WithDevType.put(sensorKey_WithDevType.toUpperCase(), sensor);
+                  }
 
-                     allDbDeviceSensors_BySensorKey.put(sensorKey, sensor);
+                  if (StringUtils.hasContent(sensorKey_NoDevType)) {
+                     allDbDeviceSensors_BySensorKey_NoDevType.put(sensorKey_NoDevType.toUpperCase(), sensor);
                   }
                }
             }
@@ -2773,7 +2806,8 @@ public class TourDatabase {
          }
 
          _allDbDeviceSensors_BySensorID = allDbDeviceSensors_BySensorID;
-         _allDbDeviceSensors_BySensorKey = allDbDeviceSensors_BySensorKey;
+         _allDbDeviceSensors_BySensorKey_WithDevType = allDbDeviceSensors_BySensorKey_WithDevType;
+         _allDbDeviceSensors_BySensorKey_NoDevType = allDbDeviceSensors_BySensorKey_NoDevType;
       }
    }
 
@@ -3492,11 +3526,12 @@ public class TourDatabase {
     *
     * @param allTourData_SensorValues
     * @param allNotSavedSensors
+    *           Returns all sensors which are not yet saved
     */
    private static void saveTransientInstances_Sensors_1_GetNotSaved(final Set<DeviceSensorValue> allTourData_SensorValues,
                                                                     final List<DeviceSensor> allNotSavedSensors) {
 
-      // loop: all sensor (values) in the tour -> find sensors which are not yet saved
+      // loop: all sensor values in the tour -> find sensors which are not yet saved
 
       for (final DeviceSensorValue tourData_SensorValue : allTourData_SensorValues) {
 
@@ -3513,23 +3548,29 @@ public class TourDatabase {
       }
    }
 
+   /**
+    * @param allTourData_SensorValues
+    *           All sensor values in one tour
+    * @param allNotSavedSensors
+    *           Contains all sensors which are not yet saved
+    */
    private static void saveTransientInstances_Sensors_2_Save(final Set<DeviceSensorValue> allTourData_SensorValues,
                                                              final List<DeviceSensor> allNotSavedSensors) {
 
       synchronized (TRANSIENT_LOCK) {
 
          HashMap<Long, DeviceSensor> allDbSensors_BySensorID = new HashMap<>(getAllDeviceSensors_BySensorID());
-         HashMap<String, DeviceSensor> allDbSensors_BySensorKey = new HashMap<>(getAllDeviceSensors_BySensorKey());
+         HashMap<String, DeviceSensor> allDbSensors_BySensorKey_WithDevType = new HashMap<>(getAllDeviceSensors_BySensorKey_WithDevType());
 
          for (final DeviceSensor notSavedSensor : allNotSavedSensors) {
 
-            final String sensorKey = notSavedSensor.getSensorKey();
+            final String sensorKey_WithDevType = notSavedSensor.getSensorKey_WithDevType();
 
-            if (StringUtils.hasContent(sensorKey)) {
+            if (StringUtils.hasContent(sensorKey_WithDevType)) {
 
-               // sensor WITH sensor key #
+               // sensor key WITH device type
 
-               final DeviceSensor dbSensor = allDbSensors_BySensorKey.get(sensorKey.toUpperCase());
+               final DeviceSensor dbSensor = allDbSensors_BySensorKey_WithDevType.get(sensorKey_WithDevType);
 
                if (dbSensor == null) {
 
@@ -3540,15 +3581,15 @@ public class TourDatabase {
 
             } else {
 
-               // sensor WITHOUT sensor key
+               // sensor WITHOUT device type
 
-               final String tourData_SensorKey = notSavedSensor.getSensorKey();
+               final String tourData_SensorKey_NoDevType = notSavedSensor.getSensorKey_NoDevType();
 
                boolean isSensorInDb = false;
 
                for (final DeviceSensor dbSensor : allDbSensors_BySensorID.values()) {
 
-                  if (dbSensor.getSensorKey().equals(tourData_SensorKey)) {
+                  if (dbSensor.getSensorKey_NoDevType().equals(tourData_SensorKey_NoDevType)) {
 
                      isSensorInDb = true;
 
@@ -3575,34 +3616,31 @@ public class TourDatabase {
 
          // RELOAD db sensors
          allDbSensors_BySensorID = new HashMap<>(getAllDeviceSensors_BySensorID());
-         allDbSensors_BySensorKey = new HashMap<>(getAllDeviceSensors_BySensorKey());
+         allDbSensors_BySensorKey_WithDevType = new HashMap<>(getAllDeviceSensors_BySensorKey_WithDevType());
 
          // loop: all sensor values in a tour -> set sensor which is saved in the db
          for (final DeviceSensorValue tourData_SensorValue : allTourData_SensorValues) {
 
             final DeviceSensor tourData_Sensor = tourData_SensorValue.getDeviceSensor();
 
-            final String sensorKey = tourData_Sensor.getSensorKey();
+            final String sensorKey_WithDevType = tourData_Sensor.getSensorKey_WithDevType();
 
             DeviceSensor dbSensor = null;
 
-            if (StringUtils.hasContent(sensorKey)) {
+            // 1. Check WITH device type
+            if (StringUtils.hasContent(sensorKey_WithDevType)) {
 
-               // sensor WITH sensor key
+               dbSensor = allDbSensors_BySensorKey_WithDevType.get(sensorKey_WithDevType);
+            }
 
-               final String serialNumberKey = sensorKey.toUpperCase();
+            // 2. Check WITHOUT device type
+            if (dbSensor == null) {
 
-               dbSensor = allDbSensors_BySensorKey.get(serialNumberKey);
-
-            } else {
-
-               // sensor WITHOUT sensor key
-
-               final String tourData_SensorKey = tourData_Sensor.getSensorKey();
+               final String tourData_SensorKey_NoDevType = tourData_Sensor.getSensorKey_NoDevType();
 
                for (final DeviceSensor dbSensorByID : allDbSensors_BySensorID.values()) {
 
-                  if (dbSensorByID.getSensorKey().equals(tourData_SensorKey)) {
+                  if (dbSensorByID.getSensorKey_NoDevType().equals(tourData_SensorKey_NoDevType)) {
 
                      dbSensor = dbSensorByID;
 

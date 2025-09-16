@@ -261,7 +261,7 @@ public class SensorView extends ViewPart implements ITourViewer {
 
                // secondly sort by sensor key
 
-               rc = sensor1.getSensorKey().compareTo(sensor2.getSensorKey());
+               rc = sensor1.getSensorKey_WithDevType().compareTo(sensor2.getSensorKey_WithDevType());
             }
 
             break;
@@ -363,7 +363,7 @@ public class SensorView extends ViewPart implements ITourViewer {
             break;
 
          case TableColumnFactory.SENSOR_NAME_KEY_ID:
-            rc = item1.sensor.getSensorKey().compareTo(item2.sensor.getSensorKey());
+            rc = item1.sensor.getSensorKey_WithDevType().compareTo(item2.sensor.getSensorKey_WithDevType());
             break;
 
          case TableColumnFactory.SENSOR_NAME_ID:
@@ -875,7 +875,7 @@ public class SensorView extends ViewPart implements ITourViewer {
          public void update(final ViewerCell cell) {
 
             final SensorItem sensorItem = (SensorItem) cell.getElement();
-            cell.setText(sensorItem.sensor.getSensorKey());
+            cell.setText(sensorItem.sensor.getSensorKey_WithDevType());
          }
       });
    }

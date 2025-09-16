@@ -103,8 +103,18 @@ public class DeviceSensor implements Cloneable, Serializable {
    @Transient
    private String               _label;
 
+   /**
+    * Key is a combination of manufacturer/product/device type/serial number. The device type was
+    * introduced later, because a sensor can have multiple device types
+    */
    @Transient
-   private String               _sensorKey;
+   private String               _sensorKey_WithDevType;
+
+   /**
+    * Key is a combination of manufacturer/product/serial number but without a device type
+    */
+   @Transient
+   private String               _sensorKey_NoDevType;
 
    /**
     * Default constructor used in EJB
@@ -160,9 +170,7 @@ public class DeviceSensor implements Cloneable, Serializable {
        */
       final List<Object> allKeys = new ArrayList<>();
 
-      /*
-       * Manufacturer
-       */
+      // manufacturer
       if (manufacturerNumber != null) {
          allKeys.add("Ma#" + manufacturerNumber);
       }
@@ -170,9 +178,7 @@ public class DeviceSensor implements Cloneable, Serializable {
          allKeys.add("MaNm:" + manufacturerName);
       }
 
-      /*
-       * Product
-       */
+      // product
       if (productNumber != null) {
          allKeys.add("Pr#" + productNumber);
       }
@@ -180,16 +186,12 @@ public class DeviceSensor implements Cloneable, Serializable {
          allKeys.add("PrNm:" + productName);
       }
 
-      /*
-       * Device
-       */
+      // device
       if (deviceType != null) {
          allKeys.add("DvTy:" + deviceType);
       }
 
-      /*
-       * Serial no
-       */
+      // serial no
       if (StringUtils.hasContent(serialNumber)) {
          allKeys.add("S#" + serialNumber);
       }
@@ -314,11 +316,33 @@ public class DeviceSensor implements Cloneable, Serializable {
    /**
     * @return Returns a sensor key which has different components
     */
-   public String getSensorKey() {
+   public String getSensorKey_NoDevType() {
 
-      if (_sensorKey == null) {
+      if (_sensorKey_NoDevType == null) {
 
-         _sensorKey = createSensorKey(
+         _sensorKey_NoDevType = createSensorKey(
+
+               manufacturerNumber,
+               manufacturerName,
+
+               productNumber,
+               productName,
+
+               serialNumber,
+               null);
+      }
+
+      return _sensorKey_NoDevType;
+   }
+
+   /**
+    * @return Returns a sensor key which has different components
+    */
+   public String getSensorKey_WithDevType() {
+
+      if (_sensorKey_WithDevType == null) {
+
+         _sensorKey_WithDevType = createSensorKey(
 
                manufacturerNumber,
                manufacturerName,
@@ -330,7 +354,7 @@ public class DeviceSensor implements Cloneable, Serializable {
                deviceType);
       }
 
-      return _sensorKey;
+      return _sensorKey_WithDevType;
    }
 
    /**
