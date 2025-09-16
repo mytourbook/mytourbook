@@ -630,18 +630,21 @@ public class FitData {
           */
          final DeviceSensorValueImport importedSensorValues = importedSensor.sensorValues;
 
-         final DeviceSensorValue sensorValue = new DeviceSensorValue(deviceSensor);
+         if (importedSensorValues != null) {
 
-         sensorValue.setBatteryLevel_Start(importedSensorValues.batteryLevel_Start);
-         sensorValue.setBatteryLevel_End(importedSensorValues.batteryLevel_End);
+            final DeviceSensorValue sensorValue = new DeviceSensorValue(deviceSensor);
 
-         sensorValue.setBatteryStatus_Start(importedSensorValues.batteryStatus_Start);
-         sensorValue.setBatteryStatus_End(importedSensorValues.batteryLevel_End);
+            sensorValue.setBatteryLevel_Start(importedSensorValues.batteryLevel_Start);
+            sensorValue.setBatteryLevel_End(importedSensorValues.batteryLevel_End);
 
-         sensorValue.setBatteryVoltage_Start(importedSensorValues.batteryVoltage_Start);
-         sensorValue.setBatteryVoltage_End(importedSensorValues.batteryVoltage_End);
+            sensorValue.setBatteryStatus_Start(importedSensorValues.batteryStatus_Start);
+            sensorValue.setBatteryStatus_End(importedSensorValues.batteryLevel_End);
 
-         allDeviceSensorValues.add(sensorValue);
+            sensorValue.setBatteryVoltage_Start(importedSensorValues.batteryVoltage_Start);
+            sensorValue.setBatteryVoltage_End(importedSensorValues.batteryVoltage_End);
+
+            allDeviceSensorValues.add(sensorValue);
+         }
 
          // reset sensor that a merged sensor can be identified
          importedSensor = null;

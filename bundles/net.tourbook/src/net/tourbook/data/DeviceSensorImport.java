@@ -55,11 +55,18 @@ public class DeviceSensorImport {
 
 //            + "[" + NL //                                                   //$NON-NLS-1$
 
+            + "      deviceIndex          = " + deviceIndex + NL //    //$NON-NLS-1$
+            + "      deviceType           = " + deviceType + NL //    //$NON-NLS-1$
+
             + "      manufacturerNumber   = " + manufacturerNumber + NL //    //$NON-NLS-1$
-            + "      manufacturerName     = " + manufacturerName + NL //      //$NON-NLS-1$
+//            + "      manufacturerName     = " + manufacturerName + NL //      //$NON-NLS-1$
             + "      productNumber        = " + productNumber + NL //         //$NON-NLS-1$
-            + "      productName          = " + productName + NL //           //$NON-NLS-1$
+//            + "      productName          = " + productName + NL //           //$NON-NLS-1$
+            + "      garminProductNumber  = " + garminProductNumber + NL //           //$NON-NLS-1$
+
             + "      serialNumber         = " + serialNumber + NL //          //$NON-NLS-1$
+            + "      softwareVersion      = " + softwareVersion + NL //          //$NON-NLS-1$
+            + "      sensorValues         = " + sensorValues + NL //          //$NON-NLS-1$
 
 //            + "]" + NL //                                                   //$NON-NLS-1$
       ;

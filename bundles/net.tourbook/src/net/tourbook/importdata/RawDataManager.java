@@ -891,14 +891,14 @@ public class RawDataManager {
        */
       final DeviceSensor newSensor = new DeviceSensor(
 
-            manufacturerNumber,
+            manufacturerNumber == null ? -1 : manufacturerNumber,
             manufacturerName,
 
-            productNumber,
+            productNumber == null ? -1 : productNumber,
             productName,
 
             serialNumber,
-            deviceType);
+            deviceType == null ? -1 : deviceType);
 
       _allImported_NewDeviceSensors.put(sensorKey_WithDevType, newSensor);
 

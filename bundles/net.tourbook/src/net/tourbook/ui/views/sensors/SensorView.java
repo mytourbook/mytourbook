@@ -1216,16 +1216,55 @@ public class SensorView extends ViewPart implements ITourViewer {
       PreparedStatement statementMinMax = null;
       ResultSet resultMinMax = null;
 
+      String sql;
+
+//      try (Connection conn = TourDatabase.getInstance().getConnection()) {
+//
+//         sql = UI.EMPTY_STRING
+//
+//               // get number of tours
+//               + " SELECT COUNT(*)" + NL //                                         //$NON-NLS-1$
+//               + " FROM" + NL //                                                    //$NON-NLS-1$
+//
+//               // get all device values which contain the selected device
+//               + " (" + NL //                                                       //$NON-NLS-1$
+//
+//               + " SELECT " + NL //                                                 //$NON-NLS-1$
+//               + "  DISTINCT TOURDATA_TourID," + NL //                              //$NON-NLS-1$
+//               + "  DEVICESENSOR_SensorID" + NL //                                  //$NON-NLS-1$
+//
+//               + "  FROM " + TourDatabase.TABLE_DEVICE_SENSOR_VALUE + NL //         //$NON-NLS-1$
+//               + "  WHERE DEVICESENSOR_SensorID = ?" + NL //                        //$NON-NLS-1$
+//
+//               + " ) TourId" + NL //                                                //$NON-NLS-1$
+//         ;
+//
+//         final PreparedStatement stmt = conn.prepareStatement(sql);
+//
+//         stmt.setLong(1, selectedSensor.getSensorId());
+//
+//         final ResultSet result = stmt.executeQuery();
+//
+//         // get first result
+//         result.next();
+//
+//         // get first value
+//         numberOfTours = result.getInt(1);
+//
+//      } catch (final SQLException e) {
+//         SQL.showException(e, sql);
+//      }
+
       try (Connection conn = TourDatabase.getInstance().getConnection()) {
 
          /*
           * Set used start/end time
           */
-         final String sql = UI.EMPTY_STRING
+          sql = UI.EMPTY_STRING
 
                + "SELECT" + NL //                                                //$NON-NLS-1$
 
-               + "   DEVICESENSOR_SENSORID      ," + NL //                    1  //$NON-NLS-1$
+                + "  DEVICESENSOR_SensorID      ," + NL //                    1  //$NON-NLS-1$
 
                + "   Min(TourStartTime)         ," + NL //                    2  //$NON-NLS-1$
                + "   Max(TourStartTime)         ," + NL //                    3  //$NON-NLS-1$
@@ -1238,7 +1277,7 @@ public class SensorView extends ViewPart implements ITourViewer {
                + "   Max(BatteryVoltage_End)     " + NL //                    9  //$NON-NLS-1$
 
                + "FROM " + TourDatabase.TABLE_DEVICE_SENSOR_VALUE + NL //        //$NON-NLS-1$
-               + "GROUP BY DEVICESENSOR_SENSORID" + NL //                        //$NON-NLS-1$
+                + "GROUP BY DEVICESENSOR_SensorID" + NL //                        //$NON-NLS-1$
          ;
 
          statementMinMax = conn.prepareStatement(sql);
@@ -1256,6 +1295,7 @@ public class SensorView extends ViewPart implements ITourViewer {
             } else {
 
 // SET_FORMATTING_OFF
+
                final long dbUsedFirstTime       = resultMinMax.getLong(2);
                final long dbUsedLastTime        = resultMinMax.getLong(3);
 
@@ -1265,6 +1305,7 @@ public class SensorView extends ViewPart implements ITourViewer {
                final float dbMaxStatus_End      = resultMinMax.getFloat(6);
                final float dbMaxVoltage_Start   = resultMinMax.getFloat(8);
                final float dbMaxVoltage_End     = resultMinMax.getFloat(9);
+
 // SET_FORMATTING_ON
 
                sensorItem.usedFirstTime = dbUsedFirstTime;

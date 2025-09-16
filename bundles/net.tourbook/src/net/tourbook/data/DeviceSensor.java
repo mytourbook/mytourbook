@@ -128,7 +128,7 @@ public class DeviceSensor implements Cloneable, Serializable {
                        final String productName,
 
                        final String serialNumber,
-                       final Short deviceType) {
+                       final short deviceType) {
 
       _createId = _createCounter.incrementAndGet();
 

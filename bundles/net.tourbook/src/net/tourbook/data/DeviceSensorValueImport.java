@@ -151,8 +151,10 @@ public class DeviceSensorValueImport {
 
             + "   batteryLevel_Start   = " + batteryLevel_Start + NL //             //$NON-NLS-1$
             + "   batteryLevel_End     = " + batteryLevel_End + NL //               //$NON-NLS-1$
+
             + "   batteryStatus_Start  = " + batteryStatus_Start + NL //            //$NON-NLS-1$
             + "   batteryStatus_End    = " + batteryStatus_End + NL //              //$NON-NLS-1$
+
             + "   batteryVoltage_Start = " + batteryVoltage_Start + NL //           //$NON-NLS-1$
             + "   batteryVoltage_End   = " + batteryVoltage_End + NL //             //$NON-NLS-1$
       ;
