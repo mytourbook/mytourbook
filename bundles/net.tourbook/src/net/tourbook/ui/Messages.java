@@ -465,6 +465,8 @@ public class Messages extends NLS {
    public static String        ColumnFactory_Sensor_Name_Tooltip;
    public static String        ColumnFactory_Sensor_NameKey;
    public static String        ColumnFactory_Sensor_NameKey_Tooltip;
+   public static String        ColumnFactory_Sensor_NumberOfTours;
+   public static String        ColumnFactory_Sensor_NumberOfTours_Header;
    public static String        ColumnFactory_Sensor_ProductName;
    public static String        ColumnFactory_Sensor_ProductNumber;
    public static String        ColumnFactory_Sensor_ProductNumber_Header;

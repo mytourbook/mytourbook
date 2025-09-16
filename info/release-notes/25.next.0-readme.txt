@@ -37,7 +37,8 @@ New / Improvements
 * Fit Import
   - Log all device sensor values, e.g. battery voltage or soft-/hardware versions
   
-  
+* Sensor view
+  - Show number of tours for each sensor  
 
 
 Changes

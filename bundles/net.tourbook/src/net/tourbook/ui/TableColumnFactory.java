@@ -398,6 +398,8 @@ public abstract class TableColumnFactory {
    public static final String             SENSOR_MANUFACTURER_NAME_ID                        = "SENSOR_MANUFACTURER_NAME";                        //$NON-NLS-1$
    public static final TableColumnFactory SENSOR_MANUFACTURER_NUMBER;
    public static final String             SENSOR_MANUFACTURER_NUMBER_ID                      = "SENSOR_MANUFACTURER_NUMBER";                      //$NON-NLS-1$
+   public static final TableColumnFactory SENSOR_NUMBER_OF_TOURS;
+   public static final String             SENSOR_NUMBER_OF_TOURS_ID                          = "SENSOR_NUMBER_OF_TOURS";                          //$NON-NLS-1$
    public static final TableColumnFactory SENSOR_PRODUCT_NAME;
    public static final String             SENSOR_PRODUCT_NAME_ID                             = "SENSOR_PRODUCT_NAME";                             //$NON-NLS-1$
    public static final TableColumnFactory SENSOR_PRODUCT_NUMBER;
@@ -3619,6 +3621,26 @@ public abstract class TableColumnFactory {
             colDef.setColumnLabel(              Messages.ColumnFactory_Sensor_ManufacturerNumber);
             colDef.setColumnHeaderText(         Messages.ColumnFactory_Sensor_ManufacturerNumber_Header);
             colDef.setColumnHeaderToolTipText(  Messages.ColumnFactory_Sensor_ManufacturerNumber);
+
+            colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(10));
+
+            return colDef;
+         }
+      };
+
+      SENSOR_NUMBER_OF_TOURS = new TableColumnFactory() {
+
+         @Override
+         public TableColumnDefinition createColumn(final ColumnManager columnManager,
+                                                   final PixelConverter pixelConverter) {
+
+            final TableColumnDefinition colDef = new TableColumnDefinition(columnManager, SENSOR_NUMBER_OF_TOURS_ID, SWT.TRAIL);
+
+            colDef.setColumnCategory(           Messages.ColumnFactory_Category_Sensor);
+
+            colDef.setColumnLabel(              Messages.ColumnFactory_Sensor_NumberOfTours);
+            colDef.setColumnHeaderText(         Messages.ColumnFactory_Sensor_NumberOfTours_Header);
+            colDef.setColumnHeaderToolTipText(  Messages.ColumnFactory_Sensor_NumberOfTours);
 
             colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(10));
 

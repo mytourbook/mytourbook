@@ -341,6 +341,10 @@ public class SensorView extends ViewPart implements ITourViewer {
 
             break;
 
+         case TableColumnFactory.SENSOR_NUMBER_OF_TOURS_ID:
+            rc = item1.numTours - item2.numTours;
+            break;
+
          case TableColumnFactory.SENSOR_TIME_FIRST_USED_ID:
             rc = item1.usedFirstTime - item2.usedFirstTime;
             break;
@@ -446,9 +450,10 @@ public class SensorView extends ViewPart implements ITourViewer {
       long         usedLastTime;
 
       boolean      isBatteryLevelAvailable;
-
       boolean      isBatteryStatusAvailable;
       boolean      isBatteryVoltageAvailable;
+
+      int          numTours;
 
       @Override
       public boolean equals(final Object obj) {
@@ -722,6 +727,7 @@ public class SensorView extends ViewPart implements ITourViewer {
 
       defineColumn_Sensor_Name();
       defineColumn_Sensor_Type();
+      defineColumn_NumberOfTours();
       defineColumn_FitDeviceType();
       defineColumn_BatteryState_Level();
       defineColumn_BatteryState_Status();
@@ -876,6 +882,25 @@ public class SensorView extends ViewPart implements ITourViewer {
 
             final SensorItem sensorItem = (SensorItem) cell.getElement();
             cell.setText(sensorItem.sensor.getSensorKey_WithDevType());
+         }
+      });
+   }
+
+   /**
+    * Column: Number of tours
+    */
+   private void defineColumn_NumberOfTours() {
+
+      final ColumnDefinition colDef = TableColumnFactory.SENSOR_NUMBER_OF_TOURS.createColumn(_columnManager, _pc);
+
+      colDef.setColumnSelectionListener(_columnSortListener);
+
+      colDef.setLabelProvider(new CellLabelProvider() {
+         @Override
+         public void update(final ViewerCell cell) {
+
+            final SensorItem sensorItem = (SensorItem) cell.getElement();
+            cell.setText(Integer.toString(sensorItem.numTours));
          }
       });
    }
@@ -1218,66 +1243,31 @@ public class SensorView extends ViewPart implements ITourViewer {
 
       String sql;
 
-//      try (Connection conn = TourDatabase.getInstance().getConnection()) {
-//
-//         sql = UI.EMPTY_STRING
-//
-//               // get number of tours
-//               + " SELECT COUNT(*)" + NL //                                         //$NON-NLS-1$
-//               + " FROM" + NL //                                                    //$NON-NLS-1$
-//
-//               // get all device values which contain the selected device
-//               + " (" + NL //                                                       //$NON-NLS-1$
-//
-//               + " SELECT " + NL //                                                 //$NON-NLS-1$
-//               + "  DISTINCT TOURDATA_TourID," + NL //                              //$NON-NLS-1$
-//               + "  DEVICESENSOR_SensorID" + NL //                                  //$NON-NLS-1$
-//
-//               + "  FROM " + TourDatabase.TABLE_DEVICE_SENSOR_VALUE + NL //         //$NON-NLS-1$
-//               + "  WHERE DEVICESENSOR_SensorID = ?" + NL //                        //$NON-NLS-1$
-//
-//               + " ) TourId" + NL //                                                //$NON-NLS-1$
-//         ;
-//
-//         final PreparedStatement stmt = conn.prepareStatement(sql);
-//
-//         stmt.setLong(1, selectedSensor.getSensorId());
-//
-//         final ResultSet result = stmt.executeQuery();
-//
-//         // get first result
-//         result.next();
-//
-//         // get first value
-//         numberOfTours = result.getInt(1);
-//
-//      } catch (final SQLException e) {
-//         SQL.showException(e, sql);
-//      }
-
       try (Connection conn = TourDatabase.getInstance().getConnection()) {
 
          /*
           * Set used start/end time
           */
-          sql = UI.EMPTY_STRING
+         sql = UI.EMPTY_STRING
 
-               + "SELECT" + NL //                                                //$NON-NLS-1$
+               + "SELECT" + NL //                                                   //$NON-NLS-1$
 
-                + "  DEVICESENSOR_SensorID      ," + NL //                    1  //$NON-NLS-1$
+               + "   DEVICESENSOR_SensorID         ," + NL //                    1  //$NON-NLS-1$
 
-               + "   Min(TourStartTime)         ," + NL //                    2  //$NON-NLS-1$
-               + "   Max(TourStartTime)         ," + NL //                    3  //$NON-NLS-1$
+               + "   Min(TourStartTime)            ," + NL //                    2  //$NON-NLS-1$
+               + "   Max(TourStartTime)            ," + NL //                    3  //$NON-NLS-1$
 
-               + "   Max(BatteryLevel_Start)    ," + NL //                    4  //$NON-NLS-1$
-               + "   Max(BatteryLevel_End)      ," + NL //                    5  //$NON-NLS-1$
-               + "   Max(BatteryStatus_Start)   ," + NL //                    6  //$NON-NLS-1$
-               + "   Max(BatteryStatus_End)     ," + NL //                    7  //$NON-NLS-1$
-               + "   Max(BatteryVoltage_Start)  ," + NL //                    8  //$NON-NLS-1$
-               + "   Max(BatteryVoltage_End)     " + NL //                    9  //$NON-NLS-1$
+               + "   Max(BatteryLevel_Start)       ," + NL //                    4  //$NON-NLS-1$
+               + "   Max(BatteryLevel_End)         ," + NL //                    5  //$NON-NLS-1$
+               + "   Max(BatteryStatus_Start)      ," + NL //                    6  //$NON-NLS-1$
+               + "   Max(BatteryStatus_End)        ," + NL //                    7  //$NON-NLS-1$
+               + "   Max(BatteryVoltage_Start)     ," + NL //                    8  //$NON-NLS-1$
+               + "   Max(BatteryVoltage_End)       ," + NL //                    9  //$NON-NLS-1$
 
-               + "FROM " + TourDatabase.TABLE_DEVICE_SENSOR_VALUE + NL //        //$NON-NLS-1$
-                + "GROUP BY DEVICESENSOR_SensorID" + NL //                        //$NON-NLS-1$
+               + "   COUNT(DEVICESENSOR_SensorID)  " + NL //                     10 //$NON-NLS-1$
+
+               + "FROM " + TourDatabase.TABLE_DEVICE_SENSOR_VALUE + NL //           //$NON-NLS-1$
+               + "GROUP BY DEVICESENSOR_SensorID" + NL //                           //$NON-NLS-1$
          ;
 
          statementMinMax = conn.prepareStatement(sql);
@@ -1306,14 +1296,18 @@ public class SensorView extends ViewPart implements ITourViewer {
                final float dbMaxVoltage_Start   = resultMinMax.getFloat(8);
                final float dbMaxVoltage_End     = resultMinMax.getFloat(9);
 
+               final int dbNumSensorValues      = resultMinMax.getInt(10);
+
+               sensorItem.usedFirstTime               = dbUsedFirstTime;
+               sensorItem.usedLastTime                = dbUsedLastTime;
+
+               sensorItem.isBatteryLevelAvailable     = dbMaxLevel_Start > 0 || dbMaxLevel_End > 0;
+               sensorItem.isBatteryStatusAvailable    = dbMaxStatus_Start > 0 || dbMaxStatus_End > 0;
+               sensorItem.isBatteryVoltageAvailable   = dbMaxVoltage_Start > 0 || dbMaxVoltage_End > 0;
+
+               sensorItem.numTours                    = dbNumSensorValues;
+               
 // SET_FORMATTING_ON
-
-               sensorItem.usedFirstTime = dbUsedFirstTime;
-               sensorItem.usedLastTime = dbUsedLastTime;
-
-               sensorItem.isBatteryLevelAvailable = dbMaxLevel_Start > 0 || dbMaxLevel_End > 0;
-               sensorItem.isBatteryStatusAvailable = dbMaxStatus_Start > 0 || dbMaxStatus_End > 0;
-               sensorItem.isBatteryVoltageAvailable = dbMaxVoltage_Start > 0 || dbMaxVoltage_End > 0;
             }
          }
 
