@@ -473,7 +473,7 @@ public class MesgListener_DeviceInfo extends AbstractMesgListener implements Dev
       }
 
       if (StringUtils.hasContent(mesgProductName)) {
-         deviceSensorImport.productName = mesgProductName;
+         deviceSensorImport.setProductName(mesgProductName);
       }
 
       if (mesgGarminProduct != null) {

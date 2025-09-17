@@ -455,9 +455,9 @@ public class Messages extends NLS {
    public static String        ColumnFactory_Sensor_BatteryState_Voltage_Header;
    public static String        ColumnFactory_Sensor_BatteryState_Voltage_Label;
    public static String        ColumnFactory_Sensor_Description;
-   public static String        ColumnFactory_Sensor_FitDeviceType_Header;
-   public static String        ColumnFactory_Sensor_FitDeviceType_Label;
-   public static String        ColumnFactory_Sensor_FitDeviceType_Tooltip;
+   public static String        ColumnFactory_Sensor_DeviceType_Header;
+   public static String        ColumnFactory_Sensor_DeviceType_Label;
+   public static String        ColumnFactory_Sensor_DeviceType_Tooltip;
    public static String        ColumnFactory_Sensor_ManufacturerName;
    public static String        ColumnFactory_Sensor_ManufacturerNumber;
    public static String        ColumnFactory_Sensor_ManufacturerNumber_Header;

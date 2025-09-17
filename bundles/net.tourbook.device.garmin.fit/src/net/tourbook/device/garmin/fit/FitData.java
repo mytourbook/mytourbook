@@ -703,85 +703,39 @@ public class FitData {
 
    private void finalizeTour_Sensor_30_UpdateSensorKeyValues(final DeviceSensor deviceSensor,
                                                              final DeviceSensorImport importedSensor) {
-      // TODO Auto-generated method stub
 
 // SET_FORMATTING_OFF
 
-      final Short    deviceType              = importedSensor.deviceType;
-      final Integer  productNumber           = importedSensor.productNumber;
-      final String   productName             = importedSensor.productName;
-      final Integer  manufacturerNumber      = importedSensor.manufacturerNumber;
-      final String   serialNumber            = importedSensor.serialNumber;
+      final Short    importedDeviceType      = importedSensor.deviceType;
+//    final Integer  manufacturerNumber      = importedSensor.manufacturerNumber;
+//    final Integer  productNumber           = importedSensor.productNumber;
+//    final String   productName             = importedSensor.productName;
+//    final String   serialNumber            = importedSensor.serialNumber;
 
-      final String   manufacturerName        = Manufacturer .getStringFromValue(manufacturerNumber);
+//    final String   manufacturerName        = Manufacturer.getStringFromValue(manufacturerNumber);
 
 // SET_FORMATTING_ON
 
-   }
+      boolean isSensorUpdated = false;
 
-   /**
-    * It is possible that a manufacturer/product number is null/-1, try to set the sensor
-    * manufacturer/product number/name from another tour
-    *
-    * @param sensor
-    * @param mesgManufacturerNumber
-    * @param mesgProductNumber
-    * @param mesgProductName
-    * @param mesgGarminProductNumber
-    * @param antplusDeviceTypeName
-    */
-   private void finalizeTour_Sensor_41_UpdateSensorKeyValues(final DeviceSensor sensor,
-                                                             final Integer mesgManufacturerNumber,
-                                                             final Integer mesgProductNumber,
-                                                             final String mesgProductName,
-                                                             final Integer mesgGarminProductNumber,
-                                                             final String antplusDeviceTypeName) {
+      if (deviceSensor.getDeviceType() == -1) {
 
-      boolean isProductUpdated = false;
-      boolean isManufacturerUpdated = false;
-
-      if (true
-
-            // manufacturer number is available
-            && mesgManufacturerNumber != null &&
-
-            // manufacturer number is not yet set in the sensor
-            sensor.getManufacturerNumber() == -1) {
-
-         /*
-          * Update sensor (saved or not saved) entity
+         /**
+          * The sensor device type is not yet set, this sensor can from a MT version before the
+          * device type was introduced
           */
-         sensor.setManufacturerNumber(mesgManufacturerNumber);
-         sensor.setManufacturerName(getManufacturerName(mesgManufacturerNumber));
 
-         isManufacturerUpdated = true;
+         if (importedDeviceType != null) {
+
+            deviceSensor.setDeviceType(importedDeviceType);
+
+            isSensorUpdated = true;
+         }
       }
 
-      if (true
+      if (isSensorUpdated) {
 
-            // product number is available
-            && mesgProductNumber != null &&
-
-            // product number is not yet set in the sensor
-            sensor.getProductNumber() == -1) {
-
-         /*
-          * Update sensor (saved or not saved) entity
-          */
-         sensor.setProductNumber(mesgProductNumber);
-         sensor.setProductName(getProductNameCombined(
-
-               mesgProductNumber,
-               mesgProductName,
-               mesgGarminProductNumber,
-               antplusDeviceTypeName));
-
-         isProductUpdated = true;
-      }
-
-      if (isProductUpdated || isManufacturerUpdated) {
-
-         if (sensor.getSensorId() == TourDatabase.ENTITY_IS_NOT_SAVED) {
+         if (deviceSensor.getSensorId() == TourDatabase.ENTITY_IS_NOT_SAVED) {
 
             /**
              * Nothing to do, sensor will be saved when a tour is saved which contains this sensor
@@ -795,7 +749,7 @@ public class FitData {
              */
             final ConcurrentHashMap<String, DeviceSensor> allDeviceSensorsToBeUpdated = _importState_Process.getAllDeviceSensorsToBeUpdated();
 
-            allDeviceSensorsToBeUpdated.put(sensor.getSerialNumber(), sensor);
+            allDeviceSensorsToBeUpdated.put(deviceSensor.getSensorKey_WithDevType(), deviceSensor);
          }
       }
    }

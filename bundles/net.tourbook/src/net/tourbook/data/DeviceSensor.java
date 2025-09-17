@@ -172,23 +172,23 @@ public class DeviceSensor implements Cloneable, Serializable {
 
       // manufacturer
       if (manufacturerNumber != null) {
-         allKeys.add("Ma#" + manufacturerNumber);
+         allKeys.add("M#" + manufacturerNumber);
       }
       if (StringUtils.hasContent(manufacturerName)) {
-         allKeys.add("MaNm:" + manufacturerName);
+         allKeys.add("M:" + manufacturerName);
       }
 
       // product
       if (productNumber != null) {
-         allKeys.add("Pr#" + productNumber);
+         allKeys.add("P#" + productNumber);
       }
       if (StringUtils.hasContent(productName)) {
-         allKeys.add("PrNm:" + productName);
+         allKeys.add("P:" + productName);
       }
 
       // device
-      if (deviceType != null) {
-         allKeys.add("DvTy:" + deviceType);
+      if (deviceType != null && deviceType != -1) {
+         allKeys.add("Dev:" + deviceType);
       }
 
       // serial no
@@ -504,18 +504,20 @@ public class DeviceSensor implements Cloneable, Serializable {
 
       return "DeviceSensor" + NL //                                           //$NON-NLS-1$
 
-//            + "[" + NL //                                                   //$NON-NLS-1$
-
             + "      sensorName           = " + sensorName + NL //            //$NON-NLS-1$
             + "      sensorId             = " + sensorId + NL //              //$NON-NLS-1$
+
             + "      manufacturerNumber   = " + manufacturerNumber + NL //    //$NON-NLS-1$
             + "      manufacturerName     = " + manufacturerName + NL //      //$NON-NLS-1$
+
             + "      productNumber        = " + productNumber + NL //         //$NON-NLS-1$
             + "      productName          = " + productName + NL //           //$NON-NLS-1$
+
+            + "      deviceType           = " + deviceType + NL //           //$NON-NLS-1$
             + "      serialNumber         = " + serialNumber + NL //          //$NON-NLS-1$
+
             + "      _label               = " + getLabel() + NL //            //$NON-NLS-1$
 
-//            + "]" + NL //                                                   //$NON-NLS-1$
       ;
    }
 

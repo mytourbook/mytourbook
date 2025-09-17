@@ -812,15 +812,10 @@ public class RawDataManager {
     * <p>
     * Use an already created sensor or create a new device sensor and keep it in
     * {@link #_allImported_NewDeviceSensors}
+    * <p>
+    * New sensors are saved in {@link TourDatabase#saveTransientInstances_Sensors(TourData)}
     *
     * @param importedSensor
-    *
-    * @param manufacturerNumber
-    * @param manufacturerName
-    * @param productNumber
-    * @param productName
-    * @param serialNumber
-    * @param deviceType
     *
     * @return Returns a new or existing device sensor
     */
@@ -830,13 +825,12 @@ public class RawDataManager {
 
 // SET_FORMATTING_OFF
 
-      final Short    deviceType              = importedSensor.deviceType;
       final Integer  productNumber           = importedSensor.productNumber;
-      final String   productName             = importedSensor.productName;
+      final String   productName             = importedSensor.getProductName();
       final Integer  manufacturerNumber      = importedSensor.manufacturerNumber;
+      final String   manufacturerName        = importedSensor.getManufacturerName();
+      final Short    deviceType              = importedSensor.deviceType;
       final String   serialNumber            = importedSensor.serialNumber;
-
-      final String   manufacturerName        = Manufacturer.getStringFromValue(manufacturerNumber);
 
 // SET_FORMATTING_ON
 
@@ -863,7 +857,8 @@ public class RawDataManager {
             null);
 
       /*
-       * Check newly imported sensors
+       * Check newly imported sensors, new sensors will be created also with a device type in the
+       * key
        */
       final DeviceSensor newDeviceSensor = _allImported_NewDeviceSensors.get(sensorKey_WithDevType);
       if (newDeviceSensor != null) {

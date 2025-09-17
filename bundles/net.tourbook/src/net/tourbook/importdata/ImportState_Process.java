@@ -15,7 +15,6 @@
  *******************************************************************************/
 package net.tourbook.importdata;
 
-import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -118,7 +117,7 @@ public class ImportState_Process {
    /**
     * OUT state:
     * <p>
-    * Device sensors which must be updated in the db, key is the device key
+    * Device sensors which must be updated in the db, key is the sensor key
     */
    private ConcurrentHashMap<String, DeviceSensor> _allDeviceSensorToBeUpdated    = new ConcurrentHashMap<>();
 
@@ -135,13 +134,19 @@ public class ImportState_Process {
    }
 
    /**
+    * OUT state:
+    *
+    * Device sensors which must be updated in the db, key is the sensor key
+    *
     * @return Returns {@link #_allDeviceSensorToBeUpdated}
     */
    public ConcurrentHashMap<String, DeviceSensor> getAllDeviceSensorsToBeUpdated() {
+
       return _allDeviceSensorToBeUpdated;
    }
 
    public long getImportId() {
+
       return _importId;
    }
 
@@ -154,6 +159,7 @@ public class ImportState_Process {
     * @return
     */
    public AtomicBoolean isCreated_NewTag() {
+
       return _isCreated_NewTag;
    }
 
@@ -352,9 +358,7 @@ public class ImportState_Process {
 
       try {
 
-         for (final Entry<String, DeviceSensor> entrySet : _allDeviceSensorToBeUpdated.entrySet()) {
-
-            final DeviceSensor sensor = entrySet.getValue();
+         for (final DeviceSensor sensor : _allDeviceSensorToBeUpdated.values()) {
 
             ts.begin();
             {
@@ -364,11 +368,15 @@ public class ImportState_Process {
          }
 
       } catch (final Exception e) {
+
          StatusUtil.showStatus(e);
+
       } finally {
+
          if (ts.isActive()) {
             ts.rollback();
          }
+
          em.close();
       }
    }

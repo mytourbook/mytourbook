@@ -728,7 +728,7 @@ public class SensorView extends ViewPart implements ITourViewer {
       defineColumn_Sensor_Name();
       defineColumn_Sensor_Type();
       defineColumn_NumberOfTours();
-      defineColumn_FitDeviceType();
+      defineColumn_DeviceType();
       defineColumn_BatteryState_Level();
       defineColumn_BatteryState_Status();
       defineColumn_BatteryState_Voltage();
@@ -812,9 +812,9 @@ public class SensorView extends ViewPart implements ITourViewer {
    /**
     * Column: Fit data: device type
     */
-   private void defineColumn_FitDeviceType() {
+   private void defineColumn_DeviceType() {
 
-      final ColumnDefinition colDef = TableColumnFactory.SENSOR_FIT_DEVICE_TYPE.createColumn(_columnManager, _pc);
+      final ColumnDefinition colDef = TableColumnFactory.SENSOR_DEVICE_TYPE.createColumn(_columnManager, _pc);
 
       colDef.setColumnSelectionListener(_columnSortListener);
 
@@ -1306,7 +1306,7 @@ public class SensorView extends ViewPart implements ITourViewer {
                sensorItem.isBatteryVoltageAvailable   = dbMaxVoltage_Start > 0 || dbMaxVoltage_End > 0;
 
                sensorItem.numTours                    = dbNumSensorValues;
-               
+
 // SET_FORMATTING_ON
             }
          }
