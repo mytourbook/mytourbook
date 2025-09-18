@@ -46,6 +46,7 @@ import net.tourbook.data.DeviceSensorType;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.tour.ITourEventListener;
+import net.tourbook.tour.SelectionDeletedTours;
 import net.tourbook.tour.TourEventId;
 import net.tourbook.tour.TourManager;
 import net.tourbook.ui.TableColumnFactory;
@@ -83,6 +84,7 @@ import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.Widget;
+import org.eclipse.ui.ISelectionListener;
 import org.eclipse.ui.part.ViewPart;
 
 public class SensorView extends ViewPart implements ITourViewer {
@@ -99,6 +101,7 @@ public class SensorView extends ViewPart implements ITourViewer {
    private final IPreferenceStore  _prefStore_Common               = CommonActivator.getPrefStore();
    private final IDialogSettings   _state                          = TourbookPlugin.getState(ID);
 
+   private ISelectionListener      _postSelectionListener;
    private IPropertyChangeListener _prefChangeListener;
    private IPropertyChangeListener _prefChangeListener_Common;
    private ITourEventListener      _tourPropertyListener;
@@ -591,6 +594,23 @@ public class SensorView extends ViewPart implements ITourViewer {
       _prefStore_Common.addPropertyChangeListener(_prefChangeListener_Common);
    }
 
+   /**
+    * Listen for events when a selection is fired
+    */
+   private void addSelectionListener() {
+
+      _postSelectionListener = (part, selection) -> {
+
+         if (part == SensorView.this) {
+            return;
+         }
+
+         onSelectionChanged(selection);
+      };
+
+      getSite().getPage().addPostSelectionListener(_postSelectionListener);
+   }
+
    private void addTourEventListener() {
 
       _tourPropertyListener = (part, eventId, eventData) -> {
@@ -641,6 +661,7 @@ public class SensorView extends ViewPart implements ITourViewer {
 
       addPrefListener();
       addTourEventListener();
+      addSelectionListener();
 
       createActions();
       fillToolbar();
@@ -1073,6 +1094,8 @@ public class SensorView extends ViewPart implements ITourViewer {
 
       TourManager.getInstance().removeTourEventListener(_tourPropertyListener);
 
+      getSite().getPage().removePostSelectionListener(_postSelectionListener);
+
       super.dispose();
    }
 
@@ -1393,12 +1416,7 @@ public class SensorView extends ViewPart implements ITourViewer {
       // get index for selected sensor
       final int lastSensorIndex = table.getSelectionIndex();
 
-      // update model
-      TourDatabase.clearDeviceSensors();
-      loadAllSensors();
-
-      // update the viewer
-      updateUI_SetViewerInput();
+      reloadSensorViewer();
 
       // get next sensor
       SensorItem nextSensorItem = (SensorItem) _sensorViewer.getElementAt(lastSensorIndex);
@@ -1485,6 +1503,14 @@ public class SensorView extends ViewPart implements ITourViewer {
       _viewerContainer.setRedraw(true);
    }
 
+   private void onSelectionChanged(final ISelection selection) {
+
+      if (selection instanceof SelectionDeletedTours) {
+
+         reloadSensorViewer();
+      }
+   }
+
    private void onSensor_Select() {
 
       if (_isInUIUpdate) {
@@ -1532,6 +1558,16 @@ public class SensorView extends ViewPart implements ITourViewer {
       _sensorViewer.getTable().setFocus();
 
       return _sensorViewer;
+   }
+
+   private void reloadSensorViewer() {
+
+      // update model
+      TourDatabase.clearDeviceSensors();
+      loadAllSensors();
+
+      // update the viewer
+      updateUI_SetViewerInput();
    }
 
    @Override

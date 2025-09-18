@@ -74,9 +74,17 @@ public class DeviceSensor implements Cloneable, Serializable {
    private DeviceSensorType     sensorType            = DeviceSensorType.NONE;
 
    private String               manufacturerName;
+
+   /**
+    * -1 indicates that this value is not set
+    */
    private int                  manufacturerNumber;
 
    private String               productName;
+
+   /**
+    * -1 indicates that this value is not set
+    */
    private int                  productNumber;
 
    private String               serialNumber          = UI.EMPTY_STRING;
@@ -171,24 +179,24 @@ public class DeviceSensor implements Cloneable, Serializable {
       final List<Object> allKeys = new ArrayList<>();
 
       // manufacturer
-      if (manufacturerNumber != null) {
+      if (manufacturerNumber != null && manufacturerNumber != -1) {
          allKeys.add("M#" + manufacturerNumber);
       }
       if (StringUtils.hasContent(manufacturerName)) {
-         allKeys.add("M:" + manufacturerName);
+         allKeys.add("M-" + manufacturerName);
       }
 
       // product
-      if (productNumber != null) {
+      if (productNumber != null && productNumber != -1) {
          allKeys.add("P#" + productNumber);
       }
       if (StringUtils.hasContent(productName)) {
-         allKeys.add("P:" + productName);
+         allKeys.add("P-" + productName);
       }
 
       // device
       if (deviceType != null && deviceType != -1) {
-         allKeys.add("Dev:" + deviceType);
+         allKeys.add("Dev-" + deviceType);
       }
 
       // serial no
@@ -472,10 +480,6 @@ public class DeviceSensor implements Cloneable, Serializable {
       this.productName = productName;
 
       updateSensorLabel();
-   }
-
-   public void setProductNumber(final int productNumber) {
-      this.productNumber = productNumber;
    }
 
    public void setSensorName(final String label) {

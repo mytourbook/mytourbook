@@ -15,8 +15,6 @@
  *******************************************************************************/
 package net.tourbook.importdata;
 
-import com.garmin.fit.Manufacturer;
-
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
