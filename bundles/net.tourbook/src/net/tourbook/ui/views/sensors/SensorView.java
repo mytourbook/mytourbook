@@ -714,7 +714,7 @@ public class SensorView extends ViewPart implements ITourViewer {
       _sensorViewer.setContentProvider(new SensorContentProvider());
       _sensorViewer.setComparator(_sensorComparator);
 
-      _sensorViewer.addSelectionChangedListener(selectionChangedEvent -> onSensor_Select());
+      _sensorViewer.addSelectionChangedListener(selectionChangedEvent -> onSelectSensor());
       _sensorViewer.addDoubleClickListener(doubleClickEvent -> onAction_OpenSensorChart());
 
       updateUI_SetSortDirection(
@@ -1511,7 +1511,7 @@ public class SensorView extends ViewPart implements ITourViewer {
       }
    }
 
-   private void onSensor_Select() {
+   private void onSelectSensor() {
 
       if (_isInUIUpdate) {
          return;

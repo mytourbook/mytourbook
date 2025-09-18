@@ -39,6 +39,7 @@ New / Improvements
   
 * Sensor view
   - Show number of tours for each sensor  
+  - All associated tours for a selected sensor can be displayed in the tour book view
 
 
 Changes
