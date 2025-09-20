@@ -19,9 +19,11 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import net.tourbook.application.TourbookPlugin;
+import net.tourbook.common.UI;
 import net.tourbook.common.util.SQLData;
 import net.tourbook.data.TourPerson;
 import net.tourbook.tag.tour.filter.TourTagFilterManager;
@@ -327,6 +329,21 @@ public class SQLFilter {
    @Override
    public String toString() {
 
-      return _sqlWhereClause;
+      final int maxLen = 50;
+
+      final List<Object> parameters = _parameters != null
+            ? _parameters.subList(0, Math.min(_parameters.size(), maxLen))
+            : null;
+
+      return UI.EMPTY_STRING
+
+            + "SQLFilter" + NL //                                             //$NON-NLS-1$
+
+            + "_sqlWhereClause      = " + _sqlWhereClause + NL //             //$NON-NLS-1$
+            + "_isTagFilterActive   = " + _isTagFilterActive + NL //          //$NON-NLS-1$
+            + "_lastParameterIndex  = " + _lastParameterIndex + NL //         //$NON-NLS-1$
+
+            + "_parameters          = " + parameters + NL //                  //$NON-NLS-1$
+      ;
    }
 }

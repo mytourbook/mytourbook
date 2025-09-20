@@ -327,6 +327,12 @@ public class TourDatabase {
     * this prepared statement is '12'.
     */
    public static final String  SQL_ERROR_XCL13                            = "XCL13";                              //$NON-NLS-1$
+
+   /**
+    * ERROR XCL14: The column position '3' is out of range. The number of columns for this ResultSet
+    * is '2'.
+    */
+   public static final String  SQL_ERROR_XCL14                            = "XCL14";                              //$NON-NLS-1$
    //
    //
    private static volatile TourDatabase                   _instance;
