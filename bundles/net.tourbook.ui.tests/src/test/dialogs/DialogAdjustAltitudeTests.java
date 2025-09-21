@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2022, 2025 Frédéric Bard
+ * Copyright (C) 2022, 2023 Frédéric Bard
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -50,8 +50,6 @@ public class DialogAdjustAltitudeTests extends UITest {
 
       bot.button(Messages.adjust_altitude_btn_update_modified_tour).click();
       bot.toolbarButtonWithTooltip(Utils.SAVE_MODIFIED_TOUR).click();
-
-      bot.sleep(2000); // Wait for the elevation gain to be updated
 
       final SWTBotTreeItem tour = Utils.selectDuplicatedTour(bot);
       assertEquals(newElevationValue, tour.cell(tourBookView_ElevationGain_Column_Index));
