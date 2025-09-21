@@ -51,6 +51,8 @@ public class DialogAdjustAltitudeTests extends UITest {
       bot.button(Messages.adjust_altitude_btn_update_modified_tour).click();
       bot.toolbarButtonWithTooltip(Utils.SAVE_MODIFIED_TOUR).click();
 
+      bot.sleep(2000); // Wait for the elevation gain to be updated
+
       final SWTBotTreeItem tour = Utils.selectDuplicatedTour(bot);
       assertEquals(newElevationValue, tour.cell(tourBookView_ElevationGain_Column_Index));
 
