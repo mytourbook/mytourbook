@@ -399,7 +399,7 @@ public class SensorView extends ViewPart implements ITourViewer {
          }
 
          /*
-          * MUST return 1 or -1 otherwise long values are not sorted correctly.
+          * MUST return 1 or -1 otherwise long values are not sorted correctly
           */
          return rc > 0
                ? 1

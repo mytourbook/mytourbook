@@ -499,12 +499,7 @@ public class MesgListener_DeviceInfo extends AbstractMesgListener implements Dev
             || mesgBatteryStatus != null
             || mesgBatteryVoltage != null) {
 
-         DeviceSensorValueImport sensorValues = deviceSensorImport.sensorValues;
-
-         if (sensorValues == null) {
-
-            sensorValues = deviceSensorImport.sensorValues = new DeviceSensorValueImport();
-         }
+         final DeviceSensorValueImport sensorValues = deviceSensorImport.sensorValues;
 
          sensorValues.setBattery_Level(mesgBatteryLevel);
          sensorValues.setBattery_Status(mesgBatteryStatus);

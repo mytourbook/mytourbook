@@ -2966,7 +2966,7 @@ public class TourDatabase {
    }
 
    /**
-    * Persists an entity.
+    * Persists a new entity or merge an entity
     * <p>
     * This method is <b>much faster</b> than using this
     * {@link #saveEntity(Object, long, Class, EntityManager)}
@@ -3022,9 +3022,12 @@ public class TourDatabase {
 
       if (isSaved == false) {
 
-         MessageDialog.openError(Display.getDefault().getActiveShell(),
-               "Error", //$NON-NLS-1$
-               "Error occurred when saving entity: " + entity); //$NON-NLS-1$
+         Display.getDefault().asyncExec(() -> {
+
+            MessageDialog.openError(Display.getDefault().getActiveShell(),
+                  "Error", //$NON-NLS-1$
+                  "Error occurred when saving entity: " + entity); //$NON-NLS-1$
+         });
       }
 
       return savedEntity;
@@ -3081,8 +3084,8 @@ public class TourDatabase {
       }
 
       if (isSaved == false) {
-         MessageDialog.openError(
-               Display.getDefault().getActiveShell(),
+
+         MessageDialog.openError(Display.getDefault().getActiveShell(),
                "Error", //$NON-NLS-1$
                "Error occurred when saving an entity"); //$NON-NLS-1$
       }
@@ -3509,21 +3512,24 @@ public class TourDatabase {
     */
    private static void saveTransientInstances_Sensors(final TourData tourData) {
 
-      final Set<DeviceSensorValue> allTourData_SensorValues = tourData.getDeviceSensorValues();
+      final Set<DeviceSensorValue> allSensorValues = tourData.getDeviceSensorValues();
 
-      if (allTourData_SensorValues.isEmpty()) {
+      if (allSensorValues.isEmpty()) {
          return;
       }
 
-      final List<DeviceSensor> allNotSavedSensors = new ArrayList<>();
+      synchronized (TRANSIENT_LOCK) {
 
-      saveTransientInstances_Sensors_1_GetNotSaved(allTourData_SensorValues, allNotSavedSensors);
+         final List<DeviceSensor> allNotSavedSensors = new ArrayList<>();
 
-      if (allNotSavedSensors.size() > 0) {
+         saveTransientInstances_Sensors_1_GetNotSaved(allSensorValues, allNotSavedSensors);
 
-         // there are sensors which are not yet saved -> save new sensors
+         if (allNotSavedSensors.size() > 0) {
 
-         saveTransientInstances_Sensors_2_Save(allTourData_SensorValues, allNotSavedSensors);
+            // there are sensors which are not yet saved -> save new sensors
+
+            saveTransientInstances_Sensors_2_Save(allSensorValues, allNotSavedSensors);
+         }
       }
    }
 
@@ -3555,6 +3561,28 @@ public class TourDatabase {
    }
 
    /**
+    * <pre>
+    *
+    * org.hibernate.PersistentObjectException: detached entity passed to persist: net.tourbook.data.DeviceSensor
+    * 	at org.hibernate.event.def.DefaultPersistEventListener.onPersist(DefaultPersistEventListener.java:102)
+    * 	at org.hibernate.event.def.DefaultPersistEventListener.onPersist(DefaultPersistEventListener.java:61)
+    * 	at org.hibernate.impl.SessionImpl.firePersist(SessionImpl.java:646)
+    * 	at org.hibernate.impl.SessionImpl.persist(SessionImpl.java:620)
+    * 	at org.hibernate.impl.SessionImpl.persist(SessionImpl.java:624)
+    * 	at org.hibernate.ejb.AbstractEntityManagerImpl.persist(AbstractEntityManagerImpl.java:220)
+    * 	at net.tourbook.database.TourDatabase.saveEntity(TourDatabase.java:2999)
+    *
+    * 	at net.tourbook.database.TourDatabase.saveTransientInstances_Sensors_2_Save(TourDatabase.java:3588)
+    *
+    * 	at net.tourbook.database.TourDatabase.saveTransientInstances_Sensors(TourDatabase.java:3529)
+    * 	at net.tourbook.database.TourDatabase.saveTransientInstances(TourDatabase.java:3500)
+    * 	at net.tourbook.database.TourDatabase.saveTour_PreSaveActions(TourDatabase.java:3459)
+    * 	at net.tourbook.database.TourDatabase.saveTour_Concurrent(TourDatabase.java:3198)
+    * 	at net.tourbook.ui.views.rawData.RawDataView.saveImportedTours_20_Concurrent_OneTour(RawDataView.java:6619)
+    * 	at net.tourbook.ui.views.rawData.RawDataView.lambda$31(RawDataView.java:6579)
+    *
+    * </pre>
+    *
     * @param allTourData_SensorValues
     *           All sensor values in one tour
     * @param allNotSavedSensors
@@ -3563,100 +3591,97 @@ public class TourDatabase {
    private static void saveTransientInstances_Sensors_2_Save(final Set<DeviceSensorValue> allTourData_SensorValues,
                                                              final List<DeviceSensor> allNotSavedSensors) {
 
-      synchronized (TRANSIENT_LOCK) {
+      HashMap<Long, DeviceSensor> allDbSensors_BySensorID = new HashMap<>(getAllDeviceSensors_BySensorID());
+      HashMap<String, DeviceSensor> allDbSensors_BySensorKey_WithDevType = new HashMap<>(getAllDeviceSensors_BySensorKey_WithDevType());
 
-         HashMap<Long, DeviceSensor> allDbSensors_BySensorID = new HashMap<>(getAllDeviceSensors_BySensorID());
-         HashMap<String, DeviceSensor> allDbSensors_BySensorKey_WithDevType = new HashMap<>(getAllDeviceSensors_BySensorKey_WithDevType());
+      for (final DeviceSensor notSavedSensor : allNotSavedSensors) {
 
-         for (final DeviceSensor notSavedSensor : allNotSavedSensors) {
+         final String sensorKey_WithDevType = notSavedSensor.getSensorKey_WithDevType();
 
-            final String sensorKey_WithDevType = notSavedSensor.getSensorKey_WithDevType();
+         if (StringUtils.hasContent(sensorKey_WithDevType)) {
 
-            if (StringUtils.hasContent(sensorKey_WithDevType)) {
+            // sensor key WITH device type
 
-               // sensor key WITH device type
+            final DeviceSensor dbSensor = allDbSensors_BySensorKey_WithDevType.get(sensorKey_WithDevType);
 
-               final DeviceSensor dbSensor = allDbSensors_BySensorKey_WithDevType.get(sensorKey_WithDevType);
-
-               if (dbSensor == null) {
-
-                  // sensor is not yet in db -> create it
-
-                  saveEntity(notSavedSensor, ENTITY_IS_NOT_SAVED, DeviceSensor.class);
-               }
-
-            } else {
-
-               // sensor WITHOUT device type
-
-               final String tourData_SensorKey_NoDevType = notSavedSensor.getSensorKey_NoDevType();
-
-               boolean isSensorInDb = false;
-
-               for (final DeviceSensor dbSensor : allDbSensors_BySensorID.values()) {
-
-                  if (dbSensor.getSensorKey_NoDevType().equals(tourData_SensorKey_NoDevType)) {
-
-                     isSensorInDb = true;
-
-                     break;
-                  }
-               }
-
-               if (isSensorInDb == false) {
-
-                  // sensor is not yet in db -> create it
-
-                  saveEntity(notSavedSensor, ENTITY_IS_NOT_SAVED, DeviceSensor.class);
-               }
-            }
-         }
-
-         /*
-          * Replace sensor in sensor values to ensure that all sensor values contain valid sensors
-          */
-
-         // force to reload db sensors
-         clearDeviceSensors();
-         TourManager.getInstance().clearTourDataCache();
-
-         // RELOAD db sensors
-         allDbSensors_BySensorID = new HashMap<>(getAllDeviceSensors_BySensorID());
-         allDbSensors_BySensorKey_WithDevType = new HashMap<>(getAllDeviceSensors_BySensorKey_WithDevType());
-
-         // loop: all sensor values in a tour -> set sensor which is saved in the db
-         for (final DeviceSensorValue tourData_SensorValue : allTourData_SensorValues) {
-
-            final DeviceSensor tourData_Sensor = tourData_SensorValue.getDeviceSensor();
-
-            final String sensorKey_WithDevType = tourData_Sensor.getSensorKey_WithDevType();
-
-            DeviceSensor dbSensor = null;
-
-            // 1. Check WITH device type
-            if (StringUtils.hasContent(sensorKey_WithDevType)) {
-
-               dbSensor = allDbSensors_BySensorKey_WithDevType.get(sensorKey_WithDevType);
-            }
-
-            // 2. Check WITHOUT device type
             if (dbSensor == null) {
 
-               final String tourData_SensorKey_NoDevType = tourData_Sensor.getSensorKey_NoDevType();
+               // sensor is not yet in db -> create it
 
-               for (final DeviceSensor dbSensorByID : allDbSensors_BySensorID.values()) {
+               saveEntity(notSavedSensor, ENTITY_IS_NOT_SAVED, DeviceSensor.class);
+            }
 
-                  if (dbSensorByID.getSensorKey_NoDevType().equals(tourData_SensorKey_NoDevType)) {
+         } else {
 
-                     dbSensor = dbSensorByID;
+            // sensor WITHOUT device type
 
-                     break;
-                  }
+            final String tourData_SensorKey_NoDevType = notSavedSensor.getSensorKey_NoDevType();
+
+            boolean isSensorInDb = false;
+
+            for (final DeviceSensor dbSensor : allDbSensors_BySensorID.values()) {
+
+               if (dbSensor.getSensorKey_NoDevType().equals(tourData_SensorKey_NoDevType)) {
+
+                  isSensorInDb = true;
+
+                  break;
                }
             }
 
-            tourData_SensorValue.setDeviceSensor(dbSensor);
+            if (isSensorInDb == false) {
+
+               // sensor is not yet in db -> create it
+
+               saveEntity(notSavedSensor, ENTITY_IS_NOT_SAVED, DeviceSensor.class);
+            }
          }
+      }
+
+      /*
+       * Replace sensor in sensor values to ensure that all sensor values contain valid sensors
+       */
+
+      // force to reload db sensors
+      clearDeviceSensors();
+      TourManager.getInstance().clearTourDataCache();
+
+      // RELOAD db sensors
+      allDbSensors_BySensorID = new HashMap<>(getAllDeviceSensors_BySensorID());
+      allDbSensors_BySensorKey_WithDevType = new HashMap<>(getAllDeviceSensors_BySensorKey_WithDevType());
+
+      // loop: all sensor values in a tour -> set sensor which is saved in the db
+      for (final DeviceSensorValue tourData_SensorValue : allTourData_SensorValues) {
+
+         final DeviceSensor tourData_Sensor = tourData_SensorValue.getDeviceSensor();
+
+         final String sensorKey_WithDevType = tourData_Sensor.getSensorKey_WithDevType();
+
+         DeviceSensor dbSensor = null;
+
+         // 1. Check WITH device type
+         if (StringUtils.hasContent(sensorKey_WithDevType)) {
+
+            dbSensor = allDbSensors_BySensorKey_WithDevType.get(sensorKey_WithDevType);
+         }
+
+         // 2. Check WITHOUT device type
+         if (dbSensor == null) {
+
+            final String tourData_SensorKey_NoDevType = tourData_Sensor.getSensorKey_NoDevType();
+
+            for (final DeviceSensor dbSensorByID : allDbSensors_BySensorID.values()) {
+
+               if (dbSensorByID.getSensorKey_NoDevType().equals(tourData_SensorKey_NoDevType)) {
+
+                  dbSensor = dbSensorByID;
+
+                  break;
+               }
+            }
+         }
+
+         tourData_SensorValue.setDeviceSensor(dbSensor);
       }
    }
 
@@ -3698,7 +3723,7 @@ public class TourDatabase {
 
          if (dbTag == null) {
 
-            // tag not available -> create a new tag
+            // tag is not available -> create a new tag
 
             allNewTags.add(tourDataTag);
 

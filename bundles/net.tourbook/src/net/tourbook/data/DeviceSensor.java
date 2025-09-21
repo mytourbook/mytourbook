@@ -180,28 +180,28 @@ public class DeviceSensor implements Cloneable, Serializable {
 
       // manufacturer
       if (manufacturerNumber != null && manufacturerNumber != -1) {
-         allKeys.add("M#" + manufacturerNumber);
+         allKeys.add("M." + manufacturerNumber);
       }
       if (StringUtils.hasContent(manufacturerName)) {
-         allKeys.add("M-" + manufacturerName);
+         allKeys.add("M.." + manufacturerName);
       }
 
       // product
       if (productNumber != null && productNumber != -1) {
-         allKeys.add("P#" + productNumber);
+         allKeys.add("P." + productNumber);
       }
       if (StringUtils.hasContent(productName)) {
-         allKeys.add("P-" + productName);
+         allKeys.add("P.." + productName);
       }
 
       // device
       if (deviceType != null && deviceType != -1) {
-         allKeys.add("Dev-" + deviceType);
+         allKeys.add("Dev.." + deviceType);
       }
 
       // serial no
       if (StringUtils.hasContent(serialNumber)) {
-         allKeys.add("S#" + serialNumber);
+         allKeys.add("S." + serialNumber);
       }
 
       /*
@@ -506,21 +506,23 @@ public class DeviceSensor implements Cloneable, Serializable {
    @Override
    public String toString() {
 
-      return "DeviceSensor" + NL //                                           //$NON-NLS-1$
+      return "DeviceSensor" + NL //                                                    //$NON-NLS-1$
 
-            + "      sensorName           = " + sensorName + NL //            //$NON-NLS-1$
-            + "      sensorId             = " + sensorId + NL //              //$NON-NLS-1$
+            + "      sensorId                = " + sensorId + NL //                    //$NON-NLS-1$
+            + "      _sensorKey_WithDevType  = " + _sensorKey_WithDevType + NL //      //$NON-NLS-1$
 
-            + "      manufacturerNumber   = " + manufacturerNumber + NL //    //$NON-NLS-1$
-            + "      manufacturerName     = " + manufacturerName + NL //      //$NON-NLS-1$
+            + "      sensorName              = " + sensorName + NL //                  //$NON-NLS-1$
 
-            + "      productNumber        = " + productNumber + NL //         //$NON-NLS-1$
-            + "      productName          = " + productName + NL //           //$NON-NLS-1$
+            + "      manufacturerNumber      = " + manufacturerNumber + NL //          //$NON-NLS-1$
+            + "      manufacturerName        = " + manufacturerName + NL //            //$NON-NLS-1$
 
-            + "      deviceType           = " + deviceType + NL //           //$NON-NLS-1$
-            + "      serialNumber         = " + serialNumber + NL //          //$NON-NLS-1$
+            + "      productNumber           = " + productNumber + NL //               //$NON-NLS-1$
+            + "      productName             = " + productName + NL //                 //$NON-NLS-1$
 
-            + "      _label               = " + getLabel() + NL //            //$NON-NLS-1$
+            + "      deviceType              = " + deviceType + NL //                  //$NON-NLS-1$
+            + "      serialNumber            = " + serialNumber + NL //                //$NON-NLS-1$
+
+            + "      _label                  = " + getLabel() + NL //                  //$NON-NLS-1$
 
       ;
    }

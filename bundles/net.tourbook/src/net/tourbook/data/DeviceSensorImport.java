@@ -22,7 +22,7 @@ import net.tourbook.common.UI;
 
 public class DeviceSensorImport {
 
-   private static final char      NL = UI.NEW_LINE;
+   private static final char      NL           = UI.NEW_LINE;
 
    public long                    dateTime;
 
@@ -44,7 +44,11 @@ public class DeviceSensorImport {
    public String                  serialNumber;
    public Float                   softwareVersion;
 
-   public DeviceSensorValueImport sensorValues;
+   /**
+    * Set values for ANY sensor, to do not skip sensors, which have no sensor values at all,
+    * otherwise they are not displayed in the sensor view !!!
+    */
+   public DeviceSensorValueImport sensorValues = new DeviceSensorValueImport();
 
    public DeviceSensorImport(final Short deviceIndex) {
 
