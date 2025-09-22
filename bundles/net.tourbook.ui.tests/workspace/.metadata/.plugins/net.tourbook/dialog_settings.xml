@@ -205,6 +205,7 @@
 		<item key="STATE_SECTION_PERSONAL" value="true"/>
 		<item key="STATE_SECTION_TITLE" value="true"/>
 		<item key="STATE_SECTION_WEATHER" value="true"/>
+		<item key="STATE_IS_RECOMPUTE_ELEVATION_UP_DOWN" value="false"/>
 	</section>
 	<section name="net.tourbook.views.TourDataEditorView.swimSlice">
 		<item key="XML_STATE_COLUMN_MANAGER" value="&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;&#x0D;&#x0A;&lt;ColumnProfiles isShowCategory=&quot;true&quot; isShowColumnAnnotation_Formatting=&quot;false&quot; isShowColumnAnnotation_Sorting=&quot;false&quot;&gt;&#x0D;&#x0A;&lt;Profile isActiveProfile=&quot;true&quot; name=&quot;Column Profile&quot; visibleColumnIds=&quot;DATA_FIRST_COLUMN,DATA_SEQUENCE,SWIM__TIME_TOUR_TIME_HH_MM_SS,SWIM__SWIM_STROKES_PER_LENGTH,SWIM__SWIM_STROKE_RATE,SWIM__SWIM_STROKE_STYLE,&quot; visibleColumnIdsAndWidth=&quot;DATA_FIRST_COLUMN,0,DATA_SEQUENCE,48,SWIM__TIME_TOUR_TIME_HH_MM_SS,72,SWIM__SWIM_STROKES_PER_LENGTH,54,SWIM__SWIM_STROKE_RATE,54,SWIM__SWIM_STROKE_STYLE,54,&quot;&gt;&#x0D;&#x0A;&lt;Column columnId=&quot;DATA_FIRST_COLUMN&quot;/&gt;&#x0D;&#x0A;&lt;Column columnId=&quot;DATA_SEQUENCE&quot;/&gt;&#x0D;&#x0A;&lt;Column columnId=&quot;SWIM__TIME_TOUR_TIME_HH_MM_SS&quot;/&gt;&#x0D;&#x0A;&lt;Column columnId=&quot;SWIM__SWIM_STROKES_PER_LENGTH&quot;/&gt;&#x0D;&#x0A;&lt;Column columnId=&quot;SWIM__SWIM_STROKE_RATE&quot;/&gt;&#x0D;&#x0A;&lt;Column columnId=&quot;SWIM__SWIM_STROKE_STYLE&quot;/&gt;&#x0D;&#x0A;&lt;/Profile&gt;&#x0D;&#x0A;&lt;/ColumnProfiles&gt;"/>
