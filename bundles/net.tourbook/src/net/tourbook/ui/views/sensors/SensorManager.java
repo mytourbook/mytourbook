@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2023 Wolfgang Schramm and Contributors
+ * Copyright (C) 2023, 2025 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -15,16 +15,28 @@
  *******************************************************************************/
 package net.tourbook.ui.views.sensors;
 
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.ArrayList;
+
 import net.tourbook.Messages;
 import net.tourbook.OtherMessages;
 import net.tourbook.common.UI;
+import net.tourbook.common.util.StatusUtil;
+import net.tourbook.common.util.Util;
 import net.tourbook.common.widgets.ComboEnumEntry;
+import net.tourbook.data.DeviceSensor;
 import net.tourbook.data.DeviceSensorType;
+import net.tourbook.database.TourDatabase;
 
 /**
  * Manage device sensors
  */
 public class SensorManager {
+
+   private static final char               NL = UI.NEW_LINE;
 
    public static final ComboEnumEntry<?>[] ALL_SENSOR_TYPES;
 
@@ -45,6 +57,9 @@ public class SensorManager {
             new ComboEnumEntry<>(Messages.Sensor_Type_PowerMeter,       DeviceSensorType.POWER_METER),
             new ComboEnumEntry<>(Messages.Sensor_Type_Wind,             DeviceSensorType.WIND),
             new ComboEnumEntry<>(Messages.Sensor_Type_Radar,            DeviceSensorType.RADAR),
+
+            new ComboEnumEntry<>(Messages.Sensor_Type_LightFront,       DeviceSensorType.LIGHT_FRONT),
+            new ComboEnumEntry<>(Messages.Sensor_Type_LightRear,        DeviceSensorType.LIGHT_REAR),
 
             new ComboEnumEntry<>(Messages.Sensor_Type_Other,            DeviceSensorType.OTHER),
       };
@@ -75,6 +90,7 @@ public class SensorManager {
 
    /**
     * @param requestedSensorType
+    *
     * @return Returns a UI name of the sensor type
     */
    public static String getSensorTypeName(final Enum<DeviceSensorType> requestedSensorType) {
@@ -94,5 +110,52 @@ public class SensorManager {
       }
 
       return Messages.App_Label_NotAvailable;
+   }
+
+   /**
+    * @param deviceSensor
+    *
+    * @return Returns a list with all tour id's which are containing the device sensor
+    */
+   public static ArrayList<Long> getToursWithSensor(final DeviceSensor deviceSensor) {
+
+      final ArrayList<Long> allTourIds = new ArrayList<>();
+
+      final String sql = UI.EMPTY_STRING
+
+            + "SELECT" + NL //                                          //$NON-NLS-1$
+            + "   DISTINCT TOURDATA_TOURID," + NL //                    //$NON-NLS-1$
+            + "   DEVICESENSOR_SENSORID" + NL //                        //$NON-NLS-1$
+
+            + "FROM DEVICESENSORVALUE " + NL //                         //$NON-NLS-1$
+
+            + "WHERE DEVICESENSOR_SENSORID = ?" + NL //                 //$NON-NLS-1$
+      ;
+
+      PreparedStatement statement = null;
+
+      try (Connection conn = TourDatabase.getInstance().getConnection()) {
+
+         statement = conn.prepareStatement(sql);
+
+         statement.setLong(1, deviceSensor.getSensorId());
+
+         final ResultSet result = statement.executeQuery();
+
+         while (result.next()) {
+            allTourIds.add(result.getLong(1));
+         }
+
+      } catch (final SQLException e) {
+
+         StatusUtil.logError(sql);
+         UI.showSQLException(e);
+
+      } finally {
+
+         Util.closeSql(statement);
+      }
+
+      return allTourIds;
    }
 }

@@ -82,6 +82,7 @@ public class PrefPageImportFit extends PreferencePage implements IWorkbenchPrefe
    private Button     _chkFitImportTourType;
    private Button     _chkIgnoreLastMarker;
    private Button     _chkIgnoreSpeedValues;
+   private Button     _chkLogSensorData;
    private Button     _chkRemoveExceededDuration;
    private Button     _chkSetTourTitleFromFileName;
 
@@ -180,6 +181,15 @@ public class PrefPageImportFit extends PreferencePage implements IWorkbenchPrefe
             _chkSetTourTitleFromFileName = new Button(container, SWT.CHECK);
             _chkSetTourTitleFromFileName.setText(Messages.PrefPage_Fit_Checkbox_SetTourTitleFromImportFileName);
             _chkSetTourTitleFromFileName.addSelectionListener(_defaultSelectionListener);
+         }
+         {
+            /*
+             * Log sensor data
+             */
+            _chkLogSensorData = new Button(container, SWT.CHECK);
+            _chkLogSensorData.setText(Messages.PrefPage_Fit_Checkbox_LogSensorData);
+            _chkLogSensorData.setToolTipText(Messages.PrefPage_Fit_Checkbox_LogSensorData_Tooltip);
+            _chkLogSensorData.addSelectionListener(_defaultSelectionListener);
          }
       }
 
@@ -560,6 +570,7 @@ public class PrefPageImportFit extends PreferencePage implements IWorkbenchPrefe
 
       if (selectedTab == TAB_FOLDER_COMMON) {
 
+         _chkLogSensorData.setSelection(_prefStore.getDefaultBoolean(IPreferences.FIT_IS_LOG_SENSOR_VALUES));
          _chkSetTourTitleFromFileName.setSelection(_prefStore.getDefaultBoolean(IPreferences.FIT_IS_SET_TOUR_TITLE_FROM_FILE_NAME));
 
       } else if (selectedTab == TAB_FOLDER_SPEED) {
@@ -623,6 +634,7 @@ public class PrefPageImportFit extends PreferencePage implements IWorkbenchPrefe
    private void restoreState() {
 
       // common
+      _chkLogSensorData.setSelection(_prefStore.getBoolean(IPreferences.FIT_IS_LOG_SENSOR_VALUES));
       _chkSetTourTitleFromFileName.setSelection(_prefStore.getBoolean(IPreferences.FIT_IS_SET_TOUR_TITLE_FROM_FILE_NAME));
 
       // speed
@@ -669,6 +681,7 @@ public class PrefPageImportFit extends PreferencePage implements IWorkbenchPrefe
    private void saveState() {
 
       // common
+      _prefStore.setValue(IPreferences.FIT_IS_LOG_SENSOR_VALUES, _chkLogSensorData.getSelection());
       _prefStore.setValue(IPreferences.FIT_IS_SET_TOUR_TITLE_FROM_FILE_NAME, _chkSetTourTitleFromFileName.getSelection());
 
       // speed

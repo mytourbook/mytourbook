@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2023 Wolfgang Schramm and Contributors
+ * Copyright (C) 2023, 2025 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -107,46 +107,6 @@ public class DeviceSensorValue implements Serializable {
       _createId = _createCounter.incrementAndGet();
    }
 
-   /**
-    * Ensure that the start value is larger than the end value, it happend that they are reverted.
-    */
-   @SuppressWarnings("unused")
-   private void checkBatteryLevel_StartEnd() {
-
-      final short start = batteryLevel_Start;
-      final short end = batteryLevel_End;
-
-      if (start == -1 || end == -1) {
-         return;
-      }
-
-      if (end > start) {
-
-         batteryLevel_Start = end;
-         batteryLevel_End = start;
-      }
-   }
-
-   /**
-    * Ensure that the start value is larger than the end value, it happend that they are reverted.
-    */
-   @SuppressWarnings("unused")
-   private void checkBatteryVoltage_StartEnd() {
-
-      final float start = batteryVoltage_Start;
-      final float end = batteryVoltage_End;
-
-      if (start == -1 || end == -1) {
-         return;
-      }
-
-      if (end > start) {
-
-         batteryVoltage_Start = end;
-         batteryVoltage_End = start;
-      }
-   }
-
    @Override
    public boolean equals(final Object obj) {
 
@@ -250,88 +210,6 @@ public class DeviceSensorValue implements Serializable {
       }
 
       return false;
-   }
-
-   public void setBattery_Level(final Short batteryLevel) {
-
-      if (batteryLevel == null) {
-         return;
-      }
-
-      if (batteryLevel_Start == -1) {
-
-         // first set the start value
-
-         batteryLevel_Start = batteryLevel;
-
-      } else {
-
-         batteryLevel_End = batteryLevel;
-      }
-
-      /*
-       * Ensure that the start value is larger than the end value
-       */
-      if (batteryLevel_Start != -1 && batteryLevel_End != -1
-
-            && batteryLevel_End > batteryLevel_Start) {
-
-         final short batteryLevel_StartBackup = batteryLevel_Start;
-
-         batteryLevel_Start = batteryLevel_End;
-         batteryLevel_End = batteryLevel_StartBackup;
-      }
-   }
-
-   public void setBattery_Status(final Short batteryStatus) {
-
-      if (batteryStatus == null) {
-         return;
-      }
-
-      if (batteryStatus_Start == -1) {
-
-         // first set the start value
-
-         batteryStatus_Start = batteryStatus;
-
-      } else {
-
-         batteryStatus_End = batteryStatus;
-      }
-   }
-
-   public void setBattery_Voltage(final Float batteryVoltage) {
-
-      if (batteryVoltage == null || batteryVoltage == 0.0) {
-         return;
-      }
-
-      if (batteryVoltage_Start == -1) {
-
-         // first set the start value
-
-         batteryVoltage_Start = batteryVoltage;
-
-      } else {
-
-         batteryVoltage_End = batteryVoltage;
-      }
-
-      /*
-       * It happened, that the end value is larger than the start value -> this cannot be possible
-       * when riding a tour -> the sensor chart could hide bars because of the wrong min/max values
-       */
-      if (batteryVoltage_Start != -1 && batteryVoltage_End != -1
-
-            && batteryVoltage_End > batteryVoltage_Start) {
-
-         final float batteryVoltage_StartBackup = batteryVoltage_Start;
-
-         batteryVoltage_Start = batteryVoltage_End;
-         batteryVoltage_End = batteryVoltage_StartBackup;
-
-      }
    }
 
    /**

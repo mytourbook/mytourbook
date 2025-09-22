@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2025 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -30,7 +30,7 @@ public class SQLData {
    private static final char NL = UI.NEW_LINE;
 
    private String            _sqlString;
-   private ArrayList<Object> _parameters;
+   private ArrayList<Object> _allParameters;
 
    private int               _lastParameterIndex;
 
@@ -40,13 +40,14 @@ public class SQLData {
    public SQLData() {
 
       _sqlString = UI.EMPTY_STRING;
-      _parameters = new ArrayList<>();
+      _allParameters = new ArrayList<>();
    }
 
-   public SQLData(final String sqlString, final ArrayList<Object> parameters) {
+   public SQLData(final String sqlString,
+                  final ArrayList<Object> parameters) {
 
       _sqlString = sqlString;
-      _parameters = parameters;
+      _allParameters = parameters;
    }
 
    /**
@@ -58,7 +59,7 @@ public class SQLData {
    }
 
    public ArrayList<Object> getParameters() {
-      return _parameters;
+      return _allParameters;
    }
 
    public String getSqlString() {
@@ -73,14 +74,16 @@ public class SQLData {
     * @param statement
     * @param startIndex
     *           Sets the parameter start index, the first parameter is 1
+    *
     * @return Returns the next parameter index which is the last paramter index +1
+    *
     * @throws SQLException
     */
    public int setParameters(final PreparedStatement statement, final int startIndex) throws SQLException {
 
       int parameterIndex = startIndex;
 
-      for (final Object parameter : _parameters) {
+      for (final Object parameter : _allParameters) {
 
          if (parameter instanceof Long) {
 
@@ -119,13 +122,17 @@ public class SQLData {
    @Override
    public String toString() {
 
+      final int parameters = _allParameters == null ? 0 : _allParameters.size();
+
       return UI.EMPTY_STRING
 
-            + "SQLData [" + NL //                        //$NON-NLS-1$
+            + "SQLData" + NL //                                      //$NON-NLS-1$
 
-            + "_sqlString  =" + _sqlString + NL //       //$NON-NLS-1$
-            + "_parameters =" + _parameters + NL //      //$NON-NLS-1$
+            + "   hash           = " + this.hashCode() + NL //            //$NON-NLS-1$
+            + "   _sqlString     = " + _sqlString + NL //            //$NON-NLS-1$
+            + "   _allParameters = " + _allParameters + NL //        //$NON-NLS-1$
+            + "   num parameters = " + parameters + NL //            //$NON-NLS-1$
 
-            + "]"; //$NON-NLS-1$
+      ;
    }
 }

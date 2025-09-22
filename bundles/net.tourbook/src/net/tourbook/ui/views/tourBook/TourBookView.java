@@ -104,6 +104,8 @@ import net.tourbook.ui.views.rawData.ActionMergeTour;
 import net.tourbook.ui.views.rawData.ActionReimportTours;
 import net.tourbook.ui.views.rawData.SubMenu_AdjustTourValues;
 import net.tourbook.ui.views.referenceTour.TVIRefTour_ComparedTour;
+import net.tourbook.ui.views.sensors.SelectionSensor;
+import net.tourbook.ui.views.sensors.SensorManager;
 import net.tourbook.ui.views.tourBook.natTable.DataProvider_ColumnHeader;
 import net.tourbook.ui.views.tourBook.natTable.NatTable_DataLoader;
 import net.tourbook.ui.views.tourBook.natTable.NatTable_DummyColumnViewer;
@@ -1561,23 +1563,25 @@ public class TourBookView extends ViewPart implements
 
                   final List<Long> allTourIds = TourLocationManager.getToursWithLocations(allTourLocations);
 
-                  _selectedTourIds.clear();
-                  _selectedTourIds.addAll(allTourIds);
-
-                  _postSelectionProvider.clearSelection();
-
-                  if (_isLayoutNatTable) {
-
-                     reselectTourViewer_NatTable(false);
-
-                  } else {
-
-                     /**
-                      * !!! This do not yet support the tree viewer, it's too complex !!!
-                      */
-//                   reselectTourViewer_Tree();
-                  }
+                  selectTourIDs(allTourIds);
                }
+            }
+
+         } else if (tourEventId == TourEventId.SELECTION_SENSOR) {
+
+            if (eventData instanceof final SelectionSensor selectionSensor) {
+
+               // check if enabled
+               if (_actionLinkWithOtherViews.getSelection() == false) {
+
+                  // linking is disabled
+
+                  return;
+               }
+
+               final List<Long> allTourIds = SensorManager.getToursWithSensor(selectionSensor.getSensor());
+
+               selectTourIDs(allTourIds);
             }
          }
       };
@@ -4373,6 +4377,26 @@ public class TourBookView extends ViewPart implements
       });
    }
 
+   private void selectTourIDs(final List<Long> allTourIds) {
+
+      _selectedTourIds.clear();
+      _selectedTourIds.addAll(allTourIds);
+
+      _postSelectionProvider.clearSelection();
+
+      if (_isLayoutNatTable) {
+
+         reselectTourViewer_NatTable(false);
+
+      } else {
+
+         /**
+          * !!! This do not yet support the tree viewer, its too complex !!!
+          */
+//       reselectTourViewer_Tree();
+      }
+   }
+
    /**
     * Select tours (rows) in the NatTable by it's row positions, the selection is delayed that tours
     * are loaded ahead.
@@ -4386,15 +4410,34 @@ public class TourBookView extends ViewPart implements
     * @param isSetFocus
     *           When <code>true</code> then the focus is set to the NatTable
     */
-   void selectTours_NatTable(final int[] allRowPositions,
+   void selectTours_NatTable(int[] allRowPositions,
                              final boolean isClearSelection,
                              final boolean isScrollIntoView,
                              final boolean isFireSelection) {
 
+      final boolean areRowsNotAvailable =
+
+            allRowPositions == null
+                  || allRowPositions.length == 0
+                  || allRowPositions[0] == -1;
+
       // ensure there is something to be selected
-      if (allRowPositions == null || allRowPositions.length == 0 || allRowPositions[0] == -1) {
-         return;
+      if (areRowsNotAvailable) {
+
+         // there are no rows
+
+         if (isClearSelection) {
+
+            // create dummy row and clear the selection
+            allRowPositions = new int[] { -1 };
+
+         } else {
+
+            return;
+         }
       }
+
+      final int[] allRowPositions_Final = allRowPositions;
 
       _parent.getDisplay().asyncExec(() -> {
 
@@ -4402,56 +4445,67 @@ public class TourBookView extends ViewPart implements
             return;
          }
 
-         /*
-          * Prevent that _tourViewer_NatTable.setFocus() is firing a part selection which would
-          * case the 2D map crumb to show the last part selection
-          */
-         _postSelectionProvider.clearSelection();
-
-         // sort rows ascending
-         Arrays.sort(allRowPositions);
-
-         final int firstRowPosition = allRowPositions[0];
-
-         /*
-          * It took me hours to solve this issue, first deselect the old selection otherwise it
-          * was PRESERVED :-(((
-          */
-         if (isClearSelection) {
-            _natTable_Body_SelectionLayer.clear(false);
-         }
-
-         final SelectRowsCommand command = new SelectRowsCommand(
-               _natTable_Body_SelectionLayer,
-               0,
-               allRowPositions,
-               false,
-               true,
-               firstRowPosition);
-
-         final boolean isPreventSelection = isFireSelection == false;
-
-         if (isPreventSelection) {
-            _isInSelection = true;
-         }
-         {
-            _natTable_Body_SelectionLayer.doCommand(command);
-         }
-         if (isPreventSelection) {
-            _isInSelection = false;
-         }
-
-         if (isScrollIntoView) {
-
-            // show first selected row in the vertical middle, TODO# sometimes it is the top row
-
-            final int numVisibleRows = _natTable_Body_ViewportLayer.getRowCount();
-            final int scrollableRowCenterPosition = numVisibleRows / 2;
-            final int rowVerticalCenterPosition = firstRowPosition + scrollableRowCenterPosition;
-
-            _natTable_Body_ViewportLayer.moveRowPositionIntoViewport(rowVerticalCenterPosition);
-         }
+         selectTours_NatTable_Runnable(
+               allRowPositions_Final,
+               isClearSelection,
+               isScrollIntoView,
+               isFireSelection);
       });
+   }
+
+   private void selectTours_NatTable_Runnable(final int[] allRowPositions,
+                                              final boolean isClearSelection,
+                                              final boolean isScrollIntoView,
+                                              final boolean isFireSelection) {
+      /*
+       * Prevent that _tourViewer_NatTable.setFocus() is firing a part selection which would
+       * case the 2D map crumb to show the last part selection
+       */
+      _postSelectionProvider.clearSelection();
+
+      // sort rows ascending
+      Arrays.sort(allRowPositions);
+
+      final int firstRowPosition = allRowPositions[0];
+
+      /*
+       * It took me hours to solve this issue, first deselect the old selection otherwise it
+       * was PRESERVED :-(((
+       */
+      if (isClearSelection) {
+         _natTable_Body_SelectionLayer.clear(false);
+      }
+
+      final SelectRowsCommand command = new SelectRowsCommand(
+            _natTable_Body_SelectionLayer,
+            0,
+            allRowPositions,
+            false,
+            true,
+            firstRowPosition);
+
+      final boolean isPreventSelection = isFireSelection == false;
+
+      if (isPreventSelection) {
+         _isInSelection = true;
+      }
+      {
+         _natTable_Body_SelectionLayer.doCommand(command);
+      }
+      if (isPreventSelection) {
+         _isInSelection = false;
+      }
+
+      if (isScrollIntoView) {
+
+         // show first selected row in the vertical middle, TODO# sometimes it is the top row
+
+         final int numVisibleRows = _natTable_Body_ViewportLayer.getRowCount();
+         final int scrollableRowCenterPosition = numVisibleRows / 2;
+         final int rowVerticalCenterPosition = firstRowPosition + scrollableRowCenterPosition;
+
+         _natTable_Body_ViewportLayer.moveRowPositionIntoViewport(rowVerticalCenterPosition);
+      }
    }
 
    void setActionDeleteTour(final ActionDeleteTour actionDeleteTour) {

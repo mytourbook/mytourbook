@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2024 Wolfgang Schramm and Contributors
+ * Copyright (C) 2021, 2025 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -16,6 +16,8 @@
 package net.tourbook.data;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -72,12 +74,26 @@ public class DeviceSensor implements Cloneable, Serializable {
    private DeviceSensorType     sensorType            = DeviceSensorType.NONE;
 
    private String               manufacturerName;
+
+   /**
+    * -1 indicates that this value is not set
+    */
    private int                  manufacturerNumber;
 
    private String               productName;
+
+   /**
+    * -1 indicates that this value is not set
+    */
    private int                  productNumber;
 
    private String               serialNumber          = UI.EMPTY_STRING;
+
+   /**
+    * A sensor can have multiple device types with the same serial number, e.g. bike radar with
+    * light. -1 indicates that this value is not set.
+    */
+   private short                deviceType            = -1;
 
    /**
     * Serial number as long value, when parsing fails of {@link #serialNumber}, then
@@ -85,18 +101,6 @@ public class DeviceSensor implements Cloneable, Serializable {
     */
    @Transient
    private long                 _serialNumberLong     = Long.MAX_VALUE;
-
-   /**
-    * Time in ms when this sensor was first used
-    */
-   @Transient
-   private long                 usedStartTime;
-
-   /**
-    * Time in ms when this sensor was last used
-    */
-   @Transient
-   private long                 usedEndTime;
 
    @Transient
    private long                 _createId             = 0;
@@ -107,8 +111,18 @@ public class DeviceSensor implements Cloneable, Serializable {
    @Transient
    private String               _label;
 
+   /**
+    * Key is a combination of manufacturer/product/device type/serial number. The device type was
+    * introduced later, because a sensor can have multiple device types
+    */
    @Transient
-   private String               _sensorKeyByName;
+   private String               _sensorKey_WithDevType;
+
+   /**
+    * Key is a combination of manufacturer/product/serial number but without a device type
+    */
+   @Transient
+   private String               _sensorKey_NoDevType;
 
    /**
     * Default constructor used in EJB
@@ -121,7 +135,8 @@ public class DeviceSensor implements Cloneable, Serializable {
                        final int productNumber,
                        final String productName,
 
-                       final String serialNumber) {
+                       final String serialNumber,
+                       final short deviceType) {
 
       _createId = _createCounter.incrementAndGet();
 
@@ -132,48 +147,82 @@ public class DeviceSensor implements Cloneable, Serializable {
       this.productName = productName;
 
       this.serialNumber = serialNumber;
+      this.deviceType = deviceType;
    }
 
    /**
-    * Creates a device key by using it's name components. Normally a device is identified by it's
-    * serial number but some devices do not have it.
+    * Creates a unique key from different sensor values
     *
-    * @param manufacturerName
     * @param manufacturerNumber
+    * @param manufacturerName
+    *
     * @param productNumber
     * @param productName
     *
-    * @return
+    * @param serialNumber
+    * @param deviceType
+    *
+    * @return An empty string is returned when all key parts are <code>null</code> or empty
     */
-   public static String createSensorKeyByName(final String manufacturerName,
-                                              final int manufacturerNumber,
-                                              final int productNumber,
-                                              final String productName) {
+   public static String createSensorKey(final Integer manufacturerNumber,
+                                        final String manufacturerName,
 
+                                        final Integer productNumber,
+                                        final String productName,
+
+                                        final String serialNumber,
+                                        final Short deviceType) {
+
+      /*
+       * Collect all key parts
+       */
+      final List<Object> allKeys = new ArrayList<>();
+
+      // manufacturer
+      if (manufacturerNumber != null && manufacturerNumber != -1) {
+         allKeys.add("m_" + manufacturerNumber);
+      }
+      if (StringUtils.hasContent(manufacturerName)) {
+         allKeys.add("m__" + manufacturerName);
+      }
+
+      // product
+      if (productNumber != null && productNumber != -1) {
+         allKeys.add("p_" + productNumber);
+      }
+      if (StringUtils.hasContent(productName)) {
+         allKeys.add("p__" + productName);
+      }
+
+      // device
+      if (deviceType != null && deviceType != -1) {
+         allKeys.add("d_" + deviceType);
+      }
+
+      // serial no
+      if (StringUtils.hasContent(serialNumber)) {
+         allKeys.add("s_" + serialNumber);
+      }
+
+      /*
+       * Create key
+       */
       final StringBuilder sb = new StringBuilder();
 
-      if (StringUtils.hasContent(manufacturerName)) {
+      for (int keyIndex = 0; keyIndex < allKeys.size(); keyIndex++) {
 
-         sb.append(manufacturerName);
+         final Object object = allKeys.get(keyIndex);
 
-      } else {
+         // separate keys
+         if (keyIndex > 0) {
+            sb.append(UI.SPACE4);
+         }
 
-         sb.append(manufacturerNumber);
-
+         sb.append(object);
       }
 
-      sb.append(UI.DASH);
-
-      if (StringUtils.hasContent(productName)) {
-
-         sb.append(productName);
-
-      } else {
-
-         sb.append(productNumber);
-      }
-
-      return sb.toString();
+      // very important: keys are UPPERCASE
+      return sb.toString().toUpperCase();
    }
 
    @Override
@@ -232,16 +281,18 @@ public class DeviceSensor implements Cloneable, Serializable {
       return description;
    }
 
+   public short getDeviceType() {
+      return deviceType;
+   }
+
    /**
     * @return Returns a name which is containg info about the sensor type, manufacturer or product
     */
    public String getLabel() {
 
-      if (_label != null) {
-         return _label;
+      if (_label == null) {
+         updateSensorLabel();
       }
-
-      updateSensorLabel();
 
       return _label;
    }
@@ -270,19 +321,47 @@ public class DeviceSensor implements Cloneable, Serializable {
    }
 
    /**
-    * @return Returns a sensor key by using it's name components. Normally a device is identified by
-    *         it's serial number but some devices do not have it, they are identified by the sensor
-    *         names/numbers
-    *
+    * @return Returns a sensor key which has different components
     */
-   public String getSensorKeyByName() {
+   public String getSensorKey_NoDevType() {
 
-      if (_sensorKeyByName == null) {
+      if (_sensorKey_NoDevType == null) {
 
-         _sensorKeyByName = createSensorKeyByName(manufacturerName, manufacturerNumber, productNumber, productName);
+         _sensorKey_NoDevType = createSensorKey(
+
+               manufacturerNumber,
+               manufacturerName,
+
+               productNumber,
+               productName,
+
+               serialNumber,
+               null);
       }
 
-      return _sensorKeyByName;
+      return _sensorKey_NoDevType;
+   }
+
+   /**
+    * @return Returns a sensor key which has different components
+    */
+   public String getSensorKey_WithDevType() {
+
+      if (_sensorKey_WithDevType == null) {
+
+         _sensorKey_WithDevType = createSensorKey(
+
+               manufacturerNumber,
+               manufacturerName,
+
+               productNumber,
+               productName,
+
+               serialNumber,
+               deviceType);
+      }
+
+      return _sensorKey_WithDevType;
    }
 
    /**
@@ -328,14 +407,6 @@ public class DeviceSensor implements Cloneable, Serializable {
       }
 
       return _serialNumberLong;
-   }
-
-   public long getUsedEndTime() {
-      return usedEndTime;
-   }
-
-   public long getUsedStartTime() {
-      return usedStartTime;
    }
 
    @Override
@@ -388,6 +459,10 @@ public class DeviceSensor implements Cloneable, Serializable {
       this.description = description;
    }
 
+   public void setDeviceType(final short deviceType) {
+      this.deviceType = deviceType;
+   }
+
    public void setManufacturerName(final String manufacturerName) {
 
       this.manufacturerName = manufacturerName;
@@ -404,10 +479,6 @@ public class DeviceSensor implements Cloneable, Serializable {
       this.productName = productName;
 
       updateSensorLabel();
-   }
-
-   public void setProductNumber(final int productNumber) {
-      this.productNumber = productNumber;
    }
 
    public void setSensorName(final String label) {
@@ -428,36 +499,30 @@ public class DeviceSensor implements Cloneable, Serializable {
       this.serialNumber = serialNumber;
    }
 
-   public void setUsedEndTime(final long usedEndTime) {
-      this.usedEndTime = usedEndTime;
-   }
-
-   public void setUsedStartTime(final long usedStartTime) {
-      this.usedStartTime = usedStartTime;
-   }
-
    /**
     * This method is called in the MT UI in the "Tour Data" view
     */
    @Override
    public String toString() {
 
-      return "DeviceSensor" + NL //                                           //$NON-NLS-1$
+      return "DeviceSensor" + NL //                                                    //$NON-NLS-1$
 
-//            + "[" + NL //                                                   //$NON-NLS-1$
+            + "      sensorId                = " + sensorId + NL //                    //$NON-NLS-1$
+            + "      _sensorKey_WithDevType  = " + _sensorKey_WithDevType + NL //      //$NON-NLS-1$
 
-            + "      sensorName           = " + sensorName + NL //            //$NON-NLS-1$
-            + "      sensorId             = " + sensorId + NL //              //$NON-NLS-1$
-            + "      manufacturerNumber   = " + manufacturerNumber + NL //    //$NON-NLS-1$
-            + "      manufacturerName     = " + manufacturerName + NL //      //$NON-NLS-1$
-            + "      productNumber        = " + productNumber + NL //         //$NON-NLS-1$
-            + "      productName          = " + productName + NL //           //$NON-NLS-1$
-            + "      serialNumber         = " + serialNumber + NL //          //$NON-NLS-1$
-            + "      _sensorKeyByName     = " + _sensorKeyByName + NL //      //$NON-NLS-1$
-            + "      _label               = " + getLabel() + NL //            //$NON-NLS-1$
+            + "      sensorName              = " + sensorName + NL //                  //$NON-NLS-1$
 
-//            + "]" + NL //                                                   //$NON-NLS-1$
-      ;
+            + "      manufacturerNumber      = " + manufacturerNumber + NL //          //$NON-NLS-1$
+            + "      manufacturerName        = " + manufacturerName + NL //            //$NON-NLS-1$
+
+            + "      productNumber           = " + productNumber + NL //               //$NON-NLS-1$
+            + "      productName             = " + productName + NL //                 //$NON-NLS-1$
+
+            + "      deviceType              = " + deviceType + NL //                  //$NON-NLS-1$
+            + "      serialNumber            = " + serialNumber + NL //                //$NON-NLS-1$
+
+            + "      _label                  = " + getLabel() + NL //                  //$NON-NLS-1$
+            + NL;
    }
 
    /**
