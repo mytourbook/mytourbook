@@ -620,7 +620,12 @@ public class SensorView extends ViewPart implements ITourViewer {
          }
 
          if (eventId == TourEventId.UPDATE_UI
-               || eventId == TourEventId.ALL_TOURS_ARE_MODIFIED) {
+               || eventId == TourEventId.ALL_TOURS_ARE_MODIFIED
+
+         // this event is fired when tours are imported, this could change the sensor values
+               || eventId == TourEventId.CLEAR_DISPLAYED_TOUR
+
+         ) {
 
             // new tours could be imported with new sensors
 

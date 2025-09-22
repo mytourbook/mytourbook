@@ -151,7 +151,7 @@ public class DeviceSensor implements Cloneable, Serializable {
    }
 
    /**
-    * Creates a unique key from different sensor values.
+    * Creates a unique key from different sensor values
     *
     * @param manufacturerNumber
     * @param manufacturerName
@@ -180,28 +180,28 @@ public class DeviceSensor implements Cloneable, Serializable {
 
       // manufacturer
       if (manufacturerNumber != null && manufacturerNumber != -1) {
-         allKeys.add("M." + manufacturerNumber);
+         allKeys.add("m_" + manufacturerNumber);
       }
       if (StringUtils.hasContent(manufacturerName)) {
-         allKeys.add("M.." + manufacturerName);
+         allKeys.add("m__" + manufacturerName);
       }
 
       // product
       if (productNumber != null && productNumber != -1) {
-         allKeys.add("P." + productNumber);
+         allKeys.add("p_" + productNumber);
       }
       if (StringUtils.hasContent(productName)) {
-         allKeys.add("P.." + productName);
+         allKeys.add("p__" + productName);
       }
 
       // device
       if (deviceType != null && deviceType != -1) {
-         allKeys.add("Dev.." + deviceType);
+         allKeys.add("d_" + deviceType);
       }
 
       // serial no
       if (StringUtils.hasContent(serialNumber)) {
-         allKeys.add("S." + serialNumber);
+         allKeys.add("s_" + serialNumber);
       }
 
       /*
@@ -215,13 +215,14 @@ public class DeviceSensor implements Cloneable, Serializable {
 
          // separate keys
          if (keyIndex > 0) {
-            sb.append(UI.SYMBOL_DASH);
+            sb.append(UI.SPACE4);
          }
 
          sb.append(object);
       }
 
-      return sb.toString();
+      // very important: keys are UPPERCASE
+      return sb.toString().toUpperCase();
    }
 
    @Override
@@ -289,11 +290,9 @@ public class DeviceSensor implements Cloneable, Serializable {
     */
    public String getLabel() {
 
-      if (_label != null) {
-         return _label;
+      if (_label == null) {
+         updateSensorLabel();
       }
-
-      updateSensorLabel();
 
       return _label;
    }
@@ -523,8 +522,7 @@ public class DeviceSensor implements Cloneable, Serializable {
             + "      serialNumber            = " + serialNumber + NL //                //$NON-NLS-1$
 
             + "      _label                  = " + getLabel() + NL //                  //$NON-NLS-1$
-
-      ;
+            + NL;
    }
 
    /**

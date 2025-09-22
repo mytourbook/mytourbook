@@ -867,13 +867,15 @@ public class RawDataManager {
       /*
        * Check if sensor is still unavailable in the database
        */
-      DeviceSensor dbDeviceSensor = TourDatabase.getAllDeviceSensors_BySensorKey_WithDevType().get(sensorKey_WithDevType);
+      Map<String, DeviceSensor> allDeviceSensors_BySensorKey_WithDevType = TourDatabase.getAllDeviceSensors_BySensorKey_WithDevType();
+      DeviceSensor dbDeviceSensor = allDeviceSensors_BySensorKey_WithDevType.get(sensorKey_WithDevType);
       if (dbDeviceSensor != null) {
 
          return dbDeviceSensor;
       }
 
-      dbDeviceSensor = TourDatabase.getAllDeviceSensors_BySensorKey_NoDevType().get(sensorKey_NoDevType);
+      Map<String, DeviceSensor> allDeviceSensors_BySensorKey_NoDevType = TourDatabase.getAllDeviceSensors_BySensorKey_NoDevType();
+      dbDeviceSensor = allDeviceSensors_BySensorKey_NoDevType.get(sensorKey_NoDevType);
       if (dbDeviceSensor != null) {
 
          return dbDeviceSensor;

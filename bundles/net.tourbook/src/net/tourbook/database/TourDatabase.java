@@ -15,6 +15,7 @@
  *******************************************************************************/
 package net.tourbook.database;
 
+import com.garmin.fit.GarminProduct;
 import com.mchange.v2.c3p0.ComboPooledDataSource;
 import com.skedgo.converter.TimezoneMapper;
 
@@ -7007,6 +7008,9 @@ public class TourDatabase {
          updateDb__3_Data_Concurrent(conn, splashManager, new TourDataUpdate_051_to_052()); //     52 - 24.1
          updateDb__3_Data_Concurrent(conn, splashManager, new TourDataUpdate_053_to_054()); //     54 - 24.1
          updateDb__3_Data_Concurrent(conn, splashManager, new TourDataUpdate_057_to_058()); //     58 - 25.6
+
+         // this must be run BEFORE the subsequent update
+         updateDb_058_To_059_DataUpdate(conn, splashManager); //                                   59 - 25.??? after 25.6
          updateDb__3_Data_Concurrent(conn, splashManager, new TourDataUpdate_058_to_059()); //     59 - 25.??? after 25.6
 
       } catch (final SQLException e) {
@@ -11115,7 +11119,6 @@ public class TourDatabase {
       logDbUpdate_Start(newDbVersion);
       updateMonitor(splashManager, newDbVersion);
 
-      // this is a dummy db design update that the db data update works
       final Statement stmt = conn.createStatement();
       {
          // alter columns
@@ -11132,6 +11135,113 @@ public class TourDatabase {
       logDbUpdate_End(newDbVersion);
 
       return newDbVersion;
+   }
+
+   /**
+    * Replace device product name with the Garmin product name when the product name is a number
+    * which can be converted into a Garmin product name.
+    * <p>
+    * This method must be run BEFORE {@link TourDataUpdate_058_to_059} which is updating the version
+    * number !!!
+    *
+    * @param conn
+    * @param splashManager
+    *
+    * @throws SQLException
+    */
+   private void updateDb_058_To_059_DataUpdate(final Connection conn, final SplashManager splashManager) throws SQLException {
+
+      final int newDbDataVersion = 59;
+
+      if (getDbVersion(conn, TABLE_DB_VERSION_DATA) >= newDbDataVersion) {
+         // data version is higher -> nothing to do
+         return;
+      }
+
+      int numUpdatedSensors = 0;
+
+      EntityManager em = null;
+
+      try {
+
+         em = TourDatabase.getInstance().getEntityManager();
+         if (em != null) {
+
+            final Query emQuery = em.createQuery("SELECT DeviceSensor FROM DeviceSensor AS DeviceSensor"); //$NON-NLS-1$
+
+            final List<?> allResults = emQuery.getResultList();
+
+            for (final Object result : allResults) {
+
+               if (result instanceof final DeviceSensor sensor) {
+
+                  final int productNumber = sensor.getProductNumber();
+                  final String productName = sensor.getProductName();
+
+                  Integer productName_AsNumber = null;
+
+                  if (StringUtils.hasContent(productName)) {
+
+                     // get product number from product name
+
+                     try {
+
+                        productName_AsNumber = Integer.parseInt(productName);
+
+                     } catch (final Exception e) {
+                        // ignore
+                     }
+                  }
+
+                  if (productName_AsNumber != null && productName_AsNumber == productNumber) {
+
+                     // the product number is the product name -> try to get a device name
+
+                     final String garminProductName = GarminProduct.getStringFromValue(productNumber);
+
+                     if (StringUtils.hasContent(garminProductName)) {
+
+                        // a product name is found -> replace product name in the sensor
+
+                        sensor.setProductName(garminProductName);
+
+                        TourDatabase.saveEntity(sensor, sensor.getSensorId(), DeviceSensor.class);
+
+                        /*
+                         * Log sensor name change
+                         */
+                        if (numUpdatedSensors == 0) {
+                           System.out.println("updateDb_058_To_059_DataUpdate - Replacing sensor product names"); //$NON-NLS-1$
+                        }
+
+                        System.out.println("   Sensor product name %d -> %s ".formatted( //$NON-NLS-1$
+                              productName_AsNumber,
+                              garminProductName));
+
+                        numUpdatedSensors++;
+                     }
+                  }
+               }
+            }
+         }
+
+      } finally {
+
+         if (em != null) {
+            em.close();
+         }
+      }
+
+      if (numUpdatedSensors > 0) {
+
+         // force reload of all device sensors
+
+         clearDeviceSensors();
+      }
+
+      /**
+       * The db version update is done in TourDataUpdate_058_to_059
+       */
    }
 
    private void updateMonitor(final SplashManager splashManager, final int newDbVersion) {

@@ -46,15 +46,17 @@ Changes
 =======
 
 * Map properties view
-  This view is removed, its options are now available directly in the 2D map options slideout
-  https://github.com/mytourbook/mytourbook/issues/1543
+  - This view is removed, its options are now available directly in the 2D map options slideout
+    https://github.com/mytourbook/mytourbook/issues/1543
   
 * Elevation gain/loss
-  The elevation gain/loss values may have to be recomputed because these values will now be ignored during break times.  
-  https://github.com/mytourbook/mytourbook/issues/1545  
+  - The elevation gain/loss values may have to be recomputed because these values will now be ignored during break times.  
+    https://github.com/mytourbook/mytourbook/issues/1545  
 
 * Device sensors
-  This was a big rewrite to include also a device type because a sensor can have multiple device types.
+  - This was a big rewrite to include also a device type because a sensor can have multiple device types
+  - When a product name is the same as the product number, then the db update process tries to find a suitable Garmin device name
+  
 
 
 Changes that require Tour Re-import
