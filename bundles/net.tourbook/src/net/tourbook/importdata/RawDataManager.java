@@ -828,6 +828,7 @@ public class RawDataManager {
       final Integer  manufacturerNumber      = importedSensor.manufacturerNumber;
       final String   manufacturerName        = importedSensor.getManufacturerName();
       final Short    deviceType              = importedSensor.deviceType;
+      final String   deviceName              = importedSensor.getDeviceName();
       final String   serialNumber            = importedSensor.serialNumber;
 
 // SET_FORMATTING_ON
@@ -867,14 +868,14 @@ public class RawDataManager {
       /*
        * Check if sensor is still unavailable in the database
        */
-      Map<String, DeviceSensor> allDeviceSensors_BySensorKey_WithDevType = TourDatabase.getAllDeviceSensors_BySensorKey_WithDevType();
+      final Map<String, DeviceSensor> allDeviceSensors_BySensorKey_WithDevType = TourDatabase.getAllDeviceSensors_BySensorKey_WithDevType();
       DeviceSensor dbDeviceSensor = allDeviceSensors_BySensorKey_WithDevType.get(sensorKey_WithDevType);
       if (dbDeviceSensor != null) {
 
          return dbDeviceSensor;
       }
 
-      Map<String, DeviceSensor> allDeviceSensors_BySensorKey_NoDevType = TourDatabase.getAllDeviceSensors_BySensorKey_NoDevType();
+      final Map<String, DeviceSensor> allDeviceSensors_BySensorKey_NoDevType = TourDatabase.getAllDeviceSensors_BySensorKey_NoDevType();
       dbDeviceSensor = allDeviceSensors_BySensorKey_NoDevType.get(sensorKey_NoDevType);
       if (dbDeviceSensor != null) {
 
@@ -894,6 +895,8 @@ public class RawDataManager {
 
             serialNumber,
             deviceType == null ? -1 : deviceType);
+
+      newSensor.setDeviceName(deviceName);
 
       _allImported_NewDeviceSensors.put(sensorKey_WithDevType, newSensor);
 

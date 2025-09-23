@@ -56,6 +56,7 @@ Changes
 * Device sensors
   - This was a big rewrite to include also a device type because a sensor can have multiple device types
   - When a product name is the same as the product number, then the db update process tries to find a suitable Garmin device name
+  - When tours are imported or re-imported without saving the tours, this will update the sensor type and name for existing sensors, when these values are not yet set
   
 
 

@@ -73,19 +73,24 @@ public class DeviceSensor implements Cloneable, Serializable {
    @Enumerated(EnumType.STRING)
    private DeviceSensorType     sensorType            = DeviceSensorType.NONE;
 
-   private String               manufacturerName;
-
    /**
     * -1 indicates that this value is not set
     */
    private int                  manufacturerNumber;
 
-   private String               productName;
+   private String               manufacturerName;
 
    /**
     * -1 indicates that this value is not set
     */
    private int                  productNumber;
+
+   private String               productName;
+
+   /**
+    * Ant plus device name
+    */
+   private String               deviceName;
 
    private String               serialNumber          = UI.EMPTY_STRING;
 
@@ -281,6 +286,13 @@ public class DeviceSensor implements Cloneable, Serializable {
       return description;
    }
 
+   /**
+    * @return Ant plus device name
+    */
+   public String getDeviceName() {
+      return deviceName;
+   }
+
    public short getDeviceType() {
       return deviceType;
    }
@@ -457,6 +469,10 @@ public class DeviceSensor implements Cloneable, Serializable {
 
    public void setDescription(final String description) {
       this.description = description;
+   }
+
+   public void setDeviceName(final String deviceName) {
+      this.deviceName = deviceName;
    }
 
    public void setDeviceType(final short deviceType) {

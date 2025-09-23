@@ -34,6 +34,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import net.tourbook.common.UI;
 import net.tourbook.common.time.TimeTools;
 import net.tourbook.common.util.FileUtils;
+import net.tourbook.common.util.StringUtils;
 import net.tourbook.common.util.Util;
 import net.tourbook.data.DeviceSensor;
 import net.tourbook.data.DeviceSensorImport;
@@ -638,6 +639,7 @@ public class FitData {
 // SET_FORMATTING_OFF
 
       final Short    importedDeviceType      = importedSensor.deviceType;
+      final String   importedDeviceName      = importedSensor.getDeviceName();
 //    final Integer  manufacturerNumber      = importedSensor.manufacturerNumber;
 //    final Integer  productNumber           = importedSensor.productNumber;
 //    final String   productName             = importedSensor.productName;
@@ -652,7 +654,7 @@ public class FitData {
       if (deviceSensor.getDeviceType() == -1) {
 
          /**
-          * The sensor device type is not yet set, this sensor can from a MT version before the
+          * The sensor device type is not yet set, this sensor can be from a MT version before the
           * device type was introduced
           */
 
@@ -664,6 +666,25 @@ public class FitData {
 
             TourLogManager.log_INFO("Updating device sensor by setting the device type %-5d into %s".formatted( //$NON-NLS-1$
                   importedDeviceType,
+                  deviceSensor.getSensorKey_WithDevType()));
+         }
+      }
+
+      if (StringUtils.hasContent(deviceSensor.getDeviceName()) == false) {
+
+         /**
+          * The sensor device name is not yet set, this sensor can be from a MT version before the
+          * device name was introduced
+          */
+
+         if (StringUtils.hasContent(importedDeviceName)) {
+
+            deviceSensor.setDeviceName(importedDeviceName);
+
+            isSensorUpdated = true;
+
+            TourLogManager.log_INFO("Updating device sensor by setting the device name '%s' into %s".formatted( //$NON-NLS-1$
+                  importedDeviceName,
                   deviceSensor.getSensorKey_WithDevType()));
          }
       }

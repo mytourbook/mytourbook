@@ -392,6 +392,8 @@ public abstract class TableColumnFactory {
    public static final String             SENSOR_NAME_KEY_ID                                 = "SENSOR_NAME_KEY";                                 //$NON-NLS-1$
    public static final TableColumnFactory SENSOR_DESCRIPTION;
    public static final String             SENSOR_DESCRIPTION_ID                              = "SENSOR_DESCRIPTION";                              //$NON-NLS-1$
+   public static final TableColumnFactory SENSOR_DEVICE_NAME;
+   public static final String             SENSOR_DEVICE_NAME_ID                              = "SENSOR_DEVICE_NAME";                              //$NON-NLS-1$
    public static final TableColumnFactory SENSOR_DEVICE_TYPE;
    public static final String             SENSOR_DEVICE_TYPE_ID                              = "SENSOR_DEVICE_TYPE";                              //$NON-NLS-1$
    public static final TableColumnFactory SENSOR_MANUFACTURER_NAME;
@@ -3818,6 +3820,26 @@ public abstract class TableColumnFactory {
             colDef.setColumnLabel(              Messages.ColumnFactory_Sensor_Type);
             colDef.setColumnHeaderText(         Messages.ColumnFactory_Sensor_Type);
             colDef.setColumnHeaderToolTipText(  Messages.ColumnFactory_Sensor_Type_Tooltip);
+
+            colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(10));
+
+            return colDef;
+         }
+      };
+
+      SENSOR_DEVICE_NAME = new TableColumnFactory() {
+
+         @Override
+         public TableColumnDefinition createColumn(final ColumnManager columnManager,
+                                                   final PixelConverter pixelConverter) {
+
+            final TableColumnDefinition colDef = new TableColumnDefinition(columnManager, SENSOR_DEVICE_NAME_ID, SWT.LEAD);
+
+            colDef.setColumnCategory(           Messages.ColumnFactory_Category_Sensor);
+
+            colDef.setColumnLabel(              Messages.ColumnFactory_Sensor_DeviceName_Label);
+            colDef.setColumnHeaderText(         Messages.ColumnFactory_Sensor_DeviceName_Header);
+            colDef.setColumnHeaderToolTipText(  Messages.ColumnFactory_Sensor_DeviceName_Tooltip);
 
             colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(10));
 

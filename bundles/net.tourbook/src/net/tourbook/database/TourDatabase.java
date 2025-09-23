@@ -4367,7 +4367,8 @@ public class TourDatabase {
 
             // version 59 start
 
-            + "   DeviceType           SMALLINT DEFAULT -1                                      " + NL //$NON-NLS-1$
+            + "   DeviceType           SMALLINT DEFAULT -1,                                     " + NL //$NON-NLS-1$
+            + "   DeviceName           VARCHAR(" + DeviceSensor.DB_LENGTH_NAME + ")             " + NL //$NON-NLS-1$ //$NON-NLS-2$
 
             // version 59 end
 
@@ -11125,7 +11126,8 @@ public class TourDatabase {
 
 // SET_FORMATTING_OFF
 
-         SQL.addColumn_SmallInt(stmt, TABLE_DEVICE_SENSOR,     "deviceType",     DEFAULT_IGNORED);    //$NON-NLS-1$
+         SQL.addColumn_SmallInt(stmt, TABLE_DEVICE_SENSOR,     "DeviceType",     DEFAULT_IGNORED);                //$NON-NLS-1$
+         SQL.addColumn_VarCar(  stmt, TABLE_DEVICE_SENSOR,     "DeviceName",     DeviceSensor.DB_LENGTH_NAME);    //$NON-NLS-1$
 
 // SET_FORMATTING_ON
 
