@@ -994,7 +994,7 @@ public class ValuePoint_ToolTip_UI extends Pinned_ToolTip_Shell implements IPinn
                   valueContainer,
                   SWT.TRAIL,
                   5,
-                  OtherMessages.GRAPH_LABEL_GEARS,
+                  OtherMessages.GRAPH_LABEL_GEAR_RATIO,
 
                   // this is a bit tricky, use default color because the text color is white
                   null);
@@ -1003,7 +1003,7 @@ public class ValuePoint_ToolTip_UI extends Pinned_ToolTip_Shell implements IPinn
                   valueContainer,
                   SWT.LEAD,
                   5,
-                  OtherMessages.GRAPH_LABEL_GEARS,
+                  OtherMessages.GRAPH_LABEL_GEAR_RATIO,
 
                   // this is a bit tricky, use default color because the text color is white
                   null);
@@ -1550,7 +1550,7 @@ public class ValuePoint_ToolTip_UI extends Pinned_ToolTip_Shell implements IPinn
       final boolean isAvailable_Cadence               = _tourData.getCadenceSerie()                   != null;
       final boolean isAvailable_ChartZoomFactor       = _canBeDisplayed_ChartZoomFactor;
       final boolean isAvailable_Distance              = _tourData.distanceSerie                       != null;
-      final boolean isAvailable_Gears                 = _tourData.getGears()                          != null;
+      final boolean isAvailable_Gears                 = _tourData.getGearValues()                     != null;
       final boolean isAvailable_Gradient              = _tourData.getGradientSerie()                  != null;
       final boolean isAvailable_Pace                  = _tourData.getPaceSerie()                      != null;
       final boolean isAvailable_Pace_Summarized       = _tourData.getPaceSerie_Summarized_Seconds()   != null;
@@ -1836,7 +1836,7 @@ public class ValuePoint_ToolTip_UI extends Pinned_ToolTip_Shell implements IPinn
 
       if (_isVisible_And_Available_Gears) {
 
-         final float[][] gears = _tourData.getGears();
+         final float[][] gears = _tourData.getGearValues();
 
 //       _gears[0] = gear ratio
 //       _gears[1] = front gear teeth

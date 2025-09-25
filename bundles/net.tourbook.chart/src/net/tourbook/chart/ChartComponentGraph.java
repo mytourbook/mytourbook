@@ -4149,6 +4149,7 @@ public class ChartComponentGraph extends Canvas {
          /*
           * draw bar when value has changed
           */
+         final boolean isChainwheelLarge = yValues2[0] == 1;
          {
             final float devYBar = devY0Inverse - devY;
 
@@ -4165,11 +4166,12 @@ public class ChartComponentGraph extends Canvas {
 
                   // set initial value
 
-                  bgColor = yValues2[0] == 1 ? colorBgBright : colorBgDark;
+                  bgColor = isChainwheelLarge ? colorBgBright : colorBgDark;
 
                } else {
 
-                  if (yValues2[valueIndex - 1] == 1) {
+                  final boolean isChainwheelLarge2 = yValues2[valueIndex - 1] == 1;
+                  if (isChainwheelLarge2) {
 
                      // grosses Kettenblatt
 
@@ -4235,10 +4237,10 @@ public class ChartComponentGraph extends Canvas {
          /*
           * draw last bar
           */
-         if (valueIndex == lastIndex || //
+         if (valueIndex == lastIndex
 
-         // check if last visible position + 1 is reached
-               devX > devXVisibleWidth) {
+               // check if last visible position + 1 is reached
+               || devX > devXVisibleWidth) {
 
             /*
              * this is the last point for a filled graph
@@ -4256,11 +4258,13 @@ public class ChartComponentGraph extends Canvas {
 
                // set initial value
 
-               bgColor = yValues2[0] == 1 ? colorBgBright : colorBgDark;
+               bgColor = isChainwheelLarge ? colorBgBright : colorBgDark;
 
             } else {
 
-               if (yValues2[valueIndex - 1] == 1) {
+               final boolean isChainwheelLarge2 = yValues2[valueIndex - 1] == 1;
+
+               if (isChainwheelLarge2) {
 
                   // grosses Kettenblatt
 

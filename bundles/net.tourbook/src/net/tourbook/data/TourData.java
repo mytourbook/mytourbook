@@ -1424,10 +1424,10 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
     * Back gear number<br>
     * <code>
     * <pre>
-   final long   frontTeeth   = (gearRaw &gt;&gt; 24 &amp; 0xff);
-   final long   frontGear   = (gearRaw &gt;&gt; 16 &amp; 0xff);
-   final long   rearTeeth   = (gearRaw &gt;&gt; 8 &amp; 0xff);
-   final long   rearGear   = (gearRaw &gt;&gt; 0 &amp; 0xff);
+   final long   frontTeeth = gearRaw &gt;&gt; 24 &amp; 0xff;
+   final long   frontGear  = gearRaw &gt;&gt; 16 &amp; 0xff;
+   final long   rearTeeth  = gearRaw &gt;&gt; 8 &amp; 0xff;
+   final long   rearGear   = gearRaw &gt;&gt; 0 &amp; 0xff;
     * </pre>
     * </code>
     */
@@ -1438,14 +1438,19 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
    /**
     * Gears have this format:
     * <p>
-    * _gears[0] = gear ratio<br>
-    * _gears[1] = front gear teeth<br>
-    * _gears[2] = rear gear teeth<br>
-    * _gears[3] = front gear number, starting with 1<br>
-    * _gears[4] = rear gear number, starting with 1<br>
+    * _gearValues[0] = gear ratio<br>
+    * <p>
+    * _gearValues[1] = front gear teeth<br>
+    * _gearValues[2] = rear gear teeth<br>
+    * <p>
+    * _gearValues[3] = front gear number, starting with 1<br>
+    * _gearValues[4] = rear gear number, starting with 1<br>
     */
    @Transient
-   private float[][]          _gears;
+   private float[][]          _gearValues;
+
+   @Transient
+   private GearDataType       _gearType;
 
    /**
     * Contains the bounds of the tour in latitude/longitude:
@@ -2580,7 +2585,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
       _hrZones = null;
       _hrZoneContext = null;
 
-      _gears = null;
+      _gearValues = null;
 
       _cadenceGaps = null;
    }
@@ -9430,54 +9435,102 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
       return _galleryPhotos;
    }
 
+   public GearDataType getGearType() {
+
+      if (_gearType == null) {
+
+         // set gear values
+
+         getGearValues();
+      }
+
+      return _gearType;
+   }
+
    /**
+    * Converts gear raw format into an easier readable format
+    *
     * @return Returns <code>null</code> when gears are not available otherwise it returns gears with
     *         this format
     *         <p>
-    *         _gears[0] = gear ratio<br>
-    *         _gears[1] = front gear teeth<br>
-    *         _gears[2] = rear gear teeth<br>
-    *         _gears[3] = front gear number, starting with 1<br>
-    *         _gears[4] = rear gear number, starting with 1<br>
+    *         _gearValues[0] = gear ratio<br>
+    *
+    *         _gearValues[1] = front gear teeth<br>
+    *         _gearValues[2] = rear gear teeth<br>
+    *
+    *         _gearValues[3] = front gear number, starting with 1<br>
+    *         _gearValues[4] = rear gear number, starting with 1<br>
     */
-   public float[][] getGears() {
+   public float[][] getGearValues() {
 
       if (gearSerie == null || timeSerie == null) {
          return null;
       }
 
-      if (_gears != null) {
-         return _gears;
+      if (_gearValues != null) {
+         return _gearValues;
       }
 
       /*
        * Create gears from gear raw data
        */
 
-      final int gearSize = timeSerie.length;
+      final int numGears = timeSerie.length;
 
-      _gears = new float[5][gearSize];
+      boolean isOnlyRearGearNumber = false;
 
-      for (int gearIndex = 0; gearIndex < gearSize; gearIndex++) {
+      if (numGears > 0) {
+
+         final long gearRaw = gearSerie[0];
+         final float rearTeeth = gearRaw >> 8 & 0xff;
+
+         if (rearTeeth == 0) {
+            isOnlyRearGearNumber = true;
+         }
+      }
+
+      _gearType = isOnlyRearGearNumber
+            ? GearDataType.REAR_GEAR
+            : GearDataType.FRONT_GEAR_TEETH__REAR_GEAR_TEETH;
+
+      _gearValues = new float[5][numGears];
+
+      for (int gearIndex = 0; gearIndex < numGears; gearIndex++) {
 
          final long gearRaw = gearSerie[gearIndex];
 
-         final float frontTeeth = (gearRaw >> 24 & 0xff);
-         final float rearTeeth = (gearRaw >> 8 & 0xff);
+         final float frontTeeth = gearRaw >> 24 & 0xff;
+         final float rearTeeth = gearRaw >> 8 & 0xff;
 
-         final float frontGearNo = (gearRaw >> 16 & 0xff);
-         final float rearGearNo = (gearRaw >> 0 & 0xff);
+         final float frontGearNo = gearRaw >> 16 & 0xff;
+         final float rearGearNo = gearRaw >> 0 & 0xff;
 
-         final float gearRatio = frontTeeth / rearTeeth;
+         if (isOnlyRearGearNumber) {
 
-         _gears[0][gearIndex] = gearRatio;
-         _gears[1][gearIndex] = frontTeeth;
-         _gears[2][gearIndex] = rearTeeth;
-         _gears[3][gearIndex] = frontGearNo;
-         _gears[4][gearIndex] = rearGearNo;
+            _gearValues[0][gearIndex] = rearGearNo; // gear ratio
+
+            _gearValues[1][gearIndex] = 0; // front teeth
+            _gearValues[2][gearIndex] = 0; // rear teeth
+
+            // force color for the large chainwheel (red)
+            _gearValues[3][gearIndex] = 2; // front gear #
+            _gearValues[4][gearIndex] = rearGearNo;
+
+         } else {
+
+            final float gearRatio = frontTeeth / rearTeeth;
+
+            _gearValues[0][gearIndex] = gearRatio;
+
+            _gearValues[1][gearIndex] = frontTeeth;
+            _gearValues[2][gearIndex] = rearTeeth;
+
+            _gearValues[3][gearIndex] = frontGearNo;
+            _gearValues[4][gearIndex] = rearGearNo;
+         }
       }
 
-      return _gears;
+      return _gearValues;
    }
 
    /**
@@ -12892,6 +12945,11 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
       this.rearShiftCount = rearShiftCount;
    }
 
+   /**
+    * Set number of shifts
+    *
+    * @param gearSerieData
+    */
    public void setGears(final long[] gearSerieData) {
 
       if (gearSerieData.length < 1) {

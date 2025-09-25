@@ -21,7 +21,11 @@ import com.garmin.fit.RecordMesg;
 import com.garmin.fit.RecordMesgListener;
 import com.garmin.fit.util.SemicirclesConverter;
 
+import java.util.List;
+
 import net.tourbook.common.UI;
+import net.tourbook.data.GearData;
+import net.tourbook.data.GearDataType;
 import net.tourbook.data.TimeData;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourMarker;
@@ -60,6 +64,8 @@ public class MesgListener_Record extends AbstractMesgListener implements RecordM
    private long                _exceededTimeSliceDuration;
    private long                _previousAbsoluteTime                = Long.MIN_VALUE;
 
+   private List<GearData>      _gearData;
+
    public MesgListener_Record(final FitData fitData) {
 
       super(fitData);
@@ -73,6 +79,27 @@ public class MesgListener_Record extends AbstractMesgListener implements RecordM
 
       // convert into milliseconds
       _exceededTimeSliceLimit *= 1000;
+
+      _gearData = fitData.getGearData(GearDataType.REAR_GEAR);
+
+   }
+
+   private void logField(final DeveloperField devField) {
+
+      final Integer integerValue = devField.getIntegerValue();
+
+      if (integerValue == null || integerValue == 0) {
+         return;
+      }
+
+//      final String units = devField.getUnits();
+//      System.out.println(UI.timeStamp() + " %-20s  %4d  %s".formatted(
+//
+//            devField.getName(),
+//            integerValue,
+//            units == null ? UI.EMPTY_STRING : units
+//
+//      ));
    }
 
    @Override
@@ -317,30 +344,35 @@ public class MesgListener_Record extends AbstractMesgListener implements RecordM
     */
    private void setRecord_DeveloperData(final RecordMesg mesg, final TimeData timeData) {
 
-      int developerFieldCount = 0;
-      for (final DeveloperField developerField : mesg.getDeveloperFields()) {
+      int numDeveloperFields = 0;
+      final Iterable<DeveloperField> allDeveloperFields = mesg.getDeveloperFields();
+
+      for (final DeveloperField developerField : allDeveloperFields) {
          final String fieldName = developerField.getName();
          if (fieldName != null) {
-            developerFieldCount++;
+            numDeveloperFields++;
          }
       }
 
-      if (developerFieldCount == 0) {
+      if (numDeveloperFields == 0) {
          return;
       }
 
-      int powerDataSources = 0;
+      int numPowerDataSources = 0;
 
-      for (final DeveloperField developerField : mesg.getDeveloperFields()) {
+      for (final DeveloperField developerField : allDeveloperFields) {
+
          final String fieldName = developerField.getName();
 
-         if (fieldName != null && (fieldName.equals(DEV_FIELD_NAME__POWER) ||
-               fieldName.equals(DEV_FIELD_NAME__RP_POWER))) {
-            ++powerDataSources;
+         if (fieldName != null &&
+               (fieldName.equals(DEV_FIELD_NAME__POWER)
+                     || fieldName.equals(DEV_FIELD_NAME__RP_POWER))) {
+
+            ++numPowerDataSources;
          }
       }
 
-      for (final DeveloperField devField : mesg.getDeveloperFields()) {
+      for (final DeveloperField devField : allDeveloperFields) {
 
          final String fieldName = devField.getName();
          if (fieldName == null) {
@@ -348,6 +380,95 @@ public class MesgListener_Record extends AbstractMesgListener implements RecordM
          }
 
          switch (fieldName) {
+
+//       rearShift           2     Idx     UINT8
+//       radar_ranges        131   null    SINT16
+//       radar_speeds        2     null    UINT8
+//       radar_current       132   null    UINT16
+//       passing_speed       2     null    UINT8
+//       passing_speedabs    2     null    UINT8
+
+         case "passing_speed":
+
+            final Integer passingSpeed = devField.getIntegerValue();
+            if (passingSpeed != null) {
+               timeData.runDyn_StanceTime = passingSpeed.shortValue();
+//               logField(devField);
+            }
+
+            break;
+
+         case "passing_speedabs":
+
+            final Integer passingSpeedAbs = devField.getIntegerValue();
+            if (passingSpeedAbs != null) {
+               timeData.runDyn_StanceTimeBalance = passingSpeedAbs.shortValue();
+//               logField(devField);
+            }
+
+            break;
+
+         case "radar_current":
+
+            final Integer radarCurrent = devField.getIntegerValue();
+            if (radarCurrent != null) {
+               timeData.runDyn_StanceTime = radarCurrent.shortValue();
+//               logField(devField);
+            }
+
+            break;
+
+         case "radar_ranges":
+
+            final Integer radarRanges = devField.getIntegerValue();
+            if (radarRanges != null) {
+               timeData.runDyn_StanceTimeBalance = radarRanges.shortValue();
+//               logField(devField);
+            }
+
+            break;
+
+         case "radar_speeds":
+
+            final Integer radarSpeeds = devField.getIntegerValue();
+            if (radarSpeeds != null) {
+               timeData.runDyn_StepLength = radarSpeeds.shortValue();
+//               logField(devField);
+            }
+
+            break;
+
+         case "rearShift":
+
+            final Integer intFieldValue = devField.getIntegerValue();
+            if (intFieldValue != null) {
+
+               final long gearRaw = intFieldValue.longValue();
+
+               timeData.gear = gearRaw;
+
+               final long frontTeeth = (gearRaw >> 24 & 0xff);
+               final long frontGear = (gearRaw >> 16 & 0xff);
+               final long rearTeeth = (gearRaw >> 8 & 0xff);
+               final long rearGear = (gearRaw >> 0 & 0xff);
+
+               /*
+                * Gear data
+                */
+               final long javaTime = mesg.getTimestamp().getDate().getTime();
+
+               // create gear data for the current time
+               final GearData gearData = new GearData();
+
+               gearData.absoluteTime = javaTime;
+               gearData.gears = gearRaw;
+
+               _gearData.add(gearData);
+
+               logField(devField);
+            }
+
+            break;
 
          case DEV_FIELD_NAME__CADENCE:
 
@@ -389,7 +510,7 @@ public class MesgListener_Record extends AbstractMesgListener implements RecordM
             //If the current power data source is not the one
             //specified by the user as the "preferred" data source,
             //we do not import it.
-            if (powerDataSources > 1) {
+            if (numPowerDataSources > 1) {
 
                //Stryd
                if (fieldName.equals(DEV_FIELD_NAME__POWER) &&

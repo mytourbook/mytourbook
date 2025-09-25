@@ -525,7 +525,7 @@ public class PrefPageAppearanceTourChart extends PreferencePage implements IWork
       final Graph graph_Pulse                         = new Graph(TourManager.GRAPH_PULSE,                        OtherMessages.GRAPH_LABEL_HEARTBEAT);
       final Graph graph_Temperature                   = new Graph(TourManager.GRAPH_TEMPERATURE,                  OtherMessages.GRAPH_LABEL_TEMPERATURE);
       final Graph graph_Cadence                       = new Graph(TourManager.GRAPH_CADENCE,                      OtherMessages.GRAPH_LABEL_CADENCE);
-      final Graph graph_Gears                         = new Graph(TourManager.GRAPH_GEARS,                        OtherMessages.GRAPH_LABEL_GEARS);
+      final Graph graph_Gears                         = new Graph(TourManager.GRAPH_GEARS,                        OtherMessages.GRAPH_LABEL_GEAR_RATIO);
       final Graph graph_Altimeter                     = new Graph(TourManager.GRAPH_ALTIMETER,                    OtherMessages.GRAPH_LABEL_ALTIMETER);
       final Graph graph_Gradient                      = new Graph(TourManager.GRAPH_GRADIENT,                     OtherMessages.GRAPH_LABEL_GRADIENT);
 

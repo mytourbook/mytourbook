@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2019 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2025 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -170,6 +170,13 @@ public class TimeData implements Serializable {
     * Running dynamics data: Vertical ratio. Contains {@link Short#MIN_VALUE} when value is not set.
     */
    public short              runDyn_VerticalRatio       = Short.MIN_VALUE;
+
+// passing_speed
+// passing_speedabs
+// radar_current
+// radar_ranges
+// radar_speeds
+// rearShift
 
    public TimeData() {
       super();

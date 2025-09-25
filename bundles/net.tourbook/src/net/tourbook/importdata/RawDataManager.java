@@ -4219,8 +4219,7 @@ public class RawDataManager {
       // wait until all re-imports are performed
       _loadingTour_CountDownLatch.await();
 
-      TourDatabase.saveTour_PostSaveActions_Concurrent_2_ForAllTours(
-            allSavedTourIds.stream().toList());
+      TourDatabase.saveTour_PostSaveActions_Concurrent_2_ForAllTours(allSavedTourIds.stream().toList());
 
       // prevent async error
       Display.getDefault().syncExec(() -> TourManager.fireEvent(TourEventId.CLEAR_DISPLAYED_TOUR, null, null));

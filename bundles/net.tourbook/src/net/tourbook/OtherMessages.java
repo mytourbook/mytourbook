@@ -111,7 +111,8 @@ public class OtherMessages {
    public static final String GRAPH_LABEL_CADENCE_UNIT_SPM                 = net.tourbook.common.Messages.Graph_Label_Cadence_Unit_Spm;
    public static final String GRAPH_LABEL_DISTANCE                         = net.tourbook.common.Messages.Graph_Label_Distance;
    public static final String GRAPH_LABEL_ELEVATION_GAIN                   = net.tourbook.common.Messages.Graph_Label_ElevationGain;
-   public static final String GRAPH_LABEL_GEARS                            = net.tourbook.common.Messages.Graph_Label_Gears;
+   public static final String GRAPH_LABEL_GEAR_RATIO                       = net.tourbook.common.Messages.Graph_Label_Gears;
+   public static final String GRAPH_LABEL_GEAR_NUMBER                      = net.tourbook.common.Messages.Graph_Label_GearNumber;
    public static final String GRAPH_LABEL_GEO_COMPARE_UNIT                 = net.tourbook.common.Messages.Graph_Label_Geo_Compare_Unit;
    public static final String GRAPH_LABEL_GRADIENT                         = net.tourbook.common.Messages.Graph_Label_Gradient;
    public static final String GRAPH_LABEL_GRADIENT_UNIT                    = net.tourbook.common.Messages.Graph_Label_Gradient_Unit;

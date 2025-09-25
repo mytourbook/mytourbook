@@ -41,6 +41,7 @@ import net.tourbook.data.DeviceSensorImport;
 import net.tourbook.data.DeviceSensorValue;
 import net.tourbook.data.DeviceSensorValueImport;
 import net.tourbook.data.GearData;
+import net.tourbook.data.GearDataType;
 import net.tourbook.data.SwimData;
 import net.tourbook.data.TimeData;
 import net.tourbook.data.TourData;
@@ -124,6 +125,8 @@ public class FitData {
    private ImportState_Process                  _importState_Process;
 
    private MesgListener_DeviceInfo              _deviceInfoListener;
+
+   private GearDataType                         _gearDataType;
 
    public FitData(final FitDataReader fitDataReader,
                   final String importFilePath,
@@ -400,7 +403,7 @@ public class FitData {
 
          final int rearTeeth = gearData.getRearGearTeeth();
 
-         if (rearTeeth == 0) {
+         if (rearTeeth == 0 && _gearDataType == GearDataType.FRONT_GEAR_TEETH__REAR_GEAR_TEETH) {
 
             /**
              * This case happened but it should not. After checking the raw data they contained the
@@ -419,12 +422,13 @@ public class FitData {
              * </code>
              */
 
-            /*
-             * Set valid value but make it visible that the values are wrong, visible value is 0x10
-             * / 0x30 = 0.33
+            /**
+             * Set valid value but make it visible that the values are wrong, visible value is
+             *
+             * <code>0x10/ 0x30 = 0.33</code>
              */
 
-            gearData.gears = 0x10013001;
+            gearData.gears = 0x10_01_30_01;
          }
 
          if (gearTime >= tourStartTime && gearTime <= tourEndTime) {
@@ -843,7 +847,17 @@ public class FitData {
       return deviceName.toString();
    }
 
-   public List<GearData> getGearData() {
+   /**
+    * @param gearDataType
+    *           Type of the gear data which are provided
+    *
+    * @return
+    */
+   public List<GearData> getGearData(final GearDataType gearDataType) {
+
+      // this value is set in the message listener constructor
+      _gearDataType = gearDataType;
+
       return _allGearData;
    }
 

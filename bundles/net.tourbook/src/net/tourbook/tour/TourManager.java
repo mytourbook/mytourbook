@@ -67,6 +67,7 @@ import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.StringToArrayConverter;
 import net.tourbook.common.util.StringUtils;
 import net.tourbook.common.util.Util;
+import net.tourbook.data.GearDataType;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourMarker;
 import net.tourbook.data.TourPhoto;
@@ -5171,27 +5172,37 @@ public class TourManager {
     */
    private ChartDataYSerie createModelData_Gears(final TourData tourData, final ChartDataModel chartDataModel) {
 
-      final float[][] gearSerie = tourData.getGears();
+      final float[][] gearSerie = tourData.getGearValues();
       ChartDataYSerie yDataGears = null;
       if (gearSerie != null) {
+
+         final GearDataType gearType = tourData.getGearType();
+         final boolean isGearNumber = gearType.equals(GearDataType.REAR_GEAR);
+
+         final String gearTitle = isGearNumber
+               ? OtherMessages.GRAPH_LABEL_GEAR_NUMBER
+               : OtherMessages.GRAPH_LABEL_GEAR_RATIO;
 
          final float[][] chartGearSerie = new float[][] {
 
                // gear ratio
                gearSerie[0],
 
-               // front gear number, starting with 1 for the large chainwheel (Kettenblatt)
-               gearSerie[3] //
+               // front gear number, starting with 1 which is the large chainwheel (Kettenblatt)
+               // this is used for the painted color
+               gearSerie[3]
          };
 
          yDataGears = createChartDataSerieNoZero(chartGearSerie, ChartType.HORIZONTAL_BAR);
 
-         yDataGears.setYTitle(OtherMessages.GRAPH_LABEL_GEARS);
+         yDataGears.setYTitle(gearTitle);
          yDataGears.setShowYSlider(true);
          yDataGears.setCustomData(ChartDataYSerie.YDATA_GRAPH_ID, GRAPH_GEARS);
-         yDataGears.setSliderLabelProvider(new SliderLabelProvider_Gear(gearSerie));
+         yDataGears.setSliderLabelProvider(new SliderLabelProvider_Gear(gearSerie, gearType));
 
-//         yDataGears.setLineGaps(tourData.getCadenceGaps());
+         if (isGearNumber) {
+            yDataGears.setUnitLabel(UI.SYMBOL_NUMBER_SIGN);
+         }
 
          setGraphColors(yDataGears, GraphColorManager.PREF_GRAPH_GEAR);
          chartDataModel.addXyData(yDataGears);

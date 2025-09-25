@@ -1454,7 +1454,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 
       createActions_12_GraphAction(
             TourManager.GRAPH_GEARS,
-            OtherMessages.GRAPH_LABEL_GEARS,
+            OtherMessages.GRAPH_LABEL_GEAR_RATIO,
             Messages.Tour_Action_GraphGears,
             ThemeUtil.getThemedImageName(Images.Graph_Gears),
             GRAPH_CONTRIBUTION_ID_GEARS);
