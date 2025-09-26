@@ -203,6 +203,36 @@ public class SerieData implements Serializable {
     */
    public long[]               tourPhotosWithPositionedGeo;
 
+   /**
+    *
+    * @since 25.8+
+    */
+   public int[]                radar_Current;
+
+   /**
+    *
+    * @since 25.8+
+    */
+   public short[]              radar_PassingSpeed;
+
+   /**
+    *
+    * @since 25.8+
+    */
+   public short[]              radar_PassingSpeed_Absolute;
+
+   /**
+    *
+    * @since 25.8+
+    */
+   public short[]              radar_Ranges;
+
+   /**
+    *
+    * @since 25.8+
+    */
+   public short[]              radar_Speeds;
+
    private String dataSerieValues(final boolean[] dataSerie) {
 
       if (dataSerie == null || dataSerie.length == 0) {
@@ -348,7 +378,13 @@ public class SerieData implements Serializable {
 
             + "   visiblePoints_Surfing         " + dataSerieValues(visiblePoints_Surfing)         + NL //$NON-NLS-1$
 
-            + "   tourPhotosWithGeoPosition     " + dataSerieValues(tourPhotosWithPositionedGeo)   + NL //$NON-NLS-1$
+            + "   tourPhotosWithPositionedGeo   " + dataSerieValues(tourPhotosWithPositionedGeo)   + NL //$NON-NLS-1$
+
+            + "   radar_Current                 " + dataSerieValues(radar_Current)                 + NL //$NON-NLS-1$
+            + "   radar_PassingSpeed            " + dataSerieValues(radar_PassingSpeed)            + NL //$NON-NLS-1$
+            + "   radar_PassingSpeed_Absolute   " + dataSerieValues(radar_PassingSpeed_Absolute)   + NL //$NON-NLS-1$
+            + "   radar_Ranges                  " + dataSerieValues(radar_Ranges)                  + NL //$NON-NLS-1$
+            + "   radar_Speeds                  " + dataSerieValues(radar_Speeds)                  + NL //$NON-NLS-1$
 
             ;
    }

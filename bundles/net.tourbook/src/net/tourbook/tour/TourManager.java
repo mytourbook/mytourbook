@@ -907,7 +907,7 @@ public class TourManager {
       final float[] toAltitudeSerie             = joinedTourData.altitudeSerie                     = new float[numTimeSlices];
       final float[] toCadenceSerie              = cadenceSerieData;
       final float[] toDistanceSerie             = joinedTourData.distanceSerie                     = new float[numTimeSlices];
-      final long[] toGearSerie                  = joinedTourData.gearSerie                         = new long[numTimeSlices];
+      final long[] toGearSerie                  = joinedTourData.gearSerieCombined                 = new long[numTimeSlices];
       final double[] toLatitudeSerie            = joinedTourData.latitudeSerie                     = new double[numTimeSlices];
       final double[] toLongitudeSerie           = joinedTourData.longitudeSerie                    = new double[numTimeSlices];
       final float[] toPowerSerie                = new float[numTimeSlices];
@@ -993,7 +993,7 @@ public class TourManager {
          final float[] fromAltitudeSerie = fromTourData.altitudeSerie;
          final float[] fromCadenceSerie = fromTourData.getCadenceSerieWithMuliplier();
          final float[] fromDistanceSerie = fromTourData.distanceSerie;
-         final long[] fromGearSerie = fromTourData.gearSerie;
+         final long[] fromGearSerie = fromTourData.gearSerieCombined;
          final double[] fromLatitudeSerie = fromTourData.latitudeSerie;
          final double[] fromLongitudeSerie = fromTourData.longitudeSerie;
          final float[] fromPulseSerie = fromTourData.pulseSerie;
@@ -1254,7 +1254,7 @@ public class TourManager {
          joinedTourData.distanceSerie = null;
       }
       if (!isGearSerie) {
-         joinedTourData.gearSerie = null;
+         joinedTourData.gearSerieCombined = null;
       }
       if (!isLatLonSerie) {
          joinedTourData.latitudeSerie = null;
@@ -2481,7 +2481,7 @@ public class TourManager {
          tourData.distanceSerie = removeTimeSlices_Float(floatSerie, firstIndex, lastIndex);
       }
 
-      longSerie = tourData.gearSerie;
+      longSerie = tourData.gearSerieCombined;
       if (longSerie != null) {
          tourData.setGears(removeTimeSlices_Long(longSerie, firstIndex, lastIndex));
       }

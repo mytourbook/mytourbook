@@ -698,7 +698,7 @@ public class DialogExtractTour extends TitleAreaDialog implements ITourProvider2
       final float[] tourAltitudeSerie = _tourDataSource.altitudeSerie;
       final float[] tourCadenceSerie = _tourDataSource.getCadenceSerie();
       final float[] tourDistanceSerie = _tourDataSource.distanceSerie;
-      final long[] tourGearSerie = _tourDataSource.gearSerie;
+      final long[] tourGearSerie = _tourDataSource.gearSerieCombined;
       final double[] tourLatitudeSerie = _tourDataSource.latitudeSerie;
       final double[] tourLongitudeSerie = _tourDataSource.longitudeSerie;
       final float[] tourPulseSerie = _tourDataSource.pulseSerie;

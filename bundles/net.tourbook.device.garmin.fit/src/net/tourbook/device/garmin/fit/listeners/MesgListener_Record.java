@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2025 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -42,11 +42,19 @@ import org.joda.time.PeriodType;
 
 public class MesgListener_Record extends AbstractMesgListener implements RecordMesgListener {
 
+   private static final String DEV_FIELD_RADAR_PASSING_SPEED        = "passing_speed";                            //$NON-NLS-1$
+   private static final String DEV_FIELD_RADAR_PASSING_SPEEDABS     = "passing_speedabs";                         //$NON-NLS-1$
+   private static final String DEV_FIELD_RADAR_CURRENT              = "radar_current";                            //$NON-NLS-1$
+   private static final String DEV_FIELD_RADAR_RANGES               = "radar_ranges";                             //$NON-NLS-1$
+   private static final String DEV_FIELD_RADAR_SPEEDS               = "radar_speeds";                             //$NON-NLS-1$
+   private static final String DEV_FIELD_REAR_SHIFT                 = "rearShift";                                //$NON-NLS-1$
    private static final String DEV_FIELD_NAME__CADENCE              = "Cadence";                                  //$NON-NLS-1$
    private static final String DEV_FIELD_NAME__GROUND_TIME          = "Ground Time";                              //$NON-NLS-1$
    private static final String DEV_FIELD_NAME__LEG_SPRING_STIFFNESS = "Leg Spring Stiffness";                     //$NON-NLS-1$
+
    //Power Data from  Stryd
    private static final String DEV_FIELD_NAME__POWER                = "Power";                                    //$NON-NLS-1$
+
    //Power Data from Garmin Running Dynamics Pod
    private static final String DEV_FIELD_NAME__RP_POWER             = "RP_Power";                                 //$NON-NLS-1$
    private static final String DEV_FIELD_NAME__FORM_POWER           = "Form Power";                               //$NON-NLS-1$
@@ -92,21 +100,18 @@ public class MesgListener_Record extends AbstractMesgListener implements RecordM
          return;
       }
 
-//      final String units = devField.getUnits();
-//      System.out.println(UI.timeStamp() + " %-20s  %4d  %s".formatted(
-//
-//            devField.getName(),
-//            integerValue,
-//            units == null ? UI.EMPTY_STRING : units
-//
-//      ));
+      final String units = devField.getUnits();
+      System.out.println(UI.timeStamp() + " %-20s  %4d  %s".formatted( //$NON-NLS-1$
+
+            devField.getName(),
+            integerValue,
+            units == null ? UI.EMPTY_STRING : units
+
+      ));
    }
 
    @Override
    public void onMesg(final RecordMesg mesg) {
-
-//      System.out.println((System.currentTimeMillis() + " onMesg Record"));
-//      // TODO remove SYSTEM.OUT.PRINTLN
 
       fitData.onSetup_Record_10_Initialize();
       {
@@ -165,14 +170,6 @@ public class MesgListener_Record extends AbstractMesgListener implements RecordM
          }
 
          timeData.absoluteTime = absoluteTime;
-
-//			System.out.println(("[" + getClass().getSimpleName() + "]")
-////					+ ("\t timestamp: " + garminTimeS)
-////					+ ("\t sliceJavaTime: " + sliceJavaTime)
-//					+ ("\t localDT " + new LocalDateTime(absoluteTime))
-//
-//			);
-// TODO remove SYSTEM.OUT.PRINTLN
 
          if (isCreateExceededMarker) {
 
@@ -382,90 +379,72 @@ public class MesgListener_Record extends AbstractMesgListener implements RecordM
          switch (fieldName) {
 
 //       rearShift           2     Idx     UINT8
+
 //       radar_ranges        131   null    SINT16
 //       radar_speeds        2     null    UINT8
 //       radar_current       132   null    UINT16
+
 //       passing_speed       2     null    UINT8
 //       passing_speedabs    2     null    UINT8
 
-         case "passing_speed":
+         case DEV_FIELD_RADAR_PASSING_SPEED:
 
-            final Integer passingSpeed = devField.getIntegerValue();
+            final Short passingSpeed = devField.getShortValue();
             if (passingSpeed != null) {
-               timeData.runDyn_StanceTime = passingSpeed.shortValue();
-//               logField(devField);
+               timeData.radar_PassingSpeed = passingSpeed.shortValue();
             }
 
             break;
 
-         case "passing_speedabs":
+         case DEV_FIELD_RADAR_PASSING_SPEEDABS:
 
-            final Integer passingSpeedAbs = devField.getIntegerValue();
-            if (passingSpeedAbs != null) {
-               timeData.runDyn_StanceTimeBalance = passingSpeedAbs.shortValue();
-//               logField(devField);
+            final Short passingSpeedAbsolute = devField.getShortValue();
+            if (passingSpeedAbsolute != null) {
+               timeData.radar_PassingSpeed_Absolute = passingSpeedAbsolute.shortValue();
             }
 
             break;
 
-         case "radar_current":
+         case DEV_FIELD_RADAR_CURRENT:
 
             final Integer radarCurrent = devField.getIntegerValue();
             if (radarCurrent != null) {
-               timeData.runDyn_StanceTime = radarCurrent.shortValue();
-//               logField(devField);
+               timeData.radar_Current = radarCurrent.intValue();
             }
 
             break;
 
-         case "radar_ranges":
+         case DEV_FIELD_RADAR_RANGES:
 
             final Integer radarRanges = devField.getIntegerValue();
             if (radarRanges != null) {
-               timeData.runDyn_StanceTimeBalance = radarRanges.shortValue();
-//               logField(devField);
+               timeData.radar_Ranges = radarRanges.shortValue();
             }
 
             break;
 
-         case "radar_speeds":
+         case DEV_FIELD_RADAR_SPEEDS:
 
-            final Integer radarSpeeds = devField.getIntegerValue();
+            final Short radarSpeeds = devField.getShortValue();
             if (radarSpeeds != null) {
-               timeData.runDyn_StepLength = radarSpeeds.shortValue();
-//               logField(devField);
+               timeData.radar_Speeds = radarSpeeds.shortValue();
             }
 
             break;
 
-         case "rearShift":
+         case DEV_FIELD_REAR_SHIFT:
 
             final Integer intFieldValue = devField.getIntegerValue();
+
             if (intFieldValue != null) {
-
-               final long gearRaw = intFieldValue.longValue();
-
-               timeData.gear = gearRaw;
-
-               final long frontTeeth = (gearRaw >> 24 & 0xff);
-               final long frontGear = (gearRaw >> 16 & 0xff);
-               final long rearTeeth = (gearRaw >> 8 & 0xff);
-               final long rearGear = (gearRaw >> 0 & 0xff);
-
-               /*
-                * Gear data
-                */
-               final long javaTime = mesg.getTimestamp().getDate().getTime();
 
                // create gear data for the current time
                final GearData gearData = new GearData();
 
-               gearData.absoluteTime = javaTime;
-               gearData.gears = gearRaw;
+               gearData.absoluteTime = mesg.getTimestamp().getDate().getTime();
+               gearData.gears = intFieldValue.longValue();
 
                _gearData.add(gearData);
-
-               logField(devField);
             }
 
             break;

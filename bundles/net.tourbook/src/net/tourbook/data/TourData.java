@@ -1416,7 +1416,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
    public double[]            longitudeSerie;
 
    /**
-    * Gears which are saved in a tour are in this HEX format (left to right)
+    * Gear values how they are saved in a tour with this HEX format (left to right)
     * <p>
     * Front teeth<br>
     * Front gear number<br>
@@ -1433,7 +1433,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
     */
    @Transient
    @JsonProperty
-   public long[]              gearSerie;
+   public long[]              gearSerieCombined;
 
    /**
     * Gears have this format:
@@ -2120,6 +2120,21 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
     */
    @Transient
    public boolean[]            interpolatedValueSerie;
+
+   @Transient
+   private short[]   radar_PassingSpeed;
+
+   @Transient
+   private short[]   radar_PassingSpeed_Absolute;
+
+   @Transient
+   private int[]     radar_Current;
+
+   @Transient
+   private short[]   radar_Ranges;
+
+   @Transient
+   private short[]   radar_Speeds;
 
 
 // SET_FORMATTING_ON
@@ -7779,7 +7794,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
       if (isAbsoluteData) {
 
          /*
-          * absolute data are available when data are from GPS devices
+          * Absolute data are available when data are from GPS devices
           */
 
          long tourStartTime = 0;
@@ -7916,7 +7931,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
              * Gear
              */
             if (isGear) {
-               gearSerie[serieIndex] = timeData.gear;
+               gearSerieCombined[serieIndex] = timeData.gear;
             }
 
             /*
@@ -7959,6 +7974,15 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
                final short tdValue = timeData.runDyn_VerticalRatio;
                runDyn_VerticalRatio[serieIndex] = tdValue == Short.MIN_VALUE ? 0 : tdValue;
             }
+
+            /*
+             * Radar
+             */
+            radar_PassingSpeed[serieIndex] = timeData.radar_PassingSpeed;
+            radar_PassingSpeed_Absolute[serieIndex] = timeData.radar_PassingSpeed_Absolute;
+            radar_Current[serieIndex] = timeData.radar_Current;
+            radar_Ranges[serieIndex] = timeData.radar_Ranges;
+            radar_Speeds[serieIndex] = timeData.radar_Speeds;
          }
 
       } else {
@@ -8030,9 +8054,9 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
       tourDeviceTime_Elapsed = elapsedTime;
       setTourEndTimeMS();
 
+      // set number of gear shifts
       if (isGear) {
-         // set shift counts
-         setGears(gearSerie);
+         setGears(gearSerieCombined);
       }
 
       cleanupDataSeries(importState_Process);
@@ -9463,7 +9487,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
     */
    public float[][] getGearValues() {
 
-      if (gearSerie == null || timeSerie == null) {
+      if (gearSerieCombined == null || timeSerie == null) {
          return null;
       }
 
@@ -9481,7 +9505,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
 
       if (numGears > 0) {
 
-         final long gearRaw = gearSerie[0];
+         final long gearRaw = gearSerieCombined[0];
          final float rearTeeth = gearRaw >> 8 & 0xff;
 
          if (rearTeeth == 0) {
@@ -9497,7 +9521,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
 
       for (int gearIndex = 0; gearIndex < numGears; gearIndex++) {
 
-         final long gearRaw = gearSerie[gearIndex];
+         final long gearRaw = gearSerieCombined[gearIndex];
 
          final float frontTeeth = gearRaw >> 24 & 0xff;
          final float rearTeeth = gearRaw >> 8 & 0xff;
@@ -12410,7 +12434,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
 
       computeGeo_Grid();
 
-      gearSerie               = serieData.gears;
+      gearSerieCombined       = serieData.gears;
 
       pulseTime_Milliseconds  = serieData.pulseTimes;
       pulseTime_TimeIndex     = serieData.pulseTime_TimeIndex;
@@ -12446,6 +12470,14 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
       // battery
       battery_Percentage            = serieData.battery_Percentage;
       battery_Time                  = serieData.battery_Time;
+
+
+      // radar
+      radar_Current                 = serieData.radar_Current;
+      radar_PassingSpeed            = serieData.radar_PassingSpeed;
+      radar_PassingSpeed_Absolute   = serieData.radar_PassingSpeed_Absolute;
+      radar_Ranges                  = serieData.radar_Ranges;
+      radar_Speeds                  = serieData.radar_Speeds;
 
       // photo
       tourPhotosWithPositionedGeo   = serieData.getTourPhotosWithPositionedGeo();
@@ -12506,7 +12538,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
       serieData.latitudeE6                      = Util.convertDoubleSeries_ToE6(latitudeSerie);
       serieData.longitudeE6                     = Util.convertDoubleSeries_ToE6(longitudeSerie);
 
-      serieData.gears                           = gearSerie;
+      serieData.gears                           = gearSerieCombined;
 
       serieData.pulseTimes                      = pulseTime_Milliseconds;
       serieData.pulseTime_TimeIndex             = pulseTime_TimeIndex;
@@ -12536,6 +12568,13 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
       // battery
       serieData.battery_Percentage              = battery_Percentage;
       serieData.battery_Time                    = battery_Time;
+
+      // radar
+      serieData.radar_Current                   = radar_Current;
+      serieData.radar_PassingSpeed              = radar_PassingSpeed;
+      serieData.radar_PassingSpeed_Absolute     = radar_PassingSpeed_Absolute;
+      serieData.radar_Ranges                    = radar_Ranges;
+      serieData.radar_Speeds                    = radar_Speeds;
 
 // SET_FORMATTING_ON
 
@@ -12860,9 +12899,14 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
       this.frontShiftCount = frontShiftCount;
    }
 
-   public void setGears(final List<GearData> gears) {
+   /**
+    * Set gear values and number of shifts
+    *
+    * @param allGearData
+    */
+   public void setGears(final List<GearData> allGearData) {
 
-      final int gearSize = gears.size();
+      final int gearSize = allGearData.size();
 
       if (gearSize == 0) {
          return;
@@ -12875,8 +12919,8 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
       int gearIndex = 0;
       final int nextGearIndex = gearSize > 0 ? 1 : 0;
 
-      GearData currentGear = gears.get(0);
-      GearData nextGear = gears.get(nextGearIndex);
+      GearData currentGear = allGearData.get(0);
+      GearData nextGear = allGearData.get(nextGearIndex);
 
       long nextGearTime;
       if (gearIndex >= nextGearIndex) {
@@ -12907,7 +12951,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
 
                currentGear = nextGear;
 
-               nextGear = gears.get(gearIndex);
+               nextGear = allGearData.get(gearIndex);
                nextGearTime = nextGear.absoluteTime;
 
                final int nextFrontGear = nextGear.getFrontGearTeeth();
@@ -12939,30 +12983,30 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
          gearSerie[timeIndex] = currentGear.gears;
       }
 
-      this.gearSerie = gearSerie;
+      this.gearSerieCombined = gearSerie;
 
       this.frontShiftCount = frontShiftCount;
       this.rearShiftCount = rearShiftCount;
    }
 
    /**
-    * Set number of shifts
+    * Set gear values and compute number of gear shifts
     *
-    * @param gearSerieData
+    * @param gearSerieRaw
     */
-   public void setGears(final long[] gearSerieData) {
+   public void setGears(final long[] gearSerieRaw) {
 
-      if (gearSerieData.length < 1) {
+      if (gearSerieRaw.length < 1) {
          return;
       }
 
       int frontShifts = 0;
       int rearShifts = 0;
 
-      int currentFrontGear = (int) (gearSerieData[0] >> 24 & 0xff);
-      int currentRearGear = (int) (gearSerieData[0] >> 8 & 0xff);
+      int currentFrontGear = (int) (gearSerieRaw[0] >> 24 & 0xff);
+      int currentRearGear = (int) (gearSerieRaw[0] >> 8 & 0xff);
 
-      for (final long gear : gearSerieData) {
+      for (final long gear : gearSerieRaw) {
 
          final int nextFrontGear = (int) (gear >> 24 & 0xff);
          final int nextRearGear = (int) (gear >> 8 & 0xff);
@@ -12979,7 +13023,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
          currentRearGear = nextRearGear;
       }
 
-      this.gearSerie = gearSerieData;
+      this.gearSerieCombined = gearSerieRaw;
 
       this.frontShiftCount = frontShifts;
       this.rearShiftCount = rearShifts;
@@ -14100,30 +14144,31 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
 
    private boolean setupStartingValues_Gear(final TimeData[] timeDataSerie) {
 
+      final int numTimeSlices = timeDataSerie.length;
       final TimeData firstTimeData = timeDataSerie[0];
-      final int serieSize = timeDataSerie.length;
 
-      boolean isAvailable = false;
+      boolean isGearAvailable = false;
 
       if (firstTimeData.gear == 0) {
 
          // search for first gear value
 
-         for (int timeDataIndex = 0; timeDataIndex < serieSize; timeDataIndex++) {
+         for (int timeDataIndex = 0; timeDataIndex < numTimeSlices; timeDataIndex++) {
 
             final TimeData timeData = timeDataSerie[timeDataIndex];
-            final long gearValue = timeData.gear;
+            final long firstGearValue = timeData.gear;
 
-            if (gearValue != 0) {
+            if (firstGearValue != 0) {
 
-               // gear is available, starting values are set to first valid gear value
+               // gear is available, the starting values will be set to the first valid gear value
 
-               gearSerie = new long[serieSize];
-               isAvailable = true;
+               gearSerieCombined = new long[numTimeSlices];
+               isGearAvailable = true;
 
                for (int invalidIndex = 0; invalidIndex < timeDataIndex; invalidIndex++) {
-                  timeDataSerie[invalidIndex].gear = gearValue;
+                  timeDataSerie[invalidIndex].gear = firstGearValue;
                }
+
                break;
             }
          }
@@ -14132,11 +14177,11 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
 
          // gear is available
 
-         gearSerie = new long[serieSize];
-         isAvailable = true;
+         gearSerieCombined = new long[numTimeSlices];
+         isGearAvailable = true;
       }
 
-      return isAvailable;
+      return isGearAvailable;
    }
 
    private boolean setupStartingValues_LatLon(final TimeData[] timeDataSerie) {

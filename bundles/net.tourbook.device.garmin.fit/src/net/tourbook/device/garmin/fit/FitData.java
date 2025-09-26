@@ -372,6 +372,11 @@ public class FitData {
       }
    }
 
+   /**
+    * Validate gear values
+    *
+    * @param tourData
+    */
    private void finalizeTour_Gears(final TourData tourData) {
 
       if (_allGearData.size() == 0) {
@@ -383,15 +388,13 @@ public class FitData {
          return;
       }
 
-      /*
-       * Validate gear list
-       */
       final long tourStartTime = tourData.getTourStartTimeMS();
       final long tourEndTime = tourStartTime + (timeSerie[timeSerie.length - 1] * 1000);
 
-      final List<GearData> validatedGearList = new ArrayList<>();
+      final List<GearData> allValidatedGearValues = new ArrayList<>();
       GearData startGear = null;
 
+      // validate gear values
       for (final GearData gearData : _allGearData) {
 
          final long gearTime = gearData.absoluteTime;
@@ -439,28 +442,31 @@ public class FitData {
                // set time to tour start
                startGear.absoluteTime = tourStartTime;
 
-               validatedGearList.add(startGear);
+               allValidatedGearValues.add(startGear);
                startGear = null;
             }
 
-            validatedGearList.add(gearData);
+            allValidatedGearValues.add(gearData);
          }
       }
 
-      if (validatedGearList.size() > 0) {
+      if (allValidatedGearValues.size() > 0) {
 
          // set end gear
-         final GearData lastGearData = validatedGearList.get(validatedGearList.size() - 1);
+
+         final GearData lastGearData = allValidatedGearValues.get(allValidatedGearValues.size() - 1);
+
          if (lastGearData.absoluteTime < tourEndTime) {
 
             final GearData lastGear = new GearData();
+
             lastGear.absoluteTime = tourEndTime;
             lastGear.gears = lastGearData.gears;
 
-            validatedGearList.add(lastGear);
+            allValidatedGearValues.add(lastGear);
          }
 
-         tourData.setGears(validatedGearList);
+         tourData.setGears(allValidatedGearValues);
       }
    }
 

@@ -3719,7 +3719,7 @@ public class RawDataManager {
       if (isAllTimeSlices || allTourValueTypes.contains(TourValueType.TIME_SLICES__GEAR)) {
 
          // re-import gear only
-         oldTourData.gearSerie = reimportedTourData.gearSerie;
+         oldTourData.gearSerieCombined = reimportedTourData.gearSerieCombined;
          oldTourData.setFrontShiftCount(reimportedTourData.getFrontShiftCount());
          oldTourData.setRearShiftCount(reimportedTourData.getRearShiftCount());
       }

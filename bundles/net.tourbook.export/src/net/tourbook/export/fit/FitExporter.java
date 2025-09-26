@@ -243,7 +243,7 @@ public class FitExporter {
                                     GearData previousGearData,
                                     final int timeSerieIndex) {
 
-      final long[] gearSerie = _tourData.gearSerie;
+      final long[] gearSerie = _tourData.gearSerieCombined;
       if (gearSerie == null) {
          return null;
       }

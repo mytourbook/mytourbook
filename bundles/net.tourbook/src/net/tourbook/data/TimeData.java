@@ -171,12 +171,31 @@ public class TimeData implements Serializable {
     */
    public short              runDyn_VerticalRatio       = Short.MIN_VALUE;
 
-// passing_speed
-// passing_speedabs
-// radar_current
-// radar_ranges
-// radar_speeds
-// rearShift
+   /**
+    *
+    */
+   public short              radar_PassingSpeed;
+
+   /**
+    *
+    */
+   public short              radar_PassingSpeed_Absolute;
+
+   /**
+    *
+    */
+   public int                radar_Current;
+
+   /**
+    *
+    */
+   public short              radar_Ranges;
+
+   /**
+    *
+    */
+   public short              radar_Speeds;
+
 
    public TimeData() {
       super();

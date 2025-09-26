@@ -29,7 +29,7 @@ public class GearData implements Serializable {
    public long               absoluteTime;
 
    /**
-    * Gears are in the HEX format (left to right)
+    * Gears are in the HEX format (left to right) how they are imported from the .fit file
     * <p>
     * Front teeth<br>
     * Front gear number<br>

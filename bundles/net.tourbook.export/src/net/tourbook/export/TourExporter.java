@@ -631,7 +631,7 @@ public class TourExporter {
       final float[] altitudeSerie = _tourData.altitudeSerie;
       final float[] cadenceSerie = _tourData.getCadenceSerie();
       final float[] distanceSerie = _tourData.distanceSerie;
-      final long[] gearSerie = _tourData.gearSerie;
+      final long[] gearSerie = _tourData.gearSerieCombined;
       final double[] latitudeSerie = _tourData.latitudeSerie;
       final double[] longitudeSerie = _tourData.longitudeSerie;
       final float[] pulseSerie = _tourData.pulseSerie;
