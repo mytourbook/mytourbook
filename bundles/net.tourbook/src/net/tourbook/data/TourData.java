@@ -2119,23 +2119,37 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
     * When an array value is <code>true</code> then this value was interpolated
     */
    @Transient
-   public boolean[]            interpolatedValueSerie;
+   public boolean[]           interpolatedValueSerie;
 
+   /**
+    * "Vehicle Count" is counting all vehicles
+    */
    @Transient
-   private short[]   radar_PassingSpeed;
+   private int[]              radar_Current;
 
+   /**
+    * Distance to approaching vehicle
+    */
    @Transient
-   private short[]   radar_PassingSpeed_Absolute;
+   private short[]            radar_Ranges;
 
+   /**
+    * "Vehicle Speed (Absolute)
+    */
    @Transient
-   private int[]     radar_Current;
+   private short[]            radar_Speeds;
 
+   /**
+    * "Approach Speed (Relative)"
+    */
    @Transient
-   private short[]   radar_Ranges;
+   private short[]            radar_PassingSpeed;
 
+   /**
+    * "Approach Speed (Absolute)"
+    */
    @Transient
-   private short[]   radar_Speeds;
-
+   private short[]            radar_PassingSpeed_Absolute;
 
 // SET_FORMATTING_ON
 
@@ -7749,13 +7763,13 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
                                 final boolean isCreateMarker,
                                 final ImportState_Process importState_Process) {
 
-      final int serieSize = timeDataList.size();
-      if (serieSize == 0) {
+      final int numTimeData = timeDataList.size();
+      if (numTimeData == 0) {
          return;
       }
 
-      final TimeData[] timeDataSerie = timeDataList.toArray(new TimeData[serieSize]);
-      final TimeData firstTimeDataItem = timeDataSerie[0];
+      final TimeData[] allTimeData = timeDataList.toArray(new TimeData[numTimeData]);
+      final TimeData firstTimeDataItem = allTimeData[0];
 
       /*
        * absolute time is set when absolute data are available which are mostly data from GPS
@@ -7764,27 +7778,33 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
       final boolean isAbsoluteData = firstTimeDataItem.absoluteTime != Long.MIN_VALUE;
 
       /*
-       * time serie is always available, except when tours are created manually
+       * Time serie is always available, except when tours are created manually
        */
-      timeSerie = new int[serieSize];
+      timeSerie = new int[numTimeData];
 
 // SET_FORMATTING_OFF
 
-      final boolean isAltitude                     = setupStartingValues_Altitude(timeDataSerie, isAbsoluteData);
-      final boolean isCadence                      = setupStartingValues_Cadence(timeDataSerie);
-      final boolean isDistance                     = setupStartingValues_Distance(timeDataSerie, isAbsoluteData);
-      final boolean isGear                         = setupStartingValues_Gear(timeDataSerie);
-      final boolean isGPS                          = setupStartingValues_LatLon(timeDataSerie);
-      final boolean isPower                        = setupStartingValues_Power(timeDataSerie);
-      final boolean isPulse                        = setupStartingValues_Pulse(timeDataSerie);
-      final boolean isSpeed                        = setupStartingValues_Speed(timeDataSerie);
-      final boolean isTemperature                  = setupStartingValues_Temperature(timeDataSerie);
+      final boolean isAltitude                     = setupStartingValues_Altitude(allTimeData, isAbsoluteData);
+      final boolean isCadence                      = setupStartingValues_Cadence(allTimeData);
+      final boolean isDistance                     = setupStartingValues_Distance(allTimeData, isAbsoluteData);
+      final boolean isGear                         = setupStartingValues_Gear(allTimeData);
+      final boolean isGPS                          = setupStartingValues_LatLon(allTimeData);
+      final boolean isPower                        = setupStartingValues_Power(allTimeData);
+      final boolean isPulse                        = setupStartingValues_Pulse(allTimeData);
+      final boolean isSpeed                        = setupStartingValues_Speed(allTimeData);
+      final boolean isTemperature                  = setupStartingValues_Temperature(allTimeData);
 
-      final boolean isRunDyn_StanceTime            = setupStartingValues_RunDyn_StanceTime(timeDataSerie);
-      final boolean isRunDyn_StanceTimeBalance     = setupStartingValues_RunDyn_StanceTimeBalance(timeDataSerie);
-      final boolean isRunDyn_StepLength            = setupStartingValues_RunDyn_StepLength(timeDataSerie);
-      final boolean isRunDyn_VerticalOscillation   = setupStartingValues_RunDyn_VerticalOscillation(timeDataSerie);
-      final boolean isRunDyn_VerticalRatio         = setupStartingValues_RunDyn_VerticalRatio(timeDataSerie);
+      final boolean isRunDyn_StanceTime            = setupStartingValues_RunDyn_StanceTime(allTimeData);
+      final boolean isRunDyn_StanceTimeBalance     = setupStartingValues_RunDyn_StanceTimeBalance(allTimeData);
+      final boolean isRunDyn_StepLength            = setupStartingValues_RunDyn_StepLength(allTimeData);
+      final boolean isRunDyn_VerticalOscillation   = setupStartingValues_RunDyn_VerticalOscillation(allTimeData);
+      final boolean isRunDyn_VerticalRatio         = setupStartingValues_RunDyn_VerticalRatio(allTimeData);
+
+      final boolean isRadar_Current                = setupStartingValues_Radar_Current(allTimeData);
+      final boolean isRadar_Ranges                 = setupStartingValues_Radar_Ranges(allTimeData);
+      final boolean isRadar_PassingSpeed           = setupStartingValues_Radar_PassingSpeed(allTimeData);
+      final boolean isRadar_PassingSpeedAbsolute   = setupStartingValues_Radar_PassingSpeedAbsolute(allTimeData);
+      final boolean isRadar_Speeds                 = setupStartingValues_Radar_Speeds(allTimeData);
 
 // SET_FORMATTING_ON
 
@@ -7802,9 +7822,9 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
          long lastValidAbsoluteTime = 0;
 
          // convert data from the tour format into integer[] arrays
-         for (int serieIndex = 0; serieIndex < serieSize; serieIndex++) {
+         for (int serieIndex = 0; serieIndex < numTimeData; serieIndex++) {
 
-            final TimeData timeData = timeDataSerie[serieIndex];
+            final TimeData timeData = allTimeData[serieIndex];
 
             final long absoluteTime = timeData.absoluteTime;
 
@@ -7978,11 +7998,26 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
             /*
              * Radar
              */
-            radar_PassingSpeed[serieIndex] = timeData.radar_PassingSpeed;
-            radar_PassingSpeed_Absolute[serieIndex] = timeData.radar_PassingSpeed_Absolute;
-            radar_Current[serieIndex] = timeData.radar_Current;
-            radar_Ranges[serieIndex] = timeData.radar_Ranges;
-            radar_Speeds[serieIndex] = timeData.radar_Speeds;
+            if (isRadar_Current) {
+               final int tdValue = timeData.radar_Current;
+               radar_Current[serieIndex] = tdValue == Integer.MIN_VALUE ? 0 : tdValue;
+            }
+            if (isRadar_Ranges) {
+               final short tdValue = timeData.radar_Ranges;
+               radar_Ranges[serieIndex] = tdValue == Short.MIN_VALUE ? 0 : tdValue;
+            }
+            if (isRadar_Speeds) {
+               final short tdValue = timeData.radar_Speeds;
+               radar_Speeds[serieIndex] = tdValue == Short.MIN_VALUE ? 0 : tdValue;
+            }
+            if (isRadar_PassingSpeed) {
+               final short tdValue = timeData.radar_PassingSpeed;
+               radar_PassingSpeed[serieIndex] = tdValue == Short.MIN_VALUE ? 0 : tdValue;
+            }
+            if (isRadar_PassingSpeedAbsolute) {
+               final short tdValue = timeData.radar_PassingSpeed_Absolute;
+               radar_PassingSpeed_Absolute[serieIndex] = tdValue == Short.MIN_VALUE ? 0 : tdValue;
+            }
          }
 
       } else {
@@ -7995,9 +8030,9 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
          int altitudeAbsolute = 0;
 
          // convert data from the tour format into an integer[]
-         for (int serieIndex = 0; serieIndex < serieSize; serieIndex++) {
+         for (int serieIndex = 0; serieIndex < numTimeData; serieIndex++) {
 
-            final TimeData timeData = timeDataSerie[serieIndex];
+            final TimeData timeData = allTimeData[serieIndex];
 
             final int tdTime = timeData.time;
 
@@ -8048,9 +8083,9 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
       }
 
       createTimeSeries_10_InterpolateMissingValues(importState_Process);
-      createTimeSeries_50_PulseTimes(timeDataSerie);
+      createTimeSeries_50_PulseTimes(allTimeData);
 
-      tourDistance = isDistance ? distanceSerie[serieSize - 1] : 0;
+      tourDistance = isDistance ? distanceSerie[numTimeData - 1] : 0;
       tourDeviceTime_Elapsed = elapsedTime;
       setTourEndTimeMS();
 
@@ -8091,9 +8126,9 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
        */
       if (isCreateMarker) {
 
-         for (int serieIndex = 0; serieIndex < serieSize; serieIndex++) {
+         for (int serieIndex = 0; serieIndex < numTimeData; serieIndex++) {
 
-            final TimeData timeData = timeDataSerie[serieIndex];
+            final TimeData timeData = allTimeData[serieIndex];
 
             if (timeData.marker != 0) {
 
@@ -12498,8 +12533,8 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
    }
 
    /**
-    * Called before this object gets persisted, copy data from the tourdata object into the object
-    * which gets serialized
+    * Called before this object gets persisted, copy data from the {@link TourData} object into the
+    * object which gets serialized
     */
    /*
     * @PrePersist + @PreUpdate is currently disabled for EJB events because of bug
@@ -14294,6 +14329,216 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
          // pulse values are available
 
          pulseSerie = new float[serieSize];
+         isAvailable = true;
+      }
+
+      return isAvailable;
+   }
+
+   private boolean setupStartingValues_Radar_Current(final TimeData[] allTimeData) {
+
+      final int numTimeData = allTimeData.length;
+      final TimeData firstTimeData = allTimeData[0];
+
+      boolean isAvailable = false;
+
+      if (firstTimeData.radar_Current == Short.MIN_VALUE) {
+
+         // check if there is a valid value
+
+         for (int timeDataIndex = 0; timeDataIndex < numTimeData; timeDataIndex++) {
+
+            final TimeData timeData = allTimeData[timeDataIndex];
+            final int timeDataValue = timeData.radar_Current;
+
+            if (timeDataValue > 0) {
+
+               // time data values are available, starting values will be set to 0
+
+               radar_Current = new int[numTimeData];
+               isAvailable = true;
+
+               for (int invalidIndex = 0; invalidIndex < timeDataIndex; invalidIndex++) {
+                  allTimeData[invalidIndex].radar_Current = 0;
+               }
+
+               break;
+            }
+         }
+
+      } else {
+
+         // time data values are available
+
+         radar_Current = new int[numTimeData];
+         isAvailable = true;
+      }
+
+      return isAvailable;
+   }
+
+   private boolean setupStartingValues_Radar_PassingSpeed(final TimeData[] allTimeData) {
+
+      final int numTimeData = allTimeData.length;
+      final TimeData firstTimeData = allTimeData[0];
+
+      boolean isAvailable = false;
+
+      if (firstTimeData.radar_PassingSpeed == Short.MIN_VALUE) {
+
+         // check if there is a valid value
+
+         for (int timeDataIndex = 0; timeDataIndex < numTimeData; timeDataIndex++) {
+
+            final TimeData timeData = allTimeData[timeDataIndex];
+            final short passingSpeed = timeData.radar_PassingSpeed;
+
+            if (passingSpeed > 0) {
+
+               // time data values are available, starting values will be set to 0
+
+               radar_PassingSpeed = new short[numTimeData];
+               isAvailable = true;
+
+               for (int invalidIndex = 0; invalidIndex < timeDataIndex; invalidIndex++) {
+                  allTimeData[invalidIndex].radar_PassingSpeed = 0;
+               }
+
+               break;
+            }
+         }
+
+      } else {
+
+         // time data values are available
+
+         radar_PassingSpeed = new short[numTimeData];
+         isAvailable = true;
+      }
+
+      return isAvailable;
+   }
+
+   private boolean setupStartingValues_Radar_PassingSpeedAbsolute(final TimeData[] allTimeData) {
+
+      final int numTimeData = allTimeData.length;
+      final TimeData firstTimeData = allTimeData[0];
+
+      boolean isAvailable = false;
+
+      if (firstTimeData.radar_PassingSpeed_Absolute == Short.MIN_VALUE) {
+
+         // check if there is a valid value
+
+         for (int timeDataIndex = 0; timeDataIndex < numTimeData; timeDataIndex++) {
+
+            final TimeData timeData = allTimeData[timeDataIndex];
+            final short passingSpeed = timeData.radar_PassingSpeed_Absolute;
+
+            if (passingSpeed > 0) {
+
+               // time data values are available, starting values will be set to 0
+
+               radar_PassingSpeed_Absolute = new short[numTimeData];
+               isAvailable = true;
+
+               for (int invalidIndex = 0; invalidIndex < timeDataIndex; invalidIndex++) {
+                  allTimeData[invalidIndex].radar_PassingSpeed_Absolute = 0;
+               }
+
+               break;
+            }
+         }
+
+      } else {
+
+         // time data values are available
+
+         radar_PassingSpeed_Absolute = new short[numTimeData];
+         isAvailable = true;
+      }
+
+      return isAvailable;
+   }
+
+   private boolean setupStartingValues_Radar_Ranges(final TimeData[] allTimeData) {
+
+      final int numTimeData = allTimeData.length;
+      final TimeData firstTimeData = allTimeData[0];
+
+      boolean isAvailable = false;
+
+      if (firstTimeData.radar_Ranges == Short.MIN_VALUE) {
+
+         // check if there is a valid value
+
+         for (int timeDataIndex = 0; timeDataIndex < numTimeData; timeDataIndex++) {
+
+            final TimeData timeData = allTimeData[timeDataIndex];
+            final short timeDataValue = timeData.radar_Ranges;
+
+            if (timeDataValue > 0) {
+
+               // time data values are available, starting values will be set to 0
+
+               radar_Ranges = new short[numTimeData];
+               isAvailable = true;
+
+               for (int invalidIndex = 0; invalidIndex < timeDataIndex; invalidIndex++) {
+                  allTimeData[invalidIndex].radar_Ranges = 0;
+               }
+
+               break;
+            }
+         }
+
+      } else {
+
+         // time data values are available
+
+         radar_Ranges = new short[numTimeData];
+         isAvailable = true;
+      }
+
+      return isAvailable;
+   }
+
+   private boolean setupStartingValues_Radar_Speeds(final TimeData[] allTimeData) {
+
+      final int numTimeData = allTimeData.length;
+      final TimeData firstTimeData = allTimeData[0];
+
+      boolean isAvailable = false;
+
+      if (firstTimeData.radar_Speeds == Short.MIN_VALUE) {
+
+         // check if there is a valid value
+
+         for (int timeDataIndex = 0; timeDataIndex < numTimeData; timeDataIndex++) {
+
+            final TimeData timeData = allTimeData[timeDataIndex];
+            final short timeDataValue = timeData.radar_Speeds;
+
+            if (timeDataValue > 0) {
+
+               // time data values are available, starting values will be set to 0
+
+               radar_Speeds = new short[numTimeData];
+               isAvailable = true;
+
+               for (int invalidIndex = 0; invalidIndex < timeDataIndex; invalidIndex++) {
+                  allTimeData[invalidIndex].radar_Speeds = 0;
+               }
+
+               break;
+            }
+         }
+
+      } else {
+
+         // time data values are available
+
+         radar_Speeds = new short[numTimeData];
          isAvailable = true;
       }
 

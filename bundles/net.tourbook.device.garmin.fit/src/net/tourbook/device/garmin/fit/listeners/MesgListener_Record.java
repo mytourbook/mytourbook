@@ -92,6 +92,7 @@ public class MesgListener_Record extends AbstractMesgListener implements RecordM
 
    }
 
+   @SuppressWarnings("unused")
    private void logField(final DeveloperField devField) {
 
       final Integer integerValue = devField.getIntegerValue();

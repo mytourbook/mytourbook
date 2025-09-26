@@ -147,7 +147,6 @@ public class SerieData implements Serializable {
     * @since Version 18.10
     */
    public short[]              swim_LengthType;                     // e.g. active, idle
-
    public short[]              swim_Cadence;                        // strokes/min
    public short[]              swim_Strokes;                        // strokes/length
    public short[]              swim_StrokeStyle;                    // e.g. freestyle, breaststroke
@@ -199,38 +198,19 @@ public class SerieData implements Serializable {
     * Contains the {@link TourPhoto} ID's where the geo position was set for photos, the other photo
     * geo positions will be interpolated
     *
-    * @since 25.x
+    * @since 25.6
     */
    public long[]               tourPhotosWithPositionedGeo;
 
    /**
+    * Radar values
     *
     * @since 25.8+
     */
    public int[]                radar_Current;
-
-   /**
-    *
-    * @since 25.8+
-    */
-   public short[]              radar_PassingSpeed;
-
-   /**
-    *
-    * @since 25.8+
-    */
-   public short[]              radar_PassingSpeed_Absolute;
-
-   /**
-    *
-    * @since 25.8+
-    */
    public short[]              radar_Ranges;
-
-   /**
-    *
-    * @since 25.8+
-    */
+   public short[]              radar_PassingSpeed;
+   public short[]              radar_PassingSpeed_Absolute;
    public short[]              radar_Speeds;
 
    private String dataSerieValues(final boolean[] dataSerie) {
