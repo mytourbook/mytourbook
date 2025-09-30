@@ -2122,34 +2122,44 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
    public boolean[]           interpolatedValueSerie;
 
    /**
-    * "Vehicle Count" is counting all vehicles
+    * "Vehicle Count" - Number of passed vehicles, fit field: <code>radar_current</code>
     */
    @Transient
-   private int[]              radar_Current;
+   public int[]               radar_PassedVehicles;
+   @Transient
+   private float[]            _radar_PassedVehicles_UI;
 
    /**
-    * Distance to approaching vehicle
+    * Distance to approaching vehicle, fit field: <code>radar_ranges</code>
     */
    @Transient
-   private short[]            radar_Ranges;
+   public short[]             radar_DistanceToVehicle;
+   @Transient
+   private float[]            _radar_DistanceToVehicle_UI;
 
    /**
-    * "Vehicle Speed (Absolute)
+    * "Vehicle Speed (Absolute)", fit field: <code>radar_speeds</code>
     */
    @Transient
-   private short[]            radar_Speeds;
+   public short[]             radar_VehicleSpeed;
+   @Transient
+   private float[]            _radar_VehicleSpeed_UI;
 
    /**
-    * "Approach Speed (Relative)"
+    * "Approach Speed (Relative)", fit field: <code>passing_speed</code>
     */
    @Transient
-   private short[]            radar_PassingSpeed;
+   public short[]             radar_PassingSpeed_Relative;
+   @Transient
+   private float[]            _radar_PassingSpeed_Relative_UI;
 
    /**
-    * "Approach Speed (Absolute)"
+    * "Approach Speed (Absolute)", fit field: <code>passing_speedabs</code>
     */
    @Transient
-   private short[]            radar_PassingSpeed_Absolute;
+   public short[]             radar_PassingSpeed_Absolute;
+   @Transient
+   private float[]            _radar_PassingSpeed_Absolute_UI;
 
 // SET_FORMATTING_ON
 
@@ -2209,7 +2219,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
    }
 
    /**
-    * Removed data series when the sum of all values is 0.
+    * Removed data series when the sum of all values is 0
     *
     * @param importState_Process
     */
@@ -2580,6 +2590,12 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
       altitudeSerieImperialSmoothed = null;
 
       cadenceSerieWithMultiplier = null;
+
+      _radar_PassedVehicles_UI = null;
+      _radar_DistanceToVehicle_UI = null;
+      _radar_VehicleSpeed_UI = null;
+      _radar_PassingSpeed_Absolute_UI = null;
+      _radar_PassingSpeed_Relative_UI = null;
 
       _runDyn_StanceTime_UI = null;
       _runDyn_StanceTimeBalance_UI = null;
@@ -7800,11 +7816,11 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
       final boolean isRunDyn_VerticalOscillation   = setupStartingValues_RunDyn_VerticalOscillation(allTimeData);
       final boolean isRunDyn_VerticalRatio         = setupStartingValues_RunDyn_VerticalRatio(allTimeData);
 
-      final boolean isRadar_Current                = setupStartingValues_Radar_Current(allTimeData);
-      final boolean isRadar_Ranges                 = setupStartingValues_Radar_Ranges(allTimeData);
-      final boolean isRadar_PassingSpeed           = setupStartingValues_Radar_PassingSpeed(allTimeData);
-      final boolean isRadar_PassingSpeedAbsolute   = setupStartingValues_Radar_PassingSpeedAbsolute(allTimeData);
-      final boolean isRadar_Speeds                 = setupStartingValues_Radar_Speeds(allTimeData);
+      final boolean isradar_PassedVehicles         = setupStartingValues_radar_PassedVehicles(allTimeData);
+      final boolean isRadar_DistanceToVehicle      = setupStartingValues_Radar_DistanceToVehicle(allTimeData);
+      final boolean isRadar_VehicleSpeed           = setupStartingValues_Radar_VehicleSpeed(allTimeData);
+      final boolean isRadar_PassingSpeed_Absolute  = setupStartingValues_Radar_PassingSpeedAbsolute(allTimeData);
+      final boolean isRadar_PassingSpeed_Relative  = setupStartingValues_Radar_PassingSpeedRelative(allTimeData);
 
 // SET_FORMATTING_ON
 
@@ -7998,23 +8014,23 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
             /*
              * Radar
              */
-            if (isRadar_Current) {
-               final int tdValue = timeData.radar_Current;
-               radar_Current[serieIndex] = tdValue == Integer.MIN_VALUE ? 0 : tdValue;
+            if (isradar_PassedVehicles) {
+               final int tdValue = timeData.radar_PassedVehicles;
+               radar_PassedVehicles[serieIndex] = tdValue == Integer.MIN_VALUE ? 0 : tdValue;
             }
-            if (isRadar_Ranges) {
-               final short tdValue = timeData.radar_Ranges;
-               radar_Ranges[serieIndex] = tdValue == Short.MIN_VALUE ? 0 : tdValue;
+            if (isRadar_DistanceToVehicle) {
+               final short tdValue = timeData.radar_DistanceToVehicle;
+               radar_DistanceToVehicle[serieIndex] = tdValue == Short.MIN_VALUE ? 0 : tdValue;
             }
-            if (isRadar_Speeds) {
-               final short tdValue = timeData.radar_Speeds;
-               radar_Speeds[serieIndex] = tdValue == Short.MIN_VALUE ? 0 : tdValue;
+            if (isRadar_VehicleSpeed) {
+               final short tdValue = timeData.radar_VehicleSpeed;
+               radar_VehicleSpeed[serieIndex] = tdValue == Short.MIN_VALUE ? 0 : tdValue;
             }
-            if (isRadar_PassingSpeed) {
-               final short tdValue = timeData.radar_PassingSpeed;
-               radar_PassingSpeed[serieIndex] = tdValue == Short.MIN_VALUE ? 0 : tdValue;
+            if (isRadar_PassingSpeed_Relative) {
+               final short tdValue = timeData.radar_PassingSpeed_Relative;
+               radar_PassingSpeed_Relative[serieIndex] = tdValue == Short.MIN_VALUE ? 0 : tdValue;
             }
-            if (isRadar_PassingSpeedAbsolute) {
+            if (isRadar_PassingSpeed_Absolute) {
                final short tdValue = timeData.radar_PassingSpeed_Absolute;
                radar_PassingSpeed_Absolute[serieIndex] = tdValue == Short.MIN_VALUE ? 0 : tdValue;
             }
@@ -10588,6 +10604,111 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
       return _pulseSerie_Smoothed;
    }
 
+   /**
+    * @return Returns the UI values for {@link #radar_DistanceToVehicle}
+    */
+   public float[] getRadar_DistanceToVehicle_UI() {
+
+      if (_radar_DistanceToVehicle_UI == null && radar_DistanceToVehicle != null) {
+
+         // create UI data serie
+
+         final int numSlices = radar_DistanceToVehicle.length;
+
+         _radar_DistanceToVehicle_UI = new float[numSlices];
+
+         for (int serieIndex = 0; serieIndex < numSlices; serieIndex++) {
+            _radar_DistanceToVehicle_UI[serieIndex] = radar_DistanceToVehicle[serieIndex];
+         }
+      }
+
+      return _radar_DistanceToVehicle_UI;
+   }
+
+   /**
+    * @return Returns the UI values for {@link #radar_PassedVehicles}
+    */
+   public float[] getRadar_PassedVehicles_UI() {
+
+      if (_radar_PassedVehicles_UI == null && radar_PassedVehicles != null) {
+
+         // create UI data serie
+
+         final int numSlices = radar_PassedVehicles.length;
+
+         _radar_PassedVehicles_UI = new float[numSlices];
+
+         for (int serieIndex = 0; serieIndex < numSlices; serieIndex++) {
+            _radar_PassedVehicles_UI[serieIndex] = radar_PassedVehicles[serieIndex];
+         }
+      }
+
+      return _radar_PassedVehicles_UI;
+   }
+
+   /**
+    * @return Returns the UI values for {@link #radar_PassingSpeed_Absolute}
+    */
+   public float[] getRadar_PassingSpeed_Absolute_UI() {
+
+      if (_radar_PassingSpeed_Absolute_UI == null && radar_PassingSpeed_Absolute != null) {
+
+         // create UI data serie
+
+         final int numSlices = radar_PassingSpeed_Absolute.length;
+
+         _radar_PassingSpeed_Absolute_UI = new float[numSlices];
+
+         for (int serieIndex = 0; serieIndex < numSlices; serieIndex++) {
+            _radar_PassingSpeed_Absolute_UI[serieIndex] = radar_PassingSpeed_Absolute[serieIndex];
+         }
+      }
+
+      return _radar_PassingSpeed_Absolute_UI;
+   }
+
+   /**
+    * @return Returns the UI values for {@link #radar_PassingSpeed_Relative}
+    */
+   public float[] getRadar_PassingSpeed_Relative_UI() {
+
+      if (_radar_PassingSpeed_Relative_UI == null && radar_PassingSpeed_Relative != null) {
+
+         // create UI data serie
+
+         final int numSlices = radar_PassingSpeed_Relative.length;
+
+         _radar_PassingSpeed_Relative_UI = new float[numSlices];
+
+         for (int serieIndex = 0; serieIndex < numSlices; serieIndex++) {
+            _radar_PassingSpeed_Relative_UI[serieIndex] = radar_PassingSpeed_Relative[serieIndex];
+         }
+      }
+
+      return _radar_PassingSpeed_Relative_UI;
+   }
+
+   /**
+    * @return Returns the UI values for {@link #radar_VehicleSpeed}
+    */
+   public float[] getRadar_VehicleSpeed_UI() {
+
+      if (_radar_VehicleSpeed_UI == null && radar_VehicleSpeed != null) {
+
+         // create UI data serie
+
+         final int numSlices = radar_VehicleSpeed.length;
+
+         _radar_VehicleSpeed_UI = new float[numSlices];
+
+         for (int serieIndex = 0; serieIndex < numSlices; serieIndex++) {
+            _radar_VehicleSpeed_UI[serieIndex] = radar_VehicleSpeed[serieIndex];
+         }
+      }
+
+      return _radar_VehicleSpeed_UI;
+   }
+
    public int getRearShiftCount() {
       return rearShiftCount;
    }
@@ -12508,11 +12629,11 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
 
 
       // radar
-      radar_Current                 = serieData.radar_Current;
-      radar_PassingSpeed            = serieData.radar_PassingSpeed;
+      radar_PassedVehicles          = serieData.radar_PassedVehicles;
+      radar_DistanceToVehicle       = serieData.radar_DistanceToVehicle;
+      radar_VehicleSpeed            = serieData.radar_VehicleSpeed;
       radar_PassingSpeed_Absolute   = serieData.radar_PassingSpeed_Absolute;
-      radar_Ranges                  = serieData.radar_Ranges;
-      radar_Speeds                  = serieData.radar_Speeds;
+      radar_PassingSpeed_Relative   = serieData.radar_PassingSpeed_Relative;
 
       // photo
       tourPhotosWithPositionedGeo   = serieData.getTourPhotosWithPositionedGeo();
@@ -12605,11 +12726,11 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
       serieData.battery_Time                    = battery_Time;
 
       // radar
-      serieData.radar_Current                   = radar_Current;
-      serieData.radar_PassingSpeed              = radar_PassingSpeed;
+      serieData.radar_PassedVehicles            = radar_PassedVehicles;
+      serieData.radar_DistanceToVehicle         = radar_DistanceToVehicle;
+      serieData.radar_VehicleSpeed              = radar_VehicleSpeed;
       serieData.radar_PassingSpeed_Absolute     = radar_PassingSpeed_Absolute;
-      serieData.radar_Ranges                    = radar_Ranges;
-      serieData.radar_Speeds                    = radar_Speeds;
+      serieData.radar_PassingSpeed_Relative     = radar_PassingSpeed_Relative;
 
 // SET_FORMATTING_ON
 
@@ -14335,73 +14456,31 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
       return isAvailable;
    }
 
-   private boolean setupStartingValues_Radar_Current(final TimeData[] allTimeData) {
+   private boolean setupStartingValues_Radar_PassingSpeedRelative(final TimeData[] allTimeData) {
 
       final int numTimeData = allTimeData.length;
       final TimeData firstTimeData = allTimeData[0];
 
       boolean isAvailable = false;
 
-      if (firstTimeData.radar_Current == Short.MIN_VALUE) {
+      if (firstTimeData.radar_PassingSpeed_Relative == Short.MIN_VALUE) {
 
          // check if there is a valid value
 
          for (int timeDataIndex = 0; timeDataIndex < numTimeData; timeDataIndex++) {
 
             final TimeData timeData = allTimeData[timeDataIndex];
-            final int timeDataValue = timeData.radar_Current;
-
-            if (timeDataValue > 0) {
-
-               // time data values are available, starting values will be set to 0
-
-               radar_Current = new int[numTimeData];
-               isAvailable = true;
-
-               for (int invalidIndex = 0; invalidIndex < timeDataIndex; invalidIndex++) {
-                  allTimeData[invalidIndex].radar_Current = 0;
-               }
-
-               break;
-            }
-         }
-
-      } else {
-
-         // time data values are available
-
-         radar_Current = new int[numTimeData];
-         isAvailable = true;
-      }
-
-      return isAvailable;
-   }
-
-   private boolean setupStartingValues_Radar_PassingSpeed(final TimeData[] allTimeData) {
-
-      final int numTimeData = allTimeData.length;
-      final TimeData firstTimeData = allTimeData[0];
-
-      boolean isAvailable = false;
-
-      if (firstTimeData.radar_PassingSpeed == Short.MIN_VALUE) {
-
-         // check if there is a valid value
-
-         for (int timeDataIndex = 0; timeDataIndex < numTimeData; timeDataIndex++) {
-
-            final TimeData timeData = allTimeData[timeDataIndex];
-            final short passingSpeed = timeData.radar_PassingSpeed;
+            final short passingSpeed = timeData.radar_PassingSpeed_Relative;
 
             if (passingSpeed > 0) {
 
                // time data values are available, starting values will be set to 0
 
-               radar_PassingSpeed = new short[numTimeData];
+               radar_PassingSpeed_Relative = new short[numTimeData];
                isAvailable = true;
 
                for (int invalidIndex = 0; invalidIndex < timeDataIndex; invalidIndex++) {
-                  allTimeData[invalidIndex].radar_PassingSpeed = 0;
+                  allTimeData[invalidIndex].radar_PassingSpeed_Relative = 0;
                }
 
                break;
@@ -14412,7 +14491,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
 
          // time data values are available
 
-         radar_PassingSpeed = new short[numTimeData];
+         radar_PassingSpeed_Relative = new short[numTimeData];
          isAvailable = true;
       }
 
@@ -14461,31 +14540,31 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
       return isAvailable;
    }
 
-   private boolean setupStartingValues_Radar_Ranges(final TimeData[] allTimeData) {
+   private boolean setupStartingValues_Radar_DistanceToVehicle(final TimeData[] allTimeData) {
 
       final int numTimeData = allTimeData.length;
       final TimeData firstTimeData = allTimeData[0];
 
       boolean isAvailable = false;
 
-      if (firstTimeData.radar_Ranges == Short.MIN_VALUE) {
+      if (firstTimeData.radar_DistanceToVehicle == Short.MIN_VALUE) {
 
          // check if there is a valid value
 
          for (int timeDataIndex = 0; timeDataIndex < numTimeData; timeDataIndex++) {
 
             final TimeData timeData = allTimeData[timeDataIndex];
-            final short timeDataValue = timeData.radar_Ranges;
+            final short timeDataValue = timeData.radar_DistanceToVehicle;
 
             if (timeDataValue > 0) {
 
                // time data values are available, starting values will be set to 0
 
-               radar_Ranges = new short[numTimeData];
+               radar_DistanceToVehicle = new short[numTimeData];
                isAvailable = true;
 
                for (int invalidIndex = 0; invalidIndex < timeDataIndex; invalidIndex++) {
-                  allTimeData[invalidIndex].radar_Ranges = 0;
+                  allTimeData[invalidIndex].radar_DistanceToVehicle = 0;
                }
 
                break;
@@ -14496,38 +14575,38 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
 
          // time data values are available
 
-         radar_Ranges = new short[numTimeData];
+         radar_DistanceToVehicle = new short[numTimeData];
          isAvailable = true;
       }
 
       return isAvailable;
    }
 
-   private boolean setupStartingValues_Radar_Speeds(final TimeData[] allTimeData) {
+   private boolean setupStartingValues_Radar_VehicleSpeed(final TimeData[] allTimeData) {
 
       final int numTimeData = allTimeData.length;
       final TimeData firstTimeData = allTimeData[0];
 
       boolean isAvailable = false;
 
-      if (firstTimeData.radar_Speeds == Short.MIN_VALUE) {
+      if (firstTimeData.radar_VehicleSpeed == Short.MIN_VALUE) {
 
          // check if there is a valid value
 
          for (int timeDataIndex = 0; timeDataIndex < numTimeData; timeDataIndex++) {
 
             final TimeData timeData = allTimeData[timeDataIndex];
-            final short timeDataValue = timeData.radar_Speeds;
+            final short timeDataValue = timeData.radar_VehicleSpeed;
 
             if (timeDataValue > 0) {
 
                // time data values are available, starting values will be set to 0
 
-               radar_Speeds = new short[numTimeData];
+               radar_VehicleSpeed = new short[numTimeData];
                isAvailable = true;
 
                for (int invalidIndex = 0; invalidIndex < timeDataIndex; invalidIndex++) {
-                  allTimeData[invalidIndex].radar_Speeds = 0;
+                  allTimeData[invalidIndex].radar_VehicleSpeed = 0;
                }
 
                break;
@@ -14538,7 +14617,49 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
 
          // time data values are available
 
-         radar_Speeds = new short[numTimeData];
+         radar_VehicleSpeed = new short[numTimeData];
+         isAvailable = true;
+      }
+
+      return isAvailable;
+   }
+
+   private boolean setupStartingValues_radar_PassedVehicles(final TimeData[] allTimeData) {
+
+      final int numTimeData = allTimeData.length;
+      final TimeData firstTimeData = allTimeData[0];
+
+      boolean isAvailable = false;
+
+      if (firstTimeData.radar_PassedVehicles == Short.MIN_VALUE) {
+
+         // check if there is a valid value
+
+         for (int timeDataIndex = 0; timeDataIndex < numTimeData; timeDataIndex++) {
+
+            final TimeData timeData = allTimeData[timeDataIndex];
+            final int timeDataValue = timeData.radar_PassedVehicles;
+
+            if (timeDataValue > 0) {
+
+               // time data values are available, starting values will be set to 0
+
+               radar_PassedVehicles = new int[numTimeData];
+               isAvailable = true;
+
+               for (int invalidIndex = 0; invalidIndex < timeDataIndex; invalidIndex++) {
+                  allTimeData[invalidIndex].radar_PassedVehicles = 0;
+               }
+
+               break;
+            }
+         }
+
+      } else {
+
+         // time data values are available
+
+         radar_PassedVehicles = new int[numTimeData];
          isAvailable = true;
       }
 

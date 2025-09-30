@@ -44,70 +44,75 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 /**
- * Manage colors which are displayed in a chart, map or other locations.
+ * Manage colors which are displayed in a chart, map or other locations
  */
 public class GraphColorManager {
 
-   public static final String  PREF_GRAPH_ALTIMETER                    = "altimeter";                  //$NON-NLS-1$
-   public static final String  PREF_GRAPH_ALTITUDE                     = "altitude";                   //$NON-NLS-1$
-   public static final String  PREF_GRAPH_CADENCE                      = "cadence";                    //$NON-NLS-1$
-   public static final String  PREF_GRAPH_GEAR                         = "gear";                       //$NON-NLS-1$
-   public static final String  PREF_GRAPH_DISTANCE                     = "distance";                   //$NON-NLS-1$
-   public static final String  PREF_GRAPH_HEARTBEAT                    = "heartbeat";                  //$NON-NLS-1$
-   public static final String  PREF_GRAPH_HISTORY                      = "History";                    //$NON-NLS-1$
-   public static final String  PREF_GRAPH_GRADIENT                     = "gradient";                   //$NON-NLS-1$
-   public static final String  PREF_GRAPH_PACE                         = "pace";                       //$NON-NLS-1$
-   public static final String  PREF_GRAPH_POWER                        = "power";                      //$NON-NLS-1$
-   public static final String  PREF_GRAPH_SENSOR                       = "Sensor";                     //$NON-NLS-1$
-   public static final String  PREF_GRAPH_SPEED                        = "speed";                      //$NON-NLS-1$
-   public static final String  PREF_GRAPH_TEMPERATURE                  = "tempterature";               //$NON-NLS-1$
-   public static final String  PREF_GRAPH_TIME                         = "duration";                   //$NON-NLS-1$
-   public static final String  PREF_GRAPH_TOUR                         = "tour";                       //$NON-NLS-1$
-   public static final String  PREF_GRAPH_TOUR_COMPARE                 = "tourCompare";                //$NON-NLS-1$
-   public static final String  PREF_GRAPH_RUN_DYN_STANCE_TIME          = "RunDyn_StanceTime";          //$NON-NLS-1$
-   public static final String  PREF_GRAPH_RUN_DYN_STANCE_TIME_BALANCED = "RunDyn_StanceTime_Balanced"; //$NON-NLS-1$
-   public static final String  PREF_GRAPH_RUN_DYN_STEP_LENGTH          = "RunDyn_StepLength";          //$NON-NLS-1$
-   public static final String  PREF_GRAPH_RUN_DYN_VERTICAL_OSCILLATION = "RunDyn_VerticalOscillation"; //$NON-NLS-1$
-   public static final String  PREF_GRAPH_RUN_DYN_VERTICAL_RATIO       = "RunDyn_VerticalRatio";       //$NON-NLS-1$
-   public static final String  PREF_GRAPH_SWIM_STROKES                 = "Swim_Strokes";               //$NON-NLS-1$
-   public static final String  PREF_GRAPH_SWIM_SWOLF                   = "Swim_Swolf";                 //$NON-NLS-1$
-   public static final String  PREF_GRAPH_TRAINING_EFFECT_AEROB        = "Training_Effect_Aerob";      //$NON-NLS-1$
-   public static final String  PREF_GRAPH_TRAINING_EFFECT_ANAEROB      = "Training_Effect_Anaerob";    //$NON-NLS-1$
-   public static final String  PREF_GRAPH_TRAINING_PERFORMANCE         = "Training_Performance";       //$NON-NLS-1$
-   public static final String  PREF_GRAPH_BODYFAT                      = "BodyFat";                    //$NON-NLS-1$
-   public static final String  PREF_GRAPH_BODYWEIGHT                   = "BodyWeight";                 //$NON-NLS-1$
+   public static final String  PREF_GRAPH_ALTIMETER                    = "altimeter";                   //$NON-NLS-1$
+   public static final String  PREF_GRAPH_ALTITUDE                     = "altitude";                    //$NON-NLS-1$
+   public static final String  PREF_GRAPH_CADENCE                      = "cadence";                     //$NON-NLS-1$
+   public static final String  PREF_GRAPH_GEAR                         = "gear";                        //$NON-NLS-1$
+   public static final String  PREF_GRAPH_DISTANCE                     = "distance";                    //$NON-NLS-1$
+   public static final String  PREF_GRAPH_HEARTBEAT                    = "heartbeat";                   //$NON-NLS-1$
+   public static final String  PREF_GRAPH_HISTORY                      = "History";                     //$NON-NLS-1$
+   public static final String  PREF_GRAPH_GRADIENT                     = "gradient";                    //$NON-NLS-1$
+   public static final String  PREF_GRAPH_PACE                         = "pace";                        //$NON-NLS-1$
+   public static final String  PREF_GRAPH_POWER                        = "power";                       //$NON-NLS-1$
+   public static final String  PREF_GRAPH_SENSOR                       = "Sensor";                      //$NON-NLS-1$
+   public static final String  PREF_GRAPH_SPEED                        = "speed";                       //$NON-NLS-1$
+   public static final String  PREF_GRAPH_TEMPERATURE                  = "tempterature";                //$NON-NLS-1$
+   public static final String  PREF_GRAPH_TIME                         = "duration";                    //$NON-NLS-1$
+   public static final String  PREF_GRAPH_TOUR                         = "tour";                        //$NON-NLS-1$
+   public static final String  PREF_GRAPH_TOUR_COMPARE                 = "tourCompare";                 //$NON-NLS-1$
+   public static final String  PREF_GRAPH_BODYFAT                      = "BodyFat";                     //$NON-NLS-1$
+   public static final String  PREF_GRAPH_BODYWEIGHT                   = "BodyWeight";                  //$NON-NLS-1$
+   public static final String  PREF_GRAPH_RADAR_PASSED_VEHICLES        = "Radar_PassedVehicles";        //$NON-NLS-1$
+   public static final String  PREF_GRAPH_RADAR_DISTANCE_TO_VEHICLE    = "Radar_DistanceToVehicle";     //$NON-NLS-1$
+   public static final String  PREF_GRAPH_RADAR_VEHICLE_SPEED          = "Radar_VehicleSpeed";          //$NON-NLS-1$
+   public static final String  PREF_GRAPH_RADAR_PASSING_SPEED_ABSOLUTE = "Radar_PassingSpeed_Absolute"; //$NON-NLS-1$
+   public static final String  PREF_GRAPH_RADAR_PASSING_SPEED_RELATIVE = "Radar_PassingSpeed_Relative"; //$NON-NLS-1$
+   public static final String  PREF_GRAPH_RUN_DYN_STANCE_TIME          = "RunDyn_StanceTime";           //$NON-NLS-1$
+   public static final String  PREF_GRAPH_RUN_DYN_STANCE_TIME_BALANCED = "RunDyn_StanceTime_Balanced";  //$NON-NLS-1$
+   public static final String  PREF_GRAPH_RUN_DYN_STEP_LENGTH          = "RunDyn_StepLength";           //$NON-NLS-1$
+   public static final String  PREF_GRAPH_RUN_DYN_VERTICAL_OSCILLATION = "RunDyn_VerticalOscillation";  //$NON-NLS-1$
+   public static final String  PREF_GRAPH_RUN_DYN_VERTICAL_RATIO       = "RunDyn_VerticalRatio";        //$NON-NLS-1$
+   public static final String  PREF_GRAPH_SWIM_STROKES                 = "Swim_Strokes";                //$NON-NLS-1$
+   public static final String  PREF_GRAPH_SWIM_SWOLF                   = "Swim_Swolf";                  //$NON-NLS-1$
+   public static final String  PREF_GRAPH_TRAINING_EFFECT_AEROB        = "Training_Effect_Aerob";       //$NON-NLS-1$
+   public static final String  PREF_GRAPH_TRAINING_EFFECT_ANAEROB      = "Training_Effect_Anaerob";     //$NON-NLS-1$
+   public static final String  PREF_GRAPH_TRAINING_PERFORMANCE         = "Training_Performance";        //$NON-NLS-1$
 
-   public static final String  PREF_COLOR_GRADIENT_BRIGHT              = "bright";                     //$NON-NLS-1$
-   public static final String  PREF_COLOR_GRADIENT_DARK                = "dark";                       //$NON-NLS-1$
-   public static final String  PREF_COLOR_LINE_LIGHT                   = "line";                       //$NON-NLS-1$
-   public static final String  PREF_COLOR_LINE_DARK                    = "line-dark";                  //$NON-NLS-1$
-   public static final String  PREF_COLOR_TEXT_LIGHT                   = "text";                       //$NON-NLS-1$
-   public static final String  PREF_COLOR_TEXT_DARK                    = "text-dark";                  //$NON-NLS-1$
-   public static final String  PREF_COLOR_MAPPING                      = "mapping";                    //$NON-NLS-1$
+   public static final String  PREF_COLOR_GRADIENT_BRIGHT              = "bright";                      //$NON-NLS-1$
+   public static final String  PREF_COLOR_GRADIENT_DARK                = "dark";                        //$NON-NLS-1$
+   public static final String  PREF_COLOR_LINE_LIGHT                   = "line";                        //$NON-NLS-1$
+   public static final String  PREF_COLOR_LINE_DARK                    = "line-dark";                   //$NON-NLS-1$
+   public static final String  PREF_COLOR_TEXT_LIGHT                   = "text";                        //$NON-NLS-1$
+   public static final String  PREF_COLOR_TEXT_DARK                    = "text-dark";                   //$NON-NLS-1$
+   public static final String  PREF_COLOR_MAPPING                      = "mapping";                     //$NON-NLS-1$
 
-   private static final String MEMENTO_LEGEND_COLOR_FILE               = "legendcolor.xml";            //$NON-NLS-1$
-   private static final String MEMENTO_ROOT                            = "legendcolorlist";            //$NON-NLS-1$
+   private static final String MEMENTO_LEGEND_COLOR_FILE               = "legendcolor.xml";             //$NON-NLS-1$
+   private static final String MEMENTO_ROOT                            = "legendcolorlist";             //$NON-NLS-1$
 
-   private static final String MEMENTO_CHILD_LEGEND_COLOR              = "legendcolor";                //$NON-NLS-1$
-   private static final String TAG_LEGEND_COLOR_PREF_NAME              = "prefname";                   //$NON-NLS-1$
+   private static final String MEMENTO_CHILD_LEGEND_COLOR              = "legendcolor";                 //$NON-NLS-1$
+   private static final String TAG_LEGEND_COLOR_PREF_NAME              = "prefname";                    //$NON-NLS-1$
 
-   private static final String MEMENTO_CHILD_VALUE_COLOR               = "valuecolor";                 //$NON-NLS-1$
-   private static final String TAG_VALUE_COLOR_VALUE                   = "value";                      //$NON-NLS-1$
-   private static final String TAG_VALUE_COLOR_RED                     = "red";                        //$NON-NLS-1$
-   private static final String TAG_VALUE_COLOR_GREEN                   = "green";                      //$NON-NLS-1$
-   private static final String TAG_VALUE_COLOR_BLUE                    = "blue";                       //$NON-NLS-1$
+   private static final String MEMENTO_CHILD_VALUE_COLOR               = "valuecolor";                  //$NON-NLS-1$
+   private static final String TAG_VALUE_COLOR_VALUE                   = "value";                       //$NON-NLS-1$
+   private static final String TAG_VALUE_COLOR_RED                     = "red";                         //$NON-NLS-1$
+   private static final String TAG_VALUE_COLOR_GREEN                   = "green";                       //$NON-NLS-1$
+   private static final String TAG_VALUE_COLOR_BLUE                    = "blue";                        //$NON-NLS-1$
 
-   static final String         MEMENTO_CHILD_BRIGHTNESS                = "brightness";                 //$NON-NLS-1$
-   static final String         TAG_BRIGHTNESS_MIN                      = "min";                        //$NON-NLS-1$
-   static final String         TAG_BRIGHTNESS_MIN_FACTOR               = "minFactor";                  //$NON-NLS-1$
-   static final String         TAG_BRIGHTNESS_MAX                      = "max";                        //$NON-NLS-1$
-   static final String         TAG_BRIGHTNESS_MAX_FACTOR               = "maxFactor";                  //$NON-NLS-1$
+   static final String         MEMENTO_CHILD_BRIGHTNESS                = "brightness";                  //$NON-NLS-1$
+   static final String         TAG_BRIGHTNESS_MIN                      = "min";                         //$NON-NLS-1$
+   static final String         TAG_BRIGHTNESS_MIN_FACTOR               = "minFactor";                   //$NON-NLS-1$
+   static final String         TAG_BRIGHTNESS_MAX                      = "max";                         //$NON-NLS-1$
+   static final String         TAG_BRIGHTNESS_MAX_FACTOR               = "maxFactor";                   //$NON-NLS-1$
 
-   static final String         MEMENTO_CHILD_MIN_MAX_VALUE             = "minmaxValue";                //$NON-NLS-1$
-   static final String         TAG_IS_MIN_VALUE_OVERWRITE              = "isMinOverwrite";             //$NON-NLS-1$
-   static final String         TAG_MIN_VALUE_OVERWRITE                 = "minValueOverwrite";          //$NON-NLS-1$
-   static final String         TAG_IS_MAX_VALUE_OVERWRITE              = "isMaxOverwrite";             //$NON-NLS-1$
-   static final String         TAG_MAX_VALUE_OVERWRITE                 = "maxValueOverwrite";          //$NON-NLS-1$
+   static final String         MEMENTO_CHILD_MIN_MAX_VALUE             = "minmaxValue";                 //$NON-NLS-1$
+   static final String         TAG_IS_MIN_VALUE_OVERWRITE              = "isMinOverwrite";              //$NON-NLS-1$
+   static final String         TAG_MIN_VALUE_OVERWRITE                 = "minValueOverwrite";           //$NON-NLS-1$
+   static final String         TAG_IS_MAX_VALUE_OVERWRITE              = "isMaxOverwrite";              //$NON-NLS-1$
+   static final String         TAG_MAX_VALUE_OVERWRITE                 = "maxValueOverwrite";           //$NON-NLS-1$
 
 // SET_FORMATTING_OFF
 
@@ -1027,6 +1032,7 @@ public class GraphColorManager {
    /**
     * @param preferenceName
     *           preference name PREF_GRAPH_...
+    *
     * @return Returns the {@link ColorDefinition} for the preference name
     */
    public ColorDefinition getGraphColorDefinition(final String preferenceName) {

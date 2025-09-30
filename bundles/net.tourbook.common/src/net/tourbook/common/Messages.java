@@ -214,6 +214,11 @@ public class Messages extends NLS {
    public static String        Graph_Label_Prefix_RunningDynamics;
    public static String        Graph_Label_Prefix_Swimming;
    public static String        Graph_Label_Prefix_Training;
+   public static String        Graph_Label_Radar_PassedVehicles;
+   public static String        Graph_Label_Radar_DistanceToVehicle;
+   public static String        Graph_Label_Radar_VehicleSpeed;
+   public static String        Graph_Label_Radar_PassingSpeed_Absolute;
+   public static String        Graph_Label_Radar_PassingSpeed_Relative;
    public static String        Graph_Label_RunDyn_StanceTime;
    public static String        Graph_Label_RunDyn_StanceTimeBalance;
    public static String        Graph_Label_RunDyn_StepLength;

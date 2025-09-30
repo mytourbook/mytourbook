@@ -42,18 +42,20 @@ import org.joda.time.PeriodType;
 
 public class MesgListener_Record extends AbstractMesgListener implements RecordMesgListener {
 
-   private static final String DEV_FIELD_RADAR_PASSING_SPEED        = "passing_speed";                            //$NON-NLS-1$
-   private static final String DEV_FIELD_RADAR_PASSING_SPEEDABS     = "passing_speedabs";                         //$NON-NLS-1$
-   private static final String DEV_FIELD_RADAR_CURRENT              = "radar_current";                            //$NON-NLS-1$
-   private static final String DEV_FIELD_RADAR_RANGES               = "radar_ranges";                             //$NON-NLS-1$
-   private static final String DEV_FIELD_RADAR_SPEEDS               = "radar_speeds";                             //$NON-NLS-1$
-   private static final String DEV_FIELD_REAR_SHIFT                 = "rearShift";                                //$NON-NLS-1$
-   private static final String DEV_FIELD_NAME__CADENCE              = "Cadence";                                  //$NON-NLS-1$
-   private static final String DEV_FIELD_NAME__GROUND_TIME          = "Ground Time";                              //$NON-NLS-1$
-   private static final String DEV_FIELD_NAME__LEG_SPRING_STIFFNESS = "Leg Spring Stiffness";                     //$NON-NLS-1$
+   private static final String DEV_FIELD_RADAR_PASSED_VEHICLES        = "radar_current";        //$NON-NLS-1$
+   private static final String DEV_FIELD_RADAR_DISTANCE_TO_VEHICLE    = "radar_ranges";         //$NON-NLS-1$
+   private static final String DEV_FIELD_RADAR_VEHICLE_SPEED          = "radar_speeds";         //$NON-NLS-1$
+   private static final String DEV_FIELD_RADAR_PASSING_SPEED_RELATIVE = "passing_speed";        //$NON-NLS-1$
+   private static final String DEV_FIELD_RADAR_PASSING_SPEED_ABSOLUTE = "passing_speedabs";     //$NON-NLS-1$
+
+   private static final String DEV_FIELD_REAR_SHIFT                   = "rearShift";            //$NON-NLS-1$
+
+   private static final String DEV_FIELD_NAME__CADENCE                = "Cadence";              //$NON-NLS-1$
+   private static final String DEV_FIELD_NAME__GROUND_TIME            = "Ground Time";          //$NON-NLS-1$
+   private static final String DEV_FIELD_NAME__LEG_SPRING_STIFFNESS   = "Leg Spring Stiffness"; //$NON-NLS-1$
 
    //Power Data from  Stryd
-   private static final String DEV_FIELD_NAME__POWER                = "Power";                                    //$NON-NLS-1$
+   private static final String DEV_FIELD_NAME__POWER = "Power"; //$NON-NLS-1$
 
    //Power Data from Garmin Running Dynamics Pod
    private static final String DEV_FIELD_NAME__RP_POWER             = "RP_Power";                                 //$NON-NLS-1$
@@ -89,7 +91,6 @@ public class MesgListener_Record extends AbstractMesgListener implements RecordM
       _exceededTimeSliceLimit *= 1000;
 
       _gearData = fitData.getGearData(GearDataType.REAR_GEAR);
-
    }
 
    @SuppressWarnings("unused")
@@ -388,47 +389,47 @@ public class MesgListener_Record extends AbstractMesgListener implements RecordM
 //       passing_speed       2     null    UINT8
 //       passing_speedabs    2     null    UINT8
 
-         case DEV_FIELD_RADAR_PASSING_SPEED:
+         case DEV_FIELD_RADAR_PASSED_VEHICLES:
 
-            final Short passingSpeed = devField.getShortValue();
-            if (passingSpeed != null) {
-               timeData.radar_PassingSpeed = passingSpeed.shortValue();
+            final Integer radarCurrent = devField.getIntegerValue();
+            if (radarCurrent != null) {
+               timeData.radar_PassedVehicles = radarCurrent.intValue();
             }
 
             break;
 
-         case DEV_FIELD_RADAR_PASSING_SPEEDABS:
+         case DEV_FIELD_RADAR_DISTANCE_TO_VEHICLE:
+
+            final Integer radarRanges = devField.getIntegerValue();
+            if (radarRanges != null) {
+               timeData.radar_DistanceToVehicle = radarRanges.shortValue();
+            }
+
+            break;
+
+         case DEV_FIELD_RADAR_VEHICLE_SPEED:
+
+            final Short radarSpeeds = devField.getShortValue();
+            if (radarSpeeds != null) {
+               timeData.radar_VehicleSpeed = radarSpeeds.shortValue();
+            }
+
+            break;
+
+         case DEV_FIELD_RADAR_PASSING_SPEED_RELATIVE:
+
+            final Short passingSpeed = devField.getShortValue();
+            if (passingSpeed != null) {
+               timeData.radar_PassingSpeed_Relative = passingSpeed.shortValue();
+            }
+
+            break;
+
+         case DEV_FIELD_RADAR_PASSING_SPEED_ABSOLUTE:
 
             final Short passingSpeedAbsolute = devField.getShortValue();
             if (passingSpeedAbsolute != null) {
                timeData.radar_PassingSpeed_Absolute = passingSpeedAbsolute.shortValue();
-            }
-
-            break;
-
-         case DEV_FIELD_RADAR_CURRENT:
-
-            final Integer radarCurrent = devField.getIntegerValue();
-            if (radarCurrent != null) {
-               timeData.radar_Current = radarCurrent.intValue();
-            }
-
-            break;
-
-         case DEV_FIELD_RADAR_RANGES:
-
-            final Integer radarRanges = devField.getIntegerValue();
-            if (radarRanges != null) {
-               timeData.radar_Ranges = radarRanges.shortValue();
-            }
-
-            break;
-
-         case DEV_FIELD_RADAR_SPEEDS:
-
-            final Short radarSpeeds = devField.getShortValue();
-            if (radarSpeeds != null) {
-               timeData.radar_Speeds = radarSpeeds.shortValue();
             }
 
             break;

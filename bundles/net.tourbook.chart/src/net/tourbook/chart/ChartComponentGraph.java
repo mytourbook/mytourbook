@@ -3975,11 +3975,11 @@ public class ChartComponentGraph extends Canvas {
       final ChartDataXSerie xData = graphDrawingData.getXData();
       final ChartDataYSerie yData = graphDrawingData.getYData();
 
-      final float[][] yHighValues = yData.getHighValuesFloat();
-
       final double[] xValues = xData.getHighValuesDouble()[0];
+
+      final float[][] yHighValues = yData.getHighValuesFloat();
       final float[] yValues = yHighValues[0];
-      final float[] yValues2 = yHighValues[1];
+      final float[] yValuesColor = yHighValues[1];
 
       final int serieSize = xValues.length;
 
@@ -4147,9 +4147,10 @@ public class ChartComponentGraph extends Canvas {
          }
 
          /*
-          * draw bar when value has changed
+          * Draw bar when value has changed
           */
-         final boolean isChainwheelLarge = yValues2[0] == 1;
+         final boolean isBrightColor_First = yValuesColor == null ? true : yValuesColor[0] == 1;
+         final boolean isBrightColor_Other = yValuesColor == null ? true : yValuesColor[valueIndex - 1] == 1;
          {
             final float devYBar = devY0Inverse - devY;
 
@@ -4166,12 +4167,11 @@ public class ChartComponentGraph extends Canvas {
 
                   // set initial value
 
-                  bgColor = isChainwheelLarge ? colorBgBright : colorBgDark;
+                  bgColor = isBrightColor_First ? colorBgBright : colorBgDark;
 
                } else {
 
-                  final boolean isChainwheelLarge2 = yValues2[valueIndex - 1] == 1;
-                  if (isChainwheelLarge2) {
+                  if (isBrightColor_Other) {
 
                      // grosses Kettenblatt
 
@@ -4193,7 +4193,7 @@ public class ChartComponentGraph extends Canvas {
                   barWidth = 1;
                }
 
-               gc.fillRectangle(//
+               gc.fillRectangle(
                      barXStart - devXOverlap,
                      barY - barHeight2,
                      barWidth,
@@ -4258,13 +4258,11 @@ public class ChartComponentGraph extends Canvas {
 
                // set initial value
 
-               bgColor = isChainwheelLarge ? colorBgBright : colorBgDark;
+               bgColor = isBrightColor_First ? colorBgBright : colorBgDark;
 
             } else {
 
-               final boolean isChainwheelLarge2 = yValues2[valueIndex - 1] == 1;
-
-               if (isChainwheelLarge2) {
+               if (isBrightColor_Other) {
 
                   // grosses Kettenblatt
 
@@ -4327,7 +4325,7 @@ public class ChartComponentGraph extends Canvas {
 //      final double graphWidth = xValues[Math.min(xValueLength - 1, lastIndex)] - graphValueOffset;
 //      final int devGraphWidth = Math.min(0x7fff, (int) (graphWidth * scaleX));
 
-//      gc.fillGradientRectangle(//
+//      gc.fillGradientRectangle(
 //            0,
 //            devGraphHeight,
 //            devGraphWidth,
@@ -6388,7 +6386,7 @@ public class ChartComponentGraph extends Canvas {
 
          gc.setAlpha(0x80);
 
-         gc.fillGradientRectangle(//
+         gc.fillGradientRectangle(
                devMovedXStart,
                devYBottom,
                devMovedXEnd - devMovedXStart,
@@ -6904,7 +6902,7 @@ public class ChartComponentGraph extends Canvas {
       gcOverlay.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_YELLOW));
       gcOverlay.setAlpha(0x10);
 
-      gcOverlay.fillRectangle(//
+      gcOverlay.fillRectangle(
             _hoveredTitleSegment.devXSegment,
             0,
             _hoveredTitleSegment.devSegmentWidth,
@@ -6919,7 +6917,7 @@ public class ChartComponentGraph extends Canvas {
             final int devYTop = graphDrawingData.getDevYBottom() - graphDrawingData.devGraphHeight;
             final int devYBottom = graphDrawingData.getDevYBottom();
 
-            gcOverlay.fillRectangle(//
+            gcOverlay.fillRectangle(
                   _hoveredTitleSegment.devXSegment,
                   devYBottom,
                   _hoveredTitleSegment.devSegmentWidth,
@@ -7970,7 +7968,7 @@ public class ChartComponentGraph extends Canvas {
       }
 
       // use external mouse event listener
-      final ChartMouseEvent externalMouseEvent = _chart.onExternalMouseDown(//
+      final ChartMouseEvent externalMouseEvent = _chart.onExternalMouseDown(
             event.time & 0xFFFFFFFFL,
             devXMouse,
             devYMouse,

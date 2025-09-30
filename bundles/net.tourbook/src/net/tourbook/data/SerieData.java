@@ -207,11 +207,11 @@ public class SerieData implements Serializable {
     *
     * @since 25.8+
     */
-   public int[]                radar_Current;
-   public short[]              radar_Ranges;
-   public short[]              radar_PassingSpeed;
+   public int[]                radar_PassedVehicles;
+   public short[]              radar_DistanceToVehicle;
+   public short[]              radar_VehicleSpeed;
    public short[]              radar_PassingSpeed_Absolute;
-   public short[]              radar_Speeds;
+   public short[]              radar_PassingSpeed_Relative;
 
    private String dataSerieValues(final boolean[] dataSerie) {
 
@@ -360,11 +360,11 @@ public class SerieData implements Serializable {
 
             + "   tourPhotosWithPositionedGeo   " + dataSerieValues(tourPhotosWithPositionedGeo)   + NL //$NON-NLS-1$
 
-            + "   radar_Current                 " + dataSerieValues(radar_Current)                 + NL //$NON-NLS-1$
-            + "   radar_PassingSpeed            " + dataSerieValues(radar_PassingSpeed)            + NL //$NON-NLS-1$
+            + "   radar_PassedVehicles          " + dataSerieValues(radar_PassedVehicles)          + NL //$NON-NLS-1$
+            + "   radar_DistanceToVehicle       " + dataSerieValues(radar_DistanceToVehicle)       + NL //$NON-NLS-1$
+            + "   radar_VehicleSpeed            " + dataSerieValues(radar_VehicleSpeed)            + NL //$NON-NLS-1$
             + "   radar_PassingSpeed_Absolute   " + dataSerieValues(radar_PassingSpeed_Absolute)   + NL //$NON-NLS-1$
-            + "   radar_Ranges                  " + dataSerieValues(radar_Ranges)                  + NL //$NON-NLS-1$
-            + "   radar_Speeds                  " + dataSerieValues(radar_Speeds)                  + NL //$NON-NLS-1$
+            + "   radar_PassingSpeed_Relative   " + dataSerieValues(radar_PassingSpeed_Relative)   + NL //$NON-NLS-1$
 
             ;
    }

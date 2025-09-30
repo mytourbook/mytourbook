@@ -15,7 +15,7 @@
  *******************************************************************************/
 package net.tourbook.ui.tourChart.action;
 
-import java.util.ArrayList;
+import java.util.List;
 
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.ui.tourChart.TourChart;
@@ -37,8 +37,6 @@ public class ActionGraph extends Action {
     * @param label
     * @param toolTip
     * @param imageEnabled
-    * @param imageDisabled
-    *           Can be <code>null</code> when the default algorithm is used for it
     * @param isChecked
     */
    public ActionGraph(final TourChart tourChart,
@@ -67,12 +65,12 @@ public class ActionGraph extends Action {
          return;
       }
 
-      final ArrayList<Integer> visibleGraphs = tcc.getVisibleGraphs();
+      final List<Integer> allVisibleGraphs = tcc.getVisibleGraphs();
 
-      final boolean isThisGraphVisible = visibleGraphs.contains(_graphId);
+      final boolean isThisGraphVisible = allVisibleGraphs.contains(_graphId);
 
       // check that at least one graph is visible
-      if (isThisGraphVisible && visibleGraphs.size() == 1) {
+      if (isThisGraphVisible && allVisibleGraphs.size() == 1) {
 
          // this is a toggle button so the check status must be reset
          setChecked(true);

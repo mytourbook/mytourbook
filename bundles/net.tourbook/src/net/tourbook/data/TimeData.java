@@ -172,29 +172,29 @@ public class TimeData implements Serializable {
    public short              runDyn_VerticalRatio        = Short.MIN_VALUE;
 
    /**
-    * "Vehicle Count"
+    * "Vehicle Count" - Number of passed vehicles
     */
-   public int                radar_Current               = Integer.MIN_VALUE;
+   public int                radar_PassedVehicles        = Integer.MIN_VALUE;
 
    /**
     * Distance to approaching vehicle
     */
-   public short              radar_Ranges                = Short.MIN_VALUE;
+   public short              radar_DistanceToVehicle     = Short.MIN_VALUE;
+
+   /**
+    * "Vehicle Speed (Absolute)"
+    */
+   public short              radar_VehicleSpeed          = Short.MIN_VALUE;
 
    /**
     * "Approach Speed (Relative)"
     */
-   public short              radar_PassingSpeed          = Short.MIN_VALUE;
+   public short              radar_PassingSpeed_Relative = Short.MIN_VALUE;
 
    /**
     * "Approach Speed (Absolute)"
     */
    public short              radar_PassingSpeed_Absolute = Short.MIN_VALUE;
-
-   /**
-    * "Vehicle Speed (Absolute)
-    */
-   public short              radar_Speeds                = Short.MIN_VALUE;
 
    public TimeData() {
       super();

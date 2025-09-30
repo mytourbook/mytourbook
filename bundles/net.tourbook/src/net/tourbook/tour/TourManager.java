@@ -179,6 +179,11 @@ public class TourManager {
    public static final String  CUSTOM_DATA_SPEED_SUMMARIZED                    = "speed-summarized";                                            //$NON-NLS-1$
    public static final String  CUSTOM_DATA_TEMPERATURE                         = "temperature";                                                 //$NON-NLS-1$
    private static final String CUSTOM_DATA_TIME                                = "time";                                                        //$NON-NLS-1$
+   public static final String  CUSTOM_DATA_RADAR_PASSED_VEHICLES               = "Radar_PassedVehicles";                                        //$NON-NLS-1$
+   public static final String  CUSTOM_DATA_RADAR_DISTANCE_TO_VEHICLE           = "Radar_DistanceToVehicle";                                     //$NON-NLS-1$
+   public static final String  CUSTOM_DATA_RADAR_VEHICLE_SPEED                 = "Radar_VehicleSpeed";                                          //$NON-NLS-1$
+   public static final String  CUSTOM_DATA_RADAR_PASSING_SPEED_ABSOLUTE        = "Radar_PassingSpeed_Absolute";                                 //$NON-NLS-1$
+   public static final String  CUSTOM_DATA_RADAR_PASSING_SPEED_RELATIVE        = "Radar_PassingSpeed_Relative";                                 //$NON-NLS-1$
    public static final String  CUSTOM_DATA_RUN_DYN_STANCE_TIME                 = "runDyn_RunDyn_StanceTime";                                    //$NON-NLS-1$
    public static final String  CUSTOM_DATA_RUN_DYN_STANCE_TIME_BALANCE         = "runDyn_RunDyn_StanceTimeBalance";                             //$NON-NLS-1$
    public static final String  CUSTOM_DATA_RUN_DYN_STEP_LENGTH                 = "runDyn_RunDyn_StepLength";                                    //$NON-NLS-1$
@@ -227,6 +232,12 @@ public class TourManager {
    public static final int     GRAPH_TRAINING_EFFECT_ANAEROB                   = 1301;
    public static final int     GRAPH_TRAINING_PERFORMANCE                      = 1302;
 
+   public static final int     GRAPH_RADAR_PASSED_VEHICLES                     = 1400;
+   public static final int     GRAPH_RADAR_DISTANCE_TO_VEHICLE                 = 1401;
+   public static final int     GRAPH_RADAR_VEHICLE_SPEED                       = 1402;
+   public static final int     GRAPH_RADAR_PASSING_SPEED_ABSOLUTE              = 1403;
+   public static final int     GRAPH_RADAR_PASSING_SPEED_RELATIVE              = 1404;
+
    public static final int     GRAPH_TOUR_COMPARE                              = 2000;
    public static final int     GRAPH_TOUR_COMPARE_REF_TOUR                     = 2001;
    //
@@ -251,6 +262,12 @@ public class TourManager {
          GRAPH_PACE_INTERVAL,
          GRAPH_PACE_SUMMARIZED,
          GRAPH_GEARS,
+
+         GRAPH_RADAR_PASSED_VEHICLES,
+         GRAPH_RADAR_DISTANCE_TO_VEHICLE,
+         GRAPH_RADAR_VEHICLE_SPEED,
+         GRAPH_RADAR_PASSING_SPEED_ABSOLUTE,
+         GRAPH_RADAR_PASSING_SPEED_RELATIVE,
 
          GRAPH_RUN_DYN_STANCE_TIME,
          GRAPH_RUN_DYN_STANCE_TIME_BALANCED,
@@ -4713,22 +4730,28 @@ public class TourManager {
       final ChartDataYSerie yDataGears             = createModelData_Gears(            tourData, chartDataModel);
       final ChartDataYSerie yDataTemperature       = createModelData_Temperature(      tourData, chartDataModel, chartType, useCustomBackground);
 
-      final ChartDataYSerie yDataTourCompare                   = createModelData_TourCompare(               tourData, chartDataModel, chartType, tcc);
-      final ChartDataYSerie yDataTourCompare_RefTour           = createModelData_TourCompareRefTour(        tourData, chartDataModel, chartType, tcc);
+      final ChartDataYSerie yData_Radar_PassedVehicles         = createModelData_Radar_PassedVehicles(         tourData, chartDataModel);
+      final ChartDataYSerie yData_Radar_DistanceToVehicle      = createModelData_Radar_DistanceToVehicle(      tourData, chartDataModel);
+      final ChartDataYSerie yData_Radar_VehicleSpeed           = createModelData_Radar_VehicleSpeed(           tourData, chartDataModel);
+      final ChartDataYSerie yData_Radar_PassingSpeed_Absolute  = createModelData_Radar_PassingSpeed_Absolute(  tourData, chartDataModel);
+      final ChartDataYSerie yData_Radar_PassingSpeed_Relative  = createModelData_Radar_PassingSpeed_Relative(  tourData, chartDataModel);
 
-      final ChartDataYSerie yData_RunDyn_StanceTime            = createModelData_RunDyn_StanceTime(         tourData, chartDataModel, chartType, useCustomBackground);
-      final ChartDataYSerie yData_RunDyn_StanceTimeBalance     = createModelData_RunDyn_StanceTimeBalance(  tourData, chartDataModel, chartType, useCustomBackground);
-      final ChartDataYSerie yData_RunDyn_StepLength            = createModelData_RunDyn_StepLength(         tourData, chartDataModel, chartType, useCustomBackground);
-      final ChartDataYSerie yData_RunDyn_VerticalOscillation   = createModelData_RunDyn_VerticalOscillation(tourData, chartDataModel, chartType, useCustomBackground);
-      final ChartDataYSerie yData_RunDyn_VerticalRatio         = createModelData_RunDyn_VerticalRatio(      tourData, chartDataModel, chartType, useCustomBackground);
+      final ChartDataYSerie yData_RunDyn_StanceTime            = createModelData_RunDyn_StanceTime(            tourData, chartDataModel, chartType, useCustomBackground);
+      final ChartDataYSerie yData_RunDyn_StanceTimeBalance     = createModelData_RunDyn_StanceTimeBalance(     tourData, chartDataModel, chartType, useCustomBackground);
+      final ChartDataYSerie yData_RunDyn_StepLength            = createModelData_RunDyn_StepLength(            tourData, chartDataModel, chartType, useCustomBackground);
+      final ChartDataYSerie yData_RunDyn_VerticalOscillation   = createModelData_RunDyn_VerticalOscillation(   tourData, chartDataModel, chartType, useCustomBackground);
+      final ChartDataYSerie yData_RunDyn_VerticalRatio         = createModelData_RunDyn_VerticalRatio(         tourData, chartDataModel, chartType, useCustomBackground);
 
-      final ChartDataYSerie yData_Swim_Strokes                 = createModelData_Swim_Strokes(              tourData, chartDataModel, chartType, useCustomBackground);
-      final ChartDataYSerie yData_Swim_Swolf                   = createModelData_Swim_Swolf(                tourData, chartDataModel, chartType, useCustomBackground);
+      final ChartDataYSerie yData_Swim_Strokes                 = createModelData_Swim_Strokes(                 tourData, chartDataModel, chartType, useCustomBackground);
+      final ChartDataYSerie yData_Swim_Swolf                   = createModelData_Swim_Swolf(                   tourData, chartDataModel, chartType, useCustomBackground);
+
+      final ChartDataYSerie yDataTourCompare                   = createModelData_TourCompare(                  tourData, chartDataModel, chartType, tcc);
+      final ChartDataYSerie yDataTourCompare_RefTour           = createModelData_TourCompareRefTour(           tourData, chartDataModel, chartType, tcc);
 
 // SET_FORMATTING_ON
 
       /*
-       * all visible graphs are added as y-data to the chart data model in the sequence as they were
+       * All visible graphs are added as y-data to the chart data model in the sequence as they were
        * activated
        */
       for (final int graphId : tcc.getVisibleGraphs()) {
@@ -4841,6 +4864,41 @@ public class TourManager {
          case GRAPH_TOUR_COMPARE_REF_TOUR:
             if (yDataTourCompare_RefTour != null) {
                chartDataModel.addYData(yDataTourCompare_RefTour);
+            }
+            break;
+
+         case GRAPH_RADAR_PASSED_VEHICLES:
+            if (yData_Radar_PassedVehicles != null) {
+               chartDataModel.addYData(yData_Radar_PassedVehicles);
+               chartDataModel.setCustomData(CUSTOM_DATA_RADAR_PASSED_VEHICLES, yData_Radar_PassedVehicles);
+            }
+            break;
+
+         case GRAPH_RADAR_DISTANCE_TO_VEHICLE:
+            if (yData_Radar_DistanceToVehicle != null) {
+               chartDataModel.addYData(yData_Radar_DistanceToVehicle);
+               chartDataModel.setCustomData(CUSTOM_DATA_RADAR_DISTANCE_TO_VEHICLE, yData_Radar_DistanceToVehicle);
+            }
+            break;
+
+         case GRAPH_RADAR_VEHICLE_SPEED:
+            if (yData_Radar_VehicleSpeed != null) {
+               chartDataModel.addYData(yData_Radar_VehicleSpeed);
+               chartDataModel.setCustomData(CUSTOM_DATA_RADAR_VEHICLE_SPEED, yData_Radar_VehicleSpeed);
+            }
+            break;
+
+         case GRAPH_RADAR_PASSING_SPEED_ABSOLUTE:
+            if (yData_Radar_PassingSpeed_Absolute != null) {
+               chartDataModel.addYData(yData_Radar_PassingSpeed_Absolute);
+               chartDataModel.setCustomData(CUSTOM_DATA_RADAR_PASSING_SPEED_ABSOLUTE, yData_Radar_PassingSpeed_Absolute);
+            }
+            break;
+
+         case GRAPH_RADAR_PASSING_SPEED_RELATIVE:
+            if (yData_Radar_PassingSpeed_Relative != null) {
+               chartDataModel.addYData(yData_Radar_PassingSpeed_Relative);
+               chartDataModel.setCustomData(CUSTOM_DATA_RADAR_PASSING_SPEED_RELATIVE, yData_Radar_PassingSpeed_Relative);
             }
             break;
 
@@ -5820,6 +5878,181 @@ public class TourManager {
       }
 
       return yDataPower;
+   }
+
+   /**
+    * Radar: Distance to vehicle
+    */
+   private ChartDataYSerie createModelData_Radar_DistanceToVehicle(final TourData tourData,
+                                                                   final ChartDataModel chartDataModel) {
+
+      ChartDataYSerie yDataValues = null;
+
+      final float[] allValues = tourData.getRadar_DistanceToVehicle_UI();
+      if (allValues != null) {
+
+         final float[][] chartValues = new float[][] {
+
+               allValues,
+
+               // this is used for the painted color
+               null
+         };
+
+         yDataValues = createChartDataSerieNoZero(chartValues, ChartType.HORIZONTAL_BAR);
+
+         yDataValues.setYTitle(OtherMessages.GRAPH_LABEL_RADAR_DISTANCE_TO_VEHICLE);
+         yDataValues.setShowYSlider(true);
+         yDataValues.setCustomData(ChartDataYSerie.YDATA_GRAPH_ID, GRAPH_RADAR_DISTANCE_TO_VEHICLE);
+//       yDataValues.setSliderLabelProvider(new SliderLabelProvider_Gear(gearSerie, gearType));
+
+         yDataValues.setUnitLabel(UI.SYMBOL_NUMBER_SIGN);
+
+         setGraphColors(yDataValues, GraphColorManager.PREF_GRAPH_RADAR_DISTANCE_TO_VEHICLE);
+         chartDataModel.addXyData(yDataValues);
+      }
+
+      return yDataValues;
+   }
+
+   /**
+    * Radar: Number of passed vehicles
+    */
+   private ChartDataYSerie createModelData_Radar_PassedVehicles(final TourData tourData,
+                                                                final ChartDataModel chartDataModel) {
+
+      ChartDataYSerie yDataValues = null;
+
+      final float[] allValues = tourData.getRadar_PassedVehicles_UI();
+      if (allValues != null) {
+
+         final float[][] chartValues = new float[][] {
+
+               allValues,
+
+               // this is used for the painted color
+               null
+         };
+
+         yDataValues = createChartDataSerieNoZero(chartValues, ChartType.HORIZONTAL_BAR);
+
+         yDataValues.setYTitle(OtherMessages.GRAPH_LABEL_RADAR_PASSED_VEHICLES);
+         yDataValues.setShowYSlider(true);
+         yDataValues.setCustomData(ChartDataYSerie.YDATA_GRAPH_ID, GRAPH_RADAR_PASSED_VEHICLES);
+//       yDataValues.setSliderLabelProvider(new SliderLabelProvider_Gear(gearSerie, gearType));
+
+         yDataValues.setUnitLabel(UI.SYMBOL_NUMBER_SIGN);
+
+         setGraphColors(yDataValues, GraphColorManager.PREF_GRAPH_RADAR_PASSED_VEHICLES);
+         chartDataModel.addXyData(yDataValues);
+      }
+
+      return yDataValues;
+   }
+
+   /**
+    * Radar: Passing speed (absolute)
+    */
+   private ChartDataYSerie createModelData_Radar_PassingSpeed_Absolute(final TourData tourData,
+                                                                       final ChartDataModel chartDataModel) {
+
+      ChartDataYSerie yDataValues = null;
+
+      final float[] allValues = tourData.getRadar_PassingSpeed_Absolute_UI();
+      if (allValues != null) {
+
+         final float[][] chartValues = new float[][] {
+
+               allValues,
+
+               // this is used for the painted color
+               null
+         };
+
+         yDataValues = createChartDataSerieNoZero(chartValues, ChartType.HORIZONTAL_BAR);
+
+         yDataValues.setYTitle(OtherMessages.GRAPH_LABEL_RADAR_PASSING_SPEED_ABSOLUTE);
+         yDataValues.setShowYSlider(true);
+         yDataValues.setCustomData(ChartDataYSerie.YDATA_GRAPH_ID, GRAPH_RADAR_PASSING_SPEED_ABSOLUTE);
+//       yDataValues.setSliderLabelProvider(new SliderLabelProvider_Gear(gearSerie, gearType));
+
+         yDataValues.setUnitLabel(UI.SYMBOL_NUMBER_SIGN);
+
+         setGraphColors(yDataValues, GraphColorManager.PREF_GRAPH_RADAR_PASSING_SPEED_ABSOLUTE);
+         chartDataModel.addXyData(yDataValues);
+      }
+
+      return yDataValues;
+   }
+
+   /**
+    * Radar: Passing speed (relative)
+    */
+   private ChartDataYSerie createModelData_Radar_PassingSpeed_Relative(final TourData tourData,
+                                                                       final ChartDataModel chartDataModel) {
+
+      ChartDataYSerie yDataValues = null;
+
+      final float[] allValues = tourData.getRadar_PassingSpeed_Relative_UI();
+      if (allValues != null) {
+
+         final float[][] chartValues = new float[][] {
+
+               allValues,
+
+               // this is used for the painted color
+               null
+         };
+
+         yDataValues = createChartDataSerieNoZero(chartValues, ChartType.HORIZONTAL_BAR);
+
+         yDataValues.setYTitle(OtherMessages.GRAPH_LABEL_RADAR_PASSING_SPEED_RELATIVE);
+         yDataValues.setShowYSlider(true);
+         yDataValues.setCustomData(ChartDataYSerie.YDATA_GRAPH_ID, GRAPH_RADAR_PASSING_SPEED_RELATIVE);
+//       yDataValues.setSliderLabelProvider(new SliderLabelProvider_Gear(gearSerie, gearType));
+
+         yDataValues.setUnitLabel(UI.SYMBOL_NUMBER_SIGN);
+
+         setGraphColors(yDataValues, GraphColorManager.PREF_GRAPH_RADAR_PASSING_SPEED_RELATIVE);
+         chartDataModel.addXyData(yDataValues);
+      }
+
+      return yDataValues;
+   }
+
+   /**
+    * Radar: Vehicle speed (absolute)
+    */
+   private ChartDataYSerie createModelData_Radar_VehicleSpeed(final TourData tourData,
+                                                              final ChartDataModel chartDataModel) {
+
+      ChartDataYSerie yDataValues = null;
+
+      final float[] allValues = tourData.getRadar_VehicleSpeed_UI();
+      if (allValues != null) {
+
+         final float[][] chartValues = new float[][] {
+
+               allValues,
+
+               // this is used for the painted color
+               null
+         };
+
+         yDataValues = createChartDataSerieNoZero(chartValues, ChartType.HORIZONTAL_BAR);
+
+         yDataValues.setYTitle(OtherMessages.GRAPH_LABEL_RADAR_VEHICLE_SPEED);
+         yDataValues.setShowYSlider(true);
+         yDataValues.setCustomData(ChartDataYSerie.YDATA_GRAPH_ID, GRAPH_RADAR_VEHICLE_SPEED);
+//       yDataValues.setSliderLabelProvider(new SliderLabelProvider_Gear(gearSerie, gearType));
+
+         yDataValues.setUnitLabel(UI.SYMBOL_NUMBER_SIGN);
+
+         setGraphColors(yDataValues, GraphColorManager.PREF_GRAPH_RADAR_VEHICLE_SPEED);
+         chartDataModel.addXyData(yDataValues);
+      }
+
+      return yDataValues;
    }
 
    /**
