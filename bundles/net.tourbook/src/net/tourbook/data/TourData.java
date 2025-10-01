@@ -14456,31 +14456,31 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
       return isAvailable;
    }
 
-   private boolean setupStartingValues_Radar_PassingSpeedRelative(final TimeData[] allTimeData) {
+   private boolean setupStartingValues_Radar_DistanceToVehicle(final TimeData[] allTimeData) {
 
       final int numTimeData = allTimeData.length;
       final TimeData firstTimeData = allTimeData[0];
 
       boolean isAvailable = false;
 
-      if (firstTimeData.radar_PassingSpeed_Relative == Short.MIN_VALUE) {
+      if (firstTimeData.radar_DistanceToVehicle == Short.MIN_VALUE) {
 
          // check if there is a valid value
 
          for (int timeDataIndex = 0; timeDataIndex < numTimeData; timeDataIndex++) {
 
             final TimeData timeData = allTimeData[timeDataIndex];
-            final short passingSpeed = timeData.radar_PassingSpeed_Relative;
+            final short timeDataValue = timeData.radar_DistanceToVehicle;
 
-            if (passingSpeed > 0) {
+            if (timeDataValue > 0) {
 
                // time data values are available, starting values will be set to 0
 
-               radar_PassingSpeed_Relative = new short[numTimeData];
+               radar_DistanceToVehicle = new short[numTimeData];
                isAvailable = true;
 
                for (int invalidIndex = 0; invalidIndex < timeDataIndex; invalidIndex++) {
-                  allTimeData[invalidIndex].radar_PassingSpeed_Relative = 0;
+                  allTimeData[invalidIndex].radar_DistanceToVehicle = 0;
                }
 
                break;
@@ -14491,7 +14491,49 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
 
          // time data values are available
 
-         radar_PassingSpeed_Relative = new short[numTimeData];
+         radar_DistanceToVehicle = new short[numTimeData];
+         isAvailable = true;
+      }
+
+      return isAvailable;
+   }
+
+   private boolean setupStartingValues_radar_PassedVehicles(final TimeData[] allTimeData) {
+
+      final int numTimeData = allTimeData.length;
+      final TimeData firstTimeData = allTimeData[0];
+
+      boolean isAvailable = false;
+
+      if (firstTimeData.radar_PassedVehicles == Integer.MIN_VALUE) {
+
+         // check if there is a valid value
+
+         for (int timeDataIndex = 0; timeDataIndex < numTimeData; timeDataIndex++) {
+
+            final TimeData timeData = allTimeData[timeDataIndex];
+            final int timeDataValue = timeData.radar_PassedVehicles;
+
+            if (timeDataValue > 0) {
+
+               // time data values are available, starting values will be set to 0
+
+               radar_PassedVehicles = new int[numTimeData];
+               isAvailable = true;
+
+               for (int invalidIndex = 0; invalidIndex < timeDataIndex; invalidIndex++) {
+                  allTimeData[invalidIndex].radar_PassedVehicles = 0;
+               }
+
+               break;
+            }
+         }
+
+      } else {
+
+         // time data values are available
+
+         radar_PassedVehicles = new int[numTimeData];
          isAvailable = true;
       }
 
@@ -14540,31 +14582,31 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
       return isAvailable;
    }
 
-   private boolean setupStartingValues_Radar_DistanceToVehicle(final TimeData[] allTimeData) {
+   private boolean setupStartingValues_Radar_PassingSpeedRelative(final TimeData[] allTimeData) {
 
       final int numTimeData = allTimeData.length;
       final TimeData firstTimeData = allTimeData[0];
 
       boolean isAvailable = false;
 
-      if (firstTimeData.radar_DistanceToVehicle == Short.MIN_VALUE) {
+      if (firstTimeData.radar_PassingSpeed_Relative == Short.MIN_VALUE) {
 
          // check if there is a valid value
 
          for (int timeDataIndex = 0; timeDataIndex < numTimeData; timeDataIndex++) {
 
             final TimeData timeData = allTimeData[timeDataIndex];
-            final short timeDataValue = timeData.radar_DistanceToVehicle;
+            final short passingSpeed = timeData.radar_PassingSpeed_Relative;
 
-            if (timeDataValue > 0) {
+            if (passingSpeed > 0) {
 
                // time data values are available, starting values will be set to 0
 
-               radar_DistanceToVehicle = new short[numTimeData];
+               radar_PassingSpeed_Relative = new short[numTimeData];
                isAvailable = true;
 
                for (int invalidIndex = 0; invalidIndex < timeDataIndex; invalidIndex++) {
-                  allTimeData[invalidIndex].radar_DistanceToVehicle = 0;
+                  allTimeData[invalidIndex].radar_PassingSpeed_Relative = 0;
                }
 
                break;
@@ -14575,7 +14617,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
 
          // time data values are available
 
-         radar_DistanceToVehicle = new short[numTimeData];
+         radar_PassingSpeed_Relative = new short[numTimeData];
          isAvailable = true;
       }
 
@@ -14618,48 +14660,6 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
          // time data values are available
 
          radar_VehicleSpeed = new short[numTimeData];
-         isAvailable = true;
-      }
-
-      return isAvailable;
-   }
-
-   private boolean setupStartingValues_radar_PassedVehicles(final TimeData[] allTimeData) {
-
-      final int numTimeData = allTimeData.length;
-      final TimeData firstTimeData = allTimeData[0];
-
-      boolean isAvailable = false;
-
-      if (firstTimeData.radar_PassedVehicles == Short.MIN_VALUE) {
-
-         // check if there is a valid value
-
-         for (int timeDataIndex = 0; timeDataIndex < numTimeData; timeDataIndex++) {
-
-            final TimeData timeData = allTimeData[timeDataIndex];
-            final int timeDataValue = timeData.radar_PassedVehicles;
-
-            if (timeDataValue > 0) {
-
-               // time data values are available, starting values will be set to 0
-
-               radar_PassedVehicles = new int[numTimeData];
-               isAvailable = true;
-
-               for (int invalidIndex = 0; invalidIndex < timeDataIndex; invalidIndex++) {
-                  allTimeData[invalidIndex].radar_PassedVehicles = 0;
-               }
-
-               break;
-            }
-         }
-
-      } else {
-
-         // time data values are available
-
-         radar_PassedVehicles = new int[numTimeData];
          isAvailable = true;
       }
 

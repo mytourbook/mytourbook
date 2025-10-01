@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2025 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -42,6 +42,9 @@ import net.tourbook.map2.view.DialogMap2ColorEditor;
 import net.tourbook.map2.view.IMap2ColorUpdater;
 import net.tourbook.tour.TourManager;
 
+import org.eclipse.jface.action.Action;
+import org.eclipse.jface.action.IMenuManager;
+import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.layout.TreeColumnLayout;
@@ -60,8 +63,8 @@ import org.eclipse.jface.viewers.TreeViewerColumn;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerCell;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.KeyListener;
+import org.eclipse.swt.events.MouseListener;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.widgets.Button;
@@ -126,16 +129,21 @@ public class PrefPageAppearanceColors extends PreferencePage implements
 
    private TreeViewer                    _colorViewer;
    private GraphColorItem                _selectedColor;
+   private GraphColorItem                _copyPaste_Selection;
    private boolean                       _isColorChanged;
 
    private ColorDefinition               _expandedItem;
-   private boolean                       _isNavigationKeyPressed;
+   private boolean                       _isInContextMenu;
    private boolean                       _isInTreeExpand;
+   private boolean                       _isNavigationKeyPressed;
 
    private IGradientColorProvider        _legendImageColorProvider;
    private DialogMap2ColorEditor         _dialogMappingColor;
 
    private GraphColorPainter             _graphColorPainter;
+
+   private ActionCopyColorIntoClipboard  _actionCopyColor;
+   private ActionPasteColorFromClipboard _actionPasteColor;
 
    /*
     * UI controls
@@ -144,6 +152,32 @@ public class PrefPageAppearanceColors extends PreferencePage implements
    private Button                _chkLiveUpdate;
 
    private ColorSelectorExtended _colorSelector;
+
+   public final class ActionCopyColorIntoClipboard extends Action {
+
+      public ActionCopyColorIntoClipboard() {
+
+         setText("&Copy Color");
+      }
+
+      @Override
+      public void run() {
+         onColor_Copy();
+      }
+   }
+
+   public final class ActionPasteColorFromClipboard extends Action {
+
+      public ActionPasteColorFromClipboard() {
+
+         setText("&Paste Color");
+      }
+
+      @Override
+      public void run() {
+         onColor_Paste();
+      }
+   }
 
    /**
     * the color content provider has the following structure<br>
@@ -239,6 +273,12 @@ public class PrefPageAppearanceColors extends PreferencePage implements
       updateAndSaveColors();
    }
 
+   private void createActions() {
+
+      _actionCopyColor = new ActionCopyColorIntoClipboard();
+      _actionPasteColor = new ActionPasteColorFromClipboard();
+   }
+
    /**
     * create color objects for every graph definition
     */
@@ -280,6 +320,7 @@ public class PrefPageAppearanceColors extends PreferencePage implements
    protected Control createContents(final Composite parent) {
 
       createColorDefinitions();
+      createActions();
 
       final Composite ui = createUI(parent);
 
@@ -320,7 +361,7 @@ public class PrefPageAppearanceColors extends PreferencePage implements
       final Composite layoutContainer = new Composite(parent, SWT.NONE);
       GridDataFactory.fillDefaults()
             .grab(true, true)
-            .hint(300, 200) 
+            .hint(300, 200)
             .applyTo(layoutContainer);
 
       final TreeColumnLayout treeLayout = new TreeColumnLayout();
@@ -340,38 +381,41 @@ public class PrefPageAppearanceColors extends PreferencePage implements
       tree.setLinesVisible(_prefStore.getBoolean(ITourbookPreferences.VIEW_LAYOUT_DISPLAY_LINES));
 
       _colorViewer = new TreeViewer(tree);
+
       defineAllColumns(treeLayout, tree);
 
       _colorViewer.setContentProvider(new ColorContentProvider());
 
       _graphColorPainter = new GraphColorPainter(this);
 
-      _colorViewer.getTree().addKeyListener(new KeyListener() {
+      setupContextMenu(tree);
 
-         @Override
-         public void keyPressed(final KeyEvent keyEvent) {
+      tree.addKeyListener(KeyListener.keyPressedAdapter(keyEvent -> {
 
-            if (keyEvent.keyCode == SWT.ARROW_UP || keyEvent.keyCode == SWT.ARROW_DOWN) {
-               _isNavigationKeyPressed = true;
-            } else {
-               _isNavigationKeyPressed = false;
-            }
+         if (keyEvent.keyCode == SWT.ARROW_UP || keyEvent.keyCode == SWT.ARROW_DOWN) {
+            _isNavigationKeyPressed = true;
+         } else {
+            _isNavigationKeyPressed = false;
          }
+      }));
 
-         @Override
-         public void keyReleased(final KeyEvent keyEvent) {}
-      });
+      tree.addMouseListener(MouseListener.mouseDownAdapter(mouseEvent -> {
+
+         _isInContextMenu = mouseEvent.button == 3;
+
+      }));
 
       _colorViewer.addSelectionChangedListener(selectionChangedEvent -> {
 
          if (_isInTreeExpand) {
 
-            // prevent: !MESSAGE Ignored reentrant call while viewer is busy. This is only logged once per viewer instance, but similar calls will still be ignored.
+            /*
+             * Prevent: !MESSAGE Ignored reentrant call while viewer is busy. This is only logged
+             * once per viewer instance, but similar calls will still be ignored.
+             */
 
             return;
          }
-
-         final Object selection = ((IStructuredSelection) _colorViewer.getSelection()).getFirstElement();
 
          // don't expand when navigation key is pressed
          if (_isNavigationKeyPressed) {
@@ -381,16 +425,21 @@ public class PrefPageAppearanceColors extends PreferencePage implements
             return;
          }
 
-         if (selection instanceof ColorDefinition) {
+         if (_isInContextMenu) {
+            return;
+         }
+
+         final Object selection = ((IStructuredSelection) _colorViewer.getSelection()).getFirstElement();
+
+         if (selection instanceof final ColorDefinition colorDefinition) {
 
             // expand/collapse current item
-            final ColorDefinition treeItem = (ColorDefinition) selection;
 
-            if (_colorViewer.getExpandedState(treeItem)) {
+            if (_colorViewer.getExpandedState(colorDefinition)) {
 
                // item is expanded -> collapse
 
-               _colorViewer.collapseToLevel(treeItem, 1);
+               _colorViewer.collapseToLevel(colorDefinition, 1);
 
             } else {
 
@@ -399,21 +448,19 @@ public class PrefPageAppearanceColors extends PreferencePage implements
                if (_expandedItem != null) {
                   _colorViewer.collapseToLevel(_expandedItem, 1);
                }
-               _colorViewer.expandToLevel(treeItem, 1);
-               _expandedItem = treeItem;
+               _colorViewer.expandToLevel(colorDefinition, 1);
+               _expandedItem = colorDefinition;
 
                // expanding the treeangle, the layout is correctly done but not with double click
                layoutContainer.layout(true, true);
             }
 
-         } else if (selection instanceof GraphColorItem) {
+         } else if (selection instanceof final GraphColorItem graphColor) {
 
             onSelect_ColorIn_ColorViewer();
 
             // run async that the UI do display the selected color in the color button
-            _colorViewer.getTree().getDisplay().asyncExec(() -> {
-
-               final GraphColorItem graphColor = (GraphColorItem) selection;
+            tree.getDisplay().asyncExec(() -> {
 
                if (graphColor.isMapColor()) {
 
@@ -445,8 +492,7 @@ public class PrefPageAppearanceColors extends PreferencePage implements
 
             final Object element = event.getElement();
 
-            if (element instanceof ColorDefinition) {
-               final ColorDefinition treeItem = (ColorDefinition) element;
+            if (element instanceof final ColorDefinition colorDefinition) {
 
                if (_expandedItem != null) {
 
@@ -457,10 +503,10 @@ public class PrefPageAppearanceColors extends PreferencePage implements
                   _isInTreeExpand = false;
                }
 
-               _colorViewer.getTree().getDisplay().asyncExec(() -> {
+               tree.getDisplay().asyncExec(() -> {
 
-                  _colorViewer.expandToLevel(treeItem, 1);
-                  _expandedItem = treeItem;
+                  _colorViewer.expandToLevel(colorDefinition, 1);
+                  _expandedItem = colorDefinition;
                });
             }
          }
@@ -606,6 +652,24 @@ public class PrefPageAppearanceColors extends PreferencePage implements
       }
    }
 
+   private void enableActions() {
+
+      final Object selectedItem = _colorViewer.getStructuredSelection().getFirstElement();
+
+      final boolean isGraphColorSelected = selectedItem instanceof GraphColorItem;
+
+      _actionCopyColor.setEnabled(isGraphColorSelected);
+      _actionPasteColor.setEnabled(isGraphColorSelected && _copyPaste_Selection != null);
+   }
+
+   private void fillContextMenu(final IMenuManager menuMgr) {
+
+      menuMgr.add(_actionCopyColor);
+      menuMgr.add(_actionPasteColor);
+
+      enableActions();
+   }
+
    @Override
    public IGradientColorProvider getMapLegendColorProvider() {
       return _legendImageColorProvider;
@@ -660,10 +724,23 @@ public class PrefPageAppearanceColors extends PreferencePage implements
 
             + " [" + getClass().getSimpleName() + "] ()" + NL //$NON-NLS-1$ //$NON-NLS-2$
 
-            + sb.toString()
+            + sb.toString());
+   }
 
-      );
+   /**
+    * Log changes that it is easier to adjust the default values
+    *
+    * @param selectedColor
+    *
+    */
+   private void logColorCode(final GraphColorItem selectedColor) {
 
+      System.out.println(NL + NL
+
+            + UI.timeStampNano()
+
+            + " [" + getClass().getSimpleName() + "] ()" //$NON-NLS-1$ //$NON-NLS-2$
+            + selectedColor.getColorDefinition().logColorCode());
    }
 
    @Override
@@ -676,6 +753,48 @@ public class PrefPageAppearanceColors extends PreferencePage implements
       return super.okToLeave();
    }
 
+   private void onColor_Copy() {
+
+      final Object selectedItem = _colorViewer.getStructuredSelection().getFirstElement();
+
+      if (selectedItem instanceof final GraphColorItem graphColor) {
+
+         _copyPaste_Selection = graphColor;
+      }
+   }
+
+   private void onColor_Paste() {
+
+      final Object selectedItem = _colorViewer.getStructuredSelection().getFirstElement();
+
+      if (selectedItem instanceof final GraphColorItem selectedGraphColor) {
+
+         if (selectedGraphColor.pasteACopy(_copyPaste_Selection)) {
+
+            final ColorDefinition colorDefinition = selectedGraphColor.getColorDefinition();
+
+            /*
+             * Dispose the old color/image from the graph
+             */
+            _graphColorPainter.invalidateResources(
+                  selectedGraphColor.getColorId(),
+                  colorDefinition.getColorDefinitionId());
+
+            /*
+             * Update the tree viewer, the color images will then be recreated
+             */
+            _colorViewer.update(selectedGraphColor, null);
+            _colorViewer.update(colorDefinition, null);
+
+            _isColorChanged = true;
+
+            logColorCode(selectedGraphColor);
+
+            updateAndSaveColors();
+         }
+      }
+   }
+
    /**
     * is called when the color in the color selector has changed
     *
@@ -686,8 +805,6 @@ public class PrefPageAppearanceColors extends PreferencePage implements
       final RGB oldValue = (RGB) event.getOldValue();
       final RGB newValue = (RGB) event.getNewValue();
 
-      ColorDefinition colorDefinition = null;
-
       if (!oldValue.equals(newValue) && _selectedColor != null) {
 
          // color has changed
@@ -695,17 +812,17 @@ public class PrefPageAppearanceColors extends PreferencePage implements
          // update the data model
          _selectedColor.setRGB(newValue);
 
-         colorDefinition = _selectedColor.getColorDefinition();
+         final ColorDefinition colorDefinition = _selectedColor.getColorDefinition();
 
          /*
-          * dispose the old color/image from the graph
+          * Dispose the old color/image from the graph
           */
          _graphColorPainter.invalidateResources(
                _selectedColor.getColorId(),
                colorDefinition.getColorDefinitionId());
 
          /*
-          * update the tree viewer, the color images will then be recreated
+          * Update the tree viewer, the color images will then be recreated
           */
          _colorViewer.update(_selectedColor, null);
          _colorViewer.update(colorDefinition, null);
@@ -713,17 +830,8 @@ public class PrefPageAppearanceColors extends PreferencePage implements
          _isColorChanged = true;
       }
 
-      // log changes that it is easier to adjust the default values
       if (_selectedColor != null) {
-
-         System.out.println(NL + NL
-
-               + UI.timeStampNano()
-
-               + " [" + getClass().getSimpleName() + "] ()" //$NON-NLS-1$ //$NON-NLS-2$
-               + _selectedColor.getColorDefinition()
-
-         );
+         logColorCode(_selectedColor);
       }
    }
 
@@ -869,6 +977,17 @@ public class PrefPageAppearanceColors extends PreferencePage implements
 
       // live update
       _chkLiveUpdate.setSelection(_prefStore.getBoolean(ITourbookPreferences.GRAPH_PREF_PAGE_IS_COLOR_LIVE_UPDATE));
+   }
+
+   private void setupContextMenu(final Tree tree) {
+
+      final MenuManager menuMgr = new MenuManager();
+
+      menuMgr.setRemoveAllWhenShown(true);
+
+      menuMgr.addMenuListener(menuManager -> fillContextMenu(menuManager));
+
+      tree.setMenu(menuMgr.createContextMenu(tree));
    }
 
    private void updateAndSaveColors() {

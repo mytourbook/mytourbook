@@ -3981,16 +3981,13 @@ public class ChartComponentGraph extends Canvas {
       final float[] yValues = yHighValues[0];
       final float[] yValuesColor = yHighValues[1];
 
-      final int serieSize = xValues.length;
+      final int numXValues = xValues.length;
+      final int numYValues = yValues.length;
 
       // create line hovered positions
-      _lineFocusRectangles.add(new RectangleLong[serieSize]);
-      _lineDevPositions.add(new PointLong[serieSize]);
+      _lineFocusRectangles.add(new RectangleLong[numXValues]);
+      _lineDevPositions.add(new PointLong[numXValues]);
       _isHoveredLineVisible = true;
-
-      // check array bounds
-//      final int xValueLength = xValues.length;
-      final int yValueLength = yValues.length;
 
       // get top/bottom border values of the graph
       final float graphYBorderBottom = graphDrawingData.getGraphYBottom();
@@ -4042,7 +4039,7 @@ public class ChartComponentGraph extends Canvas {
       int prevValueIndex = 0;
 
       /*
-       * set the hovered index only ONCE because when autoscrolling is done to the right side this
+       * Set the hovered index only ONCE because when autoscrolling is done to the right side this
        * can cause that the last value is used for the hovered index instead of the previous before
        * the last
        */
@@ -4076,7 +4073,7 @@ public class ChartComponentGraph extends Canvas {
       for (int valueIndex = 0; valueIndex < valueSize; valueIndex++) {
 
          // check array bounds
-         if (valueIndex >= yValueLength) {
+         if (valueIndex >= numYValues) {
             break;
          }
 
@@ -4206,7 +4203,7 @@ public class ChartComponentGraph extends Canvas {
             barXEnd = (int) devX;
 
             /*
-             * set line hover positions
+             * Set line hover positions
              */
             final double devXDiff = (devX - devXPrev) / 2;
             final double devXDiffWidth = devXDiff < 1 ? 1 : (devXDiff + 0.5);
@@ -4226,6 +4223,7 @@ public class ChartComponentGraph extends Canvas {
                   0,
                   (long) (devXDiffWidth + 1),
                   devChartHeight);
+
             final PointLong currentPoint = new PointLong((long) devX, (long) (devYTop + devYBar));
 
             lineDevPositions[valueIndex] = currentPoint;
@@ -4284,7 +4282,7 @@ public class ChartComponentGraph extends Canvas {
                   barHeight);
 
             /*
-             * set line rectangle
+             * Set line rectangle
              */
             final double devXDiff = (devX - devXPrev) / 2;
             final long devXDiffWidth = devXDiff < 1 ? 1 : (int) (devXDiff + 0.5);

@@ -442,6 +442,7 @@ public class GraphColorManager {
             null));
 
       allColorDef.add(new ColorDefinition(PREF_GRAPH_GEAR,
+
             Messages.Graph_Label_Gears,
 
             new RGB(0xff, 0xff, 0xff),
@@ -454,6 +455,77 @@ public class GraphColorManager {
             null));
 
       final String uiSpacing = UI.SPACE3 + UI.SYMBOL_GREATER_THAN + UI.SPACE3;
+
+      /*
+       * Radar
+       */
+
+      final String radarPrefix = Messages.Graph_Label_Prefix_Radar + uiSpacing;
+
+      allColorDef.add(new ColorDefinition(PREF_GRAPH_RADAR_PASSED_VEHICLES,
+
+            radarPrefix + Messages.Graph_Label_Radar_PassedVehicles,
+
+            new RGB(0xff, 0xff, 0xff),
+            new RGB(0x0, 0x8b, 0xe9),
+            new RGB(0x0, 0x65, 0xa8),
+            new RGB(0x0, 0x93, 0xf4),
+            new RGB(0x0, 0x53, 0x8a),
+            new RGB(0x28, 0xa9, 0xff),
+
+            null));
+
+      allColorDef.add(new ColorDefinition(PREF_GRAPH_RADAR_DISTANCE_TO_VEHICLE,
+
+            radarPrefix + Messages.Graph_Label_Radar_DistanceToVehicle,
+
+            new RGB(0xff, 0xff, 0xff),
+            new RGB(0x0, 0x8b, 0xe9),
+            new RGB(0x0, 0x65, 0xa8),
+            new RGB(0x0, 0x93, 0xf4),
+            new RGB(0x0, 0x53, 0x8a),
+            new RGB(0x28, 0xa9, 0xff),
+
+            null));
+
+      allColorDef.add(new ColorDefinition(PREF_GRAPH_RADAR_VEHICLE_SPEED,
+
+            radarPrefix + Messages.Graph_Label_Radar_VehicleSpeed,
+
+            new RGB(0xff, 0xff, 0xff),
+            new RGB(0x0, 0x8b, 0xe9),
+            new RGB(0x0, 0x65, 0xa8),
+            new RGB(0x0, 0x93, 0xf4),
+            new RGB(0x0, 0x53, 0x8a),
+            new RGB(0x28, 0xa9, 0xff),
+
+            null));
+
+      allColorDef.add(new ColorDefinition(PREF_GRAPH_RADAR_PASSING_SPEED_ABSOLUTE,
+
+            radarPrefix + Messages.Graph_Label_Radar_PassingSpeed_Absolute,
+
+            new RGB(0xff, 0xff, 0xff),
+            new RGB(0x0, 0x8b, 0xe9),
+            new RGB(0x0, 0x65, 0xa8),
+            new RGB(0x0, 0x93, 0xf4),
+            new RGB(0x0, 0x53, 0x8a),
+            new RGB(0x28, 0xa9, 0xff),
+
+            null));
+
+      allColorDef.add(new ColorDefinition(PREF_GRAPH_RADAR_PASSING_SPEED_RELATIVE,
+
+            radarPrefix + Messages.Graph_Label_Radar_PassingSpeed_Relative,
+
+            new RGB(0xff, 0xff, 0xff),
+            new RGB(0x0, 0x8b, 0xe9),
+            new RGB(0x0, 0x65, 0xa8),
+            new RGB(0x0, 0x93, 0xf4),
+            new RGB(0x0, 0x53, 0x8a),
+            new RGB(0x28, 0xa9, 0xff),
+
+            null));
 
       /*
        * Running Dynamics

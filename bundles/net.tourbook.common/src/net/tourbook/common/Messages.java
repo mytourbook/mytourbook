@@ -211,6 +211,7 @@ public class Messages extends NLS {
    public static String        Graph_Label_Tour_Compare_Unit;
    public static String        Graph_Label_Geo_Compare_Unit;
    public static String        Graph_Label_Prefix_AthleteData;
+   public static String        Graph_Label_Prefix_Radar;
    public static String        Graph_Label_Prefix_RunningDynamics;
    public static String        Graph_Label_Prefix_Swimming;
    public static String        Graph_Label_Prefix_Training;

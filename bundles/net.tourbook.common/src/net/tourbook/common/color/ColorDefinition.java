@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2025 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -14,6 +14,9 @@
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
 package net.tourbook.common.color;
+
+import java.util.Arrays;
+import java.util.List;
 
 import net.tourbook.common.CommonActivator;
 import net.tourbook.common.UI;
@@ -357,6 +360,24 @@ public class ColorDefinition {
       return result;
    }
 
+   public String logColorCode() {
+
+      return NL + NL
+
+            + "_colorDefinitionId = " + _colorDefinitionId + NL + NL //$NON-NLS-1$
+
+            + UI.logRGB(_gradientBright_New) + NL
+            + UI.logRGB(_gradientDark_New) + NL
+
+            + UI.logRGB(_lineColor_New_LightTheme) + NL
+            + UI.logRGB(_lineColor_New_DarkTheme) + NL
+
+            + UI.logRGB(_textColor_New_LightTheme) + NL
+            + UI.logRGB(_textColor_New_DarkTheme) + NL
+
+      ;
+   }
+
    /**
     * Set color items for this color definition, the color items are children in the tree.
     *
@@ -429,22 +450,47 @@ public class ColorDefinition {
    @Override
    public String toString() {
 
-// SET_FORMATTING_OFF
+      final int maxLen = 5;
 
-      return NL + NL
+      final List<GraphColorItem> allGraphColorItems = _graphColorItems != null
+            ? Arrays.asList(_graphColorItems).subList(0, Math.min(_graphColorItems.length, maxLen))
+            : null;
 
-            + "_colorDefinitionId = " + _colorDefinitionId  + NL + NL //$NON-NLS-1$
+      return UI.EMPTY_STRING
 
-            + UI.logRGB(_gradientBright_New)    + NL
-            + UI.logRGB(_gradientDark_New)      + NL
+            + "ColorDefinition" + NL //                                                      //$NON-NLS-1$
 
-            + UI.logRGB(_lineColor_New_LightTheme)   + NL
-            + UI.logRGB(_lineColor_New_DarkTheme)    + NL
+            + "  _colorDefinitionId             =" + _colorDefinitionId + NL //              //$NON-NLS-1$
+            + "  _visibleName                   =" + _visibleName + NL //                    //$NON-NLS-1$
+            + "  _graphPrefNamePrefix           =" + _graphPrefNamePrefix + NL //            //$NON-NLS-1$
 
-            + UI.logRGB(_textColor_New_LightTheme)   + NL
-            + UI.logRGB(_textColor_New_DarkTheme)    + NL
+//          + "  _gradientBright_Active         =" + _gradientBright_Active + NL //          //$NON-NLS-1$
+//          + "  _gradientBright_Default        =" + _gradientBright_Default + NL //         //$NON-NLS-1$
+            + "  _gradientBright_New            =" + _gradientBright_New + NL //             //$NON-NLS-1$
+//          + "  _gradientDark_Active           =" + _gradientDark_Active + NL //            //$NON-NLS-1$
+//          + "  _gradientDark_Default          =" + _gradientDark_Default + NL //           //$NON-NLS-1$
+            + "  _gradientDark_New              =" + _gradientDark_New + NL //               //$NON-NLS-1$
+//
+//          + "  _lineColor_Active_LightTheme   =" + _lineColor_Active_LightTheme + NL //    //$NON-NLS-1$
+//          + "  _lineColor_Active_DarkTheme    =" + _lineColor_Active_DarkTheme + NL //     //$NON-NLS-1$
+//          + "  _lineColor_Default_LightTheme  =" + _lineColor_Default_LightTheme + NL //   //$NON-NLS-1$
+//          + "  _lineColor_Default_DarkTheme   =" + _lineColor_Default_DarkTheme + NL //    //$NON-NLS-1$
+            + "  _lineColor_New_LightTheme      =" + _lineColor_New_LightTheme + NL //       //$NON-NLS-1$
+            + "  _lineColor_New_DarkTheme       =" + _lineColor_New_DarkTheme + NL //        //$NON-NLS-1$
+//
+//          + "  _textColor_Active_LightTheme   =" + _textColor_Active_LightTheme + NL //    //$NON-NLS-1$
+//          + "  _textColor_Active_DarkTheme    =" + _textColor_Active_DarkTheme + NL //     //$NON-NLS-1$
+//          + "  _textColor_Default_LightTheme  =" + _textColor_Default_LightTheme + NL //   //$NON-NLS-1$
+//          + "  _textColor_Default_DarkTheme   =" + _textColor_Default_DarkTheme + NL //    //$NON-NLS-1$
+            + "  _textColor_New_LightTheme      =" + _textColor_New_LightTheme + NL //       //$NON-NLS-1$
+            + "  _textColor_New_DarkTheme       =" + _textColor_New_DarkTheme + NL //        //$NON-NLS-1$
 
+            + "  _graphColorItems               =" + NL + allGraphColorItems + NL //         //$NON-NLS-1$
+
+//          + "  _map2ColorProfile_Active       =" + _map2ColorProfile_Active + NL //        //$NON-NLS-1$
+//          + "  _map2ColorProfile_Default      =" + _map2ColorProfile_Default + NL //       //$NON-NLS-1$
+//          + "  _map2ColorProfile_New          =" + _map2ColorProfile_New + NL //           //$NON-NLS-1$
       ;
-// SET_FORMATTING_ON
    }
+
 }
