@@ -380,7 +380,7 @@ public class PhotoRenderer extends AbstractGalleryMT20ItemRenderer {
       final int itemImageX = galleryItem.paintedX_Photo + (isBorder ? border2 : 0);
       final int itemImageY = galleryItem.paintedY_Photo + (isBorder ? border2 : 0);
 
-      final float scaledCanvasWidth = DPIUtil.autoScaleUp(canvasWidth);
+      final float scaledCanvasWidth = DPIUtil.pixelToPoint(canvasWidth, DPIUtil.getDeviceZoom());
       final boolean isThumbImage = scaledCanvasWidth <= PhotoLoadManager.IMAGE_SIZE_THUMBNAIL;
 
       final ImageQuality requestedImageQuality = isThumbImage
