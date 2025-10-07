@@ -4019,13 +4019,11 @@ public class ChartComponentGraph extends Canvas {
       final double graphXStart = xValues[0] - graphValueOffset;
       final float graphYStart = yValues[0];
 
-      float graphYPrev = graphYStart;
-
       double devXPrev = (scaleX * graphXStart);
-      float devYPrev = (float) (scaleY * graphYPrev);
+      float devYPrev = (float) (scaleY * graphYStart);
 
-      final int devXOverlap = (int) (0.5 * scaleX) + 0;
-      final int devXOverlap2 = devXOverlap * 2 + 0;
+      final int devXOverlap = (int) (0.5 * scaleX);
+      final int devXOverlap2 = devXOverlap * 2;
 
       final Rectangle chartRectangle = gc.getClipping();
       final int devXVisibleWidth = chartRectangle.width;
@@ -4066,9 +4064,13 @@ public class ChartComponentGraph extends Canvas {
       gc.setBackground(colorBgDark);
 
       boolean isPrevInvalid = true;
+      boolean isSkipNextBar = false;
+
+      final boolean isHide0Values = true;
+      final boolean isShow0Values = isHide0Values == false;
 
       /*
-       * draw the lines into the paths
+       * Draw bars directly into the gc
        */
       for (int valueIndex = 0; valueIndex < valueSize; valueIndex++) {
 
@@ -4101,19 +4103,17 @@ public class ChartComponentGraph extends Canvas {
 
             isPrevInvalid = false;
 
-            graphYPrev = graphY;
-
             devXPrev = devX;
             devYPrev = devY;
-            prevValueIndex = valueIndex;
 
+            prevValueIndex = valueIndex;
             valueIndexFirstPoint = valueIndex;
 
             continue;
          }
 
          /*
-          * draw first point
+          * Draw first point
           */
          if (isDrawFirstPoint) {
 
@@ -4124,18 +4124,25 @@ public class ChartComponentGraph extends Canvas {
             // set first point before devX==0 that the first line is not visible but correctly painted
             final double devXFirstPoint = devXPrev;
 
-            final float devYInverse = devY0Inverse - devYPrev;
+            final float devYBarInverse = devY0Inverse - devYPrev;
 
             barXStart = (int) devXFirstPoint;
-            barY = (int) devYInverse;
+            barY = (int) devYBarInverse;
+
+            if (isHide0Values && devY0Inverse == devYBarInverse) {
+
+               // y graph is 0
+
+               isSkipNextBar = true;
+            }
 
             /*
-             * set line hover positions for the first point
+             * Set line hover positions for the first point
              */
             final long devXRect = (long) devXFirstPoint;
 
             final RectangleLong currentRect = new RectangleLong(devXRect, 0, 1, devChartHeight);
-            final PointLong currentPoint = new PointLong(devXRect, (long) (devYTop + devYInverse));
+            final PointLong currentPoint = new PointLong(devXRect, (long) (devYTop + devYBarInverse));
 
             lineDevPositions[valueIndexFirstPoint] = currentPoint;
             lineFocusRectangles[valueIndexFirstPoint] = currentRect;
@@ -4149,7 +4156,7 @@ public class ChartComponentGraph extends Canvas {
          final boolean isBrightColor_First = yValuesColor == null ? true : yValuesColor[0] == 1;
          final boolean isBrightColor_Other = yValuesColor == null ? true : yValuesColor[valueIndex - 1] == 1;
          {
-            final float devYBar = devY0Inverse - devY;
+            final float devYBarInverse = devY0Inverse - devY;
 
             if (devY == devYPrev) {
 
@@ -4190,14 +4197,28 @@ public class ChartComponentGraph extends Canvas {
                   barWidth = 1;
                }
 
-               gc.fillRectangle(
-                     barXStart - devXOverlap,
-                     barY - barHeight2,
-                     barWidth,
-                     barHeight);
+               if (isSkipNextBar) {
+
+                  isSkipNextBar = false;
+
+               } else {
+
+                  gc.fillRectangle(
+                        barXStart - devXOverlap,
+                        barY - barHeight2,
+                        barWidth,
+                        barHeight);
+               }
+
+               if (isHide0Values && devY0Inverse == devYBarInverse) {
+
+                  // y graph is 0
+
+                  isSkipNextBar = true;
+               }
 
                barXStart = (int) devX;
-               barY = (int) devYBar;
+               barY = (int) devYBarInverse;
             }
 
             barXEnd = (int) devX;
@@ -4224,7 +4245,7 @@ public class ChartComponentGraph extends Canvas {
                   (long) (devXDiffWidth + 1),
                   devChartHeight);
 
-            final PointLong currentPoint = new PointLong((long) devX, (long) (devYTop + devYBar));
+            final PointLong currentPoint = new PointLong((long) devX, (long) (devYTop + devYBarInverse));
 
             lineDevPositions[valueIndex] = currentPoint;
             lineFocusRectangles[valueIndex] = currentRect;
@@ -4233,16 +4254,12 @@ public class ChartComponentGraph extends Canvas {
          }
 
          /*
-          * draw last bar
+          * Draw last bar
           */
          if (valueIndex == lastIndex
 
                // check if last visible position + 1 is reached
                || devX > devXVisibleWidth) {
-
-            /*
-             * this is the last point for a filled graph
-             */
 
             int barWidth = barXEnd - barXStart + devXOverlap2;
 
@@ -4275,11 +4292,18 @@ public class ChartComponentGraph extends Canvas {
             }
             gc.setBackground(bgColor);
 
-            gc.fillRectangle(
-                  barXStart - devXOverlap,
-                  barY - barHeight2,
-                  barWidth,
-                  barHeight);
+            final float devYBarInverse = devY0Inverse - devY;
+
+            if (isShow0Values || isHide0Values && devYBarInverse != devY0Inverse) {
+
+               // show 0 values
+
+               gc.fillRectangle(
+                     barXStart - devXOverlap,
+                     barY - barHeight2,
+                     barWidth,
+                     barHeight);
+            }
 
             /*
              * Set line rectangle

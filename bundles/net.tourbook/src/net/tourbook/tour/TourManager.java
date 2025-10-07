@@ -5899,7 +5899,8 @@ public class TourManager {
                null
          };
 
-         yDataValues = createChartDataSerieNoZero(chartValues, ChartType.HORIZONTAL_BAR);
+//         yDataValues = createChartDataSerieNoZero(chartValues, ChartType.HORIZONTAL_BAR);
+         yDataValues = createChartDataSerieNoZero(allValues, ChartType.LINE);
 
          yDataValues.setYTitle(OtherMessages.GRAPH_LABEL_RADAR_DISTANCE_TO_VEHICLE);
          yDataValues.setShowYSlider(true);
@@ -5951,7 +5952,7 @@ public class TourManager {
    }
 
    /**
-    * Radar: Passing speed (absolute)
+    * Radar: Passing/approaching speed (absolute)
     */
    private ChartDataYSerie createModelData_Radar_PassingSpeed_Absolute(final TourData tourData,
                                                                        final ChartDataModel chartDataModel) {
@@ -5986,7 +5987,7 @@ public class TourManager {
    }
 
    /**
-    * Radar: Passing speed (relative)
+    * Radar: Passing/approaching speed (relative)
     */
    private ChartDataYSerie createModelData_Radar_PassingSpeed_Relative(final TourData tourData,
                                                                        final ChartDataModel chartDataModel) {

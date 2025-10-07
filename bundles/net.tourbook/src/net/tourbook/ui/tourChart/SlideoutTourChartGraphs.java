@@ -305,8 +305,8 @@ public class SlideoutTourChartGraphs extends ToolbarSlideout implements IActionR
          final Label label = new Label(parent, SWT.NONE);
          label.setText(Messages.Slideout_TourChartGraph_Label_DefaultWhenOpened);
 
-         _chkShowInChartToolbar_Radar_DistanceToVehicle_DefaultWhenOpened     = createUI_DefaulWhenOpened(parent);
          _chkShowInChartToolbar_Radar_PassedVehicles_DefaultWhenOpened        = createUI_DefaulWhenOpened(parent);
+         _chkShowInChartToolbar_Radar_DistanceToVehicle_DefaultWhenOpened     = createUI_DefaulWhenOpened(parent);
          _chkShowInChartToolbar_Radar_VehicleSpeed_DefaultWhenOpened          = createUI_DefaulWhenOpened(parent);
          _chkShowInChartToolbar_Radar_PassingSpeed_Absolute_DefaultWhenOpened = createUI_DefaulWhenOpened(parent);
          _chkShowInChartToolbar_Radar_PassingSpeed_Relative_DefaultWhenOpened = createUI_DefaulWhenOpened(parent);
