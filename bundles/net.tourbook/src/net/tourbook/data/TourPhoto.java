@@ -15,7 +15,6 @@
  *******************************************************************************/
 package net.tourbook.data;
 
-import com.fasterxml.jackson.core.JacksonException;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -530,7 +529,7 @@ public class TourPhoto implements Serializable {
             StatusUtil.logError("Cannot save photoAdjustmentsJSON because it is > %d".formatted(TourDatabase.VARCHAR_MAX_LENGTH)); //$NON-NLS-1$
          }
 
-      } catch (final JacksonException e) {
+      } catch (final JsonProcessingException e) {
 
          StatusUtil.log(e);
       }
