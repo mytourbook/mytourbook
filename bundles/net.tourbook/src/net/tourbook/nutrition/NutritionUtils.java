@@ -15,7 +15,7 @@
  *******************************************************************************/
 package net.tourbook.nutrition;
 
-import com.fasterxml.jackson.core.JacksonException;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -157,7 +157,7 @@ public class NutritionUtils {
                   new TypeReference<List<Product>>() {});
 
          }
-      } catch (final JacksonException e) {
+      } catch (final JsonProcessingException e) {
          StatusUtil.log(e);
       }
 
