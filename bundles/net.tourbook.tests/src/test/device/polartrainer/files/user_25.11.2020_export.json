@@ -75,96 +75,6 @@
   "tourEndTime" : 1606341598000,
   "tourMarkers" : [ {
     "markerId" : -1,
-    "altitude" : 709.8792,
-    "distance20" : 48052.89,
-    "latitude" : -1.0E300,
-    "longitude" : -1.0E300,
-    "serieIndex" : 6054,
-    "time" : 6054,
-    "tourTime" : 1606337334000
-  }, {
-    "markerId" : -1,
-    "altitude" : 822.96,
-    "distance20" : 52010.82,
-    "latitude" : -1.0E300,
-    "longitude" : -1.0E300,
-    "serieIndex" : 6682,
-    "time" : 6682,
-    "tourTime" : 1606337962000
-  }, {
-    "markerId" : -1,
-    "altitude" : 789.1272,
-    "distance20" : 55930.613,
-    "latitude" : -1.0E300,
-    "longitude" : -1.0E300,
-    "serieIndex" : 7224,
-    "time" : 7224,
-    "tourTime" : 1606338504000
-  }, {
-    "markerId" : -1,
-    "altitude" : 754.0752,
-    "distance20" : 59836.984,
-    "latitude" : -1.0E300,
-    "longitude" : -1.0E300,
-    "serieIndex" : 7640,
-    "time" : 7640,
-    "tourTime" : 1606338920000
-  }, {
-    "markerId" : -1,
-    "altitude" : 672.9984,
-    "distance20" : 63793.633,
-    "latitude" : -1.0E300,
-    "longitude" : -1.0E300,
-    "serieIndex" : 8045,
-    "time" : 8045,
-    "tourTime" : 1606339325000
-  }, {
-    "markerId" : -1,
-    "altitude" : 623.9256,
-    "distance20" : 67817.85,
-    "latitude" : -1.0E300,
-    "longitude" : -1.0E300,
-    "serieIndex" : 8437,
-    "time" : 8437,
-    "tourTime" : 1606339717000
-  }, {
-    "markerId" : -1,
-    "altitude" : 584.9112,
-    "distance20" : 71834.35,
-    "latitude" : -1.0E300,
-    "longitude" : -1.0E300,
-    "serieIndex" : 8900,
-    "time" : 8900,
-    "tourTime" : 1606340180000
-  }, {
-    "markerId" : -1,
-    "altitude" : 551.9928,
-    "distance20" : 75846.984,
-    "latitude" : -1.0E300,
-    "longitude" : -1.0E300,
-    "serieIndex" : 9462,
-    "time" : 9462,
-    "tourTime" : 1606340742000
-  }, {
-    "markerId" : -1,
-    "altitude" : 563.88,
-    "distance20" : 79939.35,
-    "latitude" : -1.0E300,
-    "longitude" : -1.0E300,
-    "serieIndex" : 10090,
-    "time" : 10090,
-    "tourTime" : 1606341370000
-  }, {
-    "markerId" : -1,
-    "altitude" : 572.1096,
-    "distance20" : 81079.82,
-    "latitude" : -1.0E300,
-    "longitude" : -1.0E300,
-    "serieIndex" : 10306,
-    "time" : 10306,
-    "tourTime" : 1606341586000
-  }, {
-    "markerId" : -1,
     "altitude" : 558.0888,
     "distance20" : 4128.831,
     "latitude" : -1.0E300,
@@ -280,6 +190,96 @@
     "serieIndex" : 5907,
     "time" : 5907,
     "tourTime" : 1606337187000
+  }, {
+    "markerId" : -1,
+    "altitude" : 709.8792,
+    "distance20" : 48052.89,
+    "latitude" : -1.0E300,
+    "longitude" : -1.0E300,
+    "serieIndex" : 6054,
+    "time" : 6054,
+    "tourTime" : 1606337334000
+  }, {
+    "markerId" : -1,
+    "altitude" : 822.96,
+    "distance20" : 52010.82,
+    "latitude" : -1.0E300,
+    "longitude" : -1.0E300,
+    "serieIndex" : 6682,
+    "time" : 6682,
+    "tourTime" : 1606337962000
+  }, {
+    "markerId" : -1,
+    "altitude" : 789.1272,
+    "distance20" : 55930.613,
+    "latitude" : -1.0E300,
+    "longitude" : -1.0E300,
+    "serieIndex" : 7224,
+    "time" : 7224,
+    "tourTime" : 1606338504000
+  }, {
+    "markerId" : -1,
+    "altitude" : 754.0752,
+    "distance20" : 59836.984,
+    "latitude" : -1.0E300,
+    "longitude" : -1.0E300,
+    "serieIndex" : 7640,
+    "time" : 7640,
+    "tourTime" : 1606338920000
+  }, {
+    "markerId" : -1,
+    "altitude" : 672.9984,
+    "distance20" : 63793.633,
+    "latitude" : -1.0E300,
+    "longitude" : -1.0E300,
+    "serieIndex" : 8045,
+    "time" : 8045,
+    "tourTime" : 1606339325000
+  }, {
+    "markerId" : -1,
+    "altitude" : 623.9256,
+    "distance20" : 67817.85,
+    "latitude" : -1.0E300,
+    "longitude" : -1.0E300,
+    "serieIndex" : 8437,
+    "time" : 8437,
+    "tourTime" : 1606339717000
+  }, {
+    "markerId" : -1,
+    "altitude" : 584.9112,
+    "distance20" : 71834.35,
+    "latitude" : -1.0E300,
+    "longitude" : -1.0E300,
+    "serieIndex" : 8900,
+    "time" : 8900,
+    "tourTime" : 1606340180000
+  }, {
+    "markerId" : -1,
+    "altitude" : 551.9928,
+    "distance20" : 75846.984,
+    "latitude" : -1.0E300,
+    "longitude" : -1.0E300,
+    "serieIndex" : 9462,
+    "time" : 9462,
+    "tourTime" : 1606340742000
+  }, {
+    "markerId" : -1,
+    "altitude" : 563.88,
+    "distance20" : 79939.35,
+    "latitude" : -1.0E300,
+    "longitude" : -1.0E300,
+    "serieIndex" : 10090,
+    "time" : 10090,
+    "tourTime" : 1606341370000
+  }, {
+    "markerId" : -1,
+    "altitude" : 572.1096,
+    "distance20" : 81079.82,
+    "latitude" : -1.0E300,
+    "longitude" : -1.0E300,
+    "serieIndex" : 10306,
+    "time" : 10306,
+    "tourTime" : 1606341586000
   } ],
   "tourStartTime" : 1606331280000,
   "tourTitle" : "Mallorca, Spain",
