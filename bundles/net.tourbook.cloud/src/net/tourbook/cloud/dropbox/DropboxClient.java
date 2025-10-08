@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2020, 2025 Frédéric Bard
+ * Copyright (C) 2020, 2024 Frédéric Bard
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -18,6 +18,7 @@ package net.tourbook.cloud.dropbox;
 import com.dropbox.core.DbxException;
 import com.dropbox.core.DbxRequestConfig;
 import com.dropbox.core.v2.DbxClientV2;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -47,8 +48,6 @@ import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.osgi.framework.FrameworkUtil;
 import org.osgi.framework.Version;
-
-import tools.jackson.databind.ObjectMapper;
 
 class DropboxClient {
 
