@@ -20,8 +20,8 @@ Bundle-ClassPath: .,
  hamcrest-3.0.jar
 Bundle-Vendor: MyTourbook
 Bundle-RequiredExecutionEnvironment: JavaSE-21
-Import-Package: tools.jackson.core.type,
- tools.jackson.databind,
+Import-Package: com.fasterxml.jackson.core.type,
+ com.fasterxml.jackson.databind,
  net.tourbook.cloud.oauth2,
  net.tourbook.cloud.strava,
  net.tourbook.cloud.suunto,
