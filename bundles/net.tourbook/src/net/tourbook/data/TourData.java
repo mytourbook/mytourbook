@@ -2130,28 +2130,40 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
    private float[]            _radar_PassedVehicles_UI;
 
    /**
-    * Distance to approaching vehicle, fit field: <code>radar_ranges</code>
+    * Distance to approaching vehicle in m (metric system), fit field: <code>radar_ranges</code>
     */
    @Transient
    public short[]             radar_DistanceToVehicle;
    @Transient
-   private float[]            _radar_DistanceToVehicle_UI;
+   private float[]            _radar_DistanceToVehicle_Meter;
+   @Transient
+   private float[]            _radar_DistanceToVehicle_Yard;
 
    /**
-    * "Approach Speed (Relative)", fit field: <code>passing_speed</code>
-    */
-   @Transient
-   public short[]             radar_PassingSpeed_Relative;
-   @Transient
-   private float[]            _radar_PassingSpeed_Relative_UI;
-
-   /**
-    * "Approach Speed (Absolute)", fit field: <code>passing_speedabs</code>
+    * "Approach Speed (Absolute)" in km/h, fit field: <code>passing_speedabs</code>
     */
    @Transient
    public short[]             radar_PassingSpeed_Absolute;
    @Transient
-   private float[]            _radar_PassingSpeed_Absolute_UI;
+   private float[]            _radar_PassingSpeed_Absolute_Kilometer;
+
+   @Transient
+   private float[]            _radar_PassingSpeed_Absolute_Mile;
+
+   @Transient
+   private float[]            _radar_PassingSpeed_Absolute_NauticalMile;
+
+   /**
+    * "Approach Speed (Relative)" in km/h, fit field: <code>passing_speed</code>
+    */
+   @Transient
+   public short[]             radar_PassingSpeed_Relative;
+   @Transient
+   private float[]            _radar_PassingSpeed_Relative_Kilometer;
+   @Transient
+   private float[]            _radar_PassingSpeed_Relative_Mile;
+   @Transient
+   private float[]            _radar_PassingSpeed_Relative_NauticalMile;
 
 // SET_FORMATTING_ON
 
@@ -2427,6 +2439,31 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
       hasGeoData = false;
    }
 
+   public void clear_Radar_DistanceToVehicle() {
+
+      _radar_DistanceToVehicle_Meter = null;
+      _radar_DistanceToVehicle_Yard = null;
+   }
+
+   public void clear_Radar_PassedVehicles() {
+
+      _radar_PassedVehicles_UI = null;
+   }
+
+   public void clear_Radar_PassingSpeed_Absolute() {
+
+      _radar_PassingSpeed_Absolute_Kilometer = null;
+      _radar_PassingSpeed_Absolute_Mile = null;
+      _radar_PassingSpeed_Absolute_NauticalMile = null;
+   }
+
+   public void clear_Radar_PassingSpeed_Relative() {
+
+      _radar_PassingSpeed_Relative_Kilometer = null;
+      _radar_PassingSpeed_Relative_Mile = null;
+      _radar_PassingSpeed_Relative_NauticalMile = null;
+   }
+
    public void clear_RunDyn_StanceTime() {
 
       runDyn_StanceTime = null;
@@ -2520,7 +2557,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
    }
 
    /**
-    * Clear computed data series so the next time, when they are needed, they are recomputed.
+    * Clear computed data series so the next time, when they are needed, they are recomputed
     */
    public void clearComputedSeries() {
 
@@ -2584,9 +2621,17 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
       cadenceSerieWithMultiplier = null;
 
       _radar_PassedVehicles_UI = null;
-      _radar_DistanceToVehicle_UI = null;
-      _radar_PassingSpeed_Absolute_UI = null;
-      _radar_PassingSpeed_Relative_UI = null;
+
+      _radar_DistanceToVehicle_Meter = null;
+      _radar_DistanceToVehicle_Yard = null;
+
+      _radar_PassingSpeed_Absolute_Kilometer = null;
+      _radar_PassingSpeed_Absolute_Mile = null;
+      _radar_PassingSpeed_Absolute_NauticalMile = null;
+
+      _radar_PassingSpeed_Relative_Kilometer = null;
+      _radar_PassingSpeed_Relative_Mile = null;
+      _radar_PassingSpeed_Relative_NauticalMile = null;
 
       _runDyn_StanceTime_UI = null;
       _runDyn_StanceTimeBalance_UI = null;
@@ -10595,20 +10640,48 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
     */
    public float[] getRadar_DistanceToVehicle_UI() {
 
-      if (_radar_DistanceToVehicle_UI == null && radar_DistanceToVehicle != null) {
+      final float[] serie;
 
-         // create UI data serie
+      if (UI.UNIT_IS_LENGTH_YARD) {
 
-         final int numSlices = radar_DistanceToVehicle.length;
+         // use mile
 
-         _radar_DistanceToVehicle_UI = new float[numSlices];
+         if (_radar_DistanceToVehicle_Yard == null && radar_DistanceToVehicle != null) {
 
-         for (int serieIndex = 0; serieIndex < numSlices; serieIndex++) {
-            _radar_DistanceToVehicle_UI[serieIndex] = radar_DistanceToVehicle[serieIndex];
+            // create UI data serie
+
+            final int numSlices = radar_DistanceToVehicle.length;
+
+            _radar_DistanceToVehicle_Yard = new float[numSlices];
+
+            for (int serieIndex = 0; serieIndex < numSlices; serieIndex++) {
+               _radar_DistanceToVehicle_Yard[serieIndex] = radar_DistanceToVehicle[serieIndex] / UI.UNIT_YARD;
+            }
          }
+
+         serie = _radar_DistanceToVehicle_Yard;
+
+      } else {
+
+         // use default, meter
+
+         if (_radar_DistanceToVehicle_Meter == null && radar_DistanceToVehicle != null) {
+
+            // create UI data serie
+
+            final int numSlices = radar_DistanceToVehicle.length;
+
+            _radar_DistanceToVehicle_Meter = new float[numSlices];
+
+            for (int serieIndex = 0; serieIndex < numSlices; serieIndex++) {
+               _radar_DistanceToVehicle_Meter[serieIndex] = radar_DistanceToVehicle[serieIndex];
+            }
+         }
+
+         serie = _radar_DistanceToVehicle_Meter;
       }
 
-      return _radar_DistanceToVehicle_UI;
+      return serie;
    }
 
    /**
@@ -10637,20 +10710,67 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
     */
    public float[] getRadar_PassingSpeed_Absolute_UI() {
 
-      if (_radar_PassingSpeed_Absolute_UI == null && radar_PassingSpeed_Absolute != null) {
+      float[] serie;
 
-         // create UI data serie
+      if (UI.UNIT_IS_DISTANCE_MILE) {
 
-         final int numSlices = radar_PassingSpeed_Absolute.length;
+         // use imperial system
 
-         _radar_PassingSpeed_Absolute_UI = new float[numSlices];
+         if (_radar_PassingSpeed_Absolute_Mile == null && radar_PassingSpeed_Absolute != null) {
 
-         for (int serieIndex = 0; serieIndex < numSlices; serieIndex++) {
-            _radar_PassingSpeed_Absolute_UI[serieIndex] = radar_PassingSpeed_Absolute[serieIndex];
+            // create UI data serie
+
+            final int numSlices = radar_PassingSpeed_Absolute.length;
+
+            _radar_PassingSpeed_Absolute_Mile = new float[numSlices];
+
+            for (int serieIndex = 0; serieIndex < numSlices; serieIndex++) {
+               _radar_PassingSpeed_Absolute_Mile[serieIndex] = radar_PassingSpeed_Absolute[serieIndex] / UI.UNIT_MILE;
+            }
          }
+
+         serie = _radar_PassingSpeed_Absolute_Mile;
+
+      } else if (UI.UNIT_IS_DISTANCE_NAUTICAL_MILE) {
+
+         // use nautical system
+
+         if (_radar_PassingSpeed_Absolute_NauticalMile == null && radar_PassingSpeed_Absolute != null) {
+
+            // create UI data serie
+
+            final int numSlices = radar_PassingSpeed_Absolute.length;
+
+            _radar_PassingSpeed_Absolute_NauticalMile = new float[numSlices];
+
+            for (int serieIndex = 0; serieIndex < numSlices; serieIndex++) {
+               _radar_PassingSpeed_Absolute_NauticalMile[serieIndex] = radar_PassingSpeed_Absolute[serieIndex] / UI.UNIT_NAUTICAL_MILE;
+            }
+         }
+
+         serie = _radar_PassingSpeed_Absolute_Kilometer;
+
+      } else {
+
+         // use metric system
+
+         if (_radar_PassingSpeed_Absolute_Kilometer == null && radar_PassingSpeed_Absolute != null) {
+
+            // create UI data serie
+
+            final int numSlices = radar_PassingSpeed_Absolute.length;
+
+            _radar_PassingSpeed_Absolute_Kilometer = new float[numSlices];
+
+            for (int serieIndex = 0; serieIndex < numSlices; serieIndex++) {
+               _radar_PassingSpeed_Absolute_Kilometer[serieIndex] = radar_PassingSpeed_Absolute[serieIndex];
+            }
+         }
+
+         serie = _radar_PassingSpeed_Absolute_Kilometer;
       }
 
-      return _radar_PassingSpeed_Absolute_UI;
+      return serie;
    }
 
    /**
@@ -10658,22 +10778,68 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
     */
    public float[] getRadar_PassingSpeed_Relative_UI() {
 
-      if (_radar_PassingSpeed_Relative_UI == null && radar_PassingSpeed_Relative != null) {
+      float[] serie;
 
-         // create UI data serie
+      if (UI.UNIT_IS_DISTANCE_MILE) {
 
-         final int numSlices = radar_PassingSpeed_Relative.length;
+         // use imperial system
 
-         _radar_PassingSpeed_Relative_UI = new float[numSlices];
+         if (_radar_PassingSpeed_Relative_Mile == null && radar_PassingSpeed_Relative != null) {
 
-         for (int serieIndex = 0; serieIndex < numSlices; serieIndex++) {
-            _radar_PassingSpeed_Relative_UI[serieIndex] = radar_PassingSpeed_Relative[serieIndex];
+            // create UI data serie
+
+            final int numSlices = radar_PassingSpeed_Relative.length;
+
+            _radar_PassingSpeed_Relative_Mile = new float[numSlices];
+
+            for (int serieIndex = 0; serieIndex < numSlices; serieIndex++) {
+               _radar_PassingSpeed_Relative_Mile[serieIndex] = radar_PassingSpeed_Relative[serieIndex] / UI.UNIT_MILE;
+            }
          }
+
+         serie = _radar_PassingSpeed_Relative_Mile;
+
+      } else if (UI.UNIT_IS_DISTANCE_NAUTICAL_MILE) {
+
+         // use nautical system
+
+         if (_radar_PassingSpeed_Relative_NauticalMile == null && radar_PassingSpeed_Relative != null) {
+
+            // create UI data serie
+
+            final int numSlices = radar_PassingSpeed_Relative.length;
+
+            _radar_PassingSpeed_Relative_NauticalMile = new float[numSlices];
+
+            for (int serieIndex = 0; serieIndex < numSlices; serieIndex++) {
+               _radar_PassingSpeed_Relative_NauticalMile[serieIndex] = radar_PassingSpeed_Relative[serieIndex] / UI.UNIT_NAUTICAL_MILE;
+            }
+         }
+
+         serie = _radar_PassingSpeed_Relative_Kilometer;
+
+      } else {
+
+         // use metric system
+
+         if (_radar_PassingSpeed_Relative_Kilometer == null && radar_PassingSpeed_Relative != null) {
+
+            // create UI data serie
+
+            final int numSlices = radar_PassingSpeed_Relative.length;
+
+            _radar_PassingSpeed_Relative_Kilometer = new float[numSlices];
+
+            for (int serieIndex = 0; serieIndex < numSlices; serieIndex++) {
+               _radar_PassingSpeed_Relative_Kilometer[serieIndex] = radar_PassingSpeed_Relative[serieIndex];
+            }
+         }
+
+         serie = _radar_PassingSpeed_Relative_Kilometer;
       }
 
-      return _radar_PassingSpeed_Relative_UI;
+      return serie;
    }
-
 
    public int getRearShiftCount() {
       return rearShiftCount;
@@ -14587,7 +14753,6 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
 
       return isAvailable;
    }
-
 
    private boolean setupStartingValues_RunDyn_StanceTime(final TimeData[] timeDataSerie) {
 

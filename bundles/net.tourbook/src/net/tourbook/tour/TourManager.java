@@ -917,40 +917,45 @@ public class TourManager {
 
 // SET_FORMATTING_OFF
 
-      final int[] toTimeSerie                   = joinedTourData.timeSerie                         = new int[numTimeSlices];
-      final float[] toAltitudeSerie             = joinedTourData.altitudeSerie                     = new float[numTimeSlices];
-      final float[] toCadenceSerie              = cadenceSerieData;
-      final float[] toDistanceSerie             = joinedTourData.distanceSerie                     = new float[numTimeSlices];
-      final long[] toGearSerie                  = joinedTourData.gearSerieCombined                 = new long[numTimeSlices];
-      final double[] toLatitudeSerie            = joinedTourData.latitudeSerie                     = new double[numTimeSlices];
-      final double[] toLongitudeSerie           = joinedTourData.longitudeSerie                    = new double[numTimeSlices];
-      final float[] toPowerSerie                = new float[numTimeSlices];
-      final float[] toPulseSerie                = joinedTourData.pulseSerie                        = new float[numTimeSlices];
-      final float[] toPulseSerie_FromTime       = joinedTourData.pulseSerie_FromTime               = new float[numTimeSlices];
-      final float[] toTemperaturSerie           = joinedTourData.temperatureSerie                  = new float[numTimeSlices];
+      final int[] toTimeSerie                      = joinedTourData.timeSerie                         = new int[numTimeSlices];
+      final float[] toAltitudeSerie                = joinedTourData.altitudeSerie                     = new float[numTimeSlices];
+      final float[] toCadenceSerie                 = cadenceSerieData;
+      final float[] toDistanceSerie                = joinedTourData.distanceSerie                     = new float[numTimeSlices];
+      final long[] toGearSerie                     = joinedTourData.gearSerieCombined                 = new long[numTimeSlices];
+      final double[] toLatitudeSerie               = joinedTourData.latitudeSerie                     = new double[numTimeSlices];
+      final double[] toLongitudeSerie              = joinedTourData.longitudeSerie                    = new double[numTimeSlices];
+      final float[] toPowerSerie                   = new float[numTimeSlices];
+      final float[] toPulseSerie                   = joinedTourData.pulseSerie                        = new float[numTimeSlices];
+      final float[] toPulseSerie_FromTime          = joinedTourData.pulseSerie_FromTime               = new float[numTimeSlices];
+      final float[] toTemperaturSerie              = joinedTourData.temperatureSerie                  = new float[numTimeSlices];
 
-      final short[] toRunDyn_StanceTime         = joinedTourData.runDyn_StanceTime                 = new short[numTimeSlices];
-      final short[] toRunDyn_StanceTimeBalance  = joinedTourData.runDyn_StanceTimeBalance          = new short[numTimeSlices];
-      final short[] toRunDyn_StepLength         = joinedTourData.runDyn_StepLength                 = new short[numTimeSlices];
-      final short[] toRunDyn_VertOscillation    = joinedTourData.runDyn_VerticalOscillation        = new short[numTimeSlices];
-      final short[] toRunDyn_VertRatio          = joinedTourData.runDyn_VerticalRatio              = new short[numTimeSlices];
+      final int[]   toRadar_PassedVehicles         = joinedTourData.radar_PassedVehicles              = new int[numTimeSlices];
+      final short[] toRadar_DistanceToVehicle      = joinedTourData.radar_DistanceToVehicle           = new short[numTimeSlices];
+      final short[] toRadar_PassingSpeed_Absolute  = joinedTourData.radar_PassingSpeed_Absolute       = new short[numTimeSlices];
+      final short[] toRadar_PassingSpeed_Relative  = joinedTourData.radar_PassingSpeed_Relative       = new short[numTimeSlices];
 
-      final short[] toswim_LengthType           = joinedTourData.swim_LengthType                   = new short[numSwimTimeSlices];
-      final short[] toSwim_Cadence              = joinedTourData.swim_Cadence                      = new short[numSwimTimeSlices];
-      final short[] toSwim_Strokes              = joinedTourData.swim_Strokes                      = new short[numSwimTimeSlices];
-      final short[] toSwim_StrokeStyle          = joinedTourData.swim_StrokeStyle                  = new short[numSwimTimeSlices];
-      final int[] toSwim_Time                   = joinedTourData.swim_Time                         = new int[numSwimTimeSlices];
+      final short[] toRunDyn_StanceTime            = joinedTourData.runDyn_StanceTime                 = new short[numTimeSlices];
+      final short[] toRunDyn_StanceTimeBalance     = joinedTourData.runDyn_StanceTimeBalance          = new short[numTimeSlices];
+      final short[] toRunDyn_StepLength            = joinedTourData.runDyn_StepLength                 = new short[numTimeSlices];
+      final short[] toRunDyn_VertOscillation       = joinedTourData.runDyn_VerticalOscillation        = new short[numTimeSlices];
+      final short[] toRunDyn_VertRatio             = joinedTourData.runDyn_VerticalRatio              = new short[numTimeSlices];
 
-      final Long[] allTourIds                   = joinedTourData.multipleTourIds                   = new Long[numTours];
-      final float[] allTours_CadenceMultiplier  = joinedTourData.multipleTours_CadenceMultiplier   = new float[numTours];
-      final int[] allStartIndex                 = joinedTourData.multipleTourStartIndex            = new int[numTours];
-      final ZonedDateTime[] allStartTime        = joinedTourData.multipleTourZonedStartTime        = new ZonedDateTime[numTours];
-      final ArrayList<TourMarker> allTourMarker = joinedTourData.multipleTourMarkers               = new ArrayList<>();
-      final List<List<Long>> allTourPauses      = joinedTourData.multipleTourPauses                = new ArrayList<>();
-      final String[] allTourTitle               = joinedTourData.multipleTourTitles                = new String[numTours];
-      final int[] allTourMarkerNumbers          = joinedTourData.multipleNumberOfMarkers           = new int[numTours];
-      final int[] allTourPausesNumbers          = joinedTourData.multipleNumberOfPauses            = new int[numTours];
-      final int[] allSwimStartIndex             = joinedTourData.multipleSwimStartIndex            = new int[numTours];
+      final short[] toswim_LengthType              = joinedTourData.swim_LengthType                   = new short[numSwimTimeSlices];
+      final short[] toSwim_Cadence                 = joinedTourData.swim_Cadence                      = new short[numSwimTimeSlices];
+      final short[] toSwim_Strokes                 = joinedTourData.swim_Strokes                      = new short[numSwimTimeSlices];
+      final short[] toSwim_StrokeStyle             = joinedTourData.swim_StrokeStyle                  = new short[numSwimTimeSlices];
+      final int[] toSwim_Time                      = joinedTourData.swim_Time                         = new int[numSwimTimeSlices];
+
+      final Long[] allTourIds                      = joinedTourData.multipleTourIds                   = new Long[numTours];
+      final float[] allTours_CadenceMultiplier     = joinedTourData.multipleTours_CadenceMultiplier   = new float[numTours];
+      final int[] allStartIndex                    = joinedTourData.multipleTourStartIndex            = new int[numTours];
+      final ZonedDateTime[] allStartTime           = joinedTourData.multipleTourZonedStartTime        = new ZonedDateTime[numTours];
+      final ArrayList<TourMarker> allTourMarker    = joinedTourData.multipleTourMarkers               = new ArrayList<>();
+      final List<List<Long>> allTourPauses         = joinedTourData.multipleTourPauses                = new ArrayList<>();
+      final String[] allTourTitle                  = joinedTourData.multipleTourTitles                = new String[numTours];
+      final int[] allTourMarkerNumbers             = joinedTourData.multipleNumberOfMarkers           = new int[numTours];
+      final int[] allTourPausesNumbers             = joinedTourData.multipleNumberOfPauses            = new int[numTours];
+      final int[] allSwimStartIndex                = joinedTourData.multipleSwimStartIndex            = new int[numTours];
 
 // SET_FORMATTING_ON
 
@@ -980,13 +985,18 @@ public class TourManager {
       boolean isPulseSerie_FromTime = false;
       boolean isTempSerie = false;
 
+      boolean isRadar_PassedVehicles = false;
+      boolean isRadar_DistanceToVehicle = false;
+      boolean isRadar_PassingSpeed_Absolute = false;
+      boolean isRadar_PassingSpeed_Relative = false;
+
       boolean isRunDyn_StanceTime = false;
       boolean isRunDyn_StanceTimeBalance = false;
       boolean isRunDyn_StepLength = false;
       boolean isRunDyn_VerticalOscillation = false;
       boolean isRunDyn_VerticalRatio = false;
 
-      boolean isswim_LengthType = false;
+      boolean isSwim_LengthType = false;
       boolean isSwim_Cadence = false;
       boolean isSwim_Strokes = false;
       boolean isSwim_StrokeStyle = false;
@@ -1002,32 +1012,41 @@ public class TourManager {
 
          final TourData fromTourData = validatedMultipleTours.get(tourIndex);
 
-         final int[] fromTimeSerie = fromTourData.timeSerie;
+// SET_FORMATTING_OFF
 
-         final float[] fromAltitudeSerie = fromTourData.altitudeSerie;
-         final float[] fromCadenceSerie = fromTourData.getCadenceSerieWithMuliplier();
-         final float[] fromDistanceSerie = fromTourData.distanceSerie;
-         final long[] fromGearSerie = fromTourData.gearSerieCombined;
-         final double[] fromLatitudeSerie = fromTourData.latitudeSerie;
-         final double[] fromLongitudeSerie = fromTourData.longitudeSerie;
-         final float[] fromPulseSerie = fromTourData.pulseSerie;
-         final float[] fromPulse_BpmFromRRIntervals = fromTourData.getPulse_AvgBpmFromRRIntervals();
-         final float[] fromTemperaturSerie = fromTourData.temperatureSerie;
+         final int[] fromTimeSerie                       = fromTourData.timeSerie;
 
-         final short[] fromRunDyn_StanceTime = fromTourData.runDyn_StanceTime;
-         final short[] fromRunDyn_StanceTimeBalance = fromTourData.runDyn_StanceTimeBalance;
-         final short[] fromRunDyn_StepLength = fromTourData.runDyn_StepLength;
-         final short[] fromRunDyn_VertOscillation = fromTourData.runDyn_VerticalOscillation;
-         final short[] fromRunDyn_VertRatio = fromTourData.runDyn_VerticalRatio;
+         final float[] fromAltitudeSerie                 = fromTourData.altitudeSerie;
+         final float[] fromCadenceSerie                  = fromTourData.getCadenceSerieWithMuliplier();
+         final float[] fromDistanceSerie                 = fromTourData.distanceSerie;
+         final long[] fromGearSerie                      = fromTourData.gearSerieCombined;
+         final double[] fromLatitudeSerie                = fromTourData.latitudeSerie;
+         final double[] fromLongitudeSerie               = fromTourData.longitudeSerie;
+         final float[] fromPulseSerie                    = fromTourData.pulseSerie;
+         final float[] fromPulse_BpmFromRRIntervals      = fromTourData.getPulse_AvgBpmFromRRIntervals();
+         final float[] fromTemperaturSerie               = fromTourData.temperatureSerie;
 
-         final short[] fromswim_LengthType = fromTourData.swim_LengthType;
-         final short[] fromSwim_Cadence = fromTourData.swim_Cadence;
-         final short[] fromSwim_Strokes = fromTourData.swim_Strokes;
-         final short[] fromSwim_StrokeStyle = fromTourData.swim_StrokeStyle;
-         final int[] fromSwim_Time = fromTourData.swim_Time;
+         final int[]   fromRadar_PassedVehicles          = fromTourData.radar_PassedVehicles;
+         final short[] fromRadar_DistanceToVehicle       = fromTourData.radar_DistanceToVehicle;
+         final short[] fromRadar_PassingSpeed_Absolute   = fromTourData.radar_PassingSpeed_Absolute;
+         final short[] fromRadar_PassingSpeed_Relative   = fromTourData.radar_PassingSpeed_Relative;
 
-         final int fromSerieLength = fromTimeSerie.length;
-         final int fromSwimSerieLength = fromSwim_Time == null ? 0 : fromSwim_Time.length;
+         final short[] fromRunDyn_StanceTime             = fromTourData.runDyn_StanceTime;
+         final short[] fromRunDyn_StanceTimeBalance      = fromTourData.runDyn_StanceTimeBalance;
+         final short[] fromRunDyn_StepLength             = fromTourData.runDyn_StepLength;
+         final short[] fromRunDyn_VertOscillation        = fromTourData.runDyn_VerticalOscillation;
+         final short[] fromRunDyn_VertRatio              = fromTourData.runDyn_VerticalRatio;
+
+         final short[] fromswim_LengthType               = fromTourData.swim_LengthType;
+         final short[] fromSwim_Cadence                  = fromTourData.swim_Cadence;
+         final short[] fromSwim_Strokes                  = fromTourData.swim_Strokes;
+         final short[] fromSwim_StrokeStyle              = fromTourData.swim_StrokeStyle;
+         final int[] fromSwim_Time                       = fromTourData.swim_Time;
+
+         final int fromSerieLength                       = fromTimeSerie.length;
+         final int fromSwimSerieLength                   = fromSwim_Time == null ? 0 : fromSwim_Time.length;
+
+// SET_FORMATTING_ON
 
          /*
           * Copy time serie
@@ -1133,6 +1152,26 @@ public class TourManager {
          }
 
          /*
+          * Radar
+          */
+         if (fromRadar_PassedVehicles != null) {
+            isRadar_PassedVehicles = true;
+            System.arraycopy(fromRadar_PassedVehicles, 0, toRadar_PassedVehicles, toStartIndex, fromSerieLength);
+         }
+         if (fromRadar_DistanceToVehicle != null) {
+            isRadar_DistanceToVehicle = true;
+            System.arraycopy(fromRadar_DistanceToVehicle, 0, toRadar_DistanceToVehicle, toStartIndex, fromSerieLength);
+         }
+         if (fromRadar_PassingSpeed_Absolute != null) {
+            isRadar_PassingSpeed_Absolute = true;
+            System.arraycopy(fromRadar_PassingSpeed_Absolute, 0, toRadar_PassingSpeed_Absolute, toStartIndex, fromSerieLength);
+         }
+         if (fromRadar_PassingSpeed_Relative != null) {
+            isRadar_PassingSpeed_Relative = true;
+            System.arraycopy(fromRadar_PassingSpeed_Relative, 0, toRadar_PassingSpeed_Relative, toStartIndex, fromSerieLength);
+         }
+
+         /*
           * Running dynamics
           */
          if (fromRunDyn_StanceTime != null) {
@@ -1160,7 +1199,7 @@ public class TourManager {
           * Swimming
           */
          if (fromswim_LengthType != null) {
-            isswim_LengthType = true;
+            isSwim_LengthType = true;
             System.arraycopy(fromswim_LengthType, 0, toswim_LengthType, toSwimStartIndex, fromSwimSerieLength);
          }
          if (fromSwim_Cadence != null) {
@@ -1288,6 +1327,22 @@ public class TourManager {
       }
 
       /*
+       * Radar
+       */
+      if (isRadar_PassedVehicles == false) {
+         joinedTourData.clear_Radar_PassedVehicles();
+      }
+      if (isRadar_DistanceToVehicle == false) {
+         joinedTourData.clear_Radar_DistanceToVehicle();
+      }
+      if (isRadar_PassingSpeed_Absolute == false) {
+         joinedTourData.clear_Radar_PassingSpeed_Absolute();
+      }
+      if (isRadar_PassingSpeed_Relative == false) {
+         joinedTourData.clear_Radar_PassingSpeed_Relative();
+      }
+
+      /*
        * Running dynamics
        */
       if (isRunDyn_StanceTime == false) {
@@ -1309,7 +1364,7 @@ public class TourManager {
       /*
        * Swimming
        */
-      if (isswim_LengthType == false) {
+      if (isSwim_LengthType == false) {
          joinedTourData.clear_swim_LengthType();
       }
       if (isSwim_Cadence == false) {
@@ -5880,23 +5935,22 @@ public class TourManager {
       final float[] allValues = tourData.getRadar_DistanceToVehicle_UI();
       if (allValues != null) {
 
-         final float[][] chartValues = new float[][] {
-
-               allValues,
-
-               // this is used for the painted color
-               null
-         };
-
+//         final float[][] chartValues = new float[][] {
+//
+//               allValues,
+//
+//               // this is used for the painted color
+//               null
+//         };
+//
 //         yDataValues = createChartDataSerieNoZero(chartValues, ChartType.HORIZONTAL_BAR);
          yDataValues = createChartDataSerieNoZero(allValues, ChartType.LINE);
 
          yDataValues.setYTitle(OtherMessages.GRAPH_LABEL_RADAR_DISTANCE_TO_VEHICLE);
          yDataValues.setShowYSlider(true);
          yDataValues.setCustomData(ChartDataYSerie.YDATA_GRAPH_ID, GRAPH_RADAR_DISTANCE_TO_VEHICLE);
-//       yDataValues.setSliderLabelProvider(new SliderLabelProvider_Gear(gearSerie, gearType));
 
-         yDataValues.setUnitLabel(UI.SYMBOL_NUMBER_SIGN);
+         yDataValues.setUnitLabel(UI.UNIT_LABEL_DISTANCE_M_OR_YD);
 
          setGraphColors(yDataValues, GraphColorManager.PREF_GRAPH_RADAR_DISTANCE_TO_VEHICLE);
          chartDataModel.addXyData(yDataValues);
@@ -5929,7 +5983,6 @@ public class TourManager {
          yDataValues.setYTitle(OtherMessages.GRAPH_LABEL_RADAR_PASSED_VEHICLES);
          yDataValues.setShowYSlider(true);
          yDataValues.setCustomData(ChartDataYSerie.YDATA_GRAPH_ID, GRAPH_RADAR_PASSED_VEHICLES);
-//       yDataValues.setSliderLabelProvider(new SliderLabelProvider_Gear(gearSerie, gearType));
 
          yDataValues.setUnitLabel(UI.SYMBOL_NUMBER_SIGN);
 
@@ -5964,9 +6017,8 @@ public class TourManager {
          yDataValues.setYTitle(OtherMessages.GRAPH_LABEL_RADAR_PASSING_SPEED_ABSOLUTE);
          yDataValues.setShowYSlider(true);
          yDataValues.setCustomData(ChartDataYSerie.YDATA_GRAPH_ID, GRAPH_RADAR_PASSING_SPEED_ABSOLUTE);
-//       yDataValues.setSliderLabelProvider(new SliderLabelProvider_Gear(gearSerie, gearType));
 
-         yDataValues.setUnitLabel(UI.SYMBOL_NUMBER_SIGN);
+         yDataValues.setUnitLabel(UI.UNIT_LABEL_SPEED);
 
          setGraphColors(yDataValues, GraphColorManager.PREF_GRAPH_RADAR_PASSING_SPEED_ABSOLUTE);
          chartDataModel.addXyData(yDataValues);
@@ -5999,9 +6051,8 @@ public class TourManager {
          yDataValues.setYTitle(OtherMessages.GRAPH_LABEL_RADAR_PASSING_SPEED_RELATIVE);
          yDataValues.setShowYSlider(true);
          yDataValues.setCustomData(ChartDataYSerie.YDATA_GRAPH_ID, GRAPH_RADAR_PASSING_SPEED_RELATIVE);
-//       yDataValues.setSliderLabelProvider(new SliderLabelProvider_Gear(gearSerie, gearType));
 
-         yDataValues.setUnitLabel(UI.SYMBOL_NUMBER_SIGN);
+         yDataValues.setUnitLabel(UI.UNIT_LABEL_SPEED);
 
          setGraphColors(yDataValues, GraphColorManager.PREF_GRAPH_RADAR_PASSING_SPEED_RELATIVE);
          chartDataModel.addXyData(yDataValues);
@@ -6009,7 +6060,6 @@ public class TourManager {
 
       return yDataValues;
    }
-
 
    /**
     * Running Dynamics: Stance time
