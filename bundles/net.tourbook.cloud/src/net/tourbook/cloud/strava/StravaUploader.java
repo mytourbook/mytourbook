@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2020, 2024 Frédéric Bard
+ * Copyright (C) 2020, 2025 Frédéric Bard
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -14,9 +14,6 @@
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
 package net.tourbook.cloud.strava;
-
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -65,6 +62,9 @@ import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.PlatformUI;
 import org.json.JSONObject;
+
+import tools.jackson.core.JacksonException;
+import tools.jackson.databind.ObjectMapper;
 
 public class StravaUploader extends TourbookCloudUploader {
 
@@ -122,7 +122,7 @@ public class StravaUploader extends TourbookCloudUploader {
          final ObjectMapper mapper = new ObjectMapper();
          try {
             activityUpload = mapper.readValue(responseBody, ActivityUpload.class);
-         } catch (final JsonProcessingException e) {
+         } catch (final JacksonException e) {
             StatusUtil.log(e);
          }
       } else {
@@ -145,7 +145,7 @@ public class StravaUploader extends TourbookCloudUploader {
       StravaTokens stravaTokens = null;
       try {
          stravaTokens = new ObjectMapper().readValue(responseBody, StravaTokens.class);
-      } catch (final IllegalArgumentException | JsonProcessingException e) {
+      } catch (final IllegalArgumentException | JacksonException e) {
          StatusUtil.log(e);
       }
 

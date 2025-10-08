@@ -15,11 +15,6 @@
  *******************************************************************************/
 package net.tourbook.nutrition;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-
 import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.URI;
@@ -46,6 +41,11 @@ import net.tourbook.web.WEB;
 
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.jface.preference.IPreferenceStore;
+
+import tools.jackson.core.JacksonException;
+import tools.jackson.core.type.TypeReference;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
 
 public class NutritionUtils {
 
@@ -157,7 +157,7 @@ public class NutritionUtils {
                   new TypeReference<List<Product>>() {});
 
          }
-      } catch (final JsonProcessingException e) {
+      } catch (final JacksonException e) {
          StatusUtil.log(e);
       }
 

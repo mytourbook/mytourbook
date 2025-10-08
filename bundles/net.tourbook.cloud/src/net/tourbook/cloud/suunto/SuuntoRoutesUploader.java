@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2021, 2024 Frédéric Bard
+ * Copyright (C) 2021, 2025 Frédéric Bard
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -14,9 +14,6 @@
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
 package net.tourbook.cloud.suunto;
-
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.net.HttpURLConnection;
 import java.net.http.HttpRequest;
@@ -60,6 +57,9 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.PlatformUI;
 import org.json.JSONObject;
 
+import tools.jackson.core.JacksonException;
+import tools.jackson.databind.ObjectMapper;
+
 public class SuuntoRoutesUploader extends TourbookCloudUploader {
 
    private static final String LOG_CLOUDACTION_END           = net.tourbook.cloud.Messages.Log_CloudAction_End;
@@ -95,7 +95,7 @@ public class SuuntoRoutesUploader extends TourbookCloudUploader {
          try {
             routeUploads = mapper.readValue(routeUploadContent, RouteUploads.class);
 
-         } catch (final JsonProcessingException e) {
+         } catch (final JacksonException e) {
             StatusUtil.log(e);
          }
       } else {

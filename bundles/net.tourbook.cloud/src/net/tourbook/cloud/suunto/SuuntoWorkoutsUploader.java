@@ -15,9 +15,6 @@
  *******************************************************************************/
 package net.tourbook.cloud.suunto;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.HttpURLConnection;
@@ -56,6 +53,9 @@ import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.PlatformUI;
 import org.json.JSONObject;
+
+import tools.jackson.core.JacksonException;
+import tools.jackson.databind.ObjectMapper;
 
 public class SuuntoWorkoutsUploader extends TourbookCloudUploader {
 
@@ -222,7 +222,7 @@ public class SuuntoWorkoutsUploader extends TourbookCloudUploader {
       WorkoutUpload workoutUpload = null;
       try {
          workoutUpload = new ObjectMapper().readValue(response.body(), WorkoutUpload.class);
-      } catch (final IllegalArgumentException | JsonProcessingException e) {
+      } catch (final IllegalArgumentException | JacksonException e) {
          StatusUtil.log(e);
       }
       return workoutUpload;

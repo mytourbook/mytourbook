@@ -19,12 +19,11 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertLinesMatch;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.annotation.PropertyAccessor;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.MapperFeature;
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -53,6 +52,11 @@ import org.skyscreamer.jsonassert.JSONCompareResult;
 import org.skyscreamer.jsonassert.comparator.CustomComparator;
 import org.xmlunit.builder.DiffBuilder;
 import org.xmlunit.diff.Diff;
+
+import tools.jackson.core.JacksonException;
+import tools.jackson.databind.MapperFeature;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.json.JsonMapper;
 
 public class Comparison {
 
@@ -227,6 +231,11 @@ public class Comparison {
 
    private static String convertTourDataToJson(final TourData tourData) {
 
+      ObjectMapper mapper = JsonMapper.builder()
+            .changeDefaultPropertyInclusion(incl -> incl.withValueInclusion(JsonInclude.Include.NON_NULL))
+            .changeDefaultPropertyInclusion(incl -> incl.withValueInclusion(JsonInclude.Include.NON_EMPTY))
+            .changeDefaultVisibility(vc -> vc.withFieldVisibility(JsonAutoDetect.Visibility.NONE))
+            .build();
       final ObjectMapper objectMapper = new ObjectMapper();
       objectMapper.setSerializationInclusion(Include.NON_NULL);
       objectMapper.setSerializationInclusion(Include.NON_EMPTY);
@@ -241,7 +250,7 @@ public class Comparison {
       String jsonString = UI.EMPTY_STRING;
       try {
          jsonString = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(tourData);
-      } catch (final JsonProcessingException e) {
+      } catch (final JacksonException e) {
          StatusUtil.log(e);
       }
       return jsonString;
