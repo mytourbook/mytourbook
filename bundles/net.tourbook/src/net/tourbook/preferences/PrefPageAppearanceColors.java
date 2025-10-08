@@ -129,7 +129,8 @@ public class PrefPageAppearanceColors extends PreferencePage implements
 
    private TreeViewer                    _colorViewer;
    private GraphColorItem                _selectedColor;
-   private GraphColorItem                _copyPaste_Selection;
+   private GraphColorItem                _copyPaste_Selection_GraphColor;
+   private ColorDefinition               _copyPaste_Selection_ColorDefinition;
    private boolean                       _isColorChanged;
 
    private ColorDefinition               _expandedItem;
@@ -144,6 +145,7 @@ public class PrefPageAppearanceColors extends PreferencePage implements
 
    private ActionCopyColorIntoClipboard  _actionCopyColor;
    private ActionPasteColorFromClipboard _actionPasteColor;
+   private ActionResetToDefaultColor     _actionResetToDefaultColor;
 
    /*
     * UI controls
@@ -176,6 +178,19 @@ public class PrefPageAppearanceColors extends PreferencePage implements
       @Override
       public void run() {
          onColor_Paste();
+      }
+   }
+
+   public final class ActionResetToDefaultColor extends Action {
+
+      public ActionResetToDefaultColor() {
+
+         setText("&Reset to Default Color");
+      }
+
+      @Override
+      public void run() {
+         onColor_ResetToDefault();
       }
    }
 
@@ -277,6 +292,7 @@ public class PrefPageAppearanceColors extends PreferencePage implements
 
       _actionCopyColor = new ActionCopyColorIntoClipboard();
       _actionPasteColor = new ActionPasteColorFromClipboard();
+      _actionResetToDefaultColor = new ActionResetToDefaultColor();
    }
 
    /**
@@ -656,16 +672,26 @@ public class PrefPageAppearanceColors extends PreferencePage implements
 
       final Object selectedItem = _colorViewer.getStructuredSelection().getFirstElement();
 
-      final boolean isGraphColorSelected = selectedItem instanceof GraphColorItem;
+// SET_FORMATTING_OFF
 
-      _actionCopyColor.setEnabled(isGraphColorSelected);
-      _actionPasteColor.setEnabled(isGraphColorSelected && _copyPaste_Selection != null);
+      final boolean isGraphColorSelected        = selectedItem instanceof GraphColorItem;
+      final boolean isColorDefinitionSelected   = selectedItem instanceof ColorDefinition;
+
+      final boolean isGraphColor                = isGraphColorSelected && _copyPaste_Selection_GraphColor != null;
+      final boolean isColorDefinition           = isColorDefinitionSelected && _copyPaste_Selection_ColorDefinition != null;
+
+      _actionCopyColor              .setEnabled(true);
+      _actionPasteColor             .setEnabled(isGraphColor || isColorDefinition);
+      _actionResetToDefaultColor    .setEnabled(isColorDefinitionSelected);
+
+// SET_FORMATTING_ON
    }
 
    private void fillContextMenu(final IMenuManager menuMgr) {
 
       menuMgr.add(_actionCopyColor);
       menuMgr.add(_actionPasteColor);
+      menuMgr.add(_actionResetToDefaultColor);
 
       enableActions();
    }
@@ -730,6 +756,22 @@ public class PrefPageAppearanceColors extends PreferencePage implements
    /**
     * Log changes that it is easier to adjust the default values
     *
+    * @param colorDefinition
+    *
+    */
+   private void logColorCode(final ColorDefinition colorDefinition) {
+
+      System.out.println(NL + NL
+
+            + UI.timeStampNano()
+
+            + " [" + getClass().getSimpleName() + "] ()" //$NON-NLS-1$ //$NON-NLS-2$
+            + colorDefinition.logColorCode());
+   }
+
+   /**
+    * Log changes that it is easier to adjust the default values
+    *
     * @param selectedColor
     *
     */
@@ -759,7 +801,11 @@ public class PrefPageAppearanceColors extends PreferencePage implements
 
       if (selectedItem instanceof final GraphColorItem graphColor) {
 
-         _copyPaste_Selection = graphColor;
+         _copyPaste_Selection_GraphColor = graphColor;
+
+      } else if (selectedItem instanceof final ColorDefinition colorDefinition) {
+
+         _copyPaste_Selection_ColorDefinition = colorDefinition;
       }
    }
 
@@ -769,7 +815,7 @@ public class PrefPageAppearanceColors extends PreferencePage implements
 
       if (selectedItem instanceof final GraphColorItem selectedGraphColor) {
 
-         if (selectedGraphColor.pasteACopy(_copyPaste_Selection)) {
+         if (selectedGraphColor.setGraphColor(_copyPaste_Selection_GraphColor)) {
 
             final ColorDefinition colorDefinition = selectedGraphColor.getColorDefinition();
 
@@ -792,6 +838,24 @@ public class PrefPageAppearanceColors extends PreferencePage implements
 
             updateAndSaveColors();
          }
+
+      } else if (selectedItem instanceof final ColorDefinition colorDefinition) {
+
+         colorDefinition.setColors(_copyPaste_Selection_ColorDefinition);
+
+         updateUI_ColorDefinition(colorDefinition);
+      }
+   }
+
+   private void onColor_ResetToDefault() {
+
+      final Object selectedItem = _colorViewer.getStructuredSelection().getFirstElement();
+
+      if (selectedItem instanceof final ColorDefinition colorDefinition) {
+
+         colorDefinition.resetToDefaultColors();
+
+         updateUI_ColorDefinition(colorDefinition);
       }
    }
 
@@ -1020,6 +1084,34 @@ public class PrefPageAppearanceColors extends PreferencePage implements
       _colorViewer.update(selectedColorDefinition, null);
 
       _isColorChanged = true;
+   }
+
+   private void updateUI_ColorDefinition(final ColorDefinition colorDefinition) {
+
+      final GraphColorItem[] allGraphColorItems = colorDefinition.getGraphColorItems();
+
+      for (final GraphColorItem graphColorItem : allGraphColorItems) {
+
+         /*
+          * Dispose the old color/image from the graph
+          */
+         _graphColorPainter.invalidateResources(
+               graphColorItem.getColorId(),
+               colorDefinition.getColorDefinitionId());
+
+         /*
+          * Update the tree viewer, the color images will then be recreated
+          */
+         _colorViewer.update(graphColorItem, null);
+      }
+
+      _colorViewer.update(colorDefinition, null);
+
+      _isColorChanged = true;
+
+      logColorCode(colorDefinition);
+
+      updateAndSaveColors();
    }
 
 }

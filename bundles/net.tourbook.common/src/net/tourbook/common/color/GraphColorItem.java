@@ -100,19 +100,24 @@ public class GraphColorItem {
       return _isMapColor;
    }
 
-   public boolean pasteACopy(final GraphColorItem pastedGraphColor) {
+   /**
+    * @param fromOneGraphColor
+    *
+    * @return Returns <code>true</code> when the graph color could be set, otherwise
+    *         <code>false</code>
+    */
+   public boolean setGraphColor(final GraphColorItem fromOneGraphColor) {
 
-      final String pastedGraphColorId = pastedGraphColor.getColorId();
+      final String fromGraphColorId = fromOneGraphColor.getColorId();
+      final ColorDefinition fromColorDefinition = fromOneGraphColor.getColorDefinition();
 
-      final ColorDefinition pastedColorDefinition = pastedGraphColor.getColorDefinition();
+      final GraphColorItem[] allFromGraphColor = fromColorDefinition.getGraphColorItems();
 
-      final GraphColorItem[] allPastedGraphColorItems = pastedColorDefinition.getGraphColorItems();
+      for (final GraphColorItem fromGraphColor : allFromGraphColor) {
 
-      for (final GraphColorItem pastedGraphColorItem : allPastedGraphColorItems) {
+         if (fromGraphColor.getColorId().equals(fromGraphColorId)) {
 
-         if (pastedGraphColorItem.getColorId().equals(pastedGraphColorId)) {
-
-            final RGB pastedRGB = pastedGraphColorItem.getRGB();
+            final RGB pastedRGB = fromGraphColor.getRGB();
 
             // clone and set new color
             setRGB(new RGB(pastedRGB.red, pastedRGB.green, pastedRGB.blue));

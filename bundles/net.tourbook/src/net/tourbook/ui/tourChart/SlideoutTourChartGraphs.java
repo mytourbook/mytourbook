@@ -295,6 +295,8 @@ public class SlideoutTourChartGraphs extends ToolbarSlideout implements IActionR
 
    private void createUI_24_Graphs(final Composite parent) {
 
+      final int numSpacerColumns = 3;
+
       {
 // SET_FORMATTING_OFF
          /*
@@ -318,7 +320,7 @@ public class SlideoutTourChartGraphs extends ToolbarSlideout implements IActionR
          _chkShowInChartToolbar_Swim_Swolf_DefaultWhenOpened                  = createUI_DefaulWhenOpened(parent);
 // SET_FORMATTING_ON
 
-         UI.createSpacer_Horizontal(parent, 2);
+         UI.createSpacer_Horizontal(parent, numSpacerColumns);
       }
       {
          /*
@@ -341,7 +343,7 @@ public class SlideoutTourChartGraphs extends ToolbarSlideout implements IActionR
          createUI_GraphAction(parent, TourManager.GRAPH_SWIM_STROKES);
          createUI_GraphAction(parent, TourManager.GRAPH_SWIM_SWOLF);
 
-         UI.createSpacer_Horizontal(parent, 2);
+         UI.createSpacer_Horizontal(parent, numSpacerColumns);
       }
       {
 // SET_FORMATTING_OFF
@@ -365,7 +367,7 @@ public class SlideoutTourChartGraphs extends ToolbarSlideout implements IActionR
          _chkShowInChartToolbar_Swim_Strokes                   = createUI_ShowActionInToolbar(parent);
          _chkShowInChartToolbar_Swim_Swolf                     = createUI_ShowActionInToolbar(parent);
 
-         UI.createSpacer_Horizontal(parent, 2);
+         UI.createSpacer_Horizontal(parent, numSpacerColumns);
       }
 // SET_FORMATTING_ON
    }
