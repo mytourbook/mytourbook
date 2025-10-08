@@ -15,7 +15,6 @@
  *******************************************************************************/
 package net.tourbook.map2.action;
 
-import com.fasterxml.jackson.core.JacksonException;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -283,7 +282,7 @@ public class ActionSetGeoPositionForGeoMarker extends SubMenu {
                      reimportedLongitudeSerie[serieIndex] = markerGeoPos.longitude;
                   }
 
-               } catch (final JacksonException e) {
+               } catch (final JsonProcessingException e) {
 
                   StatusUtil.log(e);
                }
