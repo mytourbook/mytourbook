@@ -182,11 +182,6 @@ public class TimeData implements Serializable {
    public short              radar_DistanceToVehicle     = Short.MIN_VALUE;
 
    /**
-    * "Vehicle Speed (Absolute)"
-    */
-   public short              radar_VehicleSpeed          = Short.MIN_VALUE;
-
-   /**
     * "Approach Speed (Relative)"
     */
    public short              radar_PassingSpeed_Relative = Short.MIN_VALUE;

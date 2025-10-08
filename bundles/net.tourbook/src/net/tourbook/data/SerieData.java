@@ -209,7 +209,6 @@ public class SerieData implements Serializable {
     */
    public int[]                radar_PassedVehicles;
    public short[]              radar_DistanceToVehicle;
-   public short[]              radar_VehicleSpeed;
    public short[]              radar_PassingSpeed_Absolute;
    public short[]              radar_PassingSpeed_Relative;
 
@@ -362,7 +361,6 @@ public class SerieData implements Serializable {
 
             + "   radar_PassedVehicles          " + dataSerieValues(radar_PassedVehicles)          + NL //$NON-NLS-1$
             + "   radar_DistanceToVehicle       " + dataSerieValues(radar_DistanceToVehicle)       + NL //$NON-NLS-1$
-            + "   radar_VehicleSpeed            " + dataSerieValues(radar_VehicleSpeed)            + NL //$NON-NLS-1$
             + "   radar_PassingSpeed_Absolute   " + dataSerieValues(radar_PassingSpeed_Absolute)   + NL //$NON-NLS-1$
             + "   radar_PassingSpeed_Relative   " + dataSerieValues(radar_PassingSpeed_Relative)   + NL //$NON-NLS-1$
 

@@ -98,8 +98,6 @@ public class SlideoutTourChartGraphs extends ToolbarSlideout implements IActionR
    private Button    _chkShowInChartToolbar_Radar_PassedVehicles_DefaultWhenOpened;
    private Button    _chkShowInChartToolbar_Radar_DistanceToVehicle;
    private Button    _chkShowInChartToolbar_Radar_DistanceToVehicle_DefaultWhenOpened;
-   private Button    _chkShowInChartToolbar_Radar_VehicleSpeed;
-   private Button    _chkShowInChartToolbar_Radar_VehicleSpeed_DefaultWhenOpened;
    private Button    _chkShowInChartToolbar_Radar_PassingSpeed_Absolute;
    private Button    _chkShowInChartToolbar_Radar_PassingSpeed_Absolute_DefaultWhenOpened;
    private Button    _chkShowInChartToolbar_Radar_PassingSpeed_Relative;
@@ -307,7 +305,6 @@ public class SlideoutTourChartGraphs extends ToolbarSlideout implements IActionR
 
          _chkShowInChartToolbar_Radar_PassedVehicles_DefaultWhenOpened        = createUI_DefaulWhenOpened(parent);
          _chkShowInChartToolbar_Radar_DistanceToVehicle_DefaultWhenOpened     = createUI_DefaulWhenOpened(parent);
-         _chkShowInChartToolbar_Radar_VehicleSpeed_DefaultWhenOpened          = createUI_DefaulWhenOpened(parent);
          _chkShowInChartToolbar_Radar_PassingSpeed_Absolute_DefaultWhenOpened = createUI_DefaulWhenOpened(parent);
          _chkShowInChartToolbar_Radar_PassingSpeed_Relative_DefaultWhenOpened = createUI_DefaulWhenOpened(parent);
 
@@ -332,7 +329,6 @@ public class SlideoutTourChartGraphs extends ToolbarSlideout implements IActionR
 
          createUI_GraphAction(parent, TourManager.GRAPH_RADAR_PASSED_VEHICLES);
          createUI_GraphAction(parent, TourManager.GRAPH_RADAR_DISTANCE_TO_VEHICLE);
-         createUI_GraphAction(parent, TourManager.GRAPH_RADAR_VEHICLE_SPEED);
          createUI_GraphAction(parent, TourManager.GRAPH_RADAR_PASSING_SPEED_ABSOLUTE);
          createUI_GraphAction(parent, TourManager.GRAPH_RADAR_PASSING_SPEED_RELATIVE);
 
@@ -357,7 +353,6 @@ public class SlideoutTourChartGraphs extends ToolbarSlideout implements IActionR
 
          _chkShowInChartToolbar_Radar_PassedVehicles           = createUI_ShowActionInToolbar(parent);
          _chkShowInChartToolbar_Radar_DistanceToVehicle        = createUI_ShowActionInToolbar(parent);
-         _chkShowInChartToolbar_Radar_VehicleSpeed             = createUI_ShowActionInToolbar(parent);
          _chkShowInChartToolbar_Radar_PassingSpeed_Absolute    = createUI_ShowActionInToolbar(parent);
          _chkShowInChartToolbar_Radar_PassingSpeed_Relative    = createUI_ShowActionInToolbar(parent);
 
@@ -463,7 +458,6 @@ public class SlideoutTourChartGraphs extends ToolbarSlideout implements IActionR
 
       _state.put(TourChart.STATE_IS_SHOW_IN_CHART_TOOLBAR_RADAR_PASSED_VEHICLES,          TourChart.STATE_IS_SHOW_IN_CHART_TOOLBAR_RADAR_PASSED_VEHICLES_DEFAULT);
       _state.put(TourChart.STATE_IS_SHOW_IN_CHART_TOOLBAR_RADAR_DISTANCE_TO_VEHICLE,      TourChart.STATE_IS_SHOW_IN_CHART_TOOLBAR_RADAR_DISTANCE_TO_VEHICLE_DEFAULT);
-      _state.put(TourChart.STATE_IS_SHOW_IN_CHART_TOOLBAR_RADAR_VEHICLE_SPEED,            TourChart.STATE_IS_SHOW_IN_CHART_TOOLBAR_RADAR_VEHICLE_SPEED_DEFAULT);
       _state.put(TourChart.STATE_IS_SHOW_IN_CHART_TOOLBAR_RADAR_PASSING_SPEED_ABSOLUTE,   TourChart.STATE_IS_SHOW_IN_CHART_TOOLBAR_RADAR_PASSING_SPEED_ABSOLUTE_DEFAULT);
       _state.put(TourChart.STATE_IS_SHOW_IN_CHART_TOOLBAR_RADAR_PASSING_SPEED_RELATIVE,   TourChart.STATE_IS_SHOW_IN_CHART_TOOLBAR_RADAR_PASSING_SPEED_RELATIVE_DEFAULT);
 
@@ -507,7 +501,6 @@ public class SlideoutTourChartGraphs extends ToolbarSlideout implements IActionR
 
       _chkShowInChartToolbar_Radar_PassedVehicles.setSelection(         Util.getStateBoolean(_state, TourChart.STATE_IS_SHOW_IN_CHART_TOOLBAR_RADAR_PASSED_VEHICLES,          TourChart.STATE_IS_SHOW_IN_CHART_TOOLBAR_RADAR_PASSED_VEHICLES_DEFAULT));
       _chkShowInChartToolbar_Radar_DistanceToVehicle.setSelection(      Util.getStateBoolean(_state, TourChart.STATE_IS_SHOW_IN_CHART_TOOLBAR_RADAR_DISTANCE_TO_VEHICLE,      TourChart.STATE_IS_SHOW_IN_CHART_TOOLBAR_RADAR_DISTANCE_TO_VEHICLE_DEFAULT));
-      _chkShowInChartToolbar_Radar_VehicleSpeed.setSelection(           Util.getStateBoolean(_state, TourChart.STATE_IS_SHOW_IN_CHART_TOOLBAR_RADAR_VEHICLE_SPEED,            TourChart.STATE_IS_SHOW_IN_CHART_TOOLBAR_RADAR_VEHICLE_SPEED_DEFAULT));
       _chkShowInChartToolbar_Radar_PassingSpeed_Absolute.setSelection(  Util.getStateBoolean(_state, TourChart.STATE_IS_SHOW_IN_CHART_TOOLBAR_RADAR_PASSING_SPEED_ABSOLUTE,   TourChart.STATE_IS_SHOW_IN_CHART_TOOLBAR_RADAR_PASSING_SPEED_ABSOLUTE_DEFAULT));
       _chkShowInChartToolbar_Radar_PassingSpeed_Relative.setSelection(  Util.getStateBoolean(_state, TourChart.STATE_IS_SHOW_IN_CHART_TOOLBAR_RADAR_PASSING_SPEED_RELATIVE,   TourChart.STATE_IS_SHOW_IN_CHART_TOOLBAR_RADAR_PASSING_SPEED_RELATIVE_DEFAULT));
 
@@ -595,10 +588,6 @@ public class SlideoutTourChartGraphs extends ToolbarSlideout implements IActionR
             _chkShowInChartToolbar_Radar_DistanceToVehicle_DefaultWhenOpened.setSelection(true);
          }
 
-         if (graphIdValue == TourManager.GRAPH_RADAR_VEHICLE_SPEED) {
-            _chkShowInChartToolbar_Radar_VehicleSpeed_DefaultWhenOpened.setSelection(true);
-         }
-
          if (graphIdValue == TourManager.GRAPH_RADAR_PASSING_SPEED_ABSOLUTE) {
             _chkShowInChartToolbar_Radar_PassingSpeed_Absolute_DefaultWhenOpened.setSelection(true);
          }
@@ -664,7 +653,6 @@ public class SlideoutTourChartGraphs extends ToolbarSlideout implements IActionR
 
       _state.put(TourChart.STATE_IS_SHOW_IN_CHART_TOOLBAR_RADAR_PASSED_VEHICLES,          _chkShowInChartToolbar_Radar_PassedVehicles        .getSelection());
       _state.put(TourChart.STATE_IS_SHOW_IN_CHART_TOOLBAR_RADAR_DISTANCE_TO_VEHICLE,      _chkShowInChartToolbar_Radar_DistanceToVehicle     .getSelection());
-      _state.put(TourChart.STATE_IS_SHOW_IN_CHART_TOOLBAR_RADAR_VEHICLE_SPEED,            _chkShowInChartToolbar_Radar_VehicleSpeed          .getSelection());
       _state.put(TourChart.STATE_IS_SHOW_IN_CHART_TOOLBAR_RADAR_PASSING_SPEED_ABSOLUTE,   _chkShowInChartToolbar_Radar_PassingSpeed_Absolute .getSelection());
       _state.put(TourChart.STATE_IS_SHOW_IN_CHART_TOOLBAR_RADAR_PASSING_SPEED_RELATIVE,   _chkShowInChartToolbar_Radar_PassingSpeed_Relative .getSelection());
 
@@ -749,10 +737,6 @@ public class SlideoutTourChartGraphs extends ToolbarSlideout implements IActionR
 
       if (_chkShowInChartToolbar_Radar_DistanceToVehicle_DefaultWhenOpened.getSelection()) {
          allDefaultGraphs.add(Integer.toString(TourManager.GRAPH_RADAR_DISTANCE_TO_VEHICLE));
-      }
-
-      if (_chkShowInChartToolbar_Radar_VehicleSpeed_DefaultWhenOpened.getSelection()) {
-         allDefaultGraphs.add(Integer.toString(TourManager.GRAPH_RADAR_VEHICLE_SPEED));
       }
 
       if (_chkShowInChartToolbar_Radar_PassingSpeed_Absolute_DefaultWhenOpened.getSelection()) {

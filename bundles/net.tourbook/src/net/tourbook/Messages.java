@@ -3132,7 +3132,6 @@ public class Messages extends NLS {
    public static String        Tour_Action_Radar_PassedVehicles_Tooltip;
    public static String        Tour_Action_Radar_PassingSpeed_Absolute_Tooltip;
    public static String        Tour_Action_Radar_PassingSpeed_Relative_Tooltip;
-   public static String        Tour_Action_Radar_VehicleSpeed_Tooltip;
    public static String        Tour_Action_RetrieveWeatherData;
    public static String        Tour_Action_RunDyn_StanceTimeBalance_Tooltip;
    public static String        Tour_Action_RunDyn_StanceTime_Tooltip;

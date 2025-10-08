@@ -178,7 +178,6 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
    static final String  STATE_IS_SHOW_IN_CHART_TOOLBAR_TEMPERATURE                           = "STATE_IS_SHOW_IN_CHART_TOOLBAR_TEMPERATURE";                   //$NON-NLS-1$
    static final String  STATE_IS_SHOW_IN_CHART_TOOLBAR_RADAR_PASSED_VEHICLES                 = "STATE_IS_SHOW_IN_CHART_TOOLBAR_RADAR_PASSED_VEHICLES";         //$NON-NLS-1$
    static final String  STATE_IS_SHOW_IN_CHART_TOOLBAR_RADAR_DISTANCE_TO_VEHICLE             = "STATE_IS_SHOW_IN_CHART_TOOLBAR_RADAR_DISTANCE_TO_VEHICLE";     //$NON-NLS-1$
-   static final String  STATE_IS_SHOW_IN_CHART_TOOLBAR_RADAR_VEHICLE_SPEED                   = "STATE_IS_SHOW_IN_CHART_TOOLBAR_RADAR_VEHICLE_SPEED";           //$NON-NLS-1$
    static final String  STATE_IS_SHOW_IN_CHART_TOOLBAR_RADAR_PASSING_SPEED_ABSOLUTE          = "STATE_IS_SHOW_IN_CHART_TOOLBAR_RADAR_PASSING_SPEED_ABSOLUTE";  //$NON-NLS-1$
    static final String  STATE_IS_SHOW_IN_CHART_TOOLBAR_RADAR_PASSING_SPEED_RELATIVE          = "STATE_IS_SHOW_IN_CHART_TOOLBAR_RADAR_PASSING_SPEED_RELATIVE";  //$NON-NLS-1$
    static final String  STATE_IS_SHOW_IN_CHART_TOOLBAR_RUN_DYN_STANCE_TIME                   = "STATE_IS_SHOW_IN_CHART_TOOLBAR_RUN_DYN_STANCE_TIME";           //$NON-NLS-1$
@@ -205,7 +204,6 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
    static final boolean STATE_IS_SHOW_IN_CHART_TOOLBAR_TEMPERATURE_DEFAULT                   = false;
    static final boolean STATE_IS_SHOW_IN_CHART_TOOLBAR_RADAR_PASSED_VEHICLES_DEFAULT         = false;
    static final boolean STATE_IS_SHOW_IN_CHART_TOOLBAR_RADAR_DISTANCE_TO_VEHICLE_DEFAULT     = false;
-   static final boolean STATE_IS_SHOW_IN_CHART_TOOLBAR_RADAR_VEHICLE_SPEED_DEFAULT           = false;
    static final boolean STATE_IS_SHOW_IN_CHART_TOOLBAR_RADAR_PASSING_SPEED_ABSOLUTE_DEFAULT  = false;
    static final boolean STATE_IS_SHOW_IN_CHART_TOOLBAR_RADAR_PASSING_SPEED_RELATIVE_DEFAULT  = true;
    static final boolean STATE_IS_SHOW_IN_CHART_TOOLBAR_RUN_DYN_STANCE_TIME_DEFAULT           = false;
@@ -237,7 +235,6 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 
    private static final String GRAPH_CONTRIBUTION_ID_RADAR_PASSED_VEHICLES          = "GRAPH_CONTRIBUTION_ID_RADAR_PASSED_VEHICLES";         //$NON-NLS-1$
    private static final String GRAPH_CONTRIBUTION_ID_RADAR_DISTANCE_TO_VEHICLE      = "GRAPH_CONTRIBUTION_ID_RADAR_DISTANCE_TO_VEHICLE";     //$NON-NLS-1$
-   private static final String GRAPH_CONTRIBUTION_ID_RADAR_VEHICLE_SPEED            = "GRAPH_CONTRIBUTION_ID_RADAR_VEHICLE_SPEED";           //$NON-NLS-1$
    private static final String GRAPH_CONTRIBUTION_ID_RADAR_PASSING_SPEED_ABSOLUTE   = "GRAPH_CONTRIBUTION_ID_RADAR_PASSING_SPEED_ABSOLUTE";  //$NON-NLS-1$
    private static final String GRAPH_CONTRIBUTION_ID_RADAR_PASSING_SPEED_RELATIVE   = "GRAPH_CONTRIBUTION_ID_RADAR_PASSING_SPEED_RELATIVE";  //$NON-NLS-1$
 
@@ -269,7 +266,6 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 
       GRAPH_CONTRIBUTION_ID_RADAR_PASSED_VEHICLES,
       GRAPH_CONTRIBUTION_ID_RADAR_DISTANCE_TO_VEHICLE,
-      GRAPH_CONTRIBUTION_ID_RADAR_VEHICLE_SPEED,
       GRAPH_CONTRIBUTION_ID_RADAR_PASSING_SPEED_ABSOLUTE,
       GRAPH_CONTRIBUTION_ID_RADAR_PASSING_SPEED_RELATIVE,
 
@@ -1518,13 +1514,6 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
             Messages.Tour_Action_Radar_DistanceToVehicle_Tooltip,
             ThemeUtil.getThemedImageName(Images.Graph_Radar_DistanceToVehicle),
             GRAPH_CONTRIBUTION_ID_RADAR_DISTANCE_TO_VEHICLE);
-
-      createActions_12_GraphAction(
-            TourManager.GRAPH_RADAR_VEHICLE_SPEED,
-            OtherMessages.GRAPH_LABEL_RADAR_VEHICLE_SPEED,
-            Messages.Tour_Action_Radar_VehicleSpeed_Tooltip,
-            ThemeUtil.getThemedImageName(Images.Graph_Radar_VehicleSpeed),
-            GRAPH_CONTRIBUTION_ID_RADAR_VEHICLE_SPEED);
 
       createActions_12_GraphAction(
             TourManager.GRAPH_RADAR_PASSING_SPEED_ABSOLUTE,
@@ -3229,12 +3218,6 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
             TourManager.GRAPH_RADAR_DISTANCE_TO_VEHICLE,
             TourChart.STATE_IS_SHOW_IN_CHART_TOOLBAR_RADAR_DISTANCE_TO_VEHICLE,
             TourChart.STATE_IS_SHOW_IN_CHART_TOOLBAR_RADAR_DISTANCE_TO_VEHICLE_DEFAULT);
-
-      fillToolbar_Graphs_Graph(
-            tbm,
-            TourManager.GRAPH_RADAR_VEHICLE_SPEED,
-            TourChart.STATE_IS_SHOW_IN_CHART_TOOLBAR_RADAR_VEHICLE_SPEED,
-            TourChart.STATE_IS_SHOW_IN_CHART_TOOLBAR_RADAR_VEHICLE_SPEED_DEFAULT);
 
       fillToolbar_Graphs_Graph(
             tbm,

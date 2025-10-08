@@ -378,15 +378,6 @@ public class MesgListener_Record extends AbstractMesgListener implements RecordM
             continue;
          }
 
-         System.out.println(UI.timeStamp() + " %5s -  %5s -  %5d -  %s".formatted(
-
-               devField.getStringValue(),
-               devField.getUnits(),
-               devField.getNum(),
-               devField.getName()
-
-               ));
-// TODO remove SYSTEM.OUT.PRINTLN
 
          switch (fieldName) {
 
@@ -419,16 +410,9 @@ public class MesgListener_Record extends AbstractMesgListener implements RecordM
 
          case DEV_FIELD_RADAR_VEHICLE_SPEED:
 
-            final Short radarSpeeds = devField.getShortValue();
-            if (radarSpeeds != null) {
-               timeData.radar_VehicleSpeed = radarSpeeds.shortValue();
-
-               if (timeData.radar_VehicleSpeed != 0) {
-                  int a = 0;
-                  a++;
-
-               }
-            }
+            /*
+             * This field has the same value as passing_speed but divided by 3.6
+             */
 
             break;
 

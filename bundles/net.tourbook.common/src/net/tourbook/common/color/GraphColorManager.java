@@ -68,7 +68,6 @@ public class GraphColorManager {
    public static final String  PREF_GRAPH_BODYWEIGHT                   = "BodyWeight";                  //$NON-NLS-1$
    public static final String  PREF_GRAPH_RADAR_PASSED_VEHICLES        = "Radar_PassedVehicles";        //$NON-NLS-1$
    public static final String  PREF_GRAPH_RADAR_DISTANCE_TO_VEHICLE    = "Radar_DistanceToVehicle";     //$NON-NLS-1$
-   public static final String  PREF_GRAPH_RADAR_VEHICLE_SPEED          = "Radar_VehicleSpeed";          //$NON-NLS-1$
    public static final String  PREF_GRAPH_RADAR_PASSING_SPEED_ABSOLUTE = "Radar_PassingSpeed_Absolute"; //$NON-NLS-1$
    public static final String  PREF_GRAPH_RADAR_PASSING_SPEED_RELATIVE = "Radar_PassingSpeed_Relative"; //$NON-NLS-1$
    public static final String  PREF_GRAPH_RUN_DYN_STANCE_TIME          = "RunDyn_StanceTime";           //$NON-NLS-1$
@@ -478,19 +477,6 @@ public class GraphColorManager {
       allColorDef.add(new ColorDefinition(PREF_GRAPH_RADAR_DISTANCE_TO_VEHICLE,
 
             radarPrefix + Messages.Graph_Label_Radar_DistanceToVehicle,
-
-            new RGB(0xff, 0xff, 0xff),
-            new RGB(0x0, 0x8b, 0xe9),
-            new RGB(0x0, 0x65, 0xa8),
-            new RGB(0x0, 0x93, 0xf4),
-            new RGB(0x0, 0x53, 0x8a),
-            new RGB(0x28, 0xa9, 0xff),
-
-            null));
-
-      allColorDef.add(new ColorDefinition(PREF_GRAPH_RADAR_VEHICLE_SPEED,
-
-            radarPrefix + Messages.Graph_Label_Radar_VehicleSpeed,
 
             new RGB(0xff, 0xff, 0xff),
             new RGB(0x0, 0x8b, 0xe9),

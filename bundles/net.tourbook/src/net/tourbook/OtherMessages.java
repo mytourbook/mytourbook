@@ -133,7 +133,6 @@ public class OtherMessages {
    public static final String GRAPH_LABEL_PREFIX_TRAINING                  = net.tourbook.common.Messages.Graph_Label_Prefix_Training;
    public static final String GRAPH_LABEL_RADAR_PASSED_VEHICLES            = net.tourbook.common.Messages.Graph_Label_Radar_PassedVehicles;
    public static final String GRAPH_LABEL_RADAR_DISTANCE_TO_VEHICLE        = net.tourbook.common.Messages.Graph_Label_Radar_DistanceToVehicle;
-   public static final String GRAPH_LABEL_RADAR_VEHICLE_SPEED              = net.tourbook.common.Messages.Graph_Label_Radar_VehicleSpeed;
    public static final String GRAPH_LABEL_RADAR_PASSING_SPEED_ABSOLUTE     = net.tourbook.common.Messages.Graph_Label_Radar_PassingSpeed_Absolute;
    public static final String GRAPH_LABEL_RADAR_PASSING_SPEED_RELATIVE     = net.tourbook.common.Messages.Graph_Label_Radar_PassingSpeed_Relative;
    public static final String GRAPH_LABEL_RUN_DYN_STANCE_TIME              = net.tourbook.common.Messages.Graph_Label_RunDyn_StanceTime;
