@@ -77,7 +77,7 @@ Export-Package: de.byteholder.geoclipse,
  net.tourbook.weather.weatherapi,
  net.tourbook.weather.worldweatheronline
 Import-Package: tools.jackson.core.type,
- tools.jackson.databind,
+ com.fasterxml.jackson.databind,
  com.javadocmd.simplelatlng,
  com.jhlabs.image,
  cop.swt.widgets.viewers.table.celleditors,

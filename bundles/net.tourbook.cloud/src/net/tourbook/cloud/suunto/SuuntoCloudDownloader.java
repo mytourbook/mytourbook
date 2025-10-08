@@ -15,6 +15,8 @@
  *******************************************************************************/
 package net.tourbook.cloud.suunto;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -63,8 +65,6 @@ import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.dialogs.PreferencesUtil;
-
-import tools.jackson.databind.ObjectMapper;
 
 public class SuuntoCloudDownloader extends TourbookCloudDownloader {
 
