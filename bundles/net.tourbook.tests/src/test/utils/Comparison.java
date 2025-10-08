@@ -240,7 +240,7 @@ public class Comparison {
       String jsonString = UI.EMPTY_STRING;
       try {
          jsonString = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(tourData);
-      } catch (final JsonProcessException e) {
+      } catch (final JsonProcessingException e) {
          StatusUtil.log(e);
       }
       return jsonString;
