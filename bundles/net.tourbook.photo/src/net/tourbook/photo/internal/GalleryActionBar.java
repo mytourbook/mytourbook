@@ -229,7 +229,7 @@ public class GalleryActionBar {
 
          _spinnerThumbSize.setSelection(imageSize);
 
-         final float scaledCanvasWidth = DPIUtil.autoScaleUp(imageSize);
+         final float scaledCanvasWidth = DPIUtil.pixelToPoint(imageSize, DPIUtil.getDeviceZoom());
          final boolean isHqImage = scaledCanvasWidth > PhotoLoadManager.IMAGE_SIZE_THUMBNAIL;
 
          _canvasImageSizeIndicator.setIndicator(isHqImage);

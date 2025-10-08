@@ -226,7 +226,7 @@ public class MarkerToolkit implements ItemizedLayer.OnItemGestureListener<Marker
 
       // adjust font to 4k display, otherwise it is really small
       final float fontHeight = textPainter.getFontHeight();
-      final float scaledFontHeight = DPIUtil.autoScaleUp(fontHeight);
+      final float scaledFontHeight = DPIUtil.pixelToPoint(fontHeight, DPIUtil.getDeviceZoom());
       textPainter.setTextSize(scaledFontHeight);
 
       final int margin = 5;

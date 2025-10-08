@@ -427,8 +427,8 @@ public class ChartLayerMarker implements IChartLayer, IChartOverlay {
                // draw label vertical
                final Transform tr = new Transform(display);
                {
-                  final int xPos = DPIUtil.autoScaleUp(_devXMarker);
-                  final int yPos = DPIUtil.autoScaleUp(_devYMarker);
+                  final int xPos = DPIUtil.pixelToPoint(_devXMarker, DPIUtil.getDeviceZoom());
+                  final int yPos = DPIUtil.pixelToPoint(_devYMarker, DPIUtil.getDeviceZoom());
 
                   tr.translate(xPos, yPos);
                   tr.rotate(-90f);

@@ -17,6 +17,7 @@ package net.tourbook.device.garmin.fit.listeners;
 
 import com.garmin.fit.AntplusDeviceType;
 import com.garmin.fit.BleDeviceType;
+import com.garmin.fit.DateTime;
 import com.garmin.fit.DeviceIndex;
 import com.garmin.fit.DeviceInfoMesg;
 import com.garmin.fit.DeviceInfoMesgListener;
@@ -403,9 +404,11 @@ public class MesgListener_DeviceInfo extends AbstractMesgListener implements Dev
 
    private void setSensorData(final DeviceInfoMesg mesg) {
 
+      final DateTime timestamp = mesg.getTimestamp();
+
 // SET_FORMATTING_OFF
 
-         final long           mesgDateTime               = mesg.getTimestamp().getDate().getTime();
+         final long           mesgDateTime               = timestamp == null ? 0 : timestamp.getDate().getTime();
          final Short          mesgDeviceIndex            = mesg.getDeviceIndex();
 
          final Integer        mesgManufacturer           = mesg.getManufacturer();
