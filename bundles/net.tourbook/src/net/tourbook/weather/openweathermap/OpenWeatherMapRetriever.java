@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2022, 2025 Frédéric Bard
+ * Copyright (C) 2022, 2024 Frédéric Bard
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -14,6 +14,10 @@
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
 package net.tourbook.weather.openweathermap;
+
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.time.Instant;
 import java.time.LocalDate;
@@ -42,10 +46,6 @@ import net.tourbook.weather.WeatherUtils;
 
 import org.apache.commons.lang3.time.DateUtils;
 import org.eclipse.jface.dialogs.IDialogSettings;
-
-import tools.jackson.core.type.TypeReference;
-import tools.jackson.databind.JsonNode;
-import tools.jackson.databind.ObjectMapper;
 
 public class OpenWeatherMapRetriever extends HistoricalWeatherRetriever {
 

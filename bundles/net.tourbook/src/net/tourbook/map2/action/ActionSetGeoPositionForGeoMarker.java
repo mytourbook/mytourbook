@@ -15,6 +15,10 @@
  *******************************************************************************/
 package net.tourbook.map2.action;
 
+import com.fasterxml.jackson.core.JacksonException;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -38,9 +42,6 @@ import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.ActionContributionItem;
 import org.eclipse.jface.action.Separator;
 import org.eclipse.swt.widgets.Menu;
-
-import tools.jackson.core.JacksonException;
-import tools.jackson.databind.ObjectMapper;
 
 /**
  */
@@ -333,7 +334,7 @@ public class ActionSetGeoPositionForGeoMarker extends SubMenu {
 
          return geoPosJSON;
 
-      } catch (final JacksonException e) {
+      } catch (final JsonProcessingException e) {
 
          StatusUtil.log(e);
       }

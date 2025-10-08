@@ -15,6 +15,10 @@
  *******************************************************************************/
 package net.tourbook.data;
 
+import com.fasterxml.jackson.core.JacksonException;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import java.io.File;
 import java.io.Serializable;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -35,9 +39,6 @@ import net.tourbook.photo.PhotoAdjustments;
 
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
-
-import tools.jackson.core.JacksonException;
-import tools.jackson.databind.ObjectMapper;
 
 /**
  * Contains a photo for a tour
@@ -364,7 +365,7 @@ public class TourPhoto implements Serializable {
 
             return photoAdjustments;
 
-         } catch (final JacksonException e) {
+         } catch (final JsonProcessingException e) {
 
             StatusUtil.log(e);
          }
