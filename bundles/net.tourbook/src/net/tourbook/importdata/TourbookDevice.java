@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2022 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2025 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -114,7 +114,7 @@ public abstract class TourbookDevice implements IRawDataReader {
    public boolean isCreateTourIdWithElapsedTime;
 
    /**
-    * When <code>true</code> imported waypoints will be converted into {@link TourMarker}.
+    * When <code>true</code> then imported waypoints will be converted into {@link TourMarker}.
     */
    public boolean isConvertWayPoints;
 

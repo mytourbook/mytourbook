@@ -199,6 +199,10 @@ public class UI {
     *          at org.eclipse.jdt.ui.actions.ExternalizeStringsAction.run(ExternalizeStringsAction.java:156)
     *          at org.eclipse.jdt.ui.actions.SelectionDispatchAction.dispatchRun(SelectionDispatchAction.java:278)
     * </pre>
+    *
+    * @see <a href=
+    *      "https://github.com/eclipse-jdt/eclipse.jdt.ui/issues/1803">https://github.com/eclipse-jdt/eclipse.jdt.ui/issues/1803</a>
+    *
     */
 // public static final String       SYMBOL_QUOTA                         = "\"";
    public static final String       SYMBOL_QUOTATION_MARK                = new StringBuilder().append('"').toString();

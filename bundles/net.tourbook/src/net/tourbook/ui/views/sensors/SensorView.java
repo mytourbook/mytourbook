@@ -46,6 +46,7 @@ import net.tourbook.data.DeviceSensorType;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.tour.ITourEventListener;
+import net.tourbook.tour.SelectionDeletedTours;
 import net.tourbook.tour.TourEventId;
 import net.tourbook.tour.TourManager;
 import net.tourbook.ui.TableColumnFactory;
@@ -83,6 +84,7 @@ import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.Widget;
+import org.eclipse.ui.ISelectionListener;
 import org.eclipse.ui.part.ViewPart;
 
 public class SensorView extends ViewPart implements ITourViewer {
@@ -99,6 +101,7 @@ public class SensorView extends ViewPart implements ITourViewer {
    private final IPreferenceStore  _prefStore_Common               = CommonActivator.getPrefStore();
    private final IDialogSettings   _state                          = TourbookPlugin.getState(ID);
 
+   private ISelectionListener      _postSelectionListener;
    private IPropertyChangeListener _prefChangeListener;
    private IPropertyChangeListener _prefChangeListener_Common;
    private ITourEventListener      _tourPropertyListener;
@@ -261,7 +264,7 @@ public class SensorView extends ViewPart implements ITourViewer {
 
                // secondly sort by sensor key
 
-               rc = sensor1.getSensorKeyByName().compareTo(sensor2.getSensorKeyByName());
+               rc = sensor1.getSensorKey_WithDevType().compareTo(sensor2.getSensorKey_WithDevType());
             }
 
             break;
@@ -341,6 +344,10 @@ public class SensorView extends ViewPart implements ITourViewer {
 
             break;
 
+         case TableColumnFactory.SENSOR_NUMBER_OF_TOURS_ID:
+            rc = item1.numTours - item2.numTours;
+            break;
+
          case TableColumnFactory.SENSOR_TIME_FIRST_USED_ID:
             rc = item1.usedFirstTime - item2.usedFirstTime;
             break;
@@ -363,7 +370,7 @@ public class SensorView extends ViewPart implements ITourViewer {
             break;
 
          case TableColumnFactory.SENSOR_NAME_KEY_ID:
-            rc = item1.sensor.getSensorKeyByName().compareTo(item2.sensor.getSensorKeyByName());
+            rc = item1.sensor.getSensorKey_WithDevType().compareTo(item2.sensor.getSensorKey_WithDevType());
             break;
 
          case TableColumnFactory.SENSOR_NAME_ID:
@@ -392,7 +399,7 @@ public class SensorView extends ViewPart implements ITourViewer {
          }
 
          /*
-          * MUST return 1 or -1 otherwise long values are not sorted correctly.
+          * MUST return 1 or -1 otherwise long values are not sorted correctly
           */
          return rc > 0
                ? 1
@@ -446,9 +453,10 @@ public class SensorView extends ViewPart implements ITourViewer {
       long         usedLastTime;
 
       boolean      isBatteryLevelAvailable;
-
       boolean      isBatteryStatusAvailable;
       boolean      isBatteryVoltageAvailable;
+
+      int          numTours;
 
       @Override
       public boolean equals(final Object obj) {
@@ -586,6 +594,23 @@ public class SensorView extends ViewPart implements ITourViewer {
       _prefStore_Common.addPropertyChangeListener(_prefChangeListener_Common);
    }
 
+   /**
+    * Listen for events when a selection is fired
+    */
+   private void addSelectionListener() {
+
+      _postSelectionListener = (part, selection) -> {
+
+         if (part == SensorView.this) {
+            return;
+         }
+
+         onSelectionChanged(selection);
+      };
+
+      getSite().getPage().addPostSelectionListener(_postSelectionListener);
+   }
+
    private void addTourEventListener() {
 
       _tourPropertyListener = (part, eventId, eventData) -> {
@@ -595,7 +620,12 @@ public class SensorView extends ViewPart implements ITourViewer {
          }
 
          if (eventId == TourEventId.UPDATE_UI
-               || eventId == TourEventId.ALL_TOURS_ARE_MODIFIED) {
+               || eventId == TourEventId.ALL_TOURS_ARE_MODIFIED
+
+         // this event is fired when tours are imported, this could change the sensor values
+               || eventId == TourEventId.CLEAR_DISPLAYED_TOUR
+
+         ) {
 
             // new tours could be imported with new sensors
 
@@ -636,6 +666,7 @@ public class SensorView extends ViewPart implements ITourViewer {
 
       addPrefListener();
       addTourEventListener();
+      addSelectionListener();
 
       createActions();
       fillToolbar();
@@ -688,7 +719,7 @@ public class SensorView extends ViewPart implements ITourViewer {
       _sensorViewer.setContentProvider(new SensorContentProvider());
       _sensorViewer.setComparator(_sensorComparator);
 
-      _sensorViewer.addSelectionChangedListener(selectionChangedEvent -> onSensor_Select());
+      _sensorViewer.addSelectionChangedListener(selectionChangedEvent -> onSelectSensor());
       _sensorViewer.addDoubleClickListener(doubleClickEvent -> onAction_OpenSensorChart());
 
       updateUI_SetSortDirection(
@@ -722,6 +753,8 @@ public class SensorView extends ViewPart implements ITourViewer {
 
       defineColumn_Sensor_Name();
       defineColumn_Sensor_Type();
+      defineColumn_NumberOfTours();
+      defineColumn_DeviceType();
       defineColumn_BatteryState_Level();
       defineColumn_BatteryState_Status();
       defineColumn_BatteryState_Voltage();
@@ -803,6 +836,25 @@ public class SensorView extends ViewPart implements ITourViewer {
    }
 
    /**
+    * Column: Fit data: device type
+    */
+   private void defineColumn_DeviceType() {
+
+      final ColumnDefinition colDef = TableColumnFactory.SENSOR_DEVICE_TYPE.createColumn(_columnManager, _pc);
+
+      colDef.setColumnSelectionListener(_columnSortListener);
+
+      colDef.setLabelProvider(new CellLabelProvider() {
+         @Override
+         public void update(final ViewerCell cell) {
+
+            final SensorItem sensorItem = (SensorItem) cell.getElement();
+            cell.setText(Short.toString(sensorItem.sensor.getDeviceType()));
+         }
+      });
+   }
+
+   /**
     * Column: Manufacturer name
     */
    private void defineColumn_Manufacturer_Name() {
@@ -855,7 +907,26 @@ public class SensorView extends ViewPart implements ITourViewer {
          public void update(final ViewerCell cell) {
 
             final SensorItem sensorItem = (SensorItem) cell.getElement();
-            cell.setText(sensorItem.sensor.getSensorKeyByName());
+            cell.setText(sensorItem.sensor.getSensorKey_WithDevType());
+         }
+      });
+   }
+
+   /**
+    * Column: Number of tours
+    */
+   private void defineColumn_NumberOfTours() {
+
+      final ColumnDefinition colDef = TableColumnFactory.SENSOR_NUMBER_OF_TOURS.createColumn(_columnManager, _pc);
+
+      colDef.setColumnSelectionListener(_columnSortListener);
+
+      colDef.setLabelProvider(new CellLabelProvider() {
+         @Override
+         public void update(final ViewerCell cell) {
+
+            final SensorItem sensorItem = (SensorItem) cell.getElement();
+            cell.setText(Integer.toString(sensorItem.numTours));
          }
       });
    }
@@ -1028,6 +1099,8 @@ public class SensorView extends ViewPart implements ITourViewer {
 
       TourManager.getInstance().removeTourEventListener(_tourPropertyListener);
 
+      getSite().getPage().removePostSelectionListener(_postSelectionListener);
+
       super.dispose();
    }
 
@@ -1196,29 +1269,33 @@ public class SensorView extends ViewPart implements ITourViewer {
       PreparedStatement statementMinMax = null;
       ResultSet resultMinMax = null;
 
+      String sql;
+
       try (Connection conn = TourDatabase.getInstance().getConnection()) {
 
          /*
           * Set used start/end time
           */
-         final String sql = UI.EMPTY_STRING
+         sql = UI.EMPTY_STRING
 
-               + "SELECT" + NL //                                                //$NON-NLS-1$
+               + "SELECT" + NL //                                                   //$NON-NLS-1$
 
-               + "   DEVICESENSOR_SENSORID      ," + NL //                    1  //$NON-NLS-1$
+               + "   DEVICESENSOR_SensorID         ," + NL //                    1  //$NON-NLS-1$
 
-               + "   Min(TourStartTime)         ," + NL //                    2  //$NON-NLS-1$
-               + "   Max(TourStartTime)         ," + NL //                    3  //$NON-NLS-1$
+               + "   Min(TourStartTime)            ," + NL //                    2  //$NON-NLS-1$
+               + "   Max(TourStartTime)            ," + NL //                    3  //$NON-NLS-1$
 
-               + "   Max(BatteryLevel_Start)    ," + NL //                    4  //$NON-NLS-1$
-               + "   Max(BatteryLevel_End)      ," + NL //                    5  //$NON-NLS-1$
-               + "   Max(BatteryStatus_Start)   ," + NL //                    6  //$NON-NLS-1$
-               + "   Max(BatteryStatus_End)     ," + NL //                    7  //$NON-NLS-1$
-               + "   Max(BatteryVoltage_Start)  ," + NL //                    8  //$NON-NLS-1$
-               + "   Max(BatteryVoltage_End)     " + NL //                    9  //$NON-NLS-1$
+               + "   Max(BatteryLevel_Start)       ," + NL //                    4  //$NON-NLS-1$
+               + "   Max(BatteryLevel_End)         ," + NL //                    5  //$NON-NLS-1$
+               + "   Max(BatteryStatus_Start)      ," + NL //                    6  //$NON-NLS-1$
+               + "   Max(BatteryStatus_End)        ," + NL //                    7  //$NON-NLS-1$
+               + "   Max(BatteryVoltage_Start)     ," + NL //                    8  //$NON-NLS-1$
+               + "   Max(BatteryVoltage_End)       ," + NL //                    9  //$NON-NLS-1$
 
-               + "FROM " + TourDatabase.TABLE_DEVICE_SENSOR_VALUE + NL //        //$NON-NLS-1$
-               + "GROUP BY DEVICESENSOR_SENSORID" + NL //                        //$NON-NLS-1$
+               + "   COUNT(DEVICESENSOR_SensorID)  " + NL //                     10 //$NON-NLS-1$
+
+               + "FROM " + TourDatabase.TABLE_DEVICE_SENSOR_VALUE + NL //           //$NON-NLS-1$
+               + "GROUP BY DEVICESENSOR_SensorID" + NL //                           //$NON-NLS-1$
          ;
 
          statementMinMax = conn.prepareStatement(sql);
@@ -1236,6 +1313,7 @@ public class SensorView extends ViewPart implements ITourViewer {
             } else {
 
 // SET_FORMATTING_OFF
+
                final long dbUsedFirstTime       = resultMinMax.getLong(2);
                final long dbUsedLastTime        = resultMinMax.getLong(3);
 
@@ -1245,14 +1323,19 @@ public class SensorView extends ViewPart implements ITourViewer {
                final float dbMaxStatus_End      = resultMinMax.getFloat(6);
                final float dbMaxVoltage_Start   = resultMinMax.getFloat(8);
                final float dbMaxVoltage_End     = resultMinMax.getFloat(9);
+
+               final int dbNumSensorValues      = resultMinMax.getInt(10);
+
+               sensorItem.usedFirstTime               = dbUsedFirstTime;
+               sensorItem.usedLastTime                = dbUsedLastTime;
+
+               sensorItem.isBatteryLevelAvailable     = dbMaxLevel_Start > 0 || dbMaxLevel_End > 0;
+               sensorItem.isBatteryStatusAvailable    = dbMaxStatus_Start > 0 || dbMaxStatus_End > 0;
+               sensorItem.isBatteryVoltageAvailable   = dbMaxVoltage_Start > 0 || dbMaxVoltage_End > 0;
+
+               sensorItem.numTours                    = dbNumSensorValues;
+
 // SET_FORMATTING_ON
-
-               sensorItem.usedFirstTime = dbUsedFirstTime;
-               sensorItem.usedLastTime = dbUsedLastTime;
-
-               sensorItem.isBatteryLevelAvailable = dbMaxLevel_Start > 0 || dbMaxLevel_End > 0;
-               sensorItem.isBatteryStatusAvailable = dbMaxStatus_Start > 0 || dbMaxStatus_End > 0;
-               sensorItem.isBatteryVoltageAvailable = dbMaxVoltage_Start > 0 || dbMaxVoltage_End > 0;
             }
          }
 
@@ -1338,12 +1421,7 @@ public class SensorView extends ViewPart implements ITourViewer {
       // get index for selected sensor
       final int lastSensorIndex = table.getSelectionIndex();
 
-      // update model
-      TourDatabase.clearDeviceSensors();
-      loadAllSensors();
-
-      // update the viewer
-      updateUI_SetViewerInput();
+      reloadSensorViewer();
 
       // get next sensor
       SensorItem nextSensorItem = (SensorItem) _sensorViewer.getElementAt(lastSensorIndex);
@@ -1430,7 +1508,15 @@ public class SensorView extends ViewPart implements ITourViewer {
       _viewerContainer.setRedraw(true);
    }
 
-   private void onSensor_Select() {
+   private void onSelectionChanged(final ISelection selection) {
+
+      if (selection instanceof SelectionDeletedTours) {
+
+         reloadSensorViewer();
+      }
+   }
+
+   private void onSelectSensor() {
 
       if (_isInUIUpdate) {
          return;
@@ -1477,6 +1563,16 @@ public class SensorView extends ViewPart implements ITourViewer {
       _sensorViewer.getTable().setFocus();
 
       return _sensorViewer;
+   }
+
+   private void reloadSensorViewer() {
+
+      // update model
+      TourDatabase.clearDeviceSensors();
+      loadAllSensors();
+
+      // update the viewer
+      updateUI_SetViewerInput();
    }
 
    @Override

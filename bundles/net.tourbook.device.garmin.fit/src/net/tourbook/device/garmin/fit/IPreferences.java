@@ -18,6 +18,7 @@ package net.tourbook.device.garmin.fit;
 public interface IPreferences {
 
    String FIT_IS_IGNORE_SPEED_VALUES                          = "FIT_IS_IGNORE_SPEED_VALUES";                          //$NON-NLS-1$
+   String FIT_IS_LOG_SENSOR_VALUES                            = "FIT_IS_LOG_SENSOR_VALUES";                            //$NON-NLS-1$
    String FIT_IS_SET_TOUR_TITLE_FROM_FILE_NAME                = "FIT_IS_SET_TOUR_TITLE_FROM_FILE_NAME";                //$NON-NLS-1$
 
    String FIT_TEMPERATURE_ADJUSTMENT                          = "FIT_TEMPERATURE_ADJUSTMENT";                          //$NON-NLS-1$

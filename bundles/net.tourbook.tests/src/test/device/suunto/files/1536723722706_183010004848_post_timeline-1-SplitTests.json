@@ -79,15 +79,6 @@
   "tourEndTime" : 1536677290557,
   "tourMarkers" : [ {
     "markerId" : -1,
-    "altitude" : 1591.0,
-    "distance20" : 12237.968,
-    "latitude" : 40.55658988936215,
-    "longitude" : -105.14391022657094,
-    "serieIndex" : 3671,
-    "time" : 4862,
-    "tourTime" : 1536677290557
-  }, {
-    "markerId" : -1,
     "altitude" : 1603.0,
     "distance20" : 5953.4067,
     "latitude" : 40.58972450306372,
@@ -113,6 +104,15 @@
     "serieIndex" : 2278,
     "time" : 2797,
     "tourTime" : 1536675225557
+  }, {
+    "markerId" : -1,
+    "altitude" : 1591.0,
+    "distance20" : 12237.968,
+    "latitude" : 40.55658988936215,
+    "longitude" : -105.14391022657094,
+    "serieIndex" : 3671,
+    "time" : 4862,
+    "tourTime" : 1536677290557
   } ],
   "tourStartTime" : 1536672428557,
   "training_TrainingEffect_Aerob" : 0.0,
