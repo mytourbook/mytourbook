@@ -575,4 +575,4 @@ Definition,0,activity,num_sessions,1,,timestamp,1,,local_timestamp,1,,total_time
 Data,0,activity,num_sessions,"1",,timestamp,"1081094032",,local_timestamp,"1081094032",,total_timer_time,"573.0",s,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
 Definition,0,device_info,timestamp,1,,serial_number,1,,manufacturer,1,,product,1,,battery_level,1,,battery_status,1,,battery_voltage,1,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
 Data,0,device_info,timestamp,"1027020911",s,manufacturer,"265",,product,"102",,battery_status,"4",,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
-Data,0,device_info,timestamp,"1027021538",s,manufacturer,"265",,product,"102",,battery_status,"4",,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+Data,0,device_info,timestamp,"1027021538",s,manufacturer,"265",,product,"102",,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
