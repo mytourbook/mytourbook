@@ -35,6 +35,8 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
@@ -44,6 +46,7 @@ import net.tourbook.common.UI;
 import net.tourbook.common.util.FileUtils;
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.data.TourData;
+import net.tourbook.data.TourMarker;
 
 import org.skyscreamer.jsonassert.ArrayValueMatcher;
 import org.skyscreamer.jsonassert.Customization;
@@ -161,7 +164,8 @@ public class Comparison {
 
       final String controlDocument = readFileContent(controlFileName + JSON);
 
-      testTourData.getTourMarkersSorted();
+      ArrayList<TourMarker> sortedMarkers = testTourData.getTourMarkersSorted();
+      testTourData.setTourMarkers(new LinkedHashSet<>(sortedMarkers));
       final String testJson = convertTourDataToJson(testTourData);
 
       final JSONCompareResult result = JSONCompare.compareJSON(controlDocument, testJson, customArrayValueComparator);

@@ -15,7 +15,7 @@ Bundle-ActivationPolicy: lazy
 Bundle-ClassPath: .,
  hibernate-entitymanager.jar,
  jsonassert-1.5.1.jar,
- xmlunit-core-2.10.3.jar,
+ xmlunit-core-2.10.4.jar,
  HttpClientMock-1.0.0.jar,
  hamcrest-3.0.jar
 Bundle-Vendor: MyTourbook
