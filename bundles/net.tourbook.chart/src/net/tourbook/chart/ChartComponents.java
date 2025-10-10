@@ -2368,13 +2368,14 @@ public class ChartComponents extends Composite {
       _chartDataModel = chartModel;
 
       /*
-       * when data model has changed, update the visible y-values to use the full visible area for
+       * When data model has changed, update the visible y-values to use the full visible area for
        * drawing the chart
        */
       final ChartType chartType = _chartDataModel.getChartType();
       if (isShowAllData
             && (chartType == ChartType.LINE
                   || chartType == ChartType.LINE_WITH_BARS
+                  || chartType == ChartType.LINE_WITH_GAPS
                   || chartType == ChartType.HISTORY)) {
 
          componentGraph.updateVisibleMinMaxValues();

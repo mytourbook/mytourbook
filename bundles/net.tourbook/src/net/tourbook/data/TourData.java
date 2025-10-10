@@ -2165,6 +2165,15 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
    @Transient
    private float[]            _radar_PassingSpeed_Relative_NauticalMile;
 
+   /**
+    * <code>0 = </code> A vehicle is recognized<p>
+    * <code>1 = </code> A vehicle is not recognized<p>
+    * <code>2 = </code> A vehicle has passed<p>
+    * <code>3 = </code> A vehicle has passed but is no recognized by the device<p>
+    */
+   @Transient
+   private short[]            _radar_VehicleStates;
+
 // SET_FORMATTING_ON
 
    public TourData() {}
@@ -2443,11 +2452,15 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
 
       _radar_DistanceToVehicle_Meter = null;
       _radar_DistanceToVehicle_Yard = null;
+
+      _radar_VehicleStates = null;
    }
 
    public void clear_Radar_PassedVehicles() {
 
       _radar_PassedVehicles_UI = null;
+
+      _radar_VehicleStates = null;
    }
 
    public void clear_Radar_PassingSpeed_Absolute() {
@@ -2620,6 +2633,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
 
       cadenceSerieWithMultiplier = null;
 
+      _radar_VehicleStates = null;
       _radar_PassedVehicles_UI = null;
 
       _radar_DistanceToVehicle_Meter = null;
@@ -10839,6 +10853,80 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
       }
 
       return serie;
+   }
+
+   /**
+    * @return Returns the vehicle states from {@link #_radar_VehicleStates}
+    */
+   public short[] getRadar_VehicleStates() {
+
+      if (_radar_VehicleStates != null) {
+         return _radar_VehicleStates;
+      }
+
+      if (radar_PassedVehicles == null || radar_PassedVehicles.length == 0
+            || radar_DistanceToVehicle == null || radar_DistanceToVehicle.length == 0
+            || radar_PassingSpeed_Relative == null || radar_PassingSpeed_Relative.length == 0
+
+      ) {
+
+         return null;
+      }
+
+      final int numTimeSlices = radar_DistanceToVehicle.length;
+      int numPassedPrev = 0;
+      short distancePrev = 0;
+
+      _radar_VehicleStates = new short[numTimeSlices];
+
+      for (int serieIndex = 0; serieIndex < numTimeSlices; serieIndex++) {
+
+         final int numPassed = radar_PassedVehicles[serieIndex];
+         final short distance = radar_DistanceToVehicle[serieIndex];
+         final short speed = radar_PassingSpeed_Relative[serieIndex];
+
+         if (distance == 0) {
+
+            if (numPassed == numPassedPrev && speed != 0) {
+
+               // this can happen -> its the same vehicle as before
+
+            } else {
+
+               _radar_VehicleStates[serieIndex] = 1;
+            }
+
+         } else if (numPassed > numPassedPrev) {
+
+            // passed have changed -> start a new line
+
+            _radar_VehicleStates[serieIndex] = 2;
+
+         } else if (distancePrev > 0) {
+
+            final int distanceDiff = distance - distancePrev;
+
+            if (distanceDiff > 0) {
+
+               /*
+                * Current distance is bigger than the previous distance, this can happen when passed
+                * vehicles are not counted
+                */
+
+               final float relativeDistance = distance / distancePrev;
+
+               if (relativeDistance > 2) {
+
+                  _radar_VehicleStates[serieIndex] = 3;
+               }
+            }
+         }
+
+         numPassedPrev = numPassed;
+         distancePrev = distance;
+      }
+
+      return _radar_VehicleStates;
    }
 
    public int getRearShiftCount() {

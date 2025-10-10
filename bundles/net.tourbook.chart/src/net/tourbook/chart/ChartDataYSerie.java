@@ -130,8 +130,6 @@ public class ChartDataYSerie extends ChartDataSerie {
 
    private final ChartType        _chartType;
 
-   private boolean[]              _lineGaps;
-
    private ISliderLabelProvider   _sliderLabelProvider;
 
    /**
@@ -163,6 +161,14 @@ public class ChartDataYSerie extends ChartDataSerie {
     * looks ugly (a triangle is painted) when a tour is paused.
     */
 //   private int                  _disabledLineToNext;
+
+   /**
+    * Defines if a line should be drawn for a value point, can be <code>null</code> to disable this
+    * feature.
+    * <p>
+    * This overwrites {@link ChartDataXSerie#_noLine} when it is not <code>null</code>
+    */
+   private short[] _noLine;
 
    /**
     * @param chartType
@@ -406,15 +412,16 @@ public class ChartDataYSerie extends ChartDataSerie {
       return _highValuesFloat;
    }
 
-   public boolean[] getLineGaps() {
-      return _lineGaps;
-   }
-
    /**
     * @return Returns the lowValues.
     */
    public float[][] getLowValuesFloat() {
       return _lowValuesFloat;
+   }
+
+   public short[] getNoLine() {
+
+      return _noLine;
    }
 
    /**
@@ -538,10 +545,6 @@ public class ChartDataYSerie extends ChartDataSerie {
       _graphFillMethod = fillMethod;
    }
 
-   public void setLineGaps(final boolean[] lineGaps) {
-      _lineGaps = lineGaps;
-   }
-
    /**
     * @param valueSeries
     * @param _isIgnoreMinMaxZero
@@ -567,6 +570,7 @@ public class ChartDataYSerie extends ChartDataSerie {
          if (_chartType == ChartType.LINE
                || _chartType == ChartType.DOT
                || _chartType == ChartType.LINE_WITH_BARS
+               || _chartType == ChartType.LINE_WITH_GAPS
                || _chartType == ChartType.HORIZONTAL_BAR
                || _chartType == ChartType.XY_SCATTER
                || _chartType == ChartType.HISTORY
@@ -820,6 +824,11 @@ public class ChartDataYSerie extends ChartDataSerie {
          _originalMinValue = _visibleMinValue;
          _originalMaxValue = _visibleMaxValue;
       }
+   }
+
+   public void setNoLine(final short[] noLine) {
+
+      _noLine = noLine;
    }
 
    public void setSetMinMax_0Values(final boolean isSetMinMax_0Values) {

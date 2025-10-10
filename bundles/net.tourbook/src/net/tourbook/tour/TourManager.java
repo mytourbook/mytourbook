@@ -4697,8 +4697,8 @@ public class TourManager {
       }
 
       /*
-       * Don't draw a (visible) line when a break occurs, break time can be minutes, hours or days.
-       * This feature prevents to draw triangles between 2 value points
+       * Don't draw a (visible) line when a break occurs, break time can be minutes, hours or
+       * days. This feature prevents to draw triangles between 2 value points
        */
       xDataTime.setNoLine(tourData.getBreakTimeSerie());
 
@@ -5932,19 +5932,12 @@ public class TourManager {
 
       ChartDataYSerie yDataValues = null;
 
-      final float[] allValues = tourData.getRadar_DistanceToVehicle_UI();
-      if (allValues != null) {
+      final float[] allGraphValues = tourData.getRadar_DistanceToVehicle_UI();
 
-//         final float[][] chartValues = new float[][] {
-//
-//               allValues,
-//
-//               // this is used for the painted color
-//               null
-//         };
-//
-//         yDataValues = createChartDataSerieNoZero(chartValues, ChartType.HORIZONTAL_BAR);
-         yDataValues = createChartDataSerieNoZero(allValues, ChartType.LINE);
+      if (allGraphValues != null) {
+
+         yDataValues = createChartDataSerieNoZero(allGraphValues, ChartType.LINE_WITH_GAPS);
+         yDataValues.setNoLine(tourData.getRadar_VehicleStates());
 
          yDataValues.setYTitle(OtherMessages.GRAPH_LABEL_RADAR_DISTANCE_TO_VEHICLE);
          yDataValues.setShowYSlider(true);
@@ -5954,6 +5947,7 @@ public class TourManager {
 
          setGraphColors(yDataValues, GraphColorManager.PREF_GRAPH_RADAR_DISTANCE_TO_VEHICLE);
          chartDataModel.addXyData(yDataValues);
+
       }
 
       return yDataValues;
@@ -6001,18 +5995,11 @@ public class TourManager {
 
       ChartDataYSerie yDataValues = null;
 
-      final float[] allValues = tourData.getRadar_PassingSpeed_Absolute_UI();
-      if (allValues != null) {
+      final float[] allGraphValues = tourData.getRadar_PassingSpeed_Absolute_UI();
+      if (allGraphValues != null) {
 
-         final float[][] chartValues = new float[][] {
-
-               allValues,
-
-               // this is used for the painted color
-               null
-         };
-
-         yDataValues = createChartDataSerieNoZero(chartValues, ChartType.HORIZONTAL_BAR);
+         yDataValues = createChartDataSerieNoZero(allGraphValues, ChartType.LINE_WITH_GAPS);
+         yDataValues.setNoLine(tourData.getRadar_VehicleStates());
 
          yDataValues.setYTitle(OtherMessages.GRAPH_LABEL_RADAR_PASSING_SPEED_ABSOLUTE);
          yDataValues.setShowYSlider(true);
@@ -6035,18 +6022,11 @@ public class TourManager {
 
       ChartDataYSerie yDataValues = null;
 
-      final float[] allValues = tourData.getRadar_PassingSpeed_Relative_UI();
-      if (allValues != null) {
+      final float[] allGraphValues = tourData.getRadar_PassingSpeed_Relative_UI();
+      if (allGraphValues != null) {
 
-         final float[][] chartValues = new float[][] {
-
-               allValues,
-
-               // this is used for the painted color
-               null
-         };
-
-         yDataValues = createChartDataSerieNoZero(chartValues, ChartType.HORIZONTAL_BAR);
+         yDataValues = createChartDataSerieNoZero(allGraphValues, ChartType.LINE_WITH_GAPS);
+         yDataValues.setNoLine(tourData.getRadar_VehicleStates());
 
          yDataValues.setYTitle(OtherMessages.GRAPH_LABEL_RADAR_PASSING_SPEED_RELATIVE);
          yDataValues.setShowYSlider(true);
