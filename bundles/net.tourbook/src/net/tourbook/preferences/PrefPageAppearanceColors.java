@@ -765,7 +765,9 @@ public class PrefPageAppearanceColors extends PreferencePage implements
 
             + UI.timeStampNano()
 
-            + " [" + getClass().getSimpleName() + "] ()" //$NON-NLS-1$ //$NON-NLS-2$
+            + " [" + getClass().getSimpleName() + "] " //$NON-NLS-1$ //$NON-NLS-2$
+            + " [GraphColorManager.createDefaultColors()] " //$NON-NLS-1$
+
             + colorDefinition.logColorCode());
    }
 
@@ -781,7 +783,9 @@ public class PrefPageAppearanceColors extends PreferencePage implements
 
             + UI.timeStampNano()
 
-            + " [" + getClass().getSimpleName() + "] ()" //$NON-NLS-1$ //$NON-NLS-2$
+            + " [" + getClass().getSimpleName() + "] " //$NON-NLS-1$ //$NON-NLS-2$
+            + " [GraphColorManager.createDefaultColors()] " //$NON-NLS-1$
+
             + selectedColor.getColorDefinition().logColorCode());
    }
 

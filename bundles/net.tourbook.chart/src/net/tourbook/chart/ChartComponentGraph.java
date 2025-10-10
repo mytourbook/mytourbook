@@ -852,7 +852,10 @@ public class ChartComponentGraph extends Canvas {
 
          final ChartType chartType = graphDrawingData.getChartType();
 
-         if (chartType != ChartType.LINE && chartType != ChartType.HORIZONTAL_BAR) {
+         if (chartType != ChartType.LINE
+               && chartType != ChartType.LINE_WITH_GAPS
+               && chartType != ChartType.HORIZONTAL_BAR) {
+
             return false;
          }
       }
