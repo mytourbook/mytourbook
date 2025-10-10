@@ -128,6 +128,7 @@ public class OtherMessages {
    public static final String GRAPH_LABEL_PACE_SUMMARIZED                  = net.tourbook.common.Messages.Graph_Label_Pace_Summarized;
    public static final String GRAPH_LABEL_POWER                            = net.tourbook.common.Messages.Graph_Label_Power;
    public static final String GRAPH_LABEL_POWER_UNIT                       = net.tourbook.common.Messages.Graph_Label_Power_Unit;
+   public static final String GRAPH_LABEL_PREFIX_RADAR                     = net.tourbook.common.Messages.Graph_Label_Prefix_Radar;
    public static final String GRAPH_LABEL_PREFIX_RUNNING_DYNAMICS          = net.tourbook.common.Messages.Graph_Label_Prefix_RunningDynamics;
    public static final String GRAPH_LABEL_PREFIX_SWIMMING                  = net.tourbook.common.Messages.Graph_Label_Prefix_Swimming;
    public static final String GRAPH_LABEL_PREFIX_TRAINING                  = net.tourbook.common.Messages.Graph_Label_Prefix_Training;

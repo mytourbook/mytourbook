@@ -2973,6 +2973,10 @@ public class Messages extends NLS {
    public static String        Tooltip_ValuePoint_Action_Value_Pace_Summarized;
    public static String        Tooltip_ValuePoint_Action_Value_Power;
    public static String        Tooltip_ValuePoint_Action_Value_Pulse;
+   public static String        Tooltip_ValuePoint_Action_Value_Radar_DistanceToVehicle;
+   public static String        Tooltip_ValuePoint_Action_Value_Radar_PassedVehicles;
+   public static String        Tooltip_ValuePoint_Action_Value_Radar_PassingSpeed_Absolute;
+   public static String        Tooltip_ValuePoint_Action_Value_Radar_PassingSpeed_Relative;
    public static String        Tooltip_ValuePoint_Action_Value_RunDyn_StanceTime;
    public static String        Tooltip_ValuePoint_Action_Value_RunDyn_StanceTimeBalance;
    public static String        Tooltip_ValuePoint_Action_Value_RunDyn_StepLength;
