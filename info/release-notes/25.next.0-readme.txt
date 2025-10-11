@@ -34,8 +34,16 @@ Experimental
 New / Improvements
 ==================
 
+* Radar values
+    https://github.com/mytourbook/mytourbook/issues/1561
+  - Import values from .fit files
+  - Display values in 
+    - Tour book view
+    - Tour chart
+      - Value point tooltip
+
 * Fit Import
-  - Log all device sensor values, e.g. battery voltage or soft-/hardware versions
+  - Log all device sensor values, e.g. battery voltage, soft-/hardware versions
   
 * Sensor view     https://github.com/mytourbook/mytourbook/issues/1569
   - Show number of tours for each sensor  

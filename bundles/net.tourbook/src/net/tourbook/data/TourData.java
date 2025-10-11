@@ -851,9 +851,17 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
    // ############################################# PHOTO  DATA #############################################
 
    /**
-    * Number of photos.
+    * Number of photos
     */
    private int                   numberOfPhotos;
+
+   // ############################################# RADAR  DATA #############################################
+
+   /**
+    * Number of passed vehicles detected by the radar
+    */
+   @SuppressWarnings("unused") // this field is read with sql
+   private int                   numberOfPassedVehicles;
 
    /**
     * Time adjustment in seconds, this is an average value for all photos
@@ -7866,7 +7874,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
       final boolean isRunDyn_VerticalOscillation   = setupStartingValues_RunDyn_VerticalOscillation(allTimeData);
       final boolean isRunDyn_VerticalRatio         = setupStartingValues_RunDyn_VerticalRatio(allTimeData);
 
-      final boolean isradar_PassedVehicles         = setupStartingValues_radar_PassedVehicles(allTimeData);
+      final boolean isRadar_PassedVehicles         = setupStartingValues_radar_PassedVehicles(allTimeData);
       final boolean isRadar_DistanceToVehicle      = setupStartingValues_Radar_DistanceToVehicle(allTimeData);
       final boolean isRadar_PassingSpeed_Absolute  = setupStartingValues_Radar_PassingSpeedAbsolute(allTimeData);
       final boolean isRadar_PassingSpeed_Relative  = setupStartingValues_Radar_PassingSpeedRelative(allTimeData);
@@ -8063,7 +8071,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
             /*
              * Radar
              */
-            if (isradar_PassedVehicles) {
+            if (isRadar_PassedVehicles) {
                final int tdValue = timeData.radar_PassedVehicles;
                radar_PassedVehicles[serieIndex] = tdValue == Integer.MIN_VALUE ? 0 : tdValue;
             }
@@ -8153,6 +8161,11 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
       // set number of gear shifts
       if (isGear) {
          setGears(gearSerieCombined);
+      }
+
+      // set number of passed vehicles
+      if (isRadar_PassedVehicles) {
+         setRadarValues();
       }
 
       cleanupDataSeries(importState_Process);
@@ -13815,8 +13828,17 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
     * @param powerSerie
     */
    public void setPowerSerie(final float[] powerSerie) {
+
       this.powerSerie = powerSerie;
       this.isPowerSerieFromDevice = true;
+   }
+
+   private void setRadarValues() {
+
+      if (radar_PassedVehicles != null && radar_PassedVehicles.length > 0) {
+
+         numberOfPassedVehicles = radar_PassedVehicles[radar_PassedVehicles.length - 1];
+      }
    }
 
    public void setRearShiftCount(final int rearShiftCount) {

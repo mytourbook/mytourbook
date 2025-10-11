@@ -1004,6 +1004,11 @@ public class NatTable_DataLoader {
       case TableColumnFactory.POWERTRAIN_SLOW_VS_FAST_CADENCE_ZONES_DELIMITER_ID:   return FIELD_WITHOUT_SORTING;
 
       /*
+       * RADAR
+       */
+      case TableColumnFactory.RADAR_PASSED_VEHICLES_ID:              return "numberOfPassedVehicles";          //$NON-NLS-1$
+
+      /*
        * RUNNING DYNAMICS
        */
       case TableColumnFactory.RUN_DYN_STANCE_TIME_AVG_ID:            return "runDyn_StanceTime_Avg";           //$NON-NLS-1$

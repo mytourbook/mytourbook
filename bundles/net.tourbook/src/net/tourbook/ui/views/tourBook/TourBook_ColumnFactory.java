@@ -244,6 +244,9 @@ class TourBook_ColumnFactory {
       defineColumn_Surfing_MinTimeDuration();
       defineColumn_Surfing_MinDistance();
 
+      // Radar
+      defineColumn_Radar_PassedVehicles();
+
       // Device
       defineColumn_Device_Name();
       defineColumn_Device_Distance();
@@ -1846,6 +1849,38 @@ class TourBook_ColumnFactory {
 
             final Object element = cell.getElement();
             final int value = ((TVITourBookItem) element).colCadenceZonesDelimiter;
+
+            colDef_Tree.printValue_0(cell, value);
+
+            setCellColor(cell, element);
+         }
+      });
+   }
+
+   /**
+    * Column: Radar - Number of passed vehicles
+    */
+   private void defineColumn_Radar_PassedVehicles() {
+
+      final TableColumnDefinition colDef_NatTable = TableColumnFactory.RADAR_PASSED_VEHICLES.createColumn(_columnManager_NatTable, _pc);
+      colDef_NatTable.setLabelProvider_NatTable(new NatTable_LabelProvider() {
+
+         @Override
+         public String getValueText(final Object element) {
+
+            final double value = ((TVITourBookItem) element).colRadar_PassedVehicles;
+
+            return colDef_NatTable.printValue_0(value);
+         }
+      });
+
+      final TreeColumnDefinition colDef_Tree = TreeColumnFactory.RADAR_PASSED_VEHICLES.createColumn(_columnManager_Tree, _pc);
+      colDef_Tree.setLabelProvider(new SelectionCellLabelProvider() {
+         @Override
+         public void update(final ViewerCell cell) {
+
+            final Object element = cell.getElement();
+            final double value = ((TVITourBookItem) element).colRadar_PassedVehicles;
 
             colDef_Tree.printValue_0(cell, value);
 

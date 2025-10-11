@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2020, 2024 Wolfgang Schramm and Contributors
+ * Copyright (C) 2020, 2025 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -93,6 +93,8 @@ public class CSVExport {
    private static final String HEADER_POWERTRAIN_PEDAL_LEFT_RIGHT_BALANCE             = "POWERTRAIN Left Right Balance";                    //$NON-NLS-1$
    private static final String HEADER_POWERTRAIN_SLOW_VS_FAST_CADENCE_PERCENTAGES     = "POWERTRAIN Cadence - Slow vs Fast (rpm)";          //$NON-NLS-1$
    private static final String HEADER_POWERTRAIN_SLOW_VS_FAST_CADENCE_ZONES_DELIMITER = "POWERTRAIN Cadence - Zones Delimiter (%)";         //$NON-NLS-1$
+
+   private static final String HEADER_RADAR_PASSED_VEHICLES                           = "RADAR Vehicle Count";                              //$NON-NLS-1$
 
    private static final String HEADER_RUN_DYN_STANCE_TIME_MIN                         = "RUNDYN Stance Time - Minimum (ms)";                //$NON-NLS-1$
    private static final String HEADER_RUN_DYN_STANCE_TIME_MAX                         = "RUNDYN Stance Time - Maximum (ms)";                //$NON-NLS-1$
@@ -257,6 +259,7 @@ public class CSVExport {
          export_240_Header_Powertrain(sb);
          export_260_Header_Training(sb);
          export_280_Header_RunningDynamics(sb);
+         export_290_Header_Radar(sb);
          export_300_Header_Surfing(sb);
          export_320_Header_Device(sb);
          export_340_Header_Data(sb);
@@ -301,6 +304,7 @@ public class CSVExport {
                         export_640_Value_Powertrain(sb, tviItem);
                         export_660_Value_Training(sb, tviItem);
                         export_680_Value_RunningDynamics(sb, tviItem);
+                        export_690_Value_Radar(sb, tviItem);
                         export_700_Value_Surfing(sb, tviItem);
                         export_720_Value_Device(sb, isTour, tviItem);
                         export_740_Value_Data(sb, isTour, tviItem);
@@ -340,6 +344,7 @@ public class CSVExport {
                   export_640_Value_Powertrain(sb, tviItem);
                   export_660_Value_Training(sb, tviItem);
                   export_680_Value_RunningDynamics(sb, tviItem);
+                  export_690_Value_Radar(sb, tviItem);
                   export_700_Value_Surfing(sb, tviItem);
                   export_720_Value_Device(sb, isTour, tviItem);
                   export_740_Value_Data(sb, isTour, tviItem);
@@ -802,6 +807,18 @@ public class CSVExport {
       csvHeader(sb,                 HEADER_RUN_DYN_VERTICAL_RATIO_MIN);
       csvHeader(sb,                 HEADER_RUN_DYN_VERTICAL_RATIO_MAX);
       csvHeader(sb,                 HEADER_RUN_DYN_VERTICAL_RATIO_AVG);
+
+// SET_FORMATTING_ON
+
+   }
+
+   private void export_290_Header_Radar(final StringBuilder sb) {
+
+// SET_FORMATTING_OFF
+
+//    defineColumn_Radar_PassedVehicles();
+
+      csvHeader(sb,                 HEADER_RADAR_PASSED_VEHICLES);
 
 // SET_FORMATTING_ON
 
@@ -1552,6 +1569,11 @@ public class CSVExport {
       csvField_Nf1(sb, tviItem.colRunDyn_VerticalRatio_Avg);         // HEADER_RUN_DYN_VERTICAL_RATIO_AVG
 
 // SET_FORMATTING_ON
+   }
+
+   private void export_690_Value_Radar(final StringBuilder sb, final TVITourBookItem tviItem) {
+
+      csvField(sb, tviItem.colRadar_PassedVehicles); // HEADER_RADAR_PASSED_VEHICLES
    }
 
    private void export_700_Value_Surfing(final StringBuilder sb,
