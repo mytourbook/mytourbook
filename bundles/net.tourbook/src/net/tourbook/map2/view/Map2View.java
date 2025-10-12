@@ -4201,11 +4201,13 @@ public class Map2View extends ViewPart implements
           */
          _externalValuePointIndex = -1;
 
+         final TourData tourData = _allTourData.size() == 0 ? null : _allTourData.get(0);
+
          // repaint map
          _directMappingPainter.setPaintingOptions(
 
                _isShowTour,
-               _allTourData.get(0),
+               tourData,
 
                _currentSliderValueIndex_Left,
                _currentSliderValueIndex_Right,
