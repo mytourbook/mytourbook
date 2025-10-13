@@ -7354,13 +7354,6 @@ public class Map2 extends Canvas {
 
             _mapPointImage = new Image(getDisplay(), imageDataProvider);
 
-//            _debugLog.append(String.format("%s - 1 - %6d - %10d - %s\n",
-//                  UI.timeStampNano(),
-//                  _mapPointPainter_RunnableCounter.get(),
-//                  _mapPointImage.hashCode(),
-//
-//                  _mapPointImage));
-
             _allDisposableMapPointImages_SWT.add(_mapPointImage);
 
             /**
@@ -7414,6 +7407,12 @@ public class Map2 extends Canvas {
             _mapPointImage.getImageData(17);
 
             for (final Image image : _allDisposableMapPointImages_SWT) {
+
+//               _debugLog.append(String.format("%s - 1 - %6d - %10d - %s\n",
+//                     UI.timeStampNano(),
+//                     _mapPointPainter_RunnableCounter.get(),
+//                     image.hashCode(),
+//                     image));
 
                if (image == _mapPointImage) {
                   continue;
