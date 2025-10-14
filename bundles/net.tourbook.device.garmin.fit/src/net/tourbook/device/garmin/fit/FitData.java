@@ -602,7 +602,15 @@ public class FitData {
       // sort by device index and date/time
       Collections.sort(allImportedSensors, (sensor1, sensor2) -> {
 
-         int compareDeviceIndex = Short.compare(sensor1.deviceIndex, sensor2.deviceIndex);
+         final Short deviceIndex1 = sensor1.deviceIndex;
+         final Short deviceIndex2 = sensor2.deviceIndex;
+
+         if (deviceIndex1 == null || deviceIndex2 == null) {
+
+            return 0;
+         }
+
+         int compareDeviceIndex = Short.compare(deviceIndex1, deviceIndex2);
 
          if (compareDeviceIndex == 0) {
             compareDeviceIndex = Long.compare(sensor1.dateTime, sensor2.dateTime);
