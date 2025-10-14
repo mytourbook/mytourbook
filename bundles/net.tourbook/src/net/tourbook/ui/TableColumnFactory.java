@@ -473,7 +473,8 @@ public abstract class TableColumnFactory {
    public static final String             TIME_TIME_ZONE_DIFFERENCE_ID                       = "TIME_TIME_ZONE_DIFFERENCE";                       //$NON-NLS-1$
    public static final TableColumnFactory TIME_TOUR_TIME_DIFF;
    public static final TableColumnFactory TIME_TOUR_TIME_HH_MM_SS;
-   public static final TableColumnFactory TIME_TOUR_TIME;
+   public static final TableColumnFactory TIME_TOUR_TIME_CLOCK;
+   public static final String             TIME_TOUR_TIME_CLOCK_ID                            = "TIME_TOUR_TIME_CLOCK_ID";                         //$NON-NLS-1$
    public static final TableColumnFactory TIME_TOUR_TIME_OF_DAY_HH_MM_SS;
    public static final TableColumnFactory TIME_TOUR_DATE;
    public static final TableColumnFactory TIME_TOUR_DURATION_TIME;
@@ -4373,7 +4374,7 @@ public abstract class TableColumnFactory {
          }
       };
 
-      TIME_TOUR_TIME = new TableColumnFactory() {
+      TIME_TOUR_TIME_CLOCK = new TableColumnFactory() {
 
          @Override
          public TableColumnDefinition createColumn(final ColumnManager columnManager,
@@ -4383,8 +4384,8 @@ public abstract class TableColumnFactory {
 
             colDef.setColumnCategory(           Messages.ColumnFactory_Category_Time);
 
-            colDef.setColumnLabel(              Messages.ColumnFactory_tour_time_label);
-            colDef.setColumnHeaderText(         Messages.ColumnFactory_tour_time);
+            colDef.setColumnLabel(              Messages.ColumnFactory_Tour_TimeClock);
+            colDef.setColumnHeaderText(         Messages.ColumnFactory_Tour_TimeClock);
             colDef.setColumnHeaderToolTipText(  Messages.ColumnFactory_tour_time_tooltip);
             colDef.setColumnUnit(               Messages.ColumnFactory_tour_time);
 

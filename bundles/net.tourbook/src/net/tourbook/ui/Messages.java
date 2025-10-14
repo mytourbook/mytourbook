@@ -562,6 +562,7 @@ public class Messages extends NLS {
    public static String        ColumnFactory_Tour_LocationEnd_Tooltip;
    public static String        ColumnFactory_Tour_LocationStart_Title;
    public static String        ColumnFactory_Tour_LocationStart_Tooltip;
+   public static String        ColumnFactory_Tour_TimeClock;
    public static String        ColumnFactory_Tour_WeekDay_Header;
    public static String        ColumnFactory_Tour_WeekDay_Label;
    public static String        ColumnFactory_Tour_WeekDay_Tooltip;

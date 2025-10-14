@@ -577,7 +577,7 @@ public class TourMarkerView extends ViewPart implements ITourProvider, ITourView
       defineColumn_Marker_IsVisible();
 
       defineColumn_Time_MarkerDate();
-      defineColumn_Time_MarkerTime();
+      defineColumn_Time_MarkerClockTime();
 
       defineColumn_Time_RelativeTime();
       defineColumn_Time_TimeDelta();
@@ -918,6 +918,31 @@ public class TourMarkerView extends ViewPart implements ITourProvider, ITourView
    }
 
    /**
+    * Column: Marker clock time
+    */
+   private void defineColumn_Time_MarkerClockTime() {
+
+      final ColumnDefinition colDef = TableColumnFactory.TIME_TOUR_TIME_CLOCK.createColumn(_columnManager, _pc);
+
+      colDef.setLabelProvider(new CellLabelProvider() {
+
+         @Override
+         public void update(final ViewerCell cell) {
+
+            final TourMarker tourMarker = (TourMarker) cell.getElement();
+
+            final TourData tourData = tourMarker.getTourData();
+            final ZonedDateTime tourStartTime = tourData.getTourStartTime();
+            final ZonedDateTime markerTime = TimeTools.getZonedDateTime(
+                  tourMarker.getTourTime(),
+                  tourStartTime.getZone());
+
+            cell.setText(TimeTools.Formatter_Time_M.format(markerTime));
+         }
+      });
+   }
+
+   /**
     * Column: Marker date
     */
    private void defineColumn_Time_MarkerDate() {
@@ -938,31 +963,6 @@ public class TourMarkerView extends ViewPart implements ITourProvider, ITourView
                   tourStartTime.getZone());
 
             cell.setText(TimeTools.Formatter_Date_S.format(markerTime));
-         }
-      });
-   }
-
-   /**
-    * Column: Marker time
-    */
-   private void defineColumn_Time_MarkerTime() {
-
-      final ColumnDefinition colDef = TableColumnFactory.TIME_TOUR_TIME.createColumn(_columnManager, _pc);
-
-      colDef.setLabelProvider(new CellLabelProvider() {
-
-         @Override
-         public void update(final ViewerCell cell) {
-
-            final TourMarker tourMarker = (TourMarker) cell.getElement();
-
-            final TourData tourData = tourMarker.getTourData();
-            final ZonedDateTime tourStartTime = tourData.getTourStartTime();
-            final ZonedDateTime markerTime = TimeTools.getZonedDateTime(
-                  tourMarker.getTourTime(),
-                  tourStartTime.getZone());
-
-            cell.setText(TimeTools.Formatter_Time_S.format(markerTime));
          }
       });
    }

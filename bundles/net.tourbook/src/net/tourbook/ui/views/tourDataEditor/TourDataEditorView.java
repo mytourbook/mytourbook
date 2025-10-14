@@ -6551,7 +6551,7 @@ public class TourDataEditorView extends ViewPart implements
     */
    private void defineColumn_TimeSlice_Time_TimeInSeconds() {
 
-      final ColumnDefinition colDef = TableColumnFactory.TIME_TOUR_TIME.createColumn(_timeSlice_ColumnManager, _pc);
+      final ColumnDefinition colDef = TableColumnFactory.TIME_TOUR_TIME_CLOCK.createColumn(_timeSlice_ColumnManager, _pc);
 
       colDef.setLabelProvider(new CellLabelProvider() {
          @Override
