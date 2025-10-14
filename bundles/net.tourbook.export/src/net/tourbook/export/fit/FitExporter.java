@@ -315,21 +315,44 @@ public class FitExporter {
 
    private int createLapMessage(int markerIndex) {
 
-      final List<TourMarker> markers = _tourData.getTourMarkersSorted();
-      if (markers == null || markers.isEmpty() ||
-            markers.size() == markerIndex) {
+      final List<TourMarker> allMarkers = _tourData.getTourMarkersSorted();
+
+      if (allMarkers == null
+            || allMarkers.isEmpty()
+            || allMarkers.size() == markerIndex) {
+
          return markerIndex;
       }
 
-      final float previousTotalDistance = markerIndex == 0 ? 0 : markers.get(markerIndex - 1).getDistance();
-      final TourMarker tourMarker = markers.get(markerIndex);
-      final float lapDistance = tourMarker.getDistance() - previousTotalDistance;
-      final DateTime timestamp = new DateTime(Date.from(Instant.ofEpochMilli(tourMarker.getDeviceLapTime())));
-      final int pausedTime = _tourData.getPausedTime(0, tourMarker.getSerieIndex());
-      final float totalTimerTime = (float) tourMarker.getTime() - pausedTime;
-      final float totalElapsedTime = tourMarker.getTime();
+      final TourMarker tourMarker = allMarkers.get(markerIndex);
 
-      final LapMesg lapMessage = createLapMessage(markerIndex, lapDistance, timestamp, totalTimerTime, totalElapsedTime);
+      float previousRelativeTime = 0;
+      float previousTotalDistance = 0;
+      int markerPausedTime = 0;
+
+      if (markerIndex > 0) {
+
+         final TourMarker prevTourMarker = allMarkers.get(markerIndex - 1);
+
+         previousRelativeTime = prevTourMarker.getTime();
+         previousTotalDistance = prevTourMarker.getDistance();
+
+         final int startIndex = prevTourMarker.getSerieIndex();
+         final int endIndex = tourMarker.getSerieIndex();
+
+         markerPausedTime = _tourData.getPausedTime(startIndex, endIndex);
+      }
+
+      final long markerTotalTime = tourMarker.getDeviceLapTime();
+      final int markerRelativeTime = tourMarker.getTime();
+      final float markerTotalDistance = tourMarker.getDistance();
+
+      final DateTime markerTimestamp = new DateTime(Date.from(Instant.ofEpochMilli(markerTotalTime)));
+      final float lapTime = markerRelativeTime - previousRelativeTime;
+      final float lapTime_NoPauses = lapTime - markerPausedTime;
+      final float lapDistance = markerTotalDistance - previousTotalDistance;
+
+      final LapMesg lapMessage = createLapMessage(markerIndex, markerTimestamp, lapTime_NoPauses, lapTime, lapDistance);
 
       _messages.add(lapMessage);
 
@@ -337,19 +360,24 @@ public class FitExporter {
    }
 
    private LapMesg createLapMessage(final int markerIndex,
-                                    final float lapDistance,
                                     final DateTime startTime,
                                     final float totalTimerTime,
-                                    final float totalElapsedTime) {
+                                    final float totalElapsedTime,
+                                    final float lapDistance) {
 
       final LapMesg lapMessage = new LapMesg();
+
+      lapMessage.setEvent(Event.LAP);
       lapMessage.setMessageIndex(markerIndex);
+
       lapMessage.setStartTime(startTime);
       lapMessage.setTimestamp(startTime);
+
+      lapMessage.setTotalTimerTime(totalTimerTime); //  (excludes pauses)
+      lapMessage.setTotalElapsedTime(totalElapsedTime); //  (includes pauses)
+
       lapMessage.setTotalDistance(lapDistance);
-      lapMessage.setTotalTimerTime(totalTimerTime);
-      lapMessage.setTotalElapsedTime(totalElapsedTime);
-      lapMessage.setEvent(Event.LAP);
+
       return lapMessage;
    }
 
@@ -487,11 +515,11 @@ public class FitExporter {
       final List<TourMarker> markers = _tourData.getTourMarkersSorted();
       if (markers == null || markers.isEmpty()) {
 
-         final LapMesg lapMessage = createLapMessage(0,
-               _tourData.getTourDistance(),
+         final LapMesg lapMessage = createLapMessage(0, // marker index
                startTime,
                _tourData.getTourDeviceTime_Recorded(),
-               _tourData.getTourDeviceTime_Elapsed());
+               _tourData.getTourDeviceTime_Elapsed(),
+               _tourData.getTourDistance());
 
          _messages.add(lapMessage);
       }

@@ -464,6 +464,9 @@ public class TourMarker implements Cloneable, Comparable<Object>, IXmlSerializab
       return description == null ? UI.EMPTY_STRING : description;
    }
 
+   /**
+    * @return Returns the absolute time of the marker in ms since 1970-01-01T00:00:00Z
+    */
    public long getDeviceLapTime() {
 
       if (_deviceLapTime == Long.MIN_VALUE) {
