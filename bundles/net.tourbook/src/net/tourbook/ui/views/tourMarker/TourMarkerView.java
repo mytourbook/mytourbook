@@ -918,11 +918,11 @@ public class TourMarkerView extends ViewPart implements ITourProvider, ITourView
    }
 
    /**
-    * Column: Marker clock time
+    * Column: Marker day time
     */
    private void defineColumn_Time_MarkerClockTime() {
 
-      final ColumnDefinition colDef = TableColumnFactory.TIME_TOUR_TIME_CLOCK.createColumn(_columnManager, _pc);
+      final ColumnDefinition colDef = TableColumnFactory.TIME_TOUR_TIME_OF_DAY_HH_MM_SS.createColumn(_columnManager, _pc);
 
       colDef.setLabelProvider(new CellLabelProvider() {
 
