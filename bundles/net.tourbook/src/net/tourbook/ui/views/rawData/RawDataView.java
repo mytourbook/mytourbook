@@ -79,10 +79,10 @@ import net.tourbook.common.tooltip.OpenDialogManager;
 import net.tourbook.common.util.ColumnDefinition;
 import net.tourbook.common.util.ColumnManager;
 import net.tourbook.common.util.ColumnProfile;
+import net.tourbook.common.util.CustomScalingImageDataProvider;
 import net.tourbook.common.util.IContextMenuProvider;
 import net.tourbook.common.util.ITourViewer;
 import net.tourbook.common.util.ITourViewer3;
-import net.tourbook.common.util.CustomScalingImageDataProvider;
 import net.tourbook.common.util.PostSelectionProvider;
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.TableColumnDefinition;
@@ -195,6 +195,7 @@ import org.eclipse.swt.browser.ProgressAdapter;
 import org.eclipse.swt.browser.ProgressEvent;
 import org.eclipse.swt.custom.CLabel;
 import org.eclipse.swt.events.ControlListener;
+import org.eclipse.swt.events.KeyListener;
 import org.eclipse.swt.events.MenuAdapter;
 import org.eclipse.swt.events.MenuEvent;
 import org.eclipse.swt.events.SelectionEvent;
@@ -1078,7 +1079,7 @@ public class RawDataView extends ViewPart implements
       }
 
       /*
-       * convert selection to array
+       * Convert selection to array
        */
       final Object[] selectedItems = selection.toArray();
       final TourData[] selectedTours = new TourData[selection.size()];
@@ -3291,6 +3292,13 @@ public class RawDataView extends ViewPart implements
       // table viewer
       _tourViewer.setContentProvider(new TourViewer_ContentProvider());
       _tourViewer.setComparator(_tourViewer_Comparator);
+
+      table.addKeyListener(KeyListener.keyPressedAdapter(keyEvent -> {
+
+         if (keyEvent.keyCode == SWT.DEL) {
+            actionRemoveTour();
+         }
+      }));
 
       _tourViewer.addDoubleClickListener(doubleClickEvent -> {
 

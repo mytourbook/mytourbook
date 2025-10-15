@@ -45,6 +45,9 @@ New / Improvements
 * Fit Import
   - Log all device sensor values, e.g. battery voltage, soft-/hardware versions
   
+* Import view
+  - Remove tours with the DELELTE key
+
 * Sensor view     https://github.com/mytourbook/mytourbook/issues/1569
   - Show number of tours for each sensor  
   - All associated tours for a selected sensor can be displayed in the tour book view
