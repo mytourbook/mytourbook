@@ -9541,7 +9541,9 @@ public class TourDataEditorView extends ViewPart implements
          _actionStartLocation.setupTourData(_tourData);
          _actionEndLocation.setupTourData(_tourData);
 
-         _isOneGearValue = _tourData.getGearType().equals(GearDataType.REAR_GEAR);
+         final GearDataType gearType = _tourData.getGearType();
+
+         _isOneGearValue = gearType == null ? false : gearType.equals(GearDataType.REAR_GEAR);
       }
    }
 
