@@ -972,11 +972,9 @@ public class FitData {
 
    public void onSetup_Lap_10_Initialize() {
 
-      final List<TourMarker> tourMarkers = _allTourMarker;
-
       _current_TourMarker = new TourMarker(_tourData, ChartLabelMarker.MARKER_TYPE_DEVICE);
 
-      tourMarkers.add(_current_TourMarker);
+      _allTourMarker.add(_current_TourMarker);
    }
 
    public void onSetup_Lap_20_Finalize() {

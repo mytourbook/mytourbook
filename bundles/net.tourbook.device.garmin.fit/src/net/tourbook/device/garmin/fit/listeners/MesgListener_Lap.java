@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2024 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2025 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -20,11 +20,13 @@ import com.garmin.fit.LapMesg;
 import com.garmin.fit.LapMesgListener;
 import com.garmin.fit.Mesg;
 
+import java.util.Date;
+
 import net.tourbook.data.TourMarker;
 import net.tourbook.device.garmin.fit.FitData;
 
 /**
- * A {@link TourMarker} is set for each lap.
+ * A {@link TourMarker} is set for each lap
  */
 public class MesgListener_Lap extends AbstractMesgListener implements LapMesgListener {
 
@@ -38,6 +40,7 @@ public class MesgListener_Lap extends AbstractMesgListener implements LapMesgLis
    }
 
    private Integer getLapMessageIndex(final Mesg mesg) {
+
       return mesg.getFieldIntegerValue(254);
    }
 
@@ -72,33 +75,33 @@ public class MesgListener_Lap extends AbstractMesgListener implements LapMesgLis
       }
 
       /*
-       * Set lap time, later the time slice position (serie index) will be set.
+       * Set lap time, later on the time slice position (serie index) will be set according to the
+       * time
        */
-      final DateTime garminTime = lapMesg.getStartTime();
-      final Float totalElapsedTime = lapMesg.getTotalElapsedTime();
-      if (garminTime != null) {
+      final DateTime garminStartTime = lapMesg.getStartTime();
+      final Float totalElapsedTime_Sec = lapMesg.getTotalElapsedTime();
 
-         if (totalElapsedTime != null) {
+      if (garminStartTime != null) {
 
-            tourMarker.setDeviceLapTime(garminTime.getDate().getTime() + totalElapsedTime.longValue() * 1000);
+         final Date javaStartTime = garminStartTime.getDate();
+         final long javaStartTime_MS = javaStartTime.getTime();
+
+         if (totalElapsedTime_Sec != null) {
+
+            tourMarker.setDeviceLapTime(javaStartTime_MS + totalElapsedTime_Sec.longValue() * 1000);
 
          } else {
 
-            tourMarker.setDeviceLapTime(garminTime.getDate().getTime());
+            tourMarker.setDeviceLapTime(javaStartTime_MS);
 
          }
-      } else if (totalElapsedTime != null) {
 
-         int lapTime = -1;
+      } else if (totalElapsedTime_Sec != null) {
 
-         lapTime = _lapTime;
-//          lapTime += Math.round(totalElapsedTime);
-         lapTime += totalElapsedTime;
+         _lapTime += totalElapsedTime_Sec;
 
-         _lapTime = lapTime;
-//
-//         // the correct absolute time will be set later
-         tourMarker.setTime(lapTime, Long.MIN_VALUE);
+         // the correct absolute time will be set later
+         tourMarker.setTime(_lapTime, Long.MIN_VALUE);
       }
    }
 }
