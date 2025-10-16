@@ -800,7 +800,21 @@ public class UI {
 
    private static final IPreferenceStore _prefStore_Common           = CommonActivator.getPrefStore();
 
+   private static final String           SYS_PROP__SWT_AUTOSCALE     = "swt.autoScale";                                              //$NON-NLS-1$
+   private static final String           _swtAutoScale               = System.getProperty(SYS_PROP__SWT_AUTOSCALE);
+
    static {
+
+      if (_swtAutoScale == null) {
+
+         System.setProperty(SYS_PROP__SWT_AUTOSCALE, "100"); //$NON-NLS-1$
+
+         StatusUtil.logInfo("\"swt.autoScale\" is not set externaly, using default value \"swt.autoScale=100\"");//$NON-NLS-1$
+
+      } else {
+
+         StatusUtil.logInfo("\"swt.autoScale=%s\" is set externaly".formatted(_swtAutoScale));//$NON-NLS-1$
+      }
 
       /**
        * This creates a display which may contain also sleak options, otherwise sleak would not
