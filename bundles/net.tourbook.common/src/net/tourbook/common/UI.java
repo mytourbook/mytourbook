@@ -801,19 +801,32 @@ public class UI {
    private static final IPreferenceStore _prefStore_Common           = CommonActivator.getPrefStore();
 
    private static final String           SYS_PROP__SWT_AUTOSCALE     = "swt.autoScale";                                              //$NON-NLS-1$
+   private static final String           SYS_PROP__SWT_AUTOSCALE_NO  = "noAutoScale";                                                //$NON-NLS-1$
    private static final String           _swtAutoScale               = System.getProperty(SYS_PROP__SWT_AUTOSCALE);
+   private static final String           _swtAutoScale_No            = System.getProperty(SYS_PROP__SWT_AUTOSCALE_NO);
 
    static {
 
       if (_swtAutoScale == null) {
 
-         System.setProperty(SYS_PROP__SWT_AUTOSCALE, "100"); //$NON-NLS-1$
+         if (_swtAutoScale_No == null) {
 
-         StatusUtil.logInfo("\"swt.autoScale\" is not set externaly, using default value \"swt.autoScale=100\"");//$NON-NLS-1$
+            System.setProperty(SYS_PROP__SWT_AUTOSCALE, "100"); //$NON-NLS-1$
+
+            StatusUtil.logInfo(UI.EMPTY_STRING
+                  + "\"swt.autoScale\" is not set externally, " //$NON-NLS-1$
+                  + " therefore the default value is used \"swt.autoScale=100\"." //$NON-NLS-1$
+                  + " The default can be prevented by setting \"noAutoScale\"");//$NON-NLS-1$
+         } else {
+
+            StatusUtil.logInfo(UI.EMPTY_STRING
+                  + "\"swt.autoScale\" is not set externally," //$NON-NLS-1$
+                  + " the default value was prevented with \"noAutoScale\"");//$NON-NLS-1$
+         }
 
       } else {
 
-         StatusUtil.logInfo("\"swt.autoScale=%s\" is set externaly".formatted(_swtAutoScale));//$NON-NLS-1$
+         StatusUtil.logInfo("\"swt.autoScale=%s\" is set externally".formatted(_swtAutoScale));//$NON-NLS-1$
       }
 
       /**
