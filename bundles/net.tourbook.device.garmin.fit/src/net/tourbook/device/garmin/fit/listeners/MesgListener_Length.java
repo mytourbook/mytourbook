@@ -30,22 +30,22 @@ import net.tourbook.device.garmin.fit.FitData;
  */
 public class MesgListener_Length extends AbstractMesgListener implements LengthMesgListener {
 
-   private List<SwimData> _swimData;
+   private List<SwimData> _allSwimData;
 
    public MesgListener_Length(final FitData fitData) {
 
       super(fitData);
 
-      _swimData = fitData.getSwimData();
+      _allSwimData = fitData.getSwimData();
    }
 
    @Override
    public void onMesg(final LengthMesg mesg) {
 
-      // create gear data for the current time
+      // create swim data for the current time
       final SwimData swimData = new SwimData();
 
-      _swimData.add(swimData);
+      _allSwimData.add(swimData);
 
       // convert garmin time into java time
       final long javaTime = mesg.getStartTime().getDate().getTime();
