@@ -331,20 +331,29 @@ public class UI {
    public static final boolean   IS_OSX      = "carbon".equals(SWT.getPlatform())   || "cocoa".equals(SWT.getPlatform());                        //$NON-NLS-1$ //$NON-NLS-2$
    public static final boolean   IS_WIN      = "win32".equals(SWT.getPlatform())    || "wpf".equals(SWT.getPlatform());                           //$NON-NLS-1$ //$NON-NLS-2$
 
+
 // SET_FORMATTING_ON
 
-   public static final String TRUE  = Boolean.toString(true);
-   public static final String FALSE = Boolean.toString(false);
+   public static final String  TRUE              = Boolean.toString(true);
+   public static final String  FALSE             = Boolean.toString(false);
 
    /**
     * Is <code>true</code> when the dark theme in the UI is selected
     */
-   public static boolean      IS_DARK_THEME;
+   public static boolean       IS_DARK_THEME;
 
    /**
     * Is <code>true</code> when the bright theme in the UI is selected
     */
-   public static boolean      IS_BRIGHT_THEME;
+   public static boolean       IS_BRIGHT_THEME;
+
+   /**
+    * When <code>true</code> then HRD images are displayed on windows when the dark theme is
+    * selected.
+    * <p>
+    * This is a central switch to enable/disable it which is more or less used for debugging
+    */
+   public static final boolean IS_USE_HDR_IMAGES = true;
 
    // https://eclipse.dev/eclipse/markdown/?f=news/4.36/platform.md#themes-and-styling
    public static String        DISABLED_ICONS_DESATURATED     = "desaturated";               //$NON-NLS-1$
