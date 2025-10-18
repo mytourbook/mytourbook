@@ -128,6 +128,149 @@ public class FitExporter {
       _allMessages.add(eventMesgStart);
    }
 
+   private void createAll(final String exportFilePath) {
+
+      _allMessages.clear();
+
+      _pausedTime_Start = _tourData.getPausedTime_Start();
+      _pausedTime_End = _tourData.getPausedTime_End();
+
+      final long[] pausedTime_Data = _tourData.getPausedTime_Data();
+      _allPausedTime_Data = pausedTime_Data == null
+            ? null
+            : Arrays.stream(pausedTime_Data).boxed().toList();
+
+      // The starting timestamp for the activity
+      final DateTime garminTimeSlice_Time = new DateTime(Date.from(_tourData.getTourStartTime().toInstant()));
+      final DateTime garminTourStart_Time = new DateTime(Date.from(_tourData.getTourStartTime().toInstant()));
+      final DateTime garminTourEnd_Time = new DateTime(Date.from(_tourData.getTourEndTime().toInstant()));
+
+      // Timer Events are a BEST PRACTICE for FIT ACTIVITY files
+      addStartEventMessage(garminTimeSlice_Time);
+
+      // Create the Developer Id message for the developer data fields.
+      final DeveloperDataIdMesg developerIdMesg = new DeveloperDataIdMesg();
+
+      // It is a BEST PRACTICE to reuse the same Guid for all FIT files created by your platform
+      final byte[] appId = convertUUIDToBytes(UUID.fromString("e1b60f54-e7cb-46d9-88df-ced1fe7ecf0f")); //$NON-NLS-1$
+      for (int index = 0; index < appId.length; index++) {
+         developerIdMesg.setApplicationId(index, appId[index]);
+      }
+
+      developerIdMesg.setDeveloperDataIndex((short) 0);
+      final Version softwareVersion = Activator.getDefault().getVersion();
+      final Float version = Float.valueOf(softwareVersion.getMajor() + UI.SYMBOL_DOT + softwareVersion.getMinor());
+      developerIdMesg.setApplicationVersion((long) (version * 100));
+      _allMessages.add(developerIdMesg);
+
+      // Every FIT ACTIVITY file MUST contain Record messages
+      final int[] timeSerie = _tourData.timeSerie;
+      if (timeSerie != null) {
+
+         int previousTimeSliceValue = 0;
+         int pulseSerieIndex = 0;
+         int batteryTimeIndex = 0;
+         int markerIndex = 0;
+
+         final int[] allPauseTimeIndices = new int[2];
+         GearData previousGearData = null;
+
+         for (int index = 0; index < timeSerie.length; ++index) {
+
+            final int currentTimeSliceValue = _tourData.timeSerie[index];
+
+            // set slice time to the next slice
+            garminTimeSlice_Time.add((long) currentTimeSliceValue - previousTimeSliceValue);
+
+            // Create a new Record message and set the timestamp
+            final RecordMesg recordMesg = new RecordMesg();
+            recordMesg.setTimestamp(garminTimeSlice_Time);
+
+            setDataSerieValue(index, recordMesg);
+
+            // Write the Record message to the output stream
+            _allMessages.add(recordMesg);
+
+            pulseSerieIndex = createHrvMessage(pulseSerieIndex, index);
+            previousGearData = createGearEvent(garminTimeSlice_Time, previousGearData, index);
+            batteryTimeIndex = createBatteryEvent(garminTimeSlice_Time, batteryTimeIndex, currentTimeSliceValue);
+            markerIndex = createLapMessage(markerIndex);
+
+            createPauseEvent(allPauseTimeIndices, currentTimeSliceValue);
+
+            // Increment the timestamp by the number of seconds between the previous
+            // timestamp and the current one
+            previousTimeSliceValue = currentTimeSliceValue;
+         }
+      }
+
+      // Every FIT ACTIVITY file MUST contain at least one Lap message
+      final List<TourMarker> markers = _tourData.getTourMarkersSorted();
+      if (markers == null || markers.isEmpty()) {
+
+         final LapMesg lapMessage = createLapMessage(
+
+               0, // marker index
+
+               garminTourStart_Time,
+               garminTourEnd_Time,
+
+               _tourData.getTourDeviceTime_Recorded(),
+               _tourData.getTourDeviceTime_Elapsed(),
+
+               _tourData.getTourDistance());
+
+         _allMessages.add(lapMessage);
+      }
+
+      addFinalEventMessage(garminTimeSlice_Time);
+
+// SET_FORMATTING_OFF
+
+      final Date javaCreationTime                     = Date.from(Instant.now());
+      final DateTime garminCreationTime               = new DateTime(javaCreationTime);
+      final LocalDateTime garminLocalCreationTime     = new LocalDateTime(javaCreationTime);
+
+      // Every FIT ACTIVITY file MUST contain at least one Session message
+      final SessionMesg sessionMesg = new SessionMesg();
+      sessionMesg.setMessageIndex      (0);
+      sessionMesg.setStartTime         (garminTourStart_Time);
+      sessionMesg.setTotalElapsedTime  ((float) _tourData.getTourDeviceTime_Elapsed());
+      sessionMesg.setTotalTimerTime    ((float) _tourData.getTourDeviceTime_Recorded());
+      sessionMesg.setFirstLapIndex     (0);
+      sessionMesg.setNumLaps           (_tourData.getTourMarkers().isEmpty() ? 1 : _tourData.getTourMarkers().size());
+      sessionMesg.setTimestamp         (garminCreationTime);
+      setSessionValues(sessionMesg);
+      _allMessages.add(sessionMesg);
+
+      // Every FIT ACTIVITY file MUST contain EXACTLY one Activity message
+      final ActivityMesg activityMesg = new ActivityMesg();
+      activityMesg.setNumSessions      (1);
+      activityMesg.setTimestamp        (garminCreationTime);
+      activityMesg.setLocalTimestamp   (garminLocalCreationTime.getTimestamp());
+      activityMesg.setTotalTimerTime   ((float) _tourData.getTourDeviceTime_Recorded());
+      _allMessages.add(activityMesg);
+
+// SET_FORMATTING_ON
+
+      final Set<DeviceSensorValue> deviceSensorValues = _tourData.getDeviceSensorValues();
+      if (deviceSensorValues != null) {
+
+         for (final DeviceSensorValue deviceSensorValue : deviceSensorValues) {
+
+            final DeviceInfoMesg deviceInfoMesgStart = createDeviceInfoMesgStart(garminTimeSlice_Time, deviceSensorValue);
+            _allMessages.add(deviceInfoMesgStart);
+
+            final DeviceInfoMesg deviceInfoMesgEnd = createDeviceInfoMesgEnd(garminTimeSlice_Time, deviceSensorValue);
+            _allMessages.add(deviceInfoMesgEnd);
+         }
+      }
+
+      createSwimMessages();
+
+      createFitFile(exportFilePath, garminCreationTime, version);
+   }
+
    private int createBatteryEvent(final DateTime timestamp,
                                   int batteryTimeIndex,
                                   final int timeSerieValue) {
@@ -521,145 +664,7 @@ public class FitExporter {
 
       _tourData = tourData;
 
-      _pausedTime_Start = _tourData.getPausedTime_Start();
-      _pausedTime_End = _tourData.getPausedTime_End();
-
-      final long[] pausedTime_Data = _tourData.getPausedTime_Data();
-      _allPausedTime_Data = pausedTime_Data == null
-            ? null
-            : Arrays.stream(pausedTime_Data).boxed().toList();
-
-      _allMessages.clear();
-
-      // The starting timestamp for the activity
-      final DateTime garminTimeSlice_Time = new DateTime(Date.from(_tourData.getTourStartTime().toInstant()));
-      final DateTime garminTourStart_Time = new DateTime(Date.from(_tourData.getTourStartTime().toInstant()));
-      final DateTime garminTourEnd_Time = new DateTime(Date.from(_tourData.getTourEndTime().toInstant()));
-
-      // Timer Events are a BEST PRACTICE for FIT ACTIVITY files
-      addStartEventMessage(garminTimeSlice_Time);
-
-      // Create the Developer Id message for the developer data fields.
-      final DeveloperDataIdMesg developerIdMesg = new DeveloperDataIdMesg();
-
-      // It is a BEST PRACTICE to reuse the same Guid for all FIT files created by your platform
-      final byte[] appId = convertUUIDToBytes(UUID.fromString("e1b60f54-e7cb-46d9-88df-ced1fe7ecf0f")); //$NON-NLS-1$
-      for (int index = 0; index < appId.length; index++) {
-         developerIdMesg.setApplicationId(index, appId[index]);
-      }
-
-      developerIdMesg.setDeveloperDataIndex((short) 0);
-      final Version softwareVersion = Activator.getDefault().getVersion();
-      final Float version = Float.valueOf(softwareVersion.getMajor() + UI.SYMBOL_DOT + softwareVersion.getMinor());
-      developerIdMesg.setApplicationVersion((long) (version * 100));
-      _allMessages.add(developerIdMesg);
-
-      // Every FIT ACTIVITY file MUST contain Record messages
-      final int[] timeSerie = _tourData.timeSerie;
-      if (timeSerie != null) {
-
-         int previousTimeSliceValue = 0;
-         int pulseSerieIndex = 0;
-         int batteryTimeIndex = 0;
-         int markerIndex = 0;
-
-         final int[] allPauseTimeIndices = new int[2];
-         GearData previousGearData = null;
-
-         for (int index = 0; index < timeSerie.length; ++index) {
-
-            final int currentTimeSliceValue = _tourData.timeSerie[index];
-
-            // set slice time to the next slice
-            garminTimeSlice_Time.add((long) currentTimeSliceValue - previousTimeSliceValue);
-
-            // Create a new Record message and set the timestamp
-            final RecordMesg recordMesg = new RecordMesg();
-            recordMesg.setTimestamp(garminTimeSlice_Time);
-
-            setDataSerieValue(index, recordMesg);
-
-            // Write the Record message to the output stream
-            _allMessages.add(recordMesg);
-
-            pulseSerieIndex = createHrvMessage(pulseSerieIndex, index);
-            previousGearData = createGearEvent(garminTimeSlice_Time, previousGearData, index);
-            batteryTimeIndex = createBatteryEvent(garminTimeSlice_Time, batteryTimeIndex, currentTimeSliceValue);
-            markerIndex = createLapMessage(markerIndex);
-
-            createPauseEvent(allPauseTimeIndices, currentTimeSliceValue);
-
-            // Increment the timestamp by the number of seconds between the previous
-            // timestamp and the current one
-            previousTimeSliceValue = currentTimeSliceValue;
-         }
-      }
-
-      // Every FIT ACTIVITY file MUST contain at least one Lap message
-      final List<TourMarker> markers = _tourData.getTourMarkersSorted();
-      if (markers == null || markers.isEmpty()) {
-
-         final LapMesg lapMessage = createLapMessage(
-
-               0, // marker index
-
-               garminTourStart_Time,
-               garminTourEnd_Time,
-
-               _tourData.getTourDeviceTime_Recorded(),
-               _tourData.getTourDeviceTime_Elapsed(),
-
-               _tourData.getTourDistance());
-
-         _allMessages.add(lapMessage);
-      }
-
-      addFinalEventMessage(garminTimeSlice_Time);
-
-// SET_FORMATTING_OFF
-
-      final Date javaCreationTime                     = Date.from(Instant.now());
-      final DateTime garminCreationTime               = new DateTime(javaCreationTime);
-      final LocalDateTime garminLocalCreationTime     = new LocalDateTime(javaCreationTime);
-
-      // Every FIT ACTIVITY file MUST contain at least one Session message
-      final SessionMesg sessionMesg = new SessionMesg();
-      sessionMesg.setMessageIndex      (0);
-      sessionMesg.setStartTime         (garminTourStart_Time);
-      sessionMesg.setTotalElapsedTime  ((float) _tourData.getTourDeviceTime_Elapsed());
-      sessionMesg.setTotalTimerTime    ((float) _tourData.getTourDeviceTime_Recorded());
-      sessionMesg.setFirstLapIndex     (0);
-      sessionMesg.setNumLaps           (_tourData.getTourMarkers().isEmpty() ? 1 : _tourData.getTourMarkers().size());
-      sessionMesg.setTimestamp         (garminCreationTime);
-      setSessionValues(sessionMesg);
-      _allMessages.add(sessionMesg);
-
-      // Every FIT ACTIVITY file MUST contain EXACTLY one Activity message
-      final ActivityMesg activityMesg = new ActivityMesg();
-      activityMesg.setNumSessions      (1);
-      activityMesg.setTimestamp        (garminCreationTime);
-      activityMesg.setLocalTimestamp   (garminLocalCreationTime.getTimestamp());
-      activityMesg.setTotalTimerTime   ((float) _tourData.getTourDeviceTime_Recorded());
-      _allMessages.add(activityMesg);
-
-// SET_FORMATTING_ON
-
-      final Set<DeviceSensorValue> deviceSensorValues = _tourData.getDeviceSensorValues();
-      if (deviceSensorValues != null) {
-
-         for (final DeviceSensorValue deviceSensorValue : deviceSensorValues) {
-
-            final DeviceInfoMesg deviceInfoMesgStart = createDeviceInfoMesgStart(garminTimeSlice_Time, deviceSensorValue);
-            _allMessages.add(deviceInfoMesgStart);
-
-            final DeviceInfoMesg deviceInfoMesgEnd = createDeviceInfoMesgEnd(garminTimeSlice_Time, deviceSensorValue);
-            _allMessages.add(deviceInfoMesgEnd);
-         }
-      }
-
-      createSwimMessages();
-
-      createFitFile(exportFilePath, garminCreationTime, version);
+      createAll(exportFilePath);
    }
 
    private void setDataSerieValue(final int index, final RecordMesg recordMesg) {
