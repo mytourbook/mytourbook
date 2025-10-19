@@ -81,6 +81,11 @@
       </repository> 
       
       <repository>
+         <id>eclipse.collections.11.1.0</id>                                           <layout>p2</layout>
+         <url>https://download.eclipse.org/collections/11.1.0/repository/</url>
+      </repository> 
+      
+      <repository>
          <id>eclipse.nebula.3.1.1</id>                                                 <layout>p2</layout>
          <url>https://download.eclipse.org/nebula/updates/release/3.1.1</url>
       </repository> 
