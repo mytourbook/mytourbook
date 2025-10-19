@@ -185,28 +185,28 @@ public class DeviceSensor implements Cloneable, Serializable {
 
       // manufacturer
       if (manufacturerNumber != null && manufacturerNumber != -1) {
-         allKeys.add("m_" + manufacturerNumber);
+         allKeys.add("m_" + manufacturerNumber); //$NON-NLS-1$
       }
       if (StringUtils.hasContent(manufacturerName)) {
-         allKeys.add("m__" + manufacturerName);
+         allKeys.add("m__" + manufacturerName); //$NON-NLS-1$
       }
 
       // product
       if (productNumber != null && productNumber != -1) {
-         allKeys.add("p_" + productNumber);
+         allKeys.add("p_" + productNumber); //$NON-NLS-1$
       }
       if (StringUtils.hasContent(productName)) {
-         allKeys.add("p__" + productName);
+         allKeys.add("p__" + productName); //$NON-NLS-1$
       }
 
       // device
       if (deviceType != null && deviceType != -1) {
-         allKeys.add("d_" + deviceType);
+         allKeys.add("d_" + deviceType); //$NON-NLS-1$
       }
 
       // serial no
       if (StringUtils.hasContent(serialNumber)) {
-         allKeys.add("s_" + serialNumber);
+         allKeys.add("s_" + serialNumber); //$NON-NLS-1$
       }
 
       /*

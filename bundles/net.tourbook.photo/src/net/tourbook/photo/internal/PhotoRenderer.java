@@ -844,7 +844,7 @@ public class PhotoRenderer extends AbstractGalleryMT20ItemRenderer {
              *
              * </code>
              */
-            System.out.println("IllegalArgumentException: %s".formatted(e.getMessage()));
+            System.out.println("IllegalArgumentException: %s".formatted(e.getMessage())); //$NON-NLS-1$
             System.out.println("Photo: %s".formatted(photo.imageFilePathName)); //$NON-NLS-1$
 
             return false;

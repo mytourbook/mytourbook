@@ -159,7 +159,7 @@ public class PrefPageAppearanceColors extends PreferencePage implements
 
       public ActionCopyColorIntoClipboard() {
 
-         setText("&Copy Color");
+         setText(Messages.Pref_ChartColors_CopyColor);
       }
 
       @Override
@@ -172,7 +172,7 @@ public class PrefPageAppearanceColors extends PreferencePage implements
 
       public ActionPasteColorFromClipboard() {
 
-         setText("&Paste Color");
+         setText(Messages.Pref_ChartColors_PasteColor);
       }
 
       @Override
@@ -185,7 +185,7 @@ public class PrefPageAppearanceColors extends PreferencePage implements
 
       public ActionResetToDefaultColor() {
 
-         setText("&Reset to Default Color");
+         setText(Messages.Pref_ChartColors_ResetToDefaultColor);
       }
 
       @Override

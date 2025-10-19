@@ -1695,6 +1695,9 @@ public class Messages extends NLS {
    public static String        Pref_App_Label_TourEditorIsModified;
 
    public static String        Pref_ChartColors_btn_legend;
+   public static String        Pref_ChartColors_CopyColor;
+   public static String        Pref_ChartColors_PasteColor;
+   public static String        Pref_ChartColors_ResetToDefaultColor;
    public static String        Pref_ChartColors_unit_high;
    public static String        Pref_ChartColors_unit_low;
    public static String        Pref_ChartColors_unit_max;
