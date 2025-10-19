@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   width="16"
+   height="16"
+   id="svg2985"
+   version="1.1"
+   viewBox="0 0 16 16.000001"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:dc="http://purl.org/dc/elements/1.1/">
+  <defs
+     id="defs2987">
+    <linearGradient
+       id="linearGradient6402">
+      <stop
+         id="stop6404"
+         offset="0"
+         style="stop-color:#000000;stop-opacity:1;" />
+      <stop
+         id="stop6406"
+         offset="1"
+         style="stop-color:#000000;stop-opacity:0;" />
+    </linearGradient>
+    <linearGradient
+       id="linearGradient3816">
+      <stop
+         id="stop3818"
+         offset="0"
+         style="stop-color:#ffa576;stop-opacity:1;" />
+      <stop
+         style="stop-color:#f45400;stop-opacity:1;"
+         offset="1"
+         id="stop3782" />
+    </linearGradient>
+  </defs>
+  <metadata
+     id="metadata2990">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <g
+     id="layer1"
+     transform="translate(-215,-434.00037)">
+    <rect
+       style="opacity:0.99;fill:none;stroke:none"
+       id="rect6783-5-7-4"
+       width="15.999996"
+       height="16"
+       x="215"
+       y="434.00037" />
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:11.5492px;line-height:0%;font-family:'Segoe UI';-inkscape-font-specification:'Segoe UI Bold';text-align:start;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:start;fill:#808080;fill-opacity:1;stroke:none;stroke-width:1"
+       x="202.60941"
+       y="477.42517"
+       id="text6789-7-2-0"
+       transform="scale(1.0825953,0.92370621)"><tspan
+         id="tspan6787-3-2-6"
+         x="202.60941"
+         y="477.42517"
+         style="font-size:10.5868px;line-height:1.25;fill:#808080;fill-opacity:1;stroke-width:1">1</tspan></text>
+    <path
+       id="path5150-9-29-2-8-7-2-3-4-9-78"
+       d="M 230.50001,449.99377 C 230.47011,446.61841 227.6447,442.52612 222.99998,442.49983 218.36872,442.49983 215.54119,446.66598 215.49996,449.99377"
+       style="fill:#d0ec86;fill-opacity:1;stroke:#435800;stroke-width:0.999992;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
+  </g>
+</svg>
