@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2024 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2025 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -141,6 +141,62 @@ public class TourbookPlugin extends AbstractUIPlugin {
    }
 
    /**
+    * @param imageName
+    *
+    * @return Returns the dark themed image descriptor from {@link TourbookPlugin} plugin images.
+    *         This is used for photo slideouts because they always have a dark UI.
+    */
+   public static ImageDescriptor getImageDescriptor_Dark(final String imageName) {
+
+      if (UI.IS_USE_HDR_IMAGES) {
+
+         // display HDR image which is created for the dark theme
+
+         final ImageDescriptor hdrImageDescriptor = getImageDescriptor(ThemeUtil.getThemedImageName_HDR(imageName));
+
+         if (hdrImageDescriptor != null) {
+
+            return hdrImageDescriptor;
+         }
+      }
+
+      // display dark theme image
+
+      return getImageDescriptor(ThemeUtil.getThemedImageName_Dark(imageName));
+   }
+
+   private static ImageDescriptor getImageDescriptor_Dark_Win(final String imageName) {
+
+      if (UI.IS_DARK_THEME && UI.IS_WIN) {
+
+         /**
+          * Since windows 11, a hovered or selected action are displaying a very bright background
+          * which makes it very difficult to see the dark images which content is mostly very
+          * bright.
+          * <p>
+          * Because of this reason, the HDR images were created and are displayed on windows 11 in
+          * the dark theme and when available.
+          */
+
+         if (UI.IS_USE_HDR_IMAGES) {
+
+            final ImageDescriptor hdrImageDescriptor = getImageDescriptor(ThemeUtil.getThemedImageName_HDR(imageName));
+
+            if (hdrImageDescriptor != null) {
+
+               return hdrImageDescriptor;
+            }
+         }
+
+         // display bright theme image
+
+         return getImageDescriptor(imageName);
+      }
+
+      return null;
+   }
+
+   /**
     * This is a shortcut for {@link TourbookPlugin#getDefault()#getPreferenceStore()}
     *
     * @return
@@ -198,30 +254,10 @@ public class TourbookPlugin extends AbstractUIPlugin {
     */
    public static ImageDescriptor getThemedImageDescriptor(final String imageName) {
 
-      if (UI.IS_DARK_THEME && UI.IS_WIN) {
+      final ImageDescriptor winDarkImageDescriptor = getImageDescriptor_Dark_Win(imageName);
 
-         /**
-          * Since windows 11, a hovered or selected action are displaying a very bright background
-          * which makes it very difficult to see the dark images which content is mostly very
-          * bright.
-          * <p>
-          * Because of this reason, the HDR images were created and are displayed on windows 11 in
-          * the dark theme and when available.
-          */
-
-         if (UI.IS_USE_HDR_IMAGES) {
-
-            final ImageDescriptor hdrImageDescriptor = getImageDescriptor(ThemeUtil.getThemedImageName_HDR(imageName));
-
-            if (hdrImageDescriptor != null) {
-
-               return hdrImageDescriptor;
-            }
-         }
-
-         // display bright theme image
-
-         return getImageDescriptor(imageName);
+      if (winDarkImageDescriptor != null) {
+         return winDarkImageDescriptor;
       }
 
       return getImageDescriptor(ThemeUtil.getThemedImageName(imageName));
