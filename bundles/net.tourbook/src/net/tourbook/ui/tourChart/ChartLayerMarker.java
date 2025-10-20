@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2025 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -427,10 +427,7 @@ public class ChartLayerMarker implements IChartLayer, IChartOverlay {
                // draw label vertical
                final Transform tr = new Transform(display);
                {
-                  final int xPos = DPIUtil.pixelToPoint(_devXMarker, DPIUtil.getDeviceZoom());
-                  final int yPos = DPIUtil.pixelToPoint(_devYMarker, DPIUtil.getDeviceZoom());
-
-                  tr.translate(xPos, yPos);
+                  tr.translate(_devXMarker, _devYMarker);
                   tr.rotate(-90f);
 
                   gc.setTransform(tr);
@@ -724,6 +721,7 @@ public class ChartLayerMarker implements IChartLayer, IChartOverlay {
 
    /**
     * @param mouseEvent
+    *
     * @return Returns the hovered {@link ChartLabel} or <code>null</code> when a {@link ChartLabel}
     *         is not hovered.
     */

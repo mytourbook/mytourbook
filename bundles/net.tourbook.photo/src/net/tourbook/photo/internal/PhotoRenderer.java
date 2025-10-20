@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2024 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2025 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -380,7 +380,10 @@ public class PhotoRenderer extends AbstractGalleryMT20ItemRenderer {
       final int itemImageX = galleryItem.paintedX_Photo + (isBorder ? border2 : 0);
       final int itemImageY = galleryItem.paintedY_Photo + (isBorder ? border2 : 0);
 
-      final float scaledCanvasWidth = DPIUtil.pixelToPoint(canvasWidth, DPIUtil.getDeviceZoom());
+      final int deviceZoom = DPIUtil.getDeviceZoom();
+      final float scalingFactor = DPIUtil.getScalingFactor(deviceZoom);
+      final float scaledCanvasWidth = canvasWidth * scalingFactor;
+
       final boolean isThumbImage = scaledCanvasWidth <= PhotoLoadManager.IMAGE_SIZE_THUMBNAIL;
 
       final ImageQuality requestedImageQuality = isThumbImage
@@ -844,8 +847,7 @@ public class PhotoRenderer extends AbstractGalleryMT20ItemRenderer {
              *
              * </code>
              */
-            System.out.println("IllegalArgumentException: %s".formatted(e.getMessage())); //$NON-NLS-1$
-            System.out.println("Photo: %s".formatted(photo.imageFilePathName)); //$NON-NLS-1$
+            System.out.println("IllegalArgumentException: %s - Photo: %s".formatted(e.getMessage(), photo.imageFilePathName)); //$NON-NLS-1$
 
             return false;
 
