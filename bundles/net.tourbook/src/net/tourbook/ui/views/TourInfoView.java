@@ -239,7 +239,6 @@ public class TourInfoView extends ViewPart {
       });
       {
          _infoContainer = new Composite(_uiContainer, SWT.NONE);
-         _infoContainer.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_INFO_BACKGROUND));
          GridDataFactory.fillDefaults().grab(true, true).applyTo(_infoContainer);
          GridLayoutFactory.fillDefaults().applyTo(_infoContainer);
       }

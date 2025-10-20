@@ -479,7 +479,15 @@ public class TourInfoUI implements ICanHideTooltip {
 
       enableControls();
 
-      updateUI_Background(parent);
+      // run async otherwise the background is not properly set for the most controls in the bright theme
+      parent.getDisplay().asyncExec(() -> {
+
+         if (parent.isDisposed()) {
+            return;
+         }
+
+         updateUI_Background(parent);
+      });
 
       return container;
    }
@@ -2641,7 +2649,10 @@ public class TourInfoUI implements ICanHideTooltip {
 
          UI.setColorForAllChildren(parent,
                display.getSystemColor(SWT.COLOR_INFO_FOREGROUND),
-               display.getSystemColor(SWT.COLOR_INFO_BACKGROUND));
+//             UI.SYS_COLOR_RED,
+               display.getSystemColor(SWT.COLOR_INFO_BACKGROUND)
+//             UI.SYS_COLOR_GREEN
+         );
       }
    }
 
