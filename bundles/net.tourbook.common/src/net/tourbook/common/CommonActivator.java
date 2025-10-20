@@ -96,6 +96,34 @@ public class CommonActivator extends AbstractUIPlugin {
     */
    public static ImageDescriptor getThemedImageDescriptor(final String imageName) {
 
+      final ImageDescriptor winDarkImageDescriptor = getWinDarkImageDescriptor(imageName);
+
+      if (winDarkImageDescriptor != null) {
+         return winDarkImageDescriptor;
+      }
+
+      return getImageDescriptor(ThemeUtil.getThemedImageName(imageName));
+   }
+
+   /**
+    * @param imageName
+    *
+    * @return Returns the dark themed image descriptor from {@link CommonActivator} plugin images.
+    *         This is used for photo slideouts because they always have a dark UI.
+    */
+   public static ImageDescriptor getThemedImageDescriptor_Dark(final String imageName) {
+
+      final ImageDescriptor winDarkImageDescriptor = getWinDarkImageDescriptor(imageName);
+
+      if (winDarkImageDescriptor != null) {
+         return winDarkImageDescriptor;
+      }
+
+      return getImageDescriptor(ThemeUtil.getThemedImageName_Dark(imageName));
+   }
+
+   private static ImageDescriptor getWinDarkImageDescriptor(final String imageName) {
+
       if (UI.IS_DARK_THEME && UI.IS_WIN) {
 
          /**
@@ -122,28 +150,7 @@ public class CommonActivator extends AbstractUIPlugin {
          return getImageDescriptor(imageName);
       }
 
-      return getImageDescriptor(ThemeUtil.getThemedImageName(imageName));
-   }
-
-   /**
-    * @param imageName
-    *
-    * @return Returns the dark themed image descriptor from {@link CommonActivator} plugin images.
-    *         This is used for photo slideouts because they always have a dark UI.
-    */
-   public static ImageDescriptor getThemedImageDescriptor_Dark(final String imageName) {
-
-      return getImageDescriptor(ThemeUtil.getThemedImageName_Dark(imageName));
-   }
-
-   /**
-    * @param imageName
-    *
-    * @return Returns the themed image descriptor from {@link CommonActivator} plugin images
-    */
-   public static ImageDescriptor getThemedImageDescriptor_OLD(final String imageName) {
-
-      return getImageDescriptor(ThemeUtil.getThemedImageName(imageName));
+      return null;
    }
 
    @Override
