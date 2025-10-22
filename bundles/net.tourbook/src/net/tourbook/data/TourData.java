@@ -379,7 +379,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
    private float                 startDistance;
 
    /**
-    * total distance of the tour in meters (metric system), this value is computed from the
+    * Total distance of the tour in meters (metric system), this value is computed from the
     * distance data serie
     */
    @XmlElement
@@ -1051,7 +1051,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
     */
    @OneToMany(fetch = EAGER, cascade = ALL, mappedBy = "tourData")
    @Cascade(org.hibernate.annotations.CascadeType.DELETE_ORPHAN)
-   private  Set<TourReference>         tourReferences                     = new HashSet<>();
+   private  Set<TourReference>         tourReferences                      = new HashSet<>();
 
    /**
     * Tags
@@ -1060,6 +1060,14 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
    @JoinTable(inverseJoinColumns = @JoinColumn(name = "TOURTAG_TagID", referencedColumnName = "TagID"))
    @JsonProperty
    private Set<TourTag>                tourTags                            = new HashSet<>();
+
+   /**
+    * Equipments
+    */
+   @ManyToMany(fetch = EAGER)
+   @JoinTable(inverseJoinColumns = @JoinColumn(name = "Equipment_EquipmentId", referencedColumnName = "EquipmentId"))
+   @JsonProperty
+   private Set<Equipment>              equipments                          = new HashSet<>();
 
    /**
     * Sensor values
@@ -11828,7 +11836,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
     */
    public ZoneId getTimeZoneIdWithDefault() {
 
-      final String zoneIdRaw = timeZoneId == null //
+      final String zoneIdRaw = timeZoneId == null
 
             ? TimeTools.getDefaultTimeZoneId()
             : timeZoneId;

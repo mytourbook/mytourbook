@@ -68,6 +68,7 @@ import net.tourbook.common.util.StringUtils;
 import net.tourbook.common.util.Util;
 import net.tourbook.data.DeviceSensor;
 import net.tourbook.data.DeviceSensorValue;
+import net.tourbook.data.Equipment;
 import net.tourbook.data.TourBeverageContainer;
 import net.tourbook.data.TourBike;
 import net.tourbook.data.TourData;
@@ -122,9 +123,9 @@ public class TourDatabase {
     * <li>/net.tourbook.export/format-templates/mt-1.0.vm</li>
     * <li>net.tourbook.device.mt.MT_StAXHandler</li>
     */
-   private static final int TOURBOOK_DB_VERSION = 59;
+   private static final int TOURBOOK_DB_VERSION = 60;
 
-//   private static final int TOURBOOK_DB_VERSION = 59; // after 25.8
+//   private static final int TOURBOOK_DB_VERSION = 59; // 25.11
 //   private static final int TOURBOOK_DB_VERSION = 58; // 25.6
 //   private static final int TOURBOOK_DB_VERSION = 57; // 25.4
 //   private static final int TOURBOOK_DB_VERSION = 56; // 24.11.3
@@ -205,6 +206,7 @@ public class TourDatabase {
 
    public static final String  TABLE_DEVICE_SENSOR                        = "DeviceSensor";                                          //$NON-NLS-1$
    public static final String  TABLE_DEVICE_SENSOR_VALUE                  = "DeviceSensorValue";                                     //$NON-NLS-1$
+   public static final String  TABLE_EQUIPMENT                            = "Equipment";                                             //$NON-NLS-1$
    public static final String  TABLE_TOUR_BEVERAGE_CONTAINER              = "TOURBEVERAGECONTAINER";                                 //$NON-NLS-1$
    public static final String  TABLE_TOUR_BIKE                            = "TOURBIKE";                                              //$NON-NLS-1$
    public static final String  TABLE_TOUR_COMPARED                        = "TOURCOMPARED";                                          //$NON-NLS-1$
@@ -226,6 +228,8 @@ public class TourDatabase {
    public static final String  JOINTABLE__TOURDATA__TOURTAG               = TABLE_TOUR_DATA + "_" + TABLE_TOUR_TAG;                  //$NON-NLS-1$
    public static final String  JOINTABLE__TOURTAGCATEGORY_TOURTAG         = TABLE_TOUR_TAG_CATEGORY + "_" + TABLE_TOUR_TAG;          //$NON-NLS-1$
    public static final String  JOINTABLE__TOURTAGCATEGORY_TOURTAGCATEGORY = TABLE_TOUR_TAG_CATEGORY + "_" + TABLE_TOUR_TAG_CATEGORY; //$NON-NLS-1$
+
+   public static final String  JOINTABLE__TOURDATA__EQUIPMENT             = TABLE_TOUR_DATA + "_" + TABLE_EQUIPMENT;                 //$NON-NLS-1$
 
    /*
     * Tables which never have been used, they are dropped in db version 24
@@ -249,6 +253,7 @@ public class TourDatabase {
    private static final String ENTITY_ID_BIKE                = "BikeID";                                    //$NON-NLS-1$
    private static final String ENTITY_ID_COMPARED            = "ComparedID";                                //$NON-NLS-1$
    private static final String ENTITY_ID_DEVICE_SENSOR       = "SensorId";                                  //$NON-NLS-1$
+   private static final String ENTITY_ID_EQUIPMENT           = "EquipmentId";                               //$NON-NLS-1$
    private static final String ENTITY_ID_DEVICE_SENSOR_VALUE = "SensorValueId";                             //$NON-NLS-1$
    private static final String ENTITY_ID_HR_ZONE             = "HrZoneID";                                  //$NON-NLS-1$
    private static final String ENTITY_ID_LOCATION            = "LocationID";                                //$NON-NLS-1$
@@ -269,6 +274,7 @@ public class TourDatabase {
    public  static final String KEY_BEVERAGE_CONTAINER       = TABLE_TOUR_BEVERAGE_CONTAINER  + "_" + ENTITY_ID_BEVERAGECONTAINER;   //$NON-NLS-1$
    private static final String KEY_BIKE                     = TABLE_TOUR_BIKE                + "_" + ENTITY_ID_BIKE;                //$NON-NLS-1$
    private static final String KEY_DEVICE_SENSOR            = TABLE_DEVICE_SENSOR            + "_" + ENTITY_ID_DEVICE_SENSOR;       //$NON-NLS-1$
+   private static final String KEY_EQUIPMENT                = TABLE_EQUIPMENT                + "_" + ENTITY_ID_EQUIPMENT;       //$NON-NLS-1$
    public static final String  KEY_MARKER_TYPE              = TABLE_TOUR_MARKER_TYPE         + "_" + ENTITY_ID_MARKER_TYPE;                //$NON-NLS-1$
    private static final String KEY_PERSON                   = TABLE_TOUR_PERSON              + "_" + ENTITY_ID_PERSON;              //$NON-NLS-1$
    public static final String  KEY_TAG                      = TABLE_TOUR_TAG                 + "_" + ENTITY_ID_TAG;                 //$NON-NLS-1$
@@ -4417,6 +4423,66 @@ public class TourDatabase {
    }
 
    /**
+    * Create table {@link #TABLE_EQUIPMENT}
+    *
+    * @param stmt
+    *
+    * @throws SQLException
+    */
+   private void createTable_Equipment(final Statement stmt) throws SQLException {
+
+      exec(stmt, "CREATE TABLE " + TABLE_EQUIPMENT + "   (                                   " + NL //$NON-NLS-1$ //$NON-NLS-2$
+      //
+            + SQL.createField_EntityId(ENTITY_ID_EQUIPMENT, true)
+
+            // version 60 start
+
+            + "   Name                 VARCHAR(" + Equipment.DB_LENGTH_NAME + "),            " + NL //$NON-NLS-1$ //$NON-NLS-2$
+            + "   Model                VARCHAR(" + Equipment.DB_LENGTH_NAME + "),            " + NL //$NON-NLS-1$ //$NON-NLS-2$
+            + "   Description          VARCHAR(" + Equipment.DB_LENGTH_DESCRIPTION + "),     " + NL //$NON-NLS-1$ //$NON-NLS-2$
+
+            + "   EquipmentType        VARCHAR(" + Equipment.DB_LENGTH_NAME + "),            " + NL //$NON-NLS-1$ //$NON-NLS-2$
+
+            + "   DateBuilt            BIGINT DEFAULT 0,                                     " + NL //$NON-NLS-1$
+            + "   DateFirstUse         BIGINT DEFAULT 0,                                     " + NL //$NON-NLS-1$
+            + "   DateRetired          BIGINT DEFAULT 0,                                     " + NL //$NON-NLS-1$
+
+            + "   Weight               FLOAT DEFAULT 0,                                      " + NL //$NON-NLS-1$
+            + "   DistanceFirstUse     FLOAT DEFAULT 0                                      " + NL //$NON-NLS-1$
+
+            // version 60 end
+
+            + ")" //                                                                                  //$NON-NLS-1$
+      );
+
+      /**
+       * Create table: TOURDATA_Equipment
+       */
+      exec(stmt,
+
+            "CREATE TABLE " + JOINTABLE__TOURDATA__EQUIPMENT + "   (                         " + NL //$NON-NLS-1$ //$NON-NLS-2$
+
+                  + "   " + KEY_EQUIPMENT + "   BIGINT NOT NULL,                             " + NL //$NON-NLS-1$ //$NON-NLS-2$
+                  + "   " + KEY_TOUR + "        BIGINT NOT NULL                              " + NL //$NON-NLS-1$ //$NON-NLS-2$
+
+                  + ")"); //$NON-NLS-1$
+
+      // Add Constraint
+      final String fkName = "fk_" + JOINTABLE__TOURDATA__EQUIPMENT + "_" + KEY_TOUR; //             //$NON-NLS-1$ //$NON-NLS-2$
+
+      exec(stmt,
+
+            "ALTER TABLE " + JOINTABLE__TOURDATA__EQUIPMENT + "                              " + NL //$NON-NLS-1$ //$NON-NLS-2$
+                  + "   ADD CONSTRAINT " + fkName + "                                        " + NL //$NON-NLS-1$ //$NON-NLS-2$
+                  + "   FOREIGN KEY (" + KEY_TOUR + ")                                       " + NL //$NON-NLS-1$ //$NON-NLS-2$
+                  + "   REFERENCES " + TABLE_TOUR_DATA + " (" + ENTITY_ID_TOUR + ")          " + NL //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+      );
+
+      // Create index Equipment_EquipmentId
+      SQL.createIndex(stmt, JOINTABLE__TOURDATA__EQUIPMENT, KEY_EQUIPMENT);
+   }
+
+   /**
     * Create table {@link #TABLE_TOUR_BEVERAGE_CONTAINER} for {@link TourBeverageContainer}.
     *
     * @param stmt
@@ -5457,7 +5523,8 @@ public class TourDatabase {
                   + "   " + KEY_TAG + "      BIGINT NOT NULL,                          " + NL //$NON-NLS-1$ //$NON-NLS-2$
                   + "   " + KEY_TOUR + "     BIGINT NOT NULL                           " + NL //$NON-NLS-1$ //$NON-NLS-2$
 
-                  + ")"); //$NON-NLS-1$
+                  + ")" //                                                                    //$NON-NLS-1$
+      );
 
       // Add Constraint
       final String fkName = "fk_" + JOINTABLE__TOURDATA__TOURTAG + "_" + KEY_TOUR; //         //$NON-NLS-1$ //$NON-NLS-2$
@@ -5470,7 +5537,7 @@ public class TourDatabase {
                   + "   REFERENCES " + TABLE_TOUR_DATA + " (" + ENTITY_ID_TOUR + ")    " + NL //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
       );
 
-      // Create index TOURTAG_TAGID
+      // Create index TOURTAG_TagID
       SQL.createIndex(stmt, JOINTABLE__TOURDATA__TOURTAG, KEY_TAG);
    }
 
@@ -6314,6 +6381,8 @@ public class TourDatabase {
 
             createTable_TourTag(stmt);
             createTable_TourTag_Category(stmt);
+            
+            createTable_Equipment(stmt);
 
             createTable_TourWayPoint(stmt);
 
@@ -6947,9 +7016,14 @@ public class TourDatabase {
             currentDbVersion = _dbDesignVersion_New = updateDb_057_To_058(conn, splashManager);
          }
 
-         // 58 -> 59    25.6+++
+         // 58 -> 59    25.11
          if (currentDbVersion == 58) {
             currentDbVersion = _dbDesignVersion_New = updateDb_058_To_059(conn, splashManager);
+         }
+
+         // 59 -> 60    25.11+++
+         if (currentDbVersion == 59) {
+            currentDbVersion = _dbDesignVersion_New = updateDb_059_To_060(conn, splashManager);
          }
 
          // update db design version number
@@ -11252,6 +11326,35 @@ public class TourDatabase {
       /**
        * The db version update is done in TourDataUpdate_058_to_059
        */
+   }
+
+   /**
+    * @param conn
+    * @param splashManager
+    *
+    * @return
+    *
+    * @throws SQLException
+    */
+   private int updateDb_059_To_060(final Connection conn, final SplashManager splashManager) throws SQLException {
+
+      final int newDbVersion = 60;
+
+      logDbUpdate_Start(newDbVersion);
+      updateMonitor(splashManager, newDbVersion);
+
+      final Statement stmt = conn.createStatement();
+      {
+         // double check if db already exists
+         if (isTableAvailable(conn, TABLE_EQUIPMENT) == false) {
+            createTable_Equipment(stmt);
+         }
+      }
+      stmt.close();
+
+      logDbUpdate_End(newDbVersion);
+
+      return newDbVersion;
    }
 
    private void updateMonitor(final SplashManager splashManager, final int newDbVersion) {

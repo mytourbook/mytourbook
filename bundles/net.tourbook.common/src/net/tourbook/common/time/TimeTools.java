@@ -710,9 +710,9 @@ public class TimeTools {
       return tzIndex;
    }
 
-   public static String getUTCISODateTime(final long date) {
+   public static String getUTCISODateTime(final long epochOfMilli) {
 
-      return Instant.ofEpochMilli(date)
+      return Instant.ofEpochMilli(epochOfMilli)
             .atZone(TimeTools.UTC)
             .format(DateTimeFormatter.ISO_DATE_TIME);
    }
