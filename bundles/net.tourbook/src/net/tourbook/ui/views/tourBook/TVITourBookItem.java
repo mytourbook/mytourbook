@@ -220,19 +220,22 @@ public abstract class TVITourBookItem extends TreeViewerItem implements ITourIte
             + "hasGeoData, " //                                   97    //$NON-NLS-1$
 
             // this shortened field needs an alias otherwise the flat tour book view do not work !!!
-            + "SUBSTR(TourDescription, 1, 100) AS TourDescription" //   98    //$NON-NLS-1$
+            + "SUBSTR(TourDescription, 1, 100) AS TourDescription," //   98    //$NON-NLS-1$
+
+            // -------- RADAR -----------
+            + "numberOfPassedVehicles " //                        99    //$NON-NLS-1$
       ;
 
-      //////////////////////////////////////////////////////////////////////////////////////////
+      SQL_ALL_OTHER_FIELDS__COLUMN_START_NUMBER = 100;
+
+      // ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
       //
-      // VERY IMPORTANT
+      // !!! VERY IMPORTANT !!!
       //
       // Adjust constant SQL_ALL_OTHER_FIELDS__COLUMN_START_NUMBER when sql fields are added,
-      // otherwise tags and number of markers are not displayed !!!
+      // otherwise tags and number of markers are not displayed or causing an exception
       //
-      //////////////////////////////////////////////////////////////////////////////////////////
-
-      SQL_ALL_OTHER_FIELDS__COLUMN_START_NUMBER = 99;
+      // ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
       /////////////////////////////////////////////////////////////////////////
       // -------- JOINT TABLES, they are added at the end --------------
@@ -287,7 +290,9 @@ public abstract class TVITourBookItem extends TreeViewerItem implements ITourIte
             + "Weather_Wind_Speed," + NL //                                //$NON-NLS-1$
 
             + "tourDeviceTime_Recorded," + NL //                           //$NON-NLS-1$
-            + "tourDeviceTime_Paused" + NL //                              //$NON-NLS-1$
+            + "tourDeviceTime_Paused," + NL //                             //$NON-NLS-1$
+
+            + "numberOfPassedVehicles" + NL //                             //$NON-NLS-1$
       ;
 
       SQL_SUM_COLUMNS = UI.EMPTY_STRING
@@ -305,7 +310,7 @@ public abstract class TVITourBookItem extends TreeViewerItem implements ITourIte
             //
             + "AVG( CASE WHEN AvgPulse = 0         THEN NULL ELSE AvgPulse END), " + NL //                                    9     //$NON-NLS-1$
             + "AVG( CASE WHEN AvgCadence = 0       THEN NULL ELSE DOUBLE(AvgCadence) * CadenceMultiplier END)," + NL //       10    //$NON-NLS-1$
-            + "AVG( CASE WHEN weather_Temperature_Average_Device = 0   THEN NULL ELSE DOUBLE(weather_Temperature_Average_Device) / TemperatureScale END)," //$NON-NLS-1$
+            + "AVG( CASE WHEN weather_Temperature_Average_Device = 0 THEN NULL ELSE DOUBLE(weather_Temperature_Average_Device) / TemperatureScale END)," //$NON-NLS-1$
             + NL //    11
             + "AVG( CASE WHEN Weather_Wind_Direction = 0 THEN NULL ELSE Weather_Wind_Direction END), " + NL //                12    //$NON-NLS-1$
             + "AVG( CASE WHEN Weather_Wind_Speed = 0 THEN NULL ELSE Weather_Wind_Speed END), " + NL //                        13    //$NON-NLS-1$
@@ -332,7 +337,9 @@ public abstract class TVITourBookItem extends TreeViewerItem implements ITourIte
             + "SUM( CAST(tourDeviceTime_Recorded AS BIGINT))," + NL //  27 //$NON-NLS-1$
             + "SUM( CAST(tourDeviceTime_Paused AS BIGINT))," + NL //    28 //$NON-NLS-1$
 
-            + "AVG( CASE WHEN weather_Temperature_Average = 0   THEN NULL ELSE DOUBLE(weather_Temperature_Average) / TemperatureScale END)" // 29 //$NON-NLS-1$
+            + "AVG( CASE WHEN weather_Temperature_Average = 0   THEN NULL ELSE DOUBLE(weather_Temperature_Average) / TemperatureScale END)," + NL // 29 //$NON-NLS-1$
+
+            + "SUM( CAST(numberOfPassedVehicles AS BIGINT))" + NL //     30 //$NON-NLS-1$
       ;
 
    }
@@ -430,6 +437,10 @@ public abstract class TVITourBookItem extends TreeViewerItem implements ITourIte
    String        colSlowVsFastCadence;
 
    int           colCadenceZonesDelimiter;
+   //
+   // ----------- Radar ---------
+   //
+   int colRadar_PassedVehicles;
    //
    // ----------- Running Dynamics ---------
    //
@@ -692,17 +703,21 @@ public abstract class TVITourBookItem extends TreeViewerItem implements ITourIte
 
       tourItem.colTourDescription                     = result.getString(98);
 
+      // -------- RADAR -----------
+
+      tourItem.colRadar_PassedVehicles                = result.getInt(99);
+
 
       // -----------------------------------------------
 
 
-      tourItem.colBodyWeight              = dbBodyWeight;
-      tourItem.colTraining_PowerToWeight  = dbBodyWeight == 0 ? 0 : dbAvgPower / dbBodyWeight;
+      tourItem.colBodyWeight                    = dbBodyWeight;
+      tourItem.colTraining_PowerToWeight        = dbBodyWeight == 0 ? 0 : dbAvgPower / dbBodyWeight;
 
-      tourItem.colAvgCadence              = dbAvgCadence * dbCadenceMultiplier;
-      tourItem.colCadenceMultiplier       = dbCadenceMultiplier;
+      tourItem.colAvgCadence                    = dbAvgCadence * dbCadenceMultiplier;
+      tourItem.colCadenceMultiplier             = dbCadenceMultiplier;
 
-      tourItem.colSlowVsFastCadence       = TourManager.generateCadenceZones_TimePercentages(cadenceZone_SlowTime, cadenceZone_FastTime);
+      tourItem.colSlowVsFastCadence             = TourManager.generateCadenceZones_TimePercentages(cadenceZone_SlowTime, cadenceZone_FastTime);
 
       tourItem.colTemperature_Average_Device    = dbAvgTemperature_Device / dbTemperatureScale;
       tourItem.colTemperature_Average           = dbAvgTemperature / dbTemperatureScale;
@@ -821,6 +836,8 @@ public abstract class TVITourBookItem extends TreeViewerItem implements ITourIte
       colTourDeviceTime_Paused         = result.getLong(startIndex + 28);
 
       colTemperature_Average           = result.getFloat(startIndex + 29);
+
+      colRadar_PassedVehicles          = result.getInt(startIndex + 30);
 
       colTourDeviceTime_Paused         = colTourDeviceTime_Elapsed - colTourDeviceTime_Recorded;
       colTourComputedTime_Break        = colTourDeviceTime_Elapsed - colTourComputedTime_Moving;

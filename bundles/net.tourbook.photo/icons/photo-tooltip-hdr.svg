@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   width="16"
+   height="16.00021"
+   id="svg2985"
+   version="1.1"
+   viewBox="0 0 16 16.000211"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:dc="http://purl.org/dc/elements/1.1/">
+  <defs
+     id="defs2987">
+    <linearGradient
+       id="linearGradient6402">
+      <stop
+         id="stop6404"
+         offset="0"
+         style="stop-color:#000000;stop-opacity:1;" />
+      <stop
+         id="stop6406"
+         offset="1"
+         style="stop-color:#000000;stop-opacity:0;" />
+    </linearGradient>
+    <linearGradient
+       id="linearGradient3816">
+      <stop
+         id="stop3818"
+         offset="0"
+         style="stop-color:#ffa576;stop-opacity:1;" />
+      <stop
+         style="stop-color:#f45400;stop-opacity:1;"
+         offset="1"
+         id="stop3782" />
+    </linearGradient>
+  </defs>
+  <metadata
+     id="metadata2990">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <g
+     id="layer1"
+     transform="translate(-150,-58.99979)">
+    <ellipse
+       ry="7.500001"
+       rx="7.499999"
+       cy="67"
+       cx="158"
+       id="path1974-4"
+       style="fill:#cccccc;fill-opacity:1;stroke:#808080;stroke-width:1;stroke-linecap:round;stroke-linejoin:bevel;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;paint-order:normal" />
+    <rect
+       y="58.99979"
+       x="150"
+       height="15.999999"
+       width="15.999966"
+       id="rect6561-8-2-9-1-9-6-6-0-8-3-0"
+       style="opacity:0.99;fill:none;stroke:none" />
+    <g
+       style="fill:#333333;fill-opacity:1"
+       transform="translate(-129.99986,-77.362372)"
+       id="g1972-5">
+      <path
+         style="fill:#333333;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+         d="M 287,140.36218 H 289 V 142.36218 H 287 Z"
+         id="path1966-96" />
+      <path
+         style="fill:#333333;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+         d="M 286,143.36218 H 289 V 147.36218 H 290 V 148.36218 H 286 V 147.36218 H 287 V 144.36218 H 286 Z"
+         id="path1968-3" />
+    </g>
+  </g>
+</svg>

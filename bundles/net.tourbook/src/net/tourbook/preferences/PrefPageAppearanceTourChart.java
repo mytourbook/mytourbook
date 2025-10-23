@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2025 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -205,7 +205,7 @@ public class PrefPageAppearanceTourChart extends PreferencePage implements IWork
 
    private void createUI_13_GraphCheckBoxList(final Composite parent) {
 
-      _graphCheckboxList = CheckboxTableViewer.newCheckList(//
+      _graphCheckboxList = CheckboxTableViewer.newCheckList(
             parent,
             SWT.SINGLE | SWT.TOP /* | SWT.BORDER */);
 //      _graphCheckboxList.getTable().setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_RED));
@@ -315,8 +315,9 @@ public class PrefPageAppearanceTourChart extends PreferencePage implements IWork
 
    /**
     * Tab: Options
-    * 
+    *
     * @param parent
+    *
     * @return
     */
    private Control createUI_50_Tab_2_Options(final Composite parent) {
@@ -525,9 +526,14 @@ public class PrefPageAppearanceTourChart extends PreferencePage implements IWork
       final Graph graph_Pulse                         = new Graph(TourManager.GRAPH_PULSE,                        OtherMessages.GRAPH_LABEL_HEARTBEAT);
       final Graph graph_Temperature                   = new Graph(TourManager.GRAPH_TEMPERATURE,                  OtherMessages.GRAPH_LABEL_TEMPERATURE);
       final Graph graph_Cadence                       = new Graph(TourManager.GRAPH_CADENCE,                      OtherMessages.GRAPH_LABEL_CADENCE);
-      final Graph graph_Gears                         = new Graph(TourManager.GRAPH_GEARS,                        OtherMessages.GRAPH_LABEL_GEARS);
+      final Graph graph_Gears                         = new Graph(TourManager.GRAPH_GEARS,                        OtherMessages.GRAPH_LABEL_GEAR_RATIO);
       final Graph graph_Altimeter                     = new Graph(TourManager.GRAPH_ALTIMETER,                    OtherMessages.GRAPH_LABEL_ALTIMETER);
       final Graph graph_Gradient                      = new Graph(TourManager.GRAPH_GRADIENT,                     OtherMessages.GRAPH_LABEL_GRADIENT);
+
+      final Graph graph_Radar_PassedVehicles          = new Graph(TourManager.GRAPH_RADAR_PASSED_VEHICLES,        OtherMessages.GRAPH_LABEL_RADAR_PASSED_VEHICLES,            OtherMessages.GRAPH_LABEL_PREFIX_RADAR);
+      final Graph graph_Radar_DistanceToVehicle       = new Graph(TourManager.GRAPH_RADAR_DISTANCE_TO_VEHICLE,    OtherMessages.GRAPH_LABEL_RADAR_DISTANCE_TO_VEHICLE,        OtherMessages.GRAPH_LABEL_PREFIX_RADAR);
+      final Graph graph_Radar_PassingSpeed_Absolute   = new Graph(TourManager.GRAPH_RADAR_PASSING_SPEED_ABSOLUTE, OtherMessages.GRAPH_LABEL_RADAR_PASSING_SPEED_ABSOLUTE,     OtherMessages.GRAPH_LABEL_PREFIX_RADAR);
+      final Graph graph_Radar_PassingSpeed_Relative   = new Graph(TourManager.GRAPH_RADAR_PASSING_SPEED_RELATIVE, OtherMessages.GRAPH_LABEL_RADAR_PASSING_SPEED_RELATIVE,     OtherMessages.GRAPH_LABEL_PREFIX_RADAR);
 
       final Graph graph_RunDyn_StanceTime             = new Graph(TourManager.GRAPH_RUN_DYN_STANCE_TIME,          OtherMessages.GRAPH_LABEL_RUN_DYN_STANCE_TIME,              OtherMessages.GRAPH_LABEL_PREFIX_RUNNING_DYNAMICS);
       final Graph graph_RunDyn_StanceTimeBalance      = new Graph(TourManager.GRAPH_RUN_DYN_STANCE_TIME_BALANCED, OtherMessages.GRAPH_LABEL_RUN_DYN_STANCE_TIME_BALANCE,      OtherMessages.GRAPH_LABEL_PREFIX_RUNNING_DYNAMICS);
@@ -557,6 +563,11 @@ public class PrefPageAppearanceTourChart extends PreferencePage implements IWork
       _graphMap.put(TourManager.GRAPH_GEARS,                         graph_Gears);
       _graphMap.put(TourManager.GRAPH_ALTIMETER,                     graph_Altimeter);
       _graphMap.put(TourManager.GRAPH_GRADIENT,                      graph_Gradient);
+
+      _graphMap.put(TourManager.GRAPH_RADAR_PASSED_VEHICLES,         graph_Radar_PassedVehicles);
+      _graphMap.put(TourManager.GRAPH_RADAR_DISTANCE_TO_VEHICLE,     graph_Radar_DistanceToVehicle);
+      _graphMap.put(TourManager.GRAPH_RADAR_PASSING_SPEED_ABSOLUTE,  graph_Radar_PassingSpeed_Absolute);
+      _graphMap.put(TourManager.GRAPH_RADAR_PASSING_SPEED_RELATIVE,  graph_Radar_PassingSpeed_Relative);
 
       _graphMap.put(TourManager.GRAPH_RUN_DYN_STANCE_TIME,           graph_RunDyn_StanceTime);
       _graphMap.put(TourManager.GRAPH_RUN_DYN_STANCE_TIME_BALANCED,  graph_RunDyn_StanceTimeBalance);
@@ -588,6 +599,11 @@ public class PrefPageAppearanceTourChart extends PreferencePage implements IWork
       _graphList.add(graph_Gears);
       _graphList.add(graph_Altimeter);
       _graphList.add(graph_Gradient);
+
+      _graphList.add(graph_Radar_PassedVehicles);
+      _graphList.add(graph_Radar_DistanceToVehicle);
+      _graphList.add(graph_Radar_PassingSpeed_Absolute);
+      _graphList.add(graph_Radar_PassingSpeed_Relative);
 
       _graphList.add(graph_RunDyn_StanceTime);
       _graphList.add(graph_RunDyn_StanceTimeBalance);

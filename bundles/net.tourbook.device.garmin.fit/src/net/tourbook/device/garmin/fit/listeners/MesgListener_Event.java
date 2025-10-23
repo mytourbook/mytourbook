@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2025 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -24,6 +24,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import net.tourbook.data.GearData;
+import net.tourbook.data.GearDataType;
 import net.tourbook.device.garmin.fit.FitData;
 
 /**
@@ -43,7 +44,7 @@ public class MesgListener_Event extends AbstractMesgListener implements EventMes
 
       super(fitData);
 
-      _gearData = fitData.getGearData();
+      _gearData = fitData.getGearData(GearDataType.FRONT_GEAR_TEETH__REAR_GEAR_TEETH);
 
       _pausedTime_Start = fitData.getPausedTime_Start();
       _pausedTime_End = fitData.getPausedTime_End();

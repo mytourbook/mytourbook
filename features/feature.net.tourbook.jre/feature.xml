@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <feature
       id       ="feature.net.tourbook.jre"
-      label    ="Eclipse Temurin by Adoptium - OpenJDK 17"
+      label    ="Eclipse Temurin by Adoptium - OpenJDK 21"
       version  ="21.0.8.qualifier"
       plugin   ="net.tourbook.branding">
 

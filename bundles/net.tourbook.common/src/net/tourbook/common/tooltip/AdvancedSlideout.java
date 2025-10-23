@@ -572,9 +572,9 @@ public abstract class AdvancedSlideout extends AdvancedSlideoutShell {
 
    public void setDarkThemeForToolbarActions() {
 
-      _actionCloseSlideout.setImageDescriptor(CommonActivator.getThemedImageDescriptor_Dark(CommonImages.App_Close));
-      _actionKeepSlideoutOpen.setImageDescriptor(CommonActivator.getThemedImageDescriptor_Dark(CommonImages.App_KeepOpen));
-      _actionPinSlideout.setImageDescriptor(CommonActivator.getThemedImageDescriptor_Dark(CommonImages.App_Pin));
+      _actionCloseSlideout.setImageDescriptor(CommonActivator.getImageDescriptor_Dark(CommonImages.App_Close));
+      _actionKeepSlideoutOpen.setImageDescriptor(CommonActivator.getImageDescriptor_Dark(CommonImages.App_KeepOpen));
+      _actionPinSlideout.setImageDescriptor(CommonActivator.getImageDescriptor_Dark(CommonImages.App_Pin));
    }
 
    public void setSlideoutLocation(final SlideoutLocation slideoutLocation) {

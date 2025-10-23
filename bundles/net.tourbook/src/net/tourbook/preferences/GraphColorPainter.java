@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2025 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -18,6 +18,8 @@ package net.tourbook.preferences;
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Set;
 
 import net.tourbook.common.UI;
 import net.tourbook.common.color.ColorDefinition;
@@ -36,17 +38,17 @@ import org.eclipse.swt.widgets.Tree;
 
 public class GraphColorPainter {
 
-   static final int                     GRAPH_COLOR_SPACING = 5;
+   static final int                     GRAPH_COLOR_SPACING            = 5;
 
    private final IColorTreeViewer       _colorTreeViewer;
 
-   private final HashMap<String, Image> _imageCache         = new HashMap<>();
-   private final HashMap<String, Color> _colorCache         = new HashMap<>();
+   private final HashMap<String, Image> _imageCache                    = new HashMap<>();
+   private final HashMap<String, Color> _colorCache                    = new HashMap<>();
 
    private final int                    _itemHeight;
 
-   private String                       _recreateColorId;
-   private String                       _recreateColorDefinitionId;
+   private Set<String>                  _allRecreateColorIds           = new HashSet<>();
+   private Set<String>                  _allRecreateColorDefinitionIds = new HashSet<>();
 
    /**
     * @param colorTree
@@ -87,13 +89,13 @@ public class GraphColorPainter {
 
       final String colorDefinitionId = colorDefinition.getColorDefinitionId();
 
-      if (isRecreateTourTypeImages || colorDefinitionId.equals(_recreateColorDefinitionId)) {
+      if (isRecreateTourTypeImages || _allRecreateColorDefinitionIds.contains(colorDefinitionId)) {
 
          /*
           * Dispose image for the color definition
           */
 
-         _recreateColorDefinitionId = null;
+         _allRecreateColorDefinitionIds.remove(colorDefinitionId);
 
          final Image image = _imageCache.remove(colorDefinitionId);
          if (image != null && !image.isDisposed()) {
@@ -199,13 +201,13 @@ public class GraphColorPainter {
 
       final String colorId = graphColorItem.getColorId();
 
-      if (isRecreateTourTypeImages || colorId.equals(_recreateColorId)) {
+      if (isRecreateTourTypeImages || _allRecreateColorIds.contains(colorId)) {
 
          /*
           * Dispose graph color image/color
           */
 
-         _recreateColorId = null;
+         _allRecreateColorIds.remove(colorId);
 
          final Image image = _imageCache.remove(colorId);
          if (image != null && !image.isDisposed()) {
@@ -305,8 +307,8 @@ public class GraphColorPainter {
 
    public void invalidateResources(final String colorId, final String colorDefinitionId) {
 
-      _recreateColorId = colorId;
-      _recreateColorDefinitionId = colorDefinitionId;
+      _allRecreateColorIds.add(colorId);
+      _allRecreateColorDefinitionIds.add(colorDefinitionId);
    }
 
 }

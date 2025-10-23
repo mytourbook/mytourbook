@@ -2094,26 +2094,26 @@ public class TourDatabase {
    }
 
    /**
-    * @param tagIds
+    * @param allTagIds
     *
-    * @return Returns the tag names separated with a comma or an empty string when tagIds are.
+    * @return Returns the tag names separated with a comma or an empty string when tagIds are
     *         <code>null</code>
     */
-   public static String getTagNames(final List<Long> tagIds) {
+   public static String getTagNames(final List<Long> allTagIds) {
 
-      if (tagIds == null) {
+      if (allTagIds == null) {
          return UI.EMPTY_STRING;
       }
 
-      final HashMap<Long, TourTag> hashTags = getAllTourTags();
-      final ArrayList<String> tagNames = new ArrayList<>();
+      final HashMap<Long, TourTag> allTourTags = getAllTourTags();
+      final ArrayList<String> allTagNames = new ArrayList<>();
 
       // get tag name for each tag id
-      for (final Long tagId : tagIds) {
-         final TourTag tag = hashTags.get(tagId);
+      for (final Long tagId : allTagIds) {
+         final TourTag tag = allTourTags.get(tagId);
 
          if (tag != null) {
-            tagNames.add(tag.getTagName());
+            allTagNames.add(tag.getTagName());
          } else {
             try {
                throw new MyTourbookException("tag id '" + tagId + "' is not available"); //$NON-NLS-1$ //$NON-NLS-2$
@@ -2123,7 +2123,7 @@ public class TourDatabase {
          }
       }
 
-      return getTagNamesText(tagNames, false);
+      return getTagNamesText(allTagNames, false);
    }
 
    /**
@@ -4367,7 +4367,8 @@ public class TourDatabase {
 
             // version 59 start
 
-            + "   DeviceType           SMALLINT DEFAULT -1                                      " + NL //$NON-NLS-1$
+            + "   DeviceType           SMALLINT DEFAULT -1,                                     " + NL //$NON-NLS-1$
+            + "   DeviceName           VARCHAR(" + DeviceSensor.DB_LENGTH_NAME + ")             " + NL //$NON-NLS-1$ //$NON-NLS-2$
 
             // version 59 end
 
@@ -4899,6 +4900,12 @@ public class TourDatabase {
             // version 58 start  -  25.x
 
             + "   poolLength                             INTEGER DEFAULT 0,            " + NL //$NON-NLS-1$
+
+            // version 58 end
+
+            // version 59 start  -  after 25.8
+
+            + "   numberOfPassedVehicles                 INTEGER DEFAULT 0,            " + NL //$NON-NLS-1$
 
             // version 58 end
 
@@ -11125,7 +11132,10 @@ public class TourDatabase {
 
 // SET_FORMATTING_OFF
 
-         SQL.addColumn_SmallInt(stmt, TABLE_DEVICE_SENSOR,     "deviceType",     DEFAULT_IGNORED);    //$NON-NLS-1$
+         SQL.addColumn_SmallInt(stmt, TABLE_TOUR_DATA,         "numberOfPassedVehicles", DEFAULT_0);              //$NON-NLS-1$
+
+         SQL.addColumn_SmallInt(stmt, TABLE_DEVICE_SENSOR,     "DeviceType",     DEFAULT_IGNORED);                //$NON-NLS-1$
+         SQL.addColumn_VarCar(  stmt, TABLE_DEVICE_SENSOR,     "DeviceName",     DeviceSensor.DB_LENGTH_NAME);    //$NON-NLS-1$
 
 // SET_FORMATTING_ON
 

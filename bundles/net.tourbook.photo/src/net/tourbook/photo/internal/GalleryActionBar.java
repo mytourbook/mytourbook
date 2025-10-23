@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2024 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2025 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -229,7 +229,11 @@ public class GalleryActionBar {
 
          _spinnerThumbSize.setSelection(imageSize);
 
-         final float scaledCanvasWidth = DPIUtil.pixelToPoint(imageSize, DPIUtil.getDeviceZoom());
+         final int deviceZoom = DPIUtil.getDeviceZoom();
+         final float scalingFactor = DPIUtil.getScalingFactor(deviceZoom);
+         
+         final float scaledCanvasWidth = imageSize * scalingFactor;
+
          final boolean isHqImage = scaledCanvasWidth > PhotoLoadManager.IMAGE_SIZE_THUMBNAIL;
 
          _canvasImageSizeIndicator.setIndicator(isHqImage);

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2025 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -21,17 +21,19 @@ import org.eclipse.swt.graphics.RGB;
 
 public class GraphColorItem {
 
-   private ColorDefinition _colorDefinition;
+   private static final char NL = UI.NEW_LINE;
 
-   private String          _colorPrefName;
-   private String          _visibleName;
+   private ColorDefinition   _colorDefinition;
 
-   private String          _colorId;
+   private String            _colorPrefName;
+   private String            _visibleName;
+
+   private String            _colorId;
 
    /**
     * Is <code>true</code> when this {@link GraphColorItem} is used as for a map color.
     */
-   private boolean         _isMapColor;
+   private boolean           _isMapColor;
 
    public GraphColorItem(final ColorDefinition colorDefinition,
                          final String colorPrefName,
@@ -98,6 +100,35 @@ public class GraphColorItem {
       return _isMapColor;
    }
 
+   /**
+    * @param fromOneGraphColor
+    *
+    * @return Returns <code>true</code> when the graph color could be set, otherwise
+    *         <code>false</code>
+    */
+   public boolean setGraphColor(final GraphColorItem fromOneGraphColor) {
+
+      final String fromGraphColorId = fromOneGraphColor.getColorId();
+      final ColorDefinition fromColorDefinition = fromOneGraphColor.getColorDefinition();
+
+      final GraphColorItem[] allFromGraphColor = fromColorDefinition.getGraphColorItems();
+
+      for (final GraphColorItem fromGraphColor : allFromGraphColor) {
+
+         if (fromGraphColor.getColorId().equals(fromGraphColorId)) {
+
+            final RGB pastedRGB = fromGraphColor.getRGB();
+
+            // clone and set new color
+            setRGB(new RGB(pastedRGB.red, pastedRGB.green, pastedRGB.blue));
+
+            return true;
+         }
+      }
+
+      return false;
+   }
+
    public void setName(final String name) {
       _visibleName = name;
    }
@@ -135,12 +166,19 @@ public class GraphColorItem {
    @Override
    public String toString() {
 
-      return "GraphColorItem [" //$NON-NLS-1$
+      return UI.EMPTY_STRING
 
-            + "_visibleName=" + _visibleName + ", " //$NON-NLS-1$ //$NON-NLS-2$
-            + "_colorId=" + _colorId + ", " //$NON-NLS-1$ //$NON-NLS-2$
-            + "_colorPrefName=" + _colorPrefName //$NON-NLS-1$
+            + "GraphColorItem" + NL //                                  //$NON-NLS-1$
 
-            + "]"; //$NON-NLS-1$
+            + "  _visibleName       = " + _visibleName + NL //          //$NON-NLS-1$
+            + "  _colorId           = " + _colorId + NL //              //$NON-NLS-1$
+            + "  _colorPrefName     = " + _colorPrefName + NL //        //$NON-NLS-1$
+            + "  _isMapColor        = " + _isMapColor + NL //           //$NON-NLS-1$
+
+// THIS MAY CAUSE AN ENDLESS LOOP -> com.sun.jdi.InvocationException: Exception occurred in target VM occurred invoking method.
+//          + "  _colorDefinition   = " + _colorDefinition + NL //      //$NON-NLS-1$
+
+      ;
+
    }
 }

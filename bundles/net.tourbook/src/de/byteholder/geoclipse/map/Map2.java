@@ -357,6 +357,9 @@ public class Map2 extends Canvas {
    private boolean                       _isShowDebug_TileBorder;
    private boolean                       _isShowDebug_GeoGrid;
 
+   @SuppressWarnings("unused")
+   private final StringBuilder           _debugLog                  = new StringBuilder();
+
    /**
     * Factory used by this component to grab the tiles necessary for painting the map.
     */
@@ -425,7 +428,7 @@ public class Map2 extends Canvas {
    private Future<?>                       _mapPointPainter_Task;
 
    /**
-    * The {@link #_mapPointPainter_Executor} is drawing into this image.
+    * The {@link #_mapPointPainter_Executor} is drawing into this image
     */
    private Image                           _mapPointImage;
 
@@ -433,7 +436,7 @@ public class Map2 extends Canvas {
     * Cleanup images, they cannot be disposed in the UI thread otherwise there are tons of
     * exceptions when the map image is resized
     */
-   private List<Image>                     _disposableMapPointImagesSWT     = new ArrayList<>();
+   private List<Image>                     _allDisposableMapPointImages_SWT = new ArrayList<>();
 
    /**
     * It looks like that onResize() is not called very early from the swtbot to initialize this
@@ -5871,7 +5874,8 @@ public class Map2 extends Canvas {
     */
    private void paint_40_MapPoints(final GC gcMapImage) {
 
-      if (_mapConfig == null
+      if (_isMapPointVisible == false
+            || _mapConfig == null
             || _mapConfig.isShowTourMarker == false
                   && _mapConfig.isShowTourLocation == false
                   && _mapConfig.isShowCommonLocation == false
@@ -7139,7 +7143,7 @@ public class Map2 extends Canvas {
 
       if (_mapPointPainter_Task != null) {
 
-         // an overlay task is currently running
+         // a task is currently running
 
          final boolean isDone = _mapPointPainter_Task.isDone();
 
@@ -7331,19 +7335,113 @@ public class Map2 extends Canvas {
             }
 
          } finally {
+
             g2d.dispose();
          }
 
-         final Image swtImage = new Image(getDisplay(), new CustomScalingImageDataProvider(awtImage));
-
          /*
-          * This may be needed to be synchronized ?
+          * Convert AWT -> SWT image
           */
-         final Image oldImage = _mapPointImage;
 
-         _mapPointImage = swtImage;
+         /**
+          * Cleanup images, they cannot be disposed in the UI thread otherwise there are tons of
+          * exceptions when the map image is resized.
+          * <p>
+          */
+         synchronized (_allDisposableMapPointImages_SWT) {
 
-         UI.disposeResource(oldImage);
+            final CustomScalingImageDataProvider imageDataProvider = new CustomScalingImageDataProvider(awtImage);
+
+            _mapPointImage = new Image(getDisplay(), imageDataProvider);
+
+            _allDisposableMapPointImages_SWT.add(_mapPointImage);
+
+            /**
+             * Starting with Eclipse 4.37. the below exception occurs.
+             * <p>
+             * The below code "_mapPointImage.getImageData();" has "fixed" the below exception, no
+             * exceptions where discovered with this code. However this code causes that the map
+             * point image "jumps" when the map is panned.
+             * <p>
+             * When debugging the code, and a smaller map image of about 1000x1000 is fastly panned,
+             * then image.dispose() will interrupt the thread and a new runnable is run.
+             *
+             * <code>
+             *
+             * java.lang.Error: SWT Resource was not properly disposed
+             *    at org.eclipse.swt.graphics.Resource.initNonDisposeTracking(Resource.java:191)
+             *    at org.eclipse.swt.graphics.Resource.<init>(Resource.java:124)
+             *    at org.eclipse.swt.graphics.Image.<init>(Image.java:231)
+             *    at org.eclipse.swt.graphics.GC$ImageOperation.setCopyOfImage(GC.java:508)
+             *    at org.eclipse.swt.graphics.Image.lambda$4(Image.java:1026)
+             *    at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+             *    at org.eclipse.swt.graphics.Image.dispose(Image.java:1026)
+             *    at de.byteholder.geoclipse.map.Map2.paint_MapPointImage_10_Runnable(Map2.java:7372)
+             *    at de.byteholder.geoclipse.map.Map2.lambda$13(Map2.java:7168)
+             *    at java.base/java.util.concurrent.Executors$RunnableAdapter.call(Executors.java:572)
+             *
+             *
+             *  08:09:40.498 - 1 -    702 -   14889067 - Image {{200=org.eclipse.swt.graphics.Image$ImageHandle@23c2a091}}
+             *  08:09:40.498 - 2 -    702 -   14889067 - Image {{200=org.eclipse.swt.graphics.Image$ImageHandle@23c2a091}}
+             *  08:09:40.499 - 3 -    702 -   14889067 - Image {*DISPOSED*}
+             *  08:09:40.499 - 1 -    702 -  976994261 - Image {{}}
+             *
+             *  08:09:40.557 - 1 -    708 -  976994261 - Image {{200=org.eclipse.swt.graphics.Image$ImageHandle@65cc513}}
+             *  08:09:40.557 - 2 -    708 -  976994261 - Image {{200=org.eclipse.swt.graphics.Image$ImageHandle@65cc513}}
+             *  08:09:40.614 - 1 -    715 -  976994261 - Image {{200=org.eclipse.swt.graphics.Image$ImageHandle@65cc513}}
+             *  08:09:40.614 - 2 -    715 -  976994261 - Image {{200=org.eclipse.swt.graphics.Image$ImageHandle@65cc513}}
+             *  08:09:40.615 - 3 -    715 -  976994261 - Image {*DISPOSED*}
+             *  08:09:40.615 - 1 -    715 - 1644039150 - Image {{200=org.eclipse.swt.graphics.Image$ImageHandle@32954a7b}}
+             *  08:09:40.615 - 2 -    715 - 1644039150 - Image {{200=org.eclipse.swt.graphics.Image$ImageHandle@32954a7b}}
+             *  08:09:40.615 - 3 -    715 - 1644039150 - Image {*DISPOSED*}
+             *  08:09:40.615 - 1 -    715 -  589661322 - Image {{}}
+             *
+             *  08:09:40.670 - 1 -    721 -  589661322 - Image {{200=org.eclipse.swt.graphics.Image$ImageHandle@ca9fe5f}}
+             *  08:09:40.670 - 2 -    721 -  589661322 - Image {{200=org.eclipse.swt.graphics.Image$ImageHandle@ca9fe5f}}
+             *  08:09:40.670 - 3 -    721 -  589661322 - Image {*DISPOSED*}
+             *  08:09:40.670 - 1 -    721 -   52898661 - Image {{}}
+             *
+             * </code>
+             */
+            // 17 is used because a "correct" zoom level would cause an exception
+            _mapPointImage.getImageData(17);
+
+            for (final Image image : _allDisposableMapPointImages_SWT) {
+
+//               _debugLog.append(String.format("%s - 1 - %6d - %10d - %s\n",
+//                     UI.timeStampNano(),
+//                     _mapPointPainter_RunnableCounter.get(),
+//                     image.hashCode(),
+//                     image));
+
+               if (image == _mapPointImage) {
+                  continue;
+               }
+
+//               _debugLog.append(String.format("%s - 2 - %6d - %10d - %s\n",
+//                     UI.timeStampNano(),
+//                     _mapPointPainter_RunnableCounter.get(),
+//                     image.hashCode(),
+//                     image));
+
+               if (image != null) {
+                  image.dispose();
+               }
+
+//               _debugLog.append(String.format("%s - 3 - %6d - %10d - %s\n",
+//                     UI.timeStampNano(),
+//                     _mapPointPainter_RunnableCounter.get(),
+//                     image.hashCode(),
+//                     image));
+            }
+
+            _allDisposableMapPointImages_SWT.clear();
+            _allDisposableMapPointImages_SWT.add(_mapPointImage);
+
+//            System.out.println(_debugLog.toString());
+//            _debugLog.setLength(0);
+//            // TODO remove SYSTEM.OUT.PRINTLN
+         }
 
          _mapPointPainter_Viewport_WhenPainted = _mapPointPainter_Viewport_DuringPainting;
 
@@ -7359,22 +7457,6 @@ public class Map2 extends Canvas {
          // reset state which can happen when map is moved and no cluster is displayed
          if (_isMarkerClusterSelected && allPaintedMarkerClusters.size() == 0) {
             _isMarkerClusterSelected = false;
-         }
-
-         /*
-          * Cleanup images, they cannot be disposed in the UI thread otherwise there are tons of
-          * exceptions when the map image is resized
-          */
-         if (_disposableMapPointImagesSWT.size() > 0) {
-
-            synchronized (_disposableMapPointImagesSWT) {
-
-               for (final Image image : _disposableMapPointImagesSWT) {
-                  if (image != null) {
-                     image.dispose();
-                  }
-               }
-            }
          }
 
          /*

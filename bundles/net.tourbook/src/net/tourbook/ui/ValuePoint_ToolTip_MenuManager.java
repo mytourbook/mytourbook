@@ -73,6 +73,10 @@ public class ValuePoint_ToolTip_MenuManager {
    static final long                           VALUE_ID_SPEED_SUMMARIZED             = 1 << 23;
    static final long                           VALUE_ID_TIME_MOVING                  = 1 << 24;
    static final long                           VALUE_ID_TIME_RECORDED                = 1 << 25;
+   static final long                           VALUE_ID_RADAR_PASSED_VEHICLES        = 1 << 26;
+   static final long                           VALUE_ID_RADAR_DISTANCE_TO_VEHICLE    = 1 << 27;
+   static final long                           VALUE_ID_RADAR_PASSING_SPEED_ABSOLUTE = 1 << 28;
+   static final long                           VALUE_ID_RADAR_PASSING_SPEED_RELATIVE = 1 << 29;
 
    static final long                           DEFAULT_GRAPHS                        =
 
@@ -122,6 +126,11 @@ public class ValuePoint_ToolTip_MenuManager {
    private ActionValueItem                     _actionValue_TimeRecorded;
    private ActionValueItem                     _actionValue_TimeSlices;
    private ActionValueItem                     _actionValue_TourCompare_Result;
+
+   private ActionValueItem                     _actionValue_Radar_PassedVehicles;
+   private ActionValueItem                     _actionValue_Radar_DistanceToVehicle;
+   private ActionValueItem                     _actionValue_Radar_PassingSpeed_Absolute;
+   private ActionValueItem                     _actionValue_Radar_PassingSpeed_Relative;
 
    private ActionValueItem                     _actionValue_RunDyn_StanceTime;
    private ActionValueItem                     _actionValue_RunDyn_StanceTimeBalance;
@@ -486,6 +495,32 @@ public class ValuePoint_ToolTip_MenuManager {
             Messages.Tooltip_ValuePoint_Action_Value_TourCompareResult,
             Images.Graph_TourCompare_ByElevation);
 
+      /*
+       * Radar
+       */
+      _actionValue_Radar_PassedVehicles = new ActionValueItem(
+            VALUE_ID_RADAR_PASSED_VEHICLES,
+            Messages.Tooltip_ValuePoint_Action_Value_Radar_PassedVehicles,
+            Images.Graph_Radar_PassedVehicles);
+
+      _actionValue_Radar_DistanceToVehicle = new ActionValueItem(
+            VALUE_ID_RADAR_DISTANCE_TO_VEHICLE,
+            Messages.Tooltip_ValuePoint_Action_Value_Radar_DistanceToVehicle,
+            Images.Graph_Radar_DistanceToVehicle);
+
+      _actionValue_Radar_PassingSpeed_Absolute = new ActionValueItem(
+            VALUE_ID_RADAR_PASSING_SPEED_ABSOLUTE,
+            Messages.Tooltip_ValuePoint_Action_Value_Radar_PassingSpeed_Absolute,
+            Images.Graph_Radar_PassingSpeed_Absolute);
+
+      _actionValue_Radar_PassingSpeed_Relative = new ActionValueItem(
+            VALUE_ID_RADAR_PASSING_SPEED_RELATIVE,
+            Messages.Tooltip_ValuePoint_Action_Value_Radar_PassingSpeed_Relative,
+            Images.Graph_Radar_PassingSpeed_Relative);
+
+      /*
+       * Running Dynamics
+       */
       _actionValue_RunDyn_StanceTime = new ActionValueItem(
             VALUE_ID_RUN_DYN_STANCE_TIME,
             Messages.Tooltip_ValuePoint_Action_Value_RunDyn_StanceTime,
@@ -582,6 +617,12 @@ public class ValuePoint_ToolTip_MenuManager {
       addItem(_actionValue_Altimeter);
       addItem(_actionValue_Cadence);
       addItem(_actionValue_Gears);
+
+      addItem(_actionValue_Radar_PassedVehicles);
+      addItem(_actionValue_Radar_DistanceToVehicle);
+      addItem(_actionValue_Radar_PassingSpeed_Absolute);
+      addItem(_actionValue_Radar_PassingSpeed_Relative);
+
       addItem(_actionValue_RunDyn_StanceTime);
       addItem(_actionValue_RunDyn_StanceTimeBalance);
       addItem(_actionValue_RunDyn_StepLength);
@@ -701,7 +742,7 @@ public class ValuePoint_ToolTip_MenuManager {
       _actionValue_Cadence                      .setState((_allVisibleValueIds & VALUE_ID_CADENCE) > 0,              _tourData.getCadenceSerie()            != null);
       _actionValue_ChartZoomFactor              .setState((_allVisibleValueIds & VALUE_ID_CHART_ZOOM_FACTOR) > 0,    true);
       _actionValue_Distance                     .setState((_allVisibleValueIds & VALUE_ID_DISTANCE) > 0,             _tourData.distanceSerie                != null);
-      _actionValue_Gears                        .setState((_allVisibleValueIds & VALUE_ID_GEARS) > 0,                _tourData.getGears()                   != null);
+      _actionValue_Gears                        .setState((_allVisibleValueIds & VALUE_ID_GEARS) > 0,                _tourData.getGearValues()              != null);
       _actionValue_Gradient                     .setState((_allVisibleValueIds & VALUE_ID_GRADIENT) > 0,             _tourData.getGradientSerie()           != null);
       _actionValue_Pace                         .setState((_allVisibleValueIds & VALUE_ID_PACE) > 0,                 _tourData.getPaceSerie()               != null);
       _actionValue_Pace_Summarized              .setState((_allVisibleValueIds & VALUE_ID_PACE_SUMMARIZED) > 0,      _tourData.getPaceSerie_Summarized_Seconds() != null);
@@ -716,6 +757,11 @@ public class ValuePoint_ToolTip_MenuManager {
       _actionValue_TimeRecorded                 .setState((_allVisibleValueIds & VALUE_ID_TIME_RECORDED) > 0,        _tourData.timeSerie                    != null);
       _actionValue_TimeSlices                   .setState((_allVisibleValueIds & VALUE_ID_TIME_SLICES) > 0,          true);
       _actionValue_TourCompare_Result           .setState((_allVisibleValueIds & VALUE_ID_TOUR_COMPARE_RESULT) > 0,  _tourData.tourCompare_DiffSerie        != null && _tourData.tourCompare_DiffSerie.length > 0);
+
+      _actionValue_Radar_PassedVehicles         .setState((_allVisibleValueIds & VALUE_ID_RADAR_PASSED_VEHICLES) > 0,         _tourData.radar_PassedVehicles            != null);
+      _actionValue_Radar_DistanceToVehicle      .setState((_allVisibleValueIds & VALUE_ID_RADAR_DISTANCE_TO_VEHICLE) > 0,     _tourData.radar_DistanceToVehicle         != null);
+      _actionValue_Radar_PassingSpeed_Absolute  .setState((_allVisibleValueIds & VALUE_ID_RADAR_PASSING_SPEED_ABSOLUTE) > 0,  _tourData.radar_PassingSpeed_Absolute     != null);
+      _actionValue_Radar_PassingSpeed_Relative  .setState((_allVisibleValueIds & VALUE_ID_RADAR_PASSING_SPEED_RELATIVE) > 0,  _tourData.radar_PassingSpeed_Relative     != null);
 
       _actionValue_RunDyn_StanceTime            .setState((_allVisibleValueIds & VALUE_ID_RUN_DYN_STANCE_TIME) > 0,           _tourData.getRunDyn_StanceTime()          != null);
       _actionValue_RunDyn_StanceTimeBalance     .setState((_allVisibleValueIds & VALUE_ID_RUN_DYN_STANCE_TIME_BALANCED) > 0,  _tourData.getRunDyn_StanceTimeBalance()   != null);

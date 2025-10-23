@@ -147,7 +147,6 @@ public class SerieData implements Serializable {
     * @since Version 18.10
     */
    public short[]              swim_LengthType;                     // e.g. active, idle
-
    public short[]              swim_Cadence;                        // strokes/min
    public short[]              swim_Strokes;                        // strokes/length
    public short[]              swim_StrokeStyle;                    // e.g. freestyle, breaststroke
@@ -199,9 +198,19 @@ public class SerieData implements Serializable {
     * Contains the {@link TourPhoto} ID's where the geo position was set for photos, the other photo
     * geo positions will be interpolated
     *
-    * @since 25.x
+    * @since 25.6
     */
    public long[]               tourPhotosWithPositionedGeo;
+
+   /**
+    * Radar values
+    *
+    * @since 25.8+
+    */
+   public int[]                radar_PassedVehicles;
+   public short[]              radar_DistanceToVehicle;
+   public short[]              radar_PassingSpeed_Absolute;
+   public short[]              radar_PassingSpeed_Relative;
 
    private String dataSerieValues(final boolean[] dataSerie) {
 
@@ -348,7 +357,12 @@ public class SerieData implements Serializable {
 
             + "   visiblePoints_Surfing         " + dataSerieValues(visiblePoints_Surfing)         + NL //$NON-NLS-1$
 
-            + "   tourPhotosWithGeoPosition     " + dataSerieValues(tourPhotosWithPositionedGeo)   + NL //$NON-NLS-1$
+            + "   tourPhotosWithPositionedGeo   " + dataSerieValues(tourPhotosWithPositionedGeo)   + NL //$NON-NLS-1$
+
+            + "   radar_PassedVehicles          " + dataSerieValues(radar_PassedVehicles)          + NL //$NON-NLS-1$
+            + "   radar_DistanceToVehicle       " + dataSerieValues(radar_DistanceToVehicle)       + NL //$NON-NLS-1$
+            + "   radar_PassingSpeed_Absolute   " + dataSerieValues(radar_PassingSpeed_Absolute)   + NL //$NON-NLS-1$
+            + "   radar_PassingSpeed_Relative   " + dataSerieValues(radar_PassingSpeed_Relative)   + NL //$NON-NLS-1$
 
             ;
    }

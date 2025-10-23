@@ -171,8 +171,15 @@ public class MesgListener_DeviceInfo extends AbstractMesgListener implements Dev
       // sort messages by device number
       _allDeviceInfoMesg.sort((final DeviceInfoMesg devInfo1, final DeviceInfoMesg devInfo2) -> {
 
-         final short deviceIndex1 = devInfo1.getDeviceIndex();
-         final short deviceIndex2 = devInfo2.getDeviceIndex();
+         final Short deviceIndex1Raw = devInfo1.getDeviceIndex();
+         final Short deviceIndex2Raw = devInfo2.getDeviceIndex();
+
+         if (deviceIndex1Raw == null || deviceIndex2Raw == null) {
+            return 0;
+         }
+
+         final short deviceIndex1 = deviceIndex1Raw;
+         final short deviceIndex2 = deviceIndex2Raw;
 
          final int returnValue = (deviceIndex1 < deviceIndex2)
                ? -1
@@ -192,7 +199,7 @@ public class MesgListener_DeviceInfo extends AbstractMesgListener implements Dev
          final Short currentDeviceIndex = deviceInfoMesg.getDeviceIndex();
 
          // log empty line between devices
-         if (currentDeviceIndex != prevDevIndex) {
+         if (currentDeviceIndex != null && currentDeviceIndex != prevDevIndex) {
 
             TourLogManager.log_INFO(UI.EMPTY_STRING);
 
@@ -257,15 +264,15 @@ public class MesgListener_DeviceInfo extends AbstractMesgListener implements Dev
                                                    ? UI.EMPTY_STRING
                                                    : GarminProduct.getStringFromValue(mesgGarminProduct_Number);
 
+// SET_FORMATTING_ON
+
       final Short deviceIndex = mesg.getDeviceIndex();
       String deviceIndexText = DeviceIndex.getStringFromValue(deviceIndex);
 
       deviceIndexText = StringUtils.hasContent(deviceIndexText)
             // CREATOR = 0; // Creator of the file is always device index 0, see com.garmin.fit.DeviceIndex
             ? deviceIndexText
-            : Short.toString(deviceIndex);
-
-// SET_FORMATTING_ON
+            : deviceIndex == null ? UI.EMPTY_STRING : Short.toString(deviceIndex);
 
       TourLogManager.log_INFO(_logFormats.formatted(
 

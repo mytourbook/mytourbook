@@ -43,14 +43,12 @@ public class TourAction implements Cloneable {
    public TourAction(final String className,
                      final String text,
                      final ImageDescriptor imageDescriptor,
-                     final ImageDescriptor imageDescriptor_Disabled,
                      final TourActionCategory category) {
 
       actionClassName = className;
       actionCategory = category;
 
       _imageDescriptor = imageDescriptor;
-      _imageDescriptor_Disabled = imageDescriptor_Disabled;
 
       final String unescapedText = text.replaceAll(UI.SYMBOL_AMPERSAND, UI.EMPTY_STRING);
 
@@ -65,7 +63,6 @@ public class TourAction implements Cloneable {
 
             text,
 
-            null,
             null,
 
             category);

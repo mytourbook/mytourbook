@@ -154,6 +154,11 @@ public class ValuePoint_ToolTip_UI extends Pinned_ToolTip_Shell implements IPinn
    private boolean _isVisible_And_Available_TimeSlice;
    private boolean _isVisible_And_Available_TourCompare_Result;
 
+   private boolean _isVisible_And_Available_Radar_PassedVehicles;
+   private boolean _isVisible_And_Available_Radar_DistanceToVehicle;
+   private boolean _isVisible_And_Available_Radar_PassingSpeed_Absolute;
+   private boolean _isVisible_And_Available_Radar_PassingSpeed_Relative;
+
    private boolean _isVisible_And_Available_RunDyn_StanceTime;
    private boolean _isVisible_And_Available_RunDyn_StanceTimeBalance;
    private boolean _isVisible_And_Available_RunDyn_StepLength;
@@ -218,6 +223,15 @@ public class ValuePoint_ToolTip_UI extends Pinned_ToolTip_Shell implements IPinn
    private Label     _lblTimeRecorded;
    private Label     _lblTimeRecorded_Unit;
    private Label     _lblTourCompareResult;
+
+   private Label     _lblRadar_PassedVehicles;
+   private Label     _lblRadar_PassedVehicles_Unit;
+   private Label     _lblRadar_DistanceToVehicle;
+   private Label     _lblRadar_DistanceToVehicle_Unit;
+   private Label     _lblRadar_PassingSpeed_Absolute;
+   private Label     _lblRadar_PassingSpeed_Absolute_Unit;
+   private Label     _lblRadar_PassingSpeed_Relative;
+   private Label     _lblRadar_PassingSpeed_Relative_Unit;
 
    private Label     _lblRunDyn_StanceTime;
    private Label     _lblRunDyn_StanceTime_Unit;
@@ -598,12 +612,19 @@ public class ValuePoint_ToolTip_UI extends Pinned_ToolTip_Shell implements IPinn
          createUI_290_Cadence(_valuesContainer);
          createUI_300_Gears(_valuesContainer);
          createUI_310_TourCompareResult(_valuesContainer);
-         createUI_400_RunDyn_StanceTime(_valuesContainer);
-         createUI_410_RunDyn_StanceTimeBalance(_valuesContainer);
-         createUI_420_RunDyn_StepLength(_valuesContainer);
-         createUI_430_RunDyn_VerticalOscillation(_valuesContainer);
-         createUI_440_RunDyn_VerticalRatio(_valuesContainer);
-         createUI_500_ChartZoomFactor(_valuesContainer);
+
+         createUI_400_Radar_PassedVehicles(_valuesContainer);
+         createUI_410_Radar_DistanceToVehicle(_valuesContainer);
+         createUI_420_Radar_PassingSpeed_Absolute(_valuesContainer);
+         createUI_430_Radar_PassingSpeed_Relative(_valuesContainer);
+
+         createUI_500_RunDyn_StanceTime(_valuesContainer);
+         createUI_510_RunDyn_StanceTimeBalance(_valuesContainer);
+         createUI_520_RunDyn_StepLength(_valuesContainer);
+         createUI_530_RunDyn_VerticalOscillation(_valuesContainer);
+         createUI_540_RunDyn_VerticalRatio(_valuesContainer);
+
+         createUI_800_ChartZoomFactor(_valuesContainer);
       }
    }
 
@@ -994,7 +1015,7 @@ public class ValuePoint_ToolTip_UI extends Pinned_ToolTip_Shell implements IPinn
                   valueContainer,
                   SWT.TRAIL,
                   5,
-                  OtherMessages.GRAPH_LABEL_GEARS,
+                  OtherMessages.GRAPH_LABEL_GEAR_RATIO,
 
                   // this is a bit tricky, use default color because the text color is white
                   null);
@@ -1003,7 +1024,7 @@ public class ValuePoint_ToolTip_UI extends Pinned_ToolTip_Shell implements IPinn
                   valueContainer,
                   SWT.LEAD,
                   5,
-                  OtherMessages.GRAPH_LABEL_GEARS,
+                  OtherMessages.GRAPH_LABEL_GEAR_RATIO,
 
                   // this is a bit tricky, use default color because the text color is white
                   null);
@@ -1036,7 +1057,95 @@ public class ValuePoint_ToolTip_UI extends Pinned_ToolTip_Shell implements IPinn
       }
    }
 
-   private void createUI_400_RunDyn_StanceTime(final Composite parent) {
+   private void createUI_400_Radar_PassedVehicles(final Composite parent) {
+
+      if (_isVisible_And_Available_Radar_PassedVehicles) {
+
+         final Composite valueContainer = _isHorizontalOrientation ? createUI_ValueContainer(parent) : parent;
+         {
+            _lblRadar_PassedVehicles = createUI_Label_Value(
+                  valueContainer,
+                  SWT.TRAIL,
+                  4,
+                  OtherMessages.GRAPH_LABEL_RADAR_PASSED_VEHICLES,
+                  GraphColorManager.PREF_GRAPH_RADAR_PASSED_VEHICLES);
+
+            _lblRadar_PassedVehicles_Unit = createUI_Label(
+                  valueContainer,
+                  UI.SYMBOL_NUMBER_SIGN,
+                  OtherMessages.GRAPH_LABEL_RADAR_PASSED_VEHICLES,
+                  GraphColorManager.PREF_GRAPH_RADAR_PASSED_VEHICLES);
+         }
+      }
+   }
+
+   private void createUI_410_Radar_DistanceToVehicle(final Composite parent) {
+
+      if (_isVisible_And_Available_Radar_DistanceToVehicle) {
+
+         final Composite valueContainer = _isHorizontalOrientation ? createUI_ValueContainer(parent) : parent;
+         {
+            _lblRadar_DistanceToVehicle = createUI_Label_Value(
+                  valueContainer,
+                  SWT.TRAIL,
+                  4,
+                  OtherMessages.GRAPH_LABEL_RADAR_DISTANCE_TO_VEHICLE,
+                  GraphColorManager.PREF_GRAPH_RADAR_DISTANCE_TO_VEHICLE);
+
+            _lblRadar_DistanceToVehicle_Unit = createUI_Label(
+                  valueContainer,
+                  UI.UNIT_LABEL_DISTANCE_M_OR_YD,
+                  OtherMessages.GRAPH_LABEL_RADAR_DISTANCE_TO_VEHICLE,
+                  GraphColorManager.PREF_GRAPH_RADAR_DISTANCE_TO_VEHICLE);
+         }
+      }
+   }
+
+   private void createUI_420_Radar_PassingSpeed_Absolute(final Composite parent) {
+
+      if (_isVisible_And_Available_Radar_PassingSpeed_Absolute) {
+
+         final Composite valueContainer = _isHorizontalOrientation ? createUI_ValueContainer(parent) : parent;
+         {
+            _lblRadar_PassingSpeed_Absolute = createUI_Label_Value(
+                  valueContainer,
+                  SWT.TRAIL,
+                  4,
+                  OtherMessages.GRAPH_LABEL_RADAR_PASSING_SPEED_ABSOLUTE,
+                  GraphColorManager.PREF_GRAPH_RADAR_PASSING_SPEED_ABSOLUTE);
+
+            _lblRadar_PassingSpeed_Absolute_Unit = createUI_Label(
+                  valueContainer,
+                  UI.UNIT_LABEL_SPEED,
+                  OtherMessages.GRAPH_LABEL_RADAR_PASSING_SPEED_ABSOLUTE,
+                  GraphColorManager.PREF_GRAPH_RADAR_PASSING_SPEED_ABSOLUTE);
+         }
+      }
+   }
+
+   private void createUI_430_Radar_PassingSpeed_Relative(final Composite parent) {
+
+      if (_isVisible_And_Available_Radar_PassingSpeed_Relative) {
+
+         final Composite valueContainer = _isHorizontalOrientation ? createUI_ValueContainer(parent) : parent;
+         {
+            _lblRadar_PassingSpeed_Relative = createUI_Label_Value(
+                  valueContainer,
+                  SWT.TRAIL,
+                  4,
+                  OtherMessages.GRAPH_LABEL_RADAR_PASSING_SPEED_RELATIVE,
+                  GraphColorManager.PREF_GRAPH_RADAR_PASSING_SPEED_RELATIVE);
+
+            _lblRadar_PassingSpeed_Relative_Unit = createUI_Label(
+                  valueContainer,
+                  UI.UNIT_LABEL_SPEED,
+                  OtherMessages.GRAPH_LABEL_RADAR_PASSING_SPEED_RELATIVE,
+                  GraphColorManager.PREF_GRAPH_RADAR_PASSING_SPEED_RELATIVE);
+         }
+      }
+   }
+
+   private void createUI_500_RunDyn_StanceTime(final Composite parent) {
 
       if (_isVisible_And_Available_RunDyn_StanceTime) {
 
@@ -1058,7 +1167,7 @@ public class ValuePoint_ToolTip_UI extends Pinned_ToolTip_Shell implements IPinn
       }
    }
 
-   private void createUI_410_RunDyn_StanceTimeBalance(final Composite parent) {
+   private void createUI_510_RunDyn_StanceTimeBalance(final Composite parent) {
 
       if (_isVisible_And_Available_RunDyn_StanceTimeBalance) {
 
@@ -1080,7 +1189,7 @@ public class ValuePoint_ToolTip_UI extends Pinned_ToolTip_Shell implements IPinn
       }
    }
 
-   private void createUI_420_RunDyn_StepLength(final Composite parent) {
+   private void createUI_520_RunDyn_StepLength(final Composite parent) {
 
       if (_isVisible_And_Available_RunDyn_StepLength) {
 
@@ -1102,7 +1211,7 @@ public class ValuePoint_ToolTip_UI extends Pinned_ToolTip_Shell implements IPinn
       }
    }
 
-   private void createUI_430_RunDyn_VerticalOscillation(final Composite parent) {
+   private void createUI_530_RunDyn_VerticalOscillation(final Composite parent) {
 
       if (_isVisible_And_Available_RunDyn_VerticalOscillation) {
 
@@ -1124,7 +1233,7 @@ public class ValuePoint_ToolTip_UI extends Pinned_ToolTip_Shell implements IPinn
       }
    }
 
-   private void createUI_440_RunDyn_VerticalRatio(final Composite parent) {
+   private void createUI_540_RunDyn_VerticalRatio(final Composite parent) {
 
       if (_isVisible_And_Available_RunDyn_VerticalRatio) {
 
@@ -1146,7 +1255,7 @@ public class ValuePoint_ToolTip_UI extends Pinned_ToolTip_Shell implements IPinn
       }
    }
 
-   private void createUI_500_ChartZoomFactor(final Composite parent) {
+   private void createUI_800_ChartZoomFactor(final Composite parent) {
 
       if (_isVisible_And_Available_ChartZoomFactor) {
 
@@ -1516,61 +1625,72 @@ public class ValuePoint_ToolTip_UI extends Pinned_ToolTip_Shell implements IPinn
 
 // SET_FORMATTING_OFF
 
-      final long visibleId_Altimeter                  = getState(ttVisibleValues, ValuePoint_ToolTip_MenuManager.VALUE_ID_ALTIMETER);
-      final long visibleId_Altitude                   = getState(ttVisibleValues, ValuePoint_ToolTip_MenuManager.VALUE_ID_ALTITUDE);
-      final long visibleId_Cadence                    = getState(ttVisibleValues, ValuePoint_ToolTip_MenuManager.VALUE_ID_CADENCE);
-      final long visibleId_ChartZoomFactor            = getState(ttVisibleValues, ValuePoint_ToolTip_MenuManager.VALUE_ID_CHART_ZOOM_FACTOR);
-      final long visibleId_Distance                   = getState(ttVisibleValues, ValuePoint_ToolTip_MenuManager.VALUE_ID_DISTANCE);
-      final long visibleId_Gears                      = getState(ttVisibleValues, ValuePoint_ToolTip_MenuManager.VALUE_ID_GEARS);
-      final long visibleId_Gradient                   = getState(ttVisibleValues, ValuePoint_ToolTip_MenuManager.VALUE_ID_GRADIENT);
-      final long visibleId_Pace                       = getState(ttVisibleValues, ValuePoint_ToolTip_MenuManager.VALUE_ID_PACE);
-      final long visibleId_Pace_Summarized            = getState(ttVisibleValues, ValuePoint_ToolTip_MenuManager.VALUE_ID_PACE_SUMMARIZED);
-      final long visibleId_Power                      = getState(ttVisibleValues, ValuePoint_ToolTip_MenuManager.VALUE_ID_POWER);
-      final long visibleId_Pulse                      = getState(ttVisibleValues, ValuePoint_ToolTip_MenuManager.VALUE_ID_PULSE);
-      final long visibleId_RunDyn_StanceTime          = getState(ttVisibleValues, ValuePoint_ToolTip_MenuManager.VALUE_ID_RUN_DYN_STANCE_TIME);
-      final long visibleId_RunDyn_StanceTimeBalance   = getState(ttVisibleValues, ValuePoint_ToolTip_MenuManager.VALUE_ID_RUN_DYN_STANCE_TIME_BALANCED);
-      final long visibleId_RunDyn_StepLength          = getState(ttVisibleValues, ValuePoint_ToolTip_MenuManager.VALUE_ID_RUN_DYN_STEP_LENGTH);
-      final long visibleId_RunDyn_VerticalOscillation = getState(ttVisibleValues, ValuePoint_ToolTip_MenuManager.VALUE_ID_RUN_DYN_VERTICAL_OSCILLATION);
-      final long visibleId_RunDyn_VerticalRatio       = getState(ttVisibleValues, ValuePoint_ToolTip_MenuManager.VALUE_ID_RUN_DYN_VERTICAL_RATIO);
-      final long visibleId_Speed                      = getState(ttVisibleValues, ValuePoint_ToolTip_MenuManager.VALUE_ID_SPEED);
-      final long visibleId_Speed_Summarized           = getState(ttVisibleValues, ValuePoint_ToolTip_MenuManager.VALUE_ID_SPEED_SUMMARIZED);
-      final long visibleId_Temperature                = getState(ttVisibleValues, ValuePoint_ToolTip_MenuManager.VALUE_ID_TEMPERATURE);
-      final long visibleId_TimeDuration               = getState(ttVisibleValues, ValuePoint_ToolTip_MenuManager.VALUE_ID_TIME_DURATION);
-      final long visibleId_TimeOfDay                  = getState(ttVisibleValues, ValuePoint_ToolTip_MenuManager.VALUE_ID_TIME_OF_DAY);
-      final long visibleId_TimeMoving                 = getState(ttVisibleValues, ValuePoint_ToolTip_MenuManager.VALUE_ID_TIME_MOVING);
-      final long visibleId_TimeRecorded               = getState(ttVisibleValues, ValuePoint_ToolTip_MenuManager.VALUE_ID_TIME_RECORDED);
-      final long visibleId_TimeSlice                  = getState(ttVisibleValues, ValuePoint_ToolTip_MenuManager.VALUE_ID_TIME_SLICES);
-      final long visibleId_TourCompareResult          = getState(ttVisibleValues, ValuePoint_ToolTip_MenuManager.VALUE_ID_TOUR_COMPARE_RESULT);
+      final long visibleId_Altimeter                     = getState(ttVisibleValues, ValuePoint_ToolTip_MenuManager.VALUE_ID_ALTIMETER);
+      final long visibleId_Altitude                      = getState(ttVisibleValues, ValuePoint_ToolTip_MenuManager.VALUE_ID_ALTITUDE);
+      final long visibleId_Cadence                       = getState(ttVisibleValues, ValuePoint_ToolTip_MenuManager.VALUE_ID_CADENCE);
+      final long visibleId_ChartZoomFactor               = getState(ttVisibleValues, ValuePoint_ToolTip_MenuManager.VALUE_ID_CHART_ZOOM_FACTOR);
+      final long visibleId_Distance                      = getState(ttVisibleValues, ValuePoint_ToolTip_MenuManager.VALUE_ID_DISTANCE);
+      final long visibleId_Gears                         = getState(ttVisibleValues, ValuePoint_ToolTip_MenuManager.VALUE_ID_GEARS);
+      final long visibleId_Gradient                      = getState(ttVisibleValues, ValuePoint_ToolTip_MenuManager.VALUE_ID_GRADIENT);
+      final long visibleId_Pace                          = getState(ttVisibleValues, ValuePoint_ToolTip_MenuManager.VALUE_ID_PACE);
+      final long visibleId_Pace_Summarized               = getState(ttVisibleValues, ValuePoint_ToolTip_MenuManager.VALUE_ID_PACE_SUMMARIZED);
+      final long visibleId_Power                         = getState(ttVisibleValues, ValuePoint_ToolTip_MenuManager.VALUE_ID_POWER);
+      final long visibleId_Pulse                         = getState(ttVisibleValues, ValuePoint_ToolTip_MenuManager.VALUE_ID_PULSE);
+      final long visibleId_Speed                         = getState(ttVisibleValues, ValuePoint_ToolTip_MenuManager.VALUE_ID_SPEED);
+      final long visibleId_Speed_Summarized              = getState(ttVisibleValues, ValuePoint_ToolTip_MenuManager.VALUE_ID_SPEED_SUMMARIZED);
+      final long visibleId_Temperature                   = getState(ttVisibleValues, ValuePoint_ToolTip_MenuManager.VALUE_ID_TEMPERATURE);
+      final long visibleId_TimeDuration                  = getState(ttVisibleValues, ValuePoint_ToolTip_MenuManager.VALUE_ID_TIME_DURATION);
+      final long visibleId_TimeOfDay                     = getState(ttVisibleValues, ValuePoint_ToolTip_MenuManager.VALUE_ID_TIME_OF_DAY);
+      final long visibleId_TimeMoving                    = getState(ttVisibleValues, ValuePoint_ToolTip_MenuManager.VALUE_ID_TIME_MOVING);
+      final long visibleId_TimeRecorded                  = getState(ttVisibleValues, ValuePoint_ToolTip_MenuManager.VALUE_ID_TIME_RECORDED);
+      final long visibleId_TimeSlice                     = getState(ttVisibleValues, ValuePoint_ToolTip_MenuManager.VALUE_ID_TIME_SLICES);
+      final long visibleId_TourCompareResult             = getState(ttVisibleValues, ValuePoint_ToolTip_MenuManager.VALUE_ID_TOUR_COMPARE_RESULT);
+      
+      final long visibleId_Radar_PassedVehicles          = getState(ttVisibleValues, ValuePoint_ToolTip_MenuManager.VALUE_ID_RADAR_PASSED_VEHICLES);
+      final long visibleId_Radar_DistanceToVehicle       = getState(ttVisibleValues, ValuePoint_ToolTip_MenuManager.VALUE_ID_RADAR_DISTANCE_TO_VEHICLE);
+      final long visibleId_Radar_PassingSpeed_Absolute   = getState(ttVisibleValues, ValuePoint_ToolTip_MenuManager.VALUE_ID_RADAR_PASSING_SPEED_ABSOLUTE);
+      final long visibleId_Radar_PassingSpeed_Relatibe   = getState(ttVisibleValues, ValuePoint_ToolTip_MenuManager.VALUE_ID_RADAR_PASSING_SPEED_RELATIVE);
+      
+      final long visibleId_RunDyn_StanceTime             = getState(ttVisibleValues, ValuePoint_ToolTip_MenuManager.VALUE_ID_RUN_DYN_STANCE_TIME);
+      final long visibleId_RunDyn_StanceTimeBalance      = getState(ttVisibleValues, ValuePoint_ToolTip_MenuManager.VALUE_ID_RUN_DYN_STANCE_TIME_BALANCED);
+      final long visibleId_RunDyn_StepLength             = getState(ttVisibleValues, ValuePoint_ToolTip_MenuManager.VALUE_ID_RUN_DYN_STEP_LENGTH);
+      final long visibleId_RunDyn_VerticalOscillation    = getState(ttVisibleValues, ValuePoint_ToolTip_MenuManager.VALUE_ID_RUN_DYN_VERTICAL_OSCILLATION);
+      final long visibleId_RunDyn_VerticalRatio          = getState(ttVisibleValues, ValuePoint_ToolTip_MenuManager.VALUE_ID_RUN_DYN_VERTICAL_RATIO);
 
-      _isAvailable_Pulse_BpmFromDevice                = _tourData.pulseSerie                          != null;
-      _isAvailable_Pulse_RRIntervals                  = _tourData.getPulse_RRIntervals()              != null;
+      _isAvailable_Pulse_BpmFromDevice                      = _tourData.pulseSerie                          != null;
+      _isAvailable_Pulse_RRIntervals                        = _tourData.getPulse_RRIntervals()              != null;
 
-      final boolean isAvailable_Altimeter             = _tourData.getAltimeterSerie()                 != null;
-      final boolean isAvailable_Altitude              = _tourData.getAltitudeSerie()                  != null;
-      final boolean isAvailable_Cadence               = _tourData.getCadenceSerie()                   != null;
-      final boolean isAvailable_ChartZoomFactor       = _canBeDisplayed_ChartZoomFactor;
-      final boolean isAvailable_Distance              = _tourData.distanceSerie                       != null;
-      final boolean isAvailable_Gears                 = _tourData.getGears()                          != null;
-      final boolean isAvailable_Gradient              = _tourData.getGradientSerie()                  != null;
-      final boolean isAvailable_Pace                  = _tourData.getPaceSerie()                      != null;
-      final boolean isAvailable_Pace_Summarized       = _tourData.getPaceSerie_Summarized_Seconds()   != null;
-      final boolean isAvailable_Power                 = _tourData.getPowerSerie()                     != null;
-      final boolean isAvailable_Pulse                 = _isAvailable_Pulse_BpmFromDevice ||_isAvailable_Pulse_RRIntervals;
-      final boolean isAvailable_Speed                 = _tourData.getSpeedSerie()                     != null;
-      final boolean isAvailable_Speed_Summarized      = _tourData.getSpeedSerie_Summarized()          != null;
-      final boolean isAvailable_Temperature           = _tourData.temperatureSerie                    != null;
-      final boolean isAvailable_TimeDuration          = _tourData.timeSerie                           != null;
-      final boolean isAvailable_TimeOfDay             = _tourData.timeSerie                           != null;
-      final boolean isAvailable_TimeMoving            = _tourData.getMovingTimeSerie()                != null;
-      final boolean isAvailable_TimeRecorded          = _tourData.getRecordedTimeSerie()              != null;
-      final boolean isAvailable_TimeSlice             = true;
-      final boolean isAvailable_TourCompare_Result    = _tourData.tourCompare_DiffSerie               != null && _tourData.tourCompare_DiffSerie.length > 0;
+      final boolean isAvailable_Altimeter                   = _tourData.getAltimeterSerie()                 != null;
+      final boolean isAvailable_Altitude                    = _tourData.getAltitudeSerie()                  != null;
+      final boolean isAvailable_Cadence                     = _tourData.getCadenceSerie()                   != null;
+      final boolean isAvailable_ChartZoomFactor             = _canBeDisplayed_ChartZoomFactor;
+      final boolean isAvailable_Distance                    = _tourData.distanceSerie                       != null;
+      final boolean isAvailable_Gears                       = _tourData.getGearValues()                     != null;
+      final boolean isAvailable_Gradient                    = _tourData.getGradientSerie()                  != null;
+      final boolean isAvailable_Pace                        = _tourData.getPaceSerie()                      != null;
+      final boolean isAvailable_Pace_Summarized             = _tourData.getPaceSerie_Summarized_Seconds()   != null;
+      final boolean isAvailable_Power                       = _tourData.getPowerSerie()                     != null;
+      final boolean isAvailable_Pulse                       = _isAvailable_Pulse_BpmFromDevice ||_isAvailable_Pulse_RRIntervals;
+      final boolean isAvailable_Speed                       = _tourData.getSpeedSerie()                     != null;
+      final boolean isAvailable_Speed_Summarized            = _tourData.getSpeedSerie_Summarized()          != null;
+      final boolean isAvailable_Temperature                 = _tourData.temperatureSerie                    != null;
+      final boolean isAvailable_TimeDuration                = _tourData.timeSerie                           != null;
+      final boolean isAvailable_TimeOfDay                   = _tourData.timeSerie                           != null;
+      final boolean isAvailable_TimeMoving                  = _tourData.getMovingTimeSerie()                != null;
+      final boolean isAvailable_TimeRecorded                = _tourData.getRecordedTimeSerie()              != null;
+      final boolean isAvailable_TimeSlice                   = true;
+      final boolean isAvailable_TourCompare_Result          = _tourData.tourCompare_DiffSerie               != null && _tourData.tourCompare_DiffSerie.length > 0;
 
-      final boolean isAvailable_RunDyn_StanceTime           = _tourData.getRunDyn_StanceTime()           != null;
-      final boolean isAvailable_RunDyn_StanceTimeBalance    = _tourData.getRunDyn_StanceTimeBalance()    != null;
-      final boolean isAvailable_RunDyn_StepLength           = _tourData.getRunDyn_StepLength()           != null;
-      final boolean isAvailable_RunDyn_VerticalOscillation  = _tourData.getRunDyn_VerticalOscillation()  != null;
-      final boolean isAvailable_RunDyn_VerticalRatio        = _tourData.getRunDyn_VerticalRatio()        != null;
+      final boolean isAvailable_Radar_PassedVehicles        = _tourData.radar_PassedVehicles                != null;
+      final boolean isAvailable_Radar_DistanceToVehicle     = _tourData.radar_DistanceToVehicle             != null;
+      final boolean isAvailable_Radar_PassingSpeed_Absolute = _tourData.radar_PassingSpeed_Absolute         != null;
+      final boolean isAvailable_Radar_PassingSpeed_Relative = _tourData.radar_PassingSpeed_Relative         != null;
+
+      final boolean isAvailable_RunDyn_StanceTime           = _tourData.getRunDyn_StanceTime()              != null;
+      final boolean isAvailable_RunDyn_StanceTimeBalance    = _tourData.getRunDyn_StanceTimeBalance()       != null;
+      final boolean isAvailable_RunDyn_StepLength           = _tourData.getRunDyn_StepLength()              != null;
+      final boolean isAvailable_RunDyn_VerticalOscillation  = _tourData.getRunDyn_VerticalOscillation()     != null;
+      final boolean isAvailable_RunDyn_VerticalRatio        = _tourData.getRunDyn_VerticalRatio()           != null;
 
       _allVisibleValueIds =
 
@@ -1594,6 +1714,12 @@ public class ValuePoint_ToolTip_UI extends Pinned_ToolTip_Shell implements IPinn
             + visibleId_TimeRecorded
             + visibleId_TimeSlice
             + visibleId_TourCompareResult
+
+            + visibleId_Radar_PassedVehicles
+            + visibleId_Radar_DistanceToVehicle
+            + visibleId_Radar_PassingSpeed_Absolute
+            + visibleId_Radar_PassingSpeed_Relatibe
+
             + visibleId_RunDyn_StanceTime
             + visibleId_RunDyn_StanceTimeBalance
             + visibleId_RunDyn_StepLength
@@ -1625,11 +1751,16 @@ public class ValuePoint_ToolTip_UI extends Pinned_ToolTip_Shell implements IPinn
             + (isAvailable_TimeSlice            ? visibleId_TimeSlice         : 0)
             + (isAvailable_TourCompare_Result   ? visibleId_TourCompareResult : 0)
 
-            + (isAvailable_RunDyn_StanceTime          ? visibleId_RunDyn_StanceTime          : 0)
-            + (isAvailable_RunDyn_StanceTimeBalance   ? visibleId_RunDyn_StanceTimeBalance   : 0)
-            + (isAvailable_RunDyn_StepLength          ? visibleId_RunDyn_StepLength          : 0)
-            + (isAvailable_RunDyn_VerticalOscillation ? visibleId_RunDyn_VerticalOscillation : 0)
-            + (isAvailable_RunDyn_VerticalRatio       ? visibleId_RunDyn_VerticalRatio       : 0)
+            + (isAvailable_Radar_DistanceToVehicle       ? visibleId_Radar_DistanceToVehicle       : 0)
+            + (isAvailable_Radar_PassedVehicles          ? visibleId_Radar_PassedVehicles          : 0)
+            + (isAvailable_Radar_PassingSpeed_Absolute   ? visibleId_Radar_PassingSpeed_Absolute   : 0)
+            + (isAvailable_Radar_PassingSpeed_Relative   ? visibleId_Radar_PassingSpeed_Relatibe   : 0)
+
+            + (isAvailable_RunDyn_StanceTime             ? visibleId_RunDyn_StanceTime             : 0)
+            + (isAvailable_RunDyn_StanceTimeBalance      ? visibleId_RunDyn_StanceTimeBalance      : 0)
+            + (isAvailable_RunDyn_StepLength             ? visibleId_RunDyn_StepLength             : 0)
+            + (isAvailable_RunDyn_VerticalOscillation    ? visibleId_RunDyn_VerticalOscillation    : 0)
+            + (isAvailable_RunDyn_VerticalRatio          ? visibleId_RunDyn_VerticalRatio          : 0)
 
             ;
 
@@ -1654,11 +1785,16 @@ public class ValuePoint_ToolTip_UI extends Pinned_ToolTip_Shell implements IPinn
       _isVisible_And_Available_TimeSlice           = isAvailable_TimeSlice          && visibleId_TimeSlice > 0;
       _isVisible_And_Available_TourCompare_Result  = isAvailable_TourCompare_Result && visibleId_TourCompareResult > 0;
 
-      _isVisible_And_Available_RunDyn_StanceTime            = isAvailable_RunDyn_StanceTime           && visibleId_RunDyn_StanceTime          > 0;
-      _isVisible_And_Available_RunDyn_StanceTimeBalance     = isAvailable_RunDyn_StanceTimeBalance    && visibleId_RunDyn_StanceTimeBalance > 0;
-      _isVisible_And_Available_RunDyn_StepLength            = isAvailable_RunDyn_StepLength           && visibleId_RunDyn_StepLength          > 0;
-      _isVisible_And_Available_RunDyn_VerticalOscillation   = isAvailable_RunDyn_VerticalOscillation  && visibleId_RunDyn_VerticalOscillation > 0;
-      _isVisible_And_Available_RunDyn_VerticalRatio         = isAvailable_RunDyn_VerticalRatio        && visibleId_RunDyn_VerticalRatio       > 0;
+      _isVisible_And_Available_Radar_PassedVehicles         = isAvailable_Radar_PassedVehicles        && visibleId_Radar_PassedVehicles         > 0;
+      _isVisible_And_Available_Radar_DistanceToVehicle      = isAvailable_Radar_DistanceToVehicle     && visibleId_Radar_DistanceToVehicle      > 0;
+      _isVisible_And_Available_Radar_PassingSpeed_Absolute  = isAvailable_Radar_PassingSpeed_Absolute && visibleId_Radar_PassingSpeed_Absolute  > 0;
+      _isVisible_And_Available_Radar_PassingSpeed_Relative  = isAvailable_Radar_PassingSpeed_Relative && visibleId_Radar_PassingSpeed_Relatibe  > 0;
+
+      _isVisible_And_Available_RunDyn_StanceTime            = isAvailable_RunDyn_StanceTime           && visibleId_RunDyn_StanceTime            > 0;
+      _isVisible_And_Available_RunDyn_StanceTimeBalance     = isAvailable_RunDyn_StanceTimeBalance    && visibleId_RunDyn_StanceTimeBalance     > 0;
+      _isVisible_And_Available_RunDyn_StepLength            = isAvailable_RunDyn_StepLength           && visibleId_RunDyn_StepLength            > 0;
+      _isVisible_And_Available_RunDyn_VerticalOscillation   = isAvailable_RunDyn_VerticalOscillation  && visibleId_RunDyn_VerticalOscillation   > 0;
+      _isVisible_And_Available_RunDyn_VerticalRatio         = isAvailable_RunDyn_VerticalRatio        && visibleId_RunDyn_VerticalRatio         > 0;
 
       _allVisibleAndAvailable_ValueCounter =
 
@@ -1682,6 +1818,11 @@ public class ValuePoint_ToolTip_UI extends Pinned_ToolTip_Shell implements IPinn
             + (_isVisible_And_Available_TimeRecorded                 ? 1 : 0)
             + (_isVisible_And_Available_TimeSlice                    ? 1 : 0)
             + (_isVisible_And_Available_TourCompare_Result           ? 1 : 0)
+
+            + (_isVisible_And_Available_Radar_PassedVehicles         ? 1 : 0)
+            + (_isVisible_And_Available_Radar_DistanceToVehicle      ? 1 : 0)
+            + (_isVisible_And_Available_Radar_PassingSpeed_Absolute  ? 1 : 0)
+            + (_isVisible_And_Available_Radar_PassingSpeed_Relative  ? 1 : 0)
 
             + (_isVisible_And_Available_RunDyn_StanceTime            ? 1 : 0)
             + (_isVisible_And_Available_RunDyn_StanceTimeBalance     ? 1 : 0)
@@ -1836,7 +1977,7 @@ public class ValuePoint_ToolTip_UI extends Pinned_ToolTip_Shell implements IPinn
 
       if (_isVisible_And_Available_Gears) {
 
-         final float[][] gears = _tourData.getGears();
+         final float[][] gears = _tourData.getGearValues();
 
 //       _gears[0] = gear ratio
 //       _gears[1] = front gear teeth
@@ -2021,6 +2162,25 @@ public class ValuePoint_ToolTip_UI extends Pinned_ToolTip_Shell implements IPinn
          _lblTourCompareResult.setText(_nf0.format(_tourData.tourCompare_DiffSerie[valueIndex]));
       }
 
+      /*
+       * Radar
+       */
+      if (_isVisible_And_Available_Radar_PassedVehicles) {
+         _lblRadar_PassedVehicles.setText(_nf0.format(_tourData.radar_PassedVehicles[valueIndex]));
+      }
+      if (_isVisible_And_Available_Radar_DistanceToVehicle) {
+         _lblRadar_DistanceToVehicle.setText(_nf0.format(_tourData.getRadar_DistanceToVehicle_UI()[valueIndex]));
+      }
+      if (_isVisible_And_Available_Radar_PassingSpeed_Absolute) {
+         _lblRadar_PassingSpeed_Absolute.setText(_nf0.format(_tourData.getRadar_PassingSpeed_Absolute_UI()[valueIndex]));
+      }
+      if (_isVisible_And_Available_Radar_PassingSpeed_Relative) {
+         _lblRadar_PassingSpeed_Relative.setText(_nf0.format(_tourData.getRadar_PassingSpeed_Relative_UI()[valueIndex]));
+      }
+
+      /*
+       * Running Dynamics
+       */
       if (_isVisible_And_Available_RunDyn_StanceTime) {
          _lblRunDyn_StanceTime.setText(_nf0.format(_tourData.getRunDyn_StanceTime()[valueIndex]));
       }
@@ -2155,6 +2315,29 @@ public class ValuePoint_ToolTip_UI extends Pinned_ToolTip_Shell implements IPinn
          updateUI_Color(_lblTourCompareResult, GraphColorManager.PREF_GRAPH_TOUR_COMPARE);
       }
 
+      /*
+       * Radar
+       */
+      if (_isVisible_And_Available_Radar_PassedVehicles) {
+         updateUI_Color(_lblRadar_PassedVehicles, GraphColorManager.PREF_GRAPH_RADAR_PASSED_VEHICLES);
+         updateUI_Color(_lblRadar_PassedVehicles_Unit, GraphColorManager.PREF_GRAPH_RADAR_PASSED_VEHICLES);
+      }
+      if (_isVisible_And_Available_Radar_DistanceToVehicle) {
+         updateUI_Color(_lblRadar_DistanceToVehicle, GraphColorManager.PREF_GRAPH_RADAR_DISTANCE_TO_VEHICLE);
+         updateUI_Color(_lblRadar_DistanceToVehicle_Unit, GraphColorManager.PREF_GRAPH_RADAR_DISTANCE_TO_VEHICLE);
+      }
+      if (_isVisible_And_Available_Radar_PassingSpeed_Absolute) {
+         updateUI_Color(_lblRadar_PassingSpeed_Absolute, GraphColorManager.PREF_GRAPH_RADAR_PASSING_SPEED_ABSOLUTE);
+         updateUI_Color(_lblRadar_PassingSpeed_Absolute_Unit, GraphColorManager.PREF_GRAPH_RADAR_PASSING_SPEED_ABSOLUTE);
+      }
+      if (_isVisible_And_Available_Radar_PassingSpeed_Relative) {
+         updateUI_Color(_lblRadar_PassingSpeed_Relative, GraphColorManager.PREF_GRAPH_RADAR_PASSING_SPEED_RELATIVE);
+         updateUI_Color(_lblRadar_PassingSpeed_Relative_Unit, GraphColorManager.PREF_GRAPH_RADAR_PASSING_SPEED_RELATIVE);
+      }
+
+      /*
+       * Running Dynamics
+       */
       if (_isVisible_And_Available_RunDyn_StanceTime) {
          updateUI_Color(_lblRunDyn_StanceTime, GraphColorManager.PREF_GRAPH_RUN_DYN_STANCE_TIME);
          updateUI_Color(_lblRunDyn_StanceTime_Unit, GraphColorManager.PREF_GRAPH_RUN_DYN_STANCE_TIME);

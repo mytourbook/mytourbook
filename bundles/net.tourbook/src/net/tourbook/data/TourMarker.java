@@ -19,9 +19,12 @@ import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
+import com.garmin.fit.DateTime;
 
 import java.io.Serializable;
 import java.io.StringWriter;
+import java.time.Instant;
+import java.util.Date;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.persistence.Entity;
@@ -42,6 +45,7 @@ import javax.xml.bind.annotation.XmlType;
 
 import net.tourbook.Messages;
 import net.tourbook.common.UI;
+import net.tourbook.common.time.TimeTools;
 import net.tourbook.database.FIELD_VALIDATION;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.preferences.ITourbookPreferences;
@@ -464,6 +468,9 @@ public class TourMarker implements Cloneable, Comparable<Object>, IXmlSerializab
       return description == null ? UI.EMPTY_STRING : description;
    }
 
+   /**
+    * @return Returns the absolute time of the marker in ms since 1970-01-01T00:00:00Z
+    */
    public long getDeviceLapTime() {
 
       if (_deviceLapTime == Long.MIN_VALUE) {
@@ -1073,35 +1080,41 @@ public class TourMarker implements Cloneable, Comparable<Object>, IXmlSerializab
    @Override
    public String toString() {
 
+      final Date javaDateTime = Date.from(Instant.ofEpochMilli(tourTime));
+      final Long garminDateTime = new DateTime(javaDateTime).getTimestamp();
+
+      final String tourDateTime = TimeTools.getZonedDateTime(tourTime).format(TimeTools.Formatter_Time_M);
+
       return UI.EMPTY_STRING
 
-            + "TourMarker" + NL //                                //$NON-NLS-1$
-            + "[" + NL //                                         //$NON-NLS-1$
+            + "TourMarker" + NL //                                      //$NON-NLS-1$
 
-            + "   markerId          = " + markerId + NL //        //$NON-NLS-1$
+            + "   markerId          = " + markerId + NL //              //$NON-NLS-1$
 
-            + "   label             = " + label + NL //           //$NON-NLS-1$
-            + "   altitude          = " + altitude + NL //        //$NON-NLS-1$
-            + "   distance20        = " + distance20 + NL //      //$NON-NLS-1$
+            + "   label             = " + label + NL //                 //$NON-NLS-1$
+//            + "   altitude          = " + altitude + NL //              //$NON-NLS-1$
+            + "   distance20        = " + distance20 + NL //            //$NON-NLS-1$
 
-            + "   latitude          = " + latitude + NL //        //$NON-NLS-1$
-            + "   longitude         = " + longitude + NL //       //$NON-NLS-1$
+//            + "   latitude          = " + latitude + NL //              //$NON-NLS-1$
+//            + "   longitude         = " + longitude + NL //             //$NON-NLS-1$
+//
+//            + "   labelXOffset      = " + labelXOffset + NL //          //$NON-NLS-1$
+//            + "   labelYOffset      = " + labelYOffset + NL //          //$NON-NLS-1$
+            + "   serieIndex        = " + serieIndex + NL //            //$NON-NLS-1$
+            + "   time              = " + time + NL //                  //$NON-NLS-1$
+            + "   tourTime          = " + tourTime + NL //              //$NON-NLS-1$
+            + "   garminDateTime    = " + garminDateTime + NL //        //$NON-NLS-1$
+            + "   tourDateTime      = " + tourDateTime + NL //          //$NON-NLS-1$
 
-            + "   labelXOffset      = " + labelXOffset + NL //    //$NON-NLS-1$
-            + "   labelYOffset      = " + labelYOffset + NL //    //$NON-NLS-1$
-            + "   serieIndex        = " + serieIndex + NL //      //$NON-NLS-1$
-            + "   time              = " + time + NL //            //$NON-NLS-1$
-            + "   tourTime          = " + tourTime + NL //        //$NON-NLS-1$
-
-            + "   type              = " + type + NL //            //$NON-NLS-1$
-            + "   visualPosition    = " + visualPosition + NL //  //$NON-NLS-1$
-            + "   isMarkerVisible   = " + isMarkerVisible + NL // //$NON-NLS-1$
-
-            + "   urlAddress        = " + urlAddress + NL //      //$NON-NLS-1$
-            + "   urlText           = " + urlText + NL //         //$NON-NLS-1$
-            + "   description       = " + description + NL //     //$NON-NLS-1$
-
-            + "   _createId         = " + _createId + NL //       //$NON-NLS-1$
+//            + "   type              = " + type + NL //                  //$NON-NLS-1$
+//            + "   visualPosition    = " + visualPosition + NL //        //$NON-NLS-1$
+//            + "   isMarkerVisible   = " + isMarkerVisible + NL //       //$NON-NLS-1$
+//
+//            + "   urlAddress        = " + urlAddress + NL //            //$NON-NLS-1$
+//            + "   urlText           = " + urlText + NL //               //$NON-NLS-1$
+//            + "   description       = " + description + NL //           //$NON-NLS-1$
+//
+//            + "   _createId         = " + _createId + NL //             //$NON-NLS-1$
 
 //          + "   tourData          = " + tourData + NL
 //          + "   markerType        = " + markerType + NL
@@ -1109,10 +1122,10 @@ public class TourMarker implements Cloneable, Comparable<Object>, IXmlSerializab
 //          + "   category          = " + category + NL
 //          + "   _visibleType      = " + _visibleType + NL
 //          + "   _markerBounds     = " + _markerBounds + NL
+//
+//            + "   tourMarkerType    = " + tourMarkerType + NL //        //$NON-NLS-1$
 
-            + "   tourMarkerType    = " + tourMarkerType + NL //  //$NON-NLS-1$
-
-            + "]" + NL; //                                        //$NON-NLS-1$
+            + NL; //
    }
 
    @Override

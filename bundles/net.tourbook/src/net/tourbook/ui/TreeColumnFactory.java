@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2024 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2025 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -83,6 +83,9 @@ public abstract class TreeColumnFactory {
    public static final TreeColumnFactory POWERTRAIN_PEDAL_LEFT_RIGHT_BALANCE;
    public static final TreeColumnFactory POWERTRAIN_SLOW_VS_FAST_CADENCE_PERCENTAGES;
    public static final TreeColumnFactory POWERTRAIN_SLOW_VS_FAST_CADENCE_ZONES_DELIMITER;
+
+   public static final TreeColumnFactory RADAR_PASSED_VEHICLES;
+   public static final String            RADAR_PASSED_VEHICLES_ID         = "RADAR_PASSED_VEHICLES_ID";         //$NON-NLS-1$
 
    public static final TreeColumnFactory RUN_DYN_STANCE_TIME_MIN;
    public static final TreeColumnFactory RUN_DYN_STANCE_TIME_MAX;
@@ -1167,6 +1170,31 @@ public abstract class TreeColumnFactory {
             colDef.setColumnUnit(               Messages.ColumnFactory_Power_SlowVsFast_CadencePercentages_Header);
 
             colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(10));
+
+            return colDef;
+         }
+      };
+
+
+      /*
+       * Radar
+       */
+
+      RADAR_PASSED_VEHICLES = new TreeColumnFactory() {
+         @Override
+         public TreeColumnDefinition createColumn(final ColumnManager columnManager,
+                                                   final PixelConverter pixelConverter) {
+
+            final TreeColumnDefinition colDef = new TreeColumnDefinition(columnManager, RADAR_PASSED_VEHICLES_ID, SWT.TRAIL);
+
+            colDef.setColumnCategory(           Messages.ColumnFactory_Category_Radar);
+
+            colDef.setColumnLabel(              Messages.ColumnFactory_Radar_PassedVehicles);
+            colDef.setColumnHeaderText(         Messages.ColumnFactory_Radar_PassedVehicles);
+            colDef.setColumnHeaderToolTipText(  Messages.ColumnFactory_Radar_PassedVehicles_Header);
+            colDef.setColumnUnit(               UI.SYMBOL_NUMBER_SIGN);
+
+            colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(5));
 
             return colDef;
          }

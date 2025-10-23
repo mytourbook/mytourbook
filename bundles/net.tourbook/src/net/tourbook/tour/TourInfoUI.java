@@ -222,11 +222,6 @@ public class TourInfoUI implements ICanHideTooltip {
    private Composite        _shellContainer;
    private Composite        _ttContainer;
 
-   private Text             _txtDescription;
-   private Text             _txtLocationEnd;
-   private Text             _txtLocationStart;
-   private Text             _txtWeather;
-
    private CLabel           _lblClouds;
    private CLabel           _lblTourType_Image;
 
@@ -298,7 +293,6 @@ public class TourInfoUI implements ICanHideTooltip {
    private Label            _lblTimeZone_Value;
    private Label            _lblTimeZoneDifference;
    private Label            _lblTimeZoneDifference_Value;
-   private Label            _lblTitle;
    private Label            _lblTourTags;
    private Label            _lblTourTags_Value;
    private Label            _lblTourType;
@@ -370,6 +364,13 @@ public class TourInfoUI implements ICanHideTooltip {
    private Label            _lblVerticalSpeed_Time_Relative_Loss;
 
    private Link             _linkBattery;
+
+   private Text             _txtDescription;
+   private Text             _txtLocationEnd;
+   private Text             _txtLocationStart;
+   private Text             _txtTitle;
+   private Text             _txtWeather;
+
    private ArrayList<Link>  _allSensorValue_Link;
 
    private ArrayList<Label> _allSensorValue_Level;
@@ -478,7 +479,15 @@ public class TourInfoUI implements ICanHideTooltip {
 
       enableControls();
 
-      updateUI_Background(parent);
+      // run async otherwise the background is not properly set for the most controls in the bright theme
+      parent.getDisplay().asyncExec(() -> {
+
+         if (parent.isDisposed()) {
+            return;
+         }
+
+         updateUI_Background(parent);
+      });
 
       return container;
    }
@@ -569,13 +578,14 @@ public class TourInfoUI implements ICanHideTooltip {
             /*
              * Title
              */
-            _lblTitle = new Label(container, SWT.LEAD | SWT.WRAP);
+            _txtTitle = new Text(container, SWT.WRAP | SWT.MULTI | SWT.READ_ONLY);
+
             GridDataFactory.fillDefaults()
                   .hint(MAX_DATA_WIDTH, SWT.DEFAULT)
                   .grab(true, false)
                   .align(SWT.FILL, SWT.CENTER)
-                  .applyTo(_lblTitle);
-            MTFont.setBannerFont(_lblTitle);
+                  .applyTo(_txtTitle);
+            MTFont.setBannerFont(_txtTitle);
          }
          {
             /*
@@ -2016,7 +2026,7 @@ public class TourInfoUI implements ICanHideTooltip {
             tourTitle = _uiTourTypeName;
          }
       }
-      _lblTitle.setText(tourTitle);
+      _txtTitle.setText(tourTitle);
 
       /*
        * Lower part container contains sensor values, weather, tour type, tags and description
@@ -2639,7 +2649,10 @@ public class TourInfoUI implements ICanHideTooltip {
 
          UI.setColorForAllChildren(parent,
                display.getSystemColor(SWT.COLOR_INFO_FOREGROUND),
-               display.getSystemColor(SWT.COLOR_INFO_BACKGROUND));
+//             UI.SYS_COLOR_RED,
+               display.getSystemColor(SWT.COLOR_INFO_BACKGROUND)
+//             UI.SYS_COLOR_GREEN
+         );
       }
    }
 

@@ -45,6 +45,12 @@ public class ThemeUtil {
     */
    public static final String DARK_THEME_POSTFIX             = "-dark"; //$NON-NLS-1$
 
+   /**
+    * HDR is use for win 11 in the dark theme because a selected/hovered image has a very bright
+    * background
+    */
+   public static final String HDR_THEME_POSTFIX              = "-hdr";  //$NON-NLS-1$
+
    /*
     * Copied from org.eclipse.e4.ui.internal.workbench.swt.E4Application
     */
@@ -254,6 +260,9 @@ public class ThemeUtil {
          imageNameThemed = imageName.substring(0, nameLength - 4) + DARK_THEME_POSTFIX + nameExtension;
 
       } else {
+
+         // bright theme
+
          imageNameThemed = imageName;
       }
 
@@ -272,6 +281,20 @@ public class ThemeUtil {
       final String nameExtension = imageName.substring(nameLength - 4, nameLength);
 
       return imageName.substring(0, nameLength - 4) + DARK_THEME_POSTFIX + nameExtension;
+   }
+
+   /**
+    * @param imageName
+    *
+    * @return Returns the hdr image name. The postfix {@value #HDR_THEME_POSTFIX} is
+    *         appended to the image name when the dark theme image name is returned for windows
+    */
+   public static String getThemedImageName_HDR(final String imageName) {
+
+      final int nameLength = imageName.length();
+      final String nameExtension = imageName.substring(nameLength - 4, nameLength);
+
+      return imageName.substring(0, nameLength - 4) + HDR_THEME_POSTFIX + nameExtension;
    }
 
    /**

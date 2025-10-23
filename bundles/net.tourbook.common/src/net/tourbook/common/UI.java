@@ -331,20 +331,29 @@ public class UI {
    public static final boolean   IS_OSX      = "carbon".equals(SWT.getPlatform())   || "cocoa".equals(SWT.getPlatform());                        //$NON-NLS-1$ //$NON-NLS-2$
    public static final boolean   IS_WIN      = "win32".equals(SWT.getPlatform())    || "wpf".equals(SWT.getPlatform());                           //$NON-NLS-1$ //$NON-NLS-2$
 
+
 // SET_FORMATTING_ON
 
-   public static final String TRUE  = Boolean.toString(true);
-   public static final String FALSE = Boolean.toString(false);
+   public static final String  TRUE              = Boolean.toString(true);
+   public static final String  FALSE             = Boolean.toString(false);
 
    /**
     * Is <code>true</code> when the dark theme in the UI is selected
     */
-   public static boolean      IS_DARK_THEME;
+   public static boolean       IS_DARK_THEME;
 
    /**
     * Is <code>true</code> when the bright theme in the UI is selected
     */
-   public static boolean      IS_BRIGHT_THEME;
+   public static boolean       IS_BRIGHT_THEME;
+
+   /**
+    * When <code>true</code> then HRD images are displayed on windows when the dark theme is
+    * selected.
+    * <p>
+    * This is a central switch to enable/disable it which is more or less used for debugging
+    */
+   public static final boolean IS_USE_HDR_IMAGES = true;
 
    // https://eclipse.dev/eclipse/markdown/?f=news/4.36/platform.md#themes-and-styling
    public static String        DISABLED_ICONS_DESATURATED     = "desaturated";               //$NON-NLS-1$
@@ -800,7 +809,34 @@ public class UI {
 
    private static final IPreferenceStore _prefStore_Common           = CommonActivator.getPrefStore();
 
+   private static final String           SYS_PROP__SWT_AUTOSCALE     = "swt.autoScale";                                              //$NON-NLS-1$
+   private static final String           SYS_PROP__SWT_AUTOSCALE_NO  = "noAutoScale";                                                //$NON-NLS-1$
+   private static final String           _swtAutoScale               = System.getProperty(SYS_PROP__SWT_AUTOSCALE);
+   private static final String           _swtAutoScale_No            = System.getProperty(SYS_PROP__SWT_AUTOSCALE_NO);
+
    static {
+
+      if (_swtAutoScale == null) {
+
+         if (_swtAutoScale_No == null) {
+
+            System.setProperty(SYS_PROP__SWT_AUTOSCALE, "100"); //$NON-NLS-1$
+
+            StatusUtil.logInfo(UI.EMPTY_STRING
+                  + "\"swt.autoScale\" is not set externally, " //$NON-NLS-1$
+                  + " therefore the default value is used \"swt.autoScale=100\"." //$NON-NLS-1$
+                  + " The default can be prevented by setting \"noAutoScale\"");//$NON-NLS-1$
+         } else {
+
+            StatusUtil.logInfo(UI.EMPTY_STRING
+                  + "\"swt.autoScale\" is not set externally," //$NON-NLS-1$
+                  + " the default value was prevented with \"noAutoScale\"");//$NON-NLS-1$
+         }
+
+      } else {
+
+         StatusUtil.logInfo("\"swt.autoScale=%s\" is set externally".formatted(_swtAutoScale));//$NON-NLS-1$
+      }
 
       /**
        * This creates a display which may contain also sleak options, otherwise sleak would not

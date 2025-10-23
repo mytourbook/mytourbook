@@ -367,6 +367,15 @@ public class SensorView extends ViewPart implements ITourViewer {
                rc = sensorTypeName1.compareToIgnoreCase(sensorTypeName2);
             }
 
+         case TableColumnFactory.SENSOR_DEVICE_NAME_ID:
+
+            final String name1 = item1.sensor.getDeviceName();
+            final String name2 = item2.sensor.getDeviceName();
+
+            if (name1 != null && name2 != null) {
+               rc = name1.compareToIgnoreCase(name2);
+            }
+
             break;
 
          case TableColumnFactory.SENSOR_NAME_KEY_ID:
@@ -755,10 +764,10 @@ public class SensorView extends ViewPart implements ITourViewer {
       defineColumn_Sensor_Type();
       defineColumn_NumberOfTours();
       defineColumn_DeviceType();
+      defineColumn_DeviceName();
       defineColumn_BatteryState_Level();
       defineColumn_BatteryState_Status();
       defineColumn_BatteryState_Voltage();
-      defineColumn_Sensor_Description();
       defineColumn_Manufacturer_Name();
       defineColumn_Manufacturer_Number();
       defineColumn_Product_Name();
@@ -766,6 +775,7 @@ public class SensorView extends ViewPart implements ITourViewer {
       defineColumn_SerialNumber();
       defineColumn_Time_FirstUsed();
       defineColumn_Time_LastUsed();
+      defineColumn_Sensor_Description();
       defineColumn_NameKey();
    }
 
@@ -831,6 +841,25 @@ public class SensorView extends ViewPart implements ITourViewer {
             cell.setText(sensorItem.isBatteryVoltageAvailable
                   ? UI.SYMBOL_BOX
                   : UI.EMPTY_STRING);
+         }
+      });
+   }
+
+   /**
+    * Column: Fit data: device type
+    */
+   private void defineColumn_DeviceName() {
+
+      final ColumnDefinition colDef = TableColumnFactory.SENSOR_DEVICE_NAME.createColumn(_columnManager, _pc);
+
+      colDef.setColumnSelectionListener(_columnSortListener);
+
+      colDef.setLabelProvider(new CellLabelProvider() {
+         @Override
+         public void update(final ViewerCell cell) {
+
+            final SensorItem sensorItem = (SensorItem) cell.getElement();
+            cell.setText(sensorItem.sensor.getDeviceName());
          }
       });
    }

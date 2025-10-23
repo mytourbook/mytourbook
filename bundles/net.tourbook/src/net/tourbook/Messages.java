@@ -1695,6 +1695,9 @@ public class Messages extends NLS {
    public static String        Pref_App_Label_TourEditorIsModified;
 
    public static String        Pref_ChartColors_btn_legend;
+   public static String        Pref_ChartColors_CopyColor;
+   public static String        Pref_ChartColors_PasteColor;
+   public static String        Pref_ChartColors_ResetToDefaultColor;
    public static String        Pref_ChartColors_unit_high;
    public static String        Pref_ChartColors_unit_low;
    public static String        Pref_ChartColors_unit_max;
@@ -2973,6 +2976,10 @@ public class Messages extends NLS {
    public static String        Tooltip_ValuePoint_Action_Value_Pace_Summarized;
    public static String        Tooltip_ValuePoint_Action_Value_Power;
    public static String        Tooltip_ValuePoint_Action_Value_Pulse;
+   public static String        Tooltip_ValuePoint_Action_Value_Radar_DistanceToVehicle;
+   public static String        Tooltip_ValuePoint_Action_Value_Radar_PassedVehicles;
+   public static String        Tooltip_ValuePoint_Action_Value_Radar_PassingSpeed_Absolute;
+   public static String        Tooltip_ValuePoint_Action_Value_Radar_PassingSpeed_Relative;
    public static String        Tooltip_ValuePoint_Action_Value_RunDyn_StanceTime;
    public static String        Tooltip_ValuePoint_Action_Value_RunDyn_StanceTimeBalance;
    public static String        Tooltip_ValuePoint_Action_Value_RunDyn_StepLength;
@@ -3128,6 +3135,10 @@ public class Messages extends NLS {
    public static String        Tour_Action_MultiplyCaloriesBy1000_Message;
    public static String        Tour_Action_MultiplyCaloriesBy1000_Title;
    public static String        Tour_Action_Pauses;
+   public static String        Tour_Action_Radar_DistanceToVehicle_Tooltip;
+   public static String        Tour_Action_Radar_PassedVehicles_Tooltip;
+   public static String        Tour_Action_Radar_PassingSpeed_Absolute_Tooltip;
+   public static String        Tour_Action_Radar_PassingSpeed_Relative_Tooltip;
    public static String        Tour_Action_RetrieveWeatherData;
    public static String        Tour_Action_RunDyn_StanceTimeBalance_Tooltip;
    public static String        Tour_Action_RunDyn_StanceTime_Tooltip;

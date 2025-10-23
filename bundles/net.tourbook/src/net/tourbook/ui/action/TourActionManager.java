@@ -49,6 +49,7 @@ import net.tourbook.ui.views.rawData.ActionReimportTours;
 import net.tourbook.ui.views.rawData.SubMenu_AdjustTourValues;
 import net.tourbook.ui.views.tourBook.ActionDeleteTourMenu;
 import net.tourbook.ui.views.tourBook.ActionExportViewCSV;
+import net.tourbook.ui.views.tourBook.TourBookView.ActionCreateTourMarkers;
 
 import org.eclipse.jface.action.ActionContributionItem;
 import org.eclipse.jface.action.IAction;
@@ -130,63 +131,60 @@ public class TourActionManager {
             ActionEditQuick.class.getName(),
             Messages.app_action_quick_edit,
             TourbookPlugin.getThemedImageDescriptor(Images.App_Edit),
-            null,
             TourActionCategory.EDIT);
 
       final TourAction actionEditTour                    = new TourAction(
             ActionEditTour.class.getName(),
             Messages.App_Action_edit_tour,
             TourbookPlugin.getThemedImageDescriptor(Images.EditTour),
-            null,
             TourActionCategory.EDIT);
 
       final TourAction actionOpenMarkerDialog            = new TourAction(
             ActionOpenMarkerDialog.class.getName(),
             Messages.app_action_edit_tour_marker,
             TourbookPlugin.getThemedImageDescriptor(Images.TourMarker),
-            null,
             TourActionCategory.EDIT);
 
       final TourAction actionOpenAdjustAltitudeDialog    = new TourAction(
             ActionOpenAdjustAltitudeDialog.class.getName(),
             Messages.app_action_edit_adjust_altitude,
             TourbookPlugin.getThemedImageDescriptor(Images.AdjustElevation),
-            null,
             TourActionCategory.EDIT);
 
       final TourAction actionSetStartEndLocation         = new TourAction(
             ActionSetStartEndLocation.class.getName(),
             Messages.Tour_Location_Action_ManageStartEndLocation,
             TourbookPlugin.getThemedImageDescriptor(Images.Tour_StartEnd),
-            null,
             TourActionCategory.EDIT);
 
       final TourAction actionOpenTour                    = new TourAction(
             ActionOpenTour.class.getName(),
             Messages.app_action_open_tour,
             TourbookPlugin.getThemedImageDescriptor(Images.TourViewer),
-            null,
             TourActionCategory.EDIT);
 
       final TourAction actionDuplicateTour               = new TourAction(
             ActionDuplicateTour.class.getName(),
             Messages.Tour_Action_DuplicateTour,
             TourbookPlugin.getThemedImageDescriptor(Images.Tour_Duplicate),
-            null,
+            TourActionCategory.EDIT);
+
+      final TourAction actionCreateTourMarkers           = new TourAction(
+            ActionCreateTourMarkers.class.getName(),
+            Messages.Tour_Action_CreateTourMarkers,
+            TourbookPlugin.getThemedImageDescriptor(Images.TourMarker_New),
             TourActionCategory.EDIT);
 
       final TourAction actionMergeTour                   = new TourAction(
             ActionMergeTour.class.getName(),
             Messages.app_action_merge_tour,
             TourbookPlugin.getThemedImageDescriptor(Images.MergeTours),
-            null,
             TourActionCategory.EDIT);
 
       final TourAction actionJoinTours                   = new TourAction(
             ActionJoinTours.class.getName(),
             Messages.App_Action_JoinTours,
             TourActionCategory.EDIT);
-
 
       _allDefinedActions.add(categoryAction_Edit);
 
@@ -197,6 +195,7 @@ public class TourActionManager {
       _allDefinedActions.add(actionSetStartEndLocation);
       _allDefinedActions.add(actionOpenTour);
       _allDefinedActions.add(actionDuplicateTour);
+      _allDefinedActions.add(actionCreateTourMarkers);
       _allDefinedActions.add(actionMergeTour);
       _allDefinedActions.add(actionJoinTours);
 
@@ -209,6 +208,7 @@ public class TourActionManager {
       _allDefinedActionsMap.put(ActionSetStartEndLocation       .class.getName(),          actionSetStartEndLocation);
       _allDefinedActionsMap.put(ActionOpenTour                  .class.getName(),          actionOpenTour);
       _allDefinedActionsMap.put(ActionDuplicateTour             .class.getName(),          actionDuplicateTour);
+      _allDefinedActionsMap.put(ActionCreateTourMarkers         .class.getName(),          actionCreateTourMarkers);
       _allDefinedActionsMap.put(ActionMergeTour                 .class.getName(),          actionMergeTour);
       _allDefinedActionsMap.put(ActionJoinTours                 .class.getName(),          actionJoinTours);
 
@@ -230,7 +230,6 @@ public class TourActionManager {
             ActionShowTourTagsView.class.getName(),
             Messages.Action_Tag_SetTags,
             TourbookPlugin.getImageDescriptor(Images.TourTags),
-            null,
             TourActionCategory.TAG);
 
       final TourAction actionAddTag_AutoOpen          = new TourAction(
@@ -361,7 +360,6 @@ public class TourActionManager {
             ActionExportViewCSV.class.getName(),
             Messages.App_Action_ExportViewCSV,
             TourbookPlugin.getImageDescriptor(Images.CSVFormat),
-            null,
             TourActionCategory.EXPORT);
 
       final TourAction actionPrintTour                   = new TourAction(
@@ -419,7 +417,6 @@ public class TourActionManager {
             ActionDeleteTourMenu.class.getName(),
             Messages.Tour_Book_Action_delete_selected_tours_menu,
             TourbookPlugin.getImageDescriptor(Images.App_Trash),
-            null,
             TourActionCategory.ADJUST);
 
 

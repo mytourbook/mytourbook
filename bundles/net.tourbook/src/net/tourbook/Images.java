@@ -94,6 +94,10 @@ public class Images {
    public static final String Graph_Pace_Interval                  = "graph-pace-interval.svg";                     //$NON-NLS-1$
    public static final String Graph_Pace_Summarized                = "graph-pace-summarized.svg";                   //$NON-NLS-1$
    public static final String Graph_Power                          = "graph-power.svg";                             //$NON-NLS-1$
+   public static final String Graph_Radar_PassedVehicles           = "graph-radar-passed-vehicles.svg";             //$NON-NLS-1$
+   public static final String Graph_Radar_DistanceToVehicle        = "graph-radar-distance-to-vehicle.svg";         //$NON-NLS-1$
+   public static final String Graph_Radar_PassingSpeed_Absolute    = "graph-radar-passing-speed-absolute.svg";      //$NON-NLS-1$
+   public static final String Graph_Radar_PassingSpeed_Relative    = "graph-radar-passing-speed-relative.svg";      //$NON-NLS-1$
    public static final String Graph_RunDyn_StanceTime              = "graph-run-dyn-stance-time.svg";               //$NON-NLS-1$
    public static final String Graph_RunDyn_StanceTimeBalance       = "graph-run-dyn-stance-time-balance.svg";       //$NON-NLS-1$
    public static final String Graph_RunDyn_StepLength              = "graph-run-dyn-step-length.svg";               //$NON-NLS-1$

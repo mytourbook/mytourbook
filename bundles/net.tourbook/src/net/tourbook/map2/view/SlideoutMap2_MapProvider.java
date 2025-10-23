@@ -188,7 +188,7 @@ public class SlideoutMap2_MapProvider extends AdvancedSlideout implements ITourV
 
          super(text, prefPageId);
 
-         setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.MapOptions_Dark));
+         setImageDescriptor(TourbookPlugin.getImageDescriptor_Dark(Images.MapOptions));
       }
    }
 

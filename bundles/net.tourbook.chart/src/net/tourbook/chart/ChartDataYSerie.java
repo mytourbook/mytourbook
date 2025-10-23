@@ -17,10 +17,14 @@ package net.tourbook.chart;
 
 import java.util.ArrayList;
 
+import net.tourbook.common.UI;
+
 /**
  * Contains the highValues and display attributes for one data serie
  */
 public class ChartDataYSerie extends ChartDataSerie {
+
+   private static final char      NL                                = UI.NEW_LINE;
 
    static final double            FLOAT_ALMOST_ZERO                 = 0.0001;
 
@@ -126,8 +130,6 @@ public class ChartDataYSerie extends ChartDataSerie {
 
    private final ChartType        _chartType;
 
-   private boolean[]              _lineGaps;
-
    private ISliderLabelProvider   _sliderLabelProvider;
 
    /**
@@ -159,6 +161,14 @@ public class ChartDataYSerie extends ChartDataSerie {
     * looks ugly (a triangle is painted) when a tour is paused.
     */
 //   private int                  _disabledLineToNext;
+
+   /**
+    * Defines if a line should be drawn for a value point, can be <code>null</code> to disable this
+    * feature.
+    * <p>
+    * This overwrites {@link ChartDataXSerie#_noLine} when it is not <code>null</code>
+    */
+   private short[] _noLine;
 
    /**
     * @param chartType
@@ -402,15 +412,16 @@ public class ChartDataYSerie extends ChartDataSerie {
       return _highValuesFloat;
    }
 
-   public boolean[] getLineGaps() {
-      return _lineGaps;
-   }
-
    /**
     * @return Returns the lowValues.
     */
    public float[][] getLowValuesFloat() {
       return _lowValuesFloat;
+   }
+
+   public short[] getNoLine() {
+
+      return _noLine;
    }
 
    /**
@@ -534,10 +545,6 @@ public class ChartDataYSerie extends ChartDataSerie {
       _graphFillMethod = fillMethod;
    }
 
-   public void setLineGaps(final boolean[] lineGaps) {
-      _lineGaps = lineGaps;
-   }
-
    /**
     * @param valueSeries
     * @param _isIgnoreMinMaxZero
@@ -563,6 +570,7 @@ public class ChartDataYSerie extends ChartDataSerie {
          if (_chartType == ChartType.LINE
                || _chartType == ChartType.DOT
                || _chartType == ChartType.LINE_WITH_BARS
+               || _chartType == ChartType.LINE_WITH_GAPS
                || _chartType == ChartType.HORIZONTAL_BAR
                || _chartType == ChartType.XY_SCATTER
                || _chartType == ChartType.HISTORY
@@ -818,6 +826,11 @@ public class ChartDataYSerie extends ChartDataSerie {
       }
    }
 
+   public void setNoLine(final short[] noLine) {
+
+      _noLine = noLine;
+   }
+
    public void setSetMinMax_0Values(final boolean isSetMinMax_0Values) {
       this.isSetVisibleMinMax_0_Values = isSetMinMax_0Values;
    }
@@ -893,22 +906,20 @@ public class ChartDataYSerie extends ChartDataSerie {
    @Override
    public String toString() {
 
-      return "ChartDataYSerie\n" //$NON-NLS-1$
+      return "ChartDataYSerie" + NL //                                          //$NON-NLS-1$
 
-            + "[\n" //$NON-NLS-1$
-
-            + "_originalMinValue =" + _originalMinValue + "\n" //$NON-NLS-1$ //$NON-NLS-2$
-            + "_originalMaxValue =" + _originalMaxValue + "\n" //$NON-NLS-1$ //$NON-NLS-2$
-
-            + "_visibleMinValue  =" + _visibleMinValue + "\n" //$NON-NLS-1$ //$NON-NLS-2$
-            + "_visibleMaxValue  =" + _visibleMaxValue + "\n" //$NON-NLS-1$ //$NON-NLS-2$
-
-            + "_isForceMinValue  =" + _isForceMinValue + "\n" //$NON-NLS-1$ //$NON-NLS-2$
-            + "_isForceMaxValue  =" + _isForceMaxValue + "\n" //$NON-NLS-1$ //$NON-NLS-2$
-            + "_visibleMinValueForced=" + _visibleMinValueForced + "\n" //$NON-NLS-1$ //$NON-NLS-2$
-            + "_visibleMaxValueForced=" + _visibleMaxValueForced //$NON-NLS-1$
-
-            + "\n]"; //$NON-NLS-1$
+            + "  _yTitle                = " + _yTitle + NL //                    //$NON-NLS-1$
+//            + "  _originalMinValue      = " + _originalMinValue + NL //          //$NON-NLS-1$
+//            + "  _originalMaxValue      = " + _originalMaxValue + NL //          //$NON-NLS-1$
+//
+//            + "  _visibleMinValue       = " + _visibleMinValue + NL //           //$NON-NLS-1$
+//            + "  _visibleMaxValue       = " + _visibleMaxValue + NL //           //$NON-NLS-1$
+//
+//            + "  _isForceMinValue       = " + _isForceMinValue + NL //           //$NON-NLS-1$
+//            + "  _isForceMaxValue       = " + _isForceMaxValue + NL //           //$NON-NLS-1$
+//            + "  _visibleMinValueForced = " + _visibleMinValueForced + NL //     //$NON-NLS-1$
+//            + "  _visibleMaxValueForced = " + _visibleMaxValueForced + NL //     //$NON-NLS-1$
+      ;
    }
 
 }

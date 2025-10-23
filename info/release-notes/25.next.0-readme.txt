@@ -37,12 +37,33 @@ New / Improvements
 * Tour Nutrition (Frederic):
   - Select a product from a list of the most recent products used
 
+* Radar values
+    https://github.com/mytourbook/mytourbook/issues/1561
+  - Import values from .fit files
+  - Display values in 
+    - Tour book view
+    - Tour chart
+      - Value point tooltip
+
 * Fit Import
-  - Log all device sensor values, e.g. battery voltage or soft-/hardware versions
+  - Log all device sensor values, e.g. battery voltage, soft-/hardware versions
   
-* Sensor view     https://github.com/mytourbook/mytourbook/issues/1569
+* Fit Export
+  - Export swim values
+    https://github.com/mytourbook/mytourbook/issues/1581
+  
+* Import view
+  - Remove tours with the DELELTE key
+
+* Sensor view     
+    https://github.com/mytourbook/mytourbook/issues/1569
   - Show number of tours for each sensor  
   - All associated tours for a selected sensor can be displayed in the tour book view
+  
+* Color preferences
+  - Copy and paste colors between different color definitions
+    https://github.com/mytourbook/mytourbook/issues/1576
+  - Reset all colors of one color definition to its defaults
 
 
 Changes
@@ -59,6 +80,7 @@ Changes
 * Device sensors
   - This was a big rewrite to include also a device type because a sensor can have multiple device types
   - When a product name is the same as the product number, then the db update process tries to find a suitable Garmin device name
+  - When tours are imported or re-imported without saving the tours, this will update the sensor type and name for existing sensors, when these values are not yet set
   
 
 

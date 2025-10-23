@@ -15,6 +15,7 @@
  *******************************************************************************/
 package net.tourbook.data;
 
+import com.garmin.fit.AntplusDeviceType;
 import com.garmin.fit.GarminProduct;
 import com.garmin.fit.Manufacturer;
 
@@ -33,6 +34,7 @@ public class DeviceSensorImport {
    public Short                   deviceIndex;
    public Short                   deviceType;
    public Short                   antPlusDeviceType;
+   private String                 antPlusDeviceName;
 
    public Integer                 manufacturerNumber;
    private String                 manufacturerName;
@@ -55,19 +57,34 @@ public class DeviceSensorImport {
       this.deviceIndex = deviceIndex;
    }
 
+   private String createDeviceName_Text() {
+
+      String sensorDeviceName = UI.EMPTY_STRING;
+
+      if (antPlusDeviceType != null) {
+         sensorDeviceName = AntplusDeviceType.getStringFromValue(antPlusDeviceType);
+      }
+
+      if (sensorDeviceName.length() == 0 && antPlusDeviceType != null) {
+         sensorDeviceName = antPlusDeviceType.toString();
+      }
+
+      return sensorDeviceName;
+   }
+
    private String createManufacturerName_Text() {
 
-      String manufacturerName = UI.EMPTY_STRING;
+      String sensorManufacturerName = UI.EMPTY_STRING;
 
       if (manufacturerNumber != null) {
-         manufacturerName = Manufacturer.getStringFromValue(manufacturerNumber);
+         sensorManufacturerName = Manufacturer.getStringFromValue(manufacturerNumber);
       }
 
-      if (manufacturerName.length() == 0 && manufacturerNumber != null) {
-         manufacturerName = manufacturerNumber.toString();
+      if (sensorManufacturerName.length() == 0 && manufacturerNumber != null) {
+         sensorManufacturerName = manufacturerNumber.toString();
       }
 
-      return manufacturerName;
+      return sensorManufacturerName;
    }
 
    private String createProductName_Text() {
@@ -87,6 +104,19 @@ public class DeviceSensorImport {
       }
 
       return sensorProductName;
+   }
+
+   /**
+    * @return Returns the ant plus device name
+    */
+   public String getDeviceName() {
+
+      if (antPlusDeviceName == null) {
+
+         antPlusDeviceName = createDeviceName_Text();
+      }
+
+      return antPlusDeviceName;
    }
 
    public String getManufacturerName() {
@@ -135,6 +165,7 @@ public class DeviceSensorImport {
 
             + "      serialNumber         = " + serialNumber + NL //          //$NON-NLS-1$
             + "      deviceType           = " + deviceType + NL //            //$NON-NLS-1$
+            + "      antPlusDeviceType    = " + antPlusDeviceType + NL //            //$NON-NLS-1$
 
             + "      softwareVersion      = " + softwareVersion + NL //       //$NON-NLS-1$
             + "      sensorValues         = " + sensorValues + NL //          //$NON-NLS-1$

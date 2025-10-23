@@ -73,19 +73,24 @@ public class DeviceSensor implements Cloneable, Serializable {
    @Enumerated(EnumType.STRING)
    private DeviceSensorType     sensorType            = DeviceSensorType.NONE;
 
-   private String               manufacturerName;
-
    /**
     * -1 indicates that this value is not set
     */
    private int                  manufacturerNumber;
 
-   private String               productName;
+   private String               manufacturerName;
 
    /**
     * -1 indicates that this value is not set
     */
    private int                  productNumber;
+
+   private String               productName;
+
+   /**
+    * Ant plus device name
+    */
+   private String               deviceName;
 
    private String               serialNumber          = UI.EMPTY_STRING;
 
@@ -180,28 +185,28 @@ public class DeviceSensor implements Cloneable, Serializable {
 
       // manufacturer
       if (manufacturerNumber != null && manufacturerNumber != -1) {
-         allKeys.add("m_" + manufacturerNumber);
+         allKeys.add("m_" + manufacturerNumber); //$NON-NLS-1$
       }
       if (StringUtils.hasContent(manufacturerName)) {
-         allKeys.add("m__" + manufacturerName);
+         allKeys.add("m__" + manufacturerName); //$NON-NLS-1$
       }
 
       // product
       if (productNumber != null && productNumber != -1) {
-         allKeys.add("p_" + productNumber);
+         allKeys.add("p_" + productNumber); //$NON-NLS-1$
       }
       if (StringUtils.hasContent(productName)) {
-         allKeys.add("p__" + productName);
+         allKeys.add("p__" + productName); //$NON-NLS-1$
       }
 
       // device
       if (deviceType != null && deviceType != -1) {
-         allKeys.add("d_" + deviceType);
+         allKeys.add("d_" + deviceType); //$NON-NLS-1$
       }
 
       // serial no
       if (StringUtils.hasContent(serialNumber)) {
-         allKeys.add("s_" + serialNumber);
+         allKeys.add("s_" + serialNumber); //$NON-NLS-1$
       }
 
       /*
@@ -279,6 +284,13 @@ public class DeviceSensor implements Cloneable, Serializable {
       }
 
       return description;
+   }
+
+   /**
+    * @return Ant plus device name
+    */
+   public String getDeviceName() {
+      return deviceName;
    }
 
    public short getDeviceType() {
@@ -457,6 +469,10 @@ public class DeviceSensor implements Cloneable, Serializable {
 
    public void setDescription(final String description) {
       this.description = description;
+   }
+
+   public void setDeviceName(final String deviceName) {
+      this.deviceName = deviceName;
    }
 
    public void setDeviceType(final short deviceType) {

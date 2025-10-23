@@ -975,8 +975,8 @@ public class SlideoutMap2_PhotoImage extends AdvancedSlideout implements IAction
 
 // SET_FORMATTING_OFF
 
-      _imageDescriptor_SlideoutCollapse   = CommonActivator.getThemedImageDescriptor_Dark(CommonImages.Slideout_Collapse);
-      _imageDescriptor_SlideoutExpand     = CommonActivator.getThemedImageDescriptor_Dark(CommonImages.Slideout_Expand);
+      _imageDescriptor_SlideoutCollapse   = CommonActivator.getImageDescriptor_Dark(CommonImages.Slideout_Collapse);
+      _imageDescriptor_SlideoutExpand     = CommonActivator.getImageDescriptor_Dark(CommonImages.Slideout_Expand);
 
       _photoMouseMoveListener    = event -> onPhoto_Mouse_30_Move(         event);
       _photoMouseUpListener      = MouseListener.mouseUpAdapter(           event -> onPhoto_Mouse_20_Up(event));

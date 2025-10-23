@@ -176,6 +176,10 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
    static final String  STATE_IS_SHOW_IN_CHART_TOOLBAR_SPEED_INTERVAL                        = "STATE_IS_SHOW_IN_CHART_TOOLBAR_SPEED_INTERVAL";                //$NON-NLS-1$
    static final String  STATE_IS_SHOW_IN_CHART_TOOLBAR_SPEED_SUMMARIZED                      = "STATE_IS_SHOW_IN_CHART_TOOLBAR_SPEED_SUMMARIZED";              //$NON-NLS-1$
    static final String  STATE_IS_SHOW_IN_CHART_TOOLBAR_TEMPERATURE                           = "STATE_IS_SHOW_IN_CHART_TOOLBAR_TEMPERATURE";                   //$NON-NLS-1$
+   static final String  STATE_IS_SHOW_IN_CHART_TOOLBAR_RADAR_PASSED_VEHICLES                 = "STATE_IS_SHOW_IN_CHART_TOOLBAR_RADAR_PASSED_VEHICLES";         //$NON-NLS-1$
+   static final String  STATE_IS_SHOW_IN_CHART_TOOLBAR_RADAR_DISTANCE_TO_VEHICLE             = "STATE_IS_SHOW_IN_CHART_TOOLBAR_RADAR_DISTANCE_TO_VEHICLE";     //$NON-NLS-1$
+   static final String  STATE_IS_SHOW_IN_CHART_TOOLBAR_RADAR_PASSING_SPEED_ABSOLUTE          = "STATE_IS_SHOW_IN_CHART_TOOLBAR_RADAR_PASSING_SPEED_ABSOLUTE";  //$NON-NLS-1$
+   static final String  STATE_IS_SHOW_IN_CHART_TOOLBAR_RADAR_PASSING_SPEED_RELATIVE          = "STATE_IS_SHOW_IN_CHART_TOOLBAR_RADAR_PASSING_SPEED_RELATIVE";  //$NON-NLS-1$
    static final String  STATE_IS_SHOW_IN_CHART_TOOLBAR_RUN_DYN_STANCE_TIME                   = "STATE_IS_SHOW_IN_CHART_TOOLBAR_RUN_DYN_STANCE_TIME";           //$NON-NLS-1$
    static final String  STATE_IS_SHOW_IN_CHART_TOOLBAR_RUN_DYN_STANCE_TIME_BALANCED          = "STATE_IS_SHOW_IN_CHART_TOOLBAR_RUN_DYN_STANCE_TIME_BALANCED";  //$NON-NLS-1$
    static final String  STATE_IS_SHOW_IN_CHART_TOOLBAR_RUN_DYN_STEP_LENGTH                   = "STATE_IS_SHOW_IN_CHART_TOOLBAR_RUN_DYN_STEP_LENGTH";           //$NON-NLS-1$
@@ -198,6 +202,10 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
    static final boolean STATE_IS_SHOW_IN_CHART_TOOLBAR_SPEED_INTERVAL_DEFAULT                = false;
    static final boolean STATE_IS_SHOW_IN_CHART_TOOLBAR_SPEED_SUMMARIZED_DEFAULT              = false;
    static final boolean STATE_IS_SHOW_IN_CHART_TOOLBAR_TEMPERATURE_DEFAULT                   = false;
+   static final boolean STATE_IS_SHOW_IN_CHART_TOOLBAR_RADAR_PASSED_VEHICLES_DEFAULT         = false;
+   static final boolean STATE_IS_SHOW_IN_CHART_TOOLBAR_RADAR_DISTANCE_TO_VEHICLE_DEFAULT     = false;
+   static final boolean STATE_IS_SHOW_IN_CHART_TOOLBAR_RADAR_PASSING_SPEED_ABSOLUTE_DEFAULT  = false;
+   static final boolean STATE_IS_SHOW_IN_CHART_TOOLBAR_RADAR_PASSING_SPEED_RELATIVE_DEFAULT  = true;
    static final boolean STATE_IS_SHOW_IN_CHART_TOOLBAR_RUN_DYN_STANCE_TIME_DEFAULT           = false;
    static final boolean STATE_IS_SHOW_IN_CHART_TOOLBAR_RUN_DYN_STANCE_TIME_BALANCED_DEFAULT  = false;
    static final boolean STATE_IS_SHOW_IN_CHART_TOOLBAR_RUN_DYN_STEP_LENGTH_DEFAULT           = true;
@@ -225,6 +233,11 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
    private static final String GRAPH_CONTRIBUTION_ID_TOUR_COMPARE                   = "GRAPH_CONTRIBUTION_ID_TOUR_COMPARE";                  //$NON-NLS-1$
    private static final String GRAPH_CONTRIBUTION_ID_TOUR_COMPARE_REF_TOUR          = "GRAPH_CONTRIBUTION_ID_TOUR_COMPARE_REF_TOUR";         //$NON-NLS-1$
 
+   private static final String GRAPH_CONTRIBUTION_ID_RADAR_PASSED_VEHICLES          = "GRAPH_CONTRIBUTION_ID_RADAR_PASSED_VEHICLES";         //$NON-NLS-1$
+   private static final String GRAPH_CONTRIBUTION_ID_RADAR_DISTANCE_TO_VEHICLE      = "GRAPH_CONTRIBUTION_ID_RADAR_DISTANCE_TO_VEHICLE";     //$NON-NLS-1$
+   private static final String GRAPH_CONTRIBUTION_ID_RADAR_PASSING_SPEED_ABSOLUTE   = "GRAPH_CONTRIBUTION_ID_RADAR_PASSING_SPEED_ABSOLUTE";  //$NON-NLS-1$
+   private static final String GRAPH_CONTRIBUTION_ID_RADAR_PASSING_SPEED_RELATIVE   = "GRAPH_CONTRIBUTION_ID_RADAR_PASSING_SPEED_RELATIVE";  //$NON-NLS-1$
+
    private static final String GRAPH_CONTRIBUTION_ID_RUN_DYN_STANCE_TIME            = "GRAPH_CONTRIBUTION_ID_RUN_DYN_STANCE_TIME";           //$NON-NLS-1$
    private static final String GRAPH_CONTRIBUTION_ID_RUN_DYN_STANCE_TIME_BALANCED   = "GRAPH_CONTRIBUTION_ID_RUN_DYN_STANCE_TIME_BALANCED";  //$NON-NLS-1$
    private static final String GRAPH_CONTRIBUTION_ID_RUN_DYN_STEP_LENGTH            = "GRAPH_CONTRIBUTION_ID_RUN_DYN_STEP_LENGTH";           //$NON-NLS-1$
@@ -250,6 +263,11 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
       GRAPH_CONTRIBUTION_ID_SPEED_INTERVAL,
       GRAPH_CONTRIBUTION_ID_SPEED_SUMMARIZED,
       GRAPH_CONTRIBUTION_ID_TEMPERATURE,
+
+      GRAPH_CONTRIBUTION_ID_RADAR_PASSED_VEHICLES,
+      GRAPH_CONTRIBUTION_ID_RADAR_DISTANCE_TO_VEHICLE,
+      GRAPH_CONTRIBUTION_ID_RADAR_PASSING_SPEED_ABSOLUTE,
+      GRAPH_CONTRIBUTION_ID_RADAR_PASSING_SPEED_RELATIVE,
 
       GRAPH_CONTRIBUTION_ID_RUN_DYN_STANCE_TIME,
       GRAPH_CONTRIBUTION_ID_RUN_DYN_STANCE_TIME_BALANCED,
@@ -1454,7 +1472,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 
       createActions_12_GraphAction(
             TourManager.GRAPH_GEARS,
-            OtherMessages.GRAPH_LABEL_GEARS,
+            OtherMessages.GRAPH_LABEL_GEAR_RATIO,
             Messages.Tour_Action_GraphGears,
             ThemeUtil.getThemedImageName(Images.Graph_Gears),
             GRAPH_CONTRIBUTION_ID_GEARS);
@@ -1479,6 +1497,37 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
             Messages.Tour_Action_Graph_TourCompareReferenceTour_Tooltip,
             ThemeUtil.getThemedImageName(Images.Graph_TourCompare),
             GRAPH_CONTRIBUTION_ID_TOUR_COMPARE_REF_TOUR);
+
+      /*
+       * Radar
+       */
+      createActions_12_GraphAction(
+            TourManager.GRAPH_RADAR_PASSED_VEHICLES,
+            OtherMessages.GRAPH_LABEL_RADAR_PASSED_VEHICLES,
+            Messages.Tour_Action_Radar_PassedVehicles_Tooltip,
+            ThemeUtil.getThemedImageName(Images.Graph_Radar_PassedVehicles),
+            GRAPH_CONTRIBUTION_ID_RADAR_PASSED_VEHICLES);
+
+      createActions_12_GraphAction(
+            TourManager.GRAPH_RADAR_DISTANCE_TO_VEHICLE,
+            OtherMessages.GRAPH_LABEL_RADAR_DISTANCE_TO_VEHICLE,
+            Messages.Tour_Action_Radar_DistanceToVehicle_Tooltip,
+            ThemeUtil.getThemedImageName(Images.Graph_Radar_DistanceToVehicle),
+            GRAPH_CONTRIBUTION_ID_RADAR_DISTANCE_TO_VEHICLE);
+
+      createActions_12_GraphAction(
+            TourManager.GRAPH_RADAR_PASSING_SPEED_ABSOLUTE,
+            OtherMessages.GRAPH_LABEL_RADAR_PASSING_SPEED_ABSOLUTE,
+            Messages.Tour_Action_Radar_PassingSpeed_Absolute_Tooltip,
+            ThemeUtil.getThemedImageName(Images.Graph_Radar_PassingSpeed_Absolute),
+            GRAPH_CONTRIBUTION_ID_RADAR_PASSING_SPEED_ABSOLUTE);
+
+      createActions_12_GraphAction(
+            TourManager.GRAPH_RADAR_PASSING_SPEED_RELATIVE,
+            OtherMessages.GRAPH_LABEL_RADAR_PASSING_SPEED_RELATIVE,
+            Messages.Tour_Action_Radar_PassingSpeed_Relative_Tooltip,
+            ThemeUtil.getThemedImageName(Images.Graph_Radar_PassingSpeed_Relative),
+            GRAPH_CONTRIBUTION_ID_RADAR_PASSING_SPEED_RELATIVE);
 
       /*
        * Running dynamics
@@ -3153,6 +3202,34 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
             TourManager.GRAPH_GEARS,
             TourChart.STATE_IS_SHOW_IN_CHART_TOOLBAR_GEARS,
             TourChart.STATE_IS_SHOW_IN_CHART_TOOLBAR_GEARS_DEFAULT);
+
+      /*
+       * Radar
+       */
+
+      fillToolbar_Graphs_Graph(
+            tbm,
+            TourManager.GRAPH_RADAR_PASSED_VEHICLES,
+            TourChart.STATE_IS_SHOW_IN_CHART_TOOLBAR_RADAR_PASSED_VEHICLES,
+            TourChart.STATE_IS_SHOW_IN_CHART_TOOLBAR_RADAR_PASSED_VEHICLES_DEFAULT);
+
+      fillToolbar_Graphs_Graph(
+            tbm,
+            TourManager.GRAPH_RADAR_DISTANCE_TO_VEHICLE,
+            TourChart.STATE_IS_SHOW_IN_CHART_TOOLBAR_RADAR_DISTANCE_TO_VEHICLE,
+            TourChart.STATE_IS_SHOW_IN_CHART_TOOLBAR_RADAR_DISTANCE_TO_VEHICLE_DEFAULT);
+
+      fillToolbar_Graphs_Graph(
+            tbm,
+            TourManager.GRAPH_RADAR_PASSING_SPEED_ABSOLUTE,
+            TourChart.STATE_IS_SHOW_IN_CHART_TOOLBAR_RADAR_PASSING_SPEED_ABSOLUTE,
+            TourChart.STATE_IS_SHOW_IN_CHART_TOOLBAR_RADAR_PASSING_SPEED_ABSOLUTE_DEFAULT);
+
+      fillToolbar_Graphs_Graph(
+            tbm,
+            TourManager.GRAPH_RADAR_PASSING_SPEED_RELATIVE,
+            TourChart.STATE_IS_SHOW_IN_CHART_TOOLBAR_RADAR_PASSING_SPEED_RELATIVE,
+            TourChart.STATE_IS_SHOW_IN_CHART_TOOLBAR_RADAR_PASSING_SPEED_RELATIVE_DEFAULT);
 
       /*
        * Running dynamics
@@ -6131,17 +6208,18 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
        * all graph actions
        */
       final int[] allGraphIds = TourManager.getAllGraphIDs();
-      final ArrayList<Integer> visibleGraphIds = _tcc.getVisibleGraphs();
-      final ArrayList<Integer> enabledGraphIds = new ArrayList<>();
+      final List<Integer> allVisibleGraphIds = _tcc.getVisibleGraphs();
+      final List<Integer> allEnabledGraphIds = new ArrayList<>();
 
       // get all graph ids which can be displayed
-      for (final ChartDataSerie xyDataIterator : getChartDataModel().getXyData()) {
+      final List<ChartDataSerie> allXYData = getChartDataModel().getXyData();
+      for (final ChartDataSerie xyDataIterator : allXYData) {
 
          if (xyDataIterator instanceof final ChartDataYSerie yData) {
 
             final Integer graphId = (Integer) yData.getCustomData(ChartDataYSerie.YDATA_GRAPH_ID);
 
-            enabledGraphIds.add(graphId);
+            allEnabledGraphIds.add(graphId);
          }
       }
 
@@ -6151,8 +6229,8 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 
          tourAction = _allTourChartActions.get(getGraphActionId(graphId));
 
-         tourAction.setChecked(visibleGraphIds.contains(graphId));
-         tourAction.setEnabled(enabledGraphIds.contains(graphId));
+         tourAction.setChecked(allVisibleGraphIds.contains(graphId));
+         tourAction.setEnabled(allEnabledGraphIds.contains(graphId));
       }
 
       /*

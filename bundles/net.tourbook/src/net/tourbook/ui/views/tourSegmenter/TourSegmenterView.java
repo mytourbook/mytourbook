@@ -64,7 +64,6 @@ import net.tourbook.tour.SelectionTourIds;
 import net.tourbook.tour.TourEvent;
 import net.tourbook.tour.TourEventId;
 import net.tourbook.tour.TourManager;
-import net.tourbook.ui.ImageComboLabel;
 import net.tourbook.ui.TableColumnFactory;
 import net.tourbook.ui.tourChart.TourChart;
 import net.tourbook.web.WEB;
@@ -113,6 +112,7 @@ import org.eclipse.swt.widgets.Link;
 import org.eclipse.swt.widgets.Spinner;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
+import org.eclipse.swt.widgets.Text;
 import org.eclipse.swt.widgets.Widget;
 import org.eclipse.ui.IPartListener2;
 import org.eclipse.ui.ISelectionListener;
@@ -482,123 +482,123 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
    /*
     * UI controls
     */
-   private Composite       _parent;
+   private Composite _parent;
    //
-   private PageBook        _pageBookUI;
-   private PageBook        _pageBookSegmenter;
-   private PageBook        _pageBookBreakTime;
+   private PageBook  _pageBookUI;
+   private PageBook  _pageBookSegmenter;
+   private PageBook  _pageBookBreakTime;
    //
-   private Button          _btnSaveTourDP;
-   private Button          _btnSaveTourMin;
+   private Button    _btnSaveTourDP;
+   private Button    _btnSaveTourMin;
    //
-   private Composite       _containerBreakTime;
-   private Composite       _viewerContainer;
+   private Composite _containerBreakTime;
+   private Composite _viewerContainer;
    //
-   private Composite       _pageSegmenter;
-   private Composite       _pageBreakBy_AvgSliceSpeed;
-   private Composite       _pageBreakBy_AvgSpeed;
-   private Composite       _pageBreakBy_SliceSpeed;
-   private Composite       _pageBreakBy_TimeDistance;
-   private Composite       _pageNoData;
-   private Composite       _pageSegType_ByAltiUpDown;
-   private Composite       _pageSegType_ByBreakTime;
-   private Composite       _pageSegType_ByDistance;
-   private Composite       _pageSegType_ByMarker;
-   private Composite       _pageSegType_DP_Elevation;
-   private Composite       _pageSegType_DP_FlatGainLoss;
-   private Composite       _pageSegType_DP_Power;
-   private Composite       _pageSegType_DP_Pulse;
-   private Composite       _pageSegType_Surfing;
+   private Composite _pageSegmenter;
+   private Composite _pageBreakBy_AvgSliceSpeed;
+   private Composite _pageBreakBy_AvgSpeed;
+   private Composite _pageBreakBy_SliceSpeed;
+   private Composite _pageBreakBy_TimeDistance;
+   private Composite _pageNoData;
+   private Composite _pageSegType_ByAltiUpDown;
+   private Composite _pageSegType_ByBreakTime;
+   private Composite _pageSegType_ByDistance;
+   private Composite _pageSegType_ByMarker;
+   private Composite _pageSegType_DP_Elevation;
+   private Composite _pageSegType_DP_FlatGainLoss;
+   private Composite _pageSegType_DP_Power;
+   private Composite _pageSegType_DP_Pulse;
+   private Composite _pageSegType_Surfing;
    //
-   private Button          _btnSurfing_DeleteTourSegments;
-   private Button          _btnSurfing_RestoreFrom_Defaults;
-   private Button          _btnSurfing_RestoreFrom_Tour;
-   private Button          _btnSurfing_SaveTourSegments;
+   private Button    _btnSurfing_DeleteTourSegments;
+   private Button    _btnSurfing_RestoreFrom_Defaults;
+   private Button    _btnSurfing_RestoreFrom_Tour;
+   private Button    _btnSurfing_SaveTourSegments;
    //
-   private Button          _chkIsMinSurfingDistance;
-   private Button          _chkIsShowOnlySelectedSegments;
+   private Button    _chkIsMinSurfingDistance;
+   private Button    _chkIsShowOnlySelectedSegments;
    //
-   private Combo           _comboBreakMethod;
-   private Combo           _comboMouseWheelIncrementer_DP;
-   private Combo           _comboMouseWheelIncrementer_Gradient;
-   private Combo           _comboSegmenterType;
-   private Combo           _comboSurfing_SegmenterFilter;
+   private Combo     _comboBreakMethod;
+   private Combo     _comboMouseWheelIncrementer_DP;
+   private Combo     _comboMouseWheelIncrementer_Gradient;
+   private Combo     _comboSegmenterType;
+   private Combo     _comboSurfing_SegmenterFilter;
    //
-   private ImageComboLabel _lblTitle;
+   private CLabel    _iconSaveSurfingState;
    //
-   private CLabel          _iconSaveSurfingState;
+   private Image     _imageSurfing_SaveState;
+   private Image     _imageSurfing_NotSaveState;
    //
-   private Image           _imageSurfing_SaveState;
-   private Image           _imageSurfing_NotSaveState;
+   private Label     _lblBreakDistanceUnit;
+   private Label     _lblDistanceValue;
+   private Label     _lblElevation_Gain;
+   private Label     _lblElevation_Gain_Min;
+   private Label     _lblMinElevation;
+   private Label     _lblNumSegments;
+   private Label     _lblSurfing_MinStartStopSpeed;
+   private Label     _lblSurfing_MinStartStopSpeed_Unit;
+   private Label     _lblSurfing_MinSurfingDistance_Unit;
+   private Label     _lblSurfing_MinSurfingSpeed;
+   private Label     _lblSurfing_MinSurfingSpeed_Unit;
+   private Label     _lblSurfing_MinSurfingTimeDuration;
+   private Label     _lblSurfing_MinSurfingTimeDuration_Unit;
+   private Label     _lblTourBreakTime;
    //
-   private Label           _lblBreakDistanceUnit;
-   private Label           _lblDistanceValue;
-   private Label           _lblElevation_Gain;
-   private Label           _lblElevation_Gain_Min;
-   private Label           _lblMinElevation;
-   private Label           _lblNumSegments;
-   private Label           _lblSurfing_MinStartStopSpeed;
-   private Label           _lblSurfing_MinStartStopSpeed_Unit;
-   private Label           _lblSurfing_MinSurfingDistance_Unit;
-   private Label           _lblSurfing_MinSurfingSpeed;
-   private Label           _lblSurfing_MinSurfingSpeed_Unit;
-   private Label           _lblSurfing_MinSurfingTimeDuration;
-   private Label           _lblSurfing_MinSurfingTimeDuration_Unit;
-   private Label           _lblTourBreakTime;
+   private Label     _lblVerticalSpeed_Distance_Header;
+   private Label     _lblVerticalSpeed_Distance_Flat;
+   private Label     _lblVerticalSpeed_Distance_Gain;
+   private Label     _lblVerticalSpeed_Distance_Loss;
    //
-   private Label           _lblVerticalSpeed_Distance_Header;
-   private Label           _lblVerticalSpeed_Distance_Flat;
-   private Label           _lblVerticalSpeed_Distance_Gain;
-   private Label           _lblVerticalSpeed_Distance_Loss;
+   private Label     _lblVerticalSpeed_Distance_Relative_Header;
+   private Label     _lblVerticalSpeed_Distance_Relative_Flat;
+   private Label     _lblVerticalSpeed_Distance_Relative_Gain;
+   private Label     _lblVerticalSpeed_Distance_Relative_Loss;
    //
-   private Label           _lblVerticalSpeed_Distance_Relative_Header;
-   private Label           _lblVerticalSpeed_Distance_Relative_Flat;
-   private Label           _lblVerticalSpeed_Distance_Relative_Gain;
-   private Label           _lblVerticalSpeed_Distance_Relative_Loss;
+   private Label     _lblVerticalSpeed_Elevation_Header;
+   private Label     _lblVerticalSpeed_Elevation_Gain;
+   private Label     _lblVerticalSpeed_Elevation_Loss;
    //
-   private Label           _lblVerticalSpeed_Elevation_Header;
-   private Label           _lblVerticalSpeed_Elevation_Gain;
-   private Label           _lblVerticalSpeed_Elevation_Loss;
+   private Label     _lblVerticalSpeed_Speed_Header;
+   private Label     _lblVerticalSpeed_Speed_Flat;
+   private Label     _lblVerticalSpeed_Speed_Gain;
+   private Label     _lblVerticalSpeed_Speed_Loss;
    //
-   private Label           _lblVerticalSpeed_Speed_Header;
-   private Label           _lblVerticalSpeed_Speed_Flat;
-   private Label           _lblVerticalSpeed_Speed_Gain;
-   private Label           _lblVerticalSpeed_Speed_Loss;
+   private Label     _lblVerticalSpeed_Time_Header;
+   private Label     _lblVerticalSpeed_Time_Flat;
+   private Label     _lblVerticalSpeed_Time_Gain;
+   private Label     _lblVerticalSpeed_Time_Loss;
    //
-   private Label           _lblVerticalSpeed_Time_Header;
-   private Label           _lblVerticalSpeed_Time_Flat;
-   private Label           _lblVerticalSpeed_Time_Gain;
-   private Label           _lblVerticalSpeed_Time_Loss;
+   private Label     _lblVerticalSpeed_Time_Relative_Header;
+   private Label     _lblVerticalSpeed_Time_Relative_Flat;
+   private Label     _lblVerticalSpeed_Time_Relative_Gain;
+   private Label     _lblVerticalSpeed_Time_Relative_Loss;
    //
-   private Label           _lblVerticalSpeed_Time_Relative_Header;
-   private Label           _lblVerticalSpeed_Time_Relative_Flat;
-   private Label           _lblVerticalSpeed_Time_Relative_Gain;
-   private Label           _lblVerticalSpeed_Time_Relative_Loss;
+   private Label     _lblVerticalSpeed_NumSegments_Header;
+   private Label     _lblVerticalSpeed_NumSegments_Flat;
+   private Label     _lblVerticalSpeed_NumSegments_Gain;
+   private Label     _lblVerticalSpeed_NumSegments_Loss;
    //
-   private Label           _lblVerticalSpeed_NumSegments_Header;
-   private Label           _lblVerticalSpeed_NumSegments_Flat;
-   private Label           _lblVerticalSpeed_NumSegments_Gain;
-   private Label           _lblVerticalSpeed_NumSegments_Loss;
+   private Spinner   _spinnerBreak_MinAvgSpeedAS;
+   private Spinner   _spinnerBreak_MinSliceSpeedAS;
+   private Spinner   _spinnerBreak_MinSliceTimeAS;
+   private Spinner   _spinnerBreak_MinAvgSpeed;
+   private Spinner   _spinnerBreak_MinSliceSpeed;
+   private Spinner   _spinnerBreak_ShortestTime;
+   private Spinner   _spinnerBreak_MaxDistance;
+   private Spinner   _spinnerBreak_SliceDiff;
+   private Spinner   _spinnerDistance;
+   private Spinner   _spinnerDPTolerance_Elevation;
+   private Spinner   _spinnerDPTolerance_FlatGainLoss;
+   private Spinner   _spinnerDPTolerance_Power;
+   private Spinner   _spinnerDPTolerance_Pulse;
+   private Spinner   _spinnerFlatGainLoss_Gradient;
+   private Spinner   _spinnerMinAltitude;
+   private Spinner   _spinnerSurfing_MinSurfingDistance;
+   private Spinner   _spinnerSurfing_MinSpeed_Surfing;
+   private Spinner   _spinnerSurfing_MinTimeDuration;
+   private Spinner   _spinnerSurfing_MinSpeed_StartStop;
    //
-   private Spinner         _spinnerBreak_MinAvgSpeedAS;
-   private Spinner         _spinnerBreak_MinSliceSpeedAS;
-   private Spinner         _spinnerBreak_MinSliceTimeAS;
-   private Spinner         _spinnerBreak_MinAvgSpeed;
-   private Spinner         _spinnerBreak_MinSliceSpeed;
-   private Spinner         _spinnerBreak_ShortestTime;
-   private Spinner         _spinnerBreak_MaxDistance;
-   private Spinner         _spinnerBreak_SliceDiff;
-   private Spinner         _spinnerDistance;
-   private Spinner         _spinnerDPTolerance_Elevation;
-   private Spinner         _spinnerDPTolerance_FlatGainLoss;
-   private Spinner         _spinnerDPTolerance_Power;
-   private Spinner         _spinnerDPTolerance_Pulse;
-   private Spinner         _spinnerFlatGainLoss_Gradient;
-   private Spinner         _spinnerMinAltitude;
-   private Spinner         _spinnerSurfing_MinSurfingDistance;
-   private Spinner         _spinnerSurfing_MinSpeed_Surfing;
-   private Spinner         _spinnerSurfing_MinTimeDuration;
-   private Spinner         _spinnerSurfing_MinSpeed_StartStop;
+   private Text      _txtTitle;
 
    //
    private class SegmenterComparator extends ViewerComparator {
@@ -2436,10 +2436,9 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
          {
             // tour title
 
-            _lblTitle = new ImageComboLabel(container, SWT.NONE);
-            GridDataFactory.fillDefaults().grab(true, false).span(4, 1).applyTo(_lblTitle);
+            _txtTitle = new Text(container, SWT.READ_ONLY);
+            GridDataFactory.fillDefaults().grab(true, false).span(4, 1).applyTo(_txtTitle);
          }
-
          {
             // label: create segments with
 
@@ -2447,14 +2446,12 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
             GridDataFactory.fillDefaults().align(SWT.BEGINNING, SWT.CENTER).applyTo(label);
             label.setText(Messages.tour_segmenter_label_createSegmentsWith);
          }
-
          {
             // combo: segmenter type
 
             _comboSegmenterType = new Combo(container, SWT.READ_ONLY);
             _comboSegmenterType.addSelectionListener(SelectionListener.widgetSelectedAdapter(selectionEvent -> onSelect_SegmenterType(true)));
          }
-
          {
             // label: number of segments
 
@@ -6401,7 +6398,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
          _tourStartDayTime = tourStartTime.get(ChronoField.SECOND_OF_DAY);
 
          // update tour title
-         _lblTitle.setText(getTourTitle());
+         _txtTitle.setText(getTourTitle());
 
          // keep original dp tolerance
          _savedDpToleranceElevation = _dpToleranceElevation = getDPTolerance_FromTour();

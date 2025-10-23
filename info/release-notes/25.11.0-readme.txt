@@ -1,0 +1,76 @@
+25.11.0                                                 ?. November 2025
+
+New / Improvements
+==================
+
+* Radar values
+    https://github.com/mytourbook/mytourbook/issues/1561
+  - Import values from .fit files
+  - Display values in 
+    - Tour book view
+    - Tour chart
+      - Value point tooltip
+
+* Fit Import
+  - Log all device sensor values, e.g. battery voltage, soft-/hardware versions
+  
+* Fit Export
+  - Export swim values
+    https://github.com/mytourbook/mytourbook/issues/1581
+  
+* Import view
+  - Remove tours with the DELELTE key
+
+* Sensor view     
+    https://github.com/mytourbook/mytourbook/issues/1569
+  - Show number of tours for each sensor  
+  - All associated tours for a selected sensor can be displayed in the tour book view
+  
+* Color preferences
+  - Copy and paste colors between different color definitions
+    https://github.com/mytourbook/mytourbook/issues/1576
+  - Reset all colors of one color definition to its defaults
+
+
+Changes
+=======
+
+* Map properties view
+  - This view is removed, its options are now available directly in the 2D map options slideout
+    https://github.com/mytourbook/mytourbook/issues/1543
+  
+* Elevation gain/loss
+  - The elevation gain/loss values may have to be recomputed because these values will now be ignored during break times.  
+    https://github.com/mytourbook/mytourbook/issues/1545  
+
+* Device sensors
+  - This was a big rewrite to include also a device type because a sensor can have multiple device types
+  - When a product name is the same as the product number, then the db update process tries to find a suitable Garmin device name
+  - When tours are imported or re-imported without saving the tours, this will update the sensor type and name for existing sensors, when these values are not yet set
+  
+
+Bugfix
+======
+  
+See milestone 25.11 https://github.com/mytourbook/mytourbook/milestone/27?closed=1
+ 
+
+Translation    
+===========
+
+- Dutch (Maarten)
+- French (Frederic)
+- German
+- Italian (Doriano)
+
+ 
+System   
+======
+
+* MyTourbook Milestone 25.11     https://github.com/mytourbook/mytourbook/milestone/27?closed=1
+* Java 21                        https://adoptium.net/temurin/releases/?version=21
+* Eclipse 2025-09 (4.37)         https://archive.eclipse.org/eclipse/downloads/drops4/R-4.37-202509050730/
+* NatTable 2.6.0                 https://eclipse.dev/nattable/download
+* Nebula Widgets                 https://download.eclipse.org/nebula/releases/latest
+* FIT SDK 21.176.0               https://forums.garmin.com/developer/fit-sdk/b/news-announcements
+* WorldWind 2.2.1                https://github.com/NASAWorldWind/WorldWindJava/releases/tag/v2.2.1

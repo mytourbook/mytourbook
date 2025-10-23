@@ -218,6 +218,7 @@ public class Messages extends NLS {
    public static String        ColumnFactory_Category_Photo;
    public static String        ColumnFactory_Category_Power;
    public static String        ColumnFactory_Category_Powertrain;
+   public static String        ColumnFactory_Category_Radar;
    public static String        ColumnFactory_Category_RunDyn;
    public static String        ColumnFactory_Category_Sensor;
    public static String        ColumnFactory_Category_State;
@@ -420,7 +421,8 @@ public class Messages extends NLS {
    public static String        ColumnFactory_restpulse_label;
    public static String        ColumnFactory_restpulse;
    public static String        ColumnFactory_restpulse_tooltip;
-
+   public static String        ColumnFactory_Radar_PassedVehicles;
+   public static String        ColumnFactory_Radar_PassedVehicles_Header;
    public static String        ColumnFactory_RunDyn_StanceTime_Avg;
    public static String        ColumnFactory_RunDyn_StanceTime_Avg_Header;
    public static String        ColumnFactory_RunDyn_StanceTime_Max;
@@ -455,6 +457,9 @@ public class Messages extends NLS {
    public static String        ColumnFactory_Sensor_BatteryState_Voltage_Header;
    public static String        ColumnFactory_Sensor_BatteryState_Voltage_Label;
    public static String        ColumnFactory_Sensor_Description;
+   public static String        ColumnFactory_Sensor_DeviceName_Header;
+   public static String        ColumnFactory_Sensor_DeviceName_Label;
+   public static String        ColumnFactory_Sensor_DeviceName_Tooltip;
    public static String        ColumnFactory_Sensor_DeviceType_Header;
    public static String        ColumnFactory_Sensor_DeviceType_Label;
    public static String        ColumnFactory_Sensor_DeviceType_Tooltip;
