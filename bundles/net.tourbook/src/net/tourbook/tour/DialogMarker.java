@@ -749,7 +749,7 @@ public class DialogMarker extends TitleAreaDialog implements ITourMarkerSelectio
             toggleMarkerVisibility();
          }
       }));
-      
+
       /*
        * Create context menu
        */
@@ -761,7 +761,6 @@ public class DialogMarker extends TitleAreaDialog implements ITourMarkerSelectio
       final Menu contextMenu = menuManager.createContextMenu(table);
       table.setMenu(contextMenu);
 
-      
       _markerViewer = new TableViewer(table);
 
       /*
@@ -1648,8 +1647,9 @@ public class DialogMarker extends TitleAreaDialog implements ITourMarkerSelectio
    @Override
    protected void okPressed() {
 
-      if (_selectedTourMarker != null &&
-            _selectedTourMarker.isValidForSave() == false) {
+      if (_selectedTourMarker != null
+            && _selectedTourMarker.isValidForSave() == false) {
+
          return;
       }
 

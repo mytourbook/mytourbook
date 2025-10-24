@@ -58,6 +58,8 @@ public abstract class TreeColumnFactory {
    public static final String            DEVICE_BATTERY_SOC_START_ID      = "DEVICE_BATTERY_SOC_START_ID";      //$NON-NLS-1$
    public static final TreeColumnFactory DEVICE_DISTANCE;
    public static final TreeColumnFactory DEVICE_NAME;
+   public static final TreeColumnFactory TOUR_EQUIPMENT_AND_CATEGORY;
+   public static final String            TOUR_EQUIPMENT_AND_CATEGORY_ID   = "TOUR_EQUIPMENT_AND_CATEGORY";      //$NON-NLS-1$
 
    public static final TreeColumnFactory MOTION_AVG_PACE;
    public static final TreeColumnFactory MOTION_AVG_SPEED;
@@ -694,6 +696,28 @@ public abstract class TreeColumnFactory {
             colDef.setColumnHeaderToolTipText(  Messages.ColumnFactory_device_tooltip);
 
             colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(10));
+
+            return colDef;
+         }
+      };
+
+      /*
+       * Equipment
+       */
+      TOUR_EQUIPMENT_AND_CATEGORY = new TreeColumnFactory() {
+         @Override
+         public TreeColumnDefinition createColumn(final ColumnManager columnManager,
+                                                  final PixelConverter pixelConverter) {
+
+            final TreeColumnDefinition colDef = new TreeColumnDefinition(columnManager, TOUR_EQUIPMENT_AND_CATEGORY_ID, SWT.LEAD);
+
+            colDef.setColumnCategory(           Messages.ColumnFactory_Category_Equipment);
+
+            colDef.setColumnLabel(              Messages.ColumnFactory_Equipment);
+            colDef.setColumnHeaderText(         Messages.ColumnFactory_Equipment);
+            colDef.setColumnHeaderToolTipText(  Messages.ColumnFactory_Equipment);
+
+            colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(20));
 
             return colDef;
          }
@@ -2381,7 +2405,6 @@ public abstract class TreeColumnFactory {
             return colDef;
          }
       };
-
 
       /*
        * Tour Tag

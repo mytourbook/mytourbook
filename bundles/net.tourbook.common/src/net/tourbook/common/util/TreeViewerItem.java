@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2025 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -18,7 +18,7 @@ package net.tourbook.common.util;
 import java.util.ArrayList;
 
 /**
- * Abstract class which contains an item for a tree viewer.
+ * Abstract class which contains an item for a tree viewer
  */
 public abstract class TreeViewerItem {
 
@@ -42,7 +42,7 @@ public abstract class TreeViewerItem {
    }
 
    /**
-    * Adds a new child before an existing child.
+    * Adds a new child before an existing child
     *
     * @param oldItem
     *           Item before the new item is inserted.
@@ -189,6 +189,7 @@ public abstract class TreeViewerItem {
     * Removes a child from this tree item
     *
     * @param treeItem
+    *
     * @return Returns <code>true</code> when the child was removed
     */
    public boolean removeChild(final TreeViewerItem treeItem) {

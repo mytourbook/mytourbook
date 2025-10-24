@@ -611,6 +611,13 @@
                mnemonic    ="%command_tagging_name_Mnemonic"
                tooltip     ="%command_tagging_name_tooltip"/>
 
+            <!-- Equipment -->
+            <command 
+               commandId   ="command.net.tourbook.equipment.EquipmentView.ID"
+               icon        ="icons/equipment.svg"
+               label       ="%View_Name_Equipment"
+               mnemonic    ="%View_Name_Equipment_Mnemonic"/>
+
             <!-- Collated Tours -->
             <command 
                commandId   ="command.net.tourbook.views.collatedToursViewID"
@@ -1288,6 +1295,11 @@
          defaultHandler ="net.tourbook.ui.views.ActionHandler_OpenView_TaggedTours"/>
 
       <command
+         id             ="command.net.tourbook.equipment.EquipmentView.ID"
+         name           ="%View_Name_Equipment"
+         defaultHandler ="net.tourbook.ui.views.ActionHandler_OpenView_Equipment"/>
+
+      <command
          id             ="command.net.tourbook.views.calendar.CalendarView"
          name           ="%view_name_Calendar"
          defaultHandler ="net.tourbook.ui.views.ActionHandler_OpenView_Calendar"/>
@@ -1656,6 +1668,13 @@
 
          <view
             category    ="net.tourbook.category.Tour_Directory"
+            id          ="net.tourbook.equipment.EquipmentView.ID"
+            class       ="net.tourbook.equipment.EquipmentView"
+            icon        ="icons/equipment.svg"
+            name        ="%View_Name_Equipment"/>
+            
+         <view
+            category    ="net.tourbook.category.Tour_Directory"
             id          ="net.tourbook.ui.views.collateTours.CollatedToursView"
             class       ="net.tourbook.ui.views.collateTours.CollatedToursView"
             icon        ="icons/collated-tours.svg"
@@ -2014,6 +2033,12 @@
       <key
          commandId   ="command.net.tourbook.views.tagViewID"
          sequence    ="%Shortcut_Key_App_TaggedTours"
+         contextId   ="org.eclipse.ui.contexts.window"
+         schemeId    ="net.tourbook.scheme"/>
+
+      <key
+         commandId   ="command.net.tourbook.equipment.EquipmentView.ID"
+         sequence    ="%Shortcut_Key_App_Equipment"
          contextId   ="org.eclipse.ui.contexts.window"
          schemeId    ="net.tourbook.scheme"/>
 

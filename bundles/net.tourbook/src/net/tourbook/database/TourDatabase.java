@@ -4437,7 +4437,7 @@ public class TourDatabase {
 
             // version 60 start
 
-            + "   Name                 VARCHAR(" + Equipment.DB_LENGTH_NAME + "),            " + NL //$NON-NLS-1$ //$NON-NLS-2$
+            + "   Brand                VARCHAR(" + Equipment.DB_LENGTH_NAME + "),            " + NL //$NON-NLS-1$ //$NON-NLS-2$
             + "   Model                VARCHAR(" + Equipment.DB_LENGTH_NAME + "),            " + NL //$NON-NLS-1$ //$NON-NLS-2$
             + "   Description          VARCHAR(" + Equipment.DB_LENGTH_DESCRIPTION + "),     " + NL //$NON-NLS-1$ //$NON-NLS-2$
 
@@ -6381,7 +6381,7 @@ public class TourDatabase {
 
             createTable_TourTag(stmt);
             createTable_TourTag_Category(stmt);
-            
+
             createTable_Equipment(stmt);
 
             createTable_TourWayPoint(stmt);

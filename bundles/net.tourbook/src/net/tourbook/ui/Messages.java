@@ -212,6 +212,7 @@ public class Messages extends NLS {
    public static String        ColumnFactory_Category_AddressOther;
    public static String        ColumnFactory_Category_AddressRoad;
    public static String        ColumnFactory_Category_AddressState;
+   public static String        ColumnFactory_Category_Equipment;
    public static String        ColumnFactory_Category_Marker;
    public static String        ColumnFactory_Category_Motion;
    public static String        ColumnFactory_Category_Nutrition;
@@ -261,6 +262,7 @@ public class Messages extends NLS {
    public static String        ColumnFactory_Elevation_LossDiff_Tooltip;
    public static String        ColumnFactory_Elevation_LossDelta_Label;
    public static String        ColumnFactory_Elevation_LossDelta_Tooltip;
+   public static String        ColumnFactory_Equipment;
    public static String        ColumnFactory_GearFrontShiftCount_Header;
    public static String        ColumnFactory_GearFrontShiftCount_Label;
    public static String        ColumnFactory_GearFrontShiftCount_Tooltip;

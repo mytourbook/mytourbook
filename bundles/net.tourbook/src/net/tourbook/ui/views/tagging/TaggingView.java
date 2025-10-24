@@ -15,7 +15,6 @@
  *******************************************************************************/
 package net.tourbook.ui.views.tagging;
 
-import static org.eclipse.swt.events.KeyListener.keyPressedAdapter;
 
 import java.text.NumberFormat;
 import java.util.ArrayList;
@@ -118,6 +117,7 @@ import org.eclipse.jface.viewers.ViewerFilter;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.BusyIndicator;
 import org.eclipse.swt.events.ControlListener;
+import org.eclipse.swt.events.KeyListener;
 import org.eclipse.swt.events.MenuAdapter;
 import org.eclipse.swt.events.MenuEvent;
 import org.eclipse.swt.graphics.Color;
@@ -161,8 +161,8 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer,
    private static final int          STATE_ITEM_TYPE_YEAR                   = 3;
    private static final int          STATE_ITEM_TYPE_MONTH                  = 4;
 
-   static final int                  TAG_VIEW_LAYOUT_FLAT                   = 0;
-   static final int                  TAG_VIEW_LAYOUT_HIERARCHICAL           = 10;
+   private static final int          TAG_VIEW_LAYOUT_FLAT                   = 0;
+   private static final int          TAG_VIEW_LAYOUT_HIERARCHICAL           = 10;
 
    private static final NumberFormat _nf0                                   = NumberFormat.getNumberInstance();
    private static final NumberFormat _nf1                                   = NumberFormat.getNumberInstance();
@@ -434,7 +434,7 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer,
 
          } else if (a instanceof final TVITaggingView_Year yearItem1 && b instanceof final TVITaggingView_Year yearItem2) {
 
-            return yearItem1.getTagId() == yearItem2.getTagId() //
+            return yearItem1.getTagId() == yearItem2.getTagId()
                   && yearItem1.getYear() == yearItem2.getYear();
 
          } else if (a instanceof final TVITaggingView_Month monthItemA
@@ -833,7 +833,7 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer,
       tree.addListener(SWT.MouseDoubleClick, event -> onTagTree_DoubleClick(event));
       tree.addListener(SWT.MouseDown, event -> onTagTree_MouseDown(event));
 
-      tree.addKeyListener(keyPressedAdapter(keyEvent -> {
+      tree.addKeyListener(KeyListener.keyPressedAdapter(keyEvent -> {
 
          _isSelectedWithKeyboard = true;
 
@@ -2627,7 +2627,7 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer,
          createUI_10_TagViewer(_viewerContainer);
          _viewerContainer.layout();
 
-         reloadViewer_0_SetContent();
+         reloadViewer_SetContent();
 
          _tagViewer.setExpandedElements(expandedElements);
          _tagViewer.setSelection(selection);
@@ -2649,14 +2649,14 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer,
       {
          final Object[] expandedElements = _tagViewer.getExpandedElements();
 
-         reloadViewer_0_SetContent();
+         reloadViewer_SetContent();
 
          _tagViewer.setExpandedElements(expandedElements);
       }
       tree.setRedraw(true);
    }
 
-   private void reloadViewer_0_SetContent() {
+   private void reloadViewer_SetContent() {
 
       final boolean isTreeLayoutHierarchical = _tagViewLayout == TAG_VIEW_LAYOUT_HIERARCHICAL;
 

@@ -23,6 +23,7 @@ import java.time.LocalDate;
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
@@ -36,74 +37,77 @@ import javax.persistence.Transient;
 import net.tourbook.Messages;
 import net.tourbook.common.UI;
 import net.tourbook.common.time.TimeTools;
+import net.tourbook.common.util.StringUtils;
 import net.tourbook.database.FIELD_VALIDATION;
 import net.tourbook.database.TourDatabase;
 
 @Entity
 public class Equipment implements Cloneable, Serializable {
 
-   private static final long   serialVersionUID      = 1L;
+   private static final long          serialVersionUID      = 1L;
 
-   private static final char   NL                    = UI.NEW_LINE;
+   private static final char          NL                    = UI.NEW_LINE;
 
-   public static final int     DB_LENGTH_NAME        = 1000;
-   public static final int     DB_LENGTH_DESCRIPTION = 32000;
+   public static final int            DB_LENGTH_NAME        = 1000;
+   public static final int            DB_LENGTH_DESCRIPTION = 32000;
+
+   private static final AtomicInteger _createCounter        = new AtomicInteger();
 
    @Id
    @GeneratedValue(strategy = GenerationType.IDENTITY)
-   private long                equipmentId           = TourDatabase.ENTITY_IS_NOT_SAVED;
+   private long                       equipmentId           = TourDatabase.ENTITY_IS_NOT_SAVED;
 
    /**
-    * Name or brand for the equipment
+    * Name/brand for the equipment
     */
-   private String              name;
+   private String                     brand;
 
    /**
     * Model/subname for the equipment
     */
-   private String              model;
+   private String                     model;
 
    /**
     * Description/notes for the equipment
     */
-   private String              description;
+   private String                     description;
 
    /**
     *
     */
    @Enumerated(EnumType.STRING)
-   private EquipmentType       equipmentType         = EquipmentType.NONE;
+   private EquipmentType              equipmentType         = EquipmentType.NONE;
 
    /**
     * When the equipment was created/build, in UTC milliseconds
     */
-   private long                dateBuilt;
+   private long                       dateBuilt;
 
    /**
     * When the equipment was bought or firstly used, in UTC milliseconds
     */
-   private long                dateFirstUse;
+   private long                       dateFirstUse;
 
    /**
     * When the equipment was retired/sold, in UTC milliseconds
     */
-   private long                dateRetired;
+   private long                       dateRetired;
 
    /**
     * Weight of the equipment, in kg
     */
-   private float               weight;
+   private float                      weight;
 
    /**
     * Initial distance, in meter
     */
-   private float               distanceFirstUse;
+   private float                      distanceFirstUse;
 
    /**
     * Contains all tours which are associated with this equipment
     */
    @ManyToMany(mappedBy = "equipments", cascade = ALL, fetch = LAZY)
-   private final Set<TourData> tourData              = new HashSet<>();
+   private final Set<TourData>        tourData              = new HashSet<>();
 
 //   Collection of services
 //   Collection of parts
@@ -128,18 +132,20 @@ public class Equipment implements Cloneable, Serializable {
    @Override
    public Equipment clone() {
 
-      Equipment newEquipment = null;
+      Equipment clonedEquipment = null;
 
       try {
 
-         newEquipment = (Equipment) super.clone();
+         clonedEquipment = (Equipment) super.clone();
 
       } catch (final CloneNotSupportedException e) {
 
          e.printStackTrace();
       }
 
-      return newEquipment;
+      clonedEquipment._createId = _createCounter.incrementAndGet();
+
+      return clonedEquipment;
    }
 
    @Override
@@ -166,13 +172,25 @@ public class Equipment implements Cloneable, Serializable {
 
       } else {
 
-         // equipment is create
+         // equipment is created
          if (_createId != other._createId) {
             return false;
          }
       }
 
       return true;
+   }
+
+   /**
+    * @return Returns the equipment name or an empty string when not available
+    */
+   public String getBrand() {
+
+      if (brand == null) {
+         return UI.EMPTY_STRING;
+      }
+
+      return brand;
    }
 
    public LocalDate getDateBuilt() {
@@ -223,19 +241,35 @@ public class Equipment implements Cloneable, Serializable {
    }
 
    public String getModel() {
+
+      if (model == null) {
+         return UI.EMPTY_STRING;
+      }
+
       return model;
    }
 
    /**
-    * @return Returns the equipment name or an empty string when not available
+    * @return Returns a combined name of the equipment with "brand - model"
     */
    public String getName() {
 
-      if (name == null) {
-         return UI.EMPTY_STRING;
+      final StringBuilder sb = new StringBuilder();
+
+      if (StringUtils.hasContent(brand)) {
+         sb.append(brand);
       }
 
-      return name;
+      if (StringUtils.hasContent(model)) {
+
+         if (sb.length() > 0) {
+            sb.append(UI.DASH_WITH_DOUBLE_SPACE);
+         }
+
+         sb.append(model);
+      }
+
+      return sb.toString();
    }
 
    public float getWeight() {
@@ -266,12 +300,19 @@ public class Equipment implements Cloneable, Serializable {
             Messages.Db_Field_EquipmentDescription);
 
       if (fieldValidation == FIELD_VALIDATION.IS_INVALID) {
+
          return false;
+
       } else if (fieldValidation == FIELD_VALIDATION.TRUNCATE) {
+
          description = description.substring(0, DB_LENGTH_DESCRIPTION);
       }
 
       return true;
+   }
+
+   public void setBrand(final String brand) {
+      this.brand = brand;
    }
 
    public void setDateBuilt(final long dateBuilt) {
@@ -303,6 +344,13 @@ public class Equipment implements Cloneable, Serializable {
 
    public void setWeight(final float weight) {
       this.weight = weight;
+   }
+
+   public void updateFromModified(final Equipment otherEquipment) {
+
+      brand = otherEquipment.getBrand();
+      model = otherEquipment.getModel();
+      description = otherEquipment.getDescription();
    }
 
 }

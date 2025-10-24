@@ -140,6 +140,7 @@ public class Messages extends NLS {
    public static String        App_Action_Copy;
    public static String        App_Action_CopyDataIntoClipboard_Tooltip;
    public static String        App_Action_CopyDataIntoClipboard_CopyIsDone;
+   public static String        App_Action_Create;
    public static String        App_Action_Delete;
    public static String        App_Action_DeleteProfile;
    public static String        App_Action_DeleteProperty;
@@ -580,6 +581,14 @@ public class Messages extends NLS {
    public static String        Dialog_EditTimeslicesValues_Label_OffsetValues;
    public static String        Dialog_EditTimeslicesValues_Label_ReplaceValues;
    public static String        Dialog_EditTimeslicesValues_Title;
+
+   public static String        Dialog_Equipment_Label_Brand;
+   public static String        Dialog_Equipment_Label_Brand_Tooltip;
+   public static String        Dialog_Equipment_Label_Description;
+   public static String        Dialog_Equipment_Label_Model;
+   public static String        Dialog_Equipment_Message_Equipment_Edit;
+   public static String        Dialog_Equipment_Message_Equipment_New;
+   public static String        Dialog_Equipment_Title;
 
    public static String        dialog_export_btn_export;
 
