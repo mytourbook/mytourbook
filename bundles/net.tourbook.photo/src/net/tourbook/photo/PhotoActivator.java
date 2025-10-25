@@ -19,6 +19,7 @@ import java.util.Optional;
 
 import net.tourbook.common.UI;
 import net.tourbook.common.color.ThemeUtil;
+import net.tourbook.common.util.StatusUtil;
 
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.preference.IPreferenceStore;
@@ -66,17 +67,7 @@ public class PhotoActivator extends AbstractUIPlugin {
       return imageDescriptor.isPresent() ? imageDescriptor.get() : null;
    }
 
-   public static IPreferenceStore getPrefStore() {
-      return getDefault().getPreferenceStore();
-   }
-
-   /**
-    * @param imageName
-    *
-    * @return Returns the themed image descriptor from the photo {@link PhotoActivator} plugin
-    *         images
-    */
-   public static ImageDescriptor getThemedImageDescriptor(final String imageName) {
+   private static ImageDescriptor getImageDescriptor_Dark_Win(final String imageName) {
 
       if (UI.IS_DARK_THEME && UI.IS_WIN) {
 
@@ -104,7 +95,38 @@ public class PhotoActivator extends AbstractUIPlugin {
          return getImageDescriptor(imageName);
       }
 
-      return getImageDescriptor(ThemeUtil.getThemedImageName(imageName));
+      return null;
+   }
+
+   public static IPreferenceStore getPrefStore() {
+      return getDefault().getPreferenceStore();
+   }
+
+   /**
+    * @param imageName
+    *
+    * @return Returns the themed image descriptor from this plugin images
+    */
+   public static ImageDescriptor getThemedImageDescriptor(final String imageName) {
+
+      final ImageDescriptor winDarkImageDescriptor = getImageDescriptor_Dark_Win(imageName);
+
+      if (winDarkImageDescriptor != null) {
+         return winDarkImageDescriptor;
+      }
+
+      final ImageDescriptor themedImageDescriptor = getImageDescriptor(ThemeUtil.getThemedImageName(imageName));
+
+      if (themedImageDescriptor == null) {
+
+         StatusUtil.logError("Cannot get themed image descriptor for '%s'".formatted(imageName)); //$NON-NLS-1$
+
+      } else {
+
+         return themedImageDescriptor;
+      }
+
+      return getImageDescriptor(imageName);
    }
 
    /**
