@@ -68,7 +68,7 @@ jobs:
         run: cd ./build/build.net.tourbook && ./gradlew mt_10_CreateBuildFiles mt_20_BuildProduct sonarqube --warning-mode all --stacktrace --info
       - name: Upload screenshot of failed tests
         if: failure()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: Tests-Failures
           path: |
@@ -83,7 +83,7 @@ jobs:
           echo "artifactFileName=$FILENAME" | Out-File -FilePath $env:GITHUB_ENV -Append
       - name: Upload JaCoCo file
         if: success()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: ${{ env.artifactFileName }}
           path: ${{ env.DRIVE_LETTER }}\a\mytourbook\mytourbook\mergedJaCoCoReport.exec
