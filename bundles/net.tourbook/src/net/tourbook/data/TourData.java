@@ -8748,7 +8748,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
    public void finalizeTour_SwimData(final TourData tourData, final List<SwimData> allTourSwimData) {
 
       // check if swim data are available
-      if (allTourSwimData == null) {
+      if (allTourSwimData == null || allTourSwimData.size() < 2) {
          return;
       }
 
@@ -8774,6 +8774,9 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
       boolean isSwimStrokeStyle = false;
       boolean isSwimTime = false;
 
+      /*
+       * Collect all swim values from the imported swim data
+       */
       for (int swimSerieIndex = 0; swimSerieIndex < numSwimValues; swimSerieIndex++) {
 
          final SwimData swimData = allTourSwimData.get(swimSerieIndex);
@@ -8865,27 +8868,31 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
          tourData.swim_Cadence = null;
       }
 
+      /*
+       * Compute time slice distances by merging tour slices with swim slices
+       */
       if (isSwimming()) {
 
          final float poolLengthMeters = poolLength / 1000f;
 
          int swimIndex = 0;
 
-         int swimTimePrev = 0;
-         int swimTimeNext = allSwimTimes[++swimIndex];
-         int swimTimePoolLengthSec = swimTimeNext - swimTimePrev;
+         int swimTimeSec_Prev = 0;
+         int swimTimeSec_Next = numSwimValues > 0 ? allSwimTimes[++swimIndex] : 0;
+         int swimTimePoolLengthSec = swimTimeSec_Next - swimTimeSec_Prev;
 
-         float timeSlice_Distance = 0;
+         float oneSecondDistance = 0;
 
          short lengthType = allLengthTypes[0];
          short lengthStroke = allStrokes[0];
 
          if (lengthType != 0 && lengthStroke != 0) {
-            timeSlice_Distance = poolLengthMeters / swimTimePoolLengthSec;
+            oneSecondDistance = poolLengthMeters / swimTimePoolLengthSec;
          }
 
          float serieDistance = 0;
          final int numTimeSlices = timeSerie.length;
+         int prevTimeSliceSec = 0;
 
          tourDistance = getSwim_Distance(allLengthTypes, poolLengthMeters);
          distanceSerie = new float[numTimeSlices];
@@ -8894,7 +8901,12 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
 
             final int tourTimeSec = timeSerie[timeSerieIndex];
 
-            if (tourTimeSec > swimTimeNext && swimIndex < numSwimValues) {
+            final int timeSliceSec = tourTimeSec - prevTimeSliceSec;
+            prevTimeSliceSec = tourTimeSec;
+
+            float oneSliceDistance = 0;
+
+            if (tourTimeSec > swimTimeSec_Next && swimIndex < numSwimValues) {
 
                if (swimIndex == numSwimValues - 1) {
 
@@ -8907,8 +8919,8 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
 
                   swimIndex++;
 
-                  swimTimePrev = swimTimeNext;
-                  swimTimeNext = allSwimTimes[swimIndex];
+                  swimTimeSec_Prev = swimTimeSec_Next;
+                  swimTimeSec_Next = allSwimTimes[swimIndex];
 
                   lengthType = allLengthTypes[swimIndex - 1];
                   lengthStroke = allStrokes[swimIndex - 1];
@@ -8926,18 +8938,20 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
                   // set same distance as before
                   distanceSerie[timeSerieIndex] = serieDistance;
 
-                  timeSlice_Distance = 0;
+                  oneSecondDistance = 0;
 
                   continue;
                }
 
-               swimTimePoolLengthSec = swimTimeNext - swimTimePrev;
-               timeSlice_Distance = poolLengthMeters / swimTimePoolLengthSec;
+               swimTimePoolLengthSec = swimTimeSec_Next - swimTimeSec_Prev;
+               oneSecondDistance = poolLengthMeters / swimTimePoolLengthSec;
             }
 
             distanceSerie[timeSerieIndex] = serieDistance;
 
-            serieDistance += timeSlice_Distance;
+            oneSliceDistance = oneSecondDistance * timeSliceSec;
+
+            serieDistance += oneSliceDistance;
          }
       }
    }
