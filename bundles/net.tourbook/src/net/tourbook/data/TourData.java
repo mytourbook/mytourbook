@@ -2129,7 +2129,9 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
    public boolean[]           interpolatedValueSerie;
 
    /**
-    * "Vehicle Count" - Number of passed vehicles, fit field: <code>radar_current</code>
+    * "Vehicle Count" - Number of passed vehicles, fit field: <code>radar_current</code>.
+    * <p>
+    * This value is saved in {@link SerieData}
     */
    @Transient
    public int[]               radar_PassedVehicles;
@@ -13872,7 +13874,12 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
       this.isPowerSerieFromDevice = true;
    }
 
-   private void setRadarValues() {
+   /**
+    * Set number of passed vehicles or 0 when not available
+    */
+   public void setRadarValues() {
+
+      numberOfPassedVehicles = 0;
 
       if (radar_PassedVehicles != null && radar_PassedVehicles.length > 0) {
 
