@@ -70,9 +70,9 @@ public class Images {
    public static final String Checkbox_Uncheck                     = "checkbox-unchecked.svg";                      //$NON-NLS-1$
    public static final String ConconiChart                         = "conconi-chart.svg";                           //$NON-NLS-1$
    public static final String CSVFormat                            = "app-csv-format.svg";                          //$NON-NLS-1$
-   public static final String Cursor_Photo_Move                    = "cursor-photo-move.png";                       //$NON-NLS-1$
-   public static final String Cursor_Photo_Select                  = "cursor-photo-select.png";                     //$NON-NLS-1$
-   public static final String Cursor_Select                        = "cursor-select.png";                           //$NON-NLS-1$
+   public static final String Cursor_Photo_Move                    = "cursor-photo-move.svg";                       //$NON-NLS-1$
+   public static final String Cursor_Photo_Select                  = "cursor-photo-select.svg";                     //$NON-NLS-1$
+   public static final String Cursor_Select                        = "cursor-select.svg";                           //$NON-NLS-1$
    public static final String EasyImport_Harddrive                 = "hard-drive.svg";                              //$NON-NLS-1$
    public static final String EditRow                              = "edit-row.svg";                                //$NON-NLS-1$
    public static final String EditTour                             = "tour-editor.svg";                             //$NON-NLS-1$
