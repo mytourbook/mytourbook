@@ -36,14 +36,14 @@ public class DPITools {
     */
    public static String get4kImageName(final String imageName) {
 
-      String imageName4k = imageName;
+      final String imageName4k = imageName;
 
-      if (UI.IS_4K_DISPLAY) {
-
-         final String imageNameWithoutExtension = imageName.substring(0, imageName.length() - PNG_EXTENSION_LENGTH);
-
-         imageName4k = imageNameWithoutExtension + POSTFIX_4K + IMAGE_NAME_EXTENSION_PNG;
-      }
+//      if (UI.IS_4K_DISPLAY) {
+//
+//         final String imageNameWithoutExtension = imageName.substring(0, imageName.length() - PNG_EXTENSION_LENGTH);
+//
+//         imageName4k = imageNameWithoutExtension + POSTFIX_4K + IMAGE_NAME_EXTENSION_PNG;
+//      }
 
       return imageName4k;
    }
