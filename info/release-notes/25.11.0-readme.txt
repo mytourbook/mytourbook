@@ -5,7 +5,7 @@ New / Improvements
 
 * Radar values
     https://github.com/mytourbook/mytourbook/issues/1561
-  - Import values from .fit files
+  - Import or re-Import values from .fit files
   - Display values in 
     - Tour book view
     - Tour chart
