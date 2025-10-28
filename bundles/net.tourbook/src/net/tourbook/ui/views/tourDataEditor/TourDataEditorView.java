@@ -6127,9 +6127,16 @@ public class TourDataEditorView extends ViewPart implements
 
                final float distance = _serieDistance[serieIndex] / 1000 / _unitValueDistance;
 
-               cell.setText(_nf3.format(distance));
+               if (distance == 0) {
+                  cell.setText(UI.EMPTY_STRING);
+               } else if (distance < 0.001) {
+                  cell.setText(_nf6.format(distance));
+               } else {
+                  cell.setText(_nf3.format(distance));
+               }
 
             } else {
+
                cell.setText(UI.EMPTY_STRING);
             }
          }
