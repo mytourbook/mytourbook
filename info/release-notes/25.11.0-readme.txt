@@ -9,7 +9,8 @@ New / Improvements
   - Display values in 
     - Tour book view
     - Tour chart
-      - Value point tooltip
+    - Tour info
+    - Value point tooltip
 
 * Fit Import
   - Log all device sensor values, e.g. battery voltage, soft-/hardware versions
