@@ -22,7 +22,6 @@ import java.util.Collections;
 import java.util.HashMap;
 
 import net.tourbook.chart.preferences.IChartPreferences;
-import net.tourbook.common.DPITools;
 import net.tourbook.common.PointLong;
 import net.tourbook.common.RectangleLong;
 import net.tourbook.common.UI;
@@ -301,7 +300,6 @@ public class ChartComponentGraph extends Canvas {
    private Cursor                     _cursorDragXSlider_ModeZoom;
    private Cursor                     _cursorDragXSlider_ModeSlider;
    private Cursor                     _cursorModeZoom;
-   private Cursor                     _cursorModeZoomMove;
    private Cursor                     _cursorModeSlider;
    private Cursor                     _cursorMove1x;
    private Cursor                     _cursorMove2x;
@@ -482,7 +480,6 @@ public class ChartComponentGraph extends Canvas {
 
       _cursorModeSlider                = createCursorFromImage(ChartImages.CursorMode_Slider);
       _cursorModeZoom                  = createCursorFromImage(ChartImages.CursorMode_Zoom);
-      _cursorModeZoomMove              = createCursorFromImage(ChartImages.CursorMode_Slider_Move);
       _cursorDragXSlider_ModeZoom      = createCursorFromImage(ChartImages.Cursor_DragXSlider_ModeZoom);
       _cursorDragXSlider_ModeSlider    = createCursorFromImage(ChartImages.Cursor_DragXSlider_ModeSlider);
 
@@ -1036,14 +1033,13 @@ public class ChartComponentGraph extends Canvas {
     */
    private Cursor createCursorFromImage(final String imageName) {
 
-      final String imageName4K = DPITools.get4kImageName(imageName);
-
       Image cursorImage = null;
-      final ImageDescriptor imageDescriptor = ChartActivator.getThemedImageDescriptor(imageName4K);
+
+      final ImageDescriptor imageDescriptor = ChartActivator.getThemedImageDescriptor_NoHDR(imageName);
 
       if (imageDescriptor == null) {
 
-         final String resourceName = "icons/" + imageName4K;//$NON-NLS-1$
+         final String resourceName = "icons/" + imageName;//$NON-NLS-1$
 
          final ClassLoader classLoader = getClass().getClassLoader();
 
@@ -7970,7 +7966,6 @@ public class ChartComponentGraph extends Canvas {
       _cursorArrow                     = UI.disposeResource(_cursorArrow);
       _cursorModeSlider                = UI.disposeResource(_cursorModeSlider);
       _cursorModeZoom                  = UI.disposeResource(_cursorModeZoom);
-      _cursorModeZoomMove              = UI.disposeResource(_cursorModeZoomMove);
       _cursorDragXSlider_ModeZoom      = UI.disposeResource(_cursorDragXSlider_ModeZoom);
       _cursorDragXSlider_ModeSlider    = UI.disposeResource(_cursorDragXSlider_ModeSlider);
 

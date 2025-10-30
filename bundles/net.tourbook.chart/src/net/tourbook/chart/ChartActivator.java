@@ -104,6 +104,7 @@ public class ChartActivator extends AbstractUIPlugin {
 
       return getDefault().getPreferenceStore();
    }
+
    /**
     * @param imageName
     *
@@ -116,6 +117,28 @@ public class ChartActivator extends AbstractUIPlugin {
       if (winDarkImageDescriptor != null) {
          return winDarkImageDescriptor;
       }
+
+      final ImageDescriptor themedImageDescriptor = getImageDescriptor(ThemeUtil.getThemedImageName(imageName));
+
+      if (themedImageDescriptor == null) {
+
+         StatusUtil.logError("Cannot get themed image descriptor for '%s'".formatted(imageName)); //$NON-NLS-1$
+
+      } else {
+
+         return themedImageDescriptor;
+      }
+
+      return getImageDescriptor(imageName);
+   }
+
+   /**
+    * @param imageName
+    *
+    * @return Returns the themed image descriptor from this plugin images but without HDR images
+    *         which is used for cursors
+    */
+   public static ImageDescriptor getThemedImageDescriptor_NoHDR(final String imageName) {
 
       final ImageDescriptor themedImageDescriptor = getImageDescriptor(ThemeUtil.getThemedImageName(imageName));
 

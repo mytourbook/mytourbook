@@ -878,6 +878,7 @@ public class Messages extends NLS {
    public static String        Dialog_ModifyTours_Checkbox_GearValues;
    public static String        Dialog_ModifyTours_Checkbox_PowerAndPulseValues;
    public static String        Dialog_ModifyTours_Checkbox_PowerAndSpeedValues;
+   public static String        Dialog_ModifyTours_Checkbox_RadarValues;
    public static String        Dialog_ModifyTours_Checkbox_RunningDynamicsValues;
    public static String        Dialog_ModifyTours_Checkbox_SwimmingValues;
    public static String        Dialog_ModifyTours_Checkbox_WeatherValues;
@@ -3274,6 +3275,7 @@ public class Messages extends NLS {
    public static String        Tour_Data_Text_ImportFileLocation;
    public static String        Tour_Data_Text_PowerValues;
    public static String        Tour_Data_Text_PulseValues;
+   public static String        Tour_Data_Text_RadarValues;
    public static String        Tour_Data_Text_RunningDynamicsValues;
    public static String        Tour_Data_Text_SpeedValues;
    public static String        Tour_Data_Text_SwimmingValues;
