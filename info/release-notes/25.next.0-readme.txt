@@ -34,9 +34,6 @@ Experimental
 New / Improvements
 ==================
 
-* Tour Nutrition (Frederic):
-  - Select a product from a list of the most recent products used
-
 * Radar values
     https://github.com/mytourbook/mytourbook/issues/1561
   - Import values from .fit files
