@@ -51,7 +51,6 @@ import net.tourbook.nutrition.DialogCustomTourNutritionProduct;
 import net.tourbook.nutrition.NutritionUtils;
 import net.tourbook.nutrition.ProductSearchType;
 import net.tourbook.nutrition.QuantityType;
-import net.tourbook.nutrition.TourNutritionProductMenuManager;
 import net.tourbook.nutrition.openfoodfacts.Product;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.tour.ITourEventListener;
@@ -125,11 +124,6 @@ import cop.swt.widgets.viewers.table.celleditors.RangeContent;
 import cop.swt.widgets.viewers.table.celleditors.SpinnerCellEditor;
 
 public class TourNutritionView extends ViewPart implements ITourViewer {
-
-   // todo fb
-
-   // add group with 2 radio buttons "Use the last most added items", "Use the most used items for all the tours"
-   // in that group, add a spinner for the number of items to show 1 to 15
 
    public static final String            ID                             = "net.tourbook.ui.views.nutrition.TourNutritionView"; //$NON-NLS-1$
 
@@ -641,7 +635,6 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
       _actionDeleteProducts = new ActionDeleteProducts();
       _actionEditCustomProduct = new ActionEditCustomProduct();
       _actionOpenProductsWebsite = new ActionOpenProductsWebsite();
-
    }
 
    private void createMenuManager() {
@@ -671,17 +664,14 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
          _tourData.getTourNutritionProducts().remove(product);
          _tourData.getTourNutritionProducts().add(updatedProduct);
 
-         reloadViewer();
-
       } else {
 
          // add new product
-         final Set<TourNutritionProduct> tourNutritionProducts = _tourData.getTourNutritionProducts();
-         tourNutritionProducts.add(dialogTourNutritionProduct.getTourNutritionProduct(_tourData));
-         _tourData.setTourNutritionProducts(tourNutritionProducts);
-         _tourData = TourManager.saveModifiedTour(_tourData);
-         _tourData.setTourNutritionProducts(_tourData.getTourNutritionProducts());
+         _tourData.getTourNutritionProducts().add(dialogTourNutritionProduct.getTourNutritionProduct(_tourData));
       }
+
+      _tourData = TourManager.saveModifiedTour(_tourData);
+      _tourData.setTourNutritionProducts(_tourData.getTourNutritionProducts());
    }
 
    @Override
@@ -1407,26 +1397,7 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
       menuMgr.add(_actionEditCustomProduct);
       menuMgr.add(_actionDeleteProducts);
 
-      //todo fb add the recent tour nutrition products when not selecting existing products
-      TourNutritionProductMenuManager.fillMenuWithRecentTourNutritionProducts(menuMgr, true);
-
       enableActions();
-   }
-
-   private List<TourNutritionProduct> getAllProducts() {
-
-      final StructuredSelection selection = (StructuredSelection) _productsViewer.getSelection();
-
-      final List<TourNutritionProduct> selectedTourNutritionProducts = new ArrayList<>();
-
-      for (final Object object : selection.toList()) {
-
-         if (object instanceof final TourNutritionProduct tourNutritionProduct) {
-            selectedTourNutritionProducts.add(tourNutritionProduct);
-         }
-      }
-
-      return selectedTourNutritionProducts;
    }
 
    @Override
