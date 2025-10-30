@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2021, 2023 Frédéric Bard
+ * Copyright (C) 2021, 2025 Frédéric Bard
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -15,7 +15,6 @@
  *******************************************************************************/
 package net.tourbook.cloud.suunto;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 class WorkoutDownload {
@@ -26,7 +25,6 @@ class WorkoutDownload {
    private String  _absoluteFilePath;
    private String  _error;
 
-   @JsonIgnoreProperties(ignoreUnknown = true)
    WorkoutDownload(final String workoutKey) {
 
       _workoutKey = workoutKey;

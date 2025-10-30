@@ -1,6 +1,6 @@
 plugins {
 
-   id 'org.sonarqube' version '6.3.1.5724'
+   id 'org.sonarqube' version '7.0.1.6134'
    id 'jacoco'
 }
 
@@ -63,7 +63,7 @@ sonarqube {
     property 'sonar.coverage.exclusions',                       'bundles/*tests/**/*.*, bundles/**/src-test/**/*.*, bundles/net.tourbook.p2/**/*.*, bundles/**/Slideout*.java, bundles/**/*_DISABLED.java, bundles/**/*_TEMPLATE_*.java, bundles/net.tourbook/src/net/tourbook/update/**/*.*, bundles/net.tourbook/src/net/tourbook/map3/**/*.*, bundles/net.tourbook/src/net/tourbook/map25/**/*.*, bundles/**/AbstractRRShell.java, bundles/net.tourbook.cloud/src/net/tourbook/cloud/dropbox/**/*.*, bundles/net.tourbook/src/de/byteholder/geoclipse/tests/**/*.*, bundles/**/*ExternalDevice.java, bundles/**/device/Port*.java, bundles/**/SimpleSerialDevice.java, bundles/**/Fmath.java'
     property 'sonar.cpd.exclusions',                            'bundles/net.tourbook.web/WebContent-rel/tourbook/search/**/*.*,bundles/net.tourbook.web/WebContent-dev/tourbook/search/nls/**/*.js'
     property 'sonar.coverage.jacoco.xmlReportPaths',            '../../mytourbook-BUILD-autocreated/core/net.tourbook.tests/target/site/jacoco-aggregate/jacoco.xml, ../../mytourbook-BUILD-autocreated/core/net.tourbook.ui.tests/target/site/jacoco-aggregate/jacoco.xml'
-    property 'sonar.java.source',                               '17'
+    property 'sonar.java.source',                               '21'
     property 'sonar.issue.ignore.multicriteria',                'e1,e2,e3,e4'
     property 'sonar.issue.ignore.multicriteria.e1.ruleKey',     'java:S1104'
     property 'sonar.issue.ignore.multicriteria.e1.resourceKey', 'bundles/**/Messages.java'
