@@ -8877,7 +8877,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
 
          if (numSwimValues > 0
 
-               // it is possible that each fit record has exactly one length (swim) record
+               // it is possible that each record (time) message has exactly one length (swim) message
                && distanceSerie != null
                && distanceSerie.length == numSwimValues
 
@@ -8925,7 +8925,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
             timeSliceSec = tourTimeSec - timeSliceSec_Prev;
             timeSliceSec_Prev = tourTimeSec;
 
-            if (tourTimeSec > swimTimeSec_Next && swimIndex < numSwimValues) {
+            if (tourTimeSec >= swimTimeSec_Next && swimIndex < numSwimValues) {
 
                if (swimIndex == numSwimValues - 1) {
 
