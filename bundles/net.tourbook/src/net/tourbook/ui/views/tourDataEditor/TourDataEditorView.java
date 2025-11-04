@@ -7597,8 +7597,8 @@ public class TourDataEditorView extends ViewPart implements
 
          if (firstSelectedSlice instanceof final SwimSlice swimSlice) {
 
-            final int swimSerieIndex1 = swimSlice.serieIndex;
-            final int swimSerieIndex2 = ((SwimSlice) selectedSlices[numSelectedSlices - 1]).serieIndex;
+            final int swimSerieIndex1 = swimSlice.serieIndex + 1;
+            final int swimSerieIndex2 = ((SwimSlice) selectedSlices[numSelectedSlices - 1]).serieIndex + 1;
 
             final int timeSerieIndex2 = getTimeSerieIndexFromSwimTime(swimSerieIndex2);
 
