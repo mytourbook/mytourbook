@@ -1962,7 +1962,9 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
    private float[]      _swim_LengthType_UI;
 
    /**
-    * Swimming data: Number of strokes. Contains {@link Short#MIN_VALUE} when value is not set.
+    * Swimming data: Number of strokes within a length. Contains {@link Short#MIN_VALUE} when value is not set.
+    * <p>
+    * Content is synced with {@link SerieData}
     */
    @Transient
    @JsonProperty
@@ -11629,7 +11631,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
    }
 
    /**
-    * @return Returns the UI values for cadence
+    * @return Returns the UI values for cadence and each time slice
     */
    private float[] getSwim_Cadence_UI() {
 
@@ -11660,7 +11662,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
    }
 
    /**
-    * @return Returns the UI values for number of strokes
+    * @return Returns the UI values for number of strokes and each time slice
     */
    public float[] getSwim_Strokes() {
 
@@ -11672,7 +11674,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
    }
 
    /**
-    * @return Returns the UI values for number of strokes
+    * @return Returns the UI values for number of strokes and each time slice
     */
    public float[] getSwim_StrokeStyle() {
 
@@ -11684,7 +11686,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
    }
 
    /**
-    * @return Returns the UI values for Swolf
+    * @return Returns the UI values for Swolf and each time slice
     */
    public float[] getSwim_Swolf() {
 

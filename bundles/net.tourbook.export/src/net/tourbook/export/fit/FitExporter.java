@@ -69,17 +69,25 @@ import net.tourbook.data.TourMarker;
 import net.tourbook.data.TourPerson;
 import net.tourbook.export.Activator;
 
+import org.eclipse.collections.impl.list.mutable.primitive.IntArrayList;
 import org.osgi.framework.Version;
 
 public class FitExporter {
 
-   private TourData   _tourData;
+   private TourData         _tourData;
 
-   private long[]     _pausedTime_Start;
-   private long[]     _pausedTime_End;
-   private List<Long> _allPausedTime_Data;
+   private long[]           _pausedTime_Start;
+   private long[]           _pausedTime_End;
+   private List<Long>       _allPausedTime_Data;
 
-   private List<Mesg> _allMessages = new ArrayList<>();
+   private List<Mesg>       _allMessages               = new ArrayList<>();
+   private List<LapMesg>    _allLapMessages            = new ArrayList<>();
+   private List<LengthMesg> _allLengthMessages         = new ArrayList<>();
+
+   private IntArrayList     _allLapTimes_FromTourStart = new IntArrayList();
+   private IntArrayList     _allLapTimes_FromLapStart  = new IntArrayList();
+
+   private boolean          _isDebug                   = true;
 
    private static byte[] convertUUIDToBytes(final UUID uuid) {
 
@@ -194,6 +202,8 @@ public class FitExporter {
             pulseSerieIndex = createHrvMessage(pulseSerieIndex, index);
             previousGearData = createGearEvent(garminTimeSlice_Time, previousGearData, index);
             batteryTimeIndex = createBatteryEvent(garminTimeSlice_Time, batteryTimeIndex, currentTimeSliceValue);
+
+            // the sequence of the lap message is not at the correct time position but the time in the lap message is OK
             markerIndex = createLapMessage(markerIndex);
 
             createPauseEvent(allPauseTimeIndices, currentTimeSliceValue);
@@ -205,8 +215,8 @@ public class FitExporter {
       }
 
       // Every FIT ACTIVITY file MUST contain at least one Lap message
-      final List<TourMarker> markers = _tourData.getTourMarkersSorted();
-      if (markers == null || markers.isEmpty()) {
+      final List<TourMarker> allMarkers = _tourData.getTourMarkersSorted();
+      if (allMarkers == null || allMarkers.isEmpty()) {
 
          final LapMesg lapMessage = createLapMessage(
 
@@ -221,6 +231,9 @@ public class FitExporter {
                _tourData.getTourDistance());
 
          _allMessages.add(lapMessage);
+         _allLapMessages.add(lapMessage);
+         _allLapTimes_FromTourStart.add(0);
+         _allLapTimes_FromLapStart.add(0);
       }
 
       addFinalEventMessage(garminTimeSlice_Time);
@@ -267,6 +280,7 @@ public class FitExporter {
       }
 
       createSwimMessages();
+      setSwimLapValues();
 
       createFitFile(exportFilePath, garminCreationTime, version);
    }
@@ -479,7 +493,7 @@ public class FitExporter {
 
       long previousTotalTime_MS = _tourData.getTourStartTimeMS();
       int markerPausedTime = 0;
-      float previousRelativeTime_Sec = 0;
+      int previousTime_FromStart_Sec = 0;
       float previousTotalDistance = 0;
 
       if (markerIndex > 0) {
@@ -487,23 +501,23 @@ public class FitExporter {
          final TourMarker prevTourMarker = allMarkers.get(markerIndex - 1);
 
          previousTotalTime_MS = prevTourMarker.getDeviceLapTime();
-         previousRelativeTime_Sec = prevTourMarker.getTime();
+         previousTime_FromStart_Sec = prevTourMarker.getTime();
          previousTotalDistance = prevTourMarker.getDistance();
 
-         final int startIndex = prevTourMarker.getSerieIndex();
-         final int endIndex = tourMarker.getSerieIndex();
+         final int markerStartIndex = prevTourMarker.getSerieIndex();
+         final int markerEndIndex = tourMarker.getSerieIndex();
 
-         markerPausedTime = _tourData.getPausedTime(startIndex, endIndex);
+         markerPausedTime = _tourData.getPausedTime(markerStartIndex, markerEndIndex);
       }
 
       final long markerTotalTime_MS = tourMarker.getDeviceLapTime();
-      final int markerRelativeTime_Sec = tourMarker.getTime();
+      final int markerTime_FromStart_Sec = tourMarker.getTime();
       final float markerTotalDistance = tourMarker.getDistance();
 
       final DateTime garminLapStartTime = new DateTime(Date.from(Instant.ofEpochMilli(previousTotalTime_MS)));
       final DateTime garminLapEndTime = new DateTime(Date.from(Instant.ofEpochMilli(markerTotalTime_MS)));
 
-      final float lapTime_Sec = markerRelativeTime_Sec - previousRelativeTime_Sec;
+      final int lapTime_Sec = markerTime_FromStart_Sec - previousTime_FromStart_Sec;
       final float lapTime_NoPauses_Sec = lapTime_Sec - markerPausedTime;
       final float lapDistance = markerTotalDistance - previousTotalDistance;
 
@@ -520,6 +534,10 @@ public class FitExporter {
             lapDistance);
 
       _allMessages.add(lapMessage);
+      _allLapMessages.add(lapMessage);
+
+      _allLapTimes_FromLapStart.add(lapTime_Sec);
+      _allLapTimes_FromTourStart.add(markerTime_FromStart_Sec);
 
       return ++markerIndex;
    }
@@ -538,7 +556,7 @@ public class FitExporter {
       lapMessage.setStartTime(startTime);
       lapMessage.setTimestamp(endTime);
 
-      lapMessage.setTotalTimerTime(totalTimerTime); //  (excludes pauses)
+      lapMessage.setTotalTimerTime(totalTimerTime); //      (excludes pauses)
       lapMessage.setTotalElapsedTime(totalElapsedTime); //  (includes pauses)
 
       lapMessage.setTotalDistance(lapDistance);
@@ -644,6 +662,7 @@ public class FitExporter {
 
          lengthMesg.setTimestamp          (garminSwimSliceTime);
          lengthMesg.setStartTime          (garminSwimSliceTime);
+         lengthMesg.setTotalTimerTime     ((float) diffSwimTime_Sec);
 
          lengthMesg.setAvgSwimmingCadence (swimCadence);
          lengthMesg.setLengthType         (LengthType.getByValue(swimLengthType));
@@ -654,6 +673,7 @@ public class FitExporter {
          previousSwimTime_Sec = swimTime_Sec;
 
          _allMessages.add(lengthMesg);
+         _allLengthMessages.add(lengthMesg);
       }
 
 // SET_FORMATTING_ON
@@ -665,6 +685,63 @@ public class FitExporter {
       _tourData = tourData;
 
       createAll(exportFilePath);
+   }
+
+   private short getAvgCadence(final LapMesg lapMesg, final Float relativeLapTime_Sec, final long lap_TotalStrokes) {
+
+      // Set avg_cadence field
+      // Units: rpm
+      //
+      // total_cycles / total_timer_time           if non_zero avg_cadence otherwise
+      // total_cycles / total_elapsed_time
+
+      short lap_AvgCadence = relativeLapTime_Sec == null
+            ? 0
+            : (short) (lap_TotalStrokes / relativeLapTime_Sec);
+
+      if (lap_AvgCadence == 0) {
+
+         final Float relativeElapsedLapTime_Sec = lapMesg.getTotalElapsedTime();
+
+         lap_AvgCadence = relativeElapsedLapTime_Sec == null
+               ? 0
+               : (short) (lap_TotalStrokes / relativeElapsedLapTime_Sec);
+      }
+
+      return lap_AvgCadence;
+   }
+
+   /**
+    * All lap fields cannot be used, some of them are <code>null</code> when read !!!
+    *
+    * @param lapMesg
+    * @param numLap_TotalStrokes
+    * @param numLap_Lengths
+    * @param numLap_ActiveLengths
+    */
+   private void logLapMessage(final LapMesg lapMesg,
+                              final long numLap_TotalStrokes,
+                              final int numLap_Lengths,
+                              final int numLap_ActiveLengths) {
+
+      if (_isDebug == false) {
+         return;
+      }
+
+      final StringBuilder sb = new StringBuilder();
+
+// SET_FORMATTING_OFF
+
+      sb.append("lap: %3d - "                .formatted(lapMesg.getMessageIndex())); //$NON-NLS-1$
+      sb.append("total strokes: %5d - "      .formatted(numLap_TotalStrokes)); //$NON-NLS-1$
+      sb.append("lenghts: %3s - "            .formatted(numLap_Lengths)); //$NON-NLS-1$
+      sb.append("active lengths: %3s - "     .formatted(numLap_ActiveLengths)); //$NON-NLS-1$
+
+//    sb.append("hash: %10d - "              .formatted(lapMesg.hashCode())); //$NON-NLS-1$
+
+// SET_FORMATTING_ON
+
+      System.out.println(sb.toString());
    }
 
    private void setDataSerieValue(final int index, final RecordMesg recordMesg) {
@@ -785,5 +862,152 @@ public class FitExporter {
       sessionMesg.setTotalStrokes(                 _tourData.getTotalStrokes());
 
 // SET_FORMATTING_ON
+   }
+
+   private void setSwimLapValues() {
+
+      if (_isDebug) {
+         System.out.println(UI.timeStamp() + " - setSwimLapValues()"); //$NON-NLS-1$
+      }
+
+      final int[] timeSerie = _tourData.timeSerie;
+
+      if (timeSerie == null) {
+         return;
+      }
+
+      final int numTimeSlices = timeSerie.length;
+      final int numLaps = _allLapMessages.size();
+
+      if (numLaps == 0) {
+         return;
+      }
+
+      final int numLengths = _allLengthMessages.size();
+      if (numLengths == 0) {
+         return;
+      }
+
+      int lapIndex = 0;
+      LapMesg lapMesg = _allLapMessages.get(lapIndex++);
+      Float lapTime_FromLapStart_Sec = lapMesg.getTotalTimerTime();
+      boolean isLastLap = false;
+
+      int lengthIndex = 0;
+      LengthMesg lengthMesg = _allLengthMessages.get(lengthIndex++);
+      Float lengthTime_FromLengthStart_Sec = lengthMesg.getTotalTimerTime();
+
+      int timeSlice_FromTourStart_Sec = 0;
+      int lapTime_FromTourStart_Sec = (int) (lapTime_FromLapStart_Sec == null ? 0 : lapTime_FromLapStart_Sec);
+      int lengthTime_FromTourStart_Sec = (int) (lengthTime_FromLengthStart_Sec == null ? 0 : lengthTime_FromLengthStart_Sec);
+
+      final float[] swim_UIStrokes = _tourData.getSwim_Strokes();
+
+      long lap_TotalStrokes = 0;
+      int lap_Lengths = 0;
+      int lap_ActiveLengths = 0;
+      short lap_AvgCadence = 0;
+
+      for (int timeIndex = 0; timeIndex < numTimeSlices; timeIndex++) {
+
+         timeSlice_FromTourStart_Sec = timeSerie[timeIndex];
+
+         if (timeSlice_FromTourStart_Sec >= lapTime_FromTourStart_Sec && isLastLap == false) {
+
+            // update lap message
+
+            final float swimStroke_0 = swim_UIStrokes[timeIndex];
+            float swimStroke_1 = 0;
+            float swimStroke_2 = 0;
+            float swimStroke_3 = 0;
+
+            if (timeIndex < numTimeSlices - 1) {
+               swimStroke_1 = swim_UIStrokes[timeIndex + 1];
+            }
+            if (timeIndex < numTimeSlices - 2) {
+               swimStroke_2 = swim_UIStrokes[timeIndex + 2];
+            }
+            if (timeIndex < numTimeSlices - 3) {
+               swimStroke_3 = swim_UIStrokes[timeIndex + 3];
+            }
+
+            lap_AvgCadence = getAvgCadence(lapMesg, lapTime_FromLapStart_Sec, lap_TotalStrokes);
+
+// SET_FORMATTING_OFF
+
+            lapMesg.setTotalMovingTime    (lapTime_FromLapStart_Sec); //        // for swim lap
+            lapMesg.setTotalStrokes       (lap_TotalStrokes); //           // for swim lap
+            lapMesg.setNumLengths         (lap_Lengths); //                // for swim lap
+            lapMesg.setNumActiveLengths   (lap_ActiveLengths); //          // for swim lap
+            lapMesg.setAvgCadence         (lap_AvgCadence); //             // for swim lap
+
+// SET_FORMATTING_ON
+
+            logLapMessage(lapMesg, lap_TotalStrokes, lap_Lengths, lap_ActiveLengths);
+
+            // advance to the next lap
+            while (lapIndex < numLaps) {
+
+               if (lapIndex >= numLaps - 1) {
+                  isLastLap = true;
+               }
+
+               lapMesg = _allLapMessages.get(lapIndex++);
+
+               lapTime_FromLapStart_Sec = lapMesg.getTotalTimerTime();
+               lapTime_FromTourStart_Sec += (int) (lapTime_FromLapStart_Sec == null ? 0 : lapTime_FromLapStart_Sec);
+
+               lap_Lengths = 0;
+               lap_ActiveLengths = 0;
+               lap_TotalStrokes = 0;
+
+               if (timeSlice_FromTourStart_Sec < lapTime_FromTourStart_Sec || isLastLap) {
+                  break;
+               }
+            }
+         }
+
+         if (timeSlice_FromTourStart_Sec >= lengthTime_FromTourStart_Sec) {
+
+            // advance to the next length
+            while (lengthIndex < numLengths) {
+
+               lengthMesg = _allLengthMessages.get(lengthIndex++);
+
+               lengthTime_FromLengthStart_Sec = lengthMesg.getTotalTimerTime();
+               lengthTime_FromTourStart_Sec += (int) (lengthTime_FromLengthStart_Sec == null ? 0 : lengthTime_FromLengthStart_Sec);
+
+               final Integer lengthTotalStrokes = lengthMesg.getTotalStrokes();
+               final int numLengthStrokes = lengthTotalStrokes == null ? 0 : lengthTotalStrokes;
+
+               lap_Lengths++;
+               lap_ActiveLengths += numLengthStrokes > 0 ? 1 : 0;
+               lap_TotalStrokes += numLengthStrokes;
+
+               if (timeSlice_FromTourStart_Sec < lengthTime_FromTourStart_Sec) {
+                  break;
+               }
+            }
+         }
+      }
+
+      // update last lap
+
+      if (timeSlice_FromTourStart_Sec >= lapTime_FromTourStart_Sec) {
+
+         lap_AvgCadence = getAvgCadence(lapMesg, lapTime_FromLapStart_Sec, lap_TotalStrokes);
+
+// SET_FORMATTING_OFF
+
+         lapMesg.setTotalMovingTime    (lapTime_FromLapStart_Sec); //        // for swim lap
+         lapMesg.setTotalStrokes       (lap_TotalStrokes); //           // for swim lap
+         lapMesg.setNumLengths         (lap_Lengths); //                // for swim lap
+         lapMesg.setNumActiveLengths   (lap_ActiveLengths); //          // for swim lap
+         lapMesg.setAvgCadence         (lap_AvgCadence); //             // for swim lap
+
+// SET_FORMATTING_ON
+
+         logLapMessage(lapMesg, lap_TotalStrokes, lap_Lengths, lap_ActiveLengths);
+      }
    }
 }
