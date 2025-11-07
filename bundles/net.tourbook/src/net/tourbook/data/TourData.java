@@ -1951,6 +1951,12 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
    public int[]         swim_Time;
 
    /**
+    * Each time slice contains the number of lengths at the current time
+    */
+   @Transient
+   private int[]        _swim_LenghNumber_UI;
+
+   /**
     * Swimming data: Activity is defined in {@link LengthType} e.g. active, idle. Contains
     * {@link Short#MIN_VALUE} when value is not set.
     */
@@ -2567,6 +2573,8 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
    public void clear_Swim_Time() {
 
       swim_Time = null;
+
+      _swim_LenghNumber_UI = null;
    }
 
    /**
@@ -7653,6 +7661,10 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
 
       final float[] swimUIValues = new float[numTimeSlices];
 
+      if (_swim_LenghNumber_UI == null) {
+         _swim_LenghNumber_UI = new int[numTimeSlices];
+      }
+
       if (isMultipleTours) {
 
          // tour data contains multiple tours
@@ -7676,7 +7688,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
             final long swimTourStartTime = tourStartTime + (timeSerie[timeSerieStartIndex] * 1000);
             long swimTime = tourStartTime + (swim_Time[swimSerieStartIndex] * 1000);
 
-            short swimStrokes = 0;
+            short swimValue = 0;
             int swimSerieIndex = swimSerieStartIndex;
 
             for (int timeSerieIndex = timeSerieStartIndex; timeSerieIndex < timeSerieEndIndex; timeSerieIndex++) {
@@ -7692,9 +7704,9 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
                   // check bounds
                   if (swimSerieIndex < swimSerieEndIndex) {
 
-                     swimStrokes = allSwimValues[swimSerieIndex];
+                     swimValue = allSwimValues[swimSerieIndex];
 
-                     if (swimStrokes == Short.MIN_VALUE) {
+                     if (swimValue == Short.MIN_VALUE) {
 
                         // use MIN_VALUE that the original color is displayed which makes a rest time more visible
                         //   swimValue = 0;
@@ -7704,7 +7716,9 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
                   }
                }
 
-               swimUIValues[timeSerieIndex] = swimStrokes;
+               swimUIValues[timeSerieIndex] = swimValue;
+
+               _swim_LenghNumber_UI[timeSerieIndex] = swimSerieIndex;
             }
          }
 
@@ -7713,11 +7727,12 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
          // tour data contains 1 tour
 
          int swimTimeIndex = 1;
-         int swimStrokeIndex = 0;
+         int swimSerieIndex = 0;
+         int swimLengthNumberIndex = 0;
 
          // set values for 1st swim slice
          long swimTime = tourStartTime + (swim_Time[swimTimeIndex] * 1000);
-         short swimStrokes = allSwimValues[swimStrokeIndex];
+         short swimValue = allSwimValues[swimSerieIndex];
 
          for (int timeSerieIndex = 0; timeSerieIndex < numTimeSlices; timeSerieIndex++) {
 
@@ -7730,14 +7745,14 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
                // advance to the next swim slice, swim slices are less frequent than tour slices
 
                swimTimeIndex++;
-               swimStrokeIndex++;
+               swimSerieIndex++;
 
                // check bounds
-               if (swimStrokeIndex < numSwimValues) {
+               if (swimSerieIndex < numSwimValues) {
 
-                  swimStrokes = allSwimValues[swimStrokeIndex];
+                  swimValue = allSwimValues[swimSerieIndex];
 
-                  if (swimStrokes == Short.MIN_VALUE) {
+                  if (swimValue == Short.MIN_VALUE) {
 
                      // use MIN_VALUE that the original color is displayed which makes a rest time more visible
                      //   swimValue = 0;
@@ -7748,10 +7763,14 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
                   }
 
                   swimTime = tourStartTime + (swim_Time[swimTimeIndex] * 1000);
+
+                  swimLengthNumberIndex = swimTimeIndex;
                }
             }
 
-            swimUIValues[timeSerieIndex] = swimStrokes;
+            swimUIValues[timeSerieIndex] = swimValue;
+
+            _swim_LenghNumber_UI[timeSerieIndex] = swimLengthNumberIndex;
          }
 
       }
@@ -11659,6 +11678,21 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
       }
 
       return swimDistance;
+   }
+
+   /**
+    * @return Returns the UI values for number of lengths and each time slice
+    */
+   public int[] getSwim_LenghNumber() {
+
+      if (_swim_LenghNumber_UI == null) {
+
+         // this will create the requested data serie, when not yet created
+
+         createSwimUI_DataSerie(swim_Strokes);
+      }
+
+      return _swim_LenghNumber_UI;
    }
 
    /**

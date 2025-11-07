@@ -741,7 +741,7 @@ public class FitExporter {
          return;
       }
 
-      final float cadence60 = lap_AvgCadence / 60.0f;
+//    final float cadence60 = lap_AvgCadence / 60.0f;
 
       final StringBuilder sb = new StringBuilder();
 
@@ -907,139 +907,163 @@ public class FitExporter {
          return;
       }
 
+      final int[] allTimeSlice_LapIndices = new int[numTimeSlices];
+
+      final int[] allLapTimes = _allLapTimes_FromTourStart.toArray();
       int lapIndex = 0;
-      LapMesg lapMesg = _allLapMessages.get(lapIndex++);
-      Float lapTime_FromLapStart_Sec = lapMesg.getTotalTimerTime();
-      boolean isLastLap = false;
+      int lapTime = allLapTimes[lapIndex];
 
-      int lengthIndex = 0;
-      LengthMesg lengthMesg = _allLengthMessages.get(lengthIndex++);
-      Float lengthTime_FromLengthStart_Sec = lengthMesg.getTotalTimerTime();
+      /*
+       * Create a data serie which contains the lap index for each time slice
+       */
+      for (int timeIndex = 0; timeIndex < numTimeSlices; timeIndex++) {
 
-      int timeSlice_FromTourStart_Sec = 0;
-      int lapTime_FromTourStart_Sec = (int) (lapTime_FromLapStart_Sec == null ? 0 : lapTime_FromLapStart_Sec);
-      int lengthTime_FromTourStart_Sec = (int) (lengthTime_FromLengthStart_Sec == null ? 0 : lengthTime_FromLengthStart_Sec);
+         final int timeSlice = timeSerie[timeIndex];
+         allTimeSlice_LapIndices[timeIndex] = lapIndex;
 
-      final float[] swim_UIStrokes = _tourData.getSwim_Strokes();
+         if (timeSlice >= lapTime) {
+
+            // advance to the next lap time
+
+            while (lapIndex < numLaps - 1) {
+
+               lapTime = allLapTimes[++lapIndex];
+
+               if (lapTime > timeSlice) {
+                  break;
+               }
+            }
+         }
+      }
 
       long lap_Strokes = 0;
       int lap_Lengths = 0;
       int lap_Lengths_Active = 0;
-      short lap_AvgCadence = 0;
 
-      final boolean isLapChange = false;
+      final float[] allTimeSlice_Strokes = _tourData.getSwim_Strokes();
+      final int[] allTimeSlice_LengthNumber = _tourData.getSwim_LenghNumber();
+
+      int prevSliceLength = 0;
+      float prevSliceStrokes = 0;
+      int prevSliceLapIdx = 0;
 
       for (int timeIndex = 0; timeIndex < numTimeSlices; timeIndex++) {
 
-         timeSlice_FromTourStart_Sec = timeSerie[timeIndex];
+         final int sliceLength = allTimeSlice_LengthNumber[timeIndex];
+         final float sliceStrokes = allTimeSlice_Strokes[timeIndex];
+         final int sliceLapIdx = allTimeSlice_LapIndices[timeIndex];
 
-//         float swimStroke_2a = 0;
-//         float swimStroke_1a = 0;
-//         final float swimStroke_0 = swim_UIStrokes[timeIndex];
-//         float swimStroke_1b = 0;
-//         float swimStroke_2b = 0;
-//
-//         if (timeIndex > 1) {
-//            swimStroke_2a = swim_UIStrokes[timeIndex - 2];
-//         }
-//         if (timeIndex > 0) {
-//            swimStroke_1a = swim_UIStrokes[timeIndex - 1];
-//         }
-//         if (timeIndex < numTimeSlices - 1) {
-//            swimStroke_1b = swim_UIStrokes[timeIndex + 1];
-//         }
-//         if (timeIndex < numTimeSlices - 2) {
-//            swimStroke_2b = swim_UIStrokes[timeIndex + 2];
-//         }
-//
-//         isLapChange = false;
+         if (sliceLapIdx != prevSliceLapIdx) {
 
-         if (timeSlice_FromTourStart_Sec >= lapTime_FromTourStart_Sec - 2
-               && timeSlice_FromTourStart_Sec <= lapTime_FromTourStart_Sec + 2
+            // lap has changed
 
-               && isLastLap == false) {
+         }
 
-            // time slice is within a lap change range of 2 seconds
+         if (sliceLength != prevSliceLength) {
 
-            // update lap message
+            // length has changed
 
-            lap_AvgCadence = getAvgCadence(lapMesg, lap_Strokes, lapTime_FromLapStart_Sec);
+            // update lap values from PREVIOUS length
 
-// SET_FORMATTING_OFF
+            lap_Lengths += 1;
+            lap_Lengths_Active += prevSliceStrokes > 0 ? 1 : 0;
+            lap_Strokes += prevSliceStrokes;
 
-            lapMesg.setTotalMovingTime    (lapTime_FromLapStart_Sec); //   // for swim lap
-            lapMesg.setTotalStrokes       (lap_Strokes); //                // for swim lap
-            lapMesg.setNumLengths         (lap_Lengths); //                // for swim lap
-            lapMesg.setNumActiveLengths   (lap_Lengths_Active); //         // for swim lap
-            lapMesg.setAvgCadence         (lap_AvgCadence); //             // for swim lap
+            // check if a lap is nearby
 
-// SET_FORMATTING_ON
+            int sliceLapIdx_2a = 0;
+            int sliceLapIdx_2b = 0;
 
-            logLapMessage(lapMesg, lap_Strokes, lap_Lengths, lap_Lengths_Active, lap_AvgCadence);
+            if (timeIndex > 1) {
+               sliceLapIdx_2a = allTimeSlice_LapIndices[timeIndex - 2];
+            }
+            if (timeIndex < numTimeSlices - 2) {
+               sliceLapIdx_2b = allTimeSlice_LapIndices[timeIndex + 2];
+            }
 
-            // advance to the next lap
-            while (lapIndex < numLaps) {
+            lapIndex = -1;
 
-               if (lapIndex >= numLaps - 1) {
-                  isLastLap = true;
-               }
+            if (sliceLapIdx != sliceLapIdx_2a) {
 
-               lapMesg = _allLapMessages.get(lapIndex++);
+               // lap has changed
 
-               lapTime_FromLapStart_Sec = lapMesg.getTotalTimerTime();
-               lapTime_FromTourStart_Sec += (int) (lapTime_FromLapStart_Sec == null ? 0 : lapTime_FromLapStart_Sec);
+               lapIndex = sliceLapIdx_2a;
+
+            } else if (sliceLapIdx != sliceLapIdx_2b) {
+
+               // lap will change
+
+               lapIndex = sliceLapIdx_2b;
+
+            } else {
+
+               // lap will not change
+            }
+
+            if (sliceLength == 85) {
+               int a = 0;
+               a++;
+            }
+
+            if (lapIndex >= 0) {
+
+               // update lap message
+
+               final int prevLapIndex = lapIndex > 0 ? lapIndex - 1 : 0;
+
+               final LapMesg lapMesg = _allLapMessages.get(prevLapIndex);
+
+               final Float lapTime_FromLapStart_Sec = lapMesg.getTotalTimerTime();
+
+               final short lap_AvgCadence = getAvgCadence(lapMesg, lap_Strokes, lapTime_FromLapStart_Sec);
+
+   // SET_FORMATTING_OFF
+
+               lapMesg.setTotalMovingTime    (lapTime_FromLapStart_Sec); //   // for swim lap
+               lapMesg.setTotalStrokes       (lap_Strokes); //                // for swim lap
+               lapMesg.setNumLengths         (lap_Lengths); //                // for swim lap
+               lapMesg.setNumActiveLengths   (lap_Lengths_Active); //         // for swim lap
+               lapMesg.setAvgCadence         (lap_AvgCadence); //             // for swim lap
+
+   // SET_FORMATTING_ON
+
+               logLapMessage(lapMesg, lap_Strokes, lap_Lengths, lap_Lengths_Active, lap_AvgCadence);
+
+               // reset lap sum values
 
                lap_Lengths = 0;
                lap_Lengths_Active = 0;
                lap_Strokes = 0;
-
-               if (timeSlice_FromTourStart_Sec < lapTime_FromTourStart_Sec || isLastLap) {
-                  break;
-               }
             }
+
+         } else {
+
+            // length has not changed
          }
 
-         if (timeSlice_FromTourStart_Sec >= lengthTime_FromTourStart_Sec) {
-
-            // advance to the next length
-            while (lengthIndex < numLengths) {
-
-               lengthMesg = _allLengthMessages.get(lengthIndex++);
-
-               lengthTime_FromLengthStart_Sec = lengthMesg.getTotalTimerTime();
-               lengthTime_FromTourStart_Sec += (int) (lengthTime_FromLengthStart_Sec == null ? 0 : lengthTime_FromLengthStart_Sec);
-
-               final Integer lengthTotalStrokes = lengthMesg.getTotalStrokes();
-               final int numLengthStrokes = lengthTotalStrokes == null ? 0 : lengthTotalStrokes;
-
-               lap_Lengths++;
-               lap_Lengths_Active += numLengthStrokes > 0 ? 1 : 0;
-               lap_Strokes += numLengthStrokes;
-
-               if (timeSlice_FromTourStart_Sec < lengthTime_FromTourStart_Sec) {
-                  break;
-               }
-            }
-         }
+         prevSliceLength = sliceLength;
+         prevSliceStrokes = sliceStrokes;
+         prevSliceLapIdx = sliceLapIdx;
       }
 
       // update last lap
+      final LapMesg lapMesg = _allLapMessages.get(numLaps - 1);
 
-      if (timeSlice_FromTourStart_Sec >= lapTime_FromTourStart_Sec) {
+      final Float lapTime_FromLapStart_Sec = lapMesg.getTotalTimerTime();
 
-         lap_AvgCadence = getAvgCadence(lapMesg, lap_Strokes, lapTime_FromLapStart_Sec);
+      final short lap_AvgCadence = getAvgCadence(lapMesg, lap_Strokes, lapTime_FromLapStart_Sec);
 
-// SET_FORMATTING_OFF
+      // SET_FORMATTING_OFF
 
-         lapMesg.setTotalMovingTime    (lapTime_FromLapStart_Sec); //   // for swim lap
-         lapMesg.setTotalStrokes       (lap_Strokes); //                // for swim lap
-         lapMesg.setNumLengths         (lap_Lengths); //                // for swim lap
-         lapMesg.setNumActiveLengths   (lap_Lengths_Active); //         // for swim lap
-         lapMesg.setAvgCadence         (lap_AvgCadence); //             // for swim lap
+      lapMesg.setTotalMovingTime    (lapTime_FromLapStart_Sec); //   // for swim lap
+      lapMesg.setTotalStrokes       (lap_Strokes); //                // for swim lap
+      lapMesg.setNumLengths         (lap_Lengths); //                // for swim lap
+      lapMesg.setNumActiveLengths   (lap_Lengths_Active); //         // for swim lap
+      lapMesg.setAvgCadence         (lap_AvgCadence); //             // for swim lap
 
-// SET_FORMATTING_ON
+      // SET_FORMATTING_ON
 
-         logLapMessage(lapMesg, lap_Strokes, lap_Lengths, lap_Lengths_Active, lap_AvgCadence);
-      }
+      logLapMessage(lapMesg, lap_Strokes, lap_Lengths, lap_Lengths_Active, lap_AvgCadence);
    }
+
 }
