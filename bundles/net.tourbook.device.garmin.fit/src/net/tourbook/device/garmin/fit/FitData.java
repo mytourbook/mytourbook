@@ -317,6 +317,8 @@ public class FitData {
          finalizeTour_Gears(_tourData);
 
          finalizeTour_Marker(_tourData, _allTourMarker);
+
+         // swim data must be set after tour markers !!!
          _tourData.finalizeTour_SwimData(_tourData, _allSwimData);
 
          finalizeTour_Type(_tourData);
@@ -486,8 +488,8 @@ public class FitData {
       final long absoluteTourStartTime = tourData.getTourStartTimeMS();
       final long absoluteTourEndTime = tourData.getTourEndTimeMS();
 
-      final ArrayList<TourMarker> validatedTourMarkers = new ArrayList<>();
-      final int tourMarkerSize = allTourMarkers.size();
+      final List<TourMarker> allValidatedTourMarkers = new ArrayList<>();
+      final int numTourMarkers = allTourMarkers.size();
 
       int markerIndex = 0;
       int serieIndex = 0;
@@ -496,7 +498,7 @@ public class FitData {
 
       markerLoop:
 
-      for (; markerIndex < tourMarkerSize; markerIndex++) {
+      for (; markerIndex < numTourMarkers; markerIndex++) {
 
          final TourMarker tourMarker = allTourMarkers.get(markerIndex);
          final long absoluteMarkerTime = tourMarker.getDeviceLapTime();
@@ -512,9 +514,10 @@ public class FitData {
             if (timeDiffEnd < 0) {
 
                // there cannot be a marker after the tour
-               if (markerIndex < tourMarkerSize) {
+               if (markerIndex < numTourMarkers) {
 
-                  // there are still markers available which are not set in the tour, set a last marker into the last time slice
+                  // there are still markers available which are not set in the tour,
+                  // set a last marker into the last time slice
 
                   // set values for the last time slice
                   serieIndex = numTimeslices - 1;
@@ -551,7 +554,7 @@ public class FitData {
 
                   tourData.completeTourMarker(tourMarker, serieIndex);
 
-                  validatedTourMarkers.add(tourMarker);
+                  allValidatedTourMarkers.add(tourMarker);
                }
 
                // check next marker
@@ -564,7 +567,7 @@ public class FitData {
          }
       }
 
-      final Set<TourMarker> tourTourMarkers = new HashSet<>(validatedTourMarkers);
+      final Set<TourMarker> tourTourMarkers = new HashSet<>(allValidatedTourMarkers);
 
       tourData.setTourMarkers(tourTourMarkers);
    }

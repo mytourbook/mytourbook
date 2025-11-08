@@ -87,7 +87,7 @@ public class FitExporter {
    private IntArrayList     _allLapTimes_FromTourStart = new IntArrayList();
    private IntArrayList     _allLapTimes_FromLapStart  = new IntArrayList();
 
-   private boolean          _isDebug                   = true;
+   private boolean          _isDebug                   = false;
 
    private static byte[] convertUUIDToBytes(final UUID uuid) {
 
@@ -747,10 +747,10 @@ public class FitExporter {
 
 // SET_FORMATTING_OFF
 
-      sb.append("lap %3d "          .formatted(lapMesg.getMessageIndex())); //$NON-NLS-1$
-      sb.append("strokes %4d "      .formatted(numLap_TotalStrokes)); //$NON-NLS-1$
-      sb.append("lenghts %3s "      .formatted(numLap_Lengths)); //$NON-NLS-1$
-      sb.append("active %3s "       .formatted(numLap_ActiveLengths)); //$NON-NLS-1$
+      sb.append("lap %3d  "          .formatted(lapMesg.getMessageIndex())); //$NON-NLS-1$
+      sb.append("strokes %4d  "      .formatted(numLap_TotalStrokes)); //$NON-NLS-1$
+      sb.append("lenghts %3s  "      .formatted(numLap_Lengths)); //$NON-NLS-1$
+      sb.append("active %3s  "       .formatted(numLap_ActiveLengths)); //$NON-NLS-1$
 
 //    sb.append("cadence %4.2f "    .formatted(cadence60)); //$NON-NLS-1$
 
@@ -760,7 +760,6 @@ public class FitExporter {
 
       System.out.println(sb.toString());
 // TODO remove SYSTEM.OUT.PRINTLN
-
    }
 
    private void setDataSerieValue(final int index, final RecordMesg recordMesg) {
@@ -919,6 +918,7 @@ public class FitExporter {
       for (int timeIndex = 0; timeIndex < numTimeSlices; timeIndex++) {
 
          final int timeSlice = timeSerie[timeIndex];
+
          allTimeSlice_LapIndices[timeIndex] = lapIndex;
 
          if (timeSlice >= lapTime) {
@@ -936,12 +936,14 @@ public class FitExporter {
          }
       }
 
-      long lap_Strokes = 0;
-      int lap_Lengths = 0;
-      int lap_Lengths_Active = 0;
+      int lap_NumLengths = 0;
+      int lap_NumLengths_Active = 0;
+      long lap_NumStrokes = 0;
 
       final float[] allTimeSlice_Strokes = _tourData.getSwim_Strokes();
       final int[] allTimeSlice_LengthNumber = _tourData.getSwim_LenghNumber();
+
+      lapIndex = 0;
 
       int prevSliceLength = 0;
       float prevSliceStrokes = 0;
@@ -953,92 +955,45 @@ public class FitExporter {
          final float sliceStrokes = allTimeSlice_Strokes[timeIndex];
          final int sliceLapIdx = allTimeSlice_LapIndices[timeIndex];
 
-         if (sliceLapIdx != prevSliceLapIdx) {
-
-            // lap has changed
-
-         }
-
          if (sliceLength != prevSliceLength) {
 
             // length has changed
 
             // update lap values from PREVIOUS length
+            lap_NumLengths += 1;
+            lap_NumLengths_Active += prevSliceStrokes > 0 ? 1 : 0;
+            lap_NumStrokes += prevSliceStrokes;
+         }
 
-            lap_Lengths += 1;
-            lap_Lengths_Active += prevSliceStrokes > 0 ? 1 : 0;
-            lap_Strokes += prevSliceStrokes;
+         if (sliceLapIdx != prevSliceLapIdx) {
 
-            // check if a lap is nearby
+            // lap has changed
 
-            int sliceLapIdx_2a = 0;
-            int sliceLapIdx_2b = 0;
+            /*
+             * Update lap message
+             */
+            final LapMesg lapMesg = _allLapMessages.get(lapIndex++);
 
-            if (timeIndex > 1) {
-               sliceLapIdx_2a = allTimeSlice_LapIndices[timeIndex - 2];
-            }
-            if (timeIndex < numTimeSlices - 2) {
-               sliceLapIdx_2b = allTimeSlice_LapIndices[timeIndex + 2];
-            }
+            final Float lapTime_FromLapStart_Sec = lapMesg.getTotalTimerTime();
 
-            lapIndex = -1;
+            final short lap_AvgCadence = getAvgCadence(lapMesg, lap_NumStrokes, lapTime_FromLapStart_Sec);
 
-            if (sliceLapIdx != sliceLapIdx_2a) {
+// SET_FORMATTING_OFF
 
-               // lap has changed
+            lapMesg.setTotalMovingTime    (lapTime_FromLapStart_Sec); //   // for swim lap
+            lapMesg.setTotalStrokes       (lap_NumStrokes); //             // for swim lap
+            lapMesg.setNumLengths         (lap_NumLengths); //             // for swim lap
+            lapMesg.setNumActiveLengths   (lap_NumLengths_Active); //      // for swim lap
+            lapMesg.setAvgCadence         (lap_AvgCadence); //             // for swim lap
 
-               lapIndex = sliceLapIdx_2a;
+// SET_FORMATTING_ON
 
-            } else if (sliceLapIdx != sliceLapIdx_2b) {
+            logLapMessage(lapMesg, lap_NumStrokes, lap_NumLengths, lap_NumLengths_Active, lap_AvgCadence);
 
-               // lap will change
-
-               lapIndex = sliceLapIdx_2b;
-
-            } else {
-
-               // lap will not change
-            }
-
-            if (sliceLength == 85) {
-               int a = 0;
-               a++;
-            }
-
-            if (lapIndex >= 0) {
-
-               // update lap message
-
-               final int prevLapIndex = lapIndex > 0 ? lapIndex - 1 : 0;
-
-               final LapMesg lapMesg = _allLapMessages.get(prevLapIndex);
-
-               final Float lapTime_FromLapStart_Sec = lapMesg.getTotalTimerTime();
-
-               final short lap_AvgCadence = getAvgCadence(lapMesg, lap_Strokes, lapTime_FromLapStart_Sec);
-
-   // SET_FORMATTING_OFF
-
-               lapMesg.setTotalMovingTime    (lapTime_FromLapStart_Sec); //   // for swim lap
-               lapMesg.setTotalStrokes       (lap_Strokes); //                // for swim lap
-               lapMesg.setNumLengths         (lap_Lengths); //                // for swim lap
-               lapMesg.setNumActiveLengths   (lap_Lengths_Active); //         // for swim lap
-               lapMesg.setAvgCadence         (lap_AvgCadence); //             // for swim lap
-
-   // SET_FORMATTING_ON
-
-               logLapMessage(lapMesg, lap_Strokes, lap_Lengths, lap_Lengths_Active, lap_AvgCadence);
-
-               // reset lap sum values
-
-               lap_Lengths = 0;
-               lap_Lengths_Active = 0;
-               lap_Strokes = 0;
-            }
-
-         } else {
-
-            // length has not changed
+            // reset lap sum values
+            lap_NumLengths = 0;
+            lap_NumLengths_Active = 0;
+            lap_NumStrokes = 0;
          }
 
          prevSliceLength = sliceLength;
@@ -1046,24 +1001,28 @@ public class FitExporter {
          prevSliceLapIdx = sliceLapIdx;
       }
 
-      // update last lap
-      final LapMesg lapMesg = _allLapMessages.get(numLaps - 1);
+      /*
+       * Update last lap message
+       */
+      if (lapIndex == numLaps - 1) {
 
-      final Float lapTime_FromLapStart_Sec = lapMesg.getTotalTimerTime();
+         final LapMesg lapMesg = _allLapMessages.get(lapIndex);
 
-      final short lap_AvgCadence = getAvgCadence(lapMesg, lap_Strokes, lapTime_FromLapStart_Sec);
+         final Float lapTime_FromLapStart_Sec = lapMesg.getTotalTimerTime();
 
-      // SET_FORMATTING_OFF
+         final short lap_AvgCadence = getAvgCadence(lapMesg, lap_NumStrokes, lapTime_FromLapStart_Sec);
 
-      lapMesg.setTotalMovingTime    (lapTime_FromLapStart_Sec); //   // for swim lap
-      lapMesg.setTotalStrokes       (lap_Strokes); //                // for swim lap
-      lapMesg.setNumLengths         (lap_Lengths); //                // for swim lap
-      lapMesg.setNumActiveLengths   (lap_Lengths_Active); //         // for swim lap
-      lapMesg.setAvgCadence         (lap_AvgCadence); //             // for swim lap
+// SET_FORMATTING_OFF
 
-      // SET_FORMATTING_ON
+         lapMesg.setTotalMovingTime    (lapTime_FromLapStart_Sec); //   // for swim lap
+         lapMesg.setTotalStrokes       (lap_NumStrokes); //             // for swim lap
+         lapMesg.setNumLengths         (lap_NumLengths); //             // for swim lap
+         lapMesg.setNumActiveLengths   (lap_NumLengths_Active); //      // for swim lap
+         lapMesg.setAvgCadence         (lap_AvgCadence); //             // for swim lap
 
-      logLapMessage(lapMesg, lap_Strokes, lap_Lengths, lap_Lengths_Active, lap_AvgCadence);
+// SET_FORMATTING_ON
+
+         logLapMessage(lapMesg, lap_NumStrokes, lap_NumLengths, lap_NumLengths_Active, lap_AvgCadence);
+      }
    }
-
 }

@@ -7729,6 +7729,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
          int swimTimeIndex = 1;
          int swimSerieIndex = 0;
          int swimLengthNumberIndex = 0;
+         boolean isInvalidLength = false;
 
          // set values for 1st swim slice
          long swimTime = tourStartTime + (swim_Time[swimTimeIndex] * 1000);
@@ -7759,7 +7760,12 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
                   }
 
                   if (swimTimeIndex >= numSwimValues) {
+
+                     // force last swim index
                      swimTimeIndex = numSwimValues - 1;
+
+                     // there can be no lengths after the end
+                     isInvalidLength = true;
                   }
 
                   swimTime = tourStartTime + (swim_Time[swimTimeIndex] * 1000);
@@ -7770,7 +7776,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
 
             swimUIValues[timeSerieIndex] = swimValue;
 
-            _swim_LenghNumber_UI[timeSerieIndex] = swimLengthNumberIndex;
+            _swim_LenghNumber_UI[timeSerieIndex] = isInvalidLength ? -1 : swimLengthNumberIndex;
          }
 
       }
