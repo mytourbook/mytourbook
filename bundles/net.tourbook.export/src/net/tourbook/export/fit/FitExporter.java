@@ -87,7 +87,7 @@ public class FitExporter {
    private IntArrayList     _allLapTimes_FromTourStart = new IntArrayList();
    private IntArrayList     _allLapTimes_FromLapStart  = new IntArrayList();
 
-   private boolean          _isDebug                   = false;
+   private boolean          _isDebug                   = true;
 
    private static byte[] convertUUIDToBytes(final UUID uuid) {
 
@@ -203,7 +203,10 @@ public class FitExporter {
             previousGearData = createGearEvent(garminTimeSlice_Time, previousGearData, index);
             batteryTimeIndex = createBatteryEvent(garminTimeSlice_Time, batteryTimeIndex, currentTimeSliceValue);
 
-            // the sequence of the lap message is not at the correct time position but the time in the lap message is OK
+            /*
+             * The sequence of all lap messages are not at the correct time position in the fit file
+             * but the time in the lap message is OK
+             */
             markerIndex = createLapMessage(markerIndex);
 
             createPauseEvent(allPauseTimeIndices, currentTimeSliceValue);
@@ -741,7 +744,7 @@ public class FitExporter {
          return;
       }
 
-//    final float cadence60 = lap_AvgCadence / 60.0f;
+      final float cadence60 = lap_AvgCadence / 60.0f;
 
       final StringBuilder sb = new StringBuilder();
 
@@ -752,7 +755,7 @@ public class FitExporter {
       sb.append("lenghts %3s  "      .formatted(numLap_Lengths)); //$NON-NLS-1$
       sb.append("active %3s  "       .formatted(numLap_ActiveLengths)); //$NON-NLS-1$
 
-//    sb.append("cadence %4.2f "    .formatted(cadence60)); //$NON-NLS-1$
+      sb.append("cadence %4.2f "    .formatted(cadence60)); //$NON-NLS-1$
 
 //    sb.append("hash: %10d - "     .formatted(lapMesg.hashCode())); //$NON-NLS-1$
 
