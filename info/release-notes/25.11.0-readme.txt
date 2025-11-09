@@ -1,4 +1,4 @@
-25.11.0                                                 ?. November 2025
+25.11                                                 9. November 2025
 
 New / Improvements
 ==================
@@ -14,11 +14,7 @@ New / Improvements
 
 * Fit Import
   - Log all device sensor values, e.g. battery voltage, soft-/hardware versions
-  
-* Fit Export
-  - Export swim values
-    https://github.com/mytourbook/mytourbook/issues/1581
-  
+    
 * Import view
   - Remove tours with the DELELTE key
 
