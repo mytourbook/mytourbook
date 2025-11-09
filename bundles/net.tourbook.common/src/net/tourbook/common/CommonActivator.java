@@ -19,6 +19,7 @@ import java.util.Optional;
 
 import net.tourbook.common.color.ThemeUtil;
 import net.tourbook.common.map.MapUI;
+import net.tourbook.common.util.StatusUtil;
 
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.preference.IPreferenceStore;
@@ -148,7 +149,7 @@ public class CommonActivator extends AbstractUIPlugin {
    /**
     * @param imageName
     *
-    * @return Returns the themed image descriptor from {@link CommonActivator} plugin images
+    * @return Returns the themed image descriptor from this plugin images
     */
    public static ImageDescriptor getThemedImageDescriptor(final String imageName) {
 
@@ -158,7 +159,18 @@ public class CommonActivator extends AbstractUIPlugin {
          return winDarkImageDescriptor;
       }
 
-      return getImageDescriptor(ThemeUtil.getThemedImageName(imageName));
+      final ImageDescriptor themedImageDescriptor = getImageDescriptor(ThemeUtil.getThemedImageName(imageName));
+
+      if (themedImageDescriptor == null) {
+
+         StatusUtil.logError("Cannot get themed image descriptor for '%s'".formatted(imageName)); //$NON-NLS-1$
+
+      } else {
+
+         return themedImageDescriptor;
+      }
+
+      return getImageDescriptor(imageName);
    }
 
    @Override

@@ -17,7 +17,9 @@ package net.tourbook.export;
 
 import java.util.Optional;
 
+import net.tourbook.common.UI;
 import net.tourbook.common.color.ThemeUtil;
+import net.tourbook.common.util.StatusUtil;
 
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.resource.ResourceLocator;
@@ -60,6 +62,7 @@ public class Activator extends AbstractUIPlugin {
     *
     * @param path
     *           the image path
+    *
     * @return the image descriptor
     */
    public static ImageDescriptor getImageDescriptor(final String path) {
@@ -69,14 +72,62 @@ public class Activator extends AbstractUIPlugin {
       return imageDescriptor.isPresent() ? imageDescriptor.get() : null;
    }
 
+   private static ImageDescriptor getImageDescriptor_Dark_Win(final String imageName) {
+
+      if (UI.IS_DARK_THEME && UI.IS_WIN) {
+
+         /**
+          * Since windows 11, a hovered or selected action are displaying a very bright background
+          * which makes it very difficult to see the dark images which content is mostly very
+          * bright.
+          * <p>
+          * Because of this reason, the HDR images were created and are displayed on windows 11 in
+          * the dark theme and when available.
+          */
+
+         if (UI.IS_USE_HDR_IMAGES) {
+
+            final ImageDescriptor hdrImageDescriptor = getImageDescriptor(ThemeUtil.getThemedImageName_HDR(imageName));
+
+            if (hdrImageDescriptor != null) {
+
+               return hdrImageDescriptor;
+            }
+         }
+
+         // display bright theme image
+
+         return getImageDescriptor(imageName);
+      }
+
+      return null;
+   }
+
    /**
     * @param imageName
     *
-    * @return Returns the themed image descriptor from {@link Activator} plugin images
+    * @return Returns the themed image descriptor from this plugin images
     */
    public static ImageDescriptor getThemedImageDescriptor(final String imageName) {
 
-      return getImageDescriptor(ThemeUtil.getThemedImageName(imageName));
+      final ImageDescriptor winDarkImageDescriptor = getImageDescriptor_Dark_Win(imageName);
+
+      if (winDarkImageDescriptor != null) {
+         return winDarkImageDescriptor;
+      }
+
+      final ImageDescriptor themedImageDescriptor = getImageDescriptor(ThemeUtil.getThemedImageName(imageName));
+
+      if (themedImageDescriptor == null) {
+
+         StatusUtil.logError("Cannot get themed image descriptor for '%s'".formatted(imageName)); //$NON-NLS-1$
+
+      } else {
+
+         return themedImageDescriptor;
+      }
+
+      return getImageDescriptor(imageName);
    }
 
    public Version getVersion() {

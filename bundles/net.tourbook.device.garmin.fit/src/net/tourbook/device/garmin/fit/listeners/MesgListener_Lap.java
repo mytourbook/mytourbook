@@ -88,7 +88,13 @@ public class MesgListener_Lap extends AbstractMesgListener implements LapMesgLis
 
          if (totalElapsedTime_Sec != null) {
 
-            tourMarker.setDeviceLapTime(javaStartTime_MS + totalElapsedTime_Sec.longValue() * 1000);
+            final float totalElapsedTime_Rounded = totalElapsedTime_Sec + 0.5f;
+            final long totalElapsedTime_Rounded_MS = (long) (totalElapsedTime_Rounded * 1000);
+
+            tourMarker.setDeviceLapTime(javaStartTime_MS + totalElapsedTime_Rounded_MS);
+
+            // implementation before 25.11
+//          tourMarker.setDeviceLapTime(javaStartTime_MS + totalElapsedTime_Sec.longValue() * 1000);
 
          } else {
 
@@ -98,7 +104,9 @@ public class MesgListener_Lap extends AbstractMesgListener implements LapMesgLis
 
       } else if (totalElapsedTime_Sec != null) {
 
-         _lapTime += totalElapsedTime_Sec;
+         final float totalElapsedTime_Rounded = totalElapsedTime_Sec + 0.5f;
+
+         _lapTime += totalElapsedTime_Rounded;
 
          // the correct absolute time will be set later
          tourMarker.setTime(_lapTime, Long.MIN_VALUE);

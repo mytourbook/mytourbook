@@ -1,23 +1,20 @@
-25.11.0                                                 ?. November 2025
+25.11                                                 9. November 2025
 
 New / Improvements
 ==================
 
 * Radar values
     https://github.com/mytourbook/mytourbook/issues/1561
-  - Import values from .fit files
+  - Import or re-Import values from .fit files
   - Display values in 
     - Tour book view
     - Tour chart
-      - Value point tooltip
+    - Tour info
+    - Value point tooltip
 
 * Fit Import
   - Log all device sensor values, e.g. battery voltage, soft-/hardware versions
-  
-* Fit Export
-  - Export swim values
-    https://github.com/mytourbook/mytourbook/issues/1581
-  
+    
 * Import view
   - Remove tours with the DELELTE key
 
@@ -34,6 +31,11 @@ New / Improvements
 
 Changes
 =======
+
+* Fit import
+  - The import of swim values could create wrong tour distance values, mostly when a time slice was larger than 1 second.
+    This can be fixed by reimporting swim values.
+  - A marker position can be slightly different, the marker time is now rounded to a second, before it was truncated
 
 * Map properties view
   - This view is removed, its options are now available directly in the 2D map options slideout

@@ -89,7 +89,6 @@ import java.util.regex.Pattern;
 import net.tourbook.Images;
 import net.tourbook.OtherMessages;
 import net.tourbook.application.TourbookPlugin;
-import net.tourbook.common.DPITools;
 import net.tourbook.common.UI;
 import net.tourbook.common.color.ColorCacheSWT;
 import net.tourbook.common.color.ThemeUtil;
@@ -1382,9 +1381,7 @@ public class Map2 extends Canvas {
 
    private Cursor createCursorFromImage(final String imageName) {
 
-      final String imageName4k = DPITools.get4kImageName(imageName);
-
-      return UI.createCursorFromImage(TourbookPlugin.getImageDescriptor(imageName4k));
+      return UI.createCursorFromImage(TourbookPlugin.getImageDescriptor(imageName));
    }
 
    private void createLabelSpreaderLabels(final Graphics2D g2d,

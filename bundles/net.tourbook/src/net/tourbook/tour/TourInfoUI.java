@@ -141,6 +141,7 @@ public class TourInfoUI implements ICanHideTooltip {
 
    private boolean        _hasRecordingDeviceBattery;
    private boolean        _hasGears;
+   private boolean        _hasRadar;
    private boolean        _hasRunDyn;
    private boolean        _hasSensorValues;
    private boolean        _hasTags;
@@ -259,14 +260,16 @@ public class TourInfoUI implements ICanHideTooltip {
    private Label            _lblDescription;
    private Label            _lblDistance;
    private Label            _lblDistance_Unit;
+   private Label            _lblElapsedTime;
+   private Label            _lblElapsedTime_Unit;
    private Label            _lblElevationUp;
    private Label            _lblElevationUp_Unit;
    private Label            _lblElevationDown;
    private Label            _lblElevationDown_Unit;
    private Label            _lblGear;
-   private Label            _lblGear_Spacer;
    private Label            _lblGear_GearShifts;
    private Label            _lblGear_GearShifts_Spacer;
+   private Label            _lblGearRadar_Spacer;
    private Label            _lblMaxElevation;
    private Label            _lblMaxElevation_Unit;
    private Label            _lblMaxPace;
@@ -277,10 +280,11 @@ public class TourInfoUI implements ICanHideTooltip {
    private Label            _lblMaxSpeed_Unit;
    private Label            _lblMovingTime;
    private Label            _lblMovingTime_Unit;
-   private Label            _lblElapsedTime;
-   private Label            _lblElapsedTime_Unit;
    private Label            _lblLocationStart;
    private Label            _lblLocationEnd;
+   private Label            _lblRadar;
+   private Label            _lblRadar_PassedVehicles;
+   private Label            _lblRadar_PassedVehicles_Spacer;
    private Label            _lblPausedTime;
    private Label            _lblPausedTime_Unit;
    private Label            _lblRecordedTime;
@@ -661,9 +665,11 @@ public class TourInfoUI implements ICanHideTooltip {
 
          if (_isShowSensorValues) {
 
-            // gear data
-            _lblGear_Spacer = createUI_Spacer(container);
+            // gear / radar data
+            _lblGearRadar_Spacer = createUI_Spacer(container);
+
             createUI_38_Gears(container);
+            createUI_39_Radar(container);
          }
       }
    }
@@ -902,6 +908,17 @@ public class TourInfoUI implements ICanHideTooltip {
 
       _lblGear_GearShifts = createUI_LabelValue(parent, SWT.TRAIL);
       _lblGear_GearShifts_Spacer = createUI_LabelValue(parent, SWT.LEAD);
+   }
+
+   private void createUI_39_Radar(final Composite parent) {
+
+      /*
+       * Passed vehicles
+       */
+      _lblRadar = createUI_Label(parent, Messages.Tour_Tooltip_Label_PassedVehicles);
+
+      _lblRadar_PassedVehicles = createUI_LabelValue(parent, SWT.TRAIL);
+      _lblRadar_PassedVehicles_Spacer = createUI_LabelValue(parent, SWT.LEAD);
    }
 
    private void createUI_40_Column_2(final Composite parent) {
@@ -1824,6 +1841,7 @@ public class TourInfoUI implements ICanHideTooltip {
 // SET_FORMATTING_OFF
 
       _hasGears                     = _tourData.getFrontShiftCount() > 0 || _tourData.getRearShiftCount() > 0;
+      _hasRadar                     = _tourData.getNumberOfPassedVehicles() > 0;
       _hasRecordingDeviceBattery    = tourData.getBattery_Percentage_Start() != -1;
       _hasRunDyn                    = _tourData.isRunDynAvailable();
       _hasTags                      = tourTags != null && tourTags.size() > 0;
@@ -2532,10 +2550,20 @@ public class TourInfoUI implements ICanHideTooltip {
                   _tourData.getRearShiftCount()));
          }
 
-         UI.showHideControl(_lblGear_Spacer,             _hasGears);
+         UI.showHideControl(_lblGearRadar_Spacer,        _hasGears || _hasRadar);
+
          UI.showHideControl(_lblGear,                    _hasGears);
          UI.showHideControl(_lblGear_GearShifts,         _hasGears);
          UI.showHideControl(_lblGear_GearShifts_Spacer,  _hasGears);
+
+         if (_hasRadar) {
+
+            _lblRadar_PassedVehicles.setText(Integer.toString(_tourData.getNumberOfPassedVehicles()));
+         }
+
+         UI.showHideControl(_lblRadar,                         _hasRadar);
+         UI.showHideControl(_lblRadar_PassedVehicles,          _hasRadar);
+         UI.showHideControl(_lblRadar_PassedVehicles_Spacer,   _hasRadar);
       }
 
       /*

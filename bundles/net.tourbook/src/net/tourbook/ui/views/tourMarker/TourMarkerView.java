@@ -581,6 +581,7 @@ public class TourMarkerView extends ViewPart implements ITourProvider, ITourView
 
       defineColumn_Time_RelativeTime();
       defineColumn_Time_TimeDelta();
+      defineColumn_Time_TimeInSeconds();
 
       defineColumn_Motion_Distance();
       defineColumn_Motion_DistanceDelta();
@@ -1053,6 +1054,25 @@ public class TourMarkerView extends ViewPart implements ITourProvider, ITourView
 
                cell.setFont(_boldFont);
             }
+         }
+      });
+   }
+
+   /**
+    * Column: Time in seconds
+    */
+   private void defineColumn_Time_TimeInSeconds() {
+
+      final ColumnDefinition colDef = TableColumnFactory.TIME_TOUR_TIME.createColumn(_columnManager, _pc);
+
+      colDef.setLabelProvider(new CellLabelProvider() {
+         @Override
+         public void update(final ViewerCell cell) {
+
+            final TourMarker marker = (TourMarker) cell.getElement();
+            final long time = marker.getTime();
+
+            cell.setText(Long.toString(time));
          }
       });
    }

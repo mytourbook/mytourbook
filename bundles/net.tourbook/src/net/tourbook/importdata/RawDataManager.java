@@ -344,6 +344,7 @@ public class RawDataManager {
       TIME_SLICES__GEAR, //
       TIME_SLICES__POWER_AND_SPEED, //
       TIME_SLICES__POWER_AND_PULSE, //
+      TIME_SLICES__RADAR, //
       TIME_SLICES__RUNNING_DYNAMICS, //
       TIME_SLICES__SWIMMING, //
       TIME_SLICES__TEMPERATURE_FROMDEVICE, //
@@ -1727,6 +1728,11 @@ public class RawDataManager {
             dataToModifyDetails.add(Messages.Tour_Data_Text_SpeedValues);
          }
 
+         // Radar
+         if (isAllTimeSlices || tourValueType == TourValueType.TIME_SLICES__RADAR) {
+            dataToModifyDetails.add(Messages.Tour_Data_Text_RadarValues);
+         }
+
          // Running Dynamics
          if (isAllTimeSlices || tourValueType == TourValueType.TIME_SLICES__RUNNING_DYNAMICS) {
             dataToModifyDetails.add(Messages.Tour_Data_Text_RunningDynamicsValues);
@@ -1963,6 +1969,17 @@ public class RawDataManager {
                tourData.setPowerSerie(null);
                tourData.setPower_Avg(0);
                tourData.setSpeedSerie(null);
+               break;
+
+            case TIME_SLICES__RADAR:
+
+               tourData.radar_DistanceToVehicle = null;
+               tourData.radar_PassedVehicles = null;
+               tourData.radar_PassingSpeed_Absolute = null;
+               tourData.radar_PassingSpeed_Relative = null;
+
+               tourData.setRadarValues();
+
                break;
 
             case TIME_SLICES__TEMPERATURE_FROMDEVICE:
@@ -3593,6 +3610,7 @@ public class RawDataManager {
                   || tourValueTypes.contains(TourValueType.TIME_SLICES__GEAR)
                   || tourValueTypes.contains(TourValueType.TIME_SLICES__POWER_AND_PULSE)
                   || tourValueTypes.contains(TourValueType.TIME_SLICES__POWER_AND_SPEED)
+                  || tourValueTypes.contains(TourValueType.TIME_SLICES__RADAR)
                   || tourValueTypes.contains(TourValueType.TIME_SLICES__RUNNING_DYNAMICS)
                   || tourValueTypes.contains(TourValueType.TIME_SLICES__SWIMMING)
                   || tourValueTypes.contains(TourValueType.TIME_SLICES__TEMPERATURE_FROMDEVICE)
@@ -3784,16 +3802,31 @@ public class RawDataManager {
          }
       }
 
+// SET_FORMATTING_OFF
+
+      // Radar
+      if (isAllTimeSlices || allTourValueTypes.contains(TourValueType.TIME_SLICES__RADAR)) {
+
+         // re-import only radar
+
+         oldTourData.radar_DistanceToVehicle       = reimportedTourData.radar_DistanceToVehicle;
+         oldTourData.radar_PassedVehicles          = reimportedTourData.radar_PassedVehicles;
+         oldTourData.radar_PassingSpeed_Absolute   = reimportedTourData.radar_PassingSpeed_Absolute;
+         oldTourData.radar_PassingSpeed_Relative   = reimportedTourData.radar_PassingSpeed_Relative;
+
+         oldTourData.setRadarValues();
+      }
+
       // Running Dynamics
       if (isAllTimeSlices || allTourValueTypes.contains(TourValueType.TIME_SLICES__RUNNING_DYNAMICS)) {
 
          // re-import only running dynamics
 
-         oldTourData.runDyn_StanceTime = reimportedTourData.runDyn_StanceTime;
-         oldTourData.runDyn_StanceTimeBalance = reimportedTourData.runDyn_StanceTimeBalance;
-         oldTourData.runDyn_StepLength = reimportedTourData.runDyn_StepLength;
-         oldTourData.runDyn_VerticalOscillation = reimportedTourData.runDyn_VerticalOscillation;
-         oldTourData.runDyn_VerticalRatio = reimportedTourData.runDyn_VerticalRatio;
+         oldTourData.runDyn_StanceTime             = reimportedTourData.runDyn_StanceTime;
+         oldTourData.runDyn_StanceTimeBalance      = reimportedTourData.runDyn_StanceTimeBalance;
+         oldTourData.runDyn_StepLength             = reimportedTourData.runDyn_StepLength;
+         oldTourData.runDyn_VerticalOscillation    = reimportedTourData.runDyn_VerticalOscillation;
+         oldTourData.runDyn_VerticalRatio          = reimportedTourData.runDyn_VerticalRatio;
       }
 
       // Swimming
@@ -3801,7 +3834,6 @@ public class RawDataManager {
 
          // re-import only swimming
 
-// SET_FORMATTING_OFF
 
          oldTourData.swim_LengthType      = reimportedTourData.swim_LengthType;
          oldTourData.swim_Cadence         = reimportedTourData.swim_Cadence;

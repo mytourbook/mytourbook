@@ -6127,9 +6127,16 @@ public class TourDataEditorView extends ViewPart implements
 
                final float distance = _serieDistance[serieIndex] / 1000 / _unitValueDistance;
 
-               cell.setText(_nf3.format(distance));
+               if (distance == 0) {
+                  cell.setText(UI.EMPTY_STRING);
+               } else if (distance < 0.001) {
+                  cell.setText(_nf6.format(distance));
+               } else {
+                  cell.setText(_nf3.format(distance));
+               }
 
             } else {
+
                cell.setText(UI.EMPTY_STRING);
             }
          }
@@ -7590,8 +7597,8 @@ public class TourDataEditorView extends ViewPart implements
 
          if (firstSelectedSlice instanceof final SwimSlice swimSlice) {
 
-            final int swimSerieIndex1 = swimSlice.serieIndex;
-            final int swimSerieIndex2 = ((SwimSlice) selectedSlices[numSelectedSlices - 1]).serieIndex;
+            final int swimSerieIndex1 = swimSlice.serieIndex + 1;
+            final int swimSerieIndex2 = ((SwimSlice) selectedSlices[numSelectedSlices - 1]).serieIndex + 1;
 
             final int timeSerieIndex2 = getTimeSerieIndexFromSwimTime(swimSerieIndex2);
 

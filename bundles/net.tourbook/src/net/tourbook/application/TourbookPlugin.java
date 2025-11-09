@@ -250,7 +250,7 @@ public class TourbookPlugin extends AbstractUIPlugin {
    /**
     * @param imageName
     *
-    * @return Returns the themed image descriptor from {@link TourbookPlugin} plugin images
+    * @return Returns the themed image descriptor from this plugin images
     */
    public static ImageDescriptor getThemedImageDescriptor(final String imageName) {
 
@@ -260,7 +260,18 @@ public class TourbookPlugin extends AbstractUIPlugin {
          return winDarkImageDescriptor;
       }
 
-      return getImageDescriptor(ThemeUtil.getThemedImageName(imageName));
+      final ImageDescriptor themedImageDescriptor = getImageDescriptor(ThemeUtil.getThemedImageName(imageName));
+
+      if (themedImageDescriptor == null) {
+
+         StatusUtil.logError("Cannot get themed image descriptor for '%s'".formatted(imageName)); //$NON-NLS-1$
+
+      } else {
+
+         return themedImageDescriptor;
+      }
+
+      return getImageDescriptor(imageName);
    }
 
    public static void setActivePerson(final TourPerson currentPerson) {
