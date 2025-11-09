@@ -983,11 +983,28 @@ public class FitExporter {
 
 // SET_FORMATTING_OFF
 
-            lapMesg.setTotalMovingTime    (lapTime_FromLapStart_Sec); //   // for swim lap
-            lapMesg.setTotalStrokes       (lap_NumStrokes); //             // for swim lap
-            lapMesg.setNumLengths         (lap_NumLengths); //             // for swim lap
-            lapMesg.setNumActiveLengths   (lap_NumLengths_Active); //      // for swim lap
-            lapMesg.setAvgCadence         (lap_AvgCadence); //             // for swim lap
+            lapMesg.setTotalMovingTime    (lapTime_FromLapStart_Sec);
+            lapMesg.setNumLengths         (lap_NumLengths);
+            lapMesg.setNumActiveLengths   (lap_NumLengths_Active);
+            lapMesg.setAvgCadence         (lap_AvgCadence);
+
+            /**
+             * !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+             * <p>
+             * setSport(Sport.SWIMMING) is needed, otherwise setTotalStrokes() is creating the field
+             * total_cycles however when setTotalCycles() is also set, then the field total_cycles
+             * is set and not the field total_strokes
+             * <p>
+             * !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+             */
+            lapMesg.setTotalStrokes       (lap_NumStrokes);
+            lapMesg.setSport              (Sport.SWIMMING);
+            lapMesg.setSubSport           (SubSport.LAP_SWIMMING);
+
+// other fields which are also set in the fit SDK example com.garmin.fit.examples.EncodeActivity
+//
+//          lapMesg.setFirstLengthIndex   ((int) lapFirstLengthIndex);           // ((int) lapFirstLengthIndex);
+//          lapMesg.setAvgStrokeDistance  (lapDistance / lap_NumStrokes);        // (lapDistance / lapTotalStrokes);
 
 // SET_FORMATTING_ON
 
@@ -1017,11 +1034,23 @@ public class FitExporter {
 
 // SET_FORMATTING_OFF
 
-         lapMesg.setTotalMovingTime    (lapTime_FromLapStart_Sec); //   // for swim lap
-         lapMesg.setTotalStrokes       (lap_NumStrokes); //             // for swim lap
-         lapMesg.setNumLengths         (lap_NumLengths); //             // for swim lap
-         lapMesg.setNumActiveLengths   (lap_NumLengths_Active); //      // for swim lap
-         lapMesg.setAvgCadence         (lap_AvgCadence); //             // for swim lap
+         lapMesg.setTotalMovingTime    (lapTime_FromLapStart_Sec);
+         lapMesg.setNumLengths         (lap_NumLengths);
+         lapMesg.setNumActiveLengths   (lap_NumLengths_Active);
+         lapMesg.setAvgCadence         (lap_AvgCadence);
+
+         /**
+          * !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+          * <p>
+          * setSport(Sport.SWIMMING) is needed, otherwise setTotalStrokes() is creating the field
+          * total_cycles however when setTotalCycles() is also set, then the field total_cycles
+          * is set and not the field total_strokes
+          * <p>
+          * !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+          */
+         lapMesg.setTotalStrokes       (lap_NumStrokes);
+         lapMesg.setSport              (Sport.SWIMMING);
+         lapMesg.setSubSport           (SubSport.LAP_SWIMMING);
 
 // SET_FORMATTING_ON
 
