@@ -58,8 +58,9 @@ public abstract class TreeColumnFactory {
    public static final String            DEVICE_BATTERY_SOC_START_ID      = "DEVICE_BATTERY_SOC_START_ID";      //$NON-NLS-1$
    public static final TreeColumnFactory DEVICE_DISTANCE;
    public static final TreeColumnFactory DEVICE_NAME;
-   public static final TreeColumnFactory TOUR_EQUIPMENT_AND_CATEGORY;
-   public static final String            TOUR_EQUIPMENT_AND_CATEGORY_ID   = "TOUR_EQUIPMENT_AND_CATEGORY";      //$NON-NLS-1$
+
+   public static final TreeColumnFactory EQUIPMENT_AND_CATEGORY;
+   public static final String            EQUIPMENT_AND_CATEGORY_ID        = "EQUIPMENT_AND_CATEGORY";           //$NON-NLS-1$
 
    public static final TreeColumnFactory MOTION_AVG_PACE;
    public static final TreeColumnFactory MOTION_AVG_SPEED;
@@ -704,12 +705,12 @@ public abstract class TreeColumnFactory {
       /*
        * Equipment
        */
-      TOUR_EQUIPMENT_AND_CATEGORY = new TreeColumnFactory() {
+      EQUIPMENT_AND_CATEGORY = new TreeColumnFactory() {
          @Override
          public TreeColumnDefinition createColumn(final ColumnManager columnManager,
                                                   final PixelConverter pixelConverter) {
 
-            final TreeColumnDefinition colDef = new TreeColumnDefinition(columnManager, TOUR_EQUIPMENT_AND_CATEGORY_ID, SWT.LEAD);
+            final TreeColumnDefinition colDef = new TreeColumnDefinition(columnManager, EQUIPMENT_AND_CATEGORY_ID, SWT.LEAD);
 
             colDef.setColumnCategory(           Messages.ColumnFactory_Category_Equipment);
 

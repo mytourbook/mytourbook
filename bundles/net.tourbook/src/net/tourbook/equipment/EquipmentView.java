@@ -422,7 +422,7 @@ public class EquipmentView extends ViewPart implements ITourProvider, ITourViewe
     */
    private void defineColumn_1stColumn() {
 
-      final TreeColumnDefinition colDef = TreeColumnFactory.TOUR_EQUIPMENT_AND_CATEGORY.createColumn(_columnManager, _pc);
+      final TreeColumnDefinition colDef = TreeColumnFactory.EQUIPMENT_AND_CATEGORY.createColumn(_columnManager, _pc);
 
       colDef.setIsDefaultColumn();
       colDef.setCanModifyVisibility(false);
@@ -434,7 +434,7 @@ public class EquipmentView extends ViewPart implements ITourProvider, ITourViewe
             final Object element = cell.getElement();
 
             if (element instanceof final TVIEquipment tviEquipment) {
-               cell.setText(tviEquipment.getEquipment().getBrand());
+               cell.setText(tviEquipment.getEquipment().getName());
             }
          }
       });
@@ -654,6 +654,8 @@ public class EquipmentView extends ViewPart implements ITourProvider, ITourViewe
          }
 
          // update model
+         equipment.updateFromOther(dialogEquipment.getEquipment());
+
          TourDatabase.saveEntity(equipment, equipment.getEquipmentId(), Equipment.class);
 
          // update UI

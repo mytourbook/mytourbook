@@ -79,17 +79,17 @@ public class Equipment implements Cloneable, Serializable {
    private EquipmentType              equipmentType         = EquipmentType.NONE;
 
    /**
-    * When the equipment was created/build, in UTC milliseconds
+    * When the equipment was created/build, in epoch days
     */
    private long                       dateBuilt;
 
    /**
-    * When the equipment was bought or firstly used, in UTC milliseconds
+    * When the equipment was bought or firstly used, in epoch days
     */
    private long                       dateFirstUse;
 
    /**
-    * When the equipment was retired/sold, in UTC milliseconds
+    * When the equipment was retired/sold, in epoch days
     */
    private long                       dateRetired;
 
@@ -323,11 +323,17 @@ public class Equipment implements Cloneable, Serializable {
    }
 
    public void setDateFirstUse(final long dateFirstUse) {
+
       this.dateFirstUse = dateFirstUse;
+
+      _dateFirstUse = null;
    }
 
    public void setDateRetired(final long dateRetired) {
+
       this.dateRetired = dateRetired;
+
+      _dateRetired = null;
    }
 
    public void setDescription(final String description) {
@@ -346,11 +352,15 @@ public class Equipment implements Cloneable, Serializable {
       this.weight = weight;
    }
 
-   public void updateFromModified(final Equipment otherEquipment) {
+   public void updateFromOther(final Equipment otherEquipment) {
 
       brand = otherEquipment.getBrand();
       model = otherEquipment.getModel();
       description = otherEquipment.getDescription();
+
+      setDateBuilt(otherEquipment.getDateBuilt().toEpochDay());
+      setDateFirstUse(otherEquipment.getDateRetired().toEpochDay());
+      setDateRetired(otherEquipment.getDateRetired().toEpochDay());
    }
 
 }
