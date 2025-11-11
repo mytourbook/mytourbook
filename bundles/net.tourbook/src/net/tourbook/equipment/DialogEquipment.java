@@ -32,6 +32,7 @@ import org.eclipse.jface.dialogs.TitleAreaDialog;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.MouseWheelListener;
 import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.Image;
@@ -60,8 +61,9 @@ public class DialogEquipment extends TitleAreaDialog {
    private boolean                      _isInUIUpdate;
    private boolean                      _isNewEquipment;
 
-   private SelectionListener            _defaultListener;
-   private MouseWheelListener           _mouseWheelListener;
+   private ModifyListener               _defaultModifyListener;
+   private SelectionListener            _defaultSelectionListener;
+   private MouseWheelListener           _defaultMouseWheelListener;
 
    /*
     * UI resources
@@ -84,6 +86,8 @@ public class DialogEquipment extends TitleAreaDialog {
 
    private Spinner   _spinDistance;
    private Spinner   _spinWeight;
+
+   private boolean   _isModified;
 
    public DialogEquipment(final Shell parentShell, final Equipment equipment) {
 
@@ -182,7 +186,7 @@ public class DialogEquipment extends TitleAreaDialog {
             gdVertCenter.applyTo(label);
 
             _txtBrand = new Text(_container, SWT.BORDER);
-            _txtBrand.addModifyListener(modifyEvent -> enableControls());
+            _txtBrand.addModifyListener(_defaultModifyListener);
 
             GridDataFactory.fillDefaults().grab(true, false).span(3, 1).applyTo(_txtBrand);
          }
@@ -194,7 +198,7 @@ public class DialogEquipment extends TitleAreaDialog {
             gdVertCenter.applyTo(label);
 
             _txtModel = new Text(_container, SWT.BORDER);
-            _txtModel.addModifyListener(modifyEvent -> enableControls());
+            _txtModel.addModifyListener(_defaultModifyListener);
             GridDataFactory.fillDefaults().grab(true, false).span(3, 1).applyTo(_txtModel);
          }
          {
@@ -205,6 +209,7 @@ public class DialogEquipment extends TitleAreaDialog {
             gdVertCenter.applyTo(label);
 
             _dateBuilt = new DateTime(_container, SWT.DATE | SWT.MEDIUM | SWT.BORDER);
+            _dateBuilt.addSelectionListener(_defaultSelectionListener);
 
             UI.createSpacer_Horizontal(_container, 2);
          }
@@ -216,6 +221,7 @@ public class DialogEquipment extends TitleAreaDialog {
             gdVertCenter.applyTo(label);
 
             _dateFirstUse = new DateTime(_container, SWT.DATE | SWT.MEDIUM | SWT.BORDER);
+            _dateFirstUse.addSelectionListener(_defaultSelectionListener);
          }
          {
             /*
@@ -225,6 +231,7 @@ public class DialogEquipment extends TitleAreaDialog {
             gdVertCenter.applyTo(label);
 
             _dateRetired = new DateTime(_container, SWT.DATE | SWT.MEDIUM);
+            _dateRetired.addSelectionListener(_defaultSelectionListener);
          }
 //         private float                      weight;
 //         private float                      distanceFirstUse;
@@ -247,7 +254,7 @@ public class DialogEquipment extends TitleAreaDialog {
                _spinWeight.setMinimum(0);
                _spinWeight.setMaximum(1_000_000_000);
 
-               _spinWeight.addMouseWheelListener(_mouseWheelListener);
+               _spinWeight.addMouseWheelListener(_defaultMouseWheelListener);
 
                // label: kg
                UI.createLabel(containerWeight, UI.UNIT_LABEL_WEIGHT);
@@ -272,7 +279,7 @@ public class DialogEquipment extends TitleAreaDialog {
                _spinDistance.setMinimum(0);
                _spinDistance.setMaximum(1_000_000_000);
 
-               _spinDistance.addMouseWheelListener(_mouseWheelListener);
+               _spinDistance.addMouseWheelListener(_defaultMouseWheelListener);
 
                // label: km
                UI.createLabel(containerWeight, UI.UNIT_LABEL_DISTANCE);
@@ -286,6 +293,7 @@ public class DialogEquipment extends TitleAreaDialog {
             GridDataFactory.fillDefaults().align(SWT.FILL, SWT.BEGINNING).applyTo(label);
 
             _txtDescription = new Text(_container, SWT.BORDER | SWT.WRAP | SWT.MULTI | SWT.V_SCROLL | SWT.H_SCROLL);
+            _txtDescription.addModifyListener(e -> onModify());
             GridDataFactory.fillDefaults()
                   .grab(true, true)
                   .hint(convertWidthInCharsToPixels(100), convertHeightInCharsToPixels(20))
@@ -301,7 +309,12 @@ public class DialogEquipment extends TitleAreaDialog {
          return;
       }
 
-      final boolean isValid = isDataValid();
+      final boolean isValid = _isNewEquipment && _isModified == false
+
+            // disable OK when new and not modified but do NOT display validation message
+            ? false
+
+            : isDataValid();
 
       // OK button
       getButton(IDialogConstants.OK_ID).setEnabled(isValid);
@@ -326,11 +339,15 @@ public class DialogEquipment extends TitleAreaDialog {
 
       _parent.addDisposeListener(disposeEvent -> onDispose());
 
-      _defaultListener = SelectionListener.widgetSelectedAdapter(selectionEvent -> enableControls());
+      _defaultModifyListener = modifyEvent -> onModify();
 
-      _mouseWheelListener = mouseEvent -> {
+      _defaultSelectionListener = SelectionListener.widgetSelectedAdapter(selectionEvent -> onModify());
+
+      _defaultMouseWheelListener = mouseEvent -> {
 
          Util.adjustSpinnerValueOnMouseScroll(mouseEvent);
+
+         onModify();
       };
    }
 
@@ -369,6 +386,17 @@ public class DialogEquipment extends TitleAreaDialog {
    private void onDispose() {
 
       UI.disposeResource(_imageDialog);
+   }
+
+   private void onModify() {
+
+      if (_isInUIUpdate) {
+         return;
+      }
+
+      _isModified = true;
+
+      enableControls();
    }
 
    private void updateModelFromUI() {

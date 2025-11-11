@@ -471,7 +471,9 @@ public class Messages extends NLS {
    public static String        DataImport_Error_file_does_not_exist_msg;
    public static String        DataImport_Error_file_does_not_exist_title;
 
-   public static String        Db_Field_EquipmentDescription;
+   public static String        Db_Field_Category;
+   public static String        Db_Field_Description;
+   public static String        Db_Field_Name;
    public static String        Db_Field_SensorDescription;
    public static String        Db_Field_SensorName;
    public static String        Db_Field_TourData_Description;

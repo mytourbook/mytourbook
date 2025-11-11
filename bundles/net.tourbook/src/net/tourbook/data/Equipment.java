@@ -16,7 +16,7 @@
 package net.tourbook.data;
 
 import static javax.persistence.CascadeType.ALL;
-import static javax.persistence.FetchType.LAZY;
+import static javax.persistence.FetchType.EAGER;
 
 import java.io.Serializable;
 import java.time.LocalDate;
@@ -31,7 +31,7 @@ import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.ManyToMany;
+import javax.persistence.OneToMany;
 import javax.persistence.Transient;
 
 import net.tourbook.Messages;
@@ -41,21 +41,18 @@ import net.tourbook.common.util.StringUtils;
 import net.tourbook.database.FIELD_VALIDATION;
 import net.tourbook.database.TourDatabase;
 
+import org.hibernate.annotations.Cascade;
+
 @Entity
 public class Equipment implements Cloneable, Serializable {
 
-   private static final long          serialVersionUID      = 1L;
+   private static final long          serialVersionUID = 1L;
 
-   private static final char          NL                    = UI.NEW_LINE;
-
-   public static final int            DB_LENGTH_NAME        = 1000;
-   public static final int            DB_LENGTH_DESCRIPTION = 32000;
-
-   private static final AtomicInteger _createCounter        = new AtomicInteger();
+   private static final AtomicInteger _createCounter   = new AtomicInteger();
 
    @Id
    @GeneratedValue(strategy = GenerationType.IDENTITY)
-   private long                       equipmentId           = TourDatabase.ENTITY_IS_NOT_SAVED;
+   private long                       equipmentId      = TourDatabase.ENTITY_IS_NOT_SAVED;
 
    /**
     * Name/brand for the equipment
@@ -76,7 +73,7 @@ public class Equipment implements Cloneable, Serializable {
     *
     */
    @Enumerated(EnumType.STRING)
-   private EquipmentType              equipmentType         = EquipmentType.NONE;
+   private EquipmentType              equipmentType    = EquipmentType.NONE;
 
    /**
     * When the equipment was created/build, in epoch days
@@ -103,26 +100,36 @@ public class Equipment implements Cloneable, Serializable {
     */
    private float                      distanceFirstUse;
 
+//   /**
+//    * Contains all parts which are associated with this equipment, e.g.
+//    * <ul>
+//    * <li></li>
+//    * </ul>
+//    */
+//   @ManyToMany(mappedBy = "parts", cascade = ALL, fetch = LAZY)
+//   private final Set<EquipmentPart>    parts                 = new HashSet<>();
+
    /**
-    * Contains all tours which are associated with this equipment
+    * Contains all services which are associated with this equipment, e.g.
+    * <ul>
+    * <li></li>
+    * </ul>
     */
-   @ManyToMany(mappedBy = "equipments", cascade = ALL, fetch = LAZY)
-   private final Set<TourData>        tourData              = new HashSet<>();
-
-//   Collection of services
-//   Collection of parts
+   @OneToMany(fetch = EAGER, cascade = ALL, mappedBy = "equipment")
+   @Cascade(org.hibernate.annotations.CascadeType.DELETE_ORPHAN)
+   private Set<EquipmentService> services  = new HashSet<>();
 
    @Transient
-   private long      _createId = 0;
+   private long                  _createId = 0;
 
    @Transient
-   private LocalDate _dateBuilt;
+   private LocalDate             _dateBuilt;
 
    @Transient
-   private LocalDate _dateFirstUse;
+   private LocalDate             _dateFirstUse;
 
    @Transient
-   private LocalDate _dateRetired;
+   private LocalDate             _dateRetired;
 
    /**
     * Default constructor used in EJB
@@ -296,8 +303,8 @@ public class Equipment implements Cloneable, Serializable {
        */
       fieldValidation = TourDatabase.isFieldValidForSave(
             description,
-            DB_LENGTH_DESCRIPTION,
-            Messages.Db_Field_EquipmentDescription);
+            TourDatabase.DB_LENGTH_DESCRIPTION,
+            Messages.Db_Field_Description);
 
       if (fieldValidation == FIELD_VALIDATION.IS_INVALID) {
 
@@ -305,7 +312,7 @@ public class Equipment implements Cloneable, Serializable {
 
       } else if (fieldValidation == FIELD_VALIDATION.TRUNCATE) {
 
-         description = description.substring(0, DB_LENGTH_DESCRIPTION);
+         description = description.substring(0, TourDatabase.DB_LENGTH_DESCRIPTION);
       }
 
       return true;

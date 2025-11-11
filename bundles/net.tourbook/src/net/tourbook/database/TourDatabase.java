@@ -68,7 +68,6 @@ import net.tourbook.common.util.StringUtils;
 import net.tourbook.common.util.Util;
 import net.tourbook.data.DeviceSensor;
 import net.tourbook.data.DeviceSensorValue;
-import net.tourbook.data.Equipment;
 import net.tourbook.data.TourBeverageContainer;
 import net.tourbook.data.TourBike;
 import net.tourbook.data.TourData;
@@ -125,6 +124,7 @@ public class TourDatabase {
     */
    private static final int TOURBOOK_DB_VERSION = 60;
 
+//   private static final int TOURBOOK_DB_VERSION = 60; // 25.11+
 //   private static final int TOURBOOK_DB_VERSION = 59; // 25.11
 //   private static final int TOURBOOK_DB_VERSION = 58; // 25.6
 //   private static final int TOURBOOK_DB_VERSION = 57; // 25.4
@@ -188,6 +188,12 @@ public class TourDatabase {
    private static final int    MAX_TRIES_TO_PING_SERVER                   = 10;
    public static final int     VARCHAR_MAX_LENGTH                         = 32_672;
 
+   /**
+    * Common text lengths
+    */
+   public static final int     DB_LENGTH_DESCRIPTION                      = 32000;
+   public static final int     DB_LENGTH_NAME                             = 1000;
+
    private static final String NUMBER_FORMAT_1F                           = "%.1f";                                                  //$NON-NLS-1$
 
    /**
@@ -207,6 +213,8 @@ public class TourDatabase {
    public static final String  TABLE_DEVICE_SENSOR                        = "DeviceSensor";                                          //$NON-NLS-1$
    public static final String  TABLE_DEVICE_SENSOR_VALUE                  = "DeviceSensorValue";                                     //$NON-NLS-1$
    public static final String  TABLE_EQUIPMENT                            = "Equipment";                                             //$NON-NLS-1$
+   public static final String  TABLE_EQUIPMENT_PART                       = "EquipmentPart";                                         //$NON-NLS-1$
+   public static final String  TABLE_EQUIPMENT_SERVICE                    = "EquipmentService";                                      //$NON-NLS-1$
    public static final String  TABLE_TOUR_BEVERAGE_CONTAINER              = "TOURBEVERAGECONTAINER";                                 //$NON-NLS-1$
    public static final String  TABLE_TOUR_BIKE                            = "TOURBIKE";                                              //$NON-NLS-1$
    public static final String  TABLE_TOUR_COMPARED                        = "TOURCOMPARED";                                          //$NON-NLS-1$
@@ -254,6 +262,8 @@ public class TourDatabase {
    private static final String ENTITY_ID_COMPARED            = "ComparedID";                                //$NON-NLS-1$
    private static final String ENTITY_ID_DEVICE_SENSOR       = "SensorId";                                  //$NON-NLS-1$
    private static final String ENTITY_ID_EQUIPMENT           = "EquipmentId";                               //$NON-NLS-1$
+   private static final String ENTITY_ID_EQUIPMENT_PART      = "PartId";                                    //$NON-NLS-1$
+   private static final String ENTITY_ID_EQUIPMENT_SERVICE   = "ServiceId";                                 //$NON-NLS-1$
    private static final String ENTITY_ID_DEVICE_SENSOR_VALUE = "SensorValueId";                             //$NON-NLS-1$
    private static final String ENTITY_ID_HR_ZONE             = "HrZoneID";                                  //$NON-NLS-1$
    private static final String ENTITY_ID_LOCATION            = "LocationID";                                //$NON-NLS-1$
@@ -274,14 +284,15 @@ public class TourDatabase {
    public  static final String KEY_BEVERAGE_CONTAINER       = TABLE_TOUR_BEVERAGE_CONTAINER  + "_" + ENTITY_ID_BEVERAGECONTAINER;   //$NON-NLS-1$
    private static final String KEY_BIKE                     = TABLE_TOUR_BIKE                + "_" + ENTITY_ID_BIKE;                //$NON-NLS-1$
    private static final String KEY_DEVICE_SENSOR            = TABLE_DEVICE_SENSOR            + "_" + ENTITY_ID_DEVICE_SENSOR;       //$NON-NLS-1$
-   private static final String KEY_EQUIPMENT                = TABLE_EQUIPMENT                + "_" + ENTITY_ID_EQUIPMENT;       //$NON-NLS-1$
-   public static final String  KEY_MARKER_TYPE              = TABLE_TOUR_MARKER_TYPE         + "_" + ENTITY_ID_MARKER_TYPE;                //$NON-NLS-1$
+   private static final String KEY_EQUIPMENT                = TABLE_EQUIPMENT                + "_" + ENTITY_ID_EQUIPMENT;           //$NON-NLS-1$
+   private static final String KEY_EQUIPMENT_PART           = TABLE_EQUIPMENT_PART           + "_" + ENTITY_ID_EQUIPMENT_PART;   //$NON-NLS-1$
+   public static final String  KEY_MARKER_TYPE              = TABLE_TOUR_MARKER_TYPE         + "_" + ENTITY_ID_MARKER_TYPE;         //$NON-NLS-1$
    private static final String KEY_PERSON                   = TABLE_TOUR_PERSON              + "_" + ENTITY_ID_PERSON;              //$NON-NLS-1$
    public static final String  KEY_TAG                      = TABLE_TOUR_TAG                 + "_" + ENTITY_ID_TAG;                 //$NON-NLS-1$
    private static final String KEY_TAG_CATEGORY             = TABLE_TOUR_TAG_CATEGORY        + "_" + ENTITY_ID_TAG_CATEGORY;        //$NON-NLS-1$
    public static final String  KEY_TOUR                     = TABLE_TOUR_DATA                + "_" + ENTITY_ID_TOUR;                //$NON-NLS-1$
    public static final String  KEY_TOUR_LOCATION            = TABLE_TOUR_LOCATION            + "_" + ENTITY_ID_LOCATION;            //$NON-NLS-1$
-   private static final String KEY_TOUR_TYPE                = TABLE_TOUR_TYPE                + "_" + ENTITY_ID_TOUR_TYPE;                //$NON-NLS-1$
+   private static final String KEY_TOUR_TYPE                = TABLE_TOUR_TYPE                + "_" + ENTITY_ID_TOUR_TYPE;           //$NON-NLS-1$
 
 // SET_FORMATTING_ON
 
@@ -4435,22 +4446,18 @@ public class TourDatabase {
       //
             + SQL.createField_EntityId(ENTITY_ID_EQUIPMENT, true)
 
-            // version 60 start
+            + "   Brand                VARCHAR(" + DB_LENGTH_NAME + "),                      " + NL //$NON-NLS-1$ //$NON-NLS-2$
+            + "   Model                VARCHAR(" + DB_LENGTH_NAME + "),                      " + NL //$NON-NLS-1$ //$NON-NLS-2$
+            + "   Description          VARCHAR(" + DB_LENGTH_DESCRIPTION + "),               " + NL //$NON-NLS-1$ //$NON-NLS-2$
 
-            + "   Brand                VARCHAR(" + Equipment.DB_LENGTH_NAME + "),            " + NL //$NON-NLS-1$ //$NON-NLS-2$
-            + "   Model                VARCHAR(" + Equipment.DB_LENGTH_NAME + "),            " + NL //$NON-NLS-1$ //$NON-NLS-2$
-            + "   Description          VARCHAR(" + Equipment.DB_LENGTH_DESCRIPTION + "),     " + NL //$NON-NLS-1$ //$NON-NLS-2$
-
-            + "   EquipmentType        VARCHAR(" + Equipment.DB_LENGTH_NAME + "),            " + NL //$NON-NLS-1$ //$NON-NLS-2$
+            + "   EquipmentType        VARCHAR(" + DB_LENGTH_NAME + "),                      " + NL //$NON-NLS-1$ //$NON-NLS-2$
 
             + "   DateBuilt            BIGINT DEFAULT 0,                                     " + NL //$NON-NLS-1$
             + "   DateFirstUse         BIGINT DEFAULT 0,                                     " + NL //$NON-NLS-1$
             + "   DateRetired          BIGINT DEFAULT 0,                                     " + NL //$NON-NLS-1$
 
             + "   Weight               FLOAT DEFAULT 0,                                      " + NL //$NON-NLS-1$
-            + "   DistanceFirstUse     FLOAT DEFAULT 0                                      " + NL //$NON-NLS-1$
-
-            // version 60 end
+            + "   DistanceFirstUse     FLOAT DEFAULT 0                                       " + NL //$NON-NLS-1$
 
             + ")" //                                                                                  //$NON-NLS-1$
       );
@@ -4480,6 +4487,32 @@ public class TourDatabase {
 
       // Create index Equipment_EquipmentId
       SQL.createIndex(stmt, JOINTABLE__TOURDATA__EQUIPMENT, KEY_EQUIPMENT);
+   }
+
+   /**
+    * Create table {@link #TABLE_EQUIPMENT_SERVICE}
+    *
+    * @param stmt
+    *
+    * @throws SQLException
+    */
+   private void createTable_EquipmentService(final Statement stmt) throws SQLException {
+
+      exec(stmt, "CREATE TABLE " + TABLE_EQUIPMENT_SERVICE + "   (                           " + NL //$NON-NLS-1$ //$NON-NLS-2$
+      //
+            + SQL.createField_EntityId(ENTITY_ID_EQUIPMENT_SERVICE, true)
+
+            + "   " + KEY_EQUIPMENT + "   BIGINT,                                            " + NL //$NON-NLS-1$ //$NON-NLS-2$
+
+            + "   Name                    VARCHAR(" + DB_LENGTH_NAME + "),                   " + NL //$NON-NLS-1$ //$NON-NLS-2$
+            + "   Description             VARCHAR(" + DB_LENGTH_DESCRIPTION + "),            " + NL //$NON-NLS-1$ //$NON-NLS-2$
+
+            + "   Category                VARCHAR(" + DB_LENGTH_NAME + "),                   " + NL //$NON-NLS-1$ //$NON-NLS-2$
+
+            + "   Date                    BIGINT DEFAULT 0                                   " + NL //$NON-NLS-1$
+
+            + ")" //                                                                                //$NON-NLS-1$
+      );
    }
 
    /**
@@ -6383,6 +6416,7 @@ public class TourDatabase {
             createTable_TourTag_Category(stmt);
 
             createTable_Equipment(stmt);
+            createTable_EquipmentService(stmt);
 
             createTable_TourWayPoint(stmt);
 
@@ -11348,6 +11382,10 @@ public class TourDatabase {
          // double check if db already exists
          if (isTableAvailable(conn, TABLE_EQUIPMENT) == false) {
             createTable_Equipment(stmt);
+         }
+
+         if (isTableAvailable(conn, TABLE_EQUIPMENT_SERVICE) == false) {
+            createTable_EquipmentService(stmt);
          }
       }
       stmt.close();
