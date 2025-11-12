@@ -61,6 +61,8 @@ public abstract class TreeColumnFactory {
 
    public static final TreeColumnFactory EQUIPMENT_AND_CATEGORY;
    public static final String            EQUIPMENT_AND_CATEGORY_ID        = "EQUIPMENT_AND_CATEGORY";           //$NON-NLS-1$
+   public static final TreeColumnFactory EQUIPMENT_DATE;
+   public static final String            EQUIPMENT_DATE_ID                = "EQUIPMENT_DATE";                   //$NON-NLS-1$
 
    public static final TreeColumnFactory MOTION_AVG_PACE;
    public static final TreeColumnFactory MOTION_AVG_SPEED;
@@ -717,6 +719,25 @@ public abstract class TreeColumnFactory {
             colDef.setColumnLabel(              Messages.ColumnFactory_Equipment);
             colDef.setColumnHeaderText(         Messages.ColumnFactory_Equipment);
             colDef.setColumnHeaderToolTipText(  Messages.ColumnFactory_Equipment);
+
+            colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(20));
+
+            return colDef;
+         }
+      };
+
+      EQUIPMENT_DATE = new TreeColumnFactory() {
+         @Override
+         public TreeColumnDefinition createColumn(final ColumnManager columnManager,
+                                                  final PixelConverter pixelConverter) {
+
+            final TreeColumnDefinition colDef = new TreeColumnDefinition(columnManager, EQUIPMENT_DATE_ID, SWT.LEAD);
+
+            colDef.setColumnCategory(           Messages.ColumnFactory_Category_Equipment);
+
+            colDef.setColumnLabel(              Messages.ColumnFactory_Equipment_Date);
+            colDef.setColumnHeaderText(         Messages.ColumnFactory_Equipment_Date);
+            colDef.setColumnHeaderToolTipText(  Messages.ColumnFactory_Equipment_Date);
 
             colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(20));
 

@@ -20,7 +20,9 @@ import static javax.persistence.FetchType.EAGER;
 
 import java.io.Serializable;
 import java.time.LocalDate;
+import java.util.Collection;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -45,6 +47,8 @@ import org.hibernate.annotations.Cascade;
 
 @Entity
 public class Equipment implements Cloneable, Serializable {
+
+   private static final char          NL               = UI.NEW_LINE;
 
    private static final long          serialVersionUID = 1L;
 
@@ -100,6 +104,19 @@ public class Equipment implements Cloneable, Serializable {
     */
    private float                      distanceFirstUse;
 
+   /**
+    * Contains all services which are associated with this equipment, e.g.
+    * <ul>
+    * <li></li>
+    * </ul>
+    */
+   @OneToMany(fetch = EAGER, cascade = ALL, mappedBy = "equipment")
+   @Cascade(org.hibernate.annotations.CascadeType.DELETE_ORPHAN)
+   private Set<EquipmentService>      services         = new HashSet<>();
+
+   @Transient
+   private long                       _createId        = 0;
+
 //   /**
 //    * Contains all parts which are associated with this equipment, e.g.
 //    * <ul>
@@ -110,26 +127,19 @@ public class Equipment implements Cloneable, Serializable {
 //   private final Set<EquipmentPart>    parts                 = new HashSet<>();
 
    /**
-    * Contains all services which are associated with this equipment, e.g.
-    * <ul>
-    * <li></li>
-    * </ul>
+    * Contain the current or last date
     */
-   @OneToMany(fetch = EAGER, cascade = ALL, mappedBy = "equipment")
-   @Cascade(org.hibernate.annotations.CascadeType.DELETE_ORPHAN)
-   private Set<EquipmentService> services  = new HashSet<>();
+   @Transient
+   private LocalDate _date;
 
    @Transient
-   private long                  _createId = 0;
+   private LocalDate _dateBuilt;
 
    @Transient
-   private LocalDate             _dateBuilt;
+   private LocalDate _dateFirstUse;
 
    @Transient
-   private LocalDate             _dateFirstUse;
-
-   @Transient
-   private LocalDate             _dateRetired;
+   private LocalDate _dateRetired;
 
    /**
     * Default constructor used in EJB
@@ -200,31 +210,76 @@ public class Equipment implements Cloneable, Serializable {
       return brand;
    }
 
+   public LocalDate getDate() {
+
+      if (_date != null) {
+         return _date;
+      }
+
+      final LocalDate now = LocalDate.now();
+
+      if (getDateRetired().isBefore(now)) {
+
+         _date = getDateRetired();
+
+         return _date;
+
+      } else if (getDateFirstUse().isBefore(now)) {
+
+         _date = getDateFirstUse();
+
+         return _date;
+
+      } else if (getDateBuilt().isBefore(now)) {
+
+         _date = getDateBuilt();
+
+         return _date;
+      }
+
+      return now;
+   }
+
    public LocalDate getDateBuilt() {
 
       if (_dateBuilt == null) {
-         _dateBuilt = TimeTools.toLocalDate(dateBuilt);
+         _dateBuilt = TimeTools.toLocalDate(dateBuilt * TimeTools.DAY_MILLISECONDS);
       }
 
       return _dateBuilt;
    }
 
+   public long getDateBuilt_Raw() {
+
+      return dateBuilt;
+   }
+
    public LocalDate getDateFirstUse() {
 
       if (_dateFirstUse == null) {
-         _dateFirstUse = TimeTools.toLocalDate(dateFirstUse);
+         _dateFirstUse = TimeTools.toLocalDate(dateFirstUse * TimeTools.DAY_MILLISECONDS);
       }
 
       return _dateFirstUse;
    }
 
+   public long getDateFirstUse_Raw() {
+
+      return dateFirstUse;
+   }
+
    public LocalDate getDateRetired() {
 
       if (_dateRetired == null) {
-         _dateRetired = TimeTools.toLocalDate(dateRetired);
+         _dateRetired = TimeTools.toLocalDate(dateRetired * TimeTools.DAY_MILLISECONDS);
       }
 
       return _dateRetired;
+   }
+
+   public long getDateRetired_Raw() {
+
+      return dateRetired;
    }
 
    public String getDescription() {
@@ -326,6 +381,7 @@ public class Equipment implements Cloneable, Serializable {
 
       this.dateBuilt = dateBuilt;
 
+      _date = null;
       _dateBuilt = null;
    }
 
@@ -333,6 +389,7 @@ public class Equipment implements Cloneable, Serializable {
 
       this.dateFirstUse = dateFirstUse;
 
+      _date = null;
       _dateFirstUse = null;
    }
 
@@ -340,6 +397,7 @@ public class Equipment implements Cloneable, Serializable {
 
       this.dateRetired = dateRetired;
 
+      _date = null;
       _dateRetired = null;
    }
 
@@ -359,15 +417,54 @@ public class Equipment implements Cloneable, Serializable {
       this.weight = weight;
    }
 
+   @Override
+   public String toString() {
+
+      final int maxLen = 5;
+
+      return UI.EMPTY_STRING
+
+            + "Equipment" + NL //                                          //$NON-NLS-1$
+
+            + " equipmentId      =" + equipmentId + NL //                  //$NON-NLS-1$
+            + " brand            =" + brand + NL //                        //$NON-NLS-1$
+            + " model            =" + model + NL //                        //$NON-NLS-1$
+            + " description      =" + description + NL //                  //$NON-NLS-1$
+            + " equipmentType    =" + equipmentType + NL //                //$NON-NLS-1$
+            + " distanceFirstUse =" + distanceFirstUse + NL //             //$NON-NLS-1$
+
+            + " dateBuilt        =" + dateBuilt + NL //                    //$NON-NLS-1$
+            + " dateFirstUse     =" + dateFirstUse + NL //                 //$NON-NLS-1$
+            + " dateRetired      =" + dateRetired + NL //                  //$NON-NLS-1$
+            + " weight           =" + weight + NL //                       //$NON-NLS-1$
+
+            + " services         =" + (services != null ? toString(services, maxLen) : null) + NL //$NON-NLS-1$
+      ;
+   }
+
+   private String toString(final Collection<?> collection, final int maxLen) {
+      final StringBuilder builder = new StringBuilder();
+      builder.append("[");
+      int i = 0;
+      for (final Iterator<?> iterator = collection.iterator(); iterator.hasNext() && i < maxLen; i++) {
+         if (i > 0) {
+            builder.append(", ");
+         }
+         builder.append(iterator.next());
+      }
+      builder.append("]");
+      return builder.toString();
+   }
+
    public void updateFromOther(final Equipment otherEquipment) {
 
       brand = otherEquipment.getBrand();
       model = otherEquipment.getModel();
       description = otherEquipment.getDescription();
 
-      setDateBuilt(otherEquipment.getDateBuilt().toEpochDay());
-      setDateFirstUse(otherEquipment.getDateRetired().toEpochDay());
-      setDateRetired(otherEquipment.getDateRetired().toEpochDay());
+      setDateBuilt(otherEquipment.getDateBuilt_Raw());
+      setDateFirstUse(otherEquipment.getDateRetired_Raw());
+      setDateRetired(otherEquipment.getDateRetired_Raw());
    }
 
 }

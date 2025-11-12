@@ -263,6 +263,7 @@ public class Messages extends NLS {
    public static String        ColumnFactory_Elevation_LossDelta_Label;
    public static String        ColumnFactory_Elevation_LossDelta_Tooltip;
    public static String        ColumnFactory_Equipment;
+   public static String        ColumnFactory_Equipment_Date;
    public static String        ColumnFactory_GearFrontShiftCount_Header;
    public static String        ColumnFactory_GearFrontShiftCount_Label;
    public static String        ColumnFactory_GearFrontShiftCount_Tooltip;

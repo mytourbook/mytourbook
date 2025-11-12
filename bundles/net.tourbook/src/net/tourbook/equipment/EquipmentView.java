@@ -15,12 +15,14 @@
  *******************************************************************************/
 package net.tourbook.equipment;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
 import net.tourbook.Images;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.CommonActivator;
+import net.tourbook.common.time.TimeTools;
 import net.tourbook.common.util.ColumnDefinition;
 import net.tourbook.common.util.ColumnManager;
 import net.tourbook.common.util.IContextMenuProvider;
@@ -35,6 +37,7 @@ import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.ui.ITourProvider;
 import net.tourbook.ui.TreeColumnFactory;
 
+import org.eclipse.e4.ui.di.PersistState;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.IToolBarManager;
@@ -43,6 +46,7 @@ import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.layout.PixelConverter;
 import org.eclipse.jface.preference.IPreferenceStore;
+import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.viewers.CellLabelProvider;
 import org.eclipse.jface.viewers.ColumnViewer;
 import org.eclipse.jface.viewers.IElementComparer;
@@ -72,6 +76,9 @@ public class EquipmentView extends ViewPart implements ITourProvider, ITourViewe
 
    private static final int              TAG_VIEW_LAYOUT_FLAT         = 0;
    private static final int              TAG_VIEW_LAYOUT_HIERARCHICAL = 10;
+
+   private IPropertyChangeListener       _prefChangeListener;
+   private IPropertyChangeListener       _prefChangeListener_Common;
 
    private int                           _tagViewLayout               = TAG_VIEW_LAYOUT_HIERARCHICAL;
 
@@ -238,6 +245,57 @@ public class EquipmentView extends ViewPart implements ITourProvider, ITourViewe
       }
    }
 
+   private void addPrefListener() {
+
+      _prefChangeListener = propertyChangeEvent -> {
+
+         final String property = propertyChangeEvent.getProperty();
+
+//         if (property.equals(ITourbookPreferences.VIEW_LAYOUT_CHANGED)) {
+//
+//            _equipViewer.getTree().setLinesVisible(_prefStore.getBoolean(ITourbookPreferences.VIEW_LAYOUT_DISPLAY_LINES));
+//
+//            _equipViewer.refresh();
+//
+//            /*
+//             * the tree must be redrawn because the styled text does not show with the new color
+//             */
+//            _equipViewer.getTree().redraw();
+//
+//         } else if (property.equals(ITourbookPreferences.APP_DATA_FILTER_IS_MODIFIED)) {
+//
+//            // reselect current sensor that the sensor chart (when opened) is reloaded
+//
+//            final StructuredSelection selection = getViewerSelection();
+//
+//            _equipViewer.setSelection(selection, true);
+//
+//            final Table table = _equipViewer.getTable();
+//            table.showSelection();
+//         }
+      };
+
+      _prefChangeListener_Common = propertyChangeEvent -> {
+
+         final String property = propertyChangeEvent.getProperty();
+
+//         if (property.equals(ICommonPreferences.MEASUREMENT_SYSTEM)) {
+//
+//            // measurement system has changed
+//
+//            _columnManager.saveState(_state);
+//            _columnManager.clearColumns();
+//
+//            defineAllColumns();
+//
+//            _equipViewer = (TableViewer) recreateViewer(_equipViewer);
+//         }
+      };
+
+      _prefStore.addPropertyChangeListener(_prefChangeListener);
+      _prefStore_Common.addPropertyChangeListener(_prefChangeListener_Common);
+   }
+
    private void createActions() {
 
    // SET_FORMATTING_OFF
@@ -282,6 +340,8 @@ public class EquipmentView extends ViewPart implements ITourProvider, ITourViewe
       fillActionBars();
 
       createUI(parent);
+
+      addPrefListener();
 
       reloadViewer();
    }
@@ -415,6 +475,7 @@ public class EquipmentView extends ViewPart implements ITourProvider, ITourViewe
    private void defineAllColumns() {
 
       defineColumn_1stColumn();
+      defineColumn_Time_Date();
    }
 
    /**
@@ -438,6 +499,43 @@ public class EquipmentView extends ViewPart implements ITourProvider, ITourViewe
             }
          }
       });
+   }
+
+   /**
+    * Column: Date
+    */
+   private void defineColumn_Time_Date() {
+
+      final ColumnDefinition colDef = TreeColumnFactory.EQUIPMENT_DATE.createColumn(_columnManager, _pc);
+
+      colDef.setLabelProvider(new CellLabelProvider() {
+
+         @Override
+         public void update(final ViewerCell cell) {
+
+            final Object element = cell.getElement();
+
+            if (element instanceof final TVIEquipment tviEquipment) {
+
+               final LocalDate date = tviEquipment.getEquipment().getDate();
+
+               cell.setText(TimeTools.Formatter_Date_M.format(date));
+            }
+         }
+      });
+   }
+
+   @Override
+   public void dispose() {
+
+      _prefStore.removePropertyChangeListener(_prefChangeListener);
+      _prefStore_Common.removePropertyChangeListener(_prefChangeListener_Common);
+
+//      TourManager.getInstance().removeTourEventListener(_tourPropertyListener);
+//
+//      getSite().getPage().removePostSelectionListener(_postSelectionListener);
+
+      super.dispose();
    }
 
    private void enableControls() {
@@ -653,8 +751,10 @@ public class EquipmentView extends ViewPart implements ITourProvider, ITourViewe
             return;
          }
 
+         final Equipment equipmentInDialog = dialogEquipment.getEquipment();
+
          // update model
-         equipment.updateFromOther(dialogEquipment.getEquipment());
+         equipment.updateFromOther(equipmentInDialog);
 
          TourDatabase.saveEntity(equipment, equipment.getEquipmentId(), Equipment.class);
 
@@ -739,6 +839,13 @@ public class EquipmentView extends ViewPart implements ITourProvider, ITourViewe
 
       // second: update viewer
       _equipViewer.setInput(_rootItem);
+   }
+
+   @PersistState
+   private void saveState() {
+
+      _columnManager.saveState(_state);
+
    }
 
    @Override
