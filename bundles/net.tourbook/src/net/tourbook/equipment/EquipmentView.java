@@ -36,6 +36,8 @@ import net.tourbook.data.Equipment;
 import net.tourbook.data.TourData;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.preferences.ITourbookPreferences;
+import net.tourbook.tour.TourEventId;
+import net.tourbook.tour.TourManager;
 import net.tourbook.ui.ITourProvider;
 import net.tourbook.ui.TreeColumnFactory;
 import net.tourbook.ui.views.tagging.TVITaggingView_TagCategory;
@@ -837,7 +839,7 @@ public class EquipmentView extends ViewPart implements ITourProvider, ITourViewe
       final ITreeSelection structuredSelection = _equipViewer.getStructuredSelection();
       final List<?> allSelection = structuredSelection.toList();
 
-      final Map<Long, Equipment> allEquipments = EquipmentManager.getAllEquipments_ByID();
+      final Map<Long, Equipment> allEquipments = EquipmentManager.getAllEquipment_ByID();
 
       final List<Equipment> allSelectedEquipments = new ArrayList<>();
 
@@ -881,6 +883,8 @@ public class EquipmentView extends ViewPart implements ITourProvider, ITourViewe
 
          // update UI
          reloadViewer();
+
+         updateOtherViews();
       }
    }
 
@@ -900,12 +904,7 @@ public class EquipmentView extends ViewPart implements ITourProvider, ITourViewe
       // update UI
       reloadViewer();
 
-//      /*
-//       * When a sensor is modified, all tours with sensor values do contain the old sensor
-//       * instance
-//       */
-//      TourManager.getInstance().clearTourDataCache();
-//      TourManager.fireEvent(TourEventId.ALL_TOURS_ARE_MODIFIED, this);
+      updateOtherViews();
    }
 
    @Override
@@ -978,6 +977,21 @@ public class EquipmentView extends ViewPart implements ITourProvider, ITourViewe
    @Override
    public void updateColumnHeader(final ColumnDefinition colDef) {
 
+   }
+
+   private void updateOtherViews() {
+
+      // remove old tags from cached tours
+      EquipmentManager.clearCachedValues();
+
+//    TagMenuManager.updateRecentTagNames();
+
+
+      TourManager.getInstance().clearTourDataCache();
+
+      // fire modify event
+//    TourManager.fireEvent(TourEventId.TAG_STRUCTURE_CHANGED);
+      TourManager.fireEvent(TourEventId.EQUIPMENT_STRUCTURE_CHANGED);
    }
 
 }

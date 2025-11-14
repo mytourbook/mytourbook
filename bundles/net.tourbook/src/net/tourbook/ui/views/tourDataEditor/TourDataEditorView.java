@@ -3001,7 +3001,8 @@ public class TourDataEditorView extends ViewPart implements
                // removed old tour data from the selection provider
                _postSelectionProvider.clearSelection();
 
-            } else if (tourEventId == TourEventId.TAG_STRUCTURE_CHANGED) {
+            } else if (tourEventId == TourEventId.TAG_STRUCTURE_CHANGED
+                  || tourEventId == TourEventId.EQUIPMENT_STRUCTURE_CHANGED) {
 
                if (_isTourDirty) {
 
@@ -3010,8 +3011,8 @@ public class TourDataEditorView extends ViewPart implements
                } else {
 
                   /**
-                   * When tags are deleted, then the tour editor is not be dirty (this is
-                   * previously checked)
+                   * When tags are deleted, then the tour editor is not dirty (this is previously
+                   * checked)
                    * <p>
                    * -> reload tour with removed tags
                    */
@@ -3560,11 +3561,10 @@ public class TourDataEditorView extends ViewPart implements
       menuMgr.setRemoveAllWhenShown(true);
       menuMgr.addMenuListener(menuManager -> {
 
-         final Set<Equipment> allEquipments = _tourData.getTourEquipments();
+         final Set<Equipment> allEquipments = _tourData.getTourEquipment();
          final boolean isTagInTour = allEquipments.size() > 0;
 
          _equipmentMenuMgr.fillEquipmentMenu(menuManager);
-//       _equipmentMenuMgr.enableTagActions();
       });
 
       // set menu for the equipment link control

@@ -16,11 +16,13 @@
 package net.tourbook.equipment;
 
 import java.time.LocalDate;
+import java.util.concurrent.ConcurrentSkipListSet;
 
 import net.tourbook.Images;
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.UI;
+import net.tourbook.common.autocomplete.AutoComplete_ComboInputMT;
 import net.tourbook.common.util.StringUtils;
 import net.tourbook.common.util.Util;
 import net.tourbook.data.Equipment;
@@ -36,6 +38,7 @@ import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.MouseWheelListener;
 import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.Image;
+import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.DateTime;
@@ -49,9 +52,12 @@ import org.eclipse.swt.widgets.Text;
  */
 public class DialogEquipment extends TitleAreaDialog {
 
-   private static final String          ID     = "net.tourbook.equipment.DialogEquipment"; //$NON-NLS-1$
+   private static final String          ID                                    = "net.tourbook.equipment.DialogEquipment"; //$NON-NLS-1$
 
-   private static final IDialogSettings _state = TourbookPlugin.getState(ID);
+   private static final IDialogSettings _state                                = TourbookPlugin.getState(ID);
+
+   private static final String          STATE_AUTOCOMPLETE_POPUP_HEIGHT_BRAND = "STATE_AUTOCOMPLETE_POPUP_HEIGHT_BRAND";  //$NON-NLS-1$
+   private static final String          STATE_AUTOCOMPLETE_POPUP_HEIGHT_MODEL = "STATE_AUTOCOMPLETE_POPUP_HEIGHT_MODEL";  //$NON-NLS-1$
 
    /**
     * New or cloned instance
@@ -65,6 +71,8 @@ public class DialogEquipment extends TitleAreaDialog {
    private SelectionListener            _defaultSelectionListener;
    private MouseWheelListener           _defaultMouseWheelListener;
 
+   private boolean                      _isModified;
+
    /*
     * UI resources
     */
@@ -73,21 +81,23 @@ public class DialogEquipment extends TitleAreaDialog {
    /*
     * UI controls
     */
-   private Composite _container;
-   private Composite _parent;
+   private Composite                 _container;
+   private Composite                 _parent;
 
-   private Text      _txtDescription;
-   private Text      _txtModel;
-   private Text      _txtBrand;
+   private Text                      _txtDescription;
 
-   private DateTime  _dateBuilt;
-   private DateTime  _dateFirstUse;
-   private DateTime  _dateRetired;
+   private Combo                     _comboBrand;
+   private Combo                     _comboModel;
 
-   private Spinner   _spinDistance;
-   private Spinner   _spinWeight;
+   private DateTime                  _dateBuilt;
+   private DateTime                  _dateFirstUse;
+   private DateTime                  _dateRetired;
 
-   private boolean   _isModified;
+   private Spinner                   _spinDistance;
+   private Spinner                   _spinWeight;
+
+   private AutoComplete_ComboInputMT _autocomplete_Brand;
+   private AutoComplete_ComboInputMT _autocomplete_Model;
 
    public DialogEquipment(final Shell parentShell, final Equipment equipment) {
 
@@ -154,10 +164,13 @@ public class DialogEquipment extends TitleAreaDialog {
 
       createUI(dlgContainer);
 
+      fillUI();
+
+      resoreState();
+
       updateUIFromModel();
 
-//      _txtBrand.selectAll();
-      _txtBrand.setFocus();
+      _comboBrand.setFocus();
 
       // ensure the UI is created
       _parent.getDisplay().asyncExec(() -> {
@@ -179,27 +192,36 @@ public class DialogEquipment extends TitleAreaDialog {
       {
          {
             /*
-             * Name/brand
+             * Brand/name
              */
 
             final Label label = UI.createLabel(_container, Messages.Dialog_Equipment_Label_Brand, Messages.Dialog_Equipment_Label_Brand_Tooltip);
             gdVertCenter.applyTo(label);
 
-            _txtBrand = new Text(_container, SWT.BORDER);
-            _txtBrand.addModifyListener(_defaultModifyListener);
+            // autocomplete combo
+            _comboBrand = new Combo(_container, SWT.BORDER | SWT.FLAT);
+            _comboBrand.setText(UI.EMPTY_STRING);
+            _comboBrand.addModifyListener(_defaultModifyListener);
 
-            GridDataFactory.fillDefaults().grab(true, false).span(3, 1).applyTo(_txtBrand);
+            GridDataFactory.fillDefaults().grab(true, false).span(3, 1).applyTo(_comboBrand);
+
+            _autocomplete_Brand = new AutoComplete_ComboInputMT(_comboBrand);
          }
          {
             /*
-             * Subname/model
+             * Model/subname
              */
             final Label label = UI.createLabel(_container, Messages.Dialog_Equipment_Label_Model);
             gdVertCenter.applyTo(label);
 
-            _txtModel = new Text(_container, SWT.BORDER);
-            _txtModel.addModifyListener(_defaultModifyListener);
-            GridDataFactory.fillDefaults().grab(true, false).span(3, 1).applyTo(_txtModel);
+            // autocomplete combo
+            _comboModel = new Combo(_container, SWT.BORDER | SWT.FLAT);
+            _comboModel.setText(UI.EMPTY_STRING);
+            _comboModel.addModifyListener(_defaultModifyListener);
+
+            GridDataFactory.fillDefaults().grab(true, false).span(3, 1).applyTo(_comboModel);
+
+            _autocomplete_Model = new AutoComplete_ComboInputMT(_comboModel);
          }
          {
             /*
@@ -320,6 +342,27 @@ public class DialogEquipment extends TitleAreaDialog {
       getButton(IDialogConstants.OK_ID).setEnabled(isValid);
    }
 
+   private void fillUI() {
+
+      // fill brand combobox
+      final ConcurrentSkipListSet<String> allBrands = EquipmentManager.getCachedFields_AllEquipment_Brands();
+
+      for (final String brand : allBrands) {
+         if (brand != null) {
+            _comboBrand.add(brand);
+         }
+      }
+
+      // fill model combobox
+      final ConcurrentSkipListSet<String> allModels = EquipmentManager.getCachedFields_AllEquipment_Models();
+
+      for (final String model : allModels) {
+         if (model != null) {
+            _comboModel.add(model);
+         }
+      }
+   }
+
    @Override
    protected IDialogSettings getDialogBoundsSettings() {
 
@@ -353,8 +396,8 @@ public class DialogEquipment extends TitleAreaDialog {
 
    private boolean isDataValid() {
 
-      final String brand = _txtBrand.getText().trim();
-      final String model = _txtModel.getText().trim();
+      final String brand = _comboBrand.getText().trim();
+      final String model = _comboModel.getText().trim();
 
       if (StringUtils.hasContent(brand) == false && StringUtils.hasContent(model) == false) {
 
@@ -386,6 +429,9 @@ public class DialogEquipment extends TitleAreaDialog {
    private void onDispose() {
 
       UI.disposeResource(_imageDialog);
+
+      _autocomplete_Brand.saveState(_state, STATE_AUTOCOMPLETE_POPUP_HEIGHT_BRAND);
+      _autocomplete_Model.saveState(_state, STATE_AUTOCOMPLETE_POPUP_HEIGHT_MODEL);
    }
 
    private void onModify() {
@@ -399,6 +445,12 @@ public class DialogEquipment extends TitleAreaDialog {
       enableControls();
    }
 
+   private void resoreState() {
+
+      _autocomplete_Brand.restoreState(_state, STATE_AUTOCOMPLETE_POPUP_HEIGHT_BRAND);
+      _autocomplete_Model.restoreState(_state, STATE_AUTOCOMPLETE_POPUP_HEIGHT_MODEL);
+   }
+
    private void updateModelFromUI() {
 
 // SET_FORMATTING_OFF
@@ -407,8 +459,8 @@ public class DialogEquipment extends TitleAreaDialog {
       final LocalDate dateFirstUse  = LocalDate.of(_dateFirstUse.getYear(),   _dateFirstUse.getMonth() + 1, _dateFirstUse.getDay());
       final LocalDate dateRetired   = LocalDate.of(_dateRetired.getYear(),    _dateRetired.getMonth() + 1,  _dateRetired.getDay());
 
-      _equipment.setBrand(       _txtBrand.getText().trim());
-      _equipment.setModel(       _txtModel.getText().trim());
+      _equipment.setBrand(       _comboBrand.getText().trim());
+      _equipment.setModel(       _comboModel.getText().trim());
       _equipment.setDescription( _txtDescription.getText().trim());
 
       _equipment.setDateBuilt(   dateBuilt.toEpochDay());
@@ -448,8 +500,8 @@ public class DialogEquipment extends TitleAreaDialog {
       _dateFirstUse     .setDate(dateFirstUse.getYear(), dateFirstUse.getMonthValue() - 1,   dateFirstUse.getDayOfMonth());
       _dateRetired      .setDate(dateRetired.getYear(),  dateRetired.getMonthValue() - 1,    dateRetired.getDayOfMonth());
 
-      _txtBrand         .setText(_equipment.getBrand());
-      _txtModel         .setText(_equipment.getModel());
+      _comboBrand       .setText(_equipment.getBrand());
+      _comboModel       .setText(_equipment.getModel());
       _txtDescription   .setText(_equipment.getDescription());
 
 // SET_FORMATTING_ON

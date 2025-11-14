@@ -4124,7 +4124,7 @@ public class TourManager {
     * {@link #getTourData} from the database.
     * <p>
     * When this method is called and a tour is modified in the tour editor, the calling method is
-    * responsible to update the tour in the tour editor:
+    * responsible to update the tour in the tour editor.
     */
    public void clearTourDataCache() {
 

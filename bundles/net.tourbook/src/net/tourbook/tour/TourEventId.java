@@ -88,6 +88,11 @@ public enum TourEventId {
    TAG_STRUCTURE_CHANGED,
 
    /**
+    * Structure of equipment are changed
+    */
+   EQUIPMENT_STRUCTURE_CHANGED,
+
+   /**
     * Tag content has changed, e.g. tag image size
     */
    TAG_CONTENT_CHANGED,

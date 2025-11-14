@@ -1904,9 +1904,9 @@ public class TourDatabase {
     *
     * @return places as string array.
     */
-   private static ConcurrentSkipListSet<String> getDistinctValues(final String db, final String fieldname) {
+   public static ConcurrentSkipListSet<String> getDistinctValues(final String db, final String fieldname) {
 
-      final ConcurrentSkipListSet<String> sortedValues = new ConcurrentSkipListSet<>((text1, text2) -> {
+      final ConcurrentSkipListSet<String> allSortedValues = new ConcurrentSkipListSet<>((text1, text2) -> {
          {
             // sort without case
             return text1.compareToIgnoreCase(text2);
@@ -1941,7 +1941,7 @@ public class TourDatabase {
                   dbValue = dbValue.trim();
 
                   if (dbValue.length() > 0) {
-                     sortedValues.add(dbValue);
+                     allSortedValues.add(dbValue);
                   }
                }
             }
@@ -1964,7 +1964,7 @@ public class TourDatabase {
 //                  System.out.println(sb.toString());
       }));
 
-      return sortedValues;
+      return allSortedValues;
    }
 
    public static TourDatabase getInstance() {

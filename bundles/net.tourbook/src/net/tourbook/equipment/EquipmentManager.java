@@ -19,6 +19,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentSkipListSet;
 
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
@@ -36,11 +37,40 @@ public class EquipmentManager {
 
    private static final Object                  DB_LOCK = new Object();
 
-   private static volatile Map<Long, Equipment> _allEquipments_ByID;
-   private static volatile List<Equipment>      _allEquipments_ByName;
+   private static volatile Map<Long, Equipment> _allEquipment_ByID;
+   private static volatile List<Equipment>      _allEquipment_ByName;
+
+   private static ConcurrentSkipListSet<String> _allEquipment_Brands;
+   private static ConcurrentSkipListSet<String> _allEquipment_Models;
+
+   public static void clearCachedValues() {
+
+      if (_allEquipment_ByID != null) {
+
+         _allEquipment_ByID.clear();
+         _allEquipment_ByID = null;
+      }
+
+      if (_allEquipment_ByName != null) {
+
+         _allEquipment_ByName.clear();
+         _allEquipment_ByName = null;
+      }
+
+      if (_allEquipment_Brands != null) {
+
+         _allEquipment_Brands.clear();
+         _allEquipment_Brands = null;
+      }
+
+      if (_allEquipment_Models != null) {
+
+         _allEquipment_Models.clear();
+         _allEquipment_Models = null;
+      }
+   }
 
    public static void deleteEquipments(final List<Equipment> allSelectedEquipments) {
-      // TODO Auto-generated method stub
 
    }
 
@@ -116,37 +146,71 @@ public class EquipmentManager {
    /**
     * @return Returns a map with all equipments, key is the equipment ID
     */
-   public static Map<Long, Equipment> getAllEquipments_ByID() {
+   public static Map<Long, Equipment> getAllEquipment_ByID() {
 
-      if (_allEquipments_ByID != null) {
-         return _allEquipments_ByID;
+      if (_allEquipment_ByID != null) {
+         return _allEquipment_ByID;
       }
 
-      loadEquipments();
+      loadEquipment();
 
-      return _allEquipments_ByID;
+      return _allEquipment_ByID;
    }
 
    /**
     * @return Returns a map with all equipments sorted by name
     */
-   public static List<Equipment> getAllEquipments_Name() {
+   public static List<Equipment> getAllEquipment_Name() {
 
-      if (_allEquipments_ByName != null) {
-         return _allEquipments_ByName;
+      if (_allEquipment_ByName != null) {
+         return _allEquipment_ByName;
       }
 
-      loadEquipments();
+      loadEquipment();
 
-      return _allEquipments_ByName;
+      return _allEquipment_ByName;
    }
 
-   private static void loadEquipments() {
+   public static ConcurrentSkipListSet<String> getCachedFields_AllEquipment_Brands() {
+
+      if (_allEquipment_Brands == null) {
+
+         synchronized (DB_LOCK) {
+
+            // recheck again, another thread could have it created
+            if (_allEquipment_Brands == null) {
+
+               _allEquipment_Brands = TourDatabase.getDistinctValues(TourDatabase.TABLE_EQUIPMENT, "brand"); //$NON-NLS-1$
+            }
+         }
+      }
+
+      return _allEquipment_Brands;
+   }
+
+   public static ConcurrentSkipListSet<String> getCachedFields_AllEquipment_Models() {
+
+      if (_allEquipment_Models == null) {
+
+         synchronized (DB_LOCK) {
+
+            // recheck again, another thread could have it created
+            if (_allEquipment_Models == null) {
+
+               _allEquipment_Models = TourDatabase.getDistinctValues(TourDatabase.TABLE_EQUIPMENT, "model"); //$NON-NLS-1$
+            }
+         }
+      }
+
+      return _allEquipment_Models;
+   }
+
+   private static void loadEquipment() {
 
       synchronized (DB_LOCK) {
 
          // check again, field must be volatile to work correctly
-         if (_allEquipments_ByID != null) {
+         if (_allEquipment_ByID != null) {
             return;
          }
 
@@ -179,8 +243,8 @@ public class EquipmentManager {
             em.close();
          }
 
-         _allEquipments_ByID = allEquipments_ByID;
-         _allEquipments_ByName = allEquipments_ByName;
+         _allEquipment_ByID = allEquipments_ByID;
+         _allEquipment_ByName = allEquipments_ByName;
       }
    }
 

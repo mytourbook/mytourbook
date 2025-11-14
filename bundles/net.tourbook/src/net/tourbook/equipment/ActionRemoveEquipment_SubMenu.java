@@ -19,7 +19,7 @@ import java.util.List;
 
 import net.tourbook.common.ui.SubMenu;
 import net.tourbook.data.Equipment;
-import net.tourbook.ui.ITourProvider;
+import net.tourbook.data.TourData;
 
 import org.eclipse.jface.action.Action;
 import org.eclipse.swt.widgets.Menu;
@@ -27,9 +27,11 @@ import org.eclipse.swt.widgets.Menu;
 /**
  * Add equipments from the selected tours
  */
-public class ActionAddEquipment_SubMenu extends SubMenu {
+public class ActionRemoveEquipment_SubMenu extends SubMenu {
 
    private EquipmentMenuManager _equipmentMenuManager;
+
+   private List<TourData>       _allSelectedTours;
 
    private class ActionEquipment extends Action {
 
@@ -45,13 +47,13 @@ public class ActionAddEquipment_SubMenu extends SubMenu {
       @Override
       public void run() {
 
-         setEquipment(isChecked(), __equipment);
+//         setTourTag(isChecked(), __equipment);
       }
    }
 
-   protected ActionAddEquipment_SubMenu(final EquipmentMenuManager equipmentMenuManager) {
+   protected ActionRemoveEquipment_SubMenu(final EquipmentMenuManager equipmentMenuManager) {
 
-      super("&Add Equipment", AS_DROP_DOWN_MENU);
+      super("&Remove Equipment", AS_DROP_DOWN_MENU);
 
       _equipmentMenuManager = equipmentMenuManager;
    }
@@ -70,12 +72,6 @@ public class ActionAddEquipment_SubMenu extends SubMenu {
 
          addActionToMenu(new ActionEquipment(equipment));
       }
-
-   }
-
-   private void setEquipment(final boolean isChecked, final Equipment equipment) {
-
-      final ITourProvider tourProvider = _equipmentMenuManager.getTourProvider();
 
    }
 

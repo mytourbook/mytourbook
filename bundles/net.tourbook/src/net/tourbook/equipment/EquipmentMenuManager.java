@@ -15,24 +15,28 @@
  *******************************************************************************/
 package net.tourbook.equipment;
 
-import net.tourbook.application.TourbookPlugin;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
+import net.tourbook.data.Equipment;
+import net.tourbook.data.TourData;
 import net.tourbook.ui.ITourProvider;
 
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.Separator;
-import org.eclipse.jface.preference.IPreferenceStore;
 
 public class EquipmentMenuManager {
-
-   private static final IPreferenceStore _prefStore = TourbookPlugin.getPrefStore();
 
    private ITourProvider                 _tourProvider;
 
    private ActionAddEquipment_SubMenu    _actionAddEquipment;
+   private ActionRemoveEquipment_SubMenu _actionRemoveEquipment;
 
    public EquipmentMenuManager(final ITourProvider tourProvider) {
 
-      _tourProvider = tourProvider;
+      setTourProvider(tourProvider);
 
       createActions();
 
@@ -40,7 +44,20 @@ public class EquipmentMenuManager {
 
    private void createActions() {
 
-      _actionAddEquipment = new ActionAddEquipment_SubMenu("&Add Equipment");
+      _actionAddEquipment = new ActionAddEquipment_SubMenu(this);
+      _actionRemoveEquipment = new ActionRemoveEquipment_SubMenu(this);
+   }
+
+   private void enableActions() {
+
+      final List<Equipment> allAvailableEquipments = EquipmentManager.getAllEquipment_Name();
+      final Map<Long, Equipment> allUseEquipments = getAllUseEquipments();
+
+      final boolean isEquipmentAvailable = allAvailableEquipments.size() > 0;
+      final boolean isEquipmentInTour = allUseEquipments.size() > 0;
+
+      _actionAddEquipment.setEnabled(isEquipmentAvailable);
+      _actionRemoveEquipment.setEnabled(isEquipmentInTour);
    }
 
    /**
@@ -53,7 +70,35 @@ public class EquipmentMenuManager {
       menuMgr.add(new Separator());
       {
          menuMgr.add(_actionAddEquipment);
-//         menuMgr.add(_actionRemoveTag);
+         menuMgr.add(_actionRemoveEquipment);
       }
+
+      enableActions();
    }
+
+   private Map<Long, Equipment> getAllUseEquipments() {
+
+      final Map<Long, Equipment> allUsedEquipment = new HashMap<>();
+
+      final List<TourData> allSelectedTours = _tourProvider.getSelectedTours();
+      for (final TourData tourData : allSelectedTours) {
+
+         final Set<Equipment> allTourEquipments = tourData.getTourEquipment();
+
+         for (final Equipment tourEquipment : allTourEquipments) {
+            allUsedEquipment.put(tourEquipment.getEquipmentId(), tourEquipment);
+         }
+      }
+
+      return allUsedEquipment;
+   }
+
+   public ITourProvider getTourProvider() {
+      return _tourProvider;
+   }
+
+   public void setTourProvider(final ITourProvider tourProvider) {
+      _tourProvider = tourProvider;
+   }
+
 }

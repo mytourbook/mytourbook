@@ -1061,7 +1061,8 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
    private Set<TourTag>                tourTags                            = new HashSet<>();
 
    /**
-    * Equipments
+    * Equipments, this word is wrong there is no plural for "equipment"
+    * but we use "equipments" in the db field name to know that there can be plurals
     */
    @ManyToMany(fetch = EAGER)
    @JoinTable(inverseJoinColumns = @JoinColumn(name = "Equipment_EquipmentId", referencedColumnName = "EquipmentId"))
@@ -12082,7 +12083,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
    /**
     * @return Returns all {@link #equipments} which are defined for this tour
     */
-   public Set<Equipment> getTourEquipments() {
+   public Set<Equipment> getTourEquipment() {
       return equipments;
    }
 
