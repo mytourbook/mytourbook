@@ -19,11 +19,11 @@ import net.tourbook.data.Equipment;
 
 import org.eclipse.jface.viewers.TreeViewer;
 
-public class TVIEquipment extends TVIEquipItem {
+public class TVIEquipmentView_Equipment extends TVIEquipmentItem {
 
    private Equipment _equipment;
 
-   public TVIEquipment(final TreeViewer equipViewer, final Equipment equipment) {
+   public TVIEquipmentView_Equipment(final TreeViewer equipViewer, final Equipment equipment) {
 
       super(equipViewer);
 
@@ -47,7 +47,7 @@ public class TVIEquipment extends TVIEquipItem {
    @Override
    public String toString() {
 
-      return "TVIEquip [" //$NON-NLS-1$
+      return "TVIEquipmentView_Equipment [" //$NON-NLS-1$
 
             + "_equipment = " + _equipment //$NON-NLS-1$
 

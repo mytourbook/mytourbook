@@ -29,7 +29,7 @@ import net.tourbook.database.TourDatabase;
 
 import org.eclipse.jface.viewers.TreeViewer;
 
-public class TVIEquipRoot extends TVIEquipItem {
+public class TVIEquipRoot extends TVIEquipmentItem {
 
    private boolean _isTreeLayoutHierarchical;
 
@@ -76,11 +76,11 @@ public class TVIEquipRoot extends TVIEquipItem {
 
       final List<Equipment> allEquipments = query.getResultList();
 
-      final TreeViewer equipViewer = getEquipViewer();
+      final TreeViewer equipViewer = getEquipmentViewer();
 
       for (final Equipment equipment : allEquipments) {
 
-         final TVIEquipment equipItem = new TVIEquipment(equipViewer, equipment);
+         final TVIEquipmentView_Equipment equipItem = new TVIEquipmentView_Equipment(equipViewer, equipment);
 
          addChild(equipItem);
       }
@@ -101,7 +101,7 @@ public class TVIEquipRoot extends TVIEquipItem {
       final ArrayList<TourTag> tourTags = (ArrayList<TourTag>) query.getResultList();
 
       for (final TourTag tourTag : tourTags) {
-         final TVIEquipment tagItem = new TVIEquipment(getEquipViewer(), tourTag);
+         final TVIEquipmentView_Equipment tagItem = new TVIEquipmentView_Equipment(getEquipmentViewer(), tourTag);
          addChild(tagItem);
       }
 
@@ -117,7 +117,7 @@ public class TVIEquipRoot extends TVIEquipItem {
       final ArrayList<TourTagCategory> tourTagCategories = (ArrayList<TourTagCategory>) query.getResultList();
 
       for (final TourTagCategory tourTagCategory : tourTagCategories) {
-         final TVIEquipCategory categoryItem = new TVIEquipCategory(getEquipViewer(), tourTagCategory);
+         final TVIEquipCategory categoryItem = new TVIEquipCategory(getEquipmentViewer(), tourTagCategory);
          addChild(categoryItem);
       }
    }

@@ -18,8 +18,10 @@ package net.tourbook.equipment;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import net.tourbook.Images;
+import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.CommonActivator;
 import net.tourbook.common.time.TimeTools;
@@ -36,6 +38,8 @@ import net.tourbook.database.TourDatabase;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.ui.ITourProvider;
 import net.tourbook.ui.TreeColumnFactory;
+import net.tourbook.ui.views.tagging.TVITaggingView_TagCategory;
+import net.tourbook.ui.views.tagging.TVITaggingView_Tour;
 
 import org.eclipse.e4.ui.di.PersistState;
 import org.eclipse.jface.action.Action;
@@ -53,6 +57,7 @@ import org.eclipse.jface.viewers.IElementComparer;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.jface.viewers.ITreeSelection;
+import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerCell;
@@ -82,6 +87,7 @@ public class EquipmentView extends ViewPart implements ITourProvider, ITourViewe
 
    private int                           _tagViewLayout               = TAG_VIEW_LAYOUT_HIERARCHICAL;
 
+   private ActionDeleteEquipment         _actionDeleteEquipment;
    private ActionEditEquipment           _actionEditEquipment;
    private ActionNewEquipment            _actionNewEquipment;
 
@@ -90,9 +96,12 @@ public class EquipmentView extends ViewPart implements ITourProvider, ITourViewe
    private TVIEquipRoot                  _rootItem;
 
    private PixelConverter                _pc;
+
    private MenuManager                   _viewerMenuManager;
    private Menu                          _treeContextMenu;
    private IContextMenuProvider          _viewerContextMenuProvider   = new TreeContextMenuProvider();
+
+   private boolean                       _isSelectedWithKeyboard;
 
    /*
     * UI controls
@@ -100,11 +109,26 @@ public class EquipmentView extends ViewPart implements ITourProvider, ITourViewe
    private Composite _parent;
    private Composite _viewerContainer;
 
+   private class ActionDeleteEquipment extends Action {
+
+      ActionDeleteEquipment() {
+
+         super(Messages.Action_Equipment_Delete, AS_PUSH_BUTTON);
+
+         setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.App_Delete));
+      }
+
+      @Override
+      public void run() {
+         onAction_DeleteEquipment();
+      }
+   }
+
    private class ActionEditEquipment extends Action {
 
       public ActionEditEquipment() {
 
-         super("&Edit Equipment", AS_PUSH_BUTTON);
+         super(Messages.Action_Equipment_Edit, AS_PUSH_BUTTON);
 
          setImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.App_Edit));
       }
@@ -119,7 +143,7 @@ public class EquipmentView extends ViewPart implements ITourProvider, ITourViewe
 
       public ActionNewEquipment() {
 
-         super("&New Equipment", AS_PUSH_BUTTON);
+         super(Messages.Action_Equipment_New, AS_PUSH_BUTTON);
 
          setImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.Equipment_New));
       }
@@ -137,7 +161,7 @@ public class EquipmentView extends ViewPart implements ITourProvider, ITourViewe
       @Override
       public int compare(final Viewer viewer, final Object obj1, final Object obj2) {
 
-         if (obj1 instanceof final TVIEquipment equip1 && obj2 instanceof final TVIEquipment equip2) {
+         if (obj1 instanceof final TVIEquipmentView_Equipment equip1 && obj2 instanceof final TVIEquipmentView_Equipment equip2) {
 
             // sort equipment by name
 
@@ -180,8 +204,8 @@ public class EquipmentView extends ViewPart implements ITourProvider, ITourViewe
 
             return true;
 
-         } else if (o1 instanceof final TVIEquipment item1
-               && o2 instanceof final TVIEquipment item2) {
+         } else if (o1 instanceof final TVIEquipmentView_Equipment item1
+               && o2 instanceof final TVIEquipmentView_Equipment item2) {
 
             return item1.getEquipment().getEquipmentId() == item2.getEquipment().getEquipmentId();
          }
@@ -302,6 +326,7 @@ public class EquipmentView extends ViewPart implements ITourProvider, ITourViewe
 
       _actionEditEquipment       = new ActionEditEquipment();
       _actionNewEquipment        = new ActionNewEquipment();
+      _actionDeleteEquipment     = new ActionDeleteEquipment();
 
    // SET_FORMATTING_ON
 
@@ -344,6 +369,8 @@ public class EquipmentView extends ViewPart implements ITourProvider, ITourViewe
       addPrefListener();
 
       reloadViewer();
+
+      enableActions();
    }
 
    private void createUI(final Composite parent) {
@@ -351,11 +378,11 @@ public class EquipmentView extends ViewPart implements ITourProvider, ITourViewe
       _viewerContainer = new Composite(parent, SWT.NONE);
       GridLayoutFactory.fillDefaults().applyTo(_viewerContainer);
       {
-         createUI_10_TagViewer(_viewerContainer);
+         createUI_10_EqipmentViewer(_viewerContainer);
       }
    }
 
-   private void createUI_10_TagViewer(final Composite parent) {
+   private void createUI_10_EqipmentViewer(final Composite parent) {
 
       /*
        * Create tree
@@ -388,23 +415,23 @@ public class EquipmentView extends ViewPart implements ITourProvider, ITourViewe
 //
       tree.addKeyListener(KeyListener.keyPressedAdapter(keyEvent -> {
 
-//         _isSelectedWithKeyboard = true;
+         _isSelectedWithKeyboard = true;
 //
-//         enableActions(true);
+         enableActions();
 
          switch (keyEvent.keyCode) {
 
          case SWT.DEL:
 
-            // delete tag only when the delete button is enabled
-//            if (_actionDeleteTag.isEnabled()) {
-//
-//               onAction_DeleteTag();
-//
+            // delete equipment only when the delete button is enabled
+            if (_actionDeleteEquipment.isEnabled()) {
+
+               onAction_DeleteEquipment();
+
 //            } else if (_actionDeleteTagCategory.isEnabled()) {
 //
 //               onAction_DeleteTagCategory();
-//            }
+            }
 
             break;
 
@@ -475,7 +502,14 @@ public class EquipmentView extends ViewPart implements ITourProvider, ITourViewe
    private void defineAllColumns() {
 
       defineColumn_1stColumn();
+
+      defineColumn_Brand();
+      defineColumn_Model();
+
       defineColumn_Time_Date();
+      defineColumn_Time_Date_Built();
+      defineColumn_Time_Date_FirstUse();
+      defineColumn_Time_Date_Retired();
    }
 
    /**
@@ -494,8 +528,52 @@ public class EquipmentView extends ViewPart implements ITourProvider, ITourViewe
 
             final Object element = cell.getElement();
 
-            if (element instanceof final TVIEquipment tviEquipment) {
+            if (element instanceof final TVIEquipmentView_Equipment tviEquipment) {
                cell.setText(tviEquipment.getEquipment().getName());
+            }
+         }
+      });
+   }
+
+   /**
+    * Column: Brand
+    */
+   private void defineColumn_Brand() {
+
+      final ColumnDefinition colDef = TreeColumnFactory.EQUIPMENT_BRAND.createColumn(_columnManager, _pc);
+
+      colDef.setLabelProvider(new CellLabelProvider() {
+
+         @Override
+         public void update(final ViewerCell cell) {
+
+            final Object element = cell.getElement();
+
+            if (element instanceof final TVIEquipmentView_Equipment tviEquipment) {
+
+               cell.setText(tviEquipment.getEquipment().getBrand());
+            }
+         }
+      });
+   }
+
+   /**
+    * Column: Model
+    */
+   private void defineColumn_Model() {
+
+      final ColumnDefinition colDef = TreeColumnFactory.EQUIPMENT_MODEL.createColumn(_columnManager, _pc);
+
+      colDef.setLabelProvider(new CellLabelProvider() {
+
+         @Override
+         public void update(final ViewerCell cell) {
+
+            final Object element = cell.getElement();
+
+            if (element instanceof final TVIEquipmentView_Equipment tviEquipment) {
+
+               cell.setText(tviEquipment.getEquipment().getModel());
             }
          }
       });
@@ -508,6 +586,8 @@ public class EquipmentView extends ViewPart implements ITourProvider, ITourViewe
 
       final ColumnDefinition colDef = TreeColumnFactory.EQUIPMENT_DATE.createColumn(_columnManager, _pc);
 
+      colDef.setIsDefaultColumn();
+
       colDef.setLabelProvider(new CellLabelProvider() {
 
          @Override
@@ -515,11 +595,83 @@ public class EquipmentView extends ViewPart implements ITourProvider, ITourViewe
 
             final Object element = cell.getElement();
 
-            if (element instanceof final TVIEquipment tviEquipment) {
+            if (element instanceof final TVIEquipmentView_Equipment tviEquipment) {
 
                final LocalDate date = tviEquipment.getEquipment().getDate();
 
-               cell.setText(TimeTools.Formatter_Date_M.format(date));
+               cell.setText(TimeTools.Formatter_Date_S.format(date));
+            }
+         }
+      });
+   }
+
+   /**
+    * Column: Build date
+    */
+   private void defineColumn_Time_Date_Built() {
+
+      final ColumnDefinition colDef = TreeColumnFactory.EQUIPMENT_DATE_BUILT.createColumn(_columnManager, _pc);
+
+      colDef.setLabelProvider(new CellLabelProvider() {
+
+         @Override
+         public void update(final ViewerCell cell) {
+
+            final Object element = cell.getElement();
+
+            if (element instanceof final TVIEquipmentView_Equipment tviEquipment) {
+
+               final LocalDate date = tviEquipment.getEquipment().getDateBuilt();
+
+               cell.setText(TimeTools.Formatter_Date_S.format(date));
+            }
+         }
+      });
+   }
+
+   /**
+    * Column: First use date
+    */
+   private void defineColumn_Time_Date_FirstUse() {
+
+      final ColumnDefinition colDef = TreeColumnFactory.EQUIPMENT_DATE_FIRST_USE.createColumn(_columnManager, _pc);
+
+      colDef.setLabelProvider(new CellLabelProvider() {
+
+         @Override
+         public void update(final ViewerCell cell) {
+
+            final Object element = cell.getElement();
+
+            if (element instanceof final TVIEquipmentView_Equipment tviEquipment) {
+
+               final LocalDate date = tviEquipment.getEquipment().getDateFirstUse();
+
+               cell.setText(TimeTools.Formatter_Date_S.format(date));
+            }
+         }
+      });
+   }
+
+   /**
+    * Column: Retired date
+    */
+   private void defineColumn_Time_Date_Retired() {
+
+      final ColumnDefinition colDef = TreeColumnFactory.EQUIPMENT_DATE_RETIRED.createColumn(_columnManager, _pc);
+
+      colDef.setLabelProvider(new CellLabelProvider() {
+
+         @Override
+         public void update(final ViewerCell cell) {
+
+            final Object element = cell.getElement();
+
+            if (element instanceof final TVIEquipmentView_Equipment tviEquipment) {
+
+               final LocalDate date = tviEquipment.getEquipment().getDateRetired();
+
+               cell.setText(TimeTools.Formatter_Date_S.format(date));
             }
          }
       });
@@ -538,7 +690,56 @@ public class EquipmentView extends ViewPart implements ITourProvider, ITourViewe
       super.dispose();
    }
 
-   private void enableControls() {
+   private void enableActions() {
+
+      final StructuredSelection selection = (StructuredSelection) _equipViewer.getSelection();
+      final int numTreeItems = _equipViewer.getTree().getItemCount();
+
+      /*
+       * Count number of selected tours/tags/categories
+       */
+      int numTours = 0;
+      int numEquipments = 0;
+      int numCategorys = 0;
+      int numItems = 0;
+      int numOtherItems = 0;
+
+      TVITaggingView_Tour firstTour = null;
+
+      for (final Object treeItem : selection) {
+
+         if (treeItem instanceof final TVITaggingView_Tour tourItem) {
+
+            if (numTours == 0) {
+               firstTour = tourItem;
+            }
+
+            numTours++;
+
+         } else if (treeItem instanceof TVIEquipmentView_Equipment) {
+
+            numEquipments++;
+
+         } else if (treeItem instanceof TVITaggingView_TagCategory) {
+
+            numCategorys++;
+
+         } else {
+
+            numOtherItems++;
+         }
+
+         numItems++;
+      }
+
+      final boolean isTourSelected = numTours > 0;
+      final boolean isEquipmentSelected = numEquipments > 0 && numTours == 0 && numCategorys == 0 && numOtherItems == 0;
+      final boolean isCategorySelected = numCategorys == 1 && numTours == 0 && numEquipments == 0 && numOtherItems == 0;
+      final boolean isOneTour = numTours == 1;
+      final boolean isItemsAvailable = numTreeItems > 0;
+
+      _actionDeleteEquipment.setEnabled(isEquipmentSelected);
+      _actionEditEquipment.setEnabled(isEquipmentSelected);
 
    }
 
@@ -564,8 +765,10 @@ public class EquipmentView extends ViewPart implements ITourProvider, ITourViewe
 
    private void fillContextMenu(final IMenuManager menuMgr) {
 
-      // customize tags in the view
       menuMgr.add(_actionEditEquipment);
+      menuMgr.add(_actionDeleteEquipment);
+
+      enableActions();
    }
 
    @Override
@@ -623,117 +826,35 @@ public class EquipmentView extends ViewPart implements ITourProvider, ITourViewe
 
       for (final TreeViewerItem childItem : allFetchedChildren) {
 
-         // skip tour items, they do not have further children
-//         if (childItem instanceof TVITaggingView_Tour) {
-//            continue;
-//         }
-
          loadAllTreeItems(childItem);
       }
 
-      /*
-       * Collect number of ...
-       */
-//      int numAllTagCategories = 0;
-//      int numAllTags = 0;
-//
-//      int numTags_NoTours = 0;
-//
-//      int numTours_InTourItems = 0;
-//      final int numTours_InTagSubCats = 0;
-//
-//      for (final TreeViewerItem childItem : allFetchedChildren) {
-//
-//         if (childItem instanceof TVITaggingView_Tour) {
-//
-//            numTours_InTourItems++;
-//
-////         } else if (childItem instanceof TVITaggingView_Year
-////               || childItem instanceof TVITaggingView_Month) {
-////
-////            // collect number of tours in the tag sub categories
-////
-////            numTours_InTagSubCats += ((TVITaggingView_Item) childItem).numTours;
-//
-//         } else if (childItem instanceof TVITaggingView_TagCategory) {
-//
-//            numAllTagCategories++;
-//
-//         } else if (childItem instanceof TVITaggingView_Tag) {
-//
-//            numAllTags++;
-//
-//         }
-//      }
-//
-//      if (numTours_InTourItems == 0 && numTours_InTagSubCats == 0) {
-//
-//         numTags_NoTours++;
-//      }
+      // SET_FORMATTING_ON
+   }
 
-// SET_FORMATTING_OFF
+   private void onAction_DeleteEquipment() {
 
-      /*
-       * Update number of tours in parent item and up to the tag item
-       */
-//      if (parentItem instanceof final TVITaggingView_Tag tagItem) {
-//
-//         tagItem.numTours           += numTours_InTourItems;
-//         tagItem.numTags_NoTours    += numTags_NoTours;
-//
-//      } else if (parentItem instanceof final TVITaggingView_Year yearItem) {
-//
-//         yearItem.numTours          += numTours_InTourItems;
-//         yearItem.numTags_NoTours   += numTags_NoTours;
-//
-//         final TreeViewerItem yearParent = yearItem.getParentItem();
-//         if (yearParent instanceof final TVITaggingView_Tag tagItem) {
-//
-//            tagItem.numTours           += numTours_InTourItems;
-//            tagItem.numTags_NoTours    += numTags_NoTours;
-//         }
-//
-//      } else if (parentItem instanceof final TVITaggingView_Month monthItem) {
-//
-//         monthItem.numTours            += numTours_InTourItems;
-//         monthItem.numTags_NoTours     += numTags_NoTours;
-//
-//         final TreeViewerItem monthParent = monthItem.getParentItem();
-//         if (monthParent instanceof final TVITaggingView_Year yearItem) {
-//
-//            yearItem.numTours          += numTours_InTourItems;
-//            yearItem.numTags_NoTours   += numTags_NoTours;
-//
-//            final TreeViewerItem yearParent = yearItem.getParentItem();
-//            if (yearParent instanceof final TVITaggingView_Tag tagItem) {
-//
-//               tagItem.numTours           += numTours_InTourItems;
-//               tagItem.numTags_NoTours    += numTags_NoTours;
-//            }
-//         }
-//
-//      } else if (parentItem instanceof final TVITaggingView_TagCategory categoryItem) {
-//
-//         long allNumChild_Tours           = 0;
-//         long allNumChild_TagsNoTours     = 0;
-//
-//         for (final TreeViewerItem treeViewerItem : allFetchedChildren) {
-//
-//            if (treeViewerItem instanceof final TVITaggingView_Item viewItem) {
-//
-//               allNumChild_Tours          += viewItem.numTours;
-//               allNumChild_TagsNoTours    += viewItem.numTags_NoTours;
-//            }
-//         }
-//
-//         categoryItem.numTagCategories    += numAllTagCategories;
-//         categoryItem.numTags             += numAllTags;
-//
-//         categoryItem.numTours            += allNumChild_Tours;
-//         categoryItem.numTags_NoTours     += allNumChild_TagsNoTours;
-//      }
+      final ITreeSelection structuredSelection = _equipViewer.getStructuredSelection();
+      final List<?> allSelection = structuredSelection.toList();
 
-// SET_FORMATTING_ON
+      final Map<Long, Equipment> allEquipments = EquipmentManager.getAllEquipments_ByID();
+
+      final List<Equipment> allSelectedEquipments = new ArrayList<>();
+
+      for (final Object object : allSelection) {
+
+         if (object instanceof final TVIEquipmentView_Equipment tviEquipment) {
+
+            allSelectedEquipments.add(allEquipments.get(tviEquipment.getEquipment().getEquipmentId()));
+         }
+      }
+
+      if (allSelectedEquipments.size() > 0) {
+
+         // delete equipments
+
+         EquipmentManager.deleteEquipments(allSelectedEquipments);
+      }
    }
 
    private void onAction_EditEquipment() {
@@ -741,7 +862,7 @@ public class EquipmentView extends ViewPart implements ITourProvider, ITourViewe
       final ITreeSelection structuredSelection = _equipViewer.getStructuredSelection();
       final Object firstElement = structuredSelection.getFirstElement();
 
-      if (firstElement instanceof final TVIEquipment equipmentItem) {
+      if (firstElement instanceof final TVIEquipmentView_Equipment equipmentItem) {
 
          final Equipment equipment = equipmentItem.getEquipment();
 
@@ -797,7 +918,7 @@ public class EquipmentView extends ViewPart implements ITourProvider, ITourViewe
 
          _equipViewer.getTree().dispose();
 
-         createUI_10_TagViewer(_viewerContainer);
+         createUI_10_EqipmentViewer(_viewerContainer);
          _viewerContainer.layout();
 
          reloadViewer_SetContent();

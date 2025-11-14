@@ -644,7 +644,7 @@ public class TagManager {
             }
          }
 
-      } catch (IOException e) {
+      } catch (final IOException e) {
 
          StatusUtil.log(e);
       }
@@ -685,8 +685,7 @@ public class TagManager {
 
    /**
     * Get all tours for a tag id.
-    */
-   /**
+    *
     * @param allTags
     *
     * @return Returns a list with all tour id's which contain the tour tag.

@@ -436,6 +436,7 @@ public class Equipment implements Cloneable, Serializable {
             + " dateBuilt        =" + dateBuilt + NL //                    //$NON-NLS-1$
             + " dateFirstUse     =" + dateFirstUse + NL //                 //$NON-NLS-1$
             + " dateRetired      =" + dateRetired + NL //                  //$NON-NLS-1$
+
             + " weight           =" + weight + NL //                       //$NON-NLS-1$
 
             + " services         =" + (services != null ? toString(services, maxLen) : null) + NL //$NON-NLS-1$
@@ -463,7 +464,7 @@ public class Equipment implements Cloneable, Serializable {
       description = otherEquipment.getDescription();
 
       setDateBuilt(otherEquipment.getDateBuilt_Raw());
-      setDateFirstUse(otherEquipment.getDateRetired_Raw());
+      setDateFirstUse(otherEquipment.getDateFirstUse_Raw());
       setDateRetired(otherEquipment.getDateRetired_Raw());
    }
 

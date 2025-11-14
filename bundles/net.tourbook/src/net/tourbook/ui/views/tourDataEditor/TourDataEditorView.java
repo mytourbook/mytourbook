@@ -69,6 +69,7 @@ import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.TableColumnDefinition;
 import net.tourbook.common.util.Util;
 import net.tourbook.common.weather.IWeather;
+import net.tourbook.data.Equipment;
 import net.tourbook.data.GearDataType;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourMarker;
@@ -79,6 +80,7 @@ import net.tourbook.data.TourTag;
 import net.tourbook.data.TourType;
 import net.tourbook.database.MyTourbookException;
 import net.tourbook.database.TourDatabase;
+import net.tourbook.equipment.EquipmentMenuManager;
 import net.tourbook.extension.export.ActionExport;
 import net.tourbook.importdata.RawDataManager;
 import net.tourbook.map2.view.SelectionMapPosition;
@@ -597,6 +599,7 @@ public class TourDataEditorView extends ViewPart implements
    //
    private ArrayList<Action_SetSwimStyle>                             _allSwimStyleActions;
    //
+   private EquipmentMenuManager                                       _equipmentMenuMgr;
    private TagMenuManager                                             _tagMenuMgr;
    //
    /**
@@ -712,6 +715,7 @@ public class TourDataEditorView extends ViewPart implements
    private Label                     _lblAltitudeDownUnit;
    private Label                     _lblCloudIcon;
    private Label                     _lblDistanceUnit;
+   private Label                     _lblEquipment;
    private Label                     _lblNoTags;
    private Label                     _lblPerson_BodyWeightUnit;
    private Label                     _lblPerson_BodyFatUnit;
@@ -732,6 +736,7 @@ public class TourDataEditorView extends ViewPart implements
    private Label                     _lblWeather_TemperatureUnit_WindChill;
    //
    private Link                      _linkDefaultTimeZone;
+   private Link                      _linkEquipment;
    private Link                      _linkGeoTimeZone;
    private Link                      _linkRemoveTimeZone;
    private Link                      _linkTag;
@@ -3239,6 +3244,7 @@ public class TourDataEditorView extends ViewPart implements
 // SET_FORMATTING_ON
 
       _tagMenuMgr = new TagMenuManager(this, false);
+      _equipmentMenuMgr = new EquipmentMenuManager(this);
 
       // swim style actions
       _action_SetSwimStyle_Header = new ActionSetSwimStyle_Header();
@@ -3511,7 +3517,7 @@ public class TourDataEditorView extends ViewPart implements
       _linkTourType.setMenu(menuMgr.createContextMenu(_linkTourType));
 
       /*
-       * tag menu
+       * Tag menu
        */
       menuMgr = new MenuManager();
 
@@ -3525,7 +3531,7 @@ public class TourDataEditorView extends ViewPart implements
          _tagMenuMgr.enableTagActions(true, isTagInTour, tourTags);
       });
 
-      // set menu for the tag item
+      // set menu for the tag link control
       final Menu tagContextMenu = menuMgr.createContextMenu(_linkTag);
       tagContextMenu.addMenuListener(new MenuAdapter() {
          @Override
@@ -3545,6 +3551,24 @@ public class TourDataEditorView extends ViewPart implements
       });
 
       _linkTag.setMenu(tagContextMenu);
+
+      /*
+       * Equipment menu
+       */
+      menuMgr = new MenuManager();
+
+      menuMgr.setRemoveAllWhenShown(true);
+      menuMgr.addMenuListener(menuManager -> {
+
+         final Set<Equipment> allEquipments = _tourData.getTourEquipments();
+         final boolean isTagInTour = allEquipments.size() > 0;
+
+         _equipmentMenuMgr.fillEquipmentMenu(menuManager);
+//       _equipmentMenuMgr.enableTagActions();
+      });
+
+      // set menu for the equipment link control
+      _linkEquipment.setMenu(menuMgr.createContextMenu(_linkEquipment));
    }
 
    @Override
@@ -5210,7 +5234,6 @@ public class TourDataEditorView extends ViewPart implements
                }
             }
          }
-
          {
             /*
              * Tour type
@@ -5227,7 +5250,25 @@ public class TourDataEditorView extends ViewPart implements
                   .span(3, 1)
                   .applyTo(_lblTourType);
          }
+         {
+            /*
+             * Equipment Menu
+             */
+            _linkEquipment = new Link(container, SWT.NONE);
+            _linkEquipment.setText(Messages.Tour_Editor_Link_Equipment);
+            _linkEquipment.addSelectionListener(SelectionListener.widgetSelectedAdapter(selectionEvent -> UI.openControlMenu(_linkEquipment)));
+            _tk.adapt(_linkEquipment, true, true);
+            _firstColumnControls.add(_linkEquipment);
+            GridDataFactory.fillDefaults()
+                  .align(SWT.BEGINNING, SWT.BEGINNING)
+                  .applyTo(_linkEquipment);
 
+            _lblEquipment = UI.createLabel(container);
+            GridDataFactory.swtDefaults()
+                  .grab(true, false)
+                  .span(3, 1)
+                  .applyTo(_lblEquipment);
+         }
          {
             /*
              * Cadence: rpm/spm

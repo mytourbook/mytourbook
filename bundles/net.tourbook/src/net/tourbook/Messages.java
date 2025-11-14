@@ -28,6 +28,10 @@ public class Messages extends NLS {
 
    public static String        Action_Compute_ElevationGain;
 
+   public static String        Action_Equipment_Delete;
+   public static String        Action_Equipment_Edit;
+   public static String        Action_Equipment_New;
+
    public static String        action_export_tour;
 
    public static String        Action_Map_AddBookmark;
@@ -3437,6 +3441,8 @@ public class Messages extends NLS {
    public static String        tour_editor_label_wind_direction_Tooltip;
    public static String        tour_editor_label_wind_speed;
    public static String        tour_editor_label_wind_speed_Tooltip;
+   public static String        Tour_Editor_Link_Equipment;
+
    public static String        Tour_Editor_Link_RemoveTimeZone;
    public static String        Tour_Editor_Link_RemoveTimeZone_Tooltip;
    public static String        Tour_Editor_Link_RetrieveWeather;

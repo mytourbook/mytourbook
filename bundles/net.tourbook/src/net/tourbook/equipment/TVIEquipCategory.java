@@ -26,7 +26,7 @@ import net.tourbook.database.TourDatabase;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.swt.widgets.Tree;
 
-public class TVIEquipCategory extends TVIEquipItem {
+public class TVIEquipCategory extends TVIEquipmentItem {
 
    private TourTagCategory _tourTagCategory;
 
@@ -46,7 +46,7 @@ public class TVIEquipCategory extends TVIEquipItem {
          return;
       }
 
-      final TreeViewer tagViewer = getEquipViewer();
+      final TreeViewer tagViewer = getEquipmentViewer();
       final Tree tree = tagViewer.getTree();
 
       final TourTagCategory tourTagCategory = em.find(TourTagCategory.class, _tourTagCategory.getCategoryId());
@@ -54,7 +54,7 @@ public class TVIEquipCategory extends TVIEquipItem {
       // create tag items
       final Set<TourTag> lazyTourTags = tourTagCategory.getTourTags();
       for (final TourTag tourTag : lazyTourTags) {
-         addChild(new TVIEquipment(tagViewer, tourTag));
+         addChild(new TVIEquipmentView_Equipment(tagViewer, tourTag));
       }
 
       // create category items

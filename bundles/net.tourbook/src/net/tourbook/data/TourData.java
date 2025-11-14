@@ -12080,6 +12080,13 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
    }
 
    /**
+    * @return Returns all {@link #equipments} which are defined for this tour
+    */
+   public Set<Equipment> getTourEquipments() {
+      return equipments;
+   }
+
+   /**
     * @return Returns the unique key in the database for this {@link TourData} entity
     */
    public Long getTourId() {
