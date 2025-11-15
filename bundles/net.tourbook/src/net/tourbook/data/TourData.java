@@ -9564,6 +9564,13 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
    }
 
    /**
+    * @return Returns all {@link #equipments} which are defined for this tour
+    */
+   public Set<Equipment> getEquipment() {
+      return equipments;
+   }
+
+   /**
     * @param values
     *
     * @return Returns first value which is not 0
@@ -12078,13 +12085,6 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
     */
    public long getTourEndTimeMS() {
       return tourEndTime;
-   }
-
-   /**
-    * @return Returns all {@link #equipments} which are defined for this tour
-    */
-   public Set<Equipment> getTourEquipment() {
-      return equipments;
    }
 
    /**

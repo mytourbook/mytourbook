@@ -767,6 +767,7 @@ public class EquipmentView extends ViewPart implements ITourProvider, ITourViewe
 
    private void fillContextMenu(final IMenuManager menuMgr) {
 
+      menuMgr.add(_actionNewEquipment);
       menuMgr.add(_actionEditEquipment);
       menuMgr.add(_actionDeleteEquipment);
 

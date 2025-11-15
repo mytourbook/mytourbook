@@ -3026,6 +3026,8 @@ public class TourDataEditorView extends ViewPart implements
 
                updateUI_TagContent();
 
+               onResize_Tab1();
+
             } else if (tourEventId == TourEventId.MARKER_SELECTION && eventData instanceof final SelectionTourMarker tourMarkerSelection) {
 
                // ensure that the tour is displayed
@@ -3242,10 +3244,10 @@ public class TourDataEditorView extends ViewPart implements
       _actionDeleteTimeSlices_KeepTimeAndDistance                 = new ActionDeleteTimeSlices_KeepTimeAndDistance(this);
       _actionDeleteTimeSlices_RemoveTime                          = new ActionDeleteTimeSlices_RemoveTime(this);
 
+      _equipmentMenuMgr = new EquipmentMenuManager(this, false, false);
+      _tagMenuMgr       = new TagMenuManager(this, false);
+      
 // SET_FORMATTING_ON
-
-      _tagMenuMgr = new TagMenuManager(this, false);
-      _equipmentMenuMgr = new EquipmentMenuManager(this);
 
       // swim style actions
       _action_SetSwimStyle_Header = new ActionSetSwimStyle_Header();
@@ -3560,9 +3562,6 @@ public class TourDataEditorView extends ViewPart implements
 
       menuMgr.setRemoveAllWhenShown(true);
       menuMgr.addMenuListener(menuManager -> {
-
-         final Set<Equipment> allEquipments = _tourData.getTourEquipment();
-         final boolean isTagInTour = allEquipments.size() > 0;
 
          _equipmentMenuMgr.fillEquipmentMenu(menuManager);
       });
@@ -9615,7 +9614,7 @@ public class TourDataEditorView extends ViewPart implements
          if (_tourData == modifiedTours.get(0)) {
 
             // tour type or tags can have been changed within this dialog
-            updateUI_TourTypeAndTags();
+            updateUI_FromExternalChanges();
 
             setTourDirty();
          }
@@ -10051,6 +10050,35 @@ public class TourDataEditorView extends ViewPart implements
 
       final GridData gdWeather = (GridData) _txtWeather.getLayoutData();
       gdWeather.heightHint = _pc.convertHeightInCharsToPixels(_numLines_WeatherDescription);
+
+      onResize_Tab1();
+   }
+
+   private void updateUI_Equipment() {
+
+      final Set<Equipment> allEquipment = _tourData.getEquipment();
+
+      final StringBuilder sb = new StringBuilder();
+
+      int nameIndex = 0;
+
+      for (final Equipment equipment : allEquipment) {
+
+         if (nameIndex++ > 0) {
+            sb.append(UI.NEW_LINE);
+         }
+
+         sb.append(equipment.getName());
+      }
+
+      _lblEquipment.setText(sb.toString());
+   }
+
+   private void updateUI_FromExternalChanges() {
+
+      net.tourbook.ui.UI.updateUI_TourType(_tourData, _lblTourType, true);
+      updateUI_TagContent();
+      updateUI_Equipment();
 
       onResize_Tab1();
    }
@@ -10512,9 +10540,10 @@ public class TourDataEditorView extends ViewPart implements
 
       updateUI_TimeZone();
 
-      // tour type/tags
+      // tour type/tags/equipment
       net.tourbook.ui.UI.updateUI_TourType(_tourData, _lblTourType, true);
       updateUI_TagContent();
+      updateUI_Equipment();
 
 // SET_FORMATTING_OFF
 
@@ -10546,10 +10575,7 @@ public class TourDataEditorView extends ViewPart implements
       final CadenceMultiplier cadence = CadenceMultiplier.getByValue((int) _tourData.getCadenceMultiplier());
       _comboCadence.setSelection(cadence);
 
-      /*
-       * layout container to resize labels
-       */
-      _tourContainer.layout(true);
+      onResize_Tab1();
    }
 
    private void updateUI_Tab_2_TimeSlices() {
@@ -10642,8 +10668,6 @@ public class TourDataEditorView extends ViewPart implements
             TagManager.updateUI_Tags(_tourData, _lblTags);
          }
       }
-
-      onResize_Tab1();
    }
 
    /**
@@ -10849,16 +10873,6 @@ public class TourDataEditorView extends ViewPart implements
             _page_EditorForm.setText(title);
          }
       });
-   }
-
-   private void updateUI_TourTypeAndTags() {
-
-      // tour type/tags
-      net.tourbook.ui.UI.updateUI_TourType(_tourData, _lblTourType, true);
-      updateUI_TagContent();
-
-      // reflow layout that the tags are aligned correctly
-      _tourContainer.layout(true);
    }
 
    private void updateUI_WeatherLinkTooltip() {

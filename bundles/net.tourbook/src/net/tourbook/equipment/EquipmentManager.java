@@ -19,6 +19,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentSkipListSet;
 
 import javax.persistence.EntityManager;
@@ -26,10 +27,17 @@ import javax.persistence.Query;
 
 import net.tourbook.common.UI;
 import net.tourbook.data.Equipment;
+import net.tourbook.data.TourData;
 import net.tourbook.data.TourTag;
 import net.tourbook.database.TourDatabase;
+import net.tourbook.tour.TourEvent;
 import net.tourbook.tour.TourEventId;
 import net.tourbook.tour.TourManager;
+import net.tourbook.ui.ITourProvider;
+import net.tourbook.ui.ITourProvider2;
+
+import org.eclipse.swt.custom.BusyIndicator;
+import org.eclipse.swt.widgets.Display;
 
 public class EquipmentManager {
 
@@ -42,6 +50,55 @@ public class EquipmentManager {
 
    private static ConcurrentSkipListSet<String> _allEquipment_Brands;
    private static ConcurrentSkipListSet<String> _allEquipment_Models;
+
+   /**
+    * Add equipment additional to the existing equipment
+    *
+    * @param equipment
+    * @param tourProvider
+    * @param isSaveTour
+    * @param isCheckTourEditor
+    *           When <code>true</code> then the tour editor is check if it is dirty
+    */
+   public static void addEquipment(final Equipment equipment,
+                                   final ITourProvider tourProvider,
+                                   final boolean isSaveTour,
+                                   final boolean isCheckTourEditor) {
+
+      // fix https://github.com/mytourbook/mytourbook/issues/1437
+      if (isCheckTourEditor) {
+
+         if (TourManager.isTourEditorModified()) {
+            return;
+         }
+      }
+
+      final Runnable runnable = new Runnable() {
+         @Override
+         public void run() {
+
+            final ArrayList<TourData> selectedTours = tourProvider.getSelectedTours();
+            if (selectedTours == null || selectedTours.isEmpty()) {
+               return;
+            }
+
+            // add equipment in all tours (without tours which are opened in an editor)
+            for (final TourData tourData : selectedTours) {
+
+               final Set<Equipment> allEquipment = tourData.getEquipment();
+
+               allEquipment.add(equipment);
+            }
+
+            // keep tour type for the recent menu
+//          addRecentTourType(tourType);
+
+            saveAndNotify(tourProvider, isSaveTour, selectedTours);
+         }
+      };
+
+      BusyIndicator.showWhile(Display.getCurrent(), runnable);
+   }
 
    public static void clearCachedValues() {
 
@@ -158,7 +215,7 @@ public class EquipmentManager {
    }
 
    /**
-    * @return Returns a map with all equipments sorted by name
+    * @return Returns a list with all equipments sorted by name
     */
    public static List<Equipment> getAllEquipment_Name() {
 
@@ -245,6 +302,76 @@ public class EquipmentManager {
 
          _allEquipment_ByID = allEquipments_ByID;
          _allEquipment_ByName = allEquipments_ByName;
+      }
+   }
+
+   /**
+    * Add equipment additional to the existing equipment
+    *
+    * @param equipment
+    * @param tourProvider
+    * @param isSaveTour
+    * @param isCheckTourEditor
+    *           When <code>true</code> then the tour editor is check if it is dirty
+    */
+   public static void removeEquipment(final Equipment equipment,
+                                      final ITourProvider tourProvider,
+                                      final boolean isSaveTour,
+                                      final boolean isCheckTourEditor) {
+
+      // fix https://github.com/mytourbook/mytourbook/issues/1437
+      if (isCheckTourEditor) {
+
+         if (TourManager.isTourEditorModified()) {
+            return;
+         }
+      }
+
+      final Runnable runnable = new Runnable() {
+         @Override
+         public void run() {
+
+            final ArrayList<TourData> selectedTours = tourProvider.getSelectedTours();
+            if (selectedTours == null || selectedTours.isEmpty()) {
+               return;
+            }
+
+            // add equipment in all tours (without tours which are opened in an editor)
+            for (final TourData tourData : selectedTours) {
+
+               final Set<Equipment> allEquipment = tourData.getEquipment();
+
+               allEquipment.remove(equipment);
+            }
+
+            saveAndNotify(tourProvider, isSaveTour, selectedTours);
+         }
+      };
+
+      BusyIndicator.showWhile(Display.getCurrent(), runnable);
+   }
+
+   private static void saveAndNotify(final ITourProvider tourProvider,
+                                     final boolean isSaveTour,
+                                     final ArrayList<TourData> selectedTours) {
+
+      if (isSaveTour) {
+
+         // save all tours with the modified equipment
+         TourManager.saveModifiedTours(selectedTours);
+
+      } else {
+
+         // tours are not saved but the tour provider must be notified
+
+         if (tourProvider instanceof final ITourProvider2 tourProvider2) {
+
+            tourProvider2.toursAreModified(selectedTours);
+
+         } else {
+
+            TourManager.fireEvent(TourEventId.TOUR_CHANGED, new TourEvent(selectedTours));
+         }
       }
    }
 

@@ -15,17 +15,19 @@
  *******************************************************************************/
 package net.tourbook.equipment;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import net.tourbook.common.ui.SubMenu;
 import net.tourbook.data.Equipment;
-import net.tourbook.ui.ITourProvider;
+import net.tourbook.data.TourData;
 
 import org.eclipse.jface.action.Action;
 import org.eclipse.swt.widgets.Menu;
 
 /**
- * Add equipments from the selected tours
+ * Add equipment into the selected tours
  */
 public class ActionAddEquipment_SubMenu extends SubMenu {
 
@@ -45,7 +47,13 @@ public class ActionAddEquipment_SubMenu extends SubMenu {
       @Override
       public void run() {
 
-         setEquipment(isChecked(), __equipment);
+         EquipmentManager.addEquipment(
+
+               __equipment,
+               _equipmentMenuManager.getTourProvider(),
+
+               _equipmentMenuManager.isSaveTour(),
+               _equipmentMenuManager.isCheckTourEditor());
       }
    }
 
@@ -64,18 +72,33 @@ public class ActionAddEquipment_SubMenu extends SubMenu {
    @Override
    public void fillMenu(final Menu menu) {
 
+      // get all equipment from all tours
+      final Set<Long> allUsedEquipmentIDs = new HashSet<>();
+      final List<TourData> allSelectedTours = _equipmentMenuManager.getTourProvider().getSelectedTours();
+
+      for (final TourData tourData : allSelectedTours) {
+
+         final Set<Equipment> allEquipment = tourData.getEquipment();
+
+         for (final Equipment equipment : allEquipment) {
+            allUsedEquipmentIDs.add(equipment.getEquipmentId());
+         }
+      }
+
       final List<Equipment> allEquipments = EquipmentManager.getAllEquipment_Name();
 
       for (final Equipment equipment : allEquipments) {
 
-         addActionToMenu(new ActionEquipment(equipment));
+         final ActionEquipment action = new ActionEquipment(equipment);
+
+         final boolean isEquipmentAlreadySet = allUsedEquipmentIDs.contains(equipment.getEquipmentId());
+
+         if (isEquipmentAlreadySet) {
+            action.setEnabled(false);
+         }
+
+         addActionToMenu(action);
       }
-
-   }
-
-   private void setEquipment(final boolean isChecked, final Equipment equipment) {
-
-      final ITourProvider tourProvider = _equipmentMenuManager.getTourProvider();
 
    }
 

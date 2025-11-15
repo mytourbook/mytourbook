@@ -151,7 +151,7 @@ public class TagMenuManager implements IActionProvider {
       @Override
       public void run() {
 
-         BusyIndicator.showWhile(Display.getCurrent(), () -> runnableRemoveAllTags());
+         BusyIndicator.showWhile(Display.getCurrent(), () -> removeAllTags());
       }
    }
 
@@ -1097,7 +1097,7 @@ public class TagMenuManager implements IActionProvider {
             toolTip);
    }
 
-   private void runnableRemoveAllTags() {
+   private void removeAllTags() {
 
       // get tours which tour type should be changed
       final ArrayList<TourData> modifiedTours = _tourProvider.getSelectedTours();
@@ -1159,7 +1159,7 @@ public class TagMenuManager implements IActionProvider {
    }
 
    /**
-    * Set/Save for multiple tour tags
+    * Add/remove and save for multiple tour tags
     *
     * @param mapWithAllModifiedTags
     * @param isAddMode

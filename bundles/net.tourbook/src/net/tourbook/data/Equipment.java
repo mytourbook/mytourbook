@@ -46,7 +46,7 @@ import net.tourbook.database.TourDatabase;
 import org.hibernate.annotations.Cascade;
 
 @Entity
-public class Equipment implements Cloneable, Serializable {
+public class Equipment implements Cloneable, Comparable<Object>, Serializable {
 
    private static final char          NL               = UI.NEW_LINE;
 
@@ -163,6 +163,17 @@ public class Equipment implements Cloneable, Serializable {
       clonedEquipment._createId = _createCounter.incrementAndGet();
 
       return clonedEquipment;
+   }
+
+   @Override
+   public int compareTo(final Object obj) {
+
+      if (obj instanceof final Equipment equipment) {
+
+         return getName().compareTo(equipment.getName());
+      }
+
+      return 0;
    }
 
    @Override

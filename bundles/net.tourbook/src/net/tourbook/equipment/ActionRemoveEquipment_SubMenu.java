@@ -15,6 +15,9 @@
  *******************************************************************************/
 package net.tourbook.equipment;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 
 import net.tourbook.common.ui.SubMenu;
@@ -31,8 +34,6 @@ public class ActionRemoveEquipment_SubMenu extends SubMenu {
 
    private EquipmentMenuManager _equipmentMenuManager;
 
-   private List<TourData>       _allSelectedTours;
-
    private class ActionEquipment extends Action {
 
       private final Equipment __equipment;
@@ -47,7 +48,13 @@ public class ActionRemoveEquipment_SubMenu extends SubMenu {
       @Override
       public void run() {
 
-//         setTourTag(isChecked(), __equipment);
+         EquipmentManager.removeEquipment(
+
+               __equipment,
+               _equipmentMenuManager.getTourProvider(),
+
+               _equipmentMenuManager.isSaveTour(),
+               _equipmentMenuManager.isCheckTourEditor());
       }
    }
 
@@ -66,13 +73,27 @@ public class ActionRemoveEquipment_SubMenu extends SubMenu {
    @Override
    public void fillMenu(final Menu menu) {
 
-      final List<Equipment> allEquipments = EquipmentManager.getAllEquipment_Name();
+      // get all equipment from all tours
+      final HashSet<Equipment> allUsedEquipment = new HashSet<>();
+      final List<TourData> allSelectedTours = _equipmentMenuManager.getTourProvider().getSelectedTours();
 
-      for (final Equipment equipment : allEquipments) {
-
-         addActionToMenu(new ActionEquipment(equipment));
+      for (final TourData tourData : allSelectedTours) {
+         allUsedEquipment.addAll(tourData.getEquipment());
       }
 
+      // sort equipment
+      final List<Equipment> allUsedAndSortedEquipment = new ArrayList<>();
+      allUsedAndSortedEquipment.addAll(allUsedEquipment);
+      Collections.sort(allUsedAndSortedEquipment);
+
+      for (final Equipment equipment : allUsedAndSortedEquipment) {
+
+         final ActionEquipment action = new ActionEquipment(equipment);
+         addActionToMenu(action);
+
+         // make the equipment more visible
+         action.setChecked(true);
+      }
    }
 
 }
