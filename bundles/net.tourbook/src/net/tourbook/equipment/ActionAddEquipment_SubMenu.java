@@ -47,13 +47,15 @@ public class ActionAddEquipment_SubMenu extends SubMenu {
       @Override
       public void run() {
 
-         EquipmentManager.addEquipment(
+         EquipmentManager.equipment_Add(
 
                __equipment,
                _equipmentMenuManager.getTourProvider(),
 
                _equipmentMenuManager.isSaveTour(),
                _equipmentMenuManager.isCheckTourEditor());
+
+         _equipmentMenuManager.updateRecentEquipment(__equipment);
       }
    }
 

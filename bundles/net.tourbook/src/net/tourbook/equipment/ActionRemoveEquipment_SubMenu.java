@@ -48,7 +48,7 @@ public class ActionRemoveEquipment_SubMenu extends SubMenu {
       @Override
       public void run() {
 
-         EquipmentManager.removeEquipment(
+         EquipmentManager.equipment_Remove(
 
                __equipment,
                _equipmentMenuManager.getTourProvider(),

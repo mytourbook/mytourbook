@@ -28,7 +28,6 @@ import javax.persistence.Query;
 import net.tourbook.common.UI;
 import net.tourbook.data.Equipment;
 import net.tourbook.data.TourData;
-import net.tourbook.data.TourTag;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.tour.TourEvent;
 import net.tourbook.tour.TourEventId;
@@ -50,55 +49,6 @@ public class EquipmentManager {
 
    private static ConcurrentSkipListSet<String> _allEquipment_Brands;
    private static ConcurrentSkipListSet<String> _allEquipment_Models;
-
-   /**
-    * Add equipment additional to the existing equipment
-    *
-    * @param equipment
-    * @param tourProvider
-    * @param isSaveTour
-    * @param isCheckTourEditor
-    *           When <code>true</code> then the tour editor is check if it is dirty
-    */
-   public static void addEquipment(final Equipment equipment,
-                                   final ITourProvider tourProvider,
-                                   final boolean isSaveTour,
-                                   final boolean isCheckTourEditor) {
-
-      // fix https://github.com/mytourbook/mytourbook/issues/1437
-      if (isCheckTourEditor) {
-
-         if (TourManager.isTourEditorModified()) {
-            return;
-         }
-      }
-
-      final Runnable runnable = new Runnable() {
-         @Override
-         public void run() {
-
-            final ArrayList<TourData> selectedTours = tourProvider.getSelectedTours();
-            if (selectedTours == null || selectedTours.isEmpty()) {
-               return;
-            }
-
-            // add equipment in all tours (without tours which are opened in an editor)
-            for (final TourData tourData : selectedTours) {
-
-               final Set<Equipment> allEquipment = tourData.getEquipment();
-
-               allEquipment.add(equipment);
-            }
-
-            // keep tour type for the recent menu
-//          addRecentTourType(tourType);
-
-            saveAndNotify(tourProvider, isSaveTour, selectedTours);
-         }
-      };
-
-      BusyIndicator.showWhile(Display.getCurrent(), runnable);
-   }
 
    public static void clearCachedValues() {
 
@@ -127,77 +77,100 @@ public class EquipmentManager {
       }
    }
 
-   public static void deleteEquipments(final List<Equipment> allSelectedEquipments) {
+   /**
+    * Add equipment additional to the existing equipment
+    *
+    * @param equipment
+    * @param tourProvider
+    * @param isSaveTour
+    * @param isCheckTourEditor
+    *           When <code>true</code> then the tour editor is check if it is dirty
+    */
+   public static void equipment_Add(final Equipment equipment,
+                                    final ITourProvider tourProvider,
+                                    final boolean isSaveTour,
+                                    final boolean isCheckTourEditor) {
 
+      // fix https://github.com/mytourbook/mytourbook/issues/1437
+      if (isCheckTourEditor) {
+
+         if (TourManager.isTourEditorModified()) {
+            return;
+         }
+      }
+
+      final Runnable runnable = new Runnable() {
+         @Override
+         public void run() {
+
+            final ArrayList<TourData> selectedTours = tourProvider.getSelectedTours();
+            if (selectedTours == null || selectedTours.isEmpty()) {
+               return;
+            }
+
+            // add equipment in all tours (without tours which are opened in an editor)
+            for (final TourData tourData : selectedTours) {
+
+               final Set<Equipment> allEquipment = tourData.getEquipment();
+
+               allEquipment.add(equipment);
+            }
+
+            saveAndNotify(tourProvider, isSaveTour, selectedTours);
+         }
+      };
+
+      BusyIndicator.showWhile(Display.getCurrent(), runnable);
+   }
+
+   public static void equipment_Delete(final List<Equipment> allSelectedEquipments) {
+ 
    }
 
    /**
-    * Deletes a tour tag from all contained tours and in the tag structure. This event
-    * {@link TourEventId#TAG_STRUCTURE_CHANGED} is fired when done.
+    * Add equipment additional to the existing equipment
     *
-    * @param allTags
-    *
-    * @return Returns <code>true</code> when deletion was successful
+    * @param equipment
+    * @param tourProvider
+    * @param isSaveTour
+    * @param isCheckTourEditor
+    *           When <code>true</code> then the tour editor is check if it is dirty
     */
-   public static boolean deleteTourTag(final List<TourTag> allTags) {
+   public static void equipment_Remove(final Equipment equipment,
+                                       final ITourProvider tourProvider,
+                                       final boolean isSaveTour,
+                                       final boolean isCheckTourEditor) {
 
-      // ensure that a tour is NOT modified in the tour editor
-      if (TourManager.isTourEditorModified(false)) {
-         return false;
+      // fix https://github.com/mytourbook/mytourbook/issues/1437
+      if (isCheckTourEditor) {
+
+         if (TourManager.isTourEditorModified()) {
+            return;
+         }
       }
 
-      final String dialogMessage;
-      final String actionDeleteTags;
+      final Runnable runnable = new Runnable() {
+         @Override
+         public void run() {
 
-//      final ArrayList<Long> allTourIds = getTaggedTours(allTags);
-//
-//      if (allTags.size() == 1) {
-//
-//         // remove one tag
-//
-//         dialogMessage = NLS.bind(Messages.Tag_Manager_Dialog_DeleteTag_Message, allTags.get(0).getTagName(), allTourIds.size());
-//         actionDeleteTags = Messages.Tag_Manager_Action_DeleteTag;
-//
-//      } else {
-//
-//         // remove multiple tags
-//
-//         dialogMessage = NLS.bind(Messages.Tag_Manager_Dialog_DeleteTag_Multiple_Message, allTags.size(), allTourIds.size());
-//         actionDeleteTags = Messages.Tag_Manager_Action_DeleteTags;
-//      }
-//
-//      final Display display = Display.getDefault();
-//
-//      // confirm deletion, show tag name and number of tours which contain a tag
-//      final MessageDialog dialog = new MessageDialog(
-//            display.getActiveShell(),
-//            Messages.Tag_Manager_Dialog_DeleteTag_Title,
-//            null,
-//            dialogMessage,
-//            MessageDialog.QUESTION,
-//            new String[] {
-//                  actionDeleteTags,
-//                  IDialogConstants.CANCEL_LABEL },
-//            1);
+            final ArrayList<TourData> selectedTours = tourProvider.getSelectedTours();
+            if (selectedTours == null || selectedTours.isEmpty()) {
+               return;
+            }
 
-      final boolean[] returnValue = { false };
+            // add equipment in all tours (without tours which are opened in an editor)
+            for (final TourData tourData : selectedTours) {
 
-//      if (dialog.open() == Window.OK) {
-//
-//         BusyIndicator.showWhile(display, () -> {
-//
-//            if (deleteTourTag_10(allTags)) {
-//
-//               clearAllTagResourcesAndFireModifyEvent();
-//
-//               updateTourTagFilterProfiles(allTags);
-//
-//               returnValue[0] = true;
-//            }
-//         });
-//      }
+               final Set<Equipment> allEquipment = tourData.getEquipment();
 
-      return returnValue[0];
+               allEquipment.remove(equipment);
+            }
+
+            saveAndNotify(tourProvider, isSaveTour, selectedTours);
+         }
+      };
+
+      BusyIndicator.showWhile(Display.getCurrent(), runnable);
    }
 
    /**
@@ -303,52 +276,6 @@ public class EquipmentManager {
          _allEquipment_ByID = allEquipments_ByID;
          _allEquipment_ByName = allEquipments_ByName;
       }
-   }
-
-   /**
-    * Add equipment additional to the existing equipment
-    *
-    * @param equipment
-    * @param tourProvider
-    * @param isSaveTour
-    * @param isCheckTourEditor
-    *           When <code>true</code> then the tour editor is check if it is dirty
-    */
-   public static void removeEquipment(final Equipment equipment,
-                                      final ITourProvider tourProvider,
-                                      final boolean isSaveTour,
-                                      final boolean isCheckTourEditor) {
-
-      // fix https://github.com/mytourbook/mytourbook/issues/1437
-      if (isCheckTourEditor) {
-
-         if (TourManager.isTourEditorModified()) {
-            return;
-         }
-      }
-
-      final Runnable runnable = new Runnable() {
-         @Override
-         public void run() {
-
-            final ArrayList<TourData> selectedTours = tourProvider.getSelectedTours();
-            if (selectedTours == null || selectedTours.isEmpty()) {
-               return;
-            }
-
-            // add equipment in all tours (without tours which are opened in an editor)
-            for (final TourData tourData : selectedTours) {
-
-               final Set<Equipment> allEquipment = tourData.getEquipment();
-
-               allEquipment.remove(equipment);
-            }
-
-            saveAndNotify(tourProvider, isSaveTour, selectedTours);
-         }
-      };
-
-      BusyIndicator.showWhile(Display.getCurrent(), runnable);
    }
 
    private static void saveAndNotify(final ITourProvider tourProvider,

@@ -332,16 +332,19 @@
          />
 
 
-      <!--
-         Import
+      <!-- 
+
+         Bicycle
+
+         pref page for bikes is disabled since version 11.07 because bikes 
+         are currently not used and is confusing the user
+
+         I set a comment around the page tag but OSX still displayed the page, this must be a bug in OSX
+
       -->
-      <page
-         class    ="net.tourbook.preferences.PrefPageImport"
-         id       ="net.tourbook.preferences.PrefPageImport"
-         name     ="%preference_page_data_import"
-      />
-      
-       <!--
+
+
+      <!--
          Cloud
       -->
       <page
@@ -350,17 +353,24 @@
          name     ="%preference_page_cloud"
       />
       
-      
-      <!-- 
-      
-         Bicycle
-      
-         pref page for bikes is disabled since version 11.07 because bikes 
-         are currently not used and is confusing the user
-         
-         I set a comment around the page tag but OSX still displayed the page, this must be a bug in OSX
-            
+      <!--
+         Equipment
       -->
+      <page
+         class    ="net.tourbook.preferences.PrefPageEquipment"
+         id       ="net.tourbook.preferences.PrefPageEquipment"
+         name     ="%Pref_Page_Equipment"
+      />
+
+
+      <!--
+         Import
+      -->
+      <page
+         class    ="net.tourbook.preferences.PrefPageImport"
+         id       ="net.tourbook.preferences.PrefPageImport"
+         name     ="%preference_page_data_import"
+      />
 
 
       <!--

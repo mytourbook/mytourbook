@@ -39,6 +39,7 @@ import net.tourbook.common.util.StringUtils;
 import net.tourbook.data.TourPerson;
 import net.tourbook.database.PersonManager;
 import net.tourbook.database.TourDatabase;
+import net.tourbook.equipment.EquipmentMenuManager;
 import net.tourbook.map.bookmark.MapBookmarkManager;
 import net.tourbook.map.player.ModelPlayerManager;
 import net.tourbook.map3.view.Map3Manager;
@@ -484,6 +485,7 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
 
       Display.getDefault().asyncExec(() -> {
 
+         EquipmentMenuManager.restoreState();
          TagMenuManager.restoreTagState();
          TourTypeMenuManager.restoreState();
 

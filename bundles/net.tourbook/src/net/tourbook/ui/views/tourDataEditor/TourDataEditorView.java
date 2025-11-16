@@ -3246,7 +3246,7 @@ public class TourDataEditorView extends ViewPart implements
 
       _equipmentMenuMgr = new EquipmentMenuManager(this, false, false);
       _tagMenuMgr       = new TagMenuManager(this, false);
-      
+
 // SET_FORMATTING_ON
 
       // swim style actions
@@ -10057,12 +10057,17 @@ public class TourDataEditorView extends ViewPart implements
    private void updateUI_Equipment() {
 
       final Set<Equipment> allEquipment = _tourData.getEquipment();
+      final List<Equipment> allSortedEquipment = new ArrayList<>();
+
+      // sort equipment
+      allSortedEquipment.addAll(allEquipment);
+      Collections.sort(allSortedEquipment);
 
       final StringBuilder sb = new StringBuilder();
 
       int nameIndex = 0;
 
-      for (final Equipment equipment : allEquipment) {
+      for (final Equipment equipment : allSortedEquipment) {
 
          if (nameIndex++ > 0) {
             sb.append(UI.NEW_LINE);

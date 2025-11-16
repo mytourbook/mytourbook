@@ -856,7 +856,7 @@ public class EquipmentView extends ViewPart implements ITourProvider, ITourViewe
 
          // delete equipments
 
-         EquipmentManager.deleteEquipments(allSelectedEquipments);
+         EquipmentManager.equipment_Delete(allSelectedEquipments);
       }
    }
 

@@ -661,4 +661,10 @@ public interface ITourbookPreferences {
     */
    public static final String NUTRITION_BEVERAGECONTAINERS_HAVE_CHANGED = "NUTRITION_BEVERAGECONTAINERS_HAVE_CHANGED"; //$NON-NLS-1$
    public static final String NUTRITION_IGNORE_FIRST_HOUR               = "NUTRITION_IGNORE_FIRST_HOUR";               //$NON-NLS-1$
+
+   /*
+    * Equipment
+    */
+   public static final String EQUIPMENT_NUMBER_OF_RECENT_EQUIPMENT = "EQUIPMENT_NUMBER_OF_RECENT_EQUIPMENT"; //$NON-NLS-1$
+
 }

@@ -573,6 +573,11 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
        * Tour Nutrition
        */
       store.setDefault(ITourbookPreferences.NUTRITION_IGNORE_FIRST_HOUR, false);
+
+      /*
+       * Equipment
+       */
+      store.setDefault(ITourbookPreferences.EQUIPMENT_NUMBER_OF_RECENT_EQUIPMENT, 3);
    }
 
 }
