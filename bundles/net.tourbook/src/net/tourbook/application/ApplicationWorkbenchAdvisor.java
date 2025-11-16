@@ -18,9 +18,29 @@ package net.tourbook.application;
 import java.io.File;
 import java.net.URISyntaxException;
 
+import net.tourbook.common.measurement_system.MeasurementSystem_Manager;
+import net.tourbook.common.swimming.SwimStrokeManager;
 import net.tourbook.database.TourDatabase;
+import net.tourbook.map.bookmark.MapBookmarkManager;
+import net.tourbook.map.player.ModelPlayerManager;
+import net.tourbook.map3.view.Map3Manager;
+import net.tourbook.map3.view.Map3State;
 import net.tourbook.preferences.PrefPageGeneral;
+import net.tourbook.search.FTSearchManager;
+import net.tourbook.tag.TagMenuManager;
+import net.tourbook.tag.tour.filter.TourTagFilterManager;
 import net.tourbook.tour.TourManager;
+import net.tourbook.tour.TourTypeFilterManager;
+import net.tourbook.tour.TourTypeMenuManager;
+import net.tourbook.tour.filter.TourFilterManager;
+import net.tourbook.tour.filter.geo.TourGeoFilter_Manager;
+import net.tourbook.tour.location.CommonLocationManager;
+import net.tourbook.tour.location.TourLocationManager;
+import net.tourbook.tour.photo.TourPhotoManager;
+import net.tourbook.tourType.TourTypeManager;
+import net.tourbook.ui.action.TourActionManager;
+import net.tourbook.ui.views.referenceTour.ElevationCompareManager;
+import net.tourbook.web.WebContentServer;
 
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.URIUtil;
@@ -93,7 +113,7 @@ public class ApplicationWorkbenchAdvisor extends WorkbenchAdvisor {
 
                   true,
                   getWorkbenchFolderPath(),
-                  
+
                   isFixViewCloseButton,
                   isFixViewIconImage);
          });
@@ -109,6 +129,44 @@ public class ApplicationWorkbenchAdvisor extends WorkbenchAdvisor {
    @Override
    public boolean preShutdown() {
 
-      return TourManager.getInstance().saveTours();
+      if (TourManager.getInstance().saveTours() == false) {
+         return false;
+      }
+
+      ApplicationWorkbenchWindowAdvisor.getApplicationActionBarAdvisor().getPersonSelector().saveState();
+
+      MeasurementSystem_Manager.saveState();
+
+      TagMenuManager.saveTagState();
+      TourTagFilterManager.saveState();
+
+      TourTypeFilterManager.saveState();
+      TourTypeMenuManager.saveState();
+      TourTypeManager.saveState();
+
+      CommonLocationManager.saveState();
+      ElevationCompareManager.saveState();
+      TourFilterManager.saveState();
+      TourGeoFilter_Manager.saveState();
+      TourPhotoManager.saveState();
+      MapBookmarkManager.saveState();
+      ModelPlayerManager.saveState();
+      SwimStrokeManager.saveState();
+      TourLocationManager.saveState();
+      TourActionManager.saveState();
+
+      FTSearchManager.closeIndexReaderSuggester();
+      WebContentServer.stop();
+
+      /**
+       * Save map3 state only when map is initialized (displayed). When this state is not checked
+       * and map is not yet initialized, the map will be initialized which produces an annoying
+       * delay when the application is being closing.
+       */
+      if (Map3State.isMapInitialized) {
+         Map3Manager.saveState();
+      }
+
+      return true;
    }
 }
