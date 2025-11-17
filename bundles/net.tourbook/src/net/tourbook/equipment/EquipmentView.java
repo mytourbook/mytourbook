@@ -748,13 +748,6 @@ public class EquipmentView extends ViewPart implements ITourProvider, ITourViewe
    private void fillActionBars() {
 
       /*
-       * Fill view menu
-       */
-//      final IMenuManager menuMgr = getViewSite().getActionBars().getMenuManager();
-//
-//      menuMgr.add(_actionRefreshView);
-
-      /*
        * Fill view toolbar
        */
       final IToolBarManager tbm = getViewSite().getActionBars().getToolBarManager();
@@ -986,7 +979,6 @@ public class EquipmentView extends ViewPart implements ITourProvider, ITourViewe
       EquipmentManager.clearCachedValues();
 
 //    TagMenuManager.updateRecentTagNames();
-
 
       TourManager.getInstance().clearTourDataCache();
 

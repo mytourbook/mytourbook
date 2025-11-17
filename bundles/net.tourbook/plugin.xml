@@ -357,19 +357,25 @@
          Equipment
       -->
       <page
-         class    ="net.tourbook.preferences.PrefPageEquipment"
-         id       ="net.tourbook.preferences.PrefPageEquipment"
          name     ="%Pref_Page_Equipment"
+         id       ="net.tourbook.preferences.PrefPageEquipment"
+         class    ="net.tourbook.preferences.PrefPageEquipment"
       />
+         <page
+            name        ="%Pref_Page_Equipment_Groups"
+            id          ="net.tourbook.preferences.PrefPageEquipmentGroups"
+            class       ="net.tourbook.preferences.PrefPageEquipmentGroups"
+            category    ="net.tourbook.preferences.PrefPageEquipment"
+         />
 
 
       <!--
          Import
       -->
       <page
-         class    ="net.tourbook.preferences.PrefPageImport"
-         id       ="net.tourbook.preferences.PrefPageImport"
          name     ="%preference_page_data_import"
+         id       ="net.tourbook.preferences.PrefPageImport"
+         class    ="net.tourbook.preferences.PrefPageImport"
       />
 
 
@@ -395,29 +401,18 @@
 
 
       <!--
-         Signs
-      
-      <page
-         name="%Pref_Page_SignImages"
-         id="net.tourbook.preferences.PrefPageSigns"
-         class="net.tourbook.preferences.PrefPageSigns"
-      />
-      -->
-
-
-      <!--
          SRTM
       -->
 
       <page
-         name="%Pref_Page_SRTM"
-         id="net.tourbook.srtm.PrefPageSRTMColors"
-         class="net.tourbook.srtm.PrefPageSRTMColors"
+         name     ="%Pref_Page_SRTM"
+         id       ="net.tourbook.srtm.PrefPageSRTMColors"
+         class    ="net.tourbook.srtm.PrefPageSRTMColors"
       />
          <page
-            name="%Pref_Page_SRTM_Data"
-            id="net.tourbook.srtm.PrefPageSRTMData"
-            class="net.tourbook.srtm.PrefPageSRTMData"
+            name        ="%Pref_Page_SRTM_Data"
+            id          ="net.tourbook.srtm.PrefPageSRTMData"
+            class       ="net.tourbook.srtm.PrefPageSRTMData"
             category    ="net.tourbook.srtm.PrefPageSRTMColors"
          />
 

@@ -77,6 +77,7 @@ public class Images {
    public static final String EditRow                              = "edit-row.svg";                                //$NON-NLS-1$
    public static final String EditTour                             = "tour-editor.svg";                             //$NON-NLS-1$
    public static final String Equipment                            = "equipment.svg";                               //$NON-NLS-1$
+   public static final String Equipment_Checked                    = "equipment-checked.svg";                       //$NON-NLS-1$
    public static final String Equipment_New                        = "equipment-new.svg";                           //$NON-NLS-1$
    public static final String GeoCompare_PinComparedTour           = "geo-compare-pin-compared-tour.svg";           //$NON-NLS-1$
    public static final String GeoCompare_SelectComparedTour        = "geo-compare-select-compared-tour.svg";        //$NON-NLS-1$

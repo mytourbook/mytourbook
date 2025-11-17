@@ -716,7 +716,7 @@ public class TagMenuManager implements IActionProvider {
       _actionRemoveTag           = new Action_RemoveTourTag_SubMenu(this);
       _actionRemoveAllTags       = new Action_RemoveAllTags();
       _actionSetTags             = new ActionShowTourTagsView();
-      _actionTagGroupPreferences = new ActionOpenPrefDialog(Messages.Action_Tag_ManageTagGroups,PrefPageTagGroups.ID);
+      _actionTagGroupPreferences = new ActionOpenPrefDialog(Messages.Action_Tag_ManageTagGroups, PrefPageTagGroups.ID);
 
       _advancedMenuToAddTags     = new AdvancedMenuForActions(_actionAddTag_AutoOpen);
 
