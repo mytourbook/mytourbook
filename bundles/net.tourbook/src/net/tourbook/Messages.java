@@ -1738,6 +1738,18 @@ public class Messages extends NLS {
    public static String        Pref_DisplayFormat_Tab_OneTour;
    public static String        Pref_DisplayFormat_Tab_OneTour_Tooltip;
 
+   public static String        Pref_Equipment_Action_FilterEquipment_ShowAll_Tooltip;
+   public static String        Pref_Equipment_Action_FilterEquipment_ShowOnlyChecked_Tooltip;
+   public static String        Pref_Equipment_Dialog_DeleteEquipment_Message;
+   public static String        Pref_Equipment_Dialog_DeleteEquipment_Title;
+   public static String        Pref_Equipment_Dialog_NewEquipment_Message;
+   public static String        Pref_Equipment_Dialog_NewEquipment_Title;
+   public static String        Pref_Equipment_Dialog_RenameEquipment_Message;
+   public static String        Pref_Equipment_Dialog_RenameEquipment_Title;
+   public static String        Pref_Equipment_Error_NameIsEmpty;
+   public static String        Pref_Equipment_Label_AllEquipment;
+   public static String        Pref_Equipment_Label_EquipmentGroups;
+
    public static String        Pref_General_Button_ComputeCalendarWeek;
    public static String        Pref_General_CalendarWeek;
    public static String        Pref_General_Checkbox_AutoCompletePrefix;

@@ -15,7 +15,10 @@
  *******************************************************************************/
 package net.tourbook.preferences;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import net.tourbook.Images;
 import net.tourbook.Messages;
@@ -27,7 +30,6 @@ import net.tourbook.data.Equipment;
 import net.tourbook.equipment.EquipmentGroup;
 import net.tourbook.equipment.EquipmentGroupManager;
 import net.tourbook.equipment.EquipmentManager;
-import net.tourbook.tag.TVIPrefTag;
 import net.tourbook.tour.ITourEventListener;
 import net.tourbook.tour.TourEventId;
 import net.tourbook.tour.TourManager;
@@ -35,9 +37,11 @@ import net.tourbook.tour.TourManager;
 import org.eclipse.collections.impl.set.mutable.primitive.LongHashSet;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.ToolBarManager;
+import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.dialogs.IInputValidator;
 import org.eclipse.jface.dialogs.InputDialog;
+import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.preference.IPreferenceStore;
@@ -63,7 +67,6 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.KeyListener;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
-import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Button;
@@ -78,10 +81,10 @@ import org.eclipse.ui.IWorkbenchPreferencePage;
 
 public class PrefPageEquipmentGroups extends PreferencePage implements IWorkbenchPreferencePage {
 
-   public static final String  ID                                        = "net.tourbook.preferences.PrefPageEquipmentGroups"; //$NON-NLS-1$
+   public static final String  ID                                             = "net.tourbook.preferences.PrefPageEquipmentGroups"; //$NON-NLS-1$
 
-   private static final String STATE_IS_SHOW_ONLY_TAGS_WHICH_ARE_CHECKED = "STATE_IS_SHOW_ONLY_TAGS_WHICH_ARE_CHECKED";        //$NON-NLS-1$
-   private static final String STATE_SELECTED_TAG_GROUP                  = "STATE_SELECTED_TAG_GROUP";                         //$NON-NLS-1$
+   private static final String STATE_IS_SHOW_ONLY_EQUIPMENT_WHICH_ARE_CHECKED = "STATE_IS_SHOW_ONLY_EQUIPMENT_WHICH_ARE_CHECKED";   //$NON-NLS-1$
+   private static final String STATE_SELECTED_EQUIPMENT_GROUP                 = "STATE_SELECTED_EQUIPMENT_GROUP";                   //$NON-NLS-1$
 
 // SET_FORMATTING_OFF
 
@@ -97,18 +100,17 @@ public class PrefPageEquipmentGroups extends PreferencePage implements IWorkbenc
    private CheckboxTableViewer     _equipmentViewer_Items;
 
    private List<Equipment>         _allEquipment;
-
    private EquipmentFilter         _equipmentFilter = new EquipmentFilter();
 
    /**
     * Complicated, it is necessary to check the checkbox, otherwise another item could be checked
     */
-   private boolean                 _tagViewerItem_IsChecked;
-   private boolean                 _tagViewerItem_IsKeyPressed;
-   private Object                  _tagViewerItem_Data;
+   private boolean                 _equipmentViewerItem_IsChecked;
+   private boolean                 _equipmentViewerItem_IsKeyPressed;
+   private Object                  _equipmentViewerItem_Data;
 
    private boolean                 _isModified;
-   private boolean                 _isShowOnlyCheckedTags;
+   private boolean                 _isShowOnlyCheckedEquipment;
 
    private EquipmentGroup          _selectedEquipmentGroup;
 
@@ -119,7 +121,7 @@ public class PrefPageEquipmentGroups extends PreferencePage implements IWorkbenc
     */
    private Composite _containerEquipmentGroupHeader;
 
-   private ToolBar   _toolBarAllTags;
+   private ToolBar   _toolBarAllEquipment;
 
    private Button    _btnCheckAll;
    private Button    _btnDelete;
@@ -129,10 +131,6 @@ public class PrefPageEquipmentGroups extends PreferencePage implements IWorkbenc
 
    private Label     _lblActionSpacer;
 
-   private Image     _imgTag;
-   private Image     _imgTagRoot;
-   private Image     _imgTagCategory;
-
    private Composite _parent;
 
    private class ActionEquipment_Filter extends Action {
@@ -141,14 +139,14 @@ public class PrefPageEquipmentGroups extends PreferencePage implements IWorkbenc
 
          super(UI.EMPTY_STRING, AS_CHECK_BOX);
 
-         setToolTipText("Show only equipments which are checked");
+         setToolTipText(Messages.Pref_Equipment_Action_FilterEquipment_ShowOnlyChecked_Tooltip);
 
          setImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.Equipment_Checked));
       }
 
       @Override
       public void run() {
-         onTag_Filter();
+         onEquipment_Filter();
       }
    }
 
@@ -162,16 +160,13 @@ public class PrefPageEquipmentGroups extends PreferencePage implements IWorkbenc
             return false;
          }
 
-//         if (element instanceof TVIPrefTag) {
-//
-//            final TVIPrefTag tviTag = (TVIPrefTag) element;
-//
-//            final TourTag tourTag = tviTag.getTourTag();
-//
-//            if (_selectedTagGroup.tourTags.contains(tourTag)) {
-//               return true;
-//            }
-//         }
+         if (element instanceof final Equipment equipment) {
+
+            if (_selectedEquipmentGroup.allEquipment.contains(equipment)) {
+
+               return true;
+            }
+         }
 
          return false;
       }
@@ -304,15 +299,11 @@ public class PrefPageEquipmentGroups extends PreferencePage implements IWorkbenc
       final Composite container = new Composite(parent, SWT.NONE);
       GridDataFactory.fillDefaults().grab(true, true).applyTo(container);
       GridLayoutFactory.fillDefaults().numColumns(3).applyTo(container);
-//      container.setBackground(UI.SYS_COLOR_BLUE);
       {
          createUI_10_Equipment_Groups(container);
          createUI_20_Equipment_Items(container);
          createUI_30_Equipment_Actions(container);
       }
-
-      // spacer
-//      UI.createSpacer_Horizontal(parent);
 
       return container;
    }
@@ -322,21 +313,17 @@ public class PrefPageEquipmentGroups extends PreferencePage implements IWorkbenc
       final Composite container = new Composite(parent, SWT.NONE);
       GridDataFactory.fillDefaults().grab(true, true).applyTo(container);
       GridLayoutFactory.fillDefaults().numColumns(1).applyTo(container);
-//      container.setBackground(UI.SYS_COLOR_GREEN);
       {
 
          _containerEquipmentGroupHeader = new Composite(container, SWT.NONE);
          GridDataFactory.fillDefaults().grab(true, false).applyTo(_containerEquipmentGroupHeader);
          GridLayoutFactory.fillDefaults().numColumns(1).applyTo(_containerEquipmentGroupHeader);
-//         _containerTagGroupHeader.setBackground(UI.SYS_COLOR_CYAN);
          {
-            final Label label = UI.createLabel(_containerEquipmentGroupHeader, "Equipment &Groups");
+            final Label label = UI.createLabel(_containerEquipmentGroupHeader, Messages.Pref_Equipment_Label_EquipmentGroups);
             GridDataFactory.fillDefaults()
                   .grab(true, true)
                   .align(SWT.FILL, SWT.END)
-//                  .indent(0, 5)
                   .applyTo(label);
-//            label.setBackground(UI.SYS_COLOR_YELLOW);
          }
 
          createUI_12_Equipment_Groups_Viewer(container);
@@ -355,22 +342,29 @@ public class PrefPageEquipmentGroups extends PreferencePage implements IWorkbenc
       table.setHeaderVisible(false);
       table.setLinesVisible(false);
 
-      TableViewerColumn tvc;
-
       _equipmentViewer_Groups = new TableViewer(table);
 
-      // column: group name
-      tvc = new TableViewerColumn(_equipmentViewer_Groups, SWT.NONE);
+      _equipmentViewer_Groups.setUseHashlookup(true);
+      _equipmentViewer_Groups.setContentProvider(new EquipmentGroupViewer_ContentProvider());
+      _equipmentViewer_Groups.setComparator(new EquipmentGroupViewer_Comparator());
+
+      _equipmentViewer_Groups.addSelectionChangedListener(selectionChangedEvent -> onEquipmentGroup_Select());
+      _equipmentViewer_Groups.addDoubleClickListener(doubleClickEvent -> onEquipmentGroup_Rename());
+
+      /*
+       * Column: Group name
+       */
+      final TableViewerColumn tvc = new TableViewerColumn(_equipmentViewer_Groups, SWT.NONE);
       tvc.setLabelProvider(new StyledCellLabelProvider() {
          @Override
          public void update(final ViewerCell cell) {
 
-            final EquipmentGroup tagGroup = ((EquipmentGroup) cell.getElement());
+            final EquipmentGroup equipmentGroup = ((EquipmentGroup) cell.getElement());
 
             final StyledString styledString = new StyledString();
 
-            styledString.append(tagGroup.name, net.tourbook.ui.UI.CONTENT_CATEGORY_STYLER);
-            styledString.append(UI.SPACE3 + tagGroup.allEquipment.size(), net.tourbook.ui.UI.TOTAL_STYLER);
+            styledString.append(equipmentGroup.name, net.tourbook.ui.UI.CONTENT_CATEGORY_STYLER);
+            styledString.append(UI.SPACE3 + equipmentGroup.allEquipment.size(), net.tourbook.ui.UI.TOTAL_STYLER);
 
             String text = styledString.getString();
 
@@ -385,13 +379,6 @@ public class PrefPageEquipmentGroups extends PreferencePage implements IWorkbenc
       });
 
       tableLayouter.addColumnData(new ColumnWeightData(1));
-
-      _equipmentViewer_Groups.setUseHashlookup(true);
-      _equipmentViewer_Groups.setContentProvider(new EquipmentGroupViewer_ContentProvider());
-      _equipmentViewer_Groups.setComparator(new EquipmentGroupViewer_Comparator());
-
-      _equipmentViewer_Groups.addSelectionChangedListener(selectionChangedEvent -> onEquipmentGroup_Select());
-      _equipmentViewer_Groups.addDoubleClickListener(doubleClickEvent -> onEquipmentGroup_Rename());
    }
 
    private void createUI_20_Equipment_Items(final Composite parent) {
@@ -399,8 +386,6 @@ public class PrefPageEquipmentGroups extends PreferencePage implements IWorkbenc
       final Composite container = new Composite(parent, SWT.NONE);
       GridDataFactory.fillDefaults().grab(true, true).applyTo(container);
       GridLayoutFactory.fillDefaults().numColumns(1).applyTo(container);
-//      container.setBackground(UI.SYS_COLOR_GREEN);
-
       {
          createUI_22_Equipment_Items_Header(container);
          createUI_24_Equipment_Items_Viewer(container);
@@ -412,12 +397,10 @@ public class PrefPageEquipmentGroups extends PreferencePage implements IWorkbenc
       final Composite container = new Composite(parent, SWT.NONE);
       GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
       GridLayoutFactory.fillDefaults().numColumns(2).applyTo(container);
-//      container.setBackground(UI.SYS_COLOR_MAGENTA);
       {
          {
-            // Label: All Tags
-            final Label label = new Label(container, SWT.NONE);
-            label.setText("Available &Equipment");
+            // Label: All equipment
+            final Label label = UI.createLabel(container, Messages.Pref_Equipment_Label_AllEquipment);
             GridDataFactory.fillDefaults()
                   .align(SWT.FILL, SWT.END)
                   .grab(true, true)
@@ -425,7 +408,7 @@ public class PrefPageEquipmentGroups extends PreferencePage implements IWorkbenc
          }
          {
             // toolbar
-            _toolBarAllTags = new ToolBar(container, SWT.FLAT);
+            _toolBarAllEquipment = new ToolBar(container, SWT.FLAT);
          }
       }
    }
@@ -438,27 +421,36 @@ public class PrefPageEquipmentGroups extends PreferencePage implements IWorkbenc
             .hint(50, 100)
             .applyTo(tableLayouter);
 
-      final Table table = new Table(
-            tableLayouter,
-            (SWT.CHECK
-                  | SWT.SINGLE
-                  | SWT.FULL_SELECTION));
+      final Table table = new Table(tableLayouter, SWT.CHECK | SWT.SINGLE | SWT.FULL_SELECTION);
 
       table.setHeaderVisible(false);
       table.setLinesVisible(false);
 
-      table.addKeyListener(KeyListener.keyPressedAdapter(keyEvent -> _tagViewerItem_IsKeyPressed = true));
+      table.addKeyListener(KeyListener.keyPressedAdapter(keyEvent -> _equipmentViewerItem_IsKeyPressed = true));
       table.addSelectionListener(SelectionListener.widgetSelectedAdapter(selectionEvent -> onEquipmentItem_TableSelect(selectionEvent)));
 
       _equipmentViewer_Items = new CheckboxTableViewer(table);
 
       _equipmentViewer_Items.setContentProvider(new EquipmentViewer_ContentProvider());
 
-//      _equipmentViewer.addCheckStateListener(event -> onAction_Check(event));
-//      _equipmentViewer.addDoubleClickListener(event -> onAction_DoubleClick(event));
+      // this is needed that the keyboard works !!!
+      _equipmentViewer_Items.addCheckStateListener(checkStateChangedEvent -> updateUI_EquipmentGroup_FromCheckedEquipment());
       _equipmentViewer_Items.addSelectionChangedListener(event -> onEquipmentItem_ViewerSelect(event));
 
-      defineAllColumn(tableLayouter);
+      final TableViewerColumn tvc = new TableViewerColumn(_equipmentViewer_Items, SWT.NONE);
+
+      tvc.setLabelProvider(new StyledCellLabelProvider() {
+
+         @Override
+         public void update(final ViewerCell cell) {
+
+            final Equipment equipment = ((Equipment) cell.getElement());
+
+            cell.setText(equipment.getName());
+         }
+      });
+
+      tableLayouter.addColumnData(new ColumnWeightData(20));
    }
 
    private void createUI_30_Equipment_Actions(final Composite parent) {
@@ -494,7 +486,10 @@ public class PrefPageEquipmentGroups extends PreferencePage implements IWorkbenc
             _btnCheckAll = new Button(container, SWT.PUSH);
             _btnCheckAll.setText(Messages.App_Action_CheckAll);
             _btnCheckAll.addSelectionListener(SelectionListener.widgetSelectedAdapter(selectionEvent -> onCheckAll(true)));
-            setButtonLayoutData(_btnCheckAll);
+            final GridData gd = setButtonLayoutData(_btnCheckAll);
+
+            // set vertical space to the upper action
+            gd.verticalIndent = 20;
          }
          {
             /*
@@ -506,31 +501,6 @@ public class PrefPageEquipmentGroups extends PreferencePage implements IWorkbenc
             setButtonLayoutData(_btnUncheckAll);
          }
       }
-   }
-
-   private void defineAllColumn(final TableLayoutComposite tableLayouter) {
-
-      defineColumn_10_EquipmentName(tableLayouter);
-   }
-
-   private void defineColumn_10_EquipmentName(final TableLayoutComposite tableLayouter) {
-
-      TableViewerColumn tvc;
-
-      tvc = new TableViewerColumn(_equipmentViewer_Items, SWT.NONE);
-
-      tvc.setLabelProvider(new StyledCellLabelProvider() {
-
-         @Override
-         public void update(final ViewerCell cell) {
-
-            final Equipment equipment = ((Equipment) cell.getElement());
-
-            cell.setText(equipment.getName());
-         }
-      });
-
-      tableLayouter.addColumnData(new ColumnWeightData(20));
    }
 
    @Override
@@ -545,21 +515,23 @@ public class PrefPageEquipmentGroups extends PreferencePage implements IWorkbenc
 
    private void enableControls() {
 
-//      final EquipmentGroup tagGroup = (EquipmentGroup) _equipmentGroupViewer.getStructuredSelection().getFirstElement();
-//
-//      final boolean areTagsAvailable = EquipmentGroupManager.getTagGroups().size() > 0;
-//      final boolean isGroupSelected = tagGroup != null;
-//
-//// SET_FORMATTING_OFF
-//
-//      _btnRename.setEnabled(isGroupSelected);
-//      _btnDelete.setEnabled(isGroupSelected);
-//
-//      _actionTag_Filter    .setEnabled(areTagsAvailable);
-//
-//// SET_FORMATTING_ON
-//
-//      _equipmentViewer.getTable().setEnabled(isGroupSelected);
+      final EquipmentGroup equipmentGroup = (EquipmentGroup) _equipmentViewer_Groups.getStructuredSelection().getFirstElement();
+
+      final boolean areGroupsAvailable = EquipmentGroupManager.getEquipmentGroups().size() > 0;
+      final boolean isGroupSelected = equipmentGroup != null;
+
+// SET_FORMATTING_OFF
+
+      _actionEquipment_Filter .setEnabled(areGroupsAvailable);
+
+      _btnRename              .setEnabled(isGroupSelected);
+      _btnDelete              .setEnabled(isGroupSelected);
+      _btnCheckAll            .setEnabled(isGroupSelected);
+      _btnUncheckAll          .setEnabled(isGroupSelected);
+
+// SET_FORMATTING_ON
+
+      _equipmentViewer_Items.getTable().setEnabled(isGroupSelected);
    }
 
    /**
@@ -568,13 +540,30 @@ public class PrefPageEquipmentGroups extends PreferencePage implements IWorkbenc
    private void fillToolbar() {
 
       /*
-       * Toolbar: All tags
+       * Toolbar: All equipment
        */
-      final ToolBarManager tbmAllTags = new ToolBarManager(_toolBarAllTags);
+      final ToolBarManager tbmAllEquipment = new ToolBarManager(_toolBarAllEquipment);
 
-      tbmAllTags.add(_actionEquipment_Filter);
+      tbmAllEquipment.add(_actionEquipment_Filter);
 
-      tbmAllTags.update(true);
+      tbmAllEquipment.update(true);
+   }
+
+   private long[] getAllCheckedEqipmentIDs() {
+
+      final LongHashSet allCheckedEquipmentIDs = new LongHashSet();
+
+      final Object[] checkedElements = _equipmentViewer_Items.getCheckedElements();
+
+      for (final Object object : checkedElements) {
+
+         if (object instanceof final Equipment equipment) {
+
+            allCheckedEquipmentIDs.add(equipment.getEquipmentId());
+         }
+      }
+
+      return allCheckedEquipmentIDs.toArray();
    }
 
    /**
@@ -590,28 +579,8 @@ public class PrefPageEquipmentGroups extends PreferencePage implements IWorkbenc
             return null;
          }
 
-         return "Name must not be empty";
+         return Messages.Pref_Equipment_Error_NameIsEmpty;
       };
-   }
-
-   private long[] getTagIds_FromTagViewer() {
-
-      final LongHashSet tagIds = new LongHashSet();
-
-      final Object[] checkedElements = _equipmentViewer_Items.getCheckedElements();
-
-      for (final Object object : checkedElements) {
-
-         if (object instanceof TVIPrefTag) {
-
-            final TVIPrefTag tagItem = (TVIPrefTag) object;
-            final long tagId = tagItem.getTourTag().getTagId();
-
-            tagIds.add(tagId);
-         }
-      }
-
-      return tagIds.toArray();
    }
 
    @Override
@@ -621,10 +590,6 @@ public class PrefPageEquipmentGroups extends PreferencePage implements IWorkbenc
    }
 
    private void initUI() {
-
-      _imgTag = TourbookPlugin.getImageDescriptor(Images.Tag).createImage();
-      _imgTagRoot = TourbookPlugin.getImageDescriptor(Images.Tag_Root).createImage();
-      _imgTagCategory = TourbookPlugin.getImageDescriptor(Images.Tag_Category).createImage();
 
       _parent.addDisposeListener(disposeEvent -> onDispose());
    }
@@ -639,34 +604,96 @@ public class PrefPageEquipmentGroups extends PreferencePage implements IWorkbenc
 
    private void onCheckAll(final boolean isChecked) {
 
-      // update model
-//      for (final TourAction tourAction : _allClonedActions) {
-//         tourAction.isChecked = isChecked;
-//      }
-
       // update UI
       _equipmentViewer_Items.setAllChecked(isChecked);
 
       // this is needed that the styler is applied !!!
       _equipmentViewer_Items.refresh();
+
+      updateUI_EquipmentGroup_FromCheckedEquipment();
    }
 
    private void onDispose() {
 
-      _imgTag.dispose();
-      _imgTagRoot.dispose();
-      _imgTagCategory.dispose();
+   }
+
+   private void onEquipment_Filter() {
+
+      // toggle equipment filter
+      _isShowOnlyCheckedEquipment = !_isShowOnlyCheckedEquipment;
+
+      updateUI_EquipmentAfterFiltering();
    }
 
    private void onEquipmentGroup_Delete() {
 
+      final EquipmentGroup equipmentGroup = (EquipmentGroup) _equipmentViewer_Groups.getStructuredSelection().getFirstElement();
+
+      if (equipmentGroup == null) {
+         return;
+      }
+
+      if (new MessageDialog(
+
+            _parent.getShell(),
+
+            Messages.Pref_Equipment_Dialog_DeleteEquipment_Title,
+            null, // no title image
+
+            Messages.Pref_Equipment_Dialog_DeleteEquipment_Message.formatted(equipmentGroup.name),
+            MessageDialog.CONFIRM,
+
+            0, // default index
+
+            Messages.App_Action_Delete,
+            Messages.App_Action_Cancel
+
+      ).open() != IDialogConstants.OK_ID) {
+
+         return;
+      }
+
+      _isModified = true;
+
+      // update model
+      EquipmentGroupManager.removeEquipmentGroup(equipmentGroup);
+
+      // update UI
+      final Table groupTable = _equipmentViewer_Groups.getTable();
+      final int selectionIndex = groupTable.getSelectionIndex();
+
+      _equipmentViewer_Groups.remove(equipmentGroup);
+
+      // select next group
+      final int nextIndex = Math.min(groupTable.getItemCount() - 1, selectionIndex);
+
+      if (nextIndex >= 0) {
+
+         _equipmentViewer_Groups.setSelection(new StructuredSelection(_equipmentViewer_Groups.getElementAt(nextIndex)));
+
+      } else {
+
+         // all groups are deleted
+
+         _selectedEquipmentGroup = null;
+
+         // uncheck all equipment
+         _equipmentViewer_Items.setCheckedElements(new Object[0]);
+
+         // deselect equipment filter
+         _isShowOnlyCheckedEquipment = false;
+
+         updateUI_EquipmentAfterFiltering();
+
+         enableControls();
+      }
    }
 
    private void onEquipmentGroup_New() {
 
       final InputDialog inputDialog = new InputDialog(getShell(),
-            "New Equipment Group",
-            "Equipment group name",
+            Messages.Pref_Equipment_Dialog_NewEquipment_Title,
+            Messages.Pref_Equipment_Dialog_NewEquipment_Message,
             UI.EMPTY_STRING,
             getNameValidator());
 
@@ -678,18 +705,18 @@ public class PrefPageEquipmentGroups extends PreferencePage implements IWorkbenc
 
       _isModified = true;
 
-      // create new tag group
-      final EquipmentGroup tagGroup = new EquipmentGroup();
-      tagGroup.name = inputDialog.getValue().trim();
+      // create new equipment group
+      final EquipmentGroup equipmentGroup = new EquipmentGroup();
+      equipmentGroup.name = inputDialog.getValue().trim();
 
       // update model
-      EquipmentGroupManager.addEquipmentGroup(tagGroup);
+      EquipmentGroupManager.addEquipmentGroup(equipmentGroup);
 
       // update UI
       _equipmentViewer_Groups.setInput(new Object());
 
       // select new group
-      _equipmentViewer_Groups.setSelection(new StructuredSelection(tagGroup), true);
+      _equipmentViewer_Groups.setSelection(new StructuredSelection(equipmentGroup), true);
 
       _equipmentViewer_Items.getTable().setFocus();
    }
@@ -699,8 +726,8 @@ public class PrefPageEquipmentGroups extends PreferencePage implements IWorkbenc
       final EquipmentGroup equipmentGroup = (EquipmentGroup) (_equipmentViewer_Groups.getStructuredSelection()).getFirstElement();
 
       final InputDialog inputDialog = new InputDialog(getShell(),
-            "Rename Tag Group",
-            "Equipment group name",
+            Messages.Pref_Equipment_Dialog_RenameEquipment_Title,
+            Messages.Pref_Equipment_Dialog_RenameEquipment_Message,
             equipmentGroup.name,
             null);
 
@@ -721,61 +748,61 @@ public class PrefPageEquipmentGroups extends PreferencePage implements IWorkbenc
       _equipmentViewer_Groups.setSelection(new StructuredSelection(_selectedEquipmentGroup), true);
       _equipmentViewer_Groups.getTable().setFocus();
 
-      // reselect group tags
+      // reselect group equipment
       onEquipmentGroup_Select();
    }
 
    private void onEquipmentGroup_Select() {
 
-//      final EquipmentGroup tagGroup = (EquipmentGroup) (_equipmentGroupViewer.getStructuredSelection()).getFirstElement();
-//
-//      if (tagGroup == null) {
-//         return;
-//      }
-//
-//      _selectedTagGroup = tagGroup;
-//
-//      _isModified = true;
-//
-//      updateUI_TagViewer(tagGroup.tourTags);
-//
-//      enableControls();
+      final EquipmentGroup equipmentGroup = (EquipmentGroup) (_equipmentViewer_Groups.getStructuredSelection()).getFirstElement();
+
+      if (equipmentGroup == null) {
+         return;
+      }
+
+      _selectedEquipmentGroup = equipmentGroup;
+
+      _isModified = true;
+
+      updateUI_EquipmentViewer(equipmentGroup.allEquipment);
+
+      enableControls();
    }
 
    private void onEquipmentItem_TableSelect(final SelectionEvent selectionEvent) {
 
-      _tagViewerItem_IsChecked = selectionEvent.detail == SWT.CHECK;
+      _equipmentViewerItem_IsChecked = selectionEvent.detail == SWT.CHECK;
 
-      if (_tagViewerItem_IsChecked) {
+      if (_equipmentViewerItem_IsChecked) {
 
          /*
           * Item can be null when <ctrl>+A is pressed !!!
           */
          final Widget item = selectionEvent.item;
 
-         _tagViewerItem_Data = item.getData();
+         _equipmentViewerItem_Data = item.getData();
       }
    }
 
    private void onEquipmentItem_ViewerSelect(final SelectionChangedEvent event) {
 
-      if (_tagViewerItem_IsKeyPressed) {
+      if (_equipmentViewerItem_IsKeyPressed) {
 
          // ignore when selected with keyboard
 
          // reset state
-         _tagViewerItem_IsKeyPressed = false;
+         _equipmentViewerItem_IsKeyPressed = false;
 
          return;
       }
 
       Object selection;
 
-      if (_tagViewerItem_IsChecked) {
+      if (_equipmentViewerItem_IsChecked) {
 
          // the checkbox is selected
 
-         selection = _tagViewerItem_Data;
+         selection = _equipmentViewerItem_Data;
 
       } else {
 
@@ -786,28 +813,20 @@ public class PrefPageEquipmentGroups extends PreferencePage implements IWorkbenc
 
       if (selection instanceof final Equipment equipment) {
 
-         // tag is selected
+         // equipment is selected
 
-         // toggle tag
-         if (_tagViewerItem_IsChecked == false) {
+         // toggle equipment
+         if (_equipmentViewerItem_IsChecked == false) {
 
-            // tag is selected and NOT the checkbox !!!
+            // equipment is selected and NOT the checkbox !!!
 
             final boolean isChecked = _equipmentViewer_Items.getChecked(equipment);
 
             _equipmentViewer_Items.setChecked(equipment, !isChecked);
          }
 
-//         updateUI_Tags_From_TagIds();
+         updateUI_EquipmentGroup_FromCheckedEquipment();
       }
-   }
-
-   private void onTag_Filter() {
-
-      // toggle tag filter
-      _isShowOnlyCheckedTags = !_isShowOnlyCheckedTags;
-
-//      updateUI_TagsAfterFiltering();
    }
 
    @Override
@@ -839,11 +858,40 @@ public class PrefPageEquipmentGroups extends PreferencePage implements IWorkbenc
 
    private void restoreState() {
 
+      /*
+       * Equipment filter
+       */
+      _actionEquipment_Filter.setChecked(_isShowOnlyCheckedEquipment);
+
+      /*
+       * Equipment group
+       */
+      final String selectedGroupName = Util.getStateString(_state, STATE_SELECTED_EQUIPMENT_GROUP, null);
+
+      if (selectedGroupName != null) {
+
+         for (final EquipmentGroup equipmentGroup : EquipmentGroupManager.getEquipmentGroups()) {
+
+            if (selectedGroupName.equals(equipmentGroup.name)) {
+
+               _selectedEquipmentGroup = equipmentGroup;
+
+               break;
+            }
+         }
+
+         if (_selectedEquipmentGroup != null) {
+
+            _equipmentViewer_Groups.setSelection(new StructuredSelection(_selectedEquipmentGroup), true);
+         }
+      }
+
+      updateUI_EquipmentFilter();
    }
 
    private void restoreStateBeforeUI() {
 
-      _isShowOnlyCheckedTags = Util.getStateBoolean(_state, STATE_IS_SHOW_ONLY_TAGS_WHICH_ARE_CHECKED, false);
+      _isShowOnlyCheckedEquipment = Util.getStateBoolean(_state, STATE_IS_SHOW_ONLY_EQUIPMENT_WHICH_ARE_CHECKED, false);
    }
 
    private void saveChanges() {
@@ -855,7 +903,7 @@ public class PrefPageEquipmentGroups extends PreferencePage implements IWorkbenc
          EquipmentGroupManager.saveState();
 
          // fire modify event
-         TourManager.fireEvent(TourEventId.TAG_STRUCTURE_CHANGED);
+         TourManager.fireEvent(TourEventId.EQUIPMENT_STRUCTURE_CHANGED);
       }
 
       saveState();
@@ -863,17 +911,109 @@ public class PrefPageEquipmentGroups extends PreferencePage implements IWorkbenc
 
    private void saveState() {
 
-      _state.put(STATE_IS_SHOW_ONLY_TAGS_WHICH_ARE_CHECKED, _isShowOnlyCheckedTags);
+      _state.put(STATE_IS_SHOW_ONLY_EQUIPMENT_WHICH_ARE_CHECKED, _isShowOnlyCheckedEquipment);
 
       if (_selectedEquipmentGroup != null) {
 
-         _state.put(STATE_SELECTED_TAG_GROUP, _selectedEquipmentGroup.name);
+         _state.put(STATE_SELECTED_EQUIPMENT_GROUP, _selectedEquipmentGroup.name);
       }
+   }
+
+   private void updateUI_EquipmentAfterFiltering() {
+
+      _parent.setRedraw(false);
+      {
+         updateUI_EquipmentFilter();
+      }
+      _parent.setRedraw(true);
+   }
+
+   /**
+    * Set equipment viewer filter which will refilter it
+    */
+   private void updateUI_EquipmentFilter() {
+
+      if (_isShowOnlyCheckedEquipment) {
+
+         _actionEquipment_Filter.setToolTipText(Messages.Pref_Equipment_Action_FilterEquipment_ShowAll_Tooltip);
+
+         _equipmentViewer_Items.setFilters(_equipmentFilter);
+
+      } else {
+
+         _actionEquipment_Filter.setToolTipText(Messages.Pref_Equipment_Action_FilterEquipment_ShowOnlyChecked_Tooltip);
+
+         _equipmentViewer_Items.setFilters();
+      }
+   }
+
+   private void updateUI_EquipmentGroup_FromCheckedEquipment() {
+
+      if (_selectedEquipmentGroup == null) {
+         return;
+      }
+
+      final long[] allCheckedIDs = getAllCheckedEqipmentIDs();
+      final Map<Long, Equipment> allEquipmentByID = EquipmentManager.getAllEquipment_ByID();
+
+      final List<Equipment> allCheckedEquipment = new ArrayList<>();
+
+      for (final long equipmentId : allCheckedIDs) {
+
+         final Equipment equipment = allEquipmentByID.get(equipmentId);
+
+         allCheckedEquipment.add(equipment);
+      }
+
+      // update model
+      _selectedEquipmentGroup.allEquipment.clear();
+      _selectedEquipmentGroup.allEquipment.addAll(allCheckedEquipment);
+
+      // update UI
+      _equipmentViewer_Groups.update(_selectedEquipmentGroup, null);
+
+      _isModified = true;
+
+      enableControls();
+   }
+
+   private void updateUI_EquipmentViewer(final Set<Equipment> allEquipment) {
+
+      final List<Equipment> allCheckedEquipment = new ArrayList<>(allEquipment);
+
+      _parent.setRedraw(false);
+      {
+
+         if (_isShowOnlyCheckedEquipment) {
+
+            // show all equipment -> disable filter
+
+            _equipmentViewer_Items.setFilters();
+         }
+
+         /**
+          * !!! VERY IMPORTANT !!!
+          * <p>
+          * Uncheck all, otherwise a second selection hides the grayed state
+          */
+         _equipmentViewer_Items.setCheckedElements(new Object[0]);
+
+         // update UI
+         _equipmentViewer_Items.setCheckedElements(allCheckedEquipment.toArray());
+
+         if (_isShowOnlyCheckedEquipment) {
+
+            // enable filter
+
+            _equipmentViewer_Items.setFilters(_equipmentFilter);
+         }
+      }
+      _parent.setRedraw(true);
    }
 
    private void updateUI_TopGridRowHeight() {
 
-      final Point toolbarSize = _toolBarAllTags.computeSize(SWT.DEFAULT, SWT.DEFAULT);
+      final Point toolbarSize = _toolBarAllEquipment.computeSize(SWT.DEFAULT, SWT.DEFAULT);
       final int toolbarHeight = toolbarSize.y;
 
       GridData gd = (GridData) _lblActionSpacer.getLayoutData();

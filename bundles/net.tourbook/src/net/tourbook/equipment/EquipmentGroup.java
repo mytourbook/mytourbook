@@ -30,6 +30,7 @@ public class EquipmentGroup {
    public String             id           = UUID.randomUUID().toString();
 
    public String             name;
+
    public Set<Equipment>     allEquipment = new HashSet<>();
 
    public EquipmentGroup() {}

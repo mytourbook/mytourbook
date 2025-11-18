@@ -382,6 +382,7 @@ public class EquipmentGroupManager {
          final IMemento xmlEquipmentGroup = xmlRoot.createChild(EQUIPMENT_GROUP);
          {
             // get all equipment ID's
+
             final LongArrayList allEquipmentIDs = new LongArrayList();
             final Set<Equipment> allEquipment = equipmentGroup.allEquipment;
 
