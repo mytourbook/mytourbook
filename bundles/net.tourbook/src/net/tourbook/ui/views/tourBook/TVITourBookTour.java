@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2024 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2025 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -56,7 +56,6 @@ public class TVITourBookTour extends TVITourBookItem implements Comparable<TVITo
     * Id's for the nutrition products or <code>null</code> when nutrition products are not available
     */
    private ArrayList<Long> _nutritionProductsIds;
-
 
    /**
     * @param view
@@ -177,15 +176,14 @@ public class TVITourBookTour extends TVITourBookItem implements Comparable<TVITo
 
       return NL
 
-            + "TVITourBookTour" + NL //                           //$NON-NLS-1$
+            + "TVITourBookTour" + NL //                              //$NON-NLS-1$
 
-            + "[" + NL //                                         //$NON-NLS-1$
+            + " tourId            = " + tourId + NL //               //$NON-NLS-1$
+//          + " colDateTimeText   = " + colDateTime_Text + NL //     //$NON-NLS-1$
+//          + " colTourDateTime   = " + colTourDateTime + NL //      //$NON-NLS-1$
+//          + " colTourTitle      = " + colTourTitle + NL //         //$NON-NLS-1$
 
-            + "colDateTimeText   = " + colDateTime_Text + NL //    //$NON-NLS-1$
-//          + "colTourDateTime   = " + colTourDateTime + NL //     //$NON-NLS-1$
-            + "colTourTitle      = " + colTourTitle + NL //        //$NON-NLS-1$
-
-            + "]" + NL //                                         //$NON-NLS-1$
+            + NL
       ;
    }
 
