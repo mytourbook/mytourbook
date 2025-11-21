@@ -17,6 +17,8 @@ package net.tourbook.ui.views;
 
 import static org.eclipse.swt.events.SelectionListener.widgetSelectedAdapter;
 
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -28,6 +30,7 @@ import net.tourbook.common.UI;
 import net.tourbook.common.action.ActionResetToDefaults;
 import net.tourbook.common.action.IActionResetToDefault;
 import net.tourbook.common.font.MTFont;
+import net.tourbook.common.time.TimeTools;
 import net.tourbook.common.tooltip.ToolbarSlideout;
 import net.tourbook.common.util.Util;
 import net.tourbook.web.WEB;
@@ -57,28 +60,46 @@ import org.eclipse.swt.widgets.ToolBar;
  */
 class SlideoutTourBlogOptions extends ToolbarSlideout implements IActionResetToDefault {
 
-   private static final IDialogSettings _state_WEB = WEB.getState();
-   private static IDialogSettings       _state;
+   private static final IDialogSettings       _state_WEB      = WEB.getState();
 
-   private ActionResetToDefaults        _actionRestoreDefaults;
+   private static IDialogSettings             _state;
 
-   private TourBlogView                 _tourBlogView;
+// SET_FORMATTING_OFF
 
-   private MouseWheelListener           _defaultMouseWheelListener;
-   private SelectionListener            _defaultSelectionListener;
-   private FocusListener                _keepOpenListener;
+   private static final TimeFormatComboData[] _allTimeFormats =
 
-   private GridDataFactory              _firstColumnLayoutData;
+      new TimeFormatComboData[] {
 
-   private List<String>                 _allSortedFontNames;
+         new TimeFormatComboData(TimeFormat.TIME_SMALL,        TimeTools.Formatter_Time_S.format(LocalTime.now())),
+         new TimeFormatComboData(TimeFormat.TIME_MEDIUM,       TimeTools.Formatter_Time_M.format(LocalTime.now())),
 
-   private PixelConverter               _pc;
+         new TimeFormatComboData(TimeFormat.DATE_TIME_SMALL,   TimeTools.Formatter_DateTime_S.format(LocalDateTime.now())),
+         new TimeFormatComboData(TimeFormat.DATE_TIME_MEDIUM,  TimeTools.Formatter_DateTime_M.format(LocalDateTime.now())),
+      };
+
+// SET_FORMATTING_ON
+
+   private ActionResetToDefaults              _actionRestoreDefaults;
+
+   private TourBlogView                       _tourBlogView;
+
+   private MouseWheelListener                 _defaultMouseWheelListener;
+   private SelectionListener                  _defaultSelectionListener;
+   private FocusListener                      _keepOpenListener;
+
+   private GridDataFactory                    _firstColumnLayoutData;
+   private GridDataFactory                    _secondColumnLayoutData;
+
+   private List<String>                       _allSortedFontNames;
+
+   private PixelConverter                     _pc;
 
    /*
     * UI controls
     */
    private Button  _chkDrawMarkerWithDefaultColor;
    private Button  _chkShowHiddenMarker;
+   private Button  _chkShowMarkerTime;
    private Button  _chkShowTourMarkers;
    private Button  _chkShowTourNutrition;
    private Button  _chkShowTourSummary;
@@ -86,8 +107,30 @@ class SlideoutTourBlogOptions extends ToolbarSlideout implements IActionResetToD
    private Button  _chkShowTourWeather;
 
    private Combo   _comboFonts;
+   private Combo   _comboTimeFormat;
 
    private Spinner _spinnerFontSize;
+
+   static enum TimeFormat {
+
+      TIME_SMALL, //
+      TIME_MEDIUM, //
+
+      DATE_TIME_SMALL, //
+      DATE_TIME_MEDIUM, //
+   }
+
+   private static class TimeFormatComboData {
+
+      String     label;
+      TimeFormat timeFormat;
+
+      private TimeFormatComboData(final TimeFormat timeFormat, final String label) {
+
+         this.timeFormat = timeFormat;
+         this.label = label;
+      }
+   }
 
    /**
     * @param ownerControl
@@ -254,7 +297,26 @@ class SlideoutTourBlogOptions extends ToolbarSlideout implements IActionResetToD
                _chkDrawMarkerWithDefaultColor.setToolTipText(Messages.Slideout_ChartMarkerOptions_Checkbox_IsShowMarkerWithDefaultColor_Tooltip);
                _chkDrawMarkerWithDefaultColor.addSelectionListener(_defaultSelectionListener);
                _firstColumnLayoutData.span(3, 1).applyTo(_chkDrawMarkerWithDefaultColor);
+            }
+            {
+               /*
+                * Display marker time
+                */
 
+               _chkShowMarkerTime = new Button(container, SWT.CHECK);
+               _chkShowMarkerTime.setText(Messages.Slideout_TourBlogOptions_Checkbox_ShowMarkerTime);
+               _chkShowMarkerTime.addSelectionListener(_defaultSelectionListener);
+               _firstColumnLayoutData.span(3, 1).applyTo(_chkShowMarkerTime);
+            }
+            {
+               /*
+                * Time format
+                */
+               _comboTimeFormat = new Combo(container, SWT.DROP_DOWN | SWT.READ_ONLY);
+               _comboTimeFormat.setVisibleItemCount(20);
+               _comboTimeFormat.addSelectionListener(_defaultSelectionListener);
+               _comboTimeFormat.addFocusListener(_keepOpenListener);
+               _secondColumnLayoutData.span(3, 1).applyTo(_comboTimeFormat);
             }
          }
          {
@@ -300,12 +362,20 @@ class SlideoutTourBlogOptions extends ToolbarSlideout implements IActionResetToD
       }
    }
 
-   public void enableControls() {
+   private void enableControls() {
 
-      final boolean isShowTourMarkers = _chkShowTourMarkers.getSelection();
+// SET_FORMATTING_OFF
 
-      _chkDrawMarkerWithDefaultColor.setEnabled(isShowTourMarkers);
-      _chkShowHiddenMarker.setEnabled(isShowTourMarkers);
+      final boolean isShowTourMarkers  = _chkShowTourMarkers.getSelection();
+      final boolean isShowMarkerTime   = _chkShowMarkerTime.getSelection();
+
+      _chkDrawMarkerWithDefaultColor   .setEnabled(isShowTourMarkers);
+      _chkShowHiddenMarker             .setEnabled(isShowTourMarkers);
+      _chkShowMarkerTime               .setEnabled(isShowTourMarkers);
+
+      _comboTimeFormat                 .setEnabled(isShowTourMarkers && isShowMarkerTime);
+
+// SET_FORMATTING_ON
    }
 
    private void fillUI() {
@@ -327,8 +397,11 @@ class SlideoutTourBlogOptions extends ToolbarSlideout implements IActionResetToD
       java.util.Collections.sort(_allSortedFontNames);
 
       for (final String fontName : _allSortedFontNames) {
-
          _comboFonts.add(fontName);
+      }
+
+      for (final TimeFormatComboData data : _allTimeFormats) {
+         _comboTimeFormat.add(data.label);
       }
    }
 
@@ -371,6 +444,36 @@ class SlideoutTourBlogOptions extends ToolbarSlideout implements IActionResetToD
       return WEB.STATE_BODY_FONT_DEFAULT;
    }
 
+   private TimeFormat getSelectedTimeFormat() {
+
+      final int selectedIndex = _comboTimeFormat.getSelectionIndex();
+
+      if (selectedIndex < 0) {
+         return TimeFormat.TIME_SMALL;
+      }
+
+      final TimeFormatComboData selectedData = _allTimeFormats[selectedIndex];
+
+      return selectedData.timeFormat;
+   }
+
+   private int getTimeFormatIndex(final TimeFormat requestedData) {
+
+      final TimeFormatComboData[] allData = _allTimeFormats;
+
+      for (int dataIndex = 0; dataIndex < allData.length; dataIndex++) {
+
+         final TimeFormatComboData data = allData[dataIndex];
+
+         if (data.timeFormat.equals(requestedData)) {
+            return dataIndex;
+         }
+      }
+
+      // this should not happen
+      return 0;
+   }
+
    private void initUI(final Composite parent) {
 
       _pc = new PixelConverter(parent);
@@ -402,6 +505,12 @@ class SlideoutTourBlogOptions extends ToolbarSlideout implements IActionResetToD
       _firstColumnLayoutData = GridDataFactory.fillDefaults()
             .indent(firstColumnIndent, 0)
             .align(SWT.FILL, SWT.CENTER);
+
+      final int secondColumnIndent = _pc.convertWidthInCharsToPixels(6);
+
+      _secondColumnLayoutData = GridDataFactory.fillDefaults()
+            .indent(secondColumnIndent, 0)
+            .align(SWT.FILL, SWT.CENTER);
    }
 
    private void onChangeUI() {
@@ -418,8 +527,9 @@ class SlideoutTourBlogOptions extends ToolbarSlideout implements IActionResetToD
 
 // SET_FORMATTING_OFF
 
-      _chkDrawMarkerWithDefaultColor   .setSelection(TourBlogView.STATE_IS_DRAW_MARKER_WITH_DEFAULT_COLOR_DEFAULT);
       _chkShowHiddenMarker             .setSelection(TourBlogView.STATE_IS_SHOW_HIDDEN_MARKER_DEFAULT);
+      _chkShowMarkerTime               .setSelection(TourBlogView.STATE_IS_SHOW_MARKER_TIME_DEFAULT);
+      _chkDrawMarkerWithDefaultColor   .setSelection(TourBlogView.STATE_IS_DRAW_MARKER_WITH_DEFAULT_COLOR_DEFAULT);
       _chkShowTourMarkers              .setSelection(TourBlogView.STATE_IS_SHOW_TOUR_MARKERS_DEFAULT);
       _chkShowTourNutrition            .setSelection(TourBlogView.STATE_IS_SHOW_TOUR_NUTRITION_DEFAULT);
       _chkShowTourSummary              .setSelection(TourBlogView.STATE_IS_SHOW_TOUR_SUMMARY_DEFAULT);
@@ -428,6 +538,8 @@ class SlideoutTourBlogOptions extends ToolbarSlideout implements IActionResetToD
 
       _comboFonts                      .select(getFontIndex(WEB.STATE_BODY_FONT_DEFAULT));
       _spinnerFontSize                 .setSelection(WEB.STATE_BODY_FONT_SIZE_DEFAULT);
+
+      _comboTimeFormat                 .select(getTimeFormatIndex(TourBlogView.STATE_TIME_FORMAT_DEFAULT));
 
 // SET_FORMATTING_ON
 
@@ -438,10 +550,13 @@ class SlideoutTourBlogOptions extends ToolbarSlideout implements IActionResetToD
 
    private void restoreState() {
 
+      final TimeFormat timeFormat = (TimeFormat) Util.getStateEnum(_state, TourBlogView.STATE_TIME_FORMAT, TourBlogView.STATE_TIME_FORMAT_DEFAULT);
+
 // SET_FORMATTING_OFF
 
-      _chkDrawMarkerWithDefaultColor   .setSelection(Util.getStateBoolean(_state, TourBlogView.STATE_IS_DRAW_MARKER_WITH_DEFAULT_COLOR,  TourBlogView.STATE_IS_DRAW_MARKER_WITH_DEFAULT_COLOR_DEFAULT));
       _chkShowHiddenMarker             .setSelection(Util.getStateBoolean(_state, TourBlogView.STATE_IS_SHOW_HIDDEN_MARKER,              TourBlogView.STATE_IS_SHOW_HIDDEN_MARKER_DEFAULT));
+      _chkShowMarkerTime               .setSelection(Util.getStateBoolean(_state, TourBlogView.STATE_IS_SHOW_MARKER_TIME,                 TourBlogView.STATE_IS_SHOW_MARKER_TIME_DEFAULT));
+      _chkDrawMarkerWithDefaultColor   .setSelection(Util.getStateBoolean(_state, TourBlogView.STATE_IS_DRAW_MARKER_WITH_DEFAULT_COLOR,  TourBlogView.STATE_IS_DRAW_MARKER_WITH_DEFAULT_COLOR_DEFAULT));
       _chkShowTourMarkers              .setSelection(Util.getStateBoolean(_state, TourBlogView.STATE_IS_SHOW_TOUR_MARKERS,               TourBlogView.STATE_IS_SHOW_TOUR_MARKERS_DEFAULT));
       _chkShowTourNutrition            .setSelection(Util.getStateBoolean(_state, TourBlogView.STATE_IS_SHOW_TOUR_NUTRITION,             TourBlogView.STATE_IS_SHOW_TOUR_NUTRITION_DEFAULT));
       _chkShowTourSummary              .setSelection(Util.getStateBoolean(_state, TourBlogView.STATE_IS_SHOW_TOUR_SUMMARY,               TourBlogView.STATE_IS_SHOW_TOUR_SUMMARY_DEFAULT));
@@ -450,6 +565,8 @@ class SlideoutTourBlogOptions extends ToolbarSlideout implements IActionResetToD
 
       _comboFonts                      .select(getFontIndex(Util.getStateString  (_state_WEB, WEB.STATE_BODY_FONT,       WEB.STATE_BODY_FONT_DEFAULT)));
       _spinnerFontSize                 .setSelection(Util.getStateInt            (_state_WEB, WEB.STATE_BODY_FONT_SIZE,  WEB.STATE_BODY_FONT_SIZE_DEFAULT));
+
+      _comboTimeFormat                 .select(getTimeFormatIndex( timeFormat));
 
 // SET_FORMATTING_ON
 
@@ -462,6 +579,7 @@ class SlideoutTourBlogOptions extends ToolbarSlideout implements IActionResetToD
 
       _state.put(TourBlogView.STATE_IS_DRAW_MARKER_WITH_DEFAULT_COLOR,  _chkDrawMarkerWithDefaultColor   .getSelection());
       _state.put(TourBlogView.STATE_IS_SHOW_HIDDEN_MARKER,              _chkShowHiddenMarker             .getSelection());
+      _state.put(TourBlogView.STATE_IS_SHOW_MARKER_TIME,                _chkShowMarkerTime               .getSelection());
       _state.put(TourBlogView.STATE_IS_SHOW_TOUR_MARKERS,               _chkShowTourMarkers              .getSelection());
       _state.put(TourBlogView.STATE_IS_SHOW_TOUR_NUTRITION,             _chkShowTourNutrition            .getSelection());
       _state.put(TourBlogView.STATE_IS_SHOW_TOUR_SUMMARY,               _chkShowTourSummary              .getSelection());
@@ -471,7 +589,8 @@ class SlideoutTourBlogOptions extends ToolbarSlideout implements IActionResetToD
       _state_WEB.put(WEB.STATE_BODY_FONT,                               getSelectedFont());
       _state_WEB.put(WEB.STATE_BODY_FONT_SIZE,                          _spinnerFontSize                 .getSelection());
 
+      Util.setStateEnum(_state, TourBlogView.STATE_TIME_FORMAT, getSelectedTimeFormat());
+
 // SET_FORMATTING_ON
    }
-
 }
