@@ -1951,7 +1951,7 @@ public class TourBookView extends ViewPart implements
       _tourViewer_NatTable.addConfiguration(new NatTable_Configuration_Hover());
 
 //    // add debug menu, this will hide MT context menu
-//    _tourViewer_NatTable.addConfiguration(new DebugMenuConfiguration(_tourViewer_NatTable));
+//      _tourViewer_NatTable.addConfiguration(new DebugMenuConfiguration(_tourViewer_NatTable));
 
       _tourViewer_NatTable.configure();
 
@@ -3158,9 +3158,6 @@ public class TourBookView extends ViewPart implements
 //         final ArrayList<SortDirectionEnum> sortDirection = _natTable_DataLoader.getSortDirections();
 //         final String[] sortColumnId = _natTable_DataLoader.getSortColumnIds();
 
-//         System.out.println((System.currentTimeMillis() + " " + sortColumnId));
-//         // TODO remove SYSTEM.OUT.PRINTLN
-
          /*
           * TODO Have no idea why this is necessary: needs an offset to make row visible, otherwise
           * it is hidden, depending on the sort direction and column :-?
@@ -3863,9 +3860,39 @@ public class TourBookView extends ViewPart implements
          return;
       }
 
-      _natTable_DataLoader.resetTourItems(true);
-
       if (_isLayoutNatTable) {
+
+         /**
+          * The postFetchRunnable ensures that the tour reselection is done, AFTER the tours are
+          * reloaded, otherwise only one tour is selected when multiple tours were selected
+          * <p>
+          * This is a fix for https://github.com/mytourbook/mytourbook/issues/1603
+          */
+
+         final Runnable postFetchRunnable = new Runnable() {
+
+            @Override
+            public void run() {
+
+               if (_parent.isDisposed()) {
+                  return;
+               }
+
+               _parent.getDisplay().asyncExec(() -> {
+
+                  /*
+                   * !!! Setting the focus is disabled because it would activate this view which is
+                   * annoying when another view has the focus !!!
+                   */
+                  reselectTourViewer(false);
+               });
+            }
+         };
+
+         _natTable_DataLoader.setPostFetchRunnable(postFetchRunnable);
+
+         // cleanup all loaded data that the next time they are newly fetched when requested.
+         _natTable_DataLoader.resetTourItems(true);
 
          _tourViewer_NatTable.setRedraw(false);
          _isInSelection = true;
@@ -3874,12 +3901,6 @@ public class TourBookView extends ViewPart implements
          }
          _isInSelection = false;
          _tourViewer_NatTable.setRedraw(true);
-
-         /*
-          * !!! Setting the focus is disabled because it would activate this view which is annoying
-          * when another view has the focus !!!
-          */
-         reselectTourViewer(false);
 
       } else {
 
@@ -3997,10 +4018,13 @@ public class TourBookView extends ViewPart implements
 
          _natTable_DataLoader.getRowIndexFromTourId(_selectedTourIds).thenAccept(allRowPositions -> {
 
-            selectTours_NatTable(allRowPositions,
+            selectTours_NatTable(
+
+                  allRowPositions,
 
                   true, // isClearSelection
                   true, // isScrollIntoView
+
                   isFireSelection);
          });
       }
@@ -4439,6 +4463,11 @@ public class TourBookView extends ViewPart implements
 
       final int[] allRowPositions_Final = allRowPositions;
 
+      /**
+       * This async is necessary that it runs in the display thread otherwise there is an
+       * <p>
+       * org.eclipse.swt.SWTException: Invalid thread access
+       */
       _parent.getDisplay().asyncExec(() -> {
 
          if (_parent.isDisposed()) {
@@ -4446,6 +4475,7 @@ public class TourBookView extends ViewPart implements
          }
 
          selectTours_NatTable_Runnable(
+
                allRowPositions_Final,
                isClearSelection,
                isScrollIntoView,
@@ -4457,6 +4487,7 @@ public class TourBookView extends ViewPart implements
                                               final boolean isClearSelection,
                                               final boolean isScrollIntoView,
                                               final boolean isFireSelection) {
+
       /*
        * Prevent that _tourViewer_NatTable.setFocus() is firing a part selection which would
        * case the 2D map crumb to show the last part selection
@@ -4477,12 +4508,14 @@ public class TourBookView extends ViewPart implements
       }
 
       final SelectRowsCommand command = new SelectRowsCommand(
-            _natTable_Body_SelectionLayer,
-            0,
-            allRowPositions,
-            false,
-            true,
-            firstRowPosition);
+            _natTable_Body_SelectionLayer, //   layer,
+            0, //                               columnPosition,
+            allRowPositions, //                 rowPositions,
+            false, //                           withShiftMask,
+            true, //                            withControlMask,
+            firstRowPosition //                 rowPositionToMoveIntoViewport
+
+      );
 
       final boolean isPreventSelection = isFireSelection == false;
 

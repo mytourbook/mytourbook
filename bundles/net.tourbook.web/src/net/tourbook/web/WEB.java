@@ -22,6 +22,7 @@ import java.io.File;
 import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLDecoder;
 import java.util.ArrayList;
@@ -533,9 +534,9 @@ public class WEB {
       try {
 
          final IWebBrowser browser = support.getExternalBrowser();
-         browser.openURL(new URL(encodeSpace(href)));
+         browser.openURL(new URI(encodeSpace(href)).toURL());
 
-      } catch (final MalformedURLException | PartInitException e) {
+      } catch (final MalformedURLException | PartInitException | URISyntaxException e) {
          StatusUtil.showStatus(e);
       }
    }

@@ -22,6 +22,7 @@ import com.linkedin.urls.detection.UrlDetectorOptions;
 import java.io.File;
 import java.text.NumberFormat;
 import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -69,6 +70,7 @@ import net.tourbook.tour.TourEvent;
 import net.tourbook.tour.TourEventId;
 import net.tourbook.tour.TourManager;
 import net.tourbook.ui.tourChart.TourChart;
+import net.tourbook.ui.views.SlideoutTourBlogOptions.TimeFormat;
 import net.tourbook.ui.views.referenceTour.SelectionReferenceTourView;
 import net.tourbook.ui.views.referenceTour.TVIElevationCompareResult_ComparedTour;
 import net.tourbook.ui.views.referenceTour.TVIRefTour_ComparedTour;
@@ -78,7 +80,7 @@ import net.tourbook.web.WEB;
 
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.RandomStringUtils;
-import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.layout.GridDataFactory;
@@ -107,43 +109,47 @@ import org.eclipse.ui.part.ViewPart;
 
 public class TourBlogView extends ViewPart {
 
-   static final String         ID                                              = "net.tourbook.ui.views.TourBlogView";      //$NON-NLS-1$
+   static final String         ID                                              = "net.tourbook.ui.views.TourBlogView";         //$NON-NLS-1$
 
    private static final String NL                                              = UI.NEW_LINE1;
 
-   private static final String SPACER                                          = "<div>&nbsp;</div>";                       //$NON-NLS-1$
+   private static final String SPACER                                          = "<div>&nbsp;</div>";                          //$NON-NLS-1$
 
-   private static final String TOUR_BLOG_CSS                                   = "/tourbook/resources/tour-blog.css";       //$NON-NLS-1$
+   private static final String TOUR_BLOG_CSS                                   = "/tourbook/resources/tour-blog.css";          //$NON-NLS-1$
 
-   static final String         STATE_IS_DRAW_MARKER_WITH_DEFAULT_COLOR         = "STATE_IS_DRAW_MARKER_WITH_DEFAULT_COLOR"; //$NON-NLS-1$
+   static final String         STATE_IS_DRAW_MARKER_WITH_DEFAULT_COLOR         = "STATE_IS_DRAW_MARKER_WITH_DEFAULT_COLOR";    //$NON-NLS-1$
    static final boolean        STATE_IS_DRAW_MARKER_WITH_DEFAULT_COLOR_DEFAULT = false;
-   static final String         STATE_IS_SHOW_HIDDEN_MARKER                     = "STATE_IS_SHOW_HIDDEN_MARKER";             //$NON-NLS-1$
+   static final String         STATE_IS_SHOW_HIDDEN_MARKER                     = "STATE_IS_SHOW_HIDDEN_MARKER";                //$NON-NLS-1$
    static final boolean        STATE_IS_SHOW_HIDDEN_MARKER_DEFAULT             = true;
-   static final String         STATE_IS_SHOW_TOUR_MARKERS                      = "STATE_IS_SHOW_TOUR_MARKERS";              //$NON-NLS-1$
+   static final String         STATE_IS_SHOW_MARKER_TIME                       = "STATE_IS_SHOW_MARKER_TIME";                  //$NON-NLS-1$
+   static final boolean        STATE_IS_SHOW_MARKER_TIME_DEFAULT               = false;
+   static final String         STATE_IS_SHOW_TOUR_MARKERS                      = "STATE_IS_SHOW_TOUR_MARKERS";                 //$NON-NLS-1$
    static final boolean        STATE_IS_SHOW_TOUR_MARKERS_DEFAULT              = true;
-   static final String         STATE_IS_SHOW_TOUR_NUTRITION                    = "STATE_IS_SHOW_TOUR_NUTRITION";            //$NON-NLS-1$
+   static final String         STATE_IS_SHOW_TOUR_NUTRITION                    = "STATE_IS_SHOW_TOUR_NUTRITION";               //$NON-NLS-1$
    static final boolean        STATE_IS_SHOW_TOUR_NUTRITION_DEFAULT            = true;
-   static final String         STATE_IS_SHOW_TOUR_SUMMARY                      = "STATE_IS_SHOW_TOUR_SUMMARY";              //$NON-NLS-1$
+   static final String         STATE_IS_SHOW_TOUR_SUMMARY                      = "STATE_IS_SHOW_TOUR_SUMMARY";                 //$NON-NLS-1$
    static final boolean        STATE_IS_SHOW_TOUR_SUMMARY_DEFAULT              = true;
-   static final String         STATE_IS_SHOW_TOUR_TAGS                         = "STATE_IS_SHOW_TOUR_TAGS";                 //$NON-NLS-1$
+   static final String         STATE_IS_SHOW_TOUR_TAGS                         = "STATE_IS_SHOW_TOUR_TAGS";                    //$NON-NLS-1$
    static final boolean        STATE_IS_SHOW_TOUR_TAGS_DEFAULT                 = true;
-   static final String         STATE_IS_SHOW_TOUR_WEATHER                      = "STATE_IS_SHOW_TOUR_WEATHER";              //$NON-NLS-1$
+   static final String         STATE_IS_SHOW_TOUR_WEATHER                      = "STATE_IS_SHOW_TOUR_WEATHER";                 //$NON-NLS-1$
    static final boolean        STATE_IS_SHOW_TOUR_WEATHER_DEFAULT              = true;
+   static final String         STATE_TIME_FORMAT                               = "STATE_TIME_FORMAT";                          //$NON-NLS-1$
+   static final TimeFormat     STATE_TIME_FORMAT_DEFAULT                       = SlideoutTourBlogOptions.TimeFormat.TIME_SMALL;
 
-   private static final String EXTERNAL_LINK_URL                               = "http";                                    //$NON-NLS-1$
-   private static final String HREF_TOKEN                                      = "#";                                       //$NON-NLS-1$
-   private static final String PAGE_ABOUT_BLANK                                = "about:blank";                             //$NON-NLS-1$
+   private static final String EXTERNAL_LINK_URL                               = "http";                                       //$NON-NLS-1$
+   private static final String HREF_TOKEN                                      = "#";                                          //$NON-NLS-1$
+   private static final String PAGE_ABOUT_BLANK                                = "about:blank";                                //$NON-NLS-1$
 
    /**
     * This is necessary otherwise XULrunner in Linux do not fire a location change event.
     */
-   private static final String HTTP_DUMMY                                      = "http://dummy";                            //$NON-NLS-1$
+   private static final String HTTP_DUMMY                                      = "http://dummy";                               //$NON-NLS-1$
 
-   private static final String ACTION_EDIT_TOUR                                = "EditTour";                                //$NON-NLS-1$
-   private static final String ACTION_EDIT_MARKER                              = "EditMarker";                              //$NON-NLS-1$
-   private static final String ACTION_HIDE_MARKER                              = "HideMarker";                              //$NON-NLS-1$
-   private static final String ACTION_OPEN_MARKER                              = "OpenMarker";                              //$NON-NLS-1$
-   private static final String ACTION_SHOW_MARKER                              = "ShowMarker";                              //$NON-NLS-1$
+   private static final String ACTION_EDIT_TOUR                                = "EditTour";                                   //$NON-NLS-1$
+   private static final String ACTION_EDIT_MARKER                              = "EditMarker";                                 //$NON-NLS-1$
+   private static final String ACTION_HIDE_MARKER                              = "HideMarker";                                 //$NON-NLS-1$
+   private static final String ACTION_OPEN_MARKER                              = "OpenMarker";                                 //$NON-NLS-1$
+   private static final String ACTION_SHOW_MARKER                              = "ShowMarker";                                 //$NON-NLS-1$
 
    private static String       HREF_EDIT_TOUR;
    private static String       HREF_EDIT_MARKER;
@@ -192,6 +198,7 @@ public class TourBlogView extends ViewPart {
 
    private boolean                 _isDrawWithDefaultColor;
    private boolean                 _isShowHiddenMarker;
+   private boolean                 _isShowMarkerTime;
    private boolean                 _isShowTourMarkers;
    private boolean                 _isShowTourNutrition;
    private boolean                 _isShowTourSummary;
@@ -201,6 +208,8 @@ public class TourBlogView extends ViewPart {
    private Long                    _reloadedTourMarkerId;
 
    private ActionTourBlogOptions   _actionTourBlogOptions;
+
+   private TimeFormat              _timeFormat;
 
    /*
     * UI controls
@@ -361,11 +370,11 @@ public class TourBlogView extends ViewPart {
          final HashMap<String, Url> detectedUrlMap = new HashMap<>();
          for (final Url detectedUrl : detectedUrls) {
 
-            final String randomString = RandomStringUtils.random(10, true, true);
+            final String randomString = RandomStringUtils.secure().next(10, true, true);
             detectedUrlMap.put(randomString, detectedUrl);
 
             final String originalUrl = detectedUrl.getOriginalUrl();
-            tourDescription = StringUtils.replaceOnce(tourDescription, originalUrl, randomString);
+            tourDescription = Strings.CS.replaceOnce(tourDescription, originalUrl, randomString);
          }
 
          for (final Map.Entry<String, Url> set : detectedUrlMap.entrySet()) {
@@ -879,6 +888,38 @@ public class TourBlogView extends ViewPart {
          markerLabel = UI.scrambleText(markerLabel);
       }
 
+      String markerTimeText = null;
+      if (_isShowMarkerTime) {
+
+         final long markerTime = tourMarker.getMarkerTime();
+
+         DateTimeFormatter dateTimeFormatter;
+
+         if (_timeFormat.equals(TimeFormat.DATE_TIME_SMALL)) {
+
+            dateTimeFormatter = TimeTools.Formatter_DateTime_S;
+
+         } else if (_timeFormat.equals(TimeFormat.DATE_TIME_MEDIUM)) {
+
+            dateTimeFormatter = TimeTools.Formatter_DateTime_M;
+
+         } else if (_timeFormat.equals(TimeFormat.TIME_MEDIUM)) {
+
+            dateTimeFormatter = TimeTools.Formatter_Time_M;
+
+         } else {
+
+            // TimeFormat.SMALL
+
+            dateTimeFormatter = TimeTools.Formatter_Time_S;
+         }
+
+         markerTimeText = TimeTools.getZonedDateTime(markerTime).format(dateTimeFormatter);
+
+         // am/pm contains a space which can break the line
+         markerTimeText = markerTimeText.replace(UI.SPACE1, WEB.NONE_BREAKING_SPACE);
+      }
+
       final String hrefOpenMarker = HTTP_DUMMY + HREF_OPEN_MARKER + markerId;
       final String hrefEditMarker = HTTP_DUMMY + HREF_EDIT_MARKER + markerId;
       final String hrefHideMarker = HTTP_DUMMY + HREF_HIDE_MARKER + markerId;
@@ -890,7 +931,7 @@ public class TourBlogView extends ViewPart {
       final String hoverShowMarker = WEB.escapeSingleQuote(NLS.bind(Messages.Tour_Blog_Action_ShowMarker_Tooltip, markerLabel));
 
       /*
-       * get color by priority
+       * Get color by priority
        */
       String cssMarkerColor;
 
@@ -916,43 +957,100 @@ public class TourBlogView extends ViewPart {
 
       final String htmlMarkerStyle = " style='color:" + cssMarkerColor + "'"; //$NON-NLS-1$ //$NON-NLS-2$
 
-      final String htmlActionShowHideMarker = tourMarker.isMarkerVisible() //
+      final String htmlActionShowHideMarker = tourMarker.isMarkerVisible()
             ? createHtml_Action(hrefHideMarker, hoverHideMarker, _imageUrl_ActionHideMarker)
             : createHtml_Action(hrefShowMarker, hoverShowMarker, _imageUrl_ActionShowMarker);
 
-      final String htmlActionContainer = UI.EMPTY_STRING //
-            + "<div class='action-container'>" //$NON-NLS-1$
-            + ("<table><tbody><tr>") //$NON-NLS-1$
-            + ("<td>" + htmlActionShowHideMarker + "</td>") //$NON-NLS-1$ //$NON-NLS-2$
-            + ("<td>" + createHtml_Action(hrefEditMarker, hoverEditMarker, _imageUrl_ActionEdit) + "</td>") //$NON-NLS-1$ //$NON-NLS-2$
-            + "</tr></tbody></table>" // //$NON-NLS-1$
-            + "</div>" + NL; //$NON-NLS-1$
+      final String htmlActionEdit = createHtml_Action(hrefEditMarker, hoverEditMarker, _imageUrl_ActionEdit);
 
-      sb.append("<div class='title'>" + NL //$NON-NLS-1$
+      final String htmlActionContainer = UI.EMPTY_STRING
 
+            + "<div class='action-container'>" //                          //$NON-NLS-1$
+            + "<table><tbody><tr>" //                                      //$NON-NLS-1$
+            + "   <td>" + htmlActionShowHideMarker + "</td>" //            //$NON-NLS-1$ //$NON-NLS-2$
+            + "   <td>" + htmlActionEdit + "</td>" //                      //$NON-NLS-1$ //$NON-NLS-2$
+            + "</tr></tbody></table>" //                                   //$NON-NLS-1$
+            + "</div>" + NL //                                             //$NON-NLS-1$
+      ;
+
+      final String htmlTitleText = UI.EMPTY_STRING
+
+            + "<a class='label-text'" //                                   //$NON-NLS-1$
+            + htmlMarkerStyle
+            + " href='" + hrefOpenMarker + "'" //                          //$NON-NLS-1$ //$NON-NLS-2$
+            + " name='" + createHtml_MarkerName(markerId) + "'" //         //$NON-NLS-1$ //$NON-NLS-2$
+            + " title='" + hoverOpenMarker + "'" //                        //$NON-NLS-1$ //$NON-NLS-2$
+            + ">" + markerLabel + "</a>" + NL //                           //$NON-NLS-1$ //$NON-NLS-2$
+      ;
+
+      final String htmlTitle = UI.EMPTY_STRING
+
+            + "<div class='title'>" + NL //$NON-NLS-1$
             + htmlActionContainer
+            + htmlTitleText
+            + "</div>" + NL //$NON-NLS-1$
+      ;
 
-            + ("<a class='label-text'" //$NON-NLS-1$
-                  + htmlMarkerStyle
-                  + (" href='" + hrefOpenMarker + "'") //$NON-NLS-1$ //$NON-NLS-2$
-                  + (" name='" + createHtml_MarkerName(markerId) + "'") //$NON-NLS-1$ //$NON-NLS-2$
-                  + (" title='" + hoverOpenMarker + "'") //$NON-NLS-1$ //$NON-NLS-2$
-                  + ">" + markerLabel + "</a>" + NL) //$NON-NLS-1$ //$NON-NLS-2$
-
-            + "</div>" + NL); //$NON-NLS-1$
       /*
        * Description
        */
       final String description = tourMarker.getDescription();
-      String descriptionWithLineBreaks = WEB.convertHTML_LineBreaks(description);
+      final boolean isDescription = description.trim().length() > 0;
 
-      if (UI.IS_SCRAMBLE_DATA) {
-         descriptionWithLineBreaks = UI.scrambleText(descriptionWithLineBreaks);
+      String htmlDescription = UI.EMPTY_STRING;
+      String htmlDescriptionRow = UI.EMPTY_STRING;
+
+      if (isDescription) {
+
+         String htmlDescriptionWithLineBreaks = WEB.convertHTML_LineBreaks(description);
+
+         if (UI.IS_SCRAMBLE_DATA) {
+            htmlDescriptionWithLineBreaks = UI.scrambleText(htmlDescriptionWithLineBreaks);
+         }
+
+         htmlDescription = UI.EMPTY_STRING
+
+               + "<a class='label-text' href='" + hrefOpenMarker + "' title='" + hoverOpenMarker + "'>" + NL //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+               + "   <p class='description'" + htmlMarkerStyle + ">" + htmlDescriptionWithLineBreaks + "</p>" + NL //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+               + "</a>" + NL //$NON-NLS-1$
+         ;
+
+         htmlDescriptionRow = UI.EMPTY_STRING
+
+               + "<tr>" + NL //                                            //$NON-NLS-1$
+               + "   <td>" + WEB.NONE_BREAKING_SPACE + "</td>" + NL //     //$NON-NLS-1$ //$NON-NLS-2$
+               + "   <td>" + htmlDescription + "</td>" + NL //             //$NON-NLS-1$ //$NON-NLS-2$
+               + "</tr>" + NL //                                           //$NON-NLS-1$
+         ;
       }
 
-      sb.append("<a class='label-text' href='" + hrefOpenMarker + "' title='" + hoverOpenMarker + "'>" + NL); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-      sb.append("   <p class='description'" + htmlMarkerStyle + ">" + descriptionWithLineBreaks + "</p>" + NL); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-      sb.append("</a>" + NL); //$NON-NLS-1$
+      /*
+       * Conbine title and description
+       */
+      String htmlMarker;
+      if (_isShowMarkerTime) {
+
+         htmlMarker = UI.EMPTY_STRING
+
+               + "<table border='0' cellpadding=5><tbody>" + NL //         //$NON-NLS-1$
+
+               + "<tr>" + NL //                                            //$NON-NLS-1$
+               + "   <td>" + markerTimeText + "</td>" + NL //              //$NON-NLS-1$ //$NON-NLS-2$
+               + "   <td>" + htmlTitle + "</td>" + NL //                   //$NON-NLS-1$ //$NON-NLS-2$
+               + "</tr>" + NL //                                           //$NON-NLS-1$
+
+               + htmlDescriptionRow
+
+               + "</tbody></table>" + NL //                                //$NON-NLS-1$
+               + "</div>" + NL //                                          //$NON-NLS-1$
+         ;
+
+      } else {
+
+         htmlMarker = htmlTitle + htmlDescription;
+      }
+
+      sb.append(htmlMarker);
    }
 
    /**
@@ -1523,11 +1621,14 @@ public class TourBlogView extends ViewPart {
 
       _isDrawWithDefaultColor = Util.getStateBoolean(_state, TourBlogView.STATE_IS_DRAW_MARKER_WITH_DEFAULT_COLOR,   TourBlogView.STATE_IS_DRAW_MARKER_WITH_DEFAULT_COLOR_DEFAULT);
       _isShowHiddenMarker     = Util.getStateBoolean(_state, TourBlogView.STATE_IS_SHOW_HIDDEN_MARKER,               TourBlogView.STATE_IS_SHOW_HIDDEN_MARKER_DEFAULT);
+      _isShowMarkerTime       = Util.getStateBoolean(_state, TourBlogView.STATE_IS_SHOW_MARKER_TIME,                 TourBlogView.STATE_IS_SHOW_MARKER_TIME_DEFAULT);
       _isShowTourMarkers      = Util.getStateBoolean(_state, TourBlogView.STATE_IS_SHOW_TOUR_MARKERS,                TourBlogView.STATE_IS_SHOW_TOUR_MARKERS_DEFAULT);
       _isShowTourNutrition    = Util.getStateBoolean(_state, TourBlogView.STATE_IS_SHOW_TOUR_NUTRITION,              TourBlogView.STATE_IS_SHOW_TOUR_NUTRITION_DEFAULT);
       _isShowTourSummary      = Util.getStateBoolean(_state, TourBlogView.STATE_IS_SHOW_TOUR_SUMMARY,                TourBlogView.STATE_IS_SHOW_TOUR_SUMMARY_DEFAULT);
       _isShowTourTags         = Util.getStateBoolean(_state, TourBlogView.STATE_IS_SHOW_TOUR_TAGS,                   TourBlogView.STATE_IS_SHOW_TOUR_TAGS_DEFAULT);
       _isShowTourWeather      = Util.getStateBoolean(_state, TourBlogView.STATE_IS_SHOW_TOUR_WEATHER,                TourBlogView.STATE_IS_SHOW_TOUR_WEATHER_DEFAULT);
+
+      _timeFormat             = (TimeFormat) Util.getStateEnum(_state, TourBlogView.STATE_TIME_FORMAT, TourBlogView.STATE_TIME_FORMAT_DEFAULT);
 
       final String graphMarker_ColorDefault = UI.IS_DARK_THEME
             ? ITourbookPreferences.GRAPH_MARKER_COLOR_DEFAULT_DARK
