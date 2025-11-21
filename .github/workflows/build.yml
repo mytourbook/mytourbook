@@ -11,7 +11,7 @@ jobs:
     steps:
       - name: echo-default-env-variables
         run: echo "github.workspace = ${{ github.workspace }}"
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
         with:
           fetch-depth: 0  # Shallow clones should be disabled for a better relevancy of analysis
       - name: Set DRIVE_LETTER environment variable
@@ -102,7 +102,7 @@ jobs:
     outputs:
       should_run: ${{ steps.should_run.outputs.should_run }}
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
       
       - name: print latest_commit
         run: echo ${{ github.sha }}
