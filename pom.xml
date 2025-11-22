@@ -15,10 +15,24 @@
    
    <dependencies>
       <dependency>
-         <artifactId>junit-jupiter</artifactId>                  <groupId>org.junit.jupiter</groupId>
-                                                                 <version>6.1.0-M1</version>
-         <scope>test</scope>
-      </dependency>
+  <groupId>org.junit.jupiter</groupId>
+  <artifactId>junit-jupiter-engine</artifactId>
+  <version>5.10.2</version>
+  <scope>test</scope>
+</dependency>
+<dependency>
+  <groupId>org.junit.jupiter</groupId>
+  <artifactId>junit-jupiter-api</artifactId>
+  <version>5.10.2</version>
+  <scope>test</scope>
+</dependency>
+<dependency>
+  <groupId>org.junit.platform</groupId>
+  <artifactId>junit-platform-engine</artifactId>
+  <version>1.10.2</version>
+  <scope>test</scope>
+</dependency>
+
    </dependencies>	
 
    <properties>
