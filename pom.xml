@@ -18,9 +18,13 @@
          <artifactId>junit-jupiter-engine</artifactId>           <groupId>org.junit.jupiter</groupId>
                                                                  <version>5.10.2</version>
          <scope>test</scope>
+      </dependency>
+      <dependency>
          <artifactId>junit-jupiter-api</artifactId>              <groupId>org.junit.jupiter</groupId>
                                                                  <version>5.10.2</version>
          <scope>test</scope>
+      </dependency>
+      <dependency>
          <artifactId>junit-platform-engine</artifactId>          <groupId>org.junit.platform</groupId>
                                                                  <version>1.10.2</version>
          <scope>test</scope>
