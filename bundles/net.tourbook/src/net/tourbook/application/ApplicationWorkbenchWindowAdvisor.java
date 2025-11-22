@@ -33,16 +33,12 @@ import net.tourbook.common.formatter.FormatManager;
 import net.tourbook.common.measurement_system.DialogSelectMeasurementSystem;
 import net.tourbook.common.measurement_system.MeasurementSystem_Manager;
 import net.tourbook.common.preferences.ICommonPreferences;
-import net.tourbook.common.swimming.SwimStrokeManager;
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.StringUtils;
 import net.tourbook.data.TourPerson;
 import net.tourbook.database.PersonManager;
 import net.tourbook.database.TourDatabase;
-import net.tourbook.map.bookmark.MapBookmarkManager;
 import net.tourbook.map.player.ModelPlayerManager;
-import net.tourbook.map3.view.Map3Manager;
-import net.tourbook.map3.view.Map3State;
 import net.tourbook.photo.PhotoUI;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.preferences.PrefPagePeople;
@@ -56,7 +52,6 @@ import net.tourbook.tour.TourTypeFilterManager;
 import net.tourbook.tour.TourTypeMenuManager;
 import net.tourbook.tour.filter.TourFilterManager;
 import net.tourbook.tour.filter.geo.TourGeoFilter_Manager;
-import net.tourbook.tour.location.CommonLocationManager;
 import net.tourbook.tour.location.TourLocationManager;
 import net.tourbook.tour.photo.TourPhotoManager;
 import net.tourbook.tourMarker.TourMarkerTypeManager;
@@ -65,7 +60,6 @@ import net.tourbook.tourType.TourTypeManager;
 import net.tourbook.ui.action.TourActionManager;
 import net.tourbook.ui.views.rawData.RawDataView;
 import net.tourbook.ui.views.referenceTour.ElevationCompareManager;
-import net.tourbook.web.WebContentServer;
 
 import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.IStatus;
@@ -107,22 +101,23 @@ import org.eclipse.ui.internal.WorkbenchPlugin;
 @SuppressWarnings("restriction")
 public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
 
-   private static IPreferenceStore           _prefStore        = TourbookPlugin.getPrefStore();
-   private static IPreferenceStore           _prefStore_Common = CommonActivator.getPrefStore();
+   private static IPreferenceStore            _prefStore        = TourbookPlugin.getPrefStore();
+   private static IPreferenceStore            _prefStore_Common = CommonActivator.getPrefStore();
 
-   private ApplicationActionBarAdvisor       _applicationActionBarAdvisor;
-   private IPerspectiveDescriptor            _lastPerspective;
+   private static ApplicationActionBarAdvisor _applicationActionBarAdvisor;
 
-   private IWorkbenchPage                    _lastActivePage;
-   private IWorkbenchPart                    _lastActivePart;
-   private String                            _lastPartTitle    = UI.EMPTY_STRING;
+   private IPerspectiveDescriptor             _lastPerspective;
 
-   private String                            _appTitle;
-   private String                            _appTitle_Extended;
+   private IWorkbenchPage                     _lastActivePage;
+   private IWorkbenchPart                     _lastActivePart;
+   private String                             _lastPartTitle    = UI.EMPTY_STRING;
 
-   private final ApplicationWorkbenchAdvisor _wbAdvisor;
+   private String                             _appTitle;
+   private String                             _appTitle_Extended;
 
-   private IPropertyListener                 _partPropertyListener;
+   private final ApplicationWorkbenchAdvisor  _wbAdvisor;
+
+   private IPropertyListener                  _partPropertyListener;
 
    ApplicationWorkbenchWindowAdvisor(final ApplicationWorkbenchAdvisor wbAdvisor,
                                      final IWorkbenchWindowConfigurer configurer) {
@@ -137,6 +132,10 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
       _appTitle_Extended = Messages.App_Title + UI.DASH_WITH_SPACE
             + ApplicationVersion.getVersionFull()
             + ApplicationVersion.getDevelopmentId();
+   }
+
+   public static ApplicationActionBarAdvisor getApplicationActionBarAdvisor() {
+      return _applicationActionBarAdvisor;
    }
 
    public static void setupProxy() {
@@ -612,45 +611,6 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
       // this MUST be called AFTER the theme is set, otherwise static images are not from a theme !!!
       UI.setupThemedImages();
       PhotoUI.setupThemedImages();
-   }
-
-   @Override
-   public boolean preWindowShellClose() {
-
-      MeasurementSystem_Manager.saveState();
-      _applicationActionBarAdvisor.getPersonSelector().saveState();
-
-      TagMenuManager.saveTagState();
-      TourTagFilterManager.saveState();
-
-      TourTypeFilterManager.saveState();
-      TourTypeMenuManager.saveState();
-      TourTypeManager.saveState();
-
-      CommonLocationManager.saveState();
-      ElevationCompareManager.saveState();
-      TourFilterManager.saveState();
-      TourGeoFilter_Manager.saveState();
-      TourPhotoManager.saveState();
-      MapBookmarkManager.saveState();
-      ModelPlayerManager.saveState();
-      SwimStrokeManager.saveState();
-      TourLocationManager.saveState();
-      TourActionManager.saveState();
-
-      FTSearchManager.closeIndexReaderSuggester();
-      WebContentServer.stop();
-
-      /**
-       * Save map3 state only when map is initialized (displayed). When this state is not checked
-       * and map is not yet initialized, the map will be initialized which produces an annoying
-       * delay when the application is being closing.
-       */
-      if (Map3State.isMapInitialized) {
-         Map3Manager.saveState();
-      }
-
-      return super.preWindowShellClose();
    }
 
    private void recomputeTitle() {

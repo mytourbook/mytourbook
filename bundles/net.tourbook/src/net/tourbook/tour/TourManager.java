@@ -6851,8 +6851,8 @@ public class TourManager {
    /**
     * Before the application is shut down, the tour save listeners are called to save unsaved data.
     *
-    * @return Returns <code>true</code> when the tours have been saved or false when it was canceled
-    *         by the user
+    * @return Returns <code>true</code> when the tours have been saved or <code>false</code> when it
+    *         was canceled by the user
     */
    public boolean saveTours() {
 

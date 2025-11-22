@@ -39,7 +39,9 @@ New / Improvements
   - Export swim values
     https://github.com/mytourbook/mytourbook/issues/1581
   
-
+* Tour Blog
+  - Display time for each tour blog entry
+    https://github.com/mytourbook/mytourbook/issues/1602
 
 Changes
 =======

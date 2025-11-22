@@ -127,6 +127,8 @@ public class NatTable_DataLoader {
 
    private SQLData                                        _tourCollectionFilter          = new SQLData();
 
+   private Runnable                                       _postFetchRunnable;
+
    public NatTable_DataLoader(final TourBookView tourBookView, final ColumnManager columnManager) {
 
       _tourBookView = tourBookView;
@@ -783,6 +785,16 @@ public class NatTable_DataLoader {
          return false;
       }
 
+      if (_postFetchRunnable != null) {
+
+         final Runnable postFetchRunnable = _postFetchRunnable;
+
+         // run it only once
+         _postFetchRunnable = null;
+
+         postFetchRunnable.run();
+      }
+
       return true;
    }
 
@@ -1266,6 +1278,11 @@ public class NatTable_DataLoader {
       if (isResetTourCollectionFilter) {
          _tourCollectionFilter = new SQLData();
       }
+   }
+
+   public void setPostFetchRunnable(final Runnable postLoadRunnable) {
+
+      _postFetchRunnable = postLoadRunnable;
    }
 
    public void setTourCollectionFilter(final TourCollectionFilter tourCollectionFilter, final List<Long> allTourIds) {
