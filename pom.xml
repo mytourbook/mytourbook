@@ -15,12 +15,7 @@
    
    <dependencies>
       <dependency>
-         <artifactId>junit-jupiter-engine</artifactId>           <groupId>org.junit.jupiter</groupId>
-                                                                 <version>5.10.2</version>
-         <scope>test</scope>
-      </dependency>
-      <dependency>
-         <artifactId>junit-jupiter-api</artifactId>              <groupId>org.junit.jupiter</groupId>
+         <artifactId>junit-jupiter</artifactId>                  <groupId>org.junit.jupiter</groupId>
                                                                  <version>5.10.2</version>
          <scope>test</scope>
       </dependency>
