@@ -27,11 +27,13 @@ import java.util.Set;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.UI;
 import net.tourbook.common.action.ActionOpenPrefDialog;
+import net.tourbook.common.ui.SubMenu;
 import net.tourbook.common.util.LRUMap;
 import net.tourbook.data.Equipment;
 import net.tourbook.data.TourData;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.preferences.PrefPageEquipment;
+import net.tourbook.preferences.PrefPageEquipmentGroups;
 import net.tourbook.tour.TourEvent;
 import net.tourbook.tour.TourEventId;
 import net.tourbook.tour.TourManager;
@@ -47,6 +49,7 @@ import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.swt.custom.BusyIndicator;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Menu;
 
 public class EquipmentMenuManager {
 
@@ -62,7 +65,8 @@ public class EquipmentMenuManager {
    private static IPropertyChangeListener        _prefChangeListener;
 
    /**
-    * Number of tags which are displayed in the context menu or saved in the dialog settings, it's
+    * Number of equipment which are displayed in the context menu or saved in the dialog settings,
+    * it's
     * max number is 9 to have a unique accelerator key
     */
    private static int                            _maxRecentEquipment;
@@ -80,13 +84,75 @@ public class EquipmentMenuManager {
    private boolean                               _isSaveTour;
 
    private ActionAddEquipment_SubMenu            _actionAddEquipment;
+   private ActionAddEquipmentGroups_SubMenu      _actionAddEquipment_Groups;
+   private ActionOpenPrefDialog                  _actionEquipmentGroupPreferences;
    private ActionOpenPrefDialog                  _actionEquipmentPreferences;
    private ActionRemoveEquipment_SubMenu         _actionRemoveEquipment;
    private ActionRemoveAllEquipment              _actionRemoveAllEquipment;
 
-   /**
-   *
-   */
+   public class ActionAddEquipmentGroups_SubMenu extends SubMenu {
+
+      List<ActionEquipmentGroup> __allEquipmentGroupActions = new ArrayList<>();
+
+      public ActionAddEquipmentGroups_SubMenu() {
+
+         super("Add &Grouped Equipment", AS_DROP_DOWN_MENU);
+      }
+
+      @Override
+      public void enableActions() {}
+
+      @Override
+      public void fillMenu(final Menu menu) {
+
+         __allEquipmentGroupActions.clear();
+
+         final List<EquipmentGroup> allEquipmentGroups = EquipmentGroupManager.getEquipmentGroups();
+
+         // create actions for each equipment group
+         for (final EquipmentGroup equipmentGroup : allEquipmentGroups) {
+
+            final Set<Equipment> allEquipment = equipmentGroup.allEquipment;
+            final boolean hasEquipment = allEquipment.size() > 0;
+
+            final ActionEquipmentGroup equipmentGroupAction = new ActionEquipmentGroup(equipmentGroup);
+
+            equipmentGroupAction.setEnabled(hasEquipment);
+
+            __allEquipmentGroupActions.add(equipmentGroupAction);
+
+            addActionToMenu(equipmentGroupAction);
+         }
+
+         if (allEquipmentGroups.size() > 0) {
+
+            addSeparatorToMenu();
+         }
+
+         addActionToMenu(_actionEquipmentGroupPreferences);
+      }
+   }
+
+   private class ActionEquipmentGroup extends Action {
+
+      private final EquipmentGroup __equipmentGroup;
+
+      public ActionEquipmentGroup(final EquipmentGroup equipmentGroup) {
+
+         super("%s  %d".formatted(equipmentGroup.name, equipmentGroup.allEquipment.size()), AS_PUSH_BUTTON); //$NON-NLS-1$
+
+         setToolTipText(EquipmentGroupManager.createEquipmentSortedList(equipmentGroup));
+
+         __equipmentGroup = equipmentGroup;
+      }
+
+      @Override
+      public void run() {
+
+         saveTourEquipment(__equipmentGroup);
+      }
+   }
+
    private static class ActionRecentEquipment extends Action {
 
       private Equipment __equipment;
@@ -153,7 +219,7 @@ public class EquipmentMenuManager {
 
          final String property = propertyChangeEvent.getProperty();
 
-         // check if the number of recent tags has changed
+         // check if the number of recent equipment has changed
          if (property.equals(ITourbookPreferences.EQUIPMENT_NUMBER_OF_RECENT_EQUIPMENT)) {
 
             setupRecentActions();
@@ -164,7 +230,7 @@ public class EquipmentMenuManager {
       _prefStore.addPropertyChangeListener(_prefChangeListener);
    }
 
-   public static void clearRecentTags() {
+   public static void clearRecentEquipment() {
 
       _allRecentEquipment.clear();
    }
@@ -218,7 +284,7 @@ public class EquipmentMenuManager {
    }
 
    /**
-    * create actions for recent tags
+    * create actions for recent equipment
     */
    private static void setupRecentActions() {
 
@@ -248,10 +314,12 @@ public class EquipmentMenuManager {
 
 // SET_FORMATTING_OFF
 
-      _actionAddEquipment           = new ActionAddEquipment_SubMenu(this);
-      _actionEquipmentPreferences   = new ActionOpenPrefDialog("Equipment &Preferences", PrefPageEquipment.ID);
-      _actionRemoveEquipment        = new ActionRemoveEquipment_SubMenu(this);
-      _actionRemoveAllEquipment     = new ActionRemoveAllEquipment();
+      _actionAddEquipment              = new ActionAddEquipment_SubMenu(this);
+      _actionAddEquipment_Groups       = new ActionAddEquipmentGroups_SubMenu();
+      _actionEquipmentPreferences      = new ActionOpenPrefDialog("Equipment &Preferences", PrefPageEquipment.ID);
+      _actionRemoveEquipment           = new ActionRemoveEquipment_SubMenu(this);
+      _actionRemoveAllEquipment        = new ActionRemoveAllEquipment();
+      _actionEquipmentGroupPreferences = new ActionOpenPrefDialog("Manage Equipment &Groups...", PrefPageEquipmentGroups.ID);
 
 // SET_FORMATTING_ON
 
@@ -263,10 +331,11 @@ public class EquipmentMenuManager {
       final Map<Long, Equipment> allUseEquipments = getAllUseEquipments();
 
       final boolean isEquipmentAvailable = allAvailableEquipments.size() > 0;
-      final boolean isEquipmentInTour = allUseEquipments.size() > 0;
+      final boolean isEquipmentUsedInTour = allUseEquipments.size() > 0;
 
       _actionAddEquipment.setEnabled(isEquipmentAvailable);
-      _actionRemoveEquipment.setEnabled(isEquipmentInTour);
+      _actionAddEquipment_Groups.setEnabled(isEquipmentAvailable);
+      _actionRemoveEquipment.setEnabled(isEquipmentUsedInTour);
 
       enableRecentActions();
    }
@@ -312,6 +381,7 @@ public class EquipmentMenuManager {
       menuMgr.add(new Separator());
       {
          menuMgr.add(_actionAddEquipment);
+         menuMgr.add(_actionAddEquipment_Groups);
          fillMenuWithRecentEquipment(menuMgr);
 
          menuMgr.add(_actionRemoveEquipment);
@@ -423,10 +493,10 @@ public class EquipmentMenuManager {
 
       final HashMap<Long, Equipment> allModifiedEquipment = new HashMap<>();
 
-      // remove tag in all tours (without tours from an editor)
+      // remove equipment in all tours (without tours from an editor)
       for (final TourData tourData : allModifiedTours) {
 
-         // get all tag's which will be removed
+         // get all equipment which will be removed
          final Set<Equipment> allEquipment = tourData.getEquipment();
 
          for (final Equipment equipment : allEquipment) {
@@ -450,7 +520,7 @@ public class EquipmentMenuManager {
 
       if (_isSaveTour) {
 
-         // save all tours with the removed tags
+         // save all tours with the removed equipment
 
          allModifiedTours = TourManager.saveModifiedTours(allModifiedTours);
 
@@ -471,6 +541,74 @@ public class EquipmentMenuManager {
 //      TourManager.fireEventWithCustomData(TourEventId.NOTIFY_TAG_VIEW,
 //            new ChangedTags(modifiedTags, allModifiedTours, false),
 //            null);
+   }
+
+   /**
+    * Set and save all tour equipment from a group
+    *
+    * @param equipmentGroup
+    */
+   private void saveTourEquipment(final EquipmentGroup equipmentGroup) {
+
+      final HashMap<Long, Equipment> allEquipment = new HashMap<>();
+
+      for (final Equipment equipment : equipmentGroup.allEquipment) {
+
+         allEquipment.put(equipment.getEquipmentId(), equipment);
+      }
+
+      saveTourEquipment_All(allEquipment, true);
+   }
+
+   /**
+    * Add/remove and save for multiple equipment
+    *
+    * @param mapWithAllModifiedEquipment
+    * @param isAddMode
+    *           When <code>true</code> then equipment are added otherwise they are removed
+    */
+   private void saveTourEquipment_All(final HashMap<Long, Equipment> mapWithAllModifiedEquipment,
+                                      final boolean isAddMode) {
+
+      final Runnable runnable = () -> {
+
+         final ArrayList<TourData> allSelectedTours = _tourProvider.getSelectedTours();
+
+         // get tours which equipment should be changed
+         if (allSelectedTours == null || allSelectedTours.isEmpty()) {
+            return;
+         }
+
+         final Collection<Equipment> allModifiedEquipment = mapWithAllModifiedEquipment.values();
+
+         // add the equipment into all selected tours
+         for (final TourData tourData : allSelectedTours) {
+
+            // set equipment into a tour
+            final Set<Equipment> allEquipment = tourData.getEquipment();
+
+            if (isAddMode) {
+
+               // add equipment to the tour
+               allEquipment.addAll(allModifiedEquipment);
+
+            } else {
+
+               // remove equipment from tour
+               allEquipment.removeAll(allModifiedEquipment);
+            }
+         }
+
+         // update recent equipment
+         for (final Equipment equipment : allModifiedEquipment) {
+
+            _allRecentEquipment.putFirst(equipment.getEquipmentId(), equipment);
+         }
+
+         saveAndNotify(allSelectedTours, mapWithAllModifiedEquipment);
+      };
+
+      BusyIndicator.showWhile(Display.getCurrent(), runnable);
    }
 
    public void updateRecentEquipment(final Equipment equipment) {

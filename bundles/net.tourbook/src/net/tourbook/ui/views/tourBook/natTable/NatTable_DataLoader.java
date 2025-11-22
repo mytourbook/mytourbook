@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2020, 2024 Wolfgang Schramm and Contributors
+ * Copyright (C) 2020, 2025 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -597,62 +597,68 @@ public class NatTable_DataLoader {
 
          sql = NL
 
-               // get all markers/tags for paged tours
-               + " SELECT" //                                                                             //$NON-NLS-1$
-               + "    " + TVITourBookItem.SQL_ALL_TOUR_FIELDS + "," + NL //                               //$NON-NLS-1$ //$NON-NLS-2$
-               + "    Tmarker.markerId," + NL //                                                          //$NON-NLS-1$
-               + "    jTdataTtag.TourTag_tagId," + NL //                                                  //$NON-NLS-1$
-               + "    TNutritionProduct.productId" + NL //                                                //$NON-NLS-1$
+               + " SELECT" //                                                                               //$NON-NLS-1$
+               
+               + "    " + TVITourBookItem.SQL_ALL_TOUR_FIELDS + "," + NL //                                 //$NON-NLS-1$ //$NON-NLS-2$
+               
+               // get all markers/tags/nutrition/equipment for paged tours
+               + "    Tmarker.markerId," + NL //                                                            //$NON-NLS-1$
+               + "    jTdataTtag.TourTag_tagId," + NL //                                                    //$NON-NLS-1$
+               + "    TNutritionProduct.productId," + NL //                                                 //$NON-NLS-1$
+               + "    JTdataTequipment.Equipment_equipmentID" + NL //                                       //$NON-NLS-1$
 
-               + " FROM" + NL //                                                                          //$NON-NLS-1$
-               + " (" + NL //                                                                             //$NON-NLS-1$
+               + " FROM" + NL //                                                                            //$NON-NLS-1$
+               + " (" + NL //                                                                               //$NON-NLS-1$
 
                // get paged tours
-               + "   SELECT " + NL //                                                                     //$NON-NLS-1$
-               + "      " + TVITourBookItem.SQL_ALL_TOUR_FIELDS + NL //                                   //$NON-NLS-1$
+               + "   SELECT " + NL //                                                                       //$NON-NLS-1$
+               + "      " + TVITourBookItem.SQL_ALL_TOUR_FIELDS + NL //                                     //$NON-NLS-1$
 
-               + "   FROM" + NL //                                                                        //$NON-NLS-1$
-               + "   (" + NL //                                                                           //$NON-NLS-1$
+               + "   FROM" + NL //                                                                          //$NON-NLS-1$
+               + "   (" + NL //                                                                             //$NON-NLS-1$
 
                // get sorted tours
-               + "      SELECT " + NL //                                                                  //$NON-NLS-1$
-               + "         DISTINCT " + TVITourBookItem.SQL_ALL_TOUR_FIELDS + NL //                       //$NON-NLS-1$
+               + "      SELECT " + NL //                                                                    //$NON-NLS-1$
+               + "         DISTINCT " + TVITourBookItem.SQL_ALL_TOUR_FIELDS + NL //                         //$NON-NLS-1$
 
-               + "      FROM" + NL //                                                                     //$NON-NLS-1$
-               + "      (" + NL //                                                                        //$NON-NLS-1$
+               + "      FROM" + NL //                                                                       //$NON-NLS-1$
+               + "      (" + NL //                                                                          //$NON-NLS-1$
 
                // get filtered tours
-               + "         SELECT " + NL //                                                               //$NON-NLS-1$
-               + "            " + TVITourBookItem.SQL_ALL_TOUR_FIELDS + "," + NL //                       //$NON-NLS-1$ //$NON-NLS-2$
-               + "            jTdataTtag.TourTag_tagId" + NL //                                           //$NON-NLS-1$
-               + "         FROM TOURDATA" + NL //                                                         //$NON-NLS-1$
-               + "         " + tagFilterSqlJoinBuilder.getSqlTagJoinTable() //                            //$NON-NLS-1$
-               + "         AS jTdataTtag" //                                                              //$NON-NLS-1$
-               + "         ON TourData.tourId = jTdataTtag.TourData_tourId" + NL //                       //$NON-NLS-1$
+               + "         SELECT " + NL //                                                                 //$NON-NLS-1$
+               + "            " + TVITourBookItem.SQL_ALL_TOUR_FIELDS + "," + NL //                         //$NON-NLS-1$ //$NON-NLS-2$
+               + "            jTdataTtag.TourTag_tagId" + NL //                                             //$NON-NLS-1$
+               + "         FROM TOURDATA" + NL //                                                           //$NON-NLS-1$
+               + "         " + tagFilterSqlJoinBuilder.getSqlTagJoinTable() //                              //$NON-NLS-1$
+               + "         AS jTdataTtag" //                                                                //$NON-NLS-1$
+               + "         ON TourData.tourId = jTdataTtag.TourData_tourId" + NL //                         //$NON-NLS-1$
 
-               + "         WHERE 1=1" + NL //                                                             //$NON-NLS-1$
-               + "            " + sqlAppFilter.getWhereClause() + NL //                                   //$NON-NLS-1$
-               + "         " + tourCollectionFilter.getSqlString() + NL //                               //$NON-NLS-1$
+               + "         WHERE 1=1" + NL //                                                               //$NON-NLS-1$
+               + "            " + sqlAppFilter.getWhereClause() + NL //                                     //$NON-NLS-1$
+               + "         " + tourCollectionFilter.getSqlString() + NL //                                  //$NON-NLS-1$
 
-               + "        " + orderBy + NL //                                                             //$NON-NLS-1$
-               + "      ) AS TourData " + NL //                                                           //$NON-NLS-1$
+               + "        " + orderBy + NL //                                                               //$NON-NLS-1$
+               + "      ) AS TourData " + NL //                                                             //$NON-NLS-1$
 
-               + "     " + orderBy + NL //                                                                //$NON-NLS-1$
-               + "   ) AS TourData " + NL //                                                              //$NON-NLS-1$
+               + "     " + orderBy + NL //                                                                  //$NON-NLS-1$
+               + "   ) AS TourData " + NL //                                                                //$NON-NLS-1$
 
-               + "   OFFSET ? ROWS FETCH NEXT ? ROWS ONLY" + NL //                                        //$NON-NLS-1$
+               + "   OFFSET ? ROWS FETCH NEXT ? ROWS ONLY" + NL //                                          //$NON-NLS-1$
 
-               + " ) AS TourData" + NL //                                                                 //$NON-NLS-1$
+               + " ) AS TourData" + NL //                                                                   //$NON-NLS-1$
 
-               + " LEFT JOIN " + TourDatabase.TABLE_TOUR_MARKER + " Tmarker" //                           //$NON-NLS-1$ //$NON-NLS-2$
-               + " ON TourData.tourId = Tmarker.TourData_tourId" + NL //                                  //$NON-NLS-1$
+               + " LEFT JOIN " + TourDatabase.TABLE_TOUR_MARKER + " Tmarker" //                             //$NON-NLS-1$ //$NON-NLS-2$
+               + " ON TourData.tourId = Tmarker.TourData_tourId" + NL //                                    //$NON-NLS-1$
 
-               + " LEFT JOIN " + TourDatabase.JOINTABLE__TOURDATA__TOURTAG + " jTdataTtag" //             //$NON-NLS-1$ //$NON-NLS-2$
-               + " ON TourData.tourId = jTdataTtag.TourData_tourId" + NL //                               //$NON-NLS-1$
+               + " LEFT JOIN " + TourDatabase.JOINTABLE__TOURDATA__TOURTAG + " jTdataTtag" //               //$NON-NLS-1$ //$NON-NLS-2$
+               + " ON TourData.tourId = jTdataTtag.TourData_tourId" + NL //                                 //$NON-NLS-1$
 
                // get nutrition product ids
-               + "LEFT OUTER JOIN " + TourDatabase.TABLE_TOUR_NUTRITION_PRODUCT + " TNutritionProduct" // //$NON-NLS-1$ //$NON-NLS-2$
-               + " ON TourData.tourId = TNutritionProduct.TourData_tourId" + NL //                        //$NON-NLS-1$
+               + "LEFT OUTER JOIN " + TourDatabase.TABLE_TOUR_NUTRITION_PRODUCT + " TNutritionProduct" //   //$NON-NLS-1$ //$NON-NLS-2$
+               + " ON TourData.tourId = TNutritionProduct.TourData_tourId" + NL //                          //$NON-NLS-1$
+
+               + " LEFT JOIN " + TourDatabase.JOINTABLE__TOURDATA__EQUIPMENT + " JTdataTequipment" //       //$NON-NLS-1$ //$NON-NLS-2$
+               + " ON TourData.tourId = JTdataTequipment.TourData_tourId" + NL //                           //$NON-NLS-1$
 
                + orderBy + NL;
 
@@ -671,6 +677,7 @@ public class NatTable_DataLoader {
          prepStmt.setInt(paramIndex++, FETCH_SIZE);
 
          long prevTourId = -1;
+         HashSet<Long> allEquipmentIDs = null;
          HashSet<Long> tagIds = null;
          HashSet<Long> markerIds = null;
          HashSet<Long> nutritionProductIds = null;
@@ -680,9 +687,16 @@ public class NatTable_DataLoader {
 
             final long result_TourId = result.getLong(1);
 
-            final Object result_MarkerId = result.getObject(TVITourBookItem.SQL_ALL_OTHER_FIELDS__COLUMN_START_NUMBER);
-            final Object result_TagId = result.getObject(TVITourBookItem.SQL_ALL_OTHER_FIELDS__COLUMN_START_NUMBER + 1);
-            final Object result_NutritionProductId = result.getObject(TVITourBookItem.SQL_ALL_OTHER_FIELDS__COLUMN_START_NUMBER + 2);
+            final int columnStartNumber = TVITourBookItem.SQL_ALL_OTHER_FIELDS__COLUMN_START_NUMBER;
+
+// SET_FORMATTING_OFF
+
+            final Object result_MarkerId           = result.getObject(columnStartNumber);
+            final Object result_TagId              = result.getObject(columnStartNumber + 1);
+            final Object result_NutritionProductId = result.getObject(columnStartNumber + 2);
+            final Object result_EquipmentId        = result.getObject(columnStartNumber + 3);
+
+// SET_FORMATTING_ON
 
             if (result_TourId == prevTourId) {
 
@@ -703,6 +717,11 @@ public class NatTable_DataLoader {
                   nutritionProductIds.add(nutritionProductId);
                }
 
+               // get equipment from left (outer) join
+               if (result_EquipmentId instanceof final Long equipmentId) {
+                  allEquipmentIDs.add(equipmentId);
+               }
+
             } else {
 
                // first resultset for a new tour
@@ -720,6 +739,15 @@ public class NatTable_DataLoader {
                   tagIds.add(tagId);
 
                   tourItem.setTagIds(tagIds);
+               }
+
+               // get first equipment ID
+               if (result_EquipmentId instanceof final Long equipmentId) {
+
+                  allEquipmentIDs = new HashSet<>();
+                  allEquipmentIDs.add(equipmentId);
+
+                  tourItem.setEquipmentIDs(allEquipmentIDs);
                }
 
                // get first marker id
@@ -1077,6 +1105,7 @@ public class NatTable_DataLoader {
       case TableColumnFactory.TOUR_NUM_MARKERS_ID:                   return FIELD_WITHOUT_SORTING;
       case TableColumnFactory.TOUR_NUM_PHOTOS_ID:                    return FIELD_WITHOUT_SORTING;
       case TableColumnFactory.TOUR_TAGS_ID:                          return FIELD_WITHOUT_SORTING;
+      case TableColumnFactory.TOUR_EQUIPMENT_ID:                     return FIELD_WITHOUT_SORTING;
 //    case TableColumnFactory.TOUR_TITLE_ID:                         // see indexed fields
       case TableColumnFactory.TOUR_TYPE_ID:                          return "tourType_typeId";  // an icon is displayed    //$NON-NLS-1$
       case TableColumnFactory.TOUR_TYPE_TEXT_ID:                     return FIELD_WITHOUT_SORTING;

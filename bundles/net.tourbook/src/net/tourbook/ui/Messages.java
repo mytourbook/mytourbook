@@ -593,6 +593,8 @@ public class Messages extends NLS {
    public static String        ColumnFactory_TourEndTime_Header;
    public static String        ColumnFactory_TourEndTime_Label;
    public static String        ColumnFactory_TourEndTime_Tooltip;
+   public static String        ColumnFactory_TourEquipment_Label;
+   public static String        ColumnFactory_TourEquipment_Tooltip;
    public static String        ColumnFactory_TourId;
    public static String        ColumnFactory_TourMarkerId;
    public static String        ColumnFactory_TourPerson;

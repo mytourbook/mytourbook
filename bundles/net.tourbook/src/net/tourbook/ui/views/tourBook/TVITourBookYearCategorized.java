@@ -74,7 +74,7 @@ public class TVITourBookYearCategorized extends TVITourBookItem {
 
             + "SELECT" + NL //                                                      //$NON-NLS-1$
 
-            + SQL_ALL_TOUR_FIELDS + UI.COMMA_SPACE + NL
+            + SQL_ALL_TOUR_FIELDS + ", " + NL //                                    //$NON-NLS-1$
             + SQL_ALL_OTHER_FIELDS + NL
 
             + "FROM " + TourDatabase.TABLE_TOUR_DATA + NL //                        //$NON-NLS-1$
@@ -88,8 +88,11 @@ public class TVITourBookYearCategorized extends TVITourBookItem {
             + " ON TourData.tourId = Tmarker.TourData_tourId" + NL //               //$NON-NLS-1$
 
             // get nutrition product ids
-            + "LEFT OUTER JOIN " + TourDatabase.TABLE_TOUR_NUTRITION_PRODUCT + " TNutritionProduct" //                  //$NON-NLS-1$ //$NON-NLS-2$
-            + " ON TourData.tourId = TNutritionProduct.TourData_tourId" + NL //                              //$NON-NLS-1$
+            + "LEFT OUTER JOIN " + TourDatabase.TABLE_TOUR_NUTRITION_PRODUCT + " TNutritionProduct" //      //$NON-NLS-1$ //$NON-NLS-2$
+            + " ON TourData.tourId = TNutritionProduct.TourData_tourId" + NL //                             //$NON-NLS-1$
+
+            + " LEFT JOIN " + TourDatabase.JOINTABLE__TOURDATA__EQUIPMENT + " JTdataTequipment" //          //$NON-NLS-1$ //$NON-NLS-2$
+            + " ON TourData.tourId = JTdataTequipment.TourData_tourId" + NL //                              //$NON-NLS-1$
 
             + "WHERE  " + sumYear + "=?" + NL //                                    //$NON-NLS-1$ //$NON-NLS-2$
             + "   AND " + sumYearSub + "=?" + NL //                                 //$NON-NLS-1$ //$NON-NLS-2$

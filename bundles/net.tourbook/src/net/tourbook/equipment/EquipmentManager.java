@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2055, 2026 Wolfgang Schramm and Contributors
+ * Copyright (C) 2025, 2026 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -16,6 +16,7 @@
 package net.tourbook.equipment;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -26,8 +27,10 @@ import javax.persistence.EntityManager;
 import javax.persistence.Query;
 
 import net.tourbook.common.UI;
+import net.tourbook.common.util.StatusUtil;
 import net.tourbook.data.Equipment;
 import net.tourbook.data.TourData;
+import net.tourbook.database.MyTourbookException;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.tour.TourEvent;
 import net.tourbook.tour.TourEventId;
@@ -124,7 +127,7 @@ public class EquipmentManager {
    }
 
    public static void equipment_Delete(final List<Equipment> allSelectedEquipments) {
- 
+
    }
 
    /**
@@ -233,6 +236,117 @@ public class EquipmentManager {
       }
 
       return _allEquipment_Models;
+   }
+
+   /**
+    * @param allEquipmentIDs
+    *
+    * @return Returns the equipment names separated with a comma.
+    */
+   public static String getEquipmentNames(final List<Long> allEquipmentIDs) {
+
+      if (allEquipmentIDs == null) {
+         return UI.EMPTY_STRING;
+      }
+
+      final Map<Long, Equipment> allEquipment = getAllEquipment_ByID();
+      final List<String> allEquipmentNames = new ArrayList<>();
+
+      // get equipment name for each equipment id
+      for (final Long equipmentID : allEquipmentIDs) {
+
+         final Equipment equipment = allEquipment.get(equipmentID);
+
+         if (equipment != null) {
+            allEquipmentNames.add(equipment.getName());
+         } else {
+            try {
+               throw new MyTourbookException("Equipment id '" + equipmentID + "' is not available"); //$NON-NLS-1$ //$NON-NLS-2$
+            } catch (final MyTourbookException e) {
+               StatusUtil.log(e);
+            }
+         }
+      }
+
+      return getEquipmentNamesText(allEquipmentNames, false);
+   }
+
+   /**
+    * @param allEquipment
+    *
+    * @return Returns the equipment names separated with a comma or an empty string when not
+    *         available.
+    */
+   public static String getEquipmentNames(final Set<Equipment> allEquipment) {
+
+      if (allEquipment.isEmpty()) {
+         return UI.EMPTY_STRING;
+      }
+
+      final List<String> allEquipmentNames = new ArrayList<>();
+
+      // get equipment name for each equipment id
+      for (final Equipment equipment : allEquipment) {
+         allEquipmentNames.add(equipment.getName());
+      }
+
+      return getEquipmentNamesText(allEquipmentNames, false);
+   }
+
+   public static String getEquipmentNames(final Set<Equipment> allEquipment, final boolean isVertical) {
+
+      if (allEquipment.isEmpty()) {
+         return UI.EMPTY_STRING;
+      }
+
+      final List<String> allEquipmentNames = new ArrayList<>();
+
+      // get equipment name for each equipment id
+      for (final Equipment equipment : allEquipment) {
+         allEquipmentNames.add(equipment.getName());
+      }
+
+      return getEquipmentNamesText(allEquipmentNames, isVertical);
+   }
+
+   private static String getEquipmentNamesText(final List<String> allEquipmentNames, final boolean isVertical) {
+
+      // sort equipment by name
+      Collections.sort(allEquipmentNames);
+
+      final int numEquipment = allEquipmentNames.size();
+
+      // convert list into visible string
+      int equipmentIndex = 0;
+      final StringBuilder sb = new StringBuilder();
+
+      for (final String equipmentName : allEquipmentNames) {
+
+         if (equipmentIndex++ > 0) {
+            if (isVertical) {
+               sb.append(NL);
+            } else {
+               sb.append(UI.COMMA_SPACE);
+            }
+         }
+
+         if (isVertical && numEquipment > 1) {
+
+            // prefix a bullet but only when multiple equipment are available
+
+            sb.append(net.tourbook.common.UI.SYMBOL_BULLET + UI.SPACE);
+         }
+         sb.append(equipmentName);
+      }
+
+      String equipmentNamesText = sb.toString();
+
+      if (net.tourbook.common.UI.IS_SCRAMBLE_DATA) {
+
+         equipmentNamesText = net.tourbook.common.UI.scrambleText(equipmentNamesText);
+      }
+
+      return equipmentNamesText;
    }
 
    private static void loadEquipment() {

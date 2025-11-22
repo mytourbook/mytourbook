@@ -90,7 +90,7 @@ public class PrefPageEquipment extends PreferencePage implements IWorkbenchPrefe
             btnRemoveRecentTags.setText("Remo&ve Recent Equipment");
             btnRemoveRecentTags.setToolTipText("All recent equipment will be removed from the recent equipment list");
             btnRemoveRecentTags.addSelectionListener(SelectionListener.widgetSelectedAdapter(
-                  selectionEvent -> EquipmentMenuManager.clearRecentTags()));
+                  selectionEvent -> EquipmentMenuManager.clearRecentEquipment()));
          }
       }
 

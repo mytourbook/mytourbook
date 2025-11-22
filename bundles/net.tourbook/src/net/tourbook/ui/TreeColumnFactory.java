@@ -145,6 +145,8 @@ public abstract class TreeColumnFactory {
    public static final TreeColumnFactory TOUR_COUNTER;
    public static final TreeColumnFactory TOUR_DESCRIPTION;
    public static final String            TOUR_DESCRIPTION_ID              = "TOUR_DESCRIPTION";                 //$NON-NLS-1$
+   public static final TreeColumnFactory TOUR_EQUIPMENT;
+   public static final String            TOUR_EQUIPMENT_ID                = "TOUR_EQUIPMENT";                   //$NON-NLS-1$
    public static final TreeColumnFactory TOUR_LOCATION_START;
    public static final String            TOUR_LOCATION_START_ID           = "TOUR_LOCATION_START";              //$NON-NLS-1$
    public static final TreeColumnFactory TOUR_LOCATION_END;
@@ -2320,6 +2322,26 @@ public abstract class TreeColumnFactory {
             colDef.setColumnLabel(              Messages.ColumnFactory_TourDescription_Label);
             colDef.setColumnHeaderText(         Messages.ColumnFactory_TourDescription_Label);
             colDef.setColumnHeaderToolTipText(  Messages.ColumnFactory_TourDescription_Tooltip);
+
+            colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(20));
+
+            return colDef;
+         }
+      };
+
+      TOUR_EQUIPMENT = new TreeColumnFactory() {
+
+         @Override
+         public TreeColumnDefinition createColumn(final ColumnManager columnManager,
+                                                  final PixelConverter pixelConverter) {
+
+            final TreeColumnDefinition colDef = new TreeColumnDefinition(columnManager, TOUR_EQUIPMENT_ID, SWT.LEAD);
+
+            colDef.setColumnCategory(           Messages.ColumnFactory_Category_Tour);
+
+            colDef.setColumnLabel(              Messages.ColumnFactory_TourEquipment_Label);
+            colDef.setColumnHeaderText(         Messages.ColumnFactory_TourEquipment_Label);
+            colDef.setColumnHeaderToolTipText(  Messages.ColumnFactory_TourEquipment_Tooltip);
 
             colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(20));
 

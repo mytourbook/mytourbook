@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2024 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2025 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -230,7 +230,7 @@ public abstract class TVITourBookItem extends TreeViewerItem implements ITourIte
 
       // ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
       //
-      // !!! VERY IMPORTANT !!!
+      // !!! EXTREEMLY IMPORTANT !!!
       //
       // Adjust constant SQL_ALL_OTHER_FIELDS__COLUMN_START_NUMBER when sql fields are added,
       // otherwise tags and number of markers are not displayed or causing an exception
@@ -242,9 +242,10 @@ public abstract class TVITourBookItem extends TreeViewerItem implements ITourIte
       /////////////////////////////////////////////////////////////////////////
       SQL_ALL_OTHER_FIELDS = UI.EMPTY_STRING
 
-            + "jTdataTtag.TourTag_tagId, " //                     SQL_ALL_OTHER_FIELDS__COLUMN_START_NUMBER + 0   //$NON-NLS-1$
-            + "Tmarker.markerId, " //                             SQL_ALL_OTHER_FIELDS__COLUMN_START_NUMBER + 1   //$NON-NLS-1$
-            + "TNutritionProduct.productId " //                   SQL_ALL_OTHER_FIELDS__COLUMN_START_NUMBER + 2   //$NON-NLS-1$
+            + "jTdataTtag.TourTag_tagId, " //               SQL_ALL_OTHER_FIELDS__COLUMN_START_NUMBER + 0   //$NON-NLS-1$
+            + "Tmarker.markerId, " //                       SQL_ALL_OTHER_FIELDS__COLUMN_START_NUMBER + 1   //$NON-NLS-1$
+            + "TNutritionProduct.productId, " //            SQL_ALL_OTHER_FIELDS__COLUMN_START_NUMBER + 2   //$NON-NLS-1$
+            + "JTdataTequipment.Equipment_EquipmentID " //  SQL_ALL_OTHER_FIELDS__COLUMN_START_NUMBER + 3   //$NON-NLS-1$
       ;
 
       SQL_SUM_FIELDS = UI.EMPTY_STRING
@@ -904,18 +905,25 @@ public abstract class TVITourBookItem extends TreeViewerItem implements ITourIte
       setChildren(children);
 
       long prevTourId = -1;
+
       HashSet<Long> tagIds = null;
       HashSet<Long> markerIds = null;
       HashSet<Long> nutritionProductIds = null;
+      HashSet<Long> allEquipmentIDs = null;
 
       final ResultSet result = statement.executeQuery();
       while (result.next()) {
 
          final long result_TourId = result.getLong(1);
 
-         final Object result_TagId = result.getObject(SQL_ALL_OTHER_FIELDS__COLUMN_START_NUMBER);
-         final Object result_MarkerId = result.getObject(TVITourBookItem.SQL_ALL_OTHER_FIELDS__COLUMN_START_NUMBER + 1);
-         final Object result_NutritionProductId = result.getObject(TVITourBookItem.SQL_ALL_OTHER_FIELDS__COLUMN_START_NUMBER + 2);
+// SET_FORMATTING_OFF
+
+         final Object result_TagId              = result.getObject(SQL_ALL_OTHER_FIELDS__COLUMN_START_NUMBER);
+         final Object result_MarkerId           = result.getObject(SQL_ALL_OTHER_FIELDS__COLUMN_START_NUMBER + 1);
+         final Object result_NutritionProductId = result.getObject(SQL_ALL_OTHER_FIELDS__COLUMN_START_NUMBER + 2);
+         final Object result_EquipmentID        = result.getObject(SQL_ALL_OTHER_FIELDS__COLUMN_START_NUMBER + 3);
+
+// SET_FORMATTING_ON
 
          if (result_TourId == prevTourId) {
 
@@ -934,6 +942,11 @@ public abstract class TVITourBookItem extends TreeViewerItem implements ITourIte
             // get nutrition products from outer join
             if (result_NutritionProductId instanceof final Long nutritionProductId) {
                nutritionProductIds.add(nutritionProductId);
+            }
+
+            // get equipment from outer join
+            if (result_EquipmentID instanceof final Long equipmentID) {
+               allEquipmentIDs.add(equipmentID);
             }
 
          } else {
@@ -978,6 +991,15 @@ public abstract class TVITourBookItem extends TreeViewerItem implements ITourIte
                nutritionProductIds.add(nutritionProductId);
 
                tourItem.setNutritionProductsIds(nutritionProductIds);
+            }
+
+            // get first equipment id
+            if (result_EquipmentID instanceof final Long equipmentID) {
+
+               allEquipmentIDs = new HashSet<>();
+               allEquipmentIDs.add(equipmentID);
+
+               tourItem.setEquipmentIDs(allEquipmentIDs);
             }
          }
 

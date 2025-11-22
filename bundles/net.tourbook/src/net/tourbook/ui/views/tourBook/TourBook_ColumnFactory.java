@@ -39,6 +39,7 @@ import net.tourbook.common.weather.IWeather;
 import net.tourbook.data.TourData;
 import net.tourbook.database.PersonManager;
 import net.tourbook.database.TourDatabase;
+import net.tourbook.equipment.EquipmentManager;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.preferences.PrefPageViews;
 import net.tourbook.ui.TableColumnFactory;
@@ -147,6 +148,7 @@ class TourBook_ColumnFactory {
       defineColumn_Tour_Marker();
       defineColumn_Tour_Photos();
       defineColumn_Tour_Tags();
+      defineColumn_Tour_Equipment();
       defineColumn_Tour_Location_Start();
       defineColumn_Tour_Location_End();
       defineColumn_Tour_LocationID_Start(); //  // for debugging
@@ -3282,6 +3284,41 @@ class TourBook_ColumnFactory {
                   cell.setText(colTourDescription);
                }
 
+               setCellColor(cell, element);
+            }
+         }
+      });
+   }
+
+   /**
+    * Column: Tour - Equipment
+    */
+   private void defineColumn_Tour_Equipment() {
+
+      final TableColumnDefinition colDef_NatTable = TableColumnFactory.TOUR_EQUIPMENT.createColumn(_columnManager_NatTable, _pc);
+      colDef_NatTable.setLabelProvider_NatTable(new NatTable_LabelProvider() {
+
+         @Override
+         public String getValueText(final Object element) {
+
+            final List<Long> allEqipmentIDs = ((TVITourBookTour) element).getEquipmentIds();
+
+            TourDatabase.getTagNames(allEqipmentIDs);
+
+            return EquipmentManager.getEquipmentNames(allEqipmentIDs);
+         }
+      });
+
+      final TreeColumnDefinition colDef_Tree = TreeColumnFactory.TOUR_EQUIPMENT.createColumn(_columnManager_Tree, _pc);
+      colDef_Tree.setLabelProvider(new SelectionCellLabelProvider() {
+
+         @Override
+         public void update(final ViewerCell cell) {
+
+            final Object element = cell.getElement();
+            if (element instanceof final TVITourBookTour tourItem) {
+
+               cell.setText(EquipmentManager.getEquipmentNames(tourItem.getEquipmentIds()));
                setCellColor(cell, element);
             }
          }
