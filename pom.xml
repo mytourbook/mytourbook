@@ -78,8 +78,8 @@
       <repository>
          <id>eclipse.nattable.2.5.0</id>                                               <layout>p2</layout>
          <url>http://download.eclipse.org/nattable/releases/2.5.0/repository/</url>
-      </repository>
-
+      </repository> 
+      
       <repository>
          <id>eclipse.collections.11.1.0</id>                                           <layout>p2</layout>
          <url>https://download.eclipse.org/collections/11.1.0/repository/</url>
