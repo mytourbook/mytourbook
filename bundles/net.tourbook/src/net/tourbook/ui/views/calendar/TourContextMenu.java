@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2011, 2024 Matthias Helmling and Contributors
+ * Copyright (C) 2011, 2025 Matthias Helmling and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -21,6 +21,7 @@ import java.util.List;
 
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourTag;
+import net.tourbook.equipment.EquipmentMenuManager;
 import net.tourbook.extension.export.ActionExport;
 import net.tourbook.extension.upload.ActionUpload;
 import net.tourbook.preferences.ViewContext;
@@ -57,6 +58,7 @@ public class TourContextMenu {
 
    private String                                     CONTEXT_ID;
 
+   private EquipmentMenuManager                       _equipmentMenuManager;
    private TagMenuManager                             _tagMenuManager;
    private TourTypeMenuManager                        _tourTypeMenuManager;
 
@@ -85,6 +87,7 @@ public class TourContextMenu {
 
 // SET_FORMATTING_OFF
 
+      _equipmentMenuManager            = new EquipmentMenuManager(tourProvider, true, true);
       _tagMenuManager                  = new TagMenuManager(tourProvider, true);
       _tourTypeMenuManager             = new TourTypeMenuManager(tourProvider);
 
@@ -133,15 +136,18 @@ public class TourContextMenu {
       _allTourActions_Adjust.put(_actionSetOtherPerson            .getClass().getName(),  _actionSetOtherPerson);
 //    _allTourActions_Adjust.put(_actionDeleteTourMenu            .getClass().getName(),  _actionDeleteTourMenu);
 
-// SET_FORMATTING_ON
-
       TourActionManager.setAllViewActions(contextID,
-            _allTourActions_Edit.keySet(),
-            _allTourActions_Export.keySet(),
-            _allTourActions_Adjust.keySet(),
-            _tagMenuManager.getAllTagActions().keySet(),
-            _tourTypeMenuManager.getAllTourTypeActions().keySet());
 
+            _allTourActions_Edit    .keySet(),
+            _allTourActions_Export  .keySet(),
+            _allTourActions_Adjust  .keySet(),
+
+            _tourTypeMenuManager    .getAllTourTypeActions()   .keySet(),
+            _tagMenuManager         .getAllTagActions()        .keySet(),
+            _equipmentMenuManager   .getAllEquipmentActions()  .keySet()
+      );
+
+// SET_FORMATTING_ON
    }
 
    public Menu createContextMenu(final CalendarView calendarView,
@@ -266,11 +272,14 @@ public class TourContextMenu {
       // edit actions
       TourActionManager.fillContextMenu(menuMgr, TourActionCategory.EDIT, _allTourActions_Edit, tourProvider);
 
+      // tour type actions
+      _tourTypeMenuManager.fillContextMenu_WithActiveActions(menuMgr, tourProvider);
+
       // tag actions
       _tagMenuManager.fillTagMenu_WithActiveActions(menuMgr, tourProvider);
 
-      // tour type actions
-      _tourTypeMenuManager.fillContextMenu_WithActiveActions(menuMgr, tourProvider);
+      // equipment actions
+      _equipmentMenuManager.fillEquipmentMenu_WithActiveActions(menuMgr, tourProvider);
 
       menuMgr.add(new Separator());
       menuMgr.add(_actionComputeDistanceValuesFromGeoposition);

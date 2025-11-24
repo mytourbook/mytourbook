@@ -95,6 +95,7 @@ import net.tourbook.data.TourTag;
 import net.tourbook.data.TourType;
 import net.tourbook.data.TourWayPoint;
 import net.tourbook.database.TourDatabase;
+import net.tourbook.equipment.EquipmentMenuManager;
 import net.tourbook.extension.download.CloudDownloaderManager;
 import net.tourbook.extension.download.TourbookCloudDownloader;
 import net.tourbook.extension.export.ActionExport;
@@ -416,6 +417,7 @@ public class RawDataView extends ViewPart implements
    private IPropertyChangeListener          _prefChangeListener_Common;
    private ITourEventListener               _tourEventListener;
    //
+   private EquipmentMenuManager             _equipmentMenuManager;
    private TagMenuManager                   _tagMenuManager;
    private TourTypeMenuManager              _tourTypeMenuManager;
    private MenuManager                      _tourViewer_MenuManager;
@@ -1442,13 +1444,18 @@ public class RawDataView extends ViewPart implements
 //    _allTourActions_Adjust.put(_actionSetOtherPerson            .getClass().getName(),  _actionSetOtherPerson);
 //    _allTourActions_Adjust.put(_actionDeleteTourMenu            .getClass().getName(),  _actionDeleteTourMenu);
 
-// SET_FORMATTING_ON
 
       TourActionManager.setAllViewActions(ID,
-            _allTourActions_Edit.keySet(),
-            _allTourActions_Export.keySet(),
-            _tagMenuManager.getAllTagActions().keySet(),
-            _tourTypeMenuManager.getAllTourTypeActions().keySet());
+
+            _allTourActions_Edit    .keySet(),
+            _allTourActions_Export  .keySet(),
+
+            _tourTypeMenuManager    .getAllTourTypeActions()   .keySet(),
+            _tagMenuManager         .getAllTagActions()        .keySet(),
+            _equipmentMenuManager   .getAllEquipmentActions()  .keySet()
+      );
+
+// SET_FORMATTING_ON
 
       _actionEditImportPreferences = new ActionOpenPrefDialog(
             Messages.Import_Data_Action_EditImportPreferences,
@@ -2635,6 +2642,7 @@ public class RawDataView extends ViewPart implements
 
    private void createMenuManager() {
 
+      _equipmentMenuManager = new EquipmentMenuManager(this, true, true);
       _tagMenuManager = new TagMenuManager(this, true);
       _tourTypeMenuManager = new TourTypeMenuManager(this);
 
@@ -4437,6 +4445,9 @@ public class RawDataView extends ViewPart implements
 
       // tour tag actions
       _tagMenuManager.fillTagMenu_WithActiveActions(menuMgr, this);
+
+      // equipment actions
+      _equipmentMenuManager.fillEquipmentMenu_WithActiveActions(menuMgr, this);
 
       // add standard group which allows other plug-ins to contribute here
       menuMgr.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));

@@ -50,6 +50,7 @@ import net.tourbook.data.TourReference;
 import net.tourbook.data.TourTag;
 import net.tourbook.data.TourType;
 import net.tourbook.database.TourDatabase;
+import net.tourbook.equipment.EquipmentMenuManager;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.preferences.ViewContext;
 import net.tourbook.tag.TagMenuManager;
@@ -207,6 +208,7 @@ public class ReferenceTourView extends ViewPart implements
    private TreeViewerTourInfoToolTip           _tourInfoToolTip;
    private TourDoubleClickState                _tourDoubleClickState                    = new TourDoubleClickState();
 
+   private EquipmentMenuManager                _equipmentMenuManager;
    private TagMenuManager                      _tagMenuManager;
    private TourTypeMenuManager                 _tourTypeMenuManager;
    private MenuManager                         _viewerMenuManager;
@@ -749,16 +751,21 @@ public class ReferenceTourView extends ViewPart implements
 //    _allTourActions_Adjust.put(_actionSetOtherPerson            .getClass().getName(),  _actionSetOtherPerson);
 //    _allTourActions_Adjust.put(_actionDeleteTourMenu            .getClass().getName(),  _actionDeleteTourMenu);
 
-// SET_FORMATTING_ON
-
       TourActionManager.setAllViewActions(ID,
-            _allTourActions_Edit.keySet(),
-            _tagMenuManager.getAllTagActions().keySet(),
-            _tourTypeMenuManager.getAllTourTypeActions().keySet());
+
+            _allTourActions_Edit    .keySet(),
+
+            _tourTypeMenuManager    .getAllTourTypeActions()   .keySet(),
+            _tagMenuManager         .getAllTagActions()        .keySet(),
+            _equipmentMenuManager   .getAllEquipmentActions()  .keySet()
+      );
+
+// SET_FORMATTING_ON
    }
 
    private void createMenuManager() {
 
+      _equipmentMenuManager = new EquipmentMenuManager(this, true, true);
       _tagMenuManager = new TagMenuManager(this, true);
       _tourTypeMenuManager = new TourTypeMenuManager(this);
 
@@ -1494,11 +1501,14 @@ public class ReferenceTourView extends ViewPart implements
       // edit actions
       TourActionManager.fillContextMenu(menuMgr, TourActionCategory.EDIT, _allTourActions_Edit, this);
 
+      // tour type actions
+      _tourTypeMenuManager.fillContextMenu_WithActiveActions(menuMgr, this);
+
       // tag actions
       _tagMenuManager.fillTagMenu_WithActiveActions(menuMgr, this);
 
-      // tour type actions
-      _tourTypeMenuManager.fillContextMenu_WithActiveActions(menuMgr, this);
+      // equipment actions
+      _equipmentMenuManager.fillEquipmentMenu_WithActiveActions(menuMgr, this);
 
       menuMgr.add(new Separator());
       menuMgr.add(_actionRemoveComparedTours);

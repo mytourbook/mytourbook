@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2024 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2025 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -47,6 +47,7 @@ import net.tourbook.common.util.TreeViewerItem;
 import net.tourbook.data.TourData;
 import net.tourbook.database.PersonManager;
 import net.tourbook.database.TourDatabase;
+import net.tourbook.equipment.EquipmentMenuManager;
 import net.tourbook.extension.export.ActionExport;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.preferences.ViewContext;
@@ -192,6 +193,7 @@ public class CollatedToursView extends ViewPart implements ITourProvider, ITourV
    private final TourDoubleClickState                 _tourDoubleClickState      = new TourDoubleClickState();
    private TreeViewerTourInfoToolTip                  _tourInfoToolTip;
    //
+   private EquipmentMenuManager                       _equipmentMenuManager;
    private TagMenuManager                             _tagMenuManager;
    private TourTypeMenuManager                        _tourTypeMenuManager;
    private MenuManager                                _viewerMenuManager;
@@ -489,20 +491,25 @@ public class CollatedToursView extends ViewPart implements ITourProvider, ITourV
       _allTourActions_Adjust.put(_actionSetOtherPerson            .getClass().getName(),  _actionSetOtherPerson);
 //    _allTourActions_Adjust.put(_actionDeleteTourMenu            .getClass().getName(),  _actionDeleteTourMenu);
 
-// SET_FORMATTING_ON
-
       TourActionManager.setAllViewActions(ID,
+
             _allTourActions_Edit.keySet(),
             _allTourActions_Export.keySet(),
             _allTourActions_Adjust.keySet(),
-            _tagMenuManager.getAllTagActions().keySet(),
-            _tourTypeMenuManager.getAllTourTypeActions().keySet());
+
+            _tourTypeMenuManager    .getAllTourTypeActions()   .keySet(),
+            _tagMenuManager         .getAllTagActions()        .keySet(),
+            _equipmentMenuManager   .getAllEquipmentActions()  .keySet()
+      );
+
+// SET_FORMATTING_ON
 
       fillActionBars();
    }
 
    private void createMenuManager() {
 
+      _equipmentMenuManager = new EquipmentMenuManager(this, true, true);
       _tagMenuManager = new TagMenuManager(this, true);
       _tourTypeMenuManager = new TourTypeMenuManager(this);
 
@@ -1913,11 +1920,14 @@ public class CollatedToursView extends ViewPart implements ITourProvider, ITourV
       // edit actions
       TourActionManager.fillContextMenu(menuMgr, TourActionCategory.EDIT, _allTourActions_Edit, this);
 
+      // tour type actions
+      _tourTypeMenuManager.fillContextMenu_WithActiveActions(menuMgr, this);
+
       // tag actions
       _tagMenuManager.fillTagMenu_WithActiveActions(menuMgr, this);
 
-      // tour type actions
-      _tourTypeMenuManager.fillContextMenu_WithActiveActions(menuMgr, this);
+      // equipment actions
+      _equipmentMenuManager.fillEquipmentMenu_WithActiveActions(menuMgr, this);
 
       menuMgr.add(new Separator());
       menuMgr.add(_actionComputeElevationGain);

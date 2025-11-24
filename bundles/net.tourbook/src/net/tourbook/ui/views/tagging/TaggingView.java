@@ -46,6 +46,7 @@ import net.tourbook.data.TourTag;
 import net.tourbook.data.TourTagCategory;
 import net.tourbook.data.TourType;
 import net.tourbook.database.TourDatabase;
+import net.tourbook.equipment.EquipmentMenuManager;
 import net.tourbook.extension.export.ActionExport;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.preferences.PrefPageTags;
@@ -215,6 +216,7 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer,
    private IPropertyChangeListener             _prefChangeListener_Common;
    private ITourEventListener                  _tourEventListener;
 
+   private EquipmentMenuManager                _equipmentMenuManager;
    private TagMenuManager                      _tagMenuManager;
    private TourTypeMenuManager                 _tourTypeMenuManager;
    private MenuManager                         _viewerMenuManager;
@@ -726,17 +728,21 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer,
 //    _allTourActions_Adjust.put(_actionSetOtherPerson            .getClass().getName(),  _actionSetOtherPerson);
 //    _allTourActions_Adjust.put(_actionDeleteTourMenu            .getClass().getName(),  _actionDeleteTourMenu);
 
-// SET_FORMATTING_ON
-
       TourActionManager.setAllViewActions(ID,
-            _allTourActions_Edit.keySet(),
-            _allTourActions_Export.keySet(),
-            _tagMenuManager.getAllTagActions().keySet(),
-            _tourTypeMenuManager.getAllTourTypeActions().keySet());
+
+            _allTourActions_Edit    .keySet(),
+            _allTourActions_Export  .keySet(),
+
+            _tourTypeMenuManager    .getAllTourTypeActions()   .keySet(),
+            _tagMenuManager         .getAllTagActions()        .keySet(),
+            _equipmentMenuManager   .getAllEquipmentActions()  .keySet()
+      );
 
       _action_RefreshView = new ActionRefreshView(this);
       _action_ToggleTagFilter = new Action_TagFilter();
       _action_ToggleTagLayout = new Action_TagLayout();
+
+// SET_FORMATTING_ON
 
       _action_PrefDialog = new ActionOpenPrefDialog(
             Messages.Tour_Tags_Action_Preferences_Tooltip,
@@ -747,6 +753,7 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer,
 
    private void createMenuManager() {
 
+      _equipmentMenuManager = new EquipmentMenuManager(this, true, true);
       _tagMenuManager = new TagMenuManager(this, true);
       _tourTypeMenuManager = new TourTypeMenuManager(this);
 
@@ -1843,11 +1850,14 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer,
       // edit actions
       TourActionManager.fillContextMenu(menuMgr, TourActionCategory.EDIT, _allTourActions_Edit, this);
 
+      // tour type actions
+      _tourTypeMenuManager.fillContextMenu_WithActiveActions(menuMgr, this);
+
       // add/remove ... tags in the tours
       _tagMenuManager.fillTagMenu_WithActiveActions(menuMgr, this);
 
-      // tour type actions
-      _tourTypeMenuManager.fillContextMenu_WithActiveActions(menuMgr, this);
+      // equipment actions
+      _equipmentMenuManager.fillEquipmentMenu_WithActiveActions(menuMgr, this);
 
       // export actions
       TourActionManager.fillContextMenu(menuMgr, TourActionCategory.EXPORT, _allTourActions_Export, this);

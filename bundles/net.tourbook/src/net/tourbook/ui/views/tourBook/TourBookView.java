@@ -1670,9 +1670,10 @@ public class TourBookView extends ViewPart implements
             _allTourActions_Export.keySet(),
             _allTourActions_Adjust.keySet(),
 
-            _equipmentMenuManager.getAllEquipmentActions()  .keySet(),
+            _tourTypeMenuManager .getAllTourTypeActions()   .keySet(),
             _tagMenuManager      .getAllTagActions()        .keySet(),
-            _tourTypeMenuManager .getAllTourTypeActions()   .keySet());
+            _equipmentMenuManager.getAllEquipmentActions()  .keySet()
+      );
 
 // SET_FORMATTING_ON
 
@@ -2498,14 +2499,14 @@ public class TourBookView extends ViewPart implements
       // edit actions
       TourActionManager.fillContextMenu(menuMgr, TourActionCategory.EDIT, _allTourActions_Edit, this);
 
+      // tour type actions
+      _tourTypeMenuManager.fillContextMenu_WithActiveActions(menuMgr, this);
+
       // tag actions
       _tagMenuManager.fillTagMenu_WithActiveActions(menuMgr, this);
 
       // equipment actions
       _equipmentMenuManager.fillEquipmentMenu_WithActiveActions(menuMgr, this);
-
-      // tour type actions
-      _tourTypeMenuManager.fillContextMenu_WithActiveActions(menuMgr, this);
 
       // tree only actions
       if (isTree) {
