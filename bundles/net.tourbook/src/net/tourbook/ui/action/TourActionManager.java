@@ -28,6 +28,7 @@ import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.action.ActionOpenPrefDialog;
 import net.tourbook.common.util.Util;
 import net.tourbook.equipment.ActionAddEquipment_SubMenu;
+import net.tourbook.equipment.ActionAddRecentEquipment;
 import net.tourbook.equipment.ActionRemoveEquipment_SubMenu;
 import net.tourbook.equipment.EquipmentMenuManager.ActionAddEquipmentGroups_SubMenu;
 import net.tourbook.equipment.EquipmentMenuManager.ActionRemoveEquipmentAll;
@@ -362,6 +363,10 @@ public class TourActionManager {
                                                                               Messages.Action_Equipment_AddEquipment_Groups,
                                                                               TourActionCategory.EQUIPMENT);
 
+      final TourAction actionAddRecentEquipment          = new TourAction(    ActionAddRecentEquipment.class.getName(),
+                                                                              Messages.Action_Equipment_AddRecentEquipment,
+                                                                              TourActionCategory.EQUIPMENT);
+
       final TourAction actionRemoveEquipment             = new TourAction(    ActionRemoveEquipment_SubMenu.class.getName(),
                                                                               Messages.Action_Equipment_RemoveEquipment,
                                                                               TourActionCategory.EQUIPMENT);
@@ -374,6 +379,7 @@ public class TourActionManager {
 
       _allDefinedActions.add(actionAddEquipment);
       _allDefinedActions.add(actionAddEquipment_Groups);
+      _allDefinedActions.add(actionAddRecentEquipment);
       _allDefinedActions.add(actionRemoveEquipment);
       _allDefinedActions.add(actionRemoveEquipment_All);
 
@@ -382,6 +388,7 @@ public class TourActionManager {
 
       _allDefinedActionsMap.put(ActionAddEquipment_SubMenu        .class.getName(),          actionAddEquipment);
       _allDefinedActionsMap.put(ActionAddEquipmentGroups_SubMenu  .class.getName(),          actionAddEquipment_Groups);
+      _allDefinedActionsMap.put(ActionAddRecentEquipment          .class.getName(),          actionAddRecentEquipment);
       _allDefinedActionsMap.put(ActionRemoveEquipment_SubMenu     .class.getName(),          actionRemoveEquipment);
       _allDefinedActionsMap.put(ActionRemoveEquipmentAll          .class.getName(),          actionRemoveEquipment_All);
 

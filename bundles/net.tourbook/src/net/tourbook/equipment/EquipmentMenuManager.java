@@ -40,6 +40,7 @@ import net.tourbook.tour.TourEventId;
 import net.tourbook.tour.TourManager;
 import net.tourbook.ui.ITourProvider;
 import net.tourbook.ui.ITourProvider2;
+import net.tourbook.ui.action.IActionProvider;
 import net.tourbook.ui.action.TourActionCategory;
 import net.tourbook.ui.action.TourActionManager;
 
@@ -54,7 +55,9 @@ import org.eclipse.swt.custom.BusyIndicator;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Menu;
 
-public class EquipmentMenuManager {
+public class EquipmentMenuManager implements IActionProvider {
+
+   private static final char NL = UI.NEW_LINE;
 
 // SET_FORMATTING_OFF
 
@@ -80,6 +83,13 @@ public class EquipmentMenuManager {
    private static List<ActionRecentEquipment>    _allActions_RecentEquipment_Visible = new ArrayList<>();
    private static Map<String, Object>            _allEquipmentActions;
 
+   /**
+    * Contains all equipment id's when only one tour is selected
+    */
+   private static HashSet<Long>                  _allEquipmentIDs_OneTour;
+
+   private static boolean                        _isEnableRecentEquipmentActions;
+
    private static EquipmentMenuManager           _currentInstance;
 
    private ITourProvider                         _tourProvider;
@@ -89,6 +99,7 @@ public class EquipmentMenuManager {
 
    private ActionAddEquipment_SubMenu            _actionAddEquipment;
    private ActionAddEquipmentGroups_SubMenu      _actionAddEquipment_Groups;
+   private ActionAddRecentEquipment              _actionAddRecentEquipment;
    private ActionOpenPrefDialog                  _actionEquipmentGroupPreferences;
    private ActionOpenPrefDialog                  _actionEquipmentPreferences;
    private ActionRemoveEquipment_SubMenu         _actionRemoveEquipment;
@@ -157,7 +168,7 @@ public class EquipmentMenuManager {
       }
    }
 
-   private static class ActionRecentEquipment extends Action {
+   public static class ActionRecentEquipment extends Action {
 
       private Equipment __equipment;
 
@@ -169,6 +180,17 @@ public class EquipmentMenuManager {
       public void run() {
 
          _currentInstance.addEquipment(__equipment);
+      }
+
+      @Override
+      public String toString() {
+
+         return UI.EMPTY_STRING
+
+               + "ActionRecentEquipment" + NL //               //$NON-NLS-1$
+
+               + " __equipment = " + __equipment + NL //       //$NON-NLS-1$
+         ;
       }
 
       private void updateAction(final Equipment equipment, final String equipmentText) {
@@ -320,6 +342,7 @@ public class EquipmentMenuManager {
 
       _actionAddEquipment              = new ActionAddEquipment_SubMenu(this);
       _actionAddEquipment_Groups       = new ActionAddEquipmentGroups_SubMenu();
+      _actionAddRecentEquipment        = new ActionAddRecentEquipment(this);
       _actionRemoveEquipment           = new ActionRemoveEquipment_SubMenu(this);
       _actionRemoveAllEquipment        = new ActionRemoveEquipmentAll();
 
@@ -330,6 +353,7 @@ public class EquipmentMenuManager {
 
       _allEquipmentActions.put(_actionAddEquipment          .getClass().getName(),  _actionAddEquipment);
       _allEquipmentActions.put(_actionAddEquipment_Groups   .getClass().getName(),  _actionAddEquipment_Groups);
+      _allEquipmentActions.put(_actionAddRecentEquipment    .getClass().getName(),  _actionAddRecentEquipment);
       _allEquipmentActions.put(_actionRemoveEquipment       .getClass().getName(),  _actionRemoveEquipment);
       _allEquipmentActions.put(_actionRemoveAllEquipment    .getClass().getName(),  _actionRemoveAllEquipment);
 
@@ -342,14 +366,91 @@ public class EquipmentMenuManager {
       final List<Equipment> allAvailableEquipments = EquipmentManager.getAllEquipment_Name();
       final Map<Long, Equipment> allUseEquipments = getAllUseEquipments();
 
-      final boolean isEquipmentAvailable = allAvailableEquipments.size() > 0;
+// SET_FORMATTING_OFF
+
+      final boolean isEquipmentAvailable  = allAvailableEquipments.size() > 0;
       final boolean isEquipmentUsedInTour = allUseEquipments.size() > 0;
 
-      _actionAddEquipment.setEnabled(isEquipmentAvailable);
-      _actionAddEquipment_Groups.setEnabled(isEquipmentAvailable);
-      _actionRemoveEquipment.setEnabled(isEquipmentUsedInTour);
+      _actionAddEquipment        .setEnabled(isEquipmentAvailable);
+      _actionAddEquipment_Groups .setEnabled(isEquipmentAvailable);
+
+      _actionRemoveEquipment     .setEnabled(isEquipmentUsedInTour);
+
+// SET_FORMATTING_ON
 
       enableRecentActions();
+   }
+
+   /**
+    * @param isEnabled_AddEquipment
+    * @param isEnabled_RemoveEquipment
+    */
+   private void enableEquipmentActions(final boolean isEnabled_AddEquipment,
+                                       final boolean isEnabled_RemoveEquipment) {
+
+// SET_FORMATTING_OFF
+
+      _actionAddEquipment           .setEnabled(isEnabled_AddEquipment);
+      _actionAddEquipment_Groups    .setEnabled(isEnabled_AddEquipment);
+
+      _actionRemoveEquipment        .setEnabled(isEnabled_RemoveEquipment);
+      _actionRemoveAllEquipment     .setEnabled(isEnabled_RemoveEquipment);
+
+// SET_FORMATTING_ON
+
+      enableRecentEquipmentActions(isEnabled_AddEquipment, _allEquipmentIDs_OneTour);
+   }
+
+   /**
+    * Enable actions from selected tours
+    *
+    * @param isTourSelected
+    *           Is <code>true</code> when one or more tours are selected
+    * @param isOneTour
+    *           Is <code>true</code> when only one tour is selected
+    * @param oneTourEquipmentIDs
+    */
+   public void enableEquipmentActions(final boolean isTourSelected,
+                                      final boolean isOneTour,
+                                      final List<Long> oneTourEquipmentIDs) {
+
+      final boolean isEnabled_AddEquipment = isTourSelected;
+      final boolean isEnabled_RemoveEquipment;
+
+      final HashSet<Long> allEquipmentIDs = new HashSet<>();
+
+      if (isOneTour) {
+
+         // one tour is selected
+
+         if (oneTourEquipmentIDs != null && oneTourEquipmentIDs.size() > 0) {
+
+            // at least one equipment is within the tour
+
+            isEnabled_RemoveEquipment = true;
+
+            for (final Long equipmentID : oneTourEquipmentIDs) {
+               allEquipmentIDs.add(equipmentID);
+            }
+
+         } else {
+
+            // equipment are not available
+
+            isEnabled_RemoveEquipment = false;
+         }
+
+      } else {
+
+         // multiple tours are selected
+
+         isEnabled_RemoveEquipment = isTourSelected;
+      }
+
+      _isEnableRecentEquipmentActions = isEnabled_AddEquipment;
+      _allEquipmentIDs_OneTour = allEquipmentIDs;
+
+      enableEquipmentActions(isEnabled_AddEquipment, isEnabled_RemoveEquipment);
    }
 
    private void enableRecentActions() {
@@ -379,6 +480,64 @@ public class EquipmentMenuManager {
          // this shared action could be checked
          actionRecentEquipment.setChecked(false);
       }
+   }
+
+   private void enableRecentEquipmentActions(final boolean isAddEquipmentEnabled,
+                                             final Set<Long> allExistingEquipmentIDs) {
+
+      if (_allRecentEquipment == null) {
+         return;
+      }
+
+      final boolean isExistingEquipmentIDs = _allEquipmentIDs_OneTour != null && _allEquipmentIDs_OneTour.size() > 0;
+
+      for (final ActionRecentEquipment actionRecentEquipment : _allActions_RecentEquipment_Visible) {
+
+         final Equipment equipment = actionRecentEquipment.__equipment;
+
+         if (equipment == null) {
+            actionRecentEquipment.setEnabled(false);
+            continue;
+         }
+
+         final long recentEquipmentID = equipment.getEquipmentId();
+         boolean isEquipmentEnabled;
+         boolean isEquipmentChecked;
+
+         if (isExistingEquipmentIDs && _isEnableRecentEquipmentActions) {
+
+            // disable action when it's equipment id is contained in allExistingEquipmentIDs
+
+            boolean isExistEquipmentId = false;
+
+            for (final long existingEquipmentID : _allEquipmentIDs_OneTour) {
+               if (recentEquipmentID == existingEquipmentID) {
+                  isExistEquipmentId = true;
+                  break;
+               }
+            }
+
+            isEquipmentEnabled = isExistEquipmentId == false;
+            isEquipmentChecked = isExistEquipmentId;
+
+         } else {
+            isEquipmentEnabled = _isEnableRecentEquipmentActions;
+            isEquipmentChecked = false;
+         }
+
+         if (isEquipmentEnabled && allExistingEquipmentIDs.contains(recentEquipmentID)) {
+            isEquipmentChecked = true;
+         }
+
+         actionRecentEquipment.setEnabled(isEquipmentEnabled);
+         actionRecentEquipment.setChecked(isEquipmentChecked);
+      }
+   }
+
+   @Override
+   public void fillActions(final IMenuManager menuMgr, final ITourProvider tourProvider) {
+
+      fillMenuWithRecentEquipment(menuMgr);
    }
 
    /**
@@ -419,6 +578,8 @@ public class EquipmentMenuManager {
     * @param menuMgr
     */
    private void fillMenuWithRecentEquipment(final IMenuManager menuMgr) {
+
+      _currentInstance = this;
 
       if (_maxRecentEquipment < 1) {
 
@@ -561,10 +722,6 @@ public class EquipmentMenuManager {
             TourManager.fireEvent(TourEventId.TOUR_CHANGED, new TourEvent(allModifiedTours));
          }
       }
-
-//      TourManager.fireEventWithCustomData(TourEventId.NOTIFY_TAG_VIEW,
-//            new ChangedTags(modifiedTags, allModifiedTours, false),
-//            null);
    }
 
    /**

@@ -440,21 +440,22 @@ public class Equipment implements Cloneable, Comparable<Object>, Serializable {
             + " equipmentId      =" + equipmentId + NL //                  //$NON-NLS-1$
             + " brand            =" + brand + NL //                        //$NON-NLS-1$
             + " model            =" + model + NL //                        //$NON-NLS-1$
-            + " description      =" + description + NL //                  //$NON-NLS-1$
-            + " equipmentType    =" + equipmentType + NL //                //$NON-NLS-1$
-            + " distanceFirstUse =" + distanceFirstUse + NL //             //$NON-NLS-1$
-
-            + " dateBuilt        =" + dateBuilt + NL //                    //$NON-NLS-1$
-            + " dateFirstUse     =" + dateFirstUse + NL //                 //$NON-NLS-1$
-            + " dateRetired      =" + dateRetired + NL //                  //$NON-NLS-1$
-
-            + " weight           =" + weight + NL //                       //$NON-NLS-1$
-
-            + " services         =" + (services != null ? toString(services, maxLen) : null) + NL //$NON-NLS-1$
+//            + " description      =" + description + NL //                  //$NON-NLS-1$
+//            + " equipmentType    =" + equipmentType + NL //                //$NON-NLS-1$
+//            + " distanceFirstUse =" + distanceFirstUse + NL //             //$NON-NLS-1$
+//
+//            + " dateBuilt        =" + dateBuilt + NL //                    //$NON-NLS-1$
+//            + " dateFirstUse     =" + dateFirstUse + NL //                 //$NON-NLS-1$
+//            + " dateRetired      =" + dateRetired + NL //                  //$NON-NLS-1$
+//
+//            + " weight           =" + weight + NL //                       //$NON-NLS-1$
+//
+//            + " services         =" + (services != null ? toString(services, maxLen) : null) + NL //$NON-NLS-1$
       ;
    }
 
    private String toString(final Collection<?> collection, final int maxLen) {
+
       final StringBuilder builder = new StringBuilder();
       builder.append("["); //$NON-NLS-1$
       int i = 0;

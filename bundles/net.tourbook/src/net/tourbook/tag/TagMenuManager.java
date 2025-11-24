@@ -737,10 +737,10 @@ public class TagMenuManager implements IActionProvider {
    }
 
    /**
-    * @param isAddTagEnabled
-    * @param isRemoveTagEnabled
+    * @param isEnabled_AddTag
+    * @param isEnabled_RemoveTag
     */
-   private void enableTagActions(final boolean isAddTagEnabled, final boolean isRemoveTagEnabled) {
+   private void enableTagActions(final boolean isEnabled_AddTag, final boolean isEnabled_RemoveTag) {
 
       _currentInstance = this;
 
@@ -757,20 +757,20 @@ public class TagMenuManager implements IActionProvider {
 
 // SET_FORMATTING_OFF
 
-      _actionAddTag              .setEnabled(isAddTagEnabled);
-      _actionAddTagGroups        .setEnabled(isAddTagEnabled);
-      actionAddTagAdvanced       .setEnabled(isAddTagEnabled);
+      _actionAddTag              .setEnabled(isEnabled_AddTag);
+      _actionAddTagGroups        .setEnabled(isEnabled_AddTag);
+      actionAddTagAdvanced       .setEnabled(isEnabled_AddTag);
 
-      _actionRemoveTag           .setEnabled(isRemoveTagEnabled);
-      _actionRemoveAllTags       .setEnabled(isRemoveTagEnabled);
-      _actionSetTags             .setEnabled(isAddTagEnabled || isRemoveTagEnabled);
+      _actionRemoveTag           .setEnabled(isEnabled_RemoveTag);
+      _actionRemoveAllTags       .setEnabled(isEnabled_RemoveTag);
+      _actionSetTags             .setEnabled(isEnabled_AddTag || isEnabled_RemoveTag);
 
-      _actionClipboard_CopyTags  .setEnabled(isRemoveTagEnabled);
-      _actionClipboard_PasteTags .setEnabled(isAddTagEnabled && numTags > 0);
+      _actionClipboard_CopyTags  .setEnabled(isEnabled_RemoveTag);
+      _actionClipboard_PasteTags .setEnabled(isEnabled_AddTag && numTags > 0);
 
 // SET_FORMATTING_ON
 
-      enableRecentTagActions(isAddTagEnabled, _allTagIds_OneTour);
+      enableRecentTagActions(isEnabled_AddTag, _allTagIds_OneTour);
    }
 
    /**
@@ -803,11 +803,8 @@ public class TagMenuManager implements IActionProvider {
 
             isRemoveTagEnabled = true;
 
-            if (oneTourTagIds != null) {
-
-               for (final Long tagId : oneTourTagIds) {
-                  allTourTagIds.add(tagId);
-               }
+            for (final Long tagId : oneTourTagIds) {
+               allTourTagIds.add(tagId);
             }
 
          } else {

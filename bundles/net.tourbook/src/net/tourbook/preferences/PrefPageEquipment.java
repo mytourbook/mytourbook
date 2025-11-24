@@ -17,13 +17,16 @@ package net.tourbook.preferences;
 
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.UI;
+import net.tourbook.common.util.Util;
 import net.tourbook.equipment.EquipmentMenuManager;
 
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
+import org.eclipse.jface.layout.PixelConverter;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.preference.PreferencePage;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.MouseWheelListener;
 import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
@@ -42,6 +45,12 @@ public class PrefPageEquipment extends PreferencePage implements IWorkbenchPrefe
 
    private static final IPreferenceStore _prefStore = TourbookPlugin.getPrefStore();
 
+   private MouseWheelListener            _defaultMouseWheelListener;
+   private SelectionListener             _defaultSelectionListener;
+
+   private PixelConverter                _pc;
+   private int                           _hintDefaultSpinnerWidth;
+
    /*
     * UI controls
     */
@@ -49,6 +58,8 @@ public class PrefPageEquipment extends PreferencePage implements IWorkbenchPrefe
 
    @Override
    protected Control createContents(final Composite parent) {
+
+      initUI(parent);
 
       final Composite ui = createUI(parent);
 
@@ -78,10 +89,10 @@ public class PrefPageEquipment extends PreferencePage implements IWorkbenchPrefe
             _spinnerRecentEquipment.setToolTipText(tooltip);
             _spinnerRecentEquipment.setMinimum(0);
             _spinnerRecentEquipment.setMaximum(9);
-//            _spinnerRecentEquipment.addSelectionListener(_defaultSelectionListener);
-//            _spinnerRecentEquipment.addMouseWheelListener(_defaultMouseWheelListener);
+            _spinnerRecentEquipment.addSelectionListener(_defaultSelectionListener);
+            _spinnerRecentEquipment.addMouseWheelListener(_defaultMouseWheelListener);
             GridDataFactory.fillDefaults()
-//                  .hint(_hintDefaultSpinnerWidth, SWT.DEFAULT)
+                  .hint(_hintDefaultSpinnerWidth, SWT.DEFAULT)
                   .align(SWT.BEGINNING, SWT.CENTER)
                   .applyTo(_spinnerRecentEquipment);
 
@@ -103,6 +114,26 @@ public class PrefPageEquipment extends PreferencePage implements IWorkbenchPrefe
 
    @Override
    public void init(final IWorkbench workbench) {
+
+   }
+
+   private void initUI(final Composite parent) {
+
+      _pc = new PixelConverter(parent);
+
+      _hintDefaultSpinnerWidth = _pc.convertWidthInCharsToPixels(3);
+
+      _defaultSelectionListener = SelectionListener.widgetSelectedAdapter(selectionEvent -> onModify());
+
+      _defaultMouseWheelListener = mouseEvent -> {
+
+         Util.adjustSpinnerValueOnMouseScroll(mouseEvent);
+
+         onModify();
+      };
+   }
+
+   private void onModify() {
 
    }
 

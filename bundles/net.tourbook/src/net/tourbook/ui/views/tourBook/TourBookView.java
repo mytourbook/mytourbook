@@ -2334,7 +2334,8 @@ public class TourBookView extends ViewPart implements
       }
 
       final boolean isTourSelected = numTourItems > 0;
-      final boolean isOneTour = numTourItems == 1;
+      final boolean isOneTourSelected = numTourItems == 1;
+
       final boolean isAllToursSelected = _actionSelectAllTours.isChecked();
 
       final int numAvailableItems = _isLayoutNatTable
@@ -2347,7 +2348,7 @@ public class TourBookView extends ViewPart implements
       _actionOpenAdjustAltitudeDialog.setEnabled(false);
       _actionOpenMarkerDialog.setEnabled(false);
 
-      if (isOneTour) {
+      if (isOneTourSelected) {
 
          // loading the first tour is very expensive (with a delay in the UI) -> run it async
 
@@ -2361,12 +2362,12 @@ public class TourBookView extends ViewPart implements
 
                      final boolean isManualTour = savedTour.isManualTour();
                      final boolean isDeviceTour = isManualTour == false;
-                     final boolean canMergeTours = isOneTour && isDeviceTour && savedTour.getMergeSourceTourId() != null;
+                     final boolean canMergeTours = isOneTourSelected && isDeviceTour && savedTour.getMergeSourceTourId() != null;
 
-                     _actionDuplicateTour.setEnabled(isOneTour);
+                     _actionDuplicateTour.setEnabled(isOneTourSelected);
                      _actionMergeTour.setEnabled(canMergeTours);
-                     _actionOpenAdjustAltitudeDialog.setEnabled(isOneTour && isDeviceTour);
-                     _actionOpenMarkerDialog.setEnabled(isOneTour && isDeviceTour);
+                     _actionOpenAdjustAltitudeDialog.setEnabled(isOneTourSelected && isDeviceTour);
+                     _actionOpenMarkerDialog.setEnabled(isOneTourSelected && isDeviceTour);
                   }
                });
       }
@@ -2377,11 +2378,11 @@ public class TourBookView extends ViewPart implements
       final boolean isTreeLayout = !isTableLayout;
 
       // set double click infos
-      _tourDoubleClickState.canEditTour = isOneTour;
-      _tourDoubleClickState.canOpenTour = isOneTour;
-      _tourDoubleClickState.canQuickEditTour = isOneTour;
-      _tourDoubleClickState.canEditMarker = isOneTour;
-      _tourDoubleClickState.canAdjustAltitude = isOneTour;
+      _tourDoubleClickState.canEditTour = isOneTourSelected;
+      _tourDoubleClickState.canOpenTour = isOneTourSelected;
+      _tourDoubleClickState.canQuickEditTour = isOneTourSelected;
+      _tourDoubleClickState.canEditMarker = isOneTourSelected;
+      _tourDoubleClickState.canAdjustAltitude = isOneTourSelected;
 
       /*
        * enable actions
@@ -2399,13 +2400,13 @@ public class TourBookView extends ViewPart implements
       _actionDeleteTourValues       .setEnabled(true);
 
       _actionCreateTourMarkers      .setEnabled(isTourSelected);
-      _actionEditQuick              .setEnabled(isOneTour);
-      _actionEditTour               .setEnabled(isOneTour);
+      _actionEditQuick              .setEnabled(isOneTourSelected);
+      _actionEditTour               .setEnabled(isOneTourSelected);
       _actionExportTour             .setEnabled(isTourSelected);
       _actionExportViewCSV          .setEnabled(numSelectedItems > 0);
       _actionGotoToday              .setEnabled(numAvailableItems > 0);
       _actionJoinTours              .setEnabled(numTourItems > 1);
-      _actionOpenTour               .setEnabled(isOneTour);
+      _actionOpenTour               .setEnabled(isOneTourSelected);
       _actionPrintTour              .setEnabled(isTourSelected);
       _actionSetOtherPerson         .setEnabled(isTourSelected);
       _actionSetStartEndLocation    .setEnabled(isTourSelected);
@@ -2437,12 +2438,19 @@ public class TourBookView extends ViewPart implements
 
       _tagMenuManager.enableTagActions(
             isTourSelected,
-            isOneTour,
+            isOneTourSelected,
             firstTourItem == null
                   ? null
                   : firstTourItem.getTagIds());
 
-      final long tourTypeID = isOneTour
+      _equipmentMenuManager.enableEquipmentActions(
+            isTourSelected,
+            isOneTourSelected,
+            firstTourItem == null
+                  ? null
+                  : firstTourItem.getEquipmentIds());
+
+      final long tourTypeID = isOneTourSelected
             ? firstTourItem.getTourTypeId()
             : TourDatabase.ENTITY_IS_NOT_SAVED;
 

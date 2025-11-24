@@ -30,6 +30,7 @@ public class Messages extends NLS {
 
    public static String        Action_Equipment_AddEquipment;
    public static String        Action_Equipment_AddEquipment_Groups;
+   public static String        Action_Equipment_AddRecentEquipment;
    public static String        Action_Equipment_Delete;
    public static String        Action_Equipment_Edit;
    public static String        Action_Equipment_EquipmentPreferences;
