@@ -47,5 +47,6 @@ Import-Package: com.fasterxml.jackson.core.type,
  org.apache.commons.io,
  org.eclipse.jface.preference,
  org.eclipse.swt,
- org.eclipse.swt.widgets
+ org.eclipse.swt.widgets,
+ org.json
 Automatic-Module-Name: net.tourbook.tests
