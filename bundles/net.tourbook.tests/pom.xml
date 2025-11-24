@@ -34,6 +34,7 @@
              <argLine>${tycho.testArgLine} -Djunit.jupiter.displayname.generator.default=org.junit.jupiter.api.DisplayNameGenerator$ReplaceUnderscores -DlogFitData</argLine>
          </configuration>
       </plugin>
+        <!-- https://wiki.eclipse.org/Tycho/How_Tos/JUnit5 -->
       
     </plugins>
   </build>
