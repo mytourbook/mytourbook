@@ -81,13 +81,13 @@
       </repository> 
       
       <repository>
-         <id>eclipse.collections.11.1.0</id>                                           <layout>p2</layout>
-         <url>https://download.eclipse.org/collections/11.1.0/repository/</url>
+         <id>eclipse.collections.12.0.0.M21</id>                                           <layout>p2</layout>
+         <url>https://download.eclipse.org/collections/12.0.0.M21/repository/</url>
       </repository> 
       
       <repository>
          <id>eclipse.nebula.3.1.1</id>                                                 <layout>p2</layout>
-         <url>https://download.eclipse.org/nebula/updates/release/3.1.1</url>
+         <url>https://download.eclipse.org/nebula/updates/release/3.2.0</url>
       </repository> 
       
       <!-- IMPORTANT: Keep that tag in a single line as it is commented out during the GitHub build -->
