@@ -57,6 +57,7 @@ import net.tourbook.common.util.TreeViewerItem;
 import net.tourbook.common.util.Util;
 import net.tourbook.data.TourData;
 import net.tourbook.database.TourDatabase;
+import net.tourbook.equipment.EquipmentMenuManager;
 import net.tourbook.extension.export.ActionExport;
 import net.tourbook.extension.upload.ActionUpload;
 import net.tourbook.preferences.ITourbookPreferences;
@@ -374,6 +375,7 @@ public class TourBookView extends ViewPart implements
    private TourLocationToolTip                _tourLocationTooltip_NatTable;
    private TourLocationToolTip                _tourLocationTooltip_Tree;
    //
+   private EquipmentMenuManager               _equipmentMenuManager;
    private TagMenuManager                     _tagMenuManager;
    private TourTypeMenuManager                _tourTypeMenuManager;
    private MenuManager                        _viewerMenuManager_NatTable;
@@ -1662,20 +1664,24 @@ public class TourBookView extends ViewPart implements
       _allTourActions_Adjust.put(_actionSetOtherPerson            .getClass().getName(),  _actionSetOtherPerson);
       _allTourActions_Adjust.put(_actionDeleteTourMenu            .getClass().getName(),  _actionDeleteTourMenu);
 
-// SET_FORMATTING_ON
-
       TourActionManager.setAllViewActions(ID,
+
             _allTourActions_Edit.keySet(),
             _allTourActions_Export.keySet(),
             _allTourActions_Adjust.keySet(),
-            _tagMenuManager.getAllTagActions().keySet(),
-            _tourTypeMenuManager.getAllTourTypeActions().keySet());
+
+            _equipmentMenuManager.getAllEquipmentActions()  .keySet(),
+            _tagMenuManager      .getAllTagActions()        .keySet(),
+            _tourTypeMenuManager .getAllTourTypeActions()   .keySet());
+
+// SET_FORMATTING_ON
 
       fillActionBars();
    }
 
    private void createMenuManager() {
 
+      _equipmentMenuManager = new EquipmentMenuManager(this, true, true);
       _tagMenuManager = new TagMenuManager(this, true);
       _tourTypeMenuManager = new TourTypeMenuManager(this);
 
@@ -2494,6 +2500,9 @@ public class TourBookView extends ViewPart implements
 
       // tag actions
       _tagMenuManager.fillTagMenu_WithActiveActions(menuMgr, this);
+
+      // equipment actions
+      _equipmentMenuManager.fillEquipmentMenu_WithActiveActions(menuMgr, this);
 
       // tour type actions
       _tourTypeMenuManager.fillContextMenu_WithActiveActions(menuMgr, this);

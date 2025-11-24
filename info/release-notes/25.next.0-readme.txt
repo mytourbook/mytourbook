@@ -52,7 +52,8 @@ Changes
 Changes that require Tour Re-import
 ===================================
 
-* 
+* Tour Actions
+  - Moved tour type actions in the context menu before the tag actions
 
 
 Bugfix

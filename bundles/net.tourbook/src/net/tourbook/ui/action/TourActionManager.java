@@ -27,6 +27,10 @@ import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.action.ActionOpenPrefDialog;
 import net.tourbook.common.util.Util;
+import net.tourbook.equipment.ActionAddEquipment_SubMenu;
+import net.tourbook.equipment.ActionRemoveEquipment_SubMenu;
+import net.tourbook.equipment.EquipmentMenuManager.ActionAddEquipmentGroups_SubMenu;
+import net.tourbook.equipment.EquipmentMenuManager.ActionRemoveEquipmentAll;
 import net.tourbook.extension.export.ActionExport;
 import net.tourbook.extension.upload.ActionUpload;
 import net.tourbook.preferences.PrefPageAppearance_TourActions;
@@ -105,8 +109,9 @@ public class TourActionManager {
       _allDefinedActionsMap = new HashMap<>();
 
       createActions_10_Edit();
-      createActions_20_Tags();
-      createActions_30_TourTypes();
+      createActions_20_TourTypes();
+      createActions_30_Tags();
+      createActions_32_Equipment();
       createActions_40_Export();
       createActions_50_Adjust();
 
@@ -216,9 +221,47 @@ public class TourActionManager {
    }
 
    /**
+    * TOUR TYPE ACTIONS
+    */
+   private static void createActions_20_TourTypes() {
+
+// SET_FORMATTING_OFF
+
+      final TourAction categoryAction_TourType           = new TourAction(
+            Messages.Tour_Action_Category_TourTypes,
+            TourActionCategory.TOUR_TYPE);
+
+      final TourAction actionSetTourType                 = new TourAction(
+            ActionSetTourTypeMenu.class.getName(),
+            Messages.App_Action_set_tour_type,
+            TourActionCategory.TOUR_TYPE);
+
+
+      final TourAction actionAddRecentTourTypes          = new TourAction(
+            ActionAddRecentTourTypes.class.getName(),
+            Messages.Action_TourType_AddRecentTourTypes,
+            TourActionCategory.TOUR_TYPE);
+
+
+      _allDefinedActions.add(categoryAction_TourType);
+
+      _allDefinedActions.add(actionSetTourType);
+      _allDefinedActions.add(actionAddRecentTourTypes);
+
+
+      _allDefinedActionsMap.put(categoryAction_TourType         .getCategoryClassName(),      categoryAction_TourType);
+
+      _allDefinedActionsMap.put(ActionSetTourTypeMenu           .class.getName(),             actionSetTourType);
+      _allDefinedActionsMap.put(ActionAddRecentTourTypes        .class.getName(),             actionAddRecentTourTypes);
+
+// SET_FORMATTING_ON
+
+   }
+
+   /**
     * TAG ACTIONS
     */
-   private static void createActions_20_Tags() {
+   private static void createActions_30_Tags() {
 
 // SET_FORMATTING_OFF
 
@@ -301,38 +344,47 @@ public class TourActionManager {
    }
 
    /**
-    * TOUR TYPE ACTIONS
+    * EQUIPMENT Actions
     */
-   private static void createActions_30_TourTypes() {
+   private static void createActions_32_Equipment() {
 
 // SET_FORMATTING_OFF
 
-      final TourAction categoryAction_TourType           = new TourAction(
-            Messages.Tour_Action_Category_TourTypes,
-            TourActionCategory.TOUR_TYPE);
-
-      final TourAction actionSetTourType                 = new TourAction(
-            ActionSetTourTypeMenu.class.getName(),
-            Messages.App_Action_set_tour_type,
-            TourActionCategory.TOUR_TYPE);
+      final TourAction categoryAction_Equipment          = new TourAction(    Messages.Tour_Action_Category_Equipment,
+                                                                              TourActionCategory.EQUIPMENT);
 
 
-      final TourAction actionAddRecentTourTypes          = new TourAction(
-            ActionAddRecentTourTypes.class.getName(),
-            Messages.Action_TourType_AddRecentTourTypes,
-            TourActionCategory.TOUR_TYPE);
+      final TourAction actionAddEquipment                = new TourAction(    ActionAddEquipment_SubMenu.class.getName(),
+                                                                              Messages.Action_Equipment_AddEquipment,
+                                                                              TourActionCategory.EQUIPMENT);
+
+      final TourAction actionAddEquipment_Groups         = new TourAction(    ActionAddEquipmentGroups_SubMenu.class.getName(),
+                                                                              Messages.Action_Equipment_AddEquipment_Groups,
+                                                                              TourActionCategory.EQUIPMENT);
+
+      final TourAction actionRemoveEquipment             = new TourAction(    ActionRemoveEquipment_SubMenu.class.getName(),
+                                                                              Messages.Action_Equipment_RemoveEquipment,
+                                                                              TourActionCategory.EQUIPMENT);
+
+      final TourAction actionRemoveEquipment_All         = new TourAction(    ActionRemoveEquipmentAll.class.getName(),
+                                                                              Messages.Action_Equipment_RemoveEquipment_All,
+                                                                              TourActionCategory.EQUIPMENT);
+
+      _allDefinedActions.add(categoryAction_Equipment);
+
+      _allDefinedActions.add(actionAddEquipment);
+      _allDefinedActions.add(actionAddEquipment_Groups);
+      _allDefinedActions.add(actionRemoveEquipment);
+      _allDefinedActions.add(actionRemoveEquipment_All);
 
 
-      _allDefinedActions.add(categoryAction_TourType);
+      _allDefinedActionsMap.put(categoryAction_Equipment          .getCategoryClassName(),   categoryAction_Equipment);
 
-      _allDefinedActions.add(actionSetTourType);
-      _allDefinedActions.add(actionAddRecentTourTypes);
+      _allDefinedActionsMap.put(ActionAddEquipment_SubMenu        .class.getName(),          actionAddEquipment);
+      _allDefinedActionsMap.put(ActionAddEquipmentGroups_SubMenu  .class.getName(),          actionAddEquipment_Groups);
+      _allDefinedActionsMap.put(ActionRemoveEquipment_SubMenu     .class.getName(),          actionRemoveEquipment);
+      _allDefinedActionsMap.put(ActionRemoveEquipmentAll          .class.getName(),          actionRemoveEquipment_All);
 
-
-      _allDefinedActionsMap.put(categoryAction_TourType         .getCategoryClassName(),      categoryAction_TourType);
-
-      _allDefinedActionsMap.put(ActionSetTourTypeMenu           .class.getName(),             actionSetTourType);
-      _allDefinedActionsMap.put(ActionAddRecentTourTypes        .class.getName(),             actionAddRecentTourTypes);
 
 // SET_FORMATTING_ON
 
@@ -562,7 +614,7 @@ public class TourActionManager {
     */
    public static void fillContextMenu(final IMenuManager menuMgr,
                                       final TourActionCategory actionCategory,
-                                      final HashMap<String, Object> allCategoryActions,
+                                      final Map<String, Object> allCategoryActions,
                                       final ITourProvider tourProvider) {
 
       final List<TourAction> allActiveActions = getActiveActions();

@@ -456,15 +456,15 @@ public class Equipment implements Cloneable, Comparable<Object>, Serializable {
 
    private String toString(final Collection<?> collection, final int maxLen) {
       final StringBuilder builder = new StringBuilder();
-      builder.append("[");
+      builder.append("["); //$NON-NLS-1$
       int i = 0;
       for (final Iterator<?> iterator = collection.iterator(); iterator.hasNext() && i < maxLen; i++) {
          if (i > 0) {
-            builder.append(", ");
+            builder.append(", "); //$NON-NLS-1$
          }
          builder.append(iterator.next());
       }
-      builder.append("]");
+      builder.append("]"); //$NON-NLS-1$
       return builder.toString();
    }
 

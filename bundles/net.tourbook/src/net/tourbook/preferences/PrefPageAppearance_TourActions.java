@@ -112,7 +112,9 @@ public class PrefPageAppearance_TourActions extends PreferencePage implements IW
 
          if (element instanceof final TourAction tourAction) {
 
-            if (_rdoShowCustomActions.getSelection()) {
+            final boolean isShowCustomizedActions = _rdoShowCustomActions.getSelection();
+
+            if (isShowCustomizedActions) {
 
                // customize actions
 

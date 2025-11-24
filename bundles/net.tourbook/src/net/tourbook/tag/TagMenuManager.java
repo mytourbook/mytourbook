@@ -720,7 +720,7 @@ public class TagMenuManager implements IActionProvider {
 
       _advancedMenuToAddTags     = new AdvancedMenuForActions(_actionAddTag_AutoOpen);
 
-      _allTagActions       = new HashMap<>();
+      _allTagActions             = new HashMap<>();
 
       _allTagActions.put(_actionAddRecentTags         .getClass().getName(),  _actionAddRecentTags);
       _allTagActions.put(_actionAddTag                .getClass().getName(),  _actionAddTag);
@@ -865,7 +865,7 @@ public class TagMenuManager implements IActionProvider {
     */
    public void fillTagMenu(final IMenuManager menuMgr) {
 
-      // all all tour tag actions
+      // add all tour tag actions
       menuMgr.add(new Separator());
       {
          menuMgr.add(_actionAddTag_AutoOpen);

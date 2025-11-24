@@ -20,6 +20,7 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 
+import net.tourbook.Messages;
 import net.tourbook.common.ui.SubMenu;
 import net.tourbook.data.Equipment;
 import net.tourbook.data.TourData;
@@ -60,7 +61,7 @@ public class ActionRemoveEquipment_SubMenu extends SubMenu {
 
    protected ActionRemoveEquipment_SubMenu(final EquipmentMenuManager equipmentMenuManager) {
 
-      super("&Remove Equipment", AS_DROP_DOWN_MENU);
+      super(Messages.Action_Equipment_RemoveEquipment, AS_DROP_DOWN_MENU);
 
       _equipmentMenuManager = equipmentMenuManager;
    }

@@ -19,6 +19,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import net.tourbook.Messages;
 import net.tourbook.common.ui.SubMenu;
 import net.tourbook.data.Equipment;
 import net.tourbook.data.TourData;
@@ -61,7 +62,7 @@ public class ActionAddEquipment_SubMenu extends SubMenu {
 
    protected ActionAddEquipment_SubMenu(final EquipmentMenuManager equipmentMenuManager) {
 
-      super("&Add Equipment", AS_DROP_DOWN_MENU);
+      super(Messages.Action_Equipment_AddEquipment, AS_DROP_DOWN_MENU);
 
       _equipmentMenuManager = equipmentMenuManager;
    }

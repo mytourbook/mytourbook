@@ -24,6 +24,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.UI;
 import net.tourbook.common.action.ActionOpenPrefDialog;
@@ -39,6 +40,8 @@ import net.tourbook.tour.TourEventId;
 import net.tourbook.tour.TourManager;
 import net.tourbook.ui.ITourProvider;
 import net.tourbook.ui.ITourProvider2;
+import net.tourbook.ui.action.TourActionCategory;
+import net.tourbook.ui.action.TourActionManager;
 
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.ActionContributionItem;
@@ -60,7 +63,7 @@ public class EquipmentMenuManager {
 
 // SET_FORMATTING_ON
 
-   private static final String                   STATE_RECENT_EQUIPMENT              = "STATE_RECENT_EQUIPMENT";
+   private static final String                   STATE_RECENT_EQUIPMENT              = "STATE_RECENT_EQUIPMENT"; //$NON-NLS-1$
 
    private static IPropertyChangeListener        _prefChangeListener;
 
@@ -75,6 +78,7 @@ public class EquipmentMenuManager {
 
    private static ActionRecentEquipment[]        _allActions_RecentEquipment;
    private static List<ActionRecentEquipment>    _allActions_RecentEquipment_Visible = new ArrayList<>();
+   private static Map<String, Object>            _allEquipmentActions;
 
    private static EquipmentMenuManager           _currentInstance;
 
@@ -88,7 +92,7 @@ public class EquipmentMenuManager {
    private ActionOpenPrefDialog                  _actionEquipmentGroupPreferences;
    private ActionOpenPrefDialog                  _actionEquipmentPreferences;
    private ActionRemoveEquipment_SubMenu         _actionRemoveEquipment;
-   private ActionRemoveAllEquipment              _actionRemoveAllEquipment;
+   private ActionRemoveEquipmentAll              _actionRemoveAllEquipment;
 
    public class ActionAddEquipmentGroups_SubMenu extends SubMenu {
 
@@ -96,7 +100,7 @@ public class EquipmentMenuManager {
 
       public ActionAddEquipmentGroups_SubMenu() {
 
-         super("Add &Grouped Equipment", AS_DROP_DOWN_MENU);
+         super(Messages.Action_Equipment_AddEquipment_Groups, AS_DROP_DOWN_MENU);
       }
 
       @Override
@@ -178,11 +182,11 @@ public class EquipmentMenuManager {
    /**
     * Removes all equipment
     */
-   public class ActionRemoveAllEquipment extends Action {
+   public class ActionRemoveEquipmentAll extends Action {
 
-      public ActionRemoveAllEquipment() {
+      public ActionRemoveEquipmentAll() {
 
-         super("Remove A&ll Equipment", AS_PUSH_BUTTON);
+         super(Messages.Action_Equipment_RemoveEquipment_All, AS_PUSH_BUTTON);
       }
 
       @Override
@@ -316,10 +320,18 @@ public class EquipmentMenuManager {
 
       _actionAddEquipment              = new ActionAddEquipment_SubMenu(this);
       _actionAddEquipment_Groups       = new ActionAddEquipmentGroups_SubMenu();
-      _actionEquipmentPreferences      = new ActionOpenPrefDialog("Equipment &Preferences", PrefPageEquipment.ID);
       _actionRemoveEquipment           = new ActionRemoveEquipment_SubMenu(this);
-      _actionRemoveAllEquipment        = new ActionRemoveAllEquipment();
-      _actionEquipmentGroupPreferences = new ActionOpenPrefDialog("Manage Equipment &Groups...", PrefPageEquipmentGroups.ID);
+      _actionRemoveAllEquipment        = new ActionRemoveEquipmentAll();
+
+      _actionEquipmentPreferences      = new ActionOpenPrefDialog(Messages.Action_Equipment_EquipmentPreferences, PrefPageEquipment.ID);
+      _actionEquipmentGroupPreferences = new ActionOpenPrefDialog(Messages.Action_Equipment_ManageEquipmentGroups, PrefPageEquipmentGroups.ID);
+
+      _allEquipmentActions             = new HashMap<>();
+
+      _allEquipmentActions.put(_actionAddEquipment          .getClass().getName(),  _actionAddEquipment);
+      _allEquipmentActions.put(_actionAddEquipment_Groups   .getClass().getName(),  _actionAddEquipment_Groups);
+      _allEquipmentActions.put(_actionRemoveEquipment       .getClass().getName(),  _actionRemoveEquipment);
+      _allEquipmentActions.put(_actionRemoveAllEquipment    .getClass().getName(),  _actionRemoveAllEquipment);
 
 // SET_FORMATTING_ON
 
@@ -395,6 +407,14 @@ public class EquipmentMenuManager {
       enableActions();
    }
 
+   public void fillEquipmentMenu_WithActiveActions(final IMenuManager menuMgr,
+                                                   final ITourProvider tourProvider) {
+
+      menuMgr.add(new Separator());
+
+      TourActionManager.fillContextMenu(menuMgr, TourActionCategory.EQUIPMENT, _allEquipmentActions, tourProvider);
+   }
+
    /**
     * @param menuMgr
     */
@@ -451,6 +471,10 @@ public class EquipmentMenuManager {
          // advance to the next equipment
          equipmentIndex++;
       }
+   }
+
+   public Map<String, Object> getAllEquipmentActions() {
+      return _allEquipmentActions;
    }
 
    private Map<Long, Equipment> getAllUseEquipments() {

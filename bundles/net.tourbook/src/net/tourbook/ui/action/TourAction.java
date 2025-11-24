@@ -40,8 +40,15 @@ public class TourAction implements Cloneable {
    public boolean            isChecked;
    public boolean            isCategory;
 
+   /**
+    * @param className
+    *           Is used as unique key to identify this action in a set or map
+    * @param actionText
+    * @param imageDescriptor
+    * @param category
+    */
    public TourAction(final String className,
-                     final String text,
+                     final String actionText,
                      final ImageDescriptor imageDescriptor,
                      final TourActionCategory category) {
 
@@ -50,18 +57,18 @@ public class TourAction implements Cloneable {
 
       _imageDescriptor = imageDescriptor;
 
-      final String unescapedText = text.replaceAll(UI.SYMBOL_AMPERSAND, UI.EMPTY_STRING);
+      final String unescapedText = actionText.replaceAll(UI.SYMBOL_AMPERSAND, UI.EMPTY_STRING);
 
-      actionText = unescapedText;
+      this.actionText = unescapedText;
    }
 
    public TourAction(final String className,
-                     final String text,
+                     final String actionText,
                      final TourActionCategory category) {
 
       this(className,
 
-            text,
+            actionText,
 
             null,
 
@@ -69,15 +76,15 @@ public class TourAction implements Cloneable {
    }
 
    /**
-    * This is an action separator
+    * This is an action separator between category
     *
-    * @param text
+    * @param actionText
     * @param category
     */
-   public TourAction(final String text,
+   public TourAction(final String actionText,
                      final TourActionCategory category) {
 
-      actionText = text;
+      this.actionText = actionText;
       actionCategory = category;
 
       isCategory = true;

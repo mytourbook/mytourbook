@@ -28,9 +28,15 @@ public class Messages extends NLS {
 
    public static String        Action_Compute_ElevationGain;
 
+   public static String        Action_Equipment_AddEquipment;
+   public static String        Action_Equipment_AddEquipment_Groups;
    public static String        Action_Equipment_Delete;
    public static String        Action_Equipment_Edit;
+   public static String        Action_Equipment_EquipmentPreferences;
+   public static String        Action_Equipment_ManageEquipmentGroups;
    public static String        Action_Equipment_New;
+   public static String        Action_Equipment_RemoveEquipment_All;
+   public static String        Action_Equipment_RemoveEquipment;
 
    public static String        action_export_tour;
 
@@ -3115,6 +3121,8 @@ public class Messages extends NLS {
    public static String        Tour_Action_auto_zoom_to_slider_position;
    public static String        Tour_Action_Category_AdjustTour;
    public static String        Tour_Action_Category_EditTour;
+
+   public static String        Tour_Action_Category_Equipment;
    public static String        Tour_Action_Category_ExportTour;
    public static String        Tour_Action_Category_Tags;
    public static String        Tour_Action_Category_TourTypes;
