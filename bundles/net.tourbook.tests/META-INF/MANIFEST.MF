@@ -10,7 +10,9 @@ Require-Bundle: net.tourbook,
  org.eclipse.ui,
  net.tourbook.common,
  org.opentest4j,
- junit-jupiter-api
+ org.junit,
+ org.junit.jupiter.api,
+ org.junit.jupiter.engine
 Bundle-ActivationPolicy: lazy
 Bundle-ClassPath: .,
  hibernate-entitymanager.jar,
