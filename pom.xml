@@ -87,7 +87,7 @@
       </repository> 
       
       <repository>
-         <id>eclipse.nebula.3.1.1</id>                                                 <layout>p2</layout>
+         <id>eclipse.nebula.3.2.0</id>                                                 <layout>p2</layout>
          <url>https://download.eclipse.org/nebula/updates/release/3.2.0</url>
       </repository> 
       
@@ -214,7 +214,7 @@
       
       <plugin>
          <artifactId>maven-compiler-plugin</artifactId>        <groupId>org.apache.maven.plugins</groupId>
-                                                               <version>3.14.1</version>
+                                                               <version>4.0.0-beta-3</version>
          <executions>
             <execution>
                <id>compiletests</id>
