@@ -41,7 +41,7 @@
              <product>net.tourbook.productWithoutJRE</product>
              <application>net.tourbook.appWithoutJRE</application>
              <skipTests>true</skipTests>
-             <!--<skipAfterFailureCount>1</skipAfterFailureCount>-->
+             <skipAfterFailureCount>1</skipAfterFailureCount>
              <osgiDataDirectory>${project.basedir}/workspace</osgiDataDirectory>
              <deleteOsgiDataDirectory>false</deleteOsgiDataDirectory>
              <argLine>${tycho.testArgLine} -Djunit.jupiter.extensions.autodetection.enabled=true -DsilentDatabaseUpdate -DlogCalendarProfile</argLine>
