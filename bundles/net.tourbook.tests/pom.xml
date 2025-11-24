@@ -26,7 +26,7 @@
         <artifactId>tycho-surefire-plugin</artifactId>         <groupId>org.eclipse.tycho</groupId>
                                                                <version>${tycho.version}</version>
          <configuration>
-             <providerHint>junit5</providerHint>
+             <!-- <providerHint>junit5</providerHint> -->
              <useUIHarness>true</useUIHarness>
              <useUIThread>true</useUIThread>
              <product>org.eclipse.platform.ide</product>
