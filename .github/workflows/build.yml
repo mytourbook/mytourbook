@@ -72,7 +72,7 @@ jobs:
         with:
           name: Tests-Failures
           path: |
-            ${{ env.DRIVE_LETTER }}\**\.log
+            ${{ env.DRIVE_LETTER }}\a\mytourbook-BUILD-autocreated\**\.log
             ${{ env.DRIVE_LETTER }}\a\mytourbook-BUILD-autocreated\core\net.tourbook.ui.tests\target\*.png
             ${{ env.DRIVE_LETTER }}\a\mytourbook-BUILD-autocreated\core\net.tourbook.ui.tests\workspace\.metadata\.log
             ${{ env.DRIVE_LETTER }}\a\mytourbook-BUILD-autocreated\core\net.tourbook.tests\**\*-GeneratedFromTests.*
