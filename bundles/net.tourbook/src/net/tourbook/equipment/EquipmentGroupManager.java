@@ -120,7 +120,7 @@ public class EquipmentGroupManager {
 
    /**
     * @param title
-    *           can be <code>null</code>
+    *           Can be <code>null</code>
     * @param allEquipment
     *
     * @return

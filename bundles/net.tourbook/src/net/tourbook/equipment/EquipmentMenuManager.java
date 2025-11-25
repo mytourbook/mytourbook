@@ -15,6 +15,11 @@
  *******************************************************************************/
 package net.tourbook.equipment;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -22,6 +27,7 @@ import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 
 import net.tourbook.Messages;
@@ -30,6 +36,7 @@ import net.tourbook.common.UI;
 import net.tourbook.common.action.ActionOpenPrefDialog;
 import net.tourbook.common.ui.SubMenu;
 import net.tourbook.common.util.LRUMap;
+import net.tourbook.common.util.StatusUtil;
 import net.tourbook.data.Equipment;
 import net.tourbook.data.TourData;
 import net.tourbook.preferences.ITourbookPreferences;
@@ -52,8 +59,13 @@ import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.swt.custom.BusyIndicator;
+import org.eclipse.swt.dnd.ByteArrayTransfer;
+import org.eclipse.swt.dnd.Clipboard;
+import org.eclipse.swt.dnd.Transfer;
+import org.eclipse.swt.dnd.TransferData;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Menu;
+import org.eclipse.ui.PlatformUI;
 
 public class EquipmentMenuManager implements IActionProvider {
 
@@ -92,7 +104,11 @@ public class EquipmentMenuManager implements IActionProvider {
 
    private static EquipmentMenuManager           _currentInstance;
 
+   private static Map<Long, Equipment>           _allEquipment_WhenCopied;
+
    private ITourProvider                         _tourProvider;
+
+   private EquipmentTransfer                     _equipmentTransfer                  = new EquipmentTransfer();
 
    private boolean                               _isCheckTourEditor;
    private boolean                               _isSaveTour;
@@ -100,6 +116,8 @@ public class EquipmentMenuManager implements IActionProvider {
    private ActionAddEquipment_SubMenu            _actionAddEquipment;
    private ActionAddEquipmentGroups_SubMenu      _actionAddEquipment_Groups;
    private ActionAddRecentEquipment              _actionAddRecentEquipment;
+   private ActionClipboard_CopyEquipment         _actionClipboard_CopyEquipment;
+   private ActionClipboard_PasteEquipment        _actionClipboard_PasteEquipment;
    private ActionOpenPrefDialog                  _actionEquipmentGroupPreferences;
    private ActionOpenPrefDialog                  _actionEquipmentPreferences;
    private ActionRemoveEquipment_SubMenu         _actionRemoveEquipment;
@@ -148,6 +166,36 @@ public class EquipmentMenuManager implements IActionProvider {
       }
    }
 
+   public class ActionClipboard_CopyEquipment extends Action {
+
+      public ActionClipboard_CopyEquipment() {
+
+         super(Messages.Action_Equipment_ClipboardCopy, AS_PUSH_BUTTON);
+
+         setToolTipText(Messages.Action_Equipment_ClipboardCopy_Tooltip);
+      }
+
+      @Override
+      public void run() {
+
+         clipboard_CopyEquipment();
+      }
+   }
+
+   public class ActionClipboard_PasteEquipment extends Action {
+
+      public ActionClipboard_PasteEquipment() {
+
+         super(Messages.Action_Equipment_ClipboardPaste, AS_PUSH_BUTTON);
+      }
+
+      @Override
+      public void run() {
+
+         clipboard_PasteEquipment();
+      }
+   }
+
    private class ActionEquipmentGroup extends Action {
 
       private final EquipmentGroup __equipmentGroup;
@@ -164,7 +212,7 @@ public class EquipmentMenuManager implements IActionProvider {
       @Override
       public void run() {
 
-         saveTourEquipment(__equipmentGroup);
+         saveEquipment(__equipmentGroup);
       }
    }
 
@@ -215,6 +263,80 @@ public class EquipmentMenuManager implements IActionProvider {
       public void run() {
 
          BusyIndicator.showWhile(Display.getCurrent(), () -> removeAllEquipment());
+      }
+   }
+
+   private class EquipmentTransfer extends ByteArrayTransfer {
+
+      private final String TYPE_NAME = "net.tourbook.equipment.EquipmentMenuManager.EquipmentTransfer"; //$NON-NLS-1$
+      private final int    TYPE_ID   = registerType(TYPE_NAME);
+
+      private EquipmentTransfer() {}
+
+      @Override
+      protected int[] getTypeIds() {
+         return new int[] { TYPE_ID };
+      }
+
+      @Override
+      protected String[] getTypeNames() {
+         return new String[] { TYPE_NAME };
+      }
+
+      @Override
+      protected void javaToNative(final Object data, final TransferData transferData) {
+
+         try (final ByteArrayOutputStream out = new ByteArrayOutputStream();
+               final DataOutputStream dataOut = new DataOutputStream(out)) {
+
+            if (_allEquipment_WhenCopied != null) {
+
+               // write number of equipment
+               dataOut.writeInt(_allEquipment_WhenCopied.size());
+
+               // write all equipment ID's
+               for (final Entry<Long, Equipment> entry : _allEquipment_WhenCopied.entrySet()) {
+                  dataOut.writeLong(entry.getKey());
+               }
+            }
+
+            super.javaToNative(out.toByteArray(), transferData);
+
+         } catch (final IOException e) {
+
+            StatusUtil.log(e);
+         }
+      }
+
+      @Override
+      protected Object nativeToJava(final TransferData transferData) {
+
+         final byte[] bytes = (byte[]) super.nativeToJava(transferData);
+
+         try (final ByteArrayInputStream in = new ByteArrayInputStream(bytes);
+               final DataInputStream dataIn = new DataInputStream(in)) {
+
+            final HashSet<Long> allEquipmentIDs = new HashSet<>();
+
+            // read number of equipment
+            final int numEquipment = dataIn.readInt();
+
+            for (int equipmentIndex = 0; equipmentIndex < numEquipment; equipmentIndex++) {
+
+               // read equipment ID
+               final long equipmentID = dataIn.readLong();
+
+               allEquipmentIDs.add(equipmentID);
+            }
+
+            return allEquipmentIDs;
+
+         } catch (final IOException e) {
+
+            StatusUtil.log(e);
+         }
+
+         return null;
       }
    }
 
@@ -336,6 +458,56 @@ public class EquipmentMenuManager implements IActionProvider {
       updateRecentEquipment(equipment);
    }
 
+   private void clipboard_CopyEquipment() {
+
+      _allEquipment_WhenCopied = getSelectedEquipment();
+
+      final Clipboard clipboard = new Clipboard(PlatformUI.getWorkbench().getDisplay());
+      {
+         clipboard.setContents(
+
+               new Object[] { new Object() },
+               new Transfer[] { _equipmentTransfer });
+      }
+      clipboard.dispose();
+
+      UI.showStatusLineMessage("%d equipment were copied to the clipboard".formatted(_allEquipment_WhenCopied.size()));
+   }
+
+   private void clipboard_PasteEquipment() {
+
+      Object contents;
+
+      final Clipboard clipboard = new Clipboard(PlatformUI.getWorkbench().getDisplay());
+      {
+         contents = clipboard.getContents(_equipmentTransfer);
+      }
+      clipboard.dispose();
+
+      if (contents instanceof final HashSet allEquipmentIDs) {
+
+         // get all equipment from the equipment ID's
+
+         final Map<Long, Equipment> allEquipment = EquipmentManager.getAllEquipment_ByID();
+         final Map<Long, Equipment> allClipboardEquipment = new HashMap<>();
+
+         for (final Object equipmentID : allEquipmentIDs) {
+
+            final Equipment equipment = allEquipment.get(equipmentID);
+
+            if (equipment != null) {
+
+               allClipboardEquipment.put(equipment.getEquipmentId(), equipment);
+            }
+         }
+
+         if (allClipboardEquipment.size() > 0) {
+
+            saveEquipment_All(allClipboardEquipment, true);
+         }
+      }
+   }
+
    private void createActions() {
 
 // SET_FORMATTING_OFF
@@ -346,16 +518,21 @@ public class EquipmentMenuManager implements IActionProvider {
       _actionRemoveEquipment           = new ActionRemoveEquipment_SubMenu(this);
       _actionRemoveAllEquipment        = new ActionRemoveEquipmentAll();
 
+      _actionClipboard_CopyEquipment  = new ActionClipboard_CopyEquipment();
+      _actionClipboard_PasteEquipment = new ActionClipboard_PasteEquipment();
+
       _actionEquipmentPreferences      = new ActionOpenPrefDialog(Messages.Action_Equipment_EquipmentPreferences, PrefPageEquipment.ID);
       _actionEquipmentGroupPreferences = new ActionOpenPrefDialog(Messages.Action_Equipment_ManageEquipmentGroups, PrefPageEquipmentGroups.ID);
 
       _allEquipmentActions             = new HashMap<>();
 
-      _allEquipmentActions.put(_actionAddEquipment          .getClass().getName(),  _actionAddEquipment);
-      _allEquipmentActions.put(_actionAddEquipment_Groups   .getClass().getName(),  _actionAddEquipment_Groups);
-      _allEquipmentActions.put(_actionAddRecentEquipment    .getClass().getName(),  _actionAddRecentEquipment);
-      _allEquipmentActions.put(_actionRemoveEquipment       .getClass().getName(),  _actionRemoveEquipment);
-      _allEquipmentActions.put(_actionRemoveAllEquipment    .getClass().getName(),  _actionRemoveAllEquipment);
+      _allEquipmentActions.put(_actionAddEquipment             .getClass().getName(),  _actionAddEquipment);
+      _allEquipmentActions.put(_actionAddEquipment_Groups      .getClass().getName(),  _actionAddEquipment_Groups);
+      _allEquipmentActions.put(_actionAddRecentEquipment       .getClass().getName(),  _actionAddRecentEquipment);
+      _allEquipmentActions.put(_actionClipboard_CopyEquipment  .getClass().getName(),  _actionClipboard_CopyEquipment);
+      _allEquipmentActions.put(_actionClipboard_PasteEquipment .getClass().getName(),  _actionClipboard_PasteEquipment);
+      _allEquipmentActions.put(_actionRemoveEquipment          .getClass().getName(),  _actionRemoveEquipment);
+      _allEquipmentActions.put(_actionRemoveAllEquipment       .getClass().getName(),  _actionRemoveAllEquipment);
 
 // SET_FORMATTING_ON
 
@@ -364,17 +541,16 @@ public class EquipmentMenuManager implements IActionProvider {
    private void enableActions() {
 
       final List<Equipment> allAvailableEquipments = EquipmentManager.getAllEquipment_Name();
-      final Map<Long, Equipment> allUseEquipments = getAllUseEquipments();
+      final Map<Long, Equipment> allUsedEquipments = getAllUsedEquipments();
+
+      final int numClipboardEquipment = updateUI_PasteAction();
 
 // SET_FORMATTING_OFF
 
-      final boolean isEquipmentAvailable  = allAvailableEquipments.size() > 0;
-      final boolean isEquipmentUsedInTour = allUseEquipments.size() > 0;
+      final boolean isEnabled_AddEquipment  = allAvailableEquipments.size() > 0;
+      final boolean isEnabled_RemoveEquipment = allUsedEquipments.size() > 0;
 
-      _actionAddEquipment        .setEnabled(isEquipmentAvailable);
-      _actionAddEquipment_Groups .setEnabled(isEquipmentAvailable);
-
-      _actionRemoveEquipment     .setEnabled(isEquipmentUsedInTour);
+      enableEquipmentActions(isEnabled_AddEquipment, isEnabled_RemoveEquipment, numClipboardEquipment);
 
 // SET_FORMATTING_ON
 
@@ -388,17 +564,28 @@ public class EquipmentMenuManager implements IActionProvider {
    private void enableEquipmentActions(final boolean isEnabled_AddEquipment,
                                        final boolean isEnabled_RemoveEquipment) {
 
-// SET_FORMATTING_OFF
+      final int numClipboardEquipment = updateUI_PasteAction();
 
-      _actionAddEquipment           .setEnabled(isEnabled_AddEquipment);
-      _actionAddEquipment_Groups    .setEnabled(isEnabled_AddEquipment);
-
-      _actionRemoveEquipment        .setEnabled(isEnabled_RemoveEquipment);
-      _actionRemoveAllEquipment     .setEnabled(isEnabled_RemoveEquipment);
-
-// SET_FORMATTING_ON
+      enableEquipmentActions(isEnabled_AddEquipment, isEnabled_RemoveEquipment, numClipboardEquipment);
 
       enableRecentEquipmentActions(isEnabled_AddEquipment, _allEquipmentIDs_OneTour);
+   }
+
+   private void enableEquipmentActions(final boolean isEnabled_AddEquipment,
+                                       final boolean isEnabled_RemoveEquipment,
+                                       final int numClipboardEquipment) {
+      // SET_FORMATTING_OFF
+
+            _actionAddEquipment              .setEnabled(isEnabled_AddEquipment);
+            _actionAddEquipment_Groups       .setEnabled(isEnabled_AddEquipment);
+
+            _actionRemoveEquipment           .setEnabled(isEnabled_RemoveEquipment);
+            _actionRemoveAllEquipment        .setEnabled(isEnabled_RemoveEquipment);
+
+            _actionClipboard_CopyEquipment   .setEnabled(isEnabled_RemoveEquipment);
+            _actionClipboard_PasteEquipment  .setEnabled(isEnabled_AddEquipment && numClipboardEquipment > 0);
+
+      // SET_FORMATTING_ON
    }
 
    /**
@@ -541,7 +728,7 @@ public class EquipmentMenuManager implements IActionProvider {
    }
 
    /**
-    * Add all tour equipment actions
+    * Add all and only the equipment actions
     *
     * @param menuMgr
     */
@@ -553,10 +740,14 @@ public class EquipmentMenuManager implements IActionProvider {
       {
          menuMgr.add(_actionAddEquipment);
          menuMgr.add(_actionAddEquipment_Groups);
+
          fillMenuWithRecentEquipment(menuMgr);
 
          menuMgr.add(_actionRemoveEquipment);
          menuMgr.add(_actionRemoveAllEquipment);
+
+         menuMgr.add(_actionClipboard_CopyEquipment);
+         menuMgr.add(_actionClipboard_PasteEquipment);
 
          menuMgr.add(new Separator());
 
@@ -638,7 +829,10 @@ public class EquipmentMenuManager implements IActionProvider {
       return _allEquipmentActions;
    }
 
-   private Map<Long, Equipment> getAllUseEquipments() {
+   /**
+    * @return Returns all equipment from all selected tours
+    */
+   private Map<Long, Equipment> getAllUsedEquipments() {
 
       final Map<Long, Equipment> allUsedEquipment = new HashMap<>();
 
@@ -653,6 +847,62 @@ public class EquipmentMenuManager implements IActionProvider {
       }
 
       return allUsedEquipment;
+   }
+
+   private List<Equipment> getEquipmentFromClipboard() {
+
+      Object clipboardContent;
+
+      final Clipboard clipboard = new Clipboard(PlatformUI.getWorkbench().getDisplay());
+      {
+         clipboardContent = clipboard.getContents(_equipmentTransfer);
+      }
+      clipboard.dispose();
+
+      if (clipboardContent instanceof final HashSet allEquipmentIDs) {
+
+         // get all equipment from the equipment ID's
+
+         final Map<Long, Equipment> allTourEquipment = EquipmentManager.getAllEquipment_ByID();
+         final List<Equipment> allClipboardEquipment = new ArrayList<>();
+
+         for (final Object equipmentID : allEquipmentIDs) {
+
+            final Equipment equipment = allTourEquipment.get(equipmentID);
+
+            if (equipment != null) {
+
+               allClipboardEquipment.add(equipment);
+            }
+         }
+
+         return allClipboardEquipment;
+      }
+
+      return null;
+   }
+
+   private Map<Long, Equipment> getSelectedEquipment() {
+
+      final Map<Long, Equipment> allEquipment_Selected = new HashMap<>();
+
+      final List<TourData> allSelectedTours = _tourProvider.getSelectedTours();
+
+      if (allSelectedTours != null) {
+
+         // get all equipment from all tours
+         for (final TourData tourData : allSelectedTours) {
+
+            final Set<Equipment> allTourEquipment = tourData.getEquipment();
+
+            for (final Equipment equipment : allTourEquipment) {
+
+               allEquipment_Selected.put(equipment.getEquipmentId(), equipment);
+            }
+         }
+      }
+
+      return allEquipment_Selected;
    }
 
    public ITourProvider getTourProvider() {
@@ -729,7 +979,7 @@ public class EquipmentMenuManager implements IActionProvider {
     *
     * @param equipmentGroup
     */
-   private void saveTourEquipment(final EquipmentGroup equipmentGroup) {
+   private void saveEquipment(final EquipmentGroup equipmentGroup) {
 
       final HashMap<Long, Equipment> allEquipment = new HashMap<>();
 
@@ -738,18 +988,18 @@ public class EquipmentMenuManager implements IActionProvider {
          allEquipment.put(equipment.getEquipmentId(), equipment);
       }
 
-      saveTourEquipment_All(allEquipment, true);
+      saveEquipment_All(allEquipment, true);
    }
 
    /**
-    * Add/remove and save for multiple equipment
+    * Add or remove and save multiple equipment in the selected tours
     *
     * @param mapWithAllModifiedEquipment
     * @param isAddMode
     *           When <code>true</code> then equipment are added otherwise they are removed
     */
-   private void saveTourEquipment_All(final HashMap<Long, Equipment> mapWithAllModifiedEquipment,
-                                      final boolean isAddMode) {
+   private void saveEquipment_All(final Map<Long, Equipment> mapWithAllModifiedEquipment,
+                                  final boolean isAddMode) {
 
       final Runnable runnable = () -> {
 
@@ -795,6 +1045,23 @@ public class EquipmentMenuManager implements IActionProvider {
    public void updateRecentEquipment(final Equipment equipment) {
 
       _allRecentEquipment.putFirst(equipment.getEquipmentId(), equipment);
+   }
+
+   /**
+    * @return Returns number of equipment in the clipboard
+    */
+   private int updateUI_PasteAction() {
+
+      final List<Equipment> allEquipmentInClipboard = getEquipmentFromClipboard();
+      final int numEquipment = allEquipmentInClipboard != null ? allEquipmentInClipboard.size() : 0;
+
+      if (numEquipment > 0) {
+
+         _actionClipboard_PasteEquipment.setToolTipText("Paste equipment from the clipboard into the selected tours\n\n%s"
+               .formatted(EquipmentGroupManager.createEquipmentSortedList(null, allEquipmentInClipboard)));
+      }
+
+      return numEquipment;
    }
 
 }

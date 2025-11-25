@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2024 Wolfgang Schramm and Contributors
+ * Copyright (C) 2024, 2025 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -66,6 +66,7 @@ public class PrefPageAppearance_TourActions extends PreferencePage implements IW
 
    public static final String            ID                 = "net.tourbook.preferences.PrefPageAppearance_TourActions"; //$NON-NLS-1$
 
+   private static final String           LINK_ID_EQUIPMENT  = "equipment";                                               //$NON-NLS-1$
    private static final String           LINK_ID_TAGS       = "tags";                                                    //$NON-NLS-1$
    private static final String           LINK_ID_TOUR_TYPES = "tourTypes";                                               //$NON-NLS-1$
 
@@ -88,21 +89,19 @@ public class PrefPageAppearance_TourActions extends PreferencePage implements IW
    private Control _parent;
 
    private Button  _btnCheckAll;
-
    private Button  _btnUncheckAll;
    private Button  _btnUp;
    private Button  _btnDown;
    private Button  _chkShowOnlyAvailableActions;
-
    private Button  _rdoShowAllActions;
-
    private Button  _rdoShowCustomActions;
+
    private Label   _lblContextView;
    private Label   _lblViewerContext;
-
    private Label   _lblOptions;
-   private Link    _linkOptions_Tags;
 
+   private Link    _linkOptions_Equipment;
+   private Link    _linkOptions_Tags;
    private Link    _linkOptions_TourTypes;
 
    private class ActionFilter extends ViewerFilter {
@@ -215,9 +214,11 @@ public class PrefPageAppearance_TourActions extends PreferencePage implements IW
 
    private Composite createUI(final Composite parent) {
 
+      final int verticalSpacing = 3;
+
       final Composite container = new Composite(parent, SWT.NONE);
       GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
-      GridLayoutFactory.fillDefaults().numColumns(1).applyTo(container);
+      GridLayoutFactory.fillDefaults().numColumns(1).spacing(0, verticalSpacing).applyTo(container);
 //      container.setBackground(UI.SYS_COLOR_YELLOW);
       {
          {
@@ -253,16 +254,15 @@ public class PrefPageAppearance_TourActions extends PreferencePage implements IW
           */
          final Composite viewerContainer = new Composite(container, SWT.NONE);
          GridDataFactory.fillDefaults()
-               .indent(8, 0)
+               .indent(12, 0)
                .grab(true, true)
                .applyTo(viewerContainer);
-         GridLayoutFactory.fillDefaults().numColumns(2).applyTo(viewerContainer);
+         GridLayoutFactory.fillDefaults().numColumns(2).spacing(0, verticalSpacing).applyTo(viewerContainer);
 //         viewerContainer.setBackground(UI.SYS_COLOR_BLUE);
          {
             createUI_10_ViewerContext(viewerContainer);
             createUI_20_ActionViewer(viewerContainer);
             createUI_30_ViewerActions(viewerContainer);
-            createUI_50_Options(viewerContainer);
          }
       }
 
@@ -315,14 +315,10 @@ public class PrefPageAppearance_TourActions extends PreferencePage implements IW
       final TableLayoutComposite tableLayouter = new TableLayoutComposite(parent, SWT.NONE);
       GridDataFactory.fillDefaults()
             .grab(true, true)
-            .hint(50, 100)
+            .hint(100, 100)
             .applyTo(tableLayouter);
 
-      final Table table = new Table(
-            tableLayouter,
-            (SWT.CHECK
-                  | SWT.SINGLE
-                  | SWT.FULL_SELECTION));
+      final Table table = new Table(tableLayouter, SWT.CHECK | SWT.SINGLE | SWT.FULL_SELECTION);
 
       table.setHeaderVisible(false);
       table.setLinesVisible(false);
@@ -341,8 +337,14 @@ public class PrefPageAppearance_TourActions extends PreferencePage implements IW
    private void createUI_30_ViewerActions(final Composite parent) {
 
       final Composite container = new Composite(parent, SWT.NONE);
-      GridDataFactory.fillDefaults().align(SWT.FILL, SWT.BEGINNING).applyTo(container);
+      GridDataFactory.fillDefaults()
+            .align(SWT.FILL, SWT.FILL)
+            .grab(false, true)
+            .indent(5, 0)
+            .applyTo(container);
+
       GridLayoutFactory.fillDefaults().applyTo(container);
+//      container.setBackground(UI.SYS_COLOR_MAGENTA);
       {
          {
             /*
@@ -393,6 +395,8 @@ public class PrefPageAppearance_TourActions extends PreferencePage implements IW
             _btnUncheckAll.addSelectionListener(SelectionListener.widgetSelectedAdapter(selectionEvent -> onCheckAll(false)));
             setButtonLayoutData(_btnUncheckAll);
          }
+
+         createUI_50_Options(container);
       }
    }
 
@@ -400,45 +404,53 @@ public class PrefPageAppearance_TourActions extends PreferencePage implements IW
 
       final String tooltipText = Messages.Pref_TourActions_Label_Options_Tooltip;
 
-      final GridDataFactory gdLink = GridDataFactory.fillDefaults().indent(6, 0);
       final SelectionListener selectionListener = SelectionListener.widgetSelectedAdapter(event -> onSelectOptions(event));
 
       final Composite container = new Composite(parent, SWT.NONE);
-      GridDataFactory.fillDefaults().span(2, 1).grab(true, false).applyTo(container);
-      GridLayoutFactory.fillDefaults()
-            .numColumns(2)
-            .spacing(0, 2)
+      GridDataFactory.fillDefaults()
+            .grab(true, true)
+            .align(SWT.CENTER, SWT.END)
             .applyTo(container);
+      GridLayoutFactory.fillDefaults().numColumns(1).spacing(0, 0).applyTo(container);
+//      container.setBackground(UI.SYS_COLOR_GREEN);
       {
          {
             _lblOptions = new Label(container, SWT.WRAP);
             _lblOptions.setText(Messages.Pref_TourActions_Label_Options);
             _lblOptions.setToolTipText(tooltipText);
-            GridDataFactory.fillDefaults()
-                  .align(SWT.FILL, SWT.BEGINNING)
-                  .applyTo(_lblOptions);
          }
          {
             /*
-             * Link to tag and tour type options
-             */
-            _linkOptions_Tags = new Link(container, SWT.WRAP);
-            _linkOptions_Tags.setText(Messages.Pref_TourActions_Link_Option_Tags.formatted(LINK_ID_TAGS));
-            _linkOptions_Tags.setToolTipText(tooltipText);
-            _linkOptions_Tags.addSelectionListener(selectionListener);
-            gdLink.applyTo(_linkOptions_Tags);
-         }
-         UI.createSpacer_Horizontal(container);
-         {
-            /*
-             * Link to tag and tour type options
+             * Link to tour type options
              */
             _linkOptions_TourTypes = new Link(container, SWT.WRAP);
             _linkOptions_TourTypes.setText(Messages.Pref_TourActions_Link_Option_TourTypes.formatted(LINK_ID_TOUR_TYPES));
             _linkOptions_TourTypes.setToolTipText(tooltipText);
             _linkOptions_TourTypes.addSelectionListener(selectionListener);
-            gdLink.applyTo(_linkOptions_TourTypes);
+            GridDataFactory.fillDefaults().grab(true, false).indent(0, 2).applyTo(_linkOptions_TourTypes);
+
          }
+         {
+            /*
+             * Link to tag options
+             */
+            _linkOptions_Tags = new Link(container, SWT.WRAP);
+            _linkOptions_Tags.setText(Messages.Pref_TourActions_Link_Option_Tags.formatted(LINK_ID_TAGS));
+            _linkOptions_Tags.setToolTipText(tooltipText);
+            _linkOptions_Tags.addSelectionListener(selectionListener);
+         }
+         {
+            /*
+             * Link to equipment options
+             */
+            _linkOptions_Equipment = new Link(container, SWT.WRAP);
+            _linkOptions_Equipment.setText(Messages.Pref_TourActions_Link_Option_Equipment.formatted(LINK_ID_EQUIPMENT));
+            _linkOptions_Equipment.setToolTipText(tooltipText);
+            _linkOptions_Equipment.addSelectionListener(selectionListener);
+         }
+
+         // force vertical space at the bottom
+         UI.createSpacer_Vertical(container, 10, 1);
       }
    }
 
@@ -607,6 +619,7 @@ public class PrefPageAppearance_TourActions extends PreferencePage implements IW
       _lblOptions                   .setEnabled(isCustomizeActions);
       _lblViewerContext             .setEnabled(isCustomizeActions);
 
+      _linkOptions_Equipment        .setEnabled(isCustomizeActions);
       _linkOptions_Tags             .setEnabled(isCustomizeActions);
       _linkOptions_TourTypes        .setEnabled(isCustomizeActions);
 
@@ -800,17 +813,15 @@ public class PrefPageAppearance_TourActions extends PreferencePage implements IW
 
       if (LINK_ID_TAGS.equals(selectionEvent.text)) {
 
-         PreferencesUtil.createPreferenceDialogOn(getShell(),
-               PrefPageAppearance.ID,
-               null,
-               null);
+         PreferencesUtil.createPreferenceDialogOn(getShell(), PrefPageAppearance.ID, null, null);
 
       } else if (LINK_ID_TOUR_TYPES.equals(selectionEvent.text)) {
 
-         PreferencesUtil.createPreferenceDialogOn(getShell(),
-               PrefPageTourType_Groups.ID,
-               null,
-               null);
+         PreferencesUtil.createPreferenceDialogOn(getShell(), PrefPageTourType_Groups.ID, null, null);
+
+      } else if (LINK_ID_EQUIPMENT.equals(selectionEvent.text)) {
+
+         PreferencesUtil.createPreferenceDialogOn(getShell(), PrefPageEquipment.ID, null, null);
       }
    }
 

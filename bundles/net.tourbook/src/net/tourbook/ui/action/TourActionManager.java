@@ -31,6 +31,8 @@ import net.tourbook.equipment.ActionAddEquipment_SubMenu;
 import net.tourbook.equipment.ActionAddRecentEquipment;
 import net.tourbook.equipment.ActionRemoveEquipment_SubMenu;
 import net.tourbook.equipment.EquipmentMenuManager.ActionAddEquipmentGroups_SubMenu;
+import net.tourbook.equipment.EquipmentMenuManager.ActionClipboard_CopyEquipment;
+import net.tourbook.equipment.EquipmentMenuManager.ActionClipboard_PasteEquipment;
 import net.tourbook.equipment.EquipmentMenuManager.ActionRemoveEquipmentAll;
 import net.tourbook.extension.export.ActionExport;
 import net.tourbook.extension.upload.ActionUpload;
@@ -375,26 +377,43 @@ public class TourActionManager {
                                                                               Messages.Action_Equipment_RemoveEquipment_All,
                                                                               TourActionCategory.EQUIPMENT);
 
+      final TourAction actionClipboard_CopyEquipment     = new TourAction(    ActionClipboard_CopyEquipment.class.getName(),
+                                                                              Messages.Action_Equipment_ClipboardCopy,
+                                                                              TourActionCategory.EQUIPMENT);
+
+      final TourAction actionClipboard_PasteEquipment    = new TourAction(    ActionClipboard_PasteEquipment.class.getName(),
+                                                                              Messages.Action_Equipment_ClipboardPaste,
+                                                                              TourActionCategory.EQUIPMENT);
+
+      // -----------------------------------------------------------------
+
       _allDefinedActions.add(categoryAction_Equipment);
 
       _allDefinedActions.add(actionAddEquipment);
       _allDefinedActions.add(actionAddEquipment_Groups);
       _allDefinedActions.add(actionAddRecentEquipment);
+
       _allDefinedActions.add(actionRemoveEquipment);
       _allDefinedActions.add(actionRemoveEquipment_All);
 
+      _allDefinedActions.add(actionClipboard_CopyEquipment);
+      _allDefinedActions.add(actionClipboard_PasteEquipment);
+
+      // -----------------------------------------------------------------
 
       _allDefinedActionsMap.put(categoryAction_Equipment          .getCategoryClassName(),   categoryAction_Equipment);
 
       _allDefinedActionsMap.put(ActionAddEquipment_SubMenu        .class.getName(),          actionAddEquipment);
       _allDefinedActionsMap.put(ActionAddEquipmentGroups_SubMenu  .class.getName(),          actionAddEquipment_Groups);
       _allDefinedActionsMap.put(ActionAddRecentEquipment          .class.getName(),          actionAddRecentEquipment);
+
       _allDefinedActionsMap.put(ActionRemoveEquipment_SubMenu     .class.getName(),          actionRemoveEquipment);
       _allDefinedActionsMap.put(ActionRemoveEquipmentAll          .class.getName(),          actionRemoveEquipment_All);
 
+      _allDefinedActionsMap.put(ActionClipboard_CopyEquipment     .class.getName(),          actionClipboard_CopyEquipment);
+      _allDefinedActionsMap.put(ActionClipboard_PasteEquipment    .class.getName(),          actionClipboard_PasteEquipment);
 
 // SET_FORMATTING_ON
-
    }
 
    private static void createActions_40_Export() {

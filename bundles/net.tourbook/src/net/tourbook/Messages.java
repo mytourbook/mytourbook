@@ -31,6 +31,9 @@ public class Messages extends NLS {
    public static String        Action_Equipment_AddEquipment;
    public static String        Action_Equipment_AddEquipment_Groups;
    public static String        Action_Equipment_AddRecentEquipment;
+   public static String        Action_Equipment_ClipboardCopy;
+   public static String        Action_Equipment_ClipboardCopy_Tooltip;
+   public static String        Action_Equipment_ClipboardPaste;
    public static String        Action_Equipment_Delete;
    public static String        Action_Equipment_Edit;
    public static String        Action_Equipment_EquipmentPreferences;
@@ -2062,6 +2065,7 @@ public class Messages extends NLS {
    public static String        Pref_TourActions_Label_Options;
    public static String        Pref_TourActions_Label_Options_Tooltip;
    public static String        Pref_TourActions_Label_ViewerContext;
+   public static String        Pref_TourActions_Link_Option_Equipment;
    public static String        Pref_TourActions_Link_Option_Tags;
    public static String        Pref_TourActions_Link_Option_TourTypes;
    public static String        Pref_TourActions_Radio_ShowAllActions;
