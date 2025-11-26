@@ -40,8 +40,7 @@ import net.tourbook.tour.TourEventId;
 import net.tourbook.tour.TourManager;
 import net.tourbook.ui.ITourProvider;
 import net.tourbook.ui.TreeColumnFactory;
-import net.tourbook.ui.views.tagging.TVITaggingView_TagCategory;
-import net.tourbook.ui.views.tagging.TVITaggingView_Tour;
+import net.tourbook.ui.action.ActionRefreshView;
 
 import org.eclipse.e4.ui.di.PersistState;
 import org.eclipse.jface.action.Action;
@@ -75,33 +74,29 @@ import org.eclipse.ui.part.ViewPart;
 
 public class EquipmentView extends ViewPart implements ITourProvider, ITourViewer, ITreeViewer {
 
-   public static final String            ID                           = "net.tourbook.equipment.EquipmentView.ID"; //$NON-NLS-1$
+   public static final String            ID                         = "net.tourbook.equipment.EquipmentView.ID"; //$NON-NLS-1$
 
-   private static final IPreferenceStore _prefStore                   = TourbookPlugin.getPrefStore();
-   private static final IPreferenceStore _prefStore_Common            = CommonActivator.getPrefStore();
-   private static final IDialogSettings  _state                       = TourbookPlugin.getState(ID);
-
-   private static final int              TAG_VIEW_LAYOUT_FLAT         = 0;
-   private static final int              TAG_VIEW_LAYOUT_HIERARCHICAL = 10;
+   private static final IPreferenceStore _prefStore                 = TourbookPlugin.getPrefStore();
+   private static final IPreferenceStore _prefStore_Common          = CommonActivator.getPrefStore();
+   private static final IDialogSettings  _state                     = TourbookPlugin.getState(ID);
 
    private IPropertyChangeListener       _prefChangeListener;
    private IPropertyChangeListener       _prefChangeListener_Common;
 
-   private int                           _tagViewLayout               = TAG_VIEW_LAYOUT_HIERARCHICAL;
-
    private ActionDeleteEquipment         _actionDeleteEquipment;
    private ActionEditEquipment           _actionEditEquipment;
    private ActionNewEquipment            _actionNewEquipment;
+   private ActionRefreshView             _action_RefreshView;
 
    private TreeViewer                    _equipViewer;
    private ColumnManager                 _columnManager;
-   private TVIEquipRoot                  _rootItem;
+   private TVIEquipmentView_EquipRoot    _rootItem;
 
    private PixelConverter                _pc;
 
    private MenuManager                   _viewerMenuManager;
    private Menu                          _treeContextMenu;
-   private IContextMenuProvider          _viewerContextMenuProvider   = new TreeContextMenuProvider();
+   private IContextMenuProvider          _viewerContextMenuProvider = new TreeContextMenuProvider();
 
    private boolean                       _isSelectedWithKeyboard;
 
@@ -326,12 +321,12 @@ public class EquipmentView extends ViewPart implements ITourProvider, ITourViewe
 
    // SET_FORMATTING_OFF
 
+      _actionDeleteEquipment     = new ActionDeleteEquipment();
       _actionEditEquipment       = new ActionEditEquipment();
       _actionNewEquipment        = new ActionNewEquipment();
-      _actionDeleteEquipment     = new ActionDeleteEquipment();
+      _action_RefreshView        = new ActionRefreshView(this);
 
    // SET_FORMATTING_ON
-
    }
 
    private void createMenuManager() {
@@ -531,7 +526,12 @@ public class EquipmentView extends ViewPart implements ITourProvider, ITourViewe
             final Object element = cell.getElement();
 
             if (element instanceof final TVIEquipmentView_Equipment tviEquipment) {
+
                cell.setText(tviEquipment.getEquipment().getName());
+
+            } else if (element instanceof final TVIEquipmentView_Tour tviTour) {
+
+               cell.setText(Long.toString(tviTour.tourId));
             }
          }
       });
@@ -702,15 +702,14 @@ public class EquipmentView extends ViewPart implements ITourProvider, ITourViewe
        */
       int numTours = 0;
       int numEquipments = 0;
-      int numCategorys = 0;
       int numItems = 0;
       int numOtherItems = 0;
 
-      TVITaggingView_Tour firstTour = null;
+      TVIEquipmentView_Tour firstTour = null;
 
       for (final Object treeItem : selection) {
 
-         if (treeItem instanceof final TVITaggingView_Tour tourItem) {
+         if (treeItem instanceof final TVIEquipmentView_Tour tourItem) {
 
             if (numTours == 0) {
                firstTour = tourItem;
@@ -722,10 +721,6 @@ public class EquipmentView extends ViewPart implements ITourProvider, ITourViewe
 
             numEquipments++;
 
-         } else if (treeItem instanceof TVITaggingView_TagCategory) {
-
-            numCategorys++;
-
          } else {
 
             numOtherItems++;
@@ -735,14 +730,12 @@ public class EquipmentView extends ViewPart implements ITourProvider, ITourViewe
       }
 
       final boolean isTourSelected = numTours > 0;
-      final boolean isEquipmentSelected = numEquipments > 0 && numTours == 0 && numCategorys == 0 && numOtherItems == 0;
-      final boolean isCategorySelected = numCategorys == 1 && numTours == 0 && numEquipments == 0 && numOtherItems == 0;
+      final boolean isEquipmentSelected = numEquipments > 0 && numTours == 0 && numOtherItems == 0;
       final boolean isOneTour = numTours == 1;
       final boolean isItemsAvailable = numTreeItems > 0;
 
       _actionDeleteEquipment.setEnabled(isEquipmentSelected);
       _actionEditEquipment.setEnabled(isEquipmentSelected);
-
    }
 
    private void fillActionBars() {
@@ -753,6 +746,7 @@ public class EquipmentView extends ViewPart implements ITourProvider, ITourViewe
       final IToolBarManager tbm = getViewSite().getActionBars().getToolBarManager();
 
       tbm.add(_actionNewEquipment);
+      tbm.add(_action_RefreshView);
 
       // update that actions are fully created otherwise action enable will fail
       tbm.update(true);
@@ -944,9 +938,7 @@ public class EquipmentView extends ViewPart implements ITourProvider, ITourViewe
 
    private void reloadViewer_SetContent() {
 
-      final boolean isTreeLayoutHierarchical = _tagViewLayout == TAG_VIEW_LAYOUT_HIERARCHICAL;
-
-      _rootItem = new TVIEquipRoot(_equipViewer, isTreeLayoutHierarchical);
+      _rootItem = new TVIEquipmentView_EquipRoot(_equipViewer);
 
       // first: load all tree items
       loadAllTreeItems();

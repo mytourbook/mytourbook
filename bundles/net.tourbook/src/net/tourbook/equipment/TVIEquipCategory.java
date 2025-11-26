@@ -26,7 +26,7 @@ import net.tourbook.database.TourDatabase;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.swt.widgets.Tree;
 
-public class TVIEquipCategory extends TVIEquipmentItem {
+public class TVIEquipCategory extends TVIEquipmentView_Item {
 
    private TourTagCategory _tourTagCategory;
 

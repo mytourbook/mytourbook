@@ -19,15 +19,18 @@ import net.tourbook.common.util.TreeViewerItem;
 
 import org.eclipse.jface.viewers.TreeViewer;
 
-public abstract class TVIEquipmentItem extends TreeViewerItem {
+public abstract class TVIEquipmentView_Item extends TreeViewerItem {
 
    private TreeViewer _equipmentViewer;
 
-   public TVIEquipmentItem(final TreeViewer equipmentViewer) {
+   public TVIEquipmentView_Item(final TreeViewer equipmentViewer) {
 
       _equipmentViewer = equipmentViewer;
    }
 
+   /**
+    * @return Each equipment viewer item has access to its viewer
+    */
    public TreeViewer getEquipmentViewer() {
 
       return _equipmentViewer;
