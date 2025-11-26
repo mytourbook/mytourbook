@@ -424,6 +424,7 @@ public class CollatedToursView extends ViewPart implements ITourProvider, ITourV
             reloadViewer();
 
          } else if (eventId == TourEventId.TAG_STRUCTURE_CHANGED
+               || eventId == TourEventId.EQUIPMENT_STRUCTURE_CHANGED
                || eventId == TourEventId.ALL_TOURS_ARE_MODIFIED) {
 
             reloadViewer();

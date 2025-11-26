@@ -658,6 +658,7 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer,
             }
 
          } else if (tourEventId == TourEventId.TAG_STRUCTURE_CHANGED
+               || tourEventId == TourEventId.EQUIPMENT_STRUCTURE_CHANGED
                || tourEventId == TourEventId.TAG_CONTENT_CHANGED // tag image size is modified
                || tourEventId == TourEventId.UPDATE_UI) {
 

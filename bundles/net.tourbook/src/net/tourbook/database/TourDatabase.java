@@ -261,7 +261,7 @@ public class TourDatabase {
    private static final String ENTITY_ID_BIKE                = "BikeID";                                    //$NON-NLS-1$
    private static final String ENTITY_ID_COMPARED            = "ComparedID";                                //$NON-NLS-1$
    private static final String ENTITY_ID_DEVICE_SENSOR       = "SensorId";                                  //$NON-NLS-1$
-   private static final String ENTITY_ID_EQUIPMENT           = "EquipmentId";                               //$NON-NLS-1$
+   public static final String  ENTITY_ID_EQUIPMENT           = "EquipmentId";                               //$NON-NLS-1$
    private static final String ENTITY_ID_EQUIPMENT_PART      = "PartId";                                    //$NON-NLS-1$
    private static final String ENTITY_ID_EQUIPMENT_SERVICE   = "ServiceId";                                 //$NON-NLS-1$
    private static final String ENTITY_ID_DEVICE_SENSOR_VALUE = "SensorValueId";                             //$NON-NLS-1$
@@ -284,7 +284,7 @@ public class TourDatabase {
    public  static final String KEY_BEVERAGE_CONTAINER       = TABLE_TOUR_BEVERAGE_CONTAINER  + "_" + ENTITY_ID_BEVERAGECONTAINER;   //$NON-NLS-1$
    private static final String KEY_BIKE                     = TABLE_TOUR_BIKE                + "_" + ENTITY_ID_BIKE;                //$NON-NLS-1$
    private static final String KEY_DEVICE_SENSOR            = TABLE_DEVICE_SENSOR            + "_" + ENTITY_ID_DEVICE_SENSOR;       //$NON-NLS-1$
-   private static final String KEY_EQUIPMENT                = TABLE_EQUIPMENT                + "_" + ENTITY_ID_EQUIPMENT;           //$NON-NLS-1$
+   public static final String  KEY_EQUIPMENT                = TABLE_EQUIPMENT                + "_" + ENTITY_ID_EQUIPMENT;           //$NON-NLS-1$
    private static final String KEY_EQUIPMENT_PART           = TABLE_EQUIPMENT_PART           + "_" + ENTITY_ID_EQUIPMENT_PART;   //$NON-NLS-1$
    public static final String  KEY_MARKER_TYPE              = TABLE_TOUR_MARKER_TYPE         + "_" + ENTITY_ID_MARKER_TYPE;         //$NON-NLS-1$
    private static final String KEY_PERSON                   = TABLE_TOUR_PERSON              + "_" + ENTITY_ID_PERSON;              //$NON-NLS-1$

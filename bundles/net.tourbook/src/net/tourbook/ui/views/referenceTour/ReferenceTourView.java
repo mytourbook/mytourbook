@@ -674,7 +674,8 @@ public class ReferenceTourView extends ViewPart implements
                   updateTourViewer(_rootItem, modifiedTours);
                }
 
-            } else if (eventId == TourEventId.TAG_STRUCTURE_CHANGED) {
+            } else if (eventId == TourEventId.TAG_STRUCTURE_CHANGED
+                  || eventId == TourEventId.EQUIPMENT_STRUCTURE_CHANGED) {
 
                reloadViewer();
 

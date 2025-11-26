@@ -341,7 +341,8 @@ public class TourBlogView extends ViewPart {
                }
             }
          } else if (eventId == TourEventId.TAG_CONTENT_CHANGED ||
-               eventId == TourEventId.TAG_STRUCTURE_CHANGED) {
+               eventId == TourEventId.TAG_STRUCTURE_CHANGED
+               || eventId == TourEventId.EQUIPMENT_STRUCTURE_CHANGED) {
 
             reloadTourData();
          }

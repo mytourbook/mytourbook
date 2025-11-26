@@ -1356,7 +1356,8 @@ public class RawDataView extends ViewPart implements
                reimportAllImportFiles(false);
             }
 
-         } else if (eventId == TourEventId.TAG_STRUCTURE_CHANGED) {
+         } else if (eventId == TourEventId.TAG_STRUCTURE_CHANGED
+               || eventId == TourEventId.EQUIPMENT_STRUCTURE_CHANGED) {
 
             _rawDataMgr.updateTourData_InImportView_FromDb(null);
 

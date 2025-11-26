@@ -676,7 +676,8 @@ public class ElevationCompareResultView extends ViewPart implements
 
                enableActions();
 
-            } else if (eventId == TourEventId.TAG_STRUCTURE_CHANGED) {
+            } else if (eventId == TourEventId.TAG_STRUCTURE_CHANGED
+                  || eventId == TourEventId.EQUIPMENT_STRUCTURE_CHANGED) {
 
                reloadViewer();
             }

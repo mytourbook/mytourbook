@@ -251,6 +251,7 @@ public class CalendarView extends ViewPart implements ITourProvider, ICalendarPr
             onSelectionChanged((ISelection) eventData);
 
          } else if (tourEventId == TourEventId.TAG_STRUCTURE_CHANGED
+               || tourEventId == TourEventId.EQUIPMENT_STRUCTURE_CHANGED
                || tourEventId == TourEventId.ALL_TOURS_ARE_MODIFIED) {
 
             refreshCalendar();

@@ -362,7 +362,8 @@ public class TourChartView extends ViewPart implements
                   clearView();
                }
 
-            } else if (eventId == TourEventId.TAG_STRUCTURE_CHANGED) {
+            } else if (eventId == TourEventId.TAG_STRUCTURE_CHANGED
+                  || eventId == TourEventId.EQUIPMENT_STRUCTURE_CHANGED) {
 
                /*
                 * A tag was saved, when this view was hidden and then unhidden, it can cause an

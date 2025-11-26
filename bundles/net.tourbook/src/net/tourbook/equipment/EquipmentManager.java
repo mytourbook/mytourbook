@@ -15,6 +15,10 @@
  *******************************************************************************/
 package net.tourbook.equipment;
 
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -28,16 +32,22 @@ import javax.persistence.Query;
 
 import net.tourbook.common.UI;
 import net.tourbook.common.util.StatusUtil;
+import net.tourbook.common.util.Util;
 import net.tourbook.data.Equipment;
 import net.tourbook.data.TourData;
 import net.tourbook.database.MyTourbookException;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.tour.TourEvent;
 import net.tourbook.tour.TourEventId;
+import net.tourbook.tour.TourLogManager;
+import net.tourbook.tour.TourLogManager.AutoOpenEvent;
 import net.tourbook.tour.TourManager;
 import net.tourbook.ui.ITourProvider;
 import net.tourbook.ui.ITourProvider2;
 
+import org.eclipse.jface.dialogs.IDialogConstants;
+import org.eclipse.jface.dialogs.MessageDialog;
+import org.eclipse.jface.window.Window;
 import org.eclipse.swt.custom.BusyIndicator;
 import org.eclipse.swt.widgets.Display;
 
@@ -52,6 +62,23 @@ public class EquipmentManager {
 
    private static ConcurrentSkipListSet<String> _allEquipment_Brands;
    private static ConcurrentSkipListSet<String> _allEquipment_Models;
+
+   /**
+    * Clear all equipment resources within MT and fire a equipment modify event, ensure that
+    * {@link TourManager#isTourEditorModified()} <code>== false</code>
+    */
+   public static void clearAllEquipmentResourcesAndFireModifyEvent() {
+
+      // remove old equpment from cached tours
+      clearCachedValues();
+
+      EquipmentMenuManager.clearRecentEquipment();
+
+      TourManager.getInstance().clearTourDataCache();
+
+      // fire modify event
+      TourManager.fireEvent(TourEventId.EQUIPMENT_STRUCTURE_CHANGED);
+   }
 
    public static void clearCachedValues() {
 
@@ -126,8 +153,151 @@ public class EquipmentManager {
       BusyIndicator.showWhile(Display.getCurrent(), runnable);
    }
 
-   public static void equipment_Delete(final List<Equipment> allSelectedEquipments) {
+   /**
+    * Deletes a equipment from all contained tours and in the equipment structure. This event
+    * {@link TourEventId#EQUIPMENT_STRUCTURE_CHANGED} is fired when done
+    *
+    * @param allEquipment
+    *
+    * @return
+    *
+    * @return Returns <code>true</code> when deletion was successful
+    */
+   public static boolean equipment_Delete(final List<Equipment> allEquipment) {
 
+      // ensure that a tour is NOT modified in the tour editor
+      if (TourManager.isTourEditorModified(false)) {
+         return false;
+      }
+
+      String dialogMessage;
+
+      final List<Long> allTourIds = getEquipmentTours(allEquipment);
+
+      if (allEquipment.size() == 1) {
+
+         // remove one equipment
+
+         dialogMessage = "Permanently delete equipment\n\n\"%s\"\n\nand remove this equipment from %d tours ?".formatted(
+               allEquipment.get(0).getName(),
+               allTourIds.size());
+
+      } else {
+
+         // remove multiple equipment
+
+         dialogMessage = "Permanently delete %d tags and remove them from %d tours ?".formatted(
+               allEquipment.size(),
+               allTourIds.size());
+      }
+
+      final Display display = Display.getDefault();
+
+      // confirm deletion, show equipment name and number of tours which contain a equipment
+      final MessageDialog dialog = new MessageDialog(
+            display.getActiveShell(),
+            "Delete Equipment",
+            null,
+            dialogMessage,
+            MessageDialog.QUESTION,
+            new String[] {
+                  "&Delete Equipment",
+                  IDialogConstants.CANCEL_LABEL },
+            1);
+
+      final boolean[] returnValue = { false };
+
+      if (dialog.open() == Window.OK) {
+
+         BusyIndicator.showWhile(display, () -> {
+
+            if (Equipment_Delete_All(allEquipment)) {
+
+               clearAllEquipmentResourcesAndFireModifyEvent();
+
+//               updateTourTagFilterProfiles(allEquipment);
+
+               returnValue[0] = true;
+            }
+         });
+      }
+
+      return returnValue[0];
+   }
+
+   private static boolean Equipment_Delete_All(final List<Equipment> allEquipment) {
+
+      boolean returnResult = false;
+
+      String sql;
+
+      PreparedStatement prepStmt_TourData = null;
+      PreparedStatement prepStmt_Equipment = null;
+
+      try (Connection conn = TourDatabase.getInstance().getConnection()) {
+
+         // remove equipment from "TOURDATA_Equipment"
+         sql = UI.EMPTY_STRING
+               + "DELETE" + NL //                                                   //$NON-NLS-1$
+               + " FROM " + TourDatabase.JOINTABLE__TOURDATA__EQUIPMENT + NL //     //$NON-NLS-1$
+               + " WHERE " + TourDatabase.KEY_EQUIPMENT + "=?" + NL //              //$NON-NLS-1$ //$NON-NLS-2$
+         ;
+
+         prepStmt_TourData = conn.prepareStatement(sql);
+
+         // remove equipment from table "Equipment"
+         sql = UI.EMPTY_STRING
+               + "DELETE" + NL//                                                    //$NON-NLS-1$
+               + " FROM " + TourDatabase.TABLE_EQUIPMENT + NL //                    //$NON-NLS-1$
+               + " WHERE " + TourDatabase.ENTITY_ID_EQUIPMENT + "=?" + NL //        //$NON-NLS-1$ //$NON-NLS-2$
+         ;
+         prepStmt_Equipment = conn.prepareStatement(sql);
+
+         int[] returnValue_TourData;
+         int[] returnValue_Equipment;
+
+         conn.setAutoCommit(false);
+         {
+            for (final Equipment equipment : allEquipment) {
+
+               final long equipmentID = equipment.getEquipmentId();
+
+               prepStmt_TourData.setLong(1, equipmentID);
+               prepStmt_TourData.addBatch();
+
+               prepStmt_Equipment.setLong(1, equipmentID);
+               prepStmt_Equipment.addBatch();
+            }
+
+            returnValue_TourData = prepStmt_TourData.executeBatch();
+            returnValue_Equipment = prepStmt_Equipment.executeBatch();
+         }
+         conn.commit();
+
+         // log result
+         TourLogManager.showLogView(AutoOpenEvent.DELETE_SOMETHING);
+
+         for (int equipmentIndex = 0; equipmentIndex < allEquipment.size(); equipmentIndex++) {
+
+            TourLogManager.log_INFO("Equipment is deleted from %d tours and %d equipment definition - \"%s\"".formatted(
+                  returnValue_TourData[equipmentIndex],
+                  returnValue_Equipment[equipmentIndex],
+                  allEquipment.get(equipmentIndex).getName()));
+         }
+
+         returnResult = true;
+
+      } catch (final SQLException e) {
+
+         net.tourbook.ui.UI.showSQLException(e);
+
+      } finally {
+
+         Util.closeSql(prepStmt_TourData);
+         Util.closeSql(prepStmt_Equipment);
+      }
+
+      return returnResult;
    }
 
    /**
@@ -347,6 +517,79 @@ public class EquipmentManager {
       }
 
       return equipmentNamesText;
+   }
+
+   /**
+    * Get all tours for a equipment ID
+    *
+    * @param allEquipment
+    *
+    * @return Returns a list with all tour id's which contain the tour equipment
+    */
+   private static List<Long> getEquipmentTours(final List<Equipment> allEquipment) {
+
+      final List<Long> allTourIds = new ArrayList<>();
+
+      final List<Long> sqlParameters = new ArrayList<>();
+      final StringBuilder sqlParameterPlaceholder = new StringBuilder();
+
+      boolean isFirst = true;
+
+      for (final Equipment equipment : allEquipment) {
+
+         if (isFirst) {
+            isFirst = false;
+            sqlParameterPlaceholder.append(TourDatabase.PARAMETER_FIRST);
+         } else {
+            sqlParameterPlaceholder.append(TourDatabase.PARAMETER_FOLLOWING);
+         }
+
+         sqlParameters.add(equipment.getEquipmentId());
+      }
+
+      final String sql = UI.EMPTY_STRING
+
+            + "SELECT" + NL //                                                                           //$NON-NLS-1$
+
+            + " DISTINCT TourData.tourId" + NL //                                                        //$NON-NLS-1$
+
+            + " FROM " + TourDatabase.JOINTABLE__TOURDATA__EQUIPMENT + " JTdataTequipment " + NL //      //$NON-NLS-1$ //$NON-NLS-2$
+
+            // get all tours for current equipment
+            + " LEFT OUTER JOIN " + TourDatabase.TABLE_TOUR_DATA + " TourData" + NL //                   //$NON-NLS-1$ //$NON-NLS-2$
+            + " ON JTdataTequipment.TourData_tourId = TourData.tourId " + NL //                          //$NON-NLS-1$
+
+            + " WHERE JTdataTequipment.Equipment_equipmentID IN (" + sqlParameterPlaceholder.toString() + ")" + NL //$NON-NLS-1$ //$NON-NLS-2$
+
+            + " ORDER BY tourId" + NL //                                                                 //$NON-NLS-1$
+      ;
+
+      PreparedStatement statement = null;
+
+      try (Connection conn = TourDatabase.getInstance().getConnection()) {
+
+         statement = conn.prepareStatement(sql);
+
+         // fillup parameter
+         for (int parameterIndex = 0; parameterIndex < sqlParameters.size(); parameterIndex++) {
+            statement.setLong(parameterIndex + 1, sqlParameters.get(parameterIndex));
+         }
+
+         final ResultSet result = statement.executeQuery();
+         while (result.next()) {
+            allTourIds.add(result.getLong(1));
+         }
+
+      } catch (final SQLException e) {
+
+         StatusUtil.logError(sql);
+         net.tourbook.ui.UI.showSQLException(e);
+
+      } finally {
+         Util.closeSql(statement);
+      }
+
+      return allTourIds;
    }
 
    private static void loadEquipment() {
