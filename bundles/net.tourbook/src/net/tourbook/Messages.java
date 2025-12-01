@@ -57,6 +57,9 @@ public class Messages extends NLS {
    public static String        action_tagView_flat_layout;
    public static String        action_tag_add;
    public static String        Action_Tag_Add_AutoOpen;
+   public static String        Action_Tag_Add_AutoOpen_Categorized;
+   public static String        Action_Tag_Add_AutoOpen_Default;
+   public static String        Action_Tag_Add_AutoOpen_Flat;
    public static String        Action_Tag_Add_AutoOpen_ModifiedTags;
    public static String        Action_Tag_Add_AutoOpen_Title;
    public static String        Action_Tag_Add_RecentTags;

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2011, 2024 Matthias Helmling and Contributors
+ * Copyright (C) 2011, 2025 Matthias Helmling and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -21,6 +21,7 @@ import static org.eclipse.swt.events.SelectionListener.widgetSelectedAdapter;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.List;
 
 import net.tourbook.Images;
 import net.tourbook.Messages;
@@ -356,7 +357,9 @@ public class CalendarView extends ViewPart implements ITourProvider, ICalendarPr
       addSelectionListener();
 
       // set context menu
-      final Menu contextMenu = (new TourContextMenu()).createContextMenu(this, _calendarGraph, getLocalActions());
+      final List<Action> localActions = getLocalActions();
+      final TourContextMenu tourContextMenu = new TourContextMenu();
+      final Menu contextMenu = tourContextMenu.createContextMenu(this, _calendarGraph, localActions);
       _calendarGraph.setMenu(contextMenu);
 
       // set tour tooltip

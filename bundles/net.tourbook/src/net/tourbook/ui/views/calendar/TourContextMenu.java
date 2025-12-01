@@ -152,9 +152,7 @@ public class TourContextMenu {
 
       createActions(calendarView, CONTEXT_ID);
 
-      // final MenuManager menuMgr = new MenuManager("#PopupMenu"); //$NON-NLS-1$
       final MenuManager menuMgr = new MenuManager();
-      final TagMenuManager tagMenuMgr = new TagMenuManager(calendarView, true);
 
       menuMgr.setRemoveAllWhenShown(true);
       menuMgr.addMenuListener(menuManager -> {
@@ -170,13 +168,14 @@ public class TourContextMenu {
       contextMenu.addMenuListener(new MenuAdapter() {
          @Override
          public void menuHidden(final MenuEvent e) {
-            tagMenuMgr.onHideMenu();
+
+            _tagMenuManager.onHideMenu();
          }
 
          @Override
          public void menuShown(final MenuEvent menuEvent) {
-            // tagMenuMgr.onShowMenu(menuEvent, _control, Display.getCurrent().getCursorLocation(), _tourInfoToolTip);
-            tagMenuMgr.onShowMenu(menuEvent, control, Display.getCurrent().getCursorLocation(), null);
+
+            _tagMenuManager.onShowMenu(menuEvent, control, Display.getCurrent().getCursorLocation(), null);
          }
       });
 

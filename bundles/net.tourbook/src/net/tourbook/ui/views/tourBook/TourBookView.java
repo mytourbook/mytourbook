@@ -1664,12 +1664,7 @@ public class TourBookView extends ViewPart implements
 
 // SET_FORMATTING_ON
 
-      TourActionManager.setAllViewActions(ID,
-            _allTourActions_Edit.keySet(),
-            _allTourActions_Export.keySet(),
-            _allTourActions_Adjust.keySet(),
-            _tagMenuManager.getAllTagActions().keySet(),
-            _tourTypeMenuManager.getAllTourTypeActions().keySet());
+      updateTourActions();
 
       fillActionBars();
    }
@@ -2026,10 +2021,13 @@ public class TourBookView extends ViewPart implements
             // set true/false/null
             _actionSetStartEndLocation.setIsStartLocation(getTourLocation_HoverState());
 
+            final Boolean isFlatView = _viewLayout == TourBookViewLayout.NAT_TABLE;
+
             _tagMenuManager.onShowMenu(menuEvent,
                   _tourViewer_NatTable,
                   Display.getCurrent().getCursorLocation(),
-                  _tourInfoToolTip_NatTable);
+                  _tourInfoToolTip_NatTable,
+                  isFlatView);
          }
 
       });
@@ -2200,7 +2198,14 @@ public class TourBookView extends ViewPart implements
 
          @Override
          public void menuShown(final MenuEvent menuEvent) {
-            _tagMenuManager.onShowMenu(menuEvent, tree, Display.getCurrent().getCursorLocation(), _tourInfoToolTip_Tree);
+
+            final Boolean isFlatView = _viewLayout == TourBookViewLayout.NAT_TABLE;
+
+            _tagMenuManager.onShowMenu(menuEvent,
+                  tree,
+                  Display.getCurrent().getCursorLocation(),
+                  _tourInfoToolTip_Tree,
+                  isFlatView);
          }
       });
 
@@ -2428,12 +2433,17 @@ public class TourBookView extends ViewPart implements
 
             : Messages.Slideout_TourCollectionFilter_Action_Tooltip);
 
+      final List<Long> oneTourTagIds = firstTourItem == null
+            ? null
+            : firstTourItem.getTagIds();
+
+      final Boolean isFlatView = _viewLayout == TourBookViewLayout.NAT_TABLE;
+
       _tagMenuManager.enableTagActions(
             isTourSelected,
             isOneTour,
-            firstTourItem == null
-                  ? null
-                  : firstTourItem.getTagIds());
+            oneTourTagIds,
+            isFlatView);
 
       final long tourTypeID = isOneTour
             ? firstTourItem.getTourTypeId()
@@ -2493,7 +2503,8 @@ public class TourBookView extends ViewPart implements
       TourActionManager.fillContextMenu(menuMgr, TourActionCategory.EDIT, _allTourActions_Edit, this);
 
       // tag actions
-      _tagMenuManager.fillTagMenu_WithActiveActions(menuMgr, this);
+      final Boolean isFlatView = _viewLayout == TourBookViewLayout.NAT_TABLE;
+      _tagMenuManager.fillTagMenu_WithActiveActions(menuMgr, this, isFlatView);
 
       // tour type actions
       _tourTypeMenuManager.fillContextMenu_WithActiveActions(menuMgr, this);
@@ -4161,6 +4172,7 @@ public class TourBookView extends ViewPart implements
        * View layout
        */
       _viewLayout = (TourBookViewLayout) Util.getStateEnum(_state, STATE_VIEW_LAYOUT, TourBookViewLayout.CATEGORY_MONTH);
+      updateTourActions();
 
       String viewLayoutImage = null;
 
@@ -4652,6 +4664,8 @@ public class TourBookView extends ViewPart implements
       _actionToggleViewLayout.setImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.TourBook_Month));
 
       _isLayoutNatTable = false;
+
+      updateTourActions();
    }
 
    private void toggleLayout_Category_Week() {
@@ -4661,6 +4675,8 @@ public class TourBookView extends ViewPart implements
       _actionToggleViewLayout.setImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.TourBook_Week));
 
       _isLayoutNatTable = false;
+
+      updateTourActions();
    }
 
    private void toggleLayout_NatTable() {
@@ -4670,6 +4686,8 @@ public class TourBookView extends ViewPart implements
       _actionToggleViewLayout.setImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.TourBook_NatTable));
 
       _isLayoutNatTable = true;
+
+      updateTourActions();
    }
 
    @Override
@@ -4683,6 +4701,18 @@ public class TourBookView extends ViewPart implements
    @Override
    public void updateColumnHeader(final ColumnDefinition colDef) {
 
+   }
+
+   private void updateTourActions() {
+
+      final Boolean isFlatView = _viewLayout == TourBookViewLayout.NAT_TABLE;
+
+      TourActionManager.setAllViewActions(ID,
+            _allTourActions_Edit.keySet(),
+            _allTourActions_Export.keySet(),
+            _allTourActions_Adjust.keySet(),
+            _tagMenuManager.getAllTagActions(isFlatView).keySet(),
+            _tourTypeMenuManager.getAllTourTypeActions().keySet());
    }
 
    void updateTourBookOptions() {

@@ -260,7 +260,7 @@ public class ActionAddTourTag_SubMenu extends Action implements IMenuCreator, IA
     * @param tagMenuMgr
     * @param isAutoOpen
     *           This parameter is ignored but it indicates that the menu auto open behavior is
-    *           used.
+    *           used and a menu creator is not set
     */
    ActionAddTourTag_SubMenu(final TagMenuManager tagMenuMgr, final Object isAutoOpen) {
 

@@ -34,6 +34,7 @@ import net.tourbook.tag.ActionAddRecentTags;
 import net.tourbook.tag.ActionAddRecentTourTypes;
 import net.tourbook.tag.ActionAddTourTag_SubMenu;
 import net.tourbook.tag.Action_RemoveTourTag_SubMenu;
+import net.tourbook.tag.TagMenuManager;
 import net.tourbook.tag.TagMenuManager.ActionClipboard_CopyTags;
 import net.tourbook.tag.TagMenuManager.ActionClipboard_PasteTags;
 import net.tourbook.tag.TagMenuManager.ActionShowTourTagsView;
@@ -59,7 +60,9 @@ import org.eclipse.jface.dialogs.IDialogSettings;
 
 public class TourActionManager {
 
-   public static final String              AUTO_OPEN                            = "#AutoOpen";                                //$NON-NLS-1$
+   public static final String              AUTO_OPEN_DEFAULT                    = "#AutoOpen_Default";                        //$NON-NLS-1$
+   public static final String              AUTO_OPEN_FLAT                       = "#AutoOpen_Flat";                           //$NON-NLS-1$
+   public static final String              AUTO_OPEN_TREE                       = "#AutoOpen_Tree";                           //$NON-NLS-1$
 
    private static final String             ID                                   = "net.tourbook.ui.action.TourActionManager"; //$NON-NLS-1$
 
@@ -70,7 +73,7 @@ public class TourActionManager {
 
    private static final IDialogSettings    _state                               = TourbookPlugin.getState(ID);
 
-   /** Contains all defined actions */
+   /** Contains all defined actions in the sequence how they are displayed */
    private static List<TourAction>         _allDefinedActions;
 
    /** Key is the action class name or in special cases a modified class name */
@@ -222,60 +225,60 @@ public class TourActionManager {
 
 // SET_FORMATTING_OFF
 
-      final TourAction categoryAction_Tag             = new TourAction(
-            Messages.Tour_Action_Category_Tags,
-            TourActionCategory.TAG);
+      final TourAction categoryAction_Tag             = new TourAction( Messages.Tour_Action_Category_Tags,
+                                                                        TourActionCategory.TAG);
 
-      final TourAction actionSetTags                  = new TourAction(
-            ActionShowTourTagsView.class.getName(),
-            Messages.Action_Tag_SetTags,
-            TourbookPlugin.getImageDescriptor(Images.TourTags),
-            TourActionCategory.TAG);
+      final TourAction actionSetTags                  = new TourAction( ActionShowTourTagsView.class.getName(),
+                                                                        Messages.Action_Tag_SetTags,
+                                                                        TourbookPlugin.getImageDescriptor(Images.TourTags),
+                                                                        TourActionCategory.TAG);
 
-      final TourAction actionAddTag_AutoOpen          = new TourAction(
-            ActionAddTourTag_SubMenu.class.getName() + AUTO_OPEN,
-            Messages.Action_Tag_Add_AutoOpen,
-            TourActionCategory.TAG);
+      final TourAction actionAddTag_AutoOpen_Default  = new TourAction( TagMenuManager.ACTION_KEY__ADD_TAG_AUTO_OPEN_DEFAULT,
+                                                                        Messages.Action_Tag_Add_AutoOpen_Default,
+                                                                        TourActionCategory.TAG);
 
-      final TourAction actionAddTag                   = new TourAction(
-            ActionAddTourTag_SubMenu.class.getName(),
-            Messages.action_tag_add,
-            TourActionCategory.TAG);
+      final TourAction actionAddTag_AutoOpen_Flat     = new TourAction( TagMenuManager.ACTION_KEY__ADD_TAG_AUTO_OPEN_FLAT,
+                                                                        Messages.Action_Tag_Add_AutoOpen_Flat,
+                                                                        TourActionCategory.TAG);
 
-      final TourAction actionAddRecentTags            = new TourAction(
-            ActionAddRecentTags.class.getName(),
-            Messages.Action_Tag_AddRecentTags,
-            TourActionCategory.TAG);
+      final TourAction actionAddTag_AutoOpen_Tree     = new TourAction( TagMenuManager.ACTION_KEY__ADD_TAG_AUTO_OPEN_TREE,
+                                                                        Messages.Action_Tag_Add_AutoOpen_Categorized,
+                                                                        TourActionCategory.TAG);
 
-      final TourAction actionAddTagGroups             = new TourAction(
-            ActionTagGroups_SubMenu.class.getName(),
-            Messages.Action_Tag_AddGroupedTags,
-            TourActionCategory.TAG);
+      final TourAction actionAddTag                   = new TourAction( ActionAddTourTag_SubMenu.class.getName(),
+                                                                        Messages.action_tag_add,
+                                                                        TourActionCategory.TAG);
 
-      final TourAction actionClipboard_CopyTags       = new TourAction(
-            ActionClipboard_CopyTags.class.getName(),
-            Messages.Action_Tag_CopyTags,
-            TourActionCategory.TAG);
+      final TourAction actionAddRecentTags            = new TourAction( ActionAddRecentTags.class.getName(),
+                                                                        Messages.Action_Tag_AddRecentTags,
+                                                                        TourActionCategory.TAG);
 
-      final TourAction actionClipboard_PasteTags      = new TourAction(
-            ActionClipboard_PasteTags.class.getName(),
-            Messages.Action_Tag_PasteTags,
-            TourActionCategory.TAG);
+      final TourAction actionAddTagGroups             = new TourAction( ActionTagGroups_SubMenu.class.getName(),
+                                                                        Messages.Action_Tag_AddGroupedTags,
+                                                                        TourActionCategory.TAG);
 
-      final TourAction actionRemoveTourTag            = new TourAction(
-            Action_RemoveTourTag_SubMenu.class.getName(),
-            Messages.action_tag_remove,
-            TourActionCategory.TAG);
+      final TourAction actionClipboard_CopyTags       = new TourAction( ActionClipboard_CopyTags.class.getName(),
+                                                                        Messages.Action_Tag_CopyTags,
+                                                                        TourActionCategory.TAG);
 
-      final TourAction actionRemoveAllTags            = new TourAction(
-            Action_RemoveAllTags.class.getName(),
-            Messages.action_tag_remove_all,
-            TourActionCategory.TAG);
+      final TourAction actionClipboard_PasteTags      = new TourAction( ActionClipboard_PasteTags.class.getName(),
+                                                                        Messages.Action_Tag_PasteTags,
+                                                                        TourActionCategory.TAG);
+
+      final TourAction actionRemoveTourTag            = new TourAction( Action_RemoveTourTag_SubMenu.class.getName(),
+                                                                        Messages.action_tag_remove,
+                                                                        TourActionCategory.TAG);
+
+      final TourAction actionRemoveAllTags            = new TourAction( Action_RemoveAllTags.class.getName(),
+                                                                        Messages.action_tag_remove_all,
+                                                                        TourActionCategory.TAG);
 
       _allDefinedActions.add(categoryAction_Tag);
 
       _allDefinedActions.add(actionSetTags);
-      _allDefinedActions.add(actionAddTag_AutoOpen);
+      _allDefinedActions.add(actionAddTag_AutoOpen_Default);
+      _allDefinedActions.add(actionAddTag_AutoOpen_Flat);
+      _allDefinedActions.add(actionAddTag_AutoOpen_Tree);
       _allDefinedActions.add(actionAddTagGroups);
       _allDefinedActions.add(actionAddTag);
       _allDefinedActions.add(actionAddRecentTags);
@@ -284,10 +287,10 @@ public class TourActionManager {
       _allDefinedActions.add(actionClipboard_CopyTags);
       _allDefinedActions.add(actionClipboard_PasteTags);
 
+
       _allDefinedActionsMap.put(categoryAction_Tag              .getCategoryClassName(),      categoryAction_Tag);
 
       _allDefinedActionsMap.put(ActionShowTourTagsView          .class.getName(),             actionSetTags);
-      _allDefinedActionsMap.put(ActionAddTourTag_SubMenu        .class.getName() + AUTO_OPEN, actionAddTag_AutoOpen);
       _allDefinedActionsMap.put(ActionTagGroups_SubMenu         .class.getName(),             actionAddTagGroups);
       _allDefinedActionsMap.put(ActionAddTourTag_SubMenu        .class.getName(),             actionAddTag);
       _allDefinedActionsMap.put(ActionAddRecentTags             .class.getName(),             actionAddRecentTags);
@@ -295,6 +298,10 @@ public class TourActionManager {
       _allDefinedActionsMap.put(ActionClipboard_PasteTags       .class.getName(),             actionClipboard_PasteTags);
       _allDefinedActionsMap.put(Action_RemoveTourTag_SubMenu    .class.getName(),             actionRemoveTourTag);
       _allDefinedActionsMap.put(Action_RemoveAllTags            .class.getName(),             actionRemoveAllTags);
+
+      _allDefinedActionsMap.put(TagMenuManager.ACTION_KEY__ADD_TAG_AUTO_OPEN_DEFAULT,  actionAddTag_AutoOpen_Default);
+      _allDefinedActionsMap.put(TagMenuManager.ACTION_KEY__ADD_TAG_AUTO_OPEN_FLAT,     actionAddTag_AutoOpen_Flat);
+      _allDefinedActionsMap.put(TagMenuManager.ACTION_KEY__ADD_TAG_AUTO_OPEN_TREE,     actionAddTag_AutoOpen_Tree);
 
 // SET_FORMATTING_ON
 
