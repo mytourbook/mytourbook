@@ -19,6 +19,12 @@
                                                                  <version>6.0.0-RC3</version>
          <scope>test</scope>
       </dependency>
+      <dependency>
+         <artifactId>junit-bom</artifactId>                  <groupId>org.junit</groupId>
+                                                                 <version>5.10.0</version>
+         <type>pom</type>
+         <scope>test</scope>
+      </dependency>
    </dependencies>	
 
    <properties>
@@ -202,6 +208,7 @@
                <artifactId>surefire-junit-platform</artifactId>
                <version>${surefire.version}</version>
             </dependency>
+
          </dependencies>
          <executions>
             <execution>
