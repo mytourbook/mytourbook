@@ -33,21 +33,21 @@ public class FitDataReaderTests extends DeviceDataReaderTester {
     * Sample provided by Doriano
     * https://github.com/mytourbook/mytourbook/discussions/939#discussioncomment-5728661
     */
-  // @Test
-  // void testFitImport_SwimmingData() {
+  @Test
+  void testFitImport_SwimmingData() {
 
-  //    testImportFile(fitDataReader, FILES_PATH + "8ADG5025", ".FIT"); //$NON-NLS-1$ //$NON-NLS-2$
- //  }
+      testImportFile(fitDataReader, FILES_PATH + "8ADG5025", ".FIT"); //$NON-NLS-1$ //$NON-NLS-2$
+   }
 
    /**
     * Regression test. This test can be useful when updating the FIT SDK and
     * ensuring that the FIT import still works as expected.
     */
-  // @Test
-  // void testFitImportConeyLake() {
+   @Test
+   void testFitImportConeyLake() {
 
-  //    testImportFile(fitDataReader, FILES_PATH + "ConeyLakeMove_2020_05_23_08_55_42_Trail+running", ".fit"); //$NON-NLS-1$ //$NON-NLS-2$
- //  }
+      testImportFile(fitDataReader, FILES_PATH + "ConeyLakeMove_2020_05_23_08_55_42_Trail+running", ".fit"); //$NON-NLS-1$ //$NON-NLS-2$
+   }
 
    /**
     * Test to ensure that files without pauses have the recorded time equal to
