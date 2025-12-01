@@ -96,7 +96,7 @@ task mt_20_BuildProduct(type: Exec) {
    // run: mvn clean verify -P build-release -V
    
    workingDir = "../.."
-   commandLine 'cmd', '/c', 'mvn -X clean verify -P build-release -V'
+   commandLine 'cmd', '/c', 'mvn clean verify -P build-release -V'
 }
 
 
