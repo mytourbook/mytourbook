@@ -916,7 +916,12 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer,
 
          @Override
          public void menuShown(final MenuEvent menuEvent) {
-            _tagMenuManager.onShowMenu(menuEvent, tree, Display.getCurrent().getCursorLocation(), _tourInfoToolTip);
+
+            _tagMenuManager.onShowMenu(
+                  menuEvent,
+                  tree,
+                  Display.getCurrent().getCursorLocation(),
+                  _tourInfoToolTip);
          }
       });
 

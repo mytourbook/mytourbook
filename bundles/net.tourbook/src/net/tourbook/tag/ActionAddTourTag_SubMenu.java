@@ -28,6 +28,7 @@ import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.CommonActivator;
 import net.tourbook.common.CommonImages;
+import net.tourbook.common.UI;
 import net.tourbook.common.action.ActionOpenPrefDialog;
 import net.tourbook.common.util.AdvancedMenuForActions;
 import net.tourbook.common.util.IAdvancedMenuForActions;
@@ -151,7 +152,7 @@ public class ActionAddTourTag_SubMenu extends Action implements IMenuCreator, IA
 
       public ActionTourTag(final TourTag tourTag) {
 
-         super(tourTag.getTagName(), AS_CHECK_BOX);
+         super(getTagName(tourTag), AS_CHECK_BOX);
 
          final Image tagImage = TagManager.getTagImage(tourTag);
 
@@ -160,6 +161,17 @@ public class ActionAddTourTag_SubMenu extends Action implements IMenuCreator, IA
          }
 
          __tourTag = tourTag;
+      }
+
+      private static String getTagName(final TourTag tourTag) {
+
+         String tagName = tourTag.getTagName();
+
+         if (UI.IS_SCRAMBLE_DATA) {
+            tagName = UI.scrambleText(tagName);
+         }
+
+         return tagName;
       }
 
       @Override
@@ -191,12 +203,23 @@ public class ActionAddTourTag_SubMenu extends Action implements IMenuCreator, IA
 
       public ActionTourTagCategory(final ActionAddTourTag_SubMenu actionAddTourTag, final TourTagCategory tagCategory) {
 
-         super(tagCategory.getCategoryName(), AS_DROP_DOWN_MENU);
+         super(getCategoryName(tagCategory), AS_DROP_DOWN_MENU);
 
          __actionAddTourTag = actionAddTourTag;
          __tagCategory = tagCategory;
 
          setMenuCreator(this);
+      }
+
+      private static String getCategoryName(final TourTagCategory tagCategory) {
+
+         String categoryName = tagCategory.getCategoryName();
+
+         if (UI.IS_SCRAMBLE_DATA) {
+            categoryName = UI.scrambleText(categoryName);
+         }
+
+         return categoryName;
       }
 
       @Override
@@ -260,7 +283,7 @@ public class ActionAddTourTag_SubMenu extends Action implements IMenuCreator, IA
     * @param tagMenuMgr
     * @param isAutoOpen
     *           This parameter is ignored but it indicates that the menu auto open behavior is
-    *           used.
+    *           used and a menu creator is not set
     */
    ActionAddTourTag_SubMenu(final TagMenuManager tagMenuMgr, final Object isAutoOpen) {
 

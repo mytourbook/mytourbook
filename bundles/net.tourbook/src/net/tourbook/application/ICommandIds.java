@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2024 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2025 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -23,5 +23,7 @@ package net.tourbook.application;
  */
 public interface ICommandIds {
 
-   public static final String ACTION_ADD_TAG = "ACTION_ADD_TAG"; //$NON-NLS-1$
+   public static final String ACTION_ADD_TAG_AUTO_OPEN_DEFAULT = "ACTION_ADD_TAG_AUTO_OPEN_DEFAULT"; //$NON-NLS-1$
+   public static final String ACTION_ADD_TAG_AUTO_OPEN_FLAT    = "ACTION_ADD_TAG_AUTO_OPEN_FLAT";    //$NON-NLS-1$
+   public static final String ACTION_ADD_TAG_AUTO_OPEN_TREE    = "ACTION_ADD_TAG_AUTO_OPEN_TREE";    //$NON-NLS-1$
 }

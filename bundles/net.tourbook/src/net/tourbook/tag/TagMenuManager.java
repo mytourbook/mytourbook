@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2024 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2025 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -77,6 +77,14 @@ import org.eclipse.ui.PlatformUI;
 
 public class TagMenuManager implements IActionProvider {
 
+// SET_FORMATTING_OFF
+
+   public static final String ACTION_KEY__ADD_TAG_AUTO_OPEN_DEFAULT = ActionAddTourTag_SubMenu.class.getName() + TourActionManager.AUTO_OPEN_DEFAULT;
+   public static final String ACTION_KEY__ADD_TAG_AUTO_OPEN_FLAT    = ActionAddTourTag_SubMenu.class.getName() + TourActionManager.AUTO_OPEN_FLAT;
+   public static final String ACTION_KEY__ADD_TAG_AUTO_OPEN_TREE    = ActionAddTourTag_SubMenu.class.getName() + TourActionManager.AUTO_OPEN_TREE;
+
+// SET_FORMATTING_ON
+
    private static final String            SETTINGS_SECTION_RECENT_TAGS = "TagManager.RecentTags";                              //$NON-NLS-1$
    private static final String            STATE_RECENT_TAGS            = "tagId";                                              //$NON-NLS-1$
    private static final String            STATE_PREVIOUS_TAGS          = UI.EMPTY_STRING;
@@ -125,7 +133,6 @@ public class TagMenuManager implements IActionProvider {
 
    private ActionAddRecentTags            _actionAddRecentTags;
    private ActionAddTourTag_SubMenu       _actionAddTag;
-   private ActionContributionItem         _actionAddTag_AutoOpen;
    private ActionTagGroups_SubMenu        _actionAddTagGroups;
    private ActionClipboard_CopyTags       _actionClipboard_CopyTags;
    private ActionClipboard_PasteTags      _actionClipboard_PasteTags;
@@ -134,7 +141,15 @@ public class TagMenuManager implements IActionProvider {
    private ActionShowTourTagsView         _actionSetTags;
    private ActionOpenPrefDialog           _actionTagGroupPreferences;
 
-   private AdvancedMenuForActions         _advancedMenuToAddTags;
+   private ActionContributionItem         _actionContribItem_AddTag_AutoOpen_Current;
+   private ActionContributionItem         _actionContribItem_AddTag_AutoOpen_Default;
+   private ActionContributionItem         _actionContribItem_AddTag_AutoOpen_Flat;
+   private ActionContributionItem         _actionContribItem_AddTag_AutoOpen_Tree;
+
+   private AdvancedMenuForActions         _advancedMenuToAddTags_Current;
+   private AdvancedMenuForActions         _advancedMenuToAddTags_Default;
+   private AdvancedMenuForActions         _advancedMenuToAddTags_Flat;
+   private AdvancedMenuForActions         _advancedMenuToAddTags_Tree;
 
    private TagTransfer                    _tagTransfer                 = new TagTransfer();
 
@@ -151,7 +166,7 @@ public class TagMenuManager implements IActionProvider {
       @Override
       public void run() {
 
-         BusyIndicator.showWhile(Display.getCurrent(), () -> removeAllTags());
+         BusyIndicator.showWhile(Display.getCurrent(), () -> runnableRemoveAllTags());
       }
    }
 
@@ -169,7 +184,8 @@ public class TagMenuManager implements IActionProvider {
 
          if (_isAdvMenu) {
 
-            final ActionAddTourTag_SubMenu actionAddTagAdvanced = (ActionAddTourTag_SubMenu) _currentInstance._actionAddTag_AutoOpen.getAction();
+            final ActionAddTourTag_SubMenu actionAddTagAdvanced =
+                  (ActionAddTourTag_SubMenu) _currentInstance._actionContribItem_AddTag_AutoOpen_Current.getAction();
 
             actionAddTagAdvanced.setTourTag(isChecked(), _allPreviousTags);
 
@@ -224,7 +240,8 @@ public class TagMenuManager implements IActionProvider {
       @Override
       public void run() {
 
-         final ActionAddTourTag_SubMenu actionAddTagAdvanced = (ActionAddTourTag_SubMenu) _currentInstance._actionAddTag_AutoOpen.getAction();
+         final ActionAddTourTag_SubMenu actionAddTagAdvanced =
+               (ActionAddTourTag_SubMenu) _currentInstance._actionContribItem_AddTag_AutoOpen_Current.getAction();
 
          if (_isAdvMenu) {
             actionAddTagAdvanced.setTourTag(isChecked(), _tag);
@@ -699,14 +716,24 @@ public class TagMenuManager implements IActionProvider {
 
 // SET_FORMATTING_OFF
 
-      final ActionAddTourTag_SubMenu actionAddTag_AutoOpen = new ActionAddTourTag_SubMenu(this, null);
+      final ActionAddTourTag_SubMenu actionAddTag_AutoOpen_Default   = new ActionAddTourTag_SubMenu(this, null);
+      final ActionAddTourTag_SubMenu actionAddTag_AutoOpen_Flat      = new ActionAddTourTag_SubMenu(this, null);
+      final ActionAddTourTag_SubMenu actionAddTag_AutoOpen_Tree      = new ActionAddTourTag_SubMenu(this, null);
 
-      _actionAddTag_AutoOpen     = new ActionContributionItem(actionAddTag_AutoOpen);
+      _actionContribItem_AddTag_AutoOpen_Default   = new ActionContributionItem(actionAddTag_AutoOpen_Default);
+      _actionContribItem_AddTag_AutoOpen_Flat      = new ActionContributionItem(actionAddTag_AutoOpen_Flat);
+      _actionContribItem_AddTag_AutoOpen_Tree      = new ActionContributionItem(actionAddTag_AutoOpen_Tree);
 
       /**
        * VERY IMPORTANT: Without an ID, the auto open do NOT work
        */
-      _actionAddTag_AutoOpen.setId(ICommandIds.ACTION_ADD_TAG);
+      _actionContribItem_AddTag_AutoOpen_Default   .setId(ICommandIds.ACTION_ADD_TAG_AUTO_OPEN_DEFAULT);
+      _actionContribItem_AddTag_AutoOpen_Flat      .setId(ICommandIds.ACTION_ADD_TAG_AUTO_OPEN_FLAT);
+      _actionContribItem_AddTag_AutoOpen_Tree      .setId(ICommandIds.ACTION_ADD_TAG_AUTO_OPEN_TREE);
+
+      _advancedMenuToAddTags_Default   = new AdvancedMenuForActions(_actionContribItem_AddTag_AutoOpen_Default);
+      _advancedMenuToAddTags_Flat      = new AdvancedMenuForActions(_actionContribItem_AddTag_AutoOpen_Flat);
+      _advancedMenuToAddTags_Tree      = new AdvancedMenuForActions(_actionContribItem_AddTag_AutoOpen_Tree);
 
       _actionAddRecentTags       = new ActionAddRecentTags(this);
       _actionAddTag              = new ActionAddTourTag_SubMenu(this);
@@ -718,8 +745,6 @@ public class TagMenuManager implements IActionProvider {
       _actionSetTags             = new ActionShowTourTagsView();
       _actionTagGroupPreferences = new ActionOpenPrefDialog(Messages.Action_Tag_ManageTagGroups, PrefPageTagGroups.ID);
 
-      _advancedMenuToAddTags     = new AdvancedMenuForActions(_actionAddTag_AutoOpen);
-
       _allTagActions             = new HashMap<>();
 
       _allTagActions.put(_actionAddRecentTags         .getClass().getName(),  _actionAddRecentTags);
@@ -727,50 +752,11 @@ public class TagMenuManager implements IActionProvider {
       _allTagActions.put(_actionAddTagGroups          .getClass().getName(),  _actionAddTagGroups);
       _allTagActions.put(_actionClipboard_CopyTags    .getClass().getName(),  _actionClipboard_CopyTags);
       _allTagActions.put(_actionClipboard_PasteTags   .getClass().getName(),  _actionClipboard_PasteTags);
-      _allTagActions.put(_actionRemoveAllTags         .getClass().getName(),  _actionRemoveAllTags);
       _allTagActions.put(_actionRemoveTag             .getClass().getName(),  _actionRemoveTag);
+      _allTagActions.put(_actionRemoveAllTags         .getClass().getName(),  _actionRemoveAllTags);
       _allTagActions.put(_actionSetTags               .getClass().getName(),  _actionSetTags);
 
-      _allTagActions.put(actionAddTag_AutoOpen        .getClass().getName() + TourActionManager.AUTO_OPEN,   _actionAddTag_AutoOpen);
-
 // SET_FORMATTING_ON
-   }
-
-   /**
-    * @param isEnabled_AddTag
-    * @param isEnabled_RemoveTag
-    */
-   private void enableTagActions(final boolean isEnabled_AddTag, final boolean isEnabled_RemoveTag) {
-
-      _currentInstance = this;
-
-      final ActionAddTourTag_SubMenu actionAddTagAdvanced = (ActionAddTourTag_SubMenu) _actionAddTag_AutoOpen.getAction();
-
-      final List<TourTag> allTagsInClipboard = getTagsFromClipboard();
-      final int numTags = allTagsInClipboard != null ? allTagsInClipboard.size() : 0;
-
-      if (numTags > 0) {
-
-         _actionClipboard_PasteTags.setToolTipText(Messages.Action_Tag_PasteTags_Tooltip
-               .formatted(TagGroupManager.createTagSortedList(null, allTagsInClipboard)));
-      }
-
-// SET_FORMATTING_OFF
-
-      _actionAddTag              .setEnabled(isEnabled_AddTag);
-      _actionAddTagGroups        .setEnabled(isEnabled_AddTag);
-      actionAddTagAdvanced       .setEnabled(isEnabled_AddTag);
-
-      _actionRemoveTag           .setEnabled(isEnabled_RemoveTag);
-      _actionRemoveAllTags       .setEnabled(isEnabled_RemoveTag);
-      _actionSetTags             .setEnabled(isEnabled_AddTag || isEnabled_RemoveTag);
-
-      _actionClipboard_CopyTags  .setEnabled(isEnabled_RemoveTag);
-      _actionClipboard_PasteTags .setEnabled(isEnabled_AddTag && numTags > 0);
-
-// SET_FORMATTING_ON
-
-      enableRecentTagActions(isEnabled_AddTag, _allTagIds_OneTour);
    }
 
    /**
@@ -787,6 +773,14 @@ public class TagMenuManager implements IActionProvider {
    public void enableTagActions(final boolean isTourSelected,
                                 final boolean isOneTour,
                                 final List<Long> oneTourTagIds) {
+
+      enableTagActions(isTourSelected, isOneTour, oneTourTagIds, null);
+   }
+
+   public void enableTagActions(final boolean isTourSelected,
+                                final boolean isOneTour,
+                                final List<Long> oneTourTagIds,
+                                final Boolean isFlatLayout) {
 
       final boolean isAddTagEnabled = isTourSelected;
       final boolean isRemoveTagEnabled;
@@ -824,7 +818,7 @@ public class TagMenuManager implements IActionProvider {
       _isEnableRecentTagActions = isAddTagEnabled;
       _allTagIds_OneTour = allTourTagIds;
 
-      enableTagActions(isAddTagEnabled, isRemoveTagEnabled);
+      enableTagActions_Internal(isAddTagEnabled, isRemoveTagEnabled, isFlatLayout);
    }
 
    /**
@@ -847,7 +841,49 @@ public class TagMenuManager implements IActionProvider {
       _isEnableRecentTagActions = isAddTagEnabled;
       _allTagIds_OneTour = allExistingTagIds;
 
-      enableTagActions(isAddTagEnabled, isRemoveTagEnabled);
+      enableTagActions_Internal(isAddTagEnabled, isRemoveTagEnabled, null);
+   }
+
+   /**
+    * @param isAddTagEnabled
+    * @param isRemoveTagEnabled
+    * @param isFlatLayout
+    */
+   private void enableTagActions_Internal(final boolean isAddTagEnabled,
+                                          final boolean isRemoveTagEnabled,
+                                          final Boolean isFlatLayout) {
+
+      _currentInstance = this;
+
+      updateTagAutoOpenAction(isFlatLayout);
+
+      final ActionAddTourTag_SubMenu actionAddTagAdvanced = (ActionAddTourTag_SubMenu) _actionContribItem_AddTag_AutoOpen_Current.getAction();
+
+      final List<TourTag> allTagsInClipboard = getTagsFromClipboard();
+      final int numTags = allTagsInClipboard != null ? allTagsInClipboard.size() : 0;
+
+      if (numTags > 0) {
+
+         _actionClipboard_PasteTags.setToolTipText(Messages.Action_Tag_PasteTags_Tooltip.formatted(
+               TagGroupManager.createTagSortedList(null, allTagsInClipboard)));
+      }
+
+// SET_FORMATTING_OFF
+
+      _actionAddTag              .setEnabled(isAddTagEnabled);
+      _actionAddTagGroups        .setEnabled(isAddTagEnabled);
+      actionAddTagAdvanced       .setEnabled(isAddTagEnabled);
+
+      _actionRemoveTag           .setEnabled(isRemoveTagEnabled);
+      _actionRemoveAllTags       .setEnabled(isRemoveTagEnabled);
+      _actionSetTags             .setEnabled(isAddTagEnabled || isRemoveTagEnabled);
+
+      _actionClipboard_CopyTags  .setEnabled(isRemoveTagEnabled);
+      _actionClipboard_PasteTags .setEnabled(isAddTagEnabled && numTags > 0);
+
+// SET_FORMATTING_ON
+
+      enableRecentTagActions(isAddTagEnabled, _allTagIds_OneTour);
    }
 
    @Override
@@ -862,10 +898,10 @@ public class TagMenuManager implements IActionProvider {
     */
    public void fillTagMenu(final IMenuManager menuMgr) {
 
-      // add all tour tag actions
+      // add all tour tag actions 
       menuMgr.add(new Separator());
       {
-         menuMgr.add(_actionAddTag_AutoOpen);
+         menuMgr.add(_actionContribItem_AddTag_AutoOpen_Current);
          menuMgr.add(_actionAddTagGroups);
          menuMgr.add(_actionAddTag);
 
@@ -883,6 +919,21 @@ public class TagMenuManager implements IActionProvider {
 
    public void fillTagMenu_WithActiveActions(final IMenuManager menuMgr,
                                              final ITourProvider tourProvider) {
+
+      fillTagMenu_WithActiveActions(menuMgr, tourProvider, null);
+   }
+
+   /**
+    * @param menuMgr
+    * @param tourProvider
+    * @param isFlatView
+    *           Can be <code>null</code> to ignore this parameter
+    */
+   public void fillTagMenu_WithActiveActions(final IMenuManager menuMgr,
+                                             final ITourProvider tourProvider,
+                                             final Boolean isFlatView) {
+
+      updateTagAutoOpenAction(isFlatView);
 
       menuMgr.add(new Separator());
 
@@ -1000,6 +1051,14 @@ public class TagMenuManager implements IActionProvider {
    }
 
    public HashMap<String, Object> getAllTagActions() {
+
+      return getAllTagActions(null);
+   }
+
+   public HashMap<String, Object> getAllTagActions(final Boolean isFlatView) {
+
+      updateTagAutoOpenAction(isFlatView);
+
       return _allTagActions;
    }
 
@@ -1068,7 +1127,7 @@ public class TagMenuManager implements IActionProvider {
     */
    public void onHideMenu() {
 
-      _advancedMenuToAddTags.onHideParentMenu();
+      _advancedMenuToAddTags_Current.onHideParentMenu();
    }
 
    /**
@@ -1084,17 +1143,46 @@ public class TagMenuManager implements IActionProvider {
                           final Point menuPosition,
                           final ToolTip toolTip) {
 
-      _advancedMenuToAddTags.onShowParentMenu(
+      onShowMenu(
+
             menuEvent,
             menuParentControl,
+            menuPosition,
+
+            toolTip,
+            null);
+   }
+
+   /**
+    * This is called when the menu is displayed which contains the tag actions.
+    *
+    * @param menuEvent
+    * @param menuParentControl
+    * @param menuPosition
+    * @param toolTip
+    */
+   public void onShowMenu(final MenuEvent menuEvent,
+                          final Control menuParentControl,
+                          final Point menuPosition,
+                          final ToolTip toolTip,
+                          final Boolean isFlatView) {
+
+      updateTagAutoOpenAction(isFlatView);
+
+      _advancedMenuToAddTags_Current.onShowParentMenu(
+
+            menuEvent,
+            menuParentControl,
+
             _isTaggingAutoOpen,
             _isTaggingAnimation,
             _taggingAutoOpenDelay,
+
             menuPosition,
             toolTip);
    }
 
-   private void removeAllTags() {
+   private void runnableRemoveAllTags() {
 
       // get tours which tour type should be changed
       final ArrayList<TourData> modifiedTours = _tourProvider.getSelectedTours();
@@ -1247,5 +1335,45 @@ public class TagMenuManager implements IActionProvider {
    void setIsAdvanceMenu() {
 
       _isAdvMenu = true;
+   }
+
+   /**
+    * Replace the action "add tag auto open" with the default, flat or categorized action
+    * <p>
+    * This is a fix for https://github.com/mytourbook/mytourbook/issues/1603
+    *
+    * @param isFlatView
+    */
+   private void updateTagAutoOpenAction(final Boolean isFlatView) {
+
+      _allTagActions.remove(ACTION_KEY__ADD_TAG_AUTO_OPEN_DEFAULT);
+      _allTagActions.remove(ACTION_KEY__ADD_TAG_AUTO_OPEN_FLAT);
+      _allTagActions.remove(ACTION_KEY__ADD_TAG_AUTO_OPEN_TREE);
+
+// SET_FORMATTING_OFF
+
+      if (isFlatView == null) {
+
+         _allTagActions.put(ACTION_KEY__ADD_TAG_AUTO_OPEN_DEFAULT, _actionContribItem_AddTag_AutoOpen_Default);
+
+         _actionContribItem_AddTag_AutoOpen_Current   = _actionContribItem_AddTag_AutoOpen_Default;
+         _advancedMenuToAddTags_Current               = _advancedMenuToAddTags_Default;
+
+      } else if (isFlatView) {
+
+         _allTagActions.put(ACTION_KEY__ADD_TAG_AUTO_OPEN_FLAT, _actionContribItem_AddTag_AutoOpen_Flat);
+
+         _actionContribItem_AddTag_AutoOpen_Current   = _actionContribItem_AddTag_AutoOpen_Flat;
+         _advancedMenuToAddTags_Current               = _advancedMenuToAddTags_Flat;
+
+      } else {
+
+         _allTagActions.put(ACTION_KEY__ADD_TAG_AUTO_OPEN_TREE, _actionContribItem_AddTag_AutoOpen_Tree);
+
+         _actionContribItem_AddTag_AutoOpen_Current   = _actionContribItem_AddTag_AutoOpen_Tree;
+         _advancedMenuToAddTags_Current               = _advancedMenuToAddTags_Tree;
+      }
+
+// SET_FORMATTING_ON
    }
 }
