@@ -33,8 +33,8 @@ public class FitDataReaderTests extends DeviceDataReaderTester {
     * Sample provided by Doriano
     * https://github.com/mytourbook/mytourbook/discussions/939#discussioncomment-5728661
     */
-  @Test
-  void testFitImport_SwimmingData() {
+   @Test
+   void testFitImport_SwimmingData() {
 
       testImportFile(fitDataReader, FILES_PATH + "8ADG5025", ".FIT"); //$NON-NLS-1$ //$NON-NLS-2$
    }
