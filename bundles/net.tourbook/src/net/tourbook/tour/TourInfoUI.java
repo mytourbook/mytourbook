@@ -43,11 +43,13 @@ import net.tourbook.common.util.Util;
 import net.tourbook.common.weather.IWeather;
 import net.tourbook.data.DeviceSensor;
 import net.tourbook.data.DeviceSensorValue;
+import net.tourbook.data.Equipment;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourPersonHRZone;
 import net.tourbook.data.TourTag;
 import net.tourbook.data.TourType;
 import net.tourbook.database.TourDatabase;
+import net.tourbook.equipment.EquipmentManager;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.statistic.StatisticView;
 import net.tourbook.tag.TagManager;
@@ -139,6 +141,7 @@ public class TourInfoUI implements ICanHideTooltip {
       _nf3.setMaximumFractionDigits(3);
    }
 
+   private boolean        _hasEquipment;
    private boolean        _hasRecordingDeviceBattery;
    private boolean        _hasGears;
    private boolean        _hasRadar;
@@ -266,6 +269,8 @@ public class TourInfoUI implements ICanHideTooltip {
    private Label            _lblElevationUp_Unit;
    private Label            _lblElevationDown;
    private Label            _lblElevationDown_Unit;
+   private Label            _lblEquipment;
+   private Label            _lblEquipment_Value;
    private Label            _lblGear;
    private Label            _lblGear_GearShifts;
    private Label            _lblGear_GearShifts_Spacer;
@@ -614,7 +619,7 @@ public class TourInfoUI implements ICanHideTooltip {
 
       final ToolBar toolbar = new ToolBar(container, SWT.FLAT);
       GridDataFactory.fillDefaults().applyTo(toolbar);
-      toolbar.setBackground(UI.SYS_COLOR_GREEN);
+//      toolbar.setBackground(UI.SYS_COLOR_GREEN);
 
       final ToolBarManager tbm = new ToolBarManager(toolbar);
 
@@ -1498,6 +1503,18 @@ public class TourInfoUI implements ICanHideTooltip {
                   .span(numColumns - 1, 1)
                   .applyTo(_lblTourTags_Value);
          }
+         {
+            /*
+             * Equipment
+             */
+            _lblEquipment = createUI_Label(_lowerPartContainer, Messages.Tour_Tooltip_Label_Equipment);
+            GridDataFactory.fillDefaults().align(SWT.FILL, SWT.BEGINNING).applyTo(_lblEquipment);
+
+            _lblEquipment_Value = createUI_LabelValue(_lowerPartContainer, SWT.LEAD | SWT.WRAP);
+            GridDataFactory.fillDefaults()
+                  .span(numColumns - 1, 1)
+                  .applyTo(_lblEquipment_Value);
+         }
 
          if (_isShowWeatherDescription && _hasWeatherDescription) {
 
@@ -1836,15 +1853,18 @@ public class TourInfoUI implements ICanHideTooltip {
             ? null
             : TourDatabase.getTourTypeName(tourType.getTypeId());
 
-      final Set<TourTag> tourTags = _tourData.getTourTags();
 
 // SET_FORMATTING_OFF
+      
+      final Set<TourTag> allTags          = _tourData.getTourTags();
+      final Set<Equipment> allEquipment   = _tourData.getEquipment();
 
+      _hasEquipment                 = allEquipment != null && allEquipment.size() > 0;
       _hasGears                     = _tourData.getFrontShiftCount() > 0 || _tourData.getRearShiftCount() > 0;
       _hasRadar                     = _tourData.getNumberOfPassedVehicles() > 0;
       _hasRecordingDeviceBattery    = tourData.getBattery_Percentage_Start() != -1;
       _hasRunDyn                    = _tourData.isRunDynAvailable();
-      _hasTags                      = tourTags != null && tourTags.size() > 0;
+      _hasTags                      = allTags != null && allTags.size() > 0;
       _hasTourType                  = tourType != null;
       _hasSensorValues              = _tourData.getDeviceSensorValues().size() > 0;
 
@@ -2088,6 +2108,15 @@ public class TourInfoUI implements ICanHideTooltip {
       }
       UI.showHideControl(_lblTourTags, _hasTags);
       UI.showHideControl(_lblTourTags_Value, _hasTags);
+
+      /*
+       * Equipment
+       */
+      if (_hasEquipment) {
+         EquipmentManager.updateUI_Equipment(_tourData, _lblEquipment_Value, true);
+      }
+      UI.showHideControl(_lblEquipment, _hasEquipment);
+      UI.showHideControl(_lblEquipment_Value, _hasEquipment);
 
       /*
        * Tour description
@@ -2677,10 +2706,12 @@ public class TourInfoUI implements ICanHideTooltip {
 
          UI.setColorForAllChildren(parent,
                display.getSystemColor(SWT.COLOR_INFO_FOREGROUND),
-//             UI.SYS_COLOR_RED,
-               display.getSystemColor(SWT.COLOR_INFO_BACKGROUND)
-//             UI.SYS_COLOR_GREEN
-         );
+               display.getSystemColor(SWT.COLOR_INFO_BACKGROUND));
+
+// For debugging         
+//         UI.setColorForAllChildren(parent,
+//               UI.SYS_COLOR_RED,
+//               UI.SYS_COLOR_GREEN);
       }
    }
 

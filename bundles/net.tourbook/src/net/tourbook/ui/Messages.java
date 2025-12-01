@@ -836,6 +836,7 @@ public class Messages extends NLS {
    public static String        Tour_Tooltip_Label_NoGeoTour;
    public static String        Tour_Tooltip_Label_NoTour;
    public static String        Tour_Tooltip_Label_ElapsedTime;
+   public static String        Tour_Tooltip_Label_Equipment;
    public static String        Tour_Tooltip_Label_PassedVehicles;
    public static String        Tour_Tooltip_Label_PausedTime;
    public static String        Tour_Tooltip_Label_RecordedTime;

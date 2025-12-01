@@ -50,6 +50,7 @@ import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.window.Window;
 import org.eclipse.swt.custom.BusyIndicator;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Label;
 
 public class EquipmentManager {
 
@@ -186,7 +187,7 @@ public class EquipmentManager {
 
          // remove multiple equipment
 
-         dialogMessage = "Permanently delete %d tags and remove them from %d tours ?".formatted(
+         dialogMessage = "Permanently delete %d equipment and remove them from %d tours ?".formatted(
                allEquipment.size(),
                allTourIds.size());
       }
@@ -659,4 +660,27 @@ public class EquipmentManager {
       }
    }
 
+   /**
+    * @param tourData
+    * @param equipmentLabel
+    * @param isVertical
+    *           When <code>true</code> then the equipment are displayed as a list, otherwise
+    *           horizontally
+    */
+   public static void updateUI_Equipment(final TourData tourData, final Label equipmentLabel, final boolean isVertical) {
+
+      final Set<Equipment> allEquipment = tourData.getEquipment();
+
+      if (allEquipment == null || allEquipment.isEmpty()) {
+
+         equipmentLabel.setText(UI.EMPTY_STRING);
+
+      } else {
+
+         final String equipmentLabels = getEquipmentNames(allEquipment, isVertical);
+
+         equipmentLabel.setText(equipmentLabels);
+         equipmentLabel.setToolTipText(equipmentLabels);
+      }
+   }
 }
