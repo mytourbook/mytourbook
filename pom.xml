@@ -19,12 +19,6 @@
                                                                  <version>6.0.0-RC3</version>
          <scope>test</scope>
       </dependency>
-      <dependency>
-         <artifactId>junit-bom</artifactId>                  <groupId>org.junit</groupId>
-                                                                 <version>5.10.0</version>
-         <type>pom</type>
-         <scope>test</scope>
-      </dependency>
    </dependencies>	
 
    <properties>
@@ -93,8 +87,8 @@
       </repository> 
       
       <repository>
-         <id>eclipse.nebula.3.2.0</id>                                                 <layout>p2</layout>
-         <url>https://download.eclipse.org/nebula/updates/release/3.2.0</url>
+         <id>eclipse.nebula.3.1.1</id>                                                 <layout>p2</layout>
+         <url>https://download.eclipse.org/nebula/updates/release/3.1.1</url>
       </repository> 
       
       <!-- IMPORTANT: Keep that tag in a single line as it is commented out during the GitHub build -->
@@ -208,7 +202,6 @@
                <artifactId>surefire-junit-platform</artifactId>
                <version>${surefire.version}</version>
             </dependency>
-
          </dependencies>
          <executions>
             <execution>
