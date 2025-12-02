@@ -427,6 +427,8 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
     * Segmenter type which the user has selected
     */
    private SegmenterType                  _userSelectedSegmenterType;
+
+   /** Break time in seconds for the whole tour by using the current break time tool */
    private long                           _tourBreakTime;
    private float                          _breakUIMinAvgSpeedAS;
    private float                          _breakUIMinSliceSpeedAS;
@@ -1565,8 +1567,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
       }
 
       _tourData.segmentSerieIndex = segmentSerieIndex.toArray();
-      _tourData.setBreakTimeSerie(breakTimeSerie);
-
+      _tourData.setBreakTimeSerie(breakTimeSerie, _tourBreakTime);
    }
 
    private void createSegmentsBy_Distance() {
