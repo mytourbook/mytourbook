@@ -22,7 +22,8 @@
    </dependencies>	
 
    <properties>
-      <tycho.version>5.0.0</tycho.version>     
+      <!-- Tycho 4 because of this issue with NatTable 2.6.0 https://github.com/eclipse-nattable/nattable/issues/177#issuecomment-3597428568 --> 
+      <tycho.version>4.0.13</tycho.version>     
       <surefire.version>3.5.4</surefire.version>
       <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>  
    </properties>
