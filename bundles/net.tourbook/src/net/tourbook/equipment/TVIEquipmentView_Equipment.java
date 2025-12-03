@@ -22,6 +22,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 
 import net.tourbook.common.UI;
+import net.tourbook.common.time.TimeTools;
 import net.tourbook.common.util.TreeViewerItem;
 import net.tourbook.data.Equipment;
 import net.tourbook.database.TourDatabase;
@@ -38,6 +39,12 @@ public class TVIEquipmentView_Equipment extends TVIEquipmentView_Item {
       super(equipViewer);
 
       _equipment = equipment;
+
+      firstColumn = equipment.getName();
+
+      if (UI.IS_SCRAMBLE_DATA) {
+         firstColumn = UI.scrambleText(firstColumn);
+      }
    }
 
    @Override
@@ -118,11 +125,11 @@ public class TVIEquipmentView_Equipment extends TVIEquipmentView_Item {
                tourItem.tourId = tourId;
                tourItem.getTourColumnData(result, resultEquipmentID, 3);
 
-//               tourItem.firstColumn = tourItem.tourDate.format(TimeTools.Formatter_Date_S);
-//
-//               if (UI.IS_SCRAMBLE_DATA) {
-//                  tourItem.firstColumn = UI.scrambleText(tourItem.firstColumn);
-//               }
+               tourItem.firstColumn = tourItem.tourDate.format(TimeTools.Formatter_Date_S);
+
+               if (UI.IS_SCRAMBLE_DATA) {
+                  tourItem.firstColumn = UI.scrambleText(tourItem.firstColumn);
+               }
             }
 
             previousTourId = tourId;

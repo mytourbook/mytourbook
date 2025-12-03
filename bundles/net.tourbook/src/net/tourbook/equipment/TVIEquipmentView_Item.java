@@ -23,6 +23,14 @@ public abstract class TVIEquipmentView_Item extends TreeViewerItem {
 
    private TreeViewer _equipmentViewer;
 
+   /**
+    * Content which is displayed in the first tree column
+    */
+   String             firstColumn;
+
+   long               numTours;
+   int                numTags_NoTours;
+
    public TVIEquipmentView_Item(final TreeViewer equipmentViewer) {
 
       _equipmentViewer = equipmentViewer;

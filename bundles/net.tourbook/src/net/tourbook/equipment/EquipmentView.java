@@ -26,6 +26,7 @@ import net.tourbook.Images;
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.CommonActivator;
+import net.tourbook.common.UI;
 import net.tourbook.common.time.TimeTools;
 import net.tourbook.common.util.ColumnDefinition;
 import net.tourbook.common.util.ColumnManager;
@@ -45,12 +46,14 @@ import net.tourbook.tour.SelectionTourId;
 import net.tourbook.tour.SelectionTourIds;
 import net.tourbook.tour.TourEventId;
 import net.tourbook.tour.TourManager;
+import net.tourbook.tourType.TourTypeImage;
 import net.tourbook.ui.ITourProvider;
 import net.tourbook.ui.TreeColumnFactory;
 import net.tourbook.ui.action.ActionCollapseAll;
 import net.tourbook.ui.action.ActionCollapseOthers;
 import net.tourbook.ui.action.ActionExpandSelection;
 import net.tourbook.ui.action.ActionRefreshView;
+import net.tourbook.ui.views.TourInfoToolTipStyledCellLabelProvider;
 
 import org.eclipse.collections.impl.list.mutable.primitive.LongArrayList;
 import org.eclipse.e4.ui.di.PersistState;
@@ -63,6 +66,8 @@ import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.layout.PixelConverter;
 import org.eclipse.jface.preference.IPreferenceStore;
+import org.eclipse.jface.resource.ColorRegistry;
+import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.viewers.CellLabelProvider;
 import org.eclipse.jface.viewers.ColumnViewer;
@@ -73,6 +78,7 @@ import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.jface.viewers.ITreeSelection;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.StructuredSelection;
+import org.eclipse.jface.viewers.StyledString;
 import org.eclipse.jface.viewers.TreePath;
 import org.eclipse.jface.viewers.TreeSelection;
 import org.eclipse.jface.viewers.TreeViewer;
@@ -83,6 +89,8 @@ import org.eclipse.jface.window.Window;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.BusyIndicator;
 import org.eclipse.swt.events.KeyListener;
+import org.eclipse.swt.graphics.Color;
+import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
@@ -157,6 +165,17 @@ public class EquipmentView extends ViewPart implements ITourProvider, ITourViewe
    private boolean                             _isSelectedWithKeyboard;
 
    private PixelConverter                      _pc;
+
+   private Color                               _colorContentCategory;
+   private Color                               _colorContentSubCategory;
+   private Color                               _colorDateCategory;
+   private Color                               _colorDateSubCategory;
+   private Color                               _colorTour;
+
+   /*
+    * UI resources
+    */
+   private final Image _imgEquipment = TourbookPlugin.getImage(Images.Equipment);
 
    /*
     * UI controls
@@ -379,6 +398,19 @@ public class EquipmentView extends ViewPart implements ITourProvider, ITourViewe
              */
             _equipmentViewer.getTree().redraw();
 
+         } else if (property.equals(ITourbookPreferences.VIEW_LAYOUT_CHANGED)) {
+
+            updateColors();
+
+            _equipmentViewer.getTree().setLinesVisible(_prefStore.getBoolean(ITourbookPreferences.VIEW_LAYOUT_DISPLAY_LINES));
+
+            _equipmentViewer.refresh();
+
+            /*
+             * the tree must be redrawn because the styled text does not show with the new color
+             */
+            _equipmentViewer.getTree().redraw();
+
 //       } else if (property.equals(ITourbookPreferences.APP_DATA_FILTER_IS_MODIFIED)) {
 //
 //            // reselect current sensor that the sensor chart (when opened) is reloaded
@@ -491,6 +523,7 @@ public class EquipmentView extends ViewPart implements ITourProvider, ITourViewe
 
       restoreState();
 
+      updateColors();
       reloadViewer();
 
       restoreState_Viewer();
@@ -647,20 +680,92 @@ public class EquipmentView extends ViewPart implements ITourProvider, ITourViewe
       colDef.setIsDefaultColumn();
       colDef.setCanModifyVisibility(false);
 
-      colDef.setLabelProvider(new CellLabelProvider() {
+      colDef.setLabelProvider(new TourInfoToolTipStyledCellLabelProvider() {
+
+         @Override
+         public Object getData(final ViewerCell cell) {
+
+//            if (_isToolTipInTag == false) {
+//               return null;
+//            }
+//
+//            final TVIEquipmentView_Item viewItem = (TVIEquipmentView_Item) cell.getElement();
+//
+//            if (viewItem instanceof TVIEquipmentView_Equipment || viewItem instanceof TVITaggingView_TagCategory) {
+//
+//               // return tag/category to show it's notes fields in the tooltip
+//
+//               return viewItem;
+//            }
+
+            return null;
+         }
+
+         @Override
+         public Long getTourId(final ViewerCell cell) {
+
+//            if (_isToolTipInTag == false) {
+//               return null;
+//            }
+//
+//            final Object element = cell.getElement();
+//            final TVIEquipmentView_Item viewItem = (TVIEquipmentView_Item) element;
+//
+//            if (viewItem instanceof final TVIEquipmentView_Tour tourItem) {
+//               return tourItem.tourId;
+//            }
+
+            return null;
+         }
+
          @Override
          public void update(final ViewerCell cell) {
 
             final Object element = cell.getElement();
+            final TVIEquipmentView_Item viewItem = (TVIEquipmentView_Item) element;
 
-            if (element instanceof final TVIEquipmentView_Equipment tviEquipment) {
+            final long numTours = viewItem.numTours;
 
-               cell.setText(tviEquipment.getEquipment().getName());
+            // hide number of tours
+//            if (_tagFilterType == TagFilterType.TAGS_WITHOUT_TOURS) {
+//               numTours = 0;
+//            }
 
-            } else if (element instanceof final TVIEquipmentView_Tour tviTour) {
+            final StyledString styledString = new StyledString();
 
-               cell.setText(Long.toString(tviTour.tourId));
+            if (viewItem instanceof final TVIEquipmentView_Tour tourItem) {
+
+               /*
+                * Tour
+                */
+
+               styledString.append(viewItem.firstColumn, net.tourbook.ui.UI.TOUR_STYLER);
+
+               cell.setImage(TourTypeImage.getTourTypeImage(tourItem.tourTypeId));
+
+               setCellColor(cell, element);
+
+            } else if (viewItem instanceof final TVIEquipmentView_Equipment equipmentItem) {
+
+               /*
+                * Equipment
+                */
+
+               styledString.append(viewItem.firstColumn, net.tourbook.ui.UI.CONTENT_SUB_CATEGORY_STYLER);
+
+               if (numTours > 0) {
+                  styledString.append(UI.SPACE3 + numTours, net.tourbook.ui.UI.TOTAL_STYLER);
+               }
+
+               cell.setImage(_imgEquipment);
+
+            } else {
+
+               styledString.append(viewItem.firstColumn, net.tourbook.ui.UI.TOUR_STYLER);
             }
+
+            cell.setText(styledString.getString());
+            cell.setStyleRanges(styledString.getStyleRanges());
          }
       });
    }
@@ -815,6 +920,8 @@ public class EquipmentView extends ViewPart implements ITourProvider, ITourViewe
 
       TourManager.getInstance().removeTourEventListener(_tourEventListener);
 
+      _imgEquipment.dispose();
+
       super.dispose();
    }
 
@@ -884,6 +991,8 @@ public class EquipmentView extends ViewPart implements ITourProvider, ITourViewe
       final IToolBarManager tbm = getViewSite().getActionBars().getToolBarManager();
 
       tbm.add(_actionNewEquipment);
+      tbm.add(_actionExpandSelection);
+      tbm.add(_actionCollapseAll_WithoutSelection);
       tbm.add(_action_RefreshView);
 
       // update that actions are fully created otherwise action enable will fail
@@ -1028,20 +1137,145 @@ public class EquipmentView extends ViewPart implements ITourProvider, ITourViewe
    /**
     * !!! RECURSIVE !!!
     * <p>
-    * Traverses all equipment viewer items
+    * Traverses all tag viewer items
     *
     * @param parentItem
     */
    private void loadAllTreeItems(final TreeViewerItem parentItem) {
 
+      final ArrayList<TreeViewerItem> allFetchedChildren = parentItem.getFetchedChildren();
+
+      for (final TreeViewerItem childItem : allFetchedChildren) {
+
+         // skip tour items, they do not have further children
+         if (childItem instanceof TVIEquipmentView_Tour) {
+            continue;
+         }
+
+         loadAllTreeItems(childItem);
+      }
+
+      /*
+       * Collect number of ...
+       */
+      final int numAllTagCategories = 0;
+      int numAllTags = 0;
+
+      int numTags_NoTours = 0;
+
+      int numTours_InTourItems = 0;
+      final int numTours_InTagSubCats = 0;
+
+      for (final TreeViewerItem childItem : allFetchedChildren) {
+
+         if (childItem instanceof TVIEquipmentView_Tour) {
+
+            numTours_InTourItems++;
+
+//         } else if (childItem instanceof TVITaggingView_Year
+//               || childItem instanceof TVITaggingView_Month) {
+//
+//            // collect number of tours in the tag sub categories
+//
+//            numTours_InTagSubCats += ((TVIEquipmentView_Item) childItem).numTours;
+//
+//         } else if (childItem instanceof TVITaggingView_TagCategory) {
+//
+//            numAllTagCategories++;
+
+         } else if (childItem instanceof TVIEquipmentView_Equipment) {
+
+            numAllTags++;
+
+         }
+      }
+
+      if (numTours_InTourItems == 0 && numTours_InTagSubCats == 0) {
+
+         numTags_NoTours++;
+      }
+
+// SET_FORMATTING_OFF
+
+      /*
+       * Update number of tours in parent item and up to the tag item
+       */
+      if (parentItem instanceof final TVIEquipmentView_Equipment tagItem) {
+
+         tagItem.numTours           += numTours_InTourItems;
+         tagItem.numTags_NoTours    += numTags_NoTours;
+
+//      } else if (parentItem instanceof final TVITaggingView_Year yearItem) {
+//
+//         yearItem.numTours          += numTours_InTourItems;
+//         yearItem.numTags_NoTours   += numTags_NoTours;
+//
+//         final TreeViewerItem yearParent = yearItem.getParentItem();
+//         if (yearParent instanceof final TVIEquipmentView_Equipment tagItem) {
+//
+//            tagItem.numTours           += numTours_InTourItems;
+//            tagItem.numTags_NoTours    += numTags_NoTours;
+//         }
+//
+//      } else if (parentItem instanceof final TVITaggingView_Month monthItem) {
+//
+//         monthItem.numTours            += numTours_InTourItems;
+//         monthItem.numTags_NoTours     += numTags_NoTours;
+//
+//         final TreeViewerItem monthParent = monthItem.getParentItem();
+//         if (monthParent instanceof final TVITaggingView_Year yearItem) {
+//
+//            yearItem.numTours          += numTours_InTourItems;
+//            yearItem.numTags_NoTours   += numTags_NoTours;
+//
+//            final TreeViewerItem yearParent = yearItem.getParentItem();
+//            if (yearParent instanceof final TVIEquipmentView_Equipment tagItem) {
+//
+//               tagItem.numTours           += numTours_InTourItems;
+//               tagItem.numTags_NoTours    += numTags_NoTours;
+//            }
+//         }
+//
+//      } else if (parentItem instanceof final TVITaggingView_TagCategory categoryItem) {
+//
+//         long allNumChild_Tours           = 0;
+//         long allNumChild_TagsNoTours     = 0;
+//
+//         for (final TreeViewerItem treeViewerItem : allFetchedChildren) {
+//
+//            if (treeViewerItem instanceof final TVIEquipmentView_Item viewItem) {
+//
+//               allNumChild_Tours          += viewItem.numTours;
+//               allNumChild_TagsNoTours    += viewItem.numTags_NoTours;
+//            }
+//         }
+//
+//         categoryItem.numTagCategories    += numAllTagCategories;
+//         categoryItem.numTags             += numAllTags;
+//
+//         categoryItem.numTours            += allNumChild_Tours;
+//         categoryItem.numTags_NoTours     += allNumChild_TagsNoTours;
+      }
+
+// SET_FORMATTING_ON
+   }
+
+   /**
+    * !!! RECURSIVE !!!
+    * <p>
+    * Traverses all equipment viewer items
+    *
+    * @param parentItem
+    */
+   private void loadAllTreeItems2(final TreeViewerItem parentItem) {
+
       final List<TreeViewerItem> allFetchedChildren = parentItem.getFetchedChildren();
 
       for (final TreeViewerItem childItem : allFetchedChildren) {
 
-         loadAllTreeItems(childItem);
+         loadAllTreeItems2(childItem);
       }
    }
-
    private void onAction_DeleteEquipment() {
 
       final ITreeSelection structuredSelection = _equipmentViewer.getStructuredSelection();
@@ -1149,7 +1383,7 @@ public class EquipmentView extends ViewPart implements ITourProvider, ITourViewe
 
             || selectedItem instanceof TVIEquipmentView_Equipment
 
-//            || selectedItem instanceof TVITaggingView_Tag
+//            || selectedItem instanceof TVIEquipmentView_Equipment
 //            || selectedItem instanceof TVITaggingView_TagCategory
 //            || selectedItem instanceof TVITaggingView_Year
 //            || selectedItem instanceof TVITaggingView_Month
@@ -1659,10 +1893,52 @@ public class EquipmentView extends ViewPart implements ITourProvider, ITourViewe
       Util.setState(_state, STATE_EXPANDED_ITEMS, expandedItems.toArray());
    }
 
+   private void setCellColor(final ViewerCell cell, final Object element) {
+
+      // set color
+
+//      if (element instanceof TVITaggingView_TagCategory) {
+//
+//         cell.setForeground(_colorContentCategory);
+//
+//      } else
+      if (element instanceof TVIEquipmentView_Equipment) {
+
+         cell.setForeground(_colorContentSubCategory);
+
+//      } else if (element instanceof TVITaggingView_Year) {
+//
+//         cell.setForeground(_colorDateCategory);
+//
+//      } else if (element instanceof TVITaggingView_Month) {
+//
+//         cell.setForeground(_colorDateSubCategory);
+
+      } else if (element instanceof TVIEquipmentView_Tour) {
+
+         cell.setForeground(_colorTour);
+      }
+   }
+
    @Override
    public void setFocus() {
 
       _equipmentViewer.getTree().setFocus();
+   }
+
+   private void updateColors() {
+
+      final ColorRegistry colorRegistry = JFaceResources.getColorRegistry();
+
+// SET_FORMATTING_OFF
+
+      _colorContentCategory      = colorRegistry.get(net.tourbook.ui.UI.VIEW_COLOR_CONTENT_CATEGORY);
+      _colorContentSubCategory   = colorRegistry.get(net.tourbook.ui.UI.VIEW_COLOR_CONTENT_SUB_CATEGORY);
+      _colorDateCategory         = colorRegistry.get(net.tourbook.ui.UI.VIEW_COLOR_DATE_CATEGORY);
+      _colorDateSubCategory      = colorRegistry.get(net.tourbook.ui.UI.VIEW_COLOR_DATE_SUB_CATEGORY);
+      _colorTour                 = colorRegistry.get(net.tourbook.ui.UI.VIEW_COLOR_TOUR);
+
+// SET_FORMATTING_ON
    }
 
    @Override
