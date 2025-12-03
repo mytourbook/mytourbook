@@ -24,10 +24,12 @@ import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.UI;
 import net.tourbook.common.util.TableLayoutComposite;
+import net.tourbook.common.util.Util;
 import net.tourbook.ui.action.TourAction;
 import net.tourbook.ui.action.TourActionCategory;
 import net.tourbook.ui.action.TourActionManager;
 
+import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.layout.PixelConverter;
@@ -64,24 +66,28 @@ import org.eclipse.ui.dialogs.PreferencesUtil;
 
 public class PrefPageAppearance_TourActions extends PreferencePage implements IWorkbenchPreferencePage {
 
-   public static final String            ID                 = "net.tourbook.preferences.PrefPageAppearance_TourActions"; //$NON-NLS-1$
+   public static final String            ID                       = "net.tourbook.preferences.PrefPageAppearance_TourActions"; //$NON-NLS-1$
 
-   private static final String           LINK_ID_EQUIPMENT  = "equipment";                                               //$NON-NLS-1$
-   private static final String           LINK_ID_TAGS       = "tags";                                                    //$NON-NLS-1$
-   private static final String           LINK_ID_TOUR_TYPES = "tourTypes";                                               //$NON-NLS-1$
+   private static final String           STATE_CHECK_ON_SELECTION = "STATE_CHECK_ON_SELECTION";                                //$NON-NLS-1$
 
-   private static final IPreferenceStore _prefStore         = TourbookPlugin.getPrefStore();
+   private static final String           LINK_ID_EQUIPMENT        = "equipment";                                               //$NON-NLS-1$
+   private static final String           LINK_ID_TAGS             = "tags";                                                    //$NON-NLS-1$
+   private static final String           LINK_ID_TOUR_TYPES       = "tourTypes";                                               //$NON-NLS-1$
 
-   private List<TourAction>              _allClonedActions  = new ArrayList<>();
+   private static final IPreferenceStore _prefStore               = TourbookPlugin.getPrefStore();
+   private static final IDialogSettings  _state                   = TourbookPlugin.getState(ID);
+
+   private List<TourAction>              _allClonedActions        = new ArrayList<>();
    private Set<String>                   _allViewActionIDs;
 
    private CheckboxTableViewer           _tourActionViewer;
-   private ActionFilter                  _actionFilter      = new ActionFilter();
+   private ActionFilter                  _actionFilter            = new ActionFilter();
 
    private SelectionListener             _defaultSelectionListener;
    private IPropertyChangeListener       _prefChangeListener;
 
    private PixelConverter                _pc;
+   private boolean                       _isInSelection;
 
    /*
     * UI controls
@@ -92,6 +98,7 @@ public class PrefPageAppearance_TourActions extends PreferencePage implements IW
    private Button  _btnUncheckAll;
    private Button  _btnUp;
    private Button  _btnDown;
+   private Button  _chkCheckOnSelection;
    private Button  _chkShowOnlyAvailableActions;
    private Button  _rdoShowAllActions;
    private Button  _rdoShowCustomActions;
@@ -415,6 +422,15 @@ public class PrefPageAppearance_TourActions extends PreferencePage implements IW
 //      container.setBackground(UI.SYS_COLOR_GREEN);
       {
          {
+            /*
+             * Button: Check action on selection
+             */
+            _chkCheckOnSelection = new Button(container, SWT.CHECK);
+            _chkCheckOnSelection.setText("Chec&k on selection");
+            _chkCheckOnSelection.setToolTipText("Check an action when it is selected,\nor it can be checked by double clicking on it");
+         }
+         UI.createSpacer_Vertical(container, 10, 1);
+         {
             _lblOptions = new Label(container, SWT.WRAP);
             _lblOptions.setText(Messages.Pref_TourActions_Label_Options);
             _lblOptions.setToolTipText(tooltipText);
@@ -477,7 +493,7 @@ public class PrefPageAppearance_TourActions extends PreferencePage implements IW
 
             if (tourAction.isCategory) {
 
-               styledString.append(tourAction.actionText, net.tourbook.ui.UI.DISABLED_STYLER);
+               styledString.append(tourAction.actionText, net.tourbook.ui.UI.CONTENT_CATEGORY_STYLER);
 
             } else {
 
@@ -759,14 +775,12 @@ public class PrefPageAppearance_TourActions extends PreferencePage implements IW
    private void onAction_Check(final CheckStateChangedEvent event) {
 
       // keep the checked status
-      final TourAction tourAction = (TourAction) event.getElement();
-      tourAction.isChecked = event.getChecked();
+      final boolean isChecked = event.getChecked();
+      final TourAction checkedAction = (TourAction) event.getElement();
 
-      // select the checked item
-      _tourActionViewer.setSelection(new StructuredSelection(tourAction));
+      checkedAction.isChecked = isChecked;
 
-      // update UI
-      _tourActionViewer.update(tourAction, null);
+      onAction_UpdateCheckState(isChecked, checkedAction);
    }
 
    private void onAction_DoubleClick(final DoubleClickEvent event) {
@@ -777,13 +791,91 @@ public class PrefPageAppearance_TourActions extends PreferencePage implements IW
       final TourAction selectedAction = (TourAction) structuredSelection.getFirstElement();
 
       // update model
-      selectedAction.isChecked = !selectedAction.isChecked;
+      final boolean isChecked = !selectedAction.isChecked;
+      selectedAction.isChecked = isChecked;
 
-      // update UI
-      _tourActionViewer.setChecked(selectedAction, selectedAction.isChecked);
+      onAction_UpdateCheckState(isChecked, selectedAction);
    }
 
    private void onAction_Select(final SelectionChangedEvent event) {
+
+      if (_isInSelection) {
+         return;
+      }
+
+      if (_chkCheckOnSelection.getSelection()) {
+
+         onAction_DoubleClick(null);
+
+      } else {
+
+         enableControls();
+      }
+   }
+
+   private void onAction_UpdateCheckState(final boolean isChecked, final TourAction checkedAction) {
+
+      final List<TourAction> allCheckedActions = new ArrayList<>();
+
+      if (checkedAction.isCategory) {
+
+         // check/uncheck all category children
+
+         final TourActionCategory actionCategory = checkedAction.actionCategory;
+
+         for (final TourAction viewTourAction : _allClonedActions) {
+
+            if (viewTourAction.actionCategory.equals(actionCategory)) {
+
+               // action is in the same category
+
+               if (viewTourAction.isCategory == false) {
+
+                  // update model
+                  viewTourAction.isChecked = isChecked;
+               }
+
+               if (isChecked) {
+
+                  allCheckedActions.add(viewTourAction);
+               }
+
+            } else {
+
+               // all other actions must be re-checked otherwise they are not checked any more
+
+               if (viewTourAction.isChecked) {
+
+                  allCheckedActions.add(viewTourAction);
+               }
+            }
+         }
+
+      } else {
+
+         // an action is checked/unchecked
+
+         for (final TourAction viewTourAction : _allClonedActions) {
+
+            if (viewTourAction.isChecked) {
+
+               allCheckedActions.add(viewTourAction);
+            }
+         }
+      }
+
+      // update UI
+      _tourActionViewer.setCheckedElements(allCheckedActions.toArray());
+
+      // select the checked item
+      _isInSelection = true;
+      {
+         _tourActionViewer.setSelection(new StructuredSelection(checkedAction));
+      }
+      _isInSelection = false;
+
+      // update UI
+      _tourActionViewer.update(checkedAction, null);
 
       enableControls();
    }
@@ -860,10 +952,12 @@ public class PrefPageAppearance_TourActions extends PreferencePage implements IW
    private void restoreState() {
 
       final boolean isCustomizeActions = TourActionManager.isCustomizeActions();
+      final boolean isCheckOnSelection = Util.getStateBoolean(_state, STATE_CHECK_ON_SELECTION, false);
 
       _rdoShowAllActions.setSelection(isCustomizeActions == false);
       _rdoShowCustomActions.setSelection(isCustomizeActions);
 
+      _chkCheckOnSelection.setSelection(isCheckOnSelection);
       _chkShowOnlyAvailableActions.setSelection(TourActionManager.isShowOnlyAvailableActions());
 
       // get viewer content
@@ -887,6 +981,8 @@ public class PrefPageAppearance_TourActions extends PreferencePage implements IW
    private void safePrefState() {
 
       TourActionManager.savePrefState(_chkShowOnlyAvailableActions.getSelection());
+
+      _state.put(STATE_CHECK_ON_SELECTION, _chkCheckOnSelection.getSelection());
    }
 
    private void saveState() {

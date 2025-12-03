@@ -4727,6 +4727,7 @@ public class TourBookView extends ViewPart implements
             _allTourActions_Export.keySet(),
             _allTourActions_Adjust.keySet(),
             _tagMenuManager.getAllTagActions(isFlatView).keySet(),
+            _equipmentMenuManager.getAllEquipmentActions().keySet(),
             _tourTypeMenuManager.getAllTourTypeActions().keySet());
    }
 

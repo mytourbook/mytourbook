@@ -421,7 +421,8 @@ public class EquipmentView extends ViewPart implements ITourProvider, ITourViewe
             return;
          }
 
-         if (tourEventId == TourEventId.EQUIPMENT_STRUCTURE_CHANGED) {
+         if (tourEventId == TourEventId.EQUIPMENT_STRUCTURE_CHANGED
+               || tourEventId == TourEventId.TOUR_CHANGED) {
 
             reloadViewer();
          }
@@ -1372,7 +1373,7 @@ public class EquipmentView extends ViewPart implements ITourProvider, ITourViewe
       tree.setRedraw(false);
       {
          final Object[] expandedElements = _equipmentViewer.getExpandedElements();
-         final ISelection selection = _equipmentViewer.getSelection();
+         final ITreeSelection selection = _equipmentViewer.getStructuredSelection();
 
          reloadViewer_SetContent();
 
@@ -1395,34 +1396,6 @@ public class EquipmentView extends ViewPart implements ITourProvider, ITourViewe
 
    private void restoreState() {
 
-//      _tagViewLayout = TAG_VIEW_LAYOUT_HIERARCHICAL;
-//
-//      // restore view layout
-//      try {
-//
-//         final int viewLayout = _state.getInt(MEMENTO_TAG_VIEW_LAYOUT);
-//         switch (viewLayout) {
-//
-//         case TAG_VIEW_LAYOUT_FLAT:
-//
-//            _tagViewLayout = viewLayout;
-//            break;
-//
-//         case TAG_VIEW_LAYOUT_HIERARCHICAL:
-//
-//            _tagViewLayout = viewLayout;
-//            break;
-//
-//         default:
-//            break;
-//         }
-//
-//      } catch (final NumberFormatException e) {
-//
-//         // set default tag view layout
-//         _tagViewLayout = TAG_VIEW_LAYOUT_HIERARCHICAL;
-//      }
-
       // on mouse select -> expand/collapse
       _isBehaviour_OnSelect_ExpandCollapse = Util.getStateBoolean(_state, STATE_IS_ON_SELECT_EXPAND_COLLAPSE, true);
       _actionOnMouseSelect_ExpandCollapse.setChecked(_isBehaviour_OnSelect_ExpandCollapse);
@@ -1430,12 +1403,6 @@ public class EquipmentView extends ViewPart implements ITourProvider, ITourViewe
       // single expand -> collapse others
       _isBehaviour_SingleExpand_CollapseOthers = Util.getStateBoolean(_state, STATE_IS_SINGLE_EXPAND_COLLAPSE_OTHERS, true);
       _actionSingleExpand_CollapseOthers.setChecked(_isBehaviour_SingleExpand_CollapseOthers);
-
-//      _tagFilterType = (TagFilterType) Util.getStateEnum(_state, STATE_TAG_FILTER, TagFilterType.ALL_IS_DISPLAYED);
-//
-//      updateUI_TagFilter();
-//      updateUI_TagLayoutAction();
-//      updateToolTipState();
    }
 
    /**
