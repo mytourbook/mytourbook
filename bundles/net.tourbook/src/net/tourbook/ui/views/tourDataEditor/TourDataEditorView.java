@@ -5182,6 +5182,22 @@ public class TourDataEditorView extends ViewPart implements
       {
          {
             /*
+             * Tour type
+             */
+            _linkTourType = new Link(container, SWT.NONE);
+            _linkTourType.setText(Messages.tour_editor_label_tour_type);
+            _linkTourType.addSelectionListener(SelectionListener.widgetSelectedAdapter(selectionEvent -> UI.openControlMenu(_linkTourType)));
+            _tk.adapt(_linkTourType, true, true);
+            _firstColumnControls.add(_linkTourType);
+
+            _lblTourType = new CLabel(container, SWT.NONE);
+            GridDataFactory.swtDefaults()
+                  .grab(true, false)
+                  .span(3, 1)
+                  .applyTo(_lblTourType);
+         }
+         {
+            /*
              * Tag Menu
              */
             _linkTag = new Link(container, SWT.NONE);
@@ -5232,22 +5248,6 @@ public class TourDataEditorView extends ViewPart implements
                   _lblNoTags = UI.createLabel(_pageBook_Tags, UI.EMPTY_STRING);
                }
             }
-         }
-         {
-            /*
-             * Tour type
-             */
-            _linkTourType = new Link(container, SWT.NONE);
-            _linkTourType.setText(Messages.tour_editor_label_tour_type);
-            _linkTourType.addSelectionListener(SelectionListener.widgetSelectedAdapter(selectionEvent -> UI.openControlMenu(_linkTourType)));
-            _tk.adapt(_linkTourType, true, true);
-            _firstColumnControls.add(_linkTourType);
-
-            _lblTourType = new CLabel(container, SWT.NONE);
-            GridDataFactory.swtDefaults()
-                  .grab(true, false)
-                  .span(3, 1)
-                  .applyTo(_lblTourType);
          }
          {
             /*
@@ -7456,6 +7456,7 @@ public class TourDataEditorView extends ViewPart implements
       _spinPerson_RestPulse               .setEnabled(canEdit);
       _spinPerson_Calories                .setEnabled(canEdit);
 
+      _linkEquipment                      .setEnabled(canEdit);
       _linkTag                            .setEnabled(canEdit);
       _linkTourType                       .setEnabled(canEdit);
 
@@ -9977,6 +9978,7 @@ public class TourDataEditorView extends ViewPart implements
       if (IS_DARK_THEME) {
 
          _linkDefaultTimeZone    .setBackground(_backgroundColor_Default);
+         _linkEquipment          .setBackground(_backgroundColor_Default);
          _linkGeoTimeZone        .setBackground(_backgroundColor_Default);
          _linkRemoveTimeZone     .setBackground(_backgroundColor_Default);
          _linkTag                .setBackground(_backgroundColor_Default);

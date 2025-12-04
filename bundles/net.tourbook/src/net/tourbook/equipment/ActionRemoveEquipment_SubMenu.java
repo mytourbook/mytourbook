@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2025, 2026 Wolfgang Schramm and Contributors
+ * Copyright (C) 2025 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -19,6 +19,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import net.tourbook.Messages;
 import net.tourbook.common.ui.SubMenu;
@@ -75,8 +76,9 @@ public class ActionRemoveEquipment_SubMenu extends SubMenu {
    public void fillMenu(final Menu menu) {
 
       // get all equipment from all tours
-      final HashSet<Equipment> allUsedEquipment = new HashSet<>();
       final List<TourData> allSelectedTours = _equipmentMenuManager.getTourProvider().getSelectedTours();
+
+      final Set<Equipment> allUsedEquipment = new HashSet<>();
 
       for (final TourData tourData : allSelectedTours) {
          allUsedEquipment.addAll(tourData.getEquipment());
@@ -95,6 +97,11 @@ public class ActionRemoveEquipment_SubMenu extends SubMenu {
          // make the equipment more visible
          action.setChecked(true);
       }
+
+      setEnabled(allUsedEquipment.size() > 0);
+
+//      System.out.println(UI.timeStamp() + " ActionRemoveEquipment_SubMenu " + isEnabled());
+//// TODO remove SYSTEM.OUT.PRINTLN
    }
 
 }

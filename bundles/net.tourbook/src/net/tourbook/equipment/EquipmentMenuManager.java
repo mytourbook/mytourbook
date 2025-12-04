@@ -545,14 +545,14 @@ public class EquipmentMenuManager implements IActionProvider {
 
       final int numClipboardEquipment = updateUI_PasteAction();
 
-// SET_FORMATTING_OFF
-
-      final boolean isEnabled_AddEquipment  = allAvailableEquipments.size() > 0;
+      final boolean isEnabled_AddEquipment = allAvailableEquipments.size() > 0;
       final boolean isEnabled_RemoveEquipment = allUsedEquipments.size() > 0;
 
-      enableEquipmentActions(isEnabled_AddEquipment, isEnabled_RemoveEquipment, numClipboardEquipment);
+      enableEquipmentActions(
 
-// SET_FORMATTING_ON
+            isEnabled_AddEquipment,
+            isEnabled_RemoveEquipment,
+            numClipboardEquipment);
 
       enableRecentActions();
    }
@@ -566,7 +566,11 @@ public class EquipmentMenuManager implements IActionProvider {
 
       final int numClipboardEquipment = updateUI_PasteAction();
 
-      enableEquipmentActions(isEnabled_AddEquipment, isEnabled_RemoveEquipment, numClipboardEquipment);
+      enableEquipmentActions(
+
+            isEnabled_AddEquipment,
+            isEnabled_RemoveEquipment,
+            numClipboardEquipment);
 
       enableRecentEquipmentActions(isEnabled_AddEquipment, _allEquipmentIDs_OneTour);
    }
@@ -574,18 +578,18 @@ public class EquipmentMenuManager implements IActionProvider {
    private void enableEquipmentActions(final boolean isEnabled_AddEquipment,
                                        final boolean isEnabled_RemoveEquipment,
                                        final int numClipboardEquipment) {
-      // SET_FORMATTING_OFF
+// SET_FORMATTING_OFF
 
-            _actionAddEquipment              .setEnabled(isEnabled_AddEquipment);
-            _actionAddEquipment_Groups       .setEnabled(isEnabled_AddEquipment);
+      _actionAddEquipment              .setEnabled(isEnabled_AddEquipment);
+      _actionAddEquipment_Groups       .setEnabled(isEnabled_AddEquipment);
 
-            _actionRemoveEquipment           .setEnabled(isEnabled_RemoveEquipment);
-            _actionRemoveAllEquipment        .setEnabled(isEnabled_RemoveEquipment);
+      _actionRemoveEquipment        .setEnabled(isEnabled_RemoveEquipment);
+      _actionRemoveAllEquipment     .setEnabled(isEnabled_RemoveEquipment);
 
-            _actionClipboard_CopyEquipment   .setEnabled(isEnabled_RemoveEquipment);
-            _actionClipboard_PasteEquipment  .setEnabled(isEnabled_AddEquipment && numClipboardEquipment > 0);
+      _actionClipboard_CopyEquipment   .setEnabled(isEnabled_RemoveEquipment);
+      _actionClipboard_PasteEquipment  .setEnabled(isEnabled_AddEquipment && numClipboardEquipment > 0);
 
-      // SET_FORMATTING_ON
+// SET_FORMATTING_ON
    }
 
    /**
@@ -919,30 +923,36 @@ public class EquipmentMenuManager implements IActionProvider {
 
    private void removeAllEquipment() {
 
-      // get tours which tour type should be changed
+      // get all tours which equipment should be changed
       final ArrayList<TourData> allModifiedTours = _tourProvider.getSelectedTours();
+      final ArrayList<TourData> allToursWithEquipment = new ArrayList<>();
 
       if (allModifiedTours == null || allModifiedTours.isEmpty()) {
          return;
       }
 
-      final HashMap<Long, Equipment> allModifiedEquipment = new HashMap<>();
+      final HashMap<Long, Equipment> allRemovedEquipment = new HashMap<>();
 
       // remove equipment in all tours (without tours from an editor)
       for (final TourData tourData : allModifiedTours) {
 
          // get all equipment which will be removed
-         final Set<Equipment> allEquipment = tourData.getEquipment();
+         final Set<Equipment> allTourEquipment = tourData.getEquipment();
 
-         for (final Equipment equipment : allEquipment) {
-            allModifiedEquipment.put(equipment.getEquipmentId(), equipment);
+         if (allTourEquipment.size() > 0) {
+
+            allToursWithEquipment.add(tourData);
+
+            for (final Equipment equipment : allTourEquipment) {
+               allRemovedEquipment.put(equipment.getEquipmentId(), equipment);
+            }
+
+            // remove all equipment
+            allTourEquipment.clear();
          }
-
-         // remove all equipment
-         allEquipment.clear();
       }
 
-      saveAndNotify(allModifiedTours, allModifiedEquipment);
+      saveAndNotify(allToursWithEquipment, allRemovedEquipment);
    }
 
    /**

@@ -287,7 +287,7 @@ public class DialogEquipment extends TitleAreaDialog {
              * Distance first use
              */
 
-            final Label label = UI.createLabel(_container, "D&istance");
+            final Label label = UI.createLabel(_container, "Initial d&istance");
             label.setToolTipText("Distance by first use");
 
             final Composite containerWeight = new Composite(_container, SWT.NONE);

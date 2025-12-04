@@ -46,7 +46,6 @@ import net.tourbook.tour.SelectionTourId;
 import net.tourbook.tour.SelectionTourIds;
 import net.tourbook.tour.TourEventId;
 import net.tourbook.tour.TourManager;
-import net.tourbook.tourType.TourTypeImage;
 import net.tourbook.ui.ITourProvider;
 import net.tourbook.ui.TreeColumnFactory;
 import net.tourbook.ui.action.ActionCollapseAll;
@@ -175,7 +174,10 @@ public class EquipmentView extends ViewPart implements ITourProvider, ITourViewe
    /*
     * UI resources
     */
-   private final Image _imgEquipment = TourbookPlugin.getImage(Images.Equipment);
+   private final Image _imgEquipment         = TourbookPlugin.getImage(Images.Equipment);
+   private final Image _imgEquipment_All     = TourbookPlugin.getImage(Images.Equipment_All);
+   private final Image _imgEquipment_Part    = TourbookPlugin.getImage(Images.Equipment_Part);
+   private final Image _imgEquipment_Service = TourbookPlugin.getImage(Images.Equipment_Service);
 
    /*
     * UI controls
@@ -741,7 +743,7 @@ public class EquipmentView extends ViewPart implements ITourProvider, ITourViewe
 
                styledString.append(viewItem.firstColumn, net.tourbook.ui.UI.TOUR_STYLER);
 
-               cell.setImage(TourTypeImage.getTourTypeImage(tourItem.tourTypeId));
+//               cell.setImage(TourTypeImage.getTourTypeImage(tourItem.tourTypeId));
 
                setCellColor(cell, element);
 
@@ -757,7 +759,7 @@ public class EquipmentView extends ViewPart implements ITourProvider, ITourViewe
                   styledString.append(UI.SPACE3 + numTours, net.tourbook.ui.UI.TOTAL_STYLER);
                }
 
-               cell.setImage(_imgEquipment);
+               cell.setImage(_imgEquipment_All);
 
             } else {
 
@@ -787,6 +789,7 @@ public class EquipmentView extends ViewPart implements ITourProvider, ITourViewe
             if (element instanceof final TVIEquipmentView_Equipment tviEquipment) {
 
                cell.setText(tviEquipment.getEquipment().getBrand());
+               setCellColor(cell, element);
             }
          }
       });
@@ -809,6 +812,7 @@ public class EquipmentView extends ViewPart implements ITourProvider, ITourViewe
             if (element instanceof final TVIEquipmentView_Equipment tviEquipment) {
 
                cell.setText(tviEquipment.getEquipment().getModel());
+               setCellColor(cell, element);
             }
          }
       });
@@ -835,6 +839,7 @@ public class EquipmentView extends ViewPart implements ITourProvider, ITourViewe
                final LocalDate date = tviEquipment.getEquipment().getDate();
 
                cell.setText(TimeTools.Formatter_Date_S.format(date));
+               setCellColor(cell, element);
             }
          }
       });
@@ -859,6 +864,7 @@ public class EquipmentView extends ViewPart implements ITourProvider, ITourViewe
                final LocalDate date = tviEquipment.getEquipment().getDateBuilt();
 
                cell.setText(TimeTools.Formatter_Date_S.format(date));
+               setCellColor(cell, element);
             }
          }
       });
@@ -883,6 +889,7 @@ public class EquipmentView extends ViewPart implements ITourProvider, ITourViewe
                final LocalDate date = tviEquipment.getEquipment().getDateFirstUse();
 
                cell.setText(TimeTools.Formatter_Date_S.format(date));
+               setCellColor(cell, element);
             }
          }
       });
@@ -907,6 +914,7 @@ public class EquipmentView extends ViewPart implements ITourProvider, ITourViewe
                final LocalDate date = tviEquipment.getEquipment().getDateRetired();
 
                cell.setText(TimeTools.Formatter_Date_S.format(date));
+               setCellColor(cell, element);
             }
          }
       });
@@ -921,6 +929,9 @@ public class EquipmentView extends ViewPart implements ITourProvider, ITourViewe
       TourManager.getInstance().removeTourEventListener(_tourEventListener);
 
       _imgEquipment.dispose();
+      _imgEquipment_All.dispose();
+      _imgEquipment_Part.dispose();
+      _imgEquipment_Service.dispose();
 
       super.dispose();
    }
@@ -1276,6 +1287,7 @@ public class EquipmentView extends ViewPart implements ITourProvider, ITourViewe
          loadAllTreeItems2(childItem);
       }
    }
+
    private void onAction_DeleteEquipment() {
 
       final ITreeSelection structuredSelection = _equipmentViewer.getStructuredSelection();
@@ -1897,11 +1909,6 @@ public class EquipmentView extends ViewPart implements ITourProvider, ITourViewe
 
       // set color
 
-//      if (element instanceof TVITaggingView_TagCategory) {
-//
-//         cell.setForeground(_colorContentCategory);
-//
-//      } else
       if (element instanceof TVIEquipmentView_Equipment) {
 
          cell.setForeground(_colorContentSubCategory);

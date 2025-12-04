@@ -790,6 +790,11 @@ public class PrefPageAppearance_TourActions extends PreferencePage implements IW
       final IStructuredSelection structuredSelection = _tourActionViewer.getStructuredSelection();
       final TourAction selectedAction = (TourAction) structuredSelection.getFirstElement();
 
+      if (selectedAction == null) {
+         // fix NPE
+         return;
+      }
+
       // update model
       final boolean isChecked = !selectedAction.isChecked;
       selectedAction.isChecked = isChecked;
