@@ -285,7 +285,6 @@ public class TourDatabase {
    private static final String KEY_BIKE                     = TABLE_TOUR_BIKE                + "_" + ENTITY_ID_BIKE;                //$NON-NLS-1$
    private static final String KEY_DEVICE_SENSOR            = TABLE_DEVICE_SENSOR            + "_" + ENTITY_ID_DEVICE_SENSOR;       //$NON-NLS-1$
    public static final String  KEY_EQUIPMENT                = TABLE_EQUIPMENT                + "_" + ENTITY_ID_EQUIPMENT;           //$NON-NLS-1$
-   private static final String KEY_EQUIPMENT_PART           = TABLE_EQUIPMENT_PART           + "_" + ENTITY_ID_EQUIPMENT_PART;   //$NON-NLS-1$
    public static final String  KEY_MARKER_TYPE              = TABLE_TOUR_MARKER_TYPE         + "_" + ENTITY_ID_MARKER_TYPE;         //$NON-NLS-1$
    private static final String KEY_PERSON                   = TABLE_TOUR_PERSON              + "_" + ENTITY_ID_PERSON;              //$NON-NLS-1$
    public static final String  KEY_TAG                      = TABLE_TOUR_TAG                 + "_" + ENTITY_ID_TAG;                 //$NON-NLS-1$
@@ -1898,11 +1897,12 @@ public class TourDatabase {
     *
     * @author Stefan F.
     *
-    * @param sqlQuery
-    *           must look like: "SELECT tourTitle FROM " + TourDatabase.TABLE_TOUR_DATA + " ORDER BY
-    *           tourTitle"
+    * @param db
+    *           Database table
+    * @param fieldname
+    *           Db field name
     *
-    * @return places as string array.
+    * @return Returns a sorted list with unique db field contents
     */
    public static ConcurrentSkipListSet<String> getDistinctValues(final String db, final String fieldname) {
 
@@ -1914,7 +1914,7 @@ public class TourDatabase {
       });
 
       /*
-       * run in UI thread otherwise the busyindicator fails
+       * Run in UI thread otherwise the busyindicator fails
        */
       final Display display = Display.getDefault();
 
@@ -4442,24 +4442,27 @@ public class TourDatabase {
     */
    private void createTable_Equipment(final Statement stmt) throws SQLException {
 
-      exec(stmt, "CREATE TABLE " + TABLE_EQUIPMENT + "   (                                   " + NL //$NON-NLS-1$ //$NON-NLS-2$
-      //
-            + SQL.createField_EntityId(ENTITY_ID_EQUIPMENT, true)
+      exec(stmt,
 
-            + "   Brand                VARCHAR(" + DB_LENGTH_NAME + "),                      " + NL //$NON-NLS-1$ //$NON-NLS-2$
-            + "   Model                VARCHAR(" + DB_LENGTH_NAME + "),                      " + NL //$NON-NLS-1$ //$NON-NLS-2$
-            + "   Description          VARCHAR(" + DB_LENGTH_DESCRIPTION + "),               " + NL //$NON-NLS-1$ //$NON-NLS-2$
+            "CREATE TABLE " + TABLE_EQUIPMENT + "   (                                        " + NL //$NON-NLS-1$ //$NON-NLS-2$
 
-            + "   EquipmentType        VARCHAR(" + DB_LENGTH_NAME + "),                      " + NL //$NON-NLS-1$ //$NON-NLS-2$
+                  + SQL.createField_EntityId(ENTITY_ID_EQUIPMENT, true)
 
-            + "   DateBuilt            BIGINT DEFAULT 0,                                     " + NL //$NON-NLS-1$
-            + "   DateFirstUse         BIGINT DEFAULT 0,                                     " + NL //$NON-NLS-1$
-            + "   DateRetired          BIGINT DEFAULT 0,                                     " + NL //$NON-NLS-1$
+                  + "   Brand                VARCHAR(" + DB_LENGTH_NAME + "),                " + NL //$NON-NLS-1$ //$NON-NLS-2$
+                  + "   Model                VARCHAR(" + DB_LENGTH_NAME + "),                " + NL //$NON-NLS-1$ //$NON-NLS-2$
+                  + "   Description          VARCHAR(" + DB_LENGTH_DESCRIPTION + "),         " + NL //$NON-NLS-1$ //$NON-NLS-2$
 
-            + "   Weight               FLOAT DEFAULT 0,                                      " + NL //$NON-NLS-1$
-            + "   DistanceFirstUse     FLOAT DEFAULT 0                                       " + NL //$NON-NLS-1$
+                  + "   DateBuilt            BIGINT DEFAULT 0,                               " + NL //$NON-NLS-1$
+                  + "   DateFirstUse         BIGINT DEFAULT 0,                               " + NL //$NON-NLS-1$
+                  + "   DateRetired          BIGINT DEFAULT 0,                               " + NL //$NON-NLS-1$
 
-            + ")" //                                                                                  //$NON-NLS-1$
+                  + "   Price                FLOAT DEFAULT 0,                                " + NL //$NON-NLS-1$
+                  + "   PriceUnit            VARCHAR(" + DB_LENGTH_NAME + "),                " + NL //$NON-NLS-1$ //$NON-NLS-2$
+
+                  + "   Weight               FLOAT DEFAULT 0,                                " + NL //$NON-NLS-1$
+                  + "   DistanceFirstUse     FLOAT DEFAULT 0                                 " + NL //$NON-NLS-1$
+
+                  + ")" //                                                                          //$NON-NLS-1$
       );
 
       /**
@@ -4485,8 +4488,41 @@ public class TourDatabase {
                   + "   REFERENCES " + TABLE_TOUR_DATA + " (" + ENTITY_ID_TOUR + ")          " + NL //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
       );
 
-      // Create index Equipment_EquipmentId
+      // Create index "Equipment_EquipmentId"
       SQL.createIndex(stmt, JOINTABLE__TOURDATA__EQUIPMENT, KEY_EQUIPMENT);
+   }
+
+   /**
+    * Create table {@link #TABLE_EQUIPMENT_PART}
+    *
+    * @param stmt
+    *
+    * @throws SQLException
+    */
+   private void createTable_EquipmentPart(final Statement stmt) throws SQLException {
+
+      exec(stmt, "CREATE TABLE " + TABLE_EQUIPMENT_PART + "   (                           " + NL //$NON-NLS-1$ //$NON-NLS-2$
+      //
+            + SQL.createField_EntityId(ENTITY_ID_EQUIPMENT_PART, true)
+
+            + "   " + KEY_EQUIPMENT + "   BIGINT,                                            " + NL //$NON-NLS-1$ //$NON-NLS-2$
+
+            + "   Brand                VARCHAR(" + DB_LENGTH_NAME + "),                " + NL //$NON-NLS-1$ //$NON-NLS-2$
+            + "   Model                VARCHAR(" + DB_LENGTH_NAME + "),                " + NL //$NON-NLS-1$ //$NON-NLS-2$
+            + "   Description          VARCHAR(" + DB_LENGTH_DESCRIPTION + "),         " + NL //$NON-NLS-1$ //$NON-NLS-2$
+
+            + "   DateBuilt            BIGINT DEFAULT 0,                               " + NL //$NON-NLS-1$
+            + "   DateFirstUse         BIGINT DEFAULT 0,                               " + NL //$NON-NLS-1$
+            + "   DateRetired          BIGINT DEFAULT 0,                               " + NL //$NON-NLS-1$
+
+            + "   Price                FLOAT DEFAULT 0,                                " + NL //$NON-NLS-1$
+            + "   PriceUnit            VARCHAR(" + DB_LENGTH_NAME + "),                " + NL //$NON-NLS-1$ //$NON-NLS-2$
+
+            + "   Weight               FLOAT DEFAULT 0,                                " + NL //$NON-NLS-1$
+            + "   DistanceFirstUse     FLOAT DEFAULT 0                                 " + NL //$NON-NLS-1$
+
+            + ")" //                                                                                //$NON-NLS-1$
+      );
    }
 
    /**
@@ -4506,8 +4542,6 @@ public class TourDatabase {
 
             + "   Name                    VARCHAR(" + DB_LENGTH_NAME + "),                   " + NL //$NON-NLS-1$ //$NON-NLS-2$
             + "   Description             VARCHAR(" + DB_LENGTH_DESCRIPTION + "),            " + NL //$NON-NLS-1$ //$NON-NLS-2$
-
-            + "   Category                VARCHAR(" + DB_LENGTH_NAME + "),                   " + NL //$NON-NLS-1$ //$NON-NLS-2$
 
             + "   Date                    BIGINT DEFAULT 0                                   " + NL //$NON-NLS-1$
 
@@ -6416,6 +6450,7 @@ public class TourDatabase {
             createTable_TourTag_Category(stmt);
 
             createTable_Equipment(stmt);
+            createTable_EquipmentPart(stmt);
             createTable_EquipmentService(stmt);
 
             createTable_TourWayPoint(stmt);
@@ -11382,6 +11417,10 @@ public class TourDatabase {
          // double check if db already exists
          if (isTableAvailable(conn, TABLE_EQUIPMENT) == false) {
             createTable_Equipment(stmt);
+         }
+
+         if (isTableAvailable(conn, TABLE_EQUIPMENT_PART) == false) {
+            createTable_EquipmentPart(stmt);
          }
 
          if (isTableAvailable(conn, TABLE_EQUIPMENT_SERVICE) == false) {

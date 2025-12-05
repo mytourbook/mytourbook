@@ -15,23 +15,18 @@
  *******************************************************************************/
 package net.tourbook.data;
 
-import static javax.persistence.CascadeType.ALL;
-import static javax.persistence.FetchType.EAGER;
-
 import java.io.Serializable;
 import java.time.LocalDate;
 import java.util.Collection;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Objects;
-import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.OneToMany;
+import javax.persistence.ManyToOne;
 import javax.persistence.Transient;
 
 import net.tourbook.Messages;
@@ -41,10 +36,8 @@ import net.tourbook.common.util.StringUtils;
 import net.tourbook.database.FIELD_VALIDATION;
 import net.tourbook.database.TourDatabase;
 
-import org.hibernate.annotations.Cascade;
-
 @Entity
-public class Equipment implements Cloneable, Comparable<Object>, Serializable {
+public class EquipmentPart implements Cloneable, Comparable<Object>, Serializable {
 
    private static final char          NL               = UI.NEW_LINE;
 
@@ -54,7 +47,7 @@ public class Equipment implements Cloneable, Comparable<Object>, Serializable {
 
    @Id
    @GeneratedValue(strategy = GenerationType.IDENTITY)
-   private long                       equipmentId      = TourDatabase.ENTITY_IS_NOT_SAVED;
+   private long                       partId           = TourDatabase.ENTITY_IS_NOT_SAVED;
 
    /**
     * Name/brand for the equipment
@@ -106,32 +99,14 @@ public class Equipment implements Cloneable, Comparable<Object>, Serializable {
     */
    private float                      distanceFirstUse;
 
-   /**
-    * Contains all parts which are associated with this equipment, e.g.
-    * <ul>
-    * <li></li>
-    * </ul>
-    */
-   @OneToMany(fetch = EAGER, cascade = ALL, mappedBy = "equipment")
-   @Cascade(org.hibernate.annotations.CascadeType.DELETE_ORPHAN)
-   private Set<EquipmentPart>         parts            = new HashSet<>();
-
-   /**
-    * Contains all services which are associated with this equipment, e.g.
-    * <ul>
-    * <li></li>
-    * </ul>
-    */
-   @OneToMany(fetch = EAGER, cascade = ALL, mappedBy = "equipment")
-   @Cascade(org.hibernate.annotations.CascadeType.DELETE_ORPHAN)
-   private Set<EquipmentService>      services         = new HashSet<>();
+   /** One equipment can have multiple parts */
+   @ManyToOne(optional = false)
+   private Equipment                  equipment;
 
    @Transient
    private long                       _createId        = 0;
 
-   /**
-    * Contain the current or last date
-    */
+   /** Contain the current or last date */
    @Transient
    private LocalDate                  _date;
 
@@ -147,16 +122,16 @@ public class Equipment implements Cloneable, Comparable<Object>, Serializable {
    /**
     * Default constructor used in EJB
     */
-   public Equipment() {}
+   public EquipmentPart() {}
 
    @Override
-   public Equipment clone() {
+   public EquipmentPart clone() {
 
-      Equipment clonedEquipment = null;
+      EquipmentPart clonedEquipment = null;
 
       try {
 
-         clonedEquipment = (Equipment) super.clone();
+         clonedEquipment = (EquipmentPart) super.clone();
 
       } catch (final CloneNotSupportedException e) {
 
@@ -171,7 +146,7 @@ public class Equipment implements Cloneable, Comparable<Object>, Serializable {
    @Override
    public int compareTo(final Object obj) {
 
-      if (obj instanceof final Equipment equipment) {
+      if (obj instanceof final EquipmentPart equipment) {
 
          return getName().compareTo(equipment.getName());
       }
@@ -188,16 +163,16 @@ public class Equipment implements Cloneable, Comparable<Object>, Serializable {
       if (obj == null) {
          return false;
       }
-      if (!(obj instanceof Equipment)) {
+      if (!(obj instanceof EquipmentPart)) {
          return false;
       }
 
-      final Equipment other = (Equipment) obj;
+      final EquipmentPart other = (EquipmentPart) obj;
 
       if (_createId == 0) {
 
          // equipment is from the database
-         if (equipmentId != other.equipmentId) {
+         if (partId != other.partId) {
             return false;
          }
 
@@ -305,15 +280,15 @@ public class Equipment implements Cloneable, Comparable<Object>, Serializable {
       return description;
    }
 
-   public float getDistanceFirstUse() {
+   public float getDistanceBought() {
       return distanceFirstUse;
    }
 
    /**
-    * @return Returns the primary key for a {@link Equipment} entity
+    * @return Returns the primary key for a {@link EquipmentPart} entity
     */
    public long getEquipmentId() {
-      return equipmentId;
+      return partId;
    }
 
    public String getModel() {
@@ -363,7 +338,7 @@ public class Equipment implements Cloneable, Comparable<Object>, Serializable {
    @Override
    public int hashCode() {
 
-      return Objects.hash(equipmentId, _createId);
+      return Objects.hash(partId, _createId);
    }
 
    /**
@@ -456,7 +431,7 @@ public class Equipment implements Cloneable, Comparable<Object>, Serializable {
 
             + "Equipment" + NL //                                          //$NON-NLS-1$
 
-            + " equipmentId      =" + equipmentId + NL //                  //$NON-NLS-1$
+            + " equipmentId      =" + partId + NL //                  //$NON-NLS-1$
             + " brand            =" + brand + NL //                        //$NON-NLS-1$
             + " model            =" + model + NL //                        //$NON-NLS-1$
 //            + " description      =" + description + NL //                  //$NON-NLS-1$
@@ -488,24 +463,15 @@ public class Equipment implements Cloneable, Comparable<Object>, Serializable {
       return builder.toString();
    }
 
-   public void updateFromOther(final Equipment otherEquipment) {
+   public void updateFromOther(final EquipmentPart otherEquipment) {
 
-// SET_FORMATTING_OFF
+      brand = otherEquipment.getBrand();
+      model = otherEquipment.getModel();
+      description = otherEquipment.getDescription();
 
-      brand             = otherEquipment.getBrand();
-      model             = otherEquipment.getModel();
-      description       = otherEquipment.getDescription();
-
-      distanceFirstUse  = otherEquipment.getDistanceFirstUse();
-      price             = otherEquipment.getPrice();
-      priceUnit         = otherEquipment.getPriceUnit();
-      weight            = otherEquipment.getWeight();
-
-      setDateBuilt(     otherEquipment.getDateBuilt_Raw());
-      setDateFirstUse(  otherEquipment.getDateFirstUse_Raw());
-      setDateRetired(   otherEquipment.getDateRetired_Raw());
-
-// SET_FORMATTING_ON
+      setDateBuilt(otherEquipment.getDateBuilt_Raw());
+      setDateFirstUse(otherEquipment.getDateFirstUse_Raw());
+      setDateRetired(otherEquipment.getDateRetired_Raw());
    }
 
 }

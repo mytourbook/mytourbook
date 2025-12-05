@@ -97,11 +97,6 @@ public class ActionRemoveEquipment_SubMenu extends SubMenu {
          // make the equipment more visible
          action.setChecked(true);
       }
-
-      setEnabled(allUsedEquipment.size() > 0);
-
-//      System.out.println(UI.timeStamp() + " ActionRemoveEquipment_SubMenu " + isEnabled());
-//// TODO remove SYSTEM.OUT.PRINTLN
    }
 
 }

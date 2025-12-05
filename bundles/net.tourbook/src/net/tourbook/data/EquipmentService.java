@@ -55,11 +55,6 @@ public class EquipmentService implements Cloneable, Serializable {
    private String                     description;
 
    /**
-    *
-    */
-   private String                     category;
-
-   /**
     * When the service was done, in epoch days
     */
    private long                       date;
@@ -133,9 +128,6 @@ public class EquipmentService implements Cloneable, Serializable {
       return true;
    }
 
-   public String getCategory() {
-      return category;
-   }
 
    public LocalDate getDate() {
 
@@ -223,29 +215,10 @@ public class EquipmentService implements Cloneable, Serializable {
          name = name.substring(0, TourDatabase.DB_LENGTH_NAME);
       }
 
-      /*
-       * Check: Category
-       */
-      fieldValidation = TourDatabase.isFieldValidForSave(
-            category,
-            TourDatabase.DB_LENGTH_NAME,
-            Messages.Db_Field_Category);
-
-      if (fieldValidation == FIELD_VALIDATION.IS_INVALID) {
-
-         return false;
-
-      } else if (fieldValidation == FIELD_VALIDATION.TRUNCATE) {
-
-         category = category.substring(0, TourDatabase.DB_LENGTH_NAME);
-      }
 
       return true;
    }
 
-   public void setCategory(final String serviceType) {
-      this.category = serviceType;
-   }
 
    public void setDate(final long date) {
 
@@ -262,7 +235,6 @@ public class EquipmentService implements Cloneable, Serializable {
 
       name = otherService.getName();
       description = otherService.getDescription();
-      category = otherService.getCategory();
 
       setDate(otherService.getDate().toEpochDay());
    }

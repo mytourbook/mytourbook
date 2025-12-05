@@ -19,8 +19,11 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import net.tourbook.Images;
 import net.tourbook.Messages;
+import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.ui.SubMenu;
+import net.tourbook.common.util.Util;
 import net.tourbook.data.Equipment;
 import net.tourbook.data.TourData;
 
@@ -32,7 +35,9 @@ import org.eclipse.swt.widgets.Menu;
  */
 public class ActionAddEquipment_SubMenu extends SubMenu {
 
-   private EquipmentMenuManager _equipmentMenuManager;
+   private EquipmentMenuManager    _equipmentMenuManager;
+
+   private ActionShowEquipmentView _actionManageEquipment;
 
    private class ActionEquipment extends Action {
 
@@ -60,11 +65,29 @@ public class ActionAddEquipment_SubMenu extends SubMenu {
       }
    }
 
+   private class ActionShowEquipmentView extends Action {
+
+      public ActionShowEquipmentView() {
+
+         super("Manage E&quipment", AS_PUSH_BUTTON);
+
+         setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.Equipment));
+      }
+
+      @Override
+      public void run() {
+
+         Util.showView(EquipmentView.ID, true);
+      }
+   }
+
    protected ActionAddEquipment_SubMenu(final EquipmentMenuManager equipmentMenuManager) {
 
       super(Messages.Action_Equipment_AddEquipment, AS_DROP_DOWN_MENU);
 
       _equipmentMenuManager = equipmentMenuManager;
+
+      _actionManageEquipment = new ActionShowEquipmentView();
    }
 
    @Override
@@ -103,6 +126,8 @@ public class ActionAddEquipment_SubMenu extends SubMenu {
          addActionToMenu(action);
       }
 
-   }
+      addSeparatorToMenu();
 
+      addActionToMenu(_actionManageEquipment);
+   }
 }

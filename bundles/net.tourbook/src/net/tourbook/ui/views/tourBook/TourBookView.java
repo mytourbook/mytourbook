@@ -2248,6 +2248,8 @@ public class TourBookView extends ViewPart implements
       TVITourBookItem firstTreeElement = null;
       TVITourBookTour firstTourItem = null;
 
+      List<TVITourBookTour> allSelectedTourItems = new ArrayList<>();
+
       if (_isLayoutNatTable) {
 
          final RowSelectionModel<TVITourBookTour> rowSelectionModel = getNatTable_SelectionModel();
@@ -2260,8 +2262,8 @@ public class TourBookView extends ViewPart implements
 
             if (numTourItems > 0) {
 
-               final List<TVITourBookTour> allSelectedRows = rowSelectionModel.getSelectedRowObjects();
-               firstTourItem = allSelectedRows.get(0);
+               allSelectedTourItems = rowSelectionModel.getSelectedRowObjects();
+               firstTourItem = allSelectedTourItems.get(0);
             }
 
             break;
@@ -2292,10 +2294,10 @@ public class TourBookView extends ViewPart implements
 
                numTourItems = numSelectedItems = rowSelectionModel.getSelectedRowCount();
 
-               final List<TVITourBookTour> selection = rowSelectionModel.getSelectedRowObjects();
+               allSelectedTourItems = rowSelectionModel.getSelectedRowObjects();
 
-               if (selection.isEmpty() == false) {
-                  firstTourItem = selection.get(0);
+               if (allSelectedTourItems.isEmpty() == false) {
+                  firstTourItem = allSelectedTourItems.get(0);
                }
 
             } else {
@@ -2307,32 +2309,39 @@ public class TourBookView extends ViewPart implements
 
                   numTourItems = numSelectedItems = 1;
                   firstTourItem = fetchedTour;
+
+                  allSelectedTourItems.add(fetchedTour);
                }
             }
+
             break;
          }
 
       } else {
 
-         final ITreeSelection selection = (ITreeSelection) _tourViewer_Tree.getSelection();
+         final ITreeSelection treeSelection = (ITreeSelection) _tourViewer_Tree.getSelection();
 
          /*
-          * count number of selected items
+          * Count number of selected items
           */
 
-         for (final Object treeItem : selection) {
+         for (final Object treeItem : treeSelection) {
 
             if (treeItem instanceof final TVITourBookTour tviTourBookTour) {
+
                if (numTourItems == 0) {
                   firstTourItem = tviTourBookTour;
                }
+
                numTourItems++;
+
+               allSelectedTourItems.add(tviTourBookTour);
             }
          }
 
-         firstTreeElement = (TVITourBookItem) selection.getFirstElement();
+         firstTreeElement = (TVITourBookItem) treeSelection.getFirstElement();
          firstElementHasChildren = firstTreeElement == null ? false : firstTreeElement.hasChildren();
-         numSelectedItems = selection.size();
+         numSelectedItems = treeSelection.size();
       }
 
       final boolean isTourSelected = numTourItems > 0;
@@ -2450,12 +2459,7 @@ public class TourBookView extends ViewPart implements
             oneTourTagIds,
             isFlatView);
 
-      _equipmentMenuManager.enableEquipmentActions(
-            isTourSelected,
-            isOneTourSelected,
-            firstTourItem == null
-                  ? null
-                  : firstTourItem.getEquipmentIds());
+      _equipmentMenuManager.enableEquipmentActions(allSelectedTourItems);
 
       final long tourTypeID = isOneTourSelected
             ? firstTourItem.getTourTypeId()

@@ -26,13 +26,13 @@ import net.tourbook.common.autocomplete.AutoComplete_ComboInputMT;
 import net.tourbook.common.util.StringUtils;
 import net.tourbook.common.util.Util;
 import net.tourbook.data.Equipment;
-import net.tourbook.data.TourTag;
 
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.dialogs.TitleAreaDialog;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
+import org.eclipse.jface.layout.PixelConverter;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.MouseWheelListener;
@@ -48,16 +48,18 @@ import org.eclipse.swt.widgets.Spinner;
 import org.eclipse.swt.widgets.Text;
 
 /**
- * Dialog to modify a {@link TourTag}
+ * Dialog to modify a {@link Equipment}
  */
 public class DialogEquipment extends TitleAreaDialog {
 
-   private static final String          ID                                    = "net.tourbook.equipment.DialogEquipment"; //$NON-NLS-1$
+   private static final String          ID                                         = "net.tourbook.equipment.DialogEquipment";     //$NON-NLS-1$
 
-   private static final IDialogSettings _state                                = TourbookPlugin.getState(ID);
+   private static final IDialogSettings _state                                     = TourbookPlugin.getState(ID);
 
-   private static final String          STATE_AUTOCOMPLETE_POPUP_HEIGHT_BRAND = "STATE_AUTOCOMPLETE_POPUP_HEIGHT_BRAND";  //$NON-NLS-1$
-   private static final String          STATE_AUTOCOMPLETE_POPUP_HEIGHT_MODEL = "STATE_AUTOCOMPLETE_POPUP_HEIGHT_MODEL";  //$NON-NLS-1$
+   private static final String          STATE_AUTOCOMPLETE_POPUP_HEIGHT_BRAND      = "STATE_AUTOCOMPLETE_POPUP_HEIGHT_BRAND";      //$NON-NLS-1$
+   private static final String          STATE_AUTOCOMPLETE_POPUP_HEIGHT_MODEL      = "STATE_AUTOCOMPLETE_POPUP_HEIGHT_MODEL";      //$NON-NLS-1$
+   private static final String          STATE_AUTOCOMPLETE_POPUP_HEIGHT_PRICE_UNIT = "STATE_AUTOCOMPLETE_POPUP_HEIGHT_PRICE_UNIT"; //$NON-NLS-1$
+   private static final String          STATE_PRICE_UNIT_DEFAULT                   = "STATE_PRICE_UNIT_DEFAULT";                   //$NON-NLS-1$
 
    /**
     * New or cloned instance
@@ -72,6 +74,8 @@ public class DialogEquipment extends TitleAreaDialog {
    private MouseWheelListener           _defaultMouseWheelListener;
 
    private boolean                      _isModified;
+
+   private PixelConverter               _pc;
 
    /*
     * UI resources
@@ -88,16 +92,19 @@ public class DialogEquipment extends TitleAreaDialog {
 
    private Combo                     _comboBrand;
    private Combo                     _comboModel;
+   private Combo                     _comboPriceUnit;
 
    private DateTime                  _dateBuilt;
    private DateTime                  _dateFirstUse;
    private DateTime                  _dateRetired;
 
    private Spinner                   _spinDistance;
+   private Spinner                   _spinPrice;
    private Spinner                   _spinWeight;
 
    private AutoComplete_ComboInputMT _autocomplete_Brand;
    private AutoComplete_ComboInputMT _autocomplete_Model;
+   private AutoComplete_ComboInputMT _autocomplete_PriceUnit;
 
    public DialogEquipment(final Shell parentShell, final Equipment equipment) {
 
@@ -255,9 +262,6 @@ public class DialogEquipment extends TitleAreaDialog {
             _dateRetired = new DateTime(_container, SWT.DATE | SWT.MEDIUM);
             _dateRetired.addSelectionListener(_defaultSelectionListener);
          }
-//         private float                      weight;
-//         private float                      distanceFirstUse;
-
          {
             /*
              * Weight
@@ -277,6 +281,7 @@ public class DialogEquipment extends TitleAreaDialog {
                _spinWeight.setMaximum(1_000_000_000);
 
                _spinWeight.addMouseWheelListener(_defaultMouseWheelListener);
+               _spinWeight.addSelectionListener(_defaultSelectionListener);
 
                // label: kg
                UI.createLabel(containerWeight, UI.UNIT_LABEL_WEIGHT);
@@ -302,11 +307,46 @@ public class DialogEquipment extends TitleAreaDialog {
                _spinDistance.setMaximum(1_000_000_000);
 
                _spinDistance.addMouseWheelListener(_defaultMouseWheelListener);
+               _spinDistance.addSelectionListener(_defaultSelectionListener);
 
-               // label: km
+               // label: km/mi
                UI.createLabel(containerWeight, UI.UNIT_LABEL_DISTANCE);
             }
          }
+         {
+            /*
+             * Price
+             */
+
+            UI.createLabel(_container, "&Price");
+
+            final Composite containerWeight = new Composite(_container, SWT.NONE);
+            GridDataFactory.fillDefaults().grab(true, false).applyTo(containerWeight);
+            GridLayoutFactory.fillDefaults().numColumns(2).applyTo(containerWeight);
+            {
+               // spinner
+               _spinPrice = new Spinner(containerWeight, SWT.BORDER);
+
+               _spinPrice.setDigits(2);
+               _spinPrice.setMinimum(-1_000_000_000);
+               _spinPrice.setMaximum(1_000_000_000);
+
+               _spinPrice.addMouseWheelListener(_defaultMouseWheelListener);
+               _spinPrice.addSelectionListener(_defaultSelectionListener);
+
+               // autocomplete combo
+               _comboPriceUnit = new Combo(containerWeight, SWT.BORDER | SWT.FLAT);
+               _comboPriceUnit.setText(UI.EMPTY_STRING);
+               _comboPriceUnit.addModifyListener(_defaultModifyListener);
+
+               GridDataFactory.fillDefaults()
+                     .hint(_pc.convertWidthInCharsToPixels(4), SWT.DEFAULT)
+                     .applyTo(_comboPriceUnit);
+
+               _autocomplete_PriceUnit = new AutoComplete_ComboInputMT(_comboPriceUnit);
+            }
+         }
+         UI.createSpacer_Horizontal(_container, 2);
          {
             /*
              * Description
@@ -361,6 +401,15 @@ public class DialogEquipment extends TitleAreaDialog {
             _comboModel.add(model);
          }
       }
+
+      // fill price unit combobox
+      final ConcurrentSkipListSet<String> allPriceUnits = EquipmentManager.getCachedFields_AllEquipment_PriceUnits();
+
+      for (final String model : allPriceUnits) {
+         if (model != null) {
+            _comboPriceUnit.add(model);
+         }
+      }
    }
 
    @Override
@@ -379,6 +428,8 @@ public class DialogEquipment extends TitleAreaDialog {
    }
 
    private void initUI() {
+
+      _pc = new PixelConverter(_parent);
 
       _parent.addDisposeListener(disposeEvent -> onDispose());
 
@@ -432,6 +483,10 @@ public class DialogEquipment extends TitleAreaDialog {
 
       _autocomplete_Brand.saveState(_state, STATE_AUTOCOMPLETE_POPUP_HEIGHT_BRAND);
       _autocomplete_Model.saveState(_state, STATE_AUTOCOMPLETE_POPUP_HEIGHT_MODEL);
+      _autocomplete_PriceUnit.saveState(_state, STATE_AUTOCOMPLETE_POPUP_HEIGHT_PRICE_UNIT);
+
+      _state.put(STATE_PRICE_UNIT_DEFAULT, _comboPriceUnit.getText().trim());
+
    }
 
    private void onModify() {
@@ -447,8 +502,16 @@ public class DialogEquipment extends TitleAreaDialog {
 
    private void resoreState() {
 
+      _isInUIUpdate = true;
+
       _autocomplete_Brand.restoreState(_state, STATE_AUTOCOMPLETE_POPUP_HEIGHT_BRAND);
       _autocomplete_Model.restoreState(_state, STATE_AUTOCOMPLETE_POPUP_HEIGHT_MODEL);
+      _autocomplete_PriceUnit.restoreState(_state, STATE_AUTOCOMPLETE_POPUP_HEIGHT_PRICE_UNIT);
+
+      // set default unit
+      _comboPriceUnit.setText(Util.getStateString(_state, STATE_PRICE_UNIT_DEFAULT, UI.EMPTY_STRING));
+
+      _isInUIUpdate = false;
    }
 
    private void updateModelFromUI() {
@@ -459,13 +522,18 @@ public class DialogEquipment extends TitleAreaDialog {
       final LocalDate dateFirstUse  = LocalDate.of(_dateFirstUse.getYear(),   _dateFirstUse.getMonth() + 1, _dateFirstUse.getDay());
       final LocalDate dateRetired   = LocalDate.of(_dateRetired.getYear(),    _dateRetired.getMonth() + 1,  _dateRetired.getDay());
 
-      _equipment.setBrand(       _comboBrand.getText().trim());
-      _equipment.setModel(       _comboModel.getText().trim());
-      _equipment.setDescription( _txtDescription.getText().trim());
-
       _equipment.setDateBuilt(   dateBuilt.toEpochDay());
       _equipment.setDateFirstUse(dateFirstUse.toEpochDay());
       _equipment.setDateRetired( dateRetired.toEpochDay());
+
+      _equipment.setBrand(             _comboBrand.getText().trim());
+      _equipment.setModel(             _comboModel.getText().trim());
+      _equipment.setDescription(       _txtDescription.getText().trim());
+
+      _equipment.setDistanceFirstUse(  _spinDistance.getSelection());
+      _equipment.setWeight(            _spinWeight.getSelection() / 1000f);
+      _equipment.setPrice(             _spinPrice.getSelection() / 100f);
+      _equipment.setPriceUnit(         _comboPriceUnit.getText());
 
 // SET_FORMATTING_ON
    }
@@ -496,15 +564,28 @@ public class DialogEquipment extends TitleAreaDialog {
          dateRetired = LocalDate.of(2099,1,1);
       }
 
+      _comboBrand       .setText(_equipment.getBrand());
+      _comboModel       .setText(_equipment.getModel());
+
       _dateBuilt        .setDate(dateBuilt.getYear(),    dateBuilt.getMonthValue() - 1,      dateBuilt.getDayOfMonth());
       _dateFirstUse     .setDate(dateFirstUse.getYear(), dateFirstUse.getMonthValue() - 1,   dateFirstUse.getDayOfMonth());
       _dateRetired      .setDate(dateRetired.getYear(),  dateRetired.getMonthValue() - 1,    dateRetired.getDayOfMonth());
 
-      _comboBrand       .setText(_equipment.getBrand());
-      _comboModel       .setText(_equipment.getModel());
+      _spinDistance     .setSelection((int) (_equipment.getDistanceFirstUse()));
+      _spinPrice        .setSelection((int) (_equipment.getPrice()  * 100));
+      _spinWeight       .setSelection((int) (_equipment.getWeight() * 1000));
+
       _txtDescription   .setText(_equipment.getDescription());
 
 // SET_FORMATTING_ON
+
+      final String priceUnit = _equipment.getPriceUnit();
+      if (StringUtils.hasContent(priceUnit)) {
+
+         // overwrite default
+
+         _comboPriceUnit.setText(priceUnit);
+      }
 
       _isInUIUpdate = false;
    }

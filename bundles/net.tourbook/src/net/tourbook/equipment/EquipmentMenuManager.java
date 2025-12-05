@@ -50,6 +50,7 @@ import net.tourbook.ui.ITourProvider2;
 import net.tourbook.ui.action.IActionProvider;
 import net.tourbook.ui.action.TourActionCategory;
 import net.tourbook.ui.action.TourActionManager;
+import net.tourbook.ui.views.tourBook.TVITourBookTour;
 
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.ActionContributionItem;
@@ -518,8 +519,8 @@ public class EquipmentMenuManager implements IActionProvider {
       _actionRemoveEquipment           = new ActionRemoveEquipment_SubMenu(this);
       _actionRemoveAllEquipment        = new ActionRemoveEquipmentAll();
 
-      _actionClipboard_CopyEquipment  = new ActionClipboard_CopyEquipment();
-      _actionClipboard_PasteEquipment = new ActionClipboard_PasteEquipment();
+      _actionClipboard_CopyEquipment   = new ActionClipboard_CopyEquipment();
+      _actionClipboard_PasteEquipment  = new ActionClipboard_PasteEquipment();
 
       _actionEquipmentPreferences      = new ActionOpenPrefDialog(Messages.Action_Equipment_EquipmentPreferences, PrefPageEquipment.ID);
       _actionEquipmentGroupPreferences = new ActionOpenPrefDialog(Messages.Action_Equipment_ManageEquipmentGroups, PrefPageEquipmentGroups.ID);
@@ -540,17 +541,14 @@ public class EquipmentMenuManager implements IActionProvider {
 
    private void enableActions() {
 
-      final List<Equipment> allAvailableEquipments = EquipmentManager.getAllEquipment_Name();
       final Map<Long, Equipment> allUsedEquipments = getAllUsedEquipments();
 
       final int numClipboardEquipment = updateUI_PasteAction();
 
-      final boolean isEnabled_AddEquipment = allAvailableEquipments.size() > 0;
       final boolean isEnabled_RemoveEquipment = allUsedEquipments.size() > 0;
 
       enableEquipmentActions(
 
-            isEnabled_AddEquipment,
             isEnabled_RemoveEquipment,
             numClipboardEquipment);
 
@@ -568,26 +566,24 @@ public class EquipmentMenuManager implements IActionProvider {
 
       enableEquipmentActions(
 
-            isEnabled_AddEquipment,
             isEnabled_RemoveEquipment,
             numClipboardEquipment);
 
       enableRecentEquipmentActions(isEnabled_AddEquipment, _allEquipmentIDs_OneTour);
    }
 
-   private void enableEquipmentActions(final boolean isEnabled_AddEquipment,
-                                       final boolean isEnabled_RemoveEquipment,
+   private void enableEquipmentActions(final boolean isEnabled_RemoveEquipment,
                                        final int numClipboardEquipment) {
 // SET_FORMATTING_OFF
 
-      _actionAddEquipment              .setEnabled(isEnabled_AddEquipment);
-      _actionAddEquipment_Groups       .setEnabled(isEnabled_AddEquipment);
+      _actionAddEquipment              .setEnabled(true);
+      _actionAddEquipment_Groups       .setEnabled(true);
 
-      _actionRemoveEquipment        .setEnabled(isEnabled_RemoveEquipment);
-      _actionRemoveAllEquipment     .setEnabled(isEnabled_RemoveEquipment);
+      _actionRemoveEquipment           .setEnabled(isEnabled_RemoveEquipment);
+      _actionRemoveAllEquipment        .setEnabled(isEnabled_RemoveEquipment);
 
       _actionClipboard_CopyEquipment   .setEnabled(isEnabled_RemoveEquipment);
-      _actionClipboard_PasteEquipment  .setEnabled(isEnabled_AddEquipment && numClipboardEquipment > 0);
+      _actionClipboard_PasteEquipment  .setEnabled(numClipboardEquipment > 0);
 
 // SET_FORMATTING_ON
    }
@@ -601,45 +597,39 @@ public class EquipmentMenuManager implements IActionProvider {
     *           Is <code>true</code> when only one tour is selected
     * @param oneTourEquipmentIDs
     */
-   public void enableEquipmentActions(final boolean isTourSelected,
-                                      final boolean isOneTour,
-                                      final List<Long> oneTourEquipmentIDs) {
+   public void enableEquipmentActions(final List<TVITourBookTour> allSelectedTourItems) {
 
-      final boolean isEnabled_AddEquipment = isTourSelected;
-      final boolean isEnabled_RemoveEquipment;
+      if (allSelectedTourItems == null) {
 
-      final HashSet<Long> allEquipmentIDs = new HashSet<>();
+         _isEnableRecentEquipmentActions = false;
+         _allEquipmentIDs_OneTour = null;
 
-      if (isOneTour) {
+         return;
+      }
 
-         // one tour is selected
+      final int numSelectedTours = allSelectedTourItems.size();
 
-         if (oneTourEquipmentIDs != null && oneTourEquipmentIDs.size() > 0) {
+      final boolean isEnabled_AddEquipment = numSelectedTours > 0;// && numAvailableEquipment > 0;
+      boolean isEnabled_RemoveEquipment = false;
 
-            // at least one equipment is within the tour
+      final HashSet<Long> allSelectedEquipmentIDs = new HashSet<>();
+
+      for (final TVITourBookTour tviTourBookTour : allSelectedTourItems) {
+
+         final List<Long> allTourEquipmentIDs = tviTourBookTour.getEquipmentIds();
+
+         if (allTourEquipmentIDs != null && allTourEquipmentIDs.size() > 0) {
+
+            allSelectedEquipmentIDs.addAll(allTourEquipmentIDs);
 
             isEnabled_RemoveEquipment = true;
 
-            for (final Long equipmentID : oneTourEquipmentIDs) {
-               allEquipmentIDs.add(equipmentID);
-            }
-
-         } else {
-
-            // equipment are not available
-
-            isEnabled_RemoveEquipment = false;
+            break;
          }
-
-      } else {
-
-         // multiple tours are selected
-
-         isEnabled_RemoveEquipment = isTourSelected;
       }
 
       _isEnableRecentEquipmentActions = isEnabled_AddEquipment;
-      _allEquipmentIDs_OneTour = allEquipmentIDs;
+      _allEquipmentIDs_OneTour = allSelectedEquipmentIDs;
 
       enableEquipmentActions(isEnabled_AddEquipment, isEnabled_RemoveEquipment);
    }
@@ -841,11 +831,12 @@ public class EquipmentMenuManager implements IActionProvider {
       final Map<Long, Equipment> allUsedEquipment = new HashMap<>();
 
       final List<TourData> allSelectedTours = _tourProvider.getSelectedTours();
+
       for (final TourData tourData : allSelectedTours) {
 
-         final Set<Equipment> allTourEquipments = tourData.getEquipment();
+         final Set<Equipment> allTourEquipment = tourData.getEquipment();
 
-         for (final Equipment tourEquipment : allTourEquipments) {
+         for (final Equipment tourEquipment : allTourEquipment) {
             allUsedEquipment.put(tourEquipment.getEquipmentId(), tourEquipment);
          }
       }

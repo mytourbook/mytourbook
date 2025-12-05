@@ -63,6 +63,7 @@ public class EquipmentManager {
 
    private static ConcurrentSkipListSet<String> _allEquipment_Brands;
    private static ConcurrentSkipListSet<String> _allEquipment_Models;
+   private static ConcurrentSkipListSet<String> _allEquipment_PriceUnits;
 
    /**
     * Clear all equipment resources within MT and fire a equipment modify event, ensure that
@@ -105,6 +106,12 @@ public class EquipmentManager {
 
          _allEquipment_Models.clear();
          _allEquipment_Models = null;
+      }
+
+      if (_allEquipment_PriceUnits != null) {
+
+         _allEquipment_PriceUnits.clear();
+         _allEquipment_PriceUnits = null;
       }
    }
 
@@ -407,6 +414,23 @@ public class EquipmentManager {
       }
 
       return _allEquipment_Models;
+   }
+
+   public static ConcurrentSkipListSet<String> getCachedFields_AllEquipment_PriceUnits() {
+
+      if (_allEquipment_PriceUnits == null) {
+
+         synchronized (DB_LOCK) {
+
+            // recheck again, another thread could have it created
+            if (_allEquipment_PriceUnits == null) {
+
+               _allEquipment_PriceUnits = TourDatabase.getDistinctValues(TourDatabase.TABLE_EQUIPMENT, "priceUnit"); //$NON-NLS-1$
+            }
+         }
+      }
+
+      return _allEquipment_PriceUnits;
    }
 
    /**

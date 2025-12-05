@@ -145,7 +145,9 @@ public class EquipmentView extends ViewPart implements ITourProvider, ITourViewe
    private ActionDeleteEquipment               _actionDeleteEquipment;
    private ActionEditEquipment                 _actionEditEquipment;
    private ActionNewEquipment                  _actionNewEquipment;
-   private ActionRefreshView                   _action_RefreshView;
+   private ActionNewPart                       _actionNewPart;
+   private ActionNewService                    _actionNewService;
+   private ActionRefreshView                   _actionRefreshView;
 
    private Action_CollapseAll_WithoutSelection _actionCollapseAll_WithoutSelection;
    private ActionCollapseOthers                _actionCollapseOthers;
@@ -174,10 +176,12 @@ public class EquipmentView extends ViewPart implements ITourProvider, ITourViewe
    /*
     * UI resources
     */
-   private final Image _imgEquipment         = TourbookPlugin.getImage(Images.Equipment);
-   private final Image _imgEquipment_All     = TourbookPlugin.getImage(Images.Equipment_All);
-   private final Image _imgEquipment_Part    = TourbookPlugin.getImage(Images.Equipment_Part);
-   private final Image _imgEquipment_Service = TourbookPlugin.getImage(Images.Equipment_Service);
+   private final Image _imgEquipment             = TourbookPlugin.getImage(Images.Equipment);
+   private final Image _imgEquipment_All         = TourbookPlugin.getImage(Images.Equipment_All);
+   private final Image _imgEquipment_Part        = TourbookPlugin.getImage(Images.Equipment_Part);
+   private final Image _imgEquipment_Part_New    = TourbookPlugin.getImage(Images.Equipment_Part_New);
+   private final Image _imgEquipment_Service     = TourbookPlugin.getImage(Images.Equipment_Service);
+   private final Image _imgEquipment_Service_New = TourbookPlugin.getImage(Images.Equipment_Service_New);
 
    /*
     * UI controls
@@ -268,6 +272,36 @@ public class EquipmentView extends ViewPart implements ITourProvider, ITourViewe
       @Override
       public void run() {
          onAction_NewEquipment();
+      }
+   }
+
+   private class ActionNewPart extends Action {
+
+      public ActionNewPart() {
+
+         super("New &Part", AS_PUSH_BUTTON);
+
+         setImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.Equipment_Part_New));
+      }
+
+      @Override
+      public void run() {
+         onAction_NewPart();
+      }
+   }
+
+   private class ActionNewService extends Action {
+
+      public ActionNewService() {
+
+         super("New &Service", AS_PUSH_BUTTON);
+
+         setImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.Equipment_Service_New));
+      }
+
+      @Override
+      public void run() {
+         onAction_NewService();
       }
    }
 
@@ -472,7 +506,9 @@ public class EquipmentView extends ViewPart implements ITourProvider, ITourViewe
       _actionDeleteEquipment                 = new ActionDeleteEquipment();
       _actionEditEquipment                   = new ActionEditEquipment();
       _actionNewEquipment                    = new ActionNewEquipment();
-      _action_RefreshView                    = new ActionRefreshView(this);
+      _actionNewPart                         = new ActionNewPart();
+      _actionNewService                      = new ActionNewService();
+      _actionRefreshView                     = new ActionRefreshView(this);
 
       _actionCollapseAll_WithoutSelection    = new Action_CollapseAll_WithoutSelection();
       _actionCollapseOthers                  = new ActionCollapseOthers(this);
@@ -931,7 +967,9 @@ public class EquipmentView extends ViewPart implements ITourProvider, ITourViewe
       _imgEquipment.dispose();
       _imgEquipment_All.dispose();
       _imgEquipment_Part.dispose();
+      _imgEquipment_Part_New.dispose();
       _imgEquipment_Service.dispose();
+      _imgEquipment_Service_New.dispose();
 
       super.dispose();
    }
@@ -978,8 +1016,15 @@ public class EquipmentView extends ViewPart implements ITourProvider, ITourViewe
 //      final boolean isOneTour = numTours == 1;
 //      final boolean isItemsAvailable = numTreeItems > 0;
 
-      _actionDeleteEquipment.setEnabled(isEquipmentSelected);
-      _actionEditEquipment.setEnabled(isEquipmentSelected);
+// SET_FORMATTING_OFF
+
+      _actionDeleteEquipment  .setEnabled(isEquipmentSelected);
+      _actionEditEquipment    .setEnabled(isEquipmentSelected);
+
+      _actionNewPart          .setEnabled(isEquipmentSelected);
+      _actionNewService       .setEnabled(isEquipmentSelected);
+
+// SET_FORMATTING_ON
    }
 
    private void expandCollapseItem(final TreeViewerItem treeItem) {
@@ -1004,7 +1049,7 @@ public class EquipmentView extends ViewPart implements ITourProvider, ITourViewe
       tbm.add(_actionNewEquipment);
       tbm.add(_actionExpandSelection);
       tbm.add(_actionCollapseAll_WithoutSelection);
-      tbm.add(_action_RefreshView);
+      tbm.add(_actionRefreshView);
 
       // update that actions are fully created otherwise action enable will fail
       tbm.update(true);
@@ -1021,6 +1066,8 @@ public class EquipmentView extends ViewPart implements ITourProvider, ITourViewe
       menuMgr.add(new Separator());
 
       menuMgr.add(_actionNewEquipment);
+      menuMgr.add(_actionNewPart);
+      menuMgr.add(_actionNewService);
       menuMgr.add(_actionEditEquipment);
       menuMgr.add(_actionDeleteEquipment);
 
@@ -1271,23 +1318,6 @@ public class EquipmentView extends ViewPart implements ITourProvider, ITourViewe
 // SET_FORMATTING_ON
    }
 
-   /**
-    * !!! RECURSIVE !!!
-    * <p>
-    * Traverses all equipment viewer items
-    *
-    * @param parentItem
-    */
-   private void loadAllTreeItems2(final TreeViewerItem parentItem) {
-
-      final List<TreeViewerItem> allFetchedChildren = parentItem.getFetchedChildren();
-
-      for (final TreeViewerItem childItem : allFetchedChildren) {
-
-         loadAllTreeItems2(childItem);
-      }
-   }
-
    private void onAction_DeleteEquipment() {
 
       final ITreeSelection structuredSelection = _equipmentViewer.getStructuredSelection();
@@ -1359,6 +1389,16 @@ public class EquipmentView extends ViewPart implements ITourProvider, ITourViewe
       reloadViewer();
 
       updateOtherViews();
+   }
+
+   private void onAction_NewPart() {
+      // TODO Auto-generated method stub
+
+   }
+
+   private void onAction_NewService() {
+      // TODO Auto-generated method stub
+
    }
 
    private void onAction_OnMouseSelect_ExpandCollapse() {
