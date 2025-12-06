@@ -2,7 +2,7 @@
 <svg
    version="1.1"
    id="svg2985"
-   height="16.000015"
+   height="16.00132"
    width="15.999985"
    xmlns="http://www.w3.org/2000/svg"
    xmlns:svg="http://www.w3.org/2000/svg"
@@ -61,8 +61,8 @@
        d="M 155.00001,21 H 157.00001 V 19 H 158 V 21 H 160 V 22 H 158 V 24 H 157.00001 V 22 H 155.00001 Z"
        style="display:inline;fill:#808080;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
     <path
-       d="M 160.00072,24.000387 V 32.001265 H 167.99984 V 24.000387"
-       style="display:inline;fill:#42b6ff;fill-opacity:1;stroke:none;stroke-width:0.500001;stroke-linecap:round;stroke-miterlimit:3"
+       d="M 160.00103,25.000002 V 35.00132 H 170 V 25.000002"
+       style="display:inline;fill:#42b6ff;fill-opacity:1;stroke:none;stroke-width:0.500002;stroke-linecap:round;stroke-miterlimit:3"
        id="path1-2-7-2-4-4-4" />
     <rect
        y="19"
@@ -74,6 +74,6 @@
     <path
        id="rect1-5-6-1-6-3-94-5-8"
        style="display:inline;fill:none;stroke:#005a92;stroke-width:0.500001;stroke-linecap:square;stroke-miterlimit:3;stroke-opacity:1"
-       d="M 160.33311,24.333221 V 31.668356 M 167.66648,31.668356 V 24.333221" />
+       d="M 160.25003,25.247721 V 34.749998 M 169.74988,34.749998 V 25.247721" />
   </g>
 </svg>

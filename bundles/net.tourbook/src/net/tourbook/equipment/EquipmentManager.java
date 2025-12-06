@@ -64,6 +64,9 @@ public class EquipmentManager {
    private static ConcurrentSkipListSet<String> _allEquipment_Brands;
    private static ConcurrentSkipListSet<String> _allEquipment_Models;
    private static ConcurrentSkipListSet<String> _allEquipment_PriceUnits;
+   private static ConcurrentSkipListSet<String> _allPart_Brands;
+   private static ConcurrentSkipListSet<String> _allPart_Models;
+   private static ConcurrentSkipListSet<String> _allPart_PriceUnits;
 
    /**
     * Clear all equipment resources within MT and fire a equipment modify event, ensure that
@@ -431,6 +434,57 @@ public class EquipmentManager {
       }
 
       return _allEquipment_PriceUnits;
+   }
+
+   public static ConcurrentSkipListSet<String> getCachedFields_AllPart_Brands() {
+
+      if (_allPart_Brands == null) {
+
+         synchronized (DB_LOCK) {
+
+            // recheck again, another thread could have it created
+            if (_allPart_Brands == null) {
+
+               _allPart_Brands = TourDatabase.getDistinctValues(TourDatabase.TABLE_EQUIPMENT_PART, "brand"); //$NON-NLS-1$
+            }
+         }
+      }
+
+      return _allPart_Brands;
+   }
+
+   public static ConcurrentSkipListSet<String> getCachedFields_AllPart_Models() {
+
+      if (_allPart_Models == null) {
+
+         synchronized (DB_LOCK) {
+
+            // recheck again, another thread could have it created
+            if (_allPart_Models == null) {
+
+               _allPart_Models = TourDatabase.getDistinctValues(TourDatabase.TABLE_EQUIPMENT_PART, "model"); //$NON-NLS-1$
+            }
+         }
+      }
+
+      return _allPart_Models;
+   }
+
+   public static ConcurrentSkipListSet<String> getCachedFields_AllPart_PriceUnits() {
+
+      if (_allPart_PriceUnits == null) {
+
+         synchronized (DB_LOCK) {
+
+            // recheck again, another thread could have it created
+            if (_allPart_PriceUnits == null) {
+
+               _allPart_PriceUnits = TourDatabase.getDistinctValues(TourDatabase.TABLE_EQUIPMENT_PART, "priceUnit"); //$NON-NLS-1$
+            }
+         }
+      }
+
+      return _allPart_PriceUnits;
    }
 
    /**

@@ -56,6 +56,9 @@ public class TVIEquipmentView_EquipRoot extends TVIEquipmentView_Item {
          final TreeViewer equipmentViewer = getEquipmentViewer();
          final List<Equipment> allEquipments = query.getResultList();
 
+         /*
+          * Create equipment tree items
+          */
          for (final Equipment equipment : allEquipments) {
 
             final TVIEquipmentView_Equipment equipmentItem = new TVIEquipmentView_Equipment(equipmentViewer, equipment);

@@ -144,6 +144,9 @@ public class Equipment implements Cloneable, Comparable<Object>, Serializable {
    @Transient
    private LocalDate                  _dateRetired;
 
+   @Transient
+   private String                     _equipmentName;
+
    /**
     * Default constructor used in EJB
     */
@@ -330,6 +333,11 @@ public class Equipment implements Cloneable, Comparable<Object>, Serializable {
     */
    public String getName() {
 
+      if (_equipmentName != null) {
+
+         return _equipmentName;
+      }
+
       final StringBuilder sb = new StringBuilder();
 
       if (StringUtils.hasContent(brand)) {
@@ -345,7 +353,13 @@ public class Equipment implements Cloneable, Comparable<Object>, Serializable {
          sb.append(model);
       }
 
-      return sb.toString();
+      _equipmentName = sb.toString();
+
+      return _equipmentName;
+   }
+
+   public Set<EquipmentPart> getParts() {
+      return parts;
    }
 
    public float getPrice() {
@@ -395,8 +409,16 @@ public class Equipment implements Cloneable, Comparable<Object>, Serializable {
       return true;
    }
 
+   public void resetName() {
+
+      _equipmentName = null;
+   }
+
    public void setBrand(final String brand) {
+
       this.brand = brand;
+
+      _equipmentName = null;
    }
 
    public void setDateBuilt(final long dateBuilt) {
@@ -432,7 +454,10 @@ public class Equipment implements Cloneable, Comparable<Object>, Serializable {
    }
 
    public void setModel(final String model) {
+
       this.model = model;
+
+      _equipmentName = null;
    }
 
    public void setPrice(final float price) {
@@ -456,27 +481,28 @@ public class Equipment implements Cloneable, Comparable<Object>, Serializable {
 
             + "Equipment" + NL //                                          //$NON-NLS-1$
 
-            + " equipmentId      =" + equipmentId + NL //                  //$NON-NLS-1$
-            + " brand            =" + brand + NL //                        //$NON-NLS-1$
-            + " model            =" + model + NL //                        //$NON-NLS-1$
-//            + " description      =" + description + NL //                  //$NON-NLS-1$
-//            + " equipmentType    =" + equipmentType + NL //                //$NON-NLS-1$
-//            + " distanceFirstUse =" + distanceFirstUse + NL //             //$NON-NLS-1$
+            + " equipmentId      = " + equipmentId + NL //                  //$NON-NLS-1$
+            + " brand            = " + brand + NL //                        //$NON-NLS-1$
+            + " model            = " + model + NL //                        //$NON-NLS-1$
+//            + " description      = " + description + NL //                  //$NON-NLS-1$
+//            + " equipmentType    = " + equipmentType + NL //                //$NON-NLS-1$
+//            + " distanceFirstUse = " + distanceFirstUse + NL //             //$NON-NLS-1$
 //
-//            + " dateBuilt        =" + dateBuilt + NL //                    //$NON-NLS-1$
-//            + " dateFirstUse     =" + dateFirstUse + NL //                 //$NON-NLS-1$
-//            + " dateRetired      =" + dateRetired + NL //                  //$NON-NLS-1$
+//            + " dateBuilt        = " + dateBuilt + NL //                    //$NON-NLS-1$
+//            + " dateFirstUse     = " + dateFirstUse + NL //                 //$NON-NLS-1$
+//            + " dateRetired      = " + dateRetired + NL //                  //$NON-NLS-1$
 //
-//            + " weight           =" + weight + NL //                       //$NON-NLS-1$
+//            + " weight           = " + weight + NL //                       //$NON-NLS-1$
 //
-//            + " services         =" + (services != null ? toString(services, maxLen) : null) + NL //$NON-NLS-1$
+            + " parts            = " + (parts != null ? toString(parts, maxLen) : null) + NL //$NON-NLS-1$
+            + " services         = " + (services != null ? toString(services, maxLen) : null) + NL //$NON-NLS-1$
       ;
    }
 
    private String toString(final Collection<?> collection, final int maxLen) {
 
       final StringBuilder builder = new StringBuilder();
-      builder.append("["); //$NON-NLS-1$
+      builder.append("\n["); //$NON-NLS-1$
       int i = 0;
       for (final Iterator<?> iterator = collection.iterator(); iterator.hasNext() && i < maxLen; i++) {
          if (i > 0) {
@@ -501,11 +527,13 @@ public class Equipment implements Cloneable, Comparable<Object>, Serializable {
       priceUnit         = otherEquipment.getPriceUnit();
       weight            = otherEquipment.getWeight();
 
-      setDateBuilt(     otherEquipment.getDateBuilt_Raw());
-      setDateFirstUse(  otherEquipment.getDateFirstUse_Raw());
-      setDateRetired(   otherEquipment.getDateRetired_Raw());
+      setDateBuilt(       otherEquipment.getDateBuilt_Raw());
+      setDateFirstUse(    otherEquipment.getDateFirstUse_Raw());
+      setDateRetired(     otherEquipment.getDateRetired_Raw());
 
 // SET_FORMATTING_ON
+
+      _equipmentName = null;
    }
 
 }

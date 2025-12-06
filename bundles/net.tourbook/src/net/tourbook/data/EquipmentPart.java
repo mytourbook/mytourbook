@@ -17,8 +17,6 @@ package net.tourbook.data;
 
 import java.io.Serializable;
 import java.time.LocalDate;
-import java.util.Collection;
-import java.util.Iterator;
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -119,6 +117,9 @@ public class EquipmentPart implements Cloneable, Comparable<Object>, Serializabl
    @Transient
    private LocalDate                  _dateRetired;
 
+   @Transient
+   private String                     _partName;
+
    /**
     * Default constructor used in EJB
     */
@@ -146,9 +147,9 @@ public class EquipmentPart implements Cloneable, Comparable<Object>, Serializabl
    @Override
    public int compareTo(final Object obj) {
 
-      if (obj instanceof final EquipmentPart equipment) {
+      if (obj instanceof final EquipmentPart part) {
 
-         return getName().compareTo(equipment.getName());
+         return getName().compareTo(part.getName());
       }
 
       return 0;
@@ -280,15 +281,8 @@ public class EquipmentPart implements Cloneable, Comparable<Object>, Serializabl
       return description;
    }
 
-   public float getDistanceBought() {
+   public float getDistanceFirstUse() {
       return distanceFirstUse;
-   }
-
-   /**
-    * @return Returns the primary key for a {@link EquipmentPart} entity
-    */
-   public long getEquipmentId() {
-      return partId;
    }
 
    public String getModel() {
@@ -305,6 +299,11 @@ public class EquipmentPart implements Cloneable, Comparable<Object>, Serializabl
     */
    public String getName() {
 
+      if (_partName != null) {
+
+         return _partName;
+      }
+
       final StringBuilder sb = new StringBuilder();
 
       if (StringUtils.hasContent(brand)) {
@@ -320,7 +319,16 @@ public class EquipmentPart implements Cloneable, Comparable<Object>, Serializabl
          sb.append(model);
       }
 
-      return sb.toString();
+      _partName = sb.toString();
+
+      return _partName;
+   }
+
+   /**
+    * @return Returns the primary key for a {@link EquipmentPart} entity
+    */
+   public long getPartId() {
+      return partId;
    }
 
    public float getPrice() {
@@ -370,8 +378,16 @@ public class EquipmentPart implements Cloneable, Comparable<Object>, Serializabl
       return true;
    }
 
+   public void resetName() {
+
+      _partName = null;
+   }
+
    public void setBrand(final String brand) {
+
       this.brand = brand;
+
+      _partName = null;
    }
 
    public void setDateBuilt(final long dateBuilt) {
@@ -406,8 +422,16 @@ public class EquipmentPart implements Cloneable, Comparable<Object>, Serializabl
       this.distanceFirstUse = distanceFirstUse;
    }
 
+   public void setEquipment(final Equipment partEquipment) {
+
+      equipment = partEquipment;
+   }
+
    public void setModel(final String model) {
+
       this.model = model;
+
+      _partName = null;
    }
 
    public void setPrice(final float price) {
@@ -425,13 +449,11 @@ public class EquipmentPart implements Cloneable, Comparable<Object>, Serializabl
    @Override
    public String toString() {
 
-      final int maxLen = 5;
-
       return UI.EMPTY_STRING
 
-            + "Equipment" + NL //                                          //$NON-NLS-1$
+            + "EquipmentPart" + NL //                                      //$NON-NLS-1$
 
-            + " equipmentId      =" + partId + NL //                  //$NON-NLS-1$
+            + " partId           =" + partId + NL //                       //$NON-NLS-1$
             + " brand            =" + brand + NL //                        //$NON-NLS-1$
             + " model            =" + model + NL //                        //$NON-NLS-1$
 //            + " description      =" + description + NL //                  //$NON-NLS-1$
@@ -443,35 +465,28 @@ public class EquipmentPart implements Cloneable, Comparable<Object>, Serializabl
 //            + " dateRetired      =" + dateRetired + NL //                  //$NON-NLS-1$
 //
 //            + " weight           =" + weight + NL //                       //$NON-NLS-1$
-//
-//            + " services         =" + (services != null ? toString(services, maxLen) : null) + NL //$NON-NLS-1$
       ;
    }
 
-   private String toString(final Collection<?> collection, final int maxLen) {
+   public void updateFromOther(final EquipmentPart otherPart) {
 
-      final StringBuilder builder = new StringBuilder();
-      builder.append("["); //$NON-NLS-1$
-      int i = 0;
-      for (final Iterator<?> iterator = collection.iterator(); iterator.hasNext() && i < maxLen; i++) {
-         if (i > 0) {
-            builder.append(", "); //$NON-NLS-1$
-         }
-         builder.append(iterator.next());
-      }
-      builder.append("]"); //$NON-NLS-1$
-      return builder.toString();
+   // SET_FORMATTING_OFF
+
+         brand             = otherPart.getBrand();
+         model             = otherPart.getModel();
+         description       = otherPart.getDescription();
+
+         distanceFirstUse  = otherPart.getDistanceFirstUse();
+         price             = otherPart.getPrice();
+         priceUnit         = otherPart.getPriceUnit();
+         weight            = otherPart.getWeight();
+
+         setDateBuilt(       otherPart.getDateBuilt_Raw());
+         setDateFirstUse(    otherPart.getDateFirstUse_Raw());
+         setDateRetired(     otherPart.getDateRetired_Raw());
+
+   // SET_FORMATTING_ON
+
+      _partName = null;
    }
-
-   public void updateFromOther(final EquipmentPart otherEquipment) {
-
-      brand = otherEquipment.getBrand();
-      model = otherEquipment.getModel();
-      description = otherEquipment.getDescription();
-
-      setDateBuilt(otherEquipment.getDateBuilt_Raw());
-      setDateFirstUse(otherEquipment.getDateFirstUse_Raw());
-      setDateRetired(otherEquipment.getDateRetired_Raw());
-   }
-
 }

@@ -446,6 +446,24 @@ public class EquipmentMenuManager implements IActionProvider {
       }
    }
 
+   /**
+    * Reset names of all recent equipment
+    */
+   public static void updateRecentEquipmentNames() {
+
+      final Map<Long, Equipment> allAvailableEquipment = EquipmentManager.getAllEquipment_ByID();
+
+      for (final Equipment recentEquipment : _allRecentEquipment.values()) {
+
+         final Equipment equipment = allAvailableEquipment.get(recentEquipment.getEquipmentId());
+
+         if (equipment != null) {
+
+            recentEquipment.resetName();
+         }
+      }
+   }
+
    private void addEquipment(final Equipment equipment) {
 
       EquipmentManager.equipment_Add(
@@ -1047,7 +1065,6 @@ public class EquipmentMenuManager implements IActionProvider {
 
       _allRecentEquipment.putFirst(equipment.getEquipmentId(), equipment);
    }
-
    /**
     * @return Returns number of equipment in the clipboard
     */

@@ -20,11 +20,13 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Set;
 
 import net.tourbook.common.UI;
 import net.tourbook.common.time.TimeTools;
 import net.tourbook.common.util.TreeViewerItem;
 import net.tourbook.data.Equipment;
+import net.tourbook.data.EquipmentPart;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.ui.SQLFilter;
 
@@ -34,11 +36,14 @@ public class TVIEquipmentView_Equipment extends TVIEquipmentView_Item {
 
    private Equipment _equipment;
 
+   private long      _equipmentID;
+
    public TVIEquipmentView_Equipment(final TreeViewer equipViewer, final Equipment equipment) {
 
       super(equipViewer);
 
       _equipment = equipment;
+      _equipmentID = equipment.getEquipmentId();
 
       firstColumn = equipment.getName();
 
@@ -50,19 +55,47 @@ public class TVIEquipmentView_Equipment extends TVIEquipmentView_Item {
    @Override
    protected void fetchChildren() {
 
-      final ArrayList<TreeViewerItem> children_Tours = readChildren_Tours(UI.EMPTY_STRING);
+      final ArrayList<TreeViewerItem> allParts = readChildren_Parts();
+      final ArrayList<TreeViewerItem> allTours = readChildren_Tours();
 
-      setChildren(children_Tours);
+      final ArrayList<TreeViewerItem> allChildren = new ArrayList<>();
+
+      allChildren.addAll(allParts);
+      allChildren.addAll(allTours);
+
+      setChildren(allChildren);
    }
 
    public Equipment getEquipment() {
       return _equipment;
    }
 
+   public long getEquipmentID() {
+      return _equipmentID;
+   }
+
+   private ArrayList<TreeViewerItem> readChildren_Parts() {
+
+      final Set<EquipmentPart> allParts = _equipment.getParts();
+
+      final ArrayList<TreeViewerItem> allPartItems = new ArrayList<>();
+
+      for (final EquipmentPart equipmentPart : allParts) {
+
+         final TVIEquipmentView_Part partItem = new TVIEquipmentView_Part(this, equipmentPart, getEquipmentViewer());
+
+         partItem.firstColumn = equipmentPart.getName();
+
+         allPartItems.add(partItem);
+      }
+
+      return allPartItems;
+   }
+
    /**
     * Get all tours for the equipment Id of this tree item
     */
-   private ArrayList<TreeViewerItem> readChildren_Tours(final String whereClause) {
+   private ArrayList<TreeViewerItem> readChildren_Tours() {
 
       final ArrayList<TreeViewerItem> children = new ArrayList<>();
 
@@ -90,7 +123,6 @@ public class TVIEquipmentView_Equipment extends TVIEquipmentView_Item {
                + " ON TourData.tourID = JTdataTequipment2.TourData_tourId" + NL //                                   //$NON-NLS-1$
 
                + " WHERE JTdataTequipment1.Equipment_EquipmentId = ?" + NL //                                        //$NON-NLS-1$
-               + whereClause + NL
                + sqlFilter.getWhereClause() + NL
 
                + " ORDER BY startYear, startMonth, startDay, startHour, startMinute" + NL //                   //$NON-NLS-1$

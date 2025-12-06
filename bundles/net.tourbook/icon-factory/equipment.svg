@@ -4057,9 +4057,9 @@
      showgrid="true"
      inkscape:current-layer="layer1"
      inkscape:document-units="px"
-     inkscape:cy="28.812498"
-     inkscape:cx="191.96874"
-     inkscape:zoom="16.000001"
+     inkscape:cy="108.24999"
+     inkscape:cx="144.62499"
+     inkscape:zoom="4.0000003"
      inkscape:pageshadow="2"
      inkscape:pageopacity="0.0"
      borderopacity="1.0"
@@ -4430,7 +4430,7 @@
        d="M 210,21 H 212 V 19 H 212.99999 V 21 H 214.99999 V 22 H 212.99999 V 24 H 212 V 22 H 210 Z"
        style="display:inline;fill:#808080;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
     <path
-       d="M 134.001,23.000386 V 31.001264 H 142 V 23.000386"
+       d="M 132.001,21.000001 V 33.001819 H 144 V 21.000001"
        style="display:inline;fill:#42b6ff;fill-opacity:1;stroke:none;stroke-width:0.500001;stroke-linecap:round;stroke-miterlimit:3"
        id="path1-2-7-2-4-4"
        inkscape:export-filename="..\icons\equipment-part.svg"
@@ -4449,11 +4449,11 @@
     <path
        id="rect1-5-6-1-6-3-94-5"
        style="display:inline;fill:none;stroke:#005a92;stroke-width:0.500001;stroke-linecap:square;stroke-miterlimit:3;stroke-opacity:1"
-       d="M 134.33339,23.33322 V 30.668355 M 141.66666,30.668355 V 23.33322"
+       d="M 132.25,21.250002 V 32.75 M 143.74708,32.75 V 21.250002"
        sodipodi:nodetypes="cccc" />
     <path
-       d="M 160.00072,24.000387 V 32.001265 H 167.99984 V 24.000387"
-       style="display:inline;fill:#42b6ff;fill-opacity:1;stroke:none;stroke-width:0.500001;stroke-linecap:round;stroke-miterlimit:3"
+       d="M 160.00103,25.000002 V 35.00132 H 170 V 25.000002"
+       style="display:inline;fill:#42b6ff;fill-opacity:1;stroke:none;stroke-width:0.500002;stroke-linecap:round;stroke-miterlimit:3"
        id="path1-2-7-2-4-4-4"
        inkscape:export-filename="..\icons\equipment-part.svg"
        inkscape:export-xdpi="96"
@@ -4471,7 +4471,7 @@
     <path
        id="rect1-5-6-1-6-3-94-5-8"
        style="display:inline;fill:none;stroke:#005a92;stroke-width:0.500001;stroke-linecap:square;stroke-miterlimit:3;stroke-opacity:1"
-       d="M 160.33311,24.333221 V 31.668356 M 167.66648,31.668356 V 24.333221"
+       d="M 160.25003,25.247721 V 34.749998 M 169.74988,34.749998 V 25.247721"
        sodipodi:nodetypes="cccc" />
     <rect
        inkscape:export-ydpi="96"
@@ -4487,9 +4487,9 @@
        style="display:inline;fill:#fe7f00;fill-opacity:1;stroke:#9a4d00;stroke-width:0.499998;stroke-linecap:butt;stroke-miterlimit:3;stroke-dasharray:none;stroke-opacity:1"
        id="path8-1-3-8-1-6"
        cx="193"
-       cy="27.000128"
-       rx="3.750001"
-       ry="3.7501285" />
+       cy="27.000191"
+       rx="5.750001"
+       ry="5.7501922" />
     <rect
        inkscape:export-ydpi="96"
        inkscape:export-xdpi="96"
@@ -4503,10 +4503,10 @@
     <ellipse
        style="display:inline;fill:#fe7f00;fill-opacity:1;stroke:#9a4d00;stroke-width:0.499998;stroke-linecap:butt;stroke-miterlimit:3;stroke-dasharray:none;stroke-opacity:1"
        id="path8-1-3-8-1-6-5"
-       cx="218.99992"
-       cy="28.000128"
-       rx="3.7499402"
-       ry="3.7501285" />
+       cx="220.50005"
+       cy="29.499784"
+       rx="5.2499585"
+       ry="5.2502174" />
     <rect
        inkscape:export-ydpi="96"
        inkscape:export-xdpi="96"
