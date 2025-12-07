@@ -18,6 +18,7 @@ package net.tourbook.common.util;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.List;
 
 import net.tourbook.common.UI;
 
@@ -30,7 +31,7 @@ public class SQLData {
    private static final char NL = UI.NEW_LINE;
 
    private String            _sqlString;
-   private ArrayList<Object> _allParameters;
+   private List<Object>      _allParameters;
 
    private int               _lastParameterIndex;
 
@@ -44,7 +45,7 @@ public class SQLData {
    }
 
    public SQLData(final String sqlString,
-                  final ArrayList<Object> parameters) {
+                  final List<Object> parameters) {
 
       _sqlString = sqlString;
       _allParameters = parameters;
@@ -58,7 +59,7 @@ public class SQLData {
       return _lastParameterIndex;
    }
 
-   public ArrayList<Object> getParameters() {
+   public List<Object> getParameters() {
       return _allParameters;
    }
 
@@ -132,7 +133,6 @@ public class SQLData {
             + "   _sqlString     = " + _sqlString + NL //            //$NON-NLS-1$
             + "   _allParameters = " + _allParameters + NL //        //$NON-NLS-1$
             + "   num parameters = " + parameters + NL //            //$NON-NLS-1$
-
       ;
    }
 }

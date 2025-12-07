@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2025 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -18,6 +18,7 @@ package net.tourbook.tag.tour.filter;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.List;
 
 import net.tourbook.common.UI;
 import net.tourbook.common.util.SQLData;
@@ -101,7 +102,7 @@ public class TourTagFilterSqlJoinBuilder {
          ;
       }
 
-      final ArrayList<Object> sqlParameters = sqlJoinPartForAndOperator.getParameters();
+      final List<Object> sqlParameters = sqlJoinPartForAndOperator.getParameters();
 
       // add number of tags that only tours with ALL tags are available in the join table
       sqlParameters.add(sqlParameters.size());

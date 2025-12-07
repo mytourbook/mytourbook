@@ -27,6 +27,7 @@ import net.tourbook.common.time.TimeTools;
 import net.tourbook.common.util.TreeViewerItem;
 import net.tourbook.data.Equipment;
 import net.tourbook.data.EquipmentPart;
+import net.tourbook.data.EquipmentService;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.ui.SQLFilter;
 
@@ -56,11 +57,13 @@ public class TVIEquipmentView_Equipment extends TVIEquipmentView_Item {
    protected void fetchChildren() {
 
       final ArrayList<TreeViewerItem> allParts = readChildren_Parts();
+      final ArrayList<TreeViewerItem> allServices = readChildren_Services();
       final ArrayList<TreeViewerItem> allTours = readChildren_Tours();
 
       final ArrayList<TreeViewerItem> allChildren = new ArrayList<>();
 
       allChildren.addAll(allParts);
+      allChildren.addAll(allServices);
       allChildren.addAll(allTours);
 
       setChildren(allChildren);
@@ -90,6 +93,24 @@ public class TVIEquipmentView_Equipment extends TVIEquipmentView_Item {
       }
 
       return allPartItems;
+   }
+
+   private ArrayList<TreeViewerItem> readChildren_Services() {
+
+      final Set<EquipmentService> allServices = _equipment.getServices();
+
+      final ArrayList<TreeViewerItem> allServiceItems = new ArrayList<>();
+
+      for (final EquipmentService service : allServices) {
+
+         final TVIEquipmentView_Service serviceItem = new TVIEquipmentView_Service(this, service, getEquipmentViewer());
+
+         serviceItem.firstColumn = service.getName();
+
+         allServiceItems.add(serviceItem);
+      }
+
+      return allServiceItems;
    }
 
    /**

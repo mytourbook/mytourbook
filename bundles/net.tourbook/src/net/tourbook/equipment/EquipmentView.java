@@ -342,6 +342,13 @@ public class EquipmentView extends ViewPart implements ITourProvider, ITourViewe
             // sort part by name
 
             return item1.getPart().getName().compareTo(item2.getPart().getName());
+
+         } else if (obj1 instanceof final TVIEquipmentView_Service item1
+               && obj2 instanceof final TVIEquipmentView_Service item2) {
+
+            // sort service by name
+
+            return item1.getService().getName().compareTo(item2.getService().getName());
          }
 
          return 0;
@@ -373,6 +380,11 @@ public class EquipmentView extends ViewPart implements ITourProvider, ITourViewe
                && o2 instanceof final TVIEquipmentView_Part item2) {
 
             return item1.getPartID() == item2.getPartID();
+
+         } else if (o1 instanceof final TVIEquipmentView_Service item1
+               && o2 instanceof final TVIEquipmentView_Service item2) {
+
+            return item1.getServiceID() == item2.getServiceID();
          }
 
          return false;
@@ -1735,12 +1747,10 @@ public class EquipmentView extends ViewPart implements ITourProvider, ITourViewe
       tree.setRedraw(false);
       {
          final Object[] expandedElements = _equipmentViewer.getExpandedElements();
-//         final ITreeSelection selection = _equipmentViewer.getStructuredSelection();
 
          reloadViewer_SetContent();
 
          _equipmentViewer.setExpandedElements(expandedElements);
-//         _equipmentViewer.setSelection(selection);
       }
       tree.setRedraw(true);
    }

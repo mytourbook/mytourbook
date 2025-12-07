@@ -31,9 +31,12 @@ import javax.persistence.EntityManager;
 import javax.persistence.Query;
 
 import net.tourbook.common.UI;
+import net.tourbook.common.util.SQL;
+import net.tourbook.common.util.SQLData;
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.Util;
 import net.tourbook.data.Equipment;
+import net.tourbook.data.EquipmentPart;
 import net.tourbook.data.TourData;
 import net.tourbook.database.MyTourbookException;
 import net.tourbook.database.TourDatabase;
@@ -177,9 +180,11 @@ public class EquipmentManager {
    public static boolean equipment_Delete(final List<Equipment> allEquipment) {
 
       // ensure that a tour is NOT modified in the tour editor
-      if (TourManager.isTourEditorModified(false)) {
+      if (TourManager.isTourEditorModified()) {
          return false;
       }
+
+      final SQLData sqlPartData = getSQLData_Parts(allEquipment);
 
       String dialogMessage;
 
@@ -189,16 +194,18 @@ public class EquipmentManager {
 
          // remove one equipment
 
-         dialogMessage = "Permanently delete equipment\n\n\"%s\"\n\nand remove this equipment from %d tours ?".formatted(
+         dialogMessage = "Permanently delete equipment\n\n\"%s\"\n\nits %d parts and remove this equipment from %d tours ?".formatted(
                allEquipment.get(0).getName(),
+               sqlPartData.getParameters().size(), // number of parts
                allTourIds.size());
 
       } else {
 
          // remove multiple equipment
 
-         dialogMessage = "Permanently delete %d equipment and remove them from %d tours ?".formatted(
+         dialogMessage = "Permanently delete %d equipment, theirs %d parts\nand remove them from %d tours ?".formatted(
                allEquipment.size(),
+               sqlPartData.getParameters().size(), // number of parts
                allTourIds.size());
       }
 
@@ -222,7 +229,7 @@ public class EquipmentManager {
 
          BusyIndicator.showWhile(display, () -> {
 
-            if (Equipment_Delete_All(allEquipment)) {
+            if (equipment_Delete_SQL(allEquipment, sqlPartData)) {
 
                clearAllEquipmentResourcesAndFireModifyEvent();
 
@@ -236,7 +243,9 @@ public class EquipmentManager {
       return returnValue[0];
    }
 
-   private static boolean Equipment_Delete_All(final List<Equipment> allEquipment) {
+   private static boolean equipment_Delete_SQL(final List<Equipment> allEquipment, final SQLData sqlPartData) {
+
+      final boolean isPartAvailable = sqlPartData.getParameters().size() > 0;
 
       boolean returnResult = false;
 
@@ -244,12 +253,12 @@ public class EquipmentManager {
 
       PreparedStatement prepStmt_TourData = null;
       PreparedStatement prepStmt_Equipment = null;
+      PreparedStatement prepStmt_EquipmentPart = null;
 
       try (Connection conn = TourDatabase.getInstance().getConnection()) {
 
          // remove equipment from "TOURDATA_Equipment"
-         sql = UI.EMPTY_STRING
-               + "DELETE" + NL //                                                   //$NON-NLS-1$
+         sql = "DELETE" + NL //                                                     //$NON-NLS-1$
                + " FROM " + TourDatabase.JOINTABLE__TOURDATA__EQUIPMENT + NL //     //$NON-NLS-1$
                + " WHERE " + TourDatabase.KEY_EQUIPMENT + "=?" + NL //              //$NON-NLS-1$ //$NON-NLS-2$
          ;
@@ -257,15 +266,27 @@ public class EquipmentManager {
          prepStmt_TourData = conn.prepareStatement(sql);
 
          // remove equipment from table "Equipment"
-         sql = UI.EMPTY_STRING
-               + "DELETE" + NL//                                                    //$NON-NLS-1$
+         sql = "DELETE" + NL//                                                      //$NON-NLS-1$
                + " FROM " + TourDatabase.TABLE_EQUIPMENT + NL //                    //$NON-NLS-1$
                + " WHERE " + TourDatabase.ENTITY_ID_EQUIPMENT + "=?" + NL //        //$NON-NLS-1$ //$NON-NLS-2$
          ;
          prepStmt_Equipment = conn.prepareStatement(sql);
 
+         if (isPartAvailable) {
+
+            // remove parts from table "EquipmentPart"
+            sql = "DELETE" + NL//                                                   //$NON-NLS-1$
+                  + " FROM " + TourDatabase.TABLE_EQUIPMENT_PART + NL //            //$NON-NLS-1$
+
+                  // "EquipmentPart.partID IN (" + parameterList + ")"
+                  + " WHERE " + sqlPartData.getSqlString() + NL //                  //$NON-NLS-1$
+            ;
+            prepStmt_EquipmentPart = conn.prepareStatement(sql);
+         }
+
          int[] returnValue_TourData;
          int[] returnValue_Equipment;
+         int[] returnValue_EquipmentPart = null;
 
          conn.setAutoCommit(false);
          {
@@ -278,21 +299,37 @@ public class EquipmentManager {
 
                prepStmt_Equipment.setLong(1, equipmentID);
                prepStmt_Equipment.addBatch();
+
+               if (isPartAvailable) {
+                  sqlPartData.setParameters(prepStmt_EquipmentPart, 1);
+                  prepStmt_EquipmentPart.addBatch();
+               }
             }
 
             returnValue_TourData = prepStmt_TourData.executeBatch();
             returnValue_Equipment = prepStmt_Equipment.executeBatch();
+
+            if (isPartAvailable) {
+               returnValue_EquipmentPart = prepStmt_EquipmentPart.executeBatch();
+            }
          }
          conn.commit();
 
          // log result
          TourLogManager.showLogView(AutoOpenEvent.DELETE_SOMETHING);
 
-         for (int equipmentIndex = 0; equipmentIndex < allEquipment.size(); equipmentIndex++) {
+         final int numEquipment = allEquipment.size();
 
-            TourLogManager.log_INFO("Equipment is deleted from %d tours and %d equipment definition - \"%s\"".formatted(
+         for (int equipmentIndex = 0; equipmentIndex < numEquipment; equipmentIndex++) {
+
+            final int partResult = returnValue_EquipmentPart == null
+                  ? 0
+                  : returnValue_EquipmentPart[equipmentIndex];
+
+            TourLogManager.log_INFO("Equipment is deleted from %d tours, %d equipment definition and %d equipment parts - \"%s\"".formatted(
                   returnValue_TourData[equipmentIndex],
                   returnValue_Equipment[equipmentIndex],
+                  partResult,
                   allEquipment.get(equipmentIndex).getName()));
          }
 
@@ -306,13 +343,14 @@ public class EquipmentManager {
 
          Util.closeSql(prepStmt_TourData);
          Util.closeSql(prepStmt_Equipment);
+         Util.closeSql(prepStmt_EquipmentPart);
       }
 
       return returnResult;
    }
 
    /**
-    * Add equipment additional to the existing equipment
+    * Remove equipment
     *
     * @param equipment
     * @param tourProvider
@@ -669,6 +707,29 @@ public class EquipmentManager {
       }
 
       return allTourIds;
+   }
+
+   private static SQLData getSQLData_Parts(final List<Equipment> allEquipment) {
+
+      // collect all part IDs
+      final List<Object> allPartIDs = new ArrayList<>();
+
+      for (final Equipment equipment : allEquipment) {
+
+         final Set<EquipmentPart> allEquipmentParts = equipment.getParts();
+
+         for (final EquipmentPart equipmentPart : allEquipmentParts) {
+
+            allPartIDs.add(equipmentPart.getPartId());
+         }
+      }
+
+      final int numIDs = allPartIDs.size();
+      final String parameterList = SQL.createParameterList(numIDs);
+
+      final String sqlStatement = "EquipmentPart.partID IN (" + parameterList + ")"; //$NON-NLS-1$ //$NON-NLS-2$
+
+      return new SQLData(sqlStatement, allPartIDs);
    }
 
    private static void loadEquipment() {

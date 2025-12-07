@@ -370,6 +370,10 @@ public class Equipment implements Cloneable, Comparable<Object>, Serializable {
       return priceUnit;
    }
 
+   public Set<EquipmentService> getServices() {
+      return services;
+   }
+
    public float getWeight() {
       return weight;
    }
