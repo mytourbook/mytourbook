@@ -57,7 +57,7 @@
      style="display:inline"
      transform="translate(-130,-19)">
     <path
-       d="M 132.001,21.000001 V 33.001819 H 144 V 21.000001"
+       d="M 132.001,33.001819 H 144 V 21.000001"
        style="display:inline;fill:#42b6ff;fill-opacity:1;stroke:none;stroke-width:0.500001;stroke-linecap:round;stroke-miterlimit:3"
        id="path1-2-7-2-4-4" />
     <rect
@@ -70,6 +70,6 @@
     <path
        id="rect1-5-6-1-6-3-94-5"
        style="display:inline;fill:none;stroke:#005a92;stroke-width:0.500001;stroke-linecap:square;stroke-miterlimit:3;stroke-opacity:1"
-       d="M 132.25,21.250002 V 32.75 M 143.74708,32.75 V 21.250002" />
+       d="M 143.74708,32.75 V 21.250002" />
   </g>
 </svg>

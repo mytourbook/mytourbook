@@ -63,12 +63,9 @@
        width="15.999991"
        id="rect6561-8-1-9-9-5-5-9-9-1-3-94-1-6-6-4-5-4-9-5-9-5-4-0-5-2"
        style="display:inline;opacity:0.99;fill:none;stroke:none" />
-    <ellipse
-       style="display:inline;fill:#fe7f00;fill-opacity:1;stroke:#9a4d00;stroke-width:0.499998;stroke-linecap:butt;stroke-miterlimit:3;stroke-dasharray:none;stroke-opacity:1"
+    <path
        id="path8-1-3-8-1-6"
-       cx="193"
-       cy="27.000191"
-       rx="5.750001"
-       ry="5.7501922" />
+       style="display:inline;fill:#fe7f00;stroke:#9a4d00;stroke-width:0.499998;stroke-miterlimit:3"
+       d="M 197,27.000225 C 197,30.728271 193.97792,33.750449 190.25,33.75045 190.25,25.000003 190.25,29.088836 190.25,20.25 193.97792,20.250001 197,23.272179 197,27.000225 Z" />
   </g>
 </svg>

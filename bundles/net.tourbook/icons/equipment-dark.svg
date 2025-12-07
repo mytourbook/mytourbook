@@ -55,33 +55,30 @@
   <g
      id="layer1"
      style="display:inline"
-     transform="translate(-75,-43.998581)">
+     transform="translate(-20,-43.998581)">
     <rect
        transform="scale(1,-1)"
        y="-59.998596"
-       x="75"
+       x="20"
        height="16.000015"
        width="15.999991"
        id="rect6561-8-1-9-9-5-5-9-9-1-3-94-1-6-6-4-5-4-9-0"
        style="display:inline;opacity:0.99;fill:none;stroke:none" />
     <path
-       d="M 84.001038,53 V 59.000438 H 90.000162 V 53"
+       id="rect9-4-1-1-6"
+       style="display:inline;fill:#92e000;fill-opacity:1;stroke:#808080;stroke-width:0.500003;stroke-miterlimit:3;stroke-opacity:1"
+       d="M 33.821817,50.203485 27.999499,44.35437 22.177183,50.203485" />
+    <path
+       id="path8-1-3-8-1-6-8-1-1"
+       style="display:inline;fill:#fe7f00;stroke:#9a4d00;stroke-width:0.5;stroke-miterlimit:3;stroke-dasharray:none"
+       d="M 26.202313,54.99812 C 26.202313,57.06919 24.4328,58.748121 22.249999,58.748122 22.249999,53.886926 22.249999,56.158421 22.249999,51.24812 24.4328,51.248121 26.202313,52.927054 26.202313,54.99812 Z" />
+    <path
+       d="M 27,58.998568 H 33.999758 V 51.998567"
        style="display:inline;fill:#42b6ff;fill-opacity:1;stroke:none;stroke-width:0.500001;stroke-linecap:round;stroke-miterlimit:3"
-       id="path1-2-7-2-7-8" />
+       id="path1-2-7-2-4-4-40-5-4" />
     <path
-       id="rect1-5-6-1-6-3-9-6"
+       id="rect1-5-6-1-6-3-94-5-9-2-2"
        style="display:inline;fill:none;stroke:#005a92;stroke-width:0.500001;stroke-linecap:square;stroke-miterlimit:3;stroke-opacity:1"
-       d="M 84.250328,53.249616 V 58.750766 M 89.750163,58.750766 V 53.249616" />
-    <ellipse
-       style="display:inline;fill:#fe7f00;fill-opacity:1;stroke:#9a4d00;stroke-width:0.499999;stroke-linecap:butt;stroke-miterlimit:3;stroke-dasharray:none;stroke-opacity:1"
-       id="path8-1-3-3-5"
-       cx="78.999939"
-       cy="55.999939"
-       rx="2.7499402"
-       ry="2.7500815" />
-    <path
-       id="rect9-4-1-0"
-       style="display:inline;fill:#92e000;fill-opacity:1;stroke:#4e7700;stroke-width:0.500001;stroke-miterlimit:3;stroke-opacity:1"
-       d="M 89.122134,50.4705 83.050029,44.355802 76.977927,50.4705" />
+       d="M 33.7081,58.707748 V 52.289386" />
   </g>
 </svg>

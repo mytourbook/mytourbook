@@ -70,6 +70,8 @@ public class EquipmentManager {
    private static ConcurrentSkipListSet<String> _allPart_Brands;
    private static ConcurrentSkipListSet<String> _allPart_Models;
    private static ConcurrentSkipListSet<String> _allPart_PriceUnits;
+   private static ConcurrentSkipListSet<String> _allService_Names;
+   private static ConcurrentSkipListSet<String> _allService_PriceUnits;
 
    /**
     * Clear all equipment resources within MT and fire a equipment modify event, ensure that
@@ -91,33 +93,53 @@ public class EquipmentManager {
    public static void clearCachedValues() {
 
       if (_allEquipment_ByID != null) {
-
          _allEquipment_ByID.clear();
          _allEquipment_ByID = null;
       }
 
       if (_allEquipment_ByName != null) {
-
          _allEquipment_ByName.clear();
          _allEquipment_ByName = null;
       }
 
       if (_allEquipment_Brands != null) {
-
          _allEquipment_Brands.clear();
          _allEquipment_Brands = null;
       }
 
       if (_allEquipment_Models != null) {
-
          _allEquipment_Models.clear();
          _allEquipment_Models = null;
       }
 
       if (_allEquipment_PriceUnits != null) {
-
          _allEquipment_PriceUnits.clear();
          _allEquipment_PriceUnits = null;
+      }
+
+      if (_allPart_Brands != null) {
+         _allPart_Brands.clear();
+         _allPart_Brands = null;
+      }
+
+      if (_allPart_Models != null) {
+         _allPart_Models.clear();
+         _allPart_Models = null;
+      }
+
+      if (_allPart_PriceUnits != null) {
+         _allPart_PriceUnits.clear();
+         _allPart_PriceUnits = null;
+      }
+
+      if (_allService_Names != null) {
+         _allService_Names.clear();
+         _allService_Names = null;
+      }
+
+      if (_allService_PriceUnits != null) {
+         _allService_PriceUnits.clear();
+         _allService_PriceUnits = null;
       }
    }
 
@@ -523,6 +545,40 @@ public class EquipmentManager {
       }
 
       return _allPart_PriceUnits;
+   }
+
+   public static ConcurrentSkipListSet<String> getCachedFields_AllService_Names() {
+
+      if (_allService_Names == null) {
+
+         synchronized (DB_LOCK) {
+
+            // recheck again, another thread could have it created
+            if (_allService_Names == null) {
+
+               _allService_Names = TourDatabase.getDistinctValues(TourDatabase.TABLE_EQUIPMENT_SERVICE, "name"); //$NON-NLS-1$
+            }
+         }
+      }
+
+      return _allService_Names;
+   }
+
+   public static ConcurrentSkipListSet<String> getCachedFields_AllService_PriceUnits() {
+
+      if (_allService_PriceUnits == null) {
+
+         synchronized (DB_LOCK) {
+
+            // recheck again, another thread could have it created
+            if (_allService_PriceUnits == null) {
+
+               _allService_PriceUnits = TourDatabase.getDistinctValues(TourDatabase.TABLE_EQUIPMENT_SERVICE, "priceUnit"); //$NON-NLS-1$
+            }
+         }
+      }
+
+      return _allService_PriceUnits;
    }
 
    /**

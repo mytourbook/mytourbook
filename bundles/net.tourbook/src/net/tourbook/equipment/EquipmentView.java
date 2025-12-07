@@ -39,6 +39,7 @@ import net.tourbook.common.util.TreeViewerItem;
 import net.tourbook.common.util.Util;
 import net.tourbook.data.Equipment;
 import net.tourbook.data.EquipmentPart;
+import net.tourbook.data.EquipmentService;
 import net.tourbook.data.TourData;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.preferences.ITourbookPreferences;
@@ -73,7 +74,6 @@ import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.viewers.CellLabelProvider;
 import org.eclipse.jface.viewers.ColumnViewer;
 import org.eclipse.jface.viewers.IElementComparer;
-import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.jface.viewers.ITreeSelection;
@@ -146,6 +146,7 @@ public class EquipmentView extends ViewPart implements ITourProvider, ITourViewe
    private ActionDeleteEquipment               _actionDeleteEquipment;
    private ActionEditEquipment                 _actionEditEquipment;
    private ActionEditPart                      _actionEditPart;
+   private ActionEditService                   _actionEditService;
    private ActionNewEquipment                  _actionNewEquipment;
    private ActionNewPart                       _actionNewPart;
    private ActionNewService                    _actionNewService;
@@ -267,6 +268,21 @@ public class EquipmentView extends ViewPart implements ITourProvider, ITourViewe
       public ActionEditPart() {
 
          super("&Edit Part", AS_PUSH_BUTTON);
+
+         setImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.App_Edit));
+      }
+
+      @Override
+      public void run() {
+         onAction_EditItem();
+      }
+   }
+
+   private class ActionEditService extends Action {
+
+      public ActionEditService() {
+
+         super("&Edit Service", AS_PUSH_BUTTON);
 
          setImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.App_Edit));
       }
@@ -547,6 +563,7 @@ public class EquipmentView extends ViewPart implements ITourProvider, ITourViewe
       _actionDeleteEquipment                 = new ActionDeleteEquipment();
       _actionEditEquipment                   = new ActionEditEquipment();
       _actionEditPart                        = new ActionEditPart();
+      _actionEditService                     = new ActionEditService();
       _actionNewEquipment                    = new ActionNewEquipment();
       _actionNewPart                         = new ActionNewPart();
       _actionNewService                      = new ActionNewService();
@@ -850,6 +867,16 @@ public class EquipmentView extends ViewPart implements ITourProvider, ITourViewe
 
                cell.setImage(_imgEquipment_Part);
 
+            } else if (viewItem instanceof TVIEquipmentView_Service) {
+
+               /*
+                * Service
+                */
+
+               styledString.append(viewItem.firstColumn, net.tourbook.ui.UI.TOUR_STYLER);
+
+               cell.setImage(_imgEquipment_Service);
+
             } else {
 
                styledString.append(viewItem.firstColumn, net.tourbook.ui.UI.TOUR_STYLER);
@@ -1035,8 +1062,9 @@ public class EquipmentView extends ViewPart implements ITourProvider, ITourViewe
        * Count number of selected items
        */
       int numEquipment = 0;
-      int numTours = 0;
       int numParts = 0;
+      int numServices = 0;
+      int numTours = 0;
 
       for (final Object selectedItem : allSelectedItems) {
 
@@ -1051,17 +1079,23 @@ public class EquipmentView extends ViewPart implements ITourProvider, ITourViewe
          } else if (selectedItem instanceof TVIEquipmentView_Part) {
 
             numParts++;
+
+         } else if (selectedItem instanceof TVIEquipmentView_Service) {
+
+            numServices++;
          }
       }
 
       final boolean isEquipmentSelected = numEquipment > 0;
       final boolean isPartSelected = numParts > 0;
+      final boolean isServiceSelected = numServices > 0;
 
 // SET_FORMATTING_OFF
 
       _actionDeleteEquipment  .setEnabled(isEquipmentSelected);
       _actionEditEquipment    .setEnabled(isEquipmentSelected);
       _actionEditPart         .setEnabled(isPartSelected);
+      _actionEditService      .setEnabled(isServiceSelected);
       _actionNewPart          .setEnabled(isEquipmentSelected);
       _actionNewService       .setEnabled(isEquipmentSelected);
 
@@ -1105,6 +1139,7 @@ public class EquipmentView extends ViewPart implements ITourProvider, ITourViewe
       int numEquipment = 0;
       int numTours = 0;
       int numParts = 0;
+      int numServices = 0;
 
       for (final Object selectedItem : allSelectedItems) {
 
@@ -1119,6 +1154,10 @@ public class EquipmentView extends ViewPart implements ITourProvider, ITourViewe
          } else if (selectedItem instanceof TVIEquipmentView_Part) {
 
             numParts++;
+
+         } else if (selectedItem instanceof TVIEquipmentView_Service) {
+
+            numServices++;
          }
       }
 
@@ -1127,11 +1166,12 @@ public class EquipmentView extends ViewPart implements ITourProvider, ITourViewe
       menuMgr.add(_actionNewService);
 
       // display only one edit action
-      if (numEquipment == 1) {
-         menuMgr.add(_actionEditEquipment);
-      } else if (numParts == 1) {
-         menuMgr.add(_actionEditPart);
+// SET_FORMATTING_OFF
+      if (        numEquipment == 1) {    menuMgr.add(_actionEditEquipment);
+      } else if ( numParts == 1) {        menuMgr.add(_actionEditPart);
+      } else if ( numServices == 1) {     menuMgr.add(_actionEditService);
       }
+// SET_FORMATTING_ON
 
       menuMgr.add(new Separator());
 
@@ -1440,6 +1480,9 @@ public class EquipmentView extends ViewPart implements ITourProvider, ITourViewe
          TourDatabase.saveEntity(part, part.getPartId(), EquipmentPart.class);
 
          updateUI_Views();
+
+      } else if (firstElement instanceof final TVIEquipmentView_Service equipmentItem) {
+
       }
    }
 
@@ -1493,8 +1536,39 @@ public class EquipmentView extends ViewPart implements ITourProvider, ITourViewe
    }
 
    private void onAction_NewService() {
-      // TODO Auto-generated method stub
 
+      final TreeSelection allSelectedItems = (TreeSelection) (_equipmentViewer.getSelection());
+      final Object firstSelectedItem = allSelectedItems.getFirstElement();
+
+      if (firstSelectedItem instanceof TVIEquipmentView_Equipment == false) {
+         // this should not happen because the action should be disabled
+         return;
+      }
+
+      final TVIEquipmentView_Equipment equipmentItem = (TVIEquipmentView_Equipment) firstSelectedItem;
+      final Equipment equipment = equipmentItem.getEquipment();
+
+      final DialogEquipmentService serviceDialog = new DialogEquipmentService(
+
+            _parent.getShell(),
+            equipment,
+            null);
+
+      if (serviceDialog.open() != Window.OK) {
+         return;
+      }
+
+      final EquipmentService serviceFromDialog = serviceDialog.getService();
+
+      // update model
+      final EquipmentService savedService = TourDatabase.saveEntity(
+            serviceFromDialog,
+            serviceFromDialog.getSeriveId(),
+            EquipmentService.class);
+
+      equipment.getServices().add(savedService);
+
+      updateUI_Views();
    }
 
    private void onAction_OnMouseSelect_ExpandCollapse() {
@@ -1722,7 +1796,7 @@ public class EquipmentView extends ViewPart implements ITourProvider, ITourViewe
       _viewerContainer.setRedraw(false);
       {
          final Object[] expandedElements = _equipmentViewer.getExpandedElements();
-         final ISelection selection = _equipmentViewer.getSelection();
+         final ITreeSelection selection = _equipmentViewer.getStructuredSelection();
 
          _equipmentViewer.getTree().dispose();
 

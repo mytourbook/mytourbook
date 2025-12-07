@@ -60,6 +60,16 @@ public class EquipmentService implements Cloneable, Serializable {
    private long                       date;
 
    /**
+    * Price
+    */
+   private float                      price;
+
+   /**
+    * Price unit
+    */
+   private String                     priceUnit;
+
+   /**
     * One equipment can have multiple services
     */
    @ManyToOne(optional = false)
@@ -128,7 +138,6 @@ public class EquipmentService implements Cloneable, Serializable {
       return true;
    }
 
-
    public LocalDate getDate() {
 
       if (_date == null) {
@@ -157,6 +166,14 @@ public class EquipmentService implements Cloneable, Serializable {
       }
 
       return name;
+   }
+
+   public float getPrice() {
+      return price;
+   }
+
+   public String getPriceUnit() {
+      return priceUnit;
    }
 
    /**
@@ -215,10 +232,8 @@ public class EquipmentService implements Cloneable, Serializable {
          name = name.substring(0, TourDatabase.DB_LENGTH_NAME);
       }
 
-
       return true;
    }
-
 
    public void setDate(final long date) {
 
@@ -231,6 +246,19 @@ public class EquipmentService implements Cloneable, Serializable {
       this.description = description;
    }
 
+   public void setEquipment(final Equipment partEquipment) {
+
+      equipment = partEquipment;
+   }
+
+   public void setPrice(final float price) {
+      this.price = price;
+   }
+
+   public void setPriceUnit(final String priceUnit) {
+      this.priceUnit = priceUnit;
+   }
+
    public void updateFromOther(final EquipmentService otherService) {
 
       name = otherService.getName();
@@ -239,4 +267,7 @@ public class EquipmentService implements Cloneable, Serializable {
       setDate(otherService.getDate().toEpochDay());
    }
 
+   public void setName(String name) {
+      this.name = name;
+   }
 }

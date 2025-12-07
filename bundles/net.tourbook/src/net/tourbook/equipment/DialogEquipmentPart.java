@@ -147,13 +147,11 @@ public class DialogEquipmentPart extends TitleAreaDialog {
 
       super.create();
 
-      final String newTitle = _isNewPart
+      final String windowTitle = _isNewPart
             ? "Create Equipment Part"
-            : "Edit Equipment Part".formatted(_part.getName());
+            : "Edit Equipment Part";
 
-      setTitle(newTitle);
-
-//      setMessage("message");
+      setTitle(windowTitle);
    }
 
    @Override
