@@ -48,6 +48,9 @@ public class TVIEquipmentView_Equipment extends TVIEquipmentView_Item {
 
       firstColumn = equipment.getName();
 
+      price = equipment.getPrice();
+      priceUnit = equipment.getPriceUnit();
+
       if (UI.IS_SCRAMBLE_DATA) {
          firstColumn = UI.scrambleText(firstColumn);
       }
@@ -83,11 +86,14 @@ public class TVIEquipmentView_Equipment extends TVIEquipmentView_Item {
 
       final ArrayList<TreeViewerItem> allPartItems = new ArrayList<>();
 
-      for (final EquipmentPart equipmentPart : allParts) {
+      for (final EquipmentPart part : allParts) {
 
-         final TVIEquipmentView_Part partItem = new TVIEquipmentView_Part(this, equipmentPart, getEquipmentViewer());
+         final TVIEquipmentView_Part partItem = new TVIEquipmentView_Part(this, part, getEquipmentViewer());
 
-         partItem.firstColumn = equipmentPart.getName();
+         partItem.firstColumn = part.getName();
+
+         partItem.price = part.getPrice();
+         partItem.priceUnit = part.getPriceUnit();
 
          allPartItems.add(partItem);
       }
@@ -106,6 +112,9 @@ public class TVIEquipmentView_Equipment extends TVIEquipmentView_Item {
          final TVIEquipmentView_Service serviceItem = new TVIEquipmentView_Service(this, service, getEquipmentViewer());
 
          serviceItem.firstColumn = service.getName();
+
+         serviceItem.price = service.getPrice();
+         serviceItem.priceUnit = service.getPriceUnit();
 
          allServiceItems.add(serviceItem);
       }

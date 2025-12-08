@@ -139,7 +139,7 @@ public class DialogEquipmentPart extends TitleAreaDialog {
       super.configureShell(shell);
 
       // set window title
-      shell.setText(Messages.Dialog_Equipment_Title);
+      shell.setText("Equipment Part");
    }
 
    @Override
@@ -147,11 +147,12 @@ public class DialogEquipmentPart extends TitleAreaDialog {
 
       super.create();
 
-      final String windowTitle = _isNewPart
+      final String messageTitle = _isNewPart
             ? "Create Equipment Part"
             : "Edit Equipment Part";
 
-      setTitle(windowTitle);
+      setTitle(messageTitle);
+      setMessage(_part.getName());
    }
 
    @Override

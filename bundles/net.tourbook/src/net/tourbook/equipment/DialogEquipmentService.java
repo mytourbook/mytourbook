@@ -133,12 +133,6 @@ public class DialogEquipmentService extends TitleAreaDialog {
 
       // set window title
       shell.setText("Equipment Service");
-
-      final String windowTitle = _isNewService
-            ? "Create Equipment Service"
-            : "Edit Equipment Part";
-
-      setTitle(windowTitle);
    }
 
    @Override
@@ -146,13 +140,12 @@ public class DialogEquipmentService extends TitleAreaDialog {
 
       super.create();
 
-      final String newTitle = _isNewService
+      final String messageTitle = _isNewService
             ? "Create Equipment Service"
-            : "Edit Equipment Service".formatted(_service.getName());
+            : "Edit Equipment Service";
 
-      setTitle(newTitle);
-
-//      setMessage("message");
+      setTitle(messageTitle);
+      setMessage(_service.getName());
    }
 
    @Override

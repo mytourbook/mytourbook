@@ -251,6 +251,10 @@ public class EquipmentService implements Cloneable, Serializable {
       equipment = partEquipment;
    }
 
+   public void setName(final String name) {
+      this.name = name;
+   }
+
    public void setPrice(final float price) {
       this.price = price;
    }
@@ -261,13 +265,15 @@ public class EquipmentService implements Cloneable, Serializable {
 
    public void updateFromOther(final EquipmentService otherService) {
 
-      name = otherService.getName();
+// SET_FORMATTING_OFF
+
       description = otherService.getDescription();
+      name        = otherService.getName();
+      price       = otherService.getPrice();
+      priceUnit   = otherService.getPriceUnit();
+
+// SET_FORMATTING_ON
 
       setDate(otherService.getDate().toEpochDay());
-   }
-
-   public void setName(String name) {
-      this.name = name;
    }
 }

@@ -3303,8 +3303,6 @@ class TourBook_ColumnFactory {
 
             final List<Long> allEqipmentIDs = ((TVITourBookTour) element).getEquipmentIds();
 
-            TourDatabase.getTagNames(allEqipmentIDs);
-
             return EquipmentManager.getEquipmentNames(allEqipmentIDs);
          }
       });

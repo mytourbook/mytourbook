@@ -73,6 +73,10 @@ public abstract class TreeColumnFactory {
    public static final String            EQUIPMENT_DATE_RETIRED_ID        = "EQUIPMENT_DATE_RETIRED";           //$NON-NLS-1$
    public static final TreeColumnFactory EQUIPMENT_MODEL;
    public static final String            EQUIPMENT_MODEL_ID               = "EQUIPMENT_MODEL";                  //$NON-NLS-1$
+   public static final TreeColumnFactory EQUIPMENT_PRICE;
+   public static final String            EQUIPMENT_PRICE_ID               = "EQUIPMENT_PRICE";                  //$NON-NLS-1$
+   public static final TreeColumnFactory EQUIPMENT_PRICE_UNIT;
+   public static final String            EQUIPMENT_PRICE_UNIT_ID          = "EQUIPMENT_PRICE_UNIT";             //$NON-NLS-1$
 
    public static final TreeColumnFactory MOTION_AVG_PACE;
    public static final TreeColumnFactory MOTION_AVG_SPEED;
@@ -848,6 +852,50 @@ public abstract class TreeColumnFactory {
             colDef.setColumnHeaderToolTipText(  Messages.ColumnFactory_Equipment_Model);
 
             colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(20));
+
+            return colDef;
+         }
+      };
+
+      EQUIPMENT_PRICE = new TreeColumnFactory() {
+         @Override
+         public TreeColumnDefinition createColumn(final ColumnManager columnManager,
+                                                  final PixelConverter pixelConverter) {
+
+            final TreeColumnDefinition colDef = new TreeColumnDefinition(columnManager, EQUIPMENT_PRICE_ID, SWT.TRAIL);
+
+            colDef.setColumnCategory(           Messages.ColumnFactory_Category_Equipment);
+
+            colDef.setColumnLabel(              "Price");
+            colDef.setColumnHeaderText(         "Price");
+            colDef.setColumnHeaderToolTipText(  "Price");
+
+            colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(10));
+
+            colDef.setValueFormats(
+                  ValueFormatSet.Number_2_Digits,
+                  ValueFormat.NUMBER_1_0,
+                  columnManager);
+
+            return colDef;
+         }
+      };
+
+      EQUIPMENT_PRICE_UNIT = new TreeColumnFactory() {
+         @Override
+         public TreeColumnDefinition createColumn(final ColumnManager columnManager,
+                                                  final PixelConverter pixelConverter) {
+
+            final TreeColumnDefinition colDef = new TreeColumnDefinition(columnManager, EQUIPMENT_PRICE_UNIT_ID, SWT.LEAD);
+
+            colDef.setColumnCategory(           Messages.ColumnFactory_Category_Equipment);
+
+            colDef.setColumnLabel(              "Price Currency");
+            colDef.setColumnHeaderText(         "cur.");
+            colDef.setColumnHeaderToolTipText(  "Price currency");
+
+            colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(5));
+
 
             return colDef;
          }

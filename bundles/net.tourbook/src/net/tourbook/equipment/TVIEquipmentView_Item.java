@@ -31,6 +31,12 @@ public abstract class TVIEquipmentView_Item extends TreeViewerItem {
    long               numTours;
    int                numTags_NoTours;
 
+   /*
+    * These are common values for equipment, part and service
+    */
+   float  price;
+   String priceUnit;
+
    public TVIEquipmentView_Item(final TreeViewer equipmentViewer) {
 
       _equipmentViewer = equipmentViewer;

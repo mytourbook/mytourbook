@@ -608,9 +608,6 @@ public class Messages extends NLS {
    public static String        Dialog_Equipment_Label_DateRetired;
    public static String        Dialog_Equipment_Label_Description;
    public static String        Dialog_Equipment_Label_Model;
-   public static String        Dialog_Equipment_Message_Equipment_Edit;
-   public static String        Dialog_Equipment_Message_Equipment_New;
-   public static String        Dialog_Equipment_Title;
 
    public static String        dialog_export_btn_export;
 

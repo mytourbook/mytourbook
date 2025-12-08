@@ -413,11 +413,6 @@ public class Equipment implements Cloneable, Comparable<Object>, Serializable {
       return true;
    }
 
-   public void resetName() {
-
-      _equipmentName = null;
-   }
-
    public void setBrand(final String brand) {
 
       this.brand = brand;

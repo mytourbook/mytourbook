@@ -219,7 +219,7 @@ public class EquipmentMenuManager implements IActionProvider {
 
    public static class ActionRecentEquipment extends Action {
 
-      private Equipment __equipment;
+      Equipment equipment;
 
       public ActionRecentEquipment() {
          super(net.tourbook.ui.UI.IS_NOT_INITIALIZED, AS_CHECK_BOX);
@@ -228,7 +228,7 @@ public class EquipmentMenuManager implements IActionProvider {
       @Override
       public void run() {
 
-         _currentInstance.addEquipment(__equipment);
+         _currentInstance.addEquipment(equipment);
       }
 
       @Override
@@ -238,7 +238,7 @@ public class EquipmentMenuManager implements IActionProvider {
 
                + "ActionRecentEquipment" + NL //               //$NON-NLS-1$
 
-               + " __equipment = " + __equipment + NL //       //$NON-NLS-1$
+               + " __equipment = " + equipment + NL //       //$NON-NLS-1$
          ;
       }
 
@@ -246,7 +246,7 @@ public class EquipmentMenuManager implements IActionProvider {
 
          setText(equipmentText);
 
-         __equipment = equipment;
+         this.equipment = equipment;
       }
    }
 
@@ -447,21 +447,24 @@ public class EquipmentMenuManager implements IActionProvider {
    }
 
    /**
-    * Reset names of all recent equipment
+    * Replace equipment in recent equipment with freshly loaded equipment instance
     */
-   public static void updateRecentEquipmentNames() {
+   public static void updateRecentEquipment() {
 
       final Map<Long, Equipment> allAvailableEquipment = EquipmentManager.getAllEquipment_ByID();
+      final Collection<Equipment> allRecentEquipment = _allRecentEquipment.values();
 
-      for (final Equipment recentEquipment : _allRecentEquipment.values()) {
+      final LinkedHashMap<Long, Equipment> allNewRecentEquipment = new LRUMap<>(10);
 
-         final Equipment equipment = allAvailableEquipment.get(recentEquipment.getEquipmentId());
+      for (final Equipment recentEquipment : allRecentEquipment) {
 
-         if (equipment != null) {
+         final long recentEquipmentID = recentEquipment.getEquipmentId();
+         final Equipment availableEquipment = allAvailableEquipment.get(recentEquipmentID);
 
-            recentEquipment.resetName();
-         }
+         allNewRecentEquipment.put(recentEquipmentID, availableEquipment);
       }
+
+      _allRecentEquipment = allNewRecentEquipment;
    }
 
    private void addEquipment(final Equipment equipment) {
@@ -664,7 +667,7 @@ public class EquipmentMenuManager implements IActionProvider {
 
       for (final ActionRecentEquipment actionRecentEquipment : _allActions_RecentEquipment_Visible) {
 
-         final Equipment equipment = actionRecentEquipment.__equipment;
+         final Equipment equipment = actionRecentEquipment.equipment;
 
          if (allUsedEquipment.contains(equipment)) {
 
@@ -692,7 +695,7 @@ public class EquipmentMenuManager implements IActionProvider {
 
       for (final ActionRecentEquipment actionRecentEquipment : _allActions_RecentEquipment_Visible) {
 
-         final Equipment equipment = actionRecentEquipment.__equipment;
+         final Equipment equipment = actionRecentEquipment.equipment;
 
          if (equipment == null) {
             actionRecentEquipment.setEnabled(false);
@@ -1065,6 +1068,7 @@ public class EquipmentMenuManager implements IActionProvider {
 
       _allRecentEquipment.putFirst(equipment.getEquipmentId(), equipment);
    }
+
    /**
     * @return Returns number of equipment in the clipboard
     */
