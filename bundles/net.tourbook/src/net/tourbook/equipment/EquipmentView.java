@@ -762,9 +762,8 @@ public class EquipmentView extends ViewPart implements ITourProvider, ITourViewe
       defineColumn_Brand();
       defineColumn_Model();
 
-      defineColumn_Time_Date();
-      defineColumn_Time_Date_Built();
       defineColumn_Time_Date_FirstUse();
+      defineColumn_Time_Date_Built();
       defineColumn_Time_Date_Retired();
 
       defineColumn_Equipment_Price();
@@ -990,33 +989,6 @@ public class EquipmentView extends ViewPart implements ITourProvider, ITourViewe
    }
 
    /**
-    * Column: Date
-    */
-   private void defineColumn_Time_Date() {
-
-      final ColumnDefinition colDef = TreeColumnFactory.EQUIPMENT_DATE.createColumn(_columnManager, _pc);
-
-      colDef.setIsDefaultColumn();
-
-      colDef.setLabelProvider(new CellLabelProvider() {
-
-         @Override
-         public void update(final ViewerCell cell) {
-
-            final Object element = cell.getElement();
-
-            if (element instanceof final TVIEquipmentView_Equipment tviEquipment) {
-
-               final LocalDate date = tviEquipment.getEquipment().getDate();
-
-               cell.setText(TimeTools.Formatter_Date_S.format(date));
-               setCellColor(cell, element);
-            }
-         }
-      });
-   }
-
-   /**
     * Column: Build date
     */
    private void defineColumn_Time_Date_Built() {
@@ -1055,9 +1027,21 @@ public class EquipmentView extends ViewPart implements ITourProvider, ITourViewe
 
             final Object element = cell.getElement();
 
-            if (element instanceof final TVIEquipmentView_Equipment tviEquipment) {
+            LocalDate date = null;
+            if (element instanceof final TVIEquipmentView_Equipment viewItem) {
 
-               final LocalDate date = tviEquipment.getEquipment().getDateFirstUse();
+               date = viewItem.getEquipment().getDateFirstUse();
+
+            } else if (element instanceof final TVIEquipmentView_Part viewItem) {
+
+               date = viewItem.getPart().getDateFirstUse();
+
+            } else if (element instanceof final TVIEquipmentView_Service viewItem) {
+
+               date = viewItem.getService().getDate();
+            }
+
+            if (date != null) {
 
                cell.setText(TimeTools.Formatter_Date_S.format(date));
                setCellColor(cell, element);

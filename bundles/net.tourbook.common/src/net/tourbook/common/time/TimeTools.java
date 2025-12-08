@@ -894,9 +894,12 @@ public class TimeTools {
 
    /**
     * @param epochOfMilli
-    *           The number of milliseconds from 1970-01-01T00:00:00Z
+    *           The number of milliseconds from 1970-01-01T00:00:00Z.
+    *           <p>
+    *           When epoch days are provided, they had to be multiplied with
+    *           {@link #DAY_MILLISECONDS}
     *
-    * @return Returns a date from epochOfMilli.
+    * @return Returns a date from epochOfMilli
     */
    public static LocalDate toLocalDate(final long epochOfMilli) {
 

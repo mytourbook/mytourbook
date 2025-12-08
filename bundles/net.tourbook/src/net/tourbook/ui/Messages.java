@@ -265,14 +265,12 @@ public class Messages extends NLS {
 
    public static String        ColumnFactory_Equipment;
    public static String        ColumnFactory_Equipment_Brand;
-   public static String        ColumnFactory_Equipment_Date;
    public static String        ColumnFactory_Equipment_Date_Built;
    public static String        ColumnFactory_Equipment_Date_Built_Tooltip;
    public static String        ColumnFactory_Equipment_Date_FirstUse;
    public static String        ColumnFactory_Equipment_Date_FirstUse_Tooltip;
    public static String        ColumnFactory_Equipment_Date_Retired;
    public static String        ColumnFactory_Equipment_Date_Retired_Tooltip;
-   public static String        ColumnFactory_Equipment_Date_Tooltip;
    public static String        ColumnFactory_Equipment_Model;
    public static String        ColumnFactory_Equipment_Tooltip;
 

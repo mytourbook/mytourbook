@@ -141,7 +141,7 @@ public class EquipmentService implements Cloneable, Serializable {
    public LocalDate getDate() {
 
       if (_date == null) {
-         _date = TimeTools.toLocalDate(date);
+         _date = TimeTools.toLocalDate(date * TimeTools.DAY_MILLISECONDS);
       }
 
       return _date;

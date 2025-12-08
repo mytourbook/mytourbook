@@ -104,10 +104,6 @@ public class EquipmentPart implements Cloneable, Comparable<Object>, Serializabl
    @Transient
    private long                       _createId        = 0;
 
-   /** Contain the current or last date */
-   @Transient
-   private LocalDate                  _date;
-
    @Transient
    private LocalDate                  _dateBuilt;
 
@@ -198,36 +194,6 @@ public class EquipmentPart implements Cloneable, Comparable<Object>, Serializabl
       }
 
       return brand;
-   }
-
-   public LocalDate getDate() {
-
-      if (_date != null) {
-         return _date;
-      }
-
-      final LocalDate now = LocalDate.now();
-
-      if (getDateRetired().isBefore(now)) {
-
-         _date = getDateRetired();
-
-         return _date;
-
-      } else if (getDateFirstUse().isBefore(now)) {
-
-         _date = getDateFirstUse();
-
-         return _date;
-
-      } else if (getDateBuilt().isBefore(now)) {
-
-         _date = getDateBuilt();
-
-         return _date;
-      }
-
-      return now;
    }
 
    public LocalDate getDateBuilt() {
@@ -394,7 +360,6 @@ public class EquipmentPart implements Cloneable, Comparable<Object>, Serializabl
 
       this.dateBuilt = dateBuilt;
 
-      _date = null;
       _dateBuilt = null;
    }
 
@@ -402,7 +367,6 @@ public class EquipmentPart implements Cloneable, Comparable<Object>, Serializabl
 
       this.dateFirstUse = dateFirstUse;
 
-      _date = null;
       _dateFirstUse = null;
    }
 
@@ -410,7 +374,6 @@ public class EquipmentPart implements Cloneable, Comparable<Object>, Serializabl
 
       this.dateRetired = dateRetired;
 
-      _date = null;
       _dateRetired = null;
    }
 
