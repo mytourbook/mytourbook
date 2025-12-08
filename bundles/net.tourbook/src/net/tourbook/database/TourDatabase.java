@@ -1967,6 +1967,80 @@ public class TourDatabase {
       return allSortedValues;
    }
 
+   /**
+    * Getting one row from multiple databases sorted by alphabet and without any double entries
+    *
+    * @param fieldname
+    *           DB field name
+    * @param allDBNames
+    *           Database tables
+    *
+    * @return Returns a sorted list with unique db field contents
+    */
+   public static ConcurrentSkipListSet<String> getDistinctValues(final String fieldname,
+                                                                 final String... allDBNames) {
+
+      final ConcurrentSkipListSet<String> allSortedValues = new ConcurrentSkipListSet<>((text1, text2) -> {
+         {
+            // sort without case
+            return text1.compareToIgnoreCase(text2);
+         }
+      });
+
+      /*
+       * Run in UI thread otherwise the busyindicator fails
+       */
+      final Display display = Display.getDefault();
+
+      display.syncExec(() -> BusyIndicator.showWhile(display, () -> {
+
+         String sql = UI.EMPTY_STRING;
+
+         try (Connection conn = getInstance().getConnection();
+               Statement stmt = conn.createStatement()) {
+
+            final StringBuilder sb = new StringBuilder();
+
+            for (int dbIndex = 0; dbIndex < allDBNames.length; dbIndex++) {
+
+               final String dbName = allDBNames[dbIndex];
+
+               if (dbIndex > 0) {
+                  sb.append("UNION" + NL);
+               }
+
+               sb.append("SELECT " + fieldname + " FROM " + dbName + NL);
+            }
+
+            sb.append("ORDER BY " + fieldname + NL);
+
+            sql = sb.toString();
+
+            final ResultSet result = stmt.executeQuery(sql);
+
+            while (result.next()) {
+
+               String dbValue = result.getString(1);
+               if (dbValue != null) {
+
+                  dbValue = dbValue.trim();
+
+                  if (dbValue.length() > 0) {
+                     allSortedValues.add(dbValue);
+                  }
+               }
+            }
+
+         } catch (final SQLException e) {
+
+            StatusUtil.logError(NL + sql);
+            UI.showSQLException(e);
+         }
+      }));
+
+      return allSortedValues;
+   }
+
    public static TourDatabase getInstance() {
 
       if (_instance != null) {

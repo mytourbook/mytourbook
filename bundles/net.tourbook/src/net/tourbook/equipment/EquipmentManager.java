@@ -67,12 +67,11 @@ public class EquipmentManager {
 
    private static ConcurrentSkipListSet<String> _allEquipment_Brands;
    private static ConcurrentSkipListSet<String> _allEquipment_Models;
-   private static ConcurrentSkipListSet<String> _allEquipment_PriceUnits;
    private static ConcurrentSkipListSet<String> _allPart_Brands;
    private static ConcurrentSkipListSet<String> _allPart_Models;
-   private static ConcurrentSkipListSet<String> _allPart_PriceUnits;
    private static ConcurrentSkipListSet<String> _allService_Names;
-   private static ConcurrentSkipListSet<String> _allService_PriceUnits;
+   
+   private static ConcurrentSkipListSet<String> _allPriceUnits;
 
    /**
     * Clear all equipment resources within MT and fire a equipment modify event, ensure that
@@ -113,11 +112,6 @@ public class EquipmentManager {
          _allEquipment_Models = null;
       }
 
-      if (_allEquipment_PriceUnits != null) {
-         _allEquipment_PriceUnits.clear();
-         _allEquipment_PriceUnits = null;
-      }
-
       if (_allPart_Brands != null) {
          _allPart_Brands.clear();
          _allPart_Brands = null;
@@ -128,19 +122,14 @@ public class EquipmentManager {
          _allPart_Models = null;
       }
 
-      if (_allPart_PriceUnits != null) {
-         _allPart_PriceUnits.clear();
-         _allPart_PriceUnits = null;
-      }
-
       if (_allService_Names != null) {
          _allService_Names.clear();
          _allService_Names = null;
       }
-
-      if (_allService_PriceUnits != null) {
-         _allService_PriceUnits.clear();
-         _allService_PriceUnits = null;
+      
+      if (_allPriceUnits != null) {
+         _allPriceUnits.clear();
+         _allPriceUnits = null;
       }
    }
 
@@ -510,23 +499,6 @@ public class EquipmentManager {
       return _allEquipment_Models;
    }
 
-   public static ConcurrentSkipListSet<String> getCachedFields_AllEquipment_PriceUnits() {
-
-      if (_allEquipment_PriceUnits == null) {
-
-         synchronized (DB_LOCK) {
-
-            // recheck again, another thread could have it created
-            if (_allEquipment_PriceUnits == null) {
-
-               _allEquipment_PriceUnits = TourDatabase.getDistinctValues(TourDatabase.TABLE_EQUIPMENT, "priceUnit"); //$NON-NLS-1$
-            }
-         }
-      }
-
-      return _allEquipment_PriceUnits;
-   }
-
    public static ConcurrentSkipListSet<String> getCachedFields_AllPart_Brands() {
 
       if (_allPart_Brands == null) {
@@ -561,21 +533,27 @@ public class EquipmentManager {
       return _allPart_Models;
    }
 
-   public static ConcurrentSkipListSet<String> getCachedFields_AllPart_PriceUnits() {
+   public static ConcurrentSkipListSet<String> getCachedFields_AllPriceUnits() {
 
-      if (_allPart_PriceUnits == null) {
+      if (_allPriceUnits == null) {
 
          synchronized (DB_LOCK) {
 
             // recheck again, another thread could have it created
-            if (_allPart_PriceUnits == null) {
+            if (_allPriceUnits == null) {
 
-               _allPart_PriceUnits = TourDatabase.getDistinctValues(TourDatabase.TABLE_EQUIPMENT_PART, "priceUnit"); //$NON-NLS-1$
+               _allPriceUnits = TourDatabase.getDistinctValues(
+
+                     "priceUnit", //$NON-NLS-1$
+
+                     TourDatabase.TABLE_EQUIPMENT,
+                     TourDatabase.TABLE_EQUIPMENT_PART,
+                     TourDatabase.TABLE_EQUIPMENT_SERVICE);
             }
          }
       }
 
-      return _allPart_PriceUnits;
+      return _allPriceUnits;
    }
 
    public static ConcurrentSkipListSet<String> getCachedFields_AllService_Names() {
@@ -593,23 +571,6 @@ public class EquipmentManager {
       }
 
       return _allService_Names;
-   }
-
-   public static ConcurrentSkipListSet<String> getCachedFields_AllService_PriceUnits() {
-
-      if (_allService_PriceUnits == null) {
-
-         synchronized (DB_LOCK) {
-
-            // recheck again, another thread could have it created
-            if (_allService_PriceUnits == null) {
-
-               _allService_PriceUnits = TourDatabase.getDistinctValues(TourDatabase.TABLE_EQUIPMENT_SERVICE, "priceUnit"); //$NON-NLS-1$
-            }
-         }
-      }
-
-      return _allService_PriceUnits;
    }
 
    /**

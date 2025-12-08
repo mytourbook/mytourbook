@@ -249,6 +249,7 @@ public class DialogEquipmentService extends TitleAreaDialog {
                // autocomplete combo
                _comboPriceUnit = new Combo(containerWeight, SWT.BORDER | SWT.FLAT);
                _comboPriceUnit.setText(UI.EMPTY_STRING);
+               _comboPriceUnit.setToolTipText("Currency");
                _comboPriceUnit.addModifyListener(_defaultModifyListener);
 
                GridDataFactory.fillDefaults()
@@ -306,7 +307,7 @@ public class DialogEquipmentService extends TitleAreaDialog {
       }
 
       // fill price unit combobox
-      final ConcurrentSkipListSet<String> allPriceUnits = EquipmentManager.getCachedFields_AllService_PriceUnits();
+      final ConcurrentSkipListSet<String> allPriceUnits = EquipmentManager.getCachedFields_AllPriceUnits();
 
       for (final String priceUnit : allPriceUnits) {
          if (priceUnit != null) {
