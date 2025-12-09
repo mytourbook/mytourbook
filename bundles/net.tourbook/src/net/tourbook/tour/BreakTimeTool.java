@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2011, 2025 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -18,6 +18,7 @@ package net.tourbook.tour;
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.CommonActivator;
+import net.tourbook.common.UI;
 import net.tourbook.common.preferences.ICommonPreferences;
 import net.tourbook.data.TourData;
 import net.tourbook.preferences.ITourbookPreferences;
@@ -27,9 +28,11 @@ import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
 
 /**
- * This class contains all data which are needed to compute tour break time.
+ * This class contains all data which are needed to compute tour break time
  */
 public class BreakTimeTool {
+
+   private static final char  NL                                   = UI.NEW_LINE;
 
    private static String      _prefBreakTimeMethodId;
    private static float       _prefMinAvgSpeedAS;
@@ -62,7 +65,7 @@ public class BreakTimeTool {
    private static boolean                _isPrefSet;
 
    /**
-    * method how break time is computed
+    * Method how break time is computed
     */
    public String                         breakTimeMethodId;
 
@@ -187,6 +190,16 @@ public class BreakTimeTool {
                                                                  final float minAvgSpeed,
                                                                  final float minSliceSpeed,
                                                                  final int minSliceTime) {
+
+      System.out.println(UI.timeStamp() + NL
+
+            + "computeBreakTimeByAvgSliceSpeed() " + NL
+
+            + " minAvgSpeed   " + minAvgSpeed + NL
+            + " minSliceSpeed " + minSliceSpeed + NL
+            + " minSliceTime  " + minSliceTime + NL //
+      );
+// TODO remove SYSTEM.OUT.PRINTLN
 
       final int[] timeSerie = tourData.timeSerie;
       final float[] distanceSerie = tourData.getMetricDistanceSerie();
@@ -399,12 +412,14 @@ public class BreakTimeTool {
       checkPrefValues();
 
       return new BreakTimeTool(
+
             _prefBreakTimeMethodId,
             _prefShortestTime,
             _prefMaxDistance,
             _prefMinSliceSpeed,
             _prefMinAvgSpeed,
             _prefSliceDiff,
+
             _prefMinAvgSpeedAS,
             _prefMinSliceSpeedAS,
             _prefMinSliceTimeAS);
@@ -412,18 +427,41 @@ public class BreakTimeTool {
 
    private static void updatePrefValues() {
 
-      _prefBreakTimeMethodId = _prefStore.getString(ITourbookPreferences.BREAK_TIME_METHOD2);
+// SET_FORMATTING_OFF
 
-      _prefMinAvgSpeedAS = _prefStore.getFloat(ITourbookPreferences.BREAK_TIME_MIN_AVG_SPEED_AS);
-      _prefMinSliceSpeedAS = _prefStore.getFloat(ITourbookPreferences.BREAK_TIME_MIN_SLICE_SPEED_AS);
-      _prefMinSliceTimeAS = _prefStore.getInt(ITourbookPreferences.BREAK_TIME_MIN_SLICE_TIME_AS);
+      _prefBreakTimeMethodId  = _prefStore.getString  (ITourbookPreferences.BREAK_TIME_METHOD2);
 
-      _prefMinAvgSpeed = _prefStore.getFloat(ITourbookPreferences.BREAK_TIME_MIN_AVG_SPEED);
-      _prefMinSliceSpeed = _prefStore.getFloat(ITourbookPreferences.BREAK_TIME_MIN_SLICE_SPEED);
+      _prefMinAvgSpeedAS      = _prefStore.getFloat   (ITourbookPreferences.BREAK_TIME_MIN_AVG_SPEED_AS);
+      _prefMinSliceSpeedAS    = _prefStore.getFloat   (ITourbookPreferences.BREAK_TIME_MIN_SLICE_SPEED_AS);
+      _prefMinSliceTimeAS     = _prefStore.getInt     (ITourbookPreferences.BREAK_TIME_MIN_SLICE_TIME_AS);
 
-      _prefShortestTime = _prefStore.getInt(ITourbookPreferences.BREAK_TIME_SHORTEST_TIME);
-      _prefMaxDistance = _prefStore.getFloat(ITourbookPreferences.BREAK_TIME_MAX_DISTANCE);
-      _prefSliceDiff = _prefStore.getInt(ITourbookPreferences.BREAK_TIME_SLICE_DIFF);
+      _prefMinAvgSpeed        = _prefStore.getFloat   (ITourbookPreferences.BREAK_TIME_MIN_AVG_SPEED);
+      _prefMinSliceSpeed      = _prefStore.getFloat   (ITourbookPreferences.BREAK_TIME_MIN_SLICE_SPEED);
+
+      _prefShortestTime       = _prefStore.getInt     (ITourbookPreferences.BREAK_TIME_SHORTEST_TIME);
+      _prefMaxDistance        = _prefStore.getFloat   (ITourbookPreferences.BREAK_TIME_MAX_DISTANCE);
+      _prefSliceDiff          = _prefStore.getInt     (ITourbookPreferences.BREAK_TIME_SLICE_DIFF);
+
+// SET_FORMATTING_ON
+   }
+
+   @Override
+   public String toString() {
+
+      return UI.EMPTY_STRING
+
+            + "BreakTimeTool"
+
+            + " breakTimeMethodId      = " + breakTimeMethodId + NL //              //$NON-NLS-1$
+            + " breakShortestTime      = " + breakShortestTime + NL //              //$NON-NLS-1$
+            + " breakMaxDistance       = " + breakMaxDistance + NL //               //$NON-NLS-1$
+            + " breakSliceDiff         = " + breakSliceDiff + NL //                 //$NON-NLS-1$
+            + " breakMinSliceSpeed     = " + breakMinSliceSpeed + NL //             //$NON-NLS-1$
+            + " breakMinAvgSpeed       = " + breakMinAvgSpeed + NL //               //$NON-NLS-1$
+            + " breakMinAvgSpeedAS     = " + breakMinAvgSpeedAS + NL //             //$NON-NLS-1$
+            + " breakMinSliceSpeedAS   = " + breakMinSliceSpeedAS + NL //           //$NON-NLS-1$
+            + " breakMinSliceTimeAS    = " + breakMinSliceTimeAS + NL //            //$NON-NLS-1$
+      ;
    }
 
 }

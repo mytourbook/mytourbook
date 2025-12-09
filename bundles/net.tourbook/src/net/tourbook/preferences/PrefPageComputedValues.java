@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
+ * Copyright (C) 2009, 2025 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -14,8 +14,6 @@
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
 package net.tourbook.preferences;
-
-import static org.eclipse.swt.events.SelectionListener.widgetSelectedAdapter;
 
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
@@ -145,9 +143,12 @@ public class PrefPageComputedValues extends PreferencePage implements IWorkbench
    private Spinner           _spinnerBreakMinSliceSpeed;
    private Spinner           _spinnerBreakMinAvgSpeed;
    private Spinner           _spinnerBreakSliceDiff;
+
+   /** AS ... Average + Slice */
    private Spinner           _spinnerBreakMinAvgSpeedAS;
    private Spinner           _spinnerBreakMinSliceSpeedAS;
    private Spinner           _spinnerBreakMinSliceTimeAS;
+
    private Spinner           _spinnerCadenceDelimiter;
    private Spinner           _spinnerDPTolerance;
 
@@ -312,7 +313,7 @@ public class PrefPageComputedValues extends PreferencePage implements IWorkbench
 
          // combo: break method
          _comboBreakMethod = new Combo(container, SWT.READ_ONLY | SWT.BORDER);
-         _comboBreakMethod.addSelectionListener(widgetSelectedAdapter(
+         _comboBreakMethod.addSelectionListener(SelectionListener.widgetSelectedAdapter(
                selectionEvent -> {
 
                   updateUIShowSelectedBreakTimeMethod();
@@ -360,7 +361,7 @@ public class PrefPageComputedValues extends PreferencePage implements IWorkbench
                null);
 
          /*
-          * compute speed values for all tours
+          * Compute speed values for all tours
           */
          final Composite btnContainer = new Composite(container, SWT.NONE);
          GridDataFactory.fillDefaults().span(3, 1).applyTo(btnContainer);
@@ -368,11 +369,14 @@ public class PrefPageComputedValues extends PreferencePage implements IWorkbench
          {
             // button: compute computed values
             final Button btnComputeValues = new Button(btnContainer, SWT.NONE);
-            GridDataFactory.fillDefaults().indent(0, DEFAULT_V_DISTANCE_PARAGRAPH).applyTo(btnComputeValues);
+
             btnComputeValues.setText(Messages.Compute_BreakTime_Button_ComputeAllTours);
             btnComputeValues.setToolTipText(Messages.Compute_BreakTime_Button_ComputeAllTours_Tooltip);
-            btnComputeValues.addSelectionListener(widgetSelectedAdapter(
+
+            btnComputeValues.addSelectionListener(SelectionListener.widgetSelectedAdapter(
                   selectionEvent -> onComputeBreakTimeValues()));
+
+            GridDataFactory.fillDefaults().indent(0, DEFAULT_V_DISTANCE_PARAGRAPH).applyTo(btnComputeValues);
          }
       }
 
@@ -715,7 +719,7 @@ public class PrefPageComputedValues extends PreferencePage implements IWorkbench
             final Link linkDP = new Link(dpContainer, SWT.NONE);
             linkDP.setText(Messages.Compute_TourValue_ElevationGain_Link_DBTolerance);
             linkDP.setToolTipText(Messages.Tour_Segmenter_Label_DPTolerance_Tooltip);
-            linkDP.addSelectionListener(widgetSelectedAdapter(
+            linkDP.addSelectionListener(SelectionListener.widgetSelectedAdapter(
                   selectionEvent -> WEB.openUrl(PrefPageComputedValues.URL_DOUGLAS_PEUCKER_ALGORITHM)));
 
             // spinner: minimum altitude
@@ -769,7 +773,7 @@ public class PrefPageComputedValues extends PreferencePage implements IWorkbench
             final Button btnComputeValues = new Button(btnContainer, SWT.NONE);
             btnComputeValues.setText(Messages.compute_tourValueElevation_button_computeValues);
             btnComputeValues.setToolTipText(Messages.Compute_TourValue_ElevationGain_Button_ComputeValues_Tooltip);
-            btnComputeValues.addSelectionListener(widgetSelectedAdapter(
+            btnComputeValues.addSelectionListener(SelectionListener.widgetSelectedAdapter(
                   selectionEvent -> onComputeElevationGainValues()));
             GridDataFactory.fillDefaults()
                   .indent(0, DEFAULT_V_DISTANCE_PARAGRAPH)
@@ -793,8 +797,7 @@ public class PrefPageComputedValues extends PreferencePage implements IWorkbench
 
          // spinner: cadence zone delimiter
          _spinnerCadenceDelimiter = new Spinner(container, SWT.BORDER);
-         GridDataFactory.fillDefaults() //
-               .applyTo(_spinnerCadenceDelimiter);
+         GridDataFactory.fillDefaults().applyTo(_spinnerCadenceDelimiter);
          _spinnerCadenceDelimiter.setMinimum(0);
          _spinnerCadenceDelimiter.setMaximum(200);
          _spinnerCadenceDelimiter.addSelectionListener(_selectionListener);
@@ -827,7 +830,7 @@ public class PrefPageComputedValues extends PreferencePage implements IWorkbench
       final Button buttonComputeTimes = new Button(container, SWT.NONE);
       GridDataFactory.fillDefaults().span(3, 0).indent(0, 50).align(SWT.BEGINNING, SWT.FILL).applyTo(buttonComputeTimes);
       buttonComputeTimes.setText(Messages.Compute_CadenceZonesTimes_ComputeAllTours);
-      buttonComputeTimes.addSelectionListener(widgetSelectedAdapter(
+      buttonComputeTimes.addSelectionListener(SelectionListener.widgetSelectedAdapter(
             selectionEvent -> onComputeCadenceZonesTimeValues()));
 
       return container;
@@ -896,19 +899,21 @@ public class PrefPageComputedValues extends PreferencePage implements IWorkbench
 
       _initialUnitHashCode = UI.UNIT_HASH_CODE;
 
-      _selectionListener = widgetSelectedAdapter(
-            selectionEvent -> {
+      _selectionListener = SelectionListener.widgetSelectedAdapter(selectionEvent -> {
 
-               if (_isUpdateUI) {
-                  return;
-               }
-               onModifyComputedValuePreference();
-            });
-
-      _spinnerMouseWheelListener = mouseEvent -> {
          if (_isUpdateUI) {
             return;
          }
+
+         onModifyComputedValuePreference();
+      });
+
+      _spinnerMouseWheelListener = mouseEvent -> {
+
+         if (_isUpdateUI) {
+            return;
+         }
+
          Util.adjustSpinnerValueOnMouseScroll(mouseEvent);
          onModifyComputedValuePreference();
       };
@@ -920,12 +925,15 @@ public class PrefPageComputedValues extends PreferencePage implements IWorkbench
       return super.okToLeave();
    }
 
+   /**
+    * Compute break time values for ALL tours !!!
+    */
    private void onComputeBreakTimeValues() {
 
-      if (MessageDialog.openConfirm(
-            Display.getCurrent().getActiveShell(),
+      if (MessageDialog.openConfirm(Display.getCurrent().getActiveShell(),
             Messages.Compute_BreakTime_Dialog_ComputeForAllTours_Title,
             Messages.Compute_BreakTime_Dialog_ComputeForAllTours_Message) == false) {
+
          return;
       }
 
@@ -958,7 +966,7 @@ public class PrefPageComputedValues extends PreferencePage implements IWorkbench
          public String getResultText() {
 
             return NLS.bind(
-                  Messages.Compute_BreakTime_ForAllTour_Job_Result, //
+                  Messages.Compute_BreakTime_ForAllTour_Job_Result,
                   new Object[] {
                         UI.format_hh_mm_ss(oldBreakTime[0]),
                         UI.format_hh_mm_ss(newBreakTime[0]), });
@@ -979,7 +987,7 @@ public class PrefPageComputedValues extends PreferencePage implements IWorkbench
                newBreakTime[0] += tourElapsedTime - tourMovingTime;
 
                subTaskText = NLS.bind(
-                     Messages.Compute_BreakTime_ForAllTour_Job_SubTask, //
+                     Messages.Compute_BreakTime_ForAllTour_Job_SubTask,
                      new Object[] {
                            UI.format_hh_mm_ss(oldBreakTime[0]),
                            UI.format_hh_mm_ss(newBreakTime[0]), });
@@ -996,10 +1004,10 @@ public class PrefPageComputedValues extends PreferencePage implements IWorkbench
 
    private void onComputeCadenceZonesTimeValues() {
 
-      if (MessageDialog.openConfirm(
-            Display.getCurrent().getActiveShell(),
+      if (MessageDialog.openConfirm(Display.getCurrent().getActiveShell(),
             Messages.Compute_CadenceZonesTimes_Dialog_ComputeForAllTours_Title,
             Messages.Compute_CadenceZonesTimes_Dialog_ComputeForAllTours_Message) == false) {
+
          return;
       }
 
@@ -1074,10 +1082,10 @@ public class PrefPageComputedValues extends PreferencePage implements IWorkbench
       final String dpToleranceWithUnit = _nf1.format(prefDPTolerance) + UI.SPACE1
             + UI.UNIT_LABEL_ELEVATION;
 
-      if (MessageDialog.openConfirm(
-            Display.getCurrent().getActiveShell(),
+      if (MessageDialog.openConfirm(Display.getCurrent().getActiveShell(),
             Messages.compute_tourValueElevation_dlg_computeValues_title,
             NLS.bind(Messages.Compute_TourValue_ElevationGain_Dlg_ComputeValues_Message, dpToleranceWithUnit)) == false) {
+
          return;
       }
 
@@ -1195,50 +1203,46 @@ public class PrefPageComputedValues extends PreferencePage implements IWorkbench
          _isUpdateUI = true;
          {
             /*
-             * break method
+             * Break method
              */
             final String prefBreakTimeMethod = _prefStore.getDefaultString(ITourbookPreferences.BREAK_TIME_METHOD2);
             selectBreakMethod(prefBreakTimeMethod);
 
-            /*
-             * break by avg+slice speed
-             */
-            final float prefMinAvgSpeedAS = _prefStore.getDefaultFloat(//
-                  ITourbookPreferences.BREAK_TIME_MIN_AVG_SPEED_AS);
-            final float prefMinSliceSpeedAS = _prefStore.getDefaultFloat(//
-                  ITourbookPreferences.BREAK_TIME_MIN_SLICE_SPEED_AS);
-            final int prefMinSliceTimeAS = _prefStore.getDefaultInt(//
-                  ITourbookPreferences.BREAK_TIME_MIN_SLICE_TIME_AS);
-
-            _spinnerBreakMinAvgSpeedAS.setSelection(//
-                  (int) (prefMinAvgSpeedAS * SPEED_DIGIT_VALUE / UI.UNIT_VALUE_DISTANCE));
-            _spinnerBreakMinSliceSpeedAS.setSelection(//
-                  (int) (prefMinSliceSpeedAS * SPEED_DIGIT_VALUE / UI.UNIT_VALUE_DISTANCE));
-            _spinnerBreakMinSliceTimeAS.setSelection(prefMinSliceTimeAS);
+// SET_FORMATTING_OFF
 
             /*
-             * break by speed
+             * Break by avg+slice speed (AS)
              */
-            final float prefMinSliceSpeed = _prefStore
-                  .getDefaultFloat(ITourbookPreferences.BREAK_TIME_MIN_SLICE_SPEED);
-            final float prefMinAvgSpeed = _prefStore.getDefaultFloat(ITourbookPreferences.BREAK_TIME_MIN_AVG_SPEED);
+            final float prefMinAvgSpeedAS    = _prefStore.getDefaultFloat(ITourbookPreferences.BREAK_TIME_MIN_AVG_SPEED_AS);
+            final float prefMinSliceSpeedAS  = _prefStore.getDefaultFloat(ITourbookPreferences.BREAK_TIME_MIN_SLICE_SPEED_AS);
+            final int prefMinSliceTimeAS     = _prefStore.getDefaultInt(ITourbookPreferences.BREAK_TIME_MIN_SLICE_TIME_AS);
 
-            _spinnerBreakMinSliceSpeed.setSelection(//
-                  (int) (prefMinSliceSpeed * SPEED_DIGIT_VALUE * UI.UNIT_VALUE_DISTANCE));
-            _spinnerBreakMinAvgSpeed.setSelection(//
-                  (int) (prefMinAvgSpeed * SPEED_DIGIT_VALUE * UI.UNIT_VALUE_DISTANCE));
+            _spinnerBreakMinAvgSpeedAS       .setSelection((int) (prefMinAvgSpeedAS * SPEED_DIGIT_VALUE / UI.UNIT_VALUE_DISTANCE));
+            _spinnerBreakMinSliceSpeedAS     .setSelection((int) (prefMinSliceSpeedAS * SPEED_DIGIT_VALUE / UI.UNIT_VALUE_DISTANCE));
+            _spinnerBreakMinSliceTimeAS      .setSelection(prefMinSliceTimeAS);
 
             /*
-             * break time by time/distance
+             * Break by speed
              */
-            final int prefShortestTime = _prefStore.getDefaultInt(ITourbookPreferences.BREAK_TIME_SHORTEST_TIME);
-            final float prefMaxDistance = _prefStore.getDefaultFloat(ITourbookPreferences.BREAK_TIME_MAX_DISTANCE);
-            final int prefSliceDiff = _prefStore.getDefaultInt(ITourbookPreferences.BREAK_TIME_SLICE_DIFF);
-            final float breakDistance = prefMaxDistance / UI.UNIT_VALUE_DISTANCE_SMALL;
+            final float prefMinSliceSpeed    = _prefStore.getDefaultFloat(ITourbookPreferences.BREAK_TIME_MIN_SLICE_SPEED);
+            final float prefMinAvgSpeed      = _prefStore.getDefaultFloat(ITourbookPreferences.BREAK_TIME_MIN_AVG_SPEED);
 
-            _spinnerBreakShortestTime.setSelection(prefShortestTime);
-            _spinnerBreakMaxDistance.setSelection((int) (breakDistance + 0.5));
-            _spinnerBreakSliceDiff.setSelection(prefSliceDiff);
+            _spinnerBreakMinSliceSpeed       .setSelection((int) (prefMinSliceSpeed * SPEED_DIGIT_VALUE * UI.UNIT_VALUE_DISTANCE));
+            _spinnerBreakMinAvgSpeed         .setSelection((int) (prefMinAvgSpeed * SPEED_DIGIT_VALUE * UI.UNIT_VALUE_DISTANCE));
+
+            /*
+             * Break by time/distance
+             */
+            final int prefShortestTime       = _prefStore.getDefaultInt(ITourbookPreferences.BREAK_TIME_SHORTEST_TIME);
+            final float prefMaxDistance      = _prefStore.getDefaultFloat(ITourbookPreferences.BREAK_TIME_MAX_DISTANCE);
+            final int prefSliceDiff          = _prefStore.getDefaultInt(ITourbookPreferences.BREAK_TIME_SLICE_DIFF);
+            final float breakDistance        = prefMaxDistance / UI.UNIT_VALUE_DISTANCE_SMALL;
+
+            _spinnerBreakShortestTime        .setSelection(prefShortestTime);
+            _spinnerBreakMaxDistance         .setSelection((int) (breakDistance + 0.5));
+            _spinnerBreakSliceDiff           .setSelection(prefSliceDiff);
+
+// SET_FORMATTING_ON
 
             updateUIShowSelectedBreakTimeMethod();
          }
@@ -1289,38 +1293,37 @@ public class PrefPageComputedValues extends PreferencePage implements IWorkbench
          final String prefBreakTimeMethod = _prefStore.getString(ITourbookPreferences.BREAK_TIME_METHOD2);
          selectBreakMethod(prefBreakTimeMethod);
 
+// SET_FORMATTING_OFF
          /*
-          * break by avg+slice speed
+          * Break by avg+slice speed
           */
-         final float prefMinAvgSpeedAS = _prefStore.getFloat(ITourbookPreferences.BREAK_TIME_MIN_AVG_SPEED_AS);
-         final float prefMinSliceSpeedAS = _prefStore.getFloat(ITourbookPreferences.BREAK_TIME_MIN_SLICE_SPEED_AS);
-         final int prefMinSliceTimeAS = _prefStore.getInt(ITourbookPreferences.BREAK_TIME_MIN_SLICE_TIME_AS);
-         _spinnerBreakMinAvgSpeedAS.setSelection(//
-               (int) (prefMinAvgSpeedAS * SPEED_DIGIT_VALUE / UI.UNIT_VALUE_DISTANCE));
-         _spinnerBreakMinSliceSpeedAS.setSelection(//
-               (int) (prefMinSliceSpeedAS * SPEED_DIGIT_VALUE / UI.UNIT_VALUE_DISTANCE));
-         _spinnerBreakMinSliceTimeAS.setSelection(prefMinSliceTimeAS);
+         final float prefMinAvgSpeedAS    = _prefStore.getFloat(ITourbookPreferences.BREAK_TIME_MIN_AVG_SPEED_AS);
+         final float prefMinSliceSpeedAS  = _prefStore.getFloat(ITourbookPreferences.BREAK_TIME_MIN_SLICE_SPEED_AS);
+         final int prefMinSliceTimeAS     = _prefStore.getInt(ITourbookPreferences.BREAK_TIME_MIN_SLICE_TIME_AS);
+         _spinnerBreakMinAvgSpeedAS       .setSelection((int) (prefMinAvgSpeedAS * SPEED_DIGIT_VALUE / UI.UNIT_VALUE_DISTANCE));
+         _spinnerBreakMinSliceSpeedAS     .setSelection((int) (prefMinSliceSpeedAS * SPEED_DIGIT_VALUE / UI.UNIT_VALUE_DISTANCE));
+         _spinnerBreakMinSliceTimeAS      .setSelection(prefMinSliceTimeAS);
 
          /*
-          * break by speed
+          * Break by speed
           */
-         final float prefMinSliceSpeed = _prefStore.getFloat(ITourbookPreferences.BREAK_TIME_MIN_SLICE_SPEED);
-         final float prefMinAvgSpeed = _prefStore.getFloat(ITourbookPreferences.BREAK_TIME_MIN_AVG_SPEED);
-         _spinnerBreakMinSliceSpeed.setSelection(//
-               (int) (prefMinSliceSpeed * SPEED_DIGIT_VALUE * UI.UNIT_VALUE_DISTANCE));
-         _spinnerBreakMinAvgSpeed.setSelection(//
-               (int) (prefMinAvgSpeed * SPEED_DIGIT_VALUE * UI.UNIT_VALUE_DISTANCE));
+         final float prefMinSliceSpeed    = _prefStore.getFloat(ITourbookPreferences.BREAK_TIME_MIN_SLICE_SPEED);
+         final float prefMinAvgSpeed      = _prefStore.getFloat(ITourbookPreferences.BREAK_TIME_MIN_AVG_SPEED);
+         _spinnerBreakMinSliceSpeed       .setSelection((int) (prefMinSliceSpeed * SPEED_DIGIT_VALUE * UI.UNIT_VALUE_DISTANCE));
+         _spinnerBreakMinAvgSpeed         .setSelection((int) (prefMinAvgSpeed * SPEED_DIGIT_VALUE * UI.UNIT_VALUE_DISTANCE));
 
          /*
-          * break time by time/distance
+          * Break by time/distance
           */
-         final int prefShortestTime = _prefStore.getInt(ITourbookPreferences.BREAK_TIME_SHORTEST_TIME);
-         final float prefMaxDistance = _prefStore.getFloat(ITourbookPreferences.BREAK_TIME_MAX_DISTANCE);
-         final int prefSliceDiff = _prefStore.getInt(ITourbookPreferences.BREAK_TIME_SLICE_DIFF);
-         final float breakDistance = prefMaxDistance / UI.UNIT_VALUE_DISTANCE_SMALL;
-         _spinnerBreakShortestTime.setSelection(prefShortestTime);
-         _spinnerBreakMaxDistance.setSelection((int) (breakDistance + 0.5));
-         _spinnerBreakSliceDiff.setSelection(prefSliceDiff);
+         final int prefShortestTime       = _prefStore.getInt(ITourbookPreferences.BREAK_TIME_SHORTEST_TIME);
+         final float prefMaxDistance      = _prefStore.getFloat(ITourbookPreferences.BREAK_TIME_MAX_DISTANCE);
+         final int prefSliceDiff          = _prefStore.getInt(ITourbookPreferences.BREAK_TIME_SLICE_DIFF);
+         final float breakDistance        = prefMaxDistance / UI.UNIT_VALUE_DISTANCE_SMALL;
+         _spinnerBreakShortestTime        .setSelection(prefShortestTime);
+         _spinnerBreakMaxDistance         .setSelection((int) (breakDistance + 0.5));
+         _spinnerBreakSliceDiff           .setSelection(prefSliceDiff);
+
+// SET_FORMATTING_ON
 
          /*
           * Folder
@@ -1368,14 +1371,10 @@ public class PrefPageComputedValues extends PreferencePage implements IWorkbench
       _prefStore.setValue(ITourbookPreferences.BREAK_TIME_METHOD2, getSelectedBreakMethod().methodId);
 
       /*
-       * break by average+slice speed
+       * Break by average+slice speed
        */
-      final float breakMinAvgSpeedAS = _spinnerBreakMinAvgSpeedAS.getSelection()
-            / SPEED_DIGIT_VALUE
-            * UI.UNIT_VALUE_DISTANCE;
-      final float breakMinSliceSpeedAS = _spinnerBreakMinSliceSpeedAS.getSelection()
-            / SPEED_DIGIT_VALUE
-            * UI.UNIT_VALUE_DISTANCE;
+      final float breakMinAvgSpeedAS = _spinnerBreakMinAvgSpeedAS.getSelection() / SPEED_DIGIT_VALUE * UI.UNIT_VALUE_DISTANCE;
+      final float breakMinSliceSpeedAS = _spinnerBreakMinSliceSpeedAS.getSelection() / SPEED_DIGIT_VALUE * UI.UNIT_VALUE_DISTANCE;
       final int breakMinSliceTimeAS = _spinnerBreakMinSliceTimeAS.getSelection();
 
       _prefStore.setValue(ITourbookPreferences.BREAK_TIME_MIN_AVG_SPEED_AS, breakMinAvgSpeedAS);
@@ -1383,23 +1382,19 @@ public class PrefPageComputedValues extends PreferencePage implements IWorkbench
       _prefStore.setValue(ITourbookPreferences.BREAK_TIME_MIN_SLICE_TIME_AS, breakMinSliceTimeAS);
 
       /*
-       * break by slice speed
+       * Break by slice speed
        */
-      final float breakMinSliceSpeed = _spinnerBreakMinSliceSpeed.getSelection()
-            / SPEED_DIGIT_VALUE
-            / UI.UNIT_VALUE_DISTANCE;
+      final float breakMinSliceSpeed = _spinnerBreakMinSliceSpeed.getSelection() / SPEED_DIGIT_VALUE / UI.UNIT_VALUE_DISTANCE;
       _prefStore.setValue(ITourbookPreferences.BREAK_TIME_MIN_SLICE_SPEED, breakMinSliceSpeed);
 
       /*
-       * break by avg speed
+       * Break by avg speed
        */
-      final float breakMinAvgSpeed = _spinnerBreakMinAvgSpeed.getSelection()
-            / SPEED_DIGIT_VALUE
-            / UI.UNIT_VALUE_DISTANCE;
+      final float breakMinAvgSpeed = _spinnerBreakMinAvgSpeed.getSelection() / SPEED_DIGIT_VALUE / UI.UNIT_VALUE_DISTANCE;
       _prefStore.setValue(ITourbookPreferences.BREAK_TIME_MIN_AVG_SPEED, breakMinAvgSpeed);
 
       /*
-       * break by time/distance
+       * Break by time/distance
        */
       _prefStore.setValue(ITourbookPreferences.BREAK_TIME_SHORTEST_TIME, _spinnerBreakShortestTime.getSelection());
 
@@ -1407,11 +1402,6 @@ public class PrefPageComputedValues extends PreferencePage implements IWorkbench
       _prefStore.setValue(ITourbookPreferences.BREAK_TIME_MAX_DISTANCE, breakDistance);
 
       _prefStore.setValue(ITourbookPreferences.BREAK_TIME_SLICE_DIFF, _spinnerBreakSliceDiff.getSelection());
-
-      /*
-       * notify break time listener
-       */
-      _prefStore.setValue(ITourbookPreferences.BREAK_TIME_IS_MODIFIED, Math.random());
 
       /*
        * Cadence delimiter value
@@ -1422,6 +1412,11 @@ public class PrefPageComputedValues extends PreferencePage implements IWorkbench
        * Pace/Speed
        */
       _prefStore.setValue(ITourbookPreferences.APPEARANCE_IS_PACEANDSPEED_FROM_RECORDED_TIME, _rdoDeviceTime_Recorded.getSelection());
+
+      /**
+       * Notify break time listener
+       */
+      _prefStore.setValue(ITourbookPreferences.BREAK_TIME_IS_MODIFIED, Math.random());
    }
 
    private void saveUIState() {
