@@ -77,7 +77,7 @@ public class Images {
    public static final String EditRow                              = "edit-row.svg";                                //$NON-NLS-1$
    public static final String EditTour                             = "tour-editor.svg";                             //$NON-NLS-1$
    public static final String Equipment                            = "equipment.svg";                               //$NON-NLS-1$
-   public static final String Equipment_All                        = "equipment-all.svg";                           //$NON-NLS-1$
+   public static final String Equipment_Only                       = "equipment-only.svg";                          //$NON-NLS-1$
    public static final String Equipment_Part                       = "equipment-part.svg";                          //$NON-NLS-1$
    public static final String Equipment_Part_New                   = "equipment-part-new.svg";                      //$NON-NLS-1$
    public static final String Equipment_Service                    = "equipment-service.svg";                       //$NON-NLS-1$

@@ -55,17 +55,17 @@
   <g
      id="layer1"
      style="display:inline"
-     transform="translate(-80,-19)">
+     transform="translate(-75,-19)">
     <rect
        y="19"
-       x="80"
+       x="75"
        height="16.000015"
        width="15.999991"
        id="rect6561-8-1-9-9-5-5-9-9-1-3-94-1-6-6-4-5-4-9-5-9-5-4-0-0"
        style="display:inline;opacity:0.99;fill:none;stroke:none" />
     <path
        id="rect9-4-8-8"
-       style="display:inline;fill:#92e000;fill-opacity:1;stroke:#4e7700;stroke-width:0.5;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:3;stroke-dasharray:none;stroke-opacity:1"
-       d="M 93.822334,29.73603 87.499962,23.355192 81.177588,29.73603" />
+       style="display:inline;fill:#e9e61f;fill-opacity:1;stroke:#79770c;stroke-width:0.5;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:3;stroke-dasharray:none;stroke-opacity:1"
+       d="M 88.822334,29.73603 82.499962,23.355192 76.177588,29.73603" />
   </g>
 </svg>

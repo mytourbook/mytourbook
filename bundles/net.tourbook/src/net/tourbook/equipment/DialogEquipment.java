@@ -80,7 +80,7 @@ public class DialogEquipment extends TitleAreaDialog {
    /*
     * UI resources
     */
-   private Image _imageDialog = TourbookPlugin.getImageDescriptor(Images.Equipment).createImage();
+   private Image _imageDialog = TourbookPlugin.getImageDescriptor(Images.Equipment_Only).createImage();
 
    /*
     * UI controls

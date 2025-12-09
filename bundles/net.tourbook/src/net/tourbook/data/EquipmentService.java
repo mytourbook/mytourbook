@@ -89,20 +89,21 @@ public class EquipmentService implements Cloneable, Serializable {
    @Override
    public EquipmentService clone() {
 
-      EquipmentService clonedEquipment = null;
+      EquipmentService clonedService = null;
 
       try {
 
-         clonedEquipment = (EquipmentService) super.clone();
+         clonedService = (EquipmentService) super.clone();
 
       } catch (final CloneNotSupportedException e) {
 
          e.printStackTrace();
       }
 
-      clonedEquipment._createId = _createCounter.incrementAndGet();
+      clonedService.serviceId = TourDatabase.ENTITY_IS_NOT_SAVED;
+      clonedService._createId = _createCounter.incrementAndGet();
 
-      return clonedEquipment;
+      return clonedService;
    }
 
    @Override

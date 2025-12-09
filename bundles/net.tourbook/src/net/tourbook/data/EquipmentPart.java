@@ -124,20 +124,21 @@ public class EquipmentPart implements Cloneable, Comparable<Object>, Serializabl
    @Override
    public EquipmentPart clone() {
 
-      EquipmentPart clonedEquipment = null;
+      EquipmentPart clonedPart = null;
 
       try {
 
-         clonedEquipment = (EquipmentPart) super.clone();
+         clonedPart = (EquipmentPart) super.clone();
 
       } catch (final CloneNotSupportedException e) {
 
          e.printStackTrace();
       }
 
-      clonedEquipment._createId = _createCounter.incrementAndGet();
+      clonedPart.partId = TourDatabase.ENTITY_IS_NOT_SAVED;
+      clonedPart._createId = _createCounter.incrementAndGet();
 
-      return clonedEquipment;
+      return clonedPart;
    }
 
    @Override

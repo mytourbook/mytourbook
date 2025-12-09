@@ -66,7 +66,9 @@ public class DialogEquipmentPart extends TitleAreaDialog {
     * New or cloned instance
     */
    private EquipmentPart                _part;
+   private Equipment                    _partEquipment;
 
+   private boolean                      _isDuplicatePart;
    private boolean                      _isInUIUpdate;
    private boolean                      _isNewPart;
 
@@ -107,17 +109,17 @@ public class DialogEquipmentPart extends TitleAreaDialog {
    private AutoComplete_ComboInputMT _autocomplete_Model;
    private AutoComplete_ComboInputMT _autocomplete_PriceUnit;
 
-   private Equipment                 _partEquipment;
-
    public DialogEquipmentPart(final Shell parentShell,
                               final Equipment equipment,
-                              final EquipmentPart part) {
+                              final EquipmentPart part,
+                              final boolean isDuplicatePart) {
 
       super(parentShell);
 
       _partEquipment = equipment;
 
       _isNewPart = part == null;
+      _isDuplicatePart = isDuplicatePart;
 
       if (_isNewPart) {
 
@@ -126,6 +128,14 @@ public class DialogEquipmentPart extends TitleAreaDialog {
       } else {
 
          _part = part.clone();
+
+         if (isDuplicatePart) {
+
+            // adjust date to today
+
+            _part.setDateBuilt(LocalDate.now().toEpochDay());
+            _part.setDateFirstUse(LocalDate.now().toEpochDay());
+         }
       }
 
       // make dialog resizable
@@ -147,9 +157,13 @@ public class DialogEquipmentPart extends TitleAreaDialog {
 
       super.create();
 
-      final String messageTitle = _isNewPart
-            ? "Create Equipment Part"
-            : "Edit Equipment Part";
+      final String messageTitle = _isDuplicatePart
+
+            ? "Duplicate Part"
+            : _isNewPart
+
+                  ? "Create Equipment Part"
+                  : "Edit Equipment Part";
 
       setTitle(messageTitle);
       setMessage(_part.getName());
@@ -553,6 +567,9 @@ public class DialogEquipmentPart extends TitleAreaDialog {
 
 // SET_FORMATTING_OFF
 
+      /*
+       * Set date default values
+       */
       LocalDate dateBuilt     = _part.getDateBuilt();
       LocalDate dateFirstUse  = _part.getDateFirstUse();
       LocalDate dateRetired   = _part.getDateRetired();

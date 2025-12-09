@@ -65,7 +65,9 @@ public class DialogEquipmentService extends TitleAreaDialog {
     * New or cloned instance
     */
    private EquipmentService             _service;
+   private Equipment                    _serviceEquipment;
 
+   private boolean                      _isDuplicateService;
    private boolean                      _isInUIUpdate;
    private boolean                      _isNewService;
 
@@ -100,15 +102,15 @@ public class DialogEquipmentService extends TitleAreaDialog {
    private AutoComplete_ComboInputMT _autocomplete_Name;
    private AutoComplete_ComboInputMT _autocomplete_PriceUnit;
 
-   private Equipment                 _serviceEquipment;
-
    public DialogEquipmentService(final Shell parentShell,
                                  final Equipment equipment,
-                                 final EquipmentService service) {
+                                 final EquipmentService service,
+                                 final boolean isDuplicate) {
 
       super(parentShell);
 
       _serviceEquipment = equipment;
+      _isDuplicateService = isDuplicate;
 
       _isNewService = service == null;
 
@@ -119,6 +121,13 @@ public class DialogEquipmentService extends TitleAreaDialog {
       } else {
 
          _service = service.clone();
+
+         if (isDuplicate) {
+
+            // adjust date to today
+
+            _service.setDate(LocalDate.now().toEpochDay());
+         }
       }
 
       // make dialog resizable
@@ -140,9 +149,11 @@ public class DialogEquipmentService extends TitleAreaDialog {
 
       super.create();
 
-      final String messageTitle = _isNewService
-            ? "Create Equipment Service"
-            : "Edit Equipment Service";
+      final String messageTitle =
+
+            _isDuplicateService ? "Duplicate Service" 
+                  : _isNewService ? "Create Equipment Service" 
+                  : "Edit Equipment Service";
 
       setTitle(messageTitle);
       setMessage(_service.getName());
@@ -176,12 +187,12 @@ public class DialogEquipmentService extends TitleAreaDialog {
 
       updateUIFromModel();
 
-      _comboName.setFocus();
-
       // ensure the UI is created
       _parent.getDisplay().asyncExec(() -> {
 
          enableControls();
+
+         _comboName.setFocus();
       });
 
       return dlgContainer;
