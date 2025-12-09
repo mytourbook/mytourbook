@@ -408,6 +408,8 @@ public interface ITourbookPreferences {
    public static final String BREAK_TIME_METHOD2                 = "BreakTime_Method2";                          //$NON-NLS-1$
 
    public static final String BREAK_TIME_IS_MODIFIED             = "BreakTime_IsModified";                       //$NON-NLS-1$
+
+   /** AS ... Average + Slice */
    public static final String BREAK_TIME_MIN_AVG_SPEED_AS        = "BreakTime_MinAvgSpeedAS";                    //$NON-NLS-1$
    public static final String BREAK_TIME_MIN_SLICE_SPEED_AS      = "BreakTime_MinSliceSpeedAS";                  //$NON-NLS-1$
    public static final String BREAK_TIME_MIN_SLICE_TIME_AS       = "BreakTime_MinSliceTimeAS";                   //$NON-NLS-1$
