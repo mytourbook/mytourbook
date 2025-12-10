@@ -70,7 +70,7 @@ public class EquipmentManager {
    private static ConcurrentSkipListSet<String> _allPart_Brands;
    private static ConcurrentSkipListSet<String> _allPart_Models;
    private static ConcurrentSkipListSet<String> _allService_Names;
-   
+
    private static ConcurrentSkipListSet<String> _allPriceUnits;
 
    /**
@@ -126,7 +126,7 @@ public class EquipmentManager {
          _allService_Names.clear();
          _allService_Names = null;
       }
-      
+
       if (_allPriceUnits != null) {
          _allPriceUnits.clear();
          _allPriceUnits = null;
@@ -189,7 +189,7 @@ public class EquipmentManager {
     *
     * @return Returns <code>true</code> when deletion was successful
     */
-   public static boolean equipment_Delete(final List<Equipment> allEquipment) {
+   public static boolean equipment_DeleteEquipment(final List<Equipment> allEquipment) {
 
       // ensure that a tour is NOT modified in the tour editor
       if (TourManager.isTourEditorModified()) {
@@ -244,7 +244,7 @@ public class EquipmentManager {
 
          BusyIndicator.showWhile(display, () -> {
 
-            if (equipment_Delete_SQL(allEquipment, sqlPartData, sqlServiceData)) {
+            if (equipment_DeleteEquipment_SQL(allEquipment, sqlPartData, sqlServiceData)) {
 
                clearAllEquipmentResourcesAndFireModifyEvent();
 
@@ -258,9 +258,9 @@ public class EquipmentManager {
       return returnValue[0];
    }
 
-   private static boolean equipment_Delete_SQL(final List<Equipment> allEquipment,
-                                               final SQLData sqlPartData,
-                                               final SQLData sqlServiceData) {
+   private static boolean equipment_DeleteEquipment_SQL(final List<Equipment> allEquipment,
+                                                        final SQLData sqlPartData,
+                                                        final SQLData sqlServiceData) {
 
       final boolean isPartAvailable = sqlPartData.getParameters().size() > 0;
       final boolean isServiceAvailable = sqlServiceData.getParameters().size() > 0;
@@ -386,6 +386,171 @@ public class EquipmentManager {
          Util.closeSql(prepStmt_Equipment);
          Util.closeSql(prepStmt_EquipmentPart);
          Util.closeSql(prepStmt_EquipmentService);
+      }
+
+      return returnResult;
+   }
+
+   public static boolean equipment_DeleteParts(final List<EquipmentPart> allParts) {
+
+      // ensure that a tour is NOT modified in the tour editor
+      if (TourManager.isTourEditorModified() || allParts.size() != 1) {
+         return false;
+      }
+
+      final EquipmentPart part = allParts.get(0);
+
+      final Display display = Display.getDefault();
+      final String dialogMessage = "Permanently delete part\n\n\"%s\" ?".formatted(part.getName());
+
+      // confirm deletion, show equipment name and number of tours which contain a equipment
+      final MessageDialog dialog = new MessageDialog(
+            display.getActiveShell(),
+            "Delete Part",
+            null,
+            dialogMessage,
+            MessageDialog.QUESTION,
+            new String[] {
+                  "&Delete Part",
+                  IDialogConstants.CANCEL_LABEL },
+            1);
+
+      final boolean[] returnValue = { false };
+
+      if (dialog.open() == Window.OK) {
+
+         BusyIndicator.showWhile(display, () -> {
+
+            if (equipment_DeleteParts_SQL(part)) {
+
+               clearAllEquipmentResourcesAndFireModifyEvent();
+
+//               updateTourTagFilterProfiles(allEquipment);
+
+               returnValue[0] = true;
+            }
+         });
+      }
+
+      return returnValue[0];
+   }
+
+   private static boolean equipment_DeleteParts_SQL(final EquipmentPart part) {
+
+      boolean returnResult = false;
+
+      PreparedStatement prepStmt = null;
+      String sql = null;
+
+      try (Connection conn = TourDatabase.getInstance().getConnection()) {
+
+         // remove part from table "EquipmentPart"
+
+         sql = "DELETE FROM " + TourDatabase.TABLE_EQUIPMENT_PART + " WHERE partID=?" + NL; //$NON-NLS-1$
+
+         final long partID = part.getPartId();
+
+         prepStmt = conn.prepareStatement(sql);
+         prepStmt.setLong(1, partID);
+         prepStmt.execute();
+
+         // log result
+         TourLogManager.showLogView(AutoOpenEvent.DELETE_SOMETHING);
+         TourLogManager.log_INFO("Equipment part is deleted \"%s\"".formatted(part.getName()));
+
+         returnResult = true;
+
+      } catch (final SQLException e) {
+
+         StatusUtil.log(sql, e);
+         net.tourbook.ui.UI.showSQLException(e);
+
+      } finally {
+
+         Util.closeSql(prepStmt);
+      }
+
+      return returnResult;
+   }
+
+   public static boolean equipment_DeleteServices(final List<EquipmentService> allServices) {
+
+      // ensure that a tour is NOT modified in the tour editor
+      if (TourManager.isTourEditorModified() || allServices.size() != 1) {
+         return false;
+      }
+
+      final EquipmentService service = allServices.get(0);
+
+      final Display display = Display.getDefault();
+      final String dialogMessage = "Permanently delete service\n\n\"%s\" ?".formatted(service.getName());
+
+      // confirm deletion, show equipment name and number of tours which contain a equipment
+      final MessageDialog dialog = new MessageDialog(
+            display.getActiveShell(),
+            "Delete Service",
+            null,
+            dialogMessage,
+            MessageDialog.QUESTION,
+            new String[] {
+                  "&Delete Service",
+                  IDialogConstants.CANCEL_LABEL },
+            1);
+
+      final boolean[] returnValue = { false };
+
+      if (dialog.open() == Window.OK) {
+
+         BusyIndicator.showWhile(display, () -> {
+
+            if (equipment_DeleteServices_SQL(service)) {
+
+               clearAllEquipmentResourcesAndFireModifyEvent();
+
+//               updateTourTagFilterProfiles(allEquipment);
+
+               returnValue[0] = true;
+            }
+         });
+      }
+
+      return returnValue[0];
+   }
+
+   private static boolean equipment_DeleteServices_SQL(final EquipmentService service) {
+
+      boolean returnResult = false;
+
+      PreparedStatement prepStmt = null;
+      String sql = null;
+
+      try (Connection conn = TourDatabase.getInstance().getConnection()) {
+
+         // remove part from table "EquipmentPart"
+
+         sql = "DELETE FROM " + TourDatabase.TABLE_EQUIPMENT_SERVICE + " WHERE serviceID=?" + NL; //$NON-NLS-1$
+
+         final long serviceID = service.getSeriveId();
+
+         prepStmt = conn.prepareStatement(sql);
+
+         prepStmt.setLong(1, serviceID);
+         prepStmt.execute();
+
+         // log result
+         TourLogManager.showLogView(AutoOpenEvent.DELETE_SOMETHING);
+         TourLogManager.log_INFO("Equipment service is deleted \"%s\"".formatted(service.getName()));
+
+         returnResult = true;
+
+      } catch (final SQLException e) {
+
+         StatusUtil.log(sql, e);
+         net.tourbook.ui.UI.showSQLException(e);
+
+      } finally {
+
+         Util.closeSql(prepStmt);
       }
 
       return returnResult;
@@ -729,18 +894,18 @@ public class EquipmentManager {
             + " ORDER BY tourId" + NL //                                                                 //$NON-NLS-1$
       ;
 
-      PreparedStatement statement = null;
+      PreparedStatement prepStatement = null;
 
       try (Connection conn = TourDatabase.getInstance().getConnection()) {
 
-         statement = conn.prepareStatement(sql);
+         prepStatement = conn.prepareStatement(sql);
 
          // fillup parameter
          for (int parameterIndex = 0; parameterIndex < sqlParameters.size(); parameterIndex++) {
-            statement.setLong(parameterIndex + 1, sqlParameters.get(parameterIndex));
+            prepStatement.setLong(parameterIndex + 1, sqlParameters.get(parameterIndex));
          }
 
-         final ResultSet result = statement.executeQuery();
+         final ResultSet result = prepStatement.executeQuery();
          while (result.next()) {
             allTourIds.add(result.getLong(1));
          }
@@ -751,7 +916,8 @@ public class EquipmentManager {
          net.tourbook.ui.UI.showSQLException(e);
 
       } finally {
-         Util.closeSql(statement);
+
+         Util.closeSql(prepStatement);
       }
 
       return allTourIds;

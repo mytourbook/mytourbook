@@ -55,6 +55,7 @@ public class Images {
    public static final String App_Show                             = "app-show.svg";                                //$NON-NLS-1$
    public static final String App_Sort                             = "app-sort.svg";                                //$NON-NLS-1$
    public static final String App_Today                            = "today.svg";                                   //$NON-NLS-1$
+   public static final String App_Today_Calendar                   = "today-calendar.svg";                          //$NON-NLS-1$
    public static final String App_Trash                            = "trash.svg";                                   //$NON-NLS-1$
    public static final String App_Trash_Themed                     = "trash-blue.svg";                              //$NON-NLS-1$
 

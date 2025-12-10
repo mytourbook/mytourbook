@@ -145,6 +145,8 @@ public class EquipmentView extends ViewPart implements ITourProvider, ITourViewe
    private IContextMenuProvider                _viewerContextMenuProvider               = new TreeContextMenuProvider();
 
    private ActionDeleteEquipment               _actionDeleteEquipment;
+   private ActionDeletePart                    _actionDeletePart;
+   private ActionDeleteService                 _actionDeleteService;
    private ActionDuplicatePart                 _actionDuplicatePart;
    private ActionDuplicateService              _actionDuplicateService;
    private ActionEditEquipment                 _actionEditEquipment;
@@ -244,6 +246,36 @@ public class EquipmentView extends ViewPart implements ITourProvider, ITourViewe
       @Override
       public void run() {
          onAction_DeleteEquipment();
+      }
+   }
+
+   private class ActionDeletePart extends Action {
+
+      ActionDeletePart() {
+
+         super("&Delete Part...", AS_PUSH_BUTTON);
+
+         setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.App_Delete));
+      }
+
+      @Override
+      public void run() {
+         onAction_DeletePart();
+      }
+   }
+
+   private class ActionDeleteService extends Action {
+
+      ActionDeleteService() {
+
+         super("&Delete Service...", AS_PUSH_BUTTON);
+
+         setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.App_Delete));
+      }
+
+      @Override
+      public void run() {
+         onAction_DeleteService();
       }
    }
 
@@ -594,6 +626,8 @@ public class EquipmentView extends ViewPart implements ITourProvider, ITourViewe
 // SET_FORMATTING_OFF
 
       _actionDeleteEquipment                 = new ActionDeleteEquipment();
+      _actionDeletePart                      = new ActionDeletePart();
+      _actionDeleteService                   = new ActionDeleteService();
       _actionDuplicatePart                   = new ActionDuplicatePart();
       _actionDuplicateService                = new ActionDuplicateService();
       _actionEditEquipment                   = new ActionEditEquipment();
@@ -718,9 +752,13 @@ public class EquipmentView extends ViewPart implements ITourProvider, ITourViewe
 
                onAction_DeleteEquipment();
 
-//            } else if (_actionDeleteTagCategory.isEnabled()) {
-//
-//               onAction_DeleteTagCategory();
+            } else if (_actionDeletePart.isEnabled()) {
+
+               onAction_DeletePart();
+
+            } else if (_actionDeleteService.isEnabled()) {
+
+               onAction_DeleteService();
             }
 
             break;
@@ -1172,13 +1210,21 @@ public class EquipmentView extends ViewPart implements ITourProvider, ITourViewe
       }
 
 // SET_FORMATTING_OFF
-      
-      final boolean isEquipmentSelected   = numEquipment > 0;
-      final boolean isPartSelected        = numParts > 0;
-      final boolean isServiceSelected     = numServices > 0;
-      boolean areEquipmentItemsSelected   = isEquipmentSelected || isPartSelected || isServiceSelected;
+
+      final boolean isEquipmentSelected         = numEquipment > 0;
+      final boolean isPartSelected              = numParts > 0;
+      final boolean isServiceSelected           = numServices > 0;
+      final boolean areEquipmentItemsSelected   = isEquipmentSelected || isPartSelected || isServiceSelected;
+
+      /*
+       * Multiple part/services can be much more complex when they have different anchestors (equipment)
+       */
+      final boolean isEnableDeletePart    = numParts == 1;
+      final boolean isEnableDeleteService = numServices == 1;
 
       _actionDeleteEquipment  .setEnabled(isEquipmentSelected);
+      _actionDeletePart       .setEnabled(isEnableDeletePart);
+      _actionDeleteService    .setEnabled(isEnableDeleteService);
       _actionDuplicatePart    .setEnabled(isPartSelected);
       _actionDuplicateService .setEnabled(isServiceSelected);
       _actionEditEquipment    .setEnabled(isEquipmentSelected);
@@ -1236,7 +1282,7 @@ public class EquipmentView extends ViewPart implements ITourProvider, ITourViewe
          } else if (selectedItem instanceof TVIEquipmentView_Service) {    numServices++;
          }
       }
-      
+
 // SET_FORMATTING_ON
 
       menuMgr.add(_actionNewEquipment);
@@ -1270,6 +1316,8 @@ public class EquipmentView extends ViewPart implements ITourProvider, ITourViewe
       menuMgr.add(new Separator());
 
       menuMgr.add(_actionDeleteEquipment);
+      menuMgr.add(_actionDeletePart);
+      menuMgr.add(_actionDeleteService);
 
       enableActions();
    }
@@ -1491,7 +1539,55 @@ public class EquipmentView extends ViewPart implements ITourProvider, ITourViewe
 
          // delete equipments
 
-         EquipmentManager.equipment_Delete(allSelectedEquipment);
+         EquipmentManager.equipment_DeleteEquipment(allSelectedEquipment);
+      }
+   }
+
+   private void onAction_DeletePart() {
+
+      final ITreeSelection structuredSelection = _equipmentViewer.getStructuredSelection();
+      final List<?> allSelection = structuredSelection.toList();
+
+      final List<EquipmentPart> allSelectedParts = new ArrayList<>();
+
+      for (final Object object : allSelection) {
+
+         if (object instanceof final TVIEquipmentView_Part partItem) {
+
+            final EquipmentPart part = partItem.getPart();
+            allSelectedParts.add(part);
+         }
+      }
+
+      if (allSelectedParts.size() > 0) {
+
+         // delete parts
+
+         EquipmentManager.equipment_DeleteParts(allSelectedParts);
+      }
+   }
+
+   private void onAction_DeleteService() {
+
+      final ITreeSelection structuredSelection = _equipmentViewer.getStructuredSelection();
+      final List<?> allSelection = structuredSelection.toList();
+
+      final List<EquipmentService> allSelectedServices = new ArrayList<>();
+
+      for (final Object selection : allSelection) {
+
+         if (selection instanceof final TVIEquipmentView_Service serviceItem) {
+
+            final EquipmentService service = serviceItem.getService();
+            allSelectedServices.add(service);
+         }
+      }
+
+      if (allSelectedServices.size() > 0) {
+
+         // delete services
+
+         EquipmentManager.equipment_DeleteServices(allSelectedServices);
       }
    }
 

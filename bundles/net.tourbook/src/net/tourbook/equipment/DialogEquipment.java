@@ -27,6 +27,8 @@ import net.tourbook.common.util.StringUtils;
 import net.tourbook.common.util.Util;
 import net.tourbook.data.Equipment;
 
+import org.eclipse.jface.action.Action;
+import org.eclipse.jface.action.ToolBarManager;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.dialogs.TitleAreaDialog;
@@ -38,6 +40,7 @@ import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.MouseWheelListener;
 import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.Image;
+import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
@@ -46,6 +49,7 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Spinner;
 import org.eclipse.swt.widgets.Text;
+import org.eclipse.swt.widgets.ToolBar;
 
 /**
  * Dialog to modify a {@link Equipment}
@@ -60,6 +64,7 @@ public class DialogEquipment extends TitleAreaDialog {
    private static final String          STATE_AUTOCOMPLETE_POPUP_HEIGHT_MODEL      = "STATE_AUTOCOMPLETE_POPUP_HEIGHT_MODEL";      //$NON-NLS-1$
    private static final String          STATE_AUTOCOMPLETE_POPUP_HEIGHT_PRICE_UNIT = "STATE_AUTOCOMPLETE_POPUP_HEIGHT_PRICE_UNIT"; //$NON-NLS-1$
    private static final String          STATE_PRICE_UNIT_DEFAULT                   = "STATE_PRICE_UNIT_DEFAULT";                   //$NON-NLS-1$
+   private static final String          STATE_SYNC_DATES                           = "STATE_SYNC_DATES";                           //$NON-NLS-1$
 
    /**
     * New or cloned instance
@@ -75,6 +80,10 @@ public class DialogEquipment extends TitleAreaDialog {
 
    private boolean                      _isModified;
 
+   private ActionSetDateNow             _actionDateNow_Buildt;
+   private ActionSetDateNow             _actionDateNow_FirstUse;
+   private ActionSetDateNow             _actionDateNow_Retired;
+
    private PixelConverter               _pc;
 
    /*
@@ -88,7 +97,7 @@ public class DialogEquipment extends TitleAreaDialog {
    private Composite                 _container;
    private Composite                 _parent;
 
-   private Text                      _txtDescription;
+   private Button                    _chkSyncDates;
 
    private Combo                     _comboBrand;
    private Combo                     _comboModel;
@@ -102,9 +111,33 @@ public class DialogEquipment extends TitleAreaDialog {
    private Spinner                   _spinPrice;
    private Spinner                   _spinWeight;
 
+   private Text                      _txtDescription;
+
    private AutoComplete_ComboInputMT _autocomplete_Brand;
    private AutoComplete_ComboInputMT _autocomplete_Model;
    private AutoComplete_ComboInputMT _autocomplete_PriceUnit;
+
+   private class ActionSetDateNow extends Action {
+
+      private int _dateField;
+
+      public ActionSetDateNow(final int dateField) {
+
+         super(UI.EMPTY_STRING, AS_PUSH_BUTTON);
+
+         _dateField = dateField;
+
+         setToolTipText("Set date to today");
+
+         setImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.App_Today_Calendar));
+      }
+
+      @Override
+      public void run() {
+
+         onAction_SetDateNow(_dateField);
+      }
+   }
 
    public DialogEquipment(final Shell parentShell, final Equipment equipment) {
 
@@ -148,6 +181,13 @@ public class DialogEquipment extends TitleAreaDialog {
       setMessage(_equipment.getName());
    }
 
+   private void createActions() {
+
+      _actionDateNow_Buildt = new ActionSetDateNow(1);
+      _actionDateNow_FirstUse = new ActionSetDateNow(2);
+      _actionDateNow_Retired = new ActionSetDateNow(3);
+   }
+
    @Override
    protected final void createButtonsForButtonBar(final Composite parent) {
 
@@ -167,6 +207,8 @@ public class DialogEquipment extends TitleAreaDialog {
       final Composite dlgContainer = (Composite) super.createDialogArea(parent);
 
       initUI();
+
+      createActions();
 
       createUI(dlgContainer);
 
@@ -231,25 +273,82 @@ public class DialogEquipment extends TitleAreaDialog {
          }
          {
             /*
-             * Built date
-             */
-            final Label label = UI.createLabel(_container, Messages.Dialog_Equipment_Label_DateBuilt);
-            gdVertCenter.applyTo(label);
-
-            _dateBuilt = new DateTime(_container, SWT.DATE | SWT.MEDIUM | SWT.BORDER);
-            _dateBuilt.addSelectionListener(_defaultSelectionListener);
-
-            UI.createSpacer_Horizontal(_container, 2);
-         }
-         {
-            /*
              * First use date
              */
             final Label label = UI.createLabel(_container, Messages.Dialog_Equipment_Label_DateFirstUse);
             gdVertCenter.applyTo(label);
 
-            _dateFirstUse = new DateTime(_container, SWT.DATE | SWT.MEDIUM | SWT.BORDER);
-            _dateFirstUse.addSelectionListener(_defaultSelectionListener);
+            final Composite subContainer = new Composite(_container, SWT.NONE);
+            GridDataFactory.fillDefaults().grab(true, false).applyTo(subContainer);
+            GridLayoutFactory.fillDefaults().numColumns(2).applyTo(subContainer);
+            {
+               _dateFirstUse = new DateTime(subContainer, SWT.DATE | SWT.MEDIUM | SWT.BORDER);
+               _dateFirstUse.addSelectionListener(_defaultSelectionListener);
+
+               final ToolBar toolbar = new ToolBar(subContainer, SWT.FLAT);
+               final ToolBarManager tbm = new ToolBarManager(toolbar);
+               tbm.add(_actionDateNow_FirstUse);
+               tbm.update(true);
+            }
+         }
+         {
+            /*
+             * Built date
+             */
+            final Label label = UI.createLabel(_container, Messages.Dialog_Equipment_Label_DateBuilt);
+            gdVertCenter.applyTo(label);
+
+            final Composite subContainer = new Composite(_container, SWT.NONE);
+            GridDataFactory.fillDefaults().grab(true, false).applyTo(subContainer);
+            GridLayoutFactory.fillDefaults().numColumns(3).applyTo(subContainer);
+            {
+               _dateBuilt = new DateTime(subContainer, SWT.DATE | SWT.MEDIUM | SWT.BORDER);
+               _dateBuilt.addSelectionListener(_defaultSelectionListener);
+
+               final ToolBar toolbar = new ToolBar(subContainer, SWT.FLAT);
+               final ToolBarManager tbm = new ToolBarManager(toolbar);
+               tbm.add(_actionDateNow_Buildt);
+               tbm.update(true);
+
+               _chkSyncDates = new Button(subContainer, SWT.CHECK);
+               _chkSyncDates.setText("S&ync");
+               _chkSyncDates.setToolTipText("Sync with first use date");
+               _chkSyncDates.addSelectionListener(_defaultSelectionListener);
+            }
+         }
+         {
+            /*
+             * Price
+             */
+
+            UI.createLabel(_container, "&Price");
+
+            final Composite subContainer = new Composite(_container, SWT.NONE);
+            GridDataFactory.fillDefaults().grab(true, false).applyTo(subContainer);
+            GridLayoutFactory.fillDefaults().numColumns(2).applyTo(subContainer);
+            {
+               // spinner
+               _spinPrice = new Spinner(subContainer, SWT.BORDER);
+
+               _spinPrice.setDigits(2);
+               _spinPrice.setMinimum(-1_000_000_000);
+               _spinPrice.setMaximum(1_000_000_000);
+
+               _spinPrice.addMouseWheelListener(_defaultMouseWheelListener);
+               _spinPrice.addSelectionListener(_defaultSelectionListener);
+
+               // autocomplete combo
+               _comboPriceUnit = new Combo(subContainer, SWT.BORDER | SWT.FLAT);
+               _comboPriceUnit.setText(UI.EMPTY_STRING);
+               _comboPriceUnit.setToolTipText("Currency");
+               _comboPriceUnit.addModifyListener(_defaultModifyListener);
+
+               GridDataFactory.fillDefaults()
+                     .hint(_pc.convertWidthInCharsToPixels(4), SWT.DEFAULT)
+                     .applyTo(_comboPriceUnit);
+
+               _autocomplete_PriceUnit = new AutoComplete_ComboInputMT(_comboPriceUnit);
+            }
          }
          {
             /*
@@ -258,8 +357,18 @@ public class DialogEquipment extends TitleAreaDialog {
             final Label label = UI.createLabel(_container, Messages.Dialog_Equipment_Label_DateRetired);
             gdVertCenter.applyTo(label);
 
-            _dateRetired = new DateTime(_container, SWT.DATE | SWT.MEDIUM);
-            _dateRetired.addSelectionListener(_defaultSelectionListener);
+            final Composite subContainer = new Composite(_container, SWT.NONE);
+            GridDataFactory.fillDefaults().grab(true, false).applyTo(subContainer);
+            GridLayoutFactory.fillDefaults().numColumns(2).applyTo(subContainer);
+            {
+               _dateRetired = new DateTime(subContainer, SWT.DATE | SWT.MEDIUM);
+               _dateRetired.addSelectionListener(_defaultSelectionListener);
+
+               final ToolBar toolbar = new ToolBar(subContainer, SWT.FLAT);
+               final ToolBarManager tbm = new ToolBarManager(toolbar);
+               tbm.add(_actionDateNow_Retired);
+               tbm.update(true);
+            }
          }
          {
             /*
@@ -268,12 +377,12 @@ public class DialogEquipment extends TitleAreaDialog {
 
             UI.createLabel(_container, "&Weight");
 
-            final Composite containerWeight = new Composite(_container, SWT.NONE);
-            GridDataFactory.fillDefaults().grab(true, false).applyTo(containerWeight);
-            GridLayoutFactory.fillDefaults().numColumns(2).applyTo(containerWeight);
+            final Composite subContainer = new Composite(_container, SWT.NONE);
+            GridDataFactory.fillDefaults().grab(true, false).applyTo(subContainer);
+            GridLayoutFactory.fillDefaults().numColumns(2).applyTo(subContainer);
             {
                // spinner
-               _spinWeight = new Spinner(containerWeight, SWT.BORDER);
+               _spinWeight = new Spinner(subContainer, SWT.BORDER);
 
                _spinWeight.setDigits(3);
                _spinWeight.setMinimum(0);
@@ -283,7 +392,7 @@ public class DialogEquipment extends TitleAreaDialog {
                _spinWeight.addSelectionListener(_defaultSelectionListener);
 
                // label: kg
-               UI.createLabel(containerWeight, UI.UNIT_LABEL_WEIGHT);
+               UI.createLabel(subContainer, UI.UNIT_LABEL_WEIGHT);
             }
          }
          {
@@ -314,41 +423,6 @@ public class DialogEquipment extends TitleAreaDialog {
          }
          {
             /*
-             * Price
-             */
-
-            UI.createLabel(_container, "&Price");
-
-            final Composite containerWeight = new Composite(_container, SWT.NONE);
-            GridDataFactory.fillDefaults().grab(true, false).applyTo(containerWeight);
-            GridLayoutFactory.fillDefaults().numColumns(2).applyTo(containerWeight);
-            {
-               // spinner
-               _spinPrice = new Spinner(containerWeight, SWT.BORDER);
-
-               _spinPrice.setDigits(2);
-               _spinPrice.setMinimum(-1_000_000_000);
-               _spinPrice.setMaximum(1_000_000_000);
-
-               _spinPrice.addMouseWheelListener(_defaultMouseWheelListener);
-               _spinPrice.addSelectionListener(_defaultSelectionListener);
-
-               // autocomplete combo
-               _comboPriceUnit = new Combo(containerWeight, SWT.BORDER | SWT.FLAT);
-               _comboPriceUnit.setText(UI.EMPTY_STRING);
-               _comboPriceUnit.setToolTipText("Currency");
-               _comboPriceUnit.addModifyListener(_defaultModifyListener);
-
-               GridDataFactory.fillDefaults()
-                     .hint(_pc.convertWidthInCharsToPixels(4), SWT.DEFAULT)
-                     .applyTo(_comboPriceUnit);
-
-               _autocomplete_PriceUnit = new AutoComplete_ComboInputMT(_comboPriceUnit);
-            }
-         }
-         UI.createSpacer_Horizontal(_container, 2);
-         {
-            /*
              * Description
              */
             final Label label = UI.createLabel(_container, Messages.Dialog_Equipment_Label_Description);
@@ -370,6 +444,12 @@ public class DialogEquipment extends TitleAreaDialog {
       if (_isInUIUpdate) {
          return;
       }
+
+      final boolean isSyncDates = _chkSyncDates.getSelection();
+      final boolean canEditBuiltDate = isSyncDates == false;
+
+      _dateBuilt.setEnabled(canEditBuiltDate);
+      _actionDateNow_Buildt.setEnabled(canEditBuiltDate);
 
       final boolean isValid = _isNewEquipment && _isModified == false
 
@@ -477,16 +557,42 @@ public class DialogEquipment extends TitleAreaDialog {
       super.okPressed();
    }
 
+   private void onAction_SetDateNow(final int dateField) {
+
+      _isInUIUpdate = true;
+
+      final LocalDate now = LocalDate.now();
+
+      final int year = now.getYear();
+      final int month = now.getMonthValue() - 1;
+      final int day = now.getDayOfMonth();
+
+      if (dateField == 1) {
+
+         _dateBuilt.setDate(year, month, day);
+
+      } else if (dateField == 2) {
+
+         _dateFirstUse.setDate(year, month, day);
+
+         if (_chkSyncDates.getSelection()) {
+            // synch first use -> buildt
+            _dateBuilt.setDate(year, month, day);
+         }
+
+      } else if (dateField == 3) {
+
+         _dateRetired.setDate(year, month, day);
+      }
+
+      _isInUIUpdate = false;
+   }
+
    private void onDispose() {
 
+      saveState();
+
       UI.disposeResource(_imageDialog);
-
-      _autocomplete_Brand.saveState(_state, STATE_AUTOCOMPLETE_POPUP_HEIGHT_BRAND);
-      _autocomplete_Model.saveState(_state, STATE_AUTOCOMPLETE_POPUP_HEIGHT_MODEL);
-      _autocomplete_PriceUnit.saveState(_state, STATE_AUTOCOMPLETE_POPUP_HEIGHT_PRICE_UNIT);
-
-      _state.put(STATE_PRICE_UNIT_DEFAULT, _comboPriceUnit.getText().trim());
-
    }
 
    private void onModify() {
@@ -496,6 +602,13 @@ public class DialogEquipment extends TitleAreaDialog {
       }
 
       _isModified = true;
+
+      final boolean isSyncDates = _chkSyncDates.getSelection();
+
+      if (isSyncDates) {
+
+         _dateBuilt.setDate(_dateFirstUse.getYear(), _dateFirstUse.getMonth(), _dateFirstUse.getDay());
+      }
 
       enableControls();
    }
@@ -508,10 +621,22 @@ public class DialogEquipment extends TitleAreaDialog {
       _autocomplete_Model.restoreState(_state, STATE_AUTOCOMPLETE_POPUP_HEIGHT_MODEL);
       _autocomplete_PriceUnit.restoreState(_state, STATE_AUTOCOMPLETE_POPUP_HEIGHT_PRICE_UNIT);
 
-      // set default unit
+      // set also default unit
       _comboPriceUnit.setText(Util.getStateString(_state, STATE_PRICE_UNIT_DEFAULT, UI.EMPTY_STRING));
 
+      _chkSyncDates.setSelection(Util.getStateBoolean(_state, STATE_SYNC_DATES, true));
+
       _isInUIUpdate = false;
+   }
+
+   private void saveState() {
+
+      _autocomplete_Brand.saveState(_state, STATE_AUTOCOMPLETE_POPUP_HEIGHT_BRAND);
+      _autocomplete_Model.saveState(_state, STATE_AUTOCOMPLETE_POPUP_HEIGHT_MODEL);
+      _autocomplete_PriceUnit.saveState(_state, STATE_AUTOCOMPLETE_POPUP_HEIGHT_PRICE_UNIT);
+
+      _state.put(STATE_PRICE_UNIT_DEFAULT, _comboPriceUnit.getText().trim());
+      _state.put(STATE_SYNC_DATES, _chkSyncDates.getSelection());
    }
 
    private void updateModelFromUI() {
