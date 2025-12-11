@@ -77,6 +77,7 @@ public class DialogEquipmentService extends TitleAreaDialog {
 
    private boolean                      _isModified;
 
+
    private PixelConverter               _pc;
 
    /*
@@ -151,12 +152,16 @@ public class DialogEquipmentService extends TitleAreaDialog {
 
       final String messageTitle =
 
-            _isDuplicateService ? "Duplicate Service" 
-                  : _isNewService ? "Create Equipment Service" 
-                  : "Edit Equipment Service";
+            _isDuplicateService ? "Duplicate Service"
+                  : _isNewService ? "Create Equipment Service"
+                        : "Edit Equipment Service";
 
       setTitle(messageTitle);
       setMessage(_service.getName());
+   }
+
+   private void createActions() {
+
    }
 
    @Override
@@ -178,6 +183,8 @@ public class DialogEquipmentService extends TitleAreaDialog {
       final Composite dlgContainer = (Composite) super.createDialogArea(parent);
 
       initUI();
+
+      createActions();
 
       createUI(dlgContainer);
 
@@ -204,8 +211,8 @@ public class DialogEquipmentService extends TitleAreaDialog {
 
       _container = new Composite(parent, SWT.NONE);
       GridDataFactory.fillDefaults().grab(true, true).applyTo(_container);
-      GridLayoutFactory.swtDefaults().numColumns(4).applyTo(_container);
-//      _container.setBackground(UI.SYS_COLOR_CYAN);
+      GridLayoutFactory.swtDefaults().numColumns(3).applyTo(_container);
+//      _container.setBackground(UI.SYS_COLOR_MAGENTA);
       {
          {
             /*
@@ -220,7 +227,7 @@ public class DialogEquipmentService extends TitleAreaDialog {
             _comboName.setText(UI.EMPTY_STRING);
             _comboName.addModifyListener(_defaultModifyListener);
 
-            GridDataFactory.fillDefaults().grab(true, false).span(3, 1).applyTo(_comboName);
+            GridDataFactory.fillDefaults().grab(true, false).span(2, 1).applyTo(_comboName);
 
             _autocomplete_Name = new AutoComplete_ComboInputMT(_comboName);
          }
@@ -231,11 +238,10 @@ public class DialogEquipmentService extends TitleAreaDialog {
             final Label label = UI.createLabel(_container, "&Date");
             gdVertCenter.applyTo(label);
 
-            _date = new DateTime(_container, SWT.DATE | SWT.MEDIUM | SWT.BORDER);
+            _date = new DateTime(_container, SWT.DATE | SWT.MEDIUM | SWT.DROP_DOWN);
             _date.addSelectionListener(_defaultSelectionListener);
-
-            UI.createSpacer_Horizontal(_container, 2);
          }
+         UI.createSpacer_Horizontal(_container, 1);
          {
             /*
              * Price
@@ -243,34 +249,29 @@ public class DialogEquipmentService extends TitleAreaDialog {
 
             UI.createLabel(_container, "&Price");
 
-            final Composite containerWeight = new Composite(_container, SWT.NONE);
-            GridDataFactory.fillDefaults().grab(true, false).applyTo(containerWeight);
-            GridLayoutFactory.fillDefaults().numColumns(2).applyTo(containerWeight);
-            {
-               // spinner
-               _spinPrice = new Spinner(containerWeight, SWT.BORDER);
+            // spinner
+            _spinPrice = new Spinner(_container, SWT.BORDER);
+            _spinPrice.setDigits(2);
+            _spinPrice.setMinimum(-1_000_000_000);
+            _spinPrice.setMaximum(1_000_000_000);
 
-               _spinPrice.setDigits(2);
-               _spinPrice.setMinimum(-1_000_000_000);
-               _spinPrice.setMaximum(1_000_000_000);
+            _spinPrice.addMouseWheelListener(_defaultMouseWheelListener);
+            _spinPrice.addSelectionListener(_defaultSelectionListener);
 
-               _spinPrice.addMouseWheelListener(_defaultMouseWheelListener);
-               _spinPrice.addSelectionListener(_defaultSelectionListener);
+            // autocomplete combo
+            _comboPriceUnit = new Combo(_container, SWT.BORDER | SWT.FLAT);
+            _comboPriceUnit.setText(UI.EMPTY_STRING);
+            _comboPriceUnit.setToolTipText("Currency");
+            _comboPriceUnit.addModifyListener(_defaultModifyListener);
 
-               // autocomplete combo
-               _comboPriceUnit = new Combo(containerWeight, SWT.BORDER | SWT.FLAT);
-               _comboPriceUnit.setText(UI.EMPTY_STRING);
-               _comboPriceUnit.setToolTipText("Currency");
-               _comboPriceUnit.addModifyListener(_defaultModifyListener);
+            GridDataFactory.fillDefaults()
+                  .align(SWT.BEGINNING, SWT.FILL)
+                  .hint(_pc.convertWidthInCharsToPixels(4), SWT.DEFAULT)
+                  .applyTo(_comboPriceUnit);
 
-               GridDataFactory.fillDefaults()
-                     .hint(_pc.convertWidthInCharsToPixels(4), SWT.DEFAULT)
-                     .applyTo(_comboPriceUnit);
-
-               _autocomplete_PriceUnit = new AutoComplete_ComboInputMT(_comboPriceUnit);
-            }
+            _autocomplete_PriceUnit = new AutoComplete_ComboInputMT(_comboPriceUnit);
          }
-         UI.createSpacer_Horizontal(_container, 2);
+//         UI.createSpacer_Horizontal(_container, 2);
          {
             /*
              * Description
@@ -283,7 +284,7 @@ public class DialogEquipmentService extends TitleAreaDialog {
             GridDataFactory.fillDefaults()
                   .grab(true, true)
                   .hint(convertWidthInCharsToPixels(100), convertHeightInCharsToPixels(20))
-                  .span(3, 1)
+                  .span(2, 1)
                   .applyTo(_txtDescription);
          }
       }

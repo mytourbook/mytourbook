@@ -15,6 +15,7 @@
  *******************************************************************************/
 package net.tourbook.equipment;
 
+import java.text.NumberFormat;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -126,9 +127,15 @@ public class EquipmentView extends ViewPart implements ITourProvider, ITourViewe
 //   private static final int                    STATE_ITEM_TYPE_YEAR                     = 3;
 //   private static final int                    STATE_ITEM_TYPE_MONTH                    = 4;
 
-   private static final IPreferenceStore       _prefStore                               = TourbookPlugin.getPrefStore();
-   private static final IPreferenceStore       _prefStore_Common                        = CommonActivator.getPrefStore();
-   private static final IDialogSettings        _state                                   = TourbookPlugin.getState(ID);
+   private static final IPreferenceStore _prefStore        = TourbookPlugin.getPrefStore();
+   private static final IPreferenceStore _prefStore_Common = CommonActivator.getPrefStore();
+   private static final IDialogSettings  _state            = TourbookPlugin.getState(ID);
+
+   private NumberFormat                  _nf0              = NumberFormat.getNumberInstance();
+   {
+      _nf0.setMinimumFractionDigits(0);
+      _nf0.setMaximumFractionDigits(0);
+   }
 
    private IPropertyChangeListener             _prefChangeListener;
    private IPropertyChangeListener             _prefChangeListener_Common;
@@ -832,8 +839,8 @@ public class EquipmentView extends ViewPart implements ITourProvider, ITourViewe
 
       defineColumn_1stColumn();
 
-      defineColumn_Brand();
-      defineColumn_Model();
+      defineColumn_Equipment_Brand();
+      defineColumn_Equipment_Model();
 
       defineColumn_Time_Date_FirstUse();
       defineColumn_Time_Date_Built();
@@ -841,6 +848,9 @@ public class EquipmentView extends ViewPart implements ITourProvider, ITourViewe
 
       defineColumn_Equipment_Price();
       defineColumn_Equipment_PriceUnit();
+
+      defineColumn_Equipment_Weight();
+      defineColumn_Equipment_InitialDistance();
    }
 
    /**
@@ -966,7 +976,7 @@ public class EquipmentView extends ViewPart implements ITourProvider, ITourViewe
    /**
     * Column: Brand
     */
-   private void defineColumn_Brand() {
+   private void defineColumn_Equipment_Brand() {
 
       final ColumnDefinition colDef = TreeColumnFactory.EQUIPMENT_BRAND.createColumn(_columnManager, _pc);
 
@@ -980,6 +990,65 @@ public class EquipmentView extends ViewPart implements ITourProvider, ITourViewe
             if (element instanceof final TVIEquipmentView_Equipment tviEquipment) {
 
                cell.setText(tviEquipment.getEquipment().getBrand());
+               setCellColor(cell, element);
+            }
+         }
+      });
+   }
+
+   /**
+    * Column: Initial distance
+    */
+   private void defineColumn_Equipment_InitialDistance() {
+
+      final ColumnDefinition colDef = TreeColumnFactory.EQUIPMENT_INITIAL_DISTANCE.createColumn(_columnManager, _pc);
+
+      colDef.setIsDefaultColumn();
+
+      colDef.setLabelProvider(new CellLabelProvider() {
+
+         @Override
+         public void update(final ViewerCell cell) {
+
+            final Object element = cell.getElement();
+
+            float distance = 0;
+
+            if (element instanceof final TVIEquipmentView_Equipment equipmentItem) {
+
+               distance = equipmentItem.getEquipment().getDistanceFirstUse();
+
+            } else if (element instanceof final TVIEquipmentView_Part partItem) {
+
+               distance = partItem.getPart().getDistanceFirstUse();
+            }
+
+            if (distance != 0) {
+
+               cell.setText(_nf0.format(distance));
+               setCellColor(cell, element);
+            }
+         }
+      });
+   }
+
+   /**
+    * Column: Model
+    */
+   private void defineColumn_Equipment_Model() {
+
+      final ColumnDefinition colDef = TreeColumnFactory.EQUIPMENT_MODEL.createColumn(_columnManager, _pc);
+
+      colDef.setLabelProvider(new CellLabelProvider() {
+
+         @Override
+         public void update(final ViewerCell cell) {
+
+            final Object element = cell.getElement();
+
+            if (element instanceof final TVIEquipmentView_Equipment tviEquipment) {
+
+               cell.setText(tviEquipment.getEquipment().getModel());
                setCellColor(cell, element);
             }
          }
@@ -1039,11 +1108,13 @@ public class EquipmentView extends ViewPart implements ITourProvider, ITourViewe
    }
 
    /**
-    * Column: Model
+    * Column: Weight
     */
-   private void defineColumn_Model() {
+   private void defineColumn_Equipment_Weight() {
 
-      final ColumnDefinition colDef = TreeColumnFactory.EQUIPMENT_MODEL.createColumn(_columnManager, _pc);
+      final ColumnDefinition colDef = TreeColumnFactory.EQUIPMENT_WEIGHT.createColumn(_columnManager, _pc);
+
+      colDef.setIsDefaultColumn();
 
       colDef.setLabelProvider(new CellLabelProvider() {
 
@@ -1052,9 +1123,20 @@ public class EquipmentView extends ViewPart implements ITourProvider, ITourViewe
 
             final Object element = cell.getElement();
 
-            if (element instanceof final TVIEquipmentView_Equipment tviEquipment) {
+            float weight = 0;
 
-               cell.setText(tviEquipment.getEquipment().getModel());
+            if (element instanceof final TVIEquipmentView_Equipment equipmentItem) {
+
+               weight = equipmentItem.getEquipment().getWeight();
+
+            } else if (element instanceof final TVIEquipmentView_Part partItem) {
+
+               weight = partItem.getPart().getWeight();
+            }
+
+            if (weight != 0) {
+
+               colDef.printDoubleValue(cell, weight, true);
                setCellColor(cell, element);
             }
          }

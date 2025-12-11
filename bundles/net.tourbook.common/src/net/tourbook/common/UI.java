@@ -1814,7 +1814,9 @@ public class UI {
     *
     * @return
     */
-   public static Composite createPage(final FormToolkit formToolkit, final Composite parent, final String labelText) {
+   public static Composite createPage(final FormToolkit formToolkit,
+                                      final Composite parent,
+                                      final String labelText) {
 
       final Composite container = formToolkit.createComposite(parent);
       GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
@@ -1848,7 +1850,23 @@ public class UI {
       return label;
    }
 
-   public static void createSpacer_Vertical(final Composite parent, final int height, final int spanHorizontal) {
+   public static Label createSpacer_Horizontal(final Composite parent,
+                                               final int width,
+                                               final int columns) {
+
+      final Label label = new Label(parent, SWT.NONE);
+
+      GridDataFactory.fillDefaults()
+            .hint(width, SWT.DEFAULT)
+            .span(columns, 1)
+            .applyTo(label);
+
+      return label;
+   }
+
+   public static void createSpacer_Vertical(final Composite parent,
+                                            final int height,
+                                            final int spanHorizontal) {
 
       final Label label = new Label(parent, SWT.NONE);
 

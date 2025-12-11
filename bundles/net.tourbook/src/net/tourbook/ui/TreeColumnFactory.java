@@ -69,12 +69,16 @@ public abstract class TreeColumnFactory {
    public static final String            EQUIPMENT_DATE_FIRST_USE_ID      = "EQUIPMENT_DATE_FIRST_USE";         //$NON-NLS-1$
    public static final TreeColumnFactory EQUIPMENT_DATE_RETIRED;
    public static final String            EQUIPMENT_DATE_RETIRED_ID        = "EQUIPMENT_DATE_RETIRED";           //$NON-NLS-1$
+   public static final TreeColumnFactory EQUIPMENT_INITIAL_DISTANCE;
+   public static final String            EQUIPMENT_INITIAL_DISTANCE_ID    = "EQUIPMENT_INITIAL_DISTANCE";       //$NON-NLS-1$
    public static final TreeColumnFactory EQUIPMENT_MODEL;
    public static final String            EQUIPMENT_MODEL_ID               = "EQUIPMENT_MODEL";                  //$NON-NLS-1$
    public static final TreeColumnFactory EQUIPMENT_PRICE;
    public static final String            EQUIPMENT_PRICE_ID               = "EQUIPMENT_PRICE";                  //$NON-NLS-1$
    public static final TreeColumnFactory EQUIPMENT_PRICE_UNIT;
    public static final String            EQUIPMENT_PRICE_UNIT_ID          = "EQUIPMENT_PRICE_UNIT";             //$NON-NLS-1$
+   public static final TreeColumnFactory EQUIPMENT_WEIGHT;
+   public static final String            EQUIPMENT_WEIGHT_ID              = "EQUIPMENT_WEIGHT";                 //$NON-NLS-1$
 
    public static final TreeColumnFactory MOTION_AVG_PACE;
    public static final TreeColumnFactory MOTION_AVG_SPEED;
@@ -816,6 +820,29 @@ public abstract class TreeColumnFactory {
          }
       };
 
+      EQUIPMENT_INITIAL_DISTANCE = new TreeColumnFactory() {
+         @Override
+         public TreeColumnDefinition createColumn(final ColumnManager columnManager,
+                                                  final PixelConverter pixelConverter) {
+
+            final TreeColumnDefinition colDef = new TreeColumnDefinition(columnManager, EQUIPMENT_INITIAL_DISTANCE_ID, SWT.TRAIL);
+
+            colDef.setColumnCategory(           Messages.ColumnFactory_Category_Motion);
+
+            colDef.setColumnLabel(              "Initial distance");
+            colDef.setColumnHeaderText(         UI.UNIT_LABEL_DISTANCE);
+            colDef.setColumnHeaderToolTipText(  "Initial distance");
+            colDef.setColumnUnit(               UI.UNIT_LABEL_DISTANCE);
+
+            colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(12));
+//            colDef.setValueFormats(
+//                  ValueFormatSet.Number,
+//                  ValueFormat.NUMBER_1_0,
+//                  columnManager);
+
+            return colDef;
+         }
+      };
 
       EQUIPMENT_MODEL = new TreeColumnFactory() {
          @Override
@@ -875,6 +902,29 @@ public abstract class TreeColumnFactory {
 
             colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(5));
 
+
+            return colDef;
+         }
+      };
+
+      EQUIPMENT_WEIGHT = new TreeColumnFactory() {
+         @Override
+         public TreeColumnDefinition createColumn(final ColumnManager columnManager,
+                                                  final PixelConverter pixelConverter) {
+
+            final TreeColumnDefinition colDef = new TreeColumnDefinition(columnManager, EQUIPMENT_WEIGHT_ID, SWT.TRAIL);
+
+            colDef.setColumnCategory(           Messages.ColumnFactory_Category_Equipment);
+
+            colDef.setColumnLabel(              "Weight");
+            colDef.setColumnHeaderText(         UI.UNIT_LABEL_WEIGHT);
+            colDef.setColumnUnit(               UI.UNIT_LABEL_WEIGHT);
+
+            colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(12));
+            colDef.setValueFormats(
+                  ValueFormatSet.Number,
+                  ValueFormat.NUMBER_1_0,
+                  columnManager);
 
             return colDef;
          }

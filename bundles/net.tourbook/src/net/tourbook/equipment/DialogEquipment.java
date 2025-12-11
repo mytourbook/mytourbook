@@ -27,8 +27,6 @@ import net.tourbook.common.util.StringUtils;
 import net.tourbook.common.util.Util;
 import net.tourbook.data.Equipment;
 
-import org.eclipse.jface.action.Action;
-import org.eclipse.jface.action.ToolBarManager;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.dialogs.TitleAreaDialog;
@@ -49,7 +47,6 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Spinner;
 import org.eclipse.swt.widgets.Text;
-import org.eclipse.swt.widgets.ToolBar;
 
 /**
  * Dialog to modify a {@link Equipment}
@@ -79,10 +76,6 @@ public class DialogEquipment extends TitleAreaDialog {
    private MouseWheelListener           _defaultMouseWheelListener;
 
    private boolean                      _isModified;
-
-   private ActionSetDateNow             _actionDateNow_Buildt;
-   private ActionSetDateNow             _actionDateNow_FirstUse;
-   private ActionSetDateNow             _actionDateNow_Retired;
 
    private PixelConverter               _pc;
 
@@ -116,28 +109,6 @@ public class DialogEquipment extends TitleAreaDialog {
    private AutoComplete_ComboInputMT _autocomplete_Brand;
    private AutoComplete_ComboInputMT _autocomplete_Model;
    private AutoComplete_ComboInputMT _autocomplete_PriceUnit;
-
-   private class ActionSetDateNow extends Action {
-
-      private int _dateField;
-
-      public ActionSetDateNow(final int dateField) {
-
-         super(UI.EMPTY_STRING, AS_PUSH_BUTTON);
-
-         _dateField = dateField;
-
-         setToolTipText("Set date to today");
-
-         setImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.App_Today_Calendar));
-      }
-
-      @Override
-      public void run() {
-
-         onAction_SetDateNow(_dateField);
-      }
-   }
 
    public DialogEquipment(final Shell parentShell, final Equipment equipment) {
 
@@ -183,9 +154,6 @@ public class DialogEquipment extends TitleAreaDialog {
 
    private void createActions() {
 
-      _actionDateNow_Buildt = new ActionSetDateNow(1);
-      _actionDateNow_FirstUse = new ActionSetDateNow(2);
-      _actionDateNow_Retired = new ActionSetDateNow(3);
    }
 
    @Override
@@ -235,8 +203,8 @@ public class DialogEquipment extends TitleAreaDialog {
 
       _container = new Composite(parent, SWT.NONE);
       GridDataFactory.fillDefaults().grab(true, true).applyTo(_container);
-      GridLayoutFactory.swtDefaults().numColumns(4).applyTo(_container);
-//      _container.setBackground(UI.SYS_COLOR_CYAN);
+      GridLayoutFactory.swtDefaults().numColumns(8).applyTo(_container);
+//      _container.setBackground(UI.SYS_COLOR_GREEN);
       {
          {
             /*
@@ -251,7 +219,7 @@ public class DialogEquipment extends TitleAreaDialog {
             _comboBrand.setText(UI.EMPTY_STRING);
             _comboBrand.addModifyListener(_defaultModifyListener);
 
-            GridDataFactory.fillDefaults().grab(true, false).span(3, 1).applyTo(_comboBrand);
+            GridDataFactory.fillDefaults().grab(true, false).span(7, 1).applyTo(_comboBrand);
 
             _autocomplete_Brand = new AutoComplete_ComboInputMT(_comboBrand);
          }
@@ -267,7 +235,7 @@ public class DialogEquipment extends TitleAreaDialog {
             _comboModel.setText(UI.EMPTY_STRING);
             _comboModel.addModifyListener(_defaultModifyListener);
 
-            GridDataFactory.fillDefaults().grab(true, false).span(3, 1).applyTo(_comboModel);
+            GridDataFactory.fillDefaults().grab(true, false).span(7, 1).applyTo(_comboModel);
 
             _autocomplete_Model = new AutoComplete_ComboInputMT(_comboModel);
          }
@@ -278,19 +246,12 @@ public class DialogEquipment extends TitleAreaDialog {
             final Label label = UI.createLabel(_container, Messages.Dialog_Equipment_Label_DateFirstUse);
             gdVertCenter.applyTo(label);
 
-            final Composite subContainer = new Composite(_container, SWT.NONE);
-            GridDataFactory.fillDefaults().grab(true, false).applyTo(subContainer);
-            GridLayoutFactory.fillDefaults().numColumns(2).applyTo(subContainer);
-            {
-               _dateFirstUse = new DateTime(subContainer, SWT.DATE | SWT.MEDIUM | SWT.BORDER);
-               _dateFirstUse.addSelectionListener(_defaultSelectionListener);
-
-               final ToolBar toolbar = new ToolBar(subContainer, SWT.FLAT);
-               final ToolBarManager tbm = new ToolBarManager(toolbar);
-               tbm.add(_actionDateNow_FirstUse);
-               tbm.update(true);
-            }
+            _dateFirstUse = new DateTime(_container, SWT.DATE | SWT.MEDIUM | SWT.DROP_DOWN);
+            _dateFirstUse.addSelectionListener(_defaultSelectionListener);
          }
+         UI.createSpacer_Horizontal(_container, 1);
+         // force more space between the 2 data columns
+         UI.createSpacer_Horizontal(_container, _pc.convertWidthInCharsToPixels(5), 1);
          {
             /*
              * Built date
@@ -298,24 +259,15 @@ public class DialogEquipment extends TitleAreaDialog {
             final Label label = UI.createLabel(_container, Messages.Dialog_Equipment_Label_DateBuilt);
             gdVertCenter.applyTo(label);
 
-            final Composite subContainer = new Composite(_container, SWT.NONE);
-            GridDataFactory.fillDefaults().grab(true, false).applyTo(subContainer);
-            GridLayoutFactory.fillDefaults().numColumns(3).applyTo(subContainer);
-            {
-               _dateBuilt = new DateTime(subContainer, SWT.DATE | SWT.MEDIUM | SWT.BORDER);
-               _dateBuilt.addSelectionListener(_defaultSelectionListener);
+            _dateBuilt = new DateTime(_container, SWT.DATE | SWT.MEDIUM | SWT.DROP_DOWN);
+            _dateBuilt.addSelectionListener(_defaultSelectionListener);
 
-               final ToolBar toolbar = new ToolBar(subContainer, SWT.FLAT);
-               final ToolBarManager tbm = new ToolBarManager(toolbar);
-               tbm.add(_actionDateNow_Buildt);
-               tbm.update(true);
-
-               _chkSyncDates = new Button(subContainer, SWT.CHECK);
-               _chkSyncDates.setText("S&ync");
-               _chkSyncDates.setToolTipText("Sync with first use date");
-               _chkSyncDates.addSelectionListener(_defaultSelectionListener);
-            }
+            _chkSyncDates = new Button(_container, SWT.CHECK);
+            _chkSyncDates.setText("S&ync");
+            _chkSyncDates.setToolTipText("Sync built date with first use date");
+            _chkSyncDates.addSelectionListener(_defaultSelectionListener);
          }
+         UI.createSpacer_Horizontal(_container, 1);
          {
             /*
              * Price
@@ -323,33 +275,29 @@ public class DialogEquipment extends TitleAreaDialog {
 
             UI.createLabel(_container, "&Price");
 
-            final Composite subContainer = new Composite(_container, SWT.NONE);
-            GridDataFactory.fillDefaults().grab(true, false).applyTo(subContainer);
-            GridLayoutFactory.fillDefaults().numColumns(2).applyTo(subContainer);
-            {
-               // spinner
-               _spinPrice = new Spinner(subContainer, SWT.BORDER);
+            // spinner
+            _spinPrice = new Spinner(_container, SWT.BORDER);
 
-               _spinPrice.setDigits(2);
-               _spinPrice.setMinimum(-1_000_000_000);
-               _spinPrice.setMaximum(1_000_000_000);
+            _spinPrice.setDigits(2);
+            _spinPrice.setMinimum(-1_000_000_000);
+            _spinPrice.setMaximum(1_000_000_000);
 
-               _spinPrice.addMouseWheelListener(_defaultMouseWheelListener);
-               _spinPrice.addSelectionListener(_defaultSelectionListener);
+            _spinPrice.addMouseWheelListener(_defaultMouseWheelListener);
+            _spinPrice.addSelectionListener(_defaultSelectionListener);
 
-               // autocomplete combo
-               _comboPriceUnit = new Combo(subContainer, SWT.BORDER | SWT.FLAT);
-               _comboPriceUnit.setText(UI.EMPTY_STRING);
-               _comboPriceUnit.setToolTipText("Currency");
-               _comboPriceUnit.addModifyListener(_defaultModifyListener);
+            // autocomplete combo
+            _comboPriceUnit = new Combo(_container, SWT.BORDER | SWT.FLAT);
+            _comboPriceUnit.setText(UI.EMPTY_STRING);
+            _comboPriceUnit.setToolTipText("Currency");
+            _comboPriceUnit.addModifyListener(_defaultModifyListener);
 
-               GridDataFactory.fillDefaults()
-                     .hint(_pc.convertWidthInCharsToPixels(4), SWT.DEFAULT)
-                     .applyTo(_comboPriceUnit);
+            GridDataFactory.fillDefaults()
+                  .hint(_pc.convertWidthInCharsToPixels(4), SWT.DEFAULT)
+                  .applyTo(_comboPriceUnit);
 
-               _autocomplete_PriceUnit = new AutoComplete_ComboInputMT(_comboPriceUnit);
-            }
+            _autocomplete_PriceUnit = new AutoComplete_ComboInputMT(_comboPriceUnit);
          }
+         UI.createSpacer_Horizontal(_container, 1);
          {
             /*
              * Retired date
@@ -357,19 +305,10 @@ public class DialogEquipment extends TitleAreaDialog {
             final Label label = UI.createLabel(_container, Messages.Dialog_Equipment_Label_DateRetired);
             gdVertCenter.applyTo(label);
 
-            final Composite subContainer = new Composite(_container, SWT.NONE);
-            GridDataFactory.fillDefaults().grab(true, false).applyTo(subContainer);
-            GridLayoutFactory.fillDefaults().numColumns(2).applyTo(subContainer);
-            {
-               _dateRetired = new DateTime(subContainer, SWT.DATE | SWT.MEDIUM);
-               _dateRetired.addSelectionListener(_defaultSelectionListener);
-
-               final ToolBar toolbar = new ToolBar(subContainer, SWT.FLAT);
-               final ToolBarManager tbm = new ToolBarManager(toolbar);
-               tbm.add(_actionDateNow_Retired);
-               tbm.update(true);
-            }
+            _dateRetired = new DateTime(_container, SWT.DATE | SWT.MEDIUM | SWT.DROP_DOWN);
+            _dateRetired.addSelectionListener(_defaultSelectionListener);
          }
+         UI.createSpacer_Horizontal(_container, 2);
          {
             /*
              * Weight
@@ -377,24 +316,20 @@ public class DialogEquipment extends TitleAreaDialog {
 
             UI.createLabel(_container, "&Weight");
 
-            final Composite subContainer = new Composite(_container, SWT.NONE);
-            GridDataFactory.fillDefaults().grab(true, false).applyTo(subContainer);
-            GridLayoutFactory.fillDefaults().numColumns(2).applyTo(subContainer);
-            {
-               // spinner
-               _spinWeight = new Spinner(subContainer, SWT.BORDER);
+            // spinner
+            _spinWeight = new Spinner(_container, SWT.BORDER);
 
-               _spinWeight.setDigits(3);
-               _spinWeight.setMinimum(0);
-               _spinWeight.setMaximum(1_000_000_000);
+            _spinWeight.setDigits(3);
+            _spinWeight.setMinimum(0);
+            _spinWeight.setMaximum(1_000_000_000);
 
-               _spinWeight.addMouseWheelListener(_defaultMouseWheelListener);
-               _spinWeight.addSelectionListener(_defaultSelectionListener);
+            _spinWeight.addMouseWheelListener(_defaultMouseWheelListener);
+            _spinWeight.addSelectionListener(_defaultSelectionListener);
 
-               // label: kg
-               UI.createLabel(subContainer, UI.UNIT_LABEL_WEIGHT);
-            }
+            // label: kg
+            UI.createLabel(_container, UI.UNIT_LABEL_WEIGHT);
          }
+         UI.createSpacer_Horizontal(_container, 1);
          {
             /*
              * Distance first use
@@ -403,24 +338,20 @@ public class DialogEquipment extends TitleAreaDialog {
             final Label label = UI.createLabel(_container, "Initial d&istance");
             label.setToolTipText("Distance by first use");
 
-            final Composite containerWeight = new Composite(_container, SWT.NONE);
-            GridDataFactory.fillDefaults().grab(true, false).applyTo(containerWeight);
-            GridLayoutFactory.fillDefaults().numColumns(2).applyTo(containerWeight);
-            {
-               // spinner
-               _spinDistance = new Spinner(containerWeight, SWT.BORDER);
+            // spinner
+            _spinDistance = new Spinner(_container, SWT.BORDER);
 
-               _spinDistance.setDigits(0);
-               _spinDistance.setMinimum(0);
-               _spinDistance.setMaximum(1_000_000_000);
+            _spinDistance.setDigits(0);
+            _spinDistance.setMinimum(0);
+            _spinDistance.setMaximum(1_000_000_000);
 
-               _spinDistance.addMouseWheelListener(_defaultMouseWheelListener);
-               _spinDistance.addSelectionListener(_defaultSelectionListener);
+            _spinDistance.addMouseWheelListener(_defaultMouseWheelListener);
+            _spinDistance.addSelectionListener(_defaultSelectionListener);
 
-               // label: km/mi
-               UI.createLabel(containerWeight, UI.UNIT_LABEL_DISTANCE);
-            }
+            // label: km/mi
+            UI.createLabel(_container, UI.UNIT_LABEL_DISTANCE);
          }
+         UI.createSpacer_Horizontal(_container, 1);
          {
             /*
              * Description
@@ -433,7 +364,7 @@ public class DialogEquipment extends TitleAreaDialog {
             GridDataFactory.fillDefaults()
                   .grab(true, true)
                   .hint(convertWidthInCharsToPixels(100), convertHeightInCharsToPixels(20))
-                  .span(3, 1)
+                  .span(7, 1)
                   .applyTo(_txtDescription);
          }
       }
@@ -449,7 +380,6 @@ public class DialogEquipment extends TitleAreaDialog {
       final boolean canEditBuiltDate = isSyncDates == false;
 
       _dateBuilt.setEnabled(canEditBuiltDate);
-      _actionDateNow_Buildt.setEnabled(canEditBuiltDate);
 
       final boolean isValid = _isNewEquipment && _isModified == false
 
@@ -555,37 +485,6 @@ public class DialogEquipment extends TitleAreaDialog {
       }
 
       super.okPressed();
-   }
-
-   private void onAction_SetDateNow(final int dateField) {
-
-      _isInUIUpdate = true;
-
-      final LocalDate now = LocalDate.now();
-
-      final int year = now.getYear();
-      final int month = now.getMonthValue() - 1;
-      final int day = now.getDayOfMonth();
-
-      if (dateField == 1) {
-
-         _dateBuilt.setDate(year, month, day);
-
-      } else if (dateField == 2) {
-
-         _dateFirstUse.setDate(year, month, day);
-
-         if (_chkSyncDates.getSelection()) {
-            // synch first use -> buildt
-            _dateBuilt.setDate(year, month, day);
-         }
-
-      } else if (dateField == 3) {
-
-         _dateRetired.setDate(year, month, day);
-      }
-
-      _isInUIUpdate = false;
    }
 
    private void onDispose() {
