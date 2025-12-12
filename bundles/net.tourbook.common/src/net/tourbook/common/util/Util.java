@@ -3257,6 +3257,11 @@ public class Util {
     */
    public static void setXmlLongArray(final IMemento memento, final String listKeyName, final long[] values) {
 
+      // fix NPE
+      if (values == null) {
+         return;
+      }
+
       final IMemento mementoList = memento.createChild(TAG_LIST);
 
       mementoList.putString(ATTR_KEY, listKeyName);
