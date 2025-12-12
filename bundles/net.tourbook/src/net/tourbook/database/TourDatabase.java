@@ -2006,13 +2006,13 @@ public class TourDatabase {
                final String dbName = allDBNames[dbIndex];
 
                if (dbIndex > 0) {
-                  sb.append("UNION" + NL);
+                  sb.append("UNION" + NL); //$NON-NLS-1$
                }
 
-               sb.append("SELECT " + fieldname + " FROM " + dbName + NL);
+               sb.append("SELECT " + fieldname + " FROM " + dbName + NL); //$NON-NLS-1$ //$NON-NLS-2$
             }
 
-            sb.append("ORDER BY " + fieldname + NL);
+            sb.append("ORDER BY " + fieldname + NL); //$NON-NLS-1$
 
             sql = sb.toString();
 
@@ -4522,19 +4522,20 @@ public class TourDatabase {
 
                   + SQL.createField_EntityId(ENTITY_ID_EQUIPMENT, true)
 
-                  + "   Brand                VARCHAR(" + DB_LENGTH_NAME + "),             " + NL //$NON-NLS-1$ //$NON-NLS-2$
-                  + "   Model                VARCHAR(" + DB_LENGTH_NAME + "),             " + NL //$NON-NLS-1$ //$NON-NLS-2$
-                  + "   Description          VARCHAR(" + DB_LENGTH_DESCRIPTION + "),      " + NL //$NON-NLS-1$ //$NON-NLS-2$
+                  + "   Brand                   VARCHAR(" + DB_LENGTH_NAME + "),          " + NL //$NON-NLS-1$ //$NON-NLS-2$
+                  + "   Model                   VARCHAR(" + DB_LENGTH_NAME + "),          " + NL //$NON-NLS-1$ //$NON-NLS-2$
+                  + "   Type                    VARCHAR(" + DB_LENGTH_NAME + "),          " + NL //$NON-NLS-1$ //$NON-NLS-2$
+                  + "   Description             VARCHAR(" + DB_LENGTH_DESCRIPTION + "),   " + NL //$NON-NLS-1$ //$NON-NLS-2$
 
-                  + "   DateBuilt            BIGINT DEFAULT 0,                            " + NL //$NON-NLS-1$
-                  + "   DateFirstUse         BIGINT DEFAULT 0,                            " + NL //$NON-NLS-1$
-                  + "   DateRetired          BIGINT DEFAULT 0,                            " + NL //$NON-NLS-1$
+                  + "   DistanceFirstUse        FLOAT DEFAULT 0,                          " + NL //$NON-NLS-1$
+                  + "   Price                   FLOAT DEFAULT 0,                          " + NL //$NON-NLS-1$
+                  + "   PriceUnit               VARCHAR(" + DB_LENGTH_NAME + "),          " + NL //$NON-NLS-1$ //$NON-NLS-2$
+                  + "   Size                    VARCHAR(" + DB_LENGTH_NAME + "),          " + NL //$NON-NLS-1$ //$NON-NLS-2$
+                  + "   Weight                  FLOAT DEFAULT 0,                          " + NL //$NON-NLS-1$
 
-                  + "   Price                FLOAT DEFAULT 0,                             " + NL //$NON-NLS-1$
-                  + "   PriceUnit            VARCHAR(" + DB_LENGTH_NAME + "),             " + NL //$NON-NLS-1$ //$NON-NLS-2$
-
-                  + "   Weight               FLOAT DEFAULT 0,                             " + NL //$NON-NLS-1$
-                  + "   DistanceFirstUse     FLOAT DEFAULT 0                              " + NL //$NON-NLS-1$
+                  + "   DateBuilt               BIGINT DEFAULT 0,                         " + NL //$NON-NLS-1$
+                  + "   DateFirstUse            BIGINT DEFAULT 0,                         " + NL //$NON-NLS-1$
+                  + "   DateRetired             BIGINT DEFAULT 0                          " + NL //$NON-NLS-1$
 
                   + ")" //                                                                       //$NON-NLS-1$
       );
@@ -4575,27 +4576,30 @@ public class TourDatabase {
     */
    private void createTable_EquipmentPart(final Statement stmt) throws SQLException {
 
-      exec(stmt, "CREATE TABLE " + TABLE_EQUIPMENT_PART + "   (                           " + NL //$NON-NLS-1$ //$NON-NLS-2$
-      //
-            + SQL.createField_EntityId(ENTITY_ID_EQUIPMENT_PART, true)
+      exec(stmt,
 
-            + "   " + KEY_EQUIPMENT + "   BIGINT,                                         " + NL //$NON-NLS-1$ //$NON-NLS-2$
+            "CREATE TABLE " + TABLE_EQUIPMENT_PART + "   (                                " + NL //$NON-NLS-1$ //$NON-NLS-2$
 
-            + "   Brand                   VARCHAR(" + DB_LENGTH_NAME + "),                " + NL //$NON-NLS-1$ //$NON-NLS-2$
-            + "   Model                   VARCHAR(" + DB_LENGTH_NAME + "),                " + NL //$NON-NLS-1$ //$NON-NLS-2$
-            + "   Description             VARCHAR(" + DB_LENGTH_DESCRIPTION + "),         " + NL //$NON-NLS-1$ //$NON-NLS-2$
+                  + SQL.createField_EntityId(ENTITY_ID_EQUIPMENT_PART, true)
 
-            + "   DateBuilt               BIGINT DEFAULT 0,                               " + NL //$NON-NLS-1$
-            + "   DateFirstUse            BIGINT DEFAULT 0,                               " + NL //$NON-NLS-1$
-            + "   DateRetired             BIGINT DEFAULT 0,                               " + NL //$NON-NLS-1$
+                  + "   " + KEY_EQUIPMENT + "   BIGINT,                                   " + NL //$NON-NLS-1$ //$NON-NLS-2$
 
-            + "   Price                   FLOAT DEFAULT 0,                                " + NL //$NON-NLS-1$
-            + "   PriceUnit               VARCHAR(" + DB_LENGTH_NAME + "),                " + NL //$NON-NLS-1$ //$NON-NLS-2$
+                  + "   Brand                   VARCHAR(" + DB_LENGTH_NAME + "),          " + NL //$NON-NLS-1$ //$NON-NLS-2$
+                  + "   Model                   VARCHAR(" + DB_LENGTH_NAME + "),          " + NL //$NON-NLS-1$ //$NON-NLS-2$
+                  + "   Type                    VARCHAR(" + DB_LENGTH_NAME + "),          " + NL //$NON-NLS-1$ //$NON-NLS-2$
+                  + "   Description             VARCHAR(" + DB_LENGTH_DESCRIPTION + "),   " + NL //$NON-NLS-1$ //$NON-NLS-2$
 
-            + "   Weight                  FLOAT DEFAULT 0,                                " + NL //$NON-NLS-1$
-            + "   DistanceFirstUse        FLOAT DEFAULT 0                                 " + NL //$NON-NLS-1$
+                  + "   DistanceFirstUse        FLOAT DEFAULT 0,                          " + NL //$NON-NLS-1$
+                  + "   Price                   FLOAT DEFAULT 0,                          " + NL //$NON-NLS-1$
+                  + "   PriceUnit               VARCHAR(" + DB_LENGTH_NAME + "),          " + NL //$NON-NLS-1$ //$NON-NLS-2$
+                  + "   Size                    VARCHAR(" + DB_LENGTH_NAME + "),          " + NL //$NON-NLS-1$ //$NON-NLS-2$
+                  + "   Weight                  FLOAT DEFAULT 0,                          " + NL //$NON-NLS-1$
 
-            + ")" //                                                                             //$NON-NLS-1$
+                  + "   DateBuilt               BIGINT DEFAULT 0,                         " + NL //$NON-NLS-1$
+                  + "   DateFirstUse            BIGINT DEFAULT 0,                         " + NL //$NON-NLS-1$
+                  + "   DateRetired             BIGINT DEFAULT 0                          " + NL //$NON-NLS-1$
+
+                  + ")" //                                                                       //$NON-NLS-1$
       );
    }
 

@@ -3,7 +3,7 @@
    version="1.1"
    id="svg2985"
    height="16.000015"
-   width="16"
+   width="16.003876"
    xmlns="http://www.w3.org/2000/svg"
    xmlns:svg="http://www.w3.org/2000/svg"
    xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
@@ -55,21 +55,21 @@
   <g
      id="layer1"
      style="display:inline"
-     transform="translate(-100,-19)">
+     transform="translate(-165,-19)">
     <rect
        y="19"
-       x="100"
+       x="165"
        height="16.000015"
        width="15.999991"
        id="rect6561-8-1-9-9-5-5-9-9-1-3-94-1-6-6-4-5-4-9-5-9-5-4-0"
        style="display:inline;opacity:0.99;fill:none;stroke:none" />
     <path
-       id="rect9-4-8"
-       style="display:inline;fill:#e9e61f;fill-opacity:1;stroke:#79770c;stroke-width:0.500003;stroke-miterlimit:3;stroke-opacity:1"
-       d="M 115.82164,34.824822 108.2495,27.115042 100.67736,34.824822" />
-    <path
        id="path10416-4-7-9"
-       d="M 100,21 H 102 V 19 H 102.99999 V 21 H 104.99999 V 22 H 102.99999 V 24 H 102 V 22 H 100 Z"
+       d="M 165,21 H 167 V 19 H 167.99999 V 21 H 169.99999 V 22 H 167.99999 V 24 H 167 V 22 H 165 Z"
        style="display:inline;fill:#808080;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
+    <path
+       id="rect9-4-1-1-2-0-4-2-4-9"
+       style="display:inline;fill:#e9e61f;fill-opacity:1;stroke:#79770c;stroke-width:0.500003;stroke-miterlimit:3;stroke-opacity:1"
+       d="M 169.05514,27.120577 173.37545,34.650284 180.87829,30.291505" />
   </g>
 </svg>

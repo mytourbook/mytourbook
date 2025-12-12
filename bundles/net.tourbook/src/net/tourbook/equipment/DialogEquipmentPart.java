@@ -60,8 +60,11 @@ public class DialogEquipmentPart extends TitleAreaDialog {
 
    private static final String          STATE_AUTOCOMPLETE_POPUP_HEIGHT_BRAND      = "STATE_AUTOCOMPLETE_POPUP_HEIGHT_BRAND";      //$NON-NLS-1$
    private static final String          STATE_AUTOCOMPLETE_POPUP_HEIGHT_MODEL      = "STATE_AUTOCOMPLETE_POPUP_HEIGHT_MODEL";      //$NON-NLS-1$
+   private static final String          STATE_AUTOCOMPLETE_POPUP_HEIGHT_SIZE       = "STATE_AUTOCOMPLETE_POPUP_HEIGHT_SIZE";       //$NON-NLS-1$
+   private static final String          STATE_AUTOCOMPLETE_POPUP_HEIGHT_TYPE       = "STATE_AUTOCOMPLETE_POPUP_HEIGHT_TYPE";       //$NON-NLS-1$
    private static final String          STATE_AUTOCOMPLETE_POPUP_HEIGHT_PRICE_UNIT = "STATE_AUTOCOMPLETE_POPUP_HEIGHT_PRICE_UNIT"; //$NON-NLS-1$
    private static final String          STATE_PRICE_UNIT_DEFAULT                   = "STATE_PRICE_UNIT_DEFAULT";                   //$NON-NLS-1$
+   private static final String          STATE_SYNC_DATES                           = "STATE_SYNC_DATES";                           //$NON-NLS-1$
 
    /**
     * New or cloned instance
@@ -97,6 +100,8 @@ public class DialogEquipmentPart extends TitleAreaDialog {
    private Combo                     _comboBrand;
    private Combo                     _comboModel;
    private Combo                     _comboPriceUnit;
+   private Combo                     _comboSize;
+   private Combo                     _comboType;
 
    private DateTime                  _dateBuilt;
    private DateTime                  _dateFirstUse;
@@ -111,6 +116,8 @@ public class DialogEquipmentPart extends TitleAreaDialog {
    private AutoComplete_ComboInputMT _autocomplete_Brand;
    private AutoComplete_ComboInputMT _autocomplete_Model;
    private AutoComplete_ComboInputMT _autocomplete_PriceUnit;
+   private AutoComplete_ComboInputMT _autocomplete_Size;
+   private AutoComplete_ComboInputMT _autocomplete_Type;
 
    public DialogEquipmentPart(final Shell parentShell,
                               final Equipment equipment,
@@ -223,8 +230,8 @@ public class DialogEquipmentPart extends TitleAreaDialog {
 
       _container = new Composite(parent, SWT.NONE);
       GridDataFactory.fillDefaults().grab(true, true).applyTo(_container);
-      GridLayoutFactory.swtDefaults().numColumns(8).applyTo(_container);
-//      _container.setBackground(UI.SYS_COLOR_CYAN);
+      GridLayoutFactory.swtDefaults().numColumns(7).applyTo(_container);
+//      _container.setBackground(UI.SYS_COLOR_GREEN);
       {
          {
             /*
@@ -239,10 +246,12 @@ public class DialogEquipmentPart extends TitleAreaDialog {
             _comboBrand.setText(UI.EMPTY_STRING);
             _comboBrand.addModifyListener(_defaultModifyListener);
 
-            GridDataFactory.fillDefaults().grab(true, false).span(7, 1).applyTo(_comboBrand);
+            GridDataFactory.fillDefaults().grab(true, false).span(2, 1).applyTo(_comboBrand);
 
             _autocomplete_Brand = new AutoComplete_ComboInputMT(_comboBrand);
          }
+         // force more space between the 2 data columns
+         UI.createSpacer_Horizontal(_container, _pc.convertWidthInCharsToPixels(3), 1);
          {
             /*
              * Model/subname
@@ -255,39 +264,43 @@ public class DialogEquipmentPart extends TitleAreaDialog {
             _comboModel.setText(UI.EMPTY_STRING);
             _comboModel.addModifyListener(_defaultModifyListener);
 
-            GridDataFactory.fillDefaults().grab(true, false).span(7, 1).applyTo(_comboModel);
+            GridDataFactory.fillDefaults().grab(true, false).span(2, 1).applyTo(_comboModel);
 
             _autocomplete_Model = new AutoComplete_ComboInputMT(_comboModel);
          }
          {
             /*
-             * First use date
+             * Type
              */
-            final Label label = UI.createLabel(_container, Messages.Dialog_Equipment_Label_DateFirstUse);
+            final Label label = UI.createLabel(_container, "T&ype");
             gdVertCenter.applyTo(label);
 
-            _dateFirstUse = new DateTime(_container, SWT.DATE | SWT.MEDIUM | SWT.DROP_DOWN);
-            _dateFirstUse.addSelectionListener(_defaultSelectionListener);
+            // autocomplete combo
+            _comboType = new Combo(_container, SWT.BORDER | SWT.FLAT);
+            _comboType.setText(UI.EMPTY_STRING);
+            _comboType.addModifyListener(_defaultModifyListener);
+
+            GridDataFactory.fillDefaults().grab(true, false).span(2, 1).applyTo(_comboType);
+
+            _autocomplete_Type = new AutoComplete_ComboInputMT(_comboType);
          }
          UI.createSpacer_Horizontal(_container, 1);
-         // force more space between the 2 data columns
-         UI.createSpacer_Horizontal(_container, _pc.convertWidthInCharsToPixels(5), 1);
          {
             /*
-             * Built date
+             * Size
              */
-            final Label label = UI.createLabel(_container, Messages.Dialog_Equipment_Label_DateBuilt);
+            final Label label = UI.createLabel(_container, "Si&ze");
             gdVertCenter.applyTo(label);
 
-            _dateBuilt = new DateTime(_container, SWT.DATE | SWT.MEDIUM | SWT.DROP_DOWN);
-            _dateBuilt.addSelectionListener(_defaultSelectionListener);
+            // autocomplete combo
+            _comboSize = new Combo(_container, SWT.BORDER | SWT.FLAT);
+            _comboSize.setText(UI.EMPTY_STRING);
+            _comboSize.addModifyListener(_defaultModifyListener);
 
-            _chkSyncDates = new Button(_container, SWT.CHECK);
-            _chkSyncDates.setText("S&ync");
-            _chkSyncDates.setToolTipText("Sync built date with first use date");
-            _chkSyncDates.addSelectionListener(_defaultSelectionListener);
+            GridDataFactory.fillDefaults().grab(true, false).span(2, 1).applyTo(_comboSize);
+
+            _autocomplete_Size = new AutoComplete_ComboInputMT(_comboSize);
          }
-         UI.createSpacer_Horizontal(_container, 1);
          {
             /*
              * Price
@@ -312,6 +325,7 @@ public class DialogEquipmentPart extends TitleAreaDialog {
             _comboPriceUnit.addModifyListener(_defaultModifyListener);
 
             GridDataFactory.fillDefaults()
+                  .align(SWT.BEGINNING, SWT.FILL)
                   .hint(_pc.convertWidthInCharsToPixels(4), SWT.DEFAULT)
                   .applyTo(_comboPriceUnit);
 
@@ -320,16 +334,15 @@ public class DialogEquipmentPart extends TitleAreaDialog {
          UI.createSpacer_Horizontal(_container, 1);
          {
             /*
-             * Retired date
+             * First use date
              */
-            final Label label = UI.createLabel(_container, Messages.Dialog_Equipment_Label_DateRetired);
+            final Label label = UI.createLabel(_container, Messages.Dialog_Equipment_Label_DateFirstUse);
             gdVertCenter.applyTo(label);
 
-            _dateRetired = new DateTime(_container, SWT.DATE | SWT.MEDIUM | SWT.DROP_DOWN);
-            _dateRetired.addSelectionListener(_defaultSelectionListener);
-
+            _dateFirstUse = new DateTime(_container, SWT.DATE | SWT.MEDIUM | SWT.DROP_DOWN);
+            _dateFirstUse.addSelectionListener(_defaultSelectionListener);
          }
-         UI.createSpacer_Horizontal(_container, 2);
+         UI.createSpacer_Horizontal(_container, 1);
          {
             /*
              * Weight
@@ -351,6 +364,21 @@ public class DialogEquipmentPart extends TitleAreaDialog {
             UI.createLabel(_container, UI.UNIT_LABEL_WEIGHT);
          }
          UI.createSpacer_Horizontal(_container, 1);
+         {
+            /*
+             * Built date
+             */
+            final Label label = UI.createLabel(_container, Messages.Dialog_Equipment_Label_DateBuilt);
+            gdVertCenter.applyTo(label);
+
+            _dateBuilt = new DateTime(_container, SWT.DATE | SWT.MEDIUM | SWT.DROP_DOWN);
+            _dateBuilt.addSelectionListener(_defaultSelectionListener);
+
+            _chkSyncDates = new Button(_container, SWT.CHECK);
+            _chkSyncDates.setText("Sy&nc");
+            _chkSyncDates.setToolTipText("Sync built date with first use date");
+            _chkSyncDates.addSelectionListener(_defaultSelectionListener);
+         }
          {
             /*
              * Distance first use
@@ -375,6 +403,18 @@ public class DialogEquipmentPart extends TitleAreaDialog {
          UI.createSpacer_Horizontal(_container, 1);
          {
             /*
+             * Retired date
+             */
+            final Label label = UI.createLabel(_container, Messages.Dialog_Equipment_Label_DateRetired);
+            gdVertCenter.applyTo(label);
+
+            _dateRetired = new DateTime(_container, SWT.DATE | SWT.MEDIUM | SWT.DROP_DOWN);
+            _dateRetired.addSelectionListener(_defaultSelectionListener);
+         }
+         UI.createSpacer_Horizontal(_container, 1);
+//         UI.createSpacer_Horizontal(_container, 1);
+         {
+            /*
              * Description
              */
             final Label label = UI.createLabel(_container, Messages.Dialog_Equipment_Label_Description);
@@ -384,11 +424,32 @@ public class DialogEquipmentPart extends TitleAreaDialog {
             _txtDescription.addModifyListener(e -> onModify());
             GridDataFactory.fillDefaults()
                   .grab(true, true)
-                  .hint(convertWidthInCharsToPixels(100), convertHeightInCharsToPixels(20))
-                  .span(7, 1)
+                  .hint(convertWidthInCharsToPixels(40), convertHeightInCharsToPixels(10))
+                  .span(6, 1)
                   .applyTo(_txtDescription);
          }
       }
+
+      // set tab ordering, cool feature but all controls MUST have the same parent !!!
+      _container.setTabList(new Control[] {
+
+            _comboBrand,
+            _comboModel,
+            _comboType,
+            _comboSize,
+
+            _spinPrice,
+            _comboPriceUnit,
+            _spinWeight,
+            _spinDistance,
+
+            _dateFirstUse,
+            _dateBuilt,
+            _chkSyncDates,
+            _dateRetired,
+
+            _txtDescription
+      });
    }
 
    private void enableControls() {
@@ -416,7 +477,7 @@ public class DialogEquipmentPart extends TitleAreaDialog {
    private void fillUI() {
 
       // fill brand combobox
-      final ConcurrentSkipListSet<String> allBrands = EquipmentManager.getCachedFields_AllPart_Brands();
+      final ConcurrentSkipListSet<String> allBrands = EquipmentManager.getCachedFields_AllBrands();
 
       for (final String brand : allBrands) {
          if (brand != null) {
@@ -425,7 +486,7 @@ public class DialogEquipmentPart extends TitleAreaDialog {
       }
 
       // fill model combobox
-      final ConcurrentSkipListSet<String> allModels = EquipmentManager.getCachedFields_AllPart_Models();
+      final ConcurrentSkipListSet<String> allModels = EquipmentManager.getCachedFields_AllModels();
 
       for (final String model : allModels) {
          if (model != null) {
@@ -510,6 +571,8 @@ public class DialogEquipmentPart extends TitleAreaDialog {
 
    private void onDispose() {
 
+      saveState();
+
       UI.disposeResource(_imageDialog);
 
       _autocomplete_Brand.saveState(_state, STATE_AUTOCOMPLETE_POPUP_HEIGHT_BRAND);
@@ -538,11 +601,25 @@ public class DialogEquipmentPart extends TitleAreaDialog {
       _autocomplete_Brand.restoreState(_state, STATE_AUTOCOMPLETE_POPUP_HEIGHT_BRAND);
       _autocomplete_Model.restoreState(_state, STATE_AUTOCOMPLETE_POPUP_HEIGHT_MODEL);
       _autocomplete_PriceUnit.restoreState(_state, STATE_AUTOCOMPLETE_POPUP_HEIGHT_PRICE_UNIT);
+      _autocomplete_Size.restoreState(_state, STATE_AUTOCOMPLETE_POPUP_HEIGHT_SIZE);
+      _autocomplete_Type.restoreState(_state, STATE_AUTOCOMPLETE_POPUP_HEIGHT_TYPE);
 
       // set default unit
       _comboPriceUnit.setText(Util.getStateString(_state, STATE_PRICE_UNIT_DEFAULT, UI.EMPTY_STRING));
 
       _isInUIUpdate = false;
+   }
+
+   private void saveState() {
+
+      _autocomplete_Brand.saveState(_state, STATE_AUTOCOMPLETE_POPUP_HEIGHT_BRAND);
+      _autocomplete_Model.saveState(_state, STATE_AUTOCOMPLETE_POPUP_HEIGHT_MODEL);
+      _autocomplete_PriceUnit.saveState(_state, STATE_AUTOCOMPLETE_POPUP_HEIGHT_PRICE_UNIT);
+      _autocomplete_Size.saveState(_state, STATE_AUTOCOMPLETE_POPUP_HEIGHT_SIZE);
+      _autocomplete_Type.saveState(_state, STATE_AUTOCOMPLETE_POPUP_HEIGHT_TYPE);
+
+      _state.put(STATE_PRICE_UNIT_DEFAULT, _comboPriceUnit.getText().trim());
+      _state.put(STATE_SYNC_DATES, _chkSyncDates.getSelection());
    }
 
    private void updateModelFromUI() {
@@ -557,12 +634,14 @@ public class DialogEquipmentPart extends TitleAreaDialog {
 
       _part.setBrand(            _comboBrand.getText().trim());
       _part.setModel(            _comboModel.getText().trim());
+      _part.setType(             _comboType.getText().trim());
       _part.setDescription(      _txtDescription.getText().trim());
 
       _part.setDistanceFirstUse( _spinDistance.getSelection());
-      _part.setWeight(           _spinWeight.getSelection() / 1000f);
       _part.setPrice(            _spinPrice.getSelection() / 100f);
       _part.setPriceUnit(        _comboPriceUnit.getText());
+      _part.setSize(             _comboSize.getText().trim());
+      _part.setWeight(           _spinWeight.getSelection() / 1000f);
 
       _part.setDateBuilt(        dateBuilt.toEpochDay());
       _part.setDateFirstUse(     dateFirstUse.toEpochDay());
@@ -602,6 +681,8 @@ public class DialogEquipmentPart extends TitleAreaDialog {
 
       _comboBrand       .setText(_part.getBrand());
       _comboModel       .setText(_part.getModel());
+      _comboSize        .setText(_part.getSize());
+      _comboType        .setText(_part.getType());
 
       _dateBuilt        .setDate(dateBuilt.getYear(),    dateBuilt.getMonthValue() - 1,      dateBuilt.getDayOfMonth());
       _dateFirstUse     .setDate(dateFirstUse.getYear(), dateFirstUse.getMonthValue() - 1,   dateFirstUse.getDayOfMonth());

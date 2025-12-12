@@ -48,14 +48,24 @@ public class EquipmentPart implements Cloneable, Comparable<Object>, Serializabl
    private long                       partId           = TourDatabase.ENTITY_IS_NOT_SAVED;
 
    /**
-    * Name/brand for the equipment
+    * Brand/name for the equipment, e.g. Continental
     */
    private String                     brand;
 
    /**
-    * Model/subname for the equipment
+    * Model/subname for the equipment, e.g. Grand Prix 4000 S II
     */
    private String                     model;
+
+   /**
+    * e.g. Faltreifen
+    */
+   private String                     type;
+
+   /**
+    * e.g. 700*22-23
+    */
+   private String                     size;
 
    /**
     * Description/notes for the equipment
@@ -306,6 +316,29 @@ public class EquipmentPart implements Cloneable, Comparable<Object>, Serializabl
       return priceUnit;
    }
 
+   public String getSize() {
+
+      if (size == null) {
+         return UI.EMPTY_STRING;
+      }
+
+      return size;
+   }
+
+   public String getType() {
+
+      if (type == null) {
+         return UI.EMPTY_STRING;
+      }
+
+      return type;
+   }
+
+   public LocalDate getUsageDuration() {
+      // TODO Auto-generated method stub
+      return null;
+   }
+
    public float getWeight() {
       return weight;
    }
@@ -406,6 +439,14 @@ public class EquipmentPart implements Cloneable, Comparable<Object>, Serializabl
       this.priceUnit = priceUnit;
    }
 
+   public void setSize(final String size) {
+      this.size = size;
+   }
+
+   public void setType(final String type) {
+      this.type = type;
+   }
+
    public void setWeight(final float weight) {
       this.weight = weight;
    }
@@ -436,18 +477,20 @@ public class EquipmentPart implements Cloneable, Comparable<Object>, Serializabl
 
    // SET_FORMATTING_OFF
 
-         brand             = otherPart.getBrand();
-         model             = otherPart.getModel();
-         description       = otherPart.getDescription();
+      brand             = otherPart.getBrand();
+      model             = otherPart.getModel();
+      type              = otherPart.getType();
+      description       = otherPart.getDescription();
 
-         distanceFirstUse  = otherPart.getDistanceFirstUse();
-         price             = otherPart.getPrice();
-         priceUnit         = otherPart.getPriceUnit();
-         weight            = otherPart.getWeight();
+      distanceFirstUse  = otherPart.getDistanceFirstUse();
+      price             = otherPart.getPrice();
+      priceUnit         = otherPart.getPriceUnit();
+      size              = otherPart.getSize();
+      weight            = otherPart.getWeight();
 
-         setDateBuilt(       otherPart.getDateBuilt_Raw());
-         setDateFirstUse(    otherPart.getDateFirstUse_Raw());
-         setDateRetired(     otherPart.getDateRetired_Raw());
+      setDateBuilt(       otherPart.getDateBuilt_Raw());
+      setDateFirstUse(    otherPart.getDateFirstUse_Raw());
+      setDateRetired(     otherPart.getDateRetired_Raw());
 
    // SET_FORMATTING_ON
 

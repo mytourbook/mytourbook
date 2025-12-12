@@ -57,34 +57,24 @@ public class Equipment implements Cloneable, Comparable<Object>, Serializable {
    private long                       equipmentId      = TourDatabase.ENTITY_IS_NOT_SAVED;
 
    /**
-    * Name/brand for the equipment
+    * Brand/name for the equipment, e.g. Price
     */
    private String                     brand;
 
    /**
-    * Model/subname for the equipment
+    * Model/subname for the equipment, e.g. Rennvelo 2016
     */
    private String                     model;
 
    /**
-    * Description/notes for the equipment
+    * e.g. Velo
     */
-   private String                     description;
+   private String                     type;
 
    /**
-    * When the equipment was created/build, in epoch days
+    * e.g.
     */
-   private long                       dateBuilt;
-
-   /**
-    * When the equipment was bought or firstly used, in epoch days
-    */
-   private long                       dateFirstUse;
-
-   /**
-    * When the equipment was retired/sold, in epoch days
-    */
-   private long                       dateRetired;
+   private String                     size;
 
    /**
     * Weight of the equipment, in kg
@@ -105,6 +95,26 @@ public class Equipment implements Cloneable, Comparable<Object>, Serializable {
     * Initial distance, in meter
     */
    private float                      distanceFirstUse;
+
+   /**
+    * Description/notes for the equipment
+    */
+   private String                     description;
+
+   /**
+    * When the equipment was created/build, in epoch days
+    */
+   private long                       dateBuilt;
+
+   /**
+    * When the equipment was bought or firstly used, in epoch days
+    */
+   private long                       dateFirstUse;
+
+   /**
+    * When the equipment was retired/sold, in epoch days
+    */
+   private long                       dateRetired;
 
    /**
     * Contains all parts which are associated with this equipment, e.g.
@@ -374,6 +384,24 @@ public class Equipment implements Cloneable, Comparable<Object>, Serializable {
       return services;
    }
 
+   public String getSize() {
+
+      if (size == null) {
+         return UI.EMPTY_STRING;
+      }
+
+      return size;
+   }
+
+   public String getType() {
+
+      if (type == null) {
+         return UI.EMPTY_STRING;
+      }
+
+      return type;
+   }
+
    public float getWeight() {
       return weight;
    }
@@ -467,6 +495,14 @@ public class Equipment implements Cloneable, Comparable<Object>, Serializable {
       this.priceUnit = priceUnit;
    }
 
+   public void setSize(final String size) {
+      this.size = size;
+   }
+
+   public void setType(final String type) {
+      this.type = type;
+   }
+
    public void setWeight(final float weight) {
       this.weight = weight;
    }
@@ -519,11 +555,13 @@ public class Equipment implements Cloneable, Comparable<Object>, Serializable {
 
       brand             = otherEquipment.getBrand();
       model             = otherEquipment.getModel();
+      type              = otherEquipment.getType();
       description       = otherEquipment.getDescription();
 
       distanceFirstUse  = otherEquipment.getDistanceFirstUse();
       price             = otherEquipment.getPrice();
       priceUnit         = otherEquipment.getPriceUnit();
+      size              = otherEquipment.getSize();
       weight            = otherEquipment.getWeight();
 
       setDateBuilt(       otherEquipment.getDateBuilt_Raw());

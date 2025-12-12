@@ -310,7 +310,7 @@ public class DialogEquipmentService extends TitleAreaDialog {
    private void fillUI() {
 
       // fill name combobox
-      final ConcurrentSkipListSet<String> allNames = EquipmentManager.getCachedFields_AllService_Names();
+      final ConcurrentSkipListSet<String> allNames = EquipmentManager.getCachedFields_AllServiceNames();
 
       for (final String model : allNames) {
          if (model != null) {

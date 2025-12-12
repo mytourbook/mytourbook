@@ -732,7 +732,7 @@ public class EquipmentView extends ViewPart implements ITourProvider, ITourViewe
       _columnManager.createColumns(_equipmentViewer);
 
       _equipmentViewer.setContentProvider(new EquipmentContentProvider());
-      _equipmentViewer.setComparator(new EquipmentComparator());
+//      _equipmentViewer.setComparator(new EquipmentComparator());
       _equipmentViewer.setComparer(new EquipmentComparer());
 //      _equipViewer.setFilters(new TagFilter());
 
@@ -841,16 +841,19 @@ public class EquipmentView extends ViewPart implements ITourProvider, ITourViewe
 
       defineColumn_Equipment_Brand();
       defineColumn_Equipment_Model();
-
-      defineColumn_Time_Date_FirstUse();
-      defineColumn_Time_Date_Built();
-      defineColumn_Time_Date_Retired();
+      defineColumn_Equipment_Type();
 
       defineColumn_Equipment_Price();
       defineColumn_Equipment_PriceUnit();
 
+      defineColumn_Equipment_Size();
       defineColumn_Equipment_Weight();
       defineColumn_Equipment_InitialDistance();
+
+      defineColumn_Time_UsageDuration();
+      defineColumn_Time_Date_FirstUse();
+      defineColumn_Time_Date_Built();
+      defineColumn_Time_Date_Retired();
    }
 
    /**
@@ -1108,6 +1111,77 @@ public class EquipmentView extends ViewPart implements ITourProvider, ITourViewe
    }
 
    /**
+    * Column: Size
+    */
+   private void defineColumn_Equipment_Size() {
+
+      final ColumnDefinition colDef = TreeColumnFactory.EQUIPMENT_SIZE.createColumn(_columnManager, _pc);
+
+      colDef.setIsDefaultColumn();
+
+      colDef.setLabelProvider(new CellLabelProvider() {
+
+         @Override
+         public void update(final ViewerCell cell) {
+
+            final Object element = cell.getElement();
+
+            String size = null;
+            if (element instanceof final TVIEquipmentView_Equipment equipmentItem) {
+
+               size = equipmentItem.getEquipment().getSize();
+
+            } else if (element instanceof final TVIEquipmentView_Part partItem) {
+
+               size = partItem.getPart().getSize();
+            }
+
+            if (size != null) {
+
+               cell.setText(size);
+               setCellColor(cell, element);
+            }
+         }
+      });
+   }
+
+   /**
+    * Column: Type
+    */
+   private void defineColumn_Equipment_Type() {
+
+      final ColumnDefinition colDef = TreeColumnFactory.EQUIPMENT_TYPE.createColumn(_columnManager, _pc);
+
+      colDef.setIsDefaultColumn();
+
+      colDef.setLabelProvider(new CellLabelProvider() {
+
+         @Override
+         public void update(final ViewerCell cell) {
+
+            final Object element = cell.getElement();
+
+            String type = null;
+
+            if (element instanceof final TVIEquipmentView_Equipment equipmentItem) {
+
+               type = equipmentItem.getEquipment().getType();
+
+            } else if (element instanceof final TVIEquipmentView_Part partItem) {
+
+               type = partItem.getPart().getType();
+            }
+
+            if (type != null) {
+
+               cell.setText(type);
+               setCellColor(cell, element);
+            }
+         }
+      });
+   }
+
+   /**
     * Column: Weight
     */
    private void defineColumn_Equipment_Weight() {
@@ -1241,6 +1315,33 @@ public class EquipmentView extends ViewPart implements ITourProvider, ITourViewe
 
                cell.setText(TimeTools.Formatter_Date_S.format(date));
                setCellColor(cell, element);
+            }
+         }
+      });
+   }
+
+   /**
+    * Column: Usage duration
+    */
+   private void defineColumn_Time_UsageDuration() {
+
+      final ColumnDefinition colDef = TreeColumnFactory.EQUIPMENT_DATE_USAGE_DURATION.createColumn(_columnManager, _pc);
+
+      colDef.setLabelProvider(new CellLabelProvider() {
+
+         @Override
+         public void update(final ViewerCell cell) {
+
+            final Object element = cell.getElement();
+
+            if (element instanceof final TVIEquipmentView_Item viewItem) {
+
+               cell.setText(Integer.toString(viewItem.usageDuration));
+               setCellColor(cell, element);
+
+               System.out.println(UI.timeStamp() + " column : " + viewItem.firstColumn);
+// TODO remove SYSTEM.OUT.PRINTLN
+
             }
          }
       });

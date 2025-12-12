@@ -65,13 +65,12 @@ public class EquipmentManager {
    private static volatile Map<Long, Equipment> _allEquipment_ByID;
    private static volatile List<Equipment>      _allEquipment_ByName;
 
-   private static ConcurrentSkipListSet<String> _allEquipment_Brands;
-   private static ConcurrentSkipListSet<String> _allEquipment_Models;
-   private static ConcurrentSkipListSet<String> _allPart_Brands;
-   private static ConcurrentSkipListSet<String> _allPart_Models;
-   private static ConcurrentSkipListSet<String> _allService_Names;
-
+   private static ConcurrentSkipListSet<String> _allBrands;
+   private static ConcurrentSkipListSet<String> _allModels;
    private static ConcurrentSkipListSet<String> _allPriceUnits;
+   private static ConcurrentSkipListSet<String> _allServiceNames;
+   private static ConcurrentSkipListSet<String> _allSizes;
+   private static ConcurrentSkipListSet<String> _allTypes;
 
    /**
     * Clear all equipment resources within MT and fire a equipment modify event, ensure that
@@ -102,34 +101,34 @@ public class EquipmentManager {
          _allEquipment_ByName = null;
       }
 
-      if (_allEquipment_Brands != null) {
-         _allEquipment_Brands.clear();
-         _allEquipment_Brands = null;
+      if (_allBrands != null) {
+         _allBrands.clear();
+         _allBrands = null;
       }
 
-      if (_allEquipment_Models != null) {
-         _allEquipment_Models.clear();
-         _allEquipment_Models = null;
-      }
-
-      if (_allPart_Brands != null) {
-         _allPart_Brands.clear();
-         _allPart_Brands = null;
-      }
-
-      if (_allPart_Models != null) {
-         _allPart_Models.clear();
-         _allPart_Models = null;
-      }
-
-      if (_allService_Names != null) {
-         _allService_Names.clear();
-         _allService_Names = null;
+      if (_allModels != null) {
+         _allModels.clear();
+         _allModels = null;
       }
 
       if (_allPriceUnits != null) {
          _allPriceUnits.clear();
          _allPriceUnits = null;
+      }
+
+      if (_allServiceNames != null) {
+         _allServiceNames.clear();
+         _allServiceNames = null;
+      }
+
+      if (_allSizes != null) {
+         _allSizes.clear();
+         _allSizes = null;
+      }
+
+      if (_allTypes != null) {
+         _allTypes.clear();
+         _allTypes = null;
       }
    }
 
@@ -630,72 +629,48 @@ public class EquipmentManager {
       return _allEquipment_ByName;
    }
 
-   public static ConcurrentSkipListSet<String> getCachedFields_AllEquipment_Brands() {
+   public static ConcurrentSkipListSet<String> getCachedFields_AllBrands() {
 
-      if (_allEquipment_Brands == null) {
+      if (_allBrands == null) {
 
          synchronized (DB_LOCK) {
 
             // recheck again, another thread could have it created
-            if (_allEquipment_Brands == null) {
+            if (_allBrands == null) {
 
-               _allEquipment_Brands = TourDatabase.getDistinctValues(TourDatabase.TABLE_EQUIPMENT, "brand"); //$NON-NLS-1$
+               _allBrands = TourDatabase.getDistinctValues(
+
+                     "brand", //$NON-NLS-1$
+
+                     TourDatabase.TABLE_EQUIPMENT,
+                     TourDatabase.TABLE_EQUIPMENT_PART);
             }
          }
       }
 
-      return _allEquipment_Brands;
+      return _allBrands;
    }
 
-   public static ConcurrentSkipListSet<String> getCachedFields_AllEquipment_Models() {
+   public static ConcurrentSkipListSet<String> getCachedFields_AllModels() {
 
-      if (_allEquipment_Models == null) {
-
-         synchronized (DB_LOCK) {
-
-            // recheck again, another thread could have it created
-            if (_allEquipment_Models == null) {
-
-               _allEquipment_Models = TourDatabase.getDistinctValues(TourDatabase.TABLE_EQUIPMENT, "model"); //$NON-NLS-1$
-            }
-         }
-      }
-
-      return _allEquipment_Models;
-   }
-
-   public static ConcurrentSkipListSet<String> getCachedFields_AllPart_Brands() {
-
-      if (_allPart_Brands == null) {
+      if (_allModels == null) {
 
          synchronized (DB_LOCK) {
 
             // recheck again, another thread could have it created
-            if (_allPart_Brands == null) {
+            if (_allModels == null) {
 
-               _allPart_Brands = TourDatabase.getDistinctValues(TourDatabase.TABLE_EQUIPMENT_PART, "brand"); //$NON-NLS-1$
+               _allModels = TourDatabase.getDistinctValues(
+
+                     "model", //$NON-NLS-1$
+
+                     TourDatabase.TABLE_EQUIPMENT,
+                     TourDatabase.TABLE_EQUIPMENT_PART);
             }
          }
       }
 
-      return _allPart_Brands;
-   }
-
-   public static ConcurrentSkipListSet<String> getCachedFields_AllPart_Models() {
-
-      if (_allPart_Models == null) {
-
-         synchronized (DB_LOCK) {
-
-            // recheck again, another thread could have it created
-            if (_allPart_Models == null) {
-
-               _allPart_Models = TourDatabase.getDistinctValues(TourDatabase.TABLE_EQUIPMENT_PART, "model"); //$NON-NLS-1$
-            }
-         }
-      }
-
-      return _allPart_Models;
+      return _allModels;
    }
 
    public static ConcurrentSkipListSet<String> getCachedFields_AllPriceUnits() {
@@ -721,21 +696,65 @@ public class EquipmentManager {
       return _allPriceUnits;
    }
 
-   public static ConcurrentSkipListSet<String> getCachedFields_AllService_Names() {
+   public static ConcurrentSkipListSet<String> getCachedFields_AllServiceNames() {
 
-      if (_allService_Names == null) {
+      if (_allServiceNames == null) {
 
          synchronized (DB_LOCK) {
 
             // recheck again, another thread could have it created
-            if (_allService_Names == null) {
+            if (_allServiceNames == null) {
 
-               _allService_Names = TourDatabase.getDistinctValues(TourDatabase.TABLE_EQUIPMENT_SERVICE, "name"); //$NON-NLS-1$
+               _allServiceNames = TourDatabase.getDistinctValues(TourDatabase.TABLE_EQUIPMENT_SERVICE, "name"); //$NON-NLS-1$
             }
          }
       }
 
-      return _allService_Names;
+      return _allServiceNames;
+   }
+
+   public static ConcurrentSkipListSet<String> getCachedFields_AllSizes() {
+
+      if (_allSizes == null) {
+
+         synchronized (DB_LOCK) {
+
+            // recheck again, another thread could have it created
+            if (_allSizes == null) {
+
+               _allSizes = TourDatabase.getDistinctValues(
+
+                     "size", //$NON-NLS-1$
+
+                     TourDatabase.TABLE_EQUIPMENT,
+                     TourDatabase.TABLE_EQUIPMENT_PART);
+            }
+         }
+      }
+
+      return _allSizes;
+   }
+
+   public static ConcurrentSkipListSet<String> getCachedFields_AllTypes() {
+
+      if (_allTypes == null) {
+
+         synchronized (DB_LOCK) {
+
+            // recheck again, another thread could have it created
+            if (_allTypes == null) {
+
+               _allTypes = TourDatabase.getDistinctValues(
+
+                     "type", //$NON-NLS-1$
+
+                     TourDatabase.TABLE_EQUIPMENT,
+                     TourDatabase.TABLE_EQUIPMENT_PART);
+            }
+         }
+      }
+
+      return _allTypes;
    }
 
    /**

@@ -65,6 +65,8 @@ public abstract class TreeColumnFactory {
    public static final String            EQUIPMENT_BRAND_ID               = "EQUIPMENT_BRAND";                  //$NON-NLS-1$
    public static final TreeColumnFactory EQUIPMENT_DATE_BUILT;
    public static final String            EQUIPMENT_DATE_BUILT_ID          = "EQUIPMENT_DATE_BUILT";             //$NON-NLS-1$
+   public static final TreeColumnFactory EQUIPMENT_DATE_USAGE_DURATION;
+   public static final String            EQUIPMENT_DATE_USAGE_DURATION_ID = "EQUIPMENT_DATE_USAGE_DURATION";    //$NON-NLS-1$
    public static final TreeColumnFactory EQUIPMENT_DATE_FIRST_USE;
    public static final String            EQUIPMENT_DATE_FIRST_USE_ID      = "EQUIPMENT_DATE_FIRST_USE";         //$NON-NLS-1$
    public static final TreeColumnFactory EQUIPMENT_DATE_RETIRED;
@@ -77,6 +79,10 @@ public abstract class TreeColumnFactory {
    public static final String            EQUIPMENT_PRICE_ID               = "EQUIPMENT_PRICE";                  //$NON-NLS-1$
    public static final TreeColumnFactory EQUIPMENT_PRICE_UNIT;
    public static final String            EQUIPMENT_PRICE_UNIT_ID          = "EQUIPMENT_PRICE_UNIT";             //$NON-NLS-1$
+   public static final TreeColumnFactory EQUIPMENT_SIZE;
+   public static final String            EQUIPMENT_SIZE_ID                = "EQUIPMENT_SIZE";                   //$NON-NLS-1$
+   public static final TreeColumnFactory EQUIPMENT_TYPE;
+   public static final String            EQUIPMENT_TYPE_ID                = "EQUIPMENT_TYPE";                   //$NON-NLS-1$
    public static final TreeColumnFactory EQUIPMENT_WEIGHT;
    public static final String            EQUIPMENT_WEIGHT_ID              = "EQUIPMENT_WEIGHT";                 //$NON-NLS-1$
 
@@ -782,6 +788,25 @@ public abstract class TreeColumnFactory {
          }
       };
 
+      EQUIPMENT_DATE_USAGE_DURATION = new TreeColumnFactory() {
+         @Override
+         public TreeColumnDefinition createColumn(final ColumnManager columnManager,
+                                                  final PixelConverter pixelConverter) {
+
+            final TreeColumnDefinition colDef = new TreeColumnDefinition(columnManager, EQUIPMENT_DATE_USAGE_DURATION_ID, SWT.LEAD);
+
+            colDef.setColumnCategory(           Messages.ColumnFactory_Category_Time);
+
+            colDef.setColumnLabel(              "Duration");
+            colDef.setColumnHeaderText(         "Days");
+            colDef.setColumnHeaderToolTipText(  "Usage duration between this and the previous item");
+
+            colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(10));
+
+            return colDef;
+         }
+      };
+
       EQUIPMENT_DATE_FIRST_USE = new TreeColumnFactory() {
          @Override
          public TreeColumnDefinition createColumn(final ColumnManager columnManager,
@@ -901,6 +926,44 @@ public abstract class TreeColumnFactory {
             colDef.setColumnHeaderToolTipText(  "Price currency");
 
             colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(5));
+
+
+            return colDef;
+         }
+      };
+
+      EQUIPMENT_SIZE = new TreeColumnFactory() {
+         @Override
+         public TreeColumnDefinition createColumn(final ColumnManager columnManager,
+                                                  final PixelConverter pixelConverter) {
+
+            final TreeColumnDefinition colDef = new TreeColumnDefinition(columnManager, EQUIPMENT_SIZE_ID, SWT.LEAD);
+
+            colDef.setColumnCategory(           Messages.ColumnFactory_Category_Equipment);
+
+            colDef.setColumnLabel(              "Size");
+            colDef.setColumnHeaderText(         "Size");
+
+            colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(15));
+
+
+            return colDef;
+         }
+      };
+
+      EQUIPMENT_TYPE = new TreeColumnFactory() {
+         @Override
+         public TreeColumnDefinition createColumn(final ColumnManager columnManager,
+                                                  final PixelConverter pixelConverter) {
+
+            final TreeColumnDefinition colDef = new TreeColumnDefinition(columnManager, EQUIPMENT_TYPE_ID, SWT.LEAD);
+
+            colDef.setColumnCategory(           Messages.ColumnFactory_Category_Equipment);
+
+            colDef.setColumnLabel(              "Type");
+            colDef.setColumnHeaderText(         "Type");
+
+            colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(15));
 
 
             return colDef;

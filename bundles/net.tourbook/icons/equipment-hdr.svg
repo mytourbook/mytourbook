@@ -3,7 +3,7 @@
    version="1.1"
    id="svg2985"
    height="16.000015"
-   width="15.999992"
+   width="16.000008"
    xmlns="http://www.w3.org/2000/svg"
    xmlns:svg="http://www.w3.org/2000/svg"
    xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
@@ -55,30 +55,30 @@
   <g
      id="layer1"
      style="display:inline"
-     transform="translate(-20,-69)">
+     transform="translate(-69.999992,-68.999985)">
     <rect
        transform="scale(1,-1)"
-       y="-85.000015"
-       x="20"
+       y="-85"
+       x="70"
        height="16.000015"
        width="15.999991"
-       id="rect6561-8-1-9-9-5-5-9-9-1-3-94-1-6-6-4-5-4-9-0-8"
+       id="rect6561-8-1-9-9-5-5-9-9-1-3-94-1-6-6-4-5-4-9-0-8-4-2-4-8"
        style="display:inline;opacity:0.99;fill:none;stroke:none" />
     <path
-       id="rect9-4-1-1-2"
+       id="rect9-4-1-1-2-0-4-2-9"
        style="display:inline;fill:#e9e61f;fill-opacity:1;stroke:#79770c;stroke-width:0.500003;stroke-miterlimit:3;stroke-opacity:1"
-       d="M 33.821817,75.203485 27.999499,69.35437 22.177183,75.203485" />
+       d="M 74.62665,69.124504 78.736719,76.281226 85.874503,72.138357" />
     <path
-       id="path8-1-3-8-1-6-8-1-2"
+       id="path8-1-3-8-1-6-8-1-2-9-5-3-2"
        style="display:inline;fill:#fe7f00;stroke:#9a4d00;stroke-width:0.5;stroke-miterlimit:3;stroke-dasharray:none"
-       d="M 26.202313,79.99812 C 26.202313,82.06919 24.4328,83.748121 22.249999,83.748122 22.249999,78.886926 22.249999,81.158421 22.249999,76.24812 24.4328,76.248121 26.202313,77.927054 26.202313,79.99812 Z" />
+       d="M 74.758845,78.499998 C 74.758845,80.847209 72.740161,82.749999 70.249993,82.75 70.249993,77.240646 70.249993,79.815005 70.249993,74.25 72.740161,74.250001 74.758845,76.152789 74.758845,78.499998 Z" />
     <path
-       d="M 27,83.998568 H 33.999758 V 76.998567"
+       d="M 77,83.998553 H 83.999758 V 76.998552"
        style="display:inline;fill:#42b6ff;fill-opacity:1;stroke:none;stroke-width:0.500001;stroke-linecap:round;stroke-miterlimit:3"
-       id="path1-2-7-2-4-4-40-5-1" />
+       id="path1-2-7-2-4-4-40-5-1-4-5-2-79" />
     <path
-       id="rect1-5-6-1-6-3-94-5-9-2-6"
+       id="rect1-5-6-1-6-3-94-5-9-2-6-8-1-2-5"
        style="display:inline;fill:none;stroke:#005a92;stroke-width:0.500001;stroke-linecap:square;stroke-miterlimit:3;stroke-opacity:1"
-       d="M 33.7081,83.707748 V 77.289386" />
+       d="M 83.7081,83.707733 V 77.289371" />
   </g>
 </svg>
