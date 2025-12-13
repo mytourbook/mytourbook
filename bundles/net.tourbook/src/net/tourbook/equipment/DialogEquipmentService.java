@@ -16,7 +16,6 @@
 package net.tourbook.equipment;
 
 import java.time.LocalDate;
-import java.util.concurrent.ConcurrentSkipListSet;
 
 import net.tourbook.Images;
 import net.tourbook.Messages;
@@ -57,6 +56,7 @@ public class DialogEquipmentService extends TitleAreaDialog {
 
    private static final IDialogSettings _state                                     = TourbookPlugin.getState(ID);
 
+   private static final String          STATE_AUTOCOMPLETE_POPUP_HEIGHT_COMPANY    = "STATE_AUTOCOMPLETE_POPUP_HEIGHT_COMPANY";       //$NON-NLS-1$
    private static final String          STATE_AUTOCOMPLETE_POPUP_HEIGHT_NAME       = "STATE_AUTOCOMPLETE_POPUP_HEIGHT_NAME";          //$NON-NLS-1$
    private static final String          STATE_AUTOCOMPLETE_POPUP_HEIGHT_PRICE_UNIT = "STATE_AUTOCOMPLETE_POPUP_HEIGHT_PRICE_UNIT";    //$NON-NLS-1$
    private static final String          STATE_PRICE_UNIT_DEFAULT                   = "STATE_PRICE_UNIT_DEFAULT";                      //$NON-NLS-1$
@@ -77,7 +77,6 @@ public class DialogEquipmentService extends TitleAreaDialog {
 
    private boolean                      _isModified;
 
-
    private PixelConverter               _pc;
 
    /*
@@ -93,6 +92,7 @@ public class DialogEquipmentService extends TitleAreaDialog {
 
    private Text                      _txtDescription;
 
+   private Combo                     _comboCompany;
    private Combo                     _comboName;
    private Combo                     _comboPriceUnit;
 
@@ -102,6 +102,7 @@ public class DialogEquipmentService extends TitleAreaDialog {
 
    private AutoComplete_ComboInputMT _autocomplete_Name;
    private AutoComplete_ComboInputMT _autocomplete_PriceUnit;
+   private AutoComplete_ComboInputMT _autocomplete_Company;
 
    public DialogEquipmentService(final Shell parentShell,
                                  final Equipment equipment,
@@ -233,9 +234,26 @@ public class DialogEquipmentService extends TitleAreaDialog {
          }
          {
             /*
+             * Company
+             */
+
+            final Label label = UI.createLabel(_container, "&Company");
+            gdVertCenter.applyTo(label);
+
+            // autocomplete combo
+            _comboCompany = new Combo(_container, SWT.BORDER | SWT.FLAT);
+            _comboCompany.setText(UI.EMPTY_STRING);
+            _comboCompany.addModifyListener(_defaultModifyListener);
+
+            GridDataFactory.fillDefaults().grab(true, false).span(2, 1).applyTo(_comboCompany);
+
+            _autocomplete_Company = new AutoComplete_ComboInputMT(_comboCompany);
+         }
+         {
+            /*
              * Date
              */
-            final Label label = UI.createLabel(_container, "&Date");
+            final Label label = UI.createLabel(_container, "D&ate");
             gdVertCenter.applyTo(label);
 
             _date = new DateTime(_container, SWT.DATE | SWT.MEDIUM | SWT.DROP_DOWN);
@@ -309,23 +327,13 @@ public class DialogEquipmentService extends TitleAreaDialog {
 
    private void fillUI() {
 
-      // fill name combobox
-      final ConcurrentSkipListSet<String> allNames = EquipmentManager.getCachedFields_AllServiceNames();
+// SET_FORMATTING_OFF
 
-      for (final String model : allNames) {
-         if (model != null) {
-            _comboName.add(model);
-         }
-      }
+      UI.fillUI_Combobox(_comboCompany,   EquipmentManager.getCachedFields_AllCompanies());
+      UI.fillUI_Combobox(_comboName,      EquipmentManager.getCachedFields_AllServiceNames());
+      UI.fillUI_Combobox(_comboPriceUnit, EquipmentManager.getCachedFields_AllPriceUnits());
 
-      // fill price unit combobox
-      final ConcurrentSkipListSet<String> allPriceUnits = EquipmentManager.getCachedFields_AllPriceUnits();
-
-      for (final String priceUnit : allPriceUnits) {
-         if (priceUnit != null) {
-            _comboPriceUnit.add(priceUnit);
-         }
-      }
+// SET_FORMATTING_ON
    }
 
    @Override
@@ -396,6 +404,7 @@ public class DialogEquipmentService extends TitleAreaDialog {
 
       UI.disposeResource(_imageDialog);
 
+      _autocomplete_Company.saveState(_state, STATE_AUTOCOMPLETE_POPUP_HEIGHT_COMPANY);
       _autocomplete_Name.saveState(_state, STATE_AUTOCOMPLETE_POPUP_HEIGHT_NAME);
       _autocomplete_PriceUnit.saveState(_state, STATE_AUTOCOMPLETE_POPUP_HEIGHT_PRICE_UNIT);
 
@@ -418,6 +427,7 @@ public class DialogEquipmentService extends TitleAreaDialog {
 
       _isInUIUpdate = true;
 
+      _autocomplete_Company.restoreState(_state, STATE_AUTOCOMPLETE_POPUP_HEIGHT_COMPANY);
       _autocomplete_Name.restoreState(_state, STATE_AUTOCOMPLETE_POPUP_HEIGHT_NAME);
       _autocomplete_PriceUnit.restoreState(_state, STATE_AUTOCOMPLETE_POPUP_HEIGHT_PRICE_UNIT);
 
@@ -435,6 +445,7 @@ public class DialogEquipmentService extends TitleAreaDialog {
 
       _service.setEquipment(        _serviceEquipment);
 
+      _service.setCompany(          _comboCompany.getText().trim());
       _service.setName(             _comboName.getText().trim());
       _service.setDescription(      _txtDescription.getText().trim());
 
@@ -461,7 +472,8 @@ public class DialogEquipmentService extends TitleAreaDialog {
       }
 
 
-      _comboName       .setText(_service.getName());
+      _comboCompany     .setText(_service.getCompany());
+      _comboName        .setText(_service.getName());
 
       _date             .setDate(date.getYear(),    date.getMonthValue() - 1,      date.getDayOfMonth());
 

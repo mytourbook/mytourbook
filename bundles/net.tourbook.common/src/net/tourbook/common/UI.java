@@ -27,7 +27,9 @@ import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Formatter;
+import java.util.List;
 import java.util.Random;
+import java.util.concurrent.ConcurrentSkipListSet;
 
 import net.tourbook.common.color.ThemeUtil;
 import net.tourbook.common.formatter.FormatManager;
@@ -2136,6 +2138,15 @@ public class UI {
       return text.replace(SYMBOL_AMPERSAND, SYMBOL_AMPERSAND_AMPERSAND);
    }
 
+   public static void fillUI_Combobox(final Combo combo, final ConcurrentSkipListSet<String> allValues) {
+
+      for (final String value : allValues) {
+         if (value != null) {
+            combo.add(value);
+         }
+      }
+   }
+
    public static String format_hh(final long time) {
 
       _formatterSB.setLength(0);
@@ -2520,32 +2531,34 @@ public class UI {
 
    /**
     * @param allVisibleItems
-    * @param allExpandedItems
+    * @param allExpandedPaths
     *
     * @return Returns {@link TreePath}'s which are expanded and open (not hidden).
     */
-   public static TreePath[] getExpandedOpenedItems(final Object[] allVisibleItems, final TreePath[] allExpandedItems) {
+   public static TreePath[] getExpandedAndOpenedItems(final Object[] allVisibleItems,
+                                                      final TreePath[] allExpandedPaths) {
 
-      final ArrayList<TreePath> expandedOpened = new ArrayList<>();
+      final List<TreePath> allExpandedAndOpenedPaths = new ArrayList<>();
 
-      for (final TreePath expandedPath : allExpandedItems) {
+      for (final TreePath expandedPath : allExpandedPaths) {
 
          /*
-          * The last expanded segment must be in the visible list otherwise it is hidden.
+          * The last expanded segment must be in the visible list otherwise it is hidden
           */
-         final Object lastExpandedItem = expandedPath.getLastSegment();
+         final Object lastExpandedSegment = expandedPath.getLastSegment();
 
          for (final Object visibleItem : allVisibleItems) {
 
-            if (lastExpandedItem == visibleItem) {
+            if (lastExpandedSegment == visibleItem) {
 
-               expandedOpened.add(expandedPath);
+               allExpandedAndOpenedPaths.add(expandedPath);
+
                break;
             }
          }
       }
 
-      return expandedOpened.toArray(new TreePath[expandedOpened.size()]);
+      return allExpandedAndOpenedPaths.toArray(new TreePath[allExpandedAndOpenedPaths.size()]);
    }
 
    /**

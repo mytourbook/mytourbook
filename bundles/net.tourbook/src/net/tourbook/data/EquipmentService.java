@@ -36,6 +36,8 @@ import net.tourbook.database.TourDatabase;
 @Entity
 public class EquipmentService implements Cloneable, Serializable {
 
+   private static final char          NL               = UI.NEW_LINE;
+
    private static final long          serialVersionUID = 1L;
 
    private static final AtomicInteger _createCounter   = new AtomicInteger();
@@ -48,6 +50,11 @@ public class EquipmentService implements Cloneable, Serializable {
     * Name for the service
     */
    private String                     name;
+
+   /**
+    * Company which did the service
+    */
+   private String                     company;
 
    /**
     * Description/notes for the service
@@ -137,6 +144,15 @@ public class EquipmentService implements Cloneable, Serializable {
       }
 
       return true;
+   }
+
+   public String getCompany() {
+
+      if (company == null) {
+         return UI.EMPTY_STRING;
+      }
+
+      return company;
    }
 
    public LocalDate getDate() {
@@ -236,6 +252,10 @@ public class EquipmentService implements Cloneable, Serializable {
       return true;
    }
 
+   public void setCompany(final String company) {
+      this.company = company;
+   }
+
    public void setDate(final long date) {
 
       this.date = date;
@@ -264,11 +284,25 @@ public class EquipmentService implements Cloneable, Serializable {
       this.priceUnit = priceUnit;
    }
 
+   @Override
+   public String toString() {
+
+      return UI.EMPTY_STRING
+
+            + "EquipmentService" + NL //                             //$NON-NLS-1$
+
+            + " serviceId   = " + serviceId + NL //                   //$NON-NLS-1$
+            + " name        = " + name + NL //                        //$NON-NLS-1$
+            + " company     = " + company + NL //                     //$NON-NLS-1$
+      ;
+   }
+
    public void updateFromOther(final EquipmentService otherService) {
 
 // SET_FORMATTING_OFF
 
       description = otherService.getDescription();
+      company     = otherService.getCompany();
       name        = otherService.getName();
       price       = otherService.getPrice();
       priceUnit   = otherService.getPriceUnit();

@@ -102,6 +102,11 @@ public class Equipment implements Cloneable, Comparable<Object>, Serializable {
    private String                     description;
 
    /**
+    * Website
+    */
+   private String                     urlAddress;
+
+   /**
     * When the equipment was created/build, in epoch days
     */
    private long                       dateBuilt;
@@ -402,6 +407,15 @@ public class Equipment implements Cloneable, Comparable<Object>, Serializable {
       return type;
    }
 
+   public String getUrlAddress() {
+
+      if (urlAddress == null) {
+         return UI.EMPTY_STRING;
+      }
+
+      return urlAddress;
+   }
+
    public float getWeight() {
       return weight;
    }
@@ -503,6 +517,11 @@ public class Equipment implements Cloneable, Comparable<Object>, Serializable {
       this.type = type;
    }
 
+   public void setUrlAddress(final String urlAddress) {
+
+      this.urlAddress = urlAddress;
+   }
+
    public void setWeight(final float weight) {
       this.weight = weight;
    }
@@ -557,6 +576,7 @@ public class Equipment implements Cloneable, Comparable<Object>, Serializable {
       model             = otherEquipment.getModel();
       type              = otherEquipment.getType();
       description       = otherEquipment.getDescription();
+      urlAddress        = otherEquipment.getUrlAddress();
 
       distanceFirstUse  = otherEquipment.getDistanceFirstUse();
       price             = otherEquipment.getPrice();
@@ -572,5 +592,4 @@ public class Equipment implements Cloneable, Comparable<Object>, Serializable {
 
       _equipmentName = null;
    }
-
 }

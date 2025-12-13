@@ -193,6 +193,7 @@ public class TourDatabase {
     */
    public static final int     DB_LENGTH_DESCRIPTION                      = 32000;
    public static final int     DB_LENGTH_NAME                             = 1000;
+   public static final int     DB_LENGTH_URL_ADDRESS                      = 4096;
 
    private static final String NUMBER_FORMAT_1F                           = "%.1f";                                                  //$NON-NLS-1$
 
@@ -4526,6 +4527,7 @@ public class TourDatabase {
                   + "   Model                   VARCHAR(" + DB_LENGTH_NAME + "),          " + NL //$NON-NLS-1$ //$NON-NLS-2$
                   + "   Type                    VARCHAR(" + DB_LENGTH_NAME + "),          " + NL //$NON-NLS-1$ //$NON-NLS-2$
                   + "   Description             VARCHAR(" + DB_LENGTH_DESCRIPTION + "),   " + NL //$NON-NLS-1$ //$NON-NLS-2$
+                  + "   UrlAddress              VARCHAR(" + DB_LENGTH_URL_ADDRESS + "),   " + NL //$NON-NLS-1$ //$NON-NLS-2$
 
                   + "   DistanceFirstUse        FLOAT DEFAULT 0,                          " + NL //$NON-NLS-1$
                   + "   Price                   FLOAT DEFAULT 0,                          " + NL //$NON-NLS-1$
@@ -4588,6 +4590,7 @@ public class TourDatabase {
                   + "   Model                   VARCHAR(" + DB_LENGTH_NAME + "),          " + NL //$NON-NLS-1$ //$NON-NLS-2$
                   + "   Type                    VARCHAR(" + DB_LENGTH_NAME + "),          " + NL //$NON-NLS-1$ //$NON-NLS-2$
                   + "   Description             VARCHAR(" + DB_LENGTH_DESCRIPTION + "),   " + NL //$NON-NLS-1$ //$NON-NLS-2$
+                  + "   UrlAddress              VARCHAR(" + DB_LENGTH_URL_ADDRESS + "),   " + NL //$NON-NLS-1$ //$NON-NLS-2$
 
                   + "   DistanceFirstUse        FLOAT DEFAULT 0,                          " + NL //$NON-NLS-1$
                   + "   Price                   FLOAT DEFAULT 0,                          " + NL //$NON-NLS-1$
@@ -4619,6 +4622,7 @@ public class TourDatabase {
             + "   " + KEY_EQUIPMENT + "   BIGINT,                                         " + NL //$NON-NLS-1$ //$NON-NLS-2$
 
             + "   Name                    VARCHAR(" + DB_LENGTH_NAME + "),                " + NL //$NON-NLS-1$ //$NON-NLS-2$
+            + "   Company                 VARCHAR(" + DB_LENGTH_NAME + "),                " + NL //$NON-NLS-1$ //$NON-NLS-2$
             + "   Description             VARCHAR(" + DB_LENGTH_DESCRIPTION + "),         " + NL //$NON-NLS-1$ //$NON-NLS-2$
 
             + "   Date                    BIGINT DEFAULT 0,                               " + NL //$NON-NLS-1$

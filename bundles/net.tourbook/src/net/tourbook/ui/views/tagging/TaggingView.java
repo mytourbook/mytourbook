@@ -2943,7 +2943,7 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer,
 
       final LongArrayList expandedItems = new LongArrayList();
 
-      final TreePath[] expandedOpenedTreePaths = net.tourbook.common.UI.getExpandedOpenedItems(
+      final TreePath[] expandedOpenedTreePaths = net.tourbook.common.UI.getExpandedAndOpenedItems(
             visibleExpanded,
             _tagViewer.getExpandedTreePaths());
 

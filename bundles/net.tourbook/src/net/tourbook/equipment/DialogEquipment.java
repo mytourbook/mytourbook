@@ -16,7 +16,6 @@
 package net.tourbook.equipment;
 
 import java.time.LocalDate;
-import java.util.concurrent.ConcurrentSkipListSet;
 
 import net.tourbook.Images;
 import net.tourbook.Messages;
@@ -109,6 +108,7 @@ public class DialogEquipment extends TitleAreaDialog {
    private Spinner                   _spinWeight;
 
    private Text                      _txtDescription;
+   private Text                      _txtUrlAddress;
 
    private AutoComplete_ComboInputMT _autocomplete_Brand;
    private AutoComplete_ComboInputMT _autocomplete_Model;
@@ -205,6 +205,7 @@ public class DialogEquipment extends TitleAreaDialog {
 
    private void createUI(final Composite parent) {
 
+      final int defaultWidth = convertWidthInCharsToPixels(40);
       final GridDataFactory gdVertCenter = GridDataFactory.fillDefaults().align(SWT.FILL, SWT.CENTER);
 
       _container = new Composite(parent, SWT.NONE);
@@ -391,7 +392,21 @@ public class DialogEquipment extends TitleAreaDialog {
             _dateRetired.addSelectionListener(_defaultSelectionListener);
          }
          UI.createSpacer_Horizontal(_container, 1);
-//         UI.createSpacer_Horizontal(_container, 1);
+         {
+            /*
+             * Website
+             */
+            final Label label = UI.createLabel(_container, "W&ebsite");
+            GridDataFactory.fillDefaults().align(SWT.FILL, SWT.BEGINNING).applyTo(label);
+
+            _txtUrlAddress = new Text(_container, SWT.BORDER);
+            _txtUrlAddress.addModifyListener(e -> onModify());
+            GridDataFactory.fillDefaults()
+                  .grab(true, false)
+                  .hint(defaultWidth, SWT.DEFAULT)
+                  .span(6, 1)
+                  .applyTo(_txtUrlAddress);
+         }
          {
             /*
              * Description
@@ -403,7 +418,7 @@ public class DialogEquipment extends TitleAreaDialog {
             _txtDescription.addModifyListener(e -> onModify());
             GridDataFactory.fillDefaults()
                   .grab(true, true)
-                  .hint(convertWidthInCharsToPixels(40), convertHeightInCharsToPixels(10))
+                  .hint(defaultWidth, convertHeightInCharsToPixels(10))
                   .span(6, 1)
                   .applyTo(_txtDescription);
          }
@@ -427,7 +442,8 @@ public class DialogEquipment extends TitleAreaDialog {
             _chkSyncDates,
             _dateRetired,
 
-            _txtDescription
+            _txtUrlAddress,
+            _txtDescription,
       });
    }
 
@@ -455,50 +471,15 @@ public class DialogEquipment extends TitleAreaDialog {
 
    private void fillUI() {
 
-      // fill brand combobox
-      final ConcurrentSkipListSet<String> allBrands = EquipmentManager.getCachedFields_AllBrands();
+// SET_FORMATTING_OFF
 
-      for (final String brand : allBrands) {
-         if (brand != null) {
-            _comboBrand.add(brand);
-         }
-      }
+      UI.fillUI_Combobox(_comboBrand,     EquipmentManager.getCachedFields_AllBrands());
+      UI.fillUI_Combobox(_comboModel,     EquipmentManager.getCachedFields_AllModels());
+      UI.fillUI_Combobox(_comboPriceUnit, EquipmentManager.getCachedFields_AllPriceUnits());
+      UI.fillUI_Combobox(_comboSize,      EquipmentManager.getCachedFields_AllSizes());
+      UI.fillUI_Combobox(_comboType,      EquipmentManager.getCachedFields_AllTypes());
 
-      // fill model combobox
-      final ConcurrentSkipListSet<String> allModels = EquipmentManager.getCachedFields_AllModels();
-
-      for (final String model : allModels) {
-         if (model != null) {
-            _comboModel.add(model);
-         }
-      }
-
-      // fill price unit combobox
-      final ConcurrentSkipListSet<String> allPriceUnits = EquipmentManager.getCachedFields_AllPriceUnits();
-
-      for (final String model : allPriceUnits) {
-         if (model != null) {
-            _comboPriceUnit.add(model);
-         }
-      }
-
-      // fill size combobox
-      final ConcurrentSkipListSet<String> allSizes = EquipmentManager.getCachedFields_AllSizes();
-
-      for (final String size : allSizes) {
-         if (size != null) {
-            _comboSize.add(size);
-         }
-      }
-
-      // fill type combobox
-      final ConcurrentSkipListSet<String> allTypes = EquipmentManager.getCachedFields_AllTypes();
-
-      for (final String type : allTypes) {
-         if (type != null) {
-            _comboType.add(type);
-         }
-      }
+// SET_FORMATTING_ON
    }
 
    @Override
@@ -637,6 +618,7 @@ public class DialogEquipment extends TitleAreaDialog {
       _equipment.setModel(             _comboModel.getText().trim());
       _equipment.setType(              _comboType.getText().trim());
       _equipment.setDescription(       _txtDescription.getText().trim());
+      _equipment.setUrlAddress(        _txtUrlAddress.getText().trim());
 
       _equipment.setDistanceFirstUse(  _spinDistance.getSelection());
       _equipment.setPrice(             _spinPrice.getSelection() / 100f);
@@ -687,6 +669,7 @@ public class DialogEquipment extends TitleAreaDialog {
       _spinWeight       .setSelection((int) (_equipment.getWeight() * 1000));
 
       _txtDescription   .setText(_equipment.getDescription());
+      _txtUrlAddress    .setText(_equipment.getUrlAddress());
 
 // SET_FORMATTING_ON
 

@@ -58,7 +58,7 @@ public class TVIEquipmentView_Tour extends TVIEquipmentView_Item {
    public long                deviceStartDistance;
    public short               deviceTimeInterval;
 
-   public TVIEquipmentView_Tour(final TVIEquipmentView_Equipment tviEquipmentView_Equipment,
+   public TVIEquipmentView_Tour(final TVIEquipmentView_Item tviEquipmentView_Equipment,
                                 final TreeViewer treeViewer) {
 
       super(treeViewer);

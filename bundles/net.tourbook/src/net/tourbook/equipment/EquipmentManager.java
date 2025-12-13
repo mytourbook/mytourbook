@@ -66,6 +66,7 @@ public class EquipmentManager {
    private static volatile List<Equipment>      _allEquipment_ByName;
 
    private static ConcurrentSkipListSet<String> _allBrands;
+   private static ConcurrentSkipListSet<String> _allCompanies;
    private static ConcurrentSkipListSet<String> _allModels;
    private static ConcurrentSkipListSet<String> _allPriceUnits;
    private static ConcurrentSkipListSet<String> _allServiceNames;
@@ -104,6 +105,11 @@ public class EquipmentManager {
       if (_allBrands != null) {
          _allBrands.clear();
          _allBrands = null;
+      }
+
+      if (_allCompanies != null) {
+         _allCompanies.clear();
+         _allCompanies = null;
       }
 
       if (_allModels != null) {
@@ -649,6 +655,23 @@ public class EquipmentManager {
       }
 
       return _allBrands;
+   }
+
+   public static ConcurrentSkipListSet<String> getCachedFields_AllCompanies() {
+
+      if (_allCompanies == null) {
+
+         synchronized (DB_LOCK) {
+
+            // recheck again, another thread could have it created
+            if (_allCompanies == null) {
+
+               _allCompanies = TourDatabase.getDistinctValues(TourDatabase.TABLE_EQUIPMENT_SERVICE, "company"); //$NON-NLS-1$
+            }
+         }
+      }
+
+      return _allCompanies;
    }
 
    public static ConcurrentSkipListSet<String> getCachedFields_AllModels() {

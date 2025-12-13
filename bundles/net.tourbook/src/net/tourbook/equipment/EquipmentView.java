@@ -104,7 +104,7 @@ import org.eclipse.ui.part.ViewPart;
 
 public class EquipmentView extends ViewPart implements ITourProvider, ITourViewer, ITreeViewer {
 
-   public static final String  ID                                     = "net.tourbook.equipment.EquipmentView.ID"; //$NON-NLS-1$
+   public static final String            ID                                     = "net.tourbook.equipment.EquipmentView.ID"; //$NON-NLS-1$
 
    /**
     * The expanded equipment items have these structure:
@@ -116,22 +116,23 @@ public class EquipmentView extends ViewPart implements ITourProvider, ITourViewe
     * 4. id/year/month<br>
     * ...
     */
-   private static final String STATE_EXPANDED_ITEMS                   = "STATE_EXPANDED_ITEMS";                    //$NON-NLS-1$
-   private static final String STATE_IS_ON_SELECT_EXPAND_COLLAPSE     = "STATE_IS_ON_SELECT_EXPAND_COLLAPSE";      //$NON-NLS-1$
-   private static final String STATE_IS_SINGLE_EXPAND_COLLAPSE_OTHERS = "STATE_IS_SINGLE_EXPAND_COLLAPSE_OTHERS";  //$NON-NLS-1$
+   private static final String           STATE_EXPANDED_ITEMS                   = "STATE_EXPANDED_ITEMS";                    //$NON-NLS-1$
+   private static final String           STATE_IS_ON_SELECT_EXPAND_COLLAPSE     = "STATE_IS_ON_SELECT_EXPAND_COLLAPSE";      //$NON-NLS-1$
+   private static final String           STATE_IS_SINGLE_EXPAND_COLLAPSE_OTHERS = "STATE_IS_SINGLE_EXPAND_COLLAPSE_OTHERS";  //$NON-NLS-1$
 
-   private static final int    STATE_ITEM_TYPE_SEPARATOR              = -1;
+   private static final int              STATE_ITEM_TYPE_SEPARATOR              = -1;
 
-//   private static final int                    STATE_ITEM_TYPE_CATEGORY                 = 1;
-   private static final int STATE_ITEM_TYPE_EQUIPMENT = 2;
-//   private static final int                    STATE_ITEM_TYPE_YEAR                     = 3;
-//   private static final int                    STATE_ITEM_TYPE_MONTH                    = 4;
+   /**
+    * Using large numbers to easier debug and find issues
+    */
+   private static final int              STATE_ITEM_TYPE_EQUIPMENT              = 1111;
+   private static final int              STATE_ITEM_TYPE_ALL_TOURS              = 2222;
 
-   private static final IPreferenceStore _prefStore        = TourbookPlugin.getPrefStore();
-   private static final IPreferenceStore _prefStore_Common = CommonActivator.getPrefStore();
-   private static final IDialogSettings  _state            = TourbookPlugin.getState(ID);
+   private static final IPreferenceStore _prefStore                             = TourbookPlugin.getPrefStore();
+   private static final IPreferenceStore _prefStore_Common                      = CommonActivator.getPrefStore();
+   private static final IDialogSettings  _state                                 = TourbookPlugin.getState(ID);
 
-   private NumberFormat                  _nf0              = NumberFormat.getNumberInstance();
+   private NumberFormat                  _nf0                                   = NumberFormat.getNumberInstance();
    {
       _nf0.setMinimumFractionDigits(0);
       _nf0.setMaximumFractionDigits(0);
@@ -193,6 +194,7 @@ public class EquipmentView extends ViewPart implements ITourProvider, ITourViewe
    private final Image _imgEquipment_Part_New    = TourbookPlugin.getImage(Images.Equipment_Part_New);
    private final Image _imgEquipment_Service     = TourbookPlugin.getImage(Images.Equipment_Service);
    private final Image _imgEquipment_Service_New = TourbookPlugin.getImage(Images.Equipment_Service_New);
+   private final Image _imgTours_All             = TourbookPlugin.getImage(Images.TourBook_NatTable);
 
    /*
     * UI controls
@@ -931,6 +933,16 @@ public class EquipmentView extends ViewPart implements ITourProvider, ITourViewe
 
                setCellColor(cell, element);
 
+            } else if (viewItem instanceof TVIEquipmentView_AllTours) {
+
+               /*
+                * All tours
+                */
+
+               styledString.append(viewItem.firstColumn, net.tourbook.ui.UI.TOUR_STYLER);
+
+               cell.setImage(_imgTours_All);
+
             } else if (viewItem instanceof TVIEquipmentView_Equipment) {
 
                /*
@@ -1355,12 +1367,17 @@ public class EquipmentView extends ViewPart implements ITourProvider, ITourViewe
 
       TourManager.getInstance().removeTourEventListener(_tourEventListener);
 
-      _imgEquipment.dispose();
-      _imgEquipment_All.dispose();
-      _imgEquipment_Part.dispose();
-      _imgEquipment_Part_New.dispose();
-      _imgEquipment_Service.dispose();
-      _imgEquipment_Service_New.dispose();
+// SET_FORMATTING_OFF
+      
+      _imgEquipment              .dispose();
+      _imgEquipment_All          .dispose();
+      _imgEquipment_Part         .dispose();
+      _imgEquipment_Part_New     .dispose();
+      _imgEquipment_Service      .dispose();
+      _imgEquipment_Service_New  .dispose();
+      _imgTours_All              .dispose();
+      
+// SET_FORMATTING_ON
 
       super.dispose();
    }
@@ -2028,9 +2045,10 @@ public class EquipmentView extends ViewPart implements ITourProvider, ITourViewe
 
          _postSelectionProvider.setSelection(new SelectionTourId(tourItem.tourId));
 
-      } else if (firstSelectedItem instanceof TVIEquipmentView_Equipment) {
+      } else if (firstSelectedItem instanceof TVIEquipmentView_Equipment
+            || firstSelectedItem instanceof TVIEquipmentView_AllTours) {
 
-         // category is selected, expand/collapse category items
+         // a category item is selected, expand/collapse category items
 
          if (_isSelectedWithKeyboard == false) {
 
@@ -2278,7 +2296,7 @@ public class EquipmentView extends ViewPart implements ITourProvider, ITourViewe
    }
 
    /**
-    * Restore viewer state after the viewer is loaded.
+    * Restore viewer state after the viewer is loaded
     */
    private void restoreState_Viewer() {
 
@@ -2288,75 +2306,60 @@ public class EquipmentView extends ViewPart implements ITourProvider, ITourViewe
       final long[] allStateItems = Util.getStateLongArray(_state, STATE_EXPANDED_ITEMS, null);
       if (allStateItems != null) {
 
-         final List<TreePath> viewerTreePaths = new ArrayList<>();
+         final List<TreePath> allViewerTreePaths = new ArrayList<>();
 
-         final List<StateSegment[]> allStateSegments = restoreState_Viewer_GetSegments(allStateItems);
-         for (final StateSegment[] stateSegments : allStateSegments) {
+         final List<StateSegment[]> allStateSegmentsAllPaths = restoreState_Viewer_GetSegments(allStateItems);
 
-            final List<Object> pathSegments = new ArrayList<>();
+         for (final StateSegment[] allStateSegmentsOnePath : allStateSegmentsAllPaths) {
+
+            final List<Object> allPathSegments = new ArrayList<>();
 
             // start tree items with the root and go deeper with every segment
-            List<TreeViewerItem> treeItems = _rootItem.getFetchedChildren();
+            List<TreeViewerItem> allTreeItems = _rootItem.getFetchedChildren();
 
-            for (final StateSegment stateSegment : stateSegments) {
+            for (final StateSegment stateSegment : allStateSegmentsOnePath) {
 
                /*
                 * This is somehow recursive as it goes deeper into the child tree items until there
                 * are no children
                 */
-               treeItems = restoreState_Viewer_ExpandItem(pathSegments, treeItems, stateSegment);
+               allTreeItems = restoreState_Viewer_ExpandItem(allPathSegments, allTreeItems, stateSegment);
             }
 
-            if (pathSegments.size() > 0) {
-               viewerTreePaths.add(new TreePath(pathSegments.toArray()));
+            if (allPathSegments.size() > 0) {
+               allViewerTreePaths.add(new TreePath(allPathSegments.toArray()));
             }
          }
 
-         if (viewerTreePaths.size() > 0) {
-            _equipmentViewer.setExpandedTreePaths(viewerTreePaths.toArray(new TreePath[viewerTreePaths.size()]));
+         if (allViewerTreePaths.size() > 0) {
+
+            final TreePath[] allPaths = allViewerTreePaths.toArray(new TreePath[allViewerTreePaths.size()]);
+
+            _equipmentViewer.setExpandedTreePaths(allPaths);
          }
       }
    }
 
    /**
-    * @param pathSegments
-    * @param treeItems
+    * @param allPathSegments
+    * @param allTreeItems
     * @param stateSegment
     *
-    * @return Returns children when it could be expanded otherwise <code>null</code>.
+    * @return Returns children when it could be expanded otherwise <code>null</code>
     */
-   private List<TreeViewerItem> restoreState_Viewer_ExpandItem(final List<Object> pathSegments,
-                                                               final List<TreeViewerItem> treeItems,
+   private List<TreeViewerItem> restoreState_Viewer_ExpandItem(final List<Object> allPathSegments,
+                                                               final List<TreeViewerItem> allTreeItems,
                                                                final StateSegment stateSegment) {
 
-      if (treeItems == null) {
+      if (allTreeItems == null) {
          return null;
       }
 
       final long stateData = stateSegment.__itemData;
 
-//      if (stateSegment.__itemType == STATE_ITEM_TYPE_CATEGORY) {
-//
-//         for (final TreeViewerItem treeItem : treeItems) {
-//
-//            if (treeItem instanceof final TVITaggingView_TagCategory categoryItem) {
-//
-//               final long viewerCatId = categoryItem.getTourTagCategory().getCategoryId();
-//
-//               if (viewerCatId == stateData) {
-//
-//                  pathSegments.add(treeItem);
-//
-//                  return categoryItem.getFetchedChildren();
-//               }
-//            }
-//         }
-//
-//      } else
-
       if (stateSegment.__itemType == STATE_ITEM_TYPE_EQUIPMENT) {
 
-         for (final TreeViewerItem treeItem : treeItems) {
+         for (final TreeViewerItem treeItem : allTreeItems) {
 
             if (treeItem instanceof final TVIEquipmentView_Equipment equipmentItem) {
 
@@ -2364,46 +2367,24 @@ public class EquipmentView extends ViewPart implements ITourProvider, ITourViewe
 
                if (viewerEquipmentId == stateData) {
 
-                  pathSegments.add(treeItem);
+                  allPathSegments.add(treeItem);
 
                   return equipmentItem.getFetchedChildren();
                }
             }
          }
 
-//      } else if (stateSegment.__itemType == STATE_ITEM_TYPE_YEAR) {
-//
-//         for (final TreeViewerItem treeItem : treeItems) {
-//
-//            if (treeItem instanceof final TVITaggingView_Year yearItem) {
-//
-//               final long viewerYear = yearItem.getYear();
-//
-//               if (viewerYear == stateData) {
-//
-//                  pathSegments.add(treeItem);
-//
-//                  return yearItem.getFetchedChildren();
-//               }
-//            }
-//         }
-//
-//      } else if (stateSegment.__itemType == STATE_ITEM_TYPE_MONTH) {
-//
-//         for (final TreeViewerItem treeItem : treeItems) {
-//
-//            if (treeItem instanceof final TVITaggingView_Month monthItem) {
-//
-//               final long viewerYear = monthItem.getMonth();
-//
-//               if (viewerYear == stateData) {
-//
-//                  pathSegments.add(treeItem);
-//
-//                  return monthItem.getFetchedChildren();
-//               }
-//            }
-//         }
+      } else if (stateSegment.__itemType == STATE_ITEM_TYPE_ALL_TOURS) {
+
+         for (final TreeViewerItem treeItem : allTreeItems) {
+
+            if (treeItem instanceof final TVIEquipmentView_AllTours allToursItem) {
+
+               allPathSegments.add(treeItem);
+
+               return allToursItem.getFetchedChildren();
+            }
+         }
       }
 
       return null;
@@ -2447,11 +2428,8 @@ public class EquipmentView extends ViewPart implements ITourProvider, ITourViewe
             // a new segment is available
 
             if (false
-//                  || itemType == STATE_ITEM_TYPE_CATEGORY
                   || itemType == STATE_ITEM_TYPE_EQUIPMENT
-//                  || itemType == STATE_ITEM_TYPE_YEAR
-//                  || itemType == STATE_ITEM_TYPE_MONTH
-            ) {
+                  || itemType == STATE_ITEM_TYPE_ALL_TOURS) {
 
                currentSegments.add(new StateSegment(itemType, itemData));
             }
@@ -2477,58 +2455,51 @@ public class EquipmentView extends ViewPart implements ITourProvider, ITourViewe
    }
 
    /**
-    * Save state for expanded tree items.
+    * Save state for expanded tree items
     */
    private void saveState_ExpandedItems() {
 
-      final Object[] visibleExpanded = _equipmentViewer.getVisibleExpandedElements();
+      final Object[] allVisibleAndExpandedItems = _equipmentViewer.getVisibleExpandedElements();
 
-      if (visibleExpanded.length == 0) {
+      if (allVisibleAndExpandedItems.length == 0) {
+
          Util.setState(_state, STATE_EXPANDED_ITEMS, new long[0]);
+
          return;
       }
 
-      final LongArrayList expandedItems = new LongArrayList();
+      final LongArrayList allExpandedItemIDs = new LongArrayList();
 
-      final TreePath[] expandedOpenedTreePaths = net.tourbook.common.UI.getExpandedOpenedItems(
-            visibleExpanded,
+      final TreePath[] allExpandedAndOpenedTreePaths = net.tourbook.common.UI.getExpandedAndOpenedItems(
+            allVisibleAndExpandedItems,
             _equipmentViewer.getExpandedTreePaths());
 
-      for (final TreePath expandedPath : expandedOpenedTreePaths) {
+      for (final TreePath expandedPath : allExpandedAndOpenedTreePaths) {
 
-         // start a new path, always set it twice to have a even structure
-         expandedItems.add(STATE_ITEM_TYPE_SEPARATOR);
-         expandedItems.add(STATE_ITEM_TYPE_SEPARATOR);
+         // start a new path, always set it twice to have an even structure
+         allExpandedItemIDs.add(STATE_ITEM_TYPE_SEPARATOR);
+         allExpandedItemIDs.add(STATE_ITEM_TYPE_SEPARATOR);
 
-         for (int segmentIndex = 0; segmentIndex < expandedPath.getSegmentCount(); segmentIndex++) {
+         final int numSegments = expandedPath.getSegmentCount();
+
+         for (int segmentIndex = 0; segmentIndex < numSegments; segmentIndex++) {
 
             final Object segment = expandedPath.getSegment(segmentIndex);
 
-//            if (segment instanceof final TVITaggingView_TagCategory categoryItem) {
-//
-//               expandedItems.add(STATE_ITEM_TYPE_CATEGORY);
-//               expandedItems.add(categoryItem.getTourTagCategory().getCategoryId());
-//
-//            } else
             if (segment instanceof final TVIEquipmentView_Equipment equipmentItem) {
 
-               expandedItems.add(STATE_ITEM_TYPE_EQUIPMENT);
-               expandedItems.add((equipmentItem).getEquipment().getEquipmentId());
+               allExpandedItemIDs.add(STATE_ITEM_TYPE_EQUIPMENT);
+               allExpandedItemIDs.add(equipmentItem.getEquipment().getEquipmentId());
 
-//            } else if (segment instanceof final TVITaggingView_Year yeatItem) {
-//
-//               expandedItems.add(STATE_ITEM_TYPE_YEAR);
-//               expandedItems.add(yeatItem.getYear());
-//
-//            } else if (segment instanceof final TVITaggingView_Month monthItem) {
-//
-//               expandedItems.add(STATE_ITEM_TYPE_MONTH);
-//               expandedItems.add(monthItem.getMonth());
+            } else if (segment instanceof TVIEquipmentView_AllTours) {
+
+               allExpandedItemIDs.add(STATE_ITEM_TYPE_ALL_TOURS);
+               allExpandedItemIDs.add(777);
             }
          }
       }
 
-      Util.setState(_state, STATE_EXPANDED_ITEMS, expandedItems.toArray());
+      Util.setState(_state, STATE_EXPANDED_ITEMS, allExpandedItemIDs.toArray());
    }
 
    private void setCellColor(final ViewerCell cell, final Object element) {

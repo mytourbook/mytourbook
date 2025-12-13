@@ -73,6 +73,11 @@ public class EquipmentPart implements Cloneable, Comparable<Object>, Serializabl
    private String                     description;
 
    /**
+    * Website
+    */
+   private String                     urlAddress;
+
+   /**
     * When the equipment was created/build, in epoch days
     */
    private long                       dateBuilt;
@@ -334,6 +339,15 @@ public class EquipmentPart implements Cloneable, Comparable<Object>, Serializabl
       return type;
    }
 
+   public String getUrlAddress() {
+
+      if (urlAddress == null) {
+         return UI.EMPTY_STRING;
+      }
+
+      return urlAddress;
+   }
+
    public LocalDate getUsageDuration() {
       // TODO Auto-generated method stub
       return null;
@@ -447,6 +461,11 @@ public class EquipmentPart implements Cloneable, Comparable<Object>, Serializabl
       this.type = type;
    }
 
+   public void setUrlAddress(final String urlAddress) {
+
+      this.urlAddress = urlAddress;
+   }
+
    public void setWeight(final float weight) {
       this.weight = weight;
    }
@@ -458,9 +477,9 @@ public class EquipmentPart implements Cloneable, Comparable<Object>, Serializabl
 
             + "EquipmentPart" + NL //                                      //$NON-NLS-1$
 
-            + " partId           =" + partId + NL //                       //$NON-NLS-1$
-            + " brand            =" + brand + NL //                        //$NON-NLS-1$
-            + " model            =" + model + NL //                        //$NON-NLS-1$
+            + " partId           = " + partId + NL //                       //$NON-NLS-1$
+            + " brand            = " + brand + NL //                        //$NON-NLS-1$
+            + " model            = " + model + NL //                        //$NON-NLS-1$
 //            + " description      =" + description + NL //                  //$NON-NLS-1$
 //            + " equipmentType    =" + equipmentType + NL //                //$NON-NLS-1$
 //            + " distanceFirstUse =" + distanceFirstUse + NL //             //$NON-NLS-1$
@@ -481,6 +500,7 @@ public class EquipmentPart implements Cloneable, Comparable<Object>, Serializabl
       model             = otherPart.getModel();
       type              = otherPart.getType();
       description       = otherPart.getDescription();
+      urlAddress        = otherPart.getUrlAddress();
 
       distanceFirstUse  = otherPart.getDistanceFirstUse();
       price             = otherPart.getPrice();

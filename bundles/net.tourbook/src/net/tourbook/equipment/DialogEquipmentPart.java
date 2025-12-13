@@ -16,7 +16,6 @@
 package net.tourbook.equipment;
 
 import java.time.LocalDate;
-import java.util.concurrent.ConcurrentSkipListSet;
 
 import net.tourbook.Images;
 import net.tourbook.Messages;
@@ -112,6 +111,7 @@ public class DialogEquipmentPart extends TitleAreaDialog {
    private Spinner                   _spinWeight;
 
    private Text                      _txtDescription;
+   private Text                      _txtUrlAddress;
 
    private AutoComplete_ComboInputMT _autocomplete_Brand;
    private AutoComplete_ComboInputMT _autocomplete_Model;
@@ -227,6 +227,8 @@ public class DialogEquipmentPart extends TitleAreaDialog {
    private void createUI(final Composite parent) {
 
       final GridDataFactory gdVertCenter = GridDataFactory.fillDefaults().align(SWT.FILL, SWT.CENTER);
+
+      final int defaultWidth = convertWidthInCharsToPixels(40);
 
       _container = new Composite(parent, SWT.NONE);
       GridDataFactory.fillDefaults().grab(true, true).applyTo(_container);
@@ -412,7 +414,21 @@ public class DialogEquipmentPart extends TitleAreaDialog {
             _dateRetired.addSelectionListener(_defaultSelectionListener);
          }
          UI.createSpacer_Horizontal(_container, 1);
-//         UI.createSpacer_Horizontal(_container, 1);
+         {
+            /*
+             * Website
+             */
+            final Label label = UI.createLabel(_container, "W&ebsite");
+            GridDataFactory.fillDefaults().align(SWT.FILL, SWT.BEGINNING).applyTo(label);
+
+            _txtUrlAddress = new Text(_container, SWT.BORDER);
+            _txtUrlAddress.addModifyListener(e -> onModify());
+            GridDataFactory.fillDefaults()
+                  .grab(true, false)
+                  .hint(defaultWidth, SWT.DEFAULT)
+                  .span(6, 1)
+                  .applyTo(_txtUrlAddress);
+         }
          {
             /*
              * Description
@@ -424,7 +440,7 @@ public class DialogEquipmentPart extends TitleAreaDialog {
             _txtDescription.addModifyListener(e -> onModify());
             GridDataFactory.fillDefaults()
                   .grab(true, true)
-                  .hint(convertWidthInCharsToPixels(40), convertHeightInCharsToPixels(10))
+                  .hint(defaultWidth, convertHeightInCharsToPixels(10))
                   .span(6, 1)
                   .applyTo(_txtDescription);
          }
@@ -448,7 +464,8 @@ public class DialogEquipmentPart extends TitleAreaDialog {
             _chkSyncDates,
             _dateRetired,
 
-            _txtDescription
+            _txtUrlAddress,
+            _txtDescription,
       });
    }
 
@@ -476,32 +493,15 @@ public class DialogEquipmentPart extends TitleAreaDialog {
 
    private void fillUI() {
 
-      // fill brand combobox
-      final ConcurrentSkipListSet<String> allBrands = EquipmentManager.getCachedFields_AllBrands();
+// SET_FORMATTING_OFF
 
-      for (final String brand : allBrands) {
-         if (brand != null) {
-            _comboBrand.add(brand);
-         }
-      }
+      UI.fillUI_Combobox(_comboBrand,     EquipmentManager.getCachedFields_AllBrands());
+      UI.fillUI_Combobox(_comboModel,     EquipmentManager.getCachedFields_AllModels());
+      UI.fillUI_Combobox(_comboPriceUnit, EquipmentManager.getCachedFields_AllPriceUnits());
+      UI.fillUI_Combobox(_comboSize,      EquipmentManager.getCachedFields_AllSizes());
+      UI.fillUI_Combobox(_comboType,      EquipmentManager.getCachedFields_AllTypes());
 
-      // fill model combobox
-      final ConcurrentSkipListSet<String> allModels = EquipmentManager.getCachedFields_AllModels();
-
-      for (final String model : allModels) {
-         if (model != null) {
-            _comboModel.add(model);
-         }
-      }
-
-      // fill price unit combobox
-      final ConcurrentSkipListSet<String> allPriceUnits = EquipmentManager.getCachedFields_AllPriceUnits();
-
-      for (final String model : allPriceUnits) {
-         if (model != null) {
-            _comboPriceUnit.add(model);
-         }
-      }
+// SET_FORMATTING_ON
    }
 
    @Override
@@ -636,6 +636,7 @@ public class DialogEquipmentPart extends TitleAreaDialog {
       _part.setModel(            _comboModel.getText().trim());
       _part.setType(             _comboType.getText().trim());
       _part.setDescription(      _txtDescription.getText().trim());
+      _part.setUrlAddress(       _txtUrlAddress.getText().trim());
 
       _part.setDistanceFirstUse( _spinDistance.getSelection());
       _part.setPrice(            _spinPrice.getSelection() / 100f);
@@ -693,6 +694,7 @@ public class DialogEquipmentPart extends TitleAreaDialog {
       _spinWeight       .setSelection((int) (_part.getWeight() * 1000));
 
       _txtDescription   .setText(_part.getDescription());
+      _txtUrlAddress    .setText(_part.getUrlAddress());
 
 // SET_FORMATTING_ON
 
