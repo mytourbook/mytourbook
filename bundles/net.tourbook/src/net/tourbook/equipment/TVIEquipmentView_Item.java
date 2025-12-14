@@ -15,6 +15,8 @@
  *******************************************************************************/
 package net.tourbook.equipment;
 
+import java.time.LocalDate;
+
 import net.tourbook.common.util.TreeViewerItem;
 
 import org.eclipse.jface.viewers.TreeViewer;
@@ -23,8 +25,20 @@ public abstract class TVIEquipmentView_Item extends TreeViewerItem {
 
    private TreeViewer _equipmentViewer;
 
-   /** Content which is displayed in the first tree column */
+   /**
+    * Content which is displayed in the first tree column
+    */
    String             firstColumn;
+
+   /**
+    * {@link #type} and {@link #date} are the key parts to collated (summarize) tour values
+    */
+   String             type;
+
+   /**
+    * {@link #type} and {@link #date} are the key parts to collated (summarize) tour values
+    */
+   LocalDate          date;
 
    long               numTours;
    int                numTags_NoTours;
@@ -35,7 +49,9 @@ public abstract class TVIEquipmentView_Item extends TreeViewerItem {
    float  price;
    String priceUnit;
 
-   /** Usage duration in days */
+   /**
+    * Usage duration in days
+    */
    int    usageDuration;
 
    public TVIEquipmentView_Item(final TreeViewer equipmentViewer) {

@@ -772,7 +772,8 @@ public class EquipmentManager {
                      "type", //$NON-NLS-1$
 
                      TourDatabase.TABLE_EQUIPMENT,
-                     TourDatabase.TABLE_EQUIPMENT_PART);
+                     TourDatabase.TABLE_EQUIPMENT_PART,
+                     TourDatabase.TABLE_EQUIPMENT_SERVICE);
             }
          }
       }

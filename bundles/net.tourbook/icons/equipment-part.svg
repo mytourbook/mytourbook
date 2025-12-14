@@ -70,6 +70,10 @@
     <path
        id="rect1-5-6-1-6-3-94-5"
        style="display:inline;fill:none;stroke:#005a92;stroke-width:0.7;stroke-linecap:square;stroke-miterlimit:3;stroke-dasharray:none;stroke-opacity:1"
-       d="M 208.65,32.655738 V 21.344263" />
+       d="M 208.65,32.650668 V 21.35" />
+    <path
+       id="rect1-5-6-1-6-3-94-5-6"
+       style="display:inline;fill:none;stroke:#005a92;stroke-width:0.7;stroke-linecap:square;stroke-miterlimit:3;stroke-dasharray:none;stroke-opacity:1"
+       d="M 197.34934,32.65 H 208.65" />
   </g>
 </svg>

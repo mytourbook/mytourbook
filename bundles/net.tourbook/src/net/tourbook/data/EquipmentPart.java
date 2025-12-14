@@ -78,14 +78,14 @@ public class EquipmentPart implements Cloneable, Comparable<Object>, Serializabl
    private String                     urlAddress;
 
    /**
+    * When the equipment was firstly used, in epoch days
+    */
+   private long                       date;
+
+   /**
     * When the equipment was created/build, in epoch days
     */
    private long                       dateBuilt;
-
-   /**
-    * When the equipment was bought or firstly used, in epoch days
-    */
-   private long                       dateFirstUse;
 
    /**
     * When the equipment was retired/sold, in epoch days
@@ -123,7 +123,7 @@ public class EquipmentPart implements Cloneable, Comparable<Object>, Serializabl
    private LocalDate                  _dateBuilt;
 
    @Transient
-   private LocalDate                  _dateFirstUse;
+   private LocalDate                  _date;
 
    @Transient
    private LocalDate                  _dateRetired;
@@ -212,6 +212,23 @@ public class EquipmentPart implements Cloneable, Comparable<Object>, Serializabl
       return brand;
    }
 
+   /**
+    * @return Return the first use date
+    */
+   public LocalDate getDate() {
+
+      if (_date == null) {
+         _date = TimeTools.toLocalDate(date * TimeTools.DAY_MILLISECONDS);
+      }
+
+      return _date;
+   }
+
+   public long getDate_Raw() {
+
+      return date;
+   }
+
    public LocalDate getDateBuilt() {
 
       if (_dateBuilt == null) {
@@ -224,20 +241,6 @@ public class EquipmentPart implements Cloneable, Comparable<Object>, Serializabl
    public long getDateBuilt_Raw() {
 
       return dateBuilt;
-   }
-
-   public LocalDate getDateFirstUse() {
-
-      if (_dateFirstUse == null) {
-         _dateFirstUse = TimeTools.toLocalDate(dateFirstUse * TimeTools.DAY_MILLISECONDS);
-      }
-
-      return _dateFirstUse;
-   }
-
-   public long getDateFirstUse_Raw() {
-
-      return dateFirstUse;
    }
 
    public LocalDate getDateRetired() {
@@ -404,18 +407,18 @@ public class EquipmentPart implements Cloneable, Comparable<Object>, Serializabl
       _partName = null;
    }
 
+   public void setDate(final long date) {
+
+      this.date = date;
+
+      _date = null;
+   }
+
    public void setDateBuilt(final long dateBuilt) {
 
       this.dateBuilt = dateBuilt;
 
       _dateBuilt = null;
-   }
-
-   public void setDateFirstUse(final long dateFirstUse) {
-
-      this.dateFirstUse = dateFirstUse;
-
-      _dateFirstUse = null;
    }
 
    public void setDateRetired(final long dateRetired) {
@@ -494,7 +497,7 @@ public class EquipmentPart implements Cloneable, Comparable<Object>, Serializabl
 
    public void updateFromOther(final EquipmentPart otherPart) {
 
-   // SET_FORMATTING_OFF
+// SET_FORMATTING_OFF
 
       brand             = otherPart.getBrand();
       model             = otherPart.getModel();
@@ -508,11 +511,11 @@ public class EquipmentPart implements Cloneable, Comparable<Object>, Serializabl
       size              = otherPart.getSize();
       weight            = otherPart.getWeight();
 
+      setDate(            otherPart.getDate_Raw());
       setDateBuilt(       otherPart.getDateBuilt_Raw());
-      setDateFirstUse(    otherPart.getDateFirstUse_Raw());
       setDateRetired(     otherPart.getDateRetired_Raw());
 
-   // SET_FORMATTING_ON
+// SET_FORMATTING_ON
 
       _partName = null;
    }

@@ -79,8 +79,10 @@ public class Images {
    public static final String Equipment                            = "equipment.svg";                               //$NON-NLS-1$
    public static final String Equipment_Only                       = "equipment-only.svg";                          //$NON-NLS-1$
    public static final String Equipment_Part                       = "equipment-part.svg";                          //$NON-NLS-1$
+   public static final String Equipment_Part_Duplicate             = "equipment-part-duplicate.svg";                //$NON-NLS-1$
    public static final String Equipment_Part_New                   = "equipment-part-new.svg";                      //$NON-NLS-1$
    public static final String Equipment_Service                    = "equipment-service.svg";                       //$NON-NLS-1$
+   public static final String Equipment_Service_Duplicate          = "equipment-service-duplicate.svg";             //$NON-NLS-1$
    public static final String Equipment_Service_New                = "equipment-service-new.svg";                   //$NON-NLS-1$
    public static final String Equipment_Checked                    = "equipment-checked.svg";                       //$NON-NLS-1$
    public static final String Equipment_New                        = "equipment-new.svg";                           //$NON-NLS-1$

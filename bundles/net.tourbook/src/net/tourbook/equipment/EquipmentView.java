@@ -27,7 +27,6 @@ import net.tourbook.Images;
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.CommonActivator;
-import net.tourbook.common.CommonImages;
 import net.tourbook.common.UI;
 import net.tourbook.common.time.TimeTools;
 import net.tourbook.common.util.ColumnDefinition;
@@ -296,7 +295,7 @@ public class EquipmentView extends ViewPart implements ITourProvider, ITourViewe
 
          setToolTipText("Duplicate part and adjust date to today");
 
-         setImageDescriptor(CommonActivator.getThemedImageDescriptor(CommonImages.App_Copy));
+         setImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.Equipment_Part_Duplicate));
       }
 
       @Override
@@ -313,7 +312,7 @@ public class EquipmentView extends ViewPart implements ITourProvider, ITourViewe
 
          setToolTipText("Duplicate service and adjust date to today");
 
-         setImageDescriptor(CommonActivator.getThemedImageDescriptor(CommonImages.App_Copy));
+         setImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.Equipment_Service_Duplicate));
       }
 
       @Override
@@ -447,9 +446,15 @@ public class EquipmentView extends ViewPart implements ITourProvider, ITourViewe
 
    /**
     * !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+    * !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+    * !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     * <p>
+    * <b>
     * A comparer is necessary to set and restore the expanded elements AND to reselect elements
+    * </b>
     * <p>
+    * !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+    * !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     * !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     */
    private class EquipmentComparer implements IElementComparer {
@@ -475,6 +480,11 @@ public class EquipmentView extends ViewPart implements ITourProvider, ITourViewe
                && o2 instanceof final TVIEquipmentView_Service item2) {
 
             return item1.getServiceID() == item2.getServiceID();
+
+         } else if (o1 instanceof final TVIEquipmentView_AllTours item1
+               && o2 instanceof final TVIEquipmentView_AllTours item2) {
+
+            return item1.getID() == item2.getID();
          }
 
          return false;
@@ -853,7 +863,7 @@ public class EquipmentView extends ViewPart implements ITourProvider, ITourViewe
       defineColumn_Equipment_InitialDistance();
 
       defineColumn_Time_UsageDuration();
-      defineColumn_Time_Date_FirstUse();
+      defineColumn_Time_Date();
       defineColumn_Time_Date_Built();
       defineColumn_Time_Date_Retired();
    }
@@ -1173,21 +1183,15 @@ public class EquipmentView extends ViewPart implements ITourProvider, ITourViewe
 
             final Object element = cell.getElement();
 
-            String type = null;
+            if (element instanceof final TVIEquipmentView_Item viewItem) {
 
-            if (element instanceof final TVIEquipmentView_Equipment equipmentItem) {
+               final String type = viewItem.type;
 
-               type = equipmentItem.getEquipment().getType();
+               if (type != null) {
 
-            } else if (element instanceof final TVIEquipmentView_Part partItem) {
-
-               type = partItem.getPart().getType();
-            }
-
-            if (type != null) {
-
-               cell.setText(type);
-               setCellColor(cell, element);
+                  cell.setText(type);
+                  setCellColor(cell, element);
+               }
             }
          }
       });
@@ -1230,6 +1234,43 @@ public class EquipmentView extends ViewPart implements ITourProvider, ITourViewe
    }
 
    /**
+    * Column: First use date
+    */
+   private void defineColumn_Time_Date() {
+
+      final ColumnDefinition colDef = TreeColumnFactory.EQUIPMENT_DATE.createColumn(_columnManager, _pc);
+
+      colDef.setLabelProvider(new CellLabelProvider() {
+
+         @Override
+         public void update(final ViewerCell cell) {
+
+            final Object element = cell.getElement();
+            LocalDate date = null;
+
+            if (element instanceof final TVIEquipmentView_Equipment viewItem) {
+
+               date = viewItem.getEquipment().getDate();
+
+            } else if (element instanceof final TVIEquipmentView_Part viewItem) {
+
+               date = viewItem.getPart().getDate();
+
+            } else if (element instanceof final TVIEquipmentView_Service viewItem) {
+
+               date = viewItem.getService().getDate();
+            }
+
+            if (date != null) {
+
+               cell.setText(TimeTools.Formatter_Date_S.format(date));
+               setCellColor(cell, element);
+            }
+         }
+      });
+   }
+
+   /**
     * Column: Build date
     */
    private void defineColumn_Time_Date_Built() {
@@ -1251,43 +1292,6 @@ public class EquipmentView extends ViewPart implements ITourProvider, ITourViewe
             } else if (element instanceof final TVIEquipmentView_Part viewItem) {
 
                date = viewItem.getPart().getDateBuilt();
-            }
-
-            if (date != null) {
-
-               cell.setText(TimeTools.Formatter_Date_S.format(date));
-               setCellColor(cell, element);
-            }
-         }
-      });
-   }
-
-   /**
-    * Column: First use date
-    */
-   private void defineColumn_Time_Date_FirstUse() {
-
-      final ColumnDefinition colDef = TreeColumnFactory.EQUIPMENT_DATE_FIRST_USE.createColumn(_columnManager, _pc);
-
-      colDef.setLabelProvider(new CellLabelProvider() {
-
-         @Override
-         public void update(final ViewerCell cell) {
-
-            final Object element = cell.getElement();
-            LocalDate date = null;
-
-            if (element instanceof final TVIEquipmentView_Equipment viewItem) {
-
-               date = viewItem.getEquipment().getDateFirstUse();
-
-            } else if (element instanceof final TVIEquipmentView_Part viewItem) {
-
-               date = viewItem.getPart().getDateFirstUse();
-
-            } else if (element instanceof final TVIEquipmentView_Service viewItem) {
-
-               date = viewItem.getService().getDate();
             }
 
             if (date != null) {
@@ -1496,13 +1500,13 @@ public class EquipmentView extends ViewPart implements ITourProvider, ITourViewe
 
       } else if (numParts == 1) {
 
-         menuMgr.add(_actionEditPart);
          menuMgr.add(_actionDuplicatePart);
+         menuMgr.add(_actionEditPart);
 
       } else if (numServices == 1) {
 
-         menuMgr.add(_actionEditService);
          menuMgr.add(_actionDuplicateService);
+         menuMgr.add(_actionEditService);
       }
 
       menuMgr.add(new Separator());

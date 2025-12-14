@@ -57,6 +57,11 @@ public class EquipmentService implements Cloneable, Serializable {
    private String                     company;
 
    /**
+    * e.g. Jahresservice
+    */
+   private String                     type;
+
+   /**
     * Description/notes for the service
     */
    private String                     description;
@@ -164,6 +169,10 @@ public class EquipmentService implements Cloneable, Serializable {
       return _date;
    }
 
+   public long getDate_Raw() {
+      return date;
+   }
+
    public String getDescription() {
 
       if (description == null) {
@@ -198,6 +207,15 @@ public class EquipmentService implements Cloneable, Serializable {
     */
    public long getSeriveId() {
       return serviceId;
+   }
+
+   public String getType() {
+
+      if (type == null) {
+         return UI.EMPTY_STRING;
+      }
+
+      return type;
    }
 
    @Override
@@ -284,6 +302,10 @@ public class EquipmentService implements Cloneable, Serializable {
       this.priceUnit = priceUnit;
    }
 
+   public void setType(final String type) {
+      this.type = type;
+   }
+
    @Override
    public String toString() {
 
@@ -303,9 +325,11 @@ public class EquipmentService implements Cloneable, Serializable {
 
       description = otherService.getDescription();
       company     = otherService.getCompany();
+      date        = otherService.getDate_Raw();
       name        = otherService.getName();
       price       = otherService.getPrice();
       priceUnit   = otherService.getPriceUnit();
+      type        = otherService.getType();
 
 // SET_FORMATTING_ON
 

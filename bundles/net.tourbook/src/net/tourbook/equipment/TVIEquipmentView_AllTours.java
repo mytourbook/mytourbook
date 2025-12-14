@@ -32,6 +32,8 @@ import org.eclipse.jface.viewers.TreeViewer;
 
 public class TVIEquipmentView_AllTours extends TVIEquipmentView_Item {
 
+   private long      _id;
+
    private Equipment _equipment;
 
    public TVIEquipmentView_AllTours(final TreeViewer equipViewer, final Equipment equipment) {
@@ -39,6 +41,12 @@ public class TVIEquipmentView_AllTours extends TVIEquipmentView_Item {
       super(equipViewer);
 
       _equipment = equipment;
+
+      /*
+       * Use the same ID as the equipment ID otherwise a view rebuild will not expand previous
+       * categories when a unique id would be used when this item is created
+       */
+      _id = equipment.getEquipmentId();
 
       firstColumn = "Tours";
 
@@ -131,12 +139,18 @@ public class TVIEquipmentView_AllTours extends TVIEquipmentView_Item {
       setChildren(allTours);
    }
 
+   public long getID() {
+      return _id;
+   }
+
    @Override
    public String toString() {
 
       return UI.EMPTY_STRING
 
-            + "TVIEquipmentView_AllTours" + NL //       //$NON-NLS-1$
+            + "TVIEquipmentView_AllTours" + NL //           //$NON-NLS-1$
+
+            + " _ID     = " + _id + NL //                   //$NON-NLS-1$
       ;
    }
 

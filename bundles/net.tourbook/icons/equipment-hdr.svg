@@ -79,6 +79,10 @@
     <path
        id="rect1-5-6-1-6-3-94-5-9-2-6-8-1-2-5"
        style="display:inline;fill:none;stroke:#005a92;stroke-width:0.500001;stroke-linecap:square;stroke-miterlimit:3;stroke-opacity:1"
-       d="M 83.7081,83.707733 V 77.289371" />
+       d="M 83.750004,83.756644 V 77.250511" />
+    <path
+       id="rect1-5-6-1-6-3-94-5-9-2-6-8-1-2-57-9"
+       style="display:inline;fill:none;stroke:#005a92;stroke-width:0.500001;stroke-linecap:square;stroke-miterlimit:3;stroke-opacity:1"
+       d="M 83.750793,83.749999 H 77.250001" />
   </g>
 </svg>

@@ -41,6 +41,9 @@ public class TVIEquipmentView_Equipment extends TVIEquipmentView_Item {
 
       firstColumn = equipment.getName();
 
+      type = equipment.getType();
+      date = equipment.getDate();
+
       price = equipment.getPrice();
       priceUnit = equipment.getPriceUnit();
 
@@ -87,6 +90,9 @@ public class TVIEquipmentView_Equipment extends TVIEquipmentView_Item {
 
          partItem.firstColumn = part.getName();
 
+         partItem.type = part.getType();
+         partItem.date = part.getDate();
+
          partItem.price = part.getPrice();
          partItem.priceUnit = part.getPriceUnit();
 
@@ -107,6 +113,9 @@ public class TVIEquipmentView_Equipment extends TVIEquipmentView_Item {
          final TVIEquipmentView_Service serviceItem = new TVIEquipmentView_Service(this, service, getEquipmentViewer());
 
          serviceItem.firstColumn = service.getName();
+
+         serviceItem.type = service.getType();
+         serviceItem.date = service.getDate();
 
          serviceItem.price = service.getPrice();
          serviceItem.priceUnit = service.getPriceUnit();

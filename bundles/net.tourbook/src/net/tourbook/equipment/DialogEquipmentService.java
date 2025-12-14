@@ -59,6 +59,7 @@ public class DialogEquipmentService extends TitleAreaDialog {
    private static final String          STATE_AUTOCOMPLETE_POPUP_HEIGHT_COMPANY    = "STATE_AUTOCOMPLETE_POPUP_HEIGHT_COMPANY";       //$NON-NLS-1$
    private static final String          STATE_AUTOCOMPLETE_POPUP_HEIGHT_NAME       = "STATE_AUTOCOMPLETE_POPUP_HEIGHT_NAME";          //$NON-NLS-1$
    private static final String          STATE_AUTOCOMPLETE_POPUP_HEIGHT_PRICE_UNIT = "STATE_AUTOCOMPLETE_POPUP_HEIGHT_PRICE_UNIT";    //$NON-NLS-1$
+   private static final String          STATE_AUTOCOMPLETE_POPUP_HEIGHT_TYPE       = "STATE_AUTOCOMPLETE_POPUP_HEIGHT_TYPE";          //$NON-NLS-1$
    private static final String          STATE_PRICE_UNIT_DEFAULT                   = "STATE_PRICE_UNIT_DEFAULT";                      //$NON-NLS-1$
 
    /**
@@ -95,14 +96,16 @@ public class DialogEquipmentService extends TitleAreaDialog {
    private Combo                     _comboCompany;
    private Combo                     _comboName;
    private Combo                     _comboPriceUnit;
+   private Combo                     _comboType;
 
    private DateTime                  _date;
 
    private Spinner                   _spinPrice;
 
+   private AutoComplete_ComboInputMT _autocomplete_Company;
    private AutoComplete_ComboInputMT _autocomplete_Name;
    private AutoComplete_ComboInputMT _autocomplete_PriceUnit;
-   private AutoComplete_ComboInputMT _autocomplete_Company;
+   private AutoComplete_ComboInputMT _autocomplete_Type;
 
    public DialogEquipmentService(final Shell parentShell,
                                  final Equipment equipment,
@@ -251,12 +254,30 @@ public class DialogEquipmentService extends TitleAreaDialog {
          }
          {
             /*
+             * Type
+             */
+            final Label label = UI.createLabel(_container, "T&ype");
+            gdVertCenter.applyTo(label);
+
+            // autocomplete combo
+            _comboType = new Combo(_container, SWT.BORDER | SWT.FLAT);
+            _comboType.setText(UI.EMPTY_STRING);
+            _comboType.setToolTipText("With the type and date fields, tours are collated to display e.g. all kilometers for one part or one service");
+            _comboType.addModifyListener(_defaultModifyListener);
+
+            GridDataFactory.fillDefaults().grab(true, false).span(2, 1).applyTo(_comboType);
+
+            _autocomplete_Type = new AutoComplete_ComboInputMT(_comboType);
+         }
+         {
+            /*
              * Date
              */
             final Label label = UI.createLabel(_container, "D&ate");
             gdVertCenter.applyTo(label);
 
             _date = new DateTime(_container, SWT.DATE | SWT.MEDIUM | SWT.DROP_DOWN);
+            _date.setToolTipText("With the type and date fields, tours are collated to display e.g. all kilometers for one part or one service");
             _date.addSelectionListener(_defaultSelectionListener);
          }
          UI.createSpacer_Horizontal(_container, 1);
@@ -332,6 +353,7 @@ public class DialogEquipmentService extends TitleAreaDialog {
       UI.fillUI_Combobox(_comboCompany,   EquipmentManager.getCachedFields_AllCompanies());
       UI.fillUI_Combobox(_comboName,      EquipmentManager.getCachedFields_AllServiceNames());
       UI.fillUI_Combobox(_comboPriceUnit, EquipmentManager.getCachedFields_AllPriceUnits());
+      UI.fillUI_Combobox(_comboType,      EquipmentManager.getCachedFields_AllTypes());
 
 // SET_FORMATTING_ON
    }
@@ -404,12 +426,16 @@ public class DialogEquipmentService extends TitleAreaDialog {
 
       UI.disposeResource(_imageDialog);
 
-      _autocomplete_Company.saveState(_state, STATE_AUTOCOMPLETE_POPUP_HEIGHT_COMPANY);
-      _autocomplete_Name.saveState(_state, STATE_AUTOCOMPLETE_POPUP_HEIGHT_NAME);
-      _autocomplete_PriceUnit.saveState(_state, STATE_AUTOCOMPLETE_POPUP_HEIGHT_PRICE_UNIT);
+// SET_FORMATTING_OFF
+      
+      _autocomplete_Company   .saveState(_state, STATE_AUTOCOMPLETE_POPUP_HEIGHT_COMPANY);
+      _autocomplete_Name      .saveState(_state, STATE_AUTOCOMPLETE_POPUP_HEIGHT_NAME);
+      _autocomplete_PriceUnit .saveState(_state, STATE_AUTOCOMPLETE_POPUP_HEIGHT_PRICE_UNIT);
+      _autocomplete_Type      .saveState(_state, STATE_AUTOCOMPLETE_POPUP_HEIGHT_TYPE);
+      
+// SET_FORMATTING_ON
 
       _state.put(STATE_PRICE_UNIT_DEFAULT, _comboPriceUnit.getText().trim());
-
    }
 
    private void onModify() {
@@ -427,10 +453,14 @@ public class DialogEquipmentService extends TitleAreaDialog {
 
       _isInUIUpdate = true;
 
-      _autocomplete_Company.restoreState(_state, STATE_AUTOCOMPLETE_POPUP_HEIGHT_COMPANY);
-      _autocomplete_Name.restoreState(_state, STATE_AUTOCOMPLETE_POPUP_HEIGHT_NAME);
-      _autocomplete_PriceUnit.restoreState(_state, STATE_AUTOCOMPLETE_POPUP_HEIGHT_PRICE_UNIT);
+// SET_FORMATTING_OFF
+      _autocomplete_Company   .restoreState(_state, STATE_AUTOCOMPLETE_POPUP_HEIGHT_COMPANY);
+      _autocomplete_Name      .restoreState(_state, STATE_AUTOCOMPLETE_POPUP_HEIGHT_NAME);
+      _autocomplete_PriceUnit .restoreState(_state, STATE_AUTOCOMPLETE_POPUP_HEIGHT_PRICE_UNIT);
+      _autocomplete_Type      .restoreState(_state, STATE_AUTOCOMPLETE_POPUP_HEIGHT_TYPE);
 
+// SET_FORMATTING_ON      
+      
       // set default unit
       _comboPriceUnit.setText(Util.getStateString(_state, STATE_PRICE_UNIT_DEFAULT, UI.EMPTY_STRING));
 
@@ -447,6 +477,7 @@ public class DialogEquipmentService extends TitleAreaDialog {
 
       _service.setCompany(          _comboCompany.getText().trim());
       _service.setName(             _comboName.getText().trim());
+      _service.setType(             _comboType.getText().trim());
       _service.setDescription(      _txtDescription.getText().trim());
 
       _service.setPrice(            _spinPrice.getSelection() / 100f);
@@ -474,6 +505,7 @@ public class DialogEquipmentService extends TitleAreaDialog {
 
       _comboCompany     .setText(_service.getCompany());
       _comboName        .setText(_service.getName());
+      _comboType        .setText(_service.getType());
 
       _date             .setDate(date.getYear(),    date.getMonthValue() - 1,      date.getDayOfMonth());
 

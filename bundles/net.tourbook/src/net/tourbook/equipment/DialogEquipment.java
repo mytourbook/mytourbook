@@ -99,8 +99,8 @@ public class DialogEquipment extends TitleAreaDialog {
    private Combo                     _comboSize;
    private Combo                     _comboType;
 
+   private DateTime                  _date;
    private DateTime                  _dateBuilt;
-   private DateTime                  _dateFirstUse;
    private DateTime                  _dateRetired;
 
    private Spinner                   _spinDistance;
@@ -319,8 +319,8 @@ public class DialogEquipment extends TitleAreaDialog {
             final Label label = UI.createLabel(_container, Messages.Dialog_Equipment_Label_DateFirstUse);
             gdVertCenter.applyTo(label);
 
-            _dateFirstUse = new DateTime(_container, SWT.DATE | SWT.MEDIUM | SWT.DROP_DOWN);
-            _dateFirstUse.addSelectionListener(_defaultSelectionListener);
+            _date = new DateTime(_container, SWT.DATE | SWT.MEDIUM | SWT.DROP_DOWN);
+            _date.addSelectionListener(_defaultSelectionListener);
          }
          UI.createSpacer_Horizontal(_container, 1);
          {
@@ -437,7 +437,7 @@ public class DialogEquipment extends TitleAreaDialog {
             _spinWeight,
             _spinDistance,
 
-            _dateFirstUse,
+            _date,
             _dateBuilt,
             _chkSyncDates,
             _dateRetired,
@@ -566,7 +566,7 @@ public class DialogEquipment extends TitleAreaDialog {
 
       if (isSyncDates) {
 
-         _dateBuilt.setDate(_dateFirstUse.getYear(), _dateFirstUse.getMonth(), _dateFirstUse.getDay());
+         _dateBuilt.setDate(_date.getYear(), _date.getMonth(), _date.getDay());
       }
 
       enableControls();
@@ -576,42 +576,49 @@ public class DialogEquipment extends TitleAreaDialog {
 
       _isInUIUpdate = true;
 
-      _autocomplete_Brand.restoreState(_state, STATE_AUTOCOMPLETE_POPUP_HEIGHT_BRAND);
-      _autocomplete_Model.restoreState(_state, STATE_AUTOCOMPLETE_POPUP_HEIGHT_MODEL);
-      _autocomplete_PriceUnit.restoreState(_state, STATE_AUTOCOMPLETE_POPUP_HEIGHT_PRICE_UNIT);
-      _autocomplete_Size.restoreState(_state, STATE_AUTOCOMPLETE_POPUP_HEIGHT_SIZE);
-      _autocomplete_Type.restoreState(_state, STATE_AUTOCOMPLETE_POPUP_HEIGHT_TYPE);
+// SET_FORMATTING_OFF
 
-      // set also default unit
-      _comboPriceUnit.setText(Util.getStateString(_state, STATE_PRICE_UNIT_DEFAULT, UI.EMPTY_STRING));
+      _autocomplete_Brand     .restoreState(_state, STATE_AUTOCOMPLETE_POPUP_HEIGHT_BRAND);
+      _autocomplete_Model     .restoreState(_state, STATE_AUTOCOMPLETE_POPUP_HEIGHT_MODEL);
+      _autocomplete_PriceUnit .restoreState(_state, STATE_AUTOCOMPLETE_POPUP_HEIGHT_PRICE_UNIT);
+      _autocomplete_Size      .restoreState(_state, STATE_AUTOCOMPLETE_POPUP_HEIGHT_SIZE);
+      _autocomplete_Type      .restoreState(_state, STATE_AUTOCOMPLETE_POPUP_HEIGHT_TYPE);
 
-      _chkSyncDates.setSelection(Util.getStateBoolean(_state, STATE_SYNC_DATES, true));
+      _chkSyncDates           .setSelection(Util.getStateBoolean(_state, STATE_SYNC_DATES, true));
+
+      _comboPriceUnit         .setText(Util.getStateString(_state, STATE_PRICE_UNIT_DEFAULT, UI.EMPTY_STRING));
+
+// SET_FORMATTING_ON
 
       _isInUIUpdate = false;
    }
 
    private void saveState() {
 
-      _autocomplete_Brand.saveState(_state, STATE_AUTOCOMPLETE_POPUP_HEIGHT_BRAND);
-      _autocomplete_Model.saveState(_state, STATE_AUTOCOMPLETE_POPUP_HEIGHT_MODEL);
-      _autocomplete_PriceUnit.saveState(_state, STATE_AUTOCOMPLETE_POPUP_HEIGHT_PRICE_UNIT);
-      _autocomplete_Size.saveState(_state, STATE_AUTOCOMPLETE_POPUP_HEIGHT_SIZE);
-      _autocomplete_Type.saveState(_state, STATE_AUTOCOMPLETE_POPUP_HEIGHT_TYPE);
+// SET_FORMATTING_OFF
 
-      _state.put(STATE_PRICE_UNIT_DEFAULT, _comboPriceUnit.getText().trim());
-      _state.put(STATE_SYNC_DATES, _chkSyncDates.getSelection());
+      _autocomplete_Brand     .saveState(_state, STATE_AUTOCOMPLETE_POPUP_HEIGHT_BRAND);
+      _autocomplete_Model     .saveState(_state, STATE_AUTOCOMPLETE_POPUP_HEIGHT_MODEL);
+      _autocomplete_PriceUnit .saveState(_state, STATE_AUTOCOMPLETE_POPUP_HEIGHT_PRICE_UNIT);
+      _autocomplete_Size      .saveState(_state, STATE_AUTOCOMPLETE_POPUP_HEIGHT_SIZE);
+      _autocomplete_Type      .saveState(_state, STATE_AUTOCOMPLETE_POPUP_HEIGHT_TYPE);
+
+      _state.put(STATE_PRICE_UNIT_DEFAULT,   _comboPriceUnit.getText().trim());
+      _state.put(STATE_SYNC_DATES,           _chkSyncDates.getSelection());
+
+// SET_FORMATTING_ON
    }
 
    private void updateModelFromUI() {
 
 // SET_FORMATTING_OFF
 
+      final LocalDate date          = LocalDate.of(_date.getYear(),           _date.getMonth() + 1,         _date.getDay());
       final LocalDate dateBuilt     = LocalDate.of(_dateBuilt.getYear(),      _dateBuilt.getMonth() + 1,    _dateBuilt.getDay());
-      final LocalDate dateFirstUse  = LocalDate.of(_dateFirstUse.getYear(),   _dateFirstUse.getMonth() + 1, _dateFirstUse.getDay());
       final LocalDate dateRetired   = LocalDate.of(_dateRetired.getYear(),    _dateRetired.getMonth() + 1,  _dateRetired.getDay());
 
+      _equipment.setDate(        date.toEpochDay());
       _equipment.setDateBuilt(   dateBuilt.toEpochDay());
-      _equipment.setDateFirstUse(dateFirstUse.toEpochDay());
       _equipment.setDateRetired( dateRetired.toEpochDay());
 
       _equipment.setBrand(             _comboBrand.getText().trim());
@@ -635,20 +642,20 @@ public class DialogEquipment extends TitleAreaDialog {
 
 // SET_FORMATTING_OFF
 
+      LocalDate date          = _equipment.getDate();
       LocalDate dateBuilt     = _equipment.getDateBuilt();
-      LocalDate dateFirstUse  = _equipment.getDateFirstUse();
       LocalDate dateRetired   = _equipment.getDateRetired();
 
+      final long epochDay           = date.toEpochDay();
       final long epochDayBuilt      = dateBuilt.toEpochDay();
-      final long epochDayFirstUse   = dateFirstUse.toEpochDay();
       final long epochDayRetired    = dateRetired.toEpochDay();
+      
+      if (epochDay == 0) {
+         date = LocalDate.now();
+      }
 
       if (epochDayBuilt == 0) {
          dateBuilt = LocalDate.now();
-      }
-
-      if (epochDayFirstUse == 0) {
-         dateFirstUse = LocalDate.now();
       }
 
       if (epochDayRetired == 0) {
@@ -660,9 +667,9 @@ public class DialogEquipment extends TitleAreaDialog {
       _comboSize        .setText(_equipment.getSize());
       _comboType        .setText(_equipment.getType());
 
-      _dateBuilt        .setDate(dateBuilt.getYear(),    dateBuilt.getMonthValue() - 1,      dateBuilt.getDayOfMonth());
-      _dateFirstUse     .setDate(dateFirstUse.getYear(), dateFirstUse.getMonthValue() - 1,   dateFirstUse.getDayOfMonth());
-      _dateRetired      .setDate(dateRetired.getYear(),  dateRetired.getMonthValue() - 1,    dateRetired.getDayOfMonth());
+      _date             .setDate(date.getYear(),         date.getMonthValue() - 1,        date.getDayOfMonth());
+      _dateBuilt        .setDate(dateBuilt.getYear(),    dateBuilt.getMonthValue() - 1,   dateBuilt.getDayOfMonth());
+      _dateRetired      .setDate(dateRetired.getYear(),  dateRetired.getMonthValue() - 1, dateRetired.getDayOfMonth());
 
       _spinDistance     .setSelection((int) (_equipment.getDistanceFirstUse()));
       _spinPrice        .setSelection((int) (_equipment.getPrice()  * 100));
