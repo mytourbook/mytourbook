@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2018 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2025 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -42,8 +42,7 @@ import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseListener;
 import org.eclipse.swt.events.MouseTrackListener;
 import org.eclipse.swt.events.MouseWheelListener;
-import org.eclipse.swt.events.SelectionAdapter;
-import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.Cursor;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
@@ -57,309 +56,304 @@ import org.eclipse.ui.PlatformUI;
 
 public class ContributionItem_TourType extends CustomControlContribution {
 
-	private static final String		ID			= "net.tourbook.tourTypeFilter";	//$NON-NLS-1$
+   private static final String     ID         = "net.tourbook.tourTypeFilter"; //$NON-NLS-1$
 
-	private final IPreferenceStore	_prefStore	= TourbookPlugin.getPrefStore();
+   private final IPreferenceStore  _prefStore = TourbookPlugin.getPrefStore();
 
-	private IPropertyChangeListener	_prefListener;
+   private IPropertyChangeListener _prefListener;
 
-	private int						_textWidth;
+   private int                     _textWidth;
 
-	private MouseListener			_mouseListener;
-	private MouseTrackListener		_mouseTrackListener;
-	private MouseWheelListener		_mouseWheelListener;
+   private MouseListener           _mouseListener;
+   private MouseTrackListener      _mouseTrackListener;
+   private MouseWheelListener      _mouseWheelListener;
 
-	private boolean					_isUIUpdating;
-	private boolean					_isContextOpening;
-	private boolean					_isShowTourTypeContextMenu;
+   private boolean                 _isUIUpdating;
+   private boolean                 _isContextOpening;
+   private boolean                 _isShowTourTypeContextMenu;
 
-	private long					_lastOpenTime;
-	private long					_lastHideTime;
+   private long                    _lastOpenTime;
+   private long                    _lastHideTime;
 
-	private TourTypeFilter			_ttFilter;
+   private TourTypeFilter          _ttFilter;
 
-	/*
-	 * UI controls
-	 */
-	private Menu					_contextMenu;
-	private Cursor					_cursorHand;
+   /*
+    * UI controls
+    */
+   private Menu   _contextMenu;
+   private Cursor _cursorHand;
 
-	private Label					_lblFilterIcon;
-	private Link					_lnkFilterText;
+   private Label  _lblFilterIcon;
+   private Link   _lnkFilterText;
 
-	public ContributionItem_TourType() {
-		super(ID);
-	}
+   public ContributionItem_TourType() {
+      super(ID);
+   }
 
-	private void addPrefListener() {
+   private void addPrefListener() {
 
-		_prefListener = new IPropertyChangeListener() {
+      _prefListener = new IPropertyChangeListener() {
 
-			@Override
-			public void propertyChange(final PropertyChangeEvent event) {
+         @Override
+         public void propertyChange(final PropertyChangeEvent event) {
 
-				final String property = event.getProperty();
-				if (property.equals(ITourbookPreferences.APPEARANCE_SHOW_TOUR_TYPE_CONTEXT_MENU)) {
+            final String property = event.getProperty();
+            if (property.equals(ITourbookPreferences.APPEARANCE_SHOW_TOUR_TYPE_CONTEXT_MENU)) {
 
-					if (event.getNewValue() instanceof Boolean) {
-						_isShowTourTypeContextMenu = (Boolean) event.getNewValue();
-					}
-				}
-			}
-		};
+               if (event.getNewValue() instanceof Boolean) {
+                  _isShowTourTypeContextMenu = (Boolean) event.getNewValue();
+               }
+            }
+         }
+      };
 
-		_prefStore.addPropertyChangeListener(_prefListener);
-	}
+      _prefStore.addPropertyChangeListener(_prefListener);
+   }
 
-	@Override
-	protected Control createControl(final Composite parent) {
+   @Override
+   protected Control createControl(final Composite parent) {
 
-		if (PlatformUI.getWorkbench().isClosing()) {
-			return new Label(parent, SWT.NONE);
-		}
+      if (PlatformUI.getWorkbench().isClosing()) {
+         return new Label(parent, SWT.NONE);
+      }
 
-		// createControl() is called 2 times when app is started and on every perspective reset -> dispose old values !
-		if (_cursorHand != null && _cursorHand.isDisposed() == false) {
-			dispose_ThisResources();
-		}
+      // createControl() is called 2 times when app is started and on every perspective reset -> dispose old values !
+      if (_cursorHand != null && _cursorHand.isDisposed() == false) {
+         dispose_ThisResources();
+      }
 
-		initUI(parent);
+      initUI(parent);
 
-		final Control ui = createUI(parent);
+      final Control ui = createUI(parent);
 
-		_cursorHand = new Cursor(parent.getDisplay(), SWT.CURSOR_HAND);
+      _cursorHand = new Cursor(parent.getDisplay(), SWT.CURSOR_HAND);
 
-		addPrefListener();
-		restoreState();
+      addPrefListener();
+      restoreState();
 
-		// update UI after a perspective reset otherwise it is empty !!!
-		// this bug exist since the beginning :-)
-		if (_ttFilter != null) {
-			updateUI(_ttFilter);
-		}
+      // update UI after a perspective reset otherwise it is empty !!!
+      // this bug exist since the beginning :-)
+      if (_ttFilter != null) {
+         updateUI(_ttFilter);
+      }
 
-		return ui;
-	}
+      return ui;
+   }
 
-	private Control createUI(final Composite parent) {
+   private Control createUI(final Composite parent) {
 
-		final Composite container = new Composite(parent, SWT.NONE);
-		GridDataFactory.fillDefaults()//
-				.grab(true, true)
-				.applyTo(container);
-		container.addMouseListener(_mouseListener);
-		container.addMouseTrackListener(_mouseTrackListener);
-		container.addMouseWheelListener(_mouseWheelListener);
-		GridLayoutFactory.fillDefaults()//
-				.numColumns(2)
-				//				.extendedMargins(10, 10, 10, 50)
-				.spacing(0, 0)
-				.applyTo(container);
+      final Composite container = new Composite(parent, SWT.NONE);
+      container.addMouseListener(_mouseListener);
+      container.addMouseTrackListener(_mouseTrackListener);
+      container.addMouseWheelListener(_mouseWheelListener);
+      GridDataFactory.fillDefaults()
+            .grab(true, true)
+            .applyTo(container);
+      GridLayoutFactory.fillDefaults()
+            .numColumns(2)
+//				.extendedMargins(10, 10, 10, 50)
+            .spacing(0, 0)
+            .applyTo(container);
 //		container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_BLUE));
-		{
-			createUI_10_FilterIcon(container);
-			createUI_20_FilterText(container);
+      {
+         createUI_10_FilterIcon(container);
+         createUI_20_FilterText(container);
+         createUI_30_ContextMenu();
+      }
 
-			createUI_30_ContextMenu();
-		}
+      return container;
+   }
 
-		return container;
-	}
+   private void createUI_10_FilterIcon(final Composite parent) {
 
-	private void createUI_10_FilterIcon(final Composite parent) {
+      _lblFilterIcon = new Label(parent, SWT.NONE);
 
-		_lblFilterIcon = new Label(parent, SWT.NONE);
-		GridDataFactory.fillDefaults()//
-				.grab(false, true)
-				.hint(16, 16)
-				.align(SWT.FILL, SWT.CENTER)
-				.applyTo(_lblFilterIcon);
+      GridDataFactory.fillDefaults()
+            .grab(false, true)
+            .hint(16, 16)
+            .align(SWT.FILL, SWT.CENTER)
+            .applyTo(_lblFilterIcon);
 
-		_lblFilterIcon.addMouseListener(_mouseListener);
-		_lblFilterIcon.addMouseTrackListener(_mouseTrackListener);
-		_lblFilterIcon.addMouseWheelListener(_mouseWheelListener);
-	}
+      _lblFilterIcon.addMouseListener(_mouseListener);
+      _lblFilterIcon.addMouseTrackListener(_mouseTrackListener);
+      _lblFilterIcon.addMouseWheelListener(_mouseWheelListener);
+   }
 
-	private void createUI_20_FilterText(final Composite parent) {
+   private void createUI_20_FilterText(final Composite parent) {
 
-		_lnkFilterText = new Link(parent, SWT.NONE);
-		GridDataFactory.fillDefaults()//
-				.grab(true, true)
-				.hint(_textWidth, SWT.DEFAULT)
-				.indent(3, 0)
-				.align(SWT.FILL, SWT.CENTER)
-				.applyTo(_lnkFilterText);
+      _lnkFilterText = new Link(parent, SWT.NONE);
+      GridDataFactory.fillDefaults()
+            .grab(true, true)
+            .hint(_textWidth, SWT.DEFAULT)
+            .indent(3, 0)
+            .align(SWT.FILL, SWT.CENTER)
+            .applyTo(_lnkFilterText);
 
-		_lnkFilterText.addMouseListener(_mouseListener);
-		_lnkFilterText.addMouseTrackListener(_mouseTrackListener);
-		_lnkFilterText.addMouseWheelListener(_mouseWheelListener);
+      _lnkFilterText.addMouseListener(_mouseListener);
+      _lnkFilterText.addMouseTrackListener(_mouseTrackListener);
+      _lnkFilterText.addMouseWheelListener(_mouseWheelListener);
 
-		_lnkFilterText.addSelectionListener(new SelectionAdapter() {
-			@Override
-			public void widgetSelected(final SelectionEvent e) {
-				openContextMenu();
-			}
-		});
+      _lnkFilterText.addSelectionListener(SelectionListener.widgetSelectedAdapter(selectionEvent -> openContextMenu()));
 
-		_lnkFilterText.addKeyListener(new KeyListener() {
-			@Override
-			public void keyPressed(final KeyEvent e) {
-				switch (e.keyCode) {
+      _lnkFilterText.addKeyListener(new KeyListener() {
+         @Override
+         public void keyPressed(final KeyEvent e) {
+            switch (e.keyCode) {
 
-				case SWT.ARROW_UP:
-					TourTypeFilterManager.selectNextFilter(false);
-					break;
+            case SWT.ARROW_UP:
+               TourTypeFilterManager.selectNextFilter(false);
+               break;
 
-				case SWT.ARROW_DOWN:
-					TourTypeFilterManager.selectNextFilter(true);
-					break;
+            case SWT.ARROW_DOWN:
+               TourTypeFilterManager.selectNextFilter(true);
+               break;
 
-				/*
-				 * These keys must be set because when the context menu is close, these keys are not
-				 * working any more. They are working after the controls gets the focus
-				 */
-				case SWT.CR:
-				case ' ':
-					openContextMenu();
-					break;
+            /*
+             * These keys must be set because when the context menu is close, these keys are not
+             * working any more. They are working after the controls gets the focus
+             */
+            case SWT.CR:
+            case ' ':
+               openContextMenu();
+               break;
 
-				default:
-					break;
-				}
-			}
+            default:
+               break;
+            }
+         }
 
-			@Override
-			public void keyReleased(final KeyEvent e) {}
-		});
-	}
+         @Override
+         public void keyReleased(final KeyEvent e) {}
+      });
+   }
 
-	/**
-	 * create tour type filter context menu
-	 */
-	private void createUI_30_ContextMenu() {
+   /**
+    * create tour type filter context menu
+    */
+   private void createUI_30_ContextMenu() {
 
-		final MenuManager menuMgr = new MenuManager();
+      final MenuManager menuMgr = new MenuManager();
 
-		menuMgr.setRemoveAllWhenShown(true);
-		menuMgr.addMenuListener(new IMenuListener() {
-			@Override
-			public void menuAboutToShow(final IMenuManager menuMgr) {
+      menuMgr.setRemoveAllWhenShown(true);
+      menuMgr.addMenuListener(new IMenuListener() {
+         @Override
+         public void menuAboutToShow(final IMenuManager menuMgr) {
 
-				// set all menu items
-				TourTypeFilterManager.fillMenu(menuMgr);
-			}
-		});
+            // set all menu items
+            TourTypeFilterManager.fillMenu(menuMgr);
+         }
+      });
 
-		// set context menu and set the parent to the tour type filter icon
-		_contextMenu = menuMgr.createContextMenu(_lblFilterIcon);
+      // set context menu and set the parent to the tour type filter icon
+      _contextMenu = menuMgr.createContextMenu(_lblFilterIcon);
 
-		_contextMenu.addMenuListener(new MenuListener() {
+      _contextMenu.addMenuListener(new MenuListener() {
 
-			@Override
-			public void menuHidden(final MenuEvent e) {
+         @Override
+         public void menuHidden(final MenuEvent e) {
 //				int a = 0;
 //				a++;
-			}
+         }
 
-			@Override
-			public void menuShown(final MenuEvent e) {
+         @Override
+         public void menuShown(final MenuEvent e) {
 //				int a = 0;
 //				a++;
-			}
-		});
+         }
+      });
 
-		_lblFilterIcon.setMenu(_contextMenu);
-	}
+      _lblFilterIcon.setMenu(_contextMenu);
+   }
 
-	@Override
-	public void dispose() {
+   @Override
+   public void dispose() {
 
-		dispose_ThisResources();
+      dispose_ThisResources();
 
-		super.dispose();
-	}
+      super.dispose();
+   }
 
-	private void dispose_ThisResources() {
+   private void dispose_ThisResources() {
 
-		if (_cursorHand != null) {
-			_cursorHand.dispose();
-			_cursorHand = null;
-		}
+      if (_cursorHand != null) {
+         _cursorHand.dispose();
+         _cursorHand = null;
+      }
 
-		_prefStore.removePropertyChangeListener(_prefListener);
-	}
+      _prefStore.removePropertyChangeListener(_prefListener);
+   }
 
-	private void initUI(final Composite parent) {
+   private void initUI(final Composite parent) {
 
-		final PixelConverter pc = new PixelConverter(parent);
-		_textWidth = pc.convertWidthInCharsToPixels(18);
+      final PixelConverter pc = new PixelConverter(parent);
+      _textWidth = pc.convertWidthInCharsToPixels(18);
 
-		_mouseWheelListener = new MouseWheelListener() {
+      _mouseWheelListener = new MouseWheelListener() {
 
-			private int __lastEventTime;
+         private int __lastEventTime;
 
-			@Override
-			public void mouseScrolled(final MouseEvent event) {
+         @Override
+         public void mouseScrolled(final MouseEvent event) {
 
-				if (event.time == __lastEventTime) {
-					// prevent doing the same for the same event, this occured when mouse is scrolled -> the event is fired 2x times
-					return;
-				}
+            if (event.time == __lastEventTime) {
+               // prevent doing the same for the same event, this occured when mouse is scrolled -> the event is fired 2x times
+               return;
+            }
 
-				__lastEventTime = event.time;
+            __lastEventTime = event.time;
 
-				TourTypeFilterManager.selectNextFilter(event.count < 0);
+            TourTypeFilterManager.selectNextFilter(event.count < 0);
 
-				_contextMenu.setVisible(false);
-				_lnkFilterText.setFocus();
-			}
-		};
+            _contextMenu.setVisible(false);
+            _lnkFilterText.setFocus();
+         }
+      };
 
-		_mouseListener = new MouseListener() {
-			@Override
-			public void mouseDoubleClick(final MouseEvent e) {}
+      _mouseListener = new MouseListener() {
+         @Override
+         public void mouseDoubleClick(final MouseEvent e) {}
 
-			@Override
-			public void mouseDown(final MouseEvent e) {
-				_lnkFilterText.setFocus();
-				openContextMenu();
-			}
+         @Override
+         public void mouseDown(final MouseEvent e) {
+            _lnkFilterText.setFocus();
+            openContextMenu();
+         }
 
-			@Override
-			public void mouseUp(final MouseEvent e) {}
-		};
+         @Override
+         public void mouseUp(final MouseEvent e) {}
+      };
 
-		_mouseTrackListener = new MouseTrackListener() {
-			@Override
-			public void mouseEnter(final MouseEvent e) {
-				if (e.widget instanceof Control) {
+      _mouseTrackListener = new MouseTrackListener() {
+         @Override
+         public void mouseEnter(final MouseEvent e) {
+            if (e.widget instanceof Control) {
 
-					final Control control = (Control) e.widget;
+               final Control control = (Control) e.widget;
 
-					if (control.isDisposed()) {
+               if (control.isDisposed()) {
 
-						/**
-						 * This error occures when the customized dialog for the perspective is
-						 * opened -> needs to be fixed.
-						 */
+                  /**
+                   * This error occures when the customized dialog for the perspective is
+                   * opened -> needs to be fixed.
+                   */
 
-						return;
-					}
+                  return;
+               }
 
-					control.setCursor(_cursorHand);
+               control.setCursor(_cursorHand);
 
-					openContextMenu_Open(control, e);
-				}
-			}
+               openContextMenu_Open(control, e);
+            }
+         }
 
-			@Override
-			public void mouseExit(final MouseEvent e) {
-				if (e.widget instanceof Control) {
+         @Override
+         public void mouseExit(final MouseEvent e) {
+            if (e.widget instanceof Control) {
 
-					final Control control = (Control) e.widget;
-					control.setCursor(null);
+               final Control control = (Control) e.widget;
+               control.setCursor(null);
 
-					openContextMenu_Hide(control, e);
+               openContextMenu_Hide(control, e);
 
 //					/*
 //					 * this is not working because the menu gets the focus and I didn't find a
@@ -369,28 +363,28 @@ public class ContributionItem_TourType extends CustomControlContribution {
 //					if (_contextMenu.isVisible()) {
 //						_contextMenu.setVisible(false);
 //					}
-				}
-			}
+            }
+         }
 
-			@Override
-			public void mouseHover(final MouseEvent e) {}
-		};
-	}
+         @Override
+         public void mouseHover(final MouseEvent e) {}
+      };
+   }
 
-	private void openContextMenu() {
+   private void openContextMenu() {
 
-		if (_contextMenu.isVisible() || _isContextOpening) {
-			return;
-		}
+      if (_contextMenu.isVisible() || _isContextOpening) {
+         return;
+      }
 
-		_isContextOpening = true;
+      _isContextOpening = true;
 
-		final Rectangle rect = _lblFilterIcon.getBounds();
-		Point pt = new Point(rect.x, rect.y + rect.height);
-		pt = _lblFilterIcon.getParent().toDisplay(pt);
+      final Rectangle rect = _lblFilterIcon.getBounds();
+      Point pt = new Point(rect.x, rect.y + rect.height);
+      pt = _lblFilterIcon.getParent().toDisplay(pt);
 
-		_contextMenu.setLocation(pt.x, pt.y);
-		_contextMenu.setVisible(true);
+      _contextMenu.setLocation(pt.x, pt.y);
+      _contextMenu.setVisible(true);
 
 //		/**
 //		 * Eventloop MUST be run otherwise the first click in the menu is not executed because of
@@ -404,109 +398,109 @@ public class ContributionItem_TourType extends CustomControlContribution {
 //			}
 //		}
 
-		_isContextOpening = false;
-	}
+      _isContextOpening = false;
+   }
 
-	private void openContextMenu_Hide(final Control control, final MouseEvent mouseEvent) {
+   private void openContextMenu_Hide(final Control control, final MouseEvent mouseEvent) {
 
-		_lastHideTime = mouseEvent.time & 0xFFFFFFFFL;
-	}
+      _lastHideTime = mouseEvent.time & 0xFFFFFFFFL;
+   }
 
-	private void openContextMenu_Open(final Control control, final MouseEvent mouseEvent) {
+   private void openContextMenu_Open(final Control control, final MouseEvent mouseEvent) {
 
-		if (_isShowTourTypeContextMenu == false || _contextMenu.isVisible() || _isContextOpening) {
-			// nothing to do
-			return;
-		}
+      if (_isShowTourTypeContextMenu == false || _contextMenu.isVisible() || _isContextOpening) {
+         // nothing to do
+         return;
+      }
 
-		_lastOpenTime = mouseEvent.time & 0xFFFFFFFFL;
+      _lastOpenTime = mouseEvent.time & 0xFFFFFFFFL;
 
-		/*
-		 * delay opening that the context is not opened when the tour type label is only hovered and
-		 * something else is selected
-		 */
-		Display.getDefault().timerExec(500, new Runnable() {
-			@Override
-			public void run() {
+      /*
+       * delay opening that the context is not opened when the tour type label is only hovered and
+       * something else is selected
+       */
+      Display.getDefault().timerExec(500, new Runnable() {
+         @Override
+         public void run() {
 
             if (_contextMenu.isDisposed()) {
                return;
             }
 
-				// check if a hide event has occured
-				if (_lastHideTime > _lastOpenTime) {
-					return;
-				}
+            // check if a hide event has occured
+            if (_lastHideTime > _lastOpenTime) {
+               return;
+            }
 
-				openContextMenu();
-			}
-		});
-	}
+            openContextMenu();
+         }
+      });
+   }
 
-	private void restoreState() {
+   private void restoreState() {
 
-		_isShowTourTypeContextMenu = _prefStore.getBoolean(ITourbookPreferences.APPEARANCE_SHOW_TOUR_TYPE_CONTEXT_MENU);
-	}
+      _isShowTourTypeContextMenu = _prefStore.getBoolean(ITourbookPreferences.APPEARANCE_SHOW_TOUR_TYPE_CONTEXT_MENU);
+   }
 
-	public void updateUI(final TourTypeFilter ttFilter) {
+   public void updateUI(final TourTypeFilter ttFilter) {
 
-		// prevent endless loops
-		if (_isUIUpdating) {
-			return;
-		}
+      // prevent endless loops
+      if (_isUIUpdating) {
+         return;
+      }
 
-		// keep for repainting the UI
-		_ttFilter = ttFilter;
+      // keep for repainting the UI
+      _ttFilter = ttFilter;
 
-		_isUIUpdating = true;
-		{
-			final String filterName = ttFilter.getFilterName();
-			final String shortFilterName = UI.shortenText(filterName, _lnkFilterText, _textWidth, true);
+      _isUIUpdating = true;
+      {
+         final String filterName = ttFilter.getFilterName();
+         final String shortFilterName = UI.shortenText(filterName, _lnkFilterText, _textWidth, true);
 
-			/*
-			 * create filter tooltip
-			 */
-			String filterTooltip;
-			if (ttFilter.getFilterType() == TourTypeFilter.FILTER_TYPE_TOURTYPE_SET) {
+         /*
+          * create filter tooltip
+          */
+         String filterTooltip;
+         if (ttFilter.getFilterType() == TourTypeFilter.FILTER_TYPE_TOURTYPE_SET) {
 
-				final StringBuilder sb = new StringBuilder();
-				sb.append(Messages.App_TourType_ToolTipTitle);
-				sb.append(filterName);
-				sb.append(UI.NEW_LINE2);
-				sb.append(Messages.App_TourType_ToolTip);
+            final StringBuilder sb = new StringBuilder();
+            sb.append(Messages.App_TourType_ToolTipTitle);
+            sb.append(filterName);
+            sb.append(UI.NEW_LINE2);
+            sb.append(Messages.App_TourType_ToolTip);
 //				sb.append(UI.NEW_LINE);
 
-				final TourTypeFilterSet ttSet = ttFilter.getTourTypeSet();
-				if (ttSet != null) {
+            final TourTypeFilterSet ttSet = ttFilter.getTourTypeSet();
+            if (ttSet != null) {
 
-					int counter = 0;
+               int counter = 0;
 
-					for (final Object ttItem : ttSet.getTourTypes()) {
-						if (ttItem instanceof TourType) {
-							final TourType ttFilterFromSet = (TourType) ttItem;
+               for (final Object ttItem : ttSet.getTourTypes()) {
+                  if (ttItem instanceof TourType) {
+                     final TourType ttFilterFromSet = (TourType) ttItem;
 
-							if (counter > 0) {
-								sb.append("\n\t\t"); //$NON-NLS-1$
-							}
+                     if (counter > 0) {
+                        sb.append("\n\t\t"); //$NON-NLS-1$
+                     }
 
-							sb.append("\t"); //$NON-NLS-1$
-							sb.append(ttFilterFromSet.getName());
+                     sb.append("\t"); //$NON-NLS-1$
+                     sb.append(ttFilterFromSet.getName());
 
-							counter++;
-						}
-					}
-				}
-				filterTooltip = sb.toString();
+                     counter++;
+                  }
+               }
+            }
+            filterTooltip = sb.toString();
 
-			} else {
-				filterTooltip = filterName;
-			}
+         } else {
+            filterTooltip = filterName;
+         }
 
-			_lnkFilterText.setText(UI.LINK_TAG_START + shortFilterName + UI.LINK_TAG_END);
-			_lnkFilterText.setToolTipText(filterTooltip);
+         _lnkFilterText.setText(UI.LINK_TAG_START + shortFilterName + UI.LINK_TAG_END);
+         _lnkFilterText.setToolTipText(filterTooltip);
 
-			_lblFilterIcon.setImage(TourTypeFilter.getFilterImage(ttFilter));
-		}
-		_isUIUpdating = false;
-	}
+         _lblFilterIcon.setImage(TourTypeFilter.getFilterImage(ttFilter));
+      }
+      _isUIUpdating = false;
+   }
 }

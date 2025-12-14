@@ -279,6 +279,7 @@ public class Images {
    public static final String TourGeoFilter                        = "tour-geo-filter.svg";                         //$NON-NLS-1$
    public static final String TourInfo                             = "tour-info.svg";                               //$NON-NLS-1$
    public static final String TourInfo_Hovered                     = "tour-info-hovered.svg";                       //$NON-NLS-1$
+   public static final String TourInView                           = "tour-in-view.svg";                            //$NON-NLS-1$
    public static final String TourLog                              = "tour-log.svg";                                //$NON-NLS-1$
    public static final String TourLog_Layout_Color                 = "tour-log-layout-color.svg";                   //$NON-NLS-1$
    public static final String TourLog_Layout_Simple                = "tour-log-layout-simple.svg";                  //$NON-NLS-1$

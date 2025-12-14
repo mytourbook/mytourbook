@@ -3,7 +3,7 @@
    version="1.1"
    id="svg2985"
    height="16.000015"
-   width="15.999985"
+   width="16"
    xmlns="http://www.w3.org/2000/svg"
    xmlns:svg="http://www.w3.org/2000/svg"
    xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
@@ -55,17 +55,17 @@
   <g
      id="layer1"
      style="display:inline"
-     transform="translate(-185,-19)">
+     transform="translate(-250,-19)">
     <rect
        y="19"
-       x="185"
+       x="250"
        height="16.000015"
        width="15.999991"
        id="rect6561-8-1-9-9-5-5-9-9-1-3-94-1-6-6-4-5-4-9-5-9-5-4-0-5-2"
        style="display:inline;opacity:0.99;fill:none;stroke:none" />
     <path
        id="path8-1-3-8-1-6"
-       style="display:inline;fill:#fe7f00;stroke:#9a4d00;stroke-width:0.499998;stroke-miterlimit:3"
-       d="M 197,27.000225 C 197,30.728271 193.97792,33.750449 190.25,33.75045 190.25,25.000003 190.25,29.088836 190.25,20.25 193.97792,20.250001 197,23.272179 197,27.000225 Z" />
+       style="display:inline;fill:#fe7f00;stroke:#9a4d00;stroke-width:0.7;stroke-miterlimit:3;stroke-dasharray:none"
+       d="M 261.99484,27 C 261.99484,30.672693 259.01984,33.649999 255.35,33.65 255.35,25.029477 255.35,29.0576 255.35,20.35 259.01984,20.350001 261.99484,23.327307 261.99484,27 Z" />
   </g>
 </svg>

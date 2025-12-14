@@ -175,39 +175,59 @@ public class TourTypeImage {
 
       final TourTypeImageConfig imageConfig = TourTypeManager.getImageConfig();
 
-      final int imageSize = (int) (TourType.TOUR_TYPE_IMAGE_SIZE * UI.HIDPI_SCALING * imageConfig.imageScaling / 100);
+      final int imageSizeInViewPort = (int) (TourType.TOUR_TYPE_IMAGE_SIZE * UI.HIDPI_SCALING);
+      final float imageScaling = imageConfig.imageScaling / 100f;
+      final int imageSizePainted = (int) (imageSizeInViewPort * imageScaling);
 
       final int borderWidth = imageConfig.borderWidth;
       final float borderWidth2 = borderWidth / 2f;
 
       int ovalPos = 0;
-      int ovalSize = imageSize;
+      int ovalSize = imageSizePainted;
 
       ovalPos = (int) (borderWidth2 + 0.0f);
-      ovalSize = imageSize - borderWidth - 0;
+      ovalSize = imageSizePainted - borderWidth - 0;
 
-//      // draw debug border
-//      g2d.setStroke(new BasicStroke(1));
-//      g2d.setColor(Color.GRAY);
-//      g2d.drawRect(0, 0, imageSize - 1, imageSize - 1);
+      int posOffset = 0;
+      if (imageSizeInViewPort > imageSizePainted) {
+
+         final int centerDiff = imageSizeInViewPort - imageSizePainted;
+         final int centerDiff2 = centerDiff / 2;
+
+         posOffset = centerDiff2;
+      }
+
+      ovalPos += posOffset;
 
       final DrawingColorsAWT drawingColors = getTourTypeColors(typeId);
 
       drawTourTypeImage_Background(g2d,
-            imageSize,
+            imageSizePainted,
+            imageSizeInViewPort,
             ovalPos,
             ovalSize,
             drawingColors);
 
       drawTourTypeImage_Border(g2d,
-            imageSize,
+            imageSizePainted,
+            imageSizeInViewPort,
             ovalPos,
             ovalSize,
             drawingColors);
+
+//      // draw debug border
+//      g2d.setStroke(new BasicStroke(1));
+//
+//      g2d.setColor(Color.GREEN);
+//      g2d.drawRect(0, 0, imageSizePainted - 1, imageSizePainted - 1);
+//
+//      g2d.setColor(Color.MAGENTA);
+//      g2d.drawRect(0, 0, imageSizeInViewPort - 1, imageSizeInViewPort - 1);
    }
 
    private static void drawTourTypeImage_Background(final Graphics2D g2d,
-                                                    final int imageSize,
+                                                    final int imageSizePainted,
+                                                    final int imageSizeInViewPort,
                                                     final int ovalPos,
                                                     final int ovalSize,
                                                     final DrawingColorsAWT drawingColors) {
@@ -219,7 +239,7 @@ public class TourTypeImage {
          return;
       }
 
-      final int imageSize2 = imageSize / 2;
+      final int imageSize2 = imageSizePainted / 2;
 
       boolean isRectangle = false;
       boolean isOval = false;
@@ -260,11 +280,11 @@ public class TourTypeImage {
 
          if (isHorizontal) {
 
-            g2d.setPaint(new GradientPaint(0, imageSize2, color1, imageSize, imageSize2, color2));
+            g2d.setPaint(new GradientPaint(0, imageSize2, color1, imageSizePainted, imageSize2, color2));
 
          } else if (isVertical) {
 
-            g2d.setPaint(new GradientPaint(imageSize2, 0, color1, imageSize2, imageSize, color2));
+            g2d.setPaint(new GradientPaint(imageSize2, 0, color1, imageSize2, imageSizePainted, color2));
          }
 
       } else {
@@ -277,7 +297,7 @@ public class TourTypeImage {
 
       if (isRectangle) {
 
-         g2d.fillRect(ovalPos, ovalPos, imageSize, imageSize);
+         g2d.fillRect(ovalPos, ovalPos, imageSizePainted, imageSizePainted);
 
       } else if (isOval) {
 
@@ -287,6 +307,7 @@ public class TourTypeImage {
 
    private static void drawTourTypeImage_Border(final Graphics2D g2d,
                                                 final int imageSize,
+                                                final int imageSizeInViewPort,
                                                 final int ovalPos,
                                                 final int ovalSize,
                                                 final DrawingColorsAWT drawingColors) {

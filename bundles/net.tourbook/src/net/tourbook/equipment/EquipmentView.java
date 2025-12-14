@@ -194,7 +194,7 @@ public class EquipmentView extends ViewPart implements ITourProvider, ITourViewe
    private final Image _imgEquipment_Part_New    = TourbookPlugin.getImage(Images.Equipment_Part_New);
    private final Image _imgEquipment_Service     = TourbookPlugin.getImage(Images.Equipment_Service);
    private final Image _imgEquipment_Service_New = TourbookPlugin.getImage(Images.Equipment_Service_New);
-   private final Image _imgTours_All             = TourbookPlugin.getImage(Images.TourBook_NatTable);
+   private final Image _imgTours_All             = TourbookPlugin.getImage(Images.TourInView);
 
    /*
     * UI controls
@@ -1368,7 +1368,7 @@ public class EquipmentView extends ViewPart implements ITourProvider, ITourViewe
       TourManager.getInstance().removeTourEventListener(_tourEventListener);
 
 // SET_FORMATTING_OFF
-      
+
       _imgEquipment              .dispose();
       _imgEquipment_All          .dispose();
       _imgEquipment_Part         .dispose();
@@ -1376,7 +1376,7 @@ public class EquipmentView extends ViewPart implements ITourProvider, ITourViewe
       _imgEquipment_Service      .dispose();
       _imgEquipment_Service_New  .dispose();
       _imgTours_All              .dispose();
-      
+
 // SET_FORMATTING_ON
 
       super.dispose();
