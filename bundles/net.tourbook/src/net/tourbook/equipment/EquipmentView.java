@@ -1250,15 +1250,15 @@ public class EquipmentView extends ViewPart implements ITourProvider, ITourViewe
 
             if (element instanceof final TVIEquipmentView_Equipment viewItem) {
 
-               date = viewItem.getEquipment().getDate();
+               date = viewItem.getEquipment().getDate_Local();
 
             } else if (element instanceof final TVIEquipmentView_Part viewItem) {
 
-               date = viewItem.getPart().getDate();
+               date = viewItem.getPart().getDate_Local();
 
             } else if (element instanceof final TVIEquipmentView_Service viewItem) {
 
-               date = viewItem.getService().getDate();
+               date = viewItem.getService().getDate_Local();
             }
 
             if (date != null) {
@@ -1287,11 +1287,11 @@ public class EquipmentView extends ViewPart implements ITourProvider, ITourViewe
 
             if (element instanceof final TVIEquipmentView_Equipment viewItem) {
 
-               date = viewItem.getEquipment().getDateBuilt();
+               date = viewItem.getEquipment().getDateBuilt_Local();
 
             } else if (element instanceof final TVIEquipmentView_Part viewItem) {
 
-               date = viewItem.getPart().getDateBuilt();
+               date = viewItem.getPart().getDateBuilt_Local();
             }
 
             if (date != null) {
@@ -1320,11 +1320,11 @@ public class EquipmentView extends ViewPart implements ITourProvider, ITourViewe
 
             if (element instanceof final TVIEquipmentView_Equipment viewItem) {
 
-               date = viewItem.getEquipment().getDateRetired();
+               date = viewItem.getEquipment().getDateRetired_Local();
 
             } else if (element instanceof final TVIEquipmentView_Part viewItem) {
 
-               date = viewItem.getPart().getDateRetired();
+               date = viewItem.getPart().getDateRetired_Local();
             }
 
             if (date != null) {

@@ -874,6 +874,12 @@ public class TimeTools {
       _defaultTimeZoneId = ZoneId.of(selectedTimeZoneId);
    }
 
+   public static long toEpochMilli(final LocalDate localDate) {
+
+      return localDate.atStartOfDay().toInstant(ZoneOffset.UTC).toEpochMilli();
+
+   }
+
    /**
     * Converts a {@link LocalDateTime} to the number of milliseconds from the epoch of
     * 1970-01-01T00:00:00Z.
@@ -890,6 +896,39 @@ public class TimeTools {
    public static long toEpochMilli(final ZonedDateTime zonedDateTime) {
 
       return zonedDateTime.toInstant().toEpochMilli();
+   }
+
+   /**
+    * Converts a {@link LocalDateTime} to the number of milliseconds from the epoch of
+    * 1970-01-01T00:00:00Z by using the default time zone
+    *
+    * @param localDate
+    *
+    * @return
+    */
+   public static long toEpochMilliWithDefaultTimeZone(final LocalDate localDate) {
+
+      final LocalDateTime localDateTime = localDate.atStartOfDay();
+      final ZoneId zoneId = getDefaultTimeZone();
+      final ZoneOffset offsetForZone = zoneId.getRules().getOffset(localDateTime);
+
+      return localDateTime.toInstant(offsetForZone).toEpochMilli();
+   }
+
+   /**
+    * Converts a {@link LocalDateTime} to the number of milliseconds from the epoch of
+    * 1970-01-01T00:00:00Z by using the default time zone
+    *
+    * @param localDateTime
+    *
+    * @return
+    */
+   public static long toEpochMilliWithDefaultTimeZone(final LocalDateTime localDateTime) {
+
+      final ZoneId zoneId = getDefaultTimeZone();
+      final ZoneOffset offsetForZone = zoneId.getRules().getOffset(localDateTime);
+
+      return localDateTime.toInstant(offsetForZone).toEpochMilli();
    }
 
    /**

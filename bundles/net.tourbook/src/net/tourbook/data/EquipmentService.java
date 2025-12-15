@@ -67,7 +67,7 @@ public class EquipmentService implements Cloneable, Serializable {
    private String                     description;
 
    /**
-    * When the service was done, in epoch days
+    * When the service was done, in milliseconds since 1970-01-01T00:00:00Z
     */
    private long                       date;
 
@@ -160,17 +160,17 @@ public class EquipmentService implements Cloneable, Serializable {
       return company;
    }
 
-   public LocalDate getDate() {
+   public long getDate() {
+      return date;
+   }
+
+   public LocalDate getDate_Local() {
 
       if (_date == null) {
-         _date = TimeTools.toLocalDate(date * TimeTools.DAY_MILLISECONDS);
+         _date = TimeTools.toLocalDate(date);
       }
 
       return _date;
-   }
-
-   public long getDate_Raw() {
-      return date;
    }
 
    public String getDescription() {
@@ -323,16 +323,15 @@ public class EquipmentService implements Cloneable, Serializable {
 
 // SET_FORMATTING_OFF
 
-      description = otherService.getDescription();
-      company     = otherService.getCompany();
-      date        = otherService.getDate_Raw();
-      name        = otherService.getName();
-      price       = otherService.getPrice();
-      priceUnit   = otherService.getPriceUnit();
-      type        = otherService.getType();
+      setCompany     (otherService.getCompany());
+      setDate        (otherService.getDate());
+      setDescription (otherService.getDescription());
+      setName        (otherService.getName());
+      setPrice       (otherService.getPrice());
+      setPriceUnit   (otherService.getPriceUnit());
+      setType        (otherService.getType());
 
 // SET_FORMATTING_ON
 
-      setDate(otherService.getDate().toEpochDay());
    }
 }

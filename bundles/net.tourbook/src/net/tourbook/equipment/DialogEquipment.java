@@ -22,6 +22,7 @@ import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.UI;
 import net.tourbook.common.autocomplete.AutoComplete_ComboInputMT;
+import net.tourbook.common.time.TimeTools;
 import net.tourbook.common.util.StringUtils;
 import net.tourbook.common.util.Util;
 import net.tourbook.data.Equipment;
@@ -617,9 +618,9 @@ public class DialogEquipment extends TitleAreaDialog {
       final LocalDate dateBuilt     = LocalDate.of(_dateBuilt.getYear(),      _dateBuilt.getMonth() + 1,    _dateBuilt.getDay());
       final LocalDate dateRetired   = LocalDate.of(_dateRetired.getYear(),    _dateRetired.getMonth() + 1,  _dateRetired.getDay());
 
-      _equipment.setDate(        date.toEpochDay());
-      _equipment.setDateBuilt(   dateBuilt.toEpochDay());
-      _equipment.setDateRetired( dateRetired.toEpochDay());
+      _equipment.setDate(              TimeTools.toEpochMilli(date));
+      _equipment.setDateBuilt(         TimeTools.toEpochMilli(dateBuilt));
+      _equipment.setDateRetired(       TimeTools.toEpochMilli(dateRetired));
 
       _equipment.setBrand(             _comboBrand.getText().trim());
       _equipment.setModel(             _comboModel.getText().trim());
@@ -642,14 +643,14 @@ public class DialogEquipment extends TitleAreaDialog {
 
 // SET_FORMATTING_OFF
 
-      LocalDate date          = _equipment.getDate();
-      LocalDate dateBuilt     = _equipment.getDateBuilt();
-      LocalDate dateRetired   = _equipment.getDateRetired();
+      LocalDate date                = _equipment.getDate_Local();
+      LocalDate dateBuilt           = _equipment.getDateBuilt_Local();
+      LocalDate dateRetired         = _equipment.getDateRetired_Local();
 
       final long epochDay           = date.toEpochDay();
       final long epochDayBuilt      = dateBuilt.toEpochDay();
       final long epochDayRetired    = dateRetired.toEpochDay();
-      
+
       if (epochDay == 0) {
          date = LocalDate.now();
       }

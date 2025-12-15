@@ -444,8 +444,8 @@ public class TourDatabase {
        * Set derby debug properties, this is helpful when debugging, the log is written into
        * derby.log
        */
-//    System.setProperty("derby.language.logStatementText", "true");
-//    System.setProperty("derby.language.logQueryPlan", "true");
+      System.setProperty("derby.language.logStatementText", "true");
+//      System.setProperty("derby.language.logQueryPlan", "true");
 
 // FOR DEBUGGING - END
 

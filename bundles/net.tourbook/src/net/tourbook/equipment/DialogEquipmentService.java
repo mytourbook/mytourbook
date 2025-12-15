@@ -22,6 +22,7 @@ import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.UI;
 import net.tourbook.common.autocomplete.AutoComplete_ComboInputMT;
+import net.tourbook.common.time.TimeTools;
 import net.tourbook.common.util.StringUtils;
 import net.tourbook.common.util.Util;
 import net.tourbook.data.Equipment;
@@ -131,7 +132,7 @@ public class DialogEquipmentService extends TitleAreaDialog {
 
             // adjust date to today
 
-            _service.setDate(LocalDate.now().toEpochDay());
+            _service.setDate(TimeTools.nowInMilliseconds());
          }
       }
 
@@ -427,12 +428,12 @@ public class DialogEquipmentService extends TitleAreaDialog {
       UI.disposeResource(_imageDialog);
 
 // SET_FORMATTING_OFF
-      
+
       _autocomplete_Company   .saveState(_state, STATE_AUTOCOMPLETE_POPUP_HEIGHT_COMPANY);
       _autocomplete_Name      .saveState(_state, STATE_AUTOCOMPLETE_POPUP_HEIGHT_NAME);
       _autocomplete_PriceUnit .saveState(_state, STATE_AUTOCOMPLETE_POPUP_HEIGHT_PRICE_UNIT);
       _autocomplete_Type      .saveState(_state, STATE_AUTOCOMPLETE_POPUP_HEIGHT_TYPE);
-      
+
 // SET_FORMATTING_ON
 
       _state.put(STATE_PRICE_UNIT_DEFAULT, _comboPriceUnit.getText().trim());
@@ -459,8 +460,8 @@ public class DialogEquipmentService extends TitleAreaDialog {
       _autocomplete_PriceUnit .restoreState(_state, STATE_AUTOCOMPLETE_POPUP_HEIGHT_PRICE_UNIT);
       _autocomplete_Type      .restoreState(_state, STATE_AUTOCOMPLETE_POPUP_HEIGHT_TYPE);
 
-// SET_FORMATTING_ON      
-      
+// SET_FORMATTING_ON
+
       // set default unit
       _comboPriceUnit.setText(Util.getStateString(_state, STATE_PRICE_UNIT_DEFAULT, UI.EMPTY_STRING));
 
@@ -471,7 +472,7 @@ public class DialogEquipmentService extends TitleAreaDialog {
 
 // SET_FORMATTING_OFF
 
-      final LocalDate dateBuilt     = LocalDate.of(_date.getYear(),      _date.getMonth() + 1,    _date.getDay());
+      final LocalDate date     = LocalDate.of(_date.getYear(), _date.getMonth() + 1, _date.getDay());
 
       _service.setEquipment(        _serviceEquipment);
 
@@ -483,7 +484,7 @@ public class DialogEquipmentService extends TitleAreaDialog {
       _service.setPrice(            _spinPrice.getSelection() / 100f);
       _service.setPriceUnit(        _comboPriceUnit.getText());
 
-      _service.setDate(             dateBuilt.toEpochDay());
+      _service.setDate(             TimeTools.toEpochMilli(date));
 
 // SET_FORMATTING_ON
    }
@@ -492,22 +493,21 @@ public class DialogEquipmentService extends TitleAreaDialog {
 
       _isInUIUpdate = true;
 
-// SET_FORMATTING_OFF
+      LocalDate date = _service.getDate_Local();
 
-      LocalDate date     = _service.getDate();
+      final long dateEpochDays = date.toEpochDay();
 
-      final long epochDayDate      = date.toEpochDay();
-
-      if (epochDayDate == 0) {
+      if (dateEpochDays == 0) {
          date = LocalDate.now();
       }
 
+// SET_FORMATTING_OFF
 
       _comboCompany     .setText(_service.getCompany());
       _comboName        .setText(_service.getName());
       _comboType        .setText(_service.getType());
 
-      _date             .setDate(date.getYear(),    date.getMonthValue() - 1,      date.getDayOfMonth());
+      _date             .setDate(date.getYear(), date.getMonthValue() - 1, date.getDayOfMonth());
 
       _spinPrice        .setSelection((int) (_service.getPrice()  * 100));
 

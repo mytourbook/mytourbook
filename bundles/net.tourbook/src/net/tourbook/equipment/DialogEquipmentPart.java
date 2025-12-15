@@ -22,6 +22,7 @@ import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.UI;
 import net.tourbook.common.autocomplete.AutoComplete_ComboInputMT;
+import net.tourbook.common.time.TimeTools;
 import net.tourbook.common.util.StringUtils;
 import net.tourbook.common.util.Util;
 import net.tourbook.data.Equipment;
@@ -143,8 +144,8 @@ public class DialogEquipmentPart extends TitleAreaDialog {
 
             // adjust date to today
 
-            long todayDays = LocalDate.now().toEpochDay();
-            
+            final long todayDays = LocalDate.now().toEpochDay();
+
             _part.setDate(todayDays);
             _part.setDateBuilt(todayDays);
          }
@@ -664,9 +665,9 @@ public class DialogEquipmentPart extends TitleAreaDialog {
       _part.setSize(             _comboSize.getText().trim());
       _part.setWeight(           _spinWeight.getSelection() / 1000f);
 
-      _part.setDate(             date.toEpochDay());
-      _part.setDateBuilt(        dateBuilt.toEpochDay());
-      _part.setDateRetired(      dateRetired.toEpochDay());
+      _part.setDate(              TimeTools.toEpochMilli(date));
+      _part.setDateBuilt(         TimeTools.toEpochMilli(dateBuilt));
+      _part.setDateRetired(       TimeTools.toEpochMilli(dateRetired));
 
 // SET_FORMATTING_ON
    }
@@ -680,14 +681,14 @@ public class DialogEquipmentPart extends TitleAreaDialog {
       /*
        * Set date default values
        */
-      LocalDate date          = _part.getDate();
-      LocalDate dateBuilt     = _part.getDateBuilt();
-      LocalDate dateRetired   = _part.getDateRetired();
+      LocalDate date                = _part.getDate_Local();
+      LocalDate dateBuilt           = _part.getDateBuilt_Local();
+      LocalDate dateRetired         = _part.getDateRetired_Local();
 
       final long epochDay           = date.toEpochDay();
       final long epochDayBuilt      = dateBuilt.toEpochDay();
       final long epochDayRetired    = dateRetired.toEpochDay();
-      
+
       if (epochDay == 0) {
          date = LocalDate.now();
       }

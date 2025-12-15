@@ -78,17 +78,17 @@ public class EquipmentPart implements Cloneable, Comparable<Object>, Serializabl
    private String                     urlAddress;
 
    /**
-    * When the equipment was firstly used, in epoch days
+    * When the equipment was firstly used, in milliseconds since 1970-01-01T00:00:00Z
     */
    private long                       date;
 
    /**
-    * When the equipment was created/build, in epoch days
+    * When the equipment was created/build, in milliseconds since 1970-01-01T00:00:00Z
     */
    private long                       dateBuilt;
 
    /**
-    * When the equipment was retired/sold, in epoch days
+    * When the equipment was retired/sold, in milliseconds since 1970-01-01T00:00:00Z
     */
    private long                       dateRetired;
 
@@ -212,49 +212,49 @@ public class EquipmentPart implements Cloneable, Comparable<Object>, Serializabl
       return brand;
    }
 
+   public long getDate() {
+
+      return date;
+   }
+
    /**
     * @return Return the first use date
     */
-   public LocalDate getDate() {
+   public LocalDate getDate_Local() {
 
       if (_date == null) {
-         _date = TimeTools.toLocalDate(date * TimeTools.DAY_MILLISECONDS);
+         _date = TimeTools.toLocalDate(date);
       }
 
       return _date;
    }
 
-   public long getDate_Raw() {
+   public long getDateBuilt() {
 
-      return date;
+      return dateBuilt;
    }
 
-   public LocalDate getDateBuilt() {
+   public LocalDate getDateBuilt_Local() {
 
       if (_dateBuilt == null) {
-         _dateBuilt = TimeTools.toLocalDate(dateBuilt * TimeTools.DAY_MILLISECONDS);
+         _dateBuilt = TimeTools.toLocalDate(dateBuilt);
       }
 
       return _dateBuilt;
    }
 
-   public long getDateBuilt_Raw() {
+   public long getDateRetired() {
 
-      return dateBuilt;
+      return dateRetired;
    }
 
-   public LocalDate getDateRetired() {
+   public LocalDate getDateRetired_Local() {
 
       if (_dateRetired == null) {
-         _dateRetired = TimeTools.toLocalDate(dateRetired * TimeTools.DAY_MILLISECONDS);
+         _dateRetired = TimeTools.toLocalDate(dateRetired);
       }
 
       return _dateRetired;
-   }
-
-   public long getDateRetired_Raw() {
-
-      return dateRetired;
    }
 
    public String getDescription() {
@@ -499,24 +499,22 @@ public class EquipmentPart implements Cloneable, Comparable<Object>, Serializabl
 
 // SET_FORMATTING_OFF
 
-      brand             = otherPart.getBrand();
-      model             = otherPart.getModel();
-      type              = otherPart.getType();
-      description       = otherPart.getDescription();
-      urlAddress        = otherPart.getUrlAddress();
+      setBrand             (otherPart.getBrand());
+      setModel             (otherPart.getModel());
+      setType              (otherPart.getType());
+      setDescription       (otherPart.getDescription());
+      setUrlAddress        (otherPart.getUrlAddress());
 
-      distanceFirstUse  = otherPart.getDistanceFirstUse();
-      price             = otherPart.getPrice();
-      priceUnit         = otherPart.getPriceUnit();
-      size              = otherPart.getSize();
-      weight            = otherPart.getWeight();
+      setDistanceFirstUse  (otherPart.getDistanceFirstUse());
+      setPrice             (otherPart.getPrice());
+      setPriceUnit         (otherPart.getPriceUnit());
+      setSize              (otherPart.getSize());
+      setWeight            (otherPart.getWeight());
 
-      setDate(            otherPart.getDate_Raw());
-      setDateBuilt(       otherPart.getDateBuilt_Raw());
-      setDateRetired(     otherPart.getDateRetired_Raw());
+      setDate              (otherPart.getDate());
+      setDateBuilt         (otherPart.getDateBuilt());
+      setDateRetired       (otherPart.getDateRetired());
 
 // SET_FORMATTING_ON
-
-      _partName = null;
    }
 }

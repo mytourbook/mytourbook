@@ -107,17 +107,17 @@ public class Equipment implements Cloneable, Comparable<Object>, Serializable {
    private String                     urlAddress;
 
    /**
-    * When the equipment was firstly used, in epoch days
+    * When the equipment was firstly used, in milliseconds since 1970-01-01T00:00:00Z
     */
    private long                       date;
 
    /**
-    * When the equipment was created/build, in epoch days
+    * When the equipment was created/build, in milliseconds since 1970-01-01T00:00:00Z
     */
    private long                       dateBuilt;
 
    /**
-    * When the equipment was retired/sold, in epoch days
+    * When the equipment was retired/sold, in milliseconds since 1970-01-01T00:00:00Z
     */
    private long                       dateRetired;
 
@@ -236,46 +236,46 @@ public class Equipment implements Cloneable, Comparable<Object>, Serializable {
       return brand;
    }
 
-   public LocalDate getDateBuilt() {
+   public long getDate() {
 
-      if (_dateBuilt == null) {
-         _dateBuilt = TimeTools.toLocalDate(dateBuilt * TimeTools.DAY_MILLISECONDS);
-      }
-
-      return _dateBuilt;
+      return date;
    }
 
-   public long getDateBuilt_Raw() {
-
-      return dateBuilt;
-   }
-
-   public LocalDate getDate() {
+   public LocalDate getDate_Local() {
 
       if (_date == null) {
-         _date = TimeTools.toLocalDate(date * TimeTools.DAY_MILLISECONDS);
+         _date = TimeTools.toLocalDate(date);
       }
 
       return _date;
    }
 
-   public long getDateFirstUse_Raw() {
+   public long getDateBuilt() {
 
-      return date;
+      return dateBuilt;
    }
 
-   public LocalDate getDateRetired() {
+   public LocalDate getDateBuilt_Local() {
+
+      if (_dateBuilt == null) {
+         _dateBuilt = TimeTools.toLocalDate(dateBuilt);
+      }
+
+      return _dateBuilt;
+   }
+
+   public long getDateRetired() {
+
+      return dateRetired;
+   }
+
+   public LocalDate getDateRetired_Local() {
 
       if (_dateRetired == null) {
-         _dateRetired = TimeTools.toLocalDate(dateRetired * TimeTools.DAY_MILLISECONDS);
+         _dateRetired = TimeTools.toLocalDate(dateRetired);
       }
 
       return _dateRetired;
-   }
-
-   public long getDateRetired_Raw() {
-
-      return dateRetired;
    }
 
    public String getDescription() {
@@ -426,9 +426,9 @@ public class Equipment implements Cloneable, Comparable<Object>, Serializable {
       _equipmentName = null;
    }
 
-   public void setDate(final long dateFirstUse) {
+   public void setDate(final long date) {
 
-      this.date = dateFirstUse;
+      this.date = date;
 
       _date = null;
    }
@@ -533,24 +533,22 @@ public class Equipment implements Cloneable, Comparable<Object>, Serializable {
 
 // SET_FORMATTING_OFF
 
-      brand             = otherEquipment.getBrand();
-      model             = otherEquipment.getModel();
-      type              = otherEquipment.getType();
-      description       = otherEquipment.getDescription();
-      urlAddress        = otherEquipment.getUrlAddress();
+      setBrand             (otherEquipment.getBrand());
+      setModel             (otherEquipment.getModel());
+      setType              (otherEquipment.getType());
+      setDescription       (otherEquipment.getDescription());
+      setUrlAddress        (otherEquipment.getUrlAddress());
 
-      distanceFirstUse  = otherEquipment.getDistanceFirstUse();
-      price             = otherEquipment.getPrice();
-      priceUnit         = otherEquipment.getPriceUnit();
-      size              = otherEquipment.getSize();
-      weight            = otherEquipment.getWeight();
+      setDistanceFirstUse  (otherEquipment.getDistanceFirstUse());
+      setPrice             (otherEquipment.getPrice());
+      setPriceUnit         (otherEquipment.getPriceUnit());
+      setSize              (otherEquipment.getSize());
+      setWeight            (otherEquipment.getWeight());
 
-      setDateBuilt(       otherEquipment.getDateBuilt_Raw());
-      setDate(            otherEquipment.getDateFirstUse_Raw());
-      setDateRetired(     otherEquipment.getDateRetired_Raw());
+      setDate              (otherEquipment.getDate());
+      setDateBuilt         (otherEquipment.getDateBuilt());
+      setDateRetired       (otherEquipment.getDateRetired());
 
 // SET_FORMATTING_ON
-
-      _equipmentName = null;
    }
 }
