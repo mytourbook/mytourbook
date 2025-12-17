@@ -604,7 +604,6 @@ public class Messages extends NLS {
    public static String        Dialog_Equipment_Label_Brand;
    public static String        Dialog_Equipment_Label_Brand_Tooltip;
    public static String        Dialog_Equipment_Label_DateBuilt;
-   public static String        Dialog_Equipment_Label_DateFirstUse;
    public static String        Dialog_Equipment_Label_DateRetired;
    public static String        Dialog_Equipment_Label_Description;
    public static String        Dialog_Equipment_Label_Model;

@@ -37,7 +37,7 @@ public class TVIEquipmentView_Service extends TVIEquipmentView_Item {
 
       _equipment = tviEquipmentView_Equipment.getEquipment();
       _service = equipmentService;
-      _serviceID = equipmentService.getSeriveId();
+      _serviceID = equipmentService.getServiceId();
    }
 
    @Override

@@ -31,6 +31,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.Query;
 
 import net.tourbook.common.UI;
+import net.tourbook.common.time.TimeTools;
 import net.tourbook.common.util.SQL;
 import net.tourbook.common.util.SQLData;
 import net.tourbook.common.util.StatusUtil;
@@ -428,9 +429,9 @@ public class EquipmentManager {
 
             if (equipment_DeleteParts_SQL(part)) {
 
-               clearAllEquipmentResourcesAndFireModifyEvent();
+               updateUntilDate_Parts(part.getEquipment(), part.getType());
 
-//               updateTourTagFilterProfiles(allEquipment);
+               clearAllEquipmentResourcesAndFireModifyEvent();
 
                returnValue[0] = true;
             }
@@ -535,7 +536,7 @@ public class EquipmentManager {
 
          sql = "DELETE FROM " + TourDatabase.TABLE_EQUIPMENT_SERVICE + " WHERE serviceID=?" + NL; //$NON-NLS-1$
 
-         final long serviceID = service.getSeriveId();
+         final long serviceID = service.getServiceId();
 
          prepStmt = conn.prepareStatement(sql);
 
@@ -545,6 +546,8 @@ public class EquipmentManager {
          // log result
          TourLogManager.showLogView(AutoOpenEvent.DELETE_SOMETHING);
          TourLogManager.log_INFO("Equipment service is deleted \"%s\"".formatted(service.getName()));
+
+         updateUntilDate_Services(service.getEquipment(), service.getType());
 
          returnResult = true;
 
@@ -1000,7 +1003,7 @@ public class EquipmentManager {
 
          for (final EquipmentService equipmentService : allEquipmentServices) {
 
-            allServiceIDs.add(equipmentService.getSeriveId());
+            allServiceIDs.add(equipmentService.getServiceId());
          }
       }
 
@@ -1102,4 +1105,251 @@ public class EquipmentManager {
          equipmentLabel.setToolTipText(equipmentLabels);
       }
    }
+
+   /**
+    * Check and update the until date for all parts of one equipment.
+    * This has to be called when at least one collated field was modified.
+    * <p>
+    * <b> !!! After calling this method, all equipments must be reloaded because they are updated
+    * !!! </b>
+    *
+    * @param equipment
+    * @param modifiedType
+    */
+   public static void updateUntilDate_Parts(final Equipment equipment,
+                                            final String modifiedType) {
+
+      final Set<EquipmentPart> allParts = equipment.getParts();
+
+      int numParts = allParts.size();
+
+      if (numParts == 0) {
+         return;
+      }
+
+      /*
+       * Filter parts: Get all parts with the same type and which are collated
+       */
+      final List<EquipmentPart> allFilteredParts = new ArrayList<>();
+
+      for (final EquipmentPart part : allParts) {
+
+         if (part.isCollate() && modifiedType.equals(part.getType())) {
+            allFilteredParts.add(part);
+         }
+      }
+
+      numParts = allFilteredParts.size();
+
+      if (numParts == 0) {
+         return;
+      }
+
+      /*
+       * Sort parts by date
+       */
+      final List<EquipmentPart> allSortedParts = new ArrayList<>(allFilteredParts);
+
+      Collections.sort(allSortedParts, (part1, part2) -> {
+         return Long.compare(part1.getDate(), part2.getDate());
+      });
+
+      final List<EquipmentPart> allModifiedParts = new ArrayList<>();
+
+      EquipmentPart part = allSortedParts.get(0);
+
+      if (numParts == 1) {
+
+         // this is the first and only part
+
+         final long currentDateUntil = part.getDateUntil();
+         final long newDateUntil = TimeTools.MAX_TIME_IN_EPOCH_MILLI;
+
+         if (currentDateUntil != newDateUntil) {
+
+            // modify date
+
+            part.setDateUntil(newDateUntil);
+
+            allModifiedParts.add(part);
+         }
+
+      } else {
+
+         // these are all other parts with more than 1 part
+
+         for (int partIndex = 0; partIndex < numParts; partIndex++) {
+
+            part = allSortedParts.get(partIndex);
+
+            final long currentDateUntil = part.getDateUntil();
+
+            long newDateUntil = currentDateUntil;
+
+            if (partIndex == numParts - 1) {
+
+               // this is the last part
+
+               newDateUntil = TimeTools.MAX_TIME_IN_EPOCH_MILLI;
+
+            } else {
+
+               // these are all parts without the last part
+
+               final EquipmentPart nextPart = allSortedParts.get(partIndex + 1);
+
+               final long nextDate = nextPart.getDate();
+
+               // this is the until date for the current part
+               final long validDateUntil = nextDate - 1;
+
+               if (currentDateUntil != validDateUntil) {
+
+                  newDateUntil = validDateUntil;
+               }
+            }
+
+            if (currentDateUntil != newDateUntil) {
+
+               // until date is not correct -> modify date
+
+               part.setDateUntil(newDateUntil);
+
+               allModifiedParts.add(part);
+            }
+         }
+      }
+
+      if (allModifiedParts.size() > 0) {
+
+         for (final EquipmentPart partModified : allModifiedParts) {
+
+            TourDatabase.saveEntity(partModified, partModified.getPartId(), EquipmentPart.class);
+         }
+      }
+   }
+
+   /**
+    * Check and update the until date for all services of one equipment.
+    * This has to be called when at least one collated field was modified.
+    * <p>
+    * <b> !!! After calling this method, all equipments must be reloaded because they are updated
+    * !!! </b>
+    *
+    * @param equipment
+    * @param modifiedType
+    */
+   public static void updateUntilDate_Services(final Equipment equipment,
+                                               final String modifiedType) {
+
+      final Set<EquipmentService> allServices = equipment.getServices();
+
+      int numServices = allServices.size();
+
+      if (numServices == 0) {
+         return;
+      }
+
+      /*
+       * Filter services: Get all services with the same type and which are collated
+       */
+      final List<EquipmentService> allFilteredServices = new ArrayList<>();
+
+      for (final EquipmentService service : allServices) {
+
+         if (service.isCollate() && modifiedType.equals(service.getType())) {
+            allFilteredServices.add(service);
+         }
+      }
+
+      numServices = allFilteredServices.size();
+
+      if (numServices == 0) {
+         return;
+      }
+
+      /*
+       * Sort services by date
+       */
+      final List<EquipmentService> allSortedServices = new ArrayList<>(allFilteredServices);
+
+      Collections.sort(allSortedServices, (service1, service2) -> {
+         return Long.compare(service1.getDate(), service2.getDate());
+      });
+
+      final List<EquipmentService> allModifiedServices = new ArrayList<>();
+
+      EquipmentService service = allSortedServices.get(0);
+
+      if (numServices == 1) {
+
+         // this is the first and only service
+
+         final long currentDateUntil = service.getDateUntil();
+         final long newDateUntil = TimeTools.MAX_TIME_IN_EPOCH_MILLI;
+
+         if (currentDateUntil != newDateUntil) {
+
+            // modify date
+
+            service.setDateUntil(newDateUntil);
+
+            allModifiedServices.add(service);
+         }
+
+      } else {
+
+         // these are all other services with more than 1 service
+
+         for (int serviceIndex = 0; serviceIndex < numServices; serviceIndex++) {
+
+            service = allSortedServices.get(serviceIndex);
+
+            final long currentDateUntil = service.getDateUntil();
+
+            long newDateUntil = currentDateUntil;
+
+            if (serviceIndex == numServices - 1) {
+
+               // this is the last service
+
+               newDateUntil = TimeTools.MAX_TIME_IN_EPOCH_MILLI;
+
+            } else {
+
+               // these are all services without the last service
+
+               final EquipmentService nextService = allSortedServices.get(serviceIndex + 1);
+
+               final long nextDate = nextService.getDate();
+
+               // this is the until date for the current service
+               final long validDateUntil = nextDate - 1;
+
+               if (currentDateUntil != validDateUntil) {
+
+                  newDateUntil = validDateUntil;
+               }
+            }
+
+            if (currentDateUntil != newDateUntil) {
+
+               // until date is not correct -> modify date
+
+               service.setDateUntil(newDateUntil);
+
+               allModifiedServices.add(service);
+            }
+         }
+      }
+
+      if (allModifiedServices.size() > 0) {
+
+         for (final EquipmentService serviceModified : allModifiedServices) {
+
+            TourDatabase.saveEntity(serviceModified, serviceModified.getServiceId(), EquipmentService.class);
+         }
+      }
+   }
+
 }

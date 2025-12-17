@@ -16,6 +16,7 @@
 package net.tourbook.equipment;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 import net.tourbook.Images;
 import net.tourbook.Messages;
@@ -95,6 +96,7 @@ public class DialogEquipmentPart extends TitleAreaDialog {
    private Composite                 _container;
    private Composite                 _parent;
 
+   private Button                    _chkCollate;
    private Button                    _chkSyncDates;
 
    private Combo                     _comboBrand;
@@ -144,10 +146,10 @@ public class DialogEquipmentPart extends TitleAreaDialog {
 
             // adjust date to today
 
-            final long todayDays = LocalDate.now().toEpochDay();
+            final long today = TimeTools.nowInMilliseconds();
 
-            _part.setDate(todayDays);
-            _part.setDateBuilt(todayDays);
+            _part.setDate(today);
+            _part.setDateBuilt(today);
          }
       }
 
@@ -216,6 +218,9 @@ public class DialogEquipmentPart extends TitleAreaDialog {
 
       updateUIFromModel();
 
+// FOR DEBUGGING
+//    _date.setFocus();
+
       _comboBrand.setFocus();
 
       // ensure the UI is created
@@ -283,7 +288,8 @@ public class DialogEquipmentPart extends TitleAreaDialog {
             // autocomplete combo
             _comboType = new Combo(_container, SWT.BORDER | SWT.FLAT);
             _comboType.setText(UI.EMPTY_STRING);
-            _comboType.setToolTipText("With the type and date fields, tours are collated to display e.g. all kilometers for one part or one service");
+            _comboType.setToolTipText(
+                  "With the type and date fields, tours are collated to display\ne.g. all kilometers for one part or one service");
             _comboType.addModifyListener(_defaultModifyListener);
 
             GridDataFactory.fillDefaults().grab(true, false).span(2, 1).applyTo(_comboType);
@@ -342,11 +348,11 @@ public class DialogEquipmentPart extends TitleAreaDialog {
             /*
              * First use date
              */
-            final Label label = UI.createLabel(_container, Messages.Dialog_Equipment_Label_DateFirstUse);
+            final Label label = UI.createLabel(_container, "D&ate");
             gdVertCenter.applyTo(label);
 
             _date = new DateTime(_container, SWT.DATE | SWT.MEDIUM | SWT.DROP_DOWN);
-            _date.setToolTipText("With the type and date fields, tours are collated to display e.g. all kilometers for one part or one service");
+            _date.setToolTipText("With the type and date fields, tours are collated to display\ne.g. all kilometers for one part or one service");
             _date.addSelectionListener(_defaultSelectionListener);
          }
          UI.createSpacer_Horizontal(_container, 1);
@@ -421,6 +427,19 @@ public class DialogEquipmentPart extends TitleAreaDialog {
          UI.createSpacer_Horizontal(_container, 1);
          {
             /*
+             * Collate tours
+             */
+            final Label label = UI.createLabel(_container, "Co&llate");
+            gdVertCenter.applyTo(label);
+
+            _chkCollate = new Button(_container, SWT.CHECK);
+            _chkCollate.setText("Include in collated tours");
+            _chkCollate.setToolTipText("Collated tours are a collection of tours to summarize,\ne.g. distance or duration values");
+            _chkCollate.addSelectionListener(_defaultSelectionListener);
+         }
+         UI.createSpacer_Horizontal(_container, 5);
+         {
+            /*
              * Website
              */
             final Label label = UI.createLabel(_container, "W&ebsite");
@@ -468,6 +487,7 @@ public class DialogEquipmentPart extends TitleAreaDialog {
             _dateBuilt,
             _chkSyncDates,
             _dateRetired,
+            _chkCollate,
 
             _txtUrlAddress,
             _txtDescription,
@@ -520,6 +540,8 @@ public class DialogEquipmentPart extends TitleAreaDialog {
     * @return Returns new or cloned instance
     */
    EquipmentPart getPart() {
+
+      _part.updateUntilDate();
 
       return _part;
    }
@@ -660,6 +682,7 @@ public class DialogEquipmentPart extends TitleAreaDialog {
       _part.setUrlAddress(       _txtUrlAddress.getText().trim());
 
       _part.setDistanceFirstUse( _spinDistance.getSelection());
+      _part.setIsCollate(        _chkCollate.getSelection());
       _part.setPrice(            _spinPrice.getSelection() / 100f);
       _part.setPriceUnit(        _comboPriceUnit.getText());
       _part.setSize(             _comboSize.getText().trim());
@@ -681,25 +704,27 @@ public class DialogEquipmentPart extends TitleAreaDialog {
       /*
        * Set date default values
        */
-      LocalDate date                = _part.getDate_Local();
-      LocalDate dateBuilt           = _part.getDateBuilt_Local();
-      LocalDate dateRetired         = _part.getDateRetired_Local();
+      LocalDateTime date            = _part.getDate_Local();
+      LocalDateTime dateBuilt       = _part.getDateBuilt_Local();
+      LocalDateTime dateRetired     = _part.getDateRetired_Local();
 
-      final long epochDay           = date.toEpochDay();
-      final long epochDayBuilt      = dateBuilt.toEpochDay();
-      final long epochDayRetired    = dateRetired.toEpochDay();
+      final long dateMS           = TimeTools.toEpochMilli(date);
+      final long dateBuiltMS      = TimeTools.toEpochMilli(dateBuilt);
+      final long dateRetiredMS    = TimeTools.toEpochMilli(dateRetired);
 
-      if (epochDay == 0) {
-         date = LocalDate.now();
+      if (dateMS == 0) {
+         date = LocalDateTime.now();
       }
 
-      if (epochDayBuilt == 0) {
-         dateBuilt = LocalDate.now();
+      if (dateBuiltMS == 0) {
+         dateBuilt = LocalDateTime.now();
       }
 
-      if (epochDayRetired == 0) {
-         dateRetired = LocalDate.of(2099,1,1);
+      if (dateRetiredMS == 0) {
+         dateRetired = LocalDateTime.of(2099,1,1,0,0);
       }
+
+      _chkCollate       .setSelection(_part.isCollate());
 
       _comboBrand       .setText(_part.getBrand());
       _comboModel       .setText(_part.getModel());

@@ -15,7 +15,7 @@
  *******************************************************************************/
 package net.tourbook.equipment;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 import net.tourbook.common.util.TreeViewerItem;
 
@@ -38,7 +38,7 @@ public abstract class TVIEquipmentView_Item extends TreeViewerItem {
    /**
     * {@link #type} and {@link #date} are the key parts to collated (summarize) tour values
     */
-   LocalDate          date;
+   LocalDateTime      date;
 
    long               numTours;
    int                numTags_NoTours;
@@ -50,9 +50,14 @@ public abstract class TVIEquipmentView_Item extends TreeViewerItem {
    String priceUnit;
 
    /**
-    * Usage duration in days
+    * Usage duration in ms
     */
-   int    usageDuration;
+   long   usageDuration;
+
+   /**
+    * Text which identifies the last collated item
+    */
+   String usageDurationLast;
 
    public TVIEquipmentView_Item(final TreeViewer equipmentViewer) {
 

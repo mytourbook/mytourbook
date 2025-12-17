@@ -670,6 +670,7 @@ public class UI {
    //
    public static final PeriodFormatter          DEFAULT_DURATION_FORMATTER;
    public static final PeriodFormatter          DEFAULT_DURATION_FORMATTER_SHORT;
+   public static final PeriodFormatter          DURATION_FORMATTER_YEAR_MONTH_DAY;
 
    private static StringBuilder                 _formatterSB               = new StringBuilder();
    private static Formatter                     _formatter                 = new Formatter(_formatterSB);
@@ -929,12 +930,14 @@ public class UI {
 
       final String commaSpace = Messages.Period_Format_CommaSpace;
       final String space2 = Messages.Period_Format_SpaceAndSpace;
+
       final String[] variants = {
 
             Messages.Period_Format_Space,
             Messages.Period_Format_Comma,
             Messages.Period_Format_CommaAndAnd,
-            Messages.Period_Format_CommaSpaceAnd };
+            Messages.Period_Format_CommaSpaceAnd
+      };
 
       DEFAULT_DURATION_FORMATTER = new PeriodFormatterBuilder()
 
@@ -1006,7 +1009,23 @@ public class UI {
 
             .toFormatter();
 
+      DURATION_FORMATTER_YEAR_MONTH_DAY = new PeriodFormatterBuilder()
+
+            .appendYears()
+            .appendSuffix(Messages.Period_Format_Year_Short, Messages.Period_Format_Year_Short)
+            .appendSeparator(commaSpace, commaSpace, variants)
+
+            .appendMonths()
+            .appendSuffix(Messages.Period_Format_Month_Short, Messages.Period_Format_Month_Short)
+            .appendSeparator(commaSpace, commaSpace, variants)
+
+            .appendDays()
+            .appendSuffix(Messages.Period_Format_Day_Short, Messages.Period_Format_Day_Short)
+            .appendSeparator(commaSpace, commaSpace, variants)
+
+            .toFormatter();
    }
+
    /**
     * Number of horizontal dialog units per character, value <code>4</code>.
     */

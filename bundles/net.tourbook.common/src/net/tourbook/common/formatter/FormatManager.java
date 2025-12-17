@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
+ * Copyright (C) 2016, 2025 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -274,6 +274,12 @@ public class FormatManager {
 
       case PACE_MM_SS:
          return Messages.Value_Formatter_Pace_MM_SS;
+
+      case DATE_TIME:
+         return "dd.mm.yyy";
+
+      case DATE_TIME_HH_MM_SS:
+         return "dd.mm.yyy hh:mm:ss";
 
       case TIME_HH:
          return Messages.Value_Formatter_Time_HH;

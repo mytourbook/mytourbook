@@ -16,7 +16,7 @@
 package net.tourbook.equipment;
 
 import java.text.NumberFormat;
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -28,6 +28,7 @@ import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.CommonActivator;
 import net.tourbook.common.UI;
+import net.tourbook.common.formatter.ValueFormat;
 import net.tourbook.common.time.TimeTools;
 import net.tourbook.common.util.ColumnDefinition;
 import net.tourbook.common.util.ColumnManager;
@@ -100,6 +101,8 @@ import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Tree;
 import org.eclipse.swt.widgets.TreeItem;
 import org.eclipse.ui.part.ViewPart;
+import org.joda.time.Period;
+import org.joda.time.PeriodType;
 
 public class EquipmentView extends ViewPart implements ITourProvider, ITourViewer, ITreeViewer {
 
@@ -130,6 +133,8 @@ public class EquipmentView extends ViewPart implements ITourProvider, ITourViewe
    private static final IPreferenceStore _prefStore                             = TourbookPlugin.getPrefStore();
    private static final IPreferenceStore _prefStore_Common                      = CommonActivator.getPrefStore();
    private static final IDialogSettings  _state                                 = TourbookPlugin.getState(ID);
+
+   private static final PeriodType       _tourPeriodTemplate                    = PeriodType.yearMonthDay();
 
    private NumberFormat                  _nf0                                   = NumberFormat.getNumberInstance();
    {
@@ -291,7 +296,7 @@ public class EquipmentView extends ViewPart implements ITourProvider, ITourViewe
 
       public ActionDuplicatePart() {
 
-         super("&Duplicate Part", AS_PUSH_BUTTON);
+         super("D&uplicate Part", AS_PUSH_BUTTON);
 
          setToolTipText("Duplicate part and adjust date to today");
 
@@ -308,7 +313,7 @@ public class EquipmentView extends ViewPart implements ITourProvider, ITourViewe
 
       public ActionDuplicateService() {
 
-         super("&Duplicate Service", AS_PUSH_BUTTON);
+         super("D&uplicate Service", AS_PUSH_BUTTON);
 
          setToolTipText("Duplicate service and adjust date to today");
 
@@ -428,16 +433,60 @@ public class EquipmentView extends ViewPart implements ITourProvider, ITourViewe
          } else if (obj1 instanceof final TVIEquipmentView_Part item1
                && obj2 instanceof final TVIEquipmentView_Part item2) {
 
-            // sort part by name
+            // sort part by type/date
 
-            return item1.getPart().getName().compareTo(item2.getPart().getName());
+            final EquipmentPart part1 = item1.getPart();
+            final EquipmentPart part2 = item2.getPart();
+
+            // 1st compare by type
+            int compareDiff = part1.getType().compareTo(part2.getType());
+
+            // 2nd compare by date
+            if (compareDiff == 0) {
+
+               final long date1 = part1.getDate();
+               final long date2 = part2.getDate();
+
+               final long dateDiff = date1 - date2;
+
+               // diff value can be larger than Integer.MAX_VALUE
+               if (dateDiff > 0) {
+                  compareDiff = 1;
+               } else if (dateDiff < 0) {
+                  compareDiff = -1;
+               }
+            }
+
+            return compareDiff;
 
          } else if (obj1 instanceof final TVIEquipmentView_Service item1
                && obj2 instanceof final TVIEquipmentView_Service item2) {
 
-            // sort service by name
+            // sort service by type/date
 
-            return item1.getService().getName().compareTo(item2.getService().getName());
+            final EquipmentService service1 = item1.getService();
+            final EquipmentService service2 = item2.getService();
+
+            // 1st compare by type
+            int compareDiff = service1.getType().compareTo(service2.getType());
+
+            // 2nd compare by date
+            if (compareDiff == 0) {
+
+               final long date1 = service1.getDate();
+               final long date2 = service2.getDate();
+
+               final long dateDiff = date1 - date2;
+
+               // diff value can be larger than Integer.MAX_VALUE
+               if (dateDiff > 0) {
+                  compareDiff = 1;
+               } else if (dateDiff < 0) {
+                  compareDiff = -1;
+               }
+            }
+
+            return compareDiff;
          }
 
          return 0;
@@ -744,7 +793,7 @@ public class EquipmentView extends ViewPart implements ITourProvider, ITourViewe
       _columnManager.createColumns(_equipmentViewer);
 
       _equipmentViewer.setContentProvider(new EquipmentContentProvider());
-//      _equipmentViewer.setComparator(new EquipmentComparator());
+      _equipmentViewer.setComparator(new EquipmentComparator());
       _equipmentViewer.setComparer(new EquipmentComparer());
 //      _equipViewer.setFilters(new TagFilter());
 
@@ -854,6 +903,7 @@ public class EquipmentView extends ViewPart implements ITourProvider, ITourViewe
       defineColumn_Equipment_Brand();
       defineColumn_Equipment_Model();
       defineColumn_Equipment_Type();
+      defineColumn_Equipment_Collate();
 
       defineColumn_Equipment_Price();
       defineColumn_Equipment_PriceUnit();
@@ -864,6 +914,7 @@ public class EquipmentView extends ViewPart implements ITourProvider, ITourViewe
 
       defineColumn_Time_UsageDuration();
       defineColumn_Time_Date();
+      defineColumn_Time_Date_Until();
       defineColumn_Time_Date_Built();
       defineColumn_Time_Date_Retired();
    }
@@ -1015,6 +1066,42 @@ public class EquipmentView extends ViewPart implements ITourProvider, ITourViewe
             if (element instanceof final TVIEquipmentView_Equipment tviEquipment) {
 
                cell.setText(tviEquipment.getEquipment().getBrand());
+               setCellColor(cell, element);
+            }
+         }
+      });
+   }
+
+   /**
+    * Column: Collate
+    */
+   private void defineColumn_Equipment_Collate() {
+
+      final ColumnDefinition colDef = TreeColumnFactory.EQUIPMENT_COLLATE.createColumn(_columnManager, _pc);
+
+      colDef.setIsDefaultColumn();
+
+      colDef.setLabelProvider(new CellLabelProvider() {
+
+         @Override
+         public void update(final ViewerCell cell) {
+
+            final Object element = cell.getElement();
+
+            boolean isCollate = false;
+
+            if (element instanceof final TVIEquipmentView_Part partItem) {
+
+               isCollate = partItem.getPart().isCollate();
+
+            } else if (element instanceof final TVIEquipmentView_Service serviceItem) {
+
+               isCollate = serviceItem.getService().isCollate();
+            }
+
+            if (isCollate) {
+
+               cell.setText(UI.SYMBOL_BOX);
                setCellColor(cell, element);
             }
          }
@@ -1246,7 +1333,7 @@ public class EquipmentView extends ViewPart implements ITourProvider, ITourViewe
          public void update(final ViewerCell cell) {
 
             final Object element = cell.getElement();
-            LocalDate date = null;
+            LocalDateTime date = null;
 
             if (element instanceof final TVIEquipmentView_Equipment viewItem) {
 
@@ -1263,7 +1350,17 @@ public class EquipmentView extends ViewPart implements ITourProvider, ITourViewe
 
             if (date != null) {
 
-               cell.setText(TimeTools.Formatter_Date_S.format(date));
+               final ValueFormat valueFormatter = colDef.getValueFormat_Detail();
+
+               String dateFormatted;
+
+               if (valueFormatter.equals(ValueFormat.DATE_TIME)) {
+                  dateFormatted = date.format(TimeTools.Formatter_Date_S);
+               } else {
+                  dateFormatted = date.format(TimeTools.Formatter_DateTime_SM);
+               }
+
+               cell.setText(dateFormatted);
                setCellColor(cell, element);
             }
          }
@@ -1283,7 +1380,7 @@ public class EquipmentView extends ViewPart implements ITourProvider, ITourViewe
          public void update(final ViewerCell cell) {
 
             final Object element = cell.getElement();
-            LocalDate date = null;
+            LocalDateTime date = null;
 
             if (element instanceof final TVIEquipmentView_Equipment viewItem) {
 
@@ -1316,7 +1413,7 @@ public class EquipmentView extends ViewPart implements ITourProvider, ITourViewe
          public void update(final ViewerCell cell) {
 
             final Object element = cell.getElement();
-            LocalDate date = null;
+            LocalDateTime date = null;
 
             if (element instanceof final TVIEquipmentView_Equipment viewItem) {
 
@@ -1337,6 +1434,57 @@ public class EquipmentView extends ViewPart implements ITourProvider, ITourViewe
    }
 
    /**
+    * Column: Until date
+    */
+   private void defineColumn_Time_Date_Until() {
+
+      final ColumnDefinition colDef = TreeColumnFactory.EQUIPMENT_DATE_UNTIL.createColumn(_columnManager, _pc);
+
+      colDef.setLabelProvider(new CellLabelProvider() {
+
+         @Override
+         public void update(final ViewerCell cell) {
+
+            final Object element = cell.getElement();
+
+            LocalDateTime date = null;
+            boolean isCollate = false;
+
+            if (element instanceof final TVIEquipmentView_Part viewItem) {
+
+               final EquipmentPart part = viewItem.getPart();
+
+               date = part.getDateUntil_Local();
+               isCollate = part.isCollate();
+
+            } else if (element instanceof final TVIEquipmentView_Service viewItem) {
+
+               final EquipmentService service = viewItem.getService();
+
+               date = service.getDateUntil_Local();
+               isCollate = service.isCollate();
+            }
+
+            if (isCollate && date != null) {
+
+               final ValueFormat valueFormatter = colDef.getValueFormat_Detail();
+
+               String dateFormatted;
+
+               if (valueFormatter.equals(ValueFormat.DATE_TIME)) {
+                  dateFormatted = date.format(TimeTools.Formatter_Date_S);
+               } else {
+                  dateFormatted = date.format(TimeTools.Formatter_DateTime_SM);
+               }
+
+               cell.setText(dateFormatted);
+               setCellColor(cell, element);
+            }
+         }
+      });
+   }
+
+   /**
     * Column: Usage duration
     */
    private void defineColumn_Time_UsageDuration() {
@@ -1350,14 +1498,36 @@ public class EquipmentView extends ViewPart implements ITourProvider, ITourViewe
 
             final Object element = cell.getElement();
 
-            if (element instanceof final TVIEquipmentView_Item viewItem) {
+            long durationMS = 0;
+            String durationLast = UI.EMPTY_STRING;
+            boolean isCollate = false;
 
-               cell.setText(Integer.toString(viewItem.usageDuration));
+            if (element instanceof final TVIEquipmentView_Part partItem) {
+
+               durationMS = partItem.usageDuration;
+               durationLast = partItem.usageDurationLast;
+               isCollate = partItem.getPart().isCollate();
+
+            } else if (element instanceof final TVIEquipmentView_Service serviceItem) {
+
+               durationMS = serviceItem.usageDuration;
+               durationLast = serviceItem.usageDurationLast;
+               isCollate = serviceItem.getService().isCollate();
+            }
+
+            if (isCollate
+                  && (element instanceof TVIEquipmentView_Part
+                        || element instanceof TVIEquipmentView_Service)) {
+
+               final Period durationPeriod = new Period(0, durationMS, _tourPeriodTemplate);
+
+               final String formattedDuration = durationPeriod.toString(UI.DURATION_FORMATTER_YEAR_MONTH_DAY);
+
+//               durationFormatted = "%d d".formatted(Duration.ofMillis(durationMS).toDays());
+//               java.time.Period javaTimePeriod = java.time.Period.of(1,2,3);
+
+               cell.setText(durationLast + formattedDuration);
                setCellColor(cell, element);
-
-               System.out.println(UI.timeStamp() + " column : " + viewItem.firstColumn);
-// TODO remove SYSTEM.OUT.PRINTLN
-
             }
          }
       });
@@ -1827,6 +1997,8 @@ public class EquipmentView extends ViewPart implements ITourProvider, ITourViewe
 
          equipment.getParts().add(savedPart);
 
+         EquipmentManager.updateUntilDate_Parts(equipment, savedPart.getType());
+
          updateUI_Views();
 
       } else if (firstElement instanceof final TVIEquipmentView_Service serviceItem) {
@@ -1851,10 +2023,12 @@ public class EquipmentView extends ViewPart implements ITourProvider, ITourViewe
          final EquipmentService savedService = TourDatabase.saveEntity(
 
                serviceFromDialog,
-               serviceFromDialog.getSeriveId(),
+               serviceFromDialog.getServiceId(),
                EquipmentService.class);
 
          equipment.getServices().add(savedService);
+
+         EquipmentManager.updateUntilDate_Services(equipment, savedService.getType());
 
          updateUI_Views();
       }
@@ -1902,10 +2076,19 @@ public class EquipmentView extends ViewPart implements ITourProvider, ITourViewe
 
          final EquipmentPart partFromDialog = dialogPart.getPart();
 
+         final boolean areCollatedFieldsModified = part.isCollatedFieldsModified(partFromDialog);
+
          // update model
          part.updateFromOther(partFromDialog);
 
          TourDatabase.saveEntity(part, part.getPartId(), EquipmentPart.class);
+
+         if (areCollatedFieldsModified) {
+
+            // date is modified -> update "until date"
+
+            EquipmentManager.updateUntilDate_Parts(equipment, part.getType());
+         }
 
          updateUI_Views();
 
@@ -1927,10 +2110,19 @@ public class EquipmentView extends ViewPart implements ITourProvider, ITourViewe
 
          final EquipmentService serviceFromDialog = dialogService.getService();
 
+         final boolean areCollatedFieldsModified = service.isCollatedFieldsModified(serviceFromDialog);
+
          // update model
          service.updateFromOther(serviceFromDialog);
 
-         TourDatabase.saveEntity(service, service.getSeriveId(), EquipmentService.class);
+         TourDatabase.saveEntity(service, service.getServiceId(), EquipmentService.class);
+
+         if (areCollatedFieldsModified) {
+
+            // date is modified -> update "until date"
+
+            EquipmentManager.updateUntilDate_Services(equipment, service.getType());
+         }
 
          updateUI_Views();
       }
@@ -1982,6 +2174,8 @@ public class EquipmentView extends ViewPart implements ITourProvider, ITourViewe
 
       equipment.getParts().add(savedPart);
 
+      EquipmentManager.updateUntilDate_Parts(equipment, savedPart.getType());
+
       updateUI_Views();
    }
 
@@ -2010,10 +2204,12 @@ public class EquipmentView extends ViewPart implements ITourProvider, ITourViewe
       final EquipmentService savedService = TourDatabase.saveEntity(
 
             serviceFromDialog,
-            serviceFromDialog.getSeriveId(),
+            serviceFromDialog.getServiceId(),
             EquipmentService.class);
 
       equipment.getServices().add(savedService);
+
+      EquipmentManager.updateUntilDate_Services(equipment, savedService.getType());
 
       updateUI_Views();
    }

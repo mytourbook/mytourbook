@@ -16,6 +16,7 @@
 package net.tourbook.equipment;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 import net.tourbook.Images;
 import net.tourbook.Messages;
@@ -317,7 +318,7 @@ public class DialogEquipment extends TitleAreaDialog {
             /*
              * First use date
              */
-            final Label label = UI.createLabel(_container, Messages.Dialog_Equipment_Label_DateFirstUse);
+            final Label label = UI.createLabel(_container, "D&ate");
             gdVertCenter.applyTo(label);
 
             _date = new DateTime(_container, SWT.DATE | SWT.MEDIUM | SWT.DROP_DOWN);
@@ -643,24 +644,24 @@ public class DialogEquipment extends TitleAreaDialog {
 
 // SET_FORMATTING_OFF
 
-      LocalDate date                = _equipment.getDate_Local();
-      LocalDate dateBuilt           = _equipment.getDateBuilt_Local();
-      LocalDate dateRetired         = _equipment.getDateRetired_Local();
+      LocalDateTime date            = _equipment.getDate_Local();
+      LocalDateTime dateBuilt       = _equipment.getDateBuilt_Local();
+      LocalDateTime dateRetired     = _equipment.getDateRetired_Local();
 
-      final long epochDay           = date.toEpochDay();
-      final long epochDayBuilt      = dateBuilt.toEpochDay();
-      final long epochDayRetired    = dateRetired.toEpochDay();
+      final long dateMS           = TimeTools.toEpochMilli(date);
+      final long dateBuiltMS      = TimeTools.toEpochMilli(dateBuilt);
+      final long dateRetiredMS    = TimeTools.toEpochMilli(dateRetired);
 
-      if (epochDay == 0) {
-         date = LocalDate.now();
+      if (dateMS == 0) {
+         date = LocalDateTime.now();
       }
 
-      if (epochDayBuilt == 0) {
-         dateBuilt = LocalDate.now();
+      if (dateBuiltMS == 0) {
+         dateBuilt = LocalDateTime.now();
       }
 
-      if (epochDayRetired == 0) {
-         dateRetired = LocalDate.of(2099,1,1);
+      if (dateRetiredMS == 0) {
+         dateRetired = LocalDateTime.of(2099, 1, 1, 0, 0);
       }
 
       _comboBrand       .setText(_equipment.getBrand());

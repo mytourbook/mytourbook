@@ -16,6 +16,7 @@
 package net.tourbook.equipment;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 import net.tourbook.Images;
 import net.tourbook.Messages;
@@ -39,6 +40,7 @@ import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.MouseWheelListener;
 import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.Image;
+import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
@@ -92,7 +94,7 @@ public class DialogEquipmentService extends TitleAreaDialog {
    private Composite                 _container;
    private Composite                 _parent;
 
-   private Text                      _txtDescription;
+   private Button                    _chkCollate;
 
    private Combo                     _comboCompany;
    private Combo                     _comboName;
@@ -102,6 +104,8 @@ public class DialogEquipmentService extends TitleAreaDialog {
    private DateTime                  _date;
 
    private Spinner                   _spinPrice;
+
+   private Text                      _txtDescription;
 
    private AutoComplete_ComboInputMT _autocomplete_Company;
    private AutoComplete_ComboInputMT _autocomplete_Name;
@@ -314,6 +318,18 @@ public class DialogEquipmentService extends TitleAreaDialog {
 //         UI.createSpacer_Horizontal(_container, 2);
          {
             /*
+             * Collate tours
+             */
+            final Label label = UI.createLabel(_container, "Co&llate");
+            gdVertCenter.applyTo(label);
+
+            _chkCollate = new Button(_container, SWT.CHECK);
+            _chkCollate.setText("Include in collated tours");
+            _chkCollate.setToolTipText("Collated tours are a collection of tours to summarize,\ne.g. distance or duration values");
+            _chkCollate.addSelectionListener(_defaultSelectionListener);
+         }
+         {
+            /*
              * Description
              */
             final Label label = UI.createLabel(_container, Messages.Dialog_Equipment_Label_Description);
@@ -370,6 +386,8 @@ public class DialogEquipmentService extends TitleAreaDialog {
     * @return Returns new or cloned instance
     */
    EquipmentService getService() {
+
+      _service.updateUntilDate();
 
       return _service;
    }
@@ -481,6 +499,7 @@ public class DialogEquipmentService extends TitleAreaDialog {
       _service.setType(             _comboType.getText().trim());
       _service.setDescription(      _txtDescription.getText().trim());
 
+      _service.setIsCollate(        _chkCollate.getSelection());
       _service.setPrice(            _spinPrice.getSelection() / 100f);
       _service.setPriceUnit(        _comboPriceUnit.getText());
 
@@ -493,12 +512,12 @@ public class DialogEquipmentService extends TitleAreaDialog {
 
       _isInUIUpdate = true;
 
-      LocalDate date = _service.getDate_Local();
+      LocalDateTime date = _service.getDate_Local();
 
-      final long dateEpochDays = date.toEpochDay();
+      final long dateMS = TimeTools.toEpochMilli(date);
 
-      if (dateEpochDays == 0) {
-         date = LocalDate.now();
+      if (dateMS == 0) {
+         date = LocalDateTime.now();
       }
 
 // SET_FORMATTING_OFF
@@ -509,6 +528,7 @@ public class DialogEquipmentService extends TitleAreaDialog {
 
       _date             .setDate(date.getYear(), date.getMonthValue() - 1, date.getDayOfMonth());
 
+      _chkCollate       .setSelection(_service.isCollate());
       _spinPrice        .setSelection((int) (_service.getPrice()  * 100));
 
       _txtDescription   .setText(_service.getDescription());

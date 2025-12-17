@@ -19,7 +19,7 @@ import static javax.persistence.CascadeType.ALL;
 import static javax.persistence.FetchType.EAGER;
 
 import java.io.Serializable;
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -145,13 +145,13 @@ public class Equipment implements Cloneable, Comparable<Object>, Serializable {
    private long                       _createId        = 0;
 
    @Transient
-   private LocalDate                  _date;
+   private LocalDateTime              _date;
 
    @Transient
-   private LocalDate                  _dateBuilt;
+   private LocalDateTime              _dateBuilt;
 
    @Transient
-   private LocalDate                  _dateRetired;
+   private LocalDateTime              _dateRetired;
 
    @Transient
    private String                     _equipmentName;
@@ -241,10 +241,10 @@ public class Equipment implements Cloneable, Comparable<Object>, Serializable {
       return date;
    }
 
-   public LocalDate getDate_Local() {
+   public LocalDateTime getDate_Local() {
 
       if (_date == null) {
-         _date = TimeTools.toLocalDate(date);
+         _date = TimeTools.toLocalDateTime(date);
       }
 
       return _date;
@@ -255,10 +255,10 @@ public class Equipment implements Cloneable, Comparable<Object>, Serializable {
       return dateBuilt;
    }
 
-   public LocalDate getDateBuilt_Local() {
+   public LocalDateTime getDateBuilt_Local() {
 
       if (_dateBuilt == null) {
-         _dateBuilt = TimeTools.toLocalDate(dateBuilt);
+         _dateBuilt = TimeTools.toLocalDateTime(dateBuilt);
       }
 
       return _dateBuilt;
@@ -269,10 +269,10 @@ public class Equipment implements Cloneable, Comparable<Object>, Serializable {
       return dateRetired;
    }
 
-   public LocalDate getDateRetired_Local() {
+   public LocalDateTime getDateRetired_Local() {
 
       if (_dateRetired == null) {
-         _dateRetired = TimeTools.toLocalDate(dateRetired);
+         _dateRetired = TimeTools.toLocalDateTime(dateRetired);
       }
 
       return _dateRetired;

@@ -169,7 +169,11 @@ public class TimeTools {
 
    private static final Object            TIME_ZONE_LOCK       = new Object();
 
+   public static final long               MAX_TIME_IN_EPOCH_MILLI;
+
    static {
+
+      MAX_TIME_IN_EPOCH_MILLI = TimeTools.toEpochMilli(LocalDateTime.of(9999, 12, 31, 23, 59, 59));
 
       /**
        * Force 4 year digits, for some locales e.g. german the short formatting for a year has 2

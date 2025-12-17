@@ -63,14 +63,18 @@ public abstract class TreeColumnFactory {
    public static final String            EQUIPMENT_AND_CATEGORY_ID        = "EQUIPMENT_AND_CATEGORY";           //$NON-NLS-1$
    public static final TreeColumnFactory EQUIPMENT_BRAND;
    public static final String            EQUIPMENT_BRAND_ID               = "EQUIPMENT_BRAND";                  //$NON-NLS-1$
+   public static final TreeColumnFactory EQUIPMENT_COLLATE;
+   public static final String            EQUIPMENT_COLLATE_ID             = "EQUIPMENT_COLLATE";                //$NON-NLS-1$
    public static final TreeColumnFactory EQUIPMENT_DATE;
    public static final String            EQUIPMENT_DATE_ID                = "EQUIPMENT_DATE";                   //$NON-NLS-1$
    public static final TreeColumnFactory EQUIPMENT_DATE_BUILT;
    public static final String            EQUIPMENT_DATE_BUILT_ID          = "EQUIPMENT_DATE_BUILT";             //$NON-NLS-1$
-   public static final TreeColumnFactory EQUIPMENT_DATE_USAGE_DURATION;
-   public static final String            EQUIPMENT_DATE_USAGE_DURATION_ID = "EQUIPMENT_DATE_USAGE_DURATION";    //$NON-NLS-1$
    public static final TreeColumnFactory EQUIPMENT_DATE_RETIRED;
    public static final String            EQUIPMENT_DATE_RETIRED_ID        = "EQUIPMENT_DATE_RETIRED";           //$NON-NLS-1$
+   public static final TreeColumnFactory EQUIPMENT_DATE_UNTIL;
+   public static final String            EQUIPMENT_DATE_UNTIL_ID          = "EQUIPMENT_DATE_UNTIL";             //$NON-NLS-1$
+   public static final TreeColumnFactory EQUIPMENT_DATE_USAGE_DURATION;
+   public static final String            EQUIPMENT_DATE_USAGE_DURATION_ID = "EQUIPMENT_DATE_USAGE_DURATION";    //$NON-NLS-1$
    public static final TreeColumnFactory EQUIPMENT_INITIAL_DISTANCE;
    public static final String            EQUIPMENT_INITIAL_DISTANCE_ID    = "EQUIPMENT_INITIAL_DISTANCE";       //$NON-NLS-1$
    public static final TreeColumnFactory EQUIPMENT_MODEL;
@@ -769,6 +773,49 @@ public abstract class TreeColumnFactory {
          }
       };
 
+      EQUIPMENT_COLLATE = new TreeColumnFactory() {
+         @Override
+         public TreeColumnDefinition createColumn(final ColumnManager columnManager,
+                                                  final PixelConverter pixelConverter) {
+
+            final TreeColumnDefinition colDef = new TreeColumnDefinition(columnManager, EQUIPMENT_COLLATE_ID, SWT.CENTER);
+
+            colDef.setColumnCategory(           Messages.ColumnFactory_Category_Equipment);
+
+            colDef.setColumnLabel(              "Collate");
+            colDef.setColumnHeaderText(         "Collate");
+            colDef.setColumnHeaderToolTipText(  "Collate tours");
+
+            colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(12));
+
+            return colDef;
+         }
+      };
+      
+      EQUIPMENT_DATE = new TreeColumnFactory() {
+         @Override
+         public TreeColumnDefinition createColumn(final ColumnManager columnManager,
+                                                  final PixelConverter pixelConverter) {
+
+            final TreeColumnDefinition colDef = new TreeColumnDefinition(columnManager, EQUIPMENT_DATE_ID, SWT.LEAD);
+
+            colDef.setColumnCategory(           Messages.ColumnFactory_Category_Time);
+
+            colDef.setColumnLabel(              Messages.ColumnFactory_Equipment_Date);
+            colDef.setColumnHeaderText(         Messages.ColumnFactory_Equipment_Date);
+            colDef.setColumnHeaderToolTipText(  Messages.ColumnFactory_Equipment_Date_Tooltip);
+
+            colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(20));
+
+            colDef.setValueFormats(
+                  ValueFormatSet.DateTime,
+                  ValueFormat.DATE_TIME,
+                  columnManager);
+
+            return colDef;
+         }
+      };
+
       EQUIPMENT_DATE_BUILT = new TreeColumnFactory() {
          @Override
          public TreeColumnDefinition createColumn(final ColumnManager columnManager,
@@ -781,44 +828,6 @@ public abstract class TreeColumnFactory {
             colDef.setColumnLabel(              Messages.ColumnFactory_Equipment_Date_Built);
             colDef.setColumnHeaderText(         Messages.ColumnFactory_Equipment_Date_Built);
             colDef.setColumnHeaderToolTipText(  Messages.ColumnFactory_Equipment_Date_Built_Tooltip);
-
-            colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(20));
-
-            return colDef;
-         }
-      };
-
-      EQUIPMENT_DATE_USAGE_DURATION = new TreeColumnFactory() {
-         @Override
-         public TreeColumnDefinition createColumn(final ColumnManager columnManager,
-                                                  final PixelConverter pixelConverter) {
-
-            final TreeColumnDefinition colDef = new TreeColumnDefinition(columnManager, EQUIPMENT_DATE_USAGE_DURATION_ID, SWT.LEAD);
-
-            colDef.setColumnCategory(           Messages.ColumnFactory_Category_Time);
-
-            colDef.setColumnLabel(              "Duration");
-            colDef.setColumnHeaderText(         "Days");
-            colDef.setColumnHeaderToolTipText(  "Usage duration between this and the previous item");
-
-            colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(10));
-
-            return colDef;
-         }
-      };
-
-      EQUIPMENT_DATE = new TreeColumnFactory() {
-         @Override
-         public TreeColumnDefinition createColumn(final ColumnManager columnManager,
-                                                  final PixelConverter pixelConverter) {
-
-            final TreeColumnDefinition colDef = new TreeColumnDefinition(columnManager, EQUIPMENT_DATE_ID, SWT.LEAD);
-
-            colDef.setColumnCategory(           Messages.ColumnFactory_Category_Time);
-
-            colDef.setColumnLabel(              Messages.ColumnFactory_Equipment_Date_FirstUse);
-            colDef.setColumnHeaderText(         Messages.ColumnFactory_Equipment_Date_FirstUse);
-            colDef.setColumnHeaderToolTipText(  Messages.ColumnFactory_Equipment_Date_FirstUse_Tooltip);
 
             colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(20));
 
@@ -844,6 +853,50 @@ public abstract class TreeColumnFactory {
             return colDef;
          }
       };
+
+      EQUIPMENT_DATE_UNTIL = new TreeColumnFactory() {
+         @Override
+         public TreeColumnDefinition createColumn(final ColumnManager columnManager,
+                                                  final PixelConverter pixelConverter) {
+
+            final TreeColumnDefinition colDef = new TreeColumnDefinition(columnManager, EQUIPMENT_DATE_UNTIL_ID, SWT.LEAD);
+
+            colDef.setColumnCategory(           Messages.ColumnFactory_Category_Time);
+
+            colDef.setColumnLabel(              "Until");
+            colDef.setColumnHeaderText(         "Until");
+            colDef.setColumnHeaderToolTipText(  "Date until this item was used");
+
+            colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(20));
+
+            colDef.setValueFormats(
+                  ValueFormatSet.DateTime,
+                  ValueFormat.DATE_TIME,
+                  columnManager);
+
+            return colDef;
+         }
+      };
+
+      EQUIPMENT_DATE_USAGE_DURATION = new TreeColumnFactory() {
+         @Override
+         public TreeColumnDefinition createColumn(final ColumnManager columnManager,
+                                                  final PixelConverter pixelConverter) {
+
+            final TreeColumnDefinition colDef = new TreeColumnDefinition(columnManager, EQUIPMENT_DATE_USAGE_DURATION_ID, SWT.LEAD);
+
+            colDef.setColumnCategory(           Messages.ColumnFactory_Category_Time);
+
+            colDef.setColumnLabel(              "Duration");
+            colDef.setColumnHeaderText(         "Duration");
+            colDef.setColumnHeaderToolTipText(  "Usage duration between this and the previous item");
+
+            colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(10));
+
+            return colDef;
+         }
+      };
+
 
       EQUIPMENT_INITIAL_DISTANCE = new TreeColumnFactory() {
          @Override

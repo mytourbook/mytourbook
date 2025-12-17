@@ -23,7 +23,6 @@ public class ValueFormatSet {
          ValueFormat.NUMBER_1_1,
          ValueFormat.NUMBER_1_2,
          ValueFormat.NUMBER_1_3
-
    };
 
    /**
@@ -34,7 +33,6 @@ public class ValueFormatSet {
          ValueFormat.NUMBER_1_0,
          ValueFormat.NUMBER_1_1,
          ValueFormat.NUMBER_1_2,
-
    };
 
    public static ValueFormat[] Time            = new ValueFormat[] {
@@ -43,7 +41,12 @@ public class ValueFormatSet {
          ValueFormat.TIME_HH_MM,
          ValueFormat.TIME_HH_MM_SS,
          ValueFormat.TIME_SSS
+   };
 
+   public static ValueFormat[] DateTime        = new ValueFormat[] {
+
+         ValueFormat.DATE_TIME,
+         ValueFormat.DATE_TIME_HH_MM_SS,
    };
 
    /**
@@ -53,7 +56,6 @@ public class ValueFormatSet {
 
          ValueFormat.TIME_HH_MM,
          ValueFormat.TIME_HH_MM_SS
-
    };
 
 }

@@ -16,7 +16,7 @@
 package net.tourbook.data;
 
 import java.io.Serializable;
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -67,9 +67,19 @@ public class EquipmentService implements Cloneable, Serializable {
    private String                     description;
 
    /**
+    * When <code>true</code> then this service is included in collated services
+    */
+   private boolean                    isCollate        = true;
+
+   /**
     * When the service was done, in milliseconds since 1970-01-01T00:00:00Z
     */
    private long                       date;
+
+   /**
+    * When the service was finished, in milliseconds since 1970-01-01T00:00:00Z.
+    */
+   private long                       dateUntil;
 
    /**
     * Price
@@ -91,7 +101,10 @@ public class EquipmentService implements Cloneable, Serializable {
    private long                       _createId        = 0;
 
    @Transient
-   private LocalDate                  _date;
+   private LocalDateTime              _date;
+
+   @Transient
+   private LocalDateTime              _dateUntil;
 
    /**
     * Default constructor used in EJB
@@ -164,13 +177,26 @@ public class EquipmentService implements Cloneable, Serializable {
       return date;
    }
 
-   public LocalDate getDate_Local() {
+   public LocalDateTime getDate_Local() {
 
       if (_date == null) {
-         _date = TimeTools.toLocalDate(date);
+         _date = TimeTools.toLocalDateTime(date);
       }
 
       return _date;
+   }
+
+   public long getDateUntil() {
+      return dateUntil;
+   }
+
+   public LocalDateTime getDateUntil_Local() {
+
+      if (_dateUntil == null) {
+         _dateUntil = TimeTools.toLocalDateTime(dateUntil);
+      }
+
+      return _dateUntil;
    }
 
    public String getDescription() {
@@ -180,6 +206,17 @@ public class EquipmentService implements Cloneable, Serializable {
       }
 
       return description;
+   }
+
+   public long getDuration() {
+
+      final long duration = dateUntil - date;
+
+      return duration;
+   }
+
+   public Equipment getEquipment() {
+      return equipment;
    }
 
    /**
@@ -205,7 +242,7 @@ public class EquipmentService implements Cloneable, Serializable {
    /**
     * @return Returns the primary key for a {@link EquipmentService} entity
     */
-   public long getSeriveId() {
+   public long getServiceId() {
       return serviceId;
    }
 
@@ -222,6 +259,24 @@ public class EquipmentService implements Cloneable, Serializable {
    public int hashCode() {
 
       return Objects.hash(serviceId, _createId);
+   }
+
+   public boolean isCollate() {
+      return isCollate;
+   }
+
+   public boolean isCollatedFieldsModified(final EquipmentService otherService) {
+
+      if (isCollate != otherService.isCollate()
+            || date != otherService.getDate()
+            || type.equalsIgnoreCase(otherService.getType()) == false) {
+
+         // collated fields are modified
+
+         return true;
+      }
+
+      return false;
    }
 
    /**
@@ -281,6 +336,13 @@ public class EquipmentService implements Cloneable, Serializable {
       _date = null;
    }
 
+   public void setDateUntil(final long dateUntil) {
+
+      this.dateUntil = dateUntil;
+
+      _dateUntil = null;
+   }
+
    public void setDescription(final String description) {
       this.description = description;
    }
@@ -288,6 +350,10 @@ public class EquipmentService implements Cloneable, Serializable {
    public void setEquipment(final Equipment partEquipment) {
 
       equipment = partEquipment;
+   }
+
+   public void setIsCollate(final boolean isCollate) {
+      this.isCollate = isCollate;
    }
 
    public void setName(final String name) {
@@ -323,15 +389,27 @@ public class EquipmentService implements Cloneable, Serializable {
 
 // SET_FORMATTING_OFF
 
-      setCompany     (otherService.getCompany());
-      setDate        (otherService.getDate());
-      setDescription (otherService.getDescription());
-      setName        (otherService.getName());
-      setPrice       (otherService.getPrice());
-      setPriceUnit   (otherService.getPriceUnit());
-      setType        (otherService.getType());
+      setCompany        (otherService.getCompany());
+      setDate           (otherService.getDate());
+      setDescription    (otherService.getDescription());
+      setIsCollate      (otherService.isCollate());
+      setName           (otherService.getName());
+      setPrice          (otherService.getPrice());
+      setPriceUnit      (otherService.getPriceUnit());
+      setType           (otherService.getType());
 
 // SET_FORMATTING_ON
+   }
 
+   /**
+    * Reset {@link #dateUntil} when service is not collated, this makes it easier to see it in the
+    * view
+    */
+   public void updateUntilDate() {
+
+      if (isCollate == false) {
+
+         setDateUntil(0);
+      }
    }
 }

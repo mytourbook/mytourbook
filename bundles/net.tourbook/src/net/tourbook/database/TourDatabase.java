@@ -3657,22 +3657,22 @@ public class TourDatabase {
     * <pre>
     *
     * org.hibernate.PersistentObjectException: detached entity passed to persist: net.tourbook.data.DeviceSensor
-    * 	at org.hibernate.event.def.DefaultPersistEventListener.onPersist(DefaultPersistEventListener.java:102)
-    * 	at org.hibernate.event.def.DefaultPersistEventListener.onPersist(DefaultPersistEventListener.java:61)
-    * 	at org.hibernate.impl.SessionImpl.firePersist(SessionImpl.java:646)
-    * 	at org.hibernate.impl.SessionImpl.persist(SessionImpl.java:620)
-    * 	at org.hibernate.impl.SessionImpl.persist(SessionImpl.java:624)
-    * 	at org.hibernate.ejb.AbstractEntityManagerImpl.persist(AbstractEntityManagerImpl.java:220)
-    * 	at net.tourbook.database.TourDatabase.saveEntity(TourDatabase.java:2999)
+    *    at org.hibernate.event.def.DefaultPersistEventListener.onPersist(DefaultPersistEventListener.java:102)
+    *    at org.hibernate.event.def.DefaultPersistEventListener.onPersist(DefaultPersistEventListener.java:61)
+    *    at org.hibernate.impl.SessionImpl.firePersist(SessionImpl.java:646)
+    *    at org.hibernate.impl.SessionImpl.persist(SessionImpl.java:620)
+    *    at org.hibernate.impl.SessionImpl.persist(SessionImpl.java:624)
+    *    at org.hibernate.ejb.AbstractEntityManagerImpl.persist(AbstractEntityManagerImpl.java:220)
+    *    at net.tourbook.database.TourDatabase.saveEntity(TourDatabase.java:2999)
     *
-    * 	at net.tourbook.database.TourDatabase.saveTransientInstances_Sensors_2_Save(TourDatabase.java:3588)
+    *    at net.tourbook.database.TourDatabase.saveTransientInstances_Sensors_2_Save(TourDatabase.java:3588)
     *
-    * 	at net.tourbook.database.TourDatabase.saveTransientInstances_Sensors(TourDatabase.java:3529)
-    * 	at net.tourbook.database.TourDatabase.saveTransientInstances(TourDatabase.java:3500)
-    * 	at net.tourbook.database.TourDatabase.saveTour_PreSaveActions(TourDatabase.java:3459)
-    * 	at net.tourbook.database.TourDatabase.saveTour_Concurrent(TourDatabase.java:3198)
-    * 	at net.tourbook.ui.views.rawData.RawDataView.saveImportedTours_20_Concurrent_OneTour(RawDataView.java:6619)
-    * 	at net.tourbook.ui.views.rawData.RawDataView.lambda$31(RawDataView.java:6579)
+    *    at net.tourbook.database.TourDatabase.saveTransientInstances_Sensors(TourDatabase.java:3529)
+    *    at net.tourbook.database.TourDatabase.saveTransientInstances(TourDatabase.java:3500)
+    *    at net.tourbook.database.TourDatabase.saveTour_PreSaveActions(TourDatabase.java:3459)
+    *    at net.tourbook.database.TourDatabase.saveTour_Concurrent(TourDatabase.java:3198)
+    *    at net.tourbook.ui.views.rawData.RawDataView.saveImportedTours_20_Concurrent_OneTour(RawDataView.java:6619)
+    *    at net.tourbook.ui.views.rawData.RawDataView.lambda$31(RawDataView.java:6579)
     *
     * </pre>
     *
@@ -4535,7 +4535,7 @@ public class TourDatabase {
                   + "   Size                    VARCHAR(" + DB_LENGTH_NAME + "),          " + NL //$NON-NLS-1$ //$NON-NLS-2$
                   + "   Weight                  FLOAT DEFAULT 0,                          " + NL //$NON-NLS-1$
 
-                  + "   Date	            		BIGINT DEFAULT 0,                         " + NL //$NON-NLS-1$
+                  + "   Date                    BIGINT DEFAULT 0,                         " + NL //$NON-NLS-1$
                   + "   DateBuilt               BIGINT DEFAULT 0,                         " + NL //$NON-NLS-1$
                   + "   DateRetired             BIGINT DEFAULT 0                          " + NL //$NON-NLS-1$
 
@@ -4598,9 +4598,12 @@ public class TourDatabase {
                   + "   Size                    VARCHAR(" + DB_LENGTH_NAME + "),          " + NL //$NON-NLS-1$ //$NON-NLS-2$
                   + "   Weight                  FLOAT DEFAULT 0,                          " + NL //$NON-NLS-1$
 
+                  + "   IsCollate               BOOLEAN DEFAULT TRUE,                      " + NL //$NON-NLS-1$
+
                   + "   Date                    BIGINT DEFAULT 0,                         " + NL //$NON-NLS-1$
                   + "   DateBuilt               BIGINT DEFAULT 0,                         " + NL //$NON-NLS-1$
-                  + "   DateRetired             BIGINT DEFAULT 0                          " + NL //$NON-NLS-1$
+                  + "   DateRetired             BIGINT DEFAULT 0,                         " + NL //$NON-NLS-1$
+                  + "   DateUntil               BIGINT DEFAULT 0                          " + NL //$NON-NLS-1$
 
                   + ")" //                                                                       //$NON-NLS-1$
       );
@@ -4617,7 +4620,7 @@ public class TourDatabase {
 
       exec(stmt,
 
-            "CREATE TABLE " + TABLE_EQUIPMENT_SERVICE + "   (                        		" + NL //$NON-NLS-1$ //$NON-NLS-2$
+            "CREATE TABLE " + TABLE_EQUIPMENT_SERVICE + "   (                              " + NL //$NON-NLS-1$ //$NON-NLS-2$
 
                   + SQL.createField_EntityId(ENTITY_ID_EQUIPMENT_SERVICE, true)
 
@@ -4628,10 +4631,13 @@ public class TourDatabase {
                   + "   Type                    VARCHAR(" + DB_LENGTH_NAME + "),          " + NL //$NON-NLS-1$ //$NON-NLS-2$
                   + "   Description             VARCHAR(" + DB_LENGTH_DESCRIPTION + "),   " + NL //$NON-NLS-1$ //$NON-NLS-2$
 
-                  + "   Date                    BIGINT DEFAULT 0,                         " + NL //$NON-NLS-1$
-
                   + "   Price                   FLOAT DEFAULT 0,                          " + NL //$NON-NLS-1$
-                  + "   PriceUnit               VARCHAR(" + DB_LENGTH_NAME + ")           " + NL //$NON-NLS-1$ //$NON-NLS-2$
+                  + "   PriceUnit               VARCHAR(" + DB_LENGTH_NAME + "),          " + NL //$NON-NLS-1$ //$NON-NLS-2$
+
+                  + "   IsCollate               BOOLEAN DEFAULT TRUE,                      " + NL //$NON-NLS-1$
+
+                  + "   Date                    BIGINT DEFAULT 0,                         " + NL //$NON-NLS-1$
+                  + "   DateUntil               BIGINT DEFAULT 0                          " + NL //$NON-NLS-1$
 
                   + ")" //                                                                       //$NON-NLS-1$
       );
