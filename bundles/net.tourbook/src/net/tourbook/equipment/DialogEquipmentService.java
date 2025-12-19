@@ -325,8 +325,15 @@ public class DialogEquipmentService extends TitleAreaDialog {
 
             _chkCollate = new Button(_container, SWT.CHECK);
             _chkCollate.setText("Include in collated tours");
-            _chkCollate.setToolTipText("Collated tours are a collection of tours to summarize,\ne.g. distance or duration values");
+            _chkCollate.setToolTipText(UI.EMPTY_STRING
+                  + "Collated tours are a collection of tours to summarize,\n"
+                  + "e.g. distance or duration values\n\n"
+                  + "Tours are collated with the type and date fields");
             _chkCollate.addSelectionListener(_defaultSelectionListener);
+
+            GridDataFactory.fillDefaults()
+                  .span(2, 1)
+                  .applyTo(_chkCollate);
          }
          {
             /*

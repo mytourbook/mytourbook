@@ -917,6 +917,8 @@ public class EquipmentView extends ViewPart implements ITourProvider, ITourViewe
       defineColumn_Time_Date_Until();
       defineColumn_Time_Date_Built();
       defineColumn_Time_Date_Retired();
+
+      defineColumn_Equipment_ID();
    }
 
    /**
@@ -1102,6 +1104,46 @@ public class EquipmentView extends ViewPart implements ITourProvider, ITourViewe
             if (isCollate) {
 
                cell.setText(UI.SYMBOL_BOX);
+               setCellColor(cell, element);
+            }
+         }
+      });
+   }
+
+   /**
+    * Column: ID
+    */
+   private void defineColumn_Equipment_ID() {
+
+      final ColumnDefinition colDef = TreeColumnFactory.EQUIPMENT_ID.createColumn(_columnManager, _pc);
+
+      colDef.setIsDefaultColumn();
+
+      colDef.setLabelProvider(new CellLabelProvider() {
+
+         @Override
+         public void update(final ViewerCell cell) {
+
+            final Object element = cell.getElement();
+
+            long id = -1;
+
+            if (element instanceof final TVIEquipmentView_Equipment equipmentItem) {
+
+               id = equipmentItem.getEquipmentID();
+
+            } else if (element instanceof final TVIEquipmentView_Part partItem) {
+
+               id = partItem.getPartID();
+
+            } else if (element instanceof final TVIEquipmentView_Service serviceItem) {
+
+               id = serviceItem.getServiceID();
+            }
+
+            if (id != -1) {
+
+               cell.setText(Long.toString(id));
                setCellColor(cell, element);
             }
          }

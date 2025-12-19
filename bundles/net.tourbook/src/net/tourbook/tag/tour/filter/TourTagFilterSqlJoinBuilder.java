@@ -66,7 +66,10 @@ public class TourTagFilterSqlJoinBuilder {
             + "            TOURDATA_TOURID AS Count_TourId," + NL //                               //$NON-NLS-1$
             + "            COUNT(*) AS NumTagIds" + NL //                                          //$NON-NLS-1$
             + "         FROM TOURDATA_TOURTAG" + NL //                                             //$NON-NLS-1$
+
+            // "                  TOURTAG_TAGID IN (" + tagIdsAsParameters.toString() + ")"
             + "         WHERE " + sqlJoinPartForAndOperator.getSqlString() //                      //$NON-NLS-1$
+
             + "         GROUP BY TOURDATA_TOURID" + NL //                                          //$NON-NLS-1$
             + "         HAVING COUNT(TOURDATA_TOURID) = ?" + NL //                                 //$NON-NLS-1$
             + "      )" + NL //                                                                    //$NON-NLS-1$
@@ -148,7 +151,9 @@ public class TourTagFilterSqlJoinBuilder {
     *
     * @param prepStmt
     * @param paramIndexFrom
+    *
     * @return Returns the last parameter index +1 which was used for setting parameters
+    *
     * @throws SQLException
     */
    public int setParameters(final PreparedStatement prepStmt, final int paramIndexFrom) throws SQLException {

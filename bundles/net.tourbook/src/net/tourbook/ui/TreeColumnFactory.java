@@ -75,6 +75,8 @@ public abstract class TreeColumnFactory {
    public static final String            EQUIPMENT_DATE_UNTIL_ID          = "EQUIPMENT_DATE_UNTIL";             //$NON-NLS-1$
    public static final TreeColumnFactory EQUIPMENT_DATE_USAGE_DURATION;
    public static final String            EQUIPMENT_DATE_USAGE_DURATION_ID = "EQUIPMENT_DATE_USAGE_DURATION";    //$NON-NLS-1$
+   public static final TreeColumnFactory EQUIPMENT_ID;
+   public static final String            EQUIPMENT_ID_ID                  = "EQUIPMENT_ID";                     //$NON-NLS-1$
    public static final TreeColumnFactory EQUIPMENT_INITIAL_DISTANCE;
    public static final String            EQUIPMENT_INITIAL_DISTANCE_ID    = "EQUIPMENT_INITIAL_DISTANCE";       //$NON-NLS-1$
    public static final TreeColumnFactory EQUIPMENT_MODEL;
@@ -791,7 +793,7 @@ public abstract class TreeColumnFactory {
             return colDef;
          }
       };
-      
+
       EQUIPMENT_DATE = new TreeColumnFactory() {
          @Override
          public TreeColumnDefinition createColumn(final ColumnManager columnManager,
@@ -897,6 +899,24 @@ public abstract class TreeColumnFactory {
          }
       };
 
+
+      EQUIPMENT_ID = new TreeColumnFactory() {
+         @Override
+         public TreeColumnDefinition createColumn(final ColumnManager columnManager,
+                                                  final PixelConverter pixelConverter) {
+
+            final TreeColumnDefinition colDef = new TreeColumnDefinition(columnManager, EQUIPMENT_ID_ID, SWT.TRAIL);
+
+            colDef.setColumnCategory(           Messages.ColumnFactory_Category_Equipment);
+
+            colDef.setColumnLabel(              "ID");
+            colDef.setColumnHeaderText(         "ID");
+
+            colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(5));
+
+            return colDef;
+         }
+      };
 
       EQUIPMENT_INITIAL_DISTANCE = new TreeColumnFactory() {
          @Override
