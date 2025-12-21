@@ -32,6 +32,8 @@ import net.tourbook.data.EquipmentPart;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.dialogs.TitleAreaDialog;
+import org.eclipse.jface.fieldassist.ControlDecoration;
+import org.eclipse.jface.fieldassist.FieldDecorationRegistry;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.layout.PixelConverter;
@@ -121,6 +123,9 @@ public class DialogEquipmentPart extends TitleAreaDialog {
    private AutoComplete_ComboInputMT _autocomplete_PriceUnit;
    private AutoComplete_ComboInputMT _autocomplete_Size;
    private AutoComplete_ComboInputMT _autocomplete_Type;
+
+   private ControlDecoration         _comboDecorator_Date;
+   private ControlDecoration         _comboDecorator_Type;
 
    public DialogEquipmentPart(final Shell parentShell,
                               final Equipment equipment,
@@ -234,7 +239,7 @@ public class DialogEquipmentPart extends TitleAreaDialog {
 
    private void createUI(final Composite parent) {
 
-      final GridDataFactory gdVertCenter = GridDataFactory.fillDefaults().align(SWT.FILL, SWT.CENTER);
+      final GridDataFactory gdVertCenter = GridDataFactory.fillDefaults().align(SWT.BEGINNING, SWT.CENTER);
 
       final int defaultWidth = convertWidthInCharsToPixels(40);
 
@@ -288,13 +293,25 @@ public class DialogEquipmentPart extends TitleAreaDialog {
             // autocomplete combo
             _comboType = new Combo(_container, SWT.BORDER | SWT.FLAT);
             _comboType.setText(UI.EMPTY_STRING);
-            _comboType.setToolTipText(
-                  "With the type and date fields, tours are collated to display\ne.g. all kilometers for one part or one service");
             _comboType.addModifyListener(_defaultModifyListener);
 
             GridDataFactory.fillDefaults().grab(true, false).span(2, 1).applyTo(_comboType);
 
             _autocomplete_Type = new AutoComplete_ComboInputMT(_comboType);
+
+            /*
+             * Add a decoration for this important field
+             */
+            _comboDecorator_Type = new ControlDecoration(_comboType, SWT.CENTER | SWT.LEFT);
+            final Image decorationImage = FieldDecorationRegistry.getDefault()
+                  .getFieldDecoration(FieldDecorationRegistry.DEC_INFORMATION)
+                  .getImage();
+
+            // a restart is required for the theme change to take full effect
+            _comboDecorator_Type.setDescriptionText(
+                  "With the type and date fields, tours are collated to display\ne.g. all kilometers for one part or one service");
+            _comboDecorator_Type.setImage(decorationImage);
+            _comboDecorator_Type.setMarginWidth(3);
          }
          UI.createSpacer_Horizontal(_container, 1);
          {
@@ -346,14 +363,27 @@ public class DialogEquipmentPart extends TitleAreaDialog {
          UI.createSpacer_Horizontal(_container, 1);
          {
             /*
-             * First use date
+             * Date
              */
             final Label label = UI.createLabel(_container, "D&ate");
             gdVertCenter.applyTo(label);
 
             _date = new DateTime(_container, SWT.DATE | SWT.MEDIUM | SWT.DROP_DOWN);
-            _date.setToolTipText("With the type and date fields, tours are collated to display\ne.g. all kilometers for one part or one service");
             _date.addSelectionListener(_defaultSelectionListener);
+
+            /*
+             * Add a decoration for this important field
+             */
+            _comboDecorator_Date = new ControlDecoration(_date, SWT.CENTER | SWT.LEFT);
+            final Image decorationImage = FieldDecorationRegistry.getDefault()
+                  .getFieldDecoration(FieldDecorationRegistry.DEC_INFORMATION)
+                  .getImage();
+
+            // a restart is required for the theme change to take full effect
+            _comboDecorator_Date.setDescriptionText(
+                  "With the type and date fields, tours are collated to display\ne.g. all kilometers for one part or one service");
+            _comboDecorator_Date.setImage(decorationImage);
+            _comboDecorator_Date.setMarginWidth(3);
          }
          UI.createSpacer_Horizontal(_container, 1);
          {

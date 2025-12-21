@@ -857,6 +857,41 @@ public class TourDatabase {
       }
 
       /**
+       * Create a composite index
+       *
+       * @param stmt
+       * @param tableName
+       * @param allColumnNames
+       *
+       * @throws SQLException
+       */
+      private static void createIndex(final Statement stmt,
+                                      final String tableName,
+                                      final String[] allColumnNames) throws SQLException {
+
+         // an exception will be thrown when the index name is larger than the max which is 128 characters
+         final String joinedNames = String.join("__", allColumnNames);
+         final String joinedSQLNames = String.join(", ", allColumnNames);
+
+         final String indexName = tableName + "___" + joinedNames;
+
+         if (isIndexAvailable(stmt.getConnection(), tableName, indexName)) {
+
+            // index already exist -> nothing to do
+
+            return;
+         }
+
+         final String sql = UI.EMPTY_STRING
+
+               + "CREATE INDEX " + indexName //       //$NON-NLS-1$
+               + " ON " + tableName //                //$NON-NLS-1$
+               + " (" + joinedSQLNames + ")"; //      //$NON-NLS-1$ //$NON-NLS-2$
+
+         exec(stmt, sql);
+      }
+
+      /**
        * Combine tableName and columnName to the indexName
        *
        * @param stmt
@@ -2738,11 +2773,11 @@ public class TourDatabase {
       return returnValue[0];
    }
 
-   private static boolean isIndexAvailable(final Connection conn, final String table, final String column) {
+   private static boolean isIndexAvailable(final Connection conn, final String table, final String columnName) {
 
       try {
 
-         final String requestedIndexColumnName = column.toUpperCase();
+         final String requestedIndexColumnName = columnName.toUpperCase();
 
          final DatabaseMetaData meta = conn.getMetaData();
          final ResultSet result = meta.getIndexInfo(null, TABLE_SCHEMA, table, false, false);
@@ -4565,8 +4600,16 @@ public class TourDatabase {
                   + "   REFERENCES " + TABLE_TOUR_DATA + " (" + ENTITY_ID_TOUR + ")       " + NL //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
       );
 
-      // Create index "Equipment_EquipmentId"
-      SQL.createIndex(stmt, JOINTABLE__TOURDATA__EQUIPMENT, KEY_EQUIPMENT);
+      // Create index "TOURDATA_Equipment"
+      SQL.createIndex(stmt,
+
+            JOINTABLE__TOURDATA__EQUIPMENT,
+
+            new String[] //
+            {
+                  KEY_EQUIPMENT,
+                  KEY_TOUR
+            });
    }
 
    /**
@@ -4607,6 +4650,21 @@ public class TourDatabase {
 
                   + ")" //                                                                       //$NON-NLS-1$
       );
+
+      // Create index "EquipmentPart"
+      SQL.createIndex(stmt,
+
+            TABLE_EQUIPMENT_PART,
+
+            new String[] //
+            {
+                  KEY_EQUIPMENT,
+                  "IsCollate",
+                  "Date",
+                  "DateUntil",
+                  "PartID",
+                  "Type"
+            });
    }
 
    /**

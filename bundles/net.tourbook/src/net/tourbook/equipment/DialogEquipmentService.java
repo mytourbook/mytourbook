@@ -32,6 +32,8 @@ import net.tourbook.data.EquipmentService;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.dialogs.TitleAreaDialog;
+import org.eclipse.jface.fieldassist.ControlDecoration;
+import org.eclipse.jface.fieldassist.FieldDecorationRegistry;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.layout.PixelConverter;
@@ -111,6 +113,9 @@ public class DialogEquipmentService extends TitleAreaDialog {
    private AutoComplete_ComboInputMT _autocomplete_Name;
    private AutoComplete_ComboInputMT _autocomplete_PriceUnit;
    private AutoComplete_ComboInputMT _autocomplete_Type;
+
+   private ControlDecoration         _comboDecorator_Date;
+   private ControlDecoration         _comboDecorator_Type;
 
    public DialogEquipmentService(final Shell parentShell,
                                  final Equipment equipment,
@@ -216,7 +221,7 @@ public class DialogEquipmentService extends TitleAreaDialog {
 
    private void createUI(final Composite parent) {
 
-      final GridDataFactory gdVertCenter = GridDataFactory.fillDefaults().align(SWT.FILL, SWT.CENTER);
+      final GridDataFactory gdVertCenter = GridDataFactory.fillDefaults().align(SWT.BEGINNING, SWT.CENTER);
 
       _container = new Composite(parent, SWT.NONE);
       GridDataFactory.fillDefaults().grab(true, true).applyTo(_container);
@@ -273,6 +278,20 @@ public class DialogEquipmentService extends TitleAreaDialog {
             GridDataFactory.fillDefaults().grab(true, false).span(2, 1).applyTo(_comboType);
 
             _autocomplete_Type = new AutoComplete_ComboInputMT(_comboType);
+
+            /*
+             * Add a decoration for this important field
+             */
+            _comboDecorator_Type = new ControlDecoration(_comboType, SWT.CENTER | SWT.LEFT);
+            final Image decorationImage = FieldDecorationRegistry.getDefault()
+                  .getFieldDecoration(FieldDecorationRegistry.DEC_INFORMATION)
+                  .getImage();
+
+            // a restart is required for the theme change to take full effect
+            _comboDecorator_Type.setDescriptionText(
+                  "With the type and date fields, tours are collated to display\ne.g. all kilometers for one part or one service");
+            _comboDecorator_Type.setImage(decorationImage);
+            _comboDecorator_Type.setMarginWidth(3);
          }
          {
             /*
@@ -284,6 +303,20 @@ public class DialogEquipmentService extends TitleAreaDialog {
             _date = new DateTime(_container, SWT.DATE | SWT.MEDIUM | SWT.DROP_DOWN);
             _date.setToolTipText("With the type and date fields, tours are collated to display e.g. all kilometers for one part or one service");
             _date.addSelectionListener(_defaultSelectionListener);
+
+            /*
+             * Add a decoration for this important field
+             */
+            _comboDecorator_Date = new ControlDecoration(_date, SWT.CENTER | SWT.LEFT);
+            final Image decorationImage = FieldDecorationRegistry.getDefault()
+                  .getFieldDecoration(FieldDecorationRegistry.DEC_INFORMATION)
+                  .getImage();
+
+            // a restart is required for the theme change to take full effect
+            _comboDecorator_Date.setDescriptionText(
+                  "With the type and date fields, tours are collated to display\ne.g. all kilometers for one part or one service");
+            _comboDecorator_Date.setImage(decorationImage);
+            _comboDecorator_Date.setMarginWidth(3);
          }
          UI.createSpacer_Horizontal(_container, 1);
          {
