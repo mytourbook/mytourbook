@@ -30,6 +30,7 @@ import net.tourbook.common.CommonActivator;
 import net.tourbook.common.UI;
 import net.tourbook.common.formatter.ValueFormat;
 import net.tourbook.common.time.TimeTools;
+import net.tourbook.common.ui.SelectionCellLabelProvider;
 import net.tourbook.common.util.ColumnDefinition;
 import net.tourbook.common.util.ColumnManager;
 import net.tourbook.common.util.IContextMenuProvider;
@@ -44,6 +45,7 @@ import net.tourbook.data.EquipmentPart;
 import net.tourbook.data.EquipmentService;
 import net.tourbook.data.TourData;
 import net.tourbook.database.TourDatabase;
+import net.tourbook.equipment.TVIEquipmentView_Root.EquipmentPartValues;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.tour.ITourEventListener;
 import net.tourbook.tour.SelectionTourId;
@@ -150,7 +152,7 @@ public class EquipmentView extends ViewPart implements ITourProvider, ITourViewe
 
    private TreeViewer                          _equipmentViewer;
    private ColumnManager                       _columnManager;
-   private TVIEquipmentView_EquipRoot          _rootItem;
+   private TVIEquipmentView_Root               _rootItem;
 
    private MenuManager                         _viewerMenuManager;
    private Menu                                _treeContextMenu;
@@ -918,6 +920,9 @@ public class EquipmentView extends ViewPart implements ITourProvider, ITourViewe
       defineColumn_Time_Date_Built();
       defineColumn_Time_Date_Retired();
 
+      defineColumn_Tour_Distance();
+      defineColumn_Tour_MovingTime();
+
       defineColumn_Equipment_ID();
    }
 
@@ -977,11 +982,6 @@ public class EquipmentView extends ViewPart implements ITourProvider, ITourViewe
 
             final long numTours = viewItem.numTours;
 
-            // hide number of tours
-//            if (_tagFilterType == TagFilterType.TAGS_WITHOUT_TOURS) {
-//               numTours = 0;
-//            }
-
             final StyledString styledString = new StyledString();
 
             if (viewItem instanceof final TVIEquipmentView_Tour tourItem) {
@@ -1015,7 +1015,7 @@ public class EquipmentView extends ViewPart implements ITourProvider, ITourViewe
                styledString.append(viewItem.firstColumn, net.tourbook.ui.UI.CONTENT_SUB_CATEGORY_STYLER);
 
                if (numTours > 0) {
-                  styledString.append(UI.SPACE3 + numTours, net.tourbook.ui.UI.TOTAL_STYLER);
+                  styledString.append(UI.SPACE3 + UI.SYMBOL_STAR, net.tourbook.ui.UI.TOTAL_STYLER);
                }
 
                cell.setImage(_imgEquipment_All);
@@ -1027,6 +1027,10 @@ public class EquipmentView extends ViewPart implements ITourProvider, ITourViewe
                 */
 
                styledString.append(viewItem.firstColumn, net.tourbook.ui.UI.TOUR_STYLER);
+
+               if (numTours > 0) {
+                  styledString.append(UI.SPACE3 + numTours, net.tourbook.ui.UI.TOTAL_STYLER);
+               }
 
                cell.setImage(_imgEquipment_Part);
 
@@ -1044,6 +1048,7 @@ public class EquipmentView extends ViewPart implements ITourProvider, ITourViewe
 
                styledString.append(viewItem.firstColumn, net.tourbook.ui.UI.TOUR_STYLER);
             }
+
 
             cell.setText(styledString.getString());
             cell.setStyleRanges(styledString.getStyleRanges());
@@ -1117,8 +1122,6 @@ public class EquipmentView extends ViewPart implements ITourProvider, ITourViewe
 
       final ColumnDefinition colDef = TreeColumnFactory.EQUIPMENT_ID.createColumn(_columnManager, _pc);
 
-      colDef.setIsDefaultColumn();
-
       colDef.setLabelProvider(new CellLabelProvider() {
 
          @Override
@@ -1156,8 +1159,6 @@ public class EquipmentView extends ViewPart implements ITourProvider, ITourViewe
    private void defineColumn_Equipment_InitialDistance() {
 
       final ColumnDefinition colDef = TreeColumnFactory.EQUIPMENT_INITIAL_DISTANCE.createColumn(_columnManager, _pc);
-
-      colDef.setIsDefaultColumn();
 
       colDef.setLabelProvider(new CellLabelProvider() {
 
@@ -1575,6 +1576,64 @@ public class EquipmentView extends ViewPart implements ITourProvider, ITourViewe
       });
    }
 
+   /**
+    * Column: Distance
+    */
+   private void defineColumn_Tour_Distance() {
+
+      final ColumnDefinition colDef = TreeColumnFactory.EQUIPMENT_TOUR_DISTANCE.createColumn(_columnManager, _pc);
+
+      colDef.setIsDefaultColumn();
+
+      colDef.setLabelProvider(new CellLabelProvider() {
+
+         @Override
+         public void update(final ViewerCell cell) {
+
+            final Object element = cell.getElement();
+
+            if (element instanceof final TVIEquipmentView_Item treeItem) {
+
+               final float distance = treeItem.distance;
+
+               if (distance != 0) {
+
+                  final double value = distance
+                        / 1000.0
+                        / UI.UNIT_VALUE_DISTANCE;
+
+                  colDef.printDoubleValue(cell, value, false);
+                  setCellColor(cell, element);
+               }
+            }
+         }
+      });
+   }
+
+   /**
+    * Column: Time - Moving time (h)
+    */
+   private void defineColumn_Tour_MovingTime() {
+
+      final TreeColumnDefinition colDef = TreeColumnFactory.TIME__COMPUTED_MOVING_TIME.createColumn(_columnManager, _pc);
+
+      colDef.setIsDefaultColumn();
+
+      colDef.setLabelProvider(new SelectionCellLabelProvider() {
+         @Override
+         public void update(final ViewerCell cell) {
+
+            final Object element = cell.getElement();
+
+            final long value = ((TVIEquipmentView_Item) element).movingTime;
+            final boolean isDetail = element instanceof TVIEquipmentView_Tour;
+
+            colDef.printLongValue(cell, value, isDetail);
+            setCellColor(cell, element);
+         }
+      });
+   }
+
    @Override
    public void dispose() {
 
@@ -1875,7 +1934,7 @@ public class EquipmentView extends ViewPart implements ITourProvider, ITourViewe
       for (final TreeViewerItem rootItem : allRootItems) {
 
          // is recursive !!!
-         loadAllTreeItems(rootItem);
+         loadAllTreeItems(rootItem, _rootItem);
       }
    }
 
@@ -1886,7 +1945,7 @@ public class EquipmentView extends ViewPart implements ITourProvider, ITourViewe
     *
     * @param parentItem
     */
-   private void loadAllTreeItems(final TreeViewerItem parentItem) {
+   private void loadAllTreeItems(final TreeViewerItem parentItem, final TVIEquipmentView_Root rootItem) {
 
       final ArrayList<TreeViewerItem> allFetchedChildren = parentItem.getFetchedChildren();
 
@@ -1897,41 +1956,46 @@ public class EquipmentView extends ViewPart implements ITourProvider, ITourViewe
             continue;
          }
 
-         loadAllTreeItems(childItem);
+         loadAllTreeItems(childItem, rootItem);
       }
 
       /*
-       * Collect number of ...
-       */
-
-      int numTags_NoTours = 0;
-      int numTours_InTourItems = 0;
-
-      for (final TreeViewerItem childItem : allFetchedChildren) {
-
-         if (childItem instanceof TVIEquipmentView_Tour) {
-
-            numTours_InTourItems++;
-         }
-      }
-
-      if (numTours_InTourItems == 0) {
-
-         numTags_NoTours++;
-      }
-
-// SET_FORMATTING_OFF
-
-      /*
-       * Update number of tours in parent item and up to the tag item
+       * Set tour values
        */
       if (parentItem instanceof final TVIEquipmentView_Equipment equipmentItem) {
 
-         equipmentItem.numTours           += numTours_InTourItems;
-         equipmentItem.numTags_NoTours    += numTags_NoTours;
-      }
+      } else if (parentItem instanceof final TVIEquipmentView_Part partItem) {
 
-// SET_FORMATTING_ON
+         final String partKey = partItem.getTourValuesKey();
+
+         final EquipmentPartValues equipmentPartValues = rootItem.allSummarizedTourValues.get(partKey);
+
+         if (equipmentPartValues != null) {
+
+            final int numTours = equipmentPartValues.numTours;
+            final float distance = equipmentPartValues.distance;
+            final long movingTime = equipmentPartValues.movingTime;
+
+            partItem.numTours = numTours;
+            partItem.distance = distance;
+            partItem.movingTime = movingTime;
+
+            /*
+             * Summarize parent values
+             */
+            final TreeViewerItem partParentItem = partItem.getParentItem();
+
+            if (partParentItem instanceof final TVIEquipmentView_Equipment partEquipmentItem) {
+
+               partEquipmentItem.numTours += numTours;
+               partEquipmentItem.distance += distance;
+               partEquipmentItem.movingTime += movingTime;
+            }
+         }
+
+      } else if (parentItem instanceof final TVIEquipmentView_Service serviceItem) {
+
+      }
    }
 
    private void onAction_DeleteEquipment() {
@@ -2517,7 +2581,7 @@ public class EquipmentView extends ViewPart implements ITourProvider, ITourViewe
 
    private void reloadViewer_SetContent() {
 
-      _rootItem = new TVIEquipmentView_EquipRoot(_equipmentViewer);
+      _rootItem = new TVIEquipmentView_Root(_equipmentViewer);
 
       // first: load all tree items
       loadAllTreeItems();

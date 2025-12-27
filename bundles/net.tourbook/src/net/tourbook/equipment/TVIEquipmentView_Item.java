@@ -17,6 +17,7 @@ package net.tourbook.equipment;
 
 import java.time.LocalDateTime;
 
+import net.tourbook.common.UI;
 import net.tourbook.common.util.TreeViewerItem;
 
 import org.eclipse.jface.viewers.TreeViewer;
@@ -40,8 +41,10 @@ public abstract class TVIEquipmentView_Item extends TreeViewerItem {
     */
    LocalDateTime      date;
 
-   long               numTours;
-   int                numTags_NoTours;
+   int                numTours;
+
+   float              distance;
+   long               movingTime;
 
    /*
     * These are common values for equipment, part and service
@@ -72,4 +75,8 @@ public abstract class TVIEquipmentView_Item extends TreeViewerItem {
       return _equipmentViewer;
    }
 
+   String getTourValuesKey(final long equipmentID, final long partID, final String partType) {
+
+      return equipmentID + UI.DASH + partID + UI.DASH + partType;
+   }
 }

@@ -36,6 +36,7 @@ public class TVIEquipmentView_Part extends TVIEquipmentView_Item {
       setParentItem(tviEquipmentView_Equipment);
 
       _equipment = tviEquipmentView_Equipment.getEquipment();
+
       _part = equipmentPart;
       _partID = equipmentPart.getPartId();
    }
@@ -56,6 +57,11 @@ public class TVIEquipmentView_Part extends TVIEquipmentView_Item {
 
    public long getPartID() {
       return _partID;
+   }
+
+   public String getTourValuesKey() {
+
+      return getTourValuesKey(_equipment.getEquipmentId(), _partID, _part.getType());
    }
 
    @Override
