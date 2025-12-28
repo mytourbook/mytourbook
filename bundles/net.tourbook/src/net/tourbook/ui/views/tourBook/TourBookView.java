@@ -2459,7 +2459,7 @@ public class TourBookView extends ViewPart implements
             oneTourTagIds,
             isFlatView);
 
-      _equipmentMenuManager.enableEquipmentActions(allSelectedTourItems);
+      _equipmentMenuManager.enableActions(allSelectedTourItems);
 
       final long tourTypeID = isOneTourSelected
             ? firstTourItem.getTourTypeId()

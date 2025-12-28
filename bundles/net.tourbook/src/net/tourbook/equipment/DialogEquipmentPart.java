@@ -182,10 +182,10 @@ public class DialogEquipmentPart extends TitleAreaDialog {
             ? "Duplicate Part"
             : _isNewPart
 
-                  ? "Create Equipment Part"
-                  : "Edit Equipment Part";
+                  ? "Create part for \"%s\""
+                  : "Edit part for: \"%s\"";
 
-      setTitle(messageTitle);
+      setTitle(messageTitle.formatted(_partEquipment.getName()));
       setMessage(_part.getName());
    }
 

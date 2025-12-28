@@ -36,6 +36,7 @@ public class TVIEquipmentView_Service extends TVIEquipmentView_Item {
       setParentItem(tviEquipmentView_Equipment);
 
       _equipment = tviEquipmentView_Equipment.getEquipment();
+
       _service = equipmentService;
       _serviceID = equipmentService.getServiceId();
    }
@@ -50,12 +51,18 @@ public class TVIEquipmentView_Service extends TVIEquipmentView_Item {
       return _equipment;
    }
 
+   public EquipmentService getService() {
+      return _service;
+   }
+
    public long getServiceID() {
       return _serviceID;
    }
 
-   public EquipmentService getService() {
-      return _service;
+
+   public String getTourValuesKey() {
+
+      return getTourValuesKey(_equipment.getEquipmentId(), _serviceID, _service.getType());
    }
 
    @Override
@@ -63,5 +70,4 @@ public class TVIEquipmentView_Service extends TVIEquipmentView_Item {
 
       return false;
    }
-
 }

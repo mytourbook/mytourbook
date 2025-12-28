@@ -4699,6 +4699,21 @@ public class TourDatabase {
 
                   + ")" //                                                                       //$NON-NLS-1$
       );
+
+      // Create index "EquipmentService"
+      SQL.createIndex(stmt,
+
+            TABLE_EQUIPMENT_SERVICE,
+
+            new String[] //
+            {
+                  KEY_EQUIPMENT,
+                  "IsCollate",
+                  "Date",
+                  "DateUntil",
+                  "ServiceID",
+                  "Type"
+            });
    }
 
    /**

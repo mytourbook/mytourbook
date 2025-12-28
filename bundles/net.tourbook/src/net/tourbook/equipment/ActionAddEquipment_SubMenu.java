@@ -22,6 +22,7 @@ import java.util.Set;
 import net.tourbook.Images;
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
+import net.tourbook.common.UI;
 import net.tourbook.common.ui.SubMenu;
 import net.tourbook.common.util.Util;
 import net.tourbook.data.Equipment;
@@ -41,7 +42,9 @@ public class ActionAddEquipment_SubMenu extends SubMenu {
 
    private class ActionEquipment extends Action {
 
-      private final Equipment __equipment;
+      private static final char NL = UI.NEW_LINE;
+
+      private final Equipment   __equipment;
 
       public ActionEquipment(final Equipment equipment) {
 
@@ -62,6 +65,16 @@ public class ActionAddEquipment_SubMenu extends SubMenu {
                _equipmentMenuManager.isCheckTourEditor());
 
          _equipmentMenuManager.updateRecentEquipment(__equipment);
+      }
+
+      @Override
+      public String toString() {
+
+         return UI.EMPTY_STRING
+
+               + "ActionEquipment" + NL //               //$NON-NLS-1$
+               + " __equipment = " + __equipment + NL //               //$NON-NLS-1$
+         ;
       }
    }
 
