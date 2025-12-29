@@ -20,6 +20,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -141,6 +142,44 @@ public class EquipmentManager {
       }
    }
 
+   public static void equipment_Add(final Collection<Equipment> allEquipment,
+                                    final ITourProvider tourProvider,
+                                    final boolean isSaveTour,
+                                    final boolean isCheckTourEditor) {
+
+      // fix https://github.com/mytourbook/mytourbook/issues/1437
+      if (isCheckTourEditor) {
+
+         if (TourManager.isTourEditorModified()) {
+            return;
+         }
+      }
+
+      final ITourDataUpdate_OnlyUpdate tourDataUpdater = new ITourDataUpdate_OnlyUpdate() {
+
+         @Override
+         public boolean updateTourData(final TourData tourData) {
+
+            final Set<Equipment> allTourEquipment = tourData.getEquipment();
+
+            boolean isAdded = false;
+
+            for (final Equipment equipment : allEquipment) {
+
+               final boolean isAddedOneTour = allTourEquipment.add(equipment);
+
+               if (isAddedOneTour) {
+                  isAdded = true;
+               }
+            }
+
+            return isAdded;
+         }
+      };
+
+      updateTours(tourProvider, tourDataUpdater, isSaveTour);
+   }
+
    /**
     * Add equipment additional to the existing equipment
     *
@@ -170,38 +209,13 @@ public class EquipmentManager {
 
             final Set<Equipment> allEquipment = tourData.getEquipment();
 
-            allEquipment.add(equipment);
+            final boolean isAdded = allEquipment.add(equipment);
 
-            return true;
+            return isAdded;
          }
       };
 
-      if (tourProvider instanceof final ITourProviderByID tourProviderByID
-            && isSaveTour) {
-
-         // this is the FAST update method
-
-         final Set<Long> selectedTourIDs = tourProviderByID.getSelectedTourIDs();
-
-         // save all tours with the added equipment
-         TourManager.updateTourData_Concurrent(selectedTourIDs, tourDataUpdater);
-
-      } else {
-
-         // this is the SLOW update method
-
-         final ArrayList<TourData> allSelectedTours = tourProvider.getSelectedTours();
-
-         if (allSelectedTours != null && allSelectedTours.size() > 0) {
-
-            for (final TourData tourData : allSelectedTours) {
-
-               tourDataUpdater.updateTourData(tourData);
-
-               saveAndNotify(tourProvider, isSaveTour, allSelectedTours);
-            }
-         }
-      }
+      updateTours(tourProvider, tourDataUpdater, isSaveTour);
    }
 
    /**
@@ -584,7 +598,7 @@ public class EquipmentManager {
    }
 
    /**
-    * Remove equipment
+    * Remove one equipment from the selected tours
     *
     * @param equipment
     * @param tourProvider
@@ -605,28 +619,59 @@ public class EquipmentManager {
          }
       }
 
-      final Runnable runnable = new Runnable() {
+      final ITourDataUpdate_OnlyUpdate tourDataUpdater = new ITourDataUpdate_OnlyUpdate() {
+
          @Override
-         public void run() {
+         public boolean updateTourData(final TourData tourData) {
 
-            final ArrayList<TourData> selectedTours = tourProvider.getSelectedTours();
-            if (selectedTours == null || selectedTours.isEmpty()) {
-               return;
-            }
+            final Set<Equipment> allEquipment = tourData.getEquipment();
 
-            // add equipment in all tours (without tours which are opened in an editor)
-            for (final TourData tourData : selectedTours) {
+            final boolean isRemoved = allEquipment.remove(equipment);
 
-               final Set<Equipment> allEquipment = tourData.getEquipment();
-
-               allEquipment.remove(equipment);
-            }
-
-            saveAndNotify(tourProvider, isSaveTour, selectedTours);
+            return isRemoved;
          }
       };
 
-      BusyIndicator.showWhile(Display.getCurrent(), runnable);
+      updateTours(tourProvider, tourDataUpdater, isSaveTour);
+   }
+
+   /**
+    * Remove all equipment from the selected tours
+    *
+    * @param tourProvider
+    * @param isSaveTour
+    * @param isCheckTourEditor
+    */
+   public static void equipment_RemoveAll(final ITourProvider tourProvider,
+                                          final boolean isSaveTour,
+                                          final boolean isCheckTourEditor) {
+
+      // fix https://github.com/mytourbook/mytourbook/issues/1437
+      if (isCheckTourEditor) {
+
+         if (TourManager.isTourEditorModified()) {
+            return;
+         }
+      }
+
+      final ITourDataUpdate_OnlyUpdate tourDataUpdater = new ITourDataUpdate_OnlyUpdate() {
+
+         @Override
+         public boolean updateTourData(final TourData tourData) {
+
+            final Set<Equipment> allEquipment = tourData.getEquipment();
+
+            if (allEquipment.size() == 0) {
+               return false;
+            }
+
+            allEquipment.clear();
+
+            return true;
+         }
+      };
+
+      updateTours(tourProvider, tourDataUpdater, isSaveTour);
    }
 
    /**
@@ -1097,6 +1142,45 @@ public class EquipmentManager {
          } else {
 
             TourManager.fireEvent(TourEventId.TOUR_CHANGED, new TourEvent(selectedTours));
+         }
+      }
+   }
+
+   /**
+    * Update and save tours
+    *
+    * @param tourProvider
+    * @param tourDataUpdater
+    * @param isSaveTour
+    */
+   private static void updateTours(final ITourProvider tourProvider,
+                                   final ITourDataUpdate_OnlyUpdate tourDataUpdater,
+                                   final boolean isSaveTour) {
+
+      if (tourProvider instanceof final ITourProviderByID tourProviderByID
+            && isSaveTour) {
+
+         // this is the FAST update method
+
+         final Set<Long> selectedTourIDs = tourProviderByID.getSelectedTourIDs();
+
+         // save all tours with the added equipment
+         TourManager.updateTourData_Concurrent(selectedTourIDs, tourDataUpdater);
+
+      } else {
+
+         // this is the SLOW update method
+
+         final ArrayList<TourData> allSelectedTours = tourProvider.getSelectedTours();
+
+         if (allSelectedTours != null && allSelectedTours.size() > 0) {
+
+            for (final TourData tourData : allSelectedTours) {
+
+               tourDataUpdater.updateTourData(tourData);
+
+               saveAndNotify(tourProvider, isSaveTour, allSelectedTours);
+            }
          }
       }
    }

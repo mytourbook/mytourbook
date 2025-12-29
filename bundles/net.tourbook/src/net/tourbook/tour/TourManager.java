@@ -3956,8 +3956,13 @@ public class TourManager {
             _tourUpdate_CountDownLatch = new CountDownLatch(numAllTourIds);
             _tourUpdate_Queue.clear();
 
-            int monitorCounter = 0;
-            long lastUIUpdateTime = 0;
+            int numWorked = 0;
+            long lastUIUpdateTime = System.currentTimeMillis();
+
+            /*
+             * Setup monitor
+             */
+            int numLastWorked = 0;
 
             monitor.beginTask(Messages.Tour_Data_Task_UpdateTours, numAllTourIds);
 
@@ -3966,13 +3971,19 @@ public class TourManager {
 
                // reduce monitor updates
                final long currentTime = System.currentTimeMillis();
-               if (currentTime > lastUIUpdateTime + 200) {
+
+               if (currentTime > lastUIUpdateTime + 500) {
 
                   lastUIUpdateTime = currentTime;
 
                   monitor.subTask(Messages.Tour_Data_Task_UpdateTours_Subtask.formatted(
-                        monitorCounter,
+                        numWorked,
                         numAllTourIds));
+
+                  // "{0} / {1} - {2} % - {3} Δ"
+                  UI.showWorkedInProgressMonitor(monitor, numWorked, numAllTourIds, numLastWorked);
+
+                  numLastWorked = numWorked;
                }
 
                if (monitor.isCanceled()) {
@@ -3990,10 +4001,10 @@ public class TourManager {
 
                updateTourData_Concurrent_OneTour(tourId, tourDataUpdater, _allSavedTours, _allSavedTourIds, monitor);
 
-               ++monitorCounter;
+               ++numWorked;
             }
 
-            // wait until all loadings are performed
+            // wait until all updates are performed
             _tourUpdate_CountDownLatch.await();
 
             /*

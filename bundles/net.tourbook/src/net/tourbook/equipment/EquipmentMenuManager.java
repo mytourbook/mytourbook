@@ -42,11 +42,7 @@ import net.tourbook.data.TourData;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.preferences.PrefPageEquipment;
 import net.tourbook.preferences.PrefPageEquipmentGroups;
-import net.tourbook.tour.TourEvent;
-import net.tourbook.tour.TourEventId;
-import net.tourbook.tour.TourManager;
 import net.tourbook.ui.ITourProvider;
-import net.tourbook.ui.ITourProvider2;
 import net.tourbook.ui.action.IActionProvider;
 import net.tourbook.ui.action.TourActionCategory;
 import net.tourbook.ui.action.TourActionManager;
@@ -59,12 +55,10 @@ import org.eclipse.jface.action.Separator;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.util.IPropertyChangeListener;
-import org.eclipse.swt.custom.BusyIndicator;
 import org.eclipse.swt.dnd.ByteArrayTransfer;
 import org.eclipse.swt.dnd.Clipboard;
 import org.eclipse.swt.dnd.Transfer;
 import org.eclipse.swt.dnd.TransferData;
-import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.ui.PlatformUI;
 
@@ -206,7 +200,7 @@ public class EquipmentMenuManager implements IActionProvider {
       @Override
       public void run() {
 
-         saveEquipment(__equipmentGroup);
+         equipment_Add(__equipmentGroup);
       }
    }
 
@@ -255,7 +249,7 @@ public class EquipmentMenuManager implements IActionProvider {
       @Override
       public void run() {
 
-         BusyIndicator.showWhile(Display.getCurrent(), () -> removeAllEquipment());
+         EquipmentManager.equipment_RemoveAll(_tourProvider, _isSaveTour, _isCheckTourEditor);
       }
    }
 
@@ -517,7 +511,7 @@ public class EquipmentMenuManager implements IActionProvider {
 
          if (allClipboardEquipment.size() > 0) {
 
-            saveEquipment_All(allClipboardEquipment, true);
+            equipment_Add(allClipboardEquipment.values());
          }
       }
    }
@@ -696,6 +690,44 @@ public class EquipmentMenuManager implements IActionProvider {
          actionRecentEquipment.setEnabled(isEquipmentEnabled);
          actionRecentEquipment.setChecked(isEquipmentChecked);
       }
+   }
+
+   /**
+    * Add and save multiple equipment in the selected tours
+    *
+    * @param allModifiedEquipment
+    */
+   private void equipment_Add(final Collection<Equipment> allModifiedEquipment) {
+
+      EquipmentManager.equipment_Add(
+
+            allModifiedEquipment,
+            _tourProvider,
+
+            _isSaveTour,
+            _isCheckTourEditor);
+
+      // update recent equipment
+      for (final Equipment equipment : allModifiedEquipment) {
+         updateRecentEquipment(equipment);
+      }
+   }
+
+   /**
+    * Set and save all tour equipment from a group
+    *
+    * @param equipmentGroup
+    */
+   private void equipment_Add(final EquipmentGroup equipmentGroup) {
+
+      final HashMap<Long, Equipment> allEquipment = new HashMap<>();
+
+      for (final Equipment equipment : equipmentGroup.allEquipment) {
+
+         allEquipment.put(equipment.getEquipmentId(), equipment);
+      }
+
+      equipment_Add(allEquipment.values());
    }
 
    @Override
@@ -897,137 +929,6 @@ public class EquipmentMenuManager implements IActionProvider {
 
    public boolean isSaveTour() {
       return _isSaveTour;
-   }
-
-   private void removeAllEquipment() {
-
-      // get all tours which equipment should be changed
-      final ArrayList<TourData> allModifiedTours = _tourProvider.getSelectedTours();
-      final ArrayList<TourData> allToursWithEquipment = new ArrayList<>();
-
-      if (allModifiedTours == null || allModifiedTours.isEmpty()) {
-         return;
-      }
-
-      final HashMap<Long, Equipment> allRemovedEquipment = new HashMap<>();
-
-      // remove equipment in all tours (without tours from an editor)
-      for (final TourData tourData : allModifiedTours) {
-
-         // get all equipment which will be removed
-         final Set<Equipment> allTourEquipment = tourData.getEquipment();
-
-         if (allTourEquipment.size() > 0) {
-
-            allToursWithEquipment.add(tourData);
-
-            for (final Equipment equipment : allTourEquipment) {
-               allRemovedEquipment.put(equipment.getEquipmentId(), equipment);
-            }
-
-            // remove all equipment
-            allTourEquipment.clear();
-         }
-      }
-
-      saveAndNotify(allToursWithEquipment, allRemovedEquipment);
-   }
-
-   /**
-    * Save modified tours and notify tour provider
-    *
-    * @param allModifiedTours
-    * @param allModifiedEquipment
-    */
-   private void saveAndNotify(ArrayList<TourData> allModifiedTours, final Map<Long, Equipment> allModifiedEquipment) {
-
-      if (_isSaveTour) {
-
-         // save all tours with the removed equipment
-
-         allModifiedTours = TourManager.saveModifiedTours(allModifiedTours);
-
-      } else {
-
-         // tours are not saved but the tour provider must be notified that tours has changed
-
-         if (_tourProvider instanceof ITourProvider2) {
-
-            ((ITourProvider2) _tourProvider).toursAreModified(allModifiedTours);
-
-         } else {
-
-            TourManager.fireEvent(TourEventId.TOUR_CHANGED, new TourEvent(allModifiedTours));
-         }
-      }
-   }
-
-   /**
-    * Set and save all tour equipment from a group
-    *
-    * @param equipmentGroup
-    */
-   private void saveEquipment(final EquipmentGroup equipmentGroup) {
-
-      final HashMap<Long, Equipment> allEquipment = new HashMap<>();
-
-      for (final Equipment equipment : equipmentGroup.allEquipment) {
-
-         allEquipment.put(equipment.getEquipmentId(), equipment);
-      }
-
-      saveEquipment_All(allEquipment, true);
-   }
-
-   /**
-    * Add or remove and save multiple equipment in the selected tours
-    *
-    * @param mapWithAllModifiedEquipment
-    * @param isAddMode
-    *           When <code>true</code> then equipment are added otherwise they are removed
-    */
-   private void saveEquipment_All(final Map<Long, Equipment> mapWithAllModifiedEquipment,
-                                  final boolean isAddMode) {
-
-      final Runnable runnable = () -> {
-
-         final ArrayList<TourData> allSelectedTours = _tourProvider.getSelectedTours();
-
-         // get tours which equipment should be changed
-         if (allSelectedTours == null || allSelectedTours.isEmpty()) {
-            return;
-         }
-
-         final Collection<Equipment> allModifiedEquipment = mapWithAllModifiedEquipment.values();
-
-         // add the equipment into all selected tours
-         for (final TourData tourData : allSelectedTours) {
-
-            // set equipment into a tour
-            final Set<Equipment> allEquipment = tourData.getEquipment();
-
-            if (isAddMode) {
-
-               // add equipment to the tour
-               allEquipment.addAll(allModifiedEquipment);
-
-            } else {
-
-               // remove equipment from tour
-               allEquipment.removeAll(allModifiedEquipment);
-            }
-         }
-
-         // update recent equipment
-         for (final Equipment equipment : allModifiedEquipment) {
-
-            _allRecentEquipment.putFirst(equipment.getEquipmentId(), equipment);
-         }
-
-         saveAndNotify(allSelectedTours, mapWithAllModifiedEquipment);
-      };
-
-      BusyIndicator.showWhile(Display.getCurrent(), runnable);
    }
 
    public void updateRecentEquipment(final Equipment equipment) {
