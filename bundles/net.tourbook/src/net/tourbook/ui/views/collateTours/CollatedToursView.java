@@ -132,7 +132,12 @@ import org.eclipse.swt.widgets.TreeColumn;
 import org.eclipse.ui.ISelectionListener;
 import org.eclipse.ui.part.ViewPart;
 
-public class CollatedToursView extends ViewPart implements ITourProvider, ITourViewer3, ITourProviderByID, ITreeViewer {
+public class CollatedToursView extends ViewPart implements
+
+      ITourProvider,
+      ITourProviderByID,
+      ITourViewer3,
+      ITreeViewer {
 
    public static final String ID = "net.tourbook.ui.views.collateTours.CollatedToursView"; //$NON-NLS-1$
 

@@ -72,6 +72,7 @@ import net.tourbook.data.TourData;
 import net.tourbook.data.TourMarker;
 import net.tourbook.data.TourPhoto;
 import net.tourbook.database.ITourDataUpdate;
+import net.tourbook.database.ITourDataUpdate_OnlyUpdate;
 import net.tourbook.database.MyTourbookException;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.importdata.RawDataManager;
@@ -3937,7 +3938,7 @@ public class TourManager {
     * @param tourDataUpdater
     */
    public static void updateTourData_Concurrent(final Set<Long> allTourIds,
-                                                final ITourDataUpdate tourDataUpdater) {
+                                                final ITourDataUpdate_OnlyUpdate tourDataUpdater) {
 
       final int numAllTourIds = allTourIds.size();
 
@@ -4050,7 +4051,7 @@ public class TourManager {
     * @return
     */
    private static void updateTourData_Concurrent_OneTour(final long tourId,
-                                                         final ITourDataUpdate tourDataUpdater,
+                                                         final ITourDataUpdate_OnlyUpdate tourDataUpdater,
                                                          final List<TourData> allSavedTours,
                                                          final ConcurrentSkipListSet<Long> allSavedTourIds,
                                                          final IProgressMonitor monitor) {

@@ -15,18 +15,17 @@
  *******************************************************************************/
 package net.tourbook.ui.action;
 
-import java.util.List;
 import java.util.Set;
 
 import net.tourbook.Messages;
 import net.tourbook.data.TourData;
-import net.tourbook.database.ITourDataUpdate;
+import net.tourbook.database.ITourDataUpdate_OnlyUpdate;
 import net.tourbook.tour.TourManager;
 import net.tourbook.ui.ITourProviderByID;
 
 import org.eclipse.jface.action.Action;
 
-public class ActionComputeTourBreakTimes extends Action implements ITourDataUpdate {
+public class ActionComputeTourBreakTimes extends Action implements ITourDataUpdate_OnlyUpdate {
 
    private final ITourProviderByID _tourProvider;
 
@@ -38,19 +37,6 @@ public class ActionComputeTourBreakTimes extends Action implements ITourDataUpda
 
       setText(Messages.Tour_Action_ComputeTourBreakTimes);
       setToolTipText(Messages.Tour_Action_ComputeTourBreakTimes_Tooltip);
-   }
-
-   @Override
-   public int getDatabaseVersion() {
-
-      // this is not needed
-
-      return 0;
-   }
-
-   @Override
-   public List<Long> getTourIDs() {
-      return null;
    }
 
    @Override
