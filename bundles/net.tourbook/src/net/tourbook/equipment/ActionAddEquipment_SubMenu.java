@@ -124,16 +124,23 @@ public class ActionAddEquipment_SubMenu extends SubMenu {
          }
       }
 
-      final List<Equipment> allEquipments = EquipmentManager.getAllEquipment_Name();
+      final int numSelectedTour = allSelectedTours.size();
 
-      for (final Equipment equipment : allEquipments) {
+      final List<Equipment> allEquipment = EquipmentManager.getAllEquipment_Name();
+
+      for (final Equipment equipment : allEquipment) {
 
          final ActionEquipment action = new ActionEquipment(equipment);
 
-         final boolean isEquipmentAlreadySet = allUsedEquipmentIDs.contains(equipment.getEquipmentId());
+         if (numSelectedTour == 1) {
 
-         if (isEquipmentAlreadySet) {
-            action.setEnabled(false);
+            // disable action only when one tour is selected
+
+            final boolean isEquipmentAlreadySet = allUsedEquipmentIDs.contains(equipment.getEquipmentId());
+
+            if (isEquipmentAlreadySet) {
+               action.setEnabled(false);
+            }
          }
 
          addActionToMenu(action);

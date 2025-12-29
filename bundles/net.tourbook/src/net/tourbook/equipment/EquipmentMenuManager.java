@@ -85,8 +85,7 @@ public class EquipmentMenuManager implements IActionProvider {
 
    /**
     * Number of equipment which are displayed in the context menu or saved in the dialog settings,
-    * it's
-    * max number is 9 to have a unique accelerator key
+    * it's max number is 9 to have a unique accelerator key
     */
    private static int                            _maxRecentEquipment;
 
@@ -673,13 +672,13 @@ public class EquipmentMenuManager implements IActionProvider {
          boolean isEquipmentEnabled;
          boolean isEquipmentChecked = false;
 
+         final boolean isRecentEquipmentSelected = allSelectedEquipmentIDs_AllTours.contains(recentEquipmentID);
+
          if (isOneTourWithEquipment) {
 
             // one tour is selected
 
             // disable action when its tour equipment id is selected
-            final boolean isRecentEquipmentSelected = allSelectedEquipmentIDs_AllTours.contains(recentEquipmentID);
-
             isEquipmentEnabled = isRecentEquipmentSelected == false;
             isEquipmentChecked = isRecentEquipmentSelected;
 
@@ -689,7 +688,7 @@ public class EquipmentMenuManager implements IActionProvider {
 
             isEquipmentEnabled = true;
 
-            if (allSelectedEquipmentIDs_AllTours.contains(recentEquipmentID)) {
+            if (isRecentEquipmentSelected) {
                isEquipmentChecked = true;
             }
          }
