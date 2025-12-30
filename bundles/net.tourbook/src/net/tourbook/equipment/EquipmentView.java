@@ -130,7 +130,6 @@ public class EquipmentView extends ViewPart implements ITourProvider, ITourViewe
     * Using large numbers to easier debug and find issues
     */
    private static final int              STATE_ITEM_TYPE_EQUIPMENT              = 1111;
-   private static final int              STATE_ITEM_TYPE_ALL_TOURS              = 2222;
 
    private static final IPreferenceStore _prefStore                             = TourbookPlugin.getPrefStore();
    private static final IPreferenceStore _prefStore_Common                      = CommonActivator.getPrefStore();
@@ -536,11 +535,6 @@ public class EquipmentView extends ViewPart implements ITourProvider, ITourViewe
                && o2 instanceof final TVIEquipmentView_Tour item2) {
 
             return item1.tourId == item2.tourId;
-
-         } else if (o1 instanceof final TVIEquipmentView_AllTours item1
-               && o2 instanceof final TVIEquipmentView_AllTours item2) {
-
-            return item1.getID() == item2.getID();
          }
 
          return false;
@@ -1000,16 +994,6 @@ public class EquipmentView extends ViewPart implements ITourProvider, ITourViewe
                cell.setImage(TourTypeImage.getTourTypeImage(tourItem.tourTypeId));
 
                setCellColor(cell, element);
-
-            } else if (viewItem instanceof TVIEquipmentView_AllTours) {
-
-               /*
-                * All tours
-                */
-
-               styledString.append(viewItem.firstColumn, net.tourbook.ui.UI.TOUR_STYLER);
-
-               cell.setImage(_imgTours_All);
 
             } else if (viewItem instanceof TVIEquipmentView_Equipment) {
 
@@ -2719,18 +2703,6 @@ public class EquipmentView extends ViewPart implements ITourProvider, ITourViewe
                }
             }
          }
-
-      } else if (stateSegment.__itemType == STATE_ITEM_TYPE_ALL_TOURS) {
-
-         for (final TreeViewerItem treeItem : allTreeItems) {
-
-            if (treeItem instanceof final TVIEquipmentView_AllTours allToursItem) {
-
-               allPathSegments.add(treeItem);
-
-               return allToursItem.getFetchedChildren();
-            }
-         }
       }
 
       return null;
@@ -2775,7 +2747,7 @@ public class EquipmentView extends ViewPart implements ITourProvider, ITourViewe
 
             if (false
                   || itemType == STATE_ITEM_TYPE_EQUIPMENT
-                  || itemType == STATE_ITEM_TYPE_ALL_TOURS) {
+            ) {
 
                currentSegments.add(new StateSegment(itemType, itemData));
             }
@@ -2836,11 +2808,6 @@ public class EquipmentView extends ViewPart implements ITourProvider, ITourViewe
 
                allExpandedItemIDs.add(STATE_ITEM_TYPE_EQUIPMENT);
                allExpandedItemIDs.add(equipmentItem.getEquipment().getEquipmentId());
-
-            } else if (segment instanceof TVIEquipmentView_AllTours) {
-
-               allExpandedItemIDs.add(STATE_ITEM_TYPE_ALL_TOURS);
-               allExpandedItemIDs.add(777);
             }
          }
       }
