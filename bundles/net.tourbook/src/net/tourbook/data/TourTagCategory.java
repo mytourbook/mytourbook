@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2025 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -180,13 +180,13 @@ public class TourTagCategory implements Cloneable, Comparable<Object> {
        */
       fieldValidation = TourDatabase.isFieldValidForSave(
             name,
-            TourTag.DB_LENGTH_NAME,
+            TourDatabase.DB_LENGTH_NAME,
             Messages.Db_Field_TourTag_Name);
 
       if (fieldValidation == FIELD_VALIDATION.IS_INVALID) {
          return false;
       } else if (fieldValidation == FIELD_VALIDATION.TRUNCATE) {
-         name = name.substring(0, TourTag.DB_LENGTH_NAME);
+         name = name.substring(0, TourDatabase.DB_LENGTH_NAME);
       }
 
       /*
@@ -194,13 +194,13 @@ public class TourTagCategory implements Cloneable, Comparable<Object> {
        */
       fieldValidation = TourDatabase.isFieldValidForSave(
             notes,
-            TourTag.DB_LENGTH_NOTES,
+            TourDatabase.DB_LENGTH_NOTES,
             Messages.Db_Field_TourTag_Notes);
 
       if (fieldValidation == FIELD_VALIDATION.IS_INVALID) {
          return false;
       } else if (fieldValidation == FIELD_VALIDATION.TRUNCATE) {
-         notes = notes.substring(0, TourTag.DB_LENGTH_NOTES);
+         notes = notes.substring(0, TourDatabase.DB_LENGTH_NOTES);
       }
 
       return true;

@@ -33,6 +33,7 @@ import net.tourbook.common.time.TimeTools;
 import net.tourbook.common.util.StringUtils;
 import net.tourbook.database.FIELD_VALIDATION;
 import net.tourbook.database.TourDatabase;
+import net.tourbook.equipment.EquipmentManager;
 
 @Entity
 public class EquipmentPart implements Cloneable, Comparable<Object>, Serializable {
@@ -78,6 +79,11 @@ public class EquipmentPart implements Cloneable, Comparable<Object>, Serializabl
    private String                     urlAddress;
 
    /**
+    *
+    */
+   private String                     imageFilePath;
+
+   /**
     * When <code>true</code> then this part is included in collated parts
     */
    private boolean                    isCollate        = true;
@@ -121,6 +127,16 @@ public class EquipmentPart implements Cloneable, Comparable<Object>, Serializabl
     * Initial distance, in meter
     */
    private float                      distanceFirstUse;
+
+   /**
+    * When a tag is expanded in the tag tree viewer, the tours can be displayed in different
+    * structures
+    * <p>
+    * <li>0 ... EXPAND_TYPE_YEAR_MONTH_DAY</li>
+    * <li>1 ... EXPAND_TYPE_FLAT</li>
+    * <li>2 ... EXPAND_TYPE_YEAR_DAY</li>
+    */
+   private int                        expandType       = EquipmentManager.EXPAND_TYPE_FLAT;
 
    /** One equipment can have multiple parts */
    @ManyToOne(optional = false)
@@ -305,6 +321,14 @@ public class EquipmentPart implements Cloneable, Comparable<Object>, Serializabl
 
    public Equipment getEquipment() {
       return equipment;
+   }
+
+   public int getExpandType() {
+      return expandType;
+   }
+
+   public String getImageFilePath() {
+      return imageFilePath;
    }
 
    public String getModel() {
@@ -498,6 +522,14 @@ public class EquipmentPart implements Cloneable, Comparable<Object>, Serializabl
       equipment = partEquipment;
    }
 
+   public void setExpandType(final int expandType) {
+      this.expandType = expandType;
+   }
+
+   public void setImageFilePath(final String imageFilePath) {
+      this.imageFilePath = imageFilePath;
+   }
+
    public void setIsCollate(final boolean isCollate) {
       this.isCollate = isCollate;
    }
@@ -541,11 +573,11 @@ public class EquipmentPart implements Cloneable, Comparable<Object>, Serializabl
 
             + "EquipmentPart" + NL //                                      //$NON-NLS-1$
 
-            + " partId           = " + partId + NL //                      //$NON-NLS-1$
-            + " brand            = " + brand + NL //                       //$NON-NLS-1$
-            + " model            = " + model + NL //                       //$NON-NLS-1$
-            + " date             = " + getDate_Local() + NL //             //$NON-NLS-1$
-            + " dateUntil        = " + getDateUntil_Local() + NL //        //$NON-NLS-1$
+            + "  partId           = " + partId + NL //                      //$NON-NLS-1$
+            + "  brand            = " + brand + NL //                       //$NON-NLS-1$
+            + "  model            = " + model + NL //                       //$NON-NLS-1$
+            + "  date             = " + getDate_Local() + NL //             //$NON-NLS-1$
+            + "  dateUntil        = " + getDateUntil_Local() + NL //        //$NON-NLS-1$
 
 //            + " description      =" + description + NL //                  //$NON-NLS-1$
 //            + " equipmentType    =" + equipmentType + NL //                //$NON-NLS-1$

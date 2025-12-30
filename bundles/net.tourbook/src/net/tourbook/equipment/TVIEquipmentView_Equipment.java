@@ -59,14 +59,14 @@ public class TVIEquipmentView_Equipment extends TVIEquipmentView_Item {
       final ArrayList<TreeViewerItem> allParts = readChildren_Parts();
       final ArrayList<TreeViewerItem> allServices = readChildren_Services();
 
-      final TVIEquipmentView_AllTours allTours = new TVIEquipmentView_AllTours(getEquipmentViewer(), _equipment);
+//      final TVIEquipmentView_AllTours allTours = new TVIEquipmentView_AllTours(getEquipmentViewer(), _equipment);
 
       final ArrayList<TreeViewerItem> allChildren = new ArrayList<>();
 
       allChildren.addAll(allParts);
       allChildren.addAll(allServices);
 
-      allChildren.add(allTours);
+//      allChildren.add(allTours);
 
       setChildren(allChildren);
    }

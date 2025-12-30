@@ -47,24 +47,22 @@ import org.eclipse.core.runtime.Path;
 @Entity
 public class TourPhoto implements Serializable {
 
-   private static final long          serialVersionUID    = 1L;
+   private static final long          serialVersionUID = 1L;
 
-   private static final char          NL                  = UI.NEW_LINE;
-
-   public static final int            DB_LENGTH_FILE_PATH = 260;
+   private static final char          NL               = UI.NEW_LINE;
 
    /**
     * Manually created marker or imported marker create a unique id to identify them, saved marker
     * are compared with the marker id
     */
-   private static final AtomicInteger _createCounter      = new AtomicInteger();
+   private static final AtomicInteger _createCounter   = new AtomicInteger();
 
    /**
     * Unique id for the {@link TourPhoto} entity
     */
    @Id
    @GeneratedValue(strategy = GenerationType.IDENTITY)
-   private long                       photoId             = TourDatabase.ENTITY_IS_NOT_SAVED;
+   private long                       photoId          = TourDatabase.ENTITY_IS_NOT_SAVED;
 
    /**
     * A photo label can be displayed in the 2D map
@@ -139,7 +137,7 @@ public class TourPhoto implements Serializable {
     * not persisted
     */
    @Transient
-   private long                       _createId           = 0;
+   private long                       _createId        = 0;
 
    @Transient
    private PhotoAdjustments           _photoAdjustments;

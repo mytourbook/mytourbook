@@ -736,15 +736,44 @@ public class TimeTools {
    /**
     * @param epochOfMilli
     *           The number of milliseconds from 1970-01-01T00:00:00Z
-    * @param timeZone
+    * @param timeZoneText
+    *           Can be <code>null</code> then the default timezome is used
     *
     * @return Returns a zoned date time from epochOfMilli
     */
-   public static ZonedDateTime getZonedDateTime(final long epochOfMilli, final ZoneId timeZone) {
+   public static ZonedDateTime getZonedDateTime(final long epochOfMilli, final String timeZoneText) {
+
+      ZoneId timeZoneID = getDefaultTimeZone();
+
+      if (timeZoneText != null) {
+
+         timeZoneID = ZoneId.of(timeZoneText);
+      }
 
       return ZonedDateTime.ofInstant(
             Instant.ofEpochMilli(epochOfMilli),
-            timeZone);
+            timeZoneID);
+   }
+
+   /**
+    * @param epochOfMilli
+    *           The number of milliseconds from 1970-01-01T00:00:00Z
+    * @param timeZoneID
+    *           Can be <code>null</code> then the default timezome is used
+    *
+    * @return Returns a zoned date time from epochOfMilli
+    */
+   public static ZonedDateTime getZonedDateTime(final long epochOfMilli, final ZoneId timeZoneID) {
+
+      ZoneId timeZoneChecked = timeZoneID;
+
+      if (timeZoneID == null) {
+         timeZoneChecked = getDefaultTimeZone();
+      }
+
+      return ZonedDateTime.ofInstant(
+            Instant.ofEpochMilli(epochOfMilli),
+            timeZoneChecked);
    }
 
    /**

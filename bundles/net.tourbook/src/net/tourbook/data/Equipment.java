@@ -40,6 +40,7 @@ import net.tourbook.common.time.TimeTools;
 import net.tourbook.common.util.StringUtils;
 import net.tourbook.database.FIELD_VALIDATION;
 import net.tourbook.database.TourDatabase;
+import net.tourbook.equipment.EquipmentManager;
 
 import org.hibernate.annotations.Cascade;
 
@@ -72,6 +73,21 @@ public class Equipment implements Cloneable, Comparable<Object>, Serializable {
    private String                     type;
 
    /**
+    * Description/notes for the equipment
+    */
+   private String                     description;
+
+   /**
+    * Website
+    */
+   private String                     urlAddress;
+
+   /**
+    *
+    */
+   private String                     imageFilePath;
+
+   /**
     * e.g.
     */
    private String                     size;
@@ -97,16 +113,6 @@ public class Equipment implements Cloneable, Comparable<Object>, Serializable {
    private float                      distanceFirstUse;
 
    /**
-    * Description/notes for the equipment
-    */
-   private String                     description;
-
-   /**
-    * Website
-    */
-   private String                     urlAddress;
-
-   /**
     * When the equipment was firstly used, in milliseconds since 1970-01-01T00:00:00Z
     */
    private long                       date;
@@ -120,6 +126,16 @@ public class Equipment implements Cloneable, Comparable<Object>, Serializable {
     * When the equipment was retired/sold, in milliseconds since 1970-01-01T00:00:00Z
     */
    private long                       dateRetired;
+
+   /**
+    * When a tag is expanded in the tag tree viewer, the tours can be displayed in different
+    * structures
+    * <p>
+    * <li>0 ... EXPAND_TYPE_YEAR_MONTH_DAY</li>
+    * <li>1 ... EXPAND_TYPE_FLAT</li>
+    * <li>2 ... EXPAND_TYPE_YEAR_DAY</li>
+    */
+   private int                        expandType       = EquipmentManager.EXPAND_TYPE_FLAT;
 
    /**
     * Contains all parts which are associated with this equipment, e.g.
@@ -298,6 +314,14 @@ public class Equipment implements Cloneable, Comparable<Object>, Serializable {
       return equipmentId;
    }
 
+   public int getExpandType() {
+      return expandType;
+   }
+
+   public String getImageFilePath() {
+      return imageFilePath;
+   }
+
    public String getModel() {
 
       if (model == null) {
@@ -453,6 +477,14 @@ public class Equipment implements Cloneable, Comparable<Object>, Serializable {
 
    public void setDistanceFirstUse(final float distanceFirstUse) {
       this.distanceFirstUse = distanceFirstUse;
+   }
+
+   public void setExpandType(final int expandType) {
+      this.expandType = expandType;
+   }
+
+   public void setImageFilePath(final String imageFilePath) {
+      this.imageFilePath = imageFilePath;
    }
 
    public void setModel(final String model) {

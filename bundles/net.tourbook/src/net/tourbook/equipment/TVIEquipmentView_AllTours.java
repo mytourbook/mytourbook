@@ -61,7 +61,7 @@ public class TVIEquipmentView_AllTours extends TVIEquipmentView_Item {
    @Override
    protected void fetchChildren() {
 
-      final ArrayList<TreeViewerItem> allTours = new ArrayList<>();
+      final ArrayList<TreeViewerItem> allTourItems = new ArrayList<>();
 
       try (Connection conn = TourDatabase.getInstance().getConnection()) {
 
@@ -116,7 +116,7 @@ public class TVIEquipmentView_AllTours extends TVIEquipmentView_Item {
             } else {
 
                tourItem = new TVIEquipmentView_Tour(this, getEquipmentViewer());
-               allTours.add(tourItem);
+               allTourItems.add(tourItem);
 
                tourItem.tourId = tourId;
                tourItem.getTourColumnData(result, resultEquipmentID, 3);
@@ -136,7 +136,7 @@ public class TVIEquipmentView_AllTours extends TVIEquipmentView_Item {
          net.tourbook.ui.UI.showSQLException(e);
       }
 
-      setChildren(allTours);
+      setChildren(allTourItems);
    }
 
    public long getID() {

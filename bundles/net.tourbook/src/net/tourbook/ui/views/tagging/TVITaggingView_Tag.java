@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2025 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -111,6 +111,7 @@ public class TVITaggingView_Tag extends TVITaggingView_Item {
 
    /**
     * @param modifiedTours
+    *
     * @return Returns an expression to select tour id's in the WHERE clause
     */
    private String getTourIdWhereClause(final ArrayList<TourData> modifiedTours) {
@@ -303,7 +304,9 @@ public class TVITaggingView_Tag extends TVITaggingView_Item {
     * @param modifiedTours
     * @param isAddMode
     */
-   public void refresh(final TreeViewer tagViewer, final ArrayList<TourData> modifiedTours, final boolean isAddMode) {
+   public void refresh(final TreeViewer tagViewer,
+                       final ArrayList<TourData> modifiedTours,
+                       final boolean isAddMode) {
 
       switch (_tourTag.getExpandType()) {
 

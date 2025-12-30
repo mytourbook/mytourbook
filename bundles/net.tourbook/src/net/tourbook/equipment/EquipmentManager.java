@@ -62,9 +62,13 @@ import org.eclipse.swt.widgets.Label;
 
 public class EquipmentManager {
 
-   private static final char                    NL      = UI.NEW_LINE;
+   private static final char                    NL                         = UI.NEW_LINE;
 
-   private static final Object                  DB_LOCK = new Object();
+   private static final Object                  DB_LOCK                    = new Object();
+
+   public static final int                      EXPAND_TYPE_FLAT           = 0;
+   public static final int                      EXPAND_TYPE_YEAR_DAY       = 1;
+   public static final int                      EXPAND_TYPE_YEAR_MONTH_DAY = 2;
 
    private static volatile Map<Long, Equipment> _allEquipment_ByID;
    private static volatile List<Equipment>      _allEquipment_ByName;

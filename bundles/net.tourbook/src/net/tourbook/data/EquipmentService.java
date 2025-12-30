@@ -32,6 +32,7 @@ import net.tourbook.common.UI;
 import net.tourbook.common.time.TimeTools;
 import net.tourbook.database.FIELD_VALIDATION;
 import net.tourbook.database.TourDatabase;
+import net.tourbook.equipment.EquipmentManager;
 
 @Entity
 public class EquipmentService implements Cloneable, Serializable {
@@ -67,6 +68,16 @@ public class EquipmentService implements Cloneable, Serializable {
    private String                     description;
 
    /**
+    * Website
+    */
+   private String                     urlAddress;
+
+   /**
+    *
+    */
+   private String                     imageFilePath;
+
+   /**
     * When <code>true</code> then this service is included in collated services
     */
    private boolean                    isCollate        = true;
@@ -90,6 +101,16 @@ public class EquipmentService implements Cloneable, Serializable {
     * Price unit
     */
    private String                     priceUnit;
+
+   /**
+    * When a tag is expanded in the tag tree viewer, the tours can be displayed in different
+    * structures
+    * <p>
+    * <li>0 ... EXPAND_TYPE_YEAR_MONTH_DAY</li>
+    * <li>1 ... EXPAND_TYPE_FLAT</li>
+    * <li>2 ... EXPAND_TYPE_YEAR_DAY</li>
+    */
+   private int                        expandType       = EquipmentManager.EXPAND_TYPE_FLAT;
 
    /**
     * One equipment can have multiple services
@@ -219,6 +240,14 @@ public class EquipmentService implements Cloneable, Serializable {
       return equipment;
    }
 
+   public int getExpandType() {
+      return expandType;
+   }
+
+   public String getImageFilePath() {
+      return imageFilePath;
+   }
+
    /**
     * @return Returns the service name or an empty string when not available
     */
@@ -253,6 +282,10 @@ public class EquipmentService implements Cloneable, Serializable {
       }
 
       return type;
+   }
+
+   public String getUrlAddress() {
+      return urlAddress;
    }
 
    @Override
@@ -352,6 +385,14 @@ public class EquipmentService implements Cloneable, Serializable {
       equipment = partEquipment;
    }
 
+   public void setExpandType(final int expandType) {
+      this.expandType = expandType;
+   }
+
+   public void setImageFilePath(final String imageFilePath) {
+      this.imageFilePath = imageFilePath;
+   }
+
    public void setIsCollate(final boolean isCollate) {
       this.isCollate = isCollate;
    }
@@ -370,6 +411,10 @@ public class EquipmentService implements Cloneable, Serializable {
 
    public void setType(final String type) {
       this.type = type;
+   }
+
+   public void setUrlAddress(final String urlAddress) {
+      this.urlAddress = urlAddress;
    }
 
    @Override

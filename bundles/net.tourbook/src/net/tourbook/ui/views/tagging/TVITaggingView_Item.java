@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2025 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -77,6 +77,7 @@ public abstract class TVITaggingView_Item extends TreeViewerItem {
             + "avgPulse," + NL //                           8  //$NON-NLS-1$
             + "avgCadence," + NL //                         9  //$NON-NLS-1$
             + "(DOUBLE(weather_Temperature_Average_Device) / TemperatureScale)," + NL //     10 //$NON-NLS-1$
+
             + "TourDeviceTime_Recorded" + NL //             11 //$NON-NLS-1$
       ;
    }

@@ -37,8 +37,6 @@ public class TVIEquipmentView_Tour extends TVIEquipmentView_Item {
 
          + "tourTitle,"                                                //   3 //$NON-NLS-1$
          + "tourType_typeId,"                                          //   4 //$NON-NLS-1$
-         + "deviceTimeInterval,"                                       //   5 //$NON-NLS-1$
-         + "startDistance"                                             //   6 //$NON-NLS-1$
 
 //         + SQL_SUM_COLUMNS_TOUR                                //   7
    ;
@@ -58,12 +56,12 @@ public class TVIEquipmentView_Tour extends TVIEquipmentView_Item {
    public long                deviceStartDistance;
    public short               deviceTimeInterval;
 
-   public TVIEquipmentView_Tour(final TVIEquipmentView_Item tviEquipmentView_Equipment,
+   public TVIEquipmentView_Tour(final TVIEquipmentView_Item tviParentItem,
                                 final TreeViewer treeViewer) {
 
       super(treeViewer);
 
-      setParentItem(tviEquipmentView_Equipment);
+      setParentItem(tviParentItem);
    }
 
    @Override

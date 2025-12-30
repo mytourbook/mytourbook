@@ -77,7 +77,6 @@ import net.tourbook.data.TourMarkerType;
 import net.tourbook.data.TourNutritionProduct;
 import net.tourbook.data.TourPerson;
 import net.tourbook.data.TourPersonHRZone;
-import net.tourbook.data.TourPhoto;
 import net.tourbook.data.TourReference;
 import net.tourbook.data.TourTag;
 import net.tourbook.data.TourTagCategory;
@@ -192,6 +191,8 @@ public class TourDatabase {
     * Common text lengths
     */
    public static final int     DB_LENGTH_DESCRIPTION                      = 32000;
+   public static final int     DB_LENGTH_NOTES                            = 32000;
+   public static final int     DB_LENGTH_FILE_PATH                        = 260;
    public static final int     DB_LENGTH_NAME                             = 1000;
    public static final int     DB_LENGTH_URL_ADDRESS                      = 4096;
 
@@ -4561,7 +4562,9 @@ public class TourDatabase {
                   + "   Brand                   VARCHAR(" + DB_LENGTH_NAME + "),          " + NL //$NON-NLS-1$ //$NON-NLS-2$
                   + "   Model                   VARCHAR(" + DB_LENGTH_NAME + "),          " + NL //$NON-NLS-1$ //$NON-NLS-2$
                   + "   Type                    VARCHAR(" + DB_LENGTH_NAME + "),          " + NL //$NON-NLS-1$ //$NON-NLS-2$
+
                   + "   Description             VARCHAR(" + DB_LENGTH_DESCRIPTION + "),   " + NL //$NON-NLS-1$ //$NON-NLS-2$
+                  + "   ImageFilePath           VARCHAR(" + DB_LENGTH_FILE_PATH + "),     " + NL //$NON-NLS-1$ //$NON-NLS-2$
                   + "   UrlAddress              VARCHAR(" + DB_LENGTH_URL_ADDRESS + "),   " + NL //$NON-NLS-1$ //$NON-NLS-2$
 
                   + "   DistanceFirstUse        FLOAT DEFAULT 0,                          " + NL //$NON-NLS-1$
@@ -4569,6 +4572,9 @@ public class TourDatabase {
                   + "   PriceUnit               VARCHAR(" + DB_LENGTH_NAME + "),          " + NL //$NON-NLS-1$ //$NON-NLS-2$
                   + "   Size                    VARCHAR(" + DB_LENGTH_NAME + "),          " + NL //$NON-NLS-1$ //$NON-NLS-2$
                   + "   Weight                  FLOAT DEFAULT 0,                          " + NL //$NON-NLS-1$
+
+                  + "   IsCollate               BOOLEAN DEFAULT TRUE,                     " + NL //$NON-NLS-1$
+                  + "   ExpandType              INTEGER,                                  " + NL //$NON-NLS-1$
 
                   + "   Date                    BIGINT DEFAULT 0,                         " + NL //$NON-NLS-1$
                   + "   DateBuilt               BIGINT DEFAULT 0,                         " + NL //$NON-NLS-1$
@@ -4632,7 +4638,9 @@ public class TourDatabase {
                   + "   Brand                   VARCHAR(" + DB_LENGTH_NAME + "),          " + NL //$NON-NLS-1$ //$NON-NLS-2$
                   + "   Model                   VARCHAR(" + DB_LENGTH_NAME + "),          " + NL //$NON-NLS-1$ //$NON-NLS-2$
                   + "   Type                    VARCHAR(" + DB_LENGTH_NAME + "),          " + NL //$NON-NLS-1$ //$NON-NLS-2$
+
                   + "   Description             VARCHAR(" + DB_LENGTH_DESCRIPTION + "),   " + NL //$NON-NLS-1$ //$NON-NLS-2$
+                  + "   ImageFilePath           VARCHAR(" + DB_LENGTH_FILE_PATH + "),     " + NL //$NON-NLS-1$ //$NON-NLS-2$
                   + "   UrlAddress              VARCHAR(" + DB_LENGTH_URL_ADDRESS + "),   " + NL //$NON-NLS-1$ //$NON-NLS-2$
 
                   + "   DistanceFirstUse        FLOAT DEFAULT 0,                          " + NL //$NON-NLS-1$
@@ -4641,7 +4649,8 @@ public class TourDatabase {
                   + "   Size                    VARCHAR(" + DB_LENGTH_NAME + "),          " + NL //$NON-NLS-1$ //$NON-NLS-2$
                   + "   Weight                  FLOAT DEFAULT 0,                          " + NL //$NON-NLS-1$
 
-                  + "   IsCollate               BOOLEAN DEFAULT TRUE,                      " + NL //$NON-NLS-1$
+                  + "   IsCollate               BOOLEAN DEFAULT TRUE,                     " + NL //$NON-NLS-1$
+                  + "   ExpandType              INTEGER,                                  " + NL //$NON-NLS-1$
 
                   + "   Date                    BIGINT DEFAULT 0,                         " + NL //$NON-NLS-1$
                   + "   DateBuilt               BIGINT DEFAULT 0,                         " + NL //$NON-NLS-1$
@@ -4687,12 +4696,16 @@ public class TourDatabase {
                   + "   Name                    VARCHAR(" + DB_LENGTH_NAME + "),          " + NL //$NON-NLS-1$ //$NON-NLS-2$
                   + "   Company                 VARCHAR(" + DB_LENGTH_NAME + "),          " + NL //$NON-NLS-1$ //$NON-NLS-2$
                   + "   Type                    VARCHAR(" + DB_LENGTH_NAME + "),          " + NL //$NON-NLS-1$ //$NON-NLS-2$
+
                   + "   Description             VARCHAR(" + DB_LENGTH_DESCRIPTION + "),   " + NL //$NON-NLS-1$ //$NON-NLS-2$
+                  + "   ImageFilePath           VARCHAR(" + DB_LENGTH_FILE_PATH + "),     " + NL //$NON-NLS-1$ //$NON-NLS-2$
+                  + "   UrlAddress              VARCHAR(" + DB_LENGTH_URL_ADDRESS + "),   " + NL //$NON-NLS-1$ //$NON-NLS-2$
 
                   + "   Price                   FLOAT DEFAULT 0,                          " + NL //$NON-NLS-1$
                   + "   PriceUnit               VARCHAR(" + DB_LENGTH_NAME + "),          " + NL //$NON-NLS-1$ //$NON-NLS-2$
 
-                  + "   IsCollate               BOOLEAN DEFAULT TRUE,                      " + NL //$NON-NLS-1$
+                  + "   IsCollate               BOOLEAN DEFAULT TRUE,                     " + NL //$NON-NLS-1$
+                  + "   ExpandType              INTEGER,                                  " + NL //$NON-NLS-1$
 
                   + "   Date                    BIGINT DEFAULT 0,                         " + NL //$NON-NLS-1$
                   + "   DateUntil               BIGINT DEFAULT 0                          " + NL //$NON-NLS-1$
@@ -5629,8 +5642,6 @@ public class TourDatabase {
       /*
        * CREATE TABLE TourPhoto
        */
-      final int dbLengthFilePath = TourPhoto.DB_LENGTH_FILE_PATH;
-
       exec(stmt, "CREATE TABLE " + TABLE_TOUR_PHOTO + "   (                            " + NL //$NON-NLS-1$ //$NON-NLS-2$
       //
             + SQL.createField_EntityId(ENTITY_ID_PHOTO, true)
@@ -5639,10 +5650,10 @@ public class TourDatabase {
 
             // version 23 start
 
-            + "   imageFileName              VARCHAR(" + dbLengthFilePath + "),        " + NL //$NON-NLS-1$ //$NON-NLS-2$
-            + "   imageFileExt               VARCHAR(" + dbLengthFilePath + "),        " + NL //$NON-NLS-1$ //$NON-NLS-2$
-            + "   imageFilePath              VARCHAR(" + dbLengthFilePath + "),        " + NL //$NON-NLS-1$ //$NON-NLS-2$
-            + "   imageFilePathName          VARCHAR(" + dbLengthFilePath + "),        " + NL //$NON-NLS-1$ //$NON-NLS-2$
+            + "   imageFileName              VARCHAR(" + DB_LENGTH_FILE_PATH + "),       " + NL //$NON-NLS-1$ //$NON-NLS-2$
+            + "   imageFileExt               VARCHAR(" + DB_LENGTH_FILE_PATH + "),     " + NL //$NON-NLS-1$ //$NON-NLS-2$
+            + "   imageFilePath              VARCHAR(" + DB_LENGTH_FILE_PATH + "),     " + NL //$NON-NLS-1$ //$NON-NLS-2$
+            + "   imageFilePathName          VARCHAR(" + DB_LENGTH_FILE_PATH + "),     " + NL //$NON-NLS-1$ //$NON-NLS-2$
             + "   imageExifTime              BIGINT DEFAULT 0,                         " + NL //$NON-NLS-1$
             + "   imageFileLastModified      BIGINT DEFAULT 0,                         " + NL //$NON-NLS-1$
 
@@ -5725,23 +5736,23 @@ public class TourDatabase {
       /*
        * Create table: TOURTAG
        */
-      exec(stmt, "CREATE TABLE " + TABLE_TOUR_TAG + "   (                                 " + NL //$NON-NLS-1$ //$NON-NLS-2$
+      exec(stmt, "CREATE TABLE " + TABLE_TOUR_TAG + "   (                              " + NL //$NON-NLS-1$ //$NON-NLS-2$
       //
             + SQL.createField_EntityId(ENTITY_ID_TAG, true)
 
-            + "   isRoot                     INTEGER,                                     " + NL //$NON-NLS-1$
-            + "   expandType                 INTEGER,                                     " + NL //$NON-NLS-1$
-            + "   name                       VARCHAR(" + TourTag.DB_LENGTH_NAME + "),     " + NL //$NON-NLS-1$ //$NON-NLS-2$
+            + "   isRoot                     INTEGER,                                  " + NL //$NON-NLS-1$
+            + "   expandType                 INTEGER,                                  " + NL //$NON-NLS-1$
+            + "   name                       VARCHAR(" + DB_LENGTH_NAME + "),           " + NL //$NON-NLS-1$ //$NON-NLS-2$
 
             // version 38 start
 
-            + "   notes                      VARCHAR(" + TourTag.DB_LENGTH_NOTES + "),    " + NL //$NON-NLS-1$ //$NON-NLS-2$
+            + "   notes                      VARCHAR(" + DB_LENGTH_NOTES + "),          " + NL //$NON-NLS-1$ //$NON-NLS-2$
 
             // version 38 end ---------
 
             // version 49 start
 
-            + "   imageFilePath              VARCHAR(" + TourTag.DB_LENGTH_FILE_PATH + ") " + NL //$NON-NLS-1$ //$NON-NLS-2$
+            + "   imageFilePath              VARCHAR(" + DB_LENGTH_FILE_PATH + ")       " + NL //$NON-NLS-1$ //$NON-NLS-2$
 
             // version 49 end ---------
 
@@ -5795,11 +5806,11 @@ public class TourDatabase {
             + SQL.createField_EntityId(ENTITY_ID_TAG_CATEGORY, true)
 
             + "   isRoot                     INTEGER,                                  " + NL //$NON-NLS-1$
-            + "   name                       VARCHAR(" + TourTag.DB_LENGTH_NAME + "),  " + NL //$NON-NLS-1$ //$NON-NLS-2$
+            + "   name                       VARCHAR(" + DB_LENGTH_NAME + "),           " + NL //$NON-NLS-1$ //$NON-NLS-2$
 
             // version 38 start
 
-            + "   notes                      VARCHAR(" + TourTag.DB_LENGTH_NOTES + ")  " + NL //$NON-NLS-1$ //$NON-NLS-2$
+            + "   notes                      VARCHAR(" + DB_LENGTH_NOTES + ")           " + NL //$NON-NLS-1$ //$NON-NLS-2$
 
             // version 38 end ---------
 
@@ -8812,10 +8823,10 @@ public class TourDatabase {
 
             final String[] sqlTourPhoto = {
 
-                  "ALTER TABLE " + TABLE_TOUR_PHOTO + " ADD COLUMN   imageFileName           VARCHAR(" + TourPhoto.DB_LENGTH_FILE_PATH + ")", //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-                  "ALTER TABLE " + TABLE_TOUR_PHOTO + " ADD COLUMN   imageFileExt            VARCHAR(" + TourPhoto.DB_LENGTH_FILE_PATH + ")", //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-                  "ALTER TABLE " + TABLE_TOUR_PHOTO + " ADD COLUMN   imageFilePath           VARCHAR(" + TourPhoto.DB_LENGTH_FILE_PATH + ")", //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-                  "ALTER TABLE " + TABLE_TOUR_PHOTO + " ADD COLUMN   imageFilePathName       VARCHAR(" + TourPhoto.DB_LENGTH_FILE_PATH + ")", //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+                  "ALTER TABLE " + TABLE_TOUR_PHOTO + " ADD COLUMN   imageFileName           VARCHAR(" + DB_LENGTH_FILE_PATH + ")", //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+                  "ALTER TABLE " + TABLE_TOUR_PHOTO + " ADD COLUMN   imageFileExt            VARCHAR(" + DB_LENGTH_FILE_PATH + ")", //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+                  "ALTER TABLE " + TABLE_TOUR_PHOTO + " ADD COLUMN   imageFilePath           VARCHAR(" + DB_LENGTH_FILE_PATH + ")", //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+                  "ALTER TABLE " + TABLE_TOUR_PHOTO + " ADD COLUMN   imageFilePathName       VARCHAR(" + DB_LENGTH_FILE_PATH + ")", //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 
                   "ALTER TABLE " + TABLE_TOUR_PHOTO + " ADD COLUMN   imageExifTime           BIGINT DEFAULT 0", //$NON-NLS-1$ //$NON-NLS-2$
                   "ALTER TABLE " + TABLE_TOUR_PHOTO + " ADD COLUMN   imageFileLastModified   BIGINT DEFAULT 0", //$NON-NLS-1$ //$NON-NLS-2$
@@ -9973,8 +9984,8 @@ public class TourDatabase {
 // SET_FORMATTING_OFF
 
          // Add new columns
-         SQL.addColumn_VarCar (stmt, TABLE_TOUR_TAG,              "notes", TourTag.DB_LENGTH_NOTES);                 //$NON-NLS-1$
-         SQL.addColumn_VarCar (stmt, TABLE_TOUR_TAG_CATEGORY,     "notes", TourTag.DB_LENGTH_NOTES);                 //$NON-NLS-1$
+         SQL.addColumn_VarCar (stmt, TABLE_TOUR_TAG,              "notes", DB_LENGTH_NOTES);                 //$NON-NLS-1$
+         SQL.addColumn_VarCar (stmt, TABLE_TOUR_TAG_CATEGORY,     "notes", DB_LENGTH_NOTES);                 //$NON-NLS-1$
 
          SQL.addColumn_Float  (stmt, TABLE_TOUR_DATA,             "training_TrainingEffect_Aerob",       DEFAULT_0); //$NON-NLS-1$
          SQL.addColumn_Float  (stmt, TABLE_TOUR_DATA,             "training_TrainingEffect_Anaerob",     DEFAULT_0); //$NON-NLS-1$
@@ -10884,7 +10895,7 @@ public class TourDatabase {
 
       final Statement stmt = connection.createStatement();
       {
-         SQL.addColumn_VarCar(stmt, TABLE_TOUR_TAG, "imageFilePath", TourTag.DB_LENGTH_FILE_PATH); //$NON-NLS-1$
+         SQL.addColumn_VarCar(stmt, TABLE_TOUR_TAG, "imageFilePath", DB_LENGTH_FILE_PATH); //$NON-NLS-1$
       }
       stmt.close();
 
