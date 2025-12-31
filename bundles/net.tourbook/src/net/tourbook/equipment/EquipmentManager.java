@@ -20,9 +20,11 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -466,7 +468,9 @@ public class EquipmentManager {
 
             if (equipment_DeleteParts_SQL(part)) {
 
-               updateUntilDate_Parts(part.getEquipment(), part.getType());
+               final Set<String> allTypes = new HashSet<>(Arrays.asList(part.getType()));
+
+               updateUntilDate_Parts(part.getEquipment(), allTypes);
 
                clearAllEquipmentResourcesAndFireModifyEvent();
 
@@ -584,7 +588,9 @@ public class EquipmentManager {
          TourLogManager.showLogView(AutoOpenEvent.DELETE_SOMETHING);
          TourLogManager.log_INFO("Equipment service is deleted \"%s\"".formatted(service.getName()));
 
-         updateUntilDate_Services(service.getEquipment(), service.getType());
+         final Set<String> allTypes = new HashSet<>(Arrays.asList(service.getType()));
+
+         updateUntilDate_Services(service.getEquipment(), allTypes);
 
          returnResult = true;
 
@@ -1221,18 +1227,24 @@ public class EquipmentManager {
     * !!! </b>
     *
     * @param equipment
-    * @param modifiedType
+    * @param allModifiedTypes
     */
    public static void updateUntilDate_Parts(final Equipment equipment,
-                                            final String modifiedType) {
+                                            final Set<String> allModifiedTypes) {
 
       final Set<EquipmentPart> allParts = equipment.getParts();
+      final int numParts = allParts.size();
 
-      int numParts = allParts.size();
+      if (numParts > 0) {
 
-      if (numParts == 0) {
-         return;
+         for (final String type : allModifiedTypes) {
+
+            updateUntilDate_Parts_One(allParts, type);
+         }
       }
+   }
+
+   private static void updateUntilDate_Parts_One(final Set<EquipmentPart> allParts, final String modifiedType) {
 
       /*
        * Filter parts: Get all parts with the same type and which are collated
@@ -1241,12 +1253,14 @@ public class EquipmentManager {
 
       for (final EquipmentPart part : allParts) {
 
-         if (part.isCollate() && modifiedType.equals(part.getType())) {
+         if (part.isCollate()
+               && modifiedType.equals(part.getType())) {
+
             allFilteredParts.add(part);
          }
       }
 
-      numParts = allFilteredParts.size();
+      int numParts = allFilteredParts.size();
 
       if (numParts == 0) {
          return;
@@ -1344,18 +1358,31 @@ public class EquipmentManager {
     * !!! </b>
     *
     * @param equipment
-    * @param modifiedType
+    * @param allModifiedTypes
     */
    public static void updateUntilDate_Services(final Equipment equipment,
-                                               final String modifiedType) {
+                                               final Set<String> allModifiedTypes) {
 
       final Set<EquipmentService> allServices = equipment.getServices();
 
-      int numServices = allServices.size();
+      final int numServices = allServices.size();
 
-      if (numServices == 0) {
-         return;
+      if (numServices > 0) {
+
+         for (final String serviceType : allModifiedTypes) {
+
+            updateUntilDate_Services_One(allServices, serviceType);
+         }
       }
+   }
+
+   /**
+    *
+    * @param equipment
+    * @param modifiedType
+    */
+   private static void updateUntilDate_Services_One(final Set<EquipmentService> allServices,
+                                                    final String modifiedType) {
 
       /*
        * Filter services: Get all services with the same type and which are collated
@@ -1364,12 +1391,14 @@ public class EquipmentManager {
 
       for (final EquipmentService service : allServices) {
 
-         if (service.isCollate() && modifiedType.equals(service.getType())) {
+         if (service.isCollate() 
+               && modifiedType.equals(service.getType())) {
+            
             allFilteredServices.add(service);
          }
       }
 
-      numServices = allFilteredServices.size();
+      final int numServices = allFilteredServices.size();
 
       if (numServices == 0) {
          return;

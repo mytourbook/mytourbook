@@ -18,6 +18,7 @@ package net.tourbook.equipment;
 import java.text.NumberFormat;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -2114,6 +2115,11 @@ public class EquipmentView extends ViewPart implements ITourProvider, ITourViewe
 
          final EquipmentPart partFromDialog = partDialog.getPart();
 
+         final String typeOld = selectedPart.getType();
+         final String typeNew = partFromDialog.getType();
+
+         final Set<String> allModifiedTypes = new HashSet<>(Arrays.asList(typeOld, typeNew));
+
          // update model
          final EquipmentPart savedPart = TourDatabase.saveEntity(
 
@@ -2123,7 +2129,7 @@ public class EquipmentView extends ViewPart implements ITourProvider, ITourViewe
 
          equipment.getParts().add(savedPart);
 
-         EquipmentManager.updateUntilDate_Parts(equipment, savedPart.getType());
+         EquipmentManager.updateUntilDate_Parts(equipment, allModifiedTypes);
 
          updateUI_Views();
 
@@ -2145,6 +2151,11 @@ public class EquipmentView extends ViewPart implements ITourProvider, ITourViewe
 
          final EquipmentService serviceFromDialog = serviceDialog.getService();
 
+         final String typeOld = selectedService.getType();
+         final String typeNew = serviceFromDialog.getType();
+
+         final Set<String> allModifiedTypes = new HashSet<>(Arrays.asList(typeOld, typeNew));
+
          // update model
          final EquipmentService savedService = TourDatabase.saveEntity(
 
@@ -2154,7 +2165,7 @@ public class EquipmentView extends ViewPart implements ITourProvider, ITourViewe
 
          equipment.getServices().add(savedService);
 
-         EquipmentManager.updateUntilDate_Services(equipment, savedService.getType());
+         EquipmentManager.updateUntilDate_Services(equipment, allModifiedTypes);
 
          updateUI_Views();
       }
@@ -2204,6 +2215,11 @@ public class EquipmentView extends ViewPart implements ITourProvider, ITourViewe
 
          final boolean areCollatedFieldsModified = part.isCollatedFieldsModified(partFromDialog);
 
+         final String typeOld = part.getType();
+         final String typeNew = partFromDialog.getType();
+
+         final Set<String> allModifiedTypes = new HashSet<>(Arrays.asList(typeOld, typeNew));
+
          // update model
          part.updateFromOther(partFromDialog);
 
@@ -2211,9 +2227,9 @@ public class EquipmentView extends ViewPart implements ITourProvider, ITourViewe
 
          if (areCollatedFieldsModified) {
 
-            // date is modified -> update "until date"
+            // date and/or type is modified -> update "until date"
 
-            EquipmentManager.updateUntilDate_Parts(equipment, part.getType());
+            EquipmentManager.updateUntilDate_Parts(equipment, allModifiedTypes);
          }
 
          updateUI_Views();
@@ -2238,6 +2254,11 @@ public class EquipmentView extends ViewPart implements ITourProvider, ITourViewe
 
          final boolean areCollatedFieldsModified = service.isCollatedFieldsModified(serviceFromDialog);
 
+         final String typeOld = service.getType();
+         final String typeNew = serviceFromDialog.getType();
+
+         final Set<String> allModifiedTypes = new HashSet<>(Arrays.asList(typeOld, typeNew));
+
          // update model
          service.updateFromOther(serviceFromDialog);
 
@@ -2247,7 +2268,7 @@ public class EquipmentView extends ViewPart implements ITourProvider, ITourViewe
 
             // date is modified -> update "until date"
 
-            EquipmentManager.updateUntilDate_Services(equipment, service.getType());
+            EquipmentManager.updateUntilDate_Services(equipment, allModifiedTypes);
          }
 
          updateUI_Views();
@@ -2300,7 +2321,9 @@ public class EquipmentView extends ViewPart implements ITourProvider, ITourViewe
 
       equipment.getParts().add(savedPart);
 
-      EquipmentManager.updateUntilDate_Parts(equipment, savedPart.getType());
+      final HashSet<String> allTypes = new HashSet<>(Arrays.asList(partFromDialog.getType()));
+
+      EquipmentManager.updateUntilDate_Parts(equipment, allTypes);
 
       updateUI_Views();
    }
@@ -2335,7 +2358,9 @@ public class EquipmentView extends ViewPart implements ITourProvider, ITourViewe
 
       equipment.getServices().add(savedService);
 
-      EquipmentManager.updateUntilDate_Services(equipment, savedService.getType());
+      final Set<String> allTypes = new HashSet<>(Arrays.asList(serviceFromDialog.getType()));
+
+      EquipmentManager.updateUntilDate_Services(equipment, allTypes);
 
       updateUI_Views();
    }

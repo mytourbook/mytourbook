@@ -571,23 +571,24 @@ public class EquipmentPart implements Cloneable, Comparable<Object>, Serializabl
 
       return UI.EMPTY_STRING
 
-            + "EquipmentPart" + NL //                                      //$NON-NLS-1$
+            + "EquipmentPart" + NL //                                         //$NON-NLS-1$
 
-            + "  partId           = " + partId + NL //                      //$NON-NLS-1$
-            + "  brand            = " + brand + NL //                       //$NON-NLS-1$
-            + "  model            = " + model + NL //                       //$NON-NLS-1$
-            + "  date             = " + getDate_Local() + NL //             //$NON-NLS-1$
-            + "  dateUntil        = " + getDateUntil_Local() + NL //        //$NON-NLS-1$
+            + "  partId           = " + partId + NL //                        //$NON-NLS-1$
+            + "  brand            = " + brand + NL //                         //$NON-NLS-1$
+            + "  model            = " + model + NL //                         //$NON-NLS-1$
+            + "  type				 = " + type + NL //                          //$NON-NLS-1$
+            + "  date             = " + getDate_Local() + NL //               //$NON-NLS-1$
+            + "  dateUntil        = " + getDateUntil_Local() + NL //          //$NON-NLS-1$
 
-//            + " description      =" + description + NL //                  //$NON-NLS-1$
-//            + " equipmentType    =" + equipmentType + NL //                //$NON-NLS-1$
-//            + " distanceFirstUse =" + distanceFirstUse + NL //             //$NON-NLS-1$
+//            + " description      =" + description + NL //                   //$NON-NLS-1$
+//            + " equipmentType    =" + equipmentType + NL //                 //$NON-NLS-1$
+//            + " distanceFirstUse =" + distanceFirstUse + NL //              //$NON-NLS-1$
 //
-//            + " dateBuilt        =" + dateBuilt + NL //                    //$NON-NLS-1$
-//            + " dateFirstUse     =" + dateFirstUse + NL //                 //$NON-NLS-1$
-//            + " dateRetired      =" + dateRetired + NL //                  //$NON-NLS-1$
+//            + " dateBuilt        =" + dateBuilt + NL //                     //$NON-NLS-1$
+//            + " dateFirstUse     =" + dateFirstUse + NL //                  //$NON-NLS-1$
+//            + " dateRetired      =" + dateRetired + NL //                   //$NON-NLS-1$
 //
-//            + " weight           =" + weight + NL //                       //$NON-NLS-1$
+//            + " weight           =" + weight + NL //                        //$NON-NLS-1$
       ;
    }
 

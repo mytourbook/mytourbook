@@ -104,9 +104,14 @@ public class TVIEquipmentView_Root extends TVIEquipmentView_Item {
       em.close();
    }
 
+   /**
+    * Summarizes all tour values for each part and type
+    *
+    * @return
+    */
    private Map<String, SummarizedValues> loadTourValuesFromParts() {
 
-      final Map<String, SummarizedValues> allEqPartValues = new HashMap<>();
+      final Map<String, SummarizedValues> allPartValues = new HashMap<>();
 
       String sql = null;
       PreparedStatement statement = null;
@@ -137,8 +142,8 @@ public class TVIEquipmentView_Root extends TVIEquipmentView_Item {
                + "      part.partid                           AS part_id," + NL //                 //$NON-NLS-1$
                + "      part.\"TYPE\"                         AS part_type," + NL //               //$NON-NLS-1$
 
-               + "      SUM(TOurDAta.tourdistance)              AS sum_distance," + NL //          //$NON-NLS-1$
-               + "      SUM(TOurDAta.tourcomputedtime_moving)   AS sum_moving_time," + NL //       //$NON-NLS-1$
+               + "      SUM(TourData.tourdistance)              AS sum_distance," + NL //          //$NON-NLS-1$
+               + "      SUM(TourData.tourcomputedtime_moving)   AS sum_moving_time," + NL //       //$NON-NLS-1$
 
                + "      COUNT(*)                              AS num_tours" + NL //                //$NON-NLS-1$
 
@@ -194,7 +199,7 @@ public class TVIEquipmentView_Root extends TVIEquipmentView_Item {
             eqPartValues.distance = distance;
             eqPartValues.movingTime = movingTime;
 
-            allEqPartValues.put(partKey, eqPartValues);
+            allPartValues.put(partKey, eqPartValues);
          }
 
       } catch (final SQLException e) {
@@ -203,12 +208,12 @@ public class TVIEquipmentView_Root extends TVIEquipmentView_Item {
          Util.closeSql(statement);
       }
 
-      return allEqPartValues;
+      return allPartValues;
    }
 
    private Map<String, SummarizedValues> loadTourValuesFromServices() {
 
-      final Map<String, SummarizedValues> allEqPartValues = new HashMap<>();
+      final Map<String, SummarizedValues> allServiceValues = new HashMap<>();
 
       String sql = null;
       PreparedStatement statement = null;
@@ -294,7 +299,7 @@ public class TVIEquipmentView_Root extends TVIEquipmentView_Item {
             eqPartValues.distance = distance;
             eqPartValues.movingTime = movingTime;
 
-            allEqPartValues.put(serviceKey, eqPartValues);
+            allServiceValues.put(serviceKey, eqPartValues);
          }
 
       } catch (final SQLException e) {
@@ -303,7 +308,7 @@ public class TVIEquipmentView_Root extends TVIEquipmentView_Item {
          Util.closeSql(statement);
       }
 
-      return allEqPartValues;
+      return allServiceValues;
    }
 
 }
