@@ -638,16 +638,9 @@ public class EquipmentView extends ViewPart implements ITourProvider, ITourViewe
              */
             _equipmentViewer.getTree().redraw();
 
-//       } else if (property.equals(ITourbookPreferences.APP_DATA_FILTER_IS_MODIFIED)) {
-//
-//            // reselect current sensor that the sensor chart (when opened) is reloaded
-//
-//            final StructuredSelection selection = getViewerSelection();
-//
-//            _equipmentViewer.setSelection(selection, true);
-//
-//            final Table table = _equipmentViewer.getTable();
-//            table.showSelection();
+         } else if (property.equals(ITourbookPreferences.APP_DATA_FILTER_IS_MODIFIED)) {
+
+            reloadViewer();
          }
       };
 
@@ -1971,38 +1964,42 @@ public class EquipmentView extends ViewPart implements ITourProvider, ITourViewe
          summarizedValues = rootItem.allSummarizedServiceValues.get(serviceKey);
       }
 
+      int numTours = 0;
+
       if (summarizedValues != null) {
 
          // an item was recognized
 
-         final int numTours = summarizedValues.numTours;
+         numTours = summarizedValues.numTours;
+
+         final float distance = summarizedValues.distance;
+         final long movingTime = summarizedValues.movingTime;
+
+         tviItem.numTours = numTours;
+         tviItem.distance = distance;
+         tviItem.movingTime = movingTime;
+
+         /*
+          * Summarize parent values
+          */
+         final TreeViewerItem partParentItem = tviItem.getParentItem();
+
+         if (partParentItem instanceof final TVIEquipmentView_Equipment partEquipmentItem) {
+
+            partEquipmentItem.numTours += numTours;
+            partEquipmentItem.distance += distance;
+            partEquipmentItem.movingTime += movingTime;
+         }
+      }
+
+      // do not digg deeper, these children are fetched when the parent item is expanded
+      if (tviItem != null) {
 
          if (numTours == 0) {
 
             // hide expand UI icon when there are no children
 
             tviItem.setChildren(new ArrayList<>());
-
-         } else {
-
-            final float distance = summarizedValues.distance;
-            final long movingTime = summarizedValues.movingTime;
-
-            tviItem.numTours = numTours;
-            tviItem.distance = distance;
-            tviItem.movingTime = movingTime;
-
-            /*
-             * Summarize parent values
-             */
-            final TreeViewerItem partParentItem = tviItem.getParentItem();
-
-            if (partParentItem instanceof final TVIEquipmentView_Equipment partEquipmentItem) {
-
-               partEquipmentItem.numTours += numTours;
-               partEquipmentItem.distance += distance;
-               partEquipmentItem.movingTime += movingTime;
-            }
          }
 
          return;
@@ -2745,9 +2742,7 @@ public class EquipmentView extends ViewPart implements ITourProvider, ITourViewe
 
             // a new segment is available
 
-            if (false
-                  || itemType == STATE_ITEM_TYPE_EQUIPMENT
-            ) {
+            if (itemType == STATE_ITEM_TYPE_EQUIPMENT) {
 
                currentSegments.add(new StateSegment(itemType, itemData));
             }

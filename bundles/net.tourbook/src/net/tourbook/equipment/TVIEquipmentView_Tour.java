@@ -38,7 +38,7 @@ public class TVIEquipmentView_Tour extends TVIEquipmentView_Item {
          + "tourTitle,"                                                //   3 //$NON-NLS-1$
          + "tourType_typeId,"                                          //   4 //$NON-NLS-1$
 
-//         + SQL_SUM_COLUMNS_TOUR                                //   7
+         + SQL_SUM_COLUMNS_TOUR                                 //   7
    ;
 
    long                       tourId;

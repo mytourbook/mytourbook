@@ -28,6 +28,7 @@ import net.tourbook.common.util.TreeViewerItem;
 import net.tourbook.data.Equipment;
 import net.tourbook.data.EquipmentPart;
 import net.tourbook.database.TourDatabase;
+import net.tourbook.ui.SQLFilter;
 
 import org.eclipse.jface.viewers.TreeViewer;
 
@@ -62,31 +63,34 @@ public class TVIEquipmentView_Part extends TVIEquipmentView_Item {
 
       try (Connection conn = TourDatabase.getInstance().getConnection()) {
 
-//         final SQLFilter sqlFilter = new SQLFilter();
+         final SQLFilter sqlFilter = new SQLFilter();
 
          final String sql = UI.EMPTY_STRING
 
                + "SELECT" + NL //                                                               //$NON-NLS-1$
 
-               + "   j_tour.tourID," + NL //                                                 1  //$NON-NLS-1$
-               + "   j_tour.tourstarttime," + NL //                                          2  //$NON-NLS-1$
-               + "   j_tour.timeZoneId," + NL //                                             3  //$NON-NLS-1$
-               + "   j_tour.tourtitle" + NL //                                               4  //$NON-NLS-1$
+               + "   TourData.tourID," + NL //                                                 1  //$NON-NLS-1$
+               + "   TourData.tourstarttime," + NL //                                          2  //$NON-NLS-1$
+               + "   TourData.timeZoneId," + NL //                                             3  //$NON-NLS-1$
+               + "   TourData.tourtitle" + NL //                                               4  //$NON-NLS-1$
 
                + "FROM equipmentpart part" + NL //                                              //$NON-NLS-1$
 
                + "JOIN tourdata_equipment j_td_eq" + NL //                                      //$NON-NLS-1$
                + "   ON j_td_eq.equipment_equipmentid = part.equipment_equipmentid" + NL //     //$NON-NLS-1$
 
-               + "JOIN tourdata j_tour" + NL //                                                 //$NON-NLS-1$
-               + "   ON j_tour.tourID = j_td_eq.tourdata_tourID" + NL //                        //$NON-NLS-1$
-               + "   AND j_tour.tourstarttime >= part.\"DATE\"" + NL //                         //$NON-NLS-1$
-               + "   AND j_tour.tourstarttime <  part.dateUntil" + NL //                        //$NON-NLS-1$
+               // The alias "TourData" is needed that the tour filter is working
+               + "JOIN tourdata TourData" + NL //                                                 //$NON-NLS-1$
+               + "   ON TourData.tourID = j_td_eq.tourdata_tourID" + NL //                        //$NON-NLS-1$
+               + "   AND TourData.tourstarttime >= part.\"DATE\"" + NL //                         //$NON-NLS-1$
+               + "   AND TourData.tourstarttime <  part.dateUntil" + NL //                        //$NON-NLS-1$
 
                + "WHERE part.isCollate = TRUE" + NL //                                          //$NON-NLS-1$
                + "   AND part.partID = ?" + NL //                                               //$NON-NLS-1$
 
-               + "ORDER BY j_tour.tourstarttime" + NL //                                        //$NON-NLS-1$
+               + sqlFilter.getWhereClause() + NL
+
+               + "ORDER BY TourData.tourstarttime" + NL //                                        //$NON-NLS-1$
          ;
 
          TVIEquipmentView_Tour tourItem = null;
@@ -94,7 +98,7 @@ public class TVIEquipmentView_Part extends TVIEquipmentView_Item {
          final PreparedStatement statement = conn.prepareStatement(sql);
 
          statement.setLong(1, _partID);
-//         sqlFilter.setParameters(statement, 2);
+         sqlFilter.setParameters(statement, 2);
 
          final ResultSet result = statement.executeQuery();
 

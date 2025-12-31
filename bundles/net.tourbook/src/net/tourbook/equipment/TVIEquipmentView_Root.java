@@ -31,6 +31,7 @@ import net.tourbook.common.util.SQL;
 import net.tourbook.common.util.Util;
 import net.tourbook.data.Equipment;
 import net.tourbook.database.TourDatabase;
+import net.tourbook.ui.SQLFilter;
 
 import org.eclipse.jface.viewers.TreeViewer;
 
@@ -108,9 +109,11 @@ public class TVIEquipmentView_Root extends TVIEquipmentView_Item {
       final Map<String, SummarizedValues> allEqPartValues = new HashMap<>();
 
       String sql = null;
-      PreparedStatement stmt = null;
+      PreparedStatement statement = null;
 
       try (Connection conn = TourDatabase.getInstance().getConnection()) {
+
+         final SQLFilter sqlFilter = new SQLFilter();
 
          sql = UI.EMPTY_STRING
 
@@ -134,8 +137,8 @@ public class TVIEquipmentView_Root extends TVIEquipmentView_Item {
                + "      part.partid                           AS part_id," + NL //                 //$NON-NLS-1$
                + "      part.\"TYPE\"                         AS part_type," + NL //               //$NON-NLS-1$
 
-               + "      SUM(j_tour.tourdistance)              AS sum_distance," + NL //            //$NON-NLS-1$
-               + "      SUM(j_tour.tourcomputedtime_moving)   AS sum_moving_time," + NL //         //$NON-NLS-1$
+               + "      SUM(TOurDAta.tourdistance)              AS sum_distance," + NL //          //$NON-NLS-1$
+               + "      SUM(TOurDAta.tourcomputedtime_moving)   AS sum_moving_time," + NL //       //$NON-NLS-1$
 
                + "      COUNT(*)                              AS num_tours" + NL //                //$NON-NLS-1$
 
@@ -144,10 +147,12 @@ public class TVIEquipmentView_Root extends TVIEquipmentView_Item {
                + "   JOIN tourdata_equipment AS j_td_eq" + NL //                                   //$NON-NLS-1$
                + "        ON j_td_eq.equipment_equipmentid = part.equipment_equipmentid" + NL //   //$NON-NLS-1$
 
-               + "   JOIN tourdata AS j_tour" + NL //                                              //$NON-NLS-1$
-               + "      ON j_tour.tourid = j_td_eq.tourdata_tourid" + NL //                        //$NON-NLS-1$
-               + "      AND j_tour.tourstarttime >= part.\"DATE\"" + NL //                         //$NON-NLS-1$
-               + "      AND j_tour.tourstarttime <  part.dateuntil" + NL //                        //$NON-NLS-1$
+               // the alias "TourData" is needed that the app filter is working
+               + "   JOIN TourData AS TourData" + NL //                                            //$NON-NLS-1$
+               + "      ON TourData.tourid = j_td_eq.tourdata_tourid" + NL //                      //$NON-NLS-1$
+               + "      AND TourData.tourstarttime >= part.\"DATE\"" + NL //                       //$NON-NLS-1$
+               + "      AND TourData.tourstarttime <  part.dateuntil" + NL //                      //$NON-NLS-1$
+               + sqlFilter.getWhereClause() + NL
 
                + "   WHERE part.iscollate = TRUE" + NL //                                          //$NON-NLS-1$
 
@@ -162,9 +167,11 @@ public class TVIEquipmentView_Root extends TVIEquipmentView_Item {
                + "LEFT JOIN equipmentpart j_part  ON j_part.partid       = parts_Summarized.part_id" + NL //      //$NON-NLS-1$
          ;
 
-         stmt = conn.prepareStatement(sql);
+         statement = conn.prepareStatement(sql);
 
-         final ResultSet result = stmt.executeQuery();
+         sqlFilter.setParameters(statement, 1);
+
+         final ResultSet result = statement.executeQuery();
 
          while (result.next()) {
 
@@ -193,7 +200,7 @@ public class TVIEquipmentView_Root extends TVIEquipmentView_Item {
       } catch (final SQLException e) {
          SQL.showException(e, sql);
       } finally {
-         Util.closeSql(stmt);
+         Util.closeSql(statement);
       }
 
       return allEqPartValues;
@@ -204,9 +211,11 @@ public class TVIEquipmentView_Root extends TVIEquipmentView_Item {
       final Map<String, SummarizedValues> allEqPartValues = new HashMap<>();
 
       String sql = null;
-      PreparedStatement stmt = null;
+      PreparedStatement statement = null;
 
       try (Connection conn = TourDatabase.getInstance().getConnection()) {
+
+         final SQLFilter sqlFilter = new SQLFilter();
 
          sql = UI.EMPTY_STRING
 
@@ -229,8 +238,8 @@ public class TVIEquipmentView_Root extends TVIEquipmentView_Item {
                + "      service.SERVICEID                      AS service_ID," + NL //             //$NON-NLS-1$
                + "      service.\"TYPE\"                       AS service_Type," + NL //           //$NON-NLS-1$
 
-               + "      SUM(j_tour.tourdistance)               AS sum_distance," + NL //           //$NON-NLS-1$
-               + "      SUM(j_tour.tourcomputedtime_moving)    AS sum_moving_time," + NL //        //$NON-NLS-1$
+               + "      SUM(TourData.tourdistance)             AS sum_distance," + NL //           //$NON-NLS-1$
+               + "      SUM(TourData.tourcomputedtime_moving)  AS sum_moving_time," + NL //        //$NON-NLS-1$
 
                + "      COUNT(*)                               AS num_tours" + NL //               //$NON-NLS-1$
 
@@ -239,10 +248,12 @@ public class TVIEquipmentView_Root extends TVIEquipmentView_Item {
                + "   JOIN tourdata_equipment AS j_td_eq" + NL //                                   //$NON-NLS-1$
                + "      ON j_td_eq.equipment_equipmentid = service.equipment_equipmentid" + NL //  //$NON-NLS-1$
 
-               + "   JOIN tourdata AS j_tour" + NL //                                              //$NON-NLS-1$
-               + "      ON j_tour.tourid = j_td_eq.tourdata_tourid" + NL //                        //$NON-NLS-1$
-               + "      AND j_tour.tourstarttime >= service.\"DATE\"" + NL //                      //$NON-NLS-1$
-               + "      AND j_tour.tourstarttime <  service.dateuntil" + NL //                     //$NON-NLS-1$
+               // the alias "TourData" is needed that the app filter is working
+               + "   JOIN tourdata AS TourData" + NL //                                            //$NON-NLS-1$
+               + "      ON TourData.tourid = j_td_eq.tourdata_tourid" + NL //                      //$NON-NLS-1$
+               + "      AND TourData.tourstarttime >= service.\"DATE\"" + NL //                    //$NON-NLS-1$
+               + "      AND TourData.tourstarttime <  service.dateuntil" + NL //                   //$NON-NLS-1$
+               + sqlFilter.getWhereClause() + NL
 
                + "   WHERE service.isCollate = TRUE" + NL //                                       //$NON-NLS-1$
 
@@ -257,9 +268,10 @@ public class TVIEquipmentView_Root extends TVIEquipmentView_Item {
                + "LEFT JOIN EQUIPMENTSERVICE    j_service   ON j_service.SERVICEID  = services_Summarized.service_ID" + NL //       //$NON-NLS-1$
          ;
 
-         stmt = conn.prepareStatement(sql);
+         statement = conn.prepareStatement(sql);
+         sqlFilter.setParameters(statement, 1);
 
-         final ResultSet result = stmt.executeQuery();
+         final ResultSet result = statement.executeQuery();
 
          while (result.next()) {
 
@@ -288,7 +300,7 @@ public class TVIEquipmentView_Root extends TVIEquipmentView_Item {
       } catch (final SQLException e) {
          SQL.showException(e, sql);
       } finally {
-         Util.closeSql(stmt);
+         Util.closeSql(statement);
       }
 
       return allEqPartValues;

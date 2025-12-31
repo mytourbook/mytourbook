@@ -92,28 +92,25 @@ public abstract class TVITaggingView_Item extends TreeViewerItem {
    long                             colDistance;
 
    long                             colElapsedTime;
-
    long                             colRecordedTime;
    long                             colMovingTime;
    long                             colPausedTime;
+
    long                             colAltitudeUp;
    long                             colAltitudeDown;
 
-   float                            colMaxSpeed;
-   long                             colMaxPulse;
    long                             colMaxAltitude;
+   long                             colMaxPulse;
+   float                            colMaxSpeed;
 
-   float                            colAvgSpeed;
-   float                            colAvgPace;
-
-   float                            colAvgPulse;
    float                            colAvgCadence;
+   float                            colAvgPace;
+   float                            colAvgPulse;
+   float                            colAvgSpeed;
    float                            colAvgTemperature_Device;
 
    long                             numTours;
    int                              numTags_NoTours;
-
-   int                              temperatureDigits;
 
    private TreeViewer               _tagViewer;
 
