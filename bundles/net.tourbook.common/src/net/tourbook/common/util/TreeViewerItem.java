@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2025 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2026 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -15,14 +15,20 @@
  *******************************************************************************/
 package net.tourbook.common.util;
 
+import java.lang.reflect.Field;
+import java.lang.reflect.Type;
 import java.util.ArrayList;
+
+import net.tourbook.common.UI;
 
 /**
  * Abstract class which contains an item for a tree viewer
  */
 public abstract class TreeViewerItem {
 
-   protected static final char       NL = net.tourbook.common.UI.NEW_LINE;
+   protected static final char       NL                    = net.tourbook.common.UI.NEW_LINE;
+
+   private static final String       SCRAMBLE_FIELD_PREFIX = "col";                          //$NON-NLS-1$
 
    private TreeViewerItem            _parentItem;
 
@@ -203,6 +209,51 @@ public abstract class TreeViewerItem {
       }
 
       return isRemoved;
+   }
+
+   /**
+    * Scramble all fields which fieldname is starting with "col"
+    *
+    * @param fields
+    */
+   protected void scrambleValues(final Field[] allFields) {
+
+      try {
+
+         for (final Field field : allFields) {
+
+            final String fieldName = field.getName();
+
+            if (fieldName.startsWith(SCRAMBLE_FIELD_PREFIX)) {
+
+               final Type fieldType = field.getGenericType();
+
+               if (Integer.TYPE.equals(fieldType)) {
+
+                  field.set(this, UI.scrambleNumbers(field.getInt(this)));
+
+               } else if (Long.TYPE.equals(fieldType)) {
+
+                  field.set(this, UI.scrambleNumbers(field.getLong(this)));
+
+               } else if (Float.TYPE.equals(fieldType)) {
+
+                  field.set(this, UI.scrambleNumbers(field.getFloat(this)));
+
+               } else if (String.class.equals(fieldType)) {
+
+                  final String fieldValue = (String) field.get(this);
+                  final String scrambledText = UI.scrambleText(fieldValue);
+
+                  field.set(this, scrambledText);
+               }
+            }
+         }
+
+      } catch (IllegalArgumentException | IllegalAccessException e) {
+
+         StatusUtil.log(e);
+      }
    }
 
    /**

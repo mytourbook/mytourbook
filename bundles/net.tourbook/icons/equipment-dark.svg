@@ -55,26 +55,26 @@
   <g
      id="layer1"
      style="display:inline"
-     transform="translate(-69.999992,-43.999985)">
+     transform="translate(-95,-43.999985)">
     <rect
-       transform="scale(1,-1)"
+       transform="scale(-1)"
        y="-60"
-       x="70"
+       x="-111"
        height="16.000015"
        width="15.999991"
-       id="rect6561-8-1-9-9-5-5-9-9-1-3-94-1-6-6-4-5-4-9-0-8-4-2-4-6"
+       id="rect6561-8-1-9-9-5-5-9-9-1-3-94-1-6-6-4-5-4-9-0-8-4-2-4-6-2"
        style="display:inline;opacity:0.99;fill:none;stroke:none" />
     <path
-       id="rect9-4-1-1-2-0-4-2-8"
+       id="rect9-4-1-1-2-0-4-2-8-4"
        style="display:inline;fill:#e9e61f;fill-opacity:1;stroke:#79770c;stroke-width:0.500003;stroke-miterlimit:3;stroke-opacity:1"
-       d="M 74.62665,44.124504 78.736719,51.281226 85.874503,47.138357" />
+       d="M 106.37335,44.124504 102.26328,51.281226 95.125497,47.138357" />
     <path
-       id="path8-1-3-8-1-6-8-1-2-9-5-3-5"
+       id="path8-1-3-8-1-6-8-1-2-9-5-3-5-5"
        style="display:inline;fill:#fe7f00;stroke:#9a4d00;stroke-width:0.5;stroke-miterlimit:3;stroke-dasharray:none"
-       d="M 74.758845,53.499998 C 74.758845,55.847209 72.740161,57.749999 70.249993,57.75 70.249993,52.240646 70.249993,54.815005 70.249993,49.25 72.740161,49.250001 74.758845,51.152789 74.758845,53.499998 Z" />
+       d="M 106.24116,53.499998 C 106.24116,55.847209 108.25984,57.749999 110.75001,57.75 110.75001,52.240646 110.75001,54.815005 110.75001,49.25 108.25984,49.250001 106.24116,51.152789 106.24116,53.499998 Z" />
     <path
-       d="M 77,58.998553 H 83.999758 V 51.998552"
+       d="M 104,58.998553 H 97.000237 V 51.998552"
        style="display:inline;fill:#42b6ff;fill-opacity:1;stroke:none;stroke-width:0.500001;stroke-linecap:round;stroke-miterlimit:3"
-       id="path1-2-7-2-4-4-40-5-1-4-5-2-7" />
+       id="path1-2-7-2-4-4-40-5-1-4-5-2-7-5" />
   </g>
 </svg>

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2025 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2026 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -166,11 +166,12 @@ public class TVITaggingView_Tag extends TVITaggingView_Item {
 
          final String sql = UI.EMPTY_STRING
 
-               + "SELECT" + NL //                                 //$NON-NLS-1$
+               + "SELECT" + NL //                                    //$NON-NLS-1$
 
-               + " TourData.tourId," + NL //                   1  //$NON-NLS-1$
-               + " jTdataTtag2.TourTag_tagId," + NL //         2 //$NON-NLS-1$
-               + TVITaggingView_Tour.SQL_TOUR_COLUMNS + NL //      3
+               + " TourData.tourId," + NL //                      1  //$NON-NLS-1$
+               + " jTdataTtag2.TourTag_tagId," + NL //            2  //$NON-NLS-1$
+
+               + TVITaggingView_Tour.SQL_TOUR_COLUMNS + NL //     3
 
                + " FROM " + TourDatabase.JOINTABLE__TOURDATA__TOURTAG + " jTdataTtag" + NL //               //$NON-NLS-1$ //$NON-NLS-2$
 
@@ -216,7 +217,7 @@ public class TVITaggingView_Tag extends TVITaggingView_Item {
                children.add(tourItem);
 
                tourItem.tourId = tourId;
-               tourItem.getTourColumnData(result, resultTagId, 3);
+               tourItem.getTourColumnValues(result, resultTagId, 3);
 
                tourItem.firstColumn = tourItem.tourDate.format(TimeTools.Formatter_Date_S);
 

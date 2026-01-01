@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2026 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -79,9 +79,9 @@ public class TVITaggingView_Tour extends TVITaggingView_Item {
    @Override
    protected void fetchChildren() {}
 
-   public void getTourColumnData(final ResultSet result,
-                                 final Object resultTagId,
-                                 final int startIndex)
+   public void getTourColumnValues(final ResultSet result,
+                                   final Object resultTagId,
+                                   final int startIndex)
          throws SQLException {
 
       tourYear = result.getInt(startIndex + 0);

@@ -55,34 +55,34 @@
   <g
      id="layer1"
      style="display:inline"
-     transform="translate(-69.999992,-68.999985)">
+     transform="translate(-95,-68.999985)">
     <rect
-       transform="scale(1,-1)"
+       transform="scale(-1)"
        y="-85"
-       x="70"
+       x="-111"
        height="16.000015"
        width="15.999991"
-       id="rect6561-8-1-9-9-5-5-9-9-1-3-94-1-6-6-4-5-4-9-0-8-4-2-4-8"
+       id="rect6561-8-1-9-9-5-5-9-9-1-3-94-1-6-6-4-5-4-9-0-8-4-2-4-8-1"
        style="display:inline;opacity:0.99;fill:none;stroke:none" />
     <path
-       id="rect9-4-1-1-2-0-4-2-9"
+       id="rect9-4-1-1-2-0-4-2-9-7"
        style="display:inline;fill:#e9e61f;fill-opacity:1;stroke:#79770c;stroke-width:0.500003;stroke-miterlimit:3;stroke-opacity:1"
-       d="M 74.62665,69.124504 78.736719,76.281226 85.874503,72.138357" />
+       d="M 106.37335,69.124504 102.26328,76.281226 95.125497,72.138357" />
     <path
-       id="path8-1-3-8-1-6-8-1-2-9-5-3-2"
+       id="path8-1-3-8-1-6-8-1-2-9-5-3-2-1"
        style="display:inline;fill:#fe7f00;stroke:#9a4d00;stroke-width:0.5;stroke-miterlimit:3;stroke-dasharray:none"
-       d="M 74.758845,78.499998 C 74.758845,80.847209 72.740161,82.749999 70.249993,82.75 70.249993,77.240646 70.249993,79.815005 70.249993,74.25 72.740161,74.250001 74.758845,76.152789 74.758845,78.499998 Z" />
+       d="M 106.24116,78.499998 C 106.24116,80.847209 108.25984,82.749999 110.75001,82.75 110.75001,77.240646 110.75001,79.815005 110.75001,74.25 108.25984,74.250001 106.24116,76.152789 106.24116,78.499998 Z" />
     <path
-       d="M 77,83.998553 H 83.999758 V 76.998552"
+       d="M 104,83.998553 H 97.000237 V 76.998552"
        style="display:inline;fill:#42b6ff;fill-opacity:1;stroke:none;stroke-width:0.500001;stroke-linecap:round;stroke-miterlimit:3"
-       id="path1-2-7-2-4-4-40-5-1-4-5-2-79" />
+       id="path1-2-7-2-4-4-40-5-1-4-5-2-79-1" />
     <path
-       id="rect1-5-6-1-6-3-94-5-9-2-6-8-1-2-5"
+       id="rect1-5-6-1-6-3-94-5-9-2-6-8-1-2-5-5"
        style="display:inline;fill:none;stroke:#005a92;stroke-width:0.500001;stroke-linecap:square;stroke-miterlimit:3;stroke-opacity:1"
-       d="M 83.750004,83.756644 V 77.250511" />
+       d="M 97.249997,83.756644 V 77.250511" />
     <path
-       id="rect1-5-6-1-6-3-94-5-9-2-6-8-1-2-57-9"
+       id="rect1-5-6-1-6-3-94-5-9-2-6-8-1-2-57-9-2"
        style="display:inline;fill:none;stroke:#005a92;stroke-width:0.500001;stroke-linecap:square;stroke-miterlimit:3;stroke-opacity:1"
-       d="M 83.750793,83.749999 H 77.250001" />
+       d="M 97.249207,83.749999 H 103.75" />
   </g>
 </svg>

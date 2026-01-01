@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2025 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2026 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -15,8 +15,6 @@
  *******************************************************************************/
 package net.tourbook.ui.views.tagging;
 
-import java.lang.reflect.Field;
-import java.lang.reflect.Type;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -34,10 +32,10 @@ import org.eclipse.jface.viewers.TreeViewer;
 
 public abstract class TVITaggingView_Item extends TreeViewerItem {
 
-   static final String         SQL_SUM_COLUMNS;
-   static final String         SQL_SUM_COLUMNS_TOUR;
+   static final String                   SQL_SUM_COLUMNS;
+   static final String                   SQL_SUM_COLUMNS_TOUR;
 
-   private static final String SCRAMBLE_FIELD_PREFIX = "col"; //$NON-NLS-1$
+   private static final IPreferenceStore _prefStore = TourbookPlugin.getPrefStore();
 
    static {
 
@@ -82,37 +80,35 @@ public abstract class TVITaggingView_Item extends TreeViewerItem {
       ;
    }
 
-   protected final IPreferenceStore _prefStore = TourbookPlugin.getPrefStore();
-
    /**
     * Content which is displayed in the first tree column
     */
-   String                           firstColumn;
+   String             firstColumn;
 
-   long                             colDistance;
+   long               colDistance;
 
-   long                             colElapsedTime;
-   long                             colRecordedTime;
-   long                             colMovingTime;
-   long                             colPausedTime;
+   long               colElapsedTime;
+   long               colRecordedTime;
+   long               colMovingTime;
+   long               colPausedTime;
 
-   long                             colAltitudeUp;
-   long                             colAltitudeDown;
+   long               colAltitudeUp;
+   long               colAltitudeDown;
 
-   long                             colMaxAltitude;
-   long                             colMaxPulse;
-   float                            colMaxSpeed;
+   long               colMaxAltitude;
+   long               colMaxPulse;
+   float              colMaxSpeed;
 
-   float                            colAvgCadence;
-   float                            colAvgPace;
-   float                            colAvgPulse;
-   float                            colAvgSpeed;
-   float                            colAvgTemperature_Device;
+   float              colAvgCadence;
+   float              colAvgPace;
+   float              colAvgPulse;
+   float              colAvgSpeed;
+   float              colAvgTemperature_Device;
 
-   long                             numTours;
-   int                              numTags_NoTours;
+   long               numTours;
+   int                numTags_NoTours;
 
-   private TreeViewer               _tagViewer;
+   private TreeViewer _tagViewer;
 
    public TVITaggingView_Item(final TreeViewer tagViewer) {
 
@@ -209,7 +205,7 @@ public abstract class TVITaggingView_Item extends TreeViewerItem {
 // SET_FORMATTING_ON
 
       if (UI.IS_SCRAMBLE_DATA) {
-         scrambleData();
+         scrambleValues(TVITaggingView_Item.class.getDeclaredFields());
       }
    }
 
@@ -218,45 +214,4 @@ public abstract class TVITaggingView_Item extends TreeViewerItem {
       readDefaultColumnData(result, startIndex);
    }
 
-   /**
-    * Scramble all fields which fieldname is starting with "col"
-    */
-   private void scrambleData() {
-
-      try {
-
-         for (final Field field : TVITaggingView_Item.class.getDeclaredFields()) {
-
-            final String fieldName = field.getName();
-
-            if (fieldName.startsWith(SCRAMBLE_FIELD_PREFIX)) {
-
-               final Type fieldType = field.getGenericType();
-
-               if (Integer.TYPE.equals(fieldType)) {
-
-                  field.set(this, UI.scrambleNumbers(field.getInt(this)));
-
-               } else if (Long.TYPE.equals(fieldType)) {
-
-                  field.set(this, UI.scrambleNumbers(field.getLong(this)));
-
-               } else if (Float.TYPE.equals(fieldType)) {
-
-                  field.set(this, UI.scrambleNumbers(field.getFloat(this)));
-
-               } else if (String.class.equals(fieldType)) {
-
-                  final String fieldValue = (String) field.get(this);
-                  final String scrambledText = UI.scrambleText(fieldValue);
-
-                  field.set(this, scrambledText);
-               }
-            }
-         }
-
-      } catch (IllegalArgumentException | IllegalAccessException e) {
-         e.printStackTrace();
-      }
-   }
 }

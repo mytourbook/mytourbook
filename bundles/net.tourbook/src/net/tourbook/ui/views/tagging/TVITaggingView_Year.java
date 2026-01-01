@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2026 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -276,7 +276,7 @@ public class TVITaggingView_Year extends TVITaggingView_Item {
                children.add(tourItem);
 
                tourItem.tourId = tourId;
-               tourItem.getTourColumnData(result, resultTagId, 3);
+               tourItem.getTourColumnValues(result, resultTagId, 3);
 
                tourItem.firstColumn = tourItem.tourDate.format(TimeTools.Formatter_Date_S);
 

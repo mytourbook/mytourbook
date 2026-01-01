@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2025 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2026 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -91,8 +91,6 @@ public abstract class TreeColumnFactory {
    public static final String            EQUIPMENT_TYPE_ID                = "EQUIPMENT_TYPE";                   //$NON-NLS-1$
    public static final TreeColumnFactory EQUIPMENT_WEIGHT;
    public static final String            EQUIPMENT_WEIGHT_ID              = "EQUIPMENT_WEIGHT";                 //$NON-NLS-1$
-   public static final TreeColumnFactory EQUIPMENT_TOUR_DISTANCE;
-   public static final String            EQUIPMENT_TOUR_DISTANCE_ID       = "EQUIPMENT_TOUR_DISTANCE";          //$NON-NLS-1$
 
    public static final TreeColumnFactory MOTION_AVG_PACE;
    public static final TreeColumnFactory MOTION_AVG_SPEED;
@@ -1068,30 +1066,6 @@ public abstract class TreeColumnFactory {
          }
       };
 
-      EQUIPMENT_TOUR_DISTANCE = new TreeColumnFactory() {
-         @Override
-         public TreeColumnDefinition createColumn(final ColumnManager columnManager,
-                                                  final PixelConverter pixelConverter) {
-
-            final TreeColumnDefinition colDef = new TreeColumnDefinition(columnManager, EQUIPMENT_TOUR_DISTANCE_ID, SWT.TRAIL);
-
-            colDef.setColumnCategory(           Messages.ColumnFactory_Category_Motion);
-
-            colDef.setColumnLabel(              "Distance");
-            colDef.setColumnHeaderText(         UI.UNIT_LABEL_DISTANCE);
-            colDef.setColumnHeaderToolTipText(  "Distance");
-            colDef.setColumnUnit(               UI.UNIT_LABEL_DISTANCE);
-
-            colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(12));
-            colDef.setValueFormats(
-                  ValueFormatSet.Number,
-                  ValueFormat.NUMBER_1_0,
-                  ValueFormat.NUMBER_1_3,
-                  columnManager);
-
-            return colDef;
-         }
-      };
 
       /*
        * Motion

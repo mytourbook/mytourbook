@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2025 Wolfgang Schramm and Contributors
+ * Copyright (C) 2025, 2026 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -44,7 +44,9 @@ public class TVIEquipmentView_Service extends TVIEquipmentView_Item {
    @Override
    protected void fetchChildren() {
 
-      // there are no children for a part
+
+      int a = 0;
+      a++;
    }
 
    public Equipment getEquipment() {
@@ -65,9 +67,4 @@ public class TVIEquipmentView_Service extends TVIEquipmentView_Item {
       return getTourValuesKey(_equipment.getEquipmentId(), _serviceID, _service.getType());
    }
 
-   @Override
-   public boolean hasChildren() {
-
-      return false;
-   }
 }

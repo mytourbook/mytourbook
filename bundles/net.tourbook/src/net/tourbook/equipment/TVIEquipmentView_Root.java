@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2025 Wolfgang Schramm and Contributors
+ * Copyright (C) 2025, 2026 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -125,11 +125,11 @@ public class TVIEquipmentView_Root extends TVIEquipmentView_Item {
                + "SELECT" + NL //                                                                  //$NON-NLS-1$
 
                + "   j_equip.EQUIPMENTID," + NL //                                              1  //$NON-NLS-1$
-
                + "   j_part.PARTID," + NL //                                                    2  //$NON-NLS-1$
 
                + "   parts_Summarized.part_type," + NL //                                       3  //$NON-NLS-1$
                + "   parts_Summarized.num_tours," + NL //                                       4  //$NON-NLS-1$
+
                + "   parts_Summarized.sum_distance," + NL //                                    5  //$NON-NLS-1$
                + "   parts_Summarized.sum_moving_time" + NL //                                  6  //$NON-NLS-1$
 
@@ -138,19 +138,19 @@ public class TVIEquipmentView_Root extends TVIEquipmentView_Item {
 
                + "   SELECT" + NL //                                                               //$NON-NLS-1$
 
-               + "      part.equipment_equipmentid            AS part_eq_id," + NL //              //$NON-NLS-1$
-               + "      part.partid                           AS part_id," + NL //                 //$NON-NLS-1$
-               + "      part.\"TYPE\"                         AS part_type," + NL //               //$NON-NLS-1$
+               + "      part.equipment_equipmentid             AS part_eq_id," + NL //              //$NON-NLS-1$
+               + "      part.partid                            AS part_id," + NL //                 //$NON-NLS-1$
+               + "      part.\"TYPE\"                          AS part_type," + NL //               //$NON-NLS-1$
 
-               + "      SUM(TourData.tourdistance)              AS sum_distance," + NL //          //$NON-NLS-1$
-               + "      SUM(TourData.tourcomputedtime_moving)   AS sum_moving_time," + NL //       //$NON-NLS-1$
+               + "      COUNT(*)                               AS num_tours," + NL //              //$NON-NLS-1$
 
-               + "      COUNT(*)                              AS num_tours" + NL //                //$NON-NLS-1$
+               + "      SUM(TourData.tourdistance)         		AS sum_distance," + NL //           //$NON-NLS-1$
+               + "      SUM(TourData.tourcomputedtime_moving)  AS sum_moving_time" + NL //         //$NON-NLS-1$
 
-               + "   FROM equipmentpart AS part" + NL //                                           //$NON-NLS-1$
+               + "   FROM EquipmentPart AS part" + NL //                                           //$NON-NLS-1$
 
                + "   JOIN tourdata_equipment AS j_td_eq" + NL //                                   //$NON-NLS-1$
-               + "        ON j_td_eq.equipment_equipmentid = part.equipment_equipmentid" + NL //   //$NON-NLS-1$
+               + "      ON j_td_eq.equipment_equipmentid = part.equipment_equipmentid" + NL //     //$NON-NLS-1$
 
                // the alias "TourData" is needed that the app filter is working
                + "   JOIN TourData AS TourData" + NL //                                            //$NON-NLS-1$

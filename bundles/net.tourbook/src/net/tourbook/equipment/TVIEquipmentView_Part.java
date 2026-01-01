@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2025 Wolfgang Schramm and Contributors
+ * Copyright (C) 2025, 2026 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -19,11 +19,9 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.time.ZonedDateTime;
 import java.util.ArrayList;
 
 import net.tourbook.common.UI;
-import net.tourbook.common.time.TimeTools;
 import net.tourbook.common.util.TreeViewerItem;
 import net.tourbook.data.Equipment;
 import net.tourbook.data.EquipmentPart;
@@ -69,10 +67,7 @@ public class TVIEquipmentView_Part extends TVIEquipmentView_Item {
 
                + "SELECT" + NL //                                                               //$NON-NLS-1$
 
-               + "   TourData.tourID," + NL //                                                 1  //$NON-NLS-1$
-               + "   TourData.tourstarttime," + NL //                                          2  //$NON-NLS-1$
-               + "   TourData.timeZoneId," + NL //                                             3  //$NON-NLS-1$
-               + "   TourData.tourtitle" + NL //                                               4  //$NON-NLS-1$
+               + TVIEquipmentView_Tour.SQL_TOUR_COLUMNS
 
                + "FROM equipmentpart part" + NL //                                              //$NON-NLS-1$
 
@@ -80,20 +75,18 @@ public class TVIEquipmentView_Part extends TVIEquipmentView_Item {
                + "   ON j_td_eq.equipment_equipmentid = part.equipment_equipmentid" + NL //     //$NON-NLS-1$
 
                // The alias "TourData" is needed that the tour filter is working
-               + "JOIN tourdata TourData" + NL //                                                 //$NON-NLS-1$
-               + "   ON TourData.tourID = j_td_eq.tourdata_tourID" + NL //                        //$NON-NLS-1$
-               + "   AND TourData.tourstarttime >= part.\"DATE\"" + NL //                         //$NON-NLS-1$
-               + "   AND TourData.tourstarttime <  part.dateUntil" + NL //                        //$NON-NLS-1$
+               + "JOIN tourdata TourData" + NL //                                               //$NON-NLS-1$
+               + "   ON TourData.tourID = j_td_eq.tourdata_tourID" + NL //                      //$NON-NLS-1$
+               + "   AND TourData.tourstarttime >= part.\"DATE\"" + NL //                       //$NON-NLS-1$
+               + "   AND TourData.tourstarttime <  part.dateUntil" + NL //                      //$NON-NLS-1$
 
                + "WHERE part.isCollate = TRUE" + NL //                                          //$NON-NLS-1$
                + "   AND part.partID = ?" + NL //                                               //$NON-NLS-1$
 
                + sqlFilter.getWhereClause() + NL
 
-               + "ORDER BY TourData.tourstarttime" + NL //                                        //$NON-NLS-1$
+               + "ORDER BY TourData.tourstarttime" + NL //                                      //$NON-NLS-1$
          ;
-
-         TVIEquipmentView_Tour tourItem = null;
 
          final PreparedStatement statement = conn.prepareStatement(sql);
 
@@ -104,20 +97,11 @@ public class TVIEquipmentView_Part extends TVIEquipmentView_Item {
 
          while (result.next()) {
 
-            final long tourId = result.getLong(1);
-            final long startTime = result.getLong(2);
-            final String timeZoneID = result.getString(3);
-            final String title = result.getString(4);
+            final TVIEquipmentView_Tour tourItem = new TVIEquipmentView_Tour(this, getEquipmentViewer());
 
-            final ZonedDateTime tourStartTime = TimeTools.getZonedDateTime(startTime, timeZoneID);
-
-            tourItem = new TVIEquipmentView_Tour(this, getEquipmentViewer());
             allTourItems.add(tourItem);
 
-            tourItem.tourId = tourId;
-            tourItem.tourTitle = title;
-
-            tourItem.firstColumn = tourStartTime.format(TimeTools.Formatter_Date_S);
+            tourItem.readColumnValues_Tour(result);
 
             if (UI.IS_SCRAMBLE_DATA) {
                tourItem.firstColumn = UI.scrambleText(tourItem.firstColumn);

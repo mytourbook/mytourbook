@@ -31,7 +31,6 @@ import net.tourbook.common.CommonActivator;
 import net.tourbook.common.UI;
 import net.tourbook.common.formatter.ValueFormat;
 import net.tourbook.common.time.TimeTools;
-import net.tourbook.common.ui.SelectionCellLabelProvider;
 import net.tourbook.common.util.ColumnDefinition;
 import net.tourbook.common.util.ColumnManager;
 import net.tourbook.common.util.IContextMenuProvider;
@@ -900,21 +899,37 @@ public class EquipmentView extends ViewPart implements ITourProvider, ITourViewe
       defineColumn_Equipment_Type();
       defineColumn_Equipment_Collate();
 
+      defineColumn_Time_ElapsedTime();
+      defineColumn_Time_MovingTime();
+      defineColumn_Time_PausedTime();
+
+      defineColumn_Motion_Distance();
+      defineColumn_Motion_MaxSpeed();
+      defineColumn_Motion_AvgSpeed();
+      defineColumn_Motion_AvgPace();
+
+      defineColumn_Time_Date();
+      defineColumn_Time_Date_Until();
+      defineColumn_Time_UsageDuration();
+      defineColumn_Time_Date_Built();
+      defineColumn_Time_Date_Retired();
+
       defineColumn_Equipment_Price();
       defineColumn_Equipment_PriceUnit();
-
       defineColumn_Equipment_Size();
       defineColumn_Equipment_Weight();
       defineColumn_Equipment_InitialDistance();
 
-      defineColumn_Time_UsageDuration();
-      defineColumn_Time_Date();
-      defineColumn_Time_Date_Until();
-      defineColumn_Time_Date_Built();
-      defineColumn_Time_Date_Retired();
+      defineColumn_Altitude_Up();
+      defineColumn_Altitude_Down();
+      defineColumn_Altitude_Max();
 
-      defineColumn_Tour_Distance();
-      defineColumn_Tour_MovingTime();
+      defineColumn_Body_MaxPulse();
+      defineColumn_Body_AvgPulse();
+
+      defineColumn_Weather_Temperature_Avg_Device();
+
+      defineColumn_Powertrain_AvgCadence();
 
       defineColumn_Equipment_ID();
    }
@@ -940,7 +955,7 @@ public class EquipmentView extends ViewPart implements ITourProvider, ITourViewe
 //
 //            final TVIEquipmentView_Item viewItem = (TVIEquipmentView_Item) cell.getElement();
 //
-//            if (viewItem instanceof TVIEquipmentView_Equipment || viewItem instanceof TVITaggingView_TagCategory) {
+//            if (viewItem instanceof TVIEquipmentView_Equipment || viewItem instanceof TVIEquipmentView_Equipment) {
 //
 //               // return tag/category to show it's notes fields in the tooltip
 //
@@ -1043,6 +1058,139 @@ public class EquipmentView extends ViewPart implements ITourProvider, ITourViewe
    }
 
    /**
+    * Column: Elevation loss (m)
+    */
+   private void defineColumn_Altitude_Down() {
+
+      final TreeColumnDefinition colDef = TreeColumnFactory.ALTITUDE_DOWN.createColumn(_columnManager, _pc);
+      colDef.setLabelProvider(new CellLabelProvider() {
+         @Override
+         public void update(final ViewerCell cell) {
+
+            final Object element = cell.getElement();
+
+            if (element instanceof TVIEquipmentView_Part
+                  || element instanceof TVIEquipmentView_Service
+                  || element instanceof TVIEquipmentView_Tour) {
+
+               final double dbAltitudeDown = ((TVIEquipmentView_Item) element).colAltitudeDown;
+               final double value = -dbAltitudeDown / UI.UNIT_VALUE_ELEVATION;
+
+               colDef.printValue_0(cell, value);
+
+               setCellColor(cell, element);
+            }
+         }
+      });
+   }
+
+   /**
+    * Column: Max elevation
+    */
+   private void defineColumn_Altitude_Max() {
+
+      final TreeColumnDefinition colDef = TreeColumnFactory.ALTITUDE_MAX.createColumn(_columnManager, _pc);
+      colDef.setLabelProvider(new CellLabelProvider() {
+         @Override
+         public void update(final ViewerCell cell) {
+
+            final Object element = cell.getElement();
+
+            if (element instanceof TVIEquipmentView_Part
+                  || element instanceof TVIEquipmentView_Service
+                  || element instanceof TVIEquipmentView_Tour) {
+
+               final long dbMaxAltitude = ((TVIEquipmentView_Item) element).colMaxAltitude;
+               final double value = dbMaxAltitude / UI.UNIT_VALUE_ELEVATION;
+
+               colDef.printValue_0(cell, value);
+
+               setCellColor(cell, element);
+            }
+         }
+      });
+   }
+
+   /**
+    * Column: Elevation gain (m)
+    */
+   private void defineColumn_Altitude_Up() {
+
+      final TreeColumnDefinition colDef = TreeColumnFactory.ALTITUDE_UP.createColumn(_columnManager, _pc);
+      colDef.setLabelProvider(new CellLabelProvider() {
+         @Override
+         public void update(final ViewerCell cell) {
+
+            final Object element = cell.getElement();
+
+            if (element instanceof TVIEquipmentView_Part
+                  || element instanceof TVIEquipmentView_Service
+                  || element instanceof TVIEquipmentView_Tour) {
+
+               final long dbAltitudeUp = ((TVIEquipmentView_Item) element).colAltitudeUp;
+               final double value = dbAltitudeUp / UI.UNIT_VALUE_ELEVATION;
+
+               colDef.printValue_0(cell, value);
+
+               setCellColor(cell, element);
+            }
+         }
+      });
+   }
+
+   /**
+    * column: avg pulse
+    */
+   private void defineColumn_Body_AvgPulse() {
+
+      final TreeColumnDefinition colDef = TreeColumnFactory.BODY_PULSE_AVG.createColumn(_columnManager, _pc);
+      colDef.setLabelProvider(new CellLabelProvider() {
+         @Override
+         public void update(final ViewerCell cell) {
+
+            final Object element = cell.getElement();
+
+            if (element instanceof TVIEquipmentView_Part
+                  || element instanceof TVIEquipmentView_Service
+                  || element instanceof TVIEquipmentView_Tour) {
+
+               final double value = ((TVIEquipmentView_Item) element).colAvgPulse;
+
+               colDef.printDoubleValue(cell, value, element instanceof TVIEquipmentView_Tour);
+
+               setCellColor(cell, element);
+            }
+         }
+      });
+   }
+
+   /**
+    * column: max pulse
+    */
+   private void defineColumn_Body_MaxPulse() {
+
+      final TreeColumnDefinition colDef = TreeColumnFactory.BODY_PULSE_MAX.createColumn(_columnManager, _pc);
+      colDef.setLabelProvider(new CellLabelProvider() {
+         @Override
+         public void update(final ViewerCell cell) {
+
+            final Object element = cell.getElement();
+
+            if (element instanceof TVIEquipmentView_Part
+                  || element instanceof TVIEquipmentView_Service
+                  || element instanceof TVIEquipmentView_Tour) {
+
+               final long value = ((TVIEquipmentView_Item) element).colMaxPulse;
+
+               colDef.printValue_0(cell, value);
+
+               setCellColor(cell, element);
+            }
+         }
+      });
+   }
+
+   /**
     * Column: Brand
     */
    private void defineColumn_Equipment_Brand() {
@@ -1128,6 +1276,10 @@ public class EquipmentView extends ViewPart implements ITourProvider, ITourViewe
             } else if (element instanceof final TVIEquipmentView_Service serviceItem) {
 
                id = serviceItem.getServiceID();
+
+            } else if (element instanceof final TVIEquipmentView_Tour tourItem) {
+
+               id = tourItem.tourId;
             }
 
             if (id != -1) {
@@ -1255,8 +1407,6 @@ public class EquipmentView extends ViewPart implements ITourProvider, ITourViewe
 
       final ColumnDefinition colDef = TreeColumnFactory.EQUIPMENT_SIZE.createColumn(_columnManager, _pc);
 
-      colDef.setIsDefaultColumn();
-
       colDef.setLabelProvider(new CellLabelProvider() {
 
          @Override
@@ -1320,8 +1470,6 @@ public class EquipmentView extends ViewPart implements ITourProvider, ITourViewe
 
       final ColumnDefinition colDef = TreeColumnFactory.EQUIPMENT_WEIGHT.createColumn(_columnManager, _pc);
 
-      colDef.setIsDefaultColumn();
-
       colDef.setLabelProvider(new CellLabelProvider() {
 
          @Override
@@ -1350,11 +1498,140 @@ public class EquipmentView extends ViewPart implements ITourProvider, ITourViewe
    }
 
    /**
+    * column: avg pace min/km - min/mi
+    */
+   private void defineColumn_Motion_AvgPace() {
+
+      final TreeColumnDefinition colDef = TreeColumnFactory.MOTION_AVG_PACE.createColumn(_columnManager, _pc);
+      colDef.setLabelProvider(new CellLabelProvider() {
+         @Override
+         public void update(final ViewerCell cell) {
+
+            final Object element = cell.getElement();
+            final float pace = ((TVIEquipmentView_Item) element).colAvgPace * UI.UNIT_VALUE_DISTANCE;
+
+            if (pace == 0.0) {
+               cell.setText(UI.EMPTY_STRING);
+            } else {
+               cell.setText(net.tourbook.common.UI.format_mm_ss((long) pace));
+            }
+
+            setCellColor(cell, element);
+         }
+      });
+   }
+
+   /**
+    * column: avg speed km/h - mph
+    */
+   private void defineColumn_Motion_AvgSpeed() {
+
+      final TreeColumnDefinition colDef = TreeColumnFactory.MOTION_AVG_SPEED.createColumn(_columnManager, _pc);
+      colDef.setLabelProvider(new CellLabelProvider() {
+         @Override
+         public void update(final ViewerCell cell) {
+
+            final Object element = cell.getElement();
+            final float value = ((TVIEquipmentView_Item) element).colAvgSpeed / UI.UNIT_VALUE_DISTANCE;
+
+            colDef.printDoubleValue(cell, value, element instanceof TVIEquipmentView_Tour);
+
+            setCellColor(cell, element);
+         }
+      });
+   }
+
+   /**
+    * Column: Distance (km/miles)
+    */
+   private void defineColumn_Motion_Distance() {
+
+      final TreeColumnDefinition colDef = TreeColumnFactory.MOTION_DISTANCE.createColumn(_columnManager, _pc);
+
+      colDef.setIsDefaultColumn();
+
+      colDef.setLabelProvider(new CellLabelProvider() {
+         @Override
+         public void update(final ViewerCell cell) {
+
+            final Object element = cell.getElement();
+
+            if (element instanceof TVIEquipmentView_Part
+                  || element instanceof TVIEquipmentView_Service
+                  || element instanceof TVIEquipmentView_Tour) {
+
+               final double value = ((TVIEquipmentView_Item) element).colDistance
+                     / 1000.0
+                     / UI.UNIT_VALUE_DISTANCE;
+
+               colDef.printDoubleValue(cell, value, element instanceof TVIEquipmentView_Tour);
+
+               setCellColor(cell, element);
+            }
+         }
+      });
+   }
+
+   /**
+    * column: max speed
+    */
+   private void defineColumn_Motion_MaxSpeed() {
+
+      final TreeColumnDefinition colDef = TreeColumnFactory.MOTION_MAX_SPEED.createColumn(_columnManager, _pc);
+      colDef.setLabelProvider(new CellLabelProvider() {
+         @Override
+         public void update(final ViewerCell cell) {
+
+            final Object element = cell.getElement();
+
+            if (element instanceof TVIEquipmentView_Part
+                  || element instanceof TVIEquipmentView_Service
+                  || element instanceof TVIEquipmentView_Tour) {
+
+               final double value = ((TVIEquipmentView_Item) element).colMaxSpeed / UI.UNIT_VALUE_DISTANCE;
+
+               colDef.printDoubleValue(cell, value, element instanceof TVIEquipmentView_Tour);
+
+               setCellColor(cell, element);
+            }
+         }
+      });
+   }
+
+   /**
+    * column: avg cadence
+    */
+   private void defineColumn_Powertrain_AvgCadence() {
+
+      final TreeColumnDefinition colDef = TreeColumnFactory.POWERTRAIN_AVG_CADENCE.createColumn(_columnManager, _pc);
+      colDef.setLabelProvider(new CellLabelProvider() {
+         @Override
+         public void update(final ViewerCell cell) {
+
+            final Object element = cell.getElement();
+
+            if (element instanceof TVIEquipmentView_Part
+                  || element instanceof TVIEquipmentView_Service
+                  || element instanceof TVIEquipmentView_Tour) {
+
+               final float value = ((TVIEquipmentView_Item) element).colAvgCadence;
+
+               colDef.printDoubleValue(cell, value, element instanceof TVIEquipmentView_Tour);
+
+               setCellColor(cell, element);
+            }
+         }
+      });
+   }
+
+   /**
     * Column: First use date
     */
    private void defineColumn_Time_Date() {
 
       final ColumnDefinition colDef = TreeColumnFactory.EQUIPMENT_DATE.createColumn(_columnManager, _pc);
+
+      colDef.setIsDefaultColumn();
 
       colDef.setLabelProvider(new CellLabelProvider() {
 
@@ -1469,6 +1746,8 @@ public class EquipmentView extends ViewPart implements ITourProvider, ITourViewe
 
       final ColumnDefinition colDef = TreeColumnFactory.EQUIPMENT_DATE_UNTIL.createColumn(_columnManager, _pc);
 
+      colDef.setIsDefaultColumn();
+
       colDef.setLabelProvider(new CellLabelProvider() {
 
          @Override
@@ -1514,11 +1793,95 @@ public class EquipmentView extends ViewPart implements ITourProvider, ITourViewe
    }
 
    /**
+    * column: elapsed time (h)
+    */
+   private void defineColumn_Time_ElapsedTime() {
+
+      final TreeColumnDefinition colDef = TreeColumnFactory.TIME__DEVICE_ELAPSED_TIME.createColumn(_columnManager, _pc);
+
+      colDef.setLabelProvider(new CellLabelProvider() {
+         @Override
+         public void update(final ViewerCell cell) {
+
+            final Object element = cell.getElement();
+
+            if (element instanceof TVIEquipmentView_Part
+                  || element instanceof TVIEquipmentView_Service
+                  || element instanceof TVIEquipmentView_Tour) {
+
+               final long value = ((TVIEquipmentView_Item) element).colElapsedTime;
+
+               colDef.printLongValue(cell, value, element instanceof TVIEquipmentView_Tour);
+
+               setCellColor(cell, element);
+            }
+         }
+      });
+   }
+
+   /**
+    * Column: Time - Moving time (h)
+    */
+   private void defineColumn_Time_MovingTime() {
+
+      final TreeColumnDefinition colDef = TreeColumnFactory.TIME__COMPUTED_MOVING_TIME.createColumn(_columnManager, _pc);
+
+      colDef.setIsDefaultColumn();
+
+      colDef.setLabelProvider(new CellLabelProvider() {
+         @Override
+         public void update(final ViewerCell cell) {
+
+            final Object element = cell.getElement();
+
+            if (element instanceof TVIEquipmentView_Part
+                  || element instanceof TVIEquipmentView_Service
+                  || element instanceof TVIEquipmentView_Tour) {
+
+               final long value = ((TVIEquipmentView_Item) element).colMovingTime;
+
+               colDef.printLongValue(cell, value, element instanceof TVIEquipmentView_Tour);
+
+               setCellColor(cell, element);
+            }
+         }
+      });
+   }
+
+   /**
+    * column: paused time (h)
+    */
+   private void defineColumn_Time_PausedTime() {
+
+      final TreeColumnDefinition colDef = TreeColumnFactory.TIME__DEVICE_PAUSED_TIME.createColumn(_columnManager, _pc);
+      colDef.setLabelProvider(new CellLabelProvider() {
+         @Override
+         public void update(final ViewerCell cell) {
+
+            final Object element = cell.getElement();
+
+            if (element instanceof TVIEquipmentView_Part
+                  || element instanceof TVIEquipmentView_Service
+                  || element instanceof TVIEquipmentView_Tour) {
+
+               final long value = ((TVIEquipmentView_Item) element).colPausedTime;
+
+               colDef.printLongValue(cell, value, element instanceof TVIEquipmentView_Tour);
+
+               setCellColor(cell, element);
+            }
+         }
+      });
+   }
+
+   /**
     * Column: Usage duration
     */
    private void defineColumn_Time_UsageDuration() {
 
       final ColumnDefinition colDef = TreeColumnFactory.EQUIPMENT_DATE_USAGE_DURATION.createColumn(_columnManager, _pc);
+
+      colDef.setIsDefaultColumn();
 
       colDef.setLabelProvider(new CellLabelProvider() {
 
@@ -1563,67 +1926,26 @@ public class EquipmentView extends ViewPart implements ITourProvider, ITourViewe
    }
 
    /**
-    * Column: Distance
+    * Column: Weather - Average temperature (measured from the device)
     */
-   private void defineColumn_Tour_Distance() {
+   private void defineColumn_Weather_Temperature_Avg_Device() {
 
-      final ColumnDefinition colDef = TreeColumnFactory.EQUIPMENT_TOUR_DISTANCE.createColumn(_columnManager, _pc);
-
-      colDef.setIsDefaultColumn();
-
+      final TreeColumnDefinition colDef = TreeColumnFactory.WEATHER_TEMPERATURE_AVG_DEVICE.createColumn(_columnManager, _pc);
       colDef.setLabelProvider(new CellLabelProvider() {
 
          @Override
          public void update(final ViewerCell cell) {
 
             final Object element = cell.getElement();
-
             if (element instanceof TVIEquipmentView_Part
-                  || element instanceof TVIEquipmentView_Service) {
+                  || element instanceof TVIEquipmentView_Service
+                  || element instanceof TVIEquipmentView_Tour) {
 
-               final TVIEquipmentView_Item treeItem = (TVIEquipmentView_Item) element;
+               final double temperature = net.tourbook.common.UI.convertTemperatureFromMetric(
+                     ((TVIEquipmentView_Item) element).colAvgTemperature_Device);
 
-               final float distance = treeItem.distance;
+               colDef.printDoubleValue(cell, temperature, element instanceof TVIEquipmentView_Tour);
 
-               if (distance != 0) {
-
-                  final double value = distance
-                        / 1000.0
-                        / UI.UNIT_VALUE_DISTANCE;
-
-                  colDef.printDoubleValue(cell, value, false);
-                  setCellColor(cell, element);
-               }
-            }
-         }
-      });
-   }
-
-   /**
-    * Column: Time - Moving time (h)
-    */
-   private void defineColumn_Tour_MovingTime() {
-
-      final TreeColumnDefinition colDef = TreeColumnFactory.TIME__COMPUTED_MOVING_TIME.createColumn(_columnManager, _pc);
-
-      colDef.setIsDefaultColumn();
-
-      colDef.setLabelProvider(new SelectionCellLabelProvider() {
-
-         @Override
-         public void update(final ViewerCell cell) {
-
-            final Object element = cell.getElement();
-
-            if (element instanceof TVIEquipmentView_Part
-                  || element instanceof TVIEquipmentView_Service) {
-
-               final TVIEquipmentView_Item treeItem = (TVIEquipmentView_Item) element;
-
-               final long value = treeItem.movingTime;
-               final boolean isDetail = element instanceof TVIEquipmentView_Tour;
-
-               colDef.printLongValue(cell, value, isDetail);
                setCellColor(cell, element);
             }
          }
@@ -1969,7 +2291,7 @@ public class EquipmentView extends ViewPart implements ITourProvider, ITourViewe
 
       if (summarizedValues != null) {
 
-         // an item was recognized
+         // part or service was recognized
 
          numTours = summarizedValues.numTours;
 
@@ -1977,24 +2299,23 @@ public class EquipmentView extends ViewPart implements ITourProvider, ITourViewe
          final long movingTime = summarizedValues.movingTime;
 
          tviItem.numTours = numTours;
-         tviItem.distance = distance;
-         tviItem.movingTime = movingTime;
+         tviItem.colDistance = distance;
+         tviItem.colMovingTime = movingTime;
 
          /*
           * Summarize parent values
           */
          final TreeViewerItem partParentItem = tviItem.getParentItem();
 
-         if (partParentItem instanceof final TVIEquipmentView_Equipment partEquipmentItem) {
+         if (partParentItem instanceof final TVIEquipmentView_Equipment equipmentItem) {
 
-            partEquipmentItem.numTours += numTours;
-            partEquipmentItem.distance += distance;
-            partEquipmentItem.movingTime += movingTime;
+            equipmentItem.numTours += numTours;
          }
       }
 
-      // do not digg deeper, these children are fetched when the parent item is expanded
       if (tviItem != null) {
+
+         // do not digg deeper, children are fetched when the parent item is expanded
 
          if (numTours == 0) {
 
