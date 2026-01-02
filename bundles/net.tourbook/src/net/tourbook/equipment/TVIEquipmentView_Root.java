@@ -127,25 +127,23 @@ public class TVIEquipmentView_Root extends TVIEquipmentView_Item {
                + "   j_equip.EQUIPMENTID," + NL //                                              1  //$NON-NLS-1$
                + "   j_part.PARTID," + NL //                                                    2  //$NON-NLS-1$
 
-               + "   parts_Summarized.part_type," + NL //                                       3  //$NON-NLS-1$
-               + "   parts_Summarized.num_tours," + NL //                                       4  //$NON-NLS-1$
+               + "   Summarized.part_type," + NL //                                       3  //$NON-NLS-1$
+               + "   Summarized.num_tours," + NL //                                       4  //$NON-NLS-1$
 
-               + "   parts_Summarized.sum_distance," + NL //                                    5  //$NON-NLS-1$
-               + "   parts_Summarized.sum_moving_time" + NL //                                  6  //$NON-NLS-1$
+               + SQL_SUM_COLUMNS
 
                + "FROM" + NL //                                                                    //$NON-NLS-1$
                + "(" + NL //                                                                       //$NON-NLS-1$
 
                + "   SELECT" + NL //                                                               //$NON-NLS-1$
 
-               + "      part.equipment_equipmentid             AS part_eq_id," + NL //              //$NON-NLS-1$
-               + "      part.partid                            AS part_id," + NL //                 //$NON-NLS-1$
-               + "      part.\"TYPE\"                          AS part_type," + NL //               //$NON-NLS-1$
+               + "      part.equipment_equipmentid   	AS part_eq_id," + NL //                      //$NON-NLS-1$
+               + "      part.partid                   AS part_id," + NL //                         //$NON-NLS-1$
+               + "      part.\"TYPE\"                 AS part_type," + NL //                       //$NON-NLS-1$
 
-               + "      COUNT(*)                               AS num_tours," + NL //              //$NON-NLS-1$
+               + "      COUNT(*)                      AS num_tours," + NL //                       //$NON-NLS-1$
 
-               + "      SUM(TourData.tourdistance)         		AS sum_distance," + NL //           //$NON-NLS-1$
-               + "      SUM(TourData.tourcomputedtime_moving)  AS sum_moving_time" + NL //         //$NON-NLS-1$
+               + SQL_SUM_COLUMNS_SUMMARIZED
 
                + "   FROM EquipmentPart AS part" + NL //                                           //$NON-NLS-1$
 
@@ -166,10 +164,10 @@ public class TVIEquipmentView_Root extends TVIEquipmentView_Item {
                + "      part.partid," + NL //                                                      //$NON-NLS-1$
                + "      part.\"TYPE\"" + NL //                                                     //$NON-NLS-1$
 
-               + ") AS parts_Summarized" + NL //                                                   //$NON-NLS-1$
+               + ") AS Summarized" + NL //                                                   //$NON-NLS-1$
 
-               + "LEFT JOIN equipment     j_equip ON j_equip.equipmentid = parts_Summarized.part_eq_id" + NL //   //$NON-NLS-1$
-               + "LEFT JOIN equipmentpart j_part  ON j_part.partid       = parts_Summarized.part_id" + NL //      //$NON-NLS-1$
+               + "LEFT JOIN equipment     j_equip ON j_equip.equipmentid = Summarized.part_eq_id" + NL //   //$NON-NLS-1$
+               + "LEFT JOIN equipmentpart j_part  ON j_part.partid       = Summarized.part_id" + NL //      //$NON-NLS-1$
          ;
 
          statement = conn.prepareStatement(sql);
@@ -227,13 +225,12 @@ public class TVIEquipmentView_Root extends TVIEquipmentView_Item {
                + "SELECT" + NL //                                                                  //$NON-NLS-1$
 
                + "   j_equip.EQUIPMENTID," + NL //                                              1  //$NON-NLS-1$
-
                + "   j_service.SERVICEID," + NL //                                              2  //$NON-NLS-1$
 
-               + "   services_Summarized.service_Type," + NL //                                 3  //$NON-NLS-1$
-               + "   services_Summarized.num_tours," + NL //                                    4  //$NON-NLS-1$
-               + "   services_Summarized.sum_distance," + NL //                                 5  //$NON-NLS-1$
-               + "   services_Summarized.sum_moving_time AS sum_Time" + NL //                   6  //$NON-NLS-1$
+               + "   Summarized.Service_Type," + NL //                                          3  //$NON-NLS-1$
+               + "   Summarized.Num_Tours," + NL //                                             4  //$NON-NLS-1$
+
+               + SQL_SUM_COLUMNS
 
                + "FROM" + NL //                                                                    //$NON-NLS-1$
                + "(" + NL //                                                                       //$NON-NLS-1$
@@ -243,10 +240,9 @@ public class TVIEquipmentView_Root extends TVIEquipmentView_Item {
                + "      service.SERVICEID                      AS service_ID," + NL //             //$NON-NLS-1$
                + "      service.\"TYPE\"                       AS service_Type," + NL //           //$NON-NLS-1$
 
-               + "      SUM(TourData.tourdistance)             AS sum_distance," + NL //           //$NON-NLS-1$
-               + "      SUM(TourData.tourcomputedtime_moving)  AS sum_moving_time," + NL //        //$NON-NLS-1$
+               + "      COUNT(*)                               AS num_tours," + NL //              //$NON-NLS-1$
 
-               + "      COUNT(*)                               AS num_tours" + NL //               //$NON-NLS-1$
+               + SQL_SUM_COLUMNS_SUMMARIZED
 
                + "   FROM EQUIPMENTSERVICE AS service" + NL //                                     //$NON-NLS-1$
 
@@ -267,10 +263,10 @@ public class TVIEquipmentView_Root extends TVIEquipmentView_Item {
                + "      service.serviceID," + NL //                                                //$NON-NLS-1$
                + "      service.\"TYPE\"" + NL //                                                  //$NON-NLS-1$
 
-               + ") AS services_Summarized" + NL //                                                //$NON-NLS-1$
+               + ") AS Summarized" + NL //                                                         //$NON-NLS-1$
 
-               + "LEFT JOIN equipment           j_equip     ON j_equip.equipmentid  = services_Summarized.service_EQ_ID" + NL //    //$NON-NLS-1$
-               + "LEFT JOIN EQUIPMENTSERVICE    j_service   ON j_service.SERVICEID  = services_Summarized.service_ID" + NL //       //$NON-NLS-1$
+               + "LEFT JOIN equipment           j_equip     ON j_equip.equipmentid  = Summarized.service_EQ_ID" + NL //    //$NON-NLS-1$
+               + "LEFT JOIN EQUIPMENTSERVICE    j_service   ON j_service.SERVICEID  = Summarized.service_ID" + NL //       //$NON-NLS-1$
          ;
 
          statement = conn.prepareStatement(sql);
