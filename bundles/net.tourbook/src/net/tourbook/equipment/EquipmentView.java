@@ -45,7 +45,6 @@ import net.tourbook.data.EquipmentPart;
 import net.tourbook.data.EquipmentService;
 import net.tourbook.data.TourData;
 import net.tourbook.database.TourDatabase;
-import net.tourbook.equipment.TVIEquipmentView_Root.SummarizedValues;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.tour.ITourEventListener;
 import net.tourbook.tour.SelectionTourId;
@@ -2248,7 +2247,7 @@ public class EquipmentView extends ViewPart implements ITourProvider, ITourViewe
       for (final TreeViewerItem rootItem : allRootItems) {
 
          // is recursive !!!
-         loadAllTreeItems(rootItem, _rootItem);
+         loadAllTreeItems_One(rootItem, _rootItem);
       }
    }
 
@@ -2259,66 +2258,11 @@ public class EquipmentView extends ViewPart implements ITourProvider, ITourViewe
     *
     * @param parentItem
     */
-   private void loadAllTreeItems(final TreeViewerItem parentItem, final TVIEquipmentView_Root rootItem) {
+   private void loadAllTreeItems_One(final TreeViewerItem parentItem, final TVIEquipmentView_Root rootItem) {
 
-      /*
-       * Set summarized tour values
-       */
-      SummarizedValues summarizedValues = null;
+      if (loadAllTreeItems_Summarized(parentItem)) {
 
-      TVIEquipmentView_Item tviItem = null;
-
-      if (parentItem instanceof final TVIEquipmentView_Part partItem) {
-
-         final String partKey = partItem.getTourValuesKey();
-
-         tviItem = partItem;
-         summarizedValues = rootItem.allSummarizedPartValues.get(partKey);
-
-      } else if (parentItem instanceof final TVIEquipmentView_Service serviceItem) {
-
-         final String serviceKey = serviceItem.getTourValuesKey();
-
-         tviItem = serviceItem;
-         summarizedValues = rootItem.allSummarizedServiceValues.get(serviceKey);
-      }
-
-      int numTours = 0;
-
-      if (summarizedValues != null) {
-
-         // part or service was recognized
-
-         numTours = summarizedValues.numTours;
-
-         final float distance = summarizedValues.distance;
-         final long movingTime = summarizedValues.movingTime;
-
-         tviItem.numTours = numTours;
-         tviItem.colDistance = distance;
-         tviItem.colMovingTime = movingTime;
-
-         /*
-          * Summarize parent values
-          */
-         final TreeViewerItem partParentItem = tviItem.getParentItem();
-
-         if (partParentItem instanceof final TVIEquipmentView_Equipment equipmentItem) {
-
-            equipmentItem.numTours += numTours;
-         }
-      }
-
-      if (tviItem != null) {
-
-         // do not digg deeper, children are fetched when the parent item is expanded
-
-         if (numTours == 0) {
-
-            // hide expand UI icon when there are no children
-
-            tviItem.setChildren(new ArrayList<>());
-         }
+         // tour values could be summarized
 
          return;
       }
@@ -2332,8 +2276,67 @@ public class EquipmentView extends ViewPart implements ITourProvider, ITourViewe
             continue;
          }
 
-         loadAllTreeItems(childItem, rootItem);
+         loadAllTreeItems_One(childItem, rootItem);
       }
+   }
+
+   /**
+    * @param parentItem
+    *
+    * @return Returns <code>true</code> when summarized values could be collected
+    */
+   private boolean loadAllTreeItems_Summarized(final TreeViewerItem parentItem) {
+
+      /*
+       * Load summarized tour values
+       */
+      TVIEquipmentView_Item tviItem = null;
+
+      long numTours = 0;
+
+      if (parentItem instanceof final TVIEquipmentView_Part partItem) {
+
+         tviItem = partItem;
+         TVIEquipmentView_Item.loadSummarizedValues_Part(partItem);
+
+         numTours = partItem.numTours;
+
+      } else if (parentItem instanceof final TVIEquipmentView_Service serviceItem) {
+
+         tviItem = serviceItem;
+
+         TVIEquipmentView_Item.loadSummarizedValues_Service(serviceItem);
+
+         numTours = serviceItem.numTours;
+      }
+
+      if (tviItem != null) {
+
+         // part or service was recognized
+
+         /*
+          * Summarize parent values
+          */
+         final TreeViewerItem partParentItem = tviItem.getParentItem();
+
+         if (partParentItem instanceof final TVIEquipmentView_Equipment equipmentItem) {
+
+            equipmentItem.numTours += numTours;
+         }
+
+         // do not digg deeper, children are fetched when the parent item is expanded
+
+         if (numTours == 0) {
+
+            // hide expand UI icon when there are no children
+
+            tviItem.setChildren(new ArrayList<>());
+         }
+
+         return true;
+      }
+
+      return false;
    }
 
    private void onAction_DeleteEquipment() {

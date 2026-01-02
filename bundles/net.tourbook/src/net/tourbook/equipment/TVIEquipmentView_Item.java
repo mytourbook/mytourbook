@@ -15,14 +15,21 @@
  *******************************************************************************/
 package net.tourbook.equipment;
 
+import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.UI;
+import net.tourbook.common.util.SQL;
 import net.tourbook.common.util.TreeViewerItem;
+import net.tourbook.common.util.Util;
+import net.tourbook.database.TourDatabase;
 import net.tourbook.preferences.ITourbookPreferences;
+import net.tourbook.ui.SQLFilter;
 
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.viewers.TreeViewer;
@@ -157,6 +164,198 @@ public abstract class TVIEquipmentView_Item extends TreeViewerItem {
    }
 
    /**
+    * Summarizes all tour values for each part and type
+    *
+    * @return
+    */
+   static void loadSummarizedValues_Part(final TVIEquipmentView_Part partItem) {
+
+      String sql = null;
+      PreparedStatement statement = null;
+
+      try (Connection conn = TourDatabase.getInstance().getConnection()) {
+
+         final SQLFilter sqlFilter = new SQLFilter();
+
+         sql = UI.EMPTY_STRING
+
+               + "SELECT" + NL //                                                                  //$NON-NLS-1$
+
+               + "   Summarized.num_tours," + NL //                                             1  //$NON-NLS-1$
+
+               + SQL_SUM_COLUMNS
+
+               + "FROM" + NL //                                                                    //$NON-NLS-1$
+               + "(" + NL //                                                                       //$NON-NLS-1$
+
+               + "   SELECT" + NL //                                                               //$NON-NLS-1$
+
+               + "      part.equipment_equipmentid    AS part_eq_id," + NL //                      //$NON-NLS-1$
+               + "      part.partid                   AS part_id," + NL //                         //$NON-NLS-1$
+               + "      part.\"TYPE\"                 AS part_type," + NL //                       //$NON-NLS-1$
+
+               + "      COUNT(*)                      AS num_tours," + NL //                       //$NON-NLS-1$
+
+               + SQL_SUM_COLUMNS_SUMMARIZED
+
+               + "   FROM EquipmentPart AS part" + NL //                                           //$NON-NLS-1$
+
+               + "   JOIN tourdata_equipment AS j_td_eq" + NL //                                   //$NON-NLS-1$
+               + "      ON j_td_eq.equipment_equipmentid = part.equipment_equipmentid" + NL //     //$NON-NLS-1$
+
+               // the alias "TourData" is needed that the app filter is working
+               + "   JOIN TourData AS TourData" + NL //                                            //$NON-NLS-1$
+               + "      ON TourData.tourid = j_td_eq.tourdata_tourid" + NL //                      //$NON-NLS-1$
+               + "      AND TourData.tourstarttime >= part.\"DATE\"" + NL //                       //$NON-NLS-1$
+               + "      AND TourData.tourstarttime <  part.dateuntil" + NL //                      //$NON-NLS-1$
+               + sqlFilter.getWhereClause() + NL
+
+               + "   WHERE part.iscollate = TRUE" + NL //                                          //$NON-NLS-1$
+               + "      AND part.partID = ?" + NL //                                               //$NON-NLS-1$
+
+               + "   GROUP BY" + NL //                                                             //$NON-NLS-1$
+               + "      part.equipment_equipmentid," + NL //                                       //$NON-NLS-1$
+               + "      part.partid," + NL //                                                      //$NON-NLS-1$
+               + "      part.\"TYPE\"" + NL //                                                     //$NON-NLS-1$
+
+               + ") AS Summarized" + NL //                                                         //$NON-NLS-1$
+
+               + "LEFT JOIN equipment     j_equip ON j_equip.equipmentid = Summarized.part_eq_id" + NL //   //$NON-NLS-1$
+               + "LEFT JOIN equipmentpart j_part  ON j_part.partid       = Summarized.part_id" + NL //      //$NON-NLS-1$
+         ;
+
+         statement = conn.prepareStatement(sql);
+
+         final int nextIndex = sqlFilter.setParameters(statement, 1);
+         statement.setLong(nextIndex, partItem.getPartID());
+
+         final ResultSet result = statement.executeQuery();
+
+         while (result.next()) {
+
+            final int numTours         = result.getInt(1);
+
+            partItem.readColumnValues_Default(result, 2);
+
+            partItem.numTours = numTours;
+
+            // there should be only one part
+            break;
+         }
+
+         final long numTours = partItem.numTours;
+
+         if (numTours == 0) {
+
+            // hide expand UI icon when there are no children
+
+            partItem.setChildren(new ArrayList<>());
+         }
+
+      } catch (final SQLException e) {
+         SQL.showException(e, sql);
+      } finally {
+         Util.closeSql(statement);
+      }
+   }
+
+   /**
+    * Summarizes all tour values for each part and type
+    *
+    * @return
+    */
+   static void loadSummarizedValues_Service(final TVIEquipmentView_Service serviceItem) {
+
+      String sql = null;
+      PreparedStatement statement = null;
+
+      try (Connection conn = TourDatabase.getInstance().getConnection()) {
+
+         final SQLFilter sqlFilter = new SQLFilter();
+
+         sql = UI.EMPTY_STRING
+
+               + "SELECT" + NL //                                                                  //$NON-NLS-1$
+
+               + "   Summarized.num_tours," + NL //                                             1  //$NON-NLS-1$
+
+               + SQL_SUM_COLUMNS
+
+               + "FROM" + NL //                                                                    //$NON-NLS-1$
+               + "(" + NL //                                                                       //$NON-NLS-1$
+
+               + "   SELECT" + NL //                                                               //$NON-NLS-1$
+
+               + "      service.equipment_equipmentid    AS service_eq_id," + NL //                      //$NON-NLS-1$
+               + "      service.serviceid                   AS service_id," + NL //                         //$NON-NLS-1$
+               + "      service.\"TYPE\"                 AS service_type," + NL //                       //$NON-NLS-1$
+
+               + "      COUNT(*)                      AS num_tours," + NL //                       //$NON-NLS-1$
+
+               + SQL_SUM_COLUMNS_SUMMARIZED
+
+               + "   FROM EquipmentService AS service" + NL //                                           //$NON-NLS-1$
+
+               + "   JOIN tourdata_equipment AS j_td_eq" + NL //                                   //$NON-NLS-1$
+               + "      ON j_td_eq.equipment_equipmentid = service.equipment_equipmentid" + NL //     //$NON-NLS-1$
+
+               // the alias "TourData" is needed that the app filter is working
+               + "   JOIN TourData AS TourData" + NL //                                            //$NON-NLS-1$
+               + "      ON TourData.tourid = j_td_eq.tourdata_tourid" + NL //                      //$NON-NLS-1$
+               + "      AND TourData.tourstarttime >= service.\"DATE\"" + NL //                       //$NON-NLS-1$
+               + "      AND TourData.tourstarttime <  service.dateuntil" + NL //                      //$NON-NLS-1$
+               + sqlFilter.getWhereClause() + NL
+
+               + "   WHERE service.isCollate = TRUE" + NL //                                          //$NON-NLS-1$
+               + "      AND service.serviceID = ?" + NL //                                               //$NON-NLS-1$
+
+               + "   GROUP BY" + NL //                                                             //$NON-NLS-1$
+               + "      service.equipment_equipmentid," + NL //                                       //$NON-NLS-1$
+               + "      service.serviceid," + NL //                                                      //$NON-NLS-1$
+               + "      service.\"TYPE\"" + NL //                                                     //$NON-NLS-1$
+
+               + ") AS Summarized" + NL //                                                         //$NON-NLS-1$
+
+               + "LEFT JOIN equipment     j_equip ON j_equip.equipmentid = Summarized.service_eq_id" + NL //   //$NON-NLS-1$
+               + "LEFT JOIN equipmentservice j_service  ON j_service.serviceid       = Summarized.service_id" + NL //      //$NON-NLS-1$
+         ;
+
+         statement = conn.prepareStatement(sql);
+
+         final int nextIndex = sqlFilter.setParameters(statement, 1);
+         statement.setLong(nextIndex, serviceItem.getServiceID());
+
+         final ResultSet result = statement.executeQuery();
+
+         while (result.next()) {
+
+            final int numTours = result.getInt(1);
+
+            serviceItem.readColumnValues_Default(result, 2);
+
+            serviceItem.numTours = numTours;
+
+            // there should be only one service
+            break;
+         }
+
+         final long numTours = serviceItem.numTours;
+
+         if (numTours == 0) {
+
+            // hide expand UI icon when there are no children
+
+            serviceItem.setChildren(new ArrayList<>());
+         }
+
+      } catch (final SQLException e) {
+         SQL.showException(e, sql);
+      } finally {
+         Util.closeSql(statement);
+      }
+   }
+
+   /**
     * @return Each equipment viewer item has access to its viewer
     */
    public TreeViewer getEquipmentViewer() {
@@ -174,6 +373,7 @@ public abstract class TVIEquipmentView_Item extends TreeViewerItem {
     *
     * @param result
     * @param startIndex
+    *           SQL column start index
     *
     * @throws SQLException
     */
@@ -213,5 +413,4 @@ public abstract class TVIEquipmentView_Item extends TreeViewerItem {
          scrambleValues(TVIEquipmentView_Item.class.getDeclaredFields());
       }
    }
-
 }
