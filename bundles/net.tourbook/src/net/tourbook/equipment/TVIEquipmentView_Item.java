@@ -233,11 +233,11 @@ public abstract class TVIEquipmentView_Item extends TreeViewerItem {
 
          while (result.next()) {
 
-            final int numTours         = result.getInt(1);
-
-            partItem.readColumnValues_Default(result, 2);
+            final int numTours = result.getInt(1);
 
             partItem.numTours = numTours;
+
+            partItem.readColumnValues_Default(result, 2);
 
             // there should be only one part
             break;
@@ -260,7 +260,7 @@ public abstract class TVIEquipmentView_Item extends TreeViewerItem {
    }
 
    /**
-    * Summarizes all tour values for each part and type
+    * Summarizes all tour values for each service and type
     *
     * @return
     */
@@ -286,37 +286,37 @@ public abstract class TVIEquipmentView_Item extends TreeViewerItem {
 
                + "   SELECT" + NL //                                                               //$NON-NLS-1$
 
-               + "      service.equipment_equipmentid    AS service_eq_id," + NL //                      //$NON-NLS-1$
-               + "      service.serviceid                   AS service_id," + NL //                         //$NON-NLS-1$
-               + "      service.\"TYPE\"                 AS service_type," + NL //                       //$NON-NLS-1$
+               + "      service.equipment_equipmentid    AS service_eq_id," + NL //                //$NON-NLS-1$
+               + "      service.serviceid                AS service_id," + NL //                   //$NON-NLS-1$
+               + "      service.\"TYPE\"                 AS service_type," + NL //                 //$NON-NLS-1$
 
-               + "      COUNT(*)                      AS num_tours," + NL //                       //$NON-NLS-1$
+               + "      COUNT(*)                         AS num_tours," + NL //                    //$NON-NLS-1$
 
                + SQL_SUM_COLUMNS_SUMMARIZED
 
-               + "   FROM EquipmentService AS service" + NL //                                           //$NON-NLS-1$
+               + "   FROM EquipmentService AS service" + NL //                                     //$NON-NLS-1$
 
                + "   JOIN tourdata_equipment AS j_td_eq" + NL //                                   //$NON-NLS-1$
-               + "      ON j_td_eq.equipment_equipmentid = service.equipment_equipmentid" + NL //     //$NON-NLS-1$
+               + "      ON j_td_eq.equipment_equipmentid = service.equipment_equipmentid" + NL //  //$NON-NLS-1$
 
                // the alias "TourData" is needed that the app filter is working
                + "   JOIN TourData AS TourData" + NL //                                            //$NON-NLS-1$
                + "      ON TourData.tourid = j_td_eq.tourdata_tourid" + NL //                      //$NON-NLS-1$
-               + "      AND TourData.tourstarttime >= service.\"DATE\"" + NL //                       //$NON-NLS-1$
-               + "      AND TourData.tourstarttime <  service.dateuntil" + NL //                      //$NON-NLS-1$
+               + "      AND TourData.tourstarttime >= service.\"DATE\"" + NL //                    //$NON-NLS-1$
+               + "      AND TourData.tourstarttime <  service.dateuntil" + NL //                   //$NON-NLS-1$
                + sqlFilter.getWhereClause() + NL
 
-               + "   WHERE service.isCollate = TRUE" + NL //                                          //$NON-NLS-1$
-               + "      AND service.serviceID = ?" + NL //                                               //$NON-NLS-1$
+               + "   WHERE service.isCollate = TRUE" + NL //                                       //$NON-NLS-1$
+               + "      AND service.serviceID = ?" + NL //                                         //$NON-NLS-1$
 
                + "   GROUP BY" + NL //                                                             //$NON-NLS-1$
-               + "      service.equipment_equipmentid," + NL //                                       //$NON-NLS-1$
-               + "      service.serviceid," + NL //                                                      //$NON-NLS-1$
-               + "      service.\"TYPE\"" + NL //                                                     //$NON-NLS-1$
+               + "      service.equipment_equipmentid," + NL //                                    //$NON-NLS-1$
+               + "      service.serviceid," + NL //                                                //$NON-NLS-1$
+               + "      service.\"TYPE\"" + NL //                                                  //$NON-NLS-1$
 
                + ") AS Summarized" + NL //                                                         //$NON-NLS-1$
 
-               + "LEFT JOIN equipment     j_equip ON j_equip.equipmentid = Summarized.service_eq_id" + NL //   //$NON-NLS-1$
+               + "LEFT JOIN equipment     j_equip ON j_equip.equipmentid = Summarized.service_eq_id" + NL //               //$NON-NLS-1$
                + "LEFT JOIN equipmentservice j_service  ON j_service.serviceid       = Summarized.service_id" + NL //      //$NON-NLS-1$
          ;
 
@@ -331,9 +331,9 @@ public abstract class TVIEquipmentView_Item extends TreeViewerItem {
 
             final int numTours = result.getInt(1);
 
-            serviceItem.readColumnValues_Default(result, 2);
-
             serviceItem.numTours = numTours;
+
+            serviceItem.readColumnValues_Default(result, 2);
 
             // there should be only one service
             break;

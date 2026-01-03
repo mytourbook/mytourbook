@@ -94,7 +94,9 @@ public class TVIEquipmentView_Tour extends TVIEquipmentView_Item {
 
       firstColumn = tourStartDateTime.format(TimeTools.Formatter_Date_S);
 
-      tourTypeId = (resultTourTypeId == null ? TourDatabase.ENTITY_IS_NOT_SAVED : (Long) resultTourTypeId);
+      tourTypeId = resultTourTypeId == null
+            ? TourDatabase.ENTITY_IS_NOT_SAVED
+            : (Long) resultTourTypeId;
 
       if (UI.IS_SCRAMBLE_DATA) {
          tourTitle = UI.scrambleText(tourTitle);

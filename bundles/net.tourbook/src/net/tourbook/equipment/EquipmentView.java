@@ -1012,7 +1012,7 @@ public class EquipmentView extends ViewPart implements ITourProvider, ITourViewe
                styledString.append(viewItem.firstColumn, net.tourbook.ui.UI.CONTENT_SUB_CATEGORY_STYLER);
 
                if (numTours > 0) {
-                  styledString.append(UI.SPACE3 + UI.SYMBOL_STAR, net.tourbook.ui.UI.TOTAL_STYLER);
+                  styledString.append(UI.SPACE3 + numTours, net.tourbook.ui.UI.TOTAL_STYLER);
                }
 
                cell.setImage(_imgEquipment_All);
@@ -2262,7 +2262,7 @@ public class EquipmentView extends ViewPart implements ITourProvider, ITourViewe
 
       if (loadAllTreeItems_Summarized(parentItem)) {
 
-         // tour values could be summarized
+         // tour values could be recognized and summarized
 
          return;
       }
@@ -2314,18 +2314,6 @@ public class EquipmentView extends ViewPart implements ITourProvider, ITourViewe
 
          // part or service was recognized
 
-         /*
-          * Summarize parent values
-          */
-         final TreeViewerItem partParentItem = tviItem.getParentItem();
-
-         if (partParentItem instanceof final TVIEquipmentView_Equipment equipmentItem) {
-
-            equipmentItem.numTours += numTours;
-         }
-
-         // do not digg deeper, children are fetched when the parent item is expanded
-
          if (numTours == 0) {
 
             // hide expand UI icon when there are no children
@@ -2333,6 +2321,7 @@ public class EquipmentView extends ViewPart implements ITourProvider, ITourViewe
             tviItem.setChildren(new ArrayList<>());
          }
 
+         // do not digg deeper, children are fetched when the parent item is expanded
          return true;
       }
 

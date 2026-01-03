@@ -71,11 +71,11 @@ public class TVIEquipmentView_Part extends TVIEquipmentView_Item {
 
                + "FROM equipmentpart part" + NL //                                              //$NON-NLS-1$
 
-               + "JOIN tourdata_equipment j_td_eq" + NL //                                      //$NON-NLS-1$
+               + "JOIN tourdata_equipment AS j_td_eq" + NL //                                   //$NON-NLS-1$
                + "   ON j_td_eq.equipment_equipmentid = part.equipment_equipmentid" + NL //     //$NON-NLS-1$
 
                // The alias "TourData" is needed that the tour filter is working
-               + "JOIN tourdata TourData" + NL //                                               //$NON-NLS-1$
+               + "JOIN tourdata AS TourData" + NL //                                            //$NON-NLS-1$
                + "   ON TourData.tourID = j_td_eq.tourdata_tourID" + NL //                      //$NON-NLS-1$
                + "   AND TourData.tourstarttime >= part.\"DATE\"" + NL //                       //$NON-NLS-1$
                + "   AND TourData.tourstarttime <  part.dateUntil" + NL //                      //$NON-NLS-1$
