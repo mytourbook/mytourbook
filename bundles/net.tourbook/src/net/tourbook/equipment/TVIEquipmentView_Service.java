@@ -15,8 +15,18 @@
  *******************************************************************************/
 package net.tourbook.equipment;
 
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.ArrayList;
+
+import net.tourbook.common.UI;
+import net.tourbook.common.util.TreeViewerItem;
 import net.tourbook.data.Equipment;
 import net.tourbook.data.EquipmentService;
+import net.tourbook.database.TourDatabase;
+import net.tourbook.ui.SQLFilter;
 
 import org.eclipse.jface.viewers.TreeViewer;
 
@@ -41,12 +51,69 @@ public class TVIEquipmentView_Service extends TVIEquipmentView_Item {
       _serviceID = equipmentService.getServiceId();
    }
 
+   /**
+    * Get all tours for this service
+    */
    @Override
    protected void fetchChildren() {
 
+      final ArrayList<TreeViewerItem> allTourItems = new ArrayList<>();
 
-      int a = 0;
-      a++;
+      try (Connection conn = TourDatabase.getInstance().getConnection()) {
+
+         final SQLFilter sqlFilter = new SQLFilter();
+
+         final String sql = UI.EMPTY_STRING
+
+               + "SELECT" + NL //                                                               //$NON-NLS-1$
+
+               + TVIEquipmentView_Tour.SQL_TOUR_COLUMNS
+
+               + "FROM equipmentService AS service" + NL //                                     //$NON-NLS-1$
+
+               + "JOIN tourdata_equipment AS j_td_eq" + NL //                                   //$NON-NLS-1$
+               + "   ON j_td_eq.equipment_equipmentid = service.equipment_equipmentid" + NL //  //$NON-NLS-1$
+
+               // The alias "TourData" is needed that the tour filter is working
+               + "JOIN tourdata AS TourData" + NL //                                            //$NON-NLS-1$
+               + "   ON TourData.tourID = j_td_eq.tourdata_tourID" + NL //                      //$NON-NLS-1$
+               + "   AND TourData.tourstarttime >= service.\"DATE\"" + NL //                    //$NON-NLS-1$
+               + "   AND TourData.tourstarttime <  service.dateUntil" + NL //                   //$NON-NLS-1$
+
+               + "WHERE service.isCollate = TRUE" + NL //                                       //$NON-NLS-1$
+               + "   AND service.serviceID = ?" + NL //                                          //$NON-NLS-1$
+
+               + sqlFilter.getWhereClause() + NL
+
+               + "ORDER BY TourData.tourstarttime" + NL //                                      //$NON-NLS-1$
+         ;
+
+         final PreparedStatement statement = conn.prepareStatement(sql);
+
+         statement.setLong(1, _serviceID);
+         sqlFilter.setParameters(statement, 2);
+
+         final ResultSet result = statement.executeQuery();
+
+         while (result.next()) {
+
+            final TVIEquipmentView_Tour tourItem = new TVIEquipmentView_Tour(this, getEquipmentViewer());
+
+            allTourItems.add(tourItem);
+
+            tourItem.readColumnValues_Tour(result);
+
+            if (UI.IS_SCRAMBLE_DATA) {
+               tourItem.firstColumn = UI.scrambleText(tourItem.firstColumn);
+            }
+         }
+
+      } catch (final SQLException e) {
+
+         net.tourbook.ui.UI.showSQLException(e);
+      }
+
+      setChildren(allTourItems);
    }
 
    public Equipment getEquipment() {

@@ -52,7 +52,7 @@ public class TVIEquipmentView_Part extends TVIEquipmentView_Item {
    }
 
    /**
-    * Get all tours for the part
+    * Get all tours for this part
     */
    @Override
    protected void fetchChildren() {
