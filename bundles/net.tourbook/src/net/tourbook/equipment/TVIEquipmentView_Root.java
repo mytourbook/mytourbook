@@ -15,10 +15,6 @@
  *******************************************************************************/
 package net.tourbook.equipment;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -27,8 +23,6 @@ import javax.persistence.EntityManager;
 import javax.persistence.Query;
 
 import net.tourbook.common.UI;
-import net.tourbook.common.util.SQL;
-import net.tourbook.common.util.Util;
 import net.tourbook.data.Equipment;
 import net.tourbook.database.TourDatabase;
 
@@ -81,53 +75,6 @@ public class TVIEquipmentView_Root extends TVIEquipmentView_Item {
       }
       em.close();
 
-      loadNumberOfTours(allEquipmentItems);
-   }
-
-   private void loadNumberOfTours(final Map<Long, TVIEquipmentView_Equipment> allEquipmentItems) {
-
-      String sql = null;
-      PreparedStatement statement = null;
-
-      try (Connection conn = TourDatabase.getInstance().getConnection()) {
-
-         sql = UI.EMPTY_STRING
-
-               + "SELECT" + NL //                                                            //$NON-NLS-1$
-
-               + "   j_TD_EQ.EQUIPMENT_EQUIPMENTID," + NL //                              1  //$NON-NLS-1$
-               + "   COUNT(*)" + NL //                                                    2  //$NON-NLS-1$
-
-               + "FROM EQUIPMENT" + NL //                                                    //$NON-NLS-1$
-
-               + "JOIN TOURDATA_EQUIPMENT AS j_TD_EQ" + NL //                                //$NON-NLS-1$
-               + "   ON j_TD_EQ.EQUIPMENT_EQUIPMENTID = EQUIPMENT.EQUIPMENTID" + NL //       //$NON-NLS-1$
-
-               + "GROUP BY " + NL //                                                         //$NON-NLS-1$
-               + "   j_TD_EQ.EQUIPMENT_EQUIPMENTID" + NL //                                  //$NON-NLS-1$
-         ;
-
-         statement = conn.prepareStatement(sql);
-
-         final ResultSet result = statement.executeQuery();
-
-         while (result.next()) {
-
-            final long equipmentID = result.getLong(1);
-            final int numTours = result.getInt(2);
-
-            final TVIEquipmentView_Equipment equipmentItem = allEquipmentItems.get(equipmentID);
-
-            if (equipmentItem != null) {
-
-               equipmentItem.numTours = numTours;
-            }
-         }
-
-      } catch (final SQLException e) {
-         SQL.showException(e, sql);
-      } finally {
-         Util.closeSql(statement);
-      }
+      loadSummarizedValues_Equipment(allEquipmentItems);
    }
 }

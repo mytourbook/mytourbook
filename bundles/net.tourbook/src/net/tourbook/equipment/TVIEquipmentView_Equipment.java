@@ -59,14 +59,10 @@ public class TVIEquipmentView_Equipment extends TVIEquipmentView_Item {
       final ArrayList<TreeViewerItem> allParts = readChildren_Parts();
       final ArrayList<TreeViewerItem> allServices = readChildren_Services();
 
-//      final TVIEquipmentView_AllTours allTours = new TVIEquipmentView_AllTours(getEquipmentViewer(), _equipment);
-
       final ArrayList<TreeViewerItem> allChildren = new ArrayList<>();
 
       allChildren.addAll(allParts);
       allChildren.addAll(allServices);
-
-//      allChildren.add(allTours);
 
       setChildren(allChildren);
    }
@@ -116,6 +112,8 @@ public class TVIEquipmentView_Equipment extends TVIEquipmentView_Item {
 // SET_FORMATTING_ON
 
          allPartItems.add(partItem);
+
+         loadSummarizedValues_Part(partItem);
       }
 
       return allPartItems;
@@ -158,6 +156,8 @@ public class TVIEquipmentView_Equipment extends TVIEquipmentView_Item {
 // SET_FORMATTING_ON
 
          allServiceItems.add(serviceItem);
+
+         loadSummarizedValues_Service(serviceItem);
       }
 
       return allServiceItems;

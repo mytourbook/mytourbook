@@ -102,7 +102,7 @@ public class TVIEquipmentView_Tour extends TVIEquipmentView_Item {
          tourTitle = UI.scrambleText(tourTitle);
       }
 
-      readColumnValues_Default(result, 6);
+      readCommonValues(result, 6);
    }
 
    @Override

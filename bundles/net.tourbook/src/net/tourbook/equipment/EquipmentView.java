@@ -1068,12 +1068,11 @@ public class EquipmentView extends ViewPart implements ITourProvider, ITourViewe
 
             final Object element = cell.getElement();
 
-            if (element instanceof TVIEquipmentView_Part
-                  || element instanceof TVIEquipmentView_Service
-                  || element instanceof TVIEquipmentView_Tour) {
+            double value = ((TVIEquipmentView_Item) element).colAltitudeDown;
 
-               final double dbAltitudeDown = ((TVIEquipmentView_Item) element).colAltitudeDown;
-               final double value = -dbAltitudeDown / UI.UNIT_VALUE_ELEVATION;
+            if (value != 0) {
+
+               value = -value / UI.UNIT_VALUE_ELEVATION;
 
                colDef.printValue_0(cell, value);
 
@@ -1095,12 +1094,11 @@ public class EquipmentView extends ViewPart implements ITourProvider, ITourViewe
 
             final Object element = cell.getElement();
 
-            if (element instanceof TVIEquipmentView_Part
-                  || element instanceof TVIEquipmentView_Service
-                  || element instanceof TVIEquipmentView_Tour) {
+            double value = ((TVIEquipmentView_Item) element).colMaxAltitude;
 
-               final long dbMaxAltitude = ((TVIEquipmentView_Item) element).colMaxAltitude;
-               final double value = dbMaxAltitude / UI.UNIT_VALUE_ELEVATION;
+            if (value != 0) {
+
+               value = value / UI.UNIT_VALUE_ELEVATION;
 
                colDef.printValue_0(cell, value);
 
@@ -1122,12 +1120,11 @@ public class EquipmentView extends ViewPart implements ITourProvider, ITourViewe
 
             final Object element = cell.getElement();
 
-            if (element instanceof TVIEquipmentView_Part
-                  || element instanceof TVIEquipmentView_Service
-                  || element instanceof TVIEquipmentView_Tour) {
+            double value = ((TVIEquipmentView_Item) element).colAltitudeUp;
 
-               final long dbAltitudeUp = ((TVIEquipmentView_Item) element).colAltitudeUp;
-               final double value = dbAltitudeUp / UI.UNIT_VALUE_ELEVATION;
+            if (value != 0) {
+
+               value = value / UI.UNIT_VALUE_ELEVATION;
 
                colDef.printValue_0(cell, value);
 
@@ -1149,11 +1146,9 @@ public class EquipmentView extends ViewPart implements ITourProvider, ITourViewe
 
             final Object element = cell.getElement();
 
-            if (element instanceof TVIEquipmentView_Part
-                  || element instanceof TVIEquipmentView_Service
-                  || element instanceof TVIEquipmentView_Tour) {
+            final double value = ((TVIEquipmentView_Item) element).colAvgPulse;
 
-               final double value = ((TVIEquipmentView_Item) element).colAvgPulse;
+            if (value != 0) {
 
                colDef.printDoubleValue(cell, value, element instanceof TVIEquipmentView_Tour);
 
@@ -1175,11 +1170,9 @@ public class EquipmentView extends ViewPart implements ITourProvider, ITourViewe
 
             final Object element = cell.getElement();
 
-            if (element instanceof TVIEquipmentView_Part
-                  || element instanceof TVIEquipmentView_Service
-                  || element instanceof TVIEquipmentView_Tour) {
+            final long value = ((TVIEquipmentView_Item) element).colMaxPulse;
 
-               final long value = ((TVIEquipmentView_Item) element).colMaxPulse;
+            if (value != 0) {
 
                colDef.printValue_0(cell, value);
 
@@ -1722,15 +1715,21 @@ public class EquipmentView extends ViewPart implements ITourProvider, ITourViewe
          public void update(final ViewerCell cell) {
 
             final Object element = cell.getElement();
-            final float pace = ((TVIEquipmentView_Item) element).colAvgPace * UI.UNIT_VALUE_DISTANCE;
 
-            if (pace == 0.0) {
-               cell.setText(UI.EMPTY_STRING);
-            } else {
-               cell.setText(net.tourbook.common.UI.format_mm_ss((long) pace));
+            final float value = ((TVIEquipmentView_Item) element).colAvgPace;
+
+            if (value != 0) {
+
+               final float pace = value * UI.UNIT_VALUE_DISTANCE;
+
+               if (pace == 0.0) {
+                  cell.setText(UI.EMPTY_STRING);
+               } else {
+                  cell.setText(net.tourbook.common.UI.format_mm_ss((long) pace));
+               }
+
+               setCellColor(cell, element);
             }
-
-            setCellColor(cell, element);
          }
       });
    }
@@ -1746,11 +1745,17 @@ public class EquipmentView extends ViewPart implements ITourProvider, ITourViewe
          public void update(final ViewerCell cell) {
 
             final Object element = cell.getElement();
-            final float value = ((TVIEquipmentView_Item) element).colAvgSpeed / UI.UNIT_VALUE_DISTANCE;
 
-            colDef.printDoubleValue(cell, value, element instanceof TVIEquipmentView_Tour);
+            float value = ((TVIEquipmentView_Item) element).colAvgSpeed;
 
-            setCellColor(cell, element);
+            if (value != 0) {
+
+               value = value / UI.UNIT_VALUE_DISTANCE;
+
+               colDef.printDoubleValue(cell, value, element instanceof TVIEquipmentView_Tour);
+
+               setCellColor(cell, element);
+            }
          }
       });
    }
@@ -1770,12 +1775,12 @@ public class EquipmentView extends ViewPart implements ITourProvider, ITourViewe
 
             final Object element = cell.getElement();
 
-            if (element instanceof TVIEquipmentView_Part
-                  || element instanceof TVIEquipmentView_Service
-                  || element instanceof TVIEquipmentView_Tour) {
+            float value = ((TVIEquipmentView_Item) element).colDistance;
 
-               final double value = ((TVIEquipmentView_Item) element).colDistance
-                     / 1000.0
+            if (value != 0) {
+
+               value = value
+                     / 1000.0f
                      / UI.UNIT_VALUE_DISTANCE;
 
                colDef.printDoubleValue(cell, value, element instanceof TVIEquipmentView_Tour);
@@ -1798,11 +1803,11 @@ public class EquipmentView extends ViewPart implements ITourProvider, ITourViewe
 
             final Object element = cell.getElement();
 
-            if (element instanceof TVIEquipmentView_Part
-                  || element instanceof TVIEquipmentView_Service
-                  || element instanceof TVIEquipmentView_Tour) {
+            float value = ((TVIEquipmentView_Item) element).colMaxSpeed;
 
-               final double value = ((TVIEquipmentView_Item) element).colMaxSpeed / UI.UNIT_VALUE_DISTANCE;
+            if (value != 0) {
+
+               value = value / UI.UNIT_VALUE_DISTANCE;
 
                colDef.printDoubleValue(cell, value, element instanceof TVIEquipmentView_Tour);
 
@@ -1824,11 +1829,9 @@ public class EquipmentView extends ViewPart implements ITourProvider, ITourViewe
 
             final Object element = cell.getElement();
 
-            if (element instanceof TVIEquipmentView_Part
-                  || element instanceof TVIEquipmentView_Service
-                  || element instanceof TVIEquipmentView_Tour) {
+            final float value = ((TVIEquipmentView_Item) element).colAvgCadence;
 
-               final float value = ((TVIEquipmentView_Item) element).colAvgCadence;
+            if (value != 0) {
 
                colDef.printDoubleValue(cell, value, element instanceof TVIEquipmentView_Tour);
 
@@ -1851,11 +1854,9 @@ public class EquipmentView extends ViewPart implements ITourProvider, ITourViewe
 
             final Object element = cell.getElement();
 
-            if (element instanceof TVIEquipmentView_Part
-                  || element instanceof TVIEquipmentView_Service
-                  || element instanceof TVIEquipmentView_Tour) {
+            final long value = ((TVIEquipmentView_Item) element).colElapsedTime;
 
-               final long value = ((TVIEquipmentView_Item) element).colElapsedTime;
+            if (value != 0) {
 
                colDef.printLongValue(cell, value, element instanceof TVIEquipmentView_Tour);
 
@@ -1880,11 +1881,9 @@ public class EquipmentView extends ViewPart implements ITourProvider, ITourViewe
 
             final Object element = cell.getElement();
 
-            if (element instanceof TVIEquipmentView_Part
-                  || element instanceof TVIEquipmentView_Service
-                  || element instanceof TVIEquipmentView_Tour) {
+            final long value = ((TVIEquipmentView_Item) element).colMovingTime;
 
-               final long value = ((TVIEquipmentView_Item) element).colMovingTime;
+            if (value != 0) {
 
                colDef.printLongValue(cell, value, element instanceof TVIEquipmentView_Tour);
 
@@ -1906,11 +1905,9 @@ public class EquipmentView extends ViewPart implements ITourProvider, ITourViewe
 
             final Object element = cell.getElement();
 
-            if (element instanceof TVIEquipmentView_Part
-                  || element instanceof TVIEquipmentView_Service
-                  || element instanceof TVIEquipmentView_Tour) {
+            final long value = ((TVIEquipmentView_Item) element).colPausedTime;
 
-               final long value = ((TVIEquipmentView_Item) element).colPausedTime;
+            if (value != 0) {
 
                colDef.printLongValue(cell, value, element instanceof TVIEquipmentView_Tour);
 
@@ -1932,12 +1929,12 @@ public class EquipmentView extends ViewPart implements ITourProvider, ITourViewe
          public void update(final ViewerCell cell) {
 
             final Object element = cell.getElement();
-            if (element instanceof TVIEquipmentView_Part
-                  || element instanceof TVIEquipmentView_Service
-                  || element instanceof TVIEquipmentView_Tour) {
 
-               final double temperature = net.tourbook.common.UI.convertTemperatureFromMetric(
-                     ((TVIEquipmentView_Item) element).colAvgTemperature_Device);
+            final float value = ((TVIEquipmentView_Item) element).colAvgTemperature_Device;
+
+            if (value != 0) {
+
+               final double temperature = net.tourbook.common.UI.convertTemperatureFromMetric(value);
 
                colDef.printDoubleValue(cell, temperature, element instanceof TVIEquipmentView_Tour);
 
@@ -2260,10 +2257,10 @@ public class EquipmentView extends ViewPart implements ITourProvider, ITourViewe
     */
    private void loadAllTreeItems_One(final TreeViewerItem parentItem, final TVIEquipmentView_Root rootItem) {
 
-      if (loadAllTreeItems_Summarized(parentItem)) {
+      if (parentItem instanceof TVIEquipmentView_Part
+            || parentItem instanceof TVIEquipmentView_Service) {
 
-         // tour values could be recognized and summarized
-
+         // do not digg deeper, children are fetched when the parent item is expanded
          return;
       }
 
@@ -2278,54 +2275,6 @@ public class EquipmentView extends ViewPart implements ITourProvider, ITourViewe
 
          loadAllTreeItems_One(childItem, rootItem);
       }
-   }
-
-   /**
-    * @param parentItem
-    *
-    * @return Returns <code>true</code> when summarized values could be collected
-    */
-   private boolean loadAllTreeItems_Summarized(final TreeViewerItem parentItem) {
-
-      /*
-       * Load summarized tour values
-       */
-      TVIEquipmentView_Item tviItem = null;
-
-      long numTours = 0;
-
-      if (parentItem instanceof final TVIEquipmentView_Part partItem) {
-
-         tviItem = partItem;
-         TVIEquipmentView_Item.loadSummarizedValues_Part(partItem);
-
-         numTours = partItem.numTours;
-
-      } else if (parentItem instanceof final TVIEquipmentView_Service serviceItem) {
-
-         tviItem = serviceItem;
-
-         TVIEquipmentView_Item.loadSummarizedValues_Service(serviceItem);
-
-         numTours = serviceItem.numTours;
-      }
-
-      if (tviItem != null) {
-
-         // part or service was recognized
-
-         if (numTours == 0) {
-
-            // hide expand UI icon when there are no children
-
-            tviItem.setChildren(new ArrayList<>());
-         }
-
-         // do not digg deeper, children are fetched when the parent item is expanded
-         return true;
-      }
-
-      return false;
    }
 
    private void onAction_DeleteEquipment() {

@@ -128,10 +128,4 @@ public class TVIEquipmentView_Service extends TVIEquipmentView_Item {
       return _serviceID;
    }
 
-
-   public String getTourValuesKey() {
-
-      return getTourValuesKey(_equipment.getEquipmentId(), _serviceID, _service.getType());
-   }
-
 }
