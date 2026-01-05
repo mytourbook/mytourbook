@@ -928,6 +928,7 @@ public class EquipmentView extends ViewPart implements ITourProvider, ITourViewe
       defineColumn_Powertrain_AvgCadence();
 
       defineColumn_Equipment_ID();
+      defineColumn_Equipment_ExpandType();
    }
 
    /**
@@ -1048,7 +1049,7 @@ public class EquipmentView extends ViewPart implements ITourProvider, ITourViewe
                 * Year
                 */
 
-               styledString.append(viewItem.firstColumn, net.tourbook.ui.UI.CONTENT_SUB_CATEGORY_STYLER);
+               styledString.append(viewItem.firstColumn, net.tourbook.ui.UI.DATE_CATEGORY_STYLER);
 
                if (numTours > 0) {
                   styledString.append(UI.SPACE3 + numTours, net.tourbook.ui.UI.TOTAL_STYLER);
@@ -1060,7 +1061,7 @@ public class EquipmentView extends ViewPart implements ITourProvider, ITourViewe
                 * Month
                 */
 
-               styledString.append(viewItem.firstColumn, net.tourbook.ui.UI.CONTENT_SUB_CATEGORY_STYLER);
+               styledString.append(viewItem.firstColumn, net.tourbook.ui.UI.DATE_SUB_CATEGORY_STYLER);
 
                if (numTours > 0) {
                   styledString.append(UI.SPACE3 + numTours, net.tourbook.ui.UI.TOTAL_STYLER);
@@ -1475,6 +1476,29 @@ public class EquipmentView extends ViewPart implements ITourProvider, ITourViewe
 //               java.time.Period javaTimePeriod = java.time.Period.of(1,2,3);
 
                cell.setText(durationLast + formattedDuration);
+               setCellColor(cell, element);
+            }
+         }
+      });
+   }
+
+   /**
+    * Column: Expand type
+    */
+   private void defineColumn_Equipment_ExpandType() {
+
+      final ColumnDefinition colDef = TreeColumnFactory.EQUIPMENT_EXPAND_TYPE.createColumn(_columnManager, _pc);
+
+      colDef.setLabelProvider(new CellLabelProvider() {
+
+         @Override
+         public void update(final ViewerCell cell) {
+
+            final Object element = cell.getElement();
+
+            if (element instanceof final TVIEquipmentView_Part partItem) {
+
+               cell.setText(Long.toString(partItem.getExpandType()));
                setCellColor(cell, element);
             }
          }

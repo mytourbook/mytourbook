@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2024 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2026 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -321,7 +321,6 @@ public class PrefPageViewColors extends PreferencePage implements IWorkbenchPref
          // fire one event for all modified colors
          getPreferenceStore().setValue(ITourbookPreferences.VIEW_LAYOUT_CHANGED, Math.random());
       }
-
    }
 
    @Override
@@ -504,9 +503,7 @@ public class PrefPageViewColors extends PreferencePage implements IWorkbenchPref
     */
    private void updateUI_CustomColors(final Object eventControl) {
 
-      if (eventControl instanceof ColorSelectorExtended) {
-
-         final ColorSelectorExtended colorSelectorExtended = (ColorSelectorExtended) eventControl;
+      if (eventControl instanceof final ColorSelectorExtended colorSelectorExtended) {
 
          // log selected color as Java code
          System.out.println(UI.logRGB(colorSelectorExtended.getColorValue()));

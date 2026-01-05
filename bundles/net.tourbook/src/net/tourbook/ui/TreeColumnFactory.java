@@ -75,6 +75,8 @@ public abstract class TreeColumnFactory {
    public static final String            EQUIPMENT_DATE_UNTIL_ID          = "EQUIPMENT_DATE_UNTIL";             //$NON-NLS-1$
    public static final TreeColumnFactory EQUIPMENT_DATE_USAGE_DURATION;
    public static final String            EQUIPMENT_DATE_USAGE_DURATION_ID = "EQUIPMENT_DATE_USAGE_DURATION";    //$NON-NLS-1$
+   public static final TreeColumnFactory EQUIPMENT_EXPAND_TYPE;
+   public static final String            EQUIPMENT_EXPAND_TYPE_ID         = "EQUIPMENT_EXPAND_TYPE_ID";         //$NON-NLS-1$
    public static final TreeColumnFactory EQUIPMENT_ID;
    public static final String            EQUIPMENT_ID_ID                  = "EQUIPMENT_ID";                     //$NON-NLS-1$
    public static final TreeColumnFactory EQUIPMENT_INITIAL_DISTANCE;
@@ -899,6 +901,25 @@ public abstract class TreeColumnFactory {
          }
       };
 
+
+      EQUIPMENT_EXPAND_TYPE = new TreeColumnFactory() {
+         @Override
+         public TreeColumnDefinition createColumn(final ColumnManager columnManager,
+                                                  final PixelConverter pixelConverter) {
+
+            final TreeColumnDefinition colDef = new TreeColumnDefinition(columnManager, EQUIPMENT_EXPAND_TYPE_ID, SWT.TRAIL);
+
+            colDef.setColumnCategory(           Messages.ColumnFactory_Category_Equipment);
+
+            colDef.setColumnLabel(              "Category Type");
+            colDef.setColumnHeaderText(         "Cat.");
+            colDef.setColumnHeaderToolTipText(  "How the tours are categorized");
+
+            colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(5));
+
+            return colDef;
+         }
+      };
 
       EQUIPMENT_ID = new TreeColumnFactory() {
          @Override

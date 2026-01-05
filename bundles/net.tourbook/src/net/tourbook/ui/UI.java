@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2025 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2026 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -111,7 +111,7 @@ public class UI {
    public static final String            VIEW_COLOR_CONTENT_CATEGORY     = "VIEW_COLOR_CONTENT_CATEGORY";     //$NON-NLS-1$
 
    /**
-    * Cntent subcategory e.g. tag
+    * Content subcategory e.g. tag
     */
    public static final String            VIEW_COLOR_CONTENT_SUB_CATEGORY = "VIEW_COLOR_CONTENT_SUB_CATEGORY"; //$NON-NLS-1$
 
@@ -159,6 +159,7 @@ public class UI {
    public static Styler                  CONTENT_SUB_CATEGORY_STYLER;
    public static Styler                  CONTENT_CATEGORY_STYLER;
    public static Styler                  DATE_CATEGORY_STYLER;
+   public static Styler                  DATE_SUB_CATEGORY_STYLER;
    public static Styler                  DISABLED_STYLER;
    public static Styler                  TOUR_STYLER;
    public static Styler                  TOTAL_STYLER;
@@ -208,6 +209,7 @@ public class UI {
       CONTENT_CATEGORY_STYLER       = StyledString.createColorRegistryStyler(VIEW_COLOR_CONTENT_CATEGORY,      null);
       CONTENT_SUB_CATEGORY_STYLER   = StyledString.createColorRegistryStyler(VIEW_COLOR_CONTENT_SUB_CATEGORY,  null);
       DATE_CATEGORY_STYLER          = StyledString.createColorRegistryStyler(VIEW_COLOR_DATE_CATEGORY,         null);
+      DATE_SUB_CATEGORY_STYLER      = StyledString.createColorRegistryStyler(VIEW_COLOR_DATE_SUB_CATEGORY,     null);
       DISABLED_STYLER               = StyledString.createColorRegistryStyler(VIEW_COLOR_DISABLED,              null);
       TOUR_STYLER                   = StyledString.createColorRegistryStyler(VIEW_COLOR_TOUR,                  null);
       TOTAL_STYLER                  = StyledString.createColorRegistryStyler(VIEW_COLOR_TOTAL,                 null);
