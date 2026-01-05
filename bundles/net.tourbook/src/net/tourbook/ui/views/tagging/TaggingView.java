@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2025 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2026 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -592,7 +592,7 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer,
             _tagViewer.refresh();
 
             /*
-             * the tree must be redrawn because the styled text does not show with the new color
+             * The tree must be redrawn because the styled text does not show with the new color
              */
             _tagViewer.getTree().redraw();
          }

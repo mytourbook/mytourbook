@@ -33,6 +33,7 @@ import java.util.concurrent.ConcurrentSkipListSet;
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
 
+import net.tourbook.Messages;
 import net.tourbook.common.UI;
 import net.tourbook.common.time.TimeTools;
 import net.tourbook.common.util.SQL;
@@ -64,13 +65,27 @@ import org.eclipse.swt.widgets.Label;
 
 public class EquipmentManager {
 
-   private static final char                    NL                         = UI.NEW_LINE;
+   private static final char                    NL                          = UI.NEW_LINE;
 
-   private static final Object                  DB_LOCK                    = new Object();
+   private static final Object                  DB_LOCK                     = new Object();
 
-   public static final int                      EXPAND_TYPE_FLAT           = 0;
-   public static final int                      EXPAND_TYPE_YEAR_DAY       = 1;
-   public static final int                      EXPAND_TYPE_YEAR_MONTH_DAY = 2;
+   public static final int                      EXPAND_TYPE_FLAT            = 0;
+   public static final int                      EXPAND_TYPE_YEAR_TOUR       = 1;
+   public static final int                      EXPAND_TYPE_YEAR_MONTH_TOUR = 2;
+
+   static final String[]                        EXPAND_TYPE_NAMES           = {
+
+         Messages.app_action_expand_type_flat,
+         Messages.app_action_expand_type_year_day,
+         Messages.app_action_expand_type_year_month_day
+   };
+
+   static final int[]                           EXPAND_TYPES                = {
+
+         EXPAND_TYPE_FLAT,
+         EXPAND_TYPE_YEAR_TOUR,
+         EXPAND_TYPE_YEAR_MONTH_TOUR
+   };
 
    private static volatile Map<Long, Equipment> _allEquipment_ByID;
    private static volatile List<Equipment>      _allEquipment_ByName;
@@ -89,7 +104,7 @@ public class EquipmentManager {
     */
    public static void clearAllEquipmentResourcesAndFireModifyEvent() {
 
-      // remove old equpment from cached tours
+      // remove old equipment from cached tours
       clearCachedValues();
 
       EquipmentMenuManager.clearRecentEquipment();
@@ -1260,7 +1275,7 @@ public class EquipmentManager {
          }
       }
 
-      int numParts = allFilteredParts.size();
+      final int numParts = allFilteredParts.size();
 
       if (numParts == 0) {
          return;
@@ -1391,9 +1406,9 @@ public class EquipmentManager {
 
       for (final EquipmentService service : allServices) {
 
-         if (service.isCollate() 
+         if (service.isCollate()
                && modifiedType.equals(service.getType())) {
-            
+
             allFilteredServices.add(service);
          }
       }

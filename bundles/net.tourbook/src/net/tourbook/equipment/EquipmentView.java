@@ -142,32 +142,34 @@ public class EquipmentView extends ViewPart implements ITourProvider, ITourViewe
       _nf0.setMaximumFractionDigits(0);
    }
 
-   private IPropertyChangeListener             _prefChangeListener;
-   private IPropertyChangeListener             _prefChangeListener_Common;
-   private ITourEventListener                  _tourEventListener;
+   private IPropertyChangeListener        _prefChangeListener;
+   private IPropertyChangeListener        _prefChangeListener_Common;
+   private ITourEventListener             _tourEventListener;
 
-   private PostSelectionProvider               _postSelectionProvider;
+   private PostSelectionProvider          _postSelectionProvider;
 
-   private TreeViewer                          _equipmentViewer;
-   private ColumnManager                       _columnManager;
-   private TVIEquipmentView_Root               _rootItem;
+   private TreeViewer                     _equipmentViewer;
+   private ColumnManager                  _columnManager;
+   private TVIEquipmentView_Root          _rootItem;
 
-   private MenuManager                         _viewerMenuManager;
-   private Menu                                _treeContextMenu;
-   private IContextMenuProvider                _viewerContextMenuProvider               = new TreeContextMenuProvider();
+   private MenuManager                    _viewerMenuManager;
+   private Menu                           _treeContextMenu;
+   private IContextMenuProvider           _viewerContextMenuProvider = new TreeContextMenuProvider();
 
-   private ActionDeleteEquipment               _actionDeleteEquipment;
-   private ActionDeletePart                    _actionDeletePart;
-   private ActionDeleteService                 _actionDeleteService;
-   private ActionDuplicatePart                 _actionDuplicatePart;
-   private ActionDuplicateService              _actionDuplicateService;
-   private ActionEditEquipment                 _actionEditEquipment;
-   private ActionEditPart                      _actionEditPart;
-   private ActionEditService                   _actionEditService;
-   private ActionNewEquipment                  _actionNewEquipment;
-   private ActionNewPart                       _actionNewPart;
-   private ActionNewService                    _actionNewService;
-   private ActionRefreshView                   _actionRefreshView;
+   private ActionDeleteEquipment          _actionDeleteEquipment;
+   private ActionDeletePart               _actionDeletePart;
+   private ActionDeleteService            _actionDeleteService;
+   private ActionDuplicatePart            _actionDuplicatePart;
+   private ActionDuplicateService         _actionDuplicateService;
+   private ActionEditEquipment            _actionEditEquipment;
+   private ActionEditPart                 _actionEditPart;
+   private ActionEditService              _actionEditService;
+   private ActionNewEquipment             _actionNewEquipment;
+   private ActionNewPart                  _actionNewPart;
+   private ActionNewService               _actionNewService;
+   private ActionRefreshView              _actionRefreshView;
+   private ActionSetTourCategoryStructure _actionSetTourStructure;
+//   private ActionSetTourStructure_All          _actionSetTourStructure_All;
 
    private Action_CollapseAll_WithoutSelection _actionCollapseAll_WithoutSelection;
    private ActionCollapseOthers                _actionCollapseOthers;
@@ -188,6 +190,10 @@ public class EquipmentView extends ViewPart implements ITourProvider, ITourViewe
    private PixelConverter                      _pc;
 
    private Color                               _colorTour;
+   private Color                               _colorContentCategory;
+   private Color                               _colorContentSubCategory;
+   private Color                               _colorDateCategory;
+   private Color                               _colorDateSubCategory;
 
    /*
     * UI resources
@@ -615,17 +621,6 @@ public class EquipmentView extends ViewPart implements ITourProvider, ITourViewe
 
          if (property.equals(ITourbookPreferences.VIEW_LAYOUT_CHANGED)) {
 
-            _equipmentViewer.getTree().setLinesVisible(_prefStore.getBoolean(ITourbookPreferences.VIEW_LAYOUT_DISPLAY_LINES));
-
-            _equipmentViewer.refresh();
-
-            /*
-             * The tree must be redrawn because the styled text does not show with the new color
-             */
-            _equipmentViewer.getTree().redraw();
-
-         } else if (property.equals(ITourbookPreferences.VIEW_LAYOUT_CHANGED)) {
-
             updateColors();
 
             _equipmentViewer.getTree().setLinesVisible(_prefStore.getBoolean(ITourbookPreferences.VIEW_LAYOUT_DISPLAY_LINES));
@@ -633,7 +628,7 @@ public class EquipmentView extends ViewPart implements ITourProvider, ITourViewe
             _equipmentViewer.refresh();
 
             /*
-             * the tree must be redrawn because the styled text does not show with the new color
+             * The tree must be redrawn because the styled text does not show with the new color
              */
             _equipmentViewer.getTree().redraw();
 
@@ -698,6 +693,8 @@ public class EquipmentView extends ViewPart implements ITourProvider, ITourViewe
       _actionNewPart                         = new ActionNewPart();
       _actionNewService                      = new ActionNewService();
       _actionRefreshView                     = new ActionRefreshView(this);
+      _actionSetTourStructure                = new ActionSetTourCategoryStructure(this);
+//      _actionSetTourStructure_All            = new ActionSetTourStructure_All();
 
       _actionCollapseAll_WithoutSelection    = new Action_CollapseAll_WithoutSelection();
       _actionCollapseOthers                  = new ActionCollapseOthers(this);
@@ -1009,7 +1006,7 @@ public class EquipmentView extends ViewPart implements ITourProvider, ITourViewe
                 * Equipment
                 */
 
-               styledString.append(viewItem.firstColumn, net.tourbook.ui.UI.CONTENT_SUB_CATEGORY_STYLER);
+               styledString.append(viewItem.firstColumn, net.tourbook.ui.UI.CONTENT_CATEGORY_STYLER);
 
                if (numTours > 0) {
                   styledString.append(UI.SPACE3 + numTours, net.tourbook.ui.UI.TOTAL_STYLER);
@@ -1023,7 +1020,7 @@ public class EquipmentView extends ViewPart implements ITourProvider, ITourViewe
                 * Part
                 */
 
-               styledString.append(viewItem.firstColumn, net.tourbook.ui.UI.TOUR_STYLER);
+               styledString.append(viewItem.firstColumn, net.tourbook.ui.UI.CONTENT_SUB_CATEGORY_STYLER);
 
                if (numTours > 0) {
                   styledString.append(UI.SPACE3 + numTours, net.tourbook.ui.UI.TOTAL_STYLER);
@@ -1037,13 +1034,37 @@ public class EquipmentView extends ViewPart implements ITourProvider, ITourViewe
                 * Service
                 */
 
-               styledString.append(viewItem.firstColumn, net.tourbook.ui.UI.TOUR_STYLER);
+               styledString.append(viewItem.firstColumn, net.tourbook.ui.UI.CONTENT_SUB_CATEGORY_STYLER);
 
                if (numTours > 0) {
                   styledString.append(UI.SPACE3 + numTours, net.tourbook.ui.UI.TOTAL_STYLER);
                }
 
                cell.setImage(_imgEquipment_Service);
+
+            } else if (viewItem instanceof TVIEquipmentView_Part_Year) {
+
+               /*
+                * Year
+                */
+
+               styledString.append(viewItem.firstColumn, net.tourbook.ui.UI.CONTENT_SUB_CATEGORY_STYLER);
+
+               if (numTours > 0) {
+                  styledString.append(UI.SPACE3 + numTours, net.tourbook.ui.UI.TOTAL_STYLER);
+               }
+
+            } else if (viewItem instanceof TVIEquipmentView_Part_Month) {
+
+               /*
+                * Month
+                */
+
+               styledString.append(viewItem.firstColumn, net.tourbook.ui.UI.CONTENT_SUB_CATEGORY_STYLER);
+
+               if (numTours > 0) {
+                  styledString.append(UI.SPACE3 + numTours, net.tourbook.ui.UI.TOTAL_STYLER);
+               }
 
             } else {
 
@@ -2089,6 +2110,8 @@ public class EquipmentView extends ViewPart implements ITourProvider, ITourViewe
          menuMgr.add(_actionDuplicateService);
          menuMgr.add(_actionEditService);
       }
+      menuMgr.add(_actionSetTourStructure);
+//      menuMgr.add(_actionSetTourStructure_All);
 
       menuMgr.add(new Separator());
 
@@ -2656,7 +2679,9 @@ public class EquipmentView extends ViewPart implements ITourProvider, ITourViewe
 
       } else if (firstSelectedItem instanceof TVIEquipmentView_Equipment
             || firstSelectedItem instanceof TVIEquipmentView_Part
-            || firstSelectedItem instanceof TVIEquipmentView_Service) {
+            || firstSelectedItem instanceof TVIEquipmentView_Service
+            || firstSelectedItem instanceof TVIEquipmentView_Part_Year
+            || firstSelectedItem instanceof TVIEquipmentView_Part_Month) {
 
          // a category item is selected, expand/collapse category items
 
@@ -3097,14 +3122,19 @@ public class EquipmentView extends ViewPart implements ITourProvider, ITourViewe
 
       // set color
 
-//      if (element instanceof TVIEquipmentView_Equipment) {
-//
-//         cell.setForeground(_colorContentSubCategory);
-//
-//      } else {
-//
-      cell.setForeground(_colorTour);
-//      }
+      if (element instanceof TVIEquipmentView_Equipment) {
+
+         cell.setForeground(_colorContentCategory);
+
+      } else if (element instanceof TVIEquipmentView_Part
+            || element instanceof TVIEquipmentView_Service) {
+
+         cell.setForeground(_colorContentSubCategory);
+
+      } else {
+
+         cell.setForeground(_colorTour);
+      }
    }
 
    @Override
@@ -3119,10 +3149,10 @@ public class EquipmentView extends ViewPart implements ITourProvider, ITourViewe
 
 // SET_FORMATTING_OFF
 
-//      _colorContentCategory      = colorRegistry.get(net.tourbook.ui.UI.VIEW_COLOR_CONTENT_CATEGORY);
-//      _colorContentSubCategory   = colorRegistry.get(net.tourbook.ui.UI.VIEW_COLOR_CONTENT_SUB_CATEGORY);
-//      _colorDateCategory         = colorRegistry.get(net.tourbook.ui.UI.VIEW_COLOR_DATE_CATEGORY);
-//      _colorDateSubCategory      = colorRegistry.get(net.tourbook.ui.UI.VIEW_COLOR_DATE_SUB_CATEGORY);
+      _colorContentCategory      = colorRegistry.get(net.tourbook.ui.UI.VIEW_COLOR_CONTENT_CATEGORY);
+      _colorContentSubCategory   = colorRegistry.get(net.tourbook.ui.UI.VIEW_COLOR_CONTENT_SUB_CATEGORY);
+      _colorDateCategory         = colorRegistry.get(net.tourbook.ui.UI.VIEW_COLOR_DATE_CATEGORY);
+      _colorDateSubCategory      = colorRegistry.get(net.tourbook.ui.UI.VIEW_COLOR_DATE_SUB_CATEGORY);
       _colorTour                 = colorRegistry.get(net.tourbook.ui.UI.VIEW_COLOR_TOUR);
 
 // SET_FORMATTING_ON

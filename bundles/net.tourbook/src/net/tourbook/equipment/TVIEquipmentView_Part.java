@@ -36,26 +36,66 @@ public class TVIEquipmentView_Part extends TVIEquipmentView_Item {
    private EquipmentPart _part;
 
    private long          _partID;
+   private boolean       _isMonthCategory;
 
-   public TVIEquipmentView_Part(final TVIEquipmentView_Equipment tviParent,
+   public TVIEquipmentView_Part(final TVIEquipmentView_Equipment parentItem,
                                 final EquipmentPart equipmentPart,
                                 final TreeViewer treeViewer) {
 
       super(treeViewer);
 
-      setParentItem(tviParent);
+      setParentItem(parentItem);
 
-      _equipment = tviParent.getEquipment();
+      _equipment = parentItem.getEquipment();
 
       _part = equipmentPart;
       _partID = equipmentPart.getPartId();
+
+      _isMonthCategory = equipmentPart.getExpandType() == EquipmentManager.EXPAND_TYPE_YEAR_MONTH_TOUR;
+   }
+
+   @Override
+   protected void fetchChildren() {
+
+      switch (getExpandType()) {
+
+      case EquipmentManager.EXPAND_TYPE_FLAT:
+         loadChildren_Tours();
+         break;
+
+      case EquipmentManager.EXPAND_TYPE_YEAR_TOUR:
+         loadChildren_Years(false);
+         break;
+
+      case EquipmentManager.EXPAND_TYPE_YEAR_MONTH_TOUR:
+         loadChildren_Years(true);
+         break;
+
+      default:
+         break;
+      }
+   }
+
+   public Equipment getEquipment() {
+      return _equipment;
+   }
+
+   int getExpandType() {
+      return _part.getExpandType();
+   }
+
+   public EquipmentPart getPart() {
+      return _part;
+   }
+
+   public long getPartID() {
+      return _partID;
    }
 
    /**
     * Get all tours for this part
     */
-   @Override
-   protected void fetchChildren() {
+   private void loadChildren_Tours() {
 
       final ArrayList<TreeViewerItem> allTourItems = new ArrayList<>();
 
@@ -116,18 +156,84 @@ public class TVIEquipmentView_Part extends TVIEquipmentView_Item {
       setChildren(allTourItems);
    }
 
-   public Equipment getEquipment() {
-      return _equipment;
-   }
+   /**
+    * Get all years for this part
+    *
+    * @param isMonth
+    */
+   private void loadChildren_Years(final boolean isMonth) {
 
-   public EquipmentPart getPart() {
-      return _part;
-   }
+      final ArrayList<TreeViewerItem> allTourItems = new ArrayList<>();
 
-   public long getPartID() {
-      return _partID;
-   }
+      try (Connection conn = TourDatabase.getInstance().getConnection()) {
 
+         final SQLFilter sqlFilter = new SQLFilter();
+
+         final String sql = UI.EMPTY_STRING
+
+               + "SELECT" + NL //                                                               //$NON-NLS-1$
+
+               + "   TourData.STARTYEAR," + NL //                                               //$NON-NLS-1$
+               + "   COUNT(*) AS num_Tours," + NL //                                            //$NON-NLS-1$
+
+               + TVIEquipmentView_Tour.SQL_SUM_COLUMNS_SUMMARIZED
+
+               + "FROM equipmentpart AS part" + NL //                                           //$NON-NLS-1$
+
+               + "JOIN tourdata_equipment AS j_td_eq" + NL //                                   //$NON-NLS-1$
+               + "   ON j_td_eq.equipment_equipmentid = part.equipment_equipmentid" + NL //     //$NON-NLS-1$
+
+               + "JOIN tourdata AS TourData" + NL //                                            //$NON-NLS-1$
+               + "   ON TourData.tourid = j_td_eq.tourdata_tourid" + NL //                      //$NON-NLS-1$
+               + "   AND TourData.tourstarttime >= part.\"DATE\"" + NL //                       //$NON-NLS-1$
+               + "   AND TourData.tourstarttime <  part.dateuntil" + NL //                      //$NON-NLS-1$
+               + sqlFilter.getWhereClause() + NL
+
+               + "WHERE part.iscollate = TRUE" + NL //                                          //$NON-NLS-1$
+               + "   AND part.partid = ?" + NL //                                               //$NON-NLS-1$
+
+               + "GROUP BY TourData.STARTYEAR" + NL //                                          //$NON-NLS-1$
+         ;
+
+         final PreparedStatement statement = conn.prepareStatement(sql);
+
+         final int nextIndex = sqlFilter.setParameters(statement, 1);
+         statement.setLong(nextIndex, _partID);
+
+         final ResultSet result = statement.executeQuery();
+
+         while (result.next()) {
+
+            final int year = result.getInt(1);
+            final long numTours = result.getLong(2);
+
+            final TVIEquipmentView_Part_Year yearItem = new TVIEquipmentView_Part_Year(
+
+                  this,
+                  year,
+                  _isMonthCategory,
+                  getEquipmentViewer());
+
+            allTourItems.add(yearItem);
+
+            yearItem.numTours = numTours;
+
+            yearItem.firstColumn = Integer.toString(year);
+
+            yearItem.readCommonValues(result, 3);
+
+            if (UI.IS_SCRAMBLE_DATA) {
+               yearItem.firstColumn = UI.scrambleText(yearItem.firstColumn);
+            }
+         }
+
+      } catch (final SQLException e) {
+
+         net.tourbook.ui.UI.showSQLException(e);
+      }
+
+      setChildren(allTourItems);
+   }
 
    @Override
    public String toString() {
