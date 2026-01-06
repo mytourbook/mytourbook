@@ -142,34 +142,34 @@ public class EquipmentView extends ViewPart implements ITourProvider, ITourViewe
       _nf0.setMaximumFractionDigits(0);
    }
 
-   private IPropertyChangeListener        _prefChangeListener;
-   private IPropertyChangeListener        _prefChangeListener_Common;
-   private ITourEventListener             _tourEventListener;
+   private IPropertyChangeListener             _prefChangeListener;
+   private IPropertyChangeListener             _prefChangeListener_Common;
+   private ITourEventListener                  _tourEventListener;
 
-   private PostSelectionProvider          _postSelectionProvider;
+   private PostSelectionProvider               _postSelectionProvider;
 
-   private TreeViewer                     _equipmentViewer;
-   private ColumnManager                  _columnManager;
-   private TVIEquipmentView_Root          _rootItem;
+   private TreeViewer                          _equipmentViewer;
+   private ColumnManager                       _columnManager;
+   private TVIEquipmentView_Root               _rootItem;
 
-   private MenuManager                    _viewerMenuManager;
-   private Menu                           _treeContextMenu;
-   private IContextMenuProvider           _viewerContextMenuProvider = new TreeContextMenuProvider();
+   private MenuManager                         _viewerMenuManager;
+   private Menu                                _treeContextMenu;
+   private IContextMenuProvider                _viewerContextMenuProvider               = new TreeContextMenuProvider();
 
-   private ActionDeleteEquipment          _actionDeleteEquipment;
-   private ActionDeletePart               _actionDeletePart;
-   private ActionDeleteService            _actionDeleteService;
-   private ActionDuplicatePart            _actionDuplicatePart;
-   private ActionDuplicateService         _actionDuplicateService;
-   private ActionEditEquipment            _actionEditEquipment;
-   private ActionEditPart                 _actionEditPart;
-   private ActionEditService              _actionEditService;
-   private ActionNewEquipment             _actionNewEquipment;
-   private ActionNewPart                  _actionNewPart;
-   private ActionNewService               _actionNewService;
-   private ActionRefreshView              _actionRefreshView;
-   private ActionSetTourCategoryStructure _actionSetTourStructure;
-//   private ActionSetTourStructure_All          _actionSetTourStructure_All;
+   private ActionDeleteEquipment               _actionDeleteEquipment;
+   private ActionDeletePart                    _actionDeletePart;
+   private ActionDeleteService                 _actionDeleteService;
+   private ActionDuplicatePart                 _actionDuplicatePart;
+   private ActionDuplicateService              _actionDuplicateService;
+   private ActionEditEquipment                 _actionEditEquipment;
+   private ActionEditPart                      _actionEditPart;
+   private ActionEditService                   _actionEditService;
+   private ActionNewEquipment                  _actionNewEquipment;
+   private ActionNewPart                       _actionNewPart;
+   private ActionNewService                    _actionNewService;
+   private ActionRefreshView                   _actionRefreshView;
+   private ActionSetPartStructure              _actionSetPartStructure;
+   private ActionSetPartStructure_All          _actionSetPartStructure_All;
 
    private Action_CollapseAll_WithoutSelection _actionCollapseAll_WithoutSelection;
    private ActionCollapseOthers                _actionCollapseOthers;
@@ -693,8 +693,8 @@ public class EquipmentView extends ViewPart implements ITourProvider, ITourViewe
       _actionNewPart                         = new ActionNewPart();
       _actionNewService                      = new ActionNewService();
       _actionRefreshView                     = new ActionRefreshView(this);
-      _actionSetTourStructure                = new ActionSetTourCategoryStructure(this);
-//      _actionSetTourStructure_All            = new ActionSetTourStructure_All();
+      _actionSetPartStructure                = new ActionSetPartStructure(this);
+      _actionSetPartStructure_All            = new ActionSetPartStructure_All();
 
       _actionCollapseAll_WithoutSelection    = new Action_CollapseAll_WithoutSelection();
       _actionCollapseOthers                  = new ActionCollapseOthers(this);
@@ -1498,7 +1498,10 @@ public class EquipmentView extends ViewPart implements ITourProvider, ITourViewe
 
             if (element instanceof final TVIEquipmentView_Part partItem) {
 
-               cell.setText(Long.toString(partItem.getExpandType()));
+               final int expandType = partItem.getExpandType();
+               final String label = EquipmentManager.EXPAND_TYPE_LABEL[expandType];
+
+               cell.setText(label);
                setCellColor(cell, element);
             }
          }
@@ -2023,15 +2026,39 @@ public class EquipmentView extends ViewPart implements ITourProvider, ITourViewe
       int numParts = 0;
       int numServices = 0;
 
+      int numItems = 0;
+      int numPartItems = 0;
+      TVIEquipmentView_Part selectedPartItem = null;
+
       for (final Object selectedItem : allSelectedItems) {
+
+         numItems++;
 
          if (selectedItem instanceof TVIEquipmentView_Equipment) {
 
             numEquipment++;
 
-         } else if (selectedItem instanceof TVIEquipmentView_Part) {
+         } else if (selectedItem instanceof final TVIEquipmentView_Part partItem) {
 
             numParts++;
+
+            numPartItems++;
+            selectedPartItem = partItem;
+
+         } else if (selectedItem instanceof final TVIEquipmentView_Part_Year yearItem) {
+
+            numPartItems++;
+            selectedPartItem = yearItem.getPartItem();
+
+         } else if (selectedItem instanceof final TVIEquipmentView_Part_Month monthItem) {
+
+            numPartItems++;
+            selectedPartItem = monthItem.getPartItem();
+
+         } else if (selectedItem instanceof final TVIEquipmentView_Tour tourItem) {
+
+            numPartItems++;
+            selectedPartItem = tourItem.getPartItem();
 
          } else if (selectedItem instanceof TVIEquipmentView_Service) {
 
@@ -2045,6 +2072,8 @@ public class EquipmentView extends ViewPart implements ITourProvider, ITourViewe
       final boolean isPartSelected              = numParts > 0;
       final boolean isServiceSelected           = numServices > 0;
       final boolean areEquipmentItemsSelected   = isEquipmentSelected || isPartSelected || isServiceSelected;
+      final boolean canSetPartStructure         = selectedPartItem != null && numPartItems == 1
+                                                      || (numEquipment == 1 && numItems == 1);
 
       /*
        * Multiple part/services can be much more complex when they have different anchestors (equipment)
@@ -2062,6 +2091,7 @@ public class EquipmentView extends ViewPart implements ITourProvider, ITourViewe
       _actionEditService      .setEnabled(isServiceSelected);
       _actionNewPart          .setEnabled(areEquipmentItemsSelected);
       _actionNewService       .setEnabled(areEquipmentItemsSelected);
+      _actionSetPartStructure .setEnabled(canSetPartStructure);
 
 // SET_FORMATTING_ON
    }
@@ -2134,8 +2164,9 @@ public class EquipmentView extends ViewPart implements ITourProvider, ITourViewe
          menuMgr.add(_actionDuplicateService);
          menuMgr.add(_actionEditService);
       }
-      menuMgr.add(_actionSetTourStructure);
-//      menuMgr.add(_actionSetTourStructure_All);
+      
+      menuMgr.add(_actionSetPartStructure);
+      menuMgr.add(_actionSetPartStructure_All);
 
       menuMgr.add(new Separator());
 
@@ -3154,6 +3185,14 @@ public class EquipmentView extends ViewPart implements ITourProvider, ITourViewe
             || element instanceof TVIEquipmentView_Service) {
 
          cell.setForeground(_colorContentSubCategory);
+
+      } else if (element instanceof TVIEquipmentView_Part_Year) {
+
+         cell.setForeground(_colorDateCategory);
+
+      } else if (element instanceof TVIEquipmentView_Part_Month) {
+
+         cell.setForeground(_colorDateSubCategory);
 
       } else {
 

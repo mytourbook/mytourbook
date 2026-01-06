@@ -27,33 +27,37 @@ import org.eclipse.jface.viewers.TreeViewer;
 
 public class TVIEquipmentView_Tour extends TVIEquipmentView_Item {
 
-   public static final String SQL_TOUR_COLUMNS = UI.EMPTY_STRING
+   public static final String    SQL_TOUR_COLUMNS = UI.EMPTY_STRING
 
-         + "TourData.TourID, "                                  //   1  //$NON-NLS-1$
+         + "TourData.TourID, "                                     //   1  //$NON-NLS-1$
 
-         + "TourData.TourStartTime, "                           //   2  //$NON-NLS-1$
-         + "TourData.TimeZoneId, "                              //   3  //$NON-NLS-1$
+         + "TourData.TourStartTime, "                              //   2  //$NON-NLS-1$
+         + "TourData.TimeZoneId, "                                 //   3  //$NON-NLS-1$
 
-         + "TourData.TourTitle, "                               //   4  //$NON-NLS-1$
-         + "TourData.TourType_TypeId, "                         //   5  //$NON-NLS-1$
+         + "TourData.TourTitle, "                                  //   4  //$NON-NLS-1$
+         + "TourData.TourType_TypeId, "                            //   5  //$NON-NLS-1$
 
-         + SQL_SUM_COLUMNS_TOUR                                 //   6
+         + SQL_SUM_COLUMNS_TOUR                                    //   6
    ;
 
-   long                       tourId;
+   private TVIEquipmentView_Part _partItem;
 
-   long                       tourStartTime;
-   ZonedDateTime              tourStartDateTime;
+   long                          tourId;
 
-   String                     tourTitle;
-   long                       tourTypeId;
+   long                          tourStartTime;
+   ZonedDateTime                 tourStartDateTime;
 
-   public TVIEquipmentView_Tour(final TVIEquipmentView_Item tviParentItem,
+   String                        tourTitle;
+   long                          tourTypeId;
+
+   public TVIEquipmentView_Tour(final TVIEquipmentView_Item parentItem,
+                                final TVIEquipmentView_Part partItem,
                                 final TreeViewer treeViewer) {
 
       super(treeViewer);
 
-      setParentItem(tviParentItem);
+      setParentItem(parentItem);
+      _partItem = partItem;
    }
 
    @Override
@@ -70,6 +74,10 @@ public class TVIEquipmentView_Tour extends TVIEquipmentView_Item {
    protected void fetchChildren() {
 
       // there are no children for a tour
+   }
+
+   public TVIEquipmentView_Part getPartItem() {
+      return _partItem;
    }
 
    @Override

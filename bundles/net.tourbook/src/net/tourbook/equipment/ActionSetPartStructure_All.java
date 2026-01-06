@@ -15,12 +15,14 @@
  *******************************************************************************/
 package net.tourbook.equipment;
 
-import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
 
 import javax.persistence.EntityManager;
 
-import net.tourbook.Messages;
 import net.tourbook.common.util.StatusUtil;
+import net.tourbook.data.Equipment;
+import net.tourbook.data.EquipmentPart;
 import net.tourbook.data.TourTag;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.tour.TourManager;
@@ -37,18 +39,21 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
 
-public class ActionSetTourCategoryStructure_All extends Action implements IMenuCreator {
+public class ActionSetPartStructure_All extends Action implements IMenuCreator {
 
    private Menu _menu;
 
-   private class ActionSetTagStructure extends Action {
+   private class ActionSetPartStructure extends Action {
 
-      private int __expandType;
+      private int    __expandType;
+      private String __expandName;
 
-      private ActionSetTagStructure(final int expandType, final String name) {
+      private ActionSetPartStructure(final int expandType, final String expandName) {
 
-         super(name, AS_CHECK_BOX);
+         super(expandName, AS_CHECK_BOX);
+
          __expandType = expandType;
+         __expandName = expandName;
       }
 
       @Override
@@ -59,10 +64,10 @@ public class ActionSetTourCategoryStructure_All extends Action implements IMenuC
             return;
          }
 
-         if (MessageDialog.openConfirm(
-               Display.getCurrent().getActiveShell(),
-               Messages.action_tag_set_all_confirm_title,
-               Messages.action_tag_set_all_confirm_message) == false) {
+         if (MessageDialog.openConfirm(Display.getCurrent().getActiveShell(),
+
+               "Set Structure for all equipment parts",
+               "Are you sure to set the structure for all equipment and all their parts to \"%s\"?".formatted(__expandName)) == false) {
 
             return;
          }
@@ -78,29 +83,32 @@ public class ActionSetTourCategoryStructure_All extends Action implements IMenuC
                try {
 
                   /*
-                   * Update all tags which have not the current expand type
+                   * Update all parts which have not the current expand type
                    */
 
-                  final HashMap<Long, TourTag> allTourTags = TourDatabase.getAllTourTags();
-                  for (final TourTag tourTag : allTourTags.values()) {
+                  final Map<Long, Equipment> allEquipment = EquipmentManager.getAllEquipment_ByID();
 
-                     if (tourTag.getExpandType() != __expandType) {
+                  for (final Equipment equipment : allEquipment.values()) {
 
-                        // set new expand type
+                     final Set<EquipmentPart> allParts = equipment.getParts();
 
-                        final Long tagId = tourTag.getTagId();
-                        final TourTag tagInDb = em.find(TourTag.class, tagId);
+                     boolean _isPartModified = false;
 
-                        if (tagInDb != null) {
+                     for (final EquipmentPart part : allParts) {
 
-                           tagInDb.setExpandType(__expandType);
+                        if (part.getExpandType() != __expandType) {
 
-                           final TourTag savedEntity = TourDatabase.saveEntity(tagInDb, tagId, TourTag.class);
+                           // set new expand type
 
-                           if (savedEntity != null) {
-                              _isModified = true;
-                           }
+                           part.setExpandType(__expandType);
+
+                           _isPartModified = true;
+                           _isModified = true;
                         }
+                     }
+
+                     if (_isPartModified) {
+                        TourDatabase.saveEntity(equipment, equipment.getEquipmentId(), TourTag.class);
                      }
                   }
 
@@ -113,18 +121,19 @@ public class ActionSetTourCategoryStructure_All extends Action implements IMenuC
                   em.close();
                }
 
-//               if (_isModified) {
-//                  EquipmentManager.clearAllTagResourcesAndFireModifyEvent();
-//               }
+               if (_isModified) {
+                  EquipmentManager.clearAllEquipmentResourcesAndFireModifyEvent();
+               }
             }
          };
+
          BusyIndicator.showWhile(Display.getCurrent(), runnable);
       }
    }
 
-   public ActionSetTourCategoryStructure_All() {
+   public ActionSetPartStructure_All() {
 
-      super(Messages.action_tag_set_all_tag_structures, AS_DROP_DOWN_MENU);
+      super("Set Structure for &all Equipment Parts...", AS_DROP_DOWN_MENU);
 
       setMenuCreator(this);
    }
@@ -137,6 +146,7 @@ public class ActionSetTourCategoryStructure_All extends Action implements IMenuC
 
    @Override
    public void dispose() {
+
       if (_menu != null) {
          _menu.dispose();
          _menu = null;
@@ -152,10 +162,12 @@ public class ActionSetTourCategoryStructure_All extends Action implements IMenuC
    public Menu getMenu(final Menu parent) {
 
       dispose();
+
       _menu = new Menu(parent);
 
       // Add listener to repopulate the menu each time
       _menu.addMenuListener(new MenuAdapter() {
+
          @Override
          public void menuShown(final MenuEvent e) {
 
@@ -167,12 +179,12 @@ public class ActionSetTourCategoryStructure_All extends Action implements IMenuC
             }
 
             /*
-             * create all expand types
+             * Create all expand types
              */
             int typeIndex = 0;
             for (final int expandType : EquipmentManager.EXPAND_TYPES) {
 
-               final ActionSetTagStructure actionTagStructure = new ActionSetTagStructure(
+               final ActionSetPartStructure actionTagStructure = new ActionSetPartStructure(
                      expandType,
                      EquipmentManager.EXPAND_TYPE_NAMES[typeIndex++]);
 

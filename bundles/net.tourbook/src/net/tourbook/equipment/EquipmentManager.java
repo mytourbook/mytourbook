@@ -80,6 +80,16 @@ public class EquipmentManager {
          Messages.app_action_expand_type_year_month_day
    };
 
+   /**
+    * The EXPAND_TYPE_... value is the index for these labels
+    */
+   static final String[]                        EXPAND_TYPE_LABEL           = {
+
+         "Sort By Date",
+         "By Year",
+         "By Year/Month"
+   };
+
    static final int[]                           EXPAND_TYPES                = {
 
          EXPAND_TYPE_FLAT,
@@ -99,8 +109,8 @@ public class EquipmentManager {
    private static ConcurrentSkipListSet<String> _allTypes;
 
    /**
-    * Clear all equipment resources within MT and fire a equipment modify event, ensure that
-    * {@link TourManager#isTourEditorModified()} <code>== false</code>
+    * Clear all equipment resources and tours within MT and fire a equipment modify event, ensure
+    * that {@link TourManager#isTourEditorModified()} <code>== false</code>
     */
    public static void clearAllEquipmentResourcesAndFireModifyEvent() {
 

@@ -736,9 +736,11 @@ public abstract class TreeColumnFactory {
          }
       };
 
+
       /*
        * Equipment
        */
+
       EQUIPMENT_AND_CATEGORY = new TreeColumnFactory() {
          @Override
          public TreeColumnDefinition createColumn(final ColumnManager columnManager,
@@ -752,7 +754,7 @@ public abstract class TreeColumnFactory {
             colDef.setColumnHeaderText(         Messages.ColumnFactory_Equipment);
             colDef.setColumnHeaderToolTipText(  Messages.ColumnFactory_Equipment_Tooltip);
 
-            colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(20));
+            colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(40));
 
             return colDef;
          }
@@ -809,7 +811,7 @@ public abstract class TreeColumnFactory {
             colDef.setColumnHeaderText(         Messages.ColumnFactory_Equipment_Date);
             colDef.setColumnHeaderToolTipText(  Messages.ColumnFactory_Equipment_Date_Tooltip);
 
-            colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(20));
+            colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(15));
 
             colDef.setValueFormats(
                   ValueFormatSet.DateTime,
@@ -833,7 +835,7 @@ public abstract class TreeColumnFactory {
             colDef.setColumnHeaderText(         Messages.ColumnFactory_Equipment_Date_Built);
             colDef.setColumnHeaderToolTipText(  Messages.ColumnFactory_Equipment_Date_Built_Tooltip);
 
-            colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(20));
+            colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(15));
 
             return colDef;
          }
@@ -852,7 +854,7 @@ public abstract class TreeColumnFactory {
             colDef.setColumnHeaderText(         Messages.ColumnFactory_Equipment_Date_Retired);
             colDef.setColumnHeaderToolTipText(  Messages.ColumnFactory_Equipment_Date_Retired_Tooltip);
 
-            colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(20));
+            colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(15));
 
             return colDef;
          }
@@ -871,7 +873,7 @@ public abstract class TreeColumnFactory {
             colDef.setColumnHeaderText(         "Until");
             colDef.setColumnHeaderToolTipText(  "Date until this item was used");
 
-            colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(20));
+            colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(15));
 
             colDef.setValueFormats(
                   ValueFormatSet.DateTime,
@@ -895,7 +897,7 @@ public abstract class TreeColumnFactory {
             colDef.setColumnHeaderText(         "Duration");
             colDef.setColumnHeaderToolTipText(  "Usage duration between this and the previous item");
 
-            colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(10));
+            colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(20));
 
             return colDef;
          }
@@ -912,8 +914,8 @@ public abstract class TreeColumnFactory {
             colDef.setColumnCategory(           Messages.ColumnFactory_Category_Equipment);
 
             colDef.setColumnLabel(              "Category Type");
-            colDef.setColumnHeaderText(         "Cat.");
-            colDef.setColumnHeaderToolTipText(  "How the tours are categorized");
+            colDef.setColumnHeaderText(         "Categorized");
+            colDef.setColumnHeaderToolTipText(  "How tours are categorized");
 
             colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(5));
 
@@ -932,6 +934,7 @@ public abstract class TreeColumnFactory {
 
             colDef.setColumnLabel(              "ID");
             colDef.setColumnHeaderText(         "ID");
+            colDef.setColumnHeaderToolTipText(  "Primary key");
 
             colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(5));
 
@@ -948,7 +951,7 @@ public abstract class TreeColumnFactory {
 
             colDef.setColumnCategory(           Messages.ColumnFactory_Category_Motion);
 
-            colDef.setColumnLabel(              "Initial distance");
+            colDef.setColumnLabel(              "Initial Distance");
             colDef.setColumnHeaderText(         UI.UNIT_LABEL_DISTANCE);
             colDef.setColumnHeaderToolTipText(  "Initial distance");
             colDef.setColumnUnit(               UI.UNIT_LABEL_DISTANCE);

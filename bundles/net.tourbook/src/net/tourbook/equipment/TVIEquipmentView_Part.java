@@ -137,7 +137,7 @@ public class TVIEquipmentView_Part extends TVIEquipmentView_Item {
 
          while (result.next()) {
 
-            final TVIEquipmentView_Tour tourItem = new TVIEquipmentView_Tour(this, getEquipmentViewer());
+            final TVIEquipmentView_Tour tourItem = new TVIEquipmentView_Tour(this, this, getEquipmentViewer());
 
             allTourItems.add(tourItem);
 

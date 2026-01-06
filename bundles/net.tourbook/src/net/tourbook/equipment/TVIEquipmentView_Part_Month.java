@@ -32,17 +32,21 @@ public class TVIEquipmentView_Part_Month extends TVIEquipmentView_Item {
 
    private final TVIEquipmentView_Part_Year _yearItem;
 
-   private final int                   _year;
-   private final int                   _month;
+   private TVIEquipmentView_Part            _partItem;
+
+   private final int                        _year;
+   private final int                        _month;
 
    public TVIEquipmentView_Part_Month(final TVIEquipmentView_Part_Year parentItem,
-                                 final int dbYear,
-                                 final int dbMonth,
-                                 final TreeViewer treeViewer) {
+                                      final TVIEquipmentView_Part partItem,
+                                      final int dbYear,
+                                      final int dbMonth,
+                                      final TreeViewer treeViewer) {
 
       super(treeViewer);
 
       setParentItem(parentItem);
+      _partItem = partItem;
 
       _yearItem = parentItem;
       _year = dbYear;
@@ -133,6 +137,10 @@ public class TVIEquipmentView_Part_Month extends TVIEquipmentView_Item {
       return _month;
    }
 
+   public TVIEquipmentView_Part getPartItem() {
+      return _partItem;
+   }
+
    public TVIEquipmentView_Part_Year getYearItem() {
       return _yearItem;
    }
@@ -200,7 +208,7 @@ public class TVIEquipmentView_Part_Month extends TVIEquipmentView_Item {
 
          while (result.next()) {
 
-            final TVIEquipmentView_Tour tourItem = new TVIEquipmentView_Tour(this, getEquipmentViewer());
+            final TVIEquipmentView_Tour tourItem = new TVIEquipmentView_Tour(this, _partItem, getEquipmentViewer());
 
             allChildren.add(tourItem);
 

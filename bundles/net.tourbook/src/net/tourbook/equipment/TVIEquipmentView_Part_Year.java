@@ -217,6 +217,7 @@ public class TVIEquipmentView_Part_Year extends TVIEquipmentView_Item {
             final TVIEquipmentView_Part_Month monthItem = new TVIEquipmentView_Part_Month(
 
                   this,
+                  _partItem,
                   dbYear,
                   dbMonth,
                   getEquipmentViewer());
@@ -293,7 +294,7 @@ public class TVIEquipmentView_Part_Year extends TVIEquipmentView_Item {
 
          while (result.next()) {
 
-            final TVIEquipmentView_Tour tourItem = new TVIEquipmentView_Tour(this, getEquipmentViewer());
+            final TVIEquipmentView_Tour tourItem = new TVIEquipmentView_Tour(this, _partItem, getEquipmentViewer());
 
             allChildren.add(tourItem);
 

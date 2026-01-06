@@ -15,13 +15,13 @@
  *******************************************************************************/
 package net.tourbook.equipment;
 
-import java.util.ArrayList;
+import java.util.Set;
 
 import javax.persistence.EntityManager;
 
 import net.tourbook.common.util.ITourViewer;
 import net.tourbook.common.util.StatusUtil;
-import net.tourbook.common.util.TreeViewerItem;
+import net.tourbook.data.Equipment;
 import net.tourbook.data.EquipmentPart;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.tour.TourManager;
@@ -29,10 +29,8 @@ import net.tourbook.tour.TourManager;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.ActionContributionItem;
 import org.eclipse.jface.action.IMenuCreator;
-import org.eclipse.jface.viewers.ColumnViewer;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.StructuredSelection;
-import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.swt.custom.BusyIndicator;
 import org.eclipse.swt.events.MenuAdapter;
 import org.eclipse.swt.events.MenuEvent;
@@ -40,19 +38,18 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
-import org.eclipse.swt.widgets.Tree;
 
-public class ActionSetTourCategoryStructure extends Action implements IMenuCreator {
+public class ActionSetPartStructure extends Action implements IMenuCreator {
 
    private Menu        _menu;
 
    private ITourViewer _tourViewer;
 
-   private class ActionSetTourCategoryStructure_One extends Action {
+   private class ActionSetExpandType extends Action {
 
       private int __expandType;
 
-      public ActionSetTourCategoryStructure_One(final int expandType, final String name) {
+      public ActionSetExpandType(final int expandType, final String name) {
 
          super(name, AS_CHECK_BOX);
 
@@ -78,13 +75,31 @@ public class ActionSetTourCategoryStructure extends Action implements IMenuCreat
 
                for (final Object element : selection.toArray()) {
 
-                  if (element instanceof final TVIEquipmentView_Tour tourItem) {
+                  if (element instanceof final TVIEquipmentView_Equipment equipmentItem) {
 
-                     setPartStructure(tourItem.getParentItem());
+                     final Equipment equipment = equipmentItem.getEquipment();
+                     final Set<EquipmentPart> allParts = equipment.getParts();
 
-                  } else {
+                     for (final EquipmentPart part : allParts) {
 
-                     setPartStructure(element);
+                        saveExpandTypeInPart(part);
+                     }
+
+                  } else if (element instanceof final TVIEquipmentView_Part partItem) {
+
+                     saveExpandTypeInPart(partItem.getPart());
+
+                  } else if (element instanceof final TVIEquipmentView_Part_Year yearItem) {
+
+                     saveExpandTypeInPart(yearItem.getPartItem().getPart());
+
+                  } else if (element instanceof final TVIEquipmentView_Part_Month monthItem) {
+
+                     saveExpandTypeInPart(monthItem.getYearItem().getPartItem().getPart());
+
+                  } else if (element instanceof final TVIEquipmentView_Tour tourItem) {
+
+                     saveExpandTypeInPart(tourItem.getPartItem().getPart());
                   }
                }
 
@@ -93,61 +108,38 @@ public class ActionSetTourCategoryStructure extends Action implements IMenuCreat
                }
             }
 
-            private void setPartStructure(final Object element) {
-
-               if (element instanceof final TVIEquipmentView_Part partItem) {
-
-                  setPartStructure_Item(partItem);
-
-               } else if (element instanceof final TVIEquipmentView_Part_Year yearItem) {
-
-                  setPartStructure_Item(yearItem.getPartItem());
-
-               } else if (element instanceof final TVIEquipmentView_Part_Month monthItem) {
-
-                  setPartStructure_Item(monthItem.getYearItem().getPartItem());
-               }
-            }
-
-            private void setPartStructure_Item(final TVIEquipmentView_Part partItem) {
+            private void saveExpandTypeInPart(final EquipmentPart part) {
 
                // check if expand type has changed
-               if (partItem.getExpandType() == __expandType) {
+               if (part.getExpandType() == __expandType) {
                   return;
                }
 
-               // remove the children of the tag because another type of children will be displayed
-               final ColumnViewer viewer = _tourViewer.getViewer();
-               if (viewer instanceof final TreeViewer treeViewer) {
+               final EntityManager em = TourDatabase.getInstance().getEntityManager();
 
-                  final boolean isTagExpanded = treeViewer.getExpandedState(partItem);
+               try {
 
-                  final Tree tree = treeViewer.getTree();
-                  tree.setRedraw(false);
-                  {
-                     treeViewer.collapseToLevel(partItem, TreeViewer.ALL_LEVELS);
+                  final long partId = part.getPartId();
 
-                     final ArrayList<TreeViewerItem> tagUnfetchedChildren = partItem.getUnfetchedChildren();
-                     if (tagUnfetchedChildren != null) {
-                        treeViewer.remove(tagUnfetchedChildren.toArray());
-                     }
+                  final EquipmentPart partInDb = em.find(EquipmentPart.class, partId);
 
-                     // set new expand type in the database
-                     saveExpandType(__expandType, partItem.getPart());
+                  if (partInDb != null) {
 
-                     partItem.clearChildren();
+                     partInDb.setExpandType(__expandType);
 
-                     if (isTagExpanded) {
-                        treeViewer.setExpandedState(partItem, true);
-                     }
-
-//                     // update viewer
-//                     treeViewer.refresh(partItem);
+                     TourDatabase.saveEntity(partInDb, partId, EquipmentPart.class);
                   }
-                  tree.setRedraw(true);
 
-                  _isModified = true;
+               } catch (final Exception e) {
+
+                  StatusUtil.log(e);
+
+               } finally {
+
+                  em.close();
                }
+
+               _isModified = true;
             }
          };
 
@@ -155,7 +147,7 @@ public class ActionSetTourCategoryStructure extends Action implements IMenuCreat
       }
    }
 
-   public ActionSetTourCategoryStructure(final ITourViewer tourViewer) {
+   public ActionSetPartStructure(final ITourViewer tourViewer) {
 
       super("Set Part Stru&cture", AS_DROP_DOWN_MENU);
 
@@ -187,6 +179,7 @@ public class ActionSetTourCategoryStructure extends Action implements IMenuCreat
    public Menu getMenu(final Menu parent) {
 
       dispose();
+
       _menu = new Menu(parent);
 
       // Add listener to repopulate the menu each time
@@ -202,15 +195,18 @@ public class ActionSetTourCategoryStructure extends Action implements IMenuCreat
             }
 
             /*
-             * Create all expand types
+             * Create all expand type actions
              */
             final int selectedExpandType = getSelectedExpandType();
-            int typeIndex = 0;
-            for (final int expandType : EquipmentManager.EXPAND_TYPES) {
+            final int[] expandTypes = EquipmentManager.EXPAND_TYPES;
 
-               final ActionSetTourCategoryStructure_One actionTourCategoryStructure = new ActionSetTourCategoryStructure_One(
+            for (int typeIndex = 0; typeIndex < expandTypes.length; typeIndex++) {
+
+               final int expandType = expandTypes[typeIndex];
+
+               final ActionSetExpandType actionTourCategoryStructure = new ActionSetExpandType(
                      expandType,
-                     EquipmentManager.EXPAND_TYPE_NAMES[typeIndex++]);
+                     EquipmentManager.EXPAND_TYPE_NAMES[typeIndex]);
 
                // check active expand type
                actionTourCategoryStructure.setChecked(selectedExpandType == expandType);
@@ -230,53 +226,33 @@ public class ActionSetTourCategoryStructure extends Action implements IMenuCreat
     */
    private int getSelectedExpandType() {
 
-      int selectedExpandType = -1;
-
       final StructuredSelection selection = (StructuredSelection) _tourViewer.getViewer().getSelection();
 
       if (selection.size() == 1) {
 
-         // set the expand type when only one tag is selected
+         // set the expand type when only one item is selected
 
-         if (selection.getFirstElement() instanceof final TVIEquipmentView_Part partItem) {
+         final Object selectedItem = selection.getFirstElement();
 
-            selectedExpandType = partItem.getPart().getExpandType();
+         if (selectedItem instanceof final TVIEquipmentView_Part partItem) {
+
+            return partItem.getPart().getExpandType();
+
+         } else if (selectedItem instanceof final TVIEquipmentView_Part_Year yearItem) {
+
+            return yearItem.getPartItem().getPart().getExpandType();
+
+         } else if (selectedItem instanceof final TVIEquipmentView_Part_Month monthItem) {
+
+            return monthItem.getPartItem().getPart().getExpandType();
+
+         } else if (selectedItem instanceof final TVIEquipmentView_Tour tourItem) {
+
+            return tourItem.getPartItem().getPart().getExpandType();
          }
       }
 
-      return selectedExpandType;
+      return -1;
    }
 
-   /**
-    * Set the expand type for the item and save the changed model in the database
-    *
-    * @param expandType
-    * @param part
-    */
-   private void saveExpandType(final int expandType, final EquipmentPart part) {
-
-      final EntityManager em = TourDatabase.getInstance().getEntityManager();
-
-      try {
-
-         final long partId = part.getPartId();
-
-         final EquipmentPart partInDb = em.find(EquipmentPart.class, partId);
-
-         if (partInDb != null) {
-
-            partInDb.setExpandType(expandType);
-
-            TourDatabase.saveEntity(partInDb, partId, EquipmentPart.class);
-         }
-
-      } catch (final Exception e) {
-
-         StatusUtil.log(e);
-
-      } finally {
-
-         em.close();
-      }
-   }
 }

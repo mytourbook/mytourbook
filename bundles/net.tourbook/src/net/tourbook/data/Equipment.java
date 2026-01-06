@@ -128,12 +128,12 @@ public class Equipment implements Cloneable, Comparable<Object>, Serializable {
    private long                       dateRetired;
 
    /**
-    * When a tag is expanded in the tag tree viewer, the tours can be displayed in different
+    * When a part is expanded in the equipment viewer, the tours can be displayed in different
     * structures
     * <p>
-    * <li>0 ... EXPAND_TYPE_YEAR_MONTH_DAY</li>
-    * <li>1 ... EXPAND_TYPE_FLAT</li>
-    * <li>2 ... EXPAND_TYPE_YEAR_DAY</li>
+    * <li>0 ... EXPAND_TYPE_FLAT</li>
+    * <li>1 ... EXPAND_TYPE_YEAR_TOUR</li>
+    * <li>2 ... EXPAND_TYPE_YEAR_MONTH_TOUR</li>
     */
    private int                        expandType       = EquipmentManager.EXPAND_TYPE_FLAT;
 
