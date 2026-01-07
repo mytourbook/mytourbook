@@ -149,7 +149,7 @@ public class ActionSetPartStructure extends Action implements IMenuCreator {
 
    public ActionSetPartStructure(final ITourViewer tourViewer) {
 
-      super("Set Part Stru&cture", AS_DROP_DOWN_MENU);
+      super("Set Tour Stru&cture", AS_DROP_DOWN_MENU);
 
       setMenuCreator(this);
 

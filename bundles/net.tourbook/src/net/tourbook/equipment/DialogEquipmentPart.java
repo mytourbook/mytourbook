@@ -141,7 +141,7 @@ public class DialogEquipmentPart extends TitleAreaDialog {
 
       if (_isNewPart) {
 
-         _part = new EquipmentPart();
+         _part = new EquipmentPart(EquipmentPart.ITEM_TYPE_PART);
 
       } else {
 

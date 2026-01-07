@@ -216,7 +216,6 @@ public class TourDatabase {
    public static final String  TABLE_DEVICE_SENSOR_VALUE                  = "DeviceSensorValue";                                     //$NON-NLS-1$
    public static final String  TABLE_EQUIPMENT                            = "Equipment";                                             //$NON-NLS-1$
    public static final String  TABLE_EQUIPMENT_PART                       = "EquipmentPart";                                         //$NON-NLS-1$
-   public static final String  TABLE_EQUIPMENT_SERVICE                    = "EquipmentService";                                      //$NON-NLS-1$
    public static final String  TABLE_TOUR_BEVERAGE_CONTAINER              = "TOURBEVERAGECONTAINER";                                 //$NON-NLS-1$
    public static final String  TABLE_TOUR_BIKE                            = "TOURBIKE";                                              //$NON-NLS-1$
    public static final String  TABLE_TOUR_COMPARED                        = "TOURCOMPARED";                                          //$NON-NLS-1$
@@ -265,7 +264,6 @@ public class TourDatabase {
    private static final String ENTITY_ID_DEVICE_SENSOR       = "SensorId";                                  //$NON-NLS-1$
    public static final String  ENTITY_ID_EQUIPMENT           = "EquipmentId";                               //$NON-NLS-1$
    private static final String ENTITY_ID_EQUIPMENT_PART      = "PartId";                                    //$NON-NLS-1$
-   private static final String ENTITY_ID_EQUIPMENT_SERVICE   = "ServiceId";                                 //$NON-NLS-1$
    private static final String ENTITY_ID_DEVICE_SENSOR_VALUE = "SensorValueId";                             //$NON-NLS-1$
    private static final String ENTITY_ID_HR_ZONE             = "HrZoneID";                                  //$NON-NLS-1$
    private static final String ENTITY_ID_LOCATION            = "LocationID";                                //$NON-NLS-1$
@@ -893,7 +891,7 @@ public class TourDatabase {
       }
 
       /**
-       * Combine tableName and columnName to the indexName
+       * Combine tableName and columnName to the indexName, e.g. Table__Column
        *
        * @param stmt
        * @param tableName
@@ -4635,9 +4633,14 @@ public class TourDatabase {
 
                   + "   " + KEY_EQUIPMENT + "   BIGINT,                                   " + NL //$NON-NLS-1$ //$NON-NLS-2$
 
+                  + "   ItemType                INTEGER,                                  " + NL //$NON-NLS-1$
+
                   + "   Brand                   VARCHAR(" + DB_LENGTH_NAME + "),          " + NL //$NON-NLS-1$ //$NON-NLS-2$
                   + "   Model                   VARCHAR(" + DB_LENGTH_NAME + "),          " + NL //$NON-NLS-1$ //$NON-NLS-2$
                   + "   Type                    VARCHAR(" + DB_LENGTH_NAME + "),          " + NL //$NON-NLS-1$ //$NON-NLS-2$
+
+                  + "   Name                    VARCHAR(" + DB_LENGTH_NAME + "),          " + NL //$NON-NLS-1$ //$NON-NLS-2$
+                  + "   Company                 VARCHAR(" + DB_LENGTH_NAME + "),          " + NL //$NON-NLS-1$ //$NON-NLS-2$
 
                   + "   Description             VARCHAR(" + DB_LENGTH_DESCRIPTION + "),   " + NL //$NON-NLS-1$ //$NON-NLS-2$
                   + "   ImageFilePath           VARCHAR(" + DB_LENGTH_FILE_PATH + "),     " + NL //$NON-NLS-1$ //$NON-NLS-2$
@@ -4660,73 +4663,15 @@ public class TourDatabase {
                   + ")" //                                                                       //$NON-NLS-1$
       );
 
-      // Create index "EquipmentPart"
-      SQL.createIndex(stmt,
+      // Create indices "EquipmentPart__..."
+      SQL.createIndex_Combined(stmt, TABLE_EQUIPMENT_PART, KEY_EQUIPMENT);
+      SQL.createIndex_Combined(stmt, TABLE_EQUIPMENT_PART, "PartID");
 
-            TABLE_EQUIPMENT_PART,
-
-            new String[] //
-            {
-                  KEY_EQUIPMENT,
-                  "IsCollate",
-                  "Date",
-                  "DateUntil",
-                  "PartID",
-                  "Type"
-            });
-   }
-
-   /**
-    * Create table {@link #TABLE_EQUIPMENT_SERVICE}
-    *
-    * @param stmt
-    *
-    * @throws SQLException
-    */
-   private void createTable_EquipmentService(final Statement stmt) throws SQLException {
-
-      exec(stmt,
-
-            "CREATE TABLE " + TABLE_EQUIPMENT_SERVICE + "   (                              " + NL //$NON-NLS-1$ //$NON-NLS-2$
-
-                  + SQL.createField_EntityId(ENTITY_ID_EQUIPMENT_SERVICE, true)
-
-                  + "   " + KEY_EQUIPMENT + "   BIGINT,                                   " + NL //$NON-NLS-1$ //$NON-NLS-2$
-
-                  + "   Name                    VARCHAR(" + DB_LENGTH_NAME + "),          " + NL //$NON-NLS-1$ //$NON-NLS-2$
-                  + "   Company                 VARCHAR(" + DB_LENGTH_NAME + "),          " + NL //$NON-NLS-1$ //$NON-NLS-2$
-                  + "   Type                    VARCHAR(" + DB_LENGTH_NAME + "),          " + NL //$NON-NLS-1$ //$NON-NLS-2$
-
-                  + "   Description             VARCHAR(" + DB_LENGTH_DESCRIPTION + "),   " + NL //$NON-NLS-1$ //$NON-NLS-2$
-                  + "   ImageFilePath           VARCHAR(" + DB_LENGTH_FILE_PATH + "),     " + NL //$NON-NLS-1$ //$NON-NLS-2$
-                  + "   UrlAddress              VARCHAR(" + DB_LENGTH_URL_ADDRESS + "),   " + NL //$NON-NLS-1$ //$NON-NLS-2$
-
-                  + "   Price                   FLOAT DEFAULT 0,                          " + NL //$NON-NLS-1$
-                  + "   PriceUnit               VARCHAR(" + DB_LENGTH_NAME + "),          " + NL //$NON-NLS-1$ //$NON-NLS-2$
-
-                  + "   IsCollate               BOOLEAN DEFAULT TRUE,                     " + NL //$NON-NLS-1$
-                  + "   ExpandType              INTEGER,                                  " + NL //$NON-NLS-1$
-
-                  + "   Date                    BIGINT DEFAULT 0,                         " + NL //$NON-NLS-1$
-                  + "   DateUntil               BIGINT DEFAULT 0                          " + NL //$NON-NLS-1$
-
-                  + ")" //                                                                       //$NON-NLS-1$
-      );
-
-      // Create index "EquipmentService"
-      SQL.createIndex(stmt,
-
-            TABLE_EQUIPMENT_SERVICE,
-
-            new String[] //
-            {
-                  KEY_EQUIPMENT,
-                  "IsCollate",
-                  "Date",
-                  "DateUntil",
-                  "ServiceID",
-                  "Type"
-            });
+      SQL.createIndex_Combined(stmt, TABLE_EQUIPMENT_PART, "IsCollate");
+      SQL.createIndex_Combined(stmt, TABLE_EQUIPMENT_PART, "ItemType");
+      SQL.createIndex_Combined(stmt, TABLE_EQUIPMENT_PART, "Date");
+      SQL.createIndex_Combined(stmt, TABLE_EQUIPMENT_PART, "DateUntil");
+      SQL.createIndex_Combined(stmt, TABLE_EQUIPMENT_PART, "Type");
    }
 
    /**
@@ -6629,7 +6574,6 @@ public class TourDatabase {
 
             createTable_Equipment(stmt);
             createTable_EquipmentPart(stmt);
-            createTable_EquipmentService(stmt);
 
             createTable_TourWayPoint(stmt);
 
@@ -11599,10 +11543,6 @@ public class TourDatabase {
 
          if (isTableAvailable(conn, TABLE_EQUIPMENT_PART) == false) {
             createTable_EquipmentPart(stmt);
-         }
-
-         if (isTableAvailable(conn, TABLE_EQUIPMENT_SERVICE) == false) {
-            createTable_EquipmentService(stmt);
          }
       }
       stmt.close();

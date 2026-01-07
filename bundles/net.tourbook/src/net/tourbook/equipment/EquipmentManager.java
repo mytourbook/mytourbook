@@ -42,7 +42,6 @@ import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.Util;
 import net.tourbook.data.Equipment;
 import net.tourbook.data.EquipmentPart;
-import net.tourbook.data.EquipmentService;
 import net.tourbook.data.TourData;
 import net.tourbook.database.ITourDataUpdate_OnlyUpdate;
 import net.tourbook.database.MyTourbookException;
@@ -267,7 +266,6 @@ public class EquipmentManager {
       }
 
       final SQLData sqlPartData = getSQLData_Parts(allEquipment);
-      final SQLData sqlServiceData = getSQLData_Services(allEquipment);
 
       String dialogMessage;
 
@@ -277,20 +275,18 @@ public class EquipmentManager {
 
          // remove one equipment
 
-         dialogMessage = "Permanently delete equipment\n\n\"%s\"\n\nits %d parts, %d services and remove this equipment from %d tours ?".formatted(
+         dialogMessage = "Permanently delete equipment\n\n\"%s\"\n\nits %d parts and services, and remove this equipment from %d tours ?".formatted(
                allEquipment.get(0).getName(),
                sqlPartData.getParameters().size(), // number of parts
-               sqlServiceData.getParameters().size(), // number of parts
                allTourIds.size());
 
       } else {
 
          // remove multiple equipment
 
-         dialogMessage = "Permanently delete %d equipment, theirs %d parts, %d serices\nand remove them from %d tours ?".formatted(
+         dialogMessage = "Permanently delete %d equipment, theirs %d parts\nand services and remove them from %d tours ?".formatted(
                allEquipment.size(),
                sqlPartData.getParameters().size(), // number of parts
-               sqlServiceData.getParameters().size(), // number of services
                allTourIds.size());
       }
 
@@ -314,7 +310,7 @@ public class EquipmentManager {
 
          BusyIndicator.showWhile(display, () -> {
 
-            if (equipment_DeleteEquipment_SQL(allEquipment, sqlPartData, sqlServiceData)) {
+            if (equipment_DeleteEquipment_SQL(allEquipment, sqlPartData)) {
 
                clearAllEquipmentResourcesAndFireModifyEvent();
 
@@ -329,11 +325,9 @@ public class EquipmentManager {
    }
 
    private static boolean equipment_DeleteEquipment_SQL(final List<Equipment> allEquipment,
-                                                        final SQLData sqlPartData,
-                                                        final SQLData sqlServiceData) {
+                                                        final SQLData sqlPartData) {
 
       final boolean isPartAvailable = sqlPartData.getParameters().size() > 0;
-      final boolean isServiceAvailable = sqlServiceData.getParameters().size() > 0;
 
       boolean returnResult = false;
 
@@ -342,7 +336,6 @@ public class EquipmentManager {
       PreparedStatement prepStmt_TourData = null;
       PreparedStatement prepStmt_Equipment = null;
       PreparedStatement prepStmt_EquipmentPart = null;
-      PreparedStatement prepStmt_EquipmentService = null;
 
       try (Connection conn = TourDatabase.getInstance().getConnection()) {
 
@@ -373,22 +366,9 @@ public class EquipmentManager {
             prepStmt_EquipmentPart = conn.prepareStatement(sql);
          }
 
-         if (isServiceAvailable) {
-
-            // remove parts from table "EquipmentService"
-            sql = "DELETE" + NL//                                                   //$NON-NLS-1$
-                  + " FROM " + TourDatabase.TABLE_EQUIPMENT_SERVICE + NL //         //$NON-NLS-1$
-
-                  // "EquipmentService.serviceID IN (" + parameterList + ")"
-                  + " WHERE " + sqlServiceData.getSqlString() + NL //               //$NON-NLS-1$
-            ;
-            prepStmt_EquipmentService = conn.prepareStatement(sql);
-         }
-
          int[] returnValue_TourData;
          int[] returnValue_Equipment;
          int[] returnValue_EquipmentPart = null;
-         int[] returnValue_EquipmentService = null;
 
          conn.setAutoCommit(false);
          {
@@ -406,11 +386,6 @@ public class EquipmentManager {
                   sqlPartData.setParameters(prepStmt_EquipmentPart, 1);
                   prepStmt_EquipmentPart.addBatch();
                }
-
-               if (isServiceAvailable) {
-                  sqlServiceData.setParameters(prepStmt_EquipmentService, 1);
-                  prepStmt_EquipmentService.addBatch();
-               }
             }
 
             returnValue_TourData = prepStmt_TourData.executeBatch();
@@ -418,9 +393,6 @@ public class EquipmentManager {
 
             if (isPartAvailable) {
                returnValue_EquipmentPart = prepStmt_EquipmentPart.executeBatch();
-            }
-            if (isServiceAvailable) {
-               returnValue_EquipmentService = prepStmt_EquipmentService.executeBatch();
             }
          }
          conn.commit();
@@ -433,14 +405,12 @@ public class EquipmentManager {
          for (int equipmentIndex = 0; equipmentIndex < numEquipment; equipmentIndex++) {
 
             final int partResult = returnValue_EquipmentPart == null ? 0 : returnValue_EquipmentPart[equipmentIndex];
-            final int serviceResult = returnValue_EquipmentService == null ? 0 : returnValue_EquipmentService[equipmentIndex];
 
             TourLogManager.log_INFO(
-                  "Equipment is deleted from %d tours, %d equipment definition, %d equipment parts and %d equipment services - \"%s\"".formatted(
+                  "Equipment is deleted from %d tours, %d equipment definition, %d equipment parts and/or services - \"%s\"".formatted(
                         returnValue_TourData[equipmentIndex],
                         returnValue_Equipment[equipmentIndex],
                         partResult,
-                        serviceResult,
                         allEquipment.get(equipmentIndex).getName()));
          }
 
@@ -455,7 +425,6 @@ public class EquipmentManager {
          Util.closeSql(prepStmt_TourData);
          Util.closeSql(prepStmt_Equipment);
          Util.closeSql(prepStmt_EquipmentPart);
-         Util.closeSql(prepStmt_EquipmentService);
       }
 
       return returnResult;
@@ -471,17 +440,39 @@ public class EquipmentManager {
       final EquipmentPart part = allParts.get(0);
 
       final Display display = Display.getDefault();
-      final String dialogMessage = "Permanently delete part\n\n\"%s\" ?".formatted(part.getName());
+
+      String dialogMessage = null;
+      String dialogTitle = null;
+      String okButtonText = null;
+
+      if (part.isItemType_Part()) {
+
+         dialogMessage = "Permanently delete part\n\n\"%s\" ?".formatted(part.getName());
+
+         dialogTitle = "Delete Part";
+         okButtonText = "&Delete Part";
+
+      } else if (part.isItemType_Service()) {
+
+         dialogMessage = "Permanently delete service\n\n\"%s\" ?".formatted(part.getName());
+
+         dialogTitle = "Delete Service";
+         okButtonText = "&Delete Service";
+      }
+
+      if (dialogTitle == null) {
+         return false;
+      }
 
       // confirm deletion, show equipment name and number of tours which contain a equipment
       final MessageDialog dialog = new MessageDialog(
             display.getActiveShell(),
-            "Delete Part",
+            dialogTitle,
             null,
             dialogMessage,
             MessageDialog.QUESTION,
             new String[] {
-                  "&Delete Part",
+                  okButtonText,
                   IDialogConstants.CANCEL_LABEL },
             1);
 
@@ -529,93 +520,6 @@ public class EquipmentManager {
          // log result
          TourLogManager.showLogView(AutoOpenEvent.DELETE_SOMETHING);
          TourLogManager.log_INFO("Equipment part is deleted \"%s\"".formatted(part.getName()));
-
-         returnResult = true;
-
-      } catch (final SQLException e) {
-
-         StatusUtil.log(sql, e);
-         net.tourbook.ui.UI.showSQLException(e);
-
-      } finally {
-
-         Util.closeSql(prepStmt);
-      }
-
-      return returnResult;
-   }
-
-   public static boolean equipment_DeleteServices(final List<EquipmentService> allServices) {
-
-      // ensure that a tour is NOT modified in the tour editor
-      if (TourManager.isTourEditorModified() || allServices.size() != 1) {
-         return false;
-      }
-
-      final EquipmentService service = allServices.get(0);
-
-      final Display display = Display.getDefault();
-      final String dialogMessage = "Permanently delete service\n\n\"%s\" ?".formatted(service.getName());
-
-      // confirm deletion, show equipment name and number of tours which contain a equipment
-      final MessageDialog dialog = new MessageDialog(
-            display.getActiveShell(),
-            "Delete Service",
-            null,
-            dialogMessage,
-            MessageDialog.QUESTION,
-            new String[] {
-                  "&Delete Service",
-                  IDialogConstants.CANCEL_LABEL },
-            1);
-
-      final boolean[] returnValue = { false };
-
-      if (dialog.open() == Window.OK) {
-
-         BusyIndicator.showWhile(display, () -> {
-
-            if (equipment_DeleteServices_SQL(service)) {
-
-               clearAllEquipmentResourcesAndFireModifyEvent();
-
-//               updateTourTagFilterProfiles(allEquipment);
-
-               returnValue[0] = true;
-            }
-         });
-      }
-
-      return returnValue[0];
-   }
-
-   private static boolean equipment_DeleteServices_SQL(final EquipmentService service) {
-
-      boolean returnResult = false;
-
-      PreparedStatement prepStmt = null;
-      String sql = null;
-
-      try (Connection conn = TourDatabase.getInstance().getConnection()) {
-
-         // remove part from table "EquipmentPart"
-
-         sql = "DELETE FROM " + TourDatabase.TABLE_EQUIPMENT_SERVICE + " WHERE serviceID=?" + NL; //$NON-NLS-1$
-
-         final long serviceID = service.getServiceId();
-
-         prepStmt = conn.prepareStatement(sql);
-
-         prepStmt.setLong(1, serviceID);
-         prepStmt.execute();
-
-         // log result
-         TourLogManager.showLogView(AutoOpenEvent.DELETE_SOMETHING);
-         TourLogManager.log_INFO("Equipment service is deleted \"%s\"".formatted(service.getName()));
-
-         final Set<String> allTypes = new HashSet<>(Arrays.asList(service.getType()));
-
-         updateUntilDate_Services(service.getEquipment(), allTypes);
 
          returnResult = true;
 
@@ -768,7 +672,7 @@ public class EquipmentManager {
             // recheck again, another thread could have it created
             if (_allCompanies == null) {
 
-               _allCompanies = TourDatabase.getDistinctValues(TourDatabase.TABLE_EQUIPMENT_SERVICE, "company"); //$NON-NLS-1$
+               _allCompanies = TourDatabase.getDistinctValues(TourDatabase.TABLE_EQUIPMENT_PART, "company"); //$NON-NLS-1$
             }
          }
       }
@@ -812,8 +716,7 @@ public class EquipmentManager {
                      "priceUnit", //$NON-NLS-1$
 
                      TourDatabase.TABLE_EQUIPMENT,
-                     TourDatabase.TABLE_EQUIPMENT_PART,
-                     TourDatabase.TABLE_EQUIPMENT_SERVICE);
+                     TourDatabase.TABLE_EQUIPMENT_PART);
             }
          }
       }
@@ -830,7 +733,7 @@ public class EquipmentManager {
             // recheck again, another thread could have it created
             if (_allServiceNames == null) {
 
-               _allServiceNames = TourDatabase.getDistinctValues(TourDatabase.TABLE_EQUIPMENT_SERVICE, "name"); //$NON-NLS-1$
+               _allServiceNames = TourDatabase.getDistinctValues(TourDatabase.TABLE_EQUIPMENT_PART, "name"); //$NON-NLS-1$
             }
          }
       }
@@ -874,8 +777,7 @@ public class EquipmentManager {
                      "type", //$NON-NLS-1$
 
                      TourDatabase.TABLE_EQUIPMENT,
-                     TourDatabase.TABLE_EQUIPMENT_PART,
-                     TourDatabase.TABLE_EQUIPMENT_SERVICE);
+                     TourDatabase.TABLE_EQUIPMENT_PART);
             }
          }
       }
@@ -1089,29 +991,6 @@ public class EquipmentManager {
       final String sqlStatement = "EquipmentPart.partID IN (" + parameterList + ")"; //$NON-NLS-1$ //$NON-NLS-2$
 
       return new SQLData(sqlStatement, allPartIDs);
-   }
-
-   private static SQLData getSQLData_Services(final List<Equipment> allEquipment) {
-
-      // collect all part IDs
-      final List<Object> allServiceIDs = new ArrayList<>();
-
-      for (final Equipment equipment : allEquipment) {
-
-         final Set<EquipmentService> allEquipmentServices = equipment.getServices();
-
-         for (final EquipmentService equipmentService : allEquipmentServices) {
-
-            allServiceIDs.add(equipmentService.getServiceId());
-         }
-      }
-
-      final int numIDs = allServiceIDs.size();
-      final String parameterList = SQL.createParameterList(numIDs);
-
-      final String sqlStatement = "EquipmentService.serviceID IN (" + parameterList + ")"; //$NON-NLS-1$ //$NON-NLS-2$
-
-      return new SQLData(sqlStatement, allServiceIDs);
    }
 
    private static void loadEquipment() {
@@ -1374,143 +1253,4 @@ public class EquipmentManager {
          }
       }
    }
-
-   /**
-    * Check and update the until date for all services of one equipment.
-    * This has to be called when at least one collated field was modified.
-    * <p>
-    * <b> !!! After calling this method, all equipments must be reloaded because they are updated
-    * !!! </b>
-    *
-    * @param equipment
-    * @param allModifiedTypes
-    */
-   public static void updateUntilDate_Services(final Equipment equipment,
-                                               final Set<String> allModifiedTypes) {
-
-      final Set<EquipmentService> allServices = equipment.getServices();
-
-      final int numServices = allServices.size();
-
-      if (numServices > 0) {
-
-         for (final String serviceType : allModifiedTypes) {
-
-            updateUntilDate_Services_One(allServices, serviceType);
-         }
-      }
-   }
-
-   /**
-    *
-    * @param equipment
-    * @param modifiedType
-    */
-   private static void updateUntilDate_Services_One(final Set<EquipmentService> allServices,
-                                                    final String modifiedType) {
-
-      /*
-       * Filter services: Get all services with the same type and which are collated
-       */
-      final List<EquipmentService> allFilteredServices = new ArrayList<>();
-
-      for (final EquipmentService service : allServices) {
-
-         if (service.isCollate()
-               && modifiedType.equals(service.getType())) {
-
-            allFilteredServices.add(service);
-         }
-      }
-
-      final int numServices = allFilteredServices.size();
-
-      if (numServices == 0) {
-         return;
-      }
-
-      /*
-       * Sort services by date
-       */
-      final List<EquipmentService> allSortedServices = new ArrayList<>(allFilteredServices);
-
-      Collections.sort(allSortedServices, (service1, service2) -> {
-         return Long.compare(service1.getDate(), service2.getDate());
-      });
-
-      final List<EquipmentService> allModifiedServices = new ArrayList<>();
-
-      EquipmentService service = allSortedServices.get(0);
-
-      if (numServices == 1) {
-
-         // this is the first and only service
-
-         final long currentDateUntil = service.getDateUntil();
-         final long newDateUntil = TimeTools.MAX_TIME_IN_EPOCH_MILLI;
-
-         if (currentDateUntil != newDateUntil) {
-
-            // modify date
-
-            service.setDateUntil(newDateUntil);
-
-            allModifiedServices.add(service);
-         }
-
-      } else {
-
-         // these are all other services with more than 1 service
-
-         for (int serviceIndex = 0; serviceIndex < numServices; serviceIndex++) {
-
-            service = allSortedServices.get(serviceIndex);
-
-            final long currentDateUntil = service.getDateUntil();
-
-            long newDateUntil = currentDateUntil;
-
-            if (serviceIndex == numServices - 1) {
-
-               // this is the last service
-
-               newDateUntil = TimeTools.MAX_TIME_IN_EPOCH_MILLI;
-
-            } else {
-
-               // these are all services without the last service
-
-               final EquipmentService nextService = allSortedServices.get(serviceIndex + 1);
-
-               final long nextDate = nextService.getDate();
-
-               // this is the until date for the current service
-               final long validDateUntil = nextDate - 1;
-
-               if (currentDateUntil != validDateUntil) {
-
-                  newDateUntil = validDateUntil;
-               }
-            }
-
-            if (currentDateUntil != newDateUntil) {
-
-               // until date is not correct -> modify date
-
-               service.setDateUntil(newDateUntil);
-
-               allModifiedServices.add(service);
-            }
-         }
-      }
-
-      if (allModifiedServices.size() > 0) {
-
-         for (final EquipmentService serviceModified : allModifiedServices) {
-
-            TourDatabase.saveEntity(serviceModified, serviceModified.getServiceId(), EquipmentService.class);
-         }
-      }
-   }
-
 }

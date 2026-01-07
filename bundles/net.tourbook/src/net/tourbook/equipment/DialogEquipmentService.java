@@ -27,7 +27,7 @@ import net.tourbook.common.time.TimeTools;
 import net.tourbook.common.util.StringUtils;
 import net.tourbook.common.util.Util;
 import net.tourbook.data.Equipment;
-import net.tourbook.data.EquipmentService;
+import net.tourbook.data.EquipmentPart;
 
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.IDialogSettings;
@@ -70,7 +70,7 @@ public class DialogEquipmentService extends TitleAreaDialog {
    /**
     * New or cloned instance
     */
-   private EquipmentService             _service;
+   private EquipmentPart                _service;
    private Equipment                    _serviceEquipment;
 
    private boolean                      _isDuplicateService;
@@ -119,7 +119,7 @@ public class DialogEquipmentService extends TitleAreaDialog {
 
    public DialogEquipmentService(final Shell parentShell,
                                  final Equipment equipment,
-                                 final EquipmentService service,
+                                 final EquipmentPart service,
                                  final boolean isDuplicate) {
 
       super(parentShell);
@@ -131,7 +131,7 @@ public class DialogEquipmentService extends TitleAreaDialog {
 
       if (_isNewService) {
 
-         _service = new EquipmentService();
+         _service = new EquipmentPart(EquipmentPart.ITEM_TYPE_SERVICE);
 
       } else {
 
@@ -425,7 +425,7 @@ public class DialogEquipmentService extends TitleAreaDialog {
    /**
     * @return Returns new or cloned instance
     */
-   EquipmentService getService() {
+   EquipmentPart getService() {
 
       _service.updateUntilDate();
 

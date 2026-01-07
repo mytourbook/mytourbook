@@ -12,7 +12,6 @@
       <class>net.tourbook.data.DeviceSensorValue</class>
       <class>net.tourbook.data.Equipment</class>
       <class>net.tourbook.data.EquipmentPart</class>
-      <class>net.tourbook.data.EquipmentService</class>
       <class>net.tourbook.data.TourBeverageContainer</class>
       <class>net.tourbook.data.TourBike</class>
       <class>net.tourbook.data.TourCompared</class>

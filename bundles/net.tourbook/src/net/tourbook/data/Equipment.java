@@ -147,16 +147,6 @@ public class Equipment implements Cloneable, Comparable<Object>, Serializable {
    @Cascade(org.hibernate.annotations.CascadeType.DELETE_ORPHAN)
    private Set<EquipmentPart>         parts            = new HashSet<>();
 
-   /**
-    * Contains all services which are associated with this equipment, e.g.
-    * <ul>
-    * <li></li>
-    * </ul>
-    */
-   @OneToMany(fetch = EAGER, cascade = ALL, mappedBy = "equipment")
-   @Cascade(org.hibernate.annotations.CascadeType.DELETE_ORPHAN)
-   private Set<EquipmentService>      services         = new HashSet<>();
-
    @Transient
    private long                       _createId        = 0;
 
@@ -373,9 +363,6 @@ public class Equipment implements Cloneable, Comparable<Object>, Serializable {
       return priceUnit;
    }
 
-   public Set<EquipmentService> getServices() {
-      return services;
-   }
 
    public String getSize() {
 
@@ -542,7 +529,6 @@ public class Equipment implements Cloneable, Comparable<Object>, Serializable {
 //            + " weight           = " + weight + NL //                       //$NON-NLS-1$
 //
             + " parts            = " + (parts != null ? toString(parts, maxLen) : null) + NL //$NON-NLS-1$
-            + " services         = " + (services != null ? toString(services, maxLen) : null) + NL //$NON-NLS-1$
       ;
    }
 

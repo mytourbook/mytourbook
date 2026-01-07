@@ -66,8 +66,8 @@ public class ActionSetPartStructure_All extends Action implements IMenuCreator {
 
          if (MessageDialog.openConfirm(Display.getCurrent().getActiveShell(),
 
-               "Set Structure for all equipment parts",
-               "Are you sure to set the structure for all equipment and all their parts to \"%s\"?".formatted(__expandName)) == false) {
+               "Set Structure for all equipment tours",
+               "Are you sure to set the structure for all equipment and all their tours to \"%s\"?".formatted(__expandName)) == false) {
 
             return;
          }
@@ -133,7 +133,7 @@ public class ActionSetPartStructure_All extends Action implements IMenuCreator {
 
    public ActionSetPartStructure_All() {
 
-      super("Set Structure for &all Equipment Parts...", AS_DROP_DOWN_MENU);
+      super("Set Structure for &all Equipment Tours...", AS_DROP_DOWN_MENU);
 
       setMenuCreator(this);
    }

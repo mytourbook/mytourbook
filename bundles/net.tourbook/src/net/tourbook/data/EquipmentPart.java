@@ -38,15 +38,26 @@ import net.tourbook.equipment.EquipmentManager;
 @Entity
 public class EquipmentPart implements Cloneable, Comparable<Object>, Serializable {
 
-   private static final char          NL               = UI.NEW_LINE;
+   private static final char          NL                = UI.NEW_LINE;
 
-   private static final long          serialVersionUID = 1L;
+   private static final long          serialVersionUID  = 1L;
 
-   private static final AtomicInteger _createCounter   = new AtomicInteger();
+   private static final AtomicInteger _createCounter    = new AtomicInteger();
+
+   public static final int            ITEM_TYPE_PART    = 0;
+   public static final int            ITEM_TYPE_SERVICE = 1;
 
    @Id
    @GeneratedValue(strategy = GenerationType.IDENTITY)
-   private long                       partId           = TourDatabase.ENTITY_IS_NOT_SAVED;
+   private long                       partId            = TourDatabase.ENTITY_IS_NOT_SAVED;
+
+   /**
+    * How this part is used and displayed, it can be e.g.
+    * <p>
+    * {@link #ITEM_TYPE_PART}<br>
+    * {@link #ITEM_TYPE_SERVICE}
+    */
+   private int                        itemType;
 
    /**
     * Brand/name for the equipment, e.g. Continental
@@ -59,9 +70,19 @@ public class EquipmentPart implements Cloneable, Comparable<Object>, Serializabl
    private String                     model;
 
    /**
-    * e.g. Faltreifen
+    * Part type, e.g. Faltreifen
     */
    private String                     type;
+
+   /**
+    * Name for the service
+    */
+   private String                     name;
+
+   /**
+    * Company which did the service
+    */
+   private String                     company;
 
    /**
     * e.g. 700*22-23
@@ -86,7 +107,7 @@ public class EquipmentPart implements Cloneable, Comparable<Object>, Serializabl
    /**
     * When <code>true</code> then this part is included in collated parts
     */
-   private boolean                    isCollate        = true;
+   private boolean                    isCollate         = true;
 
    /**
     * When the part was firstly used, in milliseconds since 1970-01-01T00:00:00Z
@@ -136,14 +157,14 @@ public class EquipmentPart implements Cloneable, Comparable<Object>, Serializabl
     * <li>1 ... EXPAND_TYPE_YEAR_TOUR</li>
     * <li>2 ... EXPAND_TYPE_YEAR_MONTH_TOUR</li>
     */
-   private int                        expandType       = EquipmentManager.EXPAND_TYPE_FLAT;
+   private int                        expandType        = EquipmentManager.EXPAND_TYPE_FLAT;
 
    /** One equipment can have multiple parts */
    @ManyToOne(optional = false)
    private Equipment                  equipment;
 
    @Transient
-   private long                       _createId        = 0;
+   private long                       _createId         = 0;
 
    @Transient
    private LocalDateTime              _date;
@@ -164,6 +185,18 @@ public class EquipmentPart implements Cloneable, Comparable<Object>, Serializabl
     * Default constructor used in EJB
     */
    public EquipmentPart() {}
+
+   /**
+    * @param itemType
+    *           How this part is used and displayed, it can be e.g.
+    *           <p>
+    *           {@link #ITEM_TYPE_PART}<br>
+    *           {@link #ITEM_TYPE_SERVICE}
+    */
+   public EquipmentPart(final int itemType) {
+
+      this.itemType = itemType;
+   }
 
    @Override
    public EquipmentPart clone() {
@@ -239,6 +272,15 @@ public class EquipmentPart implements Cloneable, Comparable<Object>, Serializabl
       }
 
       return brand;
+   }
+
+   public String getCompany() {
+
+      if (company == null) {
+         return UI.EMPTY_STRING;
+      }
+
+      return company;
    }
 
    public long getDate() {
@@ -341,6 +383,10 @@ public class EquipmentPart implements Cloneable, Comparable<Object>, Serializabl
       return imageFilePath;
    }
 
+   public int getItemType() {
+      return itemType;
+   }
+
    public String getModel() {
 
       if (model == null) {
@@ -351,33 +397,50 @@ public class EquipmentPart implements Cloneable, Comparable<Object>, Serializabl
    }
 
    /**
-    * @return Returns a combined name of the equipment with "brand - model"
+    * @return Returns a combined name of the equipment part with "brand - model" or the service name
     */
    public String getName() {
 
-      if (_partName != null) {
+      if (itemType == ITEM_TYPE_PART) {
 
-         return _partName;
-      }
+         // part
 
-      final StringBuilder sb = new StringBuilder();
+         if (_partName != null) {
 
-      if (StringUtils.hasContent(brand)) {
-         sb.append(brand);
-      }
-
-      if (StringUtils.hasContent(model)) {
-
-         if (sb.length() > 0) {
-            sb.append(UI.DASH_WITH_DOUBLE_SPACE);
+            return _partName;
          }
 
-         sb.append(model);
+         final StringBuilder sb = new StringBuilder();
+
+         if (StringUtils.hasContent(brand)) {
+            sb.append(brand);
+         }
+
+         if (StringUtils.hasContent(model)) {
+
+            if (sb.length() > 0) {
+               sb.append(UI.DASH_WITH_DOUBLE_SPACE);
+            }
+
+            sb.append(model);
+         }
+
+         _partName = sb.toString();
+
+         return _partName;
+
+      } else if (itemType == ITEM_TYPE_SERVICE) {
+
+         // service
+
+         if (name == null) {
+            return UI.EMPTY_STRING;
+         }
+
+         return name;
       }
 
-      _partName = sb.toString();
-
-      return _partName;
+      return UI.EMPTY_STRING;
    }
 
    /**
@@ -450,6 +513,14 @@ public class EquipmentPart implements Cloneable, Comparable<Object>, Serializabl
       return false;
    }
 
+   public boolean isItemType_Part() {
+      return itemType == ITEM_TYPE_PART;
+   }
+
+   public boolean isItemType_Service() {
+      return itemType == ITEM_TYPE_SERVICE;
+   }
+
    /**
     * Checks if VARCHAR fields have the correct length
     *
@@ -476,6 +547,23 @@ public class EquipmentPart implements Cloneable, Comparable<Object>, Serializabl
          description = description.substring(0, TourDatabase.DB_LENGTH_DESCRIPTION);
       }
 
+      /*
+       * Check: Name
+       */
+      fieldValidation = TourDatabase.isFieldValidForSave(
+            name,
+            TourDatabase.DB_LENGTH_NAME,
+            Messages.Db_Field_Name);
+
+      if (fieldValidation == FIELD_VALIDATION.IS_INVALID) {
+
+         return false;
+
+      } else if (fieldValidation == FIELD_VALIDATION.TRUNCATE) {
+
+         name = name.substring(0, TourDatabase.DB_LENGTH_NAME);
+      }
+
       return true;
    }
 
@@ -489,6 +577,10 @@ public class EquipmentPart implements Cloneable, Comparable<Object>, Serializabl
       this.brand = brand;
 
       _partName = null;
+   }
+
+   public void setCompany(final String company) {
+      this.company = company;
    }
 
    public void setDate(final long date) {
@@ -551,6 +643,10 @@ public class EquipmentPart implements Cloneable, Comparable<Object>, Serializabl
       _partName = null;
    }
 
+   public void setName(final String name) {
+      this.name = name;
+   }
+
    public void setPrice(final float price) {
       this.price = price;
    }
@@ -608,12 +704,16 @@ public class EquipmentPart implements Cloneable, Comparable<Object>, Serializabl
 
       setBrand             (otherPart.getBrand());
       setModel             (otherPart.getModel());
-      setType              (otherPart.getType());
       setDescription       (otherPart.getDescription());
       setUrlAddress        (otherPart.getUrlAddress());
 
-      setDistanceFirstUse  (otherPart.getDistanceFirstUse());
+      setCompany           (otherPart.getCompany());
+      setName              (otherPart.getName());
+
+      setType              (otherPart.getType());
       setIsCollate         (otherPart.isCollate());
+
+      setDistanceFirstUse  (otherPart.getDistanceFirstUse());
       setPrice             (otherPart.getPrice());
       setPriceUnit         (otherPart.getPriceUnit());
       setSize              (otherPart.getSize());

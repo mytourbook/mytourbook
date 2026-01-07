@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2025 Wolfgang Schramm and Contributors
+ * Copyright (C) 2025, 2025 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -23,7 +23,6 @@ import net.tourbook.common.time.TimeTools;
 import net.tourbook.common.util.TreeViewerItem;
 import net.tourbook.data.Equipment;
 import net.tourbook.data.EquipmentPart;
-import net.tourbook.data.EquipmentService;
 
 import org.eclipse.jface.viewers.TreeViewer;
 
@@ -56,15 +55,7 @@ public class TVIEquipmentView_Equipment extends TVIEquipmentView_Item {
    @Override
    protected void fetchChildren() {
 
-      final ArrayList<TreeViewerItem> allParts = readChildren_Parts();
-      final ArrayList<TreeViewerItem> allServices = readChildren_Services();
-
-      final ArrayList<TreeViewerItem> allChildren = new ArrayList<>();
-
-      allChildren.addAll(allParts);
-      allChildren.addAll(allServices);
-
-      setChildren(allChildren);
+      setChildren(readChildren());
    }
 
    public Equipment getEquipment() {
@@ -75,7 +66,7 @@ public class TVIEquipmentView_Equipment extends TVIEquipmentView_Item {
       return _equipmentID;
    }
 
-   private ArrayList<TreeViewerItem> readChildren_Parts() {
+   private ArrayList<TreeViewerItem> readChildren() {
 
       final Set<EquipmentPart> allParts = _equipment.getParts();
 
@@ -117,50 +108,6 @@ public class TVIEquipmentView_Equipment extends TVIEquipmentView_Item {
       }
 
       return allPartItems;
-   }
-
-   private ArrayList<TreeViewerItem> readChildren_Services() {
-
-      final Set<EquipmentService> allServices = _equipment.getServices();
-
-      final ArrayList<TreeViewerItem> allServiceItems = new ArrayList<>();
-
-      for (final EquipmentService service : allServices) {
-
-         long durationMS = service.getDuration();
-         String durationLastText = UI.EMPTY_STRING;
-
-         if (service.getDateUntil() == TimeTools.MAX_TIME_IN_EPOCH_MILLI) {
-
-            // this is the last collated part
-
-            durationMS = TimeTools.nowInMilliseconds() - service.getDate();
-            durationLastText = "Until now : ";
-         }
-
-         final TVIEquipmentView_Service serviceItem = new TVIEquipmentView_Service(this, service, getEquipmentViewer());
-
-// SET_FORMATTING_OFF
-
-         serviceItem.firstColumn          = service.getName();
-
-         serviceItem.type                 = service.getType();
-         serviceItem.date                 = service.getDate_Local();
-
-         serviceItem.price                = service.getPrice();
-         serviceItem.priceUnit            = service.getPriceUnit();
-
-         serviceItem.usageDuration        = durationMS;
-         serviceItem.usageDurationLast    = durationLastText;
-
-// SET_FORMATTING_ON
-
-         allServiceItems.add(serviceItem);
-
-         loadSummarizedValues_Service(serviceItem);
-      }
-
-      return allServiceItems;
    }
 
    @Override
