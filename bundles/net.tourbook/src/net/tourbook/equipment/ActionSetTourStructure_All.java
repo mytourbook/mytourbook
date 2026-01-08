@@ -39,7 +39,7 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
 
-public class ActionSetPartStructure_All extends Action implements IMenuCreator {
+public class ActionSetTourStructure_All extends Action implements IMenuCreator {
 
    private Menu _menu;
 
@@ -66,7 +66,7 @@ public class ActionSetPartStructure_All extends Action implements IMenuCreator {
 
          if (MessageDialog.openConfirm(Display.getCurrent().getActiveShell(),
 
-               "Set Structure for all equipment tours",
+               "Set Structure for all tours in all equipment",
                "Are you sure to set the structure for all equipment and all their tours to \"%s\"?".formatted(__expandName)) == false) {
 
             return;
@@ -131,9 +131,9 @@ public class ActionSetPartStructure_All extends Action implements IMenuCreator {
       }
    }
 
-   public ActionSetPartStructure_All() {
+   public ActionSetTourStructure_All() {
 
-      super("Set Structure for &all Equipment Tours...", AS_DROP_DOWN_MENU);
+      super("Set Structure for &all Tours in all Equipment...", AS_DROP_DOWN_MENU);
 
       setMenuCreator(this);
    }

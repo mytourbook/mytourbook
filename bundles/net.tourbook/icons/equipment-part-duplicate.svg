@@ -55,33 +55,33 @@
   <g
      id="layer1"
      style="display:inline"
-     transform="translate(-244.99899,-19)">
+     transform="translate(-359.99899,-19)">
+    <path
+       d="M 365,33.999981 H 375 V 23.999981"
+       style="display:inline;fill:#42b6ff;fill-opacity:1;stroke:none;stroke-width:0.500001;stroke-linecap:round;stroke-miterlimit:3"
+       id="path1-2-7-2-4-4-2-0" />
+    <path
+       id="rect1-5-6-1-6-3-94-5-4-4"
+       style="display:inline;fill:none;stroke:#005a92;stroke-width:0.7;stroke-linecap:square;stroke-miterlimit:3;stroke-dasharray:none;stroke-opacity:1"
+       d="M 374.65,33.65 V 24.349964" />
+    <path
+       id="rect1-5-6-1-6-3-94-5-4-3-2"
+       style="display:inline;fill:none;stroke:#005a92;stroke-width:0.7;stroke-linecap:square;stroke-miterlimit:3;stroke-dasharray:none;stroke-opacity:1"
+       d="M 365.34944,33.65 H 374.65" />
     <path
        id="path10416-4-7-9-1-4"
-       d="M 244.99901,21 H 246.99901 V 19 H 247.999 V 21 H 249.999 V 22 H 247.999 V 24 H 246.99901 V 22 H 244.99901 Z"
+       d="M 359.99901,21 H 361.99901 V 19 H 362.999 V 21 H 364.999 V 22 H 362.999 V 24 H 361.99901 V 22 H 359.99901 Z"
        style="display:inline;fill:#808080;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
     <rect
        y="19"
-       x="244.99899"
+       x="359.99899"
        height="16.000015"
        width="15.999991"
        id="rect6561-8-1-9-9-5-5-9-9-1-3-94-1-6-6-4-5-4-9-5-9-5-4-0-5-8-9"
        style="display:inline;opacity:0.99;fill:none;stroke:none" />
     <g
-       id="g1"
-       transform="translate(1,0.99998201)">
-      <path
-         d="M 249,32.999999 H 259 V 22.999999"
-         style="display:inline;fill:#42b6ff;fill-opacity:1;stroke:none;stroke-width:0.500001;stroke-linecap:round;stroke-miterlimit:3"
-         id="path1-2-7-2-4-4-2-0" />
-      <path
-         id="rect1-5-6-1-6-3-94-5-4-4"
-         style="display:inline;fill:none;stroke:#005a92;stroke-width:0.7;stroke-linecap:square;stroke-miterlimit:3;stroke-dasharray:none;stroke-opacity:1"
-         d="M 258.65,32.650018 V 23.349982" />
-    </g>
-    <g
        id="g2"
-       transform="translate(-1,-0.99999999)">
+       transform="translate(114,-0.99999999)">
       <path
          d="M 248,31.999981 H 258 V 21.999981"
          style="display:inline;fill:#42b6ff;fill-opacity:1;stroke:none;stroke-width:0.500001;stroke-linecap:round;stroke-miterlimit:3"
@@ -95,9 +95,5 @@
          style="display:inline;fill:none;stroke:#005a92;stroke-width:0.7;stroke-linecap:square;stroke-miterlimit:3;stroke-dasharray:none;stroke-opacity:1"
          d="M 257.65,31.65 H 248.34996" />
     </g>
-    <path
-       id="rect1-5-6-1-6-3-94-5-4-3-2"
-       style="display:inline;fill:none;stroke:#005a92;stroke-width:0.7;stroke-linecap:square;stroke-miterlimit:3;stroke-dasharray:none;stroke-opacity:1"
-       d="M 250.34944,33.65 H 259.65" />
   </g>
 </svg>

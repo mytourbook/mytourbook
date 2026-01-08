@@ -469,8 +469,9 @@ public class DialogEquipmentPart extends TitleAreaDialog {
                   + "e.g. distance or duration values\n\n"
                   + "Tours are collated with the type and date fields");
             _chkCollate.addSelectionListener(_defaultSelectionListener);
+
+            GridDataFactory.fillDefaults().grab(true, false).span(6, 1).applyTo(_chkCollate);
          }
-         UI.createSpacer_Horizontal(_container, 5);
          {
             /*
              * Website

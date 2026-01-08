@@ -113,6 +113,11 @@ public class Equipment implements Cloneable, Comparable<Object>, Serializable {
    private float                      distanceFirstUse;
 
    /**
+    * When <code>true</code> then this equipment is collated but it can have no parts or services
+    */
+   private boolean                    isCollate;
+
+   /**
     * When the equipment was firstly used, in milliseconds since 1970-01-01T00:00:00Z
     */
    private long                       date;
@@ -126,6 +131,11 @@ public class Equipment implements Cloneable, Comparable<Object>, Serializable {
     * When the equipment was retired/sold, in milliseconds since 1970-01-01T00:00:00Z
     */
    private long                       dateRetired;
+
+   /**
+    * When the part usage was finished, in milliseconds since 1970-01-01T00:00:00Z.
+    */
+   private long                       dateUntil;
 
    /**
     * When a part is expanded in the equipment viewer, the tours can be displayed in different
@@ -160,12 +170,28 @@ public class Equipment implements Cloneable, Comparable<Object>, Serializable {
    private LocalDateTime              _dateRetired;
 
    @Transient
+   private LocalDateTime              _dateUntil;
+
+   @Transient
    private String                     _equipmentName;
 
    /**
     * Default constructor used in EJB
     */
    public Equipment() {}
+
+   /**
+    * An equipment can only collate when there are no parts/services, otherwise it would be too
+    * complicated
+    *
+    * @return
+    */
+   public boolean canCollate() {
+
+      final int numParts = parts.size();
+
+      return numParts == 0;
+   }
 
    @Override
    public Equipment clone() {
@@ -181,7 +207,17 @@ public class Equipment implements Cloneable, Comparable<Object>, Serializable {
          e.printStackTrace();
       }
 
+      clonedEquipment.equipmentId = TourDatabase.ENTITY_IS_NOT_SAVED;
       clonedEquipment._createId = _createCounter.incrementAndGet();
+
+      /**
+       * This is fixing:
+       *
+       * org.hibernate.HibernateException:
+       * Don't change the reference to a collection with cascade="all-delete-orphan":
+       * net.tourbook.data.Equipment.parts
+       */
+      clonedEquipment.parts = new HashSet<>();
 
       return clonedEquipment;
    }
@@ -284,6 +320,19 @@ public class Equipment implements Cloneable, Comparable<Object>, Serializable {
       return _dateRetired;
    }
 
+   public long getDateUntil() {
+      return dateUntil;
+   }
+
+   public LocalDateTime getDateUntil_Local() {
+
+      if (_dateUntil == null) {
+         _dateUntil = TimeTools.toLocalDateTime(dateUntil);
+      }
+
+      return _dateUntil;
+   }
+
    public String getDescription() {
 
       if (description == null) {
@@ -295,6 +344,13 @@ public class Equipment implements Cloneable, Comparable<Object>, Serializable {
 
    public float getDistanceFirstUse() {
       return distanceFirstUse;
+   }
+
+   public long getDuration() {
+
+      final long duration = dateUntil - date;
+
+      return duration;
    }
 
    /**
@@ -363,7 +419,6 @@ public class Equipment implements Cloneable, Comparable<Object>, Serializable {
       return priceUnit;
    }
 
-
    public String getSize() {
 
       if (size == null) {
@@ -399,6 +454,24 @@ public class Equipment implements Cloneable, Comparable<Object>, Serializable {
    public int hashCode() {
 
       return Objects.hash(equipmentId, _createId);
+   }
+
+   public boolean isCollate() {
+      return isCollate;
+   }
+
+   public boolean isCollatedFieldsModified(final Equipment otherEquipment) {
+
+      if (isCollate != otherEquipment.isCollate()
+            || date != otherEquipment.getDate()
+            || type.equalsIgnoreCase(otherEquipment.getType()) == false) {
+
+         // collated fields are modified
+
+         return true;
+      }
+
+      return false;
    }
 
    /**
@@ -458,6 +531,13 @@ public class Equipment implements Cloneable, Comparable<Object>, Serializable {
       _dateRetired = null;
    }
 
+   public void setDateUntil(final long dateUntil) {
+
+      this.dateUntil = dateUntil;
+
+      _dateUntil = null;
+   }
+
    public void setDescription(final String description) {
       this.description = description;
    }
@@ -472,6 +552,10 @@ public class Equipment implements Cloneable, Comparable<Object>, Serializable {
 
    public void setImageFilePath(final String imageFilePath) {
       this.imageFilePath = imageFilePath;
+   }
+
+   public void setIsCollate(final boolean isCollate) {
+      this.isCollate = isCollate;
    }
 
    public void setModel(final String model) {
@@ -515,9 +599,14 @@ public class Equipment implements Cloneable, Comparable<Object>, Serializable {
 
             + "Equipment" + NL //                                          //$NON-NLS-1$
 
-            + " equipmentId      = " + equipmentId + NL //                  //$NON-NLS-1$
-            + " brand            = " + brand + NL //                        //$NON-NLS-1$
-            + " model            = " + model + NL //                        //$NON-NLS-1$
+            + "  equipmentId      = " + equipmentId + NL //                //$NON-NLS-1$
+            + "  brand            = " + brand + NL //                      //$NON-NLS-1$
+            + "  model            = " + model + NL //                      //$NON-NLS-1$
+
+            + "  type             = " + type + NL //                       //$NON-NLS-1$
+            + "  date             = " + getDate_Local() + NL //            //$NON-NLS-1$
+            + "  dateUntil        = " + getDateUntil_Local() + NL //       //$NON-NLS-1$
+
 //            + " description      = " + description + NL //                  //$NON-NLS-1$
 //            + " equipmentType    = " + equipmentType + NL //                //$NON-NLS-1$
 //            + " distanceFirstUse = " + distanceFirstUse + NL //             //$NON-NLS-1$
@@ -553,9 +642,11 @@ public class Equipment implements Cloneable, Comparable<Object>, Serializable {
 
       setBrand             (otherEquipment.getBrand());
       setModel             (otherEquipment.getModel());
-      setType              (otherEquipment.getType());
       setDescription       (otherEquipment.getDescription());
       setUrlAddress        (otherEquipment.getUrlAddress());
+
+      setIsCollate         (otherEquipment.isCollate());
+      setType              (otherEquipment.getType());
 
       setDistanceFirstUse  (otherEquipment.getDistanceFirstUse());
       setPrice             (otherEquipment.getPrice());
@@ -566,7 +657,19 @@ public class Equipment implements Cloneable, Comparable<Object>, Serializable {
       setDate              (otherEquipment.getDate());
       setDateBuilt         (otherEquipment.getDateBuilt());
       setDateRetired       (otherEquipment.getDateRetired());
+      setDateUntil         (otherEquipment.getDateUntil());
 
 // SET_FORMATTING_ON
+   }
+
+   /**
+    * Reset {@link #dateUntil} when part is not collated, this makes it easier to see it in the view
+    */
+   public void updateUntilDate() {
+
+      if (isCollate == false) {
+
+         setDateUntil(0);
+      }
    }
 }

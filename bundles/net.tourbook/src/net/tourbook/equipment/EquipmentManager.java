@@ -1124,10 +1124,133 @@ public class EquipmentManager {
    }
 
    /**
+    * Check and update the until date for all equipment with the modified types and/or dates. This
+    * has to be called when at least one collated field was modified.
+    * <p>
+    * <b> !!! After calling this method, all equipment must be reloaded because they are updated
+    * !!! </b>
+    *
+    * @param allModifiedTypes
+    */
+   public static void updateUntilDate_Equipment(final Set<String> allModifiedTypes) {
+
+      // force the reload of equipment because one of them was modified
+      _allEquipment_ByID = null;
+
+      final Map<Long, Equipment> allEquipment_ByID = getAllEquipment_ByID();
+
+      for (final String modifiedType : allModifiedTypes) {
+
+         final List<Equipment> allFilteredEquipment = new ArrayList<>();
+
+         /*
+          * Filter equipment: Get all equipment with the same type and which are collated
+          */
+         for (final Equipment equipment : allEquipment_ByID.values()) {
+
+            if (equipment.isCollate()
+                  && modifiedType.equalsIgnoreCase(equipment.getType())) {
+
+               allFilteredEquipment.add(equipment);
+            }
+         }
+
+         final int numEquipment = allFilteredEquipment.size();
+
+         if (numEquipment == 0) {
+            continue;
+         }
+
+         /*
+          * Sort equipment by date
+          */
+         final List<Equipment> allSortedEquipment = new ArrayList<>(allFilteredEquipment);
+
+         Collections.sort(allSortedEquipment, (equipment1, equipment2) -> {
+            return Long.compare(equipment1.getDate(), equipment2.getDate());
+         });
+
+         final List<Equipment> allModifiedEquipment = new ArrayList<>();
+
+         Equipment equipment = allSortedEquipment.get(0);
+
+         if (numEquipment == 1) {
+
+            // this is the first and only equipment
+
+            final long currentDateUntil = equipment.getDateUntil();
+            final long newDateUntil = TimeTools.MAX_TIME_IN_EPOCH_MILLI;
+
+            if (currentDateUntil != newDateUntil) {
+
+               // modify date
+
+               equipment.setDateUntil(newDateUntil);
+
+               allModifiedEquipment.add(equipment);
+            }
+
+         } else {
+
+            // these are all other equipment with more than 1 equipment
+
+            for (int equipmentIndex = 0; equipmentIndex < numEquipment; equipmentIndex++) {
+
+               equipment = allSortedEquipment.get(equipmentIndex);
+
+               final long currentDateUntil = equipment.getDateUntil();
+
+               long newDateUntil = currentDateUntil;
+
+               if (equipmentIndex == numEquipment - 1) {
+
+                  // this is the last equipment
+
+                  newDateUntil = TimeTools.MAX_TIME_IN_EPOCH_MILLI;
+
+               } else {
+
+                  // these are all equipment without the last equipment
+
+                  final Equipment nextEquipment = allSortedEquipment.get(equipmentIndex + 1);
+
+                  final long nextDate = nextEquipment.getDate();
+
+                  // this is the until date for the current equipment
+                  final long validDateUntil = nextDate - 1;
+
+                  if (currentDateUntil != validDateUntil) {
+
+                     newDateUntil = validDateUntil;
+                  }
+               }
+
+               if (currentDateUntil != newDateUntil) {
+
+                  // until date is not correct -> modify date
+
+                  equipment.setDateUntil(newDateUntil);
+
+                  allModifiedEquipment.add(equipment);
+               }
+            }
+         }
+
+         if (allModifiedEquipment.size() > 0) {
+
+            for (final Equipment modifiedEquipment : allModifiedEquipment) {
+
+               TourDatabase.saveEntity(modifiedEquipment, modifiedEquipment.getEquipmentId(), Equipment.class);
+            }
+         }
+      }
+   }
+
+   /**
     * Check and update the until date for all parts of one equipment.
     * This has to be called when at least one collated field was modified.
     * <p>
-    * <b> !!! After calling this method, all equipments must be reloaded because they are updated
+    * <b> !!! After calling this method, all equipment must be reloaded because they are updated
     * !!! </b>
     *
     * @param equipment
@@ -1158,7 +1281,7 @@ public class EquipmentManager {
       for (final EquipmentPart part : allParts) {
 
          if (part.isCollate()
-               && modifiedType.equals(part.getType())) {
+               && modifiedType.equalsIgnoreCase(part.getType())) {
 
             allFilteredParts.add(part);
          }
@@ -1247,9 +1370,9 @@ public class EquipmentManager {
 
       if (allModifiedParts.size() > 0) {
 
-         for (final EquipmentPart partModified : allModifiedParts) {
+         for (final EquipmentPart modifiedPart : allModifiedParts) {
 
-            TourDatabase.saveEntity(partModified, partModified.getPartId(), EquipmentPart.class);
+            TourDatabase.saveEntity(modifiedPart, modifiedPart.getPartId(), EquipmentPart.class);
          }
       }
    }

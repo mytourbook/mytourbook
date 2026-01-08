@@ -39,7 +39,7 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
 
-public class ActionSetPartStructure extends Action implements IMenuCreator {
+public class ActionSetTourStructure extends Action implements IMenuCreator {
 
    private Menu        _menu;
 
@@ -147,7 +147,7 @@ public class ActionSetPartStructure extends Action implements IMenuCreator {
       }
    }
 
-   public ActionSetPartStructure(final ITourViewer tourViewer) {
+   public ActionSetTourStructure(final ITourViewer tourViewer) {
 
       super("Set Tour Stru&cture", AS_DROP_DOWN_MENU);
 

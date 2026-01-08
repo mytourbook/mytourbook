@@ -4571,12 +4571,13 @@ public class TourDatabase {
                   + "   Size                    VARCHAR(" + DB_LENGTH_NAME + "),          " + NL //$NON-NLS-1$ //$NON-NLS-2$
                   + "   Weight                  FLOAT DEFAULT 0,                          " + NL //$NON-NLS-1$
 
-                  + "   IsCollate               BOOLEAN DEFAULT TRUE,                     " + NL //$NON-NLS-1$
+                  + "   IsCollate               BOOLEAN DEFAULT FALSE,                    " + NL //$NON-NLS-1$
                   + "   ExpandType              INTEGER,                                  " + NL //$NON-NLS-1$
 
                   + "   Date                    BIGINT DEFAULT 0,                         " + NL //$NON-NLS-1$
                   + "   DateBuilt               BIGINT DEFAULT 0,                         " + NL //$NON-NLS-1$
-                  + "   DateRetired             BIGINT DEFAULT 0                          " + NL //$NON-NLS-1$
+                  + "   DateRetired             BIGINT DEFAULT 0,                         " + NL //$NON-NLS-1$
+                  + "   DateUntil               BIGINT DEFAULT 0                          " + NL //$NON-NLS-1$
 
                   + ")" //                                                                       //$NON-NLS-1$
       );

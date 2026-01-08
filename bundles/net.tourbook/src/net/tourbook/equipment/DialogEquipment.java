@@ -31,6 +31,8 @@ import net.tourbook.data.Equipment;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.dialogs.TitleAreaDialog;
+import org.eclipse.jface.fieldassist.ControlDecoration;
+import org.eclipse.jface.fieldassist.FieldDecorationRegistry;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.layout.PixelConverter;
@@ -79,6 +81,7 @@ public class DialogEquipment extends TitleAreaDialog {
    private MouseWheelListener           _defaultMouseWheelListener;
 
    private boolean                      _isModified;
+   private boolean                      _isDuplicateEquipment;
 
    private PixelConverter               _pc;
 
@@ -93,6 +96,7 @@ public class DialogEquipment extends TitleAreaDialog {
    private Composite                 _container;
    private Composite                 _parent;
 
+   private Button                    _chkCollate;
    private Button                    _chkSyncDates;
 
    private Combo                     _comboBrand;
@@ -104,6 +108,8 @@ public class DialogEquipment extends TitleAreaDialog {
    private DateTime                  _date;
    private DateTime                  _dateBuilt;
    private DateTime                  _dateRetired;
+
+   private Label                     _lblCollate;
 
    private Spinner                   _spinDistance;
    private Spinner                   _spinPrice;
@@ -118,11 +124,17 @@ public class DialogEquipment extends TitleAreaDialog {
    private AutoComplete_ComboInputMT _autocomplete_Size;
    private AutoComplete_ComboInputMT _autocomplete_Type;
 
-   public DialogEquipment(final Shell parentShell, final Equipment equipment) {
+   private ControlDecoration         _comboDecorator_Date;
+   private ControlDecoration         _comboDecorator_Type;
+
+   public DialogEquipment(final Shell parentShell,
+                          final Equipment equipment,
+                          final boolean isDuplicateEquipment) {
 
       super(parentShell);
 
       _isNewEquipment = equipment == null;
+      _isDuplicateEquipment = isDuplicateEquipment;
 
       if (_isNewEquipment) {
 
@@ -131,6 +143,16 @@ public class DialogEquipment extends TitleAreaDialog {
       } else {
 
          _equipment = equipment.clone();
+
+         if (isDuplicateEquipment) {
+
+            // adjust date to today
+
+            final long today = TimeTools.nowInMilliseconds();
+
+            _equipment.setDate(today);
+            _equipment.setDateBuilt(today);
+         }
       }
 
       // make dialog resizable
@@ -152,9 +174,13 @@ public class DialogEquipment extends TitleAreaDialog {
 
       super.create();
 
-      final String messageTitle = _isNewEquipment
-            ? "New Equipment"
-            : "Edit Equipment";
+      final String messageTitle = _isDuplicateEquipment
+
+            ? "Duplicate Equipment"
+            : _isNewEquipment
+
+                  ? "New Equipment"
+                  : "Edit Equipment";
 
       setTitle(messageTitle);
       setMessage(_equipment.getName());
@@ -254,8 +280,7 @@ public class DialogEquipment extends TitleAreaDialog {
             /*
              * Type
              */
-            final Label label = UI.createLabel(_container, "T&ype");
-            gdVertCenter.applyTo(label);
+            UI.createLabel(_container, "T&ype");
 
             // autocomplete combo
             _comboType = new Combo(_container, SWT.BORDER | SWT.FLAT);
@@ -265,6 +290,21 @@ public class DialogEquipment extends TitleAreaDialog {
             GridDataFactory.fillDefaults().grab(true, false).span(2, 1).applyTo(_comboType);
 
             _autocomplete_Type = new AutoComplete_ComboInputMT(_comboType);
+
+            /*
+             * Add a decoration for this important field
+             */
+            final Image decorationImage = FieldDecorationRegistry.getDefault()
+                  .getFieldDecoration(FieldDecorationRegistry.DEC_INFORMATION)
+                  .getImage();
+
+            _comboDecorator_Type = new ControlDecoration(_comboType, SWT.CENTER | SWT.LEFT);
+
+            // a restart is required for the theme change to take full effect
+            _comboDecorator_Type.setDescriptionText(
+                  "With the type and date fields, tours are collated to display\ne.g. all kilometers for one part or one service");
+            _comboDecorator_Type.setImage(decorationImage);
+            _comboDecorator_Type.setMarginWidth(3);
          }
          UI.createSpacer_Horizontal(_container, 1);
          {
@@ -318,11 +358,25 @@ public class DialogEquipment extends TitleAreaDialog {
             /*
              * First use date
              */
-            final Label label = UI.createLabel(_container, "D&ate");
-            gdVertCenter.applyTo(label);
+            UI.createLabel(_container, "D&ate");
 
             _date = new DateTime(_container, SWT.DATE | SWT.MEDIUM | SWT.DROP_DOWN);
             _date.addSelectionListener(_defaultSelectionListener);
+
+            /*
+             * Add a decoration for this important field
+             */
+            final Image decorationImage = FieldDecorationRegistry.getDefault()
+                  .getFieldDecoration(FieldDecorationRegistry.DEC_INFORMATION)
+                  .getImage();
+
+            _comboDecorator_Date = new ControlDecoration(_date, SWT.CENTER | SWT.LEFT);
+
+            // a restart is required for the theme change to take full effect
+            _comboDecorator_Date.setDescriptionText(
+                  "With the type and date fields, tours are collated to display\ne.g. all kilometers for one part or one service");
+            _comboDecorator_Date.setImage(decorationImage);
+            _comboDecorator_Date.setMarginWidth(3);
          }
          UI.createSpacer_Horizontal(_container, 1);
          {
@@ -396,6 +450,25 @@ public class DialogEquipment extends TitleAreaDialog {
          UI.createSpacer_Horizontal(_container, 1);
          {
             /*
+             * Collate tours
+             */
+            _lblCollate = UI.createLabel(_container, "Co&llate");
+            gdVertCenter.applyTo(_lblCollate);
+
+            _chkCollate = new Button(_container, SWT.CHECK);
+            _chkCollate.setText("Include in collated tours");
+            _chkCollate.setToolTipText(UI.EMPTY_STRING
+                  + "Collated tours are a collection of tours to summarize values,\n"
+                  + "e.g. distances or durations.\n\n"
+                  + "Tours are collated by the type and date fields.\n\n"
+                  + "When an equipment is collated, then it cannot contain parts or services!");
+
+            _chkCollate.addSelectionListener(_defaultSelectionListener);
+
+            GridDataFactory.fillDefaults().grab(true, false).span(6, 1).applyTo(_chkCollate);
+         }
+         {
+            /*
              * Website
              */
             final Label label = UI.createLabel(_container, "W&ebsite");
@@ -443,6 +516,7 @@ public class DialogEquipment extends TitleAreaDialog {
             _dateBuilt,
             _chkSyncDates,
             _dateRetired,
+            _chkCollate,
 
             _txtUrlAddress,
             _txtDescription,
@@ -455,10 +529,23 @@ public class DialogEquipment extends TitleAreaDialog {
          return;
       }
 
+      final boolean isCollate = _chkCollate.getSelection();
       final boolean isSyncDates = _chkSyncDates.getSelection();
+
       final boolean canEditBuiltDate = isSyncDates == false;
 
       _dateBuilt.setEnabled(canEditBuiltDate);
+
+      if (isCollate) {
+
+         _comboDecorator_Date.show();
+         _comboDecorator_Type.show();
+
+      } else {
+
+         _comboDecorator_Date.hide();
+         _comboDecorator_Type.hide();
+      }
 
       final boolean isValid = _isNewEquipment && _isModified == false
 
@@ -495,6 +582,8 @@ public class DialogEquipment extends TitleAreaDialog {
     * @return Returns new or cloned instance
     */
    Equipment getEquipment() {
+
+      _equipment.updateUntilDate();
 
       return _equipment;
    }
@@ -580,15 +669,15 @@ public class DialogEquipment extends TitleAreaDialog {
 
 // SET_FORMATTING_OFF
 
-      _autocomplete_Brand     .restoreState(_state, STATE_AUTOCOMPLETE_POPUP_HEIGHT_BRAND);
-      _autocomplete_Model     .restoreState(_state, STATE_AUTOCOMPLETE_POPUP_HEIGHT_MODEL);
-      _autocomplete_PriceUnit .restoreState(_state, STATE_AUTOCOMPLETE_POPUP_HEIGHT_PRICE_UNIT);
-      _autocomplete_Size      .restoreState(_state, STATE_AUTOCOMPLETE_POPUP_HEIGHT_SIZE);
-      _autocomplete_Type      .restoreState(_state, STATE_AUTOCOMPLETE_POPUP_HEIGHT_TYPE);
+   _autocomplete_Brand     .restoreState(_state, STATE_AUTOCOMPLETE_POPUP_HEIGHT_BRAND);
+   _autocomplete_Model     .restoreState(_state, STATE_AUTOCOMPLETE_POPUP_HEIGHT_MODEL);
+   _autocomplete_PriceUnit .restoreState(_state, STATE_AUTOCOMPLETE_POPUP_HEIGHT_PRICE_UNIT);
+   _autocomplete_Size      .restoreState(_state, STATE_AUTOCOMPLETE_POPUP_HEIGHT_SIZE);
+   _autocomplete_Type      .restoreState(_state, STATE_AUTOCOMPLETE_POPUP_HEIGHT_TYPE);
 
-      _chkSyncDates           .setSelection(Util.getStateBoolean(_state, STATE_SYNC_DATES, true));
+   _chkSyncDates           .setSelection(Util.getStateBoolean(_state, STATE_SYNC_DATES, true));
 
-      _comboPriceUnit         .setText(Util.getStateString(_state, STATE_PRICE_UNIT_DEFAULT, UI.EMPTY_STRING));
+   _comboPriceUnit         .setText(Util.getStateString(_state, STATE_PRICE_UNIT_DEFAULT, UI.EMPTY_STRING));
 
 // SET_FORMATTING_ON
 
@@ -619,10 +708,6 @@ public class DialogEquipment extends TitleAreaDialog {
       final LocalDate dateBuilt     = LocalDate.of(_dateBuilt.getYear(),      _dateBuilt.getMonth() + 1,    _dateBuilt.getDay());
       final LocalDate dateRetired   = LocalDate.of(_dateRetired.getYear(),    _dateRetired.getMonth() + 1,  _dateRetired.getDay());
 
-      _equipment.setDate(              TimeTools.toEpochMilli(date));
-      _equipment.setDateBuilt(         TimeTools.toEpochMilli(dateBuilt));
-      _equipment.setDateRetired(       TimeTools.toEpochMilli(dateRetired));
-
       _equipment.setBrand(             _comboBrand.getText().trim());
       _equipment.setModel(             _comboModel.getText().trim());
       _equipment.setType(              _comboType.getText().trim());
@@ -630,10 +715,15 @@ public class DialogEquipment extends TitleAreaDialog {
       _equipment.setUrlAddress(        _txtUrlAddress.getText().trim());
 
       _equipment.setDistanceFirstUse(  _spinDistance.getSelection());
+      _equipment.setIsCollate(         _chkCollate.getSelection());
       _equipment.setPrice(             _spinPrice.getSelection() / 100f);
       _equipment.setPriceUnit(         _comboPriceUnit.getText());
       _equipment.setSize(              _comboSize.getText().trim());
       _equipment.setWeight(            _spinWeight.getSelection() / 1000f);
+
+      _equipment.setDate(              TimeTools.toEpochMilli(date));
+      _equipment.setDateBuilt(         TimeTools.toEpochMilli(dateBuilt));
+      _equipment.setDateRetired(       TimeTools.toEpochMilli(dateRetired));
 
 // SET_FORMATTING_ON
    }
@@ -664,6 +754,8 @@ public class DialogEquipment extends TitleAreaDialog {
          dateRetired = LocalDateTime.of(2099, 1, 1, 0, 0);
       }
 
+      _chkCollate       .setSelection(_equipment.isCollate());
+
       _comboBrand       .setText(_equipment.getBrand());
       _comboModel       .setText(_equipment.getModel());
       _comboSize        .setText(_equipment.getSize());
@@ -688,6 +780,18 @@ public class DialogEquipment extends TitleAreaDialog {
          // overwrite default
 
          _comboPriceUnit.setText(priceUnit);
+      }
+
+      /*
+       * An equipment can only collate when there are no parts
+       */
+      if (_equipment.canCollate() == false) {
+
+         // ensure that this equipment cannot collate
+         _chkCollate.setSelection(false);
+         _chkCollate.setEnabled(false);
+
+         _lblCollate.setEnabled(false);
       }
 
       _isInUIUpdate = false;
