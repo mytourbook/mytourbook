@@ -17,6 +17,7 @@ package net.tourbook.equipment;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.Set;
 
 import net.tourbook.Images;
 import net.tourbook.Messages;
@@ -27,6 +28,7 @@ import net.tourbook.common.time.TimeTools;
 import net.tourbook.common.util.StringUtils;
 import net.tourbook.common.util.Util;
 import net.tourbook.data.Equipment;
+import net.tourbook.data.EquipmentPart;
 
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.IDialogSettings;
@@ -152,6 +154,8 @@ public class DialogEquipment extends TitleAreaDialog {
 
             _equipment.setDate(today);
             _equipment.setDateBuilt(today);
+
+            _equipment.resetParts();
          }
       }
 
@@ -529,12 +533,15 @@ public class DialogEquipment extends TitleAreaDialog {
          return;
       }
 
+      final boolean canCollate = _equipment.canCollate();
+
       final boolean isCollate = _chkCollate.getSelection();
       final boolean isSyncDates = _chkSyncDates.getSelection();
 
       final boolean canEditBuiltDate = isSyncDates == false;
 
       _dateBuilt.setEnabled(canEditBuiltDate);
+      _chkCollate.setEnabled(canCollate);
 
       if (isCollate) {
 

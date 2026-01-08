@@ -481,7 +481,13 @@ public class EquipmentView extends ViewPart implements ITourProvider, ITourViewe
 
                return compareDiff;
 
-            } else if (isCollate1 || isCollate2) {
+            } else if (isCollate1) {
+
+               // sort collated before not collated
+
+               return -1;
+
+            } else if (isCollate2) {
 
                // sort collated before not collated
 

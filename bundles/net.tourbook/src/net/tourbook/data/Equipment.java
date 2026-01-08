@@ -210,15 +210,6 @@ public class Equipment implements Cloneable, Comparable<Object>, Serializable {
       clonedEquipment.equipmentId = TourDatabase.ENTITY_IS_NOT_SAVED;
       clonedEquipment._createId = _createCounter.incrementAndGet();
 
-      /**
-       * This is fixing:
-       *
-       * org.hibernate.HibernateException:
-       * Don't change the reference to a collection with cascade="all-delete-orphan":
-       * net.tourbook.data.Equipment.parts
-       */
-      clonedEquipment.parts = new HashSet<>();
-
       return clonedEquipment;
    }
 
@@ -501,6 +492,18 @@ public class Equipment implements Cloneable, Comparable<Object>, Serializable {
       }
 
       return true;
+   }
+
+   /**
+    * This is fixing an exception when an equipment is cloned:
+    *
+    * org.hibernate.HibernateException:
+    * Don't change the reference to a collection with cascade="all-delete-orphan":
+    * net.tourbook.data.Equipment.parts
+    */
+   public void resetParts() {
+
+      parts = new HashSet<>();
    }
 
    public void setBrand(final String brand) {
