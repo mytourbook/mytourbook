@@ -38,7 +38,7 @@ public class TVIEquipmentView_Equipment_Month extends TVIEquipmentView_Item {
    private final int                             _month;
 
    public TVIEquipmentView_Equipment_Month(final TVIEquipmentView_Equipment_Year parentItem,
-                                           final TVIEquipmentView_Equipment partItem,
+                                           final TVIEquipmentView_Equipment equipmentItem,
                                            final int dbYear,
                                            final int dbMonth,
                                            final TreeViewer treeViewer) {
@@ -46,7 +46,7 @@ public class TVIEquipmentView_Equipment_Month extends TVIEquipmentView_Item {
       super(treeViewer);
 
       setParentItem(parentItem);
-      _equipmentItem = partItem;
+      _equipmentItem = equipmentItem;
 
       _yearItem = parentItem;
       _year = dbYear;
@@ -133,12 +133,12 @@ public class TVIEquipmentView_Equipment_Month extends TVIEquipmentView_Item {
       loadChildren_Tours();
    }
 
-   public int getMonth() {
-      return _month;
+   public TVIEquipmentView_Equipment getEquipmentItem() {
+      return _equipmentItem;
    }
 
-   public TVIEquipmentView_Equipment getPartItem() {
-      return _equipmentItem;
+   public int getMonth() {
+      return _month;
    }
 
    public TVIEquipmentView_Equipment_Year getYearItem() {
@@ -164,7 +164,7 @@ public class TVIEquipmentView_Equipment_Month extends TVIEquipmentView_Item {
          final SQLFilter sqlFilter = new SQLFilter();
 
          /*
-          * Load: Equipment, Part, Year, Tour
+          * Load: Equipment, Year, Tour
           */
          final String sql = UI.EMPTY_STRING
 
@@ -172,22 +172,22 @@ public class TVIEquipmentView_Equipment_Month extends TVIEquipmentView_Item {
 
                + TVIEquipmentView_Tour.SQL_TOUR_COLUMNS
 
-               + "FROM equipmentpart AS part" + NL //                                              //$NON-NLS-1$
+               + "FROM equipment AS equipment" + NL //                                             //$NON-NLS-1$
 
                + "JOIN tourdata_equipment AS j_td_eq" + NL //                                      //$NON-NLS-1$
-               + "   ON j_td_eq.equipment_equipmentid = part.equipment_equipmentid" + NL //        //$NON-NLS-1$
+               + "   ON j_td_eq.equipment_equipmentid = equipment.equipmentid" + NL //             //$NON-NLS-1$
 
                + "JOIN tourdata AS TourData" + NL //                                               //$NON-NLS-1$
                + "   ON TourData.tourID = j_td_eq.tourdata_tourID" + NL //                         //$NON-NLS-1$
-               + "   AND TourData.tourstarttime >= part.dateFrom" + NL //                          //$NON-NLS-1$
-               + "   AND TourData.tourstarttime <  part.dateUntil" + NL //                         //$NON-NLS-1$
+               + "   AND TourData.tourstarttime >= equipment.dateFrom" + NL //                     //$NON-NLS-1$
+               + "   AND TourData.tourstarttime <  equipment.dateUntil" + NL //                    //$NON-NLS-1$
                + "   AND TourData.StartYear = ?" + NL //                                           //$NON-NLS-1$
                + "   AND TourData.StartMonth = ?" + NL //                                          //$NON-NLS-1$
 
                + sqlFilter.getWhereClause() + NL
 
-               + "WHERE part.isCollate = TRUE" + NL //                                             //$NON-NLS-1$
-               + "   AND part.partID = ?" + NL //                                                  //$NON-NLS-1$
+               + "WHERE equipment.isCollate = TRUE" + NL //                                        //$NON-NLS-1$
+               + "   AND equipment.equipmentID = ?" + NL //                                        //$NON-NLS-1$
 
                + "ORDER BY TourData.tourstarttime" + NL //                                         //$NON-NLS-1$
          ;
@@ -234,16 +234,11 @@ public class TVIEquipmentView_Equipment_Month extends TVIEquipmentView_Item {
 
             + "TVITagView_Month " + System.identityHashCode(this) + NL //     //$NON-NLS-1$
 
-            + "[" + NL //                                                     //$NON-NLS-1$
-
             + "  _year         = " + _year + NL //                            //$NON-NLS-1$
             + "  _month        = " + _month + NL //                           //$NON-NLS-1$
             + "  _yearItem     = " + _yearItem + NL //                        //$NON-NLS-1$
 
-            + "  numTours          = " + numTours + NL //                     //$NON-NLS-1$
-//            + "  numTags_NoTours   = " + numTags_NoTours + NL //              //$NON-NLS-1$
-
-            + "]" + NL //                                                     //$NON-NLS-1$
+            + "  numTours      = " + numTours + NL //                         //$NON-NLS-1$
       ;
    }
 }

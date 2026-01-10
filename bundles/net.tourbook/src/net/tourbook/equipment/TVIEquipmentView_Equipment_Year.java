@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2026 Wolfgang Schramm and Contributors
+ * Copyright (C) 2026 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -152,8 +152,6 @@ public class TVIEquipmentView_Equipment_Year extends TVIEquipmentView_Item {
 
    /**
     * Get all months for this year
-    *
-    * @param isMonth
     */
    private void loadChildren_Months() {
 
@@ -163,6 +161,9 @@ public class TVIEquipmentView_Equipment_Year extends TVIEquipmentView_Item {
 
          final SQLFilter sqlFilter = new SQLFilter();
 
+         /*
+          * Load: Equipment, Year, Month
+          */
          final String sql = UI.EMPTY_STRING
 
                + "SELECT" + NL //                                                               //$NON-NLS-1$
@@ -174,21 +175,21 @@ public class TVIEquipmentView_Equipment_Year extends TVIEquipmentView_Item {
 
                + TVIEquipmentView_Tour.SQL_SUM_COLUMNS_SUMMARIZED //                         4
 
-               + "FROM equipmentpart AS part" + NL //                                           //$NON-NLS-1$
+               + "FROM equipment AS equipment" + NL //                                           //$NON-NLS-1$
 
                + "JOIN tourdata_equipment AS j_td_eq" + NL //                                   //$NON-NLS-1$
-               + "   ON j_td_eq.equipment_equipmentid = part.equipment_equipmentid" + NL //     //$NON-NLS-1$
+               + "   ON j_td_eq.equipment_equipmentid = equipment.equipmentID" + NL //          //$NON-NLS-1$
 
                + "JOIN tourdata AS TourData" + NL //                                            //$NON-NLS-1$
                + "   ON TourData.tourid = j_td_eq.tourdata_tourid" + NL //                      //$NON-NLS-1$
-               + "   AND TourData.tourstarttime >= part.dateFrom" + NL //                       //$NON-NLS-1$
-               + "   AND TourData.tourstarttime <  part.dateUntil" + NL //                      //$NON-NLS-1$
+               + "   AND TourData.tourstarttime >= equipment.dateFrom" + NL //                  //$NON-NLS-1$
+               + "   AND TourData.tourstarttime <  equipment.dateUntil" + NL //                 //$NON-NLS-1$
                + "   AND TourData.StartYear = ?" + NL //                                        //$NON-NLS-1$
 
                + sqlFilter.getWhereClause() + NL
 
-               + "WHERE part.iscollate = TRUE" + NL //                                          //$NON-NLS-1$
-               + "   AND part.partid = ?" + NL //                                               //$NON-NLS-1$
+               + "WHERE equipment.iscollate = TRUE" + NL //                                     //$NON-NLS-1$
+               + "   AND equipment.equipmentID = ?" + NL //                                     //$NON-NLS-1$
 
                + "GROUP BY "
                + "   TourData.StartYear," + NL //                                               //$NON-NLS-1$
@@ -252,7 +253,7 @@ public class TVIEquipmentView_Equipment_Year extends TVIEquipmentView_Item {
          final SQLFilter sqlFilter = new SQLFilter();
 
          /*
-          * Load: Equipment, Part, Year, Tour
+          * Load: Equipment, Year, Tour
           */
          final String sql = UI.EMPTY_STRING
 
@@ -260,21 +261,21 @@ public class TVIEquipmentView_Equipment_Year extends TVIEquipmentView_Item {
 
                + TVIEquipmentView_Tour.SQL_TOUR_COLUMNS
 
-               + "FROM equipmentpart AS part" + NL //                                              //$NON-NLS-1$
+               + "FROM equipment AS equipment" + NL //                                              //$NON-NLS-1$
 
                + "JOIN tourdata_equipment AS j_td_eq" + NL //                                      //$NON-NLS-1$
-               + "   ON j_td_eq.equipment_equipmentid = part.equipment_equipmentid" + NL //        //$NON-NLS-1$
+               + "   ON j_td_eq.equipment_equipmentid = equipment.equipmentID" + NL //             //$NON-NLS-1$
 
                + "JOIN tourdata AS TourData" + NL //                                               //$NON-NLS-1$
                + "   ON TourData.tourID = j_td_eq.tourdata_tourID" + NL //                         //$NON-NLS-1$
-               + "   AND TourData.tourstarttime >= part.dateFrom" + NL //                          //$NON-NLS-1$
-               + "   AND TourData.tourstarttime <  part.dateUntil" + NL //                         //$NON-NLS-1$
+               + "   AND TourData.tourstarttime >= equipment.dateFrom" + NL //                     //$NON-NLS-1$
+               + "   AND TourData.tourstarttime <  equipment.dateUntil" + NL //                    //$NON-NLS-1$
                + "   AND TourData.StartYear = ?" + NL //                                           //$NON-NLS-1$
 
                + sqlFilter.getWhereClause() + NL
 
-               + "WHERE part.isCollate = TRUE" + NL //                                             //$NON-NLS-1$
-               + "   AND part.partID = ?" + NL //                                                  //$NON-NLS-1$
+               + "WHERE equipment.isCollate = TRUE" + NL //                                        //$NON-NLS-1$
+               + "   AND equipment.equipmentID = ?" + NL //                                        //$NON-NLS-1$
 
                + "ORDER BY TourData.tourstarttime" + NL //                                         //$NON-NLS-1$
          ;
@@ -320,19 +321,11 @@ public class TVIEquipmentView_Equipment_Year extends TVIEquipmentView_Item {
 
             + "TVITagView_Year " + System.identityHashCode(this) + NL //   //$NON-NLS-1$
 
-            + " [" + NL //                                                 //$NON-NLS-1$
-
             + "  _year        = " + _year + NL //                          //$NON-NLS-1$
-            + "  _isMonth     = " + _isMonthCategory + NL //                       //$NON-NLS-1$
+            + "  _isMonth     = " + _isMonthCategory + NL //               //$NON-NLS-1$
 
             + NL
             + "  numTours          = " + numTours + NL //                  //$NON-NLS-1$
-//            + "  numTags_NoTours   = " + numTags_NoTours + NL //           //$NON-NLS-1$
-
-//          + NL
-//          + "_tagItem  = " + _tagItem + NL //                            //$NON-NLS-1$
-
-            + "]" + NL //                                                  //$NON-NLS-1$
       ;
    }
 }

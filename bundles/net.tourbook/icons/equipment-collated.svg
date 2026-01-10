@@ -3,7 +3,7 @@
    version="1.1"
    id="svg2985"
    height="16.000015"
-   width="16"
+   width="15.999985"
    xmlns="http://www.w3.org/2000/svg"
    xmlns:svg="http://www.w3.org/2000/svg"
    xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
@@ -55,17 +55,24 @@
   <g
      id="layer1"
      style="display:inline"
-     transform="translate(-415,-19)">
+     transform="translate(-175,-18.999985)">
     <rect
-       y="19"
-       x="415"
+       y="18.999985"
+       x="175"
        height="16.000015"
        width="15.999991"
-       id="rect6561-8-1-9-9-5-5-9-9-1-3-94-1-6-6-4-5-4-9-5-9-5-4-0-5-2"
+       id="rect6561-8-1-9-9-5-5-9-9-1-3-94-1-6-6-4-5-4-9-5-9-5-4-0-0-2-4"
        style="display:inline;opacity:0.99;fill:none;stroke:none" />
     <path
-       id="path8-1-3-8-1-6"
-       style="display:inline;fill:#fe7f00;stroke:#9a4d00;stroke-width:0.7;stroke-miterlimit:3;stroke-dasharray:none"
-       d="M 418.005,27 C 418.005,30.672693 420.98,33.649999 424.64984,33.65 424.64984,25.029477 424.64984,29.0576 424.64984,20.35 420.98,20.350001 418.005,23.327307 418.005,27 Z" />
+       id="rect9-4-1-1-2-0-4-2-4-3-0"
+       style="display:inline;fill:#e9e61f;fill-opacity:1;stroke:#79770c;stroke-width:0.500003;stroke-miterlimit:3;stroke-opacity:1"
+       d="M 188.37334,23.500968 184.26327,30.65769 177.12549,26.514821" />
+    <rect
+       style="fill:#ff4200;fill-opacity:1;stroke:none;stroke-width:0.7;stroke-miterlimit:3;paint-order:markers fill stroke"
+       id="rect1"
+       width="3"
+       height="2.0000005"
+       x="187.99998"
+       y="33" />
   </g>
 </svg>

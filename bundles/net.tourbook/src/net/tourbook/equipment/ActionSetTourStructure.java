@@ -75,23 +75,19 @@ public class ActionSetTourStructure extends Action implements IMenuCreator {
 
                for (final Object element : selection.toArray()) {
 
+                  TVIEquipmentView_Equipment selectedEquipmentItem = null;
+
                   if (element instanceof final TVIEquipmentView_Equipment equipmentItem) {
 
-                     final Equipment equipment = equipmentItem.getEquipment();
+                     selectedEquipmentItem = equipmentItem;
 
-                     if (equipment.isCollate()) {
+                  } else if (element instanceof final TVIEquipmentView_Equipment_Year yearItem) {
 
-                        saveExpandTypeInEquipment(equipment);
+                     selectedEquipmentItem = yearItem.getEquipmentItem();
 
-                     } else {
+                  } else if (element instanceof final TVIEquipmentView_Equipment_Month monthItem) {
 
-                        final Set<EquipmentPart> allParts = equipment.getParts();
-
-                        for (final EquipmentPart part : allParts) {
-
-                           saveExpandTypeInPart(part);
-                        }
-                     }
+                     selectedEquipmentItem = monthItem.getEquipmentItem();
 
                   } else if (element instanceof final TVIEquipmentView_Part partItem) {
 
@@ -107,8 +103,38 @@ public class ActionSetTourStructure extends Action implements IMenuCreator {
 
                   } else if (element instanceof final TVIEquipmentView_Tour tourItem) {
 
-                     saveExpandTypeInPart(tourItem.getPartItem().getPart());
+                     selectedEquipmentItem = tourItem.getEquipmentItem();
+
+                     final TVIEquipmentView_Part partItem = tourItem.getPartItem();
+
+                     if (partItem != null) {
+
+                        saveExpandTypeInPart(partItem.getPart());
+                     }
                   }
+
+                  if (selectedEquipmentItem != null) {
+
+                     final Equipment equipment = selectedEquipmentItem.getEquipment();
+
+                     if (equipment != null) {
+
+                        if (equipment.isCollate()) {
+
+                           saveExpandTypeInEquipment(equipment);
+
+                        } else {
+
+                           final Set<EquipmentPart> allParts = equipment.getParts();
+
+                           for (final EquipmentPart part : allParts) {
+
+                              saveExpandTypeInPart(part);
+                           }
+                        }
+                     }
+                  }
+
                }
 
                if (_isModified) {
@@ -276,13 +302,19 @@ public class ActionSetTourStructure extends Action implements IMenuCreator {
 
          final Object selectedItem = selection.getFirstElement();
 
+         TVIEquipmentView_Equipment selectedEquipmentItem = null;
+
          if (selectedItem instanceof final TVIEquipmentView_Equipment equipmentItem) {
 
-            final Equipment equipment = equipmentItem.getEquipment();
+            selectedEquipmentItem = equipmentItem;
 
-            if (equipment.isCollate()) {
-               return equipment.getExpandType();
-            }
+         } else if (selectedItem instanceof final TVIEquipmentView_Equipment_Year yearItem) {
+
+            selectedEquipmentItem = yearItem.getEquipmentItem();
+
+         } else if (selectedItem instanceof final TVIEquipmentView_Equipment_Month monthItem) {
+
+            selectedEquipmentItem = monthItem.getEquipmentItem();
 
          } else if (selectedItem instanceof final TVIEquipmentView_Part partItem) {
 
@@ -298,7 +330,22 @@ public class ActionSetTourStructure extends Action implements IMenuCreator {
 
          } else if (selectedItem instanceof final TVIEquipmentView_Tour tourItem) {
 
-            return tourItem.getPartItem().getPart().getExpandType();
+            selectedEquipmentItem = tourItem.getEquipmentItem();
+
+            final TVIEquipmentView_Part partItem = tourItem.getPartItem();
+
+            if (partItem != null) {
+               return partItem.getExpandType();
+            }
+         }
+
+         if (selectedEquipmentItem != null) {
+
+            final Equipment equipment = selectedEquipmentItem.getEquipment();
+
+            if (equipment.isCollate()) {
+               return equipment.getExpandType();
+            }
          }
       }
 

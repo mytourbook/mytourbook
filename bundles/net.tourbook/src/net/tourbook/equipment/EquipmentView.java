@@ -197,13 +197,16 @@ public class EquipmentView extends ViewPart implements ITourProvider, ITourViewe
    /*
     * UI resources
     */
-   private final Image _imgEquipment             = TourbookPlugin.getImage(Images.Equipment);
-   private final Image _imgEquipment_All         = TourbookPlugin.getImage(Images.Equipment_Only);
-   private final Image _imgEquipment_Part        = TourbookPlugin.getImage(Images.Equipment_Part);
-   private final Image _imgEquipment_Part_New    = TourbookPlugin.getImage(Images.Equipment_Part_New);
-   private final Image _imgEquipment_Service     = TourbookPlugin.getImage(Images.Equipment_Service);
-   private final Image _imgEquipment_Service_New = TourbookPlugin.getImage(Images.Equipment_Service_New);
-   private final Image _imgTours_All             = TourbookPlugin.getImage(Images.TourInView);
+   private final Image _imgEquipment                 = TourbookPlugin.getImage(Images.Equipment);
+   private final Image _imgEquipment_All             = TourbookPlugin.getImage(Images.Equipment_Only);
+   private final Image _imgEquipment_Collated        = TourbookPlugin.getImage(Images.Equipment_Collated);
+   private final Image _imgEquipment_Part            = TourbookPlugin.getImage(Images.Equipment_Part);
+   private final Image _imgEquipment_Part_Collate    = TourbookPlugin.getImage(Images.Equipment_Part_Collated);
+   private final Image _imgEquipment_Part_New        = TourbookPlugin.getImage(Images.Equipment_Part_New);
+   private final Image _imgEquipment_Service         = TourbookPlugin.getImage(Images.Equipment_Service);
+   private final Image _imgEquipment_Service_Collate = TourbookPlugin.getImage(Images.Equipment_Service_Collated);
+   private final Image _imgEquipment_Service_New     = TourbookPlugin.getImage(Images.Equipment_Service_New);
+   private final Image _imgTours_All                 = TourbookPlugin.getImage(Images.TourInView);
 
    /*
     * UI controls
@@ -1029,7 +1032,7 @@ public class EquipmentView extends ViewPart implements ITourProvider, ITourViewe
 
                setCellColor(cell, element);
 
-            } else if (viewItem instanceof TVIEquipmentView_Equipment) {
+            } else if (viewItem instanceof final TVIEquipmentView_Equipment equipmentItem) {
 
                /*
                 * Equipment
@@ -1044,10 +1047,14 @@ public class EquipmentView extends ViewPart implements ITourProvider, ITourViewe
                final long numTours_NotCallated = viewItem.numTours_NotCollated;
                if (numTours_NotCallated > 0) {
 
-                  styledString.append(UI.SPACE3 + numTours_NotCallated, net.tourbook.ui.UI.TOTAL_STYLER);
+                  styledString.append(UI.SPACE3 + numTours_NotCallated, net.tourbook.ui.UI.TOUR_STYLER);
                }
 
-               cell.setImage(_imgEquipment_All);
+               if (equipmentItem.getEquipment().isCollate()) {
+                  cell.setImage(_imgEquipment_Collated);
+               } else {
+                  cell.setImage(_imgEquipment_All);
+               }
 
             } else if (viewItem instanceof final TVIEquipmentView_Part partItem) {
 
@@ -1065,14 +1072,23 @@ public class EquipmentView extends ViewPart implements ITourProvider, ITourViewe
 
                if (part.isItemType_Part()) {
 
-                  cell.setImage(_imgEquipment_Part);
+                  if (part.isCollate()) {
+                     cell.setImage(_imgEquipment_Part_Collate);
+                  } else {
+                     cell.setImage(_imgEquipment_Part);
+                  }
 
                } else if (part.isItemType_Service()) {
 
-                  cell.setImage(_imgEquipment_Service);
+                  if (part.isCollate()) {
+                     cell.setImage(_imgEquipment_Service_Collate);
+                  } else {
+                     cell.setImage(_imgEquipment_Service);
+                  }
                }
 
-            } else if (viewItem instanceof TVIEquipmentView_Part_Year) {
+            } else if (viewItem instanceof TVIEquipmentView_Part_Year
+                  || viewItem instanceof TVIEquipmentView_Equipment_Year) {
 
                /*
                 * Year
@@ -1084,7 +1100,8 @@ public class EquipmentView extends ViewPart implements ITourProvider, ITourViewe
                   styledString.append(UI.SPACE3 + numTours, net.tourbook.ui.UI.TOTAL_STYLER);
                }
 
-            } else if (viewItem instanceof TVIEquipmentView_Part_Month) {
+            } else if (viewItem instanceof TVIEquipmentView_Part_Month
+                  || viewItem instanceof TVIEquipmentView_Equipment_Month) {
 
                /*
                 * Month
@@ -2023,13 +2040,16 @@ public class EquipmentView extends ViewPart implements ITourProvider, ITourViewe
 
 // SET_FORMATTING_OFF
 
-      _imgEquipment              .dispose();
-      _imgEquipment_All          .dispose();
-      _imgEquipment_Part         .dispose();
-      _imgEquipment_Part_New     .dispose();
-      _imgEquipment_Service      .dispose();
-      _imgEquipment_Service_New  .dispose();
-      _imgTours_All              .dispose();
+      _imgEquipment                 .dispose();
+      _imgEquipment_All             .dispose();
+      _imgEquipment_Collated        .dispose();
+      _imgEquipment_Part            .dispose();
+      _imgEquipment_Part_Collate    .dispose();
+      _imgEquipment_Part_New        .dispose();
+      _imgEquipment_Service         .dispose();
+      _imgEquipment_Service_Collate .dispose();
+      _imgEquipment_Service_New     .dispose();
+      _imgTours_All                 .dispose();
 
 // SET_FORMATTING_ON
 
@@ -2048,7 +2068,6 @@ public class EquipmentView extends ViewPart implements ITourProvider, ITourViewe
       int numServices = 0;
 
       int numItems = 0;
-      int numPartItems = 0;
       TVIEquipmentView_Part selectedPartItem = null;
       boolean isEquipmentCollate = false;
 
@@ -2056,13 +2075,11 @@ public class EquipmentView extends ViewPart implements ITourProvider, ITourViewe
 
          numItems++;
 
+         TVIEquipmentView_Equipment selectedEquipmentItem = null;
+
          if (selectedItem instanceof final TVIEquipmentView_Equipment equipmentItem) {
 
-            final Equipment equipment = equipmentItem.getEquipment();
-
-            isEquipmentCollate = equipment.isCollate();
-
-            numEquipment++;
+            selectedEquipmentItem = equipmentItem;
 
          } else if (selectedItem instanceof final TVIEquipmentView_Part partItem) {
 
@@ -2077,23 +2094,37 @@ public class EquipmentView extends ViewPart implements ITourProvider, ITourViewe
                numServices++;
             }
 
-            numPartItems++;
             selectedPartItem = partItem;
+
+         } else if (selectedItem instanceof final TVIEquipmentView_Equipment_Year yearItem) {
+
+            selectedEquipmentItem = yearItem.getEquipmentItem();
+
+         } else if (selectedItem instanceof final TVIEquipmentView_Equipment_Month monthItem) {
+
+            selectedEquipmentItem = monthItem.getEquipmentItem();
 
          } else if (selectedItem instanceof final TVIEquipmentView_Part_Year yearItem) {
 
-            numPartItems++;
             selectedPartItem = yearItem.getPartItem();
 
          } else if (selectedItem instanceof final TVIEquipmentView_Part_Month monthItem) {
 
-            numPartItems++;
             selectedPartItem = monthItem.getPartItem();
 
          } else if (selectedItem instanceof final TVIEquipmentView_Tour tourItem) {
 
-            numPartItems++;
             selectedPartItem = tourItem.getPartItem();
+            selectedEquipmentItem = tourItem.getEquipmentItem();
+         }
+
+         if (selectedEquipmentItem != null) {
+
+            final Equipment equipment = selectedEquipmentItem.getEquipment();
+
+            isEquipmentCollate = equipment.isCollate();
+
+            numEquipment++;
          }
       }
 
@@ -2109,8 +2140,8 @@ public class EquipmentView extends ViewPart implements ITourProvider, ITourViewe
                                                    && (isEquipmentSelected || isPartSelected || isServiceSelected)
                                                    && isEquipmentCollate == false                                                   ;
 
-      final boolean canSetTourStructure         = selectedPartItem != null && numPartItems == 1
-                                                      || (numEquipment == 1 && isOneItemSelected);
+      final boolean canSetTourStructure         = isOneItemSelected
+                                                   && (selectedPartItem != null || isEquipmentCollate);
 
       /*
        * Multiple part/services can be much more complex when they have different anchestors (equipment)
@@ -2771,6 +2802,8 @@ public class EquipmentView extends ViewPart implements ITourProvider, ITourViewe
          _postSelectionProvider.setSelection(new SelectionTourId(tourItem.tourId));
 
       } else if (firstSelectedItem instanceof TVIEquipmentView_Equipment
+            || firstSelectedItem instanceof TVIEquipmentView_Equipment_Year
+            || firstSelectedItem instanceof TVIEquipmentView_Equipment_Month
             || firstSelectedItem instanceof TVIEquipmentView_Part
             || firstSelectedItem instanceof TVIEquipmentView_Part_Year
             || firstSelectedItem instanceof TVIEquipmentView_Part_Month) {

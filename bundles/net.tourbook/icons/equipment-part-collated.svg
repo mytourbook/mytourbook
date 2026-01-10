@@ -55,17 +55,32 @@
   <g
      id="layer1"
      style="display:inline"
-     transform="translate(-415,-19)">
+     transform="translate(-305,-19)">
+    <path
+       d="M 318.99834,33.001819 H 306.99934 V 21.000001"
+       style="display:inline;fill:#42b6ff;fill-opacity:1;stroke:none;stroke-width:0.500001;stroke-linecap:round;stroke-miterlimit:3"
+       id="path1-2-7-2-4-4-7" />
     <rect
        y="19"
-       x="415"
+       x="305"
        height="16.000015"
        width="15.999991"
-       id="rect6561-8-1-9-9-5-5-9-9-1-3-94-1-6-6-4-5-4-9-5-9-5-4-0-5-2"
+       id="rect6561-8-1-9-9-5-5-9-9-1-3-94-1-6-6-4-5-4-9-5-9-5-4-0-5-1"
        style="display:inline;opacity:0.99;fill:none;stroke:none" />
     <path
-       id="path8-1-3-8-1-6"
-       style="display:inline;fill:#fe7f00;stroke:#9a4d00;stroke-width:0.7;stroke-miterlimit:3;stroke-dasharray:none"
-       d="M 418.005,27 C 418.005,30.672693 420.98,33.649999 424.64984,33.65 424.64984,25.029477 424.64984,29.0576 424.64984,20.35 420.98,20.350001 418.005,23.327307 418.005,27 Z" />
+       id="rect1-5-6-1-6-3-94-5-1"
+       style="display:inline;fill:none;stroke:#005a92;stroke-width:0.7;stroke-linecap:square;stroke-miterlimit:3;stroke-dasharray:none;stroke-opacity:1"
+       d="M 307.34934,32.650668 V 21.35" />
+    <path
+       id="rect1-5-6-1-6-3-94-5-6-5"
+       style="display:inline;fill:none;stroke:#005a92;stroke-width:0.7;stroke-linecap:square;stroke-miterlimit:3;stroke-dasharray:none;stroke-opacity:1"
+       d="M 318.65,32.65 H 307.34934" />
+    <rect
+       style="display:inline;fill:#ff4200;fill-opacity:1;stroke:none;stroke-width:0.7;stroke-miterlimit:3;paint-order:markers fill stroke"
+       id="rect1-8"
+       width="3"
+       height="2.0000005"
+       x="315.99835"
+       y="21.000002" />
   </g>
 </svg>

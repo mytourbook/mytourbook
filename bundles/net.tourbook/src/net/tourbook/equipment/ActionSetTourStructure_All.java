@@ -23,7 +23,6 @@ import javax.persistence.EntityManager;
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.data.Equipment;
 import net.tourbook.data.EquipmentPart;
-import net.tourbook.data.TourTag;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.tour.TourManager;
 
@@ -92,7 +91,7 @@ public class ActionSetTourStructure_All extends Action implements IMenuCreator {
 
                      final Set<EquipmentPart> allParts = equipment.getParts();
 
-                     boolean _isPartModified = false;
+                     boolean isPartModified = false;
 
                      for (final EquipmentPart part : allParts) {
 
@@ -102,13 +101,29 @@ public class ActionSetTourStructure_All extends Action implements IMenuCreator {
 
                            part.setExpandType(__expandType);
 
-                           _isPartModified = true;
+                           isPartModified = true;
                            _isModified = true;
                         }
                      }
 
-                     if (_isPartModified) {
-                        TourDatabase.saveEntity(equipment, equipment.getEquipmentId(), TourTag.class);
+                     if (isPartModified == false) {
+
+                        // check collated equipment
+
+                        if (equipment.isCollate()) {
+
+                           if (equipment.getExpandType() != __expandType) {
+
+                              equipment.setExpandType(__expandType);
+
+                              isPartModified = true;
+                              _isModified = true;
+                           }
+                        }
+                     }
+
+                     if (isPartModified) {
+                        TourDatabase.saveEntity(equipment, equipment.getEquipmentId(), Equipment.class);
                      }
                   }
 
