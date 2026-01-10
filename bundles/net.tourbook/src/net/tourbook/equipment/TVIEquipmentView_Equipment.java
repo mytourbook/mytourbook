@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2025, 2025 Wolfgang Schramm and Contributors
+ * Copyright (C) 2025, 2026 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -15,6 +15,10 @@
  *******************************************************************************/
 package net.tourbook.equipment;
 
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Set;
 
@@ -23,6 +27,8 @@ import net.tourbook.common.time.TimeTools;
 import net.tourbook.common.util.TreeViewerItem;
 import net.tourbook.data.Equipment;
 import net.tourbook.data.EquipmentPart;
+import net.tourbook.database.TourDatabase;
+import net.tourbook.ui.SQLFilter;
 
 import org.eclipse.jface.viewers.TreeViewer;
 
@@ -31,6 +37,8 @@ public class TVIEquipmentView_Equipment extends TVIEquipmentView_Item {
    private Equipment _equipment;
 
    private long      _equipmentID;
+
+   private boolean   _isMonthCategory;
 
    public TVIEquipmentView_Equipment(final TreeViewer equipViewer, final Equipment equipment) {
 
@@ -50,12 +58,38 @@ public class TVIEquipmentView_Equipment extends TVIEquipmentView_Item {
       if (UI.IS_SCRAMBLE_DATA) {
          firstColumn = UI.scrambleText(firstColumn);
       }
+
+      _isMonthCategory = equipment.getExpandType() == EquipmentManager.EXPAND_TYPE_YEAR_MONTH_TOUR;
    }
 
    @Override
    protected void fetchChildren() {
 
-      setChildren(readChildren());
+      loadChildren_Parts();
+
+      /*
+       * Load equipment children which are collated
+       */
+      if (_equipment.isCollate()) {
+
+         switch (getExpandType()) {
+
+         case EquipmentManager.EXPAND_TYPE_FLAT:
+            loadChildren_Tours();
+            break;
+
+         case EquipmentManager.EXPAND_TYPE_YEAR_TOUR:
+            loadChildren_Years(false);
+            break;
+
+         case EquipmentManager.EXPAND_TYPE_YEAR_MONTH_TOUR:
+            loadChildren_Years(true);
+            break;
+
+         default:
+            break;
+         }
+      }
    }
 
    public Equipment getEquipment() {
@@ -66,7 +100,11 @@ public class TVIEquipmentView_Equipment extends TVIEquipmentView_Item {
       return _equipmentID;
    }
 
-   private ArrayList<TreeViewerItem> readChildren() {
+   int getExpandType() {
+      return _equipment.getExpandType();
+   }
+
+   private void loadChildren_Parts() {
 
       final Set<EquipmentPart> allParts = _equipment.getParts();
 
@@ -107,7 +145,149 @@ public class TVIEquipmentView_Equipment extends TVIEquipmentView_Item {
          loadSummarizedValues_Part(partItem);
       }
 
-      return allPartItems;
+      setChildren(allPartItems);
+   }
+
+   /**
+    * Get all tours for this part
+    */
+   private void loadChildren_Tours() {
+
+      final ArrayList<TreeViewerItem> allTourItems = new ArrayList<>();
+
+      try (Connection conn = TourDatabase.getInstance().getConnection()) {
+
+         final SQLFilter sqlFilter = new SQLFilter();
+
+         final String sql = UI.EMPTY_STRING
+
+               + "SELECT" + NL //                                                               //$NON-NLS-1$
+
+               + TVIEquipmentView_Tour.SQL_TOUR_COLUMNS
+
+               + "FROM equipment AS equipment" + NL //                                          //$NON-NLS-1$
+
+               + "JOIN tourdata_equipment AS j_td_eq" + NL //                                   //$NON-NLS-1$
+               + "  ON j_td_eq.equipment_equipmentid = equipment.EQUIPMENTID" + NL //           //$NON-NLS-1$
+
+               + "JOIN tourdata AS TourData" + NL //                                            //$NON-NLS-1$
+               + "  ON TourData.tourid = j_td_eq.tourdata_tourid" + NL //                       //$NON-NLS-1$
+               + "  AND TourData.tourstarttime >= equipment.\"DATE\"" + NL //                   //$NON-NLS-1$
+               + "  AND TourData.tourstarttime <  equipment.dateuntil" + NL //                  //$NON-NLS-1$
+
+               + "WHERE equipment.isCollate = TRUE" + NL //                                     //$NON-NLS-1$
+               + "   AND equipment.equipmentID = ?" + NL //                                     //$NON-NLS-1$
+
+               + sqlFilter.getWhereClause() + NL
+
+               + "ORDER BY TourData.TOURSTARTTIME" + NL //                                      //$NON-NLS-1$
+         ;
+
+         final PreparedStatement statement = conn.prepareStatement(sql);
+
+         statement.setLong(1, _equipmentID);
+         sqlFilter.setParameters(statement, 2);
+
+         final ResultSet result = statement.executeQuery();
+
+         while (result.next()) {
+
+            final TVIEquipmentView_Tour tourItem = new TVIEquipmentView_Tour(this, this, getEquipmentViewer());
+
+            allTourItems.add(tourItem);
+
+            tourItem.readColumnValues_Tour(result);
+
+            if (UI.IS_SCRAMBLE_DATA) {
+               tourItem.firstColumn = UI.scrambleText(tourItem.firstColumn);
+            }
+         }
+
+      } catch (final SQLException e) {
+
+         net.tourbook.ui.UI.showSQLException(e);
+      }
+
+      setChildren(allTourItems);
+   }
+
+   /**
+    * Get all years for this part
+    *
+    * @param isMonth
+    */
+   private void loadChildren_Years(final boolean isMonth) {
+
+      final ArrayList<TreeViewerItem> allTourItems = new ArrayList<>();
+
+      try (Connection conn = TourDatabase.getInstance().getConnection()) {
+
+         final SQLFilter sqlFilter = new SQLFilter();
+
+         final String sql = UI.EMPTY_STRING
+
+               + "SELECT" + NL //                                                               //$NON-NLS-1$
+               + "   TourData.STARTYEAR," + NL //                                               //$NON-NLS-1$
+               + "   COUNT(*) AS num_Tours," + NL //                                            //$NON-NLS-1$
+
+               + TVIEquipmentView_Tour.SQL_SUM_COLUMNS_SUMMARIZED
+
+               + "FROM equipment AS equipment" + NL //                                          //$NON-NLS-1$
+
+               + "JOIN tourdata_equipment AS j_td_eq" + NL //                                   //$NON-NLS-1$
+               + "   ON j_td_eq.equipment_equipmentid = equipment.EQUIPMENTID" + NL //          //$NON-NLS-1$
+
+               + "JOIN tourdata AS TourData" + NL //                                            //$NON-NLS-1$
+               + "   ON TourData.tourid = j_td_eq.tourdata_tourid" + NL //                      //$NON-NLS-1$
+               + "   AND TourData.tourstarttime >= equipment.\"DATE\"" + NL //                  //$NON-NLS-1$
+               + "   AND TourData.tourstarttime <  equipment.dateuntil" + NL //                 //$NON-NLS-1$
+
+               + sqlFilter.getWhereClause() + NL
+
+               + "WHERE equipment.iscollate = TRUE" + NL //                                     //$NON-NLS-1$
+               + "   AND equipment.equipmentID = ?" + NL //                                     //$NON-NLS-1$
+
+               + "GROUP BY TourData.STARTYEAR" + NL //                                          //$NON-NLS-1$
+         ;
+
+         final PreparedStatement statement = conn.prepareStatement(sql);
+
+         final int nextIndex = sqlFilter.setParameters(statement, 1);
+         statement.setLong(nextIndex, _equipmentID);
+
+         final ResultSet result = statement.executeQuery();
+
+         while (result.next()) {
+
+            final int year = result.getInt(1);
+            final long numTours = result.getLong(2);
+
+            final TVIEquipmentView_Equipment_Year yearItem = new TVIEquipmentView_Equipment_Year(
+
+                  this,
+                  year,
+                  _isMonthCategory,
+                  getEquipmentViewer());
+
+            allTourItems.add(yearItem);
+
+            yearItem.numTours = numTours;
+
+            yearItem.firstColumn = Integer.toString(year);
+
+            yearItem.readCommonValues(result, 3);
+
+            if (UI.IS_SCRAMBLE_DATA) {
+               yearItem.firstColumn = UI.scrambleText(yearItem.firstColumn);
+            }
+         }
+
+      } catch (final SQLException e) {
+
+         net.tourbook.ui.UI.showSQLException(e);
+      }
+
+      setChildren(allTourItems);
    }
 
    @Override

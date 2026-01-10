@@ -36,7 +36,6 @@ public class TVIEquipmentView_Root extends TVIEquipmentView_Item {
    public TVIEquipmentView_Root(final TreeViewer equipmentViewer) {
 
       super(equipmentViewer);
-
    }
 
    @Override

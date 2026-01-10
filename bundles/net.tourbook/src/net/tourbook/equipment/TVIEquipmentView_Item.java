@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2026 Wolfgang Schramm and Contributors
+ * Copyright (C) 2025, 2026 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -111,6 +111,7 @@ public abstract class TVIEquipmentView_Item extends TreeViewerItem {
    String             firstColumn;
 
    long               numTours;
+   long               numTours_NotCollated;
 
    float              colDistance;
 
@@ -174,6 +175,12 @@ public abstract class TVIEquipmentView_Item extends TreeViewerItem {
 
    void loadSummarizedValues_Equipment(final Map<Long, TVIEquipmentView_Equipment> allEquipmentItems) {
 
+      loadSummarizedValues_Equipment_WithCollate(allEquipmentItems);
+      loadSummarizedValues_Equipment_IgnoreCollate(allEquipmentItems);
+   }
+
+   void loadSummarizedValues_Equipment_IgnoreCollate(final Map<Long, TVIEquipmentView_Equipment> allEquipmentItems) {
+
       String sql = null;
       PreparedStatement statement = null;
 
@@ -186,9 +193,7 @@ public abstract class TVIEquipmentView_Item extends TreeViewerItem {
                + "SELECT" + NL //                                                            //$NON-NLS-1$
 
                + "   j_TD_EQ.EQUIPMENT_EQUIPMENTID," + NL //                              1  //$NON-NLS-1$
-               + "   COUNT(*) AS numTours," + NL //                                       2  //$NON-NLS-1$
-
-               + SQL_SUM_COLUMNS_SUMMARIZED //                                            3
+               + "   COUNT(*) AS numTours" + NL //                                        2  //$NON-NLS-1$
 
                + "FROM EQUIPMENT" + NL //                                                    //$NON-NLS-1$
 
@@ -203,6 +208,67 @@ public abstract class TVIEquipmentView_Item extends TreeViewerItem {
 
                + "GROUP BY " + NL //                                                         //$NON-NLS-1$
                + "   j_TD_EQ.EQUIPMENT_EQUIPMENTID" + NL //                                  //$NON-NLS-1$
+         ;
+
+         statement = conn.prepareStatement(sql);
+
+         sqlFilter.setParameters(statement, 1);
+
+         final ResultSet result = statement.executeQuery();
+
+         while (result.next()) {
+
+            final long equipmentID = result.getLong(1);
+            final int numTours = result.getInt(2);
+
+            final TVIEquipmentView_Equipment equipmentItem = allEquipmentItems.get(equipmentID);
+
+            if (equipmentItem != null) {
+
+               equipmentItem.numTours_NotCollated = numTours;
+            }
+         }
+
+      } catch (final SQLException e) {
+         SQL.showException(e, sql);
+      } finally {
+         Util.closeSql(statement);
+      }
+   }
+
+   void loadSummarizedValues_Equipment_WithCollate(final Map<Long, TVIEquipmentView_Equipment> allEquipmentItems) {
+
+      String sql = null;
+      PreparedStatement statement = null;
+
+      try (Connection conn = TourDatabase.getInstance().getConnection()) {
+
+         final SQLFilter sqlFilter = new SQLFilter();
+
+         sql = UI.EMPTY_STRING
+
+               + "SELECT" + NL //                                                            //$NON-NLS-1$
+               + "   equipment.EQUIPMENTID," + NL //                                      1  //$NON-NLS-1$
+               + "   COUNT(*) AS num_Tours," + NL //                                      2  //$NON-NLS-1$
+
+               + SQL_SUM_COLUMNS_SUMMARIZED //                                            3
+
+               + "FROM equipment AS equipment" + NL //                                       //$NON-NLS-1$
+
+               + "JOIN tourdata_equipment AS j_td_eq" + NL //                                //$NON-NLS-1$
+               + "  ON j_td_eq.equipment_equipmentid = equipment.EQUIPMENTID" + NL //        //$NON-NLS-1$
+
+               // the alias "TourData" is needed that the app filter is working
+               + "JOIN tourdata AS TourData" + NL //                                         //$NON-NLS-1$
+               + "  ON TourData.tourid = j_td_eq.tourdata_tourid" + NL //                    //$NON-NLS-1$
+               + "  AND TourData.tourstarttime >= equipment.\"DATE\"" + NL //                //$NON-NLS-1$
+               + "  AND TourData.tourstarttime <  equipment.dateuntil" + NL //               //$NON-NLS-1$
+
+               + sqlFilter.getWhereClause() + NL
+
+               + "WHERE equipment.iscollate = true" + NL //                                  //$NON-NLS-1$
+
+               + "GROUP BY equipment.EQUIPMENTID" + NL //                                    //$NON-NLS-1$
          ;
 
          statement = conn.prepareStatement(sql);

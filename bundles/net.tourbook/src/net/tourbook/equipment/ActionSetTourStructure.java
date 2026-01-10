@@ -78,11 +78,19 @@ public class ActionSetTourStructure extends Action implements IMenuCreator {
                   if (element instanceof final TVIEquipmentView_Equipment equipmentItem) {
 
                      final Equipment equipment = equipmentItem.getEquipment();
-                     final Set<EquipmentPart> allParts = equipment.getParts();
 
-                     for (final EquipmentPart part : allParts) {
+                     if (equipment.isCollate()) {
 
-                        saveExpandTypeInPart(part);
+                        saveExpandTypeInEquipment(equipment);
+
+                     } else {
+
+                        final Set<EquipmentPart> allParts = equipment.getParts();
+
+                        for (final EquipmentPart part : allParts) {
+
+                           saveExpandTypeInPart(part);
+                        }
                      }
 
                   } else if (element instanceof final TVIEquipmentView_Part partItem) {
@@ -106,6 +114,40 @@ public class ActionSetTourStructure extends Action implements IMenuCreator {
                if (_isModified) {
                   EquipmentManager.clearAllEquipmentResourcesAndFireModifyEvent();
                }
+            }
+
+            private void saveExpandTypeInEquipment(final Equipment equipment) {
+
+               // check if expand type has changed
+               if (equipment.getExpandType() == __expandType) {
+                  return;
+               }
+
+               final EntityManager em = TourDatabase.getInstance().getEntityManager();
+
+               try {
+
+                  final long equipmentId = equipment.getEquipmentId();
+
+                  final Equipment equipmentInDb = em.find(Equipment.class, equipmentId);
+
+                  if (equipmentInDb != null) {
+
+                     equipmentInDb.setExpandType(__expandType);
+
+                     TourDatabase.saveEntity(equipmentInDb, equipmentId, Equipment.class);
+                  }
+
+               } catch (final Exception e) {
+
+                  StatusUtil.log(e);
+
+               } finally {
+
+                  em.close();
+               }
+
+               _isModified = true;
             }
 
             private void saveExpandTypeInPart(final EquipmentPart part) {
@@ -234,7 +276,15 @@ public class ActionSetTourStructure extends Action implements IMenuCreator {
 
          final Object selectedItem = selection.getFirstElement();
 
-         if (selectedItem instanceof final TVIEquipmentView_Part partItem) {
+         if (selectedItem instanceof final TVIEquipmentView_Equipment equipmentItem) {
+
+            final Equipment equipment = equipmentItem.getEquipment();
+
+            if (equipment.isCollate()) {
+               return equipment.getExpandType();
+            }
+
+         } else if (selectedItem instanceof final TVIEquipmentView_Part partItem) {
 
             return partItem.getPart().getExpandType();
 

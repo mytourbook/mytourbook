@@ -1041,6 +1041,12 @@ public class EquipmentView extends ViewPart implements ITourProvider, ITourViewe
                   styledString.append(UI.SPACE3 + numTours, net.tourbook.ui.UI.TOTAL_STYLER);
                }
 
+               final long numTours_NotCallated = viewItem.numTours_NotCollated;
+               if (numTours_NotCallated > 0) {
+
+                  styledString.append(UI.SPACE3 + numTours_NotCallated, net.tourbook.ui.UI.TOTAL_STYLER);
+               }
+
                cell.setImage(_imgEquipment_All);
 
             } else if (viewItem instanceof final TVIEquipmentView_Part partItem) {
@@ -1501,10 +1507,24 @@ public class EquipmentView extends ViewPart implements ITourProvider, ITourViewe
 
             final Object element = cell.getElement();
 
-            if (element instanceof final TVIEquipmentView_Part partItem) {
+            int expandType;
+            String label = null;
 
-               final int expandType = partItem.getExpandType();
-               final String label = EquipmentManager.EXPAND_TYPE_LABEL[expandType];
+            if (element instanceof final TVIEquipmentView_Equipment equipmentItem) {
+
+               if (equipmentItem.getEquipment().isCollate()) {
+
+                  expandType = equipmentItem.getExpandType();
+                  label = EquipmentManager.EXPAND_TYPE_LABEL[expandType];
+               }
+
+            } else if (element instanceof final TVIEquipmentView_Part partItem) {
+
+               expandType = partItem.getExpandType();
+               label = EquipmentManager.EXPAND_TYPE_LABEL[expandType];
+            }
+
+            if (label != null) {
 
                cell.setText(label);
                setCellColor(cell, element);
