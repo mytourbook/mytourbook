@@ -120,7 +120,7 @@ public class Equipment implements Cloneable, Comparable<Object>, Serializable {
    /**
     * When the equipment was firstly used, in milliseconds since 1970-01-01T00:00:00Z
     */
-   private long                       date;
+   private long                       dateFrom;
 
    /**
     * When the equipment was created/build, in milliseconds since 1970-01-01T00:00:00Z
@@ -134,6 +134,8 @@ public class Equipment implements Cloneable, Comparable<Object>, Serializable {
 
    /**
     * When the part usage was finished, in milliseconds since 1970-01-01T00:00:00Z.
+    * <p>
+    * This value is computed from the previous equipment.
     */
    private long                       dateUntil;
 
@@ -161,7 +163,7 @@ public class Equipment implements Cloneable, Comparable<Object>, Serializable {
    private long                       _createId        = 0;
 
    @Transient
-   private LocalDateTime              _date;
+   private LocalDateTime              _dateFrom;
 
    @Transient
    private LocalDateTime              _dateBuilt;
@@ -269,18 +271,18 @@ public class Equipment implements Cloneable, Comparable<Object>, Serializable {
       return brand;
    }
 
-   public long getDate() {
+   public long getDateFrom() {
 
-      return date;
+      return dateFrom;
    }
 
-   public LocalDateTime getDate_Local() {
+   public LocalDateTime getDateFrom_Local() {
 
-      if (_date == null) {
-         _date = TimeTools.toLocalDateTime(date);
+      if (_dateFrom == null) {
+         _dateFrom = TimeTools.toLocalDateTime(dateFrom);
       }
 
-      return _date;
+      return _dateFrom;
    }
 
    public long getDateBuilt() {
@@ -339,7 +341,7 @@ public class Equipment implements Cloneable, Comparable<Object>, Serializable {
 
    public long getDuration() {
 
-      final long duration = dateUntil - date;
+      final long duration = dateUntil - dateFrom;
 
       return duration;
    }
@@ -454,7 +456,7 @@ public class Equipment implements Cloneable, Comparable<Object>, Serializable {
    public boolean isCollatedFieldsModified(final Equipment otherEquipment) {
 
       if (isCollate != otherEquipment.isCollate()
-            || date != otherEquipment.getDate()
+            || dateFrom != otherEquipment.getDateFrom()
             || type.equalsIgnoreCase(otherEquipment.getType()) == false) {
 
          // collated fields are modified
@@ -513,11 +515,11 @@ public class Equipment implements Cloneable, Comparable<Object>, Serializable {
       _equipmentName = null;
    }
 
-   public void setDate(final long date) {
+   public void setDateFrom(final long dateFrom) {
 
-      this.date = date;
+      this.dateFrom = dateFrom;
 
-      _date = null;
+      _dateFrom = null;
    }
 
    public void setDateBuilt(final long dateBuilt) {
@@ -607,7 +609,7 @@ public class Equipment implements Cloneable, Comparable<Object>, Serializable {
             + "  model            = " + model + NL //                      //$NON-NLS-1$
 
             + "  type             = " + type + NL //                       //$NON-NLS-1$
-            + "  date             = " + getDate_Local() + NL //            //$NON-NLS-1$
+            + "  dateFrom         = " + getDateFrom_Local() + NL //        //$NON-NLS-1$
             + "  dateUntil        = " + getDateUntil_Local() + NL //       //$NON-NLS-1$
 
 //            + " description      = " + description + NL //                  //$NON-NLS-1$
@@ -615,7 +617,6 @@ public class Equipment implements Cloneable, Comparable<Object>, Serializable {
 //            + " distanceFirstUse = " + distanceFirstUse + NL //             //$NON-NLS-1$
 //
 //            + " dateBuilt        = " + dateBuilt + NL //                    //$NON-NLS-1$
-//            + " dateFirstUse     = " + dateFirstUse + NL //                 //$NON-NLS-1$
 //            + " dateRetired      = " + dateRetired + NL //                  //$NON-NLS-1$
 //
 //            + " weight           = " + weight + NL //                       //$NON-NLS-1$
@@ -657,7 +658,7 @@ public class Equipment implements Cloneable, Comparable<Object>, Serializable {
       setSize              (otherEquipment.getSize());
       setWeight            (otherEquipment.getWeight());
 
-      setDate              (otherEquipment.getDate());
+      setDateFrom          (otherEquipment.getDateFrom());
       setDateBuilt         (otherEquipment.getDateBuilt());
       setDateRetired       (otherEquipment.getDateRetired());
       setDateUntil         (otherEquipment.getDateUntil());

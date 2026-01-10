@@ -107,7 +107,7 @@ public class DialogEquipmentPart extends TitleAreaDialog {
    private Combo                     _comboSize;
    private Combo                     _comboType;
 
-   private DateTime                  _date;
+   private DateTime                  _dateFrom;
    private DateTime                  _dateBuilt;
    private DateTime                  _dateRetired;
 
@@ -124,7 +124,7 @@ public class DialogEquipmentPart extends TitleAreaDialog {
    private AutoComplete_ComboInputMT _autocomplete_Size;
    private AutoComplete_ComboInputMT _autocomplete_Type;
 
-   private ControlDecoration         _comboDecorator_Date;
+   private ControlDecoration         _comboDecorator_DateFrom;
    private ControlDecoration         _comboDecorator_Type;
 
    public DialogEquipmentPart(final Shell parentShell,
@@ -153,7 +153,7 @@ public class DialogEquipmentPart extends TitleAreaDialog {
 
             final long today = TimeTools.nowInMilliseconds();
 
-            _part.setDate(today);
+            _part.setDateFrom(today);
             _part.setDateBuilt(today);
          }
       }
@@ -368,22 +368,22 @@ public class DialogEquipmentPart extends TitleAreaDialog {
             final Label label = UI.createLabel(_container, "D&ate");
             gdVertCenter.applyTo(label);
 
-            _date = new DateTime(_container, SWT.DATE | SWT.MEDIUM | SWT.DROP_DOWN);
-            _date.addSelectionListener(_defaultSelectionListener);
+            _dateFrom = new DateTime(_container, SWT.DATE | SWT.MEDIUM | SWT.DROP_DOWN);
+            _dateFrom.addSelectionListener(_defaultSelectionListener);
 
             /*
              * Add a decoration for this important field
              */
-            _comboDecorator_Date = new ControlDecoration(_date, SWT.CENTER | SWT.LEFT);
+            _comboDecorator_DateFrom = new ControlDecoration(_dateFrom, SWT.CENTER | SWT.LEFT);
             final Image decorationImage = FieldDecorationRegistry.getDefault()
                   .getFieldDecoration(FieldDecorationRegistry.DEC_INFORMATION)
                   .getImage();
 
             // a restart is required for the theme change to take full effect
-            _comboDecorator_Date.setDescriptionText(
+            _comboDecorator_DateFrom.setDescriptionText(
                   "With the type and date fields, tours are collated to display\ne.g. all kilometers for one part or one service");
-            _comboDecorator_Date.setImage(decorationImage);
-            _comboDecorator_Date.setMarginWidth(3);
+            _comboDecorator_DateFrom.setImage(decorationImage);
+            _comboDecorator_DateFrom.setMarginWidth(3);
          }
          UI.createSpacer_Horizontal(_container, 1);
          {
@@ -517,7 +517,7 @@ public class DialogEquipmentPart extends TitleAreaDialog {
             _spinWeight,
             _spinDistance,
 
-            _date,
+            _dateFrom,
             _dateBuilt,
             _chkSyncDates,
             _dateRetired,
@@ -654,7 +654,7 @@ public class DialogEquipmentPart extends TitleAreaDialog {
 
       if (isSyncDates) {
 
-         _dateBuilt.setDate(_date.getYear(), _date.getMonth(), _date.getDay());
+         _dateBuilt.setDate(_dateFrom.getYear(), _dateFrom.getMonth(), _dateFrom.getDay());
       }
 
       _isModified = true;
@@ -703,7 +703,7 @@ public class DialogEquipmentPart extends TitleAreaDialog {
 
 // SET_FORMATTING_OFF
 
-      final LocalDate date          = LocalDate.of(_date.getYear(),        _date.getMonth() + 1,         _date.getDay());
+      final LocalDate dateFrom      = LocalDate.of(_dateFrom.getYear(),    _dateFrom.getMonth() + 1,     _dateFrom.getDay());
       final LocalDate dateBuilt     = LocalDate.of(_dateBuilt.getYear(),   _dateBuilt.getMonth() + 1,    _dateBuilt.getDay());
       final LocalDate dateRetired   = LocalDate.of(_dateRetired.getYear(), _dateRetired.getMonth() + 1,  _dateRetired.getDay());
 
@@ -722,9 +722,9 @@ public class DialogEquipmentPart extends TitleAreaDialog {
       _part.setSize(             _comboSize.getText().trim());
       _part.setWeight(           _spinWeight.getSelection() / 1000f);
 
-      _part.setDate(              TimeTools.toEpochMilli(date));
-      _part.setDateBuilt(         TimeTools.toEpochMilli(dateBuilt));
-      _part.setDateRetired(       TimeTools.toEpochMilli(dateRetired));
+      _part.setDateFrom(         TimeTools.toEpochMilli(dateFrom));
+      _part.setDateBuilt(        TimeTools.toEpochMilli(dateBuilt));
+      _part.setDateRetired(      TimeTools.toEpochMilli(dateRetired));
 
 // SET_FORMATTING_ON
    }
@@ -738,16 +738,16 @@ public class DialogEquipmentPart extends TitleAreaDialog {
       /*
        * Set date default values
        */
-      LocalDateTime date            = _part.getDate_Local();
+      LocalDateTime dateFrom        = _part.getDateFrom_Local();
       LocalDateTime dateBuilt       = _part.getDateBuilt_Local();
       LocalDateTime dateRetired     = _part.getDateRetired_Local();
 
-      final long dateMS           = TimeTools.toEpochMilli(date);
-      final long dateBuiltMS      = TimeTools.toEpochMilli(dateBuilt);
-      final long dateRetiredMS    = TimeTools.toEpochMilli(dateRetired);
+      final long dateMS             = TimeTools.toEpochMilli(dateFrom);
+      final long dateBuiltMS        = TimeTools.toEpochMilli(dateBuilt);
+      final long dateRetiredMS      = TimeTools.toEpochMilli(dateRetired);
 
       if (dateMS == 0) {
-         date = LocalDateTime.now();
+         dateFrom = LocalDateTime.now();
       }
 
       if (dateBuiltMS == 0) {
@@ -765,7 +765,7 @@ public class DialogEquipmentPart extends TitleAreaDialog {
       _comboSize        .setText(_part.getSize());
       _comboType        .setText(_part.getType());
 
-      _date             .setDate(date.getYear(),         date.getMonthValue() - 1,        date.getDayOfMonth());
+      _dateFrom             .setDate(dateFrom.getYear(),         dateFrom.getMonthValue() - 1,        dateFrom.getDayOfMonth());
       _dateBuilt        .setDate(dateBuilt.getYear(),    dateBuilt.getMonthValue() - 1,   dateBuilt.getDayOfMonth());
       _dateRetired      .setDate(dateRetired.getYear(),  dateRetired.getMonthValue() - 1, dateRetired.getDayOfMonth());
 

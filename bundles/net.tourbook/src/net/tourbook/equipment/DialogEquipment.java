@@ -107,7 +107,7 @@ public class DialogEquipment extends TitleAreaDialog {
    private Combo                     _comboSize;
    private Combo                     _comboType;
 
-   private DateTime                  _date;
+   private DateTime                  _dateFrom;
    private DateTime                  _dateBuilt;
    private DateTime                  _dateRetired;
 
@@ -152,7 +152,7 @@ public class DialogEquipment extends TitleAreaDialog {
 
             final long today = TimeTools.nowInMilliseconds();
 
-            _equipment.setDate(today);
+            _equipment.setDateFrom(today);
             _equipment.setDateBuilt(today);
 
             _equipment.resetParts();
@@ -364,8 +364,8 @@ public class DialogEquipment extends TitleAreaDialog {
              */
             UI.createLabel(_container, "D&ate");
 
-            _date = new DateTime(_container, SWT.DATE | SWT.MEDIUM | SWT.DROP_DOWN);
-            _date.addSelectionListener(_defaultSelectionListener);
+            _dateFrom = new DateTime(_container, SWT.DATE | SWT.MEDIUM | SWT.DROP_DOWN);
+            _dateFrom.addSelectionListener(_defaultSelectionListener);
 
             /*
              * Add a decoration for this important field
@@ -374,7 +374,7 @@ public class DialogEquipment extends TitleAreaDialog {
                   .getFieldDecoration(FieldDecorationRegistry.DEC_INFORMATION)
                   .getImage();
 
-            _comboDecorator_Date = new ControlDecoration(_date, SWT.CENTER | SWT.LEFT);
+            _comboDecorator_Date = new ControlDecoration(_dateFrom, SWT.CENTER | SWT.LEFT);
 
             // a restart is required for the theme change to take full effect
             _comboDecorator_Date.setDescriptionText(
@@ -516,7 +516,7 @@ public class DialogEquipment extends TitleAreaDialog {
             _spinWeight,
             _spinDistance,
 
-            _date,
+            _dateFrom,
             _dateBuilt,
             _chkSyncDates,
             _dateRetired,
@@ -664,7 +664,7 @@ public class DialogEquipment extends TitleAreaDialog {
 
       if (isSyncDates) {
 
-         _dateBuilt.setDate(_date.getYear(), _date.getMonth(), _date.getDay());
+         _dateBuilt.setDate(_dateFrom.getYear(), _dateFrom.getMonth(), _dateFrom.getDay());
       }
 
       enableControls();
@@ -711,7 +711,7 @@ public class DialogEquipment extends TitleAreaDialog {
 
 // SET_FORMATTING_OFF
 
-      final LocalDate date          = LocalDate.of(_date.getYear(),           _date.getMonth() + 1,         _date.getDay());
+      final LocalDate date          = LocalDate.of(_dateFrom.getYear(),           _dateFrom.getMonth() + 1,         _dateFrom.getDay());
       final LocalDate dateBuilt     = LocalDate.of(_dateBuilt.getYear(),      _dateBuilt.getMonth() + 1,    _dateBuilt.getDay());
       final LocalDate dateRetired   = LocalDate.of(_dateRetired.getYear(),    _dateRetired.getMonth() + 1,  _dateRetired.getDay());
 
@@ -728,7 +728,7 @@ public class DialogEquipment extends TitleAreaDialog {
       _equipment.setSize(              _comboSize.getText().trim());
       _equipment.setWeight(            _spinWeight.getSelection() / 1000f);
 
-      _equipment.setDate(              TimeTools.toEpochMilli(date));
+      _equipment.setDateFrom(          TimeTools.toEpochMilli(date));
       _equipment.setDateBuilt(         TimeTools.toEpochMilli(dateBuilt));
       _equipment.setDateRetired(       TimeTools.toEpochMilli(dateRetired));
 
@@ -741,16 +741,16 @@ public class DialogEquipment extends TitleAreaDialog {
 
 // SET_FORMATTING_OFF
 
-      LocalDateTime date            = _equipment.getDate_Local();
+      LocalDateTime dateFrom        = _equipment.getDateFrom_Local();
       LocalDateTime dateBuilt       = _equipment.getDateBuilt_Local();
       LocalDateTime dateRetired     = _equipment.getDateRetired_Local();
 
-      final long dateMS           = TimeTools.toEpochMilli(date);
-      final long dateBuiltMS      = TimeTools.toEpochMilli(dateBuilt);
-      final long dateRetiredMS    = TimeTools.toEpochMilli(dateRetired);
+      final long dateFromMS         = TimeTools.toEpochMilli(dateFrom);
+      final long dateBuiltMS        = TimeTools.toEpochMilli(dateBuilt);
+      final long dateRetiredMS      = TimeTools.toEpochMilli(dateRetired);
 
-      if (dateMS == 0) {
-         date = LocalDateTime.now();
+      if (dateFromMS == 0) {
+         dateFrom = LocalDateTime.now();
       }
 
       if (dateBuiltMS == 0) {
@@ -768,7 +768,7 @@ public class DialogEquipment extends TitleAreaDialog {
       _comboSize        .setText(_equipment.getSize());
       _comboType        .setText(_equipment.getType());
 
-      _date             .setDate(date.getYear(),         date.getMonthValue() - 1,        date.getDayOfMonth());
+      _dateFrom         .setDate(dateFrom.getYear(),     dateFrom.getMonthValue() - 1,    dateFrom.getDayOfMonth());
       _dateBuilt        .setDate(dateBuilt.getYear(),    dateBuilt.getMonthValue() - 1,   dateBuilt.getDayOfMonth());
       _dateRetired      .setDate(dateRetired.getYear(),  dateRetired.getMonthValue() - 1, dateRetired.getDayOfMonth());
 

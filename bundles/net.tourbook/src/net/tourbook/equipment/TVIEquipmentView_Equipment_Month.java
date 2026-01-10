@@ -179,7 +179,7 @@ public class TVIEquipmentView_Equipment_Month extends TVIEquipmentView_Item {
 
                + "JOIN tourdata AS TourData" + NL //                                               //$NON-NLS-1$
                + "   ON TourData.tourID = j_td_eq.tourdata_tourID" + NL //                         //$NON-NLS-1$
-               + "   AND TourData.tourstarttime >= part.\"DATE\"" + NL //                          //$NON-NLS-1$
+               + "   AND TourData.tourstarttime >= part.dateFrom" + NL //                          //$NON-NLS-1$
                + "   AND TourData.tourstarttime <  part.dateUntil" + NL //                         //$NON-NLS-1$
                + "   AND TourData.StartYear = ?" + NL //                                           //$NON-NLS-1$
                + "   AND TourData.StartMonth = ?" + NL //                                          //$NON-NLS-1$

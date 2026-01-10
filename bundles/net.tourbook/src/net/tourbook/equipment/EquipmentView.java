@@ -466,8 +466,8 @@ public class EquipmentView extends ViewPart implements ITourProvider, ITourViewe
                // 2nd compare by date
                if (compareDiff == 0) {
 
-                  final long date1 = equipment1.getDate();
-                  final long date2 = equipment2.getDate();
+                  final long date1 = equipment1.getDateFrom();
+                  final long date2 = equipment2.getDateFrom();
 
                   final long dateDiff = date1 - date2;
 
@@ -514,8 +514,8 @@ public class EquipmentView extends ViewPart implements ITourProvider, ITourViewe
             // 2nd compare by date
             if (compareDiff == 0) {
 
-               final long date1 = part1.getDate();
-               final long date2 = part2.getDate();
+               final long date1 = part1.getDateFrom();
+               final long date2 = part2.getDateFrom();
 
                final long dateDiff = date1 - date2;
 
@@ -1311,11 +1311,11 @@ public class EquipmentView extends ViewPart implements ITourProvider, ITourViewe
 
             if (element instanceof final TVIEquipmentView_Equipment viewItem) {
 
-               date = viewItem.getEquipment().getDate_Local();
+               date = viewItem.getEquipment().getDateFrom_Local();
 
             } else if (element instanceof final TVIEquipmentView_Part viewItem) {
 
-               date = viewItem.getPart().getDate_Local();
+               date = viewItem.getPart().getDateFrom_Local();
             }
 
             if (date != null) {

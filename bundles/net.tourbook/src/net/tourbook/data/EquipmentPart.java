@@ -112,7 +112,7 @@ public class EquipmentPart implements Cloneable, Comparable<Object>, Serializabl
    /**
     * When the part was firstly used, in milliseconds since 1970-01-01T00:00:00Z
     */
-   private long                       date;
+   private long                       dateFrom;
 
    /**
     * When the part was created/build, in milliseconds since 1970-01-01T00:00:00Z
@@ -126,6 +126,8 @@ public class EquipmentPart implements Cloneable, Comparable<Object>, Serializabl
 
    /**
     * When the part usage was finished, in milliseconds since 1970-01-01T00:00:00Z.
+    * <p>
+    * This value is computed from the previous part.
     */
    private long                       dateUntil;
 
@@ -167,7 +169,7 @@ public class EquipmentPart implements Cloneable, Comparable<Object>, Serializabl
    private long                       _createId         = 0;
 
    @Transient
-   private LocalDateTime              _date;
+   private LocalDateTime              _dateFrom;
 
    @Transient
    private LocalDateTime              _dateBuilt;
@@ -283,21 +285,21 @@ public class EquipmentPart implements Cloneable, Comparable<Object>, Serializabl
       return company;
    }
 
-   public long getDate() {
+   public long getDateFrom() {
 
-      return date;
+      return dateFrom;
    }
 
    /**
     * @return Return the first use date
     */
-   public LocalDateTime getDate_Local() {
+   public LocalDateTime getDateFrom_Local() {
 
-      if (_date == null) {
-         _date = TimeTools.toLocalDateTime(date);
+      if (_dateFrom == null) {
+         _dateFrom = TimeTools.toLocalDateTime(dateFrom);
       }
 
-      return _date;
+      return _dateFrom;
    }
 
    public long getDateBuilt() {
@@ -356,7 +358,7 @@ public class EquipmentPart implements Cloneable, Comparable<Object>, Serializabl
 
    public long getDuration() {
 
-      final long duration = dateUntil - date;
+      final long duration = dateUntil - dateFrom;
 
       return duration;
    }
@@ -502,7 +504,7 @@ public class EquipmentPart implements Cloneable, Comparable<Object>, Serializabl
    public boolean isCollatedFieldsModified(final EquipmentPart otherPart) {
 
       if (isCollate != otherPart.isCollate()
-            || date != otherPart.getDate()
+            || dateFrom != otherPart.getDateFrom()
             || type.equalsIgnoreCase(otherPart.getType()) == false) {
 
          // collated fields are modified
@@ -583,11 +585,11 @@ public class EquipmentPart implements Cloneable, Comparable<Object>, Serializabl
       this.company = company;
    }
 
-   public void setDate(final long date) {
+   public void setDateFrom(final long dateFrom) {
 
-      this.date = date;
+      this.dateFrom = dateFrom;
 
-      _date = null;
+      _dateFrom = null;
    }
 
    public void setDateBuilt(final long dateBuilt) {
@@ -683,7 +685,7 @@ public class EquipmentPart implements Cloneable, Comparable<Object>, Serializabl
             + "  brand            = " + brand + NL //                         //$NON-NLS-1$
             + "  model            = " + model + NL //                         //$NON-NLS-1$
             + "  type				 = " + type + NL //                          //$NON-NLS-1$
-            + "  date             = " + getDate_Local() + NL //               //$NON-NLS-1$
+            + "  dateFrom         = " + getDateFrom_Local() + NL //               //$NON-NLS-1$
             + "  dateUntil        = " + getDateUntil_Local() + NL //          //$NON-NLS-1$
 
 //            + " description      =" + description + NL //                   //$NON-NLS-1$
@@ -719,7 +721,7 @@ public class EquipmentPart implements Cloneable, Comparable<Object>, Serializabl
       setSize              (otherPart.getSize());
       setWeight            (otherPart.getWeight());
 
-      setDate              (otherPart.getDate());
+      setDateFrom          (otherPart.getDateFrom());
       setDateBuilt         (otherPart.getDateBuilt());
       setDateRetired       (otherPart.getDateRetired());
 

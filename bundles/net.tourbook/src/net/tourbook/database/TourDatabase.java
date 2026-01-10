@@ -829,33 +829,6 @@ public class TourDatabase {
       }
 
       /**
-       * @param stmt
-       * @param tableName
-       * @param indexAndColumnName
-       *
-       * @throws SQLException
-       */
-      private static void createIndex(final Statement stmt,
-                                      final String tableName,
-                                      final String indexAndColumnName) throws SQLException {
-
-         if (isIndexAvailable(stmt.getConnection(), tableName, indexAndColumnName)) {
-
-            // index already exist -> nothing to do
-
-            return;
-         }
-
-         final String sql = UI.EMPTY_STRING
-
-               + "CREATE INDEX " + indexAndColumnName //    //$NON-NLS-1$
-               + " ON " + tableName //                      //$NON-NLS-1$
-               + " (" + indexAndColumnName + ")"; //        //$NON-NLS-1$ //$NON-NLS-2$
-
-         exec(stmt, sql);
-      }
-
-      /**
        * Create a composite index
        *
        * @param stmt
@@ -864,9 +837,9 @@ public class TourDatabase {
        *
        * @throws SQLException
        */
-      private static void createIndex(final Statement stmt,
-                                      final String tableName,
-                                      final String[] allColumnNames) throws SQLException {
+      private static void createIndex_Composite(final Statement stmt,
+                                                final String tableName,
+                                                final String... allColumnNames) throws SQLException {
 
          // an exception will be thrown when the index name is larger than the max which is 128 characters
          final String joinedNames = String.join("__", allColumnNames);
@@ -891,6 +864,33 @@ public class TourDatabase {
       }
 
       /**
+       * @param stmt
+       * @param tableName
+       * @param indexAndColumnName
+       *
+       * @throws SQLException
+       */
+      private static void createIndex_Simple(final Statement stmt,
+                                             final String tableName,
+                                             final String indexAndColumnName) throws SQLException {
+
+         if (isIndexAvailable(stmt.getConnection(), tableName, indexAndColumnName)) {
+
+            // index already exist -> nothing to do
+
+            return;
+         }
+
+         final String sql = UI.EMPTY_STRING
+
+               + "CREATE INDEX " + indexAndColumnName //    //$NON-NLS-1$
+               + " ON " + tableName //                      //$NON-NLS-1$
+               + " (" + indexAndColumnName + ")"; //        //$NON-NLS-1$ //$NON-NLS-2$
+
+         exec(stmt, sql);
+      }
+
+      /**
        * Combine tableName and columnName to the indexName, e.g. Table__Column
        *
        * @param stmt
@@ -899,9 +899,9 @@ public class TourDatabase {
        *
        * @throws SQLException
        */
-      private static void createIndex_Combined(final Statement stmt,
-                                               final String tableName,
-                                               final String columnName) throws SQLException {
+      private static void createIndex_Table__Column(final Statement stmt,
+                                                    final String tableName,
+                                                    final String columnName) throws SQLException {
 
          final String combinedIndexName = tableName + "__" + columnName; //$NON-NLS-1$
 
@@ -4501,7 +4501,7 @@ public class TourDatabase {
             + ")" //                                                                                  //$NON-NLS-1$
       );
 
-      SQL.createIndex(stmt, TABLE_DEVICE_SENSOR, "SerialNumber"); //$NON-NLS-1$
+      SQL.createIndex_Simple(stmt, TABLE_DEVICE_SENSOR, "SerialNumber"); //$NON-NLS-1$
    }
 
    /**
@@ -4539,7 +4539,7 @@ public class TourDatabase {
             + ")" //                                                                          //$NON-NLS-1$
       );
 
-      SQL.createIndex_Combined(stmt, TABLE_DEVICE_SENSOR_VALUE, "TourStartTime"); //$NON-NLS-1$
+      SQL.createIndex_Table__Column(stmt, TABLE_DEVICE_SENSOR_VALUE, "TourStartTime"); //$NON-NLS-1$
    }
 
    /**
@@ -4574,7 +4574,7 @@ public class TourDatabase {
                   + "   IsCollate               BOOLEAN DEFAULT FALSE,                    " + NL //$NON-NLS-1$
                   + "   ExpandType              INTEGER,                                  " + NL //$NON-NLS-1$
 
-                  + "   Date                    BIGINT DEFAULT 0,                         " + NL //$NON-NLS-1$
+                  + "   DateFrom                BIGINT DEFAULT 0,                         " + NL //$NON-NLS-1$
                   + "   DateBuilt               BIGINT DEFAULT 0,                         " + NL //$NON-NLS-1$
                   + "   DateRetired             BIGINT DEFAULT 0,                         " + NL //$NON-NLS-1$
                   + "   DateUntil               BIGINT DEFAULT 0                          " + NL //$NON-NLS-1$
@@ -4606,15 +4606,18 @@ public class TourDatabase {
       );
 
       // Create index "TOURDATA_Equipment"
-      SQL.createIndex(stmt,
-
+      SQL.createIndex_Composite(stmt,
+            
             JOINTABLE__TOURDATA__EQUIPMENT,
 
-            new String[] //
-            {
-                  KEY_EQUIPMENT,
-                  KEY_TOUR
-            });
+            KEY_EQUIPMENT,
+            KEY_TOUR);
+
+      // Create indices "Equipment__..."
+      SQL.createIndex_Table__Column(stmt, TABLE_EQUIPMENT, "IsCollate");
+      SQL.createIndex_Table__Column(stmt, TABLE_EQUIPMENT, "DateFrom");
+      SQL.createIndex_Table__Column(stmt, TABLE_EQUIPMENT, "DateUntil");
+      SQL.createIndex_Table__Column(stmt, TABLE_EQUIPMENT, "Type");
    }
 
    /**
@@ -4656,7 +4659,7 @@ public class TourDatabase {
                   + "   IsCollate               BOOLEAN DEFAULT TRUE,                     " + NL //$NON-NLS-1$
                   + "   ExpandType              INTEGER,                                  " + NL //$NON-NLS-1$
 
-                  + "   Date                    BIGINT DEFAULT 0,                         " + NL //$NON-NLS-1$
+                  + "   DateFrom                BIGINT DEFAULT 0,                         " + NL //$NON-NLS-1$
                   + "   DateBuilt               BIGINT DEFAULT 0,                         " + NL //$NON-NLS-1$
                   + "   DateRetired             BIGINT DEFAULT 0,                         " + NL //$NON-NLS-1$
                   + "   DateUntil               BIGINT DEFAULT 0                          " + NL //$NON-NLS-1$
@@ -4665,14 +4668,14 @@ public class TourDatabase {
       );
 
       // Create indices "EquipmentPart__..."
-      SQL.createIndex_Combined(stmt, TABLE_EQUIPMENT_PART, KEY_EQUIPMENT);
-      SQL.createIndex_Combined(stmt, TABLE_EQUIPMENT_PART, "PartID");
+      SQL.createIndex_Table__Column(stmt, TABLE_EQUIPMENT_PART, KEY_EQUIPMENT);
+      SQL.createIndex_Table__Column(stmt, TABLE_EQUIPMENT_PART, "PartID");
 
-      SQL.createIndex_Combined(stmt, TABLE_EQUIPMENT_PART, "IsCollate");
-      SQL.createIndex_Combined(stmt, TABLE_EQUIPMENT_PART, "ItemType");
-      SQL.createIndex_Combined(stmt, TABLE_EQUIPMENT_PART, "Date");
-      SQL.createIndex_Combined(stmt, TABLE_EQUIPMENT_PART, "DateUntil");
-      SQL.createIndex_Combined(stmt, TABLE_EQUIPMENT_PART, "Type");
+      SQL.createIndex_Table__Column(stmt, TABLE_EQUIPMENT_PART, "IsCollate");
+      SQL.createIndex_Table__Column(stmt, TABLE_EQUIPMENT_PART, "ItemType");
+      SQL.createIndex_Table__Column(stmt, TABLE_EQUIPMENT_PART, "DateFrom");
+      SQL.createIndex_Table__Column(stmt, TABLE_EQUIPMENT_PART, "DateUntil");
+      SQL.createIndex_Table__Column(stmt, TABLE_EQUIPMENT_PART, "Type");
    }
 
    /**
@@ -5190,10 +5193,10 @@ public class TourDatabase {
       createIndex_TourData_033(stmt);
       createIndex_TourData_037(stmt);
 
-      SQL.createIndex_Combined(stmt, TABLE_TOUR_DATA, "Battery_Percentage_Start"); //$NON-NLS-1$
+      SQL.createIndex_Table__Column(stmt, TABLE_TOUR_DATA, "Battery_Percentage_Start"); //$NON-NLS-1$
 
-      SQL.createIndex_Combined(stmt, TABLE_TOUR_DATA, "TourLocationStart_LocationID"); //$NON-NLS-1$
-      SQL.createIndex_Combined(stmt, TABLE_TOUR_DATA, "TourLocationEnd_LocationID"); //$NON-NLS-1$
+      SQL.createIndex_Table__Column(stmt, TABLE_TOUR_DATA, "TourLocationStart_LocationID"); //$NON-NLS-1$
+      SQL.createIndex_Table__Column(stmt, TABLE_TOUR_DATA, "TourLocationEnd_LocationID"); //$NON-NLS-1$
    }
 
    /**
@@ -5213,12 +5216,12 @@ public class TourDatabase {
             + "   TourId                     BIGINT   NOT NULL,                        " + NL //$NON-NLS-1$
             + "   GeoPart                    INTEGER  NOT NULL,                        " + NL //$NON-NLS-1$
 
-            + "   CONSTRAINT                 PK_TourId_GeoPart PRIMARY KEY (TourId, GeoPart)          " + NL //$NON-NLS-1$
+            + "   CONSTRAINT                 PK_TourId_GeoPart PRIMARY KEY (TourId, GeoPart)" + NL //$NON-NLS-1$
 
             + ")"); //$NON-NLS-1$
 
-      SQL.createIndex(stmt, TABLE_TOUR_GEO_PARTS, "TourId"); //$NON-NLS-1$
-      SQL.createIndex(stmt, TABLE_TOUR_GEO_PARTS, "GeoPart"); //$NON-NLS-1$
+      SQL.createIndex_Simple(stmt, TABLE_TOUR_GEO_PARTS, "TourId"); //$NON-NLS-1$
+      SQL.createIndex_Simple(stmt, TABLE_TOUR_GEO_PARTS, "GeoPart"); //$NON-NLS-1$
    }
 
    /**
@@ -5443,7 +5446,7 @@ public class TourDatabase {
 
                   + ")"); //$NON-NLS-1$
 
-      SQL.createIndex_Combined(stmt, TABLE_TOUR_MARKER, KEY_MARKER_TYPE);
+      SQL.createIndex_Table__Column(stmt, TABLE_TOUR_MARKER, KEY_MARKER_TYPE);
    }
 
    /**
@@ -5628,7 +5631,7 @@ public class TourDatabase {
       );
 
       // Create index for {@link TourPhoto}, it will dramatically improve performance.
-      SQL.createIndex(stmt, TABLE_TOUR_PHOTO, "ImageFilePathName"); //$NON-NLS-1$
+      SQL.createIndex_Simple(stmt, TABLE_TOUR_PHOTO, "ImageFilePathName"); //$NON-NLS-1$
    }
 
    /**
@@ -5729,7 +5732,7 @@ public class TourDatabase {
       );
 
       // Create index TOURTAG_TagID
-      SQL.createIndex(stmt, JOINTABLE__TOURDATA__TOURTAG, KEY_TAG);
+      SQL.createIndex_Simple(stmt, JOINTABLE__TOURDATA__TOURTAG, KEY_TAG);
    }
 
    /**
@@ -9995,7 +9998,7 @@ public class TourDatabase {
          SQL.addColumn_Int    (stmt, TABLE_TOUR_COMPARED, RENAMED__TOUR_RECORDING_TIME__FROM,         DEFAULT_0);
 
          // Create index in table: TOURDATA_TOURTAG - Index: TOURTAG_TAGID
-         SQL.createIndex   (stmt, JOINTABLE__TOURDATA__TOURTAG, KEY_TAG);
+         SQL.createIndex_Simple(stmt, JOINTABLE__TOURDATA__TOURTAG, KEY_TAG);
 
 // SET_FORMATTING_ON
       }
@@ -10539,7 +10542,7 @@ public class TourDatabase {
             SQL.addColumn_SmallInt(stmt, TABLE_TOUR_DATA, "Battery_Percentage_Start", DEFAULT_IGNORED); //$NON-NLS-1$
             SQL.addColumn_SmallInt(stmt, TABLE_TOUR_DATA, "Battery_Percentage_End", DEFAULT_IGNORED); //$NON-NLS-1$
 
-            SQL.createIndex_Combined(stmt, TABLE_TOUR_DATA, "Battery_Percentage_Start"); //$NON-NLS-1$
+            SQL.createIndex_Table__Column(stmt, TABLE_TOUR_DATA, "Battery_Percentage_Start"); //$NON-NLS-1$
          }
       }
       stmt.close();
@@ -11189,8 +11192,8 @@ public class TourDatabase {
          SQL.addColumn_BigInt          (stmt, TABLE_TOUR_DATA, "tourLocationStart_LocationID",  null);   //$NON-NLS-1$
          SQL.addColumn_BigInt          (stmt, TABLE_TOUR_DATA, "tourLocationEnd_LocationID",    null);   //$NON-NLS-1$
 
-         SQL.createIndex_Combined      (stmt, TABLE_TOUR_DATA, "tourLocationStart_LocationID");          //$NON-NLS-1$
-         SQL.createIndex_Combined      (stmt, TABLE_TOUR_DATA, "tourLocationEnd_LocationID");            //$NON-NLS-1$
+         SQL.createIndex_Table__Column (stmt, TABLE_TOUR_DATA, "tourLocationStart_LocationID");          //$NON-NLS-1$
+         SQL.createIndex_Table__Column (stmt, TABLE_TOUR_DATA, "tourLocationEnd_LocationID");            //$NON-NLS-1$
 
 // SET_FORMATTING_ON
 

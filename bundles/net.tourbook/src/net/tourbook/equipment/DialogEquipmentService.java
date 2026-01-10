@@ -103,7 +103,7 @@ public class DialogEquipmentService extends TitleAreaDialog {
    private Combo                     _comboPriceUnit;
    private Combo                     _comboType;
 
-   private DateTime                  _date;
+   private DateTime                  _dateFrom;
 
    private Spinner                   _spinPrice;
 
@@ -141,7 +141,7 @@ public class DialogEquipmentService extends TitleAreaDialog {
 
             // adjust date to today
 
-            _service.setDate(TimeTools.nowInMilliseconds());
+            _service.setDateFrom(TimeTools.nowInMilliseconds());
          }
       }
 
@@ -300,14 +300,14 @@ public class DialogEquipmentService extends TitleAreaDialog {
             final Label label = UI.createLabel(_container, "D&ate");
             gdVertCenter.applyTo(label);
 
-            _date = new DateTime(_container, SWT.DATE | SWT.MEDIUM | SWT.DROP_DOWN);
-            _date.setToolTipText("With the type and date fields, tours are collated to display e.g. all kilometers for one part or one service");
-            _date.addSelectionListener(_defaultSelectionListener);
+            _dateFrom = new DateTime(_container, SWT.DATE | SWT.MEDIUM | SWT.DROP_DOWN);
+            _dateFrom.setToolTipText("With the type and date fields, tours are collated to display e.g. all kilometers for one part or one service");
+            _dateFrom.addSelectionListener(_defaultSelectionListener);
 
             /*
              * Add a decoration for this important field
              */
-            _comboDecorator_Date = new ControlDecoration(_date, SWT.CENTER | SWT.LEFT);
+            _comboDecorator_Date = new ControlDecoration(_dateFrom, SWT.CENTER | SWT.LEFT);
             final Image decorationImage = FieldDecorationRegistry.getDefault()
                   .getFieldDecoration(FieldDecorationRegistry.DEC_INFORMATION)
                   .getImage();
@@ -530,7 +530,7 @@ public class DialogEquipmentService extends TitleAreaDialog {
 
 // SET_FORMATTING_OFF
 
-      final LocalDate date     = LocalDate.of(_date.getYear(), _date.getMonth() + 1, _date.getDay());
+      final LocalDate date     = LocalDate.of(_dateFrom.getYear(), _dateFrom.getMonth() + 1, _dateFrom.getDay());
 
       _service.setEquipment(        _serviceEquipment);
 
@@ -543,7 +543,7 @@ public class DialogEquipmentService extends TitleAreaDialog {
       _service.setPrice(            _spinPrice.getSelection() / 100f);
       _service.setPriceUnit(        _comboPriceUnit.getText());
 
-      _service.setDate(             TimeTools.toEpochMilli(date));
+      _service.setDateFrom(         TimeTools.toEpochMilli(date));
 
 // SET_FORMATTING_ON
    }
@@ -552,12 +552,12 @@ public class DialogEquipmentService extends TitleAreaDialog {
 
       _isInUIUpdate = true;
 
-      LocalDateTime date = _service.getDate_Local();
+      LocalDateTime dateFrom = _service.getDateFrom_Local();
 
-      final long dateMS = TimeTools.toEpochMilli(date);
+      final long dateMS = TimeTools.toEpochMilli(dateFrom);
 
       if (dateMS == 0) {
-         date = LocalDateTime.now();
+         dateFrom = LocalDateTime.now();
       }
 
 // SET_FORMATTING_OFF
@@ -566,7 +566,7 @@ public class DialogEquipmentService extends TitleAreaDialog {
       _comboName        .setText(_service.getName());
       _comboType        .setText(_service.getType());
 
-      _date             .setDate(date.getYear(), date.getMonthValue() - 1, date.getDayOfMonth());
+      _dateFrom         .setDate(dateFrom.getYear(), dateFrom.getMonthValue() - 1, dateFrom.getDayOfMonth());
 
       _chkCollate       .setSelection(_service.isCollate());
       _spinPrice        .setSelection((int) (_service.getPrice()  * 100));

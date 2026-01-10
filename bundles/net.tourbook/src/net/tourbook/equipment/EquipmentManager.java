@@ -1167,7 +1167,7 @@ public class EquipmentManager {
          final List<Equipment> allSortedEquipment = new ArrayList<>(allFilteredEquipment);
 
          Collections.sort(allSortedEquipment, (equipment1, equipment2) -> {
-            return Long.compare(equipment1.getDate(), equipment2.getDate());
+            return Long.compare(equipment1.getDateFrom(), equipment2.getDateFrom());
          });
 
          final List<Equipment> allModifiedEquipment = new ArrayList<>();
@@ -1214,7 +1214,7 @@ public class EquipmentManager {
 
                   final Equipment nextEquipment = allSortedEquipment.get(equipmentIndex + 1);
 
-                  final long nextDate = nextEquipment.getDate();
+                  final long nextDate = nextEquipment.getDateFrom();
 
                   // this is the until date for the current equipment
                   final long validDateUntil = nextDate - 1;
@@ -1299,7 +1299,7 @@ public class EquipmentManager {
       final List<EquipmentPart> allSortedParts = new ArrayList<>(allFilteredParts);
 
       Collections.sort(allSortedParts, (part1, part2) -> {
-         return Long.compare(part1.getDate(), part2.getDate());
+         return Long.compare(part1.getDateFrom(), part2.getDateFrom());
       });
 
       final List<EquipmentPart> allModifiedParts = new ArrayList<>();
@@ -1346,7 +1346,7 @@ public class EquipmentManager {
 
                final EquipmentPart nextPart = allSortedParts.get(partIndex + 1);
 
-               final long nextDate = nextPart.getDate();
+               final long nextDate = nextPart.getDateFrom();
 
                // this is the until date for the current part
                final long validDateUntil = nextDate - 1;
