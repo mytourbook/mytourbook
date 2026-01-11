@@ -18,6 +18,9 @@ package net.tourbook.equipment;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.ZonedDateTime;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
 
 import net.tourbook.common.UI;
 import net.tourbook.common.time.TimeTools;
@@ -35,9 +38,13 @@ public class TVIEquipmentView_Tour extends TVIEquipmentView_Item {
          + "TourData.TimeZoneId, "                                      //   3  //$NON-NLS-1$
 
          + "TourData.TourTitle, "                                       //   4  //$NON-NLS-1$
+
          + "TourData.TourType_TypeId, "                                 //   5  //$NON-NLS-1$
 
-         + SQL_SUM_COLUMNS_TOUR                                         //   6
+         + "jTdataTtag.TourTag_TagId, "                                 //   6  //$NON-NLS-1$
+         + "Tmarker.MarkerId, "                                         //   7  //$NON-NLS-1$
+
+         + SQL_SUM_COLUMNS_TOUR                                         //   8
    ;
 
    private TVIEquipmentView_Equipment _equipmentItem;
@@ -50,6 +57,12 @@ public class TVIEquipmentView_Tour extends TVIEquipmentView_Item {
 
    String                             tourTitle;
    long                               tourTypeId;
+
+   private Set<Long>                  _allMarkerIDs;
+   private Set<Long>                  _allTagIDs;
+
+   private List<Long>                 _allMarkerIDsList;
+   private List<Long>                 _allTagIDsList;
 
    public TVIEquipmentView_Tour(final TVIEquipmentView_Item parentItem,
                                 final TVIEquipmentView_Equipment equipmentItem,
@@ -90,8 +103,34 @@ public class TVIEquipmentView_Tour extends TVIEquipmentView_Item {
       return _equipmentItem;
    }
 
+   public List<Long> getMarkerIds() {
+
+      if (_allMarkerIDsList != null) {
+         return _allMarkerIDsList;
+      }
+
+      if (_allMarkerIDs != null) {
+         _allMarkerIDsList = new ArrayList<>(_allMarkerIDs);
+      }
+
+      return _allMarkerIDsList;
+   }
+
    public TVIEquipmentView_Part getPartItem() {
       return _partItem;
+   }
+
+   public List<Long> getTagIds() {
+
+      if (_allTagIDsList != null) {
+         return _allTagIDsList;
+      }
+
+      if (_allTagIDs != null) {
+         _allTagIDsList = new ArrayList<>(_allTagIDs);
+      }
+
+      return _allTagIDsList;
    }
 
    @Override
@@ -108,7 +147,8 @@ public class TVIEquipmentView_Tour extends TVIEquipmentView_Item {
       final long tourStartTimeMS    = result.getLong(2);
       final String timeZoneID       = result.getString(3);
       tourTitle                     = result.getString(4);
-      final Object resultTourTypeId = result.getObject(5);
+
+      final Object dbTourTypeId     = result.getObject(5);
 
 // SET_FORMATTING_ON
 
@@ -116,15 +156,23 @@ public class TVIEquipmentView_Tour extends TVIEquipmentView_Item {
 
       firstColumn = tourStartDateTime.format(TimeTools.Formatter_Date_S);
 
-      tourTypeId = resultTourTypeId == null
+      tourTypeId = dbTourTypeId == null
             ? TourDatabase.ENTITY_IS_NOT_SAVED
-            : (Long) resultTourTypeId;
+            : (Long) dbTourTypeId;
 
       if (UI.IS_SCRAMBLE_DATA) {
          tourTitle = UI.scrambleText(tourTitle);
       }
 
-      readCommonValues(result, 6);
+      readCommonValues(result, 8);
+   }
+
+   public void setMarkerIds(final Set<Long> allMarkerIDs) {
+      _allMarkerIDs = allMarkerIDs;
+   }
+
+   void setTagIds(final Set<Long> allTagIDs) {
+      _allTagIDs = allTagIDs;
    }
 
    @Override

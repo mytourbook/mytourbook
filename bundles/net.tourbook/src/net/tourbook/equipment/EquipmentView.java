@@ -31,6 +31,7 @@ import net.tourbook.common.CommonActivator;
 import net.tourbook.common.UI;
 import net.tourbook.common.formatter.ValueFormat;
 import net.tourbook.common.time.TimeTools;
+import net.tourbook.common.ui.SelectionCellLabelProvider;
 import net.tourbook.common.util.ColumnDefinition;
 import net.tourbook.common.util.ColumnManager;
 import net.tourbook.common.util.IContextMenuProvider;
@@ -61,7 +62,6 @@ import net.tourbook.ui.views.TourInfoToolTipCellLabelProvider;
 import net.tourbook.ui.views.TourInfoToolTipStyledCellLabelProvider;
 import net.tourbook.ui.views.TreeViewerTourInfoToolTip;
 import net.tourbook.ui.views.collateTours.TVICollatedTour_Event;
-import net.tourbook.ui.views.collateTours.TVICollatedTour_Tour;
 
 import org.eclipse.collections.impl.list.mutable.primitive.LongArrayList;
 import org.eclipse.e4.ui.di.PersistState;
@@ -943,7 +943,8 @@ public class EquipmentView extends ViewPart implements ITourProvider, ITourViewe
       defineColumn_Equipment_Collate();
 
       defineColumn_Tour_Title();
-//      defineColumn_Tour_Tags();
+      defineColumn_Tour_Marker();
+      defineColumn_Tour_Tags();
 
       defineColumn_Equipment_Date();
       defineColumn_Equipment_Date_Until();
@@ -2023,12 +2024,43 @@ public class EquipmentView extends ViewPart implements ITourProvider, ITourViewe
    }
 
    /**
-    * Column: Tags
+    * Column: Tour - Markers
+    */
+   private void defineColumn_Tour_Marker() {
+
+      final TreeColumnDefinition colDef_Tree = TreeColumnFactory.TOUR_NUM_MARKERS.createColumn(_columnManager, _pc);
+
+      colDef_Tree.setIsDefaultColumn();
+
+      colDef_Tree.setLabelProvider(new SelectionCellLabelProvider() {
+         @Override
+         public void update(final ViewerCell cell) {
+
+            final Object element = cell.getElement();
+
+            if (element instanceof final TVIEquipmentView_Tour tourItem) {
+
+               final List<Long> allMarkerIds = tourItem.getMarkerIds();
+               if (allMarkerIds != null) {
+
+                  cell.setText(Integer.toString(allMarkerIds.size()));
+
+                  setCellColor(cell, element);
+               }
+            }
+         }
+      });
+   }
+
+   /**
+    * Column: Tour - Tags
     */
    private void defineColumn_Tour_Tags() {
 
       final TreeColumnDefinition colDef = TreeColumnFactory.TOUR_TAGS.createColumn(_columnManager, _pc);
+
       colDef.setIsDefaultColumn();
+
       colDef.setLabelProvider(new TourInfoToolTipCellLabelProvider() {
 
          @Override
@@ -2046,19 +2078,15 @@ public class EquipmentView extends ViewPart implements ITourProvider, ITourViewe
             final Object element = cell.getElement();
 
             List<Long> tagIds = null;
-            if (element instanceof final TVICollatedTour_Tour tviCollatedTour_Tour) {
+            if (element instanceof final TVIEquipmentView_Tour tourItem) {
 
-               tagIds = tviCollatedTour_Tour.getTagIds();
+               tagIds = tourItem.getTagIds();
 
-            } else if (element instanceof final TVICollatedTour_Event tviCollatedTour_Event) {
+               if (tagIds != null) {
 
-               tagIds = tviCollatedTour_Event.getTagIds();
-            }
-
-            if (tagIds != null) {
-
-               cell.setText(TourDatabase.getTagNames(tagIds));
-               setCellColor(cell, element);
+                  cell.setText(TourDatabase.getTagNames(tagIds));
+                  setCellColor(cell, element);
+               }
             }
          }
       });
@@ -2518,7 +2546,15 @@ public class EquipmentView extends ViewPart implements ITourProvider, ITourViewe
     */
    private void loadAllTreeItems_One(final TreeViewerItem parentItem, final TVIEquipmentView_Root rootItem) {
 
-      if (parentItem instanceof TVIEquipmentView_Part) {
+      if (parentItem instanceof final TVIEquipmentView_Equipment equipmentItem) {
+
+         if (equipmentItem.getEquipment().isCollate()) {
+
+            // do not digg deeper, children are fetched when the parent item is expanded
+            return;
+         }
+
+      } else if (parentItem instanceof TVIEquipmentView_Part) {
 
          // do not digg deeper, children are fetched when the parent item is expanded
          return;

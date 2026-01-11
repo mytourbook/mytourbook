@@ -20,6 +20,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Set;
 
 import net.tourbook.common.UI;
@@ -159,6 +160,9 @@ public class TVIEquipmentView_Equipment extends TVIEquipmentView_Item {
 
          final SQLFilter sqlFilter = new SQLFilter();
 
+         /*
+          * Load: Equipment, Tour
+          */
          final String sql = UI.EMPTY_STRING
 
                + "SELECT" + NL //                                                               //$NON-NLS-1$
@@ -175,6 +179,14 @@ public class TVIEquipmentView_Equipment extends TVIEquipmentView_Item {
                + "  AND TourData.tourstarttime >= equipment.dateFrom" + NL //                   //$NON-NLS-1$
                + "  AND TourData.tourstarttime <  equipment.dateUntil" + NL //                  //$NON-NLS-1$
 
+               // get tag id's
+               + "LEFT JOIN " + TourDatabase.JOINTABLE__TOURDATA__TOURTAG + " AS jTdataTtag" // //$NON-NLS-1$ //$NON-NLS-2$
+               + "  ON TourData.tourId = jTdataTtag.TourData_tourId" + NL //                    //$NON-NLS-1$
+
+               // get marker id's
+               + "LEFT JOIN " + TourDatabase.TABLE_TOUR_MARKER + " AS Tmarker" //               //$NON-NLS-1$ //$NON-NLS-2$
+               + "  ON TourData.tourId = Tmarker.TourData_tourId" + NL //                       //$NON-NLS-1$
+
                + "WHERE equipment.isCollate = TRUE" + NL //                                     //$NON-NLS-1$
                + "   AND equipment.equipmentID = ?" + NL //                                     //$NON-NLS-1$
 
@@ -190,17 +202,62 @@ public class TVIEquipmentView_Equipment extends TVIEquipmentView_Item {
 
          final ResultSet result = statement.executeQuery();
 
+         long prevTourId = -1;
+         final Set<Long> allTagIDs = new HashSet<>();
+         final Set<Long> allMarkerIDs = new HashSet<>();
+
          while (result.next()) {
 
-            final TVIEquipmentView_Tour tourItem = new TVIEquipmentView_Tour(this, this, getEquipmentViewer());
+// SET_FORMATTING_OFF
 
-            allTourItems.add(tourItem);
+            final long dbTourId     = result.getLong(1);
+            final Object dbTagId    = result.getObject(6);
+            final Object dbMarkerId = result.getObject(7);
 
-            tourItem.readColumnValues_Tour(result);
+// SET_FORMATTING_ON
 
-            if (UI.IS_SCRAMBLE_DATA) {
-               tourItem.firstColumn = UI.scrambleText(tourItem.firstColumn);
+            if (dbTourId == prevTourId) {
+
+               // additional resultsets for the same tour
+
+               // get tags from outer join
+               if (dbTagId instanceof final Long tagId) {
+                  allTagIDs.add(tagId);
+               }
+
+               // get markers from outer join
+               if (dbMarkerId instanceof final Long markerId) {
+                  allMarkerIDs.add(markerId);
+               }
+
+            } else {
+
+               // first resultset for a new tour
+
+               final TVIEquipmentView_Tour tourItem = new TVIEquipmentView_Tour(this, this, getEquipmentViewer());
+
+               allTourItems.add(tourItem);
+
+               tourItem.readColumnValues_Tour(result);
+
+               if (UI.IS_SCRAMBLE_DATA) {
+                  tourItem.firstColumn = UI.scrambleText(tourItem.firstColumn);
+               }
+
+               // get first tag id
+               if (dbTagId instanceof Long) {
+                  allTagIDs.add((Long) dbTagId);
+                  tourItem.setTagIds(allTagIDs);
+               }
+
+               // get first marker id
+               if (dbMarkerId instanceof Long) {
+                  allMarkerIDs.add((Long) dbMarkerId);
+                  tourItem.setMarkerIds(allMarkerIDs);
+               }
             }
+
+            prevTourId = dbTourId;
          }
 
       } catch (final SQLException e) {

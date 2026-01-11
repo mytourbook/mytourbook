@@ -20,6 +20,8 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Set;
 
 import net.tourbook.common.UI;
 import net.tourbook.common.util.TreeViewerItem;
@@ -157,14 +159,14 @@ public class TVIEquipmentView_Part_Month extends TVIEquipmentView_Item {
 
    private void loadChildren_Tours() {
 
-      final ArrayList<TreeViewerItem> allChildren = new ArrayList<>();
+      final ArrayList<TreeViewerItem> allTourItems = new ArrayList<>();
 
       try (Connection conn = TourDatabase.getInstance().getConnection()) {
 
          final SQLFilter sqlFilter = new SQLFilter();
 
          /*
-          * Load: Equipment, Part, Year, Tour
+          * Load: Part, Year, Month, Tour
           */
          final String sql = UI.EMPTY_STRING
 
@@ -186,6 +188,14 @@ public class TVIEquipmentView_Part_Month extends TVIEquipmentView_Item {
 
                + sqlFilter.getWhereClause() + NL
 
+               // get tag id's
+               + "LEFT JOIN " + TourDatabase.JOINTABLE__TOURDATA__TOURTAG + " AS jTdataTtag" // //$NON-NLS-1$ //$NON-NLS-2$
+               + "  ON TourData.tourId = jTdataTtag.TourData_tourId" + NL //                    //$NON-NLS-1$
+
+               // get marker id's
+               + "LEFT JOIN " + TourDatabase.TABLE_TOUR_MARKER + " AS Tmarker" //               //$NON-NLS-1$ //$NON-NLS-2$
+               + "  ON TourData.tourId = Tmarker.TourData_tourId" + NL //                       //$NON-NLS-1$
+
                + "WHERE part.isCollate = TRUE" + NL //                                             //$NON-NLS-1$
                + "   AND part.partID = ?" + NL //                                                  //$NON-NLS-1$
 
@@ -206,25 +216,69 @@ public class TVIEquipmentView_Part_Month extends TVIEquipmentView_Item {
 
          final ResultSet result = statement.executeQuery();
 
+         long prevTourId = -1;
+         final Set<Long> allTagIDs = new HashSet<>();
+         final Set<Long> allMarkerIDs = new HashSet<>();
+
          while (result.next()) {
 
-            final TVIEquipmentView_Tour tourItem = new TVIEquipmentView_Tour(this, _partItem, getEquipmentViewer());
+// SET_FORMATTING_OFF
 
-            allChildren.add(tourItem);
+            final long dbTourId     = result.getLong(1);
+            final Object dbTagId    = result.getObject(6);
+            final Object dbMarkerId = result.getObject(7);
 
-            tourItem.readColumnValues_Tour(result);
+// SET_FORMATTING_ON
 
-            if (UI.IS_SCRAMBLE_DATA) {
-               tourItem.firstColumn = UI.scrambleText(tourItem.firstColumn);
+            if (dbTourId == prevTourId) {
+
+               // additional resultsets for the same tour
+
+               // get tags from outer join
+               if (dbTagId instanceof final Long tagId) {
+                  allTagIDs.add(tagId);
+               }
+
+               // get markers from outer join
+               if (dbMarkerId instanceof final Long markerId) {
+                  allMarkerIDs.add(markerId);
+               }
+
+            } else {
+
+               // first resultset for a new tour
+
+               final TVIEquipmentView_Tour tourItem = new TVIEquipmentView_Tour(this, _partItem, getEquipmentViewer());
+
+               allTourItems.add(tourItem);
+
+               tourItem.readColumnValues_Tour(result);
+
+               if (UI.IS_SCRAMBLE_DATA) {
+                  tourItem.firstColumn = UI.scrambleText(tourItem.firstColumn);
+               }
+
+               // get first tag id
+               if (dbTagId instanceof Long) {
+                  allTagIDs.add((Long) dbTagId);
+                  tourItem.setTagIds(allTagIDs);
+               }
+
+               // get first marker id
+               if (dbMarkerId instanceof Long) {
+                  allMarkerIDs.add((Long) dbMarkerId);
+                  tourItem.setMarkerIds(allMarkerIDs);
+               }
             }
-         }
 
+            prevTourId = dbTourId;
+         }
       } catch (final SQLException e) {
 
          UI.showSQLException(e);
       }
 
-      setChildren(allChildren);
+      setChildren(allTourItems);
    }
 
    @Override
