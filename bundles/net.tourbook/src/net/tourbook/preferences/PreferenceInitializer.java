@@ -504,6 +504,10 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
       store.setDefault(ITourbookPreferences.VIEW_TOOLTIP_TAGGING_TITLE, true);
       store.setDefault(ITourbookPreferences.VIEW_TOOLTIP_TAGGING_TAGS, true);
 
+      store.setDefault(ITourbookPreferences.VIEW_TOOLTIP_EQUIPMENT_EQUIPMENT, true);
+      store.setDefault(ITourbookPreferences.VIEW_TOOLTIP_EQUIPMENT_TITLE, true);
+      store.setDefault(ITourbookPreferences.VIEW_TOOLTIP_EQUIPMENT_TAGS, true);
+
       store.setDefault(ITourbookPreferences.VIEW_TOOLTIP_TOURCATALOG_REFTOUR, true);
       store.setDefault(ITourbookPreferences.VIEW_TOOLTIP_TOURCATALOG_TITLE, true);
       store.setDefault(ITourbookPreferences.VIEW_TOOLTIP_TOURCATALOG_TAGS, true);

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2025 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2026 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -117,7 +117,9 @@ public class TaggingView_TooltipUIProvider implements ITooltipUIProvider {
    }
 
    @Override
-   public Composite createTooltipUI(final Composite parent, final Object viewerCellData, final IToolTipProvider toolTipProvider) {
+   public Composite createTooltipUI(final Composite parent,
+                                    final Object viewerCellData,
+                                    final IToolTipProvider toolTipProvider) {
 
       _viewerCellData = viewerCellData;
       _toolTipProvider = toolTipProvider;

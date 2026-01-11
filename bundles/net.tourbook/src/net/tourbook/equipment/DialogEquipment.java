@@ -17,7 +17,6 @@ package net.tourbook.equipment;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.Set;
 
 import net.tourbook.Images;
 import net.tourbook.Messages;
@@ -28,7 +27,6 @@ import net.tourbook.common.time.TimeTools;
 import net.tourbook.common.util.StringUtils;
 import net.tourbook.common.util.Util;
 import net.tourbook.data.Equipment;
-import net.tourbook.data.EquipmentPart;
 
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.IDialogSettings;

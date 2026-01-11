@@ -15,7 +15,6 @@
  *******************************************************************************/
 package net.tourbook.ui.views.tagging;
 
-
 import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -791,6 +790,7 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer,
       addTourEventListener();
       addPrefListener();
       addSelectionListener();
+
       restoreState();
 
       updateColors();
@@ -881,7 +881,7 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer,
 
       // set tour info tooltip provider
       _tourInfoToolTip = new TreeViewerTourInfoToolTip(_tagViewer);
-      _tourInfoToolTip.setTooltipUIProvider(new TaggingView_TooltipUIProvider(this));
+      _tourInfoToolTip.setTooltipUICustomProvider(new TaggingView_TooltipUIProvider(this));
    }
 
    /**
@@ -1294,7 +1294,7 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer,
             if (pace == 0.0) {
                cell.setText(UI.EMPTY_STRING);
             } else {
-               cell.setText(net.tourbook.common.UI.format_mm_ss((long) pace));
+               cell.setText(UI.format_mm_ss((long) pace));
             }
 
             setCellColor(cell, element);
@@ -1619,8 +1619,8 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer,
 
                String tagNames = TourDatabase.getTagNames(tourItem.tagIds);
 
-               if (net.tourbook.common.UI.IS_SCRAMBLE_DATA) {
-                  tagNames = net.tourbook.common.UI.scrambleText(tagNames);
+               if (UI.IS_SCRAMBLE_DATA) {
+                  tagNames = UI.scrambleText(tagNames);
                }
 
                cell.setText(tagNames);
@@ -1689,7 +1689,7 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer,
                return;
             }
 
-            final double temperature = net.tourbook.common.UI.convertTemperatureFromMetric(
+            final double temperature = UI.convertTemperatureFromMetric(
                   ((TVITaggingView_Item) element).colAvgTemperature_Device);
 
             colDef.printDoubleValue(cell, temperature, element instanceof TVITaggingView_Tour);
@@ -2943,7 +2943,7 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer,
 
       final LongArrayList expandedItems = new LongArrayList();
 
-      final TreePath[] expandedOpenedTreePaths = net.tourbook.common.UI.getExpandedAndOpenedItems(
+      final TreePath[] expandedOpenedTreePaths = UI.getExpandedAndOpenedItems(
             visibleExpanded,
             _tagViewer.getExpandedTreePaths());
 

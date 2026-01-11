@@ -543,6 +543,10 @@ public interface ITourbookPreferences {
    public static final String VIEW_TOOLTIP_TAGGING_TAGS           = VIEW_TOOLTIP + "tagging.tags";           //$NON-NLS-1$
    public static final String VIEW_TOOLTIP_TAGGING_TITLE          = VIEW_TOOLTIP + "tagging.title";          //$NON-NLS-1$
 
+   public static final String VIEW_TOOLTIP_EQUIPMENT_EQUIPMENT    = "VIEW_TOOLTIP_EQUIPMENT_EQUIPMENT";      //$NON-NLS-1$
+   public static final String VIEW_TOOLTIP_EQUIPMENT_TAGS         = "VIEW_TOOLTIP_EQUIPMENT_TAGS";           //$NON-NLS-1$
+   public static final String VIEW_TOOLTIP_EQUIPMENT_TITLE        = "VIEW_TOOLTIP_EQUIPMENT_TITLE";          //$NON-NLS-1$
+
    public static final String VIEW_TOOLTIP_TOURCATALOG_REFTOUR    = VIEW_TOOLTIP + "tourcatalog.reftour";    //$NON-NLS-1$
    public static final String VIEW_TOOLTIP_TOURCATALOG_TAGS       = VIEW_TOOLTIP + "tourcatalog.tags";       //$NON-NLS-1$
    public static final String VIEW_TOOLTIP_TOURCATALOG_TITLE      = VIEW_TOOLTIP + "tourcatalog.title";      //$NON-NLS-1$

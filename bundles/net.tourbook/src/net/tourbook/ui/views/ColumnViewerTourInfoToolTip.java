@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2026 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -54,9 +54,17 @@ public abstract class ColumnViewerTourInfoToolTip extends ToolTip implements ITo
 
    private ColumnViewer       _columnViewer;
    private ViewerCell         _viewerCell;
+
+   /**
+    * Contains values from the {@link #_tooltipUICustomProvider}
+    */
    private Object             _viewerCell_Data;
 
-   private ITooltipUIProvider _tooltipUIProvider;
+   /**
+    * This UI custom provider is used when it is not <code>null</code> and {@link #_viewerCell_Data}
+    * is also not <code>null</code>
+    */
+   private ITooltipUIProvider _tooltipUICustomProvider;
 
    public ColumnViewerTourInfoToolTip(final Control control, final int style, final ColumnViewer columnViewer) {
 
@@ -86,11 +94,11 @@ public abstract class ColumnViewerTourInfoToolTip extends ToolTip implements ITo
 
       Composite container;
 
-      if (_viewerCell_Data != null && _tooltipUIProvider != null) {
+      if (_viewerCell_Data != null && _tooltipUICustomProvider != null) {
 
          // a cell with custom data is hovered
 
-         container = _tooltipUIProvider.createTooltipUI(parent, _viewerCell_Data, this);
+         container = _tooltipUICustomProvider.createTooltipUI(parent, _viewerCell_Data, this);
 
          // allow the actions to be selected
          setHideOnMouseDown(false);
@@ -237,9 +245,7 @@ public abstract class ColumnViewerTourInfoToolTip extends ToolTip implements ITo
          Long tourId = null;
          final CellLabelProvider labelProvider = _columnViewer.getLabelProvider(_viewerCell.getColumnIndex());
 
-         if (labelProvider instanceof IColumnViewerTourIdProvider) {
-
-            final IColumnViewerTourIdProvider columnViewerTourIdProvider = (IColumnViewerTourIdProvider) labelProvider;
+         if (labelProvider instanceof final IColumnViewerTourIdProvider columnViewerTourIdProvider) {
 
             tourId = columnViewerTourIdProvider.getTourId(_viewerCell);
 
@@ -277,8 +283,13 @@ public abstract class ColumnViewerTourInfoToolTip extends ToolTip implements ITo
       _tourInfoUI.setNoTourTooltip(noTourTooltip);
    }
 
-   public void setTooltipUIProvider(final ITooltipUIProvider tooltipUIProvider) {
-      _tooltipUIProvider = tooltipUIProvider;
+   /**
+    * @see #_tooltipUICustomProvider
+    *
+    * @param tooltipUIProvider
+    */
+   public void setTooltipUICustomProvider(final ITooltipUIProvider tooltipUIProvider) {
+      _tooltipUICustomProvider = tooltipUIProvider;
    }
 
    @Override
