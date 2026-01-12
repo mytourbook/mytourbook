@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2024 Wolfgang Schramm and Contributors
+ * Copyright (C) 2024, 2026 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -22,6 +22,7 @@ public class ViewNames {
    public static final String VIEW_NAME_CALENDAR             = PluginProperties.getText("view_name_Calendar");            //$NON-NLS-1$
    public static final String VIEW_NAME_COLLATED_TOURS       = PluginProperties.getText("View_Name_CollatedTours");       //$NON-NLS-1$
    public static final String VIEW_NAME_COMPARE_BY_ELEVATION = PluginProperties.getText("View_Name_Compare_ByElevation"); //$NON-NLS-1$
+   public static final String VIEW_NAME_EQUIPMENT            = PluginProperties.getText("View_Name_Equipment");           //$NON-NLS-1$
    public static final String VIEW_NAME_REFERENCE_TOURS      = PluginProperties.getText("View_Name_ReferenceTours");      //$NON-NLS-1$
    public static final String VIEW_NAME_TAGGED_TOURS         = PluginProperties.getText("command_tagging_name");          //$NON-NLS-1$
    public static final String VIEW_NAME_TOUR_BOOK            = PluginProperties.getText("view_name_Book");                //$NON-NLS-1$

@@ -19,6 +19,7 @@ import java.text.NumberFormat;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -45,23 +46,32 @@ import net.tourbook.data.Equipment;
 import net.tourbook.data.EquipmentPart;
 import net.tourbook.data.TourData;
 import net.tourbook.database.TourDatabase;
+import net.tourbook.extension.export.ActionExport;
 import net.tourbook.preferences.ITourbookPreferences;
+import net.tourbook.preferences.ViewContext;
+import net.tourbook.tag.TagMenuManager;
 import net.tourbook.tour.ITourEventListener;
 import net.tourbook.tour.SelectionTourId;
 import net.tourbook.tour.SelectionTourIds;
 import net.tourbook.tour.TourEventId;
 import net.tourbook.tour.TourManager;
+import net.tourbook.tour.TourTypeMenuManager;
 import net.tourbook.tourType.TourTypeImage;
 import net.tourbook.ui.ITourProvider;
 import net.tourbook.ui.TreeColumnFactory;
 import net.tourbook.ui.action.ActionCollapseAll;
 import net.tourbook.ui.action.ActionCollapseOthers;
+import net.tourbook.ui.action.ActionEditQuick;
+import net.tourbook.ui.action.ActionEditTour;
 import net.tourbook.ui.action.ActionExpandSelection;
+import net.tourbook.ui.action.ActionOpenTour;
 import net.tourbook.ui.action.ActionRefreshView;
+import net.tourbook.ui.action.TourActionCategory;
+import net.tourbook.ui.action.TourActionManager;
 import net.tourbook.ui.views.TourInfoToolTipCellLabelProvider;
 import net.tourbook.ui.views.TourInfoToolTipStyledCellLabelProvider;
 import net.tourbook.ui.views.TreeViewerTourInfoToolTip;
-import net.tourbook.ui.views.collateTours.TVICollatedTour_Event;
+import net.tourbook.ui.views.ViewNames;
 
 import org.eclipse.collections.impl.list.mutable.primitive.LongArrayList;
 import org.eclipse.e4.ui.di.PersistState;
@@ -111,6 +121,8 @@ public class EquipmentView extends ViewPart implements ITourProvider, ITourViewe
 
    public static final String            ID                                     = "net.tourbook.equipment.EquipmentView.ID"; //$NON-NLS-1$
 
+   private static final char             NL                                     = UI.NEW_LINE;
+
    /**
     * The expanded equipment items have these structure:
     * <p>
@@ -131,6 +143,12 @@ public class EquipmentView extends ViewPart implements ITourProvider, ITourViewe
     * Using large numbers to easier debug and find issues
     */
    private static final int              STATE_ITEM_TYPE_EQUIPMENT              = 1111;
+   private static final int              STATE_ITEM_TYPE_EQUIPMENT_YEAR         = 1222;
+   private static final int              STATE_ITEM_TYPE_EQUIPMENT_MONTH        = 1333;
+
+   private static final int              STATE_ITEM_TYPE_PART                   = 2111;
+   private static final int              STATE_ITEM_TYPE_PART_YEAR              = 2222;
+   private static final int              STATE_ITEM_TYPE_PART_MONTH             = 2333;
 
    private static final IPreferenceStore _prefStore                             = TourbookPlugin.getPrefStore();
    private static final IPreferenceStore _prefStore_Common                      = CommonActivator.getPrefStore();
@@ -160,6 +178,12 @@ public class EquipmentView extends ViewPart implements ITourProvider, ITourViewe
 
    private TreeViewerTourInfoToolTip           _tourInfoToolTip;
 
+   private TagMenuManager                      _tagMenuManager;
+   private TourTypeMenuManager                 _tourTypeMenuManager;
+
+   private HashMap<String, Object>             _allTourActions_Edit;
+   private HashMap<String, Object>             _allTourActions_Export;
+
    private ActionDeleteEquipment               _actionDeleteEquipment;
    private ActionDeletePart                    _actionDeletePart;
    private ActionDeleteService                 _actionDeleteService;
@@ -181,6 +205,13 @@ public class EquipmentView extends ViewPart implements ITourProvider, ITourViewe
    private ActionExpandSelection               _actionExpandSelection;
    private Action_OnMouseSelect_ExpandCollapse _actionOnMouseSelect_ExpandCollapse;
    private Action_SingleExpand_CollapseOthers  _actionSingleExpand_CollapseOthers;
+
+   private ActionEditQuick                     _actionEditQuick;
+   private ActionEditTour                      _actionEditTour;
+   private ActionExport                        _actionExportTour;
+   private ActionOpenTour                      _actionOpenTour;
+
+   private int                                 _numSelectedTours;
 
    private boolean                             _isBehaviour_SingleExpand_CollapseOthers = true;
    private boolean                             _isBehaviour_OnSelect_ExpandCollapse     = true;
@@ -565,25 +596,61 @@ public class EquipmentView extends ViewPart implements ITourProvider, ITourViewe
       @Override
       public boolean equals(final Object o1, final Object o2) {
 
+// SET_FORMATTING_OFF
+
          if (o1 == o2) {
 
             return true;
 
+         } else if (o1 instanceof final TVIEquipmentView_Tour item1
+                 && o2 instanceof final TVIEquipmentView_Tour item2) {
+
+            return item1.tourId == item2.tourId;
+
          } else if (o1 instanceof final TVIEquipmentView_Equipment item1
-               && o2 instanceof final TVIEquipmentView_Equipment item2) {
+                 && o2 instanceof final TVIEquipmentView_Equipment item2) {
 
             return item1.getEquipmentID() == item2.getEquipmentID();
 
          } else if (o1 instanceof final TVIEquipmentView_Part item1
-               && o2 instanceof final TVIEquipmentView_Part item2) {
+                 && o2 instanceof final TVIEquipmentView_Part item2) {
 
             return item1.getPartID() == item2.getPartID();
 
-         } else if (o1 instanceof final TVIEquipmentView_Tour item1
-               && o2 instanceof final TVIEquipmentView_Tour item2) {
+         } else if (o1 instanceof final TVIEquipmentView_Equipment_Year item1
+                 && o2 instanceof final TVIEquipmentView_Equipment_Year item2) {
 
-            return item1.tourId == item2.tourId;
+            return item1.getEquipmentId() == item2.getEquipmentId()
+                && item1.getYear()        == item2.getYear();
+
+         } else if (o1 instanceof final TVIEquipmentView_Part_Year item1
+                 && o2 instanceof final TVIEquipmentView_Part_Year item2) {
+
+            return item1.getPartId() == item2.getPartId()
+                && item1.getYear()   == item2.getYear();
+
+         } else if (o1 instanceof final TVIEquipmentView_Equipment_Month monthItem1
+                 && o2 instanceof final TVIEquipmentView_Equipment_Month monthItem2) {
+
+            final TVIEquipmentView_Equipment_Year yearItem1 = monthItem1.getYearItem();
+            final TVIEquipmentView_Equipment_Year yearItem2 = monthItem2.getYearItem();
+
+            return yearItem1.getEquipmentId() == yearItem2.getEquipmentId()
+                && yearItem1.getYear()        == yearItem2.getYear()
+                && monthItem1.getMonth()      == monthItem2.getMonth();
+
+         } else if (o1 instanceof final TVIEquipmentView_Part_Month monthItem1
+                 && o2 instanceof final TVIEquipmentView_Part_Month monthItem2) {
+
+            final TVIEquipmentView_Part_Year yearItem1 = monthItem1.getYearItem();
+            final TVIEquipmentView_Part_Year yearItem2 = monthItem2.getYearItem();
+
+            return yearItem1.getPartId() == yearItem2.getPartId()
+                && yearItem1.getYear()   == yearItem2.getYear()
+                && monthItem1.getMonth() == monthItem2.getMonth();
          }
+
+// SET_FORMATTING_ON
 
          return false;
       }
@@ -627,6 +694,17 @@ public class EquipmentView extends ViewPart implements ITourProvider, ITourViewe
 
          __itemType = itemType;
          __itemData = itemData;
+      }
+
+      @Override
+      public String toString() {
+         return UI.EMPTY_STRING
+
+               + "StateSegment" + NL //                     //$NON-NLS-1$
+
+               + " __itemType = " + __itemType + NL //      //$NON-NLS-1$
+               + " __itemData = " + __itemData + NL //      //$NON-NLS-1$
+         ;
       }
    }
 
@@ -728,6 +806,7 @@ public class EquipmentView extends ViewPart implements ITourProvider, ITourViewe
 
 // SET_FORMATTING_OFF
 
+      // equipment actions
       _actionDeleteEquipment                 = new ActionDeleteEquipment();
       _actionDeletePart                      = new ActionDeletePart();
       _actionDeleteService                   = new ActionDeleteService();
@@ -744,19 +823,44 @@ public class EquipmentView extends ViewPart implements ITourProvider, ITourViewe
       _actionSetTourStructure                = new ActionSetTourStructure(this);
       _actionSetTourStructure_All            = new ActionSetTourStructure_All();
 
+      // collapse/expand actions
       _actionCollapseAll_WithoutSelection    = new Action_CollapseAll_WithoutSelection();
       _actionCollapseOthers                  = new ActionCollapseOthers(this);
       _actionExpandSelection                 = new ActionExpandSelection(this, true);
       _actionOnMouseSelect_ExpandCollapse    = new Action_OnMouseSelect_ExpandCollapse();
       _actionSingleExpand_CollapseOthers     = new Action_SingleExpand_CollapseOthers();
 
-// SET_FORMATTING_ON
+      // tour actions
+      _actionEditQuick                       = new ActionEditQuick(this);
+      _actionEditTour                        = new ActionEditTour(this);
+      _actionExportTour                      = new ActionExport(this);
+      _actionOpenTour                        = new ActionOpenTour(this);
+
+      _allTourActions_Edit    = new HashMap<>();
+      _allTourActions_Export  = new HashMap<>();
+
+      _allTourActions_Edit.put(_actionEditQuick          .getClass().getName(),  _actionEditQuick);
+      _allTourActions_Edit.put(_actionEditTour           .getClass().getName(),  _actionEditTour);
+      _allTourActions_Edit.put(_actionOpenTour           .getClass().getName(),  _actionOpenTour);
+
+      _allTourActions_Export.put(_actionExportTour       .getClass().getName(),  _actionExportTour);
+
+      TourActionManager.setAllViewActions(ID,
+
+            _allTourActions_Edit    .keySet(),
+            _allTourActions_Export  .keySet(),
+
+            _tourTypeMenuManager    .getAllTourTypeActions()   .keySet(),
+            _tagMenuManager         .getAllTagActions()        .keySet()
+      );
+
+   // SET_FORMATTING_ON
    }
 
    private void createMenuManager() {
 
-//      _tagMenuManager = new TagMenuManager(this, true);
-//      _tourTypeMenuManager = new TourTypeMenuManager(this);
+      _tagMenuManager = new TagMenuManager(this, true);
+      _tourTypeMenuManager = new TourTypeMenuManager(this);
 
       _viewerMenuManager = new MenuManager("#PopupMenu"); //$NON-NLS-1$
       _viewerMenuManager.setRemoveAllWhenShown(true);
@@ -1831,7 +1935,7 @@ public class EquipmentView extends ViewPart implements ITourProvider, ITourViewe
                if (pace == 0.0) {
                   cell.setText(UI.EMPTY_STRING);
                } else {
-                  cell.setText(net.tourbook.common.UI.format_mm_ss((long) pace));
+                  cell.setText(UI.format_mm_ss((long) pace));
                }
 
                setCellColor(cell, element);
@@ -2142,7 +2246,7 @@ public class EquipmentView extends ViewPart implements ITourProvider, ITourViewe
 
             if (value != 0) {
 
-               final double temperature = net.tourbook.common.UI.convertTemperatureFromMetric(value);
+               final double temperature = UI.convertTemperatureFromMetric(value);
 
                colDef.printDoubleValue(cell, temperature, element instanceof TVIEquipmentView_Tour);
 
@@ -2188,9 +2292,12 @@ public class EquipmentView extends ViewPart implements ITourProvider, ITourViewe
       int numEquipment = 0;
       int numParts = 0;
       int numServices = 0;
+      int numTours = 0;
 
       int numItems = 0;
       TVIEquipmentView_Part selectedPartItem = null;
+      TVIEquipmentView_Tour selectedTourItem = null;
+
       boolean isEquipmentCollate = false;
 
       for (final Object selectedItem : allSelectedItems) {
@@ -2238,6 +2345,9 @@ public class EquipmentView extends ViewPart implements ITourProvider, ITourViewe
 
          } else if (selectedItem instanceof final TVIEquipmentView_Tour tourItem) {
 
+            numTours++;
+            selectedTourItem = tourItem;
+
             selectedPartItem = tourItem.getPartItem();
             equipmentItemContext = tourItem.getEquipmentItem();
          }
@@ -2250,6 +2360,10 @@ public class EquipmentView extends ViewPart implements ITourProvider, ITourViewe
          }
       }
 
+      final List<Long> allSelectedTourIds = getSelectedTourIDs();
+      _numSelectedTours = allSelectedTourIds.size();
+      final boolean isSelectedTours = _numSelectedTours > 0;
+
 // SET_FORMATTING_OFF
 
       final boolean isOneItemSelected           = numItems == 1;
@@ -2257,6 +2371,8 @@ public class EquipmentView extends ViewPart implements ITourProvider, ITourViewe
       final boolean isEquipmentSelected         = numEquipment > 0;
       final boolean isPartSelected              = numParts > 0;
       final boolean isServiceSelected           = numServices > 0;
+      final boolean isTourSelected              = numTours > 0;
+      final boolean isOneTour                   = numTours == 1;
 
       final boolean canCreatePartOrService      = isOneItemSelected
                                                    && (isEquipmentSelected || isPartSelected || isServiceSelected)
@@ -2265,11 +2381,20 @@ public class EquipmentView extends ViewPart implements ITourProvider, ITourViewe
       final boolean canSetTourStructure         = isOneItemSelected
                                                    && (selectedPartItem != null || isEquipmentCollate);
 
+
       /*
        * Multiple part/services can be much more complex when they have different anchestors (equipment)
        */
       final boolean isEnableDeletePart    = numParts == 1;
       final boolean isEnableDeleteService = numServices == 1;
+
+      final long tourTypeID = isOneTour
+            ? selectedTourItem.tourId
+            : TourDatabase.ENTITY_IS_NOT_SAVED;
+
+      final List<Long> oneTourTagIds = isOneTour
+            ? selectedTourItem.getTagIds()
+            : null;
 
       _actionDeleteEquipment     .setEnabled(isEquipmentSelected);
       _actionDeletePart          .setEnabled(isEnableDeletePart);
@@ -2284,7 +2409,19 @@ public class EquipmentView extends ViewPart implements ITourProvider, ITourViewe
       _actionNewService          .setEnabled(canCreatePartOrService);
       _actionSetTourStructure    .setEnabled(canSetTourStructure);
 
+      _actionExportTour          .setEnabled(isSelectedTours);
+
+      _actionEditTour            .setEnabled(isOneTour);
+      _actionOpenTour            .setEnabled(isOneTour);
+      _actionEditQuick           .setEnabled(isOneTour);
+
+      _tourTypeMenuManager       .enableTourTypeActions(isTourSelected, tourTypeID);
+
+      _tagMenuManager            .enableTagActions(isTourSelected, isOneTour, oneTourTagIds);
+
+
 // SET_FORMATTING_ON
+
    }
 
    private void expandCollapseItem(final TreeViewerItem treeItem) {
@@ -2371,21 +2508,42 @@ public class EquipmentView extends ViewPart implements ITourProvider, ITourViewe
       menuMgr.add(_actionSetTourStructure);
       menuMgr.add(_actionSetTourStructure_All);
 
-      menuMgr.add(new Separator());
+      // edit actions
+      TourActionManager.fillContextMenu(menuMgr, TourActionCategory.EDIT, _allTourActions_Edit, this);
 
+      // tour type actions
+      _tourTypeMenuManager.fillContextMenu_WithActiveActions(menuMgr, this);
+
+      // add/remove ... tags in the tours
+      _tagMenuManager.fillTagMenu_WithActiveActions(menuMgr, this);
+
+      // export actions
+      TourActionManager.fillContextMenu(menuMgr, TourActionCategory.EXPORT, _allTourActions_Export, this);
+
+      // expand/collapse actions
+      menuMgr.add(new Separator());
       menuMgr.add(_actionCollapseOthers);
       menuMgr.add(_actionExpandSelection);
       menuMgr.add(_actionCollapseAll_WithoutSelection);
       menuMgr.add(_actionOnMouseSelect_ExpandCollapse);
       menuMgr.add(_actionSingleExpand_CollapseOthers);
 
+      // delete actions
       menuMgr.add(new Separator());
-
       menuMgr.add(_actionDeleteEquipment);
       menuMgr.add(_actionDeletePart);
       menuMgr.add(_actionDeleteService);
 
+      // customize context menu
+      TourActionManager.fillContextMenu_CustomizeAction(menuMgr)
+
+            // set pref page custom data that actions from this view can be identified
+            .setPrefData(new ViewContext(ID, ViewNames.VIEW_NAME_EQUIPMENT));
+
       enableActions();
+
+      // set AFTER the actions are enabled this retrieves the number of tours
+      _actionExportTour.setNumberOfTours(_numSelectedTours);
    }
 
    private Long getCellTourId(final ViewerCell cell) {
@@ -2403,38 +2561,6 @@ public class EquipmentView extends ViewPart implements ITourProvider, ITourViewe
    @Override
    public ColumnManager getColumnManager() {
       return _columnManager;
-   }
-
-   /**
-    * Recursive !!!
-    * <p>
-    * Fetch children of a equipment item and collect tour id's.
-    *
-    * @param equipmentItem
-    * @param allTourIds
-    * @param checkedTourIds
-    */
-   private void getEquipmentChildren(final TVIEquipmentView_Item equipmentItem,
-                                     final List<Long> allTourIds,
-                                     final Set<Long> checkedTourIds) {
-
-      // iterate over all equipment children
-
-      for (final TreeViewerItem viewerItem : equipmentItem.getFetchedChildren()) {
-
-         if (viewerItem instanceof final TVIEquipmentView_Tour tourItem) {
-
-            final long tourId = tourItem.tourId;
-
-            if (checkedTourIds.add(tourId)) {
-               allTourIds.add(tourId);
-            }
-
-         } else if (viewerItem instanceof final TVIEquipmentView_Item viewItem) {
-
-            getEquipmentChildren(viewItem, allTourIds, checkedTourIds);
-         }
-      }
    }
 
    private Equipment getEquipmentFromSelection() {
@@ -2472,10 +2598,6 @@ public class EquipmentView extends ViewPart implements ITourProvider, ITourViewe
             if (checkedTourIds.add(tourId)) {
                allTourIds.add(tourId);
             }
-
-         } else if (selectedItem instanceof final TVIEquipmentView_Tour viewItem) {
-
-            getEquipmentChildren(viewItem, allTourIds, checkedTourIds);
          }
       }
 
@@ -3259,7 +3381,7 @@ public class EquipmentView extends ViewPart implements ITourProvider, ITourViewe
          return null;
       }
 
-      final long stateData = stateSegment.__itemData;
+      final long stateValue = stateSegment.__itemData;
 
       if (stateSegment.__itemType == STATE_ITEM_TYPE_EQUIPMENT) {
 
@@ -3267,13 +3389,98 @@ public class EquipmentView extends ViewPart implements ITourProvider, ITourViewe
 
             if (treeItem instanceof final TVIEquipmentView_Equipment equipmentItem) {
 
-               final long viewerEquipmentId = equipmentItem.getEquipment().getEquipmentId();
+               final long itemValue = equipmentItem.getEquipment().getEquipmentId();
 
-               if (viewerEquipmentId == stateData) {
+               if (itemValue == stateValue) {
 
                   allPathSegments.add(treeItem);
 
                   return equipmentItem.getFetchedChildren();
+               }
+            }
+         }
+
+      } else if (stateSegment.__itemType == STATE_ITEM_TYPE_EQUIPMENT_YEAR) {
+
+         for (final TreeViewerItem treeItem : allTreeItems) {
+
+            if (treeItem instanceof final TVIEquipmentView_Equipment_Year yearItem) {
+
+               final long itemValue = yearItem.getYear();
+
+               if (itemValue == stateValue) {
+
+                  allPathSegments.add(treeItem);
+
+                  return yearItem.getFetchedChildren();
+               }
+            }
+         }
+
+      } else if (stateSegment.__itemType == STATE_ITEM_TYPE_EQUIPMENT_MONTH) {
+
+         for (final TreeViewerItem treeItem : allTreeItems) {
+
+            if (treeItem instanceof final TVIEquipmentView_Equipment_Month monthItem) {
+
+               final long itemValue = monthItem.getMonth();
+
+               if (itemValue == stateValue) {
+
+                  allPathSegments.add(treeItem);
+
+                  return monthItem.getFetchedChildren();
+               }
+            }
+         }
+
+      } else if (stateSegment.__itemType == STATE_ITEM_TYPE_PART) {
+
+         for (final TreeViewerItem treeItem : allTreeItems) {
+
+            if (treeItem instanceof final TVIEquipmentView_Part partItem) {
+
+               final long itemValue = partItem.getPartID();
+
+               if (itemValue == stateValue) {
+
+                  allPathSegments.add(treeItem);
+
+                  return partItem.getFetchedChildren();
+               }
+            }
+         }
+
+      } else if (stateSegment.__itemType == STATE_ITEM_TYPE_PART_YEAR) {
+
+         for (final TreeViewerItem treeItem : allTreeItems) {
+
+            if (treeItem instanceof final TVIEquipmentView_Part_Year yearItem) {
+
+               final long itemValue = yearItem.getYear();
+
+               if (itemValue == stateValue) {
+
+                  allPathSegments.add(treeItem);
+
+                  return yearItem.getFetchedChildren();
+               }
+            }
+         }
+
+      } else if (stateSegment.__itemType == STATE_ITEM_TYPE_PART_MONTH) {
+
+         for (final TreeViewerItem treeItem : allTreeItems) {
+
+            if (treeItem instanceof final TVIEquipmentView_Part_Month monthItem) {
+
+               final long itemValue = monthItem.getMonth();
+
+               if (itemValue == stateValue) {
+
+                  allPathSegments.add(treeItem);
+
+                  return monthItem.getFetchedChildren();
                }
             }
          }
@@ -3319,7 +3526,13 @@ public class EquipmentView extends ViewPart implements ITourProvider, ITourViewe
 
             // a new segment is available
 
-            if (itemType == STATE_ITEM_TYPE_EQUIPMENT) {
+            if (false
+                  || itemType == STATE_ITEM_TYPE_EQUIPMENT
+                  || itemType == STATE_ITEM_TYPE_EQUIPMENT_YEAR
+                  || itemType == STATE_ITEM_TYPE_EQUIPMENT_MONTH
+                  || itemType == STATE_ITEM_TYPE_PART
+                  || itemType == STATE_ITEM_TYPE_PART_YEAR
+                  || itemType == STATE_ITEM_TYPE_PART_MONTH) {
 
                currentSegments.add(new StateSegment(itemType, itemData));
             }
@@ -3360,7 +3573,7 @@ public class EquipmentView extends ViewPart implements ITourProvider, ITourViewe
 
       final LongArrayList allExpandedItemIDs = new LongArrayList();
 
-      final TreePath[] allExpandedAndOpenedTreePaths = net.tourbook.common.UI.getExpandedAndOpenedItems(
+      final TreePath[] allExpandedAndOpenedTreePaths = UI.getExpandedAndOpenedItems(
             allVisibleAndExpandedItems,
             _equipmentViewer.getExpandedTreePaths());
 
@@ -3376,10 +3589,35 @@ public class EquipmentView extends ViewPart implements ITourProvider, ITourViewe
 
             final Object segment = expandedPath.getSegment(segmentIndex);
 
-            if (segment instanceof final TVIEquipmentView_Equipment equipmentItem) {
+            if (segment instanceof final TVIEquipmentView_Equipment treeItem) {
 
                allExpandedItemIDs.add(STATE_ITEM_TYPE_EQUIPMENT);
-               allExpandedItemIDs.add(equipmentItem.getEquipment().getEquipmentId());
+               allExpandedItemIDs.add(treeItem.getEquipment().getEquipmentId());
+
+            } else if (segment instanceof final TVIEquipmentView_Equipment_Year treeItem) {
+
+               allExpandedItemIDs.add(STATE_ITEM_TYPE_EQUIPMENT_YEAR);
+               allExpandedItemIDs.add(treeItem.getYear());
+
+            } else if (segment instanceof final TVIEquipmentView_Equipment_Month treeItem) {
+
+               allExpandedItemIDs.add(STATE_ITEM_TYPE_EQUIPMENT_MONTH);
+               allExpandedItemIDs.add(treeItem.getMonth());
+
+            } else if (segment instanceof final TVIEquipmentView_Part treeItem) {
+
+               allExpandedItemIDs.add(STATE_ITEM_TYPE_PART);
+               allExpandedItemIDs.add(treeItem.getPartID());
+
+            } else if (segment instanceof final TVIEquipmentView_Part_Year treeItem) {
+
+               allExpandedItemIDs.add(STATE_ITEM_TYPE_PART_YEAR);
+               allExpandedItemIDs.add(treeItem.getYear());
+
+            } else if (segment instanceof final TVIEquipmentView_Part_Month treeItem) {
+
+               allExpandedItemIDs.add(STATE_ITEM_TYPE_PART_MONTH);
+               allExpandedItemIDs.add(treeItem.getMonth());
             }
          }
       }

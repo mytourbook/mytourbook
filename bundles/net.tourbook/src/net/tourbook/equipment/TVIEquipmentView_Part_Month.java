@@ -217,8 +217,8 @@ public class TVIEquipmentView_Part_Month extends TVIEquipmentView_Item {
          final ResultSet result = statement.executeQuery();
 
          long prevTourId = -1;
-         final Set<Long> allTagIDs = new HashSet<>();
-         final Set<Long> allMarkerIDs = new HashSet<>();
+         Set<Long> allTagIDs = null;
+         Set<Long> allMarkerIDs = null;
 
          while (result.next()) {
 
@@ -260,13 +260,19 @@ public class TVIEquipmentView_Part_Month extends TVIEquipmentView_Item {
 
                // get first tag id
                if (dbTagId instanceof Long) {
+
+                  allTagIDs = new HashSet<>();
                   allTagIDs.add((Long) dbTagId);
+
                   tourItem.setTagIds(allTagIDs);
                }
 
                // get first marker id
                if (dbMarkerId instanceof Long) {
+
+                  allMarkerIDs = new HashSet<>();
                   allMarkerIDs.add((Long) dbMarkerId);
+
                   tourItem.setMarkerIds(allMarkerIDs);
                }
             }

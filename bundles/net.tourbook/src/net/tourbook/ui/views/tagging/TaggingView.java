@@ -429,38 +429,43 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer,
       @Override
       public boolean equals(final Object a, final Object b) {
 
+// SET_FORMATTING_OFF
+         
          if (a == b) {
 
             return true;
 
-         } else if (a instanceof final TVITaggingView_Year yearItem1 && b instanceof final TVITaggingView_Year yearItem2) {
+         } else if (a instanceof final TVITaggingView_Year yearItem1
+                 && b instanceof final TVITaggingView_Year yearItem2) {
 
             return yearItem1.getTagId() == yearItem2.getTagId()
-                  && yearItem1.getYear() == yearItem2.getYear();
+                && yearItem1.getYear()  == yearItem2.getYear();
 
          } else if (a instanceof final TVITaggingView_Month monthItemA
-               && b instanceof final TVITaggingView_Month monthItemB) {
+                 && b instanceof final TVITaggingView_Month monthItemB) {
 
             final TVITaggingView_Year yearItemA = monthItemA.getYearItem();
             final TVITaggingView_Year yearItemB = monthItemB.getYearItem();
 
-            return yearItemA.getTagId() == yearItemB.getTagId()
-                  && yearItemA.getYear() == yearItemB.getYear()
-                  && monthItemA.getMonth() == monthItemB.getMonth();
+            return yearItemA.getTagId()  == yearItemB.getTagId()
+                && yearItemA.getYear()   == yearItemB.getYear()
+                && monthItemA.getMonth() == monthItemB.getMonth();
 
          } else if (a instanceof final TVITaggingView_TagCategory itemA
-               && b instanceof final TVITaggingView_TagCategory itemB) {
+                 && b instanceof final TVITaggingView_TagCategory itemB) {
 
             final TourTagCategory tagCategoryA = itemA.getTourTagCategory();
             final TourTagCategory tagCategoryB = itemB.getTourTagCategory();
 
             return tagCategoryA.getTagCategoryId() == tagCategoryB.getTagCategoryId();
 
-         } else if (a instanceof final TVITaggingView_Tag tagItemA && b instanceof final TVITaggingView_Tag tabItemB) {
+         } else if (a instanceof final TVITaggingView_Tag tagItemA 
+                 && b instanceof final TVITaggingView_Tag tabItemB) {
 
             return tagItemA.getTagId() == tabItemB.getTagId();
-
          }
+         
+// SET_FORMATTING_ON
 
          return false;
       }
@@ -1743,13 +1748,13 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer,
       int numItems = 0;
       int numOtherItems = 0;
 
-      TVITaggingView_Tour firstTour = null;
+      TVITaggingView_Tour firstTourItem = null;
 
       for (final Object treeItem : selection) {
 
          if (treeItem instanceof final TVITaggingView_Tour tourItem) {
             if (numTours == 0) {
-               firstTour = tourItem;
+               firstTourItem = tourItem;
             }
             numTours++;
          } else if (treeItem instanceof TVITaggingView_Tag) {
@@ -1828,11 +1833,11 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer,
       _actionCollapseOthers.setEnabled(selectedItems == 1 && firstElementHasChildren);
       _actionCollapseAll_WithoutSelection.setEnabled(isItemsAvailable);
 
-      _tagMenuManager.enableTagActions(isTourSelected, isOneTour, firstTour == null ? null : firstTour.tagIds);
+      _tagMenuManager.enableTagActions(isTourSelected, isOneTour, firstTourItem == null ? null : firstTourItem.tagIds);
 
       _tourTypeMenuManager.enableTourTypeActions(isTourSelected,
             isOneTour
-                  ? firstTour.tourTypeId
+                  ? firstTourItem.tourTypeId
                   : TourDatabase.ENTITY_IS_NOT_SAVED);
    }
 
@@ -1846,12 +1851,6 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer,
    }
 
    private void fillContextMenu(final IMenuManager menuMgr) {
-
-      menuMgr.add(_actionCollapseOthers);
-      menuMgr.add(_actionExpandSelection);
-      menuMgr.add(_actionCollapseAll_WithoutSelection);
-      menuMgr.add(_actionOnMouseSelect_ExpandCollapse);
-      menuMgr.add(_actionSingleExpand_CollapseOthers);
 
       // edit actions
       TourActionManager.fillContextMenu(menuMgr, TourActionCategory.EDIT, _allTourActions_Edit, this);
@@ -1876,6 +1875,13 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer,
       menuMgr.add(_actionOpenTagPrefs);
       menuMgr.add(_actionDeleteTag);
       menuMgr.add(_actionDeleteTagCategory);
+
+      menuMgr.add(new Separator());
+      menuMgr.add(_actionCollapseOthers);
+      menuMgr.add(_actionExpandSelection);
+      menuMgr.add(_actionCollapseAll_WithoutSelection);
+      menuMgr.add(_actionOnMouseSelect_ExpandCollapse);
+      menuMgr.add(_actionSingleExpand_CollapseOthers);
 
       // customize context menu
       TourActionManager.fillContextMenu_CustomizeAction(menuMgr)
