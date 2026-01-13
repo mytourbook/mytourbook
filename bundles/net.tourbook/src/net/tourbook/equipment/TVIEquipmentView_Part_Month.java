@@ -300,7 +300,7 @@ public class TVIEquipmentView_Part_Month extends TVIEquipmentView_Item {
             + "  _month        = " + _month + NL //                           //$NON-NLS-1$
             + "  _yearItem     = " + _yearItem + NL //                        //$NON-NLS-1$
 
-            + "  numTours          = " + numTours + NL //                     //$NON-NLS-1$
+            + "  numTours_IsCollated = " + numTours_IsCollated + NL //                     //$NON-NLS-1$
 //            + "  numTags_NoTours   = " + numTags_NoTours + NL //              //$NON-NLS-1$
 
             + "]" + NL //                                                     //$NON-NLS-1$

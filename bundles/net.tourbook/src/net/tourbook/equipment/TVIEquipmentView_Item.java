@@ -105,13 +105,13 @@ public abstract class TVIEquipmentView_Item extends TreeViewerItem {
 
    private TreeViewer _equipmentViewer;
 
+   long               numTours_All;
+   long               numTours_IsCollated;
+
    /**
     * Content which is displayed in the first tree column
     */
    String             firstColumn;
-
-   long               numTours;
-   long               numTours_NotCollated;
 
    float              colDistance;
 
@@ -179,7 +179,7 @@ public abstract class TVIEquipmentView_Item extends TreeViewerItem {
       loadSummarizedValues_Equipment_IgnoreCollate(allEquipmentItems);
    }
 
-   void loadSummarizedValues_Equipment_IgnoreCollate(final Map<Long, TVIEquipmentView_Equipment> allEquipmentItems) {
+   private void loadSummarizedValues_Equipment_IgnoreCollate(final Map<Long, TVIEquipmentView_Equipment> allEquipmentItems) {
 
       String sql = null;
       PreparedStatement statement = null;
@@ -225,7 +225,7 @@ public abstract class TVIEquipmentView_Item extends TreeViewerItem {
 
             if (equipmentItem != null) {
 
-               equipmentItem.numTours_NotCollated = numTours;
+               equipmentItem.numTours_All = numTours;
             }
          }
 
@@ -236,7 +236,7 @@ public abstract class TVIEquipmentView_Item extends TreeViewerItem {
       }
    }
 
-   void loadSummarizedValues_Equipment_WithCollate(final Map<Long, TVIEquipmentView_Equipment> allEquipmentItems) {
+   private void loadSummarizedValues_Equipment_WithCollate(final Map<Long, TVIEquipmentView_Equipment> allEquipmentItems) {
 
       String sql = null;
       PreparedStatement statement = null;
@@ -286,7 +286,7 @@ public abstract class TVIEquipmentView_Item extends TreeViewerItem {
 
             if (equipmentItem != null) {
 
-               equipmentItem.numTours = numTours;
+               equipmentItem.numTours_IsCollated = numTours;
 
                equipmentItem.readCommonValues(result, 3);
             }
@@ -371,7 +371,7 @@ public abstract class TVIEquipmentView_Item extends TreeViewerItem {
 
             final int numTours = result.getInt(1);
 
-            partItem.numTours = numTours;
+            partItem.numTours_IsCollated = numTours;
 
             partItem.readCommonValues(result, 2);
 
@@ -379,7 +379,7 @@ public abstract class TVIEquipmentView_Item extends TreeViewerItem {
             break;
          }
 
-         final long numTours = partItem.numTours;
+         final long numTours = partItem.numTours_IsCollated;
 
          if (numTours == 0) {
 

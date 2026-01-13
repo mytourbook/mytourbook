@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   version="1.1"
+   id="svg2985"
+   height="16"
+   width="15.999976"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:dc="http://purl.org/dc/elements/1.1/">
+  <defs
+     id="defs2987">
+    <linearGradient
+       id="linearGradient5090">
+      <stop
+         style="stop-color:#435800;stop-opacity:1;"
+         offset="0"
+         id="stop5088" />
+    </linearGradient>
+    <linearGradient
+       id="linearGradient6402">
+      <stop
+         id="stop6404"
+         offset="0"
+         style="stop-color:#000000;stop-opacity:1;" />
+      <stop
+         id="stop6406"
+         offset="1"
+         style="stop-color:#000000;stop-opacity:0;" />
+    </linearGradient>
+    <linearGradient
+       id="linearGradient3816">
+      <stop
+         id="stop3818"
+         offset="0"
+         style="stop-color:#ffa576;stop-opacity:1;" />
+      <stop
+         style="stop-color:#f45400;stop-opacity:1;"
+         offset="1"
+         id="stop3782" />
+    </linearGradient>
+  </defs>
+  <metadata
+     id="metadata2990">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <g
+     id="layer1"
+     style="display:inline"
+     transform="translate(-15.000062,-179.00208)">
+    <path
+       id="rect9-4-1-1-2-0-4-2-0-7"
+       style="display:inline;fill:#e9e61f;fill-opacity:1;stroke:#79770c;stroke-width:0.500003;stroke-miterlimit:3;stroke-opacity:1"
+       d="M 27.405081,179.1254 24.196614,184.65912 18.624601,181.45581" />
+    <path
+       id="path5771-6-9-5-5-4-8-3-1-9-9-2-8-6-4-59"
+       d="M 15,186.00282 21.00781,192.35938 V 195.00239 H 24.99999 V 192.35938 L 31,186.00282 Z"
+       style="color:#000000;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:medium;line-height:normal;font-family:sans-serif;font-variant-ligatures:normal;font-variant-position:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-alternates:normal;font-feature-settings:normal;text-indent:0;text-align:start;text-decoration:none;text-decoration-line:none;text-decoration-style:solid;text-decoration-color:#000000;letter-spacing:normal;word-spacing:normal;text-transform:none;writing-mode:lr-tb;direction:ltr;text-orientation:mixed;dominant-baseline:auto;baseline-shift:baseline;text-anchor:start;white-space:normal;shape-padding:0;clip-rule:nonzero;display:inline;overflow:visible;visibility:visible;isolation:auto;mix-blend-mode:normal;color-interpolation:sRGB;color-interpolation-filters:linearRGB;solid-color:#000000;solid-opacity:1;fill:#3b4e00;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:2;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;color-rendering:auto;image-rendering:auto;shape-rendering:auto;text-rendering:auto;enable-background:accumulate" />
+    <rect
+       y="179.00208"
+       x="15.000062"
+       height="15.999999"
+       width="15.999976"
+       id="rect6561-7-5-9-4-3-0-1-6-9-6-0-2-9"
+       style="display:inline;opacity:0.99;fill:none;fill-opacity:1;stroke:none;stroke-width:1" />
+    <path
+       id="path3480-7-9-7-3-3-3-71"
+       d="M 21.84765,191.8019 V 195.00233 H 24.24765 V 191.8019 L 30.04766,186.0019 H 16.04766 C 20.82605,190.90845 18.32264,188.24637 21.84765,191.8019 Z"
+       style="display:inline;fill:#d0ec86;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
+  </g>
+</svg>

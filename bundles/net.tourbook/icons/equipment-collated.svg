@@ -56,6 +56,10 @@
      id="layer1"
      style="display:inline"
      transform="translate(-175,-18.999985)">
+    <path
+       id="rect9-4-1-1-2-0-4-2-4-3-4"
+       style="display:inline;fill:#e9e61f;fill-opacity:1;stroke:#79770c;stroke-width:0.500002;stroke-miterlimit:3;stroke-opacity:1"
+       d="M 189.78294,22.920909 184.79257,31.653854 176.12597,26.598543" />
     <rect
        y="18.999985"
        x="175"
@@ -63,10 +67,6 @@
        width="15.999991"
        id="rect6561-8-1-9-9-5-5-9-9-1-3-94-1-6-6-4-5-4-9-5-9-5-4-0-0-2-4"
        style="display:inline;opacity:0.99;fill:none;stroke:none" />
-    <path
-       id="rect9-4-1-1-2-0-4-2-4-3-0"
-       style="display:inline;fill:#e9e61f;fill-opacity:1;stroke:#79770c;stroke-width:0.500003;stroke-miterlimit:3;stroke-opacity:1"
-       d="M 188.37334,23.500968 184.26327,30.65769 177.12549,26.514821" />
     <rect
        style="fill:#ff4200;fill-opacity:1;stroke:none;stroke-width:0.7;stroke-miterlimit:3;paint-order:markers fill stroke"
        id="rect1"

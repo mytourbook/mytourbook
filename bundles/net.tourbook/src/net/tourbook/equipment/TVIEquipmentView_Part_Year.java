@@ -226,7 +226,7 @@ public class TVIEquipmentView_Part_Year extends TVIEquipmentView_Item {
 
             allTourItems.add(monthItem);
 
-            monthItem.numTours = numTours;
+            monthItem.numTours_IsCollated = numTours;
 
             monthItem.firstColumn = LocalDate.of(dbYear, dbMonth, 1).format(TimeTools.Formatter_Month);
 
@@ -378,21 +378,13 @@ public class TVIEquipmentView_Part_Year extends TVIEquipmentView_Item {
 
       return UI.EMPTY_STRING
 
-            + "TVITagView_Year " + System.identityHashCode(this) + NL //   //$NON-NLS-1$
-
-            + " [" + NL //                                                 //$NON-NLS-1$
+            + "TVITagView_Year" + System.identityHashCode(this) + NL //    //$NON-NLS-1$
 
             + "  _year        = " + _year + NL //                          //$NON-NLS-1$
-            + "  _isMonth     = " + _isMonthCategory + NL //                       //$NON-NLS-1$
+            + "  _isMonth     = " + _isMonthCategory + NL //               //$NON-NLS-1$
 
             + NL
-            + "  numTours          = " + numTours + NL //                  //$NON-NLS-1$
-//            + "  numTags_NoTours   = " + numTags_NoTours + NL //           //$NON-NLS-1$
-
-//          + NL
-//          + "_tagItem  = " + _tagItem + NL //                            //$NON-NLS-1$
-
-            + "]" + NL //                                                  //$NON-NLS-1$
+            + "  numTours_IsCollated = " + numTours_IsCollated + NL //     //$NON-NLS-1$
       ;
    }
 }

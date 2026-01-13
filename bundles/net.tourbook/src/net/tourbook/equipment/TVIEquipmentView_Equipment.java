@@ -334,7 +334,7 @@ public class TVIEquipmentView_Equipment extends TVIEquipmentView_Item {
 
             allTourItems.add(yearItem);
 
-            yearItem.numTours = numTours;
+            yearItem.numTours_IsCollated = numTours;
 
             yearItem.firstColumn = Integer.toString(year);
 
