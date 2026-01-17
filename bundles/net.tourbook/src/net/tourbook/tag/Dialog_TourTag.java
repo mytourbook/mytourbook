@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2024 Wolfgang Schramm and Contributors
+ * Copyright (C) 2019, 2026 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -15,6 +15,7 @@
  *******************************************************************************/
 package net.tourbook.tag;
 
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 
@@ -22,6 +23,7 @@ import net.tourbook.Images;
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.UI;
+import net.tourbook.common.util.ImageUtils;
 import net.tourbook.common.util.StringUtils;
 import net.tourbook.data.TourTag;
 
@@ -53,10 +55,10 @@ public class Dialog_TourTag extends TitleAreaDialog {
 
    private static final String           ID                       = "net.tourbook.tag.Dialog_TourTag";      //$NON-NLS-1$
 
-   private static final IPreferenceStore _prefStore               = TourbookPlugin.getPrefStore();
    private static final String           IMAGE_LAST_SELECTED_PATH = "Dialog_TourTag_ImageLastSelectedPath"; //$NON-NLS-1$
 
-   private final IDialogSettings         _state                   = TourbookPlugin.getState(ID);
+   private static final IPreferenceStore _prefStore               = TourbookPlugin.getPrefStore();
+   private static final IDialogSettings  _state                   = TourbookPlugin.getState(ID);
 
    private String                        _dlgMessage;
 
@@ -133,8 +135,7 @@ public class Dialog_TourTag extends TitleAreaDialog {
 
       final Composite dlgContainer = (Composite) super.createDialogArea(parent);
 
-      _imageCamera = TourbookPlugin.getImageDescriptor(Images.Camera).createImage();
-      _imageTrash = TourbookPlugin.getImageDescriptor(Images.App_Trash_Themed).createImage();
+      initUI();
 
       createUI(dlgContainer);
 
@@ -264,6 +265,12 @@ public class Dialog_TourTag extends TitleAreaDialog {
       return _state;
    }
 
+   private void initUI() {
+
+      _imageCamera = TourbookPlugin.getImageDescriptor(Images.Camera).createImage();
+      _imageTrash = TourbookPlugin.getImageDescriptor(Images.App_Trash_Themed).createImage();
+   }
+
    @Override
    protected void okPressed() {
 
@@ -298,7 +305,7 @@ public class Dialog_TourTag extends TitleAreaDialog {
       fileDialog.setText(Messages.Dialog_TourTag_ImportImage_Title);
       fileDialog.setFilterPath(_prefStore.getString(IMAGE_LAST_SELECTED_PATH));
       fileDialog.setFilterNames(new String[] { Messages.Dialog_TourTag_FileDialog_ImageFiles });
-      fileDialog.setFilterExtensions(new String[] { "*.bmp;*.gif;*.png;*.jpg" });//$NON-NLS-1$
+      fileDialog.setFilterExtensions(ImageUtils.getImageExtensions());
 
       // open file dialog
       final String imageFilePath = fileDialog.open();
@@ -308,15 +315,18 @@ public class Dialog_TourTag extends TitleAreaDialog {
          return;
       }
 
-      _lblImageFile.setText(imageFilePath);
-      setTagImage(imageFilePath);
-
-      final String filePathFolder = Paths.get(imageFilePath).getParent().toString();
-
       // keep last selected path
+      final String filePathFolder = Paths.get(imageFilePath).getParent().toString();
       _prefStore.putValue(IMAGE_LAST_SELECTED_PATH, filePathFolder);
 
-      enableControls();
+      final boolean isImageLoaded = setTagImage(imageFilePath);
+
+      if (isImageLoaded) {
+
+         _lblImageFile.setText(imageFilePath);
+
+         enableControls();
+      }
    }
 
    private void restoreState() {
@@ -338,11 +348,16 @@ public class Dialog_TourTag extends TitleAreaDialog {
       _tourTag_Clone.setImageFilePath(_imageFilePath);
    }
 
-   private void setTagImage(final String imageFilePath) {
+   /**
+    * @param imageFilePath
+    *
+    * @return Returns <code>true</code> when the image could be loaded, otherwise <code>false</code>
+    */
+   private boolean setTagImage(final String imageFilePath) {
 
       setErrorMessage(null);
 
-      final Image[] image = new Image[] { _imageCamera };
+      final Image[] loadedImage = new Image[] { null };
 
       if (StringUtils.hasContent(imageFilePath)) {
 
@@ -354,20 +369,43 @@ public class Dialog_TourTag extends TitleAreaDialog {
 
             _imageFilePath = imageFilePath;
 
-            BusyIndicator.showWhile(Display.getCurrent(),
-                  () -> image[0] = TagManager.createTagImage(_imageFilePath));
+            BusyIndicator.showWhile(Display.getCurrent(), () -> {
+
+               try {
+
+                  loadedImage[0] = TagManager.createTagImage(_imageFilePath);
+
+               } catch (final IOException ioException) {
+
+                  /**
+                   * It is possible that an image cannot be loaded, e.g.
+                   * <p>
+                   * javax.imageio.IIOException: 16-bit samples are not supported for Horizontal
+                   * differencing Predictor
+                   */
+                  setErrorMessage("Cannot load image %s\n%s".formatted(
+                        imageFilePath,
+                        ioException.getMessage()));
+               }
+            });
          }
       }
+
+      final Image tagImage = loadedImage[0] == null
+            ? _imageCamera
+            : loadedImage[0];
 
       // Before setting a new image, we make sure that the previous one was disposed
       disposeCanvasTagImage();
 
-      _canvasTagImage.setImage(image[0]);
+      _canvasTagImage.setImage(tagImage);
 
-      // update layout
+      // update layout height
       final GridData gd = (GridData) _canvasTagImage.getLayoutData();
-      gd.heightHint = image[0].getBounds().height;
+      gd.heightHint = tagImage.getBounds().height;
       _container.layout(true, true);
+
+      return loadedImage[0] != null;
 
    }
 }

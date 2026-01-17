@@ -31,11 +31,13 @@ import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.CommonActivator;
 import net.tourbook.common.CommonImages;
 import net.tourbook.common.UI;
+import net.tourbook.common.action.ActionOpenPrefDialog;
 import net.tourbook.common.formatter.ValueFormat;
 import net.tourbook.common.time.TimeTools;
 import net.tourbook.common.ui.SelectionCellLabelProvider;
 import net.tourbook.common.util.ColumnDefinition;
 import net.tourbook.common.util.ColumnManager;
+import net.tourbook.common.util.ColumnProfile;
 import net.tourbook.common.util.IContextMenuProvider;
 import net.tourbook.common.util.ITourViewer;
 import net.tourbook.common.util.ITreeViewer;
@@ -49,6 +51,7 @@ import net.tourbook.data.TourData;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.extension.export.ActionExport;
 import net.tourbook.preferences.ITourbookPreferences;
+import net.tourbook.preferences.PrefPageEquipment;
 import net.tourbook.preferences.ViewContext;
 import net.tourbook.tag.TagMenuManager;
 import net.tourbook.tour.ITourEventListener;
@@ -105,6 +108,7 @@ import org.eclipse.jface.viewers.ViewerFilter;
 import org.eclipse.jface.window.Window;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.BusyIndicator;
+import org.eclipse.swt.events.ControlListener;
 import org.eclipse.swt.events.KeyListener;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Image;
@@ -114,6 +118,7 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Tree;
+import org.eclipse.swt.widgets.TreeColumn;
 import org.eclipse.swt.widgets.TreeItem;
 import org.eclipse.ui.part.ViewPart;
 import org.joda.time.Period;
@@ -182,6 +187,10 @@ public class EquipmentView extends ViewPart implements ITourProvider, ITourViewe
 
    private TreeViewerTourInfoToolTip           _tourInfoToolTip;
 
+   private TreeColumnDefinition                _colDef_EquipmentImage;
+   private int                                 _columnIndex_EquipmentImage;
+   private int                                 _columnWidth_EquipmentImage;
+
    private EquipmentFilterType                 _equipmentFilterType                     = EquipmentFilterType.ALL_IS_DISPLAYED;
 
    private TagMenuManager                      _tagMenuManager;
@@ -218,6 +227,7 @@ public class EquipmentView extends ViewPart implements ITourProvider, ITourViewe
    private ActionEditTour                      _actionEditTour;
    private ActionExport                        _actionExportTour;
    private ActionOpenTour                      _actionOpenTour;
+   private ActionOpenPrefDialog                _actionPrefDialog;
 
    private int                                 _numSelectedTours;
 
@@ -849,8 +859,10 @@ public class EquipmentView extends ViewPart implements ITourProvider, ITourViewe
             return;
          }
 
-         if (tourEventId == TourEventId.EQUIPMENT_STRUCTURE_CHANGED
-               || tourEventId == TourEventId.TOUR_CHANGED) {
+         if (tourEventId == TourEventId.TOUR_CHANGED
+               || tourEventId == TourEventId.EQUIPMENT_STRUCTURE_CHANGED
+               || tourEventId == TourEventId.EQUIPMENT_CONTENT_CHANGED // equipment image size is modified
+         ) {
 
             reloadViewer();
          }
@@ -913,7 +925,13 @@ public class EquipmentView extends ViewPart implements ITourProvider, ITourViewe
             _tagMenuManager         .getAllTagActions()        .keySet()
       );
 
-   // SET_FORMATTING_ON
+      _actionPrefDialog = new ActionOpenPrefDialog(
+            "Equipment preferences",
+            PrefPageEquipment.ID);
+
+      _actionPrefDialog.setImageDescriptor(CommonActivator.getThemedImageDescriptor(CommonImages.TourOptions));
+
+// SET_FORMATTING_ON
    }
 
    private void createMenuManager() {
@@ -1042,15 +1060,16 @@ public class EquipmentView extends ViewPart implements ITourProvider, ITourViewe
        * belongs to the old viewer
        */
       createUI_20_ContextMenu();
-//      createUI_30_ColumnImages(tree);
-//
-//      fillToolBar();
+
+      createUI_30_SetupColumnImages(tree);
+
+//    fillToolBar();
 
       // set tour info tooltip provider
       _tourInfoToolTip = new TreeViewerTourInfoToolTip(_equipmentViewer);
 
-      // this tooltip provider shows equipment info
-//      _tourInfoToolTip.setTooltipUICustomProvider(new TaggingView_TooltipUIProvider(this));
+// this tooltip provider shows equipment info
+//    _tourInfoToolTip.setTooltipUICustomProvider(new TaggingView_TooltipUIProvider(this));
    }
 
    /**
@@ -1093,6 +1112,34 @@ public class EquipmentView extends ViewPart implements ITourProvider, ITourViewe
       return treeContextMenu;
    }
 
+   private void createUI_30_SetupColumnImages(final Tree tree) {
+
+      // update column index which is needed for repainting
+      final ColumnProfile activeProfile = _columnManager.getActiveProfile();
+      _columnIndex_EquipmentImage = activeProfile.getColumnIndex(_colDef_EquipmentImage.getColumnId());
+
+      final int numColumns = tree.getColumns().length;
+
+      // add listeners
+      if (_columnIndex_EquipmentImage >= 0 && _columnIndex_EquipmentImage < numColumns) {
+
+         // column is visible
+
+         final TreeColumn imageColumn = tree.getColumn(_columnIndex_EquipmentImage);
+         final ControlListener controlResizedAdapter = ControlListener.controlResizedAdapter(
+               controlEvent -> onColumnImage_Resize_SetWidthForImageColumn());
+
+         imageColumn.addControlListener(controlResizedAdapter);
+         tree.addControlListener(controlResizedAdapter);
+
+         /*
+          * NOTE: MeasureItem, PaintItem and EraseItem are called repeatedly. Therefore, it is
+          * critical for performance that these methods be as efficient as possible.
+          */
+         tree.addListener(SWT.PaintItem, event -> onColumnImage_OnPaintViewer(event));
+      }
+   }
+
    /**
     * Defines all columns for the table viewer in the column manager
     */
@@ -1107,7 +1154,10 @@ public class EquipmentView extends ViewPart implements ITourProvider, ITourViewe
 
       defineColumn_Tour_Title();
       defineColumn_Tour_Marker();
+
       defineColumn_Tour_Tags();
+      defineColumn_Equipment_Image();
+      defineColumn_Equipment_ImageFilePath();
 
       defineColumn_Equipment_Date();
       defineColumn_Equipment_Date_Until();
@@ -1767,6 +1817,50 @@ public class EquipmentView extends ViewPart implements ITourProvider, ITourViewe
 
                cell.setText(Long.toString(id));
                setCellColor(cell, element);
+            }
+         }
+      });
+   }
+
+   /**
+    * Column: Image
+    */
+   private void defineColumn_Equipment_Image() {
+
+      _colDef_EquipmentImage = TreeColumnFactory.EQUIPMENT_IMAGE.createColumn(_columnManager, _pc);
+
+      _colDef_EquipmentImage.setLabelProvider(new CellLabelProvider() {
+
+         // !!! set dummy label provider, otherwise an error occurs !!!
+         // the image is painted in onPaintViewer()
+
+         @Override
+         public void update(final ViewerCell cell) {}
+      });
+   }
+
+   /**
+    * Column: Image file path
+    */
+   private void defineColumn_Equipment_ImageFilePath() {
+
+      final TreeColumnDefinition colDef = TreeColumnFactory.EQUIPMENT_IMAGE_FILE_PATH.createColumn(_columnManager, _pc);
+
+      colDef.setLabelProvider(new CellLabelProvider() {
+
+         @Override
+         public void update(final ViewerCell cell) {
+
+            final Object element = cell.getElement();
+
+            if (element instanceof final TVIEquipmentView_Equipment equipmentItem) {
+
+               final String imageFilePath = equipmentItem.getEquipment().getImageFilePath();
+
+               if (imageFilePath != null) {
+                  cell.setText(imageFilePath);
+                  setCellColor(cell, element);
+               }
             }
          }
       });
@@ -2506,6 +2600,7 @@ public class EquipmentView extends ViewPart implements ITourProvider, ITourViewe
       tbm.add(_actionExpandSelection);
       tbm.add(_actionCollapseAll_WithoutSelection);
       tbm.add(_actionRefreshView);
+      tbm.add(_actionPrefDialog);
 
       // update that actions are fully created otherwise action enable will fail
       tbm.update(true);
@@ -3183,6 +3278,56 @@ public class EquipmentView extends ViewPart implements ITourProvider, ITourViewe
       }
       tree.setRedraw(true);
 
+   }
+
+   private void onColumnImage_OnPaintViewer(final Event event) {
+
+      // skip other columns
+      if (event.index != _columnIndex_EquipmentImage) {
+         return;
+      }
+
+      final TreeItem item = (TreeItem) event.item;
+      final Object itemData = item.getData();
+
+      // skip other tree items
+      if (itemData instanceof final TVIEquipmentView_Equipment equipmentItem) {
+
+         /*
+          * Paint equipment image
+          */
+
+         final Equipment equipment = equipmentItem.getEquipment();
+         final Image equipmentImage = EquipmentManager.getEquipmentImage(equipment);
+
+         if (equipmentImage != null && equipmentImage.isDisposed() == false) {
+
+            UI.paintImage(
+
+                  event,
+                  equipmentImage,
+                  _columnWidth_EquipmentImage,
+
+                  _colDef_EquipmentImage.getColumnStyle(), //  horizontal alignment
+                  SWT.CENTER, //                               vertical alignment
+
+                  0 //                                         horizontal offset
+            );
+         }
+      }
+   }
+
+   private void onColumnImage_Resize_SetWidthForImageColumn() {
+
+      if (_colDef_EquipmentImage != null) {
+
+         final TreeColumn treeColumn = _colDef_EquipmentImage.getTreeColumn();
+
+         if (treeColumn != null && treeColumn.isDisposed() == false) {
+
+            _columnWidth_EquipmentImage = treeColumn.getWidth();
+         }
+      }
    }
 
    private void onEquipmentTree_MouseDown(final Event event) {

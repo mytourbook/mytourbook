@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2025 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2026 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -15,8 +15,6 @@
  *******************************************************************************/
 package net.tourbook.tag;
 
-import java.awt.image.BufferedImage;
-import java.io.File;
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -29,12 +27,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import javax.imageio.ImageIO;
-
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.UI;
-import net.tourbook.common.util.CustomScalingImageDataProvider;
 import net.tourbook.common.util.ImageUtils;
 import net.tourbook.common.util.SQL;
 import net.tourbook.common.util.StatusUtil;
@@ -51,11 +46,6 @@ import net.tourbook.tour.TourLogManager.AutoOpenEvent;
 import net.tourbook.tour.TourManager;
 import net.tourbook.ui.views.tourDataEditor.TourDataEditorView;
 
-import org.apache.commons.imaging.Imaging;
-import org.apache.commons.imaging.common.ImageMetadata;
-import org.apache.commons.imaging.formats.jpeg.JpegImageMetadata;
-import org.apache.commons.imaging.formats.tiff.TiffField;
-import org.apache.commons.imaging.formats.tiff.constants.TiffTagConstants;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.dialogs.MessageDialog;
@@ -72,10 +62,6 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
-import org.eclipse.ui.PlatformUI;
-import org.imgscalr.Scalr;
-import org.imgscalr.Scalr.Method;
-import org.imgscalr.Scalr.Rotation;
 
 public class TagManager {
 
@@ -206,82 +192,17 @@ public class TagManager {
    }
 
    /**
-    * Creates a tag image which must be disposed when not needed any more
+    * This image must be disposed externally
     *
     * @param imageFilePath
     *
     * @return
+    *
+    * @throws IOException
     */
-   public static Image createTagImage(final String imageFilePath) {
+   public static Image createTagImage(final String imageFilePath) throws IOException {
 
-      if (StringUtils.isNullOrEmpty(imageFilePath)
-            || new File(imageFilePath).exists() == false) {
-
-         return null;
-      }
-
-      /*
-       * Load tag image
-       */
-      BufferedImage awtImage;
-
-      try {
-
-         awtImage = ImageIO.read(new File(imageFilePath));
-
-      } catch (final Exception e) {
-
-         StatusUtil.logError("Tag image cannot be loaded: \"%s\"".formatted(imageFilePath)); //$NON-NLS-1$
-
-         return null;
-      }
-
-      final int originalImageWidth = awtImage.getWidth();
-      final int originalImageHeight = awtImage.getHeight();
-
-      if (originalImageWidth >= _tagImageSize || originalImageHeight >= _tagImageSize) {
-
-         // the original image is larger than the required image -> resize it
-
-         final org.eclipse.swt.graphics.Point bestSize = ImageUtils.getBestSize(
-               originalImageWidth,
-               originalImageHeight,
-               _tagImageSize,
-               _tagImageSize);
-
-         final int scaleWidth = bestSize.x;
-         final int scaledHeight = bestSize.y;
-
-         final int maxSize = Math.max(scaleWidth, scaledHeight);
-         final BufferedImage scaledHQImage = Scalr.resize(awtImage, Method.QUALITY, maxSize);
-
-         awtImage.flush();
-
-         awtImage = scaledHQImage;
-      }
-
-      /*
-       * Rotate image
-       */
-      final Rotation rotation = getImageRotation(imageFilePath);
-
-      if (rotation != null) {
-
-         // rotate image according to the EXIF flag
-
-         final BufferedImage rotatedImage = Scalr.rotate(awtImage, rotation);
-
-         awtImage.flush();
-
-         awtImage = rotatedImage;
-      }
-
-      final Image swtImage = new Image(PlatformUI.getWorkbench().getDisplay(),
-            new CustomScalingImageDataProvider(awtImage));
-
-      awtImage.flush();
-
-      return swtImage;
+      return ImageUtils.createImage(imageFilePath, _tagImageSize);
    }
 
    /**
@@ -616,42 +537,6 @@ public class TagManager {
       return tourTagsAccumulatedValues;
    }
 
-   private static Rotation getImageRotation(final String imageFilePath) {
-
-      Rotation rotation = null;
-
-      try {
-
-         // load metadata
-         final ImageMetadata imageMetadata = Imaging.getMetadata(new File(imageFilePath));
-         if (imageMetadata instanceof JpegImageMetadata) {
-
-            final JpegImageMetadata jpegMetadata = (JpegImageMetadata) imageMetadata;
-            final TiffField field = jpegMetadata.findExifValueWithExactMatch(TiffTagConstants.TIFF_TAG_ORIENTATION);
-
-            if (field != null) {
-
-               final int orientation = field.getIntValue();
-
-// SET_FORMATTING_OFF
-
-               if (       orientation == 6) {   rotation = Rotation.CW_90;
-               } else if (orientation == 3) {   rotation = Rotation.CW_180;
-               } else if (orientation == 8) {   rotation = Rotation.CW_270;
-               }
-
-// SET_FORMATTING_ON
-            }
-         }
-
-      } catch (final IOException e) {
-
-         StatusUtil.log(e);
-      }
-
-      return rotation;
-   }
-
    private static long getNumberOfItems(final Connection conn, final String sql) {
 
       long numItems = 0;
@@ -776,7 +661,14 @@ public class TagManager {
 
       if (tagImage == null) {
 
-         tagImage = createTagImage(imageFilePath);
+         try {
+
+            tagImage = ImageUtils.createImage(imageFilePath, _tagImageSize);
+
+         } catch (final IOException e) {
+
+            return null;
+         }
 
          if (tagImage != null) {
             _tagImagesCache.put(imageFilePath, tagImage);

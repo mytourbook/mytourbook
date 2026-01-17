@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2025 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2026 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -15,7 +15,6 @@
  *******************************************************************************/
 package net.tourbook.common.util;
 
-import java.awt.image.BufferedImage;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.ByteArrayInputStream;
@@ -44,15 +43,12 @@ import java.time.LocalDate;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Base64;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.List;
 import java.util.StringTokenizer;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
-
-import javax.imageio.ImageIO;
 
 import net.tourbook.common.UI;
 import net.tourbook.common.time.TimeTools;
@@ -64,7 +60,6 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.FontData;
-import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.graphics.RGBA;
 import org.eclipse.swt.widgets.Combo;
@@ -2106,23 +2101,7 @@ public class Util {
       return year;
    }
 
-   public static String imageToBase64(final Image image) {
 
-      byte[] imageBytes = null;
-      final BufferedImage bufferedImage = ImageConverter.convertIntoAWT(image);
-
-      try (final ByteArrayOutputStream output = new ByteArrayOutputStream()) {
-
-         ImageIO.write(bufferedImage, "png", output); //$NON-NLS-1$
-         imageBytes = output.toByteArray();
-
-      } catch (final IOException e) {
-         StatusUtil.log(e);
-      }
-
-      final byte[] encoded = Base64.getEncoder().encode(imageBytes);
-      return new String(encoded);
-   }
 
    /**
     * @param event

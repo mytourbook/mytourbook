@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2007, 2025 Wolfgang Schramm and Contributors
+ * Copyright (C) 2007, 2026 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -80,6 +80,7 @@ import net.tourbook.data.TourTag;
 import net.tourbook.data.TourType;
 import net.tourbook.database.MyTourbookException;
 import net.tourbook.database.TourDatabase;
+import net.tourbook.equipment.EquipmentContentLayout;
 import net.tourbook.equipment.EquipmentMenuManager;
 import net.tourbook.extension.export.ActionExport;
 import net.tourbook.importdata.RawDataManager;
@@ -252,104 +253,119 @@ public class TourDataEditorView extends ViewPart implements
       ITourLocationConsumer,
       IPhotoEventListener {
 
-   public static final String            ID                                               = "net.tourbook.views.TourDataEditorView";          //$NON-NLS-1$
+   public static final String                 ID                                               = "net.tourbook.views.TourDataEditorView";          //$NON-NLS-1$
    //
-   private static final char             NL                                               = UI.NEW_LINE;
+   private static final char                  NL                                               = UI.NEW_LINE;
    //
-   private static final int              COLUMN_SPACING                                   = 20;
+   private static final int                   COLUMN_SPACING                                   = 20;
    //
-   private static final String           WIDGET_KEY                                       = "widgetKey";                                      //$NON-NLS-1$
-   private static final String           WIDGET_KEY_TOUR_DISTANCE                         = "tourDistance";                                   //$NON-NLS-1$
-   private static final String           WIDGET_KEY_ALTITUDE_UP                           = "altitudeUp";                                     //$NON-NLS-1$
-   private static final String           WIDGET_KEY_ALTITUDE_DOWN                         = "altitudeDown";                                   //$NON-NLS-1$
-   private static final String           WIDGET_KEY_PERSON                                = "tourPerson";                                     //$NON-NLS-1$
+   private static final String                WIDGET_KEY                                       = "widgetKey";                                      //$NON-NLS-1$
+   private static final String                WIDGET_KEY_TOUR_DISTANCE                         = "tourDistance";                                   //$NON-NLS-1$
+   private static final String                WIDGET_KEY_ALTITUDE_UP                           = "altitudeUp";                                     //$NON-NLS-1$
+   private static final String                WIDGET_KEY_ALTITUDE_DOWN                         = "altitudeDown";                                   //$NON-NLS-1$
+   private static final String                WIDGET_KEY_PERSON                                = "tourPerson";                                     //$NON-NLS-1$
    //
-   private static final String           MESSAGE_KEY_ANOTHER_SELECTION                    = "anotherSelection";                               //$NON-NLS-1$
+   private static final String                MESSAGE_KEY_ANOTHER_SELECTION                    = "anotherSelection";                               //$NON-NLS-1$
    //
    /**
     * shows the busy indicator to load the slice viewer when there are more items as this value
     */
-   private static final int              BUSY_INDICATOR_ITEMS                             = 5000;
+   private static final int                   BUSY_INDICATOR_ITEMS                             = 5000;
    //
-   private static final String           STATE_SELECTED_TAB                               = "tourDataEditor.selectedTab";                     //$NON-NLS-1$
-   private static final String           STATE_ROW_EDIT_MODE                              = "tourDataEditor.rowEditMode";                     //$NON-NLS-1$
-   private static final String           STATE_IS_EDIT_MODE                               = "tourDataEditor.isEditMode";                      //$NON-NLS-1$
-   private static final String           STATE_CSV_EXPORT_PATH                            = "tourDataEditor.csvExportPath";                   //$NON-NLS-1$
+   private static final String                STATE_SELECTED_TAB                               = "tourDataEditor.selectedTab";                     //$NON-NLS-1$
+   private static final String                STATE_ROW_EDIT_MODE                              = "tourDataEditor.rowEditMode";                     //$NON-NLS-1$
+   private static final String                STATE_IS_EDIT_MODE                               = "tourDataEditor.isEditMode";                      //$NON-NLS-1$
+   private static final String                STATE_CSV_EXPORT_PATH                            = "tourDataEditor.csvExportPath";                   //$NON-NLS-1$
    //
-   private static final String           STATE_SECTION_CHARACTERISTICS                    = "STATE_SECTION_CHARACTERISTICS";                  //$NON-NLS-1$
-   private static final String           STATE_SECTION_DATE_TIME                          = "STATE_SECTION_DATE_TIME";                        //$NON-NLS-1$
-   private static final String           STATE_SECTION_PERSONAL                           = "STATE_SECTION_PERSONAL";                         //$NON-NLS-1$
-   private static final String           STATE_SECTION_TITLE                              = "STATE_SECTION_TITLE";                            //$NON-NLS-1$
-   private static final String           STATE_SECTION_WEATHER                            = "STATE_SECTION_WEATHER";                          //$NON-NLS-1$
+   private static final String                STATE_SECTION_CHARACTERISTICS                    = "STATE_SECTION_CHARACTERISTICS";                  //$NON-NLS-1$
+   private static final String                STATE_SECTION_DATE_TIME                          = "STATE_SECTION_DATE_TIME";                        //$NON-NLS-1$
+   private static final String                STATE_SECTION_PERSONAL                           = "STATE_SECTION_PERSONAL";                         //$NON-NLS-1$
+   private static final String                STATE_SECTION_TITLE                              = "STATE_SECTION_TITLE";                            //$NON-NLS-1$
+   private static final String                STATE_SECTION_WEATHER                            = "STATE_SECTION_WEATHER";                          //$NON-NLS-1$
    //
-   static final String                   STATE_DESCRIPTION_NUMBER_OF_LINES                = "STATE_DESCRIPTION_NUMBER_OF_LINES";              //$NON-NLS-1$
-   static final int                      STATE_DESCRIPTION_NUMBER_OF_LINES_DEFAULT        = 3;
-   static final String                   STATE_IS_ADJUST_TOUR_START_TIME                  = "STATE_IS_ADJUST_TOUR_START_TIME";                //$NON-NLS-1$
-   static final boolean                  STATE_IS_ADJUST_TOUR_START_TIME_DEFAULT          = true;
-   static final String                   STATE_IS_DELETE_KEEP_DISTANCE                    = "STATE_IS_DELETE_KEEP_DISTANCE";                  //$NON-NLS-1$
-   static final boolean                  STATE_IS_DELETE_KEEP_DISTANCE_DEFAULT            = false;
-   static final String                   STATE_IS_DELETE_KEEP_TIME                        = "STATE_IS_DELETE_KEEP_TIME";                      //$NON-NLS-1$
-   static final boolean                  STATE_IS_DELETE_KEEP_TIME_DEFAULT                = false;
-   static final String                   STATE_IS_ELEVATION_FROM_DEVICE                   = "STATE_IS_ELEVATION_FROM_DEVICE";                 //$NON-NLS-1$
-   static final boolean                  STATE_IS_ELEVATION_FROM_DEVICE_DEFAULT           = true;
-   static final String                   STATE_IS_RECOMPUTE_ELEVATION_UP_DOWN             = "STATE_IS_RECOMPUTE_ELEVATION_UP_DOWN";           //$NON-NLS-1$
-   static final boolean                  STATE_IS_RECOMPUTE_ELEVATION_UP_DOWN_DEFAULT     = true;
-   static final String                   STATE_LAT_LON_DIGITS                             = "STATE_LAT_LON_DIGITS";                           //$NON-NLS-1$
-   static final int                      STATE_LAT_LON_DIGITS_DEFAULT                     = 5;
-   public static final String            STATE_WEATHERDESCRIPTION_NUMBER_OF_LINES         = "STATE_WEATHERDESCRIPTION_NUMBER_OF_LINES";       //$NON-NLS-1$
-   public static final int               STATE_WEATHERDESCRIPTION_NUMBER_OF_LINES_DEFAULT = 6;
+   static final String                        STATE_DESCRIPTION_NUMBER_OF_LINES                = "STATE_DESCRIPTION_NUMBER_OF_LINES";              //$NON-NLS-1$
+   static final int                           STATE_DESCRIPTION_NUMBER_OF_LINES_DEFAULT        = 3;
+   static final String                        STATE_IS_ADJUST_TOUR_START_TIME                  = "STATE_IS_ADJUST_TOUR_START_TIME";                //$NON-NLS-1$
+   static final boolean                       STATE_IS_ADJUST_TOUR_START_TIME_DEFAULT          = true;
+   static final String                        STATE_IS_DELETE_KEEP_DISTANCE                    = "STATE_IS_DELETE_KEEP_DISTANCE";                  //$NON-NLS-1$
+   static final boolean                       STATE_IS_DELETE_KEEP_DISTANCE_DEFAULT            = false;
+   static final String                        STATE_IS_DELETE_KEEP_TIME                        = "STATE_IS_DELETE_KEEP_TIME";                      //$NON-NLS-1$
+   static final boolean                       STATE_IS_DELETE_KEEP_TIME_DEFAULT                = false;
+   static final String                        STATE_IS_ELEVATION_FROM_DEVICE                   = "STATE_IS_ELEVATION_FROM_DEVICE";                 //$NON-NLS-1$
+   static final boolean                       STATE_IS_ELEVATION_FROM_DEVICE_DEFAULT           = true;
+   static final String                        STATE_IS_RECOMPUTE_ELEVATION_UP_DOWN             = "STATE_IS_RECOMPUTE_ELEVATION_UP_DOWN";           //$NON-NLS-1$
+   static final boolean                       STATE_IS_RECOMPUTE_ELEVATION_UP_DOWN_DEFAULT     = true;
+   static final String                        STATE_LAT_LON_DIGITS                             = "STATE_LAT_LON_DIGITS";                           //$NON-NLS-1$
+   static final int                           STATE_LAT_LON_DIGITS_DEFAULT                     = 5;
+   public static final String                 STATE_WEATHERDESCRIPTION_NUMBER_OF_LINES         = "STATE_WEATHERDESCRIPTION_NUMBER_OF_LINES";       //$NON-NLS-1$
+   public static final int                    STATE_WEATHERDESCRIPTION_NUMBER_OF_LINES_DEFAULT = 6;
    //
-   static final String                   STATE_IS_SCROLL_FIELD_CONTENT                    = "STATE_IS_SCROLL_FIELD_CONTENT";                  //$NON-NLS-1$
-   static final boolean                  STATE_IS_SCROLL_FIELD_CONTENT_DEFAULT            = true;
-   static final String                   STATE_SCROLL_FIELD_CONTENT                       = "STATE_SCROLL_FIELD_CONTENT";                     //$NON-NLS-1$
-   static final ScrollFieldContent       STATE_SCROLL_FIELD_CONTENT_DEFAULT               = ScrollFieldContent.WHEN_FIELD_IS_HOVERED;
+   static final String                        STATE_IS_SCROLL_FIELD_CONTENT                    = "STATE_IS_SCROLL_FIELD_CONTENT";                  //$NON-NLS-1$
+   static final boolean                       STATE_IS_SCROLL_FIELD_CONTENT_DEFAULT            = true;
+   static final String                        STATE_SCROLL_FIELD_CONTENT                       = "STATE_SCROLL_FIELD_CONTENT";                     //$NON-NLS-1$
+   static final ScrollFieldContent            STATE_SCROLL_FIELD_CONTENT_DEFAULT               = ScrollFieldContent.WHEN_FIELD_IS_HOVERED;
    //
-   public static final String            STATE_TAG_CONTENT_LAYOUT                         = "STATE_TAG_CONTENT_LAYOUT";                       //$NON-NLS-1$
-   public static final TagContentLayout  STATE_TAG_CONTENT_LAYOUT_DEFAULT                 = TagContentLayout.IMAGE_AND_DATA;
-   public static final String            STATE_TAG_IMAGE_SIZE                             = "STATE_TAG_IMAGE_SIZE";                           //$NON-NLS-1$
-   public static final int               STATE_TAG_IMAGE_SIZE_DEFAULT                     = 100;
-   public static final int               STATE_TAG_IMAGE_SIZE_MIN                         = 10;
-   public static final int               STATE_TAG_IMAGE_SIZE_MAX                         = 500;
-   public static final String            STATE_TAG_TEXT_WIDTH                             = "STATE_TAG_TEXT_WIDTH";                           //$NON-NLS-1$
-   public static final int               STATE_TAG_TEXT_WIDTH_DEFAULT                     = 200;
-   public static final int               STATE_TAG_TEXT_WIDTH_MIN                         = 20;
-   public static final int               STATE_TAG_TEXT_WIDTH_MAX                         = 1000;
-   public static final String            STATE_TAG_NUM_CONTENT_COLUMNS                    = "STATE_TAG_NUM_CONTENT_COLUMNS";                  //$NON-NLS-1$
-   public static final int               STATE_TAG_NUM_CONTENT_COLUMNS_DEFAULT            = 2;
-   public static final int               STATE_TAG_NUM_CONTENT_COLUMNS_MIN                = 1;
-   public static final int               STATE_TAG_NUM_CONTENT_COLUMNS_MAX                = 100;
+   public static final String                 STATE_TAG_CONTENT_LAYOUT                         = "STATE_TAG_CONTENT_LAYOUT";                       //$NON-NLS-1$
+   public static final TagContentLayout       STATE_TAG_CONTENT_LAYOUT_DEFAULT                 = TagContentLayout.IMAGE_AND_DATA;
+   public static final String                 STATE_TAG_IMAGE_SIZE                             = "STATE_TAG_IMAGE_SIZE";                           //$NON-NLS-1$
+   public static final int                    STATE_TAG_IMAGE_SIZE_DEFAULT                     = 100;
+   public static final int                    STATE_TAG_IMAGE_SIZE_MIN                         = 10;
+   public static final int                    STATE_TAG_IMAGE_SIZE_MAX                         = 500;
+   public static final String                 STATE_TAG_TEXT_WIDTH                             = "STATE_TAG_TEXT_WIDTH";                           //$NON-NLS-1$
+   public static final int                    STATE_TAG_TEXT_WIDTH_DEFAULT                     = 200;
+   public static final int                    STATE_TAG_TEXT_WIDTH_MIN                         = 20;
+   public static final int                    STATE_TAG_TEXT_WIDTH_MAX                         = 1000;
+   public static final String                 STATE_TAG_NUM_CONTENT_COLUMNS                    = "STATE_TAG_NUM_CONTENT_COLUMNS";                  //$NON-NLS-1$
+   public static final int                    STATE_TAG_NUM_CONTENT_COLUMNS_DEFAULT            = 2;
+   public static final int                    STATE_TAG_NUM_CONTENT_COLUMNS_MIN                = 1;
+   public static final int                    STATE_TAG_NUM_CONTENT_COLUMNS_MAX                = 100;
    //
-   public static final String            STATE_AUTOCOMPLETE_POPUP_HEIGHT_TITLE            = "STATE_AUTOCOMPLETE_POPUP_HEIGHT_TITLE";          //$NON-NLS-1$
-   public static final String            STATE_AUTOCOMPLETE_POPUP_HEIGHT_LOCATION_START   = "STATE_AUTOCOMPLETE_POPUP_HEIGHT_LOCATION_START"; //$NON-NLS-1$
-   public static final String            STATE_AUTOCOMPLETE_POPUP_HEIGHT_LOCATION_END     = "STATE_AUTOCOMPLETE_POPUP_HEIGHT_LOCATION_END";   //$NON-NLS-1$
+   public static final String                 STATE_EQUIPMENT_CONTENT_LAYOUT                   = "STATE_EQUIPMENT_CONTENT_LAYOUT";                 //$NON-NLS-1$
+   public static final EquipmentContentLayout STATE_EQUIPMENT_CONTENT_LAYOUT_DEFAULT           = EquipmentContentLayout.IMAGE_AND_DATA;
+   public static final String                 STATE_EQUIPMENT_IMAGE_SIZE                       = "STATE_EQUIPMENT_IMAGE_SIZE";                     //$NON-NLS-1$
+   public static final int                    STATE_EQUIPMENT_IMAGE_SIZE_DEFAULT               = 100;
+   public static final int                    STATE_EQUIPMENT_IMAGE_SIZE_MIN                   = 10;
+   public static final int                    STATE_EQUIPMENT_IMAGE_SIZE_MAX                   = 500;
+   public static final String                 STATE_EQUIPMENT_TEXT_WIDTH                       = "STATE_EQUIPMENT_TEXT_WIDTH";                     //$NON-NLS-1$
+   public static final int                    STATE_EQUIPMENT_TEXT_WIDTH_DEFAULT               = 200;
+   public static final int                    STATE_EQUIPMENT_TEXT_WIDTH_MIN                   = 20;
+   public static final int                    STATE_EQUIPMENT_TEXT_WIDTH_MAX                   = 1000;
+   public static final String                 STATE_EQUIPMENT_NUM_CONTENT_COLUMNS              = "STATE_EQUIPMENT_NUM_CONTENT_COLUMNS";            //$NON-NLS-1$
+   public static final int                    STATE_EQUIPMENT_NUM_CONTENT_COLUMNS_DEFAULT      = 2;
+   public static final int                    STATE_EQUIPMENT_NUM_CONTENT_COLUMNS_MIN          = 1;
+   public static final int                    STATE_EQUIPMENT_NUM_CONTENT_COLUMNS_MAX          = 100;
    //
-   private static final String           COLUMN_ALTITUDE                                  = "ALTITUDE_ALTITUDE";                              //$NON-NLS-1$
-   private static final String           COLUMN_CADENCE                                   = "POWERTRAIN_CADENCE";                             //$NON-NLS-1$
-   private static final String           COLUMN_DATA_SEQUENCE                             = "DATA_SEQUENCE";                                  //$NON-NLS-1$
-   private static final String           COLUMN_POWER                                     = "POWER";                                          //$NON-NLS-1$
-   private static final String           COLUMN_PACE                                      = "MOTION_PACE";                                    //$NON-NLS-1$
-   private static final String           COLUMN_PULSE                                     = "BODY_PULSE";                                     //$NON-NLS-1$
-   private static final String           COLUMN_TEMPERATURE                               = "WEATHER_TEMPERATURE";                            //$NON-NLS-1$
+   public static final String                 STATE_AUTOCOMPLETE_POPUP_HEIGHT_TITLE            = "STATE_AUTOCOMPLETE_POPUP_HEIGHT_TITLE";          //$NON-NLS-1$
+   public static final String                 STATE_AUTOCOMPLETE_POPUP_HEIGHT_LOCATION_START   = "STATE_AUTOCOMPLETE_POPUP_HEIGHT_LOCATION_START"; //$NON-NLS-1$
+   public static final String                 STATE_AUTOCOMPLETE_POPUP_HEIGHT_LOCATION_END     = "STATE_AUTOCOMPLETE_POPUP_HEIGHT_LOCATION_END";   //$NON-NLS-1$
    //
-   private static final IPreferenceStore _prefStore                                       = TourbookPlugin.getPrefStore();
-   private static final IPreferenceStore _prefStore_Common                                = CommonActivator.getPrefStore();
-   private static final IDialogSettings  _state                                           = TourbookPlugin.getState(ID);
-   private static final IDialogSettings  _stateSwimSlice                                  = TourbookPlugin.getState(ID + ".swimSlice");       //$NON-NLS-1$
-   private static final IDialogSettings  _stateTimeSlice                                  = TourbookPlugin.getState(ID + ".slice");           //$NON-NLS-1$
+   private static final String                COLUMN_ALTITUDE                                  = "ALTITUDE_ALTITUDE";                              //$NON-NLS-1$
+   private static final String                COLUMN_CADENCE                                   = "POWERTRAIN_CADENCE";                             //$NON-NLS-1$
+   private static final String                COLUMN_DATA_SEQUENCE                             = "DATA_SEQUENCE";                                  //$NON-NLS-1$
+   private static final String                COLUMN_POWER                                     = "POWER";                                          //$NON-NLS-1$
+   private static final String                COLUMN_PACE                                      = "MOTION_PACE";                                    //$NON-NLS-1$
+   private static final String                COLUMN_PULSE                                     = "BODY_PULSE";                                     //$NON-NLS-1$
+   private static final String                COLUMN_TEMPERATURE                               = "WEATHER_TEMPERATURE";                            //$NON-NLS-1$
    //
-   private static final boolean          IS_LINUX                                         = UI.IS_LINUX;
-   private static final boolean          IS_OSX                                           = UI.IS_OSX;
-   private static final boolean          IS_DARK_THEME                                    = UI.IS_DARK_THEME;
+   private static final IPreferenceStore      _prefStore                                       = TourbookPlugin.getPrefStore();
+   private static final IPreferenceStore      _prefStore_Common                                = CommonActivator.getPrefStore();
+   private static final IDialogSettings       _state                                           = TourbookPlugin.getState(ID);
+   private static final IDialogSettings       _stateSwimSlice                                  = TourbookPlugin.getState(ID + ".swimSlice");       //$NON-NLS-1$
+   private static final IDialogSettings       _stateTimeSlice                                  = TourbookPlugin.getState(ID + ".slice");           //$NON-NLS-1$
+   //
+   private static final boolean               IS_LINUX                                         = UI.IS_LINUX;
+   private static final boolean               IS_OSX                                           = UI.IS_OSX;
+   private static final boolean               IS_DARK_THEME                                    = UI.IS_DARK_THEME;
    /**
     * this width is used as a hint for the width of the description field, this value also
     * influences the width of the columns in this editor
     */
-   private static final int              _hintTextColumnWidth                             = IS_OSX ? 200 : 150;
+   private static final int                   _hintTextColumnWidth                             = IS_OSX ? 200 : 150;
    //
-   private DecimalFormat                 _temperatureFormat                               = new DecimalFormat("###.0");                       //$NON-NLS-1$
+   private DecimalFormat                      _temperatureFormat                               = new DecimalFormat("###.0");                       //$NON-NLS-1$
    //
-   private ZonedDateTime                 _tourStartTime;
-   private int                           _tourStartTime_Seconds;
+   private ZonedDateTime                      _tourStartTime;
+   private int                                _tourStartTime_Seconds;
    //
    /*
     * Data series which are displayed in the viewer, all are metric system

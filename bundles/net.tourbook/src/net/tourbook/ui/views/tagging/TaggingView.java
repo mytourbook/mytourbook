@@ -430,7 +430,7 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer,
       public boolean equals(final Object a, final Object b) {
 
 // SET_FORMATTING_OFF
-         
+
          if (a == b) {
 
             return true;
@@ -459,12 +459,12 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer,
 
             return tagCategoryA.getTagCategoryId() == tagCategoryB.getTagCategoryId();
 
-         } else if (a instanceof final TVITaggingView_Tag tagItemA 
+         } else if (a instanceof final TVITaggingView_Tag tagItemA
                  && b instanceof final TVITaggingView_Tag tabItemB) {
 
             return tagItemA.getTagId() == tabItemB.getTagId();
          }
-         
+
 // SET_FORMATTING_ON
 
          return false;
@@ -661,10 +661,12 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer,
                updateViewerAfterTagStructureIsModified(_rootItem, changedTagsClone, isAddMode);
             }
 
-         } else if (tourEventId == TourEventId.TAG_STRUCTURE_CHANGED
+         } else if (tourEventId == TourEventId.UPDATE_UI
+               || tourEventId == TourEventId.TAG_STRUCTURE_CHANGED
+               || tourEventId == TourEventId.TAG_CONTENT_CHANGED //        tag image size is modified
                || tourEventId == TourEventId.EQUIPMENT_STRUCTURE_CHANGED
-               || tourEventId == TourEventId.TAG_CONTENT_CHANGED // tag image size is modified
-               || tourEventId == TourEventId.UPDATE_UI) {
+               || tourEventId == TourEventId.EQUIPMENT_CONTENT_CHANGED //  equipment image size is modified
+         ) {
 
             reloadViewer();
 
@@ -880,6 +882,7 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer,
        * belongs to the old viewer
        */
       createUI_20_ContextMenu();
+
       createUI_30_ColumnImages(tree);
 
       fillToolBar();

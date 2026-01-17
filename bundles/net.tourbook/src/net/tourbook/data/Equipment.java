@@ -271,20 +271,6 @@ public class Equipment implements Cloneable, Comparable<Object>, Serializable {
       return brand;
    }
 
-   public long getDateFrom() {
-
-      return dateFrom;
-   }
-
-   public LocalDateTime getDateFrom_Local() {
-
-      if (_dateFrom == null) {
-         _dateFrom = TimeTools.toLocalDateTime(dateFrom);
-      }
-
-      return _dateFrom;
-   }
-
    public long getDateBuilt() {
 
       return dateBuilt;
@@ -297,6 +283,20 @@ public class Equipment implements Cloneable, Comparable<Object>, Serializable {
       }
 
       return _dateBuilt;
+   }
+
+   public long getDateFrom() {
+
+      return dateFrom;
+   }
+
+   public LocalDateTime getDateFrom_Local() {
+
+      if (_dateFrom == null) {
+         _dateFrom = TimeTools.toLocalDateTime(dateFrom);
+      }
+
+      return _dateFrom;
    }
 
    public long getDateRetired() {
@@ -358,6 +358,11 @@ public class Equipment implements Cloneable, Comparable<Object>, Serializable {
    }
 
    public String getImageFilePath() {
+
+      if (imageFilePath == null) {
+         return UI.EMPTY_STRING;
+      }
+
       return imageFilePath;
    }
 
@@ -515,18 +520,18 @@ public class Equipment implements Cloneable, Comparable<Object>, Serializable {
       _equipmentName = null;
    }
 
-   public void setDateFrom(final long dateFrom) {
-
-      this.dateFrom = dateFrom;
-
-      _dateFrom = null;
-   }
-
    public void setDateBuilt(final long dateBuilt) {
 
       this.dateBuilt = dateBuilt;
 
       _dateBuilt = null;
+   }
+
+   public void setDateFrom(final long dateFrom) {
+
+      this.dateFrom = dateFrom;
+
+      _dateFrom = null;
    }
 
    public void setDateRetired(final long dateRetired) {
@@ -647,6 +652,7 @@ public class Equipment implements Cloneable, Comparable<Object>, Serializable {
       setBrand             (otherEquipment.getBrand());
       setModel             (otherEquipment.getModel());
       setDescription       (otherEquipment.getDescription());
+      setImageFilePath     (otherEquipment.getImageFilePath());
       setUrlAddress        (otherEquipment.getUrlAddress());
 
       setIsCollate         (otherEquipment.isCollate());

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2024 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2026 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -17,9 +17,20 @@
 package net.tourbook.common.util;
 
 import java.awt.image.BufferedImage;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.IOException;
+import java.util.Base64;
+
+import javax.imageio.ImageIO;
 
 import net.tourbook.common.UI;
 
+import org.apache.commons.imaging.Imaging;
+import org.apache.commons.imaging.common.ImageMetadata;
+import org.apache.commons.imaging.formats.jpeg.JpegImageMetadata;
+import org.apache.commons.imaging.formats.tiff.TiffField;
+import org.apache.commons.imaging.formats.tiff.constants.TiffTagConstants;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
@@ -28,12 +39,17 @@ import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.graphics.Transform;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.ui.PlatformUI;
+import org.imgscalr.Scalr;
+import org.imgscalr.Scalr.Method;
 import org.imgscalr.Scalr.Rotation;
 
 /**
  * Original code: org.sharemedia.utils.ImageUtils
  */
 public class ImageUtils {
+
+   private static String _allImageExtensions;
 
    /**
     * For images with a transparent layer, this will keep the existing
@@ -92,6 +108,88 @@ public class ImageUtils {
       return awtImage;
    }
 
+   /**
+    * Creates an image which must be disposed when not needed any more
+    *
+    * @param imageFilePath
+    * @param imageSize
+    *
+    * @return
+    *
+    * @throws IOException
+    */
+   public static Image createImage(final String imageFilePath, final int imageSize) throws IOException {
+
+      if (StringUtils.isNullOrEmpty(imageFilePath)
+            || new File(imageFilePath).exists() == false) {
+
+         return null;
+      }
+
+      /*
+       * Load image
+       */
+      BufferedImage awtImage;
+
+      try {
+
+         awtImage = ImageIO.read(new File(imageFilePath));
+
+      } catch (final IOException ioException) {
+
+         StatusUtil.log("Image cannot be loaded: \"%s\"".formatted(imageFilePath), ioException); //$NON-NLS-1$
+
+         throw ioException;
+      }
+
+      final int originalImageWidth = awtImage.getWidth();
+      final int originalImageHeight = awtImage.getHeight();
+
+      if (originalImageWidth >= imageSize || originalImageHeight >= imageSize) {
+
+         // the original image is larger than the required image -> resize it
+
+         final org.eclipse.swt.graphics.Point bestSize = ImageUtils.getBestSize(
+               originalImageWidth,
+               originalImageHeight,
+               imageSize,
+               imageSize);
+
+         final int scaleWidth = bestSize.x;
+         final int scaledHeight = bestSize.y;
+
+         final int maxSize = Math.max(scaleWidth, scaledHeight);
+         final BufferedImage scaledHQImage = Scalr.resize(awtImage, Method.QUALITY, maxSize);
+
+         awtImage.flush();
+
+         awtImage = scaledHQImage;
+      }
+
+      /*
+       * Rotate image
+       */
+      final Rotation rotation = getImageRotation(imageFilePath);
+
+      if (rotation != null) {
+
+         // rotate image according to the EXIF flag
+
+         final BufferedImage rotatedImage = Scalr.rotate(awtImage, rotation);
+
+         awtImage.flush();
+
+         awtImage = rotatedImage;
+      }
+
+      final Image swtImage = new Image(PlatformUI.getWorkbench().getDisplay(),
+            new CustomScalingImageDataProvider(awtImage));
+
+      awtImage.flush();
+
+      return swtImage;
+   }
+
    public static double getBestRatio(final int originalX, final int originalY, final int maxX, final int maxY) {
 
       final double widthRatio = (double) originalX / (double) maxX;
@@ -101,6 +199,7 @@ public class ImageUtils {
 
       return bestRatio;
    }
+
    public static Point getBestSize(final int originalX, final int originalY, final int maxX, final int maxY) {
 
       final double bestRatio = getBestRatio(originalX, originalY, maxX, maxY);
@@ -109,6 +208,92 @@ public class ImageUtils {
       final int newHeight = (int) (originalY / bestRatio);
 
       return new Point(newWidth, newHeight);
+   }
+
+   /**
+    * The strings are platform specific. For example, on some platforms, an extension filter string
+    * is typically of the form "*.extension", where "*.*" matches all files. For filters with
+    * multiple extensions, use semicolon as a separator, e.g. "*.jpg;*.png".
+    *
+    * @return Returns a string with file extensions for all supported image readers
+    */
+   public static String getImageExtensions() {
+
+      if (_allImageExtensions != null) {
+         return _allImageExtensions;
+      }
+
+      final String[] allImageExtensions = ImageIO.getReaderFormatNames();
+
+      final StringBuilder sb = new StringBuilder();
+
+      for (int formatIndex = 0; formatIndex < allImageExtensions.length; formatIndex++) {
+
+         if (formatIndex > 0) {
+            sb.append(';');
+         }
+
+         final String imageExtension = allImageExtensions[formatIndex];
+         sb.append("*." + imageExtension);
+      }
+
+      _allImageExtensions = sb.toString();
+
+      return _allImageExtensions;
+   }
+
+   public static Rotation getImageRotation(final String imageFilePath) {
+
+      Rotation rotation = null;
+
+      try {
+
+         // load metadata
+         final ImageMetadata imageMetadata = Imaging.getMetadata(new File(imageFilePath));
+         if (imageMetadata instanceof JpegImageMetadata) {
+
+            final JpegImageMetadata jpegMetadata = (JpegImageMetadata) imageMetadata;
+            final TiffField field = jpegMetadata.findExifValueWithExactMatch(TiffTagConstants.TIFF_TAG_ORIENTATION);
+
+            if (field != null) {
+
+               final int orientation = field.getIntValue();
+
+// SET_FORMATTING_OFF
+
+               if (       orientation == 6) {   rotation = Rotation.CW_90;
+               } else if (orientation == 3) {   rotation = Rotation.CW_180;
+               } else if (orientation == 8) {   rotation = Rotation.CW_270;
+               }
+
+// SET_FORMATTING_ON
+            }
+         }
+
+      } catch (final IOException e) {
+
+         StatusUtil.log(e);
+      }
+
+      return rotation;
+   }
+
+   public static String imageToBase64(final Image image) {
+
+      byte[] imageBytes = null;
+      final BufferedImage bufferedImage = ImageConverter.convertIntoAWT(image);
+
+      try (final ByteArrayOutputStream output = new ByteArrayOutputStream()) {
+
+         ImageIO.write(bufferedImage, "png", output); //$NON-NLS-1$
+         imageBytes = output.toByteArray();
+
+      } catch (final IOException e) {
+         StatusUtil.log(e);
+      }
+
+      final byte[] encoded = Base64.getEncoder().encode(imageBytes);
+      return new String(encoded);
    }
 
    /**

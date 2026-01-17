@@ -79,6 +79,10 @@ public abstract class TreeColumnFactory {
    public static final String            EQUIPMENT_EXPAND_TYPE_ID         = "EQUIPMENT_EXPAND_TYPE_ID";         //$NON-NLS-1$
    public static final TreeColumnFactory EQUIPMENT_ID;
    public static final String            EQUIPMENT_ID_ID                  = "EQUIPMENT_ID";                     //$NON-NLS-1$
+   public static final TreeColumnFactory EQUIPMENT_IMAGE;
+   public static final String            EQUIPMENT_IMAGE_ID               = "EQUIPMENT_IMAGE_id";               //$NON-NLS-1$
+   public static final TreeColumnFactory EQUIPMENT_IMAGE_FILE_PATH;
+   public static final String            EQUIPMENT_IMAGE_FILE_PATH_ID     = "EQUIPMENT_IMAGE_FILE_PATH_ID";     //$NON-NLS-1$
    public static final TreeColumnFactory EQUIPMENT_INITIAL_DISTANCE;
    public static final String            EQUIPMENT_INITIAL_DISTANCE_ID    = "EQUIPMENT_INITIAL_DISTANCE";       //$NON-NLS-1$
    public static final TreeColumnFactory EQUIPMENT_MODEL;
@@ -937,6 +941,44 @@ public abstract class TreeColumnFactory {
             colDef.setColumnHeaderToolTipText(  "Primary key");
 
             colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(5));
+
+            return colDef;
+         }
+      };
+
+
+      EQUIPMENT_IMAGE = new TreeColumnFactory() {
+         @Override
+         public TreeColumnDefinition createColumn(final ColumnManager columnManager,
+                                                  final PixelConverter pixelConverter) {
+
+            final TreeColumnDefinition colDef = new TreeColumnDefinition(columnManager, EQUIPMENT_IMAGE_ID, SWT.LEAD);
+
+            colDef.setColumnCategory(           Messages.ColumnFactory_Category_Equipment);
+
+            colDef.setColumnLabel(              Messages.ColumnFactory_TagImageFile_Header);
+            colDef.setColumnHeaderText(         Messages.ColumnFactory_TagImageFile_Header);
+
+            colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(15));
+
+            return colDef;
+         }
+      };
+
+      EQUIPMENT_IMAGE_FILE_PATH = new TreeColumnFactory() {
+         @Override
+         public TreeColumnDefinition createColumn(final ColumnManager columnManager,
+                                                  final PixelConverter pixelConverter) {
+
+            final TreeColumnDefinition colDef = new TreeColumnDefinition(columnManager, EQUIPMENT_IMAGE_FILE_PATH_ID, SWT.LEAD);
+
+            colDef.setColumnCategory(           Messages.ColumnFactory_Category_Equipment);
+
+            colDef.setColumnLabel(              Messages.ColumnFactory_TagImageFilePath_Label);
+            colDef.setColumnHeaderText(         Messages.ColumnFactory_TagImageFilePath_Header2);
+            colDef.setColumnHeaderToolTipText(  "The absolute image file path");
+
+            colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(25));
 
             return colDef;
          }

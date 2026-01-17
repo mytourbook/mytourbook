@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2025 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2026 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -38,6 +38,7 @@ import net.tourbook.common.util.StringUtils;
 import net.tourbook.data.TourPerson;
 import net.tourbook.database.PersonManager;
 import net.tourbook.database.TourDatabase;
+import net.tourbook.equipment.EquipmentManager;
 import net.tourbook.equipment.EquipmentMenuManager;
 import net.tourbook.map.player.ModelPlayerManager;
 import net.tourbook.photo.PhotoUI;
@@ -447,6 +448,7 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
 
       // do last cleanup, this dispose causes NPE in e4 when run in dispose() method
 
+      EquipmentManager.disposeEquipmentImages();
       TagManager.disposeTagImages();
       TourMarkerTypeManager.dispose();
       TourTypeImage.dispose();

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2023 Frédéric Bard
+ * Copyright (C) 2023, 2026 Frédéric Bard
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -19,7 +19,9 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
-import net.tourbook.tag.TagManager;
+import java.io.IOException;
+
+import net.tourbook.common.util.ImageUtils;
 
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Display;
@@ -43,11 +45,20 @@ public class UITests {
             () -> assertEquals(256, originalImage.getBounds().height),
             () -> assertEquals(256, originalImage.getBounds().width));
 
-      final Image resizedImage = TagManager.createTagImage(imageFilePath);
+      try {
 
-      assertAll(
-            () -> assertNotNull(resizedImage),
-            () -> assertEquals(100, resizedImage.getBounds().height),
-            () -> assertEquals(100, resizedImage.getBounds().width));
+         final int imageSize = 100;
+
+         final Image resizedImage = ImageUtils.createImage(imageFilePath, imageSize);
+
+         assertAll(
+               () -> assertNotNull(resizedImage),
+               () -> assertEquals(100, resizedImage.getBounds().height),
+               () -> assertEquals(100, resizedImage.getBounds().width));
+
+      } catch (final IOException e) {
+
+         e.printStackTrace();
+      }
    }
 }

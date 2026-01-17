@@ -15,11 +15,16 @@
  *******************************************************************************/
 package net.tourbook.preferences;
 
+import static org.eclipse.swt.events.SelectionListener.widgetSelectedAdapter;
+
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.UI;
 import net.tourbook.common.util.Util;
+import net.tourbook.equipment.EquipmentManager;
 import net.tourbook.equipment.EquipmentMenuManager;
+import net.tourbook.ui.views.tourDataEditor.TourDataEditorView;
 
+import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.layout.PixelConverter;
@@ -41,9 +46,10 @@ import org.eclipse.ui.IWorkbenchPreferencePage;
  */
 public class PrefPageEquipment extends PreferencePage implements IWorkbenchPreferencePage {
 
-   public static final String            ID         = "net.tourbook.preferences.PrefPageEquipment"; //$NON-NLS-1$
+   public static final String            ID         = "net.tourbook.preferences.PrefPageEquipment";  //$NON-NLS-1$
 
    private static final IPreferenceStore _prefStore = TourbookPlugin.getPrefStore();
+   private static final IDialogSettings  _state     = TourbookPlugin.getState(TourDataEditorView.ID);
 
    private MouseWheelListener            _defaultMouseWheelListener;
    private SelectionListener             _defaultSelectionListener;
@@ -54,6 +60,7 @@ public class PrefPageEquipment extends PreferencePage implements IWorkbenchPrefe
    /*
     * UI controls
     */
+   private Spinner _spinnerEquipmentImageSize;
    private Spinner _spinnerRecentEquipment;
 
    @Override
@@ -77,9 +84,35 @@ public class PrefPageEquipment extends PreferencePage implements IWorkbenchPrefe
       {
          {
             /*
+             * Equipment image size
+             */
+
+            // label
+            final Label label = new Label(container, SWT.NONE);
+            label.setText("Equipment &image size");
+            GridDataFactory.fillDefaults().align(SWT.FILL, SWT.CENTER).applyTo(label);
+
+            // spinner
+            _spinnerEquipmentImageSize = new Spinner(container, SWT.BORDER);
+            _spinnerEquipmentImageSize.setMinimum(TourDataEditorView.STATE_EQUIPMENT_IMAGE_SIZE_MIN);
+            _spinnerEquipmentImageSize.setMaximum(TourDataEditorView.STATE_EQUIPMENT_IMAGE_SIZE_MAX);
+            _spinnerEquipmentImageSize.addSelectionListener(widgetSelectedAdapter(selectionEvent -> onSelect_EquipmentLayout()));
+            _spinnerEquipmentImageSize.addMouseWheelListener(mouseEvent -> {
+               UI.adjustSpinnerValueOnMouseScroll(mouseEvent, 10);
+               onSelect_EquipmentLayout();
+            });
+            GridDataFactory.fillDefaults()
+                  .align(SWT.BEGINNING, SWT.FILL)
+                  .applyTo(_spinnerEquipmentImageSize);
+
+            UI.createSpacer_Horizontal(container);
+         }
+         {
+            /*
              * Number of recent equipment
              */
-            final String tooltip = "Number of recently used equipment which are displayed in the context menu.\n\n0 will hide recently used tags.";
+            final String tooltip =
+                  "Number of recently used equipment which are displayed in the context menu.\n\n0 will hide recently used equipment.";
 
             final Label label = UI.createLabel(container, "Number of recent &equipment");
             label.setToolTipText(tooltip);
@@ -97,10 +130,10 @@ public class PrefPageEquipment extends PreferencePage implements IWorkbenchPrefe
                   .applyTo(_spinnerRecentEquipment);
 
             // button: Remove recent equipment
-            final Button btnRemoveRecentTags = new Button(container, SWT.PUSH);
-            btnRemoveRecentTags.setText("Remo&ve Recent Equipment");
-            btnRemoveRecentTags.setToolTipText("All recent equipment will be removed from the recent equipment list");
-            btnRemoveRecentTags.addSelectionListener(SelectionListener.widgetSelectedAdapter(
+            final Button btnRemoveRecentEquipment = new Button(container, SWT.PUSH);
+            btnRemoveRecentEquipment.setText("Remo&ve Recent Equipment");
+            btnRemoveRecentEquipment.setToolTipText("All recent equipment will be removed from the recent equipment list");
+            btnRemoveRecentEquipment.addSelectionListener(SelectionListener.widgetSelectedAdapter(
                   selectionEvent -> EquipmentMenuManager.clearRecentEquipment()));
          }
       }
@@ -137,6 +170,16 @@ public class PrefPageEquipment extends PreferencePage implements IWorkbenchPrefe
 
    }
 
+   private void onSelect_EquipmentLayout() {
+
+      _state.put(TourDataEditorView.STATE_EQUIPMENT_IMAGE_SIZE, _spinnerEquipmentImageSize.getSelection());
+
+      enableControls();
+
+      // run async because it can take time to reload the tag images
+      _spinnerEquipmentImageSize.getDisplay().asyncExec(() -> EquipmentManager.updateEquipmentContent());
+   }
+
    @Override
    protected void performApply() {
 
@@ -170,6 +213,12 @@ public class PrefPageEquipment extends PreferencePage implements IWorkbenchPrefe
    }
 
    private void restoreState() {
+
+      _spinnerEquipmentImageSize.setSelection(Util.getStateInt(_state,
+            TourDataEditorView.STATE_EQUIPMENT_IMAGE_SIZE,
+            TourDataEditorView.STATE_EQUIPMENT_IMAGE_SIZE_DEFAULT,
+            TourDataEditorView.STATE_EQUIPMENT_IMAGE_SIZE_MIN,
+            TourDataEditorView.STATE_EQUIPMENT_IMAGE_SIZE_MAX));
 
       _spinnerRecentEquipment.setSelection(_prefStore.getInt(ITourbookPreferences.EQUIPMENT_NUMBER_OF_RECENT_EQUIPMENT));
    }

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2025 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2026 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -46,6 +46,7 @@ import net.tourbook.common.time.TimeTools;
 import net.tourbook.common.tooltip.ActionToolbarSlideout;
 import net.tourbook.common.tooltip.ToolbarSlideout;
 import net.tourbook.common.util.CSS;
+import net.tourbook.common.util.ImageUtils;
 import net.tourbook.common.util.PostSelectionProvider;
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.Util;
@@ -534,7 +535,7 @@ public class TourBlogView extends ViewPart {
          final Image tagImage = TagManager.getTagImage(tag);
          if (tagImage != null) {
 
-            final String imageBase64 = Util.imageToBase64(tagImage);
+            final String imageBase64 = ImageUtils.imageToBase64(tagImage);
             sb.append("<img src=\"data:image/png;base64," + imageBase64 + "\">"); //$NON-NLS-1$ //$NON-NLS-2$
          }
          final String tagText = NL + tag.getTagName() + NL + "<i>" + tourTagsAccumulatedValues.get(tag.getTagId()) + "</i>"; //$NON-NLS-1$ //$NON-NLS-2$

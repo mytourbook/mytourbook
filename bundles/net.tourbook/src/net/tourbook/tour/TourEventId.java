@@ -82,15 +82,20 @@ public enum TourEventId {
    NOTIFY_TAG_VIEW,
 
    /**
+    * Structure of equipment are changed
+    */
+   EQUIPMENT_STRUCTURE_CHANGED,
+
+   /**
+    * Equipment content has changed, e.g. equipment image size
+    */
+   EQUIPMENT_CONTENT_CHANGED,
+
+   /**
     * structure of the tags changed, this includes add/remove of tags and categories and
     * tag/category renaming
     */
    TAG_STRUCTURE_CHANGED,
-
-   /**
-    * Structure of equipment are changed
-    */
-   EQUIPMENT_STRUCTURE_CHANGED,
 
    /**
     * Tag content has changed, e.g. tag image size
