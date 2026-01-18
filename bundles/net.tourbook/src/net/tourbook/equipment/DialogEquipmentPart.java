@@ -15,6 +15,9 @@
  *******************************************************************************/
 package net.tourbook.equipment;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
@@ -24,6 +27,7 @@ import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.UI;
 import net.tourbook.common.autocomplete.AutoComplete_ComboInputMT;
 import net.tourbook.common.time.TimeTools;
+import net.tourbook.common.util.ImageUtils;
 import net.tourbook.common.util.StringUtils;
 import net.tourbook.common.util.Util;
 import net.tourbook.data.Equipment;
@@ -37,23 +41,28 @@ import org.eclipse.jface.fieldassist.FieldDecorationRegistry;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.layout.PixelConverter;
+import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.custom.BusyIndicator;
 import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.MouseWheelListener;
 import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.Image;
+import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.DateTime;
+import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Spinner;
 import org.eclipse.swt.widgets.Text;
 
 /**
- * Dialog to modify a {@link EquipmentPart}
+ * Dialog to modify an {@link EquipmentPart}
  */
 public class DialogEquipmentPart extends TitleAreaDialog {
 
@@ -66,6 +75,7 @@ public class DialogEquipmentPart extends TitleAreaDialog {
    private static final String          STATE_AUTOCOMPLETE_POPUP_HEIGHT_SIZE       = "STATE_AUTOCOMPLETE_POPUP_HEIGHT_SIZE";       //$NON-NLS-1$
    private static final String          STATE_AUTOCOMPLETE_POPUP_HEIGHT_TYPE       = "STATE_AUTOCOMPLETE_POPUP_HEIGHT_TYPE";       //$NON-NLS-1$
    private static final String          STATE_AUTOCOMPLETE_POPUP_HEIGHT_PRICE_UNIT = "STATE_AUTOCOMPLETE_POPUP_HEIGHT_PRICE_UNIT"; //$NON-NLS-1$
+   private static final String          STATE_IMAGE_LAST_SELECTED_PATH             = "STATE_IMAGE_LAST_SELECTED_PATH";             //$NON-NLS-1$
    private static final String          STATE_PRICE_UNIT_DEFAULT                   = "STATE_PRICE_UNIT_DEFAULT";                   //$NON-NLS-1$
    private static final String          STATE_SYNC_DATES                           = "STATE_SYNC_DATES";                           //$NON-NLS-1$
 
@@ -85,11 +95,17 @@ public class DialogEquipmentPart extends TitleAreaDialog {
 
    private boolean                      _isModified;
 
+   private String                       _imageFilePath;
+
    private PixelConverter               _pc;
 
    /*
     * UI resources
     */
+   private Image _imageTrash;
+   private Image _imageCamera;
+
+   // must be created eraly
    private Image _imageDialog = TourbookPlugin.getImageDescriptor(Images.Equipment_Part).createImage();
 
    /*
@@ -97,6 +113,8 @@ public class DialogEquipmentPart extends TitleAreaDialog {
     */
    private Composite                 _container;
    private Composite                 _parent;
+
+   private Button                    _btnDeleteImage;
 
    private Button                    _chkCollate;
    private Button                    _chkSyncDates;
@@ -111,6 +129,12 @@ public class DialogEquipmentPart extends TitleAreaDialog {
    private DateTime                  _dateBuilt;
    private DateTime                  _dateRetired;
 
+   private Label                     _canvasEquipmentImage;
+
+   private Label                     _lblCollate;
+   private Label                     _lblImage;
+   private Label                     _lblImageFilePath;
+
    private Spinner                   _spinDistance;
    private Spinner                   _spinPrice;
    private Spinner                   _spinWeight;
@@ -124,6 +148,7 @@ public class DialogEquipmentPart extends TitleAreaDialog {
    private AutoComplete_ComboInputMT _autocomplete_Size;
    private AutoComplete_ComboInputMT _autocomplete_Type;
 
+   private ControlDecoration         _comboDecorator_Collate;
    private ControlDecoration         _comboDecorator_DateFrom;
    private ControlDecoration         _comboDecorator_Type;
 
@@ -219,9 +244,9 @@ public class DialogEquipmentPart extends TitleAreaDialog {
 
       fillUI();
 
-      resoreState();
-
       updateUIFromModel();
+
+      resoreState();
 
 // FOR DEBUGGING
 //    _date.setFocus();
@@ -242,6 +267,21 @@ public class DialogEquipmentPart extends TitleAreaDialog {
       final GridDataFactory gdVertCenter = GridDataFactory.fillDefaults().align(SWT.BEGINNING, SWT.CENTER);
 
       final int defaultWidth = convertWidthInCharsToPixels(40);
+
+      final int decoratorDistance = 5;
+
+      final Image decorationImage = FieldDecorationRegistry.getDefault()
+            .getFieldDecoration(FieldDecorationRegistry.DEC_INFORMATION)
+            .getImage();
+
+      final String tooltip = UI.EMPTY_STRING
+            + "Collated tours are a collection of tours to summarize,\n"
+            + "e.g. distance or duration values\n\n"
+            + "Tours are collated with the type and date fields";
+
+      final String tooltip2 = UI.EMPTY_STRING
+            + "With the type and date fields, tours are collated to display\n"
+            + "e.g. all kilometers for one part or one service";
 
       _container = new Composite(parent, SWT.NONE);
       GridDataFactory.fillDefaults().grab(true, true).applyTo(_container);
@@ -303,15 +343,9 @@ public class DialogEquipmentPart extends TitleAreaDialog {
              * Add a decoration for this important field
              */
             _comboDecorator_Type = new ControlDecoration(_comboType, SWT.CENTER | SWT.LEFT);
-            final Image decorationImage = FieldDecorationRegistry.getDefault()
-                  .getFieldDecoration(FieldDecorationRegistry.DEC_INFORMATION)
-                  .getImage();
-
-            // a restart is required for the theme change to take full effect
-            _comboDecorator_Type.setDescriptionText(
-                  "With the type and date fields, tours are collated to display\ne.g. all kilometers for one part or one service");
+            _comboDecorator_Type.setDescriptionText(tooltip2);
             _comboDecorator_Type.setImage(decorationImage);
-            _comboDecorator_Type.setMarginWidth(3);
+            _comboDecorator_Type.setMarginWidth(decoratorDistance);
          }
          UI.createSpacer_Horizontal(_container, 1);
          {
@@ -330,6 +364,25 @@ public class DialogEquipmentPart extends TitleAreaDialog {
 
             _autocomplete_Size = new AutoComplete_ComboInputMT(_comboSize);
          }
+         {
+            /*
+             * Date from
+             */
+            UI.createLabel(_container, "D&ate");
+
+            _dateFrom = new DateTime(_container, SWT.DATE | SWT.MEDIUM | SWT.DROP_DOWN);
+            _dateFrom.addSelectionListener(_defaultSelectionListener);
+
+            /*
+             * Add a decoration for this important field
+             */
+            _comboDecorator_DateFrom = new ControlDecoration(_dateFrom, SWT.CENTER | SWT.LEFT);
+            _comboDecorator_DateFrom.setDescriptionText(tooltip2);
+            _comboDecorator_DateFrom.setImage(decorationImage);
+            _comboDecorator_DateFrom.setMarginWidth(decoratorDistance);
+         }
+         UI.createSpacer_Horizontal(_container, 1);
+         UI.createSpacer_Horizontal(_container, 1);
          {
             /*
              * Price
@@ -360,30 +413,20 @@ public class DialogEquipmentPart extends TitleAreaDialog {
 
             _autocomplete_PriceUnit = new AutoComplete_ComboInputMT(_comboPriceUnit);
          }
-         UI.createSpacer_Horizontal(_container, 1);
          {
             /*
-             * Date
+             * Built date
              */
-            final Label label = UI.createLabel(_container, "D&ate");
+            final Label label = UI.createLabel(_container, Messages.Dialog_Equipment_Label_DateBuilt);
             gdVertCenter.applyTo(label);
 
-            _dateFrom = new DateTime(_container, SWT.DATE | SWT.MEDIUM | SWT.DROP_DOWN);
-            _dateFrom.addSelectionListener(_defaultSelectionListener);
+            _dateBuilt = new DateTime(_container, SWT.DATE | SWT.MEDIUM | SWT.DROP_DOWN);
+            _dateBuilt.addSelectionListener(_defaultSelectionListener);
 
-            /*
-             * Add a decoration for this important field
-             */
-            _comboDecorator_DateFrom = new ControlDecoration(_dateFrom, SWT.CENTER | SWT.LEFT);
-            final Image decorationImage = FieldDecorationRegistry.getDefault()
-                  .getFieldDecoration(FieldDecorationRegistry.DEC_INFORMATION)
-                  .getImage();
-
-            // a restart is required for the theme change to take full effect
-            _comboDecorator_DateFrom.setDescriptionText(
-                  "With the type and date fields, tours are collated to display\ne.g. all kilometers for one part or one service");
-            _comboDecorator_DateFrom.setImage(decorationImage);
-            _comboDecorator_DateFrom.setMarginWidth(3);
+            _chkSyncDates = new Button(_container, SWT.CHECK);
+            _chkSyncDates.setText("Sy&nc");
+            _chkSyncDates.setToolTipText("Sync built date with first use date");
+            _chkSyncDates.addSelectionListener(_defaultSelectionListener);
          }
          UI.createSpacer_Horizontal(_container, 1);
          {
@@ -406,22 +449,18 @@ public class DialogEquipmentPart extends TitleAreaDialog {
             // label: kg
             UI.createLabel(_container, UI.UNIT_LABEL_WEIGHT);
          }
-         UI.createSpacer_Horizontal(_container, 1);
          {
             /*
-             * Built date
+             * Retired date
              */
-            final Label label = UI.createLabel(_container, Messages.Dialog_Equipment_Label_DateBuilt);
+            final Label label = UI.createLabel(_container, Messages.Dialog_Equipment_Label_DateRetired);
             gdVertCenter.applyTo(label);
 
-            _dateBuilt = new DateTime(_container, SWT.DATE | SWT.MEDIUM | SWT.DROP_DOWN);
-            _dateBuilt.addSelectionListener(_defaultSelectionListener);
-
-            _chkSyncDates = new Button(_container, SWT.CHECK);
-            _chkSyncDates.setText("Sy&nc");
-            _chkSyncDates.setToolTipText("Sync built date with first use date");
-            _chkSyncDates.addSelectionListener(_defaultSelectionListener);
+            _dateRetired = new DateTime(_container, SWT.DATE | SWT.MEDIUM | SWT.DROP_DOWN);
+            _dateRetired.addSelectionListener(_defaultSelectionListener);
          }
+         UI.createSpacer_Horizontal(_container, 1);
+         UI.createSpacer_Horizontal(_container, 1);
          {
             /*
              * Distance first use
@@ -443,34 +482,29 @@ public class DialogEquipmentPart extends TitleAreaDialog {
             // label: km/mi
             UI.createLabel(_container, UI.UNIT_LABEL_DISTANCE);
          }
-         UI.createSpacer_Horizontal(_container, 1);
-         {
-            /*
-             * Retired date
-             */
-            final Label label = UI.createLabel(_container, Messages.Dialog_Equipment_Label_DateRetired);
-            gdVertCenter.applyTo(label);
-
-            _dateRetired = new DateTime(_container, SWT.DATE | SWT.MEDIUM | SWT.DROP_DOWN);
-            _dateRetired.addSelectionListener(_defaultSelectionListener);
-         }
-         UI.createSpacer_Horizontal(_container, 1);
          {
             /*
              * Collate tours
              */
-            final Label label = UI.createLabel(_container, "Co&llate");
-            gdVertCenter.applyTo(label);
+
+            _lblCollate = UI.createLabel(_container, "Co&llate");
+            _lblCollate.setToolTipText(tooltip);
+            gdVertCenter.applyTo(_lblCollate);
 
             _chkCollate = new Button(_container, SWT.CHECK);
             _chkCollate.setText("Include in collated tours");
-            _chkCollate.setToolTipText(UI.EMPTY_STRING
-                  + "Collated tours are a collection of tours to summarize,\n"
-                  + "e.g. distance or duration values\n\n"
-                  + "Tours are collated with the type and date fields");
+            _chkCollate.setToolTipText(tooltip);
             _chkCollate.addSelectionListener(_defaultSelectionListener);
 
             GridDataFactory.fillDefaults().grab(true, false).span(6, 1).applyTo(_chkCollate);
+
+            /*
+             * Add a decoration for this important field
+             */
+            _comboDecorator_Collate = new ControlDecoration(_chkCollate, SWT.CENTER | SWT.LEFT);
+            _comboDecorator_Collate.setDescriptionText(tooltip);
+            _comboDecorator_Collate.setImage(decorationImage);
+            _comboDecorator_Collate.setMarginWidth(decoratorDistance);
          }
          {
             /*
@@ -502,6 +536,57 @@ public class DialogEquipmentPart extends TitleAreaDialog {
                   .span(6, 1)
                   .applyTo(_txtDescription);
          }
+         {
+            /*
+             * Image filename
+             */
+
+            _lblImage = UI.createLabel(_container, UI.EMPTY_STRING);
+            _lblImage.setText("Ima&ge");
+            GridDataFactory.fillDefaults().align(SWT.BEGINNING, SWT.CENTER).applyTo(_lblImage);
+
+            final Composite imageContainer = new Composite(_container, SWT.NONE);
+            GridDataFactory.fillDefaults()
+                  .grab(true, false)
+                  .span(6, 1)
+                  .applyTo(imageContainer);
+            GridLayoutFactory.fillDefaults().numColumns(3).applyTo(imageContainer);
+//            imageContainer.setBackground(UI.SYS_COLOR_YELLOW);
+            {
+               {
+                  _lblImageFilePath = UI.createLabel(imageContainer, UI.EMPTY_STRING);
+                  GridDataFactory.fillDefaults()
+                        .grab(true, false)
+                        .align(SWT.FILL, SWT.CENTER)
+                        .applyTo(_lblImageFilePath);
+               }
+               {
+                  final Button btnSelectImage = new Button(imageContainer, SWT.PUSH);
+                  btnSelectImage.setText(Messages.app_btn_browse);
+                  btnSelectImage.addSelectionListener(SelectionListener.widgetSelectedAdapter(selectionEvent -> onImage_Select()));
+               }
+               {
+                  _btnDeleteImage = new Button(imageContainer, SWT.PUSH);
+                  _btnDeleteImage.setImage(_imageTrash);
+                  _btnDeleteImage.addSelectionListener(SelectionListener.widgetSelectedAdapter(selectionEvent -> onImage_Delete()));
+               }
+            }
+            {
+               /*
+                * Equipment image
+                */
+
+               UI.createSpacer_Horizontal(_container);
+
+               final int imageSize = EquipmentManager.getEquipmentImageSize();
+
+               _canvasEquipmentImage = new Label(_container, SWT.WRAP);
+               GridDataFactory.fillDefaults()
+                     .span(6, 1)
+                     .hint(imageSize, imageSize)
+                     .applyTo(_canvasEquipmentImage);
+            }
+         }
       }
 
       // set tab ordering, cool feature but all controls MUST have the same parent !!!
@@ -528,25 +613,48 @@ public class DialogEquipmentPart extends TitleAreaDialog {
       });
    }
 
+   private void disposeCanvasImage() {
+
+      if (_canvasEquipmentImage == null ||
+            _canvasEquipmentImage.getImage() == _imageCamera) {
+
+         return;
+      }
+
+      UI.disposeResource(_canvasEquipmentImage.getImage());
+   }
+
    private void enableControls() {
 
       if (_isInUIUpdate) {
          return;
       }
 
+      final boolean isCollate = _chkCollate.getSelection();
       final boolean isSyncDates = _chkSyncDates.getSelection();
       final boolean canEditBuiltDate = isSyncDates == false;
 
       _dateBuilt.setEnabled(canEditBuiltDate);
+      _btnDeleteImage.setEnabled(StringUtils.hasContent(_imageFilePath));
 
+      if (isCollate) {
+
+         _comboDecorator_DateFrom.show();
+         _comboDecorator_Type.show();
+
+      } else {
+
+         _comboDecorator_DateFrom.hide();
+         _comboDecorator_Type.hide();
+      }
+
+      // OK button
       final boolean isValid = _isNewPart && _isModified == false
 
             // disable OK when new and not modified but do NOT display validation message
             ? false
 
             : isDataValid();
-
-      // OK button
       getButton(IDialogConstants.OK_ID).setEnabled(isValid);
    }
 
@@ -584,6 +692,9 @@ public class DialogEquipmentPart extends TitleAreaDialog {
 
       _pc = new PixelConverter(_parent);
 
+      _imageCamera = TourbookPlugin.getImageDescriptor(Images.Camera).createImage();
+      _imageTrash = TourbookPlugin.getImageDescriptor(Images.App_Trash_Themed).createImage();
+
       _parent.addDisposeListener(disposeEvent -> onDispose());
 
       _defaultModifyListener = modifyEvent -> onModify();
@@ -615,6 +726,63 @@ public class DialogEquipmentPart extends TitleAreaDialog {
       return true;
    }
 
+   /**
+    * @param imageFilePath
+    *
+    * @return Returns <code>true</code> when the image could be loaded, otherwise <code>false</code>
+    */
+   private boolean loadEquipmentImage(final String imageFilePath) {
+
+      setErrorMessage(null);
+
+      final Image[] loadedImage = new Image[] { null };
+
+      if (StringUtils.hasContent(imageFilePath)) {
+
+         if (Files.exists(Paths.get(imageFilePath)) == false) {
+
+            setErrorMessage(NLS.bind(Messages.Dialog_TourTag_Label_ImageNotFound, imageFilePath));
+
+         } else {
+
+            _imageFilePath = imageFilePath;
+
+            BusyIndicator.showWhile(Display.getCurrent(), () -> {
+
+               try {
+
+                  loadedImage[0] = EquipmentManager.createEquipmentImage(_imageFilePath);
+
+               } catch (final IOException ioException) {
+
+                  /**
+                   * It is possible that an image cannot be loaded, e.g.
+                   * <p>
+                   * javax.imageio.IIOException: 16-bit samples are not supported for Horizontal
+                   * differencing Predictor
+                   */
+                  final String errorMessage = "Cannot load image %s\n%s".formatted(
+                        imageFilePath,
+                        ioException.getMessage());
+
+                  setErrorMessage(errorMessage);
+               }
+            });
+         }
+      }
+
+      // Before setting a new image, we make sure that the previous one was disposed
+      disposeCanvasImage();
+
+      final Image equipmentImage = loadedImage[0];
+      final boolean isImageLoaded = equipmentImage != null;
+
+      // update UI
+      updateUI_EquipmentImage(equipmentImage, getErrorMessage());
+
+      return isImageLoaded;
+   }
+
    @Override
    protected void okPressed() {
 
@@ -634,14 +802,64 @@ public class DialogEquipmentPart extends TitleAreaDialog {
 
       saveState();
 
-      UI.disposeResource(_imageDialog);
-
       _autocomplete_Brand.saveState(_state, STATE_AUTOCOMPLETE_POPUP_HEIGHT_BRAND);
       _autocomplete_Model.saveState(_state, STATE_AUTOCOMPLETE_POPUP_HEIGHT_MODEL);
       _autocomplete_PriceUnit.saveState(_state, STATE_AUTOCOMPLETE_POPUP_HEIGHT_PRICE_UNIT);
 
       _state.put(STATE_PRICE_UNIT_DEFAULT, _comboPriceUnit.getText().trim());
 
+      disposeCanvasImage();
+
+      UI.disposeResource(_imageCamera);
+      UI.disposeResource(_imageDialog);
+      UI.disposeResource(_imageTrash);
+   }
+
+   private void onImage_Delete() {
+
+      _imageFilePath = null;
+
+      disposeCanvasImage();
+
+      _lblImageFilePath.setText(UI.EMPTY_STRING);
+      _canvasEquipmentImage.setImage(_imageCamera);
+
+      enableControls();
+   }
+
+   private void onImage_Select() {
+
+      final String lastSelectedPath = Util.getStateString(_state, STATE_IMAGE_LAST_SELECTED_PATH, null);
+
+      final FileDialog fileDialog = new FileDialog(getShell(), SWT.OPEN);
+
+      fileDialog.setText("Set Part Image");
+      fileDialog.setFilterPath(lastSelectedPath);
+
+      final String imageExtensions = ImageUtils.getImageExtensions();
+
+      fileDialog.setFilterNames(imageExtensions);
+      fileDialog.setFilterExtensions(imageExtensions);
+
+      // open file dialog
+      final String imageFilePath = fileDialog.open();
+
+      // check if user canceled the dialog
+      if (imageFilePath == null) {
+         return;
+      }
+
+      // keep last selected path
+      final String filePathFolder = Paths.get(imageFilePath).getParent().toString();
+      _state.put(STATE_IMAGE_LAST_SELECTED_PATH, filePathFolder);
+
+      final boolean isImageLoaded = loadEquipmentImage(imageFilePath);
+      if (isImageLoaded) {
+
+         _lblImageFilePath.setText(imageFilePath);
+
+         enableControls();
+      }
    }
 
    private void onModify() {
@@ -680,6 +898,12 @@ public class DialogEquipmentPart extends TitleAreaDialog {
 
 // SET_FORMATTING_ON
 
+      _imageFilePath = _part.getImageFilePath();
+
+      _lblImageFilePath.setText(_imageFilePath == null ? UI.EMPTY_STRING : _imageFilePath);
+
+      loadEquipmentImage(_imageFilePath);
+
       _isInUIUpdate = false;
    }
 
@@ -715,6 +939,8 @@ public class DialogEquipmentPart extends TitleAreaDialog {
       _part.setDescription(      _txtDescription.getText().trim());
       _part.setUrlAddress(       _txtUrlAddress.getText().trim());
 
+      _part.setImageFilePath(    _lblImageFilePath.getText().trim());
+
       _part.setDistanceFirstUse( _spinDistance.getSelection());
       _part.setIsCollate(        _chkCollate.getSelection());
       _part.setPrice(            _spinPrice.getSelection() / 100f);
@@ -727,6 +953,56 @@ public class DialogEquipmentPart extends TitleAreaDialog {
       _part.setDateRetired(      TimeTools.toEpochMilli(dateRetired));
 
 // SET_FORMATTING_ON
+   }
+
+   /**
+    * @param equipmentImage
+    *           Can be <code>null</code>
+    * @param errorMessage
+    *           Can be <code>null</code>
+    */
+   private void updateUI_EquipmentImage(final Image equipmentImage, final String errorMessage) {
+
+      int gdHeight;
+
+      if (equipmentImage != null) {
+
+         // image is available
+
+         _canvasEquipmentImage.setImage(equipmentImage);
+
+         gdHeight = equipmentImage.getBounds().height;
+
+      } else {
+
+         // image is not available
+
+         final boolean isError = errorMessage != null;
+
+         if (isError) {
+
+            // display error
+
+            _canvasEquipmentImage.setImage(null);
+            _canvasEquipmentImage.setText(errorMessage);
+
+            gdHeight = SWT.DEFAULT;
+
+         } else {
+
+            // image is not yet set -> display default image
+
+            _canvasEquipmentImage.setImage(_imageCamera);
+            _canvasEquipmentImage.setText(UI.EMPTY_STRING);
+
+            gdHeight = _imageCamera.getBounds().height;
+         }
+      }
+
+      // update layout height
+      final GridData gd = (GridData) _canvasEquipmentImage.getLayoutData();
+      gd.heightHint = gdHeight;
+      _container.layout(true, true);
    }
 
    private void updateUIFromModel() {
@@ -765,7 +1041,7 @@ public class DialogEquipmentPart extends TitleAreaDialog {
       _comboSize        .setText(_part.getSize());
       _comboType        .setText(_part.getType());
 
-      _dateFrom             .setDate(dateFrom.getYear(),         dateFrom.getMonthValue() - 1,        dateFrom.getDayOfMonth());
+      _dateFrom         .setDate(dateFrom.getYear(),     dateFrom.getMonthValue() - 1,    dateFrom.getDayOfMonth());
       _dateBuilt        .setDate(dateBuilt.getYear(),    dateBuilt.getMonthValue() - 1,   dateBuilt.getDayOfMonth());
       _dateRetired      .setDate(dateRetired.getYear(),  dateRetired.getMonthValue() - 1, dateRetired.getDayOfMonth());
 

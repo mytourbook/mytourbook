@@ -836,13 +836,11 @@ public class EquipmentManager {
     * Image resource from the cache.
     * Otherwise, create an image resource, and put it in the cache
     *
-    * @param equipment
+    * @param string
     *
     * @return Return the equipment image or <code>null</code> when not available
     */
-   public static Image getEquipmentImage(final Equipment equipment) {
-
-      final String imageFilePath = equipment.getImageFilePath();
+   public static Image getEquipmentImage(final String imageFilePath) {
 
       if (StringUtils.isNullOrEmpty(imageFilePath)) {
          return null;

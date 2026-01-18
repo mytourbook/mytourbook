@@ -285,6 +285,20 @@ public class EquipmentPart implements Cloneable, Comparable<Object>, Serializabl
       return company;
    }
 
+   public long getDateBuilt() {
+
+      return dateBuilt;
+   }
+
+   public LocalDateTime getDateBuilt_Local() {
+
+      if (_dateBuilt == null) {
+         _dateBuilt = TimeTools.toLocalDateTime(dateBuilt);
+      }
+
+      return _dateBuilt;
+   }
+
    public long getDateFrom() {
 
       return dateFrom;
@@ -300,20 +314,6 @@ public class EquipmentPart implements Cloneable, Comparable<Object>, Serializabl
       }
 
       return _dateFrom;
-   }
-
-   public long getDateBuilt() {
-
-      return dateBuilt;
-   }
-
-   public LocalDateTime getDateBuilt_Local() {
-
-      if (_dateBuilt == null) {
-         _dateBuilt = TimeTools.toLocalDateTime(dateBuilt);
-      }
-
-      return _dateBuilt;
    }
 
    public long getDateRetired() {
@@ -363,19 +363,15 @@ public class EquipmentPart implements Cloneable, Comparable<Object>, Serializabl
       return duration;
    }
 
+   /**
+    * @return {@link #equipment}
+    */
    public Equipment getEquipment() {
       return equipment;
    }
 
    /**
-    * When a part is expanded in the equipment viewer, the tours can be displayed in different
-    * structures
-    * <p>
-    * <li>0 ... EXPAND_TYPE_FLAT</li>
-    * <li>1 ... EXPAND_TYPE_YEAR_TOUR</li>
-    * <li>2 ... EXPAND_TYPE_YEAR_MONTH_TOUR</li>
-    *
-    * @return
+    * @return {@link #expandType}
     */
    public int getExpandType() {
       return expandType;
@@ -385,10 +381,16 @@ public class EquipmentPart implements Cloneable, Comparable<Object>, Serializabl
       return imageFilePath;
    }
 
+   /**
+    * @return {@link #itemType}
+    */
    public int getItemType() {
       return itemType;
    }
 
+   /**
+    * @return {@link #model}
+    */
    public String getModel() {
 
       if (model == null) {
@@ -585,18 +587,18 @@ public class EquipmentPart implements Cloneable, Comparable<Object>, Serializabl
       this.company = company;
    }
 
-   public void setDateFrom(final long dateFrom) {
-
-      this.dateFrom = dateFrom;
-
-      _dateFrom = null;
-   }
-
    public void setDateBuilt(final long dateBuilt) {
 
       this.dateBuilt = dateBuilt;
 
       _dateBuilt = null;
+   }
+
+   public void setDateFrom(final long dateFrom) {
+
+      this.dateFrom = dateFrom;
+
+      _dateFrom = null;
    }
 
    public void setDateRetired(final long dateRetired) {
@@ -707,13 +709,14 @@ public class EquipmentPart implements Cloneable, Comparable<Object>, Serializabl
       setBrand             (otherPart.getBrand());
       setModel             (otherPart.getModel());
       setDescription       (otherPart.getDescription());
+      setImageFilePath     (otherPart.getImageFilePath());
       setUrlAddress        (otherPart.getUrlAddress());
 
       setCompany           (otherPart.getCompany());
       setName              (otherPart.getName());
 
-      setType              (otherPart.getType());
       setIsCollate         (otherPart.isCollate());
+      setType              (otherPart.getType());
 
       setDistanceFirstUse  (otherPart.getDistanceFirstUse());
       setPrice             (otherPart.getPrice());

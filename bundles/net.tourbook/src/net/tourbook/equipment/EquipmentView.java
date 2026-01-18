@@ -1832,7 +1832,7 @@ public class EquipmentView extends ViewPart implements ITourProvider, ITourViewe
       _colDef_EquipmentImage.setLabelProvider(new CellLabelProvider() {
 
          // !!! set dummy label provider, otherwise an error occurs !!!
-         // the image is painted in onPaintViewer()
+         // the image is painted in onColumnImage_OnPaintViewer()
 
          @Override
          public void update(final ViewerCell cell) {}
@@ -1853,14 +1853,20 @@ public class EquipmentView extends ViewPart implements ITourProvider, ITourViewe
 
             final Object element = cell.getElement();
 
+            String imageFilePath = null;
+
             if (element instanceof final TVIEquipmentView_Equipment equipmentItem) {
 
-               final String imageFilePath = equipmentItem.getEquipment().getImageFilePath();
+               imageFilePath = equipmentItem.getEquipment().getImageFilePath();
 
-               if (imageFilePath != null) {
-                  cell.setText(imageFilePath);
-                  setCellColor(cell, element);
-               }
+            } else if (element instanceof final TVIEquipmentView_Part partItem) {
+
+               imageFilePath = partItem.getPart().getImageFilePath();
+            }
+
+            if (imageFilePath != null) {
+               cell.setText(imageFilePath);
+               setCellColor(cell, element);
             }
          }
       });
@@ -3290,30 +3296,36 @@ public class EquipmentView extends ViewPart implements ITourProvider, ITourViewe
       final TreeItem item = (TreeItem) event.item;
       final Object itemData = item.getData();
 
+      Image equipmentImage = null;
+
       // skip other tree items
       if (itemData instanceof final TVIEquipmentView_Equipment equipmentItem) {
 
-         /*
-          * Paint equipment image
-          */
-
          final Equipment equipment = equipmentItem.getEquipment();
-         final Image equipmentImage = EquipmentManager.getEquipmentImage(equipment);
+         equipmentImage = EquipmentManager.getEquipmentImage(equipment.getImageFilePath());
 
-         if (equipmentImage != null && equipmentImage.isDisposed() == false) {
+      } else if (itemData instanceof final TVIEquipmentView_Part partItem) {
 
-            UI.paintImage(
+         final EquipmentPart part = partItem.getPart();
+         equipmentImage = EquipmentManager.getEquipmentImage(part.getImageFilePath());
+      }
 
-                  event,
-                  equipmentImage,
-                  _columnWidth_EquipmentImage,
+      /*
+       * Paint equipment image
+       */
+      if (equipmentImage != null && equipmentImage.isDisposed() == false) {
 
-                  _colDef_EquipmentImage.getColumnStyle(), //  horizontal alignment
-                  SWT.CENTER, //                               vertical alignment
+         UI.paintImage(
 
-                  0 //                                         horizontal offset
-            );
-         }
+               event,
+               equipmentImage,
+               _columnWidth_EquipmentImage,
+
+               _colDef_EquipmentImage.getColumnStyle(), //  horizontal alignment
+               SWT.CENTER, //                               vertical alignment
+
+               0 //                                         horizontal offset
+         );
       }
    }
 
