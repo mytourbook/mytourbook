@@ -804,7 +804,16 @@ public class DialogEquipment extends TitleAreaDialog {
 
    private void onImage_Select() {
 
-      final String lastSelectedPath = Util.getStateString(_state, STATE_IMAGE_LAST_SELECTED_PATH, null);
+      String lastSelectedPath;
+
+      if (StringUtils.hasContent(_imageFilePath)) {
+
+         lastSelectedPath = Paths.get(_imageFilePath).getParent().toString();
+
+      } else {
+
+         lastSelectedPath = Util.getStateString(_state, STATE_IMAGE_LAST_SELECTED_PATH, null);
+      }
 
       final FileDialog fileDialog = new FileDialog(getShell(), SWT.OPEN);
 
@@ -875,7 +884,7 @@ public class DialogEquipment extends TitleAreaDialog {
 
       _imageFilePath = _equipment.getImageFilePath();
 
-      _lblImageFilePath.setText(_imageFilePath == null ? UI.EMPTY_STRING : _imageFilePath);
+      _lblImageFilePath.setText(_imageFilePath);
 
       loadEquipmentImage(_imageFilePath);
 

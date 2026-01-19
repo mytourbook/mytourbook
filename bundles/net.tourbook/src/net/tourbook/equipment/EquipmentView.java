@@ -4129,7 +4129,12 @@ public class EquipmentView extends ViewPart implements ITourProvider, ITourViewe
       // ensure to keep column width otherwise the columns are resized to the default width
       _columnManager.saveState(_state);
 
-      // the viewer must be recreated because a smaller height is not recognized with a refresh() method !!!
-      recreateViewer(_equipmentViewer);
+      // prevent a selection which could expand/collapse a category item
+      _isInExpandingSelection = true;
+      {
+         // the viewer must be recreated because a smaller height is not recognized with a refresh() method !!!
+         recreateViewer(_equipmentViewer);
+      }
+      _isInExpandingSelection = false;
    }
 }
