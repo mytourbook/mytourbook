@@ -473,7 +473,7 @@ public class DialogEquipmentService extends TitleAreaDialog {
 
                UI.createSpacer_Horizontal(_container);
 
-               final int imageSize = EquipmentManager.getEquipmentImageSize();
+               final int imageSize = EquipmentManager.getEquipmentImageSize_Content();
 
                _canvasEquipmentImage = new Label(_container, SWT.WRAP);
                GridDataFactory.fillDefaults()
@@ -483,17 +483,6 @@ public class DialogEquipmentService extends TitleAreaDialog {
             }
          }
       }
-   }
-
-   private void disposeCanvasImage() {
-
-      if (_canvasEquipmentImage == null ||
-            _canvasEquipmentImage.getImage() == _imageCamera) {
-
-         return;
-      }
-
-      UI.disposeResource(_canvasEquipmentImage.getImage());
    }
 
    private void enableControls() {
@@ -618,7 +607,7 @@ public class DialogEquipmentService extends TitleAreaDialog {
 
                try {
 
-                  loadedImage[0] = EquipmentManager.createEquipmentImage(_imageFilePath);
+                  loadedImage[0] = EquipmentManager.getEquipmentImage(_imageFilePath, ImageSize.CONTENT);
 
                } catch (final IOException ioException) {
 
@@ -637,9 +626,6 @@ public class DialogEquipmentService extends TitleAreaDialog {
             });
          }
       }
-
-      // Before setting a new image, we make sure that the previous one was disposed
-      disposeCanvasImage();
 
       final Image equipmentImage = loadedImage[0];
       final boolean isImageLoaded = equipmentImage != null;
@@ -671,8 +657,6 @@ public class DialogEquipmentService extends TitleAreaDialog {
       UI.disposeResource(_imageDialog);
       UI.disposeResource(_imageTrash);
 
-      disposeCanvasImage();
-
 // SET_FORMATTING_OFF
 
       _autocomplete_Company   .saveState(_state, STATE_AUTOCOMPLETE_POPUP_HEIGHT_COMPANY);
@@ -688,8 +672,6 @@ public class DialogEquipmentService extends TitleAreaDialog {
    private void onImage_Delete() {
 
       _imageFilePath = null;
-
-      disposeCanvasImage();
 
       _lblImageFilePath.setText(UI.EMPTY_STRING);
       _canvasEquipmentImage.setImage(_imageCamera);

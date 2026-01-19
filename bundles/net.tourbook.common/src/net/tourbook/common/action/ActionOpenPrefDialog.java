@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2025 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2026 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -130,8 +130,8 @@ public class ActionOpenPrefDialog extends Action {
    }
 
    /**
-    * Set shell to the parent otherwise the pref dialog is closed when the slideout is closed. Is a
-    * bit tricky :-)
+    * Set shell to the slideout parent otherwise the pref dialog is closed when the slideout is
+    * closed. Is a bit tricky :-)
     *
     * @return
     */

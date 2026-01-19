@@ -81,6 +81,7 @@ public class PrefPageEquipment extends PreferencePage implements IWorkbenchPrefe
       final Composite container = new Composite(parent, SWT.NONE);
       GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
       GridLayoutFactory.fillDefaults().numColumns(3).applyTo(container);
+//      container.setBackground(UI.SYS_COLOR_CYAN);
       {
          {
             /*

@@ -959,7 +959,7 @@ public abstract class TreeColumnFactory {
             colDef.setColumnLabel(              Messages.ColumnFactory_TagImageFile_Header);
             colDef.setColumnHeaderText(         Messages.ColumnFactory_TagImageFile_Header);
 
-            colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(15));
+            colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(20));
 
             return colDef;
          }

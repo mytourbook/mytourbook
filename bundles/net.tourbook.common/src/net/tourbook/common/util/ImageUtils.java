@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2026 Wolfgang Schramm and Contributors
+ * Copyright (C) 2026 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -13,7 +13,6 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
-
 package net.tourbook.common.util;
 
 import java.awt.image.BufferedImage;
@@ -45,7 +44,7 @@ import org.imgscalr.Scalr.Method;
 import org.imgscalr.Scalr.Rotation;
 
 /**
- * Original code: org.sharemedia.utils.ImageUtils
+ * Original code: net.tourbook.photo.ImageUtils
  */
 public class ImageUtils {
 
@@ -117,8 +116,29 @@ public class ImageUtils {
     * @return
     *
     * @throws IOException
+    *            This exceptions is thrown when the image could not be loaded
     */
-   public static Image createImage(final String imageFilePath, final int imageSize) throws IOException {
+   public static Image createImage(final String imageFilePath,
+                                   final int imageSize) throws IOException {
+
+      return createImage(imageFilePath, imageSize, false);
+   }
+
+   /**
+    * Creates an image which must be disposed when not needed any more
+    *
+    * @param imageFilePath
+    * @param imageSize
+    * @param isForceHeight
+    *
+    * @return
+    *
+    * @throws IOException
+    *            This exceptions is thrown when the image could not be loaded
+    */
+   public static Image createImage(final String imageFilePath,
+                                   final int imageSize,
+                                   final boolean isForceHeight) throws IOException {
 
       if (StringUtils.isNullOrEmpty(imageFilePath)
             || new File(imageFilePath).exists() == false) {
@@ -149,11 +169,12 @@ public class ImageUtils {
 
          // the original image is larger than the required image -> resize it
 
-         final org.eclipse.swt.graphics.Point bestSize = ImageUtils.getBestSize(
+         final org.eclipse.swt.graphics.Point bestSize = getBestSize(
                originalImageWidth,
                originalImageHeight,
                imageSize,
-               imageSize);
+               imageSize,
+               isForceHeight);
 
          final int scaleWidth = bestSize.x;
          final int scaledHeight = bestSize.y;
@@ -190,7 +211,10 @@ public class ImageUtils {
       return swtImage;
    }
 
-   public static double getBestRatio(final int originalX, final int originalY, final int maxX, final int maxY) {
+   public static double getBestRatio(final int originalX,
+                                     final int originalY,
+                                     final int maxX,
+                                     final int maxY) {
 
       final double widthRatio = (double) originalX / (double) maxX;
       final double heightRatio = (double) originalY / (double) maxY;
@@ -200,9 +224,24 @@ public class ImageUtils {
       return bestRatio;
    }
 
-   public static Point getBestSize(final int originalX, final int originalY, final int maxX, final int maxY) {
+   public static Point getBestSize(final int originalX,
+                                   final int originalY,
+                                   final int maxX,
+                                   final int maxY,
+                                   final boolean isForceHeight) {
 
-      final double bestRatio = getBestRatio(originalX, originalY, maxX, maxY);
+      double bestRatio;
+
+      if (isForceHeight) {
+
+         final double heightRatio = (double) originalY / (double) maxY;
+
+         bestRatio = heightRatio;
+
+      } else {
+
+         bestRatio = getBestRatio(originalX, originalY, maxX, maxY);
+      }
 
       final int newWidth = (int) (originalX / bestRatio);
       final int newHeight = (int) (originalY / bestRatio);
@@ -310,14 +349,14 @@ public class ImageUtils {
       return resize(display, image, width, height, SWT.ON, SWT.HIGH, null, false);
    }
 
-   public static/* synchronized */Image resize(final Display display,
-                                               final Image srcImage,
-                                               final int newWidth,
-                                               final int newHeight,
-                                               final int antialias,
-                                               final int interpolation,
-                                               final Rotation exifRotation,
-                                               final boolean isRotateImageAutomatically) {
+   public static Image resize(final Display display,
+                              final Image srcImage,
+                              final int newWidth,
+                              final int newHeight,
+                              final int antialias,
+                              final int interpolation,
+                              final Rotation exifRotation,
+                              final boolean isRotateImageAutomatically) {
 
       if (srcImage == null) {
          return null;
@@ -351,8 +390,8 @@ public class ImageUtils {
 
       Image scaledImage = new Image(display, imgWidth, imgHeight);
 
-      final ImageData scaledImageWithTransparencyData =
-            copyImageTransparencyData(srcImage.getImageData(), imgWidth, imgHeight);
+      final ImageData scaledImageWithTransparencyData = copyImageTransparencyData(srcImage.getImageData(), imgWidth, imgHeight);
+
       if (scaledImageWithTransparencyData != null) {
 
          UI.disposeResource(scaledImage);

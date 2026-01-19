@@ -15,6 +15,7 @@
  *******************************************************************************/
 package net.tourbook.equipment;
 
+import java.io.IOException;
 import java.text.NumberFormat;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -31,9 +32,12 @@ import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.CommonActivator;
 import net.tourbook.common.CommonImages;
 import net.tourbook.common.UI;
-import net.tourbook.common.action.ActionOpenPrefDialog;
 import net.tourbook.common.formatter.ValueFormat;
 import net.tourbook.common.time.TimeTools;
+import net.tourbook.common.tooltip.ActionToolbarSlideout;
+import net.tourbook.common.tooltip.IOpeningDialog;
+import net.tourbook.common.tooltip.OpenDialogManager;
+import net.tourbook.common.tooltip.ToolbarSlideout;
 import net.tourbook.common.ui.SelectionCellLabelProvider;
 import net.tourbook.common.util.ColumnDefinition;
 import net.tourbook.common.util.ColumnManager;
@@ -51,7 +55,6 @@ import net.tourbook.data.TourData;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.extension.export.ActionExport;
 import net.tourbook.preferences.ITourbookPreferences;
-import net.tourbook.preferences.PrefPageEquipment;
 import net.tourbook.preferences.ViewContext;
 import net.tourbook.tag.TagMenuManager;
 import net.tourbook.tour.ITourEventListener;
@@ -76,6 +79,7 @@ import net.tourbook.ui.views.TourInfoToolTipCellLabelProvider;
 import net.tourbook.ui.views.TourInfoToolTipStyledCellLabelProvider;
 import net.tourbook.ui.views.TreeViewerTourInfoToolTip;
 import net.tourbook.ui.views.ViewNames;
+import net.tourbook.ui.views.tourDataEditor.TourDataEditorView;
 
 import org.eclipse.collections.impl.list.mutable.primitive.LongArrayList;
 import org.eclipse.e4.ui.di.PersistState;
@@ -116,7 +120,9 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
+import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Menu;
+import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.swt.widgets.Tree;
 import org.eclipse.swt.widgets.TreeColumn;
 import org.eclipse.swt.widgets.TreeItem;
@@ -171,87 +177,91 @@ public class EquipmentView extends ViewPart implements ITourProvider, ITourViewe
       _nf0.setMaximumFractionDigits(0);
    }
 
-   private IPropertyChangeListener             _prefChangeListener;
-   private IPropertyChangeListener             _prefChangeListener_Common;
-   private ITourEventListener                  _tourEventListener;
+   private IPropertyChangeListener            _prefChangeListener;
+   private IPropertyChangeListener            _prefChangeListener_Common;
+   private ITourEventListener                 _tourEventListener;
 
-   private PostSelectionProvider               _postSelectionProvider;
+   private PostSelectionProvider              _postSelectionProvider;
 
-   private TreeViewer                          _equipmentViewer;
-   private ColumnManager                       _columnManager;
-   private TVIEquipmentView_Root               _rootItem;
+   private TreeViewer                         _equipmentViewer;
+   private ColumnManager                      _columnManager;
+   private TVIEquipmentView_Root              _rootItem;
 
-   private MenuManager                         _viewerMenuManager;
-   private Menu                                _treeContextMenu;
-   private IContextMenuProvider                _viewerContextMenuProvider               = new TreeContextMenuProvider();
+   private MenuManager                        _viewerMenuManager;
+   private Menu                               _treeContextMenu;
+   private IContextMenuProvider               _viewerContextMenuProvider               = new TreeContextMenuProvider();
 
-   private TreeViewerTourInfoToolTip           _tourInfoToolTip;
+   private TreeViewerTourInfoToolTip          _tourInfoToolTip;
 
-   private TreeColumnDefinition                _colDef_EquipmentImage;
-   private int                                 _columnIndex_EquipmentImage;
-   private int                                 _columnWidth_EquipmentImage;
+   private TreeColumnDefinition               _colDef_EquipmentImage;
+   private int                                _columnIndex_EquipmentImage;
+   private int                                _columnWidth_EquipmentImage;
+   private int                                _defaultTreeItemHeight;
+   private int                                _selectedTreeItemHeight;
 
-   private EquipmentFilterType                 _equipmentFilterType                     = EquipmentFilterType.ALL_IS_DISPLAYED;
+   private OpenDialogManager                  _openDlgMgr                              = new OpenDialogManager();
 
-   private TagMenuManager                      _tagMenuManager;
-   private TourTypeMenuManager                 _tourTypeMenuManager;
+   private EquipmentFilterType                _equipmentFilterType                     = EquipmentFilterType.ALL_IS_DISPLAYED;
 
-   private HashMap<String, Object>             _allTourActions_Edit;
-   private HashMap<String, Object>             _allTourActions_Export;
+   private TagMenuManager                     _tagMenuManager;
+   private TourTypeMenuManager                _tourTypeMenuManager;
 
-   private Action_EquipmentFilter              _actionToggleEquipmentFilter;
+   private HashMap<String, Object>            _allTourActions_Edit;
+   private HashMap<String, Object>            _allTourActions_Export;
 
-   private ActionDeleteEquipment               _actionDeleteEquipment;
-   private ActionDeletePart                    _actionDeletePart;
-   private ActionDeleteService                 _actionDeleteService;
-   private ActionDuplicateEquipment            _actionDuplicateEquipment;
-   private ActionDuplicatePart                 _actionDuplicatePart;
-   private ActionDuplicateService              _actionDuplicateService;
-   private ActionEditEquipment                 _actionEditEquipment;
-   private ActionEditPart                      _actionEditPart;
-   private ActionEditService                   _actionEditService;
-   private ActionNewEquipment                  _actionNewEquipment;
-   private ActionNewPart                       _actionNewPart;
-   private ActionNewService                    _actionNewService;
-   private ActionRefreshView                   _actionRefreshView;
-   private ActionSetTourStructure              _actionSetTourStructure;
-   private ActionSetTourStructure_All          _actionSetTourStructure_All;
+   private ActionEquipmentFilter              _actionToggleEquipmentFilter;
+   private ActionEquipmentOptions             _actionEquipmentOptions;
 
-   private Action_CollapseAll_WithoutSelection _actionCollapseAll_WithoutSelection;
-   private ActionCollapseOthers                _actionCollapseOthers;
-   private ActionExpandSelection               _actionExpandSelection;
-   private Action_OnMouseSelect_ExpandCollapse _actionOnMouseSelect_ExpandCollapse;
-   private Action_SingleExpand_CollapseOthers  _actionSingleExpand_CollapseOthers;
+   private ActionDeleteEquipment              _actionDeleteEquipment;
+   private ActionDeletePart                   _actionDeletePart;
+   private ActionDeleteService                _actionDeleteService;
+   private ActionDuplicateEquipment           _actionDuplicateEquipment;
+   private ActionDuplicatePart                _actionDuplicatePart;
+   private ActionDuplicateService             _actionDuplicateService;
+   private ActionEditEquipment                _actionEditEquipment;
+   private ActionEditPart                     _actionEditPart;
+   private ActionEditService                  _actionEditService;
+   private ActionNewEquipment                 _actionNewEquipment;
+   private ActionNewPart                      _actionNewPart;
+   private ActionNewService                   _actionNewService;
+   private ActionRefreshView                  _actionRefreshView;
+   private ActionSetTourStructure             _actionSetTourStructure;
+   private ActionSetTourStructure_All         _actionSetTourStructure_All;
 
-   private ActionEditQuick                     _actionEditQuick;
-   private ActionEditTour                      _actionEditTour;
-   private ActionExport                        _actionExportTour;
-   private ActionOpenTour                      _actionOpenTour;
-   private ActionOpenPrefDialog                _actionPrefDialog;
+   private ActionCollapseAll_WithoutSelection _actionCollapseAll_WithoutSelection;
+   private ActionCollapseOthers               _actionCollapseOthers;
+   private ActionExpandSelection              _actionExpandSelection;
+   private ActionOnMouseSelect_ExpandCollapse _actionOnMouseSelect_ExpandCollapse;
+   private ActionSingleExpand_CollapseOthers  _actionSingleExpand_CollapseOthers;
 
-   private int                                 _numSelectedTours;
+   private ActionEditQuick                    _actionEditQuick;
+   private ActionEditTour                     _actionEditTour;
+   private ActionExport                       _actionExportTour;
+   private ActionOpenTour                     _actionOpenTour;
 
-   private boolean                             _isBehaviour_SingleExpand_CollapseOthers = true;
-   private boolean                             _isBehaviour_OnSelect_ExpandCollapse     = true;
-   private boolean                             _isInCollapseAll;
-   private boolean                             _isInExpandingSelection;
-   private int                                 _expandRunnableCounter;
-   private long                                _lastExpandSelectionTime;
+   private int                                _numSelectedTours;
 
-   private boolean                             _isMouseContextMenu;
-   private boolean                             _isSelectedWithKeyboard;
+   private boolean                            _isBehaviour_SingleExpand_CollapseOthers = true;
+   private boolean                            _isBehaviour_OnSelect_ExpandCollapse     = true;
+   private boolean                            _isInCollapseAll;
+   private boolean                            _isInExpandingSelection;
+   private int                                _expandRunnableCounter;
+   private long                               _lastExpandSelectionTime;
 
-   private boolean                             _isShowToolTipInEquipment;
-   private boolean                             _isShowToolTipInTitle;
-   private boolean                             _isShowToolTipInTags;
+   private boolean                            _isMouseContextMenu;
+   private boolean                            _isSelectedWithKeyboard;
 
-   private PixelConverter                      _pc;
+   private boolean                            _isShowToolTipInEquipment;
+   private boolean                            _isShowToolTipInTitle;
+   private boolean                            _isShowToolTipInTags;
 
-   private Color                               _colorTour;
-   private Color                               _colorContentCategory;
-   private Color                               _colorContentSubCategory;
-   private Color                               _colorDateCategory;
-   private Color                               _colorDateSubCategory;
+   private PixelConverter                     _pc;
+
+   private Color                              _colorTour;
+   private Color                              _colorContentCategory;
+   private Color                              _colorContentSubCategory;
+   private Color                              _colorDateCategory;
+   private Color                              _colorDateSubCategory;
 
    /*
     * UI resources
@@ -273,9 +283,9 @@ public class EquipmentView extends ViewPart implements ITourProvider, ITourViewe
    private Composite _parent;
    private Composite _viewerContainer;
 
-   private class Action_CollapseAll_WithoutSelection extends ActionCollapseAll {
+   private class ActionCollapseAll_WithoutSelection extends ActionCollapseAll {
 
-      public Action_CollapseAll_WithoutSelection() {
+      public ActionCollapseAll_WithoutSelection() {
          super(EquipmentView.this);
       }
 
@@ -287,55 +297,6 @@ public class EquipmentView extends ViewPart implements ITourProvider, ITourViewe
             super.run();
          }
          _isInCollapseAll = false;
-      }
-   }
-
-   private class Action_EquipmentFilter extends Action {
-
-      Action_EquipmentFilter() {
-
-         super(UI.EMPTY_STRING, AS_CHECK_BOX);
-
-//         Toggle tag filter between
-//
-//         • Show all tags
-//
-//         • Show only tags which contain tours
-//
-//         • Show only tags which do not contain tours
-
-         setToolTipText("Togg...");
-
-         setImageDescriptor(CommonActivator.getThemedImageDescriptor(CommonImages.App_Filter));
-      }
-
-      @Override
-      public void runWithEvent(final Event event) {
-         onAction_ToggleEquipmentFilter(event);
-      }
-   }
-
-   private class Action_OnMouseSelect_ExpandCollapse extends Action {
-
-      public Action_OnMouseSelect_ExpandCollapse() {
-         super(Messages.Tour_Tags_Action_OnMouseSelect_ExpandCollapse, AS_CHECK_BOX);
-      }
-
-      @Override
-      public void run() {
-         onAction_OnMouseSelect_ExpandCollapse();
-      }
-   }
-
-   private class Action_SingleExpand_CollapseOthers extends Action {
-
-      public Action_SingleExpand_CollapseOthers() {
-         super(Messages.Tour_Tags_Action_SingleExpand_CollapseOthers, AS_CHECK_BOX);
-      }
-
-      @Override
-      public void run() {
-         onAction_SingleExpandCollapseOthers();
       }
    }
 
@@ -480,6 +441,45 @@ public class EquipmentView extends ViewPart implements ITourProvider, ITourViewe
       }
    }
 
+   private class ActionEquipmentFilter extends Action {
+
+      ActionEquipmentFilter() {
+
+         super(UI.EMPTY_STRING, AS_CHECK_BOX);
+
+//         Toggle tag filter between
+//
+//         • Show all tags
+//
+//         • Show only tags which contain tours
+//
+//         • Show only tags which do not contain tours
+
+         setToolTipText("Togg...");
+
+         setImageDescriptor(CommonActivator.getThemedImageDescriptor(CommonImages.App_Filter));
+      }
+
+      @Override
+      public void runWithEvent(final Event event) {
+         onAction_ToggleEquipmentFilter(event);
+      }
+   }
+
+   private class ActionEquipmentOptions extends ActionToolbarSlideout {
+
+      @Override
+      protected ToolbarSlideout createSlideout(final ToolBar toolbar) {
+
+         return new SlideoutEquipmentOptions(_parent, toolbar, EquipmentView.this, _state);
+      }
+
+      @Override
+      protected void onBeforeOpenSlideout() {
+         closeOpenedDialogs(this);
+      }
+   }
+
    private class ActionNewEquipment extends Action {
 
       public ActionNewEquipment() {
@@ -522,6 +522,30 @@ public class EquipmentView extends ViewPart implements ITourProvider, ITourViewe
       @Override
       public void run() {
          onAction_NewService();
+      }
+   }
+
+   private class ActionOnMouseSelect_ExpandCollapse extends Action {
+
+      public ActionOnMouseSelect_ExpandCollapse() {
+         super(Messages.Tour_Tags_Action_OnMouseSelect_ExpandCollapse, AS_CHECK_BOX);
+      }
+
+      @Override
+      public void run() {
+         onAction_OnMouseSelect_ExpandCollapse();
+      }
+   }
+
+   private class ActionSingleExpand_CollapseOthers extends Action {
+
+      public ActionSingleExpand_CollapseOthers() {
+         super(Messages.Tour_Tags_Action_SingleExpand_CollapseOthers, AS_CHECK_BOX);
+      }
+
+      @Override
+      public void run() {
+         onAction_SingleExpandCollapseOthers();
       }
    }
 
@@ -871,11 +895,22 @@ public class EquipmentView extends ViewPart implements ITourProvider, ITourViewe
       TourManager.getInstance().addTourEventListener(_tourEventListener);
    }
 
+   /**
+    * Close all opened dialogs except the opening dialog
+    *
+    * @param openingDialog
+    */
+   private void closeOpenedDialogs(final IOpeningDialog openingDialog) {
+
+      _openDlgMgr.closeOpenedDialogs(openingDialog);
+   }
+
    private void createActions() {
 
 // SET_FORMATTING_OFF
 
-      _actionToggleEquipmentFilter          = new Action_EquipmentFilter();
+      _actionToggleEquipmentFilter           = new ActionEquipmentFilter();
+      _actionEquipmentOptions                = new ActionEquipmentOptions();
 
       // equipment actions
       _actionDeleteEquipment                 = new ActionDeleteEquipment();
@@ -895,11 +930,11 @@ public class EquipmentView extends ViewPart implements ITourProvider, ITourViewe
       _actionSetTourStructure_All            = new ActionSetTourStructure_All();
 
       // collapse/expand actions
-      _actionCollapseAll_WithoutSelection    = new Action_CollapseAll_WithoutSelection();
+      _actionCollapseAll_WithoutSelection    = new ActionCollapseAll_WithoutSelection();
       _actionCollapseOthers                  = new ActionCollapseOthers(this);
       _actionExpandSelection                 = new ActionExpandSelection(this, true);
-      _actionOnMouseSelect_ExpandCollapse    = new Action_OnMouseSelect_ExpandCollapse();
-      _actionSingleExpand_CollapseOthers     = new Action_SingleExpand_CollapseOthers();
+      _actionOnMouseSelect_ExpandCollapse    = new ActionOnMouseSelect_ExpandCollapse();
+      _actionSingleExpand_CollapseOthers     = new ActionSingleExpand_CollapseOthers();
 
       // tour actions
       _actionEditQuick                       = new ActionEditQuick(this);
@@ -924,12 +959,6 @@ public class EquipmentView extends ViewPart implements ITourProvider, ITourViewe
             _tourTypeMenuManager    .getAllTourTypeActions()   .keySet(),
             _tagMenuManager         .getAllTagActions()        .keySet()
       );
-
-      _actionPrefDialog = new ActionOpenPrefDialog(
-            "Equipment preferences",
-            PrefPageEquipment.ID);
-
-      _actionPrefDialog.setImageDescriptor(CommonActivator.getThemedImageDescriptor(CommonImages.TourOptions));
 
 // SET_FORMATTING_ON
    }
@@ -1004,6 +1033,8 @@ public class EquipmentView extends ViewPart implements ITourProvider, ITourViewe
 
       tree.setHeaderVisible(true);
       tree.setLinesVisible(_prefStore.getBoolean(ITourbookPreferences.VIEW_LAYOUT_DISPLAY_LINES));
+
+      _defaultTreeItemHeight = tree.getItemHeight();
 
       /*
        * Create viewer
@@ -1136,7 +1167,10 @@ public class EquipmentView extends ViewPart implements ITourProvider, ITourViewe
           * NOTE: MeasureItem, PaintItem and EraseItem are called repeatedly. Therefore, it is
           * critical for performance that these methods be as efficient as possible.
           */
-         tree.addListener(SWT.PaintItem, event -> onColumnImage_OnPaintViewer(event));
+         final Listener paintListener = event -> onColumnImage_OnPaintViewer(event);
+         tree.addListener(SWT.MeasureItem, paintListener);
+         tree.addListener(SWT.PaintItem, paintListener);
+
       }
    }
 
@@ -2606,7 +2640,7 @@ public class EquipmentView extends ViewPart implements ITourProvider, ITourViewe
       tbm.add(_actionExpandSelection);
       tbm.add(_actionCollapseAll_WithoutSelection);
       tbm.add(_actionRefreshView);
-      tbm.add(_actionPrefDialog);
+      tbm.add(_actionEquipmentOptions);
 
       // update that actions are fully created otherwise action enable will fail
       tbm.update(true);
@@ -2721,6 +2755,10 @@ public class EquipmentView extends ViewPart implements ITourProvider, ITourViewe
    @Override
    public ColumnManager getColumnManager() {
       return _columnManager;
+   }
+
+   public int getDefaultItemHeight() {
+      return _defaultTreeItemHeight;
    }
 
    private Equipment getEquipmentFromSelection() {
@@ -2978,7 +3016,7 @@ public class EquipmentView extends ViewPart implements ITourProvider, ITourViewe
 
          EquipmentManager.updateUntilDate_Equipment(allModifiedTypes);
 
-         updateUI_Views();
+         updateUI_ReloadViewer();
 
       } else if (firstElement instanceof final TVIEquipmentView_Part partItem) {
 
@@ -3038,7 +3076,7 @@ public class EquipmentView extends ViewPart implements ITourProvider, ITourViewe
 
          EquipmentManager.updateUntilDate_Parts(equipment, allModifiedTypes);
 
-         updateUI_Views();
+         updateUI_ReloadViewer();
       }
    }
 
@@ -3078,7 +3116,7 @@ public class EquipmentView extends ViewPart implements ITourProvider, ITourViewe
             EquipmentManager.updateUntilDate_Equipment(allModifiedTypes);
          }
 
-         updateUI_Views();
+         updateUI_ReloadViewer();
 
       } else if (firstElement instanceof final TVIEquipmentView_Part partItem) {
 
@@ -3141,7 +3179,7 @@ public class EquipmentView extends ViewPart implements ITourProvider, ITourViewe
             EquipmentManager.updateUntilDate_Parts(equipment, allModifiedTypes);
          }
 
-         updateUI_Views();
+         updateUI_ReloadViewer();
       }
    }
 
@@ -3161,7 +3199,7 @@ public class EquipmentView extends ViewPart implements ITourProvider, ITourViewe
 
       EquipmentManager.updateUntilDate_Equipment(allTypes);
 
-      updateUI_Views();
+      updateUI_ReloadViewer();
    }
 
    private void onAction_NewPart() {
@@ -3198,7 +3236,7 @@ public class EquipmentView extends ViewPart implements ITourProvider, ITourViewe
 
       EquipmentManager.updateUntilDate_Parts(equipment, allTypes);
 
-      updateUI_Views();
+      updateUI_ReloadViewer();
    }
 
    private void onAction_NewService() {
@@ -3235,7 +3273,7 @@ public class EquipmentView extends ViewPart implements ITourProvider, ITourViewe
 
       EquipmentManager.updateUntilDate_Parts(equipment, allTypes);
 
-      updateUI_Views();
+      updateUI_ReloadViewer();
    }
 
    private void onAction_OnMouseSelect_ExpandCollapse() {
@@ -3293,39 +3331,58 @@ public class EquipmentView extends ViewPart implements ITourProvider, ITourViewe
          return;
       }
 
-      final TreeItem item = (TreeItem) event.item;
-      final Object itemData = item.getData();
+      switch (event.type) {
+      case SWT.MeasureItem:
 
-      Image equipmentImage = null;
+         // set row height to the selected image height
+         event.height = _selectedTreeItemHeight;
 
-      // skip other tree items
-      if (itemData instanceof final TVIEquipmentView_Equipment equipmentItem) {
+         break;
 
-         final Equipment equipment = equipmentItem.getEquipment();
-         equipmentImage = EquipmentManager.getEquipmentImage(equipment.getImageFilePath());
+      case SWT.PaintItem:
 
-      } else if (itemData instanceof final TVIEquipmentView_Part partItem) {
+         /*
+          * Paint equipment image
+          */
+         final TreeItem item = (TreeItem) event.item;
+         final Object itemData = item.getData();
 
-         final EquipmentPart part = partItem.getPart();
-         equipmentImage = EquipmentManager.getEquipmentImage(part.getImageFilePath());
-      }
+         Image equipmentImage = null;
 
-      /*
-       * Paint equipment image
-       */
-      if (equipmentImage != null && equipmentImage.isDisposed() == false) {
+         // skip other tree items
+         try {
 
-         UI.paintImage(
+            if (itemData instanceof final TVIEquipmentView_Equipment equipmentItem) {
 
-               event,
-               equipmentImage,
-               _columnWidth_EquipmentImage,
+               final Equipment equipment = equipmentItem.getEquipment();
+               equipmentImage = EquipmentManager.getEquipmentImage(equipment.getImageFilePath(), ImageSize.VIEW);
 
-               _colDef_EquipmentImage.getColumnStyle(), //  horizontal alignment
-               SWT.CENTER, //                               vertical alignment
+            } else if (itemData instanceof final TVIEquipmentView_Part partItem) {
 
-               0 //                                         horizontal offset
-         );
+               final EquipmentPart part = partItem.getPart();
+               equipmentImage = EquipmentManager.getEquipmentImage(part.getImageFilePath(), ImageSize.VIEW);
+            }
+
+         } catch (final IOException e) {
+            // ignore
+         }
+
+         if (equipmentImage != null && equipmentImage.isDisposed() == false) {
+
+            UI.paintImage(
+
+                  event,
+                  equipmentImage,
+                  _columnWidth_EquipmentImage,
+
+                  _colDef_EquipmentImage.getColumnStyle(), //  horizontal alignment
+                  SWT.CENTER, //                               vertical alignment
+
+                  0 //                                         horizontal offset
+            );
+
+            break;
+         }
       }
    }
 
@@ -3617,6 +3674,14 @@ public class EquipmentView extends ViewPart implements ITourProvider, ITourViewe
       _actionSingleExpand_CollapseOthers.setChecked(_isBehaviour_SingleExpand_CollapseOthers);
 
       _equipmentFilterType = (EquipmentFilterType) Util.getStateEnum(_state, STATE_EQUIPMENT_FILTER, EquipmentFilterType.ALL_IS_DISPLAYED);
+
+      _selectedTreeItemHeight = Util.getStateInt(_state,
+            TourDataEditorView.STATE_EQUIPMENT_VIEWER_IMAGE_HEIGHT,
+            _defaultTreeItemHeight,
+            TourDataEditorView.STATE_EQUIPMENT_IMAGE_SIZE_MIN,
+            TourDataEditorView.STATE_EQUIPMENT_IMAGE_SIZE_MAX);
+
+      EquipmentManager.setEquipmentImageSize_View(_selectedTreeItemHeight);
 
       updateUI_EquipmentFilter();
       updateToolTipState();
@@ -4031,7 +4096,7 @@ public class EquipmentView extends ViewPart implements ITourProvider, ITourViewe
       }
    }
 
-   private void updateUI_Views() {
+   private void updateUI_ReloadViewer() {
 
       // remove old equipment from cached tours
       EquipmentManager.clearCachedValues();
@@ -4046,5 +4111,25 @@ public class EquipmentView extends ViewPart implements ITourProvider, ITourViewe
 
       // update UI
       reloadViewer();
+   }
+
+   /**
+    * Update viewer after properties are modified in the slideout
+    */
+   public void updateUI_Viewer() {
+
+      _selectedTreeItemHeight = Util.getStateInt(_state,
+            TourDataEditorView.STATE_EQUIPMENT_VIEWER_IMAGE_HEIGHT,
+            _defaultTreeItemHeight,
+            TourDataEditorView.STATE_EQUIPMENT_IMAGE_SIZE_MIN,
+            TourDataEditorView.STATE_EQUIPMENT_IMAGE_SIZE_MAX);
+
+      EquipmentManager.setEquipmentImageSize_View(_selectedTreeItemHeight);
+
+      // ensure to keep column width otherwise the columns are resized to the default width
+      _columnManager.saveState(_state);
+
+      // the viewer must be recreated because a smaller height is not recognized with a refresh() method !!!
+      recreateViewer(_equipmentViewer);
    }
 }

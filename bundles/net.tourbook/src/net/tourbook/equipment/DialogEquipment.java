@@ -571,7 +571,7 @@ public class DialogEquipment extends TitleAreaDialog {
 
                UI.createSpacer_Horizontal(_container);
 
-               final int imageSize = EquipmentManager.getEquipmentImageSize();
+               final int imageSize = EquipmentManager.getEquipmentImageSize_Content();
 
                _canvasEquipmentImage = new Label(_container, SWT.WRAP);
                GridDataFactory.fillDefaults()
@@ -605,17 +605,6 @@ public class DialogEquipment extends TitleAreaDialog {
             _txtDescription,
             _lblImage,
       });
-   }
-
-   private void disposeCanvasImage() {
-
-      if (_canvasEquipmentImage == null ||
-            _canvasEquipmentImage.getImage() == _imageCamera) {
-
-         return;
-      }
-
-      UI.disposeResource(_canvasEquipmentImage.getImage());
    }
 
    private void enableControls() {
@@ -750,7 +739,7 @@ public class DialogEquipment extends TitleAreaDialog {
 
                try {
 
-                  loadedImage[0] = EquipmentManager.createEquipmentImage(_imageFilePath);
+                  loadedImage[0] = EquipmentManager.getEquipmentImage(_imageFilePath, ImageSize.CONTENT);
 
                } catch (final IOException ioException) {
 
@@ -769,9 +758,6 @@ public class DialogEquipment extends TitleAreaDialog {
             });
          }
       }
-
-      // Before setting a new image, we make sure that the previous one was disposed
-      disposeCanvasImage();
 
       final Image equipmentImage = loadedImage[0];
       final boolean isImageLoaded = equipmentImage != null;
@@ -801,8 +787,6 @@ public class DialogEquipment extends TitleAreaDialog {
 
       saveState();
 
-      disposeCanvasImage();
-
       UI.disposeResource(_imageCamera);
       UI.disposeResource(_imageDialog);
       UI.disposeResource(_imageTrash);
@@ -811,8 +795,6 @@ public class DialogEquipment extends TitleAreaDialog {
    private void onImage_Delete() {
 
       _imageFilePath = null;
-
-      disposeCanvasImage();
 
       _lblImageFilePath.setText(UI.EMPTY_STRING);
       _canvasEquipmentImage.setImage(_imageCamera);

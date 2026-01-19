@@ -15,6 +15,11 @@
  *******************************************************************************/
 package net.tourbook.equipment;
 
+import com.github.benmanes.caffeine.cache.Cache;
+import com.github.benmanes.caffeine.cache.Caffeine;
+import com.github.benmanes.caffeine.cache.RemovalCause;
+import com.github.benmanes.caffeine.cache.RemovalListener;
+
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -29,7 +34,10 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.Callable;
 import java.util.concurrent.ConcurrentSkipListSet;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
@@ -66,20 +74,21 @@ import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.window.Window;
 import org.eclipse.swt.custom.BusyIndicator;
 import org.eclipse.swt.graphics.Image;
+import org.eclipse.swt.internal.DPIUtil;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
 
 public class EquipmentManager {
 
-   private static final char               NL                          = UI.NEW_LINE;
+   private static final char                 NL                          = UI.NEW_LINE;
 
-   private static final Object             DB_LOCK                     = new Object();
+   private static final Object               DB_LOCK                     = new Object();
 
-   public static final int                 EXPAND_TYPE_FLAT            = 0;
-   public static final int                 EXPAND_TYPE_YEAR_TOUR       = 1;
-   public static final int                 EXPAND_TYPE_YEAR_MONTH_TOUR = 2;
+   public static final int                   EXPAND_TYPE_FLAT            = 0;
+   public static final int                   EXPAND_TYPE_YEAR_TOUR       = 1;
+   public static final int                   EXPAND_TYPE_YEAR_MONTH_TOUR = 2;
 
-   static final String[]                   EXPAND_TYPE_NAMES           = {
+   static final String[]                     EXPAND_TYPE_NAMES           = {
 
          Messages.app_action_expand_type_flat,
          Messages.app_action_expand_type_year_day,
@@ -89,33 +98,70 @@ public class EquipmentManager {
    /**
     * The EXPAND_TYPE_... value is the index for these labels
     */
-   static final String[]                   EXPAND_TYPE_LABEL           = {
+   static final String[]                     EXPAND_TYPE_LABEL           = {
 
          "Sort By Date",
          "By Year",
          "By Year/Month"
    };
 
-   static final int[]                      EXPAND_TYPES                = {
+   static final int[]                        EXPAND_TYPES                = {
 
          EXPAND_TYPE_FLAT,
          EXPAND_TYPE_YEAR_TOUR,
          EXPAND_TYPE_YEAR_MONTH_TOUR
    };
 
-   private static EquipmentContentLayout   _equipmentContentLayout;
-   private static int                      _equipmentNumContentColumns;
-   private static int                      _equipmentImageSize;
-   private static int                      _equipmentTextWidth;
+   private static EquipmentContentLayout     _equipmentContentLayout;
+   private static int                        _equipmentImageSize_Content;
+   private static int                        _equipmentImageSize_View;
+   private static int                        _equipmentNumContentColumns;
+   private static int                        _equipmentTextWidth;
 
    /**
     * Key is the image file path
     */
-   private static final Map<String, Image> _equipmentImageCache        = new HashMap<>();
+   private static final Cache<String, Image> _imageCache_Content;
+   private static final Cache<String, Image> _imageCache_View;
 
    static {
 
       restoreEquipmentContentValues();
+
+   }
+   static {
+
+      final RemovalListener<String, Image> removalListener = new RemovalListener<>() {
+
+         final ExecutorService executor = Executors.newSingleThreadExecutor();
+
+         @Override
+         public void onRemoval(final String fileName,
+                               final Image image,
+                               final RemovalCause removalCause) {
+
+            executor.submit(new Callable<Void>() {
+               @Override
+               public Void call() throws IOException {
+
+                  // dispose cached image
+                  UI.disposeResource(image);
+
+                  return null;
+               }
+            });
+         }
+      };
+
+      _imageCache_Content = Caffeine.newBuilder()
+            .maximumSize(20)
+            .removalListener(removalListener)
+            .build();
+
+      _imageCache_View = Caffeine.newBuilder()
+            .maximumSize(100)
+            .removalListener(removalListener)
+            .build();
    }
 
    private static volatile Map<Long, Equipment> _allEquipment_ByID;
@@ -195,27 +241,12 @@ public class EquipmentManager {
    }
 
    /**
-    * This image must be disposed externally
-    *
-    * @param imageFilePath
-    *
-    * @return
-    *
-    * @throws IOException
+    * Dispose all images
     */
-   public static Image createEquipmentImage(final String imageFilePath) throws IOException {
+   public static void disposeAllEquipmentImages() {
 
-      return ImageUtils.createImage(imageFilePath, _equipmentImageSize);
-   }
-
-   /**
-    * Dispose images
-    */
-   public static void disposeEquipmentImages() {
-
-      _equipmentImageCache.values().forEach(image -> UI.disposeResource(image));
-
-      _equipmentImageCache.clear();
+      _imageCache_Content.invalidateAll();
+      _imageCache_View.invalidateAll();
    }
 
    public static void equipment_Add(final Collection<Equipment> allEquipment,
@@ -831,45 +862,74 @@ public class EquipmentManager {
       return _allTypes;
    }
 
+   public static int getEquipmentContentImageSize() {
+
+      return _equipmentImageSize_Content;
+   }
+
    /**
     * For a given image file path, try to retrieve the already created
     * Image resource from the cache.
     * Otherwise, create an image resource, and put it in the cache
     *
-    * @param string
+    * @param imageFilePath
+    * @param imageSize
     *
     * @return Return the equipment image or <code>null</code> when not available
+    *
+    * @throws IOException
+    *            This exceptions is thrown when the image could not be loaded
     */
-   public static Image getEquipmentImage(final String imageFilePath) {
+   public static Image getEquipmentImage(final String imageFilePath,
+                                         final ImageSize imageSizeType) throws IOException {
 
       if (StringUtils.isNullOrEmpty(imageFilePath)) {
          return null;
       }
 
-      Image equipmentImage = _equipmentImageCache.get(imageFilePath);
+      final int deviceZoom = DPIUtil.getDeviceZoom();
+      final float deviceScale = deviceZoom / 100.0f;
 
-      if (equipmentImage == null) {
+      if (imageSizeType == ImageSize.CONTENT) {
 
-         try {
+         Image equipmentImage = _imageCache_Content.getIfPresent(imageFilePath);
 
-            equipmentImage = ImageUtils.createImage(imageFilePath, _equipmentImageSize);
+         if (equipmentImage == null) {
 
-         } catch (final IOException e) {
+            final int imageSizeScaled = (int) (_equipmentImageSize_Content * deviceScale);
 
-            return null;
+            equipmentImage = ImageUtils.createImage(imageFilePath, imageSizeScaled);
+
+            if (equipmentImage != null) {
+               _imageCache_Content.put(imageFilePath, equipmentImage);
+            }
          }
 
-         if (equipmentImage != null) {
-            _equipmentImageCache.put(imageFilePath, equipmentImage);
+         return equipmentImage;
+
+      } else if (imageSizeType == ImageSize.VIEW) {
+
+         Image equipmentImage = _imageCache_View.getIfPresent(imageFilePath);
+
+         if (equipmentImage == null) {
+
+            final int imageSizeScaled = (int) (_equipmentImageSize_View * deviceScale);
+
+            equipmentImage = ImageUtils.createImage(imageFilePath, imageSizeScaled, true);
+
+            if (equipmentImage != null) {
+               _imageCache_View.put(imageFilePath, equipmentImage);
+            }
          }
+
+         return equipmentImage;
       }
 
-      return equipmentImage;
+      return null;
    }
 
-   public static int getEquipmentImageSize() {
-
-      return _equipmentImageSize;
+   public static int getEquipmentImageSize_Content() {
+      return _equipmentImageSize_Content;
    }
 
    /**
@@ -1137,7 +1197,7 @@ public class EquipmentManager {
             TourDataEditorView.STATE_EQUIPMENT_TEXT_WIDTH_MIN,
             TourDataEditorView.STATE_EQUIPMENT_TEXT_WIDTH_MAX);
 
-      _equipmentImageSize = Util.getStateInt(state,
+      _equipmentImageSize_Content = Util.getStateInt(state,
             TourDataEditorView.STATE_EQUIPMENT_IMAGE_SIZE,
             TourDataEditorView.STATE_EQUIPMENT_IMAGE_SIZE_DEFAULT,
             TourDataEditorView.STATE_EQUIPMENT_IMAGE_SIZE_MIN,
@@ -1174,12 +1234,24 @@ public class EquipmentManager {
       }
    }
 
+   public static void setEquipmentImageSize_View(final int imageSize) {
+
+      if (imageSize != _equipmentImageSize_View) {
+
+         // the image size was modified -> dispose images with the wrong size
+         _imageCache_View.invalidateAll();
+
+         // set new image size
+         _equipmentImageSize_View = imageSize;
+      }
+   }
+
    public static void updateEquipmentContent() {
 
       // get old values
       final EquipmentContentLayout equipmentContentLayout = _equipmentContentLayout;
       final int equipmentTextWidth = _equipmentTextWidth;
-      final int equipmentImageSize = _equipmentImageSize;
+      final int equipmentImageSize = _equipmentImageSize_Content;
       final int equipmentNumContentColumns = _equipmentNumContentColumns;
 
       // update values from the state
@@ -1187,7 +1259,7 @@ public class EquipmentManager {
 
       // check if values are modified
       if (equipmentContentLayout == _equipmentContentLayout
-            && equipmentImageSize == _equipmentImageSize
+            && equipmentImageSize == _equipmentImageSize_Content
             && equipmentTextWidth == _equipmentTextWidth
             && equipmentNumContentColumns == _equipmentNumContentColumns) {
 
@@ -1197,8 +1269,7 @@ public class EquipmentManager {
       }
 
       // dispose equipment content
-      disposeEquipmentImages();
-//      disposeTagUIContent();
+      _imageCache_Content.invalidateAll();
 
       // fire event that the equipment content is redisplayed
       TourManager.fireEvent(TourEventId.EQUIPMENT_CONTENT_CHANGED);

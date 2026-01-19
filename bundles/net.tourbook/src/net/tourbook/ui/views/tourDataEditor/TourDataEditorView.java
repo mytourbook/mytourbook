@@ -334,6 +334,7 @@ public class TourDataEditorView extends ViewPart implements
    public static final int                    STATE_EQUIPMENT_NUM_CONTENT_COLUMNS_DEFAULT      = 2;
    public static final int                    STATE_EQUIPMENT_NUM_CONTENT_COLUMNS_MIN          = 1;
    public static final int                    STATE_EQUIPMENT_NUM_CONTENT_COLUMNS_MAX          = 100;
+   public static final String                 STATE_EQUIPMENT_VIEWER_IMAGE_HEIGHT              = "STATE_EQUIPMENT_VIEWER_IMAGE_HEIGHT";            //$NON-NLS-1$
    //
    public static final String                 STATE_AUTOCOMPLETE_POPUP_HEIGHT_TITLE            = "STATE_AUTOCOMPLETE_POPUP_HEIGHT_TITLE";          //$NON-NLS-1$
    public static final String                 STATE_AUTOCOMPLETE_POPUP_HEIGHT_LOCATION_START   = "STATE_AUTOCOMPLETE_POPUP_HEIGHT_LOCATION_START"; //$NON-NLS-1$
