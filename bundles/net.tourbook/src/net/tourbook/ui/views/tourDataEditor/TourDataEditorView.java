@@ -326,6 +326,7 @@ public class TourDataEditorView extends ViewPart implements
    public static final int                    STATE_EQUIPMENT_IMAGE_SIZE_DEFAULT               = 100;
    public static final int                    STATE_EQUIPMENT_IMAGE_SIZE_MIN                   = 10;
    public static final int                    STATE_EQUIPMENT_IMAGE_SIZE_MAX                   = 500;
+   public static final String                 STATE_EQUIPMENT_IS_USE_VIEWER_DEFAULT_HEIGHT     = "STATE_EQUIPMENT_IS_USE_VIEWER_DEFAULT_HEIGHT";   //$NON-NLS-1$
    public static final String                 STATE_EQUIPMENT_TEXT_WIDTH                       = "STATE_EQUIPMENT_TEXT_WIDTH";                     //$NON-NLS-1$
    public static final int                    STATE_EQUIPMENT_TEXT_WIDTH_DEFAULT               = 200;
    public static final int                    STATE_EQUIPMENT_TEXT_WIDTH_MIN                   = 20;

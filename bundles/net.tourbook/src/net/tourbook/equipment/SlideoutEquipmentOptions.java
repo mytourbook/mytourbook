@@ -34,6 +34,7 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.MouseWheelListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
@@ -56,6 +57,9 @@ public class SlideoutEquipmentOptions extends ToolbarSlideout implements IAction
     * UI controls
     */
    private Spinner _spinnerViewerImageHeight;
+
+   private Button  _rdoShowCustomHeight;
+   private Button  _rdoShowDefaultHeight;
 
    /**
     * @param ownerControl
@@ -159,19 +163,42 @@ public class SlideoutEquipmentOptions extends ToolbarSlideout implements IAction
             .grab(true, false)
             .applyTo(container);
       GridLayoutFactory.fillDefaults().numColumns(2).applyTo(container);
+//      container.setBackground(UI.SYS_COLOR_YELLOW);
       {
          {
-            /*
-             * Image height
-             */
+            // Label
+            final Label label = new Label(container, SWT.NONE);
+            label.setText("Row height");
+            GridDataFactory.fillDefaults().align(SWT.BEGINNING, SWT.BEGINNING).applyTo(label);
+
+         }
+         {
+            final Composite heightContainer = new Composite(container, SWT.NONE);
+            GridDataFactory.fillDefaults().grab(true, false).applyTo(heightContainer);
+            GridLayoutFactory.fillDefaults().numColumns(2).applyTo(heightContainer);
             {
-               // Label
-               final Label label = new Label(container, SWT.NONE);
-               label.setText("Row &height");
+               /*
+                * Show default height
+                */
+               _rdoShowDefaultHeight = new Button(heightContainer, SWT.RADIO);
+               _rdoShowDefaultHeight.setText("Use &default height");
+               _rdoShowDefaultHeight.addSelectionListener(_defaultSelectionListener);
+
+               GridDataFactory.fillDefaults().span(2, 1).applyTo(_rdoShowDefaultHeight);
             }
             {
-               // Spinner
-               _spinnerViewerImageHeight = new Spinner(container, SWT.BORDER);
+
+               /*
+                * Show custom height
+                */
+               _rdoShowCustomHeight = new Button(heightContainer, SWT.RADIO);
+               _rdoShowCustomHeight.setText("&Customize height");
+               _rdoShowCustomHeight.addSelectionListener(_defaultSelectionListener);
+
+               /*
+                * Image height
+                */
+               _spinnerViewerImageHeight = new Spinner(heightContainer, SWT.BORDER);
                _spinnerViewerImageHeight.setMinimum(getDefaultItemHeight());
                _spinnerViewerImageHeight.setMaximum(TourDataEditorView.STATE_EQUIPMENT_IMAGE_SIZE_MAX);
                _spinnerViewerImageHeight.setPageIncrement(10);
@@ -184,6 +211,9 @@ public class SlideoutEquipmentOptions extends ToolbarSlideout implements IAction
 
    private void enableControls() {
 
+      final boolean isUseCustomHeight = _rdoShowCustomHeight.getSelection();
+
+      _spinnerViewerImageHeight.setEnabled(isUseCustomHeight);
    }
 
    /**
@@ -216,13 +246,16 @@ public class SlideoutEquipmentOptions extends ToolbarSlideout implements IAction
 
       saveState();
 
+      enableControls();
+
       _equipmentView.updateUI_Viewer();
    }
 
    @Override
    public void resetToDefaults() {
 
-      _spinnerViewerImageHeight.setSelection(getDefaultItemHeight());
+      _rdoShowDefaultHeight.setSelection(true);
+      _rdoShowCustomHeight.setSelection(false);
 
       onChangeUI();
    }
@@ -237,14 +270,25 @@ public class SlideoutEquipmentOptions extends ToolbarSlideout implements IAction
             defaultItemHeight,
             TourDataEditorView.STATE_EQUIPMENT_IMAGE_SIZE_MAX);
 
-      _spinnerViewerImageHeight.setSelection(itemHeight);
+      final boolean isUseDefaultHeight = Util.getStateBoolean(_state, TourDataEditorView.STATE_EQUIPMENT_IS_USE_VIEWER_DEFAULT_HEIGHT, true);
+
+// SET_FORMATTING_OFF
+
+      _rdoShowDefaultHeight      .setSelection(isUseDefaultHeight);
+      _rdoShowCustomHeight       .setSelection(isUseDefaultHeight == false);
+      _spinnerViewerImageHeight  .setSelection(itemHeight);
+
+// SET_FORMATTING_ON
    }
 
    private void saveState() {
 
-      final int imageHeight = _spinnerViewerImageHeight.getSelection();
+// SET_FORMATTING_OFF
 
-      _state.put(TourDataEditorView.STATE_EQUIPMENT_VIEWER_IMAGE_HEIGHT, imageHeight);
+      _state.put(TourDataEditorView.STATE_EQUIPMENT_IS_USE_VIEWER_DEFAULT_HEIGHT,   _rdoShowDefaultHeight      .getSelection());
+      _state.put(TourDataEditorView.STATE_EQUIPMENT_VIEWER_IMAGE_HEIGHT,            _spinnerViewerImageHeight  .getSelection());
+
+// SET_FORMATTING_ON
    }
 
 }

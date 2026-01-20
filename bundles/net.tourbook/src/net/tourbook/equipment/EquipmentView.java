@@ -3675,16 +3675,32 @@ public class EquipmentView extends ViewPart implements ITourProvider, ITourViewe
 
       _equipmentFilterType = (EquipmentFilterType) Util.getStateEnum(_state, STATE_EQUIPMENT_FILTER, EquipmentFilterType.ALL_IS_DISPLAYED);
 
-      _selectedTreeItemHeight = Util.getStateInt(_state,
-            TourDataEditorView.STATE_EQUIPMENT_VIEWER_IMAGE_HEIGHT,
-            _defaultTreeItemHeight,
-            TourDataEditorView.STATE_EQUIPMENT_IMAGE_SIZE_MIN,
-            TourDataEditorView.STATE_EQUIPMENT_IMAGE_SIZE_MAX);
+      restoreState_TreeItemHeight();
 
       EquipmentManager.setEquipmentImageSize_View(_selectedTreeItemHeight);
 
       updateUI_EquipmentFilter();
       updateToolTipState();
+   }
+
+   private void restoreState_TreeItemHeight() {
+
+      final boolean isUseDefaultHeight = Util.getStateBoolean(_state,
+            TourDataEditorView.STATE_EQUIPMENT_IS_USE_VIEWER_DEFAULT_HEIGHT,
+            true);
+
+      if (isUseDefaultHeight) {
+
+         _selectedTreeItemHeight = _defaultTreeItemHeight;
+
+      } else {
+
+         _selectedTreeItemHeight = Util.getStateInt(_state,
+               TourDataEditorView.STATE_EQUIPMENT_VIEWER_IMAGE_HEIGHT,
+               _defaultTreeItemHeight,
+               TourDataEditorView.STATE_EQUIPMENT_IMAGE_SIZE_MIN,
+               TourDataEditorView.STATE_EQUIPMENT_IMAGE_SIZE_MAX);
+      }
    }
 
    /**
@@ -4118,11 +4134,7 @@ public class EquipmentView extends ViewPart implements ITourProvider, ITourViewe
     */
    public void updateUI_Viewer() {
 
-      _selectedTreeItemHeight = Util.getStateInt(_state,
-            TourDataEditorView.STATE_EQUIPMENT_VIEWER_IMAGE_HEIGHT,
-            _defaultTreeItemHeight,
-            TourDataEditorView.STATE_EQUIPMENT_IMAGE_SIZE_MIN,
-            TourDataEditorView.STATE_EQUIPMENT_IMAGE_SIZE_MAX);
+      restoreState_TreeItemHeight();
 
       EquipmentManager.setEquipmentImageSize_View(_selectedTreeItemHeight);
 
