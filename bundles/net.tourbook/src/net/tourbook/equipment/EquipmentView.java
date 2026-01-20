@@ -60,6 +60,7 @@ import net.tourbook.tag.TagMenuManager;
 import net.tourbook.tour.ITourEventListener;
 import net.tourbook.tour.SelectionTourId;
 import net.tourbook.tour.SelectionTourIds;
+import net.tourbook.tour.TourDoubleClickState;
 import net.tourbook.tour.TourEventId;
 import net.tourbook.tour.TourManager;
 import net.tourbook.tour.TourTypeMenuManager;
@@ -186,6 +187,7 @@ public class EquipmentView extends ViewPart implements ITourProvider, ITourViewe
    private TreeViewer                         _equipmentViewer;
    private ColumnManager                      _columnManager;
    private TVIEquipmentView_Root              _rootItem;
+   private TourDoubleClickState               _tourDoubleClickState                    = new TourDoubleClickState();
 
    private MenuManager                        _viewerMenuManager;
    private Menu                               _treeContextMenu;
@@ -1050,15 +1052,15 @@ public class EquipmentView extends ViewPart implements ITourProvider, ITourViewe
       _equipmentViewer.setUseHashlookup(true);
 
       _equipmentViewer.addSelectionChangedListener(selectionChangedEvent -> onEquipmentViewer_Selection(selectionChangedEvent));
-//      _equipViewer.addDoubleClickListener(doubleClickEvent -> onTagViewer_DoubleClick());
-//
+      _equipmentViewer.addDoubleClickListener(doubleClickEvent -> onEquipmentViewer_DoubleClick());
+
       tree.addListener(SWT.MouseDoubleClick, event -> onAction_EditItem());
       tree.addListener(SWT.MouseDown, event -> onEquipmentTree_MouseDown(event));
-//
+
       tree.addKeyListener(KeyListener.keyPressedAdapter(keyEvent -> {
 
          _isSelectedWithKeyboard = true;
-//
+
          enableActions();
 
          switch (keyEvent.keyCode) {
@@ -2612,6 +2614,12 @@ public class EquipmentView extends ViewPart implements ITourProvider, ITourViewe
       _tagMenuManager            .enableTagActions(isTourSelected, isOneTour, oneTourTagIds);
       _tourTypeMenuManager       .enableTourTypeActions(isTourSelected, tourTypeID);
 
+      _tourDoubleClickState.canEditTour         = isOneTour;
+      _tourDoubleClickState.canOpenTour         = isOneTour;
+      _tourDoubleClickState.canQuickEditTour    = isOneTour;
+      _tourDoubleClickState.canEditMarker       = isOneTour;
+      _tourDoubleClickState.canAdjustAltitude   = isOneTour;
+
 // SET_FORMATTING_ON
 
    }
@@ -2678,6 +2686,19 @@ public class EquipmentView extends ViewPart implements ITourProvider, ITourViewe
          }
       }
 
+      // edit tour actions
+      TourActionManager.fillContextMenu(menuMgr, TourActionCategory.EDIT, _allTourActions_Edit, this);
+
+      // tour type actions
+      _tourTypeMenuManager.fillContextMenu_WithActiveActions(menuMgr, this);
+
+      // add/remove ... tags in the tours
+      _tagMenuManager.fillTagMenu_WithActiveActions(menuMgr, this);
+
+      // export actions
+      TourActionManager.fillContextMenu(menuMgr, TourActionCategory.EXPORT, _allTourActions_Export, this);
+
+      // customize equipment actions
       menuMgr.add(_actionNewEquipment);
       menuMgr.add(_actionNewPart);
       menuMgr.add(_actionNewService);
@@ -2701,18 +2722,6 @@ public class EquipmentView extends ViewPart implements ITourProvider, ITourViewe
 
       menuMgr.add(_actionSetTourStructure);
       menuMgr.add(_actionSetTourStructure_All);
-
-      // edit actions
-      TourActionManager.fillContextMenu(menuMgr, TourActionCategory.EDIT, _allTourActions_Edit, this);
-
-      // tour type actions
-      _tourTypeMenuManager.fillContextMenu_WithActiveActions(menuMgr, this);
-
-      // add/remove ... tags in the tours
-      _tagMenuManager.fillTagMenu_WithActiveActions(menuMgr, this);
-
-      // export actions
-      TourActionManager.fillContextMenu(menuMgr, TourActionCategory.EXPORT, _allTourActions_Export, this);
 
       // expand/collapse actions
       menuMgr.add(new Separator());
@@ -3402,6 +3411,24 @@ public class EquipmentView extends ViewPart implements ITourProvider, ITourViewe
    private void onEquipmentTree_MouseDown(final Event event) {
 
       _isMouseContextMenu = event.button == 3;
+   }
+
+   private void onEquipmentViewer_DoubleClick() {
+
+      final Object selection = _equipmentViewer.getStructuredSelection().getFirstElement();
+
+      if (selection instanceof TVIEquipmentView_Tour) {
+
+         TourManager.getInstance().tourDoubleClickAction(EquipmentView.this, _tourDoubleClickState);
+
+      } else if (selection != null) {
+
+         // expand/collapse current item
+
+         final TreeViewerItem treeItem = (TreeViewerItem) selection;
+
+         expandCollapseItem(treeItem);
+      }
    }
 
    private void onEquipmentViewer_Selection(final SelectionChangedEvent event) {

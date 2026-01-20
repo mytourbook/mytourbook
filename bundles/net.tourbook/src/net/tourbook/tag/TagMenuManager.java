@@ -898,6 +898,13 @@ public class TagMenuManager implements IActionProvider {
     */
    public void fillTagMenu(final IMenuManager menuMgr) {
 
+      if (_actionContribItem_AddTag_AutoOpen_Current == null) {
+
+         // this happened when opening the tag context menu the first time in the tour data editor
+
+         updateTagAutoOpenAction(null);
+      }
+
       // add all tour tag actions
       menuMgr.add(new Separator());
       {
