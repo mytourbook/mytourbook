@@ -275,6 +275,10 @@ public class TVIEquipmentView_Part_Year extends TVIEquipmentView_Item {
 
                + sqlFilter.getWhereClause() + NL
 
+               // get all equipment id's
+               + "LEFT JOIN " + TourDatabase.JOINTABLE__TOURDATA__EQUIPMENT + " AS jTdataEq" + NL //   //$NON-NLS-1$ //$NON-NLS-2$
+               + "  ON TourData.TOURID = jTdataEq.TOURDATA_TOURID" + NL //                             //$NON-NLS-1$
+
                // get tag id's
                + "LEFT JOIN " + TourDatabase.JOINTABLE__TOURDATA__TOURTAG + " AS jTdataTtag" // //$NON-NLS-1$ //$NON-NLS-2$
                + "  ON TourData.tourId = jTdataTtag.TourData_tourId" + NL //                    //$NON-NLS-1$
@@ -303,6 +307,7 @@ public class TVIEquipmentView_Part_Year extends TVIEquipmentView_Item {
          final ResultSet result = statement.executeQuery();
 
          long prevTourId = -1;
+         Set<Long> allEquipmentIDs = null;
          Set<Long> allTagIDs = null;
          Set<Long> allMarkerIDs = null;
 
@@ -313,12 +318,18 @@ public class TVIEquipmentView_Part_Year extends TVIEquipmentView_Item {
             final long dbTourId     = result.getLong(1);
             final Object dbTagId    = result.getObject(6);
             final Object dbMarkerId = result.getObject(7);
+            final Object dbEquipmentID = result.getObject(8);
 
 // SET_FORMATTING_ON
 
             if (dbTourId == prevTourId) {
 
                // additional resultsets for the same tour
+
+               // get equipment from left join
+               if (dbEquipmentID instanceof final Long equipmentID) {
+                  allEquipmentIDs.add(equipmentID);
+               }
 
                // get tags from outer join
                if (dbTagId instanceof final Long tagId) {
@@ -342,6 +353,15 @@ public class TVIEquipmentView_Part_Year extends TVIEquipmentView_Item {
 
                if (UI.IS_SCRAMBLE_DATA) {
                   tourItem.firstColumn = UI.scrambleText(tourItem.firstColumn);
+               }
+
+               // get first equipment id
+               if (dbEquipmentID instanceof final Long equipmentID) {
+
+                  allEquipmentIDs = new HashSet<>();
+                  allEquipmentIDs.add(equipmentID);
+
+                  tourItem.setEquipmentIds(allEquipmentIDs);
                }
 
                // get first tag id

@@ -2248,7 +2248,7 @@ public class TourBookView extends ViewPart implements
       TVITourBookItem firstTreeElement = null;
       TVITourBookTour firstTourItem = null;
 
-      List<TVITourBookTour> allSelectedTourItems = new ArrayList<>();
+      List<TreeViewerItem> allSelectedTreeItems = new ArrayList<>();
 
       if (_isLayoutNatTable) {
 
@@ -2262,7 +2262,9 @@ public class TourBookView extends ViewPart implements
 
             if (numTourItems > 0) {
 
-               allSelectedTourItems = rowSelectionModel.getSelectedRowObjects();
+               final List<TVITourBookTour> allSelectedTourItems = rowSelectionModel.getSelectedRowObjects();
+
+               allSelectedTreeItems = new ArrayList<>(allSelectedTourItems);
                firstTourItem = allSelectedTourItems.get(0);
             }
 
@@ -2294,9 +2296,11 @@ public class TourBookView extends ViewPart implements
 
                numTourItems = numSelectedItems = rowSelectionModel.getSelectedRowCount();
 
-               allSelectedTourItems = rowSelectionModel.getSelectedRowObjects();
+               final List<TVITourBookTour> allSelectedTourItems = rowSelectionModel.getSelectedRowObjects();
 
-               if (allSelectedTourItems.isEmpty() == false) {
+               allSelectedTreeItems = new ArrayList<>(allSelectedTourItems);
+
+               if (allSelectedTreeItems.isEmpty() == false) {
                   firstTourItem = allSelectedTourItems.get(0);
                }
 
@@ -2310,7 +2314,7 @@ public class TourBookView extends ViewPart implements
                   numTourItems = numSelectedItems = 1;
                   firstTourItem = fetchedTour;
 
-                  allSelectedTourItems.add(fetchedTour);
+                  allSelectedTreeItems.add(fetchedTour);
                }
             }
 
@@ -2335,7 +2339,7 @@ public class TourBookView extends ViewPart implements
 
                numTourItems++;
 
-               allSelectedTourItems.add(tviTourBookTour);
+               allSelectedTreeItems.add(tviTourBookTour);
             }
          }
 
@@ -2459,7 +2463,7 @@ public class TourBookView extends ViewPart implements
             oneTourTagIds,
             isFlatView);
 
-      _equipmentMenuManager.enableActions(allSelectedTourItems);
+      _equipmentMenuManager.enableActions(allSelectedTreeItems);
 
       final long tourTypeID = isOneTourSelected
             ? firstTourItem.getTourTypeId()

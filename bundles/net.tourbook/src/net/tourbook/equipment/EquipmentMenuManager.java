@@ -37,6 +37,7 @@ import net.tourbook.common.action.ActionOpenPrefDialog;
 import net.tourbook.common.ui.SubMenu;
 import net.tourbook.common.util.LRUMap;
 import net.tourbook.common.util.StatusUtil;
+import net.tourbook.common.util.TreeViewerItem;
 import net.tourbook.data.Equipment;
 import net.tourbook.data.TourData;
 import net.tourbook.preferences.ITourbookPreferences;
@@ -549,29 +550,43 @@ public class EquipmentMenuManager implements IActionProvider {
    /**
     * Enable actions from selected tours
     *
-    * @param allSelectedTourItems
+    * @param allSelectedTreeItems
     */
-   public void enableActions(final List<TVITourBookTour> allSelectedTourItems) {
+   public void enableActions(final List<TreeViewerItem> allSelectedTreeItems) {
 
-      if (allSelectedTourItems == null) {
+      if (allSelectedTreeItems == null) {
          return;
       }
 
-      final int numSelectedTours = allSelectedTourItems.size();
+      final int numSelectedTours = allSelectedTreeItems.size();
 
       boolean isEnabled_RemoveEquipment = false;
 
       final HashSet<Long> allSelectedEquipmentIDs_AllTours = new HashSet<>();
 
-      for (final TVITourBookTour tviTourBookTour : allSelectedTourItems) {
+      for (final TreeViewerItem treeItem : allSelectedTreeItems) {
 
-         final List<Long> allTourEquipmentIDs = tviTourBookTour.getEquipmentIds();
+         if (treeItem instanceof final TVITourBookTour tourItem) {
 
-         if (allTourEquipmentIDs != null && allTourEquipmentIDs.size() > 0) {
+            final List<Long> allTourEquipmentIDs = tourItem.getEquipmentIds();
 
-            allSelectedEquipmentIDs_AllTours.addAll(allTourEquipmentIDs);
+            if (allTourEquipmentIDs != null && allTourEquipmentIDs.size() > 0) {
 
-            isEnabled_RemoveEquipment = true;
+               allSelectedEquipmentIDs_AllTours.addAll(allTourEquipmentIDs);
+
+               isEnabled_RemoveEquipment = true;
+            }
+
+         } else if (treeItem instanceof final TVIEquipmentView_Tour tourItem) {
+
+//            final List<Long> allTourEquipmentIDs = tourItem.getEquipmentIds();
+//
+//            if (allTourEquipmentIDs != null && allTourEquipmentIDs.size() > 0) {
+//
+//               allSelectedEquipmentIDs_AllTours.addAll(allTourEquipmentIDs);
+//
+//               isEnabled_RemoveEquipment = true;
+//            }
          }
       }
 

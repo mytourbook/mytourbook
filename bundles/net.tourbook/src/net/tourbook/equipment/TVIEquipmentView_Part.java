@@ -110,35 +110,39 @@ public class TVIEquipmentView_Part extends TVIEquipmentView_Item {
           */
          final String sql = UI.EMPTY_STRING
 
-               + "SELECT" + NL //                                                               //$NON-NLS-1$
+               + "SELECT" + NL //                                                                        //$NON-NLS-1$
 
                + TVIEquipmentView_Tour.SQL_TOUR_COLUMNS
 
-               + "FROM equipmentpart part" + NL //                                              //$NON-NLS-1$
+               + "FROM equipmentpart AS part" + NL //                                                    //$NON-NLS-1$
 
-               + "JOIN tourdata_equipment AS j_td_eq" + NL //                                   //$NON-NLS-1$
-               + "   ON j_td_eq.equipment_equipmentid = part.equipment_equipmentid" + NL //     //$NON-NLS-1$
+               + "JOIN " + TourDatabase.JOINTABLE__TOURDATA__EQUIPMENT + " AS j_td_eq" + NL //           //$NON-NLS-1$
+               + "   ON j_td_eq.equipment_equipmentid = part.equipment_equipmentid" + NL //              //$NON-NLS-1$
 
                // The alias "TourData" is needed that the tour filter is working
-               + "JOIN tourdata AS TourData" + NL //                                            //$NON-NLS-1$
-               + "   ON TourData.tourID = j_td_eq.tourdata_tourID" + NL //                      //$NON-NLS-1$
-               + "   AND TourData.tourstarttime >= part.dateFrom" + NL //                       //$NON-NLS-1$
-               + "   AND TourData.tourstarttime <  part.dateUntil" + NL //                      //$NON-NLS-1$
+               + "JOIN tourdata AS TourData" + NL //                                                     //$NON-NLS-1$
+               + "   ON TourData.tourID = j_td_eq.tourdata_tourID" + NL //                               //$NON-NLS-1$
+               + "   AND TourData.tourstarttime >= part.dateFrom" + NL //                                //$NON-NLS-1$
+               + "   AND TourData.tourstarttime <  part.dateUntil" + NL //                               //$NON-NLS-1$
 
-               // get tag id's
-               + "LEFT JOIN " + TourDatabase.JOINTABLE__TOURDATA__TOURTAG + " AS jTdataTtag" // //$NON-NLS-1$ //$NON-NLS-2$
-               + "  ON TourData.tourId = jTdataTtag.TourData_tourId" + NL //                    //$NON-NLS-1$
+               // get all equipment id's
+               + "LEFT JOIN " + TourDatabase.JOINTABLE__TOURDATA__EQUIPMENT + " AS jTdataEq" + NL //   //$NON-NLS-1$ //$NON-NLS-2$
+               + "  ON TourData.TOURID = jTdataEq.TOURDATA_TOURID" + NL //                             //$NON-NLS-1$
 
-               // get marker id's
-               + "LEFT JOIN " + TourDatabase.TABLE_TOUR_MARKER + " AS Tmarker" //               //$NON-NLS-1$ //$NON-NLS-2$
-               + "  ON TourData.tourId = Tmarker.TourData_tourId" + NL //                       //$NON-NLS-1$
+               // get all tag id's
+               + "LEFT JOIN " + TourDatabase.JOINTABLE__TOURDATA__TOURTAG + " AS jTdataTtag" //          //$NON-NLS-1$ //$NON-NLS-2$
+               + "  ON TourData.tourId = jTdataTtag.TourData_tourId" + NL //                             //$NON-NLS-1$
 
-               + "WHERE part.isCollate = TRUE" + NL //                                          //$NON-NLS-1$
-               + "   AND part.partID = ?" + NL //                                               //$NON-NLS-1$
+               // get all marker id's
+               + "LEFT JOIN " + TourDatabase.TABLE_TOUR_MARKER + " AS Tmarker" //                        //$NON-NLS-1$ //$NON-NLS-2$
+               + "  ON TourData.tourId = Tmarker.TourData_tourId" + NL //                                //$NON-NLS-1$
+
+               + "WHERE part.isCollate = TRUE" + NL //                                                   //$NON-NLS-1$
+               + "   AND part.partID = ?" + NL //                                                        //$NON-NLS-1$
 
                + sqlFilter.getWhereClause() + NL
 
-               + "ORDER BY TourData.tourstarttime" + NL //                                      //$NON-NLS-1$
+               + "ORDER BY TourData.tourstarttime" + NL //                                               //$NON-NLS-1$
          ;
 
          final PreparedStatement statement = conn.prepareStatement(sql);
@@ -149,6 +153,7 @@ public class TVIEquipmentView_Part extends TVIEquipmentView_Item {
          final ResultSet result = statement.executeQuery();
 
          long prevTourId = -1;
+         Set<Long> allEquipmentIDs = null;
          Set<Long> allTagIDs = null;
          Set<Long> allMarkerIDs = null;
 
@@ -156,15 +161,21 @@ public class TVIEquipmentView_Part extends TVIEquipmentView_Item {
 
 // SET_FORMATTING_OFF
 
-            final long dbTourId     = result.getLong(1);
-            final Object dbTagId    = result.getObject(6);
-            final Object dbMarkerId = result.getObject(7);
+            final long dbTourId        = result.getLong(1);
+            final Object dbTagId       = result.getObject(6);
+            final Object dbMarkerId    = result.getObject(7);
+            final Object dbEquipmentID = result.getObject(8);
 
 // SET_FORMATTING_ON
 
             if (dbTourId == prevTourId) {
 
                // additional resultsets for the same tour
+
+               // get equipment from left join
+               if (dbEquipmentID instanceof final Long equipmentID) {
+                  allEquipmentIDs.add(equipmentID);
+               }
 
                // get tags from outer join
                if (dbTagId instanceof final Long tagId) {
@@ -190,20 +201,29 @@ public class TVIEquipmentView_Part extends TVIEquipmentView_Item {
                   tourItem.firstColumn = UI.scrambleText(tourItem.firstColumn);
                }
 
+               // get first equipment id
+               if (dbEquipmentID instanceof final Long equipmentID) {
+
+                  allEquipmentIDs = new HashSet<>();
+                  allEquipmentIDs.add(equipmentID);
+
+                  tourItem.setEquipmentIds(allEquipmentIDs);
+               }
+
                // get first tag id
-               if (dbTagId instanceof Long) {
+               if (dbTagId instanceof final Long tagID) {
 
                   allTagIDs = new HashSet<>();
-                  allTagIDs.add((Long) dbTagId);
+                  allTagIDs.add(tagID);
 
                   tourItem.setTagIds(allTagIDs);
                }
 
                // get first marker id
-               if (dbMarkerId instanceof Long) {
+               if (dbMarkerId instanceof final Long markerID) {
 
                   allMarkerIDs = new HashSet<>();
-                  allMarkerIDs.add((Long) dbMarkerId);
+                  allMarkerIDs.add(markerID);
 
                   tourItem.setMarkerIds(allMarkerIDs);
                }

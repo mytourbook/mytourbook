@@ -205,6 +205,7 @@ public class EquipmentView extends ViewPart implements ITourProvider, ITourViewe
 
    private EquipmentFilterType                _equipmentFilterType                     = EquipmentFilterType.ALL_IS_DISPLAYED;
 
+   private EquipmentMenuManager               _equipmentMenuManager;
    private TagMenuManager                     _tagMenuManager;
    private TourTypeMenuManager                _tourTypeMenuManager;
 
@@ -959,7 +960,8 @@ public class EquipmentView extends ViewPart implements ITourProvider, ITourViewe
             _allTourActions_Export  .keySet(),
 
             _tourTypeMenuManager    .getAllTourTypeActions()   .keySet(),
-            _tagMenuManager         .getAllTagActions()        .keySet()
+            _tagMenuManager         .getAllTagActions()        .keySet(),
+            _equipmentMenuManager   .getAllEquipmentActions()  .keySet()
       );
 
 // SET_FORMATTING_ON
@@ -967,8 +969,13 @@ public class EquipmentView extends ViewPart implements ITourProvider, ITourViewe
 
    private void createMenuManager() {
 
-      _tagMenuManager = new TagMenuManager(this, true);
-      _tourTypeMenuManager = new TourTypeMenuManager(this);
+// SET_FORMATTING_OFF
+
+      _equipmentMenuManager   = new EquipmentMenuManager(this, true, true);
+      _tagMenuManager         = new TagMenuManager(this, true);
+      _tourTypeMenuManager    = new TourTypeMenuManager(this);
+
+// SET_FORMATTING_ON
 
       _viewerMenuManager = new MenuManager("#PopupMenu"); //$NON-NLS-1$
       _viewerMenuManager.setRemoveAllWhenShown(true);
@@ -1189,9 +1196,11 @@ public class EquipmentView extends ViewPart implements ITourProvider, ITourViewe
       defineColumn_Equipment_Collate();
 
       defineColumn_Tour_Title();
-      defineColumn_Tour_Marker();
 
+      defineColumn_Tour_Marker();
       defineColumn_Tour_Tags();
+      defineColumn_Tour_Equipment();
+
       defineColumn_Equipment_Image();
       defineColumn_Equipment_ImageFilePath();
 
@@ -2324,6 +2333,28 @@ public class EquipmentView extends ViewPart implements ITourProvider, ITourViewe
    }
 
    /**
+    * Column: Tour - Equipment
+    */
+   private void defineColumn_Tour_Equipment() {
+
+      final TreeColumnDefinition colDef_Tree = TreeColumnFactory.TOUR_EQUIPMENT.createColumn(_columnManager, _pc);
+
+      colDef_Tree.setLabelProvider(new SelectionCellLabelProvider() {
+
+         @Override
+         public void update(final ViewerCell cell) {
+
+            final Object element = cell.getElement();
+            if (element instanceof final TVIEquipmentView_Tour tourItem) {
+
+               cell.setText(EquipmentManager.getEquipmentNames(tourItem.getEquipmentIds()));
+               setCellColor(cell, element);
+            }
+         }
+      });
+   }
+
+   /**
     * Column: Tour - Markers
     */
    private void defineColumn_Tour_Marker() {
@@ -2493,6 +2524,7 @@ public class EquipmentView extends ViewPart implements ITourProvider, ITourViewe
       int numItems = 0;
       TVIEquipmentView_Part selectedPartItem = null;
       TVIEquipmentView_Tour selectedTourItem = null;
+      final List<TreeViewerItem> allSelectedTreeItems = new ArrayList<>();
 
       boolean isEquipmentCollate = false;
 
@@ -2546,6 +2578,8 @@ public class EquipmentView extends ViewPart implements ITourProvider, ITourViewe
 
             selectedPartItem = tourItem.getPartItem();
             equipmentItemContext = tourItem.getEquipmentItem();
+
+            allSelectedTreeItems.add(tourItem);
          }
 
          if (equipmentItemContext != null) {
@@ -2613,6 +2647,7 @@ public class EquipmentView extends ViewPart implements ITourProvider, ITourViewe
 
       _tagMenuManager            .enableTagActions(isTourSelected, isOneTour, oneTourTagIds);
       _tourTypeMenuManager       .enableTourTypeActions(isTourSelected, tourTypeID);
+      _equipmentMenuManager      .enableActions(allSelectedTreeItems);
 
       _tourDoubleClickState.canEditTour         = isOneTour;
       _tourDoubleClickState.canOpenTour         = isOneTour;
@@ -4067,7 +4102,7 @@ public class EquipmentView extends ViewPart implements ITourProvider, ITourViewe
       _equipmentFilterType = EquipmentFilterType.ALL_IS_DISPLAYED;
 
       _actionToggleEquipmentFilter.setChecked(false);
-      _actionToggleEquipmentFilter.setImageDescriptor(CommonActivator.getThemedImageDescriptor(CommonImages.App_Filter));
+      _actionToggleEquipmentFilter.setImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.Equipment_Filter));
    }
 
    private void setEquipmentFilter_NoTours() {

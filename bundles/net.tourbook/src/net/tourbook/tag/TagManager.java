@@ -710,6 +710,9 @@ public class TagManager {
             TourDataEditorView.STATE_TAG_NUM_CONTENT_COLUMNS_MAX);
    }
 
+   /**
+    * This is called when the tag content layout was modified
+    */
    public static void updateTagContent() {
 
       // get old values

@@ -43,8 +43,9 @@ public class TVIEquipmentView_Tour extends TVIEquipmentView_Item {
 
          + "jTdataTtag.TourTag_TagId, "                                 //   6  //$NON-NLS-1$
          + "Tmarker.MarkerId, "                                         //   7  //$NON-NLS-1$
+         + "jTdataEq.Equipment_EquipmentID, "                           //   8  //$NON-NLS-1$
 
-         + SQL_SUM_COLUMNS_TOUR                                         //   8
+         + SQL_SUM_COLUMNS_TOUR                                         //   9
    ;
 
    private TVIEquipmentView_Equipment _equipmentItem;
@@ -58,9 +59,11 @@ public class TVIEquipmentView_Tour extends TVIEquipmentView_Item {
    String                             tourTitle;
    long                               tourTypeId;
 
+   private Set<Long>                  _allEquipmentIDs;
    private Set<Long>                  _allMarkerIDs;
    private Set<Long>                  _allTagIDs;
 
+   private List<Long>                 _allEquipmentIDsList;
    private List<Long>                 _allMarkerIDsList;
    private List<Long>                 _allTagIDsList;
 
@@ -97,6 +100,19 @@ public class TVIEquipmentView_Tour extends TVIEquipmentView_Item {
    protected void fetchChildren() {
 
       // there are no children for a tour
+   }
+
+   public List<Long> getEquipmentIds() {
+
+      if (_allEquipmentIDsList != null) {
+         return _allEquipmentIDsList;
+      }
+
+      if (_allEquipmentIDs != null) {
+         _allEquipmentIDsList = new ArrayList<>(_allEquipmentIDs);
+      }
+
+      return _allEquipmentIDsList;
    }
 
    public TVIEquipmentView_Equipment getEquipmentItem() {
@@ -164,7 +180,11 @@ public class TVIEquipmentView_Tour extends TVIEquipmentView_Item {
          tourTitle = UI.scrambleText(tourTitle);
       }
 
-      readCommonValues(result, 8);
+      readCommonValues(result, 9);
+   }
+
+   void setEquipmentIds(final Set<Long> allEquipmentIDs) {
+      _allEquipmentIDs = allEquipmentIDs;
    }
 
    public void setMarkerIds(final Set<Long> allMarkerIDs) {
