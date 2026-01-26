@@ -2516,12 +2516,12 @@ public class EquipmentView extends ViewPart implements ITourProvider, ITourViewe
       /*
        * Count number of selected items
        */
+      int numItems = 0;
       int numEquipment = 0;
       int numParts = 0;
       int numServices = 0;
       int numTours = 0;
 
-      int numItems = 0;
       TVIEquipmentView_Part selectedPartItem = null;
       TVIEquipmentView_Tour selectedTourItem = null;
       final List<TreeViewerItem> allSelectedTreeItems = new ArrayList<>();
@@ -2603,6 +2603,8 @@ public class EquipmentView extends ViewPart implements ITourProvider, ITourViewe
       final boolean isServiceSelected           = numServices > 0;
       final boolean isTourSelected              = numTours > 0;
       final boolean isOneTour                   = numTours == 1;
+      final boolean isOneServiceSelected        = isServiceSelected   && isOneItemSelected;
+      final boolean isOnePartSelected           = isPartSelected      && isOneItemSelected;
 
       final boolean canCreatePartOrService      = isOneItemSelected
                                                    && (isEquipmentSelected || isPartSelected || isServiceSelected)
@@ -2630,11 +2632,11 @@ public class EquipmentView extends ViewPart implements ITourProvider, ITourViewe
       _actionDeletePart          .setEnabled(isEnableDeletePart);
       _actionDeleteService       .setEnabled(isEnableDeleteService);
       _actionDuplicateEquipment  .setEnabled(isEquipmentSelected && isEquipmentCollate);
-      _actionDuplicatePart       .setEnabled(isPartSelected);
-      _actionDuplicateService    .setEnabled(isServiceSelected);
-      _actionEditEquipment       .setEnabled(isEquipmentSelected);
-      _actionEditPart            .setEnabled(isPartSelected);
-      _actionEditService         .setEnabled(isServiceSelected);
+      _actionDuplicatePart       .setEnabled(isOnePartSelected);
+      _actionDuplicateService    .setEnabled(isOneServiceSelected);
+      _actionEditEquipment       .setEnabled(isEquipmentSelected && isOneItemSelected);
+      _actionEditPart            .setEnabled(isOnePartSelected);
+      _actionEditService         .setEnabled(isOneServiceSelected);
       _actionNewPart             .setEnabled(canCreatePartOrService);
       _actionNewService          .setEnabled(canCreatePartOrService);
       _actionSetTourStructure    .setEnabled(canSetTourStructure);
