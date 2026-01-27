@@ -16,42 +16,35 @@
 package net.tourbook.equipment.tour.filter;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import net.tourbook.Images;
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.UI;
-import net.tourbook.common.action.ActionOpenPrefDialog;
 import net.tourbook.common.dialog.MessageDialog_OnTop;
 import net.tourbook.common.form.SashLeftFixedForm;
 import net.tourbook.common.tooltip.AdvancedSlideout;
 import net.tourbook.common.util.ITreeViewer;
+import net.tourbook.common.util.StateSegment;
 import net.tourbook.common.util.TreeViewerItem;
 import net.tourbook.common.util.Util;
 import net.tourbook.data.Equipment;
 import net.tourbook.data.EquipmentPart;
-import net.tourbook.data.TourTag;
-import net.tourbook.database.TourDatabase;
+import net.tourbook.equipment.EquipmentManager;
 import net.tourbook.equipment.TVIEquipmentView_Equipment;
-import net.tourbook.equipment.TVIEquipmentView_Equipment_Month;
-import net.tourbook.equipment.TVIEquipmentView_Equipment_Year;
 import net.tourbook.equipment.TVIEquipmentView_Item;
 import net.tourbook.equipment.TVIEquipmentView_Part;
-import net.tourbook.equipment.TVIEquipmentView_Part_Month;
-import net.tourbook.equipment.TVIEquipmentView_Part_Year;
 import net.tourbook.equipment.TVIEquipmentView_Root;
 import net.tourbook.equipment.TVIEquipmentView_Tour;
-import net.tourbook.preferences.PrefPageTags;
-import net.tourbook.tag.TVIPrefTag;
-import net.tourbook.tag.TVIPrefTagCategory;
 import net.tourbook.tour.ITourEventListener;
 import net.tourbook.tour.TourEventId;
 import net.tourbook.tour.TourManager;
 import net.tourbook.ui.action.ActionCollapseAll;
 import net.tourbook.ui.action.ActionExpandAll;
 
+import org.eclipse.collections.impl.list.mutable.primitive.LongArrayList;
 import org.eclipse.collections.impl.set.mutable.primitive.LongHashSet;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.ToolBarManager;
@@ -64,13 +57,14 @@ import org.eclipse.jface.layout.PixelConverter;
 import org.eclipse.jface.layout.TableColumnLayout;
 import org.eclipse.jface.layout.TreeColumnLayout;
 import org.eclipse.jface.viewers.CellLabelProvider;
+import org.eclipse.jface.viewers.CheckStateChangedEvent;
 import org.eclipse.jface.viewers.CheckboxTableViewer;
+import org.eclipse.jface.viewers.CheckboxTreeViewer;
 import org.eclipse.jface.viewers.ColumnWeightData;
 import org.eclipse.jface.viewers.IElementComparer;
 import org.eclipse.jface.viewers.IStructuredContentProvider;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.ITreeContentProvider;
-import org.eclipse.jface.viewers.ITreeSelection;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.StyledCellLabelProvider;
@@ -79,7 +73,6 @@ import org.eclipse.jface.viewers.TableLayout;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.TableViewerColumn;
 import org.eclipse.jface.viewers.TreePath;
-import org.eclipse.jface.viewers.TreeSelection;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.TreeViewerColumn;
 import org.eclipse.jface.viewers.Viewer;
@@ -110,52 +103,65 @@ import org.eclipse.swt.widgets.Tree;
 import org.eclipse.swt.widgets.TreeColumn;
 import org.eclipse.swt.widgets.TreeItem;
 import org.eclipse.swt.widgets.Widget;
-import org.eclipse.ui.dialogs.ContainerCheckedTreeViewer;
 
 /**
- * Slideout for the tour tag filter
+ * Slideout for the tour equipment filter
  */
 public class SlideoutTourEquipmentFilter extends AdvancedSlideout implements ITreeViewer {
 
-   private static final String                         STATE_IS_LIVE_UPDATE                     = "STATE_IS_LIVE_UPDATE";                  //$NON-NLS-1$
-   private static final String                         STATE_SASH_WIDTH_CONTAINER               = "STATE_SASH_WIDTH_CONTAINER";            //$NON-NLS-1$
-   private static final String                         STATE_SASH_WIDTH_TAG_CONTAINER           = "STATE_SASH_WIDTH_TAG_CONTAINER";        //$NON-NLS-1$
+   private static final String                         STATE_IS_LIVE_UPDATE           = "STATE_IS_LIVE_UPDATE";                  //$NON-NLS-1$
+   private static final String                         STATE_SASH_WIDTH_CONTAINER     = "STATE_SASH_WIDTH_CONTAINER";            //$NON-NLS-1$
+   private static final String                         STATE_SASH_WIDTH_TAG_CONTAINER = "STATE_SASH_WIDTH_TAG_CONTAINER";        //$NON-NLS-1$
 
-   private static final Object[]                       EMPTY_LIST                               = new Object[] {};
-   private static final long[]                         NO_TAGS                                  = new long[] {};
+   /**
+    * The expanded equipment items have these structure:
+    * <p>
+    * 1. Type<br>
+    * 2. id/year/month<br>
+    * <br>
+    * 3. Type<br>
+    * 4. id/year/month<br>
+    * ...
+    */
+   private static final String                         STATE_EXPANDED_ITEMS           = "STATE_EXPANDED_ITEMS";                  //$NON-NLS-1$
+
+   /**
+    * Using large numbers to easier debug and find issues
+    */
+   private static final int                            STATE_ITEM_TYPE_SEPARATOR      = -1;
+   private static final int                            STATE_ITEM_TYPE_EQUIPMENT      = 1111;
+   private static final int                            STATE_ITEM_TYPE_PART           = 2111;
+
+   private static final Object[]                       EMPTY_LIST                     = new Object[] {};
+   private static final long[]                         NO_EQUIPMENT                   = new long[] {};
 
    private static IDialogSettings                      _state;
 
-   private final List<TourEquipmentFilterProfile>      _profiles                                = TourEquipmentFilterManager.getProfiles();
+   private final List<TourEquipmentFilterProfile>      _profiles                      = TourEquipmentFilterManager.getProfiles();
 
    private TableViewer                                 _profileViewer;
    private TourEquipmentFilterProfile                  _selectedProfile;
 
-   private ContainerCheckedTreeViewer                  _equipmentViewer;
+   private CheckboxTreeViewer                          _equipmentViewer;
    private TVIEquipmentView_Root                       _equipmentViewerRootItem;
 
    private CheckboxTableViewer                         _selectedEquipmentViewer;
-   private List<SelectedEquipment>                     _allSelectedEquipmentItems               = new ArrayList<>();
+   private List<SelectedEquipment>                     _allSelectedEquipmentItems     = new ArrayList<>();
 
-   private ToolItem                                    _tourTagFilterItem;
+   private ToolItem                                    _tourEquipmentFilterItem;
 
    private ModifyListener                              _defaultModifyListener;
    private SelectionListener                           _defaultSelectionListener;
    private ITourEventListener                          _tourEventListener;
 
-   private boolean                                     _tagViewerItem_IsChecked;
-   private boolean                                     _tagViewerItem_IsKeyPressed;
-   private Object                                      _tagViewerItem_Data;
+   private boolean                                     _equipmentViewerItem_IsChecked;
+   private boolean                                     _equipmentViewerItem_IsKeyPressed;
+   private Object                                      _equipmentViewerItem_Data;
 
    private boolean                                     _selectedEquipmentViewerItem_IsChecked;
    private boolean                                     _selectedEquipmentViewerItem_IsKeyPressed;
    private Object                                      _selectedEquipmentViewerItem_Data;
 
-   private long                                        _expandRunnableCounter;
-   private boolean                                     _isBehaviourSingleExpandedOthersCollapse = true;
-   private boolean                                     _isBehaviourAutoExpandCollapse           = true;
-   private boolean                                     _isExpandingSelection;
-   private boolean                                     _isInCollapseAll;
    private boolean                                     _isInUpdateUI;
    private boolean                                     _isInUpdateUIAfterDelete;
    private boolean                                     _isLiveUpdate;
@@ -164,7 +170,6 @@ public class SlideoutTourEquipmentFilter extends AdvancedSlideout implements ITr
 
    private ActionCollapseAllWithoutSelection           _actionCollapseAll;
    private ActionExpandAll                             _actionExpandAll;
-   private ActionOpenPrefDialog                        _actionOpenPrefTags;
    private ActionSelectedEquipment_CheckAllEquipment   _actionSelectedEquipment_CheckAll;
    private ActionSelectedEquipment_UncheckAllEquipment _actionSelectedEquipment_UncheckAll;
 
@@ -208,11 +213,11 @@ public class SlideoutTourEquipmentFilter extends AdvancedSlideout implements ITr
       @Override
       public void run() {
 
-         _isInCollapseAll = true;
+//         _isInCollapseAll = true;
          {
             super.run();
          }
-         _isInCollapseAll = false;
+//         _isInCollapseAll = false;
       }
 
    }
@@ -254,7 +259,7 @@ public class SlideoutTourEquipmentFilter extends AdvancedSlideout implements ITr
    /**
     * Comparator is sorting the tree items
     */
-   private final class EquipmentComparator extends ViewerComparator {
+   private class AllEquipment_Comparator extends ViewerComparator {
       @Override
       public int compare(final Viewer viewer, final Object obj1, final Object obj2) {
 
@@ -360,7 +365,7 @@ public class SlideoutTourEquipmentFilter extends AdvancedSlideout implements ITr
     * !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     * !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     */
-   private class EquipmentComparer implements IElementComparer {
+   private class AllEquipment_Comparer implements IElementComparer {
 
       @Override
       public boolean equals(final Object o1, final Object o2) {
@@ -380,38 +385,6 @@ public class SlideoutTourEquipmentFilter extends AdvancedSlideout implements ITr
                  && o2 instanceof final TVIEquipmentView_Part item2) {
 
             return item1.getPartID() == item2.getPartID();
-
-         } else if (o1 instanceof final TVIEquipmentView_Equipment_Year item1
-                 && o2 instanceof final TVIEquipmentView_Equipment_Year item2) {
-
-            return item1.getEquipmentId() == item2.getEquipmentId()
-                && item1.getYear()        == item2.getYear();
-
-         } else if (o1 instanceof final TVIEquipmentView_Part_Year item1
-                 && o2 instanceof final TVIEquipmentView_Part_Year item2) {
-
-            return item1.getPartId() == item2.getPartId()
-                && item1.getYear()   == item2.getYear();
-
-         } else if (o1 instanceof final TVIEquipmentView_Equipment_Month monthItem1
-                 && o2 instanceof final TVIEquipmentView_Equipment_Month monthItem2) {
-
-            final TVIEquipmentView_Equipment_Year yearItem1 = monthItem1.getYearItem();
-            final TVIEquipmentView_Equipment_Year yearItem2 = monthItem2.getYearItem();
-
-            return yearItem1.getEquipmentId() == yearItem2.getEquipmentId()
-                && yearItem1.getYear()        == yearItem2.getYear()
-                && monthItem1.getMonth()      == monthItem2.getMonth();
-
-         } else if (o1 instanceof final TVIEquipmentView_Part_Month monthItem1
-                 && o2 instanceof final TVIEquipmentView_Part_Month monthItem2) {
-
-            final TVIEquipmentView_Part_Year yearItem1 = monthItem1.getYearItem();
-            final TVIEquipmentView_Part_Year yearItem2 = monthItem2.getYearItem();
-
-            return yearItem1.getPartId() == yearItem2.getPartId()
-                && yearItem1.getYear()   == yearItem2.getYear()
-                && monthItem1.getMonth() == monthItem2.getMonth();
          }
 
 // SET_FORMATTING_ON
@@ -426,7 +399,7 @@ public class SlideoutTourEquipmentFilter extends AdvancedSlideout implements ITr
 
    }
 
-   private final class EquipmentContentProvider implements ITreeContentProvider {
+   private class AllEquipment_ContentProvider implements ITreeContentProvider {
 
       @Override
       public Object[] getChildren(final Object parentElement) {
@@ -488,40 +461,87 @@ public class SlideoutTourEquipmentFilter extends AdvancedSlideout implements ITr
 
    private class SelectedEquipment {
 
-      long   tagId;
-      String tagName;
+      Equipment equipment;
 
-      SelectedEquipment(final long tagId, final String tagName) {
+      long      equipmentId;
+      String    equipmentName;
 
-         this.tagId = tagId;
-         this.tagName = tagName;
+      public SelectedEquipment(final Equipment equipment) {
+
+         this.equipment = equipment;
+         this.equipmentId = equipment.getEquipmentId();
+         this.equipmentName = equipment.getName();
       }
    }
 
-   private class SelectedEquipmentComparator extends ViewerComparator {
-
+   /**
+    * Comparator is sorting the tree items
+    */
+   private class SelectedEquipment_Comparator extends ViewerComparator {
       @Override
-      public int compare(final Viewer viewer, final Object e1, final Object e2) {
+      public int compare(final Viewer viewer, final Object obj1, final Object obj2) {
 
-         if (e1 == null || e2 == null) {
-            return 0;
+         if (obj1 instanceof final SelectedEquipment item1
+               && obj2 instanceof final SelectedEquipment item2) {
+
+            // sort equipment by name
+
+            final Equipment equipment1 = item1.equipment;
+            final Equipment equipment2 = item2.equipment;
+
+            final boolean isCollate1 = equipment1.isCollate();
+            final boolean isCollate2 = equipment2.isCollate();
+
+            if (isCollate1 && isCollate2) {
+
+               // collated equipment
+
+               // 1st compare by type
+               int compareDiff = equipment1.getType().compareTo(equipment2.getType());
+
+               // 2nd compare by date
+               if (compareDiff == 0) {
+
+                  final long date1 = equipment1.getDateFrom();
+                  final long date2 = equipment2.getDateFrom();
+
+                  final long dateDiff = date1 - date2;
+
+                  // diff value can be larger than Integer.MAX_VALUE
+                  if (dateDiff > 0) {
+                     compareDiff = 1;
+                  } else if (dateDiff < 0) {
+                     compareDiff = -1;
+                  }
+               }
+
+               return compareDiff;
+
+            } else if (isCollate1) {
+
+               // sort collated before not collated
+
+               return -1;
+
+            } else if (isCollate2) {
+
+               // sort collated before not collated
+
+               return 1;
+
+            } else {
+
+               // not collated equipment -> sort by name
+
+               return equipment1.getName().compareTo(equipment2.getName());
+            }
          }
 
-         final SelectedEquipment selectedEquipment1 = (SelectedEquipment) e1;
-         final SelectedEquipment selectedEquipment2 = (SelectedEquipment) e2;
-
-         return selectedEquipment1.tagName.compareTo(selectedEquipment2.tagName);
-      }
-
-      @Override
-      public boolean isSorterProperty(final Object element, final String property) {
-
-         // force resorting when a name is renamed
-         return true;
+         return 0;
       }
    }
 
-   private class SelectedEquipmentProvider implements IStructuredContentProvider {
+   private class SelectedEquipment_Provider implements IStructuredContentProvider {
 
       @Override
       public void dispose() {}
@@ -546,7 +566,7 @@ public class SlideoutTourEquipmentFilter extends AdvancedSlideout implements ITr
             state,
             new int[] { 700, 400, 700, 400 });
 
-      _tourTagFilterItem = toolItem;
+      _tourEquipmentFilterItem = toolItem;
       _state = state;
 
       setShellFadeOutDelaySteps(30);
@@ -563,7 +583,7 @@ public class SlideoutTourEquipmentFilter extends AdvancedSlideout implements ITr
                return;
             }
 
-            updateTagModel();
+            updateEquipmentModel();
 
             // reselect profile
             onProfile_Select(false);
@@ -577,7 +597,6 @@ public class SlideoutTourEquipmentFilter extends AdvancedSlideout implements ITr
 
       _actionExpandAll = new ActionExpandAll(this);
       _actionCollapseAll = new ActionCollapseAllWithoutSelection(this);
-      _actionOpenPrefTags = new ActionOpenPrefDialog(Messages.action_tag_open_tagging_structure, PrefPageTags.ID);
       _actionSelectedEquipment_CheckAll = new ActionSelectedEquipment_CheckAllEquipment();
       _actionSelectedEquipment_UncheckAll = new ActionSelectedEquipment_UncheckAllEquipment();
    }
@@ -600,10 +619,12 @@ public class SlideoutTourEquipmentFilter extends AdvancedSlideout implements ITr
       // load profile viewer
       _profileViewer.setInput(new Object());
 
-      // load tag viewer
-      updateTagModel();
+      // load equipment viewer
+      updateEquipmentModel();
 
       restoreState();
+      restoreState_Viewer();
+
       enableControls();
    }
 
@@ -626,13 +647,13 @@ public class SlideoutTourEquipmentFilter extends AdvancedSlideout implements ITr
             final Sash sash = new Sash(sashContainer, SWT.VERTICAL);
 
             // right part
-            final Composite containerTags = createUI_300_Tags(sashContainer);
+            final Composite containerEquipment = createUI_300_Equipment(sashContainer);
 
             new SashLeftFixedForm(
                   sashContainer,
                   containerProfiles,
                   sash,
-                  containerTags,
+                  containerEquipment,
                   _state,
                   STATE_SASH_WIDTH_CONTAINER,
                   30);
@@ -645,8 +666,7 @@ public class SlideoutTourEquipmentFilter extends AdvancedSlideout implements ITr
    private Composite createUI_200_Profiles(final Composite parent) {
 
       final Composite container = new Composite(parent, SWT.NONE);
-      GridDataFactory.fillDefaults()
-            .applyTo(container);
+      GridDataFactory.fillDefaults().applyTo(container);
       GridLayoutFactory.fillDefaults()
             .numColumns(1)
             .extendedMargins(0, 3, 0, 0)
@@ -669,8 +689,7 @@ public class SlideoutTourEquipmentFilter extends AdvancedSlideout implements ITr
    private void createUI_210_ProfileViewer(final Composite parent) {
 
       final Composite layoutContainer = new Composite(parent, SWT.NONE);
-      GridDataFactory
-            .fillDefaults()
+      GridDataFactory.fillDefaults()
             .grab(true, true)
             .hint(_pc.convertWidthInCharsToPixels(15), _pc.convertHeightInCharsToPixels(8))
             .applyTo(layoutContainer);
@@ -714,7 +733,7 @@ public class SlideoutTourEquipmentFilter extends AdvancedSlideout implements ITr
          tableLayout.setColumnData(tc, new ColumnWeightData(1, false));
       }
       {
-         // Column: Number of checked tags
+         // Column: Number of checked equipment
 
          tvc = new TableViewerColumn(_profileViewer, SWT.TRAIL);
          tc = tvc.getColumn();
@@ -725,17 +744,17 @@ public class SlideoutTourEquipmentFilter extends AdvancedSlideout implements ITr
             public void update(final ViewerCell cell) {
 
                final TourEquipmentFilterProfile profile = (TourEquipmentFilterProfile) cell.getElement();
-               final int numTags = profile.equipmentFilterIDs.size();
+               final int numEquipment = profile.equipmentFilterIDs.size();
 
-               cell.setText(numTags == 0
+               cell.setText(numEquipment == 0
                      ? UI.EMPTY_STRING
-                     : Integer.toString(numTags));
+                     : Integer.toString(numEquipment));
             }
          });
          tableLayout.setColumnData(tc, net.tourbook.ui.UI.getColumnPixelWidth(_pc, 6));
       }
       {
-         // Column: Number of unchecked tags
+         // Column: Number of unchecked equipment
 
          tvc = new TableViewerColumn(_profileViewer, SWT.TRAIL);
          tc = tvc.getColumn();
@@ -746,17 +765,17 @@ public class SlideoutTourEquipmentFilter extends AdvancedSlideout implements ITr
             public void update(final ViewerCell cell) {
 
                final TourEquipmentFilterProfile profile = (TourEquipmentFilterProfile) cell.getElement();
-               final int numUncheckedTags = profile.equipmentFilterIds_Unchecked.size();
+               final int numUncheckedEquipment = profile.equipmentFilterIds_Unchecked.size();
 
-               cell.setText(numUncheckedTags == 0
+               cell.setText(numUncheckedEquipment == 0
                      ? UI.EMPTY_STRING
-                     : Integer.toString(numUncheckedTags));
+                     : Integer.toString(numUncheckedEquipment));
             }
          });
          tableLayout.setColumnData(tc, net.tourbook.ui.UI.getColumnPixelWidth(_pc, 6));
       }
       {
-         // Column: Combine tags with OR or AND
+         // Column: Combine equipment with OR or AND
 
          tvc = new TableViewerColumn(_profileViewer, SWT.TRAIL);
          tc = tvc.getColumn();
@@ -767,16 +786,16 @@ public class SlideoutTourEquipmentFilter extends AdvancedSlideout implements ITr
             public void update(final ViewerCell cell) {
 
                final TourEquipmentFilterProfile profile = (TourEquipmentFilterProfile) cell.getElement();
-               final int numTags = profile.equipmentFilterIDs.size();
+               final int numEquipment = profile.equipmentFilterIDs.size();
 
-               final String combineTags = profile.isOrOperator
+               final String combineEquipment = profile.isOrOperator
                      ? Messages.Slideout_TourTagFilter_CombineTags_With_OR
                      : Messages.Slideout_TourTagFilter_CombineTags_With_AND;
 
-               cell.setText(numTags > 1
+               cell.setText(numEquipment > 1
 
-                     // combine tags requires at least 2 tags
-                     ? combineTags
+                     // combine equipment requires at least 2 equipment
+                     ? combineEquipment
 
                      : UI.EMPTY_STRING);
             }
@@ -807,7 +826,7 @@ public class SlideoutTourEquipmentFilter extends AdvancedSlideout implements ITr
       }));
    }
 
-   private Composite createUI_300_Tags(final Composite parent) {
+   private Composite createUI_300_Equipment(final Composite parent) {
 
       final Composite container = new Composite(parent, SWT.NONE);
       GridDataFactory.fillDefaults()
@@ -864,34 +883,33 @@ public class SlideoutTourEquipmentFilter extends AdvancedSlideout implements ITr
    private void createUI_320_EquipmentContainer(final Composite parent) {
 
       final Composite container = new Composite(parent, SWT.NONE);
-      GridDataFactory
-            .fillDefaults()
+      GridDataFactory.fillDefaults()
             .grab(true, true)
             .indent(0, 10)
             .applyTo(container);
       GridLayoutFactory.fillDefaults().numColumns(1).applyTo(container);
       {
          // left part
-         final Composite containerTagList = createUI_330_EquipmentSelected(container);
+         final Composite containerEquipmentList = createUI_330_SelectedEquipment(container);
 
          // sash
          final Sash sash = new Sash(container, SWT.VERTICAL);
 
          // right part
-         final Composite containerTagViewer = createUI_340_AllEquipment(container);
+         final Composite containerEquipmentViewer = createUI_340_AllEquipment(container);
 
          new SashLeftFixedForm(
                container,
-               containerTagList,
+               containerEquipmentList,
                sash,
-               containerTagViewer,
+               containerEquipmentViewer,
                _state,
                STATE_SASH_WIDTH_TAG_CONTAINER,
                40);
       }
    }
 
-   private Composite createUI_330_EquipmentSelected(final Composite parent) {
+   private Composite createUI_330_SelectedEquipment(final Composite parent) {
 
       final Composite container = new Composite(parent, SWT.NONE);
       GridDataFactory.fillDefaults().grab(true, true).applyTo(container);
@@ -901,15 +919,15 @@ public class SlideoutTourEquipmentFilter extends AdvancedSlideout implements ITr
             .applyTo(container);
 //      container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_YELLOW));
       {
-         createUI_332_EquipmentSelected_Header(container);
-         createUI_334_EquipmentSelected_Viewer(container);
-         createUI_336_EquipmentSelected_Options(container);
+         createUI_332_SelectedEquipment_Header(container);
+         createUI_334_SelectedEquipment_Viewer(container);
+         createUI_336_SelectedEquipment_Options(container);
       }
 
       return container;
    }
 
-   private void createUI_332_EquipmentSelected_Header(final Composite parent) {
+   private void createUI_332_SelectedEquipment_Header(final Composite parent) {
 
       final Composite container = new Composite(parent, SWT.NONE);
       GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
@@ -917,7 +935,7 @@ public class SlideoutTourEquipmentFilter extends AdvancedSlideout implements ITr
 //      container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_BLUE));
       {
          {
-            // Label: Selected Tags
+            // Label: Selected equipment
 
             _lblSelectEquipment = new Label(container, SWT.NONE);
             _lblSelectEquipment.setText("Se&lected Equipment");
@@ -933,7 +951,7 @@ public class SlideoutTourEquipmentFilter extends AdvancedSlideout implements ITr
       }
    }
 
-   private void createUI_334_EquipmentSelected_Viewer(final Composite parent) {
+   private void createUI_334_SelectedEquipment_Viewer(final Composite parent) {
 
       final Composite layoutContainer = new Composite(parent, SWT.NONE);
       GridDataFactory.fillDefaults().grab(true, true).applyTo(layoutContainer);
@@ -951,7 +969,7 @@ public class SlideoutTourEquipmentFilter extends AdvancedSlideout implements ITr
       table.addSelectionListener(SelectionListener.widgetSelectedAdapter(selectionEvent -> {
 
          /*
-          * The tag cloud viewer selection event can have another selection !!!
+          * The selected equipment viewer selection event can have another selection !!!
           */
 
          _selectedEquipmentViewerItem_IsChecked = selectionEvent.detail == SWT.CHECK;
@@ -985,7 +1003,7 @@ public class SlideoutTourEquipmentFilter extends AdvancedSlideout implements ITr
       TableColumn tc;
 
       {
-         // Column: Tag name
+         // Column: Equipment name
 
          tvc = new TableViewerColumn(_selectedEquipmentViewer, SWT.LEAD);
          tc = tvc.getColumn();
@@ -996,7 +1014,7 @@ public class SlideoutTourEquipmentFilter extends AdvancedSlideout implements ITr
 
                final SelectedEquipment selectedEquipment = (SelectedEquipment) cell.getElement();
 
-               cell.setText(selectedEquipment.tagName);
+               cell.setText(selectedEquipment.equipmentName);
             }
          });
          tableLayout.setColumnData(tc, new ColumnWeightData(1, false));
@@ -1005,20 +1023,20 @@ public class SlideoutTourEquipmentFilter extends AdvancedSlideout implements ITr
       /*
        * create table viewer
        */
-      _selectedEquipmentViewer.setContentProvider(new SelectedEquipmentProvider());
-      _selectedEquipmentViewer.setComparator(new SelectedEquipmentComparator());
+      _selectedEquipmentViewer.setContentProvider(new SelectedEquipment_Provider());
+      _selectedEquipmentViewer.setComparator(new SelectedEquipment_Comparator());
 
       _selectedEquipmentViewer.addSelectionChangedListener(selectionChangedEvent -> onSelectedEquipment_Select(selectionChangedEvent));
    }
 
-   private void createUI_336_EquipmentSelected_Options(final Composite parent) {
+   private void createUI_336_SelectedEquipment_Options(final Composite parent) {
 
       final Composite container = new Composite(parent, SWT.NONE);
       GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
       GridLayoutFactory.fillDefaults().numColumns(2).applyTo(container);
       {
          {
-            // Label: Tag operator
+            // Label: Equipment operator
             _lblEquipmentOperator = new Label(container, SWT.NONE);
             _lblEquipmentOperator.setText("&Combine equipment with");
          }
@@ -1071,14 +1089,13 @@ public class SlideoutTourEquipmentFilter extends AdvancedSlideout implements ITr
       final Composite container = new Composite(parent, SWT.NONE);
       GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
       GridLayoutFactory.fillDefaults().numColumns(2).applyTo(container);
-//      containerTag.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_BLUE));
+//      container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_BLUE));
       {
          {
-            // Label: All Tags
+            // Label: All Equipment
             _lblAllEquipment = new Label(container, SWT.NONE);
             _lblAllEquipment.setText("&Available Equipment");
-            GridDataFactory
-                  .fillDefaults()//
+            GridDataFactory.fillDefaults()
                   .align(SWT.FILL, SWT.CENTER)
                   .grab(true, false)
                   .applyTo(_lblAllEquipment);
@@ -1097,8 +1114,7 @@ public class SlideoutTourEquipmentFilter extends AdvancedSlideout implements ITr
        */
 
       final Composite layoutContainer = new Composite(parent, SWT.NONE);
-      GridDataFactory
-            .fillDefaults()//
+      GridDataFactory.fillDefaults()
             .grab(true, true)
             .hint(200, 100)
             .applyTo(layoutContainer);
@@ -1121,43 +1137,42 @@ public class SlideoutTourEquipmentFilter extends AdvancedSlideout implements ITr
       tree.addSelectionListener(SelectionListener.widgetSelectedAdapter(selectionEvent -> {
 
          /*
-          * The tag treeviewer selection event can have another selection !!!
+          * The equipment treeviewer selection event can have another selection !!!
           */
 
-         _tagViewerItem_IsChecked = selectionEvent.detail == SWT.CHECK;
+         _equipmentViewerItem_IsChecked = selectionEvent.detail == SWT.CHECK;
 
-         if (_tagViewerItem_IsChecked) {
+         if (_equipmentViewerItem_IsChecked) {
 
             /*
              * Item can be null when <ctrl>+A is pressed !!!
              */
             final Widget item = selectionEvent.item;
 
-            _tagViewerItem_Data = item.getData();
+            _equipmentViewerItem_Data = item.getData();
          }
       }));
 
-      tree.addKeyListener(KeyListener.keyPressedAdapter(keyEvent -> _tagViewerItem_IsKeyPressed = true));
+      tree.addKeyListener(KeyListener.keyPressedAdapter(keyEvent -> _equipmentViewerItem_IsKeyPressed = true));
 
       layoutContainer.addTraverseListener(traverseEvent -> onTraverse_EquipmentContainer(tree, traverseEvent));
 
       /*
        * Create viewer
        */
-      _equipmentViewer = new ContainerCheckedTreeViewer(tree);
+      _equipmentViewer = new CheckboxTreeViewer(tree);
 
       _equipmentViewer.setUseHashlookup(true);
 
-      _equipmentViewer.setContentProvider(new EquipmentContentProvider());
-      _equipmentViewer.setComparator(new EquipmentComparator());
-      _equipmentViewer.setComparer(new EquipmentComparer());
+      _equipmentViewer.setContentProvider(new AllEquipment_ContentProvider());
+      _equipmentViewer.setComparator(new AllEquipment_Comparator());
+      _equipmentViewer.setComparer(new AllEquipment_Comparer());
 
-      _equipmentViewer.addCheckStateListener(checkStateChangedEvent -> update_FromEquipmentViewer());
-
+      _equipmentViewer.addCheckStateListener(checkStateChangedEvent -> onEquipment_Checked(checkStateChangedEvent));
       _equipmentViewer.addSelectionChangedListener(selectionChangedEvent -> onEquipment_Select(selectionChangedEvent));
 
       /*
-       * Create column
+       * Create 1st column
        */
       final TreeViewerColumn tvc = new TreeViewerColumn(_equipmentViewer, SWT.LEAD);
       final TreeColumn tvcColumn = tvc.getColumn();
@@ -1360,9 +1375,9 @@ public class SlideoutTourEquipmentFilter extends AdvancedSlideout implements ITr
       final int numSelectedEquipmentItems = _allSelectedEquipmentItems.size();
 
       final boolean isProfileSelected = _selectedProfile != null;
-      final boolean canCheckTags = numSelectedEquipmentItems > 0 && numCheckedSelectedEquipmentItems < numSelectedEquipmentItems;
-      final boolean canUncheckTags = numSelectedEquipmentItems > 0 && numCheckedSelectedEquipmentItems > 0;
-      final boolean canSetTagOperator = isProfileSelected && numCheckedSelectedEquipmentItems > 1;
+      final boolean canCheckEquipment = numSelectedEquipmentItems > 0 && numCheckedSelectedEquipmentItems < numSelectedEquipmentItems;
+      final boolean canUncheckEquipment = numSelectedEquipmentItems > 0 && numCheckedSelectedEquipmentItems > 0;
+      final boolean canSetEquipmentOperator = isProfileSelected && numCheckedSelectedEquipmentItems > 1;
 
       _btnApply.setEnabled(isProfileSelected && _isLiveUpdate == false);
       _btnCopyProfile.setEnabled(isProfileSelected);
@@ -1370,34 +1385,23 @@ public class SlideoutTourEquipmentFilter extends AdvancedSlideout implements ITr
 
       _actionCollapseAll.setEnabled(isProfileSelected);
       _actionExpandAll.setEnabled(isProfileSelected);
-      _actionOpenPrefTags.setEnabled(isProfileSelected);
-      _actionSelectedEquipment_CheckAll.setEnabled(isProfileSelected && canCheckTags);
-      _actionSelectedEquipment_UncheckAll.setEnabled(isProfileSelected && canUncheckTags);
+      _actionSelectedEquipment_CheckAll.setEnabled(isProfileSelected && canCheckEquipment);
+      _actionSelectedEquipment_UncheckAll.setEnabled(isProfileSelected && canUncheckEquipment);
 
       _chkLiveUpdate.setEnabled(isProfileSelected);
 
       _lblAllEquipment.setEnabled(isProfileSelected);
       _lblProfileName.setEnabled(isProfileSelected);
       _lblSelectEquipment.setEnabled(isProfileSelected);
-      _lblEquipmentOperator.setEnabled(canSetTagOperator);
+      _lblEquipmentOperator.setEnabled(canSetEquipmentOperator);
 
-      _rdoEquipmentOperator_AND.setEnabled(canSetTagOperator);
-      _rdoEquipmentOperator_OR.setEnabled(canSetTagOperator);
+      _rdoEquipmentOperator_AND.setEnabled(canSetEquipmentOperator);
+      _rdoEquipmentOperator_OR.setEnabled(canSetEquipmentOperator);
 
       _selectedEquipmentViewer.getTable().setEnabled(isProfileSelected);
       _equipmentViewer.getTree().setEnabled(isProfileSelected);
 
       _txtProfileName.setEnabled(isProfileSelected);
-   }
-
-   private void expandCollapseFolder(final TVIPrefTagCategory treeItem) {
-
-      if (_equipmentViewer.getExpandedState(treeItem)) {
-
-         // collapse folder
-
-         _equipmentViewer.collapseToLevel(treeItem, 1);
-      }
    }
 
    /**
@@ -1406,7 +1410,7 @@ public class SlideoutTourEquipmentFilter extends AdvancedSlideout implements ITr
    private void fillToolbar() {
 
       /*
-       * Toolbar: Tag cloud
+       * Toolbar: Selected equipment
        */
       final ToolBarManager tbmSelectedEquipment = new ToolBarManager(_toolBarSelectedEquipment);
 
@@ -1416,15 +1420,14 @@ public class SlideoutTourEquipmentFilter extends AdvancedSlideout implements ITr
       tbmSelectedEquipment.update(true);
 
       /*
-       * Toolbar: All tags
+       * Toolbar: All equipment
        */
-      final ToolBarManager tbmAllTags = new ToolBarManager(_toolBarAllEquipment);
+      final ToolBarManager tbmAllEquipment = new ToolBarManager(_toolBarAllEquipment);
 
-      tbmAllTags.add(_actionExpandAll);
-      tbmAllTags.add(_actionCollapseAll);
-      tbmAllTags.add(_actionOpenPrefTags);
+      tbmAllEquipment.add(_actionExpandAll);
+      tbmAllEquipment.add(_actionCollapseAll);
 
-      tbmAllTags.update(true);
+      tbmAllEquipment.update(true);
    }
 
    /**
@@ -1439,57 +1442,56 @@ public class SlideoutTourEquipmentFilter extends AdvancedSlideout implements ITr
 
    private long[] getEquipmentIDs_FromEquipmentViewer() {
 
-      final LongHashSet tagIds = new LongHashSet();
+      final LongHashSet equipmentIDs = new LongHashSet();
 
       final Object[] checkedElements = _equipmentViewer.getCheckedElements();
 
       for (final Object object : checkedElements) {
 
-         if (object instanceof TVIPrefTag) {
+         if (object instanceof final TVIEquipmentView_Equipment equipmentItem) {
 
-            final TVIPrefTag tagItem = (TVIPrefTag) object;
-            final long tagId = tagItem.getTourTag().getTagId();
+            final long equipmentID = equipmentItem.getEquipmentID();
 
-            tagIds.add(tagId);
+            equipmentIDs.add(equipmentID);
          }
       }
 
-      return tagIds.toArray();
+      return equipmentIDs.toArray();
    }
 
    private long[] getEquipmentIDs_FromSelectedEquipment_Checked() {
 
-      final LongHashSet tagIds = new LongHashSet();
+      final LongHashSet equipmentIDs = new LongHashSet();
 
       final Object[] checkedElements = _selectedEquipmentViewer.getCheckedElements();
 
       for (final Object object : checkedElements) {
 
-         if (object instanceof SelectedEquipment) {
-            tagIds.add(((SelectedEquipment) object).tagId);
+         if (object instanceof final SelectedEquipment selectedEquipment) {
+            equipmentIDs.add(selectedEquipment.equipmentId);
          }
       }
 
-      return tagIds.toArray();
+      return equipmentIDs.toArray();
    }
 
    private long[] getEquipmentIDs_FromSelectedEquipment_Unchecked() {
 
-      final Object[] allCheckedTags = _selectedEquipmentViewer.getCheckedElements();
-      final LongHashSet allUncheckedTagIds = new LongHashSet();
+      final Object[] allCheckedEquipment = _selectedEquipmentViewer.getCheckedElements();
+      final LongHashSet allUncheckedEquipmentIDs = new LongHashSet();
 
       for (final SelectedEquipment selectedEquipmentItem : _allSelectedEquipmentItems) {
 
-         final long tagId = selectedEquipmentItem.tagId;
+         final long equipmentID = selectedEquipmentItem.equipmentId;
          boolean isChecked = false;
 
-         for (final Object item : allCheckedTags) {
+         for (final Object item : allCheckedEquipment) {
 
             if (item instanceof SelectedEquipment) {
 
                final SelectedEquipment selectedEquipmentChecked = (SelectedEquipment) item;
 
-               if (tagId == selectedEquipmentChecked.tagId) {
+               if (equipmentID == selectedEquipmentChecked.equipmentId) {
                   isChecked = true;
                   break;
                }
@@ -1497,18 +1499,18 @@ public class SlideoutTourEquipmentFilter extends AdvancedSlideout implements ITr
          }
 
          if (!isChecked) {
-            allUncheckedTagIds.add(tagId);
+            allUncheckedEquipmentIDs.add(equipmentID);
          }
       }
 
-      return allUncheckedTagIds.toArray();
+      return allUncheckedEquipmentIDs.toArray();
    }
 
    @Override
    protected Rectangle getParentBounds() {
 
-      final Rectangle itemBounds = _tourTagFilterItem.getBounds();
-      final Point itemDisplayPosition = _tourTagFilterItem.getParent().toDisplay(itemBounds.x, itemBounds.y);
+      final Rectangle itemBounds = _tourEquipmentFilterItem.getBounds();
+      final Point itemDisplayPosition = _tourEquipmentFilterItem.getParent().toDisplay(itemBounds.x, itemBounds.y);
 
       itemBounds.x = itemDisplayPosition.x;
       itemBounds.y = itemDisplayPosition.y;
@@ -1616,61 +1618,51 @@ public class SlideoutTourEquipmentFilter extends AdvancedSlideout implements ITr
       saveState();
    }
 
+   private void onEquipment_Checked(final CheckStateChangedEvent checkStateChangedEvent) {
+
+      update_FromEquipmentViewer();
+   }
+
    private void onEquipment_Select(final SelectionChangedEvent event) {
 
-      if (_tagViewerItem_IsKeyPressed) {
+      if (_equipmentViewerItem_IsKeyPressed) {
 
          // ignore when selected with keyboard
 
          // reset state
-         _tagViewerItem_IsKeyPressed = false;
+         _equipmentViewerItem_IsKeyPressed = false;
 
          return;
       }
 
       Object selection;
 
-      if (_tagViewerItem_IsChecked) {
+      if (_equipmentViewerItem_IsChecked) {
 
          // a checkbox is checked
 
-         selection = _tagViewerItem_Data;
+         selection = _equipmentViewerItem_Data;
 
       } else {
 
          selection = ((IStructuredSelection) event.getSelection()).getFirstElement();
       }
 
-      if (selection instanceof TVIPrefTag) {
+      if (selection instanceof final TVIEquipmentView_Equipment equipmentItem) {
 
-         // tag is selected
+         // equipment is selected
 
-         final TVIPrefTag tviTag = (TVIPrefTag) selection;
+         // toggle equipment
+         if (_equipmentViewerItem_IsChecked == false) {
 
-         // toggle tag
-         if (_tagViewerItem_IsChecked == false) {
+            // equipment is selected and NOT the checkbox !!!
 
-            // tag is selected and NOT the checkbox !!!
+            final boolean isChecked = _equipmentViewer.getChecked(equipmentItem);
 
-            final boolean isChecked = _equipmentViewer.getChecked(tviTag);
-
-            _equipmentViewer.setChecked(tviTag, !isChecked);
+            _equipmentViewer.setChecked(equipmentItem, !isChecked);
          }
 
          update_FromEquipmentViewer();
-
-      } else if (selection instanceof TVIPrefTagCategory) {
-
-         // expand/collapse current item
-
-         if (_tagViewerItem_IsChecked == false) {
-
-            // category is selected and NOT the checkbox !!!
-
-            final TreeSelection treeSelection = (TreeSelection) event.getSelection();
-
-            onTag_SelectCategory(treeSelection);
-         }
       }
    }
 
@@ -1792,8 +1784,8 @@ public class SlideoutTourEquipmentFilter extends AdvancedSlideout implements ITr
 
          _selectedProfile = null;
 
-         updateEquipment_EquipmentViewer(NO_TAGS);
-         updateEquipment_SelectedEquipment(NO_TAGS, NO_TAGS);
+         updateEquipment_EquipmentViewer(NO_EQUIPMENT);
+         updateEquipment_SelectedEquipment(NO_EQUIPMENT, NO_EQUIPMENT);
 
          enableControls();
 
@@ -1971,14 +1963,14 @@ public class SlideoutTourEquipmentFilter extends AdvancedSlideout implements ITr
 
       if (selection instanceof SelectedEquipment) {
 
-         // tag is selected
+         // equipment is selected
 
          final SelectedEquipment selectedEquipment = (SelectedEquipment) selection;
 
-         // toggle tag
+         // toggle equipment
          if (_selectedEquipmentViewerItem_IsChecked == false) {
 
-            // tag is selected and NOT the checkbox !!!
+            // equipment is selected and NOT the checkbox !!!
 
             final boolean isChecked = _selectedEquipmentViewer.getChecked(selectedEquipment);
 
@@ -1987,143 +1979,6 @@ public class SlideoutTourEquipmentFilter extends AdvancedSlideout implements ITr
 
          update_FromSelectedEquipment();
       }
-   }
-
-   private void onTag_SelectCategory(final TreeSelection treeSelection) {
-
-      if (_isExpandingSelection) {
-         // prevent endless loops
-         return;
-      }
-
-      final TreePath[] selectedTreePaths = treeSelection.getPaths();
-      if (selectedTreePaths.length == 0) {
-         return;
-      }
-      final TreePath selectedTreePath = selectedTreePaths[0];
-      if (selectedTreePath == null) {
-         return;
-      }
-
-      final TVIPrefTagCategory tviFolder = (TVIPrefTagCategory) selectedTreePath.getLastSegment();
-
-      onTag_SelectCategory_10_AutoExpandCollapse(treeSelection, selectedTreePath, tviFolder);
-   }
-
-   /**
-    * This is not yet working thoroughly because the expanded position moves up or down and all
-    * expanded children are not visible (but they could) like when the triangle (+/-) icon in the
-    * tree is clicked.
-    *
-    * @param treeSelection
-    * @param selectedTreePath
-    * @param tviFolder
-    */
-   private void onTag_SelectCategory_10_AutoExpandCollapse(final ITreeSelection treeSelection,
-                                                           final TreePath selectedTreePath,
-                                                           final TVIPrefTagCategory tviFolder) {
-
-      if (_isInCollapseAll) {
-
-         // prevent auto expand
-         return;
-      }
-
-      if (_isBehaviourSingleExpandedOthersCollapse) {
-
-         final Tree tree = _equipmentViewer.getTree();
-
-         /*
-          * Run async because this is doing a reselection which cannot be done within the current
-          * selection event
-          */
-         tree.getDisplay().asyncExec(new Runnable() {
-
-            private long           __expandRunnableCounter = ++_expandRunnableCounter;
-
-            private ITreeSelection __treeSelection         = treeSelection;
-            private TreePath       __selectedTreePath      = selectedTreePath;
-
-            @Override
-            public void run() {
-
-               // check if a newer expand event occurred
-               if (__expandRunnableCounter != _expandRunnableCounter) {
-                  return;
-               }
-
-               if (tree.isDisposed()) {
-                  return;
-               }
-
-               onTag_SelectCategory_20_AutoExpandCollapse_Runnable(
-                     __treeSelection,
-                     __selectedTreePath);
-            }
-         });
-
-      } else {
-
-         if (_isBehaviourAutoExpandCollapse) {
-
-            // expand folder with one mouse click but not with the keyboard
-            expandCollapseFolder(tviFolder);
-         }
-      }
-   }
-
-   /**
-    * This behavior is complex and still have possible problems.
-    *
-    * @param treeSelection
-    * @param selectedTreePath
-    */
-   private void onTag_SelectCategory_20_AutoExpandCollapse_Runnable(final ITreeSelection treeSelection,
-                                                                    final TreePath selectedTreePath) {
-      _isExpandingSelection = true;
-      {
-         final Tree tree = _equipmentViewer.getTree();
-
-         tree.setRedraw(false);
-         {
-            final TreeItem topItem = tree.getTopItem();
-
-            final boolean isExpanded = _equipmentViewer.getExpandedState(selectedTreePath);
-
-            /*
-             * collapse all tree paths
-             */
-            final TreePath[] allExpandedTreePaths = _equipmentViewer.getExpandedTreePaths();
-            for (final TreePath treePath : allExpandedTreePaths) {
-               _equipmentViewer.setExpandedState(treePath, false);
-            }
-
-            /*
-             * expand and select selected folder
-             */
-            _equipmentViewer.setExpandedTreePaths(selectedTreePath);
-            _equipmentViewer.setSelection(treeSelection, true);
-
-            if (_isBehaviourAutoExpandCollapse && isExpanded) {
-
-               // auto collapse expanded folder
-               _equipmentViewer.setExpandedState(selectedTreePath, false);
-            }
-
-            /**
-             * set top item to the previous top item, otherwise the expanded/collapse item is
-             * positioned at the bottom and the UI is jumping all the time
-             * <p>
-             * win behavior: when an item is set to top which was collapsed before, it will be
-             * expanded
-             */
-            if (topItem.isDisposed() == false) {
-               tree.setTopItem(topItem);
-            }
-         }
-         tree.setRedraw(true);
-      }
-      _isExpandingSelection = false;
    }
 
    /**
@@ -2200,12 +2055,215 @@ public class SlideoutTourEquipmentFilter extends AdvancedSlideout implements ITr
       }
    }
 
+   /**
+    * Restore viewer state after the viewer is loaded
+    */
+   private void restoreState_Viewer() {
+
+      /*
+       * Expanded equipment categories
+       */
+      final long[] allStateItems = Util.getStateLongArray(_state, STATE_EXPANDED_ITEMS, null);
+      if (allStateItems != null) {
+
+         final List<TreePath> allViewerTreePaths = new ArrayList<>();
+
+         final List<StateSegment[]> allStateSegmentsAllPaths = restoreState_Viewer_GetSegments(allStateItems);
+
+         for (final StateSegment[] allStateSegmentsOnePath : allStateSegmentsAllPaths) {
+
+            final List<Object> allPathSegments = new ArrayList<>();
+
+            // start tree items with the root and go deeper with every segment
+            List<TreeViewerItem> allTreeItems = _equipmentViewerRootItem.getFetchedChildren();
+
+            for (final StateSegment stateSegment : allStateSegmentsOnePath) {
+
+               /*
+                * This is somehow recursive as it goes deeper into the child tree items until there
+                * are no children
+                */
+               allTreeItems = restoreState_Viewer_ExpandItem(allPathSegments, allTreeItems, stateSegment);
+            }
+
+            if (allPathSegments.size() > 0) {
+               allViewerTreePaths.add(new TreePath(allPathSegments.toArray()));
+            }
+         }
+
+         if (allViewerTreePaths.size() > 0) {
+
+            final TreePath[] allPaths = allViewerTreePaths.toArray(new TreePath[allViewerTreePaths.size()]);
+
+            _equipmentViewer.setExpandedTreePaths(allPaths);
+         }
+      }
+   }
+
+   /**
+    * @param allPathSegments
+    * @param allTreeItems
+    * @param stateSegment
+    *
+    * @return Returns children when it could be expanded otherwise <code>null</code>
+    */
+   private List<TreeViewerItem> restoreState_Viewer_ExpandItem(final List<Object> allPathSegments,
+                                                               final List<TreeViewerItem> allTreeItems,
+                                                               final StateSegment stateSegment) {
+
+      if (allTreeItems == null) {
+         return null;
+      }
+
+      final long stateValue = stateSegment.itemData;
+
+      if (stateSegment.itemType == STATE_ITEM_TYPE_EQUIPMENT) {
+
+         for (final TreeViewerItem treeItem : allTreeItems) {
+
+            if (treeItem instanceof final TVIEquipmentView_Equipment equipmentItem) {
+
+               final long itemValue = equipmentItem.getEquipment().getEquipmentId();
+
+               if (itemValue == stateValue) {
+
+                  allPathSegments.add(treeItem);
+
+                  return equipmentItem.getFetchedChildren();
+               }
+            }
+         }
+
+      } else if (stateSegment.itemType == STATE_ITEM_TYPE_PART) {
+
+         for (final TreeViewerItem treeItem : allTreeItems) {
+
+            if (treeItem instanceof final TVIEquipmentView_Part partItem) {
+
+               final long itemValue = partItem.getPartID();
+
+               if (itemValue == stateValue) {
+
+                  allPathSegments.add(treeItem);
+
+                  return partItem.getFetchedChildren();
+               }
+            }
+         }
+      }
+
+      return null;
+   }
+
+   /**
+    * Convert state structure into a 'segment' structure.
+    */
+   private List<StateSegment[]> restoreState_Viewer_GetSegments(final long[] expandedItems) {
+
+      final List<StateSegment[]> allTreePathSegments = new ArrayList<>();
+      final List<StateSegment> currentSegments = new ArrayList<>();
+
+      for (int itemIndex = 0; itemIndex < expandedItems.length;) {
+
+         // ensure array bounds
+         if (itemIndex + 1 >= expandedItems.length) {
+            // this should not happen when data are not corrupted
+            break;
+         }
+
+         final long itemType = expandedItems[itemIndex++];
+         final long itemData = expandedItems[itemIndex++];
+
+         if (itemType == STATE_ITEM_TYPE_SEPARATOR) {
+
+            // a new tree path starts
+
+            if (currentSegments.size() > 0) {
+
+               // keep current tree path segments
+
+               allTreePathSegments.add(currentSegments.toArray(new StateSegment[currentSegments.size()]));
+
+               // start a new path
+               currentSegments.clear();
+            }
+
+         } else {
+
+            // a new segment is available
+
+            if (false
+                  || itemType == STATE_ITEM_TYPE_EQUIPMENT
+                  || itemType == STATE_ITEM_TYPE_PART) {
+
+               currentSegments.add(new StateSegment(itemType, itemData));
+            }
+         }
+      }
+
+      if (currentSegments.size() > 0) {
+         allTreePathSegments.add(currentSegments.toArray(new StateSegment[currentSegments.size()]));
+      }
+
+      return allTreePathSegments;
+   }
+
    @Override
-   protected void saveState() {
+   protected void saveState_BeforeDisposed() {
 
       _state.put(STATE_IS_LIVE_UPDATE, _isLiveUpdate);
 
+      saveState_ExpandedItems();
+
       super.saveState();
+   }
+
+   /**
+    * Save state for expanded tree items
+    */
+   private void saveState_ExpandedItems() {
+
+      final Object[] allVisibleAndExpandedItems = _equipmentViewer.getVisibleExpandedElements();
+
+      if (allVisibleAndExpandedItems.length == 0) {
+
+         Util.setState(_state, STATE_EXPANDED_ITEMS, new long[0]);
+
+         return;
+      }
+
+      final LongArrayList allExpandedItemIDs = new LongArrayList();
+
+      final TreePath[] allExpandedAndOpenedTreePaths = UI.getExpandedAndOpenedItems(
+            allVisibleAndExpandedItems,
+            _equipmentViewer.getExpandedTreePaths());
+
+      for (final TreePath expandedPath : allExpandedAndOpenedTreePaths) {
+
+         // start a new path, always set it twice to have an even structure
+         allExpandedItemIDs.add(STATE_ITEM_TYPE_SEPARATOR);
+         allExpandedItemIDs.add(STATE_ITEM_TYPE_SEPARATOR);
+
+         final int numSegments = expandedPath.getSegmentCount();
+
+         for (int segmentIndex = 0; segmentIndex < numSegments; segmentIndex++) {
+
+            final Object segment = expandedPath.getSegment(segmentIndex);
+
+            if (segment instanceof final TVIEquipmentView_Equipment treeItem) {
+
+               allExpandedItemIDs.add(STATE_ITEM_TYPE_EQUIPMENT);
+               allExpandedItemIDs.add(treeItem.getEquipment().getEquipmentId());
+
+            } else if (segment instanceof final TVIEquipmentView_Part treeItem) {
+
+               allExpandedItemIDs.add(STATE_ITEM_TYPE_PART);
+               allExpandedItemIDs.add(treeItem.getPartID());
+            }
+         }
+      }
+
+      Util.setState(_state, STATE_EXPANDED_ITEMS, allExpandedItemIDs.toArray());
    }
 
    private void selectProfile(final TourEquipmentFilterProfile selectedProfile) {
@@ -2222,11 +2280,11 @@ public class SlideoutTourEquipmentFilter extends AdvancedSlideout implements ITr
          return;
       }
 
-      final long[] tagIds_Checked = getEquipmentIDs_FromEquipmentViewer();
-      final long[] tagIds_Unchecked = getEquipmentIDs_FromSelectedEquipment_Unchecked();
+      final long[] equipmentIDs_Checked = getEquipmentIDs_FromEquipmentViewer();
+      final long[] equipmentIDs_Unchecked = getEquipmentIDs_FromSelectedEquipment_Unchecked();
 
-      updateEquipment_EquipmentProfile(_selectedProfile, tagIds_Checked, tagIds_Unchecked);
-      updateEquipment_SelectedEquipment(tagIds_Checked, tagIds_Unchecked);
+      updateEquipment_EquipmentProfile(_selectedProfile, equipmentIDs_Checked, equipmentIDs_Unchecked);
+      updateEquipment_SelectedEquipment(equipmentIDs_Checked, equipmentIDs_Unchecked);
 
       enableControls();
 
@@ -2235,11 +2293,11 @@ public class SlideoutTourEquipmentFilter extends AdvancedSlideout implements ITr
 
    private void update_FromProfile() {
 
-      final long[] tagIds_Checked = _selectedProfile.equipmentFilterIDs.toArray();
-      final long[] tagIds_Unchecked = _selectedProfile.equipmentFilterIds_Unchecked.toArray();
+      final long[] equipmentIDs_Checked = _selectedProfile.equipmentFilterIDs.toArray();
+      final long[] equipmentIDs_Unchecked = _selectedProfile.equipmentFilterIds_Unchecked.toArray();
 
-      updateEquipment_SelectedEquipment(tagIds_Checked, tagIds_Unchecked);
-      updateEquipment_EquipmentViewer(tagIds_Checked);
+      updateEquipment_SelectedEquipment(equipmentIDs_Checked, equipmentIDs_Unchecked);
+      updateEquipment_EquipmentViewer(equipmentIDs_Checked);
 
       enableControls();
    }
@@ -2250,11 +2308,11 @@ public class SlideoutTourEquipmentFilter extends AdvancedSlideout implements ITr
          return;
       }
 
-      final long[] tagIds_Checked = getEquipmentIDs_FromSelectedEquipment_Checked();
-      final long[] tagIds_Unchecked = getEquipmentIDs_FromSelectedEquipment_Unchecked();
+      final long[] equipmentIDs_Checked = getEquipmentIDs_FromSelectedEquipment_Checked();
+      final long[] equipmentIDs_Unchecked = getEquipmentIDs_FromSelectedEquipment_Unchecked();
 
-      updateEquipment_EquipmentProfile(_selectedProfile, tagIds_Checked, tagIds_Unchecked);
-      updateEquipment_EquipmentViewer(tagIds_Checked);
+      updateEquipment_EquipmentProfile(_selectedProfile, equipmentIDs_Checked, equipmentIDs_Unchecked);
+      updateEquipment_EquipmentViewer(equipmentIDs_Checked);
 
       enableControls();
 
@@ -2262,19 +2320,19 @@ public class SlideoutTourEquipmentFilter extends AdvancedSlideout implements ITr
    }
 
    private void updateEquipment_EquipmentProfile(final TourEquipmentFilterProfile profile,
-                                                 final long[] tagIds_Checked,
-                                                 final long[] tagIds_Unchecked) {
+                                                 final long[] equipmentIDs_Checked,
+                                                 final long[] equipmentIDs_Unchecked) {
 
       /*
        * Update model
        */
-      final LongHashSet profileTagFilterIds = profile.equipmentFilterIDs;
-      profileTagFilterIds.clear();
-      profileTagFilterIds.addAll(tagIds_Checked);
+      final LongHashSet profileEquipmentFilterIDs = profile.equipmentFilterIDs;
+      profileEquipmentFilterIDs.clear();
+      profileEquipmentFilterIDs.addAll(equipmentIDs_Checked);
 
-      final LongHashSet profileTagFilterIds_Unchecked = profile.equipmentFilterIds_Unchecked;
-      profileTagFilterIds_Unchecked.clear();
-      profileTagFilterIds_Unchecked.addAll(tagIds_Unchecked);
+      final LongHashSet profileEquipmentFilterIDs_Unchecked = profile.equipmentFilterIds_Unchecked;
+      profileEquipmentFilterIDs_Unchecked.clear();
+      profileEquipmentFilterIDs_Unchecked.addAll(equipmentIDs_Unchecked);
 
       /*
        * Update UI
@@ -2282,79 +2340,94 @@ public class SlideoutTourEquipmentFilter extends AdvancedSlideout implements ITr
       _profileViewer.update(profile, null);
    }
 
-   private void updateEquipment_EquipmentViewer(final long[] tagIds) {
+   private void updateEquipment_EquipmentViewer(final long[] allEquipmentIDs) {
 
-      final ArrayList<TVIPrefTag> tagItems = new ArrayList<>(tagIds.length);
+      final int numIDs = allEquipmentIDs.length;
 
-      if (tagIds.length > 0) {
+      final List<TVIEquipmentView_Item> allEquipmentItems = new ArrayList<>(numIDs);
 
-         // get all tag viewer items which should be checked
+      if (numIDs > 0) {
 
-         final ArrayList<TreeViewerItem> rootItems = _equipmentViewerRootItem.getFetchedChildren();
+         // get all equipment items which should be checked
 
-         for (final long tagId : tagIds) {
+         final ArrayList<TreeViewerItem> allRootItems = _equipmentViewerRootItem.getFetchedChildren();
 
-            // Is recursive !!!
-//            getTagItems(rootItems, tagItems, tagId);
+         for (final TreeViewerItem rootItem : allRootItems) {
+
+            if (rootItem instanceof final TVIEquipmentView_Equipment equipmentItem) {
+
+               final long itemID = equipmentItem.getEquipmentID();
+
+               for (final long equipmentID : allEquipmentIDs) {
+
+                  if (equipmentID == itemID) {
+
+                     allEquipmentItems.add(equipmentItem);
+                     break;
+                  }
+               }
+            }
          }
       }
 
       // update UI
-      _equipmentViewer.setCheckedElements(tagItems.toArray());
+      _equipmentViewer.setCheckedElements(allEquipmentItems.toArray());
    }
 
-   private void updateEquipment_SelectedEquipment(final long[] tagIds_Checked, final long[] tagIds_Unchecked) {
+   private void updateEquipment_SelectedEquipment(final long[] allEquipmentIDs_Checked,
+                                                  final long[] allEquipmentIDs_Unchecked) {
 
       /*
        * Update model
        */
       _allSelectedEquipmentItems.clear();
 
-      final ArrayList<SelectedEquipment> allCheckedTags = new ArrayList<>();
-      final HashMap<Long, TourTag> allTourTags = TourDatabase.getAllTourTags();
+      final List<SelectedEquipment> allCheckedEquipment = new ArrayList<>();
+      final Map<Long, Equipment> allEquipment = EquipmentManager.getAllEquipment_ByID();
 
-      // add all checked tags
-      for (final long tagId : tagIds_Checked) {
+      // add all checked equipment
+      for (final long equipmentID : allEquipmentIDs_Checked) {
 
-         final TourTag tourTag = allTourTags.get(tagId);
+         final Equipment equipment = allEquipment.get(equipmentID);
 
-         if (tourTag == null) {
+         if (equipment == null) {
 
             //fixed unknown NPE
             continue;
          }
 
-         final SelectedEquipment selectedEquipment = new SelectedEquipment(tagId, tourTag.getTagName());
+         final SelectedEquipment selectedEquipment = new SelectedEquipment(equipment);
 
          _allSelectedEquipmentItems.add(selectedEquipment);
-         allCheckedTags.add(selectedEquipment);
+         allCheckedEquipment.add(selectedEquipment);
       }
 
-      // add unchecked tags
-      for (final long tagId : tagIds_Unchecked) {
+      // add unchecked equipment
+      for (final long equipmentID : allEquipmentIDs_Unchecked) {
 
-         final TourTag tourTag = allTourTags.get(tagId);
+         final Equipment equipment = allEquipment.get(equipmentID);
 
-         if (tourTag == null) {
+         if (equipment == null) {
 
             /*
-             * It is possible that the tour tag in the tour tag filter is already deleted and the
-             * tour tag filter is not yet updated
+             * It is possible that the equipment in the tour equipment filter is already
+             * deleted and the tour equipment filter is not yet updated
              */
 
             continue;
          }
 
-         final SelectedEquipment selectedEquipment = new SelectedEquipment(tagId, tourTag.getTagName());
+         final SelectedEquipment selectedEquipment = new SelectedEquipment(equipment);
 
          /*
-          * It is possible that there are duplicates in unchecked tags when a tag is selected in the
-          * available tags and this tag is unchecked in selected tags
+          * It is possible that there are duplicates in unchecked equipment when a equipment is
+          * selected in the available equipment and this equipment is unchecked in selected
+          * equipment
           */
          boolean canAddSelectedEquipment = true;
          for (final SelectedEquipment alreadyAddedSelectedEquipment : _allSelectedEquipmentItems) {
 
-            if (alreadyAddedSelectedEquipment.tagId == tagId) {
+            if (alreadyAddedSelectedEquipment.equipmentId == equipmentID) {
                canAddSelectedEquipment = false;
                break;
             }
@@ -2371,11 +2444,11 @@ public class SlideoutTourEquipmentFilter extends AdvancedSlideout implements ITr
       // reload viewer
       _selectedEquipmentViewer.setInput(EMPTY_LIST);
 
-      // check tag cloud items
-      _selectedEquipmentViewer.setCheckedElements(allCheckedTags.toArray());
+      // check selected equipment items
+      _selectedEquipmentViewer.setCheckedElements(allCheckedEquipment.toArray());
    }
 
-   private void updateTagModel() {
+   private void updateEquipmentModel() {
 
       _equipmentViewerRootItem = new TVIEquipmentView_Root(_equipmentViewer, false);
       _equipmentViewer.setInput(this);

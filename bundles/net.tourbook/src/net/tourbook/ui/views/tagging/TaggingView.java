@@ -37,6 +37,7 @@ import net.tourbook.common.util.IContextMenuProvider;
 import net.tourbook.common.util.ITourViewer;
 import net.tourbook.common.util.ITreeViewer;
 import net.tourbook.common.util.PostSelectionProvider;
+import net.tourbook.common.util.StateSegment;
 import net.tourbook.common.util.TreeColumnDefinition;
 import net.tourbook.common.util.TreeViewerItem;
 import net.tourbook.common.util.Util;
@@ -368,18 +369,6 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer,
       @Override
       public void run() {
          onAction_ToggleTagLayout();
-      }
-   }
-
-   private class StateSegment {
-
-      private long __itemType;
-      private long __itemData;
-
-      public StateSegment(final long itemType, final long itemData) {
-
-         __itemType = itemType;
-         __itemData = itemData;
       }
    }
 
@@ -2795,9 +2784,9 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer,
          return null;
       }
 
-      final long stateData = stateSegment.__itemData;
+      final long stateData = stateSegment.itemData;
 
-      if (stateSegment.__itemType == STATE_ITEM_TYPE_CATEGORY) {
+      if (stateSegment.itemType == STATE_ITEM_TYPE_CATEGORY) {
 
          for (final TreeViewerItem treeItem : treeItems) {
 
@@ -2814,7 +2803,7 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer,
             }
          }
 
-      } else if (stateSegment.__itemType == STATE_ITEM_TYPE_TAG) {
+      } else if (stateSegment.itemType == STATE_ITEM_TYPE_TAG) {
 
          for (final TreeViewerItem treeItem : treeItems) {
 
@@ -2831,7 +2820,7 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer,
             }
          }
 
-      } else if (stateSegment.__itemType == STATE_ITEM_TYPE_YEAR) {
+      } else if (stateSegment.itemType == STATE_ITEM_TYPE_YEAR) {
 
          for (final TreeViewerItem treeItem : treeItems) {
 
@@ -2848,7 +2837,7 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer,
             }
          }
 
-      } else if (stateSegment.__itemType == STATE_ITEM_TYPE_MONTH) {
+      } else if (stateSegment.itemType == STATE_ITEM_TYPE_MONTH) {
 
          for (final TreeViewerItem treeItem : treeItems) {
 

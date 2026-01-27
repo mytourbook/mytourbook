@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2025 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2026 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -1392,17 +1392,17 @@ public class SlideoutTourTagFilter extends AdvancedSlideout implements ITreeView
    /**
     * Traverses all tag viewer items until a tag items is found Recursive !
     *
-    * @param parentItems
-    * @param tagItems
+    * @param allParentItems
+    * @param allTagItems
     * @param tagId
     *
     * @return Returns <code>true</code> when the tag id is found
     */
-   private boolean getTagItems(final ArrayList<TreeViewerItem> parentItems,
-                               final ArrayList<TVIPrefTag> tagItems,
+   private boolean getTagItems(final ArrayList<TreeViewerItem> allParentItems,
+                               final ArrayList<TVIPrefTag> allTagItems,
                                final long tagId) {
 
-      for (final TreeViewerItem tvItem : parentItems) {
+      for (final TreeViewerItem tvItem : allParentItems) {
 
          if (tvItem instanceof TVIPrefTagCategory) {
 
@@ -1411,7 +1411,7 @@ public class SlideoutTourTagFilter extends AdvancedSlideout implements ITreeView
 
             if (tagCategoryChildren.size() > 0) {
 
-               final boolean isTagFound = getTagItems(tagCategoryChildren, tagItems, tagId);
+               final boolean isTagFound = getTagItems(tagCategoryChildren, allTagItems, tagId);
 
                if (isTagFound) {
                   return true;
@@ -1424,7 +1424,7 @@ public class SlideoutTourTagFilter extends AdvancedSlideout implements ITreeView
 
             if (tagId == tagItem.getTourTag().getTagId()) {
 
-               tagItems.add(tagItem);
+               allTagItems.add(tagItem);
 
                return true;
             }
@@ -1463,22 +1463,22 @@ public class SlideoutTourTagFilter extends AdvancedSlideout implements ITreeView
    private void loadAllTagItems() {
 
       final HashMap<Long, TourTag> allTourTags = TourDatabase.getAllTourTags();
+      final Set<Long> allTagIDs = allTourTags.keySet();
 
-      final Set<Long> tagIds = allTourTags.keySet();
+      if (allTagIDs.size() == 0) {
+         return;
+      }
 
-      final ArrayList<TVIPrefTag> tagItems = new ArrayList<>(tagIds.size());
 
-      if (tagIds.size() > 0) {
+      final ArrayList<TVIPrefTag> allTagItems = new ArrayList<>(allTagIDs.size());
 
-         // get all tag viewer items which should be checked
+      final ArrayList<TreeViewerItem> allRootItems = _tagViewerRootItem.getFetchedChildren();
 
-         final ArrayList<TreeViewerItem> rootItems = _tagViewerRootItem.getFetchedChildren();
+      // get all tag viewer items which should be checked
+      for (final long tagID : allTagIDs) {
 
-         for (final long tagId : tagIds) {
-
-            // Is recursive !!!
-            getTagItems(rootItems, tagItems, tagId);
-         }
+         // Is recursive !!!
+         getTagItems(allRootItems, allTagItems, tagID);
       }
    }
 
@@ -2272,7 +2272,7 @@ public class SlideoutTourTagFilter extends AdvancedSlideout implements ITreeView
 
    private void updateTags_TagViewer(final long[] tagIds) {
 
-      final ArrayList<TVIPrefTag> tagItems = new ArrayList<>(tagIds.length);
+      final ArrayList<TVIPrefTag> allTagItems = new ArrayList<>(tagIds.length);
 
       if (tagIds.length > 0) {
 
@@ -2283,12 +2283,12 @@ public class SlideoutTourTagFilter extends AdvancedSlideout implements ITreeView
          for (final long tagId : tagIds) {
 
             // Is recursive !!!
-            getTagItems(rootItems, tagItems, tagId);
+            getTagItems(rootItems, allTagItems, tagId);
          }
       }
 
       // update UI
-      _tagViewer.setCheckedElements(tagItems.toArray());
+      _tagViewer.setCheckedElements(allTagItems.toArray());
    }
 
 }

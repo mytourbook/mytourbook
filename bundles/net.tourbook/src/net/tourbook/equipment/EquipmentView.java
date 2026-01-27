@@ -46,6 +46,7 @@ import net.tourbook.common.util.IContextMenuProvider;
 import net.tourbook.common.util.ITourViewer;
 import net.tourbook.common.util.ITreeViewer;
 import net.tourbook.common.util.PostSelectionProvider;
+import net.tourbook.common.util.StateSegment;
 import net.tourbook.common.util.TreeColumnDefinition;
 import net.tourbook.common.util.TreeViewerItem;
 import net.tourbook.common.util.Util;
@@ -134,8 +135,6 @@ import org.joda.time.PeriodType;
 public class EquipmentView extends ViewPart implements ITourProvider, ITourViewer, ITreeViewer {
 
    public static final String            ID                                     = "net.tourbook.equipment.EquipmentView.ID"; //$NON-NLS-1$
-
-   private static final char             NL                                     = UI.NEW_LINE;
 
    private static final String           STATE_EQUIPMENT_FILTER                 = "STATE_EQUIPMENT_FILTER";                  //$NON-NLS-1$
 
@@ -777,29 +776,6 @@ public class EquipmentView extends ViewPart implements ITourProvider, ITourViewe
        * Only equipment without tours are displayed
        */
       EQUIPMENT_WITHOUT_TOURS
-   }
-
-   private class StateSegment {
-
-      private long __itemType;
-      private long __itemData;
-
-      public StateSegment(final long itemType, final long itemData) {
-
-         __itemType = itemType;
-         __itemData = itemData;
-      }
-
-      @Override
-      public String toString() {
-         return UI.EMPTY_STRING
-
-               + "StateSegment" + NL //                     //$NON-NLS-1$
-
-               + " __itemType = " + __itemType + NL //      //$NON-NLS-1$
-               + " __itemData = " + __itemData + NL //      //$NON-NLS-1$
-         ;
-      }
    }
 
    private class TreeContextMenuProvider implements IContextMenuProvider {
@@ -3827,9 +3803,9 @@ public class EquipmentView extends ViewPart implements ITourProvider, ITourViewe
          return null;
       }
 
-      final long stateValue = stateSegment.__itemData;
+      final long stateValue = stateSegment.itemData;
 
-      if (stateSegment.__itemType == STATE_ITEM_TYPE_EQUIPMENT) {
+      if (stateSegment.itemType == STATE_ITEM_TYPE_EQUIPMENT) {
 
          for (final TreeViewerItem treeItem : allTreeItems) {
 
@@ -3846,7 +3822,7 @@ public class EquipmentView extends ViewPart implements ITourProvider, ITourViewe
             }
          }
 
-      } else if (stateSegment.__itemType == STATE_ITEM_TYPE_EQUIPMENT_YEAR) {
+      } else if (stateSegment.itemType == STATE_ITEM_TYPE_EQUIPMENT_YEAR) {
 
          for (final TreeViewerItem treeItem : allTreeItems) {
 
@@ -3863,7 +3839,7 @@ public class EquipmentView extends ViewPart implements ITourProvider, ITourViewe
             }
          }
 
-      } else if (stateSegment.__itemType == STATE_ITEM_TYPE_EQUIPMENT_MONTH) {
+      } else if (stateSegment.itemType == STATE_ITEM_TYPE_EQUIPMENT_MONTH) {
 
          for (final TreeViewerItem treeItem : allTreeItems) {
 
@@ -3880,7 +3856,7 @@ public class EquipmentView extends ViewPart implements ITourProvider, ITourViewe
             }
          }
 
-      } else if (stateSegment.__itemType == STATE_ITEM_TYPE_PART) {
+      } else if (stateSegment.itemType == STATE_ITEM_TYPE_PART) {
 
          for (final TreeViewerItem treeItem : allTreeItems) {
 
@@ -3897,7 +3873,7 @@ public class EquipmentView extends ViewPart implements ITourProvider, ITourViewe
             }
          }
 
-      } else if (stateSegment.__itemType == STATE_ITEM_TYPE_PART_YEAR) {
+      } else if (stateSegment.itemType == STATE_ITEM_TYPE_PART_YEAR) {
 
          for (final TreeViewerItem treeItem : allTreeItems) {
 
@@ -3914,7 +3890,7 @@ public class EquipmentView extends ViewPart implements ITourProvider, ITourViewe
             }
          }
 
-      } else if (stateSegment.__itemType == STATE_ITEM_TYPE_PART_MONTH) {
+      } else if (stateSegment.itemType == STATE_ITEM_TYPE_PART_MONTH) {
 
          for (final TreeViewerItem treeItem : allTreeItems) {
 

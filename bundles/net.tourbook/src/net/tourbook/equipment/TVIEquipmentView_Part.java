@@ -78,7 +78,6 @@ public class TVIEquipmentView_Part extends TVIEquipmentView_Item {
          break;
       }
    }
-
    public Equipment getEquipment() {
       return _equipment;
    }
@@ -93,6 +92,17 @@ public class TVIEquipmentView_Part extends TVIEquipmentView_Item {
 
    public long getPartID() {
       return _partID;
+   }
+
+   @Override
+   public boolean hasChildren() {
+
+      if (isShowTours() == false) {
+
+         return false;
+      }
+
+      return true;
    }
 
    /**
@@ -127,8 +137,8 @@ public class TVIEquipmentView_Part extends TVIEquipmentView_Item {
                + "   AND TourData.tourstarttime <  part.dateUntil" + NL //                               //$NON-NLS-1$
 
                // get all equipment id's
-               + "LEFT JOIN " + TourDatabase.JOINTABLE__TOURDATA__EQUIPMENT + " AS jTdataEq" + NL //   //$NON-NLS-1$ //$NON-NLS-2$
-               + "  ON TourData.TOURID = jTdataEq.TOURDATA_TOURID" + NL //                             //$NON-NLS-1$
+               + "LEFT JOIN " + TourDatabase.JOINTABLE__TOURDATA__EQUIPMENT + " AS jTdataEq" + NL //     //$NON-NLS-1$ //$NON-NLS-2$
+               + "  ON TourData.TOURID = jTdataEq.TOURDATA_TOURID" + NL //                               //$NON-NLS-1$
 
                // get all tag id's
                + "LEFT JOIN " + TourDatabase.JOINTABLE__TOURDATA__TOURTAG + " AS jTdataTtag" //          //$NON-NLS-1$ //$NON-NLS-2$

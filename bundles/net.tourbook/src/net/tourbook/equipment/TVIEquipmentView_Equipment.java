@@ -110,8 +110,7 @@ public class TVIEquipmentView_Equipment extends TVIEquipmentView_Item {
    @Override
    public boolean hasChildren() {
 
-      if (isShowTours() == false
-            && _equipment.isCollate()) {
+      if (_equipment.isCollate() && isShowTours() == false) {
 
          return false;
       }
