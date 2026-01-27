@@ -105,13 +105,20 @@ public abstract class TVIEquipmentView_Item extends TreeViewerItem {
 
    private TreeViewer _equipmentViewer;
 
-   long               numTours_All;
-   long               numTours_IsCollated;
+   /**
+    * Is <code>true</code> when tours, years and months should be displayed in the viewer, otherwise
+    * <code>false</code> which is used in the tour equipment filter where only the equipment
+    * structure is displayed
+    */
+   private boolean    _isShowTours;
+
+   public long        numTours_All;
+   public long        numTours_IsCollated;
 
    /**
     * Content which is displayed in the first tree column
     */
-   String             firstColumn;
+   public String      firstColumn;
 
    float              colDistance;
 
@@ -160,9 +167,11 @@ public abstract class TVIEquipmentView_Item extends TreeViewerItem {
     */
    String usageDurationLast;
 
-   public TVIEquipmentView_Item(final TreeViewer equipmentViewer) {
+   public TVIEquipmentView_Item(final TreeViewer equipmentViewer, final boolean isShowTours) {
 
       _equipmentViewer = equipmentViewer;
+
+      _isShowTours = isShowTours;
    }
 
    /**
@@ -171,6 +180,14 @@ public abstract class TVIEquipmentView_Item extends TreeViewerItem {
    public TreeViewer getEquipmentViewer() {
 
       return _equipmentViewer;
+   }
+
+   /**
+    * @return {@link #_isShowTours}
+    */
+   public boolean isShowTours() {
+
+      return _isShowTours;
    }
 
    void loadSummarizedValues_Equipment(final Map<Long, TVIEquipmentView_Equipment> allEquipmentItems) {

@@ -3718,7 +3718,7 @@ public class EquipmentView extends ViewPart implements ITourProvider, ITourViewe
 
    private void reloadViewer_SetContent() {
 
-      _rootItem = new TVIEquipmentView_Root(_equipmentViewer);
+      _rootItem = new TVIEquipmentView_Root(_equipmentViewer, true);
 
       // first: load all tree items
       loadAllTreeItems();

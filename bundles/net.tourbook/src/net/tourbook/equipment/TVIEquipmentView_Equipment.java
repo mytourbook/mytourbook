@@ -41,9 +41,11 @@ public class TVIEquipmentView_Equipment extends TVIEquipmentView_Item {
 
    private boolean   _isMonthCategory;
 
-   public TVIEquipmentView_Equipment(final TreeViewer equipViewer, final Equipment equipment) {
+   public TVIEquipmentView_Equipment(final TreeViewer equipViewer,
+                                     final Equipment equipment,
+                                     final boolean isShowTours) {
 
-      super(equipViewer);
+      super(equipViewer, isShowTours);
 
       _equipment = equipment;
       _equipmentID = equipment.getEquipmentId();
@@ -105,6 +107,18 @@ public class TVIEquipmentView_Equipment extends TVIEquipmentView_Item {
       return _equipment.getExpandType();
    }
 
+   @Override
+   public boolean hasChildren() {
+
+      if (isShowTours() == false
+            && _equipment.isCollate()) {
+
+         return false;
+      }
+
+      return true;
+   }
+
    private void loadChildren_Parts() {
 
       final Set<EquipmentPart> allParts = _equipment.getParts();
@@ -124,7 +138,7 @@ public class TVIEquipmentView_Equipment extends TVIEquipmentView_Item {
             durationLastText = "Until now : ";
          }
 
-         final TVIEquipmentView_Part partItem = new TVIEquipmentView_Part(this, part, getEquipmentViewer());
+         final TVIEquipmentView_Part partItem = new TVIEquipmentView_Part(this, part, getEquipmentViewer(), isShowTours());
 
 // SET_FORMATTING_OFF
 
@@ -245,7 +259,7 @@ public class TVIEquipmentView_Equipment extends TVIEquipmentView_Item {
 
                // first resultset for a new tour
 
-               final TVIEquipmentView_Tour tourItem = new TVIEquipmentView_Tour(this, this, getEquipmentViewer());
+               final TVIEquipmentView_Tour tourItem = new TVIEquipmentView_Tour(this, this, getEquipmentViewer(), isShowTours());
 
                allTourItems.add(tourItem);
 
@@ -349,7 +363,8 @@ public class TVIEquipmentView_Equipment extends TVIEquipmentView_Item {
                   this,
                   year,
                   _isMonthCategory,
-                  getEquipmentViewer());
+                  getEquipmentViewer(),
+                  isShowTours());
 
             allTourItems.add(yearItem);
 

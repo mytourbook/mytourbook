@@ -454,6 +454,9 @@ public class Equipment implements Cloneable, Comparable<Object>, Serializable {
       return Objects.hash(equipmentId, _createId);
    }
 
+   /**
+    * @return {@link #isCollate}
+    */
    public boolean isCollate() {
       return isCollate;
    }

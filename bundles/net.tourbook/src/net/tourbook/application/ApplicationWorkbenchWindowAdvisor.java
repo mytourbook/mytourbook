@@ -40,6 +40,7 @@ import net.tourbook.database.PersonManager;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.equipment.EquipmentManager;
 import net.tourbook.equipment.EquipmentMenuManager;
+import net.tourbook.equipment.tour.filter.TourEquipmentFilterManager;
 import net.tourbook.map.player.ModelPlayerManager;
 import net.tourbook.photo.PhotoUI;
 import net.tourbook.preferences.ITourbookPreferences;
@@ -474,6 +475,7 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
       TourTypeFilterManager.restoreState();
 
       ElevationCompareManager.restoreState();
+      TourEquipmentFilterManager.restoreState();
       TourFilterManager.restoreState();
       TourGeoFilter_Manager.restoreState();
       TourTagFilterManager.restoreState();

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2024 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2026 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -20,6 +20,7 @@ import net.tourbook.common.CommonActivator;
 import net.tourbook.common.CommonImages;
 import net.tourbook.common.preferences.ICommonPreferences;
 import net.tourbook.database.PersonManager;
+import net.tourbook.equipment.tour.filter.TourEquipmentFilterManager;
 import net.tourbook.tag.tour.filter.TourTagFilterManager;
 import net.tourbook.tour.TourTypeFilterManager;
 import net.tourbook.tour.filter.TourFilterManager;
@@ -78,6 +79,7 @@ class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 // private IWorkbenchAction                  _actionEditActionSets;
 
    private ActionTourDataFilter               _actionTourFilter_Data;
+   private ActionTourEquipmentFilter          _actionTourFilter_Equipment;
    private ActionTourGeoFilter                _actionTourFilter_Geo;
    private ActionTourTagFilter                _actionTourFilter_Tag;
 
@@ -253,6 +255,19 @@ class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 
             TourTagFilterManager.setTourTagFilterAction(_actionTourFilter_Tag);
          }
+         {
+            /*
+             * Tour equipment filter
+             */
+            final ToolBarContributionItem tbContribItem = new ToolBarContributionItem(
+                  tbMgr_TourFilter,
+                  MENU_CONTRIB_TOOLBAR_APP_FILTER);
+
+            coolBarMgr.add(tbContribItem);
+            tbMgr_TourFilter.add(_actionTourFilter_Equipment);
+
+            TourEquipmentFilterManager.setTourEquipmentFilterAction(_actionTourFilter_Equipment);
+         }
       }
 
       {
@@ -365,6 +380,7 @@ class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 // SET_FORMATTING_OFF
 
       _actionTourFilter_Data           = new ActionTourDataFilter();
+      _actionTourFilter_Equipment      = new ActionTourEquipmentFilter();
       _actionTourFilter_Geo            = new ActionTourGeoFilter();
       _actionTourFilter_Tag            = new ActionTourTagFilter();
 

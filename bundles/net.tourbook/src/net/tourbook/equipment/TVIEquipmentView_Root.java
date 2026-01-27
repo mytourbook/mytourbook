@@ -32,10 +32,13 @@ public class TVIEquipmentView_Root extends TVIEquipmentView_Item {
 
    /**
     * @param equipmentViewer
+    * @param isShowTours
+    *           When <code>true</code> then the years/months and tours are displayed, otherwise
+    *           then just the equipment structure is displayed, e.g. in the equipment tour filter
     */
-   public TVIEquipmentView_Root(final TreeViewer equipmentViewer) {
+   public TVIEquipmentView_Root(final TreeViewer equipmentViewer, final boolean isShowTours) {
 
-      super(equipmentViewer);
+      super(equipmentViewer, isShowTours);
    }
 
    @Override
@@ -65,7 +68,7 @@ public class TVIEquipmentView_Root extends TVIEquipmentView_Item {
           */
          for (final Equipment equipment : allEquipments) {
 
-            final TVIEquipmentView_Equipment equipmentItem = new TVIEquipmentView_Equipment(equipmentViewer, equipment);
+            final TVIEquipmentView_Equipment equipmentItem = new TVIEquipmentView_Equipment(equipmentViewer, equipment, isShowTours());
 
             addChild(equipmentItem);
 

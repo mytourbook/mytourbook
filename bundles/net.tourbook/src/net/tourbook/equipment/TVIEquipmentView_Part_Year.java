@@ -50,9 +50,10 @@ public class TVIEquipmentView_Part_Year extends TVIEquipmentView_Item {
    public TVIEquipmentView_Part_Year(final TVIEquipmentView_Part partItem,
                                      final int year,
                                      final boolean isMonth,
-                                     final TreeViewer treeViewer) {
+                                     final TreeViewer treeViewer,
+                                     final boolean isShowTours) {
 
-      super(treeViewer);
+      super(treeViewer, isShowTours);
 
       setParentItem(partItem);
 
@@ -222,7 +223,8 @@ public class TVIEquipmentView_Part_Year extends TVIEquipmentView_Item {
                   _partItem,
                   dbYear,
                   dbMonth,
-                  getEquipmentViewer());
+                  getEquipmentViewer(),
+                  isShowTours());
 
             allTourItems.add(monthItem);
 
@@ -345,7 +347,7 @@ public class TVIEquipmentView_Part_Year extends TVIEquipmentView_Item {
 
                // first resultset for a new tour
 
-               final TVIEquipmentView_Tour tourItem = new TVIEquipmentView_Tour(this, _partItem, getEquipmentViewer());
+               final TVIEquipmentView_Tour tourItem = new TVIEquipmentView_Tour(this, _partItem, getEquipmentViewer(), isShowTours());
 
                allTourItems.add(tourItem);
 

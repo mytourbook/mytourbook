@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2025 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2026 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -22,6 +22,7 @@ import net.tourbook.common.measurement_system.MeasurementSystem_Manager;
 import net.tourbook.common.swimming.SwimStrokeManager;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.equipment.EquipmentMenuManager;
+import net.tourbook.equipment.tour.filter.TourEquipmentFilterManager;
 import net.tourbook.map.bookmark.MapBookmarkManager;
 import net.tourbook.map.player.ModelPlayerManager;
 import net.tourbook.map3.view.Map3Manager;
@@ -141,11 +142,12 @@ public class ApplicationWorkbenchAdvisor extends WorkbenchAdvisor {
       TagMenuManager.saveTagState();
       TourTagFilterManager.saveState();
 
+      EquipmentMenuManager.saveState();
+      TourEquipmentFilterManager.saveState();
+
       TourTypeFilterManager.saveState();
       TourTypeMenuManager.saveState();
       TourTypeManager.saveState();
-
-      EquipmentMenuManager.saveState();
 
       CommonLocationManager.saveState();
       ElevationCompareManager.saveState();

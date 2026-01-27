@@ -51,13 +51,13 @@ public class TVIEquipmentView_Tour extends TVIEquipmentView_Item {
    private TVIEquipmentView_Equipment _equipmentItem;
    private TVIEquipmentView_Part      _partItem;
 
-   long                               tourId;
+   public long                        tourId;
 
    long                               tourStartTime;
    ZonedDateTime                      tourStartDateTime;
 
    String                             tourTitle;
-   long                               tourTypeId;
+   public long                        tourTypeId;
 
    private Set<Long>                  _allEquipmentIDs;
    private Set<Long>                  _allMarkerIDs;
@@ -69,8 +69,10 @@ public class TVIEquipmentView_Tour extends TVIEquipmentView_Item {
 
    public TVIEquipmentView_Tour(final TVIEquipmentView_Item parentItem,
                                 final TVIEquipmentView_Equipment equipmentItem,
-                                final TreeViewer treeViewer) {
-      super(treeViewer);
+                                final TreeViewer treeViewer,
+                                final boolean isShowTours) {
+
+      super(treeViewer, isShowTours);
 
       setParentItem(parentItem);
       _equipmentItem = equipmentItem;
@@ -78,9 +80,10 @@ public class TVIEquipmentView_Tour extends TVIEquipmentView_Item {
 
    public TVIEquipmentView_Tour(final TVIEquipmentView_Item parentItem,
                                 final TVIEquipmentView_Part partItem,
-                                final TreeViewer treeViewer) {
+                                final TreeViewer treeViewer,
+                                final boolean isShowTours) {
 
-      super(treeViewer);
+      super(treeViewer, isShowTours);
 
       setParentItem(parentItem);
       _partItem = partItem;

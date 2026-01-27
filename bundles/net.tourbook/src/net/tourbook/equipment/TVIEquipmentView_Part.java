@@ -42,9 +42,10 @@ public class TVIEquipmentView_Part extends TVIEquipmentView_Item {
 
    public TVIEquipmentView_Part(final TVIEquipmentView_Equipment parentItem,
                                 final EquipmentPart equipmentPart,
-                                final TreeViewer treeViewer) {
+                                final TreeViewer treeViewer,
+                                final boolean isShowTours) {
 
-      super(treeViewer);
+      super(treeViewer, isShowTours);
 
       setParentItem(parentItem);
 
@@ -191,7 +192,7 @@ public class TVIEquipmentView_Part extends TVIEquipmentView_Item {
 
                // first resultset for a new tour
 
-               final TVIEquipmentView_Tour tourItem = new TVIEquipmentView_Tour(this, this, getEquipmentViewer());
+               final TVIEquipmentView_Tour tourItem = new TVIEquipmentView_Tour(this, this, getEquipmentViewer(), isShowTours());
 
                allTourItems.add(tourItem);
 
@@ -295,7 +296,8 @@ public class TVIEquipmentView_Part extends TVIEquipmentView_Item {
                   this,
                   year,
                   _isMonthCategory,
-                  getEquipmentViewer());
+                  getEquipmentViewer(),
+                  isShowTours());
 
             allTourItems.add(yearItem);
 
