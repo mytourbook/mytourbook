@@ -598,14 +598,14 @@ public class NatTable_DataLoader {
          sql = NL
 
                + " SELECT" //                                                                               //$NON-NLS-1$
-               
+
                + "    " + TVITourBookItem.SQL_ALL_TOUR_FIELDS + "," + NL //                                 //$NON-NLS-1$ //$NON-NLS-2$
-               
+
                // get all markers/tags/nutrition/equipment for paged tours
                + "    Tmarker.markerId," + NL //                                                            //$NON-NLS-1$
                + "    jTdataTtag.TourTag_tagId," + NL //                                                    //$NON-NLS-1$
                + "    TNutritionProduct.productId," + NL //                                                 //$NON-NLS-1$
-               + "    JTdataTequipment.Equipment_equipmentID" + NL //                                       //$NON-NLS-1$
+               + "    jTdataTequipment.Equipment_equipmentID" + NL //                                       //$NON-NLS-1$
 
                + " FROM" + NL //                                                                            //$NON-NLS-1$
                + " (" + NL //                                                                               //$NON-NLS-1$
@@ -629,6 +629,7 @@ public class NatTable_DataLoader {
                + "            " + TVITourBookItem.SQL_ALL_TOUR_FIELDS + "," + NL //                         //$NON-NLS-1$ //$NON-NLS-2$
                + "            jTdataTtag.TourTag_tagId" + NL //                                             //$NON-NLS-1$
                + "         FROM TOURDATA" + NL //                                                           //$NON-NLS-1$
+
                + "         " + tagFilterSqlJoinBuilder.getSqlTagJoinTable() //                              //$NON-NLS-1$
                + "         AS jTdataTtag" //                                                                //$NON-NLS-1$
                + "         ON TourData.tourId = jTdataTtag.TourData_tourId" + NL //                         //$NON-NLS-1$
@@ -654,11 +655,11 @@ public class NatTable_DataLoader {
                + " ON TourData.tourId = jTdataTtag.TourData_tourId" + NL //                                 //$NON-NLS-1$
 
                // get nutrition product ids
-               + "LEFT OUTER JOIN " + TourDatabase.TABLE_TOUR_NUTRITION_PRODUCT + " TNutritionProduct" //   //$NON-NLS-1$ //$NON-NLS-2$
+               + " LEFT JOIN " + TourDatabase.TABLE_TOUR_NUTRITION_PRODUCT + " TNutritionProduct" //        //$NON-NLS-1$ //$NON-NLS-2$
                + " ON TourData.tourId = TNutritionProduct.TourData_tourId" + NL //                          //$NON-NLS-1$
 
-               + " LEFT JOIN " + TourDatabase.JOINTABLE__TOURDATA__EQUIPMENT + " JTdataTequipment" //       //$NON-NLS-1$ //$NON-NLS-2$
-               + " ON TourData.tourId = JTdataTequipment.TourData_tourId" + NL //                           //$NON-NLS-1$
+               + " LEFT JOIN " + TourDatabase.JOINTABLE__TOURDATA__EQUIPMENT + " jTdataTequipment" //       //$NON-NLS-1$ //$NON-NLS-2$
+               + " ON TourData.tourId = jTdataTequipment.TourData_tourId" + NL //                           //$NON-NLS-1$
 
                + orderBy + NL;
 

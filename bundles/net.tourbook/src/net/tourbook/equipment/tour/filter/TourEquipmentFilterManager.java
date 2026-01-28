@@ -41,31 +41,31 @@ import org.osgi.framework.Version;
 
 public class TourEquipmentFilterManager {
 
-   private static final char                            NL                          = UI.NEW_LINE;
+   private static final char                       NL                          = UI.NEW_LINE;
 
-   private static final String                          TOUR_FILTER_FILE_NAME       = "tour-equipment-filter.xml";            //$NON-NLS-1$
-   private static final int                             TOUR_FILTER_VERSION         = 1;
+   private static final String                     TOUR_FILTER_FILE_NAME       = "tour-equipment-filter.xml";            //$NON-NLS-1$
+   private static final int                        TOUR_FILTER_VERSION         = 1;
 
-   private static final String                          EQUIPMENT_PROFILE           = "Profile";                              //$NON-NLS-1$
-   private static final String                          EQUIPMENT_ROOT              = "TourEquipmentFilterProfiles";          //$NON-NLS-1$
+   private static final String                     EQUIPMENT_PROFILE           = "Profile";                              //$NON-NLS-1$
+   private static final String                     EQUIPMENT_ROOT              = "TourEquipmentFilterProfiles";          //$NON-NLS-1$
 
-   private static final String                          ATTR_TOUR_FILTER_VERSION    = "tourEquipmentFilterVersion";           //$NON-NLS-1$
-   private static final String                          ATTR_IS_OR_OPERATOR         = "isOrOperator";                         //$NON-NLS-1$
-   static final boolean                                 ATTR_IS_OR_OPERATOR_DEFAULT = true;
-   private static final String                          ATTR_IS_SELECTED            = "isSelected";                           //$NON-NLS-1$
-   private static final String                          ATTR_NAME                   = "name";                                 //$NON-NLS-1$
-   private static final String                          ATTR_EQUIPMENT_ID           = "equipmentIDs";                         //$NON-NLS-1$
-   private static final String                          ATTR_EQUIPMENT_ID_UNCHECKED = "equipmentIdsUnchecked";                //$NON-NLS-1$
+   private static final String                     ATTR_TOUR_FILTER_VERSION    = "tourEquipmentFilterVersion";           //$NON-NLS-1$
+   private static final String                     ATTR_IS_OR_OPERATOR         = "isOrOperator";                         //$NON-NLS-1$
+   static final boolean                            ATTR_IS_OR_OPERATOR_DEFAULT = true;
+   private static final String                     ATTR_IS_SELECTED            = "isSelected";                           //$NON-NLS-1$
+   private static final String                     ATTR_NAME                   = "name";                                 //$NON-NLS-1$
+   private static final String                     ATTR_EQUIPMENT_ID           = "equipmentIDs";                         //$NON-NLS-1$
+   private static final String                     ATTR_EQUIPMENT_ID_UNCHECKED = "equipmentIDsUnchecked";                //$NON-NLS-1$
 
-   private static final String                          PARAMETER_FIRST             = " ?";                                   //$NON-NLS-1$
-   private static final String                          PARAMETER_FOLLOWING         = ", ?";                                  //$NON-NLS-1$
+   private static final String                     PARAMETER_FIRST             = " ?";                                   //$NON-NLS-1$
+   private static final String                     PARAMETER_FOLLOWING         = ", ?";                                  //$NON-NLS-1$
 
-   private static final Bundle                          _bundle                     = TourbookPlugin.getDefault().getBundle();
+   private static final Bundle                     _bundle                     = TourbookPlugin.getDefault().getBundle();
 
-   private static final IPath                           _stateLocation              = Platform.getStateLocation(_bundle);
-   private static final IPreferenceStore                _prefStore                  = TourbookPlugin.getPrefStore();
+   private static final IPath                      _stateLocation              = Platform.getStateLocation(_bundle);
+   private static final IPreferenceStore           _prefStore                  = TourbookPlugin.getPrefStore();
 
-   private static boolean                               _isTourEquipmentFilterEnabled;
+   private static boolean                          _isTourEquipmentFilterEnabled;
 
    /**
     * Contains all available profiles.
@@ -75,11 +75,11 @@ public class TourEquipmentFilterManager {
    /**
     * Contains the selected profile or <code>null</code> when a profile is not selected.
     */
-   private static TourEquipmentFilterProfile            _selectedProfile;
+   private static TourEquipmentFilterProfile       _selectedProfile;
 
-   private static int[]                                 _fireEventCounter           = new int[1];
+   private static int[]                            _fireEventCounter           = new int[1];
 
-   private static ActionTourEquipmentFilter             _actionTourEquipmentFilter;
+   private static ActionTourEquipmentFilter        _actionTourEquipmentFilter;
 
    /**
     * Fire event that the tour filter has changed.
@@ -315,20 +315,20 @@ public class TourEquipmentFilterManager {
          xmlRoot = writeFilterProfile_10_Root();
 
          // loop: profiles
-         for (final TourEquipmentFilterProfile tagFilterProfile : _filterProfiles) {
+         for (final TourEquipmentFilterProfile filterProfile : _filterProfiles) {
 
             final IMemento xmlProfile = xmlRoot.createChild(EQUIPMENT_PROFILE);
 
-            xmlProfile.putString(ATTR_NAME, tagFilterProfile.name);
-            xmlProfile.putBoolean(ATTR_IS_OR_OPERATOR, tagFilterProfile.isOrOperator);
+            xmlProfile.putString(ATTR_NAME, filterProfile.name);
+            xmlProfile.putBoolean(ATTR_IS_OR_OPERATOR, filterProfile.isOrOperator);
 
             // set flag for active profile
-            if (tagFilterProfile == _selectedProfile) {
+            if (filterProfile == _selectedProfile) {
                xmlProfile.putBoolean(ATTR_IS_SELECTED, true);
             }
 
-            Util.setXmlLongArray(xmlProfile, ATTR_EQUIPMENT_ID, tagFilterProfile.equipmentFilterIDs.toArray());
-            Util.setXmlLongArray(xmlProfile, ATTR_EQUIPMENT_ID_UNCHECKED, tagFilterProfile.equipmentFilterIds_Unchecked.toArray());
+            Util.setXmlLongArray(xmlProfile, ATTR_EQUIPMENT_ID, filterProfile.equipmentFilterIDs.toArray());
+            Util.setXmlLongArray(xmlProfile, ATTR_EQUIPMENT_ID_UNCHECKED, filterProfile.equipmentFilterIds_Unchecked.toArray());
          }
 
       } catch (final Exception e) {

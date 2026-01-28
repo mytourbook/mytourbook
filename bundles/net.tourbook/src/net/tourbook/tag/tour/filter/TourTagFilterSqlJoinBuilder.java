@@ -51,21 +51,21 @@ public class TourTagFilterSqlJoinBuilder {
       return createSql_CombineTagsWithAnd(false);
    }
 
-   public static SQLData createSql_CombineTagsWithAnd(final boolean isDistinctTourId) {
+   private static SQLData createSql_CombineTagsWithAnd(final boolean isDistinctTourId) {
 
       final SQLData sqlJoinPartForAndOperator = createSQL_JoinPartForAndOperator();
 
       final String sqlTourTags = UI.EMPTY_STRING
 
             + "      SELECT *" + NL //                                                             //$NON-NLS-1$
-            + "      FROM TOURDATA_TOURTAG" + NL //                                                //$NON-NLS-1$
+            + "      FROM " + TourDatabase.JOINTABLE__TOURDATA__TOURTAG + NL //                    //$NON-NLS-1$
             + "      INNER JOIN" + NL //                                                           //$NON-NLS-1$
             + "      (" + NL //                                                                    //$NON-NLS-1$
             + "         SELECT" + NL //                                                            //$NON-NLS-1$
             //             !!! The name "Count_TourId" is required to prevent duplicated names !!!
             + "            TOURDATA_TOURID AS Count_TourId," + NL //                               //$NON-NLS-1$
             + "            COUNT(*) AS NumTagIds" + NL //                                          //$NON-NLS-1$
-            + "         FROM TOURDATA_TOURTAG" + NL //                                             //$NON-NLS-1$
+            + "         FROM " + TourDatabase.JOINTABLE__TOURDATA__TOURTAG + NL //                 //$NON-NLS-1$
 
             // "                  TOURTAG_TAGID IN (" + tagIdsAsParameters.toString() + ")"
             + "         WHERE " + sqlJoinPartForAndOperator.getSqlString() //                      //$NON-NLS-1$
