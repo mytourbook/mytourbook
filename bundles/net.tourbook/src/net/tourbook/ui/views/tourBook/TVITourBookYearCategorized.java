@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2024 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2026 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -74,7 +74,8 @@ public class TVITourBookYearCategorized extends TVITourBookItem {
 
             + "SELECT" + NL //                                                      //$NON-NLS-1$
 
-            + SQL_ALL_TOUR_FIELDS + ", " + NL //                                    //$NON-NLS-1$
+            + TVITourBookItem.getSQL_ALL_TOUR_FIELDS("TourData", 3) + "," + NL //     //$NON-NLS-1$ //$NON-NLS-2$
+
             + SQL_ALL_OTHER_FIELDS + NL
 
             + "FROM " + TourDatabase.TABLE_TOUR_DATA + NL //                        //$NON-NLS-1$

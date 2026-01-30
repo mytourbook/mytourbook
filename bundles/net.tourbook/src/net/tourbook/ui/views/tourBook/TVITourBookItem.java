@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2025 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2026 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -23,6 +23,7 @@ import java.sql.SQLException;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.concurrent.ConcurrentHashMap;
 
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.UI;
@@ -40,190 +41,192 @@ import org.eclipse.jface.preference.IPreferenceStore;
 
 public abstract class TVITourBookItem extends TreeViewerItem implements ITourItem {
 
-   private static final String SCRAMBLE_FIELD_PREFIX = "col";                                                          //$NON-NLS-1$
+   private static final String                      SCRAMBLE_FIELD_PREFIX       = "col";                                                          //$NON-NLS-1$
 
-   static ZonedDateTime        calendar8             = ZonedDateTime.now().with(TimeTools.calendarWeek.dayOfWeek(), 1);
+   static ZonedDateTime                             calendar8                   = ZonedDateTime.now().with(TimeTools.calendarWeek.dayOfWeek(), 1);
+
+   private static ConcurrentHashMap<String, String> _allCached_SqlAllTourFields = new ConcurrentHashMap<>();
 
    /**
     * All tour fields in the tourbook view, the first field is <code>tourId</code> which can be
     * prefixed with <code>DISTINCT</code>
     */
-   public static final String  SQL_ALL_TOUR_FIELDS;
+   private static final String                      SQL_ALL_TOUR_FIELDS;
 
-   public static final String  SQL_ALL_OTHER_FIELDS;
-   public static final int     SQL_ALL_OTHER_FIELDS__COLUMN_START_NUMBER;
+   public static final String                       SQL_ALL_OTHER_FIELDS;
+   public static final int                          SQL_ALL_OTHER_FIELDS__COLUMN_START_NUMBER;
 
    /**
     * <b>All</b> fields which are used in {@link #SQL_SUM_COLUMNS} <b>MUST be defined in</b>
     * {@link #SQL_SUM_FIELDS}, otherwise the SQL fails
     */
-   static final String         SQL_SUM_COLUMNS;
+   static final String                              SQL_SUM_COLUMNS;
 
    /**
     * SQL fields for {@link #SQL_SUM_COLUMNS}, the field ordering is NOT important
     */
-   static final String         SQL_SUM_FIELDS;
+   static final String                              SQL_SUM_FIELDS;
 
    static {
 
       SQL_ALL_TOUR_FIELDS = UI.EMPTY_STRING
 
-            + "tourID, " //                                       1     //$NON-NLS-1$
+            + "$i_$db_tourID," + NL //                                                 1     //$NON-NLS-1$
 
-            + "startYear, " //                                    2     //$NON-NLS-1$
-            + "startMonth, " //                                   3     //$NON-NLS-1$
-            + "startDay, " //                                     4     //$NON-NLS-1$
-            + "tourDistance, " //                                 5     //$NON-NLS-1$
-            + "tourDeviceTime_Elapsed, " //                       6     //$NON-NLS-1$
-            + "tourComputedTime_Moving, " //                      7     //$NON-NLS-1$
-            + "tourAltUp, " //                                    8     //$NON-NLS-1$
-            + "tourAltDown, " //                                  9     //$NON-NLS-1$
-            + "startDistance, " //                                10    //$NON-NLS-1$
-            + "tourType_typeId, " //                              11    //$NON-NLS-1$
-            + "tourTitle, " //                                    12    //$NON-NLS-1$
-            + "deviceTimeInterval, " //                           13    //$NON-NLS-1$
-            + "maxSpeed, " //                                     14    //$NON-NLS-1$
-            + "maxAltitude, " //                                  15    //$NON-NLS-1$
-            + "maxPulse, " //                                     16    //$NON-NLS-1$
-            + "avgPulse, " //                                     17    //$NON-NLS-1$
-            + "avgCadence, " //                                   18    //$NON-NLS-1$
-            + "weather_Temperature_Average_Device, " //           19    //$NON-NLS-1$
+            + "$i_$db_startYear," + NL //                                              2     //$NON-NLS-1$
+            + "$i_$db_startMonth," + NL //                                             3     //$NON-NLS-1$
+            + "$i_$db_startDay," + NL //                                               4     //$NON-NLS-1$
+            + "$i_$db_tourDistance," + NL //                                           5     //$NON-NLS-1$
+            + "$i_$db_tourDeviceTime_Elapsed," + NL //                                 6     //$NON-NLS-1$
+            + "$i_$db_tourComputedTime_Moving," + NL //                                7     //$NON-NLS-1$
+            + "$i_$db_tourAltUp," + NL //                                              8     //$NON-NLS-1$
+            + "$i_$db_tourAltDown," + NL //                                            9     //$NON-NLS-1$
+            + "$i_$db_startDistance," + NL //                                          10    //$NON-NLS-1$
+            + "$i_$db_tourType_typeId," + NL //                                        11    //$NON-NLS-1$
+            + "$i_$db_tourTitle," + NL //                                              12    //$NON-NLS-1$
+            + "$i_$db_deviceTimeInterval," + NL //                                     13    //$NON-NLS-1$
+            + "$i_$db_maxSpeed," + NL //                                               14    //$NON-NLS-1$
+            + "$i_$db_maxAltitude," + NL //                                            15    //$NON-NLS-1$
+            + "$i_$db_maxPulse," + NL //                                               16    //$NON-NLS-1$
+            + "$i_$db_avgPulse," + NL //                                               17    //$NON-NLS-1$
+            + "$i_$db_avgCadence," + NL //                                             18    //$NON-NLS-1$
+            + "$i_$db_weather_Temperature_Average_Device," + NL //                     19    //$NON-NLS-1$
 
-            + "TourStartTime, " //                                20    //$NON-NLS-1$
-            + "TimeZoneId, " //                                   21    //$NON-NLS-1$
+            + "$i_$db_TourStartTime," + NL //                                          20    //$NON-NLS-1$
+            + "$i_$db_TimeZoneId, " + NL //                                            21    //$NON-NLS-1$
 
-            + "startWeek, " //                                    22    //$NON-NLS-1$
-            + "startWeekYear, " //                                23    //$NON-NLS-1$
+            + "$i_$db_startWeek," + NL //                                              22    //$NON-NLS-1$
+            + "$i_$db_startWeekYear," + NL //                                          23    //$NON-NLS-1$
             //
-            + "weather_Wind_Direction, " //                       24    //$NON-NLS-1$
-            + "weather_Wind_Speed, " //                           25    //$NON-NLS-1$
-            + "weather_Clouds, " //                               26    //$NON-NLS-1$
+            + "$i_$db_weather_Wind_Direction," + NL //                                 24    //$NON-NLS-1$
+            + "$i_$db_weather_Wind_Speed," + NL //                                     25    //$NON-NLS-1$
+            + "$i_$db_weather_Clouds," + NL //                                         26    //$NON-NLS-1$
             //
-            + "restPulse, " //                                    27    //$NON-NLS-1$
-            + "TourData.calories, " //                            28    //$NON-NLS-1$
+            + "$i_$db_restPulse," + NL //                                              27    //$NON-NLS-1$
+            + "$i_$db_calories," + NL //                                               28    //$NON-NLS-1$
             //
-            + "tourPerson_personId, " //                          29    //$NON-NLS-1$
+            + "$i_$db_tourPerson_personId," + NL //                                    29    //$NON-NLS-1$
             //
-            + "numberOfTimeSlices, " //                           30    //$NON-NLS-1$
-            + "numberOfPhotos, " //                               31    //$NON-NLS-1$
-            + "dpTolerance, " //                                  32    //$NON-NLS-1$
+            + "$i_$db_numberOfTimeSlices," + NL //                                     30    //$NON-NLS-1$
+            + "$i_$db_numberOfPhotos," + NL //                                         31    //$NON-NLS-1$
+            + "$i_$db_dpTolerance," + NL //                                            32    //$NON-NLS-1$
             //
-            + "frontShiftCount, " //                              33    //$NON-NLS-1$
-            + "rearShiftCount," //                                34    //$NON-NLS-1$
+            + "$i_$db_frontShiftCount," + NL //                                        33    //$NON-NLS-1$
+            + "$i_$db_rearShiftCount," + NL //                                         34    //$NON-NLS-1$
             //
             // ---------- POWER -------------
             //
-            + "power_Avg," //                                     35    //$NON-NLS-1$
-            + "power_Max, " //                                    36    //$NON-NLS-1$
-            + "power_Normalized, " //                             37    //$NON-NLS-1$
-            + "power_FTP, " //                                    38    //$NON-NLS-1$
+            + "$i_$db_power_Avg," + NL //                                              35    //$NON-NLS-1$
+            + "$i_$db_power_Max," + NL //                                              36    //$NON-NLS-1$
+            + "$i_$db_power_Normalized," + NL //                                       37    //$NON-NLS-1$
+            + "$i_$db_power_FTP," + NL //                                              38    //$NON-NLS-1$
 
-            + "power_TotalWork, " //                              39    //$NON-NLS-1$
-            + "power_TrainingStressScore, " //                    40    //$NON-NLS-1$
-            + "power_IntensityFactor, " //                        41    //$NON-NLS-1$
+            + "$i_$db_power_TotalWork," + NL //                                        39    //$NON-NLS-1$
+            + "$i_$db_power_TrainingStressScore," + NL //                              40    //$NON-NLS-1$
+            + "$i_$db_power_IntensityFactor," + NL //                                  41    //$NON-NLS-1$
 
-            + "power_PedalLeftRightBalance, " //                  42    //$NON-NLS-1$
-            + "power_AvgLeftTorqueEffectiveness, " //             43    //$NON-NLS-1$
-            + "power_AvgRightTorqueEffectiveness, " //            44    //$NON-NLS-1$
-            + "power_AvgLeftPedalSmoothness, " //                 45    //$NON-NLS-1$
-            + "power_AvgRightPedalSmoothness, " //                46    //$NON-NLS-1$
+            + "$i_$db_power_PedalLeftRightBalance," + NL //                            42    //$NON-NLS-1$
+            + "$i_$db_power_AvgLeftTorqueEffectiveness," + NL //                       43    //$NON-NLS-1$
+            + "$i_$db_power_AvgRightTorqueEffectiveness," + NL //                      44    //$NON-NLS-1$
+            + "$i_$db_power_AvgLeftPedalSmoothness," + NL //                           45    //$NON-NLS-1$
+            + "$i_$db_power_AvgRightPedalSmoothness," + NL //                          46    //$NON-NLS-1$
 
-            + "bodyWeight, " //                                   47    //$NON-NLS-1$
+            + "$i_$db_bodyWeight," + NL //                                             47    //$NON-NLS-1$
             //
             // ---------- IMPORT -------------
             //
-            + "tourImportFileName, " //                           48    //$NON-NLS-1$
-            + "tourImportFilePath, " //                           49    //$NON-NLS-1$
-            + "devicePluginName, " //                             50    //$NON-NLS-1$
-            + "deviceFirmwareVersion, " //                        51    //$NON-NLS-1$
+            + "$i_$db_tourImportFileName," + NL //                                     48    //$NON-NLS-1$
+            + "$i_$db_tourImportFilePath," + NL //                                     49    //$NON-NLS-1$
+            + "$i_$db_devicePluginName," + NL //                                       50    //$NON-NLS-1$
+            + "$i_$db_deviceFirmwareVersion," + NL //                                  51    //$NON-NLS-1$
 
-            + "cadenceMultiplier, " //                            52    //$NON-NLS-1$
+            + "$i_$db_cadenceMultiplier," + NL //                                      52    //$NON-NLS-1$
 
             //
             // ---------- RUNNING DYNAMICS -------------
             //
-            + "runDyn_StanceTime_Min, " //                        53    //$NON-NLS-1$
-            + "runDyn_StanceTime_Max, " //                        54    //$NON-NLS-1$
-            + "runDyn_StanceTime_Avg, " //                        55    //$NON-NLS-1$
+            + "$i_$db_runDyn_StanceTime_Min," + NL //                                  53    //$NON-NLS-1$
+            + "$i_$db_runDyn_StanceTime_Max," + NL //                                  54    //$NON-NLS-1$
+            + "$i_$db_runDyn_StanceTime_Avg," + NL //                                  55    //$NON-NLS-1$
 
-            + "runDyn_StanceTimeBalance_Min, " //                 56    //$NON-NLS-1$
-            + "runDyn_StanceTimeBalance_Max, " //                 57    //$NON-NLS-1$
-            + "runDyn_StanceTimeBalance_Avg, " //                 58    //$NON-NLS-1$
+            + "$i_$db_runDyn_StanceTimeBalance_Min," + NL //                           56    //$NON-NLS-1$
+            + "$i_$db_runDyn_StanceTimeBalance_Max," + NL //                           57    //$NON-NLS-1$
+            + "$i_$db_runDyn_StanceTimeBalance_Avg," + NL //                           58    //$NON-NLS-1$
 
-            + "runDyn_StepLength_Min, " //                        59    //$NON-NLS-1$
-            + "runDyn_StepLength_Max, " //                        60    //$NON-NLS-1$
-            + "runDyn_StepLength_Avg, " //                        61    //$NON-NLS-1$
+            + "$i_$db_runDyn_StepLength_Min," + NL //                                  59    //$NON-NLS-1$
+            + "$i_$db_runDyn_StepLength_Max," + NL //                                  60    //$NON-NLS-1$
+            + "$i_$db_runDyn_StepLength_Avg," + NL //                                  61    //$NON-NLS-1$
 
-            + "runDyn_VerticalOscillation_Min, " //               62    //$NON-NLS-1$
-            + "runDyn_VerticalOscillation_Max, " //               63    //$NON-NLS-1$
-            + "runDyn_VerticalOscillation_Avg, " //               64    //$NON-NLS-1$
+            + "$i_$db_runDyn_VerticalOscillation_Min," + NL //                         62    //$NON-NLS-1$
+            + "$i_$db_runDyn_VerticalOscillation_Max," + NL //                         63    //$NON-NLS-1$
+            + "$i_$db_runDyn_VerticalOscillation_Avg," + NL //                         64    //$NON-NLS-1$
 
-            + "runDyn_VerticalRatio_Min, " //                     65    //$NON-NLS-1$
-            + "runDyn_VerticalRatio_Max, " //                     66    //$NON-NLS-1$
-            + "runDyn_VerticalRatio_Avg, " //                     67    //$NON-NLS-1$
+            + "$i_$db_runDyn_VerticalRatio_Min," + NL //                               65    //$NON-NLS-1$
+            + "$i_$db_runDyn_VerticalRatio_Max," + NL //                               66    //$NON-NLS-1$
+            + "$i_$db_runDyn_VerticalRatio_Avg," + NL //                               67    //$NON-NLS-1$
 
             //
             // ---------- SURFING -------------
             //
-            + "surfing_NumberOfEvents, " //                       68    //$NON-NLS-1$
-            + "surfing_MinSpeed_StartStop, " //                   69    //$NON-NLS-1$
-            + "surfing_MinSpeed_Surfing, " //                     70    //$NON-NLS-1$
-            + "surfing_MinTimeDuration, " //                      71    //$NON-NLS-1$
-            + "surfing_IsMinDistance, " //                        72    //$NON-NLS-1$
-            + "surfing_MinDistance," //                           73    //$NON-NLS-1$
+            + "$i_$db_surfing_NumberOfEvents," + NL //                                 68    //$NON-NLS-1$
+            + "$i_$db_surfing_MinSpeed_StartStop," + NL //                             69    //$NON-NLS-1$
+            + "$i_$db_surfing_MinSpeed_Surfing," + NL //                               70    //$NON-NLS-1$
+            + "$i_$db_surfing_MinTimeDuration," + NL //                                71    //$NON-NLS-1$
+            + "$i_$db_surfing_IsMinDistance," + NL //                                  72    //$NON-NLS-1$
+            + "$i_$db_surfing_MinDistance," + NL //                                    73    //$NON-NLS-1$
 
             //
             // ---------- TRAINING -------------
             //
-            + "training_TrainingEffect_Aerob, " //                74    //$NON-NLS-1$
-            + "training_TrainingEffect_Anaerob, " //              75    //$NON-NLS-1$
-            + "training_TrainingPerformance, " //                 76    //$NON-NLS-1$
+            + "$i_$db_training_TrainingEffect_Aerob," + NL //                          74    //$NON-NLS-1$
+            + "$i_$db_training_TrainingEffect_Anaerob," + NL //                        75    //$NON-NLS-1$
+            + "$i_$db_training_TrainingPerformance," + NL //                           76    //$NON-NLS-1$
 
             // ---------- CADENCE ZONE -------------
 
-            + "cadenceZone_SlowTime, " //                         77    //$NON-NLS-1$
-            + "cadenceZone_FastTime, " //                         78    //$NON-NLS-1$
-            + "cadenceZones_DelimiterValue, " //                  79    //$NON-NLS-1$
+            + "$i_$db_cadenceZone_SlowTime," + NL //                                   77    //$NON-NLS-1$
+            + "$i_$db_cadenceZone_FastTime," + NL //                                   78    //$NON-NLS-1$
+            + "$i_$db_cadenceZones_DelimiterValue," + NL //                            79    //$NON-NLS-1$
 
             // ---------- WEATHER -------------
-            + "weather_Temperature_Min_Device, " //               80    //$NON-NLS-1$
-            + "weather_Temperature_Max_Device, " //               81    //$NON-NLS-1$
-            + "temperatureScale, " //                             82    //$NON-NLS-1$
+            + "$i_$db_weather_Temperature_Min_Device," + NL //                         80    //$NON-NLS-1$
+            + "$i_$db_weather_Temperature_Max_Device," + NL //                         81    //$NON-NLS-1$
+            + "$i_$db_temperatureScale," + NL //                                       82    //$NON-NLS-1$
 
             // ---------- TOUR START LOCATION -------------
-            + "tourStartPlace, " //                               83    //$NON-NLS-1$
-            + "tourEndPlace, " //                                 84    //$NON-NLS-1$
+            + "$i_$db_tourStartPlace," + NL //                                         83    //$NON-NLS-1$
+            + "$i_$db_tourEndPlace," + NL //                                           84    //$NON-NLS-1$
 
             // -------- AVERAGE ALTITUDE CHANGE -----------
-            + "avgAltitudeChange, " //                            85    //$NON-NLS-1$
+            + "$i_$db_avgAltitudeChange," + NL //                                      85    //$NON-NLS-1$
 
             // -------- TIME -----------
-            + "tourDeviceTime_Recorded, " //                      86    //$NON-NLS-1$
-            + "tourDeviceTime_Paused, " //                        87    //$NON-NLS-1$
+            + "$i_$db_tourDeviceTime_Recorded," + NL //                                86    //$NON-NLS-1$
+            + "$i_$db_tourDeviceTime_Paused," + NL //                                  87    //$NON-NLS-1$
 
             // computed break time
-            + "(tourDeviceTime_Elapsed - tourComputedTime_Moving), " // 88    //$NON-NLS-1$
+            + "$i_($db_tourDeviceTime_Elapsed - $db_tourComputedTime_Moving)," + NL // 88    //$NON-NLS-1$
 
             // -------- BATTERY -----------
-            + "Battery_Percentage_Start, " //                     89    //$NON-NLS-1$
-            + "Battery_Percentage_End," //                        90    //$NON-NLS-1$
+            + "$i_$db_Battery_Percentage_Start," + NL //                               89    //$NON-NLS-1$
+            + "$i_$db_Battery_Percentage_End," + NL //                                 90    //$NON-NLS-1$
 
             // -------- WEATHER -----------
-            + "weather_Temperature_Average, " //                  91    //$NON-NLS-1$
-            + "weather_Temperature_Max, " //                      92    //$NON-NLS-1$
-            + "weather_Temperature_Min, " //                      93    //$NON-NLS-1$
-            + "weather_AirQuality, " //                           94    //$NON-NLS-1$
+            + "$i_$db_weather_Temperature_Average," + NL //                            91    //$NON-NLS-1$
+            + "$i_$db_weather_Temperature_Max," + NL //                                92    //$NON-NLS-1$
+            + "$i_$db_weather_Temperature_Min," + NL //                                93    //$NON-NLS-1$
+            + "$i_$db_weather_AirQuality," + NL //                                     94    //$NON-NLS-1$
 
-            + "tourLocationStart_LocationID, " //                 95    //$NON-NLS-1$
-            + "tourLocationEnd_LocationID, " //                   96    //$NON-NLS-1$
+            + "$i_$db_tourLocationStart_LocationID," + NL //                           95    //$NON-NLS-1$
+            + "$i_$db_tourLocationEnd_LocationID," + NL //                             96    //$NON-NLS-1$
 
-            + "hasGeoData, " //                                   97    //$NON-NLS-1$
+            + "$i_$db_hasGeoData," + NL //                                             97    //$NON-NLS-1$
 
             // this shortened field needs an alias otherwise the flat tour book view do not work !!!
-            + "SUBSTR(TourDescription, 1, 100) AS TourDescription," //   98    //$NON-NLS-1$
+            + "$i_SUBSTR($db_TourDescription, 1, 100) AS TourDescription," + NL //     98    //$NON-NLS-1$
 
             // -------- RADAR -----------
-            + "numberOfPassedVehicles " //                        99    //$NON-NLS-1$
+            + "$i_$db_numberOfPassedVehicles " + NL //                                 99    //$NON-NLS-1$
       ;
 
       SQL_ALL_OTHER_FIELDS__COLUMN_START_NUMBER = 100;
@@ -242,10 +245,10 @@ public abstract class TVITourBookItem extends TreeViewerItem implements ITourIte
       /////////////////////////////////////////////////////////////////////////
       SQL_ALL_OTHER_FIELDS = UI.EMPTY_STRING
 
-            + "jTdataTtag.TourTag_tagId, " //               SQL_ALL_OTHER_FIELDS__COLUMN_START_NUMBER + 0   //$NON-NLS-1$
-            + "Tmarker.markerId, " //                       SQL_ALL_OTHER_FIELDS__COLUMN_START_NUMBER + 1   //$NON-NLS-1$
-            + "TNutritionProduct.productId, " //            SQL_ALL_OTHER_FIELDS__COLUMN_START_NUMBER + 2   //$NON-NLS-1$
-            + "JTdataTequipment.Equipment_EquipmentID " //  SQL_ALL_OTHER_FIELDS__COLUMN_START_NUMBER + 3   //$NON-NLS-1$
+            + "jTdataTtag.TourTag_tagId," + NL //                 SQL_ALL_OTHER_FIELDS__COLUMN_START_NUMBER + 0   //$NON-NLS-1$
+            + "Tmarker.markerId," + NL //                         SQL_ALL_OTHER_FIELDS__COLUMN_START_NUMBER + 1   //$NON-NLS-1$
+            + "TNutritionProduct.productId," + NL //              SQL_ALL_OTHER_FIELDS__COLUMN_START_NUMBER + 2   //$NON-NLS-1$
+            + "JTdataTequipment.Equipment_EquipmentID " + NL //   SQL_ALL_OTHER_FIELDS__COLUMN_START_NUMBER + 3   //$NON-NLS-1$
       ;
 
       SQL_SUM_FIELDS = UI.EMPTY_STRING
@@ -266,7 +269,7 @@ public abstract class TVITourBookItem extends TreeViewerItem implements ITourIte
             + "CadenceMultiplier," + NL //                                 //$NON-NLS-1$
             + "TemperatureScale," + NL //                                  //$NON-NLS-1$
 
-            + "TourData.Calories," + NL //                                          //$NON-NLS-1$
+            + "Calories," + NL //                                          //$NON-NLS-1$
             + "RestPulse," + NL //                                         //$NON-NLS-1$
 
             + "Power_TotalWork," + NL //                                   //$NON-NLS-1$
@@ -309,13 +312,13 @@ public abstract class TVITourBookItem extends TreeViewerItem implements ITourIte
             + "MAX(MaxAltitude)," + NL //                               7  //$NON-NLS-1$
             + "MAX(MaxPulse)," + NL //                                  8  //$NON-NLS-1$
             //
-            + "AVG( CASE WHEN AvgPulse = 0         THEN NULL ELSE AvgPulse END), " + NL //                                    9     //$NON-NLS-1$
-            + "AVG( CASE WHEN AvgCadence = 0       THEN NULL ELSE DOUBLE(AvgCadence) * CadenceMultiplier END)," + NL //       10    //$NON-NLS-1$
+            + "AVG( CASE WHEN AvgPulse = 0               THEN NULL ELSE AvgPulse END)," + NL //                                     9     //$NON-NLS-1$
+            + "AVG( CASE WHEN AvgCadence = 0             THEN NULL ELSE DOUBLE(AvgCadence) * CadenceMultiplier END)," + NL //       10    //$NON-NLS-1$
             + "AVG( CASE WHEN weather_Temperature_Average_Device = 0 THEN NULL ELSE DOUBLE(weather_Temperature_Average_Device) / TemperatureScale END)," //$NON-NLS-1$
             + NL //    11
-            + "AVG( CASE WHEN Weather_Wind_Direction = 0 THEN NULL ELSE Weather_Wind_Direction END), " + NL //                12    //$NON-NLS-1$
-            + "AVG( CASE WHEN Weather_Wind_Speed = 0 THEN NULL ELSE Weather_Wind_Speed END), " + NL //                        13    //$NON-NLS-1$
-            + "AVG( CASE WHEN RestPulse = 0        THEN NULL ELSE RestPulse END), " + NL //                                   14    //$NON-NLS-1$
+            + "AVG( CASE WHEN Weather_Wind_Direction = 0 THEN NULL ELSE Weather_Wind_Direction END)," + NL //                       12    //$NON-NLS-1$
+            + "AVG( CASE WHEN Weather_Wind_Speed = 0     THEN NULL ELSE Weather_Wind_Speed END)," + NL //                           13    //$NON-NLS-1$
+            + "AVG( CASE WHEN RestPulse = 0              THEN NULL ELSE RestPulse END)," + NL //                                    14    //$NON-NLS-1$
             //
             + "SUM( CAST(Calories AS BIGINT))," + NL //                 15 //$NON-NLS-1$
             + "SUM( CAST(Power_TotalWork AS BIGINT))," + NL //          16 //$NON-NLS-1$
@@ -340,7 +343,7 @@ public abstract class TVITourBookItem extends TreeViewerItem implements ITourIte
 
             + "AVG( CASE WHEN weather_Temperature_Average = 0   THEN NULL ELSE DOUBLE(weather_Temperature_Average) / TemperatureScale END)," + NL // 29 //$NON-NLS-1$
 
-            + "SUM( CAST(numberOfPassedVehicles AS BIGINT))" + NL //     30 //$NON-NLS-1$
+            + "SUM( CAST(numberOfPassedVehicles AS BIGINT))" + NL //    30 //$NON-NLS-1$
       ;
 
    }
@@ -515,6 +518,44 @@ public abstract class TVITourBookItem extends TreeViewerItem implements ITourIte
    TVITourBookItem(final TourBookView view) {
 
       tourBookView = view;
+   }
+
+   /**
+    * Append a db prefix to all fields and additional indent it
+    *
+    * @param dbPrefix
+    * @param indent
+    *
+    * @return
+    */
+   public static String getSQL_ALL_TOUR_FIELDS(final String dbPrefix, final int indent) {
+
+      final String key = dbPrefix + UI.SYMBOL_UNDERSCORE + Integer.toString(indent);
+
+      final String cachedSqlFields = _allCached_SqlAllTourFields.get(key);
+
+      if (cachedSqlFields != null) {
+         return cachedSqlFields;
+      }
+
+      final StringBuilder sbIndent = new StringBuilder();
+      for (int i = 0; i < indent; i++) {
+         sbIndent.append(UI.SPACE);
+      }
+
+      String dbPrefixReplaced = UI.EMPTY_STRING;
+      if (dbPrefix.length() > 0) {
+         dbPrefixReplaced = dbPrefix + UI.SYMBOL_DOT;
+      }
+
+      String sqlReplaced = SQL_ALL_TOUR_FIELDS;
+
+      sqlReplaced = sqlReplaced.replaceAll("\\$i_", sbIndent.toString());
+      sqlReplaced = sqlReplaced.replaceAll("\\$db_", dbPrefixReplaced);
+
+      _allCached_SqlAllTourFields.put(key, sqlReplaced);
+
+      return sqlReplaced;
    }
 
    /**

@@ -40,6 +40,7 @@ import net.tourbook.database.TourDatabase;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.tag.tour.filter.TourTagFilterManager;
 import net.tourbook.tag.tour.filter.TourTagFilterSqlJoinBuilder;
+import net.tourbook.tag.tour.filter.TourTagFilter_WithExists;
 import net.tourbook.ui.SQLFilter;
 import net.tourbook.ui.TableColumnFactory;
 import net.tourbook.ui.views.tourBook.LazyTourLoaderItem;
@@ -299,6 +300,7 @@ public class NatTable_DataLoader {
             final SQLFilter sqlFilter = new SQLFilter(SQLFilter.ANY_APP_FILTERS);
 
             String sqlSelectFields_1 = sqlSelectFields_Raw;
+
             if (sqlSelectFields_1.length() > 0) {
                sqlSelectFields_1 += UI.COMMA_SPACE + NL;
             }
@@ -316,16 +318,16 @@ public class NatTable_DataLoader {
                   + " ON TourData.tourId = jTdataTtag.TourData_tourId" + NL //                              //$NON-NLS-1$
 
                   + " WHERE 1=1" + NL //                                                                    //$NON-NLS-1$
-                  + "   " + sqlFilter.getWhereClause() + NL //                                              //$NON-NLS-1$
-                  + "   " + _tourCollectionFilter.getSqlString() + NL //                                    //$NON-NLS-1$
 
+                  + sqlFilter.getWhereClause() + NL //
+                  + _tourCollectionFilter.getSqlString() + NL //
                   + createSql_Sorting_OrderBy() + NL;
 
             prepStmt = conn.prepareStatement(sql);
 
             // set sql parameters
             sqlFilter.setParameters(prepStmt, 1);
-            _tourCollectionFilter.setParameters(prepStmt, sqlFilter.getLastParameterIndex());
+            _tourCollectionFilter.setParameters(prepStmt, sqlFilter.getNextParameterIndex());
 
          } else {
 
@@ -369,7 +371,7 @@ public class NatTable_DataLoader {
             // set sql parameters
             sqlCombineTagsWithAnd   .setParameters(prepStmt, 1);
             sqlFilter               .setParameters(prepStmt, sqlCombineTagsWithAnd.getLastParameterIndex());
-            _tourCollectionFilter   .setParameters(prepStmt, sqlFilter.getLastParameterIndex());
+            _tourCollectionFilter   .setParameters(prepStmt, sqlFilter.getNextParameterIndex());
 
 // SET_FORMATTING_ON
          }
@@ -411,14 +413,16 @@ public class NatTable_DataLoader {
       int numTours = 0;
 
       String sql = null;
+
       String sqlCollectionFilter = _tourCollectionFilter.getSqlString();
+      final TourTagFilter_WithExists tagFilter = new TourTagFilter_WithExists();
 
       try (Connection conn = TourDatabase.getInstance().getConnection()) {
 
          for (int runCounter = 0; runCounter < 2; runCounter++) {
 
-            // first run is using the collection filter
-            // second run is without the collection filter
+            // 1st run is WITH the collection filter
+            // 2nd run is WITHOUT the collection filter
 
             final boolean isFirstRun = runCounter == 0;
 
@@ -428,85 +432,30 @@ public class NatTable_DataLoader {
 
             PreparedStatement prepStmt;
 
-            if (TourTagFilterManager.isNoTagsFilter_Or_CombineTagsWithOr()) {
+            final SQLFilter appFilter = new SQLFilter(SQLFilter.ANY_APP_FILTERS_NO_TAG);
 
-               final SQLFilter sqlFilter = new SQLFilter(SQLFilter.ANY_APP_FILTERS);
+            sql = UI.EMPTY_STRING
 
-               sql = NL
+                  + "SELECT COUNT(*)" + NL //                                                      //$NON-NLS-1$
+                  + "FROM TOURDATA AS TourData" + NL //                                            //$NON-NLS-1$
+                  + "WHERE 1=1" + NL //                                                            //$NON-NLS-1$
 
-                     + "SELECT" + NL //                                                                        //$NON-NLS-1$
-                     + "   COUNT(*)" + NL //                                                                   //$NON-NLS-1$
-                     + "FROM" + NL //                                                                          //$NON-NLS-1$
-                     + "(  SELECT DISTINCT TourId" + NL //                                                     //$NON-NLS-1$
-                     + "   FROM" + NL //                                                                       //$NON-NLS-1$
-                     + "   (  SELECT" + NL //                                                                  //$NON-NLS-1$
-                     + "         TourId," + NL //                                                              //$NON-NLS-1$
-                     + "         jTdataTtag.TourTag_tagId" + NL //                                             //$NON-NLS-1$
+                  + appFilter.getWhereClause() + NL //
+                  + sqlCollectionFilter + NL //
+                  + tagFilter.getSql();
 
-                     + "      FROM " + TourDatabase.TABLE_TOUR_DATA + NL //                                    //$NON-NLS-1$
-                     + "      LEFT JOIN " + TourDatabase.JOINTABLE__TOURDATA__TOURTAG + " jTdataTtag" //       //$NON-NLS-1$ //$NON-NLS-2$
-                     + "      ON TourData.tourId = jTdataTtag.TourData_tourId" + NL //                         //$NON-NLS-1$
+            prepStmt = conn.prepareStatement(sql);
 
-                     + "      WHERE 1=1" + NL //                                                               //$NON-NLS-1$
-                     + "      " + sqlFilter.getWhereClause() + NL //                                           //$NON-NLS-1$
-                     + "      " + sqlCollectionFilter + NL //                                                  //$NON-NLS-1$
+            // set filter parameters
+            appFilter.setParameters(prepStmt, 1);
 
-                     // VERY IMPORTANT: "AS <name>" MUST be set, otherwise it DO NOT work
-                     + "   ) AS DerivedTable1" + NL //                                                         //$NON-NLS-1$
-                     + ") AS DerivedTable2" + NL //                                                            //$NON-NLS-1$
-               ;
+            int nextIndex = appFilter.getNextParameterIndex();
 
-               prepStmt = conn.prepareStatement(sql);
-
-               // set filter parameters
-               sqlFilter.setParameters(prepStmt, 1);
-               if (isFirstRun) {
-                  _tourCollectionFilter.setParameters(prepStmt, sqlFilter.getLastParameterIndex());
-               }
-
-            } else {
-
-               final SQLFilter sqlFilter = new SQLFilter();
-               final SQLData sqlCombineTagsWithAnd = TourTagFilterSqlJoinBuilder.createSql_CombineTagsWithAnd();
-
-               sql = NL
-
-                     + " SELECT" + NL //                                                                       //$NON-NLS-1$
-                     + "    COUNT(*)" + NL //                                                                  //$NON-NLS-1$
-                     + " FROM" + NL //                                                                         //$NON-NLS-1$
-                     + " ( SELECT DISTINCT TourId" + NL //                                                     //$NON-NLS-1$
-                     + "   FROM" + NL //                                                                       //$NON-NLS-1$
-                     + "   (  SELECT" + NL //                                                                  //$NON-NLS-1$
-                     + "         TourId," + NL //                                                              //$NON-NLS-1$
-                     + "         jTdataTtag.TourTag_tagId" + NL //                                             //$NON-NLS-1$
-
-                     + "      FROM TOURDATA" + NL //                                                           //$NON-NLS-1$
-                     + sqlCombineTagsWithAnd.getSqlString()
-                     + "      AS jTdataTtag" + NL //                                                           //$NON-NLS-1$
-                     + "      ON TourData.tourId = jTdataTtag.TourData_tourId" + NL //                         //$NON-NLS-1$
-
-                     + "      WHERE 1=1" + NL //                                                               //$NON-NLS-1$
-                     + "         " + sqlFilter.getWhereClause() + NL //                                        //$NON-NLS-1$
-                     + "         " + sqlCollectionFilter + NL //                                               //$NON-NLS-1$
-
-                     + "   ) AS DerivedTable1" + NL //                                                         //$NON-NLS-1$
-                     + " ) AS DerivedTable2" + NL //                                                           //$NON-NLS-1$
-               ;
-
-               prepStmt = conn.prepareStatement(sql);
-
-// SET_FORMATTING_OFF
-
-               // set sql parameters
-               sqlCombineTagsWithAnd   .setParameters(prepStmt, 1);
-               sqlFilter               .setParameters(prepStmt, sqlCombineTagsWithAnd.getLastParameterIndex());
-
-               if (isFirstRun) {
-                  _tourCollectionFilter   .setParameters(prepStmt, sqlFilter.getLastParameterIndex());
-               }
-
-// SET_FORMATTING_ON
+            if (isFirstRun) {
+               nextIndex = _tourCollectionFilter.setParameters(prepStmt, nextIndex);
             }
+
+            tagFilter.setParameters(prepStmt, nextIndex);
 
             final ResultSet result = prepStmt.executeQuery();
 
@@ -554,7 +503,7 @@ public class NatTable_DataLoader {
 
    private boolean fetchPagedTourItems(final LazyTourLoaderItem loaderItem) {
 
-      final SQLFilter sqlAppFilter = new SQLFilter(SQLFilter.ANY_APP_FILTERS);
+      final SQLFilter sqlAppFilter = new SQLFilter(SQLFilter.ANY_APP_FILTERS_NO_TAG);
 
       /**
        * Using this syntax from
@@ -592,90 +541,60 @@ public class NatTable_DataLoader {
 
          int rowIndex = loaderItem.sqlOffset;
 
-         final TourTagFilterSqlJoinBuilder tagFilterSqlJoinBuilder = new TourTagFilterSqlJoinBuilder();
+         final TourTagFilter_WithExists tagFilter = new TourTagFilter_WithExists();
          final String orderBy = createSql_Sorting_OrderBy();
 
          sql = NL
 
-               + " SELECT" //                                                                               //$NON-NLS-1$
+               + "SELECT" + NL //                                                                  //$NON-NLS-1$
 
-               + "    " + TVITourBookItem.SQL_ALL_TOUR_FIELDS + "," + NL //                                 //$NON-NLS-1$ //$NON-NLS-2$
+               + TVITourBookItem.getSQL_ALL_TOUR_FIELDS("tdFiltered", 3) + "," + NL //             //$NON-NLS-1$ //$NON-NLS-2$
 
-               // get all markers/tags/nutrition/equipment for paged tours
-               + "    Tmarker.markerId," + NL //                                                            //$NON-NLS-1$
-               + "    jTdataTtag.TourTag_tagId," + NL //                                                    //$NON-NLS-1$
-               + "    TNutritionProduct.productId," + NL //                                                 //$NON-NLS-1$
-               + "    jTdataTequipment.Equipment_equipmentID" + NL //                                       //$NON-NLS-1$
+               + "     tm.markerId," + NL //                                                       //$NON-NLS-1$
+               + "     jtt.TourTag_TagID  AS TourTag_tagId," + NL //                               //$NON-NLS-1$
+               + "     np.ProductId," + NL //                                                      //$NON-NLS-1$
+               + "     te.Equipment_equipmentID" + NL //                                           //$NON-NLS-1$
 
-               + " FROM" + NL //                                                                            //$NON-NLS-1$
-               + " (" + NL //                                                                               //$NON-NLS-1$
+               + "FROM" + NL //                                                                    //$NON-NLS-1$
+               + "(" + NL //                                                                       //$NON-NLS-1$
 
-               // get paged tours
-               + "   SELECT " + NL //                                                                       //$NON-NLS-1$
-               + "      " + TVITourBookItem.SQL_ALL_TOUR_FIELDS + NL //                                     //$NON-NLS-1$
+               + "   SELECT" + NL //                                                               //$NON-NLS-1$
 
-               + "   FROM" + NL //                                                                          //$NON-NLS-1$
-               + "   (" + NL //                                                                             //$NON-NLS-1$
+               + TVITourBookItem.getSQL_ALL_TOUR_FIELDS("TourData", 6) + NL //                     //$NON-NLS-1$
 
-               // get sorted tours
-               + "      SELECT " + NL //                                                                    //$NON-NLS-1$
-               + "         DISTINCT " + TVITourBookItem.SQL_ALL_TOUR_FIELDS + NL //                         //$NON-NLS-1$
+               + "     FROM TOURDATA AS TourData" + NL //                                          //$NON-NLS-1$
+               + "     WHERE 1=1" + NL //                                                          //$NON-NLS-1$
 
-               + "      FROM" + NL //                                                                       //$NON-NLS-1$
-               + "      (" + NL //                                                                          //$NON-NLS-1$
+               + sqlAppFilter.getWhereClause() + NL //
+               + tourCollectionFilter.getSqlString() + NL //
+               + tagFilter.getSql()
 
-               // get filtered tours
-               + "         SELECT " + NL //                                                                 //$NON-NLS-1$
-               + "            " + TVITourBookItem.SQL_ALL_TOUR_FIELDS + "," + NL //                         //$NON-NLS-1$ //$NON-NLS-2$
-               + "            jTdataTtag.TourTag_tagId" + NL //                                             //$NON-NLS-1$
-               + "         FROM TOURDATA" + NL //                                                           //$NON-NLS-1$
+               + "   " + orderBy + NL //                                                           //$NON-NLS-1$
 
-               + "         " + tagFilterSqlJoinBuilder.getSqlTagJoinTable() //                              //$NON-NLS-1$
-               + "         AS jTdataTtag" //                                                                //$NON-NLS-1$
-               + "         ON TourData.tourId = jTdataTtag.TourData_tourId" + NL //                         //$NON-NLS-1$
+               + "   OFFSET ? ROWS FETCH NEXT ? ROWS ONLY" + NL //                                 //$NON-NLS-1$
 
-               + "         WHERE 1=1" + NL //                                                               //$NON-NLS-1$
-               + "            " + sqlAppFilter.getWhereClause() + NL //                                     //$NON-NLS-1$
-               + "         " + tourCollectionFilter.getSqlString() + NL //                                  //$NON-NLS-1$
+               + ") AS tdFiltered" + NL //                                                         //$NON-NLS-1$
 
-               + "        " + orderBy + NL //                                                               //$NON-NLS-1$
-               + "      ) AS TourData " + NL //                                                             //$NON-NLS-1$
+               + "LEFT JOIN " + TourDatabase.TABLE_TOUR_MARKER + "              	AS tm  	ON tdFiltered.tourID = tm.TourData_tourId" + NL //   //$NON-NLS-1$
+               + "LEFT JOIN " + TourDatabase.JOINTABLE__TOURDATA__TOURTAG + "    AS jtt   ON tdFiltered.tourID = jtt.TourData_tourId" + NL //  //$NON-NLS-1$
+               + "LEFT JOIN " + TourDatabase.TABLE_TOUR_NUTRITION_PRODUCT + "    AS np    ON tdFiltered.tourID = np.TourData_tourId" + NL //   //$NON-NLS-1$
+               + "LEFT JOIN " + TourDatabase.JOINTABLE__TOURDATA__EQUIPMENT + "  AS te    ON tdFiltered.tourID = te.TourData_tourId" + NL //   //$NON-NLS-1$
 
-               + "     " + orderBy + NL //                                                                  //$NON-NLS-1$
-               + "   ) AS TourData " + NL //                                                                //$NON-NLS-1$
-
-               + "   OFFSET ? ROWS FETCH NEXT ? ROWS ONLY" + NL //                                          //$NON-NLS-1$
-
-               + " ) AS TourData" + NL //                                                                   //$NON-NLS-1$
-
-               + " LEFT JOIN " + TourDatabase.TABLE_TOUR_MARKER + " Tmarker" //                             //$NON-NLS-1$ //$NON-NLS-2$
-               + " ON TourData.tourId = Tmarker.TourData_tourId" + NL //                                    //$NON-NLS-1$
-
-               + " LEFT JOIN " + TourDatabase.JOINTABLE__TOURDATA__TOURTAG + " jTdataTtag" //               //$NON-NLS-1$ //$NON-NLS-2$
-               + " ON TourData.tourId = jTdataTtag.TourData_tourId" + NL //                                 //$NON-NLS-1$
-
-               // get nutrition product ids
-               + " LEFT JOIN " + TourDatabase.TABLE_TOUR_NUTRITION_PRODUCT + " TNutritionProduct" //        //$NON-NLS-1$ //$NON-NLS-2$
-               + " ON TourData.tourId = TNutritionProduct.TourData_tourId" + NL //                          //$NON-NLS-1$
-
-               + " LEFT JOIN " + TourDatabase.JOINTABLE__TOURDATA__EQUIPMENT + " jTdataTequipment" //       //$NON-NLS-1$ //$NON-NLS-2$
-               + " ON TourData.tourId = jTdataTequipment.TourData_tourId" + NL //                           //$NON-NLS-1$
-
-               + orderBy + NL;
+               + "   " + orderBy + NL //                                                           //$NON-NLS-1$
+         ;
 
          final PreparedStatement prepStmt = conn.prepareStatement(sql);
 
-         int paramIndex = 1;
-
-         paramIndex = tagFilterSqlJoinBuilder.setParameters(prepStmt, paramIndex);
+         int nextIndex = 1;
 
          // set filter parameters
-         sqlAppFilter.setParameters(prepStmt, paramIndex);
-         paramIndex = tourCollectionFilter.setParameters(prepStmt, sqlAppFilter.getLastParameterIndex());
+         nextIndex = sqlAppFilter.setParameters(prepStmt, nextIndex);
+         nextIndex = tourCollectionFilter.setParameters(prepStmt, nextIndex);
+         nextIndex = tagFilter.setParameters(prepStmt, nextIndex);
 
-         // set other parameters
-         prepStmt.setInt(paramIndex++, rowIndex);
-         prepStmt.setInt(paramIndex++, FETCH_SIZE);
+         // set number of fetched parameters
+         prepStmt.setInt(nextIndex++, rowIndex);
+         prepStmt.setInt(nextIndex++, FETCH_SIZE);
 
          long prevTourId = -1;
          HashSet<Long> allEquipmentIDs = null;
@@ -860,7 +779,10 @@ public class NatTable_DataLoader {
    int getNumberOfTours() {
 
       if (_numAllTourItems == -1) {
-         _numAllTourItems = fetchNumberOfTours();
+
+         final int fetchedNumberOfTours = fetchNumberOfTours();
+
+         _numAllTourItems = fetchedNumberOfTours;
       }
 
       return _numAllTourItems;
@@ -1245,7 +1167,9 @@ public class NatTable_DataLoader {
             return;
          }
 
-         if (fetchPagedTourItems(loaderItem)) {
+         final boolean fetchPagedTourItems = fetchPagedTourItems(loaderItem);
+
+         if (fetchPagedTourItems) {
 
             // update UI
 

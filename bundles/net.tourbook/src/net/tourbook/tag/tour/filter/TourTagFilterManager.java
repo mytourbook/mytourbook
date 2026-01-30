@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2026 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -185,11 +185,20 @@ public class TourTagFilterManager {
       boolean isNoTagFilter_Or_CombineTagsWithOr = true;
       final boolean isTourTagFilterEnabled = isTourTagFilterEnabled();
 
-      if (isTourTagFilterEnabled && getSelectedProfile().isOrOperator == false) {
+      if (isTourTagFilterEnabled && isOrOperator() == false) {
          isNoTagFilter_Or_CombineTagsWithOr = false;
       }
 
       return isNoTagFilter_Or_CombineTagsWithOr;
+   }
+
+   /**
+    * @return Returns <code>true</code> when the active filter tags are OR'ed, otherwise tags's are
+    *         AND'ed
+    */
+   public static boolean isOrOperator() {
+
+      return getSelectedProfile().isOrOperator;
    }
 
    /**

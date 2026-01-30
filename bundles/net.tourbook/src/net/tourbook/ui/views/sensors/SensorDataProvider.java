@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2021, 2022 Wolfgang Schramm and Contributors
+ * Copyright (C) 2021, 2026 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -163,7 +163,7 @@ public class SensorDataProvider {
 
          if (isAppFilter) {
             appFilter.setParameters(stmt, paramIndex);
-            paramIndex = appFilter.getLastParameterIndex();
+            paramIndex = appFilter.getNextParameterIndex();
          }
 
          if (isDurationFilter) {

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2024 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2026 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -245,7 +245,7 @@ public class TourGeoFilter_Loader {
          // app filter parameters
          if (isUseAppFilter) {
             appFilter.setParameters(stmtSelect, 1);
-            lastAppFilterParamIndex = appFilter.getLastParameterIndex();
+            lastAppFilterParamIndex = appFilter.getNextParameterIndex();
          }
 
          // geo part parameter

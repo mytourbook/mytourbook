@@ -123,16 +123,16 @@ public class SQLData {
    @Override
    public String toString() {
 
-      final int parameters = _allParameters == null ? 0 : _allParameters.size();
+      final int numParameters = _allParameters == null ? 0 : _allParameters.size();
 
       return UI.EMPTY_STRING
 
             + "SQLData" + NL //                                      //$NON-NLS-1$
 
-            + "   hash           = " + this.hashCode() + NL //            //$NON-NLS-1$
+            + "   hash           = " + this.hashCode() + NL //       //$NON-NLS-1$
             + "   _sqlString     = " + _sqlString + NL //            //$NON-NLS-1$
             + "   _allParameters = " + _allParameters + NL //        //$NON-NLS-1$
-            + "   num parameters = " + parameters + NL //            //$NON-NLS-1$
+            + "   numParameters  = " + numParameters + NL //         //$NON-NLS-1$
       ;
    }
 }

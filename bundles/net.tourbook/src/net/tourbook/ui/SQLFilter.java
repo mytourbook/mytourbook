@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2024 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2026 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -27,43 +27,56 @@ import net.tourbook.common.UI;
 import net.tourbook.common.util.SQLData;
 import net.tourbook.data.TourPerson;
 import net.tourbook.tag.tour.filter.TourTagFilterManager;
+import net.tourbook.tag.tour.filter.TourTagFilter_WithExists;
 import net.tourbook.tour.filter.TourFilterManager;
 import net.tourbook.tour.filter.geo.TourGeoFilter_Manager;
 
 /**
  * The filter provides a sql WHERE which contains all tour filter, e.g. selected person, tour type,
- * photo and advanced tour filter.
+ * photo and advanced tour filter
  */
 public class SQLFilter {
 
-   private static final char              NL                    = net.tourbook.common.UI.NEW_LINE;
+   private static final char              NL                     = net.tourbook.common.UI.NEW_LINE;
 
    /**
     * Contains any available app filters
     */
-   public static final Set<SQLAppFilter>  ANY_APP_FILTERS       = new HashSet<>();
+   public static final Set<SQLAppFilter>  ANY_APP_FILTERS        = new HashSet<>();
+
+   /**
+    * Contains the same app filters like {@link #ANY_APP_FILTERS} but without
+    * {@link SQLAppFilter#Tag}.
+    * <p>
+    * This is a temporarily solution until all tag filter are implemented with the SQL EXISTS
+    * statement in {@link TourTagFilter_WithExists}
+    */
+   public static final Set<SQLAppFilter>  ANY_APP_FILTERS_NO_TAG = new HashSet<>();
 
    /**
     * Contains mostly fast app filters
     */
-   private static final Set<SQLAppFilter> DEFAULT_APP_FILTERS   = new HashSet<>();
+   private static final Set<SQLAppFilter> DEFAULT_APP_FILTERS    = new HashSet<>();
 
    /**
     * Contains only app filters which performed very fast
     */
-   public static final Set<SQLAppFilter>  ONLY_FAST_APP_FILTERS = new HashSet<>();
+   public static final Set<SQLAppFilter>  ONLY_FAST_APP_FILTERS  = new HashSet<>();
 
    /**
     * Exclude all special app filters, so only default filters are applied, which are person, tour
     * type and tour data
     */
-   public static final Set<SQLAppFilter>  NO_PHOTOS             = new HashSet<>();
+   public static final Set<SQLAppFilter>  NO_PHOTOS              = new HashSet<>();
 
    static {
 
       ANY_APP_FILTERS.add(SQLAppFilter.Photo);
       ANY_APP_FILTERS.add(SQLAppFilter.GeoLocation);
       ANY_APP_FILTERS.add(SQLAppFilter.Tag);
+
+      ANY_APP_FILTERS_NO_TAG.add(SQLAppFilter.Photo);
+      ANY_APP_FILTERS_NO_TAG.add(SQLAppFilter.GeoLocation);
 
       DEFAULT_APP_FILTERS.add(SQLAppFilter.Photo);
       DEFAULT_APP_FILTERS.add(SQLAppFilter.GeoLocation);
@@ -74,9 +87,7 @@ public class SQLFilter {
    private String            _sqlWhereClause = net.tourbook.common.UI.EMPTY_STRING;
    private ArrayList<Object> _parameters     = new ArrayList<>();
 
-   private boolean           _isTagFilterActive;
-
-   private int               _lastParameterIndex;
+   private int               _nextParameterIndex;
 
    /**
     * Create sql app filter which contains the mostly fast app filters
@@ -178,8 +189,6 @@ public class SQLFilter {
 
             if (tourTagSqlData != null) {
 
-               _isTagFilterActive = true;
-
                sql.append(tourTagSqlData.getSqlString());
 
                _parameters.addAll(tourTagSqlData.getParameters());
@@ -244,9 +253,9 @@ public class SQLFilter {
     * @return Returns the last parameter index +1 which was used for setting parameters in
     *         {@link #setParameters(PreparedStatement, int)}
     */
-   public int getLastParameterIndex() {
+   public int getNextParameterIndex() {
 
-      return _lastParameterIndex;
+      return _nextParameterIndex;
    }
 
    /**
@@ -263,18 +272,9 @@ public class SQLFilter {
    }
 
    /**
-    * @return Returns <code>true</code> when the tag filter is being used, it is enabled and has at
-    *         least 1 tag
-    */
-   public boolean isTagFilterActive() {
-
-      return _isTagFilterActive;
-   }
-
-   /**
     * Sets the app filter parameters into the filter statement.
     * <p>
-    * The last used index can be retrieved with {@link #getLastParameterIndex()}
+    * The last used index can be retrieved with {@link #getNextParameterIndex()}
     *
     * @param statement
     * @param startIndex
@@ -321,7 +321,7 @@ public class SQLFilter {
          }
       }
 
-      _lastParameterIndex = parameterIndex;
+      _nextParameterIndex = parameterIndex;
 
       return parameterIndex;
    }
@@ -339,11 +339,10 @@ public class SQLFilter {
 
             + "SQLFilter" + NL //                                             //$NON-NLS-1$
 
-            + "_sqlWhereClause      = " + _sqlWhereClause + NL //             //$NON-NLS-1$
-            + "_isTagFilterActive   = " + _isTagFilterActive + NL //          //$NON-NLS-1$
-            + "_lastParameterIndex  = " + _lastParameterIndex + NL //         //$NON-NLS-1$
+            + " _sqlWhereClause      = " + _sqlWhereClause + NL //             //$NON-NLS-1$
+            + " _nextParameterIndex  = " + _nextParameterIndex + NL //         //$NON-NLS-1$
 
-            + "_parameters          = " + parameters + NL //                  //$NON-NLS-1$
+            + " _parameters          = " + parameters + NL //                  //$NON-NLS-1$
       ;
    }
 }
