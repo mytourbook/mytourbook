@@ -280,7 +280,7 @@ public class SQLFilter {
     * @param startIndex
     *           Sets the parameter start index, the first parameter is 1
     *
-    * @return Returns the last parameter index +1 which was used for setting parameters
+    * @return Returns the next parameter index which is the last paramter index +1
     *
     * @throws SQLException
     */
