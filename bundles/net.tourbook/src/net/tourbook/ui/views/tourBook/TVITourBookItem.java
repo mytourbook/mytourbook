@@ -53,7 +53,6 @@ public abstract class TVITourBookItem extends TreeViewerItem implements ITourIte
     */
    private static final String                      SQL_ALL_TOUR_FIELDS;
 
-   public static final String                       SQL_ALL_OTHER_FIELDS;
    public static final int                          SQL_ALL_OTHER_FIELDS__COLUMN_START_NUMBER;
 
    /**
@@ -240,17 +239,6 @@ public abstract class TVITourBookItem extends TreeViewerItem implements ITourIte
       //
       // ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-      /////////////////////////////////////////////////////////////////////////
-      // -------- JOINT TABLES, they are added at the end --------------
-      /////////////////////////////////////////////////////////////////////////
-      SQL_ALL_OTHER_FIELDS = UI.EMPTY_STRING
-
-            + "jTdataTtag.TourTag_tagId," + NL //                 SQL_ALL_OTHER_FIELDS__COLUMN_START_NUMBER + 0   //$NON-NLS-1$
-            + "Tmarker.markerId," + NL //                         SQL_ALL_OTHER_FIELDS__COLUMN_START_NUMBER + 1   //$NON-NLS-1$
-            + "TNutritionProduct.productId," + NL //              SQL_ALL_OTHER_FIELDS__COLUMN_START_NUMBER + 2   //$NON-NLS-1$
-            + "JTdataTequipment.Equipment_EquipmentID " + NL //   SQL_ALL_OTHER_FIELDS__COLUMN_START_NUMBER + 3   //$NON-NLS-1$
-      ;
-
       SQL_SUM_FIELDS = UI.EMPTY_STRING
 
             + "TourDistance," + NL //                                      //$NON-NLS-1$
@@ -306,6 +294,7 @@ public abstract class TVITourBookItem extends TreeViewerItem implements ITourIte
             + "SUM( CAST(TourComputedTime_Moving AS BIGINT))," + NL //  2  //$NON-NLS-1$
             + "SUM( CAST(TourAltUp AS BIGINT))," + NL //                3  //$NON-NLS-1$
             + "SUM( CAST(TourAltDown AS BIGINT))," + NL //              4  //$NON-NLS-1$
+
             + "SUM(1)," + NL //                                         5  //$NON-NLS-1$
             //
             + "MAX(MaxSpeed)," + NL //                                  6  //$NON-NLS-1$
@@ -957,12 +946,14 @@ public abstract class TVITourBookItem extends TreeViewerItem implements ITourIte
 
          final long result_TourId = result.getLong(1);
 
+         final int columnStartNumber = TVITourBookItem.SQL_ALL_OTHER_FIELDS__COLUMN_START_NUMBER;
+
 // SET_FORMATTING_OFF
 
-         final Object result_TagId              = result.getObject(SQL_ALL_OTHER_FIELDS__COLUMN_START_NUMBER);
-         final Object result_MarkerId           = result.getObject(SQL_ALL_OTHER_FIELDS__COLUMN_START_NUMBER + 1);
-         final Object result_NutritionProductId = result.getObject(SQL_ALL_OTHER_FIELDS__COLUMN_START_NUMBER + 2);
-         final Object result_EquipmentID        = result.getObject(SQL_ALL_OTHER_FIELDS__COLUMN_START_NUMBER + 3);
+         final Object result_TagId              = result.getObject(columnStartNumber);
+         final Object result_MarkerId           = result.getObject(columnStartNumber + 1);
+         final Object result_NutritionProductId = result.getObject(columnStartNumber + 2);
+         final Object result_EquipmentID        = result.getObject(columnStartNumber + 3);
 
 // SET_FORMATTING_ON
 

@@ -122,7 +122,7 @@ public class NatTable_DataLoader {
     * Contains all tour id's for the current tour filter and tour sorting, this is used
     * to get the row index for a tour.
     */
-   private long[]                                         _allSortedTourIds;
+   private long[]                                         _allSortedTourIDs;
 
    private SQLData                                        _tourCollectionFilter          = new SQLData();
 
@@ -195,7 +195,7 @@ public class NatTable_DataLoader {
       }
 
       final IntArrayList allRowIndices = new IntArrayList();
-      final int numAllAvailableTourIds = _allSortedTourIds.length;
+      final int numAllAvailableTourIds = _allSortedTourIDs.length;
 
       // loop: all requested tour id's
       for (final Long requestedTourId : allRequestedTourIds) {
@@ -203,7 +203,7 @@ public class NatTable_DataLoader {
          // loop: all available tour id's
          for (int rowPosition = 0; rowPosition < numAllAvailableTourIds; rowPosition++) {
 
-            final long loadedTourId = _allSortedTourIds[rowPosition];
+            final long loadedTourId = _allSortedTourIDs[rowPosition];
 
             if (loadedTourId == requestedTourId) {
 
@@ -289,19 +289,18 @@ public class NatTable_DataLoader {
 
       try (Connection conn = TourDatabase.getInstance().getConnection()) {
 
-         PreparedStatement prepStmt;
-
          final String sqlSortFields = createSql_Sorting_SelectFields();
 
          final SQLFilter appFilter = new SQLFilter(SQLFilter.ANY_APP_FILTERS_NO_TAG);
          final TourTagFilter_WithExists tagFilter = new TourTagFilter_WithExists();
+         final SQLData tourCollectionFilter = _tourCollectionFilter;
 
          sql = UI.EMPTY_STRING
 
                + "SELECT" + NL //                              //$NON-NLS-1$
 
                + "   TourId," + NL //                          //$NON-NLS-1$
-               + "   " + sqlSortFields //                    //$NON-NLS-1$
+               + "   " + sqlSortFields //                      //$NON-NLS-1$
 
                + "FROM TOURDATA AS TourData" + NL //           //$NON-NLS-1$
 
@@ -309,18 +308,18 @@ public class NatTable_DataLoader {
 
                + appFilter.getWhereClause() + NL //
                + tagFilter.getSql()
-               + _tourCollectionFilter.getSqlString() + NL //
+               + tourCollectionFilter.getSqlString() + NL //
 
                + createSql_Sorting_OrderBy() + NL;
 
-         prepStmt = conn.prepareStatement(sql);
+         final PreparedStatement prepStmt = conn.prepareStatement(sql);
 
          int nextIndex = 1;
 
          // set filter parameters
          nextIndex = appFilter.setParameters(prepStmt, nextIndex);
          nextIndex = tagFilter.setParameters(prepStmt, nextIndex);
-         nextIndex = _tourCollectionFilter.setParameters(prepStmt, nextIndex);
+         nextIndex = tourCollectionFilter.setParameters(prepStmt, nextIndex);
 
          final ResultSet result = prepStmt.executeQuery();
 
@@ -340,9 +339,12 @@ public class NatTable_DataLoader {
          SQL.showException(e, sql);
       }
 
-      _allSortedTourIds = allTourIds.toArray();
+      _allSortedTourIDs = allTourIds.toArray();
    }
 
+   /**
+    * @return Returns number of fetched tours
+    */
    private int fetchNumberOfTours() {
 
 //    TourDatabase.enableRuntimeStatistics(conn);
@@ -351,10 +353,12 @@ public class NatTable_DataLoader {
 
       String sql = null;
 
-      String sqlCollectionFilter = _tourCollectionFilter.getSqlString();
-      final TourTagFilter_WithExists tagFilter = new TourTagFilter_WithExists();
-
       try (Connection conn = TourDatabase.getInstance().getConnection()) {
+
+         final SQLData tourCollectionFilter = _tourCollectionFilter;
+         final TourTagFilter_WithExists tagFilter = new TourTagFilter_WithExists();
+
+         String sqlCollectionFilter = tourCollectionFilter.getSqlString();
 
          for (int runCounter = 0; runCounter < 2; runCounter++) {
 
@@ -389,7 +393,7 @@ public class NatTable_DataLoader {
             int nextIndex = appFilter.getNextParameterIndex();
 
             if (isFirstRun) {
-               nextIndex = _tourCollectionFilter.setParameters(prepStmt, nextIndex);
+               nextIndex = tourCollectionFilter.setParameters(prepStmt, nextIndex);
             }
 
             tagFilter.setParameters(prepStmt, nextIndex);
@@ -440,8 +444,6 @@ public class NatTable_DataLoader {
 
    private boolean fetchPagedTourItems(final LazyTourLoaderItem loaderItem) {
 
-      final SQLFilter sqlAppFilter = new SQLFilter(SQLFilter.ANY_APP_FILTERS_NO_TAG);
-
       /**
        * Using this syntax from
        * https://stackoverflow.com/questions/38770349/get-rows-on-first-table-not-on-left-joins-result-set#38770491
@@ -472,13 +474,13 @@ public class NatTable_DataLoader {
        * which is causing exceptions because of differences between the sql and the parameters,
        * propably because of concurrency !!!
        */
-      final SQLData tourCollectionFilter = _tourCollectionFilter;
 
       try (Connection conn = TourDatabase.getInstance().getConnection()) {
 
-         int rowIndex = loaderItem.sqlOffset;
-
+         final SQLFilter appFilter = new SQLFilter(SQLFilter.ANY_APP_FILTERS_NO_TAG);
          final TourTagFilter_WithExists tagFilter = new TourTagFilter_WithExists();
+         final SQLData tourCollectionFilter = _tourCollectionFilter;
+
          final String orderBy = createSql_Sorting_OrderBy();
 
          sql = NL
@@ -502,9 +504,9 @@ public class NatTable_DataLoader {
                + "     FROM TOURDATA AS TourData" + NL //                                          //$NON-NLS-1$
                + "     WHERE 1=1" + NL //                                                          //$NON-NLS-1$
 
-               + sqlAppFilter.getWhereClause() + NL //
-               + tourCollectionFilter.getSqlString() + NL //
+               + appFilter.getWhereClause() + NL //
                + tagFilter.getSql()
+               + tourCollectionFilter.getSqlString() + NL //
 
                + "   " + orderBy + NL //                                                           //$NON-NLS-1$
 
@@ -522,12 +524,13 @@ public class NatTable_DataLoader {
 
          final PreparedStatement prepStmt = conn.prepareStatement(sql);
 
+         int rowIndex = loaderItem.sqlOffset;
          int nextIndex = 1;
 
          // set filter parameters
-         nextIndex = sqlAppFilter.setParameters(prepStmt, nextIndex);
-         nextIndex = tourCollectionFilter.setParameters(prepStmt, nextIndex);
+         nextIndex = appFilter.setParameters(prepStmt, nextIndex);
          nextIndex = tagFilter.setParameters(prepStmt, nextIndex);
+         nextIndex = tourCollectionFilter.setParameters(prepStmt, nextIndex);
 
          // set number of fetched parameters
          prepStmt.setInt(nextIndex++, rowIndex);
@@ -754,7 +757,7 @@ public class NatTable_DataLoader {
     */
    public CompletableFuture<int[]> getRowIndexFromTourId(final List<Long> allRequestedTourIds) {
 
-      if (_allSortedTourIds == null) {
+      if (_allSortedTourIDs == null) {
 
          // firstly load all tour id's
 
@@ -1135,18 +1138,18 @@ public class NatTable_DataLoader {
 
    long getTourId(final int rowIndex) {
 
-      if (_allSortedTourIds == null) {
+      if (_allSortedTourIDs == null) {
 
          return -1;
 
       } else {
 
-         return _allSortedTourIds[rowIndex];
+         return _allSortedTourIDs[rowIndex];
       }
    }
 
    /**
-    * Cleanup all loaded data that the next time they are newly fetched when requested.
+    * Cleanup all loaded data that the next time they are newly fetched when requested
     *
     * @param isResetTourCollectionFilter
     */
@@ -1162,7 +1165,7 @@ public class NatTable_DataLoader {
       _pageNumbers_Fetched.clear();
       _pageNumbers_Loading.clear();
 
-      _allSortedTourIds = null;
+      _allSortedTourIDs = null;
 
       _numAllTourItems = -1;
 

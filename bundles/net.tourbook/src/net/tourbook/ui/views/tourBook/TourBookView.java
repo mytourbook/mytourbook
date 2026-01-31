@@ -1424,6 +1424,9 @@ public class TourBookView extends ViewPart implements
 
                || property.equals(ITourbookPreferences.VIEW_PREFERRED_TEMPERATURE_VALUE)) {
 
+            // ensure that the viewer is updated when the app filter is modified
+            _natTable_DataLoader.resetTourItems(false);
+
             /*
              * Flat view do not preserve column reordering when reloaded -> recreate it
              */
