@@ -59,6 +59,7 @@ import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.preferences.ViewContext;
 import net.tourbook.tag.TagMenuManager;
 import net.tourbook.tour.ITourEventListener;
+import net.tourbook.tour.SelectionDeletedTours;
 import net.tourbook.tour.SelectionTourId;
 import net.tourbook.tour.SelectionTourIds;
 import net.tourbook.tour.TourDoubleClickState;
@@ -100,6 +101,7 @@ import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.viewers.CellLabelProvider;
 import org.eclipse.jface.viewers.ColumnViewer;
 import org.eclipse.jface.viewers.IElementComparer;
+import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.jface.viewers.ITreeSelection;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
@@ -128,6 +130,8 @@ import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.swt.widgets.Tree;
 import org.eclipse.swt.widgets.TreeColumn;
 import org.eclipse.swt.widgets.TreeItem;
+import org.eclipse.ui.ISelectionListener;
+import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.part.ViewPart;
 import org.joda.time.Period;
 import org.joda.time.PeriodType;
@@ -179,6 +183,7 @@ public class EquipmentView extends ViewPart implements ITourProvider, ITourViewe
 
    private IPropertyChangeListener            _prefChangeListener;
    private IPropertyChangeListener            _prefChangeListener_Common;
+   private ISelectionListener                 _postSelectionListener;
    private ITourEventListener                 _tourEventListener;
 
    private PostSelectionProvider              _postSelectionProvider;
@@ -854,6 +859,26 @@ public class EquipmentView extends ViewPart implements ITourProvider, ITourViewe
       _prefStore_Common.addPropertyChangeListener(_prefChangeListener_Common);
    }
 
+   /**
+    * Listen for events when a tour is selected or deleted
+    */
+   private void addSelectionListener() {
+
+      _postSelectionListener = new ISelectionListener() {
+         @Override
+         public void selectionChanged(final IWorkbenchPart part, final ISelection selection) {
+
+            if (part == EquipmentView.this) {
+               return;
+            }
+
+            onSelectionChanged(selection);
+         }
+      };
+
+      getSite().getPage().addPostSelectionListener(_postSelectionListener);
+   }
+
    private void addTourEventListener() {
 
       _tourEventListener = (workbenchPart, tourEventId, eventData) -> {
@@ -987,6 +1012,7 @@ public class EquipmentView extends ViewPart implements ITourProvider, ITourViewe
 
       addPrefListener();
       addTourEventListener();
+      addSelectionListener();
 
       restoreState();
 
@@ -2465,6 +2491,7 @@ public class EquipmentView extends ViewPart implements ITourProvider, ITourViewe
       _prefStore.removePropertyChangeListener(_prefChangeListener);
       _prefStore_Common.removePropertyChangeListener(_prefChangeListener_Common);
 
+      getSite().getPage().removePostSelectionListener(_postSelectionListener);
       TourManager.getInstance().removeTourEventListener(_tourEventListener);
 
 // SET_FORMATTING_OFF
@@ -3651,6 +3678,14 @@ public class EquipmentView extends ViewPart implements ITourProvider, ITourViewe
       }
       _isInExpandingSelection = false;
       _lastExpandSelectionTime = System.currentTimeMillis();
+   }
+
+   private void onSelectionChanged(final ISelection selection) {
+
+      if (selection instanceof SelectionDeletedTours) {
+
+         reloadViewer();
+      }
    }
 
    @Override

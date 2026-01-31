@@ -1428,9 +1428,11 @@ public class TourDatabase {
             "DELETE FROM " + TABLE_TOUR_WAYPOINT            + sqlWhere_TourData_TourId,   //$NON-NLS-1$
             "DELETE FROM " + TABLE_TOUR_REFERENCE           + sqlWhere_TourData_TourId,   //$NON-NLS-1$
             "DELETE FROM " + JOINTABLE__TOURDATA__TOURTAG   + sqlWhere_TourData_TourId,   //$NON-NLS-1$
+            "DELETE FROM " + JOINTABLE__TOURDATA__EQUIPMENT + sqlWhere_TourData_TourId,   //$NON-NLS-1$
             "DELETE FROM " + TABLE_TOUR_COMPARED            + sqlWhere_TourId,            //$NON-NLS-1$
             "DELETE FROM " + TABLE_TOUR_GEO_PARTS           + sqlWhere_TourId,            //$NON-NLS-1$
          };
+
 // SET_FORMATTING_ON
 
          for (final String sqlExec : allSql) {
@@ -1465,9 +1467,18 @@ public class TourDatabase {
 
       // log runtime statistics
       final ResultSet rs = cs.getResultSet();
+
+      System.out.println("--------------------------------");
+      System.out.println("DERBY RUNTIME STATISTICS - START");
+      System.out.println("--------------------------------");
+
       while (rs.next()) {
          System.out.println(rs.getString(1));
       }
+
+      System.out.println("------------------------------");
+      System.out.println("DERBY RUNTIME STATISTICS - END");
+      System.out.println("------------------------------");
 
       cs.close();
 
@@ -4607,7 +4618,7 @@ public class TourDatabase {
 
       // Create index "TOURDATA_Equipment"
       SQL.createIndex_Composite(stmt,
-            
+
             JOINTABLE__TOURDATA__EQUIPMENT,
 
             KEY_EQUIPMENT,
