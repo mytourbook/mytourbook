@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2025 Wolfgang Schramm and Contributors
+ * Copyright (C) 2014, 2026 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -191,6 +191,7 @@ public final class SQL {
                + sqlStatementWithNumber + UI.NEW_LINE2
                + Util.getSQLExceptionText(exception);
 
+         // log in app
          StatusUtil.logError(message);
          StatusUtil.log(exception);
 

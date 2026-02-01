@@ -24,6 +24,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import net.tourbook.common.UI;
+import net.tourbook.common.util.SQL;
 import net.tourbook.common.util.TreeViewerItem;
 import net.tourbook.data.Equipment;
 import net.tourbook.data.EquipmentPart;
@@ -114,6 +115,8 @@ public class TVIEquipmentView_Part extends TVIEquipmentView_Item {
 
       final ArrayList<TreeViewerItem> allTourItems = new ArrayList<>();
 
+      String sql = null;
+
       try (Connection conn = TourDatabase.getInstance().getConnection()) {
 
          final SQLFilter appFilter = new SQLFilter(SQLFilter.ANY_APP_FILTERS_NO_TAG);
@@ -122,7 +125,7 @@ public class TVIEquipmentView_Part extends TVIEquipmentView_Item {
          /*
           * Load: Part, Tour
           */
-         final String sql = UI.EMPTY_STRING
+         sql = UI.EMPTY_STRING
 
                + "SELECT" + NL //                                                                        //$NON-NLS-1$
 
@@ -165,7 +168,7 @@ public class TVIEquipmentView_Part extends TVIEquipmentView_Item {
          int nextIndex = 1;
 
          statement.setLong(nextIndex++, _partID);
-         
+
          nextIndex = appFilter.setParameters(statement, nextIndex);
          nextIndex = tagFilter.setParameters(statement, nextIndex);
 
@@ -252,7 +255,7 @@ public class TVIEquipmentView_Part extends TVIEquipmentView_Item {
          }
       } catch (final SQLException e) {
 
-         net.tourbook.ui.UI.showSQLException(e);
+         SQL.showException(e, sql);
       }
 
       setChildren(allTourItems);
@@ -267,12 +270,14 @@ public class TVIEquipmentView_Part extends TVIEquipmentView_Item {
 
       final ArrayList<TreeViewerItem> allTourItems = new ArrayList<>();
 
+      String sql = null;
+
       try (Connection conn = TourDatabase.getInstance().getConnection()) {
 
          final SQLFilter appFilter = new SQLFilter(SQLFilter.ANY_APP_FILTERS_NO_TAG);
          final TourTagFilter_WithExists tagFilter = new TourTagFilter_WithExists();
 
-         final String sql = UI.EMPTY_STRING
+         sql = UI.EMPTY_STRING
 
                + "SELECT" + NL //                                                               //$NON-NLS-1$
 
@@ -339,7 +344,7 @@ public class TVIEquipmentView_Part extends TVIEquipmentView_Item {
 
       } catch (final SQLException e) {
 
-         net.tourbook.ui.UI.showSQLException(e);
+         SQL.showException(e, sql);
       }
 
       setChildren(allTourItems);

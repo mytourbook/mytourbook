@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2011, 2023 Matthias Helmling and Contributors
+ * Copyright (C) 2011, 2026 Matthias Helmling and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -32,6 +32,7 @@ import java.util.concurrent.atomic.AtomicLong;
 
 import net.tourbook.common.UI;
 import net.tourbook.common.time.TimeTools;
+import net.tourbook.common.util.SQL;
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourType;
@@ -123,7 +124,7 @@ class CalendarTourDataProvider {
 
       LocalDateTime dt = LocalDateTime.now();
 
-      final String select =
+      final String sql =
 
             "SELECT" //                               //$NON-NLS-1$
 
@@ -139,7 +140,7 @@ class CalendarTourDataProvider {
 
       try (Connection conn = TourDatabase.getInstance().getConnection()) {
 
-         final PreparedStatement statement = conn.prepareStatement(select);
+         final PreparedStatement statement = conn.prepareStatement(sql);
 
          statement.setLong(1, tourId);
          final ResultSet result = statement.executeQuery();
@@ -157,9 +158,7 @@ class CalendarTourDataProvider {
 
       } catch (final SQLException e) {
 
-         StatusUtil.logError(select);
-         net.tourbook.ui.UI.showSQLException(e);
-
+         SQL.showException(e, sql);
       }
 
       return dt;
@@ -383,6 +382,7 @@ class CalendarTourDataProvider {
     * @param year
     * @param month
     * @param day
+    *
     * @return CalendarTourData
     */
    private CalendarTourData[][] loadFromDb_Month(final int year, final int month) {
@@ -719,16 +719,8 @@ class CalendarTourDataProvider {
 
       } catch (final SQLException e) {
 
-         StatusUtil.logError(sql);
-         net.tourbook.ui.UI.showSQLException(e);
-
+         SQL.showException(e, sql);
       }
-
-//      System.out.println(
-//            (UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ") +
-//                  "getCalendarMonthData_FromDb\t\t\t" + (System.currentTimeMillis() - start) + " ms - "
-//                  + "\t" + year + " " + month);
-//      // TODO remove SYSTEM.OUT.PRINTLN
 
       return monthData;
    }
@@ -888,16 +880,12 @@ class CalendarTourDataProvider {
 
       } catch (final SQLException e) {
 
-         StatusUtil.logError(sql);
-         net.tourbook.ui.UI.showSQLException(e);
+         SQL.showException(e, sql);
 
       } finally {
 
          weekData.loadingState = LoadingState.IS_LOADED;
       }
-
-//      System.out.println("getCalendarWeekSummaryData_FromDb\t" + (System.currentTimeMillis() - start) + " ms");
-//      // TODO remove SYSTEM.OUT.PRINTLN
 
       return true;
    }

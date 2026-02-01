@@ -24,6 +24,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import net.tourbook.common.UI;
+import net.tourbook.common.util.SQL;
 import net.tourbook.common.util.TreeViewerItem;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.tag.tour.filter.TourTagFilter_WithExists;
@@ -163,6 +164,8 @@ public class TVIEquipmentView_Part_Month extends TVIEquipmentView_Item {
 
       final ArrayList<TreeViewerItem> allTourItems = new ArrayList<>();
 
+      String sql = null;
+
       try (Connection conn = TourDatabase.getInstance().getConnection()) {
 
          final SQLFilter appFilter = new SQLFilter(SQLFilter.ANY_APP_FILTERS_NO_TAG);
@@ -171,43 +174,43 @@ public class TVIEquipmentView_Part_Month extends TVIEquipmentView_Item {
          /*
           * Load: Part, Year, Month, Tour
           */
-         final String sql = UI.EMPTY_STRING
+         sql = UI.EMPTY_STRING
 
-               + "SELECT" + NL //                                                                  //$NON-NLS-1$
+               + "SELECT" + NL //                                                                     //$NON-NLS-1$
 
                + TVIEquipmentView_Tour.SQL_TOUR_COLUMNS
 
-               + "FROM equipmentpart AS part" + NL //                                              //$NON-NLS-1$
+               + "FROM equipmentpart AS part" + NL //                                                 //$NON-NLS-1$
 
-               + "JOIN tourdata_equipment AS j_td_eq" + NL //                                      //$NON-NLS-1$
-               + "   ON j_td_eq.equipment_equipmentid = part.equipment_equipmentid" + NL //        //$NON-NLS-1$
+               + "JOIN tourdata_equipment AS j_td_eq" + NL //                                         //$NON-NLS-1$
+               + "   ON j_td_eq.equipment_equipmentid = part.equipment_equipmentid" + NL //           //$NON-NLS-1$
 
-               + "JOIN tourdata AS TourData" + NL //                                               //$NON-NLS-1$
-               + "   ON TourData.tourID = j_td_eq.tourdata_tourID" + NL //                         //$NON-NLS-1$
-               + "   AND TourData.tourstarttime >= part.dateFrom" + NL //                          //$NON-NLS-1$
-               + "   AND TourData.tourstarttime <  part.dateUntil" + NL //                         //$NON-NLS-1$
-               + "   AND TourData.StartYear = ?" + NL //                                           //$NON-NLS-1$
-               + "   AND TourData.StartMonth = ?" + NL //                                          //$NON-NLS-1$
+               + "JOIN tourdata AS TourData" + NL //                                                  //$NON-NLS-1$
+               + "   ON TourData.tourID = j_td_eq.tourdata_tourID" + NL //                            //$NON-NLS-1$
+               + "   AND TourData.tourstarttime >= part.dateFrom" + NL //                             //$NON-NLS-1$
+               + "   AND TourData.tourstarttime <  part.dateUntil" + NL //                            //$NON-NLS-1$
+               + "   AND TourData.StartYear = ?" + NL //                                              //$NON-NLS-1$
+               + "   AND TourData.StartMonth = ?" + NL //                                             //$NON-NLS-1$
 
                + appFilter.getWhereClause()
                + tagFilter.getSql()
 
                // get equipment id's
-               + "LEFT JOIN " + TourDatabase.JOINTABLE__TOURDATA__EQUIPMENT + " AS jTdataEq" + NL //   //$NON-NLS-1$ //$NON-NLS-2$
-               + "  ON TourData.TOURID = jTdataEq.TOURDATA_TOURID" + NL //                             //$NON-NLS-1$
+               + "LEFT JOIN " + TourDatabase.JOINTABLE__TOURDATA__EQUIPMENT + " AS jTdataEq" + NL //  //$NON-NLS-1$ //$NON-NLS-2$
+               + "  ON TourData.TOURID = jTdataEq.TOURDATA_TOURID" + NL //                            //$NON-NLS-1$
 
                // get tag id's
-               + "LEFT JOIN " + TourDatabase.JOINTABLE__TOURDATA__TOURTAG + " AS jTdataTtag" // //$NON-NLS-1$ //$NON-NLS-2$
-               + "  ON TourData.tourId = jTdataTtag.TourData_tourId" + NL //                    //$NON-NLS-1$
+               + "LEFT JOIN " + TourDatabase.JOINTABLE__TOURDATA__TOURTAG + " AS jTdataTtag" //       //$NON-NLS-1$ //$NON-NLS-2$
+               + "  ON TourData.tourId = jTdataTtag.TourData_tourId" + NL //                          //$NON-NLS-1$
 
                // get marker id's
-               + "LEFT JOIN " + TourDatabase.TABLE_TOUR_MARKER + " AS Tmarker" //               //$NON-NLS-1$ //$NON-NLS-2$
-               + "  ON TourData.tourId = Tmarker.TourData_tourId" + NL //                       //$NON-NLS-1$
+               + "LEFT JOIN " + TourDatabase.TABLE_TOUR_MARKER + " AS Tmarker" //                     //$NON-NLS-1$ //$NON-NLS-2$
+               + "  ON TourData.tourId = Tmarker.TourData_tourId" + NL //                             //$NON-NLS-1$
 
-               + "WHERE part.isCollate = TRUE" + NL //                                             //$NON-NLS-1$
-               + "   AND part.partID = ?" + NL //                                                  //$NON-NLS-1$
+               + "WHERE part.isCollate = TRUE" + NL //                                                //$NON-NLS-1$
+               + "   AND part.partID = ?" + NL //                                                     //$NON-NLS-1$
 
-               + "ORDER BY TourData.tourstarttime" + NL //                                         //$NON-NLS-1$
+               + "ORDER BY TourData.tourstarttime" + NL //                                            //$NON-NLS-1$
          ;
 
          final PreparedStatement statement = conn.prepareStatement(sql);
@@ -305,7 +308,7 @@ public class TVIEquipmentView_Part_Month extends TVIEquipmentView_Item {
          }
       } catch (final SQLException e) {
 
-         UI.showSQLException(e);
+         SQL.showException(e, sql);
       }
 
       setChildren(allTourItems);
