@@ -75,7 +75,7 @@ public class TourTagFilter_WithExists {
    }
 
    /**
-    * @return the sqlTagJoinTable
+    * @return Returns a SQL WHERE AND statement
     */
    public String getSql() {
 

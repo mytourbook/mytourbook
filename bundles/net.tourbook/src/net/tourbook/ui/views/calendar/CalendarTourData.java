@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2011, 2023 Matthias Helmling and Contributors
+ * Copyright (C) 2011, 2026 Matthias Helmling and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -16,61 +16,58 @@
 package net.tourbook.ui.views.calendar;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
 
 public class CalendarTourData {
 
-   LoadingState    loadingState = LoadingState.NOT_LOADED;
+   LoadingState loadingState = LoadingState.NOT_LOADED;
 
-   long            tourId;
-   long            typeId;
+   long         tourId;
+   long         typeId;
 
-   int             typeColorIndex;
+   int          typeColorIndex;
 
-   int             year;
-   int             month;
-   int             day;
-   int             week;
-   int             dayOfWeek;
+   int          year;
+   int          month;
+   int          day;
+   int          week;
+   int          dayOfWeek;
 
-   int             startTime;
-   int             endTime;
+   int          startTime;
+   int          endTime;
 
-   int             elevationGain;
-   int             elevationLoss;
-   int             distance;
+   int          elevationGain;
+   int          elevationLoss;
+   int          distance;
 
-   int             cadenceZone_SlowTime;
-   int             cadenceZone_FastTime;
+   int          cadenceZone_SlowTime;
+   int          cadenceZone_FastTime;
 
-   int             elapsedTime;
-   int             recordedTime;
-   int             movingTime;
+   int          elapsedTime;
+   int          recordedTime;
+   int          movingTime;
 
-   int             calories;
-   float           power_Avg;
-   float           pulse_Avg;
+   int          calories;
+   float        power_Avg;
+   float        pulse_Avg;
 
-   String          tourTitle;
-   String          tourDescription;
+   String       tourTitle;
+   String       tourDescription;
 
-   float           trainingLoad_Tss;
+   float        trainingLoad_Tss;
 
-   String          weatherClouds;
-
-   ArrayList<Long> tagIds;
+   String       weatherClouds;
 
    /**
     * Number of tours in a week
     */
-   int             numTours;
+   int          numTours;
 
    /**
     * Currently only manually created tours can be copied/dragged
     */
-   boolean         isManualTour;
+   boolean      isManualTour;
 
-   LocalDate       tourDate;
+   LocalDate    tourDate;
 
    @Override
    public String toString() {
