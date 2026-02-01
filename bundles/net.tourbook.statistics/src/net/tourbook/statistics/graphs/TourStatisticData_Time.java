@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2026 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -17,48 +17,42 @@ package net.tourbook.statistics.graphs;
 
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
-import java.util.HashMap;
 
 public class TourStatisticData_Time {
 
-   int[]                          allYear_Numbers;
-   int                            numDaysInAllYears;
+   int[]                    allYear_Numbers;
+   int                      numDaysInAllYears;
 
-   long[]                         allTourIds;
-   long[]                         allTypeIds;
+   long[]                   allTourIds;
+   long[]                   allTypeIds;
 
-   int[]                          allTypeColorIndices;
+   int[]                    allTypeColorIndices;
 
    /**
     * Number for all days in each year
     */
-   int[]                          allYear_NumDays;
+   int[]                    allYear_NumDays;
 
-   int[]                          allTourYears;
-   int[]                          allTourMonths;
-   int[]                          allTourDays;
+   int[]                    allTourYears;
+   int[]                    allTourMonths;
+   int[]                    allTourDays;
 
-   int[]                          allTourDOYs;
-   int[]                          allWeeks;
+   int[]                    allTourDOYs;
+   int[]                    allWeeks;
 
-   int[]                          allTourTimeStart;
-   int[]                          allTourTimeEnd;
-   ArrayList<ZonedDateTime>       allTourStartDateTimes;
-   ArrayList<String>              allTourTimeZoneOffsets;
+   int[]                    allTourTimeStart;
+   int[]                    allTourTimeEnd;
+   ArrayList<ZonedDateTime> allTourStartDateTimes;
+   ArrayList<String>        allTourTimeZoneOffsets;
 
-   float[]                        allTourElevations;
-   float[]                        allTourDistances;
+   float[]                  allTourElevations;
+   float[]                  allTourDistances;
 
-   int[]                          allTourDeviceTime_Elapsed;
-   int[]                          allTourDeviceTime_Recorded;
-   int[]                          allTourDeviceTime_Paused;
-   int[]                          allTourComputedTime_Moving;
+   int[]                    allTourDeviceTime_Elapsed;
+   int[]                    allTourDeviceTime_Recorded;
+   int[]                    allTourDeviceTime_Paused;
+   int[]                    allTourComputedTime_Moving;
 
-   ArrayList<String>              allTourTitles;
-   ArrayList<String>              allTourDescriptions;
-
-   /**
-    * Contains the tags for the tour, key is the tour ID
-    */
-   HashMap<Long, ArrayList<Long>> allTagIds;
+   ArrayList<String>        allTourTitles;
+   ArrayList<String>        allTourDescriptions;
 }

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2024 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2026 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -27,8 +27,7 @@ import net.tourbook.common.UI;
 import net.tourbook.common.time.TimeTools;
 import net.tourbook.data.TourPerson;
 import net.tourbook.database.TourDatabase;
-import net.tourbook.tag.tour.filter.TourTagFilterManager;
-import net.tourbook.tag.tour.filter.TourTagFilterSqlJoinBuilder;
+import net.tourbook.tag.tour.filter.TourTagFilter_WithExists;
 import net.tourbook.ui.SQLFilter;
 import net.tourbook.ui.TourTypeFilter;
 
@@ -282,63 +281,8 @@ public class DataProvider_HrZone_Week extends DataProvider {
 
          _weekData = new TourStatisticData_WeekHrZones();
 
-         String sqlFromTourData;
-
-         final SQLFilter sqlAppFilter = new SQLFilter(SQLFilter.ANY_APP_FILTERS);
-
-         final TourTagFilterSqlJoinBuilder tagFilterSqlJoinBuilder = new TourTagFilterSqlJoinBuilder(true);
-
-         if (TourTagFilterManager.isTourTagFilterEnabled()) {
-
-            // with tag filter
-
-            sqlFromTourData = UI.EMPTY_STRING
-
-                  + "FROM (" + NL //                                    //$NON-NLS-1$
-
-                  + "   SELECT" + NL //                                 //$NON-NLS-1$
-
-                  + "      StartWeekYear," + NL //                      //$NON-NLS-1$
-                  + "      StartWeek," + NL //                          //$NON-NLS-1$
-
-                  + "      HrZone0," + NL //                            //$NON-NLS-1$
-                  + "      HrZone1," + NL //                            //$NON-NLS-1$
-                  + "      HrZone2," + NL //                            //$NON-NLS-1$
-                  + "      HrZone3," + NL //                            //$NON-NLS-1$
-                  + "      HrZone4," + NL //                            //$NON-NLS-1$
-                  + "      HrZone5," + NL //                            //$NON-NLS-1$
-                  + "      HrZone6," + NL //                            //$NON-NLS-1$
-                  + "      HrZone7," + NL //                            //$NON-NLS-1$
-                  + "      HrZone8," + NL //                            //$NON-NLS-1$
-                  + "      HrZone9" + NL //                             //$NON-NLS-1$
-
-                  + "   FROM " + TourDatabase.TABLE_TOUR_DATA + NL //   //$NON-NLS-1$
-
-                  // get/filter tag id's
-                  + "   " + tagFilterSqlJoinBuilder.getSqlTagJoinTable() + " jTdataTtag" //        //$NON-NLS-1$ //$NON-NLS-2$
-                  + "   ON TourData.tourId = jTdataTtag.TourData_tourId" + NL //                   //$NON-NLS-1$
-
-                  + "   WHERE StartWeekYear IN (" + getYearList(lastYear, numYears) + ")" + NL //  //$NON-NLS-1$ //$NON-NLS-2$
-                  + "      AND NumberOfHrZones > 0" + NL //                                        //$NON-NLS-1$
-                  + "      " + sqlAppFilter.getWhereClause() + NL //                               //$NON-NLS-1$
-
-                  + ") NecessaryNameOtherwiseItDoNotWork" + NL //                                  //$NON-NLS-1$
-            ;
-
-         } else {
-
-            // without tag filter
-
-            sqlFromTourData = UI.EMPTY_STRING
-
-                  + "FROM " + TourDatabase.TABLE_TOUR_DATA + NL //                                 //$NON-NLS-1$
-
-                  + "WHERE StartWeekYear IN (" + getYearList(lastYear, numYears) + ")" + NL //     //$NON-NLS-1$ //$NON-NLS-2$
-                  + "   AND NumberOfHrZones > 0" + NL //                                           //$NON-NLS-1$
-                  + "   " + sqlAppFilter.getWhereClause() + NL //                                  //$NON-NLS-1$
-
-            ;
-         }
+         final SQLFilter appFilter = new SQLFilter(SQLFilter.ANY_APP_FILTERS_NO_TAG);
+         final TourTagFilter_WithExists tagFilter = new TourTagFilter_WithExists();
 
          sql = UI.EMPTY_STRING
 
@@ -358,7 +302,13 @@ public class DataProvider_HrZone_Week extends DataProvider {
                + "   SUM(CASE WHEN hrZone8 > 0 THEN hrZone8 ELSE 0 END)," + NL //   11 //$NON-NLS-1$
                + "   SUM(CASE WHEN hrZone9 > 0 THEN hrZone9 ELSE 0 END)" + NL //    12 //$NON-NLS-1$
 
-               + sqlFromTourData
+               + "FROM " + TourDatabase.TABLE_TOUR_DATA + NL //                                 //$NON-NLS-1$
+
+               + "WHERE StartWeekYear IN (" + getYearList(lastYear, numYears) + ")" + NL //     //$NON-NLS-1$ //$NON-NLS-2$
+               + "   AND NumberOfHrZones > 0" + NL //                                           //$NON-NLS-1$
+
+               + appFilter.getWhereClause()
+               + tagFilter.getSql()
 
                + "GROUP BY StartWeekYear, StartWeek" + NL //                           //$NON-NLS-1$
                + "ORDER BY StartWeekYear, StartWeek" + NL //                           //$NON-NLS-1$
@@ -369,12 +319,13 @@ public class DataProvider_HrZone_Week extends DataProvider {
          {
             final PreparedStatement prepStmt = conn.prepareStatement(sql);
 
-            int paramIndex = 1;
-            paramIndex = tagFilterSqlJoinBuilder.setParameters(prepStmt, paramIndex);
+            int nextIndex = 1;
 
-            sqlAppFilter.setParameters(prepStmt, paramIndex);
+            nextIndex = appFilter.setParameters(prepStmt, nextIndex);
+            nextIndex = tagFilter.setParameters(prepStmt, nextIndex);
 
             final ResultSet result = prepStmt.executeQuery();
+
             while (result.next()) {
 
                final int dbValue_CW_Year = result.getInt(1);

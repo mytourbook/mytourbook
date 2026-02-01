@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2026 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -30,8 +30,7 @@ import net.tourbook.data.TourPerson;
 import net.tourbook.data.TourType;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.statistic.DurationTime;
-import net.tourbook.tag.tour.filter.TourTagFilterManager;
-import net.tourbook.tag.tour.filter.TourTagFilterSqlJoinBuilder;
+import net.tourbook.tag.tour.filter.TourTagFilter_WithExists;
 import net.tourbook.ui.SQLFilter;
 import net.tourbook.ui.TourTypeFilter;
 
@@ -258,66 +257,8 @@ public class DataProvider_Tour_Year extends DataProvider {
 
          _tourYearData = new TourStatisticData_Year();
 
-         String fromTourData;
-
-         final SQLFilter sqlAppFilter = new SQLFilter(SQLFilter.ANY_APP_FILTERS);
-
-         final TourTagFilterSqlJoinBuilder tagFilterSqlJoinBuilder = new TourTagFilterSqlJoinBuilder(true);
-
-         if (TourTagFilterManager.isTourTagFilterEnabled()) {
-
-            // with tag filter
-
-            fromTourData = NL
-
-                  + "FROM (" + NL //                                                            //$NON-NLS-1$
-
-                  + "   SELECT" + NL //                                                         //$NON-NLS-1$
-
-                  // this is necessary otherwise tours can occur multiple times when a tour contains multiple tags !!!
-                  + "      DISTINCT TourId," + NL //                                            //$NON-NLS-1$
-
-                  + "      StartYear," + NL //                                                  //$NON-NLS-1$
-
-                  + "      TourType_TypeId," + NL //                                            //$NON-NLS-1$
-
-                  + "      TourDeviceTime_Elapsed," + NL //                                     //$NON-NLS-1$
-                  + "      TourDeviceTime_Recorded," + NL //                                    //$NON-NLS-1$
-                  + "      TourDeviceTime_Paused," + NL //                                      //$NON-NLS-1$
-                  + "      TourComputedTime_Moving," + NL //                                    //$NON-NLS-1$
-
-                  + "      TourDistance," + NL //                                               //$NON-NLS-1$
-                  + "      TourAltUp," + NL //                                                  //$NON-NLS-1$
-                  + "      TourAltDown," + NL //                                                //$NON-NLS-1$
-
-                  + "      BodyWeight,         " + NL //       //$NON-NLS-1$
-                  + "      BodyFat          " + NL //       //$NON-NLS-1$
-
-                  + "   FROM " + TourDatabase.TABLE_TOUR_DATA + NL //                           //$NON-NLS-1$
-
-                  // get/filter tag id's
-                  + "   " + tagFilterSqlJoinBuilder.getSqlTagJoinTable() + " jTdataTtag" //     //$NON-NLS-1$ //$NON-NLS-2$
-                  + "   ON TourData.tourId = jTdataTtag.TourData_tourId" + NL //                //$NON-NLS-1$
-
-                  + "   WHERE StartYear IN (" + getYearList(lastYear, numYears) + ")" + NL //   //$NON-NLS-1$ //$NON-NLS-2$
-                  + "      " + sqlAppFilter.getWhereClause() //$NON-NLS-1$
-
-                  + ") NecessaryNameOtherwiseItDoNotWork" + NL //                               //$NON-NLS-1$
-            ;
-
-         } else {
-
-            // without tag filter
-
-            fromTourData = NL
-
-                  + "FROM " + TourDatabase.TABLE_TOUR_DATA + NL //                              //$NON-NLS-1$
-
-                  + "WHERE StartYear IN (" + getYearList(lastYear, numYears) + ")" + NL //      //$NON-NLS-1$ //$NON-NLS-2$
-                  + "   " + sqlAppFilter.getWhereClause() //$NON-NLS-1$
-
-            ;
-         }
+         final SQLFilter appFilter = new SQLFilter(SQLFilter.ANY_APP_FILTERS_NO_TAG);
+         final TourTagFilter_WithExists tagFilter = new TourTagFilter_WithExists();
 
          sql = NL +
 
@@ -342,7 +283,12 @@ public class DataProvider_Tour_Year extends DataProvider {
                + "   AVG( CASE WHEN BodyWeight = 0    THEN NULL ELSE BodyWeight END)," + NL //  12 //$NON-NLS-1$
                + "   AVG( CASE WHEN BodyFat = 0       THEN NULL ELSE BodyFat END)" + NL //      13 //$NON-NLS-1$
 
-               + fromTourData
+               + "FROM " + TourDatabase.TABLE_TOUR_DATA + NL //                              //$NON-NLS-1$
+
+               + "WHERE StartYear IN (" + getYearList(lastYear, numYears) + ")" + NL //      //$NON-NLS-1$ //$NON-NLS-2$
+
+               + appFilter.getWhereClause()
+               + tagFilter.getSql()
 
                + "GROUP BY StartYear, tourType_typeId " + NL //               //$NON-NLS-1$
                + "ORDER BY StartYear" + NL //                                 //$NON-NLS-1$
@@ -392,12 +338,13 @@ public class DataProvider_Tour_Year extends DataProvider {
 
          final PreparedStatement prepStmt = conn.prepareStatement(sql);
 
-         int paramIndex = 1;
-         paramIndex = tagFilterSqlJoinBuilder.setParameters(prepStmt, paramIndex);
+         int nextIndex = 1;
 
-         sqlAppFilter.setParameters(prepStmt, paramIndex);
+         nextIndex = appFilter.setParameters(prepStmt, nextIndex);
+         nextIndex = tagFilter.setParameters(prepStmt, nextIndex);
 
          final ResultSet result = prepStmt.executeQuery();
+
          while (result.next()) {
 
 // SET_FORMATTING_OFF

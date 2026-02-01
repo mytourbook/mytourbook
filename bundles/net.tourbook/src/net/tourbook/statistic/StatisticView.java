@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2025 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2026 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -40,8 +40,7 @@ import net.tourbook.data.TourData;
 import net.tourbook.data.TourPerson;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.preferences.ITourbookPreferences;
-import net.tourbook.tag.tour.filter.TourTagFilterManager;
-import net.tourbook.tag.tour.filter.TourTagFilterSqlJoinBuilder;
+import net.tourbook.tag.tour.filter.TourTagFilter_WithExists;
 import net.tourbook.tour.ITourEventListener;
 import net.tourbook.tour.SelectionDeletedTours;
 import net.tourbook.tour.TourEvent;
@@ -114,7 +113,7 @@ public class StatisticView extends ViewPart implements ITourProvider {
    /**
     * Contains all years which have tours for the selected tour type and person.
     */
-   private IntArrayList                      _availableYears          = new IntArrayList();
+   private IntArrayList                      _allAvailableYears       = new IntArrayList();
 
    /**
     * contains the statistics in the same sort order as the statistic combo box
@@ -557,7 +556,7 @@ public class StatisticView extends ViewPart implements ITourProvider {
 
       int selectedYearIndex = -1;
 
-      if (_availableYears == null) {
+      if (_allAvailableYears == null) {
          return selectedYearIndex;
       }
 
@@ -567,7 +566,7 @@ public class StatisticView extends ViewPart implements ITourProvider {
       if (defaultYear != -1) {
 
          int yearIndex = 0;
-         for (final int year : _availableYears.toArray()) {
+         for (final int year : _allAvailableYears.toArray()) {
 
             if (year == defaultYear) {
 
@@ -583,7 +582,7 @@ public class StatisticView extends ViewPart implements ITourProvider {
        * try to get year index of the selected year
        */
       int yearIndex = 0;
-      for (final int year : _availableYears.toArray()) {
+      for (final int year : _allAvailableYears.toArray()) {
          if (year == _selectedYear) {
             selectedYearIndex = yearIndex;
             break;
@@ -772,7 +771,7 @@ public class StatisticView extends ViewPart implements ITourProvider {
    }
 
    /**
-    * create the year list for all tours and fill the year combobox with the available years
+    * Create the year list for all tours and fill the year combobox with the available years
     */
    private void refreshYearCombobox() {
 
@@ -782,64 +781,29 @@ public class StatisticView extends ViewPart implements ITourProvider {
 
       try (Connection conn = TourDatabase.getInstance().getConnection()) {
 
-         String sqlFromTourData;
-
-         final SQLFilter sqlAppFilter = new SQLFilter(SQLFilter.ANY_APP_FILTERS);
-
-         final TourTagFilterSqlJoinBuilder tagFilterSqlJoinBuilder = new TourTagFilterSqlJoinBuilder();
-
-         if (TourTagFilterManager.isTourTagFilterEnabled()) {
-
-            // with tag filter
-
-            sqlFromTourData = UI.EMPTY_STRING
-
-                  + "FROM (" + NL //                                       //$NON-NLS-1$
-
-                  + "   SELECT" + NL //                                    //$NON-NLS-1$
-                  + "      StartYear" + NL //                              //$NON-NLS-1$
-                  + "   FROM " + TourDatabase.TABLE_TOUR_DATA + NL //      //$NON-NLS-1$
-
-                  // get/filter tag id's
-                  + "   " + tagFilterSqlJoinBuilder.getSqlTagJoinTable() + " jTdataTtag" //     //$NON-NLS-1$ //$NON-NLS-2$
-                  + "   ON TourData.tourId = jTdataTtag.TourData_tourId" + NL //                //$NON-NLS-1$
-
-                  + "   WHERE 1=1" + NL //                                 //$NON-NLS-1$
-                  + "      " + sqlAppFilter.getWhereClause() //            //$NON-NLS-1$
-
-                  + ") NecessaryNameOtherwiseItDoNotWork" + NL //          //$NON-NLS-1$
-            ;
-
-         } else {
-
-            // without tag filter
-
-            sqlFromTourData = UI.EMPTY_STRING
-
-                  + "FROM " + TourDatabase.TABLE_TOUR_DATA + NL //          //$NON-NLS-1$
-
-                  + "WHERE 1=1" + NL //                                    //$NON-NLS-1$
-                  + "   " + sqlAppFilter.getWhereClause() + NL; //         //$NON-NLS-1$
-         }
+         final SQLFilter appFilter = new SQLFilter(SQLFilter.ANY_APP_FILTERS_NO_TAG);
+         final TourTagFilter_WithExists tagFilter = new TourTagFilter_WithExists();
 
          sql = UI.EMPTY_STRING
 
-               + "SELECT" + NL //                                          //$NON-NLS-1$
+               + "SELECT" + NL //                                       //$NON-NLS-1$
+               + "   StartYear" + NL //                                 //$NON-NLS-1$
+               + "FROM " + TourDatabase.TABLE_TOUR_DATA + NL //         //$NON-NLS-1$
+               + "WHERE 1=1" + NL //                                    //$NON-NLS-1$
 
-               + "   StartYear" + NL //                                    //$NON-NLS-1$
+               + appFilter.getWhereClause()
+               + tagFilter.getSql()
 
-               + sqlFromTourData
-
-               + "GROUP BY STARTYEAR" + NL //                              //$NON-NLS-1$
-               + "ORDER BY STARTYEAR" + NL //                              //$NON-NLS-1$
+               + "GROUP BY STARTYEAR" + NL //                           //$NON-NLS-1$
+               + "ORDER BY STARTYEAR" + NL //                           //$NON-NLS-1$
          ;
 
          final PreparedStatement prepStmt = conn.prepareStatement(sql);
 
-         int paramIndex = 1;
-         paramIndex = tagFilterSqlJoinBuilder.setParameters(prepStmt, paramIndex);
+         int nextIndex = 1;
 
-         sqlAppFilter.setParameters(prepStmt, paramIndex);
+         nextIndex = appFilter.setParameters(prepStmt, nextIndex);
+         nextIndex = tagFilter.setParameters(prepStmt, nextIndex);
 
          final ResultSet result = prepStmt.executeQuery();
 
@@ -848,6 +812,7 @@ public class StatisticView extends ViewPart implements ITourProvider {
          }
 
       } catch (final SQLException e) {
+
          SQL.showException(e, sql);
       }
 
@@ -869,11 +834,11 @@ public class StatisticView extends ViewPart implements ITourProvider {
        * not available for every year
        */
       _comboYear.removeAll();
-      _availableYears.clear();
+      _allAvailableYears.clear();
 
       for (int year = firstYear; year <= thisYear; year++) {
 
-         _availableYears.add(year);
+         _allAvailableYears.add(year);
          _comboYear.add(Integer.toString(year));
       }
    }

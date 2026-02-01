@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2021, 2022 Wolfgang Schramm and Contributors
+ * Copyright (C) 2021, 2026 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -22,7 +22,6 @@ import java.sql.SQLException;
 import java.time.ZonedDateTime;
 import java.time.temporal.ChronoField;
 import java.util.ArrayList;
-import java.util.HashMap;
 
 import net.tourbook.common.UI;
 import net.tourbook.common.time.TimeTools;
@@ -31,7 +30,7 @@ import net.tourbook.common.util.SQL;
 import net.tourbook.data.TourPerson;
 import net.tourbook.data.TourType;
 import net.tourbook.database.TourDatabase;
-import net.tourbook.tag.tour.filter.TourTagFilterSqlJoinBuilder;
+import net.tourbook.tag.tour.filter.TourTagFilter_WithExists;
 import net.tourbook.ui.SQLFilter;
 import net.tourbook.ui.TourTypeFilter;
 
@@ -162,6 +161,7 @@ public class DataProvider_Battery extends DataProvider {
     * @param lastYear
     * @param numYears
     * @param isForceUpdate
+    *
     * @return
     */
    TourStatisticData_Battery getTourTimeData(final TourPerson person,
@@ -198,9 +198,8 @@ public class DataProvider_Battery extends DataProvider {
          final ArrayList<TourType> allActiveTourTypes = TourDatabase.getActiveTourTypes();
          final TourType[] allTourTypes = allActiveTourTypes.toArray(new TourType[allActiveTourTypes.size()]);
 
-         final SQLFilter sqlAppFilter = new SQLFilter(SQLFilter.ANY_APP_FILTERS);
-
-         final TourTagFilterSqlJoinBuilder tagFilterSqlJoinBuilder = new TourTagFilterSqlJoinBuilder();
+         final SQLFilter appFilter = new SQLFilter(SQLFilter.ANY_APP_FILTERS_NO_TAG);
+         final TourTagFilter_WithExists tagFilter = new TourTagFilter_WithExists();
 
          final String sqlYears = getYearList(lastYear, numYears);
 
@@ -220,15 +219,9 @@ public class DataProvider_Battery extends DataProvider {
                + "   TourType_typeId," + NL //                                   8  //$NON-NLS-1$
 
                + "   Battery_Percentage_Start," + NL //                          9  //$NON-NLS-1$
-               + "   Battery_Percentage_End," + NL //                            10 //$NON-NLS-1$
-
-               + "   jTdataTtag.TourTag_tagId" + NL //                           11 //$NON-NLS-1$
+               + "   Battery_Percentage_End" + NL //                             10 //$NON-NLS-1$
 
                + "FROM " + TourDatabase.TABLE_TOUR_DATA + NL //                     //$NON-NLS-1$
-
-               // set tag filter id's
-               + tagFilterSqlJoinBuilder.getSqlTagJoinTable() + " jTdataTtag" //    //$NON-NLS-1$
-               + " ON TourId = jTdataTtag.TourData_tourId" + NL //                  //$NON-NLS-1$
 
                + "WHERE" + NL //                                                    //$NON-NLS-1$
 
@@ -236,7 +229,9 @@ public class DataProvider_Battery extends DataProvider {
                + "   Battery_Percentage_Start > -1 AND " + NL //                    //$NON-NLS-1$
 
                + "   StartYear IN (" + sqlYears + ")" + NL //                       //$NON-NLS-1$ //$NON-NLS-2$
-               + sqlAppFilter.getWhereClause() + NL //
+
+               + appFilter.getWhereClause()
+               + tagFilter.getSql()
 
                + "ORDER BY TourStartTime" + NL //                                   //$NON-NLS-1$
          ;
@@ -259,125 +254,95 @@ public class DataProvider_Battery extends DataProvider {
          final ArrayList<ZonedDateTime> allTourStartDateTime = new ArrayList<>();
          final ArrayList<String> allTourTimeOffset = new ArrayList<>();
 
-         final HashMap<Long, ArrayList<Long>> allTagIds = new HashMap<>();
-
-//         final float lastBatteryPerformance = 0;
-         long lastTourId = -1;
-         ArrayList<Long> tagIds = null;
-
          final PreparedStatement prepStmt = conn.prepareStatement(sql);
 
-         int paramIndex = 1;
-         paramIndex = tagFilterSqlJoinBuilder.setParameters(prepStmt, paramIndex);
+         int nextIndex = 1;
 
-         sqlAppFilter.setParameters(prepStmt, paramIndex);
+         nextIndex = appFilter.setParameters(prepStmt, nextIndex);
+         nextIndex = tagFilter.setParameters(prepStmt, nextIndex);
 
          final ResultSet result = prepStmt.executeQuery();
+
          while (result.next()) {
-
-            final long dbTourId = result.getLong(1);
-            final Object dbTagId = result.getObject(11);
-
-            if (dbTourId == lastTourId) {
-
-               // get additional tags from outer join
-
-               if (dbTagId instanceof Long) {
-                  tagIds.add((Long) dbTagId);
-               }
-
-            } else {
-
-               // get first record for a tour
-
-               allTourIds.add(dbTourId);
 
 // SET_FORMATTING_OFF
 
-               final int dbTourYear                   = result.getShort(2);
-               final int dbTourMonth                  = result.getShort(3);
-               final int dbTourStartWeek              = result.getInt(4);
-               final long dbStartTimeMilli            = result.getLong(5);
-               final String dbTimeZoneId              = result.getString(6);
-//               final int dbElapsedTime                = result.getInt(7);
+            allTourIds.add(result.getLong(1));
 
-               final Object dbTourTypeIdObject        = result.getObject(8);
+            final int dbTourYear                   = result.getShort(2);
+            final int dbTourMonth                  = result.getShort(3);
+            final int dbTourStartWeek              = result.getInt(4);
+            final long dbStartTimeMilli            = result.getLong(5);
+            final String dbTimeZoneId              = result.getString(6);
+//          final int dbElapsedTime                = result.getInt(7);
 
-               final short dbBatteryPercentage_Start  = result.getShort(9);
-               final short dbBatteryPercentage_End    = result.getShort(10);
+            final Object dbTourTypeIdObject        = result.getObject(8);
+
+            final short dbBatteryPercentage_Start  = result.getShort(9);
+            final short dbBatteryPercentage_End    = result.getShort(10);
 
 // SET_FORMATTING_ON
 
-               final TourDateTime tourDateTime = TimeTools.createTourDateTime(dbStartTimeMilli, dbTimeZoneId);
-               final ZonedDateTime zonedStartDateTime = tourDateTime.tourZonedDateTime;
+            final TourDateTime tourDateTime = TimeTools.createTourDateTime(dbStartTimeMilli, dbTimeZoneId);
+            final ZonedDateTime zonedStartDateTime = tourDateTime.tourZonedDateTime;
 
-               // get number of days for the year, start with 0
-               final int tourDOY = zonedStartDateTime.get(ChronoField.DAY_OF_YEAR) - 1;
+            // get number of days for the year, start with 0
+            final int tourDOY = zonedStartDateTime.get(ChronoField.DAY_OF_YEAR) - 1;
 
-               zonedStartDateTime.getDayOfMonth();
+            zonedStartDateTime.getDayOfMonth();
 
-               allTourYear.add(dbTourYear);
-               allTourMonths.add(dbTourMonth);
-               allTourDays.add(zonedStartDateTime.getDayOfMonth());
+            allTourYear.add(dbTourYear);
+            allTourMonths.add(dbTourMonth);
+            allTourDays.add(zonedStartDateTime.getDayOfMonth());
 
-               allYearsDOY.add(getYearDOYs(dbTourYear) + tourDOY);
-               allTourStartWeek.add(dbTourStartWeek);
+            allYearsDOY.add(getYearDOYs(dbTourYear) + tourDOY);
+            allTourStartWeek.add(dbTourStartWeek);
 
-               // tour start date/time
-               allTourStartDateTime.add(zonedStartDateTime);
-               allTourTimeOffset.add(tourDateTime.timeZoneOffsetLabel);
+            // tour start date/time
+            allTourStartDateTime.add(zonedStartDateTime);
+            allTourTimeOffset.add(tourDateTime.timeZoneOffsetLabel);
 
-               allBatteryPercentage_Start.add(dbBatteryPercentage_Start);
-               allBatteryPercentage_End.add(dbBatteryPercentage_End);
+            allBatteryPercentage_Start.add(dbBatteryPercentage_Start);
+            allBatteryPercentage_End.add(dbBatteryPercentage_End);
 
-//               final int batteryDiff = dbBatteryPercentage_Start - dbBatteryPercentage_End;
-//               final float batteryPerformance = batteryDiff < 20
+//          final int batteryDiff = dbBatteryPercentage_Start - dbBatteryPercentage_End;
+//          final float batteryPerformance = batteryDiff < 20
 //
-//                     // ignore values which are too small because these values have a higher error
-//                     ? lastBatteryPerformance
+//                // ignore values which are too small because these values have a higher error
+//                ? lastBatteryPerformance
 //
-//                     : dbElapsedTime / batteryDiff;
+//                : dbElapsedTime / batteryDiff;
 //
-//               lastBatteryPerformance = batteryPerformance;
+//          lastBatteryPerformance = batteryPerformance;
 //
-//               allBatteryPercentage_Start.add((short) batteryPerformance);
+//          allBatteryPercentage_Start.add((short) batteryPerformance);
 
-               if (dbTagId instanceof Long) {
-                  tagIds = new ArrayList<>();
-                  tagIds.add((Long) dbTagId);
+            /*
+             * Convert type id to the type index in the tour type array, this is also the
+             * color index for the tour type
+             */
+            int colorIndex = 0;
+            long dbTypeId = TourDatabase.ENTITY_IS_NOT_SAVED;
 
-                  allTagIds.put(dbTourId, tagIds);
-               }
+            if (dbTourTypeIdObject instanceof Long) {
 
-               /*
-                * Convert type id to the type index in the tour type array, this is also the
-                * color index for the tour type
-                */
-               int colorIndex = 0;
-               long dbTypeId = TourDatabase.ENTITY_IS_NOT_SAVED;
+               dbTypeId = (Long) dbTourTypeIdObject;
 
-               if (dbTourTypeIdObject instanceof Long) {
-
-                  dbTypeId = (Long) dbTourTypeIdObject;
-
-                  for (int typeIndex = 0; typeIndex < allTourTypes.length; typeIndex++) {
-                     if (allTourTypes[typeIndex].getTypeId() == dbTypeId) {
-                        colorIndex = typeIndex;
-                        break;
-                     }
+               for (int typeIndex = 0; typeIndex < allTourTypes.length; typeIndex++) {
+                  if (allTourTypes[typeIndex].getTypeId() == dbTypeId) {
+                     colorIndex = typeIndex;
+                     break;
                   }
                }
-
-               // paint graph with tour type color
-               allTypeColorIndex.add(colorIndex);
-
-               // paint graph with 1st tour type color
-//             allTypeColorIndex.add(0);
-
-               allTypeIds.add(dbTypeId);
             }
 
-            lastTourId = dbTourId;
+            // paint graph with tour type color
+            allTypeColorIndex.add(colorIndex);
+
+            // paint graph with 1st tour type color
+//          allTypeColorIndex.add(0);
+
+            allTypeIds.add(dbTypeId);
          }
 
          // get number of days for all years
@@ -395,8 +360,6 @@ public class DataProvider_Battery extends DataProvider {
 
          _batteryData.allTypeIds = allTypeIds.toArray();
          _batteryData.allTypeColorIndices = allTypeColorIndex.toArray();
-
-         _batteryData.allTagIds = allTagIds;
 
          _batteryData.numDaysInAllYears = numDaysInAllYears;
          _batteryData.allYear_NumDays = allYear_NumDays;
