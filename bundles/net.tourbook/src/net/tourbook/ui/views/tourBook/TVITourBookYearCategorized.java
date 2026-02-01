@@ -109,8 +109,6 @@ public class TVITourBookYearCategorized extends TVITourBookItem {
 
       try (Connection conn = TourDatabase.getInstance().getConnection()) {
 
-//         TourDatabase.enableRuntimeStatistics(conn);
-
          final PreparedStatement prepStmt = conn.prepareStatement(sql);
 
          int nextIndex = 1;
@@ -123,8 +121,6 @@ public class TVITourBookYearCategorized extends TVITourBookItem {
          nextIndex = tagFilter.setParameters(prepStmt, nextIndex);
 
          fetchTourItems(prepStmt);
-
-//         TourDatabase.disableRuntimeStatistic(conn);
 
       } catch (final SQLException e) {
          SQL.showException(e, sql);

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2026 Wolfgang Schramm and Contributors
+ * Copyright (C) 2026 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -28,6 +28,7 @@ import net.tourbook.common.UI;
 import net.tourbook.common.time.TimeTools;
 import net.tourbook.common.util.TreeViewerItem;
 import net.tourbook.database.TourDatabase;
+import net.tourbook.tag.tour.filter.TourTagFilter_WithExists;
 import net.tourbook.ui.SQLFilter;
 
 import org.eclipse.jface.viewers.TreeViewer;
@@ -164,7 +165,8 @@ public class TVIEquipmentView_Part_Year extends TVIEquipmentView_Item {
 
       try (Connection conn = TourDatabase.getInstance().getConnection()) {
 
-         final SQLFilter sqlFilter = new SQLFilter();
+         final SQLFilter appFilter = new SQLFilter(SQLFilter.ANY_APP_FILTERS_NO_TAG);
+         final TourTagFilter_WithExists tagFilter = new TourTagFilter_WithExists();
 
          final String sql = UI.EMPTY_STRING
 
@@ -188,7 +190,8 @@ public class TVIEquipmentView_Part_Year extends TVIEquipmentView_Item {
                + "   AND TourData.tourstarttime <  part.dateUntil" + NL //                      //$NON-NLS-1$
                + "   AND TourData.StartYear = ?" + NL //                                        //$NON-NLS-1$
 
-               + sqlFilter.getWhereClause() + NL
+               + appFilter.getWhereClause()
+               + tagFilter.getSql()
 
                + "WHERE part.iscollate = TRUE" + NL //                                          //$NON-NLS-1$
                + "   AND part.partid = ?" + NL //                                               //$NON-NLS-1$
@@ -200,14 +203,14 @@ public class TVIEquipmentView_Part_Year extends TVIEquipmentView_Item {
 
          final PreparedStatement statement = conn.prepareStatement(sql);
 
-         // parameter: 1
-         statement.setLong(1, _year);
+         int nextIndex = 1;
 
-         // parameter: 2
-         final int nextIndex = sqlFilter.setParameters(statement, 2);
+         statement.setLong(nextIndex++, _year);
 
-         // parameter: next
-         statement.setLong(nextIndex, _partItem.getPartID());
+         nextIndex = appFilter.setParameters(statement, nextIndex);
+         nextIndex = tagFilter.setParameters(statement, nextIndex);
+
+         statement.setLong(nextIndex++, _partItem.getPartID());
 
          final ResultSet result = statement.executeQuery();
 
@@ -253,7 +256,8 @@ public class TVIEquipmentView_Part_Year extends TVIEquipmentView_Item {
 
       try (Connection conn = TourDatabase.getInstance().getConnection()) {
 
-         final SQLFilter sqlFilter = new SQLFilter();
+         final SQLFilter appFilter = new SQLFilter(SQLFilter.ANY_APP_FILTERS_NO_TAG);
+         final TourTagFilter_WithExists tagFilter = new TourTagFilter_WithExists();
 
          /*
           * Load: Part, Year, Tour
@@ -275,7 +279,8 @@ public class TVIEquipmentView_Part_Year extends TVIEquipmentView_Item {
                + "   AND TourData.tourstarttime <  part.dateUntil" + NL //                         //$NON-NLS-1$
                + "   AND TourData.StartYear = ?" + NL //                                           //$NON-NLS-1$
 
-               + sqlFilter.getWhereClause() + NL
+               + appFilter.getWhereClause()
+               + tagFilter.getSql()
 
                // get all equipment id's
                + "LEFT JOIN " + TourDatabase.JOINTABLE__TOURDATA__EQUIPMENT + " AS jTdataEq" + NL //   //$NON-NLS-1$ //$NON-NLS-2$
@@ -297,14 +302,14 @@ public class TVIEquipmentView_Part_Year extends TVIEquipmentView_Item {
 
          final PreparedStatement statement = conn.prepareStatement(sql);
 
-         // 1
-         statement.setLong(1, _year);
+         int nextIndex = 1;
 
-         // 2
-         final int nextIndex = sqlFilter.setParameters(statement, 2);
+         statement.setLong(nextIndex++, _year);
 
-         // next
-         statement.setLong(nextIndex, _partItem.getPartID());
+         nextIndex = appFilter.setParameters(statement, nextIndex);
+         nextIndex = tagFilter.setParameters(statement, nextIndex);
+
+         statement.setLong(nextIndex++, _partItem.getPartID());
 
          final ResultSet result = statement.executeQuery();
 

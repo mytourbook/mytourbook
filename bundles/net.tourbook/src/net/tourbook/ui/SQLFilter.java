@@ -104,6 +104,7 @@ public class SQLFilter {
     * Tours are always filtered by
     * <p>
     * <li>Person</li>
+    * <li>Photo</li>
     * <li>Tour Type</li>
     * <li>Tour Data</li>
     * <p>

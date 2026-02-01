@@ -30,6 +30,7 @@ import net.tourbook.common.util.TreeViewerItem;
 import net.tourbook.common.util.Util;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.preferences.ITourbookPreferences;
+import net.tourbook.tag.tour.filter.TourTagFilter_WithExists;
 import net.tourbook.ui.SQLFilter;
 
 import org.eclipse.jface.preference.IPreferenceStore;
@@ -203,7 +204,8 @@ public abstract class TVIEquipmentView_Item extends TreeViewerItem {
 
       try (Connection conn = TourDatabase.getInstance().getConnection()) {
 
-         final SQLFilter sqlFilter = new SQLFilter();
+         final SQLFilter appFilter = new SQLFilter(SQLFilter.ANY_APP_FILTERS_NO_TAG);
+         final TourTagFilter_WithExists tagFilter = new TourTagFilter_WithExists();
 
          sql = UI.EMPTY_STRING
 
@@ -221,7 +223,8 @@ public abstract class TVIEquipmentView_Item extends TreeViewerItem {
                + "JOIN TourData AS TourData" + NL //                                         //$NON-NLS-1$
                + "   ON TourData.tourid = j_td_eq.tourdata_tourid" + NL //                   //$NON-NLS-1$
 
-               + sqlFilter.getWhereClause() + NL
+               + appFilter.getWhereClause()
+               + tagFilter.getSql()
 
                + "GROUP BY " + NL //                                                         //$NON-NLS-1$
                + "   j_TD_EQ.EQUIPMENT_EQUIPMENTID" + NL //                                  //$NON-NLS-1$
@@ -229,7 +232,10 @@ public abstract class TVIEquipmentView_Item extends TreeViewerItem {
 
          statement = conn.prepareStatement(sql);
 
-         sqlFilter.setParameters(statement, 1);
+         int nextIndex = 1;
+
+         nextIndex = appFilter.setParameters(statement, nextIndex);
+         nextIndex = tagFilter.setParameters(statement, nextIndex);
 
          final ResultSet result = statement.executeQuery();
 
@@ -260,7 +266,8 @@ public abstract class TVIEquipmentView_Item extends TreeViewerItem {
 
       try (Connection conn = TourDatabase.getInstance().getConnection()) {
 
-         final SQLFilter sqlFilter = new SQLFilter();
+         final SQLFilter appFilter = new SQLFilter(SQLFilter.ANY_APP_FILTERS_NO_TAG);
+         final TourTagFilter_WithExists tagFilter = new TourTagFilter_WithExists();
 
          sql = UI.EMPTY_STRING
 
@@ -281,7 +288,8 @@ public abstract class TVIEquipmentView_Item extends TreeViewerItem {
                + "  AND TourData.tourstarttime >= equipment.dateFrom" + NL //                //$NON-NLS-1$
                + "  AND TourData.tourstarttime <  equipment.dateUntil" + NL //               //$NON-NLS-1$
 
-               + sqlFilter.getWhereClause() + NL
+               + appFilter.getWhereClause()
+               + tagFilter.getSql()
 
                + "WHERE equipment.iscollate = true" + NL //                                  //$NON-NLS-1$
 
@@ -290,7 +298,10 @@ public abstract class TVIEquipmentView_Item extends TreeViewerItem {
 
          statement = conn.prepareStatement(sql);
 
-         sqlFilter.setParameters(statement, 1);
+         int nextIndex = 1;
+
+         nextIndex = appFilter.setParameters(statement, nextIndex);
+         nextIndex = tagFilter.setParameters(statement, nextIndex);
 
          final ResultSet result = statement.executeQuery();
 
@@ -328,7 +339,8 @@ public abstract class TVIEquipmentView_Item extends TreeViewerItem {
 
       try (Connection conn = TourDatabase.getInstance().getConnection()) {
 
-         final SQLFilter sqlFilter = new SQLFilter();
+         final SQLFilter appFilter = new SQLFilter(SQLFilter.ANY_APP_FILTERS_NO_TAG);
+         final TourTagFilter_WithExists tagFilter = new TourTagFilter_WithExists();
 
          sql = UI.EMPTY_STRING
 
@@ -361,7 +373,9 @@ public abstract class TVIEquipmentView_Item extends TreeViewerItem {
                + "      ON TourData.tourid = j_td_eq.tourdata_tourid" + NL //                      //$NON-NLS-1$
                + "      AND TourData.tourstarttime >= part.dateFrom" + NL //                       //$NON-NLS-1$
                + "      AND TourData.tourstarttime <  part.dateUntil" + NL //                      //$NON-NLS-1$
-               + sqlFilter.getWhereClause() + NL
+
+               + appFilter.getWhereClause()
+               + tagFilter.getSql()
 
                + "   WHERE part.iscollate = TRUE" + NL //                                          //$NON-NLS-1$
                + "      AND part.partID = ?" + NL //                                               //$NON-NLS-1$
@@ -379,8 +393,12 @@ public abstract class TVIEquipmentView_Item extends TreeViewerItem {
 
          statement = conn.prepareStatement(sql);
 
-         final int nextIndex = sqlFilter.setParameters(statement, 1);
-         statement.setLong(nextIndex, partItem.getPartID());
+         int nextIndex = 1;
+
+         nextIndex = appFilter.setParameters(statement, nextIndex);
+         nextIndex = tagFilter.setParameters(statement, nextIndex);
+
+         statement.setLong(nextIndex++, partItem.getPartID());
 
          final ResultSet result = statement.executeQuery();
 
