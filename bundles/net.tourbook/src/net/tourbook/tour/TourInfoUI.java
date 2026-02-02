@@ -226,7 +226,7 @@ public class TourInfoUI implements ICanHideTooltip {
    private Composite        _shellContainer;
    private Composite        _ttContainer;
 
-   private CLabel           _lblClouds;
+   private CLabel           _lblCloud_Image;
    private CLabel           _lblTourType_Image;
 
    private Label            _lblAirQuality;
@@ -1210,8 +1210,8 @@ public class TourInfoUI implements ICanHideTooltip {
       createUI_Label(parent, Messages.Tour_Tooltip_Label_Clouds);
 
       // Icon: clouds
-      _lblClouds = new CLabel(parent, SWT.TRAIL);
-      GridDataFactory.fillDefaults().align(SWT.END, SWT.FILL).applyTo(_lblClouds);
+      _lblCloud_Image = new CLabel(parent, SWT.TRAIL);
+      GridDataFactory.fillDefaults().align(SWT.END, SWT.FILL).applyTo(_lblCloud_Image);
 
       // text: clouds
       _lblCloudsUnit = createUI_LabelValue(parent, SWT.LEAD);
@@ -1855,7 +1855,7 @@ public class TourInfoUI implements ICanHideTooltip {
 
 
 // SET_FORMATTING_OFF
-      
+
       final Set<TourTag> allTags          = _tourData.getTourTags();
       final Set<Equipment> allEquipment   = _tourData.getEquipment();
 
@@ -2373,7 +2373,7 @@ public class TourInfoUI implements ICanHideTooltip {
          final String cloudText = IWeather.CLOUD_TEXT[weatherIndex];
          final String cloudImageName = IWeather.CLOUD_ICON[weatherIndex];
 
-         _lblClouds.setImage(UI.IMAGE_REGISTRY.get(cloudImageName));
+         _lblCloud_Image.setImage(UI.IMAGE_REGISTRY.get(cloudImageName));
          _lblCloudsUnit.setText(cloudText.equals(IWeather.cloudIsNotDefined) ? UI.EMPTY_STRING : cloudText);
       }
 
@@ -2708,7 +2708,7 @@ public class TourInfoUI implements ICanHideTooltip {
                display.getSystemColor(SWT.COLOR_INFO_FOREGROUND),
                display.getSystemColor(SWT.COLOR_INFO_BACKGROUND));
 
-// For debugging         
+// For debugging
 //         UI.setColorForAllChildren(parent,
 //               UI.SYS_COLOR_RED,
 //               UI.SYS_COLOR_GREEN);

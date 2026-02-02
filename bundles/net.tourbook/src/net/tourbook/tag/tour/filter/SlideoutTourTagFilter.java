@@ -434,8 +434,7 @@ public class SlideoutTourTagFilter extends AdvancedSlideout implements ITreeView
    public SlideoutTourTagFilter(final ToolItem toolItem,
                                 final IDialogSettings state) {
 
-      super(
-            toolItem.getParent(),
+      super(toolItem.getParent(),
             state,
             new int[] { 700, 400, 700, 400 });
 
@@ -443,7 +442,9 @@ public class SlideoutTourTagFilter extends AdvancedSlideout implements ITreeView
       _state = state;
 
       setShellFadeOutDelaySteps(30);
+
       setTitleText(Messages.Slideout_TourTagFilter_Label_Title);
+      setTitleImage(TourbookPlugin.getThemedImageDescriptor(Images.TourTagFilter));
    }
 
    private void addTourEventListener() {
@@ -1468,7 +1469,6 @@ public class SlideoutTourTagFilter extends AdvancedSlideout implements ITreeView
       if (allTagIDs.size() == 0) {
          return;
       }
-
 
       final ArrayList<TVIPrefTag> allTagItems = new ArrayList<>(allTagIDs.size());
 

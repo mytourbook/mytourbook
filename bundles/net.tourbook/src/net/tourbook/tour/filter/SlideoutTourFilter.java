@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2025 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2026 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -26,7 +26,9 @@ import java.time.MonthDay;
 import java.util.ArrayList;
 import java.util.Collections;
 
+import net.tourbook.Images;
 import net.tourbook.Messages;
+import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.CommonActivator;
 import net.tourbook.common.UI;
 import net.tourbook.common.dialog.MessageDialog_OnTop;
@@ -195,7 +197,9 @@ public class SlideoutTourFilter extends AdvancedSlideout {
       _tourFilterItem = toolItem;
 
       setShellFadeOutDelaySteps(30);
+
       setTitleText(Messages.Slideout_TourFilter_Label_Title);
+      setTitleImage(TourbookPlugin.getThemedImageDescriptor(Images.TourFilter));
    }
 
    void action_PropertyCopy(final TourFilterProperty filterProperty) {

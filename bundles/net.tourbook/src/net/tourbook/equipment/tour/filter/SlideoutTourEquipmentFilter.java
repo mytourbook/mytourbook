@@ -570,7 +570,9 @@ public class SlideoutTourEquipmentFilter extends AdvancedSlideout implements ITr
       _state = state;
 
       setShellFadeOutDelaySteps(30);
+
       setTitleText("Tour Equipment Filter");
+      setTitleImage(TourbookPlugin.getThemedImageDescriptor(Images.Equipment_Filter));
    }
 
    private void addTourEventListener() {

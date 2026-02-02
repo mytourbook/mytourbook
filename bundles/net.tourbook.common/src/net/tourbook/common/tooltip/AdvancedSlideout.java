@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2024 Wolfgang Schramm and Contributors
+ * Copyright (C) 2017, 2026 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -26,11 +26,14 @@ import org.eclipse.jface.action.ToolBarManager;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
+import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.custom.CLabel;
 import org.eclipse.swt.events.MouseAdapter;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseTrackListener;
 import org.eclipse.swt.graphics.Cursor;
+import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.GridData;
@@ -74,6 +77,8 @@ public abstract class AdvancedSlideout extends AdvancedSlideoutShell {
    private Cursor    _cursorHand;
 
    private ToolBar   _toolbarSlideoutActions;
+
+   private Image     _imgTitle;
 
    private class ActionCloseSlideout extends Action {
 
@@ -208,6 +213,11 @@ public abstract class AdvancedSlideout extends AdvancedSlideoutShell {
       return container;
    }
 
+   /**
+    * Overwrite this to create the first controls of the title bar
+    *
+    * @param parent
+    */
    protected void createTitleBar_FirstControls(final Composite parent) {
 
       // create default content
@@ -248,20 +258,49 @@ public abstract class AdvancedSlideout extends AdvancedSlideoutShell {
 
    private void createUI_10_ActionBar(final Composite parent) {
 
+      final int bottom = _imgTitle == null
+
+            // default bottom spacing
+            ? 3
+
+            // the image creates additional pixel at the bottom
+            : 0;
+
       _titleContainer = new Composite(parent, SWT.NONE);
       GridDataFactory.fillDefaults().grab(true, false).applyTo(_titleContainer);
       GridLayoutFactory.fillDefaults()
-            .numColumns(4)
-            .extendedMargins(0, 0, 0, 3)
+            .numColumns(5)
+            .extendedMargins(0, 0, 0, bottom)
             .spacing(0, 0)
             .applyTo(_titleContainer);
-//      _titleContainer.setBackground(UI.SYS_COLOR_YELLOW);
+//      _titleContainer.setBackground(UI.SYS_COLOR_BLUE);
       {
+         createUI_10_Header_Icon(_titleContainer);
          createTitleBar_FirstControls(_titleContainer);
          createUI_12_Header_Draggable(_titleContainer);
          createTitleBarControls(_titleContainer);
          createUI_14_Header_Toolbar(_titleContainer);
       }
+   }
+
+   private void createUI_10_Header_Icon(final Composite parent) {
+
+      final CLabel lblTitleImage = new CLabel(parent, SWT.TRAIL);
+
+      // the default is to hide the image
+      int widthHint = 0;
+
+      if (_imgTitle != null) {
+
+         widthHint = SWT.DEFAULT;
+
+         lblTitleImage.setImage(_imgTitle);
+      }
+
+      GridDataFactory.fillDefaults()
+            .align(SWT.BEGINNING, SWT.BEGINNING)
+            .hint(widthHint, SWT.DEFAULT)
+            .applyTo(lblTitleImage);
    }
 
    private void createUI_12_Header_Draggable(final Composite container) {
@@ -465,6 +504,8 @@ public abstract class AdvancedSlideout extends AdvancedSlideoutShell {
 
       _cursorResize.dispose();
       _cursorHand.dispose();
+
+      UI.disposeResource(_imgTitle);
    }
 
    protected abstract void onFocus();
@@ -580,6 +621,16 @@ public abstract class AdvancedSlideout extends AdvancedSlideoutShell {
    public void setSlideoutLocation(final SlideoutLocation slideoutLocation) {
 
       _slideoutLocation = slideoutLocation;
+   }
+
+   /**
+    * Image descriptor for the tooltip title
+    *
+    * @param imageDescriptor
+    */
+   protected void setTitleImage(final ImageDescriptor imageDescriptor) {
+
+      _imgTitle = imageDescriptor.createImage();
    }
 
    protected void setTitleText(final String titleText) {
