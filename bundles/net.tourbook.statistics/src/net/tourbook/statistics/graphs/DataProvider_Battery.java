@@ -30,7 +30,6 @@ import net.tourbook.common.util.SQL;
 import net.tourbook.data.TourPerson;
 import net.tourbook.data.TourType;
 import net.tourbook.database.TourDatabase;
-import net.tourbook.tag.tour.filter.TourTagFilter_WithExists;
 import net.tourbook.ui.SQLFilter;
 import net.tourbook.ui.TourTypeFilter;
 
@@ -198,8 +197,7 @@ public class DataProvider_Battery extends DataProvider {
          final ArrayList<TourType> allActiveTourTypes = TourDatabase.getActiveTourTypes();
          final TourType[] allTourTypes = allActiveTourTypes.toArray(new TourType[allActiveTourTypes.size()]);
 
-         final SQLFilter appFilter = new SQLFilter(SQLFilter.ANY_APP_FILTERS_NO_TAG);
-         final TourTagFilter_WithExists tagFilter = new TourTagFilter_WithExists();
+         final SQLFilter appFilter = new SQLFilter(SQLFilter.ANY_APP_FILTERS);
 
          final String sqlYears = getYearList(lastYear, numYears);
 
@@ -231,7 +229,6 @@ public class DataProvider_Battery extends DataProvider {
                + "   StartYear IN (" + sqlYears + ")" + NL //                       //$NON-NLS-1$ //$NON-NLS-2$
 
                + appFilter.getWhereClause()
-               + tagFilter.getSql()
 
                + "ORDER BY TourStartTime" + NL //                                   //$NON-NLS-1$
          ;
@@ -259,7 +256,6 @@ public class DataProvider_Battery extends DataProvider {
          int nextIndex = 1;
 
          nextIndex = appFilter.setParameters(prepStmt, nextIndex);
-         nextIndex = tagFilter.setParameters(prepStmt, nextIndex);
 
          final ResultSet result = prepStmt.executeQuery();
 

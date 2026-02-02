@@ -177,35 +177,10 @@ public class TourTagFilterManager {
    }
 
    /**
-    * @return Returns <code>true</code> when the filter tags are OR'ed or the tour tag filter is not
-    *         enabled, otherwise tags's are AND'ed
-    */
-   public static boolean isNoTagsFilter_Or_CombineTagsWithOr() {
-
-      boolean isNoTagFilter_Or_CombineTagsWithOr = true;
-      final boolean isTourTagFilterEnabled = isTourTagFilterEnabled();
-
-      if (isTourTagFilterEnabled && isOrOperator() == false) {
-         isNoTagFilter_Or_CombineTagsWithOr = false;
-      }
-
-      return isNoTagFilter_Or_CombineTagsWithOr;
-   }
-
-   /**
-    * @return Returns <code>true</code> when the active filter tags are OR'ed, otherwise tags's are
-    *         AND'ed
-    */
-   public static boolean isOrOperator() {
-
-      return getSelectedProfile().isOrOperator;
-   }
-
-   /**
     * @return Returns <code>true</code> when a tour tag filter is enabled in the current tour tag
     *         filter profile.
     */
-   public static boolean isTourTagFilterEnabled() {
+   public static boolean isFilterEnabled() {
 
       if (_selectedProfile == null) {
          return false;

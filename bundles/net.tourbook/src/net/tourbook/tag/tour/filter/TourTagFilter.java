@@ -15,8 +15,6 @@
  *******************************************************************************/
 package net.tourbook.tag.tour.filter;
 
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -26,20 +24,16 @@ import net.tourbook.common.util.SQLData;
 /**
  * The SQL EXISTS statement is from the github KI copilot optimizations
  */
-public class TourTagFilter_WithExists {
+public class TourTagFilter {
 
    private static final char   NL                  = UI.NEW_LINE;
 
    private static final String PARAMETER_FIRST     = " ?";       //$NON-NLS-1$
    private static final String PARAMETER_FOLLOWING = ", ?";      //$NON-NLS-1$
 
-   private boolean             _isEnabled;
-
    private SQLData             _sqlData;
 
-   public TourTagFilter_WithExists() {
-
-      _isEnabled = TourTagFilterManager.isTourTagFilterEnabled();
+   public TourTagFilter() {
 
       setupSQL();
    }
@@ -74,37 +68,9 @@ public class TourTagFilter_WithExists {
       return sb;
    }
 
-   /**
-    * @return Returns a SQL WHERE AND statement
-    */
-   public String getSql() {
+   public SQLData getSqlData() {
 
-      return _sqlData.getSqlString();
-   }
-
-   /**
-    * Sets the SQL tag parameters when necessary
-    *
-    * @param prepStmt
-    * @param paramIndex_From
-    *
-    * @return Returns the next parameter index which can be used for setting the next parameter
-    *
-    * @throws SQLException
-    */
-   public int setParameters(final PreparedStatement prepStmt, final int paramIndex_From) throws SQLException {
-
-      int paramIndex = paramIndex_From;
-
-      // set sql tag parameters
-      if (_isEnabled) {
-
-         _sqlData.setParameters(prepStmt, paramIndex);
-
-         paramIndex = _sqlData.getLastParameterIndex();
-      }
-
-      return paramIndex;
+      return _sqlData;
    }
 
    private void setupSQL() {
@@ -113,13 +79,15 @@ public class TourTagFilter_WithExists {
 
       final List<Object> allSQLParameters = new ArrayList<>();
 
-      if (_isEnabled) {
+      if (TourTagFilterManager.isFilterEnabled()) {
 
-         if (TourTagFilterManager.isOrOperator()) {
+         final TourTagFilterProfile selectedProfile = TourTagFilterManager.getSelectedProfile();
+
+         if (selectedProfile.isOrOperator) {
 
             // combine tags with OR
 
-            final StringBuilder sqlParameterString = createOR_Parameters(allSQLParameters);
+            final StringBuilder sqlParameters = createOR_Parameters(allSQLParameters);
 
             /* require tour to have at least one of these tags (index-friendly) */
             sql = UI.EMPTY_STRING
@@ -129,7 +97,7 @@ public class TourTagFilter_WithExists {
                   + "  SELECT 1" + NL //                                                     //$NON-NLS-1$
                   + "  FROM TOURDATA_TOURTAG AS tt" + NL //                                  //$NON-NLS-1$
                   + "  WHERE tt.TOURDATA_TOURID = TourData.tourID" + NL //                   //$NON-NLS-1$
-                  + "    AND tt.TOURTAG_TAGID IN (" + sqlParameterString + ")" + NL //       //$NON-NLS-1$ //$NON-NLS-2$
+                  + "    AND tt.TOURTAG_TAGID IN (" + sqlParameters + ")" + NL //            //$NON-NLS-1$ //$NON-NLS-2$
                   + ")" + NL //                                                              //$NON-NLS-1$
             ;
 
@@ -141,7 +109,7 @@ public class TourTagFilter_WithExists {
             // AND EXISTS (SELECT 1 FROM TOURDATA_TOURTAG AS tt WHERE tt.TOURDATA_TOURID = TourData.tourId AND tt.TOURTAG_TAGID = 12    )
             // AND EXISTS (SELECT 1 FROM TOURDATA_TOURTAG AS tt WHERE tt.TOURDATA_TOURID = TourData.tourId AND tt.TOURTAG_TAGID = 20    )
 
-            final long[] allTagIDs = TourTagFilterManager.getSelectedProfile().tagFilterIds.toArray();
+            final long[] allTagIDs = selectedProfile.tagFilterIds.toArray();
 
             final StringBuilder sb = new StringBuilder();
 

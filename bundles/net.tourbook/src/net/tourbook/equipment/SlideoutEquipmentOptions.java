@@ -193,6 +193,7 @@ public class SlideoutEquipmentOptions extends ToolbarSlideout implements IAction
                 */
                _rdoShowCustomHeight = new Button(heightContainer, SWT.RADIO);
                _rdoShowCustomHeight.setText("&Customize height");
+               _rdoShowCustomHeight.setToolTipText("This height is only applied when the image column is displayed");
                _rdoShowCustomHeight.addSelectionListener(_defaultSelectionListener);
 
                /*

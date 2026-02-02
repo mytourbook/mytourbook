@@ -26,7 +26,6 @@ import java.util.Set;
 import net.tourbook.common.UI;
 import net.tourbook.common.util.TreeViewerItem;
 import net.tourbook.database.TourDatabase;
-import net.tourbook.tag.tour.filter.TourTagFilter_WithExists;
 import net.tourbook.ui.SQLFilter;
 
 import org.eclipse.jface.viewers.TreeViewer;
@@ -165,8 +164,7 @@ public class TVIEquipmentView_Equipment_Month extends TVIEquipmentView_Item {
 
       try (Connection conn = TourDatabase.getInstance().getConnection()) {
 
-         final SQLFilter appFilter = new SQLFilter(SQLFilter.ANY_APP_FILTERS_NO_TAG);
-         final TourTagFilter_WithExists tagFilter = new TourTagFilter_WithExists();
+         final SQLFilter appFilter = new SQLFilter(SQLFilter.ANY_APP_FILTERS);
 
          /*
           * Load: Equipment, Year, Month, Tour
@@ -190,7 +188,6 @@ public class TVIEquipmentView_Equipment_Month extends TVIEquipmentView_Item {
                + "   AND TourData.StartMonth = ?" + NL //                                          //$NON-NLS-1$
 
                + appFilter.getWhereClause()
-               + tagFilter.getSql()
 
                // get all equipment id's
                + "LEFT JOIN " + TourDatabase.JOINTABLE__TOURDATA__EQUIPMENT + " AS jTdataEq" + NL //   //$NON-NLS-1$ //$NON-NLS-2$
@@ -218,7 +215,6 @@ public class TVIEquipmentView_Equipment_Month extends TVIEquipmentView_Item {
          statement.setLong(nextIndex++, _month);
 
          nextIndex = appFilter.setParameters(statement, nextIndex);
-         nextIndex = tagFilter.setParameters(statement, nextIndex);
 
          statement.setLong(nextIndex++, _yearItem.getEquipmentId());
 

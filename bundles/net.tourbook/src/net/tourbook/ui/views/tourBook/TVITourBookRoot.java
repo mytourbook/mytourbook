@@ -26,7 +26,6 @@ import net.tourbook.common.time.TourDateTime;
 import net.tourbook.common.util.SQL;
 import net.tourbook.common.util.TreeViewerItem;
 import net.tourbook.database.TourDatabase;
-import net.tourbook.tag.tour.filter.TourTagFilter_WithExists;
 import net.tourbook.ui.SQLFilter;
 
 public class TVITourBookRoot extends TVITourBookItem {
@@ -62,8 +61,7 @@ public class TVITourBookRoot extends TVITourBookItem {
                // hide summary row
                : "GROUP BY StartYear" + NL; //                 //$NON-NLS-1$
 
-         final SQLFilter appFilter = new SQLFilter(SQLFilter.ANY_APP_FILTERS_NO_TAG);
-         final TourTagFilter_WithExists tagFilter = new TourTagFilter_WithExists();
+         final SQLFilter appFilter = new SQLFilter(SQLFilter.ANY_APP_FILTERS);
 
          sql = UI.EMPTY_STRING
 
@@ -77,7 +75,6 @@ public class TVITourBookRoot extends TVITourBookItem {
                + "WHERE 1=1" + NL //                           //$NON-NLS-1$
 
                + appFilter.getWhereClause() + NL //
-               + tagFilter.getSql()
 
                + sqlGroupBy
 
@@ -90,7 +87,6 @@ public class TVITourBookRoot extends TVITourBookItem {
 
          // set filter parameters
          nextIndex = appFilter.setParameters(prepStmt, nextIndex);
-         nextIndex = tagFilter.setParameters(prepStmt, nextIndex);
 
          int yearIndex = 0;
          int summaryIndex = 0;

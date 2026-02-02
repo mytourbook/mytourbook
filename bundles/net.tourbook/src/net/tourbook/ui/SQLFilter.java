@@ -26,8 +26,8 @@ import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.UI;
 import net.tourbook.common.util.SQLData;
 import net.tourbook.data.TourPerson;
+import net.tourbook.tag.tour.filter.TourTagFilter;
 import net.tourbook.tag.tour.filter.TourTagFilterManager;
-import net.tourbook.tag.tour.filter.TourTagFilter_WithExists;
 import net.tourbook.tour.filter.TourFilterManager;
 import net.tourbook.tour.filter.geo.TourGeoFilter_Manager;
 
@@ -37,37 +37,28 @@ import net.tourbook.tour.filter.geo.TourGeoFilter_Manager;
  */
 public class SQLFilter {
 
-   private static final char              NL                     = net.tourbook.common.UI.NEW_LINE;
+   private static final char              NL                    = net.tourbook.common.UI.NEW_LINE;
 
    /**
     * Contains any available app filters
     */
-   public static final Set<SQLAppFilter>  ANY_APP_FILTERS        = new HashSet<>();
-
-   /**
-    * Contains the same app filters like {@link #ANY_APP_FILTERS} but without
-    * {@link SQLAppFilter#Tag}.
-    * <p>
-    * This is a temporarily solution until all tag filter are implemented with the SQL EXISTS
-    * statement in {@link TourTagFilter_WithExists}
-    */
-   public static final Set<SQLAppFilter>  ANY_APP_FILTERS_NO_TAG = new HashSet<>();
+   public static final Set<SQLAppFilter>  ANY_APP_FILTERS       = new HashSet<>();
 
    /**
     * Contains mostly fast app filters
     */
-   private static final Set<SQLAppFilter> DEFAULT_APP_FILTERS    = new HashSet<>();
+   private static final Set<SQLAppFilter> DEFAULT_APP_FILTERS   = new HashSet<>();
 
    /**
     * Contains only app filters which performed very fast
     */
-   public static final Set<SQLAppFilter>  ONLY_FAST_APP_FILTERS  = new HashSet<>();
+   public static final Set<SQLAppFilter>  ONLY_FAST_APP_FILTERS = new HashSet<>();
 
    /**
     * Exclude all special app filters, so only default filters are applied, which are person, tour
     * type and tour data
     */
-   public static final Set<SQLAppFilter>  NO_PHOTOS              = new HashSet<>();
+   public static final Set<SQLAppFilter>  NO_PHOTOS             = new HashSet<>();
 
    static {
 
@@ -75,19 +66,16 @@ public class SQLFilter {
       ANY_APP_FILTERS.add(SQLAppFilter.GeoLocation);
       ANY_APP_FILTERS.add(SQLAppFilter.Tag);
 
-      ANY_APP_FILTERS_NO_TAG.add(SQLAppFilter.Photo);
-      ANY_APP_FILTERS_NO_TAG.add(SQLAppFilter.GeoLocation);
-
       DEFAULT_APP_FILTERS.add(SQLAppFilter.Photo);
       DEFAULT_APP_FILTERS.add(SQLAppFilter.GeoLocation);
 
       ONLY_FAST_APP_FILTERS.add(SQLAppFilter.Photo);
    }
 
-   private String            _sqlWhereClause = net.tourbook.common.UI.EMPTY_STRING;
-   private ArrayList<Object> _parameters     = new ArrayList<>();
+   private String       _sqlWhereClause = net.tourbook.common.UI.EMPTY_STRING;
+   private List<Object> _allParameters  = new ArrayList<>();
 
-   private int               _nextParameterIndex;
+   private int          _nextParameterIndex;
 
    /**
     * Create sql app filter which contains the mostly fast app filters
@@ -113,7 +101,7 @@ public class SQLFilter {
     */
    public SQLFilter(final Set<SQLAppFilter> additionalAppFilter) {
 
-      final StringBuilder sql = new StringBuilder();
+      final StringBuilder sqlWhere = new StringBuilder();
 
       /*
        * App filter: Person
@@ -127,9 +115,9 @@ public class SQLFilter {
 
          // select only one person
 
-         sql.append(" AND TourData.tourPerson_personId = ?" + NL); //$NON-NLS-1$
+         sqlWhere.append(" AND TourData.tourPerson_personId = ?" + NL); //$NON-NLS-1$
 
-         _parameters.add(activePerson.getPersonId());
+         _allParameters.add(activePerson.getPersonId());
       }
 
       /*
@@ -137,7 +125,7 @@ public class SQLFilter {
        */
       if (additionalAppFilter.contains(SQLAppFilter.Photo) && TourbookPlugin.getActivePhotoFilter()) {
 
-         sql.append(" AND TourData.NumberOfPhotos > 0" + NL); //$NON-NLS-1$
+         sqlWhere.append(" AND TourData.NumberOfPhotos > 0" + NL); //$NON-NLS-1$
       }
 
       /*
@@ -148,9 +136,9 @@ public class SQLFilter {
 
          final TourTypeSQLData sqlData = activeTourTypeFilter.getSQLData();
 
-         sql.append(sqlData.getWhereString());
+         sqlWhere.append(sqlData.getWhereString());
 
-         _parameters.addAll(sqlData.getParameters());
+         _allParameters.addAll(sqlData.getParameters());
       }
 
       /*
@@ -159,9 +147,9 @@ public class SQLFilter {
       final SQLData tourSqlData = TourFilterManager.getSQL();
       if (tourSqlData != null) {
 
-         sql.append(tourSqlData.getSqlString());
+         sqlWhere.append(tourSqlData.getSqlString());
 
-         _parameters.addAll(tourSqlData.getParameters());
+         _allParameters.addAll(tourSqlData.getParameters());
       }
 
       /*
@@ -173,9 +161,9 @@ public class SQLFilter {
 
          if (tourSqlGeoData != null) {
 
-            sql.append(tourSqlGeoData.getSqlString());
+            sqlWhere.append(tourSqlGeoData.getSqlString());
 
-            _parameters.addAll(tourSqlGeoData.getParameters());
+            _allParameters.addAll(tourSqlGeoData.getParameters());
          }
       }
 
@@ -184,20 +172,17 @@ public class SQLFilter {
        */
       if (additionalAppFilter.contains(SQLAppFilter.Tag)) {
 
-         if (TourTagFilterManager.isTourTagFilterEnabled() && TourTagFilterManager.getSelectedProfile().isOrOperator) {
+         if (TourTagFilterManager.isFilterEnabled()) {
 
-            final SQLData tourTagSqlData = TourTagFilterManager.getSQL_WherePart();
+            final SQLData tagSqlData = new TourTagFilter().getSqlData();
 
-            if (tourTagSqlData != null) {
+            sqlWhere.append(tagSqlData.getSqlString());
 
-               sql.append(tourTagSqlData.getSqlString());
-
-               _parameters.addAll(tourTagSqlData.getParameters());
-            }
+            _allParameters.addAll(tagSqlData.getParameters());
          }
       }
 
-      _sqlWhereClause = sql.toString();
+      _sqlWhereClause = sqlWhere.toString();
    }
 
    /**
@@ -227,7 +212,7 @@ public class SQLFilter {
 
                sql.append(" AND TourData.tourPerson_personId = ?" + NL); //$NON-NLS-1$
 
-               _parameters.add(activePerson.getPersonId());
+               _allParameters.add(activePerson.getPersonId());
             }
 
          } else if (SQLAppFilter.TourType.equals(appFilter)) {
@@ -242,7 +227,7 @@ public class SQLFilter {
 
                sql.append(sqlData.getWhereString());
 
-               _parameters.addAll(sqlData.getParameters());
+               _allParameters.addAll(sqlData.getParameters());
             }
          }
       }
@@ -289,7 +274,7 @@ public class SQLFilter {
 
       int parameterIndex = startIndex;
 
-      for (final Object parameter : _parameters) {
+      for (final Object parameter : _allParameters) {
 
          if (parameter instanceof Long) {
 
@@ -332,18 +317,18 @@ public class SQLFilter {
 
       final int maxLen = 50;
 
-      final List<Object> parameters = _parameters != null
-            ? _parameters.subList(0, Math.min(_parameters.size(), maxLen))
+      final List<Object> parameters = _allParameters != null
+            ? _allParameters.subList(0, Math.min(_allParameters.size(), maxLen))
             : null;
 
       return UI.EMPTY_STRING
 
             + "SQLFilter" + NL //                                             //$NON-NLS-1$
 
-            + " _sqlWhereClause      = " + _sqlWhereClause + NL //             //$NON-NLS-1$
-            + " _nextParameterIndex  = " + _nextParameterIndex + NL //         //$NON-NLS-1$
+            + " _sqlWhereClause      = " + _sqlWhereClause + NL //            //$NON-NLS-1$
+            + " _nextParameterIndex  = " + _nextParameterIndex + NL //        //$NON-NLS-1$
 
-            + " _parameters          = " + parameters + NL //                  //$NON-NLS-1$
+            + " _allParameters       = " + parameters + NL //                 //$NON-NLS-1$
       ;
    }
 }

@@ -30,7 +30,6 @@ import net.tourbook.common.time.TourDateTime;
 import net.tourbook.common.util.SQL;
 import net.tourbook.common.util.TreeViewerItem;
 import net.tourbook.database.TourDatabase;
-import net.tourbook.tag.tour.filter.TourTagFilter_WithExists;
 import net.tourbook.ui.SQLFilter;
 
 public class TVITourBookYear extends TVITourBookItem {
@@ -84,8 +83,7 @@ public class TVITourBookYear extends TVITourBookItem {
             sqlSumYearFieldSub = "StartMonth"; //$NON-NLS-1$
          }
 
-         final SQLFilter appFilter = new SQLFilter(SQLFilter.ANY_APP_FILTERS_NO_TAG);
-         final TourTagFilter_WithExists tagFilter = new TourTagFilter_WithExists();
+         final SQLFilter appFilter = new SQLFilter(SQLFilter.ANY_APP_FILTERS);
 
          sql = UI.EMPTY_STRING
 
@@ -102,7 +100,6 @@ public class TVITourBookYear extends TVITourBookItem {
                + "	" + sqlSumYearField + " = ?" + NL //                                //$NON-NLS-1$ //$NON-NLS-2$
 
                + appFilter.getWhereClause()
-               + tagFilter.getSql()
 
                + "GROUP BY " + sqlSumYearField + "," + sqlSumYearFieldSub + NL //      //$NON-NLS-1$ //$NON-NLS-2$
                + "ORDER BY " + sqlSumYearFieldSub + NL //                              //$NON-NLS-1$
@@ -117,7 +114,6 @@ public class TVITourBookYear extends TVITourBookItem {
 
          // set filter parameters
          nextIndex = appFilter.setParameters(prepStmt, nextIndex);
-         nextIndex = tagFilter.setParameters(prepStmt, nextIndex);
 
          final ResultSet result = prepStmt.executeQuery();
          while (result.next()) {

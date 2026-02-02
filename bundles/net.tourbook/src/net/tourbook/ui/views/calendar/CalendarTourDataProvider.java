@@ -38,7 +38,6 @@ import net.tourbook.common.util.StatusUtil;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourType;
 import net.tourbook.database.TourDatabase;
-import net.tourbook.tag.tour.filter.TourTagFilter_WithExists;
 import net.tourbook.ui.SQLFilter;
 
 import org.eclipse.collections.impl.list.mutable.primitive.FloatArrayList;
@@ -436,8 +435,7 @@ class CalendarTourDataProvider {
 
 // SET_FORMATTING_ON
 
-         final SQLFilter appFilter = new SQLFilter(SQLFilter.ANY_APP_FILTERS_NO_TAG);
-         final TourTagFilter_WithExists tagFilter = new TourTagFilter_WithExists();
+         final SQLFilter appFilter = new SQLFilter(SQLFilter.ANY_APP_FILTERS);
 
          sql = NL
 
@@ -473,7 +471,6 @@ class CalendarTourDataProvider {
                + "   AND StartDay   = ?" + NL //                     //$NON-NLS-1$
 
                + appFilter.getWhereClause()
-               + tagFilter.getSql()
 
                + "ORDER BY StartYear, StartMonth, StartDay, StartHour, StartMinute"; //$NON-NLS-1$
 
@@ -487,7 +484,6 @@ class CalendarTourDataProvider {
          final int dayParamIndex = nextIndex++;
 
          nextIndex = appFilter.setParameters(prepStmt, nextIndex);
-         nextIndex = tagFilter.setParameters(prepStmt, nextIndex);
 
          monthData = new CalendarTourData[31][];
 
@@ -714,8 +710,7 @@ class CalendarTourDataProvider {
          final int year = weekLoader.year;
          final int week = weekLoader.week;
 
-         final SQLFilter appFilter = new SQLFilter(SQLFilter.ANY_APP_FILTERS_NO_TAG);
-         final TourTagFilter_WithExists tagFilter = new TourTagFilter_WithExists();
+         final SQLFilter appFilter = new SQLFilter(SQLFilter.ANY_APP_FILTERS);
 
          sql = NL
 
@@ -744,8 +739,7 @@ class CalendarTourDataProvider {
                + "WHERE StartWeekYear = ?" + NL //                      //$NON-NLS-1$
                + "  AND StartWeek     = ?" + NL //                      //$NON-NLS-1$
 
-               + appFilter.getWhereClause()
-               + tagFilter.getSql();
+               + appFilter.getWhereClause();
 
          final PreparedStatement prepStmt = conn.prepareStatement(sql);
 
@@ -755,7 +749,6 @@ class CalendarTourDataProvider {
          prepStmt.setInt(nextIndex++, week);
 
          nextIndex = appFilter.setParameters(prepStmt, nextIndex);
-         nextIndex = tagFilter.setParameters(prepStmt, nextIndex);
 
          final ResultSet result = prepStmt.executeQuery();
 

@@ -29,7 +29,6 @@ import net.tourbook.data.TourPerson;
 import net.tourbook.data.TourType;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.statistic.DurationTime;
-import net.tourbook.tag.tour.filter.TourTagFilter_WithExists;
 import net.tourbook.ui.SQLFilter;
 import net.tourbook.ui.TourTypeFilter;
 
@@ -75,8 +74,7 @@ class DataProvider_Tour_Month extends DataProvider {
 
          _tourMonthData = new TourStatisticData_Month();
 
-         final SQLFilter appFilter = new SQLFilter(SQLFilter.ANY_APP_FILTERS_NO_TAG);
-         final TourTagFilter_WithExists tagFilter = new TourTagFilter_WithExists();
+         final SQLFilter appFilter = new SQLFilter(SQLFilter.ANY_APP_FILTERS);
 
          sql = NL +
 
@@ -107,7 +105,6 @@ class DataProvider_Tour_Month extends DataProvider {
                + " WHERE StartYear IN (" + getYearList(lastYear, numYears) + ")" + NL //     //$NON-NLS-1$ //$NON-NLS-2$
 
                + appFilter.getWhereClause()
-               + tagFilter.getSql()
 
                + "GROUP BY StartYear, StartMonth, tourType_typeId" + NL //   //$NON-NLS-1$
                + "ORDER BY StartYear, StartMonth" + NL //                    //$NON-NLS-1$
@@ -155,7 +152,6 @@ class DataProvider_Tour_Month extends DataProvider {
          int nextIndex = 1;
 
          nextIndex = appFilter.setParameters(prepStmt, nextIndex);
-         nextIndex = tagFilter.setParameters(prepStmt, nextIndex);
 
          final ResultSet result = prepStmt.executeQuery();
 

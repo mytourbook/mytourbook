@@ -22,7 +22,6 @@ import java.sql.SQLException;
 import net.tourbook.common.UI;
 import net.tourbook.common.util.SQL;
 import net.tourbook.database.TourDatabase;
-import net.tourbook.tag.tour.filter.TourTagFilter_WithExists;
 import net.tourbook.ui.SQLFilter;
 
 public class TVITourBookYearCategorized extends TVITourBookItem {
@@ -67,8 +66,7 @@ public class TVITourBookYearCategorized extends TVITourBookItem {
          sumYearSub = "startMonth"; //$NON-NLS-1$
       }
 
-      final SQLFilter appFilter = new SQLFilter(SQLFilter.ANY_APP_FILTERS_NO_TAG);
-      final TourTagFilter_WithExists tagFilter = new TourTagFilter_WithExists();
+      final SQLFilter appFilter = new SQLFilter(SQLFilter.ANY_APP_FILTERS);
 
       final String sql = NL
 
@@ -103,7 +101,6 @@ public class TVITourBookYearCategorized extends TVITourBookItem {
             + "   AND " + sumYearSub + " = ?" + NL //                                                 //$NON-NLS-1$ //$NON-NLS-2$
 
             + appFilter.getWhereClause()
-            + tagFilter.getSql()
 
             + "ORDER BY TourStartTime" + NL; //                                                       //$NON-NLS-1$
 
@@ -118,7 +115,6 @@ public class TVITourBookYearCategorized extends TVITourBookItem {
          prepStmt.setInt(nextIndex++, tourYearSub);
 
          nextIndex = appFilter.setParameters(prepStmt, nextIndex);
-         nextIndex = tagFilter.setParameters(prepStmt, nextIndex);
 
          fetchTourItems(prepStmt);
 

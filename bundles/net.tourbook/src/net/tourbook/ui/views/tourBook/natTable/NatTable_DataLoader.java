@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2020, 2025 Wolfgang Schramm and Contributors
+ * Copyright (C) 2020, 2026 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -38,7 +38,6 @@ import net.tourbook.common.util.SQLData;
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.preferences.ITourbookPreferences;
-import net.tourbook.tag.tour.filter.TourTagFilter_WithExists;
 import net.tourbook.ui.SQLFilter;
 import net.tourbook.ui.TableColumnFactory;
 import net.tourbook.ui.views.tourBook.LazyTourLoaderItem;
@@ -291,8 +290,7 @@ public class NatTable_DataLoader {
 
          final String sqlSortFields = createSql_Sorting_SelectFields();
 
-         final SQLFilter appFilter = new SQLFilter(SQLFilter.ANY_APP_FILTERS_NO_TAG);
-         final TourTagFilter_WithExists tagFilter = new TourTagFilter_WithExists();
+         final SQLFilter appFilter = new SQLFilter(SQLFilter.ANY_APP_FILTERS);
          final SQLData tourCollectionFilter = _tourCollectionFilter;
 
          sql = UI.EMPTY_STRING
@@ -307,7 +305,6 @@ public class NatTable_DataLoader {
                + "WHERE 1=1" + NL //                           //$NON-NLS-1$
 
                + appFilter.getWhereClause() + NL //
-               + tagFilter.getSql()
                + tourCollectionFilter.getSqlString() + NL //
 
                + createSql_Sorting_OrderBy() + NL;
@@ -318,7 +315,6 @@ public class NatTable_DataLoader {
 
          // set filter parameters
          nextIndex = appFilter.setParameters(prepStmt, nextIndex);
-         nextIndex = tagFilter.setParameters(prepStmt, nextIndex);
          nextIndex = tourCollectionFilter.setParameters(prepStmt, nextIndex);
 
          final ResultSet result = prepStmt.executeQuery();
@@ -356,7 +352,6 @@ public class NatTable_DataLoader {
       try (Connection conn = TourDatabase.getInstance().getConnection()) {
 
          final SQLData tourCollectionFilter = _tourCollectionFilter;
-         final TourTagFilter_WithExists tagFilter = new TourTagFilter_WithExists();
 
          String sqlCollectionFilter = tourCollectionFilter.getSqlString();
 
@@ -373,7 +368,7 @@ public class NatTable_DataLoader {
 
             PreparedStatement prepStmt;
 
-            final SQLFilter appFilter = new SQLFilter(SQLFilter.ANY_APP_FILTERS_NO_TAG);
+            final SQLFilter appFilter = new SQLFilter(SQLFilter.ANY_APP_FILTERS);
 
             sql = UI.EMPTY_STRING
 
@@ -381,9 +376,8 @@ public class NatTable_DataLoader {
                   + "FROM TOURDATA AS TourData" + NL //                                            //$NON-NLS-1$
                   + "WHERE 1=1" + NL //                                                            //$NON-NLS-1$
 
-                  + appFilter.getWhereClause() + NL //
-                  + sqlCollectionFilter + NL //
-                  + tagFilter.getSql();
+                  + appFilter.getWhereClause()
+                  + sqlCollectionFilter;
 
             prepStmt = conn.prepareStatement(sql);
 
@@ -395,8 +389,6 @@ public class NatTable_DataLoader {
             if (isFirstRun) {
                nextIndex = tourCollectionFilter.setParameters(prepStmt, nextIndex);
             }
-
-            tagFilter.setParameters(prepStmt, nextIndex);
 
             final ResultSet result = prepStmt.executeQuery();
 
@@ -477,8 +469,7 @@ public class NatTable_DataLoader {
 
       try (Connection conn = TourDatabase.getInstance().getConnection()) {
 
-         final SQLFilter appFilter = new SQLFilter(SQLFilter.ANY_APP_FILTERS_NO_TAG);
-         final TourTagFilter_WithExists tagFilter = new TourTagFilter_WithExists();
+         final SQLFilter appFilter = new SQLFilter(SQLFilter.ANY_APP_FILTERS);
          final SQLData tourCollectionFilter = _tourCollectionFilter;
 
          final String orderBy = createSql_Sorting_OrderBy();
@@ -505,7 +496,6 @@ public class NatTable_DataLoader {
                + "     WHERE 1=1" + NL //                                                          //$NON-NLS-1$
 
                + appFilter.getWhereClause() + NL //
-               + tagFilter.getSql()
                + tourCollectionFilter.getSqlString() + NL //
 
                + "   " + orderBy + NL //                                                           //$NON-NLS-1$
@@ -529,7 +519,6 @@ public class NatTable_DataLoader {
 
          // set filter parameters
          nextIndex = appFilter.setParameters(prepStmt, nextIndex);
-         nextIndex = tagFilter.setParameters(prepStmt, nextIndex);
          nextIndex = tourCollectionFilter.setParameters(prepStmt, nextIndex);
 
          // set number of fetched parameters

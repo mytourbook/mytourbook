@@ -27,7 +27,6 @@ import net.tourbook.common.UI;
 import net.tourbook.common.time.TimeTools;
 import net.tourbook.data.TourPerson;
 import net.tourbook.database.TourDatabase;
-import net.tourbook.tag.tour.filter.TourTagFilter_WithExists;
 import net.tourbook.ui.SQLFilter;
 import net.tourbook.ui.TourTypeFilter;
 
@@ -281,8 +280,7 @@ public class DataProvider_HrZone_Week extends DataProvider {
 
          _weekData = new TourStatisticData_WeekHrZones();
 
-         final SQLFilter appFilter = new SQLFilter(SQLFilter.ANY_APP_FILTERS_NO_TAG);
-         final TourTagFilter_WithExists tagFilter = new TourTagFilter_WithExists();
+         final SQLFilter appFilter = new SQLFilter(SQLFilter.ANY_APP_FILTERS);
 
          sql = UI.EMPTY_STRING
 
@@ -308,7 +306,6 @@ public class DataProvider_HrZone_Week extends DataProvider {
                + "   AND NumberOfHrZones > 0" + NL //                                           //$NON-NLS-1$
 
                + appFilter.getWhereClause()
-               + tagFilter.getSql()
 
                + "GROUP BY StartWeekYear, StartWeek" + NL //                           //$NON-NLS-1$
                + "ORDER BY StartWeekYear, StartWeek" + NL //                           //$NON-NLS-1$
@@ -322,7 +319,6 @@ public class DataProvider_HrZone_Week extends DataProvider {
             int nextIndex = 1;
 
             nextIndex = appFilter.setParameters(prepStmt, nextIndex);
-            nextIndex = tagFilter.setParameters(prepStmt, nextIndex);
 
             final ResultSet result = prepStmt.executeQuery();
 

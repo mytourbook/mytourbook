@@ -40,7 +40,6 @@ import net.tourbook.data.TourData;
 import net.tourbook.data.TourPerson;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.preferences.ITourbookPreferences;
-import net.tourbook.tag.tour.filter.TourTagFilter_WithExists;
 import net.tourbook.tour.ITourEventListener;
 import net.tourbook.tour.SelectionDeletedTours;
 import net.tourbook.tour.TourEvent;
@@ -781,8 +780,7 @@ public class StatisticView extends ViewPart implements ITourProvider {
 
       try (Connection conn = TourDatabase.getInstance().getConnection()) {
 
-         final SQLFilter appFilter = new SQLFilter(SQLFilter.ANY_APP_FILTERS_NO_TAG);
-         final TourTagFilter_WithExists tagFilter = new TourTagFilter_WithExists();
+         final SQLFilter appFilter = new SQLFilter(SQLFilter.ANY_APP_FILTERS);
 
          sql = UI.EMPTY_STRING
 
@@ -792,7 +790,6 @@ public class StatisticView extends ViewPart implements ITourProvider {
                + "WHERE 1=1" + NL //                                    //$NON-NLS-1$
 
                + appFilter.getWhereClause()
-               + tagFilter.getSql()
 
                + "GROUP BY STARTYEAR" + NL //                           //$NON-NLS-1$
                + "ORDER BY STARTYEAR" + NL //                           //$NON-NLS-1$
@@ -803,7 +800,6 @@ public class StatisticView extends ViewPart implements ITourProvider {
          int nextIndex = 1;
 
          nextIndex = appFilter.setParameters(prepStmt, nextIndex);
-         nextIndex = tagFilter.setParameters(prepStmt, nextIndex);
 
          final ResultSet result = prepStmt.executeQuery();
 

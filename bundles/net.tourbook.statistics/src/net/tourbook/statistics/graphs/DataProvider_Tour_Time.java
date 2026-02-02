@@ -30,7 +30,6 @@ import net.tourbook.common.util.SQL;
 import net.tourbook.data.TourPerson;
 import net.tourbook.data.TourType;
 import net.tourbook.database.TourDatabase;
-import net.tourbook.tag.tour.filter.TourTagFilter_WithExists;
 import net.tourbook.ui.SQLFilter;
 import net.tourbook.ui.TourTypeFilter;
 
@@ -233,8 +232,7 @@ public class DataProvider_Tour_Time extends DataProvider {
          final ArrayList<TourType> tourTypeList = TourDatabase.getActiveTourTypes();
          final TourType[] tourTypes = tourTypeList.toArray(new TourType[tourTypeList.size()]);
 
-         final SQLFilter appFilter = new SQLFilter(SQLFilter.ANY_APP_FILTERS_NO_TAG);
-         final TourTagFilter_WithExists tagFilter = new TourTagFilter_WithExists();
+         final SQLFilter appFilter = new SQLFilter(SQLFilter.ANY_APP_FILTERS);
 
          sql = UI.EMPTY_STRING
 
@@ -268,7 +266,6 @@ public class DataProvider_Tour_Time extends DataProvider {
                + "   StartYear IN (" + yearList + ")" + NL //                       //$NON-NLS-1$ //$NON-NLS-2$
 
                + appFilter.getWhereClause()
-               + tagFilter.getSql()
 
                + " ORDER BY TourStartTime"; //                                      //$NON-NLS-1$
 
@@ -306,7 +303,6 @@ public class DataProvider_Tour_Time extends DataProvider {
          int nextIndex = 1;
 
          nextIndex = appFilter.setParameters(prepStmt, nextIndex);
-         nextIndex = tagFilter.setParameters(prepStmt, nextIndex);
 
          final ResultSet result = prepStmt.executeQuery();
 

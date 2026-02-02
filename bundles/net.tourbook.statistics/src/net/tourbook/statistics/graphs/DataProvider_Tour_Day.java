@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2022 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2026 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -36,7 +36,6 @@ import net.tourbook.data.TourPerson;
 import net.tourbook.data.TourType;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.statistic.DurationTime;
-import net.tourbook.tag.tour.filter.TourTagFilter_WithExists;
 import net.tourbook.ui.SQLFilter;
 import net.tourbook.ui.TourTypeFilter;
 
@@ -296,8 +295,7 @@ public class DataProvider_Tour_Day extends DataProvider {
          final ArrayList<TourType> tourTypeList = TourDatabase.getActiveTourTypes();
          final TourType[] tourTypes = tourTypeList.toArray(new TourType[tourTypeList.size()]);
 
-         final SQLFilter appFilter = new SQLFilter(SQLFilter.ANY_APP_FILTERS_NO_TAG);
-         final TourTagFilter_WithExists tagFilter = new TourTagFilter_WithExists();
+         final SQLFilter appFilter = new SQLFilter(SQLFilter.ANY_APP_FILTERS);
 
          sql = UI.EMPTY_STRING
 
@@ -335,7 +333,6 @@ public class DataProvider_Tour_Day extends DataProvider {
                + "WHERE StartYear IN (" + getYearList(lastYear, numberOfYears) + ")" + NL //    //$NON-NLS-1$ //$NON-NLS-2$
 
                + appFilter.getWhereClause()
-               + tagFilter.getSql()
 
                + "ORDER BY TourStartTime" + NL; //                                              //$NON-NLS-1$
 
@@ -383,7 +380,6 @@ public class DataProvider_Tour_Day extends DataProvider {
          int nextIndex = 1;
 
          nextIndex = appFilter.setParameters(prepStmt, nextIndex);
-         nextIndex = tagFilter.setParameters(prepStmt, nextIndex);
 
          final ResultSet result = prepStmt.executeQuery();
 
