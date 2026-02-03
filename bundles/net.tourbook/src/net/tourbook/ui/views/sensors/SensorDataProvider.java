@@ -28,7 +28,7 @@ import net.tourbook.common.util.SQL;
 import net.tourbook.common.util.Util;
 import net.tourbook.data.TourType;
 import net.tourbook.database.TourDatabase;
-import net.tourbook.ui.SQLFilter;
+import net.tourbook.ui.AppFilter;
 
 import org.eclipse.collections.impl.list.mutable.primitive.FloatArrayList;
 import org.eclipse.collections.impl.list.mutable.primitive.IntArrayList;
@@ -76,7 +76,7 @@ public class SensorDataProvider {
          /*
           * Setup app filter
           */
-         final SQLFilter appFilter = new SQLFilter(SQLFilter.ONLY_FAST_APP_FILTERS);
+         final AppFilter appFilter = new AppFilter(AppFilter.ONLY_FAST_APP_FILTERS);
          if (isAppFilter) {
 
             final String sqlTourIds = UI.EMPTY_STRING

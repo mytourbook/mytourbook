@@ -38,7 +38,7 @@ import net.tourbook.common.util.SQLData;
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.preferences.ITourbookPreferences;
-import net.tourbook.ui.SQLFilter;
+import net.tourbook.ui.AppFilter;
 import net.tourbook.ui.TableColumnFactory;
 import net.tourbook.ui.views.tourBook.LazyTourLoaderItem;
 import net.tourbook.ui.views.tourBook.TVITourBookItem;
@@ -290,7 +290,7 @@ public class NatTable_DataLoader {
 
          final String sqlSortFields = createSql_Sorting_SelectFields();
 
-         final SQLFilter appFilter = new SQLFilter(SQLFilter.ANY_APP_FILTERS);
+         final AppFilter appFilter = new AppFilter(AppFilter.ANY_APP_FILTERS);
          final SQLData tourCollectionFilter = _tourCollectionFilter;
 
          sql = UI.EMPTY_STRING
@@ -368,7 +368,7 @@ public class NatTable_DataLoader {
 
             PreparedStatement prepStmt;
 
-            final SQLFilter appFilter = new SQLFilter(SQLFilter.ANY_APP_FILTERS);
+            final AppFilter appFilter = new AppFilter(AppFilter.ANY_APP_FILTERS);
 
             sql = UI.EMPTY_STRING
 
@@ -469,7 +469,7 @@ public class NatTable_DataLoader {
 
       try (Connection conn = TourDatabase.getInstance().getConnection()) {
 
-         final SQLFilter appFilter = new SQLFilter(SQLFilter.ANY_APP_FILTERS);
+         final AppFilter appFilter = new AppFilter(AppFilter.ANY_APP_FILTERS);
          final SQLData tourCollectionFilter = _tourCollectionFilter;
 
          final String orderBy = createSql_Sorting_OrderBy();

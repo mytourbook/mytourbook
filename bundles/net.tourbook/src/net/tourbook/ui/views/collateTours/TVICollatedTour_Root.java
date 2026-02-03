@@ -31,7 +31,7 @@ import net.tourbook.common.util.SQL;
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.TreeViewerItem;
 import net.tourbook.database.TourDatabase;
-import net.tourbook.ui.SQLFilter;
+import net.tourbook.ui.AppFilter;
 import net.tourbook.ui.TourTypeSQLData;
 
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -59,7 +59,7 @@ public class TVICollatedTour_Root extends TVICollatedTour {
             return;
          }
 
-         final SQLFilter sqlFilter = new SQLFilter();
+         final AppFilter sqlFilter = new AppFilter();
 
          final ArrayList<TVICollatedTour_Event> collateEvents = getCollateEvents(sqlData);
 
@@ -176,7 +176,7 @@ public class TVICollatedTour_Root extends TVICollatedTour {
       return collateEvents;
    }
 
-   private void getCollateTVI(final ArrayList<TVICollatedTour_Event> collatedEvents, final SQLFilter sqlFilter) {
+   private void getCollateTVI(final ArrayList<TVICollatedTour_Event> collatedEvents, final AppFilter sqlFilter) {
 
       final int eventSize = collatedEvents.size();
 

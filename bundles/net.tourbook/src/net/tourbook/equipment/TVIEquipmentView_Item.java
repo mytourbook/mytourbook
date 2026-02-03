@@ -30,7 +30,7 @@ import net.tourbook.common.util.TreeViewerItem;
 import net.tourbook.common.util.Util;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.preferences.ITourbookPreferences;
-import net.tourbook.ui.SQLFilter;
+import net.tourbook.ui.AppFilter;
 
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.viewers.TreeViewer;
@@ -203,7 +203,7 @@ public abstract class TVIEquipmentView_Item extends TreeViewerItem {
 
       try (Connection conn = TourDatabase.getInstance().getConnection()) {
 
-         final SQLFilter appFilter = new SQLFilter(SQLFilter.ANY_APP_FILTERS);
+         final AppFilter appFilter = new AppFilter(AppFilter.ANY_APP_FILTERS);
 
          sql = UI.EMPTY_STRING
 
@@ -262,7 +262,7 @@ public abstract class TVIEquipmentView_Item extends TreeViewerItem {
 
       try (Connection conn = TourDatabase.getInstance().getConnection()) {
 
-         final SQLFilter appFilter = new SQLFilter(SQLFilter.ANY_APP_FILTERS);
+         final AppFilter appFilter = new AppFilter(AppFilter.ANY_APP_FILTERS);
 
          sql = UI.EMPTY_STRING
 
@@ -332,7 +332,7 @@ public abstract class TVIEquipmentView_Item extends TreeViewerItem {
 
       try (Connection conn = TourDatabase.getInstance().getConnection()) {
 
-         final SQLFilter appFilter = new SQLFilter(SQLFilter.ANY_APP_FILTERS);
+         final AppFilter appFilter = new AppFilter(AppFilter.ANY_APP_FILTERS);
 
          sql = UI.EMPTY_STRING
 

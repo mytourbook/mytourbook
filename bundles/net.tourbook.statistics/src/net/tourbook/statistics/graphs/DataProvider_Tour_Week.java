@@ -33,7 +33,7 @@ import net.tourbook.data.TourPerson;
 import net.tourbook.data.TourType;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.statistic.DurationTime;
-import net.tourbook.ui.SQLFilter;
+import net.tourbook.ui.AppFilter;
 import net.tourbook.ui.TourTypeFilter;
 
 class DataProvider_Tour_Week extends DataProvider {
@@ -327,7 +327,7 @@ class DataProvider_Tour_Week extends DataProvider {
          int numTourTypes = allActiveTourTypes.length;
          numTourTypes = numTourTypes == 0 ? 1 : numTourTypes; // ensure that at least 1 is available
 
-         final SQLFilter appFilter = new SQLFilter(SQLFilter.ANY_APP_FILTERS);
+         final AppFilter appFilter = new AppFilter(AppFilter.ANY_APP_FILTERS);
 
          sql = UI.EMPTY_STRING
 

@@ -37,42 +37,42 @@ import net.tourbook.tour.filter.geo.TourGeoFilter_Manager;
  * The filter provides a sql WHERE which contains all tour filter, e.g. selected person, tour type,
  * photo and advanced tour filter
  */
-public class SQLFilter {
+public class AppFilter {
 
    private static final char              NL                    = net.tourbook.common.UI.NEW_LINE;
 
    /**
     * Contains any available app filters
     */
-   public static final Set<SQLAppFilter>  ANY_APP_FILTERS       = new HashSet<>();
+   public static final Set<AppFilterType>  ANY_APP_FILTERS       = new HashSet<>();
 
    /**
     * Contains mostly fast app filters
     */
-   private static final Set<SQLAppFilter> DEFAULT_APP_FILTERS   = new HashSet<>();
+   private static final Set<AppFilterType> DEFAULT_APP_FILTERS   = new HashSet<>();
 
    /**
     * Contains only app filters which performed very fast
     */
-   public static final Set<SQLAppFilter>  ONLY_FAST_APP_FILTERS = new HashSet<>();
+   public static final Set<AppFilterType>  ONLY_FAST_APP_FILTERS = new HashSet<>();
 
    /**
     * Exclude all special app filters, so only default filters are applied, which are person, tour
     * type and tour data
     */
-   public static final Set<SQLAppFilter>  NO_PHOTOS             = new HashSet<>();
+   public static final Set<AppFilterType>  NO_PHOTOS             = new HashSet<>();
 
    static {
 
-      ANY_APP_FILTERS.add(SQLAppFilter.Photo);
-      ANY_APP_FILTERS.add(SQLAppFilter.GeoLocation);
-      ANY_APP_FILTERS.add(SQLAppFilter.Tag);
-      ANY_APP_FILTERS.add(SQLAppFilter.Equipment);
+      ANY_APP_FILTERS.add(AppFilterType.Photo);
+      ANY_APP_FILTERS.add(AppFilterType.GeoLocation);
+      ANY_APP_FILTERS.add(AppFilterType.Tag);
+      ANY_APP_FILTERS.add(AppFilterType.Equipment);
 
-      DEFAULT_APP_FILTERS.add(SQLAppFilter.Photo);
-      DEFAULT_APP_FILTERS.add(SQLAppFilter.GeoLocation);
+      DEFAULT_APP_FILTERS.add(AppFilterType.Photo);
+      DEFAULT_APP_FILTERS.add(AppFilterType.GeoLocation);
 
-      ONLY_FAST_APP_FILTERS.add(SQLAppFilter.Photo);
+      ONLY_FAST_APP_FILTERS.add(AppFilterType.Photo);
    }
 
    private String       _sqlWhereClause = net.tourbook.common.UI.EMPTY_STRING;
@@ -83,7 +83,7 @@ public class SQLFilter {
    /**
     * Create sql app filter which contains the mostly fast app filters
     */
-   public SQLFilter() {
+   public AppFilter() {
 
       this(DEFAULT_APP_FILTERS);
    }
@@ -102,7 +102,7 @@ public class SQLFilter {
     *
     * @param additionalAppFilter
     */
-   public SQLFilter(final Set<SQLAppFilter> additionalAppFilter) {
+   public AppFilter(final Set<AppFilterType> additionalAppFilter) {
 
       final StringBuilder sqlWhere = new StringBuilder();
 
@@ -126,7 +126,7 @@ public class SQLFilter {
       /*
        * App filter: Photo
        */
-      if (additionalAppFilter.contains(SQLAppFilter.Photo) && TourbookPlugin.getActivePhotoFilter()) {
+      if (additionalAppFilter.contains(AppFilterType.Photo) && TourbookPlugin.getActivePhotoFilter()) {
 
          sqlWhere.append(" AND TourData.NumberOfPhotos > 0" + NL); //$NON-NLS-1$
       }
@@ -158,7 +158,7 @@ public class SQLFilter {
       /*
        * App Filter: Tour geo location
        */
-      if (additionalAppFilter.contains(SQLAppFilter.GeoLocation)) {
+      if (additionalAppFilter.contains(AppFilterType.GeoLocation)) {
 
          final SQLData tourSqlGeoData = TourGeoFilter_Manager.getSQL();
 
@@ -173,7 +173,7 @@ public class SQLFilter {
       /*
        * App Filter: Tour tags
        */
-      if (additionalAppFilter.contains(SQLAppFilter.Tag)) {
+      if (additionalAppFilter.contains(AppFilterType.Tag)) {
 
          if (TourTagFilterManager.isFilterEnabled()) {
 
@@ -188,7 +188,7 @@ public class SQLFilter {
       /*
        * App Filter: Equipment
        */
-      if (additionalAppFilter.contains(SQLAppFilter.Equipment)) {
+      if (additionalAppFilter.contains(AppFilterType.Equipment)) {
 
          if (TourEquipmentFilterManager.isFilterEnabled()) {
 
@@ -208,13 +208,13 @@ public class SQLFilter {
     *
     * @param appFilters
     */
-   public SQLFilter(final SQLAppFilter... appFilters) {
+   public AppFilter(final AppFilterType... appFilters) {
 
       final StringBuilder sql = new StringBuilder();
 
-      for (final SQLAppFilter appFilter : appFilters) {
+      for (final AppFilterType appFilter : appFilters) {
 
-         if (SQLAppFilter.Person.equals(appFilter)) {
+         if (AppFilterType.Person.equals(appFilter)) {
 
             /*
              * App filter: Person
@@ -233,7 +233,7 @@ public class SQLFilter {
                _allParameters.add(activePerson.getPersonId());
             }
 
-         } else if (SQLAppFilter.TourType.equals(appFilter)) {
+         } else if (AppFilterType.TourType.equals(appFilter)) {
 
             /*
              * App filter: Tour type

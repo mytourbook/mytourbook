@@ -24,7 +24,7 @@ import java.util.ArrayList;
 import net.tourbook.common.UI;
 import net.tourbook.common.util.TreeViewerItem;
 import net.tourbook.database.TourDatabase;
-import net.tourbook.ui.SQLFilter;
+import net.tourbook.ui.AppFilter;
 
 public class TVIWizardCompareMonth extends TVIWizardCompareItem {
 
@@ -48,7 +48,7 @@ public class TVIWizardCompareMonth extends TVIWizardCompareItem {
       setChildren(children);
 
       // use fast app filter
-      final SQLFilter appFilter = new SQLFilter(SQLFilter.ONLY_FAST_APP_FILTERS);
+      final AppFilter appFilter = new AppFilter(AppFilter.ONLY_FAST_APP_FILTERS);
 
       String sqlWhere = UI.EMPTY_STRING;
 

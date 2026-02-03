@@ -15,7 +15,7 @@
  *******************************************************************************/
 package net.tourbook.ui;
 
-public enum SQLAppFilter {
+public enum AppFilterType {
 
    /**
     *

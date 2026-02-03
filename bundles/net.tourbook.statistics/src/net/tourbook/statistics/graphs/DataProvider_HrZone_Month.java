@@ -24,7 +24,7 @@ import net.tourbook.common.UI;
 import net.tourbook.common.util.SQL;
 import net.tourbook.data.TourPerson;
 import net.tourbook.database.TourDatabase;
-import net.tourbook.ui.SQLFilter;
+import net.tourbook.ui.AppFilter;
 import net.tourbook.ui.TourTypeFilter;
 
 public class DataProvider_HrZone_Month extends DataProvider {
@@ -64,7 +64,7 @@ public class DataProvider_HrZone_Month extends DataProvider {
 
          _monthData = new TourStatisticData_MonthHrZones();
 
-         final SQLFilter appFilter = new SQLFilter(SQLFilter.ANY_APP_FILTERS);
+         final AppFilter appFilter = new AppFilter(AppFilter.ANY_APP_FILTERS);
 
          sql = UI.EMPTY_STRING
 

@@ -59,7 +59,7 @@ import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.tour.SelectionTourId;
 import net.tourbook.tour.TourManager;
 import net.tourbook.tour.photo.TourPhotoLinkView.TimeAdjustmentType;
-import net.tourbook.ui.SQLFilter;
+import net.tourbook.ui.AppFilter;
 
 import org.apache.commons.imaging.Imaging;
 import org.apache.commons.imaging.common.ImageMetadata;
@@ -1120,7 +1120,7 @@ public class TourPhotoManager implements IPhotoServiceProvider {
 
          if (_sqlConnection == null) {
 
-            final SQLFilter sqlFilter = new SQLFilter(SQLFilter.NO_PHOTOS);
+            final AppFilter sqlFilter = new AppFilter(AppFilter.NO_PHOTOS);
 
             final String sql = UI.EMPTY_STRING
 

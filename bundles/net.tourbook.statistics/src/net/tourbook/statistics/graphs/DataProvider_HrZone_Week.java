@@ -27,7 +27,7 @@ import net.tourbook.common.UI;
 import net.tourbook.common.time.TimeTools;
 import net.tourbook.data.TourPerson;
 import net.tourbook.database.TourDatabase;
-import net.tourbook.ui.SQLFilter;
+import net.tourbook.ui.AppFilter;
 import net.tourbook.ui.TourTypeFilter;
 
 public class DataProvider_HrZone_Week extends DataProvider {
@@ -280,7 +280,7 @@ public class DataProvider_HrZone_Week extends DataProvider {
 
          _weekData = new TourStatisticData_WeekHrZones();
 
-         final SQLFilter appFilter = new SQLFilter(SQLFilter.ANY_APP_FILTERS);
+         final AppFilter appFilter = new AppFilter(AppFilter.ANY_APP_FILTERS);
 
          sql = UI.EMPTY_STRING
 

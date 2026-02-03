@@ -88,7 +88,7 @@ import net.tourbook.tag.TagCollection;
 import net.tourbook.tour.TourLogManager;
 import net.tourbook.tour.TourManager;
 import net.tourbook.tourType.TourTypeImage;
-import net.tourbook.ui.SQLFilter;
+import net.tourbook.ui.AppFilter;
 import net.tourbook.ui.TourTypeFilter;
 import net.tourbook.ui.TreeColumnFactory;
 
@@ -1690,7 +1690,7 @@ public class TourDatabase {
       try (Connection conn = getInstance().getConnection()) {
 
          // get app filter without geo location
-         final SQLFilter appFilter = new SQLFilter(SQLFilter.ONLY_FAST_APP_FILTERS);
+         final AppFilter appFilter = new AppFilter(AppFilter.ONLY_FAST_APP_FILTERS);
 
          final String sql = UI.EMPTY_STRING
 

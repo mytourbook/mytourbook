@@ -25,7 +25,7 @@ import net.tourbook.common.UI;
 import net.tourbook.common.util.TreeViewerItem;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.preferences.ITourbookPreferences;
-import net.tourbook.ui.SQLFilter;
+import net.tourbook.ui.AppFilter;
 
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.viewers.TreeViewer;
@@ -124,7 +124,7 @@ public abstract class TVITaggingView_Item extends TreeViewerItem {
 
       try (Connection conn = TourDatabase.getInstance().getConnection()) {
 
-         final SQLFilter sqlFilter = new SQLFilter();
+         final AppFilter sqlFilter = new AppFilter();
 
          /*
           * Get tags

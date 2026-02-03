@@ -30,7 +30,7 @@ import net.tourbook.common.time.TourDateTime;
 import net.tourbook.common.util.SQL;
 import net.tourbook.common.util.TreeViewerItem;
 import net.tourbook.database.TourDatabase;
-import net.tourbook.ui.SQLFilter;
+import net.tourbook.ui.AppFilter;
 
 public class TVICollatedTour_Event extends TVICollatedTour {
 
@@ -57,7 +57,7 @@ public class TVICollatedTour_Event extends TVICollatedTour {
       final ArrayList<TreeViewerItem> children = new ArrayList<>();
       setChildren(children);
 
-      final SQLFilter sqlFilter = new SQLFilter();
+      final AppFilter sqlFilter = new AppFilter();
 
       final String sqlString = UI.EMPTY_STRING +
 

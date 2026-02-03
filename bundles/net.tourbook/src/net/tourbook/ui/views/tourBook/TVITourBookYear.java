@@ -30,7 +30,7 @@ import net.tourbook.common.time.TourDateTime;
 import net.tourbook.common.util.SQL;
 import net.tourbook.common.util.TreeViewerItem;
 import net.tourbook.database.TourDatabase;
-import net.tourbook.ui.SQLFilter;
+import net.tourbook.ui.AppFilter;
 
 public class TVITourBookYear extends TVITourBookItem {
 
@@ -83,7 +83,7 @@ public class TVITourBookYear extends TVITourBookItem {
             sqlSumYearFieldSub = "StartMonth"; //$NON-NLS-1$
          }
 
-         final SQLFilter appFilter = new SQLFilter(SQLFilter.ANY_APP_FILTERS);
+         final AppFilter appFilter = new AppFilter(AppFilter.ANY_APP_FILTERS);
 
          sql = UI.EMPTY_STRING
 

@@ -37,7 +37,7 @@ import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.Util;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.map2.view.Map2View;
-import net.tourbook.ui.SQLFilter;
+import net.tourbook.ui.AppFilter;
 
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.swt.graphics.Point;
@@ -184,7 +184,7 @@ public class TourGeoFilter_Loader {
             TourGeoFilter_Manager.STATE_IS_INCLUDE_GEO_PARTS_DEFAULT);
 
       String sqlSelect;
-      SQLFilter appFilter = null;
+      AppFilter appFilter = null;
 
       if (isUseAppFilter) {
 
@@ -193,7 +193,7 @@ public class TourGeoFilter_Loader {
          final String sqlIncludeExcludeGeoParts = isIncludeGeoParts ? UI.EMPTY_STRING : "NOT"; //$NON-NLS-1$
 
          // get app filter without geo location, this is added here
-         appFilter = new SQLFilter(SQLFilter.ONLY_FAST_APP_FILTERS);
+         appFilter = new AppFilter(AppFilter.ONLY_FAST_APP_FILTERS);
 
          sqlSelect = UI.EMPTY_STRING
 

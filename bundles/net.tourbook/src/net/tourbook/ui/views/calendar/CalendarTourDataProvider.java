@@ -38,7 +38,7 @@ import net.tourbook.common.util.StatusUtil;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourType;
 import net.tourbook.database.TourDatabase;
-import net.tourbook.ui.SQLFilter;
+import net.tourbook.ui.AppFilter;
 
 import org.eclipse.collections.impl.list.mutable.primitive.FloatArrayList;
 
@@ -435,7 +435,7 @@ class CalendarTourDataProvider {
 
 // SET_FORMATTING_ON
 
-         final SQLFilter appFilter = new SQLFilter(SQLFilter.ANY_APP_FILTERS);
+         final AppFilter appFilter = new AppFilter(AppFilter.ANY_APP_FILTERS);
 
          sql = NL
 
@@ -710,7 +710,7 @@ class CalendarTourDataProvider {
          final int year = weekLoader.year;
          final int week = weekLoader.week;
 
-         final SQLFilter appFilter = new SQLFilter(SQLFilter.ANY_APP_FILTERS);
+         final AppFilter appFilter = new AppFilter(AppFilter.ANY_APP_FILTERS);
 
          sql = NL
 

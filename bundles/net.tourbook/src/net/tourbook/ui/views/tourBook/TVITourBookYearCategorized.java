@@ -22,7 +22,7 @@ import java.sql.SQLException;
 import net.tourbook.common.UI;
 import net.tourbook.common.util.SQL;
 import net.tourbook.database.TourDatabase;
-import net.tourbook.ui.SQLFilter;
+import net.tourbook.ui.AppFilter;
 
 public class TVITourBookYearCategorized extends TVITourBookItem {
 
@@ -66,7 +66,7 @@ public class TVITourBookYearCategorized extends TVITourBookItem {
          sumYearSub = "startMonth"; //$NON-NLS-1$
       }
 
-      final SQLFilter appFilter = new SQLFilter(SQLFilter.ANY_APP_FILTERS);
+      final AppFilter appFilter = new AppFilter(AppFilter.ANY_APP_FILTERS);
 
       final String sql = NL
 

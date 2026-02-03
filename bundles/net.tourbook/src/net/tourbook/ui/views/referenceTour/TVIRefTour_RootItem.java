@@ -24,8 +24,8 @@ import java.util.ArrayList;
 import net.tourbook.common.UI;
 import net.tourbook.common.util.TreeViewerItem;
 import net.tourbook.database.TourDatabase;
-import net.tourbook.ui.SQLAppFilter;
-import net.tourbook.ui.SQLFilter;
+import net.tourbook.ui.AppFilterType;
+import net.tourbook.ui.AppFilter;
 
 public class TVIRefTour_RootItem extends TVIRefTour_Item {
 
@@ -48,7 +48,7 @@ public class TVIRefTour_RootItem extends TVIRefTour_Item {
 
       setChildren(children);
 
-      final SQLFilter sqlAppFilter = new SQLFilter(SQLAppFilter.Person, SQLAppFilter.TourType);
+      final AppFilter sqlAppFilter = new AppFilter(AppFilterType.Person, AppFilterType.TourType);
 
       final String sqlFilterWhereClause = sqlAppFilter.getWhereClause().trim();
       final boolean isSqlWhereClause = sqlFilterWhereClause.length() > 0;

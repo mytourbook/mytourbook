@@ -29,7 +29,7 @@ import net.tourbook.common.UI;
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.data.NormalizedGeoData;
 import net.tourbook.database.TourDatabase;
-import net.tourbook.ui.SQLFilter;
+import net.tourbook.ui.AppFilter;
 
 import org.eclipse.collections.impl.list.mutable.primitive.LongArrayList;
 
@@ -100,7 +100,7 @@ public class GeoPartTourLoader {
 
 // this is very slow
 //       final SQLFilter appFilter = new SQLFilter(SQLFilter.TAG_FILTER);
-         final SQLFilter appFilter = new SQLFilter();
+         final AppFilter appFilter = new AppFilter();
 
          final String selectGeoPart = UI.EMPTY_STRING
 

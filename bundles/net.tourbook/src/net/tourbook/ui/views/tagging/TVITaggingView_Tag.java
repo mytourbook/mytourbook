@@ -29,7 +29,7 @@ import net.tourbook.common.util.TreeViewerItem;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourTag;
 import net.tourbook.database.TourDatabase;
-import net.tourbook.ui.SQLFilter;
+import net.tourbook.ui.AppFilter;
 
 import org.eclipse.jface.viewers.TreeViewer;
 
@@ -162,7 +162,7 @@ public class TVITaggingView_Tag extends TVITaggingView_Item {
 
       try (Connection conn = TourDatabase.getInstance().getConnection()) {
 
-         final SQLFilter sqlFilter = new SQLFilter();
+         final AppFilter sqlFilter = new AppFilter();
 
          final String sql = UI.EMPTY_STRING
 
@@ -247,7 +247,7 @@ public class TVITaggingView_Tag extends TVITaggingView_Item {
          /*
           * get all tours for the tag Id of this tree item
           */
-         final SQLFilter sqlFilter = new SQLFilter();
+         final AppFilter sqlFilter = new AppFilter();
 
          final String sql = UI.EMPTY_STRING
 
