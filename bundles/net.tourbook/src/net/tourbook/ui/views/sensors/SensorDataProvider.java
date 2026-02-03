@@ -47,6 +47,7 @@ public class SensorDataProvider {
     * @param sensorId
     * @param isUseAppFilter
     * @param state
+    *
     * @return
     */
    SensorData getData(final long sensorId, final boolean useTourFilter, final IDialogSettings state) {
@@ -130,6 +131,7 @@ public class SensorDataProvider {
                + "WHERE" + NL //                                                       //$NON-NLS-1$
 
                + "   DEVICESENSOR_SensorID = ?" + NL //                                //$NON-NLS-1$
+
                + "   " + sqlAppFilter + NL //                                          //$NON-NLS-1$
                + "   " + sqlDurationFilter + NL //                                     //$NON-NLS-1$
 
@@ -157,17 +159,16 @@ public class SensorDataProvider {
 
          final PreparedStatement stmt = conn.prepareStatement(sql);
 
-         stmt.setLong(1, sensorId);
+         int nextIndex = 1;
 
-         int paramIndex = 2;
+         stmt.setLong(nextIndex++, sensorId);
 
          if (isAppFilter) {
-            appFilter.setParameters(stmt, paramIndex);
-            paramIndex = appFilter.getNextParameterIndex();
+            nextIndex = appFilter.setParameters(stmt, nextIndex);
          }
 
          if (isDurationFilter) {
-            stmt.setLong(paramIndex++, durationFilter_DateTime.toEpochSecond() * 1000);
+            stmt.setLong(nextIndex++, durationFilter_DateTime.toEpochSecond() * 1000);
          }
 
          final ResultSet result = stmt.executeQuery();
@@ -358,6 +359,7 @@ public class SensorDataProvider {
 
    /**
     * @param state
+    *
     * @return Returns the date/time after which the tours should be retrieved
     */
    private ZonedDateTime getDurationFilter_DateTime(final IDialogSettings state) {

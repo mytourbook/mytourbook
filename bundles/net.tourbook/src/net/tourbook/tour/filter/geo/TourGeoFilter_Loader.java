@@ -240,18 +240,17 @@ public class TourGeoFilter_Loader {
           * Fillup parameters
           */
 
-         int lastAppFilterParamIndex = 1;
+         int nextIndex = 1;
 
          // app filter parameters
          if (isUseAppFilter) {
-            appFilter.setParameters(stmtSelect, 1);
-            lastAppFilterParamIndex = appFilter.getNextParameterIndex();
+            nextIndex = appFilter.setParameters(stmtSelect, nextIndex);
          }
 
          // geo part parameter
          for (int partIndex = 0; partIndex < numGeoParts; partIndex++) {
 
-            final int paramIndex = lastAppFilterParamIndex + partIndex;
+            final int paramIndex = nextIndex + partIndex;
 
             stmtSelect.setInt(paramIndex, allLatLonParts.get(partIndex));
          }

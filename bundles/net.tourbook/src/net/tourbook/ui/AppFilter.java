@@ -39,7 +39,7 @@ import net.tourbook.tour.filter.geo.TourGeoFilter_Manager;
  */
 public class AppFilter {
 
-   private static final char              NL                    = net.tourbook.common.UI.NEW_LINE;
+   private static final char               NL                    = net.tourbook.common.UI.NEW_LINE;
 
    /**
     * Contains any available app filters
@@ -78,14 +78,62 @@ public class AppFilter {
    private String       _sqlWhereClause = net.tourbook.common.UI.EMPTY_STRING;
    private List<Object> _allParameters  = new ArrayList<>();
 
-   private int          _nextParameterIndex;
-
    /**
     * Create sql app filter which contains the mostly fast app filters
     */
    public AppFilter() {
 
       this(DEFAULT_APP_FILTERS);
+   }
+
+   /**
+    * Creates the WHERE statement for the provided app filters
+    *
+    * @param appFilters
+    */
+   public AppFilter(final AppFilterType... appFilters) {
+
+      final StringBuilder sql = new StringBuilder();
+
+      for (final AppFilterType appFilter : appFilters) {
+
+         if (AppFilterType.Person.equals(appFilter)) {
+
+            /*
+             * App filter: Person
+             */
+            final TourPerson activePerson = TourbookPlugin.getActivePerson();
+            if (activePerson == null) {
+
+               // select all people
+
+            } else {
+
+               // select only one person
+
+               sql.append(" AND TourData.tourPerson_personId = ?" + NL); //$NON-NLS-1$
+
+               _allParameters.add(activePerson.getPersonId());
+            }
+
+         } else if (AppFilterType.TourType.equals(appFilter)) {
+
+            /*
+             * App filter: Tour type
+             */
+            final TourTypeFilter activeTourTypeFilter = TourbookPlugin.getActiveTourTypeFilter();
+            if (activeTourTypeFilter != null) {
+
+               final TourTypeSQLData sqlData = activeTourTypeFilter.getSQLData();
+
+               sql.append(sqlData.getWhereString());
+
+               _allParameters.addAll(sqlData.getParameters());
+            }
+         }
+      }
+
+      _sqlWhereClause = sql.toString();
    }
 
    /**
@@ -204,65 +252,6 @@ public class AppFilter {
    }
 
    /**
-    * Creates the WHERE statement for the provided app filters
-    *
-    * @param appFilters
-    */
-   public AppFilter(final AppFilterType... appFilters) {
-
-      final StringBuilder sql = new StringBuilder();
-
-      for (final AppFilterType appFilter : appFilters) {
-
-         if (AppFilterType.Person.equals(appFilter)) {
-
-            /*
-             * App filter: Person
-             */
-            final TourPerson activePerson = TourbookPlugin.getActivePerson();
-            if (activePerson == null) {
-
-               // select all people
-
-            } else {
-
-               // select only one person
-
-               sql.append(" AND TourData.tourPerson_personId = ?" + NL); //$NON-NLS-1$
-
-               _allParameters.add(activePerson.getPersonId());
-            }
-
-         } else if (AppFilterType.TourType.equals(appFilter)) {
-
-            /*
-             * App filter: Tour type
-             */
-            final TourTypeFilter activeTourTypeFilter = TourbookPlugin.getActiveTourTypeFilter();
-            if (activeTourTypeFilter != null) {
-
-               final TourTypeSQLData sqlData = activeTourTypeFilter.getSQLData();
-
-               sql.append(sqlData.getWhereString());
-
-               _allParameters.addAll(sqlData.getParameters());
-            }
-         }
-      }
-
-      _sqlWhereClause = sql.toString();
-   }
-
-   /**
-    * @return Returns the last parameter index +1 which was used for setting parameters in
-    *         {@link #setParameters(PreparedStatement, int)}
-    */
-   public int getNextParameterIndex() {
-
-      return _nextParameterIndex;
-   }
-
-   /**
     * @return Returns the WHERE clause to filter tours by the app filter, e.g. person, tour types,
     *         ...
     *         <p>
@@ -277,8 +266,6 @@ public class AppFilter {
 
    /**
     * Sets the app filter parameters into the filter statement.
-    * <p>
-    * The last used index can be retrieved with {@link #getNextParameterIndex()}
     *
     * @param statement
     * @param startIndex
@@ -296,36 +283,29 @@ public class AppFilter {
 
          if (parameter instanceof Long) {
 
-            statement.setLong(parameterIndex, (Long) parameter);
-            parameterIndex++;
+            statement.setLong(parameterIndex++, (Long) parameter);
 
          } else if (parameter instanceof Integer) {
 
-            statement.setInt(parameterIndex, (Integer) parameter);
-            parameterIndex++;
+            statement.setInt(parameterIndex++, (Integer) parameter);
 
          } else if (parameter instanceof Float) {
 
-            statement.setFloat(parameterIndex, (Float) parameter);
-            parameterIndex++;
+            statement.setFloat(parameterIndex++, (Float) parameter);
 
          } else if (parameter instanceof Double) {
 
-            statement.setDouble(parameterIndex, (Double) parameter);
-            parameterIndex++;
+            statement.setDouble(parameterIndex++, (Double) parameter);
 
          } else if (parameter instanceof String) {
 
-            statement.setString(parameterIndex, (String) parameter);
-            parameterIndex++;
+            statement.setString(parameterIndex++, (String) parameter);
 
          } else {
 
-            throw new RuntimeException("SQL filter parameter is not supported, " + parameter.getClass());//$NON-NLS-1$
+            throw new RuntimeException("This SQL filter parameter class is not supported: " + parameter.getClass());//$NON-NLS-1$
          }
       }
-
-      _nextParameterIndex = parameterIndex;
 
       return parameterIndex;
    }
@@ -344,7 +324,6 @@ public class AppFilter {
             + "SQLFilter" + NL //                                             //$NON-NLS-1$
 
             + " _sqlWhereClause      = " + _sqlWhereClause + NL //            //$NON-NLS-1$
-            + " _nextParameterIndex  = " + _nextParameterIndex + NL //        //$NON-NLS-1$
 
             + " _allParameters       = " + parameters + NL //                 //$NON-NLS-1$
       ;

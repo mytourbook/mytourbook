@@ -381,10 +381,9 @@ public class NatTable_DataLoader {
 
             prepStmt = conn.prepareStatement(sql);
 
-            // set filter parameters
-            appFilter.setParameters(prepStmt, 1);
+            int nextIndex = 1;
 
-            int nextIndex = appFilter.getNextParameterIndex();
+            nextIndex = appFilter.setParameters(prepStmt, nextIndex);
 
             if (isFirstRun) {
                nextIndex = tourCollectionFilter.setParameters(prepStmt, nextIndex);
