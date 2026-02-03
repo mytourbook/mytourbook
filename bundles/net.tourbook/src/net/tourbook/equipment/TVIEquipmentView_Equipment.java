@@ -112,6 +112,17 @@ public class TVIEquipmentView_Equipment extends TVIEquipmentView_Item {
 
       if (_equipment.isCollate() && isShowTours() == false) {
 
+         // hide the expand icon in the view
+
+         return false;
+      }
+
+      final ArrayList<TreeViewerItem> unfetchedChildren = getUnfetchedChildren();
+
+      if (unfetchedChildren != null && unfetchedChildren.size() == 0) {
+
+         // hide the expand icon in the view
+
          return false;
       }
 

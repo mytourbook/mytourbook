@@ -21,6 +21,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Map;
 
 import net.tourbook.application.TourbookPlugin;
@@ -198,6 +199,9 @@ public abstract class TVIEquipmentView_Item extends TreeViewerItem {
 
    private void loadSummarizedValues_Equipment_IgnoreCollate(final Map<Long, TVIEquipmentView_Equipment> allEquipmentItems) {
 
+      // clone map
+      final Map<Long, TVIEquipmentView_Equipment> allEquipmentItemsWithoutTours = new HashMap<>(allEquipmentItems);
+
       String sql = null;
       PreparedStatement statement = null;
 
@@ -209,22 +213,22 @@ public abstract class TVIEquipmentView_Item extends TreeViewerItem {
 
                + "SELECT" + NL //                                                            //$NON-NLS-1$
 
-               + "   j_TD_EQ.EQUIPMENT_EQUIPMENTID," + NL //                              1  //$NON-NLS-1$
+               + "   j_Td_Eq.EQUIPMENT_EQUIPMENTID," + NL //                              1  //$NON-NLS-1$
                + "   COUNT(*) AS numTours" + NL //                                        2  //$NON-NLS-1$
 
                + "FROM EQUIPMENT" + NL //                                                    //$NON-NLS-1$
 
-               + "JOIN TOURDATA_EQUIPMENT AS j_TD_EQ" + NL //                                //$NON-NLS-1$
-               + "   ON j_TD_EQ.EQUIPMENT_EQUIPMENTID = EQUIPMENT.EQUIPMENTID" + NL //       //$NON-NLS-1$
+               + "JOIN TOURDATA_EQUIPMENT AS j_Td_Eq" + NL //                                //$NON-NLS-1$
+               + "   ON j_Td_Eq.EQUIPMENT_EQUIPMENTID = EQUIPMENT.EQUIPMENTID" + NL //       //$NON-NLS-1$
 
                // the alias "TourData" is needed that the app filter is working
                + "JOIN TourData AS TourData" + NL //                                         //$NON-NLS-1$
-               + "   ON TourData.tourid = j_td_eq.tourdata_tourid" + NL //                   //$NON-NLS-1$
+               + "   ON TourData.tourid = j_Td_Eq.tourdata_tourid" + NL //                   //$NON-NLS-1$
 
                + appFilter.getWhereClause()
 
                + "GROUP BY " + NL //                                                         //$NON-NLS-1$
-               + "   j_TD_EQ.EQUIPMENT_EQUIPMENTID" + NL //                                  //$NON-NLS-1$
+               + "   j_Td_Eq.EQUIPMENT_EQUIPMENTID" + NL //                                  //$NON-NLS-1$
          ;
 
          statement = conn.prepareStatement(sql);
@@ -245,7 +249,16 @@ public abstract class TVIEquipmentView_Item extends TreeViewerItem {
             if (equipmentItem != null) {
 
                equipmentItem.numTours_All = numTours;
+
+               // this equipment has a tour -> remove from list
+               allEquipmentItemsWithoutTours.remove(equipmentID);
             }
+         }
+
+         for (final TVIEquipmentView_Equipment equipmentItem : allEquipmentItemsWithoutTours.values()) {
+
+            // set 0 children that the expand icon in the view is not displayed
+            equipmentItem.setChildren(new ArrayList<>());
          }
 
       } catch (final SQLException e) {
@@ -274,12 +287,12 @@ public abstract class TVIEquipmentView_Item extends TreeViewerItem {
 
                + "FROM equipment AS equipment" + NL //                                       //$NON-NLS-1$
 
-               + "JOIN tourdata_equipment AS j_td_eq" + NL //                                //$NON-NLS-1$
-               + "  ON j_td_eq.equipment_equipmentid = equipment.EQUIPMENTID" + NL //        //$NON-NLS-1$
+               + "JOIN tourdata_equipment AS j_Td_Eq" + NL //                                //$NON-NLS-1$
+               + "  ON j_Td_Eq.equipment_equipmentid = equipment.EQUIPMENTID" + NL //        //$NON-NLS-1$
 
                // the alias "TourData" is needed that the app filter is working
                + "JOIN tourdata AS TourData" + NL //                                         //$NON-NLS-1$
-               + "  ON TourData.tourid = j_td_eq.tourdata_tourid" + NL //                    //$NON-NLS-1$
+               + "  ON TourData.tourid = j_Td_Eq.tourdata_tourid" + NL //                    //$NON-NLS-1$
                + "  AND TourData.tourstarttime >= equipment.dateFrom" + NL //                //$NON-NLS-1$
                + "  AND TourData.tourstarttime <  equipment.dateUntil" + NL //               //$NON-NLS-1$
 
@@ -357,12 +370,12 @@ public abstract class TVIEquipmentView_Item extends TreeViewerItem {
 
                + "   FROM EquipmentPart AS part" + NL //                                           //$NON-NLS-1$
 
-               + "   JOIN tourdata_equipment AS j_td_eq" + NL //                                   //$NON-NLS-1$
-               + "      ON j_td_eq.equipment_equipmentid = part.equipment_equipmentid" + NL //     //$NON-NLS-1$
+               + "   JOIN tourdata_equipment AS j_Td_Eq" + NL //                                   //$NON-NLS-1$
+               + "      ON j_Td_Eq.equipment_equipmentid = part.equipment_equipmentid" + NL //     //$NON-NLS-1$
 
                // the alias "TourData" is needed that the app filter is working
                + "   JOIN TourData AS TourData" + NL //                                            //$NON-NLS-1$
-               + "      ON TourData.tourid = j_td_eq.tourdata_tourid" + NL //                      //$NON-NLS-1$
+               + "      ON TourData.tourid = j_Td_Eq.tourdata_tourid" + NL //                      //$NON-NLS-1$
                + "      AND TourData.tourstarttime >= part.dateFrom" + NL //                       //$NON-NLS-1$
                + "      AND TourData.tourstarttime <  part.dateUntil" + NL //                      //$NON-NLS-1$
 

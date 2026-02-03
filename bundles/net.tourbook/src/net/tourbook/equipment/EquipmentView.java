@@ -2904,12 +2904,11 @@ public class EquipmentView extends ViewPart implements ITourProvider, ITourViewe
          return true;
       }
 
-      // equipment are filtered
+      // equipment is filtered
 
-      if (false
-            || item instanceof TVIEquipmentView_Equipment) {
+      if (item instanceof final TVIEquipmentView_Equipment equipmentItem) {
 
-         final boolean hasTour = ((TVIEquipmentView_Item) item).numTours_All > 0;
+         final boolean hasTour = equipmentItem.numTours_All > 0;
 
          if (_equipmentFilterType == EquipmentFilterType.EQUIPMENT_WITH_TOURS && hasTour) {
 
