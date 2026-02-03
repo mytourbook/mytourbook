@@ -104,53 +104,51 @@ public abstract class TVIEquipmentView_Item extends TreeViewerItem {
       ;
    }
 
-   private TreeViewer _equipmentViewer;
+   private TreeViewer          _equipmentViewer;
 
    /**
-    * Is <code>true</code> when tours, years and months should be displayed in the viewer, otherwise
-    * <code>false</code> which is used in the tour equipment filter where only the equipment
-    * structure is displayed
+    * Type where the viewer items are used
     */
-   private boolean    _isShowTours;
+   private EquipmentViewerType _viewerType;
 
-   public long        numTours_All;
-   public long        numTours_IsCollated;
+   public long                 numTours_All;
+   public long                 numTours_IsCollated;
 
    /**
     * Content which is displayed in the first tree column
     */
-   public String      firstColumn;
+   public String               firstColumn;
 
-   float              colDistance;
+   float                       colDistance;
 
-   long               colElapsedTime;
-   long               colRecordedTime;
-   long               colMovingTime;
-   long               colPausedTime;
+   long                        colElapsedTime;
+   long                        colRecordedTime;
+   long                        colMovingTime;
+   long                        colPausedTime;
 
-   long               colAltitudeUp;
-   long               colAltitudeDown;
+   long                        colAltitudeUp;
+   long                        colAltitudeDown;
 
-   float              colMaxSpeed;
-   long               colMaxPulse;
-   long               colMaxAltitude;
+   float                       colMaxSpeed;
+   long                        colMaxPulse;
+   long                        colMaxAltitude;
 
-   float              colAvgSpeed;
-   float              colAvgPace;
+   float                       colAvgSpeed;
+   float                       colAvgPace;
 
-   float              colAvgPulse;
-   float              colAvgCadence;
-   float              colAvgTemperature_Device;
-
-   /**
-    * {@link #type} and {@link #dateFrom} are the key parts to collated (summarize) tour values
-    */
-   String             type;
+   float                       colAvgPulse;
+   float                       colAvgCadence;
+   float                       colAvgTemperature_Device;
 
    /**
     * {@link #type} and {@link #dateFrom} are the key parts to collated (summarize) tour values
     */
-   LocalDateTime      dateFrom;
+   String                      type;
+
+   /**
+    * {@link #type} and {@link #dateFrom} are the key parts to collated (summarize) tour values
+    */
+   LocalDateTime               dateFrom;
 
    /*
     * These are common values for equipment, part and service
@@ -168,11 +166,11 @@ public abstract class TVIEquipmentView_Item extends TreeViewerItem {
     */
    String usageDurationLast;
 
-   public TVIEquipmentView_Item(final TreeViewer equipmentViewer, final boolean isShowTours) {
+   public TVIEquipmentView_Item(final TreeViewer equipmentViewer, final EquipmentViewerType equipmentType) {
 
       _equipmentViewer = equipmentViewer;
 
-      _isShowTours = isShowTours;
+      _viewerType = equipmentType;
    }
 
    /**
@@ -184,11 +182,11 @@ public abstract class TVIEquipmentView_Item extends TreeViewerItem {
    }
 
    /**
-    * @return {@link #_isShowTours}
+    * @return {@link #_viewerType}
     */
-   public boolean isShowTours() {
+   public EquipmentViewerType getViewerType() {
 
-      return _isShowTours;
+      return _viewerType;
    }
 
    void loadSummarizedValues_Equipment(final Map<Long, TVIEquipmentView_Equipment> allEquipmentItems) {
@@ -198,9 +196,6 @@ public abstract class TVIEquipmentView_Item extends TreeViewerItem {
    }
 
    private void loadSummarizedValues_Equipment_IgnoreCollate(final Map<Long, TVIEquipmentView_Equipment> allEquipmentItems) {
-
-      // clone map
-      final Map<Long, TVIEquipmentView_Equipment> allEquipmentItemsWithoutTours = new HashMap<>(allEquipmentItems);
 
       String sql = null;
       PreparedStatement statement = null;
@@ -249,16 +244,7 @@ public abstract class TVIEquipmentView_Item extends TreeViewerItem {
             if (equipmentItem != null) {
 
                equipmentItem.numTours_All = numTours;
-
-               // this equipment has a tour -> remove from list
-               allEquipmentItemsWithoutTours.remove(equipmentID);
             }
-         }
-
-         for (final TVIEquipmentView_Equipment equipmentItem : allEquipmentItemsWithoutTours.values()) {
-
-            // set 0 children that the expand icon in the view is not displayed
-            equipmentItem.setChildren(new ArrayList<>());
          }
 
       } catch (final SQLException e) {
@@ -269,6 +255,9 @@ public abstract class TVIEquipmentView_Item extends TreeViewerItem {
    }
 
    private void loadSummarizedValues_Equipment_WithCollate(final Map<Long, TVIEquipmentView_Equipment> allEquipmentItems) {
+
+      // clone map
+      final Map<Long, TVIEquipmentView_Equipment> allEquipmentItemsWithoutTours = new HashMap<>(allEquipmentItems);
 
       String sql = null;
       PreparedStatement statement = null;
@@ -323,6 +312,18 @@ public abstract class TVIEquipmentView_Item extends TreeViewerItem {
                equipmentItem.numTours_IsCollated = numTours;
 
                equipmentItem.readCommonValues(result, 3);
+
+               // this equipment has a tour -> remove from list
+               allEquipmentItemsWithoutTours.remove(equipmentID);
+            }
+         }
+
+         for (final TVIEquipmentView_Equipment equipmentItem : allEquipmentItemsWithoutTours.values()) {
+
+            if (equipmentItem.getEquipment().isCollate()) {
+
+               // set 0 children that the expand icon in the view is not displayed
+               equipmentItem.setChildren(new ArrayList<>());
             }
          }
 
@@ -391,8 +392,8 @@ public abstract class TVIEquipmentView_Item extends TreeViewerItem {
 
                + ") AS Summarized" + NL //                                                         //$NON-NLS-1$
 
-               + "LEFT JOIN equipment     j_equip ON j_equip.equipmentid = Summarized.part_eq_id" + NL //   //$NON-NLS-1$
-               + "LEFT JOIN equipmentpart j_part  ON j_part.partid       = Summarized.part_id" + NL //      //$NON-NLS-1$
+               + "LEFT JOIN equipment     AS j_equip ON j_equip.equipmentid = Summarized.part_eq_id" + NL //   //$NON-NLS-1$
+               + "LEFT JOIN equipmentpart AS j_part  ON j_part.partid       = Summarized.part_id" + NL //      //$NON-NLS-1$
          ;
 
          statement = conn.prepareStatement(sql);

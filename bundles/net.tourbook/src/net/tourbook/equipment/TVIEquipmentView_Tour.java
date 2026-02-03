@@ -70,22 +70,24 @@ public class TVIEquipmentView_Tour extends TVIEquipmentView_Item {
    public TVIEquipmentView_Tour(final TVIEquipmentView_Item parentItem,
                                 final TVIEquipmentView_Equipment equipmentItem,
                                 final TreeViewer treeViewer,
-                                final boolean isShowTours) {
+                                final EquipmentViewerType equipmentType) {
 
-      super(treeViewer, isShowTours);
+      super(treeViewer, equipmentType);
 
       setParentItem(parentItem);
+      
       _equipmentItem = equipmentItem;
    }
 
    public TVIEquipmentView_Tour(final TVIEquipmentView_Item parentItem,
                                 final TVIEquipmentView_Part partItem,
                                 final TreeViewer treeViewer,
-                                final boolean isShowTours) {
+                                final EquipmentViewerType equipmentType) {
 
-      super(treeViewer, isShowTours);
+      super(treeViewer, equipmentType);
 
       setParentItem(parentItem);
+      
       _partItem = partItem;
    }
 

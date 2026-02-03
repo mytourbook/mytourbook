@@ -39,7 +39,7 @@ import net.tourbook.tour.filter.geo.TourGeoFilter_Manager;
  */
 public class AppFilter {
 
-   private static final char               NL                    = net.tourbook.common.UI.NEW_LINE;
+   private static final char               NL                    = UI.NEW_LINE;
 
    /**
     * Contains any available app filters
@@ -75,7 +75,8 @@ public class AppFilter {
       ONLY_FAST_APP_FILTERS.add(AppFilterType.Photo);
    }
 
-   private String       _sqlWhereClause = net.tourbook.common.UI.EMPTY_STRING;
+   private String       _sqlWhereClause = UI.EMPTY_STRING;
+
    private List<Object> _allParameters  = new ArrayList<>();
 
    /**

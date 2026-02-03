@@ -181,41 +181,42 @@ public class EquipmentView extends ViewPart implements ITourProvider, ITourViewe
       _nf0.setMaximumFractionDigits(0);
    }
 
-   private IPropertyChangeListener            _prefChangeListener;
-   private IPropertyChangeListener            _prefChangeListener_Common;
-   private ISelectionListener                 _postSelectionListener;
-   private ITourEventListener                 _tourEventListener;
+   private IPropertyChangeListener   _prefChangeListener;
+   private IPropertyChangeListener   _prefChangeListener_Common;
+   private ISelectionListener        _postSelectionListener;
+   private ITourEventListener        _tourEventListener;
 
-   private PostSelectionProvider              _postSelectionProvider;
+   private PostSelectionProvider     _postSelectionProvider;
 
-   private TreeViewer                         _equipmentViewer;
-   private ColumnManager                      _columnManager;
-   private TVIEquipmentView_Root              _rootItem;
-   private TourDoubleClickState               _tourDoubleClickState                    = new TourDoubleClickState();
+   private TreeViewer                _equipmentViewer;
+   private ColumnManager             _columnManager;
+   private TVIEquipmentView_Root     _rootItem;
+   private TourDoubleClickState      _tourDoubleClickState      = new TourDoubleClickState();
 
-   private MenuManager                        _viewerMenuManager;
-   private Menu                               _treeContextMenu;
-   private IContextMenuProvider               _viewerContextMenuProvider               = new TreeContextMenuProvider();
+   private MenuManager               _viewerMenuManager;
+   private Menu                      _treeContextMenu;
+   private IContextMenuProvider      _viewerContextMenuProvider = new TreeContextMenuProvider();
 
-   private TreeViewerTourInfoToolTip          _tourInfoToolTip;
+   private TreeViewerTourInfoToolTip _tourInfoToolTip;
 
-   private TreeColumnDefinition               _colDef_EquipmentImage;
-   private int                                _columnIndex_EquipmentImage;
-   private int                                _columnWidth_EquipmentImage;
-   private int                                _defaultTreeItemHeight;
-   private int                                _selectedTreeItemHeight;
+   private TreeColumnDefinition      _colDef_EquipmentImage;
+   private int                       _columnIndex_EquipmentImage;
+   private int                       _columnWidth_EquipmentImage;
+   private int                       _defaultTreeItemHeight;
+   private int                       _selectedTreeItemHeight;
 
-   private OpenDialogManager                  _openDlgMgr                              = new OpenDialogManager();
+   private OpenDialogManager         _openDlgMgr                = new OpenDialogManager();
 
-   private EquipmentFilterType                _equipmentFilterType                     = EquipmentFilterType.ALL_IS_DISPLAYED;
+   private EquipmentFilterType       _equipmentFilterType       = EquipmentFilterType.ALL_IS_DISPLAYED;
 
-   private EquipmentMenuManager               _equipmentMenuManager;
-   private TagMenuManager                     _tagMenuManager;
-   private TourTypeMenuManager                _tourTypeMenuManager;
+   private EquipmentMenuManager      _equipmentMenuManager;
+   private TagMenuManager            _tagMenuManager;
+   private TourTypeMenuManager       _tourTypeMenuManager;
 
-   private HashMap<String, Object>            _allTourActions_Edit;
-   private HashMap<String, Object>            _allTourActions_Export;
+   private HashMap<String, Object>   _allTourActions_Edit;
+   private HashMap<String, Object>   _allTourActions_Export;
 
+// private ActionAppFilter                    _actionToggleAppFilter;
    private ActionEquipmentFilter              _actionToggleEquipmentFilter;
    private ActionEquipmentOptions             _actionEquipmentOptions;
 
@@ -289,6 +290,23 @@ public class EquipmentView extends ViewPart implements ITourProvider, ITourViewe
     */
    private Composite _parent;
    private Composite _viewerContainer;
+
+//   private class ActionAppFilter extends Action {
+//
+//      ActionAppFilter() {
+//
+//         super(UI.EMPTY_STRING, AS_CHECK_BOX);
+//
+//         setToolTipText("Toggle app filter");
+//
+//         setImageDescriptor(CommonActivator.getThemedImageDescriptor(CommonImages.App_Filter));
+//      }
+//
+//      @Override
+//      public void runWithEvent(final Event event) {
+//         onAction_ToggleAppFilter(event);
+//      }
+//   }
 
    private class ActionCollapseAll_WithoutSelection extends ActionCollapseAll {
 
@@ -454,15 +472,14 @@ public class EquipmentView extends ViewPart implements ITourProvider, ITourViewe
 
          super(UI.EMPTY_STRING, AS_CHECK_BOX);
 
-//         Toggle tag filter between
-//
-//         • Show all tags
-//
-//         • Show only tags which contain tours
-//
-//         • Show only tags which do not contain tours
+         final String tooltip = UI.EMPTY_STRING
 
-         setToolTipText("Togg...");
+               + "Toggle equipment filter between\n\n"
+               + "• Show all equipment\n"
+               + "• Show only equipment which contain tours\n"
+               + "• Show only equipment which do not contain tours\n";
+
+         setToolTipText(tooltip);
 
          setImageDescriptor(CommonActivator.getThemedImageDescriptor(CommonImages.App_Filter));
       }
@@ -913,6 +930,7 @@ public class EquipmentView extends ViewPart implements ITourProvider, ITourViewe
 
 // SET_FORMATTING_OFF
 
+//    _actionToggleAppFilter                 = new ActionAppFilter();
       _actionToggleEquipmentFilter           = new ActionEquipmentFilter();
       _actionEquipmentOptions                = new ActionEquipmentOptions();
 
@@ -2683,6 +2701,7 @@ public class EquipmentView extends ViewPart implements ITourProvider, ITourViewe
        */
       final IToolBarManager tbm = getViewSite().getActionBars().getToolBarManager();
 
+//    tbm.add(_actionToggleAppFilter);
       tbm.add(_actionToggleEquipmentFilter);
       tbm.add(_actionNewEquipment);
       tbm.add(_actionExpandSelection);
@@ -3728,7 +3747,7 @@ public class EquipmentView extends ViewPart implements ITourProvider, ITourViewe
 
    private void reloadViewer_SetContent() {
 
-      _rootItem = new TVIEquipmentView_Root(_equipmentViewer, true);
+      _rootItem = new TVIEquipmentView_Root(_equipmentViewer, EquipmentViewerType.IS_EQUIPMENT_VIEWER);
 
       // first: load all tree items
       loadAllTreeItems();
@@ -4114,7 +4133,7 @@ public class EquipmentView extends ViewPart implements ITourProvider, ITourViewe
       _equipmentFilterType = EquipmentFilterType.ALL_IS_DISPLAYED;
 
       _actionToggleEquipmentFilter.setChecked(false);
-      _actionToggleEquipmentFilter.setImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.Equipment_Filter));
+      _actionToggleEquipmentFilter.setImageDescriptor(CommonActivator.getThemedImageDescriptor(CommonImages.App_Filter));
    }
 
    private void setEquipmentFilter_NoTours() {

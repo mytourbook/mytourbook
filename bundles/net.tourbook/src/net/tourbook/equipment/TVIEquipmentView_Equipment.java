@@ -21,6 +21,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import net.tourbook.common.UI;
@@ -43,9 +44,9 @@ public class TVIEquipmentView_Equipment extends TVIEquipmentView_Item {
 
    public TVIEquipmentView_Equipment(final TreeViewer equipViewer,
                                      final Equipment equipment,
-                                     final boolean isShowTours) {
+                                     final EquipmentViewerType equipmentType) {
 
-      super(equipViewer, isShowTours);
+      super(equipViewer, equipmentType);
 
       _equipment = equipment;
       _equipmentID = equipment.getEquipmentId();
@@ -110,20 +111,19 @@ public class TVIEquipmentView_Equipment extends TVIEquipmentView_Item {
    @Override
    public boolean hasChildren() {
 
-      if (_equipment.isCollate() && isShowTours() == false) {
+      final List<TreeViewerItem> unfetchedChildren = getUnfetchedChildren();
 
-         // hide the expand icon in the view
+      final EquipmentViewerType viewerType = getViewerType();
 
-         return false;
-      }
+      if (viewerType == EquipmentViewerType.IS_EQUIPMENT_FILTER
+            || viewerType == EquipmentViewerType.IS_EQUIPMENT_VIEWER && _equipment.isCollate()) {
 
-      final ArrayList<TreeViewerItem> unfetchedChildren = getUnfetchedChildren();
+         if (unfetchedChildren != null && unfetchedChildren.size() == 0) {
 
-      if (unfetchedChildren != null && unfetchedChildren.size() == 0) {
+            // hide the expand icon in the view
 
-         // hide the expand icon in the view
-
-         return false;
+            return false;
+         }
       }
 
       return true;
@@ -148,7 +148,12 @@ public class TVIEquipmentView_Equipment extends TVIEquipmentView_Item {
             durationLastText = "Until now : ";
          }
 
-         final TVIEquipmentView_Part partItem = new TVIEquipmentView_Part(this, part, getEquipmentViewer(), isShowTours());
+         final TVIEquipmentView_Part partItem = new TVIEquipmentView_Part(
+
+               this,
+               part,
+               getEquipmentViewer(),
+               getViewerType());
 
 // SET_FORMATTING_OFF
 
@@ -272,7 +277,12 @@ public class TVIEquipmentView_Equipment extends TVIEquipmentView_Item {
 
                // first resultset for a new tour
 
-               final TVIEquipmentView_Tour tourItem = new TVIEquipmentView_Tour(this, this, getEquipmentViewer(), isShowTours());
+               final TVIEquipmentView_Tour tourItem = new TVIEquipmentView_Tour(
+
+                     this,
+                     this,
+                     getEquipmentViewer(),
+                     getViewerType());
 
                allTourItems.add(tourItem);
 
@@ -380,7 +390,7 @@ public class TVIEquipmentView_Equipment extends TVIEquipmentView_Item {
                   year,
                   _isMonthCategory,
                   getEquipmentViewer(),
-                  isShowTours());
+                  getViewerType());
 
             allTourItems.add(yearItem);
 

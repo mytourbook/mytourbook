@@ -44,9 +44,9 @@ public class TVIEquipmentView_Equipment_Month extends TVIEquipmentView_Item {
                                            final int dbYear,
                                            final int dbMonth,
                                            final TreeViewer treeViewer,
-                                           final boolean isShowTours) {
+                                           final EquipmentViewerType equipmentType) {
 
-      super(treeViewer, isShowTours);
+      super(treeViewer, equipmentType);
 
       setParentItem(parentItem);
       _equipmentItem = equipmentItem;
@@ -259,7 +259,12 @@ public class TVIEquipmentView_Equipment_Month extends TVIEquipmentView_Item {
 
                // first resultset for a new tour
 
-               final TVIEquipmentView_Tour tourItem = new TVIEquipmentView_Tour(this, _equipmentItem, getEquipmentViewer(), isShowTours());
+               final TVIEquipmentView_Tour tourItem = new TVIEquipmentView_Tour(
+
+                     this,
+                     _equipmentItem,
+                     getEquipmentViewer(),
+                     getViewerType());
 
                allTourItems.add(tourItem);
 

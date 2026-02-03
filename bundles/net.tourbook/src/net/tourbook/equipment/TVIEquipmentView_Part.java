@@ -21,6 +21,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import net.tourbook.common.UI;
@@ -44,9 +45,9 @@ public class TVIEquipmentView_Part extends TVIEquipmentView_Item {
    public TVIEquipmentView_Part(final TVIEquipmentView_Equipment parentItem,
                                 final EquipmentPart equipmentPart,
                                 final TreeViewer treeViewer,
-                                final boolean isShowTours) {
+                                final EquipmentViewerType equipmentType) {
 
-      super(treeViewer, isShowTours);
+      super(treeViewer, equipmentType);
 
       setParentItem(parentItem);
 
@@ -99,9 +100,20 @@ public class TVIEquipmentView_Part extends TVIEquipmentView_Item {
    @Override
    public boolean hasChildren() {
 
-      if (isShowTours() == false) {
+      final List<TreeViewerItem> unfetchedChildren = getUnfetchedChildren();
 
-         return false;
+      final EquipmentViewerType viewerType = getViewerType();
+
+      if (viewerType == EquipmentViewerType.IS_EQUIPMENT_FILTER
+
+            || viewerType == EquipmentViewerType.IS_EQUIPMENT_VIEWER && _part.isCollate()) {
+
+         if (unfetchedChildren != null && unfetchedChildren.size() == 0) {
+
+            // hide the expand icon in the view
+
+            return false;
+         }
       }
 
       return true;
@@ -209,7 +221,12 @@ public class TVIEquipmentView_Part extends TVIEquipmentView_Item {
 
                // first resultset for a new tour
 
-               final TVIEquipmentView_Tour tourItem = new TVIEquipmentView_Tour(this, this, getEquipmentViewer(), isShowTours());
+               final TVIEquipmentView_Tour tourItem = new TVIEquipmentView_Tour(
+
+                     this,
+                     this,
+                     getEquipmentViewer(),
+                     getViewerType());
 
                allTourItems.add(tourItem);
 
@@ -320,7 +337,7 @@ public class TVIEquipmentView_Part extends TVIEquipmentView_Item {
                   year,
                   _isMonthCategory,
                   getEquipmentViewer(),
-                  isShowTours());
+                  getViewerType());
 
             allTourItems.add(yearItem);
 

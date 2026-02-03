@@ -33,6 +33,7 @@ import net.tourbook.common.util.Util;
 import net.tourbook.data.Equipment;
 import net.tourbook.data.EquipmentPart;
 import net.tourbook.equipment.EquipmentManager;
+import net.tourbook.equipment.EquipmentViewerType;
 import net.tourbook.equipment.TVIEquipmentView_Equipment;
 import net.tourbook.equipment.TVIEquipmentView_Item;
 import net.tourbook.equipment.TVIEquipmentView_Part;
@@ -109,9 +110,9 @@ import org.eclipse.swt.widgets.Widget;
  */
 public class SlideoutTourEquipmentFilter extends AdvancedSlideout implements ITreeViewer {
 
-   private static final String                         STATE_IS_LIVE_UPDATE           = "STATE_IS_LIVE_UPDATE";                  //$NON-NLS-1$
-   private static final String                         STATE_SASH_WIDTH_CONTAINER     = "STATE_SASH_WIDTH_CONTAINER";            //$NON-NLS-1$
-   private static final String                         STATE_SASH_WIDTH_TAG_CONTAINER = "STATE_SASH_WIDTH_TAG_CONTAINER";        //$NON-NLS-1$
+   private static final String                         STATE_IS_LIVE_UPDATE                 = "STATE_IS_LIVE_UPDATE";                  //$NON-NLS-1$
+   private static final String                         STATE_SASH_WIDTH_CONTAINER           = "STATE_SASH_WIDTH_CONTAINER";            //$NON-NLS-1$
+   private static final String                         STATE_SASH_WIDTH_EQUIPMENT_CONTAINER = "STATE_SASH_WIDTH_EQUIPMENT_CONTAINER";  //$NON-NLS-1$
 
    /**
     * The expanded equipment items have these structure:
@@ -123,21 +124,21 @@ public class SlideoutTourEquipmentFilter extends AdvancedSlideout implements ITr
     * 4. id/year/month<br>
     * ...
     */
-   private static final String                         STATE_EXPANDED_ITEMS           = "STATE_EXPANDED_ITEMS";                  //$NON-NLS-1$
+   private static final String                         STATE_EXPANDED_ITEMS                 = "STATE_EXPANDED_ITEMS";                  //$NON-NLS-1$
 
    /**
     * Using large numbers to easier debug and find issues
     */
-   private static final int                            STATE_ITEM_TYPE_SEPARATOR      = -1;
-   private static final int                            STATE_ITEM_TYPE_EQUIPMENT      = 1111;
-   private static final int                            STATE_ITEM_TYPE_PART           = 2111;
+   private static final int                            STATE_ITEM_TYPE_SEPARATOR            = -1;
+   private static final int                            STATE_ITEM_TYPE_EQUIPMENT            = 1111;
+   private static final int                            STATE_ITEM_TYPE_PART                 = 2111;
 
-   private static final Object[]                       EMPTY_LIST                     = new Object[] {};
-   private static final long[]                         NO_EQUIPMENT                   = new long[] {};
+   private static final Object[]                       EMPTY_LIST                           = new Object[] {};
+   private static final long[]                         NO_EQUIPMENT                         = new long[] {};
 
    private static IDialogSettings                      _state;
 
-   private final List<TourEquipmentFilterProfile>      _profiles                      = TourEquipmentFilterManager.getProfiles();
+   private final List<TourEquipmentFilterProfile>      _profiles                            = TourEquipmentFilterManager.getProfiles();
 
    private TableViewer                                 _profileViewer;
    private TourEquipmentFilterProfile                  _selectedProfile;
@@ -146,7 +147,7 @@ public class SlideoutTourEquipmentFilter extends AdvancedSlideout implements ITr
    private TVIEquipmentView_Root                       _equipmentViewerRootItem;
 
    private CheckboxTableViewer                         _selectedEquipmentViewer;
-   private List<SelectedEquipment>                     _allSelectedEquipmentItems     = new ArrayList<>();
+   private List<SelectedEquipment>                     _allSelectedEquipmentItems           = new ArrayList<>();
 
    private ToolItem                                    _tourEquipmentFilterItem;
 
@@ -579,7 +580,7 @@ public class SlideoutTourEquipmentFilter extends AdvancedSlideout implements ITr
 
       _tourEventListener = (workbenchPart, tourEventId, eventData) -> {
 
-         if (tourEventId == TourEventId.TAG_STRUCTURE_CHANGED) {
+         if (tourEventId == TourEventId.EQUIPMENT_STRUCTURE_CHANGED) {
 
             if (_profileViewer != null && _profileViewer.getTable().isDisposed()) {
                return;
@@ -906,7 +907,7 @@ public class SlideoutTourEquipmentFilter extends AdvancedSlideout implements ITr
                sash,
                containerEquipmentViewer,
                _state,
-               STATE_SASH_WIDTH_TAG_CONTAINER,
+               STATE_SASH_WIDTH_EQUIPMENT_CONTAINER,
                40);
       }
    }
@@ -2452,7 +2453,7 @@ public class SlideoutTourEquipmentFilter extends AdvancedSlideout implements ITr
 
    private void updateEquipmentModel() {
 
-      _equipmentViewerRootItem = new TVIEquipmentView_Root(_equipmentViewer, false);
+      _equipmentViewerRootItem = new TVIEquipmentView_Root(_equipmentViewer, EquipmentViewerType.IS_EQUIPMENT_FILTER);
       _equipmentViewer.setInput(this);
 
       loadAllTreeItems();

@@ -616,6 +616,7 @@ public class Equipment implements Cloneable, Comparable<Object>, Serializable {
             + "  brand            = " + brand + NL //                      //$NON-NLS-1$
             + "  model            = " + model + NL //                      //$NON-NLS-1$
 
+            + "  isCollate        = " + isCollate + NL //                  //$NON-NLS-1$
             + "  type             = " + type + NL //                       //$NON-NLS-1$
             + "  dateFrom         = " + getDateFrom_Local() + NL //        //$NON-NLS-1$
             + "  dateUntil        = " + getDateUntil_Local() + NL //       //$NON-NLS-1$
