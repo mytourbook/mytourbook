@@ -24,7 +24,6 @@ import net.tourbook.application.ActionTourTagFilter;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.UI;
 import net.tourbook.common.time.TimeTools;
-import net.tourbook.common.util.SQLData;
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.Util;
 import net.tourbook.preferences.ITourbookPreferences;
@@ -40,8 +39,6 @@ import org.osgi.framework.Version;
 
 public class TourTagFilterManager {
 
-   private static final char                      NL                          = UI.NEW_LINE;
-
    private static final String                    TOUR_FILTER_FILE_NAME       = "tour-tag-filter.xml";                  //$NON-NLS-1$
    private static final int                       TOUR_FILTER_VERSION         = 1;
 
@@ -55,9 +52,6 @@ public class TourTagFilterManager {
    private static final String                    ATTR_NAME                   = "name";                                 //$NON-NLS-1$
    private static final String                    ATTR_TAG_ID                 = "tagIds";                               //$NON-NLS-1$
    private static final String                    ATTR_TAG_ID_UNCHECKED       = "tagIdsUnchecked";                      //$NON-NLS-1$
-
-   private static final String                    PARAMETER_FIRST             = " ?";                                   //$NON-NLS-1$
-   private static final String                    PARAMETER_FOLLOWING         = ", ?";                                  //$NON-NLS-1$
 
    private static final Bundle                    _bundle                     = TourbookPlugin.getDefault().getBundle();
 
@@ -116,59 +110,6 @@ public class TourTagFilterManager {
     */
    public static TourTagFilterProfile getSelectedProfile() {
       return _selectedProfile;
-   }
-
-   /**
-    * @return Returns the SQL <code>WHERE</code> part for the tag filter when a tag filter is
-    *         enabled and tag's are OR'ed, otherwise <code>null</code>.
-    */
-   public static SQLData getSQL_WherePart() {
-
-      if (_selectedProfile == null) {
-         return null;
-      }
-
-      final long[] tagIds = _selectedProfile.tagFilterIds.toArray();
-
-      if (_isTourTagFilterEnabled == false || tagIds.length == 0) {
-
-         // tour tag filter is not enabled
-
-         return null;
-      }
-
-      if (_selectedProfile.isOrOperator == false) {
-
-         /**
-          * Tags are combined with AND
-          * <p>
-          * This cannot simply be done by using an AND operator between tag's, it is done with an
-          * inner join -> complicated
-          */
-
-         return null;
-      }
-
-      /*
-       * Combine tags with OR
-       */
-
-      final ArrayList<Object> sqlParameters = new ArrayList<>();
-      final StringBuilder parameterTagIds = new StringBuilder();
-
-      for (int tagIndex = 0; tagIndex < tagIds.length; tagIndex++) {
-         if (tagIndex == 0) {
-            parameterTagIds.append(PARAMETER_FIRST);
-         } else {
-            parameterTagIds.append(PARAMETER_FOLLOWING);
-         }
-
-         sqlParameters.add(tagIds[tagIndex]);
-      }
-
-      final String sqlWhere = " AND jTdataTtag.TourTag_tagId IN (" + parameterTagIds.toString() + ")" + NL; //$NON-NLS-1$ //$NON-NLS-2$
-
-      return new SQLData(sqlWhere, sqlParameters);
    }
 
    private static File getXmlFile() {

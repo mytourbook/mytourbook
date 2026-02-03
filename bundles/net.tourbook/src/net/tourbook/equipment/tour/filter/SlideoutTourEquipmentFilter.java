@@ -746,7 +746,7 @@ public class SlideoutTourEquipmentFilter extends AdvancedSlideout implements ITr
             public void update(final ViewerCell cell) {
 
                final TourEquipmentFilterProfile profile = (TourEquipmentFilterProfile) cell.getElement();
-               final int numEquipment = profile.equipmentFilterIDs.size();
+               final int numEquipment = profile.allEquipmentFilterIDs.size();
 
                cell.setText(numEquipment == 0
                      ? UI.EMPTY_STRING
@@ -767,7 +767,7 @@ public class SlideoutTourEquipmentFilter extends AdvancedSlideout implements ITr
             public void update(final ViewerCell cell) {
 
                final TourEquipmentFilterProfile profile = (TourEquipmentFilterProfile) cell.getElement();
-               final int numUncheckedEquipment = profile.equipmentFilterIds_Unchecked.size();
+               final int numUncheckedEquipment = profile.allEquipmentFilterIDs_Unchecked.size();
 
                cell.setText(numUncheckedEquipment == 0
                      ? UI.EMPTY_STRING
@@ -788,7 +788,7 @@ public class SlideoutTourEquipmentFilter extends AdvancedSlideout implements ITr
             public void update(final ViewerCell cell) {
 
                final TourEquipmentFilterProfile profile = (TourEquipmentFilterProfile) cell.getElement();
-               final int numEquipment = profile.equipmentFilterIDs.size();
+               final int numEquipment = profile.allEquipmentFilterIDs.size();
 
                final String combineEquipment = profile.isOrOperator
                      ? Messages.Slideout_TourTagFilter_CombineTags_With_OR
@@ -2295,8 +2295,8 @@ public class SlideoutTourEquipmentFilter extends AdvancedSlideout implements ITr
 
    private void update_FromProfile() {
 
-      final long[] equipmentIDs_Checked = _selectedProfile.equipmentFilterIDs.toArray();
-      final long[] equipmentIDs_Unchecked = _selectedProfile.equipmentFilterIds_Unchecked.toArray();
+      final long[] equipmentIDs_Checked = _selectedProfile.allEquipmentFilterIDs.toArray();
+      final long[] equipmentIDs_Unchecked = _selectedProfile.allEquipmentFilterIDs_Unchecked.toArray();
 
       updateEquipment_SelectedEquipment(equipmentIDs_Checked, equipmentIDs_Unchecked);
       updateEquipment_EquipmentViewer(equipmentIDs_Checked);
@@ -2328,11 +2328,11 @@ public class SlideoutTourEquipmentFilter extends AdvancedSlideout implements ITr
       /*
        * Update model
        */
-      final LongHashSet profileEquipmentFilterIDs = profile.equipmentFilterIDs;
+      final LongHashSet profileEquipmentFilterIDs = profile.allEquipmentFilterIDs;
       profileEquipmentFilterIDs.clear();
       profileEquipmentFilterIDs.addAll(equipmentIDs_Checked);
 
-      final LongHashSet profileEquipmentFilterIDs_Unchecked = profile.equipmentFilterIds_Unchecked;
+      final LongHashSet profileEquipmentFilterIDs_Unchecked = profile.allEquipmentFilterIDs_Unchecked;
       profileEquipmentFilterIDs_Unchecked.clear();
       profileEquipmentFilterIDs_Unchecked.addAll(equipmentIDs_Unchecked);
 

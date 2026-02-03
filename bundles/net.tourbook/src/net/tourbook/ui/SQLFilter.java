@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2026 Wolfgang Schramm and Contributors
+ * Copyright (C) 2008, 2026 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -26,6 +26,8 @@ import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.UI;
 import net.tourbook.common.util.SQLData;
 import net.tourbook.data.TourPerson;
+import net.tourbook.equipment.EquipmentFilter;
+import net.tourbook.equipment.tour.filter.TourEquipmentFilterManager;
 import net.tourbook.tag.tour.filter.TourTagFilter;
 import net.tourbook.tag.tour.filter.TourTagFilterManager;
 import net.tourbook.tour.filter.TourFilterManager;
@@ -65,6 +67,7 @@ public class SQLFilter {
       ANY_APP_FILTERS.add(SQLAppFilter.Photo);
       ANY_APP_FILTERS.add(SQLAppFilter.GeoLocation);
       ANY_APP_FILTERS.add(SQLAppFilter.Tag);
+      ANY_APP_FILTERS.add(SQLAppFilter.Equipment);
 
       DEFAULT_APP_FILTERS.add(SQLAppFilter.Photo);
       DEFAULT_APP_FILTERS.add(SQLAppFilter.GeoLocation);
@@ -179,6 +182,21 @@ public class SQLFilter {
             sqlWhere.append(tagSqlData.getSqlString());
 
             _allParameters.addAll(tagSqlData.getParameters());
+         }
+      }
+
+      /*
+       * App Filter: Equipment
+       */
+      if (additionalAppFilter.contains(SQLAppFilter.Equipment)) {
+
+         if (TourEquipmentFilterManager.isFilterEnabled()) {
+
+            final SQLData equipmentSqlData = new EquipmentFilter().getSqlData();
+
+            sqlWhere.append(equipmentSqlData.getSqlString());
+
+            _allParameters.addAll(equipmentSqlData.getParameters());
          }
       }
 

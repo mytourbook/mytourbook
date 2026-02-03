@@ -13,7 +13,7 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
-package net.tourbook.tag.tour.filter;
+package net.tourbook.equipment;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -21,11 +21,10 @@ import java.util.List;
 import net.tourbook.common.UI;
 import net.tourbook.common.util.SQLData;
 import net.tourbook.database.TourDatabase;
+import net.tourbook.equipment.tour.filter.TourEquipmentFilterManager;
+import net.tourbook.equipment.tour.filter.TourEquipmentFilterProfile;
 
-/**
- * The SQL EXISTS statement is from the github KI copilot optimizations
- */
-public class TourTagFilter {
+public class EquipmentFilter {
 
    private static final char   NL                  = UI.NEW_LINE;
 
@@ -34,7 +33,7 @@ public class TourTagFilter {
 
    private SQLData             _sqlData;
 
-   public TourTagFilter() {
+   public EquipmentFilter() {
 
       _sqlData = createSQL();
    }
@@ -45,48 +44,56 @@ public class TourTagFilter {
 
       final List<Object> allSQLParameters = new ArrayList<>();
 
-      if (TourTagFilterManager.isFilterEnabled()) {
+      if (TourEquipmentFilterManager.isFilterEnabled()) {
 
-         final TourTagFilterProfile selectedProfile = TourTagFilterManager.getSelectedProfile();
+         final TourEquipmentFilterProfile selectedProfile = TourEquipmentFilterManager.getSelectedProfile();
 
-         final String joinTable = TourDatabase.JOINTABLE__TOURDATA__TOURTAG;
+         final String joinTable = TourDatabase.JOINTABLE__TOURDATA__EQUIPMENT;
 
          if (selectedProfile.isOrOperator) {
 
-            // combine tags with OR
+            // combine equipment with OR
 
             final StringBuilder sqlParameters = createSQL_OR_Parameters(allSQLParameters);
 
-            /* require tour to have at least one of these tags (index-friendly) */
+            /* require tour to have at least one of these equipment (index-friendly) */
             sql = UI.EMPTY_STRING
 
                   + "AND EXISTS" + NL //                                                     //$NON-NLS-1$
                   + "(" + NL //                                                              //$NON-NLS-1$
                   + "  SELECT 1" + NL //                                                     //$NON-NLS-1$
-                  + "  FROM " + joinTable + " AS tt" + NL //                                 //$NON-NLS-1$
+                  + "  FROM " + joinTable + " AS tt" + NL //                                 //$NON-NLS-1$ //$NON-NLS-2$
                   + "  WHERE tt.TOURDATA_TOURID = TourData.tourID" + NL //                   //$NON-NLS-1$
-                  + "    AND tt.TOURTAG_TAGID IN (" + sqlParameters + ")" + NL //            //$NON-NLS-1$ //$NON-NLS-2$
+                  + "    AND tt.Equipment_EquipmentId IN (" + sqlParameters + ")" + NL //            //$NON-NLS-1$ //$NON-NLS-2$
                   + ")" + NL //                                                              //$NON-NLS-1$
             ;
 
          } else {
 
-            // combine tags with AND
+            // combine equipment with AND
 
-            // AND EXISTS (SELECT 1 FROM TOURDATA_TOURTAG AS tt WHERE tt.TOURDATA_TOURID = TourData.tourId AND tt.TOURTAG_TAGID = 9)
-            // AND EXISTS (SELECT 1 FROM TOURDATA_TOURTAG AS tt WHERE tt.TOURDATA_TOURID = TourData.tourId AND tt.TOURTAG_TAGID = 12    )
-            // AND EXISTS (SELECT 1 FROM TOURDATA_TOURTAG AS tt WHERE tt.TOURDATA_TOURID = TourData.tourId AND tt.TOURTAG_TAGID = 20    )
+            // AND EXISTS (SELECT 1 FROM TOURDATA_Equipment AS tt WHERE tt.TOURDATA_TOURID = TourData.tourId AND tt.Equipment_EquipmentId = 9)
+            // AND EXISTS (SELECT 1 FROM TOURDATA_Equipment AS tt WHERE tt.TOURDATA_TOURID = TourData.tourId AND tt.Equipment_EquipmentId = 12    )
+            // AND EXISTS (SELECT 1 FROM TOURDATA_Equipment AS tt WHERE tt.TOURDATA_TOURID = TourData.tourId AND tt.Equipment_EquipmentId = 20    )
 
-            final long[] allTagIDs = selectedProfile.tagFilterIds.toArray();
+            final long[] allEquipmentIDs = selectedProfile.allEquipmentFilterIDs.toArray();
 
             final StringBuilder sb = new StringBuilder();
 
-            for (final long tagID : allTagIDs) {
+            for (final long equipmentID : allEquipmentIDs) {
 
-               sb.append("AND EXISTS (SELECT 1 FROM " + joinTable + " AS tt WHERE tt.TOURDATA_TOURID = TourData.tourId AND tt.TOURTAG_TAGID = ?)" //$NON-NLS-1$
-                     + NL);
+               sb.append(UI.EMPTY_STRING
 
-               allSQLParameters.add(tagID);
+                     + "AND EXISTS " //                                                //$NON-NLS-1$
+                     + "(" //                                                          //$NON-NLS-1$
+                     + "   SELECT 1" //                                                //$NON-NLS-1$
+                     + "   FROM " + joinTable + " AS tt " //                           //$NON-NLS-1$ //$NON-NLS-2$
+                     + "   WHERE tt.TOURDATA_TOURID = TourData.tourId " //             //$NON-NLS-1$
+                     + "     AND tt.Equipment_EquipmentId = ?" //                      //$NON-NLS-1$
+                     + ")" + NL //                                                     //$NON-NLS-1$
+               );
+
+               allSQLParameters.add(equipmentID);
             }
 
             sql = sb.toString();
@@ -108,11 +115,11 @@ public class TourTagFilter {
 
       final StringBuilder sb = new StringBuilder();
 
-      final long[] allTagIDs = TourTagFilterManager.getSelectedProfile().tagFilterIds.toArray();
+      final long[] allEquipmentIDs = TourEquipmentFilterManager.getSelectedProfile().allEquipmentFilterIDs.toArray();
 
-      for (int paramIndex = 0; paramIndex < allTagIDs.length; paramIndex++) {
+      for (int paramIndex = 0; paramIndex < allEquipmentIDs.length; paramIndex++) {
 
-         final long tagId = allTagIDs[paramIndex];
+         final long equipmentID = allEquipmentIDs[paramIndex];
 
          if (paramIndex == 0) {
             sb.append(PARAMETER_FIRST);
@@ -120,7 +127,7 @@ public class TourTagFilter {
             sb.append(PARAMETER_FOLLOWING);
          }
 
-         allSQLParameters.add(tagId);
+         allSQLParameters.add(equipmentID);
       }
 
       return sb;
