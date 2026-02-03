@@ -167,7 +167,7 @@ public class TVIEquipmentView_Part_Year extends TVIEquipmentView_Item {
 
       try (Connection conn = TourDatabase.getInstance().getConnection()) {
 
-         final AppFilter appFilter = new AppFilter(AppFilter.ANY_APP_FILTERS);
+         final AppFilter appFilter = createAppFilter();
 
          sql = UI.EMPTY_STRING
 
@@ -257,7 +257,7 @@ public class TVIEquipmentView_Part_Year extends TVIEquipmentView_Item {
 
       try (Connection conn = TourDatabase.getInstance().getConnection()) {
 
-         final AppFilter appFilter = new AppFilter(AppFilter.ANY_APP_FILTERS);
+         final AppFilter appFilter = createAppFilter();
 
          /*
           * Load: Part, Year, Tour

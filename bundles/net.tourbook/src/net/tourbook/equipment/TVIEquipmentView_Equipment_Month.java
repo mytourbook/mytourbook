@@ -164,7 +164,7 @@ public class TVIEquipmentView_Equipment_Month extends TVIEquipmentView_Item {
 
       try (Connection conn = TourDatabase.getInstance().getConnection()) {
 
-         final AppFilter appFilter = new AppFilter(AppFilter.ANY_APP_FILTERS);
+         final AppFilter appFilter = createAppFilter();
 
          /*
           * Load: Equipment, Year, Month, Tour

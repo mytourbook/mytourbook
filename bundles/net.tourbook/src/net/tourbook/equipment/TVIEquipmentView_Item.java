@@ -32,6 +32,7 @@ import net.tourbook.common.util.Util;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.ui.AppFilter;
+import net.tourbook.ui.AppFilterType;
 
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.viewers.TreeViewer;
@@ -173,6 +174,20 @@ public abstract class TVIEquipmentView_Item extends TreeViewerItem {
       _viewerType = equipmentType;
    }
 
+   AppFilter createAppFilter() {
+
+      if (_viewerType == EquipmentViewerType.IS_EQUIPMENT_FILTER) {
+
+         // the equipment filter viewer should display ALL available equipment for the current person
+
+         return new AppFilter(AppFilterType.Person);
+
+      } else {
+
+         return new AppFilter(AppFilter.ANY_APP_FILTERS);
+      }
+   }
+
    /**
     * @return Each equipment viewer item has access to its viewer
     */
@@ -202,7 +217,7 @@ public abstract class TVIEquipmentView_Item extends TreeViewerItem {
 
       try (Connection conn = TourDatabase.getInstance().getConnection()) {
 
-         final AppFilter appFilter = new AppFilter(AppFilter.ANY_APP_FILTERS);
+         final AppFilter appFilter = createAppFilter();
 
          sql = UI.EMPTY_STRING
 
@@ -264,7 +279,7 @@ public abstract class TVIEquipmentView_Item extends TreeViewerItem {
 
       try (Connection conn = TourDatabase.getInstance().getConnection()) {
 
-         final AppFilter appFilter = new AppFilter(AppFilter.ANY_APP_FILTERS);
+         final AppFilter appFilter = createAppFilter();
 
          sql = UI.EMPTY_STRING
 
@@ -346,7 +361,7 @@ public abstract class TVIEquipmentView_Item extends TreeViewerItem {
 
       try (Connection conn = TourDatabase.getInstance().getConnection()) {
 
-         final AppFilter appFilter = new AppFilter(AppFilter.ANY_APP_FILTERS);
+         final AppFilter appFilter = createAppFilter();
 
          sql = UI.EMPTY_STRING
 

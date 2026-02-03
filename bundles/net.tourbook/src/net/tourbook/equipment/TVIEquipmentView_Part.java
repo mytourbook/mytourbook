@@ -101,14 +101,31 @@ public class TVIEquipmentView_Part extends TVIEquipmentView_Item {
    public boolean hasChildren() {
 
       final List<TreeViewerItem> unfetchedChildren = getUnfetchedChildren();
+      final boolean is0UnfetchedChildren = unfetchedChildren != null && unfetchedChildren.size() == 0;
 
       final EquipmentViewerType viewerType = getViewerType();
 
-      if (viewerType == EquipmentViewerType.IS_EQUIPMENT_FILTER
+      if (viewerType == EquipmentViewerType.IS_EQUIPMENT_FILTER) {
 
-            || viewerType == EquipmentViewerType.IS_EQUIPMENT_VIEWER && _part.isCollate()) {
+         if (_part.isCollate()) {
 
-         if (unfetchedChildren != null && unfetchedChildren.size() == 0) {
+            // hide the expand icon in the view
+
+            return false;
+
+         } else {
+
+            if (is0UnfetchedChildren) {
+
+               // hide the expand icon in the view
+
+               return false;
+            }
+         }
+
+      } else if (viewerType == EquipmentViewerType.IS_EQUIPMENT_VIEWER && _part.isCollate()) {
+
+         if (is0UnfetchedChildren) {
 
             // hide the expand icon in the view
 
@@ -130,7 +147,7 @@ public class TVIEquipmentView_Part extends TVIEquipmentView_Item {
 
       try (Connection conn = TourDatabase.getInstance().getConnection()) {
 
-         final AppFilter appFilter = new AppFilter(AppFilter.ANY_APP_FILTERS);
+         final AppFilter appFilter = createAppFilter();
 
          /*
           * Load: Part, Tour
@@ -287,7 +304,7 @@ public class TVIEquipmentView_Part extends TVIEquipmentView_Item {
 
       try (Connection conn = TourDatabase.getInstance().getConnection()) {
 
-         final AppFilter appFilter = new AppFilter(AppFilter.ANY_APP_FILTERS);
+         final AppFilter appFilter = createAppFilter();
 
          sql = UI.EMPTY_STRING
 
