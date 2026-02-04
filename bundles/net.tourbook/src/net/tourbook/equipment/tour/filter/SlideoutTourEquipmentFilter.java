@@ -148,7 +148,7 @@ public class SlideoutTourEquipmentFilter extends AdvancedSlideout implements ITr
    private TVIEquipmentView_Root                       _equipmentViewerRootItem;
 
    private CheckboxTableViewer                         _selectedAssetViewer;
-   private List<SelectedAsset>                         _allSelectedEquipmentItems           = new ArrayList<>();
+   private List<SelectedAsset>                         _allSelectedAssetItems               = new ArrayList<>();
 
    private ToolItem                                    _tourEquipmentFilterItem;
 
@@ -464,6 +464,9 @@ public class SlideoutTourEquipmentFilter extends AdvancedSlideout implements ITr
       public void inputChanged(final Viewer viewer, final Object oldInput, final Object newInput) {}
    }
 
+   /**
+    * The name "Asset" is used for ONE type of an equipment
+    */
    private class SelectedAsset {
 
       Equipment     equipment;
@@ -555,7 +558,7 @@ public class SlideoutTourEquipmentFilter extends AdvancedSlideout implements ITr
 
       @Override
       public Object[] getElements(final Object inputElement) {
-         return _allSelectedEquipmentItems.toArray();
+         return _allSelectedAssetItems.toArray();
       }
 
       @Override
@@ -1455,11 +1458,11 @@ public class SlideoutTourEquipmentFilter extends AdvancedSlideout implements ITr
 // SET_FORMATTING_OFF
 
       final int numCheckedSelectedEquipmentItems   = _selectedAssetViewer.getCheckedElements().length;
-      final int numSelectedEquipmentItems          = _allSelectedEquipmentItems.size();
+      final int numSelectedAssetItems              = _allSelectedAssetItems.size();
 
       final boolean isProfileSelected              = _selectedProfile != null;
-      final boolean canCheckEquipment              = numSelectedEquipmentItems > 0 && numCheckedSelectedEquipmentItems < numSelectedEquipmentItems;
-      final boolean canUncheckEquipment            = numSelectedEquipmentItems > 0 && numCheckedSelectedEquipmentItems > 0;
+      final boolean canCheckEquipment              = numSelectedAssetItems > 0 && numCheckedSelectedEquipmentItems < numSelectedAssetItems;
+      final boolean canUncheckEquipment            = numSelectedAssetItems > 0 && numCheckedSelectedEquipmentItems > 0;
       final boolean canSetEquipmentOperator        = isProfileSelected && numCheckedSelectedEquipmentItems > 1;
 
       _btnApply                              .setEnabled(isProfileSelected && _isLiveUpdate == false);
@@ -1528,7 +1531,7 @@ public class SlideoutTourEquipmentFilter extends AdvancedSlideout implements ITr
       }
    }
 
-   private long[] getEquipmentIDs_FromEquipmentViewer() {
+   private long[] getAssetIDs_FromEquipmentViewer() {
 
       final LongHashSet allCheckedIDs = new LongHashSet();
 
@@ -1563,7 +1566,7 @@ public class SlideoutTourEquipmentFilter extends AdvancedSlideout implements ITr
       return allCheckedIDs.toArray();
    }
 
-   private long[] getEquipmentIDs_FromSelectedEquipment_Checked() {
+   private long[] getAssetIDs_FromSelectedAssets_Checked() {
 
       final LongHashSet allCheckedIDs = new LongHashSet();
 
@@ -1579,35 +1582,35 @@ public class SlideoutTourEquipmentFilter extends AdvancedSlideout implements ITr
       return allCheckedIDs.toArray();
    }
 
-   private long[] getEquipmentIDs_FromSelectedEquipment_Unchecked() {
+   private long[] getAssetIDs_FromSelectedAssets_Unchecked() {
 
-      final Object[] allCheckedEquipment = _selectedAssetViewer.getCheckedElements();
-      final LongHashSet allUncheckedEquipmentIDs = new LongHashSet();
+      final Object[] allCheckedAssets = _selectedAssetViewer.getCheckedElements();
+      final LongHashSet allUncheckedAssetIDs = new LongHashSet();
 
-      for (final SelectedAsset selectedEquipmentItem : _allSelectedEquipmentItems) {
+      for (final SelectedAsset selectedAssetItem : _allSelectedAssetItems) {
 
-         final long equipmentID = selectedEquipmentItem.assetId;
+         final long assetID = selectedAssetItem.assetId;
          boolean isChecked = false;
 
-         for (final Object item : allCheckedEquipment) {
+         for (final Object item : allCheckedAssets) {
 
             if (item instanceof SelectedAsset) {
 
-               final SelectedAsset selectedEquipmentChecked = (SelectedAsset) item;
+               final SelectedAsset selectedAssetChecked = (SelectedAsset) item;
 
-               if (equipmentID == selectedEquipmentChecked.assetId) {
+               if (assetID == selectedAssetChecked.assetId) {
                   isChecked = true;
                   break;
                }
             }
          }
 
-         if (!isChecked) {
-            allUncheckedEquipmentIDs.add(equipmentID);
+         if (isChecked == false) {
+            allUncheckedAssetIDs.add(assetID);
          }
       }
 
-      return allUncheckedEquipmentIDs.toArray();
+      return allUncheckedAssetIDs.toArray();
    }
 
    @Override
@@ -1951,7 +1954,7 @@ public class SlideoutTourEquipmentFilter extends AdvancedSlideout implements ITr
          _selectedProfile = null;
 
          updateEquipment_EquipmentViewer(NO_EQUIPMENT);
-         updateEquipment_SelectedEquipment(NO_EQUIPMENT, NO_EQUIPMENT);
+         updateEquipment_SelectedAssetViewer(NO_EQUIPMENT, NO_EQUIPMENT);
 
          enableControls();
 
@@ -2068,30 +2071,30 @@ public class SlideoutTourEquipmentFilter extends AdvancedSlideout implements ITr
 
    private void onSelectedAsset_Checkbox_CheckAll() {
 
-      _selectedAssetViewer.setCheckedElements(_allSelectedEquipmentItems.toArray());
+      _selectedAssetViewer.setCheckedElements(_allSelectedAssetItems.toArray());
 
-      update_FromSelectedEquipment();
+      update_FromSelectedAssets();
    }
 
    private void onSelectedAsset_Checkbox_UncheckAll() {
 
       _selectedAssetViewer.setCheckedElements(EMPTY_LIST);
 
-      update_FromSelectedEquipment();
+      update_FromSelectedAssets();
    }
 
    private void onSelectedAsset_Delete() {
 
-      final SelectedAsset selectedSelectedEquipment = (SelectedAsset) _selectedAssetViewer.getStructuredSelection().getFirstElement();
+      final SelectedAsset selectedAsset = (SelectedAsset) _selectedAssetViewer.getStructuredSelection().getFirstElement();
 
-      if (selectedSelectedEquipment == null) {
+      if (selectedAsset == null) {
          return;
       }
 
       /*
        * Update model
        */
-      _allSelectedEquipmentItems.remove(selectedSelectedEquipment);
+      _allSelectedAssetItems.remove(selectedAsset);
 
       /*
        * Update UI
@@ -2099,7 +2102,7 @@ public class SlideoutTourEquipmentFilter extends AdvancedSlideout implements ITr
       final Table selectedEquipmentTable = _selectedAssetViewer.getTable();
       final int selectionIndex = selectedEquipmentTable.getSelectionIndex();
 
-      _selectedAssetViewer.remove(selectedSelectedEquipment);
+      _selectedAssetViewer.remove(selectedAsset);
 
       // select next item
       final int nextIndex = Math.min(selectedEquipmentTable.getItemCount() - 1, selectionIndex);
@@ -2114,7 +2117,7 @@ public class SlideoutTourEquipmentFilter extends AdvancedSlideout implements ITr
          _isInUpdateUIAfterDelete = false;
       }
 
-      update_FromSelectedEquipment();
+      update_FromSelectedAssets();
    }
 
    private void onSelectedAsset_Select(final SelectionChangedEvent event) {
@@ -2162,7 +2165,7 @@ public class SlideoutTourEquipmentFilter extends AdvancedSlideout implements ITr
             _selectedAssetViewer.setChecked(selectedEquipment, !isChecked);
          }
 
-         update_FromSelectedEquipment();
+         update_FromSelectedAssets();
       }
    }
 
@@ -2465,11 +2468,11 @@ public class SlideoutTourEquipmentFilter extends AdvancedSlideout implements ITr
          return;
       }
 
-      final long[] equipmentIDs_Checked = getEquipmentIDs_FromEquipmentViewer();
-      final long[] equipmentIDs_Unchecked = getEquipmentIDs_FromSelectedEquipment_Unchecked();
+      final long[] assetIDs_Checked = getAssetIDs_FromEquipmentViewer();
+      final long[] assetIDs_Unchecked = getAssetIDs_FromSelectedAssets_Unchecked();
 
-      updateEquipment_EquipmentProfile(_selectedProfile, equipmentIDs_Checked, equipmentIDs_Unchecked);
-      updateEquipment_SelectedEquipment(equipmentIDs_Checked, equipmentIDs_Unchecked);
+      updateEquipment_EquipmentProfile(_selectedProfile, assetIDs_Checked, assetIDs_Unchecked);
+      updateEquipment_SelectedAssetViewer(assetIDs_Checked, assetIDs_Unchecked);
 
       enableControls();
 
@@ -2481,23 +2484,23 @@ public class SlideoutTourEquipmentFilter extends AdvancedSlideout implements ITr
       final long[] equipmentIDs_Checked = _selectedProfile.allEquipmentFilterIDs.toArray();
       final long[] equipmentIDs_Unchecked = _selectedProfile.allEquipmentFilterIDs_Unchecked.toArray();
 
-      updateEquipment_SelectedEquipment(equipmentIDs_Checked, equipmentIDs_Unchecked);
+      updateEquipment_SelectedAssetViewer(equipmentIDs_Checked, equipmentIDs_Unchecked);
       updateEquipment_EquipmentViewer(equipmentIDs_Checked);
 
       enableControls();
    }
 
-   private void update_FromSelectedEquipment() {
+   private void update_FromSelectedAssets() {
 
       if (_selectedProfile == null) {
          return;
       }
 
-      final long[] equipmentIDs_Checked = getEquipmentIDs_FromSelectedEquipment_Checked();
-      final long[] equipmentIDs_Unchecked = getEquipmentIDs_FromSelectedEquipment_Unchecked();
+      final long[] assetIDs_Checked = getAssetIDs_FromSelectedAssets_Checked();
+      final long[] assetIDs_Unchecked = getAssetIDs_FromSelectedAssets_Unchecked();
 
-      updateEquipment_EquipmentProfile(_selectedProfile, equipmentIDs_Checked, equipmentIDs_Unchecked);
-      updateEquipment_EquipmentViewer(equipmentIDs_Checked);
+      updateEquipment_EquipmentProfile(_selectedProfile, assetIDs_Checked, assetIDs_Unchecked);
+      updateEquipment_EquipmentViewer(assetIDs_Checked);
 
       enableControls();
 
@@ -2559,19 +2562,19 @@ public class SlideoutTourEquipmentFilter extends AdvancedSlideout implements ITr
       _equipmentViewer.setCheckedElements(allEquipmentItems.toArray());
    }
 
-   private void updateEquipment_SelectedEquipment(final long[] allEquipmentIDs_Checked,
-                                                  final long[] allEquipmentIDs_Unchecked) {
+   private void updateEquipment_SelectedAssetViewer(final long[] allAssetIDs_Checked,
+                                                    final long[] allAssetIDs_Unchecked) {
 
       /*
        * Update model
        */
-      _allSelectedEquipmentItems.clear();
+      _allSelectedAssetItems.clear();
 
-      final List<SelectedAsset> allCheckedEquipment = new ArrayList<>();
+      final List<SelectedAsset> allCheckedAssets = new ArrayList<>();
       final Map<Long, Equipment> allEquipment = EquipmentManager.getAllEquipment_ByID();
 
       // add all checked equipment
-      for (final long equipmentID : allEquipmentIDs_Checked) {
+      for (final long equipmentID : allAssetIDs_Checked) {
 
          final Equipment equipment = allEquipment.get(equipmentID);
 
@@ -2581,18 +2584,18 @@ public class SlideoutTourEquipmentFilter extends AdvancedSlideout implements ITr
             continue;
          }
 
-         final SelectedAsset selectedEquipment = new SelectedAsset(equipment);
+         final SelectedAsset selectedAsset = new SelectedAsset(equipment);
 
-         _allSelectedEquipmentItems.add(selectedEquipment);
-         allCheckedEquipment.add(selectedEquipment);
+         _allSelectedAssetItems.add(selectedAsset);
+         allCheckedAssets.add(selectedAsset);
       }
 
-      // add unchecked equipment
-      for (final long equipmentID : allEquipmentIDs_Unchecked) {
+      // add unchecked assets
+      for (final long assetID : allAssetIDs_Unchecked) {
 
-         final Equipment equipment = allEquipment.get(equipmentID);
+         final Equipment asset = allEquipment.get(assetID);
 
-         if (equipment == null) {
+         if (asset == null) {
 
             /*
              * It is possible that the equipment in the tour equipment filter is already
@@ -2602,7 +2605,7 @@ public class SlideoutTourEquipmentFilter extends AdvancedSlideout implements ITr
             continue;
          }
 
-         final SelectedAsset selectedEquipment = new SelectedAsset(equipment);
+         final SelectedAsset selectedAsset = new SelectedAsset(asset);
 
          /*
           * It is possible that there are duplicates in unchecked equipment when a equipment is
@@ -2610,16 +2613,16 @@ public class SlideoutTourEquipmentFilter extends AdvancedSlideout implements ITr
           * equipment
           */
          boolean canAddSelectedEquipment = true;
-         for (final SelectedAsset alreadyAddedSelectedEquipment : _allSelectedEquipmentItems) {
+         for (final SelectedAsset alreadyAddedSelectedEquipment : _allSelectedAssetItems) {
 
-            if (alreadyAddedSelectedEquipment.assetId == equipmentID) {
+            if (alreadyAddedSelectedEquipment.assetId == assetID) {
                canAddSelectedEquipment = false;
                break;
             }
          }
 
          if (canAddSelectedEquipment) {
-            _allSelectedEquipmentItems.add(selectedEquipment);
+            _allSelectedAssetItems.add(selectedAsset);
          }
       }
 
@@ -2630,7 +2633,7 @@ public class SlideoutTourEquipmentFilter extends AdvancedSlideout implements ITr
       _selectedAssetViewer.setInput(EMPTY_LIST);
 
       // check selected equipment items
-      _selectedAssetViewer.setCheckedElements(allCheckedEquipment.toArray());
+      _selectedAssetViewer.setCheckedElements(allCheckedAssets.toArray());
    }
 
    private void updateEquipmentModel() {
