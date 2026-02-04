@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2024, 2025 Wolfgang Schramm and Contributors
+ * Copyright (C) 2024, 2026 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -325,21 +325,24 @@ public class TourActionManager {
       _allDefinedActions.add(actionAddTag_AutoOpen_Default);
       _allDefinedActions.add(actionAddTag_AutoOpen_Flat);
       _allDefinedActions.add(actionAddTag_AutoOpen_Tree);
-      _allDefinedActions.add(actionAddTagGroups);
       _allDefinedActions.add(actionAddTag);
       _allDefinedActions.add(actionAddRecentTags);
+      _allDefinedActions.add(actionAddTagGroups);
+
       _allDefinedActions.add(actionRemoveTourTag);
       _allDefinedActions.add(actionRemoveAllTags);
       _allDefinedActions.add(actionClipboard_CopyTags);
       _allDefinedActions.add(actionClipboard_PasteTags);
 
 
+
       _allDefinedActionsMap.put(categoryAction_Tag              .getCategoryClassName(),      categoryAction_Tag);
 
       _allDefinedActionsMap.put(ActionShowTourTagsView          .class.getName(),             actionSetTags);
-      _allDefinedActionsMap.put(ActionTagGroups_SubMenu         .class.getName(),             actionAddTagGroups);
       _allDefinedActionsMap.put(ActionAddTourTag_SubMenu        .class.getName(),             actionAddTag);
       _allDefinedActionsMap.put(ActionAddRecentTags             .class.getName(),             actionAddRecentTags);
+      _allDefinedActionsMap.put(ActionTagGroups_SubMenu         .class.getName(),             actionAddTagGroups);
+
       _allDefinedActionsMap.put(ActionClipboard_CopyTags        .class.getName(),             actionClipboard_CopyTags);
       _allDefinedActionsMap.put(ActionClipboard_PasteTags       .class.getName(),             actionClipboard_PasteTags);
       _allDefinedActionsMap.put(Action_RemoveTourTag_SubMenu    .class.getName(),             actionRemoveTourTag);
@@ -397,8 +400,8 @@ public class TourActionManager {
       _allDefinedActions.add(categoryAction_Equipment);
 
       _allDefinedActions.add(actionAddEquipment);
-      _allDefinedActions.add(actionAddEquipment_Groups);
       _allDefinedActions.add(actionAddRecentEquipment);
+      _allDefinedActions.add(actionAddEquipment_Groups);
 
       _allDefinedActions.add(actionRemoveEquipment);
       _allDefinedActions.add(actionRemoveEquipment_All);
@@ -411,8 +414,8 @@ public class TourActionManager {
       _allDefinedActionsMap.put(categoryAction_Equipment          .getCategoryClassName(),   categoryAction_Equipment);
 
       _allDefinedActionsMap.put(ActionAddEquipment_SubMenu        .class.getName(),          actionAddEquipment);
-      _allDefinedActionsMap.put(ActionAddEquipmentGroups_SubMenu  .class.getName(),          actionAddEquipment_Groups);
       _allDefinedActionsMap.put(ActionAddRecentEquipment          .class.getName(),          actionAddRecentEquipment);
+      _allDefinedActionsMap.put(ActionAddEquipmentGroups_SubMenu  .class.getName(),          actionAddEquipment_Groups);
 
       _allDefinedActionsMap.put(ActionRemoveEquipment_SubMenu     .class.getName(),          actionRemoveEquipment);
       _allDefinedActionsMap.put(ActionRemoveEquipmentAll          .class.getName(),          actionRemoveEquipment_All);

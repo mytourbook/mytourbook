@@ -48,6 +48,7 @@ import net.tourbook.ui.action.IActionProvider;
 import net.tourbook.ui.action.TourActionCategory;
 import net.tourbook.ui.action.TourActionManager;
 import net.tourbook.ui.views.tourBook.TVITourBookTour;
+import net.tourbook.ui.views.tourDataEditor.TourDataEditorView;
 
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.ActionContributionItem;
@@ -558,11 +559,9 @@ public class EquipmentMenuManager implements IActionProvider {
          return;
       }
 
-      final int numSelectedTours = allSelectedTreeItems.size();
-
       boolean isEnabled_RemoveEquipment = false;
 
-      final HashSet<Long> allSelectedEquipmentIDs_AllTours = new HashSet<>();
+      final HashSet<Long> allSelectedEquipmentIDs_FromTours = new HashSet<>();
 
       for (final TreeViewerItem treeItem : allSelectedTreeItems) {
 
@@ -572,37 +571,40 @@ public class EquipmentMenuManager implements IActionProvider {
 
             if (allTourEquipmentIDs != null && allTourEquipmentIDs.size() > 0) {
 
-               allSelectedEquipmentIDs_AllTours.addAll(allTourEquipmentIDs);
+               allSelectedEquipmentIDs_FromTours.addAll(allTourEquipmentIDs);
 
                isEnabled_RemoveEquipment = true;
             }
 
          } else if (treeItem instanceof final TVIEquipmentView_Tour tourItem) {
 
-//            final List<Long> allTourEquipmentIDs = tourItem.getEquipmentIds();
-//
-//            if (allTourEquipmentIDs != null && allTourEquipmentIDs.size() > 0) {
-//
-//               allSelectedEquipmentIDs_AllTours.addAll(allTourEquipmentIDs);
-//
-//               isEnabled_RemoveEquipment = true;
-//            }
+            final List<Long> allTourEquipmentIDs = tourItem.getEquipmentIds();
+
+            if (allTourEquipmentIDs != null && allTourEquipmentIDs.size() > 0) {
+
+               allSelectedEquipmentIDs_FromTours.addAll(allTourEquipmentIDs);
+
+               isEnabled_RemoveEquipment = true;
+            }
          }
       }
 
+      final boolean isEnabled_AddEquipment = allSelectedEquipmentIDs_FromTours.size() > 0;
+
       final int numClipboardEquipment = updateUI_PasteAction();
+      final int numSelectedItems = allSelectedTreeItems.size();
 
-      enableActions_Equipment(isEnabled_RemoveEquipment, numClipboardEquipment);
-
-      enableActions_Recent(allSelectedEquipmentIDs_AllTours, numSelectedTours);
+      enableActions_Equipment(isEnabled_AddEquipment, isEnabled_RemoveEquipment, numClipboardEquipment);
+      enableActions_Recent(isEnabled_AddEquipment, allSelectedEquipmentIDs_FromTours, numSelectedItems);
    }
 
-   private void enableActions_Equipment(final boolean isEnabled_RemoveEquipment,
+   private void enableActions_Equipment(final boolean isEnabled_AddEquipment,
+                                        final boolean isEnabled_RemoveEquipment,
                                         final int numClipboardEquipment) {
 // SET_FORMATTING_OFF
 
-      _actionAddEquipment              .setEnabled(true);
-      _actionAddEquipment_Groups       .setEnabled(true);
+      _actionAddEquipment              .setEnabled(isEnabled_AddEquipment);
+      _actionAddEquipment_Groups       .setEnabled(isEnabled_AddEquipment);
 
       _actionRemoveEquipment           .setEnabled(isEnabled_RemoveEquipment);
       _actionRemoveAllEquipment        .setEnabled(isEnabled_RemoveEquipment);
@@ -621,8 +623,7 @@ public class EquipmentMenuManager implements IActionProvider {
 
       final boolean isEnabled_RemoveEquipment = allUsedEquipments.size() > 0;
 
-      enableActions_Equipment(isEnabled_RemoveEquipment, numClipboardEquipment);
-
+      enableActions_Equipment(true, isEnabled_RemoveEquipment, numClipboardEquipment);
       enableActions_Recent();
    }
 
@@ -655,55 +656,66 @@ public class EquipmentMenuManager implements IActionProvider {
       }
    }
 
-   private void enableActions_Recent(final Set<Long> allSelectedEquipmentIDs_AllTours,
+   private void enableActions_Recent(final boolean isEnabled_AddEquipment,
+                                     final Set<Long> allSelectedEquipmentIDs_FromTours,
                                      final int numSelectedTours) {
 
       if (_allActions_RecentEquipment_Visible.size() == 0) {
          return;
       }
 
-      final boolean isOneTourWithEquipment = allSelectedEquipmentIDs_AllTours.size() > 0 && numSelectedTours == 1;
+      if (isEnabled_AddEquipment) {
 
-      for (final ActionRecentEquipment actionRecentEquipment : _allActions_RecentEquipment_Visible) {
+         final boolean isOneTourWithEquipment = allSelectedEquipmentIDs_FromTours.size() > 0 && numSelectedTours == 1;
 
-         final Equipment recentEquipment = actionRecentEquipment.equipment;
+         for (final ActionRecentEquipment actionRecentEquipment : _allActions_RecentEquipment_Visible) {
 
-         if (recentEquipment == null) {
+            final Equipment recentEquipment = actionRecentEquipment.equipment;
 
-            actionRecentEquipment.setEnabled(false);
-            actionRecentEquipment.setChecked(false);
+            if (recentEquipment == null) {
 
-            continue;
-         }
+               actionRecentEquipment.setEnabled(false);
+               actionRecentEquipment.setChecked(false);
 
-         final long recentEquipmentID = recentEquipment.getEquipmentId();
-
-         boolean isEquipmentEnabled;
-         boolean isEquipmentChecked = false;
-
-         final boolean isRecentEquipmentSelected = allSelectedEquipmentIDs_AllTours.contains(recentEquipmentID);
-
-         if (isOneTourWithEquipment) {
-
-            // one tour is selected
-
-            // disable action when its tour equipment id is selected
-            isEquipmentEnabled = isRecentEquipmentSelected == false;
-            isEquipmentChecked = isRecentEquipmentSelected;
-
-         } else {
-
-            // multiple tours are selected
-
-            isEquipmentEnabled = true;
-
-            if (isRecentEquipmentSelected) {
-               isEquipmentChecked = true;
+               continue;
             }
-         }
 
-         actionRecentEquipment.setEnabled(isEquipmentEnabled);
-         actionRecentEquipment.setChecked(isEquipmentChecked);
+            final long recentEquipmentID = recentEquipment.getEquipmentId();
+
+            boolean isEquipmentEnabled;
+            boolean isEquipmentChecked = false;
+
+            final boolean isRecentEquipmentSelected = allSelectedEquipmentIDs_FromTours.contains(recentEquipmentID);
+
+            if (isOneTourWithEquipment) {
+
+               // one tour is selected
+
+               // disable action when its tour equipment id is selected
+               isEquipmentEnabled = isRecentEquipmentSelected == false;
+               isEquipmentChecked = isRecentEquipmentSelected;
+
+            } else {
+
+               // multiple tours are selected
+
+               isEquipmentEnabled = true;
+
+               if (isRecentEquipmentSelected) {
+                  isEquipmentChecked = true;
+               }
+            }
+
+            actionRecentEquipment.setEnabled(isEquipmentEnabled);
+            actionRecentEquipment.setChecked(isEquipmentChecked);
+         }
+      } else {
+
+         // disable all recent actions, this is applied when no tours are selected
+
+         for (final ActionRecentEquipment recentAction : _allActions_RecentEquipment_Visible) {
+            recentAction.setEnabled(false);
+         }
       }
    }
 
@@ -755,7 +767,7 @@ public class EquipmentMenuManager implements IActionProvider {
    }
 
    /**
-    * Add all equipment actions
+    * Add all equipment actions, this is called from the {@link TourDataEditorView}
     *
     * @param menuMgr
     */

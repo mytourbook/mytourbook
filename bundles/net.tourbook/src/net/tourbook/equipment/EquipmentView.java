@@ -2754,6 +2754,9 @@ public class EquipmentView extends ViewPart implements ITourProvider, ITourViewe
       // add/remove ... tags in the tours
       _tagMenuManager.fillTagMenu_WithActiveActions(menuMgr, this);
 
+      // equipment actions
+      _equipmentMenuManager.fillEquipmentMenu_WithActiveActions(menuMgr, this);
+
       // export actions
       TourActionManager.fillContextMenu(menuMgr, TourActionCategory.EXPORT, _allTourActions_Export, this);
 

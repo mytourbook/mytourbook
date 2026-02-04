@@ -272,6 +272,8 @@ public class ActionAddTourTag_SubMenu extends Action implements IMenuCreator, IA
 
       super(Messages.action_tag_add, AS_DROP_DOWN_MENU);
 
+      setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.Tag));
+
       createDefaultAction(tagMenuManager);
 
       setMenuCreator(this);
@@ -288,6 +290,8 @@ public class ActionAddTourTag_SubMenu extends Action implements IMenuCreator, IA
    ActionAddTourTag_SubMenu(final TagMenuManager tagMenuMgr, final Object isAutoOpen) {
 
       super(Messages.Action_Tag_Add_AutoOpen, AS_PUSH_BUTTON);
+
+      setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.Tag));
 
       createDefaultAction(tagMenuMgr);
    }

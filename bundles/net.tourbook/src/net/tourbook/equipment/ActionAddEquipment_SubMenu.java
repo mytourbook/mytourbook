@@ -72,8 +72,8 @@ public class ActionAddEquipment_SubMenu extends SubMenu {
 
          return UI.EMPTY_STRING
 
-               + "ActionEquipment" + NL //               //$NON-NLS-1$
-               + " __equipment = " + __equipment + NL //               //$NON-NLS-1$
+               + "ActionEquipment" + NL //                     //$NON-NLS-1$
+               + " __equipment = " + __equipment + NL //       //$NON-NLS-1$
          ;
       }
    }
@@ -97,6 +97,8 @@ public class ActionAddEquipment_SubMenu extends SubMenu {
    protected ActionAddEquipment_SubMenu(final EquipmentMenuManager equipmentMenuManager) {
 
       super(Messages.Action_Equipment_AddEquipment, AS_DROP_DOWN_MENU);
+
+      setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.Equipment_Only));
 
       _equipmentMenuManager = equipmentMenuManager;
 
