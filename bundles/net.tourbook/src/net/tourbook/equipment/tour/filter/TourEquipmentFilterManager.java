@@ -53,6 +53,8 @@ public class TourEquipmentFilterManager {
    private static final String                     ATTR_NAME                   = "name";                                 //$NON-NLS-1$
    private static final String                     ATTR_EQUIPMENT_ID           = "equipmentIDs";                         //$NON-NLS-1$
    private static final String                     ATTR_EQUIPMENT_ID_UNCHECKED = "equipmentIDsUnchecked";                //$NON-NLS-1$
+   private static final String                     ATTR_FILTER_TYPE            = "filterType";                           //$NON-NLS-1$
+   public static final FilterType                  ATTR_FILTER_TYPE_DEFAULT    = FilterType.EQUIPMENT;
 
    private static final Bundle                     _bundle                     = TourbookPlugin.getDefault().getBundle();
 
@@ -241,16 +243,21 @@ public class TourEquipmentFilterManager {
 
             final IMemento xmlProfile = xmlRoot.createChild(EQUIPMENT_PROFILE);
 
-            xmlProfile.putString(ATTR_NAME, filterProfile.name);
-            xmlProfile.putBoolean(ATTR_IS_OR_OPERATOR, filterProfile.isOrOperator);
+// SET_FORMATTING_OFF
+
+            xmlProfile.putString(ATTR_FILTER_TYPE,       filterProfile.filterType.name());
+            xmlProfile.putString(ATTR_NAME,              filterProfile.name);
+            xmlProfile.putBoolean(ATTR_IS_OR_OPERATOR,   filterProfile.isOrOperator);
 
             // set flag for active profile
             if (filterProfile == _selectedProfile) {
                xmlProfile.putBoolean(ATTR_IS_SELECTED, true);
             }
 
-            Util.setXmlLongArray(xmlProfile, ATTR_EQUIPMENT_ID, filterProfile.allEquipmentFilterIDs.toArray());
-            Util.setXmlLongArray(xmlProfile, ATTR_EQUIPMENT_ID_UNCHECKED, filterProfile.allEquipmentFilterIDs_Unchecked.toArray());
+            Util.setXmlLongArray(xmlProfile, ATTR_EQUIPMENT_ID,            filterProfile.allEquipmentFilterIDs.toArray());
+            Util.setXmlLongArray(xmlProfile, ATTR_EQUIPMENT_ID_UNCHECKED,  filterProfile.allEquipmentFilterIDs_Unchecked.toArray());
+
+// SET_FORMATTING_ON
          }
 
       } catch (final Exception e) {

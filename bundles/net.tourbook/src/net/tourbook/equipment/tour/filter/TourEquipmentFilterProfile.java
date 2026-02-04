@@ -48,6 +48,8 @@ public class TourEquipmentFilterProfile implements Cloneable {
     */
    public boolean     isOrOperator                    = TourEquipmentFilterManager.ATTR_IS_OR_OPERATOR_DEFAULT;
 
+   public FilterType  filterType                      = TourEquipmentFilterManager.ATTR_FILTER_TYPE_DEFAULT;
+
    public TourEquipmentFilterProfile() {
 
       profileId = ++_idCounter;
