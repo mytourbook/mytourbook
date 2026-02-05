@@ -23,32 +23,33 @@ import org.eclipse.collections.impl.set.mutable.primitive.LongHashSet;
 
 public class TourEquipmentFilterProfile implements Cloneable {
 
-   private static int _idCounter                      = 0;
+   private static int _idCounter                  = 0;
 
    int                profileId;
 
    /**
     * Profile name
     */
-   String             name                            = Messages.Tour_Filter_Default_ProfileName;
+   String             name                        = Messages.Tour_Filter_Default_ProfileName;
 
    /**
-    * Contains all equipment id's for this profile
+    * Contains all asset IDs for this profile. It can be an equipment ID or a part ID depending on
+    * the {@link #filterType}
     */
-   public LongHashSet allEquipmentFilterIDs           = new LongHashSet();
+   public LongHashSet allAssetFilterIDs           = new LongHashSet();
 
    /**
-    * Keeps equipment IDs which are unchecked in the selected equipment viewer
+    * Keeps asset IDs which are unchecked in the selected asset viewer
     */
-   public LongHashSet allEquipmentFilterIDs_Unchecked = new LongHashSet();
+   public LongHashSet allAssetFilterIDs_Unchecked = new LongHashSet();
 
    /**
     * When <code>true</code> (default) then the equipment are combined with OR otherwise they are
     * combined with AND
     */
-   public boolean     isOrOperator                    = TourEquipmentFilterManager.ATTR_IS_OR_OPERATOR_DEFAULT;
+   public boolean     isOrOperator                = TourEquipmentFilterManager.ATTR_IS_OR_OPERATOR_DEFAULT;
 
-   public FilterType  filterType                      = TourEquipmentFilterManager.ATTR_FILTER_TYPE_DEFAULT;
+   public FilterType  filterType                  = TourEquipmentFilterManager.ATTR_FILTER_TYPE_DEFAULT;
 
    public TourEquipmentFilterProfile() {
 
@@ -69,8 +70,8 @@ public class TourEquipmentFilterProfile implements Cloneable {
          // create a unique name
          clonedObject.name = name + UI.SPACE + Integer.toString(clonedObject.profileId);
 
-         clonedObject.allEquipmentFilterIDs = new LongHashSet(allEquipmentFilterIDs.toArray());
-         clonedObject.allEquipmentFilterIDs_Unchecked = new LongHashSet(allEquipmentFilterIDs_Unchecked.toArray());
+         clonedObject.allAssetFilterIDs = new LongHashSet(allAssetFilterIDs.toArray());
+         clonedObject.allAssetFilterIDs_Unchecked = new LongHashSet(allAssetFilterIDs_Unchecked.toArray());
 
       } catch (final CloneNotSupportedException e) {
          StatusUtil.log(e);

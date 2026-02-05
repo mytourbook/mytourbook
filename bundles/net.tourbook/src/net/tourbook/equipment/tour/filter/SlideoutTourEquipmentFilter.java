@@ -61,6 +61,7 @@ import org.eclipse.jface.viewers.CellLabelProvider;
 import org.eclipse.jface.viewers.CheckStateChangedEvent;
 import org.eclipse.jface.viewers.CheckboxTableViewer;
 import org.eclipse.jface.viewers.CheckboxTreeViewer;
+import org.eclipse.jface.viewers.ColumnPixelData;
 import org.eclipse.jface.viewers.ColumnWeightData;
 import org.eclipse.jface.viewers.IElementComparer;
 import org.eclipse.jface.viewers.IStructuredContentProvider;
@@ -144,11 +145,13 @@ public class SlideoutTourEquipmentFilter extends AdvancedSlideout implements ITr
    private TourEquipmentFilterProfile                  _selectedProfile;
    private boolean                                     _isFilterEquipment;
 
+   private CheckboxTableViewer                         _selectedAssetViewer;
+   private TableViewerColumn                           _selectedAssetViewer_Column1;
+   private TableViewerColumn                           _selectedAssetViewer_Column2;
+   private List<SelectedAsset>                         _allSelectedAssetItems               = new ArrayList<>();
+
    private CheckboxTreeViewer                          _equipmentViewer;
    private TVIEquipmentView_Root                       _equipmentViewerRootItem;
-
-   private CheckboxTableViewer                         _selectedAssetViewer;
-   private List<SelectedAsset>                         _allSelectedAssetItems               = new ArrayList<>();
 
    private ToolItem                                    _tourEquipmentFilterItem;
 
@@ -188,26 +191,28 @@ public class SlideoutTourEquipmentFilter extends AdvancedSlideout implements ITr
    /*
     * UI controls
     */
-   private Button  _btnApply;
-   private Button  _btnCopyProfile;
-   private Button  _btnDeleteProfile;
-   private Button  _btnNewProfile;
-   private Button  _chkLiveUpdate;
-   private Button  _rdoEquipmentOperator_OR;
-   private Button  _rdoEquipmentOperator_AND;
-   private Button  _rdoFilterType_Equipment;
-   private Button  _rdoFilterType_Part;
+   private Button    _btnApply;
+   private Button    _btnCopyProfile;
+   private Button    _btnDeleteProfile;
+   private Button    _btnNewProfile;
+   private Button    _chkLiveUpdate;
+   private Button    _rdoEquipmentOperator_OR;
+   private Button    _rdoEquipmentOperator_AND;
+   private Button    _rdoFilterType_Equipment;
+   private Button    _rdoFilterType_Part;
 
-   private Label   _lblAllEquipment;
-   private Label   _lblFilterType;
-   private Label   _lblProfileName;
-   private Label   _lblSelectEquipment;
-   private Label   _lblEquipmentOperator;
+   private Composite _selectedAssetLayoutContainer;
 
-   private Text    _txtProfileName;
+   private Label     _lblAllEquipment;
+   private Label     _lblFilterType;
+   private Label     _lblProfileName;
+   private Label     _lblSelectEquipment;
+   private Label     _lblEquipmentOperator;
 
-   private ToolBar _toolBarAllEquipment;
-   private ToolBar _toolBarSelectedEquipment;
+   private Text      _txtProfileName;
+
+   private ToolBar   _toolBarAllEquipment;
+   private ToolBar   _toolBarSelectedEquipment;
 
    private class ActionCollapseAllWithoutSelection extends ActionCollapseAll {
 
@@ -473,7 +478,9 @@ public class SlideoutTourEquipmentFilter extends AdvancedSlideout implements ITr
       EquipmentPart part;
 
       long          assetId;
+
       String        assetName;
+      String        assetParent = UI.EMPTY_STRING;
 
       public SelectedAsset(final Equipment equipment) {
 
@@ -481,6 +488,19 @@ public class SlideoutTourEquipmentFilter extends AdvancedSlideout implements ITr
 
          this.assetId = equipment.getEquipmentId();
          this.assetName = equipment.getName();
+      }
+
+      public SelectedAsset(final EquipmentPart part) {
+
+         this.part = part;
+
+         final Equipment partEquipment = part.getEquipment();
+         final String equipmentName = partEquipment.getName();
+         final String partName = part.getName();
+
+         assetId = part.getPartId();
+         assetName = partName;
+         assetParent = equipmentName;
       }
    }
 
@@ -494,56 +514,70 @@ public class SlideoutTourEquipmentFilter extends AdvancedSlideout implements ITr
          if (obj1 instanceof final SelectedAsset item1
                && obj2 instanceof final SelectedAsset item2) {
 
-            // sort equipment by name
+            if (_isFilterEquipment) {
 
-            final Equipment equipment1 = item1.equipment;
-            final Equipment equipment2 = item2.equipment;
+               // sort equipment by name
 
-            final boolean isCollate1 = equipment1.isCollate();
-            final boolean isCollate2 = equipment2.isCollate();
+               final Equipment equipment1 = item1.equipment;
+               final Equipment equipment2 = item2.equipment;
 
-            if (isCollate1 && isCollate2) {
+               final boolean isCollate1 = equipment1.isCollate();
+               final boolean isCollate2 = equipment2.isCollate();
 
-               // collated equipment
+               if (isCollate1 && isCollate2) {
 
-               // 1st compare by type
-               int compareDiff = equipment1.getType().compareTo(equipment2.getType());
+                  // collated equipment
 
-               // 2nd compare by date
-               if (compareDiff == 0) {
+                  // 1st compare by type
+                  int compareDiff = equipment1.getType().compareTo(equipment2.getType());
 
-                  final long date1 = equipment1.getDateFrom();
-                  final long date2 = equipment2.getDateFrom();
+                  // 2nd compare by date
+                  if (compareDiff == 0) {
 
-                  final long dateDiff = date1 - date2;
+                     final long date1 = equipment1.getDateFrom();
+                     final long date2 = equipment2.getDateFrom();
 
-                  // diff value can be larger than Integer.MAX_VALUE
-                  if (dateDiff > 0) {
-                     compareDiff = 1;
-                  } else if (dateDiff < 0) {
-                     compareDiff = -1;
+                     final long dateDiff = date1 - date2;
+
+                     // diff value can be larger than Integer.MAX_VALUE
+                     if (dateDiff > 0) {
+                        compareDiff = 1;
+                     } else if (dateDiff < 0) {
+                        compareDiff = -1;
+                     }
                   }
+
+                  return compareDiff;
+
+               } else if (isCollate1) {
+
+                  // sort collated before not collated
+
+                  return -1;
+
+               } else if (isCollate2) {
+
+                  // sort collated before not collated
+
+                  return 1;
+
+               } else {
+
+                  // not collated equipment -> sort by name
+
+                  return equipment1.getName().compareTo(equipment2.getName());
                }
-
-               return compareDiff;
-
-            } else if (isCollate1) {
-
-               // sort collated before not collated
-
-               return -1;
-
-            } else if (isCollate2) {
-
-               // sort collated before not collated
-
-               return 1;
 
             } else {
 
-               // not collated equipment -> sort by name
+               // part
 
-               return equipment1.getName().compareTo(equipment2.getName());
+               final EquipmentPart part1 = item1.part;
+               final EquipmentPart part2 = item2.part;
+
+               final boolean isCollate1 = part1.isCollate();
+               final boolean isCollate2 = part2.isCollate();
+
             }
          }
 
@@ -756,7 +790,7 @@ public class SlideoutTourEquipmentFilter extends AdvancedSlideout implements ITr
             public void update(final ViewerCell cell) {
 
                final TourEquipmentFilterProfile profile = (TourEquipmentFilterProfile) cell.getElement();
-               final int numEquipment = profile.allEquipmentFilterIDs.size();
+               final int numEquipment = profile.allAssetFilterIDs.size();
 
                cell.setText(numEquipment == 0
                      ? UI.EMPTY_STRING
@@ -777,7 +811,7 @@ public class SlideoutTourEquipmentFilter extends AdvancedSlideout implements ITr
             public void update(final ViewerCell cell) {
 
                final TourEquipmentFilterProfile profile = (TourEquipmentFilterProfile) cell.getElement();
-               final int numUncheckedEquipment = profile.allEquipmentFilterIDs_Unchecked.size();
+               final int numUncheckedEquipment = profile.allAssetFilterIDs_Unchecked.size();
 
                cell.setText(numUncheckedEquipment == 0
                      ? UI.EMPTY_STRING
@@ -817,7 +851,7 @@ public class SlideoutTourEquipmentFilter extends AdvancedSlideout implements ITr
             public void update(final ViewerCell cell) {
 
                final TourEquipmentFilterProfile profile = (TourEquipmentFilterProfile) cell.getElement();
-               final int numEquipment = profile.allEquipmentFilterIDs.size();
+               final int numEquipment = profile.allAssetFilterIDs.size();
 
                final String combineEquipment = profile.isOrOperator
                      ? Messages.Slideout_TourTagFilter_CombineTags_With_OR
@@ -869,8 +903,8 @@ public class SlideoutTourEquipmentFilter extends AdvancedSlideout implements ITr
             .applyTo(container);
 //      container.setBackground(UI.SYS_COLOR_DARK_GREEN);
       {
-         createUI_310_ProfileHeader(container);
-         createUI_320_EquipmentContainer(container);
+         createUI_310_Equipment_Header(container);
+         createUI_320_Equipment_Container(container);
       }
 
 //      /**
@@ -884,7 +918,7 @@ public class SlideoutTourEquipmentFilter extends AdvancedSlideout implements ITr
       return container;
    }
 
-   private void createUI_310_ProfileHeader(final Composite parent) {
+   private void createUI_310_Equipment_Header(final Composite parent) {
 
       final Composite container = new Composite(parent, SWT.NONE);
       GridDataFactory.fillDefaults()
@@ -950,7 +984,7 @@ public class SlideoutTourEquipmentFilter extends AdvancedSlideout implements ITr
       }
    }
 
-   private void createUI_320_EquipmentContainer(final Composite parent) {
+   private void createUI_320_Equipment_Container(final Composite parent) {
 
       final Composite container = new Composite(parent, SWT.NONE);
       GridDataFactory.fillDefaults()
@@ -1023,18 +1057,19 @@ public class SlideoutTourEquipmentFilter extends AdvancedSlideout implements ITr
 
    private void createUI_334_SelectedAsset_Viewer(final Composite parent) {
 
-      final Composite layoutContainer = new Composite(parent, SWT.NONE);
-      GridDataFactory.fillDefaults().grab(true, true).applyTo(layoutContainer);
+      _selectedAssetLayoutContainer = new Composite(parent, SWT.NONE);
+      GridDataFactory.fillDefaults().grab(true, true).applyTo(_selectedAssetLayoutContainer);
 
       final TableColumnLayout tableLayout = new TableColumnLayout();
-      layoutContainer.setLayout(tableLayout);
+      _selectedAssetLayoutContainer.setLayout(tableLayout);
 
       /*
        * Create table
        */
-      final Table table = new Table(layoutContainer, SWT.FULL_SELECTION | SWT.CHECK);
+      final Table table = new Table(_selectedAssetLayoutContainer, SWT.FULL_SELECTION | SWT.CHECK);
 
       table.setLayout(new TableLayout());
+      table.setHeaderVisible(true);
 
       table.addSelectionListener(SelectionListener.widgetSelectedAdapter(selectionEvent -> {
 
@@ -1062,23 +1097,21 @@ public class SlideoutTourEquipmentFilter extends AdvancedSlideout implements ITr
          }
       });
 
-      layoutContainer.addTraverseListener(traverseEvent -> onTraverse_SelectedEquipmentContainer(table, traverseEvent));
+      _selectedAssetLayoutContainer.addTraverseListener(traverseEvent -> onTraverse_SelectedEquipmentContainer(table, traverseEvent));
 
       _selectedAssetViewer = new CheckboxTableViewer(table);
 
       /*
        * Create columns
        */
-      TableViewerColumn tvc;
       TableColumn tc;
 
       {
-         // Column: Equipment name
+         // Column: asset name
 
-         tvc = new TableViewerColumn(_selectedAssetViewer, SWT.LEAD);
-         tc = tvc.getColumn();
-         tc.setText(Messages.Slideout_TourFilter_Column_ProfileName);
-         tvc.setLabelProvider(new CellLabelProvider() {
+         _selectedAssetViewer_Column1 = new TableViewerColumn(_selectedAssetViewer, SWT.LEAD);
+         tc = _selectedAssetViewer_Column1.getColumn();
+         _selectedAssetViewer_Column1.setLabelProvider(new CellLabelProvider() {
             @Override
             public void update(final ViewerCell cell) {
 
@@ -1087,7 +1120,23 @@ public class SlideoutTourEquipmentFilter extends AdvancedSlideout implements ITr
                cell.setText(selectedEquipment.assetName);
             }
          });
-         tableLayout.setColumnData(tc, new ColumnWeightData(1, false));
+         tableLayout.setColumnData(tc, new ColumnWeightData(1, true));
+      }
+      {
+         // Column: equipment name
+
+         _selectedAssetViewer_Column2 = new TableViewerColumn(_selectedAssetViewer, SWT.LEAD);
+         tc = _selectedAssetViewer_Column2.getColumn();
+         _selectedAssetViewer_Column2.setLabelProvider(new CellLabelProvider() {
+            @Override
+            public void update(final ViewerCell cell) {
+
+               final SelectedAsset selectedEquipment = (SelectedAsset) cell.getElement();
+
+               cell.setText(selectedEquipment.assetParent);
+            }
+         });
+         tableLayout.setColumnData(tc, new ColumnWeightData(1, true));
       }
 
       /*
@@ -1238,9 +1287,8 @@ public class SlideoutTourEquipmentFilter extends AdvancedSlideout implements ITr
       _equipmentViewer.setComparator(new AllEquipment_Comparator());
       _equipmentViewer.setComparer(new AllEquipment_Comparer());
 
-      _equipmentViewer.addSelectionChangedListener(selectionChangedEvent -> onAsset_Listener_Select(selectionChangedEvent));
-
-      _equipmentViewer.addCheckStateListener(checkStateChangedEvent -> onAsset_Listener_Checked(checkStateChangedEvent));
+      _equipmentViewer.addSelectionChangedListener(selectionChangedEvent -> onEquipment_Listener_Select(selectionChangedEvent));
+      _equipmentViewer.addCheckStateListener(checkStateChangedEvent -> onEquipment_Listener_Checked(checkStateChangedEvent));
 
 //      _equipmentViewer.setCheckStateProvider(new ICheckStateProvider() {
 //
@@ -1377,7 +1425,8 @@ public class SlideoutTourEquipmentFilter extends AdvancedSlideout implements ITr
             _btnNewProfile = new Button(container, SWT.PUSH);
             _btnNewProfile.setText(Messages.Slideout_TourFilter_Action_AddProfile);
             _btnNewProfile.setToolTipText(Messages.Slideout_TourTagFilter_Action_AddProfile_Tooltip);
-            _btnNewProfile.addSelectionListener(SelectionListener.widgetSelectedAdapter(selectionEvent -> onProfile_Add()));
+            _btnNewProfile.addSelectionListener(SelectionListener.widgetSelectedAdapter(
+                  selectionEvent -> onProfile_Add()));
 
             // set button default width
             UI.setButtonLayoutData(_btnNewProfile);
@@ -1389,7 +1438,8 @@ public class SlideoutTourEquipmentFilter extends AdvancedSlideout implements ITr
             _btnCopyProfile = new Button(container, SWT.PUSH);
             _btnCopyProfile.setText(Messages.Slideout_TourFilter_Action_CopyProfile);
             _btnCopyProfile.setToolTipText(Messages.Slideout_TourFilter_Action_CopyProfile_Tooltip);
-            _btnCopyProfile.addSelectionListener(SelectionListener.widgetSelectedAdapter(selectionEvent -> onProfile_Copy()));
+            _btnCopyProfile.addSelectionListener(SelectionListener.widgetSelectedAdapter(
+                  selectionEvent -> onProfile_Copy()));
 
             // set button default width
             UI.setButtonLayoutData(_btnCopyProfile);
@@ -1401,7 +1451,8 @@ public class SlideoutTourEquipmentFilter extends AdvancedSlideout implements ITr
             _btnDeleteProfile = new Button(container, SWT.PUSH);
             _btnDeleteProfile.setText(Messages.Slideout_TourFilter_Action_DeleteProfile);
             _btnDeleteProfile.setToolTipText(Messages.Slideout_TourFilter_Action_DeleteProfile_Tooltip);
-            _btnDeleteProfile.addSelectionListener(SelectionListener.widgetSelectedAdapter(selectionEvent -> onProfile_Delete()));
+            _btnDeleteProfile.addSelectionListener(SelectionListener.widgetSelectedAdapter(
+                  selectionEvent -> onProfile_Delete()));
 
             // set button default width
             UI.setButtonLayoutData(_btnDeleteProfile);
@@ -1422,7 +1473,8 @@ public class SlideoutTourEquipmentFilter extends AdvancedSlideout implements ITr
             _chkLiveUpdate = new Button(container, SWT.CHECK);
             _chkLiveUpdate.setText(Messages.Slideout_TourFilter_Checkbox_IsLiveUpdate);
             _chkLiveUpdate.setToolTipText(Messages.Slideout_TourTagFilter_Checkbox_IsLiveUpdate_Tooltip);
-            _chkLiveUpdate.addSelectionListener(SelectionListener.widgetSelectedAdapter(selectionEvent -> doLiveUpdate()));
+            _chkLiveUpdate.addSelectionListener(SelectionListener.widgetSelectedAdapter(
+                  selectionEvent -> doLiveUpdate()));
 
             GridDataFactory.fillDefaults()
                   .grab(true, false)
@@ -1435,8 +1487,8 @@ public class SlideoutTourEquipmentFilter extends AdvancedSlideout implements ITr
              */
             _btnApply = new Button(container, SWT.PUSH);
             _btnApply.setText(Messages.Slideout_TourFilter_Action_Apply);
-            _btnApply.addSelectionListener(SelectionListener.widgetSelectedAdapter(selectionEvent -> TourEquipmentFilterManager
-                  .fireFilterModifyEvent()));
+            _btnApply.addSelectionListener(SelectionListener.widgetSelectedAdapter(
+                  selectionEvent -> TourEquipmentFilterManager.fireFilterModifyEvent()));
 
             // set button default width
             UI.setButtonLayoutData(_btnApply);
@@ -1487,10 +1539,10 @@ public class SlideoutTourEquipmentFilter extends AdvancedSlideout implements ITr
       _rdoFilterType_Equipment               .setEnabled(isProfileSelected);
       _rdoFilterType_Part                    .setEnabled(isProfileSelected);
 
-      _selectedAssetViewer               .getTable().setEnabled(isProfileSelected);
-      _equipmentViewer                       .getTree().setEnabled(isProfileSelected);
-
       _txtProfileName                        .setEnabled(isProfileSelected);
+
+      _equipmentViewer                       .getTree().setEnabled(isProfileSelected);
+      _selectedAssetViewer                   .getTable().setEnabled(isProfileSelected);
 
 // SET_FORMATTING_ON
    }
@@ -1585,6 +1637,7 @@ public class SlideoutTourEquipmentFilter extends AdvancedSlideout implements ITr
    private long[] getAssetIDs_FromSelectedAssets_Unchecked() {
 
       final Object[] allCheckedAssets = _selectedAssetViewer.getCheckedElements();
+
       final LongHashSet allUncheckedAssetIDs = new LongHashSet();
 
       for (final SelectedAsset selectedAssetItem : _allSelectedAssetItems) {
@@ -1709,7 +1762,41 @@ public class SlideoutTourEquipmentFilter extends AdvancedSlideout implements ITr
       }
    }
 
-   private void onAsset_Listener_Checked(final CheckStateChangedEvent event) {
+   private void onDisposeSlideout() {
+
+// SET_FORMATTING_OFF
+
+      _imgEquipment_All             .dispose();
+      _imgEquipment_Collated        .dispose();
+      _imgEquipment_Part            .dispose();
+      _imgEquipment_Part_Collate    .dispose();
+      _imgEquipment_Service         .dispose();
+      _imgEquipment_Service_Collate .dispose();
+
+// SET_FORMATTING_ON
+
+      saveState();
+   }
+
+   private boolean onEquipment_CheckProvider_IsChecked(final Object element) {
+
+//      System.out.println(UI.timeStamp() + " IsChecked()" + UI.NEW_LINE + element);
+//// TODO remove SYSTEM.OUT.PRINTLN
+
+      // TODO Auto-generated method stub
+      return true;
+   }
+
+   private boolean onEquipment_CheckProvider_IsGrayed(final Object element) {
+
+//      System.out.println(UI.timeStamp() + " IsGrayed()" + UI.NEW_LINE + element);
+//// TODO remove SYSTEM.OUT.PRINTLN
+
+      // TODO Auto-generated method stub
+      return true;
+   }
+
+   private void onEquipment_Listener_Checked(final CheckStateChangedEvent event) {
 
       final Object element = event.getElement();
 
@@ -1753,7 +1840,7 @@ public class SlideoutTourEquipmentFilter extends AdvancedSlideout implements ITr
       update_FromEquipmentViewer();
    }
 
-   private void onAsset_Listener_Select(final SelectionChangedEvent event) {
+   private void onEquipment_Listener_Select(final SelectionChangedEvent event) {
 
       if (_equipmentViewerItem_IsKeyPressed) {
 
@@ -1817,22 +1904,6 @@ public class SlideoutTourEquipmentFilter extends AdvancedSlideout implements ITr
 
          update_FromEquipmentViewer();
       }
-   }
-
-   private void onDisposeSlideout() {
-
-// SET_FORMATTING_OFF
-
-      _imgEquipment_All             .dispose();
-      _imgEquipment_Collated        .dispose();
-      _imgEquipment_Part            .dispose();
-      _imgEquipment_Part_Collate    .dispose();
-      _imgEquipment_Service         .dispose();
-      _imgEquipment_Service_Collate .dispose();
-
-// SET_FORMATTING_ON
-
-      saveState();
    }
 
    @Override
@@ -1979,6 +2050,8 @@ public class SlideoutTourEquipmentFilter extends AdvancedSlideout implements ITr
          return;
       }
 
+      final boolean isFilterEquipment_Old = _isFilterEquipment;
+
       final FilterType filterType = _rdoFilterType_Equipment.getSelection()
             ? FilterType.EQUIPMENT
             : FilterType.PART;
@@ -1991,7 +2064,21 @@ public class SlideoutTourEquipmentFilter extends AdvancedSlideout implements ITr
 
       updateUI_SelectedAssetHeader();
 
-      _profileViewer.refresh();
+      if (isFilterEquipment_Old != _isFilterEquipment) {
+
+         // filter type changed -> uncheck all equipment
+
+         _equipmentViewer.setCheckedElements(new Object[] {});
+
+         // remove all selected/unselected assets
+         _allSelectedAssetItems.clear();
+
+         update_FromEquipmentViewer();
+
+      } else {
+
+         _profileViewer.refresh();
+      }
    }
 
    /**
@@ -2462,6 +2549,9 @@ public class SlideoutTourEquipmentFilter extends AdvancedSlideout implements ITr
       table.setSelection(table.getSelectionIndices());
    }
 
+   /**
+    * This is called when something was selected/modified in the {@link #_equipmentViewer}
+    */
    private void update_FromEquipmentViewer() {
 
       if (_selectedProfile == null) {
@@ -2479,10 +2569,13 @@ public class SlideoutTourEquipmentFilter extends AdvancedSlideout implements ITr
       fireModifyEvent();
    }
 
+   /**
+    * This is called when a profile was selected in the {@link #_profileViewer}
+    */
    private void update_FromProfile() {
 
-      final long[] equipmentIDs_Checked = _selectedProfile.allEquipmentFilterIDs.toArray();
-      final long[] equipmentIDs_Unchecked = _selectedProfile.allEquipmentFilterIDs_Unchecked.toArray();
+      final long[] equipmentIDs_Checked = _selectedProfile.allAssetFilterIDs.toArray();
+      final long[] equipmentIDs_Unchecked = _selectedProfile.allAssetFilterIDs_Unchecked.toArray();
 
       updateEquipment_SelectedAssetViewer(equipmentIDs_Checked, equipmentIDs_Unchecked);
       updateEquipment_EquipmentViewer(equipmentIDs_Checked);
@@ -2508,19 +2601,19 @@ public class SlideoutTourEquipmentFilter extends AdvancedSlideout implements ITr
    }
 
    private void updateEquipment_EquipmentProfile(final TourEquipmentFilterProfile profile,
-                                                 final long[] equipmentIDs_Checked,
-                                                 final long[] equipmentIDs_Unchecked) {
+                                                 final long[] assetIDs_Checked,
+                                                 final long[] assetIDs_Unchecked) {
 
       /*
        * Update model
        */
-      final LongHashSet profileEquipmentFilterIDs = profile.allEquipmentFilterIDs;
+      final LongHashSet profileEquipmentFilterIDs = profile.allAssetFilterIDs;
       profileEquipmentFilterIDs.clear();
-      profileEquipmentFilterIDs.addAll(equipmentIDs_Checked);
+      profileEquipmentFilterIDs.addAll(assetIDs_Checked);
 
-      final LongHashSet profileEquipmentFilterIDs_Unchecked = profile.allEquipmentFilterIDs_Unchecked;
+      final LongHashSet profileEquipmentFilterIDs_Unchecked = profile.allAssetFilterIDs_Unchecked;
       profileEquipmentFilterIDs_Unchecked.clear();
-      profileEquipmentFilterIDs_Unchecked.addAll(equipmentIDs_Unchecked);
+      profileEquipmentFilterIDs_Unchecked.addAll(assetIDs_Unchecked);
 
       /*
        * Update UI
@@ -2528,38 +2621,94 @@ public class SlideoutTourEquipmentFilter extends AdvancedSlideout implements ITr
       _profileViewer.update(profile, null);
    }
 
-   private void updateEquipment_EquipmentViewer(final long[] allEquipmentIDs) {
+   /**
+    * @param allAssetIDs
+    *           Check all viewer items with these IDs
+    */
+   private void updateEquipment_EquipmentViewer(final long[] allAssetIDs) {
 
-      final int numIDs = allEquipmentIDs.length;
+      final int numIDs = allAssetIDs.length;
 
-      final List<TVIEquipmentView_Item> allEquipmentItems = new ArrayList<>(numIDs);
+      final List<TVIEquipmentView_Item> allEquipmentItems_Checked = new ArrayList<>(numIDs);
+      final List<TVIEquipmentView_Item> allEquipmentItems_Grayed = new ArrayList<>(numIDs);
 
       if (numIDs > 0) {
 
-         // get all equipment items which should be checked
+         // get all asset items which should be checked
 
-         final ArrayList<TreeViewerItem> allRootItems = _equipmentViewerRootItem.getFetchedChildren();
+         final List<TreeViewerItem> allRootItems = _equipmentViewerRootItem.getFetchedChildren();
 
          for (final TreeViewerItem rootItem : allRootItems) {
 
             if (rootItem instanceof final TVIEquipmentView_Equipment equipmentItem) {
 
-               final long itemID = equipmentItem.getEquipmentID();
+               if (_isFilterEquipment) {
 
-               for (final long equipmentID : allEquipmentIDs) {
+                  // check equipment
 
-                  if (equipmentID == itemID) {
+                  final long itemID = equipmentItem.getEquipmentID();
 
-                     allEquipmentItems.add(equipmentItem);
-                     break;
+                  for (final long assetID : allAssetIDs) {
+
+                     if (assetID == itemID) {
+
+                        allEquipmentItems_Checked.add(equipmentItem);
+                        break;
+                     }
+                  }
+
+               } else {
+
+                  // check parts
+
+                  final ArrayList<TreeViewerItem> allPartItems = equipmentItem.getFetchedChildren();
+
+                  boolean isPartChecked = false;
+
+                  for (final TreeViewerItem treeViewerItem : allPartItems) {
+
+                     if (treeViewerItem instanceof final TVIEquipmentView_Part partItem) {
+
+                        final long itemID = partItem.getPartID();
+
+                        for (final long assetID : allAssetIDs) {
+
+                           if (assetID == itemID) {
+
+                              allEquipmentItems_Checked.add(partItem);
+
+                              isPartChecked = true;
+                              break;
+                           }
+                        }
+                     }
+                  }
+
+                  if (isPartChecked) {
+                     allEquipmentItems_Grayed.add(equipmentItem);
                   }
                }
             }
          }
       }
 
+      /*
+       * Remove gray state for all items, otherwise a selected equipment can have the gray state
+       * when it's part was checked in the parts filter
+       */
+      _equipmentViewer.setGrayedElements(new Object[] {});
+
       // update UI
-      _equipmentViewer.setCheckedElements(allEquipmentItems.toArray());
+      _equipmentViewer.setCheckedElements(allEquipmentItems_Checked.toArray());
+
+      /*
+       * This do not work:
+       * _equipmentViewer.setGrayedElements(allEquipmentItems_Grayed.toArray());
+       * so we set each item separately
+       */
+      for (final TVIEquipmentView_Item equipmentItem : allEquipmentItems_Grayed) {
+         _equipmentViewer.setGrayChecked(equipmentItem, true);
+      }
    }
 
    private void updateEquipment_SelectedAssetViewer(final long[] allAssetIDs_Checked,
@@ -2571,41 +2720,89 @@ public class SlideoutTourEquipmentFilter extends AdvancedSlideout implements ITr
       _allSelectedAssetItems.clear();
 
       final List<SelectedAsset> allCheckedAssets = new ArrayList<>();
+
       final Map<Long, Equipment> allEquipment = EquipmentManager.getAllEquipment_ByID();
+      final Map<Long, EquipmentPart> allParts = EquipmentManager.getAllParts_ByID();
 
-      // add all checked equipment
-      for (final long equipmentID : allAssetIDs_Checked) {
+      /*
+       * Add all checked assets
+       */
+      for (final long assetID : allAssetIDs_Checked) {
 
-         final Equipment equipment = allEquipment.get(equipmentID);
+         SelectedAsset selectedAsset;
 
-         if (equipment == null) {
+         if (_isFilterEquipment) {
 
-            //fixed unknown NPE
-            continue;
+            // equipment are displayed
+
+            final Equipment equipment = allEquipment.get(assetID);
+
+            if (equipment == null) {
+
+               //fixed unknown NPE
+               continue;
+            }
+
+            selectedAsset = new SelectedAsset(equipment);
+
+         } else {
+
+            // parts are displayed
+
+            final EquipmentPart part = allParts.get(assetID);
+
+            if (part == null) {
+
+               // this should not happen
+               continue;
+            }
+
+            selectedAsset = new SelectedAsset(part);
          }
-
-         final SelectedAsset selectedAsset = new SelectedAsset(equipment);
 
          _allSelectedAssetItems.add(selectedAsset);
          allCheckedAssets.add(selectedAsset);
       }
 
-      // add unchecked assets
+      /*
+       * Add all unchecked assets
+       */
       for (final long assetID : allAssetIDs_Unchecked) {
 
-         final Equipment asset = allEquipment.get(assetID);
+         SelectedAsset selectedAsset;
 
-         if (asset == null) {
+         if (_isFilterEquipment) {
 
-            /*
-             * It is possible that the equipment in the tour equipment filter is already
-             * deleted and the tour equipment filter is not yet updated
-             */
+            // equipment are displayed
 
-            continue;
+            final Equipment equipment = allEquipment.get(assetID);
+
+            if (equipment == null) {
+
+               /*
+                * It is possible that the equipment in the tour equipment filter is already
+                * deleted and the tour equipment filter is not yet updated
+                */
+
+               continue;
+            }
+
+            selectedAsset = new SelectedAsset(equipment);
+
+         } else {
+
+            // parts are displayed
+
+            final EquipmentPart part = allParts.get(assetID);
+
+            if (part == null) {
+
+               // this should not happen
+               continue;
+            }
+
+            selectedAsset = new SelectedAsset(part);
          }
-
-         final SelectedAsset selectedAsset = new SelectedAsset(asset);
 
          /*
           * It is possible that there are duplicates in unchecked equipment when a equipment is
@@ -2613,9 +2810,11 @@ public class SlideoutTourEquipmentFilter extends AdvancedSlideout implements ITr
           * equipment
           */
          boolean canAddSelectedEquipment = true;
+
          for (final SelectedAsset alreadyAddedSelectedEquipment : _allSelectedAssetItems) {
 
             if (alreadyAddedSelectedEquipment.assetId == assetID) {
+
                canAddSelectedEquipment = false;
                break;
             }
@@ -2646,11 +2845,37 @@ public class SlideoutTourEquipmentFilter extends AdvancedSlideout implements ITr
 
    private void updateUI_SelectedAssetHeader() {
 
-      final String headerText = _isFilterEquipment
-            ? "Se&lected Equipment"
-            : "Se&lected Parts/Services";
+      final TableColumn assetColumn1 = _selectedAssetViewer_Column1.getColumn();
+      final TableColumn assetColumn2 = _selectedAssetViewer_Column2.getColumn();
+
+      final TableColumnLayout tableLayout = (TableColumnLayout) _selectedAssetLayoutContainer.getLayout();
+
+      String headerText;
+
+      if (_isFilterEquipment) {
+
+         headerText = "Se&lected Equipment";
+
+         assetColumn1.setText("Equipment");
+         assetColumn2.setText(UI.EMPTY_STRING);
+
+         tableLayout.setColumnData(assetColumn1, new ColumnWeightData(10, true));
+         tableLayout.setColumnData(assetColumn2, new ColumnPixelData(0, true));
+
+      } else {
+
+         headerText = "Se&lected Parts / Services";
+
+         assetColumn1.setText("Part / Service");
+         assetColumn2.setText("Equipment");
+
+         tableLayout.setColumnData(assetColumn1, new ColumnWeightData(1, true));
+         tableLayout.setColumnData(assetColumn2, new ColumnWeightData(1, true));
+      }
 
       _lblSelectEquipment.setText(headerText);
+
+      _selectedAssetLayoutContainer.layout(true, true);
    }
 
 }

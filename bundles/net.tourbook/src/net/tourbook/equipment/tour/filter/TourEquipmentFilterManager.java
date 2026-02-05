@@ -131,7 +131,7 @@ public class TourEquipmentFilterManager {
          return false;
       }
 
-      if (_isTourEquipmentFilterEnabled == false || _selectedProfile.allEquipmentFilterIDs.isEmpty()) {
+      if (_isTourEquipmentFilterEnabled == false || _selectedProfile.allAssetFilterIDs.isEmpty()) {
 
          // tour equipment filter is not enabled
 
@@ -162,8 +162,11 @@ public class TourEquipmentFilterManager {
 
                   final TourEquipmentFilterProfile equipmentFilterProfile = new TourEquipmentFilterProfile();
 
-                  equipmentFilterProfile.name = Util.getXmlString(xmlProfile, ATTR_NAME, UI.EMPTY_STRING);
+// SET_FORMATTING_OFF
+
+                  equipmentFilterProfile.name         = Util.getXmlString(xmlProfile, ATTR_NAME, UI.EMPTY_STRING);
                   equipmentFilterProfile.isOrOperator = Util.getXmlBoolean(xmlProfile, ATTR_IS_OR_OPERATOR, true);
+                  equipmentFilterProfile.filterType   = (FilterType) Util.getXmlEnum(xmlProfile, ATTR_FILTER_TYPE, FilterType.EQUIPMENT);
 
                   _filterProfiles.add(equipmentFilterProfile);
 
@@ -172,11 +175,13 @@ public class TourEquipmentFilterManager {
                      _selectedProfile = equipmentFilterProfile;
                   }
 
-                  final long[] equipmentIDs = Util.getXmlLongArray(xmlProfile, ATTR_EQUIPMENT_ID);
-                  final long[] equipmentIDsUnchecked = Util.getXmlLongArray(xmlProfile, ATTR_EQUIPMENT_ID_UNCHECKED);
+                  final long[] equipmentIDs           = Util.getXmlLongArray(xmlProfile, ATTR_EQUIPMENT_ID);
+                  final long[] equipmentIDsUnchecked  = Util.getXmlLongArray(xmlProfile, ATTR_EQUIPMENT_ID_UNCHECKED);
 
-                  equipmentFilterProfile.allEquipmentFilterIDs.addAll(equipmentIDs);
-                  equipmentFilterProfile.allEquipmentFilterIDs_Unchecked.addAll(equipmentIDsUnchecked);
+                  equipmentFilterProfile.allAssetFilterIDs.addAll(equipmentIDs);
+                  equipmentFilterProfile.allAssetFilterIDs_Unchecked.addAll(equipmentIDsUnchecked);
+
+// SET_FORMATTING_ON
                }
             }
 
@@ -254,8 +259,8 @@ public class TourEquipmentFilterManager {
                xmlProfile.putBoolean(ATTR_IS_SELECTED, true);
             }
 
-            Util.setXmlLongArray(xmlProfile, ATTR_EQUIPMENT_ID,            filterProfile.allEquipmentFilterIDs.toArray());
-            Util.setXmlLongArray(xmlProfile, ATTR_EQUIPMENT_ID_UNCHECKED,  filterProfile.allEquipmentFilterIDs_Unchecked.toArray());
+            Util.setXmlLongArray(xmlProfile, ATTR_EQUIPMENT_ID,            filterProfile.allAssetFilterIDs.toArray());
+            Util.setXmlLongArray(xmlProfile, ATTR_EQUIPMENT_ID_UNCHECKED,  filterProfile.allAssetFilterIDs_Unchecked.toArray());
 
 // SET_FORMATTING_ON
          }

@@ -608,6 +608,12 @@ public class Equipment implements Cloneable, Comparable<Object>, Serializable {
 
       final int maxLen = 5;
 
+      String partValues = parts != null ? toString(parts, maxLen) : null;
+
+      partValues = parts == null
+            ? "-"
+            : "" + parts.size();
+
       return UI.EMPTY_STRING
 
             + "Equipment" + NL //                                          //$NON-NLS-1$
@@ -630,7 +636,7 @@ public class Equipment implements Cloneable, Comparable<Object>, Serializable {
 //
 //            + " weight           = " + weight + NL //                       //$NON-NLS-1$
 //
-            + " parts            = " + (parts != null ? toString(parts, maxLen) : null) + NL //$NON-NLS-1$
+            + " parts            = " + partValues + NL //$NON-NLS-1$
       ;
    }
 

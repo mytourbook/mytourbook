@@ -76,7 +76,7 @@ public class EquipmentFilter {
             // AND EXISTS (SELECT 1 FROM TOURDATA_Equipment AS tt WHERE tt.TOURDATA_TOURID = TourData.tourId AND tt.Equipment_EquipmentId = 12    )
             // AND EXISTS (SELECT 1 FROM TOURDATA_Equipment AS tt WHERE tt.TOURDATA_TOURID = TourData.tourId AND tt.Equipment_EquipmentId = 20    )
 
-            final long[] allEquipmentIDs = selectedProfile.allEquipmentFilterIDs.toArray();
+            final long[] allEquipmentIDs = selectedProfile.allAssetFilterIDs.toArray();
 
             final StringBuilder sb = new StringBuilder();
 
@@ -115,7 +115,7 @@ public class EquipmentFilter {
 
       final StringBuilder sb = new StringBuilder();
 
-      final long[] allEquipmentIDs = TourEquipmentFilterManager.getSelectedProfile().allEquipmentFilterIDs.toArray();
+      final long[] allEquipmentIDs = TourEquipmentFilterManager.getSelectedProfile().allAssetFilterIDs.toArray();
 
       for (int paramIndex = 0; paramIndex < allEquipmentIDs.length; paramIndex++) {
 

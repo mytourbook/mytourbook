@@ -164,16 +164,17 @@ public class EquipmentManager {
             .build();
    }
 
-   private static volatile Map<Long, Equipment> _allEquipment_ByID;
-   private static volatile List<Equipment>      _allEquipment_ByName;
+   private static volatile Map<Long, Equipment>     _allEquipment_ByID;
+   private static volatile List<Equipment>          _allEquipment_ByName;
+   private static volatile Map<Long, EquipmentPart> _allParts_ByID;
 
-   private static ConcurrentSkipListSet<String> _allBrands;
-   private static ConcurrentSkipListSet<String> _allCompanies;
-   private static ConcurrentSkipListSet<String> _allModels;
-   private static ConcurrentSkipListSet<String> _allPriceUnits;
-   private static ConcurrentSkipListSet<String> _allServiceNames;
-   private static ConcurrentSkipListSet<String> _allSizes;
-   private static ConcurrentSkipListSet<String> _allTypes;
+   private static ConcurrentSkipListSet<String>     _allBrands;
+   private static ConcurrentSkipListSet<String>     _allCompanies;
+   private static ConcurrentSkipListSet<String>     _allModels;
+   private static ConcurrentSkipListSet<String>     _allPriceUnits;
+   private static ConcurrentSkipListSet<String>     _allServiceNames;
+   private static ConcurrentSkipListSet<String>     _allSizes;
+   private static ConcurrentSkipListSet<String>     _allTypes;
 
    /**
     * Clear all equipment resources and tours within MT and fire a equipment modify event, ensure
@@ -202,6 +203,11 @@ public class EquipmentManager {
       if (_allEquipment_ByName != null) {
          _allEquipment_ByName.clear();
          _allEquipment_ByName = null;
+      }
+
+      if (_allParts_ByID != null) {
+         _allParts_ByID.clear();
+         _allParts_ByID = null;
       }
 
       if (_allBrands != null) {
@@ -718,6 +724,20 @@ public class EquipmentManager {
       return _allEquipment_ByName;
    }
 
+   /**
+    * @return Returns {@link #_allParts_ByID}
+    */
+   public static Map<Long, EquipmentPart> getAllParts_ByID() {
+
+      if (_allParts_ByID != null) {
+         return _allParts_ByID;
+      }
+
+      loadEquipment();
+
+      return _allParts_ByID;
+   }
+
    public static ConcurrentSkipListSet<String> getCachedFields_AllBrands() {
 
       if (_allBrands == null) {
@@ -1150,6 +1170,8 @@ public class EquipmentManager {
          }
 
          final Map<Long, Equipment> allEquipments_ByID = new HashMap<>();
+         final Map<Long, EquipmentPart> allParts_ByID = new HashMap<>();
+
          final List<Equipment> allEquipments_ByName = new ArrayList<>();
 
          final EntityManager em = TourDatabase.getInstance().getEntityManager();
@@ -1172,6 +1194,11 @@ public class EquipmentManager {
 
                   allEquipments_ByID.put(equipment.getEquipmentId(), equipment);
                   allEquipments_ByName.add(equipment);
+
+                  for (final EquipmentPart part : equipment.getParts()) {
+
+                     allParts_ByID.put(part.getPartId(), part);
+                  }
                }
             }
 
@@ -1180,6 +1207,8 @@ public class EquipmentManager {
 
          _allEquipment_ByID = allEquipments_ByID;
          _allEquipment_ByName = allEquipments_ByName;
+
+         _allParts_ByID = allParts_ByID;
       }
    }
 
