@@ -78,6 +78,7 @@ public class Images {
    public static final String EditTour                             = "tour-editor.svg";                             //$NON-NLS-1$
 
    public static final String Equipment                            = "equipment.svg";                               //$NON-NLS-1$
+   public static final String Equipment_Asset_Collated             = "equipment-asset-collated.svg";                //$NON-NLS-1$
    public static final String Equipment_Checked                    = "equipment-checked.svg";                       //$NON-NLS-1$
    public static final String Equipment_Collated                   = "equipment-collated.svg";                      //$NON-NLS-1$
    public static final String Equipment_Duplicate                  = "equipment-duplicate.svg";                     //$NON-NLS-1$
