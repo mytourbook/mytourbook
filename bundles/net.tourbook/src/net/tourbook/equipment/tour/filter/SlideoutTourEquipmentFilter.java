@@ -1290,19 +1290,6 @@ public class SlideoutTourEquipmentFilter extends AdvancedSlideout implements ITr
       _equipmentViewer.addSelectionChangedListener(selectionChangedEvent -> onEquipment_Listener_Select(selectionChangedEvent));
       _equipmentViewer.addCheckStateListener(checkStateChangedEvent -> onEquipment_Listener_Checked(checkStateChangedEvent));
 
-//      _equipmentViewer.setCheckStateProvider(new ICheckStateProvider() {
-//
-//         @Override
-//         public boolean isChecked(final Object element) {
-//            return onEquipment_CheckProvider_IsChecked(element);
-//         }
-//
-//         @Override
-//         public boolean isGrayed(final Object element) {
-//            return onEquipment_CheckProvider_IsGrayed(element);
-//         }
-//      });
-
       /*
        * Create 1st column
        */
@@ -1472,7 +1459,7 @@ public class SlideoutTourEquipmentFilter extends AdvancedSlideout implements ITr
              */
             _chkLiveUpdate = new Button(container, SWT.CHECK);
             _chkLiveUpdate.setText(Messages.Slideout_TourFilter_Checkbox_IsLiveUpdate);
-            _chkLiveUpdate.setToolTipText(Messages.Slideout_TourTagFilter_Checkbox_IsLiveUpdate_Tooltip);
+            _chkLiveUpdate.setToolTipText("Apply tour equipment filter modifications immediately\nwithout pressing the \"Apply\" button");
             _chkLiveUpdate.addSelectionListener(SelectionListener.widgetSelectedAdapter(
                   selectionEvent -> doLiveUpdate()));
 
@@ -1776,24 +1763,6 @@ public class SlideoutTourEquipmentFilter extends AdvancedSlideout implements ITr
 // SET_FORMATTING_ON
 
       saveState();
-   }
-
-   private boolean onEquipment_CheckProvider_IsChecked(final Object element) {
-
-//      System.out.println(UI.timeStamp() + " IsChecked()" + UI.NEW_LINE + element);
-//// TODO remove SYSTEM.OUT.PRINTLN
-
-      // TODO Auto-generated method stub
-      return true;
-   }
-
-   private boolean onEquipment_CheckProvider_IsGrayed(final Object element) {
-
-//      System.out.println(UI.timeStamp() + " IsGrayed()" + UI.NEW_LINE + element);
-//// TODO remove SYSTEM.OUT.PRINTLN
-
-      // TODO Auto-generated method stub
-      return true;
    }
 
    private void onEquipment_Listener_Checked(final CheckStateChangedEvent event) {

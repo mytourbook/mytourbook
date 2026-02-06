@@ -2642,11 +2642,12 @@ public class EquipmentView extends ViewPart implements ITourProvider, ITourViewe
       final boolean isServiceSelected           = numServices > 0;
       final boolean isTourSelected              = numTours > 0;
       final boolean isOneTour                   = numTours == 1;
+      final boolean isAssetSelected             = isEquipmentSelected || isPartSelected || isServiceSelected;
       final boolean isOneServiceSelected        = isServiceSelected   && isOneItemSelected;
       final boolean isOnePartSelected           = isPartSelected      && isOneItemSelected;
 
       final boolean canCreatePartOrService      = isOneItemSelected
-                                                   && (isEquipmentSelected || isPartSelected || isServiceSelected)
+                                                   && isAssetSelected
                                                    && isEquipmentCollate == false                                                   ;
 
       final boolean canSetTourStructure         = isOneItemSelected
@@ -2679,7 +2680,7 @@ public class EquipmentView extends ViewPart implements ITourProvider, ITourViewe
       _actionNewPart             .setEnabled(canCreatePartOrService);
       _actionNewService          .setEnabled(canCreatePartOrService);
       _actionSetTourStructure    .setEnabled(canSetTourStructure);
-      _actionToggleCollatedTours .setEnabled(isOneItemSelected && (isEquipmentSelected || isPartSelected));
+      _actionToggleCollatedTours .setEnabled(isOneItemSelected && isAssetSelected);
 
       _actionExportTour          .setEnabled(isSelectedTours);
 
