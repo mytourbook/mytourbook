@@ -23,33 +23,33 @@ import org.eclipse.collections.impl.set.mutable.primitive.LongHashSet;
 
 public class TourEquipmentFilterProfile implements Cloneable {
 
-   private static int _idCounter                  = 0;
+   private static int         _idCounter                  = 0;
 
-   int                profileId;
+   int                        profileId;
 
    /**
     * Profile name
     */
-   String             name                        = Messages.Tour_Filter_Default_ProfileName;
+   String                     name                        = Messages.Tour_Filter_Default_ProfileName;
 
    /**
     * Contains all asset IDs for this profile. It can be an equipment ID or a part ID depending on
     * the {@link #filterType}
     */
-   public LongHashSet allAssetFilterIDs           = new LongHashSet();
+   public LongHashSet         allAssetFilterIDs           = new LongHashSet();
 
    /**
     * Keeps asset IDs which are unchecked in the selected asset viewer
     */
-   public LongHashSet allAssetFilterIDs_Unchecked = new LongHashSet();
+   public LongHashSet         allAssetFilterIDs_Unchecked = new LongHashSet();
 
    /**
     * When <code>true</code> (default) then the equipment are combined with OR otherwise they are
     * combined with AND
     */
-   public boolean     isOrOperator                = TourEquipmentFilterManager.ATTR_IS_OR_OPERATOR_DEFAULT;
+   public boolean             isOrOperator                = TourEquipmentFilterManager.ATTR_IS_OR_OPERATOR_DEFAULT;
 
-   public FilterType  filterType                  = TourEquipmentFilterManager.ATTR_FILTER_TYPE_DEFAULT;
+   public EquipmentFilterType filterType                  = TourEquipmentFilterManager.ATTR_FILTER_TYPE_DEFAULT;
 
    public TourEquipmentFilterProfile() {
 

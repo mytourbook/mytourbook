@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2025 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2026 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -33,8 +33,6 @@ public class SQLData {
    private String            _sqlString;
    private List<Object>      _allParameters;
 
-   private int               _lastParameterIndex;
-
    /**
     * Setup with empty sql data
     */
@@ -51,14 +49,6 @@ public class SQLData {
       _allParameters = parameters;
    }
 
-   /**
-    * @return Returns the last parameter index +1 which was used for setting parameters in
-    *         {@link #setParameters(PreparedStatement, int)}
-    */
-   public int getLastParameterIndex() {
-      return _lastParameterIndex;
-   }
-
    public List<Object> getParameters() {
       return _allParameters;
    }
@@ -69,8 +59,6 @@ public class SQLData {
 
    /**
     * Sets the app filter parameters into the filter statement.
-    * <p>
-    * The last used index can be retrieved with {@link #getLastParameterIndex()}
     *
     * @param statement
     * @param startIndex
@@ -88,28 +76,23 @@ public class SQLData {
 
          if (parameter instanceof Long) {
 
-            statement.setLong(parameterIndex, (Long) parameter);
-            parameterIndex++;
+            statement.setLong(parameterIndex++, (Long) parameter);
 
          } else if (parameter instanceof Integer) {
 
-            statement.setInt(parameterIndex, (Integer) parameter);
-            parameterIndex++;
+            statement.setInt(parameterIndex++, (Integer) parameter);
 
          } else if (parameter instanceof Float) {
 
-            statement.setFloat(parameterIndex, (Float) parameter);
-            parameterIndex++;
+            statement.setFloat(parameterIndex++, (Float) parameter);
 
          } else if (parameter instanceof Double) {
 
-            statement.setDouble(parameterIndex, (Double) parameter);
-            parameterIndex++;
+            statement.setDouble(parameterIndex++, (Double) parameter);
 
          } else if (parameter instanceof String) {
 
-            statement.setString(parameterIndex, (String) parameter);
-            parameterIndex++;
+            statement.setString(parameterIndex++, (String) parameter);
 
          } else {
 
@@ -117,7 +100,7 @@ public class SQLData {
          }
       }
 
-      return _lastParameterIndex = parameterIndex;
+      return parameterIndex;
    }
 
    @Override

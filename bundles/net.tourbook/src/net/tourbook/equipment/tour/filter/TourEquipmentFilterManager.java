@@ -54,7 +54,7 @@ public class TourEquipmentFilterManager {
    private static final String                     ATTR_EQUIPMENT_ID           = "equipmentIDs";                         //$NON-NLS-1$
    private static final String                     ATTR_EQUIPMENT_ID_UNCHECKED = "equipmentIDsUnchecked";                //$NON-NLS-1$
    private static final String                     ATTR_FILTER_TYPE            = "filterType";                           //$NON-NLS-1$
-   public static final FilterType                  ATTR_FILTER_TYPE_DEFAULT    = FilterType.EQUIPMENT;
+   public static final EquipmentFilterType         ATTR_FILTER_TYPE_DEFAULT    = EquipmentFilterType.EQUIPMENT;
 
    private static final Bundle                     _bundle                     = TourbookPlugin.getDefault().getBundle();
 
@@ -166,7 +166,7 @@ public class TourEquipmentFilterManager {
 
                   equipmentFilterProfile.name         = Util.getXmlString(xmlProfile, ATTR_NAME, UI.EMPTY_STRING);
                   equipmentFilterProfile.isOrOperator = Util.getXmlBoolean(xmlProfile, ATTR_IS_OR_OPERATOR, true);
-                  equipmentFilterProfile.filterType   = (FilterType) Util.getXmlEnum(xmlProfile, ATTR_FILTER_TYPE, FilterType.EQUIPMENT);
+                  equipmentFilterProfile.filterType   = (EquipmentFilterType) Util.getXmlEnum(xmlProfile, ATTR_FILTER_TYPE, EquipmentFilterType.EQUIPMENT);
 
                   _filterProfiles.add(equipmentFilterProfile);
 

@@ -3371,7 +3371,7 @@ public class EquipmentView extends ViewPart implements ITourProvider, ITourViewe
 
             MessageDialog.openInformation(_parent.getShell(),
                   "Toggle Collated Tours",
-                  "An equipment which contains parts or services cannot collate tours itself, only the parts or services of this equipment can collate tours");
+                  "An equipment which contains parts or services cannot collate tours for itself.\nOnly the parts or services of this equipment can collate tours");
 
             return;
          }

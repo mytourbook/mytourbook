@@ -15,7 +15,7 @@
  *******************************************************************************/
 package net.tourbook.equipment.tour.filter;
 
-public enum FilterType {
+public enum EquipmentFilterType {
 
    EQUIPMENT, //
 

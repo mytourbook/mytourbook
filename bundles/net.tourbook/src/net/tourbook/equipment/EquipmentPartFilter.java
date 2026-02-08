@@ -25,7 +25,7 @@ import net.tourbook.equipment.tour.filter.EquipmentFilterType;
 import net.tourbook.equipment.tour.filter.TourEquipmentFilterManager;
 import net.tourbook.equipment.tour.filter.TourEquipmentFilterProfile;
 
-public class EquipmentFilter {
+public class EquipmentPartFilter {
 
    private static final char   NL                  = UI.NEW_LINE;
 
@@ -34,7 +34,7 @@ public class EquipmentFilter {
 
    private SQLData             _sqlData;
 
-   public EquipmentFilter() {
+   public EquipmentPartFilter() {
 
       _sqlData = createSQL();
    }
@@ -49,67 +49,47 @@ public class EquipmentFilter {
 
          final TourEquipmentFilterProfile selectedProfile = TourEquipmentFilterManager.getSelectedProfile();
 
-         if (EquipmentFilterType.EQUIPMENT.equals(selectedProfile.filterType) == false) {
+         if (EquipmentFilterType.PART.equals(selectedProfile.filterType) == false) {
 
-            // part filter
+            // equipment filter
 
             /**
-             * The part filter is implemented differently in {@link EquipmentPartFilter}
+             * The equipment filter is implemented differently in {@link EquipmentFilter}
              */
 
          } else {
 
-            // equipment filter
+            // part filter
 
             final String joinTable = TourDatabase.JOINTABLE__TOURDATA__EQUIPMENT;
 
             if (selectedProfile.isOrOperator) {
 
-               // combine equipment with OR
+               // combine parts with OR
 
                final StringBuilder sqlParameters = createSQL_OR_Parameters(allSQLParameters);
 
                /* require tour to have at least one of these equipment (index-friendly) */
                sql = UI.EMPTY_STRING
 
-                     + "AND EXISTS" + NL //                                                     //$NON-NLS-1$
-                     + "(" + NL //                                                              //$NON-NLS-1$
-                     + "  SELECT 1" + NL //                                                     //$NON-NLS-1$
-                     + "  FROM " + joinTable + " AS jTdEq" + NL //                              //$NON-NLS-1$ //$NON-NLS-2$
-                     + "  WHERE jTdEq.TOURDATA_TOURID = TourData.tourID" + NL //                //$NON-NLS-1$
-                     + "    AND jTdEq.Equipment_EquipmentId IN (" + sqlParameters + ")" + NL // //$NON-NLS-1$ //$NON-NLS-2$
-                     + ")" + NL //                                                              //$NON-NLS-1$
+                     + "JOIN " + joinTable + " AS jTdEq"
+                     + "   ON jTdEq.TOURDATA_TOURID = TourData.TOURID" + NL //                     //$NON-NLS-1$
+
+                     + "JOIN " + TourDatabase.TABLE_EQUIPMENT_PART + " AS part" //                 //$NON-NLS-1$
+                     + "   ON part.EQUIPMENT_EQUIPMENTID = jTdEq.EQUIPMENT_EQUIPMENTID" + NL //    //$NON-NLS-1$
+
+                     + "   AND part.ISCOLLATE = TRUE" + NL //                                      //$NON-NLS-1$
+                     + "   AND part.PARTID IN (" + sqlParameters + ")" + NL //                     //$NON-NLS-1$ //$NON-NLS-2$
+
+                     + "   AND TourData.TourStartTime >= part.dateFrom" + NL //                    //$NON-NLS-1$
+                     + "   AND TourData.TourStartTime < part.dateUntil" + NL //                    //$NON-NLS-1$
                ;
 
             } else {
 
-               // combine equipment with AND
+               // combine parts with AND
 
-               // AND EXISTS (SELECT 1 FROM TOURDATA_Equipment AS jTdEq WHERE jTdEq.TOURDATA_TOURID = TourData.tourId AND jTdEq.Equipment_EquipmentId = 9)
-               // AND EXISTS (SELECT 1 FROM TOURDATA_Equipment AS jTdEq WHERE jTdEq.TOURDATA_TOURID = TourData.tourId AND jTdEq.Equipment_EquipmentId = 12    )
-               // AND EXISTS (SELECT 1 FROM TOURDATA_Equipment AS jTdEq WHERE jTdEq.TOURDATA_TOURID = TourData.tourId AND jTdEq.Equipment_EquipmentId = 20    )
-
-               final long[] allEquipmentIDs = selectedProfile.allAssetFilterIDs.toArray();
-
-               final StringBuilder sb = new StringBuilder();
-
-               for (final long equipmentID : allEquipmentIDs) {
-
-                  sb.append(UI.EMPTY_STRING
-
-                        + "AND EXISTS " //                                                //$NON-NLS-1$
-                        + "(" //                                                          //$NON-NLS-1$
-                        + "   SELECT 1" //                                                //$NON-NLS-1$
-                        + "   FROM " + joinTable + " AS jTdEq " //                        //$NON-NLS-1$ //$NON-NLS-2$
-                        + "   WHERE jTdEq.TOURDATA_TOURID = TourData.tourId " //          //$NON-NLS-1$
-                        + "     AND jTdEq.Equipment_EquipmentId = ?" //                   //$NON-NLS-1$
-                        + ")" + NL //                                                     //$NON-NLS-1$
-                  );
-
-                  allSQLParameters.add(equipmentID);
-               }
-
-               sql = sb.toString();
+//               TBD
             }
          }
       }

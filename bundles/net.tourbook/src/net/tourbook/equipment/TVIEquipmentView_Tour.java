@@ -32,18 +32,17 @@ public class TVIEquipmentView_Tour extends TVIEquipmentView_Item {
 
    public static final String         SQL_TOUR_COLUMNS = UI.EMPTY_STRING
 
-         + "TourData.TourID, "                                          //   1  //$NON-NLS-1$
+         + "TourData.TourID," + NL                                      //   1  //$NON-NLS-1$
 
-         + "TourData.TourStartTime, "                                   //   2  //$NON-NLS-1$
-         + "TourData.TimeZoneId, "                                      //   3  //$NON-NLS-1$
+         + "TourData.TourStartTime," + NL                               //   2  //$NON-NLS-1$
+         + "TourData.TimeZoneId," + NL                                  //   3  //$NON-NLS-1$
+         + "TourData.TourTitle," + NL                                   //   4  //$NON-NLS-1$
 
-         + "TourData.TourTitle, "                                       //   4  //$NON-NLS-1$
+         + "TourData.TourType_TypeId," + NL                             //   5  //$NON-NLS-1$
 
-         + "TourData.TourType_TypeId, "                                 //   5  //$NON-NLS-1$
-
-         + "jTdataTtag.TourTag_TagId, "                                 //   6  //$NON-NLS-1$
-         + "Tmarker.MarkerId, "                                         //   7  //$NON-NLS-1$
-         + "jTdataEq.Equipment_EquipmentID, "                           //   8  //$NON-NLS-1$
+         + "jTdataTtag.TourTag_TagId," + NL                             //   6  //$NON-NLS-1$
+         + "Tmarker.MarkerId," + NL                                     //   7  //$NON-NLS-1$
+         + "jTdataEq.Equipment_EquipmentID," + NL                       //   8  //$NON-NLS-1$
 
          + SQL_SUM_COLUMNS_TOUR                                         //   9
    ;
@@ -75,7 +74,7 @@ public class TVIEquipmentView_Tour extends TVIEquipmentView_Item {
       super(treeViewer, equipmentType);
 
       setParentItem(parentItem);
-      
+
       _equipmentItem = equipmentItem;
    }
 
@@ -87,7 +86,7 @@ public class TVIEquipmentView_Tour extends TVIEquipmentView_Item {
       super(treeViewer, equipmentType);
 
       setParentItem(parentItem);
-      
+
       _partItem = partItem;
    }
 

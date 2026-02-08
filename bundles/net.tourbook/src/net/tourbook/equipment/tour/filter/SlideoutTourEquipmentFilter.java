@@ -832,7 +832,7 @@ public class SlideoutTourEquipmentFilter extends AdvancedSlideout implements ITr
 
                final TourEquipmentFilterProfile profile = (TourEquipmentFilterProfile) cell.getElement();
 
-               final FilterType filterType = profile.filterType;
+               final EquipmentFilterType filterType = profile.filterType;
 
                cell.setText(filterType.name());
             }
@@ -2021,11 +2021,11 @@ public class SlideoutTourEquipmentFilter extends AdvancedSlideout implements ITr
 
       final boolean isFilterEquipment_Old = _isFilterEquipment;
 
-      final FilterType filterType = _rdoFilterType_Equipment.getSelection()
-            ? FilterType.EQUIPMENT
-            : FilterType.PART;
+      final EquipmentFilterType filterType = _rdoFilterType_Equipment.getSelection()
+            ? EquipmentFilterType.EQUIPMENT
+            : EquipmentFilterType.PART;
 
-      _isFilterEquipment = FilterType.EQUIPMENT.equals(filterType);
+      _isFilterEquipment = EquipmentFilterType.EQUIPMENT.equals(filterType);
 
       _selectedProfile.filterType = filterType;
       _selectedProfile.name = _txtProfileName.getText();
@@ -2095,7 +2095,7 @@ public class SlideoutTourEquipmentFilter extends AdvancedSlideout implements ITr
 // SET_FORMATTING_OFF
 
             final boolean isOrOperator    = _selectedProfile.isOrOperator;
-            _isFilterEquipment            = FilterType.EQUIPMENT.equals(_selectedProfile.filterType);
+            _isFilterEquipment            = EquipmentFilterType.EQUIPMENT.equals(_selectedProfile.filterType);
 
             _txtProfileName            .setText(_selectedProfile.name);
 

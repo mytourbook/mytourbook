@@ -37,6 +37,7 @@ import net.tourbook.common.util.SQL;
 import net.tourbook.common.util.SQLData;
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.database.TourDatabase;
+import net.tourbook.equipment.EquipmentPartFilter;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.ui.AppFilter;
 import net.tourbook.ui.TableColumnFactory;
@@ -229,7 +230,7 @@ public class NatTable_DataLoader {
 
       final StringBuilder sb = new StringBuilder();
 
-      sb.append(" ORDER BY ");//$NON-NLS-1$
+      sb.append("ORDER BY "); //$NON-NLS-1$
 
       for (int fieldIndex = 0; fieldIndex < numOrderFields; fieldIndex++) {
 
@@ -291,6 +292,9 @@ public class NatTable_DataLoader {
          final String sqlSortFields = createSql_Sorting_SelectFields();
 
          final AppFilter appFilter = new AppFilter(AppFilter.ANY_APP_FILTERS);
+         final EquipmentPartFilter equipmentPartFilter = new EquipmentPartFilter();
+
+         final SQLData partFilter = equipmentPartFilter.getSqlData();
          final SQLData tourCollectionFilter = _tourCollectionFilter;
 
          sql = UI.EMPTY_STRING
@@ -301,6 +305,8 @@ public class NatTable_DataLoader {
                + "   " + sqlSortFields //                      //$NON-NLS-1$
 
                + "FROM TOURDATA AS TourData" + NL //           //$NON-NLS-1$
+
+               + partFilter.getSqlString()
 
                + "WHERE 1=1" + NL //                           //$NON-NLS-1$
 
@@ -313,7 +319,7 @@ public class NatTable_DataLoader {
 
          int nextIndex = 1;
 
-         // set filter parameters
+         nextIndex = partFilter.setParameters(prepStmt, nextIndex);
          nextIndex = appFilter.setParameters(prepStmt, nextIndex);
          nextIndex = tourCollectionFilter.setParameters(prepStmt, nextIndex);
 
@@ -343,8 +349,6 @@ public class NatTable_DataLoader {
     */
    private int fetchNumberOfTours() {
 
-//    TourDatabase.enableRuntimeStatistics(conn);
-
       int numTours = 0;
 
       String sql = null;
@@ -369,12 +373,18 @@ public class NatTable_DataLoader {
             PreparedStatement prepStmt;
 
             final AppFilter appFilter = new AppFilter(AppFilter.ANY_APP_FILTERS);
+            final EquipmentPartFilter equipmentPartFilter = new EquipmentPartFilter();
+
+            final SQLData partFilter = equipmentPartFilter.getSqlData();
 
             sql = UI.EMPTY_STRING
 
-                  + "SELECT COUNT(*)" + NL //                                                      //$NON-NLS-1$
-                  + "FROM TOURDATA AS TourData" + NL //                                            //$NON-NLS-1$
-                  + "WHERE 1=1" + NL //                                                            //$NON-NLS-1$
+                  + "SELECT COUNT(DISTINCT TourData.TourID)" + NL //          //$NON-NLS-1$
+                  + "FROM TOURDATA AS TourData" + NL //                       //$NON-NLS-1$
+
+                  + partFilter.getSqlString()
+
+                  + "WHERE 1=1" + NL //                                       //$NON-NLS-1$
 
                   + appFilter.getWhereClause()
                   + sqlCollectionFilter;
@@ -383,6 +393,7 @@ public class NatTable_DataLoader {
 
             int nextIndex = 1;
 
+            nextIndex = partFilter.setParameters(prepStmt, nextIndex);
             nextIndex = appFilter.setParameters(prepStmt, nextIndex);
 
             if (isFirstRun) {
@@ -428,8 +439,6 @@ public class NatTable_DataLoader {
          SQL.showException(e, sql);
       }
 
-//    TourDatabase.disableRuntimeStatistic(conn);
-
       return numTours;
    }
 
@@ -469,6 +478,9 @@ public class NatTable_DataLoader {
       try (Connection conn = TourDatabase.getInstance().getConnection()) {
 
          final AppFilter appFilter = new AppFilter(AppFilter.ANY_APP_FILTERS);
+         final EquipmentPartFilter equipmentPartFilter = new EquipmentPartFilter();
+
+         final SQLData partFilter = equipmentPartFilter.getSqlData();
          final SQLData tourCollectionFilter = _tourCollectionFilter;
 
          final String orderBy = createSql_Sorting_OrderBy();
@@ -489,9 +501,15 @@ public class NatTable_DataLoader {
 
                + "   SELECT" + NL //                                                               //$NON-NLS-1$
 
+               // create unique tour IDs otherwise multiple parts for one tour can create multiple tour rows
+               + "      DISTINCT " //                                                              //$NON-NLS-1$
+
                + TVITourBookItem.getSQL_ALL_TOUR_FIELDS("TourData", 6) + NL //                     //$NON-NLS-1$
 
                + "     FROM TOURDATA AS TourData" + NL //                                          //$NON-NLS-1$
+
+               + partFilter.getSqlString()
+
                + "     WHERE 1=1" + NL //                                                          //$NON-NLS-1$
 
                + appFilter.getWhereClause() + NL //
@@ -503,13 +521,12 @@ public class NatTable_DataLoader {
 
                + ") AS tdFiltered" + NL //                                                         //$NON-NLS-1$
 
-               + "LEFT JOIN " + TourDatabase.TABLE_TOUR_MARKER + "              	AS tm  	ON tdFiltered.tourID = tm.TourData_tourId" + NL //   //$NON-NLS-1$
+               + "LEFT JOIN " + TourDatabase.TABLE_TOUR_MARKER + "               AS tm    ON tdFiltered.tourID = tm.TourData_tourId" + NL //   //$NON-NLS-1$
                + "LEFT JOIN " + TourDatabase.JOINTABLE__TOURDATA__TOURTAG + "    AS jtt   ON tdFiltered.tourID = jtt.TourData_tourId" + NL //  //$NON-NLS-1$
                + "LEFT JOIN " + TourDatabase.TABLE_TOUR_NUTRITION_PRODUCT + "    AS np    ON tdFiltered.tourID = np.TourData_tourId" + NL //   //$NON-NLS-1$
                + "LEFT JOIN " + TourDatabase.JOINTABLE__TOURDATA__EQUIPMENT + "  AS te    ON tdFiltered.tourID = te.TourData_tourId" + NL //   //$NON-NLS-1$
 
-               + "   " + orderBy + NL //                                                           //$NON-NLS-1$
-         ;
+               + orderBy + NL;
 
          final PreparedStatement prepStmt = conn.prepareStatement(sql);
 
@@ -517,6 +534,7 @@ public class NatTable_DataLoader {
          int nextIndex = 1;
 
          // set filter parameters
+         nextIndex = partFilter.setParameters(prepStmt, nextIndex);
          nextIndex = appFilter.setParameters(prepStmt, nextIndex);
          nextIndex = tourCollectionFilter.setParameters(prepStmt, nextIndex);
 
