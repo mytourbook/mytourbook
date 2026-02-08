@@ -560,12 +560,15 @@ public class EquipmentMenuManager implements IActionProvider {
       }
 
       boolean isEnabled_RemoveEquipment = false;
+      int numTours = 0;
 
       final HashSet<Long> allSelectedEquipmentIDs_FromTours = new HashSet<>();
 
       for (final TreeViewerItem treeItem : allSelectedTreeItems) {
 
          if (treeItem instanceof final TVITourBookTour tourItem) {
+
+            numTours++;
 
             final List<Long> allTourEquipmentIDs = tourItem.getEquipmentIds();
 
@@ -578,6 +581,8 @@ public class EquipmentMenuManager implements IActionProvider {
 
          } else if (treeItem instanceof final TVIEquipmentView_Tour tourItem) {
 
+            numTours++;
+
             final List<Long> allTourEquipmentIDs = tourItem.getEquipmentIds();
 
             if (allTourEquipmentIDs != null && allTourEquipmentIDs.size() > 0) {
@@ -589,7 +594,7 @@ public class EquipmentMenuManager implements IActionProvider {
          }
       }
 
-      final boolean isEnabled_AddEquipment = allSelectedEquipmentIDs_FromTours.size() > 0;
+      final boolean isEnabled_AddEquipment = numTours > 0;
 
       final int numClipboardEquipment = updateUI_PasteAction();
       final int numSelectedItems = allSelectedTreeItems.size();

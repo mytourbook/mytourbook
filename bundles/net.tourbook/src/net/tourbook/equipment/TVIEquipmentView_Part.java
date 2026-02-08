@@ -26,6 +26,7 @@ import java.util.Set;
 
 import net.tourbook.common.UI;
 import net.tourbook.common.util.SQL;
+import net.tourbook.common.util.SQLData;
 import net.tourbook.common.util.TreeViewerItem;
 import net.tourbook.data.Equipment;
 import net.tourbook.data.EquipmentPart;
@@ -148,6 +149,7 @@ public class TVIEquipmentView_Part extends TVIEquipmentView_Item {
       try (Connection conn = TourDatabase.getInstance().getConnection()) {
 
          final AppFilter appFilter = createAppFilter();
+         final SQLData partFilter = new EquipmentPartFilter().getSqlData();
 
          /*
           * Load: Part, Tour

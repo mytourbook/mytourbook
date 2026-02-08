@@ -61,7 +61,8 @@ public class EquipmentPartFilter {
 
             // part filter
 
-            final String joinTable = TourDatabase.JOINTABLE__TOURDATA__EQUIPMENT;
+            final String tEqPart = TourDatabase.TABLE_EQUIPMENT_PART;
+            final String jTdEq = TourDatabase.JOINTABLE__TOURDATA__EQUIPMENT;
 
             if (selectedProfile.isOrOperator) {
 
@@ -72,10 +73,10 @@ public class EquipmentPartFilter {
                /* require tour to have at least one of these equipment (index-friendly) */
                sql = UI.EMPTY_STRING
 
-                     + "JOIN " + joinTable + " AS jTdEq"
+                     + "JOIN " + jTdEq + " AS jTdEq"
                      + "   ON jTdEq.TOURDATA_TOURID = TourData.TOURID" + NL //                     //$NON-NLS-1$
 
-                     + "JOIN " + TourDatabase.TABLE_EQUIPMENT_PART + " AS part" //                 //$NON-NLS-1$
+                     + "JOIN " + tEqPart + " AS part" //                 //$NON-NLS-1$
                      + "   ON part.EQUIPMENT_EQUIPMENTID = jTdEq.EQUIPMENT_EQUIPMENTID" + NL //    //$NON-NLS-1$
 
                      + "   AND part.ISCOLLATE = TRUE" + NL //                                      //$NON-NLS-1$
@@ -89,7 +90,61 @@ public class EquipmentPartFilter {
 
                // combine parts with AND
 
-//               TBD
+               final StringBuilder allSqlPartIDParameters = createSQL_OR_Parameters(allSQLParameters);
+
+               final long[] allPartIDs = TourEquipmentFilterManager.getSelectedProfile().allAssetFilterIDs.toArray();
+               final int numParts = allPartIDs.length;
+
+               // sequence is important when the parameters are set !!!
+               allSQLParameters.add(numParts);
+
+               final StringBuilder sb = new StringBuilder();
+
+               for (int partIndex = 0; partIndex < allPartIDs.length; partIndex++) {
+
+                  final long partID = allPartIDs[partIndex];
+
+                  allSQLParameters.add(partID);
+
+                  final String partName = "part_" + partIndex;
+
+                  final String joinPart = UI.EMPTY_STRING
+
+                        + "INNER JOIN " + tEqPart + " AS " + partName + NL //                                     //$NON-NLS-1$
+                        + "  ON " + partName + ".EQUIPMENT_EQUIPMENTID = jTdEq.EQUIPMENT_EQUIPMENTID" + NL //     //$NON-NLS-1$
+                        + "    AND " + partName + ".PARTID = ?" + NL //                                           //$NON-NLS-1$
+                        + "    AND " + partName + ".ISCOLLATE = TRUE" + NL //                                     //$NON-NLS-1$
+                        + "    AND TourData.TourStartTime >= " + partName + ".dateFrom" + NL //                   //$NON-NLS-1$
+                        + "    AND TourData.TourStartTime < " + partName + ".dateUntil" + NL //                   //$NON-NLS-1$
+                  ;
+
+                  sb.append(joinPart);
+               }
+
+               final String allJoinedParts = sb.toString();
+
+               sql = UI.EMPTY_STRING
+
+                     // require tour to have at least one of these equipment (index-friendly)
+
+                     + "INNER JOIN " + jTdEq + " jTdEq" + NL //                                                   //$NON-NLS-1$
+                     + "   ON jTdEq.TOURDATA_TOURID = TourData.TOURID" + NL //                                    //$NON-NLS-1$
+
+                     + "INNER JOIN" + NL //                                                                       //$NON-NLS-1$
+                     + "(" + NL //                                                                                //$NON-NLS-1$
+
+                     // Pre-filter: equipment that has ALL n parts with ISCOLLATE=TRUE
+                     + "   SELECT EQUIPMENT_EQUIPMENTID" + NL //                                                  //$NON-NLS-1$
+                     + "   FROM " + tEqPart + NL //                                                               //$NON-NLS-1$
+                     + "   WHERE ISCOLLATE = TRUE" + NL //                                                        //$NON-NLS-1$
+                     + "     AND PARTID IN (" + allSqlPartIDParameters + ")" + NL //                              //$NON-NLS-1$
+                     + "   GROUP BY EQUIPMENT_EQUIPMENTID" + NL //                                                //$NON-NLS-1$
+                     + "   HAVING COUNT(DISTINCT PARTID) = ?" + NL //                                             //$NON-NLS-1$
+
+                     + ") AS Eq_With_All_Parts" + NL //                                                           //$NON-NLS-1$
+                     + "  ON Eq_With_All_Parts.EQUIPMENT_EQUIPMENTID = jTdEq.EQUIPMENT_EQUIPMENTID" + NL //       //$NON-NLS-1$
+
+                     + allJoinedParts;
             }
          }
       }

@@ -208,7 +208,7 @@ public class EquipmentView extends ViewPart implements ITourProvider, ITourViewe
 
    private OpenDialogManager                  _openDlgMgr                              = new OpenDialogManager();
 
-   private EquipmentFilterType                _equipmentFilterType                     = EquipmentFilterType.ALL_IS_DISPLAYED;
+   private EquipmentViewer_FilterType         _equipmentFilterType                     = EquipmentViewer_FilterType.ALL_IS_DISPLAYED;
 
    private EquipmentMenuManager               _equipmentMenuManager;
    private TagMenuManager                     _tagMenuManager;
@@ -794,7 +794,7 @@ public class EquipmentView extends ViewPart implements ITourProvider, ITourViewe
       }
    }
 
-   private class EquipmentFilter extends ViewerFilter {
+   private class EquipmentViewer_Filter extends ViewerFilter {
 
       @Override
       public boolean select(final Viewer viewer, final Object parentElement, final Object element) {
@@ -803,7 +803,7 @@ public class EquipmentView extends ViewPart implements ITourProvider, ITourViewe
       }
    }
 
-   private enum EquipmentFilterType {
+   private enum EquipmentViewer_FilterType {
 
       ALL_IS_DISPLAYED,
 
@@ -1092,7 +1092,7 @@ public class EquipmentView extends ViewPart implements ITourProvider, ITourViewe
       _equipmentViewer.setContentProvider(new EquipmentContentProvider());
       _equipmentViewer.setComparator(new EquipmentComparator());
       _equipmentViewer.setComparer(new EquipmentComparer());
-      _equipmentViewer.setFilters(new EquipmentFilter());
+      _equipmentViewer.setFilters(new EquipmentViewer_Filter());
 
       _equipmentViewer.setUseHashlookup(true);
 
@@ -2939,7 +2939,7 @@ public class EquipmentView extends ViewPart implements ITourProvider, ITourViewe
     */
    private boolean isInEquipmentFilter(final Object item) {
 
-      if (_equipmentFilterType == EquipmentFilterType.ALL_IS_DISPLAYED) {
+      if (_equipmentFilterType == EquipmentViewer_FilterType.ALL_IS_DISPLAYED) {
 
          // nothing is filtered
 
@@ -2952,13 +2952,13 @@ public class EquipmentView extends ViewPart implements ITourProvider, ITourViewe
 
          final boolean hasTour = equipmentItem.numTours_All > 0;
 
-         if (_equipmentFilterType == EquipmentFilterType.EQUIPMENT_WITH_TOURS && hasTour) {
+         if (_equipmentFilterType == EquipmentViewer_FilterType.EQUIPMENT_WITH_TOURS && hasTour) {
 
             // show equipment WITH tours
 
             return true;
 
-         } else if (_equipmentFilterType == EquipmentFilterType.EQUIPMENT_WITHOUT_TOURS && hasTour == false) {
+         } else if (_equipmentFilterType == EquipmentViewer_FilterType.EQUIPMENT_WITHOUT_TOURS && hasTour == false) {
 
             // show equipment WITHOUT tours
 
@@ -3395,7 +3395,7 @@ public class EquipmentView extends ViewPart implements ITourProvider, ITourViewe
 
       final boolean isForwards = UI.isCtrlKey(event) == false;
 
-      if (_equipmentFilterType == EquipmentFilterType.ALL_IS_DISPLAYED) {
+      if (_equipmentFilterType == EquipmentViewer_FilterType.ALL_IS_DISPLAYED) {
 
          if (isForwards) {
             setEquipmentFilter_WithTours();
@@ -3403,7 +3403,7 @@ public class EquipmentView extends ViewPart implements ITourProvider, ITourViewe
             setEquipmentFilter_NoTours();
          }
 
-      } else if (_equipmentFilterType == EquipmentFilterType.EQUIPMENT_WITH_TOURS) {
+      } else if (_equipmentFilterType == EquipmentViewer_FilterType.EQUIPMENT_WITH_TOURS) {
 
          if (isForwards) {
             setEquipmentFilter_NoTours();
@@ -3804,7 +3804,9 @@ public class EquipmentView extends ViewPart implements ITourProvider, ITourViewe
       _isBehaviour_SingleExpand_CollapseOthers = Util.getStateBoolean(_state, STATE_IS_SINGLE_EXPAND_COLLAPSE_OTHERS, true);
       _actionSingleExpand_CollapseOthers.setChecked(_isBehaviour_SingleExpand_CollapseOthers);
 
-      _equipmentFilterType = (EquipmentFilterType) Util.getStateEnum(_state, STATE_EQUIPMENT_FILTER, EquipmentFilterType.ALL_IS_DISPLAYED);
+      _equipmentFilterType = (EquipmentViewer_FilterType) Util.getStateEnum(_state,
+            STATE_EQUIPMENT_FILTER,
+            EquipmentViewer_FilterType.ALL_IS_DISPLAYED);
 
       restoreState_TreeItemHeight();
 
@@ -4168,7 +4170,7 @@ public class EquipmentView extends ViewPart implements ITourProvider, ITourViewe
 
    private void setEquipmentFilter_All() {
 
-      _equipmentFilterType = EquipmentFilterType.ALL_IS_DISPLAYED;
+      _equipmentFilterType = EquipmentViewer_FilterType.ALL_IS_DISPLAYED;
 
       _actionToggleEquipmentFilter.setChecked(false);
       _actionToggleEquipmentFilter.setImageDescriptor(CommonActivator.getThemedImageDescriptor(CommonImages.App_Filter));
@@ -4176,7 +4178,7 @@ public class EquipmentView extends ViewPart implements ITourProvider, ITourViewe
 
    private void setEquipmentFilter_NoTours() {
 
-      _equipmentFilterType = EquipmentFilterType.EQUIPMENT_WITHOUT_TOURS;
+      _equipmentFilterType = EquipmentViewer_FilterType.EQUIPMENT_WITHOUT_TOURS;
 
       _actionToggleEquipmentFilter.setChecked(true);
       _actionToggleEquipmentFilter.setImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.Equipment_Filter_NoTours));
@@ -4184,7 +4186,7 @@ public class EquipmentView extends ViewPart implements ITourProvider, ITourViewe
 
    private void setEquipmentFilter_WithTours() {
 
-      _equipmentFilterType = EquipmentFilterType.EQUIPMENT_WITH_TOURS;
+      _equipmentFilterType = EquipmentViewer_FilterType.EQUIPMENT_WITH_TOURS;
 
       _actionToggleEquipmentFilter.setChecked(true);
       _actionToggleEquipmentFilter.setImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.Equipment_Filter));
@@ -4253,11 +4255,11 @@ public class EquipmentView extends ViewPart implements ITourProvider, ITourViewe
 
    private void updateUI_EquipmentFilter() {
 
-      if (_equipmentFilterType == EquipmentFilterType.ALL_IS_DISPLAYED) {
+      if (_equipmentFilterType == EquipmentViewer_FilterType.ALL_IS_DISPLAYED) {
 
          setEquipmentFilter_All();
 
-      } else if (_equipmentFilterType == EquipmentFilterType.EQUIPMENT_WITH_TOURS) {
+      } else if (_equipmentFilterType == EquipmentViewer_FilterType.EQUIPMENT_WITH_TOURS) {
 
          setEquipmentFilter_WithTours();
 

@@ -201,13 +201,14 @@ public class SlideoutTourEquipmentFilter extends AdvancedSlideout implements ITr
    private Button    _rdoFilterType_Equipment;
    private Button    _rdoFilterType_Part;
 
+   private Composite _containerSelectedAsset;
    private Composite _selectedAssetLayoutContainer;
 
    private Label     _lblAllEquipment;
+   private Label     _lblAssetOperator;
    private Label     _lblFilterType;
    private Label     _lblProfileName;
    private Label     _lblSelectEquipment;
-   private Label     _lblEquipmentOperator;
 
    private Text      _txtProfileName;
 
@@ -578,6 +579,7 @@ public class SlideoutTourEquipmentFilter extends AdvancedSlideout implements ITr
                final boolean isCollate1 = part1.isCollate();
                final boolean isCollate2 = part2.isCollate();
 
+               return part1.getName().compareTo(part2.getName());
             }
          }
 
@@ -994,7 +996,7 @@ public class SlideoutTourEquipmentFilter extends AdvancedSlideout implements ITr
       GridLayoutFactory.fillDefaults().numColumns(1).applyTo(container);
       {
          // left part
-         final Composite containerEquipmentList = createUI_330_SelectedAsset(container);
+         _containerSelectedAsset = createUI_330_SelectedAsset(container);
 
          // sash
          final Sash sash = new Sash(container, SWT.VERTICAL);
@@ -1004,7 +1006,7 @@ public class SlideoutTourEquipmentFilter extends AdvancedSlideout implements ITr
 
          new SashLeftFixedForm(
                container,
-               containerEquipmentList,
+               _containerSelectedAsset,
                sash,
                containerEquipmentViewer,
                _state,
@@ -1156,8 +1158,8 @@ public class SlideoutTourEquipmentFilter extends AdvancedSlideout implements ITr
       {
          {
             // Label: Equipment operator
-            _lblEquipmentOperator = new Label(container, SWT.NONE);
-            _lblEquipmentOperator.setText("&Combine equipment with");
+            _lblAssetOperator = new Label(container, SWT.NONE);
+            _lblAssetOperator.setText(UI.EMPTY_STRING);
          }
 
          final Composite containerOperator = new Composite(container, SWT.NONE);
@@ -1519,7 +1521,7 @@ public class SlideoutTourEquipmentFilter extends AdvancedSlideout implements ITr
       _lblFilterType                         .setEnabled(isProfileSelected);
       _lblProfileName                        .setEnabled(isProfileSelected);
       _lblSelectEquipment                    .setEnabled(isProfileSelected);
-      _lblEquipmentOperator                  .setEnabled(canSetEquipmentOperator);
+      _lblAssetOperator                      .setEnabled(canSetEquipmentOperator);
 
       _rdoEquipmentOperator_AND              .setEnabled(canSetEquipmentOperator);
       _rdoEquipmentOperator_OR               .setEnabled(canSetEquipmentOperator);
@@ -2819,11 +2821,13 @@ public class SlideoutTourEquipmentFilter extends AdvancedSlideout implements ITr
 
       final TableColumnLayout tableLayout = (TableColumnLayout) _selectedAssetLayoutContainer.getLayout();
 
-      String headerText;
+      String headerLabel;
+      String assetOperatorLabel;
 
       if (_isFilterEquipment) {
 
-         headerText = "Se&lected Equipment";
+         headerLabel = "Se&lected Equipment";
+         assetOperatorLabel = "&Combine equipment with";
 
          assetColumn1.setText("Equipment");
          assetColumn2.setText(UI.EMPTY_STRING);
@@ -2833,7 +2837,8 @@ public class SlideoutTourEquipmentFilter extends AdvancedSlideout implements ITr
 
       } else {
 
-         headerText = "Se&lected Parts / Services";
+         headerLabel = "Se&lected Parts/Services";
+         assetOperatorLabel = "&Combine parts/services with";
 
          assetColumn1.setText("Part / Service");
          assetColumn2.setText("Equipment");
@@ -2842,9 +2847,10 @@ public class SlideoutTourEquipmentFilter extends AdvancedSlideout implements ITr
          tableLayout.setColumnData(assetColumn2, new ColumnWeightData(1, true));
       }
 
-      _lblSelectEquipment.setText(headerText);
+      _lblAssetOperator.setText(assetOperatorLabel);
+      _lblSelectEquipment.setText(headerLabel);
 
-      _selectedAssetLayoutContainer.layout(true, true);
+      _containerSelectedAsset.layout(true, true);
    }
 
 }

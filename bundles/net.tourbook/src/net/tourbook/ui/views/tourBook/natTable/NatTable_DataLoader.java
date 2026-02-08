@@ -293,9 +293,7 @@ public class NatTable_DataLoader {
          final String sqlSortFields = createSql_Sorting_SelectFields();
 
          final AppFilter appFilter = new AppFilter(AppFilter.ANY_APP_FILTERS);
-         final EquipmentPartFilter equipmentPartFilter = new EquipmentPartFilter();
-
-         final SQLData partFilter = equipmentPartFilter.getSqlData();
+         final SQLData partFilter = new EquipmentPartFilter().getSqlData();
          final SQLData tourCollectionFilter = _tourCollectionFilter;
 
          sql = UI.EMPTY_STRING
@@ -374,18 +372,17 @@ public class NatTable_DataLoader {
             PreparedStatement prepStmt;
 
             final AppFilter appFilter = new AppFilter(AppFilter.ANY_APP_FILTERS);
-            final EquipmentPartFilter equipmentPartFilter = new EquipmentPartFilter();
-
-            final SQLData partFilter = equipmentPartFilter.getSqlData();
+            final SQLData partFilter = new EquipmentPartFilter().getSqlData();
 
             sql = UI.EMPTY_STRING
 
-                  + "SELECT COUNT(DISTINCT TourData.TourID)" + NL //          //$NON-NLS-1$
-                  + "FROM TOURDATA AS TourData" + NL //                       //$NON-NLS-1$
+                  + "SELECT COUNT(DISTINCT TourData.TourID) as NumTours" + NL //    //$NON-NLS-1$
+
+                  + "FROM TOURDATA AS TourData" + NL //                             //$NON-NLS-1$
 
                   + partFilter.getSqlString()
 
-                  + "WHERE 1=1" + NL //                                       //$NON-NLS-1$
+                  + "WHERE 1=1" + NL //                                             //$NON-NLS-1$
 
                   + appFilter.getWhereClause()
                   + sqlCollectionFilter;
@@ -479,9 +476,7 @@ public class NatTable_DataLoader {
       try (Connection conn = TourDatabase.getInstance().getConnection()) {
 
          final AppFilter appFilter = new AppFilter(AppFilter.ANY_APP_FILTERS);
-         final EquipmentPartFilter equipmentPartFilter = new EquipmentPartFilter();
-
-         final SQLData partFilter = equipmentPartFilter.getSqlData();
+         final SQLData partFilter = new EquipmentPartFilter().getSqlData();
          final SQLData tourCollectionFilter = _tourCollectionFilter;
 
          final String orderBy = createSql_Sorting_OrderBy();
