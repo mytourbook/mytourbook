@@ -278,7 +278,8 @@ public class NatTable_DataLoader {
    }
 
    /**
-    * Loads all tour ID's for the current sort and tour filter
+    * Loads all tour ID's for the current sort and tour filter. This is use to reselect tours when
+    * tourbook view is reopened.
     *
     * @return
     */
