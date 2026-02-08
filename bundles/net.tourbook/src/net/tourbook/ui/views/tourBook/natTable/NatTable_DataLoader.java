@@ -301,7 +301,7 @@ public class NatTable_DataLoader {
 
                + "SELECT" + NL //                              //$NON-NLS-1$
 
-               + "   TourId," + NL //                          //$NON-NLS-1$
+               + "   DISTINCT TourId," + NL //                 //$NON-NLS-1$
                + "   " + sqlSortFields //                      //$NON-NLS-1$
 
                + "FROM TOURDATA AS TourData" + NL //           //$NON-NLS-1$
