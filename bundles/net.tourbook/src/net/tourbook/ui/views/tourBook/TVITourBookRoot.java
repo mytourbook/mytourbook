@@ -24,8 +24,10 @@ import java.util.ArrayList;
 import net.tourbook.common.UI;
 import net.tourbook.common.time.TourDateTime;
 import net.tourbook.common.util.SQL;
+import net.tourbook.common.util.SQLData;
 import net.tourbook.common.util.TreeViewerItem;
 import net.tourbook.database.TourDatabase;
+import net.tourbook.equipment.EquipmentPartFilter;
 import net.tourbook.ui.AppFilter;
 
 public class TVITourBookRoot extends TVITourBookItem {
@@ -62,30 +64,48 @@ public class TVITourBookRoot extends TVITourBookItem {
                : "GROUP BY StartYear" + NL; //                 //$NON-NLS-1$
 
          final AppFilter appFilter = new AppFilter(AppFilter.ANY_APP_FILTERS);
+         final SQLData partFilter = new EquipmentPartFilter().getSqlData();
 
          sql = UI.EMPTY_STRING
 
-               + "SELECT" + NL //                              //$NON-NLS-1$
+               + "SELECT" + NL //                                    //$NON-NLS-1$
 
-               + "	StartYear," + NL //                       //$NON-NLS-1$
-               + SQL_SUM_COLUMNS //
+               + "	tdFields.StartYear," + NL //                    //$NON-NLS-1$
 
-               + "FROM TOURDATA" + NL //                       //$NON-NLS-1$
+               + getSQL_SUM_COLUMNS("tdFields", 3)
 
-               + "WHERE 1=1" + NL //                           //$NON-NLS-1$
+               + "FROM " + NL //                                     //$NON-NLS-1$
+
+               + "(" + NL //                                         //$NON-NLS-1$
+
+               // Get distinct tours that match the criteria (parts 1 or 6 active at tour start)
+               + "   SELECT DISTINCT" + NL //                        //$NON-NLS-1$
+
+               + "      TourData.TourID," + NL //                    //$NON-NLS-1$
+               + "      TourData.StartYear," + NL //                 //$NON-NLS-1$
+
+               + getSQL_SUM_FIELDS("TourData", 6)
+
+               + "   FROM TOURDATA AS TourData" + NL //              //$NON-NLS-1$
+
+               + partFilter.getSqlString()
+
+               + "   WHERE 1=1" + NL //                              //$NON-NLS-1$
 
                + appFilter.getWhereClause() + NL //
 
+               + ") AS tdFields" + NL //                             //$NON-NLS-1$
+
                + sqlGroupBy
 
-               + "ORDER BY StartYear" + NL //                  //$NON-NLS-1$
+               + "ORDER BY StartYear" + NL //               //$NON-NLS-1$
          ;
 
          final PreparedStatement prepStmt = conn.prepareStatement(sql);
 
          int nextIndex = 1;
 
-         // set filter parameters
+         nextIndex = partFilter.setParameters(prepStmt, nextIndex);
          nextIndex = appFilter.setParameters(prepStmt, nextIndex);
 
          int yearIndex = 0;

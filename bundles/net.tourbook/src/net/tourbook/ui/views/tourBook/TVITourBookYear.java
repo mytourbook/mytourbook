@@ -28,8 +28,10 @@ import net.tourbook.common.UI;
 import net.tourbook.common.time.TimeTools;
 import net.tourbook.common.time.TourDateTime;
 import net.tourbook.common.util.SQL;
+import net.tourbook.common.util.SQLData;
 import net.tourbook.common.util.TreeViewerItem;
 import net.tourbook.database.TourDatabase;
+import net.tourbook.equipment.EquipmentPartFilter;
 import net.tourbook.ui.AppFilter;
 
 public class TVITourBookYear extends TVITourBookItem {
@@ -84,24 +86,47 @@ public class TVITourBookYear extends TVITourBookItem {
          }
 
          final AppFilter appFilter = new AppFilter(AppFilter.ANY_APP_FILTERS);
+         final SQLData partFilter = new EquipmentPartFilter().getSqlData();
 
          sql = UI.EMPTY_STRING
 
                + "SELECT" + NL //                                                      //$NON-NLS-1$
 
-               + sqlSumYearField + "," + NL //                                         //$NON-NLS-1$
-               + sqlSumYearFieldSub + "," + NL //                                      //$NON-NLS-1$
-               
-               + SQL_SUM_COLUMNS
+               + "   " + sqlSumYearField + "," + NL //                                 //$NON-NLS-1$ //$NON-NLS-2$
+               + "   " + sqlSumYearFieldSub + "," + NL //                              //$NON-NLS-1$ //$NON-NLS-2$
 
-               + "FROM TOURDATA" + NL //                                               //$NON-NLS-1$
+               + getSQL_SUM_COLUMNS("tdFields", 3) //                                  //$NON-NLS-1$
 
-               + "WHERE" + NL //                                                       //$NON-NLS-1$
-               + "	" + sqlSumYearField + " = ?" + NL //                                //$NON-NLS-1$ //$NON-NLS-2$
+               + "FROM " + NL //                                                       //$NON-NLS-1$
+
+               + "(" + NL //                                                           //$NON-NLS-1$
+
+               // Get distinct tours that match the criteria (parts 1 or 6 active at tour start)
+               + "   SELECT DISTINCT" + NL //                                          //$NON-NLS-1$
+
+               + "      TourData.TourID," + NL //                                      //$NON-NLS-1$
+
+               + "      TourData.StartYear," + NL //                                   //$NON-NLS-1$
+               + "      TourData.StartMonth," + NL //                                  //$NON-NLS-1$
+
+               + "      TourData.StartWeekYear," + NL //                               //$NON-NLS-1$
+               + "      TourData.StartWeek," + NL //                                   //$NON-NLS-1$
+
+               + getSQL_SUM_FIELDS("TourData", 6) //                                   //$NON-NLS-1$
+
+               + "   FROM TOURDATA AS TourData" + NL //                                //$NON-NLS-1$
+
+               + partFilter.getSqlString()
+
+               + "   WHERE" + NL //                                                    //$NON-NLS-1$
+
+               + "      " + sqlSumYearField + " = ?" + NL //                           //$NON-NLS-1$ //$NON-NLS-2$
 
                + appFilter.getWhereClause()
 
-               + "GROUP BY " + sqlSumYearField + "," + sqlSumYearFieldSub + NL //      //$NON-NLS-1$ //$NON-NLS-2$
+               + ") AS tdFields" + NL //                                               //$NON-NLS-1$
+
+               + "GROUP BY " + sqlSumYearField + ", " + sqlSumYearFieldSub + NL //     //$NON-NLS-1$ //$NON-NLS-2$
                + "ORDER BY " + sqlSumYearFieldSub + NL //                              //$NON-NLS-1$
          ;
 
@@ -109,10 +134,10 @@ public class TVITourBookYear extends TVITourBookItem {
 
          int nextIndex = 1;
 
-         // set WHERE parameters
+         nextIndex = partFilter.setParameters(prepStmt, nextIndex);
+
          prepStmt.setInt(nextIndex++, tourYear);
 
-         // set filter parameters
          nextIndex = appFilter.setParameters(prepStmt, nextIndex);
 
          final ResultSet result = prepStmt.executeQuery();

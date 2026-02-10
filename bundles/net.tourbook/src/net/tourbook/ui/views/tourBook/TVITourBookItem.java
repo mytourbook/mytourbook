@@ -46,6 +46,8 @@ public abstract class TVITourBookItem extends TreeViewerItem implements ITourIte
    static ZonedDateTime                             calendar8                   = ZonedDateTime.now().with(TimeTools.calendarWeek.dayOfWeek(), 1);
 
    private static ConcurrentHashMap<String, String> _allCached_SqlAllTourFields = new ConcurrentHashMap<>();
+   private static ConcurrentHashMap<String, String> _allCached_SqlAllSumColumns = new ConcurrentHashMap<>();
+   private static ConcurrentHashMap<String, String> _allCached_SqlAllSumFields  = new ConcurrentHashMap<>();
 
    /**
     * All tour fields in the tourbook view, the first field is <code>tourId</code> which can be
@@ -59,12 +61,12 @@ public abstract class TVITourBookItem extends TreeViewerItem implements ITourIte
     * <b>All</b> fields which are used in {@link #SQL_SUM_COLUMNS} <b>MUST be defined in</b>
     * {@link #SQL_SUM_FIELDS}, otherwise the SQL fails
     */
-   static final String                              SQL_SUM_COLUMNS;
+   private static final String                      SQL_SUM_COLUMNS;
 
    /**
     * SQL fields for {@link #SQL_SUM_COLUMNS}, the field ordering is NOT important
     */
-   static final String                              SQL_SUM_FIELDS;
+   private static final String                      SQL_SUM_FIELDS;
 
    static {
 
@@ -228,113 +230,118 @@ public abstract class TVITourBookItem extends TreeViewerItem implements ITourIte
             + "$i_$db_numberOfPassedVehicles " + NL //                                 99    //$NON-NLS-1$
       ;
 
+      // vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
+      // vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
+      // vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
+
       SQL_ALL_OTHER_FIELDS__COLUMN_START_NUMBER = 100;
 
+      // ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+      // ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
       // ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
       //
       // !!! EXTREEMLY IMPORTANT !!!
       //
       // Adjust constant SQL_ALL_OTHER_FIELDS__COLUMN_START_NUMBER when sql fields are added,
       // otherwise tags and number of markers are not displayed or causing an exception
-      //
-      // ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
       SQL_SUM_FIELDS = UI.EMPTY_STRING
 
-            + "TourDistance," + NL //                                      //$NON-NLS-1$
-            + "TourDeviceTime_Elapsed," + NL //                            //$NON-NLS-1$
-            + "TourComputedTime_Moving," + NL //                           //$NON-NLS-1$
-            + "TourAltUp," + NL //                                         //$NON-NLS-1$
-            + "TourAltDown," + NL //                                       //$NON-NLS-1$
+            + "$i_$db_TourDistance," + NL //                                      //$NON-NLS-1$
+            + "$i_$db_TourDeviceTime_Elapsed," + NL //                            //$NON-NLS-1$
+            + "$i_$db_TourComputedTime_Moving," + NL //                           //$NON-NLS-1$
+            + "$i_$db_TourAltUp," + NL //                                         //$NON-NLS-1$
+            + "$i_$db_TourAltDown," + NL //                                       //$NON-NLS-1$
 
-            + "MaxAltitude," + NL //                                       //$NON-NLS-1$
-            + "MaxPulse," + NL //                                          //$NON-NLS-1$
-            + "MaxSpeed," + NL //                                          //$NON-NLS-1$
+            + "$i_$db_MaxAltitude," + NL //                                       //$NON-NLS-1$
+            + "$i_$db_MaxPulse," + NL //                                          //$NON-NLS-1$
+            + "$i_$db_MaxSpeed," + NL //                                          //$NON-NLS-1$
 
-            + "AvgCadence," + NL //                                        //$NON-NLS-1$
-            + "AvgPulse," + NL //                                          //$NON-NLS-1$
+            + "$i_$db_AvgCadence," + NL //                                        //$NON-NLS-1$
+            + "$i_$db_AvgPulse," + NL //                                          //$NON-NLS-1$
 
-            + "CadenceMultiplier," + NL //                                 //$NON-NLS-1$
-            + "TemperatureScale," + NL //                                  //$NON-NLS-1$
+            + "$i_$db_CadenceMultiplier," + NL //                                 //$NON-NLS-1$
+            + "$i_$db_TemperatureScale," + NL //                                  //$NON-NLS-1$
 
-            + "Calories," + NL //                                          //$NON-NLS-1$
-            + "RestPulse," + NL //                                         //$NON-NLS-1$
+            + "$i_$db_Calories," + NL //                                          //$NON-NLS-1$
+            + "$i_$db_RestPulse," + NL //                                         //$NON-NLS-1$
 
-            + "Power_TotalWork," + NL //                                   //$NON-NLS-1$
+            + "$i_$db_Power_TotalWork," + NL //                                   //$NON-NLS-1$
 
-            + "NumberOfTimeSlices," + NL //                                //$NON-NLS-1$
-            + "NumberOfPhotos," + NL //                                    //$NON-NLS-1$
+            + "$i_$db_NumberOfTimeSlices," + NL //                                //$NON-NLS-1$
+            + "$i_$db_NumberOfPhotos," + NL //                                    //$NON-NLS-1$
 
-            + "FrontShiftCount," + NL //                                   //$NON-NLS-1$
-            + "RearShiftCount," + NL //                                    //$NON-NLS-1$
+            + "$i_$db_FrontShiftCount," + NL //                                   //$NON-NLS-1$
+            + "$i_$db_RearShiftCount," + NL //                                    //$NON-NLS-1$
 
-            + "surfing_NumberOfEvents," + NL //                            //$NON-NLS-1$
+            + "$i_$db_surfing_NumberOfEvents," + NL //                            //$NON-NLS-1$
 
-            + "cadenceZone_SlowTime," + NL //                              //$NON-NLS-1$
-            + "cadenceZone_FastTime," + NL //                              //$NON-NLS-1$
-            + "cadenceZones_DelimiterValue," + NL //                       //$NON-NLS-1$
+            + "$i_$db_cadenceZone_SlowTime," + NL //                              //$NON-NLS-1$
+            + "$i_$db_cadenceZone_FastTime," + NL //                              //$NON-NLS-1$
+            + "$i_$db_cadenceZones_DelimiterValue," + NL //                       //$NON-NLS-1$
 
-            + "Weather_Temperature_Average," + NL //                       //$NON-NLS-1$
-            + "Weather_Temperature_Average_Device," + NL //                //$NON-NLS-1$
-            + "Weather_Temperature_Min_Device," + NL //                    //$NON-NLS-1$
-            + "Weather_Temperature_Max_Device," + NL //                    //$NON-NLS-1$
-            + "Weather_Wind_Direction," + NL //                            //$NON-NLS-1$
-            + "Weather_Wind_Speed," + NL //                                //$NON-NLS-1$
+            + "$i_$db_Weather_Temperature_Average," + NL //                       //$NON-NLS-1$
+            + "$i_$db_Weather_Temperature_Average_Device," + NL //                //$NON-NLS-1$
+            + "$i_$db_Weather_Temperature_Min_Device," + NL //                    //$NON-NLS-1$
+            + "$i_$db_Weather_Temperature_Max_Device," + NL //                    //$NON-NLS-1$
+            + "$i_$db_Weather_Wind_Direction," + NL //                            //$NON-NLS-1$
+            + "$i_$db_Weather_Wind_Speed," + NL //                                //$NON-NLS-1$
 
-            + "tourDeviceTime_Recorded," + NL //                           //$NON-NLS-1$
-            + "tourDeviceTime_Paused," + NL //                             //$NON-NLS-1$
+            + "$i_$db_tourDeviceTime_Recorded," + NL //                           //$NON-NLS-1$
+            + "$i_$db_tourDeviceTime_Paused," + NL //                             //$NON-NLS-1$
 
-            + "numberOfPassedVehicles" + NL //                             //$NON-NLS-1$
+            + "$i_$db_numberOfPassedVehicles" + NL //                             //$NON-NLS-1$
       ;
+
+// SET_FORMATTING_OFF
 
       SQL_SUM_COLUMNS = UI.EMPTY_STRING
 
-            + "SUM( CAST(TourDistance AS BIGINT))," + NL //             0  //$NON-NLS-1$
-            + "SUM( CAST(TourDeviceTime_Elapsed AS BIGINT))," + NL //   1  //$NON-NLS-1$
-            + "SUM( CAST(TourComputedTime_Moving AS BIGINT))," + NL //  2  //$NON-NLS-1$
-            + "SUM( CAST(TourAltUp AS BIGINT))," + NL //                3  //$NON-NLS-1$
-            + "SUM( CAST(TourAltDown AS BIGINT))," + NL //              4  //$NON-NLS-1$
+            + "$i_SUM(1)," + NL //                                               0  //$NON-NLS-1$
 
-            + "SUM(1)," + NL //                                         5  //$NON-NLS-1$
+            + "$i_SUM( CAST($db_TourDistance AS BIGINT))," + NL //               1  //$NON-NLS-1$
+            + "$i_SUM( CAST($db_TourDeviceTime_Elapsed AS BIGINT))," + NL //     2  //$NON-NLS-1$
+            + "$i_SUM( CAST($db_TourComputedTime_Moving AS BIGINT))," + NL //    3  //$NON-NLS-1$
+            + "$i_SUM( CAST($db_TourAltUp AS BIGINT))," + NL //                  4  //$NON-NLS-1$
+            + "$i_SUM( CAST($db_TourAltDown AS BIGINT))," + NL //                5  //$NON-NLS-1$
+
+            + "$i_MAX($db_MaxSpeed)," + NL //                                    6  //$NON-NLS-1$
+            + "$i_MAX($db_MaxAltitude)," + NL //                                 7  //$NON-NLS-1$
+            + "$i_MAX($db_MaxPulse)," + NL //                                    8  //$NON-NLS-1$
+
+            + "$i_AVG( CASE WHEN $db_AvgPulse = 0                              THEN NULL ELSE $db_AvgPulse END)," + NL //                                                           9     //$NON-NLS-1$
+            + "$i_AVG( CASE WHEN $db_AvgCadence = 0                            THEN NULL ELSE DOUBLE($db_AvgCadence) * CadenceMultiplier END)," + NL //                             10    //$NON-NLS-1$
+            + "$i_AVG( CASE WHEN $db_weather_Temperature_Average_Device = 0    THEN NULL ELSE DOUBLE($db_weather_Temperature_Average_Device) / TemperatureScale END)," + NL //      11   //$NON-NLS-1$
+            + "$i_AVG( CASE WHEN $db_Weather_Wind_Direction = 0                THEN NULL ELSE $db_Weather_Wind_Direction END)," + NL //                                             12    //$NON-NLS-1$
+            + "$i_AVG( CASE WHEN $db_Weather_Wind_Speed = 0                    THEN NULL ELSE $db_Weather_Wind_Speed END)," + NL //                                                 13    //$NON-NLS-1$
+            + "$i_AVG( CASE WHEN $db_RestPulse = 0                             THEN NULL ELSE $db_RestPulse END)," + NL //                                                          14    //$NON-NLS-1$
             //
-            + "MAX(MaxSpeed)," + NL //                                  6  //$NON-NLS-1$
-            + "MAX(MaxAltitude)," + NL //                               7  //$NON-NLS-1$
-            + "MAX(MaxPulse)," + NL //                                  8  //$NON-NLS-1$
+            + "$i_SUM( CAST($db_Calories AS BIGINT))," + NL //                   15 //$NON-NLS-1$
+            + "$i_SUM( CAST($db_Power_TotalWork AS BIGINT))," + NL //            16 //$NON-NLS-1$
+
+            + "$i_SUM( CAST($db_NumberOfTimeSlices AS BIGINT))," + NL //         17 //$NON-NLS-1$
+            + "$i_SUM( CAST($db_NumberOfPhotos AS BIGINT))," + NL //             18 //$NON-NLS-1$
             //
-            + "AVG( CASE WHEN AvgPulse = 0               THEN NULL ELSE AvgPulse END)," + NL //                                     9     //$NON-NLS-1$
-            + "AVG( CASE WHEN AvgCadence = 0             THEN NULL ELSE DOUBLE(AvgCadence) * CadenceMultiplier END)," + NL //       10    //$NON-NLS-1$
-            + "AVG( CASE WHEN weather_Temperature_Average_Device = 0 THEN NULL ELSE DOUBLE(weather_Temperature_Average_Device) / TemperatureScale END)," //$NON-NLS-1$
-            + NL //    11
-            + "AVG( CASE WHEN Weather_Wind_Direction = 0 THEN NULL ELSE Weather_Wind_Direction END)," + NL //                       12    //$NON-NLS-1$
-            + "AVG( CASE WHEN Weather_Wind_Speed = 0     THEN NULL ELSE Weather_Wind_Speed END)," + NL //                           13    //$NON-NLS-1$
-            + "AVG( CASE WHEN RestPulse = 0              THEN NULL ELSE RestPulse END)," + NL //                                    14    //$NON-NLS-1$
-            //
-            + "SUM( CAST(Calories AS BIGINT))," + NL //                 15 //$NON-NLS-1$
-            + "SUM( CAST(Power_TotalWork AS BIGINT))," + NL //          16 //$NON-NLS-1$
+            + "$i_SUM( CAST($db_FrontShiftCount AS BIGINT))," + NL //            19 //$NON-NLS-1$
+            + "$i_SUM( CAST($db_RearShiftCount AS BIGINT))," + NL //             20 //$NON-NLS-1$
 
-            + "SUM( CAST(NumberOfTimeSlices AS BIGINT))," + NL //       17 //$NON-NLS-1$
-            + "SUM( CAST(NumberOfPhotos AS BIGINT))," + NL //           18 //$NON-NLS-1$
-            //
-            + "SUM( CAST(FrontShiftCount AS BIGINT))," + NL //          19 //$NON-NLS-1$
-            + "SUM( CAST(RearShiftCount AS BIGINT))," + NL //           20 //$NON-NLS-1$
+            + "$i_SUM( CAST($db_Surfing_NumberOfEvents AS BIGINT))," + NL //     21 //$NON-NLS-1$
 
-            + "SUM( CAST(Surfing_NumberOfEvents AS BIGINT))," + NL //   21 //$NON-NLS-1$
+            + "$i_SUM( CAST($db_cadenceZone_SlowTime AS BIGINT))," + NL //       22 //$NON-NLS-1$
+            + "$i_SUM( CAST($db_cadenceZone_FastTime AS BIGINT))," + NL //       23 //$NON-NLS-1$
+            + "$i_AVG( CASE WHEN $db_cadenceZones_DelimiterValue = 0          THEN NULL ELSE $db_cadenceZones_DelimiterValue END)," + NL //       24 //$NON-NLS-1$
 
-            + "SUM( CAST(cadenceZone_SlowTime AS BIGINT))," + NL //     22 //$NON-NLS-1$
-            + "SUM( CAST(cadenceZone_FastTime AS BIGINT))," + NL //     23 //$NON-NLS-1$
-            + "AVG( CASE WHEN cadenceZones_DelimiterValue = 0 THEN NULL ELSE cadenceZones_DelimiterValue END)," + NL //       24 //$NON-NLS-1$
+            + "$i_MIN( CASE WHEN $db_weather_Temperature_Min_Device = 0       THEN NULL ELSE $db_weather_Temperature_Min_Device END)," + NL // 25 //$NON-NLS-1$
+            + "$i_MAX( CASE WHEN $db_weather_Temperature_Max_Device = 0       THEN NULL ELSE $db_weather_Temperature_Max_Device END)," + NL // 26 //$NON-NLS-1$
 
-            + "MIN( CASE WHEN weather_Temperature_Min_Device = 0 THEN NULL ELSE weather_Temperature_Min_Device END)," + NL // 25 //$NON-NLS-1$
-            + "MAX( CASE WHEN weather_Temperature_Max_Device = 0 THEN NULL ELSE weather_Temperature_Max_Device END)," + NL // 26 //$NON-NLS-1$
+            + "$i_SUM( CAST($db_tourDeviceTime_Recorded AS BIGINT))," + NL //    27 //$NON-NLS-1$
+            + "$i_SUM( CAST($db_tourDeviceTime_Paused AS BIGINT))," + NL //      28 //$NON-NLS-1$
 
-            + "SUM( CAST(tourDeviceTime_Recorded AS BIGINT))," + NL //  27 //$NON-NLS-1$
-            + "SUM( CAST(tourDeviceTime_Paused AS BIGINT))," + NL //    28 //$NON-NLS-1$
+            + "$i_AVG( CASE WHEN $db_weather_Temperature_Average = 0          THEN NULL ELSE DOUBLE($db_weather_Temperature_Average) / TemperatureScale END)," + NL // 29 //$NON-NLS-1$
 
-            + "AVG( CASE WHEN weather_Temperature_Average = 0   THEN NULL ELSE DOUBLE(weather_Temperature_Average) / TemperatureScale END)," + NL // 29 //$NON-NLS-1$
-
-            + "SUM( CAST(numberOfPassedVehicles AS BIGINT))" + NL //    30 //$NON-NLS-1$
+            + "$i_SUM( CAST($db_numberOfPassedVehicles AS BIGINT))" + NL //      30 //$NON-NLS-1$
       ;
-
+// SET_FORMATTING_ON
    }
 
    protected static final IPreferenceStore _prefStore = TourbookPlugin.getPrefStore();
@@ -509,19 +516,14 @@ public abstract class TVITourBookItem extends TreeViewerItem implements ITourIte
       tourBookView = view;
    }
 
-   /**
-    * Append a db prefix to all fields and additional indent it
-    *
-    * @param dbPrefix
-    * @param indent
-    *
-    * @return
-    */
-   public static String getSQL_ALL_TOUR_FIELDS(final String dbPrefix, final int indent) {
+   private static String getCachedSQL(final ConcurrentHashMap<String, String> allCachedSql,
+                                      final String sql,
+                                      final String dbPrefix,
+                                      final int indent) {
 
       final String key = dbPrefix + UI.SYMBOL_UNDERSCORE + Integer.toString(indent);
 
-      final String cachedSqlFields = _allCached_SqlAllTourFields.get(key);
+      final String cachedSqlFields = allCachedSql.get(key);
 
       if (cachedSqlFields != null) {
          return cachedSqlFields;
@@ -537,14 +539,53 @@ public abstract class TVITourBookItem extends TreeViewerItem implements ITourIte
          dbPrefixReplaced = dbPrefix + UI.SYMBOL_DOT;
       }
 
-      String sqlReplaced = SQL_ALL_TOUR_FIELDS;
+      String sqlReplaced = sql;
 
       sqlReplaced = sqlReplaced.replaceAll("\\$i_", sbIndent.toString());
       sqlReplaced = sqlReplaced.replaceAll("\\$db_", dbPrefixReplaced);
 
-      _allCached_SqlAllTourFields.put(key, sqlReplaced);
+      allCachedSql.put(key, sqlReplaced);
 
       return sqlReplaced;
+   }
+
+   /**
+    * Prepend a db prefix to all fields and additional indent it
+    *
+    * @param dbPrefix
+    * @param indent
+    *
+    * @return
+    */
+   public static String getSQL_ALL_TOUR_FIELDS(final String dbPrefix, final int indent) {
+
+      return getCachedSQL(_allCached_SqlAllTourFields, SQL_ALL_TOUR_FIELDS, dbPrefix, indent);
+   }
+
+   /**
+    * Prepend a db prefix to all fields and additional indent it
+    *
+    * @param dbPrefix
+    * @param indent
+    *
+    * @return
+    */
+   public static String getSQL_SUM_COLUMNS(final String dbPrefix, final int indent) {
+
+      return getCachedSQL(_allCached_SqlAllSumFields, SQL_SUM_COLUMNS, dbPrefix, indent);
+   }
+
+   /**
+    * Prepend a db prefix to all fields and additional indent it
+    *
+    * @param dbPrefix
+    * @param indent
+    *
+    * @return
+    */
+   public static String getSQL_SUM_FIELDS(final String dbPrefix, final int indent) {
+
+      return getCachedSQL(_allCached_SqlAllSumColumns, SQL_SUM_FIELDS, dbPrefix, indent);
    }
 
    /**
@@ -809,31 +850,17 @@ public abstract class TVITourBookItem extends TreeViewerItem implements ITourIte
 
 // SET_FORMATTING_OFF
 
-      colTourDistance                  = result.getLong(startIndex + 0);
+      colCounter                       = result.getLong(startIndex + 0);
 
-      colTourDeviceTime_Elapsed        = result.getLong(startIndex + 1);
-      colTourComputedTime_Moving       = result.getLong(startIndex + 2);
+      colTourDistance                  = result.getLong(startIndex + 1);
 
-      colAltitudeUp                    = result.getLong(startIndex + 3);
-      colAltitudeDown                  = result.getLong(startIndex + 4);
+      colTourDeviceTime_Elapsed        = result.getLong(startIndex + 2);
+      colTourComputedTime_Moving       = result.getLong(startIndex + 3);
 
-      // VERY IMPORTANT !
-      // Note that we don't do an AVG(avgAltitudeChange) as it would return wrong results.
-      // Indeed, we can't do a mean average as we need to do a distance-weighted average.
-      colAltitude_AvgChange            = UI.computeAverageElevationChange(colAltitudeUp + colAltitudeDown, colTourDistance);
-
-      colCounter                       = result.getLong(startIndex + 5);
+      colAltitudeUp                    = result.getLong(startIndex + 4);
+      colAltitudeDown                  = result.getLong(startIndex + 5);
 
       colMaxSpeed                      = result.getFloat(startIndex + 6);
-
-      // compute average speed/pace, prevent divide by 0
-      final boolean isPaceAndSpeedFromRecordedTime = _prefStore.getBoolean(ITourbookPreferences.APPEARANCE_IS_PACEANDSPEED_FROM_RECORDED_TIME);
-      final long timeField = isPaceAndSpeedFromRecordedTime
-            ? colTourDeviceTime_Recorded
-            : colTourComputedTime_Moving;
-      colAvgSpeed                      = timeField       == 0 ? 0 : 3.6f * colTourDistance / timeField;
-      colAvgPace                       = colTourDistance == 0 ? 0 : timeField * 1000f / colTourDistance;
-
       colMaxAltitude                   = result.getLong(startIndex + 7);
       colMaxPulse                      = result.getLong(startIndex + 8);
 
@@ -876,6 +903,19 @@ public abstract class TVITourBookItem extends TreeViewerItem implements ITourIte
       colSlowVsFastCadence             = TourManager.generateCadenceZones_TimePercentages(
                                                 cadenceZone_SlowTime,
                                                 cadenceZone_FastTime);
+      // VERY IMPORTANT !
+      // Note that we don't do an AVG(avgAltitudeChange) as it would return wrong results.
+      // Indeed, we can't do a mean average as we need to do a distance-weighted average.
+      colAltitude_AvgChange            = UI.computeAverageElevationChange(colAltitudeUp + colAltitudeDown, colTourDistance);
+
+      // compute average speed/pace, prevent divide by 0
+      final boolean isPaceAndSpeedFromRecordedTime = _prefStore.getBoolean(ITourbookPreferences.APPEARANCE_IS_PACEANDSPEED_FROM_RECORDED_TIME);
+      final long timeField = isPaceAndSpeedFromRecordedTime
+                                 ? colTourDeviceTime_Recorded
+                                 : colTourComputedTime_Moving;
+      
+      colAvgSpeed                      = timeField       == 0 ? 0 : 3.6f * colTourDistance / timeField;
+      colAvgPace                       = colTourDistance == 0 ? 0 : timeField * 1000f / colTourDistance;
 
 // SET_FORMATTING_ON
    }
