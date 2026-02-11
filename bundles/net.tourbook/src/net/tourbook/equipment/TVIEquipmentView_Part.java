@@ -171,6 +171,8 @@ public class TVIEquipmentView_Part extends TVIEquipmentView_Item {
                + "   AND TourData.tourstarttime >= part.dateFrom" + NL //                                //$NON-NLS-1$
                + "   AND TourData.tourstarttime <  part.dateUntil" + NL //                               //$NON-NLS-1$
 
+               + partFilter.getSqlString()
+
                // get all equipment id's
                + "LEFT JOIN " + TourDatabase.JOINTABLE__TOURDATA__EQUIPMENT + " AS jTdataEq" + NL //     //$NON-NLS-1$ //$NON-NLS-2$
                + "  ON TourData.TOURID = jTdataEq.TOURDATA_TOURID" + NL //                               //$NON-NLS-1$
@@ -194,6 +196,8 @@ public class TVIEquipmentView_Part extends TVIEquipmentView_Item {
          final PreparedStatement statement = conn.prepareStatement(sql);
 
          int nextIndex = 1;
+
+         nextIndex = partFilter.setParameters(statement, nextIndex);
 
          statement.setLong(nextIndex++, _partID);
 
@@ -307,6 +311,7 @@ public class TVIEquipmentView_Part extends TVIEquipmentView_Item {
       try (Connection conn = TourDatabase.getInstance().getConnection()) {
 
          final AppFilter appFilter = createAppFilter();
+         final SQLData partFilter = new EquipmentPartFilter().getSqlData();
 
          sql = UI.EMPTY_STRING
 
@@ -328,6 +333,7 @@ public class TVIEquipmentView_Part extends TVIEquipmentView_Item {
                + "   AND TourData.tourstarttime <  part.dateUntil" + NL //                      //$NON-NLS-1$
 
                + appFilter.getWhereClause()
+               + partFilter.getSqlString()
 
                + "WHERE part.iscollate = TRUE" + NL //                                          //$NON-NLS-1$
                + "   AND part.partid = ?" + NL //                                               //$NON-NLS-1$
@@ -340,6 +346,7 @@ public class TVIEquipmentView_Part extends TVIEquipmentView_Item {
          int nextIndex = 1;
 
          nextIndex = appFilter.setParameters(statement, nextIndex);
+         nextIndex = partFilter.setParameters(statement, nextIndex);
 
          statement.setLong(nextIndex++, _partID);
 

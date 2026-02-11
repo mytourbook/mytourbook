@@ -27,6 +27,7 @@ import java.util.Map;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.UI;
 import net.tourbook.common.util.SQL;
+import net.tourbook.common.util.SQLData;
 import net.tourbook.common.util.TreeViewerItem;
 import net.tourbook.common.util.Util;
 import net.tourbook.database.TourDatabase;
@@ -218,6 +219,7 @@ public abstract class TVIEquipmentView_Item extends TreeViewerItem {
       try (Connection conn = TourDatabase.getInstance().getConnection()) {
 
          final AppFilter appFilter = createAppFilter();
+         final SQLData partFilter = new EquipmentPartFilter().getSqlData();
 
          sql = UI.EMPTY_STRING
 
@@ -236,6 +238,7 @@ public abstract class TVIEquipmentView_Item extends TreeViewerItem {
                + "   ON TourData.tourid = j_Td_Eq.tourdata_tourid" + NL //                   //$NON-NLS-1$
 
                + appFilter.getWhereClause()
+               + partFilter.getSqlString()
 
                + "GROUP BY " + NL //                                                         //$NON-NLS-1$
                + "   j_Td_Eq.EQUIPMENT_EQUIPMENTID" + NL //                                  //$NON-NLS-1$
@@ -246,6 +249,7 @@ public abstract class TVIEquipmentView_Item extends TreeViewerItem {
          int nextIndex = 1;
 
          nextIndex = appFilter.setParameters(statement, nextIndex);
+         nextIndex = partFilter.setParameters(statement, nextIndex);
 
          final ResultSet result = statement.executeQuery();
 
@@ -280,6 +284,7 @@ public abstract class TVIEquipmentView_Item extends TreeViewerItem {
       try (Connection conn = TourDatabase.getInstance().getConnection()) {
 
          final AppFilter appFilter = createAppFilter();
+         final SQLData partFilter = new EquipmentPartFilter().getSqlData();
 
          sql = UI.EMPTY_STRING
 
@@ -301,6 +306,7 @@ public abstract class TVIEquipmentView_Item extends TreeViewerItem {
                + "  AND TourData.tourstarttime <  equipment.dateUntil" + NL //               //$NON-NLS-1$
 
                + appFilter.getWhereClause()
+               + partFilter.getSqlString()
 
                + "WHERE equipment.iscollate = true" + NL //                                  //$NON-NLS-1$
 
@@ -312,6 +318,7 @@ public abstract class TVIEquipmentView_Item extends TreeViewerItem {
          int nextIndex = 1;
 
          nextIndex = appFilter.setParameters(statement, nextIndex);
+         nextIndex = partFilter.setParameters(statement, nextIndex);
 
          final ResultSet result = statement.executeQuery();
 
@@ -362,6 +369,7 @@ public abstract class TVIEquipmentView_Item extends TreeViewerItem {
       try (Connection conn = TourDatabase.getInstance().getConnection()) {
 
          final AppFilter appFilter = createAppFilter();
+         final SQLData partFilter = new EquipmentPartFilter().getSqlData();
 
          sql = UI.EMPTY_STRING
 
@@ -396,6 +404,7 @@ public abstract class TVIEquipmentView_Item extends TreeViewerItem {
                + "      AND TourData.tourstarttime <  part.dateUntil" + NL //                      //$NON-NLS-1$
 
                + appFilter.getWhereClause()
+               + partFilter.getSqlString()
 
                + "   WHERE part.iscollate = TRUE" + NL //                                          //$NON-NLS-1$
                + "      AND part.partID = ?" + NL //                                               //$NON-NLS-1$
@@ -416,6 +425,7 @@ public abstract class TVIEquipmentView_Item extends TreeViewerItem {
          int nextIndex = 1;
 
          nextIndex = appFilter.setParameters(statement, nextIndex);
+         nextIndex = partFilter.setParameters(statement, nextIndex);
 
          statement.setLong(nextIndex++, partItem.getPartID());
 

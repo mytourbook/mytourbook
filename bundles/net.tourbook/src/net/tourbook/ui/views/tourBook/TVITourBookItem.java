@@ -230,15 +230,13 @@ public abstract class TVITourBookItem extends TreeViewerItem implements ITourIte
             + "$i_$db_numberOfPassedVehicles " + NL //                                 99    //$NON-NLS-1$
       ;
 
-      // vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
-      // vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
-      // vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
+      //  v v v v v v v v v v v v v v v v v v v v v v
+      // v v v v v v v v v v v v v v v v v v v v v v v
 
       SQL_ALL_OTHER_FIELDS__COLUMN_START_NUMBER = 100;
 
-      // ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-      // ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-      // ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+      // ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^
+      //  ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^
       //
       // !!! EXTREEMLY IMPORTANT !!!
       //
@@ -913,7 +911,7 @@ public abstract class TVITourBookItem extends TreeViewerItem implements ITourIte
       final long timeField = isPaceAndSpeedFromRecordedTime
                                  ? colTourDeviceTime_Recorded
                                  : colTourComputedTime_Moving;
-      
+
       colAvgSpeed                      = timeField       == 0 ? 0 : 3.6f * colTourDistance / timeField;
       colAvgPace                       = colTourDistance == 0 ? 0 : timeField * 1000f / colTourDistance;
 

@@ -27,6 +27,7 @@ import java.util.Set;
 import net.tourbook.common.UI;
 import net.tourbook.common.time.TimeTools;
 import net.tourbook.common.util.SQL;
+import net.tourbook.common.util.SQLData;
 import net.tourbook.common.util.TreeViewerItem;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.ui.AppFilter;
@@ -168,6 +169,7 @@ public class TVIEquipmentView_Part_Year extends TVIEquipmentView_Item {
       try (Connection conn = TourDatabase.getInstance().getConnection()) {
 
          final AppFilter appFilter = createAppFilter();
+//         final SQLData partFilter = new EquipmentPartFilter().getSqlData();
 
          sql = UI.EMPTY_STRING
 
@@ -192,6 +194,7 @@ public class TVIEquipmentView_Part_Year extends TVIEquipmentView_Item {
                + "   AND TourData.StartYear = ?" + NL //                                        //$NON-NLS-1$
 
                + appFilter.getWhereClause()
+//               + partFilter.getSqlString()
 
                + "WHERE part.iscollate = TRUE" + NL //                                          //$NON-NLS-1$
                + "   AND part.partid = ?" + NL //                                               //$NON-NLS-1$
@@ -208,6 +211,7 @@ public class TVIEquipmentView_Part_Year extends TVIEquipmentView_Item {
          statement.setLong(nextIndex++, _year);
 
          nextIndex = appFilter.setParameters(statement, nextIndex);
+//         nextIndex = partFilter.setParameters(statement, nextIndex);
 
          statement.setLong(nextIndex++, _partItem.getPartID());
 
@@ -258,6 +262,7 @@ public class TVIEquipmentView_Part_Year extends TVIEquipmentView_Item {
       try (Connection conn = TourDatabase.getInstance().getConnection()) {
 
          final AppFilter appFilter = createAppFilter();
+         final SQLData partFilter = new EquipmentPartFilter().getSqlData();
 
          /*
           * Load: Part, Year, Tour
@@ -280,6 +285,7 @@ public class TVIEquipmentView_Part_Year extends TVIEquipmentView_Item {
                + "   AND TourData.StartYear = ?" + NL //                                           //$NON-NLS-1$
 
                + appFilter.getWhereClause()
+               + partFilter.getSqlString()
 
                // get all equipment id's
                + "LEFT JOIN " + TourDatabase.JOINTABLE__TOURDATA__EQUIPMENT + " AS jTdataEq" + NL //   //$NON-NLS-1$ //$NON-NLS-2$
@@ -306,6 +312,7 @@ public class TVIEquipmentView_Part_Year extends TVIEquipmentView_Item {
          statement.setLong(nextIndex++, _year);
 
          nextIndex = appFilter.setParameters(statement, nextIndex);
+         nextIndex = partFilter.setParameters(statement, nextIndex);
 
          statement.setLong(nextIndex++, _partItem.getPartID());
 

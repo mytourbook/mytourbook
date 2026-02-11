@@ -74,16 +74,16 @@ public class EquipmentPartFilter {
                sql = UI.EMPTY_STRING
 
                      + "JOIN " + jTdEq + " AS jTdEq"
-                     + "   ON jTdEq.TOURDATA_TOURID = TourData.TOURID" + NL //                     //$NON-NLS-1$
+                     + "   ON jTdEq.TOURDATA_TOURID = TourData.TOURID" + NL //                        //$NON-NLS-1$
 
-                     + "JOIN " + tEqPart + " AS part" //                 //$NON-NLS-1$
-                     + "   ON part.EQUIPMENT_EQUIPMENTID = jTdEq.EQUIPMENT_EQUIPMENTID" + NL //    //$NON-NLS-1$
+                     + "JOIN " + tEqPart + " AS partOR" //                 //$NON-NLS-1$
+                     + "   ON partOR.EQUIPMENT_EQUIPMENTID = jTdEq.EQUIPMENT_EQUIPMENTID" + NL //    //$NON-NLS-1$
 
-                     + "   AND part.ISCOLLATE = TRUE" + NL //                                      //$NON-NLS-1$
-                     + "   AND part.PARTID IN (" + sqlParameters + ")" + NL //                     //$NON-NLS-1$ //$NON-NLS-2$
+                     + "   AND partOR.ISCOLLATE = TRUE" + NL //                                      //$NON-NLS-1$
+                     + "   AND partOR.PARTID IN (" + sqlParameters + ")" + NL //                     //$NON-NLS-1$ //$NON-NLS-2$
 
-                     + "   AND TourData.TourStartTime >= part.dateFrom" + NL //                    //$NON-NLS-1$
-                     + "   AND TourData.TourStartTime < part.dateUntil" + NL //                    //$NON-NLS-1$
+                     + "   AND TourData.TourStartTime >= partOR.dateFrom" + NL //                    //$NON-NLS-1$
+                     + "   AND TourData.TourStartTime < partOR.dateUntil" + NL //                    //$NON-NLS-1$
                ;
 
             } else {
@@ -98,7 +98,7 @@ public class EquipmentPartFilter {
                // sequence is important when the parameters are set !!!
                allSQLParameters.add(numParts);
 
-               final StringBuilder sb = new StringBuilder();
+               final StringBuilder sbAllParts = new StringBuilder();
 
                for (int partIndex = 0; partIndex < allPartIDs.length; partIndex++) {
 
@@ -118,10 +118,10 @@ public class EquipmentPartFilter {
                         + "    AND TourData.TourStartTime < " + partName + ".dateUntil" + NL //                   //$NON-NLS-1$
                   ;
 
-                  sb.append(joinPart);
+                  sbAllParts.append(joinPart);
                }
 
-               final String allJoinedParts = sb.toString();
+               final String allJoinedParts = sbAllParts.toString();
 
                sql = UI.EMPTY_STRING
 
