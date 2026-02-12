@@ -44,7 +44,7 @@ public class TVIEquipmentView_Tour extends TVIEquipmentView_Item {
          + "Tmarker.MarkerId," + NL                                     //   7  //$NON-NLS-1$
          + "jTdataEq.Equipment_EquipmentID," + NL                       //   8  //$NON-NLS-1$
 
-         + SQL_SUM_COLUMNS_TOUR                                         //   9
+         + getSQL_SUM_TOUR_COLUMNS("TourData", 0)                       //   9  //$NON-NLS-1$
    ;
 
    private TVIEquipmentView_Equipment _equipmentItem;

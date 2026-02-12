@@ -23,6 +23,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.UI;
@@ -40,70 +41,78 @@ import org.eclipse.jface.viewers.TreeViewer;
 
 public abstract class TVIEquipmentView_Item extends TreeViewerItem {
 
-   static final String                   SQL_SUM_COLUMNS;
-   static final String                   SQL_SUM_COLUMNS_SUMMARIZED;
-   static final String                   SQL_SUM_COLUMNS_TOUR;
+   private static final String                      SQL_SUM_FIELDS;
+   private static final String                      SQL_SUM_COLUMNS;
+   private static final String                      SQL_SUM_TOUR_FIELDS;
 
-   private static final IPreferenceStore _prefStore = TourbookPlugin.getPrefStore();
+   private static final IPreferenceStore            _prefStore                     = TourbookPlugin.getPrefStore();
+
+   private static ConcurrentHashMap<String, String> _allCached_SqlAllSumColumns    = new ConcurrentHashMap<>();
+   private static ConcurrentHashMap<String, String> _allCached_SqlAllSumFields     = new ConcurrentHashMap<>();
+   private static ConcurrentHashMap<String, String> _allCached_SqlAllSumTourFields = new ConcurrentHashMap<>();
 
    static {
 
+// SET_FORMATTING_OFF
+
+      SQL_SUM_TOUR_FIELDS = UI.EMPTY_STRING
+
+            + "$i_$db_TourDistance," + NL //                            0  //$NON-NLS-1$
+            + "$i_$db_TourDeviceTime_Elapsed," + NL //                  1  //$NON-NLS-1$
+            + "$i_$db_TourDeviceTime_Recorded," + NL //                 2  //$NON-NLS-1$
+            + "$i_$db_TourComputedTime_Moving," + NL //                 3  //$NON-NLS-1$
+            + "$i_$db_TourAltUp," + NL //                               4  //$NON-NLS-1$
+            + "$i_$db_TourAltDown," + NL //                             5  //$NON-NLS-1$
+
+            + "$i_$db_MaxPulse," + NL //                                6  //$NON-NLS-1$
+            + "$i_$db_MaxAltitude," + NL //                             7  //$NON-NLS-1$
+            + "$i_$db_MaxSpeed," + NL //                                8  //$NON-NLS-1$
+
+            + "$i_$db_AvgPulse," + NL //                                9  //$NON-NLS-1$
+            + "$i_$db_AvgCadence," + NL //                             10  //$NON-NLS-1$
+            + "$i_(DOUBLE($db_weather_Temperature_Average_Device) / $db_TemperatureScale)" + NL //      11 //$NON-NLS-1$
+            ;
+
+      SQL_SUM_FIELDS = UI.EMPTY_STRING
+
+            + "$i_$db_Sum_TourDistance," + NL //                        0  //$NON-NLS-1$
+            + "$i_$db_Sum_TourDeviceTime_Elapsed," + NL //              1  //$NON-NLS-1$
+            + "$i_$db_Sum_TourDeviceTime_Recorded," + NL //             2  //$NON-NLS-1$
+            + "$i_$db_Sum_TourComputedTime_Moving," + NL //             3  //$NON-NLS-1$
+            + "$i_$db_Sum_TourAltUp," + NL //                           4  //$NON-NLS-1$
+            + "$i_$db_Sum_TourAltDown," + NL //                         5  //$NON-NLS-1$
+
+            + "$i_$db_Max_MaxPulse," + NL //                            6  //$NON-NLS-1$
+            + "$i_$db_Max_MaxAltitude," + NL //                         7  //$NON-NLS-1$
+            + "$i_$db_Max_MaxSpeed," + NL //                            8  //$NON-NLS-1$
+
+            + "$i_$db_Avg_AvgPulse," + NL //                            9  //$NON-NLS-1$
+            + "$i_$db_Avg_AvgCadence," + NL //                         10  //$NON-NLS-1$
+            + "$i_$db_Avg_Weather_Temperature_Average_Device" + NL //  11  //$NON-NLS-1$
+      ;
+
       SQL_SUM_COLUMNS = UI.EMPTY_STRING
 
-            + "   Summarized.Sum_TourDistance," + NL //                       0  //$NON-NLS-1$
-            + "   Summarized.Sum_TourDeviceTime_Elapsed," + NL //             1  //$NON-NLS-1$
-            + "   Summarized.Sum_TourDeviceTime_Recorded," + NL //            2  //$NON-NLS-1$
-            + "   Summarized.Sum_TourComputedTime_Moving," + NL //            3  //$NON-NLS-1$
-            + "   Summarized.Sum_TourAltUp," + NL //                          4  //$NON-NLS-1$
-            + "   Summarized.Sum_TourAltDown," + NL //                        5  //$NON-NLS-1$
+            + "$i_SUM($db_TourDistance)                AS Sum_TourDistance," + NL //                   0  //$NON-NLS-1$
+            + "$i_SUM($db_TourDeviceTime_Elapsed)      AS Sum_TourDeviceTime_Elapsed," + NL //         1  //$NON-NLS-1$
+            + "$i_SUM($db_TourDeviceTime_Recorded)     AS Sum_TourDeviceTime_Recorded," + NL //        2  //$NON-NLS-1$
+            + "$i_SUM($db_TourComputedTime_Moving)     AS Sum_TourComputedTime_Moving," + NL //        3  //$NON-NLS-1$
+            + "$i_SUM($db_TourAltUp)                   AS Sum_TourAltUp," + NL //                      4  //$NON-NLS-1$
+            + "$i_SUM($db_TourAltDown)                 AS Sum_TourAltDown," + NL //                    5  //$NON-NLS-1$
 
-            + "   Summarized.Max_MaxPulse," + NL //                           6  //$NON-NLS-1$
-            + "   Summarized.Max_MaxAltitude," + NL //                        7  //$NON-NLS-1$
-            + "   Summarized.Max_MaxSpeed," + NL //                           8  //$NON-NLS-1$
+            + "$i_MAX($db_MaxPulse)                    AS Max_MaxPulse," + NL //                       6  //$NON-NLS-1$
+            + "$i_MAX($db_MaxAltitude)                 AS Max_MaxAltitude," + NL //                    7  //$NON-NLS-1$
+            + "$i_MAX($db_MaxSpeed)                    AS Max_MaxSpeed," + NL //                       8  //$NON-NLS-1$
 
-            + "   Summarized.Avg_AvgPulse," + NL //                           9  //$NON-NLS-1$
-            + "   Summarized.Avg_AvgCadence," + NL //                        10  //$NON-NLS-1$
-            + "   Summarized.Avg_Weather_Temperature_Average_Device" + NL // 11  //$NON-NLS-1$
+            + "$i_AVG( CASE WHEN $db_AVGPULSE = 0      THEN NULL ELSE $db_AVGPULSE END)     AS Avg_AvgPulse," + NL //              9  //$NON-NLS-1$
+            + "$i_AVG( CASE WHEN $db_AVGCADENCE = 0    THEN NULL ELSE $db_AVGCADENCE END)   AS Avg_AvgCadence," + NL //           10  //$NON-NLS-1$
+
+            + "$i_AVG( CASE WHEN $db_weather_Temperature_Average_Device = 0" //                                                                          //$NON-NLS-1$
+            + "  THEN NULL" //                                                                                                                           //$NON-NLS-1$
+            + "  ELSE DOUBLE($db_Weather_Temperature_Average_Device) / $db_TemperatureScale END) AS Avg_Weather_Temperature_Average_Device" + NL //  11  //$NON-NLS-1$
       ;
 
-      SQL_SUM_COLUMNS_SUMMARIZED = UI.EMPTY_STRING
-
-            + "   SUM(TourData.TourDistance)                AS Sum_TourDistance," + NL //                   0  //$NON-NLS-1$
-            + "   SUM(TourData.TourDeviceTime_Elapsed)      AS Sum_TourDeviceTime_Elapsed," + NL //         1  //$NON-NLS-1$
-            + "   SUM(TourData.TourDeviceTime_Recorded)     AS Sum_TourDeviceTime_Recorded," + NL //        2  //$NON-NLS-1$
-            + "   SUM(TourData.TourComputedTime_Moving)     AS Sum_TourComputedTime_Moving," + NL //        3  //$NON-NLS-1$
-            + "   SUM(TourData.TourAltUp)                   AS Sum_TourAltUp," + NL //                      4  //$NON-NLS-1$
-            + "   SUM(TourData.TourAltDown)                 AS Sum_TourAltDown," + NL //                    5  //$NON-NLS-1$
-
-            + "   MAX(TourData.MaxPulse)                    AS Max_MaxPulse," + NL //                       6  //$NON-NLS-1$
-            + "   MAX(TourData.MaxAltitude)                 AS Max_MaxAltitude," + NL //                    7  //$NON-NLS-1$
-            + "   MAX(TourData.MaxSpeed)                    AS Max_MaxSpeed," + NL //                       8  //$NON-NLS-1$
-
-            + "   AVG( CASE WHEN TourData.AVGPULSE = 0      THEN NULL ELSE TourData.AVGPULSE END)     AS Avg_AvgPulse," + NL //              9  //$NON-NLS-1$
-            + "   AVG( CASE WHEN TourData.AVGCADENCE = 0    THEN NULL ELSE TourData.AVGCADENCE END)   AS Avg_AvgCadence," + NL //           10  //$NON-NLS-1$
-            + "   AVG( CASE WHEN TourData.weather_Temperature_Average_Device = 0" //                                                            //$NON-NLS-1$
-            + "     THEN NULL" //                                                                                                               //$NON-NLS-1$
-            + "     ELSE DOUBLE(TourData.Weather_Temperature_Average_Device) / TourData.TemperatureScale END )" + NL //                         //$NON-NLS-1$
-            + "     AS Avg_Weather_Temperature_Average_Device" + NL //                                                                      11  //$NON-NLS-1$
-      ;
-
-      SQL_SUM_COLUMNS_TOUR = UI.EMPTY_STRING
-
-            + "   TourData.TourDistance," + NL //                       0  //$NON-NLS-1$
-            + "   TourData.TourDeviceTime_Elapsed," + NL //             1  //$NON-NLS-1$
-            + "   TourData.TourDeviceTime_Recorded," + NL //            2  //$NON-NLS-1$
-            + "   TourData.TourComputedTime_Moving," + NL //            3  //$NON-NLS-1$
-            + "   TourData.TourAltUp," + NL //                          4  //$NON-NLS-1$
-            + "   TourData.TourAltDown," + NL //                        5  //$NON-NLS-1$
-
-            + "   TourData.MaxPulse," + NL //                           6  //$NON-NLS-1$
-            + "   TourData.MaxAltitude," + NL //                        7  //$NON-NLS-1$
-            + "   TourData.MaxSpeed," + NL //                           8  //$NON-NLS-1$
-
-            + "   TourData.AvgPulse," + NL //                           9  //$NON-NLS-1$
-            + "   TourData.AvgCadence," + NL //                        10  //$NON-NLS-1$
-            + "   (DOUBLE(TourData.weather_Temperature_Average_Device) / TourData.TemperatureScale)" + NL //      11 //$NON-NLS-1$
-      ;
+// SET_FORMATTING_ON
    }
 
    private TreeViewer          _equipmentViewer;
@@ -173,6 +182,45 @@ public abstract class TVIEquipmentView_Item extends TreeViewerItem {
       _equipmentViewer = equipmentViewer;
 
       _viewerType = equipmentType;
+   }
+
+   /**
+    * Prepend a db prefix to the fields and indent it
+    *
+    * @param dbPrefix
+    * @param indent
+    *
+    * @return
+    */
+   public static String getSQL_SUM_COLUMNS(final String dbPrefix, final int indent) {
+
+      return getCachedSQL(_allCached_SqlAllSumFields, SQL_SUM_COLUMNS, dbPrefix, indent);
+   }
+
+   /**
+    * Prepend a db prefix to the fields and indent it
+    *
+    * @param dbPrefix
+    * @param indent
+    *
+    * @return
+    */
+   public static String getSQL_SUM_FIELDS(final String dbPrefix, final int indent) {
+
+      return getCachedSQL(_allCached_SqlAllSumColumns, SQL_SUM_FIELDS, dbPrefix, indent);
+   }
+
+   /**
+    * Prepend a db prefix to the fields and indent it
+    *
+    * @param dbPrefix
+    * @param indent
+    *
+    * @return
+    */
+   public static String getSQL_SUM_TOUR_COLUMNS(final String dbPrefix, final int indent) {
+
+      return getCachedSQL(_allCached_SqlAllSumTourFields, SQL_SUM_TOUR_FIELDS, dbPrefix, indent);
    }
 
    AppFilter createAppFilter() {
@@ -292,7 +340,7 @@ public abstract class TVIEquipmentView_Item extends TreeViewerItem {
                + "   equipment.EQUIPMENTID," + NL //                                      1  //$NON-NLS-1$
                + "   COUNT(*) AS num_Tours," + NL //                                      2  //$NON-NLS-1$
 
-               + SQL_SUM_COLUMNS_SUMMARIZED //                                            3
+               + getSQL_SUM_COLUMNS("TourData", 3) //                                     3  //$NON-NLS-1$
 
                + "FROM equipment AS equipment" + NL //                                       //$NON-NLS-1$
 
@@ -377,7 +425,7 @@ public abstract class TVIEquipmentView_Item extends TreeViewerItem {
 
                + "   Summarized.num_tours," + NL //                                             1  //$NON-NLS-1$
 
-               + SQL_SUM_COLUMNS //                                                             2
+               + getSQL_SUM_FIELDS("Summarized", 3) //                                          2
 
                + "FROM" + NL //                                                                    //$NON-NLS-1$
                + "(" + NL //                                                                       //$NON-NLS-1$
@@ -390,7 +438,7 @@ public abstract class TVIEquipmentView_Item extends TreeViewerItem {
 
                + "      COUNT(*)                      AS num_tours," + NL //                       //$NON-NLS-1$
 
-               + SQL_SUM_COLUMNS_SUMMARIZED
+               + getSQL_SUM_COLUMNS("TourData", 6) //                                              //$NON-NLS-1$
 
                + "   FROM EquipmentPart AS part" + NL //                                           //$NON-NLS-1$
 

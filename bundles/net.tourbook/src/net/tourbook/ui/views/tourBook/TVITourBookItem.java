@@ -72,7 +72,7 @@ public abstract class TVITourBookItem extends TreeViewerItem implements ITourIte
 
       SQL_ALL_TOUR_FIELDS = UI.EMPTY_STRING
 
-            + "$i_$db_tourID," + NL //                                                 1     //$NON-NLS-1$
+            + "$i_$db_TourID," + NL //                                                 1     //$NON-NLS-1$
 
             + "$i_$db_startYear," + NL //                                              2     //$NON-NLS-1$
             + "$i_$db_startMonth," + NL //                                             3     //$NON-NLS-1$
@@ -514,38 +514,7 @@ public abstract class TVITourBookItem extends TreeViewerItem implements ITourIte
       tourBookView = view;
    }
 
-   private static String getCachedSQL(final ConcurrentHashMap<String, String> allCachedSql,
-                                      final String sql,
-                                      final String dbPrefix,
-                                      final int indent) {
 
-      final String key = dbPrefix + UI.SYMBOL_UNDERSCORE + Integer.toString(indent);
-
-      final String cachedSqlFields = allCachedSql.get(key);
-
-      if (cachedSqlFields != null) {
-         return cachedSqlFields;
-      }
-
-      final StringBuilder sbIndent = new StringBuilder();
-      for (int i = 0; i < indent; i++) {
-         sbIndent.append(UI.SPACE);
-      }
-
-      String dbPrefixReplaced = UI.EMPTY_STRING;
-      if (dbPrefix.length() > 0) {
-         dbPrefixReplaced = dbPrefix + UI.SYMBOL_DOT;
-      }
-
-      String sqlReplaced = sql;
-
-      sqlReplaced = sqlReplaced.replaceAll("\\$i_", sbIndent.toString());
-      sqlReplaced = sqlReplaced.replaceAll("\\$db_", dbPrefixReplaced);
-
-      allCachedSql.put(key, sqlReplaced);
-
-      return sqlReplaced;
-   }
 
    /**
     * Prepend a db prefix to all fields and additional indent it

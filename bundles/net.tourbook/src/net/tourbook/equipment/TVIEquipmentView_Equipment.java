@@ -367,7 +367,7 @@ public class TVIEquipmentView_Equipment extends TVIEquipmentView_Item {
                + "   TourData.STARTYEAR," + NL //                                               //$NON-NLS-1$
                + "   COUNT(*) AS num_Tours," + NL //                                            //$NON-NLS-1$
 
-               + TVIEquipmentView_Tour.SQL_SUM_COLUMNS_SUMMARIZED
+               + getSQL_SUM_COLUMNS("TourData", 3)
 
                + "FROM equipment AS equipment" + NL //                                          //$NON-NLS-1$
 

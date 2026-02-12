@@ -180,7 +180,7 @@ public class TVIEquipmentView_Part_Year extends TVIEquipmentView_Item {
 
                + "   COUNT(*) AS num_Tours," + NL //                                         3  //$NON-NLS-1$
 
-               + TVIEquipmentView_Tour.SQL_SUM_COLUMNS_SUMMARIZED //                         4
+               + getSQL_SUM_COLUMNS("TourData", 3) //                                        4
 
                + "FROM equipmentpart AS part" + NL //                                           //$NON-NLS-1$
 

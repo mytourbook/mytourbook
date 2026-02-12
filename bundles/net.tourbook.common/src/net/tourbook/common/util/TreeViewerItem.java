@@ -18,6 +18,7 @@ package net.tourbook.common.util;
 import java.lang.reflect.Field;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
+import java.util.concurrent.ConcurrentHashMap;
 
 import net.tourbook.common.UI;
 
@@ -33,6 +34,53 @@ public abstract class TreeViewerItem {
    private TreeViewerItem            _parentItem;
 
    private ArrayList<TreeViewerItem> _children;
+
+   /**
+    * Replace tags in a sql string with an indent <code>\\$i_</code> and the db name
+    * <code>\\$db_</code> and cache these values.
+    * <p>
+    * Also adds a dot separator between the db name and the field name, when a db name is defined
+    *
+    * @param allCachedSql
+    * @param sql
+    * @param dbPrefix
+    * @param indent
+    *
+    * @return
+    */
+   protected static String getCachedSQL(final ConcurrentHashMap<String, String> allCachedSql,
+                                        final String sql,
+                                        final String dbPrefix,
+                                        final int indent) {
+
+      final String key = dbPrefix + UI.SYMBOL_UNDERSCORE + Integer.toString(indent);
+
+      final String cachedSqlFields = allCachedSql.get(key);
+
+      if (cachedSqlFields != null) {
+         return cachedSqlFields;
+      }
+
+      final StringBuilder sbIndent = new StringBuilder();
+      for (int i = 0; i < indent; i++) {
+         sbIndent.append(UI.SPACE);
+      }
+
+      // add a dot separator between db name and field name
+      String dbPrefixReplaced = UI.EMPTY_STRING;
+      if (dbPrefix.length() > 0) {
+         dbPrefixReplaced = dbPrefix + UI.SYMBOL_DOT;
+      }
+
+      String sqlReplaced = sql;
+
+      sqlReplaced = sqlReplaced.replaceAll("\\$i_", sbIndent.toString());
+      sqlReplaced = sqlReplaced.replaceAll("\\$db_", dbPrefixReplaced);
+
+      allCachedSql.put(key, sqlReplaced);
+
+      return sqlReplaced;
+   }
 
    /**
     * Adds a new child to this tree item
