@@ -182,7 +182,7 @@ public class TVIEquipmentView_Equipment_Month extends TVIEquipmentView_Item {
 
                + TVIEquipmentView_Tour.SQL_TOUR_COLUMNS
 
-               + "FROM equipment AS equipment" + NL //                                             //$NON-NLS-1$
+               + "FROM " + TourDatabase.TABLE_EQUIPMENT + " AS equipment" + NL //                  //$NON-NLS-1$
 
                + "JOIN " + TourDatabase.JOINTABLE__TOURDATA__EQUIPMENT + " AS j_td_eq" + NL //     //$NON-NLS-1$
                + "   ON j_td_eq.equipment_equipmentid = equipment.equipmentid" + NL //             //$NON-NLS-1$

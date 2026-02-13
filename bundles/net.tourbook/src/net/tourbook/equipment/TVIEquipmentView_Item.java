@@ -285,7 +285,7 @@ public abstract class TVIEquipmentView_Item extends TreeViewerItem {
                + "   j_Td_Eq.EQUIPMENT_EQUIPMENTID," + NL //                                 1  //$NON-NLS-1$
                + "   COUNT(*) AS numTours" + NL //                                           2  //$NON-NLS-1$
 
-               + "FROM EQUIPMENT" + NL //                                                       //$NON-NLS-1$
+               + "FROM " + TourDatabase.TABLE_EQUIPMENT + NL //                                 //$NON-NLS-1$
 
                + "JOIN " + TourDatabase.JOINTABLE__TOURDATA__EQUIPMENT + " AS j_Td_Eq" + NL //  //$NON-NLS-1$
                + "   ON j_Td_Eq.EQUIPMENT_EQUIPMENTID = EQUIPMENT.EQUIPMENTID" + NL //          //$NON-NLS-1$
@@ -360,7 +360,7 @@ public abstract class TVIEquipmentView_Item extends TreeViewerItem {
 
                + getSQL_SUM_COLUMNS("TourData", 3) //                                           3  //$NON-NLS-1$
 
-               + "FROM equipment AS equipment" + NL //                                             //$NON-NLS-1$
+               + "FROM " + TourDatabase.TABLE_EQUIPMENT + " AS equipment" + NL //                  //$NON-NLS-1$
 
                + "JOIN " + TourDatabase.JOINTABLE__TOURDATA__EQUIPMENT + " AS j_Td_Eq" + NL //     //$NON-NLS-1$
                + "  ON j_Td_Eq.equipment_equipmentid = equipment.EQUIPMENTID" + NL //              //$NON-NLS-1$
