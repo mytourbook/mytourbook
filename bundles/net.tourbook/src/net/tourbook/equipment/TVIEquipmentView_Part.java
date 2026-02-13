@@ -152,7 +152,7 @@ public class TVIEquipmentView_Part extends TVIEquipmentView_Item {
          final SQLData partFilter = new EquipmentPartFilter().getSqlData();
 
          /*
-          * Load: Part, Tour
+          * Load: Part, Tours
           */
          sql = UI.EMPTY_STRING
 
@@ -168,8 +168,8 @@ public class TVIEquipmentView_Part extends TVIEquipmentView_Item {
                // The alias "TourData" is needed that the tour filter is working
                + "JOIN " + TourDatabase.TABLE_TOUR_DATA + " AS TourData" + NL //                         //$NON-NLS-1$
                + "   ON TourData.tourID = j_td_eq.tourdata_tourID" + NL //                               //$NON-NLS-1$
-               + "   AND TourData.tourstarttime >= part.dateFrom" + NL //                                //$NON-NLS-1$
-               + "   AND TourData.tourstarttime <  part.dateUntil" + NL //                               //$NON-NLS-1$
+               + "   AND TourData.TourStartTime >= part.dateFrom" + NL //                                //$NON-NLS-1$
+               + "   AND TourData.TourStartTime <  part.dateUntil" + NL //                               //$NON-NLS-1$
 
                + partFilter.getSqlString()
 
@@ -190,7 +190,7 @@ public class TVIEquipmentView_Part extends TVIEquipmentView_Item {
 
                + appFilter.getWhereClause()
 
-               + "ORDER BY TourData.tourstarttime" + NL //                                               //$NON-NLS-1$
+               + "ORDER BY TourData.TourStartTime" + NL //                                               //$NON-NLS-1$
          ;
 
          final PreparedStatement statement = conn.prepareStatement(sql);
@@ -313,6 +313,9 @@ public class TVIEquipmentView_Part extends TVIEquipmentView_Item {
          final AppFilter appFilter = createAppFilter();
          final SQLData partFilter = new EquipmentPartFilter().getSqlData();
 
+         /*
+          * Load: Part, Years
+          */
          sql = UI.EMPTY_STRING
 
                + "SELECT" + NL //                                                               //$NON-NLS-1$
@@ -341,8 +344,8 @@ public class TVIEquipmentView_Part extends TVIEquipmentView_Item {
 
                + "JOIN " + TourDatabase.TABLE_TOUR_DATA + " AS TourData" + NL //                //$NON-NLS-1$
                + "   ON TourData.tourid = j_td_eq.tourdata_tourid" + NL //                      //$NON-NLS-1$
-               + "   AND TourData.tourstarttime >= part.dateFrom" + NL //                       //$NON-NLS-1$
-               + "   AND TourData.tourstarttime <  part.dateUntil" + NL //                      //$NON-NLS-1$
+               + "   AND TourData.TourStartTime >= part.dateFrom" + NL //                       //$NON-NLS-1$
+               + "   AND TourData.TourStartTime <  part.dateUntil" + NL //                      //$NON-NLS-1$
 
                + appFilter.getWhereClause()
                + partFilter.getSqlString()
@@ -353,7 +356,6 @@ public class TVIEquipmentView_Part extends TVIEquipmentView_Item {
                + ") AS tdFields" + NL //                                                        //$NON-NLS-1$
 
                + "GROUP BY StartYear" + NL //                                                   //$NON-NLS-1$
-
                + "ORDER BY StartYear" + NL //                                                   //$NON-NLS-1$
          ;
 

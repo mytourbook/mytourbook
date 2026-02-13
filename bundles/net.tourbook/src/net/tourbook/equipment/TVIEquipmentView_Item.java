@@ -187,7 +187,7 @@ public abstract class TVIEquipmentView_Item extends TreeViewerItem {
    }
 
    /**
-    * Prepend a db prefix to the fields and indent it
+    * Get {@link #SQL_SUM_COLUMNS} but prepend a db prefix to the fields and indent it
     *
     * @param dbPrefix
     * @param indent
@@ -200,7 +200,7 @@ public abstract class TVIEquipmentView_Item extends TreeViewerItem {
    }
 
    /**
-    * Prepend a db prefix to the fields and indent it
+    * Get {@link #SQL_SUM_FIELDS} but prepend a db prefix to the fields and indent it
     *
     * @param dbPrefix
     * @param indent
@@ -213,7 +213,7 @@ public abstract class TVIEquipmentView_Item extends TreeViewerItem {
    }
 
    /**
-    * Prepend a db prefix to the fields and indent it
+    * Get {@link #SQL_SUM_TOUR_FIELDS} but prepend a db prefix to the fields and indent it
     *
     * @param dbPrefix
     * @param indent
@@ -425,30 +425,26 @@ public abstract class TVIEquipmentView_Item extends TreeViewerItem {
 
                + "SELECT" + NL //                                                                  //$NON-NLS-1$
 
-               + "   Summarized.num_tours," + NL //                                             1  //$NON-NLS-1$
+               + "   COUNT(*) AS Num_Tours," + NL //                                               //$NON-NLS-1$
 
-               + getSQL_SUM_FIELDS("Summarized", 3) //                                          2
+               + getSQL_SUM_COLUMNS("tdFields", 3) //                                              //$NON-NLS-1$
 
                + "FROM" + NL //                                                                    //$NON-NLS-1$
                + "(" + NL //                                                                       //$NON-NLS-1$
 
                + "   SELECT" + NL //                                                               //$NON-NLS-1$
 
-               + "      part.equipment_equipmentid    AS part_eq_id," + NL //                      //$NON-NLS-1$
-               + "      part.partid                   AS part_id," + NL //                         //$NON-NLS-1$
-               + "      part.\"TYPE\"                 AS part_type," + NL //                       //$NON-NLS-1$
+               // the part filter can create duplicated tour ids
+               + "      DISTINCT TourData.TourID," + NL //                                         //$NON-NLS-1$
 
-               + "      COUNT(*)                      AS num_tours," + NL //                       //$NON-NLS-1$
-
-               + getSQL_SUM_COLUMNS("TourData", 6) //                                              //$NON-NLS-1$
+               + getSQL_SUM_TOUR_COLUMNS("TourData", 6) //                                         //$NON-NLS-1$
 
                + "   FROM EquipmentPart AS part" + NL //                                           //$NON-NLS-1$
 
-               + "   JOIN tourdata_equipment AS j_Td_Eq" + NL //                                   //$NON-NLS-1$
+               + "   JOIN tourdata_equipment AS j_Td_Eq" //                                        //$NON-NLS-1$
                + "      ON j_Td_Eq.equipment_equipmentid = part.equipment_equipmentid" + NL //     //$NON-NLS-1$
 
-               // the alias "TourData" is needed that the app filter is working
-               + "   JOIN TourData AS TourData" + NL //                                            //$NON-NLS-1$
+               + "   JOIN TourData AS TourData" //                                                 //$NON-NLS-1$
                + "      ON TourData.tourid = j_Td_Eq.tourdata_tourid" + NL //                      //$NON-NLS-1$
                + "      AND TourData.tourstarttime >= part.dateFrom" + NL //                       //$NON-NLS-1$
                + "      AND TourData.tourstarttime <  part.dateUntil" + NL //                      //$NON-NLS-1$
@@ -457,17 +453,10 @@ public abstract class TVIEquipmentView_Item extends TreeViewerItem {
                + partFilter.getSqlString()
 
                + "   WHERE part.isCollate = TRUE" + NL //                                          //$NON-NLS-1$
-               + "      AND part.partID = ?" + NL //                                               //$NON-NLS-1$
+               + "     AND part.partID    = ?" + NL //                                             //$NON-NLS-1$
 
-               + "   GROUP BY" + NL //                                                             //$NON-NLS-1$
-               + "      part.equipment_equipmentid," + NL //                                       //$NON-NLS-1$
-               + "      part.partid," + NL //                                                      //$NON-NLS-1$
-               + "      part.\"TYPE\"" + NL //                                                     //$NON-NLS-1$
+               + ") AS tdFields" + NL //                                                           //$NON-NLS-1$
 
-               + ") AS Summarized" + NL //                                                         //$NON-NLS-1$
-
-               + "LEFT JOIN equipment     AS j_equip ON j_equip.equipmentid = Summarized.part_eq_id" + NL //   //$NON-NLS-1$
-               + "LEFT JOIN equipmentpart AS j_part  ON j_part.partid       = Summarized.part_id" + NL //      //$NON-NLS-1$
          ;
 
          statement = conn.prepareStatement(sql);

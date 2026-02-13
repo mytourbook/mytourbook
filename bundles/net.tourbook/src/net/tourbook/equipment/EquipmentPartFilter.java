@@ -110,7 +110,7 @@ public class EquipmentPartFilter {
 
                   final String joinPart = UI.EMPTY_STRING
 
-                        + "INNER JOIN " + tEqPart + " AS " + partName + NL //                                     //$NON-NLS-1$
+                        + "JOIN " + tEqPart + " AS " + partName + NL //                                           //$NON-NLS-1$
                         + "  ON " + partName + ".EQUIPMENT_EQUIPMENTID = jTdEq.EQUIPMENT_EQUIPMENTID" + NL //     //$NON-NLS-1$
                         + "    AND " + partName + ".PARTID = ?" + NL //                                           //$NON-NLS-1$
                         + "    AND " + partName + ".ISCOLLATE = TRUE" + NL //                                     //$NON-NLS-1$
@@ -127,10 +127,10 @@ public class EquipmentPartFilter {
 
                      // require tour to have at least one of these equipment (index-friendly)
 
-                     + "INNER JOIN " + jTdEq + " jTdEqAND" + NL //                                                   //$NON-NLS-1$
-                     + "   ON jTdEqAND.TOURDATA_TOURID = TourData.TOURID" + NL //                                    //$NON-NLS-1$
+                     + "JOIN " + jTdEq + " jTdEq" + NL //                                                         //$NON-NLS-1$
+                     + "   ON jTdEq.TOURDATA_TOURID = TourData.TOURID" + NL //                                    //$NON-NLS-1$
 
-                     + "INNER JOIN" + NL //                                                                       //$NON-NLS-1$
+                     + "JOIN" + NL //                                                                             //$NON-NLS-1$
                      + "(" + NL //                                                                                //$NON-NLS-1$
 
                      // Pre-filter: equipment that has ALL n parts with ISCOLLATE=TRUE
@@ -142,14 +142,21 @@ public class EquipmentPartFilter {
                      + "   HAVING COUNT(DISTINCT PARTID) = ?" + NL //                                             //$NON-NLS-1$
 
                      + ") AS Eq_With_All_Parts" + NL //                                                           //$NON-NLS-1$
-                     + "  ON Eq_With_All_Parts.EQUIPMENT_EQUIPMENTID = jTdEqAND.EQUIPMENT_EQUIPMENTID" + NL //       //$NON-NLS-1$
+                     + "  ON Eq_With_All_Parts.EQUIPMENT_EQUIPMENTID = jTdEq.EQUIPMENT_EQUIPMENTID" + NL //       //$NON-NLS-1$
 
                      + allJoinedParts;
             }
          }
       }
 
-      return new SQLData(sql, allSQLParameters);
+      final String sqlFinal = UI.EMPTY_STRING
+
+            + "-- part filter - START" + NL //$NON-NLS-1$
+            + sql
+            + "-- part filter - END" + NL //$NON-NLS-1$
+      ;
+
+      return new SQLData(sqlFinal, allSQLParameters);
    }
 
    /**

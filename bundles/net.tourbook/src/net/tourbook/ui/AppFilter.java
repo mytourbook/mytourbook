@@ -96,6 +96,8 @@ public class AppFilter {
 
       final StringBuilder sql = new StringBuilder();
 
+      sql.append("-- app filter 1 - START" + NL); //$NON-NLS-1$
+
       for (final AppFilterType appFilter : appFilters) {
 
          if (AppFilterType.Person.equals(appFilter)) {
@@ -134,6 +136,8 @@ public class AppFilter {
          }
       }
 
+      sql.append("-- app filter 1 - END" + NL); //$NON-NLS-1$
+
       _sqlWhereClause = sql.toString();
    }
 
@@ -154,6 +158,8 @@ public class AppFilter {
    public AppFilter(final Set<AppFilterType> additionalAppFilter) {
 
       final StringBuilder sqlWhere = new StringBuilder();
+
+      sqlWhere.append("-- app filter 2 - START" + NL); //$NON-NLS-1$
 
       /*
        * App filter: Person
@@ -248,6 +254,8 @@ public class AppFilter {
             _allParameters.addAll(equipmentSqlData.getParameters());
          }
       }
+
+      sqlWhere.append("-- app filter 2 - END" + NL); //$NON-NLS-1$
 
       _sqlWhereClause = sqlWhere.toString();
    }
