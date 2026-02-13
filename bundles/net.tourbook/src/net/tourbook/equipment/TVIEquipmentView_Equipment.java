@@ -212,6 +212,13 @@ public class TVIEquipmentView_Equipment extends TVIEquipmentView_Item {
           */
          final String sql = UI.EMPTY_STRING
 
+               + "--" + NL //                                                                   //$NON-NLS-1$
+               + NL
+               + "--------------------" + NL //                                                 //$NON-NLS-1$
+               + "-- equipment - tours" + NL //                                                 //$NON-NLS-1$
+               + "--------------------" + NL //                                                 //$NON-NLS-1$
+               + NL
+
                + "SELECT" + NL //                                                               //$NON-NLS-1$
 
                + TVIEquipmentView_Tour.SQL_TOUR_COLUMNS
@@ -244,6 +251,9 @@ public class TVIEquipmentView_Equipment extends TVIEquipmentView_Item {
                + appFilter.getWhereClause()
 
                + "ORDER BY TourData.TOURSTARTTIME" + NL //                                      //$NON-NLS-1$
+
+               + NL
+               + "--" + NL //                                                                   //$NON-NLS-1$
          ;
 
          final PreparedStatement statement = conn.prepareStatement(sql);
@@ -363,6 +373,13 @@ public class TVIEquipmentView_Equipment extends TVIEquipmentView_Item {
 
          final String sql = UI.EMPTY_STRING
 
+               + "--" + NL //                                                                   //$NON-NLS-1$
+               + NL
+               + "--------------------" + NL //                                                 //$NON-NLS-1$
+               + "-- equipment - years" + NL //                                                 //$NON-NLS-1$
+               + "--------------------" + NL //                                                 //$NON-NLS-1$
+               + NL
+
                + "SELECT" + NL //                                                               //$NON-NLS-1$
                + "   TourData.STARTYEAR," + NL //                                               //$NON-NLS-1$
                + "   COUNT(*) AS num_Tours," + NL //                                            //$NON-NLS-1$
@@ -385,6 +402,9 @@ public class TVIEquipmentView_Equipment extends TVIEquipmentView_Item {
                + "   AND equipment.equipmentID = ?" + NL //                                     //$NON-NLS-1$
 
                + "GROUP BY TourData.STARTYEAR" + NL //                                          //$NON-NLS-1$
+
+               + NL
+               + "--" + NL //                                                                   //$NON-NLS-1$
          ;
 
          final PreparedStatement statement = conn.prepareStatement(sql);

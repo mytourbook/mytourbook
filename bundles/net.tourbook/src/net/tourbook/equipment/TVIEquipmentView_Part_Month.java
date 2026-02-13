@@ -176,6 +176,13 @@ public class TVIEquipmentView_Part_Month extends TVIEquipmentView_Item {
           */
          sql = UI.EMPTY_STRING
 
+               + "--" + NL //                                                                         //$NON-NLS-1$
+               + NL
+               + "-----------------------" + NL //                                                    //$NON-NLS-1$
+               + "-- part - month - tours" + NL //                                                    //$NON-NLS-1$
+               + "-----------------------" + NL //                                                    //$NON-NLS-1$
+               + NL
+
                + "SELECT" + NL //                                                                     //$NON-NLS-1$
 
                + TVIEquipmentView_Tour.SQL_TOUR_COLUMNS
@@ -211,6 +218,9 @@ public class TVIEquipmentView_Part_Month extends TVIEquipmentView_Item {
                + "   AND part.partID = ?" + NL //                                                     //$NON-NLS-1$
 
                + "ORDER BY TourData.tourstarttime" + NL //                                            //$NON-NLS-1$
+
+               + NL
+               + "--" + NL //                                                                      //$NON-NLS-1$
          ;
 
          final PreparedStatement statement = conn.prepareStatement(sql);
@@ -324,7 +334,7 @@ public class TVIEquipmentView_Part_Month extends TVIEquipmentView_Item {
 
       return UI.EMPTY_STRING
 
-            + "TVITagView_Month " + System.identityHashCode(this) + NL //     //$NON-NLS-1$
+            + "TVIEquipmentView_Part_Month " + System.identityHashCode(this) + NL //     //$NON-NLS-1$
 
             + "[" + NL //                                                     //$NON-NLS-1$
 

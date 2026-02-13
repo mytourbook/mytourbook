@@ -156,6 +156,13 @@ public class TVIEquipmentView_Part extends TVIEquipmentView_Item {
           */
          sql = UI.EMPTY_STRING
 
+               + "--" + NL //                                                                            //$NON-NLS-1$
+               + NL
+               + "---------------" + NL //                                                               //$NON-NLS-1$
+               + "-- part - tours" + NL //                                                               //$NON-NLS-1$
+               + "---------------" + NL //                                                               //$NON-NLS-1$
+               + NL
+
                + "SELECT" + NL //                                                                        //$NON-NLS-1$
 
                + TVIEquipmentView_Tour.SQL_TOUR_COLUMNS
@@ -191,6 +198,9 @@ public class TVIEquipmentView_Part extends TVIEquipmentView_Item {
                + appFilter.getWhereClause()
 
                + "ORDER BY TourData.TourStartTime" + NL //                                               //$NON-NLS-1$
+
+               + NL
+               + "--" + NL //                                                                      //$NON-NLS-1$
          ;
 
          final PreparedStatement statement = conn.prepareStatement(sql);
@@ -318,6 +328,13 @@ public class TVIEquipmentView_Part extends TVIEquipmentView_Item {
           */
          sql = UI.EMPTY_STRING
 
+               + "--" + NL //                                                                   //$NON-NLS-1$
+               + NL
+               + "---------------" + NL //                                                      //$NON-NLS-1$
+               + "-- part - years" + NL //                                                      //$NON-NLS-1$
+               + "---------------" + NL //                                                      //$NON-NLS-1$
+               + NL
+
                + "SELECT" + NL //                                                               //$NON-NLS-1$
 
                + "   tdFields.StartYear," + NL //                                               //$NON-NLS-1$
@@ -357,6 +374,9 @@ public class TVIEquipmentView_Part extends TVIEquipmentView_Item {
 
                + "GROUP BY StartYear" + NL //                                                   //$NON-NLS-1$
                + "ORDER BY StartYear" + NL //                                                   //$NON-NLS-1$
+
+               + NL
+               + "--" + NL //                                                                      //$NON-NLS-1$
          ;
 
          final PreparedStatement statement = conn.prepareStatement(sql);

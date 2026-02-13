@@ -173,6 +173,13 @@ public class TVIEquipmentView_Part_Year extends TVIEquipmentView_Item {
 
          sql = UI.EMPTY_STRING
 
+               + "--" + NL //                                                                   //$NON-NLS-1$
+               + NL
+               + "-----------------------" + NL //                                              //$NON-NLS-1$
+               + "-- part - year - months" + NL //                                              //$NON-NLS-1$
+               + "-----------------------" + NL //                                              //$NON-NLS-1$
+               + NL
+
                + "SELECT" + NL //                                                               //$NON-NLS-1$
 
                + "   TourData.StartYear," + NL //                                            1  //$NON-NLS-1$
@@ -202,6 +209,9 @@ public class TVIEquipmentView_Part_Year extends TVIEquipmentView_Item {
                + "GROUP BY "
                + "   TourData.StartYear," + NL //                                               //$NON-NLS-1$
                + "   TourData.StartMonth" + NL //                                               //$NON-NLS-1$
+
+               + NL
+               + "--" + NL //                                                                   //$NON-NLS-1$
          ;
 
          final PreparedStatement statement = conn.prepareStatement(sql);
@@ -269,6 +279,13 @@ public class TVIEquipmentView_Part_Year extends TVIEquipmentView_Item {
           */
          sql = UI.EMPTY_STRING
 
+               + "--" + NL //                                                                      //$NON-NLS-1$
+               + NL
+               + "----------------------" + NL //                                                  //$NON-NLS-1$
+               + "-- part - year - tours" + NL //                                                  //$NON-NLS-1$
+               + "----------------------" + NL //                                                  //$NON-NLS-1$
+               + NL
+
                + "SELECT" + NL //                                                                  //$NON-NLS-1$
 
                + TVIEquipmentView_Tour.SQL_TOUR_COLUMNS
@@ -292,17 +309,20 @@ public class TVIEquipmentView_Part_Year extends TVIEquipmentView_Item {
                + "  ON TourData.TOURID = jTdataEq.TOURDATA_TOURID" + NL //                             //$NON-NLS-1$
 
                // get tag id's
-               + "LEFT JOIN " + TourDatabase.JOINTABLE__TOURDATA__TOURTAG + " AS jTdataTtag" // //$NON-NLS-1$ //$NON-NLS-2$
-               + "  ON TourData.tourId = jTdataTtag.TourData_tourId" + NL //                    //$NON-NLS-1$
+               + "LEFT JOIN " + TourDatabase.JOINTABLE__TOURDATA__TOURTAG + " AS jTdataTtag" //    //$NON-NLS-1$ //$NON-NLS-2$
+               + "  ON TourData.tourId = jTdataTtag.TourData_tourId" + NL //                       //$NON-NLS-1$
 
                // get marker id's
-               + "LEFT JOIN " + TourDatabase.TABLE_TOUR_MARKER + " AS Tmarker" //               //$NON-NLS-1$ //$NON-NLS-2$
-               + "  ON TourData.tourId = Tmarker.TourData_tourId" + NL //                       //$NON-NLS-1$
+               + "LEFT JOIN " + TourDatabase.TABLE_TOUR_MARKER + " AS Tmarker" //                  //$NON-NLS-1$ //$NON-NLS-2$
+               + "  ON TourData.tourId = Tmarker.TourData_tourId" + NL //                          //$NON-NLS-1$
 
                + "WHERE part.isCollate = TRUE" + NL //                                             //$NON-NLS-1$
                + "   AND part.partID = ?" + NL //                                                  //$NON-NLS-1$
 
                + "ORDER BY TourData.tourstarttime" + NL //                                         //$NON-NLS-1$
+
+               + NL
+               + "--" + NL //                                                                      //$NON-NLS-1$
          ;
 
          final PreparedStatement statement = conn.prepareStatement(sql);

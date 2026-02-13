@@ -171,6 +171,13 @@ public class TVIEquipmentView_Equipment_Month extends TVIEquipmentView_Item {
           */
          final String sql = UI.EMPTY_STRING
 
+               + "--" + NL //                                                                      //$NON-NLS-1$
+               + NL
+               + "----------------------------" + NL //                                            //$NON-NLS-1$
+               + "-- equipment - month - tours" + NL //                                            //$NON-NLS-1$
+               + "----------------------------" + NL //                                            //$NON-NLS-1$
+               + NL
+
                + "SELECT" + NL //                                                                  //$NON-NLS-1$
 
                + TVIEquipmentView_Tour.SQL_TOUR_COLUMNS
@@ -205,6 +212,9 @@ public class TVIEquipmentView_Equipment_Month extends TVIEquipmentView_Item {
                + "   AND equipment.equipmentID = ?" + NL //                                        //$NON-NLS-1$
 
                + "ORDER BY TourData.tourstarttime" + NL //                                         //$NON-NLS-1$
+
+               + NL
+               + "--" + NL //                                                                      //$NON-NLS-1$
          ;
 
          final PreparedStatement statement = conn.prepareStatement(sql);
