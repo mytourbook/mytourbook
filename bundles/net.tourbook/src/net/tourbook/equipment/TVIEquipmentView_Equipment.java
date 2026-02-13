@@ -218,10 +218,10 @@ public class TVIEquipmentView_Equipment extends TVIEquipmentView_Item {
 
                + "FROM equipment AS equipment" + NL //                                          //$NON-NLS-1$
 
-               + "JOIN tourdata_equipment AS j_td_eq" + NL //                                   //$NON-NLS-1$
+               + "JOIN " + TourDatabase.JOINTABLE__TOURDATA__EQUIPMENT + " AS j_td_eq" + NL //  //$NON-NLS-1$
                + "  ON j_td_eq.equipment_equipmentid = equipment.EQUIPMENTID" + NL //           //$NON-NLS-1$
 
-               + "JOIN tourdata AS TourData" + NL //                                            //$NON-NLS-1$
+               + "JOIN " + TourDatabase.TABLE_TOUR_DATA + " AS TourData" + NL //                //$NON-NLS-1$
                + "  ON TourData.tourid = j_td_eq.tourdata_tourid" + NL //                       //$NON-NLS-1$
                + "  AND TourData.tourstarttime >= equipment.dateFrom" + NL //                   //$NON-NLS-1$
                + "  AND TourData.tourstarttime <  equipment.dateUntil" + NL //                  //$NON-NLS-1$
@@ -371,10 +371,10 @@ public class TVIEquipmentView_Equipment extends TVIEquipmentView_Item {
 
                + "FROM equipment AS equipment" + NL //                                          //$NON-NLS-1$
 
-               + "JOIN tourdata_equipment AS j_td_eq" + NL //                                   //$NON-NLS-1$
+               + "JOIN " + TourDatabase.JOINTABLE__TOURDATA__EQUIPMENT + " AS j_td_eq" + NL //  //$NON-NLS-1$
                + "   ON j_td_eq.equipment_equipmentid = equipment.EQUIPMENTID" + NL //          //$NON-NLS-1$
 
-               + "JOIN tourdata AS TourData" + NL //                                            //$NON-NLS-1$
+               + "JOIN " + TourDatabase.TABLE_TOUR_DATA + " AS TourData" + NL //                //$NON-NLS-1$
                + "   ON TourData.tourid = j_td_eq.tourdata_tourid" + NL //                      //$NON-NLS-1$
                + "   AND TourData.tourstarttime >= equipment.dateFrom" + NL //                  //$NON-NLS-1$
                + "   AND TourData.tourstarttime <  equipment.dateUntil" + NL //                 //$NON-NLS-1$

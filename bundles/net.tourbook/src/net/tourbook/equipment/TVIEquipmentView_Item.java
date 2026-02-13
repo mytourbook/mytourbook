@@ -273,25 +273,25 @@ public abstract class TVIEquipmentView_Item extends TreeViewerItem {
 
          sql = UI.EMPTY_STRING
 
-               + "SELECT" + NL //                                                            //$NON-NLS-1$
+               + "SELECT" + NL //                                                               //$NON-NLS-1$
 
-               + "   j_Td_Eq.EQUIPMENT_EQUIPMENTID," + NL //                              1  //$NON-NLS-1$
-               + "   COUNT(*) AS numTours" + NL //                                        2  //$NON-NLS-1$
+               + "   j_Td_Eq.EQUIPMENT_EQUIPMENTID," + NL //                                 1  //$NON-NLS-1$
+               + "   COUNT(*) AS numTours" + NL //                                           2  //$NON-NLS-1$
 
-               + "FROM EQUIPMENT" + NL //                                                    //$NON-NLS-1$
+               + "FROM EQUIPMENT" + NL //                                                       //$NON-NLS-1$
 
-               + "JOIN TOURDATA_EQUIPMENT AS j_Td_Eq" + NL //                                //$NON-NLS-1$
-               + "   ON j_Td_Eq.EQUIPMENT_EQUIPMENTID = EQUIPMENT.EQUIPMENTID" + NL //       //$NON-NLS-1$
+               + "JOIN " + TourDatabase.JOINTABLE__TOURDATA__EQUIPMENT + " AS j_Td_Eq" + NL //  //$NON-NLS-1$
+               + "   ON j_Td_Eq.EQUIPMENT_EQUIPMENTID = EQUIPMENT.EQUIPMENTID" + NL //          //$NON-NLS-1$
 
                // the alias "TourData" is needed that the app filter is working
-               + "JOIN TourData AS TourData" + NL //                                         //$NON-NLS-1$
-               + "   ON TourData.tourid = j_Td_Eq.tourdata_tourid" + NL //                   //$NON-NLS-1$
+               + "JOIN " + TourDatabase.TABLE_TOUR_DATA + " AS TourData" + NL //                //$NON-NLS-1$
+               + "   ON TourData.tourid = j_Td_Eq.tourdata_tourid" + NL //                      //$NON-NLS-1$
 
                + appFilter.getWhereClause()
                + partFilter.getSqlString()
 
-               + "GROUP BY " + NL //                                                         //$NON-NLS-1$
-               + "   j_Td_Eq.EQUIPMENT_EQUIPMENTID" + NL //                                  //$NON-NLS-1$
+               + "GROUP BY " + NL //                                                            //$NON-NLS-1$
+               + "   j_Td_Eq.EQUIPMENT_EQUIPMENTID" + NL //                                     //$NON-NLS-1$
          ;
 
          statement = conn.prepareStatement(sql);
@@ -338,29 +338,29 @@ public abstract class TVIEquipmentView_Item extends TreeViewerItem {
 
          sql = UI.EMPTY_STRING
 
-               + "SELECT" + NL //                                                            //$NON-NLS-1$
-               + "   equipment.EQUIPMENTID," + NL //                                      1  //$NON-NLS-1$
-               + "   COUNT(*) AS num_Tours," + NL //                                      2  //$NON-NLS-1$
+               + "SELECT" + NL //                                                                  //$NON-NLS-1$
+               + "   equipment.EQUIPMENTID," + NL //                                            1  //$NON-NLS-1$
+               + "   COUNT(*) AS num_Tours," + NL //                                            2  //$NON-NLS-1$
 
-               + getSQL_SUM_COLUMNS("TourData", 3) //                                     3  //$NON-NLS-1$
+               + getSQL_SUM_COLUMNS("TourData", 3) //                                           3  //$NON-NLS-1$
 
-               + "FROM equipment AS equipment" + NL //                                       //$NON-NLS-1$
+               + "FROM equipment AS equipment" + NL //                                             //$NON-NLS-1$
 
-               + "JOIN tourdata_equipment AS j_Td_Eq" + NL //                                //$NON-NLS-1$
-               + "  ON j_Td_Eq.equipment_equipmentid = equipment.EQUIPMENTID" + NL //        //$NON-NLS-1$
+               + "JOIN " + TourDatabase.JOINTABLE__TOURDATA__EQUIPMENT + " AS j_Td_Eq" + NL //     //$NON-NLS-1$
+               + "  ON j_Td_Eq.equipment_equipmentid = equipment.EQUIPMENTID" + NL //              //$NON-NLS-1$
 
                // the alias "TourData" is needed that the app filter is working
-               + "JOIN tourdata AS TourData" + NL //                                         //$NON-NLS-1$
-               + "  ON TourData.tourid = j_Td_Eq.tourdata_tourid" + NL //                    //$NON-NLS-1$
-               + "  AND TourData.tourstarttime >= equipment.dateFrom" + NL //                //$NON-NLS-1$
-               + "  AND TourData.tourstarttime <  equipment.dateUntil" + NL //               //$NON-NLS-1$
+               + "JOIN " + TourDatabase.TABLE_TOUR_DATA + " AS TourData" + NL //                   //$NON-NLS-1$
+               + "  ON TourData.tourid = j_Td_Eq.tourdata_tourid" + NL //                          //$NON-NLS-1$
+               + "  AND TourData.tourstarttime >= equipment.dateFrom" + NL //                      //$NON-NLS-1$
+               + "  AND TourData.tourstarttime <  equipment.dateUntil" + NL //                     //$NON-NLS-1$
 
                + appFilter.getWhereClause()
                + partFilter.getSqlString()
 
-               + "WHERE equipment.iscollate = true" + NL //                                  //$NON-NLS-1$
+               + "WHERE equipment.iscollate = true" + NL //                                        //$NON-NLS-1$
 
-               + "GROUP BY equipment.EQUIPMENTID" + NL //                                    //$NON-NLS-1$
+               + "GROUP BY equipment.EQUIPMENTID" + NL //                                          //$NON-NLS-1$
          ;
 
          statement = conn.prepareStatement(sql);
@@ -439,12 +439,12 @@ public abstract class TVIEquipmentView_Item extends TreeViewerItem {
 
                + getSQL_SUM_TOUR_COLUMNS("TourData", 6) //                                         //$NON-NLS-1$
 
-               + "   FROM EquipmentPart AS part" + NL //                                           //$NON-NLS-1$
+               + "   FROM " + TourDatabase.TABLE_EQUIPMENT_PART + " AS part" + NL //               //$NON-NLS-1$
 
-               + "   JOIN tourdata_equipment AS j_Td_Eq" //                                        //$NON-NLS-1$
+               + "   JOIN " + TourDatabase.JOINTABLE__TOURDATA__EQUIPMENT + " AS j_Td_Eq" //       //$NON-NLS-1$
                + "      ON j_Td_Eq.equipment_equipmentid = part.equipment_equipmentid" + NL //     //$NON-NLS-1$
 
-               + "   JOIN TourData AS TourData" //                                                 //$NON-NLS-1$
+               + "   JOIN " + TourDatabase.TABLE_TOUR_DATA + " AS TourData" //                     //$NON-NLS-1$
                + "      ON TourData.tourid = j_Td_Eq.tourdata_tourid" + NL //                      //$NON-NLS-1$
                + "      AND TourData.tourstarttime >= part.dateFrom" + NL //                       //$NON-NLS-1$
                + "      AND TourData.tourstarttime <  part.dateUntil" + NL //                      //$NON-NLS-1$
