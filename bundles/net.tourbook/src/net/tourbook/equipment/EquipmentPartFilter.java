@@ -73,17 +73,17 @@ public class EquipmentPartFilter {
                /* require tour to have at least one of these equipment (index-friendly) */
                sql = UI.EMPTY_STRING
 
-                     + "JOIN " + jTdEq + " AS jTdEq"
-                     + "   ON jTdEq.TOURDATA_TOURID = TourData.TOURID" + NL //                        //$NON-NLS-1$
+                     + "JOIN " + jTdEq + " AS jTdEqOR"
+                     + "   ON jTdEqOR.TOURDATA_TOURID = TourData.TOURID" + NL //                         //$NON-NLS-1$
 
                      + "JOIN " + tEqPart + " AS partOR" //                 //$NON-NLS-1$
-                     + "   ON partOR.EQUIPMENT_EQUIPMENTID = jTdEq.EQUIPMENT_EQUIPMENTID" + NL //    //$NON-NLS-1$
+                     + "   ON partOR.EQUIPMENT_EQUIPMENTID = jTdEqOR.EQUIPMENT_EQUIPMENTID" + NL //      //$NON-NLS-1$
 
-                     + "   AND partOR.ISCOLLATE = TRUE" + NL //                                      //$NON-NLS-1$
-                     + "   AND partOR.PARTID IN (" + sqlParameters + ")" + NL //                     //$NON-NLS-1$ //$NON-NLS-2$
+                     + "   AND partOR.ISCOLLATE = TRUE" + NL //                                          //$NON-NLS-1$
+                     + "   AND partOR.PARTID IN (" + sqlParameters + ")" + NL //                         //$NON-NLS-1$ //$NON-NLS-2$
 
-                     + "   AND TourData.TourStartTime >= partOR.dateFrom" + NL //                    //$NON-NLS-1$
-                     + "   AND TourData.TourStartTime < partOR.dateUntil" + NL //                    //$NON-NLS-1$
+                     + "   AND TourData.TourStartTime >= partOR.dateFrom" + NL //                        //$NON-NLS-1$
+                     + "   AND TourData.TourStartTime < partOR.dateUntil" + NL //                        //$NON-NLS-1$
                ;
 
             } else {
@@ -127,8 +127,8 @@ public class EquipmentPartFilter {
 
                      // require tour to have at least one of these equipment (index-friendly)
 
-                     + "INNER JOIN " + jTdEq + " jTdEq" + NL //                                                   //$NON-NLS-1$
-                     + "   ON jTdEq.TOURDATA_TOURID = TourData.TOURID" + NL //                                    //$NON-NLS-1$
+                     + "INNER JOIN " + jTdEq + " jTdEqAND" + NL //                                                   //$NON-NLS-1$
+                     + "   ON jTdEqAND.TOURDATA_TOURID = TourData.TOURID" + NL //                                    //$NON-NLS-1$
 
                      + "INNER JOIN" + NL //                                                                       //$NON-NLS-1$
                      + "(" + NL //                                                                                //$NON-NLS-1$
@@ -142,7 +142,7 @@ public class EquipmentPartFilter {
                      + "   HAVING COUNT(DISTINCT PARTID) = ?" + NL //                                             //$NON-NLS-1$
 
                      + ") AS Eq_With_All_Parts" + NL //                                                           //$NON-NLS-1$
-                     + "  ON Eq_With_All_Parts.EQUIPMENT_EQUIPMENTID = jTdEq.EQUIPMENT_EQUIPMENTID" + NL //       //$NON-NLS-1$
+                     + "  ON Eq_With_All_Parts.EQUIPMENT_EQUIPMENTID = jTdEqAND.EQUIPMENT_EQUIPMENTID" + NL //       //$NON-NLS-1$
 
                      + allJoinedParts;
             }

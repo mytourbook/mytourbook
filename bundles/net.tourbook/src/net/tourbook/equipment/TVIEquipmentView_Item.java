@@ -70,7 +70,9 @@ public abstract class TVIEquipmentView_Item extends TreeViewerItem {
 
             + "$i_$db_AvgPulse," + NL //                                9  //$NON-NLS-1$
             + "$i_$db_AvgCadence," + NL //                             10  //$NON-NLS-1$
-            + "$i_(DOUBLE($db_weather_Temperature_Average_Device) / $db_TemperatureScale)" + NL //      11 //$NON-NLS-1$
+
+            + "$i_$db_Weather_Temperature_Average_Device," + NL //     11  //$NON-NLS-1$
+            + "$i_$db_TemperatureScale" + NL //                        12  //$NON-NLS-1$
             ;
 
       SQL_SUM_FIELDS = UI.EMPTY_STRING
@@ -454,7 +456,7 @@ public abstract class TVIEquipmentView_Item extends TreeViewerItem {
                + appFilter.getWhereClause()
                + partFilter.getSqlString()
 
-               + "   WHERE part.iscollate = TRUE" + NL //                                          //$NON-NLS-1$
+               + "   WHERE part.isCollate = TRUE" + NL //                                          //$NON-NLS-1$
                + "      AND part.partID = ?" + NL //                                               //$NON-NLS-1$
 
                + "   GROUP BY" + NL //                                                             //$NON-NLS-1$

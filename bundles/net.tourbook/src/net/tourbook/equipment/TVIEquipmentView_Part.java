@@ -317,17 +317,29 @@ public class TVIEquipmentView_Part extends TVIEquipmentView_Item {
 
                + "SELECT" + NL //                                                               //$NON-NLS-1$
 
-               + "   TourData.STARTYEAR," + NL //                                               //$NON-NLS-1$
-               + "   COUNT(*) AS num_Tours," + NL //                                            //$NON-NLS-1$
+               + "   tdFields.StartYear," + NL //                                               //$NON-NLS-1$
+               + "   COUNT(*) AS Num_Tours," + NL //                                            //$NON-NLS-1$
 
-               + getSQL_SUM_COLUMNS("TourData", 3)
+               + getSQL_SUM_COLUMNS("tdFields", 3)
 
-               + "FROM equipmentpart AS part" + NL //                                           //$NON-NLS-1$
+               + "FROM " + NL //                                                                //$NON-NLS-1$
 
-               + "JOIN tourdata_equipment AS j_td_eq" + NL //                                   //$NON-NLS-1$
+               + "(" + NL //                                                                    //$NON-NLS-1$
+
+               // Get distinct tours that match the criteria (parts 1 or 6 active at tour start)
+               + "   SELECT DISTINCT" + NL //                                                   //$NON-NLS-1$
+
+               + "      TourData.TourID," + NL //                                               //$NON-NLS-1$
+               + "      TourData.StartYear," + NL //                                            //$NON-NLS-1$
+
+               + getSQL_SUM_TOUR_COLUMNS("TourData", 6)
+
+               + "   FROM " + TourDatabase.TABLE_EQUIPMENT_PART + " AS part" + NL //            //$NON-NLS-1$
+
+               + "JOIN " + TourDatabase.JOINTABLE__TOURDATA__EQUIPMENT + " AS j_td_eq" + NL //  //$NON-NLS-1$
                + "   ON j_td_eq.equipment_equipmentid = part.equipment_equipmentid" + NL //     //$NON-NLS-1$
 
-               + "JOIN tourdata AS TourData" + NL //                                            //$NON-NLS-1$
+               + "JOIN " + TourDatabase.TABLE_TOUR_DATA + " AS TourData" + NL //                //$NON-NLS-1$
                + "   ON TourData.tourid = j_td_eq.tourdata_tourid" + NL //                      //$NON-NLS-1$
                + "   AND TourData.tourstarttime >= part.dateFrom" + NL //                       //$NON-NLS-1$
                + "   AND TourData.tourstarttime <  part.dateUntil" + NL //                      //$NON-NLS-1$
@@ -335,10 +347,14 @@ public class TVIEquipmentView_Part extends TVIEquipmentView_Item {
                + appFilter.getWhereClause()
                + partFilter.getSqlString()
 
-               + "WHERE part.iscollate = TRUE" + NL //                                          //$NON-NLS-1$
-               + "   AND part.partid = ?" + NL //                                               //$NON-NLS-1$
+               + "	WHERE part.IsCollate = TRUE" + NL //                                       //$NON-NLS-1$
+               + "     AND part.PartId = ?" + NL //                                             //$NON-NLS-1$
 
-               + "GROUP BY TourData.STARTYEAR" + NL //                                          //$NON-NLS-1$
+               + ") AS tdFields" + NL //                                                        //$NON-NLS-1$
+
+               + "GROUP BY StartYear" + NL //                                                   //$NON-NLS-1$
+
+               + "ORDER BY StartYear" + NL //                                                   //$NON-NLS-1$
          ;
 
          final PreparedStatement statement = conn.prepareStatement(sql);
