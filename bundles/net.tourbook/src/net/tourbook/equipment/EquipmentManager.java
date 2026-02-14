@@ -43,7 +43,6 @@ import javax.persistence.EntityManager;
 import javax.persistence.Query;
 
 import net.tourbook.Messages;
-import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.UI;
 import net.tourbook.common.time.TimeTools;
 import net.tourbook.common.util.ImageUtils;
@@ -58,6 +57,7 @@ import net.tourbook.data.TourData;
 import net.tourbook.database.ITourDataUpdate_OnlyUpdate;
 import net.tourbook.database.MyTourbookException;
 import net.tourbook.database.TourDatabase;
+import net.tourbook.tag.TagManager;
 import net.tourbook.tour.TourEvent;
 import net.tourbook.tour.TourEventId;
 import net.tourbook.tour.TourLogManager;
@@ -66,15 +66,20 @@ import net.tourbook.tour.TourManager;
 import net.tourbook.ui.ITourProvider;
 import net.tourbook.ui.ITourProvider2;
 import net.tourbook.ui.ITourProviderByID;
-import net.tourbook.ui.views.tourDataEditor.TourDataEditorView;
 
 import org.eclipse.jface.dialogs.IDialogConstants;
-import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.dialogs.MessageDialog;
+import org.eclipse.jface.layout.GridDataFactory;
+import org.eclipse.jface.layout.GridLayoutFactory;
+import org.eclipse.jface.layout.PixelConverter;
 import org.eclipse.jface.window.Window;
+import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.BusyIndicator;
+import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.internal.DPIUtil;
+import org.eclipse.swt.layout.GridLayout;
+import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
 
@@ -112,11 +117,7 @@ public class EquipmentManager {
          EXPAND_TYPE_YEAR_MONTH_TOUR
    };
 
-   private static EquipmentContentLayout     _equipmentContentLayout;
-   private static int                        _equipmentImageSize_Content;
    private static int                        _equipmentImageSize_View;
-   private static int                        _equipmentNumContentColumns;
-   private static int                        _equipmentTextWidth;
 
    /**
     * Key is the image file path
@@ -175,6 +176,16 @@ public class EquipmentManager {
    private static ConcurrentSkipListSet<String>     _allServiceNames;
    private static ConcurrentSkipListSet<String>     _allSizes;
    private static ConcurrentSkipListSet<String>     _allTypes;
+
+   private static final List<EquipmentUIContent>    _allEquipmentUIContainer = new ArrayList<>();
+
+   private static class EquipmentUIContent {
+
+      Composite container;
+
+      Label     label1;
+      Label     label2;
+   }
 
    /**
     * Clear all equipment resources and tours within MT and fire a equipment modify event, ensure
@@ -253,6 +264,13 @@ public class EquipmentManager {
 
       _imageCache_Content.invalidateAll();
       _imageCache_View.invalidateAll();
+   }
+
+   public static void disposeEquipmentUIContent() {
+
+      _allEquipmentUIContainer.forEach(tagUIContent -> tagUIContent.container.dispose());
+
+      _allEquipmentUIContainer.clear();
    }
 
    public static void equipment_Add(final Collection<Equipment> allEquipment,
@@ -696,6 +714,59 @@ public class EquipmentManager {
       updateTours(tourProvider, tourDataUpdater, isSaveTour);
    }
 
+   public static Map<Long, String> fetchEquipmentAccumulatedValuesxxx() {
+
+      final String sqlQuery = UI.EMPTY_STRING
+
+            + "SELECT" + NL //                                                               //$NON-NLS-1$
+
+            + "jTdataTtag.TOURTAG_TAGID," + NL //                                      1     //$NON-NLS-1$
+            + "SUM(tourData.TOURDISTANCE) AS TOTALDISTANCE," + NL //                   2     //$NON-NLS-1$
+            + "SUM(tourData.TOURDEVICETIME_RECORDED) AS TOTALRECORDEDTIME" + NL //     3     //$NON-NLS-1$
+
+            + "FROM " + TourDatabase.JOINTABLE__TOURDATA__TOURTAG + " jTdataTtag" + NL //    //$NON-NLS-1$ //$NON-NLS-2$
+            + "INNER JOIN " + TourDatabase.TABLE_TOUR_DATA + NL //                           //$NON-NLS-1$
+            + "ON jTdataTtag.TOURDATA_TOURID = tourData.TOURID" + NL //                      //$NON-NLS-1$
+
+            + "GROUP BY jTdataTtag.TOURTAG_TAGID" //                                         //$NON-NLS-1$
+      ;
+
+      final Map<Long, String> tourTagsAccumulatedValues = new HashMap<>();
+
+      try (Connection connection = TourDatabase.getInstance().getConnection();
+            final PreparedStatement preparedStatement = connection.prepareStatement(sqlQuery)) {
+
+         final ResultSet result = preparedStatement.executeQuery();
+
+         while (result.next()) {
+
+            final long tourTagId = result.getLong(1);
+            float usedMiles = result.getLong(2);
+            final long usedHours = result.getLong(3);
+
+            usedMiles = usedMiles / 1000 / net.tourbook.common.UI.UNIT_VALUE_DISTANCE;
+
+            final StringBuilder sb = new StringBuilder();
+
+            sb.append(Math.round(usedHours / 3600f));
+            sb.append(UI.SPACE + net.tourbook.common.UI.UNIT_LABEL_TIME);
+
+            sb.append(NL);
+
+            sb.append(Math.round(usedMiles));
+            sb.append(UI.SPACE + net.tourbook.common.UI.UNIT_LABEL_DISTANCE);
+
+            tourTagsAccumulatedValues.put(tourTagId, sb.toString());
+         }
+
+      } catch (final SQLException e) {
+
+         SQL.showException(e, sqlQuery);
+      }
+
+      return tourTagsAccumulatedValues;
+   }
+
    /**
     * @return Returns a map with all equipments, key is the equipment ID
     */
@@ -882,9 +953,42 @@ public class EquipmentManager {
       return _allTypes;
    }
 
-   public static int getEquipmentContentImageSize() {
+   /**
+    * For a given image file path, try to retrieve the already created
+    * Image resource from the cache.
+    * Otherwise, create an image resource, and put it in the cache
+    *
+    * @param equipment
+    *
+    * @return Return the equipment image or <code>null</code> when not available
+    */
+   public static Image getEquipmentImage(final Equipment equipment) {
 
-      return _equipmentImageSize_Content;
+      final String imageFilePath = equipment.getImageFilePath();
+
+      if (StringUtils.isNullOrEmpty(imageFilePath)) {
+         return null;
+      }
+
+      Image equipmentImage = _imageCache_Content.getIfPresent(imageFilePath);
+
+      if (equipmentImage == null) {
+
+         try {
+
+            equipmentImage = ImageUtils.createImage(imageFilePath, TagManager.getTagContent_ImageSize());
+
+         } catch (final IOException e) {
+
+            return null;
+         }
+
+         if (equipmentImage != null) {
+            _imageCache_Content.put(imageFilePath, equipmentImage);
+         }
+      }
+
+      return equipmentImage;
    }
 
    /**
@@ -916,7 +1020,7 @@ public class EquipmentManager {
 
          if (equipmentImage == null) {
 
-            final int imageSizeScaled = (int) (_equipmentImageSize_Content * deviceScale);
+            final int imageSizeScaled = (int) (TagManager.getTagContent_ImageSize() * deviceScale);
 
             equipmentImage = ImageUtils.createImage(imageFilePath, imageSizeScaled);
 
@@ -946,10 +1050,6 @@ public class EquipmentManager {
       }
 
       return null;
-   }
-
-   public static int getEquipmentImageSize_Content() {
-      return _equipmentImageSize_Content;
    }
 
    /**
@@ -1214,29 +1314,6 @@ public class EquipmentManager {
 
    private static void restoreEquipmentContentValues() {
 
-      final IDialogSettings state = TourbookPlugin.getState(TourDataEditorView.ID);
-
-      _equipmentContentLayout = (EquipmentContentLayout) Util.getStateEnum(state,
-            TourDataEditorView.STATE_EQUIPMENT_CONTENT_LAYOUT,
-            TourDataEditorView.STATE_EQUIPMENT_CONTENT_LAYOUT_DEFAULT);
-
-      _equipmentTextWidth = Util.getStateInt(state,
-            TourDataEditorView.STATE_EQUIPMENT_TEXT_WIDTH,
-            TourDataEditorView.STATE_EQUIPMENT_TEXT_WIDTH_DEFAULT,
-            TourDataEditorView.STATE_EQUIPMENT_TEXT_WIDTH_MIN,
-            TourDataEditorView.STATE_EQUIPMENT_TEXT_WIDTH_MAX);
-
-      _equipmentImageSize_Content = Util.getStateInt(state,
-            TourDataEditorView.STATE_EQUIPMENT_IMAGE_SIZE,
-            TourDataEditorView.STATE_EQUIPMENT_IMAGE_SIZE_DEFAULT,
-            TourDataEditorView.STATE_EQUIPMENT_IMAGE_SIZE_MIN,
-            TourDataEditorView.STATE_EQUIPMENT_IMAGE_SIZE_MAX);
-
-      _equipmentNumContentColumns = Util.getStateInt(state,
-            TourDataEditorView.STATE_EQUIPMENT_NUM_CONTENT_COLUMNS,
-            TourDataEditorView.STATE_EQUIPMENT_NUM_CONTENT_COLUMNS_DEFAULT,
-            TourDataEditorView.STATE_EQUIPMENT_NUM_CONTENT_COLUMNS_MIN,
-            TourDataEditorView.STATE_EQUIPMENT_NUM_CONTENT_COLUMNS_MAX);
    }
 
    private static void saveAndNotify(final ITourProvider tourProvider,
@@ -1277,31 +1354,9 @@ public class EquipmentManager {
 
    public static void updateEquipmentContent() {
 
-      // get old values
-      final EquipmentContentLayout equipmentContentLayout = _equipmentContentLayout;
-      final int equipmentTextWidth = _equipmentTextWidth;
-      final int equipmentImageSize = _equipmentImageSize_Content;
-      final int equipmentNumContentColumns = _equipmentNumContentColumns;
-
-      // update values from the state
-      restoreEquipmentContentValues();
-
-      // check if values are modified
-      if (equipmentContentLayout == _equipmentContentLayout
-            && equipmentImageSize == _equipmentImageSize_Content
-            && equipmentTextWidth == _equipmentTextWidth
-            && equipmentNumContentColumns == _equipmentNumContentColumns) {
-
-         // equipment content is not modified -> nothing to do
-
-         return;
-      }
-
       // dispose equipment content
       _imageCache_Content.invalidateAll();
-
-      // fire event that the equipment content is redisplayed
-      TourManager.fireEvent(TourEventId.EQUIPMENT_CONTENT_CHANGED);
+      disposeEquipmentUIContent();
    }
 
    /**
@@ -1350,7 +1405,9 @@ public class EquipmentManager {
     *           When <code>true</code> then the equipment are displayed as a list, otherwise
     *           horizontally
     */
-   public static void updateUI_Equipment(final TourData tourData, final Label equipmentLabel, final boolean isVertical) {
+   public static void updateUI_Equipment(final TourData tourData,
+                                         final Label equipmentLabel,
+                                         final boolean isVertical) {
 
       final Set<Equipment> allEquipment = tourData.getEquipment();
 
@@ -1364,6 +1421,175 @@ public class EquipmentManager {
 
          equipmentLabel.setText(equipmentLabels);
          equipmentLabel.setToolTipText(equipmentLabels);
+      }
+   }
+
+   public static void updateUI_EquipmentWithImage(final PixelConverter pc,
+                                                  final Set<Equipment> allEquipment,
+                                                  final Composite contentContainer) {
+
+      final int numEquipment = allEquipment.size();
+
+      if (numEquipment == 0) {
+         return;
+      }
+
+      final Equipment[] allEquipmentSorted = allEquipment.toArray(new Equipment[numEquipment]);
+
+      // sort equipment by name
+      Arrays.sort(allEquipmentSorted);
+
+      // update number of equipment content columns
+      ((GridLayout) contentContainer.getLayout()).numColumns = TagManager.getTagContent_NumContentColumns();
+
+      // create missing equipment UI container
+      updateUI_EquipmentWithImages_CreateUIContainer(pc, contentContainer, numEquipment);
+
+      /*
+       * Check if any equipment images are available
+       */
+      boolean isAnyEquipmentImageAvailable = false;
+
+      for (final Equipment equipment : allEquipmentSorted) {
+
+         final Image equipmentImage = getEquipmentImage(equipment);
+
+         if (equipmentImage != null) {
+
+            isAnyEquipmentImageAvailable = true;
+
+            break;
+         }
+      }
+
+      /*
+       * Fill equipment content
+       */
+      final Map<Long, String> tourEquipmentAccumulatedValues = fetchEquipmentAccumulatedValues();
+      final ArrayList<EquipmentUIContent> notNeededEquipment = new ArrayList<>();
+
+      final GridDataFactory gd = GridDataFactory.fillDefaults();
+
+      for (int equipmentIndex = 0; equipmentIndex < _allEquipmentUIContainer.size(); equipmentIndex++) {
+
+         final EquipmentUIContent equipmentUIContent = _allEquipmentUIContainer.get(equipmentIndex);
+
+         if (equipmentIndex < numEquipment) {
+
+            final Equipment equipment = allEquipmentSorted[equipmentIndex];
+            final long equipmentId = equipment.getEquipmentId();
+
+            final String equipmentText = equipment.getName() + UI.NEW_LINE + tourEquipmentAccumulatedValues.get(equipmentId);
+
+            final Label label1 = equipmentUIContent.label1;
+            final Label label2 = equipmentUIContent.label2;
+
+            if (isAnyEquipmentImageAvailable) {
+
+               // 1st label shows the equipment image
+               // 2nd label shows the equipment text
+
+               final Image equipmentImage = getEquipmentImage(equipment);
+
+               label1.setText(UI.EMPTY_STRING);
+
+               // !!! IMPORTANT: image must be set AFTER the text, otherwise the image is not displayed !!!
+               label1.setImage(equipmentImage);
+
+               label2.setVisible(true);
+               label2.setText(equipmentText);
+
+               gd.grab(false, false).hint(TagManager.getTagContent_ImageSize(), SWT.DEFAULT).applyTo(label1);
+               gd.grab(true, false).applyTo(label2);
+
+            } else {
+
+               // 1st label shows the equipment text
+               // 2nd label is hidden
+
+               label1.setText(equipmentText);
+               label1.setImage(null);
+
+               label2.setVisible(false);
+               label2.setText(UI.EMPTY_STRING);
+
+               gd.grab(true, false).hint(SWT.DEFAULT, SWT.DEFAULT).applyTo(label1);
+               gd.grab(false, false).applyTo(label2);
+            }
+
+         } else {
+
+            // there are no more equipment -> dispose remaining UI container
+
+            notNeededEquipment.add(equipmentUIContent);
+         }
+      }
+
+      /*
+       * Not used equipment UI container must be disposed and removed otherwise they still occupy UI
+       * space
+       * :-(
+       */
+      notNeededEquipment.forEach(equipmentUIContent -> {
+         equipmentUIContent.container.dispose();
+      });
+
+      _allEquipmentUIContainer.removeAll(notNeededEquipment);
+   }
+
+   /**
+    * Create missing equipment UI container
+    *
+    * @param pc
+    * @param equipmentContainer
+    * @param numEquipment
+    */
+   private static void updateUI_EquipmentWithImages_CreateUIContainer(final PixelConverter pc,
+                                                                      final Composite equipmentContainer,
+                                                                      final int numEquipment) {
+
+      final int numMissingUIContainer = numEquipment - _allEquipmentUIContainer.size();
+
+      if (numMissingUIContainer > 0) {
+
+         final int equipmentContentWidth = TagManager.getTagContent_ImageSize() + TagManager.getTagContent_TextWidth();
+
+         final Color backgroundColor = equipmentContainer.getBackground();
+
+         final GridDataFactory gdContainer = GridDataFactory.fillDefaults().hint(equipmentContentWidth, SWT.DEFAULT);
+
+         for (int numCreated = 0; numCreated < numMissingUIContainer; numCreated++) {
+
+            Label label1;
+            Label label2;
+
+            final EquipmentUIContent equipmentUIContent = new EquipmentUIContent();
+
+            final Composite container = new Composite(equipmentContainer, SWT.NONE);
+            gdContainer.applyTo(container);
+            GridLayoutFactory.fillDefaults().numColumns(2).applyTo(container);
+            {
+               label1 = new Label(container, SWT.WRAP);
+               GridDataFactory.fillDefaults().hint(TagManager.getTagContent_ImageSize(), SWT.DEFAULT).applyTo(label1);
+
+               label2 = new Label(container, SWT.WRAP);
+               GridDataFactory.fillDefaults().grab(true, false).applyTo(label2);
+
+               equipmentUIContent.container = container;
+               equipmentUIContent.label1 = label1;
+               equipmentUIContent.label2 = label2;
+            }
+
+            container.setBackground(backgroundColor);
+            label1.setBackground(backgroundColor);
+            label2.setBackground(backgroundColor);
+
+//            container.setBackground(net.tourbook.common.UI.SYS_COLOR_RED);
+//            label1.setBackground(net.tourbook.common.UI.SYS_COLOR_GREEN);
+//            label2.setBackground(net.tourbook.common.UI.SYS_COLOR_YELLOW);
+
+            _allEquipmentUIContainer.add(equipmentUIContent);
+         }
       }
    }
 

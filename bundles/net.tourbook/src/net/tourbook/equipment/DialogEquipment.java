@@ -31,6 +31,7 @@ import net.tourbook.common.util.ImageUtils;
 import net.tourbook.common.util.StringUtils;
 import net.tourbook.common.util.Util;
 import net.tourbook.data.Equipment;
+import net.tourbook.tag.TagManager;
 
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.IDialogSettings;
@@ -571,7 +572,7 @@ public class DialogEquipment extends TitleAreaDialog {
 
                UI.createSpacer_Horizontal(_container);
 
-               final int imageSize = EquipmentManager.getEquipmentImageSize_Content();
+               final int imageSize = TagManager.getTagContent_ImageSize();
 
                _canvasEquipmentImage = new Label(_container, SWT.WRAP);
                GridDataFactory.fillDefaults()

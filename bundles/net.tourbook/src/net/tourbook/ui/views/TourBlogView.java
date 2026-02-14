@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2026 Wolfgang Schramm and Contributors
+ * Copyright (C) 2014, 2026 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -341,8 +341,8 @@ public class TourBlogView extends ViewPart {
                   updateUI();
                }
             }
-         } else if (eventId == TourEventId.TAG_CONTENT_CHANGED ||
-               eventId == TourEventId.TAG_STRUCTURE_CHANGED
+         } else if (eventId == TourEventId.CONTENT_LAYOUT_CHANGED
+               || eventId == TourEventId.TAG_STRUCTURE_CHANGED
                || eventId == TourEventId.EQUIPMENT_STRUCTURE_CHANGED) {
 
             reloadTourData();

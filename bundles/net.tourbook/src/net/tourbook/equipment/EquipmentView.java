@@ -924,7 +924,7 @@ public class EquipmentView extends ViewPart implements ITourProvider, ITourViewe
 
          if (tourEventId == TourEventId.TOUR_CHANGED
                || tourEventId == TourEventId.EQUIPMENT_STRUCTURE_CHANGED
-               || tourEventId == TourEventId.EQUIPMENT_CONTENT_CHANGED // equipment image size is modified
+               || tourEventId == TourEventId.CONTENT_LAYOUT_CHANGED // equipment image size is modified
          ) {
 
             reloadViewer();
@@ -3831,8 +3831,8 @@ public class EquipmentView extends ViewPart implements ITourProvider, ITourViewe
          _selectedTreeItemHeight = Util.getStateInt(_state,
                TourDataEditorView.STATE_EQUIPMENT_VIEWER_IMAGE_HEIGHT,
                _defaultTreeItemHeight,
-               TourDataEditorView.STATE_EQUIPMENT_IMAGE_SIZE_MIN,
-               TourDataEditorView.STATE_EQUIPMENT_IMAGE_SIZE_MAX);
+               TourDataEditorView.STATE_CONTENT_IMAGE_SIZE_MIN,
+               TourDataEditorView.STATE_CONTENT_IMAGE_SIZE_MAX);
       }
    }
 

@@ -1998,7 +1998,6 @@ public class Messages extends NLS {
    public static String        pref_tourtag_dlg_reset_message;
    public static String        pref_tourtag_dlg_reset_title;
    public static String        pref_tourtag_hint;
-   public static String        Pref_TourTag_Lable_TagImageSize;
    public static String        Pref_TourTag_Link_AppearanceOptions;
    public static String        pref_tourtag_viewer_title;
 
@@ -2805,7 +2804,6 @@ public class Messages extends NLS {
    public static String        Slideout_TourEditor_Combo_ElevationFromSRTM;
    public static String        Slideout_TourEditor_Combo_ScrollFieldContent_WhenFocused;
    public static String        Slideout_TourEditor_Combo_ScrollFieldContent_WhenHovered;
-   public static String        Slideout_TourEditor_Group_Tags;
    public static String        Slideout_TourEditor_Label_DeleteTimeSlices;
    public static String        Slideout_TourEditor_Label_LatLonDigits;
    public static String        Slideout_TourEditor_Label_LatLonDigits_Tooltip;

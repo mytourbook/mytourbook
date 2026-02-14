@@ -15,6 +15,8 @@
  *******************************************************************************/
 package net.tourbook.preferences;
 
+import static org.eclipse.swt.events.SelectionListener.widgetSelectedAdapter;
+
 import de.byteholder.geoclipse.preferences.IMappingPreferences;
 
 import java.util.ArrayList;
@@ -28,14 +30,18 @@ import net.tourbook.common.UI;
 import net.tourbook.common.color.ThemeUtil;
 import net.tourbook.common.font.FontFieldEditorExtended;
 import net.tourbook.common.preferences.ICommonPreferences;
+import net.tourbook.common.util.Util;
 import net.tourbook.statistic.StatisticValuesView;
+import net.tourbook.tag.TagManager;
 import net.tourbook.tag.TagMenuManager;
+import net.tourbook.ui.views.tourDataEditor.TourDataEditorView;
 
 import org.eclipse.e4.core.contexts.IEclipseContext;
 import org.eclipse.e4.ui.css.swt.theme.ITheme;
 import org.eclipse.e4.ui.css.swt.theme.IThemeEngine;
 import org.eclipse.e4.ui.model.application.MApplication;
 import org.eclipse.jface.dialogs.IDialogConstants;
+import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.fieldassist.ControlDecoration;
 import org.eclipse.jface.fieldassist.FieldDecorationRegistry;
@@ -70,6 +76,8 @@ public class PrefPageAppearance extends PreferencePage implements IWorkbenchPref
 
    private static final IPreferenceStore _prefStore        = TourbookPlugin.getPrefStore();
    private static final IPreferenceStore _prefStore_Common = CommonActivator.getPrefStore();
+
+   private static final IDialogSettings  _state            = TourbookPlugin.getState(TourDataEditorView.ID);
 
    private boolean                       _isShowInApp_MemoryMonitor;
    private boolean                       _isShowInApp_RestartApp;
@@ -114,6 +122,7 @@ public class PrefPageAppearance extends PreferencePage implements IWorkbenchPref
    private Label   _lblAutoTagDelay;
 
    private Spinner _spinnerAutoOpenDelay;
+   private Spinner _spinnerContentImageSize;
    private Spinner _spinnerNotificationMessagesDuration;
    private Spinner _spinnerRecentTags;
 
@@ -270,6 +279,31 @@ public class PrefPageAppearance extends PreferencePage implements IWorkbenchPref
                   _uiFontEditor.store();
                });
             }
+         }
+         {
+            /*
+             * Tag image size
+             */
+
+            // label
+            final Label label = new Label(group, SWT.NONE);
+            label.setText("Content &image size");
+            label.setToolTipText("These images are displays for e.g. tags or equipment");
+            GridDataFactory.fillDefaults().align(SWT.FILL, SWT.CENTER).applyTo(label);
+
+            // spinner
+            _spinnerContentImageSize = new Spinner(group, SWT.BORDER);
+            _spinnerContentImageSize.setMinimum(TourDataEditorView.STATE_CONTENT_IMAGE_SIZE_MIN);
+            _spinnerContentImageSize.setMaximum(TourDataEditorView.STATE_CONTENT_IMAGE_SIZE_MAX);
+            _spinnerContentImageSize.addSelectionListener(widgetSelectedAdapter(selectionEvent -> onSelect_ContentImageLayout()));
+            _spinnerContentImageSize.addMouseWheelListener(mouseEvent -> {
+               UI.adjustSpinnerValueOnMouseScroll(mouseEvent, 10);
+               onSelect_ContentImageLayout();
+            });
+            GridDataFactory.fillDefaults()
+                  .hint(_pc.convertWidthInCharsToPixels(5), SWT.DEFAULT)
+                  .align(SWT.BEGINNING, SWT.FILL)
+                  .applyTo(_spinnerContentImageSize);
          }
       }
    }
@@ -561,6 +595,16 @@ public class PrefPageAppearance extends PreferencePage implements IWorkbenchPref
             Messages.Pref_Appearance_Dialog_ResetAllToggleDialogs_Message);
    }
 
+   private void onSelect_ContentImageLayout() {
+
+      _state.put(TourDataEditorView.STATE_CONTENT_IMAGE_SIZE, _spinnerContentImageSize.getSelection());
+
+      enableControls();
+
+      // run async because it can take time to reload the tag images
+      _spinnerContentImageSize.getDisplay().asyncExec(() -> TagManager.updateTagContent());
+   }
+
    private void onSelectDisabledIcons() {
 
       final DisabledIcons selectedDisabledIcon = getSelectedDisabledIcon();
@@ -826,6 +870,15 @@ public class PrefPageAppearance extends PreferencePage implements IWorkbenchPref
       }
 
       _currentDisabledIcons = _prefDisabledIcons = getPrefDisabledIcons(false);
+
+      /*
+       * Content image
+       */
+      _spinnerContentImageSize.setSelection(Util.getStateInt(_state,
+            TourDataEditorView.STATE_CONTENT_IMAGE_SIZE,
+            TourDataEditorView.STATE_CONTENT_IMAGE_SIZE_DEFAULT,
+            TourDataEditorView.STATE_CONTENT_IMAGE_SIZE_MIN,
+            TourDataEditorView.STATE_CONTENT_IMAGE_SIZE_MAX));
 
 // SET_FORMATTING_OFF
 

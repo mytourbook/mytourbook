@@ -41,7 +41,8 @@ New / Improvements
 Changes
 =======
 
-*   
+* Tag 
+  - Moved tag content image size into pref page "Appearance" 
 
 
 Changes that require Tour Re-import

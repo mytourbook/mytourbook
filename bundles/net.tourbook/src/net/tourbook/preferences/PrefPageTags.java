@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2025 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2026 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -38,7 +38,6 @@ import net.tourbook.common.util.ColumnManager;
 import net.tourbook.common.util.ITourViewer;
 import net.tourbook.common.util.ITreeViewer;
 import net.tourbook.common.util.TreeViewerItem;
-import net.tourbook.common.util.Util;
 import net.tourbook.data.TourTag;
 import net.tourbook.data.TourTagCategory;
 import net.tourbook.database.TourDatabase;
@@ -56,7 +55,6 @@ import net.tourbook.tour.TourLogManager.AutoOpenEvent;
 import net.tourbook.tour.TourManager;
 import net.tourbook.ui.action.ActionCollapseAll;
 import net.tourbook.ui.action.ActionExpandSelection;
-import net.tourbook.ui.views.tourDataEditor.TourDataEditorView;
 
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IMenuManager;
@@ -64,12 +62,10 @@ import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.action.Separator;
 import org.eclipse.jface.action.ToolBarManager;
 import org.eclipse.jface.dialogs.IDialogConstants;
-import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.dialogs.InputDialog;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
-import org.eclipse.jface.layout.PixelConverter;
 import org.eclipse.jface.layout.TreeColumnLayout;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.preference.PreferencePage;
@@ -108,7 +104,6 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Link;
-import org.eclipse.swt.widgets.Spinner;
 import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.swt.widgets.Tree;
 import org.eclipse.swt.widgets.TreeColumn;
@@ -122,12 +117,11 @@ import org.eclipse.ui.dialogs.PreferencesUtil;
  */
 public class PrefPageTags extends PreferencePage implements IWorkbenchPreferencePage, ITourViewer, ITreeViewer {
 
-   public static final String            ID            = "net.tourbook.preferences.PrefPageTags";       //$NON-NLS-1$
+   public static final String            ID            = "net.tourbook.preferences.PrefPageTags"; //$NON-NLS-1$
 
-   private static final String           SORT_PROPERTY = "sort";                                        //$NON-NLS-1$
+   private static final String           SORT_PROPERTY = "sort";                                  //$NON-NLS-1$
 
    private static final IPreferenceStore _prefStore    = TourbookPlugin.getPrefStore();
-   private static final IDialogSettings  _state        = TourbookPlugin.getState(TourDataEditorView.ID);
 
    private IPropertyChangeListener       _prefChangeListener;
 
@@ -145,8 +139,6 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
    private boolean                       _isSelectedWithKeyboard;
 
    private long                          _dragStartTime;
-
-   private PixelConverter                _pc;
 
    /*
     * Image resources
@@ -167,8 +159,6 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
    private Button             _btnNewTag;
    private Button             _btnNewTagCategory;
    private Button             _btnReset;
-
-   private Spinner            _spinnerTag_ImageSize;
 
    private ITourEventListener _tourEventListener;
 
@@ -340,7 +330,7 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
 
       _tourEventListener = (workbenchPart, tourEventId, eventData) -> {
 
-         if (tourEventId == TourEventId.TAG_CONTENT_CHANGED) {
+         if (tourEventId == TourEventId.CONTENT_LAYOUT_CHANGED) {
 
             // redisplay tour tags
 
@@ -762,30 +752,6 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
          }
          {
             /*
-             * Tag image size
-             */
-
-            // label
-            final Label label = new Label(container, SWT.NONE);
-            label.setText(Messages.Pref_TourTag_Lable_TagImageSize);
-            GridDataFactory.fillDefaults().align(SWT.FILL, SWT.CENTER).applyTo(label);
-
-            // spinner
-            _spinnerTag_ImageSize = new Spinner(container, SWT.BORDER);
-            _spinnerTag_ImageSize.setMinimum(TourDataEditorView.STATE_TAG_IMAGE_SIZE_MIN);
-            _spinnerTag_ImageSize.setMaximum(TourDataEditorView.STATE_TAG_IMAGE_SIZE_MAX);
-            _spinnerTag_ImageSize.addSelectionListener(widgetSelectedAdapter(selectionEvent -> onSelect_TagLayout()));
-            _spinnerTag_ImageSize.addMouseWheelListener(mouseEvent -> {
-               UI.adjustSpinnerValueOnMouseScroll(mouseEvent, 10);
-               onSelect_TagLayout();
-            });
-            GridDataFactory.fillDefaults()
-                  .hint(_pc.convertWidthInCharsToPixels(5), SWT.DEFAULT)
-                  .align(SWT.BEGINNING, SWT.FILL)
-                  .applyTo(_spinnerTag_ImageSize);
-         }
-         {
-            /*
              * Link to options
              */
             final Link link = new Link(container, SWT.WRAP);
@@ -1095,7 +1061,6 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
 
    private void initUI(final Composite parent) {
 
-      _pc = new PixelConverter(parent);
    }
 
    @Override
@@ -1485,16 +1450,6 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
       }
    }
 
-   private void onSelect_TagLayout() {
-
-      _state.put(TourDataEditorView.STATE_TAG_IMAGE_SIZE, _spinnerTag_ImageSize.getSelection());
-
-      enableControls();
-
-      // run async because it can take time to reload the tag images
-      _spinnerTag_ImageSize.getDisplay().asyncExec(() -> TagManager.updateTagContent());
-   }
-
    private void onTagTree_DoubleClick(final Event event) {
 
       final boolean isCtrl = (event.stateMask & SWT.CTRL) != 0;
@@ -1611,11 +1566,6 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
 
    private void restoreState() {
 
-      _spinnerTag_ImageSize.setSelection(Util.getStateInt(_state,
-            TourDataEditorView.STATE_TAG_IMAGE_SIZE,
-            TourDataEditorView.STATE_TAG_IMAGE_SIZE_DEFAULT,
-            TourDataEditorView.STATE_TAG_IMAGE_SIZE_MIN,
-            TourDataEditorView.STATE_TAG_IMAGE_SIZE_MAX));
    }
 
    private void saveChanges() {

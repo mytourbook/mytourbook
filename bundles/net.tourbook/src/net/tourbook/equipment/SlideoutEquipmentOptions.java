@@ -201,7 +201,7 @@ public class SlideoutEquipmentOptions extends ToolbarSlideout implements IAction
                 */
                _spinnerViewerImageHeight = new Spinner(heightContainer, SWT.BORDER);
                _spinnerViewerImageHeight.setMinimum(getDefaultItemHeight());
-               _spinnerViewerImageHeight.setMaximum(TourDataEditorView.STATE_EQUIPMENT_IMAGE_SIZE_MAX);
+               _spinnerViewerImageHeight.setMaximum(TourDataEditorView.STATE_CONTENT_IMAGE_SIZE_MAX);
                _spinnerViewerImageHeight.setPageIncrement(10);
                _spinnerViewerImageHeight.addSelectionListener(_defaultSelectionListener);
                _spinnerViewerImageHeight.addMouseWheelListener(_defaultMouseWheelListener);
@@ -269,7 +269,7 @@ public class SlideoutEquipmentOptions extends ToolbarSlideout implements IAction
             TourDataEditorView.STATE_EQUIPMENT_VIEWER_IMAGE_HEIGHT,
             defaultItemHeight,
             defaultItemHeight,
-            TourDataEditorView.STATE_EQUIPMENT_IMAGE_SIZE_MAX);
+            TourDataEditorView.STATE_CONTENT_IMAGE_SIZE_MAX);
 
       final boolean isUseDefaultHeight = Util.getStateBoolean(_state, TourDataEditorView.STATE_EQUIPMENT_IS_USE_VIEWER_DEFAULT_HEIGHT, true);
 

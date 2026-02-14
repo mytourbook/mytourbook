@@ -38,12 +38,14 @@ import net.tourbook.common.util.Util;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourTag;
 import net.tourbook.database.TourDatabase;
+import net.tourbook.equipment.EquipmentManager;
 import net.tourbook.tag.tour.filter.TourTagFilterManager;
 import net.tourbook.tag.tour.filter.TourTagFilterProfile;
 import net.tourbook.tour.TourEventId;
 import net.tourbook.tour.TourLogManager;
 import net.tourbook.tour.TourLogManager.AutoOpenEvent;
 import net.tourbook.tour.TourManager;
+import net.tourbook.ui.views.tourDataEditor.ContentLayout;
 import net.tourbook.ui.views.tourDataEditor.TourDataEditorView;
 
 import org.eclipse.jface.dialogs.IDialogConstants;
@@ -81,7 +83,7 @@ public class TagManager {
          TourTag.EXPAND_TYPE_YEAR_MONTH_DAY
    };
 
-   private static TagContentLayout _tagContentLayout;
+   private static ContentLayout    _tagContentLayout;
    private static int              _tagNumContentColumns;
    private static int              _tagImageSize;
    private static int              _tagTextWidth;
@@ -97,16 +99,16 @@ public class TagManager {
 
    public static final TagContentLayoutItem[]   ALL_TAG_CONTENT_LAYOUT = {
 
-         new TagContentLayoutItem(Messages.Tag_ContentLayout_SimpleText, TagContentLayout.SIMPLE_TEXT),
-         new TagContentLayoutItem(Messages.Tag_ContentLayout_ImageAndData, TagContentLayout.IMAGE_AND_DATA),
+         new TagContentLayoutItem(Messages.Tag_ContentLayout_SimpleText, ContentLayout.SIMPLE_TEXT),
+         new TagContentLayoutItem(Messages.Tag_ContentLayout_ImageAndData, ContentLayout.IMAGE_AND_DATA),
    };
 
    public static class TagContentLayoutItem {
 
-      public String           label;
-      public TagContentLayout tagContentLayout;
+      public String        label;
+      public ContentLayout tagContentLayout;
 
-      public TagContentLayoutItem(final String label, final TagContentLayout legendUnitLayout) {
+      public TagContentLayoutItem(final String label, final ContentLayout legendUnitLayout) {
 
          this.label = label;
          this.tagContentLayout = legendUnitLayout;
@@ -563,7 +565,19 @@ public class TagManager {
       return _tagNumContentColumns;
    }
 
-   public static TagContentLayout getTagContentLayout() {
+   public static int getTagContent_ImageSize() {
+      return _tagImageSize;
+   }
+
+   public static int getTagContent_NumContentColumns() {
+      return _tagNumContentColumns;
+   }
+
+   public static int getTagContent_TextWidth() {
+      return _tagTextWidth;
+   }
+
+   public static ContentLayout getTagContentLayout() {
 
       return _tagContentLayout;
    }
@@ -687,27 +701,27 @@ public class TagManager {
 
       final IDialogSettings state = TourbookPlugin.getState(TourDataEditorView.ID);
 
-      _tagContentLayout = (TagContentLayout) Util.getStateEnum(state,
-            TourDataEditorView.STATE_TAG_CONTENT_LAYOUT,
-            TourDataEditorView.STATE_TAG_CONTENT_LAYOUT_DEFAULT);
+      _tagContentLayout = (ContentLayout) Util.getStateEnum(state,
+            TourDataEditorView.STATE_CONTENT_LAYOUT,
+            TourDataEditorView.STATE_CONTENT_LAYOUT_DEFAULT);
 
       _tagTextWidth = Util.getStateInt(state,
-            TourDataEditorView.STATE_TAG_TEXT_WIDTH,
-            TourDataEditorView.STATE_TAG_TEXT_WIDTH_DEFAULT,
-            TourDataEditorView.STATE_TAG_TEXT_WIDTH_MIN,
-            TourDataEditorView.STATE_TAG_TEXT_WIDTH_MAX);
+            TourDataEditorView.STATE_CONTENT_TEXT_WIDTH,
+            TourDataEditorView.STATE_CONTENT_TEXT_WIDTH_DEFAULT,
+            TourDataEditorView.STATE_CONTENT_TEXT_WIDTH_MIN,
+            TourDataEditorView.STATE_CONTENT_TEXT_WIDTH_MAX);
 
       _tagImageSize = Util.getStateInt(state,
-            TourDataEditorView.STATE_TAG_IMAGE_SIZE,
-            TourDataEditorView.STATE_TAG_IMAGE_SIZE_DEFAULT,
-            TourDataEditorView.STATE_TAG_IMAGE_SIZE_MIN,
-            TourDataEditorView.STATE_TAG_IMAGE_SIZE_MAX);
+            TourDataEditorView.STATE_CONTENT_IMAGE_SIZE,
+            TourDataEditorView.STATE_CONTENT_IMAGE_SIZE_DEFAULT,
+            TourDataEditorView.STATE_CONTENT_IMAGE_SIZE_MIN,
+            TourDataEditorView.STATE_CONTENT_IMAGE_SIZE_MAX);
 
       _tagNumContentColumns = Util.getStateInt(state,
-            TourDataEditorView.STATE_TAG_NUM_CONTENT_COLUMNS,
-            TourDataEditorView.STATE_TAG_NUM_CONTENT_COLUMNS_DEFAULT,
-            TourDataEditorView.STATE_TAG_NUM_CONTENT_COLUMNS_MIN,
-            TourDataEditorView.STATE_TAG_NUM_CONTENT_COLUMNS_MAX);
+            TourDataEditorView.STATE_CONTENT_NUM_COLUMNS,
+            TourDataEditorView.STATE_CONTENT_NUM_COLUMNS_DEFAULT,
+            TourDataEditorView.STATE_CONTENT_NUM_CONTENT_COLUMNS_MIN,
+            TourDataEditorView.STATE_CONTENT_NUM_CONTENT_COLUMNS_MAX);
    }
 
    /**
@@ -716,7 +730,7 @@ public class TagManager {
    public static void updateTagContent() {
 
       // get old values
-      final TagContentLayout tagContentLayout = _tagContentLayout;
+      final ContentLayout tagContentLayout = _tagContentLayout;
       final int tagTextWidth = _tagTextWidth;
       final int tagImageSize = _tagImageSize;
       final int tagNumContentColumns = _tagNumContentColumns;
@@ -739,8 +753,11 @@ public class TagManager {
       disposeTagImages();
       disposeTagUIContent();
 
+      // update equipment content layout values which are the same as the tags
+      EquipmentManager.updateEquipmentContent();
+
       // fire event that the tag content is redisplayed
-      TourManager.fireEvent(TourEventId.TAG_CONTENT_CHANGED);
+      TourManager.fireEvent(TourEventId.CONTENT_LAYOUT_CHANGED);
    }
 
    /**
@@ -775,7 +792,9 @@ public class TagManager {
     * @param isVertical
     *           When <code>true</code> the tags are displayed as a list, otherwise horizontally
     */
-   public static void updateUI_Tags(final TourData tourData, final Label tourTagLabel, final boolean isVertical) {
+   public static void updateUI_Tags(final TourData tourData,
+                                    final Label tourTagLabel,
+                                    final boolean isVertical) {
 
       // tour tags
       final Set<TourTag> tourTags = tourData.getTourTags();

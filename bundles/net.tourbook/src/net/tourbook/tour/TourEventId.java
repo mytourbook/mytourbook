@@ -87,20 +87,15 @@ public enum TourEventId {
    EQUIPMENT_STRUCTURE_CHANGED,
 
    /**
-    * Equipment content has changed, e.g. equipment image size
-    */
-   EQUIPMENT_CONTENT_CHANGED,
-
-   /**
     * structure of the tags changed, this includes add/remove of tags and categories and
     * tag/category renaming
     */
    TAG_STRUCTURE_CHANGED,
 
    /**
-    * Tag content has changed, e.g. tag image size
+    * Equipment or tag content has changed, e.g. tag image size
     */
-   TAG_CONTENT_CHANGED,
+   CONTENT_LAYOUT_CHANGED,
 
    /**
     * Sliders in the tour chart moved. Property data contains {@link SelectionChartInfo} or
