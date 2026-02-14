@@ -257,11 +257,11 @@ public abstract class TVIEquipmentView_Item extends TreeViewerItem {
 
    void loadSummarizedValues_Equipment(final Map<Long, TVIEquipmentView_Equipment> allEquipmentItems) {
 
-      loadSummarizedValues_Equipment_WithCollate(allEquipmentItems);
-      loadSummarizedValues_Equipment_IgnoreCollate(allEquipmentItems);
+      loadSummarizedValues_Equipment_AllTours(allEquipmentItems);
+      loadSummarizedValues_Equipment_CollateTours(allEquipmentItems);
    }
 
-   private void loadSummarizedValues_Equipment_IgnoreCollate(final Map<Long, TVIEquipmentView_Equipment> allEquipmentItems) {
+   private void loadSummarizedValues_Equipment_AllTours(final Map<Long, TVIEquipmentView_Equipment> allEquipmentItems) {
 
       String sql = null;
       PreparedStatement statement = null;
@@ -269,15 +269,14 @@ public abstract class TVIEquipmentView_Item extends TreeViewerItem {
       try (Connection conn = TourDatabase.getInstance().getConnection()) {
 
          final AppFilter appFilter = createAppFilter();
-         final SQLData partFilter = new EquipmentPartFilter().getSqlData();
 
          sql = UI.EMPTY_STRING
 
                + "--" + NL //                                                                   //$NON-NLS-1$
                + NL
-               + "----------------------------------" + NL //                                   //$NON-NLS-1$
-               + "-- equipment sum - without collate" + NL //                                   //$NON-NLS-1$
-               + "----------------------------------" + NL //                                   //$NON-NLS-1$
+               + "----------------------------" + NL //                                         //$NON-NLS-1$
+               + "-- equipment sum - all tours" + NL //                                         //$NON-NLS-1$
+               + "----------------------------" + NL //                                         //$NON-NLS-1$
                + NL
 
                + "SELECT" + NL //                                                               //$NON-NLS-1$
@@ -287,14 +286,13 @@ public abstract class TVIEquipmentView_Item extends TreeViewerItem {
 
                + "FROM " + TourDatabase.TABLE_EQUIPMENT + NL //                                 //$NON-NLS-1$
 
-               + "JOIN " + TourDatabase.JOINTABLE__TOURDATA__EQUIPMENT + " AS j_Td_Eq" + NL //  //$NON-NLS-1$
+               + "JOIN " + TourDatabase.JOINTABLE__TOURDATA__EQUIPMENT + " AS j_Td_Eq" //       //$NON-NLS-1$
                + "   ON j_Td_Eq.EQUIPMENT_EQUIPMENTID = EQUIPMENT.EQUIPMENTID" + NL //          //$NON-NLS-1$
 
-               + "JOIN " + TourDatabase.TABLE_TOUR_DATA + " AS TourData" + NL //                //$NON-NLS-1$
+               + "JOIN " + TourDatabase.TABLE_TOUR_DATA + " AS TourData" //                     //$NON-NLS-1$
                + "   ON TourData.tourid = j_Td_Eq.tourdata_tourid" + NL //                      //$NON-NLS-1$
 
                + appFilter.getWhereClause()
-               + partFilter.getSqlString()
 
                + "GROUP BY " + NL //                                                            //$NON-NLS-1$
                + "   j_Td_Eq.EQUIPMENT_EQUIPMENTID" + NL //                                     //$NON-NLS-1$
@@ -308,7 +306,6 @@ public abstract class TVIEquipmentView_Item extends TreeViewerItem {
          int nextIndex = 1;
 
          nextIndex = appFilter.setParameters(statement, nextIndex);
-         nextIndex = partFilter.setParameters(statement, nextIndex);
 
          final ResultSet result = statement.executeQuery();
 
@@ -332,7 +329,7 @@ public abstract class TVIEquipmentView_Item extends TreeViewerItem {
       }
    }
 
-   private void loadSummarizedValues_Equipment_WithCollate(final Map<Long, TVIEquipmentView_Equipment> allEquipmentItems) {
+   private void loadSummarizedValues_Equipment_CollateTours(final Map<Long, TVIEquipmentView_Equipment> allEquipmentItems) {
 
       // clone map
       final Map<Long, TVIEquipmentView_Equipment> allEquipmentItemsWithoutTours = new HashMap<>(allEquipmentItems);
@@ -343,40 +340,38 @@ public abstract class TVIEquipmentView_Item extends TreeViewerItem {
       try (Connection conn = TourDatabase.getInstance().getConnection()) {
 
          final AppFilter appFilter = createAppFilter();
-         final SQLData partFilter = new EquipmentPartFilter().getSqlData();
 
          sql = UI.EMPTY_STRING
 
                + "--" + NL //                                                                      //$NON-NLS-1$
                + NL
-               + "-------------------------------" + NL //                                         //$NON-NLS-1$
-               + "-- equipment sum - with collate" + NL //                                         //$NON-NLS-1$
-               + "-------------------------------" + NL //                                         //$NON-NLS-1$
+               + "---------------------------------" + NL //                                       //$NON-NLS-1$
+               + "-- equipment sum - collated tours" + NL //                                       //$NON-NLS-1$
+               + "---------------------------------" + NL //                                       //$NON-NLS-1$
                + NL
 
                + "SELECT" + NL //                                                                  //$NON-NLS-1$
-               + "   equipment.EQUIPMENTID," + NL //                                            1  //$NON-NLS-1$
+               + "   equip.EQUIPMENTID," + NL //                                                1  //$NON-NLS-1$
                + "   COUNT(*) AS num_Tours," + NL //                                            2  //$NON-NLS-1$
 
                + getSQL_SUM_COLUMNS("TourData", 3) //                                           3  //$NON-NLS-1$
 
-               + "FROM " + TourDatabase.TABLE_EQUIPMENT + " AS equipment" + NL //                  //$NON-NLS-1$
+               + "FROM " + TourDatabase.TABLE_EQUIPMENT + " AS equip" + NL //                      //$NON-NLS-1$
 
-               + "JOIN " + TourDatabase.JOINTABLE__TOURDATA__EQUIPMENT + " AS j_Td_Eq" + NL //     //$NON-NLS-1$
-               + "  ON j_Td_Eq.equipment_equipmentid = equipment.EQUIPMENTID" + NL //              //$NON-NLS-1$
+               + "JOIN " + TourDatabase.JOINTABLE__TOURDATA__EQUIPMENT + " AS j_Td_Eq" //          //$NON-NLS-1$
+               + "  ON j_Td_Eq.equipment_equipmentid = equip.EQUIPMENTID" + NL //                  //$NON-NLS-1$
 
                // the alias "TourData" is needed that the app filter is working
-               + "JOIN " + TourDatabase.TABLE_TOUR_DATA + " AS TourData" + NL //                   //$NON-NLS-1$
+               + "JOIN " + TourDatabase.TABLE_TOUR_DATA + " AS TourData" //                        //$NON-NLS-1$
                + "  ON TourData.tourid = j_Td_Eq.tourdata_tourid" + NL //                          //$NON-NLS-1$
-               + "  AND TourData.tourstarttime >= equipment.dateFrom" + NL //                      //$NON-NLS-1$
-               + "  AND TourData.tourstarttime <  equipment.dateUntil" + NL //                     //$NON-NLS-1$
+               + "  AND TourData.tourstarttime >= equip.dateFrom" + NL //                          //$NON-NLS-1$
+               + "  AND TourData.tourstarttime <  equip.dateUntil" + NL //                         //$NON-NLS-1$
 
                + appFilter.getWhereClause()
-               + partFilter.getSqlString()
 
-               + "WHERE equipment.iscollate = true" + NL //                                        //$NON-NLS-1$
+               + "WHERE equip.isCollate = true" + NL //                                            //$NON-NLS-1$
 
-               + "GROUP BY equipment.EQUIPMENTID" + NL //                                          //$NON-NLS-1$
+               + "GROUP BY equip.EQUIPMENTID" + NL //                                              //$NON-NLS-1$
 
                + NL
                + "--" + NL //                                                                      //$NON-NLS-1$
@@ -387,7 +382,6 @@ public abstract class TVIEquipmentView_Item extends TreeViewerItem {
          int nextIndex = 1;
 
          nextIndex = appFilter.setParameters(statement, nextIndex);
-         nextIndex = partFilter.setParameters(statement, nextIndex);
 
          final ResultSet result = statement.executeQuery();
 
