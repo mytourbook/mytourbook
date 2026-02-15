@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2015, 2025 Wolfgang Schramm and Contributors
+ * Copyright (C) 2015, 2026 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -20,6 +20,8 @@ import java.util.ArrayList;
 import net.tourbook.common.UI;
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.data.TourType;
+import net.tourbook.equipment.EquipmentGroup;
+import net.tourbook.equipment.EquipmentGroupManager;
 import net.tourbook.tag.TagGroup;
 import net.tourbook.tag.TagGroupManager;
 import net.tourbook.tour.CadenceMultiplier;
@@ -138,6 +140,16 @@ public class ImportLauncher implements Cloneable {
     */
    public String                   tourTagGroupID;
 
+   /**
+    * When <code>true</code> then all equipment in a groups are set into the tour
+    */
+   public boolean                  isSetEquipmentGroup;
+
+   /**
+    * ID of the {@link EquipmentGroup}
+    */
+   public String                   equipmentGroupID;
+
    public ImportLauncher() {
 
       _id = ++_idCreator;
@@ -198,6 +210,21 @@ public class ImportLauncher implements Cloneable {
       int result = 1;
       result = prime * result + (int) (_id ^ (_id >>> 32));
       return result;
+   }
+
+   /**
+    * @return Returns <code>true</code> when equipment are set into the tour
+    */
+   public boolean isSetEquipment() {
+
+      final EquipmentGroup equipmentGroup = EquipmentGroupManager.getEquipmentGroup(equipmentGroupID);
+
+      if (equipmentGroup != null && isSetEquipmentGroup) {
+
+         return equipmentGroup.allEquipment.size() > 0;
+      }
+
+      return false;
    }
 
    /**

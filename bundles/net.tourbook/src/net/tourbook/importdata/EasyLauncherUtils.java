@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2023, 2025 Wolfgang Schramm and Contributors
+ * Copyright (C) 2023, 2026 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -25,8 +25,11 @@ import net.tourbook.Messages;
 import net.tourbook.common.UI;
 import net.tourbook.common.util.ColumnManager;
 import net.tourbook.common.util.TableColumnDefinition;
+import net.tourbook.data.Equipment;
 import net.tourbook.data.TourTag;
 import net.tourbook.data.TourType;
+import net.tourbook.equipment.EquipmentGroup;
+import net.tourbook.equipment.EquipmentGroupManager;
 import net.tourbook.tag.TagGroup;
 import net.tourbook.tag.TagGroupManager;
 import net.tourbook.tour.CadenceMultiplier;
@@ -65,6 +68,30 @@ public class EasyLauncherUtils {
    {
       _nf1.setMinimumFractionDigits(1);
       _nf1.setMaximumFractionDigits(1);
+   }
+
+   public static void getEquipmentGroupText(final ImportLauncher importLauncher, final StringBuilder sb) {
+
+      final EquipmentGroup equipmentGroup = EquipmentGroupManager.getEquipmentGroup(importLauncher.equipmentGroupID);
+      final Set<Equipment> allEquipment = EquipmentGroupManager.getEquipment(importLauncher.equipmentGroupID);
+
+      if (equipmentGroup == null || allEquipment == null) {
+
+         return;
+      }
+
+      final List<Equipment> sortedEquipment = new ArrayList<>(allEquipment);
+      Collections.sort(sortedEquipment);
+
+      final StringBuilder sbEquipment = new StringBuilder();
+
+      for (final Equipment equipment : sortedEquipment) {
+
+         sbEquipment.append(UI.SPACE3 + equipment.getName() + NL);
+      }
+
+      sb.append(NL);
+      sb.append("Set equipment: %s\n\n%s".formatted(equipmentGroup.name, sbEquipment.toString()));
    }
 
    public static void getTagGroupText(final ImportLauncher importLauncher, final StringBuilder sb) {
@@ -185,7 +212,20 @@ public class EasyLauncherUtils {
          } else {
 
             sb.append(NL);
-            sb.append(Messages.Import_Data_HTML_SetTourTags_NO.formatted());
+            sb.append(Messages.Import_Data_HTML_SetTourTags_NO);
+         }
+      }
+      {
+         // equipment group
+
+         if (importLauncher.isSetEquipmentGroup) {
+
+            getEquipmentGroupText(importLauncher, sb);
+
+         } else {
+
+            sb.append(NL);
+            sb.append("Set equipment: NO");
          }
       }
       {
@@ -280,6 +320,7 @@ public class EasyLauncherUtils {
       defineColumn_10_LauncherName();
       defineColumn_50_03_TourTypeImage();
       defineColumn_50_08_TourTags();
+      defineColumn_50_09_Equipment();
       defineColumn_50_041_Remove2ndLastTimeSliceMarker();
       defineColumn_50_042_LastMarkerDistance();
       defineColumn_50_05_AdjustTemperature();
@@ -547,6 +588,45 @@ public class EasyLauncherUtils {
                final TagGroup tagGroup = TagGroupManager.getTagGroup(importLauncher.tourTagGroupID);
 
                cell.setText(tagGroup == null ? UI.EMPTY_STRING : tagGroup.name);
+
+            } else {
+
+               cell.setText(UI.EMPTY_STRING);
+            }
+         }
+      });
+   }
+
+   private void defineColumn_50_09_Equipment() {
+
+      final TableColumnDefinition colDef = new TableColumnDefinition(_columnManager, "equipment", SWT.LEAD); //$NON-NLS-1$
+
+      colDef.setColumnLabel("Equipment");
+      colDef.setColumnHeaderText("Equipment");
+
+      colDef.setDefaultColumnWidth(_pc.convertWidthInCharsToPixels(10));
+      colDef.setColumnWeightData(new ColumnWeightData(7));
+
+      colDef.setIsDefaultColumn();
+
+      colDef.setLabelProvider(new CellLabelProvider() {
+
+         @Override
+         public String getToolTipText(final Object element) {
+
+            return createLauncherTooltip((ImportLauncher) element);
+         }
+
+         @Override
+         public void update(final ViewerCell cell) {
+
+            final ImportLauncher importLauncher = (ImportLauncher) cell.getElement();
+
+            if (importLauncher.isSetEquipmentGroup) {
+
+               final EquipmentGroup equipmentGroup = EquipmentGroupManager.getEquipmentGroup(importLauncher.equipmentGroupID);
+
+               cell.setText(equipmentGroup == null ? UI.EMPTY_STRING : equipmentGroup.name);
 
             } else {
 

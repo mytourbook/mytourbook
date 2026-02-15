@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2025 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2026 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -2329,7 +2329,20 @@ public class RawDataView extends ViewPart implements
          } else {
 
             sb.append(NL);
-            sb.append(Messages.Import_Data_HTML_SetTourTags_NO.formatted());
+            sb.append(Messages.Import_Data_HTML_SetTourTags_NO);
+         }
+      }
+      {
+         // equipment group
+
+         if (importLauncher.isSetEquipment()) {
+
+            EasyLauncherUtils.getEquipmentGroupText(importLauncher, sb);
+
+         } else {
+
+            sb.append(NL);
+            sb.append("Set equipment: NO");
          }
       }
       {
