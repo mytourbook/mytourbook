@@ -753,14 +753,14 @@ public class EquipmentManager {
    }
 
    /**
-    * @param allTags
+    * @param allEquipment
     *
     * @return Returns a map were the key is the equipment ID and the value is the multiline detailed
     *         text
     */
-   private static Map<Long, String> fetchEquipmentAccumulatedValues(final Set<Equipment> allTags) {
+   public static Map<Long, String> fetchEquipmentAccumulatedValues(final Set<Equipment> allEquipment) {
 
-      final SQLData sqlTagData = createSQLEquipmentParameters(allTags);
+      final SQLData sqlTagData = createSQLEquipmentParameters(allEquipment);
 
       final String sqlQuery = UI.EMPTY_STRING
 

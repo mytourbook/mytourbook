@@ -100,6 +100,7 @@ class SlideoutTourBlogOptions extends ToolbarSlideout implements IActionResetToD
    private Button  _chkDrawMarkerWithDefaultColor;
    private Button  _chkShowHiddenMarker;
    private Button  _chkShowMarkerTime;
+   private Button  _chkShowTourEquipment;
    private Button  _chkShowTourMarkers;
    private Button  _chkShowTourNutrition;
    private Button  _chkShowTourSummary;
@@ -266,6 +267,17 @@ class SlideoutTourBlogOptions extends ToolbarSlideout implements IActionResetToD
             _chkShowTourTags.setToolTipText(Messages.Slideout_TourBlogOptions_Checkbox_ShowTourTags_Tooltip);
             _chkShowTourTags.addSelectionListener(_defaultSelectionListener);
             GridDataFactory.fillDefaults().span(3, 1).applyTo(_chkShowTourTags);
+         }
+         {
+            /*
+             * Display tour equipment
+             */
+
+            _chkShowTourEquipment = new Button(container, SWT.CHECK);
+            _chkShowTourEquipment.setText("Show tour &equipment");
+            _chkShowTourEquipment.setToolTipText("Display all equipment with their image\nand information in the view");
+            _chkShowTourEquipment.addSelectionListener(_defaultSelectionListener);
+            GridDataFactory.fillDefaults().span(3, 1).applyTo(_chkShowTourEquipment);
          }
          {
             /*
@@ -530,6 +542,7 @@ class SlideoutTourBlogOptions extends ToolbarSlideout implements IActionResetToD
       _chkShowHiddenMarker             .setSelection(TourBlogView.STATE_IS_SHOW_HIDDEN_MARKER_DEFAULT);
       _chkShowMarkerTime               .setSelection(TourBlogView.STATE_IS_SHOW_MARKER_TIME_DEFAULT);
       _chkDrawMarkerWithDefaultColor   .setSelection(TourBlogView.STATE_IS_DRAW_MARKER_WITH_DEFAULT_COLOR_DEFAULT);
+      _chkShowTourEquipment            .setSelection(TourBlogView.STATE_IS_SHOW_TOUR_EQUIPMENT_DEFAULT);
       _chkShowTourMarkers              .setSelection(TourBlogView.STATE_IS_SHOW_TOUR_MARKERS_DEFAULT);
       _chkShowTourNutrition            .setSelection(TourBlogView.STATE_IS_SHOW_TOUR_NUTRITION_DEFAULT);
       _chkShowTourSummary              .setSelection(TourBlogView.STATE_IS_SHOW_TOUR_SUMMARY_DEFAULT);
@@ -555,8 +568,9 @@ class SlideoutTourBlogOptions extends ToolbarSlideout implements IActionResetToD
 // SET_FORMATTING_OFF
 
       _chkShowHiddenMarker             .setSelection(Util.getStateBoolean(_state, TourBlogView.STATE_IS_SHOW_HIDDEN_MARKER,              TourBlogView.STATE_IS_SHOW_HIDDEN_MARKER_DEFAULT));
-      _chkShowMarkerTime               .setSelection(Util.getStateBoolean(_state, TourBlogView.STATE_IS_SHOW_MARKER_TIME,                 TourBlogView.STATE_IS_SHOW_MARKER_TIME_DEFAULT));
+      _chkShowMarkerTime               .setSelection(Util.getStateBoolean(_state, TourBlogView.STATE_IS_SHOW_MARKER_TIME,                TourBlogView.STATE_IS_SHOW_MARKER_TIME_DEFAULT));
       _chkDrawMarkerWithDefaultColor   .setSelection(Util.getStateBoolean(_state, TourBlogView.STATE_IS_DRAW_MARKER_WITH_DEFAULT_COLOR,  TourBlogView.STATE_IS_DRAW_MARKER_WITH_DEFAULT_COLOR_DEFAULT));
+      _chkShowTourEquipment            .setSelection(Util.getStateBoolean(_state, TourBlogView.STATE_IS_SHOW_TOUR_EQUIPMENT,             TourBlogView.STATE_IS_SHOW_TOUR_EQUIPMENT_DEFAULT));
       _chkShowTourMarkers              .setSelection(Util.getStateBoolean(_state, TourBlogView.STATE_IS_SHOW_TOUR_MARKERS,               TourBlogView.STATE_IS_SHOW_TOUR_MARKERS_DEFAULT));
       _chkShowTourNutrition            .setSelection(Util.getStateBoolean(_state, TourBlogView.STATE_IS_SHOW_TOUR_NUTRITION,             TourBlogView.STATE_IS_SHOW_TOUR_NUTRITION_DEFAULT));
       _chkShowTourSummary              .setSelection(Util.getStateBoolean(_state, TourBlogView.STATE_IS_SHOW_TOUR_SUMMARY,               TourBlogView.STATE_IS_SHOW_TOUR_SUMMARY_DEFAULT));
@@ -580,6 +594,7 @@ class SlideoutTourBlogOptions extends ToolbarSlideout implements IActionResetToD
       _state.put(TourBlogView.STATE_IS_DRAW_MARKER_WITH_DEFAULT_COLOR,  _chkDrawMarkerWithDefaultColor   .getSelection());
       _state.put(TourBlogView.STATE_IS_SHOW_HIDDEN_MARKER,              _chkShowHiddenMarker             .getSelection());
       _state.put(TourBlogView.STATE_IS_SHOW_MARKER_TIME,                _chkShowMarkerTime               .getSelection());
+      _state.put(TourBlogView.STATE_IS_SHOW_TOUR_EQUIPMENT,             _chkShowTourEquipment            .getSelection());
       _state.put(TourBlogView.STATE_IS_SHOW_TOUR_MARKERS,               _chkShowTourMarkers              .getSelection());
       _state.put(TourBlogView.STATE_IS_SHOW_TOUR_NUTRITION,             _chkShowTourNutrition            .getSelection());
       _state.put(TourBlogView.STATE_IS_SHOW_TOUR_SUMMARY,               _chkShowTourSummary              .getSelection());

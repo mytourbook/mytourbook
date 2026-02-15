@@ -50,12 +50,14 @@ import net.tourbook.common.util.ImageUtils;
 import net.tourbook.common.util.PostSelectionProvider;
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.Util;
+import net.tourbook.data.Equipment;
 import net.tourbook.data.TourBeverageContainer;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourMarker;
 import net.tourbook.data.TourNutritionProduct;
 import net.tourbook.data.TourTag;
 import net.tourbook.database.TourDatabase;
+import net.tourbook.equipment.EquipmentManager;
 import net.tourbook.nutrition.NutritionUtils;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.tag.TagManager;
@@ -124,6 +126,8 @@ public class TourBlogView extends ViewPart {
    static final boolean        STATE_IS_SHOW_HIDDEN_MARKER_DEFAULT             = true;
    static final String         STATE_IS_SHOW_MARKER_TIME                       = "STATE_IS_SHOW_MARKER_TIME";                  //$NON-NLS-1$
    static final boolean        STATE_IS_SHOW_MARKER_TIME_DEFAULT               = false;
+   static final String         STATE_IS_SHOW_TOUR_EQUIPMENT                    = "STATE_IS_SHOW_TOUR_EQUIPMENT";               //$NON-NLS-1$
+   static final boolean        STATE_IS_SHOW_TOUR_EQUIPMENT_DEFAULT            = true;
    static final String         STATE_IS_SHOW_TOUR_MARKERS                      = "STATE_IS_SHOW_TOUR_MARKERS";                 //$NON-NLS-1$
    static final boolean        STATE_IS_SHOW_TOUR_MARKERS_DEFAULT              = true;
    static final String         STATE_IS_SHOW_TOUR_NUTRITION                    = "STATE_IS_SHOW_TOUR_NUTRITION";               //$NON-NLS-1$
@@ -200,6 +204,7 @@ public class TourBlogView extends ViewPart {
    private boolean                 _isDrawWithDefaultColor;
    private boolean                 _isShowHiddenMarker;
    private boolean                 _isShowMarkerTime;
+   private boolean                 _isShowTourEquipment;
    private boolean                 _isShowTourMarkers;
    private boolean                 _isShowTourNutrition;
    private boolean                 _isShowTourSummary;
@@ -391,6 +396,47 @@ public class TourBlogView extends ViewPart {
       }
 
       return "<p class='description'>" + WEB.convertHTML_LineBreaks(tourDescription) + "</p>" + NL; //$NON-NLS-1$ //$NON-NLS-2$
+   }
+
+   private String buildSection_Equipment(final Set<Equipment> allEquipment, final boolean addSpacer) {
+
+      final StringBuilder sb = new StringBuilder();
+
+      if (addSpacer) {
+         sb.append(SPACER);
+      }
+
+      sb.append("<div class='title'>" + Messages.Tour_Blog_Section_Equipment + "</div>" + NL); //$NON-NLS-1$ //$NON-NLS-2$
+      sb.append("<table><tr>"); //$NON-NLS-1$
+
+      final Map<Long, String> allAccumulatedValues = EquipmentManager.fetchEquipmentAccumulatedValues(allEquipment);
+
+      for (final Equipment equipment : allEquipment) {
+
+         sb.append("<td>"); //$NON-NLS-1$
+
+         final Image equipmentImage = EquipmentManager.getEquipmentImage(equipment);
+         if (equipmentImage != null) {
+
+            final String imageBase64 = ImageUtils.imageToBase64(equipmentImage);
+            sb.append("<img src=\"data:image/png;base64," + imageBase64 + "\">"); //$NON-NLS-1$ //$NON-NLS-2$
+         }
+         final String equipmentText = NL + equipment.getName() + NL + "<i>" + allAccumulatedValues.get(equipment.getEquipmentId()) + "</i>"; //$NON-NLS-1$ //$NON-NLS-2$
+
+         sb.append(equipmentText);
+
+         sb.append("</td>"); //$NON-NLS-1$
+      }
+
+      sb.append("</tr></table>"); //$NON-NLS-1$
+
+      String equipmentSectionString = WEB.convertHTML_LineBreaks(sb.toString());
+
+      if (UI.IS_SCRAMBLE_DATA) {
+         equipmentSectionString = UI.scrambleText(equipmentSectionString);
+      }
+
+      return equipmentSectionString;
    }
 
    private String buildSection_Nutrition(final Set<TourNutritionProduct> tourNutritionProducts, final boolean addSpacer) {
@@ -765,12 +811,13 @@ public class TourBlogView extends ViewPart {
 
 // SET_FORMATTING_OFF
 
-      String tourTitle              = _tourData.getTourTitle();
-      final String tourDescription  = _tourData.getTourDescription();
-      final Set<TourTag> tourTags   = _tourData.getTourTags();
-      String tourSummary            = buildSection_TourSummary();
+      String tourTitle                    = _tourData.getTourTitle();
+      final String tourDescription        = _tourData.getTourDescription();
+      final Set<TourTag> tourTags         = _tourData.getTourTags();
+      final Set<Equipment> allEquipment   = _tourData.getEquipment();
+      String tourSummary                  = buildSection_TourSummary();
 
-      final String tourWeather      = WeatherUtils.buildWeatherDataString(_tourData,
+      final String tourWeather   = WeatherUtils.buildWeatherDataString(_tourData,
                                           true, // isdisplayMaximumMinimumTemperature
                                           true, // isDisplayPressure
                                           isSaveWeatherLogInWeatherDescription // isWeatherDataSeparatorNewLine
@@ -781,13 +828,14 @@ public class TourBlogView extends ViewPart {
       final boolean isDescription   = tourDescription.length() > 0;
       final boolean isNutrition     = tourNutritionProducts.size() > 0;
       final boolean isTitle         = tourTitle.length() > 0;
+      final boolean isTourEquipment = allEquipment.size() > 0;
       final boolean isTourSummary   = tourSummary.length() > 0;
       final boolean isTourTags      = tourTags.size() > 0;
       final boolean isWeather       = tourWeather.length() > 0;
 
 // SET_FORMATTING_ON
 
-      if (isDescription || isTourSummary || isTitle || isWeather || isTourTags || isNutrition) {
+      if (isDescription || isTourSummary || isTitle || isWeather || isTourTags || isTourEquipment || isNutrition) {
 
          sb.append("<div class='action-hover-container' style='margin-top:15px; margin-bottom: 5px;'>" + NL); //$NON-NLS-1$
          {
@@ -864,6 +912,14 @@ public class TourBlogView extends ViewPart {
                if (isTourTags && _isShowTourTags) {
 
                   sb.append(buildSection_Tags(tourTags, isDescription || isWeather || isNutrition));
+               }
+
+               /*
+                * Equipment
+                */
+               if (isTourEquipment && _isShowTourEquipment) {
+
+                  sb.append(buildSection_Equipment(allEquipment, isDescription || isWeather || isNutrition));
                }
             }
             sb.append("</div>" + NL); //$NON-NLS-1$
@@ -1621,16 +1677,17 @@ public class TourBlogView extends ViewPart {
 
 // SET_FORMATTING_OFF
 
-      _isDrawWithDefaultColor = Util.getStateBoolean(_state, TourBlogView.STATE_IS_DRAW_MARKER_WITH_DEFAULT_COLOR,   TourBlogView.STATE_IS_DRAW_MARKER_WITH_DEFAULT_COLOR_DEFAULT);
-      _isShowHiddenMarker     = Util.getStateBoolean(_state, TourBlogView.STATE_IS_SHOW_HIDDEN_MARKER,               TourBlogView.STATE_IS_SHOW_HIDDEN_MARKER_DEFAULT);
-      _isShowMarkerTime       = Util.getStateBoolean(_state, TourBlogView.STATE_IS_SHOW_MARKER_TIME,                 TourBlogView.STATE_IS_SHOW_MARKER_TIME_DEFAULT);
-      _isShowTourMarkers      = Util.getStateBoolean(_state, TourBlogView.STATE_IS_SHOW_TOUR_MARKERS,                TourBlogView.STATE_IS_SHOW_TOUR_MARKERS_DEFAULT);
-      _isShowTourNutrition    = Util.getStateBoolean(_state, TourBlogView.STATE_IS_SHOW_TOUR_NUTRITION,              TourBlogView.STATE_IS_SHOW_TOUR_NUTRITION_DEFAULT);
-      _isShowTourSummary      = Util.getStateBoolean(_state, TourBlogView.STATE_IS_SHOW_TOUR_SUMMARY,                TourBlogView.STATE_IS_SHOW_TOUR_SUMMARY_DEFAULT);
-      _isShowTourTags         = Util.getStateBoolean(_state, TourBlogView.STATE_IS_SHOW_TOUR_TAGS,                   TourBlogView.STATE_IS_SHOW_TOUR_TAGS_DEFAULT);
-      _isShowTourWeather      = Util.getStateBoolean(_state, TourBlogView.STATE_IS_SHOW_TOUR_WEATHER,                TourBlogView.STATE_IS_SHOW_TOUR_WEATHER_DEFAULT);
+      _isDrawWithDefaultColor = Util.getStateBoolean(_state, STATE_IS_DRAW_MARKER_WITH_DEFAULT_COLOR,   STATE_IS_DRAW_MARKER_WITH_DEFAULT_COLOR_DEFAULT);
+      _isShowHiddenMarker     = Util.getStateBoolean(_state, STATE_IS_SHOW_HIDDEN_MARKER,               STATE_IS_SHOW_HIDDEN_MARKER_DEFAULT);
+      _isShowMarkerTime       = Util.getStateBoolean(_state, STATE_IS_SHOW_MARKER_TIME,                 STATE_IS_SHOW_MARKER_TIME_DEFAULT);
+      _isShowTourEquipment    = Util.getStateBoolean(_state, STATE_IS_SHOW_TOUR_EQUIPMENT,              STATE_IS_SHOW_TOUR_EQUIPMENT_DEFAULT);
+      _isShowTourMarkers      = Util.getStateBoolean(_state, STATE_IS_SHOW_TOUR_MARKERS,                STATE_IS_SHOW_TOUR_MARKERS_DEFAULT);
+      _isShowTourNutrition    = Util.getStateBoolean(_state, STATE_IS_SHOW_TOUR_NUTRITION,              STATE_IS_SHOW_TOUR_NUTRITION_DEFAULT);
+      _isShowTourSummary      = Util.getStateBoolean(_state, STATE_IS_SHOW_TOUR_SUMMARY,                STATE_IS_SHOW_TOUR_SUMMARY_DEFAULT);
+      _isShowTourTags         = Util.getStateBoolean(_state, STATE_IS_SHOW_TOUR_TAGS,                   STATE_IS_SHOW_TOUR_TAGS_DEFAULT);
+      _isShowTourWeather      = Util.getStateBoolean(_state, STATE_IS_SHOW_TOUR_WEATHER,                STATE_IS_SHOW_TOUR_WEATHER_DEFAULT);
 
-      _timeFormat             = (TimeFormat) Util.getStateEnum(_state, TourBlogView.STATE_TIME_FORMAT, TourBlogView.STATE_TIME_FORMAT_DEFAULT);
+      _timeFormat             = (TimeFormat) Util.getStateEnum(_state, STATE_TIME_FORMAT, STATE_TIME_FORMAT_DEFAULT);
 
       final String graphMarker_ColorDefault = UI.IS_DARK_THEME
             ? ITourbookPreferences.GRAPH_MARKER_COLOR_DEFAULT_DARK
