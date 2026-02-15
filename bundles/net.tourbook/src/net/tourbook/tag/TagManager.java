@@ -32,6 +32,7 @@ import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.UI;
 import net.tourbook.common.util.ImageUtils;
 import net.tourbook.common.util.SQL;
+import net.tourbook.common.util.SQLData;
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.StringUtils;
 import net.tourbook.common.util.Util;
@@ -191,6 +192,21 @@ public class TagManager {
 
       // fire modify event
       TourManager.fireEvent(TourEventId.TAG_STRUCTURE_CHANGED);
+   }
+
+   private static SQLData createSQLTagParameters(final Set<TourTag> allTags) {
+
+      // collect all ids
+      final List<Object> allTagIDs = new ArrayList<>();
+
+      for (final TourTag tag : allTags) {
+         allTagIDs.add(tag.getTagId());
+      }
+
+      final int numIDs = allTagIDs.size();
+      final String sqlString = SQL.createParameterList(numIDs);
+
+      return new SQLData(sqlString, allTagIDs);
    }
 
    /**
@@ -487,48 +503,74 @@ public class TagManager {
       _allTagUIContainer.clear();
    }
 
-   public static Map<Long, String> fetchTourTagsAccumulatedValues() {
+   /**
+    * @param allTags
+    *
+    * @return Returns a map were the key is the equipment ID and the value is the multiline detailed
+    *         text
+    */
+   public static Map<Long, String> fetchTourTagsAccumulatedValues(final Set<TourTag> allTags) {
+
+      final SQLData sqlTagData = createSQLTagParameters(allTags);
 
       final String sqlQuery = UI.EMPTY_STRING
 
-            + "SELECT" + NL //                                                               //$NON-NLS-1$
+            + "--" + NL //                                                                      //$NON-NLS-1$
+            + NL
+            + "---------------------------" + NL //                                             //$NON-NLS-1$
+            + "-- tags - tours accumulated" + NL //                                             //$NON-NLS-1$
+            + "---------------------------" + NL //                                             //$NON-NLS-1$
+            + NL
 
-            + "jTdataTtag.TOURTAG_TAGID," + NL //                                      1     //$NON-NLS-1$
-            + "SUM(tourData.TOURDISTANCE) AS TOTALDISTANCE," + NL //                   2     //$NON-NLS-1$
-            + "SUM(tourData.TOURDEVICETIME_RECORDED) AS TOTALRECORDEDTIME" + NL //     3     //$NON-NLS-1$
+            + "SELECT" + NL //                                                                  //$NON-NLS-1$
 
-            + "FROM " + TourDatabase.JOINTABLE__TOURDATA__TOURTAG + " jTdataTtag" + NL //    //$NON-NLS-1$ //$NON-NLS-2$
-            + "INNER JOIN " + TourDatabase.TABLE_TOUR_DATA + NL //                           //$NON-NLS-1$
-            + "ON jTdataTtag.TOURDATA_TOURID = tourData.TOURID" + NL //                      //$NON-NLS-1$
+            + "   jTdataTtag.TOURTAG_TAGID," + NL //                                         1  //$NON-NLS-1$
+            + "   SUM(tourData.TOURDISTANCE)					AS TOTALDISTANCE," + NL //          2  //$NON-NLS-1$
+            + "   SUM(tourData.TOURDEVICETIME_RECORDED) 	AS TOTALRECORDEDTIME" + NL //       3  //$NON-NLS-1$
 
-            + "GROUP BY jTdataTtag.TOURTAG_TAGID" //                                         //$NON-NLS-1$
+            + "FROM " + TourDatabase.JOINTABLE__TOURDATA__TOURTAG + " AS jTdataTtag" + NL //    //$NON-NLS-1$ //$NON-NLS-2$
+
+            + "JOIN " + TourDatabase.TABLE_TOUR_DATA + " AS TourData"//                         //$NON-NLS-1$
+            + " ON jTdataTtag.TOURDATA_TOURID = tourData.TOURID" + NL //                        //$NON-NLS-1$
+
+            + "WHERE jTdataTtag.TOURTAG_TAGID IN (" + sqlTagData.getSqlString() + ")" + NL //   //$NON-NLS-1$
+
+            + "GROUP BY jTdataTtag.TOURTAG_TAGID" + NL //                                       //$NON-NLS-1$
+
+            + NL
+            + "--" + NL //                                                                      //$NON-NLS-1$
       ;
 
-      final Map<Long, String> tourTagsAccumulatedValues = new HashMap<>();
+      final Map<Long, String> allAccumulatedValues = new HashMap<>();
 
       try (Connection connection = TourDatabase.getInstance().getConnection();
             final PreparedStatement preparedStatement = connection.prepareStatement(sqlQuery)) {
+
+         sqlTagData.setParameters(preparedStatement, 1);
 
          final ResultSet result = preparedStatement.executeQuery();
 
          while (result.next()) {
 
-            final long tourTagId = result.getLong(1);
-            float usedMiles = result.getLong(2);
-            final long usedHours = result.getLong(3);
+            final long tagId = result.getLong(1);
+            final float distance = result.getLong(2);
+            final long timeRecorded = result.getLong(3);
 
-            final StringBuilder tagAccumulatedValues = new StringBuilder();
+            final float distanceConverted = distance / 1000 / net.tourbook.common.UI.UNIT_VALUE_DISTANCE;
 
-            tagAccumulatedValues.append(Math.round(usedHours / 3600f));
-            tagAccumulatedValues.append(UI.SPACE + net.tourbook.common.UI.UNIT_LABEL_TIME);
+            final StringBuilder sb = new StringBuilder();
 
-            tagAccumulatedValues.append(NL);
+            sb.append(Math.round(timeRecorded / 3600f));
+            sb.append(UI.SPACE);
+            sb.append(net.tourbook.common.UI.UNIT_LABEL_TIME);
 
-            usedMiles = usedMiles / 1000 / net.tourbook.common.UI.UNIT_VALUE_DISTANCE;
-            tagAccumulatedValues.append(Math.round(usedMiles));
-            tagAccumulatedValues.append(UI.SPACE + net.tourbook.common.UI.UNIT_LABEL_DISTANCE);
+            sb.append(NL);
 
-            tourTagsAccumulatedValues.put(tourTagId, tagAccumulatedValues.toString());
+            sb.append(Math.round(distanceConverted));
+            sb.append(UI.SPACE);
+            sb.append(net.tourbook.common.UI.UNIT_LABEL_DISTANCE);
+
+            allAccumulatedValues.put(tagId, sb.toString());
          }
 
       } catch (final SQLException e) {
@@ -536,7 +578,7 @@ public class TagManager {
          SQL.showException(e, sqlQuery);
       }
 
-      return tourTagsAccumulatedValues;
+      return allAccumulatedValues;
    }
 
    private static long getNumberOfItems(final Connection conn, final String sql) {
@@ -853,7 +895,8 @@ public class TagManager {
       /*
        * Fill tag content
        */
-      final Map<Long, String> tourTagsAccumulatedValues = fetchTourTagsAccumulatedValues();
+      final Map<Long, String> tourTagsAccumulatedValues = fetchTourTagsAccumulatedValues(tourTags);
+
       final ArrayList<TagUIContent> notNeededTags = new ArrayList<>();
 
       final GridDataFactory gd = GridDataFactory.fillDefaults();
@@ -912,7 +955,7 @@ public class TagManager {
             notNeededTags.add(tagUIContent);
          }
 
-//         tagUIContent.container.setBackground(net.tourbook.common.UI.SYS_COLOR_CYAN);
+//       tagUIContent.container.setBackground(net.tourbook.common.UI.SYS_COLOR_CYAN);
       }
 
       /*

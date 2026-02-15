@@ -516,7 +516,7 @@ public class TourBlogView extends ViewPart {
       return nutritionSectionString;
    }
 
-   private String buildSection_Tags(final Set<TourTag> tourTags, final boolean addSpacer) {
+   private String buildSection_Tags(final Set<TourTag> allTags, final boolean addSpacer) {
 
       final StringBuilder sb = new StringBuilder();
 
@@ -527,8 +527,8 @@ public class TourBlogView extends ViewPart {
       sb.append("<div class='title'>" + Messages.Tour_Blog_Section_Tags + "</div>" + NL); //$NON-NLS-1$ //$NON-NLS-2$
       sb.append("<table><tr>"); //$NON-NLS-1$
 
-      final Map<Long, String> tourTagsAccumulatedValues = TagManager.fetchTourTagsAccumulatedValues();
-      for (final TourTag tag : tourTags) {
+      final Map<Long, String> tourTagsAccumulatedValues = TagManager.fetchTourTagsAccumulatedValues(allTags);
+      for (final TourTag tag : allTags) {
 
          sb.append("<td>"); //$NON-NLS-1$
 

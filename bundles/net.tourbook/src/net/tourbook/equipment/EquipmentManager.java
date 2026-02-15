@@ -257,6 +257,44 @@ public class EquipmentManager {
       }
    }
 
+   private static SQLData createSQLEquipmentParameters(final Set<Equipment> allEquipment) {
+
+      // collect all ids
+      final List<Object> allEquipmentIDs = new ArrayList<>();
+
+      for (final Equipment equipment : allEquipment) {
+         allEquipmentIDs.add(equipment.getEquipmentId());
+      }
+
+      final int numIDs = allEquipmentIDs.size();
+      final String sqlString = SQL.createParameterList(numIDs);
+
+      return new SQLData(sqlString, allEquipmentIDs);
+   }
+
+   private static SQLData createSQLPartParameters(final List<Equipment> allEquipment) {
+
+      // collect all part IDs
+      final List<Object> allPartIDs = new ArrayList<>();
+
+      for (final Equipment equipment : allEquipment) {
+
+         final Set<EquipmentPart> allEquipmentParts = equipment.getParts();
+
+         for (final EquipmentPart equipmentPart : allEquipmentParts) {
+
+            allPartIDs.add(equipmentPart.getPartId());
+         }
+      }
+
+      final int numIDs = allPartIDs.size();
+      final String parameterList = SQL.createParameterList(numIDs);
+
+      final String sqlStatement = "EquipmentPart.partID IN (" + parameterList + ")"; //$NON-NLS-1$ //$NON-NLS-2$
+
+      return new SQLData(sqlStatement, allPartIDs);
+   }
+
    /**
     * Dispose all images
     */
@@ -366,7 +404,7 @@ public class EquipmentManager {
          return false;
       }
 
-      final SQLData sqlPartData = getSQLData_Parts(allEquipment);
+      final SQLData sqlPartData = createSQLPartParameters(allEquipment);
 
       String dialogMessage;
 
@@ -714,49 +752,74 @@ public class EquipmentManager {
       updateTours(tourProvider, tourDataUpdater, isSaveTour);
    }
 
-   public static Map<Long, String> fetchEquipmentAccumulatedValuesxxx() {
+   /**
+    * @param allTags
+    *
+    * @return Returns a map were the key is the equipment ID and the value is the multiline detailed
+    *         text
+    */
+   private static Map<Long, String> fetchEquipmentAccumulatedValues(final Set<Equipment> allTags) {
+
+      final SQLData sqlTagData = createSQLEquipmentParameters(allTags);
 
       final String sqlQuery = UI.EMPTY_STRING
 
-            + "SELECT" + NL //                                                               //$NON-NLS-1$
+            + "--" + NL //                                                                         //$NON-NLS-1$
+            + NL
+            + "--------------------------------" + NL //                                           //$NON-NLS-1$
+            + "-- equipment - tours accumulated" + NL //                                           //$NON-NLS-1$
+            + "--------------------------------" + NL //                                           //$NON-NLS-1$
+            + NL
 
-            + "jTdataTtag.TOURTAG_TAGID," + NL //                                      1     //$NON-NLS-1$
-            + "SUM(tourData.TOURDISTANCE) AS TOTALDISTANCE," + NL //                   2     //$NON-NLS-1$
-            + "SUM(tourData.TOURDEVICETIME_RECORDED) AS TOTALRECORDEDTIME" + NL //     3     //$NON-NLS-1$
+            + "SELECT" + NL //                                                                     //$NON-NLS-1$
 
-            + "FROM " + TourDatabase.JOINTABLE__TOURDATA__TOURTAG + " jTdataTtag" + NL //    //$NON-NLS-1$ //$NON-NLS-2$
-            + "INNER JOIN " + TourDatabase.TABLE_TOUR_DATA + NL //                           //$NON-NLS-1$
-            + "ON jTdataTtag.TOURDATA_TOURID = tourData.TOURID" + NL //                      //$NON-NLS-1$
+            + "   jTdEq.Equipment_EquipmentID," + NL //                                         1  //$NON-NLS-1$
+            + "   SUM(tourData.TOURDISTANCE)             AS TOTALDISTANCE," + NL //             2  //$NON-NLS-1$
+            + "   SUM(tourData.TOURDEVICETIME_RECORDED)  AS TOTALRECORDEDTIME" + NL //          3  //$NON-NLS-1$
 
-            + "GROUP BY jTdataTtag.TOURTAG_TAGID" //                                         //$NON-NLS-1$
+            + "FROM " + TourDatabase.JOINTABLE__TOURDATA__EQUIPMENT + " AS jTdEq" + NL //          //$NON-NLS-1$ //$NON-NLS-2$
+
+            + "JOIN " + TourDatabase.TABLE_TOUR_DATA + " AS TourData"//                            //$NON-NLS-1$
+            + " ON jTdEq.TourData_TourID = TourData.TOURID" + NL //                                //$NON-NLS-1$
+
+            + "WHERE jTdEq.Equipment_EquipmentID IN (" + sqlTagData.getSqlString() + ")" + NL //   //$NON-NLS-1$
+
+            + "GROUP BY jTdEq.Equipment_EquipmentID" + NL //                                       //$NON-NLS-1$
+
+            + NL
+            + "--" + NL //                                                                         //$NON-NLS-1$
       ;
 
-      final Map<Long, String> tourTagsAccumulatedValues = new HashMap<>();
+      final Map<Long, String> allAccumulatedValues = new HashMap<>();
 
       try (Connection connection = TourDatabase.getInstance().getConnection();
             final PreparedStatement preparedStatement = connection.prepareStatement(sqlQuery)) {
+
+         sqlTagData.setParameters(preparedStatement, 1);
 
          final ResultSet result = preparedStatement.executeQuery();
 
          while (result.next()) {
 
-            final long tourTagId = result.getLong(1);
-            float usedMiles = result.getLong(2);
-            final long usedHours = result.getLong(3);
+            final long tagId = result.getLong(1);
+            final float distance = result.getLong(2);
+            final long timeRecorded = result.getLong(3);
 
-            usedMiles = usedMiles / 1000 / net.tourbook.common.UI.UNIT_VALUE_DISTANCE;
+            final float distanceConverted = distance / 1000 / net.tourbook.common.UI.UNIT_VALUE_DISTANCE;
 
             final StringBuilder sb = new StringBuilder();
 
-            sb.append(Math.round(usedHours / 3600f));
-            sb.append(UI.SPACE + net.tourbook.common.UI.UNIT_LABEL_TIME);
+            sb.append(Math.round(timeRecorded / 3600f));
+            sb.append(UI.SPACE);
+            sb.append(net.tourbook.common.UI.UNIT_LABEL_TIME);
 
             sb.append(NL);
 
-            sb.append(Math.round(usedMiles));
-            sb.append(UI.SPACE + net.tourbook.common.UI.UNIT_LABEL_DISTANCE);
+            sb.append(Math.round(distanceConverted));
+            sb.append(UI.SPACE);
+            sb.append(net.tourbook.common.UI.UNIT_LABEL_DISTANCE);
 
-            tourTagsAccumulatedValues.put(tourTagId, sb.toString());
+            allAccumulatedValues.put(tagId, sb.toString());
          }
 
       } catch (final SQLException e) {
@@ -764,7 +827,7 @@ public class EquipmentManager {
          SQL.showException(e, sqlQuery);
       }
 
-      return tourTagsAccumulatedValues;
+      return allAccumulatedValues;
    }
 
    /**
@@ -1237,29 +1300,6 @@ public class EquipmentManager {
       return allTourIds;
    }
 
-   private static SQLData getSQLData_Parts(final List<Equipment> allEquipment) {
-
-      // collect all part IDs
-      final List<Object> allPartIDs = new ArrayList<>();
-
-      for (final Equipment equipment : allEquipment) {
-
-         final Set<EquipmentPart> allEquipmentParts = equipment.getParts();
-
-         for (final EquipmentPart equipmentPart : allEquipmentParts) {
-
-            allPartIDs.add(equipmentPart.getPartId());
-         }
-      }
-
-      final int numIDs = allPartIDs.size();
-      final String parameterList = SQL.createParameterList(numIDs);
-
-      final String sqlStatement = "EquipmentPart.partID IN (" + parameterList + ")"; //$NON-NLS-1$ //$NON-NLS-2$
-
-      return new SQLData(sqlStatement, allPartIDs);
-   }
-
    private static void loadEquipment() {
 
       synchronized (DB_LOCK) {
@@ -1465,8 +1505,8 @@ public class EquipmentManager {
       /*
        * Fill equipment content
        */
-      final Map<Long, String> tourEquipmentAccumulatedValues = fetchEquipmentAccumulatedValues();
-      final ArrayList<EquipmentUIContent> notNeededEquipment = new ArrayList<>();
+      final Map<Long, String> allEquipmentAccumulatedValues = fetchEquipmentAccumulatedValues(allEquipment);
+      final List<EquipmentUIContent> allNotNeededEquipment = new ArrayList<>();
 
       final GridDataFactory gd = GridDataFactory.fillDefaults();
 
@@ -1479,7 +1519,9 @@ public class EquipmentManager {
             final Equipment equipment = allEquipmentSorted[equipmentIndex];
             final long equipmentId = equipment.getEquipmentId();
 
-            final String equipmentText = equipment.getName() + UI.NEW_LINE + tourEquipmentAccumulatedValues.get(equipmentId);
+            final String equipmentText = equipment.getName() + UI.NEW_LINE
+
+                  + allEquipmentAccumulatedValues.get(equipmentId);
 
             final Label label1 = equipmentUIContent.label1;
             final Label label2 = equipmentUIContent.label2;
@@ -1521,7 +1563,7 @@ public class EquipmentManager {
 
             // there are no more equipment -> dispose remaining UI container
 
-            notNeededEquipment.add(equipmentUIContent);
+            allNotNeededEquipment.add(equipmentUIContent);
          }
       }
 
@@ -1530,11 +1572,11 @@ public class EquipmentManager {
        * space
        * :-(
        */
-      notNeededEquipment.forEach(equipmentUIContent -> {
+      allNotNeededEquipment.forEach(equipmentUIContent -> {
          equipmentUIContent.container.dispose();
       });
 
-      _allEquipmentUIContainer.removeAll(notNeededEquipment);
+      _allEquipmentUIContainer.removeAll(allNotNeededEquipment);
    }
 
    /**
@@ -1552,7 +1594,9 @@ public class EquipmentManager {
 
       if (numMissingUIContainer > 0) {
 
-         final int equipmentContentWidth = TagManager.getTagContent_ImageSize() + TagManager.getTagContent_TextWidth();
+         final int equipmentContentWidth = 0
+               + TagManager.getTagContent_ImageSize()
+               + TagManager.getTagContent_TextWidth();
 
          final Color backgroundColor = equipmentContainer.getBackground();
 
