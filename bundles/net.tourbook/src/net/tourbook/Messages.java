@@ -1660,6 +1660,8 @@ public class Messages extends NLS {
    public static String        PrefPage_ViewTooltip_Label_CompareResult;
    public static String        PrefPage_ViewTooltip_Label_Date;
    public static String        PrefPage_ViewTooltip_Label_Day;
+   public static String        PrefPage_ViewTooltip_Label_Equipment;
+   public static String        PrefPage_ViewTooltip_Label_EquipmentTour;
    public static String        PrefPage_ViewTooltip_Label_Info;
    public static String        PrefPage_ViewTooltip_Label_RawData;
    public static String        PrefPage_ViewTooltip_Label_ReferenceTour;

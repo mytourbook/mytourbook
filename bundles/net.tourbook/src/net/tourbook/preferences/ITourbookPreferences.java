@@ -525,39 +525,45 @@ public interface ITourbookPreferences {
    /*
     * view tooltip
     */
-   public static final String VIEW_TOOLTIP                        = "view.tooltip.";                         //$NON-NLS-1$
-   public static final String VIEW_TOOLTIP_IS_MODIFIED            = VIEW_TOOLTIP + "isModified";             //$NON-NLS-1$
+   public static final String VIEW_TOOLTIP                                = "view.tooltip.";                               //$NON-NLS-1$
+   public static final String VIEW_TOOLTIP_IS_MODIFIED                    = VIEW_TOOLTIP + "isModified";                   //$NON-NLS-1$
 
-   public static final String VIEW_TOOLTIP_COLLATED_COLLATION     = "VIEW_TOOLTIP_COLLATED_COLLATION";       //$NON-NLS-1$
-   public static final String VIEW_TOOLTIP_COLLATED_TIME          = "VIEW_TOOLTIP_COLLATED_TIME";            //$NON-NLS-1$
-   public static final String VIEW_TOOLTIP_COLLATED_TITLE         = "VIEW_TOOLTIP_COLLATED_TITLE";           //$NON-NLS-1$
-   public static final String VIEW_TOOLTIP_COLLATED_TAGS          = "VIEW_TOOLTIP_COLLATED_TAGS";            //$NON-NLS-1$
-   public static final String VIEW_TOOLTIP_COLLATED_WEEKDAY       = "VIEW_TOOLTIP_COLLATED_WEEKDAY";         //$NON-NLS-1$
+   public static final String VIEW_TOOLTIP_COLLATED_COLLATION             = "VIEW_TOOLTIP_COLLATED_COLLATION";             //$NON-NLS-1$
+   public static final String VIEW_TOOLTIP_COLLATED_TIME                  = "VIEW_TOOLTIP_COLLATED_TIME";                  //$NON-NLS-1$
+   public static final String VIEW_TOOLTIP_COLLATED_TITLE                 = "VIEW_TOOLTIP_COLLATED_TITLE";                 //$NON-NLS-1$
+   public static final String VIEW_TOOLTIP_COLLATED_TAGS                  = "VIEW_TOOLTIP_COLLATED_TAGS";                  //$NON-NLS-1$
+   public static final String VIEW_TOOLTIP_COLLATED_EQUIPMENT             = "VIEW_TOOLTIP_COLLATED_EQUIPMENT";             //$NON-NLS-1$
+   public static final String VIEW_TOOLTIP_COLLATED_WEEKDAY               = "VIEW_TOOLTIP_COLLATED_WEEKDAY";               //$NON-NLS-1$
 
-   public static final String VIEW_TOOLTIP_TOURBOOK_DATE          = VIEW_TOOLTIP + "tourbook.date";          //$NON-NLS-1$
-   public static final String VIEW_TOOLTIP_TOURBOOK_TIME          = VIEW_TOOLTIP + "tourbook.time";          //$NON-NLS-1$
-   public static final String VIEW_TOOLTIP_TOURBOOK_WEEKDAY       = VIEW_TOOLTIP + "tourbook.weekday";       //$NON-NLS-1$
-   public static final String VIEW_TOOLTIP_TOURBOOK_TITLE         = VIEW_TOOLTIP + "tourbook.title";         //$NON-NLS-1$
-   public static final String VIEW_TOOLTIP_TOURBOOK_TAGS          = VIEW_TOOLTIP + "tourbook.tags";          //$NON-NLS-1$
+   public static final String VIEW_TOOLTIP_TOURBOOK_DATE                  = VIEW_TOOLTIP + "tourbook.date";                //$NON-NLS-1$
+   public static final String VIEW_TOOLTIP_TOURBOOK_TIME                  = VIEW_TOOLTIP + "tourbook.time";                //$NON-NLS-1$
+   public static final String VIEW_TOOLTIP_TOURBOOK_WEEKDAY               = VIEW_TOOLTIP + "tourbook.weekday";             //$NON-NLS-1$
+   public static final String VIEW_TOOLTIP_TOURBOOK_TITLE                 = VIEW_TOOLTIP + "tourbook.title";               //$NON-NLS-1$
+   public static final String VIEW_TOOLTIP_TOURBOOK_TAGS                  = VIEW_TOOLTIP + "tourbook.tags";                //$NON-NLS-1$
+   public static final String VIEW_TOOLTIP_TOURBOOK_EQUIPMENT             = VIEW_TOOLTIP + "tourbook.EQUIPMENT";           //$NON-NLS-1$
 
-   public static final String VIEW_TOOLTIP_TAGGING_TAG            = VIEW_TOOLTIP + "tagging.tag";            //$NON-NLS-1$
-   public static final String VIEW_TOOLTIP_TAGGING_TAGS           = VIEW_TOOLTIP + "tagging.tags";           //$NON-NLS-1$
-   public static final String VIEW_TOOLTIP_TAGGING_TITLE          = VIEW_TOOLTIP + "tagging.title";          //$NON-NLS-1$
+   public static final String VIEW_TOOLTIP_TAGGING_TAG                    = VIEW_TOOLTIP + "tagging.tag";                  //$NON-NLS-1$
+   public static final String VIEW_TOOLTIP_TAGGING_TITLE                  = VIEW_TOOLTIP + "tagging.title";                //$NON-NLS-1$
+   public static final String VIEW_TOOLTIP_TAGGING_TAGS                   = VIEW_TOOLTIP + "tagging.tags";                 //$NON-NLS-1$
+   public static final String VIEW_TOOLTIP_TAGGING_EQUIPMENT              = VIEW_TOOLTIP + "tagging.EQUIPMENT";            //$NON-NLS-1$
 
-   public static final String VIEW_TOOLTIP_EQUIPMENT_EQUIPMENT    = "VIEW_TOOLTIP_EQUIPMENT_EQUIPMENT";      //$NON-NLS-1$
-   public static final String VIEW_TOOLTIP_EQUIPMENT_TAGS         = "VIEW_TOOLTIP_EQUIPMENT_TAGS";           //$NON-NLS-1$
-   public static final String VIEW_TOOLTIP_EQUIPMENT_TITLE        = "VIEW_TOOLTIP_EQUIPMENT_TITLE";          //$NON-NLS-1$
+   public static final String VIEW_TOOLTIP_EQUIPMENT_EQUIPMENT_1ST_COLUMN = "VIEW_TOOLTIP_EQUIPMENT_EQUIPMENT_1ST_COLUMN"; //$NON-NLS-1$
+   public static final String VIEW_TOOLTIP_EQUIPMENT_TAGS                 = "VIEW_TOOLTIP_EQUIPMENT_TAGS";                 //$NON-NLS-1$
+   public static final String VIEW_TOOLTIP_EQUIPMENT_EQUIPMENT            = "VIEW_TOOLTIP_EQUIPMENT_EQUIPMENT";            //$NON-NLS-1$
+   public static final String VIEW_TOOLTIP_EQUIPMENT_TITLE                = "VIEW_TOOLTIP_EQUIPMENT_TITLE";                //$NON-NLS-1$
 
-   public static final String VIEW_TOOLTIP_TOURCATALOG_REFTOUR    = VIEW_TOOLTIP + "tourcatalog.reftour";    //$NON-NLS-1$
-   public static final String VIEW_TOOLTIP_TOURCATALOG_TAGS       = VIEW_TOOLTIP + "tourcatalog.tags";       //$NON-NLS-1$
-   public static final String VIEW_TOOLTIP_TOURCATALOG_TITLE      = VIEW_TOOLTIP + "tourcatalog.title";      //$NON-NLS-1$
+   public static final String VIEW_TOOLTIP_TOURCATALOG_REFTOUR            = VIEW_TOOLTIP + "tourcatalog.reftour";          //$NON-NLS-1$
+   public static final String VIEW_TOOLTIP_TOURCATALOG_TAGS               = VIEW_TOOLTIP + "tourcatalog.tags";             //$NON-NLS-1$
+   public static final String VIEW_TOOLTIP_TOURCATALOG_EQUIPMENT          = VIEW_TOOLTIP + "tourcatalog.EQUIPMENT";        //$NON-NLS-1$
+   public static final String VIEW_TOOLTIP_TOURCATALOG_TITLE              = VIEW_TOOLTIP + "tourcatalog.title";            //$NON-NLS-1$
 
-   public static final String VIEW_TOOLTIP_TOURIMPORT_DATE        = VIEW_TOOLTIP + "tourimport.date";        //$NON-NLS-1$
-   public static final String VIEW_TOOLTIP_TOURIMPORT_TIME        = VIEW_TOOLTIP + "tourimport.time";        //$NON-NLS-1$
-   public static final String VIEW_TOOLTIP_TOURIMPORT_TAGS        = VIEW_TOOLTIP + "tourimport.tags";        //$NON-NLS-1$
-   public static final String VIEW_TOOLTIP_TOURIMPORT_TITLE       = VIEW_TOOLTIP + "tourimport.title";       //$NON-NLS-1$
+   public static final String VIEW_TOOLTIP_TOURIMPORT_DATE                = VIEW_TOOLTIP + "tourimport.date";              //$NON-NLS-1$
+   public static final String VIEW_TOOLTIP_TOURIMPORT_TIME                = VIEW_TOOLTIP + "tourimport.time";              //$NON-NLS-1$
+   public static final String VIEW_TOOLTIP_TOURIMPORT_TAGS                = VIEW_TOOLTIP + "tourimport.tags";              //$NON-NLS-1$
+   public static final String VIEW_TOOLTIP_TOURIMPORT_EQUIPMENT           = VIEW_TOOLTIP + "tourimport.EQUIPMENT";         //$NON-NLS-1$
+   public static final String VIEW_TOOLTIP_TOURIMPORT_TITLE               = VIEW_TOOLTIP + "tourimport.title";             //$NON-NLS-1$
 
-   public static final String VIEW_TOOLTIP_TOURCOMPARERESULT_TIME = VIEW_TOOLTIP + "tourcompareresult.time"; //$NON-NLS-1$
+   public static final String VIEW_TOOLTIP_TOURCOMPARERESULT_TIME         = VIEW_TOOLTIP + "tourcompareresult.time";       //$NON-NLS-1$
 
    /*
     * view actions

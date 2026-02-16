@@ -2563,7 +2563,7 @@ public class EquipmentView extends ViewPart implements ITourProvider, ITourViewe
 
       TVIEquipmentView_Part selectedPartItem = null;
       TVIEquipmentView_Tour selectedTourItem = null;
-      final List<TreeViewerItem> allSelectedTreeItems = new ArrayList<>();
+      final List<Object> allSelectedTourItems = new ArrayList<>();
 
       boolean isEquipmentCollate = false;
 
@@ -2618,7 +2618,7 @@ public class EquipmentView extends ViewPart implements ITourProvider, ITourViewe
             selectedPartItem = tourItem.getPartItem();
             equipmentItemContext = tourItem.getEquipmentItem();
 
-            allSelectedTreeItems.add(tourItem);
+            allSelectedTourItems.add(tourItem);
          }
 
          if (equipmentItemContext != null) {
@@ -2690,7 +2690,7 @@ public class EquipmentView extends ViewPart implements ITourProvider, ITourViewe
 
       _tagMenuManager            .enableTagActions(isTourSelected, isOneTour, oneTourTagIds);
       _tourTypeMenuManager       .enableTourTypeActions(isTourSelected, tourTypeID);
-      _equipmentMenuManager      .enableActions(allSelectedTreeItems);
+      _equipmentMenuManager      .enableActions(allSelectedTourItems);
 
       _tourDoubleClickState.canEditTour         = isOneTour;
       _tourDoubleClickState.canOpenTour         = isOneTour;
@@ -4246,7 +4246,7 @@ public class EquipmentView extends ViewPart implements ITourProvider, ITourViewe
 
 // SET_FORMATTING_OFF
 
-      _isShowToolTipInEquipment  = _prefStore.getBoolean(ITourbookPreferences.VIEW_TOOLTIP_EQUIPMENT_EQUIPMENT);
+      _isShowToolTipInEquipment  = _prefStore.getBoolean(ITourbookPreferences.VIEW_TOOLTIP_EQUIPMENT_EQUIPMENT_1ST_COLUMN);
       _isShowToolTipInTitle      = _prefStore.getBoolean(ITourbookPreferences.VIEW_TOOLTIP_EQUIPMENT_TITLE);
       _isShowToolTipInTags       = _prefStore.getBoolean(ITourbookPreferences.VIEW_TOOLTIP_EQUIPMENT_TAGS);
 

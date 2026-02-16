@@ -37,7 +37,6 @@ import net.tourbook.common.action.ActionOpenPrefDialog;
 import net.tourbook.common.ui.SubMenu;
 import net.tourbook.common.util.LRUMap;
 import net.tourbook.common.util.StatusUtil;
-import net.tourbook.common.util.TreeViewerItem;
 import net.tourbook.data.Equipment;
 import net.tourbook.data.TourData;
 import net.tourbook.preferences.ITourbookPreferences;
@@ -551,11 +550,11 @@ public class EquipmentMenuManager implements IActionProvider {
    /**
     * Enable actions from selected tours
     *
-    * @param allSelectedTreeItems
+    * @param allSelectedItems
     */
-   public void enableActions(final List<TreeViewerItem> allSelectedTreeItems) {
+   public void enableActions(final List<Object> allSelectedItems) {
 
-      if (allSelectedTreeItems == null) {
+      if (allSelectedItems == null) {
          return;
       }
 
@@ -564,9 +563,9 @@ public class EquipmentMenuManager implements IActionProvider {
 
       final HashSet<Long> allSelectedEquipmentIDs_FromTours = new HashSet<>();
 
-      for (final TreeViewerItem treeItem : allSelectedTreeItems) {
+      for (final Object selectedItem : allSelectedItems) {
 
-         if (treeItem instanceof final TVITourBookTour tourItem) {
+         if (selectedItem instanceof final TVITourBookTour tourItem) {
 
             numTours++;
 
@@ -579,7 +578,28 @@ public class EquipmentMenuManager implements IActionProvider {
                isEnabled_RemoveEquipment = true;
             }
 
-         } else if (treeItem instanceof final TVIEquipmentView_Tour tourItem) {
+         } else if (selectedItem instanceof final TourData tourData) {
+
+            // this is from the import view
+
+            numTours++;
+
+            final Set<Equipment> allEquipment = tourData.getEquipment();
+
+            if (allEquipment != null && allEquipment.size() > 0) {
+
+               final List<Long> allEquipmentIDs = new ArrayList<>();
+
+               for (final Equipment equipment : allEquipment) {
+                  allEquipmentIDs.add(equipment.getEquipmentId());
+               }
+
+               allSelectedEquipmentIDs_FromTours.addAll(allEquipmentIDs);
+
+               isEnabled_RemoveEquipment = true;
+            }
+
+         } else if (selectedItem instanceof final TVIEquipmentView_Tour tourItem) {
 
             numTours++;
 
@@ -597,7 +617,7 @@ public class EquipmentMenuManager implements IActionProvider {
       final boolean isEnabled_AddEquipment = numTours > 0;
 
       final int numClipboardEquipment = updateUI_PasteAction();
-      final int numSelectedItems = allSelectedTreeItems.size();
+      final int numSelectedItems = allSelectedItems.size();
 
       enableActions_Equipment(isEnabled_AddEquipment, isEnabled_RemoveEquipment, numClipboardEquipment);
       enableActions_Recent(isEnabled_AddEquipment, allSelectedEquipmentIDs_FromTours, numSelectedItems);

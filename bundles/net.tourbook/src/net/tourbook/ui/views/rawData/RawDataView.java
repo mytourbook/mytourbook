@@ -98,6 +98,7 @@ import net.tourbook.data.TourWayPoint;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.equipment.EquipmentGroup;
 import net.tourbook.equipment.EquipmentGroupManager;
+import net.tourbook.equipment.EquipmentManager;
 import net.tourbook.equipment.EquipmentMenuManager;
 import net.tourbook.extension.download.CloudDownloaderManager;
 import net.tourbook.extension.download.TourbookCloudDownloader;
@@ -480,10 +481,11 @@ public class RawDataView extends ViewPart implements
             .withMillisRemoved();
    }
    //
-   private boolean                       _isToolTipInDate;
-   private boolean                       _isToolTipInTime;
-   private boolean                       _isToolTipInTitle;
-   private boolean                       _isToolTipInTags;
+   private boolean                       _isShowToolTipInDate;
+   private boolean                       _isShowToolTipInEquipment;
+   private boolean                       _isShowToolTipInTags;
+   private boolean                       _isShowToolTipInTime;
+   private boolean                       _isShowToolTipInTitle;
    //
    private TourDoubleClickState          _tourDoubleClickState       = new TourDoubleClickState();
    //
@@ -3509,6 +3511,7 @@ public class RawDataView extends ViewPart implements
       defineColumn_Tour_TypeText();
       defineColumn_Tour_Title();
       defineColumn_Tour_Tags();
+      defineColumn_Tour_Equipment();
       defineColumn_Tour_Marker();
 
       defineColumn_Motion_Distance();
@@ -3915,7 +3918,7 @@ public class RawDataView extends ViewPart implements
          @Override
          public Long getTourId(final ViewerCell cell) {
 
-            if (_isToolTipInDate == false) {
+            if (_isShowToolTipInDate == false) {
                return null;
             }
 
@@ -3949,7 +3952,7 @@ public class RawDataView extends ViewPart implements
          @Override
          public Long getTourId(final ViewerCell cell) {
 
-            if (_isToolTipInTime == false) {
+            if (_isShowToolTipInTime == false) {
                return null;
             }
 
@@ -3973,6 +3976,48 @@ public class RawDataView extends ViewPart implements
             }
          }
       });
+   }
+
+   /**
+    * Column: Tour - Equipment
+    */
+   private void defineColumn_Tour_Equipment() {
+
+      final ColumnDefinition colDef = TableColumnFactory.TOUR_EQUIPMENT.createColumn(_tourViewer_ColumnManager, _pc);
+
+      colDef.setIsDefaultColumn();
+
+      colDef.setLabelProvider(new TourInfoToolTipCellLabelProvider() {
+
+         @Override
+         public Long getTourId(final ViewerCell cell) {
+
+            if (_isShowToolTipInEquipment) {
+               
+               return ((TourData) cell.getElement()).getTourId();
+            }
+
+            return null;
+         }
+
+         @Override
+         public void update(final ViewerCell cell) {
+
+            final TourData tourData = (TourData) cell.getElement();
+
+            final Set<Equipment> allEquipment = tourData.getEquipment();
+
+            if (allEquipment.isEmpty()) {
+
+               cell.setText(UI.EMPTY_STRING);
+
+            } else {
+
+               cell.setText(EquipmentManager.getEquipmentNames(allEquipment));
+            }
+         }
+      });
+
    }
 
    /**
@@ -4025,7 +4070,7 @@ public class RawDataView extends ViewPart implements
          @Override
          public Long getTourId(final ViewerCell cell) {
 
-            if (_isToolTipInTags == false) {
+            if (_isShowToolTipInTags == false) {
                return null;
             }
 
@@ -4070,7 +4115,7 @@ public class RawDataView extends ViewPart implements
          @Override
          public Long getTourId(final ViewerCell cell) {
 
-            if (_isToolTipInTitle == false) {
+            if (_isShowToolTipInTitle == false) {
                return null;
             }
 
@@ -4224,6 +4269,8 @@ public class RawDataView extends ViewPart implements
 
    private void enableActions() {
 
+      final List<Object> allSelectedAndSavedItems = new ArrayList<>();
+
       final boolean isTourImported = _rawDataMgr.getImportedTours().values().size() > 0;
 
       final StructuredSelection selection = (StructuredSelection) _tourViewer.getSelection();
@@ -4258,12 +4305,16 @@ public class RawDataView extends ViewPart implements
 
             } else {
 
+               // tour is saved
+
                if (numSavedTours == 0) {
                   firstSavedTour = tourData;
                }
 
                numSavedTours++;
                numSelectedNotDeletedTours++;
+
+               allSelectedAndSavedItems.add(treeItem);
             }
 
             if (numSelectedNotDeletedTours == 1) {
@@ -4369,6 +4420,7 @@ public class RawDataView extends ViewPart implements
       _actionSetTourType.setEnabled(isSavedTourSelected && (allTourTypes.size() > 0));
       _tagMenuManager.enableTagActions(isSavedTourSelected, isOneTourSelected, allUsedTagIds);
       _tourTypeMenuManager.enableTourTypeActions(isSavedTourSelected, existingTourTypeId);
+      _equipmentMenuManager.enableActions(allSelectedAndSavedItems);
 
       // set double click state
       _tourDoubleClickState.canEditTour         = isOneSavedAndNotDeleteTour;
@@ -7399,10 +7451,15 @@ public class RawDataView extends ViewPart implements
 
    private void updateToolTipState() {
 
-      _isToolTipInDate = _prefStore.getBoolean(ITourbookPreferences.VIEW_TOOLTIP_TOURIMPORT_DATE);
-      _isToolTipInTime = _prefStore.getBoolean(ITourbookPreferences.VIEW_TOOLTIP_TOURIMPORT_TIME);
-      _isToolTipInTitle = _prefStore.getBoolean(ITourbookPreferences.VIEW_TOOLTIP_TOURIMPORT_TITLE);
-      _isToolTipInTags = _prefStore.getBoolean(ITourbookPreferences.VIEW_TOOLTIP_TOURIMPORT_TAGS);
+// SET_FORMATTING_OFF
+
+      _isShowToolTipInDate       = _prefStore.getBoolean(ITourbookPreferences.VIEW_TOOLTIP_TOURIMPORT_DATE);
+      _isShowToolTipInEquipment  = _prefStore.getBoolean(ITourbookPreferences.VIEW_TOOLTIP_TOURIMPORT_EQUIPMENT);
+      _isShowToolTipInTags       = _prefStore.getBoolean(ITourbookPreferences.VIEW_TOOLTIP_TOURIMPORT_TAGS);
+      _isShowToolTipInTitle      = _prefStore.getBoolean(ITourbookPreferences.VIEW_TOOLTIP_TOURIMPORT_TITLE);
+      _isShowToolTipInTime       = _prefStore.getBoolean(ITourbookPreferences.VIEW_TOOLTIP_TOURIMPORT_TIME);
+
+// SET_FORMATTING_ON
    }
 
    /**

@@ -2251,7 +2251,7 @@ public class TourBookView extends ViewPart implements
       TVITourBookItem firstTreeElement = null;
       TVITourBookTour firstTourItem = null;
 
-      List<TreeViewerItem> allSelectedTreeItems = new ArrayList<>();
+      List<Object> allSelectedItems = new ArrayList<>();
 
       if (_isLayoutNatTable) {
 
@@ -2267,7 +2267,7 @@ public class TourBookView extends ViewPart implements
 
                final List<TVITourBookTour> allSelectedTourItems = rowSelectionModel.getSelectedRowObjects();
 
-               allSelectedTreeItems = new ArrayList<>(allSelectedTourItems);
+               allSelectedItems = new ArrayList<>(allSelectedTourItems);
                firstTourItem = allSelectedTourItems.get(0);
             }
 
@@ -2301,9 +2301,9 @@ public class TourBookView extends ViewPart implements
 
                final List<TVITourBookTour> allSelectedTourItems = rowSelectionModel.getSelectedRowObjects();
 
-               allSelectedTreeItems = new ArrayList<>(allSelectedTourItems);
+               allSelectedItems = new ArrayList<>(allSelectedTourItems);
 
-               if (allSelectedTreeItems.isEmpty() == false) {
+               if (allSelectedItems.isEmpty() == false) {
                   firstTourItem = allSelectedTourItems.get(0);
                }
 
@@ -2317,7 +2317,7 @@ public class TourBookView extends ViewPart implements
                   numTourItems = numSelectedItems = 1;
                   firstTourItem = fetchedTour;
 
-                  allSelectedTreeItems.add(fetchedTour);
+                  allSelectedItems.add(fetchedTour);
                }
             }
 
@@ -2342,7 +2342,7 @@ public class TourBookView extends ViewPart implements
 
                numTourItems++;
 
-               allSelectedTreeItems.add(tviTourBookTour);
+               allSelectedItems.add(tviTourBookTour);
             }
          }
 
@@ -2466,7 +2466,7 @@ public class TourBookView extends ViewPart implements
             oneTourTagIds,
             isFlatView);
 
-      _equipmentMenuManager.enableActions(allSelectedTreeItems);
+      _equipmentMenuManager.enableActions(allSelectedItems);
 
       final long tourTypeID = isOneTourSelected
             ? firstTourItem.getTourTypeId()

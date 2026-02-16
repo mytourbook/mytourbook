@@ -1156,21 +1156,11 @@ public class EquipmentManager {
     */
    public static String getEquipmentNames(final Set<Equipment> allEquipment) {
 
-      if (allEquipment.isEmpty()) {
-         return UI.EMPTY_STRING;
-      }
-
-      final List<String> allEquipmentNames = new ArrayList<>();
-
-      // get equipment name for each equipment id
-      for (final Equipment equipment : allEquipment) {
-         allEquipmentNames.add(equipment.getName());
-      }
-
-      return getEquipmentNamesText(allEquipmentNames, false);
+      return getEquipmentNames(allEquipment, false);
    }
 
-   public static String getEquipmentNames(final Set<Equipment> allEquipment, final boolean isVertical) {
+   public static String getEquipmentNames(final Set<Equipment> allEquipment,
+                                          final boolean isVertical) {
 
       if (allEquipment.isEmpty()) {
          return UI.EMPTY_STRING;
@@ -1186,7 +1176,8 @@ public class EquipmentManager {
       return getEquipmentNamesText(allEquipmentNames, isVertical);
    }
 
-   private static String getEquipmentNamesText(final List<String> allEquipmentNames, final boolean isVertical) {
+   private static String getEquipmentNamesText(final List<String> allEquipmentNames,
+                                               final boolean isVertical) {
 
       // sort equipment by name
       Collections.sort(allEquipmentNames);
