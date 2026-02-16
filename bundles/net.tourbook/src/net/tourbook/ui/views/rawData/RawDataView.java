@@ -87,6 +87,7 @@ import net.tourbook.common.util.PostSelectionProvider;
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.TableColumnDefinition;
 import net.tourbook.common.util.Util;
+import net.tourbook.data.Equipment;
 import net.tourbook.data.FlatGainLoss;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourMarker;
@@ -95,6 +96,8 @@ import net.tourbook.data.TourTag;
 import net.tourbook.data.TourType;
 import net.tourbook.data.TourWayPoint;
 import net.tourbook.database.TourDatabase;
+import net.tourbook.equipment.EquipmentGroup;
+import net.tourbook.equipment.EquipmentGroupManager;
 import net.tourbook.equipment.EquipmentMenuManager;
 import net.tourbook.extension.download.CloudDownloaderManager;
 import net.tourbook.extension.download.TourbookCloudDownloader;
@@ -523,11 +526,12 @@ public class RawDataView extends ViewPart implements
    private String                        _imageUrl_SerialPort_Configured;
    private String                        _imageUrl_SerialPort_Directly;
    private String                        _imageUrl_State_AdjustTemperature;
-   private String                        _imageUrl_State_RetrieveTourLocation;
-   private String                        _imageUrl_State_RetrieveWeatherData;
+   private String                        _imageUrl_State_Equipment;
    private String                        _imageUrl_State_Error;
    private String                        _imageUrl_State_OK;
    private String                        _imageUrl_State_MovedFiles;
+   private String                        _imageUrl_State_RetrieveTourLocation;
+   private String                        _imageUrl_State_RetrieveWeatherData;
    private String                        _imageUrl_State_SaveTour;
    private String                        _imageUrl_State_TourMarker;
    private String                        _imageUrl_State_TourTags;
@@ -2288,7 +2292,7 @@ public class RawDataView extends ViewPart implements
 
       final String tileName = importLauncher.name.trim();
       final String tileDescription = importLauncher.description.trim();
-      final String tourTypeText = EasyLauncherUtils.getTourTypeText(importLauncher, tileName);
+      final String tourTypeText = EasyLauncherUtils.createText_TourType(importLauncher, tileName);
 
       {
          // tour type name
@@ -2324,7 +2328,7 @@ public class RawDataView extends ViewPart implements
 
          if (importLauncher.isSetTags()) {
 
-            EasyLauncherUtils.getTagGroupText(importLauncher, sb);
+            EasyLauncherUtils.createText_TagsGroup(importLauncher, sb);
 
          } else {
 
@@ -2337,7 +2341,7 @@ public class RawDataView extends ViewPart implements
 
          if (importLauncher.isSetEquipment()) {
 
-            EasyLauncherUtils.getEquipmentGroupText(importLauncher, sb);
+            EasyLauncherUtils.createText_EquipmentGroup(importLauncher, sb);
 
          } else {
 
@@ -2503,6 +2507,17 @@ public class RawDataView extends ViewPart implements
       }
 
       /*
+       * Equipment
+       */
+      String htmlEquipment = UI.EMPTY_STRING;
+      if (importLauncher.isSetEquipment()) {
+
+         final String stateImage = createHTML_BgImage(_imageUrl_State_Equipment);
+
+         htmlEquipment = createHTML_TileAnnotation(stateImage);
+      }
+
+      /*
        * Tags
        */
       String htmlTourTags = UI.EMPTY_STRING;
@@ -2533,6 +2548,7 @@ public class RawDataView extends ViewPart implements
       sb.append(htmlRetrieveWeatherData);
       sb.append(htmlAdjustTemperature);
       sb.append(htmlLastMarker);
+      sb.append(htmlEquipment);
       sb.append(htmlTourTags);
 
       sb.append("<div style='float:left;'>" + importLauncher.name + "</div>"); //$NON-NLS-1$ //$NON-NLS-2$
@@ -2811,11 +2827,12 @@ public class RawDataView extends ViewPart implements
          _imageUrl_SerialPort_Directly          = getIconUrl(Images.RawData_TransferDirect);
 
          _imageUrl_State_AdjustTemperature      = getIconUrl(Images.State_AdjustTemperature);
+         _imageUrl_State_Equipment              = getIconUrl(Images.State_Equipment);
+         _imageUrl_State_Error                  = getIconUrl(Images.State_Error);
+         _imageUrl_State_MovedFiles             = getIconUrl(Images.State_MovedTour);
+         _imageUrl_State_OK                     = getIconUrl(Images.State_OK);
          _imageUrl_State_RetrieveTourLocation   = getIconUrl(Images.State_RetrieveTourLocation);
          _imageUrl_State_RetrieveWeatherData    = getIconUrl(Images.State_RetrieveWeatherData);
-         _imageUrl_State_Error                  = getIconUrl(Images.State_Error);
-         _imageUrl_State_OK                     = getIconUrl(Images.State_OK);
-         _imageUrl_State_MovedFiles             = getIconUrl(Images.State_MovedTour);
          _imageUrl_State_SaveTour               = getIconUrl(Images.State_SaveTour);
          _imageUrl_State_TourMarker             = getIconUrl(Images.State_TourMarker);
          _imageUrl_State_TourTags               = getIconUrl(Images.State_TourTags);
@@ -2836,9 +2853,40 @@ public class RawDataView extends ViewPart implements
       }
    }
 
-   private String createTagGroupText(final ImportLauncher importLauncher) {
+   private String createText_EquipmentGroup(final ImportLauncher importLauncher) {
+
+      final String equipmentGroupID = importLauncher.equipmentGroupID;
+
+      final EquipmentGroup equipmentGroup = EquipmentGroupManager.getEquipmentGroup(equipmentGroupID);
+      final Set<Equipment> allEquipment = EquipmentGroupManager.getEquipment(equipmentGroupID);
+
+      if (equipmentGroup == null || allEquipment == null) {
+
+         return UI.EMPTY_STRING;
+      }
+
+      final List<Equipment> allSortedEquipment = new ArrayList<>(allEquipment);
+      Collections.sort(allSortedEquipment);
 
       final StringBuilder sb = new StringBuilder();
+
+      for (int equipmentIndex = 0; equipmentIndex < allSortedEquipment.size(); equipmentIndex++) {
+
+         final Equipment equipment = allSortedEquipment.get(equipmentIndex);
+
+         if (equipmentIndex > 0) {
+            sb.append(UI.SPACE2 + UI.SYMBOL_BULLET + UI.SPACE2);
+         }
+
+         sb.append(equipment.getName());
+      }
+
+      final String text = "\"%s\" : %s".formatted(equipmentGroup.name, sb.toString()); //$NON-NLS-1$
+
+      return text;
+   }
+
+   private String createText_TagsGroup(final ImportLauncher importLauncher) {
 
       final String tourTagGroupID = importLauncher.tourTagGroupID;
 
@@ -2853,22 +2901,22 @@ public class RawDataView extends ViewPart implements
       final List<TourTag> sortedTags = new ArrayList<>(allTags);
       Collections.sort(sortedTags);
 
-      final StringBuilder sbTags = new StringBuilder();
+      final StringBuilder sb = new StringBuilder();
 
       for (int tagIndex = 0; tagIndex < sortedTags.size(); tagIndex++) {
 
          final TourTag tourTag = sortedTags.get(tagIndex);
 
          if (tagIndex > 0) {
-            sbTags.append(UI.SPACE2 + UI.SYMBOL_BULLET + UI.SPACE2);
+            sb.append(UI.SPACE2 + UI.SYMBOL_BULLET + UI.SPACE2);
          }
 
-         sbTags.append(tourTag.getTagName());
+         sb.append(tourTag.getTagName());
       }
 
-      sb.append("\"%s\" : %s".formatted(tagGroup.name, sbTags.toString())); //$NON-NLS-1$
+      final String text = "\"%s\" : %s".formatted(tagGroup.name, sb.toString()); //$NON-NLS-1$
 
-      return sb.toString();
+      return text;
    }
 
    private void createUI(final Composite parent) {
@@ -5925,6 +5973,13 @@ public class RawDataView extends ViewPart implements
          }
 
          /*
+          * 9. Set equipment from a group
+          */
+         if (importLauncher.isSetEquipmentGroup) {
+            runEasyImport_009_SetEquipment(importLauncher, importedTours);
+         }
+
+         /*
           * 50. Retrieve weather data
           */
          if (importLauncher.isRetrieveWeatherData) {
@@ -6220,7 +6275,7 @@ public class RawDataView extends ViewPart implements
    }
 
    private void runEasyImport_008_SetTourTags(final ImportLauncher importLauncher,
-                                              final ArrayList<TourData> importedTours) {
+                                              final ArrayList<TourData> allImportedTours) {
 
       final String tourTagGroupID = importLauncher.tourTagGroupID;
       final TagGroup tagGroup = TagGroupManager.getTagGroup(tourTagGroupID);
@@ -6230,11 +6285,30 @@ public class RawDataView extends ViewPart implements
       }
 
       // "8. Set tour tags from the tag group %s"
-      TourLogManager.log_DEFAULT(EasyImportManager.LOG_EASY_IMPORT_008_SET_TOUR_TAGS.formatted(createTagGroupText(importLauncher)));
+      TourLogManager.log_DEFAULT(EasyImportManager.LOG_EASY_IMPORT_008_SET_TOUR_TAGS.formatted(createText_TagsGroup(importLauncher)));
 
-      for (final TourData tourData : importedTours) {
+      for (final TourData tourData : allImportedTours) {
 
          tourData.setTourTags(tagGroup.tourTags);
+      }
+   }
+
+   private void runEasyImport_009_SetEquipment(final ImportLauncher importLauncher,
+                                               final ArrayList<TourData> allImportedTours) {
+
+      final String equipmentGroupID = importLauncher.equipmentGroupID;
+      final EquipmentGroup equipmentGroup = EquipmentGroupManager.getEquipmentGroup(equipmentGroupID);
+
+      if (equipmentGroup == null) {
+         return;
+      }
+
+      // "9. Set tour equipment from the equipment group %s"
+      TourLogManager.log_DEFAULT(EasyImportManager.LOG_EASY_IMPORT_009_SET_EQUIPMENT.formatted(createText_EquipmentGroup(importLauncher)));
+
+      for (final TourData tourData : allImportedTours) {
+
+         tourData.setEquipment(equipmentGroup.allEquipment);
       }
    }
 

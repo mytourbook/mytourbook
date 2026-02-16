@@ -1043,7 +1043,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
    @OneToMany(fetch = EAGER, cascade = ALL, mappedBy = "tourData")
    @Cascade(org.hibernate.annotations.CascadeType.DELETE_ORPHAN)
    @JsonProperty
-   private Set<TourNutritionProduct>             tourNutritionProducts     = new HashSet<>();
+   private Set<TourNutritionProduct>   tourNutritionProducts               = new HashSet<>();
 
    /**
     * Reference tours
@@ -1061,13 +1061,12 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
    private Set<TourTag>                tourTags                            = new HashSet<>();
 
    /**
-    * Equipments, this word is wrong there is no plural for "equipment"
-    * but we use "equipments" in the db field name to know that there can be plurals
+    * Equipment
     */
    @ManyToMany(fetch = EAGER)
    @JoinTable(inverseJoinColumns = @JoinColumn(name = "Equipment_EquipmentId", referencedColumnName = "EquipmentId"))
    @JsonProperty
-   private Set<Equipment>              equipments                          = new HashSet<>();
+   private Set<Equipment>              equipment                          = new HashSet<>();
 
    /**
     * Sensor values
@@ -6917,6 +6916,10 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
       tourTags_Clone.addAll(tourData_DeepCopy.tourTags);
       tourData_DeepCopy.tourTags = tourTags_Clone;
 
+      final Set<Equipment> equipment_Clone = new HashSet<>();
+      equipment_Clone.addAll(tourData_DeepCopy.equipment);
+      tourData_DeepCopy.equipment = equipment_Clone;
+
       final Set<DeviceSensorValue> deviceSensor_Clone = new HashSet<>();
       deviceSensor_Clone.addAll(tourData_DeepCopy.deviceSensorValues);
       tourData_DeepCopy.deviceSensorValues = deviceSensor_Clone;
@@ -9570,10 +9573,10 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
    }
 
    /**
-    * @return Returns all {@link #equipments} which are defined for this tour
+    * @return Returns all {@link #equipment} which are defined for this tour
     */
    public Set<Equipment> getEquipment() {
-      return equipments;
+      return equipment;
    }
 
    /**
@@ -13382,6 +13385,15 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
 
       // We update the average elevation change
       computeAvg_AltitudeChange();
+   }
+
+   /**
+    * Set all equipment for this tour into {@link #equipment}
+    *
+    * @param equipment
+    */
+   public void setEquipment(final Set<Equipment> equipment) {
+      this.equipment = equipment;
    }
 
    public void setFrontShiftCount(final int frontShiftCount) {

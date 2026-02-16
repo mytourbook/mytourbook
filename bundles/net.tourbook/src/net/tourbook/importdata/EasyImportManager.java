@@ -148,6 +148,7 @@ public class EasyImportManager {
    public static final String       LOG_EASY_IMPORT_006_ADJUST_ELEVATION                  = Messages.Log_EasyImport_006_AdjustElevation;
    public static final String       LOG_EASY_IMPORT_007_REPLACE_ELEVATION_FROM_SRTM       = Messages.Log_EasyImport_006_ReplaceElevationFromSRTM;
    public static final String       LOG_EASY_IMPORT_008_SET_TOUR_TAGS                     = Messages.Log_EasyImport_008_SetTourTags;
+   public static final String       LOG_EASY_IMPORT_009_SET_EQUIPMENT                     = Messages.Log_EasyImport_009_SetEquipment;
    public static final String       LOG_EASY_IMPORT_050_RETRIEVE_WEATHER_DATA             = Messages.Log_EasyImport_050_RetrieveWeatherData;
    public static final String       LOG_EASY_IMPORT_051_RETRIEVE_TOUR_LOCATION            = Messages.Log_EasyImport_051_RetrieveTourLocation;
    public static final String       LOG_EASY_IMPORT_099_SAVE_TOUR                         = Messages.Log_EasyImport_099_SaveTour;

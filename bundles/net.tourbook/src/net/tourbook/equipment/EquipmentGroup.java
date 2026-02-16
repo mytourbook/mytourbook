@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2025 Wolfgang Schramm and Contributors
+ * Copyright (C) 2025, 2026 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -31,6 +31,9 @@ public class EquipmentGroup {
 
    public String             name;
 
+   /**
+    * Contains all equipment in this group
+    */
    public Set<Equipment>     allEquipment = new HashSet<>();
 
    public EquipmentGroup() {}

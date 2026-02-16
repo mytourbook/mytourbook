@@ -226,6 +226,7 @@ public class Images {
    public static final String State_Copy                           = "state-copy.svg";                              //$NON-NLS-1$
    public static final String State_Deleted_Backup                 = "state-delete-backup.svg";                     //$NON-NLS-1$
    public static final String State_Deleted_Device                 = "state-delete-device.svg";                     //$NON-NLS-1$
+   public static final String State_Equipment                      = "state-equipment.svg";                         //$NON-NLS-1$
    public static final String State_Error                          = "state-error.svg";                             //$NON-NLS-1$
    public static final String State_Info                           = "state-info.svg";                              //$NON-NLS-1$
    public static final String State_MovedTour                      = "state-moved-tour.svg";                        //$NON-NLS-1$

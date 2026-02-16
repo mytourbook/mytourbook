@@ -70,7 +70,7 @@ public class EasyLauncherUtils {
       _nf1.setMaximumFractionDigits(1);
    }
 
-   public static void getEquipmentGroupText(final ImportLauncher importLauncher, final StringBuilder sb) {
+   public static void createText_EquipmentGroup(final ImportLauncher importLauncher, final StringBuilder sb) {
 
       final EquipmentGroup equipmentGroup = EquipmentGroupManager.getEquipmentGroup(importLauncher.equipmentGroupID);
       final Set<Equipment> allEquipment = EquipmentGroupManager.getEquipment(importLauncher.equipmentGroupID);
@@ -94,7 +94,7 @@ public class EasyLauncherUtils {
       sb.append("Set equipment: %s\n\n%s".formatted(equipmentGroup.name, sbEquipment.toString()));
    }
 
-   public static void getTagGroupText(final ImportLauncher importLauncher, final StringBuilder sb) {
+   public static void createText_TagsGroup(final ImportLauncher importLauncher, final StringBuilder sb) {
 
       final TagGroup tagGroup = TagGroupManager.getTagGroup(importLauncher.tourTagGroupID);
       final Set<TourTag> allTags = TagGroupManager.getTags(importLauncher.tourTagGroupID);
@@ -118,7 +118,7 @@ public class EasyLauncherUtils {
       sb.append(Messages.Import_Data_HTML_SetTourTags_YES.formatted(tagGroup.name, sbTags.toString()));
    }
 
-   public static String getTourTypeText(final ImportLauncher importLauncher, final String tileName) {
+   public static String createText_TourType(final ImportLauncher importLauncher, final String tileName) {
 
       final StringBuilder ttText = new StringBuilder();
       final Enum<TourTypeConfig> ttConfig = importLauncher.tourTypeConfig;
@@ -171,7 +171,7 @@ public class EasyLauncherUtils {
 
       final String tileName = importLauncher.name.trim();
       final String tileDescription = importLauncher.description.trim();
-      final String tourTypeText = getTourTypeText(importLauncher, tileName);
+      final String tourTypeText = createText_TourType(importLauncher, tileName);
 
       {
          // tour type name
@@ -207,7 +207,7 @@ public class EasyLauncherUtils {
 
          if (importLauncher.isSetTourTagGroup) {
 
-            getTagGroupText(importLauncher, sb);
+            createText_TagsGroup(importLauncher, sb);
 
          } else {
 
@@ -220,7 +220,7 @@ public class EasyLauncherUtils {
 
          if (importLauncher.isSetEquipmentGroup) {
 
-            getEquipmentGroupText(importLauncher, sb);
+            createText_EquipmentGroup(importLauncher, sb);
 
          } else {
 

@@ -1793,7 +1793,7 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements IActionRe
             GridDataFactory.fillDefaults().grab(true, false).applyTo(topContainer);
             GridLayoutFactory.fillDefaults().numColumns(2).applyTo(topContainer);
             {
-               createUI_610_IL_01_Name(topContainer);
+               createUI_610_IL_nn_Name(topContainer);
             }
          }
          {
@@ -1803,19 +1803,19 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements IActionRe
                   .hint(_defaultPaneWidth, SWT.DEFAULT)
                   .applyTo(_tabFolderIL);
             {
-               // tab: 2...3
+               // tab: 3
                final CTabItem tabConfig = new CTabItem(_tabFolderIL, SWT.NONE);
-               tabConfig.setText(" 2 . . . 3 ");
+               tabConfig.setText("  &3 +  ");
                tabConfig.setControl(createUI_602_Tab_1(_tabFolderIL));
 
                // tab: 4...9
                final CTabItem tabLauncher = new CTabItem(_tabFolderIL, SWT.NONE);
-               tabLauncher.setText(" 4 . . . 9 ");
+               tabLauncher.setText(" &4 . . . 9 ");
                tabLauncher.setControl(createUI_604_Tab_2(_tabFolderIL));
 
                // tab: 50...99
                final CTabItem tabOptions = new CTabItem(_tabFolderIL, SWT.NONE);
-               tabOptions.setText(" 50 . . . 99 ");
+               tabOptions.setText(" &50 . . . 99 ");
                tabOptions.setControl(createUI_606_Tab_3(_tabFolderIL));
             }
          }
@@ -1827,9 +1827,10 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements IActionRe
       final Composite container = new Composite(parent, SWT.NONE);
       GridDataFactory.fillDefaults().grab(true, true).applyTo(container);
       GridLayoutFactory.swtDefaults().numColumns(2).applyTo(container);
+//      container.setBackground(UI.SYS_COLOR_YELLOW);
       {
-         createUI_610_IL_02_Description(container);
-         createUI_620_IL_03_TourType(container);
+         createUI_612_IL_03_TourType(container);
+         createUI_614_IL_nn_Description(container);
       }
 
       return container;
@@ -1867,7 +1868,7 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements IActionRe
       return container;
    }
 
-   private void createUI_610_IL_01_Name(final Composite parent) {
+   private void createUI_610_IL_nn_Name(final Composite parent) {
 
       {
          /*
@@ -1890,37 +1891,7 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements IActionRe
       }
    }
 
-   private void createUI_610_IL_02_Description(final Composite parent) {
-
-      {
-         /*
-          * Config description
-          */
-
-         // label
-         _lblIL_ConfigDescription = new Label(parent, SWT.NONE);
-         _lblIL_ConfigDescription.setText(Messages.Dialog_ImportConfig_Label_ConfigDescription);
-         GridDataFactory.fillDefaults()
-               .align(SWT.FILL, SWT.BEGINNING)
-               .applyTo(_lblIL_ConfigDescription);
-
-         // text
-         _txtIL_ConfigDescription = new Text(parent,
-               SWT.BORDER
-                     | SWT.WRAP
-                     | SWT.MULTI
-                     | SWT.V_SCROLL
-                     | SWT.H_SCROLL);
-         _txtIL_ConfigDescription.addModifyListener(_ilModifyListener);
-
-         GridDataFactory.fillDefaults()
-               .grab(true, false)
-               .hint(SWT.DEFAULT, convertHeightInCharsToPixels(5))
-               .applyTo(_txtIL_ConfigDescription);
-      }
-   }
-
-   private void createUI_620_IL_03_TourType(final Composite parent) {
+   private void createUI_612_IL_03_TourType(final Composite parent) {
 
       final SelectionListener ttListener = SelectionListener.widgetSelectedAdapter(selectionEvent -> onSelect_IL_TourType());
 
@@ -1964,6 +1935,36 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements IActionRe
             _pageTourType_OneForAll = createUI_624_IL_Page_OneForAll(_pagebookTourType);
             _pageTourType_BySpeed = createUI_630_IL_Page_BySpeed(_pagebookTourType);
          }
+      }
+   }
+
+   private void createUI_614_IL_nn_Description(final Composite parent) {
+
+      {
+         /*
+          * Config description
+          */
+
+         // label
+         _lblIL_ConfigDescription = new Label(parent, SWT.NONE);
+         _lblIL_ConfigDescription.setText(Messages.Dialog_ImportConfig_Label_ConfigDescription);
+         GridDataFactory.fillDefaults()
+               .align(SWT.FILL, SWT.BEGINNING)
+               .applyTo(_lblIL_ConfigDescription);
+
+         // text
+         _txtIL_ConfigDescription = new Text(parent,
+               SWT.BORDER
+                     | SWT.WRAP
+                     | SWT.MULTI
+                     | SWT.V_SCROLL
+                     | SWT.H_SCROLL);
+         _txtIL_ConfigDescription.addModifyListener(_ilModifyListener);
+
+         GridDataFactory.fillDefaults()
+               .grab(true, true)
+               .hint(SWT.DEFAULT, convertHeightInCharsToPixels(4))
+               .applyTo(_txtIL_ConfigDescription);
       }
    }
 
