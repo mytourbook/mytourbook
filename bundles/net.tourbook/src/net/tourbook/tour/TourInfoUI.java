@@ -222,7 +222,8 @@ public class TourInfoUI implements ICanHideTooltip {
     * UI controls
     */
    private Composite        _parent;
-   private Composite        _lowerPartContainer;
+   private Composite        _lowerPartContainer1;
+   private Composite        _lowerPartContainer2;
    private Composite        _shellContainer;
    private Composite        _ttContainer;
 
@@ -557,7 +558,8 @@ public class TourInfoUI implements ICanHideTooltip {
             }
          }
 
-         createUI_90_LowerPart(_ttContainer);
+         createUI_90_LowerPart1(_ttContainer);
+         createUI_90_LowerPart2(_ttContainer);
          createUI_99_CreateModifyTime(_ttContainer);
       }
    }
@@ -1462,30 +1464,40 @@ public class TourInfoUI implements ICanHideTooltip {
       }
    }
 
-   private void createUI_90_LowerPart(final Composite parent) {
+   private void createUI_90_LowerPart1(final Composite parent) {
 
       final int numColumns = 4;
 
-      _lowerPartContainer = new Composite(parent, SWT.NONE);
-      GridDataFactory.fillDefaults().grab(true, false).applyTo(_lowerPartContainer);
-      GridLayoutFactory.fillDefaults().numColumns(numColumns).spacing(16, 0).applyTo(_lowerPartContainer);
-//      _lowerPartContainer.setBackground(UI.SYS_COLOR_CYAN);
+      _lowerPartContainer1 = new Composite(parent, SWT.NONE);
+      GridDataFactory.fillDefaults().grab(true, false).applyTo(_lowerPartContainer1);
+      GridLayoutFactory.fillDefaults().numColumns(numColumns).spacing(16, 0).applyTo(_lowerPartContainer1);
+//      _lowerPartContainer1.setBackground(UI.SYS_COLOR_MAGENTA);
       {
-
          if (_isShowSensorValues) {
-            createUI_92_SensorValues(_lowerPartContainer);
+            createUI_95_SensorValues(_lowerPartContainer1);
          }
+      }
+   }
 
+   private void createUI_90_LowerPart2(final Composite parent) {
+
+      final int numColumns = 4;
+
+      _lowerPartContainer2 = new Composite(parent, SWT.NONE);
+      GridDataFactory.fillDefaults().grab(true, false).applyTo(_lowerPartContainer2);
+      GridLayoutFactory.fillDefaults().numColumns(numColumns).spacing(16, 0).applyTo(_lowerPartContainer2);
+//      _lowerPartContainer2.setBackground(UI.SYS_COLOR_MAGENTA);
+      {
          {
             /*
              * Tour type
              */
-            _lblTourType = createUI_Label(_lowerPartContainer, Messages.Tour_Tooltip_Label_TourType);
+            _lblTourType = createUI_Label(_lowerPartContainer2, Messages.Tour_Tooltip_Label_TourType);
             GridDataFactory.fillDefaults().align(SWT.FILL, SWT.BEGINNING)
                   .indent(0, 5)
                   .applyTo(_lblTourType);
 
-            _lblTourType_Value = createUI_LabelValue(_lowerPartContainer, SWT.LEAD | SWT.WRAP);
+            _lblTourType_Value = createUI_LabelValue(_lowerPartContainer2, SWT.LEAD | SWT.WRAP);
             GridDataFactory.fillDefaults()
                   .span(numColumns - 1, 1)
                   .indent(0, 5)
@@ -1495,10 +1507,10 @@ public class TourInfoUI implements ICanHideTooltip {
             /*
              * Tags
              */
-            _lblTourTags = createUI_Label(_lowerPartContainer, Messages.Tour_Tooltip_Label_Tags);
+            _lblTourTags = createUI_Label(_lowerPartContainer2, Messages.Tour_Tooltip_Label_Tags);
             GridDataFactory.fillDefaults().align(SWT.FILL, SWT.BEGINNING).applyTo(_lblTourTags);
 
-            _lblTourTags_Value = createUI_LabelValue(_lowerPartContainer, SWT.LEAD | SWT.WRAP);
+            _lblTourTags_Value = createUI_LabelValue(_lowerPartContainer2, SWT.LEAD | SWT.WRAP);
             GridDataFactory.fillDefaults()
                   .span(numColumns - 1, 1)
                   .applyTo(_lblTourTags_Value);
@@ -1507,10 +1519,10 @@ public class TourInfoUI implements ICanHideTooltip {
             /*
              * Equipment
              */
-            _lblEquipment = createUI_Label(_lowerPartContainer, Messages.Tour_Tooltip_Label_Equipment);
+            _lblEquipment = createUI_Label(_lowerPartContainer2, Messages.Tour_Tooltip_Label_Equipment);
             GridDataFactory.fillDefaults().align(SWT.FILL, SWT.BEGINNING).applyTo(_lblEquipment);
 
-            _lblEquipment_Value = createUI_LabelValue(_lowerPartContainer, SWT.LEAD | SWT.WRAP);
+            _lblEquipment_Value = createUI_LabelValue(_lowerPartContainer2, SWT.LEAD | SWT.WRAP);
             GridDataFactory.fillDefaults()
                   .span(numColumns - 1, 1)
                   .applyTo(_lblEquipment_Value);
@@ -1521,14 +1533,14 @@ public class TourInfoUI implements ICanHideTooltip {
             /*
              * Weather
              */
-            _lblWeather = createUI_Label(_lowerPartContainer, Messages.Tour_Tooltip_Label_Weather);
+            _lblWeather = createUI_Label(_lowerPartContainer2, Messages.Tour_Tooltip_Label_Weather);
             _lblWeather.setFont(_boldFont);
             GridDataFactory.fillDefaults()
                   .span(numColumns, 1)
                   .indent(0, 10)
                   .applyTo(_lblWeather);
 
-            _txtWeather = new Text(_lowerPartContainer, SWT.MULTI | SWT.READ_ONLY);
+            _txtWeather = new Text(_lowerPartContainer2, SWT.MULTI | SWT.READ_ONLY);
             GridDataFactory.fillDefaults().span(numColumns, 1).applyTo(_txtWeather);
          }
          {
@@ -1537,7 +1549,7 @@ public class TourInfoUI implements ICanHideTooltip {
              */
 
             // label
-            _lblDescription = createUI_Label(_lowerPartContainer, Messages.Tour_Tooltip_Label_Description);
+            _lblDescription = createUI_Label(_lowerPartContainer2, Messages.Tour_Tooltip_Label_Description);
             _lblDescription.setFont(_boldFont);
             GridDataFactory.fillDefaults()
                   .span(numColumns, 1)
@@ -1552,7 +1564,7 @@ public class TourInfoUI implements ICanHideTooltip {
                style |= SWT.V_SCROLL;
             }
 
-            _txtDescription = new Text(_lowerPartContainer, style);
+            _txtDescription = new Text(_lowerPartContainer2, style);
 
             GridDataFactory.fillDefaults().span(numColumns, 1).applyTo(_txtDescription);
             if (_descriptionLineCount > _descriptionScroll_Lines) {
@@ -1567,35 +1579,35 @@ public class TourInfoUI implements ICanHideTooltip {
                /*
                 * Start location
                 */
-               _lblLocationStart = createUI_Label(_lowerPartContainer, Messages.Tour_Tooltip_Label_TourLocation_Start);
+               _lblLocationStart = createUI_Label(_lowerPartContainer2, Messages.Tour_Tooltip_Label_TourLocation_Start);
                _lblLocationStart.setFont(_boldFont);
                GridDataFactory.fillDefaults()
                      .span(numColumns, 1)
                      .indent(0, 10)
                      .applyTo(_lblLocationStart);
 
-               _txtLocationStart = new Text(_lowerPartContainer, SWT.WRAP | SWT.MULTI | SWT.READ_ONLY);
+               _txtLocationStart = new Text(_lowerPartContainer2, SWT.WRAP | SWT.MULTI | SWT.READ_ONLY);
                GridDataFactory.fillDefaults().span(numColumns, 1).applyTo(_txtLocationStart);
             }
             {
                /*
                 * End location
                 */
-               _lblLocationEnd = createUI_Label(_lowerPartContainer, Messages.Tour_Tooltip_Label_TourLocation_End);
+               _lblLocationEnd = createUI_Label(_lowerPartContainer2, Messages.Tour_Tooltip_Label_TourLocation_End);
                _lblLocationEnd.setFont(_boldFont);
                GridDataFactory.fillDefaults()
                      .span(numColumns, 1)
                      .indent(0, 10)
                      .applyTo(_lblLocationEnd);
 
-               _txtLocationEnd = new Text(_lowerPartContainer, SWT.WRAP | SWT.MULTI | SWT.READ_ONLY);
+               _txtLocationEnd = new Text(_lowerPartContainer2, SWT.WRAP | SWT.MULTI | SWT.READ_ONLY);
                GridDataFactory.fillDefaults().span(numColumns, 1).applyTo(_txtLocationEnd);
             }
          }
       }
    }
 
-   private void createUI_92_SensorValues(final Composite parent) {
+   private void createUI_95_SensorValues(final Composite parent) {
 
       /*
        * Setup sensor value data BEFORE returning, otherwise old data could cause widget dispose
@@ -1853,7 +1865,6 @@ public class TourInfoUI implements ICanHideTooltip {
             ? null
             : TourDatabase.getTourTypeName(tourType.getTypeId());
 
-
 // SET_FORMATTING_OFF
 
       final Set<TourTag> allTags          = _tourData.getTourTags();
@@ -2067,14 +2078,18 @@ public class TourInfoUI implements ICanHideTooltip {
       _txtTitle.setText(tourTitle);
 
       /*
-       * Lower part container contains sensor values, weather, tour type, tags and description
+       * Lower part containers contains sensor values, weather, tour type, tags and description
        */
-      UI.showHideControl(_lowerPartContainer,
+      UI.showHideControl(_lowerPartContainer1, _hasSensorValues);
 
-            _hasSensorValues
+      UI.showHideControl(_lowerPartContainer2,
+
+            false
+
                   || _hasWeatherDescription
                   || _hasTourType
                   || _hasTags
+                  || _hasEquipment
                   || _hasTourDescription
                   || _hasLocationStart
                   || _hasLocationEnd);
