@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2022 Wolfgang Schramm and Contributors
+ * Copyright (C) 2015, 2026 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -22,7 +22,6 @@ import java.sql.SQLException;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.Set;
 
 import net.tourbook.common.UI;
 import net.tourbook.common.time.TimeTools;
@@ -54,83 +53,100 @@ public class TVICollatedTour_Event extends TVICollatedTour {
    @Override
    protected void fetchChildren() {
 
-      final ArrayList<TreeViewerItem> children = new ArrayList<>();
-      setChildren(children);
+      final ArrayList<TreeViewerItem> allChildren = new ArrayList<>();
+      setChildren(allChildren);
 
-      final AppFilter sqlFilter = new AppFilter();
+      final AppFilter appFilter = new AppFilter();
 
-      final String sqlString = UI.EMPTY_STRING +
+      final String sql = UI.EMPTY_STRING
 
-            "SELECT " //                                                //$NON-NLS-1$
-
-            + "tourID, " //                                          1  //$NON-NLS-1$
-            + "tourPerson_personId, " //                             2  //$NON-NLS-1$
-            + "tourType_typeId, " //                                 3  //$NON-NLS-1$
-            + "jTdataTtag.TourTag_tagId, "//                         4  //$NON-NLS-1$
-            + "Tmarker.markerId, "//                                 5  //$NON-NLS-1$
-
-            + "TourStartTime, " //                                   6  //$NON-NLS-1$
-            + "tourDistance, " //                                    7  //$NON-NLS-1$
-            + "TourDeviceTime_Elapsed, " //                          8  //$NON-NLS-1$
-            + "TourComputedTime_Moving, " //                         9  //$NON-NLS-1$
-            + "tourAltUp, " //                                       10 //$NON-NLS-1$
-            + "tourAltDown, " //                                     11 //$NON-NLS-1$
-            + "startDistance, " //                                   12 //$NON-NLS-1$
-            + "tourTitle, " //                                       13 //$NON-NLS-1$
-            + "deviceTimeInterval, " //                              14 //$NON-NLS-1$
-            + "maxSpeed, " //                                        15 //$NON-NLS-1$
-            + "maxAltitude, " //                                     16 //$NON-NLS-1$
-            + "maxPulse, " //                                        17 //$NON-NLS-1$
-            + "avgPulse, " //                                        18 //$NON-NLS-1$
-            + "avgCadence, " //                                      19 //$NON-NLS-1$
-            + "(DOUBLE(weather_Temperature_Average_Device) / temperatureScale), " //     20 //$NON-NLS-1$
-            + "startWeek, " //                                       21 //$NON-NLS-1$
-            + "startWeekYear, " //                                   22 //$NON-NLS-1$
-
-            + "weather_Wind_Direction, " //                          23 //$NON-NLS-1$
-            + "weather_Wind_Speed, " //                              24 //$NON-NLS-1$
-            + "weather_Clouds, " //                                  25 //$NON-NLS-1$
-
-            + "restPulse, " //                                       26 //$NON-NLS-1$
-            + "calories, " //                                        27 //$NON-NLS-1$
-
-            + "numberOfTimeSlices, " //                              28 //$NON-NLS-1$
-            + "numberOfPhotos, " //                                  29 //$NON-NLS-1$
-            + "dpTolerance, " //                                     30 //$NON-NLS-1$
-
-            + "frontShiftCount, " //                                 31 //$NON-NLS-1$
-            + "rearShiftCount," //                                   32 //$NON-NLS-1$
-
-            + "TimeZoneId " //                                       33 //$NON-NLS-1$
-
+            + "--" + NL //                                                    //$NON-NLS-1$
+            + NL
+            + "--------------------------" + NL //                            //$NON-NLS-1$
+            + "-- collated - tour details" + NL //                            //$NON-NLS-1$
+            + "--------------------------" + NL //                            //$NON-NLS-1$
             + NL
 
-            + "FROM " + TourDatabase.TABLE_TOUR_DATA + " TourData" + NL //$NON-NLS-1$ //$NON-NLS-2$
+            + "SELECT" + NL //                                                //$NON-NLS-1$
+
+            + "   tourID," + NL //                                         1  //$NON-NLS-1$
+            + "   tourPerson_personId," + NL //                            2  //$NON-NLS-1$
+
+            + "   tourType_typeId," + NL //                                3  //$NON-NLS-1$
+            + "   jTdataTtag.TourTag_tagId," + NL //                       4  //$NON-NLS-1$
+            + "   Tmarker.markerId," + NL //                               5  //$NON-NLS-1$
+            + "   jTdataEq.Equipment_EquipmentID," + NL //                 6  //$NON-NLS-1$
+
+            + "   TourStartTime," + NL //                                  7  //$NON-NLS-1$
+            + "   tourDistance," + NL //                                   8  //$NON-NLS-1$
+            + "   TourDeviceTime_Elapsed," + NL //                         9  //$NON-NLS-1$
+            + "   TourComputedTime_Moving," + NL //                        10 //$NON-NLS-1$
+            + "   tourAltUp," + NL //                                      11 //$NON-NLS-1$
+            + "   tourAltDown," + NL //                                    12 //$NON-NLS-1$
+            + "   startDistance," + NL //                                  13 //$NON-NLS-1$
+            + "   tourTitle," + NL //                                      14 //$NON-NLS-1$
+            + "   deviceTimeInterval," + NL //                             15 //$NON-NLS-1$
+            + "   maxSpeed," + NL //                                       16 //$NON-NLS-1$
+            + "   maxAltitude," + NL //                                    17 //$NON-NLS-1$
+            + "   maxPulse," + NL //                                       18 //$NON-NLS-1$
+            + "   avgPulse," + NL //                                       19 //$NON-NLS-1$
+            + "   avgCadence," + NL //                                     20 //$NON-NLS-1$
+            + "   (DOUBLE(weather_Temperature_Average_Device) / temperatureScale)," + NL //     21 //$NON-NLS-1$
+            + "   startWeek," + NL //                                      22 //$NON-NLS-1$
+            + "   startWeekYear," + NL //                                  23 //$NON-NLS-1$
+
+            + "   weather_Wind_Direction," + NL //                         24 //$NON-NLS-1$
+            + "   weather_Wind_Speed," + NL //                             25 //$NON-NLS-1$
+            + "   weather_Clouds," + NL //                                 26 //$NON-NLS-1$
+
+            + "   restPulse," + NL //                                      27 //$NON-NLS-1$
+            + "   calories," + NL //                                       28 //$NON-NLS-1$
+
+            + "   numberOfTimeSlices," + NL //                             29 //$NON-NLS-1$
+            + "   numberOfPhotos," + NL //                                 30 //$NON-NLS-1$
+            + "   dpTolerance," + NL //                                    31 //$NON-NLS-1$
+
+            + "   frontShiftCount," + NL //                                32 //$NON-NLS-1$
+            + "   rearShiftCount," + NL //                                 33 //$NON-NLS-1$
+
+            + "   TimeZoneId" + NL //                                      34 //$NON-NLS-1$
+
+            + "FROM " + TourDatabase.TABLE_TOUR_DATA + " TourData" + NL //    //$NON-NLS-1$ //$NON-NLS-2$
+
+            // get all equipment id's
+            + "LEFT JOIN " + TourDatabase.JOINTABLE__TOURDATA__EQUIPMENT + " AS jTdataEq" // //$NON-NLS-1$ //$NON-NLS-2$
+            + "  ON TourData.TOURID = jTdataEq.TOURDATA_TOURID" + NL //                      //$NON-NLS-1$
 
             // get tag id's
-            + "LEFT OUTER JOIN " + TourDatabase.JOINTABLE__TOURDATA__TOURTAG + " jTdataTtag" //    //$NON-NLS-1$ //$NON-NLS-2$
-            + " ON TourData.tourId = jTdataTtag.TourData_tourId" + NL //                           //$NON-NLS-1$
+            + "LEFT JOIN " + TourDatabase.JOINTABLE__TOURDATA__TOURTAG + " jTdataTtag" //    //$NON-NLS-1$ //$NON-NLS-2$
+            + " ON TourData.tourId = jTdataTtag.TourData_tourId" + NL //                     //$NON-NLS-1$
 
             // get marker id's
-            + "LEFT OUTER JOIN " + TourDatabase.TABLE_TOUR_MARKER + " Tmarker" //                  //$NON-NLS-1$ //$NON-NLS-2$
-            + " ON TourData.tourId = Tmarker.TourData_tourId" + NL //                              //$NON-NLS-1$
+            + "LEFT JOIN " + TourDatabase.TABLE_TOUR_MARKER + " Tmarker" //                  //$NON-NLS-1$ //$NON-NLS-2$
+            + " ON TourData.tourId = Tmarker.TourData_tourId" + NL //                        //$NON-NLS-1$
 
-            + "WHERE TourStartTime >= ? AND TourStartTime < ?" + NL //                             //$NON-NLS-1$
-            + sqlFilter.getWhereClause()
+            + "WHERE TourStartTime >= ? AND TourStartTime < ?" + NL //                       //$NON-NLS-1$
+            + appFilter.getWhereClause()
 
-            + "ORDER BY TourStartTime"; //                                                         //$NON-NLS-1$
+            + "ORDER BY TourStartTime" + NL //                                               //$NON-NLS-1$
+
+            + NL
+            + "--" + NL //                                                                   //$NON-NLS-1$
+      ;
 
       try (Connection conn = TourDatabase.getInstance().getConnection()) {
 
-         final PreparedStatement statement = conn.prepareStatement(sqlString);
+         final PreparedStatement statement = conn.prepareStatement(sql);
          statement.setLong(1, eventStart.toInstant().toEpochMilli());
          statement.setLong(2, eventEnd.toInstant().toEpochMilli());
 
-         sqlFilter.setParameters(statement, 3);
+         appFilter.setParameters(statement, 3);
 
          long prevTourId = -1;
-         HashSet<Long> tagIds = null;
-         HashSet<Long> markerIds = null;
+
+         HashSet<Long> allEquipmentIDs = null;
+         HashSet<Long> allMarkerIDs = null;
+         HashSet<Long> allTagIDs = null;
 
          final ResultSet result = statement.executeQuery();
 
@@ -140,19 +156,25 @@ public class TVICollatedTour_Event extends TVICollatedTour {
 
             final Object dbTagId = result.getObject(4);
             final Object dbMarkerId = result.getObject(5);
+            final Object dbEquipmentId = result.getObject(6);
 
             if (dbTourId == prevTourId) {
 
-               // additional result set's for the same tour
-
-               // get tags from outer join
-               if (dbTagId instanceof Long) {
-                  tagIds.add((Long) dbTagId);
-               }
+               // additional result sets for the same tour
 
                // get markers from outer join
                if (dbMarkerId instanceof Long) {
-                  markerIds.add((Long) dbMarkerId);
+                  allMarkerIDs.add((Long) dbMarkerId);
+               }
+
+               // get tags from outer join
+               if (dbTagId instanceof Long) {
+                  allTagIDs.add((Long) dbTagId);
+               }
+
+               // get equipment from outer join
+               if (dbEquipmentId instanceof Long) {
+                  allEquipmentIDs.add((Long) dbEquipmentId);
                }
 
             } else {
@@ -160,51 +182,59 @@ public class TVICollatedTour_Event extends TVICollatedTour {
                // first resultset for a new tour
 
                final TVICollatedTour_Tour tourItem = new TVICollatedTour_Tour(collateToursView, this);
-               children.add(tourItem);
 
-               tourItem.tourId = dbTourId;
-               tourItem.colPersonId = result.getLong(2);
-               final Object tourTypeId = result.getObject(3);
+               allChildren.add(tourItem);
+
+// SET_FORMATTING_OFF
+
+               tourItem.tourId                     = dbTourId;
+               tourItem.colPersonId                = result.getLong(2);
+
+               final Object tourTypeId             = result.getObject(3);
 
                // 4: tag id
                // 5: marker id
+               // 5: equipment id
 
-               final long dbTourStartTime = result.getLong(6);
-               final long dbDistance = tourItem.colDistance = result.getLong(7);
-               tourItem.colElapsedTime = result.getLong(8);
-               final long dbMovingTime = tourItem.colMovingTime = result.getLong(9);
-               tourItem.colAltitudeUp = result.getLong(10);
-               tourItem.colAltitudeDown = result.getLong(11);
 
-               tourItem.colStartDistance = result.getLong(12);
-               tourItem.colTourTitle = result.getString(13);
-               tourItem.colTimeInterval = result.getShort(14);
+               final long dbTourStartTime          = result.getLong(7);
+               final long dbDistance               = tourItem.colDistance = result.getLong(8);
+               tourItem.colElapsedTime             = result.getLong(9);
+               final long dbMovingTime             = tourItem.colMovingTime = result.getLong(10);
+               tourItem.colAltitudeUp              = result.getLong(11);
+               tourItem.colAltitudeDown            = result.getLong(12);
 
-               tourItem.colMaxSpeed = result.getFloat(15);
-               tourItem.colMaxAltitude = result.getLong(16);
-               tourItem.colMaxPulse = result.getLong(17);
-               tourItem.colAvgPulse = result.getFloat(18);
-               tourItem.colAvgCadence = result.getFloat(19);
-               tourItem.colAvgTemperature_Device = result.getFloat(20);
+               tourItem.colStartDistance           = result.getLong(13);
+               tourItem.colTourTitle               = result.getString(14);
+               tourItem.colTimeInterval            = result.getShort(15);
 
-               tourItem.colWeekNo = result.getInt(21);
-               tourItem.colWeekYear = result.getInt(22);
+               tourItem.colMaxSpeed                = result.getFloat(16);
+               tourItem.colMaxAltitude             = result.getLong(17);
+               tourItem.colMaxPulse                = result.getLong(18);
+               tourItem.colAvgPulse                = result.getFloat(19);
+               tourItem.colAvgCadence              = result.getFloat(20);
+               tourItem.colAvgTemperature_Device   = result.getFloat(21);
 
-               tourItem.colWindDir = result.getInt(23);
-               tourItem.colWindSpd = result.getInt(24);
-               tourItem.colClouds = result.getString(25);
+               tourItem.colWeekNo                  = result.getInt(22);
+               tourItem.colWeekYear                = result.getInt(23);
 
-               tourItem.colRestPulse = result.getInt(26);
-               tourItem.colCalories = result.getInt(27);
+               tourItem.colWindDir                 = result.getInt(24);
+               tourItem.colWindSpd                 = result.getInt(25);
+               tourItem.colClouds                  = result.getString(26);
 
-               tourItem.colNumberOfTimeSlices = result.getInt(28);
-               tourItem.colNumberOfPhotos = result.getInt(29);
-               tourItem.colDPTolerance = result.getInt(30);
+               tourItem.colRestPulse               = result.getInt(27);
+               tourItem.colCalories                = result.getInt(28);
 
-               tourItem.colFrontShiftCount = result.getInt(31);
-               tourItem.colRearShiftCount = result.getInt(32);
+               tourItem.colNumberOfTimeSlices      = result.getInt(29);
+               tourItem.colNumberOfPhotos          = result.getInt(30);
+               tourItem.colDPTolerance             = result.getInt(31);
 
-               final String dbTimeZoneId = result.getString(33);
+               tourItem.colFrontShiftCount         = result.getInt(32);
+               tourItem.colRearShiftCount          = result.getInt(33);
+
+               final String dbTimeZoneId           = result.getString(34);
+
+// SET_FORMATTING_ON
 
                // -----------------------------------------------
 
@@ -225,32 +255,40 @@ public class TVICollatedTour_Event extends TVICollatedTour {
                tourItem.colPausedTime = tourItem.colElapsedTime - tourItem.colRecordedTime;
                tourItem.colBreakTime = tourItem.colElapsedTime - tourItem.colMovingTime;
 
-               // get first tag id
-               if (dbTagId instanceof Long) {
-
-                  tagIds = new HashSet<>();
-                  tagIds.add((Long) dbTagId);
-
-                  tourItem.setTagIds(tagIds);
-               }
-
                // get first marker id
                if (dbMarkerId instanceof Long) {
 
-                  markerIds = new HashSet<>();
-                  markerIds.add((Long) dbMarkerId);
+                  allMarkerIDs = new HashSet<>();
+                  allMarkerIDs.add((Long) dbMarkerId);
 
-                  tourItem.setMarkerIds(markerIds);
+                  tourItem.setMarkerIds(allMarkerIDs);
+               }
+
+               // get first tag id
+               if (dbTagId instanceof Long) {
+
+                  allTagIDs = new HashSet<>();
+                  allTagIDs.add((Long) dbTagId);
+
+                  tourItem.setTagIds(allTagIDs);
+               }
+
+               // get first equipment id
+               if (dbEquipmentId instanceof Long) {
+
+                  allEquipmentIDs = new HashSet<>();
+                  allEquipmentIDs.add((Long) dbEquipmentId);
+
+                  tourItem.setEquipmentIds(allEquipmentIDs);
                }
             }
 
             prevTourId = dbTourId;
          }
 
-//         TourDatabase.disableRuntimeStatistic(conn);
-
       } catch (final SQLException e) {
-         SQL.showException(e);
+
+         SQL.showException(e, sql);
       }
    }
 
@@ -270,11 +308,6 @@ public class TVICollatedTour_Event extends TVICollatedTour {
       }
 
       return colCounter > 0;
-   }
-
-   @Override
-   public void setTagIds(final Set<Long> tagIds) {
-      sqlTagIds = tagIds;
    }
 
    @Override

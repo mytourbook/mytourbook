@@ -22,6 +22,7 @@ import java.sql.SQLException;
 
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.UI;
+import net.tourbook.common.util.SQL;
 import net.tourbook.common.util.TreeViewerItem;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.preferences.ITourbookPreferences;
@@ -122,6 +123,8 @@ public abstract class TVITaggingView_Item extends TreeViewerItem {
     */
    public static void readTagTotals(final TVITaggingView_Tag tagItem) {
 
+      String sql = null;
+
       try (Connection conn = TourDatabase.getInstance().getConnection()) {
 
          final AppFilter sqlFilter = new AppFilter();
@@ -129,7 +132,7 @@ public abstract class TVITaggingView_Item extends TreeViewerItem {
          /*
           * Get tags
           */
-         final String sql = UI.EMPTY_STRING
+         sql = UI.EMPTY_STRING
 
                + "SELECT " + SQL_SUM_COLUMNS + NL //                                               //$NON-NLS-1$
                + " FROM " + TourDatabase.JOINTABLE__TOURDATA__TOURTAG + " jtblTagData" + NL //     //$NON-NLS-1$ //$NON-NLS-2$
@@ -163,7 +166,7 @@ public abstract class TVITaggingView_Item extends TreeViewerItem {
 
       } catch (final SQLException e) {
 
-         net.tourbook.ui.UI.showSQLException(e);
+         SQL.showException(e, sql);
       }
    }
 

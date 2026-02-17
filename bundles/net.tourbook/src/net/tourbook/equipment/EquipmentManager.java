@@ -470,7 +470,7 @@ public class EquipmentManager {
 
       boolean returnResult = false;
 
-      String sql;
+      String sql = null;
 
       PreparedStatement prepStmt_TourData = null;
       PreparedStatement prepStmt_Equipment = null;
@@ -557,7 +557,7 @@ public class EquipmentManager {
 
       } catch (final SQLException e) {
 
-         net.tourbook.ui.UI.showSQLException(e);
+         SQL.showException(e, sql);
 
       } finally {
 
@@ -665,7 +665,6 @@ public class EquipmentManager {
       } catch (final SQLException e) {
 
          StatusUtil.log(sql, e);
-         net.tourbook.ui.UI.showSQLException(e);
 
       } finally {
 
@@ -1117,6 +1116,7 @@ public class EquipmentManager {
 
    /**
     * @param allEquipmentIDs
+    *           When <code>null</code> then an empty string is returned
     *
     * @return Returns the equipment names separated with a comma.
     */
@@ -1280,8 +1280,7 @@ public class EquipmentManager {
 
       } catch (final SQLException e) {
 
-         StatusUtil.logError(sql);
-         net.tourbook.ui.UI.showSQLException(e);
+         SQL.showException(e, sql);
 
       } finally {
 

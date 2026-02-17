@@ -3993,7 +3993,7 @@ public class RawDataView extends ViewPart implements
          public Long getTourId(final ViewerCell cell) {
 
             if (_isShowToolTipInEquipment) {
-               
+
                return ((TourData) cell.getElement()).getTourId();
             }
 
@@ -4323,7 +4323,7 @@ public class RawDataView extends ViewPart implements
          }
       }
 
-      final boolean isSavedTourSelected = numSavedTours > 0;
+      final boolean isSavedSelectedTour = numSavedTours > 0;
       final boolean isOneSavedAndNotDeleteTour = numSelectedNotDeletedTours == 1 && numSavedTours == 1;
       final boolean isOneSelectedNotDeleteTour = numSelectedNotDeletedTours == 1;
 
@@ -4416,11 +4416,11 @@ public class RawDataView extends ViewPart implements
       _actionSetupImport                  .setEnabled(isTourImported == false);
       _actionToggleImportUI               .setEnabled(isTourImported == false);
 
-      // actions for tags/tour types
-      _actionSetTourType.setEnabled(isSavedTourSelected && (allTourTypes.size() > 0));
-      _tagMenuManager.enableTagActions(isSavedTourSelected, isOneTourSelected, allUsedTagIds);
-      _tourTypeMenuManager.enableTourTypeActions(isSavedTourSelected, existingTourTypeId);
-      _equipmentMenuManager.enableActions(allSelectedAndSavedItems);
+      // actions for tags/tour types/...
+      _actionSetTourType                  .setEnabled(            isSavedSelectedTour && (allTourTypes.size() > 0));
+      _tagMenuManager                     .enableTagActions(      isSavedSelectedTour, isOneTourSelected, allUsedTagIds);
+      _tourTypeMenuManager                .enableTourTypeActions( isSavedSelectedTour, existingTourTypeId);
+      _equipmentMenuManager               .enableActions(         allSelectedAndSavedItems);
 
       // set double click state
       _tourDoubleClickState.canEditTour         = isOneSavedAndNotDeleteTour;

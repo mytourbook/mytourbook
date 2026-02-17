@@ -26,6 +26,7 @@ import java.util.Set;
 
 import net.tourbook.common.UI;
 import net.tourbook.common.time.TimeTools;
+import net.tourbook.common.util.SQL;
 import net.tourbook.common.util.TreeViewerItem;
 import net.tourbook.data.Equipment;
 import net.tourbook.data.EquipmentPart;
@@ -203,6 +204,8 @@ public class TVIEquipmentView_Equipment extends TVIEquipmentView_Item {
 
       final ArrayList<TreeViewerItem> allTourItems = new ArrayList<>();
 
+      String sql = null;
+
       try (Connection conn = TourDatabase.getInstance().getConnection()) {
 
          final AppFilter appFilter = createAppFilter();
@@ -210,7 +213,7 @@ public class TVIEquipmentView_Equipment extends TVIEquipmentView_Item {
          /*
           * Load: Equipment, Tour
           */
-         final String sql = UI.EMPTY_STRING
+         sql = UI.EMPTY_STRING
 
                + "--" + NL //                                                                   //$NON-NLS-1$
                + NL
@@ -352,7 +355,7 @@ public class TVIEquipmentView_Equipment extends TVIEquipmentView_Item {
 
       } catch (final SQLException e) {
 
-         net.tourbook.ui.UI.showSQLException(e);
+         SQL.showException(e, sql);
       }
 
       setChildren(allTourItems);
@@ -367,11 +370,13 @@ public class TVIEquipmentView_Equipment extends TVIEquipmentView_Item {
 
       final ArrayList<TreeViewerItem> allTourItems = new ArrayList<>();
 
+      String sql = null;
+
       try (Connection conn = TourDatabase.getInstance().getConnection()) {
 
          final AppFilter appFilter = createAppFilter();
 
-         final String sql = UI.EMPTY_STRING
+         sql = UI.EMPTY_STRING
 
                + "--" + NL //                                                                   //$NON-NLS-1$
                + NL
@@ -445,7 +450,7 @@ public class TVIEquipmentView_Equipment extends TVIEquipmentView_Item {
 
       } catch (final SQLException e) {
 
-         net.tourbook.ui.UI.showSQLException(e);
+         SQL.showException(e, sql);
       }
 
       setChildren(allTourItems);

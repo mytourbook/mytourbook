@@ -25,6 +25,7 @@ import java.util.HashMap;
 
 import net.tourbook.common.UI;
 import net.tourbook.common.time.TimeTools;
+import net.tourbook.common.util.SQL;
 import net.tourbook.common.util.TreeViewerItem;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourTag;
@@ -160,11 +161,13 @@ public class TVITaggingView_Tag extends TVITaggingView_Item {
 
       final ArrayList<TreeViewerItem> children = new ArrayList<>();
 
+      String sql = null;
+
       try (Connection conn = TourDatabase.getInstance().getConnection()) {
 
          final AppFilter sqlFilter = new AppFilter();
 
-         final String sql = UI.EMPTY_STRING
+         sql = UI.EMPTY_STRING
 
                + "SELECT" + NL //                                    //$NON-NLS-1$
 
@@ -230,7 +233,8 @@ public class TVITaggingView_Tag extends TVITaggingView_Item {
          }
 
       } catch (final SQLException e) {
-         net.tourbook.ui.UI.showSQLException(e);
+
+         SQL.showException(e, sql);
       }
       return children;
    }
@@ -242,6 +246,8 @@ public class TVITaggingView_Tag extends TVITaggingView_Item {
        */
       final ArrayList<TreeViewerItem> children = new ArrayList<>();
 
+      String sql = null;
+
       try (Connection conn = TourDatabase.getInstance().getConnection()) {
 
          /*
@@ -249,7 +255,7 @@ public class TVITaggingView_Tag extends TVITaggingView_Item {
           */
          final AppFilter sqlFilter = new AppFilter();
 
-         final String sql = UI.EMPTY_STRING
+         sql = UI.EMPTY_STRING
 
                + "SELECT " + NL //                 //$NON-NLS-1$
 
@@ -291,7 +297,8 @@ public class TVITaggingView_Tag extends TVITaggingView_Item {
          }
 
       } catch (final SQLException e) {
-         net.tourbook.ui.UI.showSQLException(e);
+
+         SQL.showException(e, sql);
       }
 
       return children;

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
+ * Copyright (C) 2015, 2026 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -65,15 +65,16 @@ public class TVICollatedTour_Root extends TVICollatedTour {
 
          children.addAll(collateEvents);
 
-         getCollateTVI(collateEvents, sqlFilter);
+         getCollateSums(collateEvents, sqlFilter);
       }
       collateToursView.setIsInUIUpdate(false);
    }
 
    /**
-    * Get all events/tours for the selected tour type filter.
+    * Get all events/tours for the selected tour type filter
     *
     * @param sqlData
+    *
     * @return
     */
    private ArrayList<TVICollatedTour_Event> getCollateEvents(final TourTypeSQLData sqlData) {
@@ -82,39 +83,63 @@ public class TVICollatedTour_Root extends TVICollatedTour {
 
       final String sql = UI.EMPTY_STRING //
 
-            + "SELECT" //                                            //$NON-NLS-1$
+            + "--" + NL //                                                    //$NON-NLS-1$
+            + NL
+            + "---------------------" + NL //                                 //$NON-NLS-1$
+            + "-- collated - events" + NL //                                  //$NON-NLS-1$
+            + "---------------------" + NL //                                 //$NON-NLS-1$
+            + NL
 
-            + " tourID, " //                                      1  //$NON-NLS-1$
-            + " jTdataTtag.TourTag_tagId, "//                     2  //$NON-NLS-1$
+            + "SELECT" + NL //                                                //$NON-NLS-1$
 
-            + " tourStartTime, " //                               3  //$NON-NLS-1$
-            + " tourTitle" //                                     4  //$NON-NLS-1$
+            + "   tourID," + NL //                                         1  //$NON-NLS-1$
 
-            + " FROM " + TourDatabase.TABLE_TOUR_DATA + "\n" //      //$NON-NLS-1$ //$NON-NLS-2$
+            + "   jTdataTtag.TourTag_tagId," + NL//                        2  //$NON-NLS-1$
+            + "   jTdataEq.Equipment_EquipmentID," + NL //                 3  //$NON-NLS-1$
 
-            // get tag id's
-            + " LEFT OUTER JOIN " + TourDatabase.JOINTABLE__TOURDATA__TOURTAG + " jTdataTtag" //$NON-NLS-1$ //$NON-NLS-2$
-            + " ON TourData.tourId = jTdataTtag.TourData_tourId" //  //$NON-NLS-1$
+            + "   tourStartTime," + NL //                                  4  //$NON-NLS-1$
+            + "   tourTitle" + NL //                                       5  //$NON-NLS-1$
 
-            + " WHERE 1=1" + sqlData.getWhereString() //             //$NON-NLS-1$
+            + "FROM " + TourDatabase.TABLE_TOUR_DATA + NL //                  //$NON-NLS-1$
 
-            + " ORDER BY tourStartTime";//                           //$NON-NLS-1$
+            // get tag ids
+            + "LEFT OUTER JOIN " + TourDatabase.JOINTABLE__TOURDATA__TOURTAG + " jTdataTtag" //   //$NON-NLS-1$ //$NON-NLS-2$
+            + " ON TourData.tourId = jTdataTtag.TourData_tourId" + NL //                           //$NON-NLS-1$
+
+            // get all equipment ids
+            + "LEFT JOIN " + TourDatabase.JOINTABLE__TOURDATA__EQUIPMENT + " AS jTdataEq" //       //$NON-NLS-1$ //$NON-NLS-2$
+            + "  ON TourData.TOURID = jTdataEq.TOURDATA_TOURID" + NL //                            //$NON-NLS-1$
+
+            + "WHERE 1=1" + NL //                                             //$NON-NLS-1$
+
+            + sqlData.getWhereString()
+
+            + "ORDER BY tourStartTime" + NL //                                //$NON-NLS-1$
+
+            + NL
+            + "--" + NL //                                                    //$NON-NLS-1$
+      ;
 
       try (Connection conn = TourDatabase.getInstance().getConnection()) {
 
          int eventCounter = 0;
 
          final PreparedStatement statement = conn.prepareStatement(sql);
+
          sqlData.setParameters(statement, 1);
 
          long prevTourId = -1;
-         HashSet<Long> tagIds = null;
+
+         HashSet<Long> allEquipmentIDs = null;
+         HashSet<Long> allTagIDs = null;
 
          final ResultSet result = statement.executeQuery();
          while (result.next()) {
 
             final long dbTourId = result.getLong(1);
+
             final Object dbTagId = result.getObject(2);
+            final Object dbEquipmentId = result.getObject(3);
 
             if (dbTourId == prevTourId) {
 
@@ -122,13 +147,18 @@ public class TVICollatedTour_Root extends TVICollatedTour {
 
                // get tags from outer join
                if (dbTagId instanceof Long) {
-                  tagIds.add((Long) dbTagId);
+                  allTagIDs.add((Long) dbTagId);
+               }
+
+               // get equipment from outer join
+               if (dbEquipmentId instanceof Long) {
+                  allEquipmentIDs.add((Long) dbEquipmentId);
                }
 
             } else {
 
-               final long dbTourStartTime = result.getLong(3);
-               final String dbTourTitle = result.getString(4);
+               final long dbTourStartTime = result.getLong(4);
+               final String dbTourTitle = result.getString(5);
 
                final TVICollatedTour_Event collateEvent = new TVICollatedTour_Event(collateToursView, this);
                collateEvents.add(collateEvent);
@@ -147,10 +177,19 @@ public class TVICollatedTour_Root extends TVICollatedTour {
                // get first tag id
                if (dbTagId instanceof Long) {
 
-                  tagIds = new HashSet<>();
-                  tagIds.add((Long) dbTagId);
+                  allTagIDs = new HashSet<>();
+                  allTagIDs.add((Long) dbTagId);
 
-                  collateEvent.setTagIds(tagIds);
+                  collateEvent.setTagIds(allTagIDs);
+               }
+
+               // get first equipment id
+               if (dbEquipmentId instanceof Long) {
+
+                  allEquipmentIDs = new HashSet<>();
+                  allEquipmentIDs.add((Long) dbEquipmentId);
+
+                  collateEvent.setEquipmentIds(allEquipmentIDs);
                }
             }
 
@@ -176,19 +215,32 @@ public class TVICollatedTour_Root extends TVICollatedTour {
       return collateEvents;
    }
 
-   private void getCollateTVI(final ArrayList<TVICollatedTour_Event> collatedEvents, final AppFilter sqlFilter) {
+   private void getCollateSums(final ArrayList<TVICollatedTour_Event> collatedEvents, final AppFilter sqlFilter) {
 
       final int eventSize = collatedEvents.size();
 
       final String sql = UI.EMPTY_STRING
-            //
-            + "SELECT " //                   //$NON-NLS-1$
+
+            + "--" + NL //                                                 //$NON-NLS-1$
+            + NL
+            + "------------------------" + NL //                           //$NON-NLS-1$
+            + "-- collated - event sums" + NL //                           //$NON-NLS-1$
+            + "------------------------" + NL //                           //$NON-NLS-1$
+            + NL
+
+            + "SELECT" + NL //                                             //$NON-NLS-1$
+
             + SQL_SUM_COLUMNS
 
-            + " FROM " + TourDatabase.TABLE_TOUR_DATA + "\n" //$NON-NLS-1$ //$NON-NLS-2$
+            + "FROM " + TourDatabase.TABLE_TOUR_DATA + NL //               //$NON-NLS-1$
 
-            + (" WHERE TourStartTime >= ? AND TourStartTime < ?") //$NON-NLS-1$
-            + sqlFilter.getWhereClause();
+            + "WHERE TourStartTime >= ? AND TourStartTime < ?" + NL //     //$NON-NLS-1$
+
+            + sqlFilter.getWhereClause()
+
+            + NL
+            + "--" + NL //                                                 //$NON-NLS-1$
+      ;
 
       try (Connection conn = TourDatabase.getInstance().getConnection()) {
 

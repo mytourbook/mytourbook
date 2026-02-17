@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2025 Wolfgang Schramm and Contributors
+ * Copyright (C) 2015, 2026 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -47,6 +47,7 @@ import net.tourbook.common.util.TreeViewerItem;
 import net.tourbook.data.TourData;
 import net.tourbook.database.PersonManager;
 import net.tourbook.database.TourDatabase;
+import net.tourbook.equipment.EquipmentManager;
 import net.tourbook.equipment.EquipmentMenuManager;
 import net.tourbook.extension.export.ActionExport;
 import net.tourbook.preferences.ITourbookPreferences;
@@ -89,7 +90,6 @@ import net.tourbook.ui.views.TreeViewerTourInfoToolTip;
 import net.tourbook.ui.views.ViewNames;
 import net.tourbook.ui.views.rawData.ActionMergeTour;
 import net.tourbook.ui.views.rawData.ActionReimportTours;
-import net.tourbook.ui.views.tourBook.TVITourBookTour;
 
 import org.eclipse.e4.ui.di.PersistState;
 import org.eclipse.jface.action.IMenuManager;
@@ -190,6 +190,7 @@ public class CollatedToursView extends ViewPart implements
 
    //
    private boolean                                    _isToolTipInCollation;
+   private boolean                                    _isToolTipInEquipment;
    private boolean                                    _isToolTipInTags;
    private boolean                                    _isToolTipInTime;
    private boolean                                    _isToolTipInTitle;
@@ -247,6 +248,35 @@ public class CollatedToursView extends ViewPart implements
 
    private Menu      _treeContextMenu;
 
+   private class ContentProvider implements ITreeContentProvider {
+
+      @Override
+      public void dispose() {}
+
+      @Override
+      public Object[] getChildren(final Object parentElement) {
+         return ((TreeViewerItem) parentElement).getFetchedChildrenAsArray();
+      }
+
+      @Override
+      public Object[] getElements(final Object inputElement) {
+         return _rootItem.getFetchedChildrenAsArray();
+      }
+
+      @Override
+      public Object getParent(final Object element) {
+         return ((TreeViewerItem) element).getParentItem();
+      }
+
+      @Override
+      public boolean hasChildren(final Object element) {
+         return ((TreeViewerItem) element).hasChildren();
+      }
+
+      @Override
+      public void inputChanged(final Viewer viewer, final Object oldInput, final Object newInput) {}
+   }
+
    private static class ItemComparer implements IElementComparer {
 
       @Override
@@ -284,35 +314,6 @@ public class CollatedToursView extends ViewPart implements
       public int hashCode(final Object element) {
          return 0;
       }
-   }
-
-   private class TourBookContentProvider implements ITreeContentProvider {
-
-      @Override
-      public void dispose() {}
-
-      @Override
-      public Object[] getChildren(final Object parentElement) {
-         return ((TreeViewerItem) parentElement).getFetchedChildrenAsArray();
-      }
-
-      @Override
-      public Object[] getElements(final Object inputElement) {
-         return _rootItem.getFetchedChildrenAsArray();
-      }
-
-      @Override
-      public Object getParent(final Object element) {
-         return ((TreeViewerItem) element).getParentItem();
-      }
-
-      @Override
-      public boolean hasChildren(final Object element) {
-         return ((TreeViewerItem) element).hasChildren();
-      }
-
-      @Override
-      public void inputChanged(final Viewer viewer, final Object oldInput, final Object newInput) {}
    }
 
    public class TreeContextMenuProvider implements IContextMenuProvider {
@@ -591,7 +592,7 @@ public class CollatedToursView extends ViewPart implements
       _tourViewer = new TreeViewer(tree);
       _columnManager.createColumns(_tourViewer);
 
-      _tourViewer.setContentProvider(new TourBookContentProvider());
+      _tourViewer.setContentProvider(new ContentProvider());
       _tourViewer.setComparer(new ItemComparer());
       _tourViewer.setUseHashlookup(true);
 
@@ -738,6 +739,7 @@ public class CollatedToursView extends ViewPart implements
       defineColumn_Tour_Photos();
       defineColumn_Tour_Title();
       defineColumn_Tour_Tags();
+      defineColumn_Tour_Equipment();
 
       defineColumn_Motion_Distance();
       defineColumn_Motion_MaxSpeed();
@@ -1544,6 +1546,42 @@ public class CollatedToursView extends ViewPart implements
    }
 
    /**
+    * Column: Tour - Equipment
+    */
+   private void defineColumn_Tour_Equipment() {
+
+      final TreeColumnDefinition colDef = TreeColumnFactory.TOUR_EQUIPMENT.createColumn(_columnManager, _pc);
+      colDef.setLabelProvider(new TourInfoToolTipCellLabelProvider() {
+
+         @Override
+         public Long getTourId(final ViewerCell cell) {
+
+            if (_isToolTipInEquipment == false) {
+               return null;
+            }
+
+            return getCellTourId(cell);
+         }
+
+         @Override
+         public void update(final ViewerCell cell) {
+
+            final Object element = cell.getElement();
+
+            if (element instanceof final TVICollatedTour_Tour tourItem) {
+
+               cell.setText(EquipmentManager.getEquipmentNames(tourItem.getEquipmentIds()));
+               setCellColor(cell, element);
+
+            } else if (element instanceof final TVICollatedTour_Event eventItem) {
+
+               cell.setText(EquipmentManager.getEquipmentNames(eventItem.getEquipmentIds()));
+            }
+         }
+      });
+   }
+
+   /**
     * column: markers
     */
    private void defineColumn_Tour_Marker() {
@@ -1734,7 +1772,7 @@ public class CollatedToursView extends ViewPart implements
             final Object element = cell.getElement();
             final float value = UI.convertTemperatureFromMetric(((TVICollatedTour) element).colAvgTemperature_Device);
 
-            colDef.printDoubleValue(cell, value, element instanceof TVITourBookTour);
+            colDef.printDoubleValue(cell, value, element instanceof TVICollatedTour_Tour);
 
             setCellColor(cell, element);
          }
@@ -1895,6 +1933,8 @@ public class CollatedToursView extends ViewPart implements
                   : firstTourItem.getTagIds());
 
       _tourTypeMenuManager.enableTourTypeActions(isTourSelected, TourDatabase.ENTITY_IS_NOT_SAVED);
+
+      _equipmentMenuManager.enableActions(getSelectedToursAsList());
    }
 
    private void fillActionBars() {
@@ -1965,8 +2005,11 @@ public class CollatedToursView extends ViewPart implements
       final Object element = cell.getElement();
 
       if (element instanceof final TVICollatedTour_Tour tviCollatedTour_Tour) {
+
          return tviCollatedTour_Tour.getTourId();
+
       } else if (element instanceof final TVICollatedTour_Event tviCollatedTour_Event) {
+
          return tviCollatedTour_Event.getTourId();
       }
 
@@ -1994,9 +2037,10 @@ public class CollatedToursView extends ViewPart implements
       return _postSelectionProvider;
    }
 
-   private void getSelectedTourData(final ArrayList<TourData> selectedTourData, final Set<Long> tourIdSet) {
-      for (final Long tourId : tourIdSet) {
-         selectedTourData.add(TourManager.getInstance().getTourData(tourId));
+   private void getSelectedTourData(final List<Object> allSelectedTourData, final Set<Long> allTourIDs) {
+
+      for (final Long tourId : allTourIDs) {
+         allSelectedTourData.add(TourManager.getInstance().getTourData(tourId));
       }
    }
 
@@ -2020,6 +2064,15 @@ public class CollatedToursView extends ViewPart implements
    @Override
    public ArrayList<TourData> getSelectedTours() {
 
+      // converting is very tricky
+      @SuppressWarnings("unchecked")
+      final ArrayList<TourData> allSelectedTourData = (ArrayList<TourData>) (List<?>) getSelectedToursAsList();
+
+      return allSelectedTourData;
+   }
+
+   public List<Object> getSelectedToursAsList() {
+
       // get selected tour id's
 
       final Set<Long> tourIds = getSelectedTourIDs();
@@ -2027,7 +2080,7 @@ public class CollatedToursView extends ViewPart implements
       /*
        * show busy indicator when multiple tours needs to be retrieved from the database
        */
-      final ArrayList<TourData> selectedTourData = new ArrayList<>();
+      final List<Object> selectedTourData = new ArrayList<>();
 
       if (tourIds.size() > 1) {
          BusyIndicator.showWhile(Display.getCurrent(), () -> getSelectedTourData(selectedTourData, tourIds));
@@ -2300,10 +2353,15 @@ public class CollatedToursView extends ViewPart implements
 
    private void updateToolTipState() {
 
-      _isToolTipInCollation = _prefStore.getBoolean(ITourbookPreferences.VIEW_TOOLTIP_COLLATED_COLLATION);
-      _isToolTipInTime = _prefStore.getBoolean(ITourbookPreferences.VIEW_TOOLTIP_COLLATED_TIME);
-      _isToolTipInWeekDay = _prefStore.getBoolean(ITourbookPreferences.VIEW_TOOLTIP_COLLATED_WEEKDAY);
-      _isToolTipInTitle = _prefStore.getBoolean(ITourbookPreferences.VIEW_TOOLTIP_COLLATED_TITLE);
-      _isToolTipInTags = _prefStore.getBoolean(ITourbookPreferences.VIEW_TOOLTIP_COLLATED_TAGS);
+// SET_FORMATTING_OFF
+
+      _isToolTipInCollation   = _prefStore.getBoolean(ITourbookPreferences.VIEW_TOOLTIP_COLLATED_COLLATION);
+      _isToolTipInEquipment   = _prefStore.getBoolean(ITourbookPreferences.VIEW_TOOLTIP_COLLATED_EQUIPMENT);
+      _isToolTipInTags        = _prefStore.getBoolean(ITourbookPreferences.VIEW_TOOLTIP_COLLATED_TAGS);
+      _isToolTipInTime        = _prefStore.getBoolean(ITourbookPreferences.VIEW_TOOLTIP_COLLATED_TIME);
+      _isToolTipInTitle       = _prefStore.getBoolean(ITourbookPreferences.VIEW_TOOLTIP_COLLATED_TITLE);
+      _isToolTipInWeekDay     = _prefStore.getBoolean(ITourbookPreferences.VIEW_TOOLTIP_COLLATED_WEEKDAY);
+
+// SET_FORMATTING_ON
    }
 }

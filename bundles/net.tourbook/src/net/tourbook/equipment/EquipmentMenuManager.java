@@ -580,7 +580,7 @@ public class EquipmentMenuManager implements IActionProvider {
 
          } else if (selectedItem instanceof final TourData tourData) {
 
-            // this is from the import view
+            // tourData are from the import view, collated view
 
             numTours++;
 

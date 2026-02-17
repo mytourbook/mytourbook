@@ -26,6 +26,7 @@ import java.util.Set;
 
 import net.tourbook.common.UI;
 import net.tourbook.common.time.TimeTools;
+import net.tourbook.common.util.SQL;
 import net.tourbook.common.util.TreeViewerItem;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.ui.AppFilter;
@@ -160,6 +161,8 @@ public class TVIEquipmentView_Equipment_Year extends TVIEquipmentView_Item {
 
       final ArrayList<TreeViewerItem> allTourItems = new ArrayList<>();
 
+      String sql = null;
+
       try (Connection conn = TourDatabase.getInstance().getConnection()) {
 
          final AppFilter appFilter = createAppFilter();
@@ -167,7 +170,7 @@ public class TVIEquipmentView_Equipment_Year extends TVIEquipmentView_Item {
          /*
           * Load: Equipment, Year, Month
           */
-         final String sql = UI.EMPTY_STRING
+         sql = UI.EMPTY_STRING
 
                + "--" + NL //                                                                   //$NON-NLS-1$
                + NL
@@ -251,7 +254,7 @@ public class TVIEquipmentView_Equipment_Year extends TVIEquipmentView_Item {
 
       } catch (final SQLException e) {
 
-         net.tourbook.ui.UI.showSQLException(e);
+         SQL.showException(e, sql);
       }
 
       setChildren(allTourItems);
