@@ -18,6 +18,7 @@ package net.tourbook.ui.views.tagging;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.ZonedDateTime;
+import java.util.Objects;
 import java.util.Set;
 
 import net.tourbook.common.UI;
@@ -81,11 +82,21 @@ public class TVITaggingView_Tour extends TVITaggingView_Item {
    @Override
    public boolean equals(final Object obj) {
 
-      if (obj == this) {
+      if (this == obj) {
          return true;
       }
 
-      return false;
+      if (obj == null) {
+         return false;
+      }
+
+      if (getClass() != obj.getClass()) {
+         return false;
+      }
+
+      final TVITaggingView_Tour other = (TVITaggingView_Tour) obj;
+
+      return tourId == other.tourId;
    }
 
    @Override
@@ -98,6 +109,11 @@ public class TVITaggingView_Tour extends TVITaggingView_Item {
    @Override
    public boolean hasChildren() {
       return false;
+   }
+
+   @Override
+   public int hashCode() {
+      return Objects.hash(tourId);
    }
 
    public void readTourColumnValues(final ResultSet result,

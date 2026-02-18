@@ -39,10 +39,13 @@ New / Improvements
   
   Equipment and tags have a lot of common features but tags have been "missused" for an equipment because of missing equipment.
   These are the feature which do not have the other:
+  
   - Tags
     - Categorize tags
     - Floating tag context menu
+    
   - Equipment
+    - Equipment items are created directly in the equipment view
     - Parts and services to collated tours by type and time
 
 

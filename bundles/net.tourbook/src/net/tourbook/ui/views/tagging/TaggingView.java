@@ -63,7 +63,6 @@ import net.tourbook.tour.SelectionDeletedTours;
 import net.tourbook.tour.SelectionTourId;
 import net.tourbook.tour.SelectionTourIds;
 import net.tourbook.tour.TourDoubleClickState;
-import net.tourbook.tour.TourEvent;
 import net.tourbook.tour.TourEventId;
 import net.tourbook.tour.TourManager;
 import net.tourbook.tour.TourTypeMenuManager;
@@ -198,6 +197,7 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer,
    private boolean                             _isBehaviour_OnSelect_ExpandCollapse     = true;
    private boolean                             _isInCollapseAll;
    private boolean                             _isInExpandingSelection;
+   private boolean                             _isInSelection;
    private int                                 _expandRunnableCounter;
    private long                                _lastExpandSelectionTime;
 
@@ -381,7 +381,10 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer,
       @Override
       public int compare(final Viewer viewer, final Object obj1, final Object obj2) {
 
-         if (obj1 instanceof final TVITaggingView_Tour tourItem1 && obj2 instanceof final TVITaggingView_Tour tourItem2) {
+// SET_FORMATTING_OFF
+         
+         if (obj1 instanceof final TVITaggingView_Tour tourItem1
+          && obj2 instanceof final TVITaggingView_Tour tourItem2) {
 
             // sort tours by date
 
@@ -389,31 +392,43 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer,
 
          }
 
-         if (obj1 instanceof final TVITaggingView_Year yearItem1 && obj2 instanceof final TVITaggingView_Year yearItem2) {
+         if (obj1 instanceof final TVITaggingView_Year yearItem1
+          && obj2 instanceof final TVITaggingView_Year yearItem2) {
 
             return yearItem1.compareTo(yearItem2);
          }
 
-         if (obj1 instanceof final TVITaggingView_Month monthItem1 && obj2 instanceof final TVITaggingView_Month monthItem2) {
+         if (obj1 instanceof final TVITaggingView_Month monthItem1
+          && obj2 instanceof final TVITaggingView_Month monthItem2) {
 
             return monthItem1.compareTo(monthItem2);
          }
 
-         if (obj1 instanceof final TVITaggingView_TagCategory iItem1 && obj2 instanceof final TVITaggingView_TagCategory item2) {
+         if (obj1 instanceof final TVITaggingView_TagCategory item1
+          && obj2 instanceof final TVITaggingView_TagCategory item2) {
 
-            return iItem1.getTourTagCategory().getCategoryName().compareTo(item2.getTourTagCategory().getCategoryName());
+            return item1.getTourTagCategory().getCategoryName().compareTo(
+                   item2.getTourTagCategory().getCategoryName());
          }
+
+// SET_FORMATTING_ON
 
          return 0;
       }
    }
 
    /**
-    * !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!<br>
-    * <br>
-    * A comparer is necessary to set and restore the expanded elements <br>
-    * <br>
-    * !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!<br>
+    * !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+    * !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+    * !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+    * <p>
+    * <b>
+    * A comparer is necessary to set and restore the expanded elements AND to reselect elements
+    * </b>
+    * <p>
+    * !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+    * !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+    * !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     */
    private class TagComparer implements IElementComparer {
 
@@ -426,11 +441,17 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer,
 
             return true;
 
+         } else if (a instanceof final TVITaggingView_Tour tourItem1
+                 && b instanceof final TVITaggingView_Tour tourItem2) {
+
+            return tourItem1.tourId == tourItem2.tourId
+                && tourItem1.tourId  == tourItem2.tourId;
+
          } else if (a instanceof final TVITaggingView_Year yearItem1
-                 && b instanceof final TVITaggingView_Year yearItem2) {
+                && b instanceof final TVITaggingView_Year yearItem2) {
 
             return yearItem1.getTagId() == yearItem2.getTagId()
-                && yearItem1.getYear()  == yearItem2.getYear();
+                  && yearItem1.getYear()  == yearItem2.getYear();
 
          } else if (a instanceof final TVITaggingView_Month monthItemA
                  && b instanceof final TVITaggingView_Month monthItemB) {
@@ -653,19 +674,12 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer,
             }
 
          } else if (tourEventId == TourEventId.UPDATE_UI
+               || tourEventId == TourEventId.TOUR_CHANGED
                || tourEventId == TourEventId.CONTENT_LAYOUT_CHANGED //        equipment or tag image size is modified
                || tourEventId == TourEventId.TAG_STRUCTURE_CHANGED
                || tourEventId == TourEventId.EQUIPMENT_STRUCTURE_CHANGED) {
 
-            reloadViewer();
-
-         } else if (tourEventId == TourEventId.TOUR_CHANGED && eventData instanceof final TourEvent tourEvent) {
-
-            final ArrayList<TourData> modifiedTours = tourEvent.getModifiedTours();
-
-            if (modifiedTours != null) {
-               updateViewerAfterTourIsModified(_rootItem, modifiedTours);
-            }
+            _viewerContainer.getDisplay().asyncExec(() -> reloadViewer());
          }
       };
 
@@ -2629,6 +2643,10 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer,
 
    private void onTagViewer_Selection(final SelectionChangedEvent event) {
 
+      if (_isInSelection) {
+         return;
+      }
+
       if (_isMouseContextMenu) {
          return;
       }
@@ -2711,17 +2729,34 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer,
    @Override
    public void reloadViewer() {
 
+      if (_isInSelection) {
+         return;
+      }
+
+      Object firstElement;
+
       final Tree tree = _tagViewer.getTree();
 
       tree.setRedraw(false);
+      _isInSelection = true;
       {
          final Object[] expandedElements = _tagViewer.getExpandedElements();
+         final ITreeSelection selection = _tagViewer.getStructuredSelection();
+
+         firstElement = selection.getFirstElement();
 
          reloadViewer_SetContent();
 
          _tagViewer.setExpandedElements(expandedElements);
+         _tagViewer.setSelection(selection, false);
       }
+      _isInSelection = false;
       tree.setRedraw(true);
+
+      // try to keep the same vertical position
+      if (firstElement != null) {
+         _tagViewer.reveal(firstElement);
+      }
    }
 
    private void reloadViewer_SetContent() {
@@ -3291,69 +3326,4 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer,
          _tagViewer.remove(deletedTourItems.toArray());
       }
    }
-
-   /**
-    * !!!Recursive !!! update the data for all tour items
-    *
-    * @param rootItem
-    * @param modifiedTours
-    */
-   private void updateViewerAfterTourIsModified(final TreeViewerItem parentItem,
-                                                final ArrayList<TourData> modifiedTours) {
-
-      final ArrayList<TreeViewerItem> children = parentItem.getUnfetchedChildren();
-
-      if (children == null) {
-         return;
-      }
-
-      // loop: all children
-      for (final Object object : children) {
-
-         if (object instanceof final TreeViewerItem treeItem) {
-
-            if (treeItem instanceof final TVITaggingView_Tour tourItem) {
-
-               final long tourItemId = tourItem.getTourId();
-
-               for (final TourData modifiedTourData : modifiedTours) {
-                  if (modifiedTourData.getTourId().longValue() == tourItemId) {
-
-                     // update tree item
-
-                     final TourType tourType = modifiedTourData.getTourType();
-                     if (tourType != null) {
-                        tourItem.tourTypeId = tourType.getTypeId();
-                     }
-
-                     // update item title
-                     tourItem.tourTitle = modifiedTourData.getTourTitle();
-
-                     // update item tags
-                     final Set<TourTag> tourTags = modifiedTourData.getTourTags();
-                     final Set<Long> allTagIDs;
-
-                     tourItem.allTagIDs = allTagIDs = new HashSet<>();
-
-                     for (final TourTag tourTag : tourTags) {
-                        allTagIDs.add(tourTag.getTagId());
-                     }
-
-                     // update item in the viewer
-                     _tagViewer.update(tourItem, null);
-
-                     // a tour exists only once as a child in a tree item
-                     break;
-                  }
-               }
-
-            } else {
-
-               // update children
-               updateViewerAfterTourIsModified(treeItem, modifiedTours);
-            }
-         }
-      }
-   }
-
 }
