@@ -331,6 +331,7 @@ public class TVIEquipmentView_Equipment extends TVIEquipmentView_Item {
 
                   tourItem.setEquipmentIds(allEquipmentIDs);
                }
+
                // get first tag id
                if (dbTagId instanceof Long) {
 

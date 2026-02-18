@@ -18,7 +18,7 @@ package net.tourbook.ui.views.tagging;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.ZonedDateTime;
-import java.util.ArrayList;
+import java.util.Set;
 
 import net.tourbook.common.UI;
 import net.tourbook.common.time.TimeTools;
@@ -30,16 +30,20 @@ public class TVITaggingView_Tour extends TVITaggingView_Item {
 
    public static final String SQL_TOUR_COLUMNS = UI.EMPTY_STRING
 
-         + "startYear,"                                         //	0 //$NON-NLS-1$
-         + "startMonth,"                                        //	1 //$NON-NLS-1$
-         + "startDay,"                                          //	2 //$NON-NLS-1$
+         + "   startYear," + NL                                            //    1  //$NON-NLS-1$
+         + "   startMonth," + NL                                           //    2  //$NON-NLS-1$
+         + "   startDay," + NL                                             //    3  //$NON-NLS-1$
 
-         + "tourTitle,"                                         //	3 //$NON-NLS-1$
-         + "tourType_typeId,"                                   //	4 //$NON-NLS-1$
-         + "deviceTimeInterval,"                                //	5 //$NON-NLS-1$
-         + "startDistance,"                                     //	6 //$NON-NLS-1$
+         + "   tourTitle," + NL                                            //    4  //$NON-NLS-1$
+         + "   tourType_typeId," + NL                                      //    5  //$NON-NLS-1$
+         + "   deviceTimeInterval," + NL                                   //    6  //$NON-NLS-1$
+         + "   startDistance," + NL                                        //    7  //$NON-NLS-1$
 
-         + SQL_SUM_COLUMNS_TOUR;                                //	7
+         + "   Tmarker.MarkerId," + NL                                     //    8  //$NON-NLS-1$
+         + "   jTdataTtag_2.TourTag_TagId," + NL                           //    9  //$NON-NLS-1$
+         + "   jTdataEq.Equipment_EquipmentID," + NL                       //   10  //$NON-NLS-1$
+
+         + SQL_SUM_COLUMNS_TOUR;                                           //   11
 
    long                       tourId;
 
@@ -53,7 +57,15 @@ public class TVITaggingView_Tour extends TVITaggingView_Item {
 
    long                       tourTypeId;
 
-   ArrayList<Long>            tagIds;
+   /**
+    * Tour tag ids
+    */
+   Set<Long>                  allTagIDs;
+
+   /**
+    * Tour equipment ids
+    */
+   Set<Long>                  allEquipmentIDs;
 
    public long                deviceStartDistance;
 
@@ -79,37 +91,6 @@ public class TVITaggingView_Tour extends TVITaggingView_Item {
    @Override
    protected void fetchChildren() {}
 
-   public void getTourColumnValues(final ResultSet result,
-                                   final Object resultTagId,
-                                   final int startIndex)
-         throws SQLException {
-
-      tourYear = result.getInt(startIndex + 0);
-      tourMonth = result.getInt(startIndex + 1);
-      tourDay = result.getInt(startIndex + 2);
-
-      tourDate = ZonedDateTime.of(tourYear, tourMonth, tourDay, 0, 0, 0, 0, TimeTools.getDefaultTimeZone());
-
-      tourTitle = result.getString(startIndex + 3);
-
-      final Object resultTourTypeId = result.getObject(startIndex + 4);
-      tourTypeId = (resultTourTypeId == null ? TourDatabase.ENTITY_IS_NOT_SAVED : (Long) resultTourTypeId);
-
-      deviceTimeInterval = result.getShort(startIndex + 5);
-      deviceStartDistance = result.getLong(startIndex + 6);
-
-      if (UI.IS_SCRAMBLE_DATA) {
-         tourTitle = UI.scrambleText(tourTitle);
-      }
-
-      readDefaultColumnData(result, startIndex + 7);
-
-      if (resultTagId instanceof Long) {
-         tagIds = new ArrayList<>();
-         tagIds.add((Long) resultTagId);
-      }
-   }
-
    public long getTourId() {
       return tourId;
    }
@@ -119,10 +100,37 @@ public class TVITaggingView_Tour extends TVITaggingView_Item {
       return false;
    }
 
+   public void readTourColumnValues(final ResultSet result,
+                                    final int startIndex)
+         throws SQLException {
+
+// SET_FORMATTING_OFF
+
+      tourYear             = result.getInt(startIndex + 0);
+      tourMonth            = result.getInt(startIndex + 1);
+      tourDay              = result.getInt(startIndex + 2);
+
+      tourTitle            = result.getString(startIndex + 3);
+      final Object resultTourTypeId = result.getObject(startIndex + 4);
+
+      deviceTimeInterval   = result.getShort(startIndex + 5);
+      deviceStartDistance  = result.getLong(startIndex + 6);
+
+      tourDate = ZonedDateTime.of(tourYear, tourMonth, tourDay, 0, 0, 0, 0, TimeTools.getDefaultTimeZone());
+
+      tourTypeId = (resultTourTypeId == null ? TourDatabase.ENTITY_IS_NOT_SAVED : (Long) resultTourTypeId);
+
+// SET_FORMATTING_ON
+
+      if (UI.IS_SCRAMBLE_DATA) {
+         tourTitle = UI.scrambleText(tourTitle);
+      }
+
+      readSumColumnData(result, startIndex + 10);
+   }
+
    @Override
    public String toString() {
-
-      final int maxLen = 5;
 
       return UI.EMPTY_STRING
 
@@ -135,12 +143,9 @@ public class TVITaggingView_Tour extends TVITaggingView_Item {
             + " tourTitle  = " + tourTitle + NL //       //$NON-NLS-1$
             + " tourTypeId = " + tourTypeId + NL //      //$NON-NLS-1$
 
-            + " tagIds     = " + (tagIds != null //      //$NON-NLS-1$
-                  ? tagIds.subList(0, Math.min(tagIds.size(), maxLen))
-                  : null) + NL
-
             + "]" + NL //                                //$NON-NLS-1$
 
       ;
    }
+
 }

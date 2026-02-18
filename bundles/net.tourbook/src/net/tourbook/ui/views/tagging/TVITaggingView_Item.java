@@ -42,42 +42,42 @@ public abstract class TVITaggingView_Item extends TreeViewerItem {
 
       SQL_SUM_COLUMNS = UI.EMPTY_STRING
 
-            + "SUM(tourDistance)," + NL //                  0  //$NON-NLS-1$
-            + "SUM(TourDeviceTime_Elapsed)," + NL //        1  //$NON-NLS-1$
-            + "SUM(tourComputedTime_Moving)," + NL //       2  //$NON-NLS-1$
-            + "SUM(tourAltUp)," + NL //                     3  //$NON-NLS-1$
-            + "SUM(tourAltDown)," + NL //                   4  //$NON-NLS-1$
+            + "   SUM(tourDistance)," + NL //                  0  //$NON-NLS-1$
+            + "   SUM(TourDeviceTime_Elapsed)," + NL //        1  //$NON-NLS-1$
+            + "   SUM(tourComputedTime_Moving)," + NL //       2  //$NON-NLS-1$
+            + "   SUM(tourAltUp)," + NL //                     3  //$NON-NLS-1$
+            + "   SUM(tourAltDown)," + NL //                   4  //$NON-NLS-1$
 
-            + "MAX(maxPulse)," + NL //                      5  //$NON-NLS-1$
-            + "MAX(maxAltitude)," + NL //                   6  //$NON-NLS-1$
-            + "MAX(maxSpeed)," + NL //                      7  //$NON-NLS-1$
+            + "   MAX(maxPulse)," + NL //                      5  //$NON-NLS-1$
+            + "   MAX(maxAltitude)," + NL //                   6  //$NON-NLS-1$
+            + "   MAX(maxSpeed)," + NL //                      7  //$NON-NLS-1$
 
-            + "AVG( CASE WHEN AVGPULSE = 0      THEN NULL ELSE AVGPULSE END)," + NL //                8  //$NON-NLS-1$
-            + "AVG( CASE WHEN AVGCADENCE = 0    THEN NULL ELSE AVGCADENCE END )," + NL //             9  //$NON-NLS-1$
-            + "AVG( CASE WHEN weather_Temperature_Average_Device = 0 " //                                //$NON-NLS-1$
-            + "  THEN NULL" //                                                                           //$NON-NLS-1$
-            + "  ELSE DOUBLE(weather_Temperature_Average_Device) / TemperatureScale END )," + NL //   10 //$NON-NLS-1$
+            + "   AVG( CASE WHEN AVGPULSE = 0      THEN NULL ELSE AVGPULSE END)," + NL //                8  //$NON-NLS-1$
+            + "   AVG( CASE WHEN AVGCADENCE = 0    THEN NULL ELSE AVGCADENCE END )," + NL //             9  //$NON-NLS-1$
+            + "   AVG( CASE WHEN weather_Temperature_Average_Device = 0 " //                                //$NON-NLS-1$
+            + "     THEN NULL" //                                                                           //$NON-NLS-1$
+            + "     ELSE DOUBLE(weather_Temperature_Average_Device) / TemperatureScale END )," + NL //   10 //$NON-NLS-1$
 
-            + "SUM(TourDeviceTime_Recorded)" + NL //        11 //$NON-NLS-1$
+            + "   SUM(TourDeviceTime_Recorded)" + NL //        11 //$NON-NLS-1$
       ;
 
       SQL_SUM_COLUMNS_TOUR = UI.EMPTY_STRING
 
-            + "tourDistance," + NL //                       0  //$NON-NLS-1$
-            + "TourDeviceTime_Elapsed," + NL //             1  //$NON-NLS-1$
-            + "tourComputedTime_Moving," + NL //            2  //$NON-NLS-1$
-            + "tourAltUp," + NL //                          3  //$NON-NLS-1$
-            + "tourAltDown," + NL //                        4  //$NON-NLS-1$
+            + "   tourDistance," + NL //                       0  //$NON-NLS-1$
+            + "   TourDeviceTime_Elapsed," + NL //             1  //$NON-NLS-1$
+            + "   tourComputedTime_Moving," + NL //            2  //$NON-NLS-1$
+            + "   tourAltUp," + NL //                          3  //$NON-NLS-1$
+            + "   tourAltDown," + NL //                        4  //$NON-NLS-1$
 
-            + "maxPulse," + NL //                           5  //$NON-NLS-1$
-            + "maxAltitude," + NL //                        6  //$NON-NLS-1$
-            + "maxSpeed," + NL //                           7  //$NON-NLS-1$
+            + "   maxPulse," + NL //                           5  //$NON-NLS-1$
+            + "   maxAltitude," + NL //                        6  //$NON-NLS-1$
+            + "   maxSpeed," + NL //                           7  //$NON-NLS-1$
 
-            + "avgPulse," + NL //                           8  //$NON-NLS-1$
-            + "avgCadence," + NL //                         9  //$NON-NLS-1$
-            + "(DOUBLE(weather_Temperature_Average_Device) / TemperatureScale)," + NL //     10 //$NON-NLS-1$
+            + "   avgPulse," + NL //                           8  //$NON-NLS-1$
+            + "   avgCadence," + NL //                         9  //$NON-NLS-1$
+            + "   (DOUBLE(weather_Temperature_Average_Device) / TemperatureScale)," + NL //     10 //$NON-NLS-1$
 
-            + "TourDeviceTime_Recorded" + NL //             11 //$NON-NLS-1$
+            + "   TourDeviceTime_Recorded" + NL //             11 //$NON-NLS-1$
       ;
    }
 
@@ -121,13 +121,13 @@ public abstract class TVITaggingView_Item extends TreeViewerItem {
     *
     * @param tagItem
     */
-   public static void readTagTotals(final TVITaggingView_Tag tagItem) {
+   static void readTagTotals(final TVITaggingView_Tag tagItem) {
 
       String sql = null;
 
       try (Connection conn = TourDatabase.getInstance().getConnection()) {
 
-         final AppFilter sqlFilter = new AppFilter();
+         final AppFilter appFilter = new AppFilter();
 
          /*
           * Get tags
@@ -135,19 +135,21 @@ public abstract class TVITaggingView_Item extends TreeViewerItem {
          sql = UI.EMPTY_STRING
 
                + "SELECT " + SQL_SUM_COLUMNS + NL //                                               //$NON-NLS-1$
-               + " FROM " + TourDatabase.JOINTABLE__TOURDATA__TOURTAG + " jtblTagData" + NL //     //$NON-NLS-1$ //$NON-NLS-2$
+
+               + "FROM " + TourDatabase.JOINTABLE__TOURDATA__TOURTAG + " AS jtblTagData" + NL //   //$NON-NLS-1$ //$NON-NLS-2$
 
                // get data for a tour
-               + " LEFT OUTER JOIN " + TourDatabase.TABLE_TOUR_DATA + " TourData ON " + NL //      //$NON-NLS-1$ //$NON-NLS-2$
-               + " jtblTagData.TourData_tourId = TourData.tourId" + NL //                          //$NON-NLS-1$
+               + "LEFT JOIN " + TourDatabase.TABLE_TOUR_DATA + " AS TourData" //                   //$NON-NLS-1$ //$NON-NLS-2$
+               + " ON jtblTagData.TourData_tourId = TourData.tourId" + NL //                       //$NON-NLS-1$
 
                + " WHERE jtblTagData.TourTag_TagId = ?" + NL //                                    //$NON-NLS-1$
-               + sqlFilter.getWhereClause();
+
+               + appFilter.getWhereClause();
 
          final PreparedStatement statement = conn.prepareStatement(sql);
 
          statement.setLong(1, tagItem.getTagId());
-         sqlFilter.setParameters(statement, 2);
+         appFilter.setParameters(statement, 2);
 
          final ResultSet result = statement.executeQuery();
 
@@ -170,12 +172,12 @@ public abstract class TVITaggingView_Item extends TreeViewerItem {
       }
    }
 
-   public TreeViewer getTagViewer() {
+   TreeViewer getTagViewer() {
 
       return _tagViewer;
    }
 
-   void readDefaultColumnData(final ResultSet result, final int startIndex) throws SQLException {
+   void readSumColumnData(final ResultSet result, final int startIndex) throws SQLException {
 
 // SET_FORMATTING_OFF
 
@@ -210,11 +212,6 @@ public abstract class TVITaggingView_Item extends TreeViewerItem {
       if (UI.IS_SCRAMBLE_DATA) {
          scrambleValues(TVITaggingView_Item.class.getDeclaredFields());
       }
-   }
-
-   public void readSumColumnData(final ResultSet result, final int startIndex) throws SQLException {
-
-      readDefaultColumnData(result, startIndex);
    }
 
 }

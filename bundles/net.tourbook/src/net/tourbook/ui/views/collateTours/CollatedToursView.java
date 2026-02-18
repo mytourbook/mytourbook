@@ -2074,7 +2074,7 @@ public class CollatedToursView extends ViewPart implements
    @Override
    public ArrayList<TourData> getSelectedTours() {
 
-      // converting is very tricky
+      // casting is very tricky
       @SuppressWarnings("unchecked")
       final ArrayList<TourData> allSelectedTourData = (ArrayList<TourData>) (List<?>) getSelectedToursAsList();
 

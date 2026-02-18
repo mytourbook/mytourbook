@@ -46,6 +46,7 @@ import net.tourbook.ui.ITourProvider;
 import net.tourbook.ui.action.IActionProvider;
 import net.tourbook.ui.action.TourActionCategory;
 import net.tourbook.ui.action.TourActionManager;
+import net.tourbook.ui.views.tagging.TVITaggingView_Tour;
 import net.tourbook.ui.views.tourBook.TVITourBookTour;
 import net.tourbook.ui.views.tourDataEditor.TourDataEditorView;
 
@@ -597,6 +598,12 @@ public class EquipmentMenuManager implements IActionProvider {
 
                   isEnabled_RemoveEquipment = true;
                }
+
+            } else if (selectedItem instanceof TVITaggingView_Tour) {
+
+               numTours++;
+
+               isEnabled_RemoveEquipment = true;
 
             } else if (selectedItem instanceof final TVIEquipmentView_Tour tourItem) {
 
