@@ -554,62 +554,62 @@ public class EquipmentMenuManager implements IActionProvider {
     */
    public void enableActions(final List<Object> allSelectedItems) {
 
-      if (allSelectedItems == null) {
-         return;
-      }
+      final Set<Long> allSelectedEquipmentIDs_FromTours = new HashSet<>();
 
       boolean isEnabled_RemoveEquipment = false;
+
       int numTours = 0;
 
-      final HashSet<Long> allSelectedEquipmentIDs_FromTours = new HashSet<>();
+      if (allSelectedItems != null && allSelectedItems.size() > 0) {
 
-      for (final Object selectedItem : allSelectedItems) {
+         for (final Object selectedItem : allSelectedItems) {
 
-         if (selectedItem instanceof final TVITourBookTour tourItem) {
+            if (selectedItem instanceof final TVITourBookTour tourItem) {
 
-            numTours++;
+               numTours++;
 
-            final List<Long> allTourEquipmentIDs = tourItem.getEquipmentIds();
+               final List<Long> allTourEquipmentIDs = tourItem.getEquipmentIds();
 
-            if (allTourEquipmentIDs != null && allTourEquipmentIDs.size() > 0) {
+               if (allTourEquipmentIDs != null && allTourEquipmentIDs.size() > 0) {
 
-               allSelectedEquipmentIDs_FromTours.addAll(allTourEquipmentIDs);
+                  allSelectedEquipmentIDs_FromTours.addAll(allTourEquipmentIDs);
 
-               isEnabled_RemoveEquipment = true;
-            }
-
-         } else if (selectedItem instanceof final TourData tourData) {
-
-            // tourData are from the import view, collated view
-
-            numTours++;
-
-            final Set<Equipment> allEquipment = tourData.getEquipment();
-
-            if (allEquipment != null && allEquipment.size() > 0) {
-
-               final List<Long> allEquipmentIDs = new ArrayList<>();
-
-               for (final Equipment equipment : allEquipment) {
-                  allEquipmentIDs.add(equipment.getEquipmentId());
+                  isEnabled_RemoveEquipment = true;
                }
 
-               allSelectedEquipmentIDs_FromTours.addAll(allEquipmentIDs);
+            } else if (selectedItem instanceof final TourData tourData) {
 
-               isEnabled_RemoveEquipment = true;
-            }
+               // tourData are from the import view, collated view
 
-         } else if (selectedItem instanceof final TVIEquipmentView_Tour tourItem) {
+               numTours++;
 
-            numTours++;
+               final Set<Equipment> allEquipment = tourData.getEquipment();
 
-            final List<Long> allTourEquipmentIDs = tourItem.getEquipmentIds();
+               if (allEquipment != null && allEquipment.size() > 0) {
 
-            if (allTourEquipmentIDs != null && allTourEquipmentIDs.size() > 0) {
+                  final List<Long> allEquipmentIDs = new ArrayList<>();
 
-               allSelectedEquipmentIDs_FromTours.addAll(allTourEquipmentIDs);
+                  for (final Equipment equipment : allEquipment) {
+                     allEquipmentIDs.add(equipment.getEquipmentId());
+                  }
 
-               isEnabled_RemoveEquipment = true;
+                  allSelectedEquipmentIDs_FromTours.addAll(allEquipmentIDs);
+
+                  isEnabled_RemoveEquipment = true;
+               }
+
+            } else if (selectedItem instanceof final TVIEquipmentView_Tour tourItem) {
+
+               numTours++;
+
+               final List<Long> allTourEquipmentIDs = tourItem.getEquipmentIds();
+
+               if (allTourEquipmentIDs != null && allTourEquipmentIDs.size() > 0) {
+
+                  allSelectedEquipmentIDs_FromTours.addAll(allTourEquipmentIDs);
+
+                  isEnabled_RemoveEquipment = true;
+               }
             }
          }
       }

@@ -201,7 +201,7 @@ public class TVICollatedTour_Root extends TVICollatedTour {
       }
 
       /*
-       * Add an additional event which shows the tours from the last event until today.
+       * Add an additional event which shows the tours from the last event until today
        */
       final TVICollatedTour_Event collateEvent = new TVICollatedTour_Event(collateToursView, this);
       collateEvents.add(collateEvent);

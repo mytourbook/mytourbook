@@ -1855,7 +1855,7 @@ public class CollatedToursView extends ViewPart implements
 
       for (final Object treeItem : selection) {
 
-         if (treeItem instanceof final TVICollatedTour tviCollatedTour) {
+         if (treeItem instanceof final TVICollatedTour collatedTourItem) {
 
             boolean isDummyTour = false;
 
@@ -1867,11 +1867,14 @@ public class CollatedToursView extends ViewPart implements
                }
             }
 
-            if (firstTourItem == null && !isDummyTour) {
-               firstTourItem = tviCollatedTour;
-            }
+            if (isDummyTour == false) {
 
-            numTourItems++;
+               numTourItems++;
+
+               if (firstTourItem == null) {
+                  firstTourItem = collatedTourItem;
+               }
+            }
          }
       }
 
@@ -1901,7 +1904,7 @@ public class CollatedToursView extends ViewPart implements
       _tourDoubleClickState.canAdjustAltitude      = isOneTour;
 
       _actionComputeDistanceValuesFromGeoPosition  .setEnabled(isTourSelected);
-      _actionComputeElevationGain                  .setEnabled(true);
+      _actionComputeElevationGain                  .setEnabled(isTourSelected);
       _actionEditQuick                             .setEnabled(isOneTour);
       _actionEditTour                              .setEnabled(isOneTour);
       _actionExportTour                            .setEnabled(isTourSelected);
@@ -2053,8 +2056,15 @@ public class CollatedToursView extends ViewPart implements
 
       for (final Object viewItem : selectedTours) {
 
-         if (viewItem instanceof final TVICollatedTour tviCollatedTour) {
-            tourIds.add(tviCollatedTour.getTourId());
+         if (viewItem instanceof final TVICollatedTour_Event tviCollatedTour) {
+
+            final Long tourId = tviCollatedTour.getTourId();
+
+            // the last "tour" is not a real tour -> prevent that a wrong tour id is returned
+            if (tviCollatedTour.isLastEvent == false) {
+
+               tourIds.add(tourId);
+            }
          }
       }
 
