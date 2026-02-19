@@ -68,6 +68,7 @@ import net.tourbook.tour.TourManager;
 import net.tourbook.tour.TourTypeMenuManager;
 import net.tourbook.tourType.TourTypeImage;
 import net.tourbook.ui.ITourProvider;
+import net.tourbook.ui.ITourProviderByID;
 import net.tourbook.ui.TreeColumnFactory;
 import net.tourbook.ui.action.ActionCollapseAll;
 import net.tourbook.ui.action.ActionCollapseOthers;
@@ -137,7 +138,14 @@ import org.eclipse.ui.part.ViewPart;
 import org.joda.time.Period;
 import org.joda.time.PeriodType;
 
-public class EquipmentView extends ViewPart implements ITourProvider, ITourViewer, ITreeViewer {
+public class EquipmentView extends ViewPart implements
+
+      ITourProvider,
+      ITourProviderByID,
+      ITourViewer,
+      ITreeViewer
+
+{
 
    public static final String            ID                                     = "net.tourbook.equipment.EquipmentView.ID"; //$NON-NLS-1$
 
@@ -2629,7 +2637,7 @@ public class EquipmentView extends ViewPart implements ITourProvider, ITourViewe
          }
       }
 
-      final List<Long> allSelectedTourIds = getSelectedTourIDs();
+      final Set<Long> allSelectedTourIds = getSelectedTourIDs();
       _numSelectedTours = allSelectedTourIds.size();
       final boolean isSelectedTours = _numSelectedTours > 0;
 
@@ -2871,10 +2879,10 @@ public class EquipmentView extends ViewPart implements ITourProvider, ITourViewe
       }
    }
 
-   private List<Long> getSelectedTourIDs() {
+   @Override
+   public Set<Long> getSelectedTourIDs() {
 
-      final List<Long> allTourIds = new ArrayList<>();
-      final Set<Long> checkedTourIds = new HashSet<>();
+      final Set<Long> allTourIds = new HashSet<>();
 
       final ITreeSelection allSelectedItems = _equipmentViewer.getStructuredSelection();
 
@@ -2882,11 +2890,7 @@ public class EquipmentView extends ViewPart implements ITourProvider, ITourViewe
 
          if (selectedItem instanceof final TVIEquipmentView_Tour tourItem) {
 
-            final long tourId = tourItem.tourId;
-
-            if (checkedTourIds.add(tourId)) {
-               allTourIds.add(tourId);
-            }
+            allTourIds.add(tourItem.tourId);
          }
       }
 
@@ -2896,21 +2900,21 @@ public class EquipmentView extends ViewPart implements ITourProvider, ITourViewe
    @Override
    public ArrayList<TourData> getSelectedTours() {
 
-      // get selected tour id's
-      final List<Long> tourIds = getSelectedTourIDs();
+      // get selected tour ids
+      final ArrayList<Long> allTourIDs = new ArrayList<>(getSelectedTourIDs());
 
       /*
-       * Show busyindicator when multiple tours needs to be retrieved from the database
+       * Show busy indicator when multiple tours needs to be retrieved from the database
        */
       final ArrayList<TourData> selectedTourData = new ArrayList<>();
 
-      if (tourIds.size() > 1) {
+      if (allTourIDs.size() > 1) {
 
-         BusyIndicator.showWhile(Display.getCurrent(), () -> TourManager.getInstance().getTourData(selectedTourData, tourIds));
+         BusyIndicator.showWhile(Display.getCurrent(), () -> TourManager.getInstance().getTourData(selectedTourData, allTourIDs));
 
       } else {
 
-         TourManager.getInstance().getTourData(selectedTourData, tourIds);
+         TourManager.getInstance().getTourData(selectedTourData, allTourIDs);
       }
 
       return selectedTourData;

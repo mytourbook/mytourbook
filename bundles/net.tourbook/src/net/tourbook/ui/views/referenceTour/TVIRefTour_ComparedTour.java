@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2018, 2023 Wolfgang Schramm and Contributors
+ * Copyright (C) 2018, 2026 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -17,6 +17,7 @@ package net.tourbook.ui.views.referenceTour;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Set;
 
 import net.tourbook.common.util.TreeViewerItem;
 import net.tourbook.data.TourCompared;
@@ -43,24 +44,25 @@ public class TVIRefTour_ComparedTour extends TVIRefTour_TourItem {
    /*
     * Fields from TourData
     */
-   long            tourTypeId;
-   String          tourTitle;
-   boolean         hasGeoData;
+   long             tourTypeId;
+   String           tourTitle;
+   boolean          hasGeoData;
 
-   LocalDate       tourDate;
-   int             year;
-   int             tourDeviceTime_Elapsed;
+   LocalDate        tourDate;
+   int              year;
+   int              tourDeviceTime_Elapsed;
 
-   float           avgAltimeter;
-   float           avgPulse;
-   float           maxPulse;
+   float            avgAltimeter;
+   float            avgPulse;
+   float            maxPulse;
 
-   float           avgSpeed;
-   float           avgPace;
+   float            avgSpeed;
+   float            avgPace;
 
-   ArrayList<Long> tagIds;
+   public Set<Long> allEquipmentIDs;
+   Set<Long>        allTagIDs;
 
-   GeoComparedTour geoCompareTour;
+   GeoComparedTour  geoCompareTour;
 
    public TVIRefTour_ComparedTour(final TreeViewerItem parentItem) {
 

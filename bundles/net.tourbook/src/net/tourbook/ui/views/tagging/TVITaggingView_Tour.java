@@ -66,7 +66,7 @@ public class TVITaggingView_Tour extends TVITaggingView_Item {
    /**
     * Tour equipment ids
     */
-   Set<Long>                  allEquipmentIDs;
+   public Set<Long>           allEquipmentIDs;
 
    public long                deviceStartDistance;
 

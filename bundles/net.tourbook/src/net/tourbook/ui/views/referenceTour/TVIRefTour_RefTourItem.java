@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2024 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2026 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -22,6 +22,9 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 import net.tourbook.common.UI;
 import net.tourbook.common.util.TreeViewerItem;
@@ -91,14 +94,22 @@ public class TVIRefTour_RefTourItem extends TVIRefTour_TourItem {
 
          // fetch compared tour items
 
-         fetchChildren_WithoutSubCategories(this, children, -1);
+         loadChildren_Tours(this, children, -1);
 
       } else {
 
          // fetch year items
 
-         fetchChildren_WithYearCategories(children);
+         loadChildren_Years(children);
       }
+   }
+
+   @Override
+   public int hashCode() {
+      final int prime = 31;
+      int result = 1;
+      result = prime * result + (int) (refId ^ (refId >>> 32));
+      return result;
    }
 
    /**
@@ -107,51 +118,68 @@ public class TVIRefTour_RefTourItem extends TVIRefTour_TourItem {
     * @param year
     *           Fetch compared tours for this year or for all years when <code>year == -1</code>
     */
-   void fetchChildren_WithoutSubCategories(final TreeViewerItem parentItem,
-                                           final ArrayList<TreeViewerItem> children,
-                                           final int year) {
+   void loadChildren_Tours(final TreeViewerItem parentItem,
+                           final List<TreeViewerItem> children,
+                           final int year) {
 
       final boolean isWithYear = year != -1;
 
       final String sqlYear = isWithYear
 
-            ? " AND TourCompared.startYear=?" //$NON-NLS-1$
+            ? " AND TourCompared.startYear= ?" + NL //$NON-NLS-1$
             : UI.EMPTY_STRING;
 
       final String sql = UI.EMPTY_STRING
 
-            + "SELECT" + NL //                                   //$NON-NLS-1$
+            + "--" + NL //                                                                         //$NON-NLS-1$
+            + NL
+            + "-------------------" + NL //                                                        //$NON-NLS-1$
+            + "-- ref tour - tours" + NL //                                                        //$NON-NLS-1$
+            + "-------------------" + NL //                                                        //$NON-NLS-1$
+            + NL
 
-            + " TourCompared.comparedId," + NL //              1 //$NON-NLS-1$
-            + " TourCompared.tourId," + NL //                  2 //$NON-NLS-1$
-            + " TourCompared.tourDate," + NL //                3 //$NON-NLS-1$
-            + " TourCompared.avgAltimeter," + NL //            4 //$NON-NLS-1$
-            + " TourCompared.avgPulse," + NL //                5 //$NON-NLS-1$
-            + " TourCompared.maxPulse," + NL //                6 //$NON-NLS-1$
-            + " TourCompared.tourSpeed," + NL //               7 //$NON-NLS-1$
-            + " TourCompared.tourPace," + NL //                8 //$NON-NLS-1$
-            + " TourCompared.startIndex," + NL //              9 //$NON-NLS-1$
-            + " TourCompared.endIndex," + NL //               10 //$NON-NLS-1$
-            + " TourCompared.tourDeviceTime_Elapsed," + NL // 11 //$NON-NLS-1$
+            + "SELECT" + NL //                                                                     //$NON-NLS-1$
 
-            + " TourData.hasGeoData," + NL //                 12 //$NON-NLS-1$
-            + " TourData.tourTitle," + NL //                  13 //$NON-NLS-1$
-            + " TourData.tourType_typeId," + NL //            14 //$NON-NLS-1$
+            + "   TourCompared.comparedId," + NL //                                             1  //$NON-NLS-1$
+            + "   TourCompared.tourId," + NL //                                                 2  //$NON-NLS-1$
+            + "   TourCompared.tourDate," + NL //                                               3  //$NON-NLS-1$
+            + "   TourCompared.avgAltimeter," + NL //                                           4  //$NON-NLS-1$
+            + "   TourCompared.avgPulse," + NL //                                               5  //$NON-NLS-1$
+            + "   TourCompared.maxPulse," + NL //                                               6  //$NON-NLS-1$
+            + "   TourCompared.tourSpeed," + NL //                                              7  //$NON-NLS-1$
+            + "   TourCompared.tourPace," + NL //                                               8  //$NON-NLS-1$
+            + "   TourCompared.startIndex," + NL //                                             9  //$NON-NLS-1$
+            + "   TourCompared.endIndex," + NL //                                              10  //$NON-NLS-1$
+            + "   TourCompared.tourDeviceTime_Elapsed," + NL //                                11  //$NON-NLS-1$
 
-            + " jTdataTtag.TourTag_tagId" + NL //             15 //$NON-NLS-1$
+            + "   TourData.hasGeoData," + NL //                                                12  //$NON-NLS-1$
+            + "   TourData.tourTitle," + NL //                                                 13  //$NON-NLS-1$
+            + "   TourData.tourType_typeId," + NL //                                           14  //$NON-NLS-1$
 
-            + " FROM " + TourDatabase.TABLE_TOUR_COMPARED + " TourCompared" + NL //                      //$NON-NLS-1$ //$NON-NLS-2$
+            + "   jTdataTtag.TourTag_TagID," + NL //                                           15  //$NON-NLS-1$
+            + "   jTdataEq.Equipment_EquipmentID" + NL //                                      16  //$NON-NLS-1$
+
+            + "FROM " + TourDatabase.TABLE_TOUR_COMPARED + " AS TourCompared" + NL //              //$NON-NLS-1$ //$NON-NLS-2$
 
             // get data for a tour
-            + " LEFT OUTER JOIN " + TourDatabase.TABLE_TOUR_DATA + " TourData " + NL //                  //$NON-NLS-1$ //$NON-NLS-2$
-            + " ON TourCompared.tourId = TourData.tourId" + NL //                                        //$NON-NLS-1$
+            + "LEFT JOIN " + TourDatabase.TABLE_TOUR_DATA + " AS TourData " //                     //$NON-NLS-1$ //$NON-NLS-2$
+            + "  ON TourCompared.tourId = TourData.tourId" + NL //                                 //$NON-NLS-1$
 
-            // get tag id's
-            + " LEFT OUTER JOIN " + TourDatabase.JOINTABLE__TOURDATA__TOURTAG + " jTdataTtag" + NL //    //$NON-NLS-1$ //$NON-NLS-2$
-            + " ON TourData.tourId = jTdataTtag.TourData_tourId" + NL //                                 //$NON-NLS-1$
+            // get equipment ids
+            + "LEFT JOIN " + TourDatabase.JOINTABLE__TOURDATA__EQUIPMENT + " AS jTdataEq" //       //$NON-NLS-1$ //$NON-NLS-2$
+            + "  ON TourData.TourID = jTdataEq.TourData_TourID" + NL //                            //$NON-NLS-1$
 
-            + " WHERE TourCompared.refTourId=?" + sqlYear + NL //                                        //$NON-NLS-1$
-            + " ORDER BY TourCompared.tourDate" + NL //                                                  //$NON-NLS-1$
+            // get tag ids
+            + "LEFT JOIN " + TourDatabase.JOINTABLE__TOURDATA__TOURTAG + " AS jTdataTtag" //       //$NON-NLS-1$ //$NON-NLS-2$
+            + "  ON TourData.TourID = jTdataTtag.TourData_TourID" + NL //                          //$NON-NLS-1$
+
+            + "WHERE TourCompared.refTourId = ?" + NL //                                           //$NON-NLS-1$
+            + sqlYear
+
+            + "ORDER BY TourCompared.tourDate" + NL //                                             //$NON-NLS-1$
+
+            + NL
+            + "--" + NL //                                                                         //$NON-NLS-1$
       ;
 
       try (Connection conn = TourDatabase.getInstance().getConnection()) {
@@ -165,24 +193,31 @@ public class TVIRefTour_RefTourItem extends TVIRefTour_TourItem {
 
          final ResultSet result = statement.executeQuery();
 
-         long lastTourId = -1;
-         ArrayList<Long> tagIds = null;
+         long prevTourId = -1;
+
+         Set<Long> allEquipmentIDs = null;
+         Set<Long> allTagIDs = null;
 
          while (result.next()) {
 
 // SET_FORMATTING_OFF
 
             final long tourId          = result.getLong(2);
-            final Object resultTagId   = result.getObject(15);
+            final Object dbTagID       = result.getObject(15);
+            final Object dbEquipmentID = result.getObject(16);
 
 // SET_FORMATTING_ON
 
-            if (tourId == lastTourId) {
+            if (tourId == prevTourId) {
 
-               // get tags from outer join
+               // get equipment from left join
+               if (dbEquipmentID instanceof final Long equipmentID) {
+                  allEquipmentIDs.add(equipmentID);
+               }
 
-               if (resultTagId instanceof Long) {
-                  tagIds.add((Long) resultTagId);
+               // get tags from left join
+               if (dbTagID instanceof final Long tagId) {
+                  allTagIDs.add(tagId);
                }
 
             } else {
@@ -237,19 +272,26 @@ public class TVIRefTour_RefTourItem extends TVIRefTour_TourItem {
                      ? TourDatabase.ENTITY_IS_NOT_SAVED
                      : (Long) tourTypeId;
 
-               // tour tags
-               if (resultTagId instanceof Long) {
+               // get first equipment id
+               if (dbEquipmentID instanceof final Long equipmentID) {
 
-                  if (tourItem.tagIds != null) {
-                     tourItem.tagIds.clear();
-                  }
+                  allEquipmentIDs = new HashSet<>();
+                  allEquipmentIDs.add(equipmentID);
 
-                  tourItem.tagIds = tagIds = new ArrayList<>();
-                  tagIds.add((Long) resultTagId);
+                  tourItem.allEquipmentIDs = allEquipmentIDs;
+               }
+
+               // get first tag id
+               if (dbTagID instanceof Long) {
+
+                  allTagIDs = new HashSet<>();
+                  allTagIDs.add((Long) dbTagID);
+
+                  tourItem.allTagIDs = allTagIDs;
                }
             }
 
-            lastTourId = tourId;
+            prevTourId = tourId;
          }
 
       } catch (final SQLException e) {
@@ -257,7 +299,7 @@ public class TVIRefTour_RefTourItem extends TVIRefTour_TourItem {
       }
    }
 
-   private void fetchChildren_WithYearCategories(final ArrayList<TreeViewerItem> children) {
+   private void loadChildren_Years(final ArrayList<TreeViewerItem> children) {
 
       /**
        * Derby does not support expression in "GROUP BY" statements, this is a workaround found
@@ -311,14 +353,6 @@ public class TVIRefTour_RefTourItem extends TVIRefTour_TourItem {
       } catch (final SQLException e) {
          UI.showSQLException(e);
       }
-   }
-
-   @Override
-   public int hashCode() {
-      final int prime = 31;
-      int result = 1;
-      result = prime * result + (int) (refId ^ (refId >>> 32));
-      return result;
    }
 
    void remove() {

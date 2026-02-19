@@ -1,4 +1,4 @@
-26.next.0                                                 ?. February 2026
+26.next.0                                                 ?. March 2026
 
 
 TODO's
@@ -46,7 +46,7 @@ New / Improvements
     
   - Equipment
     - Equipment items are created directly in the equipment view
-    - Parts and services to collated tours by type and time
+    - Parts and services are collating tours by a type and time
 
 
 Changes

@@ -68,6 +68,7 @@ import net.tourbook.tour.TourManager;
 import net.tourbook.tour.TourTypeMenuManager;
 import net.tourbook.tourType.TourTypeImage;
 import net.tourbook.ui.ITourProvider;
+import net.tourbook.ui.ITourProviderByID;
 import net.tourbook.ui.TreeColumnFactory;
 import net.tourbook.ui.action.ActionCollapseAll;
 import net.tourbook.ui.action.ActionCollapseOthers;
@@ -134,7 +135,14 @@ import org.eclipse.swt.widgets.TreeItem;
 import org.eclipse.ui.ISelectionListener;
 import org.eclipse.ui.part.ViewPart;
 
-public class TaggingView extends ViewPart implements ITourProvider, ITourViewer, ITreeViewer {
+public class TaggingView extends ViewPart implements
+
+      ITourProvider,
+      ITourProviderByID,
+      ITourViewer,
+      ITreeViewer
+
+{
 
    public static final String        ID                                     = "net.tourbook.views.tagViewID";           //$NON-NLS-1$
 
@@ -382,7 +390,7 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer,
       public int compare(final Viewer viewer, final Object obj1, final Object obj2) {
 
 // SET_FORMATTING_OFF
-         
+
          if (obj1 instanceof final TVITaggingView_Tour tourItem1
           && obj2 instanceof final TVITaggingView_Tour tourItem2) {
 
@@ -1767,7 +1775,7 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer,
       boolean isIteratedTours = false;
       if (isIterateTours) {
 
-         final ArrayList<Long> allSelectedTourIds = getSelectedTourIDs();
+         final Set<Long> allSelectedTourIds = getSelectedTourIDs();
          _numIteratedTours = allSelectedTourIds.size();
          isIteratedTours = _numIteratedTours > 0;
       }
@@ -1989,7 +1997,29 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer,
       return _columnManager;
    }
 
-   private ArrayList<Long> getSelectedTourIDs() {
+   @Override
+   public Set<Long> getSelectedTourIDs() {
+
+      final Set<Long> allTourIds = new HashSet<>();
+
+      final ITreeSelection selection = _tagViewer.getStructuredSelection();
+
+      for (final Object selectedItem : selection) {
+
+         if (selectedItem instanceof final TVITaggingView_Tour tourItem) {
+
+            allTourIds.add(tourItem.tourId);
+
+         } else if (selectedItem instanceof final TVITaggingView_Item viewItem) {
+
+            getTagChildren(viewItem, allTourIds);
+         }
+      }
+
+      return allTourIds;
+   }
+
+   private ArrayList<Long> getSelectedTourIDsList() {
 
       final ArrayList<Long> allTourIds = new ArrayList<>();
       final Set<Long> checkedTourIds = new HashSet<>();
@@ -2018,8 +2048,8 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer,
    @Override
    public ArrayList<TourData> getSelectedTours() {
 
-      // get selected tour id's
-      final ArrayList<Long> allTourIds = getSelectedTourIDs();
+      // get selected tour ids
+      final ArrayList<Long> allTourIds = getSelectedTourIDsList();
 
       /*
        * Show busyindicator when multiple tours needs to be retrieved from the database
@@ -2044,10 +2074,12 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer,
     * Fetch children of a tag item and collect tour id's.
     *
     * @param tagItem
-    * @param allTourIds
+    * @param allCollectedTourIDs
     * @param checkedTourIds
     */
-   private void getTagChildren(final TVITaggingView_Item tagItem, final ArrayList<Long> allTourIds, final Set<Long> checkedTourIds) {
+   private void getTagChildren(final TVITaggingView_Item tagItem,
+                               final ArrayList<Long> allCollectedTourIDs,
+                               final Set<Long> checkedTourIds) {
 
       // iterate over all tag children
 
@@ -2058,12 +2090,38 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer,
             final long tourId = tourItem.tourId;
 
             if (checkedTourIds.add(tourId)) {
-               allTourIds.add(tourId);
+               allCollectedTourIDs.add(tourId);
             }
 
          } else if (viewerItem instanceof final TVITaggingView_Item viewItem) {
 
-            getTagChildren(viewItem, allTourIds, checkedTourIds);
+            getTagChildren(viewItem, allCollectedTourIDs, checkedTourIds);
+         }
+      }
+   }
+
+   /**
+    * Recursive !!!
+    * <p>
+    * Fetch children of a tag item and collect tour ids
+    *
+    * @param tagItem
+    * @param allCollectedTourIDs
+    */
+   private void getTagChildren(final TVITaggingView_Item tagItem,
+                               final Set<Long> allCollectedTourIDs) {
+
+      // iterate over all tag children
+
+      for (final TreeViewerItem viewerItem : tagItem.getFetchedChildren()) {
+
+         if (viewerItem instanceof final TVITaggingView_Tour tourItem) {
+
+            allCollectedTourIDs.add(tourItem.tourId);
+
+         } else if (viewerItem instanceof final TVITaggingView_Item viewItem) {
+
+            getTagChildren(viewItem, allCollectedTourIDs);
          }
       }
    }

@@ -46,6 +46,7 @@ import net.tourbook.ui.ITourProvider;
 import net.tourbook.ui.action.IActionProvider;
 import net.tourbook.ui.action.TourActionCategory;
 import net.tourbook.ui.action.TourActionManager;
+import net.tourbook.ui.views.referenceTour.TVIRefTour_ComparedTour;
 import net.tourbook.ui.views.tagging.TVITaggingView_Tour;
 import net.tourbook.ui.views.tourBook.TVITourBookTour;
 import net.tourbook.ui.views.tourDataEditor.TourDataEditorView;
@@ -599,11 +600,31 @@ public class EquipmentMenuManager implements IActionProvider {
                   isEnabled_RemoveEquipment = true;
                }
 
-            } else if (selectedItem instanceof TVITaggingView_Tour) {
+            } else if (selectedItem instanceof final TVITaggingView_Tour tourItem) {
+
+               final Set<Long> allEquipmentIDs = tourItem.allEquipmentIDs;
+
+               if (allEquipmentIDs != null && allEquipmentIDs.size() > 0) {
+
+                  allSelectedEquipmentIDs_FromTours.addAll(new ArrayList<>(allEquipmentIDs));
+
+                  isEnabled_RemoveEquipment = true;
+               }
 
                numTours++;
 
-               isEnabled_RemoveEquipment = true;
+            } else if (selectedItem instanceof final TVIRefTour_ComparedTour tourItem) {
+
+               final Set<Long> allEquipmentIDs = tourItem.allEquipmentIDs;
+
+               if (allEquipmentIDs != null && allEquipmentIDs.size() > 0) {
+
+                  allSelectedEquipmentIDs_FromTours.addAll(new ArrayList<>(allEquipmentIDs));
+
+                  isEnabled_RemoveEquipment = true;
+               }
+
+               numTours++;
 
             } else if (selectedItem instanceof final TVIEquipmentView_Tour tourItem) {
 

@@ -236,15 +236,15 @@ public class TVIEquipmentView_Equipment extends TVIEquipmentView_Item {
                + "  AND TourData.tourstarttime >= equipment.dateFrom" + NL //                   //$NON-NLS-1$
                + "  AND TourData.tourstarttime <  equipment.dateUntil" + NL //                  //$NON-NLS-1$
 
-               // get all equipment id's
+               // get all equipment ids
                + "LEFT JOIN " + TourDatabase.JOINTABLE__TOURDATA__EQUIPMENT + " AS jTdataEq" + NL //   //$NON-NLS-1$ //$NON-NLS-2$
                + "  ON TourData.TOURID = jTdataEq.TOURDATA_TOURID" + NL //                             //$NON-NLS-1$
 
-               // get tag id's
+               // get tag ids
                + "LEFT JOIN " + TourDatabase.JOINTABLE__TOURDATA__TOURTAG + " AS jTdataTtag" // //$NON-NLS-1$ //$NON-NLS-2$
                + "  ON TourData.tourId = jTdataTtag.TourData_tourId" + NL //                    //$NON-NLS-1$
 
-               // get marker id's
+               // get marker ids
                + "LEFT JOIN " + TourDatabase.TABLE_TOUR_MARKER + " AS Tmarker" //               //$NON-NLS-1$ //$NON-NLS-2$
                + "  ON TourData.tourId = Tmarker.TourData_tourId" + NL //                       //$NON-NLS-1$
 
