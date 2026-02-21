@@ -265,14 +265,35 @@ public class Messages extends NLS {
 
    public static String        ColumnFactory_Equipment;
    public static String        ColumnFactory_Equipment_Brand;
+   public static String        ColumnFactory_Equipment_Collate;
+   public static String        ColumnFactory_Equipment_Collate_Tooltip;
    public static String        ColumnFactory_Equipment_Date;
    public static String        ColumnFactory_Equipment_Date_Tooltip;
    public static String        ColumnFactory_Equipment_Date_Built;
    public static String        ColumnFactory_Equipment_Date_Built_Tooltip;
    public static String        ColumnFactory_Equipment_Date_Retired;
    public static String        ColumnFactory_Equipment_Date_Retired_Tooltip;
+   public static String        ColumnFactory_Equipment_Date_Duration;
+   public static String        ColumnFactory_Equipment_Date_DurationTooltip;
+   public static String        ColumnFactory_Equipment_Date_Until;
+   public static String        ColumnFactory_Equipment_Date_Until_Tooltip;
+   public static String        ColumnFactory_Equipment_ID;
+   public static String        ColumnFactory_Equipment_ID_Tootip;
+   public static String        ColumnFactory_Equipment_ImageFile_Tooltip;
+   public static String        ColumnFactory_Equipment_InitialDistance;
+   public static String        ColumnFactory_Equipment_InitialDistance_Tooltip;
    public static String        ColumnFactory_Equipment_Model;
+   public static String        ColumnFactory_Equipment_Price;
+   public static String        ColumnFactory_Equipment_PriceCurrency_Header;
+   public static String        ColumnFactory_Equipment_PriceCurrency_Label;
+   public static String        ColumnFactory_Equipment_PriceCurrency_Tooltip;
+   public static String        ColumnFactory_Equipment_Size;
    public static String        ColumnFactory_Equipment_Tooltip;
+   public static String        ColumnFactory_Equipment_TourStructure_Header;
+   public static String        ColumnFactory_Equipment_TourStructure_Label;
+   public static String        ColumnFactory_Equipment_TourStructure_Tooltip;
+   public static String        ColumnFactory_Equipment_Type;
+   public static String        ColumnFactory_Equipment_Weight;
 
    public static String        ColumnFactory_GearFrontShiftCount_Header;
    public static String        ColumnFactory_GearFrontShiftCount_Label;

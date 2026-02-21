@@ -608,6 +608,11 @@ public class Messages extends NLS {
    public static String        Dialog_Equipment_Label_Description;
    public static String        Dialog_Equipment_Label_Model;
 
+   public static String        Dialog_EquipmentPart_Dialog_Message_CreatePart;
+   public static String        Dialog_EquipmentPart_Dialog_Message_DuplicatePart;
+   public static String        Dialog_EquipmentPart_Dialog_Message_EditPart;
+   public static String        Dialog_EquipmentPart_Dialog_Title;
+
    public static String        dialog_export_btn_export;
 
    public static String        Dialog_Export_Checkbox_Description;
@@ -1050,6 +1055,26 @@ public class Messages extends NLS {
    public static String        Dialog_TourTag_Label_Notes;
    public static String        Dialog_TourTag_Label_TagName;
    public static String        Dialog_TourTag_Title;
+
+   public static String        DialogEquipmentPart_Dialog_EquipmentPart_Checkbox_IncludeInCollatedTours;
+   public static String        DialogEquipmentPart_Dialog_EquipmentPart_Error_BrandModelIsEmpty;
+   public static String        DialogEquipmentPart_Dialog_EquipmentPart_Error_CannotLoadImage;
+   public static String        DialogEquipmentPart_Dialog_EquipmentPart_FileDialog_Text;
+   public static String        DialogEquipmentPart_Dialog_EquipmentPart_Label_Collate;
+   public static String        DialogEquipmentPart_Dialog_EquipmentPart_Label_Currency;
+   public static String        DialogEquipmentPart_Dialog_EquipmentPart_Label_Date;
+   public static String        DialogEquipmentPart_Dialog_EquipmentPart_Label_Image;
+   public static String        DialogEquipmentPart_Dialog_EquipmentPart_Label_InitialDistance;
+   public static String        DialogEquipmentPart_Dialog_EquipmentPart_Label_InitialDistance_Tooltip;
+   public static String        DialogEquipmentPart_Dialog_EquipmentPart_Label_Price;
+   public static String        DialogEquipmentPart_Dialog_EquipmentPart_Label_Size;
+   public static String        DialogEquipmentPart_Dialog_EquipmentPart_Label_Sync;
+   public static String        DialogEquipmentPart_Dialog_EquipmentPart_Label_SyncTooltip;
+   public static String        DialogEquipmentPart_Dialog_EquipmentPart_Label_Tooltip1;
+   public static String        DialogEquipmentPart_Dialog_EquipmentPart_Label_Tooltip2;
+   public static String        DialogEquipmentPart_Dialog_EquipmentPart_Label_Type;
+   public static String        DialogEquipmentPart_Dialog_EquipmentPart_Label_Website;
+   public static String        DialogEquipmentPart_Dialog_EquipmentPart_Label_Weight;
 
    public static String        Dlg_AdjustAltitude_Group_options;
    public static String        Dlg_AdjustAltitude_Label_end_altitude;

@@ -195,7 +195,7 @@ public class DialogEquipmentPart extends TitleAreaDialog {
       super.configureShell(shell);
 
       // set window title
-      shell.setText("Equipment Part");
+      shell.setText(Messages.Dialog_EquipmentPart_Dialog_Title);
    }
 
    @Override
@@ -205,11 +205,11 @@ public class DialogEquipmentPart extends TitleAreaDialog {
 
       final String messageTitle = _isDuplicatePart
 
-            ? "Duplicate Part"
+            ? Messages.Dialog_EquipmentPart_Dialog_Message_DuplicatePart
             : _isNewPart
 
-                  ? "Create part for \"%s\""
-                  : "Edit part for: \"%s\"";
+                  ? Messages.Dialog_EquipmentPart_Dialog_Message_CreatePart
+                  : Messages.Dialog_EquipmentPart_Dialog_Message_EditPart;
 
       setTitle(messageTitle.formatted(_partEquipment.getName()));
       setMessage(_part.getName());
@@ -275,14 +275,8 @@ public class DialogEquipmentPart extends TitleAreaDialog {
             .getFieldDecoration(FieldDecorationRegistry.DEC_INFORMATION)
             .getImage();
 
-      final String tooltip = UI.EMPTY_STRING
-            + "Collated tours are a collection of tours to summarize,\n"
-            + "e.g. distance or duration values\n\n"
-            + "Tours are collated with the type and date fields";
-
-      final String tooltip2 = UI.EMPTY_STRING
-            + "With the type and date fields, tours are collated to display\n"
-            + "e.g. all kilometers for one part or one service";
+      final String tooltip = Messages.DialogEquipmentPart_Dialog_EquipmentPart_Label_Tooltip1;
+      final String tooltip2 = Messages.DialogEquipmentPart_Dialog_EquipmentPart_Label_Tooltip2;
 
       _container = new Composite(parent, SWT.NONE);
       GridDataFactory.fillDefaults().grab(true, true).applyTo(_container);
@@ -328,7 +322,7 @@ public class DialogEquipmentPart extends TitleAreaDialog {
             /*
              * Type
              */
-            final Label label = UI.createLabel(_container, "T&ype");
+            final Label label = UI.createLabel(_container, Messages.DialogEquipmentPart_Dialog_EquipmentPart_Label_Type);
             gdVertCenter.applyTo(label);
 
             // autocomplete combo
@@ -353,7 +347,7 @@ public class DialogEquipmentPart extends TitleAreaDialog {
             /*
              * Size
              */
-            final Label label = UI.createLabel(_container, "Si&ze");
+            final Label label = UI.createLabel(_container, Messages.DialogEquipmentPart_Dialog_EquipmentPart_Label_Size);
             gdVertCenter.applyTo(label);
 
             // autocomplete combo
@@ -369,7 +363,7 @@ public class DialogEquipmentPart extends TitleAreaDialog {
             /*
              * Date from
              */
-            UI.createLabel(_container, "D&ate");
+            UI.createLabel(_container, Messages.DialogEquipmentPart_Dialog_EquipmentPart_Label_Date);
 
             _dateFrom = new DateTime(_container, SWT.DATE | SWT.MEDIUM | SWT.DROP_DOWN);
             _dateFrom.addSelectionListener(_defaultSelectionListener);
@@ -389,7 +383,7 @@ public class DialogEquipmentPart extends TitleAreaDialog {
              * Price
              */
 
-            UI.createLabel(_container, "&Price");
+            UI.createLabel(_container, Messages.DialogEquipmentPart_Dialog_EquipmentPart_Label_Price);
 
             // spinner
             _spinPrice = new Spinner(_container, SWT.BORDER);
@@ -404,7 +398,7 @@ public class DialogEquipmentPart extends TitleAreaDialog {
             // autocomplete combo
             _comboPriceUnit = new Combo(_container, SWT.BORDER | SWT.FLAT);
             _comboPriceUnit.setText(UI.EMPTY_STRING);
-            _comboPriceUnit.setToolTipText("Currency");
+            _comboPriceUnit.setToolTipText(Messages.DialogEquipmentPart_Dialog_EquipmentPart_Label_Currency);
             _comboPriceUnit.addModifyListener(_defaultModifyListener);
 
             GridDataFactory.fillDefaults()
@@ -425,8 +419,8 @@ public class DialogEquipmentPart extends TitleAreaDialog {
             _dateBuilt.addSelectionListener(_defaultSelectionListener);
 
             _chkSyncDates = new Button(_container, SWT.CHECK);
-            _chkSyncDates.setText("Sy&nc");
-            _chkSyncDates.setToolTipText("Sync built date with first use date");
+            _chkSyncDates.setText(Messages.DialogEquipmentPart_Dialog_EquipmentPart_Label_Sync);
+            _chkSyncDates.setToolTipText(Messages.DialogEquipmentPart_Dialog_EquipmentPart_Label_SyncTooltip);
             _chkSyncDates.addSelectionListener(_defaultSelectionListener);
          }
          UI.createSpacer_Horizontal(_container, 1);
@@ -435,7 +429,7 @@ public class DialogEquipmentPart extends TitleAreaDialog {
              * Weight
              */
 
-            UI.createLabel(_container, "&Weight");
+            UI.createLabel(_container, Messages.DialogEquipmentPart_Dialog_EquipmentPart_Label_Weight);
 
             // spinner
             _spinWeight = new Spinner(_container, SWT.BORDER);
@@ -467,8 +461,8 @@ public class DialogEquipmentPart extends TitleAreaDialog {
              * Distance first use
              */
 
-            final Label label = UI.createLabel(_container, "Initial d&istance");
-            label.setToolTipText("Distance by first use");
+            final Label label = UI.createLabel(_container, Messages.DialogEquipmentPart_Dialog_EquipmentPart_Label_InitialDistance);
+            label.setToolTipText(Messages.DialogEquipmentPart_Dialog_EquipmentPart_Label_InitialDistance_Tooltip);
 
             // spinner
             _spinDistance = new Spinner(_container, SWT.BORDER);
@@ -488,12 +482,12 @@ public class DialogEquipmentPart extends TitleAreaDialog {
              * Collate tours
              */
 
-            _lblCollate = UI.createLabel(_container, "Co&llate");
+            _lblCollate = UI.createLabel(_container, Messages.DialogEquipmentPart_Dialog_EquipmentPart_Label_Collate);
             _lblCollate.setToolTipText(tooltip);
             gdVertCenter.applyTo(_lblCollate);
 
             _chkCollate = new Button(_container, SWT.CHECK);
-            _chkCollate.setText("Include in collated tours");
+            _chkCollate.setText(Messages.DialogEquipmentPart_Dialog_EquipmentPart_Checkbox_IncludeInCollatedTours);
             _chkCollate.setToolTipText(tooltip);
             _chkCollate.addSelectionListener(_defaultSelectionListener);
 
@@ -511,7 +505,7 @@ public class DialogEquipmentPart extends TitleAreaDialog {
             /*
              * Website
              */
-            final Label label = UI.createLabel(_container, "W&ebsite");
+            final Label label = UI.createLabel(_container, Messages.DialogEquipmentPart_Dialog_EquipmentPart_Label_Website);
             GridDataFactory.fillDefaults().align(SWT.FILL, SWT.BEGINNING).applyTo(label);
 
             _txtUrlAddress = new Text(_container, SWT.BORDER);
@@ -543,7 +537,7 @@ public class DialogEquipmentPart extends TitleAreaDialog {
              */
 
             _lblImage = UI.createLabel(_container, UI.EMPTY_STRING);
-            _lblImage.setText("Ima&ge");
+            _lblImage.setText(Messages.DialogEquipmentPart_Dialog_EquipmentPart_Label_Image);
             GridDataFactory.fillDefaults().align(SWT.BEGINNING, SWT.CENTER).applyTo(_lblImage);
 
             final Composite imageContainer = new Composite(_container, SWT.NONE);
@@ -706,7 +700,7 @@ public class DialogEquipmentPart extends TitleAreaDialog {
 
       if (StringUtils.hasContent(brand) == false && StringUtils.hasContent(model) == false) {
 
-         setErrorMessage("Brand and model cannot be empty");
+         setErrorMessage(Messages.DialogEquipmentPart_Dialog_EquipmentPart_Error_BrandModelIsEmpty);
 
          return false;
       }
@@ -751,7 +745,7 @@ public class DialogEquipmentPart extends TitleAreaDialog {
                    * javax.imageio.IIOException: 16-bit samples are not supported for Horizontal
                    * differencing Predictor
                    */
-                  final String errorMessage = "Cannot load image %s\n%s".formatted(
+                  final String errorMessage = Messages.DialogEquipmentPart_Dialog_EquipmentPart_Error_CannotLoadImage.formatted(
                         imageFilePath,
                         ioException.getMessage());
 
@@ -816,7 +810,7 @@ public class DialogEquipmentPart extends TitleAreaDialog {
 
       final FileDialog fileDialog = new FileDialog(getShell(), SWT.OPEN);
 
-      fileDialog.setText("Set Part Image");
+      fileDialog.setText(Messages.DialogEquipmentPart_Dialog_EquipmentPart_FileDialog_Text);
       fileDialog.setFilterPath(lastSelectedPath);
 
       final String imageExtensions = ImageUtils.getImageExtensions();
