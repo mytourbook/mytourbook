@@ -205,6 +205,7 @@ public class ReferenceTourView extends ViewPart implements
    private boolean                             _isInCollapseAll;
    private boolean                             _isInExpandingSelection;
    private boolean                             _isInRestore;
+   private boolean                             _isInSelection;
    private boolean                             _isPartVisible;
    private int                                 _expandRunnableCounter;
    private long                                _lastExpandSelectionTime;
@@ -2132,7 +2133,7 @@ public class ReferenceTourView extends ViewPart implements
     */
    private void onTourViewer_Selection(final SelectionChangedEvent selectionChangedEvent) {
 
-      if (_isInRestore || _isMouseContextMenu) {
+      if (_isInRestore || _isMouseContextMenu || _isInSelection) {
          return;
       }
 
@@ -2226,6 +2227,12 @@ public class ReferenceTourView extends ViewPart implements
    @Override
    public void reloadViewer() {
 
+      if (_isInSelection) {
+         return;
+      }
+
+      _isInSelection = true;
+
       final Tree tree = _tourViewer.getTree();
       tree.setRedraw(false);
       {
@@ -2238,6 +2245,8 @@ public class ReferenceTourView extends ViewPart implements
          _tourViewer.setSelection(selection, true);
       }
       tree.setRedraw(true);
+      
+      _isInSelection = false;
    }
 
    private void restoreState() {
