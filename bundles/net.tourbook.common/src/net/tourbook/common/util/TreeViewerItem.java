@@ -74,8 +74,8 @@ public abstract class TreeViewerItem {
 
       String sqlReplaced = sql;
 
-      sqlReplaced = sqlReplaced.replaceAll("\\$i_", sbIndent.toString());
-      sqlReplaced = sqlReplaced.replaceAll("\\$db_", dbPrefixReplaced);
+      sqlReplaced = sqlReplaced.replaceAll("\\$i_", sbIndent.toString()); //$NON-NLS-1$
+      sqlReplaced = sqlReplaced.replaceAll("\\$db_", dbPrefixReplaced); //$NON-NLS-1$
 
       allCachedSql.put(key, sqlReplaced);
 

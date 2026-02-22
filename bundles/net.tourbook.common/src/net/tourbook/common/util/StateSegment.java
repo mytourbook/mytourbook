@@ -35,9 +35,9 @@ public class StateSegment {
 
       return UI.EMPTY_STRING
 
-            + "StateSegment" + NL
+            + "StateSegment" + NL //$NON-NLS-1$
 
-            + " itemType = " + itemType + NL
-            + " itemData = " + itemData + NL;
+            + " itemType = " + itemType + NL //$NON-NLS-1$
+            + " itemData = " + itemData + NL; //$NON-NLS-1$
    }
 }

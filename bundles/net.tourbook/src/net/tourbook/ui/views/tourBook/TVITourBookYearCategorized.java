@@ -87,7 +87,7 @@ public class TVITourBookYearCategorized extends TVITourBookItem {
             + partFilter.getSqlString()
 
             // get tag IDs
-            + "LEFT JOIN " + TourDatabase.JOINTABLE__TOURDATA__TOURTAG + " jTdataTtag" //             //$NON-NLS-1$
+            + "LEFT JOIN " + TourDatabase.JOINTABLE__TOURDATA__TOURTAG + " jTdataTtag" //             //$NON-NLS-1$ //$NON-NLS-2$
             + " ON tourID = jTdataTtag.TourData_tourId" + NL //                                       //$NON-NLS-1$
 
             // get marker IDs

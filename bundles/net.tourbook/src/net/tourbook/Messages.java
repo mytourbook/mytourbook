@@ -601,17 +601,54 @@ public class Messages extends NLS {
    public static String        Dialog_EditTimeslicesValues_Label_ReplaceValues;
    public static String        Dialog_EditTimeslicesValues_Title;
 
+   public static String        Dialog_Equipment_Checkbox_Collate;
+   public static String        Dialog_Equipment_Checkbox_Sync;
+   public static String        Dialog_Equipment_Checkbox_Sync_Tooltip;
+   public static String        Dialog_Equipment_Combo_PriceUnit_Tooltip;
+   public static String        Dialog_Equipment_Dialog_Message_Eqipment_Duplicate;
+   public static String        Dialog_Equipment_Dialog_Message_Eqipment_Edit;
+   public static String        Dialog_Equipment_Dialog_Message_Eqipment_New;
+   public static String        Dialog_Equipment_Dialog_Title;
+   public static String        Dialog_Equipment_Error_BrandModelIsEmpty;
+   public static String        Dialog_Equipment_Error_CannotLoadImage;
+   public static String        Dialog_Equipment_FileDialog_Title;
    public static String        Dialog_Equipment_Label_Brand;
    public static String        Dialog_Equipment_Label_Brand_Tooltip;
+   public static String        Dialog_Equipment_Label_Collate;
+   public static String        Dialog_Equipment_Label_Date;
    public static String        Dialog_Equipment_Label_DateBuilt;
    public static String        Dialog_Equipment_Label_DateRetired;
    public static String        Dialog_Equipment_Label_Description;
+   public static String        Dialog_Equipment_Label_Image;
+   public static String        Dialog_Equipment_Label_InitialDistance;
+   public static String        Dialog_Equipment_Label_InitialDistance_Tooltip;
    public static String        Dialog_Equipment_Label_Model;
+   public static String        Dialog_Equipment_Label_Price;
+   public static String        Dialog_Equipment_Label_Size;
+   public static String        Dialog_Equipment_Label_Type;
+   public static String        Dialog_Equipment_Label_Website;
+   public static String        Dialog_Equipment_Label_Weight;
+   public static String        Dialog_Equipment_Tooltip_1;
+   public static String        Dialog_Equipment_Tooltip_2;
 
+   public static String        Dialog_EquipmentPart_Checkbox_IncludeInCollatedTours;
    public static String        Dialog_EquipmentPart_Dialog_Message_CreatePart;
    public static String        Dialog_EquipmentPart_Dialog_Message_DuplicatePart;
    public static String        Dialog_EquipmentPart_Dialog_Message_EditPart;
    public static String        Dialog_EquipmentPart_Dialog_Title;
+   public static String        Dialog_EquipmentPart_FileDialog_Text;
+   public static String        Dialog_EquipmentPart_Label_Currency;
+   public static String        Dialog_EquipmentPart_Label_Sync;
+   public static String        Dialog_EquipmentPart_Label_SyncTooltip;
+
+   public static String        Dialog_EquipmentService_Dialog_Message_Service_Duplicate;
+   public static String        Dialog_EquipmentService_Dialog_Message_Service_Edit;
+   public static String        Dialog_EquipmentService_Dialog_Message_Service_New;
+   public static String        Dialog_EquipmentService_Dialog_Title;
+   public static String        Dialog_EquipmentService_Error_NameIsEmpty;
+   public static String        Dialog_EquipmentService_FileDialog_Title;
+   public static String        Dialog_EquipmentService_Label_Company;
+   public static String        Dialog_EquipmentService_Label_Name;
 
    public static String        dialog_export_btn_export;
 
@@ -1056,26 +1093,6 @@ public class Messages extends NLS {
    public static String        Dialog_TourTag_Label_TagName;
    public static String        Dialog_TourTag_Title;
 
-   public static String        DialogEquipmentPart_Dialog_EquipmentPart_Checkbox_IncludeInCollatedTours;
-   public static String        DialogEquipmentPart_Dialog_EquipmentPart_Error_BrandModelIsEmpty;
-   public static String        DialogEquipmentPart_Dialog_EquipmentPart_Error_CannotLoadImage;
-   public static String        DialogEquipmentPart_Dialog_EquipmentPart_FileDialog_Text;
-   public static String        DialogEquipmentPart_Dialog_EquipmentPart_Label_Collate;
-   public static String        DialogEquipmentPart_Dialog_EquipmentPart_Label_Currency;
-   public static String        DialogEquipmentPart_Dialog_EquipmentPart_Label_Date;
-   public static String        DialogEquipmentPart_Dialog_EquipmentPart_Label_Image;
-   public static String        DialogEquipmentPart_Dialog_EquipmentPart_Label_InitialDistance;
-   public static String        DialogEquipmentPart_Dialog_EquipmentPart_Label_InitialDistance_Tooltip;
-   public static String        DialogEquipmentPart_Dialog_EquipmentPart_Label_Price;
-   public static String        DialogEquipmentPart_Dialog_EquipmentPart_Label_Size;
-   public static String        DialogEquipmentPart_Dialog_EquipmentPart_Label_Sync;
-   public static String        DialogEquipmentPart_Dialog_EquipmentPart_Label_SyncTooltip;
-   public static String        DialogEquipmentPart_Dialog_EquipmentPart_Label_Tooltip1;
-   public static String        DialogEquipmentPart_Dialog_EquipmentPart_Label_Tooltip2;
-   public static String        DialogEquipmentPart_Dialog_EquipmentPart_Label_Type;
-   public static String        DialogEquipmentPart_Dialog_EquipmentPart_Label_Website;
-   public static String        DialogEquipmentPart_Dialog_EquipmentPart_Label_Weight;
-
    public static String        Dlg_AdjustAltitude_Group_options;
    public static String        Dlg_AdjustAltitude_Label_end_altitude;
    public static String        Dlg_AdjustAltitude_Label_end_altitude_tooltip;
@@ -1138,6 +1155,8 @@ public class Messages extends NLS {
    public static String        Elevation_Compare_Action_TourCompareFilter_Tooltip;
    public static String        Elevation_Compare_Monitor_SubTask;
    public static String        Elevation_Compare_Monitor_Task;
+
+   public static String        Equipment_View_Label_UntilNow;
 
    public static String        Format_hhmm;
    public static String        Format_rawdata_file_yyyy_mm_dd;

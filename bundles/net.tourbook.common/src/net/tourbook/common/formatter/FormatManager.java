@@ -276,10 +276,10 @@ public class FormatManager {
          return Messages.Value_Formatter_Pace_MM_SS;
 
       case DATE_TIME:
-         return "dd.mm.yyy";
+         return Messages.Value_Formatter_Time_DD_MM_YYY;
 
       case DATE_TIME_HH_MM_SS:
-         return "dd.mm.yyy hh:mm:ss";
+         return Messages.Value_Formatter_Time_DD_MM_YYY__HH_MM_SS;
 
       case TIME_HH:
          return Messages.Value_Formatter_Time_HH;

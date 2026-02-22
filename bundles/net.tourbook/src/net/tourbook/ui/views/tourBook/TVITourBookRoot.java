@@ -72,7 +72,7 @@ public class TVITourBookRoot extends TVITourBookItem {
 
                + "	tdFields.StartYear," + NL //                    //$NON-NLS-1$
 
-               + getSQL_SUM_COLUMNS("tdFields", 3)
+               + getSQL_SUM_COLUMNS("tdFields", 3) //                //$NON-NLS-1$
 
                + "FROM " + NL //                                     //$NON-NLS-1$
 
@@ -84,7 +84,7 @@ public class TVITourBookRoot extends TVITourBookItem {
                + "      TourData.TourID," + NL //                    //$NON-NLS-1$
                + "      TourData.StartYear," + NL //                 //$NON-NLS-1$
 
-               + getSQL_SUM_FIELDS("TourData", 6)
+               + getSQL_SUM_FIELDS("TourData", 6) //                 //$NON-NLS-1$
 
                + "   FROM TOURDATA AS TourData" + NL //              //$NON-NLS-1$
 

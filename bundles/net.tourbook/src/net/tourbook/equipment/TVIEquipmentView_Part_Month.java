@@ -187,12 +187,12 @@ public class TVIEquipmentView_Part_Month extends TVIEquipmentView_Item {
 
                + TVIEquipmentView_Tour.SQL_TOUR_COLUMNS
 
-               + "FROM " + TourDatabase.TABLE_EQUIPMENT_PART + " AS part" + NL //                     //$NON-NLS-1$
+               + "FROM " + TourDatabase.TABLE_EQUIPMENT_PART + " AS part" + NL //                     //$NON-NLS-1$ //$NON-NLS-2$
 
-               + "JOIN " + TourDatabase.JOINTABLE__TOURDATA__EQUIPMENT + " AS j_td_eq" + NL //        //$NON-NLS-1$
+               + "JOIN " + TourDatabase.JOINTABLE__TOURDATA__EQUIPMENT + " AS j_td_eq" + NL //        //$NON-NLS-1$ //$NON-NLS-2$
                + "   ON j_td_eq.equipment_equipmentid = part.equipment_equipmentid" + NL //           //$NON-NLS-1$
 
-               + "JOIN " + TourDatabase.TABLE_TOUR_DATA + " AS TourData" + NL //                      //$NON-NLS-1$
+               + "JOIN " + TourDatabase.TABLE_TOUR_DATA + " AS TourData" + NL //                      //$NON-NLS-1$ //$NON-NLS-2$
                + "   ON TourData.tourID = j_td_eq.tourdata_tourID" + NL //                            //$NON-NLS-1$
                + "   AND TourData.tourstarttime >= part.dateFrom" + NL //                             //$NON-NLS-1$
                + "   AND TourData.tourstarttime <  part.dateUntil" + NL //                            //$NON-NLS-1$

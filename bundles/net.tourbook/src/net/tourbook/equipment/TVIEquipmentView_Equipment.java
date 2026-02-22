@@ -24,6 +24,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import net.tourbook.Messages;
 import net.tourbook.common.UI;
 import net.tourbook.common.time.TimeTools;
 import net.tourbook.common.util.SQL;
@@ -164,7 +165,7 @@ public class TVIEquipmentView_Equipment extends TVIEquipmentView_Item {
             // this is the last collated part
 
             durationMS = TimeTools.nowInMilliseconds() - part.getDateFrom();
-            durationLastText = "Until now : ";
+            durationLastText = Messages.Equipment_View_Label_UntilNow;
          }
 
          final TVIEquipmentView_Part partItem = new TVIEquipmentView_Part(
@@ -226,12 +227,12 @@ public class TVIEquipmentView_Equipment extends TVIEquipmentView_Item {
 
                + TVIEquipmentView_Tour.SQL_TOUR_COLUMNS
 
-               + "FROM " + TourDatabase.TABLE_EQUIPMENT + " AS equipment" + NL //               //$NON-NLS-1$
+               + "FROM " + TourDatabase.TABLE_EQUIPMENT + " AS equipment" + NL //               //$NON-NLS-1$ //$NON-NLS-2$
 
-               + "JOIN " + TourDatabase.JOINTABLE__TOURDATA__EQUIPMENT + " AS j_td_eq" + NL //  //$NON-NLS-1$
+               + "JOIN " + TourDatabase.JOINTABLE__TOURDATA__EQUIPMENT + " AS j_td_eq" + NL //  //$NON-NLS-1$ //$NON-NLS-2$
                + "  ON j_td_eq.equipment_equipmentid = equipment.EQUIPMENTID" + NL //           //$NON-NLS-1$
 
-               + "JOIN " + TourDatabase.TABLE_TOUR_DATA + " AS TourData" + NL //                //$NON-NLS-1$
+               + "JOIN " + TourDatabase.TABLE_TOUR_DATA + " AS TourData" + NL //                //$NON-NLS-1$ //$NON-NLS-2$
                + "  ON TourData.tourid = j_td_eq.tourdata_tourid" + NL //                       //$NON-NLS-1$
                + "  AND TourData.tourstarttime >= equipment.dateFrom" + NL //                   //$NON-NLS-1$
                + "  AND TourData.tourstarttime <  equipment.dateUntil" + NL //                  //$NON-NLS-1$
@@ -390,14 +391,14 @@ public class TVIEquipmentView_Equipment extends TVIEquipmentView_Item {
                + "   TourData.STARTYEAR," + NL //                                               //$NON-NLS-1$
                + "   COUNT(*) AS num_Tours," + NL //                                            //$NON-NLS-1$
 
-               + getSQL_SUM_COLUMNS("TourData", 3)
+               + getSQL_SUM_COLUMNS("TourData", 3) //                                           //$NON-NLS-1$
 
-               + "FROM " + TourDatabase.TABLE_EQUIPMENT + " AS equipment" + NL //               //$NON-NLS-1$
+               + "FROM " + TourDatabase.TABLE_EQUIPMENT + " AS equipment" + NL //               //$NON-NLS-1$ //$NON-NLS-2$
 
-               + "JOIN " + TourDatabase.JOINTABLE__TOURDATA__EQUIPMENT + " AS j_td_eq" + NL //  //$NON-NLS-1$
+               + "JOIN " + TourDatabase.JOINTABLE__TOURDATA__EQUIPMENT + " AS j_td_eq" + NL //  //$NON-NLS-1$ //$NON-NLS-2$
                + "   ON j_td_eq.equipment_equipmentid = equipment.EQUIPMENTID" + NL //          //$NON-NLS-1$
 
-               + "JOIN " + TourDatabase.TABLE_TOUR_DATA + " AS TourData" + NL //                //$NON-NLS-1$
+               + "JOIN " + TourDatabase.TABLE_TOUR_DATA + " AS TourData" + NL //                //$NON-NLS-1$ //$NON-NLS-2$
                + "   ON TourData.tourid = j_td_eq.tourdata_tourid" + NL //                      //$NON-NLS-1$
                + "   AND TourData.tourstarttime >= equipment.dateFrom" + NL //                  //$NON-NLS-1$
                + "   AND TourData.tourstarttime <  equipment.dateUntil" + NL //                 //$NON-NLS-1$

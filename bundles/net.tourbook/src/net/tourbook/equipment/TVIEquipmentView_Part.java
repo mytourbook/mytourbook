@@ -167,13 +167,13 @@ public class TVIEquipmentView_Part extends TVIEquipmentView_Item {
 
                + TVIEquipmentView_Tour.SQL_TOUR_COLUMNS
 
-               + "FROM " + TourDatabase.TABLE_EQUIPMENT_PART + " AS part" + NL //                        //$NON-NLS-1$
+               + "FROM " + TourDatabase.TABLE_EQUIPMENT_PART + " AS part" + NL //                        //$NON-NLS-1$ //$NON-NLS-2$
 
-               + "JOIN " + TourDatabase.JOINTABLE__TOURDATA__EQUIPMENT + " AS j_td_eq" + NL //           //$NON-NLS-1$
+               + "JOIN " + TourDatabase.JOINTABLE__TOURDATA__EQUIPMENT + " AS j_td_eq" + NL //           //$NON-NLS-1$ //$NON-NLS-2$
                + "   ON j_td_eq.equipment_equipmentid = part.equipment_equipmentid" + NL //              //$NON-NLS-1$
 
                // The alias "TourData" is needed that the tour filter is working
-               + "JOIN " + TourDatabase.TABLE_TOUR_DATA + " AS TourData" + NL //                         //$NON-NLS-1$
+               + "JOIN " + TourDatabase.TABLE_TOUR_DATA + " AS TourData" + NL //                         //$NON-NLS-1$ //$NON-NLS-2$
                + "   ON TourData.tourID = j_td_eq.tourdata_tourID" + NL //                               //$NON-NLS-1$
                + "   AND TourData.TourStartTime >= part.dateFrom" + NL //                                //$NON-NLS-1$
                + "   AND TourData.TourStartTime <  part.dateUntil" + NL //                               //$NON-NLS-1$
@@ -340,7 +340,7 @@ public class TVIEquipmentView_Part extends TVIEquipmentView_Item {
                + "   tdFields.StartYear," + NL //                                               //$NON-NLS-1$
                + "   COUNT(*) AS Num_Tours," + NL //                                            //$NON-NLS-1$
 
-               + getSQL_SUM_COLUMNS("tdFields", 3)
+               + getSQL_SUM_COLUMNS("tdFields", 3) //                                           //$NON-NLS-1$
 
                + "FROM " + NL //                                                                //$NON-NLS-1$
 
@@ -352,14 +352,14 @@ public class TVIEquipmentView_Part extends TVIEquipmentView_Item {
                + "      TourData.TourID," + NL //                                               //$NON-NLS-1$
                + "      TourData.StartYear," + NL //                                            //$NON-NLS-1$
 
-               + getSQL_SUM_TOUR_COLUMNS("TourData", 6)
+               + getSQL_SUM_TOUR_COLUMNS("TourData", 6) //                                      //$NON-NLS-1$
 
-               + "   FROM " + TourDatabase.TABLE_EQUIPMENT_PART + " AS part" + NL //            //$NON-NLS-1$
+               + "   FROM " + TourDatabase.TABLE_EQUIPMENT_PART + " AS part" + NL //            //$NON-NLS-1$ //$NON-NLS-2$
 
-               + "JOIN " + TourDatabase.JOINTABLE__TOURDATA__EQUIPMENT + " AS j_td_eq" + NL //  //$NON-NLS-1$
+               + "JOIN " + TourDatabase.JOINTABLE__TOURDATA__EQUIPMENT + " AS j_td_eq" + NL //  //$NON-NLS-1$ //$NON-NLS-2$
                + "   ON j_td_eq.equipment_equipmentid = part.equipment_equipmentid" + NL //     //$NON-NLS-1$
 
-               + "JOIN " + TourDatabase.TABLE_TOUR_DATA + " AS TourData" + NL //                //$NON-NLS-1$
+               + "JOIN " + TourDatabase.TABLE_TOUR_DATA + " AS TourData" + NL //                //$NON-NLS-1$ //$NON-NLS-2$
                + "   ON TourData.tourid = j_td_eq.tourdata_tourid" + NL //                      //$NON-NLS-1$
                + "   AND TourData.TourStartTime >= part.dateFrom" + NL //                       //$NON-NLS-1$
                + "   AND TourData.TourStartTime <  part.dateUntil" + NL //                      //$NON-NLS-1$
@@ -429,9 +429,9 @@ public class TVIEquipmentView_Part extends TVIEquipmentView_Item {
 
       return UI.EMPTY_STRING
 
-            + "TVIEquipmentView_Part" + NL
+            + "TVIEquipmentView_Part" + NL //$NON-NLS-1$
 
-            + " _part   = " + _part + NL
+            + " _part   = " + _part + NL //$NON-NLS-1$
 
       ;
    }

@@ -517,10 +517,10 @@ public class NatTable_DataLoader {
 
                + ") AS tdFiltered" + NL //                                                         //$NON-NLS-1$
 
-               + "LEFT JOIN " + TourDatabase.TABLE_TOUR_MARKER + "               AS tm    ON tdFiltered.tourID = tm.TourData_tourId" + NL //   //$NON-NLS-1$
-               + "LEFT JOIN " + TourDatabase.JOINTABLE__TOURDATA__TOURTAG + "    AS jtt   ON tdFiltered.tourID = jtt.TourData_tourId" + NL //  //$NON-NLS-1$
-               + "LEFT JOIN " + TourDatabase.TABLE_TOUR_NUTRITION_PRODUCT + "    AS np    ON tdFiltered.tourID = np.TourData_tourId" + NL //   //$NON-NLS-1$
-               + "LEFT JOIN " + TourDatabase.JOINTABLE__TOURDATA__EQUIPMENT + "  AS te    ON tdFiltered.tourID = te.TourData_tourId" + NL //   //$NON-NLS-1$
+               + "LEFT JOIN " + TourDatabase.TABLE_TOUR_MARKER + "               AS tm    ON tdFiltered.tourID = tm.TourData_tourId" + NL //   //$NON-NLS-1$ //$NON-NLS-2$
+               + "LEFT JOIN " + TourDatabase.JOINTABLE__TOURDATA__TOURTAG + "    AS jtt   ON tdFiltered.tourID = jtt.TourData_tourId" + NL //  //$NON-NLS-1$ //$NON-NLS-2$
+               + "LEFT JOIN " + TourDatabase.TABLE_TOUR_NUTRITION_PRODUCT + "    AS np    ON tdFiltered.tourID = np.TourData_tourId" + NL //   //$NON-NLS-1$ //$NON-NLS-2$
+               + "LEFT JOIN " + TourDatabase.JOINTABLE__TOURDATA__EQUIPMENT + "  AS te    ON tdFiltered.tourID = te.TourData_tourId" + NL //   //$NON-NLS-1$ //$NON-NLS-2$
 
                + orderBy + NL;
 

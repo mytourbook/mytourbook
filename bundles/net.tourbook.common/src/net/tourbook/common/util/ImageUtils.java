@@ -273,7 +273,7 @@ public class ImageUtils {
          }
 
          final String imageExtension = allImageExtensions[formatIndex];
-         sb.append("*." + imageExtension);
+         sb.append("*." + imageExtension); //$NON-NLS-1$
       }
 
       _allImageExtensions = sb.toString();

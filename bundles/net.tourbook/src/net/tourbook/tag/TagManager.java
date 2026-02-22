@@ -530,10 +530,10 @@ public class TagManager {
 
             + "FROM " + TourDatabase.JOINTABLE__TOURDATA__TOURTAG + " AS jTdataTtag" + NL //    //$NON-NLS-1$ //$NON-NLS-2$
 
-            + "JOIN " + TourDatabase.TABLE_TOUR_DATA + " AS TourData"//                         //$NON-NLS-1$
+            + "JOIN " + TourDatabase.TABLE_TOUR_DATA + " AS TourData"//                         //$NON-NLS-1$ //$NON-NLS-2$
             + " ON jTdataTtag.TOURDATA_TOURID = tourData.TOURID" + NL //                        //$NON-NLS-1$
 
-            + "WHERE jTdataTtag.TOURTAG_TAGID IN (" + sqlTagData.getSqlString() + ")" + NL //   //$NON-NLS-1$
+            + "WHERE jTdataTtag.TOURTAG_TAGID IN (" + sqlTagData.getSqlString() + ")" + NL //   //$NON-NLS-1$ //$NON-NLS-2$
 
             + "GROUP BY jTdataTtag.TOURTAG_TAGID" + NL //                                       //$NON-NLS-1$
 
