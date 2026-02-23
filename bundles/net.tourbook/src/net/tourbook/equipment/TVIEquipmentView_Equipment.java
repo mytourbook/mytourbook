@@ -257,7 +257,7 @@ public class TVIEquipmentView_Equipment extends TVIEquipmentView_Item {
                + "ORDER BY TourData.TOURSTARTTIME" + NL //                                      //$NON-NLS-1$
 
                + NL
-               + "--" + NL //                                                                   //$NON-NLS-1$
+               + "--;" + NL //                                                                  //$NON-NLS-1$
          ;
 
          final PreparedStatement statement = conn.prepareStatement(sql);
@@ -411,7 +411,7 @@ public class TVIEquipmentView_Equipment extends TVIEquipmentView_Item {
                + "GROUP BY TourData.STARTYEAR" + NL //                                          //$NON-NLS-1$
 
                + NL
-               + "--" + NL //                                                                   //$NON-NLS-1$
+               + "--;" + NL //                                                                  //$NON-NLS-1$
          ;
 
          final PreparedStatement statement = conn.prepareStatement(sql);

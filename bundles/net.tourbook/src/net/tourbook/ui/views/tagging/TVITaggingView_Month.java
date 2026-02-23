@@ -186,7 +186,7 @@ public class TVITaggingView_Month extends TVITaggingView_Item {
                + "ORDER BY TourStartTime" + NL //                                                     //$NON-NLS-1$
 
                + NL
-               + "--" + NL //                                                                         //$NON-NLS-1$
+               + "--;" + NL //                                                                        //$NON-NLS-1$
          ;
 
          final PreparedStatement statement = conn.prepareStatement(sql);

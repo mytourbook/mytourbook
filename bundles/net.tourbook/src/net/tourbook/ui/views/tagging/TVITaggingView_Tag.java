@@ -210,7 +210,7 @@ public class TVITaggingView_Tag extends TVITaggingView_Item {
                + "ORDER BY TourStartTime" + NL //                                                  //$NON-NLS-1$
 
                + NL
-               + "--" + NL //                                                                      //$NON-NLS-1$
+               + "--;" + NL //                                                                     //$NON-NLS-1$
          ;
 
          long previousTourId = -1;

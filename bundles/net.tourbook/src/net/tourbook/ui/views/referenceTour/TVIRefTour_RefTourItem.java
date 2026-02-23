@@ -179,7 +179,7 @@ public class TVIRefTour_RefTourItem extends TVIRefTour_TourItem {
             + "ORDER BY TourCompared.tourDate" + NL //                                             //$NON-NLS-1$
 
             + NL
-            + "--" + NL //                                                                         //$NON-NLS-1$
+            + "--;" + NL //                                                                        //$NON-NLS-1$
       ;
 
       try (Connection conn = TourDatabase.getInstance().getConnection()) {

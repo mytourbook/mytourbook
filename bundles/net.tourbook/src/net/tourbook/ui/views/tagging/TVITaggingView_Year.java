@@ -264,10 +264,10 @@ public class TVITaggingView_Year extends TVITaggingView_Item {
 
                + appFilter.getWhereClause() + NL
 
-               + "ORDER BY TourStartTime" + NL //                                                  //$NON-NLS-1$
+               + "ORDER BY TourStartTime" + NL //                                                        //$NON-NLS-1$
 
                + NL
-               + "--" + NL //                                                                      //$NON-NLS-1$
+               + "--;" + NL //                                                                           //$NON-NLS-1$
          ;
 
          final PreparedStatement statement = conn.prepareStatement(sql);

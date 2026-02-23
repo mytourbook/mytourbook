@@ -209,7 +209,7 @@ public class TVIEquipmentView_Equipment_Year extends TVIEquipmentView_Item {
                + "   TourData.StartMonth" + NL //                                               //$NON-NLS-1$
 
                + NL
-               + "--" + NL //                                                                   //$NON-NLS-1$
+               + "--;" + NL //                                                                  //$NON-NLS-1$
          ;
 
          final PreparedStatement statement = conn.prepareStatement(sql);
@@ -315,7 +315,7 @@ public class TVIEquipmentView_Equipment_Year extends TVIEquipmentView_Item {
                + "ORDER BY TourData.tourstarttime" + NL //                                         //$NON-NLS-1$
 
                + NL
-               + "--" + NL //                                                                      //$NON-NLS-1$
+               + "--;" + NL //                                                                     //$NON-NLS-1$
          ;
 
          final PreparedStatement statement = conn.prepareStatement(sql);

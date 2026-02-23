@@ -131,7 +131,7 @@ public class TVICollatedTour_Event extends TVICollatedTour {
             + "ORDER BY TourStartTime" + NL //                                               //$NON-NLS-1$
 
             + NL
-            + "--" + NL //                                                                   //$NON-NLS-1$
+            + "--;" + NL //                                                                  //$NON-NLS-1$
       ;
 
       try (Connection conn = TourDatabase.getInstance().getConnection()) {
