@@ -383,7 +383,7 @@ public class Dialog_TourTag extends TitleAreaDialog {
                    * javax.imageio.IIOException: 16-bit samples are not supported for Horizontal
                    * differencing Predictor
                    */
-                  setErrorMessage("Cannot load image %s\n%s".formatted(
+                  setErrorMessage(Messages.Dialog_TourTag_Error_CannotLoadImage.formatted(
                         imageFilePath,
                         ioException.getMessage()));
                }

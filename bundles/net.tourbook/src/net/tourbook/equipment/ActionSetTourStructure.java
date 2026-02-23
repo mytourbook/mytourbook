@@ -19,6 +19,7 @@ import java.util.Set;
 
 import javax.persistence.EntityManager;
 
+import net.tourbook.Messages;
 import net.tourbook.common.util.ITourViewer;
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.data.Equipment;
@@ -217,7 +218,7 @@ public class ActionSetTourStructure extends Action implements IMenuCreator {
 
    public ActionSetTourStructure(final ITourViewer tourViewer) {
 
-      super("Set Tour Stru&cture", AS_DROP_DOWN_MENU);
+      super(Messages.Equipment_Action_SetTourStructure, AS_DROP_DOWN_MENU);
 
       setMenuCreator(this);
 

@@ -63,7 +63,7 @@ public class TourTagFilter {
                   + "AND EXISTS" + NL //                                                     //$NON-NLS-1$
                   + "(" + NL //                                                              //$NON-NLS-1$
                   + "  SELECT 1" + NL //                                                     //$NON-NLS-1$
-                  + "  FROM " + joinTable + " AS tt" + NL //                                 //$NON-NLS-1$
+                  + "  FROM " + joinTable + " AS tt" + NL //                                 //$NON-NLS-1$ //$NON-NLS-2$
                   + "  WHERE tt.TOURDATA_TOURID = TourData.tourID" + NL //                   //$NON-NLS-1$
                   + "    AND tt.TOURTAG_TAGID IN (" + sqlParameters + ")" + NL //            //$NON-NLS-1$ //$NON-NLS-2$
                   + ")" + NL //                                                              //$NON-NLS-1$
@@ -83,7 +83,7 @@ public class TourTagFilter {
 
             for (final long tagID : allTagIDs) {
 
-               sb.append("AND EXISTS (SELECT 1 FROM " + joinTable + " AS tt WHERE tt.TOURDATA_TOURID = TourData.tourId AND tt.TOURTAG_TAGID = ?)" //$NON-NLS-1$
+               sb.append("AND EXISTS (SELECT 1 FROM " + joinTable + " AS tt WHERE tt.TOURDATA_TOURID = TourData.tourId AND tt.TOURTAG_TAGID = ?)" //$NON-NLS-1$ //$NON-NLS-2$
                      + NL);
 
                allSQLParameters.add(tagID);

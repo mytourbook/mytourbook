@@ -120,7 +120,7 @@ public class EquipmentMenuManager implements IActionProvider {
 
       public ActionAddEquipmentGroups_SubMenu() {
 
-         super(Messages.Action_Equipment_AddEquipment_Groups, AS_DROP_DOWN_MENU);
+         super(Messages.Equipment_Action_AddEquipment_Groups, AS_DROP_DOWN_MENU);
       }
 
       @Override
@@ -161,9 +161,9 @@ public class EquipmentMenuManager implements IActionProvider {
 
       public ActionClipboard_CopyEquipment() {
 
-         super(Messages.Action_Equipment_ClipboardCopy, AS_PUSH_BUTTON);
+         super(Messages.Equipment_Action_ClipboardCopy, AS_PUSH_BUTTON);
 
-         setToolTipText(Messages.Action_Equipment_ClipboardCopy_Tooltip);
+         setToolTipText(Messages.Equipment_Action_ClipboardCopy_Tooltip);
       }
 
       @Override
@@ -177,7 +177,7 @@ public class EquipmentMenuManager implements IActionProvider {
 
       public ActionClipboard_PasteEquipment() {
 
-         super(Messages.Action_Equipment_ClipboardPaste, AS_PUSH_BUTTON);
+         super(Messages.Equipment_Action_ClipboardPaste, AS_PUSH_BUTTON);
       }
 
       @Override
@@ -246,7 +246,7 @@ public class EquipmentMenuManager implements IActionProvider {
 
       public ActionRemoveEquipmentAll() {
 
-         super(Messages.Action_Equipment_RemoveEquipment_All, AS_PUSH_BUTTON);
+         super(Messages.Equipment_Action_RemoveEquipment_All, AS_PUSH_BUTTON);
       }
 
       @Override
@@ -482,7 +482,7 @@ public class EquipmentMenuManager implements IActionProvider {
       }
       clipboard.dispose();
 
-      UI.showStatusLineMessage("%d equipment were copied to the clipboard".formatted(_allEquipment_WhenCopied.size()));
+      UI.showStatusLineMessage(Messages.Equipment_StatusLine_EquipmentCopiedToClipboard.formatted(_allEquipment_WhenCopied.size()));
    }
 
    private void clipboard_PasteEquipment() {
@@ -532,8 +532,8 @@ public class EquipmentMenuManager implements IActionProvider {
       _actionClipboard_CopyEquipment   = new ActionClipboard_CopyEquipment();
       _actionClipboard_PasteEquipment  = new ActionClipboard_PasteEquipment();
 
-      _actionEquipmentPreferences      = new ActionOpenPrefDialog(Messages.Action_Equipment_EquipmentPreferences, PrefPageEquipment.ID);
-      _actionEquipmentGroupPreferences = new ActionOpenPrefDialog(Messages.Action_Equipment_ManageEquipmentGroups, PrefPageEquipmentGroups.ID);
+      _actionEquipmentPreferences      = new ActionOpenPrefDialog(Messages.Equipment_Action_EquipmentPreferences, PrefPageEquipment.ID);
+      _actionEquipmentGroupPreferences = new ActionOpenPrefDialog(Messages.Equipment_Action_ManageEquipmentGroups, PrefPageEquipmentGroups.ID);
 
       _allEquipmentActions             = new HashMap<>();
 
@@ -1026,7 +1026,7 @@ public class EquipmentMenuManager implements IActionProvider {
 
       if (numEquipment > 0) {
 
-         _actionClipboard_PasteEquipment.setToolTipText("Paste equipment from the clipboard into the selected tours\n\n%s"
+         _actionClipboard_PasteEquipment.setToolTipText(Messages.Equipment_Action_Paste_Tooltip
                .formatted(EquipmentGroupManager.createEquipmentSortedList(null, allEquipmentInClipboard)));
       }
 

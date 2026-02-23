@@ -611,8 +611,8 @@ public class Equipment implements Cloneable, Comparable<Object>, Serializable {
       String partValues = parts != null ? toString(parts, maxLen) : null;
 
       partValues = parts == null
-            ? "-"
-            : "" + parts.size();
+            ? "-" //                                                       //$NON-NLS-1$
+            : "" + parts.size(); //                                        //$NON-NLS-1$
 
       return UI.EMPTY_STRING
 

@@ -274,8 +274,8 @@ class SlideoutTourBlogOptions extends ToolbarSlideout implements IActionResetToD
              */
 
             _chkShowTourEquipment = new Button(container, SWT.CHECK);
-            _chkShowTourEquipment.setText("Show tour &equipment");
-            _chkShowTourEquipment.setToolTipText("Display all equipment with their image\nand information in the view");
+            _chkShowTourEquipment.setText(Messages.Slideout_TourBlogOptions_Checkbox_ShowTourEquipment);
+            _chkShowTourEquipment.setToolTipText(Messages.Slideout_TourBlogOptions_Checkbox_ShowTourEquipment_Tooltip);
             _chkShowTourEquipment.addSelectionListener(_defaultSelectionListener);
             GridDataFactory.fillDefaults().span(3, 1).applyTo(_chkShowTourEquipment);
          }

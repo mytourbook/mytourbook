@@ -617,7 +617,7 @@ public class SlideoutTourEquipmentFilter extends AdvancedSlideout implements ITr
 
       setShellFadeOutDelaySteps(30);
 
-      setTitleText("Tour Equipment Filter");
+      setTitleText(Messages.Slideout_EquipmentFilter_Title);
       setTitleImage(TourbookPlugin.getThemedImageDescriptor(Images.Equipment_Filter));
    }
 
@@ -827,7 +827,7 @@ public class SlideoutTourEquipmentFilter extends AdvancedSlideout implements ITr
 
          tvc = new TableViewerColumn(_profileViewer, SWT.LEAD);
          tc = tvc.getColumn();
-         tc.setText("Filter");
+         tc.setText(Messages.Slideout_EquipmentFilter_Column_Filter);
          tvc.setLabelProvider(new CellLabelProvider() {
             @Override
             public void update(final ViewerCell cell) {
@@ -958,7 +958,7 @@ public class SlideoutTourEquipmentFilter extends AdvancedSlideout implements ITr
             {
                // label
                _lblFilterType = new Label(container, SWT.NONE);
-               _lblFilterType.setText("&Filter");
+               _lblFilterType.setText(Messages.Slideout_EquipmentFilter_Label_Filter);
             }
 
             final Composite containerType = new Composite(container, SWT.NONE);
@@ -970,7 +970,7 @@ public class SlideoutTourEquipmentFilter extends AdvancedSlideout implements ITr
                    * radio: Equipment
                    */
                   _rdoFilterType_Equipment = new Button(containerType, SWT.RADIO);
-                  _rdoFilterType_Equipment.setText("Equipment");
+                  _rdoFilterType_Equipment.setText(Messages.Slideout_EquipmentFilter_Radio_Equipment);
                   _rdoFilterType_Equipment.addSelectionListener(_defaultSelectionListener);
                }
                {
@@ -978,7 +978,7 @@ public class SlideoutTourEquipmentFilter extends AdvancedSlideout implements ITr
                    * radio: Part
                    */
                   _rdoFilterType_Part = new Button(containerType, SWT.RADIO);
-                  _rdoFilterType_Part.setText("Parts/Services");
+                  _rdoFilterType_Part.setText(Messages.Slideout_EquipmentFilter_Radio_PartService);
                   _rdoFilterType_Part.addSelectionListener(_defaultSelectionListener);
                }
             }
@@ -1172,7 +1172,7 @@ public class SlideoutTourEquipmentFilter extends AdvancedSlideout implements ITr
                 */
                _rdoEquipmentOperator_OR = new Button(containerOperator, SWT.RADIO);
                _rdoEquipmentOperator_OR.setText(Messages.Slideout_TourTagFilter_Radio_TagOperator_OR);
-               _rdoEquipmentOperator_OR.setToolTipText("A tour is displayed when it contains at least ONE of the selected equipment");
+               _rdoEquipmentOperator_OR.setToolTipText(Messages.Slideout_EquipmentFilter_Radio_EquipmentOperator_OR_Tooltip);
                _rdoEquipmentOperator_OR.addSelectionListener(_defaultSelectionListener);
             }
             {
@@ -1181,7 +1181,7 @@ public class SlideoutTourEquipmentFilter extends AdvancedSlideout implements ITr
                 */
                _rdoEquipmentOperator_AND = new Button(containerOperator, SWT.RADIO);
                _rdoEquipmentOperator_AND.setText(Messages.Slideout_TourTagFilter_Radio_TagOperator_AND);
-               _rdoEquipmentOperator_AND.setToolTipText("A tour is displayed when it contains ALL selected equipment");
+               _rdoEquipmentOperator_AND.setToolTipText(Messages.Slideout_EquipmentFilter_Radio_EquipmentOperator_AND_Tooltip);
                _rdoEquipmentOperator_AND.addSelectionListener(_defaultSelectionListener);
             }
          }
@@ -1215,7 +1215,7 @@ public class SlideoutTourEquipmentFilter extends AdvancedSlideout implements ITr
          {
             // Label: All Equipment
             _lblAllEquipment = new Label(container, SWT.NONE);
-            _lblAllEquipment.setText("&Available Equipment");
+            _lblAllEquipment.setText(Messages.Slideout_EquipmentFilter_Label_AvailableEquipment);
             GridDataFactory.fillDefaults()
                   .align(SWT.FILL, SWT.CENTER)
                   .grab(true, false)
@@ -1461,7 +1461,7 @@ public class SlideoutTourEquipmentFilter extends AdvancedSlideout implements ITr
              */
             _chkLiveUpdate = new Button(container, SWT.CHECK);
             _chkLiveUpdate.setText(Messages.Slideout_TourFilter_Checkbox_IsLiveUpdate);
-            _chkLiveUpdate.setToolTipText("Apply tour equipment filter modifications immediately\nwithout pressing the \"Apply\" button");
+            _chkLiveUpdate.setToolTipText(Messages.Slideout_EquipmentFilter_Label_AvailableEquipment_Tooltip);
             _chkLiveUpdate.addSelectionListener(SelectionListener.widgetSelectedAdapter(
                   selectionEvent -> doLiveUpdate()));
 
@@ -2826,10 +2826,10 @@ public class SlideoutTourEquipmentFilter extends AdvancedSlideout implements ITr
 
       if (_isFilterEquipment) {
 
-         headerLabel = "Se&lected Equipment";
-         assetOperatorLabel = "&Combine equipment with";
+         headerLabel = Messages.Slideout_EquipmentFilter_Label_SelectedEquipment;
+         assetOperatorLabel = Messages.Slideout_EquipmentFilter_Label_AssetOperator_Equipment;
 
-         assetColumn1.setText("Equipment");
+         assetColumn1.setText(Messages.Slideout_EquipmentFilter_Column_Equipment);
          assetColumn2.setText(UI.EMPTY_STRING);
 
          tableLayout.setColumnData(assetColumn1, new ColumnWeightData(10, true));
@@ -2837,11 +2837,11 @@ public class SlideoutTourEquipmentFilter extends AdvancedSlideout implements ITr
 
       } else {
 
-         headerLabel = "Se&lected Parts/Services";
-         assetOperatorLabel = "&Combine parts/services with";
+         headerLabel = Messages.Slideout_EquipmentFilter_Label_SelectedPartService;
+         assetOperatorLabel = Messages.Slideout_EquipmentFilter_Label_AssetOperator_PartService;
 
-         assetColumn1.setText("Part / Service");
-         assetColumn2.setText("Equipment");
+         assetColumn1.setText(Messages.Slideout_EquipmentFilter_Column_PartService);
+         assetColumn2.setText(Messages.Slideout_EquipmentFilter_Column_Equipment);
 
          tableLayout.setColumnData(assetColumn1, new ColumnWeightData(1, true));
          tableLayout.setColumnData(assetColumn2, new ColumnWeightData(1, true));

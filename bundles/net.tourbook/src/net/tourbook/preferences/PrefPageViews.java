@@ -258,42 +258,42 @@ public class PrefPageViews extends FieldEditorPreferencePage implements IWorkben
        * Checkbox: All
        */
       _chkAll_1stColum = new Button(parent, SWT.CHECK);
-      _chkAll_1stColum.setText("All");
+      _chkAll_1stColum.setText(Messages.PrefPage_ViewActions_Checkbox_All);
       _chkAll_1stColum.addSelectionListener(_toolTipSelectionListener);
 
       /*
        * Checkbox: All
        */
       _chkAll_Time = new Button(parent, SWT.CHECK);
-      _chkAll_Time.setText("All");
+      _chkAll_Time.setText(Messages.PrefPage_ViewActions_Checkbox_All);
       _chkAll_Time.addSelectionListener(_toolTipSelectionListener);
 
       /*
        * Checkbox: All
        */
       _chkAll_Title = new Button(parent, SWT.CHECK);
-      _chkAll_Title.setText("All");
+      _chkAll_Title.setText(Messages.PrefPage_ViewActions_Checkbox_All);
       _chkAll_Title.addSelectionListener(_toolTipSelectionListener);
 
       /*
        * Checkbox: All
        */
       _chkAll_Tags = new Button(parent, SWT.CHECK);
-      _chkAll_Tags.setText("All");
+      _chkAll_Tags.setText(Messages.PrefPage_ViewActions_Checkbox_All);
       _chkAll_Tags.addSelectionListener(_toolTipSelectionListener);
 
       /*
        * Checkbox: All
        */
       _chkAll_Equipment = new Button(parent, SWT.CHECK);
-      _chkAll_Equipment.setText("All");
+      _chkAll_Equipment.setText(Messages.PrefPage_ViewActions_Checkbox_All);
       _chkAll_Equipment.addSelectionListener(_toolTipSelectionListener);
 
       /*
        * Checkbox: All
        */
       _chkAll_Weekday = new Button(parent, SWT.CHECK);
-      _chkAll_Weekday.setText("All");
+      _chkAll_Weekday.setText(Messages.PrefPage_ViewActions_Checkbox_All);
       _chkAll_Weekday.addSelectionListener(_toolTipSelectionListener);
    }
 

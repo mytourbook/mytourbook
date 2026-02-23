@@ -91,7 +91,7 @@ public class EasyLauncherUtils {
       }
 
       sb.append(NL);
-      sb.append("Set equipment: %s\n\n%s".formatted(equipmentGroup.name, sbEquipment.toString()));
+      sb.append(Messages.Import_Data_HTML_SetEquipment_YES.formatted(equipmentGroup.name, sbEquipment.toString()));
    }
 
    public static void createText_TagsGroup(final ImportLauncher importLauncher, final StringBuilder sb) {
@@ -225,7 +225,7 @@ public class EasyLauncherUtils {
          } else {
 
             sb.append(NL);
-            sb.append("Set equipment: NO");
+            sb.append(Messages.Import_Data_HTML_SetEquipment_NO);
          }
       }
       {
@@ -601,8 +601,8 @@ public class EasyLauncherUtils {
 
       final TableColumnDefinition colDef = new TableColumnDefinition(_columnManager, "equipment", SWT.LEAD); //$NON-NLS-1$
 
-      colDef.setColumnLabel("Equipment");
-      colDef.setColumnHeaderText("Equipment");
+      colDef.setColumnLabel(Messages.Dialog_ImportConfig_Column_Equipment);
+      colDef.setColumnHeaderText(Messages.Dialog_ImportConfig_Column_Equipment);
 
       colDef.setDefaultColumnWidth(_pc.convertWidthInCharsToPixels(10));
       colDef.setColumnWeightData(new ColumnWeightData(7));

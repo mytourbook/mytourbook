@@ -450,7 +450,7 @@ public class BreakTimeTool {
 
       return UI.EMPTY_STRING
 
-            + "BreakTimeTool"
+            + "BreakTimeTool" //                                                    //$NON-NLS-1$
 
             + " breakTimeMethodId      = " + breakTimeMethodId + NL //              //$NON-NLS-1$
             + " breakShortestTime      = " + breakShortestTime + NL //              //$NON-NLS-1$

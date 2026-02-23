@@ -287,8 +287,8 @@ public class PrefPageAppearance extends PreferencePage implements IWorkbenchPref
 
             // label
             final Label label = new Label(group, SWT.NONE);
-            label.setText("Content &image size");
-            label.setToolTipText("These images are displays for e.g. tags or equipment");
+            label.setText(Messages.Pref_Appearance_Label_ImageSize);
+            label.setToolTipText(Messages.Pref_Appearance_Label_ImageSize_Tooltip);
             GridDataFactory.fillDefaults().align(SWT.FILL, SWT.CENTER).applyTo(label);
 
             // spinner

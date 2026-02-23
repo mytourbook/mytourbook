@@ -338,7 +338,7 @@ public class EquipmentView extends ViewPart implements
 
       ActionDeleteEquipment() {
 
-         super(Messages.Action_Equipment_Delete, AS_PUSH_BUTTON);
+         super(Messages.Equipment_Action_Delete, AS_PUSH_BUTTON);
 
          setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.App_Delete));
       }
@@ -353,7 +353,7 @@ public class EquipmentView extends ViewPart implements
 
       ActionDeletePart() {
 
-         super("&Delete Part...", AS_PUSH_BUTTON);
+         super(Messages.Equipment_Action_Delete_Part, AS_PUSH_BUTTON);
 
          setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.App_Delete));
       }
@@ -368,7 +368,7 @@ public class EquipmentView extends ViewPart implements
 
       ActionDeleteService() {
 
-         super("&Delete Service...", AS_PUSH_BUTTON);
+         super(Messages.Equipment_Action_Delete_Service, AS_PUSH_BUTTON);
 
          setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.App_Delete));
       }
@@ -383,9 +383,9 @@ public class EquipmentView extends ViewPart implements
 
       public ActionDuplicateEquipment() {
 
-         super("D&uplicate Equipment", AS_PUSH_BUTTON);
+         super(Messages.Equipment_Action_DuplicateEquipment, AS_PUSH_BUTTON);
 
-         setToolTipText("Duplicate equipment and adjust date to today");
+         setToolTipText(Messages.Equipment_Action_DuplicateEquipment_Tooltip);
 
          setImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.Equipment_Duplicate));
       }
@@ -400,9 +400,9 @@ public class EquipmentView extends ViewPart implements
 
       public ActionDuplicatePart() {
 
-         super("D&uplicate Part", AS_PUSH_BUTTON);
+         super(Messages.Equipment_Action_DuplicatePart, AS_PUSH_BUTTON);
 
-         setToolTipText("Duplicate part and adjust date to today");
+         setToolTipText(Messages.Equipment_Action_DuplicatePart_Tooltip);
 
          setImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.Equipment_Part_Duplicate));
       }
@@ -417,9 +417,9 @@ public class EquipmentView extends ViewPart implements
 
       public ActionDuplicateService() {
 
-         super("D&uplicate Service", AS_PUSH_BUTTON);
+         super(Messages.Equipment_Action_DuplicateService, AS_PUSH_BUTTON);
 
-         setToolTipText("Duplicate service and adjust date to today");
+         setToolTipText(Messages.Equipment_Action_DuplicateService_Tooltip);
 
          setImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.Equipment_Service_Duplicate));
       }
@@ -434,7 +434,7 @@ public class EquipmentView extends ViewPart implements
 
       public ActionEditEquipment() {
 
-         super(Messages.Action_Equipment_Edit, AS_PUSH_BUTTON);
+         super(Messages.Equipment_Action_Edit, AS_PUSH_BUTTON);
 
          setImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.App_Edit));
       }
@@ -449,7 +449,7 @@ public class EquipmentView extends ViewPart implements
 
       public ActionEditPart() {
 
-         super("&Edit Part", AS_PUSH_BUTTON);
+         super(Messages.Equipment_Action_EditPart, AS_PUSH_BUTTON);
 
          setImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.App_Edit));
       }
@@ -464,7 +464,7 @@ public class EquipmentView extends ViewPart implements
 
       public ActionEditService() {
 
-         super("&Edit Service", AS_PUSH_BUTTON);
+         super(Messages.Equipment_Action_EditService, AS_PUSH_BUTTON);
 
          setImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.App_Edit));
       }
@@ -481,12 +481,7 @@ public class EquipmentView extends ViewPart implements
 
          super(UI.EMPTY_STRING, AS_CHECK_BOX);
 
-         final String tooltip = UI.EMPTY_STRING
-
-               + "Toggle equipment filter between\n\n"
-               + "• Show all equipment\n"
-               + "• Show only equipment which contain tours\n"
-               + "• Show only equipment which do not contain tours\n";
+         final String tooltip = Messages.Equipment_Action_EquipmentFilter_Tooltip;
 
          setToolTipText(tooltip);
 
@@ -517,7 +512,7 @@ public class EquipmentView extends ViewPart implements
 
       public ActionNewEquipment() {
 
-         super(Messages.Action_Equipment_New, AS_PUSH_BUTTON);
+         super(Messages.Equipment_Action_NewEquipment, AS_PUSH_BUTTON);
 
          setImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.Equipment_New));
       }
@@ -532,7 +527,7 @@ public class EquipmentView extends ViewPart implements
 
       public ActionNewPart() {
 
-         super("New &Part", AS_PUSH_BUTTON);
+         super(Messages.Equipment_Action_NewPart, AS_PUSH_BUTTON);
 
          setImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.Equipment_Part_New));
       }
@@ -547,7 +542,7 @@ public class EquipmentView extends ViewPart implements
 
       public ActionNewService() {
 
-         super("New &Service", AS_PUSH_BUTTON);
+         super(Messages.Equipment_Action_NewService, AS_PUSH_BUTTON);
 
          setImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.Equipment_Service_New));
       }
@@ -586,9 +581,9 @@ public class EquipmentView extends ViewPart implements
 
       public ActionToggleCollatedTours() {
 
-         super("Toggle Co&llated Tours", AS_PUSH_BUTTON);
+         super(Messages.Equipment_Action_ToggleCollatedTours, AS_PUSH_BUTTON);
 
-         setToolTipText("Set or unset if tours are collated for this item");
+         setToolTipText(Messages.Equipment_Action_ToggleCollatedTours_Tooltip);
 
          setImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.Equipment_Asset_Collated));
       }
@@ -3374,8 +3369,8 @@ public class EquipmentView extends ViewPart implements
          if (numParts > 0) {
 
             MessageDialog.openInformation(_parent.getShell(),
-                  "Toggle Collated Tours",
-                  "An equipment which contains parts or services cannot collate tours for itself.\nOnly the parts or services of this equipment can collate tours");
+                  Messages.Equipment_Dialog_ToggleCollatedTours_Title,
+                  Messages.Equipment_Dialog_ToggleCollatedTours_Message);
 
             return;
          }

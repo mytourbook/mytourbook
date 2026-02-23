@@ -426,8 +426,8 @@ public class PrefPageAppearance_TourActions extends PreferencePage implements IW
              * Button: Check action on selection
              */
             _chkCheckOnSelection = new Button(container, SWT.CHECK);
-            _chkCheckOnSelection.setText("Chec&k on selection");
-            _chkCheckOnSelection.setToolTipText("Check an action when it is selected,\nor it can be checked by double clicking on it");
+            _chkCheckOnSelection.setText(Messages.Pref_TourActions_Check_CheckOnSelection);
+            _chkCheckOnSelection.setToolTipText(Messages.Pref_TourActions_Check_CheckOnSelection_Tooltip);
          }
          UI.createSpacer_Vertical(container, 10, 1);
          {

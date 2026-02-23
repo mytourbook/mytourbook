@@ -62,7 +62,7 @@ public class ActionRemoveEquipment_SubMenu extends SubMenu {
 
    protected ActionRemoveEquipment_SubMenu(final EquipmentMenuManager equipmentMenuManager) {
 
-      super(Messages.Action_Equipment_RemoveEquipment, AS_DROP_DOWN_MENU);
+      super(Messages.Equipment_Action_RemoveEquipment, AS_DROP_DOWN_MENU);
 
       _equipmentMenuManager = equipmentMenuManager;
    }

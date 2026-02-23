@@ -73,10 +73,10 @@ public class EquipmentPartFilter {
                /* require tour to have at least one of these equipment (index-friendly) */
                sql = UI.EMPTY_STRING
 
-                     + "JOIN " + jTdEq + " AS jTdEqOR"
+                     + "JOIN " + jTdEq + " AS jTdEqOR" //                                                //$NON-NLS-1$ //$NON-NLS-2$
                      + "   ON jTdEqOR.TOURDATA_TOURID = TourData.TOURID" + NL //                         //$NON-NLS-1$
 
-                     + "JOIN " + tEqPart + " AS partOR" //                 //$NON-NLS-1$
+                     + "JOIN " + tEqPart + " AS partOR" //                                               //$NON-NLS-1$ //$NON-NLS-2$
                      + "   ON partOR.EQUIPMENT_EQUIPMENTID = jTdEqOR.EQUIPMENT_EQUIPMENTID" + NL //      //$NON-NLS-1$
 
                      + "   AND partOR.ISCOLLATE = TRUE" + NL //                                          //$NON-NLS-1$
@@ -106,16 +106,16 @@ public class EquipmentPartFilter {
 
                   allSQLParameters.add(partID);
 
-                  final String partName = "part_" + partIndex;
+                  final String partName = "part_" + partIndex; //                                                 //$NON-NLS-1$
 
                   final String joinPart = UI.EMPTY_STRING
 
-                        + "JOIN " + tEqPart + " AS " + partName + NL //                                           //$NON-NLS-1$
-                        + "  ON " + partName + ".EQUIPMENT_EQUIPMENTID = jTdEq.EQUIPMENT_EQUIPMENTID" + NL //     //$NON-NLS-1$
-                        + "    AND " + partName + ".PARTID = ?" + NL //                                           //$NON-NLS-1$
-                        + "    AND " + partName + ".ISCOLLATE = TRUE" + NL //                                     //$NON-NLS-1$
-                        + "    AND TourData.TourStartTime >= " + partName + ".dateFrom" + NL //                   //$NON-NLS-1$
-                        + "    AND TourData.TourStartTime < " + partName + ".dateUntil" + NL //                   //$NON-NLS-1$
+                        + "JOIN " + tEqPart + " AS " + partName + NL //                                           //$NON-NLS-1$ //$NON-NLS-2$
+                        + "  ON " + partName + ".EQUIPMENT_EQUIPMENTID = jTdEq.EQUIPMENT_EQUIPMENTID" + NL //     //$NON-NLS-1$ //$NON-NLS-2$
+                        + "    AND " + partName + ".PARTID = ?" + NL //                                           //$NON-NLS-1$ //$NON-NLS-2$
+                        + "    AND " + partName + ".ISCOLLATE = TRUE" + NL //                                     //$NON-NLS-1$ //$NON-NLS-2$
+                        + "    AND TourData.TourStartTime >= " + partName + ".dateFrom" + NL //                   //$NON-NLS-1$ //$NON-NLS-2$
+                        + "    AND TourData.TourStartTime < " + partName + ".dateUntil" + NL //                   //$NON-NLS-1$ //$NON-NLS-2$
                   ;
 
                   sbAllParts.append(joinPart);
@@ -127,7 +127,7 @@ public class EquipmentPartFilter {
 
                      // require tour to have at least one of these equipment (index-friendly)
 
-                     + "JOIN " + jTdEq + " jTdEq" + NL //                                                         //$NON-NLS-1$
+                     + "JOIN " + jTdEq + " jTdEq" + NL //                                                         //$NON-NLS-1$ //$NON-NLS-2$
                      + "   ON jTdEq.TOURDATA_TOURID = TourData.TOURID" + NL //                                    //$NON-NLS-1$
 
                      + "JOIN" + NL //                                                                             //$NON-NLS-1$
@@ -137,7 +137,7 @@ public class EquipmentPartFilter {
                      + "   SELECT EQUIPMENT_EQUIPMENTID" + NL //                                                  //$NON-NLS-1$
                      + "   FROM " + tEqPart + NL //                                                               //$NON-NLS-1$
                      + "   WHERE ISCOLLATE = TRUE" + NL //                                                        //$NON-NLS-1$
-                     + "     AND PARTID IN (" + allSqlPartIDParameters + ")" + NL //                              //$NON-NLS-1$
+                     + "     AND PARTID IN (" + allSqlPartIDParameters + ")" + NL //                              //$NON-NLS-1$ //$NON-NLS-2$
                      + "   GROUP BY EQUIPMENT_EQUIPMENTID" + NL //                                                //$NON-NLS-1$
                      + "   HAVING COUNT(DISTINCT PARTID) = ?" + NL //                                             //$NON-NLS-1$
 

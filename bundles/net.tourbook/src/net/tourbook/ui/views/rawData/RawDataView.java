@@ -2348,7 +2348,7 @@ public class RawDataView extends ViewPart implements
          } else {
 
             sb.append(NL);
-            sb.append("Set equipment: NO");
+            sb.append(Messages.Import_Data_HTML_SetEquipment_NO);
          }
       }
       {

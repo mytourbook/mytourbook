@@ -105,9 +105,9 @@ public class EquipmentManager {
     */
    static final String[]                     EXPAND_TYPE_LABEL           = {
 
-         "Sort By Date",
-         "By Year",
-         "By Year/Month"
+         Messages.Equipment_ExpandType_SortByDate,
+         Messages.Equipment_ExpandType_ByYear,
+         Messages.Equipment_ExpandType_ByYearMonth
    };
 
    static final int[]                        EXPAND_TYPES                = {
@@ -414,7 +414,7 @@ public class EquipmentManager {
 
          // remove one equipment
 
-         dialogMessage = "Permanently delete equipment\n\n\"%s\"\n\nits %d parts and services, and remove this equipment from %d tours ?".formatted(
+         dialogMessage = Messages.Equipment_Dialog_DeleteEquipment_Message_One.formatted(
                allEquipment.get(0).getName(),
                sqlPartData.getParameters().size(), // number of parts
                allTourIds.size());
@@ -423,7 +423,7 @@ public class EquipmentManager {
 
          // remove multiple equipment
 
-         dialogMessage = "Permanently delete %d equipment, theirs %d parts\nand services and remove them from %d tours ?".formatted(
+         dialogMessage = Messages.Equipment_Dialog_DeleteEquipment_Message_Multiple.formatted(
                allEquipment.size(),
                sqlPartData.getParameters().size(), // number of parts
                allTourIds.size());
@@ -434,12 +434,12 @@ public class EquipmentManager {
       // confirm deletion, show equipment name and number of tours which contain a equipment
       final MessageDialog dialog = new MessageDialog(
             display.getActiveShell(),
-            "Delete Equipment",
+            Messages.Equipment_Dialog_DeleteEquipment_Title,
             null,
             dialogMessage,
             MessageDialog.QUESTION,
             new String[] {
-                  "&Delete Equipment",
+                  Messages.Equipment_Dialog_DeleteEquipment_Action,
                   IDialogConstants.CANCEL_LABEL },
             1);
 
@@ -546,7 +546,7 @@ public class EquipmentManager {
             final int partResult = returnValue_EquipmentPart == null ? 0 : returnValue_EquipmentPart[equipmentIndex];
 
             TourLogManager.log_INFO(
-                  "Equipment is deleted from %d tours, %d equipment definition, %d equipment parts and/or services - \"%s\"".formatted(
+                  Messages.Equipment_Log_EquipmentIsDeleted.formatted(
                         returnValue_TourData[equipmentIndex],
                         returnValue_Equipment[equipmentIndex],
                         partResult,
@@ -586,17 +586,17 @@ public class EquipmentManager {
 
       if (part.isItemType_Part()) {
 
-         dialogMessage = "Permanently delete part\n\n\"%s\" ?".formatted(part.getName());
+         dialogMessage = Messages.Equipment_Dialog_DeletePart_Message.formatted(part.getName());
 
-         dialogTitle = "Delete Part";
-         okButtonText = "&Delete Part";
+         dialogTitle = Messages.Equipment_Dialog_DeletePart_Title;
+         okButtonText = Messages.Equipment_Dialog_DeletePart_Action;
 
       } else if (part.isItemType_Service()) {
 
-         dialogMessage = "Permanently delete service\n\n\"%s\" ?".formatted(part.getName());
+         dialogMessage = Messages.Equipment_Dialog_DeleteService_Message.formatted(part.getName());
 
-         dialogTitle = "Delete Service";
-         okButtonText = "&Delete Service";
+         dialogTitle = Messages.Equipment_Dialog_DeleteService_Title;
+         okButtonText = Messages.Equipment_Dialog_DeleteService_Action;
       }
 
       if (dialogTitle == null) {
@@ -648,7 +648,7 @@ public class EquipmentManager {
 
          // remove part from table "EquipmentPart"
 
-         sql = "DELETE FROM " + TourDatabase.TABLE_EQUIPMENT_PART + " WHERE partID=?" + NL; //$NON-NLS-1$
+         sql = "DELETE FROM " + TourDatabase.TABLE_EQUIPMENT_PART + " WHERE partID=?" + NL; //$NON-NLS-1$ //$NON-NLS-2$
 
          final long partID = part.getPartId();
 
@@ -658,7 +658,7 @@ public class EquipmentManager {
 
          // log result
          TourLogManager.showLogView(AutoOpenEvent.DELETE_SOMETHING);
-         TourLogManager.log_INFO("Equipment part is deleted \"%s\"".formatted(part.getName()));
+         TourLogManager.log_INFO(Messages.Equipment_Log_PartIsDeleted.formatted(part.getName()));
 
          returnResult = true;
 
@@ -778,10 +778,10 @@ public class EquipmentManager {
 
             + "FROM " + TourDatabase.JOINTABLE__TOURDATA__EQUIPMENT + " AS jTdEq" + NL //          //$NON-NLS-1$ //$NON-NLS-2$
 
-            + "JOIN " + TourDatabase.TABLE_TOUR_DATA + " AS TourData"//                            //$NON-NLS-1$
+            + "JOIN " + TourDatabase.TABLE_TOUR_DATA + " AS TourData"//                            //$NON-NLS-1$ //$NON-NLS-2$
             + " ON jTdEq.TourData_TourID = TourData.TOURID" + NL //                                //$NON-NLS-1$
 
-            + "WHERE jTdEq.Equipment_EquipmentID IN (" + sqlTagData.getSqlString() + ")" + NL //   //$NON-NLS-1$
+            + "WHERE jTdEq.Equipment_EquipmentID IN (" + sqlTagData.getSqlString() + ")" + NL //   //$NON-NLS-1$ //$NON-NLS-2$
 
             + "GROUP BY jTdEq.Equipment_EquipmentID" + NL //                                       //$NON-NLS-1$
 

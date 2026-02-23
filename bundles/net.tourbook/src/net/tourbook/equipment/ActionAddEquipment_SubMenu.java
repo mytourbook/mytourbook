@@ -82,7 +82,7 @@ public class ActionAddEquipment_SubMenu extends SubMenu {
 
       public ActionShowEquipmentView() {
 
-         super("Manage E&quipment", AS_PUSH_BUTTON);
+         super(Messages.Equipment_Action_ManageEquipment, AS_PUSH_BUTTON);
 
          setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.Equipment));
       }
@@ -96,7 +96,7 @@ public class ActionAddEquipment_SubMenu extends SubMenu {
 
    protected ActionAddEquipment_SubMenu(final EquipmentMenuManager equipmentMenuManager) {
 
-      super(Messages.Action_Equipment_AddEquipment, AS_DROP_DOWN_MENU);
+      super(Messages.Equipment_Action_AddEquipment, AS_DROP_DOWN_MENU);
 
       setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.Equipment_Only));
 

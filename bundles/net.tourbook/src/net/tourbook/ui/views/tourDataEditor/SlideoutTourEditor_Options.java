@@ -365,7 +365,7 @@ public class SlideoutTourEditor_Options extends ToolbarSlideout implements IColo
    private void createUI_30_Tags(final Composite parent) {
 
       final Group group = new Group(parent, SWT.NONE);
-      group.setText("Equipment/Tag Layout");
+      group.setText(Messages.Slideout_TourEditor_Group_TagEquipmentLayout);
       GridDataFactory.fillDefaults()
             .grab(true, false)
             .span(2, 1)

@@ -20,6 +20,7 @@ import java.util.Set;
 
 import javax.persistence.EntityManager;
 
+import net.tourbook.Messages;
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.data.Equipment;
 import net.tourbook.data.EquipmentPart;
@@ -65,8 +66,8 @@ public class ActionSetTourStructure_All extends Action implements IMenuCreator {
 
          if (MessageDialog.openConfirm(Display.getCurrent().getActiveShell(),
 
-               "Set Structure for all tours in all equipment",
-               "Are you sure to set the structure for all equipment and all their tours to \"%s\"?".formatted(__expandName)) == false) {
+               Messages.Equipment_Action_SetTourStructure_All_Dialog_Title,
+               Messages.Equipment_Action_SetTourStructure_All_Dialog_Message.formatted(__expandName)) == false) {
 
             return;
          }
@@ -148,7 +149,7 @@ public class ActionSetTourStructure_All extends Action implements IMenuCreator {
 
    public ActionSetTourStructure_All() {
 
-      super("Set Structure for &all Tours in all Equipment...", AS_DROP_DOWN_MENU);
+      super(Messages.Equipment_Action_SetTourStructure_All, AS_DROP_DOWN_MENU);
 
       setMenuCreator(this);
    }

@@ -1805,17 +1805,17 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements IActionRe
             {
                // tab: 3
                final CTabItem tabConfig = new CTabItem(_tabFolderIL, SWT.NONE);
-               tabConfig.setText("  &3 +  ");
+               tabConfig.setText("  &3 +  "); //$NON-NLS-1$
                tabConfig.setControl(createUI_602_Tab_1(_tabFolderIL));
 
                // tab: 4...9
                final CTabItem tabLauncher = new CTabItem(_tabFolderIL, SWT.NONE);
-               tabLauncher.setText(" &4 . . . 9 ");
+               tabLauncher.setText(" &4 . . . 9 "); //$NON-NLS-1$
                tabLauncher.setControl(createUI_604_Tab_2(_tabFolderIL));
 
                // tab: 50...99
                final CTabItem tabOptions = new CTabItem(_tabFolderIL, SWT.NONE);
-               tabOptions.setText(" &50 . . . 99 ");
+               tabOptions.setText(" &50 . . . 99 "); //$NON-NLS-1$
                tabOptions.setControl(createUI_606_Tab_3(_tabFolderIL));
             }
          }
@@ -2472,8 +2472,8 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements IActionRe
 
       {
          _chkIL_SetEquipmentGroup = new Button(parent, SWT.CHECK);
-         _chkIL_SetEquipmentGroup.setText("9. Set all &equipment from a group");
-         _chkIL_SetEquipmentGroup.setToolTipText("All equipment in this group are set into the tour");
+         _chkIL_SetEquipmentGroup.setText(Messages.Dialog_ImportConfig_Checkbox_SetEquipmentFromGroup);
+         _chkIL_SetEquipmentGroup.setToolTipText(Messages.Dialog_ImportConfig_Checkbox_SetEquipmentFromGroup_Tooltip);
          _chkIL_SetEquipmentGroup.addSelectionListener(_defaultModify_Listener);
          GridDataFactory.fillDefaults()
                .span(2, 1)
@@ -2483,7 +2483,7 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements IActionRe
 
       {
          _lblIL_EquipmentGroup = new Label(parent, SWT.NONE);
-         _lblIL_EquipmentGroup.setText("Equipment group");
+         _lblIL_EquipmentGroup.setText(Messages.Dialog_ImportConfig_Label_EquipmentGroup);
          GridDataFactory.fillDefaults()
                .align(SWT.FILL, SWT.CENTER)
                .indent(_leftPadding, 0)
@@ -3429,7 +3429,7 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements IActionRe
       }
 
       // equipment groups
-      _comboIL_EquipmentGroups.add("< Select an equipment group >");
+      _comboIL_EquipmentGroups.add(Messages.Dialog_ImportConfig_Label_SelectEquipmentGroup);
       for (final EquipmentGroup equipmentGroup : EquipmentGroupManager.getEquipmentGroupsSorted()) {
          _comboIL_EquipmentGroups.add(equipmentGroup.name + UI.SPACE3 + equipmentGroup.allEquipment.size());
       }

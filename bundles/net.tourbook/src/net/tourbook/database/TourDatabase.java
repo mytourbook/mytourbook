@@ -842,10 +842,10 @@ public class TourDatabase {
                                                 final String... allColumnNames) throws SQLException {
 
          // an exception will be thrown when the index name is larger than the max which is 128 characters
-         final String joinedNames = String.join("__", allColumnNames);
-         final String joinedSQLNames = String.join(", ", allColumnNames);
+         final String joinedNames = String.join("__", allColumnNames); //        //$NON-NLS-1$
+         final String joinedSQLNames = String.join(", ", allColumnNames); //     //$NON-NLS-1$
 
-         final String indexName = tableName + "___" + joinedNames;
+         final String indexName = tableName + "___" + joinedNames; //            //$NON-NLS-1$
 
          if (isIndexAvailable(stmt.getConnection(), tableName, indexName)) {
 
@@ -1468,17 +1468,17 @@ public class TourDatabase {
       // log runtime statistics
       final ResultSet rs = cs.getResultSet();
 
-      System.out.println("--------------------------------");
-      System.out.println("DERBY RUNTIME STATISTICS - START");
-      System.out.println("--------------------------------");
+      System.out.println("--------------------------------"); //$NON-NLS-1$
+      System.out.println("DERBY RUNTIME STATISTICS - START"); //$NON-NLS-1$
+      System.out.println("--------------------------------"); //$NON-NLS-1$
 
       while (rs.next()) {
          System.out.println(rs.getString(1));
       }
 
-      System.out.println("------------------------------");
-      System.out.println("DERBY RUNTIME STATISTICS - END");
-      System.out.println("------------------------------");
+      System.out.println("------------------------------"); //$NON-NLS-1$
+      System.out.println("DERBY RUNTIME STATISTICS - END"); //$NON-NLS-1$
+      System.out.println("------------------------------"); //$NON-NLS-1$
 
       cs.close();
 
@@ -4625,10 +4625,10 @@ public class TourDatabase {
             KEY_TOUR);
 
       // Create indices "Equipment__..."
-      SQL.createIndex_Table__Column(stmt, TABLE_EQUIPMENT, "IsCollate");
-      SQL.createIndex_Table__Column(stmt, TABLE_EQUIPMENT, "DateFrom");
-      SQL.createIndex_Table__Column(stmt, TABLE_EQUIPMENT, "DateUntil");
-      SQL.createIndex_Table__Column(stmt, TABLE_EQUIPMENT, "Type");
+      SQL.createIndex_Table__Column(stmt, TABLE_EQUIPMENT, "IsCollate"); //      //$NON-NLS-1$
+      SQL.createIndex_Table__Column(stmt, TABLE_EQUIPMENT, "DateFrom"); //       //$NON-NLS-1$
+      SQL.createIndex_Table__Column(stmt, TABLE_EQUIPMENT, "DateUntil"); //      //$NON-NLS-1$
+      SQL.createIndex_Table__Column(stmt, TABLE_EQUIPMENT, "Type"); //           //$NON-NLS-1$
    }
 
    /**
@@ -4680,13 +4680,13 @@ public class TourDatabase {
 
       // Create indices "EquipmentPart__..."
       SQL.createIndex_Table__Column(stmt, TABLE_EQUIPMENT_PART, KEY_EQUIPMENT);
-      SQL.createIndex_Table__Column(stmt, TABLE_EQUIPMENT_PART, "PartID");
+      SQL.createIndex_Table__Column(stmt, TABLE_EQUIPMENT_PART, "PartID"); //       //$NON-NLS-1$
 
-      SQL.createIndex_Table__Column(stmt, TABLE_EQUIPMENT_PART, "IsCollate");
-      SQL.createIndex_Table__Column(stmt, TABLE_EQUIPMENT_PART, "ItemType");
-      SQL.createIndex_Table__Column(stmt, TABLE_EQUIPMENT_PART, "DateFrom");
-      SQL.createIndex_Table__Column(stmt, TABLE_EQUIPMENT_PART, "DateUntil");
-      SQL.createIndex_Table__Column(stmt, TABLE_EQUIPMENT_PART, "Type");
+      SQL.createIndex_Table__Column(stmt, TABLE_EQUIPMENT_PART, "IsCollate"); //    //$NON-NLS-1$
+      SQL.createIndex_Table__Column(stmt, TABLE_EQUIPMENT_PART, "ItemType"); //     //$NON-NLS-1$
+      SQL.createIndex_Table__Column(stmt, TABLE_EQUIPMENT_PART, "DateFrom"); //     //$NON-NLS-1$
+      SQL.createIndex_Table__Column(stmt, TABLE_EQUIPMENT_PART, "DateUntil"); //    //$NON-NLS-1$
+      SQL.createIndex_Table__Column(stmt, TABLE_EQUIPMENT_PART, "Type"); //         //$NON-NLS-1$
    }
 
    /**

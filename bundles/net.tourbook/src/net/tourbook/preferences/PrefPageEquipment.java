@@ -15,6 +15,7 @@
  *******************************************************************************/
 package net.tourbook.preferences;
 
+import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.UI;
 import net.tourbook.common.util.Util;
@@ -80,10 +81,9 @@ public class PrefPageEquipment extends PreferencePage implements IWorkbenchPrefe
             /*
              * Number of recent equipment
              */
-            final String tooltip =
-                  "Number of recently used equipment which are displayed in the context menu.\n\n0 will hide recently used equipment.";
+            final String tooltip = Messages.Pref_Equipment_Label_NumberOfRecentEquipment_Tooltip;
 
-            final Label label = UI.createLabel(container, "Number of recent &equipment");
+            final Label label = UI.createLabel(container, Messages.Pref_Equipment_Label_NumberOfRecentEquipment);
             label.setToolTipText(tooltip);
 
             // spinner
@@ -100,8 +100,8 @@ public class PrefPageEquipment extends PreferencePage implements IWorkbenchPrefe
 
             // button: Remove recent equipment
             final Button btnRemoveRecentEquipment = new Button(container, SWT.PUSH);
-            btnRemoveRecentEquipment.setText("Remo&ve Recent Equipment");
-            btnRemoveRecentEquipment.setToolTipText("All recent equipment will be removed from the recent equipment list");
+            btnRemoveRecentEquipment.setText(Messages.Pref_Equipment_Button_RemoveRecentEquipment);
+            btnRemoveRecentEquipment.setToolTipText(Messages.Pref_Equipment_Button_RemoveRecentEquipment_Tooltip);
             btnRemoveRecentEquipment.addSelectionListener(SelectionListener.widgetSelectedAdapter(
                   selectionEvent -> EquipmentMenuManager.clearRecentEquipment()));
          }

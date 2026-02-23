@@ -368,31 +368,31 @@ public class TourActionManager {
 
 
       final TourAction actionAddEquipment                = new TourAction(    ActionAddEquipment_SubMenu.class.getName(),
-                                                                              Messages.Action_Equipment_AddEquipment,
+                                                                              Messages.Equipment_Action_AddEquipment,
                                                                               TourActionCategory.EQUIPMENT);
 
       final TourAction actionAddEquipment_Groups         = new TourAction(    ActionAddEquipmentGroups_SubMenu.class.getName(),
-                                                                              Messages.Action_Equipment_AddEquipment_Groups,
+                                                                              Messages.Equipment_Action_AddEquipment_Groups,
                                                                               TourActionCategory.EQUIPMENT);
 
       final TourAction actionAddRecentEquipment          = new TourAction(    ActionAddRecentEquipment.class.getName(),
-                                                                              Messages.Action_Equipment_AddRecentEquipment,
+                                                                              Messages.Equipment_Action_AddRecentEquipment,
                                                                               TourActionCategory.EQUIPMENT);
 
       final TourAction actionRemoveEquipment             = new TourAction(    ActionRemoveEquipment_SubMenu.class.getName(),
-                                                                              Messages.Action_Equipment_RemoveEquipment,
+                                                                              Messages.Equipment_Action_RemoveEquipment,
                                                                               TourActionCategory.EQUIPMENT);
 
       final TourAction actionRemoveEquipment_All         = new TourAction(    ActionRemoveEquipmentAll.class.getName(),
-                                                                              Messages.Action_Equipment_RemoveEquipment_All,
+                                                                              Messages.Equipment_Action_RemoveEquipment_All,
                                                                               TourActionCategory.EQUIPMENT);
 
       final TourAction actionClipboard_CopyEquipment     = new TourAction(    ActionClipboard_CopyEquipment.class.getName(),
-                                                                              Messages.Action_Equipment_ClipboardCopy,
+                                                                              Messages.Equipment_Action_ClipboardCopy,
                                                                               TourActionCategory.EQUIPMENT);
 
       final TourAction actionClipboard_PasteEquipment    = new TourAction(    ActionClipboard_PasteEquipment.class.getName(),
-                                                                              Messages.Action_Equipment_ClipboardPaste,
+                                                                              Messages.Equipment_Action_ClipboardPaste,
                                                                               TourActionCategory.EQUIPMENT);
 
       // -----------------------------------------------------------------
