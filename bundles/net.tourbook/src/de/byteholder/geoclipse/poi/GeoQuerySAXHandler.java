@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2024 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2026 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -29,30 +29,31 @@ import org.xml.sax.helpers.DefaultHandler;
 
 public class GeoQuerySAXHandler extends DefaultHandler {
 
-   private static final String   TAG_PLACE          = "place";         //$NON-NLS-1$
-   private static final String   TAG_NEAREST_PLACES = "nearestplaces"; //$NON-NLS-1$
+   private static final String TAG_PLACE          = "place";         //$NON-NLS-1$
+   private static final String TAG_NEAREST_PLACES = "nearestplaces"; //$NON-NLS-1$
 
-   private static final String   ATTR_LAT           = "lat";           //$NON-NLS-1$
-   private static final String   ATTR_LON           = "lon";           //$NON-NLS-1$
-//	private static final String			ATTR_NAME			= "name";			//$NON-NLS-1$
-   private static final String   ATTR_NAME          = "display_name";  //$NON-NLS-1$
-   private static final String   ATTR_CATEGORY      = "class";         //$NON-NLS-1$
-   private static final String   ATTR_INFO          = "info";          //$NON-NLS-1$
-   private static final String   ATTR_TYPE          = "type";          //$NON-NLS-1$
-//	private static final String			ATTR_ZOOM			= "zoom";			//$NON-NLS-1$
-   private static final String   ATTR_BOUNDINGBOX   = "boundingbox";   //$NON-NLS-1$
+   private static final String ATTR_LAT           = "lat";           //$NON-NLS-1$
+   private static final String ATTR_LON           = "lon";           //$NON-NLS-1$
+   private static final String ATTR_NAME          = "display_name";  //$NON-NLS-1$
+// private static final String ATTR_NAME          = "name";          //$NON-NLS-1$
+   private static final String ATTR_CATEGORY      = "class";         //$NON-NLS-1$
+   private static final String ATTR_INFO          = "info";          //$NON-NLS-1$
+   private static final String ATTR_TYPE          = "type";          //$NON-NLS-1$
+   private static final String ATTR_BOUNDINGBOX   = "boundingbox";   //$NON-NLS-1$
+// private static final String ATTR_ZOOM          = "zoom";          //$NON-NLS-1$
 
-   private List<PointOfInterest> _searchResult;
+   private List<PointOfInterest> _allPOIs;
 
    /**
     * The named tag can be recursive, this counts the level of the named hierarchy
     */
-   private int                   _poiLevel          = 0;
-   private PointOfInterest       _poiRoot           = null;
-   private List<PointOfInterest> _nearestPlaces     = null;
+   private int                   _poiLevel      = 0;
+   private PointOfInterest       _poiRoot       = null;
+   private List<PointOfInterest> _nearestPlaces = null;
 
    public GeoQuerySAXHandler(final List<PointOfInterest> searchResult) {
-      _searchResult = searchResult;
+
+      _allPOIs = searchResult;
    }
 
    private static double parseDouble(final String textValue, final double defaultValue) {
@@ -69,46 +70,39 @@ public class GeoQuerySAXHandler extends DefaultHandler {
       }
    }
 
-//	private static int parseInt(final String textValue, final int defaultValue) {
-//		try {
-//			if (textValue != null) {
-//				return Integer.parseInt(textValue);
-//			} else {
-//				return defaultValue;
-//			}
-//
-//		} catch (final NumberFormatException e) {
-//			return defaultValue;
-//		}
-//	}
-
    private PointOfInterest createPOI(final Attributes attributes) {
 
       final PointOfInterest poi = new PointOfInterest();
 
-      final String attrLatitude = attributes.getValue(ATTR_LAT);
-      final String attrLongitude = attributes.getValue(ATTR_LON);
-      final String attrName = attributes.getValue(ATTR_NAME);
-      final String attrCategory = attributes.getValue(ATTR_CATEGORY);
-      final String attrInfo = attributes.getValue(ATTR_INFO);
-      final String attrType = attributes.getValue(ATTR_TYPE);
-//		final String attrZoom = attributes.getValue(ATTR_ZOOM);
-      final String attrBoundingBox = attributes.getValue(ATTR_BOUNDINGBOX);
+// SET_FORMATTING_OFF
+
+      final String attrLatitude     = attributes.getValue(ATTR_LAT);
+      final String attrLongitude    = attributes.getValue(ATTR_LON);
+      final String attrName         = attributes.getValue(ATTR_NAME);
+      final String attrCategory     = attributes.getValue(ATTR_CATEGORY);
+      final String attrInfo         = attributes.getValue(ATTR_INFO);
+      final String attrType         = attributes.getValue(ATTR_TYPE);
+      final String attrBoundingBox  = attributes.getValue(ATTR_BOUNDINGBOX);
+//    final String attrZoom         = attributes.getValue(ATTR_ZOOM);
 
       poi.setPosition(new GeoPosition(parseDouble(attrLatitude, 0), parseDouble(attrLongitude, 0)));
-//		poi.setRecommendedZoom(parseInt(attrZoom, 8));
       poi.setBoundingBox(attrBoundingBox);
+//    poi.setRecommendedZoom(parseInt(attrZoom, 8));
 
-      poi.setName(attrName == null ? UI.EMPTY_STRING : attrName);
-      poi.setCategory(attrCategory == null ? UI.EMPTY_STRING : attrCategory);
-      poi.setInfo(attrInfo == null ? UI.EMPTY_STRING : attrInfo);
-      poi.setType(attrType == null ? UI.EMPTY_STRING : attrType);
+      poi.setName(      attrName     == null ? UI.EMPTY_STRING : attrName);
+      poi.setCategory(  attrCategory == null ? UI.EMPTY_STRING : attrCategory);
+      poi.setInfo(      attrInfo     == null ? UI.EMPTY_STRING : attrInfo);
+      poi.setType(      attrType     == null ? UI.EMPTY_STRING : attrType);
+
+// SET_FORMATTING_ON
 
       return poi;
    }
 
    @Override
-   public void endElement(final String uri, final String localName, final String name) throws SAXException {
+   public void endElement(final String uri,
+                          final String localName,
+                          final String name) throws SAXException {
 
       if (name.equals(TAG_PLACE)) {
 
@@ -126,7 +120,11 @@ public class GeoQuerySAXHandler extends DefaultHandler {
    }
 
    @Override
-   public void startElement(final String uri, final String localName, final String name, final Attributes attributes)
+   public void startElement(final String uri,
+                            final String localName,
+                            final String name,
+                            final Attributes attributes)
+
          throws SAXException {
 
       if (name.equals(TAG_PLACE)) {
@@ -135,7 +133,7 @@ public class GeoQuerySAXHandler extends DefaultHandler {
 
          if (_poiLevel == 0) {
             _poiRoot = poi;
-            _searchResult.add(poi);
+            _allPOIs.add(poi);
          } else {
             _nearestPlaces.add(poi);
          }
