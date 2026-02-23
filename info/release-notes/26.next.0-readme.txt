@@ -1,4 +1,4 @@
-26.next.0                                                 ?. March 2026
+26.next.0                                                 ?. February 2025
 
 
 TODO's
@@ -34,36 +34,21 @@ Experimental
 New / Improvements
 ==================
 
-* Equipment
-  https://github.com/mytourbook/mytourbook/issues/1590
-  
-  Equipment and tags have a lot of common features but tags have been "missused" for an equipment because of missing equipment.
-  These are the feature which do not have the other:
-  
-  - Tags
-    - Categorize tags
-    - Floating tag context menu
-    
-  - Equipment
-    - Equipment items are created directly in the equipment view
-    - Parts and services are collating tours by a type and time
 
+* TBD: Fit Export
+  - Export swim values
+    https://github.com/mytourbook/mytourbook/issues/1581
+  
 
 Changes
 =======
 
-* Easy Import Dialog
-  - Splitted import launcher configuration into tabs
-  - Added equipment configuration
-
-* Tag 
-  - Moved tag content image size into pref page "Appearance" 
+*  
 
 
 Changes that require Tour Re-import
 ===================================
 
-* 
 
 
 Bugfix
@@ -89,10 +74,10 @@ Translation
 System   
 ======
 
-* MyTourbook Milestone 25.?   https://github.com/mytourbook/mytourbook/milestone/19?closed=1
-* Java 17                     https://adoptium.net/temurin/releases/?version=17
-* Eclipse 2024-03 (4.31)      https://download.eclipse.org/eclipse/downloads/drops4/R-4.31-202402290520/
-* NatTable 2.5.0              https://eclipse.dev/nattable/download
-* Nebula Widgets              https://download.eclipse.org/nebula/releases/latest
-* FIT SDK 21.176.0            https://forums.garmin.com/developer/fit-sdk/b/news-announcements
-* WorldWind 2.2.1             https://github.com/NASAWorldWind/WorldWindJava/releases/tag/v2.2.1
+* MyTourbook Milestone 25.11     https://github.com/mytourbook/mytourbook/milestone/27?closed=1
+* Java 21                        https://adoptium.net/temurin/releases/?version=21
+* Eclipse 2025-09 (4.37)         https://archive.eclipse.org/eclipse/downloads/drops4/R-4.37-202509050730/
+* NatTable 2.6.0                 https://eclipse.dev/nattable/download
+* Nebula Widgets                 https://download.eclipse.org/nebula/releases/latest
+* FIT SDK 21.176.0               https://forums.garmin.com/developer/fit-sdk/b/news-announcements
+* WorldWind 2.2.1                https://github.com/NASAWorldWind/WorldWindJava/releases/tag/v2.2.1
