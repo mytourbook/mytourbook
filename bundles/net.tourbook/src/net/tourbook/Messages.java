@@ -474,7 +474,6 @@ public class Messages extends NLS {
    public static String        DataImport_Error_file_does_not_exist_msg;
    public static String        DataImport_Error_file_does_not_exist_title;
 
-   public static String        Db_Field_Category;
    public static String        Db_Field_Description;
    public static String        Db_Field_Name;
    public static String        Db_Field_SensorDescription;
@@ -617,15 +616,11 @@ public class Messages extends NLS {
    public static String        Dialog_Equipment_Tooltip_1;
    public static String        Dialog_Equipment_Tooltip_2;
 
-   public static String        Dialog_EquipmentPart_Checkbox_IncludeInCollatedTours;
    public static String        Dialog_EquipmentPart_Dialog_Message_CreatePart;
    public static String        Dialog_EquipmentPart_Dialog_Message_DuplicatePart;
    public static String        Dialog_EquipmentPart_Dialog_Message_EditPart;
    public static String        Dialog_EquipmentPart_Dialog_Title;
    public static String        Dialog_EquipmentPart_FileDialog_Text;
-   public static String        Dialog_EquipmentPart_Label_Currency;
-   public static String        Dialog_EquipmentPart_Label_Sync;
-   public static String        Dialog_EquipmentPart_Label_SyncTooltip;
 
    public static String        Dialog_EquipmentService_Dialog_Message_Service_Duplicate;
    public static String        Dialog_EquipmentService_Dialog_Message_Service_Edit;
