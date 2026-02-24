@@ -1885,6 +1885,18 @@ public class UI {
       return label;
    }
 
+   public static Label createSpacer_Horizontal(final Composite parent,
+                                               final int columns,
+                                               final int alignHorizontal,
+                                               final int alignVertical) {
+
+      final Label label = new Label(parent, SWT.NONE);
+
+      GridDataFactory.fillDefaults().align(alignHorizontal, alignVertical).span(columns, 1).applyTo(label);
+
+      return label;
+   }
+
    public static void createSpacer_Vertical(final Composite parent,
                                             final int height,
                                             final int spanHorizontal) {

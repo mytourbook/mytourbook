@@ -259,12 +259,11 @@ public class DialogEquipmentService extends TitleAreaDialog {
       final int defaultWidth = convertWidthInCharsToPixels(100);
 
       // > 0 will hide the decorator
-      final int decoratorWidth = 0;
       final int decoratorDistance = 3;
 
       _container = new Composite(parent, SWT.NONE);
       GridDataFactory.fillDefaults().grab(true, true).applyTo(_container);
-      GridLayoutFactory.swtDefaults().numColumns(4).applyTo(_container);
+      GridLayoutFactory.swtDefaults().numColumns(3).applyTo(_container);
 //      _container.setBackground(UI.SYS_COLOR_MAGENTA);
       {
          {
@@ -274,8 +273,6 @@ public class DialogEquipmentService extends TitleAreaDialog {
 
             final Label label = UI.createLabel(_container, Messages.Dialog_EquipmentService_Label_Name);
             gdVertCenter.applyTo(label);
-
-            UI.createSpacer_Horizontal(_container, decoratorWidth, 1);
 
             // autocomplete combo
             _comboName = new Combo(_container, SWT.BORDER | SWT.FLAT);
@@ -294,8 +291,6 @@ public class DialogEquipmentService extends TitleAreaDialog {
             final Label label = UI.createLabel(_container, Messages.Dialog_EquipmentService_Label_Company);
             gdVertCenter.applyTo(label);
 
-            UI.createSpacer_Horizontal(_container, decoratorWidth, 1);
-
             // autocomplete combo
             _comboCompany = new Combo(_container, SWT.BORDER | SWT.FLAT);
             _comboCompany.setText(UI.EMPTY_STRING);
@@ -311,8 +306,6 @@ public class DialogEquipmentService extends TitleAreaDialog {
              */
             final Label label = UI.createLabel(_container, Messages.Dialog_Equipment_Label_Type);
             gdVertCenter.applyTo(label);
-
-            UI.createSpacer_Horizontal(_container, decoratorWidth, 1);
 
             // autocomplete combo
             _comboType = new Combo(_container, SWT.BORDER | SWT.FLAT);
@@ -341,8 +334,6 @@ public class DialogEquipmentService extends TitleAreaDialog {
             final Label label = UI.createLabel(_container, Messages.Dialog_Equipment_Label_Date);
             gdVertCenter.applyTo(label);
 
-            UI.createSpacer_Horizontal(_container, decoratorWidth, 1);
-
             _dateFrom = new DateTime(_container, SWT.DATE | SWT.MEDIUM | SWT.DROP_DOWN);
             _dateFrom.setToolTipText(tooltip2);
             _dateFrom.addSelectionListener(_defaultSelectionListener);
@@ -362,8 +353,6 @@ public class DialogEquipmentService extends TitleAreaDialog {
              */
 
             UI.createLabel(_container, Messages.Dialog_Equipment_Label_Price);
-
-            UI.createSpacer_Horizontal(_container, decoratorWidth, 1);
 
             // spinner
             _spinPrice = new Spinner(_container, SWT.BORDER);
@@ -394,19 +383,21 @@ public class DialogEquipmentService extends TitleAreaDialog {
             final Label label = UI.createLabel(_container, Messages.Dialog_Equipment_Label_Collate);
             gdVertCenter.applyTo(label);
 
-            UI.createSpacer_Horizontal(_container, decoratorWidth, 1);
-
             _chkCollate = new Button(_container, SWT.CHECK);
             _chkCollate.setText(Messages.Dialog_Equipment_Checkbox_Collate);
             _chkCollate.setToolTipText(tooltip);
             _chkCollate.addSelectionListener(_defaultSelectionListener);
 
-            GridDataFactory.fillDefaults().span(2, 1).applyTo(_chkCollate);
+            GridDataFactory.fillDefaults()
+                  .span(2, 1)
+                  // align to the beginning, otherwise the decoration is partly hidden !!!
+                  .align(SWT.BEGINNING, SWT.FILL)
+                  .applyTo(_chkCollate);
 
             /*
              * Add a decoration for this important field
              */
-            _comboDecorator_Collate = new ControlDecoration(_chkCollate, SWT.CENTER | SWT.LEFT);
+            _comboDecorator_Collate = new ControlDecoration(_chkCollate, SWT.CENTER | SWT.RIGHT);
             _comboDecorator_Collate.setDescriptionText(tooltip);
             _comboDecorator_Collate.setImage(decorationImage);
             _comboDecorator_Collate.setMarginWidth(decoratorDistance);
@@ -417,8 +408,6 @@ public class DialogEquipmentService extends TitleAreaDialog {
              */
             final Label label = UI.createLabel(_container, Messages.Dialog_Equipment_Label_Website);
             GridDataFactory.fillDefaults().align(SWT.FILL, SWT.BEGINNING).applyTo(label);
-
-            UI.createSpacer_Horizontal(_container, decoratorWidth, 1);
 
             _txtUrlAddress = new Text(_container, SWT.BORDER);
             _txtUrlAddress.addModifyListener(e -> onModify());
@@ -434,8 +423,6 @@ public class DialogEquipmentService extends TitleAreaDialog {
              */
             final Label label = UI.createLabel(_container, Messages.Dialog_Equipment_Label_Description);
             GridDataFactory.fillDefaults().align(SWT.FILL, SWT.BEGINNING).applyTo(label);
-
-            UI.createSpacer_Horizontal(_container, decoratorWidth, 1);
 
             _txtDescription = new Text(_container, SWT.BORDER | SWT.WRAP | SWT.MULTI | SWT.V_SCROLL | SWT.H_SCROLL);
             _txtDescription.addModifyListener(e -> onModify());
@@ -453,8 +440,6 @@ public class DialogEquipmentService extends TitleAreaDialog {
             _lblImage = UI.createLabel(_container, UI.EMPTY_STRING);
             _lblImage.setText(Messages.Dialog_Equipment_Label_Image);
             GridDataFactory.fillDefaults().align(SWT.BEGINNING, SWT.CENTER).applyTo(_lblImage);
-
-            UI.createSpacer_Horizontal(_container, decoratorWidth, 1);
 
             final Composite imageContainer = new Composite(_container, SWT.NONE);
             GridDataFactory.fillDefaults()
@@ -488,8 +473,6 @@ public class DialogEquipmentService extends TitleAreaDialog {
                 */
 
                UI.createSpacer_Horizontal(_container);
-
-               UI.createSpacer_Horizontal(_container, decoratorWidth, 1);
 
                final int imageSize = TagManager.getTagContent_ImageSize();
 
