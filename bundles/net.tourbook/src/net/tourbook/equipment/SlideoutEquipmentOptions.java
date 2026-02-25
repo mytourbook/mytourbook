@@ -83,7 +83,7 @@ public class SlideoutEquipmentOptions extends ToolbarSlideout implements IAction
 
       _actionRestoreDefaults = new ActionResetToDefaults(this);
 
-      _actionPrefDialog = new ActionOpenPrefDialog(Messages.Equipment_SlideoutOptions_Action_EquipmentPreferences, PrefPageEquipment.ID);
+      _actionPrefDialog = new ActionOpenPrefDialog(Messages.Slideout_EquipmentOptions_Action_EquipmentPreferences, PrefPageEquipment.ID);
       _actionPrefDialog.closeThisTooltip(this);
       _actionPrefDialog.setShell(_equipmentView.getTreeViewer().getTree().getShell());
    }
@@ -135,7 +135,7 @@ public class SlideoutEquipmentOptions extends ToolbarSlideout implements IAction
        */
       final Label label = new Label(parent, SWT.NONE);
       GridDataFactory.fillDefaults().applyTo(label);
-      label.setText(Messages.Equipment_SlideoutOptions_Title);
+      label.setText(Messages.Slideout_EquipmentOptions_Title);
       label.setFont(JFaceResources.getBannerFont());
 
       MTFont.setBannerFont(label);
@@ -169,7 +169,7 @@ public class SlideoutEquipmentOptions extends ToolbarSlideout implements IAction
          {
             // Label
             final Label label = new Label(container, SWT.NONE);
-            label.setText(Messages.Equipment_SlideoutOptions_Label_RowHeight);
+            label.setText(Messages.Slideout_EquipmentOptions_Label_RowHeight);
             GridDataFactory.fillDefaults().align(SWT.BEGINNING, SWT.BEGINNING).applyTo(label);
 
          }
@@ -182,7 +182,7 @@ public class SlideoutEquipmentOptions extends ToolbarSlideout implements IAction
                 * Show default height
                 */
                _rdoShowDefaultHeight = new Button(heightContainer, SWT.RADIO);
-               _rdoShowDefaultHeight.setText(Messages.Equipment_SlideoutOptions_Radio_DefaultHeight);
+               _rdoShowDefaultHeight.setText(Messages.Slideout_EquipmentOptions_Radio_DefaultHeight);
                _rdoShowDefaultHeight.addSelectionListener(_defaultSelectionListener);
 
                GridDataFactory.fillDefaults().span(2, 1).applyTo(_rdoShowDefaultHeight);
@@ -193,8 +193,8 @@ public class SlideoutEquipmentOptions extends ToolbarSlideout implements IAction
                 * Show custom height
                 */
                _rdoShowCustomHeight = new Button(heightContainer, SWT.RADIO);
-               _rdoShowCustomHeight.setText(Messages.Equipment_SlideoutOptions_Radio_CustomHeight);
-               _rdoShowCustomHeight.setToolTipText(Messages.Equipment_SlideoutOptions_Radio_CustomHeight_Tooltip);
+               _rdoShowCustomHeight.setText(Messages.Slideout_EquipmentOptions_Radio_CustomHeight);
+               _rdoShowCustomHeight.setToolTipText(Messages.Slideout_EquipmentOptions_Radio_CustomHeight_Tooltip);
                _rdoShowCustomHeight.addSelectionListener(_defaultSelectionListener);
 
                /*

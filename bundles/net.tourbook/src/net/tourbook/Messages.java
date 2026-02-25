@@ -1149,20 +1149,21 @@ public class Messages extends NLS {
    public static String        Equipment_Action_ClipboardCopy;
    public static String        Equipment_Action_ClipboardCopy_Tooltip;
    public static String        Equipment_Action_ClipboardPaste;
-   public static String        Equipment_Action_Delete;
-   public static String        Equipment_Action_Delete_Part;
-   public static String        Equipment_Action_Delete_Service;
+   public static String        Equipment_Action_DeleteEquipment;
+   public static String        Equipment_Action_DeletePart;
+   public static String        Equipment_Action_DeleteService;
    public static String        Equipment_Action_DuplicateEquipment;
    public static String        Equipment_Action_DuplicateEquipment_Tooltip;
    public static String        Equipment_Action_DuplicatePart;
    public static String        Equipment_Action_DuplicatePart_Tooltip;
    public static String        Equipment_Action_DuplicateService;
    public static String        Equipment_Action_DuplicateService_Tooltip;
-   public static String        Equipment_Action_Edit;
+   public static String        Equipment_Action_EditEquipment;
    public static String        Equipment_Action_EditPart;
    public static String        Equipment_Action_EditService;
-   public static String        Equipment_Action_EnableEquipmentFilter;
    public static String        Equipment_Action_EquipmentFilter_Tooltip;
+
+   public static String Equipment_Action_EquipmentFilterInfo_Tooltip;
    public static String        Equipment_Action_EquipmentPreferences;
    public static String        Equipment_Action_ManageEquipment;
    public static String        Equipment_Action_ManageEquipmentGroups;
@@ -1195,12 +1196,6 @@ public class Messages extends NLS {
    public static String        Equipment_ExpandType_SortByDate;
    public static String        Equipment_Log_EquipmentIsDeleted;
    public static String        Equipment_Log_PartIsDeleted;
-   public static String        Equipment_SlideoutOptions_Action_EquipmentPreferences;
-   public static String        Equipment_SlideoutOptions_Label_RowHeight;
-   public static String        Equipment_SlideoutOptions_Radio_CustomHeight;
-   public static String        Equipment_SlideoutOptions_Radio_CustomHeight_Tooltip;
-   public static String        Equipment_SlideoutOptions_Radio_DefaultHeight;
-   public static String        Equipment_SlideoutOptions_Title;
    public static String        Equipment_StatusLine_EquipmentCopiedToClipboard;
    public static String        Equipment_View_Label_UntilNow;
 
@@ -2441,7 +2436,7 @@ public class Messages extends NLS {
    public static String        Slideout_EquipmentFilter_Label_AssetOperator_Equipment;
    public static String        Slideout_EquipmentFilter_Label_AssetOperator_PartService;
    public static String        Slideout_EquipmentFilter_Label_AvailableEquipment;
-   public static String        Slideout_EquipmentFilter_Label_AvailableEquipment_Tooltip;
+   public static String        Slideout_EquipmentFilter_Checkbox_IsLiveUpdate_Tooltip;
    public static String        Slideout_EquipmentFilter_Label_Filter;
    public static String        Slideout_EquipmentFilter_Label_SelectedEquipment;
    public static String        Slideout_EquipmentFilter_Label_SelectedPartService;
@@ -2450,6 +2445,13 @@ public class Messages extends NLS {
    public static String        Slideout_EquipmentFilter_Radio_EquipmentOperator_OR_Tooltip;
    public static String        Slideout_EquipmentFilter_Radio_PartService;
    public static String        Slideout_EquipmentFilter_Title;
+
+   public static String        Slideout_EquipmentOptions_Action_EquipmentPreferences;
+   public static String        Slideout_EquipmentOptions_Label_RowHeight;
+   public static String        Slideout_EquipmentOptions_Radio_CustomHeight;
+   public static String        Slideout_EquipmentOptions_Radio_CustomHeight_Tooltip;
+   public static String        Slideout_EquipmentOptions_Radio_DefaultHeight;
+   public static String        Slideout_EquipmentOptions_Title;
 
    public static String        Slideout_GeoCompareOptions_Group_MapOptions;
    public static String        Slideout_GeoCompareOptions_Label_ComparedTourPart;

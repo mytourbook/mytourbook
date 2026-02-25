@@ -1461,7 +1461,7 @@ public class SlideoutTourEquipmentFilter extends AdvancedSlideout implements ITr
              */
             _chkLiveUpdate = new Button(container, SWT.CHECK);
             _chkLiveUpdate.setText(Messages.Slideout_TourFilter_Checkbox_IsLiveUpdate);
-            _chkLiveUpdate.setToolTipText(Messages.Slideout_EquipmentFilter_Label_AvailableEquipment_Tooltip);
+            _chkLiveUpdate.setToolTipText(Messages.Slideout_EquipmentFilter_Checkbox_IsLiveUpdate_Tooltip);
             _chkLiveUpdate.addSelectionListener(SelectionListener.widgetSelectedAdapter(
                   selectionEvent -> doLiveUpdate()));
 

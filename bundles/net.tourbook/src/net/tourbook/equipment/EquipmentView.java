@@ -338,7 +338,7 @@ public class EquipmentView extends ViewPart implements
 
       ActionDeleteEquipment() {
 
-         super(Messages.Equipment_Action_Delete, AS_PUSH_BUTTON);
+         super(Messages.Equipment_Action_DeleteEquipment, AS_PUSH_BUTTON);
 
          setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.App_Delete));
       }
@@ -353,7 +353,7 @@ public class EquipmentView extends ViewPart implements
 
       ActionDeletePart() {
 
-         super(Messages.Equipment_Action_Delete_Part, AS_PUSH_BUTTON);
+         super(Messages.Equipment_Action_DeletePart, AS_PUSH_BUTTON);
 
          setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.App_Delete));
       }
@@ -368,7 +368,7 @@ public class EquipmentView extends ViewPart implements
 
       ActionDeleteService() {
 
-         super(Messages.Equipment_Action_Delete_Service, AS_PUSH_BUTTON);
+         super(Messages.Equipment_Action_DeleteService, AS_PUSH_BUTTON);
 
          setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.App_Delete));
       }
@@ -434,7 +434,7 @@ public class EquipmentView extends ViewPart implements
 
       public ActionEditEquipment() {
 
-         super(Messages.Equipment_Action_Edit, AS_PUSH_BUTTON);
+         super(Messages.Equipment_Action_EditEquipment, AS_PUSH_BUTTON);
 
          setImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.App_Edit));
       }
@@ -1822,7 +1822,7 @@ public class EquipmentView extends ViewPart implements
 
                   final String formattedDuration = durationPeriod.toString(UI.DURATION_FORMATTER_YEAR_MONTH_DAY);
 
-                  cell.setText(durationLast + formattedDuration);
+                  cell.setText(durationLast.formatted(formattedDuration));
                   setCellColor(cell, element);
                }
             }

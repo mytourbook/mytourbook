@@ -729,7 +729,7 @@ public class PrefPageEquipmentGroups extends PreferencePage implements IWorkbenc
             Messages.Pref_Equipment_Dialog_RenameEquipment_Title,
             Messages.Pref_Equipment_Dialog_RenameEquipment_Message,
             equipmentGroup.name,
-            null);
+            getNameValidator());
 
       inputDialog.open();
 

@@ -38,7 +38,7 @@ public class ActionTourEquipmentFilter extends ActionToolbarSlideoutAdv {
       super(TourbookPlugin.getThemedImageDescriptor(Images.Equipment_Filter));
 
       isToggleAction = true;
-      notSelectedTooltip = Messages.Equipment_Action_EnableEquipmentFilter;
+      notSelectedTooltip = Messages.Equipment_Action_EquipmentFilterInfo_Tooltip;
    }
 
    @Override
