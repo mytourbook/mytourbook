@@ -1162,8 +1162,7 @@ public class Messages extends NLS {
    public static String        Equipment_Action_EditPart;
    public static String        Equipment_Action_EditService;
    public static String        Equipment_Action_EquipmentFilter_Tooltip;
-
-   public static String Equipment_Action_EquipmentFilterInfo_Tooltip;
+   public static String        Equipment_Action_EquipmentFilterInfo_Tooltip;
    public static String        Equipment_Action_EquipmentPreferences;
    public static String        Equipment_Action_ManageEquipment;
    public static String        Equipment_Action_ManageEquipmentGroups;
@@ -3248,7 +3247,6 @@ public class Messages extends NLS {
    public static String        Tour_Action_auto_zoom_to_slider_position;
    public static String        Tour_Action_Category_AdjustTour;
    public static String        Tour_Action_Category_EditTour;
-
    public static String        Tour_Action_Category_Equipment;
    public static String        Tour_Action_Category_ExportTour;
    public static String        Tour_Action_Category_Tags;
@@ -3591,7 +3589,6 @@ public class Messages extends NLS {
    public static String        tour_editor_label_wind_speed;
    public static String        tour_editor_label_wind_speed_Tooltip;
    public static String        Tour_Editor_Link_Equipment;
-
    public static String        Tour_Editor_Link_RemoveTimeZone;
    public static String        Tour_Editor_Link_RemoveTimeZone_Tooltip;
    public static String        Tour_Editor_Link_RetrieveWeather;
