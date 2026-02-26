@@ -133,6 +133,10 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements IActionRe
 
    public static final String           ID                                 = "DialogEasyImportConfig";               //$NON-NLS-1$
    //
+   public static final String           IMPORT_LAUNCHER_TAB_1              = "  &3 +  ";                             //$NON-NLS-1$
+   public static final String           IMPORT_LAUNCHER_TAB_2              = " &4 . . . 9 ";                         //$NON-NLS-1$
+   public static final String           IMPORT_LAUNCHER_TAB_3              = " &50 . . . 99 ";                       //$NON-NLS-1$
+   //
    private static final String          STATE_BACKUP_DEVICE_HISTORY_ITEMS  = "STATE_BACKUP_DEVICE_HISTORY_ITEMS";    //$NON-NLS-1$
    private static final String          STATE_BACKUP_FOLDER_HISTORY_ITEMS  = "STATE_BACKUP_FOLDER_HISTORY_ITEMS";    //$NON-NLS-1$
    private static final String          STATE_DEVICE_DEVICE_HISTORY_ITEMS  = "STATE_DEVICE_DEVICE_HISTORY_ITEMS";    //$NON-NLS-1$
@@ -1805,17 +1809,17 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements IActionRe
             {
                // tab: 3
                final CTabItem tabConfig = new CTabItem(_tabFolderIL, SWT.NONE);
-               tabConfig.setText("  &3 +  "); //$NON-NLS-1$
+               tabConfig.setText(IMPORT_LAUNCHER_TAB_1);
                tabConfig.setControl(createUI_602_Tab_1(_tabFolderIL));
 
                // tab: 4...9
                final CTabItem tabLauncher = new CTabItem(_tabFolderIL, SWT.NONE);
-               tabLauncher.setText(" &4 . . . 9 "); //$NON-NLS-1$
+               tabLauncher.setText(IMPORT_LAUNCHER_TAB_2);
                tabLauncher.setControl(createUI_604_Tab_2(_tabFolderIL));
 
                // tab: 50...99
                final CTabItem tabOptions = new CTabItem(_tabFolderIL, SWT.NONE);
-               tabOptions.setText(" &50 . . . 99 "); //$NON-NLS-1$
+               tabOptions.setText(IMPORT_LAUNCHER_TAB_3);
                tabOptions.setControl(createUI_606_Tab_3(_tabFolderIL));
             }
          }
