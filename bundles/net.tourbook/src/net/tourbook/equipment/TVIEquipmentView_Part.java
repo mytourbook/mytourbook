@@ -124,7 +124,7 @@ public class TVIEquipmentView_Part extends TVIEquipmentView_Item {
             }
          }
 
-      } else if (viewerType == EquipmentViewerType.IS_EQUIPMENT_VIEWER && _part.isCollate()) {
+      } else if (viewerType == EquipmentViewerType.IS_EQUIPMENT_VIEWER) {
 
          if (is0UnfetchedChildren) {
 

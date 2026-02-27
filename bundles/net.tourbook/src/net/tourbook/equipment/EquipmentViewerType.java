@@ -15,6 +15,9 @@
  *******************************************************************************/
 package net.tourbook.equipment;
 
+/**
+ * The viewer type determines where equipment tree items are displayed
+ */
 public enum EquipmentViewerType {
 
    IS_EQUIPMENT_VIEWER, //

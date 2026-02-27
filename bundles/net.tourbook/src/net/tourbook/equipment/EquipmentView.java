@@ -665,7 +665,9 @@ public class EquipmentView extends ViewPart implements
             final EquipmentPart part2 = item2.getPart();
 
             // 1st compare by type
-            int compareDiff = part1.getType().compareTo(part2.getType());
+// disabled: this may be an option in the future
+//          int compareDiff = part1.getType().compareTo(part2.getType());
+            int compareDiff = 0;
 
             // 2nd compare by date
             if (compareDiff == 0) {
