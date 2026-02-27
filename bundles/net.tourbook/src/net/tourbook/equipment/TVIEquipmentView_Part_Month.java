@@ -219,9 +219,7 @@ public class TVIEquipmentView_Part_Month extends TVIEquipmentView_Item {
 
                + "ORDER BY TourData.tourstarttime" + NL //                                            //$NON-NLS-1$
 
-               + NL
-               + "--;" + NL //                                                                        //$NON-NLS-1$
-         ;
+               + NL;
 
          final PreparedStatement statement = conn.prepareStatement(sql);
 

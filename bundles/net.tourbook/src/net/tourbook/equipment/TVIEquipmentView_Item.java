@@ -297,9 +297,7 @@ public abstract class TVIEquipmentView_Item extends TreeViewerItem {
                + "GROUP BY " + NL //                                                            //$NON-NLS-1$
                + "   j_Td_Eq.EQUIPMENT_EQUIPMENTID" + NL //                                     //$NON-NLS-1$
 
-               + NL
-               + "--;" + NL //                                                                  //$NON-NLS-1$
-         ;
+               + NL;
 
          statement = conn.prepareStatement(sql);
 
@@ -373,9 +371,7 @@ public abstract class TVIEquipmentView_Item extends TreeViewerItem {
 
                + "GROUP BY equip.EQUIPMENTID" + NL //                                              //$NON-NLS-1$
 
-               + NL
-               + "--;" + NL //                                                                     //$NON-NLS-1$
-         ;
+               + NL;
 
          statement = conn.prepareStatement(sql);
 
@@ -477,9 +473,7 @@ public abstract class TVIEquipmentView_Item extends TreeViewerItem {
 
                + ") AS tdFields" + NL //                                                           //$NON-NLS-1$
 
-               + NL
-               + "--;" + NL //                                                                     //$NON-NLS-1$
-         ;
+               + NL;
 
          statement = conn.prepareStatement(sql);
 

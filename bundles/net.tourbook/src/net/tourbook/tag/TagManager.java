@@ -537,9 +537,7 @@ public class TagManager {
 
             + "GROUP BY jTdataTtag.TOURTAG_TAGID" + NL //                                       //$NON-NLS-1$
 
-            + NL
-            + "--;" + NL //                                                                     //$NON-NLS-1$
-      ;
+            + NL;
 
       final Map<Long, String> allAccumulatedValues = new HashMap<>();
 

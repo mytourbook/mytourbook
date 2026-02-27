@@ -185,9 +185,7 @@ public class TVITaggingView_Month extends TVITaggingView_Item {
 
                + "ORDER BY TourStartTime" + NL //                                                     //$NON-NLS-1$
 
-               + NL
-               + "--;" + NL //                                                                        //$NON-NLS-1$
-         ;
+               + NL;
 
          final PreparedStatement statement = conn.prepareStatement(sql);
 
@@ -202,7 +200,6 @@ public class TVITaggingView_Month extends TVITaggingView_Item {
 
          Set<Long> allTagIDs = null;
          Set<Long> allEquipmentIDs = null;
-
 
          final ResultSet result = statement.executeQuery();
          while (result.next()) {

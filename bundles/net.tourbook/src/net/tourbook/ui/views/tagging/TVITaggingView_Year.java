@@ -266,9 +266,7 @@ public class TVITaggingView_Year extends TVITaggingView_Item {
 
                + "ORDER BY TourStartTime" + NL //                                                        //$NON-NLS-1$
 
-               + NL
-               + "--;" + NL //                                                                           //$NON-NLS-1$
-         ;
+               + NL;
 
          final PreparedStatement statement = conn.prepareStatement(sql);
 

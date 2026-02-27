@@ -785,9 +785,7 @@ public class EquipmentManager {
 
             + "GROUP BY jTdEq.Equipment_EquipmentID" + NL //                                       //$NON-NLS-1$
 
-            + NL
-            + "--;" + NL //                                                                        //$NON-NLS-1$
-      ;
+            + NL;
 
       final Map<Long, String> allAccumulatedValues = new HashMap<>();
 

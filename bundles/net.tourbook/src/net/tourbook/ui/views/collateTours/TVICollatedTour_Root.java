@@ -116,9 +116,7 @@ public class TVICollatedTour_Root extends TVICollatedTour {
 
             + "ORDER BY tourStartTime" + NL //                                //$NON-NLS-1$
 
-            + NL
-            + "--;" + NL //                                                   //$NON-NLS-1$
-      ;
+            + NL;
 
       try (Connection conn = TourDatabase.getInstance().getConnection()) {
 
@@ -238,9 +236,7 @@ public class TVICollatedTour_Root extends TVICollatedTour {
 
             + sqlFilter.getWhereClause()
 
-            + NL
-            + "--;" + NL //                                                //$NON-NLS-1$
-      ;
+            + NL;
 
       try (Connection conn = TourDatabase.getInstance().getConnection()) {
 
