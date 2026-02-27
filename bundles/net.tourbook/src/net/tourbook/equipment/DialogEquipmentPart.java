@@ -818,7 +818,7 @@ public class DialogEquipmentPart extends TitleAreaDialog {
       fileDialog.setText(Messages.Dialog_EquipmentPart_FileDialog_Text);
       fileDialog.setFilterPath(lastSelectedPath);
 
-      final String imageExtensions = ImageUtils.getImageExtensions();
+      final String[] imageExtensions = { ImageUtils.getImageExtensions() };
 
       fileDialog.setFilterNames(imageExtensions);
       fileDialog.setFilterExtensions(imageExtensions);

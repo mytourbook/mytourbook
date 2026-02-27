@@ -305,7 +305,7 @@ public class Dialog_TourTag extends TitleAreaDialog {
       fileDialog.setText(Messages.Dialog_TourTag_ImportImage_Title);
       fileDialog.setFilterPath(_prefStore.getString(IMAGE_LAST_SELECTED_PATH));
       fileDialog.setFilterNames(new String[] { Messages.Dialog_TourTag_FileDialog_ImageFiles });
-      fileDialog.setFilterExtensions(ImageUtils.getImageExtensions());
+      fileDialog.setFilterExtensions(new String[] { ImageUtils.getImageExtensions() });
 
       // open file dialog
       final String imageFilePath = fileDialog.open();
