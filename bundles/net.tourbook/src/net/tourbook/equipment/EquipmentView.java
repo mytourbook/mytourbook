@@ -2767,22 +2767,8 @@ public class EquipmentView extends ViewPart implements
          }
       }
 
-      // edit tour actions
-      TourActionManager.fillContextMenu(menuMgr, TourActionCategory.EDIT, _allTourActions_Edit, this);
-
-      // tour type actions
-      _tourTypeMenuManager.fillContextMenu_WithActiveActions(menuMgr, this);
-
-      // add/remove ... tags in the tours
-      _tagMenuManager.fillTagMenu_WithActiveActions(menuMgr, this);
-
-      // equipment actions
-      _equipmentMenuManager.fillEquipmentMenu_WithActiveActions(menuMgr, this);
-
-      // export actions
-      TourActionManager.fillContextMenu(menuMgr, TourActionCategory.EXPORT, _allTourActions_Export, this);
-
       // customize equipment actions
+      menuMgr.add(new Separator());
       menuMgr.add(_actionNewEquipment);
       menuMgr.add(_actionNewPart);
       menuMgr.add(_actionNewService);
@@ -2807,6 +2793,21 @@ public class EquipmentView extends ViewPart implements
       menuMgr.add(_actionToggleCollatedTours);
       menuMgr.add(_actionSetTourStructure);
       menuMgr.add(_actionSetTourStructure_All);
+
+      // edit tour actions
+      TourActionManager.fillContextMenu(menuMgr, TourActionCategory.EDIT, _allTourActions_Edit, this);
+
+      // tour type actions
+      _tourTypeMenuManager.fillContextMenu_WithActiveActions(menuMgr, this);
+
+      // add/remove ... tags in the tours
+      _tagMenuManager.fillTagMenu_WithActiveActions(menuMgr, this);
+
+      // equipment actions
+      _equipmentMenuManager.fillEquipmentMenu_WithActiveActions(menuMgr, this);
+
+      // export actions
+      TourActionManager.fillContextMenu(menuMgr, TourActionCategory.EXPORT, _allTourActions_Export, this);
 
       // expand/collapse actions
       menuMgr.add(new Separator());

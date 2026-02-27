@@ -809,7 +809,7 @@ public abstract class TreeColumnFactory {
 
             final TreeColumnDefinition colDef = new TreeColumnDefinition(columnManager, EQUIPMENT_DATE_ID, SWT.LEAD);
 
-            colDef.setColumnCategory(           Messages.ColumnFactory_Category_Time);
+            colDef.setColumnCategory(           Messages.ColumnFactory_Category_Equipment);
 
             colDef.setColumnLabel(              Messages.ColumnFactory_Equipment_Date);
             colDef.setColumnHeaderText(         Messages.ColumnFactory_Equipment_Date);
@@ -833,7 +833,7 @@ public abstract class TreeColumnFactory {
 
             final TreeColumnDefinition colDef = new TreeColumnDefinition(columnManager, EQUIPMENT_DATE_BUILT_ID, SWT.LEAD);
 
-            colDef.setColumnCategory(           Messages.ColumnFactory_Category_Time);
+            colDef.setColumnCategory(           Messages.ColumnFactory_Category_Equipment);
 
             colDef.setColumnLabel(              Messages.ColumnFactory_Equipment_Date_Built);
             colDef.setColumnHeaderText(         Messages.ColumnFactory_Equipment_Date_Built);
@@ -852,7 +852,7 @@ public abstract class TreeColumnFactory {
 
             final TreeColumnDefinition colDef = new TreeColumnDefinition(columnManager, EQUIPMENT_DATE_RETIRED_ID, SWT.LEAD);
 
-            colDef.setColumnCategory(           Messages.ColumnFactory_Category_Time);
+            colDef.setColumnCategory(           Messages.ColumnFactory_Category_Equipment);
 
             colDef.setColumnLabel(              Messages.ColumnFactory_Equipment_Date_Retired);
             colDef.setColumnHeaderText(         Messages.ColumnFactory_Equipment_Date_Retired);
@@ -871,7 +871,7 @@ public abstract class TreeColumnFactory {
 
             final TreeColumnDefinition colDef = new TreeColumnDefinition(columnManager, EQUIPMENT_DATE_UNTIL_ID, SWT.LEAD);
 
-            colDef.setColumnCategory(           Messages.ColumnFactory_Category_Time);
+            colDef.setColumnCategory(           Messages.ColumnFactory_Category_Equipment);
 
             colDef.setColumnLabel(              Messages.ColumnFactory_Equipment_Date_Until);
             colDef.setColumnHeaderText(         Messages.ColumnFactory_Equipment_Date_Until);
@@ -895,7 +895,7 @@ public abstract class TreeColumnFactory {
 
             final TreeColumnDefinition colDef = new TreeColumnDefinition(columnManager, EQUIPMENT_DATE_USAGE_DURATION_ID, SWT.LEAD);
 
-            colDef.setColumnCategory(           Messages.ColumnFactory_Category_Time);
+            colDef.setColumnCategory(           Messages.ColumnFactory_Category_Equipment);
 
             colDef.setColumnLabel(              Messages.ColumnFactory_Equipment_Date_Duration);
             colDef.setColumnHeaderText(         Messages.ColumnFactory_Equipment_Date_Duration);
