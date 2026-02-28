@@ -136,7 +136,7 @@ public class TVIEquipmentView_Equipment extends TVIEquipmentView_Item {
             }
          }
 
-      } else if (viewerType == EquipmentViewerType.IS_EQUIPMENT_VIEWER && _equipment.isCollate()) {
+      } else if (viewerType == EquipmentViewerType.IS_EQUIPMENT_VIEWER) {
 
          if (is0UnfetchedChildren) {
 
@@ -179,7 +179,7 @@ public class TVIEquipmentView_Equipment extends TVIEquipmentView_Item {
 
          partItem.firstColumn          = part.getName();
 
-         partItem.type                 = part.getType();
+         partItem.type                 = part.getPartType();
          partItem.dateFrom             = part.getDateFrom_Local();
 
          partItem.price                = part.getPrice();

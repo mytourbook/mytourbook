@@ -119,6 +119,8 @@ public class DialogEquipmentPart extends TitleAreaDialog {
 
    private Button                    _chkCollate;
    private Button                    _chkSyncDates;
+   private Button                    _rdoCollateWith_Previous;
+   private Button                    _rdoCollateWith_Next;
 
    private Combo                     _comboBrand;
    private Combo                     _comboModel;
@@ -133,6 +135,7 @@ public class DialogEquipmentPart extends TitleAreaDialog {
    private Label                     _canvasEquipmentImage;
 
    private Label                     _lblCollate;
+   private Label                     _lblCollateWith;
    private Label                     _lblImage;
    private Label                     _lblImageFilePath;
 
@@ -508,6 +511,36 @@ public class DialogEquipmentPart extends TitleAreaDialog {
          }
          {
             /*
+             * Collate with
+             */
+            final String collateWithTooltip =
+                  "All parts of the same \"Type\" can be collated only\neither with the next or the previous part,\nthere can be no mix and match";
+
+            _lblCollateWith = UI.createLabel(_container, "With");
+            _lblCollateWith.setToolTipText(collateWithTooltip);
+            GridDataFactory.fillDefaults()
+                  .indent(8, 0)
+                  .applyTo(_lblCollateWith);
+
+            final Composite collateContainer = new Composite(_container, SWT.NONE);
+            GridDataFactory.fillDefaults().grab(true, false).span(6, 1).applyTo(collateContainer);
+            GridLayoutFactory.fillDefaults().numColumns(2).applyTo(collateContainer);
+//            collateContainer.setBackground(UI.SYS_COLOR_CYAN);
+            {
+
+               _rdoCollateWith_Previous = new Button(collateContainer, SWT.RADIO);
+               _rdoCollateWith_Previous.setText("Pre&vious part");
+               _rdoCollateWith_Previous.setToolTipText(collateWithTooltip);
+               _rdoCollateWith_Previous.addSelectionListener(_defaultSelectionListener);
+
+               _rdoCollateWith_Next = new Button(collateContainer, SWT.RADIO);
+               _rdoCollateWith_Next.setText("Ne&xt Part");
+               _rdoCollateWith_Next.setToolTipText(collateWithTooltip);
+               _rdoCollateWith_Next.addSelectionListener(_defaultSelectionListener);
+            }
+         }
+         {
+            /*
              * Website
              */
             final Label label = UI.createLabel(_container, Messages.Dialog_Equipment_Label_Website);
@@ -619,23 +652,31 @@ public class DialogEquipmentPart extends TitleAreaDialog {
          return;
       }
 
-      final boolean isCollate = _chkCollate.getSelection();
-      final boolean isSyncDates = _chkSyncDates.getSelection();
-      final boolean canEditBuiltDate = isSyncDates == false;
+// SET_FORMATTING_OFF
 
-      _dateBuilt.setEnabled(canEditBuiltDate);
-      _btnDeleteImage.setEnabled(StringUtils.hasContent(_imageFilePath));
+      final boolean isCollate          = _chkCollate.getSelection();
+      final boolean isSyncDates        = _chkSyncDates.getSelection();
+      final boolean canEditBuiltDate   = isSyncDates == false;
+
+      _dateBuilt                 .setEnabled(canEditBuiltDate);
+      _btnDeleteImage            .setEnabled(StringUtils.hasContent(_imageFilePath));
+
+      _lblCollateWith            .setEnabled(isCollate);
+      _rdoCollateWith_Next       .setEnabled(isCollate);
+      _rdoCollateWith_Previous   .setEnabled(isCollate);
 
       if (isCollate) {
 
-         _comboDecorator_DateFrom.show();
-         _comboDecorator_Type.show();
+         _comboDecorator_DateFrom   .show();
+         _comboDecorator_Type       .show();
 
       } else {
 
-         _comboDecorator_DateFrom.hide();
-         _comboDecorator_Type.hide();
+         _comboDecorator_DateFrom   .hide();
+         _comboDecorator_Type       .hide();
       }
+
+// SET_FORMATTING_ON
 
       // OK button
       final boolean isValid = _isNewPart && _isModified == false
@@ -644,6 +685,7 @@ public class DialogEquipmentPart extends TitleAreaDialog {
             ? false
 
             : isDataValid();
+
       getButton(IDialogConstants.OK_ID).setEnabled(isValid);
    }
 
@@ -917,14 +959,17 @@ public class DialogEquipmentPart extends TitleAreaDialog {
 
       _part.setBrand(            _comboBrand.getText().trim());
       _part.setModel(            _comboModel.getText().trim());
-      _part.setType(             _comboType.getText().trim());
+      _part.setPartType(         _comboType.getText().trim());
       _part.setDescription(      _txtDescription.getText().trim());
       _part.setUrlAddress(       _txtUrlAddress.getText().trim());
-
       _part.setImageFilePath(    _lblImageFilePath.getText().trim());
 
-      _part.setDistanceFirstUse( _spinDistance.getSelection());
       _part.setIsCollate(        _chkCollate.getSelection());
+      _part.setCollateWith(      _rdoCollateWith_Next.getSelection()
+                                       ? EquipmentPart.COLLATED_WITH_NEXT
+                                       : EquipmentPart.COLLATED_WITH_PREVIOUS);
+
+      _part.setDistanceFirstUse( _spinDistance.getSelection());
       _part.setPrice(            _spinPrice.getSelection() / 100f);
       _part.setPriceUnit(        _comboPriceUnit.getText());
       _part.setSize(             _comboSize.getText().trim());
@@ -1016,23 +1061,28 @@ public class DialogEquipmentPart extends TitleAreaDialog {
          dateRetired = LocalDateTime.of(2099,1,1,0,0);
       }
 
-      _chkCollate       .setSelection(_part.isCollate());
+      final int collateWith      = _part.getCollateWith();
 
-      _comboBrand       .setText(_part.getBrand());
-      _comboModel       .setText(_part.getModel());
-      _comboSize        .setText(_part.getSize());
-      _comboType        .setText(_part.getType());
+      _chkCollate                .setSelection(_part.isCollate());
 
-      _dateFrom         .setDate(dateFrom.getYear(),     dateFrom.getMonthValue() - 1,    dateFrom.getDayOfMonth());
-      _dateBuilt        .setDate(dateBuilt.getYear(),    dateBuilt.getMonthValue() - 1,   dateBuilt.getDayOfMonth());
-      _dateRetired      .setDate(dateRetired.getYear(),  dateRetired.getMonthValue() - 1, dateRetired.getDayOfMonth());
+      _comboBrand                .setText(_part.getBrand());
+      _comboModel                .setText(_part.getModel());
+      _comboSize                 .setText(_part.getSize());
+      _comboType                 .setText(_part.getPartType());
 
-      _spinDistance     .setSelection((int) (_part.getDistanceFirstUse()));
-      _spinPrice        .setSelection((int) (_part.getPrice()  * 100));
-      _spinWeight       .setSelection((int) (_part.getWeight() * 1000));
+      _dateFrom                  .setDate(dateFrom.getYear(),     dateFrom.getMonthValue() - 1,    dateFrom.getDayOfMonth());
+      _dateBuilt                 .setDate(dateBuilt.getYear(),    dateBuilt.getMonthValue() - 1,   dateBuilt.getDayOfMonth());
+      _dateRetired               .setDate(dateRetired.getYear(),  dateRetired.getMonthValue() - 1, dateRetired.getDayOfMonth());
 
-      _txtDescription   .setText(_part.getDescription());
-      _txtUrlAddress    .setText(_part.getUrlAddress());
+      _rdoCollateWith_Next       .setSelection(collateWith == EquipmentPart.COLLATED_WITH_NEXT);
+      _rdoCollateWith_Previous   .setSelection(collateWith == EquipmentPart.COLLATED_WITH_PREVIOUS);
+
+      _spinDistance              .setSelection((int) (_part.getDistanceFirstUse()));
+      _spinPrice                 .setSelection((int) (_part.getPrice()  * 100));
+      _spinWeight                .setSelection((int) (_part.getWeight() * 1000));
+
+      _txtDescription            .setText(_part.getDescription());
+      _txtUrlAddress             .setText(_part.getUrlAddress());
 
 // SET_FORMATTING_ON
 

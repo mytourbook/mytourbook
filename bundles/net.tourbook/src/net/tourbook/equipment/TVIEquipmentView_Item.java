@@ -120,7 +120,7 @@ public abstract class TVIEquipmentView_Item extends TreeViewerItem {
    private TreeViewer          _equipmentViewer;
 
    /**
-    * Type where the viewer items are used
+    * Location where the viewer items are displayed
     */
    private EquipmentViewerType _viewerType;
 

@@ -38,18 +38,21 @@ import net.tourbook.equipment.EquipmentManager;
 @Entity
 public class EquipmentPart implements Cloneable, Comparable<Object>, Serializable {
 
-   private static final char          NL                = UI.NEW_LINE;
+   private static final char          NL                     = UI.NEW_LINE;
 
-   private static final long          serialVersionUID  = 1L;
+   private static final long          serialVersionUID       = 1L;
 
-   private static final AtomicInteger _createCounter    = new AtomicInteger();
+   private static final AtomicInteger _createCounter         = new AtomicInteger();
 
-   public static final int            ITEM_TYPE_PART    = 0;
-   public static final int            ITEM_TYPE_SERVICE = 1;
+   public static final short          ITEM_TYPE_PART         = 0;
+   public static final short          ITEM_TYPE_SERVICE      = 1;
+
+   public static final short          COLLATED_WITH_PREVIOUS = 0;
+   public static final short          COLLATED_WITH_NEXT     = 1;
 
    @Id
    @GeneratedValue(strategy = GenerationType.IDENTITY)
-   private long                       partId            = TourDatabase.ENTITY_IS_NOT_SAVED;
+   private long                       partId                 = TourDatabase.ENTITY_IS_NOT_SAVED;
 
    /**
     * How this part is used and displayed, it can be e.g.
@@ -57,7 +60,17 @@ public class EquipmentPart implements Cloneable, Comparable<Object>, Serializabl
     * {@link #ITEM_TYPE_PART}<br>
     * {@link #ITEM_TYPE_SERVICE}
     */
-   private int                        itemType;
+   private short                      itemType;
+
+   /**
+    * Defines how this part/service is collating tours, to the previous or next part/service of the
+    * same
+    * {@link #type} and {@link #dateFrom}
+    * <p>
+    * {@link #COLLATED_WITH_PREVIOUS}<br>
+    * {@link #COLLATED_WITH_NEXT}
+    */
+   private short                      collateWith;
 
    /**
     * Brand/name for the equipment, e.g. Continental
@@ -107,7 +120,7 @@ public class EquipmentPart implements Cloneable, Comparable<Object>, Serializabl
    /**
     * When <code>true</code> then this part is included in collated parts
     */
-   private boolean                    isCollate         = true;
+   private boolean                    isCollate              = true;
 
    /**
     * When the part was firstly used, in milliseconds since 1970-01-01T00:00:00Z
@@ -159,14 +172,14 @@ public class EquipmentPart implements Cloneable, Comparable<Object>, Serializabl
     * <li>1 ... EXPAND_TYPE_YEAR_TOUR</li>
     * <li>2 ... EXPAND_TYPE_YEAR_MONTH_TOUR</li>
     */
-   private int                        expandType        = EquipmentManager.EXPAND_TYPE_FLAT;
+   private short                      expandType             = EquipmentManager.EXPAND_TYPE_FLAT;
 
    /** One equipment can have multiple parts */
    @ManyToOne(optional = false)
    private Equipment                  equipment;
 
    @Transient
-   private long                       _createId         = 0;
+   private long                       _createId              = 0;
 
    @Transient
    private LocalDateTime              _dateFrom;
@@ -195,7 +208,7 @@ public class EquipmentPart implements Cloneable, Comparable<Object>, Serializabl
     *           {@link #ITEM_TYPE_PART}<br>
     *           {@link #ITEM_TYPE_SERVICE}
     */
-   public EquipmentPart(final int itemType) {
+   public EquipmentPart(final short itemType) {
 
       this.itemType = itemType;
    }
@@ -274,6 +287,13 @@ public class EquipmentPart implements Cloneable, Comparable<Object>, Serializabl
       }
 
       return brand;
+   }
+
+   /**
+    * @return Returns {@link #collateWith}
+    */
+   public short getCollateWith() {
+      return collateWith;
    }
 
    public String getCompany() {
@@ -471,7 +491,7 @@ public class EquipmentPart implements Cloneable, Comparable<Object>, Serializabl
       return size;
    }
 
-   public String getType() {
+   public String getPartType() {
 
       if (type == null) {
          return UI.EMPTY_STRING;
@@ -506,8 +526,9 @@ public class EquipmentPart implements Cloneable, Comparable<Object>, Serializabl
    public boolean isCollatedFieldsModified(final EquipmentPart otherPart) {
 
       if (isCollate != otherPart.isCollate()
+            || collateWith != otherPart.getCollateWith()
             || dateFrom != otherPart.getDateFrom()
-            || type.equalsIgnoreCase(otherPart.getType()) == false) {
+            || type.equalsIgnoreCase(otherPart.getPartType()) == false) {
 
          // collated fields are modified
 
@@ -583,6 +604,15 @@ public class EquipmentPart implements Cloneable, Comparable<Object>, Serializabl
       _partName = null;
    }
 
+   /**
+    * Set {@link #collateWith}
+    *
+    * @param collateWith
+    */
+   public void setCollateWith(final short collateWith) {
+      this.collateWith = collateWith;
+   }
+
    public void setCompany(final String company) {
       this.company = company;
    }
@@ -628,7 +658,7 @@ public class EquipmentPart implements Cloneable, Comparable<Object>, Serializabl
       equipment = partEquipment;
    }
 
-   public void setExpandType(final int expandType) {
+   public void setExpandType(final short expandType) {
       this.expandType = expandType;
    }
 
@@ -663,7 +693,7 @@ public class EquipmentPart implements Cloneable, Comparable<Object>, Serializabl
       this.size = size;
    }
 
-   public void setType(final String type) {
+   public void setPartType(final String type) {
       this.type = type;
    }
 
@@ -716,7 +746,8 @@ public class EquipmentPart implements Cloneable, Comparable<Object>, Serializabl
       setName              (otherPart.getName());
 
       setIsCollate         (otherPart.isCollate());
-      setType              (otherPart.getType());
+      setCollateWith       (otherPart.getCollateWith());
+      setPartType          (otherPart.getPartType());
 
       setDistanceFirstUse  (otherPart.getDistanceFirstUse());
       setPrice             (otherPart.getPrice());

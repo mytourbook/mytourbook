@@ -666,8 +666,8 @@ public class EquipmentView extends ViewPart implements
 
             // 1st compare by type
 // disabled: this may be an option in the future
-//          int compareDiff = part1.getType().compareTo(part2.getType());
-            int compareDiff = 0;
+            int compareDiff = part1.getPartType().compareTo(part2.getPartType());
+//            int compareDiff = 0;
 
             // 2nd compare by date
             if (compareDiff == 0) {
@@ -1586,9 +1586,25 @@ public class EquipmentView extends ViewPart implements
 
             final Object element = cell.getElement();
 
-            if (element instanceof final TVIEquipmentView_Equipment tviEquipment) {
+            if (element instanceof final TVIEquipmentView_Equipment equipmentItem) {
 
-               cell.setText(tviEquipment.getEquipment().getBrand());
+               cell.setText(equipmentItem.getEquipment().getBrand());
+               setCellColor(cell, element);
+
+            } else if (element instanceof final TVIEquipmentView_Part partItem) {
+
+               final EquipmentPart part = partItem.getPart();
+               final int itemType = part.getItemType();
+
+               if (itemType == EquipmentPart.ITEM_TYPE_PART) {
+
+                  cell.setText(part.getBrand());
+
+               } else {
+
+                  cell.setText(part.getCompany());
+               }
+
                setCellColor(cell, element);
             }
          }
@@ -2008,9 +2024,14 @@ public class EquipmentView extends ViewPart implements
 
             final Object element = cell.getElement();
 
-            if (element instanceof final TVIEquipmentView_Equipment tviEquipment) {
+            if (element instanceof final TVIEquipmentView_Equipment equipmentItem) {
 
-               cell.setText(tviEquipment.getEquipment().getModel());
+               cell.setText(equipmentItem.getEquipment().getModel());
+               setCellColor(cell, element);
+
+            } else if (element instanceof final TVIEquipmentView_Part partItem) {
+
+               cell.setText(partItem.getPart().getModel());
                setCellColor(cell, element);
             }
          }
@@ -2382,7 +2403,17 @@ public class EquipmentView extends ViewPart implements
 
       final TreeColumnDefinition colDef_Tree = TreeColumnFactory.TOUR_EQUIPMENT.createColumn(_columnManager, _pc);
 
-      colDef_Tree.setLabelProvider(new SelectionCellLabelProvider() {
+      colDef_Tree.setLabelProvider(new TourInfoToolTipCellLabelProvider() {
+
+         @Override
+         public Long getTourId(final ViewerCell cell) {
+
+            if (_isShowToolTipInEquipment == false) {
+               return null;
+            }
+
+            return getCellTourId(cell);
+         }
 
          @Override
          public void update(final ViewerCell cell) {
@@ -3152,8 +3183,8 @@ public class EquipmentView extends ViewPart implements
             return;
          }
 
-         final String typeOld = selectedPart.getType();
-         final String typeNew = partFromDialog.getType();
+         final String typeOld = selectedPart.getPartType();
+         final String typeNew = partFromDialog.getPartType();
 
          final Set<String> allModifiedTypes = new HashSet<>(Arrays.asList(typeOld, typeNew));
 
@@ -3254,8 +3285,8 @@ public class EquipmentView extends ViewPart implements
 
          final boolean areCollatedFieldsModified = selectedPart.isCollatedFieldsModified(partFromDialog);
 
-         final String typeOld = selectedPart.getType();
-         final String typeNew = partFromDialog.getType();
+         final String typeOld = selectedPart.getPartType();
+         final String typeNew = partFromDialog.getPartType();
 
          final Set<String> allModifiedTypes = new HashSet<>(Arrays.asList(typeOld, typeNew));
 
@@ -3342,7 +3373,7 @@ public class EquipmentView extends ViewPart implements
 
       equipment.getParts().add(savedService);
 
-      final Set<String> allTypes = new HashSet<>(Arrays.asList(serviceFromDialog.getType()));
+      final Set<String> allTypes = new HashSet<>(Arrays.asList(serviceFromDialog.getPartType()));
 
       EquipmentManager.updateUntilDate_Parts(equipment, allTypes);
 
@@ -4217,7 +4248,7 @@ public class EquipmentView extends ViewPart implements
 
       equipment.getParts().add(savedPart);
 
-      final HashSet<String> allTypes = new HashSet<>(Arrays.asList(part.getType()));
+      final HashSet<String> allTypes = new HashSet<>(Arrays.asList(part.getPartType()));
 
       EquipmentManager.updateUntilDate_Parts(equipment, allTypes);
 

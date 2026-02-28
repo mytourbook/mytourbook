@@ -338,7 +338,7 @@ public class SlideoutTourEquipmentFilter extends AdvancedSlideout implements ITr
             final EquipmentPart part2 = item2.getPart();
 
             // 1st compare by type
-            int compareDiff = part1.getType().compareTo(part2.getType());
+            int compareDiff = part1.getPartType().compareTo(part2.getPartType());
 
             // 2nd compare by date
             if (compareDiff == 0) {

@@ -45,10 +45,10 @@ public class ActionSetTourStructure_All extends Action implements IMenuCreator {
 
    private class ActionSetPartStructure extends Action {
 
-      private int    __expandType;
+      private short  __expandType;
       private String __expandName;
 
-      private ActionSetPartStructure(final int expandType, final String expandName) {
+      private ActionSetPartStructure(final short expandType, final String expandName) {
 
          super(expandName, AS_CHECK_BOX);
 
@@ -198,7 +198,7 @@ public class ActionSetTourStructure_All extends Action implements IMenuCreator {
              * Create all expand types
              */
             int typeIndex = 0;
-            for (final int expandType : EquipmentManager.EXPAND_TYPES) {
+            for (final short expandType : EquipmentManager.EXPAND_TYPES) {
 
                final ActionSetPartStructure actionTagStructure = new ActionSetPartStructure(
                      expandType,

@@ -4648,7 +4648,8 @@ public class TourDatabase {
 
                   + "   " + KEY_EQUIPMENT + "   BIGINT,                                   " + NL //$NON-NLS-1$ //$NON-NLS-2$
 
-                  + "   ItemType                INTEGER,                                  " + NL //$NON-NLS-1$
+                  + "   ItemType                SMALLINT DEFAULT 0,                       " + NL //$NON-NLS-1$
+                  + "   ExpandType              SMALLINT DEFAULT 0,                       " + NL //$NON-NLS-1$
 
                   + "   Brand                   VARCHAR(" + DB_LENGTH_NAME + "),          " + NL //$NON-NLS-1$ //$NON-NLS-2$
                   + "   Model                   VARCHAR(" + DB_LENGTH_NAME + "),          " + NL //$NON-NLS-1$ //$NON-NLS-2$
@@ -4668,7 +4669,7 @@ public class TourDatabase {
                   + "   Weight                  FLOAT DEFAULT 0,                          " + NL //$NON-NLS-1$
 
                   + "   IsCollate               BOOLEAN DEFAULT TRUE,                     " + NL //$NON-NLS-1$
-                  + "   ExpandType              INTEGER,                                  " + NL //$NON-NLS-1$
+                  + "   CollateWith            	SMALLINT DEFAULT 0,                       " + NL //$NON-NLS-1$
 
                   + "   DateFrom                BIGINT DEFAULT 0,                         " + NL //$NON-NLS-1$
                   + "   DateBuilt               BIGINT DEFAULT 0,                         " + NL //$NON-NLS-1$

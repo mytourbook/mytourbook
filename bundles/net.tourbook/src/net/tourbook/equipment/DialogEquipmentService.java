@@ -117,6 +117,9 @@ public class DialogEquipmentService extends TitleAreaDialog {
 
    private Button                    _chkCollate;
 
+   private Button                    _rdoCollateWith_Next;
+   private Button                    _rdoCollateWith_Previous;
+
    private Combo                     _comboCompany;
    private Combo                     _comboName;
    private Combo                     _comboPriceUnit;
@@ -126,6 +129,7 @@ public class DialogEquipmentService extends TitleAreaDialog {
 
    private Label                     _canvasEquipmentImage;
 
+   private Label                     _lblCollateWith;
    private Label                     _lblImage;
    private Label                     _lblImageFilePath;
 
@@ -404,6 +408,36 @@ public class DialogEquipmentService extends TitleAreaDialog {
          }
          {
             /*
+             * Collate with
+             */
+            final String collateWithTooltip =
+                  "All services of the same \"Type\" can be collated only\neither with the next or the previous service,\nthere can be no mix and match";
+
+            _lblCollateWith = UI.createLabel(_container, "With");
+            _lblCollateWith.setToolTipText(collateWithTooltip);
+            GridDataFactory.fillDefaults()
+                  .indent(8, 0)
+                  .applyTo(_lblCollateWith);
+
+            final Composite collateContainer = new Composite(_container, SWT.NONE);
+            GridDataFactory.fillDefaults().grab(true, false).span(2, 1).applyTo(collateContainer);
+            GridLayoutFactory.fillDefaults().numColumns(2).applyTo(collateContainer);
+//            collateContainer.setBackground(UI.SYS_COLOR_CYAN);
+            {
+
+               _rdoCollateWith_Previous = new Button(collateContainer, SWT.RADIO);
+               _rdoCollateWith_Previous.setText("Pre&vious service");
+               _rdoCollateWith_Previous.setToolTipText(collateWithTooltip);
+               _rdoCollateWith_Previous.addSelectionListener(_defaultSelectionListener);
+
+               _rdoCollateWith_Next = new Button(collateContainer, SWT.RADIO);
+               _rdoCollateWith_Next.setText("Ne&xt service");
+               _rdoCollateWith_Next.setToolTipText(collateWithTooltip);
+               _rdoCollateWith_Next.addSelectionListener(_defaultSelectionListener);
+            }
+         }
+         {
+            /*
              * Website
              */
             final Label label = UI.createLabel(_container, Messages.Dialog_Equipment_Label_Website);
@@ -492,20 +526,28 @@ public class DialogEquipmentService extends TitleAreaDialog {
          return;
       }
 
-      _btnDeleteImage.setEnabled(StringUtils.hasContent(_imageFilePath));
-
       final boolean isCollate = _chkCollate.getSelection();
+
+// SET_FORMATTING_OFF
+
+      _btnDeleteImage            .setEnabled(StringUtils.hasContent(_imageFilePath));
+
+      _lblCollateWith            .setEnabled(isCollate);
+      _rdoCollateWith_Next       .setEnabled(isCollate);
+      _rdoCollateWith_Previous   .setEnabled(isCollate);
 
       if (isCollate) {
 
-         _comboDecorator_DateFrom.show();
-         _comboDecorator_Type.show();
+         _comboDecorator_DateFrom   .show();
+         _comboDecorator_Type       .show();
 
       } else {
 
-         _comboDecorator_DateFrom.hide();
-         _comboDecorator_Type.hide();
+         _comboDecorator_DateFrom   .hide();
+         _comboDecorator_Type       .hide();
       }
+
+// SET_FORMATTING_ON
 
       // OK button
       final boolean isValid = _isNewService && _isModified == false
@@ -760,13 +802,17 @@ public class DialogEquipmentService extends TitleAreaDialog {
 
       _service.setCompany(          _comboCompany.getText().trim());
       _service.setName(             _comboName.getText().trim());
-      _service.setType(             _comboType.getText().trim());
+      _service.setPartType(         _comboType.getText().trim());
       _service.setDescription(      _txtDescription.getText().trim());
       _service.setUrlAddress(       _txtUrlAddress.getText().trim());
 
       _service.setImageFilePath(    _lblImageFilePath.getText().trim());
 
       _service.setIsCollate(        _chkCollate.getSelection());
+      _service.setCollateWith(      _rdoCollateWith_Next.getSelection()
+                                          ? EquipmentPart.COLLATED_WITH_NEXT
+                                          : EquipmentPart.COLLATED_WITH_PREVIOUS);
+
       _service.setPrice(            _spinPrice.getSelection() / 100f);
       _service.setPriceUnit(        _comboPriceUnit.getText());
 
@@ -839,17 +885,23 @@ public class DialogEquipmentService extends TitleAreaDialog {
 
 // SET_FORMATTING_OFF
 
-      _comboCompany     .setText(_service.getCompany());
-      _comboName        .setText(_service.getName());
-      _comboType        .setText(_service.getType());
+      final int collateWith      = _service.getCollateWith();
 
-      _dateFrom         .setDate(dateFrom.getYear(), dateFrom.getMonthValue() - 1, dateFrom.getDayOfMonth());
+      _chkCollate                .setSelection(_service.isCollate());
 
-      _chkCollate       .setSelection(_service.isCollate());
-      _spinPrice        .setSelection((int) (_service.getPrice()  * 100));
+      _comboCompany              .setText(_service.getCompany());
+      _comboName                 .setText(_service.getName());
+      _comboType                 .setText(_service.getPartType());
 
-      _txtDescription   .setText(_service.getDescription());
-      _txtUrlAddress    .setText(_service.getUrlAddress());
+      _dateFrom                  .setDate(dateFrom.getYear(), dateFrom.getMonthValue() - 1, dateFrom.getDayOfMonth());
+
+      _rdoCollateWith_Next       .setSelection(collateWith == EquipmentPart.COLLATED_WITH_NEXT);
+      _rdoCollateWith_Previous   .setSelection(collateWith == EquipmentPart.COLLATED_WITH_PREVIOUS);
+
+      _spinPrice                 .setSelection((int) (_service.getPrice()  * 100));
+
+      _txtDescription            .setText(_service.getDescription());
+      _txtUrlAddress             .setText(_service.getUrlAddress());
 
 // SET_FORMATTING_ON
 

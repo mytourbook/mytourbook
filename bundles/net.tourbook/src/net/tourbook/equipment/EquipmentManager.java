@@ -89,9 +89,9 @@ public class EquipmentManager {
 
    private static final Object               DB_LOCK                     = new Object();
 
-   public static final int                   EXPAND_TYPE_FLAT            = 0;
-   public static final int                   EXPAND_TYPE_YEAR_TOUR       = 1;
-   public static final int                   EXPAND_TYPE_YEAR_MONTH_TOUR = 2;
+   public static final short                 EXPAND_TYPE_FLAT            = 0;
+   public static final short                 EXPAND_TYPE_YEAR_TOUR       = 1;
+   public static final short                 EXPAND_TYPE_YEAR_MONTH_TOUR = 2;
 
    static final String[]                     EXPAND_TYPE_NAMES           = {
 
@@ -110,7 +110,7 @@ public class EquipmentManager {
          Messages.Equipment_ExpandType_ByYearMonth
    };
 
-   static final int[]                        EXPAND_TYPES                = {
+   static final short[]                      EXPAND_TYPES                = {
 
          EXPAND_TYPE_FLAT,
          EXPAND_TYPE_YEAR_TOUR,
@@ -623,7 +623,7 @@ public class EquipmentManager {
 
             if (equipment_DeleteParts_SQL(part)) {
 
-               final Set<String> allTypes = new HashSet<>(Arrays.asList(part.getType()));
+               final Set<String> allTypes = new HashSet<>(Arrays.asList(part.getPartType()));
 
                updateUntilDate_Parts(part.getEquipment(), allTypes);
 
@@ -1783,7 +1783,7 @@ public class EquipmentManager {
       for (final EquipmentPart part : allParts) {
 
          if (part.isCollate()
-               && modifiedType.equalsIgnoreCase(part.getType())) {
+               && modifiedType.equalsIgnoreCase(part.getPartType())) {
 
             allFilteredParts.add(part);
          }
