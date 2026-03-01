@@ -1822,6 +1822,11 @@ public class EquipmentManager {
       final List<EquipmentPart> allModifiedParts = new ArrayList<>();
 
       EquipmentPart part = allSortedParts.get(0);
+      final Equipment equipment = part.getEquipment();
+
+      final int oneDayMS = TimeTools.DAY_MILLISECONDS - 1;
+
+      final long equipmentDateUsed = equipment.getDateUsed();
 
       final boolean isCollateNext = collateBetween == EquipmentPart.COLLATED_WITH_NEXT;
       final boolean isCollatePrev = !isCollateNext;
@@ -1830,13 +1835,34 @@ public class EquipmentManager {
 
          // this is the first and only part
 
-         final long currentDateUntil = part.getDateCollateUntil();
-         final long newDateUntil = TimeTools.MAX_TIME_IN_EPOCH_MILLI;
+         final long partDateUsed = part.getDateUsed();
+         final long partDateFrom = part.getDateCollateFrom();
+         final long partDateUntil = part.getDateCollateUntil();
 
-         if (currentDateUntil != newDateUntil) {
+         long newDateFrom;
+         long newDateUntil;
+
+         if (isCollatePrev) {
+
+            // collate from this part to the previous part, in this case to the equipment date
+
+            newDateFrom = equipmentDateUsed;
+            newDateUntil = partDateUsed + oneDayMS;
+
+         } else {
+
+            // collate from this part to the next part, in this case to the max date
+
+            newDateFrom = partDateUsed;
+            newDateUntil = TimeTools.MAX_TIME_IN_EPOCH_MILLI;
+         }
+
+         if (partDateFrom != newDateFrom
+               || partDateUntil != newDateUntil) {
 
             // modify date
 
+            part.setDateCollateFrom(newDateFrom);
             part.setDateCollateUntil(newDateUntil);
 
             allModifiedParts.add(part);
@@ -1844,46 +1870,81 @@ public class EquipmentManager {
 
       } else {
 
-         // these are all other parts with more than 1 part
+         // these are all other parts with more than 1 parts
+
+         long prevPartDateUsed = 0;
 
          for (int partIndex = 0; partIndex < numParts; partIndex++) {
 
             part = allSortedParts.get(partIndex);
 
-            final long currentDateUntil = part.getDateCollateUntil();
+            final long partDateUsed = part.getDateUsed();
+            final long partDateFrom = part.getDateCollateFrom();
+            final long partDateUntil = part.getDateCollateUntil();
 
-            long newDateUntil = currentDateUntil;
+            long newDateFrom;
+            long newDateUntil;
 
-            if (partIndex == numParts - 1) {
+            if (isCollatePrev) {
 
-               // this is the last part
+               /*
+                * Collate from this part to the previous part
+                */
 
-               newDateUntil = TimeTools.MAX_TIME_IN_EPOCH_MILLI;
+               if (partIndex == 0) {
+
+                  // this is the first part -> collate to the equipments used date
+
+                  newDateFrom = equipmentDateUsed;
+
+               } else {
+
+                  // these are all parts without the first part -> collate with the previous part
+
+                  newDateFrom = prevPartDateUsed + TimeTools.DAY_MILLISECONDS;
+               }
+
+               newDateUntil = partDateUsed + oneDayMS;
+
+               prevPartDateUsed = partDateUsed;
 
             } else {
 
-               // these are all parts without the last part
+               /*
+                * Collate from this part to the next part
+                */
 
-               final EquipmentPart nextPart = allSortedParts.get(partIndex + 1);
+               if (partIndex == numParts - 1) {
 
-               final long nextDate = nextPart.getDateUsed();
+                  // this is the last part
 
-               // this is the until date for the current part
-               final long validDateUntil = nextDate - 1;
+                  newDateUntil = TimeTools.MAX_TIME_IN_EPOCH_MILLI;
 
-               if (currentDateUntil != validDateUntil) {
+               } else {
 
-                  newDateUntil = validDateUntil;
+                  // these are all parts without the last part
+
+                  final EquipmentPart nextPart = allSortedParts.get(partIndex + 1);
+                  final long nextPartDateUsed = nextPart.getDateUsed();
+
+                  // this is the until date for the current part
+                  final long nextPartDateUntil = nextPartDateUsed - 1;
+
+                  newDateUntil = nextPartDateUntil;
                }
+
+               newDateFrom = partDateUsed;
             }
 
-            if (currentDateUntil != newDateUntil
+            if (partDateFrom != newDateFrom
+                  || partDateUntil != newDateUntil
 
                   // check if collated between is modified
                   || collateBetween != part.getCollateBetween()) {
 
-               // until date is not correct -> modify date
+               // modify date
 
+               part.setDateCollateFrom(newDateFrom);
                part.setDateCollateUntil(newDateUntil);
 
                // there can be only ONE "collated between" within the part collection of an equipment
