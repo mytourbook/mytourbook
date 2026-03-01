@@ -38,21 +38,24 @@ import net.tourbook.equipment.EquipmentManager;
 @Entity
 public class EquipmentPart implements Cloneable, Comparable<Object>, Serializable {
 
-   private static final char          NL                     = UI.NEW_LINE;
+   private static final char          NL                              = UI.NEW_LINE;
 
-   private static final long          serialVersionUID       = 1L;
+   private static final long          serialVersionUID                = 1L;
 
-   private static final AtomicInteger _createCounter         = new AtomicInteger();
+   private static final AtomicInteger _createCounter                  = new AtomicInteger();
 
-   public static final short          ITEM_TYPE_PART         = 0;
-   public static final short          ITEM_TYPE_SERVICE      = 1;
+   public static final short          ITEM_TYPE_PART                  = 0;
+   public static final short          ITEM_TYPE_SERVICE               = 1;
 
-   public static final short          COLLATED_WITH_PREVIOUS = 0;
-   public static final short          COLLATED_WITH_NEXT     = 1;
+   public static final short          COLLATED_WITH_PREVIOUS          = 0;
+   public static final short          COLLATED_WITH_NEXT              = 1;
+
+   private static final String        COLLATE_BETWEEN_SYMBOL_NEXT     = "▼";                              //$NON-NLS-1$
+   private static final String        COLLATE_BETWEEN_SYMBOL_PREVIOUS = "▲";                              //$NON-NLS-1$
 
    @Id
    @GeneratedValue(strategy = GenerationType.IDENTITY)
-   private long                       partId                 = TourDatabase.ENTITY_IS_NOT_SAVED;
+   private long                       partId                          = TourDatabase.ENTITY_IS_NOT_SAVED;
 
    /**
     * How this part is used and displayed, it can be e.g.
@@ -65,12 +68,12 @@ public class EquipmentPart implements Cloneable, Comparable<Object>, Serializabl
    /**
     * Defines how this part/service is collating tours, to the previous or next part/service of the
     * same
-    * {@link #type} and {@link #dateFrom}
+    * {@link #type} and {@link #dateCollateFrom}
     * <p>
     * {@link #COLLATED_WITH_PREVIOUS}<br>
     * {@link #COLLATED_WITH_NEXT}
     */
-   private short                      collateWith;
+   private short                      collateBetween;
 
    /**
     * Brand/name for the equipment, e.g. Continental
@@ -120,12 +123,12 @@ public class EquipmentPart implements Cloneable, Comparable<Object>, Serializabl
    /**
     * When <code>true</code> then this part is included in collated parts
     */
-   private boolean                    isCollate              = true;
+   private boolean                    isCollate                       = true;
 
    /**
     * When the part was firstly used, in milliseconds since 1970-01-01T00:00:00Z
     */
-   private long                       dateFrom;
+   private long                       dateUsed;
 
    /**
     * When the part was created/build, in milliseconds since 1970-01-01T00:00:00Z
@@ -138,11 +141,18 @@ public class EquipmentPart implements Cloneable, Comparable<Object>, Serializabl
    private long                       dateRetired;
 
    /**
+    * When the part was firstly used, in milliseconds since 1970-01-01T00:00:00Z
+    * <p>
+    * This value is computed from the previous part/equipment.
+    */
+   private long                       dateCollateFrom;
+
+   /**
     * When the part usage was finished, in milliseconds since 1970-01-01T00:00:00Z.
     * <p>
     * This value is computed from the previous part.
     */
-   private long                       dateUntil;
+   private long                       dateCollateUntil;
 
    /**
     * Weight of the equipment, in kg
@@ -172,17 +182,17 @@ public class EquipmentPart implements Cloneable, Comparable<Object>, Serializabl
     * <li>1 ... EXPAND_TYPE_YEAR_TOUR</li>
     * <li>2 ... EXPAND_TYPE_YEAR_MONTH_TOUR</li>
     */
-   private short                      expandType             = EquipmentManager.EXPAND_TYPE_FLAT;
+   private short                      expandType                      = EquipmentManager.EXPAND_TYPE_FLAT;
 
    /** One equipment can have multiple parts */
    @ManyToOne(optional = false)
    private Equipment                  equipment;
 
    @Transient
-   private long                       _createId              = 0;
+   private long                       _createId                       = 0;
 
    @Transient
-   private LocalDateTime              _dateFrom;
+   private LocalDateTime              _dateUsed;
 
    @Transient
    private LocalDateTime              _dateBuilt;
@@ -191,7 +201,10 @@ public class EquipmentPart implements Cloneable, Comparable<Object>, Serializabl
    private LocalDateTime              _dateRetired;
 
    @Transient
-   private LocalDateTime              _dateUntil;
+   private LocalDateTime              _dateCollateFrom;
+
+   @Transient
+   private LocalDateTime              _dateCollateUntil;
 
    @Transient
    private String                     _partName;
@@ -290,10 +303,25 @@ public class EquipmentPart implements Cloneable, Comparable<Object>, Serializabl
    }
 
    /**
-    * @return Returns {@link #collateWith}
+    * @return Returns {@link #collateBetween}
     */
-   public short getCollateWith() {
-      return collateWith;
+   public short getCollateBetween() {
+      return collateBetween;
+   }
+
+   /**
+    * @return Returns {@link #collateBetween}
+    */
+   public String getCollateBetweenText() {
+
+      if (collateBetween == EquipmentPart.COLLATED_WITH_NEXT) {
+
+         return COLLATE_BETWEEN_SYMBOL_NEXT;
+
+      } else {
+
+         return COLLATE_BETWEEN_SYMBOL_PREVIOUS;
+      }
    }
 
    public String getCompany() {
@@ -319,21 +347,31 @@ public class EquipmentPart implements Cloneable, Comparable<Object>, Serializabl
       return _dateBuilt;
    }
 
-   public long getDateFrom() {
+   public long getDateCollateFrom() {
 
-      return dateFrom;
+      return dateCollateFrom;
    }
 
-   /**
-    * @return Return the first use date
-    */
-   public LocalDateTime getDateFrom_Local() {
+   public LocalDateTime getDateCollateFrom_Local() {
 
-      if (_dateFrom == null) {
-         _dateFrom = TimeTools.toLocalDateTime(dateFrom);
+      if (_dateCollateFrom == null) {
+         _dateCollateFrom = TimeTools.toLocalDateTime(dateCollateFrom);
       }
 
-      return _dateFrom;
+      return _dateCollateFrom;
+   }
+
+   public long getDateCollateUntil() {
+      return dateCollateUntil;
+   }
+
+   public LocalDateTime getDateCollateUntil_Local() {
+
+      if (_dateCollateUntil == null) {
+         _dateCollateUntil = TimeTools.toLocalDateTime(dateCollateUntil);
+      }
+
+      return _dateCollateUntil;
    }
 
    public long getDateRetired() {
@@ -350,17 +388,20 @@ public class EquipmentPart implements Cloneable, Comparable<Object>, Serializabl
       return _dateRetired;
    }
 
-   public long getDateUntil() {
-      return dateUntil;
+   public long getDateUsed() {
+      return dateUsed;
    }
 
-   public LocalDateTime getDateUntil_Local() {
+   /**
+    * @return Return the first use date
+    */
+   public LocalDateTime getDateUsed_Local() {
 
-      if (_dateUntil == null) {
-         _dateUntil = TimeTools.toLocalDateTime(dateUntil);
+      if (_dateUsed == null) {
+         _dateUsed = TimeTools.toLocalDateTime(dateUsed);
       }
 
-      return _dateUntil;
+      return _dateUsed;
    }
 
    public String getDescription() {
@@ -378,7 +419,7 @@ public class EquipmentPart implements Cloneable, Comparable<Object>, Serializabl
 
    public long getDuration() {
 
-      final long duration = dateUntil - dateFrom;
+      final long duration = dateCollateUntil - dateCollateFrom;
 
       return duration;
    }
@@ -474,6 +515,15 @@ public class EquipmentPart implements Cloneable, Comparable<Object>, Serializabl
       return partId;
    }
 
+   public String getPartType() {
+
+      if (type == null) {
+         return UI.EMPTY_STRING;
+      }
+
+      return type;
+   }
+
    public float getPrice() {
       return price;
    }
@@ -489,15 +539,6 @@ public class EquipmentPart implements Cloneable, Comparable<Object>, Serializabl
       }
 
       return size;
-   }
-
-   public String getPartType() {
-
-      if (type == null) {
-         return UI.EMPTY_STRING;
-      }
-
-      return type;
    }
 
    public String getUrlAddress() {
@@ -526,8 +567,8 @@ public class EquipmentPart implements Cloneable, Comparable<Object>, Serializabl
    public boolean isCollatedFieldsModified(final EquipmentPart otherPart) {
 
       if (isCollate != otherPart.isCollate()
-            || collateWith != otherPart.getCollateWith()
-            || dateFrom != otherPart.getDateFrom()
+            || collateBetween != otherPart.getCollateBetween()
+            || dateUsed != otherPart.getDateUsed()
             || type.equalsIgnoreCase(otherPart.getPartType()) == false) {
 
          // collated fields are modified
@@ -605,12 +646,12 @@ public class EquipmentPart implements Cloneable, Comparable<Object>, Serializabl
    }
 
    /**
-    * Set {@link #collateWith}
+    * Set {@link #collateBetween}
     *
-    * @param collateWith
+    * @param collateBetween
     */
-   public void setCollateWith(final short collateWith) {
-      this.collateWith = collateWith;
+   public void setCollateBetween(final short collateBetween) {
+      this.collateBetween = collateBetween;
    }
 
    public void setCompany(final String company) {
@@ -624,11 +665,18 @@ public class EquipmentPart implements Cloneable, Comparable<Object>, Serializabl
       _dateBuilt = null;
    }
 
-   public void setDateFrom(final long dateFrom) {
+   public void setDateCollateFrom(final long dateCollateFrom) {
 
-      this.dateFrom = dateFrom;
+      this.dateCollateFrom = dateCollateFrom;
 
-      _dateFrom = null;
+      _dateCollateFrom = null;
+   }
+
+   public void setDateCollateUntil(final long dateCollateUntil) {
+
+      this.dateCollateUntil = dateCollateUntil;
+
+      _dateCollateUntil = null;
    }
 
    public void setDateRetired(final long dateRetired) {
@@ -638,11 +686,11 @@ public class EquipmentPart implements Cloneable, Comparable<Object>, Serializabl
       _dateRetired = null;
    }
 
-   public void setDateUntil(final long dateUntil) {
+   public void setDateUsed(final long dateUsed) {
 
-      this.dateUntil = dateUntil;
+      this.dateUsed = dateUsed;
 
-      _dateUntil = null;
+      _dateUsed = null;
    }
 
    public void setDescription(final String description) {
@@ -681,6 +729,10 @@ public class EquipmentPart implements Cloneable, Comparable<Object>, Serializabl
       this.name = name;
    }
 
+   public void setPartType(final String type) {
+      this.type = type;
+   }
+
    public void setPrice(final float price) {
       this.price = price;
    }
@@ -691,10 +743,6 @@ public class EquipmentPart implements Cloneable, Comparable<Object>, Serializabl
 
    public void setSize(final String size) {
       this.size = size;
-   }
-
-   public void setPartType(final String type) {
-      this.type = type;
    }
 
    public void setUrlAddress(final String urlAddress) {
@@ -717,8 +765,11 @@ public class EquipmentPart implements Cloneable, Comparable<Object>, Serializabl
             + "  brand            = " + brand + NL //                         //$NON-NLS-1$
             + "  model            = " + model + NL //                         //$NON-NLS-1$
             + "  type				 = " + type + NL //                          //$NON-NLS-1$
-            + "  dateFrom         = " + getDateFrom_Local() + NL //               //$NON-NLS-1$
-            + "  dateUntil        = " + getDateUntil_Local() + NL //          //$NON-NLS-1$
+            + "  dateUsed         = " + getDateUsed_Local() + NL //           //$NON-NLS-1$
+            + "  dateCollateFrom  = " + getDateCollateFrom_Local() + NL //    //$NON-NLS-1$
+            + "  dateCollateUntil = " + getDateCollateUntil_Local() + NL //   //$NON-NLS-1$
+
+            + "  collateBetween   = " + getCollateBetweenText() + NL //       //$NON-NLS-1$
 
 //            + " description      =" + description + NL //                   //$NON-NLS-1$
 //            + " equipmentType    =" + equipmentType + NL //                 //$NON-NLS-1$
@@ -746,7 +797,7 @@ public class EquipmentPart implements Cloneable, Comparable<Object>, Serializabl
       setName              (otherPart.getName());
 
       setIsCollate         (otherPart.isCollate());
-      setCollateWith       (otherPart.getCollateWith());
+      setCollateBetween    (otherPart.getCollateBetween());
       setPartType          (otherPart.getPartType());
 
       setDistanceFirstUse  (otherPart.getDistanceFirstUse());
@@ -755,7 +806,7 @@ public class EquipmentPart implements Cloneable, Comparable<Object>, Serializabl
       setSize              (otherPart.getSize());
       setWeight            (otherPart.getWeight());
 
-      setDateFrom          (otherPart.getDateFrom());
+      setDateUsed          (otherPart.getDateUsed());
       setDateBuilt         (otherPart.getDateBuilt());
       setDateRetired       (otherPart.getDateRetired());
 
@@ -763,13 +814,14 @@ public class EquipmentPart implements Cloneable, Comparable<Object>, Serializabl
    }
 
    /**
-    * Reset {@link #dateUntil} when part is not collated, this makes it easier to see it in the view
+    * Reset {@link #dateCollateUntil} when part is not collated, this makes it easier to see it in
+    * the view
     */
    public void updateUntilDate() {
 
       if (isCollate == false) {
 
-         setDateUntil(0);
+         setDateCollateUntil(0);
       }
    }
 }

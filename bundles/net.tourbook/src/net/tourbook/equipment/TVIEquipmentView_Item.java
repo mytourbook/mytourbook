@@ -154,14 +154,14 @@ public abstract class TVIEquipmentView_Item extends TreeViewerItem {
    float                       colAvgTemperature_Device;
 
    /**
-    * {@link #type} and {@link #dateFrom} are the key parts to collated (summarize) tour values
+    * {@link #type} and {@link #dateUsed} are the key parts to collated (summarize) tour values
     */
    String                      type;
 
    /**
-    * {@link #type} and {@link #dateFrom} are the key parts to collated (summarize) tour values
+    * {@link #type} and {@link #dateUsed} are the key parts to collated (summarize) tour values
     */
-   LocalDateTime               dateFrom;
+   LocalDateTime               dateUsed;
 
    /*
     * These are common values for equipment, part and service
@@ -362,8 +362,8 @@ public abstract class TVIEquipmentView_Item extends TreeViewerItem {
                // the alias "TourData" is needed that the app filter is working
                + "JOIN " + TourDatabase.TABLE_TOUR_DATA + " AS TourData" //                        //$NON-NLS-1$ //$NON-NLS-2$
                + "  ON TourData.tourid = j_Td_Eq.tourdata_tourid" + NL //                          //$NON-NLS-1$
-               + "  AND TourData.tourstarttime >= equip.dateFrom" + NL //                          //$NON-NLS-1$
-               + "  AND TourData.tourstarttime <  equip.dateUntil" + NL //                         //$NON-NLS-1$
+               + "  AND TourData.tourstarttime >= equip.dateCollateFrom" + NL //                   //$NON-NLS-1$
+               + "  AND TourData.tourstarttime <  equip.dateCollateUntil" + NL //                  //$NON-NLS-1$
 
                + appFilter.getWhereClause()
 
@@ -462,8 +462,8 @@ public abstract class TVIEquipmentView_Item extends TreeViewerItem {
 
                + "   JOIN " + TourDatabase.TABLE_TOUR_DATA + " AS TourData" //                     //$NON-NLS-1$ //$NON-NLS-2$
                + "      ON TourData.tourid = j_Td_Eq.tourdata_tourid" + NL //                      //$NON-NLS-1$
-               + "      AND TourData.tourstarttime >= part.dateFrom" + NL //                       //$NON-NLS-1$
-               + "      AND TourData.tourstarttime <  part.dateUntil" + NL //                      //$NON-NLS-1$
+               + "      AND TourData.tourstarttime >= part.dateCollateFrom" + NL //                //$NON-NLS-1$
+               + "      AND TourData.tourstarttime <  part.dateCollateUntil" + NL //               //$NON-NLS-1$
 
                + appFilter.getWhereClause()
                + partFilter.getSqlString()

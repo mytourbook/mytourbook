@@ -195,8 +195,8 @@ public class TVIEquipmentView_Equipment_Year extends TVIEquipmentView_Item {
 
                + "JOIN " + TourDatabase.TABLE_TOUR_DATA + " AS TourData" + NL //                //$NON-NLS-1$ //$NON-NLS-2$
                + "   ON TourData.tourid = j_td_eq.tourdata_tourid" + NL //                      //$NON-NLS-1$
-               + "   AND TourData.tourstarttime >= equipment.dateFrom" + NL //                  //$NON-NLS-1$
-               + "   AND TourData.tourstarttime <  equipment.dateUntil" + NL //                 //$NON-NLS-1$
+               + "   AND TourData.tourstarttime >= equipment.dateCollateFrom" + NL //           //$NON-NLS-1$
+               + "   AND TourData.tourstarttime <  equipment.dateCollateUntil" + NL //          //$NON-NLS-1$
                + "   AND TourData.StartYear = ?" + NL //                                        //$NON-NLS-1$
 
                + appFilter.getWhereClause()
@@ -289,8 +289,8 @@ public class TVIEquipmentView_Equipment_Year extends TVIEquipmentView_Item {
 
                + "JOIN " + TourDatabase.TABLE_TOUR_DATA + " AS TourData" + NL //                   //$NON-NLS-1$ //$NON-NLS-2$
                + "   ON TourData.tourID = j_td_eq.tourdata_tourID" + NL //                         //$NON-NLS-1$
-               + "   AND TourData.tourstarttime >= equipment.dateFrom" + NL //                     //$NON-NLS-1$
-               + "   AND TourData.tourstarttime <  equipment.dateUntil" + NL //                    //$NON-NLS-1$
+               + "   AND TourData.tourstarttime >= equipment.dateCollateFrom" + NL //              //$NON-NLS-1$
+               + "   AND TourData.tourstarttime <  equipment.dateCollateUntil" + NL //             //$NON-NLS-1$
                + "   AND TourData.StartYear = ?" + NL //                                           //$NON-NLS-1$
 
                + appFilter.getWhereClause()

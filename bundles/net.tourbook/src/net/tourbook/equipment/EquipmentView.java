@@ -622,8 +622,8 @@ public class EquipmentView extends ViewPart implements
                // 2nd compare by date
                if (compareDiff == 0) {
 
-                  final long date1 = equipment1.getDateFrom();
-                  final long date2 = equipment2.getDateFrom();
+                  final long date1 = equipment1.getDateUsed();
+                  final long date2 = equipment2.getDateUsed();
 
                   final long dateDiff = date1 - date2;
 
@@ -672,8 +672,8 @@ public class EquipmentView extends ViewPart implements
             // 2nd compare by date
             if (compareDiff == 0) {
 
-               final long date1 = part1.getDateFrom();
-               final long date2 = part2.getDateFrom();
+               final long date1 = part1.getDateUsed();
+               final long date2 = part2.getDateUsed();
 
                final long dateDiff = date1 - date2;
 
@@ -1237,6 +1237,7 @@ public class EquipmentView extends ViewPart implements
       defineColumn_Equipment_Model();
       defineColumn_Equipment_Type();
       defineColumn_Equipment_Collate();
+      defineColumn_Equipment_CollateBetween();
 
       defineColumn_Tour_Title();
 
@@ -1247,8 +1248,9 @@ public class EquipmentView extends ViewPart implements
       defineColumn_Equipment_Image();
       defineColumn_Equipment_ImageFilePath();
 
-      defineColumn_Equipment_Date();
-      defineColumn_Equipment_Date_Until();
+      defineColumn_Equipment_Date_Used();
+      defineColumn_Equipment_Date_Collate_From();
+      defineColumn_Equipment_Date_Collate_Until();
       defineColumn_Equipment_Date_UsageDuration();
       defineColumn_Equipment_Date_Built();
       defineColumn_Equipment_Date_Retired();
@@ -1648,11 +1650,11 @@ public class EquipmentView extends ViewPart implements
    }
 
    /**
-    * Column: First use date
+    * Column: Collate between
     */
-   private void defineColumn_Equipment_Date() {
+   private void defineColumn_Equipment_CollateBetween() {
 
-      final ColumnDefinition colDef = TreeColumnFactory.EQUIPMENT_DATE.createColumn(_columnManager, _pc);
+      final ColumnDefinition colDef = TreeColumnFactory.EQUIPMENT_COLLATE_BETWEEN.createColumn(_columnManager, _pc);
 
       colDef.setIsDefaultColumn();
 
@@ -1662,30 +1664,10 @@ public class EquipmentView extends ViewPart implements
          public void update(final ViewerCell cell) {
 
             final Object element = cell.getElement();
-            LocalDateTime date = null;
 
-            if (element instanceof final TVIEquipmentView_Equipment viewItem) {
+            if (element instanceof final TVIEquipmentView_Part partItem) {
 
-               date = viewItem.getEquipment().getDateFrom_Local();
-
-            } else if (element instanceof final TVIEquipmentView_Part viewItem) {
-
-               date = viewItem.getPart().getDateFrom_Local();
-            }
-
-            if (date != null) {
-
-               final ValueFormat valueFormatter = colDef.getValueFormat_Detail();
-
-               String dateFormatted;
-
-               if (valueFormatter.equals(ValueFormat.DATE_TIME)) {
-                  dateFormatted = date.format(TimeTools.Formatter_Date_S);
-               } else {
-                  dateFormatted = date.format(TimeTools.Formatter_DateTime_SM);
-               }
-
-               cell.setText(dateFormatted);
+               cell.setText(partItem.getPart().getCollateBetweenText());
                setCellColor(cell, element);
             }
          }
@@ -1726,6 +1708,112 @@ public class EquipmentView extends ViewPart implements
    }
 
    /**
+    * Column: Collate date: From
+    */
+   private void defineColumn_Equipment_Date_Collate_From() {
+
+      final ColumnDefinition colDef = TreeColumnFactory.EQUIPMENT_DATE_COLLATE_FROM.createColumn(_columnManager, _pc);
+
+      colDef.setIsDefaultColumn();
+
+      colDef.setLabelProvider(new CellLabelProvider() {
+
+         @Override
+         public void update(final ViewerCell cell) {
+
+            final Object element = cell.getElement();
+
+            boolean isCollate = false;
+            LocalDateTime date = null;
+
+            if (element instanceof final TVIEquipmentView_Equipment equipmentItem) {
+
+               final Equipment equipment = equipmentItem.getEquipment();
+
+               isCollate = equipment.isCollate();
+               date = equipment.getDateCollateFrom_Local();
+
+            } else if (element instanceof final TVIEquipmentView_Part partItem) {
+
+               final EquipmentPart part = partItem.getPart();
+
+               isCollate = part.isCollate();
+               date = part.getDateCollateFrom_Local();
+            }
+
+            if (isCollate && date != null) {
+
+               final ValueFormat valueFormatter = colDef.getValueFormat_Detail();
+
+               String dateFormatted;
+
+               if (valueFormatter.equals(ValueFormat.DATE_TIME)) {
+                  dateFormatted = date.format(TimeTools.Formatter_Date_S);
+               } else {
+                  dateFormatted = date.format(TimeTools.Formatter_DateTime_SM);
+               }
+
+               cell.setText(dateFormatted);
+               setCellColor(cell, element);
+            }
+         }
+      });
+   }
+
+   /**
+    * Column: Collate date: Until
+    */
+   private void defineColumn_Equipment_Date_Collate_Until() {
+
+      final ColumnDefinition colDef = TreeColumnFactory.EQUIPMENT_DATE_COLLATE_UNTIL.createColumn(_columnManager, _pc);
+
+      colDef.setIsDefaultColumn();
+
+      colDef.setLabelProvider(new CellLabelProvider() {
+
+         @Override
+         public void update(final ViewerCell cell) {
+
+            final Object element = cell.getElement();
+
+            boolean isCollate = false;
+            LocalDateTime date = null;
+
+            if (element instanceof final TVIEquipmentView_Equipment equipmentItem) {
+
+               final Equipment equipment = equipmentItem.getEquipment();
+
+               isCollate = equipment.isCollate();
+               date = equipment.getDateCollateUntil_Local();
+
+            } else if (element instanceof final TVIEquipmentView_Part partItem) {
+
+               final EquipmentPart part = partItem.getPart();
+
+               isCollate = part.isCollate();
+               date = part.getDateCollateUntil_Local();
+            }
+
+            if (isCollate && date != null) {
+
+               final ValueFormat valueFormatter = colDef.getValueFormat_Detail();
+
+               String dateFormatted;
+
+               if (valueFormatter.equals(ValueFormat.DATE_TIME)) {
+                  dateFormatted = date.format(TimeTools.Formatter_Date_S);
+               } else {
+                  dateFormatted = date.format(TimeTools.Formatter_DateTime_SM);
+               }
+
+               cell.setText(dateFormatted);
+               setCellColor(cell, element);
+            }
+         }
+      });
+   }
+
+   /**
     * Column: Retired date
     */
    private void defineColumn_Equipment_Date_Retired() {
@@ -1752,59 +1840,6 @@ public class EquipmentView extends ViewPart implements
             if (date != null) {
 
                cell.setText(TimeTools.Formatter_Date_S.format(date));
-               setCellColor(cell, element);
-            }
-         }
-      });
-   }
-
-   /**
-    * Column: Until date
-    */
-   private void defineColumn_Equipment_Date_Until() {
-
-      final ColumnDefinition colDef = TreeColumnFactory.EQUIPMENT_DATE_UNTIL.createColumn(_columnManager, _pc);
-
-      colDef.setIsDefaultColumn();
-
-      colDef.setLabelProvider(new CellLabelProvider() {
-
-         @Override
-         public void update(final ViewerCell cell) {
-
-            final Object element = cell.getElement();
-
-            boolean isCollate = false;
-            LocalDateTime date = null;
-
-            if (element instanceof final TVIEquipmentView_Equipment equipmentItem) {
-
-               final Equipment equipment = equipmentItem.getEquipment();
-
-               isCollate = equipment.isCollate();
-               date = equipment.getDateUntil_Local();
-
-            } else if (element instanceof final TVIEquipmentView_Part partItem) {
-
-               final EquipmentPart part = partItem.getPart();
-
-               isCollate = part.isCollate();
-               date = part.getDateUntil_Local();
-            }
-
-            if (isCollate && date != null) {
-
-               final ValueFormat valueFormatter = colDef.getValueFormat_Detail();
-
-               String dateFormatted;
-
-               if (valueFormatter.equals(ValueFormat.DATE_TIME)) {
-                  dateFormatted = date.format(TimeTools.Formatter_Date_S);
-               } else {
-                  dateFormatted = date.format(TimeTools.Formatter_DateTime_SM);
-               }
-
-               cell.setText(dateFormatted);
                setCellColor(cell, element);
             }
          }
@@ -1843,6 +1878,51 @@ public class EquipmentView extends ViewPart implements
                   cell.setText(durationLast.formatted(formattedDuration));
                   setCellColor(cell, element);
                }
+            }
+         }
+      });
+   }
+
+   /**
+    * Column: First use date
+    */
+   private void defineColumn_Equipment_Date_Used() {
+
+      final ColumnDefinition colDef = TreeColumnFactory.EQUIPMENT_DATE_USED.createColumn(_columnManager, _pc);
+
+      colDef.setIsDefaultColumn();
+
+      colDef.setLabelProvider(new CellLabelProvider() {
+
+         @Override
+         public void update(final ViewerCell cell) {
+
+            final Object element = cell.getElement();
+            LocalDateTime date = null;
+
+            if (element instanceof final TVIEquipmentView_Equipment viewItem) {
+
+               date = viewItem.getEquipment().getDateUsed_Local();
+
+            } else if (element instanceof final TVIEquipmentView_Part viewItem) {
+
+               date = viewItem.getPart().getDateUsed_Local();
+            }
+
+            if (date != null) {
+
+               final ValueFormat valueFormatter = colDef.getValueFormat_Detail();
+
+               String dateFormatted;
+
+               if (valueFormatter.equals(ValueFormat.DATE_TIME)) {
+                  dateFormatted = date.format(TimeTools.Formatter_Date_S);
+               } else {
+                  dateFormatted = date.format(TimeTools.Formatter_DateTime_SM);
+               }
+
+               cell.setText(dateFormatted);
+               setCellColor(cell, element);
             }
          }
       });
@@ -3197,7 +3277,7 @@ public class EquipmentView extends ViewPart implements
 
          equipment.getParts().add(savedPart);
 
-         EquipmentManager.updateUntilDate_Parts(equipment, allModifiedTypes);
+         EquipmentManager.updateUntilDate_Parts(equipment, allModifiedTypes, savedPart.getCollateBetween());
 
          updateUI_ReloadViewer();
       }
@@ -3299,7 +3379,7 @@ public class EquipmentView extends ViewPart implements
 
             // date and/or type is modified -> update "until date"
 
-            EquipmentManager.updateUntilDate_Parts(equipment, allModifiedTypes);
+            EquipmentManager.updateUntilDate_Parts(equipment, allModifiedTypes, selectedPart.getCollateBetween());
          }
 
          updateUI_ReloadViewer();
@@ -3375,7 +3455,7 @@ public class EquipmentView extends ViewPart implements
 
       final Set<String> allTypes = new HashSet<>(Arrays.asList(serviceFromDialog.getPartType()));
 
-      EquipmentManager.updateUntilDate_Parts(equipment, allTypes);
+      EquipmentManager.updateUntilDate_Parts(equipment, allTypes, savedService.getCollateBetween());
 
       updateUI_ReloadViewer();
    }
@@ -4250,7 +4330,7 @@ public class EquipmentView extends ViewPart implements
 
       final HashSet<String> allTypes = new HashSet<>(Arrays.asList(part.getPartType()));
 
-      EquipmentManager.updateUntilDate_Parts(equipment, allTypes);
+      EquipmentManager.updateUntilDate_Parts(equipment, allTypes, savedPart.getCollateBetween());
 
       updateUI_ReloadViewer();
    }

@@ -125,7 +125,7 @@ public class DialogEquipmentService extends TitleAreaDialog {
    private Combo                     _comboPriceUnit;
    private Combo                     _comboType;
 
-   private DateTime                  _dateFrom;
+   private DateTime                  _dateUsed;
 
    private Label                     _canvasEquipmentImage;
 
@@ -163,6 +163,8 @@ public class DialogEquipmentService extends TitleAreaDialog {
 
          _service = new EquipmentPart(EquipmentPart.ITEM_TYPE_SERVICE);
 
+         _service.setCollateBetween(EquipmentPart.COLLATED_WITH_PREVIOUS);
+
       } else {
 
          _service = service.clone();
@@ -171,7 +173,7 @@ public class DialogEquipmentService extends TitleAreaDialog {
 
             // adjust date to today
 
-            _service.setDateFrom(TimeTools.nowInMilliseconds());
+            _service.setDateUsed(TimeTools.nowInMilliseconds());
          }
       }
 
@@ -214,7 +216,7 @@ public class DialogEquipmentService extends TitleAreaDialog {
       super.createButtonsForButtonBar(parent);
 
       // OK -> Create/Save
-      getButton(IDialogConstants.OK_ID).setText(_isNewService
+      getButton(IDialogConstants.OK_ID).setText(_isNewService || _isDuplicateService
             ? Messages.App_Action_Create
             : Messages.App_Action_Save);
    }
@@ -338,14 +340,14 @@ public class DialogEquipmentService extends TitleAreaDialog {
             final Label label = UI.createLabel(_container, Messages.Dialog_Equipment_Label_Date);
             gdVertCenter.applyTo(label);
 
-            _dateFrom = new DateTime(_container, SWT.DATE | SWT.MEDIUM | SWT.DROP_DOWN);
-            _dateFrom.setToolTipText(tooltip2);
-            _dateFrom.addSelectionListener(_defaultSelectionListener);
+            _dateUsed = new DateTime(_container, SWT.DATE | SWT.MEDIUM | SWT.DROP_DOWN);
+            _dateUsed.setToolTipText(tooltip2);
+            _dateUsed.addSelectionListener(_defaultSelectionListener);
 
             /*
              * Add a decoration for this important field
              */
-            _comboDecorator_DateFrom = new ControlDecoration(_dateFrom, SWT.CENTER | SWT.LEFT);
+            _comboDecorator_DateFrom = new ControlDecoration(_dateUsed, SWT.CENTER | SWT.LEFT);
             _comboDecorator_DateFrom.setDescriptionText(tooltip2);
             _comboDecorator_DateFrom.setImage(decorationImage);
             _comboDecorator_DateFrom.setMarginWidth(decoratorDistance);
@@ -410,20 +412,22 @@ public class DialogEquipmentService extends TitleAreaDialog {
             /*
              * Collate with
              */
+
+            UI.createSpacer_Horizontal(_container, 1);
+
             final String collateWithTooltip =
                   "All services of the same \"Type\" can be collated only\neither with the next or the previous service,\nthere can be no mix and match";
 
-            _lblCollateWith = UI.createLabel(_container, "With");
-            _lblCollateWith.setToolTipText(collateWithTooltip);
-            GridDataFactory.fillDefaults()
-                  .indent(8, 0)
-                  .applyTo(_lblCollateWith);
-
             final Composite collateContainer = new Composite(_container, SWT.NONE);
             GridDataFactory.fillDefaults().grab(true, false).span(2, 1).applyTo(collateContainer);
-            GridLayoutFactory.fillDefaults().numColumns(2).applyTo(collateContainer);
+            GridLayoutFactory.fillDefaults().numColumns(3).applyTo(collateContainer);
 //            collateContainer.setBackground(UI.SYS_COLOR_CYAN);
             {
+               _lblCollateWith = UI.createLabel(collateContainer, "Collate between this service and");
+               _lblCollateWith.setToolTipText(collateWithTooltip);
+               GridDataFactory.fillDefaults()
+                     .indent(12, 0)
+                     .applyTo(_lblCollateWith);
 
                _rdoCollateWith_Previous = new Button(collateContainer, SWT.RADIO);
                _rdoCollateWith_Previous.setText("Pre&vious service");
@@ -796,7 +800,7 @@ public class DialogEquipmentService extends TitleAreaDialog {
 
 // SET_FORMATTING_OFF
 
-      final LocalDate date     = LocalDate.of(_dateFrom.getYear(), _dateFrom.getMonth() + 1, _dateFrom.getDay());
+      final LocalDate dateUsed      = LocalDate.of(_dateUsed.getYear(), _dateUsed.getMonth() + 1, _dateUsed.getDay());
 
       _service.setEquipment(        _serviceEquipment);
 
@@ -809,14 +813,14 @@ public class DialogEquipmentService extends TitleAreaDialog {
       _service.setImageFilePath(    _lblImageFilePath.getText().trim());
 
       _service.setIsCollate(        _chkCollate.getSelection());
-      _service.setCollateWith(      _rdoCollateWith_Next.getSelection()
+      _service.setCollateBetween(   _rdoCollateWith_Next.getSelection()
                                           ? EquipmentPart.COLLATED_WITH_NEXT
                                           : EquipmentPart.COLLATED_WITH_PREVIOUS);
 
       _service.setPrice(            _spinPrice.getSelection() / 100f);
       _service.setPriceUnit(        _comboPriceUnit.getText());
 
-      _service.setDateFrom(         TimeTools.toEpochMilli(date));
+      _service.setDateUsed(         TimeTools.toEpochMilli(dateUsed));
 
 // SET_FORMATTING_ON
    }
@@ -875,17 +879,17 @@ public class DialogEquipmentService extends TitleAreaDialog {
 
       _isInUIUpdate = true;
 
-      LocalDateTime dateFrom = _service.getDateFrom_Local();
+      LocalDateTime dateUsed = _service.getDateUsed_Local();
 
-      final long dateMS = TimeTools.toEpochMilli(dateFrom);
+      final long dateUsedMS = TimeTools.toEpochMilli(dateUsed);
 
-      if (dateMS == 0) {
-         dateFrom = LocalDateTime.now();
+      if (dateUsedMS == 0) {
+         dateUsed = LocalDateTime.now();
       }
 
 // SET_FORMATTING_OFF
 
-      final int collateWith      = _service.getCollateWith();
+      final int collateWith      = _service.getCollateBetween();
 
       _chkCollate                .setSelection(_service.isCollate());
 
@@ -893,7 +897,7 @@ public class DialogEquipmentService extends TitleAreaDialog {
       _comboName                 .setText(_service.getName());
       _comboType                 .setText(_service.getPartType());
 
-      _dateFrom                  .setDate(dateFrom.getYear(), dateFrom.getMonthValue() - 1, dateFrom.getDayOfMonth());
+      _dateUsed                  .setDate(dateUsed.getYear(), dateUsed.getMonthValue() - 1, dateUsed.getDayOfMonth());
 
       _rdoCollateWith_Next       .setSelection(collateWith == EquipmentPart.COLLATED_WITH_NEXT);
       _rdoCollateWith_Previous   .setSelection(collateWith == EquipmentPart.COLLATED_WITH_PREVIOUS);

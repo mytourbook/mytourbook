@@ -625,7 +625,7 @@ public class EquipmentManager {
 
                final Set<String> allTypes = new HashSet<>(Arrays.asList(part.getPartType()));
 
-               updateUntilDate_Parts(part.getEquipment(), allTypes);
+               updateUntilDate_Parts(part.getEquipment(), allTypes, part.getCollateBetween());
 
                clearAllEquipmentResourcesAndFireModifyEvent();
 
@@ -1669,7 +1669,7 @@ public class EquipmentManager {
          final List<Equipment> allSortedEquipment = new ArrayList<>(allFilteredEquipment);
 
          Collections.sort(allSortedEquipment, (equipment1, equipment2) -> {
-            return Long.compare(equipment1.getDateFrom(), equipment2.getDateFrom());
+            return Long.compare(equipment1.getDateUsed(), equipment2.getDateUsed());
          });
 
          final List<Equipment> allModifiedEquipment = new ArrayList<>();
@@ -1680,14 +1680,19 @@ public class EquipmentManager {
 
             // this is the first and only equipment
 
-            final long currentDateUntil = equipment.getDateUntil();
+            final long currentDateFrom = equipment.getDateCollateFrom();
+            final long currentDateUntil = equipment.getDateCollateUntil();
+
+            final long newDateFrom = equipment.getDateUsed();
             final long newDateUntil = TimeTools.MAX_TIME_IN_EPOCH_MILLI;
 
-            if (currentDateUntil != newDateUntil) {
+            if (currentDateFrom != newDateFrom
+                  || currentDateUntil != newDateUntil) {
 
                // modify date
 
-               equipment.setDateUntil(newDateUntil);
+               equipment.setDateCollateFrom(newDateFrom);
+               equipment.setDateCollateUntil(newDateUntil);
 
                allModifiedEquipment.add(equipment);
             }
@@ -1700,7 +1705,8 @@ public class EquipmentManager {
 
                equipment = allSortedEquipment.get(equipmentIndex);
 
-               final long currentDateUntil = equipment.getDateUntil();
+               final long currentDateFrom = equipment.getDateCollateFrom();
+               final long currentDateUntil = equipment.getDateCollateUntil();
 
                long newDateUntil = currentDateUntil;
 
@@ -1716,7 +1722,7 @@ public class EquipmentManager {
 
                   final Equipment nextEquipment = allSortedEquipment.get(equipmentIndex + 1);
 
-                  final long nextDate = nextEquipment.getDateFrom();
+                  final long nextDate = nextEquipment.getDateUsed();
 
                   // this is the until date for the current equipment
                   final long validDateUntil = nextDate - 1;
@@ -1727,11 +1733,16 @@ public class EquipmentManager {
                   }
                }
 
-               if (currentDateUntil != newDateUntil) {
+               // collated tours are starting always with the equipment first used date
+               final long newDateFrom = equipment.getDateUsed();
 
-                  // until date is not correct -> modify date
+               if (currentDateFrom != newDateFrom
+                     || currentDateUntil != newDateUntil) {
 
-                  equipment.setDateUntil(newDateUntil);
+                  // from/until date is not correct -> modify date
+
+                  equipment.setDateCollateFrom(newDateFrom);
+                  equipment.setDateCollateUntil(newDateUntil);
 
                   allModifiedEquipment.add(equipment);
                }
@@ -1757,9 +1768,11 @@ public class EquipmentManager {
     *
     * @param equipment
     * @param allModifiedTypes
+    * @param collatedBetween
     */
    public static void updateUntilDate_Parts(final Equipment equipment,
-                                            final Set<String> allModifiedTypes) {
+                                            final Set<String> allModifiedTypes,
+                                            final short collatedBetween) {
 
       final Set<EquipmentPart> allParts = equipment.getParts();
       final int numParts = allParts.size();
@@ -1768,12 +1781,14 @@ public class EquipmentManager {
 
          for (final String type : allModifiedTypes) {
 
-            updateUntilDate_Parts_One(allParts, type);
+            updateUntilDate_Parts_OneType(allParts, type, collatedBetween);
          }
       }
    }
 
-   private static void updateUntilDate_Parts_One(final Set<EquipmentPart> allParts, final String modifiedType) {
+   private static void updateUntilDate_Parts_OneType(final Set<EquipmentPart> allParts,
+                                                     final String modifiedType,
+                                                     final short collateBetween) {
 
       /*
        * Filter parts: Get all parts with the same type and which are collated
@@ -1801,25 +1816,28 @@ public class EquipmentManager {
       final List<EquipmentPart> allSortedParts = new ArrayList<>(allFilteredParts);
 
       Collections.sort(allSortedParts, (part1, part2) -> {
-         return Long.compare(part1.getDateFrom(), part2.getDateFrom());
+         return Long.compare(part1.getDateUsed(), part2.getDateUsed());
       });
 
       final List<EquipmentPart> allModifiedParts = new ArrayList<>();
 
       EquipmentPart part = allSortedParts.get(0);
 
+      final boolean isCollateNext = collateBetween == EquipmentPart.COLLATED_WITH_NEXT;
+      final boolean isCollatePrev = !isCollateNext;
+
       if (numParts == 1) {
 
          // this is the first and only part
 
-         final long currentDateUntil = part.getDateUntil();
+         final long currentDateUntil = part.getDateCollateUntil();
          final long newDateUntil = TimeTools.MAX_TIME_IN_EPOCH_MILLI;
 
          if (currentDateUntil != newDateUntil) {
 
             // modify date
 
-            part.setDateUntil(newDateUntil);
+            part.setDateCollateUntil(newDateUntil);
 
             allModifiedParts.add(part);
          }
@@ -1832,7 +1850,7 @@ public class EquipmentManager {
 
             part = allSortedParts.get(partIndex);
 
-            final long currentDateUntil = part.getDateUntil();
+            final long currentDateUntil = part.getDateCollateUntil();
 
             long newDateUntil = currentDateUntil;
 
@@ -1848,7 +1866,7 @@ public class EquipmentManager {
 
                final EquipmentPart nextPart = allSortedParts.get(partIndex + 1);
 
-               final long nextDate = nextPart.getDateFrom();
+               final long nextDate = nextPart.getDateUsed();
 
                // this is the until date for the current part
                final long validDateUntil = nextDate - 1;
@@ -1859,11 +1877,17 @@ public class EquipmentManager {
                }
             }
 
-            if (currentDateUntil != newDateUntil) {
+            if (currentDateUntil != newDateUntil
+
+                  // check if collated between is modified
+                  || collateBetween != part.getCollateBetween()) {
 
                // until date is not correct -> modify date
 
-               part.setDateUntil(newDateUntil);
+               part.setDateCollateUntil(newDateUntil);
+
+               // there can be only ONE "collated between" within the part collection of an equipment
+               part.setCollateBetween(collateBetween);
 
                allModifiedParts.add(part);
             }

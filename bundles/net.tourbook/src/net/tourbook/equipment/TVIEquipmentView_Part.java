@@ -175,8 +175,8 @@ public class TVIEquipmentView_Part extends TVIEquipmentView_Item {
                // The alias "TourData" is needed that the tour filter is working
                + "JOIN " + TourDatabase.TABLE_TOUR_DATA + " AS TourData" + NL //                         //$NON-NLS-1$ //$NON-NLS-2$
                + "   ON TourData.tourID = j_td_eq.tourdata_tourID" + NL //                               //$NON-NLS-1$
-               + "   AND TourData.TourStartTime >= part.dateFrom" + NL //                                //$NON-NLS-1$
-               + "   AND TourData.TourStartTime <  part.dateUntil" + NL //                               //$NON-NLS-1$
+               + "   AND TourData.TourStartTime >= part.dateCollateFrom" + NL //                         //$NON-NLS-1$
+               + "   AND TourData.TourStartTime <  part.dateCollateUntil" + NL //                        //$NON-NLS-1$
 
                + partFilter.getSqlString()
 
@@ -359,8 +359,8 @@ public class TVIEquipmentView_Part extends TVIEquipmentView_Item {
 
                + "JOIN " + TourDatabase.TABLE_TOUR_DATA + " AS TourData" + NL //                //$NON-NLS-1$ //$NON-NLS-2$
                + "   ON TourData.tourid = j_td_eq.tourdata_tourid" + NL //                      //$NON-NLS-1$
-               + "   AND TourData.TourStartTime >= part.dateFrom" + NL //                       //$NON-NLS-1$
-               + "   AND TourData.TourStartTime <  part.dateUntil" + NL //                      //$NON-NLS-1$
+               + "   AND TourData.TourStartTime >= part.dateCollateFrom" + NL //                //$NON-NLS-1$
+               + "   AND TourData.TourStartTime <  part.dateCollateUntil" + NL //               //$NON-NLS-1$
 
                + appFilter.getWhereClause()
                + partFilter.getSqlString()

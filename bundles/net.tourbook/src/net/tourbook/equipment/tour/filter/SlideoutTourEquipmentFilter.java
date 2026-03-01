@@ -295,8 +295,8 @@ public class SlideoutTourEquipmentFilter extends AdvancedSlideout implements ITr
                // 2nd compare by date
                if (compareDiff == 0) {
 
-                  final long date1 = equipment1.getDateFrom();
-                  final long date2 = equipment2.getDateFrom();
+                  final long date1 = equipment1.getDateUsed();
+                  final long date2 = equipment2.getDateUsed();
 
                   final long dateDiff = date1 - date2;
 
@@ -343,8 +343,8 @@ public class SlideoutTourEquipmentFilter extends AdvancedSlideout implements ITr
             // 2nd compare by date
             if (compareDiff == 0) {
 
-               final long date1 = part1.getDateFrom();
-               final long date2 = part2.getDateFrom();
+               final long date1 = part1.getDateUsed();
+               final long date2 = part2.getDateUsed();
 
                final long dateDiff = date1 - date2;
 
@@ -535,8 +535,8 @@ public class SlideoutTourEquipmentFilter extends AdvancedSlideout implements ITr
                   // 2nd compare by date
                   if (compareDiff == 0) {
 
-                     final long date1 = equipment1.getDateFrom();
-                     final long date2 = equipment2.getDateFrom();
+                     final long date1 = equipment1.getDateUsed();
+                     final long date2 = equipment2.getDateUsed();
 
                      final long dateDiff = date1 - date2;
 
@@ -575,9 +575,6 @@ public class SlideoutTourEquipmentFilter extends AdvancedSlideout implements ITr
 
                final EquipmentPart part1 = item1.part;
                final EquipmentPart part2 = item2.part;
-
-               final boolean isCollate1 = part1.isCollate();
-               final boolean isCollate2 = part2.isCollate();
 
                return part1.getName().compareTo(part2.getName());
             }

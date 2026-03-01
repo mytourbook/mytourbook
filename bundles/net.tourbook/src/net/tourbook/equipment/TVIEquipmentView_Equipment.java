@@ -56,7 +56,7 @@ public class TVIEquipmentView_Equipment extends TVIEquipmentView_Item {
       firstColumn = equipment.getName();
 
       type = equipment.getType();
-      dateFrom = equipment.getDateFrom_Local();
+      dateUsed = equipment.getDateUsed_Local();
 
       price = equipment.getPrice();
       priceUnit = equipment.getPriceUnit();
@@ -160,11 +160,11 @@ public class TVIEquipmentView_Equipment extends TVIEquipmentView_Item {
          long durationMS = part.getDuration();
          String durationLastText = UI.EMPTY_STRING;
 
-         if (part.getDateUntil() == TimeTools.MAX_TIME_IN_EPOCH_MILLI) {
+         if (part.getDateCollateUntil() == TimeTools.MAX_TIME_IN_EPOCH_MILLI) {
 
             // this is the last collated part
 
-            durationMS = TimeTools.nowInMilliseconds() - part.getDateFrom();
+            durationMS = TimeTools.nowInMilliseconds() - part.getDateUsed();
             durationLastText = Messages.Equipment_View_Label_UntilNow;
          }
 
@@ -180,7 +180,7 @@ public class TVIEquipmentView_Equipment extends TVIEquipmentView_Item {
          partItem.firstColumn          = part.getName();
 
          partItem.type                 = part.getPartType();
-         partItem.dateFrom             = part.getDateFrom_Local();
+         partItem.dateUsed             = part.getDateUsed_Local();
 
          partItem.price                = part.getPrice();
          partItem.priceUnit            = part.getPriceUnit();
@@ -234,8 +234,8 @@ public class TVIEquipmentView_Equipment extends TVIEquipmentView_Item {
 
                + "JOIN " + TourDatabase.TABLE_TOUR_DATA + " AS TourData" + NL //                //$NON-NLS-1$ //$NON-NLS-2$
                + "  ON TourData.tourid = j_td_eq.tourdata_tourid" + NL //                       //$NON-NLS-1$
-               + "  AND TourData.tourstarttime >= equipment.dateFrom" + NL //                   //$NON-NLS-1$
-               + "  AND TourData.tourstarttime <  equipment.dateUntil" + NL //                  //$NON-NLS-1$
+               + "  AND TourData.tourstarttime >= equipment.dateCollateFrom" + NL //            //$NON-NLS-1$
+               + "  AND TourData.tourstarttime <  equipment.dateCollateUntil" + NL //           //$NON-NLS-1$
 
                // get all equipment ids
                + "LEFT JOIN " + TourDatabase.JOINTABLE__TOURDATA__EQUIPMENT + " AS jTdataEq" + NL //   //$NON-NLS-1$ //$NON-NLS-2$
@@ -398,8 +398,8 @@ public class TVIEquipmentView_Equipment extends TVIEquipmentView_Item {
 
                + "JOIN " + TourDatabase.TABLE_TOUR_DATA + " AS TourData" + NL //                //$NON-NLS-1$ //$NON-NLS-2$
                + "   ON TourData.tourid = j_td_eq.tourdata_tourid" + NL //                      //$NON-NLS-1$
-               + "   AND TourData.tourstarttime >= equipment.dateFrom" + NL //                  //$NON-NLS-1$
-               + "   AND TourData.tourstarttime <  equipment.dateUntil" + NL //                 //$NON-NLS-1$
+               + "   AND TourData.tourstarttime >= equipment.dateCollateFrom" + NL //           //$NON-NLS-1$
+               + "   AND TourData.tourstarttime <  equipment.dateCollateUntil" + NL //          //$NON-NLS-1$
 
                + appFilter.getWhereClause()
 

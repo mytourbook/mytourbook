@@ -4585,10 +4585,11 @@ public class TourDatabase {
                   + "   IsCollate               BOOLEAN DEFAULT FALSE,                    " + NL //$NON-NLS-1$
                   + "   ExpandType              INTEGER,                                  " + NL //$NON-NLS-1$
 
-                  + "   DateFrom                BIGINT DEFAULT 0,                         " + NL //$NON-NLS-1$
+                  + "   DateUsed                BIGINT DEFAULT 0,                         " + NL //$NON-NLS-1$
                   + "   DateBuilt               BIGINT DEFAULT 0,                         " + NL //$NON-NLS-1$
                   + "   DateRetired             BIGINT DEFAULT 0,                         " + NL //$NON-NLS-1$
-                  + "   DateUntil               BIGINT DEFAULT 0                          " + NL //$NON-NLS-1$
+                  + "   DateCollateFrom         BIGINT DEFAULT 0,                         " + NL //$NON-NLS-1$
+                  + "   DateCollateUntil        BIGINT DEFAULT 0                          " + NL //$NON-NLS-1$
 
                   + ")" //                                                                       //$NON-NLS-1$
       );
@@ -4625,10 +4626,11 @@ public class TourDatabase {
             KEY_TOUR);
 
       // Create indices "Equipment__..."
-      SQL.createIndex_Table__Column(stmt, TABLE_EQUIPMENT, "IsCollate"); //      //$NON-NLS-1$
-      SQL.createIndex_Table__Column(stmt, TABLE_EQUIPMENT, "DateFrom"); //       //$NON-NLS-1$
-      SQL.createIndex_Table__Column(stmt, TABLE_EQUIPMENT, "DateUntil"); //      //$NON-NLS-1$
-      SQL.createIndex_Table__Column(stmt, TABLE_EQUIPMENT, "Type"); //           //$NON-NLS-1$
+      SQL.createIndex_Table__Column(stmt, TABLE_EQUIPMENT, "IsCollate"); //            //$NON-NLS-1$
+      SQL.createIndex_Table__Column(stmt, TABLE_EQUIPMENT, "DateUsed"); //             //$NON-NLS-1$
+      SQL.createIndex_Table__Column(stmt, TABLE_EQUIPMENT, "DateCollateFrom"); //      //$NON-NLS-1$
+      SQL.createIndex_Table__Column(stmt, TABLE_EQUIPMENT, "DateCollateUntil"); //     //$NON-NLS-1$
+      SQL.createIndex_Table__Column(stmt, TABLE_EQUIPMENT, "Type"); //                 //$NON-NLS-1$
    }
 
    /**
@@ -4669,25 +4671,27 @@ public class TourDatabase {
                   + "   Weight                  FLOAT DEFAULT 0,                          " + NL //$NON-NLS-1$
 
                   + "   IsCollate               BOOLEAN DEFAULT TRUE,                     " + NL //$NON-NLS-1$
-                  + "   CollateWith            	SMALLINT DEFAULT 0,                       " + NL //$NON-NLS-1$
+                  + "   CollateBetween         	SMALLINT DEFAULT 0,                       " + NL //$NON-NLS-1$
 
-                  + "   DateFrom                BIGINT DEFAULT 0,                         " + NL //$NON-NLS-1$
+                  + "   DateUsed                BIGINT DEFAULT 0,                         " + NL //$NON-NLS-1$
                   + "   DateBuilt               BIGINT DEFAULT 0,                         " + NL //$NON-NLS-1$
                   + "   DateRetired             BIGINT DEFAULT 0,                         " + NL //$NON-NLS-1$
-                  + "   DateUntil               BIGINT DEFAULT 0                          " + NL //$NON-NLS-1$
+                  + "   DateCollateFrom         BIGINT DEFAULT 0,                         " + NL //$NON-NLS-1$
+                  + "   DateCollateUntil        BIGINT DEFAULT 0                          " + NL //$NON-NLS-1$
 
                   + ")" //                                                                       //$NON-NLS-1$
       );
 
       // Create indices "EquipmentPart__..."
       SQL.createIndex_Table__Column(stmt, TABLE_EQUIPMENT_PART, KEY_EQUIPMENT);
-      SQL.createIndex_Table__Column(stmt, TABLE_EQUIPMENT_PART, "PartID"); //       //$NON-NLS-1$
+      SQL.createIndex_Table__Column(stmt, TABLE_EQUIPMENT_PART, "PartID"); //             //$NON-NLS-1$
 
-      SQL.createIndex_Table__Column(stmt, TABLE_EQUIPMENT_PART, "IsCollate"); //    //$NON-NLS-1$
-      SQL.createIndex_Table__Column(stmt, TABLE_EQUIPMENT_PART, "ItemType"); //     //$NON-NLS-1$
-      SQL.createIndex_Table__Column(stmt, TABLE_EQUIPMENT_PART, "DateFrom"); //     //$NON-NLS-1$
-      SQL.createIndex_Table__Column(stmt, TABLE_EQUIPMENT_PART, "DateUntil"); //    //$NON-NLS-1$
-      SQL.createIndex_Table__Column(stmt, TABLE_EQUIPMENT_PART, "Type"); //         //$NON-NLS-1$
+      SQL.createIndex_Table__Column(stmt, TABLE_EQUIPMENT_PART, "IsCollate"); //          //$NON-NLS-1$
+      SQL.createIndex_Table__Column(stmt, TABLE_EQUIPMENT_PART, "ItemType"); //           //$NON-NLS-1$
+      SQL.createIndex_Table__Column(stmt, TABLE_EQUIPMENT_PART, "DateUsed"); //           //$NON-NLS-1$
+      SQL.createIndex_Table__Column(stmt, TABLE_EQUIPMENT_PART, "DateCollateFrom"); //    //$NON-NLS-1$
+      SQL.createIndex_Table__Column(stmt, TABLE_EQUIPMENT_PART, "DateCollateUntil"); //   //$NON-NLS-1$
+      SQL.createIndex_Table__Column(stmt, TABLE_EQUIPMENT_PART, "Type"); //               //$NON-NLS-1$
    }
 
    /**

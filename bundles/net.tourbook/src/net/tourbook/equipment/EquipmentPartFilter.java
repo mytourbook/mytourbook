@@ -82,8 +82,8 @@ public class EquipmentPartFilter {
                      + "   AND partOR.ISCOLLATE = TRUE" + NL //                                          //$NON-NLS-1$
                      + "   AND partOR.PARTID IN (" + sqlParameters + ")" + NL //                         //$NON-NLS-1$ //$NON-NLS-2$
 
-                     + "   AND TourData.TourStartTime >= partOR.dateFrom" + NL //                        //$NON-NLS-1$
-                     + "   AND TourData.TourStartTime < partOR.dateUntil" + NL //                        //$NON-NLS-1$
+                     + "   AND TourData.TourStartTime >= partOR.dateCollateFrom" + NL //                 //$NON-NLS-1$
+                     + "   AND TourData.TourStartTime < partOR.dateCollateUntil" + NL //                 //$NON-NLS-1$
                ;
 
             } else {
@@ -114,8 +114,8 @@ public class EquipmentPartFilter {
                         + "  ON " + partName + ".EQUIPMENT_EQUIPMENTID = jTdEq.EQUIPMENT_EQUIPMENTID" + NL //     //$NON-NLS-1$ //$NON-NLS-2$
                         + "    AND " + partName + ".PARTID = ?" + NL //                                           //$NON-NLS-1$ //$NON-NLS-2$
                         + "    AND " + partName + ".ISCOLLATE = TRUE" + NL //                                     //$NON-NLS-1$ //$NON-NLS-2$
-                        + "    AND TourData.TourStartTime >= " + partName + ".dateFrom" + NL //                   //$NON-NLS-1$ //$NON-NLS-2$
-                        + "    AND TourData.TourStartTime < " + partName + ".dateUntil" + NL //                   //$NON-NLS-1$ //$NON-NLS-2$
+                        + "    AND TourData.TourStartTime >= " + partName + ".dateCollateFrom" + NL //            //$NON-NLS-1$ //$NON-NLS-2$
+                        + "    AND TourData.TourStartTime < " + partName + ".dateCollateUntil" + NL //            //$NON-NLS-1$ //$NON-NLS-2$
                   ;
 
                   sbAllParts.append(joinPart);

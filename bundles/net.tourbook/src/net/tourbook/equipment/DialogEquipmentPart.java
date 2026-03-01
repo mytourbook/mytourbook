@@ -128,7 +128,7 @@ public class DialogEquipmentPart extends TitleAreaDialog {
    private Combo                     _comboSize;
    private Combo                     _comboType;
 
-   private DateTime                  _dateFrom;
+   private DateTime                  _dateUsed;
    private DateTime                  _dateBuilt;
    private DateTime                  _dateRetired;
 
@@ -172,6 +172,8 @@ public class DialogEquipmentPart extends TitleAreaDialog {
 
          _part = new EquipmentPart(EquipmentPart.ITEM_TYPE_PART);
 
+         _part.setCollateBetween(EquipmentPart.COLLATED_WITH_NEXT);
+
       } else {
 
          _part = part.clone();
@@ -182,7 +184,7 @@ public class DialogEquipmentPart extends TitleAreaDialog {
 
             final long today = TimeTools.nowInMilliseconds();
 
-            _part.setDateFrom(today);
+            _part.setDateUsed(today);
             _part.setDateBuilt(today);
          }
       }
@@ -228,7 +230,7 @@ public class DialogEquipmentPart extends TitleAreaDialog {
       super.createButtonsForButtonBar(parent);
 
       // OK -> Create/Save
-      getButton(IDialogConstants.OK_ID).setText(_isNewPart
+      getButton(IDialogConstants.OK_ID).setText(_isNewPart || _isDuplicatePart
             ? Messages.App_Action_Create
             : Messages.App_Action_Save);
    }
@@ -365,17 +367,17 @@ public class DialogEquipmentPart extends TitleAreaDialog {
          }
          {
             /*
-             * Date from
+             * Date used
              */
             UI.createLabel(_container, Messages.Dialog_Equipment_Label_Date);
 
-            _dateFrom = new DateTime(_container, SWT.DATE | SWT.MEDIUM | SWT.DROP_DOWN);
-            _dateFrom.addSelectionListener(_defaultSelectionListener);
+            _dateUsed = new DateTime(_container, SWT.DATE | SWT.MEDIUM | SWT.DROP_DOWN);
+            _dateUsed.addSelectionListener(_defaultSelectionListener);
 
             /*
              * Add a decoration for this important field
              */
-            _comboDecorator_DateFrom = new ControlDecoration(_dateFrom, SWT.CENTER | SWT.LEFT);
+            _comboDecorator_DateFrom = new ControlDecoration(_dateUsed, SWT.CENTER | SWT.LEFT);
             _comboDecorator_DateFrom.setDescriptionText(tooltip2);
             _comboDecorator_DateFrom.setImage(decorationImage);
             _comboDecorator_DateFrom.setMarginWidth(decoratorDistance);
@@ -511,22 +513,24 @@ public class DialogEquipmentPart extends TitleAreaDialog {
          }
          {
             /*
-             * Collate with
+             * Collate between
              */
+
+            UI.createSpacer_Horizontal(_container, 1);
+
             final String collateWithTooltip =
                   "All parts of the same \"Type\" can be collated only\neither with the next or the previous part,\nthere can be no mix and match";
 
-            _lblCollateWith = UI.createLabel(_container, "With");
-            _lblCollateWith.setToolTipText(collateWithTooltip);
-            GridDataFactory.fillDefaults()
-                  .indent(8, 0)
-                  .applyTo(_lblCollateWith);
-
             final Composite collateContainer = new Composite(_container, SWT.NONE);
             GridDataFactory.fillDefaults().grab(true, false).span(6, 1).applyTo(collateContainer);
-            GridLayoutFactory.fillDefaults().numColumns(2).applyTo(collateContainer);
+            GridLayoutFactory.fillDefaults().numColumns(3).applyTo(collateContainer);
 //            collateContainer.setBackground(UI.SYS_COLOR_CYAN);
             {
+               _lblCollateWith = UI.createLabel(collateContainer, "Collate between this part and");
+               _lblCollateWith.setToolTipText(collateWithTooltip);
+               GridDataFactory.fillDefaults()
+                     .indent(12, 0)
+                     .applyTo(_lblCollateWith);
 
                _rdoCollateWith_Previous = new Button(collateContainer, SWT.RADIO);
                _rdoCollateWith_Previous.setText("Pre&vious part");
@@ -635,7 +639,7 @@ public class DialogEquipmentPart extends TitleAreaDialog {
             _spinWeight,
             _spinDistance,
 
-            _dateFrom,
+            _dateUsed,
             _dateBuilt,
             _chkSyncDates,
             _dateRetired,
@@ -896,7 +900,7 @@ public class DialogEquipmentPart extends TitleAreaDialog {
 
       if (isSyncDates) {
 
-         _dateBuilt.setDate(_dateFrom.getYear(), _dateFrom.getMonth(), _dateFrom.getDay());
+         _dateBuilt.setDate(_dateUsed.getYear(), _dateUsed.getMonth(), _dateUsed.getDay());
       }
 
       _isModified = true;
@@ -951,7 +955,7 @@ public class DialogEquipmentPart extends TitleAreaDialog {
 
 // SET_FORMATTING_OFF
 
-      final LocalDate dateFrom      = LocalDate.of(_dateFrom.getYear(),    _dateFrom.getMonth() + 1,     _dateFrom.getDay());
+      final LocalDate dateUsed      = LocalDate.of(_dateUsed.getYear(),    _dateUsed.getMonth() + 1,     _dateUsed.getDay());
       final LocalDate dateBuilt     = LocalDate.of(_dateBuilt.getYear(),   _dateBuilt.getMonth() + 1,    _dateBuilt.getDay());
       final LocalDate dateRetired   = LocalDate.of(_dateRetired.getYear(), _dateRetired.getMonth() + 1,  _dateRetired.getDay());
 
@@ -965,7 +969,7 @@ public class DialogEquipmentPart extends TitleAreaDialog {
       _part.setImageFilePath(    _lblImageFilePath.getText().trim());
 
       _part.setIsCollate(        _chkCollate.getSelection());
-      _part.setCollateWith(      _rdoCollateWith_Next.getSelection()
+      _part.setCollateBetween(   _rdoCollateWith_Next.getSelection()
                                        ? EquipmentPart.COLLATED_WITH_NEXT
                                        : EquipmentPart.COLLATED_WITH_PREVIOUS);
 
@@ -975,7 +979,7 @@ public class DialogEquipmentPart extends TitleAreaDialog {
       _part.setSize(             _comboSize.getText().trim());
       _part.setWeight(           _spinWeight.getSelection() / 1000f);
 
-      _part.setDateFrom(         TimeTools.toEpochMilli(dateFrom));
+      _part.setDateUsed(         TimeTools.toEpochMilli(dateUsed));
       _part.setDateBuilt(        TimeTools.toEpochMilli(dateBuilt));
       _part.setDateRetired(      TimeTools.toEpochMilli(dateRetired));
 
@@ -1041,16 +1045,16 @@ public class DialogEquipmentPart extends TitleAreaDialog {
       /*
        * Set date default values
        */
-      LocalDateTime dateFrom        = _part.getDateFrom_Local();
+      LocalDateTime dateUsed        = _part.getDateUsed_Local();
       LocalDateTime dateBuilt       = _part.getDateBuilt_Local();
       LocalDateTime dateRetired     = _part.getDateRetired_Local();
 
-      final long dateMS             = TimeTools.toEpochMilli(dateFrom);
+      final long dateUsedMS         = TimeTools.toEpochMilli(dateUsed);
       final long dateBuiltMS        = TimeTools.toEpochMilli(dateBuilt);
       final long dateRetiredMS      = TimeTools.toEpochMilli(dateRetired);
 
-      if (dateMS == 0) {
-         dateFrom = LocalDateTime.now();
+      if (dateUsedMS == 0) {
+         dateUsed = LocalDateTime.now();
       }
 
       if (dateBuiltMS == 0) {
@@ -1061,7 +1065,7 @@ public class DialogEquipmentPart extends TitleAreaDialog {
          dateRetired = LocalDateTime.of(2099,1,1,0,0);
       }
 
-      final int collateWith      = _part.getCollateWith();
+      final int collateWith      = _part.getCollateBetween();
 
       _chkCollate                .setSelection(_part.isCollate());
 
@@ -1070,7 +1074,7 @@ public class DialogEquipmentPart extends TitleAreaDialog {
       _comboSize                 .setText(_part.getSize());
       _comboType                 .setText(_part.getPartType());
 
-      _dateFrom                  .setDate(dateFrom.getYear(),     dateFrom.getMonthValue() - 1,    dateFrom.getDayOfMonth());
+      _dateUsed                  .setDate(dateUsed.getYear(),     dateUsed.getMonthValue() - 1,    dateUsed.getDayOfMonth());
       _dateBuilt                 .setDate(dateBuilt.getYear(),    dateBuilt.getMonthValue() - 1,   dateBuilt.getDayOfMonth());
       _dateRetired               .setDate(dateRetired.getYear(),  dateRetired.getMonthValue() - 1, dateRetired.getDayOfMonth());
 
