@@ -415,27 +415,26 @@ public class DialogEquipmentService extends TitleAreaDialog {
 
             UI.createSpacer_Horizontal(_container, 1);
 
-            final String collateWithTooltip =
-                  "All services of the same \"Type\" can be collated only\neither with the next or the previous service,\nthere can be no mix and match";
+            final String collateWithTooltip = Messages.Dialog_EquipmentService_Collate_Tooltip;
 
             final Composite collateContainer = new Composite(_container, SWT.NONE);
             GridDataFactory.fillDefaults().grab(true, false).span(2, 1).applyTo(collateContainer);
             GridLayoutFactory.fillDefaults().numColumns(3).applyTo(collateContainer);
 //            collateContainer.setBackground(UI.SYS_COLOR_CYAN);
             {
-               _lblCollateWith = UI.createLabel(collateContainer, "Collate between this service and");
+               _lblCollateWith = UI.createLabel(collateContainer, Messages.Dialog_EquipmentService_Label_CollateBetween);
                _lblCollateWith.setToolTipText(collateWithTooltip);
                GridDataFactory.fillDefaults()
                      .indent(12, 0)
                      .applyTo(_lblCollateWith);
 
                _rdoCollateWith_Previous = new Button(collateContainer, SWT.RADIO);
-               _rdoCollateWith_Previous.setText("Pre&vious service");
+               _rdoCollateWith_Previous.setText(Messages.Dialog_EquipmentService_Radio_CollateService_Previous);
                _rdoCollateWith_Previous.setToolTipText(collateWithTooltip);
                _rdoCollateWith_Previous.addSelectionListener(_defaultSelectionListener);
 
                _rdoCollateWith_Next = new Button(collateContainer, SWT.RADIO);
-               _rdoCollateWith_Next.setText("Ne&xt service");
+               _rdoCollateWith_Next.setText(Messages.Dialog_EquipmentService_Radio_CollateService_Next);
                _rdoCollateWith_Next.setToolTipText(collateWithTooltip);
                _rdoCollateWith_Next.addSelectionListener(_defaultSelectionListener);
             }

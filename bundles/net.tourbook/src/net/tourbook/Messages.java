@@ -616,20 +616,28 @@ public class Messages extends NLS {
    public static String        Dialog_Equipment_Tooltip_1;
    public static String        Dialog_Equipment_Tooltip_2;
 
+   public static String        Dialog_EquipmentPart_Collate_Tooltip;
    public static String        Dialog_EquipmentPart_Dialog_Message_CreatePart;
    public static String        Dialog_EquipmentPart_Dialog_Message_DuplicatePart;
    public static String        Dialog_EquipmentPart_Dialog_Message_EditPart;
    public static String        Dialog_EquipmentPart_Dialog_Title;
    public static String        Dialog_EquipmentPart_FileDialog_Text;
-
+   public static String        Dialog_EquipmentPart_Label_CollateBetween;
+   public static String        Dialog_EquipmentPart_Radio_CollatePart_Next;
+   public static String        Dialog_EquipmentPart_Radio_CollatePart_Previous;
+   
+   public static String        Dialog_EquipmentService_Collate_Tooltip;
    public static String        Dialog_EquipmentService_Dialog_Message_Service_Duplicate;
    public static String        Dialog_EquipmentService_Dialog_Message_Service_Edit;
    public static String        Dialog_EquipmentService_Dialog_Message_Service_New;
    public static String        Dialog_EquipmentService_Dialog_Title;
    public static String        Dialog_EquipmentService_Error_NameIsEmpty;
    public static String        Dialog_EquipmentService_FileDialog_Title;
+   public static String        Dialog_EquipmentService_Label_CollateBetween;
    public static String        Dialog_EquipmentService_Label_Company;
    public static String        Dialog_EquipmentService_Label_Name;
+   public static String        Dialog_EquipmentService_Radio_CollateService_Next;
+   public static String        Dialog_EquipmentService_Radio_CollateService_Previous;
 
    public static String        dialog_export_btn_export;
 

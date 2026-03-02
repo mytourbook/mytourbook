@@ -518,27 +518,26 @@ public class DialogEquipmentPart extends TitleAreaDialog {
 
             UI.createSpacer_Horizontal(_container, 1);
 
-            final String collateWithTooltip =
-                  "All parts of the same \"Type\" can be collated only\neither with the next or the previous part,\nthere can be no mix and match";
+            final String collateWithTooltip = Messages.Dialog_EquipmentPart_Collate_Tooltip;
 
             final Composite collateContainer = new Composite(_container, SWT.NONE);
             GridDataFactory.fillDefaults().grab(true, false).span(6, 1).applyTo(collateContainer);
             GridLayoutFactory.fillDefaults().numColumns(3).applyTo(collateContainer);
 //            collateContainer.setBackground(UI.SYS_COLOR_CYAN);
             {
-               _lblCollateWith = UI.createLabel(collateContainer, "Collate between this part and");
+               _lblCollateWith = UI.createLabel(collateContainer, Messages.Dialog_EquipmentPart_Label_CollateBetween);
                _lblCollateWith.setToolTipText(collateWithTooltip);
                GridDataFactory.fillDefaults()
                      .indent(12, 0)
                      .applyTo(_lblCollateWith);
 
                _rdoCollateWith_Previous = new Button(collateContainer, SWT.RADIO);
-               _rdoCollateWith_Previous.setText("Pre&vious part");
+               _rdoCollateWith_Previous.setText(Messages.Dialog_EquipmentPart_Radio_CollatePart_Previous);
                _rdoCollateWith_Previous.setToolTipText(collateWithTooltip);
                _rdoCollateWith_Previous.addSelectionListener(_defaultSelectionListener);
 
                _rdoCollateWith_Next = new Button(collateContainer, SWT.RADIO);
-               _rdoCollateWith_Next.setText("Ne&xt Part");
+               _rdoCollateWith_Next.setText(Messages.Dialog_EquipmentPart_Radio_CollatePart_Next);
                _rdoCollateWith_Next.setToolTipText(collateWithTooltip);
                _rdoCollateWith_Next.addSelectionListener(_defaultSelectionListener);
             }
