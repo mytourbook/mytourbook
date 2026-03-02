@@ -758,9 +758,9 @@ public abstract class TreeColumnFactory {
 
             colDef.setColumnCategory(           Messages.ColumnFactory_Category_Equipment);
 
-            colDef.setColumnLabel(              Messages.ColumnFactory_Equipment);
-            colDef.setColumnHeaderText(         Messages.ColumnFactory_Equipment);
-            colDef.setColumnHeaderToolTipText(  Messages.ColumnFactory_Equipment_Tooltip);
+            colDef.setColumnLabel(              Messages.ColumnFactory_Equipment_Equipment);
+            colDef.setColumnHeaderText(         Messages.ColumnFactory_Equipment_Equipment);
+            colDef.setColumnHeaderToolTipText(  Messages.ColumnFactory_Equipment_Equipment_Tooltip);
 
             colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(40));
 
@@ -858,7 +858,7 @@ public abstract class TreeColumnFactory {
 
             colDef.setColumnCategory(           Messages.ColumnFactory_Category_Equipment);
 
-            colDef.setColumnLabel(              Messages.ColumnFactory_Equipment_Date_Built);
+            colDef.setColumnLabel(              Messages.ColumnFactory_Equipment_DateBuilt);
             colDef.setColumnHeaderText(         Messages.ColumnFactory_Equipment_DateBuilt_Tooltip);
             colDef.setColumnHeaderToolTipText(  Messages.ColumnFactory_Equipment_DateBuilt_Tooltip);
 
@@ -944,9 +944,9 @@ public abstract class TreeColumnFactory {
 
             colDef.setColumnCategory(           Messages.ColumnFactory_Category_Equipment);
 
-            colDef.setColumnLabel(              Messages.ColumnFactory_Equipment_Date_Duration);
-            colDef.setColumnHeaderText(         Messages.ColumnFactory_Equipment_Date_Duration);
-            colDef.setColumnHeaderToolTipText(  Messages.ColumnFactory_Equipment_Date_DurationTooltip);
+            colDef.setColumnLabel(              Messages.ColumnFactory_Equipment_DateDuration);
+            colDef.setColumnHeaderText(         Messages.ColumnFactory_Equipment_DateDuration);
+            colDef.setColumnHeaderToolTipText(  Messages.ColumnFactory_Equipment_DateDuration_Tooltip);
 
             colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(20));
 

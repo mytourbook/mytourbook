@@ -263,19 +263,16 @@ public class Messages extends NLS {
    public static String        ColumnFactory_Elevation_LossDelta_Label;
    public static String        ColumnFactory_Elevation_LossDelta_Tooltip;
 
-   public static String        ColumnFactory_Equipment;
    public static String        ColumnFactory_Equipment_Brand;
    public static String        ColumnFactory_Equipment_Collate;
    public static String        ColumnFactory_Equipment_Collate_Tooltip;
    public static String        ColumnFactory_Equipment_CollateBetween_Header;
    public static String        ColumnFactory_Equipment_CollateBetween_Label;
    public static String        ColumnFactory_Equipment_CollateBetween_Tooltip;
-   public static String        ColumnFactory_Equipment_Date_Tooltip;
-   public static String        ColumnFactory_Equipment_Date_Built;
-   public static String        ColumnFactory_Equipment_Date_Duration;
-   public static String        ColumnFactory_Equipment_Date_DurationTooltip;
    public static String        ColumnFactory_Equipment_Date_Header;
    public static String        ColumnFactory_Equipment_Date_Label;
+   public static String        ColumnFactory_Equipment_Date_Tooltip;
+   public static String        ColumnFactory_Equipment_DateBuilt;
    public static String        ColumnFactory_Equipment_DateBuilt_Tooltip;
    public static String        ColumnFactory_Equipment_DateCollate_From_Header;
    public static String        ColumnFactory_Equipment_DateCollate_From_Label;
@@ -283,8 +280,12 @@ public class Messages extends NLS {
    public static String        ColumnFactory_Equipment_DateCollate_Until_Header;
    public static String        ColumnFactory_Equipment_DateCollate_Until_Label;
    public static String        ColumnFactory_Equipment_DateCollate_Until_Tooltip;
+   public static String        ColumnFactory_Equipment_DateDuration;
+   public static String        ColumnFactory_Equipment_DateDuration_Tooltip;
    public static String        ColumnFactory_Equipment_DateRetired_Label;
    public static String        ColumnFactory_Equipment_DateRetired_Tooltip;
+   public static String        ColumnFactory_Equipment_Equipment;
+   public static String        ColumnFactory_Equipment_Equipment_Tooltip;
    public static String        ColumnFactory_Equipment_ID;
    public static String        ColumnFactory_Equipment_ID_Tootip;
    public static String        ColumnFactory_Equipment_ImageFile_Tooltip;
@@ -296,7 +297,6 @@ public class Messages extends NLS {
    public static String        ColumnFactory_Equipment_PriceCurrency_Label;
    public static String        ColumnFactory_Equipment_PriceCurrency_Tooltip;
    public static String        ColumnFactory_Equipment_Size;
-   public static String        ColumnFactory_Equipment_Tooltip;
    public static String        ColumnFactory_Equipment_TourStructure_Header;
    public static String        ColumnFactory_Equipment_TourStructure_Label;
    public static String        ColumnFactory_Equipment_TourStructure_Tooltip;
