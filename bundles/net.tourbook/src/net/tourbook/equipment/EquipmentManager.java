@@ -1767,11 +1767,11 @@ public class EquipmentManager {
     * !!! </b>
     *
     * @param equipment
-    * @param allModifiedTypes
+    * @param allModifiedPartTypes
     * @param collatedBetween
     */
    public static void updateUntilDate_Parts(final Equipment equipment,
-                                            final Set<String> allModifiedTypes,
+                                            final Set<String> allModifiedPartTypes,
                                             final short collatedBetween) {
 
       final Set<EquipmentPart> allParts = equipment.getParts();
@@ -1779,26 +1779,37 @@ public class EquipmentManager {
 
       if (numParts > 0) {
 
-         for (final String type : allModifiedTypes) {
+         for (final String partType : allModifiedPartTypes) {
 
-            updateUntilDate_Parts_OneType(allParts, type, collatedBetween);
+            updateUntilDate_Parts_OneType(equipment, partType, collatedBetween);
          }
       }
    }
 
-   private static void updateUntilDate_Parts_OneType(final Set<EquipmentPart> allParts,
-                                                     final String modifiedType,
-                                                     final short collateBetween) {
+   /**
+    * <b> !!! After calling this method, all equipment must be reloaded because they are updated
+    * !!! </b>
+    *
+    * @param allParts
+    * @param modifiedPartType
+    * @param collateBetween
+    *           Can be <code>-1</code> to use the collateBetween value from the first filtered part
+    */
+   public static void updateUntilDate_Parts_OneType(final Equipment equipment,
+                                                    final String modifiedPartType,
+                                                    short collateBetween) {
+
+      final Set<EquipmentPart> allParts = equipment.getParts();
 
       /*
-       * Filter parts: Get all parts with the same type and which are collated
+       * Filter parts: Get all parts with the same part type and which are collated
        */
       final List<EquipmentPart> allFilteredParts = new ArrayList<>();
 
       for (final EquipmentPart part : allParts) {
 
          if (part.isCollate()
-               && modifiedType.equalsIgnoreCase(part.getPartType())) {
+               && modifiedPartType.equalsIgnoreCase(part.getPartType())) {
 
             allFilteredParts.add(part);
          }
@@ -1810,6 +1821,9 @@ public class EquipmentManager {
          return;
       }
 
+      final int oneDayMS = TimeTools.DAY_MILLISECONDS - 1;
+      final long equipmentDateUsed = equipment.getDateUsed();
+
       /*
        * Sort parts by date
        */
@@ -1819,17 +1833,16 @@ public class EquipmentManager {
          return Long.compare(part1.getDateUsed(), part2.getDateUsed());
       });
 
-      final List<EquipmentPart> allModifiedParts = new ArrayList<>();
-
       EquipmentPart part = allSortedParts.get(0);
-      final Equipment equipment = part.getEquipment();
 
-      final int oneDayMS = TimeTools.DAY_MILLISECONDS - 1;
-
-      final long equipmentDateUsed = equipment.getDateUsed();
+      if (collateBetween == -1) {
+         collateBetween = part.getCollateBetween();
+      }
 
       final boolean isCollateNext = collateBetween == EquipmentPart.COLLATED_WITH_NEXT;
       final boolean isCollatePrev = !isCollateNext;
+
+      final List<EquipmentPart> allModifiedParts = new ArrayList<>();
 
       if (numParts == 1) {
 
@@ -1934,6 +1947,14 @@ public class EquipmentManager {
                }
 
                newDateFrom = partDateUsed;
+            }
+
+            /*
+             * Check if the equipment used date is larger than the part used date, this can happen
+             * for any part
+             */
+            if (equipmentDateUsed > newDateFrom) {
+               newDateFrom = equipmentDateUsed;
             }
 
             if (partDateFrom != newDateFrom

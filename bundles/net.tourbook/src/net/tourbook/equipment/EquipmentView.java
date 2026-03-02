@@ -3316,7 +3316,30 @@ public class EquipmentView extends ViewPart implements
 
             // date and/or type is modified -> update "until date"
 
-            EquipmentManager.updateUntilDate_Equipment(allModifiedTypes);
+            if (selectedEquipment.isCollate()) {
+
+               EquipmentManager.updateUntilDate_Equipment(allModifiedTypes);
+
+            } else {
+
+               // update part/service items
+
+               final Set<String> allPartTypes = new HashSet<>();
+
+               final Set<EquipmentPart> allParts = selectedEquipment.getParts();
+
+               for (final EquipmentPart part : allParts) {
+
+                  if (part.isCollate()) {
+                     allPartTypes.add(part.getPartType());
+                  }
+               }
+
+               for (final String partType : allPartTypes) {
+
+                  EquipmentManager.updateUntilDate_Parts_OneType(selectedEquipment, partType, (short) -1);
+               }
+            }
          }
 
          updateUI_ReloadViewer();
