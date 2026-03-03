@@ -796,8 +796,8 @@ public abstract class TreeColumnFactory {
 
             colDef.setColumnCategory(           Messages.ColumnFactory_Category_Equipment);
 
-            colDef.setColumnLabel(              Messages.ColumnFactory_Equipment_Collate);
-            colDef.setColumnHeaderText(         Messages.ColumnFactory_Equipment_Collate);
+            colDef.setColumnLabel(              Messages.ColumnFactory_Equipment_Collate_Tooltip);
+            colDef.setColumnHeaderText(         Messages.ColumnFactory_Equipment_Collate_Label);
             colDef.setColumnHeaderToolTipText(  Messages.ColumnFactory_Equipment_Collate_Tooltip);
 
             colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(12));

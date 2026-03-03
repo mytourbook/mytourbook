@@ -264,7 +264,7 @@ public class Messages extends NLS {
    public static String        ColumnFactory_Elevation_LossDelta_Tooltip;
 
    public static String        ColumnFactory_Equipment_Brand;
-   public static String        ColumnFactory_Equipment_Collate;
+   public static String        ColumnFactory_Equipment_Collate_Label;
    public static String        ColumnFactory_Equipment_Collate_Tooltip;
    public static String        ColumnFactory_Equipment_CollateBetween_Header;
    public static String        ColumnFactory_Equipment_CollateBetween_Label;
