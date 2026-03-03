@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2024 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2026 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -555,7 +555,7 @@ public class ColumnManager {
       _allDefinedColumnDefinitions.clear();
    }
 
-   private String createColumnLabel(final ColumnDefinition colDef, final boolean isWithCategory) {
+   private String createColumnLabel(final ColumnDefinition colDef) {
 
       final String category = colDef.getColumnCategory();
       final String label = colDef.getColumnLabel();
@@ -564,13 +564,13 @@ public class ColumnManager {
       final StringBuilder sb = new StringBuilder();
 
       // add category
-      if (isWithCategory && _isCategoryAvailable && _isShowCategory && category != null) {
+      if (_isCategoryAvailable && _isShowCategory && category != null) {
          sb.append(category);
       }
 
       // add label
       if (label != null) {
-         if (isWithCategory && sb.length() > 0) {
+         if (sb.length() > 0) {
             sb.append(COLUMN_CATEGORY_SEPARATOR);
          }
          sb.append(label);
@@ -595,7 +595,7 @@ public class ColumnManager {
 
          final MenuItem colMenuItem = new MenuItem(contextMenu, SWT.CHECK);
 
-         final String columnLabel = createColumnLabel(colDef, true);
+         final String columnLabel = createColumnLabel(colDef);
 
          colMenuItem.setText(columnLabel);
          colMenuItem.setEnabled(colDef.canModifyVisibility());
@@ -1233,7 +1233,7 @@ public class ColumnManager {
           */
 
          // create menu item text
-         final String menuItemText = NLS.bind(Messages.Action_ColumnManager_ColumnActions_Info, createColumnLabel(colDef, false));
+         final String menuItemText = NLS.bind(Messages.Action_ColumnManager_ColumnActions_Info, createColumnLabel(colDef));
 
          final MenuItem menuItem = new MenuItem(contextMenu, SWT.PUSH);
          menuItem.setText(menuItemText);
