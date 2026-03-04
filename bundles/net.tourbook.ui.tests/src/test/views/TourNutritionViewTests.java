@@ -77,7 +77,7 @@ public class TourNutritionViewTests extends UITest {
       productsSearchTable.header(Messages.Tour_Nutrition_Column_Quantity).click();
 
       // Act - Search for a beverage in the OpenFoodFacts database
-      bot.comboBox(0).setText("coca"); //$NON-NLS-1$
+      bot.comboBox(0).setText("tailwind"); //$NON-NLS-1$
       bot.button(Messages.Dialog_SearchProduct_Button_Search).click();
       bot.sleep(5000);
       // Act - Add the product via the button in the context menu
