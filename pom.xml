@@ -87,8 +87,8 @@
       </repository> 
       
       <repository>
-         <id>eclipse.nebula.3.1.1</id>                                                 <layout>p2</layout>
-         <url>https://download.eclipse.org/nebula/updates/release/3.1.1</url>
+         <id>eclipse.nebula.3.2.0</id>                                                 <layout>p2</layout>
+         <url>https://download.eclipse.org/nebula/updates/release/3.2.0</url>
       </repository> 
       
       <!-- IMPORTANT: Keep that tag in a single line as it is commented out during the GitHub build -->
@@ -252,7 +252,7 @@
       
       <plugin>
          <artifactId>jacoco-maven-plugin</artifactId>          <groupId>org.jacoco</groupId>
-                                                               <version>0.8.13</version>
+                                                               <version>0.8.14</version>
          <executions>
          
             <execution>
