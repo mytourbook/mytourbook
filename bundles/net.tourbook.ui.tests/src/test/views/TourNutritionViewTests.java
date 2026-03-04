@@ -63,7 +63,7 @@ public class TourNutritionViewTests extends UITest {
       // Act - Search for a food in the OpenFoodFacts database
       bot.comboBox(0).setText("larabar"); //$NON-NLS-1$
       bot.button(Messages.Dialog_SearchProduct_Button_Search).click();
-      bot.sleep(5000);
+      bot.sleep(20000);
       bot.button(Messages.Dialog_SearchProduct_Button_Add).click();
 
       // Sort the products by name
