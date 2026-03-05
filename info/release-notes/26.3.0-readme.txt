@@ -5,18 +5,19 @@ New / Improvements
 ==================
 
 * Equipment
-  https://github.com/mytourbook/mytourbook/issues/1590
+  https://github.com/mytourbook/mytourbook/issues/777
   
-  Equipment and tags have a lot of common features but tags have been "missused" for an equipment because of missing equipment.
+  Equipment and tags have almost equal features but tags have been "misused" for an equipment because of missing a real equipment.
   These are the feature which do not have the other:
-  
+
+  - Equipment
+    - Equipment items are created directly in the equipment view
+    - Parts and services are collating tours by a type and time until the next or previous part or service
+
   - Tags
     - Categorize tags
     - Floating tag context menu
     
-  - Equipment
-    - Equipment items are created directly in the equipment view
-    - Parts and services are collating tours by a type and time
 
 * Tour Blog
   - Display time for each tour blog entry
@@ -41,7 +42,7 @@ Changes
 Bugfix
 ======
   
-See also milestone 26.3 https://github.com/mytourbook/mytourbook/milestone/28?closed=1
+See milestone 26.3 https://github.com/mytourbook/mytourbook/milestone/28?closed=1
  
 
 
@@ -57,10 +58,9 @@ Translation
 System   
 ======
 
-* MyTourbook Milestone 26.3      https://github.com/mytourbook/mytourbook/milestone/28?closed=1
 * Java 21                        https://adoptium.net/temurin/releases/?version=21
-* Eclipse 2025-09 (4.37)         https://archive.eclipse.org/eclipse/downloads/drops4/R-4.37-202509050730/
+* Eclipse 2025-12 (4.38)         https://archive.eclipse.org/eclipse/downloads/drops4/R-4.38-202512010920/
 * NatTable 2.6.0                 https://eclipse.dev/nattable/download
 * Nebula Widgets                 https://download.eclipse.org/nebula/releases/latest
-* FIT SDK 21.176.0               https://forums.garmin.com/developer/fit-sdk/b/news-announcements
+* FIT SDK 21.195.0               https://forums.garmin.com/developer/fit-sdk/b/news-announcements
 * WorldWind 2.2.1                https://github.com/NASAWorldWind/WorldWindJava/releases/tag/v2.2.1

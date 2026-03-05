@@ -105,7 +105,7 @@ public class DialogEquipmentService extends TitleAreaDialog {
    private Image _imageCamera;
 
    // must be created eraly
-   private Image _imageDialog = TourbookPlugin.getImageDescriptor(Images.Equipment_Part).createImage();
+   private Image _imageDialog = TourbookPlugin.getImageDescriptor(Images.Equipment_Service).createImage();
 
    /*
     * UI controls
@@ -198,11 +198,15 @@ public class DialogEquipmentService extends TitleAreaDialog {
 
       final String messageTitle =
 
-            _isDuplicateService ? Messages.Dialog_EquipmentService_Dialog_Message_Service_Duplicate
-                  : _isNewService ? Messages.Dialog_EquipmentService_Dialog_Message_Service_New
+            _isDuplicateService
+
+                  ? Messages.Dialog_EquipmentService_Dialog_Message_Service_Duplicate
+                  : _isNewService
+
+                        ? Messages.Dialog_EquipmentService_Dialog_Message_Service_New
                         : Messages.Dialog_EquipmentService_Dialog_Message_Service_Edit;
 
-      setTitle(messageTitle);
+      setTitle(messageTitle.formatted(_serviceEquipment.getName()));
       setMessage(_service.getName());
    }
 
