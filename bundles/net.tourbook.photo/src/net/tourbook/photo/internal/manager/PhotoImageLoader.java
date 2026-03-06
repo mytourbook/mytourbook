@@ -684,7 +684,14 @@ public class PhotoImageLoader {
 
       try {
 
-         hqImage = loadImageHQ_10();
+         if (_photo.isSvgImage()) {
+
+            hqImage = loadImageSVG();
+
+         } else {
+
+            hqImage = loadImageHQ_10();
+         }
 
       } catch (final Exception e) {
 
@@ -771,13 +778,13 @@ public class PhotoImageLoader {
 
       } catch (final Exception e) {
 
-         StatusUtil.logError("AWT: image \"%s\" cannot be loaded.".formatted(originalImagePathName)); //$NON-NLS-1$
+         StatusUtil.logError("loadImageHQ_10() AWT: image \"%s\" cannot be loaded.".formatted(originalImagePathName)); //$NON-NLS-1$
 
       } finally {
 
          if (awtOriginalImage == null) {
 
-            System.out.println(UI.timeStampNano() + " AWT: image \"%s\" cannot be loaded".formatted(originalImagePathName)); //$NON-NLS-1$
+            System.out.println(UI.timeStampNano() + "loadImageHQ_10() AWT: image \"%s\" cannot be loaded".formatted(originalImagePathName)); //$NON-NLS-1$
 
             return null;
          }
@@ -1542,6 +1549,11 @@ public class PhotoImageLoader {
             }
          }
       }
+   }
+
+   private Image loadImageSVG() {
+      // TODO Auto-generated method stub
+      return null;
    }
 
    /**

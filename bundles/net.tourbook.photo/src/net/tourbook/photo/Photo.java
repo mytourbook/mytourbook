@@ -903,6 +903,15 @@ public class Photo implements Serializable {
          return null;
       }
 
+      if (ImageUtils.IMAGE_FILE_EXTENSION_SVG.equalsIgnoreCase(imageFileExt)) {
+
+         // svg images do not contain "normal" meta data
+
+         PhotoLoadManager.putPhotoInLoadingErrorMap(imageFilePathName);
+
+         return null;
+      }
+
       ImageMetadata imageFileMetadata = null;
 
       try {
@@ -1348,6 +1357,14 @@ public class Photo implements Serializable {
 
    public boolean isLoadingError() {
       return _isLoadingError;
+   }
+
+   /**
+    * @return Returns <code>true</code> when the photo image is a svg image
+    */
+   public boolean isSvgImage() {
+
+      return ImageUtils.IMAGE_FILE_EXTENSION_SVG.equals(imageFileExt);
    }
 
    /**

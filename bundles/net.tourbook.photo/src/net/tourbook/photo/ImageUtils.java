@@ -36,6 +36,8 @@ import org.eclipse.swt.widgets.Display;
  */
 public class ImageUtils {
 
+   static final String IMAGE_FILE_EXTENSION_SVG = "svg"; //$NON-NLS-1$
+
    public static FileFilter createImageFileFilter() {
 
       return pathname -> {
@@ -58,6 +60,10 @@ public class ImageUtils {
          }
 
          if (Imaging.hasImageFileExtension(pathname)) {
+            return true;
+         }
+
+         if (name.toLowerCase().endsWith(UI.SYMBOL_DOT + IMAGE_FILE_EXTENSION_SVG)) {
             return true;
          }
 

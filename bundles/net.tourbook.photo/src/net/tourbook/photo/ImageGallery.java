@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2024 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2026 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -265,7 +265,7 @@ public abstract class ImageGallery implements
     */
    private Photo[]                 _sortedAndFilteredPhotos;
 
-   FileFilter                      _fileFilter;
+   private FileFilter              _fileFilter;
 
    /**
     * Photo image size without border
@@ -2286,23 +2286,24 @@ public abstract class ImageGallery implements
    /**
     * Get gps state and exif data
     *
-    * @return Returns <code>true</code> when exif data is already available from the cache and must
-    *         not be loaded.
     */
-   private boolean putInExifLoadingQueue(final Photo photo) {
+   private void putInExifLoadingQueue(final Photo photo) {
+
+      if (photo.isSvgImage()) {
+
+         photo.isExifLoaded = true;
+
+         return;
+      }
 
       final PhotoImageMetadata photoImageMetadata = ExifCache.get(photo.imageFilePathName);
 
       if (photoImageMetadata != null) {
 
          photo.updateImageMetadata(photoImageMetadata);
-
-         return true;
       }
 
       PhotoLoadManager.putImageInLoadingQueueExif(photo, new LoadCallbackExif(photo, _currentExifRunId));
-
-      return false;
    }
 
    @Override
