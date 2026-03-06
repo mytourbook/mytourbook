@@ -757,14 +757,16 @@ public class EquipmentPart implements Cloneable, Comparable<Object>, Serializabl
    @Override
    public String toString() {
 
-      return UI.EMPTY_STRING
+      return UI.EMPTY_STRING + NL
 
             + "EquipmentPart" + NL //                                         //$NON-NLS-1$
 
             + "  partId           = " + partId + NL //                        //$NON-NLS-1$
+
             + "  brand            = " + brand + NL //                         //$NON-NLS-1$
             + "  model            = " + model + NL //                         //$NON-NLS-1$
-            + "  type				 = " + type + NL //                          //$NON-NLS-1$
+            + "  type             = " + type + NL //                          //$NON-NLS-1$
+
             + "  dateUsed         = " + getDateUsed_Local() + NL //           //$NON-NLS-1$
             + "  dateCollateFrom  = " + getDateCollateFrom_Local() + NL //    //$NON-NLS-1$
             + "  dateCollateUntil = " + getDateCollateUntil_Local() + NL //   //$NON-NLS-1$
