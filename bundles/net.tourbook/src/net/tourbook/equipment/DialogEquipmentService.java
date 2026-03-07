@@ -41,7 +41,6 @@ import org.eclipse.jface.fieldassist.ControlDecoration;
 import org.eclipse.jface.fieldassist.FieldDecorationRegistry;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
-import org.eclipse.jface.layout.PixelConverter;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.BusyIndicator;
@@ -95,8 +94,6 @@ public class DialogEquipmentService extends TitleAreaDialog {
    private boolean                      _isModified;
 
    private String                       _imageFilePath;
-
-   private PixelConverter               _pc;
 
    /*
     * UI resources
@@ -597,8 +594,6 @@ public class DialogEquipmentService extends TitleAreaDialog {
    }
 
    private void initUI() {
-
-      _pc = new PixelConverter(_parent);
 
       _imageCamera = TourbookPlugin.getImageDescriptor(Images.Camera).createImage();
       _imageTrash = TourbookPlugin.getImageDescriptor(Images.App_Trash_Themed).createImage();

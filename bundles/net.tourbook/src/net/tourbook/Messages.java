@@ -586,6 +586,7 @@ public class Messages extends NLS {
    public static String        Dialog_EditTimeslicesValues_Label_ReplaceValues;
    public static String        Dialog_EditTimeslicesValues_Title;
 
+   public static String        Dialog_Equipment_Button_SetDateToToday_Tooltip;
    public static String        Dialog_Equipment_Checkbox_Collate;
    public static String        Dialog_Equipment_Checkbox_Sync;
    public static String        Dialog_Equipment_Checkbox_Sync_Tooltip;
