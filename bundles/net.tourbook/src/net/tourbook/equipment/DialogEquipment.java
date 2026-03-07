@@ -266,6 +266,7 @@ public class DialogEquipment extends TitleAreaDialog {
             .getImage();
 
       final int defaultWidth = convertWidthInCharsToPixels(40);
+      final int currencyWidth = UI.IS_WIN ? convertWidthInCharsToPixels(4) : convertWidthInCharsToPixels(12);
 
       final int decoratorDistance = 3;
 
@@ -395,7 +396,7 @@ public class DialogEquipment extends TitleAreaDialog {
 
             GridDataFactory.fillDefaults()
                   .align(SWT.BEGINNING, SWT.FILL)
-                  .hint(_pc.convertWidthInCharsToPixels(4), SWT.DEFAULT)
+                  .hint(currencyWidth, SWT.DEFAULT)
                   .applyTo(_comboPriceUnit);
 
             _autocomplete_PriceUnit = new AutoComplete_ComboInputMT(_comboPriceUnit);

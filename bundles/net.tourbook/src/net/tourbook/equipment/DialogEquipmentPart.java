@@ -276,6 +276,7 @@ public class DialogEquipmentPart extends TitleAreaDialog {
       final GridDataFactory gdVertCenter = GridDataFactory.fillDefaults().align(SWT.BEGINNING, SWT.CENTER);
 
       final int defaultWidth = convertWidthInCharsToPixels(40);
+      final int currencyWidth = UI.IS_WIN ? convertWidthInCharsToPixels(4) : convertWidthInCharsToPixels(12);
 
       // > 0 will hide the decorator
       final int decoratorDistance = 3;
@@ -409,7 +410,7 @@ public class DialogEquipmentPart extends TitleAreaDialog {
 
             GridDataFactory.fillDefaults()
                   .align(SWT.BEGINNING, SWT.FILL)
-                  .hint(_pc.convertWidthInCharsToPixels(4), SWT.DEFAULT)
+                  .hint(currencyWidth, SWT.DEFAULT)
                   .applyTo(_comboPriceUnit);
 
             _autocomplete_PriceUnit = new AutoComplete_ComboInputMT(_comboPriceUnit);
