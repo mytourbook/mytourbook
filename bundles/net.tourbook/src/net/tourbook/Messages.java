@@ -586,6 +586,7 @@ public class Messages extends NLS {
    public static String        Dialog_EditTimeslicesValues_Label_ReplaceValues;
    public static String        Dialog_EditTimeslicesValues_Title;
 
+   public static String        Dialog_Equipment_Button_SetDateToToday_Tooltip;
    public static String        Dialog_Equipment_Checkbox_Collate;
    public static String        Dialog_Equipment_Checkbox_Sync;
    public static String        Dialog_Equipment_Checkbox_Sync_Tooltip;
@@ -617,15 +618,15 @@ public class Messages extends NLS {
    public static String        Dialog_Equipment_Tooltip_2;
 
    public static String        Dialog_EquipmentPart_Collate_Tooltip;
-   public static String        Dialog_EquipmentPart_Dialog_Message_CreatePart;
-   public static String        Dialog_EquipmentPart_Dialog_Message_DuplicatePart;
-   public static String        Dialog_EquipmentPart_Dialog_Message_EditPart;
+   public static String        Dialog_EquipmentPart_Dialog_Message_Part_Duplicate;
+   public static String        Dialog_EquipmentPart_Dialog_Message_Part_Edit;
+   public static String        Dialog_EquipmentPart_Dialog_Message_Part_New;
    public static String        Dialog_EquipmentPart_Dialog_Title;
    public static String        Dialog_EquipmentPart_FileDialog_Text;
    public static String        Dialog_EquipmentPart_Label_CollateBetween;
    public static String        Dialog_EquipmentPart_Radio_CollatePart_Next;
    public static String        Dialog_EquipmentPart_Radio_CollatePart_Previous;
-   
+
    public static String        Dialog_EquipmentService_Collate_Tooltip;
    public static String        Dialog_EquipmentService_Dialog_Message_Service_Duplicate;
    public static String        Dialog_EquipmentService_Dialog_Message_Service_Edit;
