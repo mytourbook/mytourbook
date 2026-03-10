@@ -104,7 +104,7 @@ public class Photo implements Serializable {
 
    public String                                   imagePathName;
    public String                                   imageFileName;
-   public String                                   imageFileExt;
+   private String                                  _imageFileExt;
 
    /**
     * File path name is the unique key for a photo.
@@ -339,6 +339,8 @@ public class Photo implements Serializable {
     * Position of this photo in the painted photo list
     */
    public int                            photoIndex;
+
+   private boolean                       _isSvgImage;
 
    /**
     */
@@ -903,7 +905,7 @@ public class Photo implements Serializable {
          return null;
       }
 
-      if (ImageUtils.IMAGE_FILE_EXTENSION_SVG.equalsIgnoreCase(imageFileExt)) {
+      if (_isSvgImage) {
 
          // svg images do not contain "normal" meta data
 
@@ -1364,7 +1366,7 @@ public class Photo implements Serializable {
     */
    public boolean isSvgImage() {
 
-      return ImageUtils.IMAGE_FILE_EXTENSION_SVG.equals(imageFileExt);
+      return _isSvgImage;
    }
 
    /**
@@ -1550,10 +1552,11 @@ public class Photo implements Serializable {
       imageFilePathName = photoImageFilePathName;
 
       imagePathName = photoImagePath.removeLastSegments(1).toOSString();
-      imageFileExt = photoImagePath.getFileExtension();
+      _imageFileExt = photoImagePath.getFileExtension();
 
       imageFileSize = photoImageFile.length();
-      _imageFileLastModified = LocalDateTime.ofInstant(//
+
+      _imageFileLastModified = LocalDateTime.ofInstant(
             Instant.ofEpochMilli(lastModified),
 //            ZoneOffset.UTC
             ZoneId.systemDefault()
@@ -1562,6 +1565,8 @@ public class Photo implements Serializable {
 
       // initially sort by file date until exif data are loaded
       imageExifTime = lastModified;
+
+      _isSvgImage = ImageUtils.IMAGE_FILE_EXTENSION_SVG.equals(_imageFileExt);
 
       _uniqueId = photoImageFilePathName;
 

@@ -63,6 +63,7 @@ public class ImageUtils {
             return true;
          }
 
+         // support .svg files
          if (name.toLowerCase().endsWith(UI.SYMBOL_DOT + IMAGE_FILE_EXTENSION_SVG)) {
             return true;
          }

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2024 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2026 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -214,7 +214,7 @@ public class PhotoImageCache {
          awtImage = cacheWrapper.awtImage;
 
          /*
-          * ensure image and metadata are set in the photo
+          * Ensure image and metadata are set in the photo
           */
          photo.getImageMetaData();
 
@@ -257,7 +257,7 @@ public class PhotoImageCache {
          }
 
          /*
-          * ensure image and metadata are set in the photo
+          * Ensure image and metadata are set in the photo
           */
          photo.getImageMetaData();
 

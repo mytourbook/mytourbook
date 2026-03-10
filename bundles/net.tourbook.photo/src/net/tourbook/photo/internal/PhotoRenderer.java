@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2025 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2026 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -169,9 +169,8 @@ public class PhotoRenderer extends AbstractGalleryMT20ItemRenderer {
     */
    private int           _photoWidth;
    private int           _photoHeight;
-   /*
-    * position and size where the photo image is painted
-    */
+
+   /* Position and size where the photo image is painted */
    private int           _photoImageWidth;
    private int           _photoImageHeight;
    private int           _paintedDest_DevX;
@@ -201,6 +200,7 @@ public class PhotoRenderer extends AbstractGalleryMT20ItemRenderer {
 
    private double  _imagePaintedZoomFactor;
 
+   /** Width of the photo image, may be scaled when painted */
    private int     _paintedImageWidth;
    private int     _paintedImageHeight;
    private int     _paintedStatusTextX;
@@ -385,19 +385,24 @@ public class PhotoRenderer extends AbstractGalleryMT20ItemRenderer {
       final float scaledCanvasWidth = canvasWidth * scalingFactor;
 
       final boolean isThumbImage = scaledCanvasWidth <= PhotoLoadManager.IMAGE_SIZE_THUMBNAIL;
+      final boolean isHqImage = scaledCanvasWidth > PhotoLoadManager.IMAGE_SIZE_THUMBNAIL;
 
       final ImageQuality requestedImageQuality = isThumbImage
             ? ImageQuality.THUMB
             : ImageQuality.HQ;
 
+      final ImageQuality lowerImageQuality = isHqImage
+            ? ImageQuality.THUMB
+            : ImageQuality.HQ;
+
       // painted image can have different sizes for 1 photo: original, HQ and thumb
-      Image paintedImage = null;
+      Image photoImage = null;
       boolean isRequestedQuality = false;
       final boolean isImageFileAvailable = photo.isImageFileAvailable();
 
       if (isImageFileAvailable) {
 
-         // check if image has an loading error
+         // check if image has a loading error
          final PhotoLoadingState photoLoadingState = photo.getLoadingState(requestedImageQuality);
 
          if (photoLoadingState != PhotoLoadingState.IMAGE_IS_INVALID) {
@@ -405,9 +410,9 @@ public class PhotoRenderer extends AbstractGalleryMT20ItemRenderer {
             // image is not yet loaded
 
             // check if image is in the cache
-            paintedImage = PhotoImageCache.getImage_SWT(photo, requestedImageQuality);
+            photoImage = PhotoImageCache.getImage_SWT(photo, requestedImageQuality);
 
-            if ((paintedImage == null || paintedImage.isDisposed())
+            if ((photoImage == null || photoImage.isDisposed())
                   && photoLoadingState == PhotoLoadingState.IMAGE_IS_IN_LOADING_QUEUE == false) {
 
                // requested image is not available in the image cache -> image must be loaded
@@ -417,23 +422,20 @@ public class PhotoRenderer extends AbstractGalleryMT20ItemRenderer {
                PhotoLoadManager.putImageInLoadingQueueThumb_Gallery(
                      galleryItem,
                      photo,
+                     (int) scaledCanvasWidth,
                      requestedImageQuality,
                      imageLoadCallback);
             }
 
             isRequestedQuality = true;
 
-            if (paintedImage == null || paintedImage.isDisposed()) {
+            if (photoImage == null || photoImage.isDisposed()) {
 
                // requested size is not available, try to get image with lower quality
 
                isRequestedQuality = false;
 
-               final ImageQuality lowerImageQuality = galleryItemWidth > PhotoLoadManager.IMAGE_SIZE_THUMBNAIL
-                     ? ImageQuality.THUMB
-                     : ImageQuality.HQ;
-
-               paintedImage = PhotoImageCache.getImage_SWT(photo, lowerImageQuality);
+               photoImage = PhotoImageCache.getImage_SWT(photo, lowerImageQuality);
             }
          }
       }
@@ -441,7 +443,7 @@ public class PhotoRenderer extends AbstractGalleryMT20ItemRenderer {
       gc.setForeground(_fgColor);
       gc.setBackground(_bgColor);
 
-      if (paintedImage != null && paintedImage.isDisposed() == false) {
+      if (photoImage != null && photoImage.isDisposed() == false) {
 
          /*
           * draw photo image, when photo height is smaller than min photo height, only the
@@ -453,7 +455,7 @@ public class PhotoRenderer extends AbstractGalleryMT20ItemRenderer {
           */
          try {
 
-            final Rectangle imageBounds = paintedImage.getBounds();
+            final Rectangle imageBounds = photoImage.getBounds();
 
             _paintedImageWidth = imageBounds.width;
             _paintedImageHeight = imageBounds.height;
@@ -464,7 +466,7 @@ public class PhotoRenderer extends AbstractGalleryMT20ItemRenderer {
 
          final boolean isPainted = draw_Image(gc,
                photo,
-               paintedImage,
+               photoImage,
                galleryItem,
 
                itemImageX,
@@ -721,7 +723,7 @@ public class PhotoRenderer extends AbstractGalleryMT20ItemRenderer {
    }
 
    /**
-    * Draw photo image centered in the photo canvas.
+    * Draw photo image centered in the photo canvas
     *
     * @param gc
     * @param photo
@@ -1320,10 +1322,10 @@ public class PhotoRenderer extends AbstractGalleryMT20ItemRenderer {
 
          draw_StatusText(gc,
                galleryItem, //
-               0, //                         x
-               canvasHeight - _fontHeight - 1, //   y
-               canvasWidth, //                width
-               _fontHeight + 1, //             height
+               0, //                                  x
+               canvasHeight - _fontHeight - 1, //     y
+               canvasWidth, //                        width
+               _fontHeight + 1, //                    height
                requestedImageQuality,
                false,
                false,

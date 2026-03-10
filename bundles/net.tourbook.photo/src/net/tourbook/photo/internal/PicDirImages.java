@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2022 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2026 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -29,15 +29,20 @@ import net.tourbook.photo.IPhotoGalleryProvider;
 import net.tourbook.photo.PhotoActivator;
 import net.tourbook.photo.PhotoEventId;
 import net.tourbook.photo.PhotoGallery;
+import net.tourbook.photo.PhotoImageCache;
 import net.tourbook.photo.PhotoImages;
+import net.tourbook.photo.PhotoLoadManager;
 import net.tourbook.photo.PhotoSelection;
 import net.tourbook.photo.PhotosWithExifSelection;
 import net.tourbook.photo.PicDirView;
+import net.tourbook.photo.internal.manager.ThumbnailStore;
 
+import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.IStatusLineManager;
 import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.action.MenuManager;
+import org.eclipse.jface.action.Separator;
 import org.eclipse.jface.action.ToolBarManager;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.layout.GridDataFactory;
@@ -78,6 +83,7 @@ public class PicDirImages implements IPhotoGalleryProvider {
    private ActionNavigateHistoryBackward         _actionNavigateBackward;
    private ActionNavigateHistoryForward          _actionNavigateForward;
    private ActionClearNavigationHistory          _actionClearNavigationHistory;
+   private ActionClearPhotoCache                 _actionClearPhotoCache;
    private ActionRemoveInvalidFoldersFromHistory _actionRemoveInvalidFoldersFromHistory;
    private ActionSortFolderHistory               _actionSortFolderHistory;
    private ActionToggleFolderGallery             _actionToggleFolderGallery;
@@ -90,8 +96,20 @@ public class PicDirImages implements IPhotoGalleryProvider {
    private Display      _display;
 
    private Combo        _comboHistory;
-   private ToolBar      _galleryToolbar;
    private PhotoGallery _photoGallery;
+
+   public class ActionClearPhotoCache extends Action {
+
+      public ActionClearPhotoCache() {
+
+         super("&Discard cached photo images", AS_PUSH_BUTTON);
+      }
+
+      @Override
+      public void run() {
+         actionClearPhotoCache();
+      }
+   }
 
    public PicDirImages(final PicDirView picDirView, final IDialogSettings state) {
 
@@ -114,6 +132,20 @@ public class PicDirImages implements IPhotoGalleryProvider {
       _actionRemoveInvalidFoldersFromHistory.setEnabled(false);
       _actionNavigateBackward.setEnabled(false);
       _actionNavigateForward.setEnabled(false);
+   }
+
+   private void actionClearPhotoCache() {
+
+      PhotoLoadManager.stopImageLoading(true);
+      PhotoLoadManager.removeInvalidImageFiles();
+
+      PhotoImageCache.disposeAll();
+
+      ThumbnailStore.cleanupStoreFiles(true, true);
+
+      System.gc();
+
+      _photoGallery.refreshUI();
    }
 
    void actionNavigateBackward() {
@@ -235,17 +267,22 @@ public class PicDirImages implements IPhotoGalleryProvider {
 
    private void createActions() {
 
-      _actionNavigateBackward = new ActionNavigateHistoryBackward(this, _picDirView);
-      _actionNavigateForward = new ActionNavigateHistoryForward(this, _picDirView);
+// SET_FORMATTING_OFF
+      
+      _actionNavigateBackward                = new ActionNavigateHistoryBackward(this, _picDirView);
+      _actionNavigateForward                 = new ActionNavigateHistoryForward(this, _picDirView);
 
       // this action activates the shortcut key <Ctrl><Shift>H but the action is not displayed
       new ActionNavigateShowHistory(this, _picDirView);
 
-      _actionClearNavigationHistory = new ActionClearNavigationHistory(this);
+      _actionClearNavigationHistory          = new ActionClearNavigationHistory(this);
+      _actionClearPhotoCache                 = new ActionClearPhotoCache();
       _actionRemoveInvalidFoldersFromHistory = new ActionRemoveInvalidFoldersFromHistory(this);
-      _actionSortFolderHistory = new ActionSortFolderHistory(this);
+      _actionSortFolderHistory               = new ActionSortFolderHistory(this);
 
-      _actionToggleFolderGallery = new ActionToggleFolderGallery(this);
+      _actionToggleFolderGallery             = new ActionToggleFolderGallery(this);
+      
+// SET_FORMATTING_ON
    }
 
    public void createUI(final Composite parent, final PicDirFolder picDirFolder) {
@@ -281,14 +318,14 @@ public class PicDirImages implements IPhotoGalleryProvider {
    private void createUI_20_GalleryToolbars(final Composite galleryActionBarContainer) {
 
       /*
-       * toolbar actions
+       * Toolbar actions
        */
-      _galleryToolbar = new ToolBar(galleryActionBarContainer, SWT.FLAT);
+      final ToolBar galleryToolbar = new ToolBar(galleryActionBarContainer, SWT.FLAT);
       GridDataFactory.fillDefaults()
             .align(SWT.BEGINNING, SWT.CENTER)
-            .applyTo(_galleryToolbar);
+            .applyTo(galleryToolbar);
 
-      final ToolBarManager tbm = new ToolBarManager(_galleryToolbar);
+      final ToolBarManager tbm = new ToolBarManager(galleryToolbar);
 
       tbm.add(_actionToggleFolderGallery);
       tbm.add(_actionNavigateBackward);
@@ -349,6 +386,9 @@ public class PicDirImages implements IPhotoGalleryProvider {
       menuMgr.add(_actionSortFolderHistory);
       menuMgr.add(_actionRemoveInvalidFoldersFromHistory);
       menuMgr.add(_actionClearNavigationHistory);
+
+      menuMgr.add(new Separator());
+      menuMgr.add(_actionClearPhotoCache);
    }
 
    public PhotosWithExifSelection getSelectedPhotosWithExif(final boolean isAllImages) {

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2024 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2026 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -54,6 +54,7 @@ public class ThumbnailStore {
    private static final long   MBYTE                         = 1024 * 1024L;
 
    static final String         THUMBNAIL_IMAGE_EXTENSION_JPG = "jpg";             //$NON-NLS-1$
+
    private static final String THUMBNAIL_STORE_OS_PATH       = "thumbnail-store"; //$NON-NLS-1$
 
    /*
@@ -144,10 +145,8 @@ public class ThumbnailStore {
 
       } else {
 
-         final long lastCleanup = _prefStore.getLong(//
-               IPhotoPreferences.PHOTO_THUMBNAIL_STORE_LAST_CLEANUP_DATE_TIME);
-         final int cleanupPeriod = _prefStore.getInt(//
-               IPhotoPreferences.PHOTO_THUMBNAIL_STORE_CLEANUP_PERIOD);
+         final long lastCleanup = _prefStore.getLong(IPhotoPreferences.PHOTO_THUMBNAIL_STORE_LAST_CLEANUP_DATE_TIME);
+         final int cleanupPeriod = _prefStore.getInt(IPhotoPreferences.PHOTO_THUMBNAIL_STORE_CLEANUP_PERIOD);
 
          ZonedDateTime dtLastCleanup;
          if (lastCleanup == 0) {
@@ -490,8 +489,7 @@ public class ThumbnailStore {
     */
    private static IPath getThumbnailStorePath() {
 
-      final boolean useDefaultLocation = _prefStore.getBoolean(//
-            IPhotoPreferences.PHOTO_THUMBNAIL_STORE_IS_DEFAULT_LOCATION);
+      final boolean useDefaultLocation = _prefStore.getBoolean(IPhotoPreferences.PHOTO_THUMBNAIL_STORE_IS_DEFAULT_LOCATION);
 
       String tnFolderName;
       if (useDefaultLocation) {
@@ -625,19 +623,19 @@ public class ThumbnailStore {
       return true;
    }
 
-   static void saveResizedImage_SWT(final Image thumbnailImage,
-                                    final IPath storeImageFilePath,
-                                    final Properties originalImageProperties) {
+   static boolean saveResizedImage_SWT(final Image swtImage,
+                                       final IPath storeImageFilePath,
+                                       final Properties originalImageProperties) {
 
       try {
 
          final IPath imagePathWithoutExt = checkPath(storeImageFilePath);
          if (imagePathWithoutExt == null) {
-            return;
+            return false;
          }
 
          final ImageLoader imageLoader = new ImageLoader();
-         imageLoader.data = new ImageData[] { thumbnailImage.getImageData() };
+         imageLoader.data = new ImageData[] { swtImage.getImageData() };
 
          final IPath fullImageFilePath = imagePathWithoutExt.addFileExtension(THUMBNAIL_IMAGE_EXTENSION_JPG);
 
@@ -654,6 +652,8 @@ public class ThumbnailStore {
 
          StatusUtil.log("Cannot save thumbnail image with SWT: \"%s\"".formatted(storeImageFilePath.toOSString()), e); //$NON-NLS-1$
       }
+
+      return true;
    }
 
    public static void updateStoreLocation() {
