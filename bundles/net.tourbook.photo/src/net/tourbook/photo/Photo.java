@@ -892,6 +892,13 @@ public class Photo implements Serializable {
     *         are already loaded.
     */
    public ImageMetadata getImageMetaData(final Boolean isReadThumbnail) {
+      
+      if (_isSvgImage) {
+         
+         // svg images do not contain "normal" meta data
+         
+         return null;
+      }
 
       if (_photoImageMetadata != null && isReadThumbnail == false) {
 
@@ -902,15 +909,6 @@ public class Photo implements Serializable {
 
       if (PhotoLoadManager.isImageLoadingError(imageFilePathName)) {
          // image could not be loaded previously
-         return null;
-      }
-
-      if (_isSvgImage) {
-
-         // svg images do not contain "normal" meta data
-
-         PhotoLoadManager.putPhotoInLoadingErrorMap(imageFilePathName);
-
          return null;
       }
 
@@ -1416,6 +1414,23 @@ public class Photo implements Serializable {
 
    public void resetLinkWorldPosition() {
       _linkWorldPosition.clear();
+   }
+
+   /**
+    * Reset all loading states that images can do a clean reloading
+    */
+   public void resetLoadingStates() {
+
+// SET_FORMATTING_OFF
+
+      _photoLoadingStateThumb    = PhotoLoadingState.UNDEFINED;
+      _photoLoadingStateThumbHQ  = PhotoLoadingState.UNDEFINED;
+      _photoLoadingStateHQ       = PhotoLoadingState.UNDEFINED;
+      _photoLoadingStateOriginal = PhotoLoadingState.UNDEFINED;
+
+// SET_FORMATTING_ON
+
+      _isLoadingError = false;
    }
 
    private void resetTourExifState() {

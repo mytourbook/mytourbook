@@ -1569,16 +1569,18 @@ public class PhotoImageLoader {
 
       final long start = System.currentTimeMillis();
       long endHqLoad = 0;
-//    long endResizeHQ = 0;
+      long endResizeHQ = 0;
       long endResizeThumb = 0;
-//    long endSaveHQ = 0;
+      long endSaveHQ = 0;
       long endSaveThumb = 0;
 
-      String exceptionMessage = null;
 
-      Image requestedSWTImage = null;
-      Image originalSWTImage = null;
-      ImageData originalSWTImageData = null;
+      Image swtRequestedImage = null;
+
+      Image swtOriginalImage = null;
+      ImageData swtOriginalImageData = null;
+
+      Image swtHQImage = null;
 
       int svgImageSize = _hqImageSize;
       svgImageSize = _hqImageSize;
@@ -1597,11 +1599,11 @@ public class PhotoImageLoader {
 
             final FileInputStream inputStream = new FileInputStream(_photo.imageFile);
 
-            originalSWTImageData = svgRasterizer.rasterizeSVG(inputStream, svgImageSize, svgImageSize);
+            swtOriginalImageData = svgRasterizer.rasterizeSVG(inputStream, svgImageSize, svgImageSize);
 
-            originalSWTImage = new Image(Display.getDefault(), new CustomScalingImageDataProvider(originalSWTImageData));
+            swtOriginalImage = new Image(_display, new CustomScalingImageDataProvider(swtOriginalImageData));
 
-            _allTrackedSWTImages.add(originalSWTImage);
+            _allTrackedSWTImages.add(swtOriginalImage);
          }
          endHqLoad = System.currentTimeMillis() - startHqLoad;
 
@@ -1611,7 +1613,7 @@ public class PhotoImageLoader {
 
       } finally {
 
-         if (originalSWTImage == null) {
+         if (swtOriginalImage == null) {
 
             System.out.println(UI.timeStampNano() + "loadImageSVG() SWT: image \"%s\" cannot be loaded".formatted(originalImagePathName)); //$NON-NLS-1$
 
@@ -1620,157 +1622,236 @@ public class PhotoImageLoader {
       }
 
       /*
-       * Create HQ image from original image
+       * Handle thumb save error
        */
+      final boolean isThumbSaveError = PhotoLoadManager.isThumbSaveError(originalImagePathName);
+      if (isThumbSaveError) {
 
-      final int originalImageWidth = originalSWTImageData.width;
-      final int originalImageHeight = originalSWTImageData.height;
+         // the thumb image could not be previously saved in the thumb store, display original image
 
-      final Properties originalImageProperties = new Properties();
-      originalImageProperties.put(ThumbnailStore.ORIGINAL_IMAGE_WIDTH, Integer.toString(originalImageWidth));
-      originalImageProperties.put(ThumbnailStore.ORIGINAL_IMAGE_HEIGHT, Integer.toString(originalImageHeight));
+         swtRequestedImage = swtOriginalImage;
 
-      final int imageWidth = originalImageWidth;
-      final int imageHeight = originalImageHeight;
-
-      // update dimension
-      updatePhotoImageSize(imageWidth, imageHeight, true);
-
-      /*
-       * Create thumb image from HQ image
-       */
-      Image swtSaveThumbImage = null;
-
-      final int thumbSize = PhotoLoadManager.IMAGE_SIZE_THUMBNAIL;
-      if (imageWidth >= thumbSize || imageHeight >= thumbSize) {
+      } else {
 
          /*
-          * Image is larger than thumb image -> resize to thumb
+          * Create HQ image from original image
           */
 
-         // check if thumb image is already available
+         boolean isHQCreated = false;
 
-         final Image exifThumbImage = loadImageFromStore_SWT(ImageQuality.THUMB);
-         if (exifThumbImage != null) {
+         final int originalImageWidth = swtOriginalImageData.width;
+         final int originalImageHeight = swtOriginalImageData.height;
 
-            // EXIF thumb image is already available in the thumbstore
+         final Properties originalImageProperties = new Properties();
+         originalImageProperties.put(ThumbnailStore.ORIGINAL_IMAGE_WIDTH, Integer.toString(originalImageWidth));
+         originalImageProperties.put(ThumbnailStore.ORIGINAL_IMAGE_HEIGHT, Integer.toString(originalImageHeight));
 
-            if (requestedSWTImage == null && _requestedImageQuality == ImageQuality.THUMB) {
+         int imageWidth = originalImageWidth;
+         int imageHeight = originalImageHeight;
 
-               requestedSWTImage = exifThumbImage;
+         // update dimension
+         updatePhotoImageSize(imageWidth, imageHeight, true);
+
+         if (imageWidth >= _hqImageSize || imageHeight >= _hqImageSize) {
+
+            // the original image is larger than HQ image -> resize it to HQ
+
+            Image swtScaledHQImage;
+            ImageData swtScaledHQImageData;
+
+            final long startResizeHQ = System.currentTimeMillis();
+            {
+               final Point bestSize = ImageUtils.getBestSize(imageWidth, imageHeight, _hqImageSize, _hqImageSize);
+
+               swtScaledHQImageData = swtOriginalImageData.scaledTo(bestSize.x, bestSize.y);
+
+               swtScaledHQImage = new Image(_display, new CustomScalingImageDataProvider(swtScaledHQImageData));
+
+               _allTrackedSWTImages.add(swtScaledHQImage);
+
+               swtHQImage = swtScaledHQImage;
+
+               imageWidth = swtScaledHQImageData.width;
+               imageHeight = swtScaledHQImageData.height;
+            }
+            endResizeHQ = System.currentTimeMillis() - startResizeHQ;
+
+            /*
+             * Save scaled HQ image in store
+             */
+            final long startSaveHQ = System.currentTimeMillis();
+            {
+               final boolean isSaved = ThumbnailStore.saveResizedImage_SWT(
+                     swtScaledHQImage,
+                     ThumbnailStore.getStoreImagePath(_photo, ImageQuality.HQ),
+                     originalImageProperties);
+
+               if (isSaved == false) {
+
+                  // AWT save error has occurred, possible error: "Bogus input colorspace"
+                  PhotoLoadManager.putPhotoInThumbSaveErrorMap(originalImagePathName);
+               }
+
+               // check if the scaled image has the requested image quality
+               if (_requestedImageQuality == ImageQuality.HQ) {
+
+                  // create swt image from saved AWT image, this converts AWT -> SWT
+
+                  swtRequestedImage = loadImageFromStore_SWT(ImageQuality.HQ);
+               }
+            }
+            endSaveHQ = System.currentTimeMillis() - startSaveHQ;
+
+            isHQCreated = true;
+
+         } else {
+
+            swtHQImage = swtOriginalImage;
+         }
+
+         /*
+          * Create thumb image from HQ image
+          */
+         Image swtSaveThumbImage = null;
+
+         final int thumbSize = PhotoLoadManager.IMAGE_SIZE_THUMBNAIL;
+         if (imageWidth >= thumbSize || imageHeight >= thumbSize) {
+
+            /*
+             * Image is larger than thumb image -> resize to thumb
+             */
+
+            if (isHQCreated == false) {
+
+               // image size is between thumb and HQ
+
+               if (_requestedImageQuality == ImageQuality.HQ) {
+                  swtRequestedImage = swtHQImage;
+               }
+            }
+
+            // check if thumb image is already available
+            final Image thumbImage = loadImageFromStore_SWT(ImageQuality.THUMB);
+            if (thumbImage != null) {
+
+               // thumb image is already available in the thumbstore
+
+               if (swtRequestedImage == null && _requestedImageQuality == ImageQuality.THUMB) {
+
+                  swtRequestedImage = thumbImage;
+
+               } else {
+
+                  _allTrackedSWTImages.add(thumbImage);
+               }
 
             } else {
 
-               _allTrackedSWTImages.add(exifThumbImage);
+               /*
+                * Create thumb image
+                */
+
+               Image swtScaledThumbImage;
+               ImageData swtScaledThumbImageData;
+
+               final long startResizeThumb = System.currentTimeMillis();
+               {
+                  final Point bestSize = ImageUtils.getBestSize(imageWidth, imageHeight, thumbSize, thumbSize);
+
+                  swtScaledThumbImageData = swtOriginalImageData.scaledTo(bestSize.x, bestSize.y);
+
+                  swtScaledThumbImage = new Image(_display, new CustomScalingImageDataProvider(swtScaledThumbImageData));
+
+                  _allTrackedSWTImages.add(swtScaledThumbImage);
+
+                  swtSaveThumbImage = swtScaledThumbImage;
+               }
+               endResizeThumb = System.currentTimeMillis() - startResizeThumb;
             }
 
          } else {
 
-            /*
-             * Create thumb image
-             */
+            // loaded image is smaller than a thumb image
 
-            Image swtScaledThumbImage;
-            final long startResizeThumb = System.currentTimeMillis();
-            {
-               final Point bestSize = ImageUtils.getBestSize(imageWidth, imageHeight, thumbSize, thumbSize);
+            swtSaveThumbImage = swtOriginalImage;
+         }
 
-               final ImageData swtThumbImageData = originalSWTImageData.scaledTo(bestSize.x, bestSize.y);
+         /*
+          * Save thumb image
+          */
+         if (swtSaveThumbImage == swtOriginalImage) {
 
-               swtScaledThumbImage = new Image(_display, new CustomScalingImageDataProvider(swtThumbImageData));
+            // original image is not saved as a thumb
 
-               _allTrackedSWTImages.add(swtScaledThumbImage);
+            if (swtRequestedImage == null) {
 
-               swtSaveThumbImage = swtScaledThumbImage;
+               swtRequestedImage = swtSaveThumbImage;
             }
-            endResizeThumb = System.currentTimeMillis() - startResizeThumb;
-         }
 
-      } else {
+         } else {
 
-         // loaded image is smaller than a thumb image
+            boolean isSaved = true;
 
-         swtSaveThumbImage = originalSWTImage;
-      }
+            if (swtSaveThumbImage != null) {
 
-      /*
-       * Save thumb image
-       */
-      if (swtSaveThumbImage == originalSWTImage) {
+               final long startSaveThumb = System.currentTimeMillis();
+               {
+                  final IPath storeThumbImagePath = ThumbnailStore.getStoreImagePath(_photo, ImageQuality.THUMB);
 
-         // original image is not saved as a thumb
-
-         if (requestedSWTImage == null) {
-
-            requestedSWTImage = swtSaveThumbImage;
-         }
-
-      } else {
-
-         boolean isSaved = true;
-
-         if (swtSaveThumbImage != null) {
-
-            final long startSaveThumb = System.currentTimeMillis();
-            {
-               final IPath storeThumbImagePath = ThumbnailStore.getStoreImagePath(_photo, ImageQuality.THUMB);
-
-               isSaved = ThumbnailStore.saveResizedImage_SWT(
-                     swtSaveThumbImage,
-                     storeThumbImagePath,
-                     originalImageProperties);
+                  isSaved = ThumbnailStore.saveResizedImage_SWT(
+                        swtSaveThumbImage,
+                        storeThumbImagePath,
+                        originalImageProperties);
+               }
+               endSaveThumb = System.currentTimeMillis() - startSaveThumb;
             }
-            endSaveThumb = System.currentTimeMillis() - startSaveThumb;
-         }
 
-         if (isSaved == false) {
+            if (isSaved == false) {
 
-            // AWT save error has occurred, possible error: "Bogus input colorspace"
-            PhotoLoadManager.putPhotoInThumbSaveErrorMap(originalImagePathName);
+               // AWT save error has occurred, possible error: "Bogus input colorspace"
+               PhotoLoadManager.putPhotoInThumbSaveErrorMap(originalImagePathName);
 
-            if (requestedSWTImage == null) {
+               if (swtRequestedImage == null) {
 
-               requestedSWTImage = swtSaveThumbImage;
-
-               if (requestedSWTImage == null) {
-                  exceptionMessage = "Photo image with thumb save error cannot be created with SWT (2): %s".formatted(originalImagePathName); //$NON-NLS-1$
+                  swtRequestedImage = swtSaveThumbImage;
                }
             }
          }
-      }
 
-      // check if the requested image is set, if not load thumb
-      if (requestedSWTImage == null) {
+         // check if the requested image is set, if not load thumb
+         if (swtRequestedImage == null) {
 
-         // create swt image from saved AWT image (convert AWT->SWT)
+            // create swt image from saved AWT image (convert AWT->SWT)
 
-         requestedSWTImage = loadImageFromStore_SWT(ImageQuality.THUMB);
-      }
+            swtRequestedImage = loadImageFromStore_SWT(ImageQuality.THUMB);
+         }
 
-      if (requestedSWTImage != null) {
+         if (swtRequestedImage != null) {
 
-         // ensure metadata are loaded
-         _photo.getImageMetaData();
+            // ensure metadata are loaded
+            _photo.getImageMetaData();
 
-         // keep requested image in cache
-         PhotoImageCache.putImage_SWT(_requestedImageKey, requestedSWTImage, originalImagePathName);
-      }
+            // keep requested image in cache
+            PhotoImageCache.putImage_SWT(_requestedImageKey, swtRequestedImage, originalImagePathName);
+         }
 
-      if (requestedSWTImage == null) {
-         setState_LoadingError();
+         if (swtRequestedImage == null) {
+            setState_LoadingError();
+         }
       }
 
       final long end = System.currentTimeMillis() - start;
 
-      final String text = " SVG: " //$NON-NLS-1$
-            + "%-15s " //$NON-NLS-1$
-            + "%-15s  " //$NON-NLS-1$
-            + "total: %5d  " //$NON-NLS-1$
-            + "load: %5d  " //$NON-NLS-1$
-//            + "resizeHQ: %3d  " //$NON-NLS-1$
-//            + "saveHQ: %4d  " //$NON-NLS-1$
-            + "resizeThumb: %3d  " //$NON-NLS-1$
-            + "saveThumb: %3d"; //$NON-NLS-1$
+      final String text = " SVG: " //     //$NON-NLS-1$
+            + "%-15s " //                 //$NON-NLS-1$
+            + "%-15s  " //                //$NON-NLS-1$
+            + "total: %5d  " //           //$NON-NLS-1$
+            + "load: %5d  " //            //$NON-NLS-1$
+            + "resizeHQ: %3d  " //        //$NON-NLS-1$
+            + "saveHQ: %4d  " //          //$NON-NLS-1$
+            + "resizeThumb: %3d  " //     //$NON-NLS-1$
+            + "saveThumb: %3d" //         //$NON-NLS-1$
+      ;
 
       System.out.println(UI.timeStampNano() + text.formatted(
 
@@ -1779,19 +1860,15 @@ public class PhotoImageLoader {
 
             end,
             endHqLoad,
-//            endResizeHQ,
-//            endSaveHQ,
+            endResizeHQ,
+            endSaveHQ,
             endResizeThumb,
             endSaveThumb));
 
-      if (exceptionMessage != null) {
-         throw new Exception(exceptionMessage);
-      }
-
       // all created swt images are tracked and will be disposed but keep returned image
-      _allTrackedSWTImages.remove(requestedSWTImage);
+      _allTrackedSWTImages.remove(swtRequestedImage);
 
-      return requestedSWTImage;
+      return swtRequestedImage;
    }
 
    /**

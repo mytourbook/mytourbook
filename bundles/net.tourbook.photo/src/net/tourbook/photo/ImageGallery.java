@@ -1035,29 +1035,6 @@ public abstract class ImageGallery implements
       });
    }
 
-//   /**
-//    * column: latitude
-//    */
-//   private void defineColumnLatitude() {
-//
-//      final ColumnDefinition colDef = TableColumnFactory.LATITUDE.createColumn(_columnManager, _pc);
-//
-//      colDef.setIsDefaultColumn();
-//      colDef.setLabelProvider(new CellLabelProvider() {
-//         @Override
-//         public void update(final ViewerCell cell) {
-//
-//            final double latitude = ((Photo) cell.getElement()).getLatitude();
-//
-//            if (latitude == Double.MIN_VALUE) {
-//               cell.setText(UI.EMPTY_STRING);
-//            } else {
-//               cell.setText(_nf8.format(latitude));
-//            }
-//         }
-//      });
-//   }
-
    /**
     * column: location
     */
@@ -1076,29 +1053,6 @@ public abstract class ImageGallery implements
          }
       });
    }
-
-//   /**
-//    * column: longitude
-//    */
-//   private void defineColumnLongitude() {
-//
-//      final ColumnDefinition colDef = net.tourbook.ui.TableColumnFactory.LONGITUDE.createColumn(_columnManager, _pc);
-//
-//      colDef.setIsDefaultColumn();
-//      colDef.setLabelProvider(new CellLabelProvider() {
-//         @Override
-//         public void update(final ViewerCell cell) {
-//
-//            final double longitude = ((Photo) cell.getElement()).getLongitude();
-//
-//            if (longitude == Double.MIN_VALUE) {
-//               cell.setText(UI.EMPTY_STRING);
-//            } else {
-//               cell.setText(_nf8.format(longitude));
-//            }
-//         }
-//      });
-//   }
 
    /**
     * column: orientation
@@ -2335,6 +2289,17 @@ public abstract class ImageGallery implements
    @Override
    public void reloadViewer() {
       _photoViewer.setInput(new Object[0]);
+   }
+
+   /**
+    * Reset all loading states for all photos that images can do a clean reloading
+    */
+   public void resetPhotoLoadingStates() {
+
+      for (final Photo photo : _allPhotos) {
+
+         photo.resetLoadingStates();
+      }
    }
 
    void restoreState() {

@@ -145,6 +145,7 @@ public class PicDirImages implements IPhotoGalleryProvider {
 
       System.gc();
 
+      _photoGallery.resetPhotoLoadingStates();
       _photoGallery.refreshUI();
    }
 
@@ -268,7 +269,7 @@ public class PicDirImages implements IPhotoGalleryProvider {
    private void createActions() {
 
 // SET_FORMATTING_OFF
-      
+
       _actionNavigateBackward                = new ActionNavigateHistoryBackward(this, _picDirView);
       _actionNavigateForward                 = new ActionNavigateHistoryForward(this, _picDirView);
 
@@ -281,7 +282,7 @@ public class PicDirImages implements IPhotoGalleryProvider {
       _actionSortFolderHistory               = new ActionSortFolderHistory(this);
 
       _actionToggleFolderGallery             = new ActionToggleFolderGallery(this);
-      
+
 // SET_FORMATTING_ON
    }
 
