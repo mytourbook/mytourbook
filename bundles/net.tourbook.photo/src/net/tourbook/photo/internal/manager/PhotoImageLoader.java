@@ -21,8 +21,9 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.time.LocalDate;
-import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Properties;
+import java.util.Set;
 import java.util.concurrent.LinkedBlockingDeque;
 
 import javax.imageio.ImageIO;
@@ -71,26 +72,26 @@ public class PhotoImageLoader {
       Messages.setHandler(new GUIMessageHandler());
    }
 
-   private Photo                    _photo;
-   private ImageQuality             _requestedImageQuality;
-   private int                      _hqImageSize;
-   private String                   _requestedImageKey;
+   private Photo              _photo;
+   private ImageQuality       _requestedImageQuality;
+   private int                _hqImageSize;
+   private String             _requestedImageKey;
 
-   private ILoadCallBack            _loadCallBack;
+   private ILoadCallBack      _loadCallBack;
 
-   private Display                  _display;
+   private Display            _display;
 
    /**
     * Contains AWT images which are disposed after loading
     */
-   private ArrayList<BufferedImage> _trackedAWTImages = new ArrayList<>();
+   private Set<BufferedImage> _allTrackedAWTImages = new HashSet<>();
 
    /**
     * Contains SWT images which are disposed after loading
     */
-   private ArrayList<Image>         _trackedSWTImages = new ArrayList<>();
+   private Set<Image>         _allTrackedSWTImages = new HashSet<>();
 
-   private int[]                    _recursiveCounter = { 0 };
+   private int[]              _recursiveCounter    = { 0 };
 
    public PhotoImageLoader(final Display display,
                            final Photo photo,
@@ -287,19 +288,19 @@ public class PhotoImageLoader {
 
    private void disposeTrackedImages() {
 
-      for (final BufferedImage awtImage : _trackedAWTImages) {
+      for (final BufferedImage awtImage : _allTrackedAWTImages) {
          if (awtImage != null) {
             awtImage.flush();
          }
       }
-      _trackedAWTImages.clear();
+      _allTrackedAWTImages.clear();
 
-      for (final Image swtImage : _trackedSWTImages) {
+      for (final Image swtImage : _allTrackedSWTImages) {
          if (swtImage != null) {
             swtImage.dispose();
          }
       }
-      _trackedSWTImages.clear();
+      _allTrackedSWTImages.clear();
    }
 
    private boolean getIsRotateImageAutomatically() {
@@ -362,7 +363,7 @@ public class PhotoImageLoader {
 
             awtBufferedImage = jpegImageMetadata.getExifThumbnail();
 
-            _trackedAWTImages.add(awtBufferedImage);
+            _allTrackedAWTImages.add(awtBufferedImage);
 
             if (awtBufferedImage == null) {
                return null;
@@ -465,7 +466,7 @@ public class PhotoImageLoader {
 
             awtBufferedImage = jpegImageMetadata.getExifThumbnail();
 
-            _trackedAWTImages.add(awtBufferedImage);
+            _allTrackedAWTImages.add(awtBufferedImage);
 
             if (awtBufferedImage == null) {
                return null;
@@ -776,7 +777,7 @@ public class PhotoImageLoader {
          {
             awtOriginalImage = ImageIO.read(_photo.imageFile);
 
-            _trackedAWTImages.add(awtOriginalImage);
+            _allTrackedAWTImages.add(awtOriginalImage);
          }
          endHqLoad = System.currentTimeMillis() - startHqLoad;
 
@@ -847,7 +848,7 @@ public class PhotoImageLoader {
 
                scaledHQImage = Scalr.resize(awtOriginalImage, Method.QUALITY, maxSize);
 
-               _trackedAWTImages.add(scaledHQImage);
+               _allTrackedAWTImages.add(scaledHQImage);
 
                // rotate image according to the EXIF flag
                if (isRotated == false) {
@@ -959,7 +960,7 @@ public class PhotoImageLoader {
 
                   } else {
 
-                     _trackedSWTImages.add(exifThumbImage);
+                     _allTrackedSWTImages.add(exifThumbImage);
                   }
 
                } else {
@@ -976,7 +977,7 @@ public class PhotoImageLoader {
 
                      awtScaledThumbImage = Scalr.resize(awtHQImage, Method.QUALITY, maxSize);
 
-                     _trackedAWTImages.add(awtScaledThumbImage);
+                     _allTrackedAWTImages.add(awtScaledThumbImage);
 
                      // rotate image according to the exif flag
                      if (isRotated == false) {
@@ -1225,7 +1226,7 @@ public class PhotoImageLoader {
          {
             awtOriginalImage = ImageIO.read(_photo.imageFile);
 
-            _trackedAWTImages.add(awtOriginalImage);
+            _allTrackedAWTImages.add(awtOriginalImage);
          }
          endHqLoad = System.currentTimeMillis() - startHqLoad;
 
@@ -1274,7 +1275,7 @@ public class PhotoImageLoader {
             final int maxSize = Math.max(scaleWidth, scaledHeight);
             scaledHQImage = Scalr.resize(awtOriginalImage, Method.QUALITY, maxSize);
 
-            _trackedAWTImages.add(scaledHQImage);
+            _allTrackedAWTImages.add(scaledHQImage);
 
             // rotate image according to the EXIF flag
             scaledHQImage = transformImageRotate(scaledHQImage);
@@ -1568,16 +1569,16 @@ public class PhotoImageLoader {
 
       final long start = System.currentTimeMillis();
       long endHqLoad = 0;
-      final long endResizeHQ = 0;
+//    long endResizeHQ = 0;
       long endResizeThumb = 0;
-      final long endSaveHQ = 0;
+//    long endSaveHQ = 0;
       long endSaveThumb = 0;
 
-      Image requestedSWTImage = null;
       String exceptionMessage = null;
 
-      Image swtOriginalImage = null;
-      ImageData swtOriginalImageData = null;
+      Image requestedSWTImage = null;
+      Image originalSWTImage = null;
+      ImageData originalSWTImageData = null;
 
       int svgImageSize = _hqImageSize;
       svgImageSize = _hqImageSize;
@@ -1596,23 +1597,23 @@ public class PhotoImageLoader {
 
             final FileInputStream inputStream = new FileInputStream(_photo.imageFile);
 
-            swtOriginalImageData = svgRasterizer.rasterizeSVG(inputStream, svgImageSize, svgImageSize);
+            originalSWTImageData = svgRasterizer.rasterizeSVG(inputStream, svgImageSize, svgImageSize);
 
-            swtOriginalImage = new Image(Display.getDefault(), new CustomScalingImageDataProvider(swtOriginalImageData));
+            originalSWTImage = new Image(Display.getDefault(), new CustomScalingImageDataProvider(originalSWTImageData));
 
-//            _trackedSWTImages.add(swtOriginalImage);
+            _allTrackedSWTImages.add(originalSWTImage);
          }
          endHqLoad = System.currentTimeMillis() - startHqLoad;
 
       } catch (final Exception e) {
 
-         StatusUtil.logError("loadImageSVG() AWT: image \"%s\" cannot be loaded.".formatted(originalImagePathName)); //$NON-NLS-1$
+         StatusUtil.logError("loadImageSVG() SWT: image \"%s\" cannot be loaded.".formatted(originalImagePathName)); //$NON-NLS-1$
 
       } finally {
 
-         if (swtOriginalImage == null) {
+         if (originalSWTImage == null) {
 
-            System.out.println(UI.timeStampNano() + "loadImageSVG() AWT: image \"%s\" cannot be loaded".formatted(originalImagePathName)); //$NON-NLS-1$
+            System.out.println(UI.timeStampNano() + "loadImageSVG() SWT: image \"%s\" cannot be loaded".formatted(originalImagePathName)); //$NON-NLS-1$
 
             return null;
          }
@@ -1622,8 +1623,8 @@ public class PhotoImageLoader {
        * Create HQ image from original image
        */
 
-      final int originalImageWidth = swtOriginalImageData.width;
-      final int originalImageHeight = swtOriginalImageData.height;
+      final int originalImageWidth = originalSWTImageData.width;
+      final int originalImageHeight = originalSWTImageData.height;
 
       final Properties originalImageProperties = new Properties();
       originalImageProperties.put(ThumbnailStore.ORIGINAL_IMAGE_WIDTH, Integer.toString(originalImageWidth));
@@ -1660,7 +1661,7 @@ public class PhotoImageLoader {
 
             } else {
 
-               _trackedSWTImages.add(exifThumbImage);
+               _allTrackedSWTImages.add(exifThumbImage);
             }
 
          } else {
@@ -1674,13 +1675,11 @@ public class PhotoImageLoader {
             {
                final Point bestSize = ImageUtils.getBestSize(imageWidth, imageHeight, thumbSize, thumbSize);
 
-               final ImageData swtThumbImageData = swtOriginalImageData.scaledTo(bestSize.x, bestSize.y);
+               final ImageData swtThumbImageData = originalSWTImageData.scaledTo(bestSize.x, bestSize.y);
 
                swtScaledThumbImage = new Image(_display, new CustomScalingImageDataProvider(swtThumbImageData));
 
-               _trackedSWTImages.add(swtScaledThumbImage);
-
-               // rotate image according to the exif flag
+               _allTrackedSWTImages.add(swtScaledThumbImage);
 
                swtSaveThumbImage = swtScaledThumbImage;
             }
@@ -1691,13 +1690,13 @@ public class PhotoImageLoader {
 
          // loaded image is smaller than a thumb image
 
-         swtSaveThumbImage = swtOriginalImage;
+         swtSaveThumbImage = originalSWTImage;
       }
 
       /*
        * Save thumb image
        */
-      if (swtSaveThumbImage == swtOriginalImage) {
+      if (swtSaveThumbImage == originalSWTImage) {
 
          // original image is not saved as a thumb
 
@@ -1768,8 +1767,8 @@ public class PhotoImageLoader {
             + "%-15s  " //$NON-NLS-1$
             + "total: %5d  " //$NON-NLS-1$
             + "load: %5d  " //$NON-NLS-1$
-            + "resizeHQ: %3d  " //$NON-NLS-1$
-            + "saveHQ: %4d  " //$NON-NLS-1$
+//            + "resizeHQ: %3d  " //$NON-NLS-1$
+//            + "saveHQ: %4d  " //$NON-NLS-1$
             + "resizeThumb: %3d  " //$NON-NLS-1$
             + "saveThumb: %3d"; //$NON-NLS-1$
 
@@ -1780,14 +1779,17 @@ public class PhotoImageLoader {
 
             end,
             endHqLoad,
-            endResizeHQ,
-            endSaveHQ,
+//            endResizeHQ,
+//            endSaveHQ,
             endResizeThumb,
             endSaveThumb));
 
       if (exceptionMessage != null) {
          throw new Exception(exceptionMessage);
       }
+
+      // all created swt images are tracked and will be disposed but keep returned image
+      _allTrackedSWTImages.remove(requestedSWTImage);
 
       return requestedSWTImage;
    }
@@ -2195,13 +2197,13 @@ public class PhotoImageLoader {
       }
 
       final BufferedImage croppedImage = Scalr.crop(thumbImage, cropX, cropY, cropWidth, cropHeight);
-      _trackedAWTImages.add(croppedImage);
+      _allTrackedAWTImages.add(croppedImage);
 
       BufferedImage rotatedImage = croppedImage;
       if (isRotate) {
 
          rotatedImage = Scalr.rotate(croppedImage, Rotation.CW_90);
-         _trackedAWTImages.add(rotatedImage);
+         _allTrackedAWTImages.add(rotatedImage);
       }
 
       return rotatedImage;
@@ -2233,7 +2235,7 @@ public class PhotoImageLoader {
 
          rotatedImage = Scalr.rotate(providedImage, correction);
 
-         _trackedAWTImages.add(rotatedImage);
+         _allTrackedAWTImages.add(rotatedImage);
       }
 
       return rotatedImage;
