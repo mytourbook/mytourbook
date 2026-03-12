@@ -20,6 +20,7 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 
 import net.tourbook.Images;
 import net.tourbook.Messages;
@@ -103,8 +104,9 @@ public class DialogEquipmentPart extends TitleAreaDialog {
    /*
     * UI resources
     */
-   private Image _imageTrash;
    private Image _imageCamera;
+   private Image _imageNow;
+   private Image _imageTrash;
 
    // must be created eraly
    private Image _imageDialog = TourbookPlugin.getImageDescriptor(Images.Equipment_Part).createImage();
@@ -115,8 +117,8 @@ public class DialogEquipmentPart extends TitleAreaDialog {
    private Composite                 _container;
    private Composite                 _parent;
 
+   private Button                    _btnDateRetiredNow;
    private Button                    _btnDeleteImage;
-
    private Button                    _chkCollate;
    private Button                    _chkSyncDates;
    private Button                    _rdoCollateWith_Previous;
@@ -276,6 +278,7 @@ public class DialogEquipmentPart extends TitleAreaDialog {
       final GridDataFactory gdVertCenter = GridDataFactory.fillDefaults().align(SWT.BEGINNING, SWT.CENTER);
 
       final int defaultWidth = convertWidthInCharsToPixels(40);
+      final int currencyWidth = UI.IS_WIN ? convertWidthInCharsToPixels(4) : convertWidthInCharsToPixels(12);
 
       // > 0 will hide the decorator
       final int decoratorDistance = 3;
@@ -409,7 +412,7 @@ public class DialogEquipmentPart extends TitleAreaDialog {
 
             GridDataFactory.fillDefaults()
                   .align(SWT.BEGINNING, SWT.FILL)
-                  .hint(_pc.convertWidthInCharsToPixels(4), SWT.DEFAULT)
+                  .hint(currencyWidth, SWT.DEFAULT)
                   .applyTo(_comboPriceUnit);
 
             _autocomplete_PriceUnit = new AutoComplete_ComboInputMT(_comboPriceUnit);
@@ -459,8 +462,12 @@ public class DialogEquipmentPart extends TitleAreaDialog {
 
             _dateRetired = new DateTime(_container, SWT.DATE | SWT.MEDIUM | SWT.DROP_DOWN);
             _dateRetired.addSelectionListener(_defaultSelectionListener);
+
+            _btnDateRetiredNow = new Button(_container, SWT.PUSH);
+            _btnDateRetiredNow.setImage(_imageNow);
+            _btnDateRetiredNow.setToolTipText(Messages.Dialog_Equipment_Button_SetDateToToday_Tooltip);
+            _btnDateRetiredNow.addSelectionListener(SelectionListener.widgetSelectedAdapter(selectionEvent -> onSelect_RetireNow()));
          }
-         UI.createSpacer_Horizontal(_container, 1);
          UI.createSpacer_Horizontal(_container, 1);
          {
             /*
@@ -633,19 +640,21 @@ public class DialogEquipmentPart extends TitleAreaDialog {
             _comboType,
             _comboSize,
 
+            _dateUsed,
+            _dateBuilt,
+            _chkSyncDates,
+            _dateRetired,
+            _btnDateRetiredNow,
+
             _spinPrice,
             _comboPriceUnit,
             _spinWeight,
             _spinDistance,
 
-            _dateUsed,
-            _dateBuilt,
-            _chkSyncDates,
-            _dateRetired,
             _chkCollate,
-
             _txtUrlAddress,
             _txtDescription,
+            _lblImage,
       });
    }
 
@@ -726,8 +735,13 @@ public class DialogEquipmentPart extends TitleAreaDialog {
 
       _pc = new PixelConverter(_parent);
 
-      _imageCamera = TourbookPlugin.getImageDescriptor(Images.Camera).createImage();
-      _imageTrash = TourbookPlugin.getImageDescriptor(Images.App_Trash_Themed).createImage();
+   // SET_FORMATTING_OFF
+
+      _imageCamera   = TourbookPlugin.getImageDescriptor(Images.Camera).createImage();
+      _imageNow      = TourbookPlugin.getImageDescriptor(Images.Calendar).createImage();
+      _imageTrash    = TourbookPlugin.getImageDescriptor(Images.App_Trash_Themed).createImage();
+
+// SET_FORMATTING_ON
 
       _parent.addDisposeListener(disposeEvent -> onDispose());
 
@@ -841,6 +855,7 @@ public class DialogEquipmentPart extends TitleAreaDialog {
 
       UI.disposeResource(_imageCamera);
       UI.disposeResource(_imageDialog);
+      UI.disposeResource(_imageNow);
       UI.disposeResource(_imageTrash);
    }
 
@@ -903,6 +918,17 @@ public class DialogEquipmentPart extends TitleAreaDialog {
       }
 
       _isModified = true;
+
+      enableControls();
+   }
+
+   private void onSelect_RetireNow() {
+
+      _isModified = true;
+
+      final ZonedDateTime now = TimeTools.now();
+
+      _dateRetired.setDate(now.getYear(), now.getMonthValue() - 1, now.getDayOfMonth());
 
       enableControls();
    }
