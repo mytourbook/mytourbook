@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2025 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2026 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -45,6 +45,7 @@ import net.tourbook.photo.PhotoImageMetadata;
 import net.tourbook.photo.PhotoLoadManager;
 import net.tourbook.photo.PhotoLoadingState;
 
+import org.apache.commons.imaging.ImageFormats;
 import org.apache.commons.imaging.common.ImageMetadata;
 import org.apache.commons.imaging.formats.jpeg.JpegImageMetadata;
 import org.eclipse.core.runtime.IPath;
@@ -54,6 +55,7 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.ImageData;
 import org.eclipse.swt.graphics.Rectangle;
+import org.eclipse.swt.internal.DPIUtil;
 import org.eclipse.swt.widgets.Display;
 import org.imgscalr.Scalr;
 import org.imgscalr.Scalr.Method;
@@ -65,7 +67,9 @@ import pixelitor.utils.Messages;
 
 public class PhotoImageLoader {
 
-   private static IPreferenceStore _prefStore = PhotoActivator.getPrefStore();
+   private static IPreferenceStore _prefStore            = PhotoActivator.getPrefStore();
+
+   private static final String     TEMP_IMAGE_FORMAT_JPG = "jpg";                        //$NON-NLS-1$
 
    static {
 
@@ -74,6 +78,7 @@ public class PhotoImageLoader {
 
    private Photo              _photo;
    private ImageQuality       _requestedImageQuality;
+   private ImageFormats       _thumbImageFormat;
    private int                _hqImageSize;
    private String             _requestedImageKey;
 
@@ -106,6 +111,9 @@ public class PhotoImageLoader {
       _requestedImageQuality  = imageQuality;
       _hqImageSize            = hqImageSize;
       _loadCallBack           = loadCallBack;
+
+      // png is needed because of the background tranparency
+      _thumbImageFormat       = photo.isSvgImage() ? ImageFormats.PNG : ImageFormats.JPEG;
 
       _requestedImageKey = photo.getImageKey(_requestedImageQuality);
 
@@ -259,7 +267,7 @@ public class PhotoImageLoader {
          tempFilename = tempFile.getName();
          tempFile.delete();
 
-         ImageIO.write(awtBufferedImage, ThumbnailStore.THUMBNAIL_IMAGE_EXTENSION_JPG, new File(tempFilename));
+         ImageIO.write(awtBufferedImage, TEMP_IMAGE_FORMAT_JPG, new File(tempFilename));
 
       } catch (final Exception e) {
 
@@ -409,7 +417,7 @@ public class PhotoImageLoader {
 
          // get image from thumbnail image in the EXIF data
 
-         final IPath storeThumbImageFilePath = ThumbnailStore.getStoreImagePath(_photo, ImageQuality.THUMB);
+         final IPath storeThumbImageFilePath = ThumbnailStore.getStoreImagePath(_photo, ImageQuality.THUMB, _thumbImageFormat);
 
          final Image exifThumbnail = loadImageFromEXIFThumbnail_SWT(storeThumbImageFilePath);
          if (exifThumbnail != null) {
@@ -535,7 +543,7 @@ public class PhotoImageLoader {
       /*
        * check if image is available in the thumbstore
        */
-      final IPath requestedStoreImageFilePath = ThumbnailStore.getStoreImagePath(_photo, requestedImageQuality);
+      final IPath requestedStoreImageFilePath = ThumbnailStore.getStoreImagePath(_photo, requestedImageQuality, _thumbImageFormat);
 
       final String imageStoreFilePath = requestedStoreImageFilePath.toOSString();
       final File storeImageFile = new File(imageStoreFilePath);
@@ -586,7 +594,7 @@ public class PhotoImageLoader {
       /*
        * check if image is available in the thumbstore
        */
-      final IPath requestedStoreImageFilePath = ThumbnailStore.getStoreImagePath(_photo, requestedImageQuality);
+      final IPath requestedStoreImageFilePath = ThumbnailStore.getStoreImagePath(_photo, requestedImageQuality, _thumbImageFormat);
 
       final String imageStoreFilePath = requestedStoreImageFilePath.toOSString();
       final File storeImageFile = new File(imageStoreFilePath);
@@ -870,10 +878,13 @@ public class PhotoImageLoader {
              */
             final long startSaveHQ = System.currentTimeMillis();
             {
+               final IPath storeImagePath = ThumbnailStore.getStoreImagePath(_photo, ImageQuality.HQ, _thumbImageFormat);
+
                final boolean isSaved = ThumbnailStore.saveResizedImage_AWT(
                      scaledHQImage,
-                     ThumbnailStore.getStoreImagePath(_photo, ImageQuality.HQ),
-                     originalImageProperties);
+                     storeImagePath,
+                     originalImageProperties,
+                     _thumbImageFormat);
 
                if (isSaved == false) {
 
@@ -942,7 +953,7 @@ public class PhotoImageLoader {
 
                   // get thumb image
 
-                  final IPath storeImageFilePath = ThumbnailStore.getStoreImagePath(_photo, ImageQuality.THUMB);
+                  final IPath storeImageFilePath = ThumbnailStore.getStoreImagePath(_photo, ImageQuality.THUMB, _thumbImageFormat);
                   requestedSWTImage = loadImageFromEXIFThumbnail_SWT(storeImageFilePath);
                }
 
@@ -1024,12 +1035,13 @@ public class PhotoImageLoader {
 
                final long startSaveThumb = System.currentTimeMillis();
                {
-                  final IPath storeThumbImagePath = ThumbnailStore.getStoreImagePath(_photo, ImageQuality.THUMB);
+                  final IPath storeThumbImagePath = ThumbnailStore.getStoreImagePath(_photo, ImageQuality.THUMB, _thumbImageFormat);
 
                   isSaved = ThumbnailStore.saveResizedImage_AWT(
                         awtSaveThumbImage,
                         storeThumbImagePath,
-                        originalImageProperties);
+                        originalImageProperties,
+                        _thumbImageFormat);
                }
                endSaveThumb = System.currentTimeMillis() - startSaveThumb;
             }
@@ -1296,10 +1308,13 @@ public class PhotoImageLoader {
           */
          final long startSaveHQ = System.currentTimeMillis();
          {
+            final IPath storeImagePath = ThumbnailStore.getStoreImagePath(_photo, ImageQuality.THUMB_HQ, _thumbImageFormat);
+
             ThumbnailStore.saveResizedImage_AWT(
                   awtHQImage,
-                  ThumbnailStore.getStoreImagePath(_photo, ImageQuality.THUMB_HQ),
-                  null);
+                  storeImagePath,
+                  null,
+                  _thumbImageFormat);
          }
          endSaveHQ = System.currentTimeMillis() - startSaveHQ;
 
@@ -1574,7 +1589,6 @@ public class PhotoImageLoader {
       long endSaveHQ = 0;
       long endSaveThumb = 0;
 
-
       Image swtRequestedImage = null;
 
       Image swtOriginalImage = null;
@@ -1601,7 +1615,14 @@ public class PhotoImageLoader {
 
             swtOriginalImageData = svgRasterizer.rasterizeSVG(inputStream, svgImageSize, svgImageSize);
 
-            swtOriginalImage = new Image(_display, new CustomScalingImageDataProvider(swtOriginalImageData));
+            // this scaling is fixing an IllegalArgumentException when its scaled within SWT
+            final int deviceZoom = DPIUtil.getDeviceZoom();
+            final float deviceScale = deviceZoom / 100.0f;
+
+            final CustomScalingImageDataProvider imageDataProvider = new CustomScalingImageDataProvider(swtOriginalImageData);
+            imageDataProvider.setImageScale(deviceScale);
+
+            swtOriginalImage = new Image(_display, imageDataProvider);
 
             _allTrackedSWTImages.add(swtOriginalImage);
          }
@@ -1665,7 +1686,13 @@ public class PhotoImageLoader {
 
                swtScaledHQImageData = swtOriginalImageData.scaledTo(bestSize.x, bestSize.y);
 
-               swtScaledHQImage = new Image(_display, new CustomScalingImageDataProvider(swtScaledHQImageData));
+               final int deviceZoom = DPIUtil.getDeviceZoom();
+               final float deviceScale = deviceZoom / 100.0f;
+
+               final CustomScalingImageDataProvider imageDataProvider = new CustomScalingImageDataProvider(swtScaledHQImageData);
+               imageDataProvider.setImageScale(deviceScale);
+
+               swtScaledHQImage = new Image(_display, imageDataProvider);
 
                _allTrackedSWTImages.add(swtScaledHQImage);
 
@@ -1681,10 +1708,13 @@ public class PhotoImageLoader {
              */
             final long startSaveHQ = System.currentTimeMillis();
             {
+               final IPath storeImagePath = ThumbnailStore.getStoreImagePath(_photo, ImageQuality.HQ, _thumbImageFormat);
+
                final boolean isSaved = ThumbnailStore.saveResizedImage_SWT(
                      swtScaledHQImage,
-                     ThumbnailStore.getStoreImagePath(_photo, ImageQuality.HQ),
-                     originalImageProperties);
+                     storeImagePath,
+                     originalImageProperties,
+                     _thumbImageFormat);
 
                if (isSaved == false) {
 
@@ -1796,12 +1826,13 @@ public class PhotoImageLoader {
 
                final long startSaveThumb = System.currentTimeMillis();
                {
-                  final IPath storeThumbImagePath = ThumbnailStore.getStoreImagePath(_photo, ImageQuality.THUMB);
+                  final IPath storeThumbImagePath = ThumbnailStore.getStoreImagePath(_photo, ImageQuality.THUMB, _thumbImageFormat);
 
                   isSaved = ThumbnailStore.saveResizedImage_SWT(
                         swtSaveThumbImage,
                         storeThumbImagePath,
-                        originalImageProperties);
+                        originalImageProperties,
+                        _thumbImageFormat);
                }
                endSaveThumb = System.currentTimeMillis() - startSaveThumb;
             }
@@ -1844,8 +1875,8 @@ public class PhotoImageLoader {
 
       final String text = " SVG: " //     //$NON-NLS-1$
             + "%-15s " //                 //$NON-NLS-1$
-            + "%-50s  " //                //$NON-NLS-1$
             + "total: %5d  " //           //$NON-NLS-1$
+            + "%-50s  " //                //$NON-NLS-1$
             + "load: %5d  " //            //$NON-NLS-1$
             + "resizeHQ: %3d  " //        //$NON-NLS-1$
             + "saveHQ: %4d  " //          //$NON-NLS-1$
@@ -1856,9 +1887,10 @@ public class PhotoImageLoader {
       System.out.println(UI.timeStampNano() + text.formatted(
 
             Thread.currentThread().getName(),
+            end,
+
             _photo.imageFileName,
 
-            end,
             endHqLoad,
             endResizeHQ,
             endSaveHQ,
@@ -1921,7 +1953,7 @@ public class PhotoImageLoader {
 
             // 2. get image from thumbnail image in the EXIF data
 
-            final IPath storeThumbImageFilePath = ThumbnailStore.getStoreImagePath(_photo, ImageQuality.THUMB);
+            final IPath storeThumbImageFilePath = ThumbnailStore.getStoreImagePath(_photo, ImageQuality.THUMB, _thumbImageFormat);
 
             final BufferedImage awtExifThumbnail = loadImageFromEXIFThumbnail_AWT(storeThumbImageFilePath);
             if (awtExifThumbnail != null) {
@@ -2050,7 +2082,7 @@ public class PhotoImageLoader {
 //  debug (delay) image loading
 //            Thread.sleep(500);
 
-            final IPath storeThumbImageFilePath = ThumbnailStore.getStoreImagePath(_photo, ImageQuality.THUMB);
+            final IPath storeThumbImageFilePath = ThumbnailStore.getStoreImagePath(_photo, ImageQuality.THUMB, _thumbImageFormat);
 
             final Image exifThumbnail = loadImageFromEXIFThumbnail_SWT(storeThumbImageFilePath);
             if (exifThumbnail != null) {
