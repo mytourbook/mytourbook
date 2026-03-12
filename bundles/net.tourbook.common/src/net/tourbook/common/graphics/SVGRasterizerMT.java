@@ -46,6 +46,8 @@ import java.awt.image.DataBufferInt;
 import java.io.InputStream;
 import java.util.Map;
 
+import net.tourbook.common.util.ImageUtils;
+
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.ImageData;
 import org.eclipse.swt.graphics.PaletteData;
@@ -156,6 +158,22 @@ public class SVGRasterizerMT {
 
       final SVGDocument svgDocument = loadAndValidateSVG(inputStream);
       final BufferedImage rasterizedImage = renderSVG(svgDocument, width, height);
+
+      return convertToSWTImageData(rasterizedImage);
+   }
+
+   public ImageData rasterizeSVGWithMaxSize(final InputStream inputStream, final int maxSize) {
+
+      final SVGDocument svgDocument = loadAndValidateSVG(inputStream);
+
+      final FloatSize svgSize = svgDocument.size();
+      
+      final int imageWidth = (int) svgSize.width;
+      final int imageHeight = (int) svgSize.height;
+
+      final org.eclipse.swt.graphics.Point bestSize = ImageUtils.getBestSize(imageWidth, imageHeight, maxSize, maxSize, false);
+
+      final BufferedImage rasterizedImage = renderSVG(svgDocument, bestSize.x, bestSize.y);
 
       return convertToSWTImageData(rasterizedImage);
    }

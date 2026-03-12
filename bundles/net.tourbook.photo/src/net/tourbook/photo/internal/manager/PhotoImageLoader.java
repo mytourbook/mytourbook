@@ -1596,9 +1596,7 @@ public class PhotoImageLoader {
 
       Image swtHQImage = null;
 
-      int svgImageSize = _hqImageSize;
-      svgImageSize = _hqImageSize;
-//    svgImageSize = 159;
+      final int svgImageSize = _hqImageSize;
 
       /*
        * Load original image
@@ -1613,7 +1611,7 @@ public class PhotoImageLoader {
 
             final FileInputStream inputStream = new FileInputStream(_photo.imageFile);
 
-            swtOriginalImageData = svgRasterizer.rasterizeSVG(inputStream, svgImageSize, svgImageSize);
+            swtOriginalImageData = svgRasterizer.rasterizeSVGWithMaxSize(inputStream, svgImageSize);
 
             // this scaling is fixing an IllegalArgumentException when its scaled within SWT
             final int deviceZoom = DPIUtil.getDeviceZoom();
