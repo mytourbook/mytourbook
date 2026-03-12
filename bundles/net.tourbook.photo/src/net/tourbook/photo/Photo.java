@@ -284,12 +284,14 @@ public class Photo implements Serializable {
    private String                        _imageKey_Original;
 
    /**
-    * This array keeps track of the loading state for the photo images and for different qualities
+    * This state keeps track of the loading state for the photo images and for different qualities.
+    * <p>
+    * They must be volatile otherwise not all thread see the current value !
     */
-   private PhotoLoadingState             _photoLoadingStateThumb;
-   private PhotoLoadingState             _photoLoadingStateThumbHQ;
-   private PhotoLoadingState             _photoLoadingStateHQ;
-   private PhotoLoadingState             _photoLoadingStateOriginal;
+   private volatile PhotoLoadingState    _photoLoadingStateThumb;
+   private volatile PhotoLoadingState    _photoLoadingStateThumbHQ;
+   private volatile PhotoLoadingState    _photoLoadingStateHQ;
+   private volatile PhotoLoadingState    _photoLoadingStateOriginal;
 
    /**
     * Is <code>true</code> when loading the image causes an error.
@@ -892,11 +894,11 @@ public class Photo implements Serializable {
     *         are already loaded.
     */
    public ImageMetadata getImageMetaData(final Boolean isReadThumbnail) {
-      
+
       if (_isSvgImage) {
-         
+
          // svg images do not contain "normal" meta data
-         
+
          return null;
       }
 
@@ -1640,12 +1642,16 @@ public class Photo implements Serializable {
             + " orientation   " + _orientation + NL //                                       //$NON-NLS-1$
             + " rotate        " + rotateDegree + NL //                                       //$NON-NLS-1$
 
-            + " EXIF GPS      %8.5f %8.5f".formatted(_exifLatitude, _exifLongitude) + NL //  //$NON-NLS-1$
-            + " Link GPS      %8.5f %8.5f".formatted(_linkLatitude, _linkLongitude) + NL //  //$NON-NLS-1$
-            + " Tour GPS      %8.5f %8.5f".formatted(_tourLatitude, _tourLongitude) + NL //  //$NON-NLS-1$
+//          + " EXIF GPS      %8.5f %8.5f".formatted(_exifLatitude, _exifLongitude) + NL //  //$NON-NLS-1$
+//          + " Link GPS      %8.5f %8.5f".formatted(_linkLatitude, _linkLongitude) + NL //  //$NON-NLS-1$
+//          + " Tour GPS      %8.5f %8.5f".formatted(_tourLatitude, _tourLongitude) + NL //  //$NON-NLS-1$
 
-            + NL
+            + " _photoLoadingStateThumb    " + _photoLoadingStateThumb + NL //               //$NON-NLS-1$
+            + " _photoLoadingStateThumbHQ  " + _photoLoadingStateThumbHQ + NL //             //$NON-NLS-1$
+            + " _photoLoadingStateHQ       " + _photoLoadingStateHQ + NL //                  //$NON-NLS-1$
+            + " _photoLoadingStateOriginal " + _photoLoadingStateOriginal + NL //            //$NON-NLS-1$
 
+            + NL //
       ;
    }
 

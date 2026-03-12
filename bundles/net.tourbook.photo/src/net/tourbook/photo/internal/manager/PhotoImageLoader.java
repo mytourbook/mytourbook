@@ -1082,7 +1082,7 @@ public class PhotoImageLoader {
 
       final String text = " AWT: " //$NON-NLS-1$
             + "%-15s " //$NON-NLS-1$
-            + "%-15s  " //$NON-NLS-1$
+            + "%-50s  " //$NON-NLS-1$
             + "total: %5d  " //$NON-NLS-1$
             + "load: %5d  " //$NON-NLS-1$
             + "resizeHQ: %3d  " //$NON-NLS-1$
@@ -1652,7 +1652,7 @@ public class PhotoImageLoader {
          // update dimension
          updatePhotoImageSize(imageWidth, imageHeight, true);
 
-         if (imageWidth >= _hqImageSize || imageHeight >= _hqImageSize) {
+         if (imageWidth > _hqImageSize || imageHeight > _hqImageSize) {
 
             // the original image is larger than HQ image -> resize it to HQ
 
@@ -1715,7 +1715,7 @@ public class PhotoImageLoader {
          Image swtSaveThumbImage = null;
 
          final int thumbSize = PhotoLoadManager.IMAGE_SIZE_THUMBNAIL;
-         if (imageWidth >= thumbSize || imageHeight >= thumbSize) {
+         if (imageWidth > thumbSize || imageHeight > thumbSize) {
 
             /*
              * Image is larger than thumb image -> resize to thumb
@@ -1844,7 +1844,7 @@ public class PhotoImageLoader {
 
       final String text = " SVG: " //     //$NON-NLS-1$
             + "%-15s " //                 //$NON-NLS-1$
-            + "%-15s  " //                //$NON-NLS-1$
+            + "%-50s  " //                //$NON-NLS-1$
             + "total: %5d  " //           //$NON-NLS-1$
             + "load: %5d  " //            //$NON-NLS-1$
             + "resizeHQ: %3d  " //        //$NON-NLS-1$

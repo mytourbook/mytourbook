@@ -145,8 +145,8 @@ public class PhotoRenderer extends AbstractGalleryMT20ItemRenderer {
    /**
     * this value has been evaluated by some test
     */
-   private int           _textMinThumbSize  = 50;
-   private int           _fontHeight        = -1;
+   private int           _textMinThumbSize = 50;
+   private int           _fontHeight       = -1;
    private boolean       _isShowPhotoName;
    private boolean       _isShowAnnotations;
 
@@ -161,8 +161,8 @@ public class PhotoRenderer extends AbstractGalleryMT20ItemRenderer {
    private ImageGallery  _imageGallery;
 
    private GalleryMT20   _galleryMT;
-   private int           _gridBorderSize    = 1;
-   private int           _imageBorderSize   = 5;
+   private int           _gridBorderSize   = 1;
+   private int           _imageBorderSize  = 5;
 
    /**
     * photo dimension without grid border but including image border
@@ -171,15 +171,15 @@ public class PhotoRenderer extends AbstractGalleryMT20ItemRenderer {
    private int           _photoHeight;
 
    /* Position and size where the photo image is painted */
-   private int           _photoImageWidth;
-   private int           _photoImageHeight;
-   private int           _paintedDest_DevX;
-   private int           _paintedDest_DevY;
+   private int _photoImageWidth;
+   private int _photoImageHeight;
+   private int _paintedDest_DevX;
+   private int _paintedDest_DevY;
 
    /**
     * Width for the painted image or <code>-1</code> when not initialized.
     */
-   private int           _paintedDest_Width = -1;
+   private int _paintedDest_Width = -1;
 
 //   private int                     _devYAnnotation;
 //   private int                     _devXAnnotationGps;
@@ -332,21 +332,6 @@ public class PhotoRenderer extends AbstractGalleryMT20ItemRenderer {
          // this case should not happen but it did
          return;
       }
-
-//      System.out.println(UI.timeStampNano()
-//            + (" \t" + photo.imageFileName)
-//            + ("\tratingStars=" + photo.ratingStars)
-//            + ("\t" + System.identityHashCode(photo)));
-//      photo.dumpTourReferences();
-//
-////      PhotoCache.dumpAllPhotos();
-//      // TODO remove SYSTEM.OUT.PRINTLN
-
-//      if (photo.imageFileName.equals("P1000641.JPG")) { //$NON-NLS-1$
-//
-//         System.out.println(UI.timeStampNano() + " photo\t" + photo.imageFileName); //$NON-NLS-1$
-//         // TODO remove SYSTEM.OUT.PRINTLN
-//      }
 
       _isFocusActive = isFocusActive;
 
