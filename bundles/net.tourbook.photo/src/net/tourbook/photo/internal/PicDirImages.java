@@ -102,7 +102,7 @@ public class PicDirImages implements IPhotoGalleryProvider {
 
       public ActionClearPhotoCache() {
 
-         super("&Discard cached photo images", AS_PUSH_BUTTON);
+         super("&Discard all cached photo images", AS_PUSH_BUTTON);
       }
 
       @Override

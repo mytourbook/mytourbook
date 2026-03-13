@@ -1093,9 +1093,11 @@ public class PhotoImageLoader {
       final long end = System.currentTimeMillis() - start;
 
       final String text = " AWT: " //$NON-NLS-1$
+
             + "%-15s " //$NON-NLS-1$
-            + "%-50s  " //$NON-NLS-1$
             + "total: %5d  " //$NON-NLS-1$
+            + "%-50s  " //$NON-NLS-1$
+
             + "load: %5d  " //$NON-NLS-1$
             + "resizeHQ: %3d  " //$NON-NLS-1$
             + "saveHQ: %4d  " //$NON-NLS-1$
@@ -1105,9 +1107,9 @@ public class PhotoImageLoader {
       System.out.println(UI.timeStampNano() + text.formatted(
 
             Thread.currentThread().getName(),
+            end,
             _photo.imageFileName,
 
-            end,
             endHqLoad,
             endResizeHQ,
             endSaveHQ,

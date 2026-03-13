@@ -349,6 +349,8 @@ public class PicDirFolder {
                tree.setTopItem(topItem);
             }
             tree.setRedraw(true);
+
+            System.gc();
          }
       });
    }
