@@ -266,11 +266,13 @@ public abstract class TreeViewerItem {
     */
    protected void scrambleValues(final Field[] allFields) {
 
+      String fieldName = null;
+
       try {
 
          for (final Field field : allFields) {
 
-            final String fieldName = field.getName();
+            fieldName = field.getName();
 
             if (fieldName.startsWith(SCRAMBLE_FIELD_PREFIX)) {
 
@@ -300,7 +302,7 @@ public abstract class TreeViewerItem {
 
       } catch (IllegalArgumentException | IllegalAccessException e) {
 
-         StatusUtil.log(e);
+         StatusUtil.log("Exception for fieldname: %s".formatted(fieldName), e);
       }
    }
 

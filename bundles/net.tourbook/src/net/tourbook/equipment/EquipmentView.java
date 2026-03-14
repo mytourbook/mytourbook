@@ -1695,7 +1695,12 @@ public class EquipmentView extends ViewPart implements
 
             } else if (element instanceof final TVIEquipmentView_Part viewItem) {
 
-               date = viewItem.getPart().getDateBuilt_Local();
+               final EquipmentPart part = viewItem.getPart();
+
+               // a service has not a build date, so the value is 0 -> 01.01.1970
+               if (part.isItemType_Part()) {
+                  date = part.getDateBuilt_Local();
+               }
             }
 
             if (date != null) {
@@ -1834,7 +1839,12 @@ public class EquipmentView extends ViewPart implements
 
             } else if (element instanceof final TVIEquipmentView_Part viewItem) {
 
-               date = viewItem.getPart().getDateRetired_Local();
+               final EquipmentPart part = viewItem.getPart();
+
+               // a service has not a retired date, so the value is 0 -> 01.01.1970
+               if (part.isItemType_Part()) {
+                  date = part.getDateRetired_Local();
+               }
             }
 
             if (date != null) {

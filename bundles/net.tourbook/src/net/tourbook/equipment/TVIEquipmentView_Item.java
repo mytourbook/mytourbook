@@ -132,52 +132,55 @@ public abstract class TVIEquipmentView_Item extends TreeViewerItem {
     */
    public String               firstColumn;
 
-   float                       colDistance;
+   /*
+    * All these fields must be public otherwise the scramble feature causes an exception
+    */
+   public float         colDistance;
 
-   long                        colElapsedTime;
-   long                        colRecordedTime;
-   long                        colMovingTime;
-   long                        colPausedTime;
+   public long          colElapsedTime;
+   public long          colRecordedTime;
+   public long          colMovingTime;
+   public long          colPausedTime;
 
-   long                        colAltitudeUp;
-   long                        colAltitudeDown;
+   public long          colAltitudeUp;
+   public long          colAltitudeDown;
 
-   float                       colMaxSpeed;
-   long                        colMaxPulse;
-   long                        colMaxAltitude;
+   public float         colMaxSpeed;
+   public long          colMaxPulse;
+   public long          colMaxAltitude;
 
-   float                       colAvgSpeed;
-   float                       colAvgPace;
+   public float         colAvgSpeed;
+   public float         colAvgPace;
 
-   float                       colAvgPulse;
-   float                       colAvgCadence;
-   float                       colAvgTemperature_Device;
+   public float         colAvgPulse;
+   public float         colAvgCadence;
+   public float         colAvgTemperature_Device;
 
    /**
     * {@link #type} and {@link #dateUsed} are the key parts to collated (summarize) tour values
     */
-   String                      type;
+   public String        type;
 
    /**
     * {@link #type} and {@link #dateUsed} are the key parts to collated (summarize) tour values
     */
-   LocalDateTime               dateUsed;
+   public LocalDateTime dateUsed;
 
    /*
     * These are common values for equipment, part and service
     */
-   float  price;
-   String priceUnit;
+   public float  price;
+   public String priceUnit;
 
    /**
     * Usage duration in ms
     */
-   long   usageDuration;
+   public long   usageDuration;
 
    /**
     * Text which identifies the last collated item
     */
-   String usageDurationLast;
+   public String usageDurationLast;
 
    public TVIEquipmentView_Item(final TreeViewer equipmentViewer, final EquipmentViewerType equipmentType) {
 

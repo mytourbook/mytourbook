@@ -453,8 +453,6 @@ public class EquipmentManager {
 
                clearAllEquipmentResourcesAndFireModifyEvent();
 
-//               updateTourTagFilterProfiles(allEquipment);
-
                returnValue[0] = true;
             }
          });
@@ -603,7 +601,7 @@ public class EquipmentManager {
          return false;
       }
 
-      // confirm deletion, show equipment name and number of tours which contain a equipment
+      // confirm deletion, show equipment name and number of tours which contain an equipment
       final MessageDialog dialog = new MessageDialog(
             display.getActiveShell(),
             dialogTitle,
@@ -623,9 +621,20 @@ public class EquipmentManager {
 
             if (equipment_DeleteParts_SQL(part)) {
 
+               /**
+                * Remove part from equipment parts otherwise it can cause
+                * <p>
+                * org.hibernate.PersistentObjectException: detached entity passed to persist:
+                * net.tourbook.data.EquipmentPart
+                *
+                */
+               final Equipment equipment = part.getEquipment();
+               final Set<EquipmentPart> allEquipmentParts = equipment.getParts();
+               allEquipmentParts.remove(part);
+
                final Set<String> allTypes = new HashSet<>(Arrays.asList(part.getPartType()));
 
-               updateUntilDate_Parts(part.getEquipment(), allTypes, part.getCollateBetween());
+               updateUntilDate_Parts(equipment, allTypes, part.getCollateBetween());
 
                clearAllEquipmentResourcesAndFireModifyEvent();
 

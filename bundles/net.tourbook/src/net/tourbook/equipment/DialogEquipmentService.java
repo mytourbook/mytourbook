@@ -41,7 +41,6 @@ import org.eclipse.jface.fieldassist.ControlDecoration;
 import org.eclipse.jface.fieldassist.FieldDecorationRegistry;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
-import org.eclipse.jface.layout.PixelConverter;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.BusyIndicator;
@@ -96,8 +95,6 @@ public class DialogEquipmentService extends TitleAreaDialog {
 
    private String                       _imageFilePath;
 
-   private PixelConverter               _pc;
-
    /*
     * UI resources
     */
@@ -105,7 +102,7 @@ public class DialogEquipmentService extends TitleAreaDialog {
    private Image _imageCamera;
 
    // must be created eraly
-   private Image _imageDialog = TourbookPlugin.getImageDescriptor(Images.Equipment_Part).createImage();
+   private Image _imageDialog = TourbookPlugin.getImageDescriptor(Images.Equipment_Service).createImage();
 
    /*
     * UI controls
@@ -198,11 +195,15 @@ public class DialogEquipmentService extends TitleAreaDialog {
 
       final String messageTitle =
 
-            _isDuplicateService ? Messages.Dialog_EquipmentService_Dialog_Message_Service_Duplicate
-                  : _isNewService ? Messages.Dialog_EquipmentService_Dialog_Message_Service_New
+            _isDuplicateService
+
+                  ? Messages.Dialog_EquipmentService_Dialog_Message_Service_Duplicate
+                  : _isNewService
+
+                        ? Messages.Dialog_EquipmentService_Dialog_Message_Service_New
                         : Messages.Dialog_EquipmentService_Dialog_Message_Service_Edit;
 
-      setTitle(messageTitle);
+      setTitle(messageTitle.formatted(_serviceEquipment.getName()));
       setMessage(_service.getName());
    }
 
@@ -263,6 +264,7 @@ public class DialogEquipmentService extends TitleAreaDialog {
       final GridDataFactory gdVertCenter = GridDataFactory.fillDefaults().align(SWT.BEGINNING, SWT.CENTER);
 
       final int defaultWidth = convertWidthInCharsToPixels(100);
+      final int currencyWidth = UI.IS_WIN ? convertWidthInCharsToPixels(4) : convertWidthInCharsToPixels(12);
 
       // > 0 will hide the decorator
       final int decoratorDistance = 3;
@@ -377,7 +379,7 @@ public class DialogEquipmentService extends TitleAreaDialog {
 
             GridDataFactory.fillDefaults()
                   .align(SWT.BEGINNING, SWT.FILL)
-                  .hint(_pc.convertWidthInCharsToPixels(4), SWT.DEFAULT)
+                  .hint(currencyWidth, SWT.DEFAULT)
                   .applyTo(_comboPriceUnit);
 
             _autocomplete_PriceUnit = new AutoComplete_ComboInputMT(_comboPriceUnit);
@@ -592,8 +594,6 @@ public class DialogEquipmentService extends TitleAreaDialog {
    }
 
    private void initUI() {
-
-      _pc = new PixelConverter(_parent);
 
       _imageCamera = TourbookPlugin.getImageDescriptor(Images.Camera).createImage();
       _imageTrash = TourbookPlugin.getImageDescriptor(Images.App_Trash_Themed).createImage();
