@@ -2,8 +2,8 @@
 <svg
    version="1.1"
    id="svg2985"
-   height="16.000313"
-   width="16.000122"
+   height="15.999981"
+   width="16"
    xml:space="preserve"
    xmlns="http://www.w3.org/2000/svg"
    xmlns:svg="http://www.w3.org/2000/svg"
@@ -30,16 +30,16 @@
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" /></cc:Work></rdf:RDF></metadata><g
      style="display:inline"
      id="layer1"
-     transform="translate(-359.99988,-69)"><rect
-       y="69.000046"
-       x="359.99988"
+     transform="translate(-349.99988,-34.000141)"><rect
+       y="34.000141"
+       x="349.99988"
        height="15.999983"
        width="15.999987"
        id="rect4471-8-4-0-6-8-5-6-1-5-9-0"
-       style="color:#000000;display:inline;overflow:visible;visibility:visible;fill:none;fill-opacity:0.0511628;stroke:#3a9ff7;stroke-width:0;stroke-linecap:round;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;marker:none;enable-background:accumulate" /><path
+       style="color:#000000;display:inline;overflow:visible;visibility:visible;fill:none;fill-opacity:0.0511628;stroke:none;stroke-width:0;stroke-linecap:round;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;marker:none;enable-background:accumulate" /><path
        id="path2914-8-6-8-5-4-5-7"
-       d="m 366,69.000343 v 6.999655 h -4.99999 L 368.01497,83 375,75.999998 h -5.02115 L 370.02115,69"
+       d="M 356,34.000441 V 41.000096 H 351.00001 L 358.01497,48.000098 365,41.000096 H 359.97885 L 360.02115,34.000098"
        style="display:inline;fill:#d0ec86;fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:0.5;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" /><path
        id="path5651-4-8-8-2-3"
-       d="m 360.00001,84.00031 h 16 v 1 h -16 z"
+       d="M 350.00001,49.000408 H 366.00001 V 50.000408 H 350.00001 Z"
        style="display:inline;fill:#d0ec86;fill-opacity:1;stroke:none;stroke-width:1.41421px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" /></g></svg>

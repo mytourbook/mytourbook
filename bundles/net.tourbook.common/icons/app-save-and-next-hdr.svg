@@ -2,8 +2,8 @@
 <svg
    version="1.1"
    id="svg2985"
-   height="16.008331"
-   width="16"
+   height="16"
+   width="15.999985"
    xml:space="preserve"
    xmlns="http://www.w3.org/2000/svg"
    xmlns:svg="http://www.w3.org/2000/svg"
@@ -30,7 +30,7 @@
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" /></cc:Work></rdf:RDF></metadata><g
      style="display:inline"
      id="layer1"
-     transform="translate(-145,-449.00003)"><g
+     transform="translate(-145.00002,-449.00836)"><g
        id="g76257-9"
        transform="translate(-76.000005,228.67193)"
        style="display:inline"><path
@@ -41,7 +41,7 @@
          d="M 230,232.08872 H 233.00065 M 233.19003,235.16439 236.7,229.33872 233.16994,223.52139 M 233.00065,226.58872 H 230"
          style="display:inline;fill:none;fill-opacity:1;fill-rule:evenodd;stroke:#334400;stroke-width:0.5;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" /></g><path
        id="rect4525-1-0-2-33-0-9-6-0-9-4-6"
-       style="display:inline;overflow:visible;opacity:0.99;fill:none;stroke:#535353;stroke-width:0;marker:none;enable-background:accumulate"
+       style="display:inline;overflow:visible;opacity:0.99;fill:none;stroke:none;stroke-width:0;marker:none;enable-background:accumulate"
        d="M 145.00001,449.00835 H 161 V 465.00835 H 145.00001 Z" /><path
        id="path1768-7-1-0-1"
        style="color:#000000;display:inline;fill:#d0ec86"
