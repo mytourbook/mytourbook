@@ -24,6 +24,10 @@ New / Improvements
     https://github.com/mytourbook/mytourbook/issues/1602
 
 
+* Photo
+  - Display svg images in the photo gallery
+    https://github.com/mytourbook/mytourbook/issues/1642
+
 Changes
 =======
 
