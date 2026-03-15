@@ -180,6 +180,9 @@ public class DialogEquipmentPart extends TitleAreaDialog {
 
          _part = part.clone();
 
+         _part.setName_Service(null);
+         _part.resetPartName();
+
          if (isDuplicatePart) {
 
             // adjust date to today
@@ -219,7 +222,7 @@ public class DialogEquipmentPart extends TitleAreaDialog {
                   : Messages.Dialog_EquipmentPart_Dialog_Message_Part_Edit;
 
       setTitle(messageTitle.formatted(_partEquipment.getName()));
-      setMessage(_part.getName());
+      setMessage(_part.getName_Combined());
    }
 
    private void createActions() {

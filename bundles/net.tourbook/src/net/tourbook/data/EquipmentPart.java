@@ -251,7 +251,7 @@ public class EquipmentPart implements Cloneable, Comparable<Object>, Serializabl
 
       if (obj instanceof final EquipmentPart part) {
 
-         return getName().compareTo(part.getName());
+         return getName_Combined().compareTo(part.getName_Combined());
       }
 
       return 0;
@@ -464,7 +464,7 @@ public class EquipmentPart implements Cloneable, Comparable<Object>, Serializabl
    /**
     * @return Returns a combined name of the equipment part with "brand - model" or the service name
     */
-   public String getName() {
+   public String getName_Combined() {
 
       if (itemType == ITEM_TYPE_PART) {
 
@@ -506,6 +506,15 @@ public class EquipmentPart implements Cloneable, Comparable<Object>, Serializabl
       }
 
       return UI.EMPTY_STRING;
+   }
+
+   public String getName_Service() {
+
+      if (name == null) {
+         return UI.EMPTY_STRING;
+      }
+
+      return name;
    }
 
    /**
@@ -633,7 +642,7 @@ public class EquipmentPart implements Cloneable, Comparable<Object>, Serializabl
       return true;
    }
 
-   public void resetName() {
+   public void resetPartName() {
 
       _partName = null;
    }
@@ -725,7 +734,7 @@ public class EquipmentPart implements Cloneable, Comparable<Object>, Serializabl
       _partName = null;
    }
 
-   public void setName(final String name) {
+   public void setName_Service(final String name) {
       this.name = name;
    }
 
@@ -787,6 +796,12 @@ public class EquipmentPart implements Cloneable, Comparable<Object>, Serializabl
 
    public void updateFromOther(final EquipmentPart otherPart) {
 
+      String serviceName = null;
+
+      if (otherPart.isItemType_Service()) {
+         serviceName = otherPart.getName_Service();
+      }
+
 // SET_FORMATTING_OFF
 
       setBrand             (otherPart.getBrand());
@@ -796,7 +811,7 @@ public class EquipmentPart implements Cloneable, Comparable<Object>, Serializabl
       setUrlAddress        (otherPart.getUrlAddress());
 
       setCompany           (otherPart.getCompany());
-      setName              (otherPart.getName());
+      setName_Service      (serviceName);
 
       setIsCollate         (otherPart.isCollate());
       setCollateBetween    (otherPart.getCollateBetween());

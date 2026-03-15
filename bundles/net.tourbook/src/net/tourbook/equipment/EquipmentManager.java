@@ -584,14 +584,14 @@ public class EquipmentManager {
 
       if (part.isItemType_Part()) {
 
-         dialogMessage = Messages.Equipment_Dialog_DeletePart_Message.formatted(part.getName());
+         dialogMessage = Messages.Equipment_Dialog_DeletePart_Message.formatted(part.getName_Combined());
 
          dialogTitle = Messages.Equipment_Dialog_DeletePart_Title;
          okButtonText = Messages.Equipment_Dialog_DeletePart_Action;
 
       } else if (part.isItemType_Service()) {
 
-         dialogMessage = Messages.Equipment_Dialog_DeleteService_Message.formatted(part.getName());
+         dialogMessage = Messages.Equipment_Dialog_DeleteService_Message.formatted(part.getName_Service());
 
          dialogTitle = Messages.Equipment_Dialog_DeleteService_Title;
          okButtonText = Messages.Equipment_Dialog_DeleteService_Action;
@@ -667,7 +667,7 @@ public class EquipmentManager {
 
          // log result
          TourLogManager.showLogView(AutoOpenEvent.DELETE_SOMETHING);
-         TourLogManager.log_INFO(Messages.Equipment_Log_PartIsDeleted.formatted(part.getName()));
+         TourLogManager.log_INFO(Messages.Equipment_Log_PartIsDeleted.formatted(part.getName_Combined()));
 
          returnResult = true;
 
