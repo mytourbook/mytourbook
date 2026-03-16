@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2012, 2026 Wolfgang Schramm and Contributors
+ * Copyright (C) 2012, 2025 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -14,6 +14,9 @@
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
 package net.tourbook.data;
+
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.io.File;
 import java.io.Serializable;
@@ -35,9 +38,6 @@ import net.tourbook.photo.PhotoAdjustments;
 
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
-
-import tools.jackson.core.JacksonException;
-import tools.jackson.databind.ObjectMapper;
 
 /**
  * Contains a photo for a tour
@@ -362,7 +362,7 @@ public class TourPhoto implements Serializable {
 
             return photoAdjustments;
 
-         } catch (final JacksonException e) {
+         } catch (final JsonProcessingException e) {
 
             StatusUtil.log(e);
          }
@@ -527,7 +527,7 @@ public class TourPhoto implements Serializable {
             StatusUtil.logError("Cannot save photoAdjustmentsJSON because it is > %d".formatted(TourDatabase.VARCHAR_MAX_LENGTH)); //$NON-NLS-1$
          }
 
-      } catch (final JacksonException e) {
+      } catch (final JsonProcessingException e) {
 
          StatusUtil.log(e);
       }

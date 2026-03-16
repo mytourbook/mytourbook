@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2025, 2026 Wolfgang Schramm and Contributors
+ * Copyright (C) 2025 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -14,6 +14,9 @@
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
 package net.tourbook.map2.action;
+
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -38,9 +41,6 @@ import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.ActionContributionItem;
 import org.eclipse.jface.action.Separator;
 import org.eclipse.swt.widgets.Menu;
-
-import tools.jackson.core.JacksonException;
-import tools.jackson.databind.ObjectMapper;
 
 /**
  */
@@ -282,7 +282,7 @@ public class ActionSetGeoPositionForGeoMarker extends SubMenu {
                      reimportedLongitudeSerie[serieIndex] = markerGeoPos.longitude;
                   }
 
-               } catch (final JacksonException e) {
+               } catch (final JsonProcessingException e) {
 
                   StatusUtil.log(e);
                }
@@ -333,7 +333,7 @@ public class ActionSetGeoPositionForGeoMarker extends SubMenu {
 
          return geoPosJSON;
 
-      } catch (final JacksonException e) {
+      } catch (final JsonProcessingException e) {
 
          StatusUtil.log(e);
       }
