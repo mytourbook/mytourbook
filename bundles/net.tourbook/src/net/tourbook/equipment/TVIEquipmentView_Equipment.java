@@ -177,7 +177,7 @@ public class TVIEquipmentView_Equipment extends TVIEquipmentView_Item {
 
 // SET_FORMATTING_OFF
 
-         partItem.firstColumn          = part.getName();
+         partItem.firstColumn          = part.getName_Combined();
 
          partItem.type                 = part.getPartType();
          partItem.dateUsed             = part.getDateUsed_Local();
