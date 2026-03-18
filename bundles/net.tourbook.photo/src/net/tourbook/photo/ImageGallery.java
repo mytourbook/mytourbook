@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2024 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2026 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -265,7 +265,7 @@ public abstract class ImageGallery implements
     */
    private Photo[]                 _sortedAndFilteredPhotos;
 
-   FileFilter                      _fileFilter;
+   private FileFilter              _fileFilter;
 
    /**
     * Photo image size without border
@@ -1035,29 +1035,6 @@ public abstract class ImageGallery implements
       });
    }
 
-//   /**
-//    * column: latitude
-//    */
-//   private void defineColumnLatitude() {
-//
-//      final ColumnDefinition colDef = TableColumnFactory.LATITUDE.createColumn(_columnManager, _pc);
-//
-//      colDef.setIsDefaultColumn();
-//      colDef.setLabelProvider(new CellLabelProvider() {
-//         @Override
-//         public void update(final ViewerCell cell) {
-//
-//            final double latitude = ((Photo) cell.getElement()).getLatitude();
-//
-//            if (latitude == Double.MIN_VALUE) {
-//               cell.setText(UI.EMPTY_STRING);
-//            } else {
-//               cell.setText(_nf8.format(latitude));
-//            }
-//         }
-//      });
-//   }
-
    /**
     * column: location
     */
@@ -1076,29 +1053,6 @@ public abstract class ImageGallery implements
          }
       });
    }
-
-//   /**
-//    * column: longitude
-//    */
-//   private void defineColumnLongitude() {
-//
-//      final ColumnDefinition colDef = net.tourbook.ui.TableColumnFactory.LONGITUDE.createColumn(_columnManager, _pc);
-//
-//      colDef.setIsDefaultColumn();
-//      colDef.setLabelProvider(new CellLabelProvider() {
-//         @Override
-//         public void update(final ViewerCell cell) {
-//
-//            final double longitude = ((Photo) cell.getElement()).getLongitude();
-//
-//            if (longitude == Double.MIN_VALUE) {
-//               cell.setText(UI.EMPTY_STRING);
-//            } else {
-//               cell.setText(_nf8.format(longitude));
-//            }
-//         }
-//      });
-//   }
 
    /**
     * column: orientation
@@ -2286,23 +2240,24 @@ public abstract class ImageGallery implements
    /**
     * Get gps state and exif data
     *
-    * @return Returns <code>true</code> when exif data is already available from the cache and must
-    *         not be loaded.
     */
-   private boolean putInExifLoadingQueue(final Photo photo) {
+   private void putInExifLoadingQueue(final Photo photo) {
+
+      if (photo.isSvgImage()) {
+
+         photo.isExifLoaded = true;
+
+         return;
+      }
 
       final PhotoImageMetadata photoImageMetadata = ExifCache.get(photo.imageFilePathName);
 
       if (photoImageMetadata != null) {
 
          photo.updateImageMetadata(photoImageMetadata);
-
-         return true;
       }
 
       PhotoLoadManager.putImageInLoadingQueueExif(photo, new LoadCallbackExif(photo, _currentExifRunId));
-
-      return false;
    }
 
    @Override
@@ -2334,6 +2289,17 @@ public abstract class ImageGallery implements
    @Override
    public void reloadViewer() {
       _photoViewer.setInput(new Object[0]);
+   }
+
+   /**
+    * Reset all loading states for all photos that images can do a clean reloading
+    */
+   public void resetPhotoLoadingStates() {
+
+      for (final Photo photo : _allPhotos) {
+
+         photo.resetLoadingStates();
+      }
    }
 
    void restoreState() {

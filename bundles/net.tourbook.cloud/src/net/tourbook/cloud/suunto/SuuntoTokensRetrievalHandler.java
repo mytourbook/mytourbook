@@ -31,7 +31,7 @@ import tools.jackson.databind.ObjectMapper;
 
 public class SuuntoTokensRetrievalHandler extends TokensRetrievalHandler {
 
-   private static IPreferenceStore _prefStore  = Activator.getDefault().getPreferenceStore();
+   private static IPreferenceStore _prefStore = Activator.getDefault().getPreferenceStore();
 
    private String                  _selectedPersonId;
 

@@ -24,14 +24,14 @@ public class Images {
     * These images are currently translated
     */
 
-//   Image_Action_ShowSliderInMap         = map-marker-slider-right-action_it.png
-//   Image_Action_ShowSliderInMap_Left    = map-marker-slider-left-action.png
-//   Image_Action_ShowStartEndInMap       = map-marker-start-action_it.png
+//   Image_Action_ShowSliderInMap         = map-marker-slider-right-action_it.svg
+//   Image_Action_ShowSliderInMap_Left    = map-marker-slider-left-action.svg
+//   Image_Action_ShowStartEndInMap       = map-marker-start-action_it.svg
 
-//   Image_Map_MarkerSliderLeft           = map-marker-slider-left_it.png
-//   Image_Map_MarkerSliderRight          = map-marker-slider-right_it.png
-//   Image_Map_TourEndMarker              = map-marker-end_it.png
-//   Image_Map_TourStartMarker            = map-marker-start_it.png
+//   Image_Map_MarkerSliderLeft           = map-marker-slider-left_it.svg
+//   Image_Map_MarkerSliderRight          = map-marker-slider-right_it.svg
+//   Image_Map_TourEndMarker              = map-marker-end_it.svg
+//   Image_Map_TourStartMarker            = map-marker-start_it.svg
 
    /*
     * These images are not translated
@@ -230,7 +230,7 @@ public class Images {
    public static final String State_Error                          = "state-error.svg";                             //$NON-NLS-1$
    public static final String State_Info                           = "state-info.svg";                              //$NON-NLS-1$
    public static final String State_MovedTour                      = "state-moved-tour.svg";                        //$NON-NLS-1$
-   public static final String State_MovedTour_View                 = "state-moved-tour-view.png";                   //$NON-NLS-1$
+   public static final String State_MovedTour_View                 = "state-moved-tour-view.svg";                   //$NON-NLS-1$
    public static final String State_OK                             = "state-ok.svg";                                //$NON-NLS-1$
    public static final String State_RetrieveTourLocation           = "state-tour-location.svg";                     //$NON-NLS-1$
    public static final String State_RetrieveWeatherData            = "state-weather.svg";                           //$NON-NLS-1$

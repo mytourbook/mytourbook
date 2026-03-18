@@ -1232,14 +1232,6 @@
             label			="%Action_PhotoDirectory_LinkPhotoWithTourInFolder"
             mnemonic		="%Action_PhotoDirectory_LinkPhotoWithTourInFolder_Mnemonic"/>
 
-         <!-- 
-         <command
-            commandId="command.net.tourbook.sign.ImportTourSignsFromFolder"
-            icon="icons/tour-sign-import.png"
-            label="%Action_TourSign_ImportTourSignsFromFolder"
-            mnemonic="%Action_TourSign_ImportTourSignsFromFolder_Mnemonic"/>
-         -->
-
       </menuContribution>
 
       <!--
@@ -1260,14 +1252,6 @@
             label       ="%Action_PhotoDirectory_LinkPhotoWithTourInGallerySelected"
             mnemonic    ="%Action_PhotoDirectory_LinkPhotoWithTourInGallerySelected_Mnemonic"/>
             
-         <!--
-         <command
-            commandId="command.net.tourbook.sign.ImportTourSigns"
-            icon="icons/tour-sign-import.png"
-            label="%Action_TourSign_ImportTourSigns"
-            mnemonic="%Action_TourSign_ImportTourSigns_Mnemonic"/>
-         -->
-
       </menuContribution>
 
    </extension>
@@ -1983,14 +1967,14 @@
                category    ="net.tourbook.category.system"
                id          ="org.eclipse.ui.views.ProgressView"
                class       ="org.eclipse.ui.ExtensionFactory:progressView"
-               icon        ="icons/pview.gif"
+               icon        ="icons/pview.svg"
                name        ="Progress View"/>
 
          <view
                category    ="net.tourbook.category.system"
                id          ="net.tourbook.views.TourChartPropertyView"
                class       ="net.tourbook.ui.views.TourChartPropertyView"
-               icon        ="icons/tourchart-properties.gif"
+               icon        ="icons/tourchart-properties.svg"
                name        ="%view_name_ChartProperty"/>
 
    </extension>

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2025 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2026 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -104,7 +104,7 @@ public class Photo implements Serializable {
 
    public String                                   imagePathName;
    public String                                   imageFileName;
-   public String                                   imageFileExt;
+   private String                                  _imageFileExt;
 
    /**
     * File path name is the unique key for a photo.
@@ -284,12 +284,14 @@ public class Photo implements Serializable {
    private String                        _imageKey_Original;
 
    /**
-    * This array keeps track of the loading state for the photo images and for different qualities
+    * This state keeps track of the loading state for the photo images and for different qualities.
+    * <p>
+    * They must be volatile otherwise not all thread see the current value !
     */
-   private PhotoLoadingState             _photoLoadingStateThumb;
-   private PhotoLoadingState             _photoLoadingStateThumbHQ;
-   private PhotoLoadingState             _photoLoadingStateHQ;
-   private PhotoLoadingState             _photoLoadingStateOriginal;
+   private volatile PhotoLoadingState    _photoLoadingStateThumb;
+   private volatile PhotoLoadingState    _photoLoadingStateThumbHQ;
+   private volatile PhotoLoadingState    _photoLoadingStateHQ;
+   private volatile PhotoLoadingState    _photoLoadingStateOriginal;
 
    /**
     * Is <code>true</code> when loading the image causes an error.
@@ -339,6 +341,8 @@ public class Photo implements Serializable {
     * Position of this photo in the painted photo list
     */
    public int                            photoIndex;
+
+   private boolean                       _isSvgImage;
 
    /**
     */
@@ -891,6 +895,13 @@ public class Photo implements Serializable {
     */
    public ImageMetadata getImageMetaData(final Boolean isReadThumbnail) {
 
+      if (_isSvgImage) {
+
+         // svg images do not contain "normal" meta data
+
+         return null;
+      }
+
       if (_photoImageMetadata != null && isReadThumbnail == false) {
 
          // meta data are available but the exif thumnail is not requested
@@ -1351,6 +1362,14 @@ public class Photo implements Serializable {
    }
 
    /**
+    * @return Returns <code>true</code> when the photo image is a svg image
+    */
+   public boolean isSvgImage() {
+
+      return _isSvgImage;
+   }
+
+   /**
     * @return Returns <code>true</code> when the original image size is not available but the thumb
     *         image size.
     */
@@ -1397,6 +1416,23 @@ public class Photo implements Serializable {
 
    public void resetLinkWorldPosition() {
       _linkWorldPosition.clear();
+   }
+
+   /**
+    * Reset all loading states that images can do a clean reloading
+    */
+   public void resetLoadingStates() {
+
+// SET_FORMATTING_OFF
+
+      _photoLoadingStateThumb    = PhotoLoadingState.UNDEFINED;
+      _photoLoadingStateThumbHQ  = PhotoLoadingState.UNDEFINED;
+      _photoLoadingStateHQ       = PhotoLoadingState.UNDEFINED;
+      _photoLoadingStateOriginal = PhotoLoadingState.UNDEFINED;
+
+// SET_FORMATTING_ON
+
+      _isLoadingError = false;
    }
 
    private void resetTourExifState() {
@@ -1533,10 +1569,11 @@ public class Photo implements Serializable {
       imageFilePathName = photoImageFilePathName;
 
       imagePathName = photoImagePath.removeLastSegments(1).toOSString();
-      imageFileExt = photoImagePath.getFileExtension();
+      _imageFileExt = photoImagePath.getFileExtension();
 
       imageFileSize = photoImageFile.length();
-      _imageFileLastModified = LocalDateTime.ofInstant(//
+
+      _imageFileLastModified = LocalDateTime.ofInstant(
             Instant.ofEpochMilli(lastModified),
 //            ZoneOffset.UTC
             ZoneId.systemDefault()
@@ -1545,6 +1582,8 @@ public class Photo implements Serializable {
 
       // initially sort by file date until exif data are loaded
       imageExifTime = lastModified;
+
+      _isSvgImage = ImageUtils.IMAGE_FILE_EXTENSION_SVG.equals(_imageFileExt);
 
       _uniqueId = photoImageFilePathName;
 
@@ -1603,12 +1642,16 @@ public class Photo implements Serializable {
             + " orientation   " + _orientation + NL //                                       //$NON-NLS-1$
             + " rotate        " + rotateDegree + NL //                                       //$NON-NLS-1$
 
-            + " EXIF GPS      %8.5f %8.5f".formatted(_exifLatitude, _exifLongitude) + NL //  //$NON-NLS-1$
-            + " Link GPS      %8.5f %8.5f".formatted(_linkLatitude, _linkLongitude) + NL //  //$NON-NLS-1$
-            + " Tour GPS      %8.5f %8.5f".formatted(_tourLatitude, _tourLongitude) + NL //  //$NON-NLS-1$
+//          + " EXIF GPS      %8.5f %8.5f".formatted(_exifLatitude, _exifLongitude) + NL //  //$NON-NLS-1$
+//          + " Link GPS      %8.5f %8.5f".formatted(_linkLatitude, _linkLongitude) + NL //  //$NON-NLS-1$
+//          + " Tour GPS      %8.5f %8.5f".formatted(_tourLatitude, _tourLongitude) + NL //  //$NON-NLS-1$
 
-            + NL
+            + " _photoLoadingStateThumb    " + _photoLoadingStateThumb + NL //               //$NON-NLS-1$
+            + " _photoLoadingStateThumbHQ  " + _photoLoadingStateThumbHQ + NL //             //$NON-NLS-1$
+            + " _photoLoadingStateHQ       " + _photoLoadingStateHQ + NL //                  //$NON-NLS-1$
+            + " _photoLoadingStateOriginal " + _photoLoadingStateOriginal + NL //            //$NON-NLS-1$
 
+            + NL //
       ;
    }
 

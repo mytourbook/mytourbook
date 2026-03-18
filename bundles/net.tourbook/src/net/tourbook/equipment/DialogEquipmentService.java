@@ -204,7 +204,7 @@ public class DialogEquipmentService extends TitleAreaDialog {
                         : Messages.Dialog_EquipmentService_Dialog_Message_Service_Edit;
 
       setTitle(messageTitle.formatted(_serviceEquipment.getName()));
-      setMessage(_service.getName());
+      setMessage(_service.getName_Service());
    }
 
    private void createActions() {
@@ -804,7 +804,7 @@ public class DialogEquipmentService extends TitleAreaDialog {
       _service.setEquipment(        _serviceEquipment);
 
       _service.setCompany(          _comboCompany.getText().trim());
-      _service.setName(             _comboName.getText().trim());
+      _service.setName_Service(     _comboName.getText().trim());
       _service.setPartType(         _comboType.getText().trim());
       _service.setDescription(      _txtDescription.getText().trim());
       _service.setUrlAddress(       _txtUrlAddress.getText().trim());
@@ -893,7 +893,7 @@ public class DialogEquipmentService extends TitleAreaDialog {
       _chkCollate                .setSelection(_service.isCollate());
 
       _comboCompany              .setText(_service.getCompany());
-      _comboName                 .setText(_service.getName());
+      _comboName                 .setText(_service.getName_Service());
       _comboType                 .setText(_service.getPartType());
 
       _dateUsed                  .setDate(dateUsed.getYear(), dateUsed.getMonthValue() - 1, dateUsed.getDayOfMonth());
