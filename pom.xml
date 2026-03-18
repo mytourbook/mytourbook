@@ -72,8 +72,8 @@
       <!-- Eclipse E4 web repository -->
       
       <repository>
-         <id>eclipse.platform.4.37</id>                                                <layout>p2</layout>
-         <url>https://download.eclipse.org/releases/2025-09/202509101001/</url>
+         <id>eclipse.platform.4.38</id>                                                <layout>p2</layout>
+         <url>https://download.eclipse.org/releases/2025-12/202512101000/</url>
       </repository>   
 
       <repository>

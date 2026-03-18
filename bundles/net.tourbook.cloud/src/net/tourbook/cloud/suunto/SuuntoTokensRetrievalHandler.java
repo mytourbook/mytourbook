@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2021, 2023 Frédéric Bard
+ * Copyright (C) 2021, 2026 Frédéric Bard
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -31,7 +31,7 @@ import org.eclipse.jface.preference.IPreferenceStore;
 
 public class SuuntoTokensRetrievalHandler extends TokensRetrievalHandler {
 
-   private static IPreferenceStore _prefStore  = Activator.getDefault().getPreferenceStore();
+   private static IPreferenceStore _prefStore = Activator.getDefault().getPreferenceStore();
 
    private String                  _selectedPersonId;
 

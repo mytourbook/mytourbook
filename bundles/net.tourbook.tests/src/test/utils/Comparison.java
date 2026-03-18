@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2020, 2025 Frédéric Bard
+ * Copyright (C) 2020, 2026 Frédéric Bard
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -90,26 +90,26 @@ public class Comparison {
          controlFileContentArray.replaceAll(line -> line = line.replace("application_version,\"2411\"", genericApplicationVersion)); //$NON-NLS-1$
 
          // Regular expression to match the version pattern
-         String regex = "(software_version,)\\" + "\"\\d+\\.\\d+\\" + "\""; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-         Pattern pattern = Pattern.compile(regex);
+         final String regex = "(software_version,)\\" + "\"\\d+\\.\\d+\\" + "\""; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+         final Pattern pattern = Pattern.compile(regex);
 
          for (int index = 0; index < testFileContentArray.size(); index++) {
 
-            String line = testFileContentArray.get(index);
-            Matcher matcher = pattern.matcher(line);
-            String result = matcher.replaceAll("$1"); //$NON-NLS-1$
+            final String line = testFileContentArray.get(index);
+            final Matcher matcher = pattern.matcher(line);
+            final String result = matcher.replaceAll("$1"); //$NON-NLS-1$
             testFileContentArray.set(index, result);
          }
          testFileContentArray.replaceAll(line -> line.replaceFirst("application_version,\"\\d\\d\\d\\d\"", genericApplicationVersion)); //$NON-NLS-1$
 
          // Modify the session/activity messages to remove/ignore their creation timestamps
          // since it will be different at every test run
-         String timeCreatedData = "Data,0,activity,num_sessions,"; //$NON-NLS-1$
+         final String timeCreatedData = "Data,0,activity,num_sessions,"; //$NON-NLS-1$
 
          List<String> timeCreatedLine = controlFileContentArray.stream().filter(s -> s.startsWith(timeCreatedData))
                .toList();
          // Retrieve the value of "time_created"
-         String controlTimeCreatedValue = timeCreatedLine.get(0).split(",")[7]; //$NON-NLS-1$
+         final String controlTimeCreatedValue = timeCreatedLine.get(0).split(",")[7]; //$NON-NLS-1$
          //Replace all the values by an empty string
          controlFileContentArray.replaceAll(line -> line = line.replace(
                controlTimeCreatedValue,
@@ -117,7 +117,7 @@ public class Comparison {
 
          timeCreatedLine = testFileContentArray.stream().filter(s -> s.startsWith(timeCreatedData)).toList();
          // Retrieve the value of "time_created"
-         String testTimeCreatedValue = timeCreatedLine.get(0).split(",")[7]; //$NON-NLS-1$
+         final String testTimeCreatedValue = timeCreatedLine.get(0).split(",")[7]; //$NON-NLS-1$
          //Replace all the values by an empty string
          testFileContentArray.replaceAll(line -> line = line.replace(
                testTimeCreatedValue,
@@ -164,7 +164,7 @@ public class Comparison {
 
       final String controlDocument = readFileContent(controlFileName + JSON);
 
-      ArrayList<TourMarker> sortedMarkers = testTourData.getTourMarkersSorted();
+      final ArrayList<TourMarker> sortedMarkers = testTourData.getTourMarkersSorted();
       testTourData.setTourMarkers(new LinkedHashSet<>(sortedMarkers));
       final String testJson = convertTourDataToJson(testTourData);
 

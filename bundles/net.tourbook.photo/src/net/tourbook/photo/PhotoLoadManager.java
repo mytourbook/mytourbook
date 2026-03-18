@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2024 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2026 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -353,22 +353,27 @@ public class PhotoLoadManager {
     *           Gallery item is used to check if it is still visible. Can be <code>null</code>,
     *           then the visibility is not checked.
     * @param photo
+    * @param svgImageSize
     * @param imageQuality
     * @param loadCallBack
     */
    private static void putImageInLoadingQueueHQ_Gallery(final GalleryMT20Item galleryItem,
                                                         final Photo photo,
+                                                        final int svgImageSize,
                                                         final ImageQuality imageQuality,
                                                         final ILoadCallBack loadCallBack) {
       // set state
       photo.setLoadingState(PhotoLoadingState.IMAGE_IS_IN_LOADING_QUEUE, imageQuality);
+
+      final int imageSize = photo.isSvgImage() ? svgImageSize : _hqImageSize;
+
 
       // set HQ image loading item into the waiting queue
       _waitingQueueHQ.add(new PhotoImageLoader(
             _display,
             photo,
             imageQuality,
-            _hqImageSize,
+            imageSize,
             loadCallBack));
 
       final Runnable executorTask = new Runnable() {
@@ -451,9 +456,9 @@ public class PhotoLoadManager {
    }
 
    public static void putImageInLoadingQueueHQ_Map_Thumb(final Photo photo,
-                                                        final int thumbImageSize,
-                                                        final ImageQuality imageQuality,
-                                                        final ILoadCallBack imageLoaderCallback) {
+                                                         final int thumbImageSize,
+                                                         final ImageQuality imageQuality,
+                                                         final ILoadCallBack imageLoaderCallback) {
 
       // set state
       photo.setLoadingState(PhotoLoadingState.IMAGE_IS_IN_LOADING_QUEUE, imageQuality);
@@ -579,24 +584,28 @@ public class PhotoLoadManager {
    /**
     * @param galleryItem
     *           Gallery item is used to check if it is still visible. Can be <code>null</code>,
-    *           then the visibility is not checked.
+    *           then the visibility is not checked
     * @param photo
+    * @param svgImageSize
     * @param imageQuality
     * @param imageLoadCallback
     */
    public static void putImageInLoadingQueueThumb_Gallery(final GalleryMT20Item galleryItem,
                                                           final Photo photo,
+                                                          final int svgImageSize,
                                                           final ImageQuality imageQuality,
                                                           final ILoadCallBack imageLoadCallback) {
       // set state
       photo.setLoadingState(PhotoLoadingState.IMAGE_IS_IN_LOADING_QUEUE, imageQuality);
+
+      final int imageSize = photo.isSvgImage() ? svgImageSize : _hqImageSize;
 
       // put image loading item into the waiting queue
       final PhotoImageLoader imageLoader = new PhotoImageLoader(
             _display,
             photo,
             imageQuality,
-            _hqImageSize,
+            imageSize,
             imageLoadCallback);
 
       final Runnable executorTask = new Runnable() {
@@ -637,13 +646,16 @@ public class PhotoLoadManager {
                   return;
                }
 
-               if (imageLoader.loadImageThumb_SWT(_waitingQueueOriginal)) {
+               final boolean isLoadHqImage = imageLoader.loadImageThumb_SWT(_waitingQueueOriginal);
+
+               if (isLoadHqImage) {
 
                   // HQ image is requested
 
                   putImageInLoadingQueueHQ_Gallery(
                         galleryItem,
                         photo,
+                        svgImageSize,
                         imageQuality,
                         imageLoadCallback);
                } else {
@@ -675,12 +687,12 @@ public class PhotoLoadManager {
       photo.setLoadingState(PhotoLoadingState.IMAGE_IS_IN_LOADING_QUEUE, imageQuality);
 
       // put image loading item into the waiting queue
-      _waitingQueueThumb.add(new PhotoImageLoader(
+      final PhotoImageLoader imageLoader = new PhotoImageLoader(
             _display,
             photo,
             imageQuality,
             _hqImageSize,
-            imageLoaderCallback));
+            imageLoaderCallback);
 
       final Runnable executorTask = new Runnable() {
          @Override
@@ -714,6 +726,8 @@ public class PhotoLoadManager {
             checkLoadingState(photo, imageQuality);
          }
       };
+
+      _waitingQueueThumb.add(imageLoader);
       _executorThumb.submit(executorTask);
    }
 
@@ -772,7 +786,9 @@ public class PhotoLoadManager {
    }
 
    private static void resetLoadingState(final Photo photo, final ImageQuality imageQuality) {
+
       // set state to undefined that it will be loaded again when image is visible and not in the cache
+
       photo.setLoadingState(PhotoLoadingState.UNDEFINED, imageQuality);
    }
 

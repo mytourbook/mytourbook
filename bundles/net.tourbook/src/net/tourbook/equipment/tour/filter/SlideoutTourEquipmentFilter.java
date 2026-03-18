@@ -497,7 +497,7 @@ public class SlideoutTourEquipmentFilter extends AdvancedSlideout implements ITr
 
          final Equipment partEquipment = part.getEquipment();
          final String equipmentName = partEquipment.getName();
-         final String partName = part.getName();
+         final String partName = part.getName_Combined();
 
          assetId = part.getPartId();
          assetName = partName;
@@ -576,7 +576,7 @@ public class SlideoutTourEquipmentFilter extends AdvancedSlideout implements ITr
                final EquipmentPart part1 = item1.part;
                final EquipmentPart part2 = item2.part;
 
-               return part1.getName().compareTo(part2.getName());
+               return part1.getName_Combined().compareTo(part2.getName_Combined());
             }
          }
 
