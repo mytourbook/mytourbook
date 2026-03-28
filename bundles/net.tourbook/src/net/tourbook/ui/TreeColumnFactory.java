@@ -1038,7 +1038,7 @@ public abstract class TreeColumnFactory {
 
             final TreeColumnDefinition colDef = new TreeColumnDefinition(columnManager, EQUIPMENT_INITIAL_DISTANCE_ID, SWT.TRAIL);
 
-            colDef.setColumnCategory(           Messages.ColumnFactory_Category_Motion);
+            colDef.setColumnCategory(           Messages.ColumnFactory_Category_Equipment);
 
             colDef.setColumnLabel(              Messages.ColumnFactory_Equipment_InitialDistance);
             colDef.setColumnHeaderText(         UI.UNIT_LABEL_DISTANCE);

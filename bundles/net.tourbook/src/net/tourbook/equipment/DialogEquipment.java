@@ -17,6 +17,7 @@ package net.tourbook.equipment;
 
 import java.io.IOException;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -817,11 +818,16 @@ public class DialogEquipment extends TitleAreaDialog {
 
    private void onImage_Select() {
 
-      String lastSelectedPath;
+      String lastSelectedPath = null;
 
       if (StringUtils.hasContent(_imageFilePath)) {
 
-         lastSelectedPath = Paths.get(_imageFilePath).getParent().toString();
+         if (Files.exists(Paths.get(_imageFilePath))) {
+
+            final Path pathParent = Paths.get(_imageFilePath).getParent();
+
+            lastSelectedPath = pathParent.toString();
+         }
 
       } else {
 
@@ -935,6 +941,9 @@ public class DialogEquipment extends TitleAreaDialog {
 
 // SET_FORMATTING_OFF
 
+      final float distance          = _spinDistance.getSelection() * UI.UNIT_VALUE_DISTANCE;
+      final float weight            = _spinWeight.getSelection() / UI.UNIT_VALUE_WEIGHT / 1000f;
+
       final LocalDate dateUsed      = LocalDate.of(_dateUsed.getYear(),       _dateUsed.getMonth() + 1,     _dateUsed.getDay());
       final LocalDate dateBuilt     = LocalDate.of(_dateBuilt.getYear(),      _dateBuilt.getMonth() + 1,    _dateBuilt.getDay());
       final LocalDate dateRetired   = LocalDate.of(_dateRetired.getYear(),    _dateRetired.getMonth() + 1,  _dateRetired.getDay());
@@ -948,11 +957,11 @@ public class DialogEquipment extends TitleAreaDialog {
 
       _equipment.setImageFilePath(     _lblImageFilePath.getText().trim());
 
-      _equipment.setDistanceFirstUse(  _spinDistance.getSelection());
+      _equipment.setDistanceFirstUse(  distance);
       _equipment.setPrice(             _spinPrice.getSelection() / 100f);
       _equipment.setPriceUnit(         _comboPriceUnit.getText());
       _equipment.setSize(              _comboSize.getText().trim());
-      _equipment.setWeight(            _spinWeight.getSelection() / 1000f);
+      _equipment.setWeight(            weight);
 
       _equipment.setDateUsed(          TimeTools.toEpochMilli(dateUsed));
       _equipment.setDateBuilt(         TimeTools.toEpochMilli(dateBuilt));
@@ -1037,6 +1046,9 @@ public class DialogEquipment extends TitleAreaDialog {
          dateRetired = LocalDateTime.of(2099, 1, 1, 0, 0);
       }
 
+      final float distance    = _equipment.getDistanceFirstUse() / UI.UNIT_VALUE_DISTANCE;
+      final float weight      = _equipment.getWeight() * UI.UNIT_VALUE_WEIGHT * 1000;
+
       _chkCollate       .setSelection(_equipment.isCollate());
 
       _comboBrand       .setText(_equipment.getBrand());
@@ -1048,9 +1060,9 @@ public class DialogEquipment extends TitleAreaDialog {
       _dateBuilt        .setDate(dateBuilt.getYear(),    dateBuilt.getMonthValue() - 1,   dateBuilt.getDayOfMonth());
       _dateRetired      .setDate(dateRetired.getYear(),  dateRetired.getMonthValue() - 1, dateRetired.getDayOfMonth());
 
-      _spinDistance     .setSelection((int) (_equipment.getDistanceFirstUse()));
+      _spinDistance     .setSelection((int) distance);
       _spinPrice        .setSelection((int) (_equipment.getPrice()  * 100));
-      _spinWeight       .setSelection((int) (_equipment.getWeight() * 1000));
+      _spinWeight       .setSelection((int) weight);
 
       _txtDescription   .setText(_equipment.getDescription());
       _txtUrlAddress    .setText(_equipment.getUrlAddress());

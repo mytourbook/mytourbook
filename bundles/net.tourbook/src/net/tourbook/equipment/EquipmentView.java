@@ -33,6 +33,7 @@ import net.tourbook.common.CommonActivator;
 import net.tourbook.common.CommonImages;
 import net.tourbook.common.UI;
 import net.tourbook.common.formatter.ValueFormat;
+import net.tourbook.common.preferences.ICommonPreferences;
 import net.tourbook.common.time.TimeTools;
 import net.tourbook.common.tooltip.ActionToolbarSlideout;
 import net.tourbook.common.tooltip.IOpeningDialog;
@@ -880,19 +881,19 @@ public class EquipmentView extends ViewPart implements
 
       _prefChangeListener_Common = propertyChangeEvent -> {
 
-//         final String property = propertyChangeEvent.getProperty();
-//
-//         if (property.equals(ICommonPreferences.MEASUREMENT_SYSTEM)) {
-//
-//            // measurement system has changed
-//
-//            _columnManager.saveState(_state);
-//            _columnManager.clearColumns();
-//
-//            defineAllColumns();
-//
-//            _equipViewer = (TableViewer) recreateViewer(_equipViewer);
-//         }
+         final String property = propertyChangeEvent.getProperty();
+
+         if (property.equals(ICommonPreferences.MEASUREMENT_SYSTEM)) {
+
+            // measurement system has changed
+
+            _columnManager.saveState(_state);
+            _columnManager.clearColumns();
+
+            defineAllColumns();
+
+            _equipmentViewer = (TreeViewer) recreateViewer(_equipmentViewer);
+         }
       };
 
       _prefStore.addPropertyChangeListener(_prefChangeListener);
@@ -2093,6 +2094,8 @@ public class EquipmentView extends ViewPart implements
 
             if (distance != 0) {
 
+               distance = distance / UI.UNIT_VALUE_DISTANCE;
+
                cell.setText(_nf0.format(distance));
                setCellColor(cell, element);
             }
@@ -2265,6 +2268,8 @@ public class EquipmentView extends ViewPart implements
             }
 
             if (weight != 0) {
+
+               weight = weight * UI.UNIT_VALUE_WEIGHT;
 
                colDef.printDoubleValue(cell, weight, true);
                setCellColor(cell, element);
