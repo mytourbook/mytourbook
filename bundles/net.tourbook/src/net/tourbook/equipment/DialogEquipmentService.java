@@ -17,6 +17,7 @@ package net.tourbook.equipment;
 
 import java.io.IOException;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -727,7 +728,21 @@ public class DialogEquipmentService extends TitleAreaDialog {
 
    private void onImage_Select() {
 
-      final String lastSelectedPath = Util.getStateString(_state, STATE_IMAGE_LAST_SELECTED_PATH, null);
+      String lastSelectedPath = null;
+
+      if (StringUtils.hasContent(_imageFilePath)) {
+
+         if (Files.exists(Paths.get(_imageFilePath))) {
+
+            final Path pathParent = Paths.get(_imageFilePath).getParent();
+
+            lastSelectedPath = pathParent.toString();
+         }
+
+      } else {
+
+         lastSelectedPath = Util.getStateString(_state, STATE_IMAGE_LAST_SELECTED_PATH, null);
+      }
 
       final FileDialog fileDialog = new FileDialog(getShell(), SWT.OPEN);
 

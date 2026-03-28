@@ -363,6 +363,9 @@ public class Equipment implements Cloneable, Comparable<Object>, Serializable {
       return description;
    }
 
+   /**
+    * @return Returns {@link #distanceFirstUse}
+    */
    public float getDistanceFirstUse() {
       return distanceFirstUse;
    }
@@ -472,6 +475,9 @@ public class Equipment implements Cloneable, Comparable<Object>, Serializable {
       return urlAddress;
    }
 
+   /**
+    * @return Returns {@link #weight}
+    */
    public float getWeight() {
       return weight;
    }
@@ -648,15 +654,15 @@ public class Equipment implements Cloneable, Comparable<Object>, Serializable {
       partValues = parts == null
             ? "-" //                                                          //$NON-NLS-1$
             : "" + parts.size(); //                                           //$NON-NLS-1$
-                                                                              
-      return UI.EMPTY_STRING                                                  
-                                                                              
+
+      return UI.EMPTY_STRING
+
             + "Equipment" + NL //                                             //$NON-NLS-1$
-                                                                              
+
             + "  equipmentId      = " + equipmentId + NL //                   //$NON-NLS-1$
             + "  brand            = " + brand + NL //                         //$NON-NLS-1$
             + "  model            = " + model + NL //                         //$NON-NLS-1$
-                                                                              
+
             + "  isCollate        = " + isCollate + NL //                     //$NON-NLS-1$
             + "  type             = " + type + NL //                          //$NON-NLS-1$
             + "  dateUsed         = " + getDateUsed_Local() + NL //           //$NON-NLS-1$
