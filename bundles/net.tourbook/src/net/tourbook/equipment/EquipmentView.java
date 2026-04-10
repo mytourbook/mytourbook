@@ -3667,14 +3667,6 @@ public class EquipmentView extends ViewPart implements
       if (selection instanceof TVIEquipmentView_Tour) {
 
          TourManager.getInstance().tourDoubleClickAction(EquipmentView.this, _tourDoubleClickState);
-
-      } else if (selection != null) {
-
-         // expand/collapse current item
-
-         final TreeViewerItem treeItem = (TreeViewerItem) selection;
-
-         expandCollapseItem(treeItem);
       }
    }
 
