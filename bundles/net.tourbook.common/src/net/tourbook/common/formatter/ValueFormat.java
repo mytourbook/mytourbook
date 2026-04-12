@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2026 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -32,9 +32,16 @@ public enum ValueFormat {
    DATE_TIME, //
    DATE_TIME_HH_MM_SS, //
 
+   EQUIPMENT_BRAND, //
+   EQUIPMENT_MODEL, //
+   EQUIPMENT_TYPE, //
+   EQUIPMENT_BRAND_MODEL, //
+
+   PERIOD_DAY, //
+   PERIOD_YEAR_MONTH_DAY, //
+
    TIME_HH, //
    TIME_HH_MM, //
    TIME_HH_MM_SS, //
    TIME_SSS, //
-
 }

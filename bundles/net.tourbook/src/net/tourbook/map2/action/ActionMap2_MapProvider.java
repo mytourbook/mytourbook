@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2026 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -43,7 +43,7 @@ public class ActionMap2_MapProvider extends ActionToolbarSlideoutAdv {
 
    public ActionMap2_MapProvider(final Map2View map2View, final IDialogSettings state_MapProvider) {
 
-      super(_actionImageDescriptor, _actionImageDescriptor);
+      super(_actionImageDescriptor);
 
       _map2View = map2View;
       _state_MapProvider = state_MapProvider;

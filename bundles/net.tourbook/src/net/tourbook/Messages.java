@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2025 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2026 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -612,8 +612,8 @@ public class Messages extends NLS {
    public static String        Dialog_Equipment_Label_Price;
    public static String        Dialog_Equipment_Label_Size;
    public static String        Dialog_Equipment_Label_Type;
-   public static String        Dialog_Equipment_Label_Website;
    public static String        Dialog_Equipment_Label_Weight;
+   public static String        Dialog_Equipment_Link_Website;
    public static String        Dialog_Equipment_Tooltip_1;
    public static String        Dialog_Equipment_Tooltip_2;
 
@@ -1170,7 +1170,6 @@ public class Messages extends NLS {
    public static String        Equipment_Action_EditEquipment;
    public static String        Equipment_Action_EditPart;
    public static String        Equipment_Action_EditService;
-   public static String        Equipment_Action_EquipmentFilter_Tooltip;
    public static String        Equipment_Action_EquipmentFilterInfo_Tooltip;
    public static String        Equipment_Action_EquipmentPreferences;
    public static String        Equipment_Action_ManageEquipment;

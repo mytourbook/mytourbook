@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2016, 2025 Wolfgang Schramm and Contributors
+ * Copyright (C) 2016, 2026 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -280,6 +280,24 @@ public class FormatManager {
 
       case DATE_TIME_HH_MM_SS:
          return Messages.Value_Formatter_Time_DD_MM_YYY__HH_MM_SS;
+
+      case EQUIPMENT_BRAND:
+         return "Brand";
+
+      case EQUIPMENT_MODEL:
+         return "Model";
+
+      case EQUIPMENT_BRAND_MODEL:
+         return "Brand - Model";
+
+      case EQUIPMENT_TYPE:
+         return "Type";
+
+      case PERIOD_DAY:
+         return "Days";
+
+      case PERIOD_YEAR_MONTH_DAY:
+         return "Years, Months, Days";
 
       case TIME_HH:
          return Messages.Value_Formatter_Time_HH;

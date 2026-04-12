@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2025 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2026 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -668,7 +668,7 @@ public class Map2View extends ViewPart implements
 
       public ActionMap2_MapPoints() {
 
-         super(_actionImageDescriptor, _actionImageDescriptor);
+         super(_actionImageDescriptor);
 
          isToggleAction = true;
          notSelectedTooltip = Messages.Map_Action_ShowMapPoints_Tooltip;
