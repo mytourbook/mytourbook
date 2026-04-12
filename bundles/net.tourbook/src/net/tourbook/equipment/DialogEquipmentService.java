@@ -21,6 +21,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 
 import net.tourbook.Images;
 import net.tourbook.Messages;
@@ -34,6 +35,7 @@ import net.tourbook.common.util.Util;
 import net.tourbook.data.Equipment;
 import net.tourbook.data.EquipmentPart;
 import net.tourbook.tag.TagManager;
+import net.tourbook.web.WEB;
 
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.IDialogSettings;
@@ -58,6 +60,7 @@ import org.eclipse.swt.widgets.DateTime;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Link;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Spinner;
 import org.eclipse.swt.widgets.Text;
@@ -99,8 +102,9 @@ public class DialogEquipmentService extends TitleAreaDialog {
    /*
     * UI resources
     */
-   private Image _imageTrash;
    private Image _imageCamera;
+   private Image _imageNow;
+   private Image _imageTrash;
 
    // must be created eraly
    private Image _imageDialog = TourbookPlugin.getImageDescriptor(Images.Equipment_Service).createImage();
@@ -111,9 +115,11 @@ public class DialogEquipmentService extends TitleAreaDialog {
    private Composite                 _container;
    private Composite                 _parent;
 
+   private Button                    _btnDateRetiredNow;
    private Button                    _btnDeleteImage;
 
    private Button                    _chkCollate;
+   private Button                    _chkRetired;
 
    private Button                    _rdoCollateWith_Next;
    private Button                    _rdoCollateWith_Previous;
@@ -123,6 +129,7 @@ public class DialogEquipmentService extends TitleAreaDialog {
    private Combo                     _comboPriceUnit;
    private Combo                     _comboType;
 
+   private DateTime                  _dateRetired;
    private DateTime                  _dateUsed;
 
    private Label                     _canvasEquipmentImage;
@@ -131,9 +138,12 @@ public class DialogEquipmentService extends TitleAreaDialog {
    private Label                     _lblImage;
    private Label                     _lblImageFilePath;
 
+   private Link                      _linkWebsite;
+
    private Spinner                   _spinPrice;
 
    private Text                      _txtDescription;
+   private Text                      _txtPurchaseLocation;
    private Text                      _txtUrlAddress;
 
    private AutoComplete_ComboInputMT _autocomplete_Company;
@@ -273,7 +283,7 @@ public class DialogEquipmentService extends TitleAreaDialog {
       _container = new Composite(parent, SWT.NONE);
       GridDataFactory.fillDefaults().grab(true, true).applyTo(_container);
       GridLayoutFactory.swtDefaults().numColumns(3).applyTo(_container);
-//      _container.setBackground(UI.SYS_COLOR_MAGENTA);
+//      _container.setBackground(UI.SYS_COLOR_GREEN);
       {
          {
             /*
@@ -356,6 +366,34 @@ public class DialogEquipmentService extends TitleAreaDialog {
             _comboDecorator_DateFrom.setMarginWidth(decoratorDistance);
          }
          UI.createSpacer_Horizontal(_container, 1);
+
+         {
+            /*
+             * Retired: Checkbox
+             */
+            final Label label = UI.createLabel(_container, Messages.Dialog_Equipment_Label_DateRetired);
+            gdVertCenter.applyTo(label);
+
+            _chkRetired = new Button(_container, SWT.CHECK);
+            _chkRetired.setText("Is retired");
+
+            _chkRetired.addSelectionListener(_defaultSelectionListener);
+         }
+         UI.createSpacer_Horizontal(_container, 1);
+         UI.createSpacer_Horizontal(_container, 1);
+         {
+            /*
+             * Retired: Date
+             */
+            _dateRetired = new DateTime(_container, SWT.DATE | SWT.MEDIUM | SWT.DROP_DOWN);
+            _dateRetired.addSelectionListener(_defaultSelectionListener);
+
+            _btnDateRetiredNow = new Button(_container, SWT.PUSH);
+            _btnDateRetiredNow.setImage(_imageNow);
+            _btnDateRetiredNow.setToolTipText(Messages.Dialog_Equipment_Button_SetDateToToday_Tooltip);
+            _btnDateRetiredNow.addSelectionListener(SelectionListener.widgetSelectedAdapter(selectionEvent -> onSelect_RetireNow()));
+         }
+
          {
             /*
              * Price
@@ -444,10 +482,25 @@ public class DialogEquipmentService extends TitleAreaDialog {
          }
          {
             /*
+             * Purchase location
+             */
+            UI.createLabel(_container, "Pur&chase location");
+
+            _txtPurchaseLocation = new Text(_container, SWT.BORDER);
+            _txtPurchaseLocation.addModifyListener(e -> onModify());
+            GridDataFactory.fillDefaults()
+                  .grab(true, false)
+                  .hint(defaultWidth, SWT.DEFAULT)
+                  .span(2, 1)
+                  .applyTo(_txtPurchaseLocation);
+         }
+         {
+            /*
              * Website
              */
-            final Label label = UI.createLabel(_container, Messages.Dialog_Equipment_Label_Website);
-            GridDataFactory.fillDefaults().align(SWT.FILL, SWT.BEGINNING).applyTo(label);
+            _linkWebsite = new Link(_container, SWT.NONE);
+            _linkWebsite.setText(Messages.Dialog_Equipment_Link_Website);
+            _linkWebsite.addSelectionListener(SelectionListener.widgetSelectedAdapter(selectionEvent -> onSelect_Website()));
 
             _txtUrlAddress = new Text(_container, SWT.BORDER);
             _txtUrlAddress.addModifyListener(e -> onModify());
@@ -533,12 +586,17 @@ public class DialogEquipmentService extends TitleAreaDialog {
       }
 
       final boolean isCollate = _chkCollate.getSelection();
+      final boolean isRetired = _chkRetired.getSelection();
 
 // SET_FORMATTING_OFF
 
       _btnDeleteImage            .setEnabled(StringUtils.hasContent(_imageFilePath));
+      _btnDateRetiredNow         .setEnabled(isRetired);
+
+      _dateRetired               .setEnabled(isRetired);
 
       _lblCollateWith            .setEnabled(isCollate);
+
       _rdoCollateWith_Next       .setEnabled(isCollate);
       _rdoCollateWith_Previous   .setEnabled(isCollate);
 
@@ -598,6 +656,7 @@ public class DialogEquipmentService extends TitleAreaDialog {
 
       _imageCamera = TourbookPlugin.getImageDescriptor(Images.Camera).createImage();
       _imageTrash = TourbookPlugin.getImageDescriptor(Images.App_Trash_Themed).createImage();
+      _imageNow = TourbookPlugin.getImageDescriptor(Images.Calendar).createImage();
 
       _parent.addDisposeListener(disposeEvent -> onDispose());
 
@@ -702,6 +761,7 @@ public class DialogEquipmentService extends TitleAreaDialog {
 
       UI.disposeResource(_imageCamera);
       UI.disposeResource(_imageDialog);
+      UI.disposeResource(_imageNow);
       UI.disposeResource(_imageTrash);
 
 // SET_FORMATTING_OFF
@@ -783,7 +843,30 @@ public class DialogEquipmentService extends TitleAreaDialog {
 
       _isModified = true;
 
+      _linkWebsite.setToolTipText(_txtUrlAddress.getText());
+
       enableControls();
+   }
+
+   private void onSelect_RetireNow() {
+
+      _isModified = true;
+
+      final ZonedDateTime now = TimeTools.now();
+
+      _dateRetired.setDate(now.getYear(), now.getMonthValue() - 1, now.getDayOfMonth());
+
+      enableControls();
+   }
+
+   private void onSelect_Website() {
+
+      final String url = _txtUrlAddress.getText().trim();
+
+      if (url.length() > 0) {
+
+         WEB.openUrl(url);
+      }
    }
 
    private void resoreState() {
@@ -818,21 +901,23 @@ public class DialogEquipmentService extends TitleAreaDialog {
 
       _service.setEquipment(        _serviceEquipment);
 
-      _service.setCompany(          _comboCompany.getText().trim());
-      _service.setName_Service(     _comboName.getText().trim());
-      _service.setPartType(         _comboType.getText().trim());
-      _service.setDescription(      _txtDescription.getText().trim());
-      _service.setUrlAddress(       _txtUrlAddress.getText().trim());
+      _service.setCompany(          _comboCompany        .getText().trim());
+      _service.setName_Service(     _comboName           .getText().trim());
+      _service.setPartType(         _comboType           .getText().trim());
+      _service.setPurchaseLocation( _txtPurchaseLocation .getText().trim());
+      _service.setDescription(      _txtDescription      .getText().trim());
+      _service.setUrlAddress(       _txtUrlAddress       .getText().trim());
 
-      _service.setImageFilePath(    _lblImageFilePath.getText().trim());
+      _service.setImageFilePath(    _lblImageFilePath    .getText().trim());
 
-      _service.setIsCollate(        _chkCollate.getSelection());
-      _service.setCollateBetween(   _rdoCollateWith_Next.getSelection()
+      _service.setIsCollate(        _chkCollate          .getSelection());
+      _service.setIsRetired(        _chkRetired          .getSelection());
+      _service.setCollateBetween(   _rdoCollateWith_Next .getSelection()
                                           ? EquipmentPart.COLLATED_WITH_NEXT
                                           : EquipmentPart.COLLATED_WITH_PREVIOUS);
 
-      _service.setPrice(            _spinPrice.getSelection() / 100f);
-      _service.setPriceUnit(        _comboPriceUnit.getText());
+      _service.setPrice(            _spinPrice           .getSelection() / 100f);
+      _service.setPriceUnit(        _comboPriceUnit      .getText());
 
       _service.setDateUsed(         TimeTools.toEpochMilli(dateUsed));
 
@@ -904,8 +989,10 @@ public class DialogEquipmentService extends TitleAreaDialog {
 // SET_FORMATTING_OFF
 
       final int collateWith      = _service.getCollateBetween();
+      final String urlAddress    = _service.getUrlAddress();
 
       _chkCollate                .setSelection(_service.isCollate());
+      _chkRetired                .setSelection(_service.isRetired());
 
       _comboCompany              .setText(_service.getCompany());
       _comboName                 .setText(_service.getName_Service());
@@ -919,7 +1006,10 @@ public class DialogEquipmentService extends TitleAreaDialog {
       _spinPrice                 .setSelection((int) (_service.getPrice()  * 100));
 
       _txtDescription            .setText(_service.getDescription());
-      _txtUrlAddress             .setText(_service.getUrlAddress());
+      _txtPurchaseLocation       .setText(_service.getPurchaseLocation());
+      _txtUrlAddress             .setText(urlAddress);
+
+      _linkWebsite               .setToolTipText(urlAddress);
 
 // SET_FORMATTING_ON
 

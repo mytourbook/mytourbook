@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2026 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -38,11 +38,11 @@ public class ActionTourGeoFilter extends ActionToolbarSlideoutAdv {
 
    private static final ImageDescriptor _actionImageDescriptor = TourbookPlugin.getThemedImageDescriptor(Images.TourGeoFilter);
 
-   private SlideoutTourGeoFilter       _slideoutTourGeoFilter;
+   private SlideoutTourGeoFilter        _slideoutTourGeoFilter;
 
    public ActionTourGeoFilter() {
 
-      super(_actionImageDescriptor, _actionImageDescriptor);
+      super(_actionImageDescriptor);
 
       isToggleAction = true;
       notSelectedTooltip = Messages.Tour_GeoFilter_Action_Tooltip;

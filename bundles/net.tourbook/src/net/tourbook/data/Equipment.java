@@ -68,9 +68,14 @@ public class Equipment implements Cloneable, Comparable<Object>, Serializable {
    private String                     model;
 
    /**
-    * e.g. Velo
+    * Collation type, e.g. backpack
     */
    private String                     type;
+
+   /**
+    * Purchase location
+    */
+   private String                     purchaseLocation;
 
    /**
     * Description/notes for the equipment
@@ -98,6 +103,14 @@ public class Equipment implements Cloneable, Comparable<Object>, Serializable {
    private float                      weight;
 
    /**
+    * This is just the unit how the weight is displayed in the UI, the weight is always saved in kg
+    * <p>
+    * 0 ... kg/lbs<br>
+    * 1 ... g/oz
+    */
+   private short                      weightUnit;
+
+   /**
     * Price
     */
    private float                      price;
@@ -116,6 +129,11 @@ public class Equipment implements Cloneable, Comparable<Object>, Serializable {
     * When <code>true</code> then this equipment is collated but it can have no parts or services
     */
    private boolean                    isCollate;
+
+   /**
+    * When <code>true</code> then this equipment is retired
+    */
+   private boolean                    isRetired;
 
    /**
     * When the equipment was firstly used, in milliseconds since 1970-01-01T00:00:00Z
@@ -186,6 +204,9 @@ public class Equipment implements Cloneable, Comparable<Object>, Serializable {
 
    @Transient
    private String                     _equipmentName;
+
+   @Transient
+   private String                     _checkedEmptyType;
 
    /**
     * Default constructor used in EJB
@@ -448,6 +469,15 @@ public class Equipment implements Cloneable, Comparable<Object>, Serializable {
       return priceUnit;
    }
 
+   public String getPurchaseLocation() {
+
+      if (purchaseLocation == null) {
+         return UI.EMPTY_STRING;
+      }
+
+      return purchaseLocation;
+   }
+
    public String getSize() {
 
       if (size == null) {
@@ -466,6 +496,16 @@ public class Equipment implements Cloneable, Comparable<Object>, Serializable {
       return type;
    }
 
+   public String getTypeEmptyChecked() {
+
+      if (_checkedEmptyType == null) {
+
+         _checkedEmptyType = EquipmentManager.isEmptyEquipmentType(type) ? UI.EMPTY_STRING : type;
+      }
+
+      return _checkedEmptyType;
+   }
+
    public String getUrlAddress() {
 
       if (urlAddress == null) {
@@ -480,6 +520,13 @@ public class Equipment implements Cloneable, Comparable<Object>, Serializable {
     */
    public float getWeight() {
       return weight;
+   }
+
+   /**
+    * @return Returns {@link #weightUnit}
+    */
+   public short getWeightUnit() {
+      return weightUnit;
    }
 
    @Override
@@ -507,6 +554,10 @@ public class Equipment implements Cloneable, Comparable<Object>, Serializable {
       }
 
       return false;
+   }
+
+   public boolean isRetired() {
+      return isRetired;
    }
 
    /**
@@ -612,6 +663,10 @@ public class Equipment implements Cloneable, Comparable<Object>, Serializable {
       this.isCollate = isCollate;
    }
 
+   public void setIsRetired(final boolean isRetired) {
+      this.isRetired = isRetired;
+   }
+
    public void setModel(final String model) {
 
       this.model = model;
@@ -627,12 +682,19 @@ public class Equipment implements Cloneable, Comparable<Object>, Serializable {
       this.priceUnit = priceUnit;
    }
 
+   public void setPurchaseLocation(final String purchaseLocation) {
+      this.purchaseLocation = purchaseLocation;
+   }
+
    public void setSize(final String size) {
       this.size = size;
    }
 
    public void setType(final String type) {
+
       this.type = type;
+
+      _checkedEmptyType = null;
    }
 
    public void setUrlAddress(final String urlAddress) {
@@ -642,6 +704,10 @@ public class Equipment implements Cloneable, Comparable<Object>, Serializable {
 
    public void setWeight(final float weight) {
       this.weight = weight;
+   }
+
+   public void setWeightUnit(final short weightUnit) {
+      this.weightUnit = weightUnit;
    }
 
    @Override
@@ -664,6 +730,7 @@ public class Equipment implements Cloneable, Comparable<Object>, Serializable {
             + "  model            = " + model + NL //                         //$NON-NLS-1$
 
             + "  isCollate        = " + isCollate + NL //                     //$NON-NLS-1$
+            + "  isRetired    	 = " + isRetired + NL //                     //$NON-NLS-1$
             + "  type             = " + type + NL //                          //$NON-NLS-1$
             + "  dateUsed         = " + getDateUsed_Local() + NL //           //$NON-NLS-1$
             + "  dateCollateFrom  = " + getDateCollateFrom_Local() + NL //    //$NON-NLS-1$
@@ -705,9 +772,11 @@ public class Equipment implements Cloneable, Comparable<Object>, Serializable {
       setModel             (otherEquipment.getModel());
       setDescription       (otherEquipment.getDescription());
       setImageFilePath     (otherEquipment.getImageFilePath());
+      setPurchaseLocation  (otherEquipment.getPurchaseLocation());
       setUrlAddress        (otherEquipment.getUrlAddress());
 
       setIsCollate         (otherEquipment.isCollate());
+      setIsRetired         (otherEquipment.isRetired());
       setType              (otherEquipment.getType());
 
       setDistanceFirstUse  (otherEquipment.getDistanceFirstUse());
@@ -715,6 +784,7 @@ public class Equipment implements Cloneable, Comparable<Object>, Serializable {
       setPriceUnit         (otherEquipment.getPriceUnit());
       setSize              (otherEquipment.getSize());
       setWeight            (otherEquipment.getWeight());
+      setWeightUnit        (otherEquipment.getWeightUnit());
 
       setDateUsed          (otherEquipment.getDateUsed());
       setDateBuilt         (otherEquipment.getDateBuilt());

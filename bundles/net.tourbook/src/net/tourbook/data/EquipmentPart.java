@@ -86,7 +86,9 @@ public class EquipmentPart implements Cloneable, Comparable<Object>, Serializabl
    private String                     model;
 
    /**
-    * Part type, e.g. Faltreifen
+    *
+    * The collation type, e.g. shoe xyz is used to combine it other parts with the same type but
+    * different {@link #dateUsed}
     */
    private String                     type;
 
@@ -104,6 +106,11 @@ public class EquipmentPart implements Cloneable, Comparable<Object>, Serializabl
     * e.g. 700*22-23
     */
    private String                     size;
+
+   /**
+    * Purchase location
+    */
+   private String                     purchaseLocation;
 
    /**
     * Description/notes for the equipment
@@ -124,6 +131,11 @@ public class EquipmentPart implements Cloneable, Comparable<Object>, Serializabl
     * When <code>true</code> then this part is included in collated parts
     */
    private boolean                    isCollate                       = true;
+
+   /**
+    * When <code>true</code> then this part is retired
+    */
+   private boolean                    isRetired;
 
    /**
     * When the part was firstly used, in milliseconds since 1970-01-01T00:00:00Z
@@ -158,6 +170,12 @@ public class EquipmentPart implements Cloneable, Comparable<Object>, Serializabl
     * Weight of the equipment, in kg
     */
    private float                      weight;
+
+   /**
+    * 0 ... kg/lbs<br>
+    * 1 ... g/oz
+    */
+   private short                      weightUnit;
 
    /**
     * Price
@@ -524,6 +542,9 @@ public class EquipmentPart implements Cloneable, Comparable<Object>, Serializabl
       return partId;
    }
 
+   /**
+    * @return Returns the part type {@link #type} or an empty string when <code>null</code>
+    */
    public String getPartType() {
 
       if (type == null) {
@@ -539,6 +560,15 @@ public class EquipmentPart implements Cloneable, Comparable<Object>, Serializabl
 
    public String getPriceUnit() {
       return priceUnit;
+   }
+
+   public String getPurchaseLocation() {
+
+      if (purchaseLocation == null) {
+         return UI.EMPTY_STRING;
+      }
+
+      return purchaseLocation;
    }
 
    public String getSize() {
@@ -561,6 +591,10 @@ public class EquipmentPart implements Cloneable, Comparable<Object>, Serializabl
 
    public float getWeight() {
       return weight;
+   }
+
+   public short getWeightUnit() {
+      return weightUnit;
    }
 
    @Override
@@ -594,6 +628,10 @@ public class EquipmentPart implements Cloneable, Comparable<Object>, Serializabl
 
    public boolean isItemType_Service() {
       return itemType == ITEM_TYPE_SERVICE;
+   }
+
+   public boolean isRetired() {
+      return isRetired;
    }
 
    /**
@@ -727,6 +765,10 @@ public class EquipmentPart implements Cloneable, Comparable<Object>, Serializabl
       this.isCollate = isCollate;
    }
 
+   public void setIsRetired(final boolean isRetired) {
+      this.isRetired = isRetired;
+   }
+
    public void setModel(final String model) {
 
       this.model = model;
@@ -750,6 +792,10 @@ public class EquipmentPart implements Cloneable, Comparable<Object>, Serializabl
       this.priceUnit = priceUnit;
    }
 
+   public void setPurchaseLocation(final String purchaseLocation) {
+      this.purchaseLocation = purchaseLocation;
+   }
+
    public void setSize(final String size) {
       this.size = size;
    }
@@ -761,6 +807,10 @@ public class EquipmentPart implements Cloneable, Comparable<Object>, Serializabl
 
    public void setWeight(final float weight) {
       this.weight = weight;
+   }
+
+   public void setWeightUnit(final short weightUnit) {
+      this.weightUnit = weightUnit;
    }
 
    @Override
@@ -808,12 +858,14 @@ public class EquipmentPart implements Cloneable, Comparable<Object>, Serializabl
       setModel             (otherPart.getModel());
       setDescription       (otherPart.getDescription());
       setImageFilePath     (otherPart.getImageFilePath());
+      setPurchaseLocation  (otherPart.getPurchaseLocation());
       setUrlAddress        (otherPart.getUrlAddress());
 
       setCompany           (otherPart.getCompany());
       setName_Service      (serviceName);
 
       setIsCollate         (otherPart.isCollate());
+      setIsRetired         (otherPart.isRetired());
       setCollateBetween    (otherPart.getCollateBetween());
       setPartType          (otherPart.getPartType());
 
@@ -822,6 +874,7 @@ public class EquipmentPart implements Cloneable, Comparable<Object>, Serializabl
       setPriceUnit         (otherPart.getPriceUnit());
       setSize              (otherPart.getSize());
       setWeight            (otherPart.getWeight());
+      setWeightUnit        (otherPart.getWeightUnit());
 
       setDateUsed          (otherPart.getDateUsed());
       setDateBuilt         (otherPart.getDateBuilt());

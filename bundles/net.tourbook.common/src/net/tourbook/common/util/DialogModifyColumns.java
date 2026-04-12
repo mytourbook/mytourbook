@@ -1519,6 +1519,7 @@ public class DialogModifyColumns extends TrayDialog {
 
       defineColumn_10_ColumnName(tableLayout);
       defineColumn_20_ColumnHeaderText(tableLayout);
+      defineColumn_22_ColumnHeaderTooltip(tableLayout);
       defineColumn_30_Unit(tableLayout);
       defineColumn_40_Alignment(tableLayout);
       defineColumn_50_Format_Category(tableLayout);
@@ -1581,6 +1582,32 @@ public class DialogModifyColumns extends TrayDialog {
       });
 
       tableLayout.setColumnData(tc, new ColumnPixelData(_pc.convertWidthInCharsToPixels(16), true));
+   }
+
+   /**
+    * Column: Column header text
+    */
+   private void defineColumn_22_ColumnHeaderTooltip(final TableColumnLayout tableLayout) {
+
+      final TableViewerColumn tvc = new TableViewerColumn(_columnViewer, SWT.LEAD);
+
+      final TableColumn tc = tvc.getColumn();
+      tc.setMoveable(true);
+      tc.setText("Column Tooltip");
+
+      tvc.setLabelProvider(new ColumnCellLabelProvider() {
+
+         @Override
+         public void update(final ViewerCell cell) {
+
+            final ColumnDefinition colDef = (ColumnDefinition) cell.getElement();
+            cell.setText(colDef.getColumnHeaderToolTipText());
+
+            setColor(cell, colDef);
+         }
+      });
+
+      tableLayout.setColumnData(tc, new ColumnPixelData(_pc.convertWidthInCharsToPixels(20), true));
    }
 
    /**

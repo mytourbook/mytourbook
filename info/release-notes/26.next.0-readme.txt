@@ -43,7 +43,10 @@ New / Improvements
 Changes
 =======
 
-*  
+* Equipment
+  - Multiple equipment with an empty type are not collated any more, each equipment with an empty type can now collate tours for itself
+    Update your equipment by removing the type when this equipment/part is not depending on another with the same type
+    The new column "Type (saved)" can display the saved value which is a random value when the type in the UI is empty.
 
 
 Changes that require Tour Re-import

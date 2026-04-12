@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2017, 2025 Wolfgang Schramm and Contributors
+ * Copyright (C) 2017, 2026 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -56,13 +56,11 @@ public abstract class ActionToolbarSlideoutAdv extends ContributionItem implemen
    public String            notSelectedTooltip = UI.EMPTY_STRING;
 
    private boolean          _isImageCreated_EnabledDisabled;
-   private boolean          _isImageCreated_Selected;
 
    /*
     * UI controls
     */
    private Image _imageEnabled;
-   private Image _imageSelected;
 
    /**
     * Use {@link CommonImages#TourOptions} as default action image
@@ -90,25 +88,6 @@ public abstract class ActionToolbarSlideoutAdv extends ContributionItem implemen
       _imageEnabled = actionImageDescriptor.createImage();
 
       _isImageCreated_EnabledDisabled = true;
-   }
-
-   public ActionToolbarSlideoutAdv(final ImageDescriptor actionImage,
-                                   final ImageDescriptor actionImageDisabled) {
-
-      _imageEnabled = actionImage.createImage();
-
-      _isImageCreated_EnabledDisabled = true;
-   }
-
-   public ActionToolbarSlideoutAdv(final ImageDescriptor actionImage_Enabled,
-                                   final ImageDescriptor actionImage_Disabled,
-                                   final ImageDescriptor actionImage_Selected) {
-
-      _imageEnabled = actionImage_Enabled.createImage();
-      _imageSelected = actionImage_Selected.createImage();
-
-      _isImageCreated_EnabledDisabled = true;
-      _isImageCreated_Selected = true;
    }
 
    protected abstract AdvancedSlideout createSlideout(ToolItem toolItem);
@@ -212,11 +191,6 @@ public abstract class ActionToolbarSlideoutAdv extends ContributionItem implemen
       if (_isImageCreated_EnabledDisabled && _imageEnabled != null && _imageEnabled.isDisposed() == false) {
 
          _imageEnabled.dispose();
-      }
-
-      if (_isImageCreated_Selected && _imageSelected != null && _imageSelected.isDisposed() == false) {
-
-         _imageSelected.dispose();
       }
    }
 
@@ -338,19 +312,7 @@ public abstract class ActionToolbarSlideoutAdv extends ContributionItem implemen
     *
     * @param _actionToolItem2
     */
-   protected void updateUI_ToolItem_Image() {
-
-      if (_imageSelected != null) {
-
-         // selected image is available
-
-         if (_actionToolItem.getSelection()) {
-            _actionToolItem.setImage(_imageSelected);
-         } else {
-            _actionToolItem.setImage(_imageEnabled);
-         }
-      }
-   }
+   protected void updateUI_ToolItem_Image() {}
 
    private void updateUI_ToolItem_Tooltip() {
 

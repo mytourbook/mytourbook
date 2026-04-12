@@ -41,6 +41,7 @@ import java.time.temporal.WeekFields;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -68,6 +69,8 @@ import net.tourbook.common.util.StringUtils;
 import net.tourbook.common.util.Util;
 import net.tourbook.data.DeviceSensor;
 import net.tourbook.data.DeviceSensorValue;
+import net.tourbook.data.Equipment;
+import net.tourbook.data.EquipmentPart;
 import net.tourbook.data.TourBeverageContainer;
 import net.tourbook.data.TourBike;
 import net.tourbook.data.TourData;
@@ -82,6 +85,7 @@ import net.tourbook.data.TourTag;
 import net.tourbook.data.TourTagCategory;
 import net.tourbook.data.TourType;
 import net.tourbook.data.TourWayPoint;
+import net.tourbook.equipment.EquipmentManager;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.search.FTSearchManager;
 import net.tourbook.tag.TagCollection;
@@ -121,7 +125,9 @@ public class TourDatabase {
     * <li>/net.tourbook.export/format-templates/mt-1.0.vm</li>
     * <li>net.tourbook.device.mt.MT_StAXHandler</li>
     */
-   private static final int TOURBOOK_DB_VERSION = 60;
+   private static final int TOURBOOK_DB_VERSION = 61;
+
+//   private static final int TOURBOOK_DB_VERSION = 61; // 26.3+
 
 //   private static final int TOURBOOK_DB_VERSION = 60; // 26.3
 //   private static final int TOURBOOK_DB_VERSION = 59; // 25.11
@@ -2056,6 +2062,89 @@ public class TourDatabase {
                }
 
                sb.append("SELECT " + fieldname + " FROM " + dbName + NL); //$NON-NLS-1$ //$NON-NLS-2$
+            }
+
+            sb.append("ORDER BY " + fieldname + NL); //$NON-NLS-1$
+
+            sql = sb.toString();
+
+            final ResultSet result = stmt.executeQuery(sql);
+
+            while (result.next()) {
+
+               String dbValue = result.getString(1);
+               if (dbValue != null) {
+
+                  dbValue = dbValue.trim();
+
+                  if (dbValue.length() > 0) {
+                     allSortedValues.add(dbValue);
+                  }
+               }
+            }
+
+         } catch (final SQLException e) {
+
+            StatusUtil.logError(NL + sql);
+            UI.showSQLException(e);
+         }
+      }));
+
+      return allSortedValues;
+   }
+
+   /**
+    * Getting one row from multiple databases sorted by alphabet and without any double entries
+    *
+    * @param fieldname
+    *           DB field name
+    * @param exclude
+    *           Startstring which excluded
+    * @param allDBNames
+    *           Database tables
+    *
+    * @return Returns a sorted list with unique db field contents
+    */
+   public static ConcurrentSkipListSet<String> getDistinctValuesWithExclude(final String fieldname,
+                                                                            final String exclude,
+                                                                            final String... allDBNames) {
+
+      final ConcurrentSkipListSet<String> allSortedValues = new ConcurrentSkipListSet<>((text1, text2) -> {
+         {
+            // sort without case
+            return text1.compareToIgnoreCase(text2);
+         }
+      });
+
+      /*
+       * Run in UI thread otherwise the busyindicator fails
+       */
+      final Display display = Display.getDefault();
+
+      display.syncExec(() -> BusyIndicator.showWhile(display, () -> {
+
+         String sql = UI.EMPTY_STRING;
+
+         try (Connection conn = getInstance().getConnection();
+               Statement stmt = conn.createStatement()) {
+
+            final StringBuilder sb = new StringBuilder();
+
+            for (int dbIndex = 0; dbIndex < allDBNames.length; dbIndex++) {
+
+               final String dbName = allDBNames[dbIndex];
+
+               if (dbIndex > 0) {
+                  sb.append("UNION" + NL); //$NON-NLS-1$
+               }
+
+               sb.append(UI.EMPTY_STRING
+
+                     + "SELECT " + fieldname //                                           //$NON-NLS-1$
+                     + " FROM " + dbName //                                               //$NON-NLS-1$
+
+               // % is a placeholder in SQL for 0..n characters
+                     + " WHERE " + fieldname + " NOT LIKE '" + exclude + "%'" + NL); //   //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
             }
 
             sb.append("ORDER BY " + fieldname + NL); //$NON-NLS-1$
@@ -4589,7 +4678,15 @@ public class TourDatabase {
                   + "   DateBuilt               BIGINT DEFAULT 0,                         " + NL //$NON-NLS-1$
                   + "   DateRetired             BIGINT DEFAULT 0,                         " + NL //$NON-NLS-1$
                   + "   DateCollateFrom         BIGINT DEFAULT 0,                         " + NL //$NON-NLS-1$
-                  + "   DateCollateUntil        BIGINT DEFAULT 0                          " + NL //$NON-NLS-1$
+                  + "   DateCollateUntil        BIGINT DEFAULT 0,                         " + NL //$NON-NLS-1$
+
+                  // version 61 start
+
+                  + "   IsRetired               BOOLEAN DEFAULT FALSE,                    " + NL //$NON-NLS-1$
+                  + "   PurchaseLocation        VARCHAR(" + DB_LENGTH_NAME + "),          " + NL //$NON-NLS-1$ //$NON-NLS-2$
+                  + "   WeightUnit              SMALLINT DEFAULT 0                        " + NL //$NON-NLS-1$
+
+                  // version 61 end
 
                   + ")" //                                                                       //$NON-NLS-1$
       );
@@ -4671,13 +4768,21 @@ public class TourDatabase {
                   + "   Weight                  FLOAT DEFAULT 0,                          " + NL //$NON-NLS-1$
 
                   + "   IsCollate               BOOLEAN DEFAULT TRUE,                     " + NL //$NON-NLS-1$
-                  + "   CollateBetween         	SMALLINT DEFAULT 0,                       " + NL //$NON-NLS-1$
+                  + "   CollateBetween          SMALLINT DEFAULT 0,                       " + NL //$NON-NLS-1$
 
                   + "   DateUsed                BIGINT DEFAULT 0,                         " + NL //$NON-NLS-1$
                   + "   DateBuilt               BIGINT DEFAULT 0,                         " + NL //$NON-NLS-1$
                   + "   DateRetired             BIGINT DEFAULT 0,                         " + NL //$NON-NLS-1$
                   + "   DateCollateFrom         BIGINT DEFAULT 0,                         " + NL //$NON-NLS-1$
-                  + "   DateCollateUntil        BIGINT DEFAULT 0                          " + NL //$NON-NLS-1$
+                  + "   DateCollateUntil        BIGINT DEFAULT 0,                         " + NL //$NON-NLS-1$
+
+                  // version 61 start
+
+                  + "   IsRetired               BOOLEAN DEFAULT FALSE,                    " + NL //$NON-NLS-1$
+                  + "   PurchaseLocation        VARCHAR(" + DB_LENGTH_NAME + "),          " + NL //$NON-NLS-1$ //$NON-NLS-2$
+                  + "   WeightUnit              SMALLINT DEFAULT 0                        " + NL //$NON-NLS-1$
+
+                  // version 61 end
 
                   + ")" //                                                                       //$NON-NLS-1$
       );
@@ -7232,9 +7337,14 @@ public class TourDatabase {
             currentDbVersion = _dbDesignVersion_New = updateDb_058_To_059(conn, splashManager);
          }
 
-         // 59 -> 60    25.11+++
+         // 59 -> 60    26.3
          if (currentDbVersion == 59) {
             currentDbVersion = _dbDesignVersion_New = updateDb_059_To_060(conn, splashManager);
+         }
+
+         // 60 -> 61    26.3+++
+         if (currentDbVersion == 60) {
+            currentDbVersion = _dbDesignVersion_New = updateDb_060_To_061(conn, splashManager);
          }
 
          // update db design version number
@@ -7302,8 +7412,10 @@ public class TourDatabase {
          updateDb__3_Data_Concurrent(conn, splashManager, new TourDataUpdate_057_to_058()); //     58 - 25.6
 
          // this must be run BEFORE the subsequent update
-         updateDb_058_To_059_DataUpdate(conn, splashManager); //                                   59 - 25.??? after 25.6
-         updateDb__3_Data_Concurrent(conn, splashManager, new TourDataUpdate_058_to_059()); //     59 - 25.??? after 25.6
+         updateDb_058_To_059_DataUpdate(conn, splashManager); //                                   59 - 25.11
+         updateDb__3_Data_Concurrent(conn, splashManager, new TourDataUpdate_058_to_059()); //     59 - 25.11
+
+         updateDb_060_To_061_DataUpdate(conn, splashManager); //                                   61 - 26.3+++?
 
       } catch (final SQLException e) {
 
@@ -7316,6 +7428,15 @@ public class TourDatabase {
       return true;
    }
 
+   /**
+    * This is updating {@link TourData} concurrently
+    *
+    * @param connection
+    * @param splashManager
+    * @param tourDataUpdater
+    *
+    * @throws SQLException
+    */
    private void updateDb__3_Data_Concurrent(final Connection connection,
                                             final SplashManager splashManager,
                                             final ITourDataUpdate tourDataUpdater) throws SQLException {
@@ -11570,6 +11691,124 @@ public class TourDatabase {
       logDbUpdate_End(newDbVersion);
 
       return newDbVersion;
+   }
+
+   private int updateDb_060_To_061(final Connection conn, final SplashManager splashManager) throws SQLException {
+
+      final int newDbVersion = 61;
+
+      logDbUpdate_Start(newDbVersion);
+      updateMonitor(splashManager, newDbVersion);
+
+      final Statement stmt = conn.createStatement();
+      {
+         // alter columns
+
+// SET_FORMATTING_OFF
+
+         SQL.addColumn_Boolean   (stmt, TABLE_EQUIPMENT,       "IsRetired",         DEFAULT_FALSE);      //$NON-NLS-1$
+         SQL.addColumn_VarCar    (stmt, TABLE_EQUIPMENT,       "PurchaseLocation",  DB_LENGTH_NAME);     //$NON-NLS-1$
+         SQL.addColumn_SmallInt  (stmt, TABLE_EQUIPMENT,       "WeightUnit",        DEFAULT_0);          //$NON-NLS-1$
+
+         SQL.addColumn_Boolean   (stmt, TABLE_EQUIPMENT_PART,  "IsRetired",         DEFAULT_FALSE);      //$NON-NLS-1$
+         SQL.addColumn_VarCar    (stmt, TABLE_EQUIPMENT_PART,  "PurchaseLocation",  DB_LENGTH_NAME);     //$NON-NLS-1$
+         SQL.addColumn_SmallInt  (stmt, TABLE_EQUIPMENT_PART,  "WeightUnit",        DEFAULT_0);          //$NON-NLS-1$
+
+         SQL.createIndex_Table__Column (stmt, TABLE_EQUIPMENT,       "IsRetired");                       //$NON-NLS-1$
+         SQL.createIndex_Table__Column (stmt, TABLE_EQUIPMENT_PART,  "IsRetired");                       //$NON-NLS-1$
+
+// SET_FORMATTING_ON
+
+      }
+      stmt.close();
+
+      logDbUpdate_End(newDbVersion);
+
+      return newDbVersion;
+   }
+
+   /**
+    * Update field <code>isRetired</code> in the equipment/parts
+    *
+    * @param conn
+    * @param splashManager
+    *
+    * @throws SQLException
+    */
+   private void updateDb_060_To_061_DataUpdate(final Connection conn,
+                                               final SplashManager splashManager) throws SQLException {
+
+      final long startTime = System.currentTimeMillis();
+
+      final int dbDataVersion = 61;
+
+      if (getDbVersion(conn, TABLE_DB_VERSION_DATA) >= dbDataVersion) {
+
+         // data version is higher -> nothing to do
+         return;
+      }
+
+      EntityManager em = null;
+
+      try {
+
+         em = TourDatabase.getInstance().getEntityManager();
+
+         if (em != null) {
+
+            final Query query = em.createQuery(UI.EMPTY_STRING
+
+                  + "SELECT Equipment" + NL //                                               //$NON-NLS-1$
+                  + " FROM " + Equipment.class.getSimpleName() + " AS Equipment" + NL //     //$NON-NLS-1$ //$NON-NLS-2$
+
+                  // sort by name
+                  + " ORDER BY Equipment.brand, Equipment.model" + NL //                     //$NON-NLS-1$
+            );
+
+            final Set<String> allEquipmentTypes = new HashSet<>();
+
+            final List<?> allResults = query.getResultList();
+
+            for (final Object result : allResults) {
+
+               if (result instanceof final Equipment equipment) {
+
+                  final Set<String> allPartTypes = new HashSet<>();
+
+                  if (equipment.isCollate()) {
+
+                     allEquipmentTypes.add(equipment.getType());
+
+                  } else {
+
+                     // equipment is not collated but parts can be
+
+                     // get all collated part types
+                     for (final EquipmentPart part : equipment.getParts()) {
+                        if (part.isCollate()) {
+                           allPartTypes.add(part.getPartType());
+                        }
+                     }
+
+                     for (final String partType : allPartTypes) {
+
+                        EquipmentManager.updateUntilDate_Parts_OneType(equipment, partType, (short) -1);
+                     }
+                  }
+               }
+            }
+
+            EquipmentManager.updateUntilDate_Equipment(allEquipmentTypes);
+         }
+
+      } finally {
+
+         if (em != null) {
+            em.close();
+         }
+      }
+
+      updateVersionNumber_20_AfterDataUpdate(conn, dbDataVersion, startTime);
    }
 
    private void updateMonitor(final SplashManager splashManager, final int newDbVersion) {

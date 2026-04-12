@@ -18,12 +18,14 @@ package net.tourbook.equipment;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
 
 import net.tourbook.common.UI;
 import net.tourbook.data.Equipment;
+import net.tourbook.data.EquipmentPart;
 import net.tourbook.database.TourDatabase;
 
 import org.eclipse.jface.viewers.TreeViewer;
@@ -53,12 +55,22 @@ public class TVIEquipmentView_Root extends TVIEquipmentView_Item {
             return;
          }
 
-         final Query query = em.createQuery(UI.EMPTY_STRING
+         final boolean isFilterEnabled = EquipmentManager.isEquipmentFilterEnabled();
+         final int equipmentFilter_Retired = EquipmentManager.getEquipmentFilter_Retired();
+
+         final boolean eqFilter_IsShowActive = equipmentFilter_Retired == EquipmentManager.FILTER_RETIRED_IS_ACTIVE;
+         final boolean eqFilter_IsShowRetired = equipmentFilter_Retired == EquipmentManager.FILTER_RETIRED_IS_RETIRED;
+
+         final boolean useFilter = isFilterEnabled && (eqFilter_IsShowRetired || eqFilter_IsShowActive);
+
+         final String sql = UI.EMPTY_STRING
 
                + "SELECT" + NL //                                                      //$NON-NLS-1$
                + " Equipment" + NL //                                                  //$NON-NLS-1$
-               + " FROM " + Equipment.class.getSimpleName() + " AS Equipment" //       //$NON-NLS-1$ //$NON-NLS-2$
-         );
+               + " FROM " + Equipment.class.getSimpleName() + " AS Equipment" + NL//   //$NON-NLS-1$ //$NON-NLS-2$
+         ;
+
+         final Query query = em.createQuery(sql);
 
          final TreeViewer equipmentViewer = getEquipmentViewer();
          final List<Equipment> allEquipments = query.getResultList();
@@ -67,6 +79,94 @@ public class TVIEquipmentView_Root extends TVIEquipmentView_Item {
           * Create all equipment top items
           */
          for (final Equipment equipment : allEquipments) {
+
+            if (useFilter) {
+
+               final boolean isEquipmentCollate = equipment.isCollate();
+               final boolean isEquipmentRetired = equipment.isRetired();
+
+               if (isEquipmentCollate) {
+
+                  // collated equipment
+
+                  if (eqFilter_IsShowRetired && isEquipmentRetired) {
+
+                     // display this equipment
+
+                  } else if (eqFilter_IsShowActive && isEquipmentRetired == false) {
+
+                     // display this equipment
+
+                  } else {
+
+                     // filter out equipment
+
+                     continue;
+                  }
+
+               } else {
+
+                  // collated parts
+
+                  final Set<EquipmentPart> allParts = equipment.getParts();
+
+                  int numRetiredParts = 0;
+
+                  for (final EquipmentPart part : allParts) {
+                     if (part.isRetired()) {
+                        numRetiredParts++;
+                     }
+                  }
+
+                  final int numParts = allParts.size();
+                  final int numActiveParts = numParts - numRetiredParts;
+
+                  if (eqFilter_IsShowRetired) {
+
+                     if (isEquipmentRetired) {
+
+                        // display this equipment
+
+                     } else {
+
+                        // equipment is active -> check parts
+
+                        if (numRetiredParts > 0) {
+
+                           // display this equipment
+
+                        } else {
+
+                           // no retired parts -> hide equipment
+
+                           continue;
+                        }
+                     }
+
+                  } else if (eqFilter_IsShowActive) {
+
+                     if (isEquipmentRetired) {
+
+                        // check parts
+
+                        if (numActiveParts > 0) {
+
+                           // display this equipment
+
+                        } else {
+
+                           // no active parts -> hide equipment
+
+                           continue;
+                        }
+
+                     } else {
+
+                        // display this equipment
+                     }
+                  }
+               }
+            }
 
             final TVIEquipmentView_Equipment equipmentItem = new TVIEquipmentView_Equipment(
 
