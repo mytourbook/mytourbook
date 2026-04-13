@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2025 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2026 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -507,7 +507,7 @@ public class WEB {
       } else if (href.startsWith("http") == false) { //$NON-NLS-1$
 
          // Ensure that a protocol is set otherwise a MalformedURLException exception occurs
-         href = "http://" + href; //$NON-NLS-1$
+         href = "https://" + href; //$NON-NLS-1$
       }
 
       final boolean useExternalWebBrowser = _state_WEB.getBoolean(STATE_USE_EXTERNAL_WEB_BROWSER);

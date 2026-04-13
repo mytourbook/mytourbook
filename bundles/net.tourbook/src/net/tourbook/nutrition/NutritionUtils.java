@@ -15,12 +15,6 @@
  *******************************************************************************/
 package net.tourbook.nutrition;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-
 import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.URI;
@@ -47,6 +41,13 @@ import net.tourbook.web.WEB;
 
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.jface.preference.IPreferenceStore;
+
+import tools.jackson.core.JacksonException;
+import tools.jackson.core.type.TypeReference;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.cfg.EnumFeature;
+import tools.jackson.databind.json.JsonMapper;
 
 public class NutritionUtils {
 
@@ -134,8 +135,9 @@ public class NutritionUtils {
 
    private static List<Product> deserializeResponse(final String body, final ProductSearchType productSearchType) {
 
-      final ObjectMapper mapper = new ObjectMapper();
-      mapper.enable(DeserializationFeature.READ_UNKNOWN_ENUM_VALUES_AS_NULL);
+      final ObjectMapper mapper = JsonMapper.builder()
+            .enable(EnumFeature.READ_UNKNOWN_ENUM_VALUES_AS_NULL)
+            .build();
 
       List<Product> deserializedProductsResults = new ArrayList<>();
 
@@ -159,7 +161,7 @@ public class NutritionUtils {
                   new TypeReference<List<Product>>() {});
 
          }
-      } catch (final JsonProcessingException e) {
+      } catch (final JacksonException e) {
          StatusUtil.log(e);
       }
 

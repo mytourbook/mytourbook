@@ -34,6 +34,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.UUID;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ConcurrentSkipListSet;
 import java.util.concurrent.ExecutorService;
@@ -43,7 +44,9 @@ import javax.persistence.EntityManager;
 import javax.persistence.Query;
 
 import net.tourbook.Messages;
+import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.UI;
+import net.tourbook.common.formatter.ValueFormat;
 import net.tourbook.common.time.TimeTools;
 import net.tourbook.common.util.ImageUtils;
 import net.tourbook.common.util.SQL;
@@ -68,6 +71,7 @@ import net.tourbook.ui.ITourProvider2;
 import net.tourbook.ui.ITourProviderByID;
 
 import org.eclipse.jface.dialogs.IDialogConstants;
+import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
@@ -85,15 +89,38 @@ import org.eclipse.swt.widgets.Label;
 
 public class EquipmentManager {
 
-   private static final char                 NL                          = UI.NEW_LINE;
+   private static final char   NL                                            = UI.NEW_LINE;
 
-   private static final Object               DB_LOCK                     = new Object();
+   private static final Object DB_LOCK                                       = new Object();
 
-   public static final short                 EXPAND_TYPE_FLAT            = 0;
-   public static final short                 EXPAND_TYPE_YEAR_TOUR       = 1;
-   public static final short                 EXPAND_TYPE_YEAR_MONTH_TOUR = 2;
+   static final String         STATE_EQUIPMENT_FILTER_IS_ENABLED             = "STATE_EQUIPMENT_FILTER_IS_ENABLED";     //$NON-NLS-1$
+   static final boolean        STATE_EQUIPMENT_FILTER_IS_ENABLED_DEFAULT     = false;
+   static final String         STATE_EQUIPMENT_FILTER_CONTAINS_TOURS         = "STATE_EQUIPMENT_FILTER_CONTAINS_TOURS"; //$NON-NLS-1$
+   static final int            STATE_EQUIPMENT_FILTER_CONTAINS_TOURS_DEFAULT = 0;
+   static final String         STATE_EQUIPMENT_FILTER_RETIRED                = "STATE_EQUIPMENT_FILTER_RETIRED";        //$NON-NLS-1$
+   static final int            STATE_EQUIPMENT_FILTER_RETIRED_DEFAULT        = 0;
+   //
+   //
+   private static final IDialogSettings      _state                       = TourbookPlugin.getState("net.tourbook.equipment.EquipmentManager");
 
-   static final String[]                     EXPAND_TYPE_NAMES           = {
+   static final int                          FILTER_CONTAINS_TOURS_IGNORE = 0;
+   static final int                          FILTER_CONTAINS_TOURS_YES    = 1;
+   static final int                          FILTER_CONTAINS_TOURS_NO     = 2;
+   static final int                          FILTER_RETIRED_IGNORE        = 0;
+   static final int                          FILTER_RETIRED_IS_RETIRED    = 1;
+   static final int                          FILTER_RETIRED_IS_ACTIVE     = 2;
+
+   /**
+    * To identify an empty equipment type, they are not empty but filled with a random UUID. To
+    * identify an UUID type from a real type, the UUID type has this 'random' prefix
+    */
+   private static final String               EMPTY_TYPE_PREFIX            = "v4a1n9---";                                                       //$NON-NLS-1$
+
+   public static final short                 EXPAND_TYPE_FLAT             = 0;
+   public static final short                 EXPAND_TYPE_YEAR_TOUR        = 1;
+   public static final short                 EXPAND_TYPE_YEAR_MONTH_TOUR  = 2;
+
+   static final String[]                     EXPAND_TYPE_NAMES            = {
 
          Messages.app_action_expand_type_flat,
          Messages.app_action_expand_type_year_day,
@@ -103,14 +130,14 @@ public class EquipmentManager {
    /**
     * The EXPAND_TYPE_... value is the index for these labels
     */
-   static final String[]                     EXPAND_TYPE_LABEL           = {
+   static final String[]                     EXPAND_TYPE_LABEL            = {
 
          Messages.Equipment_ExpandType_SortByDate,
          Messages.Equipment_ExpandType_ByYear,
          Messages.Equipment_ExpandType_ByYearMonth
    };
 
-   static final short[]                      EXPAND_TYPES                = {
+   static final short[]                      EXPAND_TYPES                 = {
 
          EXPAND_TYPE_FLAT,
          EXPAND_TYPE_YEAR_TOUR,
@@ -120,6 +147,33 @@ public class EquipmentManager {
    private static int                        _equipmentImageSize_View;
 
    /**
+    * Main switch if equipment are filtered or not
+    */
+   private static boolean                    _equipmentFilter_IsEnabled;
+
+   /**
+    * Contains
+    *
+    * <pre>
+    * {@link #FILTER_CONTAINS_TOURS_IGNORE} ... {@value #FILTER_CONTAINS_TOURS_IGNORE}
+    * {@link #FILTER_CONTAINS_TOURS_YES} ... {@value #FILTER_CONTAINS_TOURS_YES}
+    * {@link #FILTER_CONTAINS_TOURS_NO} ...{@value #FILTER_CONTAINS_TOURS_NO}
+    * </pre>
+    */
+   private static int                        _equipmentFilter_ContainsTours;
+
+   /**
+    * Contains
+    *
+    * <pre>
+    * {@link #FILTER_RETIRED_IGNORE} ... {@value #FILTER_RETIRED_IGNORE}
+    * {@link #FILTER_RETIRED_IS_RETIRED} ... {@value #FILTER_RETIRED_IS_RETIRED}
+    * {@link #FILTER_RETIRED_IS_ACTIVE} ...{@value #FILTER_RETIRED_IS_ACTIVE}
+    * </pre>
+    */
+   private static int                        _equipmentFilter_Retired;
+
+   /**
     * Key is the image file path
     */
    private static final Cache<String, Image> _imageCache_Content;
@@ -127,10 +181,17 @@ public class EquipmentManager {
 
    static {
 
-      restoreEquipmentContentValues();
+      _equipmentFilter_IsEnabled = Util.getStateBoolean(_state, STATE_EQUIPMENT_FILTER_IS_ENABLED, false);
 
-   }
-   static {
+      _equipmentFilter_ContainsTours = Util.getStateInt(_state,
+            STATE_EQUIPMENT_FILTER_CONTAINS_TOURS,
+            STATE_EQUIPMENT_FILTER_CONTAINS_TOURS_DEFAULT);
+
+      _equipmentFilter_Retired = Util.getStateInt(_state,
+            STATE_EQUIPMENT_FILTER_RETIRED,
+            STATE_EQUIPMENT_FILTER_RETIRED_DEFAULT);
+
+      restoreEquipmentContentValues();
 
       final RemovalListener<String, Image> removalListener = new RemovalListener<>() {
 
@@ -255,6 +316,17 @@ public class EquipmentManager {
          _allTypes.clear();
          _allTypes = null;
       }
+   }
+
+   /**
+    * @return To identify an empty equipment type, they are not empty but filled with a random
+    *         UUID. To identify an UUID type from a real type, the UUID type has this prefix.
+    *
+    *         Empty types can be tested with {@link #isEmptyEquipmentType(String)}
+    */
+   public static String createEmptyEquipmentType() {
+
+      return EMPTY_TYPE_PREFIX + UUID.randomUUID();
    }
 
    private static SQLData createSQLEquipmentParameters(final Set<Equipment> allEquipment) {
@@ -1009,9 +1081,11 @@ public class EquipmentManager {
             // recheck again, another thread could have it created
             if (_allTypes == null) {
 
-               _allTypes = TourDatabase.getDistinctValues(
+               _allTypes = TourDatabase.getDistinctValuesWithExclude(
 
                      "type", //$NON-NLS-1$
+
+                     EMPTY_TYPE_PREFIX, // exclude all which start with this value
 
                      TourDatabase.TABLE_EQUIPMENT,
                      TourDatabase.TABLE_EQUIPMENT_PART);
@@ -1020,6 +1094,22 @@ public class EquipmentManager {
       }
 
       return _allTypes;
+   }
+
+   /**
+    * @return Returns {@link #_equipmentFilter_ContainsTours}
+    */
+   public static int getEquipmentFilter_ContainsTours() {
+
+      return _equipmentFilter_ContainsTours;
+   }
+
+   /**
+    * @return Returns {@link #_equipmentFilter_Retired}
+    */
+   public static int getEquipmentFilter_Retired() {
+
+      return _equipmentFilter_Retired;
    }
 
    /**
@@ -1144,6 +1234,52 @@ public class EquipmentManager {
          if (equipment != null) {
             allEquipmentNames.add(equipment.getName());
          } else {
+            try {
+               throw new MyTourbookException("Equipment id '" + equipmentID + "' is not available"); //$NON-NLS-1$ //$NON-NLS-2$
+            } catch (final MyTourbookException e) {
+               StatusUtil.log(e);
+            }
+         }
+      }
+
+      return getEquipmentNamesText(allEquipmentNames, false);
+   }
+
+   public static String getEquipmentNames(final List<Long> allEquipmentIDs, final ValueFormat valueFormat) {
+
+      if (allEquipmentIDs == null) {
+         return UI.EMPTY_STRING;
+      }
+
+      final Map<Long, Equipment> allEquipment = getAllEquipment_ByID();
+      final List<String> allEquipmentNames = new ArrayList<>();
+
+      // get equipment name for each equipment id
+      for (final Long equipmentID : allEquipmentIDs) {
+
+         final Equipment equipment = allEquipment.get(equipmentID);
+
+         if (equipment != null) {
+
+            if (valueFormat.equals(ValueFormat.EQUIPMENT_BRAND_MODEL)) {
+
+               allEquipmentNames.add(equipment.getName());
+
+            } else if (valueFormat.equals(ValueFormat.EQUIPMENT_BRAND)) {
+
+               allEquipmentNames.add(equipment.getBrand());
+
+            } else if (valueFormat.equals(ValueFormat.EQUIPMENT_MODEL)) {
+
+               allEquipmentNames.add(equipment.getModel());
+
+            } else if (valueFormat.equals(ValueFormat.EQUIPMENT_TYPE)) {
+
+               allEquipmentNames.add(equipment.getType());
+            }
+
+         } else {
+
             try {
                throw new MyTourbookException("Equipment id '" + equipmentID + "' is not available"); //$NON-NLS-1$ //$NON-NLS-2$
             } catch (final MyTourbookException e) {
@@ -1297,6 +1433,22 @@ public class EquipmentManager {
       return allTourIds;
    }
 
+   /**
+    * @param type
+    *
+    * @return Returns <code>true</code> when the provided type is an empty type which is starting
+    *         with {@value #EMPTY_TYPE_PREFIX}
+    */
+   public static boolean isEmptyEquipmentType(final String type) {
+
+      return type != null && type.trim().startsWith(EMPTY_TYPE_PREFIX);
+   }
+
+   public static boolean isEquipmentFilterEnabled() {
+
+      return _equipmentFilter_IsEnabled;
+   }
+
    private static void loadEquipment() {
 
       synchronized (DB_LOCK) {
@@ -1375,6 +1527,27 @@ public class EquipmentManager {
             TourManager.fireEvent(TourEventId.TOUR_CHANGED, new TourEvent(selectedTours));
          }
       }
+   }
+
+   public static void setEquipmentFilter_ContainsTours(final int containsTours) {
+
+      _equipmentFilter_ContainsTours = containsTours;
+
+      _state.put(STATE_EQUIPMENT_FILTER_CONTAINS_TOURS, _equipmentFilter_ContainsTours);
+   }
+
+   public static void setEquipmentFilter_IsEnabled(final boolean isEnabled) {
+
+      _equipmentFilter_IsEnabled = isEnabled;
+
+      _state.put(STATE_EQUIPMENT_FILTER_IS_ENABLED, _equipmentFilter_IsEnabled);
+   }
+
+   public static void setEquipmentFilter_Retired(final int retiredState) {
+
+      _equipmentFilter_Retired = retiredState;
+
+      _state.put(STATE_EQUIPMENT_FILTER_RETIRED, _equipmentFilter_Retired);
    }
 
    public static void setEquipmentImageSize_View(final int imageSize) {
@@ -1689,22 +1862,14 @@ public class EquipmentManager {
 
             // this is the first and only equipment
 
-            final long currentDateFrom = equipment.getDateCollateFrom();
-            final long currentDateUntil = equipment.getDateCollateUntil();
-
             final long newDateFrom = equipment.getDateUsed();
             final long newDateUntil = TimeTools.MAX_TIME_IN_EPOCH_MILLI;
 
-            if (currentDateFrom != newDateFrom
-                  || currentDateUntil != newDateUntil) {
+            // modify date
+            equipment.setDateCollateFrom(newDateFrom);
+            equipment.setDateCollateUntil(newDateUntil);
 
-               // modify date
-
-               equipment.setDateCollateFrom(newDateFrom);
-               equipment.setDateCollateUntil(newDateUntil);
-
-               allModifiedEquipment.add(equipment);
-            }
+            allModifiedEquipment.add(equipment);
 
          } else {
 
@@ -1714,7 +1879,6 @@ public class EquipmentManager {
 
                equipment = allSortedEquipment.get(equipmentIndex);
 
-               final long currentDateFrom = equipment.getDateCollateFrom();
                final long currentDateUntil = equipment.getDateCollateUntil();
 
                long newDateUntil = currentDateUntil;
@@ -1745,16 +1909,11 @@ public class EquipmentManager {
                // collated tours are starting always with the equipment first used date
                final long newDateFrom = equipment.getDateUsed();
 
-               if (currentDateFrom != newDateFrom
-                     || currentDateUntil != newDateUntil) {
+               // modify date
+               equipment.setDateCollateFrom(newDateFrom);
+               equipment.setDateCollateUntil(newDateUntil);
 
-                  // from/until date is not correct -> modify date
-
-                  equipment.setDateCollateFrom(newDateFrom);
-                  equipment.setDateCollateUntil(newDateUntil);
-
-                  allModifiedEquipment.add(equipment);
-               }
+               allModifiedEquipment.add(equipment);
             }
          }
 
@@ -1858,8 +2017,6 @@ public class EquipmentManager {
          // this is the first and only part
 
          final long partDateUsed = part.getDateUsed();
-         final long partDateFrom = part.getDateCollateFrom();
-         final long partDateUntil = part.getDateCollateUntil();
 
          long newDateFrom;
          long newDateUntil;
@@ -1879,30 +2036,24 @@ public class EquipmentManager {
             newDateUntil = TimeTools.MAX_TIME_IN_EPOCH_MILLI;
          }
 
-         if (partDateFrom != newDateFrom
-               || partDateUntil != newDateUntil) {
+         // modify date
+         part.setDateCollateFrom(newDateFrom);
+         part.setDateCollateUntil(newDateUntil);
 
-            // modify date
-
-            part.setDateCollateFrom(newDateFrom);
-            part.setDateCollateUntil(newDateUntil);
-
-            allModifiedParts.add(part);
-         }
+         allModifiedParts.add(part);
 
       } else {
 
          // these are all other parts with more than 1 parts
 
          long prevPartDateUsed = 0;
+         final int lastIndex = numParts - 1;
 
          for (int partIndex = 0; partIndex < numParts; partIndex++) {
 
             part = allSortedParts.get(partIndex);
 
             final long partDateUsed = part.getDateUsed();
-            final long partDateFrom = part.getDateCollateFrom();
-            final long partDateUntil = part.getDateCollateUntil();
 
             long newDateFrom;
             long newDateUntil;
@@ -1936,7 +2087,7 @@ public class EquipmentManager {
                 * Collate from this part to the next part
                 */
 
-               if (partIndex == numParts - 1) {
+               if (partIndex == lastIndex) {
 
                   // this is the last part
 
@@ -1966,22 +2117,14 @@ public class EquipmentManager {
                newDateFrom = equipmentDateUsed;
             }
 
-            if (partDateFrom != newDateFrom
-                  || partDateUntil != newDateUntil
+            // modify date
+            part.setDateCollateFrom(newDateFrom);
+            part.setDateCollateUntil(newDateUntil);
 
-                  // check if collated between is modified
-                  || collateBetween != part.getCollateBetween()) {
+            // there can be only ONE "collated between" within the part collection of an equipment
+            part.setCollateBetween(collateBetween);
 
-               // modify date
-
-               part.setDateCollateFrom(newDateFrom);
-               part.setDateCollateUntil(newDateUntil);
-
-               // there can be only ONE "collated between" within the part collection of an equipment
-               part.setCollateBetween(collateBetween);
-
-               allModifiedParts.add(part);
-            }
+            allModifiedParts.add(part);
          }
       }
 

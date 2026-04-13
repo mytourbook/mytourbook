@@ -467,6 +467,12 @@ public class UI {
    public static final float   UNIT_KILOGRAM_TO_POUND         = 2.204623f;
 
    /**
+    * 1 lbs = 16 oz
+    * 1 oz = 0.0625 lbs
+    */
+   public static final float   UNIT_OZ_TO_POUND               = 16.0f;
+
+   /**
     * Hash code including all system measurement data. This can be used to easily find out if the
     * system has changed.
     */
@@ -610,6 +616,7 @@ public class UI {
    public static String       UNIT_LABEL_PACE;
    public static String       UNIT_LABEL_PACE_SWIMMING;
    public static String       UNIT_LABEL_WEIGHT;
+   public static String       UNIT_LABEL_WEIGHT_SMALL;
 
    public static final String UNIT_LABEL_TIME      = "h";      //$NON-NLS-1$
    public static final String UNIT_LABEL_DIRECTION = "\u00B0"; //$NON-NLS-1$
@@ -659,6 +666,7 @@ public class UI {
    public static final String                   UNIT_WEIGHT_KG             = "kg";                       //$NON-NLS-1$
    public static final String                   UNIT_WEIGHT_LBS            = "lbs";                      //$NON-NLS-1$
    public static final String                   UNIT_WEIGHT_MG             = "mg";                       //$NON-NLS-1$
+   public static final String                   UNIT_WEIGHT_OZ             = "oz";                       //$NON-NLS-1$
 
    private static final String                  DISTANCE_MILES_1_8         = "1/8";                      //$NON-NLS-1$
    private static final String                  DISTANCE_MILES_1_4         = "1/4";                      //$NON-NLS-1$
@@ -4346,7 +4354,10 @@ public class UI {
          UNIT_IS_WEIGHT_POUND             = true;
 
          UNIT_LABEL_WEIGHT                = UNIT_WEIGHT_LBS;
+         UNIT_LABEL_WEIGHT_SMALL          = UNIT_WEIGHT_OZ;
+
          UNIT_VALUE_WEIGHT                = UNIT_POUND;
+
 
       } else {
 
@@ -4355,6 +4366,8 @@ public class UI {
          UNIT_IS_WEIGHT_KILOGRAM         = true;
 
          UNIT_LABEL_WEIGHT                = UNIT_WEIGHT_KG;
+         UNIT_LABEL_WEIGHT_SMALL          = UNIT_WEIGHT_G;
+
          UNIT_VALUE_WEIGHT                = 1;
       }
 

@@ -175,12 +175,12 @@ public abstract class TVIEquipmentView_Item extends TreeViewerItem {
    /**
     * Usage duration in ms
     */
-   public long   usageDuration;
+   public long   usageDurationMS;
 
    /**
     * Text which identifies the last collated item
     */
-   public String usageDurationLast;
+   public String usageDurationText;
 
    public TVIEquipmentView_Item(final TreeViewer equipmentViewer, final EquipmentViewerType equipmentType) {
 

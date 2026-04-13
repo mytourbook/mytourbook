@@ -17,6 +17,7 @@ package net.tourbook.equipment;
 
 import java.io.IOException;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -27,6 +28,9 @@ import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.UI;
 import net.tourbook.common.autocomplete.AutoComplete_ComboInputMT;
+import net.tourbook.common.measurement_system.MeasurementSystem;
+import net.tourbook.common.measurement_system.MeasurementSystem_Manager;
+import net.tourbook.common.measurement_system.Unit_Weight;
 import net.tourbook.common.time.TimeTools;
 import net.tourbook.common.util.ImageUtils;
 import net.tourbook.common.util.StringUtils;
@@ -34,6 +38,7 @@ import net.tourbook.common.util.Util;
 import net.tourbook.data.Equipment;
 import net.tourbook.data.EquipmentPart;
 import net.tourbook.tag.TagManager;
+import net.tourbook.web.WEB;
 
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.IDialogSettings;
@@ -59,6 +64,7 @@ import org.eclipse.swt.widgets.DateTime;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Link;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Spinner;
 import org.eclipse.swt.widgets.Text;
@@ -120,6 +126,7 @@ public class DialogEquipmentPart extends TitleAreaDialog {
    private Button                    _btnDateRetiredNow;
    private Button                    _btnDeleteImage;
    private Button                    _chkCollate;
+   private Button                    _chkRetired;
    private Button                    _chkSyncDates;
    private Button                    _rdoCollateWith_Previous;
    private Button                    _rdoCollateWith_Next;
@@ -129,6 +136,7 @@ public class DialogEquipmentPart extends TitleAreaDialog {
    private Combo                     _comboPriceUnit;
    private Combo                     _comboSize;
    private Combo                     _comboType;
+   private Combo                     _comboWeightUnit;
 
    private DateTime                  _dateUsed;
    private DateTime                  _dateBuilt;
@@ -141,11 +149,14 @@ public class DialogEquipmentPart extends TitleAreaDialog {
    private Label                     _lblImage;
    private Label                     _lblImageFilePath;
 
+   private Link                      _linkWebsite;
+
    private Spinner                   _spinDistance;
    private Spinner                   _spinPrice;
    private Spinner                   _spinWeight;
 
    private Text                      _txtDescription;
+   private Text                      _txtPurchaseLocation;
    private Text                      _txtUrlAddress;
 
    private AutoComplete_ComboInputMT _autocomplete_Brand;
@@ -255,7 +266,7 @@ public class DialogEquipmentPart extends TitleAreaDialog {
 
       fillUI();
 
-      updateUIFromModel();
+      updateUI_FromModel();
 
       resoreState();
 
@@ -453,25 +464,28 @@ public class DialogEquipmentPart extends TitleAreaDialog {
             _spinWeight.addMouseWheelListener(_defaultMouseWheelListener);
             _spinWeight.addSelectionListener(_defaultSelectionListener);
 
-            // label: kg
-            UI.createLabel(_container, UI.UNIT_LABEL_WEIGHT);
+            // combo: weight kg/g - lbs/oz
+            _comboWeightUnit = new Combo(_container, SWT.BORDER | SWT.READ_ONLY);
+            _comboWeightUnit.addSelectionListener(SelectionListener.widgetSelectedAdapter(selectionEvent -> onSelect_WeightUnit()));
+
+            GridDataFactory.fillDefaults()
+                  .align(SWT.BEGINNING, SWT.FILL)
+                  .hint(currencyWidth, SWT.DEFAULT)
+                  .applyTo(_comboWeightUnit);
          }
          {
             /*
-             * Retired date
+             * Retired: Checkbox
              */
             final Label label = UI.createLabel(_container, Messages.Dialog_Equipment_Label_DateRetired);
             gdVertCenter.applyTo(label);
 
-            _dateRetired = new DateTime(_container, SWT.DATE | SWT.MEDIUM | SWT.DROP_DOWN);
-            _dateRetired.addSelectionListener(_defaultSelectionListener);
+            _chkRetired = new Button(_container, SWT.CHECK);
+            _chkRetired.setText("Is retired");
 
-            _btnDateRetiredNow = new Button(_container, SWT.PUSH);
-            _btnDateRetiredNow.setImage(_imageNow);
-            _btnDateRetiredNow.setToolTipText(Messages.Dialog_Equipment_Button_SetDateToToday_Tooltip);
-            _btnDateRetiredNow.addSelectionListener(SelectionListener.widgetSelectedAdapter(selectionEvent -> onSelect_RetireNow()));
+            _chkRetired.addSelectionListener(_defaultSelectionListener);
          }
-         UI.createSpacer_Horizontal(_container, 1);
+         UI.createSpacer_Horizontal(_container, 2);
          {
             /*
              * Distance first use
@@ -493,6 +507,20 @@ public class DialogEquipmentPart extends TitleAreaDialog {
             // label: km/mi
             UI.createLabel(_container, UI.UNIT_LABEL_DISTANCE);
          }
+         UI.createSpacer_Horizontal(_container, 1);
+         {
+            /*
+             * Retired: Date
+             */
+            _dateRetired = new DateTime(_container, SWT.DATE | SWT.MEDIUM | SWT.DROP_DOWN);
+            _dateRetired.addSelectionListener(_defaultSelectionListener);
+
+            _btnDateRetiredNow = new Button(_container, SWT.PUSH);
+            _btnDateRetiredNow.setImage(_imageNow);
+            _btnDateRetiredNow.setToolTipText(Messages.Dialog_Equipment_Button_SetDateToToday_Tooltip);
+            _btnDateRetiredNow.addSelectionListener(SelectionListener.widgetSelectedAdapter(selectionEvent -> onSelect_RetireNow()));
+         }
+         UI.createSpacer_Horizontal(_container, 4);
          {
             /*
              * Collate tours
@@ -554,10 +582,25 @@ public class DialogEquipmentPart extends TitleAreaDialog {
          }
          {
             /*
+             * Purchase location
+             */
+            UI.createLabel(_container, "Pur&chase location");
+
+            _txtPurchaseLocation = new Text(_container, SWT.BORDER);
+            _txtPurchaseLocation.addModifyListener(e -> onModify());
+            GridDataFactory.fillDefaults()
+                  .grab(true, false)
+                  .hint(defaultWidth, SWT.DEFAULT)
+                  .span(6, 1)
+                  .applyTo(_txtPurchaseLocation);
+         }
+         {
+            /*
              * Website
              */
-            final Label label = UI.createLabel(_container, Messages.Dialog_Equipment_Label_Website);
-            GridDataFactory.fillDefaults().align(SWT.FILL, SWT.BEGINNING).applyTo(label);
+            _linkWebsite = new Link(_container, SWT.NONE);
+            _linkWebsite.setText(Messages.Dialog_Equipment_Link_Website);
+            _linkWebsite.addSelectionListener(SelectionListener.widgetSelectedAdapter(selectionEvent -> onSelect_Website()));
 
             _txtUrlAddress = new Text(_container, SWT.BORDER);
             _txtUrlAddress.addModifyListener(e -> onModify());
@@ -652,9 +695,12 @@ public class DialogEquipmentPart extends TitleAreaDialog {
             _spinPrice,
             _comboPriceUnit,
             _spinWeight,
+            _comboWeightUnit,
             _spinDistance,
 
             _chkCollate,
+            _txtPurchaseLocation,
+            _linkWebsite,
             _txtUrlAddress,
             _txtDescription,
             _lblImage,
@@ -670,10 +716,14 @@ public class DialogEquipmentPart extends TitleAreaDialog {
 // SET_FORMATTING_OFF
 
       final boolean isCollate          = _chkCollate.getSelection();
+      final boolean isRetired          = _chkRetired.getSelection();
       final boolean isSyncDates        = _chkSyncDates.getSelection();
       final boolean canEditBuiltDate   = isSyncDates == false;
 
       _dateBuilt                 .setEnabled(canEditBuiltDate);
+      _dateRetired               .setEnabled(isRetired);
+
+      _btnDateRetiredNow         .setEnabled(isRetired);
       _btnDeleteImage            .setEnabled(StringUtils.hasContent(_imageFilePath));
 
       _lblCollateWith            .setEnabled(isCollate);
@@ -715,6 +765,9 @@ public class DialogEquipmentPart extends TitleAreaDialog {
       UI.fillUI_Combobox(_comboType,      EquipmentManager.getCachedFields_AllTypes());
 
 // SET_FORMATTING_ON
+
+      _comboWeightUnit.add(UI.UNIT_LABEL_WEIGHT);
+      _comboWeightUnit.add(UI.UNIT_LABEL_WEIGHT_SMALL);
    }
 
    @Override
@@ -732,6 +785,108 @@ public class DialogEquipmentPart extends TitleAreaDialog {
       _part.updateUntilDate();
 
       return _part;
+   }
+
+   private int getWeight_FromModel(final EquipmentPart part) {
+
+      final float weightKG = part.getWeight();
+      final short weightUnit = part.getWeightUnit();
+
+      final MeasurementSystem activeSystem = MeasurementSystem_Manager.getActiveMeasurementSystem();
+
+      if (Unit_Weight.POUND.equals(activeSystem.getWeight())) {
+
+         // imperial system
+
+         if (weightUnit == 1) {
+
+            // oz
+
+            final float weightPound = weightKG * UI.UNIT_VALUE_WEIGHT;
+            final float weightOz = weightPound * UI.UNIT_OZ_TO_POUND;
+
+            return (int) weightOz;
+
+         } else {
+
+            // lbs
+
+            final float weightPound = weightKG * UI.UNIT_VALUE_WEIGHT;
+            final float weightPoundUI = weightPound * 1000f;
+
+            return Math.round(weightPoundUI);
+         }
+
+      } else {
+
+         // metric system
+
+         if (weightUnit == 1) {
+
+            // g
+
+            return (int) (weightKG * 1000f);
+
+         } else {
+
+            // kg
+
+            return Math.round(weightKG * 1000);
+         }
+      }
+   }
+
+   /**
+    * @return Returns the selected weight in kg
+    */
+   private float getWeight_FromUI() {
+
+      final float selectedWeight_kg_g_lbs_oz = _spinWeight.getSelection();
+
+      final int selectionUnitIndex = _comboWeightUnit.getSelectionIndex();
+
+      final MeasurementSystem activeSystem = MeasurementSystem_Manager.getActiveMeasurementSystem();
+
+      if (Unit_Weight.POUND.equals(activeSystem.getWeight())) {
+
+         // imperial system
+
+         float selectedWeightPound;
+
+         if (selectionUnitIndex == 1) {
+
+            // oz
+
+            selectedWeightPound = selectedWeight_kg_g_lbs_oz / UI.UNIT_OZ_TO_POUND;
+
+         } else {
+
+            // lbs
+
+            selectedWeightPound = selectedWeight_kg_g_lbs_oz / 1000;
+         }
+
+         final float selectedWeightKG = selectedWeightPound / UI.UNIT_VALUE_WEIGHT;
+
+         return selectedWeightKG;
+
+      } else {
+
+         // metric system
+
+         if (selectionUnitIndex == 1) {
+
+            // g
+
+            return selectedWeight_kg_g_lbs_oz / 1000f;
+
+         } else {
+
+            // kg
+
+            return selectedWeight_kg_g_lbs_oz / 1000f;
+         }
+      }
    }
 
    private void initUI() {
@@ -874,7 +1029,21 @@ public class DialogEquipmentPart extends TitleAreaDialog {
 
    private void onImage_Select() {
 
-      final String lastSelectedPath = Util.getStateString(_state, STATE_IMAGE_LAST_SELECTED_PATH, null);
+      String lastSelectedPath = null;
+
+      if (StringUtils.hasContent(_imageFilePath)) {
+
+         if (Files.exists(Paths.get(_imageFilePath))) {
+
+            final Path pathParent = Paths.get(_imageFilePath).getParent();
+
+            lastSelectedPath = pathParent.toString();
+         }
+
+      } else {
+
+         lastSelectedPath = Util.getStateString(_state, STATE_IMAGE_LAST_SELECTED_PATH, null);
+      }
 
       final FileDialog fileDialog = new FileDialog(getShell(), SWT.OPEN);
 
@@ -913,6 +1082,8 @@ public class DialogEquipmentPart extends TitleAreaDialog {
          return;
       }
 
+      _linkWebsite.setToolTipText(_txtUrlAddress.getText());
+
       final boolean isSyncDates = _chkSyncDates.getSelection();
 
       if (isSyncDates) {
@@ -934,6 +1105,61 @@ public class DialogEquipmentPart extends TitleAreaDialog {
       _dateRetired.setDate(now.getYear(), now.getMonthValue() - 1, now.getDayOfMonth());
 
       enableControls();
+   }
+
+   private void onSelect_Website() {
+
+      final String url = _txtUrlAddress.getText().trim();
+
+      if (url.length() > 0) {
+
+         WEB.openUrl(url);
+      }
+   }
+
+   private void onSelect_WeightUnit() {
+
+      final float selectedWeight = _spinWeight.getSelection() / 1000f;
+      final int selectionUnitIndex = _comboWeightUnit.getSelectionIndex();
+
+      final MeasurementSystem activeSystem = MeasurementSystem_Manager.getActiveMeasurementSystem();
+
+      if (Unit_Weight.POUND.equals(activeSystem.getWeight())) {
+
+         // imperial system
+
+         if (selectionUnitIndex == 1) {
+
+            // lbs ->  oz
+
+            _spinWeight.setSelection((int) (selectedWeight * UI.UNIT_OZ_TO_POUND * 1000f));
+
+         } else {
+
+            // oz -> lbs
+
+            _spinWeight.setSelection(Math.round(selectedWeight / UI.UNIT_OZ_TO_POUND * 1000f));
+         }
+
+      } else {
+
+         // metric system
+
+         if (selectionUnitIndex == 1) {
+
+            // kg -> g
+
+            _spinWeight.setSelection((int) (selectedWeight * 1000 * 1000));
+
+         } else {
+
+            // g -> kg
+
+            _spinWeight.setSelection(Math.round(selectedWeight));
+         }
+      }
+
+      updateUI_WeightUnits();
    }
 
    private void resoreState() {
@@ -981,7 +1207,15 @@ public class DialogEquipmentPart extends TitleAreaDialog {
 
    private void updateModelFromUI() {
 
+      String type = _comboType.getText().trim();
+
+      if (type.length() == 0) {
+         type = EquipmentManager.createEmptyEquipmentType();
+      }
+
 // SET_FORMATTING_OFF
+
+      final float distance          = _spinDistance.getSelection() * UI.UNIT_VALUE_DISTANCE;
 
       final LocalDate dateUsed      = LocalDate.of(_dateUsed.getYear(),    _dateUsed.getMonth() + 1,     _dateUsed.getDay());
       final LocalDate dateBuilt     = LocalDate.of(_dateBuilt.getYear(),   _dateBuilt.getMonth() + 1,    _dateBuilt.getDay());
@@ -991,21 +1225,24 @@ public class DialogEquipmentPart extends TitleAreaDialog {
 
       _part.setBrand(            _comboBrand.getText().trim());
       _part.setModel(            _comboModel.getText().trim());
-      _part.setPartType(         _comboType.getText().trim());
-      _part.setDescription(      _txtDescription.getText().trim());
-      _part.setUrlAddress(       _txtUrlAddress.getText().trim());
-      _part.setImageFilePath(    _lblImageFilePath.getText().trim());
+      _part.setPartType(         type);
+      _part.setPurchaseLocation( _txtPurchaseLocation    .getText().trim());
+      _part.setDescription(      _txtDescription         .getText().trim());
+      _part.setUrlAddress(       _txtUrlAddress          .getText().trim());
+      _part.setImageFilePath(    _lblImageFilePath       .getText().trim());
 
       _part.setIsCollate(        _chkCollate.getSelection());
+      _part.setIsRetired(        _chkRetired.getSelection());
       _part.setCollateBetween(   _rdoCollateWith_Next.getSelection()
                                        ? EquipmentPart.COLLATED_WITH_NEXT
                                        : EquipmentPart.COLLATED_WITH_PREVIOUS);
 
-      _part.setDistanceFirstUse( _spinDistance.getSelection());
-      _part.setPrice(            _spinPrice.getSelection() / 100f);
-      _part.setPriceUnit(        _comboPriceUnit.getText());
-      _part.setSize(             _comboSize.getText().trim());
-      _part.setWeight(           _spinWeight.getSelection() / 1000f);
+      _part.setDistanceFirstUse( distance);
+      _part.setPrice(            _spinPrice              .getSelection() / 100f);
+      _part.setPriceUnit(        _comboPriceUnit         .getText());
+      _part.setSize(             _comboSize              .getText().trim());
+      _part.setWeight(           getWeight_FromUI());
+      _part.setWeightUnit(       (short) _comboWeightUnit.getSelectionIndex());
 
       _part.setDateUsed(         TimeTools.toEpochMilli(dateUsed));
       _part.setDateBuilt(        TimeTools.toEpochMilli(dateBuilt));
@@ -1064,9 +1301,15 @@ public class DialogEquipmentPart extends TitleAreaDialog {
       _container.layout(true, true);
    }
 
-   private void updateUIFromModel() {
+   private void updateUI_FromModel() {
 
       _isInUIUpdate = true;
+
+      String type = _part.getPartType();
+
+      if (EquipmentManager.isEmptyEquipmentType(type)) {
+         type = UI.EMPTY_STRING;
+      }
 
 // SET_FORMATTING_OFF
 
@@ -1090,17 +1333,22 @@ public class DialogEquipmentPart extends TitleAreaDialog {
       }
 
       if (dateRetiredMS == 0) {
-         dateRetired = LocalDateTime.of(2099,1,1,0,0);
+         dateRetired = LocalDateTime.of(2099, 1, 1, 0, 0);
       }
 
       final int collateWith      = _part.getCollateBetween();
+      final float distance       = _part.getDistanceFirstUse() / UI.UNIT_VALUE_DISTANCE;
+      final String urlAddress    = _part.getUrlAddress();
 
       _chkCollate                .setSelection(_part.isCollate());
+      _chkRetired                .setSelection(_part.isRetired());
 
       _comboBrand                .setText(_part.getBrand());
       _comboModel                .setText(_part.getModel());
       _comboSize                 .setText(_part.getSize());
-      _comboType                 .setText(_part.getPartType());
+      _comboType                 .setText(type);
+
+      _comboWeightUnit           .select(_part.getWeightUnit());
 
       _dateUsed                  .setDate(dateUsed.getYear(),     dateUsed.getMonthValue() - 1,    dateUsed.getDayOfMonth());
       _dateBuilt                 .setDate(dateBuilt.getYear(),    dateBuilt.getMonthValue() - 1,   dateBuilt.getDayOfMonth());
@@ -1109,12 +1357,15 @@ public class DialogEquipmentPart extends TitleAreaDialog {
       _rdoCollateWith_Next       .setSelection(collateWith == EquipmentPart.COLLATED_WITH_NEXT);
       _rdoCollateWith_Previous   .setSelection(collateWith == EquipmentPart.COLLATED_WITH_PREVIOUS);
 
-      _spinDistance              .setSelection((int) (_part.getDistanceFirstUse()));
+      _spinDistance              .setSelection((int) distance);
       _spinPrice                 .setSelection((int) (_part.getPrice()  * 100));
-      _spinWeight                .setSelection((int) (_part.getWeight() * 1000));
+      _spinWeight                .setSelection(getWeight_FromModel(_part));
 
       _txtDescription            .setText(_part.getDescription());
-      _txtUrlAddress             .setText(_part.getUrlAddress());
+      _txtPurchaseLocation       .setText(_part.getPurchaseLocation());
+      _txtUrlAddress             .setText(urlAddress);
+
+      _linkWebsite               .setToolTipText(urlAddress);
 
 // SET_FORMATTING_ON
 
@@ -1126,7 +1377,63 @@ public class DialogEquipmentPart extends TitleAreaDialog {
          _comboPriceUnit.setText(priceUnit);
       }
 
+      updateUI_WeightUnits();
+
       _isInUIUpdate = false;
    }
 
+   private void updateUI_WeightUnits() {
+
+      final int selectedUnitIndex = _comboWeightUnit.getSelectionIndex();
+
+      final MeasurementSystem activeSystem = MeasurementSystem_Manager.getActiveMeasurementSystem();
+
+      if (Unit_Weight.POUND.equals(activeSystem.getWeight())) {
+
+         // imperial system
+
+         if (selectedUnitIndex == 1) {
+
+            // lbs ->  oz
+
+            _spinWeight.setDigits(0);
+
+            _spinWeight.setIncrement(10);
+            _spinWeight.setPageIncrement(100);
+
+         } else {
+
+            // oz -> lbs
+
+            _spinWeight.setDigits(3);
+
+            _spinWeight.setIncrement(100);
+            _spinWeight.setPageIncrement(1000);
+
+         }
+
+      } else {
+
+         // metric system
+
+         if (selectedUnitIndex == 1) {
+
+            // kg -> g
+
+            _spinWeight.setDigits(0);
+
+            _spinWeight.setIncrement(10);
+            _spinWeight.setPageIncrement(100);
+
+         } else {
+
+            // g -> kg
+
+            _spinWeight.setDigits(3);
+
+            _spinWeight.setIncrement(100);
+            _spinWeight.setPageIncrement(1000);
+         }
+      }
+   }
 }

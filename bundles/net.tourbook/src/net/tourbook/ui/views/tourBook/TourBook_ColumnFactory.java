@@ -3301,9 +3301,13 @@ class TourBook_ColumnFactory {
          @Override
          public String getValueText(final Object element) {
 
-            final List<Long> allEqipmentIDs = ((TVITourBookTour) element).getEquipmentIds();
+            final List<Long> allEquipmentIDs = ((TVITourBookTour) element).getEquipmentIds();
 
-            return EquipmentManager.getEquipmentNames(allEqipmentIDs);
+            final ValueFormat valueFormat = colDef_NatTable.getValueFormat_Detail();
+
+            final String text = EquipmentManager.getEquipmentNames(allEquipmentIDs, valueFormat);
+
+            return text;
          }
       });
 
@@ -3316,7 +3320,13 @@ class TourBook_ColumnFactory {
             final Object element = cell.getElement();
             if (element instanceof final TVITourBookTour tourItem) {
 
-               cell.setText(EquipmentManager.getEquipmentNames(tourItem.getEquipmentIds()));
+               final List<Long> allEquipmentIDs = tourItem.getEquipmentIds();
+
+               final ValueFormat valueFormat = colDef_Tree.getValueFormat_Detail();
+
+               final String text = EquipmentManager.getEquipmentNames(allEquipmentIDs, valueFormat);
+
+               cell.setText(text);
                setCellColor(cell, element);
             }
          }

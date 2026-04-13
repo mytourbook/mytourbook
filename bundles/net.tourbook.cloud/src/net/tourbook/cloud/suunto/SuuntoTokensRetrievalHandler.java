@@ -15,9 +15,6 @@
  *******************************************************************************/
 package net.tourbook.cloud.suunto;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-
 import net.tourbook.cloud.Activator;
 import net.tourbook.cloud.Preferences;
 import net.tourbook.cloud.oauth2.OAuth2Utils;
@@ -28,6 +25,9 @@ import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.StringUtils;
 
 import org.eclipse.jface.preference.IPreferenceStore;
+
+import tools.jackson.core.JacksonException;
+import tools.jackson.databind.ObjectMapper;
 
 public class SuuntoTokensRetrievalHandler extends TokensRetrievalHandler {
 
@@ -81,7 +81,7 @@ public class SuuntoTokensRetrievalHandler extends TokensRetrievalHandler {
       SuuntoTokens suuntoTokens = null;
       try {
          suuntoTokens = new ObjectMapper().readValue(responseBody, SuuntoTokens.class);
-      } catch (final IllegalArgumentException | JsonProcessingException e) {
+      } catch (final IllegalArgumentException | JacksonException e) {
          StatusUtil.log(e);
       }
 
