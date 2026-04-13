@@ -89,7 +89,7 @@ jobs:
           path: ${{ env.DRIVE_LETTER }}\a\mytourbook\mytourbook\mergedJaCoCoReport.exec
           retention-days: 5
       - name: Test Report
-        uses: dorny/test-reporter@v2
+        uses: dorny/test-reporter@v3
         if: success() || failure()
         with:
           name: Tests Report
