@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2024, 2025 Frédéric Bard
+ * Copyright (C) 2024, 2026 Frédéric Bard
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -51,6 +51,7 @@ import net.tourbook.nutrition.DialogCustomTourNutritionProduct;
 import net.tourbook.nutrition.NutritionUtils;
 import net.tourbook.nutrition.ProductSearchType;
 import net.tourbook.nutrition.QuantityType;
+import net.tourbook.nutrition.TourNutritionProductMenuManager;
 import net.tourbook.nutrition.openfoodfacts.Product;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.tour.ITourEventListener;
@@ -1407,7 +1408,7 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
       menuMgr.add(_actionDeleteProducts);
 
       //todo fb add the recent tour nutrition products when not selecting existing products
-      // TourNutritionProductMenuManager.fillMenuWithRecentTourNutritionProducts(menuMgr, true);
+      TourNutritionProductMenuManager.fillMenuWithRecentTourNutritionProducts(menuMgr, true);
 
       enableActions();
    }
