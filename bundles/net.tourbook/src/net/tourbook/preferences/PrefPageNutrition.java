@@ -74,6 +74,7 @@ public class PrefPageNutrition extends PreferencePage implements IWorkbenchPrefe
       GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
       GridLayoutFactory.fillDefaults()
             .spacing(5, 15)
+            .numColumns(3)
             .applyTo(container);
       {
          /*
@@ -83,7 +84,7 @@ public class PrefPageNutrition extends PreferencePage implements IWorkbenchPrefe
             _chkIgnoreFirstHour = new Button(container, SWT.CHECK);
             _chkIgnoreFirstHour.setText(Messages.PrefPage_Nutrition_Checkbox_IgnoreFirstHour);
             _chkIgnoreFirstHour.setToolTipText(Messages.PrefPage_Nutrition_Checkbox_IgnoreFirstHour_Tooltip);
-            GridDataFactory.fillDefaults().align(SWT.BEGINNING, SWT.FILL).applyTo(_chkIgnoreFirstHour);
+            GridDataFactory.fillDefaults().span(3, 1).align(SWT.BEGINNING, SWT.FILL).applyTo(_chkIgnoreFirstHour);
          }
 
          {
