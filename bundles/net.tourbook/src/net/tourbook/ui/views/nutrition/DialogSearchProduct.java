@@ -41,6 +41,7 @@ import net.tourbook.data.TourNutritionProduct;
 import net.tourbook.nutrition.NutritionQuery;
 import net.tourbook.nutrition.NutritionUtils;
 import net.tourbook.nutrition.ProductSearchType;
+import net.tourbook.nutrition.TourNutritionProductMenuManager;
 import net.tourbook.nutrition.openfoodfacts.Product;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.tour.TourManager;
@@ -159,6 +160,8 @@ public class DialogSearchProduct extends TitleAreaDialog implements ITourViewer,
 
    private Image     _imageDialog = TourbookPlugin.getImageDescriptor(Images.TourNutrition).createImage();
 
+   private TourNutritionProductMenuManager _tourNutritionProductMenuManager;
+
    private class ActionAddProduct extends Action {
 
       public ActionAddProduct() {
@@ -170,6 +173,7 @@ public class DialogSearchProduct extends TitleAreaDialog implements ITourViewer,
       @Override
       public void run() {
          onAddProduct();
+
       }
    }
 
@@ -361,7 +365,7 @@ public class DialogSearchProduct extends TitleAreaDialog implements ITourViewer,
       }
    }
 
-   public DialogSearchProduct(final Shell parentShell, final long tourId) {
+   public DialogSearchProduct(final Shell parentShell, final long tourId, final TourNutritionProductMenuManager tourNutritionProductMenuManager) {
 
       super(parentShell);
 
@@ -372,6 +376,7 @@ public class DialogSearchProduct extends TitleAreaDialog implements ITourViewer,
       setDefaultImage(_imageDialog);
 
       _tourId = tourId;
+      _tourNutritionProductMenuManager = tourNutritionProductMenuManager;
    }
 
    private void addPrefListener() {
@@ -857,6 +862,16 @@ public class DialogSearchProduct extends TitleAreaDialog implements ITourViewer,
          tourData.addNutritionProduct(tourNutritionProduct);
 
          TourManager.saveModifiedTour(tourData);
+
+         TourNutritionProductMenuManager.equipment_Add(
+
+               tourNutritionProduct,
+               _tourNutritionProductMenuManager.getTourProvider(),
+
+               _tourNutritionProductMenuManager.isSaveTour(),
+               _tourNutritionProductMenuManager.isCheckTourEditor());
+
+         _tourNutritionProductMenuManager.updateRecentEquipment(tourNutritionProduct);
       });
    }
 
