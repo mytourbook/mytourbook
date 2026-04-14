@@ -2732,31 +2732,28 @@ public class TourDatabase {
 
          final DatabaseMetaData meta = conn.getMetaData();
 
-         final ResultSet result = meta.getColumns(null, TABLE_SCHEMA, table, column.toUpperCase());
+         // very IMPORTANT: The table name must be UPPERCASE
+         final ResultSet result = meta.getColumns(null, TABLE_SCHEMA, table.toUpperCase(), column.toUpperCase());
 
          while (result.next()) {
             return true;
          }
 
-         /*
-          * dump all columns
-          */
-//         final DatabaseMetaData meta = conn.getMetaData();
-//         final ResultSet result = meta.getColumns(null, TABLE_SCHEMA, table, NULL);
+//         /*
+//          * Dump all columns
+//          */
+//         final DatabaseMetaData meta2 = conn.getMetaData();
+//         final ResultSet result2 = meta2.getColumns(null, TABLE_SCHEMA, table.toUpperCase(), null);
 //
-//         while (result.next()) {
+//         while (result2.next()) {
+//
 //            System.out.println("  "
-//                  + result.getString("TABLE_SCHEM")
-//                  + ", "
-//                  + result.getString("TABLE_NAME")
-//                  + ", "
-//                  + result.getString("COLUMN_NAME")
-//                  + ", "
-//                  + result.getString("TYPE_NAME")
-//                  + ", "
-//                  + result.getInt("COLUMN_SIZE")
-//                  + ", "
-//                  + result.getString("NULLABLE"));
+//                  + result2.getString("TABLE_SCHEM") + ", "
+//                  + result2.getString("TABLE_NAME") + ", "
+//                  + result2.getString("COLUMN_NAME") + ", "
+//                  + result2.getString("TYPE_NAME") + ", "
+//                  + result2.getInt("COLUMN_SIZE") + ", "
+//                  + result2.getString("NULLABLE"));
 //         }
 
       } catch (final SQLException e) {
@@ -10672,7 +10669,7 @@ public class TourDatabase {
 
       final Statement stmt = conn.createStatement();
       {
-         // double check if db already exists
+         // double check if column already exists
          if (isColumnAvailable(conn, TABLE_TOUR_DATA, "Battery_Percentage_Start") == false) { //$NON-NLS-1$
 
             // add new fields
@@ -11700,27 +11697,28 @@ public class TourDatabase {
       logDbUpdate_Start(newDbVersion);
       updateMonitor(splashManager, newDbVersion);
 
-      final Statement stmt = conn.createStatement();
-      {
-         // alter columns
+      // double check if column already exists
+      if (isColumnAvailable(conn, TABLE_EQUIPMENT, "IsRetired") == false) { //$NON-NLS-1$
+
+         final Statement stmt = conn.createStatement();
+         {
+            // alter columns
 
 // SET_FORMATTING_OFF
 
-         SQL.addColumn_Boolean   (stmt, TABLE_EQUIPMENT,       "IsRetired",         DEFAULT_FALSE);      //$NON-NLS-1$
-         SQL.addColumn_VarCar    (stmt, TABLE_EQUIPMENT,       "PurchaseLocation",  DB_LENGTH_NAME);     //$NON-NLS-1$
-         SQL.addColumn_SmallInt  (stmt, TABLE_EQUIPMENT,       "WeightUnit",        DEFAULT_0);          //$NON-NLS-1$
+            SQL.addColumn_Boolean   (stmt, TABLE_EQUIPMENT,       "IsRetired",         DEFAULT_FALSE);      //$NON-NLS-1$
+            SQL.addColumn_VarCar    (stmt, TABLE_EQUIPMENT,       "PurchaseLocation",  DB_LENGTH_NAME);     //$NON-NLS-1$
+            SQL.addColumn_SmallInt  (stmt, TABLE_EQUIPMENT,       "WeightUnit",        DEFAULT_0);          //$NON-NLS-1$
 
-         SQL.addColumn_Boolean   (stmt, TABLE_EQUIPMENT_PART,  "IsRetired",         DEFAULT_FALSE);      //$NON-NLS-1$
-         SQL.addColumn_VarCar    (stmt, TABLE_EQUIPMENT_PART,  "PurchaseLocation",  DB_LENGTH_NAME);     //$NON-NLS-1$
-         SQL.addColumn_SmallInt  (stmt, TABLE_EQUIPMENT_PART,  "WeightUnit",        DEFAULT_0);          //$NON-NLS-1$
-
-         SQL.createIndex_Table__Column (stmt, TABLE_EQUIPMENT,       "IsRetired");                       //$NON-NLS-1$
-         SQL.createIndex_Table__Column (stmt, TABLE_EQUIPMENT_PART,  "IsRetired");                       //$NON-NLS-1$
+            SQL.addColumn_Boolean   (stmt, TABLE_EQUIPMENT_PART,  "IsRetired",         DEFAULT_FALSE);      //$NON-NLS-1$
+            SQL.addColumn_VarCar    (stmt, TABLE_EQUIPMENT_PART,  "PurchaseLocation",  DB_LENGTH_NAME);     //$NON-NLS-1$
+            SQL.addColumn_SmallInt  (stmt, TABLE_EQUIPMENT_PART,  "WeightUnit",        DEFAULT_0);          //$NON-NLS-1$
 
 // SET_FORMATTING_ON
 
+         }
+         stmt.close();
       }
-      stmt.close();
 
       logDbUpdate_End(newDbVersion);
 
