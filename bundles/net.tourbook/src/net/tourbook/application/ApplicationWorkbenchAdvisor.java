@@ -27,6 +27,7 @@ import net.tourbook.map.bookmark.MapBookmarkManager;
 import net.tourbook.map.player.ModelPlayerManager;
 import net.tourbook.map3.view.Map3Manager;
 import net.tourbook.map3.view.Map3State;
+import net.tourbook.nutrition.TourNutritionProductMenuManager;
 import net.tourbook.preferences.PrefPageGeneral;
 import net.tourbook.search.FTSearchManager;
 import net.tourbook.tag.TagMenuManager;
@@ -144,6 +145,8 @@ public class ApplicationWorkbenchAdvisor extends WorkbenchAdvisor {
 
       EquipmentMenuManager.saveState();
       TourEquipmentFilterManager.saveState();
+
+      TourNutritionProductMenuManager.saveState();
 
       TourTypeFilterManager.saveState();
       TourTypeMenuManager.saveState();

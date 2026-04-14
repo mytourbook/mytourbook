@@ -2074,6 +2074,9 @@ public class Messages extends NLS {
    public static String        Pref_People_Tab_Person;
    public static String        Pref_People_Title;
 
+   public static String        Pref_Equipment_Label_NumberOfRecentProducts;
+   public static String        Pref_Equipment_Label_NumberOfRecentProducts_Tooltip;
+
    public static String        Pref_Statistic_Action_SortByData;
    public static String        Pref_Statistic_Action_SortByTime;
    public static String        Pref_Statistic_Label_Info;

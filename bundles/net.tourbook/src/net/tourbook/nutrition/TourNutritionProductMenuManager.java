@@ -44,12 +44,12 @@ public class TourNutritionProductMenuManager {
    private static final String                       STATE_ID                     = "TourNutritionProductManager.RecentTourNutritionProducts"; //$NON-NLS-1$
    private static final String                       STATE_TOUR_TYPE_ID           = "TourNutritionProductId";                                  //$NON-NLS-1$
 
-   private static final IPreferenceStore  _prefStore         = TourbookPlugin.getDefault().getPreferenceStore();
+   private static final IPreferenceStore             _prefStore                   = TourbookPlugin.getDefault().getPreferenceStore();
 
    /**
     * Tour type manager state is saved in {@link #STATE_ID}
     */
-   private static IDialogSettings         _state             = TourbookPlugin.getDefault()                      //
+   private static IDialogSettings                    _state                       = TourbookPlugin.getDefault()                                //
          .getDialogSettingsSection(STATE_ID);
 
    /**
@@ -65,10 +65,10 @@ public class TourNutritionProductMenuManager {
 
    private static int                                _maxTourNutritionProducts    = -1;
 
-   private static IPropertyChangeListener _prefChangeListener;
+   private static IPropertyChangeListener            _prefChangeListener;
 
-   private static boolean                 _isInitialized     = false;
-   private static boolean                 _isSaveTour;
+   private static boolean                            _isInitialized               = false;
+   private static boolean                            _isSaveTour;
 
    private static class RecentTourNutritionProductAction extends Action {
 
@@ -109,6 +109,11 @@ public class TourNutritionProductMenuManager {
    private static void addRecentTourNutritionProduct(final TourNutritionProduct TourNutritionProduct) {
       _recentTourNutritionProducts.remove(TourNutritionProduct);
       _recentTourNutritionProducts.addFirst(TourNutritionProduct);
+   }
+
+   public static void clearRecentProducts() {
+
+      _recentTourNutritionProducts.clear();
    }
 
    /**
@@ -186,7 +191,7 @@ public class TourNutritionProductMenuManager {
     * @param isSaveTour
     */
    public static void fillMenuWithRecentTourNutritionProducts(final IMenuManager menuMgr,
-                                                  final boolean isSaveTour) {
+                                                              final boolean isSaveTour) {
 
       if (_isInitialized == false) {
          initTourNutritionProductManager();
@@ -300,7 +305,7 @@ public class TourNutritionProductMenuManager {
    }
 
    public static void setTourNutritionProductIntoTour(final TourNutritionProduct TourNutritionProduct,
-                                          final boolean isSaveTour) {
+                                                      final boolean isSaveTour) {
 
       final Runnable runnable = () -> {
 

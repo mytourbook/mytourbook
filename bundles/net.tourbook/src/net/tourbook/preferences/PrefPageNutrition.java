@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2024 Frédéric Bard
+ * Copyright (C) 2024, 2026 Frédéric Bard
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -17,15 +17,23 @@ package net.tourbook.preferences;
 
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
+import net.tourbook.common.UI;
+import net.tourbook.common.util.Util;
+import net.tourbook.nutrition.TourNutritionProductMenuManager;
 
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
+import org.eclipse.jface.layout.PixelConverter;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.preference.PreferencePage;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.MouseWheelListener;
+import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Spinner;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
 
@@ -35,13 +43,23 @@ public class PrefPageNutrition extends PreferencePage implements IWorkbenchPrefe
 
    private final IPreferenceStore _prefStore = TourbookPlugin.getPrefStore();
 
+   private PixelConverter         _pc;
+   private MouseWheelListener     _defaultMouseWheelListener;
+   private SelectionListener      _defaultSelectionListener;
+
+   private int                    _hintDefaultSpinnerWidth;
+
    /*
     * UI controls
     */
-   private Button _chkIgnoreFirstHour;
+   private Button  _chkIgnoreFirstHour;
+
+   private Spinner _spinnerRecentProducts;
 
    @Override
    protected Control createContents(final Composite parent) {
+
+      initUI(parent);
 
       final Composite container = createUI(parent);
 
@@ -67,6 +85,35 @@ public class PrefPageNutrition extends PreferencePage implements IWorkbenchPrefe
             _chkIgnoreFirstHour.setToolTipText(Messages.PrefPage_Nutrition_Checkbox_IgnoreFirstHour_Tooltip);
             GridDataFactory.fillDefaults().align(SWT.BEGINNING, SWT.FILL).applyTo(_chkIgnoreFirstHour);
          }
+
+         {
+            /*
+             * Number of recent products
+             */
+            final String tooltip = Messages.Pref_Equipment_Label_NumberOfRecentProducts_Tooltip;
+
+            final Label label = UI.createLabel(container, Messages.Pref_Equipment_Label_NumberOfRecentProducts);
+            label.setToolTipText(tooltip);
+
+            // spinner
+            _spinnerRecentProducts = new Spinner(container, SWT.BORDER);
+            _spinnerRecentProducts.setToolTipText(tooltip);
+            _spinnerRecentProducts.setMinimum(0);
+            _spinnerRecentProducts.setMaximum(9);
+            _spinnerRecentProducts.addSelectionListener(_defaultSelectionListener);
+            _spinnerRecentProducts.addMouseWheelListener(_defaultMouseWheelListener);
+            GridDataFactory.fillDefaults()
+                  .hint(_hintDefaultSpinnerWidth, SWT.DEFAULT)
+                  .align(SWT.BEGINNING, SWT.CENTER)
+                  .applyTo(_spinnerRecentProducts);
+
+            // button: Remove recent equipment
+            final Button btnRemoveRecentProducts = new Button(container, SWT.PUSH);
+            btnRemoveRecentProducts.setText(Messages.Pref_Equipment_Button_RemoveRecentEquipment);
+            btnRemoveRecentProducts.setToolTipText(Messages.Pref_Equipment_Button_RemoveRecentEquipment_Tooltip);
+            btnRemoveRecentProducts.addSelectionListener(SelectionListener.widgetSelectedAdapter(
+                  selectionEvent -> TourNutritionProductMenuManager.clearRecentProducts()));
+         }
       }
 
       return container;
@@ -74,8 +121,26 @@ public class PrefPageNutrition extends PreferencePage implements IWorkbenchPrefe
 
    @Override
    public void init(final IWorkbench workbench) {
-      // Nothing to do
+
    }
+
+   private void initUI(final Composite parent) {
+
+      _pc = new PixelConverter(parent);
+
+      _hintDefaultSpinnerWidth = _pc.convertWidthInCharsToPixels(3);
+
+      _defaultSelectionListener = SelectionListener.widgetSelectedAdapter(selectionEvent -> onModify());
+
+      _defaultMouseWheelListener = mouseEvent -> {
+
+         Util.adjustSpinnerValueOnMouseScroll(mouseEvent);
+
+         onModify();
+      };
+   }
+
+   private void onModify() {}
 
    @Override
    protected void performDefaults() {

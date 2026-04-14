@@ -201,38 +201,40 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
    /*
     * UI controls
     */
-   private Button                    _btnUpdateProducts;
+   private Button                          _btnUpdateProducts;
 
-   private Image                     _imageAdd        = TourbookPlugin.getThemedImageDescriptor(Images.App_Add).createImage();
-   private Image                     _imageRefreshAll = CommonActivator.getImageDescriptor(CommonImages.App_Refresh_All).createImage();
-   private Image                     _imageSearch     = TourbookPlugin.getImageDescriptor(Images.SearchTours).createImage();
+   private Image                           _imageAdd        = TourbookPlugin.getThemedImageDescriptor(Images.App_Add).createImage();
+   private Image                           _imageRefreshAll = CommonActivator.getImageDescriptor(CommonImages.App_Refresh_All).createImage();
+   private Image                           _imageSearch     = TourbookPlugin.getImageDescriptor(Images.SearchTours).createImage();
 
-   private Image                     _imageCheck      = TourbookPlugin.getImageDescriptor(Images.Checkbox_Checked).createImage();
-   private Image                     _imageUncheck    = TourbookPlugin.getImageDescriptor(Images.Checkbox_Uncheck).createImage();
-   private Image                     _imageYes        = CommonActivator.getImageDescriptor(CommonImages.App_Yes).createImage();
+   private Image                           _imageCheck      = TourbookPlugin.getImageDescriptor(Images.Checkbox_Checked).createImage();
+   private Image                           _imageUncheck    = TourbookPlugin.getImageDescriptor(Images.Checkbox_Uncheck).createImage();
+   private Image                           _imageYes        = CommonActivator.getImageDescriptor(CommonImages.App_Yes).createImage();
 
-   private PageBook                  _pageBook;
-   private Composite                 _pageNoData;
-   private Composite                 _pageContent;
-   private Composite                 _viewerContainer;
+   private PageBook                        _pageBook;
+   private Composite                       _pageNoData;
+   private Composite                       _pageContent;
+   private Composite                       _viewerContainer;
 
-   private boolean                   _isInUpdate;
-   private Label                     _lblCalories_Average;
-   private Label                     _lblCalories_Total;
-   private Label                     _lblCarbohydrates_Average;
-   private Label                     _lblCarbohydrates_Total;
-   private Label                     _lblFluid_Average;
-   private Label                     _lblFluid_Total;
-   private Label                     _lblSodium_Average;
-   private Label                     _lblSodium_Total;
-   private Section                   _sectionProductsList;
-   private Section                   _sectionSummary;
-   private FormToolkit               _tk;
-   private Menu                      _tableContextMenu;
+   private boolean                         _isInUpdate;
+   private Label                           _lblCalories_Average;
+   private Label                           _lblCalories_Total;
+   private Label                           _lblCarbohydrates_Average;
+   private Label                           _lblCarbohydrates_Total;
+   private Label                           _lblFluid_Average;
+   private Label                           _lblFluid_Total;
+   private Label                           _lblSodium_Average;
+   private Label                           _lblSodium_Total;
+   private Section                         _sectionProductsList;
+   private Section                         _sectionSummary;
+   private FormToolkit                     _tk;
+   private Menu                            _tableContextMenu;
 
-   private ActionDeleteProducts      _actionDeleteProducts;
-   private ActionEditCustomProduct   _actionEditCustomProduct;
-   private ActionOpenProductsWebsite _actionOpenProductsWebsite;
+   private ActionDeleteProducts            _actionDeleteProducts;
+   private ActionEditCustomProduct         _actionEditCustomProduct;
+   private ActionOpenProductsWebsite       _actionOpenProductsWebsite;
+
+   private TourNutritionProductMenuManager _tourNutritionProductMenuManager;
 
    private class ActionDeleteProducts extends Action {
 
@@ -642,6 +644,7 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
       _actionEditCustomProduct = new ActionEditCustomProduct();
       _actionOpenProductsWebsite = new ActionOpenProductsWebsite();
 
+      _tourNutritionProductMenuManager = new TourNutritionProductMenuManager();
    }
 
    private void createMenuManager() {
