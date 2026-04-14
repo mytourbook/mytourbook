@@ -90,9 +90,9 @@ public class PrefPageNutrition extends PreferencePage implements IWorkbenchPrefe
             /*
              * Number of recent products
              */
-            final String tooltip = Messages.Pref_Equipment_Label_NumberOfRecentProducts_Tooltip;
+            final String tooltip = Messages.Pref_Nutrition_Label_NumberOfRecentProducts_Tooltip;
 
-            final Label label = UI.createLabel(container, Messages.Pref_Equipment_Label_NumberOfRecentProducts);
+            final Label label = UI.createLabel(container, Messages.Pref_Nutrition_Label_NumberOfRecentProducts);
             label.setToolTipText(tooltip);
 
             // spinner
