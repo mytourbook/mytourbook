@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2024, 2025 Frédéric Bard
+ * Copyright (C) 2024, 2026 Frédéric Bard
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -145,20 +145,20 @@ public class DialogSearchProduct extends TitleAreaDialog implements ITourViewer,
    /*
     * UI controls
     */
-   private Button    _btnAdd;
-   private Button    _btnSearch;
+   private Button                          _btnAdd;
+   private Button                          _btnSearch;
 
-   private Label     _lblKeywords;
-   private Label     _lblSearchType;
+   private Label                           _lblKeywords;
+   private Label                           _lblSearchType;
 
-   private Combo     _comboSearchQuery;
-   private Combo     _comboSearchType;
+   private Combo                           _comboSearchQuery;
+   private Combo                           _comboSearchType;
 
-   private Composite _viewerContainer;
+   private Composite                       _viewerContainer;
 
-   private Menu      _tableContextMenu;
+   private Menu                            _tableContextMenu;
 
-   private Image     _imageDialog = TourbookPlugin.getImageDescriptor(Images.TourNutrition).createImage();
+   private Image                           _imageDialog = TourbookPlugin.getImageDescriptor(Images.TourNutrition).createImage();
 
    private TourNutritionProductMenuManager _tourNutritionProductMenuManager;
 
@@ -863,15 +863,14 @@ public class DialogSearchProduct extends TitleAreaDialog implements ITourViewer,
 
          TourManager.saveModifiedTour(tourData);
 
-         TourNutritionProductMenuManager.equipment_Add(
-
-               tourNutritionProduct,
-               _tourNutritionProductMenuManager.getTourProvider(),
-
-               _tourNutritionProductMenuManager.isSaveTour(),
-               _tourNutritionProductMenuManager.isCheckTourEditor());
-
-         _tourNutritionProductMenuManager.updateRecentEquipment(tourNutritionProduct);
+         /*
+          * TourNutritionProductMenuManager.equipment_Add(
+          * tourNutritionProduct,
+          * _tourNutritionProductMenuManager.getTourProvider(),
+          * _tourNutritionProductMenuManager.isSaveTour(),
+          * _tourNutritionProductMenuManager.isCheckTourEditor());
+          * _tourNutritionProductMenuManager.updateRecentEquipment(tourNutritionProduct);
+          */
       });
    }
 
