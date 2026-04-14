@@ -107,10 +107,10 @@ public class PrefPageNutrition extends PreferencePage implements IWorkbenchPrefe
                   .align(SWT.BEGINNING, SWT.CENTER)
                   .applyTo(_spinnerRecentProducts);
 
-            // button: Remove recent equipment
+            // button: Remove recent products
             final Button btnRemoveRecentProducts = new Button(container, SWT.PUSH);
-            btnRemoveRecentProducts.setText(Messages.Pref_Equipment_Button_RemoveRecentEquipment);
-            btnRemoveRecentProducts.setToolTipText(Messages.Pref_Equipment_Button_RemoveRecentEquipment_Tooltip);
+            btnRemoveRecentProducts.setText(Messages.Pref_Nutrition_Button_RemoveRecentProducts);
+            btnRemoveRecentProducts.setToolTipText(Messages.Pref_Nutrition_Button_RemoveRecentProducts_Tooltip);
             btnRemoveRecentProducts.addSelectionListener(SelectionListener.widgetSelectedAdapter(
                   selectionEvent -> TourNutritionProductMenuManager.clearRecentProducts()));
          }

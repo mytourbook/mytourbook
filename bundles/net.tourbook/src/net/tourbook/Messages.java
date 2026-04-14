@@ -2032,6 +2032,8 @@ public class Messages extends NLS {
 
    public static String        Pref_Nutrition_Label_NumberOfRecentProducts;
    public static String        Pref_Nutrition_Label_NumberOfRecentProducts_Tooltip;
+   public static String        Pref_Nutrition_Button_RemoveRecentProducts;
+   public static String        Pref_Nutrition_Button_RemoveRecentProducts_Tooltip;
 
    public static String        Pref_People_Action_add_person;
    public static String        Pref_People_Button_HrZones_ComputeAllTours;
