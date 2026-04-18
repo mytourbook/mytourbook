@@ -265,6 +265,7 @@ public class EquipmentView extends ViewPart implements
    private boolean                            _isMouseContextMenu;
    private boolean                            _isSelectedWithKeyboard;
 
+   private boolean                            _isShowToolTipInEquipment1stColumn;
    private boolean                            _isShowToolTipInEquipment;
    private boolean                            _isShowToolTipInTitle;
    private boolean                            _isShowToolTipInTags;
@@ -1256,29 +1257,11 @@ public class EquipmentView extends ViewPart implements
 
       colDef.setLabelProvider(new TourInfoToolTipStyledCellLabelProvider() {
 
-         @Override
-         public Object getData(final ViewerCell cell) {
-
-//            if (_isShowToolTipInEquipment == false) {
-//               return null;
-//            }
-//
-//            final TVIEquipmentView_Item viewItem = (TVIEquipmentView_Item) cell.getElement();
-//
-//            if (viewItem instanceof TVIEquipmentView_Equipment) {
-//
-//               // return equipment to show it's notes fields in the tooltip
-//
-//               return viewItem;
-//            }
-
-            return null;
-         }
 
          @Override
          public Long getTourId(final ViewerCell cell) {
 
-            if (_isShowToolTipInEquipment == false) {
+            if (_isShowToolTipInEquipment1stColumn == false) {
                return null;
             }
 
@@ -2637,7 +2620,11 @@ public class EquipmentView extends ViewPart implements
             final Object element = cell.getElement();
             if (element instanceof final TVIEquipmentView_Tour tourItem) {
 
-               cell.setText(EquipmentManager.getEquipmentNames(tourItem.getEquipmentIds()));
+               final List<Long> allEquipmentIDs = tourItem.getEquipmentIds();
+               final ValueFormat valueFormat = colDef_Tree.getValueFormat_Detail();
+
+               cell.setText(EquipmentManager.getEquipmentNames(allEquipmentIDs, valueFormat));
+
                setCellColor(cell, element);
             }
          }
@@ -4076,6 +4063,8 @@ public class EquipmentView extends ViewPart implements
 
    private void reloadViewer_SetContent() {
 
+      EquipmentLoader.startUpdate();
+
       BusyIndicator.showWhile(_parent.getDisplay(), () -> {
 
          _rootItem = new TVIEquipmentView_Root(_equipmentViewer, EquipmentViewerType.IS_EQUIPMENT_VIEWER);
@@ -4515,16 +4504,27 @@ public class EquipmentView extends ViewPart implements
 
    void updateEquipmentFilter_FromSlideout() {
 
-      reloadViewer_SetContent();
+      _viewerContainer.setRedraw(false);
+      {
+         final Object[] expandedElements = _equipmentViewer.getExpandedElements();
+         final ITreeSelection selection = _equipmentViewer.getStructuredSelection();
+
+         reloadViewer_SetContent();
+
+         _equipmentViewer.setExpandedElements(expandedElements);
+         _equipmentViewer.setSelection(selection);
+      }
+      _viewerContainer.setRedraw(true);
    }
 
    private void updateToolTipState() {
 
 // SET_FORMATTING_OFF
 
-      _isShowToolTipInEquipment  = _prefStore.getBoolean(ITourbookPreferences.VIEW_TOOLTIP_EQUIPMENT_EQUIPMENT_1ST_COLUMN);
-      _isShowToolTipInTitle      = _prefStore.getBoolean(ITourbookPreferences.VIEW_TOOLTIP_EQUIPMENT_TITLE);
-      _isShowToolTipInTags       = _prefStore.getBoolean(ITourbookPreferences.VIEW_TOOLTIP_EQUIPMENT_TAGS);
+      _isShowToolTipInEquipment           = _prefStore.getBoolean(ITourbookPreferences.VIEW_TOOLTIP_EQUIPMENT_EQUIPMENT);
+      _isShowToolTipInEquipment1stColumn  = _prefStore.getBoolean(ITourbookPreferences.VIEW_TOOLTIP_EQUIPMENT_EQUIPMENT_1ST_COLUMN);
+      _isShowToolTipInTitle               = _prefStore.getBoolean(ITourbookPreferences.VIEW_TOOLTIP_EQUIPMENT_TITLE);
+      _isShowToolTipInTags                = _prefStore.getBoolean(ITourbookPreferences.VIEW_TOOLTIP_EQUIPMENT_TAGS);
 
 // SET_FORMATTING_ON
    }

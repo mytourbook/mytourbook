@@ -181,6 +181,6 @@ public class TVIEquipmentView_Root extends TVIEquipmentView_Item {
       }
       em.close();
 
-      loadSummarizedValues_Equipment(allEquipmentItems);
+      EquipmentLoader.loadSummarizedValues_Equipment(allEquipmentItems, this);
    }
 }

@@ -218,7 +218,7 @@ public class SlideoutEquipmentFilter extends AdvancedSlideout {
       EquipmentManager.setEquipmentFilter_ContainsTours(containsTours);
       EquipmentManager.setEquipmentFilter_Retired(retired);
 
-      _shellContainer.getDisplay().asyncExec(() -> _equipmentView.updateEquipmentFilter_FromSlideout());
+      _equipmentView.updateEquipmentFilter_FromSlideout();
    }
 
    @Override

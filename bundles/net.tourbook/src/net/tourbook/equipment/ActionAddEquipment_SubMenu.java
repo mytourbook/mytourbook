@@ -132,6 +132,12 @@ public class ActionAddEquipment_SubMenu extends SubMenu {
 
       for (final Equipment equipment : allEquipment) {
 
+         if (equipment.isRetired()) {
+
+            // skip retired equipment https://github.com/mytourbook/mytourbook/issues/1660
+            continue;
+         }
+
          final ActionEquipment action = new ActionEquipment(equipment);
 
          if (numSelectedTour == 1) {

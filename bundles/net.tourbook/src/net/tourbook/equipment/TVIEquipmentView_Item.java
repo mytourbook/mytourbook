@@ -15,23 +15,14 @@
  *******************************************************************************/
 package net.tourbook.equipment;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.UI;
-import net.tourbook.common.util.SQL;
-import net.tourbook.common.util.SQLData;
 import net.tourbook.common.util.TreeViewerItem;
-import net.tourbook.common.util.Util;
-import net.tourbook.database.TourDatabase;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.ui.AppFilter;
 import net.tourbook.ui.AppFilterType;
@@ -44,13 +35,13 @@ public abstract class TVIEquipmentView_Item extends TreeViewerItem {
    private static final String                      SQL_SUM_FIELDS;
    private static final String                      SQL_SUM_COLUMNS;
    private static final String                      SQL_SUM_TOUR_FIELDS;
-
+   
    private static final IPreferenceStore            _prefStore                     = TourbookPlugin.getPrefStore();
 
    private static ConcurrentHashMap<String, String> _allCached_SqlAllSumColumns    = new ConcurrentHashMap<>();
    private static ConcurrentHashMap<String, String> _allCached_SqlAllSumFields     = new ConcurrentHashMap<>();
    private static ConcurrentHashMap<String, String> _allCached_SqlAllSumTourFields = new ConcurrentHashMap<>();
-
+   
    static {
 
 // SET_FORMATTING_OFF
@@ -151,7 +142,6 @@ public abstract class TVIEquipmentView_Item extends TreeViewerItem {
 
    public float         colAvgSpeed;
    public float         colAvgPace;
-
    public float         colAvgPulse;
    public float         colAvgCadence;
    public float         colAvgTemperature_Device;
@@ -256,265 +246,6 @@ public abstract class TVIEquipmentView_Item extends TreeViewerItem {
    public EquipmentViewerType getViewerType() {
 
       return _viewerType;
-   }
-
-   void loadSummarizedValues_Equipment(final Map<Long, TVIEquipmentView_Equipment> allEquipmentItems) {
-
-      loadSummarizedValues_Equipment_AllTours(allEquipmentItems);
-      loadSummarizedValues_Equipment_CollateTours(allEquipmentItems);
-   }
-
-   private void loadSummarizedValues_Equipment_AllTours(final Map<Long, TVIEquipmentView_Equipment> allEquipmentItems) {
-
-      String sql = null;
-      PreparedStatement statement = null;
-
-      try (Connection conn = TourDatabase.getInstance().getConnection()) {
-
-         final AppFilter appFilter = createAppFilter();
-
-         sql = UI.EMPTY_STRING
-
-               + "--" + NL //                                                                   //$NON-NLS-1$
-               + NL
-               + "----------------------------" + NL //                                         //$NON-NLS-1$
-               + "-- equipment sum - all tours" + NL //                                         //$NON-NLS-1$
-               + "----------------------------" + NL //                                         //$NON-NLS-1$
-               + NL
-
-               + "SELECT" + NL //                                                               //$NON-NLS-1$
-
-               + "   j_Td_Eq.EQUIPMENT_EQUIPMENTID," + NL //                                 1  //$NON-NLS-1$
-               + "   COUNT(*) AS numTours" + NL //                                           2  //$NON-NLS-1$
-
-               + "FROM " + TourDatabase.TABLE_EQUIPMENT + NL //                                 //$NON-NLS-1$
-
-               + "JOIN " + TourDatabase.JOINTABLE__TOURDATA__EQUIPMENT + " AS j_Td_Eq" //       //$NON-NLS-1$ //$NON-NLS-2$
-               + "   ON j_Td_Eq.EQUIPMENT_EQUIPMENTID = EQUIPMENT.EQUIPMENTID" + NL //          //$NON-NLS-1$
-
-               + "JOIN " + TourDatabase.TABLE_TOUR_DATA + " AS TourData" //                     //$NON-NLS-1$ //$NON-NLS-2$
-               + "   ON TourData.tourid = j_Td_Eq.tourdata_tourid" + NL //                      //$NON-NLS-1$
-
-               + appFilter.getWhereClause()
-
-               + "GROUP BY " + NL //                                                            //$NON-NLS-1$
-               + "   j_Td_Eq.EQUIPMENT_EQUIPMENTID" + NL //                                     //$NON-NLS-1$
-
-               + NL;
-
-         statement = conn.prepareStatement(sql);
-
-         int nextIndex = 1;
-
-         nextIndex = appFilter.setParameters(statement, nextIndex);
-
-         final ResultSet result = statement.executeQuery();
-
-         while (result.next()) {
-
-            final long equipmentID = result.getLong(1);
-            final int numTours = result.getInt(2);
-
-            final TVIEquipmentView_Equipment equipmentItem = allEquipmentItems.get(equipmentID);
-
-            if (equipmentItem != null) {
-
-               equipmentItem.numTours_All = numTours;
-            }
-         }
-
-      } catch (final SQLException e) {
-         SQL.showException(e, sql);
-      } finally {
-         Util.closeSql(statement);
-      }
-   }
-
-   private void loadSummarizedValues_Equipment_CollateTours(final Map<Long, TVIEquipmentView_Equipment> allEquipmentItems) {
-
-      // clone map
-      final Map<Long, TVIEquipmentView_Equipment> allEquipmentItemsWithoutTours = new HashMap<>(allEquipmentItems);
-
-      String sql = null;
-      PreparedStatement statement = null;
-
-      try (Connection conn = TourDatabase.getInstance().getConnection()) {
-
-         final AppFilter appFilter = createAppFilter();
-
-         sql = UI.EMPTY_STRING
-
-               + "--" + NL //                                                                      //$NON-NLS-1$
-               + NL
-               + "---------------------------------" + NL //                                       //$NON-NLS-1$
-               + "-- equipment sum - collated tours" + NL //                                       //$NON-NLS-1$
-               + "---------------------------------" + NL //                                       //$NON-NLS-1$
-               + NL
-
-               + "SELECT" + NL //                                                                  //$NON-NLS-1$
-               + "   equip.EQUIPMENTID," + NL //                                                1  //$NON-NLS-1$
-               + "   COUNT(*) AS num_Tours," + NL //                                            2  //$NON-NLS-1$
-
-               + getSQL_SUM_COLUMNS("TourData", 3) //                                           3  //$NON-NLS-1$
-
-               + "FROM " + TourDatabase.TABLE_EQUIPMENT + " AS equip" + NL //                      //$NON-NLS-1$ //$NON-NLS-2$
-
-               + "JOIN " + TourDatabase.JOINTABLE__TOURDATA__EQUIPMENT + " AS j_Td_Eq" //          //$NON-NLS-1$ //$NON-NLS-2$
-               + "  ON j_Td_Eq.equipment_equipmentid = equip.EQUIPMENTID" + NL //                  //$NON-NLS-1$
-
-               // the alias "TourData" is needed that the app filter is working
-               + "JOIN " + TourDatabase.TABLE_TOUR_DATA + " AS TourData" //                        //$NON-NLS-1$ //$NON-NLS-2$
-               + "  ON TourData.tourid = j_Td_Eq.tourdata_tourid" + NL //                          //$NON-NLS-1$
-               + "  AND TourData.tourstarttime >= equip.dateCollateFrom" + NL //                   //$NON-NLS-1$
-               + "  AND TourData.tourstarttime <  equip.dateCollateUntil" + NL //                  //$NON-NLS-1$
-
-               + appFilter.getWhereClause()
-
-               + "WHERE equip.isCollate = true" + NL //                                            //$NON-NLS-1$
-
-               + "GROUP BY equip.EQUIPMENTID" + NL //                                              //$NON-NLS-1$
-
-               + NL;
-
-         statement = conn.prepareStatement(sql);
-
-         int nextIndex = 1;
-
-         nextIndex = appFilter.setParameters(statement, nextIndex);
-
-         final ResultSet result = statement.executeQuery();
-
-         while (result.next()) {
-
-            final long equipmentID = result.getLong(1);
-            final int numTours = result.getInt(2);
-
-            final TVIEquipmentView_Equipment equipmentItem = allEquipmentItems.get(equipmentID);
-
-            if (equipmentItem != null) {
-
-               equipmentItem.numTours_IsCollated = numTours;
-
-               equipmentItem.readCommonValues(result, 3);
-
-               // this equipment has a tour -> remove from list
-               allEquipmentItemsWithoutTours.remove(equipmentID);
-            }
-         }
-
-         for (final TVIEquipmentView_Equipment equipmentItem : allEquipmentItemsWithoutTours.values()) {
-
-            if (equipmentItem.getEquipment().isCollate()) {
-
-               // set 0 children that the expand icon in the view is not displayed
-               equipmentItem.setChildren(new ArrayList<>());
-            }
-         }
-
-      } catch (final SQLException e) {
-         SQL.showException(e, sql);
-      } finally {
-         Util.closeSql(statement);
-      }
-   }
-
-   /**
-    * Summarizes all tour values for each part and type
-    *
-    * @return
-    */
-   void loadSummarizedValues_Part(final TVIEquipmentView_Part partItem) {
-
-      String sql = null;
-      PreparedStatement statement = null;
-
-      try (Connection conn = TourDatabase.getInstance().getConnection()) {
-
-         final AppFilter appFilter = createAppFilter();
-         final SQLData partFilter = new EquipmentPartFilter().getSqlData();
-
-         sql = UI.EMPTY_STRING
-
-               + "--" + NL //                                                                      //$NON-NLS-1$
-               + NL
-               + "-----------" + NL //                                                             //$NON-NLS-1$
-               + "-- part sum" + NL //                                                             //$NON-NLS-1$
-               + "-----------" + NL //                                                             //$NON-NLS-1$
-               + NL
-
-               + "SELECT" + NL //                                                                  //$NON-NLS-1$
-
-               + "   COUNT(*) AS Num_Tours," + NL //                                               //$NON-NLS-1$
-
-               + getSQL_SUM_COLUMNS("tdFields", 3) //                                              //$NON-NLS-1$
-
-               + "FROM" + NL //                                                                    //$NON-NLS-1$
-               + "(" + NL //                                                                       //$NON-NLS-1$
-
-               + "   SELECT" + NL //                                                               //$NON-NLS-1$
-
-               // the part filter can create duplicated tour ids
-               + "      DISTINCT TourData.TourID," + NL //                                         //$NON-NLS-1$
-
-               + getSQL_SUM_TOUR_COLUMNS("TourData", 6) //                                         //$NON-NLS-1$
-
-               + "   FROM " + TourDatabase.TABLE_EQUIPMENT_PART + " AS part" + NL //               //$NON-NLS-1$ //$NON-NLS-2$
-
-               + "   JOIN " + TourDatabase.JOINTABLE__TOURDATA__EQUIPMENT + " AS j_Td_Eq" //       //$NON-NLS-1$ //$NON-NLS-2$
-               + "      ON j_Td_Eq.equipment_equipmentid = part.equipment_equipmentid" + NL //     //$NON-NLS-1$
-
-               + "   JOIN " + TourDatabase.TABLE_TOUR_DATA + " AS TourData" //                     //$NON-NLS-1$ //$NON-NLS-2$
-               + "      ON TourData.tourid = j_Td_Eq.tourdata_tourid" + NL //                      //$NON-NLS-1$
-               + "      AND TourData.tourstarttime >= part.dateCollateFrom" + NL //                //$NON-NLS-1$
-               + "      AND TourData.tourstarttime <  part.dateCollateUntil" + NL //               //$NON-NLS-1$
-
-               + appFilter.getWhereClause()
-               + partFilter.getSqlString()
-
-               + "   WHERE part.isCollate = TRUE" + NL //                                          //$NON-NLS-1$
-               + "     AND part.partID    = ?" + NL //                                             //$NON-NLS-1$
-
-               + ") AS tdFields" + NL //                                                           //$NON-NLS-1$
-
-               + NL;
-
-         statement = conn.prepareStatement(sql);
-
-         int nextIndex = 1;
-
-         nextIndex = appFilter.setParameters(statement, nextIndex);
-         nextIndex = partFilter.setParameters(statement, nextIndex);
-
-         statement.setLong(nextIndex++, partItem.getPartID());
-
-         final ResultSet result = statement.executeQuery();
-
-         while (result.next()) {
-
-            final int numTours = result.getInt(1);
-
-            partItem.numTours_IsCollated = numTours;
-
-            partItem.readCommonValues(result, 2);
-
-            // there should be only one part
-            break;
-         }
-
-         final long numTours = partItem.numTours_IsCollated;
-
-         if (numTours == 0) {
-
-            // hide expand UI icon when there are no children
-
-            partItem.setChildren(new ArrayList<>());
-         }
-
-      } catch (final SQLException e) {
-         SQL.showException(e, sql);
-      } finally {
-         Util.closeSql(statement);
-      }
    }
 
    /**

@@ -250,7 +250,7 @@ public class TVIEquipmentView_Equipment extends TVIEquipmentView_Item {
 
          allPartItems.add(partItem);
 
-         loadSummarizedValues_Part(partItem);
+         EquipmentLoader.loadSummarizedValues_Part(partItem);
       }
 
       setChildren(allPartItems);
