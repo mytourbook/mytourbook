@@ -878,8 +878,9 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
          final Button btnSearchProduct = new Button(container, SWT.NONE);
          btnSearchProduct.setText(Messages.Tour_Nutrition_Button_SearchProduct);
          btnSearchProduct.setToolTipText(Messages.Tour_Nutrition_Button_SearchProduct_Tooltip);
-         btnSearchProduct.addSelectionListener(widgetSelectedAdapter(selectionEvent -> new DialogSearchProduct(Display.getCurrent().getActiveShell(),
-               _tourData.getTourId()).open()));
+         //TODO FB
+//         btnSearchProduct.addSelectionListener(widgetSelectedAdapter(selectionEvent -> new DialogSearchProduct(Display.getCurrent().getActiveShell(),
+//               _tourData.getTourId()).open()));
          btnSearchProduct.setImage(_imageSearch);
          GridDataFactory.fillDefaults().align(SWT.BEGINNING, SWT.CENTER).applyTo(btnSearchProduct);
 
