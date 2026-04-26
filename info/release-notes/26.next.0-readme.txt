@@ -38,6 +38,9 @@ New / Improvements
 * TBD: Fit Export
   - Export swim values
     https://github.com/mytourbook/mytourbook/issues/1581
+
+* Tour filter (Frederic)
+  - Added nutrition tour filters
   
 
 Changes
