@@ -966,6 +966,8 @@ public class TourFilterManager {
          long value1;
          long value2;
 
+         //todo fb, le filtrage se passe ici
+
          switch (fieldId) {
          case ALTITUDE_DOWN:
 
