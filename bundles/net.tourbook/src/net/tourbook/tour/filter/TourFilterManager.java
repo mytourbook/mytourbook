@@ -251,6 +251,7 @@ public class TourFilterManager {
             OtherMessages.COLUMN_FACTORY_CATEGORY_DEVICE,
             OtherMessages.COLUMN_FACTORY_CATEGORY_MARKER,
             OtherMessages.COLUMN_FACTORY_CATEGORY_MOTION,
+            OtherMessages.COLUMN_FACTORY_CATEGORY_NUTRITION,
             OtherMessages.COLUMN_FACTORY_CATEGORY_PHOTO,
             OtherMessages.COLUMN_FACTORY_CATEGORY_POWER,
             OtherMessages.COLUMN_FACTORY_CATEGORY_POWERTRAIN,
@@ -479,6 +480,10 @@ public class TourFilterManager {
             //todo fb ???
             TourFilterFieldId.MOTION_DISTANCE));
 
+      //todo fb
+      // List of products (is empty vs is not empty, cf. tour title)
+      // Product's name (starts with, ends with, contains, equals, not equals)
+      // Product's barcode (is equals, not equals)
       allConfigs.add(
             TourFilterFieldConfig
                   .name(Messages.Tour_Filter_Field_Distance)
