@@ -489,20 +489,22 @@ public class TourFilterManager {
             TourFilterFieldConfig
                   .name(Messages.Tour_Filter_Field_NutritionProductsList)
                   .fieldId(TourFilterFieldId.NUTRITION_PRODUCTSLIST)
+                  .fieldOperators(FILTER_OPERATORS_BOOLEAN)
+                  .defaultFieldOperator(TourFilterFieldOperator.IS_AVAILABLE));
+
+      allConfigs.add(
+            TourFilterFieldConfig
+                  .name(Messages.Tour_Filter_Field_NutritionProductName)
+                  .fieldId(TourFilterFieldId.NUTRITION_PRODUCT_NAME)
                   .fieldType(TourFilterFieldType.TEXT)
                   .fieldOperators(FILTER_OPERATORS_TEXT));
 
       allConfigs.add(
             TourFilterFieldConfig
-                  .name(Messages.Tour_Filter_Field_Distance)
-                  .fieldId(TourFilterFieldId.MOTION_DISTANCE)
-                  .fieldType(TourFilterFieldType.NUMBER_FLOAT)
-                  .fieldOperators(FILTER_OPERATORS_NUMBER)
-                  .defaultFieldOperator(TourFilterFieldOperator.GREATER_THAN)
-                  .pageIncrement(100)
-                  .numDigits(1)
-                  .fieldValueProvider(_fieldValueProvider_Distance)
-                  .unitLabel(UI.UNIT_LABEL_DISTANCE));
+                  .name(Messages.Tour_Filter_Field_NutritionProductBarcode)
+                  .fieldId(TourFilterFieldId.NUTRITION_PRODUCT_BARCODE)
+                  .fieldType(TourFilterFieldType.TEXT)
+                  .fieldOperators(FILTER_OPERATORS_TEXT));
    }
 
    private static void createConfig_Power(final ArrayList<TourFilterFieldConfig> allConfigs) {
