@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2026 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -286,6 +286,9 @@ public class TourFilterManager {
          } else if (category.equals(OtherMessages.COLUMN_FACTORY_CATEGORY_MOTION)) {
             createConfig_Motion(allConfigs);
 
+         } else if (category.equals(OtherMessages.COLUMN_FACTORY_CATEGORY_NUTRITION)) {
+            createConfig_Nutrition(allConfigs);
+
          } else if (category.equals(OtherMessages.COLUMN_FACTORY_CATEGORY_PHOTO)) {
             createConfig_Power(allConfigs);
 
@@ -455,6 +458,26 @@ public class TourFilterManager {
 //      defineColumn_Motion_AvgPace();
 //
       allConfigs.add(new TourFilterFieldConfig(OtherMessages.COLUMN_FACTORY_CATEGORY_MOTION, TourFilterFieldId.MOTION_DISTANCE));
+
+      allConfigs.add(
+            TourFilterFieldConfig
+                  .name(Messages.Tour_Filter_Field_Distance)
+                  .fieldId(TourFilterFieldId.MOTION_DISTANCE)
+                  .fieldType(TourFilterFieldType.NUMBER_FLOAT)
+                  .fieldOperators(FILTER_OPERATORS_NUMBER)
+                  .defaultFieldOperator(TourFilterFieldOperator.GREATER_THAN)
+                  .pageIncrement(100)
+                  .numDigits(1)
+                  .fieldValueProvider(_fieldValueProvider_Distance)
+                  .unitLabel(UI.UNIT_LABEL_DISTANCE));
+   }
+
+   private static void createConfig_Nutrition(final ArrayList<TourFilterFieldConfig> allConfigs) {
+
+      allConfigs.add(new TourFilterFieldConfig(
+            OtherMessages.COLUMN_FACTORY_CATEGORY_NUTRITION,
+            //todo fb ???
+            TourFilterFieldId.MOTION_DISTANCE));
 
       allConfigs.add(
             TourFilterFieldConfig

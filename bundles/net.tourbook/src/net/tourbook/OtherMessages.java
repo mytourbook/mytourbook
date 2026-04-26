@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2023, 2025 Wolfgang Schramm and Contributors
+ * Copyright (C) 2023, 2026 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -231,6 +231,7 @@ public class OtherMessages {
    public static final String COLUMN_FACTORY_CATEGORY_ELEVATION            = net.tourbook.ui.Messages.ColumnFactory_Category_Altitude;
    public static final String COLUMN_FACTORY_CATEGORY_MARKER               = net.tourbook.ui.Messages.ColumnFactory_Category_Marker;
    public static final String COLUMN_FACTORY_CATEGORY_MOTION               = net.tourbook.ui.Messages.ColumnFactory_Category_Motion;
+   public static final String COLUMN_FACTORY_CATEGORY_NUTRITION            = net.tourbook.ui.Messages.ColumnFactory_Category_Nutrition;
    public static final String COLUMN_FACTORY_CATEGORY_PHOTO                = net.tourbook.ui.Messages.ColumnFactory_Category_Photo;
    public static final String COLUMN_FACTORY_CATEGORY_POWER                = net.tourbook.ui.Messages.ColumnFactory_Category_Power;
    public static final String COLUMN_FACTORY_CATEGORY_POWERTRAIN           = net.tourbook.ui.Messages.ColumnFactory_Category_Powertrain;
