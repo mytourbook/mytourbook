@@ -482,8 +482,7 @@ public class TourFilterManager {
 
       //todo fb
       // List of products (is empty vs is not empty, cf. tour title)
-      // Product's name (starts with, ends with, contains, equals, not equals)
-      // Product's barcode (is equals, not equals)
+      // Product (name, barcode).... does the search works with a barcode or a product name ??
 
       allConfigs.add(
             TourFilterFieldConfig
