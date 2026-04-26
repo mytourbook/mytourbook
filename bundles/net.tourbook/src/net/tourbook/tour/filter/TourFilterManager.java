@@ -495,14 +495,7 @@ public class TourFilterManager {
       allConfigs.add(
             TourFilterFieldConfig
                   .name(Messages.Tour_Filter_Field_NutritionProduct)
-                  .fieldId(TourFilterFieldId.NUTRITION_PRODUCT_NAME)
-                  .fieldType(TourFilterFieldType.TEXT)
-                  .fieldOperators(FILTER_OPERATORS_TEXT));
-
-      allConfigs.add(
-            TourFilterFieldConfig
-                  .name(Messages.Tour_Filter_Field_NutritionProductBarcode)
-                  .fieldId(TourFilterFieldId.NUTRITION_PRODUCT_BARCODE)
+                  .fieldId(TourFilterFieldId.NUTRITION_PRODUCT)
                   .fieldType(TourFilterFieldType.TEXT)
                   .fieldOperators(FILTER_OPERATORS_TEXT));
    }
