@@ -62,6 +62,7 @@ public class TourFilterManager {
    private static final String TOUR_DATA_TEMPERATURE_AVG_DEVICE = "TourData.weather_Temperature_Average_Device"; //$NON-NLS-1$
    private static final String TOUR_DATA_MANUAL_TOUR            = "TourData.devicePluginId";                     //$NON-NLS-1$
    private static final String TOUR_DATA_NUMBER_OF_PHOTOS       = "TourData.numberOfPhotos";                     //$NON-NLS-1$
+   private static final String TOUR_DATA_NUTRITION_PRODUCTSLIST = "TourData.tourNutritionProducts";              //$NON-NLS-1$
    private static final String TOUR_DATA_POWER_AVG              = "TourData.power_Avg";                          //$NON-NLS-1$
    private static final String TOUR_DATA_POWER_MAX              = "TourData.power_Max";                          //$NON-NLS-1$
    private static final String TOUR_DATA_POWER_NORMALIZED       = "TourData.power_Normalized";                   //$NON-NLS-1$
@@ -477,8 +478,7 @@ public class TourFilterManager {
 
       allConfigs.add(new TourFilterFieldConfig(
             OtherMessages.COLUMN_FACTORY_CATEGORY_NUTRITION,
-            //todo fb ???
-            TourFilterFieldId.MOTION_DISTANCE));
+            TourFilterFieldId.NUTRITION_PRODUCTSLIST));
 
       //todo fb
       // List of products (is empty vs is not empty, cf. tour title)
@@ -1063,6 +1063,11 @@ public class TourFilterManager {
             final double distance2 = double2 * 1000;
 
             getSQL__FieldOperators_Number(sqlWhere, sqlParameters, fieldOperator, sql, distance1, distance2);
+            break;
+
+         case NUTRITION_PRODUCTSLIST:
+            sql = TOUR_DATA_NUTRITION_PRODUCTSLIST;
+            //TODO FB, i don't think text works here, ugh getSQL__FieldOperators_Boolean(sqlWhere, sqlParameters, fieldOperator, sql);
             break;
 
          case TOUR_MANUAL_TOUR:
