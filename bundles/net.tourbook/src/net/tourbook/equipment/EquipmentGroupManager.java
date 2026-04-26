@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2025 Wolfgang Schramm and Contributors
+ * Copyright (C) 2025, 2026 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -176,8 +176,7 @@ public class EquipmentGroupManager {
     * @param equipmentGroupID
     *
     * @return Returns the equipment group or <code>null</code> when not available, e.g. when a group
-    *         was
-    *         deleted
+    *         was deleted
     */
    public static EquipmentGroup getEquipmentGroup(final String equipmentGroupID) {
 

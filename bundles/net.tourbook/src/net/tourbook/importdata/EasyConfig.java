@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2026 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -60,9 +60,9 @@ public class EasyConfig {
    static final int        LAST_MARKER_DISTANCE_MIN                = 0;
    static final int        LAST_MARKER_DISTANCE_MAX                = 10000;   // 10 km
 
-   static final int        TOUR_TYPE_AVG_SPEED_DEFAULT             = 0;
-   static final int        TOUR_TYPE_AVG_SPEED_MIN                 = 0;
-   static final int        TOUR_TYPE_AVG_SPEED_MAX                 = 3000;
+   static final int        TOUR_AVG_SPEED_DEFAULT                  = 0;
+   static final int        TOUR_AVG_SPEED_MIN                      = 0;
+   static final int        TOUR_AVG_SPEED_MAX                      = 3000;
 
    public static final int TEMPERATURE_ADJUSTMENT_DURATION_DEFAULT = 12 * 60; // 12 minutes
 

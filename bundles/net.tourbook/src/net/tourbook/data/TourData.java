@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2025 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2026 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -2190,6 +2190,12 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
     */
    @Transient
    private short[]            _radar_VehicleStates;
+
+   /**
+    * All equipment ids
+    */
+   @Transient
+   private List<Long>         _allEquipmentIDs;
 
 // SET_FORMATTING_ON
 
@@ -9579,6 +9585,20 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
       return equipment;
    }
 
+   public List<Long> getEquipmentIds() {
+
+      if (_allEquipmentIDs == null) {
+
+         _allEquipmentIDs = new ArrayList<>();
+
+         for (final Equipment equipmentItem : equipment) {
+            _allEquipmentIDs.add(equipmentItem.getEquipmentId());
+         }
+      }
+
+      return _allEquipmentIDs;
+   }
+
    /**
     * @param values
     *
@@ -12036,7 +12056,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
    }
 
    /**
-    * @return the tour distance in metric measurement system
+    * @return Returns {@link #tourDistance}
     */
    public float getTourDistance() {
       return tourDistance;
@@ -13393,7 +13413,10 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
     * @param equipment
     */
    public void setEquipment(final Set<Equipment> equipment) {
+
       this.equipment = equipment;
+
+      _allEquipmentIDs = null;
    }
 
    public void setFrontShiftCount(final int frontShiftCount) {

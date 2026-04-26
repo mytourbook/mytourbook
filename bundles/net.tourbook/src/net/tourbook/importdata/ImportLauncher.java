@@ -16,6 +16,7 @@
 package net.tourbook.importdata;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import net.tourbook.common.UI;
 import net.tourbook.common.util.StatusUtil;
@@ -29,81 +30,83 @@ import net.tourbook.tour.location.TourLocationProfile;
 
 public class ImportLauncher implements Cloneable {
 
-   private static long             _idCreator;
+   private static final char    NL                            = UI.NEW_LINE;
 
-   public String                   description                   = UI.EMPTY_STRING;
-   public String                   name                          = UI.EMPTY_STRING;
+   private static long          _idCreator;
+
+   public String                description                   = UI.EMPTY_STRING;
+   public String                name                          = UI.EMPTY_STRING;
 
    /**
-    * When <code>null</code> then the tour type is not set.
+    * When <code>null</code> then the tour type is not set
     */
-   public Enum<TourTypeConfig>     tourTypeConfig;
+   public Enum<TourTypeConfig>  tourTypeConfig;
 
-   public TourType                 oneTourType;
-   public CadenceMultiplier        oneTourTypeCadence;
+   public TourType              oneTourType;
+   public CadenceMultiplier     oneTourTypeCadence;
 
-   public ArrayList<SpeedTourType> speedTourTypes                = new ArrayList<>();
+   public List<SpeedTourType>   speedTourTypes                = new ArrayList<>();
 
    /** Contains the image hash or 0 when an image is not displayed. */
-   public int                      imageHash;
+   public int                   imageHash;
 
-   public int                      imageWidth;
+   public int                   imageWidth;
 
    /**
     * Show/hide this launcher in the dashboard.
     */
-   public boolean                  isShowInDashboard             = true;
+   public boolean               isShowInDashboard             = true;
 
    /**
     * When <code>true</code>, assigns a type to the tour.
     */
-   public boolean                  isSetTourType;
+   public boolean               isSetTourType;
 
    /**
     * When <code>true</code> save the tour for the active person.
     */
-   public boolean                  isSaveTour;
+   public boolean               isSaveTour;
 
    /**
     * When <code>true</code> then the text of the last marker is set.
     */
-   public boolean                  isSetLastMarker;
+   public boolean               isSetLastMarker;
 
    /**
     * When <code>true</code> then a marker will be removed when it is located at the 2nd last time
     * slice
     */
-   public boolean                  isRemove2ndLastTimeSliceMarker;
+   public boolean               isRemove2ndLastTimeSliceMarker;
 
    /**
     * Last marker distance in meters.
     */
-   public int                      lastMarkerDistance;
+   public int                   lastMarkerDistance;
 
-   public String                   lastMarkerText                = UI.EMPTY_STRING;
+   public String                lastMarkerText                = UI.EMPTY_STRING;
 
    /**
     * When <code>true</code> then the tour start temperature is adjusted.
     */
-   public boolean                  isAdjustTemperature;
+   public boolean               isAdjustTemperature;
 
    /**
     * When <code>true</code>, the weather data is saved in the tour.
     */
-   public boolean                  isRetrieveWeatherData;
+   public boolean               isRetrieveWeatherData;
 
    /**
     * Duration in seconds during which the temperature is adjusted.
     */
-   public int                      temperatureAdjustmentDuration = EasyConfig.TEMPERATURE_ADJUSTMENT_DURATION_DEFAULT;
+   public int                   temperatureAdjustmentDuration = EasyConfig.TEMPERATURE_ADJUSTMENT_DURATION_DEFAULT;
 
    /**
     * Temperature adjustment will be performed when the tour average temperature is below this
     * value.
     */
-   public float                    tourAvgTemperature            = EasyConfig.TEMPERATURE_AVG_TEMPERATURE_DEFAULT;
+   public float                 tourAvgTemperature            = EasyConfig.TEMPERATURE_AVG_TEMPERATURE_DEFAULT;
 
-   private long                    _id;
+   private long                 _id;
 
    /**
     * When <code>true</code> then elevation from the first time slice is replaced with the value of
@@ -112,43 +115,50 @@ public class ImportLauncher implements Cloneable {
     * This fixes an issue after updating the Garmin Edge 1030 firmware version to 12.20, sometimes
     * it has total wrong elevation value for the first time slice
     */
-   public boolean                  isReplaceFirstTimeSliceElevation;
+   public boolean               isReplaceFirstTimeSliceElevation;
 
    /**
     * When <code>true</code> then the elevation up/down totals are computed from SRTM data when
     * available
     */
-   public boolean                  isReplaceElevationFromSRTM;
+   public boolean               isReplaceElevationFromSRTM;
 
    /**
     * When <code>true</code> then tour start/end locations are retrieved and set into the tour
     */
-   public boolean                  isRetrieveTourLocation;
+   public boolean               isRetrieveTourLocation;
 
    /**
     * This tour location profile is used to set the tour location values
     */
-   public TourLocationProfile      tourLocationProfile;
+   public TourLocationProfile   tourLocationProfile;
 
    /**
     * When <code>true</code> then all tags in a groups are set into the tour
     */
-   public boolean                  isSetTourTagGroup;
+   public boolean               isSetTourTagGroup;
 
    /**
     * ID of the {@link TagGroup}
     */
-   public String                   tourTagGroupID;
+   public String                tourTagGroupID;
 
    /**
     * When <code>true</code> then all equipment in a groups are set into the tour
     */
-   public boolean                  isSetEquipmentGroup;
+   public boolean               isSetEquipment;
+
+   /**
+    * When <code>null</code> then a equipment config is not set and an empty page is displayed
+    */
+   public Enum<EquipmentConfig> equipmentConfig;
 
    /**
     * ID of the {@link EquipmentGroup}
     */
-   public String                   equipmentGroupID;
+   public String                equipmentOneGroupID;
+
+   public List<SpeedEquipment>  allEquipmentSpeeds            = new ArrayList<>();
 
    public ImportLauncher() {
 
@@ -215,13 +225,23 @@ public class ImportLauncher implements Cloneable {
    /**
     * @return Returns <code>true</code> when equipment are set into the tour
     */
-   public boolean isSetEquipment() {
+   public boolean isSetEquipmentAndIsAvailable() {
 
-      final EquipmentGroup equipmentGroup = EquipmentGroupManager.getEquipmentGroup(equipmentGroupID);
+      if (isSetEquipment) {
 
-      if (equipmentGroup != null && isSetEquipmentGroup) {
+         if (EquipmentConfig.EQUIPMENT_CONFIG_BY_SPEED == equipmentConfig) {
 
-         return equipmentGroup.allEquipment.size() > 0;
+            return allEquipmentSpeeds.size() > 0;
+
+         } else if (EquipmentConfig.EQUIPMENT_CONFIG_ONE_FOR_ALL == equipmentConfig) {
+
+            final EquipmentGroup equipmentGroup = EquipmentGroupManager.getEquipmentGroup(equipmentOneGroupID);
+
+            if (equipmentGroup != null) {
+
+               return equipmentGroup.allEquipment.size() > 0;
+            }
+         }
       }
 
       return false;
@@ -243,7 +263,7 @@ public class ImportLauncher implements Cloneable {
    }
 
    /**
-    * Setup data for the tour type config image.
+    * Setup data for the tour type config image
     */
    void setupItemImage() {
 
@@ -278,13 +298,56 @@ public class ImportLauncher implements Cloneable {
 
    @Override
    public String toString() {
-      return "DeviceImportLauncher [" //$NON-NLS-1$
-            //
-            + ("name=" + name + ", ") //$NON-NLS-1$ //$NON-NLS-2$
-//            + ("speedTourTypes=" + speedTourTypes + ", ") //$NON-NLS-1$ //$NON-NLS-2$
-//            + ("tourTypeConfig=" + tourTypeConfig + ", ") //$NON-NLS-1$ //$NON-NLS-2$
-            + ("lastMarkerDistance=" + lastMarkerDistance + ", ") //$NON-NLS-1$ //$NON-NLS-2$
 
-            + "]"; //$NON-NLS-1$
+      final int maxLen = 5;
+
+      final List<SpeedTourType> subAllSpeedTourTypes = speedTourTypes != null
+            ? speedTourTypes.subList(0, Math.min(speedTourTypes.size(), maxLen))
+            : null;
+
+      final List<SpeedEquipment> subAllEquipmentSpeeds = allEquipmentSpeeds != null
+            ? allEquipmentSpeeds.subList(0,
+                  Math.min(allEquipmentSpeeds.size(), maxLen))
+            : null;
+
+      return UI.EMPTY_STRING
+
+            + "ImportLauncher" + NL //                                                             //$NON-NLS-1$
+
+            + " name                   = " + name + NL //                                          //$NON-NLS-1$
+            + " description            = " + description + NL //                                   //$NON-NLS-1$
+
+            + " isSetTourType          = " + isSetTourType + NL //                                 //$NON-NLS-1$
+//          + " tourTypeConfig         = " + tourTypeConfig + NL //                                //$NON-NLS-1$
+//          + " oneTourType            = " + oneTourType + NL //                                   //$NON-NLS-1$
+//          + " oneTourTypeCadence     = " + oneTourTypeCadence + NL //                            //$NON-NLS-1$
+            + " speedTourTypes         = " + subAllSpeedTourTypes + NL //                          //$NON-NLS-1$
+//
+            + " isSetTourTagGroup      = " + isSetTourTagGroup + NL //                             //$NON-NLS-1$
+//          + " tourTagGroupID         = " + tourTagGroupID + NL //                                //$NON-NLS-1$
+
+            + " isSetEquipment         = " + isSetEquipment + NL //                                //$NON-NLS-1$
+            + " equipmentConfig        = " + equipmentConfig + NL //                               //$NON-NLS-1$
+            + " equipmentOneGroupID    = " + equipmentOneGroupID + NL //                           //$NON-NLS-1$
+            + " allEquipmentSpeeds     = " + subAllEquipmentSpeeds + NL //                         //$NON-NLS-1$
+
+//          + " imageHash              = " + imageHash + NL //                                     //$NON-NLS-1$
+//          + " imageWidth             = " + imageWidth + NL //                                    //$NON-NLS-1$
+//          + " isShowInDashboard      = " + isShowInDashboard + NL //                             //$NON-NLS-1$
+//          + " isSaveTour             = " + isSaveTour + NL //                                    //$NON-NLS-1$
+//          + " isSetLastMarker        = " + isSetLastMarker + NL //                               //$NON-NLS-1$
+//          + " isRemove2ndLastTimeSliceMarker =" + isRemove2ndLastTimeSliceMarker + NL //         //$NON-NLS-1$
+//          + " lastMarkerDistance     = " + lastMarkerDistance + NL //                            //$NON-NLS-1$
+//          + " lastMarkerText         = " + lastMarkerText + NL //                                //$NON-NLS-1$
+//          + " isAdjustTemperature    = " + isAdjustTemperature + NL //                           //$NON-NLS-1$
+//          + " isRetrieveWeatherData  = " + isRetrieveWeatherData + NL //                         //$NON-NLS-1$
+//          + " temperatureAdjustmentDuration =" + temperatureAdjustmentDuration + NL //           //$NON-NLS-1$
+//          + " tourAvgTemperature     = " + tourAvgTemperature + NL //                            //$NON-NLS-1$
+//          + " isReplaceFirstTimeSliceElevation =" + isReplaceFirstTimeSliceElevation + NL //     //$NON-NLS-1$
+//          + " isReplaceElevationFromSRTM =" + isReplaceElevationFromSRTM + NL //                 //$NON-NLS-1$
+//          + " isRetrieveTourLocation = " + isRetrieveTourLocation + NL //                        //$NON-NLS-1$
+//          + " tourLocationProfile    = " + tourLocationProfile + NL //                           //$NON-NLS-1$
+
+      ;
    }
 }

@@ -109,6 +109,7 @@ import net.tourbook.importdata.DialogEasyImportConfig;
 import net.tourbook.importdata.EasyConfig;
 import net.tourbook.importdata.EasyImportManager;
 import net.tourbook.importdata.EasyLauncherUtils;
+import net.tourbook.importdata.EquipmentConfig;
 import net.tourbook.importdata.ImportConfig;
 import net.tourbook.importdata.ImportLauncher;
 import net.tourbook.importdata.ImportState_Easy;
@@ -116,6 +117,7 @@ import net.tourbook.importdata.ImportState_File;
 import net.tourbook.importdata.ImportState_Process;
 import net.tourbook.importdata.OSFile;
 import net.tourbook.importdata.RawDataManager;
+import net.tourbook.importdata.SpeedEquipment;
 import net.tourbook.importdata.SpeedTourType;
 import net.tourbook.importdata.TourTypeConfig;
 import net.tourbook.photo.ImageUtils;
@@ -2292,16 +2294,16 @@ public class RawDataView extends ViewPart implements
 
       final StringBuilder sb = new StringBuilder();
 
-      final String tileName = importLauncher.name.trim();
+      final String launcherName = importLauncher.name.trim();
       final String tileDescription = importLauncher.description.trim();
-      final String tourTypeText = EasyLauncherUtils.createText_TourType(importLauncher, tileName);
 
       {
-         // tour type name
+         // launcher name
 
-         if (tileName.length() > 0) {
+         if (launcherName.length() > 0) {
 
-            sb.append(tileName);
+            sb.append(launcherName);
+            sb.append(NL);
             sb.append(NL);
          }
       }
@@ -2310,23 +2312,38 @@ public class RawDataView extends ViewPart implements
 
          if (tileDescription.length() > 0) {
 
-            sb.append(NL);
             sb.append(tileDescription);
             sb.append(NL);
          }
       }
       {
-         // tour type text
+         // tour type
 
-         if (tourTypeText.length() > 0) {
+         if (importLauncher.isSetTourType) {
 
-            sb.append(NL);
-            sb.append(tourTypeText);
+            EasyLauncherUtils.createText_TourType(importLauncher, launcherName, sb);
+
+         } else {
+
+            sb.append("Set tour type: NO");
             sb.append(NL);
          }
       }
       {
-         // tag group tags
+         // equipment
+
+         if (importLauncher.isSetEquipmentAndIsAvailable()) {
+
+            EasyLauncherUtils.createText_Equipment(importLauncher, sb);
+
+         } else {
+
+            sb.append(Messages.Import_Data_HTML_SetEquipment_NO);
+            sb.append(NL);
+         }
+      }
+      {
+         // tags
 
          if (importLauncher.isSetTags()) {
 
@@ -2334,30 +2351,17 @@ public class RawDataView extends ViewPart implements
 
          } else {
 
-            sb.append(NL);
             sb.append(Messages.Import_Data_HTML_SetTourTags_NO);
-         }
-      }
-      {
-         // equipment group
-
-         if (importLauncher.isSetEquipment()) {
-
-            EasyLauncherUtils.createText_EquipmentGroup(importLauncher, sb);
-
-         } else {
-
             sb.append(NL);
-            sb.append(Messages.Import_Data_HTML_SetEquipment_NO);
          }
       }
       {
          // 2nd last time slice marker
 
-         sb.append(NL);
          sb.append(importLauncher.isRemove2ndLastTimeSliceMarker
                ? Messages.Import_Data_HTML_Remove2dLastTimeSliceMarker_Yes
                : Messages.Import_Data_HTML_Remove2dLastTimeSliceMarker_No);
+         sb.append(NL);
       }
       {
          // last marker
@@ -2366,15 +2370,13 @@ public class RawDataView extends ViewPart implements
 
          final String distanceValue = _nf1.format(distance) + UI.SPACE1 + UI.UNIT_LABEL_DISTANCE;
 
-         sb.append(NL);
          sb.append(importLauncher.isSetLastMarker
                ? NLS.bind(Messages.Import_Data_HTML_LastMarker_Yes, distanceValue, importLauncher.lastMarkerText)
                : Messages.Import_Data_HTML_LastMarker_No);
+         sb.append(NL);
       }
       {
          // adjust temperature
-
-         sb.append(NL);
 
          if (importLauncher.isAdjustTemperature) {
 
@@ -2392,60 +2394,62 @@ public class RawDataView extends ViewPart implements
 
             sb.append(Messages.Import_Data_HTML_AdjustTemperature_No);
          }
+
+         sb.append(NL);
       }
       {
          // adjust elevation
 
-         sb.append(NL);
-
          sb.append(importLauncher.isReplaceFirstTimeSliceElevation
                ? Messages.Import_Data_HTML_ReplaceFirstTimeSliceElevation_Yes
                : Messages.Import_Data_HTML_ReplaceFirstTimeSliceElevation_No);
+
+         sb.append(NL);
       }
       {
          // set elevation from SRTM
 
-         sb.append(NL);
-
          sb.append(importLauncher.isReplaceElevationFromSRTM
                ? Messages.Import_Data_HTML_ReplaceElevationFromSRTM_Yes
                : Messages.Import_Data_HTML_ReplaceElevationFromSRTM_No);
+
+         sb.append(NL);
       }
       {
          // retrieve weather data
 
-         sb.append(NL);
-
          sb.append(importLauncher.isRetrieveWeatherData
                ? Messages.Import_Data_HTML_RetrieveWeatherData_Yes
                : Messages.Import_Data_HTML_RetrieveWeatherData_No);
+
+         sb.append(NL);
       }
       {
          // retrieve tour location
 
-         sb.append(NL);
-
          sb.append(importLauncher.isRetrieveTourLocation
                ? Messages.Import_Data_HTML_RetrieveTourLocation_Yes
                : Messages.Import_Data_HTML_RetrieveTourLocation_No);
+
+         sb.append(NL);
       }
       {
          // save tour
 
-         sb.append(NL);
-
          sb.append(importLauncher.isSaveTour
                ? Messages.Import_Data_HTML_SaveTour_Yes
                : Messages.Import_Data_HTML_SaveTour_No);
+
+         sb.append(NL);
       }
       {
          // delete device files
 
-         sb.append(NL);
-
          sb.append(getEasyConfig().getActiveImportConfig().isDeleteDeviceFiles
                ? Messages.Import_Data_HTML_DeleteDeviceFiles_Yes
                : Messages.Import_Data_HTML_DeleteDeviceFiles_No);
+
+         sb.append(NL);
       }
 
       return sb.toString();
@@ -2512,7 +2516,7 @@ public class RawDataView extends ViewPart implements
        * Equipment
        */
       String htmlEquipment = UI.EMPTY_STRING;
-      if (importLauncher.isSetEquipment()) {
+      if (importLauncher.isSetEquipmentAndIsAvailable()) {
 
          final String stateImage = createHTML_BgImage(_imageUrl_State_Equipment);
 
@@ -2857,7 +2861,7 @@ public class RawDataView extends ViewPart implements
 
    private String createText_EquipmentGroup(final ImportLauncher importLauncher) {
 
-      final String equipmentGroupID = importLauncher.equipmentGroupID;
+      final String equipmentGroupID = importLauncher.equipmentOneGroupID;
 
       final EquipmentGroup equipmentGroup = EquipmentGroupManager.getEquipmentGroup(equipmentGroupID);
       final Set<Equipment> allEquipment = EquipmentGroupManager.getEquipment(equipmentGroupID);
@@ -4013,11 +4017,15 @@ public class RawDataView extends ViewPart implements
 
             } else {
 
-               cell.setText(EquipmentManager.getEquipmentNames(allEquipment));
+               final List<Long> allEquipmentIDs = tourData.getEquipmentIds();
+
+               final ValueFormat valueFormat = colDef.getValueFormat_Detail();
+               final String text = EquipmentManager.getEquipmentNames(allEquipmentIDs, valueFormat);
+
+               cell.setText(text);
             }
          }
       });
-
    }
 
    /**
@@ -4759,7 +4767,7 @@ public class RawDataView extends ViewPart implements
 
          // draw multiple tour types in one image
 
-         final ArrayList<SpeedTourType> allSpeedVertices = importConfig.speedTourTypes;
+         final List<SpeedTourType> allSpeedVertices = importConfig.speedTourTypes;
 
          final ImageData swtImageData = new ImageData(
                configWidthScaled,
@@ -6027,7 +6035,7 @@ public class RawDataView extends ViewPart implements
          /*
           * 9. Set equipment from a group
           */
-         if (importLauncher.isSetEquipmentGroup) {
+         if (importLauncher.isSetEquipment) {
             runEasyImport_009_SetEquipment(importLauncher, importedTours);
          }
 
@@ -6348,19 +6356,64 @@ public class RawDataView extends ViewPart implements
    private void runEasyImport_009_SetEquipment(final ImportLauncher importLauncher,
                                                final ArrayList<TourData> allImportedTours) {
 
-      final String equipmentGroupID = importLauncher.equipmentGroupID;
-      final EquipmentGroup equipmentGroup = EquipmentGroupManager.getEquipmentGroup(equipmentGroupID);
+      final Enum<EquipmentConfig> eqConfig = importLauncher.equipmentConfig;
 
-      if (equipmentGroup == null) {
-         return;
-      }
+      if (EquipmentConfig.EQUIPMENT_CONFIG_BY_SPEED.equals(eqConfig)) {
 
-      // "9. Set tour equipment from the equipment group %s"
-      TourLogManager.log_DEFAULT(EasyImportManager.LOG_EASY_IMPORT_009_SET_EQUIPMENT.formatted(createText_EquipmentGroup(importLauncher)));
+         // "9. Set tour equipment from the equipment group %s"
+         TourLogManager.log_DEFAULT(EasyImportManager.LOG_EASY_IMPORT_009_SET_EQUIPMENT.formatted(createText_EquipmentGroup(importLauncher)));
 
-      for (final TourData tourData : allImportedTours) {
+         for (final TourData tourData : allImportedTours) {
 
-         tourData.setEquipment(equipmentGroup.allEquipment);
+            final float tourDistanceMeter = tourData.getTourDistance();
+            final long movingTime = tourData.getTourComputedTime_Moving();
+
+            double tourAvgSpeed = 0;
+
+            if (movingTime != 0) {
+               tourAvgSpeed = tourDistanceMeter / movingTime * 3.6;
+            }
+
+            if (tourAvgSpeed != 0) {
+
+               final List<SpeedEquipment> allEqSpeed = importLauncher.allEquipmentSpeeds;
+               String eqGroupId = null;
+
+               // find equipment for the tour avg speed
+               for (final SpeedEquipment eqSpeed : allEqSpeed) {
+
+                  if (tourAvgSpeed <= eqSpeed.avgSpeed) {
+
+                     eqGroupId = eqSpeed.equipmentGroupID;
+
+                     final Set<Equipment> allEquipment = EquipmentGroupManager.getEquipment(eqGroupId);
+
+                     if (allEquipment != null) {
+                        tourData.setEquipment(allEquipment);
+                     }
+
+                     break;
+                  }
+               }
+            }
+         }
+
+      } else if (EquipmentConfig.EQUIPMENT_CONFIG_ONE_FOR_ALL.equals(eqConfig)) {
+
+         final String equipmentGroupID = importLauncher.equipmentOneGroupID;
+         final EquipmentGroup equipmentGroup = EquipmentGroupManager.getEquipmentGroup(equipmentGroupID);
+
+         if (equipmentGroup == null) {
+            return;
+         }
+
+         // "9. Set tour equipment from the equipment group %s"
+         TourLogManager.log_DEFAULT(EasyImportManager.LOG_EASY_IMPORT_009_SET_EQUIPMENT.formatted(createText_EquipmentGroup(importLauncher)));
+
+         for (final TourData tourData : allImportedTours) {
+
+            tourData.setEquipment(equipmentGroup.allEquipment);
+         }
       }
    }
 

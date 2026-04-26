@@ -140,6 +140,7 @@ public class RawDataManager {
 
    public static final int               ADJUST_IMPORT_YEAR_IS_DISABLED   = -1;
 
+   static final ComboEnumEntry<?>[]      ALL_IMPORT_EQUIPMENT_CONFIG;
    static final ComboEnumEntry<?>[]      ALL_IMPORT_TOUR_TYPE_CONFIG;
 
    private static boolean                _importState_IsIgnoreInvalidFile = RawDataView.STATE_IS_IGNORE_INVALID_FILE_DEFAULT;
@@ -148,12 +149,22 @@ public class RawDataManager {
 
    static {
 
+// SET_FORMATTING_OFF
+
+      ALL_IMPORT_EQUIPMENT_CONFIG = new ComboEnumEntry<?>[] {
+
+            new ComboEnumEntry<>("Set one equipment group for all imported tours",  EquipmentConfig.EQUIPMENT_CONFIG_ONE_FOR_ALL),
+            new ComboEnumEntry<>("Set equipment group by average speed",            EquipmentConfig.EQUIPMENT_CONFIG_BY_SPEED)
+      };
+
+
       ALL_IMPORT_TOUR_TYPE_CONFIG = new ComboEnumEntry<?>[] {
 
-            new ComboEnumEntry<>(Messages.Import_Data_TourTypeConfig_OneForAll, TourTypeConfig.TOUR_TYPE_CONFIG_ONE_FOR_ALL),
-            new ComboEnumEntry<>(Messages.Import_Data_TourTypeConfig_BySpeed, TourTypeConfig.TOUR_TYPE_CONFIG_BY_SPEED)
-
+            new ComboEnumEntry<>(Messages.Import_Data_TourTypeConfig_OneForAll,  TourTypeConfig.TOUR_TYPE_CONFIG_ONE_FOR_ALL),
+            new ComboEnumEntry<>(Messages.Import_Data_TourTypeConfig_BySpeed,    TourTypeConfig.TOUR_TYPE_CONFIG_BY_SPEED)
       };
+
+// SET_FORMATTING_ON
 
       _importState_DefaultCadenceMultiplier = (CadenceMultiplier) Util.getStateEnum(_state_RawDataView,
             RawDataView.STATE_DEFAULT_CADENCE_MULTIPLIER,

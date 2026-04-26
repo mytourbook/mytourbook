@@ -1745,9 +1745,9 @@ public class Util {
     * @param key
     * @param defaultValue
     * @param minValue
-    *           Float min value.
+    *           Float min value
     * @param maxValue
-    *           Float max value.
+    *           Float max value
     *
     * @return
     */

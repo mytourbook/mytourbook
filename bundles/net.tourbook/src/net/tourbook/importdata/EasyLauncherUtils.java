@@ -70,28 +70,78 @@ public class EasyLauncherUtils {
       _nf1.setMaximumFractionDigits(1);
    }
 
-   public static void createText_EquipmentGroup(final ImportLauncher importLauncher, final StringBuilder sb) {
+   public static void createText_Equipment(final ImportLauncher importLauncher, final StringBuilder sb) {
 
-      final EquipmentGroup equipmentGroup = EquipmentGroupManager.getEquipmentGroup(importLauncher.equipmentGroupID);
-      final Set<Equipment> allEquipment = EquipmentGroupManager.getEquipment(importLauncher.equipmentGroupID);
+      final Enum<EquipmentConfig> eqConfig = importLauncher.equipmentConfig;
 
-      if (equipmentGroup == null || allEquipment == null) {
+      if (EquipmentConfig.EQUIPMENT_CONFIG_BY_SPEED == eqConfig) {
 
-         return;
+         final List<SpeedEquipment> allEqSpeeds = importLauncher.allEquipmentSpeeds;
+
+         final StringBuilder sbSpeed = new StringBuilder();
+
+         for (int speedIndex = 0; speedIndex < allEqSpeeds.size(); speedIndex++) {
+
+            final SpeedEquipment eqSpeed = allEqSpeeds.get(speedIndex);
+
+            final String eqGroupId = eqSpeed.equipmentGroupID;
+            final int avgSpeed = Math.round(eqSpeed.avgSpeed / UI.UNIT_VALUE_DISTANCE);
+
+            final EquipmentGroup eqGroup = EquipmentGroupManager.getEquipmentGroup(eqGroupId);
+            final Set<Equipment> allEquipment = EquipmentGroupManager.getEquipment(eqGroupId);
+
+            if (eqGroup == null || allEquipment == null) {
+               continue;
+            }
+
+            if (speedIndex > 0) {
+//               sbSpeed.append(NL);
+            }
+
+            sbSpeed.append(avgSpeed);
+            sbSpeed.append(UI.SPACE);
+            sbSpeed.append(UI.UNIT_LABEL_SPEED);
+            sbSpeed.append(UI.DASH_WITH_DOUBLE_SPACE);
+            sbSpeed.append(eqGroup.name);
+            sbSpeed.append(NL);
+            sbSpeed.append(NL);
+            sbSpeed.append(createText_Equipment_OneGroup(allEquipment));
+            sbSpeed.append(NL);
+         }
+
+         sb.append("Set equipment: By Speed\n\n%s".formatted(sbSpeed.toString()));
+
+      } else if (EquipmentConfig.EQUIPMENT_CONFIG_ONE_FOR_ALL == eqConfig) {
+
+         final String eqGroupId = importLauncher.equipmentOneGroupID;
+
+         final EquipmentGroup eqGroup = EquipmentGroupManager.getEquipmentGroup(eqGroupId);
+         final Set<Equipment> allEquipment = EquipmentGroupManager.getEquipment(eqGroupId);
+
+         if (eqGroup == null || allEquipment == null) {
+            return;
+         }
+
+         final String eqText = createText_Equipment_OneGroup(allEquipment);
+
+         sb.append(Messages.Import_Data_HTML_SetEquipment_YES.formatted(eqGroup.name, eqText));
+         sb.append(NL);
       }
+   }
+
+   private static String createText_Equipment_OneGroup(final Set<Equipment> allEquipment) {
 
       final List<Equipment> sortedEquipment = new ArrayList<>(allEquipment);
       Collections.sort(sortedEquipment);
 
-      final StringBuilder sbEquipment = new StringBuilder();
+      final StringBuilder sb = new StringBuilder();
 
       for (final Equipment equipment : sortedEquipment) {
 
-         sbEquipment.append(UI.SPACE3 + equipment.getName() + NL);
+         sb.append(UI.SPACE3 + equipment.getName() + NL);
       }
 
-      sb.append(NL);
-      sb.append(Messages.Import_Data_HTML_SetEquipment_YES.formatted(equipmentGroup.name, sbEquipment.toString()));
+      return sb.toString();
    }
 
    public static void createText_TagsGroup(final ImportLauncher importLauncher, final StringBuilder sb) {
@@ -114,71 +164,82 @@ public class EasyLauncherUtils {
          sbTags.append(UI.SPACE3 + tourTag.getTagName() + NL);
       }
 
-      sb.append(NL);
       sb.append(Messages.Import_Data_HTML_SetTourTags_YES.formatted(tagGroup.name, sbTags.toString()));
+      sb.append(NL);
    }
 
-   public static String createText_TourType(final ImportLauncher importLauncher, final String tileName) {
+   public static void createText_TourType(final ImportLauncher importLauncher,
+                                          final String tileName,
+                                          final StringBuilder sb) {
 
-      final StringBuilder ttText = new StringBuilder();
       final Enum<TourTypeConfig> ttConfig = importLauncher.tourTypeConfig;
 
       if (TourTypeConfig.TOUR_TYPE_CONFIG_BY_SPEED.equals(ttConfig)) {
 
-         final ArrayList<SpeedTourType> speedTourTypes = importLauncher.speedTourTypes;
-         boolean isSpeedAdded = false;
+         final List<SpeedTourType> allSpeedTourTypes = importLauncher.speedTourTypes;
 
-         for (final SpeedTourType speedTT : speedTourTypes) {
+         final StringBuilder sbSpeed = new StringBuilder();
 
-            if (isSpeedAdded) {
-               ttText.append(NL);
-            }
+         for (int speedIndex = 0; speedIndex < allSpeedTourTypes.size(); speedIndex++) {
+
+            final SpeedTourType speedTT = allSpeedTourTypes.get(speedIndex);
 
             final long tourTypeId = speedTT.tourTypeId;
             final double avgSpeed = (speedTT.avgSpeed / UI.UNIT_VALUE_DISTANCE) + 0.0001;
 
-            ttText.append(UI.SPACE3);
-            ttText.append((int) avgSpeed);
-            ttText.append(UI.SPACE);
-            ttText.append(UI.UNIT_LABEL_SPEED);
-            ttText.append(UI.DASH_WITH_DOUBLE_SPACE);
-            ttText.append(net.tourbook.ui.UI.getTourTypeLabel(tourTypeId));
+            if (speedIndex > 0) {
+//               sbSpeed.append(NL);
+            }
 
-            isSpeedAdded = true;
+            sbSpeed.append(UI.SPACE3);
+            sbSpeed.append((int) avgSpeed);
+            sbSpeed.append(UI.SPACE);
+            sbSpeed.append(UI.UNIT_LABEL_SPEED);
+            sbSpeed.append(UI.DASH_WITH_DOUBLE_SPACE);
+            sbSpeed.append(net.tourbook.ui.UI.getTourTypeLabel(tourTypeId));
+            sbSpeed.append(NL);
          }
+
+         sb.append("Set tour type: By Speed\n\n%s".formatted(sbSpeed.toString()));
+         sb.append(NL);
 
       } else if (TourTypeConfig.TOUR_TYPE_CONFIG_ONE_FOR_ALL.equals(ttConfig)) {
 
          final TourType oneTourType = importLauncher.oneTourType;
+
+         String ttName = UI.EMPTY_STRING;
+
          if (oneTourType != null) {
 
-            final String ttName = oneTourType.getName();
+            ttName = oneTourType.getName();
             final CadenceMultiplier ttCadence = importLauncher.oneTourTypeCadence;
 
             // show this text only when the name is different
-            if (!tileName.equals(ttName)) {
-               ttText.append(String.format("%s (%s)", ttName, ttCadence.getNlsLabel()));//$NON-NLS-1$
+            if (tileName.equals(ttName) == false) {
+//               sb.append(String.format("%s (%s)", ttName, ttCadence.getNlsLabel()));//$NON-NLS-1$
             }
-         }
-      }
 
-      return ttText.toString();
+         }
+
+         sb.append("Set tour type: %s".formatted(ttName));
+         sb.append(NL);
+      }
    }
 
    private String createLauncherTooltip(final ImportLauncher importLauncher) {
 
       final StringBuilder sb = new StringBuilder();
 
-      final String tileName = importLauncher.name.trim();
+      final String launcherName = importLauncher.name.trim();
       final String tileDescription = importLauncher.description.trim();
-      final String tourTypeText = createText_TourType(importLauncher, tileName);
 
       {
-         // tour type name
+         // launcher name
 
-         if (tileName.length() > 0) {
+         if (launcherName.length() > 0) {
 
-            sb.append(tileName);
+            sb.append(launcherName);
+            sb.append(NL);
             sb.append(NL);
          }
       }
@@ -187,7 +248,6 @@ public class EasyLauncherUtils {
 
          if (tileDescription.length() > 0) {
 
-            sb.append(NL);
             sb.append(tileDescription);
             sb.append(NL);
          }
@@ -195,10 +255,21 @@ public class EasyLauncherUtils {
       {
          // tour type text
 
-         if (tourTypeText.length() > 0) {
+         if (importLauncher.isSetTourType) {
 
-            sb.append(NL);
-            sb.append(tourTypeText);
+            createText_TourType(importLauncher, launcherName, sb);
+         }
+      }
+      {
+         // equipment
+
+         if (importLauncher.isSetEquipment) {
+
+            createText_Equipment(importLauncher, sb);
+
+         } else {
+
+            sb.append(Messages.Import_Data_HTML_SetEquipment_NO);
             sb.append(NL);
          }
       }
@@ -208,24 +279,12 @@ public class EasyLauncherUtils {
          if (importLauncher.isSetTourTagGroup) {
 
             createText_TagsGroup(importLauncher, sb);
+            sb.append(NL);
 
          } else {
 
-            sb.append(NL);
             sb.append(Messages.Import_Data_HTML_SetTourTags_NO);
-         }
-      }
-      {
-         // equipment group
-
-         if (importLauncher.isSetEquipmentGroup) {
-
-            createText_EquipmentGroup(importLauncher, sb);
-
-         } else {
-
             sb.append(NL);
-            sb.append(Messages.Import_Data_HTML_SetEquipment_NO);
          }
       }
       {
@@ -235,16 +294,14 @@ public class EasyLauncherUtils {
 
          final String distanceValue = _nf1.format(distance) + UI.SPACE1 + UI.UNIT_LABEL_DISTANCE;
 
-         sb.append(NL);
-
          sb.append(importLauncher.isSetLastMarker
                ? NLS.bind(Messages.Import_Data_HTML_LastMarker_Yes, distanceValue, importLauncher.lastMarkerText)
                : Messages.Import_Data_HTML_LastMarker_No);
+
+         sb.append(NL);
       }
       {
          // adjust temperature
-
-         sb.append(NL);
 
          if (importLauncher.isAdjustTemperature) {
 
@@ -262,51 +319,53 @@ public class EasyLauncherUtils {
 
             sb.append(Messages.Import_Data_HTML_AdjustTemperature_No);
          }
+
+         sb.append(NL);
       }
       {
          // adjust elevation
 
-         sb.append(NL);
-
          sb.append(importLauncher.isReplaceFirstTimeSliceElevation
                ? Messages.Import_Data_HTML_ReplaceFirstTimeSliceElevation_Yes
                : Messages.Import_Data_HTML_ReplaceFirstTimeSliceElevation_No);
+
+         sb.append(NL);
       }
       {
          // set elevation from SRTM
 
-         sb.append(NL);
-
          sb.append(importLauncher.isReplaceElevationFromSRTM
                ? Messages.Import_Data_HTML_ReplaceElevationFromSRTM_Yes
                : Messages.Import_Data_HTML_ReplaceElevationFromSRTM_No);
+
+         sb.append(NL);
       }
       {
          // retrieve weather data
 
-         sb.append(NL);
-
          sb.append(importLauncher.isRetrieveWeatherData
                ? Messages.Import_Data_HTML_RetrieveWeatherData_Yes
                : Messages.Import_Data_HTML_RetrieveWeatherData_No);
+
+         sb.append(NL);
       }
       {
          // retrieve tour location
 
-         sb.append(NL);
-
          sb.append(importLauncher.isRetrieveTourLocation
                ? Messages.Import_Data_HTML_RetrieveTourLocation_Yes
                : Messages.Import_Data_HTML_RetrieveTourLocation_No);
+
+         sb.append(NL);
       }
       {
          // save tour
 
-         sb.append(NL);
-
          sb.append(importLauncher.isSaveTour
                ? Messages.Import_Data_HTML_SaveTour_Yes
                : Messages.Import_Data_HTML_SaveTour_No);
+
+         sb.append(NL);
       }
 
       return sb.toString();
@@ -622,11 +681,26 @@ public class EasyLauncherUtils {
 
             final ImportLauncher importLauncher = (ImportLauncher) cell.getElement();
 
-            if (importLauncher.isSetEquipmentGroup) {
+            if (importLauncher.isSetEquipment) {
 
-               final EquipmentGroup equipmentGroup = EquipmentGroupManager.getEquipmentGroup(importLauncher.equipmentGroupID);
+               final Enum<EquipmentConfig> eqConfig = importLauncher.equipmentConfig;
 
-               cell.setText(equipmentGroup == null ? UI.EMPTY_STRING : equipmentGroup.name);
+               String eqText = UI.EMPTY_STRING;
+
+               if (EquipmentConfig.EQUIPMENT_CONFIG_ONE_FOR_ALL == eqConfig) {
+
+                  final EquipmentGroup eqGroup = EquipmentGroupManager.getEquipmentGroup(importLauncher.equipmentOneGroupID);
+
+                  eqText = eqGroup == null ? UI.EMPTY_STRING : eqGroup.name;
+
+               } else if (EquipmentConfig.EQUIPMENT_CONFIG_BY_SPEED == eqConfig) {
+
+                  final List<SpeedEquipment> allEqSpeeds = importLauncher.allEquipmentSpeeds;
+
+                  eqText = "Speed #" + allEqSpeeds.size();
+               }
+
+               cell.setText(eqText);
 
             } else {
 
