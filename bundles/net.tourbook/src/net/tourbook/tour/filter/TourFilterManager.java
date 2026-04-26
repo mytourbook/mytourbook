@@ -484,6 +484,14 @@ public class TourFilterManager {
       // List of products (is empty vs is not empty, cf. tour title)
       // Product's name (starts with, ends with, contains, equals, not equals)
       // Product's barcode (is equals, not equals)
+
+      allConfigs.add(
+            TourFilterFieldConfig
+                  .name(Messages.Tour_Filter_Field_NutritionProductsList)
+                  .fieldId(TourFilterFieldId.NUTRITION_PRODUCTSLIST)
+                  .fieldType(TourFilterFieldType.TEXT)
+                  .fieldOperators(FILTER_OPERATORS_TEXT));
+
       allConfigs.add(
             TourFilterFieldConfig
                   .name(Messages.Tour_Filter_Field_Distance)
