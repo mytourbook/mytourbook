@@ -27,6 +27,7 @@ import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotView;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotShell;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTable;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import utils.UITest;
@@ -35,6 +36,7 @@ import utils.Utils;
 public class TourNutritionViewTests extends UITest {
 
    @Test
+   @Disabled("Skipped because the OpenFoodFacts API is unreliable")
    void testAddTourNutritionItem() {
 
       /*
