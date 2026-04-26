@@ -3,7 +3,7 @@
    <classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-21"/>
    <classpathentry kind="con" path="org.eclipse.pde.core.requiredPlugins"/>
    <classpathentry kind="src" path="src"/>
-   <classpathentry exported="true" kind="lib" path="c3p0-0.12.0.jar"/>                                                                                         <!-- https://mvnrepository.com/artifact/com.mchange/c3p0 -->
+   <classpathentry exported="true" kind="lib" path="c3p0-0.13.0.jar"/>                                                                                         <!-- https://mvnrepository.com/artifact/com.mchange/c3p0 -->
    <classpathentry exported="true" kind="lib" path="caffeine-3.2.3.jar"                   sourcepath="jar-sources/caffeine-3.2.3-sources.jar"/>                <!-- https://mvnrepository.com/artifact/com.github.ben-manes.caffeine/caffeine -->
    <classpathentry exported="true" kind="lib" path="commons-imaging-1.0.0-alpha6.jar"     sourcepath="jar-sources/commons-imaging-1.0.0-alpha6-sources.jar"/>  <!-- https://mvnrepository.com/artifact/org.apache.commons/commons-imaging -->
    <classpathentry exported="true" kind="lib" path="commons-io-2.21.0.jar"                sourcepath="jar-sources/commons-io-2.21.0-sources.jar"/>             <!-- https://mvnrepository.com/artifact/commons-io/commons-io -->
@@ -19,7 +19,7 @@
    <classpathentry exported="true" kind="lib" path="joda-time-2.14.1.jar"                 sourcepath="jar-sources/joda-time-2.14.1-sources.jar"/>              <!-- https://mvnrepository.com/artifact/joda-time/joda-time -->
    <classpathentry exported="true" kind="lib" path="json-20251224.jar"/>                                                                                       <!-- https://mvnrepository.com/artifact/org.json/json -->
    <classpathentry exported="true" kind="lib" path="lat-lon-timezone-converter-2019-04-30.jar" />                                                              <!-- https://github.com/drtimcooper/LatLongToTimezone/blob/master/src/main/java/com/skedgo/converter/TimezoneMapper.java -->
-   <classpathentry exported="true" kind="lib" path="mchange-commons-java-0.4.0.jar"/>                                                                          <!-- https://mvnrepository.com/artifact/com.mchange/mchange-commons-java -->
+   <classpathentry exported="true" kind="lib" path="mchange-commons-java-0.5.0.jar"/>                                                                          <!-- https://mvnrepository.com/artifact/com.mchange/mchange-commons-java -->
    <classpathentry exported="true" kind="lib" path="simplelatlng-1.4.0.jar"               sourcepath="jar-sources/simplelatlng-1.4.0-sources.jar"/>            <!-- https://mvnrepository.com/artifact/com.javadocmd/simplelatlng -->
    <classpathentry exported="true" kind="lib" path="url-detector-0.1.23.jar"/>                                                                                 <!-- https://mvnrepository.com/artifact/io.github.url-detector/url-detector -->
    <classpathentry exported="true" kind="lib" path="jsvg-2.0.0.jar"                       sourcepath="jar-sources/jsvg-2.0.0-sources.jar"/>                    <!-- https://mvnrepository.com/artifact/com.github.weisj/jsvg -->/>
