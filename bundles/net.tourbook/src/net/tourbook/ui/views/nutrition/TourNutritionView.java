@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2024, 2025 Frédéric Bard
+ * Copyright (C) 2024, 2026 Frédéric Bard
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -1634,14 +1634,23 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
       for (final TourNutritionProduct tourNutritionProduct : tourNutritionProducts) {
 
          // We skip the custom products
-         if (net.tourbook.common.util.StringUtils.isNullOrEmpty(tourNutritionProduct.getProductCode())) {
+         if (net.tourbook.common.util.StringUtils.isNullOrEmpty(
+               tourNutritionProduct.getProductCode())) {
             continue;
          }
 
          //get the most up-to-date product info from the api
-         final Product updatedProduct = NutritionUtils.searchProduct(
+         final List<Product> searchProductResults = NutritionUtils.searchProduct(
                tourNutritionProduct.getProductCode(),
-               ProductSearchType.ByCode).get(0);
+               ProductSearchType.ByCode);
+
+         if (searchProductResults.isEmpty()) {
+            // If the product cannot be found anymore, we keep the old product info.
+            updatedTourNutritionProducts.add(tourNutritionProduct);
+            continue;
+         }
+
+         final Product updatedProduct = searchProductResults.get(0);
 
          final TourNutritionProduct updatedTourNutritionProduct = new TourNutritionProduct(
                _tourData,
