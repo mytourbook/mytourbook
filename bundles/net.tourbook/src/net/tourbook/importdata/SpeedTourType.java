@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2026 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -17,24 +17,20 @@ package net.tourbook.importdata;
 
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.database.TourDatabase;
-import net.tourbook.tour.CadenceMultiplier;
 
 public class SpeedTourType implements Comparable<Object>, Cloneable {
 
    /**
-    * Average speed for this tour type in km/h.
+    * Average speed for this tour type in km/h
     */
-   public float             avgSpeed;
-   public long              tourTypeId = TourDatabase.ENTITY_IS_NOT_SAVED;
-
-   public CadenceMultiplier cadenceMultiplier;
+   public float avgSpeed;
+   public long  tourTypeId = TourDatabase.ENTITY_IS_NOT_SAVED;
 
    public SpeedTourType() {}
 
-   public SpeedTourType(final int avgSpeed, final CadenceMultiplier cadenceMultiplier) {
-      
+   public SpeedTourType(final int avgSpeed) {
+
       this.avgSpeed = avgSpeed;
-      this.cadenceMultiplier = cadenceMultiplier;
    }
 
    @Override
@@ -67,7 +63,6 @@ public class SpeedTourType implements Comparable<Object>, Cloneable {
             //
             + ("avgSpeed=" + avgSpeed + ", ") //$NON-NLS-1$ //$NON-NLS-2$
             + ("tourTypeId=" + tourTypeId + ", ") //$NON-NLS-1$ //$NON-NLS-2$
-            + ("cadenceMultiplier=" + cadenceMultiplier + ", ") //$NON-NLS-1$ //$NON-NLS-2$
 
             + "]"; //$NON-NLS-1$
    }

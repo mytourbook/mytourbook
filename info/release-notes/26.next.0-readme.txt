@@ -46,6 +46,10 @@ New / Improvements
 Changes
 =======
 
+* Easyimport
+  - Improved launcher tab layout
+  - Cadence settings needs to be recreated, they are not related any more with the tour type settings
+
 * Equipment
   - Multiple equipment with an empty type are not collated any more, each equipment with an empty type can now collate tours for itself
     Update your equipment by removing the type when this equipment/part is not depending on another with the same type

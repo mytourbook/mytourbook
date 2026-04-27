@@ -845,7 +845,6 @@ public class Messages extends NLS {
    public static String        Dialog_ImportConfig_Label_BackgroundOpacity_Tooltip;
    public static String        Dialog_ImportConfig_Label_BackupFolder;
    public static String        Dialog_ImportConfig_Label_BackupFolder_Tooltip;
-   public static String        Dialog_ImportConfig_Label_ConfigDescription;
    public static String        Dialog_ImportConfig_Label_ConfigName;
    public static String        Dialog_ImportConfig_Label_ConfigTileSize;
    public static String        Dialog_ImportConfig_Label_ConfigTileSize_Tooltip;

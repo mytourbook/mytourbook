@@ -84,30 +84,34 @@ public abstract class TVITaggingView_Item extends TreeViewerItem {
    /**
     * Content which is displayed in the first tree column
     */
-   String             firstColumn;
+   String firstColumn;
 
-   long               colDistance;
+   /*
+    * THESE FIELD MUST BE PUBLIC THAT net.tourbook.common.util.TreeViewerItem.scrambleValues() HAS
+    * ACCESS !!!
+    */
+   public long        colDistance;
 
-   long               colElapsedTime;
-   long               colRecordedTime;
-   long               colMovingTime;
-   long               colPausedTime;
+   public long        colElapsedTime;
+   public long        colRecordedTime;
+   public long        colMovingTime;
+   public long        colPausedTime;
 
-   long               colAltitudeUp;
-   long               colAltitudeDown;
+   public long        colAltitudeUp;
+   public long        colAltitudeDown;
 
-   long               colMaxAltitude;
-   long               colMaxPulse;
-   float              colMaxSpeed;
+   public long        colMaxAltitude;
+   public long        colMaxPulse;
+   public float       colMaxSpeed;
 
-   float              colAvgCadence;
-   float              colAvgPace;
-   float              colAvgPulse;
-   float              colAvgSpeed;
-   float              colAvgTemperature_Device;
+   public float       colAvgCadence;
+   public float       colAvgPace;
+   public float       colAvgPulse;
+   public float       colAvgSpeed;
+   public float       colAvgTemperature_Device;
 
-   long               numTours;
-   int                numTags_NoTours;
+   public long        numTours;
+   public int         numTags_NoTours;
 
    private TreeViewer _tagViewer;
 
