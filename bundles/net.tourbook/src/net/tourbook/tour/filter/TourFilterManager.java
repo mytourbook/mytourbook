@@ -1606,6 +1606,13 @@ public class TourFilterManager {
 
       sqlWhere.append(OP_AND + TOUR_NUTRITION_PRODUCTID);
 
+      /**
+       * Ca devrait marcher et ne necessite pas de inner join
+       * SELECT *
+       * FROM A a
+       * WHERE EXISTS (SELECT 1 FROM B b WHERE b.id = a.id )
+       */
+
       if (fieldOperator == TourFilterFieldOperator.IS_AVAILABLE) {
 
          sqlWhere.append(OP_NOT_EQUALS);

@@ -146,7 +146,7 @@ public abstract class TVITaggingView_Item extends TreeViewerItem {
                + "LEFT JOIN " + TourDatabase.TABLE_TOUR_DATA + " AS TourData" //                   //$NON-NLS-1$ //$NON-NLS-2$
                + " ON jtblTagData.TourData_tourId = TourData.tourId" + NL //                       //$NON-NLS-1$
 
-               + "LEFT JOIN " + TourDatabase.TABLE_TOUR_NUTRITION_PRODUCT //$NON-NLS-1$
+               + "LEFT OUTER JOIN " + TourDatabase.TABLE_TOUR_NUTRITION_PRODUCT //$NON-NLS-1$
                + "    AS TNutritionProduct ON " + TourDatabase.TABLE_TOUR_DATA + ".tourID = TNutritionProduct.TourData_tourId" + NL //    //$NON-NLS-1$
 
                + " WHERE jtblTagData.TourTag_TagId = ?" + NL //                                    //$NON-NLS-1$
