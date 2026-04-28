@@ -436,10 +436,6 @@ class CalendarTourDataProvider {
 // SET_FORMATTING_ON
 
          final AppFilter appFilter = new AppFilter(AppFilter.ANY_APP_FILTERS);
-         final String innerJoin = appFilter.getWhereClause().contains("TourNutritionProduct") //$NON-NLS-1$
-               ? "INNER JOIN TOURNUTRITIONPRODUCT AS TourNutritionProduct" //$NON-NLS-1$
-                     + "    ON TourNutritionProduct.TOURDATA_TOURID = TourData.TourID" //$NON-NLS-1$
-               : UI.EMPTY_STRING;
 
          sql = NL
 
@@ -460,7 +456,7 @@ class CalendarTourDataProvider {
                + "   TourDescription," + NL //                    13 //$NON-NLS-1$
                + "   StartWeek," + NL //                          14 //$NON-NLS-1$
                + "   DevicePluginId," + NL //                     15 //$NON-NLS-1$
-               + TourDatabase.TABLE_TOUR_DATA + ".Calories," + NL //                           16 //$NON-NLS-1$
+               + TourDatabase.TABLE_TOUR_DATA + ". Calories," + NL //                           16 //$NON-NLS-1$
 
                + "   TourAltDown," + NL //                        17 //$NON-NLS-1$
                + "   AvgPulse," + NL //                           18 //$NON-NLS-1$
@@ -470,7 +466,7 @@ class CalendarTourDataProvider {
 
                + "FROM " + TourDatabase.TABLE_TOUR_DATA + NL //      //$NON-NLS-1$
 
-               + innerJoin + NL //
+               + appFilter.getInnerJoin() + NL //
 
                + "WHERE  StartYear  = ?" + NL //                     //$NON-NLS-1$
                + "   AND StartMonth = ?" + NL //                     //$NON-NLS-1$

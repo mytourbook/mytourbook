@@ -263,8 +263,8 @@ public class AppFilter {
    public String getInnerJoin() {
 
       final String innerJoin = _sqlWhereClause.contains("TourNutritionProduct") //$NON-NLS-1$
-            ? "INNER JOIN TOURNUTRITIONPRODUCT AS TourNutritionProduct" //$NON-NLS-1$
-                  + "    ON TourNutritionProduct.TOURDATA_TOURID = TourData.TourID" //$NON-NLS-1$
+            ? "INNER JOIN TOURNUTRITIONPRODUCT AS TourNutritionProduct" + //$NON-NLS-1$
+                  " ON TourNutritionProduct.TOURDATA_TOURID = TourData.TourID" //$NON-NLS-1$
             : UI.EMPTY_STRING;
 
       return innerJoin;
