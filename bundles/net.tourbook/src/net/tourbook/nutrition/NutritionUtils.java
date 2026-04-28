@@ -173,18 +173,26 @@ public class NutritionUtils {
 
       for (final TourNutritionProduct tourNutritionProduct : tourNutritionProducts) {
 
+         float calories = 0f;
+
          switch (tourNutritionProduct.getQuantityType()) {
 
          case Servings:
 
-            totalCalories += tourNutritionProduct.getCalories_Serving() * tourNutritionProduct.getConsumedQuantity();
+            calories = tourNutritionProduct.getCalories_Serving() * tourNutritionProduct.getConsumedQuantity();
             break;
 
          case Products:
 
-            totalCalories += tourNutritionProduct.getCalories() * tourNutritionProduct.getConsumedQuantity();
+            calories = tourNutritionProduct.getCalories() * tourNutritionProduct.getConsumedQuantity();
             break;
          }
+
+         if (tourNutritionProduct.getTourBeverageContainer() != null) {
+            calories *= tourNutritionProduct.getContainersConsumed();
+         }
+
+         totalCalories += calories;
       }
 
       return totalCalories;
@@ -196,18 +204,26 @@ public class NutritionUtils {
 
       for (final TourNutritionProduct tourNutritionProduct : tourNutritionProducts) {
 
+         float carbohydrates = 0f;
+
          switch (tourNutritionProduct.getQuantityType()) {
 
          case Servings:
 
-            totalCarbohydrates += tourNutritionProduct.getCarbohydrates_Serving() * tourNutritionProduct.getConsumedQuantity();
+            carbohydrates = tourNutritionProduct.getCarbohydrates_Serving() * tourNutritionProduct.getConsumedQuantity();
             break;
 
          case Products:
 
-            totalCarbohydrates += tourNutritionProduct.getCarbohydrates() * tourNutritionProduct.getConsumedQuantity();
+            carbohydrates = tourNutritionProduct.getCarbohydrates() * tourNutritionProduct.getConsumedQuantity();
             break;
          }
+
+         if (tourNutritionProduct.getTourBeverageContainer() != null) {
+            carbohydrates *= tourNutritionProduct.getContainersConsumed();
+         }
+
+         totalCarbohydrates += carbohydrates;
       }
 
       return totalCarbohydrates;
@@ -256,18 +272,26 @@ public class NutritionUtils {
 
       for (final TourNutritionProduct tourNutritionProduct : tourNutritionProducts) {
 
+         float sodium = 0f;
+
          switch (tourNutritionProduct.getQuantityType()) {
 
          case Servings:
 
-            totalSodium += tourNutritionProduct.getSodium_Serving() * tourNutritionProduct.getConsumedQuantity();
+            sodium = tourNutritionProduct.getSodium_Serving() * tourNutritionProduct.getConsumedQuantity();
             break;
 
          case Products:
 
-            totalSodium += tourNutritionProduct.getSodium() * tourNutritionProduct.getConsumedQuantity();
+            sodium = tourNutritionProduct.getSodium() * tourNutritionProduct.getConsumedQuantity();
             break;
          }
+
+         if (tourNutritionProduct.getTourBeverageContainer() != null) {
+            sodium *= tourNutritionProduct.getContainersConsumed();
+         }
+
+         totalSodium += sodium;
       }
 
       return totalSodium;
