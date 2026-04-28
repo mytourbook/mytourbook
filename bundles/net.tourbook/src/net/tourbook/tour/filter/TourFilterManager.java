@@ -968,7 +968,6 @@ public class TourFilterManager {
          long value1;
          long value2;
 
-
          switch (fieldId) {
          case ALTITUDE_DOWN:
 
@@ -1057,7 +1056,7 @@ public class TourFilterManager {
             break;
 
          case NUTRITION_PRODUCTSLIST:
-            getSQL_Nutrition_ProductsList(sqlWhere, fieldOperator);
+            getSQL_Nutrition_ProductsList(sqlWhere, sqlParameters, fieldOperator);
             break;
 
          case TOUR_MANUAL_TOUR:
@@ -1601,23 +1600,21 @@ public class TourFilterManager {
    }
 
    private static void getSQL_Nutrition_ProductsList(final StringBuilder sqlWhere,
+                                                     final ArrayList<Object> sqlParameters,
                                                      final TourFilterFieldOperator fieldOperator) {
 
-      final String sqlField = TOUR_DATA_NUTRITION_PRODUCTSLIST;
-
-      final String sql_IN_ManualId = " IN ('" //$NON-NLS-1$
-            + TourData.DEVICE_ID_FOR_MANUAL_TOUR + "', '" //$NON-NLS-1$
-            + TourData.DEVICE_ID_CSV_TOUR_DATA_READER + "'" //$NON-NLS-1$
-            + ")\n"; //$NON-NLS-1$
+      sqlWhere.append(OP_AND + TOUR_DATA_NUTRITION_PRODUCTSLIST);
 
       if (fieldOperator == TourFilterFieldOperator.IS_AVAILABLE) {
 
-         sqlWhere.append(OP_AND + sqlField + sql_IN_ManualId);
+         sqlWhere.append(OP_NOT_EQUALS);
 
       } else {
 
-         sqlWhere.append(OP_AND + sqlField + OP_NOT + sql_IN_ManualId);
+         sqlWhere.append(OP_EQUALS);
       }
+
+      sqlParameters.add("[]"); //$NON-NLS-1$
 
    }
 
