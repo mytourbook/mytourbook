@@ -305,6 +305,8 @@ public class NatTable_DataLoader {
 
                + "FROM TOURDATA AS TourData" + NL //           //$NON-NLS-1$
 
+               + appFilter.getInnerJoin() + NL //
+
                + partFilter.getSqlString()
 
                + "WHERE 1=1" + NL //                           //$NON-NLS-1$
@@ -395,9 +397,9 @@ public class NatTable_DataLoader {
 
                   + "FROM TOURDATA AS TourData" + NL //                             //$NON-NLS-1$
 
-                  + partFilter.getSqlString()
+                  + innerJoin + NL //
 
-                  + innerJoin //
+                  + partFilter.getSqlString()
 
                   + "WHERE 1=1" + NL //                                             //$NON-NLS-1$
 

@@ -1058,7 +1058,7 @@ public class TourFilterManager {
 
          case NUTRITION_PRODUCTSLIST:
             //TODO FB
-            //getSQL_Nutrition_ProductsList(sqlWhere, sqlParameters, fieldOperator);
+            getSQL_Nutrition_ProductsList(sqlWhere, sqlParameters, fieldOperator);
             break;
 
          case TOUR_MANUAL_TOUR:
