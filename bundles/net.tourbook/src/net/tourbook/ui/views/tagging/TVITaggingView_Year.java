@@ -173,6 +173,9 @@ public class TVITaggingView_Year extends TVITaggingView_Item {
                + " LEFT OUTER JOIN " + TourDatabase.TABLE_TOUR_DATA + " TourData" + NL //       //$NON-NLS-1$ //$NON-NLS-2$
                + " ON jTdataTtag.TourData_tourId=TourData.tourId " + NL //                      //$NON-NLS-1$
 
+               + "LEFT JOIN " + TourDatabase.TABLE_TOUR_NUTRITION_PRODUCT //$NON-NLS-1$
+               + "    AS TNutritionProduct ON " + TourDatabase.TABLE_TOUR_DATA + ".tourID = TNutritionProduct.TourData_tourId" + NL //    //$NON-NLS-1$
+
                + " WHERE jTdataTtag.TourTag_TagId=?" + NL //                                    //$NON-NLS-1$
                + " AND startYear=?" + NL //                                                     //$NON-NLS-1$
                + sqlFilter.getWhereClause() + NL
@@ -242,6 +245,9 @@ public class TVITaggingView_Year extends TVITaggingView_Item {
                + TVITaggingView_Tour.SQL_TOUR_COLUMNS + NL //                                         3
 
                + "FROM " + TourDatabase.JOINTABLE__TOURDATA__TOURTAG + " AS jTdataTtag" + NL //          //$NON-NLS-1$ //$NON-NLS-2$
+
+               + "LEFT JOIN " + TourDatabase.TABLE_TOUR_NUTRITION_PRODUCT //$NON-NLS-1$
+               + "    AS TNutritionProduct ON " + TourDatabase.TABLE_TOUR_DATA + ".tourID = TNutritionProduct.TourData_tourId" + NL //    //$NON-NLS-1$
 
                // get all tours for current tag and year/month
                + "LEFT JOIN " + TourDatabase.TABLE_TOUR_DATA + " AS TourData" //                         //$NON-NLS-1$ //$NON-NLS-2$

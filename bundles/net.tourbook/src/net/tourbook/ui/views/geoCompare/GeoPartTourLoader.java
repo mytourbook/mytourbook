@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2018, 2023 Wolfgang Schramm and Contributors
+ * Copyright (C) 2018, 2026 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -120,6 +120,8 @@ public class GeoPartTourLoader {
 
                   + " TourId" + NL //                                      //$NON-NLS-1$
                   + " FROM " + TourDatabase.TABLE_TOUR_DATA + NL //        //$NON-NLS-1$
+
+                  + appFilter.getInnerJoin() + NL
 
 // this is very slow
 //                // get tag id's

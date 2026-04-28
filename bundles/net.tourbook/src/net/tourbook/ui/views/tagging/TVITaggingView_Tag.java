@@ -203,6 +203,9 @@ public class TVITaggingView_Tag extends TVITaggingView_Item {
                + "LEFT JOIN " + TourDatabase.TABLE_TOUR_MARKER + " AS Tmarker" //                  //$NON-NLS-1$ //$NON-NLS-2$
                + "  ON TourData.tourId = Tmarker.TourData_tourId" + NL //                          //$NON-NLS-1$
 
+               + "LEFT JOIN " + TourDatabase.TABLE_TOUR_NUTRITION_PRODUCT //$NON-NLS-1$
+               + "    AS TNutritionProduct ON " + TourDatabase.TABLE_TOUR_DATA + ".tourID = TNutritionProduct.TourData_tourId" + NL //    //$NON-NLS-1$
+
                + "WHERE jTdataTtag.TourTag_TagId = ?" + NL //                                      //$NON-NLS-1$
                + whereClause + NL
                + appFilter.getWhereClause() + NL
@@ -313,6 +316,9 @@ public class TVITaggingView_Tag extends TVITaggingView_Item {
                // get all tours for current tag
                + " LEFT OUTER JOIN " + TourDatabase.TABLE_TOUR_DATA + " TourData" + NL //          //$NON-NLS-1$ //$NON-NLS-2$
                + " ON jTdataTtag.TourData_tourId = TourData.tourId " + NL //                       //$NON-NLS-1$
+
+               + "LEFT JOIN " + TourDatabase.TABLE_TOUR_NUTRITION_PRODUCT //$NON-NLS-1$
+               + "    AS TNutritionProduct ON " + TourDatabase.TABLE_TOUR_DATA + ".tourID = TNutritionProduct.TourData_tourId" + NL //    //$NON-NLS-1$
 
                + " WHERE jTdataTtag.TourTag_TagId = ?" + NL //             //$NON-NLS-1$
                + whereClause + NL //

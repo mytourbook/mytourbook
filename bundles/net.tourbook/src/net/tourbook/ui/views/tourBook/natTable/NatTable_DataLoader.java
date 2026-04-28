@@ -375,10 +375,6 @@ public class NatTable_DataLoader {
 
             final AppFilter appFilter = new AppFilter(AppFilter.ANY_APP_FILTERS);
             final String appFilterWhereClause = appFilter.getWhereClause();
-            final String innerJoin = appFilterWhereClause.contains("TourNutritionProduct") //$NON-NLS-1$
-                  ? "INNER JOIN TOURNUTRITIONPRODUCT AS TourNutritionProduct" //$NON-NLS-1$
-                        + "    ON TourNutritionProduct.TOURDATA_TOURID = TourData.TourID" //$NON-NLS-1$
-                  : UI.EMPTY_STRING;
             /*
              * SELECT COUNT(DISTINCT TourData.TourID) AS NumTours
              * FROM "USER".TOURDATA AS TourData
@@ -397,7 +393,7 @@ public class NatTable_DataLoader {
 
                   + "FROM TOURDATA AS TourData" + NL //                             //$NON-NLS-1$
 
-                  + innerJoin + NL //
+                  + appFilter.getInnerJoin() + NL //
 
                   + partFilter.getSqlString()
 
@@ -536,10 +532,11 @@ public class NatTable_DataLoader {
 
                + ") AS tdFiltered" + NL //                                                         //$NON-NLS-1$
 
-               + "LEFT JOIN " + TourDatabase.TABLE_TOUR_MARKER + "               AS tm    ON tdFiltered.tourID = tm.TourData_tourId" + NL //   //$NON-NLS-1$ //$NON-NLS-2$
-               + "LEFT JOIN " + TourDatabase.JOINTABLE__TOURDATA__TOURTAG + "    AS jtt   ON tdFiltered.tourID = jtt.TourData_tourId" + NL //  //$NON-NLS-1$ //$NON-NLS-2$
-               + "LEFT JOIN " + TourDatabase.TABLE_TOUR_NUTRITION_PRODUCT + "    AS np    ON tdFiltered.tourID = np.TourData_tourId" + NL //   //$NON-NLS-1$ //$NON-NLS-2$
-               + "LEFT JOIN " + TourDatabase.JOINTABLE__TOURDATA__EQUIPMENT + "  AS te    ON tdFiltered.tourID = te.TourData_tourId" + NL //   //$NON-NLS-1$ //$NON-NLS-2$
+               + "LEFT JOIN " + TourDatabase.TABLE_TOUR_MARKER + "               AS tm                ON tdFiltered.tourID = tm.TourData_tourId" + NL //   //$NON-NLS-1$ //$NON-NLS-2$
+               + "LEFT JOIN " + TourDatabase.JOINTABLE__TOURDATA__TOURTAG + "    AS jtt               ON tdFiltered.tourID = jtt.TourData_tourId" + NL //  //$NON-NLS-1$ //$NON-NLS-2$
+               + "LEFT JOIN " + TourDatabase.TABLE_TOUR_NUTRITION_PRODUCT //$NON-NLS-1$
+               + "    AS TNutritionProduct ON tdFiltered.tourID = TNutritionProduct.TourData_tourId" + NL //    //$NON-NLS-1$
+               + "LEFT JOIN " + TourDatabase.JOINTABLE__TOURDATA__EQUIPMENT + "  AS te                 ON tdFiltered.tourID = te.TourData_tourId" + NL //   //$NON-NLS-1$ //$NON-NLS-2$
 
                + orderBy + NL;
 

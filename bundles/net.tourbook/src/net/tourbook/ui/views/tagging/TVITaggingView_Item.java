@@ -148,7 +148,11 @@ public abstract class TVITaggingView_Item extends TreeViewerItem {
 
                + " WHERE jtblTagData.TourTag_TagId = ?" + NL //                                    //$NON-NLS-1$
 
-               + appFilter.getWhereClause();
+               + appFilter.getWhereClause()
+
+               + "LEFT JOIN " + TourDatabase.TABLE_TOUR_NUTRITION_PRODUCT //$NON-NLS-1$
+               + "    AS TNutritionProduct ON " + TourDatabase.TABLE_TOUR_DATA + ".tourID = TNutritionProduct.TourData_tourId" + NL //    //$NON-NLS-1$
+         ;
 
          final PreparedStatement statement = conn.prepareStatement(sql);
 
