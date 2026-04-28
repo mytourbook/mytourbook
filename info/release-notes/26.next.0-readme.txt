@@ -64,7 +64,8 @@ Changes that require Tour Re-import
 Bugfix
 ======
   
-* 
+* Tour Nutrition (Frederic)
+  - Fixed an exception when updating the list of products for which a product is not found in the OpenFoodFacts database
 
 
 
