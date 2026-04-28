@@ -1633,15 +1633,15 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
       final Set<TourNutritionProduct> updatedTourNutritionProducts = new HashSet<>();
       for (final TourNutritionProduct tourNutritionProduct : tourNutritionProducts) {
 
+         final String productCode = tourNutritionProduct.getProductCode();
          // We skip the custom products
-         if (net.tourbook.common.util.StringUtils.isNullOrEmpty(
-               tourNutritionProduct.getProductCode())) {
+         if (net.tourbook.common.util.StringUtils.isNullOrEmpty(productCode)) {
             continue;
          }
 
          //get the most up-to-date product info from the api
          final List<Product> searchProductResults = NutritionUtils.searchProduct(
-               tourNutritionProduct.getProductCode(),
+               productCode,
                ProductSearchType.ByCode);
 
          if (searchProductResults.isEmpty()) {
@@ -1651,7 +1651,7 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
             TourLogManager.subLog_ERROR(NLS.bind(
                   Messages.Log_Tour_Nutrition_ProductRetrieval_Error,
                   new Object[] {
-                        tourNutritionProduct.getProductCode(),
+                        productCode,
                         tourNutritionProduct.getName() }));
 
             continue;
