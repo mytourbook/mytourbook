@@ -151,8 +151,7 @@ public abstract class TVITaggingView_Item extends TreeViewerItem {
 
                + " WHERE jtblTagData.TourTag_TagId = ?" + NL //                                    //$NON-NLS-1$
 
-               + appFilter.getWhereClause()
-         ;
+               + appFilter.getWhereClause();
 
          final PreparedStatement statement = conn.prepareStatement(sql);
 
