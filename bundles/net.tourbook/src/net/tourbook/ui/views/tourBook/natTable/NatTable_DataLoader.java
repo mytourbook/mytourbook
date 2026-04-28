@@ -487,7 +487,7 @@ public class NatTable_DataLoader {
        * </code>
        *
        * which is causing exceptions because of differences between the sql and the parameters,
-       * propably because of concurrency !!!
+       * probably because of concurrency !!!
        */
 
       try (Connection conn = TourDatabase.getInstance().getConnection()) {
@@ -506,7 +506,7 @@ public class NatTable_DataLoader {
 
                + "     tm.markerId," + NL //                                                       //$NON-NLS-1$
                + "     jtt.TourTag_TagID  AS TourTag_tagId," + NL //                               //$NON-NLS-1$
-               + "     np.ProductId," + NL //                                                      //$NON-NLS-1$
+               + "     TNutritionProduct.ProductId," + NL //                                                      //$NON-NLS-1$
                + "     te.Equipment_equipmentID" + NL //                                           //$NON-NLS-1$
 
                + "FROM" + NL //                                                                    //$NON-NLS-1$
@@ -660,6 +660,7 @@ public class NatTable_DataLoader {
 
       } catch (final SQLException sqlException) {
 
+         // todo fb ca crashe ici
          final String sqlState = sqlException.getSQLState();
 
          if (TourDatabase.SQL_ERROR_XCL13.equals(sqlState)
