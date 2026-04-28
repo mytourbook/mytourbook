@@ -15,12 +15,6 @@
  *******************************************************************************/
 package net.tourbook.nutrition;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-
 import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.URI;
@@ -47,6 +41,13 @@ import net.tourbook.web.WEB;
 
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.jface.preference.IPreferenceStore;
+
+import tools.jackson.core.JacksonException;
+import tools.jackson.core.type.TypeReference;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.cfg.EnumFeature;
+import tools.jackson.databind.json.JsonMapper;
 
 public class NutritionUtils {
 
@@ -134,8 +135,9 @@ public class NutritionUtils {
 
    private static List<Product> deserializeResponse(final String body, final ProductSearchType productSearchType) {
 
-      final ObjectMapper mapper = new ObjectMapper();
-      mapper.enable(DeserializationFeature.READ_UNKNOWN_ENUM_VALUES_AS_NULL);
+      final ObjectMapper mapper = JsonMapper.builder()
+            .enable(EnumFeature.READ_UNKNOWN_ENUM_VALUES_AS_NULL)
+            .build();
 
       List<Product> deserializedProductsResults = new ArrayList<>();
 
@@ -159,7 +161,7 @@ public class NutritionUtils {
                   new TypeReference<List<Product>>() {});
 
          }
-      } catch (final JsonProcessingException e) {
+      } catch (final JacksonException e) {
          StatusUtil.log(e);
       }
 
@@ -173,26 +175,18 @@ public class NutritionUtils {
 
       for (final TourNutritionProduct tourNutritionProduct : tourNutritionProducts) {
 
-         float calories = 0f;
-
          switch (tourNutritionProduct.getQuantityType()) {
 
          case Servings:
 
-            calories = tourNutritionProduct.getCalories_Serving() * tourNutritionProduct.getConsumedQuantity();
+            totalCalories += tourNutritionProduct.getCalories_Serving() * tourNutritionProduct.getConsumedQuantity();
             break;
 
          case Products:
 
-            calories = tourNutritionProduct.getCalories() * tourNutritionProduct.getConsumedQuantity();
+            totalCalories += tourNutritionProduct.getCalories() * tourNutritionProduct.getConsumedQuantity();
             break;
          }
-
-         if (tourNutritionProduct.getTourBeverageContainer() != null) {
-            calories *= tourNutritionProduct.getContainersConsumed();
-         }
-
-         totalCalories += calories;
       }
 
       return totalCalories;
@@ -204,26 +198,18 @@ public class NutritionUtils {
 
       for (final TourNutritionProduct tourNutritionProduct : tourNutritionProducts) {
 
-         float carbohydrates = 0f;
-
          switch (tourNutritionProduct.getQuantityType()) {
 
          case Servings:
 
-            carbohydrates = tourNutritionProduct.getCarbohydrates_Serving() * tourNutritionProduct.getConsumedQuantity();
+            totalCarbohydrates += tourNutritionProduct.getCarbohydrates_Serving() * tourNutritionProduct.getConsumedQuantity();
             break;
 
          case Products:
 
-            carbohydrates = tourNutritionProduct.getCarbohydrates() * tourNutritionProduct.getConsumedQuantity();
+            totalCarbohydrates += tourNutritionProduct.getCarbohydrates() * tourNutritionProduct.getConsumedQuantity();
             break;
          }
-
-         if (tourNutritionProduct.getTourBeverageContainer() != null) {
-            carbohydrates *= tourNutritionProduct.getContainersConsumed();
-         }
-
-         totalCarbohydrates += carbohydrates;
       }
 
       return totalCarbohydrates;
@@ -272,26 +258,18 @@ public class NutritionUtils {
 
       for (final TourNutritionProduct tourNutritionProduct : tourNutritionProducts) {
 
-         float sodium = 0f;
-
          switch (tourNutritionProduct.getQuantityType()) {
 
          case Servings:
 
-            sodium = tourNutritionProduct.getSodium_Serving() * tourNutritionProduct.getConsumedQuantity();
+            totalSodium += tourNutritionProduct.getSodium_Serving() * tourNutritionProduct.getConsumedQuantity();
             break;
 
          case Products:
 
-            sodium = tourNutritionProduct.getSodium() * tourNutritionProduct.getConsumedQuantity();
+            totalSodium += tourNutritionProduct.getSodium() * tourNutritionProduct.getConsumedQuantity();
             break;
          }
-
-         if (tourNutritionProduct.getTourBeverageContainer() != null) {
-            sodium *= tourNutritionProduct.getContainersConsumed();
-         }
-
-         totalSodium += sodium;
       }
 
       return totalSodium;
