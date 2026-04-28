@@ -1668,11 +1668,11 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
 
       final boolean tourNutritionProductsUpdated =
             _tourData.updateTourNutritionProducts(updatedTourNutritionProducts);
-      reloadViewer();
 
       if (tourNutritionProductsUpdated) {
 
          _tourData = TourManager.saveModifiedTour(_tourData);
+         reloadViewer();
       } else {
          TourLogManager.subLog_INFO(Messages.Log_ModifiedTour_No_New_Data);
       }
