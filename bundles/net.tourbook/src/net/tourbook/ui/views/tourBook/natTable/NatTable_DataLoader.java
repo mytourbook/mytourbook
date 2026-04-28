@@ -375,17 +375,6 @@ public class NatTable_DataLoader {
             PreparedStatement prepStmt;
 
             final AppFilter appFilter = new AppFilter(AppFilter.ANY_APP_FILTERS);
-            final String appFilterWhereClause = appFilter.getWhereClause();
-            /*
-             * SELECT COUNT(DISTINCT TourData.TourID) AS NumTours
-             * FROM "USER".TOURDATA AS TourData
-             * INNER JOIN "USER".TOURNUTRITIONPRODUCT AS TourNutritionProduct
-             * ON TourNutritionProduct.TOURDATA_TOURID = TourData.TourID
-             * -- part filter - START
-             * -- part filter - END
-             * WHERE 1=1
-             * AND TourNutritionProduct.productId != 0
-             */
             final SQLData partFilter = new EquipmentPartFilter().getSqlData();
 
             sql = UI.EMPTY_STRING
@@ -401,7 +390,7 @@ public class NatTable_DataLoader {
 
                   + "WHERE 1=1" + NL //                                             //$NON-NLS-1$
 
-                  + appFilterWhereClause
+                  + appFilter.getWhereClause()
                   + sqlCollectionFilter;
 
             prepStmt = conn.prepareStatement(sql);
