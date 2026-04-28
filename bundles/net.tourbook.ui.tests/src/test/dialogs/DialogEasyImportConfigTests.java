@@ -38,19 +38,19 @@ public class DialogEasyImportConfigTests extends UITest {
       bot.textWithLabel(Messages.Dialog_ImportConfig_Label_ConfigName).setText("New Import For Tests"); //$NON-NLS-1$
 
       // "  &3 +  "
-      bot.cTabItem(DialogEasyImportConfig.IMPORT_LAUNCHER_TAB_1).activate();
+      bot.cTabItem(DialogEasyImportConfig.IMPORT_LAUNCHER_TAB_TOUR_TYPE).activate();
       bot.checkBox(Messages.Dialog_ImportConfig_Checkbox_TourType).select();
       bot.comboBox(0).setSelection(Messages.Import_Data_TourTypeConfig_BySpeed);
 
       //  " &4 . . . 9 "
-      bot.cTabItem(DialogEasyImportConfig.IMPORT_LAUNCHER_TAB_2).activate();
+      bot.cTabItem(DialogEasyImportConfig.IMPORT_LAUNCHER_TAB_OPTIONS_1).activate();
       bot.checkBox(Messages.Dialog_ImportConfig_Checkbox_LastMarker).select();
       bot.checkBox(Messages.Dialog_ImportConfig_Checkbox_AdjustTemperature).select();
       bot.checkBox(Messages.Dialog_ImportConfig_Checkbox_ReplaceFirstTimeSliceElevation).select();
       bot.checkBox(Messages.Dialog_ImportConfig_Checkbox_ReplaceElevationFromSRTM).select();
 
       // " &50 . . . 99 "
-      bot.cTabItem(DialogEasyImportConfig.IMPORT_LAUNCHER_TAB_3).activate();
+      bot.cTabItem(DialogEasyImportConfig.IMPORT_LAUNCHER_TAB_OPTIONS_2).activate();
       bot.checkBox(Messages.Dialog_ImportConfig_Checkbox_RetrieveWeatherData).select();
       bot.checkBox(Messages.Dialog_ImportConfig_Checkbox_SaveTour).select();
 

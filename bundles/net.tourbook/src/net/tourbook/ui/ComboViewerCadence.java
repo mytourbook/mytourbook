@@ -59,6 +59,10 @@ public class ComboViewerCadence extends ComboViewer {
    }
 
    public void setSelection(final CadenceMultiplier selection) {
-      super.setSelection(new StructuredSelection(selection));
+
+      if (selection != null) {
+
+         super.setSelection(new StructuredSelection(selection));
+      }
    }
 }

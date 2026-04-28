@@ -76,6 +76,7 @@ import net.tourbook.common.tooltip.AdvancedSlideout;
 import net.tourbook.common.tooltip.ICloseOpenedDialogs;
 import net.tourbook.common.tooltip.IOpeningDialog;
 import net.tourbook.common.tooltip.OpenDialogManager;
+import net.tourbook.common.ui.SelectionCellLabelProvider;
 import net.tourbook.common.util.ColumnDefinition;
 import net.tourbook.common.util.ColumnManager;
 import net.tourbook.common.util.ColumnProfile;
@@ -104,6 +105,7 @@ import net.tourbook.extension.download.CloudDownloaderManager;
 import net.tourbook.extension.download.TourbookCloudDownloader;
 import net.tourbook.extension.export.ActionExport;
 import net.tourbook.extension.upload.ActionUpload;
+import net.tourbook.importdata.CadenceConfig;
 import net.tourbook.importdata.DeviceImportState;
 import net.tourbook.importdata.DialogEasyImportConfig;
 import net.tourbook.importdata.EasyConfig;
@@ -117,6 +119,7 @@ import net.tourbook.importdata.ImportState_File;
 import net.tourbook.importdata.ImportState_Process;
 import net.tourbook.importdata.OSFile;
 import net.tourbook.importdata.RawDataManager;
+import net.tourbook.importdata.SpeedCadence;
 import net.tourbook.importdata.SpeedEquipment;
 import net.tourbook.importdata.SpeedTourType;
 import net.tourbook.importdata.TourTypeConfig;
@@ -2314,6 +2317,7 @@ public class RawDataView extends ViewPart implements
 
             sb.append(tileDescription);
             sb.append(NL);
+            sb.append(NL);
          }
       }
       {
@@ -2321,24 +2325,11 @@ public class RawDataView extends ViewPart implements
 
          if (importLauncher.isSetTourType) {
 
-            EasyLauncherUtils.createText_TourType(importLauncher, launcherName, sb);
+            EasyLauncherUtils.createTooltipText_TourType(importLauncher, launcherName, sb);
 
          } else {
 
-            sb.append("Set tour type: NO");
-            sb.append(NL);
-         }
-      }
-      {
-         // equipment
-
-         if (importLauncher.isSetEquipmentAndIsAvailable()) {
-
-            EasyLauncherUtils.createText_Equipment(importLauncher, sb);
-
-         } else {
-
-            sb.append(Messages.Import_Data_HTML_SetEquipment_NO);
+            sb.append("Set tour type . . . NO");
             sb.append(NL);
          }
       }
@@ -2347,11 +2338,37 @@ public class RawDataView extends ViewPart implements
 
          if (importLauncher.isSetTags()) {
 
-            EasyLauncherUtils.createText_TagsGroup(importLauncher, sb);
+            EasyLauncherUtils.createTooltipText_Tags(importLauncher, sb);
 
          } else {
 
             sb.append(Messages.Import_Data_HTML_SetTourTags_NO);
+            sb.append(NL);
+         }
+      }
+      {
+         // equipment
+
+         if (importLauncher.isSetEquipmentAndIsAvailable()) {
+
+            EasyLauncherUtils.createTooltipText_Equipment(importLauncher, sb);
+
+         } else {
+
+            sb.append(Messages.Import_Data_HTML_SetEquipment_NO);
+            sb.append(NL);
+         }
+      }
+      {
+         // cadence
+
+         if (importLauncher.isSetCadence) {
+
+            EasyLauncherUtils.createTooltipText_Cadence(importLauncher, sb);
+
+         } else {
+
+            sb.append("Set cadence . . . NO");
             sb.append(NL);
          }
       }
@@ -2857,6 +2874,11 @@ public class RawDataView extends ViewPart implements
       } catch (final IOException e) {
          TourLogManager.log_EXCEPTION_WithStacktrace(e);
       }
+   }
+
+   private String createText_Cadence(final ImportLauncher importLauncher) {
+      // TODO Auto-generated method stub
+      return null;
    }
 
    private String createText_EquipmentGroup(final ImportLauncher importLauncher) {
@@ -3522,6 +3544,8 @@ public class RawDataView extends ViewPart implements
       defineColumn_Motion_AvgSpeed();
       defineColumn_Motion_AvgPace();
 
+      defineColumn_Powertrain_CadenceMultiplier();
+
       defineColumn_Altitude_Up();
       defineColumn_Altitude_Down();
 
@@ -3782,6 +3806,28 @@ public class RawDataView extends ViewPart implements
             final double value = tourDistance / 1000 / UI.UNIT_VALUE_DISTANCE;
 
             colDef.printDetailValue(cell, value);
+         }
+      });
+   }
+
+   /**
+    * Column: Powertrain - Cadence multiplier
+    */
+   private void defineColumn_Powertrain_CadenceMultiplier() {
+
+      final TableColumnDefinition colDef = TableColumnFactory.POWERTRAIN_CADENCE_MULTIPLIER.createColumn(_tourViewer_ColumnManager, _pc);
+      colDef.setLabelProvider(new SelectionCellLabelProvider() {
+         @Override
+         public void update(final ViewerCell cell) {
+
+            final TourData tourData = (TourData) cell.getElement();
+            final double cadenceMultiplier = tourData.getCadenceMultiplier();
+
+            if (cadenceMultiplier == 0) {
+               cell.setText(UI.EMPTY_STRING);
+            } else {
+               cell.setText(_nf1.format(cadenceMultiplier));
+            }
          }
       });
    }
@@ -4767,7 +4813,7 @@ public class RawDataView extends ViewPart implements
 
          // draw multiple tour types in one image
 
-         final List<SpeedTourType> allSpeedVertices = importConfig.speedTourTypes;
+         final List<SpeedTourType> allSpeedVertices = importConfig.allTourTypeSpeeds;
 
          final ImageData swtImageData = new ImageData(
                configWidthScaled,
@@ -6040,6 +6086,13 @@ public class RawDataView extends ViewPart implements
          }
 
          /*
+          * 10. Set cadence
+          */
+         if (importLauncher.isSetCadence) {
+            runEasyImport_010_SetCadence(importLauncher, importedTours);
+         }
+
+         /*
           * 50. Retrieve weather data
           */
          if (importLauncher.isRetrieveWeatherData) {
@@ -6413,6 +6466,68 @@ public class RawDataView extends ViewPart implements
          for (final TourData tourData : allImportedTours) {
 
             tourData.setEquipment(equipmentGroup.allEquipment);
+         }
+      }
+   }
+
+   private void runEasyImport_010_SetCadence(final ImportLauncher importLauncher,
+                                             final ArrayList<TourData> allImportedTours) {
+
+      final Enum<CadenceConfig> cadConfig = importLauncher.cadenceConfig;
+
+      if (CadenceConfig.CADENCE_CONFIG_BY_SPEED.equals(cadConfig)) {
+
+         // "10. Set cadence - %s"
+         TourLogManager.log_DEFAULT(EasyImportManager.LOG_EASY_IMPORT_010_SET_CADENCE.formatted(createText_Cadence(importLauncher)));
+
+         for (final TourData tourData : allImportedTours) {
+
+            final float tourDistanceMeter = tourData.getTourDistance();
+            final long movingTime = tourData.getTourComputedTime_Moving();
+
+            double tourAvgSpeed = 0;
+
+            if (movingTime != 0) {
+               tourAvgSpeed = tourDistanceMeter / movingTime * 3.6;
+            }
+
+            if (tourAvgSpeed != 0) {
+
+               final List<SpeedCadence> allCadSpeed = importLauncher.allCadenceSpeeds;
+
+               // find cadence for the tour avg speed
+               for (final SpeedCadence cadSpeed : allCadSpeed) {
+
+                  if (tourAvgSpeed <= cadSpeed.avgSpeed) {
+
+                     final CadenceMultiplier cadenceMultiplier = cadSpeed.cadenceMultiplier;
+
+                     if (cadenceMultiplier != null) {
+
+                        tourData.setCadenceMultiplier(cadenceMultiplier.getMultiplier());
+
+                        break;
+                     }
+                  }
+               }
+            }
+         }
+
+      } else if (CadenceConfig.CADENCE_CONFIG_ONE_FOR_ALL.equals(cadConfig)) {
+
+         final CadenceMultiplier oneCadence = importLauncher.cadenceOne;
+
+         if (oneCadence != null) {
+
+            final float cadenceMultiplier = oneCadence.getMultiplier();
+
+            // "10. Set cadence - %s"
+            TourLogManager.log_DEFAULT(EasyImportManager.LOG_EASY_IMPORT_010_SET_CADENCE.formatted(createText_Cadence(importLauncher)));
+
+            for (final TourData tourData : allImportedTours) {
+
+               tourData.setCadenceMultiplier(cadenceMultiplier);
+            }
          }
       }
    }

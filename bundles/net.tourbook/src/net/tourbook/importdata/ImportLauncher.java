@@ -43,9 +43,7 @@ public class ImportLauncher implements Cloneable {
    public Enum<TourTypeConfig>  tourTypeConfig;
 
    public TourType              oneTourType;
-   public CadenceMultiplier     oneTourTypeCadence;
-
-   public List<SpeedTourType>   speedTourTypes                = new ArrayList<>();
+   public List<SpeedTourType>   allTourTypeSpeeds             = new ArrayList<>();
 
    /** Contains the image hash or 0 when an image is not displayed. */
    public int                   imageHash;
@@ -157,8 +155,20 @@ public class ImportLauncher implements Cloneable {
     * ID of the {@link EquipmentGroup}
     */
    public String                equipmentOneGroupID;
-
    public List<SpeedEquipment>  allEquipmentSpeeds            = new ArrayList<>();
+
+   /**
+    * When <code>true</code> then all cadence in a groups are set into the tour
+    */
+   public boolean               isSetCadence;
+
+   /**
+    * When <code>null</code> then a cadence config is not set and an empty page is displayed
+    */
+   public Enum<CadenceConfig>   cadenceConfig;
+
+   public CadenceMultiplier     cadenceOne;
+   public List<SpeedCadence>    allCadenceSpeeds              = new ArrayList<>();
 
    public ImportLauncher() {
 
@@ -176,10 +186,10 @@ public class ImportLauncher implements Cloneable {
 
          clonedObject._id = ++_idCreator;
 
-         clonedObject.speedTourTypes = new ArrayList<>();
+         clonedObject.allTourTypeSpeeds = new ArrayList<>();
 
-         for (final SpeedTourType speedVertex : speedTourTypes) {
-            clonedObject.speedTourTypes.add(speedVertex.clone());
+         for (final SpeedTourType speedVertex : allTourTypeSpeeds) {
+            clonedObject.allTourTypeSpeeds.add(speedVertex.clone());
          }
 
       } catch (final CloneNotSupportedException e) {
@@ -269,9 +279,9 @@ public class ImportLauncher implements Cloneable {
 
       if (TourTypeConfig.TOUR_TYPE_CONFIG_BY_SPEED.equals(tourTypeConfig)) {
 
-         final int numVertices = speedTourTypes.size();
+         final int numVertices = allTourTypeSpeeds.size();
 
-         imageHash = speedTourTypes.hashCode();
+         imageHash = allTourTypeSpeeds.hashCode();
          imageWidth = numVertices * TourType.TOUR_TYPE_IMAGE_SIZE;
 
       } else if (TourTypeConfig.TOUR_TYPE_CONFIG_ONE_FOR_ALL.equals(tourTypeConfig)) {
@@ -301,8 +311,8 @@ public class ImportLauncher implements Cloneable {
 
       final int maxLen = 5;
 
-      final List<SpeedTourType> subAllSpeedTourTypes = speedTourTypes != null
-            ? speedTourTypes.subList(0, Math.min(speedTourTypes.size(), maxLen))
+      final List<SpeedTourType> subAllSpeedTourTypes = allTourTypeSpeeds != null
+            ? allTourTypeSpeeds.subList(0, Math.min(allTourTypeSpeeds.size(), maxLen))
             : null;
 
       final List<SpeedEquipment> subAllEquipmentSpeeds = allEquipmentSpeeds != null

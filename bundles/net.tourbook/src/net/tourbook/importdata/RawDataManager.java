@@ -140,6 +140,7 @@ public class RawDataManager {
 
    public static final int               ADJUST_IMPORT_YEAR_IS_DISABLED   = -1;
 
+   static final ComboEnumEntry<?>[]      ALL_IMPORT_CADENCE_CONFIG;
    static final ComboEnumEntry<?>[]      ALL_IMPORT_EQUIPMENT_CONFIG;
    static final ComboEnumEntry<?>[]      ALL_IMPORT_TOUR_TYPE_CONFIG;
 
@@ -151,10 +152,16 @@ public class RawDataManager {
 
 // SET_FORMATTING_OFF
 
+      ALL_IMPORT_CADENCE_CONFIG = new ComboEnumEntry<?>[] {
+
+            new ComboEnumEntry<>("Set one cadence for all imported tours",       CadenceConfig.CADENCE_CONFIG_ONE_FOR_ALL),
+            new ComboEnumEntry<>("Set cadence by average speed",                 CadenceConfig.CADENCE_CONFIG_BY_SPEED)
+      };
+
       ALL_IMPORT_EQUIPMENT_CONFIG = new ComboEnumEntry<?>[] {
 
-            new ComboEnumEntry<>("Set one equipment group for all imported tours",  EquipmentConfig.EQUIPMENT_CONFIG_ONE_FOR_ALL),
-            new ComboEnumEntry<>("Set equipment group by average speed",            EquipmentConfig.EQUIPMENT_CONFIG_BY_SPEED)
+         new ComboEnumEntry<>("Set one equipment group for all imported tours",  EquipmentConfig.EQUIPMENT_CONFIG_ONE_FOR_ALL),
+         new ComboEnumEntry<>("Set equipment group by average speed",            EquipmentConfig.EQUIPMENT_CONFIG_BY_SPEED)
       };
 
 
