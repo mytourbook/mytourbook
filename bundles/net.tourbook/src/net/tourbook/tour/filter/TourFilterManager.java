@@ -62,7 +62,6 @@ public class TourFilterManager {
    private static final String TOUR_DATA_TEMPERATURE_AVG_DEVICE = "TourData.weather_Temperature_Average_Device"; //$NON-NLS-1$
    private static final String TOUR_DATA_MANUAL_TOUR            = "TourData.devicePluginId";                     //$NON-NLS-1$
    private static final String TOUR_DATA_NUMBER_OF_PHOTOS       = "TourData.numberOfPhotos";                     //$NON-NLS-1$
-   private static final String TOUR_DATA_NUTRITION_PRODUCTSLIST = "TourData.tourNutritionProducts";              //$NON-NLS-1$
    private static final String TOUR_DATA_POWER_AVG              = "TourData.power_Avg";                          //$NON-NLS-1$
    private static final String TOUR_DATA_POWER_MAX              = "TourData.power_Max";                          //$NON-NLS-1$
    private static final String TOUR_DATA_POWER_NORMALIZED       = "TourData.power_Normalized";                   //$NON-NLS-1$
@@ -83,6 +82,8 @@ public class TourFilterManager {
 
    private static final String TOUR_FILTER_FILE_NAME            = "tour-filter.xml";                             //$NON-NLS-1$
    private static final int    TOUR_FILTER_VERSION              = 1;
+
+   private static final String TOUR_NUTRITION_PRODUCTID         = "TourNutritionProduct.productId";              //$NON-NLS-1$
 
    private static final String TAG_PROFILE                      = "Profile";                                     //$NON-NLS-1$
    private static final String TAG_PROPERTY                     = "Property";                                    //$NON-NLS-1$
@@ -1603,7 +1604,7 @@ public class TourFilterManager {
                                                      final ArrayList<Object> sqlParameters,
                                                      final TourFilterFieldOperator fieldOperator) {
 
-      sqlWhere.append(OP_AND + TOUR_DATA_NUTRITION_PRODUCTSLIST);
+      sqlWhere.append(OP_AND + TOUR_NUTRITION_PRODUCTID);
 
       if (fieldOperator == TourFilterFieldOperator.IS_AVAILABLE) {
 
@@ -1614,7 +1615,7 @@ public class TourFilterManager {
          sqlWhere.append(OP_EQUALS);
       }
 
-      sqlParameters.add("[]"); //$NON-NLS-1$
+      sqlParameters.add("0"); //$NON-NLS-1$
 
    }
 
