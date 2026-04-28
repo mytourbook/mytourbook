@@ -449,7 +449,7 @@ public class TourDatabase {
        * Set derby debug properties, this is helpful when debugging, the log is written into
        * derby.log
        */
-      System.setProperty("derby.language.logStatementText", "true");
+//      System.setProperty("derby.language.logStatementText", "true");
 //      System.setProperty("derby.language.logQueryPlan", "true");
 
 // FOR DEBUGGING - END
@@ -4636,6 +4636,7 @@ public class TourDatabase {
             + ")" //                                                                          //$NON-NLS-1$
       );
 
+      SQL.createIndex_Table__Column(stmt, TABLE_DEVICE_SENSOR_VALUE, KEY_TOUR);
       SQL.createIndex_Table__Column(stmt, TABLE_DEVICE_SENSOR_VALUE, "TourStartTime"); //$NON-NLS-1$
    }
 
@@ -5535,6 +5536,8 @@ public class TourDatabase {
 
             + ")" //$NON-NLS-1$
       );
+
+      SQL.createIndex_Table__Column(stmt, TABLE_TOUR_MARKER, KEY_TOUR);
    }
 
    /**
@@ -5612,7 +5615,10 @@ public class TourDatabase {
 
             // Version 58 - end
 
-            + ")"); //$NON-NLS-1$
+            + ")" //$NON-NLS-1$
+      );
+
+      SQL.createIndex_Table__Column(stmt, TABLE_TOUR_NUTRITION_PRODUCT, KEY_TOUR);
    }
 
    /**
@@ -5750,6 +5756,8 @@ public class TourDatabase {
 
       // Create index for {@link TourPhoto}, it will dramatically improve performance.
       SQL.createIndex_Simple(stmt, TABLE_TOUR_PHOTO, "ImageFilePathName"); //$NON-NLS-1$
+
+      SQL.createIndex_Table__Column(stmt, TABLE_TOUR_PHOTO, KEY_TOUR);
    }
 
    /**
@@ -5786,7 +5794,10 @@ public class TourDatabase {
 
             // version 51 end ---------
 
-            + ")"); //$NON-NLS-1$
+            + ")" //$NON-NLS-1$
+      );
+
+      SQL.createIndex_Table__Column(stmt, TABLE_TOUR_REFERENCE, KEY_TOUR);
    }
 
    /**
@@ -6052,7 +6063,10 @@ public class TourDatabase {
 
             // version 28 end ---------
 
-            + ")"); //$NON-NLS-1$
+            + ")" //$NON-NLS-1$
+      );
+
+      SQL.createIndex_Table__Column(stmt, TABLE_TOUR_WAYPOINT, KEY_TOUR);
    }
 
    private String createUIServerStateMessage(final int stateCounter) {
@@ -11714,8 +11728,15 @@ public class TourDatabase {
             SQL.addColumn_VarCar    (stmt, TABLE_EQUIPMENT_PART,  "PurchaseLocation",  DB_LENGTH_NAME);     //$NON-NLS-1$
             SQL.addColumn_SmallInt  (stmt, TABLE_EQUIPMENT_PART,  "WeightUnit",        DEFAULT_0);          //$NON-NLS-1$
 
-// SET_FORMATTING_ON
 
+            SQL.createIndex_Table__Column(stmt, TABLE_DEVICE_SENSOR_VALUE,    KEY_TOUR);
+            SQL.createIndex_Table__Column(stmt, TABLE_TOUR_MARKER,            KEY_TOUR);
+            SQL.createIndex_Table__Column(stmt, TABLE_TOUR_NUTRITION_PRODUCT, KEY_TOUR);
+            SQL.createIndex_Table__Column(stmt, TABLE_TOUR_PHOTO,             KEY_TOUR);
+            SQL.createIndex_Table__Column(stmt, TABLE_TOUR_REFERENCE,         KEY_TOUR);
+            SQL.createIndex_Table__Column(stmt, TABLE_TOUR_WAYPOINT,          KEY_TOUR);
+
+// SET_FORMATTING_ON
          }
          stmt.close();
       }

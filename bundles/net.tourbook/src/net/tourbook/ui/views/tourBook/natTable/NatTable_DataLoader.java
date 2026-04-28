@@ -481,7 +481,14 @@ public class NatTable_DataLoader {
 
          final String orderBy = createSql_Sorting_OrderBy();
 
-         sql = NL
+         sql = UI.EMPTY_STRING
+
+               + "--" + NL //                                                                            //$NON-NLS-1$
+               + NL
+               + "---------------" + NL //                                                               //$NON-NLS-1$
+               + "-- NatTable_DataLoader.fetchPagedTourItems" + NL //                                    //$NON-NLS-1$
+               + "---------------" + NL //                                                               //$NON-NLS-1$
+               + NL
 
                + "SELECT" + NL //                                                                  //$NON-NLS-1$
 
