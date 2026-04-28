@@ -17,7 +17,7 @@ Bundle-ClassPath: .,
  dropbox-core-sdk-7.0.0.jar,
  java-fs-dropbox-0.1.0.jar,
  java7-fs-base-0.0.3.jar
-Import-Package: com.fasterxml.jackson.core,
+Import-Package: tools.jackson.core,
  net.tourbook,
  net.tourbook.application,
  net.tourbook.data,
