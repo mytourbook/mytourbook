@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2025 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2026 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -7232,7 +7232,7 @@ public class Map2 extends Canvas {
 
       if (_mapPointImageSize.width == 0 || _mapPointImageSize.height == 0) {
 
-         // this happend, the UI is propably not yet fully initialized
+         // this happened, the UI is probably not yet fully initialized
 
          return;
       }
@@ -10460,7 +10460,7 @@ public class Map2 extends Canvas {
 
       if (serieIndex >= tourData.latitudeSerie.length) {
 
-         // this happened, propably a wrong tour was set
+         // this happened, probably a wrong tour was set
 
          return;
       }

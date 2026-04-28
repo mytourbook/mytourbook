@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2014  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2026  Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -72,7 +72,7 @@ public class MapGradientColorProvider {
 
       /*
        * the scaled unit with long min/max values is used because arithmetic with floating point
-       * values fails, BigDecimal could propably solve this problem but I don't have it used yet
+       * values fails, BigDecimal could probably solve this problem but I don't have it used yet
        */
       final long valueScaling = Util.getValueScaling(graphUnit);
       final long scaledUnit = (long) (graphUnit * valueScaling);
