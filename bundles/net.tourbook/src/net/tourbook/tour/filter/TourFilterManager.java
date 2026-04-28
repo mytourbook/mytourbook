@@ -1057,8 +1057,7 @@ public class TourFilterManager {
             break;
 
          case NUTRITION_PRODUCTSLIST:
-            sql = TOUR_DATA_NUTRITION_PRODUCTSLIST;
-            //TODO FB, i don't think text works here, ugh getSQL__FieldOperators_Boolean(sqlWhere, sqlParameters, fieldOperator, sql);
+            getSQL_Nutrition_ProductsList(sqlWhere, fieldOperator);
             break;
 
          case TOUR_MANUAL_TOUR:
@@ -1584,6 +1583,27 @@ public class TourFilterManager {
                                          final TourFilterFieldOperator fieldOperator) {
 
       final String sqlField = TOUR_DATA_MANUAL_TOUR;
+
+      final String sql_IN_ManualId = " IN ('" //$NON-NLS-1$
+            + TourData.DEVICE_ID_FOR_MANUAL_TOUR + "', '" //$NON-NLS-1$
+            + TourData.DEVICE_ID_CSV_TOUR_DATA_READER + "'" //$NON-NLS-1$
+            + ")\n"; //$NON-NLS-1$
+
+      if (fieldOperator == TourFilterFieldOperator.IS_AVAILABLE) {
+
+         sqlWhere.append(OP_AND + sqlField + sql_IN_ManualId);
+
+      } else {
+
+         sqlWhere.append(OP_AND + sqlField + OP_NOT + sql_IN_ManualId);
+      }
+
+   }
+
+   private static void getSQL_Nutrition_ProductsList(final StringBuilder sqlWhere,
+                                                     final TourFilterFieldOperator fieldOperator) {
+
+      final String sqlField = TOUR_DATA_NUTRITION_PRODUCTSLIST;
 
       final String sql_IN_ManualId = " IN ('" //$NON-NLS-1$
             + TourData.DEVICE_ID_FOR_MANUAL_TOUR + "', '" //$NON-NLS-1$
