@@ -260,16 +260,6 @@ public class AppFilter {
       _sqlWhereClause = sqlWhere.toString();
    }
 
-   public String getInnerJoin() {
-
-      final String innerJoin = _sqlWhereClause.contains("np.") //$NON-NLS-1$
-            ? "INNER JOIN TOURNUTRITIONPRODUCT AS np" + //$NON-NLS-1$
-                  " ON np.TOURDATA_TOURID = TourData.TourID" //$NON-NLS-1$
-            : UI.EMPTY_STRING;
-
-      return innerJoin;
-   }
-
    /**
     * @return Returns the WHERE clause to filter tours by the app filter, e.g. person, tour types,
     *         ...

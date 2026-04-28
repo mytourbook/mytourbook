@@ -125,11 +125,11 @@ public class TVICollatedTour_Event extends TVICollatedTour {
             + "LEFT JOIN " + TourDatabase.TABLE_TOUR_MARKER + " Tmarker" //                  //$NON-NLS-1$ //$NON-NLS-2$
             + " ON TourData.tourId = Tmarker.TourData_tourId" + NL //                        //$NON-NLS-1$
 
-            + "WHERE TourStartTime >= ? AND TourStartTime < ?" + NL //                       //$NON-NLS-1$
-            + appFilter.getWhereClause()
-
             + "LEFT JOIN " + TourDatabase.TABLE_TOUR_NUTRITION_PRODUCT //$NON-NLS-1$
             + "    AS TNutritionProduct ON " + TourDatabase.TABLE_TOUR_DATA + ".tourID = TNutritionProduct.TourData_tourId" + NL //    //$NON-NLS-1$
+
+            + "WHERE TourStartTime >= ? AND TourStartTime < ?" + NL //                       //$NON-NLS-1$
+            + appFilter.getWhereClause()
 
             + "ORDER BY TourStartTime" + NL //                                               //$NON-NLS-1$
 

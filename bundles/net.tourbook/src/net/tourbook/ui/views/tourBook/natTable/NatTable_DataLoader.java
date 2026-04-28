@@ -305,7 +305,8 @@ public class NatTable_DataLoader {
 
                + "FROM TOURDATA AS TourData" + NL //           //$NON-NLS-1$
 
-               + appFilter.getInnerJoin() + NL //
+               + "LEFT JOIN " + TourDatabase.TABLE_TOUR_NUTRITION_PRODUCT //$NON-NLS-1$
+               + "    AS TNutritionProduct ON " + TourDatabase.TABLE_TOUR_DATA + ".tourID = TNutritionProduct.TourData_tourId" + NL //    //$NON-NLS-1$
 
                + partFilter.getSqlString()
 
@@ -393,7 +394,8 @@ public class NatTable_DataLoader {
 
                   + "FROM TOURDATA AS TourData" + NL //                             //$NON-NLS-1$
 
-                  + appFilter.getInnerJoin() + NL //
+                  + "LEFT JOIN " + TourDatabase.TABLE_TOUR_NUTRITION_PRODUCT //$NON-NLS-1$
+                  + "    AS TNutritionProduct ON " + TourDatabase.TABLE_TOUR_DATA + ".tourID = TNutritionProduct.TourData_tourId" + NL //    //$NON-NLS-1$
 
                   + partFilter.getSqlString()
 
