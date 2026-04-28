@@ -1647,6 +1647,13 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
          if (searchProductResults.isEmpty()) {
             // If the product cannot be found anymore, we keep the old product info.
             updatedTourNutritionProducts.add(tourNutritionProduct);
+
+            TourLogManager.subLog_ERROR(NLS.bind(
+                  Messages.Log_Tour_Nutrition_ProductRetrieval_Error,
+                  new Object[] {
+                        tourNutritionProduct.getProductCode(),
+                        tourNutritionProduct.getName() }));
+
             continue;
          }
 
@@ -1661,11 +1668,11 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
 
       final boolean tourNutritionProductsUpdated =
             _tourData.updateTourNutritionProducts(updatedTourNutritionProducts);
+      reloadViewer();
 
       if (tourNutritionProductsUpdated) {
 
          _tourData = TourManager.saveModifiedTour(_tourData);
-         reloadViewer();
       } else {
          TourLogManager.subLog_INFO(Messages.Log_ModifiedTour_No_New_Data);
       }

@@ -1542,6 +1542,7 @@ public class Messages extends NLS {
    public static String        Log_Tour_CopyTour;
    public static String        Log_Tour_DeleteTours;
    public static String        Log_Tour_MoveTour;
+   public static String        Log_Tour_Nutrition_ProductRetrieval_Error;
    public static String        Log_Tour_SaveTours;
    public static String        Log_Tour_SaveTours_End;
    public static String        Log_TourLocation_Retrieve_End;
