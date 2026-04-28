@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2024, 2025 Frédéric Bard
+ * Copyright (C) 2024, 2026 Frédéric Bard
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -47,6 +47,7 @@ import net.tourbook.tour.TourManager;
 import net.tourbook.web.WEB;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.MenuManager;
@@ -195,7 +196,7 @@ public class DialogSearchProduct extends TitleAreaDialog implements ITourViewer,
          switch (__sortColumnName) {
 
          case COLUMN_CODE:
-            rc = StringUtils.compareIgnoreCase(p1.code, p2.code);
+            rc = Strings.CI.compare(p1.code, p2.code);
             break;
 
          case COLUMN_QUANTITY:
@@ -203,12 +204,12 @@ public class DialogSearchProduct extends TitleAreaDialog implements ITourViewer,
                   ? UI.EMPTY_STRING : p1.quantity;
             final String quantity2 = net.tourbook.common.util.StringUtils.isNullOrEmpty(p2.quantity)
                   ? UI.EMPTY_STRING : p2.quantity;
-            rc = StringUtils.compareIgnoreCase(quantity1, quantity2);
+            rc = Strings.CI.compare(quantity1, quantity2);
             break;
 
          case COLUMN_NAME:
          default:
-            rc = StringUtils.compareIgnoreCase(p1.productName, p2.productName);
+            rc = Strings.CI.compare(p1.productName, p2.productName);
             break;
 
          }
@@ -216,7 +217,7 @@ public class DialogSearchProduct extends TitleAreaDialog implements ITourViewer,
          if (rc == 0) {
 
             // subsort 1 by name
-            rc = StringUtils.compareIgnoreCase(p1.productName, p2.productName);
+            rc = Strings.CI.compare(p1.productName, p2.productName);
          }
 
          // if descending order, flip the direction

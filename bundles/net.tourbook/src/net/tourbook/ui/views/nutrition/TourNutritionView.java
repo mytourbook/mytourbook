@@ -66,7 +66,7 @@ import net.tourbook.tour.TourLogState;
 import net.tourbook.tour.TourLogView;
 import net.tourbook.tour.TourManager;
 
-import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.eclipse.e4.ui.di.PersistState;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IMenuManager;
@@ -433,7 +433,7 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
 
          case COLUMN_NAME:
          default:
-            rc = StringUtils.compareIgnoreCase(tnp1.getName(), tnp2.getName());
+            rc = Strings.CI.compare(tnp1.getName(), tnp2.getName());
             break;
 
          }
@@ -441,7 +441,7 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
          if (rc == 0) {
 
             // subsort 1 by name
-            rc = StringUtils.compareIgnoreCase(tnp1.getName(), tnp2.getName());
+            rc = Strings.CI.compare(tnp1.getName(), tnp2.getName());
          }
 
          // if descending order, flip the direction
