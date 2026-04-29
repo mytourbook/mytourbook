@@ -14,14 +14,14 @@ Require-Bundle: net.tourbook,
 Bundle-ActivationPolicy: lazy
 Bundle-ClassPath: .,
  hibernate-entitymanager.jar,
- jsonassert-1.5.1.jar,
+ jsonassert-2.0-rc1.jar,
  xmlunit-core-2.11.0.jar,
  HttpClientMock-1.0.0.jar,
  hamcrest-3.0.jar
 Bundle-Vendor: MyTourbook
 Bundle-RequiredExecutionEnvironment: JavaSE-21
-Import-Package: com.fasterxml.jackson.core.type,
- com.fasterxml.jackson.databind,
+Import-Package: tools.jackson.core.type,
+ tools.jackson.databind,
  net.tourbook.cloud.oauth2,
  net.tourbook.cloud.strava,
  net.tourbook.cloud.suunto,
