@@ -204,7 +204,7 @@ public class PhotoLoadManager {
    }
 
    /**
-    * Check if loading state is reset, it happend VERY OFTEN that it was NOT reset. It happened
+    * Check if loading state is reset, it happened VERY OFTEN that it was NOT reset. It happened
     * when zoomed in and scrolled very quickly, then some images are never loaded until a folder
     * refresh.
     */
@@ -366,7 +366,6 @@ public class PhotoLoadManager {
       photo.setLoadingState(PhotoLoadingState.IMAGE_IS_IN_LOADING_QUEUE, imageQuality);
 
       final int imageSize = photo.isSvgImage() ? svgImageSize : _hqImageSize;
-
 
       // set HQ image loading item into the waiting queue
       _waitingQueueHQ.add(new PhotoImageLoader(

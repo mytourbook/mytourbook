@@ -152,7 +152,7 @@ public abstract class ActionToolbarSlideoutAdv extends ContributionItem implemen
       if (_actionToolItem == null) {
 
          /*
-          * This case happend when MT was shutting down
+          * This case happened when MT was shutting down
           * https://github.com/mytourbook/mytourbook/issues/1290
           */
 

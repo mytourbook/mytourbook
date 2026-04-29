@@ -470,7 +470,7 @@ public class NatTable_DataLoader {
        * </code>
        *
        * which is causing exceptions because of differences between the sql and the parameters,
-       * propably because of concurrency !!!
+       * probably because of concurrency !!!
        */
 
       try (Connection conn = TourDatabase.getInstance().getConnection()) {
