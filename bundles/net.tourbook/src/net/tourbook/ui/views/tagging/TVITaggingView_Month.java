@@ -155,7 +155,7 @@ public class TVITaggingView_Month extends TVITaggingView_Item {
 
                + "SELECT" + NL //                                                                     //$NON-NLS-1$
 
-               + "   tourID," + NL //                                                              1	//$NON-NLS-1$
+               + "   tourID," + NL //                                                              1  //$NON-NLS-1$
                + "   jTdataTtag.TourTag_tagId," + NL //                                            2  //$NON-NLS-1$
 
                + TVITaggingView_Tour.SQL_TOUR_COLUMNS + NL //                                      3
@@ -177,9 +177,6 @@ public class TVITaggingView_Month extends TVITaggingView_Item {
                // get marker ids
                + "LEFT JOIN " + TourDatabase.TABLE_TOUR_MARKER + " AS Tmarker" //                     //$NON-NLS-1$ //$NON-NLS-2$
                + "  ON TourData.tourId = Tmarker.TourData_tourId" + NL //                             //$NON-NLS-1$
-
-               + "LEFT JOIN " + TourDatabase.TABLE_TOUR_NUTRITION_PRODUCT //$NON-NLS-1$
-               + "    AS TNutritionProduct ON " + TourDatabase.TABLE_TOUR_DATA + ".tourID = TNutritionProduct.TourData_tourId" + NL //    //$NON-NLS-1$
 
                + "WHERE jTdataTtag.TourTag_TagId = ?" + NL //                                         //$NON-NLS-1$
                + "  AND startYear                = ?" + NL //                                         //$NON-NLS-1$
