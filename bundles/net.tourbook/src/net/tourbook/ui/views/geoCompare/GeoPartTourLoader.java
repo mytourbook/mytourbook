@@ -198,7 +198,6 @@ public class GeoPartTourLoader {
     * @param useAppFilter
     * @param previousGeoCompareData
     * @param geoPartView
-    *
     * @return
     */
    static GeoCompareData loadToursFromGeoParts(final long refTour_TourId,

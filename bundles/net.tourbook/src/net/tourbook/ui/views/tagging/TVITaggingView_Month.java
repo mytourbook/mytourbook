@@ -155,7 +155,7 @@ public class TVITaggingView_Month extends TVITaggingView_Item {
 
                + "SELECT" + NL //                                                                     //$NON-NLS-1$
 
-               + "   tourID," + NL //                                                              1  //$NON-NLS-1$
+               + "   tourID," + NL //                                                              1	//$NON-NLS-1$
                + "   jTdataTtag.TourTag_tagId," + NL //                                            2  //$NON-NLS-1$
 
                + TVITaggingView_Tour.SQL_TOUR_COLUMNS + NL //                                      3
