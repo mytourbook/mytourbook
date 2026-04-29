@@ -2260,7 +2260,7 @@ public class Map2 extends Canvas {
 
          if (pauseWorldPixelPosition == null) {
 
-            // this happend but it should not
+            // this happened but it should not
 
             continue;
          }
