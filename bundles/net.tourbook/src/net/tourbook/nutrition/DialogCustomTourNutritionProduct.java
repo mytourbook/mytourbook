@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2024, 2025 Frédéric Bard
+ * Copyright (C) 2024, 2026 Frédéric Bard
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -255,7 +255,8 @@ public class DialogCustomTourNutritionProduct extends Dialog {
       _checkIsBeverage.setSelection(_product.isBeverage());
    }
 
-   public TourNutritionProduct getTourNutritionProduct(final TourData tourData) {
+   public TourNutritionProduct getTourNutritionProduct(final TourData tourData,
+                                                       final TourNutritionProduct originalProduct) {
 
       final TourNutritionProduct product = new TourNutritionProduct(tourData, true);
       product.setName(_name.trim());
@@ -276,8 +277,15 @@ public class DialogCustomTourNutritionProduct extends Dialog {
 
       product.setIsBeverage(_isBeverage);
       if (_isBeverage) {
+
          product.setBeverageQuantity(_beverageQuantity);
          product.setBeverageQuantity_Serving((int) Math.round(_beverageQuantity * 1.0 / _numServings));
+      }
+
+      if (originalProduct != null) {
+
+         product.setTourBeverageContainer(originalProduct.getTourBeverageContainer());
+         product.setContainersConsumed(originalProduct.getContainersConsumed());
       }
 
       return product;
