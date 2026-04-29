@@ -146,7 +146,7 @@ public class DialogCustomTourNutritionProduct extends Dialog {
             // Label: calories
             UI.createLabel(container, Messages.Dialog_CustomTourNutritionProduct_Label_Calories);
             _spinnerCalories = new Spinner(container, SWT.BORDER);
-            _spinnerCalories.setMinimum(1);
+            _spinnerCalories.setMinimum(0);
             _spinnerCalories.setMaximum(5000);
             _spinnerCalories.addModifyListener(event -> onModifyCalories(event));
             GridDataFactory.fillDefaults()
@@ -161,7 +161,7 @@ public class DialogCustomTourNutritionProduct extends Dialog {
             // Label: carbohydrates
             UI.createLabel(container, Messages.Dialog_CustomTourNutritionProduct_Label_Carbohydrates);
             _spinnerCarbohydrates = new Spinner(container, SWT.BORDER);
-            _spinnerCarbohydrates.setMinimum(1);
+            _spinnerCarbohydrates.setMinimum(0);
             _spinnerCarbohydrates.setMaximum(5000);
             _spinnerCarbohydrates.addModifyListener(event -> onModifyCarbohydrates(event));
             GridDataFactory.fillDefaults()
@@ -177,7 +177,7 @@ public class DialogCustomTourNutritionProduct extends Dialog {
             UI.createLabel(container, Messages.Dialog_CustomTourNutritionProduct_Label_Sodium);
 
             _spinnerSodium = new Spinner(container, SWT.BORDER);
-            _spinnerSodium.setMinimum(1);
+            _spinnerSodium.setMinimum(0);
             _spinnerSodium.setMaximum(5000);
             _spinnerSodium.addModifyListener(event -> onModifySodium(event));
             GridDataFactory.fillDefaults()
