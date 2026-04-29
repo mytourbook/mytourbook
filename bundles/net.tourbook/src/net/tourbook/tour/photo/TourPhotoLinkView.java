@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2012, 2025 Wolfgang Schramm and Contributors
+ * Copyright (C) 2012, 2026 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -2380,7 +2380,7 @@ public class TourPhotoLinkView extends ViewPart implements ITourProvider, ITourV
 
       if (_allPhotos.isEmpty()) {
 
-         // view is not fully initialized, this happend in the pref listener
+         // view is not fully initialized, this happened in the pref listener
          return;
       }
 

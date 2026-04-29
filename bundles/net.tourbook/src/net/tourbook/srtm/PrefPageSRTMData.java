@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2022 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2026 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -93,8 +93,8 @@ public class PrefPageSRTMData extends PreferencePage implements IWorkbenchPrefer
    public void applyData(final Object data) {
 
       if (_prefContainer == null) {
-         
-         // this happend during debugging
+
+         // this happened during debugging
          return;
       }
 
