@@ -63,11 +63,11 @@ public class DialogCustomTourNutritionProduct extends Dialog {
 
    private Spinner              _spinnerNumServings;
    private Spinner              _spinnerBeverageQuantity;
+   private Spinner              _spinnerCalories;
+   private Spinner              _spinnerCarbohydrates;
+   private Spinner              _spinnerSodium;
 
-   private Text                 _txtCalories;
-   private Text                 _txtCarbohydrates;
    private Text                 _txtName;
-   private Text                 _txtSodium;
 
    public DialogCustomTourNutritionProduct(final Shell parentShell,
                                            final boolean isEditMode,
@@ -145,12 +145,14 @@ public class DialogCustomTourNutritionProduct extends Dialog {
          {
             // Label: calories
             UI.createLabel(container, Messages.Dialog_CustomTourNutritionProduct_Label_Calories);
-            _txtCalories = new Text(container, SWT.BORDER);
-            _txtCalories.addModifyListener(event -> onModifyCalories(event));
+            _spinnerCalories = new Spinner(container, SWT.BORDER);
+            _spinnerCalories.setMinimum(1);
+            _spinnerCalories.setMaximum(5000);
+            _spinnerCalories.addModifyListener(event -> onModifyCalories(event));
             GridDataFactory.fillDefaults()
                   .hint(HINT_TEXT_COLUMN_WIDTH, SWT.DEFAULT)
                   .align(SWT.BEGINNING, SWT.CENTER)
-                  .applyTo(_txtCalories);
+                  .applyTo(_spinnerCalories);
 
             // Unit: kcal
             UI.createLabel(container, OtherMessages.VALUE_UNIT_K_CALORIES);
@@ -158,12 +160,14 @@ public class DialogCustomTourNutritionProduct extends Dialog {
          {
             // Label: carbohydrates
             UI.createLabel(container, Messages.Dialog_CustomTourNutritionProduct_Label_Carbohydrates);
-            _txtCarbohydrates = new Text(container, SWT.BORDER);
-            _txtCarbohydrates.addModifyListener(event -> onModifyCarbohydrates(event));
+            _spinnerCarbohydrates = new Spinner(container, SWT.BORDER);
+            _spinnerCarbohydrates.setMinimum(1);
+            _spinnerCarbohydrates.setMaximum(5000);
+            _spinnerCarbohydrates.addModifyListener(event -> onModifyCarbohydrates(event));
             GridDataFactory.fillDefaults()
                   .hint(HINT_TEXT_COLUMN_WIDTH, SWT.DEFAULT)
                   .align(SWT.BEGINNING, SWT.CENTER)
-                  .applyTo(_txtCarbohydrates);
+                  .applyTo(_spinnerCarbohydrates);
 
             // Unit: g
             UI.createLabel(container, UI.UNIT_WEIGHT_G);
@@ -172,12 +176,14 @@ public class DialogCustomTourNutritionProduct extends Dialog {
             // Label: sodium
             UI.createLabel(container, Messages.Dialog_CustomTourNutritionProduct_Label_Sodium);
 
-            _txtSodium = new Text(container, SWT.BORDER);
-            _txtSodium.addModifyListener(event -> onModifySodium(event));
+            _spinnerSodium = new Spinner(container, SWT.BORDER);
+            _spinnerSodium.setMinimum(1);
+            _spinnerSodium.setMaximum(5000);
+            _spinnerSodium.addModifyListener(event -> onModifySodium(event));
             GridDataFactory.fillDefaults()
                   .hint(HINT_TEXT_COLUMN_WIDTH, SWT.DEFAULT)
                   .align(SWT.BEGINNING, SWT.CENTER)
-                  .applyTo(_txtSodium);
+                  .applyTo(_spinnerSodium);
 
             // Unit: mg
             UI.createLabel(container, UI.UNIT_WEIGHT_MG);
@@ -247,9 +253,9 @@ public class DialogCustomTourNutritionProduct extends Dialog {
          _spinnerNumServings.setSelection(numServings * 100);
       }
 
-      _txtCarbohydrates.setText(String.valueOf(_product.getCarbohydrates()));
-      _txtCalories.setText(String.valueOf(_product.getCalories()));
-      _txtSodium.setText(String.valueOf(_product.getSodium()));
+      _spinnerCarbohydrates.setSelection(_product.getCarbohydrates());
+      _spinnerCalories.setSelection(_product.getCalories());
+      _spinnerSodium.setSelection(_product.getSodium());
       _spinnerBeverageQuantity.setSelection(_product.getBeverageQuantity());
       _spinnerBeverageQuantity.setEnabled(_product.isBeverage());
       _checkIsBeverage.setSelection(_product.isBeverage());
@@ -296,9 +302,9 @@ public class DialogCustomTourNutritionProduct extends Dialog {
 
       _name = _txtName.getText();
       _numServings = (int) Math.round(_spinnerNumServings.getSelection() / 100.0);
-      _calories = UI.verifyIntegerValue(_txtCalories.getText()) ? Integer.valueOf(_txtCalories.getText()) : 0;
-      _carbohydrates = UI.verifyIntegerValue(_txtCarbohydrates.getText()) ? Integer.valueOf(_txtCarbohydrates.getText()) : 0;
-      _sodium = UI.verifyIntegerValue(_txtSodium.getText()) ? Integer.valueOf(_txtSodium.getText()) : 0;
+      _calories = _spinnerCalories.getSelection();
+      _carbohydrates = _spinnerCarbohydrates.getSelection();
+      _sodium = _spinnerSodium.getSelection();
       _isBeverage = _checkIsBeverage.getSelection();
       _beverageQuantity = _isBeverage
             ? _spinnerBeverageQuantity.getSelection()
