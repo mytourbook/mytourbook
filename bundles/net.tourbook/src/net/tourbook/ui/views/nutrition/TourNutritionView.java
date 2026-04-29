@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2024, 2025 Frédéric Bard
+ * Copyright (C) 2024, 2026 Frédéric Bard
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -66,7 +66,7 @@ import net.tourbook.tour.TourLogState;
 import net.tourbook.tour.TourLogView;
 import net.tourbook.tour.TourManager;
 
-import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.eclipse.e4.ui.di.PersistState;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IMenuManager;
@@ -433,7 +433,7 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
 
          case COLUMN_NAME:
          default:
-            rc = StringUtils.compareIgnoreCase(tnp1.getName(), tnp2.getName());
+            rc = Strings.CI.compare(tnp1.getName(), tnp2.getName());
             break;
 
          }
@@ -441,7 +441,7 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
          if (rc == 0) {
 
             // subsort 1 by name
-            rc = StringUtils.compareIgnoreCase(tnp1.getName(), tnp2.getName());
+            rc = Strings.CI.compare(tnp1.getName(), tnp2.getName());
          }
 
          // if descending order, flip the direction
@@ -1633,15 +1633,31 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
       final Set<TourNutritionProduct> updatedTourNutritionProducts = new HashSet<>();
       for (final TourNutritionProduct tourNutritionProduct : tourNutritionProducts) {
 
+         final String productCode = tourNutritionProduct.getProductCode();
          // We skip the custom products
-         if (net.tourbook.common.util.StringUtils.isNullOrEmpty(tourNutritionProduct.getProductCode())) {
+         if (net.tourbook.common.util.StringUtils.isNullOrEmpty(productCode)) {
             continue;
          }
 
          //get the most up-to-date product info from the api
-         final Product updatedProduct = NutritionUtils.searchProduct(
-               tourNutritionProduct.getProductCode(),
-               ProductSearchType.ByCode).get(0);
+         final List<Product> searchProductResults = NutritionUtils.searchProduct(
+               productCode,
+               ProductSearchType.ByCode);
+
+         if (searchProductResults.isEmpty()) {
+            // If the product cannot be found anymore, we keep the old product info.
+            updatedTourNutritionProducts.add(tourNutritionProduct);
+
+            TourLogManager.subLog_ERROR(NLS.bind(
+                  Messages.Log_Tour_Nutrition_ProductRetrieval_Error,
+                  new Object[] {
+                        productCode,
+                        tourNutritionProduct.getName() }));
+
+            continue;
+         }
+
+         final Product updatedProduct = searchProductResults.get(0);
 
          final TourNutritionProduct updatedTourNutritionProduct = new TourNutritionProduct(
                _tourData,

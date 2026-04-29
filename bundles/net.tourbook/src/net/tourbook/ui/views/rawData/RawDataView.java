@@ -7824,7 +7824,7 @@ public class RawDataView extends ViewPart implements
       if (deviceState_ActionToolItem == null) {
 
          /*
-          * This happend during development when closing the import view. It may be possible that
+          * This happened during development when closing the import view. It may be possible that
           * this UI was not yet displayed.
           */
 
