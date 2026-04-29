@@ -383,9 +383,6 @@ public class NatTable_DataLoader {
 
                   + "FROM TOURDATA AS TourData" + NL //                             //$NON-NLS-1$
 
-                  + "LEFT JOIN " + TourDatabase.TABLE_TOUR_NUTRITION_PRODUCT //$NON-NLS-1$
-                  + "    AS TNutritionProduct ON " + TourDatabase.TABLE_TOUR_DATA + ".tourID = TNutritionProduct.TourData_tourId" + NL //    //$NON-NLS-1$
-
                   + partFilter.getSqlString()
 
                   + "WHERE 1=1" + NL //                                             //$NON-NLS-1$
@@ -495,7 +492,7 @@ public class NatTable_DataLoader {
 
                + "     tm.markerId," + NL //                                                       //$NON-NLS-1$
                + "     jtt.TourTag_TagID  AS TourTag_tagId," + NL //                               //$NON-NLS-1$
-               + "     TNutritionProduct.ProductId," + NL //                                                      //$NON-NLS-1$
+               + "     np.ProductId," + NL //                                                      //$NON-NLS-1$
                + "     te.Equipment_equipmentID" + NL //                                           //$NON-NLS-1$
 
                + "FROM" + NL //                                                                    //$NON-NLS-1$
@@ -526,8 +523,8 @@ public class NatTable_DataLoader {
                + "LEFT JOIN " + TourDatabase.TABLE_TOUR_MARKER + "               AS tm                ON tdFiltered.tourID = tm.TourData_tourId" + NL //   //$NON-NLS-1$ //$NON-NLS-2$
                + "LEFT JOIN " + TourDatabase.JOINTABLE__TOURDATA__TOURTAG + "    AS jtt               ON tdFiltered.tourID = jtt.TourData_tourId" + NL //  //$NON-NLS-1$ //$NON-NLS-2$
                + "LEFT JOIN " + TourDatabase.TABLE_TOUR_NUTRITION_PRODUCT //$NON-NLS-1$
-               + "    AS TNutritionProduct ON tdFiltered.tourID = TNutritionProduct.TourData_tourId" + NL //    //$NON-NLS-1$
-               + "LEFT JOIN " + TourDatabase.JOINTABLE__TOURDATA__EQUIPMENT + "  AS te                 ON tdFiltered.tourID = te.TourData_tourId" + NL //   //$NON-NLS-1$ //$NON-NLS-2$
+               + "LEFT JOIN " + TourDatabase.TABLE_TOUR_NUTRITION_PRODUCT + "    AS np    ON tdFiltered.tourID = np.TourData_tourId" + NL //   //$NON-NLS-1$ //$NON-NLS-2$
+               + "LEFT JOIN " + TourDatabase.JOINTABLE__TOURDATA__EQUIPMENT + "  AS te    ON tdFiltered.tourID = te.TourData_tourId" + NL //   //$NON-NLS-1$ //$NON-NLS-2$
 
                + orderBy + NL;
 
