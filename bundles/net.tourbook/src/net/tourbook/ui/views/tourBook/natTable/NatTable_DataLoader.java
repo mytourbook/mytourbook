@@ -305,9 +305,6 @@ public class NatTable_DataLoader {
 
                + "FROM TOURDATA AS TourData" + NL //           //$NON-NLS-1$
 
-               + "LEFT JOIN " + TourDatabase.TABLE_TOUR_NUTRITION_PRODUCT //$NON-NLS-1$
-               + "    AS TNutritionProduct ON " + TourDatabase.TABLE_TOUR_DATA + ".tourID = TNutritionProduct.TourData_tourId" + NL //    //$NON-NLS-1$
-
                + partFilter.getSqlString()
 
                + "WHERE 1=1" + NL //                           //$NON-NLS-1$
@@ -473,7 +470,7 @@ public class NatTable_DataLoader {
        * </code>
        *
        * which is causing exceptions because of differences between the sql and the parameters,
-       * probably because of concurrency !!!
+       * propably because of concurrency !!!
        */
 
       try (Connection conn = TourDatabase.getInstance().getConnection()) {
@@ -520,9 +517,8 @@ public class NatTable_DataLoader {
 
                + ") AS tdFiltered" + NL //                                                         //$NON-NLS-1$
 
-               + "LEFT JOIN " + TourDatabase.TABLE_TOUR_MARKER + "               AS tm                ON tdFiltered.tourID = tm.TourData_tourId" + NL //   //$NON-NLS-1$ //$NON-NLS-2$
-               + "LEFT JOIN " + TourDatabase.JOINTABLE__TOURDATA__TOURTAG + "    AS jtt               ON tdFiltered.tourID = jtt.TourData_tourId" + NL //  //$NON-NLS-1$ //$NON-NLS-2$
-               + "LEFT JOIN " + TourDatabase.TABLE_TOUR_NUTRITION_PRODUCT //$NON-NLS-1$
+               + "LEFT JOIN " + TourDatabase.TABLE_TOUR_MARKER + "               AS tm    ON tdFiltered.tourID = tm.TourData_tourId" + NL //   //$NON-NLS-1$ //$NON-NLS-2$
+               + "LEFT JOIN " + TourDatabase.JOINTABLE__TOURDATA__TOURTAG + "    AS jtt   ON tdFiltered.tourID = jtt.TourData_tourId" + NL //  //$NON-NLS-1$ //$NON-NLS-2$
                + "LEFT JOIN " + TourDatabase.TABLE_TOUR_NUTRITION_PRODUCT + "    AS np    ON tdFiltered.tourID = np.TourData_tourId" + NL //   //$NON-NLS-1$ //$NON-NLS-2$
                + "LEFT JOIN " + TourDatabase.JOINTABLE__TOURDATA__EQUIPMENT + "  AS te    ON tdFiltered.tourID = te.TourData_tourId" + NL //   //$NON-NLS-1$ //$NON-NLS-2$
 
@@ -646,7 +642,6 @@ public class NatTable_DataLoader {
 
       } catch (final SQLException sqlException) {
 
-         // todo fb ca crashe ici
          final String sqlState = sqlException.getSQLState();
 
          if (TourDatabase.SQL_ERROR_XCL13.equals(sqlState)
