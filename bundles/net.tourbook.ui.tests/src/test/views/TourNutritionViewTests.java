@@ -66,8 +66,6 @@ public class TourNutritionViewTests extends UITest {
       bot.comboBox(0).setText("larabar"); //$NON-NLS-1$
       bot.button(Messages.Dialog_SearchProduct_Button_Search).click();
       bot.sleep(20000);
-      bot.button(Messages.Dialog_SearchProduct_Button_Search).click();
-      bot.sleep(5000);
       bot.button(Messages.Dialog_SearchProduct_Button_Add).click();
 
       // Sort the products by name
@@ -84,7 +82,6 @@ public class TourNutritionViewTests extends UITest {
       bot.comboBox(0).setText("tailwind"); //$NON-NLS-1$
       bot.button(Messages.Dialog_SearchProduct_Button_Search).click();
       bot.sleep(20000);
-      bot.button(Messages.Dialog_SearchProduct_Button_Search).click();
       bot.sleep(5000);
       // Act - Add the product via the button in the context menu
       productsSearchTable.click(0, 1);
