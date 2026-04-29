@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2018, 2026 Wolfgang Schramm and Contributors
+ * Copyright (C) 2018, 2023 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -121,9 +121,6 @@ public class GeoPartTourLoader {
                   + " TourId" + NL //                                      //$NON-NLS-1$
                   + " FROM " + TourDatabase.TABLE_TOUR_DATA + NL //        //$NON-NLS-1$
 
-                  + "LEFT JOIN " + TourDatabase.TABLE_TOUR_NUTRITION_PRODUCT //$NON-NLS-1$
-                  + "    AS TNutritionProduct ON " + TourDatabase.TABLE_TOUR_DATA + ".tourID = TNutritionProduct.TourData_tourId" + NL //    //$NON-NLS-1$
-
 // this is very slow
 //                // get tag id's
 //                + (" LEFT OUTER JOIN " + TourDatabase.JOINTABLE__TOURDATA__TOURTAG + " jTdataTtag") + NL //$NON-NLS-1$ //$NON-NLS-2$
@@ -201,6 +198,7 @@ public class GeoPartTourLoader {
     * @param useAppFilter
     * @param previousGeoCompareData
     * @param geoPartView
+    *
     * @return
     */
    static GeoCompareData loadToursFromGeoParts(final long refTour_TourId,
