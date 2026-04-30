@@ -19,6 +19,8 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.List;
+import java.util.concurrent.atomic.AtomicLong;
 
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.UI;
@@ -110,7 +112,7 @@ public abstract class TVITaggingView_Item extends TreeViewerItem {
    public float       colAvgSpeed;
    public float       colAvgTemperature_Device;
 
-   public long        numTours;
+   public AtomicLong  numTours = new AtomicLong();
    public int         numTags_NoTours;
 
    private TreeViewer _tagViewer;
@@ -138,6 +140,13 @@ public abstract class TVITaggingView_Item extends TreeViewerItem {
           */
          sql = UI.EMPTY_STRING
 
+               + "--" + NL //                                                                            //$NON-NLS-1$
+               + NL
+               + "--" + NL //                                                                            //$NON-NLS-1$
+               + "-- tag - sum" + NL //                                                  //$NON-NLS-1$
+               + "--" + NL //                                                                            //$NON-NLS-1$
+               + NL
+
                + "SELECT " + SQL_SUM_COLUMNS + NL //                                               //$NON-NLS-1$
 
                + "FROM " + TourDatabase.JOINTABLE__TOURDATA__TOURTAG + " AS jtblTagData" + NL //   //$NON-NLS-1$ //$NON-NLS-2$
@@ -161,7 +170,7 @@ public abstract class TVITaggingView_Item extends TreeViewerItem {
             tagItem.readSumColumnData(result, 1);
          }
 
-         if (tagItem.numTours == 0) {
+         if (tagItem.numTours.get() == 0) {
 
             /*
              * to hide the '+' for an item which has no children, an empty list of children will be
@@ -218,4 +227,66 @@ public abstract class TVITaggingView_Item extends TreeViewerItem {
       }
    }
 
+   /**
+    * !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+    * <p>
+    * <b>RECURSIVE</b>
+    * <p>
+    * Update number of tours
+    * <p>
+    * !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+    *
+    * @param newNumTours
+    * @param allUpdatedItems
+    */
+   void updateParentNumTours(final int newNumTours, final List<TVITaggingView_Item> allUpdatedItems) {
+
+      final TreeViewerItem parentItem = getParentItem();
+
+      if (parentItem instanceof final TVITaggingView_Item taggingItem) {
+
+         if (taggingItem instanceof TVITaggingView_Root) {
+
+            // skip root
+
+            return;
+         }
+
+         taggingItem.numTours.addAndGet(newNumTours);
+
+         allUpdatedItems.add(taggingItem);
+
+         taggingItem.updateParentNumTours(newNumTours, allUpdatedItems);
+
+//         String item = UI.EMPTY_STRING;
+//         String name = UI.EMPTY_STRING;
+//
+//         if (taggingItem instanceof final TVITaggingView_Tag tagItem) {
+//
+//            item = "tag";
+//            name = tagItem.getTourTag().getTagName();
+//
+//         } else if (taggingItem instanceof final TVITaggingView_TagCategory categoryItem) {
+//
+//            item = "cat";
+//            name = categoryItem.getTourTagCategory().getCategoryName();
+//         }
+//
+//         final String text = "%-5s %-30s %5d %5d+  %-15s".formatted(
+//
+//               item,
+//               name,
+//
+//               newAddedTours,
+//               newNumTours,
+//
+//               Thread.currentThread().getName()
+//
+//         );
+//
+//         System.out.println(text);
+//
+// TODO remove SYSTEM.OUT.PRINTLN
+      }
+   }
 }

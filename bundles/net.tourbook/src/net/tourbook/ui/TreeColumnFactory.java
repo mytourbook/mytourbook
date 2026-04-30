@@ -79,8 +79,6 @@ public abstract class TreeColumnFactory {
    public static final String            EQUIPMENT_DATE_COLLATE_UNTIL_ID  = "EQUIPMENT_DATE_COLLATE_UNTIL";     //$NON-NLS-1$
    public static final TreeColumnFactory EQUIPMENT_DATE_USAGE_DURATION;
    public static final String            EQUIPMENT_DATE_USAGE_DURATION_ID = "EQUIPMENT_DATE_USAGE_DURATION";    //$NON-NLS-1$
-   public static final TreeColumnFactory EQUIPMENT_EXPAND_TYPE;
-   public static final String            EQUIPMENT_EXPAND_TYPE_ID         = "EQUIPMENT_EXPAND_TYPE_ID";         //$NON-NLS-1$
    public static final TreeColumnFactory EQUIPMENT_ID;
    public static final String            EQUIPMENT_ID_ID                  = "EQUIPMENT_ID";                     //$NON-NLS-1$
    public static final TreeColumnFactory EQUIPMENT_IMAGE;
@@ -103,6 +101,8 @@ public abstract class TreeColumnFactory {
    public static final String            EQUIPMENT_RETIRED_ID             = "EQUIPMENT_RETIRED";                //$NON-NLS-1$
    public static final TreeColumnFactory EQUIPMENT_SIZE;
    public static final String            EQUIPMENT_SIZE_ID                = "EQUIPMENT_SIZE";                   //$NON-NLS-1$
+   public static final TreeColumnFactory EQUIPMENT_TOUR_STRUCTURE;
+   public static final String            EQUIPMENT_TOUR_STRUCTURE_ID      = "EQUIPMENT_TOUR_STRUCTURE";         //$NON-NLS-1$
    public static final TreeColumnFactory EQUIPMENT_TYPE;
    public static final String            EQUIPMENT_TYPE_ID                = "EQUIPMENT_TYPE";                   //$NON-NLS-1$
    public static final TreeColumnFactory EQUIPMENT_TYPE_RAW;
@@ -207,6 +207,8 @@ public abstract class TreeColumnFactory {
    public static final String            TOUR_TAG_IMAGE_ID                = "TOUR_TAG_IMAGE";                   //$NON-NLS-1$
    public static final TreeColumnFactory TOUR_TAG_IMAGE_FILE_PATH;
    public static final String            TOUR_TAG_IMAGE_FILE_PATH_ID      = "TOUR_TAG_IMAGE_FILE_PATH";         //$NON-NLS-1$
+   public static final TreeColumnFactory TOUR_TAG_STRUCTURE;
+   public static final String            TOUR_TAG_STRUCTURE_ID            = "TOUR_TAG_STRUCTURE";               //$NON-NLS-1$
 
    public static final TreeColumnFactory TRAINING_FTP;
    public static final TreeColumnFactory TRAINING_INTENSITY_FACTOR;
@@ -961,26 +963,6 @@ public abstract class TreeColumnFactory {
          }
       };
 
-
-      EQUIPMENT_EXPAND_TYPE = new TreeColumnFactory() {
-         @Override
-         public TreeColumnDefinition createColumn(final ColumnManager columnManager,
-                                                  final PixelConverter pixelConverter) {
-
-            final TreeColumnDefinition colDef = new TreeColumnDefinition(columnManager, EQUIPMENT_EXPAND_TYPE_ID, SWT.TRAIL);
-
-            colDef.setColumnCategory(           Messages.ColumnFactory_Category_Equipment);
-
-            colDef.setColumnLabel(              Messages.ColumnFactory_Equipment_TourStructure_Label);
-            colDef.setColumnHeaderText(         Messages.ColumnFactory_Equipment_TourStructure_Header);
-            colDef.setColumnHeaderToolTipText(  Messages.ColumnFactory_Equipment_TourStructure_Tooltip);
-
-            colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(5));
-
-            return colDef;
-         }
-      };
-
       EQUIPMENT_ID = new TreeColumnFactory() {
          @Override
          public TreeColumnDefinition createColumn(final ColumnManager columnManager,
@@ -1172,6 +1154,25 @@ public abstract class TreeColumnFactory {
 
             colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(15));
 
+
+            return colDef;
+         }
+      };
+
+      EQUIPMENT_TOUR_STRUCTURE = new TreeColumnFactory() {
+         @Override
+         public TreeColumnDefinition createColumn(final ColumnManager columnManager,
+                                                  final PixelConverter pixelConverter) {
+
+            final TreeColumnDefinition colDef = new TreeColumnDefinition(columnManager, EQUIPMENT_TOUR_STRUCTURE_ID, SWT.TRAIL);
+
+            colDef.setColumnCategory(           Messages.ColumnFactory_Category_Equipment);
+
+            colDef.setColumnLabel(              Messages.ColumnFactory_Equipment_TourStructure_Label);
+            colDef.setColumnHeaderText(         Messages.ColumnFactory_Equipment_TourStructure_Header);
+            colDef.setColumnHeaderToolTipText(  Messages.ColumnFactory_Equipment_TourStructure_Tooltip);
+
+            colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(5));
 
             return colDef;
          }
@@ -3060,6 +3061,24 @@ public abstract class TreeColumnFactory {
          }
       };
 
+      TOUR_TAG_STRUCTURE = new TreeColumnFactory() {
+         @Override
+         public TreeColumnDefinition createColumn(final ColumnManager columnManager,
+                                                  final PixelConverter pixelConverter) {
+
+            final TreeColumnDefinition colDef = new TreeColumnDefinition(columnManager, TOUR_TAG_STRUCTURE_ID, SWT.LEAD);
+
+            colDef.setColumnCategory(           Messages.ColumnFactory_Category_Tag);
+
+            colDef.setColumnLabel(              Messages.ColumnFactory_Equipment_TourStructure_Label);
+            colDef.setColumnHeaderText(         Messages.ColumnFactory_Equipment_TourStructure_Header);
+            colDef.setColumnHeaderToolTipText(  Messages.ColumnFactory_Equipment_TourStructure_Tooltip);
+
+            colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(5));
+
+            return colDef;
+         }
+      };
 
       /*
        * Training

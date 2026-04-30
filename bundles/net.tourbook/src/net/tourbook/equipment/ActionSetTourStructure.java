@@ -275,7 +275,7 @@ public class ActionSetTourStructure extends Action implements IMenuCreator {
 
                final ActionSetExpandType actionTourCategoryStructure = new ActionSetExpandType(
                      expandType,
-                     EquipmentManager.EXPAND_TYPE_NAMES[typeIndex]);
+                     EquipmentManager.EXPAND_TYPE_ACTION_LABELS[typeIndex]);
 
                // check active expand type
                actionTourCategoryStructure.setChecked(selectedExpandType == expandType);

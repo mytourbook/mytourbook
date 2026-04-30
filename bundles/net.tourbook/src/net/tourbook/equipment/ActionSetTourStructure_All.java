@@ -202,7 +202,7 @@ public class ActionSetTourStructure_All extends Action implements IMenuCreator {
 
                final ActionSetPartStructure actionTagStructure = new ActionSetPartStructure(
                      expandType,
-                     EquipmentManager.EXPAND_TYPE_NAMES[typeIndex++]);
+                     EquipmentManager.EXPAND_TYPE_ACTION_LABELS[typeIndex++]);
 
                addActionToMenu(actionTagStructure);
             }

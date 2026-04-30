@@ -83,19 +83,16 @@ public class TVITaggingView_Tag extends TVITaggingView_Item {
 
       switch (_tourTag.getExpandType()) {
 
-      // 0
-      case TourTag.EXPAND_TYPE_YEAR_MONTH_DAY:
-         setChildren(loadTagChildren_Years(true, UI.EMPTY_STRING));
-         break;
-
-      // 1
       case TourTag.EXPAND_TYPE_FLAT:
-         setChildren(loadTagChildren_Tours(UI.EMPTY_STRING));
+         TagLoader.loadValues(this, TagLoaderID.TAG__TOURS);
          break;
 
-      // 2
+      case TourTag.EXPAND_TYPE_YEAR_MONTH_DAY:
+         loadTagChildren_Years(this, true);
+         break;
+
       case TourTag.EXPAND_TYPE_YEAR_DAY:
-         setChildren(loadTagChildren_Years(false, UI.EMPTY_STRING));
+         loadTagChildren_Years(this, false);
          break;
 
       default:
@@ -285,12 +282,13 @@ public class TVITaggingView_Tag extends TVITaggingView_Item {
       return children;
    }
 
-   private ArrayList<TreeViewerItem> loadTagChildren_Years(final boolean isMonth, final String whereClause) {
+   private void loadTagChildren_Years(final TVITaggingView_Tag tagItem,
+                                      final boolean isMonth) {
 
       /*
        * get the children for the tag item
        */
-      final ArrayList<TreeViewerItem> children = new ArrayList<>();
+      final ArrayList<TreeViewerItem> allChildren = new ArrayList<>();
 
       String sql = null;
 
@@ -302,6 +300,13 @@ public class TVITaggingView_Tag extends TVITaggingView_Item {
          final AppFilter sqlFilter = new AppFilter();
 
          sql = UI.EMPTY_STRING
+
+               + "--" + NL //                                                                            //$NON-NLS-1$
+               + NL
+               + "--" + NL //                                                                            //$NON-NLS-1$
+               + "-- tag - years" + NL //                                                  //$NON-NLS-1$
+               + "--" + NL //                                                                            //$NON-NLS-1$
+               + NL
 
                + "SELECT " + NL //                 //$NON-NLS-1$
 
@@ -315,7 +320,6 @@ public class TVITaggingView_Tag extends TVITaggingView_Item {
                + " ON jTdataTtag.TourData_tourId = TourData.tourId " + NL //                       //$NON-NLS-1$
 
                + " WHERE jTdataTtag.TourTag_TagId = ?" + NL //             //$NON-NLS-1$
-               + whereClause + NL //
                + sqlFilter.getWhereClause() + NL
 
                + " GROUP BY startYear" + NL //                             //$NON-NLS-1$
@@ -332,7 +336,7 @@ public class TVITaggingView_Tag extends TVITaggingView_Item {
             final int dbYear = result.getInt(1);
 
             final TVITaggingView_Year yearItem = new TVITaggingView_Year(this, dbYear, isMonth, getTagViewer());
-            children.add(yearItem);
+            allChildren.add(yearItem);
 
             yearItem.firstColumn = Integer.toString(dbYear);
             yearItem.readSumColumnData(result, 2);
@@ -342,41 +346,39 @@ public class TVITaggingView_Tag extends TVITaggingView_Item {
             }
          }
 
+         setChildren(allChildren);
+
       } catch (final SQLException e) {
 
          SQL.showException(e, sql);
       }
-
-      return children;
    }
 
    /**
     * This tag was added or removed from tours. According to the expand type, the structure of the
     * tag will be modified for the added or removed tours
     *
-    * @param tagViewer
     * @param modifiedTours
     * @param isAddMode
     */
-   public void refresh(final TreeViewer tagViewer,
-                       final ArrayList<TourData> modifiedTours,
+   public void refresh(final ArrayList<TourData> modifiedTours,
                        final boolean isAddMode) {
 
       switch (_tourTag.getExpandType()) {
 
       case TourTag.EXPAND_TYPE_FLAT:
 
-         refreshFlatTours(tagViewer, modifiedTours, isAddMode);
+         refreshFlatTours(modifiedTours, isAddMode);
          break;
 
       case TourTag.EXPAND_TYPE_YEAR_MONTH_DAY:
 
-         refreshYearItems(tagViewer, true);
+         loadTagChildren_Years(this, true);
          break;
 
       case TourTag.EXPAND_TYPE_YEAR_DAY:
 
-         refreshYearItems(tagViewer, false);
+         loadTagChildren_Years(this, false);
          break;
 
       default:
@@ -384,8 +386,7 @@ public class TVITaggingView_Tag extends TVITaggingView_Item {
       }
    }
 
-   private void refreshFlatTours(final TreeViewer tagViewer,
-                                 final ArrayList<TourData> modifiedTours,
+   private void refreshFlatTours(final ArrayList<TourData> modifiedTours,
                                  final boolean isAddMode) {
 
       final ArrayList<TreeViewerItem> unfetchedChildren = getUnfetchedChildren();
@@ -404,7 +405,7 @@ public class TVITaggingView_Tag extends TVITaggingView_Item {
          unfetchedChildren.addAll(tagChildren);
 
          // update viewer
-         tagViewer.add(this, tagChildren.toArray());
+         getTagViewer().add(this, tagChildren.toArray());
 
       } else {
 
@@ -441,26 +442,8 @@ public class TVITaggingView_Tag extends TVITaggingView_Item {
          unfetchedChildren.removeAll(removedTours.values());
 
          // update viewer
-         tagViewer.remove(removedTourItems.toArray());
+         getTagViewer().remove(removedTourItems.toArray());
       }
-   }
-
-   /**
-    * Read the year totals, this will read all year items for the tag and removes the years which do
-    * not have any tour items
-    *
-    * @param tagViewer
-    * @param isMonth
-    */
-   private void refreshYearItems(final TreeViewer tagViewer, final boolean isMonth) {
-
-      final ArrayList<TreeViewerItem> allYearItems = loadTagChildren_Years(isMonth, UI.EMPTY_STRING);
-
-      // update model
-      setChildren(allYearItems);
-
-      // update viewer
-      tagViewer.update(allYearItems.toArray(), null);
    }
 
    @Override
@@ -470,15 +453,11 @@ public class TVITaggingView_Tag extends TVITaggingView_Item {
 
             + "TVITagView_Tag " + System.identityHashCode(this) + NL //       //$NON-NLS-1$
 
-            + "[" + NL //                                                     //$NON-NLS-1$
-
             + _tourTag
 
             + NL
             + "  numTours          = " + numTours + NL //                     //$NON-NLS-1$
             + "  numTags_NoTours   = " + numTags_NoTours + NL //              //$NON-NLS-1$
-
-            + "]" + NL //                                                     //$NON-NLS-1$
       ;
    }
 

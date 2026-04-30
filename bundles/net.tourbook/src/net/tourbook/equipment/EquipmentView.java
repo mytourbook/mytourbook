@@ -1242,7 +1242,7 @@ public class EquipmentView extends ViewPart implements
       // system columns
       defineColumn_Equipment_ID();
       defineColumn_Equipment_TypeRaw();
-      defineColumn_Equipment_ExpandType();
+      defineColumn_Equipment_TourStructure();
    }
 
    /**
@@ -1256,7 +1256,6 @@ public class EquipmentView extends ViewPart implements
       colDef.setCanModifyVisibility(false);
 
       colDef.setLabelProvider(new TourInfoToolTipStyledCellLabelProvider() {
-
 
          @Override
          public Long getTourId(final ViewerCell cell) {
@@ -1913,46 +1912,6 @@ public class EquipmentView extends ViewPart implements
    }
 
    /**
-    * Column: Expand type
-    */
-   private void defineColumn_Equipment_ExpandType() {
-
-      final ColumnDefinition colDef = TreeColumnFactory.EQUIPMENT_EXPAND_TYPE.createColumn(_columnManager, _pc);
-
-      colDef.setLabelProvider(new CellLabelProvider() {
-
-         @Override
-         public void update(final ViewerCell cell) {
-
-            final Object element = cell.getElement();
-
-            int expandType;
-            String label = null;
-
-            if (element instanceof final TVIEquipmentView_Equipment equipmentItem) {
-
-               if (equipmentItem.getEquipment().isCollate()) {
-
-                  expandType = equipmentItem.getExpandType();
-                  label = EquipmentManager.EXPAND_TYPE_LABEL[expandType];
-               }
-
-            } else if (element instanceof final TVIEquipmentView_Part partItem) {
-
-               expandType = partItem.getExpandType();
-               label = EquipmentManager.EXPAND_TYPE_LABEL[expandType];
-            }
-
-            if (label != null) {
-
-               cell.setText(label);
-               setCellColor(cell, element);
-            }
-         }
-      });
-   }
-
-   /**
     * Column: ID
     */
    private void defineColumn_Equipment_ID() {
@@ -2249,6 +2208,46 @@ public class EquipmentView extends ViewPart implements
             if (size != null) {
 
                cell.setText(size);
+               setCellColor(cell, element);
+            }
+         }
+      });
+   }
+
+   /**
+    * Column: Tour structure
+    */
+   private void defineColumn_Equipment_TourStructure() {
+
+      final ColumnDefinition colDef = TreeColumnFactory.EQUIPMENT_TOUR_STRUCTURE.createColumn(_columnManager, _pc);
+
+      colDef.setLabelProvider(new CellLabelProvider() {
+
+         @Override
+         public void update(final ViewerCell cell) {
+
+            final Object element = cell.getElement();
+
+            int expandType;
+            String label = null;
+
+            if (element instanceof final TVIEquipmentView_Equipment equipmentItem) {
+
+               if (equipmentItem.getEquipment().isCollate()) {
+
+                  expandType = equipmentItem.getExpandType();
+                  label = EquipmentManager.EXPAND_TYPE_LABEL[expandType];
+               }
+
+            } else if (element instanceof final TVIEquipmentView_Part partItem) {
+
+               expandType = partItem.getExpandType();
+               label = EquipmentManager.EXPAND_TYPE_LABEL[expandType];
+            }
+
+            if (label != null) {
+
+               cell.setText(label);
                setCellColor(cell, element);
             }
          }
