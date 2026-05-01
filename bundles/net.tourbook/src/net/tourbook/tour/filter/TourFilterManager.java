@@ -60,6 +60,16 @@ import org.osgi.framework.Version;
 *WHERE id IN (SELECT id FROM B);
 
 * the simples one i can find ?
+
+* For the productIds...
+*SELECT *
+*FROM A
+*WHERE EXISTS (
+ * SELECT 1
+ * FROM B b
+*WHERE b.productId = :productId
+*    AND b.productName = :productName
+*);
 */
 public class TourFilterManager {
 
