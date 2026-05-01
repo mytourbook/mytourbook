@@ -52,7 +52,15 @@ import org.eclipse.ui.IMemento;
 import org.eclipse.ui.XMLMemento;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.Version;
+/*
+*SELECT *
 
+*FROM A
+
+*WHERE id IN (SELECT id FROM B);
+
+* the simples one i can find ?
+*/
 public class TourFilterManager {
 
    private static final String TOUR_DATA_ALTITUDE_DOWN          = "TourData.tourAltDown";                        //$NON-NLS-1$
