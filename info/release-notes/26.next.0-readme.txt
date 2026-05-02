@@ -49,6 +49,9 @@ Changes
     The new column "Type (saved)" can display the saved value which is a random value when the type in the UI is empty.
 
 
+* Tagged Tours View
+  - New columns to display the parent of a tag and how tours are sorted/categorized
+
 Changes that require Tour Re-import
 ===================================
 

@@ -82,9 +82,9 @@ public class TVITaggingView_TagCategory extends TVITaggingView_Item {
 
          final TVITaggingView_Tag tagItem = new TVITaggingView_Tag(tourTag, this, tagViewer);
 
-         readTagTotals(tagItem);
-
          addChild(tagItem);
+
+         TagLoader.loadValues(tagItem, TagLoaderID.TAG__TOTALS);
       }
 
       // update number of categories/tags
@@ -131,7 +131,6 @@ public class TVITaggingView_TagCategory extends TVITaggingView_Item {
 
             + NL
             + "  numTours          = " + numTours + NL //               //$NON-NLS-1$
-            + "  numTags_NoTours   = " + numTags_NoTours + NL //        //$NON-NLS-1$
 
             + "]" + NL //                                               //$NON-NLS-1$
       ;

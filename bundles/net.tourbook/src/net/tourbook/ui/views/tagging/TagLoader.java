@@ -22,9 +22,9 @@ import java.sql.SQLException;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Executors;
 import java.util.concurrent.FutureTask;
 import java.util.concurrent.LinkedBlockingDeque;
@@ -40,6 +40,7 @@ import net.tourbook.ui.AppFilter;
 
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Tree;
 
 public class TagLoader {
 
@@ -50,6 +51,13 @@ public class TagLoader {
 
    private static int                                  _loadCounter;
    private static int                                  _viewUpdateCounter;
+
+   /**
+    * This is a concurrent set
+    */
+   private static Set<TVITaggingView_Item>             _allUpdateItems  = ConcurrentHashMap.newKeySet();
+
+   private static long                                 _lastUpdateTime;
 
    static {
 
@@ -113,6 +121,25 @@ public class TagLoader {
    }
 
    /**
+    * @return Returns all items which needs to be updated
+    */
+   private static TVITaggingView_Item[] getUpdateItems() {
+
+      TVITaggingView_Item[] allUpdateItems;
+
+      synchronized (_allUpdateItems) {
+
+         final int numItems = _allUpdateItems.size();
+
+         allUpdateItems = (TVITaggingView_Item[]) _allUpdateItems.toArray(new TVITaggingView_Item[numItems]);
+
+         _allUpdateItems.clear();
+      }
+
+      return allUpdateItems;
+   }
+
+   /**
     * @param taggingItem
     * @param tagLoaderID
     */
@@ -141,64 +168,72 @@ public class TagLoader {
                return;
             }
 
-            final List<TVITaggingView_Item> allUpdatedItems = new ArrayList<>();
-
-            final TagLoaderID loaderID = loaderItem.__tagLoaderID;
-            final TVITaggingView_Item runnableTaggingItem = loaderItem.__taggingItem;
-
-            if (TagLoaderID.TAG__TOURS.equals(loaderID)) {
-
-               if (runnableTaggingItem instanceof final TVITaggingView_Tag tagItem) {
-
-                  loadValues_Tag__Tours(tagItem, allUpdatedItems);
-               }
-
-            } else if (TagLoaderID.YEAR__TOURS.equals(loaderID)) {
-
-               if (runnableTaggingItem instanceof final TVITaggingView_Year yearItem) {
-
-                  loadValues_Year__Tours(yearItem, allUpdatedItems);
-               }
-
-            } else if (TagLoaderID.YEAR__MONTHS.equals(loaderID)) {
-
-               if (runnableTaggingItem instanceof final TVITaggingView_Year yearItem) {
-
-                  loadValues_Year__Months(yearItem, allUpdatedItems);
-               }
-
-            } else if (TagLoaderID.MONTH__TOURS.equals(loaderID)) {
-
-               if (runnableTaggingItem instanceof final TVITaggingView_Month monthItem) {
-
-                  loadValues_Month__Tours(monthItem, allUpdatedItems);
-               }
-            }
-
-            if (allUpdatedItems.size() > 0) {
-
-               Display.getDefault().asyncExec(() -> {
-
-                  final TreeViewer tagViewer = runnableTaggingItem.getTagViewer();
-
-                  if (tagViewer.getTree().isDisposed()) {
-                     return;
-                  }
-
-                  final TVITaggingView_Item[] allItems = (TVITaggingView_Item[]) allUpdatedItems.toArray(new TVITaggingView_Item[allUpdatedItems
-                        .size()]);
-
-                  tagViewer.update(allItems, null);
-               });
-            }
+            loadValues_Runnable(loaderItem);
          }
       };
 
       _sqlExecutor.submit(executorTask);
    }
 
-   private static void loadValues_Month__Tours(final TVITaggingView_Month monthItem,
-                                               final List<TVITaggingView_Item> allUpdatedItems) {
+   private static void loadValues_Runnable(final SQLLoader loaderItem) {
+
+      final TagLoaderID loaderID = loaderItem.__tagLoaderID;
+      final TVITaggingView_Item runnableTaggingItem = loaderItem.__taggingItem;
+
+      /*
+       * Load values
+       */
+      if (TagLoaderID.TAG__TOURS.equals(loaderID)) {
+
+         if (runnableTaggingItem instanceof final TVITaggingView_Tag tagItem) {
+
+            loadValues_Runnable_Tag__Tours(tagItem);
+         }
+
+      } else if (TagLoaderID.TAG__TOTALS.equals(loaderID)) {
+
+         if (runnableTaggingItem instanceof final TVITaggingView_Tag tagItem) {
+
+            loadValues_Runnable_Tag__Totals(tagItem);
+         }
+
+      } else if (TagLoaderID.YEAR__TOURS.equals(loaderID)) {
+
+         if (runnableTaggingItem instanceof final TVITaggingView_Year yearItem) {
+
+            loadValues_Runnable_Year__Tours(yearItem);
+         }
+
+      } else if (TagLoaderID.YEAR__MONTHS.equals(loaderID)) {
+
+         if (runnableTaggingItem instanceof final TVITaggingView_Year yearItem) {
+
+            loadValues_Runnable_Year__Months(yearItem);
+         }
+
+      } else if (TagLoaderID.MONTH__TOURS.equals(loaderID)) {
+
+         if (runnableTaggingItem instanceof final TVITaggingView_Month monthItem) {
+
+            loadValues_Runnable_Month__Tours(monthItem);
+         }
+      }
+
+      /*
+       * Update UI
+       */
+      final int numUpdateItems = _allUpdateItems.size();
+
+      if (numUpdateItems > 0) {
+
+         Display.getDefault().asyncExec(() -> {
+
+            updateUI(runnableTaggingItem.getTagViewer());
+         });
+      }
+   }
+
+   private static void loadValues_Runnable_Month__Tours(final TVITaggingView_Month monthItem) {
 
       final ArrayList<TreeViewerItem> allChildren = new ArrayList<>();
 
@@ -328,10 +363,64 @@ public class TagLoader {
 
          final int numTours = allChildren.size();
 
-         yearItem.numTours.addAndGet(numTours);
-         yearItem.updateParentNumTours(numTours, allUpdatedItems);
+         monthItem.numTours.addAndGet(numTours);
+         monthItem.updateParentNumTours(numTours, _allUpdateItems);
 
-         allUpdatedItems.add(yearItem);
+         _allUpdateItems.add(monthItem);
+
+      } catch (final SQLException e) {
+
+         SQL.showException(e, sql);
+      }
+   }
+
+   /**
+    * Read sum totals from the database for the tagItem
+    *
+    * @param tagItem
+    */
+   private static void loadValues_Runnable_Tag__Totals(final TVITaggingView_Tag tagItem) {
+
+      String sql = null;
+
+      try (Connection conn = TourDatabase.getInstance().getConnection()) {
+
+         final AppFilter appFilter = new AppFilter();
+
+         /*
+          * Get tags
+          */
+         sql = UI.EMPTY_STRING
+
+               + "--" + NL //                                                                      //$NON-NLS-1$
+               + NL
+               + "--" + NL //                                                                      //$NON-NLS-1$
+               + "-- tag - totals (concurrent)" + NL //                                            //$NON-NLS-1$
+               + "--" + NL //                                                                      //$NON-NLS-1$
+               + NL
+
+               + "SELECT " + TVITaggingView_Item.SQL_SUM_COLUMNS + NL //                           //$NON-NLS-1$
+
+               + "FROM " + TourDatabase.JOINTABLE__TOURDATA__TOURTAG + " AS jtblTagData" + NL //   //$NON-NLS-1$ //$NON-NLS-2$
+
+               // get data for a tour
+               + "LEFT JOIN " + TourDatabase.TABLE_TOUR_DATA + " AS TourData" //                   //$NON-NLS-1$ //$NON-NLS-2$
+               + " ON jtblTagData.TourData_tourId = TourData.tourId" + NL //                       //$NON-NLS-1$
+
+               + " WHERE jtblTagData.TourTag_TagId = ?" + NL //                                    //$NON-NLS-1$
+
+               + appFilter.getWhereClause();
+
+         final PreparedStatement statement = conn.prepareStatement(sql);
+
+         statement.setLong(1, tagItem.getTagId());
+         appFilter.setParameters(statement, 2);
+
+         final ResultSet result = statement.executeQuery();
+
+         while (result.next()) {
+            tagItem.readSumColumnData(result, 1);
+         }
 
       } catch (final SQLException e) {
 
@@ -348,8 +437,7 @@ public class TagLoader {
     * @param tagItem
     * @param allUpdatedItems
     */
-   private static void loadValues_Tag__Tours(final TVITaggingView_Tag tagItem,
-                                             final List<TVITaggingView_Item> allUpdatedItems) {
+   private static void loadValues_Runnable_Tag__Tours(final TVITaggingView_Tag tagItem) {
 
       final ArrayList<TreeViewerItem> allChildren = new ArrayList<>();
 
@@ -472,9 +560,9 @@ public class TagLoader {
          final int numTours = allChildren.size();
 
          tagItem.numTours.addAndGet(numTours);
-         tagItem.updateParentNumTours(numTours, allUpdatedItems);
+         tagItem.updateParentNumTours(numTours, _allUpdateItems);
 
-         allUpdatedItems.add(tagItem);
+         _allUpdateItems.add(tagItem);
 
       } catch (final SQLException e) {
 
@@ -482,8 +570,7 @@ public class TagLoader {
       }
    }
 
-   private static void loadValues_Year__Months(final TVITaggingView_Year yearItem,
-                                               final List<TVITaggingView_Item> allUpdatedItems) {
+   private static void loadValues_Runnable_Year__Months(final TVITaggingView_Year yearItem) {
 
       final ArrayList<TreeViewerItem> allChildren = new ArrayList<>();
 
@@ -556,8 +643,7 @@ public class TagLoader {
       }
    }
 
-   private static void loadValues_Year__Tours(final TVITaggingView_Year yearItem,
-                                              final List<TVITaggingView_Item> allUpdatedItems) {
+   private static void loadValues_Runnable_Year__Tours(final TVITaggingView_Year yearItem) {
 
       final ArrayList<TreeViewerItem> allChildren = new ArrayList<>();
 
@@ -689,9 +775,9 @@ public class TagLoader {
          final int numTours = allChildren.size();
 
          yearItem.numTours.addAndGet(numTours);
-         yearItem.updateParentNumTours(numTours, allUpdatedItems);
+         yearItem.updateParentNumTours(numTours, _allUpdateItems);
 
-         allUpdatedItems.add(yearItem);
+         _allUpdateItems.add(yearItem);
 
       } catch (final SQLException e) {
 
@@ -702,5 +788,67 @@ public class TagLoader {
    public static void startUpdate() {
 
       _viewUpdateCounter++;
+
+      _allUpdateItems.clear();
+   }
+
+   private static void updateUI(final TreeViewer tagViewer) {
+
+      final Tree tree = tagViewer.getTree();
+
+      if (tree.isDisposed()) {
+         return;
+      }
+
+      final Display display = tree.getDisplay();
+
+      if (tree.isDisposed()) {
+         return;
+      }
+
+      final int numItems = _allUpdateItems.size();
+
+      if (numItems == 0) {
+         return;
+      }
+
+      final long now = System.currentTimeMillis();
+      final long timeDiff = now - _lastUpdateTime;
+
+      if (timeDiff < 300) {
+
+         display.timerExec(500, () -> {
+            updateUI_CheckLatestUpdates(tagViewer);
+         });
+
+         return;
+      }
+
+      _lastUpdateTime = now;
+
+      final TVITaggingView_Item[] allUpdateItems = getUpdateItems();
+
+      for (final TVITaggingView_Item taggingItem : allUpdateItems) {
+
+         // refresh MUST be called to update the category twisties
+         tagViewer.refresh(taggingItem);
+      }
+   }
+
+   private static void updateUI_CheckLatestUpdates(final TreeViewer tagViewer) {
+
+      final long timeDiff = System.currentTimeMillis() - _lastUpdateTime;
+      final int numItems = _allUpdateItems.size();
+
+      if (timeDiff > 500 && numItems > 0) {
+
+         final TVITaggingView_Item[] allUpdateItems = getUpdateItems();
+
+         for (final TVITaggingView_Item taggingItem : allUpdateItems) {
+
+            // refresh MUST be called to update the category twisties
+            tagViewer.refresh(taggingItem);
+         }
+      }
    }
 }

@@ -35,6 +35,11 @@ public enum TagLoaderID {
    /**
     * Create all months for a year
     */
-   YEAR__MONTHS
+   YEAR__MONTHS,
+
+   /**
+    * Read totals for a tag
+    */
+   TAG__TOTALS
 
 }

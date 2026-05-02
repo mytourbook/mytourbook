@@ -207,6 +207,10 @@ public abstract class TreeColumnFactory {
    public static final String            TOUR_TAG_IMAGE_ID                = "TOUR_TAG_IMAGE";                   //$NON-NLS-1$
    public static final TreeColumnFactory TOUR_TAG_IMAGE_FILE_PATH;
    public static final String            TOUR_TAG_IMAGE_FILE_PATH_ID      = "TOUR_TAG_IMAGE_FILE_PATH";         //$NON-NLS-1$
+   public static final TreeColumnFactory TOUR_TAG_NUM_TOURS;
+   public static final String            TOUR_TAG_NUM_TOURS_ID            = "TOUR_TAG_NUM_TOURS";               //$NON-NLS-1$
+   public static final TreeColumnFactory TOUR_TAG_PARENT;
+   public static final String            TOUR_TAG_PARENT_ID               = "TOUR_TAG_PARENT";                  //$NON-NLS-1$
    public static final TreeColumnFactory TOUR_TAG_STRUCTURE;
    public static final String            TOUR_TAG_STRUCTURE_ID            = "TOUR_TAG_STRUCTURE";               //$NON-NLS-1$
 
@@ -3056,6 +3060,43 @@ public abstract class TreeColumnFactory {
             colDef.setColumnHeaderToolTipText(  Messages.ColumnFactory_TagImageFilePath_Tooltip);
 
             colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(25));
+
+            return colDef;
+         }
+      };
+
+      TOUR_TAG_NUM_TOURS = new TreeColumnFactory() {
+         @Override
+         public TreeColumnDefinition createColumn(final ColumnManager columnManager,
+                                                  final PixelConverter pixelConverter) {
+
+            final TreeColumnDefinition colDef = new TreeColumnDefinition(columnManager, TOUR_TAG_NUM_TOURS_ID, SWT.LEAD);
+
+            colDef.setColumnCategory(           Messages.ColumnFactory_Category_Tag);
+
+            colDef.setColumnLabel("Tours - Children");
+            colDef.setColumnHeaderText("Tours - Children");
+            colDef.setColumnHeaderToolTipText("Number of tours - Number of children");
+
+            colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(8));
+
+            return colDef;
+         }
+      };
+
+      TOUR_TAG_PARENT = new TreeColumnFactory() {
+         @Override
+         public TreeColumnDefinition createColumn(final ColumnManager columnManager,
+                                                  final PixelConverter pixelConverter) {
+
+            final TreeColumnDefinition colDef = new TreeColumnDefinition(columnManager, TreeColumnFactory.TOUR_TAG_PARENT_ID, SWT.LEAD);
+
+            colDef.setColumnCategory(           Messages.ColumnFactory_Category_Tag);
+
+            colDef.setColumnLabel("Parent");
+            colDef.setColumnHeaderText("Parent");
+
+            colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(8));
 
             return colDef;
          }

@@ -79,9 +79,9 @@ public class TVITaggingView_Root extends TVITaggingView_Item {
 
          final TVITaggingView_Tag tagItem = new TVITaggingView_Tag(tourTag, this, getTagViewer());
 
-         readTagTotals(tagItem);
-
          addChild(tagItem);
+
+         TagLoader.loadValues(tagItem, TagLoaderID.TAG__TOTALS);
       }
    }
 
@@ -107,7 +107,7 @@ public class TVITaggingView_Root extends TVITaggingView_Item {
       }
 
       /*
-       * Read tour tags from db
+       * Read root tour tags from db
        */
       query = em.createQuery(UI.EMPTY_STRING
 
@@ -123,9 +123,9 @@ public class TVITaggingView_Root extends TVITaggingView_Item {
 
          final TVITaggingView_Tag tagItem = new TVITaggingView_Tag(tourTag, this, getTagViewer());
 
-         readTagTotals(tagItem);
-
          addChild(tagItem);
+
+         TagLoader.loadValues(tagItem, TagLoaderID.TAG__TOTALS);
       }
    }
 

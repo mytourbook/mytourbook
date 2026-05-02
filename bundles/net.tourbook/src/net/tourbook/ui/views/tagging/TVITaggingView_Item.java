@@ -15,20 +15,15 @@
  *******************************************************************************/
 package net.tourbook.ui.views.tagging;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.List;
+import java.util.Set;
 import java.util.concurrent.atomic.AtomicLong;
 
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.UI;
-import net.tourbook.common.util.SQL;
 import net.tourbook.common.util.TreeViewerItem;
-import net.tourbook.database.TourDatabase;
 import net.tourbook.preferences.ITourbookPreferences;
-import net.tourbook.ui.AppFilter;
 
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.viewers.TreeViewer;
@@ -113,76 +108,12 @@ public abstract class TVITaggingView_Item extends TreeViewerItem {
    public float       colAvgTemperature_Device;
 
    public AtomicLong  numTours = new AtomicLong();
-   public int         numTags_NoTours;
 
    private TreeViewer _tagViewer;
 
    public TVITaggingView_Item(final TreeViewer tagViewer) {
 
       _tagViewer = tagViewer;
-   }
-
-   /**
-    * Read sum totals from the database for the tagItem
-    *
-    * @param tagItem
-    */
-   static void readTagTotals(final TVITaggingView_Tag tagItem) {
-
-      String sql = null;
-
-      try (Connection conn = TourDatabase.getInstance().getConnection()) {
-
-         final AppFilter appFilter = new AppFilter();
-
-         /*
-          * Get tags
-          */
-         sql = UI.EMPTY_STRING
-
-               + "--" + NL //                                                                            //$NON-NLS-1$
-               + NL
-               + "--" + NL //                                                                            //$NON-NLS-1$
-               + "-- tag - sum" + NL //                                                  //$NON-NLS-1$
-               + "--" + NL //                                                                            //$NON-NLS-1$
-               + NL
-
-               + "SELECT " + SQL_SUM_COLUMNS + NL //                                               //$NON-NLS-1$
-
-               + "FROM " + TourDatabase.JOINTABLE__TOURDATA__TOURTAG + " AS jtblTagData" + NL //   //$NON-NLS-1$ //$NON-NLS-2$
-
-               // get data for a tour
-               + "LEFT JOIN " + TourDatabase.TABLE_TOUR_DATA + " AS TourData" //                   //$NON-NLS-1$ //$NON-NLS-2$
-               + " ON jtblTagData.TourData_tourId = TourData.tourId" + NL //                       //$NON-NLS-1$
-
-               + " WHERE jtblTagData.TourTag_TagId = ?" + NL //                                    //$NON-NLS-1$
-
-               + appFilter.getWhereClause();
-
-         final PreparedStatement statement = conn.prepareStatement(sql);
-
-         statement.setLong(1, tagItem.getTagId());
-         appFilter.setParameters(statement, 2);
-
-         final ResultSet result = statement.executeQuery();
-
-         while (result.next()) {
-            tagItem.readSumColumnData(result, 1);
-         }
-
-         if (tagItem.numTours.get() == 0) {
-
-            /*
-             * to hide the '+' for an item which has no children, an empty list of children will be
-             * created
-             */
-//            tagItem.setChildren(new ArrayList<>());
-         }
-
-      } catch (final SQLException e) {
-
-         SQL.showException(e, sql);
-      }
    }
 
    TreeViewer getTagViewer() {
@@ -239,7 +170,7 @@ public abstract class TVITaggingView_Item extends TreeViewerItem {
     * @param newNumTours
     * @param allUpdatedItems
     */
-   void updateParentNumTours(final int newNumTours, final List<TVITaggingView_Item> allUpdatedItems) {
+   void updateParentNumTours(final int newNumTours, final Set<TVITaggingView_Item> allUpdatedItems) {
 
       final TreeViewerItem parentItem = getParentItem();
 
