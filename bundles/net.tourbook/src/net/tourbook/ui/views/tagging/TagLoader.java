@@ -362,9 +362,12 @@ public class TagLoader {
          }
 
          final int numTours = allChildren.size();
+         final int numNoTours = numTours == 0 ? 1 : 0;
 
          monthItem.numTours.addAndGet(numTours);
-         monthItem.updateParentNumTours(numTours, _allUpdateItems);
+         monthItem.numNoTours.addAndGet(numNoTours);
+
+         monthItem.updateParentNumTours(numTours, numNoTours, _allUpdateItems);
 
          _allUpdateItems.add(monthItem);
 
@@ -558,9 +561,12 @@ public class TagLoader {
          }
 
          final int numTours = allChildren.size();
+         final int numNoTours = numTours == 0 ? 1 : 0;
 
          tagItem.numTours.addAndGet(numTours);
-         tagItem.updateParentNumTours(numTours, _allUpdateItems);
+         tagItem.numNoTours.addAndGet(numNoTours);
+
+         tagItem.updateParentNumTours(numTours, numNoTours, _allUpdateItems);
 
          _allUpdateItems.add(tagItem);
 
@@ -773,9 +779,12 @@ public class TagLoader {
          }
 
          final int numTours = allChildren.size();
+         final int numNoTours = numTours == 0 ? 1 : 0;
 
          yearItem.numTours.addAndGet(numTours);
-         yearItem.updateParentNumTours(numTours, _allUpdateItems);
+         yearItem.numNoTours.addAndGet(numNoTours);
+
+         yearItem.updateParentNumTours(numTours, numNoTours, _allUpdateItems);
 
          _allUpdateItems.add(yearItem);
 

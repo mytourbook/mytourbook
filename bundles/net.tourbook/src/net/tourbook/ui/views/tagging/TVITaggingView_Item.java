@@ -107,7 +107,13 @@ public abstract class TVITaggingView_Item extends TreeViewerItem {
    public float       colAvgSpeed;
    public float       colAvgTemperature_Device;
 
-   public AtomicLong  numTours = new AtomicLong();
+   public AtomicLong  numTours   = new AtomicLong();
+
+   /**
+    * This is needed to identify tag categories which contained tags, do not have tours, that the
+    * tag filter works
+    */
+   public AtomicLong  numNoTours = new AtomicLong();
 
    private TreeViewer _tagViewer;
 
@@ -170,7 +176,9 @@ public abstract class TVITaggingView_Item extends TreeViewerItem {
     * @param newNumTours
     * @param allUpdatedItems
     */
-   void updateParentNumTours(final int newNumTours, final Set<TVITaggingView_Item> allUpdatedItems) {
+   void updateParentNumTours(final int newNumTours,
+                             final int newNoNumTours,
+                             final Set<TVITaggingView_Item> allUpdatedItems) {
 
       final TreeViewerItem parentItem = getParentItem();
 
@@ -184,10 +192,11 @@ public abstract class TVITaggingView_Item extends TreeViewerItem {
          }
 
          taggingItem.numTours.addAndGet(newNumTours);
+         taggingItem.numNoTours.addAndGet(newNoNumTours);
 
          allUpdatedItems.add(taggingItem);
 
-         taggingItem.updateParentNumTours(newNumTours, allUpdatedItems);
+         taggingItem.updateParentNumTours(newNumTours, newNoNumTours, allUpdatedItems);
 
 //         String item = UI.EMPTY_STRING;
 //         String name = UI.EMPTY_STRING;

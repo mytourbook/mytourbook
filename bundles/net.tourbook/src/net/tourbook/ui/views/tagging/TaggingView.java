@@ -2289,9 +2289,10 @@ public class TaggingView extends ViewPart implements
             || item instanceof TVITaggingView_Month) {
 
          final long numTours = ((TVITaggingView_Item) item).numTours.get();
+         final long numNoTours = ((TVITaggingView_Item) item).numNoTours.get();
 
          final boolean hasTour = numTours > 0;
-         final boolean xxxhasTagsNoTours = numTours == 0;
+         final boolean hasTagsNoTours = numNoTours > 0;
 
          if (_tagFilterType == TagFilterType.TAGS_WITH_TOURS && hasTour) {
 
@@ -2301,7 +2302,7 @@ public class TaggingView extends ViewPart implements
 
          } else if (_tagFilterType == TagFilterType.TAGS_WITHOUT_TOURS && hasTagsNoTours) {
 
-            // show tags WITHOUT tours
+            // show tag categories and tags WITHOUT tours
 
             return true;
 
@@ -2474,7 +2475,6 @@ public class TaggingView extends ViewPart implements
          _tagViewer.refresh();
       }
       tree.setRedraw(true);
-
    }
 
    private void onAction_ToggleTagLayout() {
@@ -3354,6 +3354,7 @@ public class TaggingView extends ViewPart implements
             final ArrayList<Long> removedIds = new ArrayList<>();
 
             for (final Long modifiedTagId : modifiedTags.keySet()) {
+
                if (viewerTagId == modifiedTagId.longValue()) {
 
                   /*
