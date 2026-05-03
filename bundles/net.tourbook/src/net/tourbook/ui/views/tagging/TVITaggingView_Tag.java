@@ -62,19 +62,24 @@ public class TVITaggingView_Tag extends TVITaggingView_Item {
 
    @Override
    public boolean equals(final Object obj) {
+
       if (this == obj) {
          return true;
       }
+
       if (obj == null) {
          return false;
       }
+
       if (getClass() != obj.getClass()) {
          return false;
       }
+
       final TVITaggingView_Tag other = (TVITaggingView_Tag) obj;
       if (_tagId != other._tagId) {
          return false;
       }
+
       return true;
    }
 
@@ -83,15 +88,24 @@ public class TVITaggingView_Tag extends TVITaggingView_Item {
 
       switch (_tourTag.getExpandType()) {
 
-      case TourTag.EXPAND_TYPE_FLAT:
+      case TourTag.EXPAND_TYPE__TAG_TOURS:
+
+         // tours
+
          TagLoader.loadValues(this, TagLoaderID.TAG__TOURS);
          break;
 
-      case TourTag.EXPAND_TYPE_YEAR_MONTH_DAY:
+      case TourTag.EXPAND_TYPE__TAG_YEAR_MONTH_TOURS:
+
+         // months
+
          loadTagChildren_Years(this, true);
          break;
 
-      case TourTag.EXPAND_TYPE_YEAR_DAY:
+      case TourTag.EXPAND_TYPE__TAG_YEAR_TOURS:
+
+         // years
+
          loadTagChildren_Years(this, false);
          break;
 
@@ -282,6 +296,11 @@ public class TVITaggingView_Tag extends TVITaggingView_Item {
       return children;
    }
 
+   /**
+    * @param tagItem
+    * @param isMonth
+    *           When <code>true</code> them months are year children, otherwise tours
+    */
    private void loadTagChildren_Years(final TVITaggingView_Tag tagItem,
                                       final boolean isMonth) {
 
@@ -336,7 +355,6 @@ public class TVITaggingView_Tag extends TVITaggingView_Item {
             final int dbYear = result.getInt(1);
 
             final TVITaggingView_Year yearItem = new TVITaggingView_Year(this, dbYear, isMonth, getTagViewer());
-            allChildren.add(yearItem);
 
             yearItem.firstColumn = Integer.toString(dbYear);
             yearItem.readSumColumnData(result, 2);
@@ -344,9 +362,12 @@ public class TVITaggingView_Tag extends TVITaggingView_Item {
             if (UI.IS_SCRAMBLE_DATA) {
                yearItem.firstColumn = UI.scrambleText(yearItem.firstColumn);
             }
+
+            allChildren.add(yearItem);
          }
 
          setChildren(allChildren);
+
 
       } catch (final SQLException e) {
 
@@ -366,17 +387,17 @@ public class TVITaggingView_Tag extends TVITaggingView_Item {
 
       switch (_tourTag.getExpandType()) {
 
-      case TourTag.EXPAND_TYPE_FLAT:
+      case TourTag.EXPAND_TYPE__TAG_TOURS:
 
          refreshFlatTours(modifiedTours, isAddMode);
          break;
 
-      case TourTag.EXPAND_TYPE_YEAR_MONTH_DAY:
+      case TourTag.EXPAND_TYPE__TAG_YEAR_MONTH_TOURS:
 
          loadTagChildren_Years(this, true);
          break;
 
-      case TourTag.EXPAND_TYPE_YEAR_DAY:
+      case TourTag.EXPAND_TYPE__TAG_YEAR_TOURS:
 
          loadTagChildren_Years(this, false);
          break;

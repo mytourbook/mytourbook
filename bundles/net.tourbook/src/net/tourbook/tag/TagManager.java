@@ -89,9 +89,9 @@ public class TagManager {
 
    protected static final int[] EXPAND_TYPES      = {
 
-         TourTag.EXPAND_TYPE_FLAT,
-         TourTag.EXPAND_TYPE_YEAR_DAY,
-         TourTag.EXPAND_TYPE_YEAR_MONTH_DAY
+         TourTag.EXPAND_TYPE__TAG_TOURS,
+         TourTag.EXPAND_TYPE__TAG_YEAR_TOURS,
+         TourTag.EXPAND_TYPE__TAG_YEAR_MONTH_TOURS
    };
 
    private static ContentLayout _tagContentLayout;

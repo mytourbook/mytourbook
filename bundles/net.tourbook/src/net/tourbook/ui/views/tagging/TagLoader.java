@@ -366,8 +366,7 @@ public class TagLoader {
 
          monthItem.numTours.addAndGet(numTours);
          monthItem.numNoTours.addAndGet(numNoTours);
-
-         monthItem.updateParentNumTours(numTours, numNoTours, _allUpdateItems);
+         monthItem.updateParentNumTours(numTours, _allUpdateItems);
 
          _allUpdateItems.add(monthItem);
 
@@ -565,8 +564,7 @@ public class TagLoader {
 
          tagItem.numTours.addAndGet(numTours);
          tagItem.numNoTours.addAndGet(numNoTours);
-
-         tagItem.updateParentNumTours(numTours, numNoTours, _allUpdateItems);
+         tagItem.updateParentNumTours(numTours, _allUpdateItems);
 
          _allUpdateItems.add(tagItem);
 
@@ -783,8 +781,7 @@ public class TagLoader {
 
          yearItem.numTours.addAndGet(numTours);
          yearItem.numNoTours.addAndGet(numNoTours);
-
-         yearItem.updateParentNumTours(numTours, numNoTours, _allUpdateItems);
+         yearItem.updateParentNumTours(numTours, _allUpdateItems);
 
          _allUpdateItems.add(yearItem);
 

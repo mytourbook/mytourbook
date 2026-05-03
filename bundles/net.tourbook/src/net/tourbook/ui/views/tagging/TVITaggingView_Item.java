@@ -175,9 +175,9 @@ public abstract class TVITaggingView_Item extends TreeViewerItem {
     *
     * @param newNumTours
     * @param allUpdatedItems
+    * @param parentCounter
     */
    void updateParentNumTours(final int newNumTours,
-                             final int newNoNumTours,
                              final Set<TVITaggingView_Item> allUpdatedItems) {
 
       final TreeViewerItem parentItem = getParentItem();
@@ -191,12 +191,12 @@ public abstract class TVITaggingView_Item extends TreeViewerItem {
             return;
          }
 
-         taggingItem.numTours.addAndGet(newNumTours);
-         taggingItem.numNoTours.addAndGet(newNoNumTours);
+         @SuppressWarnings("unused")
+         final long newAddedTours = taggingItem.numTours.addAndGet(newNumTours);
 
          allUpdatedItems.add(taggingItem);
 
-         taggingItem.updateParentNumTours(newNumTours, newNoNumTours, allUpdatedItems);
+         taggingItem.updateParentNumTours(newNumTours, allUpdatedItems);
 
 //         String item = UI.EMPTY_STRING;
 //         String name = UI.EMPTY_STRING;
@@ -225,7 +225,7 @@ public abstract class TVITaggingView_Item extends TreeViewerItem {
 //         );
 //
 //         System.out.println(text);
-//
+
 // TODO remove SYSTEM.OUT.PRINTLN
       }
    }

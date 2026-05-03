@@ -51,6 +51,8 @@ Changes
 
 * Tagged Tours View
   - New columns to display the parent of a tag and how tours are sorted/categorized
+  - The tag filter works only in the "flat view" which has no tag categories)
+  
 
 Changes that require Tour Re-import
 ===================================

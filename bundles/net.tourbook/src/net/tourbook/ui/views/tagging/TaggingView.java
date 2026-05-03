@@ -1060,7 +1060,9 @@ public class TaggingView extends ViewPart implements
             long numTours = viewItem.numTours.get();
 
             // hide number of tours
-            if (_tagFilterType == TagFilterType.TAGS_WITHOUT_TOURS) {
+            if (_tagViewLayout == TAG_VIEW_LAYOUT_FLAT
+                  && _tagFilterType == TagFilterType.TAGS_WITHOUT_TOURS) {
+
                numTours = 0;
             }
 
@@ -1107,8 +1109,10 @@ public class TaggingView extends ViewPart implements
                 * Hide number of tags & categories, it's toooo complicated to compute it, an
                 * alternative could be to filter tags with sql.
                 */
-               if (_tagFilterType == TagFilterType.TAGS_WITHOUT_TOURS
-                     || _tagFilterType == TagFilterType.TAGS_WITH_TOURS) {
+               if (_tagViewLayout == TAG_VIEW_LAYOUT_FLAT
+
+                     && (_tagFilterType == TagFilterType.TAGS_WITHOUT_TOURS
+                           || _tagFilterType == TagFilterType.TAGS_WITH_TOURS)) {
 
                   numTags = 0;
                   numCategories = 0;
@@ -1446,7 +1450,11 @@ public class TaggingView extends ViewPart implements
                   numChildren = unfetchedChildren.size();
                }
 
-               cell.setText(viewItem.numTours.toString() + " - " + numChildren);
+               cell.setText(viewItem.numTours.toString()
+                     + UI.SPACE6 + numChildren
+//                     + UI.SPACE6 + viewItem.numNoTours.toString()
+               );
+
                setCellColor(cell, element);
 
             } else {
@@ -1950,6 +1958,7 @@ public class TaggingView extends ViewPart implements
       final boolean isCategorySelected = numCategorys == 1 && numTours == 0 && numTags == 0 && numOtherItems == 0;
       final boolean isOneTour = numTours == 1;
       final boolean isItemsAvailable = numTreeItems > 0;
+      final boolean isFlatLayout = _tagViewLayout == TAG_VIEW_LAYOUT_FLAT;
 
       final int selectedItems = selection.size();
       final TVITaggingView_Item firstElement = (TVITaggingView_Item) selection.getFirstElement();
@@ -1999,15 +2008,10 @@ public class TaggingView extends ViewPart implements
       _actionDeleteTag.setEnabled(isTagSelected);
       _actionDeleteTagCategory.setEnabled(isCategorySelected);
 
-//      _actionContext_ExpandSelection.setEnabled(firstElement == null
-//            ? false
-//            : selectedItems == 1
-//                  ? firstElementHasChildren
-//                  : true);
-      _actionExpandSelection.setEnabled(true);
-
       _actionExportTour.setEnabled(isIteratedTours);
+      _action_ToggleTagFilter.setEnabled(isFlatLayout);
 
+      _actionExpandSelection.setEnabled(true);
       _actionCollapseOthers.setEnabled(selectedItems == 1 && firstElementHasChildren);
       _actionCollapseAll_WithoutSelection.setEnabled(isItemsAvailable);
 
@@ -2273,6 +2277,16 @@ public class TaggingView extends ViewPart implements
     */
    private boolean isInTagFilter(final Object item) {
 
+      if (_tagViewLayout == TAG_VIEW_LAYOUT_HIERARCHICAL) {
+
+         /*
+          * After many hours of try and error, could not find an easy way to run this filter for
+          * categorized tags/tours when running concurrent and in the background
+          */
+
+         return true;
+      }
+
       if (_tagFilterType == TagFilterType.ALL_IS_DISPLAYED) {
 
          // nothing is filtered
@@ -2288,8 +2302,10 @@ public class TaggingView extends ViewPart implements
             || item instanceof TVITaggingView_Year
             || item instanceof TVITaggingView_Month) {
 
-         final long numTours = ((TVITaggingView_Item) item).numTours.get();
-         final long numNoTours = ((TVITaggingView_Item) item).numNoTours.get();
+         final TVITaggingView_Item taggingItem = (TVITaggingView_Item) item;
+
+         final long numTours = taggingItem.numTours.get();
+         final long numNoTours = taggingItem.numNoTours.get();
 
          final boolean hasTour = numTours > 0;
          final boolean hasTagsNoTours = numNoTours > 0;
@@ -2355,7 +2371,7 @@ public class TaggingView extends ViewPart implements
       }
 
       /*
-       * Collect number of ...
+       * Collect number of tags/categories
        */
       int numAllTagCategories = 0;
       int numAllTags = 0;
@@ -2493,6 +2509,8 @@ public class TaggingView extends ViewPart implements
       }
 
       updateUI_TagLayoutAction();
+
+      enableActions(false);
 
       reloadViewer();
    }

@@ -103,11 +103,13 @@ public class TVITaggingView_Root extends TVITaggingView_Item {
 
       for (final TourTagCategory tagCategory : allTagCategories) {
 
-         addChild(new TVITaggingView_TagCategory(tagCategory, this, getTagViewer()));
+         final TVITaggingView_TagCategory categoryItem = new TVITaggingView_TagCategory(tagCategory, this, getTagViewer());
+
+         addChild(categoryItem);
       }
 
       /*
-       * Read root tour tags from db
+       * Read ROOT tags from db
        */
       query = em.createQuery(UI.EMPTY_STRING
 

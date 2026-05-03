@@ -66,17 +66,24 @@ public class TVITaggingView_TagCategory extends TVITaggingView_Item {
 
       final TourTagCategory tourTagCategory = em.find(TourTagCategory.class, _tagCategory.getCategoryId());
 
-      // create category items
+      /*
+       * Create category items
+       */
       final Set<TourTagCategory> lazyTourTagCategories = tourTagCategory.getTagCategories();
 
       final ArrayList<TourTagCategory> sortedCategories = new ArrayList<>(lazyTourTagCategories);
       Collections.sort(sortedCategories);
 
       for (final TourTagCategory tagCategory : lazyTourTagCategories) {
-         addChild(new TVITaggingView_TagCategory(tagCategory, this, tagViewer));
+
+         final TVITaggingView_TagCategory categoryItem = new TVITaggingView_TagCategory(tagCategory, this, tagViewer);
+
+         addChild(categoryItem);
       }
 
-      // create tag items
+      /*
+       * Create tag items
+       */
       final Set<TourTag> lazyTourTags = tourTagCategory.getTourTags();
       for (final TourTag tourTag : lazyTourTags) {
 
