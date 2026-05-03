@@ -40,7 +40,7 @@ New / Improvements
     https://github.com/mytourbook/mytourbook/issues/1581
 
 * Tour filter (Frederic)
-  - Added nutrition tour filters
+  - Added nutrition tour filter
   
 
 Changes
