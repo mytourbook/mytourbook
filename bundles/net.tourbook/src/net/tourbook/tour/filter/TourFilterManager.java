@@ -494,7 +494,6 @@ public class TourFilterManager {
             TourFilterFieldId.NUTRITION_PRODUCTSLIST));
 
       //todo fb
-      // List of products (is empty vs is not empty, cf. tour title)
       // Product (name, barcode).... does the search works with a barcode or a product name ??
 
       allConfigs.add(
@@ -1072,6 +1071,13 @@ public class TourFilterManager {
             getSQL_Nutrition_ProductsList(sqlWhere, fieldOperator);
             break;
 
+         case NUTRITION_PRODUCT:
+            getSQL_Nutrition_Product(sqlWhere, fieldOperator, text2);
+
+            sql = TOUR_NUTRITION_PRODUCTID;
+            getSQL__FieldOperators_Text(sqlWhere, fieldOperator, sql);
+            break;
+
          case TOUR_MANUAL_TOUR:
             getSQL_ManualTour(sqlWhere, fieldOperator);
             break;
@@ -1609,6 +1615,30 @@ public class TourFilterManager {
 
          sqlWhere.append(OP_AND + sqlField + OP_NOT + sql_IN_ManualId);
       }
+
+   }
+
+   private static void getSQL_Nutrition_Product(final StringBuilder sqlWhere,
+                                                final TourFilterFieldOperator fieldOperator,
+                                                final String text2) {
+      //TODO FB
+      sqlWhere.append(OP_AND);
+
+      String operator;
+      if (fieldOperator == TourFilterFieldOperator.IS_AVAILABLE) {
+
+         operator = "IN";//$NON-NLS-1$
+
+      } else {
+
+         operator = "NOT IN";//$NON-NLS-1$
+      }
+
+      final String whereClause = String.format(
+            "TOURID %s (SELECT TOURDATA_TOURID FROM %s)",
+            operator,
+            TourDatabase.TABLE_TOUR_NUTRITION_PRODUCT);
+      sqlWhere.append(whereClause);
 
    }
 
