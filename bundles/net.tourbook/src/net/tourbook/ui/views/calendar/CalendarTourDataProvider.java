@@ -456,7 +456,7 @@ class CalendarTourDataProvider {
                + "   TourDescription," + NL //                    13 //$NON-NLS-1$
                + "   StartWeek," + NL //                          14 //$NON-NLS-1$
                + "   DevicePluginId," + NL //                     15 //$NON-NLS-1$
-               + TourDatabase.TABLE_TOUR_DATA + ".Calories," + NL //                           16 //$NON-NLS-1$
+               + "   Calories," + NL //                           16 //$NON-NLS-1$
 
                + "   TourAltDown," + NL //                        17 //$NON-NLS-1$
                + "   AvgPulse," + NL //                           18 //$NON-NLS-1$
@@ -465,9 +465,6 @@ class CalendarTourDataProvider {
                + "   weather_Clouds" + NL //                      21 //$NON-NLS-1$
 
                + "FROM " + TourDatabase.TABLE_TOUR_DATA + NL //      //$NON-NLS-1$
-
-//               + "INNER JOIN " + TourDatabase.TABLE_TOUR_NUTRITION_PRODUCT //$NON-NLS-1$
-//               + "    AS TNutritionProduct ON " + TourDatabase.TABLE_TOUR_DATA + ".tourID = TNutritionProduct.TourData_tourId" + NL //    //$NON-NLS-1$
 
                + "WHERE  StartYear  = ?" + NL //                     //$NON-NLS-1$
                + "   AND StartMonth = ?" + NL //                     //$NON-NLS-1$
