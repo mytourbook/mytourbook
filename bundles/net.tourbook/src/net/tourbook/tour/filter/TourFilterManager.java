@@ -1623,6 +1623,8 @@ public class TourFilterManager {
    private static void getSQL_Nutrition_ProductsList(final StringBuilder sqlWhere,
                                                      final TourFilterFieldOperator fieldOperator) {
 
+      sqlWhere.append(OP_AND);
+
       String operator;
       if (fieldOperator == TourFilterFieldOperator.IS_AVAILABLE) {
 
@@ -1632,10 +1634,12 @@ public class TourFilterManager {
 
          operator = "NOT IN";//$NON-NLS-1$
       }
-      sqlWhere.append("TOURID " + //$NON-NLS-1$
-            operator +
-            " (SELECT TOURDATA_TOURID  FROM " + //$NON-NLS-1$
+
+      final String whereClause = String.format(
+            "TOURID %s (SELECT TOURDATA_TOURID FROM %s)",
+            operator,
             TourDatabase.TABLE_TOUR_NUTRITION_PRODUCT);
+      sqlWhere.append(whereClause);
    }
 
    private static File getXmlFile() {
