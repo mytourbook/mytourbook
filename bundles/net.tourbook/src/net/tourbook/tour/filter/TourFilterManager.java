@@ -54,17 +54,6 @@ import org.eclipse.ui.XMLMemento;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.Version;
 
-/*
-* For the productIds...
-*SELECT *
-*FROM A
-*WHERE EXISTS (
- * SELECT 1
- * FROM B b
-*WHERE b.productId = :productId
-*    AND b.productName = :productName
-*);
-*/
 public class TourFilterManager {
 
    private static final String TOUR_DATA_ALTITUDE_DOWN          = "TourData.tourAltDown";                        //$NON-NLS-1$
@@ -493,22 +482,12 @@ public class TourFilterManager {
             OtherMessages.COLUMN_FACTORY_CATEGORY_NUTRITION,
             TourFilterFieldId.NUTRITION_PRODUCTSLIST));
 
-      //todo fb
-      // Product (name, barcode).... does the search works with a barcode or a product name ??
-
       allConfigs.add(
             TourFilterFieldConfig
                   .name(Messages.Tour_Filter_Field_NutritionProductsList)
                   .fieldId(TourFilterFieldId.NUTRITION_PRODUCTSLIST)
                   .fieldOperators(FILTER_OPERATORS_BOOLEAN)
                   .defaultFieldOperator(TourFilterFieldOperator.IS_AVAILABLE));
-
-      allConfigs.add(
-            TourFilterFieldConfig
-                  .name(Messages.Tour_Filter_Field_NutritionProduct)
-                  .fieldId(TourFilterFieldId.NUTRITION_PRODUCT)
-                  .fieldType(TourFilterFieldType.TEXT)
-                  .fieldOperators(FILTER_OPERATORS_TEXT));
    }
 
    private static void createConfig_Power(final ArrayList<TourFilterFieldConfig> allConfigs) {
@@ -1071,13 +1050,6 @@ public class TourFilterManager {
             getSQL_Nutrition_ProductsList(sqlWhere, fieldOperator);
             break;
 
-         case NUTRITION_PRODUCT:
-            getSQL_Nutrition_Product(sqlWhere, fieldOperator, text2);
-
-            sql = TOUR_NUTRITION_PRODUCTID;
-            getSQL__FieldOperators_Text(sqlWhere, fieldOperator, sql);
-            break;
-
          case TOUR_MANUAL_TOUR:
             getSQL_ManualTour(sqlWhere, fieldOperator);
             break;
@@ -1618,30 +1590,6 @@ public class TourFilterManager {
 
    }
 
-   private static void getSQL_Nutrition_Product(final StringBuilder sqlWhere,
-                                                final TourFilterFieldOperator fieldOperator,
-                                                final String text2) {
-      //TODO FB
-      sqlWhere.append(OP_AND);
-
-      String operator;
-      if (fieldOperator == TourFilterFieldOperator.IS_AVAILABLE) {
-
-         operator = "IN";//$NON-NLS-1$
-
-      } else {
-
-         operator = "NOT IN";//$NON-NLS-1$
-      }
-
-      final String whereClause = String.format(
-            "TOURID %s (SELECT TOURDATA_TOURID FROM %s)",
-            operator,
-            TourDatabase.TABLE_TOUR_NUTRITION_PRODUCT);
-      sqlWhere.append(whereClause);
-
-   }
-
    private static void getSQL_Nutrition_ProductsList(final StringBuilder sqlWhere,
                                                      final TourFilterFieldOperator fieldOperator) {
 
@@ -1658,7 +1606,7 @@ public class TourFilterManager {
       }
 
       final String whereClause = String.format(
-            "TOURID %s (SELECT TOURDATA_TOURID FROM %s)",
+            "TOURID %s (SELECT TOURDATA_TOURID FROM %s)", //$NON-NLS-1$
             operator,
             TourDatabase.TABLE_TOUR_NUTRITION_PRODUCT);
       sqlWhere.append(whereClause);

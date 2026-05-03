@@ -3629,7 +3629,6 @@ public class Messages extends NLS {
    public static String        Tour_Filter_Field_DeviceTime_Elapsed;
    public static String        Tour_Filter_Field_Distance;
    public static String        Tour_Filter_Field_NutritionProductsList;
-   public static String        Tour_Filter_Field_NutritionProduct;
    public static String        Tour_Filter_Field_ManualTour;
    public static String        Tour_Filter_Field_Photos;
    public static String        Tour_Filter_Field_Season;

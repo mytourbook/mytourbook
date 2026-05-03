@@ -43,7 +43,6 @@ public enum TourFilterFieldId {
    MOTION_DISTANCE, //
 
    NUTRITION_PRODUCTSLIST, //
-   NUTRITION_PRODUCT, //
 
    POWER_AVERAGE, //
    POWER_MAX, //
