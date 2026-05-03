@@ -55,14 +55,6 @@ import org.osgi.framework.Bundle;
 import org.osgi.framework.Version;
 
 /*
-*SELECT *
-
-*FROM A
-
-*WHERE id IN (SELECT id FROM B);
-
-* the simples one i can find ?
-
 * For the productIds...
 *SELECT *
 *FROM A
