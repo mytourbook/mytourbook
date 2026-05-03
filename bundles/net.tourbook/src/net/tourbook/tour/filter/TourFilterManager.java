@@ -84,8 +84,6 @@ public class TourFilterManager {
    private static final String TOUR_FILTER_FILE_NAME            = "tour-filter.xml";                             //$NON-NLS-1$
    private static final int    TOUR_FILTER_VERSION              = 1;
 
-   private static final String TOUR_NUTRITION_PRODUCTID         = "TNutritionProduct.productId";                 //$NON-NLS-1$
-
    private static final String TAG_PROFILE                      = "Profile";                                     //$NON-NLS-1$
    private static final String TAG_PROPERTY                     = "Property";                                    //$NON-NLS-1$
    private static final String TAG_ROOT                         = "TourFilterProfiles";                          //$NON-NLS-1$
