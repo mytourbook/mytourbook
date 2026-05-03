@@ -40,6 +40,7 @@ import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.Util;
 import net.tourbook.common.weather.IWeather;
 import net.tourbook.data.TourData;
+import net.tourbook.database.TourDatabase;
 import net.tourbook.preferences.ITourbookPreferences;
 
 import org.eclipse.core.runtime.Assert;
@@ -52,6 +53,7 @@ import org.eclipse.ui.IMemento;
 import org.eclipse.ui.XMLMemento;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.Version;
+
 /*
 *SELECT *
 
@@ -1075,7 +1077,7 @@ public class TourFilterManager {
             break;
 
          case NUTRITION_PRODUCTSLIST:
-            getSQL_Nutrition_ProductsList(sqlWhere, sqlParameters, fieldOperator);
+            getSQL_Nutrition_ProductsList(sqlWhere, fieldOperator);
             break;
 
          case TOUR_MANUAL_TOUR:
@@ -1619,29 +1621,21 @@ public class TourFilterManager {
    }
 
    private static void getSQL_Nutrition_ProductsList(final StringBuilder sqlWhere,
-                                                     final ArrayList<Object> sqlParameters,
                                                      final TourFilterFieldOperator fieldOperator) {
 
-      sqlWhere.append(OP_AND + TOUR_NUTRITION_PRODUCTID);
-
-      /**
-       * Ca devrait marcher et ne necessite pas de inner join
-       * SELECT *
-       * FROM A a
-       * WHERE EXISTS (SELECT 1 FROM B b WHERE b.id = a.id )
-       */
-
+      String operator;
       if (fieldOperator == TourFilterFieldOperator.IS_AVAILABLE) {
 
-         sqlWhere.append(OP_NOT_EQUALS);
+         operator = "IN";//$NON-NLS-1$
 
       } else {
 
-         sqlWhere.append(OP_EQUALS);
+         operator = "NOT IN";//$NON-NLS-1$
       }
-
-      sqlParameters.add("0"); //$NON-NLS-1$
-
+      sqlWhere.append("TOURID " + //$NON-NLS-1$
+            operator +
+            " (SELECT TOURDATA_TOURID  FROM " + //$NON-NLS-1$
+            TourDatabase.TABLE_TOUR_NUTRITION_PRODUCT);
    }
 
    private static File getXmlFile() {
