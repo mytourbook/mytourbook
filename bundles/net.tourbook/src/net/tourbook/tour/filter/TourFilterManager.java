@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2026 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -40,6 +40,7 @@ import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.Util;
 import net.tourbook.common.weather.IWeather;
 import net.tourbook.data.TourData;
+import net.tourbook.database.TourDatabase;
 import net.tourbook.preferences.ITourbookPreferences;
 
 import org.eclipse.core.runtime.Assert;
@@ -251,6 +252,7 @@ public class TourFilterManager {
             OtherMessages.COLUMN_FACTORY_CATEGORY_DEVICE,
             OtherMessages.COLUMN_FACTORY_CATEGORY_MARKER,
             OtherMessages.COLUMN_FACTORY_CATEGORY_MOTION,
+            OtherMessages.COLUMN_FACTORY_CATEGORY_NUTRITION,
             OtherMessages.COLUMN_FACTORY_CATEGORY_PHOTO,
             OtherMessages.COLUMN_FACTORY_CATEGORY_POWER,
             OtherMessages.COLUMN_FACTORY_CATEGORY_POWERTRAIN,
@@ -285,6 +287,9 @@ public class TourFilterManager {
 
          } else if (category.equals(OtherMessages.COLUMN_FACTORY_CATEGORY_MOTION)) {
             createConfig_Motion(allConfigs);
+
+         } else if (category.equals(OtherMessages.COLUMN_FACTORY_CATEGORY_NUTRITION)) {
+            createConfig_Nutrition(allConfigs);
 
          } else if (category.equals(OtherMessages.COLUMN_FACTORY_CATEGORY_PHOTO)) {
             createConfig_Power(allConfigs);
@@ -467,6 +472,20 @@ public class TourFilterManager {
                   .numDigits(1)
                   .fieldValueProvider(_fieldValueProvider_Distance)
                   .unitLabel(UI.UNIT_LABEL_DISTANCE));
+   }
+
+   private static void createConfig_Nutrition(final ArrayList<TourFilterFieldConfig> allConfigs) {
+
+      allConfigs.add(new TourFilterFieldConfig(
+            OtherMessages.COLUMN_FACTORY_CATEGORY_NUTRITION,
+            TourFilterFieldId.NUTRITION_PRODUCTSLIST));
+
+      allConfigs.add(
+            TourFilterFieldConfig
+                  .name(Messages.Tour_Filter_Field_NutritionProductsList)
+                  .fieldId(TourFilterFieldId.NUTRITION_PRODUCTSLIST)
+                  .fieldOperators(FILTER_OPERATORS_BOOLEAN)
+                  .defaultFieldOperator(TourFilterFieldOperator.IS_AVAILABLE));
    }
 
    private static void createConfig_Power(final ArrayList<TourFilterFieldConfig> allConfigs) {
@@ -1025,6 +1044,10 @@ public class TourFilterManager {
             getSQL__FieldOperators_Number(sqlWhere, sqlParameters, fieldOperator, sql, distance1, distance2);
             break;
 
+         case NUTRITION_PRODUCTSLIST:
+            getSQL_Nutrition_ProductsList(sqlWhere, fieldOperator);
+            break;
+
          case TOUR_MANUAL_TOUR:
             getSQL_ManualTour(sqlWhere, fieldOperator);
             break;
@@ -1563,6 +1586,28 @@ public class TourFilterManager {
          sqlWhere.append(OP_AND + sqlField + OP_NOT + sql_IN_ManualId);
       }
 
+   }
+
+   private static void getSQL_Nutrition_ProductsList(final StringBuilder sqlWhere,
+                                                     final TourFilterFieldOperator fieldOperator) {
+
+      sqlWhere.append(OP_AND);
+
+      String operator;
+      if (fieldOperator == TourFilterFieldOperator.IS_AVAILABLE) {
+
+         operator = "IN";//$NON-NLS-1$
+
+      } else {
+
+         operator = "NOT IN";//$NON-NLS-1$
+      }
+
+      final String whereClause = String.format(
+            "TOURID %s (SELECT TOURDATA_TOURID FROM %s)", //$NON-NLS-1$
+            operator,
+            TourDatabase.TABLE_TOUR_NUTRITION_PRODUCT);
+      sqlWhere.append(whereClause);
    }
 
    private static File getXmlFile() {

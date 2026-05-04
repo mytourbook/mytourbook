@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2024, 2025 Frédéric Bard
+ * Copyright (C) 2024, 2026 Frédéric Bard
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -31,6 +31,8 @@ import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.layout.PixelConverter;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyEvent;
+import org.eclipse.swt.events.MouseWheelListener;
+import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
@@ -40,14 +42,17 @@ import org.eclipse.swt.widgets.Text;
 
 public class DialogCustomTourNutritionProduct extends Dialog {
 
-   private static final int HINT_TEXT_COLUMN_WIDTH = UI.IS_OSX ? 100 : 50;
-   private int              _calories;
-   private int              _carbohydrates;
-   private boolean          _isBeverage;
-   private int              _sodium;
-   private String           _name                  = UI.EMPTY_STRING;
-   private int              _numServings           = 1;
-   private int              _beverageQuantity;
+   private static final int   HINT_TEXT_COLUMN_WIDTH = UI.IS_OSX ? 100 : 50;
+   private int                _calories;
+   private int                _carbohydrates;
+   private boolean            _isBeverage;
+   private int                _sodium;
+   private String             _name                  = UI.EMPTY_STRING;
+   private int                _numServings           = 1;
+   private int                _beverageQuantity;
+
+   private SelectionListener  _defaultSelectionListener;
+   private MouseWheelListener _defaultMouseWheelListener;
 
    /*
     * UI controls
@@ -63,11 +68,11 @@ public class DialogCustomTourNutritionProduct extends Dialog {
 
    private Spinner              _spinnerNumServings;
    private Spinner              _spinnerBeverageQuantity;
+   private Spinner              _spinnerCalories;
+   private Spinner              _spinnerCarbohydrates;
+   private Spinner              _spinnerSodium;
 
-   private Text                 _txtCalories;
-   private Text                 _txtCarbohydrates;
    private Text                 _txtName;
-   private Text                 _txtSodium;
 
    public DialogCustomTourNutritionProduct(final Shell parentShell,
                                            final boolean isEditMode,
@@ -94,6 +99,12 @@ public class DialogCustomTourNutritionProduct extends Dialog {
    protected Control createDialogArea(final Composite parent) {
 
       final Composite container = (Composite) super.createDialogArea(parent);
+
+      _defaultSelectionListener = SelectionListener.widgetSelectedAdapter(
+            selectionEvent -> enableControls());
+
+      _defaultMouseWheelListener = mouseEvent -> UI.adjustSpinnerValueOnMouseScroll(
+            mouseEvent);
 
       _pc = new PixelConverter(container);
 
@@ -127,11 +138,14 @@ public class DialogCustomTourNutritionProduct extends Dialog {
          }
          {
             // Label: number of servings
-            UI.createLabel(container, Messages.Dialog_CustomTourNutritionProduct_Label_NumberServings);
+            UI.createLabel(
+                  container,
+                  Messages.Dialog_CustomTourNutritionProduct_Label_NumberServings);
 
             // Spinner: number of servings
             _spinnerNumServings = UI.createSpinner(container, 2, 100, 10000, 25, 100);
-            _spinnerNumServings.addSelectionListener(widgetSelectedAdapter(selectionEvent -> onCapacityModified()));
+            _spinnerNumServings.addSelectionListener(widgetSelectedAdapter(
+                  selectionEvent -> onCapacityModified()));
             _spinnerNumServings.addModifyListener(event -> onCapacityModified());
             _spinnerNumServings.addMouseWheelListener(mouseEvent -> {
 
@@ -139,31 +153,43 @@ public class DialogCustomTourNutritionProduct extends Dialog {
 
                onCapacityModified();
             });
-            GridDataFactory.fillDefaults().hint(_pc.convertWidthInCharsToPixels(5), SWT.DEFAULT).span(2, 1).align(SWT.BEGINNING, SWT.CENTER).applyTo(
-                  _spinnerNumServings);
+            GridDataFactory.fillDefaults().hint(
+                  _pc.convertWidthInCharsToPixels(5),
+                  SWT.DEFAULT).span(2, 1)
+                  .align(SWT.BEGINNING, SWT.CENTER)
+                  .applyTo(
+                        _spinnerNumServings);
          }
          {
             // Label: calories
             UI.createLabel(container, Messages.Dialog_CustomTourNutritionProduct_Label_Calories);
-            _txtCalories = new Text(container, SWT.BORDER);
-            _txtCalories.addModifyListener(event -> onModifyCalories(event));
+            _spinnerCalories = new Spinner(container, SWT.BORDER);
+            _spinnerCalories.setMinimum(0);
+            _spinnerCalories.setMaximum(5000);
+            _spinnerCalories.addSelectionListener(_defaultSelectionListener);
+            _spinnerCalories.addMouseWheelListener(_defaultMouseWheelListener);
             GridDataFactory.fillDefaults()
                   .hint(HINT_TEXT_COLUMN_WIDTH, SWT.DEFAULT)
                   .align(SWT.BEGINNING, SWT.CENTER)
-                  .applyTo(_txtCalories);
+                  .applyTo(_spinnerCalories);
 
             // Unit: kcal
             UI.createLabel(container, OtherMessages.VALUE_UNIT_K_CALORIES);
          }
          {
             // Label: carbohydrates
-            UI.createLabel(container, Messages.Dialog_CustomTourNutritionProduct_Label_Carbohydrates);
-            _txtCarbohydrates = new Text(container, SWT.BORDER);
-            _txtCarbohydrates.addModifyListener(event -> onModifyCarbohydrates(event));
+            UI.createLabel(
+                  container,
+                  Messages.Dialog_CustomTourNutritionProduct_Label_Carbohydrates);
+            _spinnerCarbohydrates = new Spinner(container, SWT.BORDER);
+            _spinnerCarbohydrates.setMinimum(0);
+            _spinnerCarbohydrates.setMaximum(5000);
+            _spinnerCarbohydrates.addSelectionListener(_defaultSelectionListener);
+            _spinnerCarbohydrates.addMouseWheelListener(_defaultMouseWheelListener);
             GridDataFactory.fillDefaults()
                   .hint(HINT_TEXT_COLUMN_WIDTH, SWT.DEFAULT)
                   .align(SWT.BEGINNING, SWT.CENTER)
-                  .applyTo(_txtCarbohydrates);
+                  .applyTo(_spinnerCarbohydrates);
 
             // Unit: g
             UI.createLabel(container, UI.UNIT_WEIGHT_G);
@@ -172,12 +198,15 @@ public class DialogCustomTourNutritionProduct extends Dialog {
             // Label: sodium
             UI.createLabel(container, Messages.Dialog_CustomTourNutritionProduct_Label_Sodium);
 
-            _txtSodium = new Text(container, SWT.BORDER);
-            _txtSodium.addModifyListener(event -> onModifySodium(event));
+            _spinnerSodium = new Spinner(container, SWT.BORDER);
+            _spinnerSodium.setMinimum(0);
+            _spinnerSodium.setMaximum(5000);
+            _spinnerSodium.addSelectionListener(_defaultSelectionListener);
+            _spinnerSodium.addMouseWheelListener(_defaultMouseWheelListener);
             GridDataFactory.fillDefaults()
                   .hint(HINT_TEXT_COLUMN_WIDTH, SWT.DEFAULT)
                   .align(SWT.BEGINNING, SWT.CENTER)
-                  .applyTo(_txtSodium);
+                  .applyTo(_spinnerSodium);
 
             // Unit: mg
             UI.createLabel(container, UI.UNIT_WEIGHT_MG);
@@ -186,7 +215,8 @@ public class DialogCustomTourNutritionProduct extends Dialog {
             // Checkbox: Is Beverage
             _checkIsBeverage = new Button(container, SWT.CHECK);
             _checkIsBeverage.setText(Messages.Dialog_CustomTourNutritionProduct_Label_IsBeverage);
-            _checkIsBeverage.addSelectionListener(widgetSelectedAdapter(selectionEvent -> enableControls()));
+            _checkIsBeverage.addSelectionListener(widgetSelectedAdapter(
+                  selectionEvent -> enableControls()));
             GridDataFactory.fillDefaults()
                   .span(3, 1)
                   .align(SWT.BEGINNING, SWT.CENTER)
@@ -194,12 +224,15 @@ public class DialogCustomTourNutritionProduct extends Dialog {
          }
          {
             // Label: Beverage quantity
-            UI.createLabel(container, Messages.Dialog_CustomTourNutritionProduct_Label_BeverageQuantity);
+            UI.createLabel(
+                  container,
+                  Messages.Dialog_CustomTourNutritionProduct_Label_BeverageQuantity);
 
-            // Create a spinner with a default of 1L (1,000mL), a maximum of 10L, an increment of 25cL
-            // and a page increment of 10cL
+            // Create a spinner with a default of 1L (1,000mL), a maximum of 10L, an
+            // increment of 25cL and a page increment of 10cL
             _spinnerBeverageQuantity = UI.createSpinner(container, 3, 0, 10000, 250, 100);
-            _spinnerBeverageQuantity.addSelectionListener(widgetSelectedAdapter(selectionEvent -> onBeverageQuantityModified()));
+            _spinnerBeverageQuantity.addSelectionListener(widgetSelectedAdapter(
+                  selectionEvent -> onBeverageQuantityModified()));
             _spinnerBeverageQuantity.addModifyListener(event -> onBeverageQuantityModified());
             _spinnerBeverageQuantity.addMouseWheelListener(mouseEvent -> {
 
@@ -243,19 +276,22 @@ public class DialogCustomTourNutritionProduct extends Dialog {
 
       if (_product.getCalories_Serving() != 0) {
 
-         final int numServings = Math.floorDiv(_product.getCalories(), _product.getCalories_Serving());
+         final int numServings = Math.floorDiv(
+               _product.getCalories(),
+               _product.getCalories_Serving());
          _spinnerNumServings.setSelection(numServings * 100);
       }
 
-      _txtCarbohydrates.setText(String.valueOf(_product.getCarbohydrates()));
-      _txtCalories.setText(String.valueOf(_product.getCalories()));
-      _txtSodium.setText(String.valueOf(_product.getSodium()));
+      _spinnerCarbohydrates.setSelection(_product.getCarbohydrates());
+      _spinnerCalories.setSelection(_product.getCalories());
+      _spinnerSodium.setSelection(_product.getSodium());
       _spinnerBeverageQuantity.setSelection(_product.getBeverageQuantity());
       _spinnerBeverageQuantity.setEnabled(_product.isBeverage());
       _checkIsBeverage.setSelection(_product.isBeverage());
    }
 
-   public TourNutritionProduct getTourNutritionProduct(final TourData tourData) {
+   public TourNutritionProduct getTourNutritionProduct(final TourData tourData,
+                                                       final TourNutritionProduct originalProduct) {
 
       final TourNutritionProduct product = new TourNutritionProduct(tourData, true);
       product.setName(_name.trim());
@@ -276,8 +312,15 @@ public class DialogCustomTourNutritionProduct extends Dialog {
 
       product.setIsBeverage(_isBeverage);
       if (_isBeverage) {
+
          product.setBeverageQuantity(_beverageQuantity);
          product.setBeverageQuantity_Serving((int) Math.round(_beverageQuantity * 1.0 / _numServings));
+      }
+
+      if (originalProduct != null) {
+
+         product.setTourBeverageContainer(originalProduct.getTourBeverageContainer());
+         product.setContainersConsumed(originalProduct.getContainersConsumed());
       }
 
       return product;
@@ -288,9 +331,9 @@ public class DialogCustomTourNutritionProduct extends Dialog {
 
       _name = _txtName.getText();
       _numServings = (int) Math.round(_spinnerNumServings.getSelection() / 100.0);
-      _calories = UI.verifyIntegerValue(_txtCalories.getText()) ? Integer.valueOf(_txtCalories.getText()) : 0;
-      _carbohydrates = UI.verifyIntegerValue(_txtCarbohydrates.getText()) ? Integer.valueOf(_txtCarbohydrates.getText()) : 0;
-      _sodium = UI.verifyIntegerValue(_txtSodium.getText()) ? Integer.valueOf(_txtSodium.getText()) : 0;
+      _calories = _spinnerCalories.getSelection();
+      _carbohydrates = _spinnerCarbohydrates.getSelection();
+      _sodium = _spinnerSodium.getSelection();
       _isBeverage = _checkIsBeverage.getSelection();
       _beverageQuantity = _isBeverage
             ? _spinnerBeverageQuantity.getSelection()
@@ -321,47 +364,11 @@ public class DialogCustomTourNutritionProduct extends Dialog {
       validateFields();
    }
 
-   private void onModifyCalories(final ModifyEvent event) {
-
-      final Text textWidget = (Text) event.getSource();
-      final String userText = textWidget.getText();
-      if (UI.verifyIntegerValue(userText)) {
-
-         _calories = Integer.parseInt(userText);
-      }
-
-      validateFields();
-   }
-
-   private void onModifyCarbohydrates(final ModifyEvent event) {
-
-      final Text textWidget = (Text) event.getSource();
-      final String userText = textWidget.getText();
-      if (UI.verifyIntegerValue(userText)) {
-
-         _carbohydrates = Integer.parseInt(userText);
-      }
-
-      validateFields();
-   }
-
    private void onModifyName(final ModifyEvent event) {
 
       final Text textWidget = (Text) event.getSource();
       final String userText = textWidget.getText();
       _name = userText;
-
-      validateFields();
-   }
-
-   private void onModifySodium(final ModifyEvent event) {
-
-      final Text textWidget = (Text) event.getSource();
-      final String userText = textWidget.getText();
-      if (UI.verifyIntegerValue(userText)) {
-
-         _sodium = Integer.parseInt(userText);
-      }
 
       validateFields();
    }
@@ -372,7 +379,8 @@ public class DialogCustomTourNutritionProduct extends Dialog {
          return;
       }
 
-      final boolean isCustomTourNutritionProductValid = StringUtils.hasContent(_txtName.getText());
+      final boolean isCustomTourNutritionProductValid =
+            StringUtils.hasContent(_txtName.getText());
       enableOK(isCustomTourNutritionProductValid);
    }
 }
