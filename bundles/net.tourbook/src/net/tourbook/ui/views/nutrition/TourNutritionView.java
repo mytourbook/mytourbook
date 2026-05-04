@@ -671,7 +671,8 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
       if (isEditMode) {
 
          // update product
-         final TourNutritionProduct updatedProduct = dialogTourNutritionProduct.getTourNutritionProduct(_tourData);
+         final TourNutritionProduct updatedProduct =
+               dialogTourNutritionProduct.getTourNutritionProduct(_tourData, product);
          _tourData.getTourNutritionProducts().remove(product);
          _tourData.getTourNutritionProducts().add(updatedProduct);
 

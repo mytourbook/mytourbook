@@ -300,7 +300,7 @@ public class TVICollatedTour_Event extends TVICollatedTour {
 
       if (eventEnd == null) {
 
-         // this occures when the collation task is canceled by the user
+         // this occurs when the collation task is canceled by the user
 
          return false;
       }
