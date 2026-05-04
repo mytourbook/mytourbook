@@ -38,6 +38,9 @@ New / Improvements
 * TBD: Fit Export
   - Export swim values
     https://github.com/mytourbook/mytourbook/issues/1581
+
+* Tour filter (Frederic)
+  - Added nutrition tour filter
   
 
 Changes
@@ -64,6 +67,7 @@ Bugfix
 * Tour Nutrition (Frederic)
   - Fixed an exception when updating the list of products for which a product is not found in the OpenFoodFacts database
   - Fixed the computation of total calories/carbs/sodium for beverages involving beverage containers
+  - FIxed a bug where modifying a custom product would remove the associated beverage container
 
 
 
@@ -88,5 +92,5 @@ System
 * Eclipse 2025-09 (4.37)         https://archive.eclipse.org/eclipse/downloads/drops4/R-4.37-202509050730/
 * NatTable 2.6.0                 https://eclipse.dev/nattable/download
 * Nebula Widgets                 https://download.eclipse.org/nebula/releases/latest
-* FIT SDK 21.201.0               https://forums.garmin.com/developer/fit-sdk/b/news-announcements
+* FIT SDK 21.202.0               https://forums.garmin.com/developer/fit-sdk/b/news-announcements
 * WorldWind 2.2.1                https://github.com/NASAWorldWind/WorldWindJava/releases/tag/v2.2.1
