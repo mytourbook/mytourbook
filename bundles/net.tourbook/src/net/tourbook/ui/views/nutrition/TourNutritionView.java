@@ -696,6 +696,8 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
 
       initUI(parent);
 
+      createMenuManager();
+
       // define all columns for the viewer
       _columnManager = new ColumnManager(this, _state);
       defineAllColumns();
@@ -1528,8 +1530,6 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
    private void initUI(final Composite parent) {
 
       _pc = new PixelConverter(parent);
-
-      createMenuManager();
 
       _columnSortListener = widgetSelectedAdapter(selectionEvent -> onSelect_SortColumn(selectionEvent));
    }
