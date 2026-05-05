@@ -107,13 +107,15 @@ public abstract class TVITaggingView_Item extends TreeViewerItem {
    public float       colAvgSpeed;
    public float       colAvgTemperature_Device;
 
-   public AtomicLong  numTours   = new AtomicLong();
+   public AtomicLong  numTours          = new AtomicLong();
 
    /**
-    * This is needed to identify tag categories which contained tags, do not have tours, that the
-    * tag filter works
+    * This is needed for the tag filter to identify tag categories which contains tags which do not
+    * have tours
     */
-   public AtomicLong  numNoTours = new AtomicLong();
+   public AtomicLong  numNoTours        = new AtomicLong();
+
+   public AtomicLong  numNotLoadedItems = new AtomicLong();
 
    private TreeViewer _tagViewer;
 
@@ -169,16 +171,78 @@ public abstract class TVITaggingView_Item extends TreeViewerItem {
     * <p>
     * <b>RECURSIVE</b>
     * <p>
-    * Update number of tours
+    * Add number of loaded items
     * <p>
     * !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+    */
+   void updateNumLoadedItems_Add(final int numItems) {
+
+      numNotLoadedItems.addAndGet(numItems);
+
+      final TreeViewerItem parentItem = getParentItem();
+
+      if (parentItem instanceof final TVITaggingView_Item taggingItem) {
+
+         taggingItem.updateNumLoadedItems_Add(numItems);
+      }
+   }
+
+   /**
+    * <b>!!! RECURSIVE !!!</b>
+    * <p>
+    * Decrement number of loaded items
+    */
+   void updateNumLoadedItems_Decrement() {
+
+      numNotLoadedItems.decrementAndGet();
+
+      final TreeViewerItem parentItem = getParentItem();
+
+      if (parentItem instanceof final TVITaggingView_Item taggingItem) {
+
+         taggingItem.updateNumLoadedItems_Decrement();
+      }
+   }
+
+   /**
+    * <b>!!! RECURSIVE !!!</b>
+    * <p>
+    * Increment number of loaded items
+    */
+   void updateNumLoadedItems_Increment() {
+
+      numNotLoadedItems.incrementAndGet();
+
+      final TreeViewerItem parentItem = getParentItem();
+
+      if (parentItem instanceof final TVITaggingView_Item taggingItem) {
+
+         taggingItem.updateNumLoadedItems_Increment();
+      }
+   }
+
+   void updateParent_NumNoTours(final TVITaggingView_Item taggingItem) {
+
+      final TreeViewerItem parentItem = getParentItem();
+
+      if (parentItem instanceof final TVITaggingView_Item parentTaggingItem) {
+
+         parentTaggingItem.numNoTours.addAndGet(taggingItem.numNoTours.get());
+      }
+   }
+
+   /**
+    * <b>!!! RECURSIVE !!!</b>
+    * <p>
+    * Update number of tours
     *
     * @param newNumTours
+    * @param newNumNoTours
     * @param allUpdatedItems
-    * @param parentCounter
     */
-   void updateParentNumTours(final int newNumTours,
-                             final Set<TVITaggingView_Item> allUpdatedItems) {
+   void updateParent_NumToursAndNoTours(final int newNumTours,
+                                        final int newNumNoTours,
+                                        final Set<TVITaggingView_Item> allUpdatedItems) {
 
       final TreeViewerItem parentItem = getParentItem();
 
@@ -191,12 +255,12 @@ public abstract class TVITaggingView_Item extends TreeViewerItem {
             return;
          }
 
-         @SuppressWarnings("unused")
-         final long newAddedTours = taggingItem.numTours.addAndGet(newNumTours);
+         taggingItem.numTours.addAndGet(newNumTours);
+         taggingItem.numNoTours.addAndGet(newNumNoTours);
 
          allUpdatedItems.add(taggingItem);
 
-         taggingItem.updateParentNumTours(newNumTours, allUpdatedItems);
+         taggingItem.updateParent_NumToursAndNoTours(newNumTours, newNumNoTours, allUpdatedItems);
 
 //         String item = UI.EMPTY_STRING;
 //         String name = UI.EMPTY_STRING;

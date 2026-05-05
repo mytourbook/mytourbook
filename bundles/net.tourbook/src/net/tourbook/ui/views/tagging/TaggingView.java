@@ -1450,10 +1450,15 @@ public class TaggingView extends ViewPart implements
                   numChildren = unfetchedChildren.size();
                }
 
-               cell.setText(viewItem.numTours.toString()
-                     + UI.SPACE6 + numChildren
-//                     + UI.SPACE6 + viewItem.numNoTours.toString()
-               );
+               final long numNotLoaded = viewItem.numNotLoadedItems.get();
+               final long numNoTours = viewItem.numNoTours.get();
+               final String numNotLoadedText = numNotLoaded == 0 ? "  " : Long.toString(numNotLoaded);
+               final String numNoToursText = numNoTours == 0 ? "  " : Long.toString(numNoTours);
+
+               cell.setText(numChildren
+                     + UI.SPACE6 + viewItem.numTours.toString()
+                     + UI.SPACE6 + numNoToursText
+                     + UI.SPACE6 + numNotLoadedText);
 
                setCellColor(cell, element);
 
@@ -1958,7 +1963,6 @@ public class TaggingView extends ViewPart implements
       final boolean isCategorySelected = numCategorys == 1 && numTours == 0 && numTags == 0 && numOtherItems == 0;
       final boolean isOneTour = numTours == 1;
       final boolean isItemsAvailable = numTreeItems > 0;
-      final boolean isFlatLayout = _tagViewLayout == TAG_VIEW_LAYOUT_FLAT;
 
       final int selectedItems = selection.size();
       final TVITaggingView_Item firstElement = (TVITaggingView_Item) selection.getFirstElement();
@@ -2009,7 +2013,6 @@ public class TaggingView extends ViewPart implements
       _actionDeleteTagCategory.setEnabled(isCategorySelected);
 
       _actionExportTour.setEnabled(isIteratedTours);
-      _action_ToggleTagFilter.setEnabled(isFlatLayout);
 
       _actionExpandSelection.setEnabled(true);
       _actionCollapseOthers.setEnabled(selectedItems == 1 && firstElementHasChildren);
@@ -2277,19 +2280,16 @@ public class TaggingView extends ViewPart implements
     */
    private boolean isInTagFilter(final Object item) {
 
-      if (_tagViewLayout == TAG_VIEW_LAYOUT_HIERARCHICAL) {
+      if (_tagFilterType == TagFilterType.ALL_IS_DISPLAYED) {
 
-         /*
-          * After many hours of try and error, could not find an easy way to run this filter for
-          * categorized tags/tours when running concurrent and in the background
-          */
+         // nothing is filtered
 
          return true;
       }
 
-      if (_tagFilterType == TagFilterType.ALL_IS_DISPLAYED) {
+      if (TagLoader.getItemUpdateCounter().get() > 0) {
 
-         // nothing is filtered
+         // all items are not yet loaded
 
          return true;
       }
@@ -2388,18 +2388,14 @@ public class TaggingView extends ViewPart implements
          }
       }
 
-// SET_FORMATTING_OFF
-
       /*
-       * Update number of tours in parent item and up to the tag item
+       * Update number of tags/categories in parent item
        */
       if (parentItem instanceof final TVITaggingView_TagCategory categoryItem) {
 
-         categoryItem.numTagCategories    += numAllTagCategories;
-         categoryItem.numTags             += numAllTags;
+         categoryItem.numTags += numAllTags;
+         categoryItem.numTagCategories += numAllTagCategories;
       }
-
-// SET_FORMATTING_ON
    }
 
    private void onAction_DeleteTag() {

@@ -1173,7 +1173,7 @@ public abstract class TreeColumnFactory {
             colDef.setColumnCategory(           Messages.ColumnFactory_Category_Equipment);
 
             colDef.setColumnLabel(              Messages.ColumnFactory_Equipment_TourStructure_Label);
-            colDef.setColumnHeaderText(         Messages.ColumnFactory_Equipment_TourStructure_Header);
+            colDef.setColumnHeaderText(         Messages.ColumnFactory_Equipment_TourStructure_Label);
             colDef.setColumnHeaderToolTipText(  Messages.ColumnFactory_Equipment_TourStructure_Tooltip);
 
             colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(5));
@@ -3074,9 +3074,9 @@ public abstract class TreeColumnFactory {
 
             colDef.setColumnCategory(           Messages.ColumnFactory_Category_Tag);
 
-            colDef.setColumnLabel("Tours - Children");
-            colDef.setColumnHeaderText("Tours - Children");
-            colDef.setColumnHeaderToolTipText("Number of tours - Number of children");
+            colDef.setColumnLabel("Children - Tours - No Tours - Not loaded");
+            colDef.setColumnHeaderText("Children - Tours - No Tours - Not loaded");
+            colDef.setColumnHeaderToolTipText("Number of children - Number of tours - Number of \"No tours\" - Not loaded");
 
             colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(8));
 
@@ -3112,7 +3112,7 @@ public abstract class TreeColumnFactory {
             colDef.setColumnCategory(           Messages.ColumnFactory_Category_Tag);
 
             colDef.setColumnLabel(              Messages.ColumnFactory_Equipment_TourStructure_Label);
-            colDef.setColumnHeaderText(         Messages.ColumnFactory_Equipment_TourStructure_Header);
+            colDef.setColumnHeaderText(         Messages.ColumnFactory_Equipment_TourStructure_Label);
             colDef.setColumnHeaderToolTipText(  Messages.ColumnFactory_Equipment_TourStructure_Tooltip);
 
             colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(5));

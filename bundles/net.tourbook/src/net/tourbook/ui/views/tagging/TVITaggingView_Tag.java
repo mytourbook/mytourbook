@@ -92,7 +92,10 @@ public class TVITaggingView_Tag extends TVITaggingView_Item {
 
          // tours
 
+         updateNumLoadedItems_Increment();
+
          TagLoader.loadValues(this, TagLoaderID.TAG__TOURS);
+
          break;
 
       case TourTag.EXPAND_TYPE__TAG_YEAR_MONTH_TOURS:
@@ -172,7 +175,7 @@ public class TVITaggingView_Tag extends TVITaggingView_Item {
     */
    private ArrayList<TreeViewerItem> loadTagChildren_Tours(final String whereClause) {
 
-      final ArrayList<TreeViewerItem> children = new ArrayList<>();
+      final ArrayList<TreeViewerItem> allTourItems = new ArrayList<>();
 
       String sql = null;
 
@@ -255,7 +258,8 @@ public class TVITaggingView_Tag extends TVITaggingView_Item {
             } else {
 
                tourItem = new TVITaggingView_Tour(this, getTagViewer());
-               children.add(tourItem);
+
+               allTourItems.add(tourItem);
 
                tourItem.tourId = tourId;
 
@@ -293,10 +297,13 @@ public class TVITaggingView_Tag extends TVITaggingView_Item {
 
          SQL.showException(e, sql);
       }
-      return children;
+
+      return allTourItems;
    }
 
    /**
+    * Get all years for the tag item
+    *
     * @param tagItem
     * @param isMonth
     *           When <code>true</code> them months are year children, otherwise tours
@@ -304,10 +311,7 @@ public class TVITaggingView_Tag extends TVITaggingView_Item {
    private void loadTagChildren_Years(final TVITaggingView_Tag tagItem,
                                       final boolean isMonth) {
 
-      /*
-       * get the children for the tag item
-       */
-      final ArrayList<TreeViewerItem> allChildren = new ArrayList<>();
+      final ArrayList<TreeViewerItem> allYearItems = new ArrayList<>();
 
       String sql = null;
 
@@ -363,17 +367,26 @@ public class TVITaggingView_Tag extends TVITaggingView_Item {
                yearItem.firstColumn = UI.scrambleText(yearItem.firstColumn);
             }
 
-            allChildren.add(yearItem);
+            allYearItems.add(yearItem);
          }
 
-         setChildren(allChildren);
+         setChildren(allYearItems);
 
+         if (allYearItems.size() == 0) {
+
+            // update no tours items
+
+            numNoTours.incrementAndGet();
+
+            updateParent_NumNoTours(this);
+         }
 
       } catch (final SQLException e) {
 
          SQL.showException(e, sql);
       }
    }
+
 
    /**
     * This tag was added or removed from tours. According to the expand type, the structure of the

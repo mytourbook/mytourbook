@@ -45,8 +45,6 @@ public class TVITaggingView_Year extends TVITaggingView_Item {
       _isMonth = isMonth;
    }
 
-
-
    /**
     * Compare two instances of {@link TVITaggingView_Year}
     *
@@ -107,8 +105,13 @@ public class TVITaggingView_Year extends TVITaggingView_Item {
    protected void fetchChildren() {
 
       if (_isMonth) {
+
          TagLoader.loadValues(this, TagLoaderID.YEAR__MONTHS);
+
       } else {
+
+         updateNumLoadedItems_Increment();
+
          TagLoader.loadValues(this, TagLoaderID.YEAR__TOURS);
       }
    }
@@ -149,4 +152,5 @@ public class TVITaggingView_Year extends TVITaggingView_Item {
             + "  numTours          = " + numTours + NL //                  //$NON-NLS-1$
       ;
    }
+
 }

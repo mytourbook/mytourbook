@@ -297,7 +297,6 @@ public class Messages extends NLS {
    public static String        ColumnFactory_Equipment_PriceCurrency_Label;
    public static String        ColumnFactory_Equipment_PriceCurrency_Tooltip;
    public static String        ColumnFactory_Equipment_Size;
-   public static String        ColumnFactory_Equipment_TourStructure_Header;
    public static String        ColumnFactory_Equipment_TourStructure_Label;
    public static String        ColumnFactory_Equipment_TourStructure_Tooltip;
    public static String        ColumnFactory_Equipment_Type;

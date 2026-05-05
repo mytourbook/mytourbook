@@ -30,6 +30,7 @@ import java.util.concurrent.FutureTask;
 import java.util.concurrent.LinkedBlockingDeque;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import net.tourbook.common.UI;
 import net.tourbook.common.time.TimeTools;
@@ -44,20 +45,23 @@ import org.eclipse.swt.widgets.Tree;
 
 public class TagLoader {
 
-   protected static final char                         NL               = net.tourbook.common.UI.NEW_LINE;
+   protected static final char                         NL                 = net.tourbook.common.UI.NEW_LINE;
 
    private static ThreadPoolExecutor                   _sqlExecutor;
-   private static final LinkedBlockingDeque<SQLLoader> _sqlWaitingQueue = new LinkedBlockingDeque<>();
+   private static final LinkedBlockingDeque<SQLLoader> _sqlWaitingQueue   = new LinkedBlockingDeque<>();
 
    private static int                                  _loadCounter;
+   private static AtomicInteger                        _loadValuesCounter = new AtomicInteger();
    private static int                                  _viewUpdateCounter;
 
    /**
     * This is a concurrent set
     */
-   private static Set<TVITaggingView_Item>             _allUpdateItems  = ConcurrentHashMap.newKeySet();
+   private static Set<TVITaggingView_Item>             _allUpdateItems    = ConcurrentHashMap.newKeySet();
 
    private static long                                 _lastUpdateTime;
+
+   private static int                                  _minUpdateDiff;
 
    static {
 
@@ -120,6 +124,10 @@ public class TagLoader {
       }
    }
 
+   public static AtomicInteger getItemUpdateCounter() {
+      return _loadValuesCounter;
+   }
+
    /**
     * @return Returns all items which needs to be updated
     */
@@ -144,6 +152,8 @@ public class TagLoader {
     * @param tagLoaderID
     */
    static void loadValues(final TVITaggingView_Item taggingItem, final TagLoaderID tagLoaderID) {
+
+      _loadValuesCounter.incrementAndGet();
 
       checkLoadingQueue();
 
@@ -219,25 +229,43 @@ public class TagLoader {
          }
       }
 
+      _loadValuesCounter.decrementAndGet();
+
       /*
        * Update UI
        */
-      final int numUpdateItems = _allUpdateItems.size();
+      final TreeViewer tagViewer = runnableTaggingItem.getTagViewer();
 
-      if (numUpdateItems > 0) {
+      if (_loadValuesCounter.get() == 0) {
 
-         Display.getDefault().asyncExec(() -> {
+         // this is needed to run the view filter when ALL is loaded
 
-            updateUI(runnableTaggingItem.getTagViewer());
+         Display.getDefault().syncExec(() -> {
+
+            if (tagViewer.getTree().isDisposed()) {
+               return;
+            }
+
+            tagViewer.refresh(false);
          });
+
+      } else {
+
+         final int numUpdateItems = _allUpdateItems.size();
+
+         if (numUpdateItems > 0) {
+
+            Display.getDefault().syncExec(() -> {
+
+               updateUI(tagViewer);
+            });
+         }
       }
    }
 
    private static void loadValues_Runnable_Month__Tours(final TVITaggingView_Month monthItem) {
 
-      final ArrayList<TreeViewerItem> allChildren = new ArrayList<>();
-
-      monthItem.setChildren(allChildren);
+      final ArrayList<TreeViewerItem> allTourItems = new ArrayList<>();
 
       String sql = null;
 
@@ -328,7 +356,7 @@ public class TagLoader {
                // new tour is in the resultset
                tourItem = new TVITaggingView_Tour(monthItem, monthItem.getTagViewer());
 
-               allChildren.add(tourItem);
+               allTourItems.add(tourItem);
 
                tourItem.tourId = tourId;
                tourItem.readTourColumnValues(result, 3);
@@ -361,12 +389,17 @@ public class TagLoader {
             lastTourId = tourId;
          }
 
-         final int numTours = allChildren.size();
+         final int numTours = allTourItems.size();
          final int numNoTours = numTours == 0 ? 1 : 0;
+
+         monthItem.setChildren(allTourItems);
 
          monthItem.numTours.addAndGet(numTours);
          monthItem.numNoTours.addAndGet(numNoTours);
-         monthItem.updateParentNumTours(numTours, _allUpdateItems);
+
+         monthItem.updateParent_NumToursAndNoTours(numTours, numNoTours, _allUpdateItems);
+
+         monthItem.updateNumLoadedItems_Decrement();
 
          _allUpdateItems.add(monthItem);
 
@@ -441,9 +474,7 @@ public class TagLoader {
     */
    private static void loadValues_Runnable_Tag__Tours(final TVITaggingView_Tag tagItem) {
 
-      final ArrayList<TreeViewerItem> allChildren = new ArrayList<>();
-
-      tagItem.setChildren(allChildren);
+      final ArrayList<TreeViewerItem> allTourItems = new ArrayList<>();
 
       String sql = null;
 
@@ -525,7 +556,7 @@ public class TagLoader {
             } else {
 
                tourItem = new TVITaggingView_Tour(tagItem, tagItem.getTagViewer());
-               allChildren.add(tourItem);
+               allTourItems.add(tourItem);
 
                tourItem.tourId = tourId;
 
@@ -559,12 +590,17 @@ public class TagLoader {
             previousTourId = tourId;
          }
 
-         final int numTours = allChildren.size();
+         final int numTours = allTourItems.size();
          final int numNoTours = numTours == 0 ? 1 : 0;
+
+         tagItem.setChildren(allTourItems);
 
          tagItem.numTours.addAndGet(numTours);
          tagItem.numNoTours.addAndGet(numNoTours);
-         tagItem.updateParentNumTours(numTours, _allUpdateItems);
+
+         tagItem.updateParent_NumToursAndNoTours(numTours, numNoTours, _allUpdateItems);
+
+         tagItem.updateNumLoadedItems_Decrement();
 
          _allUpdateItems.add(tagItem);
 
@@ -576,7 +612,7 @@ public class TagLoader {
 
    private static void loadValues_Runnable_Year__Months(final TVITaggingView_Year yearItem) {
 
-      final ArrayList<TreeViewerItem> allChildren = new ArrayList<>();
+      final ArrayList<TreeViewerItem> allMonthItems = new ArrayList<>();
 
       String sql = null;
 
@@ -625,21 +661,24 @@ public class TagLoader {
             final int dbMonth = result.getInt(2);
 
             final TVITaggingView_Month monthItem = new TVITaggingView_Month(yearItem, dbYear, dbMonth, yearItem.getTagViewer());
-            allChildren.add(monthItem);
 
             monthItem.firstColumn = LocalDate.of(dbYear, dbMonth, 1).format(TimeTools.Formatter_Month);
-
             monthItem.readSumColumnData(result, 3);
 
             if (UI.IS_SCRAMBLE_DATA) {
                monthItem.firstColumn = UI.scrambleText(monthItem.firstColumn);
             }
 
+            allMonthItems.add(monthItem);
+
             // load all tours for a month
+            monthItem.numNotLoadedItems.incrementAndGet();
             loadValues(monthItem, TagLoaderID.MONTH__TOURS);
          }
 
-         yearItem.setChildren(allChildren);
+         yearItem.setChildren(allMonthItems);
+
+         yearItem.updateNumLoadedItems_Add(allMonthItems.size());
 
       } catch (final SQLException e) {
 
@@ -649,9 +688,7 @@ public class TagLoader {
 
    private static void loadValues_Runnable_Year__Tours(final TVITaggingView_Year yearItem) {
 
-      final ArrayList<TreeViewerItem> allChildren = new ArrayList<>();
-
-      yearItem.setChildren(allChildren);
+      final ArrayList<TreeViewerItem> allTourItems = new ArrayList<>();
 
       String sql = null;
 
@@ -743,7 +780,7 @@ public class TagLoader {
 
                tourItem = new TVITaggingView_Tour(yearItem, yearItem.getTagViewer());
 
-               allChildren.add(tourItem);
+               allTourItems.add(tourItem);
 
                tourItem.tourId = tourId;
                tourItem.readTourColumnValues(result, 3);
@@ -776,12 +813,17 @@ public class TagLoader {
             lastTourId = tourId;
          }
 
-         final int numTours = allChildren.size();
+         final int numTours = allTourItems.size();
          final int numNoTours = numTours == 0 ? 1 : 0;
+
+         yearItem.setChildren(allTourItems);
 
          yearItem.numTours.addAndGet(numTours);
          yearItem.numNoTours.addAndGet(numNoTours);
-         yearItem.updateParentNumTours(numTours, _allUpdateItems);
+
+         yearItem.updateParent_NumToursAndNoTours(numTours, numNoTours, _allUpdateItems);
+
+         yearItem.updateNumLoadedItems_Decrement();
 
          _allUpdateItems.add(yearItem);
 
@@ -793,6 +835,7 @@ public class TagLoader {
 
    public static void startUpdate() {
 
+      _loadValuesCounter.set(0);
       _viewUpdateCounter++;
 
       _allUpdateItems.clear();
@@ -800,13 +843,9 @@ public class TagLoader {
 
    private static void updateUI(final TreeViewer tagViewer) {
 
+      _minUpdateDiff = 300;
+
       final Tree tree = tagViewer.getTree();
-
-      if (tree.isDisposed()) {
-         return;
-      }
-
-      final Display display = tree.getDisplay();
 
       if (tree.isDisposed()) {
          return;
@@ -819,11 +858,11 @@ public class TagLoader {
       }
 
       final long now = System.currentTimeMillis();
-      final long timeDiff = now - _lastUpdateTime;
+      final long lastUpdateTimeDiff = now - _lastUpdateTime;
 
-      if (timeDiff < 300) {
+      if (lastUpdateTimeDiff < _minUpdateDiff) {
 
-         display.timerExec(500, () -> {
+         tree.getDisplay().timerExec(_minUpdateDiff, () -> {
             updateUI_CheckLatestUpdates(tagViewer);
          });
 
@@ -838,15 +877,21 @@ public class TagLoader {
 
          // refresh MUST be called to update the category twisties
          tagViewer.refresh(taggingItem);
+
+         // update() is about 20% faster but do not display the twisties
+//       tagViewer.update(taggingItem, null);
       }
    }
 
    private static void updateUI_CheckLatestUpdates(final TreeViewer tagViewer) {
+      
+      if (tagViewer.getTree().isDisposed()) {
+         return;
+      }
 
       final long timeDiff = System.currentTimeMillis() - _lastUpdateTime;
-      final int numItems = _allUpdateItems.size();
 
-      if (timeDiff > 500 && numItems > 0) {
+      if (timeDiff > _minUpdateDiff) {
 
          final TVITaggingView_Item[] allUpdateItems = getUpdateItems();
 
@@ -854,6 +899,9 @@ public class TagLoader {
 
             // refresh MUST be called to update the category twisties
             tagViewer.refresh(taggingItem);
+
+            // update() is about 20% faster but do not display the twisties
+//          tagViewer.update(taggingItem, null);
          }
       }
    }
