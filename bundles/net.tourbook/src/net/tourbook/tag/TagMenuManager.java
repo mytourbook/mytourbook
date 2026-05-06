@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2025 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2026 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -104,7 +104,7 @@ public class TagMenuManager implements IActionProvider {
     * Number of tags which are displayed in the context menu or saved in the dialog settings, it's
     * max number is 9 to have a unique accelerator key
     */
-   private static LinkedList<TourTag>     _recentTags                  = new LinkedList<>();
+   private static LinkedList<TourTag>     _allRecentTags               = new LinkedList<>();
 
    /**
     * Contains all tags which are added by the last add action
@@ -462,10 +462,11 @@ public class TagMenuManager implements IActionProvider {
    public static void clearRecentTags() {
 
       _allPreviousTags.clear();
-      _recentTags.clear();
+      _allRecentTags.clear();
    }
 
-   static void enableRecentTagActions(final boolean isAddTagEnabled, final Set<Long> existingTagIds) {
+   static void enableRecentTagActions(final boolean isAddTagEnabled,
+                                      final Set<Long> existingTagIds) {
 
       if (_actionsRecentTags == null) {
          return;
@@ -555,7 +556,7 @@ public class TagMenuManager implements IActionProvider {
             try {
                final TourTag tag = allTags.get(Long.valueOf(tagId));
                if (tag != null) {
-                  _recentTags.add(tag);
+                  _allRecentTags.add(tag);
                }
             } catch (final NumberFormatException e) {
                // ignore
@@ -583,10 +584,10 @@ public class TagMenuManager implements IActionProvider {
 
       if (_maxRecentActions > 0) {
 
-         final String[] tagIds = new String[Math.min(_maxRecentActions, _recentTags.size())];
+         final String[] tagIds = new String[Math.min(_maxRecentActions, _allRecentTags.size())];
          int tagIndex = 0;
 
-         for (final TourTag tag : _recentTags) {
+         for (final TourTag tag : _allRecentTags) {
 
             tagIds[tagIndex++] = Long.toString(tag.getTagId());
 
@@ -645,7 +646,7 @@ public class TagMenuManager implements IActionProvider {
 
       final HashMap<Long, TourTag> allTourTags = TourDatabase.getAllTourTags();
 
-      for (final TourTag recentTag : _recentTags) {
+      for (final TourTag recentTag : _allRecentTags) {
 
          final TourTag tourTag = allTourTags.get(recentTag.getTagId());
          if (tourTag != null) {
@@ -955,7 +956,7 @@ public class TagMenuManager implements IActionProvider {
     */
    void fillTagMenu_WithRecentTags(final IMenuManager menuMgr, final Menu menu) {
 
-      if (_recentTags.isEmpty()) {
+      if (_allRecentTags.isEmpty()) {
          return;
       }
 
@@ -970,7 +971,7 @@ public class TagMenuManager implements IActionProvider {
          final Collection<TourTag> allPreviousTags = _allPreviousTags.values();
 
          // check if the first previous tag is the same as the first recent tag
-         if (numPreviousTags > 1 || allPreviousTags.iterator().next().equals(_recentTags.get(0)) == false) {
+         if (numPreviousTags > 1 || allPreviousTags.iterator().next().equals(_allRecentTags.get(0)) == false) {
 
             final StringBuilder sb = new StringBuilder();
             boolean isFirst = true;
@@ -1020,14 +1021,14 @@ public class TagMenuManager implements IActionProvider {
       int tagIndex = 0;
       for (final ActionRecentTag actionRecentTag : _actionsRecentTags) {
 
-         if (tagIndex >= _recentTags.size()) {
+         if (tagIndex >= _allRecentTags.size()) {
 
             // there are no more recent tags
 
             break;
          }
 
-         final TourTag tag = _recentTags.get(tagIndex);
+         final TourTag tag = _allRecentTags.get(tagIndex);
 
          String tagText = tag.getTagName();
 
@@ -1138,7 +1139,7 @@ public class TagMenuManager implements IActionProvider {
    }
 
    /**
-    * This is called when the menu is displayed which contains the tag actions.
+    * This is called when the menu is displayed which contains the tag actions
     *
     * @param menuEvent
     * @param menuParentControl
@@ -1161,12 +1162,13 @@ public class TagMenuManager implements IActionProvider {
    }
 
    /**
-    * This is called when the menu is displayed which contains the tag actions.
+    * This is called when the menu is displayed which contains the tag actions
     *
     * @param menuEvent
     * @param menuParentControl
     * @param menuPosition
     * @param toolTip
+    * @param isFlatView
     */
    public void onShowMenu(final MenuEvent menuEvent,
                           final Control menuParentControl,
@@ -1297,8 +1299,8 @@ public class TagMenuManager implements IActionProvider {
          // update recent tags
          for (final TourTag tag : allModifiedTags) {
 
-            _recentTags.remove(tag);
-            _recentTags.addFirst(tag);
+            _allRecentTags.remove(tag);
+            _allRecentTags.addFirst(tag);
          }
 
          // it's possible that both hash maps are the same when previous tags has been added as last

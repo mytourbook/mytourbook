@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2020, 2025 Wolfgang Schramm and Contributors
+ * Copyright (C) 2020, 2026 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -90,6 +90,7 @@ class TourBook_ColumnFactory {
    private boolean              _isShowSummaryRow;
 
    private boolean              _isShowToolTipIn_Date;
+   private boolean              _isShowToolTipIn_Equipment;
    private boolean              _isShowToolTipIn_Tags;
    private boolean              _isShowToolTipIn_Time;
    private boolean              _isShowToolTipIn_Title;
@@ -3296,7 +3297,7 @@ class TourBook_ColumnFactory {
    private void defineColumn_Tour_Equipment() {
 
       final TableColumnDefinition colDef_NatTable = TableColumnFactory.TOUR_EQUIPMENT.createColumn(_columnManager_NatTable, _pc);
-      colDef_NatTable.setLabelProvider_NatTable(new NatTable_LabelProvider() {
+      colDef_NatTable.setLabelProvider_NatTable(new NatTable_LabelProvider_WithTourTooltip() {
 
          @Override
          public String getValueText(final Object element) {
@@ -3309,10 +3310,34 @@ class TourBook_ColumnFactory {
 
             return text;
          }
+
+         @Override
+         public boolean isShowTooltip() {
+            return _isShowToolTipIn_Equipment;
+         }
       });
 
       final TreeColumnDefinition colDef_Tree = TreeColumnFactory.TOUR_EQUIPMENT.createColumn(_columnManager_Tree, _pc);
       colDef_Tree.setLabelProvider(new SelectionCellLabelProvider() {
+
+      });
+      colDef_Tree.setLabelProvider(new TourInfoToolTipCellLabelProvider() {
+
+         @Override
+         public Long getTourId(final ViewerCell cell) {
+
+            if (_isShowToolTipIn_Equipment == false) {
+               return null;
+            }
+
+            final Object element = cell.getElement();
+
+            if (element instanceof final TVITourBookTour tourItem) {
+               return tourItem.getTourId();
+            }
+
+            return null;
+         }
 
          @Override
          public void update(final ViewerCell cell) {
@@ -4730,11 +4755,16 @@ class TourBook_ColumnFactory {
 
    void updateToolTipState() {
 
-      _isShowToolTipIn_Date = _prefStore.getBoolean(ITourbookPreferences.VIEW_TOOLTIP_TOURBOOK_DATE);
-      _isShowToolTipIn_Time = _prefStore.getBoolean(ITourbookPreferences.VIEW_TOOLTIP_TOURBOOK_TIME);
-      _isShowToolTipIn_WeekDay = _prefStore.getBoolean(ITourbookPreferences.VIEW_TOOLTIP_TOURBOOK_WEEKDAY);
-      _isShowToolTipIn_Title = _prefStore.getBoolean(ITourbookPreferences.VIEW_TOOLTIP_TOURBOOK_TITLE);
-      _isShowToolTipIn_Tags = _prefStore.getBoolean(ITourbookPreferences.VIEW_TOOLTIP_TOURBOOK_TAGS);
+// SET_FORMATTING_OFF
+
+      _isShowToolTipIn_Date      = _prefStore.getBoolean(ITourbookPreferences.VIEW_TOOLTIP_TOURBOOK_DATE);
+      _isShowToolTipIn_Equipment = _prefStore.getBoolean(ITourbookPreferences.VIEW_TOOLTIP_TOURBOOK_EQUIPMENT);
+      _isShowToolTipIn_Tags      = _prefStore.getBoolean(ITourbookPreferences.VIEW_TOOLTIP_TOURBOOK_TAGS);
+      _isShowToolTipIn_Time      = _prefStore.getBoolean(ITourbookPreferences.VIEW_TOOLTIP_TOURBOOK_TIME);
+      _isShowToolTipIn_Title     = _prefStore.getBoolean(ITourbookPreferences.VIEW_TOOLTIP_TOURBOOK_TITLE);
+      _isShowToolTipIn_WeekDay   = _prefStore.getBoolean(ITourbookPreferences.VIEW_TOOLTIP_TOURBOOK_WEEKDAY);
+
+// SET_FORMATTING_ON
    }
 
 }

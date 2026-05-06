@@ -31,12 +31,15 @@ import java.util.Map.Entry;
 import java.util.Set;
 
 import net.tourbook.Messages;
+import net.tourbook.application.ICommandIds;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.UI;
 import net.tourbook.common.action.ActionOpenPrefDialog;
 import net.tourbook.common.ui.SubMenu;
+import net.tourbook.common.util.AdvancedMenuForActions;
 import net.tourbook.common.util.LRUMap;
 import net.tourbook.common.util.StatusUtil;
+import net.tourbook.common.util.ToolTip;
 import net.tourbook.data.Equipment;
 import net.tourbook.data.TourData;
 import net.tourbook.preferences.ITourbookPreferences;
@@ -62,6 +65,9 @@ import org.eclipse.swt.dnd.ByteArrayTransfer;
 import org.eclipse.swt.dnd.Clipboard;
 import org.eclipse.swt.dnd.Transfer;
 import org.eclipse.swt.dnd.TransferData;
+import org.eclipse.swt.events.MenuEvent;
+import org.eclipse.swt.graphics.Point;
+import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.ui.PlatformUI;
 
@@ -70,6 +76,10 @@ public class EquipmentMenuManager implements IActionProvider {
    private static final char NL = UI.NEW_LINE;
 
 // SET_FORMATTING_OFF
+
+   public static final String ACTION_KEY__ADD_EQUIPMENT_AUTO_OPEN_DEFAULT = ActionAddEquipment_SubMenu.class.getName() + TourActionManager.AUTO_OPEN_DEFAULT;
+   public static final String ACTION_KEY__ADD_EQUIPMENT_AUTO_OPEN_FLAT    = ActionAddEquipment_SubMenu.class.getName() + TourActionManager.AUTO_OPEN_FLAT;
+   public static final String ACTION_KEY__ADD_EQUIPMENT_AUTO_OPEN_TREE    = ActionAddEquipment_SubMenu.class.getName() + TourActionManager.AUTO_OPEN_TREE;
 
    private static final IPreferenceStore         _prefStore    = TourbookPlugin.getPrefStore();
    private static final IDialogSettings          _state        = TourbookPlugin.getState("net.tourbook.equipment.EquipmentMenuManager");                                                             //$NON-NLS-1$
@@ -95,6 +105,10 @@ public class EquipmentMenuManager implements IActionProvider {
 
    private static Map<Long, Equipment>           _allEquipment_WhenCopied;
 
+   private static boolean                        _isTaggingAutoOpen;
+   private static boolean                        _isTaggingAnimation;
+   private static int                            _taggingAutoOpenDelay;
+
    private ITourProvider                         _tourProvider;
 
    private EquipmentTransfer                     _equipmentTransfer                  = new EquipmentTransfer();
@@ -113,6 +127,18 @@ public class EquipmentMenuManager implements IActionProvider {
    private ActionOpenPrefDialog                  _actionEquipmentPreferences;
    private ActionRemoveEquipment_SubMenu         _actionRemoveEquipment;
    private ActionRemoveEquipmentAll              _actionRemoveAllEquipment;
+
+   private boolean                               _isAdvMenu;
+
+   private ActionContributionItem                _actionContribItem_AddEquipment_AutoOpen_Current;
+   private ActionContributionItem                _actionContribItem_AddEquipment_AutoOpen_Default;
+   private ActionContributionItem                _actionContribItem_AddEquipment_AutoOpen_Flat;
+   private ActionContributionItem                _actionContribItem_AddEquipment_AutoOpen_Tree;
+
+   private AdvancedMenuForActions                _advancedMenuToAddEquipment_Current;
+   private AdvancedMenuForActions                _advancedMenuToAddEquipment_Default;
+   private AdvancedMenuForActions                _advancedMenuToAddEquipment_Flat;
+   private AdvancedMenuForActions                _advancedMenuToAddEquipment_Tree;
 
    public class ActionAddEquipmentGroups_SubMenu extends SubMenu {
 
@@ -345,6 +371,7 @@ public class EquipmentMenuManager implements IActionProvider {
 
          addPrefListener();
          setupRecentActions();
+         restoreAutoOpen();
       }
 
       createActions();
@@ -361,6 +388,12 @@ public class EquipmentMenuManager implements IActionProvider {
          if (property.equals(ITourbookPreferences.EQUIPMENT_NUMBER_OF_RECENT_EQUIPMENT)) {
 
             setupRecentActions();
+
+         } else if (property.equals(ITourbookPreferences.APPEARANCE_IS_TAGGING_AUTO_OPEN)
+               || property.equals(ITourbookPreferences.APPEARANCE_IS_TAGGING_ANIMATION)
+               || property.equals(ITourbookPreferences.APPEARANCE_TAGGING_AUTO_OPEN_DELAY)) {
+
+            restoreAutoOpen();
          }
       };
 
@@ -371,6 +404,76 @@ public class EquipmentMenuManager implements IActionProvider {
    public static void clearRecentEquipment() {
 
       _allRecentEquipment.clear();
+   }
+
+   static void enableActions_Recent(final boolean isEnabled_AddEquipment,
+                                    final Set<Long> allSelectedEquipmentIDs_FromTours,
+                                    final int numSelectedTours) {
+
+      if (_allActions_RecentEquipment_Visible.size() == 0) {
+         return;
+      }
+
+      if (isEnabled_AddEquipment) {
+
+         final boolean isOneTourWithEquipment = allSelectedEquipmentIDs_FromTours.size() > 0 && numSelectedTours == 1;
+
+         for (final ActionRecentEquipment actionRecentEquipment : _allActions_RecentEquipment_Visible) {
+
+            final Equipment recentEquipment = actionRecentEquipment.equipment;
+
+            if (recentEquipment == null) {
+
+               actionRecentEquipment.setEnabled(false);
+               actionRecentEquipment.setChecked(false);
+
+               continue;
+            }
+
+            final long recentEquipmentID = recentEquipment.getEquipmentId();
+
+            boolean isEquipmentEnabled;
+            boolean isEquipmentChecked = false;
+
+            final boolean isRecentEquipmentSelected = allSelectedEquipmentIDs_FromTours.contains(recentEquipmentID);
+
+            if (isOneTourWithEquipment) {
+
+               // one tour is selected
+
+               // disable action when its tour equipment id is selected
+               isEquipmentEnabled = isRecentEquipmentSelected == false;
+               isEquipmentChecked = isRecentEquipmentSelected;
+
+            } else {
+
+               // multiple tours are selected
+
+               isEquipmentEnabled = true;
+
+               if (isRecentEquipmentSelected) {
+                  isEquipmentChecked = true;
+               }
+            }
+
+            actionRecentEquipment.setEnabled(isEquipmentEnabled);
+            actionRecentEquipment.setChecked(isEquipmentChecked);
+         }
+      } else {
+
+         // disable all recent actions, this is applied when no tours are selected
+
+         for (final ActionRecentEquipment recentAction : _allActions_RecentEquipment_Visible) {
+            recentAction.setEnabled(false);
+         }
+      }
+   }
+
+   private static void restoreAutoOpen() {
+
+      _isTaggingAutoOpen = _prefStore.getBoolean(ITourbookPreferences.APPEARANCE_IS_TAGGING_AUTO_OPEN);
+      _isTaggingAnimation = _prefStore.getBoolean(ITourbookPreferences.APPEARANCE_IS_TAGGING_ANIMATION);
+      _taggingAutoOpenDelay = _prefStore.getInt(ITourbookPreferences.APPEARANCE_TAGGING_AUTO_OPEN_DELAY);
    }
 
    public static void restoreState() {
@@ -522,6 +625,25 @@ public class EquipmentMenuManager implements IActionProvider {
    private void createActions() {
 
 // SET_FORMATTING_OFF
+
+      final ActionAddEquipment_SubMenu actionAddEquipment_AutoOpen_Default   = new ActionAddEquipment_SubMenu(this, null);
+      final ActionAddEquipment_SubMenu actionAddEquipment_AutoOpen_Flat      = new ActionAddEquipment_SubMenu(this, null);
+      final ActionAddEquipment_SubMenu actionAddEquipment_AutoOpen_Tree      = new ActionAddEquipment_SubMenu(this, null);
+
+      _actionContribItem_AddEquipment_AutoOpen_Default   = new ActionContributionItem(actionAddEquipment_AutoOpen_Default);
+      _actionContribItem_AddEquipment_AutoOpen_Flat      = new ActionContributionItem(actionAddEquipment_AutoOpen_Flat);
+      _actionContribItem_AddEquipment_AutoOpen_Tree      = new ActionContributionItem(actionAddEquipment_AutoOpen_Tree);
+
+      /**
+       * VERY IMPORTANT: Without an ID, the auto open do NOT work
+       */
+      _actionContribItem_AddEquipment_AutoOpen_Default   .setId(ICommandIds.ACTION_ADD_EQUIPMENT_AUTO_OPEN_DEFAULT);
+      _actionContribItem_AddEquipment_AutoOpen_Flat      .setId(ICommandIds.ACTION_ADD_EQUIPMENT_AUTO_OPEN_FLAT);
+      _actionContribItem_AddEquipment_AutoOpen_Tree      .setId(ICommandIds.ACTION_ADD_EQUIPMENT_AUTO_OPEN_TREE);
+
+      _advancedMenuToAddEquipment_Default   = new AdvancedMenuForActions(_actionContribItem_AddEquipment_AutoOpen_Default);
+      _advancedMenuToAddEquipment_Flat      = new AdvancedMenuForActions(_actionContribItem_AddEquipment_AutoOpen_Flat);
+      _advancedMenuToAddEquipment_Tree      = new AdvancedMenuForActions(_actionContribItem_AddEquipment_AutoOpen_Tree);
 
       _actionAddEquipment              = new ActionAddEquipment_SubMenu(this);
       _actionAddEquipment_Groups       = new ActionAddEquipmentGroups_SubMenu();
@@ -709,75 +831,12 @@ public class EquipmentMenuManager implements IActionProvider {
       }
    }
 
-   private void enableActions_Recent(final boolean isEnabled_AddEquipment,
-                                     final Set<Long> allSelectedEquipmentIDs_FromTours,
-                                     final int numSelectedTours) {
-
-      if (_allActions_RecentEquipment_Visible.size() == 0) {
-         return;
-      }
-
-      if (isEnabled_AddEquipment) {
-
-         final boolean isOneTourWithEquipment = allSelectedEquipmentIDs_FromTours.size() > 0 && numSelectedTours == 1;
-
-         for (final ActionRecentEquipment actionRecentEquipment : _allActions_RecentEquipment_Visible) {
-
-            final Equipment recentEquipment = actionRecentEquipment.equipment;
-
-            if (recentEquipment == null) {
-
-               actionRecentEquipment.setEnabled(false);
-               actionRecentEquipment.setChecked(false);
-
-               continue;
-            }
-
-            final long recentEquipmentID = recentEquipment.getEquipmentId();
-
-            boolean isEquipmentEnabled;
-            boolean isEquipmentChecked = false;
-
-            final boolean isRecentEquipmentSelected = allSelectedEquipmentIDs_FromTours.contains(recentEquipmentID);
-
-            if (isOneTourWithEquipment) {
-
-               // one tour is selected
-
-               // disable action when its tour equipment id is selected
-               isEquipmentEnabled = isRecentEquipmentSelected == false;
-               isEquipmentChecked = isRecentEquipmentSelected;
-
-            } else {
-
-               // multiple tours are selected
-
-               isEquipmentEnabled = true;
-
-               if (isRecentEquipmentSelected) {
-                  isEquipmentChecked = true;
-               }
-            }
-
-            actionRecentEquipment.setEnabled(isEquipmentEnabled);
-            actionRecentEquipment.setChecked(isEquipmentChecked);
-         }
-      } else {
-
-         // disable all recent actions, this is applied when no tours are selected
-
-         for (final ActionRecentEquipment recentAction : _allActions_RecentEquipment_Visible) {
-            recentAction.setEnabled(false);
-         }
-      }
-   }
-
    /**
     * Add and save multiple equipment in the selected tours
     *
     * @param allModifiedEquipment
     */
-   private void equipment_Add(final Collection<Equipment> allModifiedEquipment) {
+   void equipment_Add(final Collection<Equipment> allModifiedEquipment) {
 
       EquipmentManager.equipment_Add(
 
@@ -847,16 +906,29 @@ public class EquipmentMenuManager implements IActionProvider {
       }
 
       enableActions_OneTour();
+
+      _isAdvMenu = false;
    }
 
    public void fillEquipmentMenu_WithActiveActions(final IMenuManager menuMgr,
                                                    final ITourProvider tourProvider) {
 
+      fillEquipmentMenu_WithActiveActions(menuMgr, tourProvider, null);
+   }
+
+   public void fillEquipmentMenu_WithActiveActions(final IMenuManager menuMgr,
+                                                   final ITourProvider tourProvider,
+                                                   final Boolean isFlatView) {
+
       _currentInstance = this;
+
+      updateEquipmentAutoOpenAction(isFlatView);
 
       menuMgr.add(new Separator());
 
       TourActionManager.fillContextMenu(menuMgr, TourActionCategory.EQUIPMENT, _allEquipmentActions, tourProvider);
+
+      _isAdvMenu = false;
    }
 
    /**
@@ -918,6 +990,13 @@ public class EquipmentMenuManager implements IActionProvider {
    }
 
    public Map<String, Object> getAllEquipmentActions() {
+
+      return getAllEquipmentActions(null);
+   }
+
+   public Map<String, Object> getAllEquipmentActions(final Boolean isFlatView) {
+
+      updateEquipmentAutoOpenAction(isFlatView);
 
       return _allEquipmentActions;
    }
@@ -1011,6 +1090,118 @@ public class EquipmentMenuManager implements IActionProvider {
       return _isSaveTour;
    }
 
+   /**
+    * This is called when the menu is hidden which contains the equipment actions
+    */
+   public void onHideMenu() {
+
+      _advancedMenuToAddEquipment_Current.onHideParentMenu();
+   }
+
+   /**
+    * This is called when the menu is displayed which contains the equipment actions
+    *
+    * @param menuEvent
+    * @param menuParentControl
+    * @param menuPosition
+    * @param toolTip
+    */
+   public void onShowMenu(final MenuEvent menuEvent,
+                          final Control menuParentControl,
+                          final Point menuPosition,
+                          final ToolTip toolTip) {
+
+      onShowMenu(
+
+            menuEvent,
+            menuParentControl,
+            menuPosition,
+
+            toolTip,
+            null);
+   }
+
+   /**
+    * This is called when the menu is displayed which contains the equipment actions
+    *
+    * @param menuEvent
+    * @param menuParentControl
+    * @param menuPosition
+    * @param toolTip
+    * @param isFlatView
+    */
+   public void onShowMenu(final MenuEvent menuEvent,
+                          final Control menuParentControl,
+                          final Point menuPosition,
+                          final ToolTip toolTip,
+                          final Boolean isFlatView) {
+
+      updateEquipmentAutoOpenAction(isFlatView);
+
+      _advancedMenuToAddEquipment_Current.onShowParentMenu(
+
+            menuEvent,
+            menuParentControl,
+
+            _isTaggingAutoOpen,
+            _isTaggingAnimation,
+            _taggingAutoOpenDelay,
+
+            menuPosition,
+            toolTip);
+   }
+
+   void setIsAdvanceMenu() {
+
+      _isAdvMenu = true;
+   }
+
+   /**
+    * Replace the action "add equipment auto open" with the default, flat or categorized action
+    * <p>
+    * This is a fix for https://github.com/mytourbook/mytourbook/issues/1603
+    *
+    * @param isFlatView
+    */
+   private void updateEquipmentAutoOpenAction(final Boolean isFlatView) {
+
+      _allEquipmentActions.remove(ACTION_KEY__ADD_EQUIPMENT_AUTO_OPEN_DEFAULT);
+      _allEquipmentActions.remove(ACTION_KEY__ADD_EQUIPMENT_AUTO_OPEN_FLAT);
+      _allEquipmentActions.remove(ACTION_KEY__ADD_EQUIPMENT_AUTO_OPEN_TREE);
+
+// SET_FORMATTING_OFF
+
+      if (isFlatView == null) {
+
+         // context menu in dialogs
+
+         _allEquipmentActions.put(ACTION_KEY__ADD_EQUIPMENT_AUTO_OPEN_DEFAULT, _actionContribItem_AddEquipment_AutoOpen_Default);
+
+         _actionContribItem_AddEquipment_AutoOpen_Current   = _actionContribItem_AddEquipment_AutoOpen_Default;
+         _advancedMenuToAddEquipment_Current                = _advancedMenuToAddEquipment_Default;
+
+      } else if (isFlatView) {
+
+         // flat tourbook view
+
+         _allEquipmentActions.put(ACTION_KEY__ADD_EQUIPMENT_AUTO_OPEN_FLAT, _actionContribItem_AddEquipment_AutoOpen_Flat);
+
+         _actionContribItem_AddEquipment_AutoOpen_Current   = _actionContribItem_AddEquipment_AutoOpen_Flat;
+         _advancedMenuToAddEquipment_Current                = _advancedMenuToAddEquipment_Flat;
+
+      } else {
+
+         // tree views
+
+         _allEquipmentActions.put(ACTION_KEY__ADD_EQUIPMENT_AUTO_OPEN_TREE, _actionContribItem_AddEquipment_AutoOpen_Tree);
+
+         _actionContribItem_AddEquipment_AutoOpen_Current   = _actionContribItem_AddEquipment_AutoOpen_Tree;
+         _advancedMenuToAddEquipment_Current                = _advancedMenuToAddEquipment_Tree;
+      }
+
+// SET_FORMATTING_ON
+   }
+
    public void updateRecentEquipment(final Equipment equipment) {
 
       _allRecentEquipment.putFirst(equipment.getEquipmentId(), equipment);
@@ -1032,5 +1223,4 @@ public class EquipmentMenuManager implements IActionProvider {
 
       return numEquipment;
    }
-
 }

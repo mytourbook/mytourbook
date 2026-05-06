@@ -120,6 +120,7 @@ import org.eclipse.swt.events.ControlListener;
 import org.eclipse.swt.events.MenuAdapter;
 import org.eclipse.swt.events.MenuEvent;
 import org.eclipse.swt.graphics.Image;
+import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
@@ -702,12 +703,25 @@ public class CollatedToursView extends ViewPart implements
       treeContextMenu.addMenuListener(new MenuAdapter() {
          @Override
          public void menuHidden(final MenuEvent e) {
+
             _tagMenuManager.onHideMenu();
+            _equipmentMenuManager.onHideMenu();
          }
 
          @Override
          public void menuShown(final MenuEvent menuEvent) {
-            _tagMenuManager.onShowMenu(menuEvent, tree, Display.getCurrent().getCursorLocation(), _tourInfoToolTip);
+
+            final Point cursorLocation = Display.getCurrent().getCursorLocation();
+
+            _tagMenuManager.onShowMenu(menuEvent,
+                  tree,
+                  cursorLocation,
+                  _tourInfoToolTip);
+
+            _equipmentMenuManager.onShowMenu(menuEvent,
+                  tree,
+                  cursorLocation,
+                  _tourInfoToolTip);
          }
       });
 

@@ -120,7 +120,7 @@ public class EquipmentManager {
    public static final short                 EXPAND_TYPE_YEAR_TOUR        = 1;
    public static final short                 EXPAND_TYPE_YEAR_MONTH_TOUR  = 2;
 
-   static final String[]                     EXPAND_TYPE_ACTION_LABELS            = {
+   static final String[]                     EXPAND_TYPE_ACTION_LABELS    = {
 
          Messages.app_action_expand_type_flat,
          Messages.app_action_expand_type_year_day,
