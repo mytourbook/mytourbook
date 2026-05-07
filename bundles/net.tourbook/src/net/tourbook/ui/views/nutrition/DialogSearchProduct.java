@@ -864,14 +864,14 @@ public class DialogSearchProduct extends TitleAreaDialog implements ITourViewer,
 
          TourManager.saveModifiedTour(tourData);
 
-         /*
-          * TourNutritionProductMenuManager.equipment_Add(
-          * tourNutritionProduct,
-          * _tourNutritionProductMenuManager.getTourProvider(),
-          * _tourNutritionProductMenuManager.isSaveTour(),
-          * _tourNutritionProductMenuManager.isCheckTourEditor());
-          * _tourNutritionProductMenuManager.updateRecentEquipment(tourNutritionProduct);
-          */
+         //TODO FB
+//         TourNutritionProductMenuManager.equipment_Add(
+//               tourNutritionProduct,
+//               _tourNutritionProductMenuManager.getTourProvider(),
+//               _tourNutritionProductMenuManager.isSaveTour(),
+//               _tourNutritionProductMenuManager.isCheckTourEditor());
+//         _tourNutritionProductMenuManager.updateRecentEquipment(tourNutritionProduct);
+
       });
    }
 

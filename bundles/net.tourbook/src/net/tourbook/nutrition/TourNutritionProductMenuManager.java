@@ -106,7 +106,7 @@ public class TourNutritionProductMenuManager {
     *
     * @param TourNutritionProduct
     */
-   private static void addRecentTourNutritionProduct(final TourNutritionProduct TourNutritionProduct) {
+   public static void addRecentTourNutritionProduct(final TourNutritionProduct TourNutritionProduct) {
       _recentTourNutritionProducts.remove(TourNutritionProduct);
       _recentTourNutritionProducts.addFirst(TourNutritionProduct);
    }
