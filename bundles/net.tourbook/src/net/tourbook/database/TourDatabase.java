@@ -387,7 +387,12 @@ public class TourDatabase {
    /**
     * Key is tag category ID.
     */
-   private static volatile HashMap<Long, TourTagCategory> _allTourTagCategories;
+   private static volatile HashMap<Long, TourTagCategory> _allTourTagCategoriesByCategory;
+
+   /**
+    * Key is tag id
+    */
+   private static volatile HashMap<Long, TourTagCategory> _allTourTagCategoriesByTag;
 
    /**
     * Key is category ID or <code>-1</code> for the root.
@@ -449,7 +454,7 @@ public class TourDatabase {
        * Set derby debug properties, this is helpful when debugging, the log is written into
        * derby.log
        */
-      System.setProperty("derby.language.logStatementText", "true");
+//      System.setProperty("derby.language.logStatementText", "true");
 //      System.setProperty("derby.language.logQueryPlan", "true");
 
 // FOR DEBUGGING - END
@@ -1032,9 +1037,14 @@ public class TourDatabase {
          _allTourTags_ByTagName = null;
       }
 
-      if (_allTourTagCategories != null) {
-         _allTourTagCategories.clear();
-         _allTourTagCategories = null;
+      if (_allTourTagCategoriesByCategory != null) {
+         _allTourTagCategoriesByCategory.clear();
+         _allTourTagCategoriesByCategory = null;
+      }
+
+      if (_allTourTagCategoriesByTag != null) {
+         _allTourTagCategoriesByTag.clear();
+         _allTourTagCategoriesByTag = null;
       }
 
       if (_tagCollections != null) {
@@ -1746,19 +1756,21 @@ public class TourDatabase {
    /**
     * This method is synchronized to conform to FindBugs
     *
-    * @return Returns all tour tags which are stored in the database, the hash key is the tag id
+    * @return Returns all tour tag categories which are stored in the database, the hash key is the
+    *         tag
+    *         category id
     */
    public static HashMap<Long, TourTagCategory> getAllTourTagCategories() {
 
-      if (_allTourTagCategories != null) {
-         return _allTourTagCategories;
+      if (_allTourTagCategoriesByCategory != null) {
+         return _allTourTagCategoriesByCategory;
       }
 
       synchronized (DB_LOCK) {
 
          // check again, field must be volatile to work correctly
-         if (_allTourTagCategories != null) {
-            return _allTourTagCategories;
+         if (_allTourTagCategoriesByCategory != null) {
+            return _allTourTagCategoriesByCategory;
          }
 
          final EntityManager em = TourDatabase.getInstance().getEntityManager();
@@ -1769,13 +1781,13 @@ public class TourDatabase {
                   + "SELECT tourTagCategory" //$NON-NLS-1$
                   + " FROM " + TourTagCategory.class.getSimpleName() + " AS tourTagCategory"); //$NON-NLS-1$ //$NON-NLS-2$
 
-            _allTourTagCategories = new HashMap<>();
+            _allTourTagCategoriesByCategory = new HashMap<>();
 
             final List<?> resultList = emQuery.getResultList();
             for (final Object result : resultList) {
 
                if (result instanceof final TourTagCategory tourTagCategory) {
-                  _allTourTagCategories.put(tourTagCategory.getCategoryId(), tourTagCategory);
+                  _allTourTagCategoriesByCategory.put(tourTagCategory.getCategoryId(), tourTagCategory);
                }
             }
 
@@ -1783,7 +1795,54 @@ public class TourDatabase {
          }
       }
 
-      return _allTourTagCategories;
+      return _allTourTagCategoriesByCategory;
+   }
+
+   /**
+    * @return Returns all tour tags categories which are stored in the database, the hash key is the
+    *         tag id
+    */
+   public static HashMap<Long, TourTagCategory> getAllTourTagCategoriesByTag() {
+
+      if (_allTourTagCategoriesByTag != null) {
+         return _allTourTagCategoriesByTag;
+      }
+
+      synchronized (DB_LOCK) {
+
+         // check again, field must be volatile to work correctly
+         if (_allTourTagCategoriesByTag != null) {
+            return _allTourTagCategoriesByTag;
+         }
+
+         final EntityManager em = TourDatabase.getInstance().getEntityManager();
+         if (em != null) {
+
+            final Query emQuery = em.createQuery(UI.EMPTY_STRING
+
+                  + "SELECT tourTagCategory" //$NON-NLS-1$
+                  + " FROM " + TourTagCategory.class.getSimpleName() + " AS tourTagCategory"); //$NON-NLS-1$ //$NON-NLS-2$
+
+            _allTourTagCategoriesByTag = new HashMap<>();
+
+            final List<?> allTagCategories = emQuery.getResultList();
+
+            for (final Object result : allTagCategories) {
+
+               if (result instanceof final TourTagCategory tourTagCategory) {
+
+                  for (final TourTag tag : tourTagCategory.getTourTags()) {
+
+                     _allTourTagCategoriesByTag.put(tag.getTagId(), tourTagCategory);
+                  }
+               }
+            }
+
+            em.close();
+         }
+      }
+
+      return _allTourTagCategoriesByTag;
    }
 
    /**
@@ -2247,25 +2306,25 @@ public class TourDatabase {
    }
 
    /**
-    * @param tagId
+    * @param tagCategoryId
     *
     * @return Returns the tag category notes
     *         <code>null</code>
     */
-   public static String getTagCategoryNotes(final Long tagId) {
+   public static String getTagCategoryNotes(final Long tagCategoryId) {
 
-      if (tagId == null) {
+      if (tagCategoryId == null) {
          return UI.EMPTY_STRING;
       }
 
       final HashMap<Long, TourTagCategory> hashAllTagCategories = getAllTourTagCategories();
-      final TourTagCategory tagCategory = hashAllTagCategories.get(tagId);
+      final TourTagCategory tagCategory = hashAllTagCategories.get(tagCategoryId);
 
       if (tagCategory != null) {
          return tagCategory.getNotes();
       } else {
          try {
-            throw new MyTourbookException("Tag category id '" + tagId + "' is not available"); //$NON-NLS-1$ //$NON-NLS-2$
+            throw new MyTourbookException("Tag category id '" + tagCategoryId + "' is not available"); //$NON-NLS-1$ //$NON-NLS-2$
          } catch (final MyTourbookException e) {
             e.printStackTrace();
          }
@@ -4636,6 +4695,7 @@ public class TourDatabase {
             + ")" //                                                                          //$NON-NLS-1$
       );
 
+      SQL.createIndex_Table__Column(stmt, TABLE_DEVICE_SENSOR_VALUE, KEY_TOUR);
       SQL.createIndex_Table__Column(stmt, TABLE_DEVICE_SENSOR_VALUE, "TourStartTime"); //$NON-NLS-1$
    }
 
@@ -5535,6 +5595,8 @@ public class TourDatabase {
 
             + ")" //$NON-NLS-1$
       );
+
+      SQL.createIndex_Table__Column(stmt, TABLE_TOUR_MARKER, KEY_TOUR);
    }
 
    /**
@@ -5612,7 +5674,10 @@ public class TourDatabase {
 
             // Version 58 - end
 
-            + ")"); //$NON-NLS-1$
+            + ")" //$NON-NLS-1$
+      );
+
+      SQL.createIndex_Table__Column(stmt, TABLE_TOUR_NUTRITION_PRODUCT, KEY_TOUR);
    }
 
    /**
@@ -5750,6 +5815,8 @@ public class TourDatabase {
 
       // Create index for {@link TourPhoto}, it will dramatically improve performance.
       SQL.createIndex_Simple(stmt, TABLE_TOUR_PHOTO, "ImageFilePathName"); //$NON-NLS-1$
+
+      SQL.createIndex_Table__Column(stmt, TABLE_TOUR_PHOTO, KEY_TOUR);
    }
 
    /**
@@ -5786,7 +5853,10 @@ public class TourDatabase {
 
             // version 51 end ---------
 
-            + ")"); //$NON-NLS-1$
+            + ")" //$NON-NLS-1$
+      );
+
+      SQL.createIndex_Table__Column(stmt, TABLE_TOUR_REFERENCE, KEY_TOUR);
    }
 
    /**
@@ -6052,7 +6122,10 @@ public class TourDatabase {
 
             // version 28 end ---------
 
-            + ")"); //$NON-NLS-1$
+            + ")" //$NON-NLS-1$
+      );
+
+      SQL.createIndex_Table__Column(stmt, TABLE_TOUR_WAYPOINT, KEY_TOUR);
    }
 
    private String createUIServerStateMessage(final int stateCounter) {
@@ -11714,8 +11787,15 @@ public class TourDatabase {
             SQL.addColumn_VarCar    (stmt, TABLE_EQUIPMENT_PART,  "PurchaseLocation",  DB_LENGTH_NAME);     //$NON-NLS-1$
             SQL.addColumn_SmallInt  (stmt, TABLE_EQUIPMENT_PART,  "WeightUnit",        DEFAULT_0);          //$NON-NLS-1$
 
-// SET_FORMATTING_ON
 
+            SQL.createIndex_Table__Column(stmt, TABLE_DEVICE_SENSOR_VALUE,    KEY_TOUR);
+            SQL.createIndex_Table__Column(stmt, TABLE_TOUR_MARKER,            KEY_TOUR);
+            SQL.createIndex_Table__Column(stmt, TABLE_TOUR_NUTRITION_PRODUCT, KEY_TOUR);
+            SQL.createIndex_Table__Column(stmt, TABLE_TOUR_PHOTO,             KEY_TOUR);
+            SQL.createIndex_Table__Column(stmt, TABLE_TOUR_REFERENCE,         KEY_TOUR);
+            SQL.createIndex_Table__Column(stmt, TABLE_TOUR_WAYPOINT,          KEY_TOUR);
+
+// SET_FORMATTING_ON
          }
          stmt.close();
       }

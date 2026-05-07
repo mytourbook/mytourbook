@@ -68,26 +68,36 @@ import org.eclipse.swt.widgets.Label;
 
 public class TagManager {
 
-   private static final char       NL                = UI.NEW_LINE;
+   private static final char    NL                = UI.NEW_LINE;
 
-   protected static final String[] EXPAND_TYPE_NAMES = {
+   public static final String[] EXPAND_TYPE_NAMES = {
 
          Messages.app_action_expand_type_flat,
          Messages.app_action_expand_type_year_day,
          Messages.app_action_expand_type_year_month_day
    };
 
-   protected static final int[]    EXPAND_TYPES      = {
+   /**
+    * The EXPAND_TYPE_... value is the index for these labels
+    */
+   public static final String[] EXPAND_TYPE_LABEL = {
 
-         TourTag.EXPAND_TYPE_FLAT,
-         TourTag.EXPAND_TYPE_YEAR_DAY,
-         TourTag.EXPAND_TYPE_YEAR_MONTH_DAY
+         Messages.Equipment_ExpandType_ByYearMonth,             // 0
+         Messages.Equipment_ExpandType_SortByDate,              // 1
+         Messages.Equipment_ExpandType_ByYear,                  // 2
    };
 
-   private static ContentLayout    _tagContentLayout;
-   private static int              _tagNumContentColumns;
-   private static int              _tagImageSize;
-   private static int              _tagTextWidth;
+   protected static final int[] EXPAND_TYPES      = {
+
+         TourTag.EXPAND_TYPE__TAG_TOURS,
+         TourTag.EXPAND_TYPE__TAG_YEAR_TOURS,
+         TourTag.EXPAND_TYPE__TAG_YEAR_MONTH_TOURS
+   };
+
+   private static ContentLayout _tagContentLayout;
+   private static int           _tagNumContentColumns;
+   private static int           _tagImageSize;
+   private static int           _tagTextWidth;
 
    static {
 

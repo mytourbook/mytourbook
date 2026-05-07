@@ -15,18 +15,15 @@
  *******************************************************************************/
 package net.tourbook.ui.views.tagging;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.Set;
+import java.util.concurrent.atomic.AtomicLong;
 
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.UI;
-import net.tourbook.common.util.SQL;
 import net.tourbook.common.util.TreeViewerItem;
-import net.tourbook.database.TourDatabase;
 import net.tourbook.preferences.ITourbookPreferences;
-import net.tourbook.ui.AppFilter;
 
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.viewers.TreeViewer;
@@ -110,70 +107,21 @@ public abstract class TVITaggingView_Item extends TreeViewerItem {
    public float       colAvgSpeed;
    public float       colAvgTemperature_Device;
 
-   public long        numTours;
-   public int         numTags_NoTours;
+   public AtomicLong  numTours          = new AtomicLong();
+
+   /**
+    * This is needed for the tag filter to identify tag categories which contains tags which do not
+    * have tours
+    */
+   public AtomicLong  numNoTours        = new AtomicLong();
+
+   public AtomicLong  numNotLoadedItems = new AtomicLong();
 
    private TreeViewer _tagViewer;
 
    public TVITaggingView_Item(final TreeViewer tagViewer) {
 
       _tagViewer = tagViewer;
-   }
-
-   /**
-    * Read sum totals from the database for the tagItem
-    *
-    * @param tagItem
-    */
-   static void readTagTotals(final TVITaggingView_Tag tagItem) {
-
-      String sql = null;
-
-      try (Connection conn = TourDatabase.getInstance().getConnection()) {
-
-         final AppFilter appFilter = new AppFilter();
-
-         /*
-          * Get tags
-          */
-         sql = UI.EMPTY_STRING
-
-               + "SELECT " + SQL_SUM_COLUMNS + NL //                                               //$NON-NLS-1$
-
-               + "FROM " + TourDatabase.JOINTABLE__TOURDATA__TOURTAG + " AS jtblTagData" + NL //   //$NON-NLS-1$ //$NON-NLS-2$
-
-               // get data for a tour
-               + "LEFT JOIN " + TourDatabase.TABLE_TOUR_DATA + " AS TourData" //                   //$NON-NLS-1$ //$NON-NLS-2$
-               + " ON jtblTagData.TourData_tourId = TourData.tourId" + NL //                       //$NON-NLS-1$
-
-               + " WHERE jtblTagData.TourTag_TagId = ?" + NL //                                    //$NON-NLS-1$
-
-               + appFilter.getWhereClause();
-
-         final PreparedStatement statement = conn.prepareStatement(sql);
-
-         statement.setLong(1, tagItem.getTagId());
-         appFilter.setParameters(statement, 2);
-
-         final ResultSet result = statement.executeQuery();
-
-         while (result.next()) {
-            tagItem.readSumColumnData(result, 1);
-         }
-
-         if (tagItem.numTours == 0) {
-
-            /*
-             * to hide the '+' for an item which has no children, an empty list of children will be
-             * created
-             */
-//            tagItem.setChildren(new ArrayList<>());
-         }
-
-      } catch (final SQLException e) {
-
-         SQL.showException(e, sql);
-      }
    }
 
    TreeViewer getTagViewer() {
@@ -218,4 +166,131 @@ public abstract class TVITaggingView_Item extends TreeViewerItem {
       }
    }
 
+   /**
+    * !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+    * <p>
+    * <b>RECURSIVE</b>
+    * <p>
+    * Add number of loaded items
+    * <p>
+    * !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+    */
+   void updateNumLoadedItems_Add(final int numItems) {
+
+      numNotLoadedItems.addAndGet(numItems);
+
+      final TreeViewerItem parentItem = getParentItem();
+
+      if (parentItem instanceof final TVITaggingView_Item taggingItem) {
+
+         taggingItem.updateNumLoadedItems_Add(numItems);
+      }
+   }
+
+   /**
+    * <b>!!! RECURSIVE !!!</b>
+    * <p>
+    * Decrement number of loaded items
+    */
+   void updateNumLoadedItems_Decrement() {
+
+      numNotLoadedItems.decrementAndGet();
+
+      final TreeViewerItem parentItem = getParentItem();
+
+      if (parentItem instanceof final TVITaggingView_Item taggingItem) {
+
+         taggingItem.updateNumLoadedItems_Decrement();
+      }
+   }
+
+   /**
+    * <b>!!! RECURSIVE !!!</b>
+    * <p>
+    * Increment number of loaded items
+    */
+   void updateNumLoadedItems_Increment() {
+
+      numNotLoadedItems.incrementAndGet();
+
+      final TreeViewerItem parentItem = getParentItem();
+
+      if (parentItem instanceof final TVITaggingView_Item taggingItem) {
+
+         taggingItem.updateNumLoadedItems_Increment();
+      }
+   }
+
+   void updateParent_NumNoTours(final TVITaggingView_Item taggingItem) {
+
+      final TreeViewerItem parentItem = getParentItem();
+
+      if (parentItem instanceof final TVITaggingView_Item parentTaggingItem) {
+
+         parentTaggingItem.numNoTours.addAndGet(taggingItem.numNoTours.get());
+      }
+   }
+
+   /**
+    * <b>!!! RECURSIVE !!!</b>
+    * <p>
+    * Update number of tours
+    *
+    * @param newNumTours
+    * @param newNumNoTours
+    * @param allUpdatedItems
+    */
+   void updateParent_NumToursAndNoTours(final int newNumTours,
+                                        final int newNumNoTours,
+                                        final Set<TVITaggingView_Item> allUpdatedItems) {
+
+      final TreeViewerItem parentItem = getParentItem();
+
+      if (parentItem instanceof final TVITaggingView_Item taggingItem) {
+
+         if (taggingItem instanceof TVITaggingView_Root) {
+
+            // skip root
+
+            return;
+         }
+
+         taggingItem.numTours.addAndGet(newNumTours);
+         taggingItem.numNoTours.addAndGet(newNumNoTours);
+
+         allUpdatedItems.add(taggingItem);
+
+         taggingItem.updateParent_NumToursAndNoTours(newNumTours, newNumNoTours, allUpdatedItems);
+
+//         String item = UI.EMPTY_STRING;
+//         String name = UI.EMPTY_STRING;
+//
+//         if (taggingItem instanceof final TVITaggingView_Tag tagItem) {
+//
+//            item = "tag";
+//            name = tagItem.getTourTag().getTagName();
+//
+//         } else if (taggingItem instanceof final TVITaggingView_TagCategory categoryItem) {
+//
+//            item = "cat";
+//            name = categoryItem.getTourTagCategory().getCategoryName();
+//         }
+//
+//         final String text = "%-5s %-30s %5d %5d+  %-15s".formatted(
+//
+//               item,
+//               name,
+//
+//               newAddedTours,
+//               newNumTours,
+//
+//               Thread.currentThread().getName()
+//
+//         );
+//
+//         System.out.println(text);
+
+// TODO remove SYSTEM.OUT.PRINTLN
+      }
+   }
 }

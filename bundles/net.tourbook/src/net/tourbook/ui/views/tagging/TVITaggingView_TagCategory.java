@@ -66,25 +66,32 @@ public class TVITaggingView_TagCategory extends TVITaggingView_Item {
 
       final TourTagCategory tourTagCategory = em.find(TourTagCategory.class, _tagCategory.getCategoryId());
 
-      // create category items
+      /*
+       * Create category items
+       */
       final Set<TourTagCategory> lazyTourTagCategories = tourTagCategory.getTagCategories();
 
       final ArrayList<TourTagCategory> sortedCategories = new ArrayList<>(lazyTourTagCategories);
       Collections.sort(sortedCategories);
 
       for (final TourTagCategory tagCategory : lazyTourTagCategories) {
-         addChild(new TVITaggingView_TagCategory(tagCategory, this, tagViewer));
+
+         final TVITaggingView_TagCategory categoryItem = new TVITaggingView_TagCategory(tagCategory, this, tagViewer);
+
+         addChild(categoryItem);
       }
 
-      // create tag items
+      /*
+       * Create tag items
+       */
       final Set<TourTag> lazyTourTags = tourTagCategory.getTourTags();
       for (final TourTag tourTag : lazyTourTags) {
 
          final TVITaggingView_Tag tagItem = new TVITaggingView_Tag(tourTag, this, tagViewer);
 
-         readTagTotals(tagItem);
-
          addChild(tagItem);
+
+         TagLoader.loadValues(tagItem, TagLoaderID.TAG__TOTALS);
       }
 
       // update number of categories/tags
@@ -131,7 +138,6 @@ public class TVITaggingView_TagCategory extends TVITaggingView_Item {
 
             + NL
             + "  numTours          = " + numTours + NL //               //$NON-NLS-1$
-            + "  numTags_NoTours   = " + numTags_NoTours + NL //        //$NON-NLS-1$
 
             + "]" + NL //                                               //$NON-NLS-1$
       ;

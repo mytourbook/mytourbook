@@ -37,10 +37,6 @@ New / Improvements
 * Tour Nutrition (Frederic):
   - Select a product from a list of the most recent products used
 
-* TBD: Fit Export
-  - Export swim values
-    https://github.com/mytourbook/mytourbook/issues/1581
-
 * Tour filter (Frederic)
   - Added nutrition tour filter
   
@@ -49,14 +45,18 @@ Changes
 =======
 
 * Easyimport
-  - Improved launcher tab layout
-  - Cadence settings needs to be recreated, they are not related any more with the tour type settings
+  - Changed launcher layout
+  - Cadence settings needs to be recreated, they are not related any more with the tour type configurations
 
 * Equipment
   - Multiple equipment with an empty type are not collated any more, each equipment with an empty type can now collate tours for itself
     Update your equipment by removing the type when this equipment/part is not depending on another with the same type
     The new column "Type (saved)" can display the saved value which is a random value when the type in the UI is empty.
 
+
+* Tagged Tours View
+  - New columns to display the parent of a tag and how tours are sorted/categorized
+  
 
 Changes that require Tour Re-import
 ===================================
