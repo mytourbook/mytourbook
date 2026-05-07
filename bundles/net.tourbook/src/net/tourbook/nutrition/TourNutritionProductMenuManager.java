@@ -197,9 +197,7 @@ public class TourNutritionProductMenuManager {
       if (_isInitialized == false) {
          initTourNutritionProductManager();
       }
-      final TourNutritionProduct tourNutritionProduct = new TourNutritionProduct();
-      tourNutritionProduct.setName("Test");
-      //_recentTourNutritionProducts.add(tourNutritionProduct);
+
       if (_recentTourNutritionProducts.isEmpty()) {
          return;
       }
