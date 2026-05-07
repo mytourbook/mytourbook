@@ -682,7 +682,10 @@ public class DialogSearchProduct extends TitleAreaDialog implements ITourViewer,
 
    private void defineColumn_10_Barcode() {
 
-      final TableColumnDefinition colDef = new TableColumnDefinition(_columnManager, COLUMN_CODE, SWT.TRAIL);
+      final TableColumnDefinition colDef = new TableColumnDefinition(
+            _columnManager,
+            COLUMN_CODE,
+            SWT.TRAIL);
 
       colDef.setColumnLabel(Messages.Tour_Nutrition_Column_Code);
       colDef.setColumnHeaderText(Messages.Tour_Nutrition_Column_Code);
@@ -705,7 +708,10 @@ public class DialogSearchProduct extends TitleAreaDialog implements ITourViewer,
 
    private void defineColumn_20_Name() {
 
-      final TableColumnDefinition colDef = new TableColumnDefinition(_columnManager, COLUMN_NAME, SWT.TRAIL);
+      final TableColumnDefinition colDef = new TableColumnDefinition(
+            _columnManager,
+            COLUMN_NAME,
+            SWT.TRAIL);
 
       colDef.setColumnLabel(Messages.Tour_Nutrition_Column_Name);
       colDef.setColumnHeaderText(Messages.Tour_Nutrition_Column_Name);
@@ -728,7 +734,10 @@ public class DialogSearchProduct extends TitleAreaDialog implements ITourViewer,
 
    private void defineColumn_30_Quantity() {
 
-      final TableColumnDefinition colDef = new TableColumnDefinition(_columnManager, COLUMN_QUANTITY, SWT.TRAIL);
+      final TableColumnDefinition colDef = new TableColumnDefinition(
+            _columnManager,
+            COLUMN_QUANTITY,
+            SWT.TRAIL);
 
       colDef.setColumnLabel(Messages.Tour_Nutrition_Column_Quantity);
       colDef.setColumnHeaderText(Messages.Tour_Nutrition_Column_Quantity);
@@ -807,7 +816,8 @@ public class DialogSearchProduct extends TitleAreaDialog implements ITourViewer,
 
    private List<String> getSelectedProducts() {
 
-      final StructuredSelection selection = (StructuredSelection) _productsViewer.getSelection();
+      final StructuredSelection selection =
+            (StructuredSelection) _productsViewer.getSelection();
 
       final List<String> productCodes = new ArrayList<>();
 
@@ -832,7 +842,8 @@ public class DialogSearchProduct extends TitleAreaDialog implements ITourViewer,
 
       createMenuManager();
 
-      _columnSortListener = SelectionListener.widgetSelectedAdapter(selectionEvent -> onSelect_SortColumn(selectionEvent));
+      _columnSortListener = SelectionListener.widgetSelectedAdapter(
+            selectionEvent -> onSelect_SortColumn(selectionEvent));
    }
 
    private void onAddProduct() {
@@ -850,8 +861,9 @@ public class DialogSearchProduct extends TitleAreaDialog implements ITourViewer,
          // Before adding the selected product, we need to check if it doesn't already exist
          // An existing product can only be added when the existing ones are
          // attached to a beverage container
-         if (tourNutritionProducts.stream().anyMatch(tourNutritionProduct -> tourNutritionProduct.getProductCode().equals(selectedProduct.code) &&
-               tourNutritionProduct.getTourBeverageContainer() == null)) {
+         if (tourNutritionProducts.stream().anyMatch(
+               tourNutritionProduct -> tourNutritionProduct.getProductCode().equals(selectedProduct.code) &&
+                     tourNutritionProduct.getTourBeverageContainer() == null)) {
 
             setErrorMessage(Messages.Dialog_SearchProduct_Label_AlreadyExists);
             return;
@@ -859,19 +871,14 @@ public class DialogSearchProduct extends TitleAreaDialog implements ITourViewer,
 
          setErrorMessage(null);
 
-         final TourNutritionProduct tourNutritionProduct = new TourNutritionProduct(tourData, selectedProduct);
+         final TourNutritionProduct tourNutritionProduct = new TourNutritionProduct(
+               tourData,
+               selectedProduct);
          tourData.addNutritionProduct(tourNutritionProduct);
 
          TourManager.saveModifiedTour(tourData);
 
-         //TODO FB
-//         TourNutritionProductMenuManager.equipment_Add(
-//               tourNutritionProduct,
-//               _tourNutritionProductMenuManager.getTourProvider(),
-//               _tourNutritionProductMenuManager.isSaveTour(),
-//               _tourNutritionProductMenuManager.isCheckTourEditor());
          _tourNutritionProductMenuManager.updateRecentEquipment(tourNutritionProduct);
-
       });
    }
 
