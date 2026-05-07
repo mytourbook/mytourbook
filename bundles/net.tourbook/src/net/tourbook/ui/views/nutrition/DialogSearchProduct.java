@@ -870,7 +870,7 @@ public class DialogSearchProduct extends TitleAreaDialog implements ITourViewer,
 //               _tourNutritionProductMenuManager.getTourProvider(),
 //               _tourNutritionProductMenuManager.isSaveTour(),
 //               _tourNutritionProductMenuManager.isCheckTourEditor());
-//         _tourNutritionProductMenuManager.updateRecentEquipment(tourNutritionProduct);
+         _tourNutritionProductMenuManager.updateRecentEquipment(tourNutritionProduct);
 
       });
    }

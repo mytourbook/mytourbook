@@ -16,10 +16,11 @@
 
 package net.tourbook.nutrition;
 
-import java.util.LinkedList;
+import java.util.LinkedHashMap;
 
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.UI;
+import net.tourbook.common.util.LRUMap;
 import net.tourbook.data.TourNutritionProduct;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.preferences.ITourbookPreferences;
@@ -56,7 +57,7 @@ public class TourNutritionProductMenuManager {
     * number of tour types which are displayed in the context menu or saved in the dialog settings,
     * it's max number is 9 to have a unique accelerator key
     */
-   private static LinkedList<TourNutritionProduct>   _recentTourNutritionProducts = new LinkedList<>();
+   private static LinkedHashMap<String, TourNutritionProduct> _recentTourNutritionProducts = new LRUMap<>(10);
 
    /**
     * Contains actions which are displayed in the menu
@@ -72,15 +73,15 @@ public class TourNutritionProductMenuManager {
 
    private static class RecentTourNutritionProductAction extends Action {
 
-      private TourNutritionProduct __TourNutritionProduct;
+      private TourNutritionProduct __tourNutritionProduct;
 
       @Override
       public void run() {
-         setTourNutritionProductIntoTour(__TourNutritionProduct, _isSaveTour);
+         setTourNutritionProductIntoTour(__tourNutritionProduct, _isSaveTour);
       }
 
-      private void setTourNutritionProduct(final TourNutritionProduct TourNutritionProduct) {
-         __TourNutritionProduct = TourNutritionProduct;
+      private void setTourNutritionProduct(final TourNutritionProduct tourNutritionProduct) {
+         __tourNutritionProduct = tourNutritionProduct;
       }
    }
 
@@ -106,9 +107,9 @@ public class TourNutritionProductMenuManager {
     *
     * @param TourNutritionProduct
     */
-   public static void addRecentTourNutritionProduct(final TourNutritionProduct TourNutritionProduct) {
-      _recentTourNutritionProducts.remove(TourNutritionProduct);
-      _recentTourNutritionProducts.addFirst(TourNutritionProduct);
+   private static void addRecentTourNutritionProduct(final TourNutritionProduct TourNutritionProduct) {
+//      _recentTourNutritionProducts.remove(TourNutritionProduct);
+//      _recentTourNutritionProducts.addFirst(TourNutritionProduct);
    }
 
    public static void clearRecentProducts() {
@@ -128,8 +129,8 @@ public class TourNutritionProductMenuManager {
 
       for (final RecentTourNutritionProductAction actionRecentTourNutritionProduct : _actionsRecentTourNutritionProducts) {
 
-         final TourNutritionProduct TourNutritionProduct = actionRecentTourNutritionProduct.__TourNutritionProduct;
-         if (TourNutritionProduct == null) {
+         final TourNutritionProduct tourNutritionProduct = actionRecentTourNutritionProduct.__tourNutritionProduct;
+         if (tourNutritionProduct == null) {
 
             // disable tour type
 
@@ -198,7 +199,7 @@ public class TourNutritionProductMenuManager {
       }
       final TourNutritionProduct tourNutritionProduct = new TourNutritionProduct();
       tourNutritionProduct.setName("Test");
-      _recentTourNutritionProducts.add(tourNutritionProduct);
+      //_recentTourNutritionProducts.add(tourNutritionProduct);
       if (_recentTourNutritionProducts.isEmpty()) {
          return;
       }
@@ -364,5 +365,10 @@ public class TourNutritionProductMenuManager {
       // set updated list
       _recentTourNutritionProducts.clear();
       // _recentTourNutritionProducts = validTourNutritionProducts;
+   }
+
+   public void updateRecentEquipment(final TourNutritionProduct tourNutritionProduct) {
+
+      _recentTourNutritionProducts.putFirst(tourNutritionProduct.getProductCode(), tourNutritionProduct);
    }
 }
