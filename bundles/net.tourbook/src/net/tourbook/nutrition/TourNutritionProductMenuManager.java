@@ -209,14 +209,16 @@ public class TourNutritionProductMenuManager {
       _isSaveTour = isSaveTour;
 
       // add tour types
-      int TourNutritionProductIndex = 0;
-      for (final RecentTourNutritionProductAction actionRecentTourNutritionProduct : _actionsRecentTourNutritionProducts) {
+      int tourNutritionProductIndex = 0;
+      //iterate over the recent tour types and add them to the menu
+      for (final TourNutritionProduct tourNutritionProduct : _recentTourNutritionProducts.values()) {
          try {
 
-            final TourNutritionProduct recentTourNutritionProduct = _recentTourNutritionProducts.get(TourNutritionProductIndex);
+            final TourNutritionProduct recentTourNutritionProduct = tourNutritionProduct;
 
+            final RecentTourNutritionProductAction actionRecentTourNutritionProduct = _actionsRecentTourNutritionProducts[tourNutritionProductIndex];
             actionRecentTourNutritionProduct.setTourNutritionProduct(recentTourNutritionProduct);
-            actionRecentTourNutritionProduct.setText(UI.SPACE4 + UI.MNEMONIC + (TourNutritionProductIndex + 1) + UI.SPACE2
+            actionRecentTourNutritionProduct.setText(UI.SPACE4 + UI.MNEMONIC + (tourNutritionProductIndex + 1) + UI.SPACE2
                   + recentTourNutritionProduct.getName());
 
             menuMgr.add(actionRecentTourNutritionProduct);
@@ -226,7 +228,7 @@ public class TourNutritionProductMenuManager {
             break;
          }
 
-         TourNutritionProductIndex++;
+         tourNutritionProductIndex++;
       }
    }
 
