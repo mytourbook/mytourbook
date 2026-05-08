@@ -2896,6 +2896,11 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 
    private void onDropTour(final long tourId, final DropTargetEvent event) {
 
+      if (_dragOverDate == null) {
+         // fix issue https://github.com/mytourbook/mytourbook/issues/1686
+         return;
+      }
+
       final TourData dragedTourData = TourManager.getInstance().getTourData(tourId);
 
       Assert.isNotNull(dragedTourData);
