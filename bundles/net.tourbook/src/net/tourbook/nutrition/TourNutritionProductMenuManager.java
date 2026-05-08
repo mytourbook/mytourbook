@@ -92,7 +92,7 @@ public class TourNutritionProductMenuManager {
          final String property = propertyChangeEvent.getProperty();
 
          // check if the number of recent tour types has changed
-         if (property.equals(ITourbookPreferences.APPEARANCE_NUMBER_OF_RECENT_TOUR_TYPES)) {
+         if (property.equals(ITourbookPreferences.NUTRITION_NUMBER_OF_RECENT_PRODUCTS)) {
             setActions();
          } else if (property.equals(ITourbookPreferences.TOUR_TYPE_LIST_IS_MODIFIED)) {
             updateTourNutritionProducts();
@@ -308,7 +308,7 @@ public class TourNutritionProductMenuManager {
       _maxTourNutritionProducts = TourbookPlugin
             .getDefault()
             .getPreferenceStore()
-            .getInt(ITourbookPreferences.APPEARANCE_NUMBER_OF_RECENT_TOUR_NUTRITION_PRODUCTS);
+            .getInt(ITourbookPreferences.NUTRITION_NUMBER_OF_RECENT_PRODUCTS);
 
       _actionsRecentTourNutritionProducts = new RecentTourNutritionProductAction[_maxTourNutritionProducts];
 
@@ -320,6 +320,7 @@ public class TourNutritionProductMenuManager {
    public static void setTourNutritionProductIntoTour(final TourNutritionProduct TourNutritionProduct,
                                                       final boolean isSaveTour) {
 
+      //TODO FB what to do when the product is already in the list ?
       final Runnable runnable = () -> {
 
          // set tour type in all tours (without tours which are opened in an editor)

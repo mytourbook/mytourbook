@@ -486,15 +486,14 @@ public interface ITourbookPreferences {
    /*
     * Common appearance
     */
-   public static final String APPEARANCE_NUMBER_OF_RECENT_TOUR_NUTRITION_PRODUCTS = "appearance.NumberOfRecentTourNutritionProducts";    //$NON-NLS-1$
-   public static final String APPEARANCE_NUMBER_OF_RECENT_TOUR_TYPES              = "appearance.NumberOfRecentTourTypes";                //$NON-NLS-1$
-   public static final String APPEARANCE_NUMBER_OF_RECENT_TAGS                    = "appearance.number-of-recent-tags";                  //$NON-NLS-1$
-   public static final String APPEARANCE_SHOW_TOUR_TYPE_CONTEXT_MENU              = "appearance.ShowTourTypeContextMenuOnMouseHovering"; //$NON-NLS-1$
+   public static final String APPEARANCE_NUMBER_OF_RECENT_TOUR_TYPES        = "appearance.NumberOfRecentTourTypes";                //$NON-NLS-1$
+   public static final String APPEARANCE_NUMBER_OF_RECENT_TAGS              = "appearance.number-of-recent-tags";                  //$NON-NLS-1$
+   public static final String APPEARANCE_SHOW_TOUR_TYPE_CONTEXT_MENU        = "appearance.ShowTourTypeContextMenuOnMouseHovering"; //$NON-NLS-1$
 
-   public static final String APPEARANCE_IS_PACEANDSPEED_FROM_RECORDED_TIME       = "Appearance.IsPaceAndSpeedFromRecordedTime";         //$NON-NLS-1$
-   public static final String APPEARANCE_IS_TAGGING_AUTO_OPEN                     = "Appearance.IsAutoOpenTagging";                      //$NON-NLS-1$
-   public static final String APPEARANCE_IS_TAGGING_ANIMATION                     = "Appearance.IsTaggingAnimation";                     //$NON-NLS-1$
-   public static final String APPEARANCE_TAGGING_AUTO_OPEN_DELAY                  = "Appearance.AutoOpenTaggingDelay";                   //$NON-NLS-1$
+   public static final String APPEARANCE_IS_PACEANDSPEED_FROM_RECORDED_TIME = "Appearance.IsPaceAndSpeedFromRecordedTime";         //$NON-NLS-1$
+   public static final String APPEARANCE_IS_TAGGING_AUTO_OPEN               = "Appearance.IsAutoOpenTagging";                      //$NON-NLS-1$
+   public static final String APPEARANCE_IS_TAGGING_ANIMATION               = "Appearance.IsTaggingAnimation";                     //$NON-NLS-1$
+   public static final String APPEARANCE_TAGGING_AUTO_OPEN_DELAY            = "Appearance.AutoOpenTaggingDelay";                   //$NON-NLS-1$
 
    /*
     * merge tour dialog
@@ -675,6 +674,7 @@ public interface ITourbookPreferences {
     */
    public static final String NUTRITION_BEVERAGECONTAINERS_HAVE_CHANGED = "NUTRITION_BEVERAGECONTAINERS_HAVE_CHANGED"; //$NON-NLS-1$
    public static final String NUTRITION_IGNORE_FIRST_HOUR               = "NUTRITION_IGNORE_FIRST_HOUR";               //$NON-NLS-1$
+   public static final String NUTRITION_NUMBER_OF_RECENT_PRODUCTS       = "NUTRITION_NUMBER_OF_RECENT_PRODUCTS";       //$NON-NLS-1$
 
    /*
     * Equipment

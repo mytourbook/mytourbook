@@ -147,6 +147,7 @@ public class PrefPageNutrition extends PreferencePage implements IWorkbenchPrefe
    protected void performDefaults() {
 
       _chkIgnoreFirstHour.setSelection(_prefStore.getDefaultBoolean(ITourbookPreferences.NUTRITION_IGNORE_FIRST_HOUR));
+      _spinnerRecentProducts.setSelection(_prefStore.getDefaultInt(ITourbookPreferences.NUTRITION_NUMBER_OF_RECENT_PRODUCTS));
 
       super.performDefaults();
    }
@@ -158,7 +159,12 @@ public class PrefPageNutrition extends PreferencePage implements IWorkbenchPrefe
 
       if (isOK) {
 
-         _prefStore.setValue(ITourbookPreferences.NUTRITION_IGNORE_FIRST_HOUR, _chkIgnoreFirstHour.getSelection());
+         _prefStore.setValue(
+               ITourbookPreferences.NUTRITION_IGNORE_FIRST_HOUR,
+               _chkIgnoreFirstHour.getSelection());
+         _prefStore.setValue(
+               ITourbookPreferences.NUTRITION_NUMBER_OF_RECENT_PRODUCTS,
+               _spinnerRecentProducts.getSelection());
       }
 
       return isOK;
@@ -167,6 +173,7 @@ public class PrefPageNutrition extends PreferencePage implements IWorkbenchPrefe
    private void restoreState() {
 
       _chkIgnoreFirstHour.setSelection(_prefStore.getBoolean(ITourbookPreferences.NUTRITION_IGNORE_FIRST_HOUR));
+      _spinnerRecentProducts.setSelection(_prefStore.getInt(ITourbookPreferences.NUTRITION_NUMBER_OF_RECENT_PRODUCTS));
    }
 
 }
