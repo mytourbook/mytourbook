@@ -49,14 +49,14 @@ public class TourNutritionProductMenuManager {
    private static final IPreferenceStore                      _prefStore                      = TourbookPlugin.getDefault().getPreferenceStore();
 
    /**
-    * Tour type manager state is saved in {@link #STATE_ID}
+    * Tour nutrition product manager state is saved in {@link #STATE_ID}
     */
    private static IDialogSettings                             _state                          = TourbookPlugin.getDefault()                      //
          .getDialogSettingsSection(STATE_ID);
 
    /**
-    * number of tour types which are displayed in the context menu or saved in the dialog settings,
-    * it's max number is 9 to have a unique accelerator key
+    * number of tour nutrition products which are displayed in the context menu or
+    * saved in the dialog settings, its max number is 9 to have a unique accelerator key
     */
    private static LinkedHashMap<String, TourNutritionProduct> _recentTourNutritionProducts    = new LRUMap<>(10);
 
@@ -301,7 +301,7 @@ public class TourNutritionProductMenuManager {
    }
 
    /**
-    * create actions for recent tour types
+    * create actions for recent tour nutrition products
     */
    private static void setActions() {
 
@@ -351,7 +351,7 @@ public class TourNutritionProductMenuManager {
    }
 
    /**
-    * Tour types has changed
+    * Tour nutrition products have changed
     */
    private static void updateTourNutritionProducts() {
 
@@ -377,7 +377,7 @@ public class TourNutritionProductMenuManager {
       // _recentTourNutritionProducts = validTourNutritionProducts;
    }
 
-   public void updateRecentEquipment(final TourNutritionProduct tourNutritionProduct) {
+   public void updateRecentTourNutritionProducts(final TourNutritionProduct tourNutritionProduct) {
 
       _recentTourNutritionProducts.putFirst(tourNutritionProduct.getProductCode(), tourNutritionProduct);
    }
