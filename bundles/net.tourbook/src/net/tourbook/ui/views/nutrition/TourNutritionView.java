@@ -126,12 +126,6 @@ import cop.swt.widgets.viewers.table.celleditors.SpinnerCellEditor;
 
 public class TourNutritionView extends ViewPart implements ITourViewer {
 
-   // todo fb
-
-   //  add a spinner for the number of items to show 1 to 15
-   //copy from the recent equipment menu manager
-   // slideout in the tour nutrition view ? if it's easy to copy from the equipment view ?
-
    public static final String            ID                             = "net.tourbook.ui.views.nutrition.TourNutritionView"; //$NON-NLS-1$
 
    private static final String           STATE_PRODUCT_SEARCHES_HISTORY = "products.searchesHistory";                          //$NON-NLS-1$
