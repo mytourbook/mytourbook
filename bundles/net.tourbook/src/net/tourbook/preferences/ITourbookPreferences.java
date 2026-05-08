@@ -486,14 +486,15 @@ public interface ITourbookPreferences {
    /*
     * Common appearance
     */
-   public static final String APPEARANCE_NUMBER_OF_RECENT_TOUR_TYPES        = "appearance.NumberOfRecentTourTypes";                //$NON-NLS-1$
-   public static final String APPEARANCE_NUMBER_OF_RECENT_TAGS              = "appearance.number-of-recent-tags";                  //$NON-NLS-1$
-   public static final String APPEARANCE_SHOW_TOUR_TYPE_CONTEXT_MENU        = "appearance.ShowTourTypeContextMenuOnMouseHovering"; //$NON-NLS-1$
+   public static final String APPEARANCE_NUMBER_OF_RECENT_TOUR_NUTRITION_PRODUCTS = "appearance.NumberOfRecentTourNutritionProducts";    //$NON-NLS-1$
+   public static final String APPEARANCE_NUMBER_OF_RECENT_TOUR_TYPES              = "appearance.NumberOfRecentTourTypes";                //$NON-NLS-1$
+   public static final String APPEARANCE_NUMBER_OF_RECENT_TAGS                    = "appearance.number-of-recent-tags";                  //$NON-NLS-1$
+   public static final String APPEARANCE_SHOW_TOUR_TYPE_CONTEXT_MENU              = "appearance.ShowTourTypeContextMenuOnMouseHovering"; //$NON-NLS-1$
 
-   public static final String APPEARANCE_IS_PACEANDSPEED_FROM_RECORDED_TIME = "Appearance.IsPaceAndSpeedFromRecordedTime";         //$NON-NLS-1$
-   public static final String APPEARANCE_IS_TAGGING_AUTO_OPEN               = "Appearance.IsAutoOpenTagging";                      //$NON-NLS-1$
-   public static final String APPEARANCE_IS_TAGGING_ANIMATION               = "Appearance.IsTaggingAnimation";                     //$NON-NLS-1$
-   public static final String APPEARANCE_TAGGING_AUTO_OPEN_DELAY            = "Appearance.AutoOpenTaggingDelay";                   //$NON-NLS-1$
+   public static final String APPEARANCE_IS_PACEANDSPEED_FROM_RECORDED_TIME       = "Appearance.IsPaceAndSpeedFromRecordedTime";         //$NON-NLS-1$
+   public static final String APPEARANCE_IS_TAGGING_AUTO_OPEN                     = "Appearance.IsAutoOpenTagging";                      //$NON-NLS-1$
+   public static final String APPEARANCE_IS_TAGGING_ANIMATION                     = "Appearance.IsTaggingAnimation";                     //$NON-NLS-1$
+   public static final String APPEARANCE_TAGGING_AUTO_OPEN_DELAY                  = "Appearance.AutoOpenTaggingDelay";                   //$NON-NLS-1$
 
    /*
     * merge tour dialog

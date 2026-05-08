@@ -42,34 +42,35 @@ import org.eclipse.swt.widgets.Display;
  */
 public class TourNutritionProductMenuManager {
 
-   private static final String                       STATE_ID                     = "TourNutritionProductManager.RecentTourNutritionProducts"; //$NON-NLS-1$
-   private static final String                       STATE_TOUR_TYPE_ID           = "TourNutritionProductId";                                  //$NON-NLS-1$
+   private static final String                                STATE_ID                        =
+         "TourNutritionProductManager.RecentTourNutritionProducts";                                                                              //$NON-NLS-1$
+   private static final String                                STATE_TOUR_NUTRITION_PRODUCT_ID = "TourNutritionProductId";                        //$NON-NLS-1$
 
-   private static final IPreferenceStore             _prefStore                   = TourbookPlugin.getDefault().getPreferenceStore();
+   private static final IPreferenceStore                      _prefStore                      = TourbookPlugin.getDefault().getPreferenceStore();
 
    /**
     * Tour type manager state is saved in {@link #STATE_ID}
     */
-   private static IDialogSettings                    _state                       = TourbookPlugin.getDefault()                                //
+   private static IDialogSettings                             _state                          = TourbookPlugin.getDefault()                      //
          .getDialogSettingsSection(STATE_ID);
 
    /**
     * number of tour types which are displayed in the context menu or saved in the dialog settings,
     * it's max number is 9 to have a unique accelerator key
     */
-   private static LinkedHashMap<String, TourNutritionProduct> _recentTourNutritionProducts = new LRUMap<>(10);
+   private static LinkedHashMap<String, TourNutritionProduct> _recentTourNutritionProducts    = new LRUMap<>(10);
 
    /**
     * Contains actions which are displayed in the menu
     */
-   private static RecentTourNutritionProductAction[] _actionsRecentTourNutritionProducts;
+   private static RecentTourNutritionProductAction[]          _actionsRecentTourNutritionProducts;
 
-   private static int                                _maxTourNutritionProducts    = -1;
+   private static int                                         _maxTourNutritionProducts       = -1;
 
-   private static IPropertyChangeListener            _prefChangeListener;
+   private static IPropertyChangeListener                     _prefChangeListener;
 
-   private static boolean                            _isInitialized               = false;
-   private static boolean                            _isSaveTour;
+   private static boolean                                     _isInitialized                  = false;
+   private static boolean                                     _isSaveTour;
 
    private static class RecentTourNutritionProductAction extends Action {
 
@@ -185,10 +186,9 @@ public class TourNutritionProductMenuManager {
    }
 
    /**
-    * Create the menu entries for the recently used tour types
+    * Create the menu entries for the recently used tour nutrition products
     *
     * @param menuMgr
-    * @param tourProvider
     * @param isSaveTour
     */
    public static void fillMenuWithRecentTourNutritionProducts(final IMenuManager menuMgr,
@@ -208,18 +208,28 @@ public class TourNutritionProductMenuManager {
 
       _isSaveTour = isSaveTour;
 
-      // add tour types
       int tourNutritionProductIndex = 0;
-      //iterate over the recent tour types and add them to the menu
-      for (final TourNutritionProduct tourNutritionProduct : _recentTourNutritionProducts.values()) {
+      //iterate over the recent tour nutrition products and add them to the menu
+      for (final TourNutritionProduct recentTourNutritionProduct : _recentTourNutritionProducts.values()) {
          try {
 
-            final TourNutritionProduct recentTourNutritionProduct = tourNutritionProduct;
+            final RecentTourNutritionProductAction actionRecentTourNutritionProduct =
+                  _actionsRecentTourNutritionProducts[tourNutritionProductIndex];
+            actionRecentTourNutritionProduct.setTourNutritionProduct(
+                  recentTourNutritionProduct);
 
-            final RecentTourNutritionProductAction actionRecentTourNutritionProduct = _actionsRecentTourNutritionProducts[tourNutritionProductIndex];
-            actionRecentTourNutritionProduct.setTourNutritionProduct(recentTourNutritionProduct);
-            actionRecentTourNutritionProduct.setText(UI.SPACE4 + UI.MNEMONIC + (tourNutritionProductIndex + 1) + UI.SPACE2
-                  + recentTourNutritionProduct.getName());
+            final String productCode = recentTourNutritionProduct.getProductCode();
+            actionRecentTourNutritionProduct.setText(
+                  UI.SPACE4 +
+                        UI.MNEMONIC +
+                        (tourNutritionProductIndex + 1) +
+                        UI.SPACE2 +
+                        UI.SYMBOL_STAR.repeat(4) +
+                        productCode.substring(productCode.length() - 4) +
+                        UI.SPACE +
+                        UI.SYMBOL_MINUS +
+                        UI.SPACE +
+                        recentTourNutritionProduct.getName());
 
             menuMgr.add(actionRecentTourNutritionProduct);
 
@@ -243,7 +253,7 @@ public class TourNutritionProductMenuManager {
 
    public static void restoreState() {
 
-      final String[] allStateTourNutritionProductIds = _state.getArray(STATE_TOUR_TYPE_ID);
+      final String[] allStateTourNutritionProductIds = _state.getArray(STATE_TOUR_NUTRITION_PRODUCT_ID);
       if (allStateTourNutritionProductIds == null) {
          return;
       }
@@ -287,18 +297,18 @@ public class TourNutritionProductMenuManager {
 //         }
 //      }
 
-      _state.put(STATE_TOUR_TYPE_ID, stateTourNutritionProductIds);
+      _state.put(STATE_TOUR_NUTRITION_PRODUCT_ID, stateTourNutritionProductIds);
    }
 
    /**
-    * create actions for recenct tour types
+    * create actions for recent tour types
     */
    private static void setActions() {
 
       _maxTourNutritionProducts = TourbookPlugin
             .getDefault()
             .getPreferenceStore()
-            .getInt(ITourbookPreferences.APPEARANCE_NUMBER_OF_RECENT_TOUR_TYPES);
+            .getInt(ITourbookPreferences.APPEARANCE_NUMBER_OF_RECENT_TOUR_NUTRITION_PRODUCTS);
 
       _actionsRecentTourNutritionProducts = new RecentTourNutritionProductAction[_maxTourNutritionProducts];
 
