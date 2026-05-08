@@ -261,6 +261,12 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
          try {
 
             final byte[] bytes = (byte[]) super.nativeToJava(transferData);
+
+            if (bytes == null) {
+               // fix https://github.com/mytourbook/mytourbook/issues/1686#issuecomment-4406777444
+               return null;
+            }
+
             final ByteArrayInputStream in = new ByteArrayInputStream(bytes);
             final DataInputStream dataIn = new DataInputStream(in);
 
