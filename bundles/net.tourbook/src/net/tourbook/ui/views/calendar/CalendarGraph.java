@@ -261,6 +261,12 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
          try {
 
             final byte[] bytes = (byte[]) super.nativeToJava(transferData);
+
+            if (bytes == null) {
+               // fix https://github.com/mytourbook/mytourbook/issues/1686#issuecomment-4406777444
+               return null;
+            }
+
             final ByteArrayInputStream in = new ByteArrayInputStream(bytes);
             final DataInputStream dataIn = new DataInputStream(in);
 
@@ -2895,6 +2901,11 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
    }
 
    private void onDropTour(final long tourId, final DropTargetEvent event) {
+
+      if (_dragOverDate == null) {
+         // fix issue https://github.com/mytourbook/mytourbook/issues/1686
+         return;
+      }
 
       final TourData dragedTourData = TourManager.getInstance().getTourData(tourId);
 

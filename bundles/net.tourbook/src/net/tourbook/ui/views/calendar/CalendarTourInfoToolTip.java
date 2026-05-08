@@ -128,7 +128,9 @@ public class CalendarTourInfoToolTip extends ToolTip implements ITourProvider, I
 
       final CalendarSelectItem hoveredItem = _calendarGraph.getHoveredTour();
 
-      if (hoveredItem.isTour() && hoveredItem.itemRectangle != null) {
+      if (hoveredItem != null
+            && hoveredItem.isTour()
+            && hoveredItem.itemRectangle != null) {
 
          final Rectangle cellBounds = hoveredItem.itemRectangle;
          final int cellWidth2 = cellBounds.width / 2;
