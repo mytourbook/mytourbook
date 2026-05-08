@@ -24,7 +24,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.LinkedHashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -37,7 +37,6 @@ import net.tourbook.common.UI;
 import net.tourbook.common.action.ActionOpenPrefDialog;
 import net.tourbook.common.ui.SubMenu;
 import net.tourbook.common.util.AdvancedMenuForActions;
-import net.tourbook.common.util.LRUMap;
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.ToolTip;
 import net.tourbook.data.Equipment;
@@ -86,59 +85,68 @@ public class EquipmentMenuManager implements IActionProvider {
 
 // SET_FORMATTING_ON
 
-   private static final String                   STATE_RECENT_EQUIPMENT              = "STATE_RECENT_EQUIPMENT"; //$NON-NLS-1$
+   private static final String               STATE_RECENT_EQUIPMENT = "STATE_RECENT_EQUIPMENT"; //$NON-NLS-1$
 
-   private static IPropertyChangeListener        _prefChangeListener;
+   private static IPropertyChangeListener    _prefChangeListener;
+
+   private static EquipmentMenuManager       _currentInstance;
+   private static boolean                    _isAdvMenu;
+
+   private static ActionRecentEquipment[]    _allActions_RecentEquipment;
+   private static ActionAllPreviousEquipment _actionAllPreviousEquipment;
 
    /**
     * Number of equipment which are displayed in the context menu or saved in the dialog settings,
     * it's max number is 9 to have a unique accelerator key
     */
-   private static int                            _maxRecentEquipment;
+   private static int                        _maxRecentEquipment    = -1;
 
-   private static LinkedHashMap<Long, Equipment> _allRecentEquipment                 = new LRUMap<>(10);
+   private static LinkedList<Equipment>      _allRecentEquipment    = new LinkedList<>();
 
-   private static ActionRecentEquipment[]        _allActions_RecentEquipment;
-   private static List<ActionRecentEquipment>    _allActions_RecentEquipment_Visible = new ArrayList<>();
+   /**
+    * Contains all equipment which are added by the last add action
+    */
+   private static Map<Long, Equipment>       _allPreviousEquipment  = new HashMap<>();
 
-   private static EquipmentMenuManager           _currentInstance;
+   /**
+    * Contains all equipment ids when only one tour is selected
+    */
+   private static HashSet<Long>              _allEquipmentIds_OneTour;
 
-   private static Map<Long, Equipment>           _allEquipment_WhenCopied;
+   private static Map<Long, Equipment>       _allEquipment_WhenCopied;
 
-   private static boolean                        _isTaggingAutoOpen;
-   private static boolean                        _isTaggingAnimation;
-   private static int                            _taggingAutoOpenDelay;
+   private static boolean                    _isTaggingAutoOpen;
+   private static boolean                    _isTaggingAnimation;
+   private static int                        _taggingAutoOpenDelay;
 
-   private ITourProvider                         _tourProvider;
+   private ITourProvider                     _tourProvider;
 
-   private EquipmentTransfer                     _equipmentTransfer                  = new EquipmentTransfer();
+   private EquipmentTransfer                 _equipmentTransfer     = new EquipmentTransfer();
 
-   private boolean                               _isCheckTourEditor;
-   private boolean                               _isSaveTour;
+   private boolean                           _isCheckTourEditor;
+   private boolean                           _isSaveTour;
 
-   private Map<String, Object>                   _allEquipmentActions;
+   private Map<String, Object>               _allEquipmentActions;
 
-   private ActionAddEquipment_SubMenu            _actionAddEquipment;
-   private ActionAddEquipmentGroups_SubMenu      _actionAddEquipment_Groups;
-   private ActionAddRecentEquipment              _actionAddRecentEquipment;
-   private ActionClipboard_CopyEquipment         _actionClipboard_CopyEquipment;
-   private ActionClipboard_PasteEquipment        _actionClipboard_PasteEquipment;
-   private ActionOpenPrefDialog                  _actionEquipmentGroupPreferences;
-   private ActionOpenPrefDialog                  _actionEquipmentPreferences;
-   private ActionRemoveEquipment_SubMenu         _actionRemoveEquipment;
-   private ActionRemoveEquipmentAll              _actionRemoveAllEquipment;
+   private ActionAddEquipment_SubMenu        _actionAddEquipment;
+   private ActionAddEquipmentGroups_SubMenu  _actionAddEquipment_Groups;
+   private ActionAddRecentEquipment          _actionAddRecentEquipment;
+   private ActionClipboard_CopyEquipment     _actionClipboard_CopyEquipment;
+   private ActionClipboard_PasteEquipment    _actionClipboard_PasteEquipment;
+   private ActionOpenPrefDialog              _actionEquipmentGroupPreferences;
+   private ActionOpenPrefDialog              _actionEquipmentPreferences;
+   private ActionRemoveEquipment_SubMenu     _actionRemoveEquipment;
+   private ActionRemoveEquipmentAll          _actionRemoveAllEquipment;
 
-   private boolean                               _isAdvMenu;
+   private ActionContributionItem            _actionContribItem_AddEquipment_AutoOpen_Current;
+   private ActionContributionItem            _actionContribItem_AddEquipment_AutoOpen_Default;
+   private ActionContributionItem            _actionContribItem_AddEquipment_AutoOpen_Flat;
+   private ActionContributionItem            _actionContribItem_AddEquipment_AutoOpen_Tree;
 
-   private ActionContributionItem                _actionContribItem_AddEquipment_AutoOpen_Current;
-   private ActionContributionItem                _actionContribItem_AddEquipment_AutoOpen_Default;
-   private ActionContributionItem                _actionContribItem_AddEquipment_AutoOpen_Flat;
-   private ActionContributionItem                _actionContribItem_AddEquipment_AutoOpen_Tree;
-
-   private AdvancedMenuForActions                _advancedMenuToAddEquipment_Current;
-   private AdvancedMenuForActions                _advancedMenuToAddEquipment_Default;
-   private AdvancedMenuForActions                _advancedMenuToAddEquipment_Flat;
-   private AdvancedMenuForActions                _advancedMenuToAddEquipment_Tree;
+   private AdvancedMenuForActions            _advancedMenuToAddEquipment_Current;
+   private AdvancedMenuForActions            _advancedMenuToAddEquipment_Default;
+   private AdvancedMenuForActions            _advancedMenuToAddEquipment_Flat;
+   private AdvancedMenuForActions            _advancedMenuToAddEquipment_Tree;
 
    public class ActionAddEquipmentGroups_SubMenu extends SubMenu {
 
@@ -180,6 +188,48 @@ public class EquipmentMenuManager implements IActionProvider {
          }
 
          addActionToMenu(_actionEquipmentGroupPreferences);
+      }
+   }
+
+   /**
+   *
+   */
+   private static class ActionAllPreviousEquipment extends Action {
+
+      public ActionAllPreviousEquipment() {
+
+         super(net.tourbook.ui.UI.IS_NOT_INITIALIZED, AS_CHECK_BOX);
+      }
+
+      @Override
+      public void run() {
+
+         if (_isAdvMenu) {
+
+            final ActionAddEquipment_SubMenu action = (ActionAddEquipment_SubMenu) _currentInstance._actionContribItem_AddEquipment_AutoOpen_Current
+                  .getAction();
+
+            action.setEquipment(isChecked(), _allPreviousEquipment);
+
+         } else {
+
+            if (isChecked()) {
+
+               EquipmentManager.equipment_Add(_allPreviousEquipment.values(),
+
+                     _currentInstance._tourProvider,
+                     _currentInstance.isSaveTour(),
+                     _currentInstance.isCheckTourEditor());
+
+            } else {
+
+               EquipmentManager.equipment_Remove(_allPreviousEquipment.values(),
+
+                     _currentInstance._tourProvider,
+                     _currentInstance.isSaveTour(),
+                     _currentInstance.isCheckTourEditor());
+            }
+         }
       }
    }
 
@@ -235,7 +285,7 @@ public class EquipmentMenuManager implements IActionProvider {
 
    public static class ActionRecentEquipment extends Action {
 
-      Equipment equipment;
+      private Equipment equipment;
 
       public ActionRecentEquipment() {
          super(net.tourbook.ui.UI.IS_NOT_INITIALIZED, AS_CHECK_BOX);
@@ -244,7 +294,17 @@ public class EquipmentMenuManager implements IActionProvider {
       @Override
       public void run() {
 
-         _currentInstance.addEquipment(equipment);
+         if (_isAdvMenu) {
+
+            final ActionAddEquipment_SubMenu actionAddEquipmentAdvanced =
+                  (ActionAddEquipment_SubMenu) _currentInstance._actionContribItem_AddEquipment_AutoOpen_Current.getAction();
+
+            actionAddEquipmentAdvanced.setEquipment(isChecked(), equipment);
+
+         } else {
+
+            _currentInstance.addEquipment(equipment);
+         }
       }
 
       @Override
@@ -257,7 +317,7 @@ public class EquipmentMenuManager implements IActionProvider {
          ;
       }
 
-      private void updateAction(final Equipment equipment, final String equipmentText) {
+      private void updateEquipmentAction(final Equipment equipment, final String equipmentText) {
 
          setText(equipmentText);
 
@@ -403,6 +463,7 @@ public class EquipmentMenuManager implements IActionProvider {
 
    public static void clearRecentEquipment() {
 
+      _allPreviousEquipment.clear();
       _allRecentEquipment.clear();
    }
 
@@ -410,15 +471,16 @@ public class EquipmentMenuManager implements IActionProvider {
                                     final Set<Long> allSelectedEquipmentIDs_FromTours,
                                     final int numSelectedTours) {
 
-      if (_allActions_RecentEquipment_Visible.size() == 0) {
+      if (_allActions_RecentEquipment.length == 0) {
          return;
       }
 
       if (isEnabled_AddEquipment) {
 
-         final boolean isOneTourWithEquipment = allSelectedEquipmentIDs_FromTours.size() > 0 && numSelectedTours == 1;
+         final boolean isOneTourWithEquipment = allSelectedEquipmentIDs_FromTours.size() > 0
+               && numSelectedTours == 1;
 
-         for (final ActionRecentEquipment actionRecentEquipment : _allActions_RecentEquipment_Visible) {
+         for (final ActionRecentEquipment actionRecentEquipment : _allActions_RecentEquipment) {
 
             final Equipment recentEquipment = actionRecentEquipment.equipment;
 
@@ -463,7 +525,7 @@ public class EquipmentMenuManager implements IActionProvider {
 
          // disable all recent actions, this is applied when no tours are selected
 
-         for (final ActionRecentEquipment recentAction : _allActions_RecentEquipment_Visible) {
+         for (final ActionRecentEquipment recentAction : _allActions_RecentEquipment) {
             recentAction.setEnabled(false);
          }
       }
@@ -493,7 +555,7 @@ public class EquipmentMenuManager implements IActionProvider {
                final Equipment equipment = allAvailableEquipment.get(equipmentID);
 
                if (equipment != null) {
-                  _allRecentEquipment.put(equipmentID, equipment);
+                  _allRecentEquipment.add(equipment);
                }
 
             } catch (final NumberFormatException e) {
@@ -511,7 +573,7 @@ public class EquipmentMenuManager implements IActionProvider {
 
          int equipmentIndex = 0;
 
-         for (final Equipment equipment : _allRecentEquipment.values()) {
+         for (final Equipment equipment : _allRecentEquipment) {
 
             allEquipmentIDs[equipmentIndex++] = Long.toString(equipment.getEquipmentId());
 
@@ -525,7 +587,7 @@ public class EquipmentMenuManager implements IActionProvider {
    }
 
    /**
-    * create actions for recent equipment
+    * Create actions for recent equipment
     */
    private static void setupRecentActions() {
 
@@ -536,6 +598,26 @@ public class EquipmentMenuManager implements IActionProvider {
       for (int actionIndex = 0; actionIndex < _allActions_RecentEquipment.length; actionIndex++) {
          _allActions_RecentEquipment[actionIndex] = new ActionRecentEquipment();
       }
+
+      _actionAllPreviousEquipment = new ActionAllPreviousEquipment();
+   }
+
+   /**
+    * Check if all previous equipment are contained in the modified equipment
+    *
+    * @param allModifiedEquipment
+    */
+   static void updatePreviousEquipmentState(final HashMap<Long, Equipment> allModifiedEquipment) {
+
+      for (final Equipment previousEquipment : _allPreviousEquipment.values()) {
+
+         if (allModifiedEquipment.containsKey(previousEquipment.getEquipmentId()) == false) {
+
+            _actionAllPreviousEquipment.setChecked(false);
+
+            return;
+         }
+      }
    }
 
    /**
@@ -544,16 +626,16 @@ public class EquipmentMenuManager implements IActionProvider {
    public static void updateRecentEquipment() {
 
       final Map<Long, Equipment> allAvailableEquipment = EquipmentManager.getAllEquipment_ByID();
-      final Collection<Equipment> allRecentEquipment = _allRecentEquipment.values();
+      final Collection<Equipment> allRecentEquipment = _allRecentEquipment;
 
-      final LinkedHashMap<Long, Equipment> allNewRecentEquipment = new LRUMap<>(10);
+      final LinkedList<Equipment> allNewRecentEquipment = new LinkedList<>();
 
       for (final Equipment recentEquipment : allRecentEquipment) {
 
          final long recentEquipmentID = recentEquipment.getEquipmentId();
          final Equipment availableEquipment = allAvailableEquipment.get(recentEquipmentID);
 
-         allNewRecentEquipment.put(recentEquipmentID, availableEquipment);
+         allNewRecentEquipment.add(availableEquipment);
       }
 
       _allRecentEquipment = allNewRecentEquipment;
@@ -812,7 +894,7 @@ public class EquipmentMenuManager implements IActionProvider {
          allUsedEquipment.addAll(tourData.getEquipment());
       }
 
-      for (final ActionRecentEquipment actionRecentEquipment : _allActions_RecentEquipment_Visible) {
+      for (final ActionRecentEquipment actionRecentEquipment : _allActions_RecentEquipment) {
 
          final Equipment equipment = actionRecentEquipment.equipment;
 
@@ -870,39 +952,39 @@ public class EquipmentMenuManager implements IActionProvider {
    }
 
    @Override
-   public void fillActions(final IMenuManager menuMgr,
+   public void fillActions(final IMenuManager menuManager,
                            final ITourProvider tourProvider) {
 
       _currentInstance = this;
 
-      fillMenuWithRecentEquipment(menuMgr);
+      fillEquipmentMenu_WithRecentEquipment(menuManager, null);
    }
 
    /**
     * Add all equipment actions, this is called from the {@link TourDataEditorView}
     *
-    * @param menuMgr
+    * @param menuManager
     */
-   public void fillEquipmentMenu(final IMenuManager menuMgr) {
+   public void fillEquipmentMenu(final IMenuManager menuManager) {
 
       _currentInstance = this;
 
-      menuMgr.add(new Separator());
+      menuManager.add(new Separator());
       {
-         menuMgr.add(_actionAddEquipment);
-         menuMgr.add(_actionAddEquipment_Groups);
+         menuManager.add(_actionAddEquipment);
+         menuManager.add(_actionAddEquipment_Groups);
 
-         fillMenuWithRecentEquipment(menuMgr);
+         fillEquipmentMenu_WithRecentEquipment(menuManager, null);
 
-         menuMgr.add(_actionRemoveEquipment);
-         menuMgr.add(_actionRemoveAllEquipment);
+         menuManager.add(_actionRemoveEquipment);
+         menuManager.add(_actionRemoveAllEquipment);
 
-         menuMgr.add(_actionClipboard_CopyEquipment);
-         menuMgr.add(_actionClipboard_PasteEquipment);
+         menuManager.add(_actionClipboard_CopyEquipment);
+         menuManager.add(_actionClipboard_PasteEquipment);
 
-         menuMgr.add(new Separator());
+         menuManager.add(new Separator());
 
-         menuMgr.add(_actionEquipmentPreferences);
+         menuManager.add(_actionEquipmentPreferences);
       }
 
       enableActions_OneTour();
@@ -932,59 +1014,107 @@ public class EquipmentMenuManager implements IActionProvider {
    }
 
    /**
-    * @param menuMgr
+    * Fill recent equipment into the menu, either with a {@link IMenuManager} or with a {@link Menu}
+    *
+    * @param menuManager
+    * @param menu
     */
-   private void fillMenuWithRecentEquipment(final IMenuManager menuMgr) {
+   void fillEquipmentMenu_WithRecentEquipment(final IMenuManager menuManager, final Menu menu) {
+
+      if (_allRecentEquipment.isEmpty()) {
+         return;
+      }
 
       if (_maxRecentEquipment < 1) {
-
-         // recent actions are disabled
-
          return;
       }
 
-      final int numRecentEquipments = _allRecentEquipment.size();
+      // add all previous equipment
+      final int numPreviousEquipment = _allPreviousEquipment.size();
+      if (numPreviousEquipment > 0) {
 
-      if (numRecentEquipments == 0) {
-         return;
+         final Collection<Equipment> allPreviousEquipment = _allPreviousEquipment.values();
+
+         // check if the first previous equipment is the same as the first recent equipment
+         if (numPreviousEquipment > 1 || allPreviousEquipment.iterator().next().equals(_allRecentEquipment.get(0)) == false) {
+
+            final StringBuilder sb = new StringBuilder();
+            boolean isFirst = true;
+
+            for (final Equipment recentEquipment : allPreviousEquipment) {
+
+               if (isFirst) {
+                  isFirst = false;
+               } else {
+                  sb.append(UI.COMMA_SPACE);
+               }
+               sb.append(recentEquipment.getName());
+            }
+
+            String equipmentText = sb.toString();
+
+            if (UI.IS_SCRAMBLE_DATA) {
+
+               equipmentText = UI.scrambleText(equipmentText);
+            }
+
+            final int maxTextWidth = 40;
+
+            if (equipmentText.length() > maxTextWidth) {
+
+               equipmentText = UI.shortenText(equipmentText, maxTextWidth, true);
+            }
+
+            final ActionContributionItem actionContributionItem = new ActionContributionItem(_actionAllPreviousEquipment);
+
+            if (menu == null) {
+
+               _actionAllPreviousEquipment.setText(UI.SPACE4 + UI.MNEMONIC + 0 + UI.SPACE2 + equipmentText);
+
+               menuManager.add(actionContributionItem);
+
+            } else {
+
+               _actionAllPreviousEquipment.setText(UI.MNEMONIC + 0 + UI.SPACE2 + equipmentText);
+
+               actionContributionItem.fill(menu, -1);
+            }
+         }
       }
 
-      final Collection<Equipment> allRecentEquipment = _allRecentEquipment.values();
-
-      final int numVisibleActions = _allActions_RecentEquipment.length;
-
+      // add all recent equipment
       int equipmentIndex = 0;
+      for (final ActionRecentEquipment actionRecentEquipment : _allActions_RecentEquipment) {
 
-      _allActions_RecentEquipment_Visible.clear();
+         if (equipmentIndex >= _allRecentEquipment.size()) {
 
-      /*
-       * loop: all recent equipment which is limited by
-       * the number of visible actions and number of available recent equipment
-       */
-      for (final Equipment equipment : allRecentEquipment) {
+            // there are no more recent equipment
 
-         if (equipmentIndex >= numVisibleActions) {
             break;
          }
+
+         final Equipment equipment = _allRecentEquipment.get(equipmentIndex);
 
          String equipmentText = equipment.getName();
 
          if (UI.IS_SCRAMBLE_DATA) {
+
             equipmentText = UI.scrambleText(equipmentText);
          }
 
-         final String equipmentTextFinal = UI.SPACE4 + UI.MNEMONIC + (equipmentIndex + 1) + UI.SPACE2 + equipmentText;
+         if (menu == null) {
 
-         // update action
-         final ActionRecentEquipment actionRecentEquipment = _allActions_RecentEquipment[equipmentIndex];
-         actionRecentEquipment.updateAction(equipment, equipmentTextFinal);
+            actionRecentEquipment.updateEquipmentAction(equipment, (UI.SPACE4 + UI.MNEMONIC + (equipmentIndex + 1) + UI.SPACE2 + equipmentText));
 
-         // add to menu
-         menuMgr.add(new ActionContributionItem(actionRecentEquipment));
+            menuManager.add(new ActionContributionItem(actionRecentEquipment));
 
-         _allActions_RecentEquipment_Visible.add(actionRecentEquipment);
+         } else {
 
-         // advance to the next equipment
+            actionRecentEquipment.updateEquipmentAction(equipment, (UI.MNEMONIC + (equipmentIndex + 1) + UI.SPACE2 + equipmentText));
+
+            new ActionContributionItem(actionRecentEquipment).fill(menu, -1);
+         }
+
          equipmentIndex++;
       }
    }
@@ -1053,6 +1183,11 @@ public class EquipmentMenuManager implements IActionProvider {
       }
 
       return null;
+   }
+
+   public LinkedList<Equipment> getRecentEquipment() {
+
+      return _allRecentEquipment;
    }
 
    private Map<Long, Equipment> getSelectedEquipment() {
@@ -1204,7 +1339,7 @@ public class EquipmentMenuManager implements IActionProvider {
 
    public void updateRecentEquipment(final Equipment equipment) {
 
-      _allRecentEquipment.putFirst(equipment.getEquipmentId(), equipment);
+      _allRecentEquipment.addFirst(equipment);
    }
 
    /**

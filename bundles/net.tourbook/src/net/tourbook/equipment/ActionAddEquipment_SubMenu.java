@@ -20,6 +20,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import net.tourbook.Images;
@@ -48,22 +49,22 @@ import org.eclipse.swt.widgets.MenuItem;
  */
 public class ActionAddEquipment_SubMenu extends Action implements IMenuCreator, IAdvancedMenuForActions {
 
-   private static final char        NL                    = UI.NEW_LINE;
+   private static final char        NL                     = UI.NEW_LINE;
 
-   private static final String      SPACE_PRE_EQUIPMENT   = "   ";          //$NON-NLS-1$
+   private static final String      SPACE_PRE_EQUIPMENT    = "   ";                        //$NON-NLS-1$
 
    private EquipmentMenuManager     _equipmentMenuManager;
    private Menu                     _menu;
 
    private List<TourData>           _allSelectedTours;
-   private final Set<Long>          _allUsedEquipmentIDs  = new HashSet<>();
+   private final Set<Long>          _allUsedEquipmentIDs   = new HashSet<>();
 
-   private ActionShowEquipmentView  _actionManageEquipment;
+   private ActionShowEquipmentView  _actionManageEquipment = new ActionShowEquipmentView();
 
    /**
     * Contains all equipment which will be added
     */
-   private HashMap<Long, Equipment> _allModifiedEquipment = new HashMap<>();
+   private HashMap<Long, Equipment> _allModifiedEquipment  = new HashMap<>();
 
    private boolean                  _isAdvancedMenu;
    private AdvancedMenuForActions   _advancedMenuProvider;
@@ -197,26 +198,26 @@ public class ActionAddEquipment_SubMenu extends Action implements IMenuCreator, 
 
       _equipmentMenuManager = equipmentMenuManager;
 
-      _actionManageEquipment = new ActionShowEquipmentView();
-
       setMenuCreator(this);
    }
 
    /**
     * This constructor creates a push button action without a drop down menu
     *
-    * @param equipmentMenuMgr
-    * @param isAutoOpen
-    *           This parameter is ignored but it indicates that the menu auto open behavior is
-    *           used and a menu creator is not set
+    * @param equipmentMenuManager
+    * @param isForAutoOpen
+    *           This parameter is not used but it indicates that the menu auto open behavior is
+    *           used and a menuCreator is not set
     */
-   ActionAddEquipment_SubMenu(final EquipmentMenuManager equipmentMenuMgr, final Object isAutoOpen) {
+   ActionAddEquipment_SubMenu(final EquipmentMenuManager equipmentMenuManager, final Object isForAutoOpen) {
 
       super("&Add Equipment...", AS_PUSH_BUTTON);
 
       setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.Equipment_New));
 
-      createDefaultAction(equipmentMenuMgr);
+      _equipmentMenuManager = equipmentMenuManager;
+
+      createDefaultActions();
    }
 
    private void addActionToMenu(final Menu menu, final Action action) {
@@ -232,9 +233,7 @@ public class ActionAddEquipment_SubMenu extends Action implements IMenuCreator, 
       (new Separator()).fill(menu, -1);
    }
 
-   private void createDefaultAction(final EquipmentMenuManager equipmentMenuMgr) {
-
-      _equipmentMenuManager = equipmentMenuMgr;
+   private void createDefaultActions() {
 
       _actionTitle_AddEquipment = new Action("» Add Equipment «") {};
       _actionTitle_AddEquipment.setEnabled(false);
@@ -255,6 +254,16 @@ public class ActionAddEquipment_SubMenu extends Action implements IMenuCreator, 
          _menu.dispose();
          _menu = null;
       }
+   }
+
+   private void enableActions() {
+
+      final boolean isModifiedEquipment = _allModifiedEquipment.size() > 0;
+
+      _actionOK.setEnabled(isModifiedEquipment);
+      _actionOK.setImageDescriptor(isModifiedEquipment
+            ? TourbookPlugin.getImageDescriptor(Images.State_OK)
+            : null);
    }
 
    public void fillMenu(final Menu menu) {
@@ -288,6 +297,34 @@ public class ActionAddEquipment_SubMenu extends Action implements IMenuCreator, 
    }
 
    /**
+    * Display all newly added equipment which are not yet set in the tours
+    *
+    * @param menu
+    */
+   private void fillMenu_AddedEquipmentButNotYetSaved(final Menu menu) {
+
+      final boolean isModifiedEquipment = _allModifiedEquipment.size() > 0;
+
+      if (isModifiedEquipment == false) {
+         return;
+      }
+
+      addSeparatorToMenu(menu);
+      {
+
+         addActionToMenu(menu, _actionTitle_ModifiedEquipment);
+
+         // create actions
+         final ArrayList<Equipment> allModifiedEquipment = new ArrayList<>(_allModifiedEquipment.values());
+         Collections.sort(allModifiedEquipment);
+
+         for (final Equipment equipment : allModifiedEquipment) {
+            addActionToMenu(menu, new ActionModifyEquipment(equipment));
+         }
+      }
+   }
+
+   /**
     * Fill all actions
     *
     * @param menu
@@ -297,6 +334,11 @@ public class ActionAddEquipment_SubMenu extends Action implements IMenuCreator, 
       if (_isAdvancedMenu == false) {
 
          fillMenu_EquipmentActions(menu);
+
+         addSeparatorToMenu(menu);
+         {
+            addActionToMenu(menu, _actionManageEquipment);
+         }
 
       } else {
 
@@ -313,27 +355,9 @@ public class ActionAddEquipment_SubMenu extends Action implements IMenuCreator, 
             fillMenu_EquipmentActions(menu);
          }
 
-//         fillMenu_RecentTags(menu);
+         fillMenu_RecentEquipment(menu);
 
-         final boolean isModifiedTags = _allModifiedEquipment.size() > 0;
-
-         addSeparatorToMenu(menu);
-         {
-            // show newly added equipment
-
-            addActionToMenu(menu, _actionTitle_ModifiedEquipment);
-
-            if (isModifiedTags) {
-
-               // create actions
-               final ArrayList<Equipment> allModifiedEquipment = new ArrayList<>(_allModifiedEquipment.values());
-               Collections.sort(allModifiedEquipment);
-
-               for (final Equipment equipment : allModifiedEquipment) {
-                  addActionToMenu(menu, new ActionModifyEquipment(equipment));
-               }
-            }
-         }
+         fillMenu_AddedEquipmentButNotYetSaved(menu);
 
          addSeparatorToMenu(menu);
          {
@@ -343,16 +367,10 @@ public class ActionAddEquipment_SubMenu extends Action implements IMenuCreator, 
 
          addSeparatorToMenu(menu);
          {
-//            addActionToMenu(menu, _actionOpenTagPrefs);
+            addActionToMenu(menu, _actionManageEquipment);
          }
 
-         /*
-          * Enable actions
-          */
-         _actionOK.setEnabled(isModifiedTags);
-         _actionOK.setImageDescriptor(isModifiedTags
-               ? TourbookPlugin.getImageDescriptor(Images.State_OK)
-               : null);
+         enableActions();
       }
    }
 
@@ -385,10 +403,24 @@ public class ActionAddEquipment_SubMenu extends Action implements IMenuCreator, 
 
          addActionToMenu(menu, action);
       }
+   }
 
-      addSeparatorToMenu(menu);
+   /**
+    * @param menu
+    */
+   private void fillMenu_RecentEquipment(final Menu menu) {
 
-//      addActionToMenu(menu, _actionManageEquipment);
+      if (_equipmentMenuManager.getRecentEquipment().size() > 0) {
+
+         // recent equipment are available
+
+         addSeparatorToMenu(menu);
+         {
+            addActionToMenu(menu, _actionTitle_RecentEquipment);
+
+            _equipmentMenuManager.fillEquipmentMenu_WithRecentEquipment(null, menu);
+         }
+      }
    }
 
    @Override
@@ -470,7 +502,7 @@ public class ActionAddEquipment_SubMenu extends Action implements IMenuCreator, 
              * It is possible that a equipment was removed which is contained within the previous
              * equipment, uncheck this action that is displays the correct checked equipment
              */
-//            TagMenuManager.updatePreviousTagState(_allModifiedTags);
+            EquipmentMenuManager.updatePreviousEquipmentState(_allModifiedEquipment);
          }
 
          // reopen action menu
@@ -489,7 +521,7 @@ public class ActionAddEquipment_SubMenu extends Action implements IMenuCreator, 
    }
 
    /**
-    * Add or remove a tour equipment
+    * Add or remove an equipment
     *
     * @param isAddEquipment
     * @param equipment
@@ -518,7 +550,7 @@ public class ActionAddEquipment_SubMenu extends Action implements IMenuCreator, 
     * @param isAddEquipment
     * @param allPreviousEquipment
     */
-   void setEquipment(final boolean isAddEquipment, final HashMap<Long, Equipment> allPreviousEquipment) {
+   void setEquipment(final boolean isAddEquipment, final Map<Long, Equipment> allPreviousEquipment) {
 
       for (final Equipment equipment : allPreviousEquipment.values()) {
 

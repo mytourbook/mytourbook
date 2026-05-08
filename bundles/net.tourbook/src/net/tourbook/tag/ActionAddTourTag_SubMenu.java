@@ -56,7 +56,7 @@ public class ActionAddTourTag_SubMenu extends Action implements IMenuCreator, IA
 
    private static final String    SPACE_PRE_TAG    = "   ";          //$NON-NLS-1$
 
-   private TagMenuManager         _tagMenuMgr;
+   private TagMenuManager         _tagMenuManager;
    private Menu                   _menu;
 
    private ArrayList<TourData>    _allSelectedTours;
@@ -298,9 +298,9 @@ public class ActionAddTourTag_SubMenu extends Action implements IMenuCreator, IA
       (new Separator()).fill(menu, -1);
    }
 
-   private void createDefaultAction(final TagMenuManager tagMenuMgr) {
+   private void createDefaultAction(final TagMenuManager tagMenuManager) {
 
-      _tagMenuMgr = tagMenuMgr;
+      _tagMenuManager = tagMenuManager;
 
       _actionTitle_AddTag = new Action(Messages.Action_Tag_Add_AutoOpen_Title) {};
       _actionTitle_AddTag.setEnabled(false);
@@ -339,7 +339,7 @@ public class ActionAddTourTag_SubMenu extends Action implements IMenuCreator, IA
       }
 
       // check if a tour is selected
-      _allSelectedTours = _tagMenuMgr.getTourProvider().getSelectedTours();
+      _allSelectedTours = _tagMenuManager.getTourProvider().getSelectedTours();
       if (_allSelectedTours == null || _allSelectedTours.isEmpty()) {
          // a tour is not selected
          return;
@@ -442,7 +442,7 @@ public class ActionAddTourTag_SubMenu extends Action implements IMenuCreator, IA
          addSeparatorToMenu(menu);
          {
             addActionToMenu(menu, _actionTitle_RecentTags);
-            _tagMenuMgr.fillTagMenu_WithRecentTags(null, menu);
+            _tagMenuManager.fillTagMenu_WithRecentTags(null, menu);
          }
       }
    }
@@ -568,9 +568,9 @@ public class ActionAddTourTag_SubMenu extends Action implements IMenuCreator, IA
    @Override
    public void onShowMenu() {
 
-      _tagMenuMgr.setIsAdvanceMenu();
+      _tagMenuManager.setIsAdvanceMenu();
 
-      TagMenuManager.enableRecentTagActions(true, _allModifiedTags.keySet());
+      TagMenuManager.enableActions_Recent(true, _allModifiedTags.keySet());
    }
 
    @Override
@@ -590,6 +590,7 @@ public class ActionAddTourTag_SubMenu extends Action implements IMenuCreator, IA
       if (_isAdvancedMenu) {
 
          if (isAddTag == false) {
+
             /*
              * It is possible that a tag was removed which is contained within the previous tags,
              * uncheck this action that is displays the correct checked tags
@@ -610,7 +611,7 @@ public class ActionAddTourTag_SubMenu extends Action implements IMenuCreator, IA
 
       if (_allModifiedTags.size() > 0) {
 
-         _tagMenuMgr.saveTourTags(_allModifiedTags, true);
+         _tagMenuManager.saveTourTags(_allModifiedTags, true);
       }
    }
 
