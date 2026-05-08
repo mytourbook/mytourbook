@@ -122,7 +122,7 @@ public class PrefPageNutrition extends PreferencePage implements IWorkbenchPrefe
 
    @Override
    public void init(final IWorkbench workbench) {
-
+      // Nothing to do
    }
 
    private void initUI(final Composite parent) {
@@ -141,7 +141,10 @@ public class PrefPageNutrition extends PreferencePage implements IWorkbenchPrefe
       };
    }
 
-   private void onModify() {}
+   private void onModify() {
+
+      //todo fb
+   }
 
    @Override
    protected void performDefaults() {

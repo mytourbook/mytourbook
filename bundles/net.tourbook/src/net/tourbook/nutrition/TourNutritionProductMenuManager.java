@@ -93,7 +93,7 @@ public class TourNutritionProductMenuManager {
       _prefChangeListener = propertyChangeEvent -> {
          final String property = propertyChangeEvent.getProperty();
 
-         // check if the number of recent tour types has changed
+         // check if the number of recent tour nutrition products has changed
          if (property.equals(ITourbookPreferences.NUTRITION_NUMBER_OF_RECENT_PRODUCTS)) {
             setActions();
          } else if (property.equals(ITourbookPreferences.TOUR_TYPE_LIST_IS_MODIFIED)) {
