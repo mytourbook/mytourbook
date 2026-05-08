@@ -17,6 +17,7 @@
 package net.tourbook.nutrition;
 
 import java.util.LinkedHashMap;
+import java.util.Map;
 
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.UI;
@@ -34,7 +35,7 @@ import org.eclipse.swt.custom.BusyIndicator;
 import org.eclipse.swt.widgets.Display;
 
 /**
- * Manage recently used tour types and fills the context menu
+ * Manage recently used tour nutrition products and fills the context menu
  * <p>
  * The method {@link #fillMenuRecentTourNutritionProducts} creates the actions and must be called
  * before the
@@ -42,51 +43,52 @@ import org.eclipse.swt.widgets.Display;
  */
 public class TourNutritionProductMenuManager {
 
-   private static final String                                STATE_ID                        =
-         "TourNutritionProductManager.RecentTourNutritionProducts";                                                                              //$NON-NLS-1$
-   private static final String                                STATE_TOUR_NUTRITION_PRODUCT_ID = "TourNutritionProductId";                        //$NON-NLS-1$
+   private static final String                       STATE_ID                        =
+         "TourNutritionProductManager.RecentTourNutritionProducts";                                                                     //$NON-NLS-1$
+   private static final String                       STATE_TOUR_NUTRITION_PRODUCT_ID = "TourNutritionProductId";                        //$NON-NLS-1$
 
-   private static final IPreferenceStore                      _prefStore                      = TourbookPlugin.getDefault().getPreferenceStore();
+   private static final IPreferenceStore             _prefStore                      = TourbookPlugin.getDefault().getPreferenceStore();
 
    /**
     * Tour nutrition product manager state is saved in {@link #STATE_ID}
     */
-   private static IDialogSettings                             _state                          = TourbookPlugin.getDefault()                      //
+   private static IDialogSettings                    _state                          = TourbookPlugin.getDefault()                      //
          .getDialogSettingsSection(STATE_ID);
 
    /**
-    * number of tour nutrition products which are displayed in the context menu or
+    * Number of tour nutrition products that are displayed in the context menu or
     * saved in the dialog settings, its max number is 9 to have a unique accelerator key
     */
-   private static LinkedHashMap<String, TourNutritionProduct> _recentTourNutritionProducts    = new LRUMap<>(10);
+   private static LinkedHashMap<String, String>      _recentTourNutritionProducts    = new LRUMap<>(10);
 
    /**
     * Contains actions which are displayed in the menu
     */
-   private static RecentTourNutritionProductAction[]          _actionsRecentTourNutritionProducts;
+   private static RecentTourNutritionProductAction[] _actionsRecentTourNutritionProducts;
 
-   private static int                                         _maxTourNutritionProducts       = -1;
+   private static int                                _maxTourNutritionProducts       = -1;
 
-   private static IPropertyChangeListener                     _prefChangeListener;
+   private static IPropertyChangeListener            _prefChangeListener;
 
-   private static boolean                                     _isInitialized                  = false;
-   private static boolean                                     _isSaveTour;
+   private static boolean                            _isInitialized                  = false;
+   private static boolean                            _isSaveTour;
 
    private static class RecentTourNutritionProductAction extends Action {
 
-      private TourNutritionProduct __tourNutritionProduct;
+      private Map.Entry<String, String> __recentTourNutritionProduct;
 
       @Override
       public void run() {
-         setTourNutritionProductIntoTour(__tourNutritionProduct, _isSaveTour);
+         setTourNutritionProductIntoTour(__recentTourNutritionProduct, _isSaveTour);
       }
 
-      private void setTourNutritionProduct(final TourNutritionProduct tourNutritionProduct) {
-         __tourNutritionProduct = tourNutritionProduct;
+      private void setTourNutritionProduct(final Map.Entry<String, String> recentTourNutritionProduct) {
+         __recentTourNutritionProduct = recentTourNutritionProduct;
       }
    }
 
    private static void addPrefChangeListener() {
+
       // create pref listener
       _prefChangeListener = propertyChangeEvent -> {
          final String property = propertyChangeEvent.getProperty();
@@ -130,7 +132,8 @@ public class TourNutritionProductMenuManager {
 
       for (final RecentTourNutritionProductAction actionRecentTourNutritionProduct : _actionsRecentTourNutritionProducts) {
 
-         final TourNutritionProduct tourNutritionProduct = actionRecentTourNutritionProduct.__tourNutritionProduct;
+         final Map.Entry<String, String> tourNutritionProduct =
+               actionRecentTourNutritionProduct.__recentTourNutritionProduct;
          if (tourNutritionProduct == null) {
 
             // disable tour type
@@ -210,7 +213,8 @@ public class TourNutritionProductMenuManager {
 
       int tourNutritionProductIndex = 0;
       //iterate over the recent tour nutrition products and add them to the menu
-      for (final TourNutritionProduct recentTourNutritionProduct : _recentTourNutritionProducts.values()) {
+      for (final Map.Entry<String, String> recentTourNutritionProduct : _recentTourNutritionProducts.entrySet()) {
+
          try {
 
             final RecentTourNutritionProductAction actionRecentTourNutritionProduct =
@@ -218,7 +222,7 @@ public class TourNutritionProductMenuManager {
             actionRecentTourNutritionProduct.setTourNutritionProduct(
                   recentTourNutritionProduct);
 
-            final String productCode = recentTourNutritionProduct.getProductCode();
+            final String productCode = recentTourNutritionProduct.getKey();
             actionRecentTourNutritionProduct.setText(
                   UI.SPACE4 +
                         UI.MNEMONIC +
@@ -229,7 +233,7 @@ public class TourNutritionProductMenuManager {
                         UI.SPACE +
                         UI.SYMBOL_MINUS +
                         UI.SPACE +
-                        recentTourNutritionProduct.getName());
+                        recentTourNutritionProduct.getValue());
 
             menuMgr.add(actionRecentTourNutritionProduct);
 
@@ -254,48 +258,55 @@ public class TourNutritionProductMenuManager {
    public static void restoreState() {
 
       final String[] allStateTourNutritionProductIds = _state.getArray(STATE_TOUR_NUTRITION_PRODUCT_ID);
+
       if (allStateTourNutritionProductIds == null) {
          return;
       }
 
-      /*
-       * get all tour types from the database which are saved in the state
-       */
-//      final ArrayList<TourNutritionProduct> dbTourNutritionProducts = TourDatabase.getAllTourNutritionProducts();
-//      for (final String stateTourNutritionProductIdItem : allStateTourNutritionProductIds) {
-//         try {
-//
-//            final long stateTourNutritionProductId = Long.parseLong(stateTourNutritionProductIdItem);
-//
-//            for (final TourNutritionProduct dbTourNutritionProduct : dbTourNutritionProducts) {
-//               if (dbTourNutritionProduct.getTypeId() == stateTourNutritionProductId) {
-//                  _recentTourNutritionProducts.add(dbTourNutritionProduct);
-//                  break;
-//               }
-//            }
-//         } catch (final NumberFormatException e) {
-//            // ignore
-//         }
-//      }
+      for (final String tourNutritionProductId : allStateTourNutritionProductIds) {
+
+         try {
+
+            //Get the string before the
+            final String productCode = tourNutritionProductId.substring(
+                  0,
+                  tourNutritionProductId.indexOf(UI.SYMBOL_MINUS));
+
+            // get the string after the first space
+            final String productName = tourNutritionProductId.substring(
+                  tourNutritionProductId.indexOf(UI.SYMBOL_MINUS) + 1).trim();
+
+            _recentTourNutritionProducts.put(productCode, productName);
+
+         } catch (final NumberFormatException e) {
+            // ignore
+         }
+      }
    }
 
    public static void saveState() {
 
       if (_maxTourNutritionProducts < 1) {
-         // tour types are not initialized or not visible, do nothing
+         // tour nutrition products are not initialized or not visible, do nothing
          return;
       }
 
-      final String[] stateTourNutritionProductIds = new String[Math.min(_maxTourNutritionProducts, _recentTourNutritionProducts.size())];
-      final int TourNutritionProductIndex = 0;
+      final String[] stateTourNutritionProductIds = new String[Math.min(
+            _maxTourNutritionProducts,
+            _recentTourNutritionProducts.size())];
+      int tourNutritionProductIndex = 0;
 
-//      for (final TourNutritionProduct recentTourNutritionProduct : _recentTourNutritionProducts) {
-//         stateTourNutritionProductIds[TourNutritionProductIndex++] = Long.toString(recentTourNutritionProduct.getTypeId());
-//
-//         if (TourNutritionProductIndex == _maxTourNutritionProducts) {
-//            break;
-//         }
-//      }
+      for (final Map.Entry<String, String> recentTourNutritionProduct : _recentTourNutritionProducts.entrySet()) {
+
+         stateTourNutritionProductIds[tourNutritionProductIndex++] =
+               recentTourNutritionProduct.getKey() +
+                     UI.SYMBOL_MINUS +
+                     recentTourNutritionProduct.getValue();
+
+         if (tourNutritionProductIndex == _maxTourNutritionProducts) {
+            break;
+         }
+      }
 
       _state.put(STATE_TOUR_NUTRITION_PRODUCT_ID, stateTourNutritionProductIds);
    }
@@ -317,10 +328,11 @@ public class TourNutritionProductMenuManager {
       }
    }
 
-   public static void setTourNutritionProductIntoTour(final TourNutritionProduct TourNutritionProduct,
+   public static void setTourNutritionProductIntoTour(final Map.Entry<String, String> recentTourNutritionProduct,
                                                       final boolean isSaveTour) {
 
       //TODO FB what to do when the product is already in the list ?
+      // the best would be to gray out the action in the contextual menu
       final Runnable runnable = () -> {
 
          // set tour type in all tours (without tours which are opened in an editor)
@@ -380,6 +392,8 @@ public class TourNutritionProductMenuManager {
 
    public void updateRecentTourNutritionProducts(final TourNutritionProduct tourNutritionProduct) {
 
-      _recentTourNutritionProducts.putFirst(tourNutritionProduct.getProductCode(), tourNutritionProduct);
+      _recentTourNutritionProducts.putFirst(
+            tourNutritionProduct.getProductCode(),
+            tourNutritionProduct.getName());
    }
 }
