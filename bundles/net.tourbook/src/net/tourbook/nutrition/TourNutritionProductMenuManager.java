@@ -378,6 +378,18 @@ public class TourNutritionProductMenuManager {
 
    public static void updateRecentTourNutritionProducts(final TourNutritionProduct tourNutritionProduct) {
 
+      final String tourNutritionProductId = getTourNutritionProductId(tourNutritionProduct);
+
+      // If the tour nutrition product Id is not in the list
+      if (_recentTourNutritionProducts.containsKey(getTourNutritionProductId(tourNutritionProduct)) == false) {
+
+         _recentTourNutritionProducts.putFirst(
+               tourNutritionProductId,
+               tourNutritionProduct);
+
+         return;
+      }
+
       // If the tour nutrition product Id is already in the list and it doesn't have
       // a TourNutritionProduct object, we insert the TourNutritionProduct object into
       // the list
@@ -401,7 +413,7 @@ public class TourNutritionProductMenuManager {
          }
       }
 
-      final String tourNutritionProductId = getTourNutritionProductId(tourNutritionProduct);
+      _recentTourNutritionProducts.remove(tourNutritionProductId);
       _recentTourNutritionProducts.putFirst(
             tourNutritionProductId,
             tourNutritionProduct);
