@@ -1416,6 +1416,7 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
       menuMgr.add(_actionEditCustomProduct);
       menuMgr.add(_actionDeleteProducts);
 
+      //TODO FB static or not static
       TourNutritionProductMenuManager.fillMenuWithRecentTourNutritionProducts(menuMgr, _tourData);
 
       enableActions();

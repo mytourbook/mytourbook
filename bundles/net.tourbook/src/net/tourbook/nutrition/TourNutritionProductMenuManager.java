@@ -199,7 +199,7 @@ public class TourNutritionProductMenuManager {
             menuMgr.add(actionRecentTourNutritionProduct);
 
          } catch (final IndexOutOfBoundsException e) {
-            // there are no more recent tour types
+            // there are no more recent tour nutrition products
             break;
          }
 
