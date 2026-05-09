@@ -101,6 +101,9 @@ public class TourNutritionProductMenuManager {
 
          // check if the number of recent tour nutrition products has changed
          if (property.equals(ITourbookPreferences.NUTRITION_NUMBER_OF_RECENT_PRODUCTS)) {
+            //todo fb ensure that works
+            // for example, if 9 is the current max number and ios changed to 3,
+            // does the linkedlist get cut ? in a which way ? do we keep the most 3 recent ?
             setActions();
          }
       };
