@@ -130,7 +130,7 @@ public class DialogSearchProduct extends TitleAreaDialog implements ITourViewer,
    private IPropertyChangeListener   _prefChangeListener;
    private SelectionListener         _columnSortListener;
 
-   private AutoComplete_ComboInputMT _autocompleteProductSearchHistory;
+   private AutoComplete_ComboInputMT _autoCompleteProductSearchHistory;
 
    private ControlDecoration         _decorator_InvalidBarCode;
 
@@ -787,7 +787,7 @@ public class DialogSearchProduct extends TitleAreaDialog implements ITourViewer,
       _comboSearchType.add(Messages.Dialog_SearchProduct_Combo_SearchType_ByCode);
       _comboSearchType.select(0);
 
-      _autocompleteProductSearchHistory = new AutoComplete_ComboInputMT(_comboSearchQuery);
+      _autoCompleteProductSearchHistory = new AutoComplete_ComboInputMT(_comboSearchQuery);
    }
 
    @Override
@@ -1042,7 +1042,7 @@ public class DialogSearchProduct extends TitleAreaDialog implements ITourViewer,
 
    private void restoreState_WithUI() {
 
-      _autocompleteProductSearchHistory.restoreState(_state, STATE_AUTOCOMPLETE_POPUP_HEIGHT_SEARCH_HISTORY);
+      _autoCompleteProductSearchHistory.restoreState(_state, STATE_AUTOCOMPLETE_POPUP_HEIGHT_SEARCH_HISTORY);
    }
 
    private void saveState() {
@@ -1052,7 +1052,7 @@ public class DialogSearchProduct extends TitleAreaDialog implements ITourViewer,
 
       _columnManager.saveState(_state);
 
-      _autocompleteProductSearchHistory.saveState(_state, STATE_AUTOCOMPLETE_POPUP_HEIGHT_SEARCH_HISTORY);
+      _autoCompleteProductSearchHistory.saveState(_state, STATE_AUTOCOMPLETE_POPUP_HEIGHT_SEARCH_HISTORY);
    }
 
    /**
