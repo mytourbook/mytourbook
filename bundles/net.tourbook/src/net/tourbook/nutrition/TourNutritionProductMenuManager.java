@@ -19,13 +19,13 @@ package net.tourbook.nutrition;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.UI;
 import net.tourbook.common.util.LRUMap;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourNutritionProduct;
-import net.tourbook.database.TourDatabase;
 import net.tourbook.nutrition.openfoodfacts.Product;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.tour.TourManager;
@@ -115,73 +115,31 @@ public class TourNutritionProductMenuManager {
    }
 
    /**
-    * @param isEnabled
     * @param existingTourNutritionProductId
     */
-   public static void enableRecentTourNutritionProductActions(final boolean isEnabled,
-                                                              final long existingTourNutritionProductId) {
+   public static void enableRecentTourNutritionProductActions() {
 
       if (_isInitialized == false) {
          initTourNutritionProductManager();
       }
 
+      final Set<TourNutritionProduct> tourNutritionProducts = _tourData.getTourNutritionProducts();
+
       for (final RecentTourNutritionProductAction actionRecentTourNutritionProduct : _actionsRecentTourNutritionProducts) {
 
          final Map.Entry<String, TourNutritionProduct> tourNutritionProduct =
                actionRecentTourNutritionProduct.__recentTourNutritionProduct;
-         if (tourNutritionProduct == null) {
 
-            // disable tour type
+         final String recentTourNutritionProductCode = getProductCodeFromTourNutritionProductId(
+               tourNutritionProduct.getKey());
 
-            actionRecentTourNutritionProduct.setEnabled(false);
+         // If the recent tour nutrition product code is in the list of tour
+         // nutrition products, we disable it
+         final boolean tourNutritionProductAlreadyExist = tourNutritionProducts.stream()
+               .anyMatch(existingTourNutritionProduct -> existingTourNutritionProduct.getProductCode().equals(recentTourNutritionProductCode));
+         final boolean isEnabled = tourNutritionProductAlreadyExist == false;
 
-            // hide image because it looks ugly (on windows) when it's disabled
-            actionRecentTourNutritionProduct.setImageDescriptor(null);
-
-            continue;
-         }
-
-         //todo fb
-         final long tourNutritionProductId = 1L;//TourNutritionProduct.getTypeId();
-
-         if (isEnabled) {
-
-            // enable tour type
-
-            boolean isExistingTourNutritionProductId = false;
-
-            // check if the existing tour type should be enabled
-            if (existingTourNutritionProductId != TourDatabase.ENTITY_IS_NOT_SAVED &&
-                  tourNutritionProductId == existingTourNutritionProductId) {
-               isExistingTourNutritionProductId = true;
-            }
-
-            actionRecentTourNutritionProduct.setEnabled(isExistingTourNutritionProductId == false);
-
-            if (isExistingTourNutritionProductId) {
-
-               // hide image because it looks ugly (on windows) when it's disabled
-               actionRecentTourNutritionProduct.setImageDescriptor(null);
-
-            } else {
-
-               // set tour type image
-//					final Image TourNutritionProductImage = UI.getInstance().getTourNutritionProductImage(TourNutritionProductId);
-//					actionRecentTourNutritionProduct.setImageDescriptor(ImageDescriptor.createFromImage(TourNutritionProductImage));
-//
-//               actionRecentTourNutritionProduct.setImageDescriptor(TourNutritionProductImage.getTourNutritionProductImageDescriptor(
-//                     TourNutritionProductId));
-            }
-
-         } else {
-
-            // disable tour type
-
-            actionRecentTourNutritionProduct.setEnabled(false);
-
-            // hide image because it looks ugly (on windows) when it's disabled
-            actionRecentTourNutritionProduct.setImageDescriptor(null);
-         }
+         actionRecentTourNutritionProduct.setEnabled(isEnabled);
       }
    }
 
@@ -244,6 +202,8 @@ public class TourNutritionProductMenuManager {
 
          tourNutritionProductIndex++;
       }
+
+      enableRecentTourNutritionProductActions();
    }
 
    private static String getProductCodeFromTourNutritionProductId(final String tourNutritionProductId) {
@@ -343,8 +303,6 @@ public class TourNutritionProductMenuManager {
 
    public static void setTourNutritionProductIntoTour(final Map.Entry<String, TourNutritionProduct> recentTourNutritionProduct) {
 
-      //TODO FB what to do when the product is already in the list ?
-      // the best would be to gray out the action in the contextual menu
       final Runnable runnable = () -> {
 
          TourNutritionProduct tourNutritionProduct = recentTourNutritionProduct.getValue();
@@ -365,7 +323,6 @@ public class TourNutritionProductMenuManager {
 
          tourNutritionProduct.setTourData(_tourData);
 
-         // keep tour type for the recent menu
          updateRecentTourNutritionProducts(tourNutritionProduct);
 
          _tourData.addNutritionProduct(tourNutritionProduct);
@@ -377,6 +334,8 @@ public class TourNutritionProductMenuManager {
    }
 
    public static void updateRecentTourNutritionProducts(final TourNutritionProduct tourNutritionProduct) {
+
+      //todo fb, when we have reached 9 and we add another product, it should act as a circular buffer
 
       final String tourNutritionProductId = getTourNutritionProductId(tourNutritionProduct);
 
