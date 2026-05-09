@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2024, 2025 Frédéric Bard
+ * Copyright (C) 2024, 2026 Frédéric Bard
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -433,6 +433,10 @@ public class TourNutritionProduct {
 
    public void setTourBeverageContainer(final TourBeverageContainer tourBeverageContainer) {
       this.tourBeverageContainer = tourBeverageContainer;
+   }
+
+   public void setTourData(final TourData tourData) {
+      this.tourData = tourData;
    }
 
    void setupDeepClone(final TourData tourDataFromClone) {

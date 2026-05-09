@@ -1416,48 +1416,15 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
       menuMgr.add(_actionEditCustomProduct);
       menuMgr.add(_actionDeleteProducts);
 
-      TourNutritionProductMenuManager.fillMenuWithRecentTourNutritionProducts(menuMgr, true);
+      TourNutritionProductMenuManager.fillMenuWithRecentTourNutritionProducts(menuMgr, _tourData);
 
       enableActions();
-   }
-
-   private List<TourNutritionProduct> getAllProducts() {
-
-      final StructuredSelection selection = (StructuredSelection) _productsViewer.getSelection();
-
-      final List<TourNutritionProduct> selectedTourNutritionProducts = new ArrayList<>();
-
-      for (final Object object : selection.toList()) {
-
-         if (object instanceof final TourNutritionProduct tourNutritionProduct) {
-            selectedTourNutritionProducts.add(tourNutritionProduct);
-         }
-      }
-
-      return selectedTourNutritionProducts;
    }
 
    @Override
    public ColumnManager getColumnManager() {
       return _columnManager;
    }
-
-//   private List<String> getAllProducts() {
-//
-//      final List<TourNutritionProduct> selectedTourNutritionProducts = getSelectedProducts();
-//
-//      final List<String> selectedTourNutritionProductsCodes = new ArrayList<>();
-//
-//      for (final TourNutritionProduct tourNutritionProduct : selectedTourNutritionProducts) {
-//
-//         if (tourNutritionProduct.isCustomProduct()) {
-//            continue;
-//         }
-//         selectedTourNutritionProductsCodes.add(tourNutritionProduct.getProductCode());
-//      }
-//
-//      return selectedTourNutritionProductsCodes;
-//   }
 
    private List<TourNutritionProduct> getSelectedProducts() {
 

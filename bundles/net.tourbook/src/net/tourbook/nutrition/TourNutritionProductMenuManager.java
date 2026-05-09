@@ -17,14 +17,18 @@
 package net.tourbook.nutrition;
 
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.UI;
 import net.tourbook.common.util.LRUMap;
+import net.tourbook.data.TourData;
 import net.tourbook.data.TourNutritionProduct;
 import net.tourbook.database.TourDatabase;
+import net.tourbook.nutrition.openfoodfacts.Product;
 import net.tourbook.preferences.ITourbookPreferences;
+import net.tourbook.tour.TourManager;
 
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IMenuManager;
@@ -72,7 +76,8 @@ public class TourNutritionProductMenuManager {
    private static IPropertyChangeListener                     _prefChangeListener;
 
    private static boolean                                     _isInitialized                  = false;
-   private static boolean                                     _isSaveTour;
+
+   private static TourData                                    _tourData;
 
    private static class RecentTourNutritionProductAction extends Action {
 
@@ -80,7 +85,7 @@ public class TourNutritionProductMenuManager {
 
       @Override
       public void run() {
-         setTourNutritionProductIntoTour(__recentTourNutritionProduct, _isSaveTour);
+         setTourNutritionProductIntoTour(__recentTourNutritionProduct);
       }
 
       private void setRecentTourNutritionProduct(final Map.Entry<String, TourNutritionProduct> recentTourNutritionProduct) {
@@ -187,7 +192,7 @@ public class TourNutritionProductMenuManager {
     * @param isSaveTour
     */
    public static void fillMenuWithRecentTourNutritionProducts(final IMenuManager menuMgr,
-                                                              final boolean isSaveTour) {
+                                                              final TourData tourData) {
 
       if (_isInitialized == false) {
          initTourNutritionProductManager();
@@ -201,7 +206,7 @@ public class TourNutritionProductMenuManager {
          return;
       }
 
-      _isSaveTour = isSaveTour;
+      _tourData = tourData;
 
       int tourNutritionProductIndex = 0;
       //iterate over the recent tour nutrition products and add them to the menu
@@ -264,6 +269,11 @@ public class TourNutritionProductMenuManager {
          // ignore
          return null;
       }
+   }
+
+   private static String getTourNutritionProductId(final TourNutritionProduct tourNutritionProduct) {
+
+      return tourNutritionProduct.getProductCode() + UI.SYMBOL_MINUS + tourNutritionProduct.getName();
    }
 
    private static synchronized void initTourNutritionProductManager() {
@@ -331,47 +341,42 @@ public class TourNutritionProductMenuManager {
       }
    }
 
-   public static void setTourNutritionProductIntoTour(final Map.Entry<String, TourNutritionProduct> recentTourNutritionProduct,
-                                                      final boolean isSaveTour) {
+   public static void setTourNutritionProductIntoTour(final Map.Entry<String, TourNutritionProduct> recentTourNutritionProduct) {
 
       //TODO FB what to do when the product is already in the list ?
       // the best would be to gray out the action in the contextual menu
       final Runnable runnable = () -> {
 
-         // set tour type in all tours (without tours which are opened in an editor)
-//         for (final TourData tourData : selectedTours) {
-//            tourData.setTourNutritionProduct(TourNutritionProduct);
-//         }
-//
-//         // keep tour type for the recent menu
-//         addRecentTourNutritionProduct(TourNutritionProduct);
-//
-//         if (isSaveTour) {
-//
-//            // save all tours with the modified tour type
-//            TourManager.saveModifiedTours(selectedTours);
-//
-//         } else {
-//
-//            // tours are not saved but the tour provider must be notified
-//
-//            if (tourProvider instanceof ITourProvider2) {
-//               ((ITourProvider2) tourProvider).toursAreModified(selectedTours);
-//            } else {
-//               TourManager.fireEvent(TourEventId.TOUR_CHANGED, new TourEvent(selectedTours));
-//            }
-//         }
+         TourNutritionProduct tourNutritionProduct = recentTourNutritionProduct.getValue();
+
+         if (tourNutritionProduct == null) {
+            // the tour nutrition product is not loaded yet, we need to load it from the database
+
+            final String productCode = getProductCodeFromTourNutritionProductId(
+                  recentTourNutritionProduct.getKey());
+            final List<Product> searchProductResults = NutritionUtils.searchProduct(
+                  productCode,
+                  ProductSearchType.ByCode);
+
+            tourNutritionProduct = new TourNutritionProduct(
+                  _tourData,
+                  searchProductResults.get(0));
+         }
+
+         tourNutritionProduct.setTourData(_tourData);
+
+         // keep tour type for the recent menu
+         updateRecentTourNutritionProducts(tourNutritionProduct);
+
+         _tourData.addNutritionProduct(tourNutritionProduct);
+
+         TourManager.saveModifiedTour(_tourData);
 
       };
       BusyIndicator.showWhile(Display.getCurrent(), runnable);
    }
 
-   private String getTourNutritionProductId(final TourNutritionProduct tourNutritionProduct) {
-
-      return tourNutritionProduct.getProductCode() + UI.SYMBOL_MINUS + tourNutritionProduct.getName();
-   }
-
-   public void updateRecentTourNutritionProducts(final TourNutritionProduct tourNutritionProduct) {
+   public static void updateRecentTourNutritionProducts(final TourNutritionProduct tourNutritionProduct) {
 
       // If the tour nutrition product Id is already in the list and it doesn't have
       // a TourNutritionProduct object, we insert the TourNutritionProduct object into
