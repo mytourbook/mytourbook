@@ -1519,10 +1519,10 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
 
    private void onEditCustomProduct() {
 
-      final TourNutritionProduct TourNutritionProduct =
+      final TourNutritionProduct tourNutritionProduct =
             getSelectedProducts().get(0);
 
-      createOrEditCustomTourNutritionProduct(true, TourNutritionProduct);
+      createOrEditCustomTourNutritionProduct(true, tourNutritionProduct);
    }
 
    private void onOpenProductsWebsite() {
