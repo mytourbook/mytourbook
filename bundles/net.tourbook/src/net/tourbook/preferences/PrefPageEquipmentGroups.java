@@ -549,7 +549,7 @@ public class PrefPageEquipmentGroups extends PreferencePage implements IWorkbenc
       tbmAllEquipment.update(true);
    }
 
-   private long[] getAllCheckedEqipmentIDs() {
+   private long[] getAllCheckedEquipmentIDs() {
 
       final LongHashSet allCheckedEquipmentIDs = new LongHashSet();
 
@@ -953,7 +953,7 @@ public class PrefPageEquipmentGroups extends PreferencePage implements IWorkbenc
          return;
       }
 
-      final long[] allCheckedIDs = getAllCheckedEqipmentIDs();
+      final long[] allCheckedIDs = getAllCheckedEquipmentIDs();
       final Map<Long, Equipment> allEquipmentByID = EquipmentManager.getAllEquipment_ByID();
 
       final List<Equipment> allCheckedEquipment = new ArrayList<>();

@@ -591,8 +591,8 @@ public class Messages extends NLS {
    public static String        Dialog_Equipment_Checkbox_Sync;
    public static String        Dialog_Equipment_Checkbox_Sync_Tooltip;
    public static String        Dialog_Equipment_Combo_PriceUnit_Tooltip;
-   public static String        Dialog_Equipment_Dialog_Message_Eqipment_Duplicate;
-   public static String        Dialog_Equipment_Dialog_Message_Eqipment_Edit;
+   public static String        Dialog_Equipment_Dialog_Message_Equipment_Duplicate;
+   public static String        Dialog_Equipment_Dialog_Message_Equipment_Edit;
    public static String        Dialog_Equipment_Dialog_Message_Equipment_New;
    public static String        Dialog_Equipment_Dialog_Title;
    public static String        Dialog_Equipment_Error_BrandModelIsEmpty;
