@@ -638,7 +638,6 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
       _actionDeleteProducts = new ActionDeleteProducts();
       _actionEditCustomProduct = new ActionEditCustomProduct();
       _actionOpenProductsWebsite = new ActionOpenProductsWebsite();
-
    }
 
    private void createMenuManager() {

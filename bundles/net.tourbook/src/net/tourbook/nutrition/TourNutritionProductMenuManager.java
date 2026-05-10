@@ -336,8 +336,6 @@ public class TourNutritionProductMenuManager {
 
    public static void updateRecentTourNutritionProducts(final TourNutritionProduct tourNutritionProduct) {
 
-      //todo fb, when we have reached 9 and we add another product, it should act as a circular buffer
-
       final String tourNutritionProductId = getTourNutritionProductId(tourNutritionProduct);
 
       // If the tour nutrition product Id is not in the list
