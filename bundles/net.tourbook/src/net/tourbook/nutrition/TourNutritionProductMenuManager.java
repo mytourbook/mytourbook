@@ -343,7 +343,7 @@ public class TourNutritionProductMenuManager {
       final String tourNutritionProductId = getTourNutritionProductId(tourNutritionProduct);
 
       // If the tour nutrition product Id is not in the list
-      if (_recentTourNutritionProducts.containsKey(getTourNutritionProductId(tourNutritionProduct)) == false) {
+      if (_recentTourNutritionProducts.containsKey(tourNutritionProductId) == false) {
 
          _recentTourNutritionProducts.putFirst(
                tourNutritionProductId,
@@ -363,15 +363,13 @@ public class TourNutritionProductMenuManager {
                getProductCodeFromTourNutritionProductId(recentTourNutritionProduct.getKey());
 
          if (recentTourNutritionProductCode != null &&
-               recentTourNutritionProductCode.equals(tourNutritionProduct.getProductCode())) {
+               recentTourNutritionProductCode.equals(tourNutritionProduct.getProductCode()) &&
+               recentTourNutritionProduct.getValue() == null) {
 
-            if (recentTourNutritionProduct.getValue() == null) {
+            // update the tour nutrition product in the list
+            recentTourNutritionProduct.setValue(tourNutritionProduct);
 
-               // update the tour nutrition product in the list
-               recentTourNutritionProduct.setValue(tourNutritionProduct);
-
-               return;
-            }
+            return;
          }
       }
 
