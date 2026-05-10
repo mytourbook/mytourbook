@@ -393,8 +393,7 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
       @Override
       public Menu getContextMenu() {
 
-         return _productsViewer.getTable().getSelectionCount() > 0
-               ? _tableContextMenu : null;
+         return _tableContextMenu;
       }
 
       @Override
@@ -1037,13 +1036,8 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
 
    private Menu createUI_32_CreateViewerContextMenu() {
 
-      final Table table = _productsViewer.getTable();
+      final Table table = (Table) _productsViewer.getControl();
       final Menu tableContextMenu = _viewerMenuManager.createContextMenu(table);
-      table.setMenu(tableContextMenu);
-
-      // Also register with the site so other plug-ins (e.g. object
-      // contributions) can contribute to this menu when there IS a selection.
-      getSite().registerContextMenu(_viewerMenuManager, _productsViewer);
 
       return tableContextMenu;
    }
