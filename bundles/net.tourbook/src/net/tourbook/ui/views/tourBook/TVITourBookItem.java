@@ -507,19 +507,12 @@ public abstract class TVITourBookItem extends TreeViewerItem implements ITourIte
    String  colDeviceName;
    //
    boolean colHasGeoData;
-   //
-   // ----------- NUTRITION ---------
-   //
-   //TODO FB: Maybe compute it via a TOurManager method ???
-   short colAvgCarbohydrates_PerHour;
 
    //
    TVITourBookItem(final TourBookView view) {
 
       tourBookView = view;
    }
-
-
 
    /**
     * Prepend a db prefix to all fields and additional indent it
