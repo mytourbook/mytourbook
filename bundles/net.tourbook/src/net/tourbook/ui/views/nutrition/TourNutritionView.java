@@ -1037,8 +1037,13 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
 
    private Menu createUI_32_CreateViewerContextMenu() {
 
-      final Table table = (Table) _productsViewer.getControl();
+      final Table table = _productsViewer.getTable();
       final Menu tableContextMenu = _viewerMenuManager.createContextMenu(table);
+      table.setMenu(tableContextMenu);
+
+      // Also register with the site so other plug-ins (e.g. object
+      // contributions) can contribute to this menu when there IS a selection.
+      getSite().registerContextMenu(_viewerMenuManager, _productsViewer);
 
       return tableContextMenu;
    }
@@ -1407,16 +1412,16 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
       _btnUpdateProducts.setEnabled(numberOfProducts > 0 && containsProductFromDatabase);
    }
 
-   private void fillContextMenu(final IMenuManager menuMgr) {
+   private void fillContextMenu(final IMenuManager menuManager) {
 
       //TODO FB, if the right click is NOT done on a product, the actions below should be hidden
       _actionOpenProductsWebsite.setTourNutritionProducts(getSelectedProductsCodes());
-      menuMgr.add(_actionOpenProductsWebsite);
-      menuMgr.add(_actionEditCustomProduct);
-      menuMgr.add(_actionDeleteProducts);
+      menuManager.add(_actionOpenProductsWebsite);
+      menuManager.add(_actionEditCustomProduct);
+      menuManager.add(_actionDeleteProducts);
 
       //TODO FB static or not static
-      TourNutritionProductMenuManager.fillMenuWithRecentTourNutritionProducts(menuMgr, _tourData);
+      TourNutritionProductMenuManager.fillMenuWithRecentTourNutritionProducts(menuManager, _tourData);
 
       enableActions();
    }
