@@ -508,7 +508,6 @@ public abstract class TVITourBookItem extends TreeViewerItem implements ITourIte
    //
    boolean colHasGeoData;
 
-
    //
    TVITourBookItem(final TourBookView view) {
 
