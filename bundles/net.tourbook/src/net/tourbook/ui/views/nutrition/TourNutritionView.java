@@ -1408,11 +1408,13 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
 
    private void fillContextMenu(final IMenuManager menuManager) {
 
-      //TODO FB, if the right click is NOT done on a product, the actions below should be hidden
-      _actionOpenProductsWebsite.setTourNutritionProducts(getSelectedProductsCodes());
-      menuManager.add(_actionOpenProductsWebsite);
-      menuManager.add(_actionEditCustomProduct);
-      menuManager.add(_actionDeleteProducts);
+      if (!getSelectedProducts().isEmpty()) {
+
+         _actionOpenProductsWebsite.setTourNutritionProducts(getSelectedProductsCodes());
+         menuManager.add(_actionOpenProductsWebsite);
+         menuManager.add(_actionEditCustomProduct);
+         menuManager.add(_actionDeleteProducts);
+      }
 
       //TODO FB static or not static
       TourNutritionProductMenuManager.fillMenuWithRecentTourNutritionProducts(menuManager, _tourData);
