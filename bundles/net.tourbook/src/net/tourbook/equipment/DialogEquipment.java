@@ -218,7 +218,7 @@ public class DialogEquipment extends TitleAreaDialog {
             ? Messages.Dialog_Equipment_Dialog_Message_Eqipment_Duplicate
             : _isNewEquipment
 
-                  ? Messages.Dialog_Equipment_Dialog_Message_Eqipment_New
+                  ? Messages.Dialog_Equipment_Dialog_Message_Equipment_New
                   : Messages.Dialog_Equipment_Dialog_Message_Eqipment_Edit;
 
       setTitle(messageTitle);
