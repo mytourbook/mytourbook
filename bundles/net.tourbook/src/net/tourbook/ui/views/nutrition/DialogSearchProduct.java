@@ -878,6 +878,7 @@ public class DialogSearchProduct extends TitleAreaDialog implements ITourViewer,
 
          TourManager.saveModifiedTour(tourData);
 
+         //todo fb
          _tourNutritionProductMenuManager.updateRecentTourNutritionProducts(tourNutritionProduct);
       });
    }
