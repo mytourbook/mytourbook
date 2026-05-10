@@ -64,14 +64,14 @@ public class TourNutritionProductMenuManager {
     * Number of tour nutrition products that are displayed in the context menu or
     * saved in the dialog settings, its max number is 9 to have a unique accelerator key
     */
+   private static int                                         _maxTourNutritionProducts;
+
    private static LinkedHashMap<String, TourNutritionProduct> _recentTourNutritionProducts    = new LRUMap<>(10);
 
    /**
     * Contains actions which are displayed in the menu
     */
    private static RecentTourNutritionProductAction[]          _actionsRecentTourNutritionProducts;
-
-   private static int                                         _maxTourNutritionProducts       = -1;
 
    private static IPropertyChangeListener                     _prefChangeListener;
 
