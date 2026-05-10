@@ -45,7 +45,6 @@ public class PrefPageNutrition extends PreferencePage implements IWorkbenchPrefe
 
    private PixelConverter         _pc;
    private MouseWheelListener     _defaultMouseWheelListener;
-   private SelectionListener      _defaultSelectionListener;
 
    private int                    _hintDefaultSpinnerWidth;
 
@@ -101,7 +100,6 @@ public class PrefPageNutrition extends PreferencePage implements IWorkbenchPrefe
             _spinnerRecentProducts.setToolTipText(tooltip);
             _spinnerRecentProducts.setMinimum(0);
             _spinnerRecentProducts.setMaximum(9);
-            _spinnerRecentProducts.addSelectionListener(_defaultSelectionListener);
             _spinnerRecentProducts.addMouseWheelListener(_defaultMouseWheelListener);
             GridDataFactory.fillDefaults()
                   .hint(_hintDefaultSpinnerWidth, SWT.DEFAULT)
@@ -131,19 +129,10 @@ public class PrefPageNutrition extends PreferencePage implements IWorkbenchPrefe
 
       _hintDefaultSpinnerWidth = _pc.convertWidthInCharsToPixels(3);
 
-      _defaultSelectionListener = SelectionListener.widgetSelectedAdapter(selectionEvent -> onModify());
-
       _defaultMouseWheelListener = mouseEvent -> {
 
          Util.adjustSpinnerValueOnMouseScroll(mouseEvent);
-
-         onModify();
       };
-   }
-
-   private void onModify() {
-
-      //todo fb
    }
 
    @Override
