@@ -855,7 +855,9 @@ public class DialogSearchProduct extends TitleAreaDialog implements ITourViewer,
 
          final TourData tourData = TourManager.getTour(_tourId);
 
-         if (NutritionUtils.isProductAlreadyPresent(selectedProduct.code, tourData)) {
+         if (NutritionUtils.isProductAlreadyPresent(
+               selectedProduct.code,
+               tourData.getTourNutritionProducts())) {
 
             setErrorMessage(Messages.Dialog_SearchProduct_Label_AlreadyExists);
             return;
@@ -870,7 +872,6 @@ public class DialogSearchProduct extends TitleAreaDialog implements ITourViewer,
 
          TourManager.saveModifiedTour(tourData);
 
-         //todo fb
          _tourNutritionProductMenuManager.updateRecentTourNutritionProducts(tourNutritionProduct);
       });
    }

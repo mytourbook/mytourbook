@@ -305,9 +305,7 @@ public class NutritionUtils {
     * attached to a beverage container
     */
    public static boolean isProductAlreadyPresent(final String productCode,
-                                                 final TourData tourData) {
-
-      final Set<TourNutritionProduct> tourNutritionProducts = tourData.getTourNutritionProducts();
+                                                 final Set<TourNutritionProduct> tourNutritionProducts) {
 
       return tourNutritionProducts.stream().anyMatch(
             tourNutritionProduct -> tourNutritionProduct.getProductCode().equals(productCode) &&

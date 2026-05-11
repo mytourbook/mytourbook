@@ -68,6 +68,8 @@ public class TourNutritionProductMenuManager {
 
    private static LinkedHashMap<String, TourNutritionProduct> _recentTourNutritionProducts    = new LRUMap<>(10);
 
+   private static TourNutritionProductMenuManager             _currentInstance;
+
    /**
     * Contains actions which are displayed in the menu
     */
@@ -77,15 +79,16 @@ public class TourNutritionProductMenuManager {
 
    private static boolean                                     _isInitialized                  = false;
 
-   private static TourData                                    _tourData;
+   private TourData                                           _tourData;
 
-   private static class RecentTourNutritionProductAction extends Action {
+   public static class RecentTourNutritionProductAction extends Action {
 
       private Map.Entry<String, TourNutritionProduct> __recentTourNutritionProduct;
 
       @Override
       public void run() {
-         setTourNutritionProductIntoTour(__recentTourNutritionProduct);
+
+         _currentInstance.setTourNutritionProductIntoTour(__recentTourNutritionProduct);
       }
 
       private void setRecentTourNutritionProduct(final Map.Entry<String, TourNutritionProduct> recentTourNutritionProduct) {
@@ -113,96 +116,6 @@ public class TourNutritionProductMenuManager {
    public static void clearRecentProducts() {
 
       _recentTourNutritionProducts.clear();
-   }
-
-   public static void enableRecentTourNutritionProductActions() {
-
-      if (_isInitialized == false) {
-         initTourNutritionProductManager();
-      }
-
-      for (final RecentTourNutritionProductAction actionRecentTourNutritionProduct : _actionsRecentTourNutritionProducts) {
-
-         final Map.Entry<String, TourNutritionProduct> tourNutritionProduct =
-               actionRecentTourNutritionProduct.__recentTourNutritionProduct;
-
-         final String recentTourNutritionProductCode = getProductCodeFromTourNutritionProductId(
-               tourNutritionProduct.getKey());
-
-         // If the recent tour nutrition product code is in the list of tour
-         // nutrition products, we disable it
-         final boolean tourNutritionProductAlreadyExist =
-               NutritionUtils.isProductAlreadyPresent(
-                     recentTourNutritionProductCode,
-                     _tourData);
-
-         final boolean isEnabled = tourNutritionProductAlreadyExist == false;
-
-         actionRecentTourNutritionProduct.setEnabled(isEnabled);
-      }
-   }
-
-   /**
-    * Create the menu entries for the recently used tour nutrition products
-    *
-    * @param menuMgr
-    * @param isSaveTour
-    */
-   public static void fillMenuWithRecentTourNutritionProducts(final IMenuManager menuMgr,
-                                                              final TourData tourData) {
-
-      if (_isInitialized == false) {
-         initTourNutritionProductManager();
-      }
-
-      if (_recentTourNutritionProducts.isEmpty()) {
-         return;
-      }
-
-      if (_maxTourNutritionProducts < 1) {
-         return;
-      }
-
-      _tourData = tourData;
-
-      int tourNutritionProductIndex = 0;
-      //iterate over the recent tour nutrition products and add them to the menu
-      for (final Map.Entry<String, TourNutritionProduct> recentTourNutritionProduct : _recentTourNutritionProducts.entrySet()) {
-
-         try {
-
-            final RecentTourNutritionProductAction actionRecentTourNutritionProduct =
-                  _actionsRecentTourNutritionProducts[tourNutritionProductIndex];
-            actionRecentTourNutritionProduct.setRecentTourNutritionProduct(
-                  recentTourNutritionProduct);
-
-            final String productCode =
-                  getProductCodeFromTourNutritionProductId(recentTourNutritionProduct.getKey());
-            final String productName =
-                  getProductNameFromTourNutritionProductId(recentTourNutritionProduct.getKey());
-            actionRecentTourNutritionProduct.setText(
-                  UI.SPACE4 +
-                        UI.MNEMONIC +
-                        (tourNutritionProductIndex + 1) +
-                        UI.SPACE2 +
-                        UI.SYMBOL_STAR.repeat(4) +
-                        productCode.substring(productCode.length() - 4) +
-                        UI.SPACE +
-                        UI.SYMBOL_MINUS +
-                        UI.SPACE +
-                        productName);
-
-            menuMgr.add(actionRecentTourNutritionProduct);
-
-         } catch (final IndexOutOfBoundsException e) {
-            // there are no more recent tour nutrition products
-            break;
-         }
-
-         tourNutritionProductIndex++;
-      }
-
-      enableRecentTourNutritionProductActions();
    }
 
    private static String getProductCodeFromTourNutritionProductId(final String tourNutritionProductId) {
@@ -300,7 +213,100 @@ public class TourNutritionProductMenuManager {
       }
    }
 
-   public static void setTourNutritionProductIntoTour(final Map.Entry<String, TourNutritionProduct> recentTourNutritionProduct) {
+   private void enableRecentTourNutritionProductActions() {
+
+      if (_isInitialized == false) {
+         initTourNutritionProductManager();
+      }
+
+      for (final RecentTourNutritionProductAction actionRecentTourNutritionProduct : _actionsRecentTourNutritionProducts) {
+
+         final Map.Entry<String, TourNutritionProduct> tourNutritionProduct =
+               actionRecentTourNutritionProduct.__recentTourNutritionProduct;
+
+         boolean isEnabled = false;
+         if (tourNutritionProduct != null) {
+
+            final String recentTourNutritionProductCode = getProductCodeFromTourNutritionProductId(
+                  tourNutritionProduct.getKey());
+
+            // If the recent tour nutrition product code is in the list of tour
+            // nutrition products, we disable it
+            final boolean tourNutritionProductAlreadyExist =
+                  NutritionUtils.isProductAlreadyPresent(
+                        recentTourNutritionProductCode,
+                        _tourData.getTourNutritionProducts());
+
+            isEnabled = tourNutritionProductAlreadyExist == false;
+         }
+
+         actionRecentTourNutritionProduct.setEnabled(isEnabled);
+      }
+   }
+
+   /**
+    * Create the menu entries for the recently used tour nutrition products
+    */
+   public void fillMenuWithRecentTourNutritionProducts(final IMenuManager menuMgr,
+                                                       final TourData tourData) {
+
+      _currentInstance = this;
+
+      if (_isInitialized == false) {
+         initTourNutritionProductManager();
+      }
+
+      if (_recentTourNutritionProducts.isEmpty()) {
+         return;
+      }
+
+      if (_maxTourNutritionProducts < 1) {
+         return;
+      }
+
+      _tourData = tourData;
+
+      int tourNutritionProductIndex = 0;
+      //iterate over the recent tour nutrition products and add them to the menu
+      for (final Map.Entry<String, TourNutritionProduct> recentTourNutritionProduct : _recentTourNutritionProducts.entrySet()) {
+
+         try {
+
+            final RecentTourNutritionProductAction actionRecentTourNutritionProduct =
+                  _actionsRecentTourNutritionProducts[tourNutritionProductIndex];
+            actionRecentTourNutritionProduct.setRecentTourNutritionProduct(
+                  recentTourNutritionProduct);
+
+            final String productCode =
+                  getProductCodeFromTourNutritionProductId(recentTourNutritionProduct.getKey());
+            final String productName =
+                  getProductNameFromTourNutritionProductId(recentTourNutritionProduct.getKey());
+            actionRecentTourNutritionProduct.setText(
+                  UI.SPACE4 +
+                        UI.MNEMONIC +
+                        (tourNutritionProductIndex + 1) +
+                        UI.SPACE2 +
+                        UI.SYMBOL_STAR.repeat(4) +
+                        productCode.substring(productCode.length() - 4) +
+                        UI.SPACE +
+                        UI.SYMBOL_MINUS +
+                        UI.SPACE +
+                        productName);
+
+            menuMgr.add(actionRecentTourNutritionProduct);
+
+         } catch (final IndexOutOfBoundsException e) {
+            // there are no more recent tour nutrition products
+            break;
+         }
+
+         tourNutritionProductIndex++;
+      }
+
+      enableRecentTourNutritionProductActions();
+   }
+
+   private void setTourNutritionProductIntoTour(final Map.Entry<String, TourNutritionProduct> recentTourNutritionProduct) {
 
       final Runnable runnable = () -> {
 
@@ -332,7 +338,7 @@ public class TourNutritionProductMenuManager {
       BusyIndicator.showWhile(Display.getCurrent(), runnable);
    }
 
-   public static void updateRecentTourNutritionProducts(final TourNutritionProduct tourNutritionProduct) {
+   public void updateRecentTourNutritionProducts(final TourNutritionProduct tourNutritionProduct) {
 
       final String tourNutritionProductId = getTourNutritionProductId(tourNutritionProduct);
 
