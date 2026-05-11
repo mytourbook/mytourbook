@@ -173,7 +173,6 @@ public class DialogSearchProduct extends TitleAreaDialog implements ITourViewer,
       @Override
       public void run() {
          onAddProduct();
-
       }
    }
 
