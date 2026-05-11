@@ -44,9 +44,9 @@ import org.eclipse.jface.preference.IPreferenceStore;
 
 import tools.jackson.core.JacksonException;
 import tools.jackson.core.type.TypeReference;
-import tools.jackson.databind.DeserializationFeature;
 import tools.jackson.databind.JsonNode;
 import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.cfg.EnumFeature;
 import tools.jackson.databind.json.JsonMapper;
 
 public class NutritionUtils {
@@ -136,7 +136,7 @@ public class NutritionUtils {
    private static List<Product> deserializeResponse(final String body, final ProductSearchType productSearchType) {
 
       final ObjectMapper mapper = JsonMapper.builder()
-            .disable(DeserializationFeature.FAIL_ON_NULL_FOR_PRIMITIVES)
+            .enable(EnumFeature.READ_UNKNOWN_ENUM_VALUES_AS_NULL)
             .build();
 
       List<Product> deserializedProductsResults = new ArrayList<>();
