@@ -21,7 +21,6 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 import java.util.stream.Stream;
 
 import net.tourbook.Images;
@@ -856,14 +855,7 @@ public class DialogSearchProduct extends TitleAreaDialog implements ITourViewer,
 
          final TourData tourData = TourManager.getTour(_tourId);
 
-         final Set<TourNutritionProduct> tourNutritionProducts = tourData.getTourNutritionProducts();
-
-         // Before adding the selected product, we need to check if it doesn't already exist
-         // An existing product can only be added when the existing ones are
-         // attached to a beverage container
-         if (tourNutritionProducts.stream().anyMatch(
-               tourNutritionProduct -> tourNutritionProduct.getProductCode().equals(selectedProduct.code) &&
-                     tourNutritionProduct.getTourBeverageContainer() == null)) {
+         if (NutritionUtils.isProductAlreadyPresent(selectedProduct.code, tourData)) {
 
             setErrorMessage(Messages.Dialog_SearchProduct_Label_AlreadyExists);
             return;

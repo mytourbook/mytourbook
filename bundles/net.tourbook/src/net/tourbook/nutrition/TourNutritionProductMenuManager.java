@@ -19,7 +19,6 @@ package net.tourbook.nutrition;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.UI;
@@ -122,8 +121,6 @@ public class TourNutritionProductMenuManager {
          initTourNutritionProductManager();
       }
 
-      final Set<TourNutritionProduct> tourNutritionProducts = _tourData.getTourNutritionProducts();
-
       for (final RecentTourNutritionProductAction actionRecentTourNutritionProduct : _actionsRecentTourNutritionProducts) {
 
          final Map.Entry<String, TourNutritionProduct> tourNutritionProduct =
@@ -134,8 +131,11 @@ public class TourNutritionProductMenuManager {
 
          // If the recent tour nutrition product code is in the list of tour
          // nutrition products, we disable it
-         final boolean tourNutritionProductAlreadyExist = tourNutritionProducts.stream()
-               .anyMatch(existingTourNutritionProduct -> existingTourNutritionProduct.getProductCode().equals(recentTourNutritionProductCode));
+         final boolean tourNutritionProductAlreadyExist =
+               NutritionUtils.isProductAlreadyPresent(
+                     recentTourNutritionProductCode,
+                     _tourData);
+
          final boolean isEnabled = tourNutritionProductAlreadyExist == false;
 
          actionRecentTourNutritionProduct.setEnabled(isEnabled);
@@ -356,10 +356,6 @@ public class TourNutritionProductMenuManager {
          // If the tour nutrition product Id is already in the list and it doesn't have
          // a TourNutritionProduct object, or that object is tied to a beverage container,
          // we insert the TourNutritionProduct object into the list
-
-         //todo fb , can i use a common method
-         //line 863 of DialogSearchProduct
-
          if (!StringUtils.isNullOrEmpty(recentTourNutritionProductCode) &&
                recentTourNutritionProductCode.equals(tourNutritionProduct.getProductCode()) &&
                recentTourNutritionProduct.getValue() == null) {

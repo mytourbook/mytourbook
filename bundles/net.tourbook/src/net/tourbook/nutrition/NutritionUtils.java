@@ -299,6 +299,21 @@ public class NutritionUtils {
       return totalSodium;
    }
 
+   /*
+    * Check if a product doesn't already exist for a given tour.
+    * An existing product can only be added when the existing ones are
+    * attached to a beverage container
+    */
+   public static boolean isProductAlreadyPresent(final String productCode,
+                                                 final TourData tourData) {
+
+      final Set<TourNutritionProduct> tourNutritionProducts = tourData.getTourNutritionProducts();
+
+      return tourNutritionProducts.stream().anyMatch(
+            tourNutritionProduct -> tourNutritionProduct.getProductCode().equals(productCode) &&
+                  tourNutritionProduct.getTourBeverageContainer() == null);
+   }
+
    public static void openProductWebPage(final String productCode) {
 
       if (StringUtils.isNumeric(productCode)) {
