@@ -340,6 +340,8 @@ public class TourNutritionProductMenuManager {
 
    public void updateRecentTourNutritionProducts(final TourNutritionProduct tourNutritionProduct) {
 
+      _currentInstance = this;
+
       final String tourNutritionProductId = getTourNutritionProductId(tourNutritionProduct);
 
       // If the tour nutrition product Id is not in the list
