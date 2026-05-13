@@ -869,8 +869,6 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
          btnAddCustomProduct.addSelectionListener(widgetSelectedAdapter(selectionEvent -> createOrEditCustomTourNutritionProduct(false, null)));
          btnAddCustomProduct.setImage(_imageAdd);
          GridDataFactory.fillDefaults().align(SWT.BEGINNING, SWT.CENTER).applyTo(btnAddCustomProduct);
-         //todo fb delete
-         //_btnUpdateProducts.setToolTipText(Messages.Tour_Nutrition_Button_UpdateProducts_Tooltip);
       }
    }
 
