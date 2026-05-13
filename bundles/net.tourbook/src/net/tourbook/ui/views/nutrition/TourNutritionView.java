@@ -195,7 +195,8 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
    /*
     * UI controls
     */
-   private Button                    _btnUpdateProducts;
+   dewfwed
+   private Button                    _btnUpdateProduce lats;
 
    private Image                     _imageAdd        = TourbookPlugin.getThemedImageDescriptor(Images.App_Add).createImage();
    private Image                     _imageRefreshAll = CommonActivator.getImageDescriptor(CommonImages.App_Refresh_All).createImage();
