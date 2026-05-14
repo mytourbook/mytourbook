@@ -479,18 +479,22 @@ public class EquipmentMenuManager implements IActionProvider {
       _allRecentEquipment.clear();
    }
 
+   /**
+    * @param isEnabled_AddEquipment
+    * @param numSelectedTours
+    * @param allEquipmentIDs_InTours
+    * @param allModifiedEquipmentIDs
+    *           Is <code>null</code> when its a normal menu. In the advanced menu it contains all
+    *           selected equipment before they are applied to the tours
+    */
    static void enableActions_Recent(final boolean isEnabled_AddEquipment,
-                                    final Set<Long> allSelectedEquipmentIDs_FromTours,
-                                    final int numSelectedTours) {
+                                    final int numSelectedTours,
+                                    final Set<Long> allEquipmentIDs_InTours,
+                                    final Set<Long> allModifiedEquipmentIDs) {
 
-      System.out.println(UI.timeStamp() + " EMM    enableActions_Recent: " + allSelectedEquipmentIDs_FromTours);
+      System.out.println(UI.timeStamp() + " EMM    enableActions_Recent: " + allEquipmentIDs_InTours);
+      System.out.println(UI.timeStamp() + " EMM    enableActions_Recent: " + allModifiedEquipmentIDs);
 // TODO remove SYSTEM.OUT.PRINTLN
-
-      if (allSelectedEquipmentIDs_FromTours.size() == 0) {
-
-         int a = 0;
-         a++;
-      }
 
       if (_allActions_RecentEquipment.length == 0) {
          return;
@@ -498,14 +502,17 @@ public class EquipmentMenuManager implements IActionProvider {
 
       if (isEnabled_AddEquipment) {
 
-         final boolean isOneTourWithEquipment = allSelectedEquipmentIDs_FromTours.size() > 0
-               && numSelectedTours == 1;
+         final boolean isOneTourWithEquipment = numSelectedTours == 1
+
+               && allEquipmentIDs_InTours.size() > 0;
 
          for (final ActionRecentEquipment actionRecentEquipment : _allActions_RecentEquipment) {
 
             final Equipment recentEquipment = actionRecentEquipment.equipment;
 
             if (recentEquipment == null) {
+
+               // this happens when the recent actions are not yet used
 
                actionRecentEquipment.setEnabled(false);
                actionRecentEquipment.setChecked(false);
@@ -515,18 +522,24 @@ public class EquipmentMenuManager implements IActionProvider {
 
             final long recentEquipmentID = recentEquipment.getEquipmentId();
 
-            boolean isEquipmentEnabled;
+            boolean isEquipmentEnabled = true;
             boolean isEquipmentChecked = false;
 
-            final boolean isRecentEquipmentSelected = allSelectedEquipmentIDs_FromTours.contains(recentEquipmentID);
+            final boolean isEquipmentInModified = allModifiedEquipmentIDs != null && allModifiedEquipmentIDs.contains(recentEquipmentID);
+            final boolean isEquipmentInTour = allEquipmentIDs_InTours.contains(recentEquipmentID);
 
-            if (isOneTourWithEquipment) {
+            if (isEquipmentInModified) {
+
+               isEquipmentEnabled = true;
+               isEquipmentChecked = true;
+
+            } else if (isOneTourWithEquipment) {
 
                // one tour is selected
 
                // disable action when its tour equipment id is selected
-               isEquipmentEnabled = isRecentEquipmentSelected == false;
-               isEquipmentChecked = isRecentEquipmentSelected;
+               isEquipmentEnabled = isEquipmentInTour == false;
+               isEquipmentChecked = isEquipmentInTour;
 
             } else {
 
@@ -534,7 +547,7 @@ public class EquipmentMenuManager implements IActionProvider {
 
                isEquipmentEnabled = true;
 
-               if (isRecentEquipmentSelected) {
+               if (isEquipmentInTour) {
                   isEquipmentChecked = true;
                }
             }
@@ -842,6 +855,9 @@ public class EquipmentMenuManager implements IActionProvider {
     */
    public void enableActions(final List<Object> allSelectedItems) {
 
+      System.out.println(UI.timeStamp() + " EMM    enableActions ");
+// TODO remove SYSTEM.OUT.PRINTLN
+
       final Set<Long> allSelectedEquipmentIDs_FromAllTours = new HashSet<>();
 
       boolean isEnabled_RemoveEquipment = false;
@@ -940,7 +956,12 @@ public class EquipmentMenuManager implements IActionProvider {
       }
 
       enableActions_Equipment(isEnabled_AddEquipment, isEnabled_RemoveEquipment, numClipboardEquipment);
-      enableActions_Recent(isEnabled_AddEquipment, allSelectedEquipmentIDs_FromAllTours, numSelectedItems);
+
+      enableActions_Recent(
+            isEnabled_AddEquipment,
+            numSelectedItems,
+            allSelectedEquipmentIDs_FromAllTours,
+            null);
    }
 
    private void enableActions_Equipment(final boolean isEnabled_AddEquipment,
