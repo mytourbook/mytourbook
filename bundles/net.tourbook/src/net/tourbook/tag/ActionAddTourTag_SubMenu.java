@@ -566,7 +566,7 @@ public class ActionAddTourTag_SubMenu extends Action implements IMenuCreator, IA
    }
 
    @Override
-   public void onShowMenu() {
+   public void onShowAdvancedMenu() {
 
       _tagMenuManager.setIsAdvanceMenu();
 
@@ -593,7 +593,7 @@ public class ActionAddTourTag_SubMenu extends Action implements IMenuCreator, IA
 
             /*
              * It is possible that a tag was removed which is contained within the previous tags,
-             * uncheck this action that is displays the correct checked tags
+             * uncheck this action that it displays the correct checked tags
              */
             TagMenuManager.updatePreviousTagState(_allModifiedTags);
          }

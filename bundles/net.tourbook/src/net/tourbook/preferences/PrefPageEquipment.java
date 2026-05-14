@@ -103,7 +103,7 @@ public class PrefPageEquipment extends PreferencePage implements IWorkbenchPrefe
             btnRemoveRecentEquipment.setText(Messages.Pref_Equipment_Button_RemoveRecentEquipment);
             btnRemoveRecentEquipment.setToolTipText(Messages.Pref_Equipment_Button_RemoveRecentEquipment_Tooltip);
             btnRemoveRecentEquipment.addSelectionListener(SelectionListener.widgetSelectedAdapter(
-                  selectionEvent -> EquipmentMenuManager.clearRecentEquipment()));
+                  selectionEvent -> EquipmentMenuManager.clearPreviousAndRecentEquipment()));
          }
       }
 

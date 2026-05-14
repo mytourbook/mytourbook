@@ -294,6 +294,7 @@ public class AdvancedMenuForActions {
       // reset data from previous menu
       final IAction action = _actionContributionItem.getAction();
       if (action instanceof final IAdvancedMenuForActions advancedMenuForActions) {
+
          advancedMenuForActions.resetData();
       }
    }
@@ -335,7 +336,7 @@ public class AdvancedMenuForActions {
 
                   final IAction action = _actionContributionItem.getAction();
                   if (action instanceof final IAdvancedMenuForActions advancedMenuForActions) {
-                     advancedMenuForActions.onShowMenu();
+                     advancedMenuForActions.onShowAdvancedMenu();
                   }
                }
             });

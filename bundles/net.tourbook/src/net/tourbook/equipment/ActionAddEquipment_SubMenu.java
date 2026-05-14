@@ -19,8 +19,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 import net.tourbook.Images;
@@ -57,7 +57,7 @@ public class ActionAddEquipment_SubMenu extends Action implements IMenuCreator, 
    private Menu                     _menu;
 
    private List<TourData>           _allSelectedTours;
-   private final Set<Long>          _allUsedEquipmentIDs   = new HashSet<>();
+   private Set<Long>                _allEquipmentIDsInMenu = new HashSet<>();
 
    private ActionShowEquipmentView  _actionManageEquipment = new ActionShowEquipmentView();
 
@@ -118,7 +118,7 @@ public class ActionAddEquipment_SubMenu extends Action implements IMenuCreator, 
                   _equipmentMenuManager.isSaveTour(),
                   _equipmentMenuManager.isCheckTourEditor());
 
-            _equipmentMenuManager.updateRecentEquipment(__equipment);
+            _equipmentMenuManager.replaceRecentEquipment(__equipment);
          }
       }
 
@@ -266,6 +266,16 @@ public class ActionAddEquipment_SubMenu extends Action implements IMenuCreator, 
             : null);
    }
 
+   private void equipmentAdd(final Equipment equipment) {
+
+      _allModifiedEquipment.put(equipment.getEquipmentId(), equipment);
+   }
+
+   private void equipmentRemove(final Equipment equipment) {
+
+      _allModifiedEquipment.remove(equipment.getEquipmentId());
+   }
+
    public void fillMenu(final Menu menu) {
 
       // dispose old items
@@ -281,19 +291,118 @@ public class ActionAddEquipment_SubMenu extends Action implements IMenuCreator, 
          return;
       }
 
-      // get all equipment from all tours
-      _allUsedEquipmentIDs.clear();
+      _allEquipmentIDsInMenu.clear();
 
+      // get all equipment from all tours
       for (final TourData tourData : _allSelectedTours) {
 
          final Set<Equipment> allEquipment = tourData.getEquipment();
 
          for (final Equipment equipment : allEquipment) {
-            _allUsedEquipmentIDs.add(equipment.getEquipmentId());
+            _allEquipmentIDsInMenu.add(equipment.getEquipmentId());
          }
       }
 
-      fillMenu_AllActions(menu);
+      fillMenu_00_AllActions(menu);
+   }
+
+   /**
+    * Fill all actions
+    *
+    * @param menu
+    */
+   private void fillMenu_00_AllActions(final Menu menu) {
+
+      if (_isAdvancedMenu) {
+
+         /*
+          * These actions are managed by the advanced menu provider
+          */
+
+         // create title menu items
+
+         addActionToMenu(menu, _actionTitle_AddEquipment);
+
+         addSeparatorToMenu(menu);
+         {
+            fillMenu_10_EquipmentActions(menu);
+         }
+
+         fillMenu_20_RecentEquipment(menu);
+
+         fillMenu_30_AddedEquipmentButNotYetSaved(menu);
+
+         addSeparatorToMenu(menu);
+         {
+            addActionToMenu(menu, _actionOK);
+            addActionToMenu(menu, new ActionCancel());
+         }
+
+         addSeparatorToMenu(menu);
+         {
+            addActionToMenu(menu, _actionManageEquipment);
+         }
+
+         enableActions();
+
+      } else {
+
+         fillMenu_10_EquipmentActions(menu);
+
+         addSeparatorToMenu(menu);
+         {
+            addActionToMenu(menu, _actionManageEquipment);
+         }
+      }
+   }
+
+   private void fillMenu_10_EquipmentActions(final Menu menu) {
+
+      final int numSelectedTour = _allSelectedTours.size();
+
+      final List<Equipment> allEquipment = EquipmentManager.getAllEquipment_Name();
+
+      for (final Equipment equipment : allEquipment) {
+
+         if (equipment.isRetired()) {
+
+            // skip retired equipment https://github.com/mytourbook/mytourbook/issues/1660
+            continue;
+         }
+
+         final ActionEquipment action = new ActionEquipment(equipment);
+
+         if (numSelectedTour == 1) {
+
+            // disable actions only when one tour is selected
+
+            final boolean isEquipmentInMenu = _allEquipmentIDsInMenu.contains(equipment.getEquipmentId());
+
+            if (isEquipmentInMenu) {
+               action.setEnabled(false);
+            }
+         }
+
+         addActionToMenu(menu, action);
+      }
+   }
+
+   /**
+    * @param menu
+    */
+   private void fillMenu_20_RecentEquipment(final Menu menu) {
+
+      if (_equipmentMenuManager.getRecentEquipment().size() > 0) {
+
+         // recent equipment are available
+
+         addSeparatorToMenu(menu);
+         {
+            addActionToMenu(menu, _actionTitle_RecentEquipment);
+
+            _equipmentMenuManager.fillEquipmentMenu_WithRecentEquipment(null, menu);
+         }
+      }
    }
 
    /**
@@ -301,7 +410,7 @@ public class ActionAddEquipment_SubMenu extends Action implements IMenuCreator, 
     *
     * @param menu
     */
-   private void fillMenu_AddedEquipmentButNotYetSaved(final Menu menu) {
+   private void fillMenu_30_AddedEquipmentButNotYetSaved(final Menu menu) {
 
       final boolean isModifiedEquipment = _allModifiedEquipment.size() > 0;
 
@@ -320,105 +429,6 @@ public class ActionAddEquipment_SubMenu extends Action implements IMenuCreator, 
 
          for (final Equipment equipment : allModifiedEquipment) {
             addActionToMenu(menu, new ActionModifyEquipment(equipment));
-         }
-      }
-   }
-
-   /**
-    * Fill all actions
-    *
-    * @param menu
-    */
-   private void fillMenu_AllActions(final Menu menu) {
-
-      if (_isAdvancedMenu == false) {
-
-         fillMenu_EquipmentActions(menu);
-
-         addSeparatorToMenu(menu);
-         {
-            addActionToMenu(menu, _actionManageEquipment);
-         }
-
-      } else {
-
-         /*
-          * These actions are managed by the advanced menu provider
-          */
-
-         // create title menu items
-
-         addActionToMenu(menu, _actionTitle_AddEquipment);
-
-         addSeparatorToMenu(menu);
-         {
-            fillMenu_EquipmentActions(menu);
-         }
-
-         fillMenu_RecentEquipment(menu);
-
-         fillMenu_AddedEquipmentButNotYetSaved(menu);
-
-         addSeparatorToMenu(menu);
-         {
-            addActionToMenu(menu, _actionOK);
-            addActionToMenu(menu, new ActionCancel());
-         }
-
-         addSeparatorToMenu(menu);
-         {
-            addActionToMenu(menu, _actionManageEquipment);
-         }
-
-         enableActions();
-      }
-   }
-
-   private void fillMenu_EquipmentActions(final Menu menu) {
-
-      final int numSelectedTour = _allSelectedTours.size();
-
-      final List<Equipment> allEquipment = EquipmentManager.getAllEquipment_Name();
-
-      for (final Equipment equipment : allEquipment) {
-
-         if (equipment.isRetired()) {
-
-            // skip retired equipment https://github.com/mytourbook/mytourbook/issues/1660
-            continue;
-         }
-
-         final ActionEquipment action = new ActionEquipment(equipment);
-
-         if (numSelectedTour == 1) {
-
-            // disable action only when one tour is selected
-
-            final boolean isEquipmentAlreadySet = _allUsedEquipmentIDs.contains(equipment.getEquipmentId());
-
-            if (isEquipmentAlreadySet) {
-               action.setEnabled(false);
-            }
-         }
-
-         addActionToMenu(menu, action);
-      }
-   }
-
-   /**
-    * @param menu
-    */
-   private void fillMenu_RecentEquipment(final Menu menu) {
-
-      if (_equipmentMenuManager.getRecentEquipment().size() > 0) {
-
-         // recent equipment are available
-
-         addSeparatorToMenu(menu);
-         {
-            addActionToMenu(menu, _actionTitle_RecentEquipment);
-
-            _equipmentMenuManager.fillEquipmentMenu_WithRecentEquipment(null, menu);
          }
       }
    }
@@ -464,16 +474,30 @@ public class ActionAddEquipment_SubMenu extends Action implements IMenuCreator, 
    }
 
    @Override
-   public void onShowMenu() {
+   public void onShowAdvancedMenu() {
+
+      System.out.println(UI.timeStamp() + " AAE onShowAdvancedMenu: " + _allEquipmentIDsInMenu
+
+      );
+// TODO remove SYSTEM.OUT.PRINTLN
 
       _equipmentMenuManager.setIsAdvanceMenu();
 
-      final int unknown = 1;
-      EquipmentMenuManager.enableActions_Recent(true, _allModifiedEquipment.keySet(), unknown);
+      final HashSet<Long> allRecentEquipmentIDs = new HashSet<>();
+
+      allRecentEquipmentIDs.addAll(_allModifiedEquipment.keySet());
+      allRecentEquipmentIDs.addAll(_allEquipmentIDsInMenu);
+
+//      EquipmentMenuManager.enableActions_Recent(true, _allModifiedEquipment.keySet(), _allSelectedTours.size());
+//      EquipmentMenuManager.enableActions_Recent(true, _allEquipmentIDsInMenu, _allSelectedTours.size());
+      EquipmentMenuManager.enableActions_Recent(true, allRecentEquipmentIDs, _allSelectedTours.size());
    }
 
    @Override
    public void resetData() {
+
+      System.out.println(UI.timeStamp() + " resetData()	 ");
+// TODO remove SYSTEM.OUT.PRINTLN
 
       _allModifiedEquipment.clear();
    }
@@ -500,7 +524,7 @@ public class ActionAddEquipment_SubMenu extends Action implements IMenuCreator, 
 
             /*
              * It is possible that a equipment was removed which is contained within the previous
-             * equipment, uncheck this action that is displays the correct checked equipment
+             * equipment, uncheck this action that it displays the correct checked equipment
              */
             EquipmentMenuManager.updatePreviousEquipmentState(_allModifiedEquipment);
          }
@@ -532,39 +556,39 @@ public class ActionAddEquipment_SubMenu extends Action implements IMenuCreator, 
 
          // add equipment
 
-         _allModifiedEquipment.put(equipment.getEquipmentId(), equipment);
+         equipmentAdd(equipment);
 
       } else {
 
          // remove equipment
 
-         _allModifiedEquipment.remove(equipment.getEquipmentId());
+         equipmentRemove(equipment);
       }
 
       saveOrReopenEquipmentMenu(isAddEquipment);
    }
 
    /**
-    * Add/Remove all previous equipment
+    * Add or remove all previous equipment
     *
     * @param isAddEquipment
     * @param allPreviousEquipment
     */
-   void setEquipment(final boolean isAddEquipment, final Map<Long, Equipment> allPreviousEquipment) {
+   void setEquipment(final boolean isAddEquipment, final LinkedList<Equipment> allPreviousEquipment) {
 
-      for (final Equipment equipment : allPreviousEquipment.values()) {
+      for (final Equipment equipment : allPreviousEquipment) {
 
          if (isAddEquipment) {
 
             // add equipment
 
-            _allModifiedEquipment.put(equipment.getEquipmentId(), equipment);
+            equipmentAdd(equipment);
 
          } else {
 
             // remove equipment
 
-            _allModifiedEquipment.remove(equipment.getEquipmentId());
+            equipmentRemove(equipment);
          }
       }
 

@@ -257,7 +257,7 @@ public class EquipmentManager {
       // remove old equipment from cached tours
       clearCachedValues();
 
-      EquipmentMenuManager.clearRecentEquipment();
+      EquipmentMenuManager.clearPreviousAndRecentEquipment();
 
       TourManager.getInstance().clearTourDataCache();
 
