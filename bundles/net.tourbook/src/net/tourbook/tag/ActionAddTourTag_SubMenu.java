@@ -248,8 +248,8 @@ public class ActionAddTourTag_SubMenu extends Action implements IMenuCreator, IA
             final TagCollection tagCollection = TourDatabase.getTagEntries(__tagCategory.getCategoryId());
 
             // add actions
-            __actionAddTourTag.fillMenu_TagCategoryActions(tagCollection, __categoryMenu);
-            __actionAddTourTag.fillMenu_TagActions(tagCollection, __categoryMenu);
+            __actionAddTourTag.fillMenu_10_TagCategoryActions(tagCollection, __categoryMenu);
+            __actionAddTourTag.fillMenu_20_TagActions(tagCollection, __categoryMenu);
          }));
 
          return __categoryMenu;
@@ -354,7 +354,7 @@ public class ActionAddTourTag_SubMenu extends Action implements IMenuCreator, IA
          }
       }
 
-      fillMenu_AllActions(menu);
+      fillMenu_00_AllActions(menu);
    }
 
    /**
@@ -362,16 +362,11 @@ public class ActionAddTourTag_SubMenu extends Action implements IMenuCreator, IA
     *
     * @param menu
     */
-   private void fillMenu_AllActions(final Menu menu) {
+   private void fillMenu_00_AllActions(final Menu menu) {
 
       final TagCollection rootTagCollection = TourDatabase.getRootTags();
 
-      if (_isAdvancedMenu == false) {
-
-         fillMenu_TagCategoryActions(rootTagCollection, menu);
-         fillMenu_TagActions(rootTagCollection, menu);
-
-      } else {
+      if (_isAdvancedMenu) {
 
          /*
           * This action is managed by the advanced menu provider
@@ -383,11 +378,11 @@ public class ActionAddTourTag_SubMenu extends Action implements IMenuCreator, IA
 
          addSeparatorToMenu(menu);
          {
-            fillMenu_TagCategoryActions(rootTagCollection, menu);
-            fillMenu_TagActions(rootTagCollection, menu);
+            fillMenu_10_TagCategoryActions(rootTagCollection, menu);
+            fillMenu_20_TagActions(rootTagCollection, menu);
          }
 
-         fillMenu_RecentTags(menu);
+         fillMenu_30_RecentTags(menu);
 
          final boolean isModifiedTags = _allModifiedTags.size() > 0;
 
@@ -400,10 +395,10 @@ public class ActionAddTourTag_SubMenu extends Action implements IMenuCreator, IA
             if (isModifiedTags) {
 
                // create actions
-               final ArrayList<TourTag> modifiedTags = new ArrayList<>(_allModifiedTags.values());
-               Collections.sort(modifiedTags);
+               final ArrayList<TourTag> allModifiedTags = new ArrayList<>(_allModifiedTags.values());
+               Collections.sort(allModifiedTags);
 
-               for (final TourTag tourTag : modifiedTags) {
+               for (final TourTag tourTag : allModifiedTags) {
                   addActionToMenu(menu, new ActionModifyTag(tourTag));
                }
             }
@@ -427,27 +422,22 @@ public class ActionAddTourTag_SubMenu extends Action implements IMenuCreator, IA
          _actionOK.setImageDescriptor(isModifiedTags
                ? TourbookPlugin.getImageDescriptor(Images.State_OK)
                : null);
+      } else {
+
+         fillMenu_10_TagCategoryActions(rootTagCollection, menu);
+         fillMenu_20_TagActions(rootTagCollection, menu);
       }
    }
 
-   /**
-    * @param menu
-    */
-   private void fillMenu_RecentTags(final Menu menu) {
+   private void fillMenu_10_TagCategoryActions(final TagCollection tagCollection, final Menu menu) {
 
-      if ((TourDatabase.getAllTourTags().size() > 0)) {
-
-         // tags are available
-
-         addSeparatorToMenu(menu);
-         {
-            addActionToMenu(menu, _actionTitle_RecentTags);
-            _tagMenuManager.fillTagMenu_WithRecentTags(null, menu);
-         }
+      // add tag categories
+      for (final TourTagCategory tagCategory : tagCollection.tourTagCategories) {
+         addActionToMenu(menu, new ActionTourTagCategory(this, tagCategory));
       }
    }
 
-   private void fillMenu_TagActions(final TagCollection tagCollection, final Menu menu) {
+   private void fillMenu_20_TagActions(final TagCollection tagCollection, final Menu menu) {
 
       final ArrayList<TourTag> allTourTags = tagCollection.tourTags;
       if (allTourTags == null) {
@@ -517,11 +507,20 @@ public class ActionAddTourTag_SubMenu extends Action implements IMenuCreator, IA
       }
    }
 
-   private void fillMenu_TagCategoryActions(final TagCollection tagCollection, final Menu menu) {
+   /**
+    * @param menu
+    */
+   private void fillMenu_30_RecentTags(final Menu menu) {
 
-      // add tag categories
-      for (final TourTagCategory tagCategory : tagCollection.tourTagCategories) {
-         addActionToMenu(menu, new ActionTourTagCategory(this, tagCategory));
+      if ((TourDatabase.getAllTourTags().size() > 0)) {
+
+         // tags are available
+
+         addSeparatorToMenu(menu);
+         {
+            addActionToMenu(menu, _actionTitle_RecentTags);
+            _tagMenuManager.fillTagMenu_WithRecentTags(null, menu);
+         }
       }
    }
 
@@ -624,16 +623,16 @@ public class ActionAddTourTag_SubMenu extends Action implements IMenuCreator, IA
    @Override
    public void setEnabled(final boolean enabled) {
 
-      if (_isAdvancedMenu == false) {
+      if (_isAdvancedMenu) {
+
+         super.setEnabled(enabled);
+
+      } else {
 
          // ensure tags are available
          final HashMap<Long, TourTag> allTags = TourDatabase.getAllTourTags();
 
          super.setEnabled(enabled && allTags.size() > 0);
-
-      } else {
-
-         super.setEnabled(enabled);
       }
    }
 
