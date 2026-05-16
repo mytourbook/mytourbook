@@ -361,8 +361,8 @@ public class NutritionUtils {
          } else {
 
             // Anything else than 200 is an error for this OpenFoodFacts endpoint
-            throw new RejectedExecutionException("Response from server - " +
-                  statusCode + ": " +
+            throw new RejectedExecutionException("Response from server - " + //$NON-NLS-1$
+                  statusCode + ": " + //$NON-NLS-1$
                   responseBody);
          }
       } catch (JacksonException | RejectedExecutionException | IOException | InterruptedException e) {
