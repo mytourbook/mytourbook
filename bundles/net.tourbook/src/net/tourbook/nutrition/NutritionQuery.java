@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2024 Frédéric Bard
+ * Copyright (C) 2024, 2026 Frédéric Bard
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -31,10 +31,8 @@ import org.eclipse.core.runtime.jobs.Job;
 public class NutritionQuery implements Runnable {
 
    private List<Product>         _searchResult = new ArrayList<>();
-
-   private Exception             _exception;
-
    private String                _searchText;
+
    private ProductSearchType     _productSearchType;
 
    private PropertyChangeSupport support;
@@ -64,14 +62,6 @@ public class NutritionQuery implements Runnable {
       job.schedule();
    }
 
-   public Exception getException() {
-      return _exception;
-   }
-
-   public List<Product> getSearchResult() {
-      return _searchResult;
-   }
-
    public void removePropertyChangeListener(final PropertyChangeListener pcl) {
       support.removePropertyChangeListener(pcl);
    }
@@ -80,17 +70,12 @@ public class NutritionQuery implements Runnable {
    public void run() {
 
       final List<Product> oldValue = List.copyOf(_searchResult);
-      try {
 
-         _searchResult.clear();
+      _searchResult.clear();
 
-         final List<Product> searchProductResults = NutritionUtils.searchProduct(_searchText, _productSearchType);
+      final List<Product> searchProductResults = NutritionUtils.searchProduct(_searchText, _productSearchType);
 
-         _searchResult.addAll(searchProductResults);
-
-      } catch (final Exception e) {
-         _exception = e;
-      }
+      _searchResult.addAll(searchProductResults);
 
       // Sending an old value of null will trigger the firing.
       // Otherwise, empty values for both old and new values will not and as
