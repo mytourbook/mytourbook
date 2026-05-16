@@ -43,6 +43,7 @@ import net.tourbook.web.WEB;
 
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.MultiStatus;
 import org.eclipse.jface.dialogs.ErrorDialog;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.swt.widgets.Display;
@@ -367,11 +368,19 @@ public class NutritionUtils {
       } catch (JacksonException | RejectedExecutionException | IOException | InterruptedException e) {
 
          final IStatus status = StatusUtil.newStatus(IStatus.ERROR, UI.EMPTY_STRING, e);
+         //Use a multiStatus as, otherwise, long errors create windows that are too
+         //big to be displayed in the error dialog
+         final MultiStatus multiStatus = new MultiStatus(
+               TourbookPlugin.PLUGIN_ID,
+               IStatus.ERROR,
+               new IStatus[] { status },
+               UI.EMPTY_STRING,
+               null);
          Display.getDefault().syncExec(() -> ErrorDialog.openError(
                Display.getCurrent().getActiveShell(),
                Messages.Dialog_SearchProduct_Title,
                Messages.Dialog_SearchProduct_Label_Error_Message,
-               status));
+               multiStatus));
 
          StatusUtil.logError(e.getMessage());
          Thread.currentThread().interrupt();
