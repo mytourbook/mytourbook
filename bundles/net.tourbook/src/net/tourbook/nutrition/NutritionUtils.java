@@ -321,7 +321,8 @@ public class NutritionUtils {
       }
    }
 
-   public static List<Product> searchProduct(final String searchText, final ProductSearchType productSearchType) {
+   public static List<Product> searchProduct(final String searchText,
+                                             final ProductSearchType productSearchType) {
 
       String searchUrl = UI.EMPTY_STRING;
 
@@ -332,7 +333,8 @@ public class NutritionUtils {
          break;
 
       case ByName:
-         searchUrl = OPENFOODFACTS_SEARCH_BY_NAME_URL + searchText.replace(UI.SPACE1, UI.SYMBOL_PLUS);
+         searchUrl = OPENFOODFACTS_SEARCH_BY_NAME_URL +
+               searchText.replace(UI.SPACE1, UI.SYMBOL_PLUS);
          break;
       }
 
@@ -343,9 +345,11 @@ public class NutritionUtils {
             .build();
 
       try {
-         final HttpResponse<String> response = _httpClient.send(request, HttpResponse.BodyHandlers.ofString());
+         final HttpResponse<String> response =
+               _httpClient.send(request, HttpResponse.BodyHandlers.ofString());
 
-         if (response.statusCode() == HttpURLConnection.HTTP_OK && net.tourbook.common.util.StringUtils.hasContent(response.body())) {
+         if (response.statusCode() == HttpURLConnection.HTTP_OK &&
+               net.tourbook.common.util.StringUtils.hasContent(response.body())) {
 
             return deserializeResponse(response.body(), productSearchType);
 
@@ -353,6 +357,7 @@ public class NutritionUtils {
             StatusUtil.logError(response.body());
          }
       } catch (IOException | InterruptedException e) {
+
          StatusUtil.log(e);
          Thread.currentThread().interrupt();
       }
