@@ -52,14 +52,19 @@ public class ActionUpdateProduct extends Action {
 
          if (searchProductResults.isEmpty()) {
 
-            // If the product cannot be found anymore, we keep the old product info.
-            // updatedTourNutritionProducts.add(tourNutritionProduct);
+            final TourNutritionProduct tourNutritionProduct =
+                  _tourData
+                        .getTourNutritionProducts()
+                        .stream()
+                        .filter(product -> product.getProductCode().equals(productCode))
+                        .findFirst()
+                        .orElse(null);
 
-//            TourLogManager.subLog_ERROR(NLS.bind(
-//                  Messages.Log_Tour_Nutrition_ProductRetrieval_Error,
-//                  new Object[] {
-//                        productCode,
-//                        tourNutritionProduct.getName() }));
+            TourLogManager.subLog_ERROR(NLS.bind(
+                  Messages.Log_Tour_Nutrition_ProductRetrieval_Error,
+                  new Object[] {
+                        productCode,
+                        tourNutritionProduct.getName() }));
 
             continue;
          }
