@@ -79,7 +79,6 @@ public class ActionUpdateProduct extends Action {
       if (tourNutritionProductsUpdated) {
 
          _tourData = TourManager.saveModifiedTour(_tourData);
-         //reloadViewer();
       } else {
          TourLogManager.subLog_INFO(Messages.Log_ModifiedTour_No_New_Data);
       }
