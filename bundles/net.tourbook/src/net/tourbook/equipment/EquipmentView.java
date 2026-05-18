@@ -1025,11 +1025,11 @@ public class EquipmentView extends ViewPart implements
       _viewerContainer = new Composite(parent, SWT.NONE);
       GridLayoutFactory.fillDefaults().applyTo(_viewerContainer);
       {
-         createUI_10_EqipmentViewer(_viewerContainer);
+         createUI_10_EquipmentViewer(_viewerContainer);
       }
    }
 
-   private void createUI_10_EqipmentViewer(final Composite parent) {
+   private void createUI_10_EquipmentViewer(final Composite parent) {
 
       /*
        * Create tree
@@ -4031,7 +4031,7 @@ public class EquipmentView extends ViewPart implements
 
          _equipmentViewer.getTree().dispose();
 
-         createUI_10_EqipmentViewer(_viewerContainer);
+         createUI_10_EquipmentViewer(_viewerContainer);
          _viewerContainer.layout();
 
          reloadViewer_SetContent();

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright 2019, 2024 Wolfgang Schramm and Contributors
+ * Copyright 2019, 2026 Wolfgang Schramm and Contributors
  * Copyright 2019, 2021 Thomas Theussing
  * Copyright 2016-2018 devemux86
  * Copyright 2017 nebular
@@ -95,7 +95,7 @@ public class PhotoToolkit extends MarkerToolkit implements ItemizedLayer.OnItemG
          createPhotoItems_10_CreateBitmapFromPhoto(_markerItem, _photo);
 
          /**
-          * EXTREEMLY IMPORTANT otherwise the photo size is not updated, it took me a while to fix
+          * EXTREMELY IMPORTANT otherwise the photo size is not updated, it took me a while to fix
           * this issue !!!
           */
          _mapApp.updateLayer_PhotoLayer();

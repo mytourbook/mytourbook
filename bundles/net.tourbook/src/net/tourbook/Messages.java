@@ -591,9 +591,9 @@ public class Messages extends NLS {
    public static String        Dialog_Equipment_Checkbox_Sync;
    public static String        Dialog_Equipment_Checkbox_Sync_Tooltip;
    public static String        Dialog_Equipment_Combo_PriceUnit_Tooltip;
-   public static String        Dialog_Equipment_Dialog_Message_Eqipment_Duplicate;
-   public static String        Dialog_Equipment_Dialog_Message_Eqipment_Edit;
-   public static String        Dialog_Equipment_Dialog_Message_Eqipment_New;
+   public static String        Dialog_Equipment_Dialog_Message_Equipment_Duplicate;
+   public static String        Dialog_Equipment_Dialog_Message_Equipment_Edit;
+   public static String        Dialog_Equipment_Dialog_Message_Equipment_New;
    public static String        Dialog_Equipment_Dialog_Title;
    public static String        Dialog_Equipment_Error_BrandModelIsEmpty;
    public static String        Dialog_Equipment_Error_CannotLoadImage;
@@ -1016,14 +1016,15 @@ public class Messages extends NLS {
    public static String        Dialog_SearchProduct_Button_Add;
    public static String        Dialog_SearchProduct_Button_Add_Tooltip;
    public static String        Dialog_SearchProduct_Button_Search;
-   public static String        Dialog_SearchProduct_Combo_SearchType_ByName;
    public static String        Dialog_SearchProduct_Combo_SearchType_ByCode;
+   public static String        Dialog_SearchProduct_Combo_SearchType_ByName;
    public static String        Dialog_SearchProduct_Label_AlreadyExists;
+   public static String        Dialog_SearchProduct_Label_Error_Message;
    public static String        Dialog_SearchProduct_Label_Keywords;
-   public static String        Dialog_SearchProduct_Label_SearchType;
    public static String        Dialog_SearchProduct_Label_NotFound;
-   public static String        Dialog_SearchProduct_Message;
+   public static String        Dialog_SearchProduct_Label_SearchType;
    public static String        Dialog_SearchProduct_Link_ProductCreationRequest;
+   public static String        Dialog_SearchProduct_Message;
    public static String        Dialog_SearchProduct_Title;
    public static String        Dialog_SearchProduct_Tooltip_InvalidBarcode;
 
@@ -2029,6 +2030,11 @@ public class Messages extends NLS {
    public static String        pref_map_layout_symbol_line;
    public static String        pref_map_layout_symbol_square;
    public static String        pref_map_layout_symbol_width;
+
+   public static String        Pref_Nutrition_Label_NumberOfRecentProducts;
+   public static String        Pref_Nutrition_Label_NumberOfRecentProducts_Tooltip;
+   public static String        Pref_Nutrition_Button_RemoveRecentProducts;
+   public static String        Pref_Nutrition_Button_RemoveRecentProducts_Tooltip;
 
    public static String        Pref_People_Action_add_person;
    public static String        Pref_People_Button_HrZones_ComputeAllTours;
