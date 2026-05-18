@@ -120,7 +120,7 @@ public class EquipmentManager {
    public static final short                 EXPAND_TYPE_YEAR_TOUR        = 1;
    public static final short                 EXPAND_TYPE_YEAR_MONTH_TOUR  = 2;
 
-   static final String[]                     EXPAND_TYPE_ACTION_LABELS            = {
+   static final String[]                     EXPAND_TYPE_ACTION_LABELS    = {
 
          Messages.app_action_expand_type_flat,
          Messages.app_action_expand_type_year_day,
@@ -257,7 +257,7 @@ public class EquipmentManager {
       // remove old equipment from cached tours
       clearCachedValues();
 
-      EquipmentMenuManager.clearRecentEquipment();
+      EquipmentMenuManager.clearPreviousAndRecentEquipment();
 
       TourManager.getInstance().clearTourDataCache();
 
@@ -753,6 +753,53 @@ public class EquipmentManager {
       }
 
       return returnResult;
+   }
+
+   /**
+    * Remove all selected equipment from the selected tours
+    *
+    * @param allEquipment
+    * @param tourProvider
+    * @param isSaveTour
+    * @param isCheckTourEditor
+    *           When <code>true</code> then the tour editor is check if it is dirty
+    */
+   public static void equipment_Remove(final Collection<Equipment> allEquipment,
+                                       final ITourProvider tourProvider,
+                                       final boolean isSaveTour,
+                                       final boolean isCheckTourEditor) {
+
+      // fix https://github.com/mytourbook/mytourbook/issues/1437
+      if (isCheckTourEditor) {
+
+         if (TourManager.isTourEditorModified()) {
+            return;
+         }
+      }
+
+      final ITourDataUpdate_OnlyUpdate tourDataUpdater = new ITourDataUpdate_OnlyUpdate() {
+
+         @Override
+         public boolean updateTourData(final TourData tourData) {
+
+            final Set<Equipment> allTourEquipment = tourData.getEquipment();
+
+            boolean isRemoved = false;
+
+            for (final Equipment equipment : allEquipment) {
+
+               final boolean isRemovedOneTour = allTourEquipment.remove(equipment);
+
+               if (isRemovedOneTour) {
+                  isRemoved = true;
+               }
+            }
+
+            return isRemoved;
+         }
+      };
+
+      updateTours(tourProvider, tourDataUpdater, isSaveTour);
    }
 
    /**

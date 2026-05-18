@@ -215,11 +215,11 @@ public class DialogEquipment extends TitleAreaDialog {
 
       final String messageTitle = _isDuplicateEquipment
 
-            ? Messages.Dialog_Equipment_Dialog_Message_Eqipment_Duplicate
+            ? Messages.Dialog_Equipment_Dialog_Message_Equipment_Duplicate
             : _isNewEquipment
 
-                  ? Messages.Dialog_Equipment_Dialog_Message_Eqipment_New
-                  : Messages.Dialog_Equipment_Dialog_Message_Eqipment_Edit;
+                  ? Messages.Dialog_Equipment_Dialog_Message_Equipment_New
+                  : Messages.Dialog_Equipment_Dialog_Message_Equipment_Edit;
 
       setTitle(messageTitle);
       setMessage(_equipment.getName());

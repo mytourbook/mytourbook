@@ -42,6 +42,7 @@ import net.tourbook.equipment.EquipmentManager;
 import net.tourbook.equipment.EquipmentMenuManager;
 import net.tourbook.equipment.tour.filter.TourEquipmentFilterManager;
 import net.tourbook.map.player.ModelPlayerManager;
+import net.tourbook.nutrition.TourNutritionProductMenuManager;
 import net.tourbook.photo.PhotoUI;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.preferences.PrefPagePeople;
@@ -491,6 +492,7 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
          EquipmentMenuManager.restoreState();
          TagMenuManager.restoreTagState();
          TourTypeMenuManager.restoreState();
+         TourNutritionProductMenuManager.restoreState();
 
          loadPeopleData();
          setupAppSelectionListener();

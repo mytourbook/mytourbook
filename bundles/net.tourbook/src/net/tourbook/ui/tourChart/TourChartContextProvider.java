@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2024 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2026 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -57,7 +57,7 @@ public class TourChartContextProvider implements IChartContextProvider, ITourPro
 
    private final ITourChartViewer           _tourChartViewer;
 
-   private TagMenuManager                   _tagMenuMgr;
+   private TagMenuManager                   _tagMenuManager;
    private TourTypeMenuManager              _tourTypeMenuManager;
 
    private ActionCreateRefTour              _actionCreateRefTour;
@@ -135,7 +135,7 @@ public class TourChartContextProvider implements IChartContextProvider, ITourPro
 
       _actionSetTourType = new ActionSetTourTypeMenu(this);
 
-      _tagMenuMgr = new TagMenuManager(this, true);
+      _tagMenuManager = new TagMenuManager(this, true);
       _tourTypeMenuManager = new TourTypeMenuManager(this);
 
       _actionPrefDialog = new ActionOpenPrefDialog(
@@ -194,7 +194,7 @@ public class TourChartContextProvider implements IChartContextProvider, ITourPro
       menuMgr.add(_actionExportTour);
 
       // tour tag actions
-      _tagMenuMgr.fillTagMenu(menuMgr);
+      _tagMenuManager.fillTagMenu(menuMgr);
 
       // tour type actions
       menuMgr.add(new Separator());
@@ -231,7 +231,7 @@ public class TourChartContextProvider implements IChartContextProvider, ITourPro
       _actionOpenTour.setEnabled(isTourSaved);
       _actionExportTour.setEnabled(true);
 
-      _tagMenuMgr.enableTagActions(
+      _tagMenuManager.enableTagActions(
             isTourSaved,
             isTourSaved && tourTags.size() > 0,
             tourTags);
@@ -351,13 +351,13 @@ public class TourChartContextProvider implements IChartContextProvider, ITourPro
    @Override
    public void onHideContextMenu(final MenuEvent menuEvent, final Control menuParentControl) {
 
-      _tagMenuMgr.onHideMenu();
+      _tagMenuManager.onHideMenu();
    }
 
    @Override
    public void onShowContextMenu(final MenuEvent menuEvent, final Control menuParentControl) {
 
-      _tagMenuMgr.onShowMenu(
+      _tagMenuManager.onShowMenu(
             menuEvent,
             menuParentControl,
             Display.getCurrent().getCursorLocation(),

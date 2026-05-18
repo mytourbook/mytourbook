@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2011, 2025 Matthias Helmling and Contributors
+ * Copyright (C) 2011, 2026 Matthias Helmling and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -50,6 +50,7 @@ import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.action.Separator;
 import org.eclipse.swt.events.MenuAdapter;
 import org.eclipse.swt.events.MenuEvent;
+import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Menu;
@@ -176,12 +177,23 @@ public class TourContextMenu {
          public void menuHidden(final MenuEvent e) {
 
             _tagMenuManager.onHideMenu();
+            _equipmentMenuManager.onHideMenu();
          }
 
          @Override
          public void menuShown(final MenuEvent menuEvent) {
 
-            _tagMenuManager.onShowMenu(menuEvent, control, Display.getCurrent().getCursorLocation(), null);
+            final Point cursorLocation = Display.getCurrent().getCursorLocation();
+
+            _tagMenuManager.onShowMenu(menuEvent,
+                  control,
+                  cursorLocation,
+                  null);
+
+            _equipmentMenuManager.onShowMenu(menuEvent,
+                  control,
+                  cursorLocation,
+                  null);
          }
       });
 

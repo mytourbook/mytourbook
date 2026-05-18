@@ -602,8 +602,8 @@ public class TourDataEditorView extends ViewPart implements
    //
    private ArrayList<Action_SetSwimStyle>                             _allSwimStyleActions;
    //
-   private EquipmentMenuManager                                       _equipmentMenuMgr;
-   private TagMenuManager                                             _tagMenuMgr;
+   private EquipmentMenuManager                                       _equipmentMenuManager;
+   private TagMenuManager                                             _tagMenuManager;
    //
    /**
     * Number of digits for the lat/lon columns.
@@ -3252,8 +3252,8 @@ public class TourDataEditorView extends ViewPart implements
       _actionDeleteTimeSlices_KeepTimeAndDistance                 = new ActionDeleteTimeSlices_KeepTimeAndDistance(this);
       _actionDeleteTimeSlices_RemoveTime                          = new ActionDeleteTimeSlices_RemoveTime(this);
 
-      _equipmentMenuMgr = new EquipmentMenuManager(this, false, false);
-      _tagMenuMgr       = new TagMenuManager(this, false);
+      _equipmentMenuManager = new EquipmentMenuManager(this, false, false);
+      _tagMenuManager       = new TagMenuManager(this, false);
 
 // SET_FORMATTING_ON
 
@@ -3538,8 +3538,8 @@ public class TourDataEditorView extends ViewPart implements
          final Set<TourTag> tourTags = _tourData.getTourTags();
          final boolean isTagInTour = tourTags.size() > 0;
 
-         _tagMenuMgr.fillTagMenu(menuManager);
-         _tagMenuMgr.enableTagActions(true, isTagInTour, tourTags);
+         _tagMenuManager.fillTagMenu(menuManager);
+         _tagMenuManager.enableTagActions(true, isTagInTour, tourTags);
       });
 
       // set menu for the tag link control
@@ -3547,7 +3547,8 @@ public class TourDataEditorView extends ViewPart implements
       tagContextMenu.addMenuListener(new MenuAdapter() {
          @Override
          public void menuHidden(final MenuEvent e) {
-            _tagMenuMgr.onHideMenu();
+
+            _tagMenuManager.onHideMenu();
          }
 
          @Override
@@ -3557,7 +3558,7 @@ public class TourDataEditorView extends ViewPart implements
             Point pt = new Point(rect.x, rect.y + rect.height);
             pt = _linkTag.getParent().toDisplay(pt);
 
-            _tagMenuMgr.onShowMenu(menuEvent, _linkTag, pt, null);
+            _tagMenuManager.onShowMenu(menuEvent, _linkTag, pt, null);
          }
       });
 
@@ -3571,7 +3572,7 @@ public class TourDataEditorView extends ViewPart implements
       menuMgr.setRemoveAllWhenShown(true);
       menuMgr.addMenuListener(menuManager -> {
 
-         _equipmentMenuMgr.fillEquipmentMenu(menuManager);
+         _equipmentMenuManager.fillEquipmentMenu(menuManager);
       });
 
       // set menu for the equipment link control

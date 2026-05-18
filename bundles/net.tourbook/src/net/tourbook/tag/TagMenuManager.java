@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2025 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2026 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -85,73 +85,73 @@ public class TagMenuManager implements IActionProvider {
 
 // SET_FORMATTING_ON
 
-   private static final String            SETTINGS_SECTION_RECENT_TAGS = "TagManager.RecentTags";                              //$NON-NLS-1$
-   private static final String            STATE_RECENT_TAGS            = "tagId";                                              //$NON-NLS-1$
-   private static final String            STATE_PREVIOUS_TAGS          = UI.EMPTY_STRING;
+   private static final String              SETTINGS_SECTION_RECENT_TAGS = "TagManager.RecentTags";                              //$NON-NLS-1$
+   private static final String              STATE_RECENT_TAGS            = "tagId";                                              //$NON-NLS-1$
+   private static final String              STATE_PREVIOUS_TAGS          = UI.EMPTY_STRING;
 
-   private static final IPreferenceStore  _prefStore                   = TourbookPlugin.getPrefStore();
-   private static final IDialogSettings   _state                       = TourbookPlugin.getState(SETTINGS_SECTION_RECENT_TAGS);
+   private static final IPreferenceStore    _prefStore                   = TourbookPlugin.getPrefStore();
+   private static final IDialogSettings     _state                       = TourbookPlugin.getState(SETTINGS_SECTION_RECENT_TAGS);
 
-   private static IPropertyChangeListener _prefChangeListener;
+   private static IPropertyChangeListener   _prefChangeListener;
 
-   private static TagMenuManager          _currentInstance;
-   private static boolean                 _isAdvMenu;
+   private static TagMenuManager            _currentInstance;
+   private static boolean                   _isAdvMenu;
 
-   private static ActionRecentTag[]       _actionsRecentTags;
-   private static ActionAllPreviousTags   _actionAllPreviousTags;
+   private static ActionRecentTag[]         _allActions_RecentTags;
+   private static ActionWithAllPreviousTags _actionWithAllPreviousTags;
 
    /**
     * Number of tags which are displayed in the context menu or saved in the dialog settings, it's
     * max number is 9 to have a unique accelerator key
     */
-   private static LinkedList<TourTag>     _recentTags                  = new LinkedList<>();
+   private static int                       _maxRecentActions            = -1;
+
+   private static LinkedList<TourTag>       _allRecentTags               = new LinkedList<>();
 
    /**
     * Contains all tags which are added by the last add action
     */
-   private static HashMap<Long, TourTag>  _allPreviousTags             = new HashMap<>();
-
-   private static int                     _maxRecentActions            = -1;
+   private static HashMap<Long, TourTag>    _allPreviousTags             = new HashMap<>();
 
    /**
     * Contains all tag id's when only one tour is selected
     */
-   private static HashSet<Long>           _allTagIds_OneTour;
+   private static HashSet<Long>             _allTagIds_OneTour;
 
-   private static Map<Long, TourTag>      _allTags_WhenCopied;
+   private static Map<Long, TourTag>        _allTags_WhenCopied;
 
-   private static boolean                 _isEnableRecentTagActions;
+   private static boolean                   _isEnableRecentTagActions;
 
-   private static int                     _taggingAutoOpenDelay;
-   private static boolean                 _isTaggingAutoOpen;
-   private static boolean                 _isTaggingAnimation;
-   private boolean                        _isSaveTour;
+   private static int                       _taggingAutoOpenDelay;
+   private static boolean                   _isTaggingAutoOpen;
+   private static boolean                   _isTaggingAnimation;
+   private boolean                          _isSaveTour;
 
-   private ITourProvider                  _tourProvider;
+   private ITourProvider                    _tourProvider;
 
-   private HashMap<String, Object>        _allTagActions;
+   private HashMap<String, Object>          _allTagActions;
 
-   private ActionAddRecentTags            _actionAddRecentTags;
-   private ActionAddTourTag_SubMenu       _actionAddTag;
-   private ActionTagGroups_SubMenu        _actionAddTagGroups;
-   private ActionClipboard_CopyTags       _actionClipboard_CopyTags;
-   private ActionClipboard_PasteTags      _actionClipboard_PasteTags;
-   private Action_RemoveTourTag_SubMenu   _actionRemoveTag;
-   private Action_RemoveAllTags           _actionRemoveAllTags;
-   private ActionShowTourTagsView         _actionSetTags;
-   private ActionOpenPrefDialog           _actionTagGroupPreferences;
+   private ActionAddRecentTags              _actionAddRecentTags;
+   private ActionAddTourTag_SubMenu         _actionAddTag;
+   private ActionTagGroups_SubMenu          _actionAddTagGroups;
+   private ActionClipboard_CopyTags         _actionClipboard_CopyTags;
+   private ActionClipboard_PasteTags        _actionClipboard_PasteTags;
+   private Action_RemoveTourTag_SubMenu     _actionRemoveTag;
+   private Action_RemoveAllTags             _actionRemoveAllTags;
+   private ActionShowTourTagsView           _actionSetTags;
+   private ActionOpenPrefDialog             _actionTagGroupPreferences;
 
-   private ActionContributionItem         _actionContribItem_AddTag_AutoOpen_Current;
-   private ActionContributionItem         _actionContribItem_AddTag_AutoOpen_Default;
-   private ActionContributionItem         _actionContribItem_AddTag_AutoOpen_Flat;
-   private ActionContributionItem         _actionContribItem_AddTag_AutoOpen_Tree;
+   private ActionContributionItem           _actionContribItem_AddTag_AutoOpen_Current;
+   private ActionContributionItem           _actionContribItem_AddTag_AutoOpen_Default;
+   private ActionContributionItem           _actionContribItem_AddTag_AutoOpen_Flat;
+   private ActionContributionItem           _actionContribItem_AddTag_AutoOpen_Tree;
 
-   private AdvancedMenuForActions         _advancedMenuToAddTags_Current;
-   private AdvancedMenuForActions         _advancedMenuToAddTags_Default;
-   private AdvancedMenuForActions         _advancedMenuToAddTags_Flat;
-   private AdvancedMenuForActions         _advancedMenuToAddTags_Tree;
+   private AdvancedMenuForActions           _advancedMenuToAddTags_Current;
+   private AdvancedMenuForActions           _advancedMenuToAddTags_Default;
+   private AdvancedMenuForActions           _advancedMenuToAddTags_Flat;
+   private AdvancedMenuForActions           _advancedMenuToAddTags_Tree;
 
-   private TagTransfer                    _tagTransfer                 = new TagTransfer();
+   private TagTransfer                      _tagTransfer                 = new TagTransfer();
 
    /**
     * Removes all tags
@@ -167,32 +167,6 @@ public class TagMenuManager implements IActionProvider {
       public void run() {
 
          BusyIndicator.showWhile(Display.getCurrent(), () -> removeAllTags());
-      }
-   }
-
-   /**
-    *
-    */
-   private static class ActionAllPreviousTags extends Action {
-
-      public ActionAllPreviousTags() {
-         super(net.tourbook.ui.UI.IS_NOT_INITIALIZED, AS_CHECK_BOX);
-      }
-
-      @Override
-      public void run() {
-
-         if (_isAdvMenu) {
-
-            final ActionAddTourTag_SubMenu actionAddTagAdvanced =
-                  (ActionAddTourTag_SubMenu) _currentInstance._actionContribItem_AddTag_AutoOpen_Current.getAction();
-
-            actionAddTagAdvanced.setTourTag(isChecked(), _allPreviousTags);
-
-         } else {
-
-            _currentInstance.saveTourTags(_allPreviousTags, isChecked());
-         }
       }
    }
 
@@ -240,19 +214,17 @@ public class TagMenuManager implements IActionProvider {
       @Override
       public void run() {
 
-         final ActionAddTourTag_SubMenu actionAddTagAdvanced =
-               (ActionAddTourTag_SubMenu) _currentInstance._actionContribItem_AddTag_AutoOpen_Current.getAction();
-
          if (_isAdvMenu) {
+
+            final ActionAddTourTag_SubMenu actionAddTagAdvanced =
+                  (ActionAddTourTag_SubMenu) _currentInstance._actionContribItem_AddTag_AutoOpen_Current.getAction();
+
             actionAddTagAdvanced.setTourTag(isChecked(), _tag);
+
          } else {
+
             _currentInstance.saveTourTags(_tag, isChecked());
          }
-      }
-
-      private void setupTagAction(final TourTag tag, final String tagText) {
-         setText(tagText);
-         _tag = tag;
       }
 
       @Override
@@ -260,6 +232,12 @@ public class TagMenuManager implements IActionProvider {
          return "ActionRecentTag [_tag=" + _tag + "]"; //$NON-NLS-1$ //$NON-NLS-2$
       }
 
+      private void updateTagAction(final TourTag tag, final String tagText) {
+
+         setText(tagText);
+
+         _tag = tag;
+      }
    }
 
    public class ActionShowTourTagsView extends Action {
@@ -338,6 +316,35 @@ public class TagMenuManager implements IActionProvider {
          }
 
          addActionToMenu(_actionTagGroupPreferences);
+      }
+   }
+
+   /**
+    * Set all tags at once which were set in the previously action but only when multiple tags were
+    * added
+    */
+   private static class ActionWithAllPreviousTags extends Action {
+
+      public ActionWithAllPreviousTags() {
+
+         // the correct action name is set later
+         super(net.tourbook.ui.UI.IS_NOT_INITIALIZED, AS_CHECK_BOX);
+      }
+
+      @Override
+      public void run() {
+
+         if (_isAdvMenu) {
+
+            final ActionAddTourTag_SubMenu actionAddTagAdvanced =
+                  (ActionAddTourTag_SubMenu) _currentInstance._actionContribItem_AddTag_AutoOpen_Current.getAction();
+
+            actionAddTagAdvanced.setTourTag(isChecked(), _allPreviousTags);
+
+         } else {
+
+            _currentInstance.saveTourTags(_allPreviousTags, isChecked());
+         }
       }
    }
 
@@ -462,18 +469,19 @@ public class TagMenuManager implements IActionProvider {
    public static void clearRecentTags() {
 
       _allPreviousTags.clear();
-      _recentTags.clear();
+      _allRecentTags.clear();
    }
 
-   static void enableRecentTagActions(final boolean isAddTagEnabled, final Set<Long> existingTagIds) {
+   static void enableActions_Recent(final boolean isAddTagEnabled,
+                                    final Set<Long> existingTagIds) {
 
-      if (_actionsRecentTags == null) {
+      if (_allActions_RecentTags == null) {
          return;
       }
 
       final boolean isExistingTagIds = _allTagIds_OneTour != null && _allTagIds_OneTour.size() > 0;
 
-      for (final ActionRecentTag actionRecentTag : _actionsRecentTags) {
+      for (final ActionRecentTag actionRecentTag : _allActions_RecentTags) {
 
          final TourTag actionTag = actionRecentTag._tag;
 
@@ -526,15 +534,14 @@ public class TagMenuManager implements IActionProvider {
             }
          }
 
-         _actionAllPreviousTags.setChecked(isTagChecked);
-         _actionAllPreviousTags.setEnabled(isTagChecked == false);
+         _actionWithAllPreviousTags.setChecked(isTagChecked);
+         _actionWithAllPreviousTags.setEnabled(isTagChecked == false);
 
       } else {
 
-         _actionAllPreviousTags.setChecked(false);
-         _actionAllPreviousTags.setEnabled(false);
+         _actionWithAllPreviousTags.setChecked(false);
+         _actionWithAllPreviousTags.setEnabled(false);
       }
-
    }
 
    private static void restoreAutoOpen() {
@@ -555,7 +562,7 @@ public class TagMenuManager implements IActionProvider {
             try {
                final TourTag tag = allTags.get(Long.valueOf(tagId));
                if (tag != null) {
-                  _recentTags.add(tag);
+                  _allRecentTags.add(tag);
                }
             } catch (final NumberFormatException e) {
                // ignore
@@ -583,10 +590,10 @@ public class TagMenuManager implements IActionProvider {
 
       if (_maxRecentActions > 0) {
 
-         final String[] tagIds = new String[Math.min(_maxRecentActions, _recentTags.size())];
+         final String[] tagIds = new String[Math.min(_maxRecentActions, _allRecentTags.size())];
          int tagIndex = 0;
 
-         for (final TourTag tag : _recentTags) {
+         for (final TourTag tag : _allRecentTags) {
 
             tagIds[tagIndex++] = Long.toString(tag.getTagId());
 
@@ -612,27 +619,34 @@ public class TagMenuManager implements IActionProvider {
    }
 
    /**
-    * create actions for recent tags
+    * Create actions for recent tags
     */
    private static void setupRecentActions() {
 
       _maxRecentActions = _prefStore.getInt(ITourbookPreferences.APPEARANCE_NUMBER_OF_RECENT_TAGS);
 
-      _actionsRecentTags = new ActionRecentTag[_maxRecentActions];
+      _allActions_RecentTags = new ActionRecentTag[_maxRecentActions];
 
-      for (int actionIndex = 0; actionIndex < _actionsRecentTags.length; actionIndex++) {
-         _actionsRecentTags[actionIndex] = new ActionRecentTag();
+      for (int actionIndex = 0; actionIndex < _allActions_RecentTags.length; actionIndex++) {
+         _allActions_RecentTags[actionIndex] = new ActionRecentTag();
       }
 
-      _actionAllPreviousTags = new ActionAllPreviousTags();
+      _actionWithAllPreviousTags = new ActionWithAllPreviousTags();
    }
 
-   static void updatePreviousTagState(final HashMap<Long, TourTag> modifiedTags) {
+   /**
+    * Check if all previous tags are contained in the modified tags
+    *
+    * @param allModifiedTags
+    */
+   static void updatePreviousTagState(final HashMap<Long, TourTag> allModifiedTags) {
 
-      // check if all previous tags are contained in the modified tags
       for (final TourTag previousTag : _allPreviousTags.values()) {
-         if (modifiedTags.containsKey(previousTag.getTagId()) == false) {
-            _actionAllPreviousTags.setChecked(false);
+
+         if (allModifiedTags.containsKey(previousTag.getTagId()) == false) {
+
+            _actionWithAllPreviousTags.setChecked(false);
+
             return;
          }
       }
@@ -645,7 +659,7 @@ public class TagMenuManager implements IActionProvider {
 
       final HashMap<Long, TourTag> allTourTags = TourDatabase.getAllTourTags();
 
-      for (final TourTag recentTag : _recentTags) {
+      for (final TourTag recentTag : _allRecentTags) {
 
          final TourTag tourTag = allTourTags.get(recentTag.getTagId());
          if (tourTag != null) {
@@ -785,7 +799,7 @@ public class TagMenuManager implements IActionProvider {
       final boolean isAddTagEnabled = isTourSelected;
       final boolean isRemoveTagEnabled;
 
-      final HashSet<Long> allTourTagIds = new HashSet<>();
+      final HashSet<Long> allNewOneTourTagIds = new HashSet<>();
 
       if (isOneTour) {
 
@@ -798,7 +812,7 @@ public class TagMenuManager implements IActionProvider {
             isRemoveTagEnabled = true;
 
             for (final Long tagId : oneTourTagIds) {
-               allTourTagIds.add(tagId);
+               allNewOneTourTagIds.add(tagId);
             }
 
          } else {
@@ -816,7 +830,7 @@ public class TagMenuManager implements IActionProvider {
       }
 
       _isEnableRecentTagActions = isAddTagEnabled;
-      _allTagIds_OneTour = allTourTagIds;
+      _allTagIds_OneTour = allNewOneTourTagIds;
 
       enableTagActions_Internal(isAddTagEnabled, isRemoveTagEnabled, isFlatLayout);
    }
@@ -824,16 +838,17 @@ public class TagMenuManager implements IActionProvider {
    /**
     * @param isAddTagEnabled
     * @param isRemoveTagEnabled
-    * @param tourTags
+    * @param allTourTags
     */
    public void enableTagActions(final boolean isAddTagEnabled,
                                 final boolean isRemoveTagEnabled,
-                                final Set<TourTag> tourTags) {
+                                final Set<TourTag> allTourTags) {
 
       // get tag id's from all tags
       final HashSet<Long> allExistingTagIds = new HashSet<>();
-      if (tourTags != null) {
-         for (final TourTag tourTag : tourTags) {
+
+      if (allTourTags != null) {
+         for (final TourTag tourTag : allTourTags) {
             allExistingTagIds.add(tourTag.getTagId());
          }
       }
@@ -883,7 +898,7 @@ public class TagMenuManager implements IActionProvider {
 
 // SET_FORMATTING_ON
 
-      enableRecentTagActions(isAddTagEnabled, _allTagIds_OneTour);
+      enableActions_Recent(isAddTagEnabled, _allTagIds_OneTour);
    }
 
    @Override
@@ -950,12 +965,14 @@ public class TagMenuManager implements IActionProvider {
    }
 
    /**
-    * @param menuMgr
+    * Fill recent tags into the menu, either with a {@link IMenuManager} or with a {@link Menu}
+    *
+    * @param menuManager
     * @param menu
     */
-   void fillTagMenu_WithRecentTags(final IMenuManager menuMgr, final Menu menu) {
+   void fillTagMenu_WithRecentTags(final IMenuManager menuManager, final Menu menu) {
 
-      if (_recentTags.isEmpty()) {
+      if (_allRecentTags.isEmpty()) {
          return;
       }
 
@@ -970,7 +987,7 @@ public class TagMenuManager implements IActionProvider {
          final Collection<TourTag> allPreviousTags = _allPreviousTags.values();
 
          // check if the first previous tag is the same as the first recent tag
-         if (numPreviousTags > 1 || allPreviousTags.iterator().next().equals(_recentTags.get(0)) == false) {
+         if (numPreviousTags > 1 || allPreviousTags.iterator().next().equals(_allRecentTags.get(0)) == false) {
 
             final StringBuilder sb = new StringBuilder();
             boolean isFirst = true;
@@ -982,6 +999,7 @@ public class TagMenuManager implements IActionProvider {
                } else {
                   sb.append(UI.COMMA_SPACE);
                }
+
                sb.append(recentTag.getTagName());
             }
 
@@ -999,17 +1017,17 @@ public class TagMenuManager implements IActionProvider {
                tagText = UI.shortenText(tagText, maxTextWidth, true);
             }
 
-            final ActionContributionItem actionContributionItem = new ActionContributionItem(_actionAllPreviousTags);
+            final ActionContributionItem actionContributionItem = new ActionContributionItem(_actionWithAllPreviousTags);
 
             if (menu == null) {
 
-               _actionAllPreviousTags.setText(UI.SPACE4 + UI.MNEMONIC + 0 + UI.SPACE2 + tagText);
+               _actionWithAllPreviousTags.setText(UI.SPACE4 + UI.MNEMONIC + 0 + UI.SPACE2 + tagText);
 
-               menuMgr.add(actionContributionItem);
+               menuManager.add(actionContributionItem);
 
             } else {
 
-               _actionAllPreviousTags.setText(UI.MNEMONIC + 0 + UI.SPACE2 + tagText);
+               _actionWithAllPreviousTags.setText(UI.MNEMONIC + 0 + UI.SPACE2 + tagText);
 
                actionContributionItem.fill(menu, -1);
             }
@@ -1018,16 +1036,16 @@ public class TagMenuManager implements IActionProvider {
 
       // add all recent tags
       int tagIndex = 0;
-      for (final ActionRecentTag actionRecentTag : _actionsRecentTags) {
+      for (final ActionRecentTag actionRecentTag : _allActions_RecentTags) {
 
-         if (tagIndex >= _recentTags.size()) {
+         if (tagIndex >= _allRecentTags.size()) {
 
             // there are no more recent tags
 
             break;
          }
 
-         final TourTag tag = _recentTags.get(tagIndex);
+         final TourTag tag = _allRecentTags.get(tagIndex);
 
          String tagText = tag.getTagName();
 
@@ -1038,15 +1056,15 @@ public class TagMenuManager implements IActionProvider {
 
          if (menu == null) {
 
-            actionRecentTag.setupTagAction(
+            actionRecentTag.updateTagAction(
                   tag,
                   (UI.SPACE4 + UI.MNEMONIC + (tagIndex + 1) + UI.SPACE2 + tagText));
 
-            menuMgr.add(new ActionContributionItem(actionRecentTag));
+            menuManager.add(new ActionContributionItem(actionRecentTag));
 
          } else {
 
-            actionRecentTag.setupTagAction(
+            actionRecentTag.updateTagAction(
                   tag,
                   (UI.MNEMONIC + (tagIndex + 1) + UI.SPACE2 + tagText));
 
@@ -1138,7 +1156,7 @@ public class TagMenuManager implements IActionProvider {
    }
 
    /**
-    * This is called when the menu is displayed which contains the tag actions.
+    * This is called when the menu is displayed which contains the tag actions
     *
     * @param menuEvent
     * @param menuParentControl
@@ -1161,12 +1179,13 @@ public class TagMenuManager implements IActionProvider {
    }
 
    /**
-    * This is called when the menu is displayed which contains the tag actions.
+    * This is called when the menu is displayed which contains the tag actions
     *
     * @param menuEvent
     * @param menuParentControl
     * @param menuPosition
     * @param toolTip
+    * @param isFlatView
     */
    public void onShowMenu(final MenuEvent menuEvent,
                           final Control menuParentControl,
@@ -1259,11 +1278,11 @@ public class TagMenuManager implements IActionProvider {
    /**
     * Add/remove and save for multiple tour tags
     *
-    * @param mapWithAllModifiedTags
+    * @param allModifiedTagsMap
     * @param isAddMode
     *           When <code>true</code> then tags are added otherwise they are removed
     */
-   void saveTourTags(final HashMap<Long, TourTag> mapWithAllModifiedTags, final boolean isAddMode) {
+   void saveTourTags(final HashMap<Long, TourTag> allModifiedTagsMap, final boolean isAddMode) {
 
       final Runnable runnable = () -> {
 
@@ -1274,7 +1293,7 @@ public class TagMenuManager implements IActionProvider {
             return;
          }
 
-         final Collection<TourTag> allModifiedTags = mapWithAllModifiedTags.values();
+         final Collection<TourTag> allModifiedTags = allModifiedTagsMap.values();
 
          // add the tag into all selected tours
          for (final TourData tourData : allSelectedTours) {
@@ -1297,18 +1316,18 @@ public class TagMenuManager implements IActionProvider {
          // update recent tags
          for (final TourTag tag : allModifiedTags) {
 
-            _recentTags.remove(tag);
-            _recentTags.addFirst(tag);
+            _allRecentTags.remove(tag);
+            _allRecentTags.addFirst(tag);
          }
 
          // it's possible that both hash maps are the same when previous tags has been added as last
-         if (_allPreviousTags != mapWithAllModifiedTags) {
+         if (_allPreviousTags != allModifiedTagsMap) {
 
             _allPreviousTags.clear();
-            _allPreviousTags.putAll(mapWithAllModifiedTags);
+            _allPreviousTags.putAll(allModifiedTagsMap);
          }
 
-         saveAndNotify(mapWithAllModifiedTags, allSelectedTours);
+         saveAndNotify(allModifiedTagsMap, allSelectedTours);
       };
 
       BusyIndicator.showWhile(Display.getCurrent(), runnable);
@@ -1339,10 +1358,10 @@ public class TagMenuManager implements IActionProvider {
     */
    void saveTourTags(final TourTag tag, final boolean isAddMode) {
 
-      final HashMap<Long, TourTag> tags = new HashMap<>();
-      tags.put(tag.getTagId(), tag);
+      final HashMap<Long, TourTag> allTags = new HashMap<>();
+      allTags.put(tag.getTagId(), tag);
 
-      saveTourTags(tags, isAddMode);
+      saveTourTags(allTags, isAddMode);
    }
 
    void setIsAdvanceMenu() {

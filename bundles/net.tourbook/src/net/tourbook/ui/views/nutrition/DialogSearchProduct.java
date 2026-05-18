@@ -21,7 +21,6 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 import java.util.stream.Stream;
 
 import net.tourbook.Images;
@@ -41,6 +40,7 @@ import net.tourbook.data.TourNutritionProduct;
 import net.tourbook.nutrition.NutritionQuery;
 import net.tourbook.nutrition.NutritionUtils;
 import net.tourbook.nutrition.ProductSearchType;
+import net.tourbook.nutrition.TourNutritionProductMenuManager;
 import net.tourbook.nutrition.openfoodfacts.Product;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.tour.TourManager;
@@ -129,7 +129,7 @@ public class DialogSearchProduct extends TitleAreaDialog implements ITourViewer,
    private IPropertyChangeListener   _prefChangeListener;
    private SelectionListener         _columnSortListener;
 
-   private AutoComplete_ComboInputMT _autocompleteProductSearchHistory;
+   private AutoComplete_ComboInputMT _autoCompleteProductSearchHistory;
 
    private ControlDecoration         _decorator_InvalidBarCode;
 
@@ -145,20 +145,22 @@ public class DialogSearchProduct extends TitleAreaDialog implements ITourViewer,
    /*
     * UI controls
     */
-   private Button    _btnAdd;
-   private Button    _btnSearch;
+   private Button                          _btnAdd;
+   private Button                          _btnSearch;
 
-   private Label     _lblKeywords;
-   private Label     _lblSearchType;
+   private Label                           _lblKeywords;
+   private Label                           _lblSearchType;
 
-   private Combo     _comboSearchQuery;
-   private Combo     _comboSearchType;
+   private Combo                           _comboSearchQuery;
+   private Combo                           _comboSearchType;
 
-   private Composite _viewerContainer;
+   private Composite                       _viewerContainer;
 
-   private Menu      _tableContextMenu;
+   private Menu                            _tableContextMenu;
 
-   private Image     _imageDialog = TourbookPlugin.getImageDescriptor(Images.TourNutrition).createImage();
+   private Image                           _imageDialog = TourbookPlugin.getImageDescriptor(Images.TourNutrition).createImage();
+
+   private TourNutritionProductMenuManager _tourNutritionProductMenuManager;
 
    private class ActionAddProduct extends Action {
 
@@ -362,7 +364,7 @@ public class DialogSearchProduct extends TitleAreaDialog implements ITourViewer,
       }
    }
 
-   public DialogSearchProduct(final Shell parentShell, final long tourId) {
+   public DialogSearchProduct(final Shell parentShell, final long tourId, final TourNutritionProductMenuManager tourNutritionProductMenuManager) {
 
       super(parentShell);
 
@@ -373,6 +375,7 @@ public class DialogSearchProduct extends TitleAreaDialog implements ITourViewer,
       setDefaultImage(_imageDialog);
 
       _tourId = tourId;
+      _tourNutritionProductMenuManager = tourNutritionProductMenuManager;
    }
 
    private void addPrefListener() {
@@ -677,7 +680,10 @@ public class DialogSearchProduct extends TitleAreaDialog implements ITourViewer,
 
    private void defineColumn_10_Barcode() {
 
-      final TableColumnDefinition colDef = new TableColumnDefinition(_columnManager, COLUMN_CODE, SWT.TRAIL);
+      final TableColumnDefinition colDef = new TableColumnDefinition(
+            _columnManager,
+            COLUMN_CODE,
+            SWT.TRAIL);
 
       colDef.setColumnLabel(Messages.Tour_Nutrition_Column_Code);
       colDef.setColumnHeaderText(Messages.Tour_Nutrition_Column_Code);
@@ -700,7 +706,10 @@ public class DialogSearchProduct extends TitleAreaDialog implements ITourViewer,
 
    private void defineColumn_20_Name() {
 
-      final TableColumnDefinition colDef = new TableColumnDefinition(_columnManager, COLUMN_NAME, SWT.TRAIL);
+      final TableColumnDefinition colDef = new TableColumnDefinition(
+            _columnManager,
+            COLUMN_NAME,
+            SWT.TRAIL);
 
       colDef.setColumnLabel(Messages.Tour_Nutrition_Column_Name);
       colDef.setColumnHeaderText(Messages.Tour_Nutrition_Column_Name);
@@ -723,7 +732,10 @@ public class DialogSearchProduct extends TitleAreaDialog implements ITourViewer,
 
    private void defineColumn_30_Quantity() {
 
-      final TableColumnDefinition colDef = new TableColumnDefinition(_columnManager, COLUMN_QUANTITY, SWT.TRAIL);
+      final TableColumnDefinition colDef = new TableColumnDefinition(
+            _columnManager,
+            COLUMN_QUANTITY,
+            SWT.TRAIL);
 
       colDef.setColumnLabel(Messages.Tour_Nutrition_Column_Quantity);
       colDef.setColumnHeaderText(Messages.Tour_Nutrition_Column_Quantity);
@@ -773,7 +785,7 @@ public class DialogSearchProduct extends TitleAreaDialog implements ITourViewer,
       _comboSearchType.add(Messages.Dialog_SearchProduct_Combo_SearchType_ByCode);
       _comboSearchType.select(0);
 
-      _autocompleteProductSearchHistory = new AutoComplete_ComboInputMT(_comboSearchQuery);
+      _autoCompleteProductSearchHistory = new AutoComplete_ComboInputMT(_comboSearchQuery);
    }
 
    @Override
@@ -802,7 +814,8 @@ public class DialogSearchProduct extends TitleAreaDialog implements ITourViewer,
 
    private List<String> getSelectedProducts() {
 
-      final StructuredSelection selection = (StructuredSelection) _productsViewer.getSelection();
+      final StructuredSelection selection =
+            (StructuredSelection) _productsViewer.getSelection();
 
       final List<String> productCodes = new ArrayList<>();
 
@@ -827,7 +840,8 @@ public class DialogSearchProduct extends TitleAreaDialog implements ITourViewer,
 
       createMenuManager();
 
-      _columnSortListener = SelectionListener.widgetSelectedAdapter(selectionEvent -> onSelect_SortColumn(selectionEvent));
+      _columnSortListener = SelectionListener.widgetSelectedAdapter(
+            selectionEvent -> onSelect_SortColumn(selectionEvent));
    }
 
    private void onAddProduct() {
@@ -840,13 +854,9 @@ public class DialogSearchProduct extends TitleAreaDialog implements ITourViewer,
 
          final TourData tourData = TourManager.getTour(_tourId);
 
-         final Set<TourNutritionProduct> tourNutritionProducts = tourData.getTourNutritionProducts();
-
-         // Before adding the selected product, we need to check if it doesn't already exist
-         // An existing product can only be added when the existing ones are
-         // attached to a beverage container
-         if (tourNutritionProducts.stream().anyMatch(tourNutritionProduct -> tourNutritionProduct.getProductCode().equals(selectedProduct.code) &&
-               tourNutritionProduct.getTourBeverageContainer() == null)) {
+         if (NutritionUtils.isProductAlreadyPresent(
+               selectedProduct.code,
+               tourData.getTourNutritionProducts())) {
 
             setErrorMessage(Messages.Dialog_SearchProduct_Label_AlreadyExists);
             return;
@@ -854,10 +864,14 @@ public class DialogSearchProduct extends TitleAreaDialog implements ITourViewer,
 
          setErrorMessage(null);
 
-         final TourNutritionProduct tourNutritionProduct = new TourNutritionProduct(tourData, selectedProduct);
+         final TourNutritionProduct tourNutritionProduct = new TourNutritionProduct(
+               tourData,
+               selectedProduct);
          tourData.addNutritionProduct(tourNutritionProduct);
 
          TourManager.saveModifiedTour(tourData);
+
+         _tourNutritionProductMenuManager.updateRecentTourNutritionProducts(tourNutritionProduct);
       });
    }
 
@@ -1021,7 +1035,7 @@ public class DialogSearchProduct extends TitleAreaDialog implements ITourViewer,
 
    private void restoreState_WithUI() {
 
-      _autocompleteProductSearchHistory.restoreState(_state, STATE_AUTOCOMPLETE_POPUP_HEIGHT_SEARCH_HISTORY);
+      _autoCompleteProductSearchHistory.restoreState(_state, STATE_AUTOCOMPLETE_POPUP_HEIGHT_SEARCH_HISTORY);
    }
 
    private void saveState() {
@@ -1031,7 +1045,7 @@ public class DialogSearchProduct extends TitleAreaDialog implements ITourViewer,
 
       _columnManager.saveState(_state);
 
-      _autocompleteProductSearchHistory.saveState(_state, STATE_AUTOCOMPLETE_POPUP_HEIGHT_SEARCH_HISTORY);
+      _autoCompleteProductSearchHistory.saveState(_state, STATE_AUTOCOMPLETE_POPUP_HEIGHT_SEARCH_HISTORY);
    }
 
    /**

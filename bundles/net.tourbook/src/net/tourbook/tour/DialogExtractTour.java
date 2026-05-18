@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2025 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2026 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -188,7 +188,7 @@ public class DialogExtractTour extends TitleAreaDialog implements ITourProvider2
 
    private TourPerson[]          _people;
    private Point                 _shellDefaultSize;
-   private TagMenuManager        _tagMenuMgr;
+   private TagMenuManager        _tagMenuManager;
 
    /*
     * UI controls
@@ -308,7 +308,7 @@ public class DialogExtractTour extends TitleAreaDialog implements ITourProvider2
 
    private void createActions() {
 
-      _tagMenuMgr = new TagMenuManager(this, false);
+      _tagMenuManager = new TagMenuManager(this, false);
 
       _actionOpenTourTypePrefs = new ActionOpenPrefDialog(
             Messages.action_tourType_modify_tourTypes,
@@ -371,8 +371,8 @@ public class DialogExtractTour extends TitleAreaDialog implements ITourProvider2
          final Set<TourTag> targetTourTags = _tourDataTarget.getTourTags();
          final boolean isTagInTour = targetTourTags != null && targetTourTags.size() > 0;
 
-         _tagMenuMgr.fillTagMenu(menuManager);
-         _tagMenuMgr.enableTagActions(true, isTagInTour, targetTourTags);
+         _tagMenuManager.fillTagMenu(menuManager);
+         _tagMenuManager.enableTagActions(true, isTagInTour, targetTourTags);
       });
 
       // set menu for the tag item
@@ -382,7 +382,8 @@ public class DialogExtractTour extends TitleAreaDialog implements ITourProvider2
 
          @Override
          public void menuHidden(final MenuEvent e) {
-            _tagMenuMgr.onHideMenu();
+
+            _tagMenuManager.onHideMenu();
          }
 
          @Override
@@ -392,7 +393,7 @@ public class DialogExtractTour extends TitleAreaDialog implements ITourProvider2
             Point pt = new Point(rect.x, rect.y + rect.height);
             pt = _linkTag.getParent().toDisplay(pt);
 
-            _tagMenuMgr.onShowMenu(e, _linkTag, pt, null);
+            _tagMenuManager.onShowMenu(e, _linkTag, pt, null);
          }
       });
 

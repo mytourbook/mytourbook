@@ -238,7 +238,7 @@ public abstract class TVITourBookItem extends TreeViewerItem implements ITourIte
       // ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^
       //  ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^
       //
-      // !!! EXTREEMLY IMPORTANT !!!
+      // !!! EXTREMELY IMPORTANT !!!
       //
       // Adjust constant SQL_ALL_OTHER_FIELDS__COLUMN_START_NUMBER when sql fields are added,
       // otherwise tags and number of markers are not displayed or causing an exception
@@ -513,8 +513,6 @@ public abstract class TVITourBookItem extends TreeViewerItem implements ITourIte
 
       tourBookView = view;
    }
-
-
 
    /**
     * Prepend a db prefix to all fields and additional indent it

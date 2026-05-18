@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2024 Wolfgang Schramm and Contributors
+ * Copyright (C) 2011, 2026 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -40,40 +40,40 @@ import org.eclipse.swt.widgets.TypedListener;
  */
 public class AdvancedMenuForActions {
 
-   private final ContextArmListener _contextArmListener = new ContextArmListener();
+   private ArmItemListener        _contextArmListener;
 
    /**
     * Contains time when the action menu item is hovered
     */
-   private long                     _armItemTimeAction;
+   private long                   _armItemTimeAction;
 
    /**
     * Contains time when other menu items are hovered
     */
-   private long                     _armItemTimeOther;
+   private long                   _armItemTimeOther;
 
-   private ActionContributionItem   _actionContributionItem;
+   private ActionContributionItem _actionContributionItem;
 
-   private Control                  _menuParentControl;
-   private Point                    _advMenuPosition;
+   private Control                _menuParentControl;
+   private Point                  _advMenuPosition;
 
-   private boolean                  _isAdvMenuOpen      = false;
-   private boolean                  _isAutoOpen         = false;
-   private boolean                  _isAnimationEnabled = false;
-   private boolean                  _isAnimating;
+   private boolean                _isAdvMenuOpen      = false;
+   private boolean                _isAutoOpen         = false;
+   private boolean                _isAnimationEnabled = false;
+   private boolean                _isAnimating;
 
-   private int                      _autoOpenDelay      = 500;
-   private final int                _animationDelay     = 50;                      //180; this is the same time as in BusyIndicator
-   private int                      _consumedAnimationTime;
+   private int                    _autoOpenDelay      = 500;
+   private final int              _animationDelay     = 50;   //180; this is the same time as in BusyIndicator
+   private int                    _consumedAnimationTime;
 
-   private Display                  _display;
-   private Runnable                 _animationRunnable;
-   private MenuItem                 _armMenuItem;
-   private String                   _armActionText;
+   private Display                _display;
+   private Runnable               _animationRunnable;
+   private MenuItem               _armMenuItem;
+   private String                 _armActionText;
 
-   private ToolTip                  _toolTip;
+   private ToolTip                _toolTip;
 
-   private class ContextArmListener implements ArmListener {
+   private class ArmItemListener implements ArmListener {
 
       @Override
       public void widgetArmed(final ArmEvent event) {
@@ -88,19 +88,22 @@ public class AdvancedMenuForActions {
 
       _actionContributionItem = actionContributionItem;
 
+      _contextArmListener = new ArmItemListener();
+
       final IAction action = actionContributionItem.getAction();
+
       if (action instanceof final IAdvancedMenuForActions advancedMenuForActions) {
          advancedMenuForActions.setAdvancedMenuProvider(this);
       }
 
       _display = Display.getCurrent();
+
       _animationRunnable = new Runnable() {
          @Override
          public void run() {
             onAnimation20Run(this);
          }
       };
-
    }
 
    private synchronized void onAnimation10Start() {
@@ -163,7 +166,7 @@ public class AdvancedMenuForActions {
             if (itemId != null && itemId.equals(actionId)) {
 
                /*
-                * the item is hovered which is associated with the action for the advanced menu
+                * The item is hovered which is associated with the action for the advanced menu
                 */
 
                _armItemTimeAction = System.currentTimeMillis();
@@ -247,19 +250,27 @@ public class AdvancedMenuForActions {
       final Menu menu = (Menu) menuEvent.widget;
 
       // add arm listener to each menu item
-      for (final MenuItem menuItem : menu.getItems()) {
+      final MenuItem[] allMenuItems = menu.getItems();
+      for (final MenuItem menuItem : allMenuItems) {
 
          /*
-          * check if an arm listener is already set
+          * Check if an arm listener is already set
           */
-         final Listener[] itemArmListeners = menuItem.getListeners(SWT.Arm);
+         final Listener[] allArmListener = menuItem.getListeners(SWT.Arm);
+
          boolean isArmAvailable = false;
 
-         for (final Listener listener : itemArmListeners) {
-            if (listener instanceof final TypedListener typedListener) {
-               if (typedListener.getEventListener() instanceof ContextArmListener) {
-                  isArmAvailable = true;
-                  break;
+         for (final Listener armListener : allArmListener) {
+
+            if (armListener instanceof final TypedListener typedListener) {
+
+               if (typedListener.getEventListener() instanceof final ArmItemListener itemArmListener) {
+
+                  if (itemArmListener == _contextArmListener) {
+
+                     isArmAvailable = true;
+                     break;
+                  }
                }
             }
          }
@@ -269,10 +280,13 @@ public class AdvancedMenuForActions {
          }
 
          /*
-          * it happened that the text of the menu item was not reset when the menu was opened
+          * It happened that the text of the menu item was not reset when the menu was opened
           * with a mouse click and not automatically
           */
-         if (_armMenuItem != null && _armMenuItem.isDisposed() == false && _armMenuItem == menuItem) {
+         if (_armMenuItem != null
+               && _armMenuItem.isDisposed() == false
+               && _armMenuItem == menuItem) {
+
             _armMenuItem.setText(_armActionText);
          }
       }
@@ -280,6 +294,7 @@ public class AdvancedMenuForActions {
       // reset data from previous menu
       final IAction action = _actionContributionItem.getAction();
       if (action instanceof final IAdvancedMenuForActions advancedMenuForActions) {
+
          advancedMenuForActions.resetData();
       }
    }
@@ -321,7 +336,7 @@ public class AdvancedMenuForActions {
 
                   final IAction action = _actionContributionItem.getAction();
                   if (action instanceof final IAdvancedMenuForActions advancedMenuForActions) {
-                     advancedMenuForActions.onShowMenu();
+                     advancedMenuForActions.onShowAdvancedMenu();
                   }
                }
             });

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2026 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -20,7 +20,7 @@ public interface IAdvancedMenuForActions {
    /**
     * Method is called when the advance menu is displayed
     */
-   void onShowMenu();
+   void onShowAdvancedMenu();
 
    /**
     * Resets data which are kept when the advanced menu is open
@@ -33,5 +33,4 @@ public interface IAdvancedMenuForActions {
     * @param actionAdvancedMenu
     */
    void setAdvancedMenuProvider(AdvancedMenuForActions actionAdvancedMenu);
-
 }

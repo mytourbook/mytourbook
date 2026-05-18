@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2025 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2026 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -2016,6 +2016,7 @@ public class TourBookView extends ViewPart implements
          public void menuHidden(final MenuEvent e) {
 
             _tagMenuManager.onHideMenu();
+            _equipmentMenuManager.onHideMenu();
          }
 
          @Override
@@ -2028,11 +2029,18 @@ public class TourBookView extends ViewPart implements
             // set true/false/null
             _actionSetStartEndLocation.setIsStartLocation(getTourLocation_HoverState());
 
+            final Point cursorLocation = Display.getCurrent().getCursorLocation();
             final Boolean isFlatView = _viewLayout == TourBookViewLayout.NAT_TABLE;
 
             _tagMenuManager.onShowMenu(menuEvent,
                   _tourViewer_NatTable,
-                  Display.getCurrent().getCursorLocation(),
+                  cursorLocation,
+                  _tourInfoToolTip_NatTable,
+                  isFlatView);
+
+            _equipmentMenuManager.onShowMenu(menuEvent,
+                  _tourViewer_NatTable,
+                  cursorLocation,
                   _tourInfoToolTip_NatTable,
                   isFlatView);
          }
@@ -2200,7 +2208,9 @@ public class TourBookView extends ViewPart implements
       contextMenu.addMenuListener(new MenuAdapter() {
          @Override
          public void menuHidden(final MenuEvent e) {
+            
             _tagMenuManager.onHideMenu();
+            _equipmentMenuManager.onHideMenu();
          }
 
          @Override
@@ -2208,10 +2218,18 @@ public class TourBookView extends ViewPart implements
 
             final Boolean isFlatView = _viewLayout == TourBookViewLayout.NAT_TABLE;
 
+            Point cursorLocation = Display.getCurrent().getCursorLocation();
+            
             _tagMenuManager.onShowMenu(menuEvent,
                   tree,
-                  Display.getCurrent().getCursorLocation(),
+                  cursorLocation,
                   _tourInfoToolTip_Tree,
+                  isFlatView);
+
+            _equipmentMenuManager.onShowMenu(menuEvent,
+                  _tourViewer_NatTable,
+                  cursorLocation,
+                  _tourInfoToolTip_NatTable,
                   isFlatView);
          }
       });
@@ -2528,12 +2546,13 @@ public class TourBookView extends ViewPart implements
       // tour type actions
       _tourTypeMenuManager.fillContextMenu_WithActiveActions(menuMgr, this);
 
-      // tag actions
       final Boolean isFlatView = _viewLayout == TourBookViewLayout.NAT_TABLE;
+
+      // tag actions
       _tagMenuManager.fillTagMenu_WithActiveActions(menuMgr, this, isFlatView);
 
       // equipment actions
-      _equipmentMenuManager.fillEquipmentMenu_WithActiveActions(menuMgr, this);
+      _equipmentMenuManager.fillEquipmentMenu_WithActiveActions(menuMgr, this, isFlatView);
 
       // tree only actions
       if (isTree) {
@@ -4399,7 +4418,7 @@ public class TourBookView extends ViewPart implements
 
                   /**
                    * <code>
-
+                  
                      Caused by: java.lang.NullPointerException
                      at org.eclipse.jface.viewers.AbstractTreeViewer.getSelection(AbstractTreeViewer.java:2956)
                      at org.eclipse.jface.viewers.StructuredViewer.handleSelect(StructuredViewer.java:1211)
@@ -4417,13 +4436,13 @@ public class TourBookView extends ViewPart implements
                      at org.eclipse.jface.viewers.AbstractTreeViewer.internalCollapseToLevel(AbstractTreeViewer.java:1586)
                      at org.eclipse.jface.viewers.AbstractTreeViewer.collapseToLevel(AbstractTreeViewer.java:751)
                      at org.eclipse.jface.viewers.AbstractTreeViewer.collapseAll(AbstractTreeViewer.java:733)
-
+                  
                      at net.tourbook.ui.views.tourBook.TourBookView$70.run(TourBookView.java:3406)
-
+                  
                      at org.eclipse.swt.widgets.RunnableLock.run(RunnableLock.java:35)
                      at org.eclipse.swt.widgets.Synchronizer.runAsyncMessages(Synchronizer.java:135)
                      ... 22 more
-
+                  
                    * </code>
                    */
 
@@ -4738,7 +4757,7 @@ public class TourBookView extends ViewPart implements
             _allTourActions_Export.keySet(),
             _allTourActions_Adjust.keySet(),
             _tagMenuManager.getAllTagActions(isFlatView).keySet(),
-            _equipmentMenuManager.getAllEquipmentActions().keySet(),
+            _equipmentMenuManager.getAllEquipmentActions(isFlatView).keySet(),
             _tourTypeMenuManager.getAllTourTypeActions().keySet());
    }
 

@@ -34,9 +34,16 @@ Experimental
 New / Improvements
 ==================
 
+* Tour Nutrition (Frederic)
+  - Select a product from a list of the most recent products used
+
+* Equipment
+  - Add a contextual menu to add several equiments at a time
+    https://github.com/mytourbook/mytourbook/issues/1657
 
 * Tour filter (Frederic)
   - Added nutrition tour filter
+  
   
 
 Changes
@@ -67,7 +74,7 @@ Bugfix
 * Tour Nutrition (Frederic)
   - Fixed an exception when updating the list of products for which a product is not found in the OpenFoodFacts database
   - Fixed the computation of total calories/carbs/sodium for beverages involving beverage containers
-  - FIxed a bug where modifying a custom product would remove the associated beverage container
+  - Fixed a bug where modifying a custom product would remove the associated beverage container
 
 
 

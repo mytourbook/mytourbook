@@ -26,7 +26,9 @@ import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.RejectedExecutionException;
 
+import net.tourbook.Messages;
 import net.tourbook.application.ApplicationVersion;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.UI;
@@ -40,13 +42,18 @@ import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.web.WEB;
 
 import org.apache.commons.lang3.StringUtils;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.MultiStatus;
+import org.eclipse.jface.dialogs.ErrorDialog;
 import org.eclipse.jface.preference.IPreferenceStore;
+import org.eclipse.swt.widgets.Display;
 
 import tools.jackson.core.JacksonException;
 import tools.jackson.core.type.TypeReference;
 import tools.jackson.databind.DeserializationFeature;
 import tools.jackson.databind.JsonNode;
 import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.cfg.EnumFeature;
 import tools.jackson.databind.json.JsonMapper;
 
 public class NutritionUtils {
@@ -133,40 +140,37 @@ public class NutritionUtils {
       return averageSodiumPerLiterFormatted;
    }
 
-   private static List<Product> deserializeResponse(final String body, final ProductSearchType productSearchType) {
+   private static List<Product> deserializeResponse(final String body,
+                                                    final ProductSearchType productSearchType)
+         throws JacksonException {
 
       final ObjectMapper mapper = JsonMapper.builder()
+            .enable(EnumFeature.READ_UNKNOWN_ENUM_VALUES_AS_NULL)
             .disable(DeserializationFeature.FAIL_ON_NULL_FOR_PRIMITIVES)
             .build();
 
       List<Product> deserializedProductsResults = new ArrayList<>();
 
-      try {
+      if (productSearchType == ProductSearchType.ByCode) {
 
-         if (productSearchType == ProductSearchType.ByCode) {
+         String productResult;
+         productResult = mapper.readValue(body, JsonNode.class)
+               .get("product") //$NON-NLS-1$
+               .toString();
+         deserializedProductsResults.add(mapper.readValue(productResult,
+               new TypeReference<Product>() {}));
 
-            String productResult;
-            productResult = mapper.readValue(body, JsonNode.class)
-                  .get("product") //$NON-NLS-1$
-                  .toString();
-            deserializedProductsResults.add(mapper.readValue(productResult,
-                  new TypeReference<Product>() {}));
+      } else if (productSearchType == ProductSearchType.ByName) {
 
-         } else if (productSearchType == ProductSearchType.ByName) {
+         final String productsResults = mapper.readValue(body, JsonNode.class)
+               .get("products") //$NON-NLS-1$
+               .toString();
+         deserializedProductsResults = mapper.readValue(productsResults,
+               new TypeReference<List<Product>>() {});
 
-            final String productsResults = mapper.readValue(body, JsonNode.class)
-                  .get("products") //$NON-NLS-1$
-                  .toString();
-            deserializedProductsResults = mapper.readValue(productsResults,
-                  new TypeReference<List<Product>>() {});
-
-         }
-      } catch (final JacksonException e) {
-         StatusUtil.log(e);
       }
 
       return deserializedProductsResults;
-
    }
 
    public static int getTotalCalories(final Set<TourNutritionProduct> tourNutritionProducts) {
@@ -299,6 +303,19 @@ public class NutritionUtils {
       return totalSodium;
    }
 
+   /*
+    * Check if a product doesn't already exist for a given tour.
+    * An existing product can only be added when the existing ones are
+    * attached to a beverage container
+    */
+   public static boolean isProductAlreadyPresent(final String productCode,
+                                                 final Set<TourNutritionProduct> tourNutritionProducts) {
+
+      return tourNutritionProducts.stream().anyMatch(
+            tourNutritionProduct -> tourNutritionProduct.getProductCode().equals(productCode) &&
+                  tourNutritionProduct.getTourBeverageContainer() == null);
+   }
+
    public static void openProductWebPage(final String productCode) {
 
       if (StringUtils.isNumeric(productCode)) {
@@ -306,7 +323,8 @@ public class NutritionUtils {
       }
    }
 
-   public static List<Product> searchProduct(final String searchText, final ProductSearchType productSearchType) {
+   public static List<Product> searchProduct(final String searchText,
+                                             final ProductSearchType productSearchType) {
 
       String searchUrl = UI.EMPTY_STRING;
 
@@ -317,7 +335,8 @@ public class NutritionUtils {
          break;
 
       case ByName:
-         searchUrl = OPENFOODFACTS_SEARCH_BY_NAME_URL + searchText.replace(UI.SPACE1, UI.SYMBOL_PLUS);
+         searchUrl = OPENFOODFACTS_SEARCH_BY_NAME_URL +
+               searchText.replace(UI.SPACE1, UI.SYMBOL_PLUS);
          break;
       }
 
@@ -328,17 +347,42 @@ public class NutritionUtils {
             .build();
 
       try {
-         final HttpResponse<String> response = _httpClient.send(request, HttpResponse.BodyHandlers.ofString());
+         final HttpResponse<String> response =
+               _httpClient.send(request, HttpResponse.BodyHandlers.ofString());
 
-         if (response.statusCode() == HttpURLConnection.HTTP_OK && net.tourbook.common.util.StringUtils.hasContent(response.body())) {
+         final int statusCode = response.statusCode();
+         final String responseBody = response.body();
+
+         if (statusCode == HttpURLConnection.HTTP_OK &&
+               net.tourbook.common.util.StringUtils.hasContent(responseBody)) {
 
             return deserializeResponse(response.body(), productSearchType);
 
          } else {
-            StatusUtil.logError(response.body());
+
+            // Anything else than 200 is an error for this OpenFoodFacts endpoint
+            throw new RejectedExecutionException("Response from server - " + //$NON-NLS-1$
+                  statusCode + ": " + //$NON-NLS-1$
+                  responseBody);
          }
-      } catch (IOException | InterruptedException e) {
-         StatusUtil.log(e);
+      } catch (JacksonException | RejectedExecutionException | IOException | InterruptedException e) {
+
+         final IStatus status = StatusUtil.newStatus(IStatus.ERROR, UI.EMPTY_STRING, e);
+         //Use a multiStatus as, otherwise, long errors create windows that are too
+         //big to be displayed in the error dialog
+         final MultiStatus multiStatus = new MultiStatus(
+               TourbookPlugin.PLUGIN_ID,
+               IStatus.ERROR,
+               new IStatus[] { status },
+               UI.EMPTY_STRING,
+               null);
+         Display.getDefault().syncExec(() -> ErrorDialog.openError(
+               Display.getCurrent().getActiveShell(),
+               Messages.Dialog_SearchProduct_Title,
+               Messages.Dialog_SearchProduct_Label_Error_Message,
+               multiStatus));
+
+         StatusUtil.logError(e.getMessage());
          Thread.currentThread().interrupt();
       }
 
