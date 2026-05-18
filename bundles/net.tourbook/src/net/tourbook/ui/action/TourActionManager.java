@@ -30,6 +30,7 @@ import net.tourbook.common.util.Util;
 import net.tourbook.equipment.ActionAddEquipment_SubMenu;
 import net.tourbook.equipment.ActionAddRecentEquipment;
 import net.tourbook.equipment.ActionRemoveEquipment_SubMenu;
+import net.tourbook.equipment.EquipmentMenuManager;
 import net.tourbook.equipment.EquipmentMenuManager.ActionAddEquipmentGroups_SubMenu;
 import net.tourbook.equipment.EquipmentMenuManager.ActionClipboard_CopyEquipment;
 import net.tourbook.equipment.EquipmentMenuManager.ActionClipboard_PasteEquipment;
@@ -117,9 +118,9 @@ public class TourActionManager {
       createActions_10_Edit();
       createActions_20_TourTypes();
       createActions_30_Tags();
-      createActions_32_Equipment();
-      createActions_40_Export();
-      createActions_50_Adjust();
+      createActions_40_Equipment();
+      createActions_70_Export();
+      createActions_80_Adjust();
 
       _actionCustomizeTourActions = new ActionOpenPrefDialog(
             Messages.Tour_Action_ContextMenu_Customize,
@@ -322,12 +323,13 @@ public class TourActionManager {
       _allDefinedActions.add(categoryAction_Tag);
 
       _allDefinedActions.add(actionSetTags);
-      _allDefinedActions.add(actionAddTag_AutoOpen_Default);
-      _allDefinedActions.add(actionAddTag_AutoOpen_Flat);
-      _allDefinedActions.add(actionAddTag_AutoOpen_Tree);
       _allDefinedActions.add(actionAddTag);
       _allDefinedActions.add(actionAddRecentTags);
       _allDefinedActions.add(actionAddTagGroups);
+
+      _allDefinedActions.add(actionAddTag_AutoOpen_Default);
+      _allDefinedActions.add(actionAddTag_AutoOpen_Flat);
+      _allDefinedActions.add(actionAddTag_AutoOpen_Tree);
 
       _allDefinedActions.add(actionRemoveTourTag);
       _allDefinedActions.add(actionRemoveAllTags);
@@ -359,7 +361,7 @@ public class TourActionManager {
    /**
     * EQUIPMENT Actions
     */
-   private static void createActions_32_Equipment() {
+   private static void createActions_40_Equipment() {
 
 // SET_FORMATTING_OFF
 
@@ -370,6 +372,19 @@ public class TourActionManager {
       final TourAction actionAddEquipment                = new TourAction(    ActionAddEquipment_SubMenu.class.getName(),
                                                                               Messages.Equipment_Action_AddEquipment,
                                                                               TourActionCategory.EQUIPMENT);
+
+      final TourAction actionAddEquipment_AutoOpen_Default  = new TourAction( EquipmentMenuManager.ACTION_KEY__ADD_EQUIPMENT_AUTO_OPEN_DEFAULT,
+                                                                              "&Add Equipment... (Default)",
+                                                                              TourActionCategory.EQUIPMENT);
+
+      final TourAction actionAddEquipment_AutoOpen_Flat     = new TourAction( EquipmentMenuManager.ACTION_KEY__ADD_EQUIPMENT_AUTO_OPEN_FLAT,
+                                                                              "&Add Equipment... (Flat)",
+                                                                              TourActionCategory.EQUIPMENT);
+
+      final TourAction actionAddEquipment_AutoOpen_Tree     = new TourAction( EquipmentMenuManager.ACTION_KEY__ADD_EQUIPMENT_AUTO_OPEN_TREE,
+                                                                              "&Add Equipment... (Categorized)",
+                                                                              TourActionCategory.EQUIPMENT);
+
 
       final TourAction actionAddEquipment_Groups         = new TourAction(    ActionAddEquipmentGroups_SubMenu.class.getName(),
                                                                               Messages.Equipment_Action_AddEquipment_Groups,
@@ -403,6 +418,10 @@ public class TourActionManager {
       _allDefinedActions.add(actionAddRecentEquipment);
       _allDefinedActions.add(actionAddEquipment_Groups);
 
+      _allDefinedActions.add(actionAddEquipment_AutoOpen_Default);
+      _allDefinedActions.add(actionAddEquipment_AutoOpen_Flat);
+      _allDefinedActions.add(actionAddEquipment_AutoOpen_Tree);
+
       _allDefinedActions.add(actionRemoveEquipment);
       _allDefinedActions.add(actionRemoveEquipment_All);
 
@@ -423,10 +442,14 @@ public class TourActionManager {
       _allDefinedActionsMap.put(ActionClipboard_CopyEquipment     .class.getName(),          actionClipboard_CopyEquipment);
       _allDefinedActionsMap.put(ActionClipboard_PasteEquipment    .class.getName(),          actionClipboard_PasteEquipment);
 
+      _allDefinedActionsMap.put(EquipmentMenuManager.ACTION_KEY__ADD_EQUIPMENT_AUTO_OPEN_DEFAULT,  actionAddEquipment_AutoOpen_Default);
+      _allDefinedActionsMap.put(EquipmentMenuManager.ACTION_KEY__ADD_EQUIPMENT_AUTO_OPEN_FLAT,     actionAddEquipment_AutoOpen_Flat);
+      _allDefinedActionsMap.put(EquipmentMenuManager.ACTION_KEY__ADD_EQUIPMENT_AUTO_OPEN_TREE,     actionAddEquipment_AutoOpen_Tree);
+
 // SET_FORMATTING_ON
    }
 
-   private static void createActions_40_Export() {
+   private static void createActions_70_Export() {
 
 // SET_FORMATTING_OFF
 
@@ -473,7 +496,7 @@ public class TourActionManager {
 // SET_FORMATTING_ON
    }
 
-   private static void createActions_50_Adjust() {
+   private static void createActions_80_Adjust() {
 
 // SET_FORMATTING_OFF
 

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2024, 2025 Wolfgang Schramm and Contributors
+ * Copyright (C) 2024, 2026 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -179,6 +179,7 @@ public class TourAction implements Cloneable {
       return "TourAction" + "\n" //$NON-NLS-1$ //$NON-NLS-2$
             + " actionText     = " + actionText + "\n" //$NON-NLS-1$ //$NON-NLS-2$
             + " actionCategory = " + actionCategory + "\n" //$NON-NLS-1$ //$NON-NLS-2$
+            + " isChecked      = " + isChecked + "\n" //$NON-NLS-1$ //$NON-NLS-2$
             + "\n"; //$NON-NLS-1$
    }
 }

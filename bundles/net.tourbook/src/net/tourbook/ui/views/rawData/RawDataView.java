@@ -215,6 +215,7 @@ import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.ImageData;
 import org.eclipse.swt.graphics.PaletteData;
+import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.internal.DPIUtil;
 import org.eclipse.swt.layout.GridData;
@@ -3502,12 +3503,25 @@ public class RawDataView extends ViewPart implements
       tableContextMenu.addMenuListener(new MenuAdapter() {
          @Override
          public void menuHidden(final MenuEvent e) {
+
             _tagMenuManager.onHideMenu();
+            _equipmentMenuManager.onHideMenu();
          }
 
          @Override
          public void menuShown(final MenuEvent menuEvent) {
-            _tagMenuManager.onShowMenu(menuEvent, table, Display.getCurrent().getCursorLocation(), _tourInfoToolTip);
+
+            final Point cursorLocation = Display.getCurrent().getCursorLocation();
+
+            _tagMenuManager.onShowMenu(menuEvent,
+                  table,
+                  cursorLocation,
+                  _tourInfoToolTip);
+
+            _equipmentMenuManager.onShowMenu(menuEvent,
+                  table,
+                  cursorLocation,
+                  _tourInfoToolTip);
          }
       });
 
