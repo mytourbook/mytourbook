@@ -278,9 +278,6 @@ public class ActionAddEquipment_SubMenu extends Action implements IMenuCreator, 
 
    public void fillMenu(final Menu menu) {
 
-      System.out.println(UI.timeStamp() + " AAE fillMenu");
-// TODO remove SYSTEM.OUT.PRINTLN
-
       // dispose old items
       final MenuItem[] allMenuItems = menu.getItems();
       for (final MenuItem item : allMenuItems) {
@@ -492,11 +489,6 @@ public class ActionAddEquipment_SubMenu extends Action implements IMenuCreator, 
    @Override
    public void onShowAdvancedMenu() {
 
-      System.out.println(UI.timeStamp() + " AAE onShowAdvancedMenu: " + _allEquipmentIDsInTours
-
-      );
-// TODO remove SYSTEM.OUT.PRINTLN
-
       _equipmentMenuManager.setIsAdvanceMenu();
 
       EquipmentMenuManager.enableActions_Recent(
@@ -508,9 +500,6 @@ public class ActionAddEquipment_SubMenu extends Action implements IMenuCreator, 
 
    @Override
    public void resetData() {
-
-      System.out.println(UI.timeStamp() + " AAE resetData	 ");
-// TODO remove SYSTEM.OUT.PRINTLN
 
       _allModifiedEquipment.clear();
    }

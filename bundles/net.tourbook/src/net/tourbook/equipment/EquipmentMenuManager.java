@@ -492,9 +492,6 @@ public class EquipmentMenuManager implements IActionProvider {
                                     final Set<Long> allEquipmentIDs_InTours,
                                     final Set<Long> allModifiedEquipmentIDs) {
 
-      System.out.println(UI.timeStamp() + " EMM    enableActions_Recent: " + allEquipmentIDs_InTours);
-      System.out.println(UI.timeStamp() + " EMM    enableActions_Recent: " + allModifiedEquipmentIDs);
-// TODO remove SYSTEM.OUT.PRINTLN
 
       if (_allActions_RecentEquipment.length == 0) {
          return;
@@ -855,8 +852,6 @@ public class EquipmentMenuManager implements IActionProvider {
     */
    public void enableActions(final List<Object> allSelectedItems) {
 
-      System.out.println(UI.timeStamp() + " EMM    enableActions ");
-// TODO remove SYSTEM.OUT.PRINTLN
 
       final Set<Long> allSelectedEquipmentIDs_FromAllTours = new HashSet<>();
 
@@ -1147,6 +1142,8 @@ public class EquipmentMenuManager implements IActionProvider {
                || allPreviousEquipment.iterator().next().equals(_allRecentEquipment.getFirst()) == false) {
 
             final StringBuilder sb = new StringBuilder();
+            final StringBuilder sbTooltip = new StringBuilder();
+
             boolean isFirst = true;
 
             for (final Equipment recentEquipment : allPreviousEquipment) {
@@ -1155,15 +1152,20 @@ public class EquipmentMenuManager implements IActionProvider {
                   isFirst = false;
                } else {
                   sb.append(UI.COMMA_SPACE);
+                  sbTooltip.append(UI.NEW_LINE);
                }
+
                sb.append(recentEquipment.getName());
+               sbTooltip.append(recentEquipment.getName());
             }
 
             String equipmentText = sb.toString();
+            String equipmentTextTooltip = sbTooltip.toString();
 
             if (UI.IS_SCRAMBLE_DATA) {
 
                equipmentText = UI.scrambleText(equipmentText);
+               equipmentTextTooltip = UI.scrambleText(equipmentTextTooltip);
             }
 
             final int maxTextWidth = 40;
@@ -1178,12 +1180,14 @@ public class EquipmentMenuManager implements IActionProvider {
             if (menu == null) {
 
                _actionWithAllPreviousEquipment.setText(UI.SPACE4 + UI.MNEMONIC + 0 + UI.SPACE2 + equipmentText);
+               _actionWithAllPreviousEquipment.setToolTipText(equipmentTextTooltip);
 
                menuManager.add(actionContributionItem);
 
             } else {
 
                _actionWithAllPreviousEquipment.setText(UI.MNEMONIC + 0 + UI.SPACE2 + equipmentText);
+               _actionWithAllPreviousEquipment.setToolTipText(equipmentTextTooltip);
 
                actionContributionItem.fill(menu, -1);
             }
