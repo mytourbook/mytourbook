@@ -34,11 +34,16 @@ Experimental
 New / Improvements
 ==================
 
-* Tour Nutrition (Frederic):
+* Tour Nutrition (Frederic)
   - Select a product from a list of the most recent products used
+
+* Equipment
+  - Add a contextual menu to add several equiments at a time
+    https://github.com/mytourbook/mytourbook/issues/1657
 
 * Tour filter (Frederic)
   - Added nutrition tour filter
+  
   
 
 Changes
