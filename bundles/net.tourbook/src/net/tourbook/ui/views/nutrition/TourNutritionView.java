@@ -1346,20 +1346,6 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
             selectedTourNutritionProducts.stream().anyMatch(TourNutritionProduct::isCustomProduct));
    }
 
-   private void enableControls() {
-
-      if (_tourData == null) {
-         return;
-      }
-
-      final int numberOfProducts = _productsViewer.getTable().getItemCount();
-
-      final Set<TourNutritionProduct> tourNutritionProducts = _tourData.getTourNutritionProducts();
-      //Ensure that at least 1 product is not a custom product
-      final boolean containsProductFromDatabase = tourNutritionProducts.stream().anyMatch(
-            tourNutritionProduct -> !tourNutritionProduct.isCustomProduct());
-   }
-
    private void fillContextMenu(final IMenuManager menuManager) {
 
       if (!getSelectedProducts().isEmpty()) {
@@ -1602,8 +1588,6 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
          reloadViewer();
       }
       _viewerContainer.setRedraw(true);
-
-      enableControls();
 
       return _productsViewer;
    }
@@ -1892,8 +1876,6 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
 
          updateUI_SummaryFromModel();
       }
-
-      enableControls();
    }
 
    private void updateUI_SummaryFromModel() {
