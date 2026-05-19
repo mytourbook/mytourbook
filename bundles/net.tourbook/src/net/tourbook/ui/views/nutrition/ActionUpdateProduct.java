@@ -1,6 +1,5 @@
 package net.tourbook.ui.views.nutrition;
 
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -26,8 +25,8 @@ import org.eclipse.swt.widgets.Display;
 
 public class ActionUpdateProduct extends Action {
 
-   private List<String> _productCodes = new ArrayList<>();
-   private TourData     _tourData;
+   private String   _productCode;
+   private TourData _tourData;
 
    public ActionUpdateProduct() {
 
@@ -35,48 +34,46 @@ public class ActionUpdateProduct extends Action {
       setImageDescriptor(CommonActivator.getImageDescriptor(CommonImages.App_Refresh_All));
    }
 
-   private void onUpdateProducts() {
+   private void onUpdateProduct() {
 
       final Set<TourNutritionProduct> updatedTourNutritionProducts = new HashSet<>();
-      for (final String productCode : _productCodes) {
 
-         // We skip the custom products
-         if (net.tourbook.common.util.StringUtils.isNullOrEmpty(productCode)) {
-            continue;
-         }
-
-         //get the most up-to-date product info from the api
-         final List<Product> searchProductResults = NutritionUtils.searchProduct(
-               productCode,
-               ProductSearchType.ByCode);
-
-         if (searchProductResults.isEmpty()) {
-
-            final TourNutritionProduct tourNutritionProduct =
-                  _tourData
-                        .getTourNutritionProducts()
-                        .stream()
-                        .filter(product -> product.getProductCode().equals(productCode))
-                        .findFirst()
-                        .orElse(null);
-
-            TourLogManager.subLog_ERROR(NLS.bind(
-                  Messages.Log_Tour_Nutrition_ProductRetrieval_Error,
-                  new Object[] {
-                        productCode,
-                        tourNutritionProduct.getName() }));
-
-            continue;
-         }
-
-         final Product updatedProduct = searchProductResults.get(0);
-
-         final TourNutritionProduct updatedTourNutritionProduct = new TourNutritionProduct(
-               _tourData,
-               updatedProduct);
-
-         updatedTourNutritionProducts.add(updatedTourNutritionProduct);
+      // We skip the custom products
+      if (net.tourbook.common.util.StringUtils.isNullOrEmpty(_productCode)) {
+         return;
       }
+
+      //get the most up-to-date product info from the api
+      final List<Product> searchProductResults = NutritionUtils.searchProduct(
+            _productCode,
+            ProductSearchType.ByCode);
+
+      if (searchProductResults.isEmpty()) {
+
+         final TourNutritionProduct tourNutritionProduct =
+               _tourData
+                     .getTourNutritionProducts()
+                     .stream()
+                     .filter(product -> product.getProductCode().equals(_productCode))
+                     .findFirst()
+                     .orElse(null);
+
+         TourLogManager.subLog_ERROR(NLS.bind(
+               Messages.Log_Tour_Nutrition_ProductRetrieval_Error,
+               new Object[] {
+                     _productCode,
+                     tourNutritionProduct.getName() }));
+
+         return;
+      }
+
+      final Product updatedProduct = searchProductResults.get(0);
+
+      final TourNutritionProduct updatedTourNutritionProduct = new TourNutritionProduct(
+            _tourData,
+            updatedProduct);
+
+      updatedTourNutritionProducts.add(updatedTourNutritionProduct);
 
       final boolean tourNutritionProductsUpdated =
             _tourData.updateTourNutritionProducts(updatedTourNutritionProducts);
@@ -105,7 +102,7 @@ public class ActionUpdateProduct extends Action {
       final long start = System.currentTimeMillis();
 
       // show busy indicator
-      BusyIndicator.showWhile(Display.getCurrent(), () -> onUpdateProducts());
+      BusyIndicator.showWhile(Display.getCurrent(), () -> onUpdateProduct());
 
       TourLogManager.log_DEFAULT(String.format(
             Messages.Log_UpdateTour_End,
@@ -116,7 +113,7 @@ public class ActionUpdateProduct extends Action {
       _tourData = tourData;
    }
 
-   public void setTourNutritionProducts(final List<String> productCodes) {
-      _productCodes = productCodes;
+   public void setTourNutritionProducts(final String productCode) {
+      _productCode = productCode;
    }
 }

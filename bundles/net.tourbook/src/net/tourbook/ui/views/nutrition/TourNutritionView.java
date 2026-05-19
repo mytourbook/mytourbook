@@ -1339,7 +1339,7 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
 
       final boolean areSelectedProductsFromDatabase = selectedProductsCodes.size() > 0;
       _actionOpenProductsWebsite.setEnabled(areSelectedProductsFromDatabase);
-      _actionUpdateProduct.setEnabled(areSelectedProductsFromDatabase);
+      _actionUpdateProduct.setEnabled(selectedProductsCodes.size() == 1);
 
       final List<TourNutritionProduct> selectedTourNutritionProducts = getSelectedProducts();
       _actionEditCustomProduct.setEnabled(selectedTourNutritionProducts.size() == 1 &&
@@ -1366,7 +1366,7 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
 
          _actionOpenProductsWebsite.setTourNutritionProducts(getSelectedProductsCodes());
          menuManager.add(_actionOpenProductsWebsite);
-         _actionUpdateProduct.setTourNutritionProducts(getSelectedProductsCodes());
+         _actionUpdateProduct.setTourNutritionProducts(getSelectedProductsCodes().get(0));
          _actionUpdateProduct.setTourData(_tourData);
          menuManager.add(_actionUpdateProduct);
          menuManager.add(_actionEditCustomProduct);
