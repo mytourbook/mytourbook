@@ -365,7 +365,7 @@ public class NutritionUtils {
                   statusCode + ": " + //$NON-NLS-1$
                   responseBody);
          }
-      } catch (JacksonException | RejectedExecutionException | IOException | InterruptedException e) {
+      } catch (JacksonException | RejectedExecutionException e) {
 
          final IStatus status = StatusUtil.newStatus(IStatus.ERROR, UI.EMPTY_STRING, e);
          //Use a multiStatus as, otherwise, long errors create windows that are too
@@ -381,6 +381,10 @@ public class NutritionUtils {
                Messages.Dialog_SearchProduct_Title,
                Messages.Dialog_SearchProduct_Label_Error_Message,
                multiStatus));
+
+         StatusUtil.logError(e.getMessage());
+
+      } catch (IOException | InterruptedException e) {
 
          StatusUtil.logError(e.getMessage());
          Thread.currentThread().interrupt();
