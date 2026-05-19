@@ -31,7 +31,7 @@ public class ActionUpdateProduct extends Action {
 
    public ActionUpdateProduct() {
 
-      super(Messages.Tour_Nutrition_Button_UpdateProducts, AS_PUSH_BUTTON);
+      super(Messages.Tour_Nutrition_Button_UpdateProduct, AS_PUSH_BUTTON);
       setImageDescriptor(CommonActivator.getImageDescriptor(CommonImages.App_Refresh_All));
    }
 
