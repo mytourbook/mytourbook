@@ -58,9 +58,12 @@ Changes
     Update your equipment by removing the type when this equipment/part is not depending on another with the same type
     The new column "Type (saved)" can display the saved value which is a random value when the type in the UI is empty.
 
-
 * Tagged Tours View
   - New columns to display the parent of a tag and how tours are sorted/categorized
+
+* Tour Nutrition (Frederic)
+  - The update button is now in the contextual menu of each product and is limited to 1 product at a time since the OpenFoodFacts database is
+    very limited
   
 
 Changes that require Tour Re-import
