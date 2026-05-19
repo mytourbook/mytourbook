@@ -1352,8 +1352,11 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
 
          _actionOpenProductsWebsite.setTourNutritionProducts(getSelectedProductsCodes());
          menuManager.add(_actionOpenProductsWebsite);
-         _actionUpdateProduct.setTourNutritionProducts(getSelectedProductsCodes().get(0));
-         _actionUpdateProduct.setTourData(_tourData);
+         if (getSelectedProductsCodes().size() == 1) {
+
+            _actionUpdateProduct.setTourNutritionProducts(getSelectedProductsCodes().get(0));
+            _actionUpdateProduct.setTourData(_tourData);
+         }
          menuManager.add(_actionUpdateProduct);
          menuManager.add(_actionEditCustomProduct);
          menuManager.add(_actionDeleteProducts);
