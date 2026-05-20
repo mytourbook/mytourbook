@@ -19,8 +19,12 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertLinesMatch;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import com.fasterxml.jackson.annotation.JsonAutoDetect;
-import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility;
+import com.fasterxml.jackson.annotation.JsonInclude.Include;
+import com.fasterxml.jackson.annotation.PropertyAccessor;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.MapperFeature;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -52,10 +56,6 @@ import org.skyscreamer.jsonassert.JSONCompareResult;
 import org.skyscreamer.jsonassert.comparator.CustomComparator;
 import org.xmlunit.builder.DiffBuilder;
 import org.xmlunit.diff.Diff;
-
-import tools.jackson.core.JacksonException;
-import tools.jackson.databind.ObjectMapper;
-import tools.jackson.databind.json.JsonMapper;
 
 public class Comparison {
 
@@ -231,19 +231,21 @@ public class Comparison {
 
    private static String convertTourDataToJson(final TourData tourData) {
 
-      final ObjectMapper mapper = JsonMapper.builder()
-            .changeDefaultPropertyInclusion(incl -> incl.withValueInclusion(JsonInclude.Include.NON_NULL))
-            .changeDefaultPropertyInclusion(incl -> incl.withValueInclusion(JsonInclude.Include.NON_EMPTY))
-            .changeDefaultVisibility(i -> i.with(JsonAutoDetect.Visibility.NONE))
-            .changeDefaultVisibility(i -> i.withFieldVisibility(JsonAutoDetect.Visibility.NONE))
-            .changeDefaultVisibility(i -> i.withGetterVisibility(JsonAutoDetect.Visibility.NONE))
-            .changeDefaultVisibility(i -> i.withSetterVisibility(JsonAutoDetect.Visibility.NONE))
-            .build();
+      final ObjectMapper objectMapper = new ObjectMapper();
+      objectMapper.setSerializationInclusion(Include.NON_NULL);
+      objectMapper.setSerializationInclusion(Include.NON_EMPTY);
+      objectMapper.setConfig(objectMapper.getSerializationConfig()
+            .with(MapperFeature.SORT_PROPERTIES_ALPHABETICALLY));
+      objectMapper.setVisibility(PropertyAccessor.ALL, Visibility.NONE);
+      objectMapper.setVisibility(PropertyAccessor.FIELD, Visibility.NONE);
+      objectMapper.setVisibility(PropertyAccessor.GETTER, Visibility.NONE);
+      objectMapper.setVisibility(PropertyAccessor.IS_GETTER, Visibility.NONE);
+      objectMapper.setVisibility(PropertyAccessor.SETTER, Visibility.NONE);
 
       String jsonString = UI.EMPTY_STRING;
       try {
-         jsonString = mapper.writerWithDefaultPrettyPrinter().writeValueAsString(tourData);
-      } catch (final JacksonException e) {
+         jsonString = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(tourData);
+      } catch (final JsonProcessingException e) {
          StatusUtil.log(e);
       }
       return jsonString;
