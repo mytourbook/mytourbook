@@ -15,6 +15,12 @@
  *******************************************************************************/
 package net.tourbook.nutrition;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.URI;
@@ -44,17 +50,10 @@ import net.tourbook.web.WEB;
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.MultiStatus;
+import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.dialogs.ErrorDialog;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.swt.widgets.Display;
-
-import tools.jackson.core.JacksonException;
-import tools.jackson.core.type.TypeReference;
-import tools.jackson.databind.DeserializationFeature;
-import tools.jackson.databind.JsonNode;
-import tools.jackson.databind.ObjectMapper;
-import tools.jackson.databind.cfg.EnumFeature;
-import tools.jackson.databind.json.JsonMapper;
 
 public class NutritionUtils {
 
@@ -142,12 +141,10 @@ public class NutritionUtils {
 
    private static List<Product> deserializeResponse(final String body,
                                                     final ProductSearchType productSearchType)
-         throws JacksonException {
+         throws JsonProcessingException {
 
-      final ObjectMapper mapper = JsonMapper.builder()
-            .enable(EnumFeature.READ_UNKNOWN_ENUM_VALUES_AS_NULL)
-            .disable(DeserializationFeature.FAIL_ON_NULL_FOR_PRIMITIVES)
-            .build();
+      final ObjectMapper mapper = new ObjectMapper();
+      mapper.enable(DeserializationFeature.READ_UNKNOWN_ENUM_VALUES_AS_NULL);
 
       List<Product> deserializedProductsResults = new ArrayList<>();
 
@@ -365,9 +362,14 @@ public class NutritionUtils {
                   statusCode + ": " + //$NON-NLS-1$
                   responseBody);
          }
-      } catch (JacksonException | RejectedExecutionException | IOException | InterruptedException e) {
+      } catch (JsonProcessingException | RejectedExecutionException e) {
 
-         final IStatus status = StatusUtil.newStatus(IStatus.ERROR, UI.EMPTY_STRING, e);
+         final IStatus status = new Status(
+               IStatus.ERROR,
+               TourbookPlugin.PLUGIN_ID,
+               e.getMessage(),
+               null);
+
          //Use a multiStatus as, otherwise, long errors create windows that are too
          //big to be displayed in the error dialog
          final MultiStatus multiStatus = new MultiStatus(
@@ -381,6 +383,10 @@ public class NutritionUtils {
                Messages.Dialog_SearchProduct_Title,
                Messages.Dialog_SearchProduct_Label_Error_Message,
                multiStatus));
+
+         StatusUtil.logError(e.getMessage());
+
+      } catch (IOException | InterruptedException e) {
 
          StatusUtil.logError(e.getMessage());
          Thread.currentThread().interrupt();

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2021, 2026 Frédéric Bard
+ * Copyright (C) 2021, 2025 Frédéric Bard
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -14,6 +14,8 @@
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
 package net.tourbook.cloud.suunto;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -63,8 +65,6 @@ import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.dialogs.PreferencesUtil;
-
-import tools.jackson.databind.ObjectMapper;
 
 public class SuuntoCloudDownloader extends TourbookCloudDownloader {
 

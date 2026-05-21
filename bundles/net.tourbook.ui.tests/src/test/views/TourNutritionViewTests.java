@@ -65,7 +65,7 @@ public class TourNutritionViewTests extends UITest {
       // Act - Search for a food in the OpenFoodFacts database
       bot.comboBox(0).setText("larabar"); //$NON-NLS-1$
       bot.button(Messages.Dialog_SearchProduct_Button_Search).click();
-      bot.sleep(20000);
+      bot.sleep(5000);
       bot.button(Messages.Dialog_SearchProduct_Button_Add).click();
 
       // Sort the products by name
@@ -81,7 +81,7 @@ public class TourNutritionViewTests extends UITest {
       // Act - Search for a beverage in the OpenFoodFacts database
       bot.comboBox(0).setText("tailwind"); //$NON-NLS-1$
       bot.button(Messages.Dialog_SearchProduct_Button_Search).click();
-      bot.sleep(20000);
+      bot.sleep(5000);
       // Act - Add the product via the button in the context menu
       productsSearchTable.click(0, 1);
       productsSearchTable.contextMenu(Messages.Dialog_SearchProduct_Button_Add).click();
@@ -90,7 +90,7 @@ public class TourNutritionViewTests extends UITest {
       bot.comboBox(1).setSelection(Messages.Dialog_SearchProduct_Combo_SearchType_ByCode);
       bot.comboBox(0).setText("829262000333"); //$NON-NLS-1$
       bot.button(Messages.Dialog_SearchProduct_Button_Search).click();
-      bot.sleep(20000);
+      bot.sleep(5000);
       bot.button(Messages.Dialog_SearchProduct_Button_Add).click();
 
       // Act - Search for a food by code in the OpenFoodFacts database that
@@ -98,7 +98,7 @@ public class TourNutritionViewTests extends UITest {
       bot.comboBox(1).setSelection(Messages.Dialog_SearchProduct_Combo_SearchType_ByCode);
       bot.comboBox(0).setText("0829262000340"); //$NON-NLS-1$
       bot.button(Messages.Dialog_SearchProduct_Button_Search).click();
-      bot.sleep(20000);
+      bot.sleep(5000);
       bot.button(Messages.Dialog_SearchProduct_Button_Add).click();
 
       // Close the {@link DialogSearchProduct}
@@ -113,7 +113,7 @@ public class TourNutritionViewTests extends UITest {
       assertEquals(initialTableRowCount + 4, productsTable.rowCount());
 
       // Act - Update all the products
-      bot.button(Messages.Tour_Nutrition_Button_UpdateProducts).click();
+      bot.button(Messages.Tour_Nutrition_Button_UpdateProduct).click();
 
       // Act - Add a manual product
       bot.button(Messages.Tour_Nutrition_Button_AddCustomProduct).click();
