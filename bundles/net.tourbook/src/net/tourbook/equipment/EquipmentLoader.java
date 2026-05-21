@@ -320,7 +320,8 @@ public class EquipmentLoader {
       try (Connection conn = TourDatabase.getInstance().getConnection()) {
 
          final AppFilter appFilter = partItem.createAppFilter();
-         final SQLData partFilter = new EquipmentPartFilter().getSqlData();
+         final SQLData partFilter_AND_OR = new EquipmentPartFilter_AND_OR().getSqlData();
+         final SQLData partFilter_NOT = new EquipmentPartFilter_NOT().getSqlData();
 
          sql = UI.EMPTY_STRING
 
@@ -358,10 +359,12 @@ public class EquipmentLoader {
                + "      AND TourData.tourstarttime <  part.dateCollateUntil" + NL //               //$NON-NLS-1$
 
                + appFilter.getWhereClause()
-               + partFilter.getSqlString()
+               + partFilter_AND_OR.getSqlString()
 
                + "   WHERE part.isCollate = TRUE" + NL //                                          //$NON-NLS-1$
                + "     AND part.partID    = ?" + NL //                                             //$NON-NLS-1$
+
+               + partFilter_NOT.getSqlString()
 
                + ") AS tdFields" + NL //                                                           //$NON-NLS-1$
 
@@ -372,9 +375,11 @@ public class EquipmentLoader {
          int nextIndex = 1;
 
          nextIndex = appFilter.setParameters(statement, nextIndex);
-         nextIndex = partFilter.setParameters(statement, nextIndex);
+         nextIndex = partFilter_AND_OR.setParameters(statement, nextIndex);
 
          statement.setLong(nextIndex++, partItem.getPartID());
+
+         nextIndex = partFilter_NOT.setParameters(statement, nextIndex);
 
          final ResultSet result = statement.executeQuery();
 

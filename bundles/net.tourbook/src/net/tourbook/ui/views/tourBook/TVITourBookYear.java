@@ -31,7 +31,8 @@ import net.tourbook.common.util.SQL;
 import net.tourbook.common.util.SQLData;
 import net.tourbook.common.util.TreeViewerItem;
 import net.tourbook.database.TourDatabase;
-import net.tourbook.equipment.EquipmentPartFilter;
+import net.tourbook.equipment.EquipmentPartFilter_AND_OR;
+import net.tourbook.equipment.EquipmentPartFilter_NOT;
 import net.tourbook.ui.AppFilter;
 
 public class TVITourBookYear extends TVITourBookItem {
@@ -86,7 +87,8 @@ public class TVITourBookYear extends TVITourBookItem {
          }
 
          final AppFilter appFilter = new AppFilter(AppFilter.ANY_APP_FILTERS);
-         final SQLData partFilter = new EquipmentPartFilter().getSqlData();
+         final SQLData partFilter_AND_OR = new EquipmentPartFilter_AND_OR().getSqlData();
+         final SQLData partFilter_NOT = new EquipmentPartFilter_NOT().getSqlData();
 
          sql = UI.EMPTY_STRING
 
@@ -116,13 +118,14 @@ public class TVITourBookYear extends TVITourBookItem {
 
                + "   FROM TOURDATA AS TourData" + NL //                                //$NON-NLS-1$
 
-               + partFilter.getSqlString()
+               + partFilter_AND_OR.getSqlString()
 
                + "   WHERE" + NL //                                                    //$NON-NLS-1$
 
                + "      " + sqlSumYearField + " = ?" + NL //                           //$NON-NLS-1$ //$NON-NLS-2$
 
                + appFilter.getWhereClause()
+               + partFilter_NOT.getSqlString()
 
                + ") AS tdFields" + NL //                                               //$NON-NLS-1$
 
@@ -134,11 +137,12 @@ public class TVITourBookYear extends TVITourBookItem {
 
          int nextIndex = 1;
 
-         nextIndex = partFilter.setParameters(prepStmt, nextIndex);
+         nextIndex = partFilter_AND_OR.setParameters(prepStmt, nextIndex);
 
          prepStmt.setInt(nextIndex++, tourYear);
 
          nextIndex = appFilter.setParameters(prepStmt, nextIndex);
+         nextIndex = partFilter_NOT.setParameters(prepStmt, nextIndex);
 
          final ResultSet result = prepStmt.executeQuery();
          while (result.next()) {

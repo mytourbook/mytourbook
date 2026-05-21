@@ -198,6 +198,7 @@ public class SlideoutTourEquipmentFilter extends AdvancedSlideout implements ITr
    private Button    _chkLiveUpdate;
    private Button    _rdoEquipmentOperator_OR;
    private Button    _rdoEquipmentOperator_AND;
+   private Button    _rdoEquipmentOperator_NOT;
    private Button    _rdoFilterType_Equipment;
    private Button    _rdoFilterType_Part;
 
@@ -850,15 +851,24 @@ public class SlideoutTourEquipmentFilter extends AdvancedSlideout implements ITr
             public void update(final ViewerCell cell) {
 
                final TourEquipmentFilterProfile profile = (TourEquipmentFilterProfile) cell.getElement();
+
                final int numEquipment = profile.allAssetFilterIDs.size();
 
-               final String combineEquipment = profile.isOrOperator
-                     ? Messages.Slideout_TourTagFilter_CombineTags_With_OR
-                     : Messages.Slideout_TourTagFilter_CombineTags_With_AND;
+               final EquipmentFilterOperator filterOperator = profile.filterOperator;
 
-               cell.setText(numEquipment > 1
+               final boolean isOperatorNOT = filterOperator.equals(EquipmentFilterOperator.NOT);
+               final boolean isOperatorOR = filterOperator.equals(EquipmentFilterOperator.OR);
+               final boolean isOperatorAND = filterOperator.equals(EquipmentFilterOperator.AND);
 
-                     // combine equipment requires at least 2 equipment
+               final String combineEquipment =
+
+                     isOperatorOR ? Messages.Slideout_TourTagFilter_CombineTags_With_OR
+                           : isOperatorAND ? Messages.Slideout_TourTagFilter_CombineTags_With_AND
+                                 : isOperatorNOT ? "NOT"
+                                       : UI.EMPTY_STRING;
+
+               cell.setText(isOperatorAND && numEquipment > 1 || numEquipment > 0
+
                      ? combineEquipment
 
                      : UI.EMPTY_STRING);
@@ -1076,8 +1086,15 @@ public class SlideoutTourEquipmentFilter extends AdvancedSlideout implements ITr
           * The selected equipment viewer selection event can have another selection !!!
           */
 
+         final Widget item = selectionEvent.item;
+
+         // this happened during debugging
+         if (item == null) {
+            return;
+         }
+
          _selectedEquipmentViewerItem_IsChecked = selectionEvent.detail == SWT.CHECK;
-         _selectedEquipmentViewerItem_Data = selectionEvent.item.getData();
+         _selectedEquipmentViewerItem_Data = item.getData();
       }));
 
       table.addKeyListener(new KeyAdapter() {
@@ -1157,11 +1174,13 @@ public class SlideoutTourEquipmentFilter extends AdvancedSlideout implements ITr
             // Label: Equipment operator
             _lblAssetOperator = new Label(container, SWT.NONE);
             _lblAssetOperator.setText(UI.EMPTY_STRING);
+            GridDataFactory.fillDefaults().align(SWT.FILL, SWT.BEGINNING).applyTo(_lblAssetOperator);
+
          }
 
          final Composite containerOperator = new Composite(container, SWT.NONE);
          GridDataFactory.fillDefaults().grab(true, false).applyTo(containerOperator);
-         GridLayoutFactory.fillDefaults().numColumns(2).applyTo(containerOperator);
+         GridLayoutFactory.fillDefaults().numColumns(1).applyTo(containerOperator);
          {
             {
                /*
@@ -1180,6 +1199,15 @@ public class SlideoutTourEquipmentFilter extends AdvancedSlideout implements ITr
                _rdoEquipmentOperator_AND.setText(Messages.Slideout_TourTagFilter_Radio_TagOperator_AND);
                _rdoEquipmentOperator_AND.setToolTipText(Messages.Slideout_EquipmentFilter_Radio_EquipmentOperator_AND_Tooltip);
                _rdoEquipmentOperator_AND.addSelectionListener(_defaultSelectionListener);
+            }
+            {
+               /*
+                * Radio: NOT
+                */
+               _rdoEquipmentOperator_NOT = new Button(containerOperator, SWT.RADIO);
+               _rdoEquipmentOperator_NOT.setText("NOT");
+               _rdoEquipmentOperator_NOT.setToolTipText("A tour is displayed when it do NOT contain one of the selected equipment");
+               _rdoEquipmentOperator_NOT.addSelectionListener(_defaultSelectionListener);
             }
          }
       }
@@ -1501,7 +1529,8 @@ public class SlideoutTourEquipmentFilter extends AdvancedSlideout implements ITr
       final boolean isProfileSelected              = _selectedProfile != null;
       final boolean canCheckEquipment              = numSelectedAssetItems > 0 && numCheckedSelectedEquipmentItems < numSelectedAssetItems;
       final boolean canUncheckEquipment            = numSelectedAssetItems > 0 && numCheckedSelectedEquipmentItems > 0;
-      final boolean canSetEquipmentOperator        = isProfileSelected && numCheckedSelectedEquipmentItems > 1;
+      final boolean canSetEquipmentOperator        = isProfileSelected && numCheckedSelectedEquipmentItems > 0;
+      final boolean canSetEquipmentOperatorAnd     = isProfileSelected && numCheckedSelectedEquipmentItems > 1;
 
       _btnApply                              .setEnabled(isProfileSelected && _isLiveUpdate == false);
       _btnCopyProfile                        .setEnabled(isProfileSelected);
@@ -1520,8 +1549,9 @@ public class SlideoutTourEquipmentFilter extends AdvancedSlideout implements ITr
       _lblSelectEquipment                    .setEnabled(isProfileSelected);
       _lblAssetOperator                      .setEnabled(canSetEquipmentOperator);
 
-      _rdoEquipmentOperator_AND              .setEnabled(canSetEquipmentOperator);
+      _rdoEquipmentOperator_AND              .setEnabled(canSetEquipmentOperatorAnd);
       _rdoEquipmentOperator_OR               .setEnabled(canSetEquipmentOperator);
+      _rdoEquipmentOperator_NOT              .setEnabled(canSetEquipmentOperator);
       _rdoFilterType_Equipment               .setEnabled(isProfileSelected);
       _rdoFilterType_Part                    .setEnabled(isProfileSelected);
 
@@ -2018,17 +2048,27 @@ public class SlideoutTourEquipmentFilter extends AdvancedSlideout implements ITr
          return;
       }
 
+// SET_FORMATTING_OFF
+
       final boolean isFilterEquipment_Old = _isFilterEquipment;
 
       final EquipmentFilterType filterType = _rdoFilterType_Equipment.getSelection()
             ? EquipmentFilterType.EQUIPMENT
             : EquipmentFilterType.PART;
 
-      _isFilterEquipment = EquipmentFilterType.EQUIPMENT.equals(filterType);
+      final EquipmentFilterOperator filterOperator =
 
-      _selectedProfile.filterType = filterType;
-      _selectedProfile.name = _txtProfileName.getText();
-      _selectedProfile.isOrOperator = _rdoEquipmentOperator_OR.getSelection();
+            _rdoEquipmentOperator_OR.getSelection()      ? EquipmentFilterOperator.OR
+          : _rdoEquipmentOperator_AND.getSelection()     ? EquipmentFilterOperator.AND
+                                                         : EquipmentFilterOperator.NOT;
+
+      _isFilterEquipment               = EquipmentFilterType.EQUIPMENT.equals(filterType);
+
+      _selectedProfile.filterType      = filterType;
+      _selectedProfile.name            = _txtProfileName.getText();
+      _selectedProfile.filterOperator  = filterOperator;
+
+// SET_FORMATTING_ON
 
       updateUI_SelectedAssetHeader();
 
@@ -2091,15 +2131,17 @@ public class SlideoutTourEquipmentFilter extends AdvancedSlideout implements ITr
 
             // a profile is selected
 
+            final EquipmentFilterOperator filterOperator = _selectedProfile.filterOperator;
+
 // SET_FORMATTING_OFF
 
-            final boolean isOrOperator    = _selectedProfile.isOrOperator;
-            _isFilterEquipment            = EquipmentFilterType.EQUIPMENT.equals(_selectedProfile.filterType);
+            _isFilterEquipment         = EquipmentFilterType.EQUIPMENT.equals(_selectedProfile.filterType);
 
             _txtProfileName            .setText(_selectedProfile.name);
 
-            _rdoEquipmentOperator_OR   .setSelection(isOrOperator);
-            _rdoEquipmentOperator_AND  .setSelection(!isOrOperator);
+            _rdoEquipmentOperator_OR   .setSelection(filterOperator.equals(EquipmentFilterOperator.OR));
+            _rdoEquipmentOperator_AND  .setSelection(filterOperator.equals(EquipmentFilterOperator.AND));
+            _rdoEquipmentOperator_NOT  .setSelection(filterOperator.equals(EquipmentFilterOperator.NOT));
 
             _rdoFilterType_Equipment   .setSelection(_isFilterEquipment);
             _rdoFilterType_Part        .setSelection(_isFilterEquipment == false);

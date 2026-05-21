@@ -21,6 +21,7 @@ import java.util.List;
 import net.tourbook.common.UI;
 import net.tourbook.common.util.SQLData;
 import net.tourbook.database.TourDatabase;
+import net.tourbook.equipment.tour.filter.EquipmentFilterOperator;
 import net.tourbook.equipment.tour.filter.EquipmentFilterType;
 import net.tourbook.equipment.tour.filter.TourEquipmentFilterManager;
 import net.tourbook.equipment.tour.filter.TourEquipmentFilterProfile;
@@ -63,22 +64,29 @@ public class EquipmentFilter {
 
             final String joinTable = TourDatabase.JOINTABLE__TOURDATA__EQUIPMENT;
 
-            if (selectedProfile.isOrOperator) {
+            final EquipmentFilterOperator filterOperator = selectedProfile.filterOperator;
+            final boolean isOrOperator = filterOperator.equals(EquipmentFilterOperator.OR);
+            final boolean isNotOperator = filterOperator.equals(EquipmentFilterOperator.NOT);
 
-               // combine equipment with OR
+            if (isOrOperator || isNotOperator) {
+
+               // combine equipment with OR or NOT
 
                final StringBuilder sqlParameters = createSQL_OR_Parameters(allSQLParameters);
 
                /* require tour to have at least one of these equipment (index-friendly) */
+
+               final String existsOperator = isOrOperator ? "EXISTS" : "NOT EXISTS";
+
                sql = UI.EMPTY_STRING
 
-                     + "AND EXISTS" + NL //                                                     //$NON-NLS-1$
-                     + "(" + NL //                                                              //$NON-NLS-1$
-                     + "  SELECT 1" + NL //                                                     //$NON-NLS-1$
-                     + "  FROM " + joinTable + " AS jTdEq" + NL //                              //$NON-NLS-1$ //$NON-NLS-2$
-                     + "  WHERE jTdEq.TOURDATA_TOURID = TourData.tourID" + NL //                //$NON-NLS-1$
-                     + "    AND jTdEq.Equipment_EquipmentId IN (" + sqlParameters + ")" + NL // //$NON-NLS-1$ //$NON-NLS-2$
-                     + ")" + NL //                                                              //$NON-NLS-1$
+                     + "AND " + existsOperator + NL //                                                                       //$NON-NLS-1$
+                     + "(" + NL //                                                                                //$NON-NLS-1$
+                     + "  SELECT 1" + NL //                                                                       //$NON-NLS-1$
+                     + "  FROM " + joinTable + " AS jTdEq" + NL //                                                //$NON-NLS-1$ //$NON-NLS-2$
+                     + "  WHERE jTdEq.TOURDATA_TOURID = TourData.tourID" + NL //                                  //$NON-NLS-1$
+                     + "    AND jTdEq.Equipment_EquipmentId IN (" + sqlParameters + ")" + NL //   //$NON-NLS-1$ //$NON-NLS-2$
+                     + ")" + NL //                                                                                //$NON-NLS-1$
                ;
 
             } else {

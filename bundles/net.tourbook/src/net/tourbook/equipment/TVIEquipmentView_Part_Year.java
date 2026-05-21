@@ -270,7 +270,8 @@ public class TVIEquipmentView_Part_Year extends TVIEquipmentView_Item {
       try (Connection conn = TourDatabase.getInstance().getConnection()) {
 
          final AppFilter appFilter = createAppFilter();
-         final SQLData partFilter = new EquipmentPartFilter().getSqlData();
+         final SQLData partFilter_AND_OR = new EquipmentPartFilter_AND_OR().getSqlData();
+         final SQLData partFilter_NOT = new EquipmentPartFilter_NOT().getSqlData();
 
          /*
           * Load: Part, Year, Tour
@@ -300,7 +301,7 @@ public class TVIEquipmentView_Part_Year extends TVIEquipmentView_Item {
                + "   AND TourData.StartYear = ?" + NL //                                           //$NON-NLS-1$
 
                + appFilter.getWhereClause()
-               + partFilter.getSqlString()
+               + partFilter_AND_OR.getSqlString()
 
                // get all equipment id's
                + "LEFT JOIN " + TourDatabase.JOINTABLE__TOURDATA__EQUIPMENT + " AS jTdataEq" + NL //   //$NON-NLS-1$ //$NON-NLS-2$
@@ -317,6 +318,8 @@ public class TVIEquipmentView_Part_Year extends TVIEquipmentView_Item {
                + "WHERE part.isCollate = TRUE" + NL //                                             //$NON-NLS-1$
                + "   AND part.partID = ?" + NL //                                                  //$NON-NLS-1$
 
+               + partFilter_NOT.getSqlString()
+
                + "ORDER BY TourData.tourstarttime" + NL //                                         //$NON-NLS-1$
 
                + NL;
@@ -328,9 +331,11 @@ public class TVIEquipmentView_Part_Year extends TVIEquipmentView_Item {
          statement.setLong(nextIndex++, _year);
 
          nextIndex = appFilter.setParameters(statement, nextIndex);
-         nextIndex = partFilter.setParameters(statement, nextIndex);
+         nextIndex = partFilter_AND_OR.setParameters(statement, nextIndex);
 
          statement.setLong(nextIndex++, _partItem.getPartID());
+
+         nextIndex = partFilter_NOT.setParameters(statement, nextIndex);
 
          final ResultSet result = statement.executeQuery();
 

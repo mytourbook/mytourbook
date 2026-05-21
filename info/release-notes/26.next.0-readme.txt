@@ -41,9 +41,10 @@ New / Improvements
   - Add a contextual menu to add several equiments at a time
     https://github.com/mytourbook/mytourbook/issues/1657
 
-* Tour filter (Frederic)
-  - Added nutrition tour filter
-  
+* Tour filter 
+  - Added nutrition tour filter (Frederic)
+  - Added option in the equipment tour filter to exclude tours with an equipment
+    https://github.com/mytourbook/mytourbook/issues/1641
   
 
 Changes
@@ -57,6 +58,8 @@ Changes
   - Multiple equipment with an empty type are not collated any more, each equipment with an empty type can now collate tours for itself
     Update your equipment by removing the type when this equipment/part is not depending on another with the same type
     The new column "Type (saved)" can display the saved value which is a random value when the type in the UI is empty.
+  - The equipment tour filter operator is now supporting also the NOT operator. 
+    This needed to rewrite the code and the old OR or AND operator have to be checked.
 
 * Tagged Tours View
   - New columns to display the parent of a tag and how tours are sorted/categorized

@@ -23,7 +23,8 @@ import net.tourbook.common.UI;
 import net.tourbook.common.util.SQL;
 import net.tourbook.common.util.SQLData;
 import net.tourbook.database.TourDatabase;
-import net.tourbook.equipment.EquipmentPartFilter;
+import net.tourbook.equipment.EquipmentPartFilter_AND_OR;
+import net.tourbook.equipment.EquipmentPartFilter_NOT;
 import net.tourbook.ui.AppFilter;
 
 public class TVITourBookYearCategorized extends TVITourBookItem {
@@ -69,7 +70,8 @@ public class TVITourBookYearCategorized extends TVITourBookItem {
       }
 
       final AppFilter appFilter = new AppFilter(AppFilter.ANY_APP_FILTERS);
-      final SQLData partFilter = new EquipmentPartFilter().getSqlData();
+      final SQLData partFilter_AND_OR = new EquipmentPartFilter_AND_OR().getSqlData();
+      final SQLData partFilter_NOT = new EquipmentPartFilter_NOT().getSqlData();
 
       final String sql = NL
 
@@ -84,7 +86,7 @@ public class TVITourBookYearCategorized extends TVITourBookItem {
 
             + "FROM " + TourDatabase.TABLE_TOUR_DATA + NL //                                          //$NON-NLS-1$
 
-            + partFilter.getSqlString()
+            + partFilter_AND_OR.getSqlString()
 
             // get tag IDs
             + "LEFT JOIN " + TourDatabase.JOINTABLE__TOURDATA__TOURTAG + " jTdataTtag" //             //$NON-NLS-1$ //$NON-NLS-2$
@@ -106,6 +108,7 @@ public class TVITourBookYearCategorized extends TVITourBookItem {
             + "   AND " + sumYearSub + " = ?" + NL //                                                 //$NON-NLS-1$ //$NON-NLS-2$
 
             + appFilter.getWhereClause()
+            + partFilter_NOT.getSqlString()
 
             + "ORDER BY TourStartTime" + NL; //                                                       //$NON-NLS-1$
 
@@ -115,12 +118,13 @@ public class TVITourBookYearCategorized extends TVITourBookItem {
 
          int nextIndex = 1;
 
-         nextIndex = partFilter.setParameters(prepStmt, nextIndex);
+         nextIndex = partFilter_AND_OR.setParameters(prepStmt, nextIndex);
 
          prepStmt.setInt(nextIndex++, tourYear);
          prepStmt.setInt(nextIndex++, tourYearSub);
 
          nextIndex = appFilter.setParameters(prepStmt, nextIndex);
+         nextIndex = partFilter_NOT.setParameters(prepStmt, nextIndex);
 
          fetchTourItems(prepStmt);
 
