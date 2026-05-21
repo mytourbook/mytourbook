@@ -149,7 +149,8 @@ public class TVIEquipmentView_Part extends TVIEquipmentView_Item {
       try (Connection conn = TourDatabase.getInstance().getConnection()) {
 
          final AppFilter appFilter = createAppFilter();
-         final SQLData partFilter = new EquipmentPartFilter().getSqlData();
+         final SQLData partFilter_AND_OR = new EquipmentPartFilter_AND_OR().getSqlData();
+         final SQLData partFilter_NOT = new EquipmentPartFilter_NOT().getSqlData();
 
          /*
           * Load: Part, Tours
@@ -178,7 +179,7 @@ public class TVIEquipmentView_Part extends TVIEquipmentView_Item {
                + "   AND TourData.TourStartTime >= part.dateCollateFrom" + NL //                         //$NON-NLS-1$
                + "   AND TourData.TourStartTime <  part.dateCollateUntil" + NL //                        //$NON-NLS-1$
 
-               + partFilter.getSqlString()
+               + partFilter_AND_OR.getSqlString()
 
                // get all equipment id's
                + "LEFT JOIN " + TourDatabase.JOINTABLE__TOURDATA__EQUIPMENT + " AS jTdataEq" + NL //     //$NON-NLS-1$ //$NON-NLS-2$
@@ -196,6 +197,7 @@ public class TVIEquipmentView_Part extends TVIEquipmentView_Item {
                + "  AND part.partID    = ?" + NL //                                                      //$NON-NLS-1$
 
                + appFilter.getWhereClause()
+               + partFilter_NOT.getSqlString()
 
                + "ORDER BY TourData.TourStartTime" + NL //                                               //$NON-NLS-1$
 
@@ -205,11 +207,12 @@ public class TVIEquipmentView_Part extends TVIEquipmentView_Item {
 
          int nextIndex = 1;
 
-         nextIndex = partFilter.setParameters(statement, nextIndex);
+         nextIndex = partFilter_AND_OR.setParameters(statement, nextIndex);
 
          statement.setLong(nextIndex++, _partID);
 
          nextIndex = appFilter.setParameters(statement, nextIndex);
+         nextIndex = partFilter_NOT.setParameters(statement, nextIndex);
 
          final ResultSet result = statement.executeQuery();
 
@@ -319,7 +322,8 @@ public class TVIEquipmentView_Part extends TVIEquipmentView_Item {
       try (Connection conn = TourDatabase.getInstance().getConnection()) {
 
          final AppFilter appFilter = createAppFilter();
-         final SQLData partFilter = new EquipmentPartFilter().getSqlData();
+         final SQLData partFilter_AND_OR = new EquipmentPartFilter_AND_OR().getSqlData();
+         final SQLData partFilter_NOT = new EquipmentPartFilter_NOT().getSqlData();
 
          /*
           * Load: Part, Years
@@ -363,10 +367,12 @@ public class TVIEquipmentView_Part extends TVIEquipmentView_Item {
                + "   AND TourData.TourStartTime <  part.dateCollateUntil" + NL //               //$NON-NLS-1$
 
                + appFilter.getWhereClause()
-               + partFilter.getSqlString()
+               + partFilter_AND_OR.getSqlString()
 
                + "	WHERE part.IsCollate = TRUE" + NL //                                       //$NON-NLS-1$
                + "     AND part.PartId = ?" + NL //                                             //$NON-NLS-1$
+
+               + partFilter_NOT.getSqlString()
 
                + ") AS tdFields" + NL //                                                        //$NON-NLS-1$
 
@@ -380,9 +386,11 @@ public class TVIEquipmentView_Part extends TVIEquipmentView_Item {
          int nextIndex = 1;
 
          nextIndex = appFilter.setParameters(statement, nextIndex);
-         nextIndex = partFilter.setParameters(statement, nextIndex);
+         nextIndex = partFilter_AND_OR.setParameters(statement, nextIndex);
 
          statement.setLong(nextIndex++, _partID);
+
+         nextIndex = partFilter_NOT.setParameters(statement, nextIndex);
 
          final ResultSet result = statement.executeQuery();
 

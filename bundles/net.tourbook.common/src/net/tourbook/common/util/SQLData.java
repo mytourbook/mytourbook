@@ -31,6 +31,7 @@ public class SQLData {
    private static final char NL = UI.NEW_LINE;
 
    private String            _sqlString;
+
    private List<Object>      _allParameters;
 
    /**
@@ -39,6 +40,7 @@ public class SQLData {
    public SQLData() {
 
       _sqlString = UI.EMPTY_STRING;
+
       _allParameters = new ArrayList<>();
    }
 
@@ -46,6 +48,7 @@ public class SQLData {
                   final List<Object> parameters) {
 
       _sqlString = sqlString;
+
       _allParameters = parameters;
    }
 

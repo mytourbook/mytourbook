@@ -21,11 +21,12 @@ import java.util.List;
 import net.tourbook.common.UI;
 import net.tourbook.common.util.SQLData;
 import net.tourbook.database.TourDatabase;
+import net.tourbook.equipment.tour.filter.EquipmentFilterOperator;
 import net.tourbook.equipment.tour.filter.EquipmentFilterType;
 import net.tourbook.equipment.tour.filter.TourEquipmentFilterManager;
 import net.tourbook.equipment.tour.filter.TourEquipmentFilterProfile;
 
-public class EquipmentPartFilter {
+public class EquipmentPartFilter_AND_OR {
 
    private static final char   NL                  = UI.NEW_LINE;
 
@@ -34,7 +35,7 @@ public class EquipmentPartFilter {
 
    private SQLData             _sqlData;
 
-   public EquipmentPartFilter() {
+   public EquipmentPartFilter_AND_OR() {
 
       _sqlData = createSQL();
    }
@@ -64,7 +65,12 @@ public class EquipmentPartFilter {
             final String tEqPart = TourDatabase.TABLE_EQUIPMENT_PART;
             final String jTdEq = TourDatabase.JOINTABLE__TOURDATA__EQUIPMENT;
 
-            if (selectedProfile.isOrOperator) {
+            final EquipmentFilterOperator filterOperator = selectedProfile.filterOperator;
+
+            final boolean isOrOperator = filterOperator.equals(EquipmentFilterOperator.OR);
+            final boolean isAndOperator = filterOperator.equals(EquipmentFilterOperator.AND);
+
+            if (isOrOperator) {
 
                // combine parts with OR
 
@@ -86,7 +92,7 @@ public class EquipmentPartFilter {
                      + "   AND TourData.TourStartTime < partOR.dateCollateUntil" + NL //                 //$NON-NLS-1$
                ;
 
-            } else {
+            } else if (isAndOperator) {
 
                // combine parts with AND
 
@@ -151,9 +157,9 @@ public class EquipmentPartFilter {
 
       final String sqlFinal = UI.EMPTY_STRING
 
-            + "-- part filter - START" + NL //$NON-NLS-1$
+            + "-- part filter OR/AND - START" + NL //$NON-NLS-1$
             + sql
-            + "-- part filter - END" + NL //$NON-NLS-1$
+            + "-- part filter OR/AND - END" + NL //$NON-NLS-1$
       ;
 
       return new SQLData(sqlFinal, allSQLParameters);

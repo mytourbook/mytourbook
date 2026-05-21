@@ -40,40 +40,40 @@ import org.osgi.framework.Version;
 
 public class TourEquipmentFilterManager {
 
-   private static final String                     TOUR_FILTER_FILE_NAME       = "tour-equipment-filter.xml";            //$NON-NLS-1$
-   private static final int                        TOUR_FILTER_VERSION         = 1;
+   private static final String                     TOUR_FILTER_FILE_NAME        = "tour-equipment-filter.xml";            //$NON-NLS-1$
+   private static final int                        TOUR_FILTER_VERSION          = 1;
 
-   private static final String                     EQUIPMENT_PROFILE           = "Profile";                              //$NON-NLS-1$
-   private static final String                     EQUIPMENT_ROOT              = "TourEquipmentFilterProfiles";          //$NON-NLS-1$
+   private static final String                     EQUIPMENT_PROFILE            = "Profile";                              //$NON-NLS-1$
+   private static final String                     EQUIPMENT_ROOT               = "TourEquipmentFilterProfiles";          //$NON-NLS-1$
 
-   private static final String                     ATTR_TOUR_FILTER_VERSION    = "tourEquipmentFilterVersion";           //$NON-NLS-1$
-   private static final String                     ATTR_IS_OR_OPERATOR         = "isOrOperator";                         //$NON-NLS-1$
-   static final boolean                            ATTR_IS_OR_OPERATOR_DEFAULT = true;
-   private static final String                     ATTR_IS_SELECTED            = "isSelected";                           //$NON-NLS-1$
-   private static final String                     ATTR_NAME                   = "name";                                 //$NON-NLS-1$
-   private static final String                     ATTR_EQUIPMENT_ID           = "equipmentIDs";                         //$NON-NLS-1$
-   private static final String                     ATTR_EQUIPMENT_ID_UNCHECKED = "equipmentIDsUnchecked";                //$NON-NLS-1$
-   private static final String                     ATTR_FILTER_TYPE            = "filterType";                           //$NON-NLS-1$
-   public static final EquipmentFilterType         ATTR_FILTER_TYPE_DEFAULT    = EquipmentFilterType.EQUIPMENT;
+   private static final String                     ATTR_TOUR_FILTER_VERSION     = "tourEquipmentFilterVersion";           //$NON-NLS-1$
+   private static final String                     ATTR_IS_SELECTED             = "isSelected";                           //$NON-NLS-1$
+   private static final String                     ATTR_NAME                    = "name";                                 //$NON-NLS-1$
+   private static final String                     ATTR_EQUIPMENT_ID            = "equipmentIDs";                         //$NON-NLS-1$
+   private static final String                     ATTR_EQUIPMENT_ID_UNCHECKED  = "equipmentIDsUnchecked";                //$NON-NLS-1$
+   private static final String                     ATTR_FILTER_TYPE             = "filterType";                           //$NON-NLS-1$
+   public static final EquipmentFilterType         ATTR_FILTER_TYPE_DEFAULT     = EquipmentFilterType.EQUIPMENT;
+   private static final String                     ATTR_FILTER_OPERATOR         = "filterOperator";                       //$NON-NLS-1$
+   public static final EquipmentFilterOperator     ATTR_FILTER_OPERATOR_DEFAULT = EquipmentFilterOperator.OR;
 
-   private static final Bundle                     _bundle                     = TourbookPlugin.getDefault().getBundle();
+   private static final Bundle                     _bundle                      = TourbookPlugin.getDefault().getBundle();
 
-   private static final IPath                      _stateLocation              = Platform.getStateLocation(_bundle);
-   private static final IPreferenceStore           _prefStore                  = TourbookPlugin.getPrefStore();
+   private static final IPath                      _stateLocation               = Platform.getStateLocation(_bundle);
+   private static final IPreferenceStore           _prefStore                   = TourbookPlugin.getPrefStore();
 
    private static boolean                          _isTourEquipmentFilterEnabled;
 
    /**
     * Contains all available profiles.
     */
-   private static List<TourEquipmentFilterProfile> _filterProfiles             = new ArrayList<>();
+   private static List<TourEquipmentFilterProfile> _filterProfiles              = new ArrayList<>();
 
    /**
     * Contains the selected profile or <code>null</code> when a profile is not selected.
     */
    private static TourEquipmentFilterProfile       _selectedProfile;
 
-   private static int[]                            _fireEventCounter           = new int[1];
+   private static int[]                            _fireEventCounter            = new int[1];
 
    private static ActionTourEquipmentFilter        _actionTourEquipmentFilter;
 
@@ -164,9 +164,9 @@ public class TourEquipmentFilterManager {
 
 // SET_FORMATTING_OFF
 
-                  equipmentFilterProfile.name         = Util.getXmlString(xmlProfile, ATTR_NAME, UI.EMPTY_STRING);
-                  equipmentFilterProfile.isOrOperator = Util.getXmlBoolean(xmlProfile, ATTR_IS_OR_OPERATOR, true);
-                  equipmentFilterProfile.filterType   = (EquipmentFilterType) Util.getXmlEnum(xmlProfile, ATTR_FILTER_TYPE, EquipmentFilterType.EQUIPMENT);
+                  equipmentFilterProfile.name            = Util.getXmlString(xmlProfile, ATTR_NAME, UI.EMPTY_STRING);
+                  equipmentFilterProfile.filterOperator  = (EquipmentFilterOperator) Util.getXmlEnum(xmlProfile, ATTR_FILTER_OPERATOR, EquipmentFilterOperator.OR);
+                  equipmentFilterProfile.filterType      = (EquipmentFilterType)     Util.getXmlEnum(xmlProfile, ATTR_FILTER_TYPE,     EquipmentFilterType.EQUIPMENT);
 
                   _filterProfiles.add(equipmentFilterProfile);
 
@@ -250,9 +250,9 @@ public class TourEquipmentFilterManager {
 
 // SET_FORMATTING_OFF
 
+            xmlProfile.putString(ATTR_FILTER_OPERATOR,   filterProfile.filterOperator.name());
             xmlProfile.putString(ATTR_FILTER_TYPE,       filterProfile.filterType.name());
             xmlProfile.putString(ATTR_NAME,              filterProfile.name);
-            xmlProfile.putBoolean(ATTR_IS_OR_OPERATOR,   filterProfile.isOrOperator);
 
             // set flag for active profile
             if (filterProfile == _selectedProfile) {
