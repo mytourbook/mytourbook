@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2023 Wolfgang Schramm and Contributors
+ * Copyright (C) 2023, 2026 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -45,6 +45,7 @@ public class SlideoutTourLogOptions extends ToolbarSlideout {
    /*
     * UI controls
     */
+   private Button _chkDisplayInfoInStatusLine;
    private Button _chkEvent_DeleteSomething;
    private Button _chkEvent_DownloadSomething;
    private Button _chkEvent_SaveSomething;
@@ -194,6 +195,13 @@ public class SlideoutTourLogOptions extends ToolbarSlideout {
             }
          }
          {
+            // checkbox: Display info in status line
+            _chkDisplayInfoInStatusLine = new Button(container, SWT.CHECK);
+            _chkDisplayInfoInStatusLine.setText(Messages.Slideout_TourLogOptions_Checkbox_DisplayInfoInStatusLine);
+            _chkDisplayInfoInStatusLine.setToolTipText(Messages.Slideout_TourLogOptions_Checkbox_DisplayInfoInStatusLine_Tooltip);
+            _chkDisplayInfoInStatusLine.addSelectionListener(_defaultSelectionListener);
+         }
+         {
             // label: More info
             final Label label = new Label(container, SWT.WRAP);
             label.setText(Messages.Slideout_TourLogOptions_Label_AutoOpenLogView_MoreInfo);
@@ -280,6 +288,8 @@ public class SlideoutTourLogOptions extends ToolbarSlideout {
             _chkEvent_TourUpload.setSelection(true);
          }
       }
+
+      _chkDisplayInfoInStatusLine.setSelection(TourLogManager.getIsShowInfoInStatusLine());
    }
 
    private void saveState() {
@@ -325,7 +335,13 @@ public class SlideoutTourLogOptions extends ToolbarSlideout {
          allOpenEvents.add(AutoOpenEvent.TOUR_ADJUSTMENTS);
       }
 
-      TourLogManager.saveState_AutoOpenValues(autoOpenWhen, allOpenEvents);
+      final boolean isShowInfoInStatusLine = _chkDisplayInfoInStatusLine.getSelection();
+
+      TourLogManager.saveState_AutoOpenValues(
+
+            autoOpenWhen,
+            allOpenEvents,
+            isShowInfoInStatusLine);
    }
 
 }

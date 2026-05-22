@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2026 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -19,6 +19,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.UI;
@@ -31,19 +32,23 @@ import org.eclipse.swt.widgets.Display;
 
 public class TourLogManager {
 
-   static final String                                ID                     = "net.tourbook.tour.TourLogManager"; //$NON-NLS-1$
+   static final String                                ID                                       = "net.tourbook.tour.TourLogManager";         //$NON-NLS-1$
 
-   private static final String                        STATE_AUTO_OPEN_WHEN   = "STATE_AUTO_OPEN_WHEN";             //$NON-NLS-1$
-   private static final String                        STATE_AUTO_OPEN_EVENTS = "STATE_AUTO_OPEN_EVENTS";           //$NON-NLS-1$
+   private static final String                        STATE_AUTO_OPEN_WHEN                     = "STATE_AUTO_OPEN_WHEN";                     //$NON-NLS-1$
+   private static final String                        STATE_AUTO_OPEN_EVENTS                   = "STATE_AUTO_OPEN_EVENTS";                   //$NON-NLS-1$
+   private static final String                        STATE_IS_DISPLAY_LOG_INFO_IN_STATUS_LINE = "STATE_IS_DISPLAY_LOG_INFO_IN_STATUS_LINE"; //$NON-NLS-1$
 
-   private static final IDialogSettings               _state                 = TourbookPlugin.getState(ID);
+   private static final IDialogSettings               _state                                   = TourbookPlugin.getState(ID);
 
-   private static final CopyOnWriteArrayList<TourLog> _allTourLogs           = new CopyOnWriteArrayList<>();
+   private static final CopyOnWriteArrayList<TourLog> _allTourLogs                             = new CopyOnWriteArrayList<>();
 
    private static TourLogView                         _logView;
 
    private static AutoOpenWhen                        _autoOpenWhen;
    private static Set<AutoOpenEvent>                  _autoOpenEvents;
+   private static Boolean                             _isDisplayLogInfoInTheStatusLine;
+
+   private static AtomicInteger                       _tourLogCounter                          = new AtomicInteger();
 
    public enum AutoOpenEvent {
 
@@ -73,6 +78,31 @@ public class TourLogManager {
       // update UI
       if (isTourLogOpen()) {
          _logView.addLog(tourLog);
+      }
+
+      // display an info in the status line
+      if (_isDisplayLogInfoInTheStatusLine) {
+
+         final int logCounter = _tourLogCounter.getAndIncrement();
+
+         if (logCounter == 0) {
+
+            // this is the first log (after a reset) -> start an UI update
+
+            final Runnable runnable = new Runnable() {
+
+               @Override
+               public void run() {
+
+                  final int logCounterRunnable = _tourLogCounter.getAndSet(0);
+
+                  UI.showStatusLineMessage("New tour log entries: " + logCounterRunnable);
+               }
+            };
+
+            // timerExec MUST be run from the display thread, otherwise org.eclipse.swt.SWTException: Invalid thread access
+            Display.getDefault().asyncExec(() -> Display.getDefault().timerExec(200, runnable));
+         }
       }
    }
 
@@ -121,6 +151,15 @@ public class TourLogManager {
       }
 
       return _autoOpenWhen;
+   }
+
+   static Boolean getIsShowInfoInStatusLine() {
+
+      if (_isDisplayLogInfoInTheStatusLine == null) {
+         restoreState();
+      }
+
+      return _isDisplayLogInfoInTheStatusLine;
    }
 
    public static CopyOnWriteArrayList<TourLog> getLogs() {
@@ -238,22 +277,31 @@ public class TourLogManager {
          openEventDefaultValues.add(autoOpenEvent);
       }
 
-      final ArrayList<AutoOpenEvent> autoOpenEvents = Util.getStateEnumList(_state, STATE_AUTO_OPEN_EVENTS, openEventDefaultValues);
+      final ArrayList<AutoOpenEvent> autoOpenEvents = Util.getStateEnumList(_state,
+            STATE_AUTO_OPEN_EVENTS,
+            openEventDefaultValues);
 
       _autoOpenEvents = new HashSet<>();
       _autoOpenEvents.addAll(autoOpenEvents);
+
+      _isDisplayLogInfoInTheStatusLine = Util.getStateBoolean(_state, STATE_IS_DISPLAY_LOG_INFO_IN_STATUS_LINE, true);
    }
 
    static void saveState_AutoOpenValues(final AutoOpenWhen autoOpenWhen,
-                                        final ArrayList<AutoOpenEvent> allOpenEvents) {
+                                        final ArrayList<AutoOpenEvent> allOpenEvents,
+                                        final boolean isShowInfoInStatusLine) {
 
       _autoOpenWhen = autoOpenWhen;
 
       _autoOpenEvents.clear();
       _autoOpenEvents.addAll(allOpenEvents);
 
+      _isDisplayLogInfoInTheStatusLine = isShowInfoInStatusLine;
+
       Util.setStateEnum(_state, STATE_AUTO_OPEN_WHEN, autoOpenWhen);
       Util.setStateEnum(_state, STATE_AUTO_OPEN_EVENTS, allOpenEvents);
+
+      _state.put(STATE_IS_DISPLAY_LOG_INFO_IN_STATUS_LINE, isShowInfoInStatusLine);
    }
 
    public static void setLogView(final TourLogView tourLogView) {

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2025 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2026 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -30,6 +30,7 @@ import java.util.Formatter;
 import java.util.List;
 import java.util.Random;
 import java.util.concurrent.ConcurrentSkipListSet;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import net.tourbook.common.color.ThemeUtil;
 import net.tourbook.common.formatter.FormatManager;
@@ -824,6 +825,8 @@ public class UI {
    private static final String           SYS_PROP__SWT_AUTOSCALE_NO  = "noAutoScale";                                                //$NON-NLS-1$
    private static final String           _swtAutoScale               = System.getProperty(SYS_PROP__SWT_AUTOSCALE);
    private static final String           _swtAutoScale_No            = System.getProperty(SYS_PROP__SWT_AUTOSCALE_NO);
+
+   private static AtomicInteger          _statusMessageCounter       = new AtomicInteger();
 
    static {
 
@@ -4017,15 +4020,29 @@ public class UI {
     */
    public static void showStatusLineMessage(final String statusMessage) {
 
-      final IStatusLineManager statusLineMgr = UI.getStatusLineManager();
+      final IStatusLineManager statusLineMgr = getStatusLineManager();
 
       if (statusLineMgr != null) {
 
+         final int lastCounter = _statusMessageCounter.incrementAndGet();
+
          statusLineMgr.setMessage(statusMessage);
 
-         final int delay = _prefStore_Common.getInt(ICommonPreferences.APPEARANCE_NOTIFICATION_MESSAGES_DURATION) * 1000;
          // cleanup message
-         Display.getDefault().timerExec(delay, () -> statusLineMgr.setMessage(null));
+
+         final int delay = _prefStore_Common.getInt(ICommonPreferences.APPEARANCE_NOTIFICATION_MESSAGES_DURATION) * 1000;
+
+         Display.getDefault().timerExec(delay, () -> {
+
+            // prevent that newer status messages are cleaned too early
+
+            final int currentCounter = _statusMessageCounter.get();
+
+            if (currentCounter == lastCounter) {
+
+               statusLineMgr.setMessage(null);
+            }
+         });
       }
    }
 
