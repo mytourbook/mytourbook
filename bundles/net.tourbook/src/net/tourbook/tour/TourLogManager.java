@@ -57,6 +57,11 @@ public class TourLogManager {
     */
    private static Image _imageTourLogView = TourbookPlugin.getThemedImageDescriptor(Images.TourLog).createImage();
 
+   static {
+
+      restoreState();
+   }
+
    public enum AutoOpenEvent {
 
       EXCEPTION, //
@@ -144,27 +149,15 @@ public class TourLogManager {
 
    static Set<AutoOpenEvent> getAutoOpenEvents() {
 
-      if (_autoOpenEvents == null) {
-         restoreState();
-      }
-
       return _autoOpenEvents;
    }
 
    static AutoOpenWhen getAutoOpenWhen() {
 
-      if (_autoOpenWhen == null) {
-         restoreState();
-      }
-
       return _autoOpenWhen;
    }
 
    static Boolean getIsShowInfoInStatusLine() {
-
-      if (_isDisplayLogInfoInTheStatusLine == null) {
-         restoreState();
-      }
 
       return _isDisplayLogInfoInTheStatusLine;
    }
