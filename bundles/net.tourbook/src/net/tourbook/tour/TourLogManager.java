@@ -21,6 +21,7 @@ import java.util.Set;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import net.tourbook.Images;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.UI;
 import net.tourbook.common.util.StatusUtil;
@@ -28,6 +29,7 @@ import net.tourbook.common.util.Util;
 import net.tourbook.web.WEB;
 
 import org.eclipse.jface.dialogs.IDialogSettings;
+import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Display;
 
 public class TourLogManager {
@@ -49,6 +51,11 @@ public class TourLogManager {
    private static Boolean                             _isDisplayLogInfoInTheStatusLine;
 
    private static AtomicInteger                       _tourLogCounter                          = new AtomicInteger();
+
+   /*
+    * UI resources
+    */
+   private static Image _imageTourLogView = TourbookPlugin.getThemedImageDescriptor(Images.TourLog).createImage();
 
    public enum AutoOpenEvent {
 
@@ -96,7 +103,7 @@ public class TourLogManager {
 
                   final int logCounterRunnable = _tourLogCounter.getAndSet(0);
 
-                  UI.showStatusLineMessage("New tour log entries: " + logCounterRunnable);
+                  UI.showStatusLineMessage("New tour log entries: " + logCounterRunnable, _imageTourLogView);
                }
             };
 

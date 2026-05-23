@@ -4020,13 +4020,25 @@ public class UI {
     */
    public static void showStatusLineMessage(final String statusMessage) {
 
+      showStatusLineMessage(statusMessage, null);
+   }
+
+   /**
+    * Show a status line message for n seconds
+    *
+    * @param statusMessage
+    * @param image
+    *           Can be <code>null</code>
+    */
+   public static void showStatusLineMessage(final String statusMessage, final Image image) {
+
       final IStatusLineManager statusLineMgr = getStatusLineManager();
 
       if (statusLineMgr != null) {
 
          final int lastCounter = _statusMessageCounter.incrementAndGet();
 
-         statusLineMgr.setMessage(statusMessage);
+         statusLineMgr.setMessage(image, statusMessage);
 
          // cleanup message
 
