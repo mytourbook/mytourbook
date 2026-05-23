@@ -302,7 +302,7 @@ public abstract class TreeViewerItem {
 
       } catch (IllegalArgumentException | IllegalAccessException e) {
 
-         StatusUtil.log("Exception for fieldname: %s".formatted(fieldName), e);
+         StatusUtil.log("Exception for fieldname: %s".formatted(fieldName), e); //$NON-NLS-1$
       }
    }
 

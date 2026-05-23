@@ -1463,8 +1463,8 @@ public class TaggingView extends ViewPart implements
 
                final long numNotLoaded = viewItem.numNotLoadedItems.get();
                final long numNoTours = viewItem.numNoTours.get();
-               final String numNotLoadedText = numNotLoaded == 0 ? "  " : Long.toString(numNotLoaded);
-               final String numNoToursText = numNoTours == 0 ? "  " : Long.toString(numNoTours);
+               final String numNotLoadedText = numNotLoaded == 0 ? UI.SPACE2 : Long.toString(numNotLoaded);
+               final String numNoToursText = numNoTours == 0 ? UI.SPACE2 : Long.toString(numNoTours);
 
                cell.setText(numChildren
                      + UI.SPACE6 + viewItem.numTours.toString()

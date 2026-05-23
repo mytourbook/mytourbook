@@ -562,9 +562,9 @@ public class EquipmentView extends ViewPart implements
 
       public ActionToggleRetiredAsset() {
 
-         super("Toggle &Retired Asset", AS_PUSH_BUTTON);
+         super(Messages.Equipment_Action_ToggleRetiredAsset, AS_PUSH_BUTTON);
 
-         setToolTipText("Set if this asset is retired or not");
+         setToolTipText(Messages.Equipment_Action_ToggleRetiredAsset_Tooltip);
       }
 
       @Override

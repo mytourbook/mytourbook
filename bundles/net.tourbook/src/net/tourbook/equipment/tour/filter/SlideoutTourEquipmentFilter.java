@@ -864,7 +864,7 @@ public class SlideoutTourEquipmentFilter extends AdvancedSlideout implements ITr
 
                      isOperatorOR ? Messages.Slideout_TourTagFilter_CombineTags_With_OR
                            : isOperatorAND ? Messages.Slideout_TourTagFilter_CombineTags_With_AND
-                                 : isOperatorNOT ? "NOT"
+                                 : isOperatorNOT ? Messages.Slideout_TourTagFilter_CombineTags_With_NOT
                                        : UI.EMPTY_STRING;
 
                cell.setText(isOperatorAND && numEquipment > 1 || numEquipment > 0
@@ -1205,8 +1205,8 @@ public class SlideoutTourEquipmentFilter extends AdvancedSlideout implements ITr
                 * Radio: NOT
                 */
                _rdoEquipmentOperator_NOT = new Button(containerOperator, SWT.RADIO);
-               _rdoEquipmentOperator_NOT.setText("NOT");
-               _rdoEquipmentOperator_NOT.setToolTipText("A tour is displayed when it do NOT contain one of the selected equipment");
+               _rdoEquipmentOperator_NOT.setText(Messages.Slideout_TourTagFilter_CombineTags_With_NOT);
+               _rdoEquipmentOperator_NOT.setToolTipText(Messages.Slideout_EquipmentFilter_Radio_EquipmentOperator_NOT_Tooltip);
                _rdoEquipmentOperator_NOT.addSelectionListener(_defaultSelectionListener);
             }
          }

@@ -154,14 +154,14 @@ public class RawDataManager {
 
       ALL_IMPORT_CADENCE_CONFIG = new ComboEnumEntry<?>[] {
 
-            new ComboEnumEntry<>("Set one cadence for all imported tours",       CadenceConfig.CADENCE_CONFIG_ONE_FOR_ALL),
-            new ComboEnumEntry<>("Set cadence by average speed",                 CadenceConfig.CADENCE_CONFIG_BY_SPEED)
+            new ComboEnumEntry<>(Messages.Import_Data_CadenceConfig_OneForAll,       CadenceConfig.CADENCE_CONFIG_ONE_FOR_ALL),
+            new ComboEnumEntry<>(Messages.Import_Data_CadenceConfig_BySpeed,                 CadenceConfig.CADENCE_CONFIG_BY_SPEED)
       };
 
       ALL_IMPORT_EQUIPMENT_CONFIG = new ComboEnumEntry<?>[] {
 
-         new ComboEnumEntry<>("Set one equipment group for all imported tours",  EquipmentConfig.EQUIPMENT_CONFIG_ONE_FOR_ALL),
-         new ComboEnumEntry<>("Set equipment group by average speed",            EquipmentConfig.EQUIPMENT_CONFIG_BY_SPEED)
+         new ComboEnumEntry<>(Messages.Import_Data_EquipmentConfig_OneForAll,  EquipmentConfig.EQUIPMENT_CONFIG_ONE_FOR_ALL),
+         new ComboEnumEntry<>(Messages.Import_Data_EquipmentConfig_BySpeed,            EquipmentConfig.EQUIPMENT_CONFIG_BY_SPEED)
       };
 
 

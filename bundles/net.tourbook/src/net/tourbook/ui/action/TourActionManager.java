@@ -374,15 +374,15 @@ public class TourActionManager {
                                                                               TourActionCategory.EQUIPMENT);
 
       final TourAction actionAddEquipment_AutoOpen_Default  = new TourAction( EquipmentMenuManager.ACTION_KEY__ADD_EQUIPMENT_AUTO_OPEN_DEFAULT,
-                                                                              "&Add Equipment... (Default)",
+                                                                              Messages.Equipment_Action_AddEquipment_Default,
                                                                               TourActionCategory.EQUIPMENT);
 
       final TourAction actionAddEquipment_AutoOpen_Flat     = new TourAction( EquipmentMenuManager.ACTION_KEY__ADD_EQUIPMENT_AUTO_OPEN_FLAT,
-                                                                              "&Add Equipment... (Flat)",
+                                                                              Messages.Equipment_Action_AddEquipment_Flat,
                                                                               TourActionCategory.EQUIPMENT);
 
       final TourAction actionAddEquipment_AutoOpen_Tree     = new TourAction( EquipmentMenuManager.ACTION_KEY__ADD_EQUIPMENT_AUTO_OPEN_TREE,
-                                                                              "&Add Equipment... (Categorized)",
+                                                                              Messages.Equipment_Action_AddEquipment_Categorized,
                                                                               TourActionCategory.EQUIPMENT);
 
 

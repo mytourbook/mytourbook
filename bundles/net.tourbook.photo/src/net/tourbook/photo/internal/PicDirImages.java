@@ -102,7 +102,7 @@ public class PicDirImages implements IPhotoGalleryProvider {
 
       public ActionClearPhotoCache() {
 
-         super("&Discard all cached photo images", AS_PUSH_BUTTON);
+         super(Messages.Pic_Dir_Action_DiscardCachedPhotoImages, AS_PUSH_BUTTON);
       }
 
       @Override

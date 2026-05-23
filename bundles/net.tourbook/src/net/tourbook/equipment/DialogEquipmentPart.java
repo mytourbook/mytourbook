@@ -481,7 +481,7 @@ public class DialogEquipmentPart extends TitleAreaDialog {
             gdVertCenter.applyTo(label);
 
             _chkRetired = new Button(_container, SWT.CHECK);
-            _chkRetired.setText("Is retired");
+            _chkRetired.setText(Messages.Dialog_Equipment_Checkbox_IsRetired);
 
             _chkRetired.addSelectionListener(_defaultSelectionListener);
          }
@@ -584,7 +584,7 @@ public class DialogEquipmentPart extends TitleAreaDialog {
             /*
              * Purchase location
              */
-            UI.createLabel(_container, "Pur&chase location");
+            UI.createLabel(_container, Messages.Dialog_Equipment_Label_PurchaseLocation);
 
             _txtPurchaseLocation = new Text(_container, SWT.BORDER);
             _txtPurchaseLocation.addModifyListener(e -> onModify());

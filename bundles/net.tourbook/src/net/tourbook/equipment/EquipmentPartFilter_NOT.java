@@ -79,14 +79,14 @@ public class EquipmentPartFilter_NOT {
                      + "   AND NOT EXISTS (" + NL //                                                        //$NON-NLS-1$
 
                      + "      SELECT 1" + NL //                                                             //$NON-NLS-1$
-                     + "      FROM " + jTdEq + " AS jTdEqOR" + NL //                                   //$NON-NLS-1$
+                     + "      FROM " + jTdEq + " AS jTdEqOR" + NL //                                   //$NON-NLS-1$ //$NON-NLS-2$
 
-                     + "      JOIN " + tEqPart + " AS eqPart " + NL //                                        //$NON-NLS-1$
+                     + "      JOIN " + tEqPart + " AS eqPart " + NL //                                        //$NON-NLS-1$ //$NON-NLS-2$
                      + "			ON eqPart.EQUIPMENT_EQUIPMENTID = jTdEqOR.EQUIPMENT_EQUIPMENTID" + NL //   //$NON-NLS-1$
 
                      + "      WHERE jTdEqOR.TOURDATA_TOURID = TourData.TOURID" + NL //                      //$NON-NLS-1$
                      + "         AND eqPart.ISCOLLATE = TRUE" + NL //                                       //$NON-NLS-1$
-                     + "         AND eqPart.PARTID IN (" + sqlParameters + ")" + NL //                      //$NON-NLS-1$
+                     + "         AND eqPart.PARTID IN (" + sqlParameters + ")" + NL //                      //$NON-NLS-1$ //$NON-NLS-2$
                      + "         AND TourData.TourStartTime >= eqPart.dateCollateFrom" + NL //              //$NON-NLS-1$
                      + "         AND TourData.TourStartTime < eqPart.dateCollateUntil" + NL //              //$NON-NLS-1$
                      + "   )" + NL //                                                                       //$NON-NLS-1$

@@ -64,6 +64,7 @@ public class Messages extends NLS {
    public static String        Pic_Dir_Action_AutoExpandCollapse;
    public static String        Pic_Dir_Action_ClearHistory;
    public static String        Pic_Dir_Action_DefineExternalApp;
+   public static String        Pic_Dir_Action_DiscardCachedPhotoImages;
    public static String        Pic_Dir_Action_NavigateHistoryBackward_Tooltip;
    public static String        Pic_Dir_Action_NavigateHistoryForward_Tooltip;
    public static String        Pic_Dir_Action_Preferences;

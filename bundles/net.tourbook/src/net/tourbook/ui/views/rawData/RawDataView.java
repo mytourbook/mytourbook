@@ -2330,7 +2330,7 @@ public class RawDataView extends ViewPart implements
 
          } else {
 
-            sb.append("Set tour type . . . NO");
+            sb.append(Messages.Import_Data_HTML_SetTourType_NO);
             sb.append(NL);
          }
       }
@@ -2369,7 +2369,7 @@ public class RawDataView extends ViewPart implements
 
          } else {
 
-            sb.append("Set cadence . . . NO");
+            sb.append(Messages.Import_Data_HTML_SetCadence_NO);
             sb.append(NL);
          }
       }

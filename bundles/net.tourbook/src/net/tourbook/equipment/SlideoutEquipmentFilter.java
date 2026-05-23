@@ -15,6 +15,7 @@
  *******************************************************************************/
 package net.tourbook.equipment;
 
+import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.UI;
 import net.tourbook.common.tooltip.AdvancedSlideout;
@@ -64,7 +65,7 @@ public class SlideoutEquipmentFilter extends AdvancedSlideout {
       _toolItem = toolItem;
       _equipmentView = equipmentView;
 
-      setTitleText("Equipment Filter");
+      setTitleText(Messages.Slideout_EquipmentSubFilter_Title);
 
       // prevent that the opened slideout is partly hidden
       setIsForceBoundsToBeInsideOfViewport(true);
@@ -87,7 +88,7 @@ public class SlideoutEquipmentFilter extends AdvancedSlideout {
             .margins(0, 0)
             .applyTo(_shellContainer);
       {
-         UI.createLabel(_shellContainer, "Choose which items to display");
+         UI.createLabel(_shellContainer, Messages.Slideout_EquipmentSubFilter_Label_DisplayedItems);
 
          createUI_10_Filter(_shellContainer);
       }
@@ -97,10 +98,8 @@ public class SlideoutEquipmentFilter extends AdvancedSlideout {
 
    private void createUI_10_Filter(final Composite parent) {
 
-      final String tooltip = UI.EMPTY_STRING
-            + "When 'Active equipment' is selected and an equipment is retired\n"
-            + "but a contained part is still active, this equipment will be displayed.\n\n"
-            + "An equal algorithm is applied for 'Retired equipment'";
+      final String tooltip =
+            Messages.Slideout_EquipmentSubFilter_Retirement_Tooltip;
 
       final SelectionListener defaultListener = SelectionListener.widgetSelectedAdapter(selectionEvent -> onModified(selectionEvent));
 
@@ -109,7 +108,7 @@ public class SlideoutEquipmentFilter extends AdvancedSlideout {
 //      container.setBackground(UI.SYS_COLOR_BLUE);
       {
          {
-            final Label label = UI.createLabel(container, "Retirement");
+            final Label label = UI.createLabel(container, Messages.Slideout_EquipmentSubFilter_Label_Retirement);
             GridDataFactory.fillDefaults().grab(true, false).align(SWT.FILL, SWT.BEGINNING).applyTo(label);
 
             final Composite containerRetired = new Composite(container, SWT.NONE);
@@ -118,25 +117,25 @@ public class SlideoutEquipmentFilter extends AdvancedSlideout {
             {
                {
                   _rdoFilter_Equipment_Retired_IsActive = new Button(containerRetired, SWT.RADIO);
-                  _rdoFilter_Equipment_Retired_IsActive.setText("&Active equipment");
+                  _rdoFilter_Equipment_Retired_IsActive.setText(Messages.Slideout_EquipmentSubFilter_Radio_Retirement_ActiveEquipment);
                   _rdoFilter_Equipment_Retired_IsActive.setToolTipText(tooltip);
                   _rdoFilter_Equipment_Retired_IsActive.addSelectionListener(defaultListener);
                }
                {
                   _rdoFilter_Equipment_Retired_IsRetired = new Button(containerRetired, SWT.RADIO);
-                  _rdoFilter_Equipment_Retired_IsRetired.setText("&Retired equipment");
+                  _rdoFilter_Equipment_Retired_IsRetired.setText(Messages.Slideout_EquipmentSubFilter_Radio_Retirement_RetireEquipment);
                   _rdoFilter_Equipment_Retired_IsRetired.setToolTipText(tooltip);
                   _rdoFilter_Equipment_Retired_IsRetired.addSelectionListener(defaultListener);
                }
                {
                   _rdoFilter_Equipment_Retired_Ignore = new Button(containerRetired, SWT.RADIO);
-                  _rdoFilter_Equipment_Retired_Ignore.setText("&Ignore retirement");
+                  _rdoFilter_Equipment_Retired_Ignore.setText(Messages.Slideout_EquipmentSubFilter_Radio_Retirement_IgnoreRetirement);
                   _rdoFilter_Equipment_Retired_Ignore.addSelectionListener(defaultListener);
                }
             }
          }
          {
-            final Label label = UI.createLabel(container, "Contained tours");
+            final Label label = UI.createLabel(container, Messages.Slideout_EquipmentSubFilter_Label_Tours);
             GridDataFactory.fillDefaults().grab(true, false).align(SWT.FILL, SWT.BEGINNING).applyTo(label);
 
             final Composite containerTours = new Composite(container, SWT.NONE);
@@ -145,17 +144,17 @@ public class SlideoutEquipmentFilter extends AdvancedSlideout {
             {
                {
                   _rdoFilter_Equipment_ContainsTours_Yes = new Button(containerTours, SWT.RADIO);
-                  _rdoFilter_Equipment_ContainsTours_Yes.setText("Equipment &with tours");
+                  _rdoFilter_Equipment_ContainsTours_Yes.setText(Messages.Slideout_EquipmentSubFilter_Radio_Tours_WithTours);
                   _rdoFilter_Equipment_ContainsTours_Yes.addSelectionListener(defaultListener);
                }
                {
                   _rdoFilter_Equipment_ContainsTours_No = new Button(containerTours, SWT.RADIO);
-                  _rdoFilter_Equipment_ContainsTours_No.setText("Equipment with&out tours");
+                  _rdoFilter_Equipment_ContainsTours_No.setText(Messages.Slideout_EquipmentSubFilter_Radio_Tours_WithoutTours);
                   _rdoFilter_Equipment_ContainsTours_No.addSelectionListener(defaultListener);
                }
                {
                   _rdoFilter_Equipment_ContainsTours_Ignore = new Button(containerTours, SWT.RADIO);
-                  _rdoFilter_Equipment_ContainsTours_Ignore.setText("Ignore &tours");
+                  _rdoFilter_Equipment_ContainsTours_Ignore.setText(Messages.Slideout_EquipmentSubFilter_Radio_Tours_IgnoreTours);
                   _rdoFilter_Equipment_ContainsTours_Ignore.addSelectionListener(defaultListener);
                }
             }

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2025 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2026 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -114,6 +114,7 @@ public class Messages extends NLS {
    public static String        ColumnModifyDialog_Checkbox_ShowSortingAnnotations;
    public static String        ColumnModifyDialog_Column_Alignment;
    public static String        ColumnModifyDialog_Column_Category;
+   public static String        ColumnModifyDialog_Column_ColumnTooltip;
    public static String        ColumnModifyDialog_Column_FormatCategory;
    public static String        ColumnModifyDialog_Column_FormatTour;
    public static String        ColumnModifyDialog_Column_HeaderText;
@@ -422,11 +423,17 @@ public class Messages extends NLS {
    public static String        Time_Tools_DST_North;
    public static String        Time_Tools_DST_South;
 
+   public static String        Value_Formatter_Equipment_Brand;
+   public static String        Value_Formatter_Equipment_BrandModel;
+   public static String        Value_Formatter_Equipment_Model;
+   public static String        Value_Formatter_Equipment_Type;
    public static String        Value_Formatter_Number_1_0;
    public static String        Value_Formatter_Number_1_1;
    public static String        Value_Formatter_Number_1_2;
    public static String        Value_Formatter_Number_1_3;
    public static String        Value_Formatter_Pace_MM_SS;
+   public static String        Value_Formatter_Period_Day;
+   public static String        Value_Formatter_Period_YearMonthDay;
    public static String        Value_Formatter_Time_DD_MM_YYY;
    public static String        Value_Formatter_Time_DD_MM_YYY__HH_MM_SS;
    public static String        Value_Formatter_Time_HH;

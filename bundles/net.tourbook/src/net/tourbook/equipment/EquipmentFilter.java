@@ -76,7 +76,7 @@ public class EquipmentFilter {
 
                /* require tour to have at least one of these equipment (index-friendly) */
 
-               final String existsOperator = isOrOperator ? "EXISTS" : "NOT EXISTS";
+               final String existsOperator = isOrOperator ? "EXISTS" : "NOT EXISTS"; //$NON-NLS-1$ //$NON-NLS-2$
 
                sql = UI.EMPTY_STRING
 

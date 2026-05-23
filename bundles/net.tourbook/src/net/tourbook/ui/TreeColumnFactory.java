@@ -1116,8 +1116,8 @@ public abstract class TreeColumnFactory {
 
             colDef.setColumnCategory(           Messages.ColumnFactory_Category_Equipment);
 
-            colDef.setColumnLabel(              "Purchase Location");
-            colDef.setColumnHeaderText(         "Location");
+            colDef.setColumnLabel(              Messages.ColumnFactory_Equipment_PurchaseLocation_Label);
+            colDef.setColumnHeaderText(         Messages.ColumnFactory_Equipment_PurchaseLocation_Header);
 
             colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(25));
 
@@ -1134,9 +1134,9 @@ public abstract class TreeColumnFactory {
 
             colDef.setColumnCategory(           Messages.ColumnFactory_Category_Equipment);
 
-            colDef.setColumnLabel(              "Is retired");
-            colDef.setColumnHeaderText(         "Retired");
-            colDef.setColumnHeaderToolTipText(  "Is retired");
+            colDef.setColumnLabel(              Messages.ColumnFactory_Equipment_IsRetired_Label);
+            colDef.setColumnHeaderText(         Messages.ColumnFactory_Equipment_IsRetired_Header);
+            colDef.setColumnHeaderToolTipText(  Messages.ColumnFactory_Equipment_IsRetired_Label);
 
             colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(12));
 
@@ -1210,8 +1210,8 @@ public abstract class TreeColumnFactory {
 
             colDef.setColumnCategory(           Messages.ColumnFactory_Category_Equipment);
 
-            colDef.setColumnLabel(              "Type (saved)");
-            colDef.setColumnHeaderText(         "Type (saved)");
+            colDef.setColumnLabel(              Messages.ColumnFactory_Equipment_TypeSaved_Label);
+            colDef.setColumnHeaderText(         Messages.ColumnFactory_Equipment_TypeSaved_Label);
 
             colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(15));
 
@@ -1228,8 +1228,8 @@ public abstract class TreeColumnFactory {
 
             colDef.setColumnCategory(           Messages.ColumnFactory_Category_Equipment);
 
-            colDef.setColumnLabel(              "Website");
-            colDef.setColumnHeaderText(         "Website");
+            colDef.setColumnLabel(              Messages.ColumnFactory_Equipment_Website_Label);
+            colDef.setColumnHeaderText(         Messages.ColumnFactory_Equipment_Website_Label);
 
             colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(25));
 
@@ -3074,9 +3074,9 @@ public abstract class TreeColumnFactory {
 
             colDef.setColumnCategory(           Messages.ColumnFactory_Category_Tag);
 
-            colDef.setColumnLabel("Children - Tours - No Tours - Not loaded");
-            colDef.setColumnHeaderText("Children - Tours - No Tours - Not loaded");
-            colDef.setColumnHeaderToolTipText("Number of children - Number of tours - Number of \"No tours\" - Not loaded");
+            colDef.setColumnLabel(Messages.ColumnFactory_Tag_NumberOf);
+            colDef.setColumnHeaderText(Messages.ColumnFactory_Tag_NumberOf);
+            colDef.setColumnHeaderToolTipText(Messages.ColumnFactory_Tag_NumberOf_Tooltip);
 
             colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(8));
 
@@ -3093,8 +3093,8 @@ public abstract class TreeColumnFactory {
 
             colDef.setColumnCategory(           Messages.ColumnFactory_Category_Tag);
 
-            colDef.setColumnLabel("Parent");
-            colDef.setColumnHeaderText("Parent");
+            colDef.setColumnLabel(Messages.ColumnFactory_Tag_Parent);
+            colDef.setColumnHeaderText(Messages.ColumnFactory_Tag_Parent);
 
             colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(8));
 

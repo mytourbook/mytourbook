@@ -101,7 +101,7 @@ public class EquipmentManager {
    static final int            STATE_EQUIPMENT_FILTER_RETIRED_DEFAULT        = 0;
    //
    //
-   private static final IDialogSettings      _state                       = TourbookPlugin.getState("net.tourbook.equipment.EquipmentManager");
+   private static final IDialogSettings      _state                       = TourbookPlugin.getState("net.tourbook.equipment.EquipmentManager"); //$NON-NLS-1$
 
    static final int                          FILTER_CONTAINS_TOURS_IGNORE = 0;
    static final int                          FILTER_CONTAINS_TOURS_YES    = 1;

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2025 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2026 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -291,15 +291,21 @@ public class Messages extends NLS {
    public static String        ColumnFactory_Equipment_ImageFile_Tooltip;
    public static String        ColumnFactory_Equipment_InitialDistance;
    public static String        ColumnFactory_Equipment_InitialDistance_Tooltip;
+   public static String        ColumnFactory_Equipment_IsRetired_Header;
+   public static String        ColumnFactory_Equipment_IsRetired_Label;
    public static String        ColumnFactory_Equipment_Model;
    public static String        ColumnFactory_Equipment_Price;
    public static String        ColumnFactory_Equipment_PriceCurrency_Header;
    public static String        ColumnFactory_Equipment_PriceCurrency_Label;
    public static String        ColumnFactory_Equipment_PriceCurrency_Tooltip;
+   public static String        ColumnFactory_Equipment_PurchaseLocation_Header;
+   public static String        ColumnFactory_Equipment_PurchaseLocation_Label;
    public static String        ColumnFactory_Equipment_Size;
    public static String        ColumnFactory_Equipment_TourStructure_Label;
    public static String        ColumnFactory_Equipment_TourStructure_Tooltip;
    public static String        ColumnFactory_Equipment_Type;
+   public static String        ColumnFactory_Equipment_TypeSaved_Label;
+   public static String        ColumnFactory_Equipment_Website_Label;
    public static String        ColumnFactory_Equipment_Weight;
 
    public static String        ColumnFactory_GearFrontShiftCount_Header;
@@ -557,6 +563,10 @@ public class Messages extends NLS {
    public static String        ColumnFactory_tour_week_header;
    public static String        ColumnFactory_tour_week_label;
    public static String        ColumnFactory_tour_week_tooltip;
+
+   public static String        ColumnFactory_Tag_NumberOf;
+   public static String        ColumnFactory_Tag_NumberOf_Tooltip;
+   public static String        ColumnFactory_Tag_Parent;
 
    public static String        ColumnFactory_TagID_Header;
    public static String        ColumnFactory_TagID_Label;

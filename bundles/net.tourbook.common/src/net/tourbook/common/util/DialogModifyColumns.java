@@ -1593,7 +1593,7 @@ public class DialogModifyColumns extends TrayDialog {
 
       final TableColumn tc = tvc.getColumn();
       tc.setMoveable(true);
-      tc.setText("Column Tooltip");
+      tc.setText(Messages.ColumnModifyDialog_Column_ColumnTooltip);
 
       tvc.setLabelProvider(new ColumnCellLabelProvider() {
 

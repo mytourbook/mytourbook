@@ -93,20 +93,20 @@ public class EasyLauncherUtils {
             sbSpeed.append(NL);
          }
 
-         sb.append("Set cadence . . . By Speed\n\n%s".formatted(sbSpeed.toString()));
+         sb.append(Messages.Import_Data_HTML_SetCadence_Speed.formatted(sbSpeed.toString()));
          sb.append(NL);
 
       } else if (CadenceConfig.CADENCE_CONFIG_ONE_FOR_ALL.equals(cadConfig)) {
 
          final CadenceMultiplier oneCadence = importLauncher.cadenceOne;
 
-         String cadLabel = "NO";
+         String cadLabel = Messages.Import_Data_HTML_NO;
 
          if (oneCadence != null) {
             cadLabel = oneCadence.getNlsLabel();
          }
 
-         sb.append("Set cadence . . . %s".formatted(cadLabel));
+         sb.append(Messages.Import_Data_HTML_SetCadence.formatted(cadLabel));
          sb.append(NL);
       }
    }
@@ -145,7 +145,7 @@ public class EasyLauncherUtils {
             sbSpeed.append(NL);
          }
 
-         sb.append("Set equipment . . . By Speed\n\n%s".formatted(sbSpeed.toString()));
+         sb.append(Messages.Import_Data_HTML_SetEquipment_Speed.formatted(sbSpeed.toString()));
 
       } else if (EquipmentConfig.EQUIPMENT_CONFIG_ONE_FOR_ALL == eqConfig) {
 
@@ -231,20 +231,20 @@ public class EasyLauncherUtils {
             sbSpeed.append(NL);
          }
 
-         sb.append("Set tour type . . . By Speed\n\n%s".formatted(sbSpeed.toString()));
+         sb.append(Messages.Import_Data_HTML_SetTourType_Speed.formatted(sbSpeed.toString()));
          sb.append(NL);
 
       } else if (TourTypeConfig.TOUR_TYPE_CONFIG_ONE_FOR_ALL.equals(ttConfig)) {
 
          final TourType oneTourType = importLauncher.oneTourType;
 
-         String ttName = "NO";
+         String ttName = Messages.Import_Data_HTML_NO;
 
          if (oneTourType != null) {
             ttName = oneTourType.getName();
          }
 
-         sb.append("Set tour type . . . %s".formatted(ttName));
+         sb.append(Messages.Import_Data_HTML_SetTourType.formatted(ttName));
          sb.append(NL);
       }
    }
@@ -319,7 +319,7 @@ public class EasyLauncherUtils {
 
          } else {
 
-            sb.append("Set cadence . . . NO");
+            sb.append(Messages.Import_Data_HTML_SetCadence_NO);
             sb.append(NL);
          }
       }
@@ -731,7 +731,7 @@ public class EasyLauncherUtils {
 
                   final List<SpeedEquipment> allEqSpeeds = importLauncher.allEquipmentSpeeds;
 
-                  eqText = "Speed #" + allEqSpeeds.size();
+                  eqText = Messages.Dialog_ImportConfig_Column_Equipment_Speed + allEqSpeeds.size();
                }
 
                cell.setText(eqText);
@@ -748,8 +748,8 @@ public class EasyLauncherUtils {
 
       final TableColumnDefinition colDef = new TableColumnDefinition(_columnManager, "cadence", SWT.LEAD); //$NON-NLS-1$
 
-      colDef.setColumnLabel("Cadence");
-      colDef.setColumnHeaderText("Cadence");
+      colDef.setColumnLabel(Messages.Dialog_ImportConfig_Column_Cadence);
+      colDef.setColumnHeaderText(Messages.Dialog_ImportConfig_Column_Cadence);
 
       colDef.setDefaultColumnWidth(_pc.convertWidthInCharsToPixels(10));
       colDef.setColumnWeightData(new ColumnWeightData(7));
@@ -788,7 +788,7 @@ public class EasyLauncherUtils {
 
                   final List<SpeedCadence> allCadSpeeds = importLauncher.allCadenceSpeeds;
 
-                  eqText = "Speed #" + allCadSpeeds.size();
+                  eqText = Messages.Dialog_ImportConfig_Column_Cadence_Speed + allCadSpeeds.size();
                }
 
                cell.setText(eqText);

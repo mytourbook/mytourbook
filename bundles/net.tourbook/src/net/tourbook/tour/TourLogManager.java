@@ -22,6 +22,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import net.tourbook.Images;
+import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.UI;
 import net.tourbook.common.util.StatusUtil;
@@ -108,7 +109,7 @@ public class TourLogManager {
 
                   final int logCounterRunnable = _tourLogCounter.getAndSet(0);
 
-                  UI.showStatusLineMessage("New tour log entries: " + logCounterRunnable, _imageTourLogView);
+                  UI.showStatusLineMessage(Messages.Tour_Log_StatusLineMessage_NewEntries + logCounterRunnable, _imageTourLogView);
                }
             };
 

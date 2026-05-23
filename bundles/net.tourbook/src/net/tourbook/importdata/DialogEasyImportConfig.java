@@ -133,13 +133,13 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements IActionRe
 
    public static final String            ID                                 = "DialogEasyImportConfig";             //$NON-NLS-1$
    //
-   public static final String            IMPORT_LAUNCHER_TAB_DESCRIPTION    = "D&escription";
-   public static final String            IMPORT_LAUNCHER_TAB_TOUR_TYPE      = "&Tour Type";
-   public static final String            IMPORT_LAUNCHER_TAB_TAGS           = "Ta&g";
-   public static final String            IMPORT_LAUNCHER_TAB_EQUIPMENT      = "E&quipment";
-   public static final String            IMPORT_LAUNCHER_TAB_CADENCE        = "C&adence";
-   public static final String            IMPORT_LAUNCHER_TAB_OPTIONS_1      = "Options &1";                         //$NON-NLS-1$
-   public static final String            IMPORT_LAUNCHER_TAB_OPTIONS_2      = "Options &2";                         //$NON-NLS-1$
+   public static final String            IMPORT_LAUNCHER_TAB_DESCRIPTION    = Messages.Dialog_ImportConfig_Tab_Description;
+   public static final String            IMPORT_LAUNCHER_TAB_TOUR_TYPE      = Messages.Dialog_ImportConfig_Tab_TourType;
+   public static final String            IMPORT_LAUNCHER_TAB_TAGS           = Messages.Dialog_ImportConfig_Tab_Tag;
+   public static final String            IMPORT_LAUNCHER_TAB_EQUIPMENT      = Messages.Dialog_ImportConfig_Tab_Equipment;
+   public static final String            IMPORT_LAUNCHER_TAB_CADENCE        = Messages.Dialog_ImportConfig_Tab_Cadence;
+   public static final String            IMPORT_LAUNCHER_TAB_OPTIONS_1      = Messages.Dialog_ImportConfig_Tab_Options1;                         
+   public static final String            IMPORT_LAUNCHER_TAB_OPTIONS_2      = Messages.Dialog_ImportConfig_Tab_Options2;                         
    //
    private static final String           STATE_BACKUP_DEVICE_HISTORY_ITEMS  = "STATE_BACKUP_DEVICE_HISTORY_ITEMS";  //$NON-NLS-1$
    private static final String           STATE_BACKUP_FOLDER_HISTORY_ITEMS  = "STATE_BACKUP_FOLDER_HISTORY_ITEMS";  //$NON-NLS-1$
@@ -470,7 +470,7 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements IActionRe
 
          super(null, AS_PUSH_BUTTON);
 
-         setToolTipText("Sort cadence by speed");
+         setToolTipText(Messages.Dialog_ImportConfig_Action_SortCadenceBySpeed_Tooltip);
 
          setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.App_Sort));
       }
@@ -528,7 +528,7 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements IActionRe
 
          super(null, AS_PUSH_BUTTON);
 
-         setToolTipText("Sort tour types by speed");
+         setToolTipText(Messages.Dialog_ImportConfig_Action_SortTourTypeBySpeed_Tooltip);
 
          setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.App_Sort));
       }
@@ -2632,7 +2632,7 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements IActionRe
             GridDataFactory.fillDefaults().align(SWT.FILL, SWT.CENTER).applyTo(spinnerValue);
             spinnerValue.setMaximum(EasyConfig.TOUR_AVG_SPEED_MAX);
             spinnerValue.setMinimum(EasyConfig.TOUR_AVG_SPEED_MIN);
-            spinnerValue.setToolTipText("Max speed for this equipment group");
+            spinnerValue.setToolTipText(Messages.Dialog_ImportConfig_Spinner_MaxSpeedEquipmentGroup_Tooltip);
             spinnerValue.addMouseWheelListener(_defaultMouseWheelListener);
 
             /*
@@ -2717,8 +2717,8 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements IActionRe
           * Checkbox: Set cadence
           */
          _chkIL_SetCadence = new Button(parent, SWT.CHECK);
-         _chkIL_SetCadence.setText("Set &cadence");
-         _chkIL_SetCadence.setToolTipText("The selected cadence will be set in the imported tour");
+         _chkIL_SetCadence.setText(Messages.Dialog_ImportConfig_Checkbox_SetCadence);
+         _chkIL_SetCadence.setToolTipText(Messages.Dialog_ImportConfig_Checkbox_SetCadence_Tooltip);
          _chkIL_SetCadence.addSelectionListener(cadListener);
          GridDataFactory.fillDefaults()
                .span(2, 1)
@@ -2783,7 +2783,7 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements IActionRe
 //      container.setBackground(UI.SYS_COLOR_YELLOW);
       {
          _lblIL_CadenceOne = new Label(container, SWT.NONE);
-         _lblIL_CadenceOne.setText("Cadence");
+         _lblIL_CadenceOne.setText(Messages.Dialog_ImportConfig_Label_Cadence);
          GridDataFactory.fillDefaults()
                .align(SWT.FILL, SWT.CENTER)
                .applyTo(_lblIL_CadenceOne);
@@ -2894,7 +2894,7 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements IActionRe
             GridDataFactory.fillDefaults().align(SWT.FILL, SWT.CENTER).applyTo(spinnerValue);
             spinnerValue.setMaximum(EasyConfig.TOUR_AVG_SPEED_MAX);
             spinnerValue.setMinimum(EasyConfig.TOUR_AVG_SPEED_MIN);
-            spinnerValue.setToolTipText("Max speed for this cadence");
+            spinnerValue.setToolTipText(Messages.Dialog_ImportConfig_Spinner_MaxSpeedCadence_Tooltip);
             spinnerValue.addMouseWheelListener(_defaultMouseWheelListener);
 
             /*

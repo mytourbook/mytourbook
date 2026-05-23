@@ -211,7 +211,7 @@ public class ActionAddEquipment_SubMenu extends Action implements IMenuCreator, 
     */
    ActionAddEquipment_SubMenu(final EquipmentMenuManager equipmentMenuManager, final Object isForAutoOpen) {
 
-      super("&Add Equipment...", AS_PUSH_BUTTON);
+      super(Messages.Equipment_Action_AddEquipment_FloatingContext, AS_PUSH_BUTTON);
 
       setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.Equipment_New));
 
@@ -235,13 +235,13 @@ public class ActionAddEquipment_SubMenu extends Action implements IMenuCreator, 
 
    private void createDefaultActions() {
 
-      _actionTitle_AddEquipment = new Action("» Add Equipment «") {};
+      _actionTitle_AddEquipment = new Action(Messages.Equipment_Action_Title_AddEquipment) {};
       _actionTitle_AddEquipment.setEnabled(false);
 
-      _actionTitle_ModifiedEquipment = new Action("» Equipment which will be added with OK «") {};
+      _actionTitle_ModifiedEquipment = new Action(Messages.Equipment_Action_Title_EquipmentIsAddedWithOK) {};
       _actionTitle_ModifiedEquipment.setEnabled(false);
 
-      _actionTitle_RecentEquipment = new Action("» Recently added Equipment «") {};
+      _actionTitle_RecentEquipment = new Action(Messages.Equipment_Action_Title_RecentlyAddedEquipment) {};
       _actionTitle_RecentEquipment.setEnabled(false);
 
       _actionOK = new ActionOK();

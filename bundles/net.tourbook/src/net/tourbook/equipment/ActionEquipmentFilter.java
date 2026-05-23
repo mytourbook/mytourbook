@@ -15,6 +15,7 @@
  *******************************************************************************/
 package net.tourbook.equipment;
 
+import net.tourbook.Messages;
 import net.tourbook.common.tooltip.ActionToolbarSlideoutAdv;
 import net.tourbook.common.tooltip.AdvancedSlideout;
 import net.tourbook.common.tooltip.SlideoutLocation;
@@ -48,7 +49,7 @@ public class ActionEquipmentFilter extends ActionToolbarSlideoutAdv {
 
       isToggleAction = true;
 
-      notSelectedTooltip = "Enable/disable equipment filter";
+      notSelectedTooltip = Messages.Equipment_Action_EquipmentFilter_Tooltip;
    }
 
    @Override

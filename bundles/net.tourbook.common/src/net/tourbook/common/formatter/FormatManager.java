@@ -282,22 +282,22 @@ public class FormatManager {
          return Messages.Value_Formatter_Time_DD_MM_YYY__HH_MM_SS;
 
       case EQUIPMENT_BRAND:
-         return "Brand";
+         return Messages.Value_Formatter_Equipment_Brand;
 
       case EQUIPMENT_MODEL:
-         return "Model";
+         return Messages.Value_Formatter_Equipment_Model;
 
       case EQUIPMENT_BRAND_MODEL:
-         return "Brand - Model";
+         return Messages.Value_Formatter_Equipment_BrandModel;
 
       case EQUIPMENT_TYPE:
-         return "Type";
+         return Messages.Value_Formatter_Equipment_Type;
 
       case PERIOD_DAY:
-         return "Days";
+         return Messages.Value_Formatter_Period_Day;
 
       case PERIOD_YEAR_MONTH_DAY:
-         return "Years, Months, Days";
+         return Messages.Value_Formatter_Period_YearMonthDay;
 
       case TIME_HH:
          return Messages.Value_Formatter_Time_HH;
