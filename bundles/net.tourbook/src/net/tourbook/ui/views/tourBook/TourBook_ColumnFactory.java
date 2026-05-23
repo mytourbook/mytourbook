@@ -3318,9 +3318,6 @@ class TourBook_ColumnFactory {
       });
 
       final TreeColumnDefinition colDef_Tree = TreeColumnFactory.TOUR_EQUIPMENT.createColumn(_columnManager_Tree, _pc);
-      colDef_Tree.setLabelProvider(new SelectionCellLabelProvider() {
-
-      });
       colDef_Tree.setLabelProvider(new TourInfoToolTipCellLabelProvider() {
 
          @Override

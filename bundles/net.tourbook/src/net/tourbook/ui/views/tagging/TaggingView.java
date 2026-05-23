@@ -1669,7 +1669,7 @@ public class TaggingView extends ViewPart implements
 
                if (allEquipmentIDs != null) {
 
-                  final ArrayList<Long> allEquipmentIDsList = new ArrayList<>(allEquipmentIDs);
+                  final List<Long> allEquipmentIDsList = new ArrayList<>(allEquipmentIDs);
 
                   cell.setText(EquipmentManager.getEquipmentNames(allEquipmentIDsList));
                   setCellColor(cell, element);
