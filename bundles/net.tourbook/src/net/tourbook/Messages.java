@@ -752,7 +752,7 @@ public class Messages extends NLS {
    public static String        Dialog_ImportConfig_Action_RemoveSpeed_Tooltip;
    public static String        Dialog_ImportConfig_Action_SortBySpeed_Tooltip;
    public static String        Dialog_ImportConfig_Action_SortCadenceBySpeed_Tooltip;
-   public static String        Dialog_ImportConfig_Action_SortTourTypeBySpeed_Tooltip;
+   public static String        Dialog_ImportConfig_Action_SortEquipmentBySpeed_Tooltip;
    public static String        Dialog_ImportConfig_Checkbox_AdjustTemperature;
    public static String        Dialog_ImportConfig_Checkbox_CreateBackup;
    public static String        Dialog_ImportConfig_Checkbox_CreateBackup_Tooltip;

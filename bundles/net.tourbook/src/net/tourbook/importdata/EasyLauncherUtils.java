@@ -731,7 +731,7 @@ public class EasyLauncherUtils {
 
                   final List<SpeedEquipment> allEqSpeeds = importLauncher.allEquipmentSpeeds;
 
-                  eqText = Messages.Dialog_ImportConfig_Column_Equipment_Speed + allEqSpeeds.size();
+                  eqText = Messages.Dialog_ImportConfig_Column_Equipment_Speed.formatted(allEqSpeeds.size());
                }
 
                cell.setText(eqText);
@@ -788,7 +788,7 @@ public class EasyLauncherUtils {
 
                   final List<SpeedCadence> allCadSpeeds = importLauncher.allCadenceSpeeds;
 
-                  eqText = Messages.Dialog_ImportConfig_Column_Cadence_Speed + allCadSpeeds.size();
+                  eqText = Messages.Dialog_ImportConfig_Column_Cadence_Speed.formatted(allCadSpeeds.size());
                }
 
                cell.setText(eqText);

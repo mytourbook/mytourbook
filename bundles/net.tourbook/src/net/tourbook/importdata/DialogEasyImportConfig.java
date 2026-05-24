@@ -138,8 +138,8 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements IActionRe
    public static final String            IMPORT_LAUNCHER_TAB_TAGS           = Messages.Dialog_ImportConfig_Tab_Tag;
    public static final String            IMPORT_LAUNCHER_TAB_EQUIPMENT      = Messages.Dialog_ImportConfig_Tab_Equipment;
    public static final String            IMPORT_LAUNCHER_TAB_CADENCE        = Messages.Dialog_ImportConfig_Tab_Cadence;
-   public static final String            IMPORT_LAUNCHER_TAB_OPTIONS_1      = Messages.Dialog_ImportConfig_Tab_Options1;                         
-   public static final String            IMPORT_LAUNCHER_TAB_OPTIONS_2      = Messages.Dialog_ImportConfig_Tab_Options2;                         
+   public static final String            IMPORT_LAUNCHER_TAB_OPTIONS_1      = Messages.Dialog_ImportConfig_Tab_Options1;
+   public static final String            IMPORT_LAUNCHER_TAB_OPTIONS_2      = Messages.Dialog_ImportConfig_Tab_Options2;
    //
    private static final String           STATE_BACKUP_DEVICE_HISTORY_ITEMS  = "STATE_BACKUP_DEVICE_HISTORY_ITEMS";  //$NON-NLS-1$
    private static final String           STATE_BACKUP_FOLDER_HISTORY_ITEMS  = "STATE_BACKUP_FOLDER_HISTORY_ITEMS";  //$NON-NLS-1$
@@ -528,7 +528,7 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements IActionRe
 
          super(null, AS_PUSH_BUTTON);
 
-         setToolTipText(Messages.Dialog_ImportConfig_Action_SortTourTypeBySpeed_Tooltip);
+         setToolTipText(Messages.Dialog_ImportConfig_Action_SortEquipmentBySpeed_Tooltip);
 
          setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.App_Sort));
       }
@@ -1658,6 +1658,7 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements IActionRe
 
       // define all columns for the viewer
       _ilColumnManager = new ColumnManager(_ilColumnViewer, _stateIL);
+
       _ilEasyLauncherUtils.defineAllColumns(_ilColumnManager, _pc);
 
       _ilViewerContainer = new Composite(parent, SWT.NONE);

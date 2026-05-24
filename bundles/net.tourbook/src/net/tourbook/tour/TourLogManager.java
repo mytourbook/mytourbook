@@ -109,7 +109,9 @@ public class TourLogManager {
 
                   final int logCounterRunnable = _tourLogCounter.getAndSet(0);
 
-                  UI.showStatusLineMessage(Messages.Tour_Log_StatusLineMessage_NewEntries + logCounterRunnable, _imageTourLogView);
+                  UI.showStatusLineMessage(
+                        Messages.Tour_Log_StatusLineMessage_NewEntries.formatted(logCounterRunnable),
+                        _imageTourLogView);
                }
             };
 
