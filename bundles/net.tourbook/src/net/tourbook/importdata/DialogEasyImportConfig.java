@@ -131,7 +131,7 @@ import org.joda.time.PeriodType;
  */
 public class DialogEasyImportConfig extends TitleAreaDialog implements IActionResetToDefault {
 
-   public static final String            ID                                 = "DialogEasyImportConfig";             //$NON-NLS-1$
+   public static final String            ID                                 = "DialogEasyImportConfig";                    //$NON-NLS-1$
    //
    public static final String            IMPORT_LAUNCHER_TAB_DESCRIPTION    = Messages.Dialog_ImportConfig_Tab_Description;
    public static final String            IMPORT_LAUNCHER_TAB_TOUR_TYPE      = Messages.Dialog_ImportConfig_Tab_TourType;
@@ -141,24 +141,24 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements IActionRe
    public static final String            IMPORT_LAUNCHER_TAB_OPTIONS_1      = Messages.Dialog_ImportConfig_Tab_Options1;
    public static final String            IMPORT_LAUNCHER_TAB_OPTIONS_2      = Messages.Dialog_ImportConfig_Tab_Options2;
    //
-   private static final String           STATE_BACKUP_DEVICE_HISTORY_ITEMS  = "STATE_BACKUP_DEVICE_HISTORY_ITEMS";  //$NON-NLS-1$
-   private static final String           STATE_BACKUP_FOLDER_HISTORY_ITEMS  = "STATE_BACKUP_FOLDER_HISTORY_ITEMS";  //$NON-NLS-1$
-   private static final String           STATE_DEVICE_DEVICE_HISTORY_ITEMS  = "STATE_DEVICE_DEVICE_HISTORY_ITEMS";  //$NON-NLS-1$
-   public static final String            STATE_DEVICE_FOLDER_HISTORY_ITEMS  = "STATE_DEVICE_FOLDER_HISTORY_ITEMS";  //$NON-NLS-1$
-   private static final String           STATE_SELECTED_IMPORT_LAUNCHER     = "STATE_SELECTED_IMPORT_LAUNCHER";     //$NON-NLS-1$
-   private static final String           STATE_SELECTED_TAB_FOLDER_LAUNCHER = "STATE_SELECTED_TAB_FOLDER_LAUNCHER"; //$NON-NLS-1$
-   private static final String           STATE_SELECTED_TAB_FOLDER_MAIN     = "STATE_SELECTED_TAB_FOLDER_MAIN";     //$NON-NLS-1$
+   private static final String           STATE_BACKUP_DEVICE_HISTORY_ITEMS  = "STATE_BACKUP_DEVICE_HISTORY_ITEMS";         //$NON-NLS-1$
+   private static final String           STATE_BACKUP_FOLDER_HISTORY_ITEMS  = "STATE_BACKUP_FOLDER_HISTORY_ITEMS";         //$NON-NLS-1$
+   private static final String           STATE_DEVICE_DEVICE_HISTORY_ITEMS  = "STATE_DEVICE_DEVICE_HISTORY_ITEMS";         //$NON-NLS-1$
+   public static final String            STATE_DEVICE_FOLDER_HISTORY_ITEMS  = "STATE_DEVICE_FOLDER_HISTORY_ITEMS";         //$NON-NLS-1$
+   private static final String           STATE_SELECTED_IMPORT_LAUNCHER     = "STATE_SELECTED_IMPORT_LAUNCHER";            //$NON-NLS-1$
+   private static final String           STATE_SELECTED_TAB_FOLDER_LAUNCHER = "STATE_SELECTED_TAB_FOLDER_LAUNCHER";        //$NON-NLS-1$
+   private static final String           STATE_SELECTED_TAB_FOLDER_MAIN     = "STATE_SELECTED_TAB_FOLDER_MAIN";            //$NON-NLS-1$
    //
-   private static final String           DATA_KEY_TOUR_TYPE_ID              = "DATA_KEY_TOUR_TYPE_ID";              //$NON-NLS-1$
-   private static final String           DATA_KEY_SPEED_INDEX               = "DATA_KEY_SPEED_INDEX";               //$NON-NLS-1$
+   private static final String           DATA_KEY_TOUR_TYPE_ID              = "DATA_KEY_TOUR_TYPE_ID";                     //$NON-NLS-1$
+   private static final String           DATA_KEY_SPEED_INDEX               = "DATA_KEY_SPEED_INDEX";                      //$NON-NLS-1$
    //
    private static final int              CONTROL_DECORATION_WIDTH           = 6;
-   private static final String           CSS_PX                             = "px";                                 //$NON-NLS-1$
+   private static final String           CSS_PX                             = "px";                                        //$NON-NLS-1$
    //
    private final IPreferenceStore        _prefStore                         = TourbookPlugin.getPrefStore();
    private final IDialogSettings         _state                             = TourbookPlugin.getState(ID);
-   private final IDialogSettings         _stateIC                           = TourbookPlugin.getState(ID + "_IC");  //$NON-NLS-1$
-   private final IDialogSettings         _stateIL                           = TourbookPlugin.getState(ID + "_IL");  //$NON-NLS-1$
+   private final IDialogSettings         _stateIC                           = TourbookPlugin.getState(ID + "_IC");         //$NON-NLS-1$
+   private final IDialogSettings         _stateIL                           = TourbookPlugin.getState(ID + "_IL");         //$NON-NLS-1$
    //
    private IPropertyChangeListener       _prefChangeListener;
    //
@@ -368,6 +368,7 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements IActionRe
    private Text                 _txtIL_ConfigDescription;
    private Text                 _txtIL_ConfigName;
    private Text                 _txtIL_LastMarker;
+   private Text                 _txtIL_TourTagGroupItems;
 
    private class ActionIL_NewOneTourType extends Action {
 
@@ -2049,6 +2050,7 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements IActionRe
       final Composite container = new Composite(parent, SWT.NONE);
       GridDataFactory.fillDefaults().grab(true, true).applyTo(container);
       GridLayoutFactory.swtDefaults().numColumns(2).applyTo(container);
+//      container.setBackground(UI.SYS_COLOR_YELLOW);
       {
          createUI_700_IL_SetTag(container);
       }
@@ -2449,6 +2451,15 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements IActionRe
                .align(SWT.BEGINNING, SWT.FILL)
                .hint(convertWidthInCharsToPixels(30), SWT.DEFAULT)
                .applyTo(_comboIL_TourTagGroups);
+      }
+      {
+         /*
+          * Display all tags from the tag group
+          */
+         UI.createSpacer_Horizontal(parent);
+
+         _txtIL_TourTagGroupItems = new Text(parent, SWT.READ_ONLY);
+         GridDataFactory.fillDefaults().grab(true, true).applyTo(_txtIL_TourTagGroupItems);
       }
    }
 
@@ -4172,7 +4183,7 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements IActionRe
       // tag groups
       _comboIL_TourTagGroups.add(Messages.Dialog_ImportConfig_Info_DefaultTourTag);
       for (final TagGroup tagGroup : TagGroupManager.getTagGroupsSorted()) {
-         _comboIL_TourTagGroups.add(tagGroup.name + UI.SPACE3 + tagGroup.tourTags.size());
+         _comboIL_TourTagGroups.add(tagGroup.name);
       }
    }
 
@@ -5904,7 +5915,7 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements IActionRe
          final boolean isSetTourTagGroup = tagGroupID != null && tagGroup != null && _selectedIL.isSetTourTagGroup;
          _chkIL_SetTourTagGroup.setSelection(isSetTourTagGroup);
 
-         _comboIL_TourTagGroups.setToolTipText(null);
+         _txtIL_TourTagGroupItems.setText(UI.EMPTY_STRING);
 
          if (isSetTourTagGroup) {
 
@@ -6273,11 +6284,13 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements IActionRe
 
       if (tagGroup == null) {
 
-         _comboIL_TourTagGroups.setToolTipText(null);
+         _txtIL_TourTagGroupItems.setText(UI.EMPTY_STRING);
 
       } else {
 
-         _comboIL_TourTagGroups.setToolTipText(TagGroupManager.createTagSortedList(tagGroup));
+         final String allTagsSorted_NoTitle = TagGroupManager.createTagSortedList(tagGroup, false);
+
+         _txtIL_TourTagGroupItems.setText(allTagsSorted_NoTitle);
       }
    }
 

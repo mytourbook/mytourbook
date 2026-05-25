@@ -264,7 +264,7 @@ public class TagMenuManager implements IActionProvider {
 
          super("%s  %d".formatted(tagGroup.name, tagGroup.tourTags.size()), AS_PUSH_BUTTON); //$NON-NLS-1$
 
-         setToolTipText(TagGroupManager.createTagSortedList(tagGroup));
+         setToolTipText(TagGroupManager.createTagSortedList(tagGroup, true));
 
          __tagGroup = tagGroup;
       }

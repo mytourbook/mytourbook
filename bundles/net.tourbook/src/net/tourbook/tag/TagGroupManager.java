@@ -139,11 +139,12 @@ public class TagGroupManager {
 
    /**
     * @param tagGroup
+    * @param isWithTitle
     *
     * @return Returns a list with all tags in the {@link TagGroup} or <code>null</code> when not
     *         available
     */
-   public static String createTagSortedList(final TagGroup tagGroup) {
+   public static String createTagSortedList(final TagGroup tagGroup, final boolean isWithTitle) {
 
       if (tagGroup == null || tagGroup.tourTags.size() == 0) {
          return null;
@@ -151,7 +152,9 @@ public class TagGroupManager {
 
       final List<TourTag> allTags = new ArrayList<>(tagGroup.tourTags);
 
-      return createTagSortedList(tagGroup.name, allTags);
+      final String title = isWithTitle ? tagGroup.name : null;
+
+      return createTagSortedList(title, allTags);
    }
 
    /**
