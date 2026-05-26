@@ -226,6 +226,7 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
 
          super(Messages.Tour_Nutrition_Button_DeleteProduct, AS_PUSH_BUTTON);
          setToolTipText(Messages.Tour_Nutrition_Button_DeleteProduct_Tooltip);
+         setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.App_Delete));
       }
 
       @Override
