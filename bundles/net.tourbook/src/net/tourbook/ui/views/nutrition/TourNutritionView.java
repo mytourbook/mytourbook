@@ -1352,7 +1352,8 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
 
    private void fillContextMenu(final IMenuManager menuManager) {
 
-      if (!getSelectedProducts().isEmpty()) {
+      final boolean isSelectedProductsEmpty = getSelectedProducts().isEmpty();
+      if (!isSelectedProductsEmpty) {
 
          _actionOpenProductsWebsite.setTourNutritionProducts(getSelectedProductsCodes());
          menuManager.add(_actionOpenProductsWebsite);
@@ -1370,7 +1371,7 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
             menuManager,
             _tourData);
 
-      if (!getSelectedProducts().isEmpty()) {
+      if (!isSelectedProductsEmpty) {
          menuManager.add(_actionDeleteProducts);
       }
 
