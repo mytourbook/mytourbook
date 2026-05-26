@@ -5347,7 +5347,7 @@ public class TourDatabase {
 
             + "   numberOfPassedVehicles                 INTEGER DEFAULT 0,            " + NL //$NON-NLS-1$
 
-            // version 58 end
+            // version 59 end
 
             // version 5 start
             /**

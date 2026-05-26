@@ -217,6 +217,7 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
    private ActionDeleteProducts            _actionDeleteProducts;
    private ActionEditCustomProduct         _actionEditCustomProduct;
    private ActionOpenProductsWebsite       _actionOpenProductsWebsite;
+   private Action                          _actionTitle_RecentTourNutritionProducts;
    private ActionUpdateProduct             _actionUpdateProduct;
 
    private class ActionDeleteProducts extends Action {
@@ -625,6 +626,9 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
       _actionDeleteProducts = new ActionDeleteProducts();
       _actionEditCustomProduct = new ActionEditCustomProduct();
       _actionOpenProductsWebsite = new ActionOpenProductsWebsite();
+      _actionTitle_RecentTourNutritionProducts =
+            new Action(Messages.Tour_Nutrition_Action_Title_RecentlyAddedProducts) {};
+      _actionTitle_RecentTourNutritionProducts.setEnabled(false);
       _actionUpdateProduct = new ActionUpdateProduct();
    }
 
@@ -1348,7 +1352,8 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
 
    private void fillContextMenu(final IMenuManager menuManager) {
 
-      if (!getSelectedProducts().isEmpty()) {
+      final boolean isSelectedProductsEmpty = getSelectedProducts().isEmpty();
+      if (!isSelectedProductsEmpty) {
 
          _actionOpenProductsWebsite.setTourNutritionProducts(getSelectedProductsCodes());
          menuManager.add(_actionOpenProductsWebsite);
@@ -1359,12 +1364,16 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
          }
          menuManager.add(_actionUpdateProduct);
          menuManager.add(_actionEditCustomProduct);
-         menuManager.add(_actionDeleteProducts);
       }
 
+      menuManager.add(_actionTitle_RecentTourNutritionProducts);
       _tourNutritionProductMenuManager.fillMenuWithRecentTourNutritionProducts(
             menuManager,
             _tourData);
+
+      if (!isSelectedProductsEmpty) {
+         menuManager.add(_actionDeleteProducts);
+      }
 
       enableActions();
    }
