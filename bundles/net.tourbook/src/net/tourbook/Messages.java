@@ -3882,6 +3882,7 @@ public class Messages extends NLS {
    public static String        tour_merger_label_adjust_seconds;
    public static String        tour_merger_save_target_tour;
 
+   public static String        Tour_Nutrition_Action_Title_RecentlyAddedProducts;
    public static String        Tour_Nutrition_Button_AddCustomProduct;
    public static String        Tour_Nutrition_Button_AddCustomProduct_Tooltip;
    public static String        Tour_Nutrition_Button_DeleteProduct;
