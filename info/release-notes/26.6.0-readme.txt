@@ -1,7 +1,18 @@
 26.6.0                                                 ?. June 2026
 
+All
+===
+
+See milestone 26.6 https://github.com/mytourbook/mytourbook/milestone/29?closed=1
+
+
 New / Improvements
 ==================
+
+* Tour filter 
+  - Added nutrition tour filter (Frederic)
+  - Added option in the equipment tour filter to exclude tours with an equipment
+    https://github.com/mytourbook/mytourbook/issues/1641
 
 * Tour Nutrition (Frederic)
   - Select a product from a list of the most recent products used
@@ -9,19 +20,20 @@ New / Improvements
 * Equipment
   - Add a contextual menu to add several equiments at a time
     https://github.com/mytourbook/mytourbook/issues/1657
-
-* Tour filter 
-  - Added nutrition tour filter (Frederic)
-  - Added option in the equipment tour filter to exclude tours with an equipment
-    https://github.com/mytourbook/mytourbook/issues/1641
+    
+* Tagged Tours View
+  - New columns to display the parent of a tag and how tours are sorted/categorized
   
 
 Changes
 =======
 
-* Easyimport
+* Easy Import
   - Changed launcher layout
   - Cadence settings needs to be recreated, they are not related any more with the tour type configurations
+
+* Tour Nutrition (Frederic)
+  - The update button is now in the contextual menu of each product and is limited to 1 product at a time since the OpenFoodFacts database is very limited
 
 * Equipment
   - Multiple equipment with an empty type are not collated any more, each equipment with an empty type can now collate tours for itself
@@ -29,13 +41,6 @@ Changes
     The new column "Type (saved)" can display the saved value which is a random value when the type in the UI is empty.
   - The equipment tour filter operator is now supporting also the NOT operator. 
     This needed to rewrite the code and the old OR or AND operator have to be checked.
-
-* Tagged Tours View
-  - New columns to display the parent of a tag and how tours are sorted/categorized
-
-* Tour Nutrition (Frederic)
-  - The update button is now in the contextual menu of each product and is limited to 1 product at a time since the OpenFoodFacts database is
-    very limited
   
 
 Bugfix
@@ -46,8 +51,6 @@ Bugfix
   - Fixed the computation of total calories/carbs/sodium for beverages involving beverage containers
   - Fixed a bug where modifying a custom product would remove the associated beverage container
 
-See also milestone 26.6 https://github.com/mytourbook/mytourbook/milestone/29?closed=1
- 
 
 Translation    
 ===========
@@ -64,6 +67,6 @@ System
 * Java 21                        https://adoptium.net/temurin/releases/?version=21
 * Eclipse 2025-12 (4.38)         https://archive.eclipse.org/eclipse/downloads/drops4/R-4.38-202512010920/
 * NatTable 2.6.0                 https://eclipse.dev/nattable/download
-* Nebula Widgets                 https://download.eclipse.org/nebula/releases/latest
+* Nebula Widgets latest          https://download.eclipse.org/nebula/releases/latest
 * FIT SDK 21.205.0               https://forums.garmin.com/developer/fit-sdk/b/news-announcements
-* WorldWind 2.2.1                https://github.com/NASAWorldWind/WorldWindJava/releases/tag/v2.2.1
+* 3D Map 2.2.1                   https://github.com/NASAWorldWind/WorldWindJava/releases/tag/v2.2.1
