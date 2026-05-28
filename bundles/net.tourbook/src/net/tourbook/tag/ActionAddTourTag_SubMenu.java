@@ -447,7 +447,9 @@ public class ActionAddTourTag_SubMenu extends Action implements IMenuCreator, IA
       // Preload the tag images
       // Note that the hourglass is only displayed on Windows (it doesn't seem
       // to work on Linux)
-      BusyIndicator.showWhile(Display.getCurrent(), () -> allTourTags.forEach(tourTag -> TagManager.getTagImage(tourTag)));
+      BusyIndicator.showWhile(Display.getCurrent(),
+            () -> allTourTags
+                  .forEach(tourTag -> TagManager.getTagImage(tourTag)));
 
       // add tag items
       for (final TourTag menuTourTag : allTourTags) {

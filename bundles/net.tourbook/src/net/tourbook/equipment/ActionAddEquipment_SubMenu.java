@@ -39,8 +39,12 @@ import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.ActionContributionItem;
 import org.eclipse.jface.action.IMenuCreator;
 import org.eclipse.jface.action.Separator;
+import org.eclipse.jface.resource.ImageDescriptor;
+import org.eclipse.swt.custom.BusyIndicator;
 import org.eclipse.swt.events.MenuListener;
+import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
 
@@ -97,6 +101,12 @@ public class ActionAddEquipment_SubMenu extends Action implements IMenuCreator, 
       public ActionEquipment(final Equipment equipment) {
 
          super(equipment.getName(), AS_CHECK_BOX);
+
+         final Image eqImage = EquipmentManager.getEquipmentImage(equipment);
+
+         if (eqImage != null) {
+            setImageDescriptor(ImageDescriptor.createFromImage(eqImage));
+         }
 
          __equipment = equipment;
       }
@@ -363,6 +373,13 @@ public class ActionAddEquipment_SubMenu extends Action implements IMenuCreator, 
       final int numSelectedTour = _allSelectedTours.size();
 
       final List<Equipment> allAvailableEquipment = EquipmentManager.getAllEquipment_Name();
+
+      // Preload the equipment images
+      // Note that the hourglass is only displayed on Windows (it doesn't seem
+      // to work on Linux)
+      BusyIndicator.showWhile(Display.getCurrent(),
+            () -> allAvailableEquipment
+                  .forEach(equipment -> EquipmentManager.getEquipmentImage(equipment)));
 
       for (final Equipment availableEquipment : allAvailableEquipment) {
 

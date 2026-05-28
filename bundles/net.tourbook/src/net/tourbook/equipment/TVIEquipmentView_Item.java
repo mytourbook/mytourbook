@@ -35,13 +35,13 @@ public abstract class TVIEquipmentView_Item extends TreeViewerItem {
    private static final String                      SQL_SUM_FIELDS;
    private static final String                      SQL_SUM_COLUMNS;
    private static final String                      SQL_SUM_TOUR_FIELDS;
-   
+
    private static final IPreferenceStore            _prefStore                     = TourbookPlugin.getPrefStore();
 
    private static ConcurrentHashMap<String, String> _allCached_SqlAllSumColumns    = new ConcurrentHashMap<>();
    private static ConcurrentHashMap<String, String> _allCached_SqlAllSumFields     = new ConcurrentHashMap<>();
    private static ConcurrentHashMap<String, String> _allCached_SqlAllSumTourFields = new ConcurrentHashMap<>();
-   
+
    static {
 
 // SET_FORMATTING_OFF
@@ -111,7 +111,8 @@ public abstract class TVIEquipmentView_Item extends TreeViewerItem {
    private TreeViewer          _equipmentViewer;
 
    /**
-    * Location where the viewer items are displayed
+    * Location where the viewer items are displayed, this can be either in the equipment view or in
+    * the equipment tour filter
     */
    private EquipmentViewerType _viewerType;
 
