@@ -59,6 +59,12 @@ public class ApplicationWorkbenchAdvisor extends WorkbenchAdvisor {
    public static boolean isFixViewIconImage;
 
    /**
+    * This is <code>true</code> when the db design update is stopped to prevent the pre shutdown
+    * event which can cause issues e.g. https://github.com/mytourbook/mytourbook/issues/1695
+    */
+   public static boolean isInDbUpdateShutdown;
+
+   /**
     * Copied from org.eclipse.e4.ui.internal.workbench.ResourceHandler.getBaseLocation()
     *
     * @return
@@ -131,6 +137,10 @@ public class ApplicationWorkbenchAdvisor extends WorkbenchAdvisor {
 
    @Override
    public boolean preShutdown() {
+
+      if (isInDbUpdateShutdown) {
+         return true;
+      }
 
       if (TourManager.getInstance().saveTours() == false) {
          return false;

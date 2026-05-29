@@ -59,6 +59,7 @@ import javax.persistence.Persistence;
 import javax.persistence.Query;
 
 import net.tourbook.Messages;
+import net.tourbook.application.ApplicationWorkbenchAdvisor;
 import net.tourbook.application.SplashManager;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.NIO;
@@ -7071,6 +7072,8 @@ public class TourDatabase {
                1).open()) != Window.OK) {
 
             // the user will not update -> close application
+
+            ApplicationWorkbenchAdvisor.isInDbUpdateShutdown = true;
 
             PlatformUI.getWorkbench().close();
 
