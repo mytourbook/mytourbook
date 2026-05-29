@@ -22,8 +22,8 @@
    </dependencies>	
 
    <properties>
-      <tycho.version>5.0.2</tycho.version>     
-      <surefire.version>3.5.5</surefire.version>
+      <tycho.version>5.0.3</tycho.version>     
+      <surefire.version>3.5.6</surefire.version>
       <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>  
    </properties>
 
