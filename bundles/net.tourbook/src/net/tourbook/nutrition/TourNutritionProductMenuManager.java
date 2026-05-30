@@ -65,7 +65,7 @@ public class TourNutritionProductMenuManager {
     */
    private static int                                         _maxTourNutritionProducts;
 
-   private static LinkedHashMap<String, TourNutritionProduct> _recentTourNutritionProducts    = new LinkedHashMap<>(10);
+   private static LinkedHashMap<String, TourNutritionProduct> _recentTourNutritionProducts    = LinkedHashMap.newLinkedHashMap(10);
 
    private static TourNutritionProductMenuManager             _currentInstance;
 
