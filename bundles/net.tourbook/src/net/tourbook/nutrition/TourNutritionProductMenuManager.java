@@ -22,7 +22,6 @@ import java.util.Map;
 
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.UI;
-import net.tourbook.common.util.LRUMap;
 import net.tourbook.common.util.StringUtils;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourNutritionProduct;
@@ -66,7 +65,7 @@ public class TourNutritionProductMenuManager {
     */
    private static int                                         _maxTourNutritionProducts;
 
-   private static LinkedHashMap<String, TourNutritionProduct> _recentTourNutritionProducts    = new LRUMap<>(10);
+   private static LinkedHashMap<String, TourNutritionProduct> _recentTourNutritionProducts    = LinkedHashMap.newLinkedHashMap(10);
 
    private static TourNutritionProductMenuManager             _currentInstance;
 
@@ -347,6 +346,7 @@ public class TourNutritionProductMenuManager {
       // If the tour nutrition product Id is not in the list
       if (_recentTourNutritionProducts.containsKey(tourNutritionProductId) == false) {
 
+         _recentTourNutritionProducts.remove(tourNutritionProductId);
          _recentTourNutritionProducts.putFirst(
                tourNutritionProductId,
                tourNutritionProduct);
