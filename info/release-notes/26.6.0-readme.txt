@@ -30,7 +30,7 @@ Changes
 
 * Easy Import
   - Changed launcher layout
-  - Cadence settings needs to be recreated, they are not related any more with the tour type configurations
+  - Cadence settings needs to be checked, they are not related any more with the tour type configurations
 
 * Tour Nutrition (Frederic)
   - The update button is now in the contextual menu of each product and is limited to 1 product at a time since the OpenFoodFacts database is very limited
