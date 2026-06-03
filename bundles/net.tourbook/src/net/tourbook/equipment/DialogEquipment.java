@@ -665,6 +665,10 @@ public class DialogEquipment extends TitleAreaDialog {
 
    private void enableControls() {
 
+      if (_parent.isDisposed()) {
+         return;
+      }
+
       if (_isInUIUpdate) {
          return;
       }
