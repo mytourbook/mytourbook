@@ -46,6 +46,10 @@ public class EquipmentLoader {
    private static final LinkedBlockingDeque<SQLLoader> _sqlWaitingQueue = new LinkedBlockingDeque<>();
 
    private static int                                  _loadCounter;
+
+   /**
+    * This counter is set (incremented) when a new update starts
+    */
    private static int                                  _viewUpdateCounter;
 
    static {
@@ -90,6 +94,7 @@ public class EquipmentLoader {
 
       loadSummarizedValues_Equipment_AllTours(allEquipmentItems, equipmentItem);
       loadSummarizedValues_Equipment_CollateTours(allEquipmentItems, equipmentItem);
+//      loadSummarizedValues_Equipment_NotCollated(allEquipmentItems, equipmentItem);
    }
 
    private static void loadSummarizedValues_Equipment_AllTours(final Map<Long, TVIEquipmentView_Equipment> allEquipmentItems,
@@ -185,7 +190,7 @@ public class EquipmentLoader {
                + "   equip.EQUIPMENTID," + NL //                                                1  //$NON-NLS-1$
                + "   COUNT(*) AS num_Tours," + NL //                                            2  //$NON-NLS-1$
 
-               + TVIEquipmentView_Item.getSQL_SUM_COLUMNS("TourData", 3) //                                           3  //$NON-NLS-1$
+               + TVIEquipmentView_Item.getSQL_SUM_COLUMNS("TourData", 3) //                     3  //$NON-NLS-1$
 
                + "FROM " + TourDatabase.TABLE_EQUIPMENT + " AS equip" + NL //                      //$NON-NLS-1$ //$NON-NLS-2$
 
@@ -224,6 +229,93 @@ public class EquipmentLoader {
             if (equipmentItem != null) {
 
                equipmentItem.numTours_IsCollated = numTours;
+
+               equipmentItem.readCommonValues(result, 3);
+
+               // this equipment has a tour -> remove from list
+               allEquipmentItemsWithoutTours.remove(equipmentID);
+            }
+         }
+
+         for (final TVIEquipmentView_Equipment equipmentItem : allEquipmentItemsWithoutTours.values()) {
+
+            if (equipmentItem.getEquipment().isCollate()) {
+
+               // set 0 children that the expand icon in the view is not displayed
+               equipmentItem.setChildren(new ArrayList<>());
+            }
+         }
+
+      } catch (final SQLException e) {
+         SQL.showException(e, sql);
+      } finally {
+         Util.closeSql(statement);
+      }
+   }
+
+   private static void loadSummarizedValues_Equipment_NotCollated(final Map<Long, TVIEquipmentView_Equipment> allEquipmentItems,
+                                                                  final TVIEquipmentView_Item equipmentItem_Top) {
+
+      // clone map
+      final Map<Long, TVIEquipmentView_Equipment> allEquipmentItemsWithoutTours = new HashMap<>(allEquipmentItems);
+
+      String sql = null;
+      PreparedStatement statement = null;
+
+      try (Connection conn = TourDatabase.getInstance().getConnection()) {
+
+         final AppFilter appFilter = equipmentItem_Top.createAppFilter();
+
+         sql = UI.EMPTY_STRING
+
+               + "--" + NL //                                                                      //$NON-NLS-1$
+               + NL
+               + "-------------------------------" + NL //                                         //$NON-NLS-1$
+               + "-- equipment sum - not collated" + NL //                                         //$NON-NLS-1$
+               + "-------------------------------" + NL //                                         //$NON-NLS-1$
+               + NL
+
+               + "SELECT" + NL //                                                                  //$NON-NLS-1$
+               + "   equip.EQUIPMENTID," + NL //                                                1  //$NON-NLS-1$
+               + "   COUNT(*) AS num_Tours," + NL //                                            2  //$NON-NLS-1$
+
+               + TVIEquipmentView_Item.getSQL_SUM_COLUMNS("TourData", 3) //                     3  //$NON-NLS-1$
+
+               + "FROM " + TourDatabase.TABLE_EQUIPMENT + " AS equip" + NL //                      //$NON-NLS-1$ //$NON-NLS-2$
+
+               + "JOIN " + TourDatabase.JOINTABLE__TOURDATA__EQUIPMENT + " AS j_Td_Eq" //          //$NON-NLS-1$ //$NON-NLS-2$
+               + "  ON j_Td_Eq.equipment_equipmentid = equip.EQUIPMENTID" + NL //                  //$NON-NLS-1$
+
+               // the alias "TourData" is needed that the app filter is working
+               + "JOIN " + TourDatabase.TABLE_TOUR_DATA + " AS TourData" //                        //$NON-NLS-1$ //$NON-NLS-2$
+               + "  ON TourData.tourid = j_Td_Eq.tourdata_tourid" + NL //                          //$NON-NLS-1$
+
+               + appFilter.getWhereClause()
+
+               + "WHERE equip.isCollate = false" + NL //                                           //$NON-NLS-1$
+
+               + "GROUP BY equip.EQUIPMENTID" + NL //                                              //$NON-NLS-1$
+
+               + NL;
+
+         statement = conn.prepareStatement(sql);
+
+         int nextIndex = 1;
+
+         nextIndex = appFilter.setParameters(statement, nextIndex);
+
+         final ResultSet result = statement.executeQuery();
+
+         while (result.next()) {
+
+            final long equipmentID = result.getLong(1);
+            final int numTours = result.getInt(2);
+
+            final TVIEquipmentView_Equipment equipmentItem = allEquipmentItems.get(equipmentID);
+
+            if (equipmentItem != null) {
+
+               equipmentItem.numTours_IsNotCollated = numTours;
 
                equipmentItem.readCommonValues(result, 3);
 
@@ -312,16 +404,19 @@ public class EquipmentLoader {
     *
     * @return
     */
-   static void loadSummarizedValues_Part_Runnable(final TVIEquipmentView_Part partItem) {
+   private static void loadSummarizedValues_Part_Runnable(final TVIEquipmentView_Part partItem) {
+
+      final EquipmentViewerType viewerType = partItem.getViewerType();
 
       String sql = null;
       PreparedStatement statement = null;
 
       try (Connection conn = TourDatabase.getInstance().getConnection()) {
 
+
          final AppFilter appFilter = partItem.createAppFilter();
-         final SQLData partFilter_AND_OR = new EquipmentPartFilter_AND_OR().getSqlData();
-         final SQLData partFilter_NOT = new EquipmentPartFilter_NOT().getSqlData();
+         final SQLData partFilter_AND_OR = new EquipmentPartFilter_AND_OR(viewerType).getSqlData();
+         final SQLData partFilter_NOT = new EquipmentPartFilter_NOT(viewerType).getSqlData();
 
          sql = UI.EMPTY_STRING
 
@@ -411,7 +506,7 @@ public class EquipmentLoader {
       }
    }
 
-   public static void startUpdate() {
+   public static void startAnUpdate() {
 
       _viewUpdateCounter++;
    }

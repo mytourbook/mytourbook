@@ -29,6 +29,7 @@ import net.tourbook.common.util.TreeViewerItem;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.equipment.EquipmentPartFilter_AND_OR;
 import net.tourbook.equipment.EquipmentPartFilter_NOT;
+import net.tourbook.equipment.EquipmentViewerType;
 import net.tourbook.ui.AppFilter;
 
 public class TVITourBookRoot extends TVITourBookItem {
@@ -65,8 +66,8 @@ public class TVITourBookRoot extends TVITourBookItem {
                : "GROUP BY StartYear" + NL; //                 //$NON-NLS-1$
 
          final AppFilter appFilter = new AppFilter(AppFilter.ANY_APP_FILTERS);
-         final SQLData partFilter_AND_OR = new EquipmentPartFilter_AND_OR().getSqlData();
-         final SQLData partFilter_NOT = new EquipmentPartFilter_NOT().getSqlData();
+         final SQLData partFilter_AND_OR = new EquipmentPartFilter_AND_OR(EquipmentViewerType.IS_EQUIPMENT_VIEWER).getSqlData();
+         final SQLData partFilter_NOT = new EquipmentPartFilter_NOT(EquipmentViewerType.IS_EQUIPMENT_VIEWER).getSqlData();
 
          sql = UI.EMPTY_STRING
 

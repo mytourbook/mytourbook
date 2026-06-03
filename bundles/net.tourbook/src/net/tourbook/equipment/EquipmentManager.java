@@ -101,8 +101,9 @@ public class EquipmentManager {
    static final int            STATE_EQUIPMENT_FILTER_RETIRED_DEFAULT        = 0;
    //
    //
-   private static final IDialogSettings      _state                       = TourbookPlugin.getState("net.tourbook.equipment.EquipmentManager"); //$NON-NLS-1$
-
+   private static final IDialogSettings _state = TourbookPlugin.getState("net.tourbook.equipment.EquipmentManager"); //$NON-NLS-1$
+//
+//
    static final int                          FILTER_CONTAINS_TOURS_IGNORE = 0;
    static final int                          FILTER_CONTAINS_TOURS_YES    = 1;
    static final int                          FILTER_CONTAINS_TOURS_NO     = 2;
@@ -114,7 +115,7 @@ public class EquipmentManager {
     * To identify an empty equipment type, they are not empty but filled with a random UUID. To
     * identify an UUID type from a real type, the UUID type has this 'random' prefix
     */
-   private static final String               EMPTY_TYPE_PREFIX            = "v4a1n9---";                                                       //$NON-NLS-1$
+   private static final String               EMPTY_TYPE_PREFIX            = "v4a1n9---"; //$NON-NLS-1$
 
    public static final short                 EXPAND_TYPE_FLAT             = 0;
    public static final short                 EXPAND_TYPE_YEAR_TOUR        = 1;
@@ -149,15 +150,15 @@ public class EquipmentManager {
    /**
     * Main switch if equipment are filtered or not
     */
-   private static boolean                    _equipmentFilter_IsEnabled;
+   private static boolean                    _equipmentTourViewerFilter_IsEnabled;
 
    /**
     * Contains
     *
     * <pre>
-    * {@link #FILTER_CONTAINS_TOURS_IGNORE} ... {@value #FILTER_CONTAINS_TOURS_IGNORE}
-    * {@link #FILTER_CONTAINS_TOURS_YES} ... {@value #FILTER_CONTAINS_TOURS_YES}
-    * {@link #FILTER_CONTAINS_TOURS_NO} ...{@value #FILTER_CONTAINS_TOURS_NO}
+    * {@link #FILTER_CONTAINS_TOURS_IGNORE}  ... {@value #FILTER_CONTAINS_TOURS_IGNORE}
+    * {@link #FILTER_CONTAINS_TOURS_YES}     ... {@value #FILTER_CONTAINS_TOURS_YES}
+    * {@link #FILTER_CONTAINS_TOURS_NO}      ... {@value #FILTER_CONTAINS_TOURS_NO}
     * </pre>
     */
    private static int                        _equipmentFilter_ContainsTours;
@@ -166,9 +167,9 @@ public class EquipmentManager {
     * Contains
     *
     * <pre>
-    * {@link #FILTER_RETIRED_IGNORE} ... {@value #FILTER_RETIRED_IGNORE}
+    * {@link #FILTER_RETIRED_IGNORE}     ... {@value #FILTER_RETIRED_IGNORE}
     * {@link #FILTER_RETIRED_IS_RETIRED} ... {@value #FILTER_RETIRED_IS_RETIRED}
-    * {@link #FILTER_RETIRED_IS_ACTIVE} ...{@value #FILTER_RETIRED_IS_ACTIVE}
+    * {@link #FILTER_RETIRED_IS_ACTIVE}  ... {@value #FILTER_RETIRED_IS_ACTIVE}
     * </pre>
     */
    private static int                        _equipmentFilter_Retired;
@@ -181,7 +182,7 @@ public class EquipmentManager {
 
    static {
 
-      _equipmentFilter_IsEnabled = Util.getStateBoolean(_state, STATE_EQUIPMENT_FILTER_IS_ENABLED, false);
+      _equipmentTourViewerFilter_IsEnabled = Util.getStateBoolean(_state, STATE_EQUIPMENT_FILTER_IS_ENABLED, false);
 
       _equipmentFilter_ContainsTours = Util.getStateInt(_state,
             STATE_EQUIPMENT_FILTER_CONTAINS_TOURS,
@@ -1491,9 +1492,12 @@ public class EquipmentManager {
       return type != null && type.trim().startsWith(EMPTY_TYPE_PREFIX);
    }
 
-   public static boolean isEquipmentFilterEnabled() {
+   /**
+    * @return {@link #_equipmentTourViewerFilter_IsEnabled}
+    */
+   public static boolean isEquipmentTourViewerFilter() {
 
-      return _equipmentFilter_IsEnabled;
+      return _equipmentTourViewerFilter_IsEnabled;
    }
 
    private static void loadEquipment() {
@@ -1585,9 +1589,9 @@ public class EquipmentManager {
 
    public static void setEquipmentFilter_IsEnabled(final boolean isEnabled) {
 
-      _equipmentFilter_IsEnabled = isEnabled;
+      _equipmentTourViewerFilter_IsEnabled = isEnabled;
 
-      _state.put(STATE_EQUIPMENT_FILTER_IS_ENABLED, _equipmentFilter_IsEnabled);
+      _state.put(STATE_EQUIPMENT_FILTER_IS_ENABLED, _equipmentTourViewerFilter_IsEnabled);
    }
 
    public static void setEquipmentFilter_Retired(final int retiredState) {

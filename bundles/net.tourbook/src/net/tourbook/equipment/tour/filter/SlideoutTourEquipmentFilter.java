@@ -278,57 +278,57 @@ public class SlideoutTourEquipmentFilter extends AdvancedSlideout implements ITr
          if (obj1 instanceof final TVIEquipmentView_Equipment item1
                && obj2 instanceof final TVIEquipmentView_Equipment item2) {
 
-            // sort equipment by name
-
             final Equipment equipment1 = item1.getEquipment();
             final Equipment equipment2 = item2.getEquipment();
 
-            final boolean isCollate1 = equipment1.isCollate();
-            final boolean isCollate2 = equipment2.isCollate();
+//            final boolean isCollate1 = equipment1.isCollate();
+//            final boolean isCollate2 = equipment2.isCollate();
+//
+//            if (isCollate1 && isCollate2) {
+//
+//               // collated equipment
+//
+//               // 1st compare by type
+//               int compareDiff = equipment1.getType().compareTo(equipment2.getType());
+//
+//               // 2nd compare by date
+//               if (compareDiff == 0) {
+//
+//                  final long date1 = equipment1.getDateUsed();
+//                  final long date2 = equipment2.getDateUsed();
+//
+//                  final long dateDiff = date1 - date2;
+//
+//                  // diff value can be larger than Integer.MAX_VALUE
+//                  if (dateDiff > 0) {
+//                     compareDiff = 1;
+//                  } else if (dateDiff < 0) {
+//                     compareDiff = -1;
+//                  }
+//               }
+//
+//               return compareDiff;
+//
+//            } else if (isCollate1) {
+//
+//               // sort collated before not collated
+//
+//               return -1;
+//
+//            } else if (isCollate2) {
+//
+//               // sort collated before not collated
+//
+//               return 1;
+//
+//            } else {
+//
+//               // not collated equipment -> sort by name
+//
+//               return equipment1.getName().compareTo(equipment2.getName());
+//            }
 
-            if (isCollate1 && isCollate2) {
-
-               // collated equipment
-
-               // 1st compare by type
-               int compareDiff = equipment1.getType().compareTo(equipment2.getType());
-
-               // 2nd compare by date
-               if (compareDiff == 0) {
-
-                  final long date1 = equipment1.getDateUsed();
-                  final long date2 = equipment2.getDateUsed();
-
-                  final long dateDiff = date1 - date2;
-
-                  // diff value can be larger than Integer.MAX_VALUE
-                  if (dateDiff > 0) {
-                     compareDiff = 1;
-                  } else if (dateDiff < 0) {
-                     compareDiff = -1;
-                  }
-               }
-
-               return compareDiff;
-
-            } else if (isCollate1) {
-
-               // sort collated before not collated
-
-               return -1;
-
-            } else if (isCollate2) {
-
-               // sort collated before not collated
-
-               return 1;
-
-            } else {
-
-               // not collated equipment -> sort by name
-
-               return equipment1.getName().compareTo(equipment2.getName());
-            }
+            return equipment1.getName().compareToIgnoreCase(equipment2.getName());
 
          } else if (obj1 instanceof final TVIEquipmentView_Part item1
                && obj2 instanceof final TVIEquipmentView_Part item2) {
@@ -776,7 +776,7 @@ public class SlideoutTourEquipmentFilter extends AdvancedSlideout implements ITr
                cell.setText(profile.name);
             }
          });
-         tableLayout.setColumnData(tc, new ColumnWeightData(1, false));
+         tableLayout.setColumnData(tc, new ColumnWeightData(10, false));
       }
       {
          // Column: Number of checked equipment
@@ -797,7 +797,7 @@ public class SlideoutTourEquipmentFilter extends AdvancedSlideout implements ITr
                      : Integer.toString(numEquipment));
             }
          });
-         tableLayout.setColumnData(tc, net.tourbook.ui.UI.getColumnPixelWidth(_pc, 6));
+         tableLayout.setColumnData(tc, net.tourbook.ui.UI.getColumnPixelWidth(_pc, 4));
       }
       {
          // Column: Number of unchecked equipment
@@ -818,7 +818,7 @@ public class SlideoutTourEquipmentFilter extends AdvancedSlideout implements ITr
                      : Integer.toString(numUncheckedEquipment));
             }
          });
-         tableLayout.setColumnData(tc, net.tourbook.ui.UI.getColumnPixelWidth(_pc, 6));
+         tableLayout.setColumnData(tc, net.tourbook.ui.UI.getColumnPixelWidth(_pc, 4));
       }
       {
          // Column: Filter
@@ -837,12 +837,12 @@ public class SlideoutTourEquipmentFilter extends AdvancedSlideout implements ITr
                cell.setText(filterType.name());
             }
          });
-         tableLayout.setColumnData(tc, net.tourbook.ui.UI.getColumnPixelWidth(_pc, 10));
+         tableLayout.setColumnData(tc, net.tourbook.ui.UI.getColumnPixelWidth(_pc, 12));
       }
       {
-         // Column: Combine equipment with OR or AND
+         // Column: Combine equipment with AND, OR or NOT
 
-         tvc = new TableViewerColumn(_profileViewer, SWT.TRAIL);
+         tvc = new TableViewerColumn(_profileViewer, SWT.LEAD);
          tc = tvc.getColumn();
          tc.setText(Messages.Slideout_TourTagFilter_Column_CombineTags);
          tc.setToolTipText(Messages.Slideout_TourTagFilter_Column_CombineTags_Tooltip);
@@ -874,7 +874,7 @@ public class SlideoutTourEquipmentFilter extends AdvancedSlideout implements ITr
                      : UI.EMPTY_STRING);
             }
          });
-         tableLayout.setColumnData(tc, net.tourbook.ui.UI.getColumnPixelWidth(_pc, 10));
+         tableLayout.setColumnData(tc, net.tourbook.ui.UI.getColumnPixelWidth(_pc, 8));
       }
 
       /*

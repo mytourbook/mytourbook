@@ -169,8 +169,8 @@ public class TVIEquipmentView_Part_Month extends TVIEquipmentView_Item {
       try (Connection conn = TourDatabase.getInstance().getConnection()) {
 
          final AppFilter appFilter = createAppFilter();
-         final SQLData partFilter_AND_OR = new EquipmentPartFilter_AND_OR().getSqlData();
-         final SQLData partFilter_NOT = new EquipmentPartFilter_NOT().getSqlData();
+         final SQLData partFilter_AND_OR = new EquipmentPartFilter_AND_OR(getViewerType()).getSqlData();
+         final SQLData partFilter_NOT = new EquipmentPartFilter_NOT(getViewerType()).getSqlData();
 
          /*
           * Load: Part, Year, Month, Tour

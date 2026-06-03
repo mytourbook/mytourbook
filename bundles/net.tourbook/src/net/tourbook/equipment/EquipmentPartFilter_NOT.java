@@ -35,7 +35,11 @@ public class EquipmentPartFilter_NOT {
 
    private SQLData             _sqlData;
 
-   public EquipmentPartFilter_NOT() {
+   private boolean             _isInEqTourViewer;
+
+   public EquipmentPartFilter_NOT(final EquipmentViewerType equipmentViewerType) {
+
+      _isInEqTourViewer = EquipmentViewerType.IS_EQUIPMENT_VIEWER.equals(equipmentViewerType);
 
       _sqlData = createSQL();
    }
@@ -46,7 +50,7 @@ public class EquipmentPartFilter_NOT {
 
       final List<Object> allSQLParameters = new ArrayList<>();
 
-      if (TourEquipmentFilterManager.isFilterEnabled()) {
+      if (_isInEqTourViewer && TourEquipmentFilterManager.isFilterEnabled()) {
 
          final TourEquipmentFilterProfile selectedProfile = TourEquipmentFilterManager.getSelectedProfile();
 
@@ -95,11 +99,15 @@ public class EquipmentPartFilter_NOT {
          }
       }
 
-      final String sqlFinal = UI.EMPTY_STRING
+      final String sqlFinal = sql.length() == 0
 
-            + "-- part filter NOT - START" + NL //$NON-NLS-1$
-            + sql
-            + "-- part filter NOT - END" + NL //$NON-NLS-1$
+            ? UI.EMPTY_STRING
+
+            : UI.EMPTY_STRING
+
+                  + "-- part filter NOT - START" + NL //$NON-NLS-1$
+                  + sql
+                  + "-- part filter NOT - END" + NL //$NON-NLS-1$
       ;
 
       return new SQLData(sqlFinal, allSQLParameters);

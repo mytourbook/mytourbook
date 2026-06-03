@@ -173,11 +173,23 @@ public class TVIEquipmentView_Equipment extends TVIEquipmentView_Item {
 
    private void loadChildren_Parts() {
 
-      final boolean isFilterEnabled = EquipmentManager.isEquipmentFilterEnabled();
-      final int equipmentFilter_Retired = EquipmentManager.getEquipmentFilter_Retired();
+      final boolean isInEqTourViewer = EquipmentViewerType.IS_EQUIPMENT_VIEWER.equals(getViewerType());
 
-      final boolean useRetiredFilter = equipmentFilter_Retired != EquipmentManager.FILTER_RETIRED_IGNORE;
-      final boolean useFilter = isFilterEnabled && useRetiredFilter;
+      boolean useFilter = false;
+
+      int equipmentFilter_Retired = EquipmentManager.FILTER_RETIRED_IGNORE;
+
+      if (isInEqTourViewer) {
+
+         // tour viewer
+
+         final boolean isFilterEnabled = EquipmentManager.isEquipmentTourViewerFilter();
+         equipmentFilter_Retired = EquipmentManager.getEquipmentFilter_Retired();
+
+         final boolean useRetiredFilter = equipmentFilter_Retired != EquipmentManager.FILTER_RETIRED_IGNORE;
+
+         useFilter = isFilterEnabled && useRetiredFilter;
+      }
 
       final Set<EquipmentPart> allParts = _equipment.getParts();
 

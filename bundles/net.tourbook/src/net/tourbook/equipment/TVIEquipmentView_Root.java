@@ -53,13 +53,26 @@ public class TVIEquipmentView_Root extends TVIEquipmentView_Item {
             return;
          }
 
-         final boolean isFilterEnabled = EquipmentManager.isEquipmentFilterEnabled();
-         final int equipmentFilter_Retired = EquipmentManager.getEquipmentFilter_Retired();
+         final EquipmentViewerType viewerType = getViewerType();
+         final boolean isInEqTourViewer = EquipmentViewerType.IS_EQUIPMENT_VIEWER.equals(viewerType);
 
-         final boolean eqFilter_IsShowActive = equipmentFilter_Retired == EquipmentManager.FILTER_RETIRED_IS_ACTIVE;
-         final boolean eqFilter_IsShowRetired = equipmentFilter_Retired == EquipmentManager.FILTER_RETIRED_IS_RETIRED;
+         boolean useFilter = false;
 
-         final boolean useFilter = isFilterEnabled && (eqFilter_IsShowRetired || eqFilter_IsShowActive);
+         boolean eqFilter_IsShowActive = true;
+         boolean eqFilter_IsShowRetired = true;
+
+         if (isInEqTourViewer) {
+
+            // tour viewer
+
+            final boolean isFilterEnabled = EquipmentManager.isEquipmentTourViewerFilter();
+            final int equipmentFilter_Retired = EquipmentManager.getEquipmentFilter_Retired();
+
+            eqFilter_IsShowActive = equipmentFilter_Retired == EquipmentManager.FILTER_RETIRED_IS_ACTIVE;
+            eqFilter_IsShowRetired = equipmentFilter_Retired == EquipmentManager.FILTER_RETIRED_IS_RETIRED;
+
+            useFilter = isFilterEnabled && (eqFilter_IsShowRetired || eqFilter_IsShowActive);
+         }
 
          final String sql = UI.EMPTY_STRING
 
@@ -170,7 +183,7 @@ public class TVIEquipmentView_Root extends TVIEquipmentView_Item {
 
                   equipmentViewer,
                   equipment,
-                  getViewerType());
+                  viewerType);
 
             addChild(equipmentItem);
 

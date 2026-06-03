@@ -122,8 +122,7 @@ public class TourEquipmentFilterManager {
 
    /**
     * @return Returns <code>true</code> when a tour equipment filter is enabled in the current tour
-    *         equipment
-    *         filter profile.
+    *         equipment filter profile.
     */
    public static boolean isFilterEnabled() {
 

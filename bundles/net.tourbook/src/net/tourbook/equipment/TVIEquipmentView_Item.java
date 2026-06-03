@@ -118,6 +118,7 @@ public abstract class TVIEquipmentView_Item extends TreeViewerItem {
 
    public long                 numTours_All;
    public long                 numTours_IsCollated;
+   public long                 numTours_IsNotCollated;
 
    /**
     * Content which is displayed in the first tree column

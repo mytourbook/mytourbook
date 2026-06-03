@@ -35,7 +35,11 @@ public class EquipmentPartFilter_AND_OR {
 
    private SQLData             _sqlData;
 
-   public EquipmentPartFilter_AND_OR() {
+   private boolean             _isInEqTourViewer;
+
+   public EquipmentPartFilter_AND_OR(final EquipmentViewerType equipmentViewerType) {
+
+      _isInEqTourViewer = EquipmentViewerType.IS_EQUIPMENT_VIEWER.equals(equipmentViewerType);
 
       _sqlData = createSQL();
    }
@@ -46,7 +50,8 @@ public class EquipmentPartFilter_AND_OR {
 
       final List<Object> allSQLParameters = new ArrayList<>();
 
-      if (TourEquipmentFilterManager.isFilterEnabled()) {
+
+      if (_isInEqTourViewer && TourEquipmentFilterManager.isFilterEnabled()) {
 
          final TourEquipmentFilterProfile selectedProfile = TourEquipmentFilterManager.getSelectedProfile();
 
@@ -155,11 +160,15 @@ public class EquipmentPartFilter_AND_OR {
          }
       }
 
-      final String sqlFinal = UI.EMPTY_STRING
+      final String sqlFinal = sql.length() == 0
 
-            + "-- part filter OR/AND - START" + NL //$NON-NLS-1$
-            + sql
-            + "-- part filter OR/AND - END" + NL //$NON-NLS-1$
+            ? UI.EMPTY_STRING
+
+            : UI.EMPTY_STRING
+
+                  + "-- part filter OR/AND - START" + NL //$NON-NLS-1$
+                  + sql
+                  + "-- part filter OR/AND - END" + NL //$NON-NLS-1$
       ;
 
       return new SQLData(sqlFinal, allSQLParameters);

@@ -39,6 +39,7 @@ import net.tourbook.common.util.StatusUtil;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.equipment.EquipmentPartFilter_AND_OR;
 import net.tourbook.equipment.EquipmentPartFilter_NOT;
+import net.tourbook.equipment.EquipmentViewerType;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.ui.AppFilter;
 import net.tourbook.ui.TableColumnFactory;
@@ -294,8 +295,8 @@ public class NatTable_DataLoader {
          final String sqlSortFields = createSql_Sorting_SelectFields();
 
          final AppFilter appFilter = new AppFilter(AppFilter.ANY_APP_FILTERS);
-         final SQLData partFilter_AND_OR = new EquipmentPartFilter_AND_OR().getSqlData();
-         final SQLData partFilter_NOT = new EquipmentPartFilter_NOT().getSqlData();
+         final SQLData partFilter_AND_OR = new EquipmentPartFilter_AND_OR(EquipmentViewerType.IS_EQUIPMENT_VIEWER).getSqlData();
+         final SQLData partFilter_NOT = new EquipmentPartFilter_NOT(EquipmentViewerType.IS_EQUIPMENT_VIEWER).getSqlData();
          final SQLData tourCollectionFilter = _tourCollectionFilter;
 
          sql = UI.EMPTY_STRING
@@ -376,8 +377,8 @@ public class NatTable_DataLoader {
             PreparedStatement prepStmt;
 
             final AppFilter appFilter = new AppFilter(AppFilter.ANY_APP_FILTERS);
-            final SQLData partFilter_AND_OR = new EquipmentPartFilter_AND_OR().getSqlData();
-            final SQLData partFilter_NOT = new EquipmentPartFilter_NOT().getSqlData();
+            final SQLData partFilter_AND_OR = new EquipmentPartFilter_AND_OR(EquipmentViewerType.IS_EQUIPMENT_VIEWER).getSqlData();
+            final SQLData partFilter_NOT = new EquipmentPartFilter_NOT(EquipmentViewerType.IS_EQUIPMENT_VIEWER).getSqlData();
 
             sql = UI.EMPTY_STRING
 
@@ -403,7 +404,7 @@ public class NatTable_DataLoader {
             if (isFirstRun) {
                nextIndex = tourCollectionFilter.setParameters(prepStmt, nextIndex);
             }
-            
+
             nextIndex = partFilter_NOT.setParameters(prepStmt, nextIndex);
 
             final ResultSet result = prepStmt.executeQuery();
@@ -484,8 +485,8 @@ public class NatTable_DataLoader {
       try (Connection conn = TourDatabase.getInstance().getConnection()) {
 
          final AppFilter appFilter = new AppFilter(AppFilter.ANY_APP_FILTERS);
-         final SQLData partFilter_AND_OR = new EquipmentPartFilter_AND_OR().getSqlData();
-         final SQLData partFilter_NOT = new EquipmentPartFilter_NOT().getSqlData();
+         final SQLData partFilter_AND_OR = new EquipmentPartFilter_AND_OR(EquipmentViewerType.IS_EQUIPMENT_VIEWER).getSqlData();
+         final SQLData partFilter_NOT = new EquipmentPartFilter_NOT(EquipmentViewerType.IS_EQUIPMENT_VIEWER).getSqlData();
          final SQLData tourCollectionFilter = _tourCollectionFilter;
 
          final String orderBy = createSql_Sorting_OrderBy();
