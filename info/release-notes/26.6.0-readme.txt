@@ -42,6 +42,9 @@ Changes
   - The equipment tour filter operator is now supporting also the NOT operator. 
     This needed to rewrite the code and the old OR or AND operator have to be checked.
   
+* Strava
+  - Strava upload in MyTourbook to end as of June 30th 2026
+    https://github.com/mytourbook/mytourbook/discussions/1698  
 
 Bugfix
 ======
