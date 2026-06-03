@@ -54,6 +54,10 @@ Bugfix
   - Fixed the computation of total calories/carbs/sodium for beverages involving beverage containers
   - Fixed a bug where modifying a custom product would remove the associated beverage container
 
+* Weather Retrieval (Weather API)
+  - Fixed a bug that could occur when retrieving weather
+    https://github.com/mytourbook/mytourbook/discussions/1683
+
 
 Translation    
 ===========
