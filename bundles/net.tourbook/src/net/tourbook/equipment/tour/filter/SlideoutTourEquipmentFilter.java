@@ -662,16 +662,27 @@ public class SlideoutTourEquipmentFilter extends AdvancedSlideout implements ITr
 
       addTourEventListener();
 
-      // load profile viewer
-      _profileViewer.setInput(new Object());
+      /*
+       * Run async that the UI is created immediately and loaded afterwards, othewise the UI seems
+       * to be not working because of a longer delay
+       */
+      parent.getDisplay().asyncExec(() -> {
 
-      // load equipment viewer
-      updateEquipmentModel();
+         if (parent.isDisposed()) {
+            return;
+         }
 
-      restoreState();
-      restoreState_Viewer();
+         // load profile viewer
+         _profileViewer.setInput(new Object());
 
-      enableControls();
+         // load equipment viewer
+         updateEquipmentModel();
+
+         restoreState();
+         restoreState_Viewer();
+
+         enableControls();
+      });
    }
 
    private void createUI(final Composite parent) {
