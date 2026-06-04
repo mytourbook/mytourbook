@@ -1904,7 +1904,7 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
       _lblCarbohydrates_Total.setText(totalCarbohydratesFormatted);
 
       final float totalFluid = NutritionUtils.getTotalFluids(tourNutritionProducts) * 100 / 100;
-      final String totalFluidFormatted = _nf2.format(totalFluid);
+      final String totalFluidFormatted = totalFluid > 0 ? _nf2.format(totalFluid) : UI.EMPTY_STRING;
       _lblFluid_Total.setText(totalFluidFormatted);
 
       final int totalSodium = (int) NutritionUtils.getTotalSodium(tourNutritionProducts);
