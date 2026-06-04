@@ -20,6 +20,9 @@ New / Improvements
 * Equipment
   - Add a contextual menu to add several equiments at a time
     https://github.com/mytourbook/mytourbook/issues/1657
+
+  - Display equipment mileage for equipment containing parts
+    https://github.com/mytourbook/mytourbook/issues/1665
     
 * Tagged Tours View
   - New columns to display the parent of a tag and how tours are sorted/categorized
