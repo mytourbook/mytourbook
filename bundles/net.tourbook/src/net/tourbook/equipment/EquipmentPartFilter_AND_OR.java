@@ -37,9 +37,26 @@ public class EquipmentPartFilter_AND_OR {
 
    private boolean             _isInEqTourViewer;
 
+   private Long                _requestedEquipmentID;
+
+   /**
+    * @param equipmentViewerType
+    */
    public EquipmentPartFilter_AND_OR(final EquipmentViewerType equipmentViewerType) {
 
+      this(equipmentViewerType, null);
+   }
+
+   /**
+    * @param equipmentViewerType
+    * @param requestedEquipmentID
+    *           Can be <code>null</code> to include all equipment, otherwise only one equipment is
+    *           filtered
+    */
+   public EquipmentPartFilter_AND_OR(final EquipmentViewerType equipmentViewerType, final Long requestedEquipmentID) {
+
       _isInEqTourViewer = EquipmentViewerType.IS_EQUIPMENT_VIEWER.equals(equipmentViewerType);
+      _requestedEquipmentID = requestedEquipmentID;
 
       _sqlData = createSQL();
    }
@@ -49,7 +66,6 @@ public class EquipmentPartFilter_AND_OR {
       String sql = UI.EMPTY_STRING;
 
       final List<Object> allSQLParameters = new ArrayList<>();
-
 
       if (_isInEqTourViewer && TourEquipmentFilterManager.isFilterEnabled()) {
 
@@ -79,29 +95,44 @@ public class EquipmentPartFilter_AND_OR {
 
                // combine parts with OR
 
-               final StringBuilder sqlParameters = createSQL_OR_Parameters(allSQLParameters);
+               final StringBuilder sqlParameters = createSQL_Parameters(allSQLParameters);
 
-               /* require tour to have at least one of these equipment (index-friendly) */
-               sql = UI.EMPTY_STRING
+               if (sqlParameters.length() > 0) {
 
-                     + "JOIN " + jTdEq + " AS jTdEqOR" //                                                //$NON-NLS-1$ //$NON-NLS-2$
-                     + "   ON jTdEqOR.TOURDATA_TOURID = TourData.TOURID" + NL //                         //$NON-NLS-1$
+                  String sqlEquipmentID = UI.EMPTY_STRING;
 
-                     + "JOIN " + tEqPart + " AS partOR" //                                               //$NON-NLS-1$ //$NON-NLS-2$
-                     + "   ON partOR.EQUIPMENT_EQUIPMENTID = jTdEqOR.EQUIPMENT_EQUIPMENTID" + NL //      //$NON-NLS-1$
+                  if (_requestedEquipmentID != null) {
 
-                     + "   AND partOR.ISCOLLATE = TRUE" + NL //                                          //$NON-NLS-1$
-                     + "   AND partOR.PARTID IN (" + sqlParameters + ")" + NL //                         //$NON-NLS-1$ //$NON-NLS-2$
+                     // get parts only for ONE equipment
 
-                     + "   AND TourData.TourStartTime >= partOR.dateCollateFrom" + NL //                 //$NON-NLS-1$
-                     + "   AND TourData.TourStartTime < partOR.dateCollateUntil" + NL //                 //$NON-NLS-1$
-               ;
+                     sqlEquipmentID = "   AND partOR.EQUIPMENT_EQUIPMENTID = ?" + NL;
+
+                     allSQLParameters.addFirst(_requestedEquipmentID);
+                  }
+
+                  sql = UI.EMPTY_STRING
+
+                        + "JOIN " + jTdEq + " AS jTdEqOR" //                                                //$NON-NLS-1$ //$NON-NLS-2$
+                        + "   ON jTdEqOR.TOURDATA_TOURID = TourData.TOURID" + NL //                         //$NON-NLS-1$
+
+                        + "JOIN " + tEqPart + " AS partOR" //                                               //$NON-NLS-1$ //$NON-NLS-2$
+                        + "   ON partOR.EQUIPMENT_EQUIPMENTID = jTdEqOR.EQUIPMENT_EQUIPMENTID" + NL //      //$NON-NLS-1$
+
+                        + sqlEquipmentID //
+
+                        + "   AND partOR.ISCOLLATE = TRUE" + NL //                                          //$NON-NLS-1$
+                        + "   AND partOR.PARTID IN (" + sqlParameters + ")" + NL //                         //$NON-NLS-1$ //$NON-NLS-2$
+
+                        + "   AND TourData.TourStartTime >= partOR.dateCollateFrom" + NL //                 //$NON-NLS-1$
+                        + "   AND TourData.TourStartTime < partOR.dateCollateUntil" + NL //                 //$NON-NLS-1$
+                  ;
+               }
 
             } else if (isAndOperator) {
 
                // combine parts with AND
 
-               final StringBuilder allSqlPartIDParameters = createSQL_OR_Parameters(allSQLParameters);
+               final StringBuilder allSqlPartIDParameters = createSQL_Parameters(allSQLParameters);
 
                final long[] allPartIDs = TourEquipmentFilterManager.getSelectedProfile().allAssetFilterIDs.toArray();
                final int numParts = allPartIDs.length;
@@ -122,11 +153,11 @@ public class EquipmentPartFilter_AND_OR {
                   final String joinPart = UI.EMPTY_STRING
 
                         + "JOIN " + tEqPart + " AS " + partName + NL //                                           //$NON-NLS-1$ //$NON-NLS-2$
-                        + "  ON " + partName + ".EQUIPMENT_EQUIPMENTID = jTdEq.EQUIPMENT_EQUIPMENTID" + NL //     //$NON-NLS-1$ //$NON-NLS-2$
-                        + "    AND " + partName + ".PARTID = ?" + NL //                                           //$NON-NLS-1$ //$NON-NLS-2$
-                        + "    AND " + partName + ".ISCOLLATE = TRUE" + NL //                                     //$NON-NLS-1$ //$NON-NLS-2$
-                        + "    AND TourData.TourStartTime >= " + partName + ".dateCollateFrom" + NL //            //$NON-NLS-1$ //$NON-NLS-2$
-                        + "    AND TourData.TourStartTime < " + partName + ".dateCollateUntil" + NL //            //$NON-NLS-1$ //$NON-NLS-2$
+                        + "   ON  " + partName + ".EQUIPMENT_EQUIPMENTID = jTdEq.EQUIPMENT_EQUIPMENTID" + NL //    //$NON-NLS-1$ //$NON-NLS-2$
+                        + "   AND " + partName + ".PARTID = ?" + NL //                                            //$NON-NLS-1$ //$NON-NLS-2$
+                        + "   AND " + partName + ".ISCOLLATE = TRUE" + NL //                                      //$NON-NLS-1$ //$NON-NLS-2$
+                        + "   AND TourData.TourStartTime >= " + partName + ".dateCollateFrom" + NL //             //$NON-NLS-1$ //$NON-NLS-2$
+                        + "   AND TourData.TourStartTime < " + partName + ".dateCollateUntil" + NL //             //$NON-NLS-1$ //$NON-NLS-2$
                   ;
 
                   sbAllParts.append(joinPart);
@@ -135,8 +166,6 @@ public class EquipmentPartFilter_AND_OR {
                final String allJoinedParts = sbAllParts.toString();
 
                sql = UI.EMPTY_STRING
-
-                     // require tour to have at least one of these equipment (index-friendly)
 
                      + "JOIN " + jTdEq + " jTdEq" + NL //                                                         //$NON-NLS-1$ //$NON-NLS-2$
                      + "   ON jTdEq.TOURDATA_TOURID = TourData.TOURID" + NL //                                    //$NON-NLS-1$
@@ -182,15 +211,15 @@ public class EquipmentPartFilter_AND_OR {
     *
     * @return
     */
-   private StringBuilder createSQL_OR_Parameters(final List<Object> allSQLParameters) {
+   private StringBuilder createSQL_Parameters(final List<Object> allSQLParameters) {
 
       final StringBuilder sb = new StringBuilder();
 
-      final long[] allEquipmentIDs = TourEquipmentFilterManager.getSelectedProfile().allAssetFilterIDs.toArray();
+      final long[] allAssetIDs = TourEquipmentFilterManager.getSelectedProfile().allAssetFilterIDs.toArray();
 
-      for (int paramIndex = 0; paramIndex < allEquipmentIDs.length; paramIndex++) {
+      for (int paramIndex = 0; paramIndex < allAssetIDs.length; paramIndex++) {
 
-         final long equipmentID = allEquipmentIDs[paramIndex];
+         final long assetID = allAssetIDs[paramIndex];
 
          if (paramIndex == 0) {
             sb.append(PARAMETER_FIRST);
@@ -198,7 +227,7 @@ public class EquipmentPartFilter_AND_OR {
             sb.append(PARAMETER_FOLLOWING);
          }
 
-         allSQLParameters.add(equipmentID);
+         allSQLParameters.add(assetID);
       }
 
       return sb;

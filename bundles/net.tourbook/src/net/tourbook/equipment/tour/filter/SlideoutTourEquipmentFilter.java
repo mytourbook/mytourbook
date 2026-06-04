@@ -143,6 +143,8 @@ public class SlideoutTourEquipmentFilter extends AdvancedSlideout implements ITr
 
    private TableViewer                                 _profileViewer;
    private TourEquipmentFilterProfile                  _selectedProfile;
+
+   /** Is <code>true</code> when equipment are filtered, otherwise parts are filtered */
    private boolean                                     _isFilterEquipment;
 
    private CheckboxTableViewer                         _selectedAssetViewer;
@@ -476,13 +478,12 @@ public class SlideoutTourEquipmentFilter extends AdvancedSlideout implements ITr
     */
    private class SelectedAsset {
 
-      Equipment     equipment;
-      EquipmentPart part;
+      Equipment equipment;
 
-      long          assetId;
+      long      assetId;
 
-      String        assetName;
-      String        assetParent = UI.EMPTY_STRING;
+      String    assetName;
+      String    assetParent = UI.EMPTY_STRING;
 
       public SelectedAsset(final Equipment equipment) {
 
@@ -493,8 +494,6 @@ public class SlideoutTourEquipmentFilter extends AdvancedSlideout implements ITr
       }
 
       public SelectedAsset(final EquipmentPart part) {
-
-         this.part = part;
 
          final Equipment partEquipment = part.getEquipment();
          final String equipmentName = partEquipment.getName();
@@ -513,15 +512,15 @@ public class SlideoutTourEquipmentFilter extends AdvancedSlideout implements ITr
       @Override
       public int compare(final Viewer viewer, final Object obj1, final Object obj2) {
 
-         if (obj1 instanceof final SelectedAsset item1
-               && obj2 instanceof final SelectedAsset item2) {
+         if (obj1 instanceof final SelectedAsset asset1
+               && obj2 instanceof final SelectedAsset asset2) {
 
             if (_isFilterEquipment) {
 
-               // sort equipment by name
+               // equipment filter
 
-               final Equipment equipment1 = item1.equipment;
-               final Equipment equipment2 = item2.equipment;
+               final Equipment equipment1 = asset1.equipment;
+               final Equipment equipment2 = asset2.equipment;
 
                final boolean isCollate1 = equipment1.isCollate();
                final boolean isCollate2 = equipment2.isCollate();
@@ -572,12 +571,26 @@ public class SlideoutTourEquipmentFilter extends AdvancedSlideout implements ITr
 
             } else {
 
-               // part
+               // part filter
 
-               final EquipmentPart part1 = item1.part;
-               final EquipmentPart part2 = item2.part;
+               // 1. sort by equipment name
 
-               return part1.getName_Combined().compareTo(part2.getName_Combined());
+               final String name1 = asset1.assetParent;
+               final String name2 = asset2.assetParent;
+
+               int result = name1.compareTo(name2);
+
+               if (result == 0) {
+
+                  // 2. sort by part/service name
+
+                  final String assetName1 = asset1.assetName;
+                  final String assetName2 = asset2.assetName;
+
+                  result = assetName1.compareTo(assetName2);
+               }
+
+               return result;
             }
          }
 
@@ -662,16 +675,27 @@ public class SlideoutTourEquipmentFilter extends AdvancedSlideout implements ITr
 
       addTourEventListener();
 
-      // load profile viewer
-      _profileViewer.setInput(new Object());
+      /*
+       * Run async that the UI is created immediately and loaded afterwards, othewise the UI seems
+       * to be not working because of a longer delay
+       */
+      parent.getDisplay().asyncExec(() -> {
 
-      // load equipment viewer
-      updateEquipmentModel();
+         if (parent.isDisposed()) {
+            return;
+         }
 
-      restoreState();
-      restoreState_Viewer();
+         // load profile viewer
+         _profileViewer.setInput(new Object());
 
-      enableControls();
+         // load equipment viewer
+         updateEquipmentModel();
+
+         restoreState();
+         restoreState_Viewer();
+
+         enableControls();
+      });
    }
 
    private void createUI(final Composite parent) {
@@ -1123,22 +1147,6 @@ public class SlideoutTourEquipmentFilter extends AdvancedSlideout implements ITr
       TableColumn tc;
 
       {
-         // Column: asset name
-
-         _selectedAssetViewer_Column1 = new TableViewerColumn(_selectedAssetViewer, SWT.LEAD);
-         tc = _selectedAssetViewer_Column1.getColumn();
-         _selectedAssetViewer_Column1.setLabelProvider(new CellLabelProvider() {
-            @Override
-            public void update(final ViewerCell cell) {
-
-               final SelectedAsset selectedEquipment = (SelectedAsset) cell.getElement();
-
-               cell.setText(selectedEquipment.assetName);
-            }
-         });
-         tableLayout.setColumnData(tc, new ColumnWeightData(1, true));
-      }
-      {
          // Column: equipment name
 
          _selectedAssetViewer_Column2 = new TableViewerColumn(_selectedAssetViewer, SWT.LEAD);
@@ -1150,6 +1158,22 @@ public class SlideoutTourEquipmentFilter extends AdvancedSlideout implements ITr
                final SelectedAsset selectedEquipment = (SelectedAsset) cell.getElement();
 
                cell.setText(selectedEquipment.assetParent);
+            }
+         });
+         tableLayout.setColumnData(tc, new ColumnWeightData(1, true));
+      }
+      {
+         // Column: asset name
+
+         _selectedAssetViewer_Column1 = new TableViewerColumn(_selectedAssetViewer, SWT.LEAD);
+         tc = _selectedAssetViewer_Column1.getColumn();
+         _selectedAssetViewer_Column1.setLabelProvider(new CellLabelProvider() {
+            @Override
+            public void update(final ViewerCell cell) {
+
+               final SelectedAsset selectedEquipment = (SelectedAsset) cell.getElement();
+
+               cell.setText(selectedEquipment.assetName);
             }
          });
          tableLayout.setColumnData(tc, new ColumnWeightData(1, true));

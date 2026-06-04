@@ -97,11 +97,11 @@ public class EquipmentFilter {
                // AND EXISTS (SELECT 1 FROM TOURDATA_Equipment AS jTdEq WHERE jTdEq.TOURDATA_TOURID = TourData.tourId AND jTdEq.Equipment_EquipmentId = 12    )
                // AND EXISTS (SELECT 1 FROM TOURDATA_Equipment AS jTdEq WHERE jTdEq.TOURDATA_TOURID = TourData.tourId AND jTdEq.Equipment_EquipmentId = 20    )
 
-               final long[] allEquipmentIDs = selectedProfile.allAssetFilterIDs.toArray();
+               final long[] allAssetIDs = selectedProfile.allAssetFilterIDs.toArray();
 
                final StringBuilder sb = new StringBuilder();
 
-               for (final long equipmentID : allEquipmentIDs) {
+               for (final long equipmentID : allAssetIDs) {
 
                   sb.append(UI.EMPTY_STRING
 

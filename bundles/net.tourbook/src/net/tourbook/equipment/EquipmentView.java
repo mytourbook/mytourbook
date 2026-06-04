@@ -1300,12 +1300,6 @@ public class EquipmentView extends ViewPart implements
                 * Equipment
                 */
 
-               final long id = equipmentItem.getEquipmentID();
-               if (id == 0) {
-                  int a = 0;
-                  a++;
-               }
-
                styledString.append(viewItem.firstColumn, net.tourbook.ui.UI.CONTENT_CATEGORY_STYLER);
 
                if (numTours > 0) {
@@ -1317,14 +1311,6 @@ public class EquipmentView extends ViewPart implements
                }
 
                final long numTours_All = viewItem.numTours_All;
-
-               // display num tours only when the values are different
-               final boolean isNumToursDiff = numTours > 0 && numTours != numTours_All;
-               final boolean isNumToursNCDiff = numToursNotCollated > 0 && numToursNotCollated != numTours_All;
-
-               if (numTours_All > 0 && (isNumToursDiff || isNumToursNCDiff)) {
-
-               }
 
                styledString.append(UI.SPACE3 + numTours_All, net.tourbook.ui.UI.TOUR_STYLER);
 
