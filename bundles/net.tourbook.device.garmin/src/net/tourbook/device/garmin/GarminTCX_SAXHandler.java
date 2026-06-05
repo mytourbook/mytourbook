@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2024 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2026 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -180,7 +180,11 @@ class GarminTCX_SAXHandler extends DefaultHandler {
    private int                 _lapCounter;
    private int                 _trackPointCounter;
 
-   private boolean             _isSetLapMarker;
+   /**
+    * This flag is renamed to ..._OLD to keep the old logic but a lap marker is now set in
+    * finalize_Lap()
+    */
+   private boolean             _isSetLapMarker_OLD;
    private boolean             _isSetLapStartTime;
    private ArrayList<Long>     _allLapStart      = new ArrayList<>();
 
@@ -523,9 +527,14 @@ class GarminTCX_SAXHandler extends DefaultHandler {
    }
 
    @Override
-   public void endElement(final String uri, final String localName, final String name) throws SAXException {
+   public void endElement(final String uri,
+                          final String localName,
+                          final String name)
 
-      //System.out.println("</" + name + ">");
+         throws SAXException {
+
+//    System.out.println("</" + name + ">");
+// TODO remove SYSTEM.OUT.PRINTLN
 
       try {
 
@@ -570,6 +579,8 @@ class GarminTCX_SAXHandler extends DefaultHandler {
 
                _totalLapAverageWatts += _lapAverageWatts;
             }
+
+            finalize_Lap();
 
          } else if (name.equals(TAG_CALORIES)) {
 
@@ -626,6 +637,19 @@ class GarminTCX_SAXHandler extends DefaultHandler {
          StatusUtil.showStatus(e);
       }
 
+   }
+
+   private void finalize_Lap() {
+
+      // set marker in the last time data
+      final int numTimeData = _allTimeData.size();
+      if (numTimeData > 0) {
+
+         final TimeData lastTimeData = _allTimeData.get(numTimeData - 1);
+
+         lastTimeData.marker = 1;
+         lastTimeData.markerLabel = Integer.toString(_lapCounter);
+      }
    }
 
    private void finalize_Tour() {
@@ -734,7 +758,9 @@ class GarminTCX_SAXHandler extends DefaultHandler {
          if (_timeData.absoluteTime == Long.MIN_VALUE) {
 
             _timeData.absoluteTime = DEFAULT_TIME;
+
          } else {
+
             //If only the time was provided in the Trackpoint element,
             //we consider that a pause.
             if (_timeData.latitude == Double.MIN_VALUE &&
@@ -760,7 +786,7 @@ class GarminTCX_SAXHandler extends DefaultHandler {
                   _pausedTime_End.add(_timeData.absoluteTime);
                   _isPreviousTrackPointAPause = false;
 
-               } else if (_isFirstTrackPointInTrack && !_allTimeData.isEmpty() && !_isSetLapMarker) {
+               } else if (_isFirstTrackPointInTrack && _allTimeData.isEmpty() == false && _isSetLapMarker_OLD == false) {
 
                   final long previousTime = _allTimeData.get(_allTimeData.size() - 1).absoluteTime;
 
@@ -772,12 +798,8 @@ class GarminTCX_SAXHandler extends DefaultHandler {
             }
          }
 
-         if (_isSetLapMarker) {
-
-            _isSetLapMarker = false;
-
-            _timeData.marker = 1;
-            _timeData.markerLabel = Integer.toString(_lapCounter - 1);
+         if (_isSetLapMarker_OLD) {
+            _isSetLapMarker_OLD = false;
          }
 
          _allTimeData.add(_timeData);
@@ -1073,7 +1095,7 @@ class GarminTCX_SAXHandler extends DefaultHandler {
       _trackPointCounter = 0;
 
       if (_lapCounter > 1) {
-         _isSetLapMarker = true;
+         _isSetLapMarker_OLD = true;
       }
       _isSetLapStartTime = true;
    }
@@ -1081,7 +1103,7 @@ class GarminTCX_SAXHandler extends DefaultHandler {
    private void initialize_NewTour() {
 
       _lapCounter = 0;
-      _isSetLapMarker = false;
+      _isSetLapMarker_OLD = false;
       _allLapStart.clear();
 
       _allTimeData.clear();
@@ -1161,10 +1183,15 @@ class GarminTCX_SAXHandler extends DefaultHandler {
    }
 
    @Override
-   public void startElement(final String uri, final String localName, final String name, final Attributes attributes)
+   public void startElement(final String uri,
+                            final String localName,
+                            final String name,
+                            final Attributes attributes)
+
          throws SAXException {
 
 //    System.out.print("<" + name + ">\n");
+//TODO remove SYSTEM.OUT.PRINTLN
 
       if (_dataVersion > 0) {
 

@@ -34,6 +34,9 @@ Changes
 * Easy Import
   - Changed launcher layout
   - Cadence settings needs to be checked, they are not related any more with the tour type configurations
+  
+* TCX Import
+  - Tour markers are now set at the last time slice of the current lap to fix https://github.com/mytourbook/mytourbook/issues/1702.
 
 * Tour Nutrition (Frederic)
   - The update button is now in the contextual menu of each product and is limited to 1 product at a time since the OpenFoodFacts database is very limited
