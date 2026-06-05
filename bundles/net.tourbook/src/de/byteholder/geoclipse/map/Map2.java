@@ -5901,6 +5901,11 @@ public class Map2 extends Canvas {
          final Rectangle topLeft_Viewport_WhenPainted = _mapPointPainter_Viewport_WhenPainted;
          final Rectangle topLeft_Viewport_Current = _worldPixel_TopLeft_Viewport;
 
+         // this happened
+         if (topLeft_Viewport_WhenPainted == null) {
+            return;
+         }
+
          final int diffX = topLeft_Viewport_WhenPainted.x - topLeft_Viewport_Current.x;
          final int diffY = topLeft_Viewport_WhenPainted.y - topLeft_Viewport_Current.y;
 
