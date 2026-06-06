@@ -35,7 +35,9 @@ New / Improvements
 Changes
 =======
 
-* 
+* Eclipse 2026-06
+  - When using the the command line parameter, e.g. -Dswt.autoScale=200, this will not work anymore with an integer value. Additionally this command line parameter must also be set: -Dswt.autoScale.updateOnRuntime=false
+    https://eclipse.dev/eclipse/markdown/?f=news/4.39/platform_isv.md#monitor-specific-scaling-by-default-windows
   
 
 Bugfix
