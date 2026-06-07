@@ -31,6 +31,7 @@ import net.tourbook.common.UI;
 import net.tourbook.common.formatter.IValueFormatter;
 import net.tourbook.common.formatter.ValueFormat;
 import net.tourbook.common.formatter.ValueFormatter_Default;
+import net.tourbook.common.formatter.ValueFormatter_Dummy;
 import net.tourbook.common.formatter.ValueFormatter_Number_1_0;
 import net.tourbook.common.formatter.ValueFormatter_Number_1_1;
 import net.tourbook.common.formatter.ValueFormatter_Number_1_2;
@@ -223,6 +224,7 @@ public class ColumnManager {
    private IValueFormatter                   _valueFormatter_Time_HHMM     = new ValueFormatter_Time_HHMM();
    private IValueFormatter                   _valueFormatter_Time_HHMMSS   = new ValueFormatter_Time_HHMMSS();
    private IValueFormatter                   _valueFormatter_Time_SSS      = new ValueFormatter_Time_SSS();
+   private ValueFormatter_Dummy              _valueFormatter_Dummy         = new ValueFormatter_Dummy();
 
    {
       _colMenuItem_Listener = event -> onSelectColumnItem(event);
@@ -2016,9 +2018,10 @@ public class ColumnManager {
    /**
     * Get a value formatter for a {@link ValueFormat}.
     *
-    * @param valueFormat_Category
+    * @param valueFormat
     *
-    * @return Returns the {@link IValueFormatter} or <code>null</code> when not available.
+    * @return Returns the {@link IValueFormatter} or {@link #_valueFormatter_Dummy} when not
+    *         available
     */
    IValueFormatter getValueFormatter(final ValueFormat valueFormat) {
 
@@ -2026,35 +2029,35 @@ public class ColumnManager {
          return null;
       }
 
+// SET_FORMATTING_OFF
+      
       switch (valueFormat) {
 
-      case NUMBER_1_0:
-         return _valueFormatter_Number_1_0;
+      case NUMBER_1_0:              return _valueFormatter_Number_1_0;
+      case NUMBER_1_1:              return _valueFormatter_Number_1_1;
+      case NUMBER_1_2:              return _valueFormatter_Number_1_2;
+      case NUMBER_1_3:              return _valueFormatter_Number_1_3;
+                                    
+      case TIME_HH:                 return _valueFormatter_Time_HH;
+      case TIME_HH_MM:              return _valueFormatter_Time_HHMM;
+      case TIME_HH_MM_SS:           return _valueFormatter_Time_HHMMSS;
+      case TIME_SSS:                return _valueFormatter_Time_SSS;
 
-      case NUMBER_1_1:
-         return _valueFormatter_Number_1_1;
+      case DATE_TIME:
+      case DATE_TIME_HH_MM_SS:
+      case EQUIPMENT_BRAND:
+      case EQUIPMENT_BRAND_MODEL:
+      case EQUIPMENT_MODEL:
+      case EQUIPMENT_TYPE:
+      case PACE_MM_SS:
+      case PERIOD_DAY:
+      case PERIOD_YEAR_MONTH_DAY:
+      case TEXT:                    return _valueFormatter_Dummy;
 
-      case NUMBER_1_2:
-         return _valueFormatter_Number_1_2;
-
-      case NUMBER_1_3:
-         return _valueFormatter_Number_1_3;
-
-      case TIME_HH:
-         return _valueFormatter_Time_HH;
-
-      case TIME_HH_MM:
-         return _valueFormatter_Time_HHMM;
-
-      case TIME_HH_MM_SS:
-         return _valueFormatter_Time_HHMMSS;
-
-      case TIME_SSS:
-         return _valueFormatter_Time_SSS;
-
-      default:
-         return null;
+      default:                      return null;
       }
+      
+// SET_FORMATTING_ON
    }
 
    /**
