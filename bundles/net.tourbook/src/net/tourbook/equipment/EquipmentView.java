@@ -1300,13 +1300,19 @@ public class EquipmentView extends ViewPart implements
                 * Equipment
                 */
 
+               final boolean isCollate = equipmentItem.getEquipment().isCollate();
+
                styledString.append(viewItem.firstColumn, net.tourbook.ui.UI.CONTENT_CATEGORY_STYLER);
 
                if (numTours > 0) {
                   styledString.append(UI.SPACE3 + numTours, net.tourbook.ui.UI.TOTAL_STYLER);
                }
 
-               if (numToursNotCollated > 0) {
+               if (numToursNotCollated > 0
+
+                     // display also 0 for not collated equipment
+                     || isCollate == false) {
+
                   styledString.append(UI.SPACE3 + numToursNotCollated, net.tourbook.ui.UI.CONTENT_SUB_CATEGORY_STYLER);
                }
 
@@ -1314,7 +1320,7 @@ public class EquipmentView extends ViewPart implements
 
                styledString.append(UI.SPACE3 + numTours_All, net.tourbook.ui.UI.TOUR_STYLER);
 
-               if (equipmentItem.getEquipment().isCollate()) {
+               if (isCollate) {
                   cell.setImage(_imgEquipment_Collated);
                } else {
                   cell.setImage(_imgEquipment_All);
