@@ -316,6 +316,7 @@ public class Images {
    public static final String XAxis_ShowDistance_NauticMile        = "x-axis-distance-nautical-mile.svg";           //$NON-NLS-1$
    public static final String XAxis_ShowTime                       = "x-axis-time.svg";                             //$NON-NLS-1$
    public static final String ZeroValues                           = "app-zero-values.svg";                         //$NON-NLS-1$
+   public static final String Zoom_CenterBy_Location               = "zoom-center-location.svg";                    //$NON-NLS-1$
    public static final String Zoom_CenterBy_Map                    = "zoom-center-map.svg";                         //$NON-NLS-1$
    public static final String Zoom_CenterBy_Mouse                  = "zoom-center-mouse.svg";                       //$NON-NLS-1$
    public static final String Zoom_CenterBy_Tour                   = "zoom-center-tour.svg";                        //$NON-NLS-1$

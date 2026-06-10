@@ -390,6 +390,9 @@ public class EquipmentLoader {
 
    private static void loadSummarizedValues_Equipment_WithParts_Equipment_Runnable(final TVIEquipmentView_Equipment eqItem) {
 
+//      System.out.println(UI.timeStamp() + " eq id: " + eqItem.getEquipmentID());
+//// TODO remove SYSTEM.OUT.PRINTLN
+
       final long equipmentID = eqItem.getEquipmentID();
 
       final EquipmentViewerType viewerType = eqItem.getViewerType();
@@ -481,6 +484,9 @@ public class EquipmentLoader {
             // hide expand UI icon when there are no children
 
             eqItem.setChildren(new ArrayList<>());
+
+//            System.out.println(UI.timeStamp() + " numTours == 0 - id: " + eqItem.getEquipmentID());
+//// TODO remove SYSTEM.OUT.PRINTLN
          }
 
       } catch (final SQLException e) {

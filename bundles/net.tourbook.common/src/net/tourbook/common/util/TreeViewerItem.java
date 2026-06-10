@@ -317,6 +317,13 @@ public abstract class TreeViewerItem {
          _children.clear();
       }
 
+//      System.out.println(UI.timeStamp() + " setChildren "
+//
+//            + _parentItem.getClass().getSimpleName()
+//            + " - o: " + _children
+//            + " - n: " + children.size());
+//// TODO remove SYSTEM.OUT.PRINTLN
+
       _children = children;
    }
 

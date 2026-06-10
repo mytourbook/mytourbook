@@ -7442,7 +7442,6 @@ public class Map2 extends Canvas {
 
 //            System.out.println(_debugLog.toString());
 //            _debugLog.setLength(0);
-//            // TODO remove SYSTEM.OUT.PRINTLN
          }
 
          _mapPointPainter_Viewport_WhenPainted = _mapPointPainter_Viewport_DuringPainting;
@@ -11303,7 +11302,7 @@ public class Map2 extends Canvas {
          setZoom(zoom);
       }
 
-      // update map with with new map center position
+      // update map with new map center position
       {
          // zoom position is the same as previous !!!
          // _mapZoomLevel == _mapZoomLevel
@@ -11741,7 +11740,7 @@ public class Map2 extends Canvas {
     * The map is initialize when this is not yet done be setting all internal data !!!
     *
     * @param newZoomLevel
-    *           zoom level for the map, it is adjusted to the min/max zoom levels
+    *           Zoom level for the map, it is adjusted to the min/max zoom levels
     * @param centerMapBy
     */
    public void setZoom(final int newZoomLevel, final CenterMapBy centerMapBy) {
@@ -11755,18 +11754,18 @@ public class Map2 extends Canvas {
       /*
        * Check if the requested zoom level is within the bounds of the map provider
        */
-      int adjustedZoomLevel = newZoomLevel;
+      int newZoomLevel_Adjusted = newZoomLevel;
       final int mpMinimumZoomLevel = _mp.getMinimumZoomLevel();
       final int mpMaximumZoomLevel = _mp.getMaximumZoomLevel();
       if (((newZoomLevel < mpMinimumZoomLevel) || (newZoomLevel > mpMaximumZoomLevel))) {
-         adjustedZoomLevel = Math.max(newZoomLevel, mpMinimumZoomLevel);
-         adjustedZoomLevel = Math.min(adjustedZoomLevel, mpMaximumZoomLevel);
+         newZoomLevel_Adjusted = Math.max(newZoomLevel, mpMinimumZoomLevel);
+         newZoomLevel_Adjusted = Math.min(newZoomLevel_Adjusted, mpMaximumZoomLevel);
       }
 
       boolean isNewZoomLevel = false;
 
       // check if zoom level has changed
-      if (oldZoomLevel == adjustedZoomLevel) {
+      if (oldZoomLevel == newZoomLevel_Adjusted) {
 
          // this is disabled that a double click can set the center of the map
 
@@ -11779,7 +11778,7 @@ public class Map2 extends Canvas {
          isNewZoomLevel = true;
       }
 
-      if (oldZoomLevel != adjustedZoomLevel) {
+      if (oldZoomLevel != newZoomLevel_Adjusted) {
 
          // zoom level has changed -> stop downloading images for the old zoom level
          _mp.resetAll(true);
@@ -11798,15 +11797,18 @@ public class Map2 extends Canvas {
          wpCurrentMapCenter = _worldPixel_MapCenter;
       }
 
-      _mapZoomLevel = adjustedZoomLevel;
+      _mapZoomLevel = newZoomLevel_Adjusted;
+
+      final boolean isZoomIn = newZoomLevel_Adjusted > oldZoomLevel;
 
       // update values for the new zoom level !!!
-      _mapTileSize = _mp.getMapTileSize(adjustedZoomLevel);
+      _mapTileSize = _mp.getMapTileSize(newZoomLevel_Adjusted);
 
       final double relativeWidth = (double) _mapTileSize.width / oldMapTileSize.width;
       final double relativeHeight = (double) _mapTileSize.height / oldMapTileSize.height;
 
       Point2D.Double wpNewMapCenter;
+      final Rectangle wpViewPort = _worldPixel_TopLeft_Viewport;
 
       if (CenterMapBy.Mouse.equals(centerMapBy)
 
@@ -11815,11 +11817,38 @@ public class Map2 extends Canvas {
 
          // set map center to the current mouse position but only when a new zoom level is set !!!
 
-         final Rectangle wpViewPort = _worldPixel_TopLeft_Viewport;
-
          wpCurrentMapCenter = new Point2D.Double(
                wpViewPort.x + _mouseMove_DevPosition_X_Last,
                wpViewPort.y + _mouseMove_DevPosition_Y_Last);
+
+      } else if (CenterMapBy.Location.equals(centerMapBy) && isNewZoomLevel) {
+
+         // keep location of the current mouse position
+
+         /*
+          * It took several hours to find finally this algorithm with try and error
+          */
+         final int vpWidth2 = _worldPixel_TopLeft_Viewport.width / 2;
+         final int vpHeight2 = _worldPixel_TopLeft_Viewport.height / 2;
+
+         final int offsetX = _mouseMove_DevPosition_X_Last - vpWidth2;
+         final int offsetY = -_mouseMove_DevPosition_Y_Last + vpHeight2;
+
+         int wpX;
+         int wpY;
+
+         if (isZoomIn) {
+
+            wpX = wpViewPort.x + _mouseMove_DevPosition_X - offsetX / 2;
+            wpY = wpViewPort.y + _mouseMove_DevPosition_Y + offsetY / 2;
+
+         } else {
+
+            wpX = wpViewPort.x + _mouseMove_DevPosition_X - 2 * offsetX;
+            wpY = wpViewPort.y + _mouseMove_DevPosition_Y + 2 * offsetY;
+         }
+
+         wpCurrentMapCenter = new Point2D.Double(wpX, wpY);
 
       } else {
 

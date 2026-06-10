@@ -2070,6 +2070,7 @@ public class Map2View extends ViewPart implements
       CenterMapBy newCenterMode;
 
       switch (_map.getCenterMapBy()) {
+
       case Tour:
          if (isForwards) {
 
@@ -2087,13 +2088,28 @@ public class Map2View extends ViewPart implements
       case Map:
          if (isForwards) {
 
-            // map -> mouse
-            newCenterMode = CenterMapBy.Mouse;
+            // map -> location
+            newCenterMode = CenterMapBy.Location;
 
          } else {
 
             // map -> tour
             newCenterMode = CenterMapBy.Tour;
+         }
+
+         break;
+
+      case Location:
+
+         if (isForwards) {
+
+            // location -> mouse
+            newCenterMode = CenterMapBy.Mouse;
+
+         } else {
+
+            // location -> map
+            newCenterMode = CenterMapBy.Map;
          }
 
          break;
@@ -2107,14 +2123,16 @@ public class Map2View extends ViewPart implements
 
          } else {
 
-            // mouse -> map
-            newCenterMode = CenterMapBy.Map;
+            // mouse -> location
+            newCenterMode = CenterMapBy.Location;
          }
          break;
       }
 
+      // update map UI
       _map.setCenterMapBy(newCenterMode);
 
+      // update action UI
       _actionZoom_CenterMapBy.setCenterMode(newCenterMode);
    }
 

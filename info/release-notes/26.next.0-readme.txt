@@ -29,7 +29,10 @@ See milestone 26.6 https://github.com/mytourbook/mytourbook/milestone/29?closed=
 New / Improvements
 ==================
 
-* 
+* 2D Map
+  - Added new mouse zoom behaviour: keep cursor in place on map
+    https://github.com/mytourbook/mytourbook/issues/1706
+
   
 
 Changes
