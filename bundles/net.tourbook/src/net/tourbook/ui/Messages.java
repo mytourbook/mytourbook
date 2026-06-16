@@ -19,6 +19,8 @@ import org.eclipse.osgi.util.NLS;
 
 public class Messages extends NLS {
 
+   //todo fb also remove the invalid files,.txt
+   //search for "invalid files when using the easy import"
    private static final String BUNDLE_NAME = "net.tourbook.ui.messages";                    //$NON-NLS-1$
 
    public static String        ChartOptions_Layout_Group_Layout;
