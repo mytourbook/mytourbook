@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2026 Wolfgang Schramm and Contributors
+ * Copyright (C) 2026 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -19,29 +19,29 @@ import java.text.NumberFormat;
 
 import net.tourbook.common.Messages;
 
-public class ValueFormatter_Number_1_2 implements IValueFormatter {
+public class ValueFormatter_Number_1_4 implements IValueFormatter {
 
-   private final static NumberFormat _nf2 = NumberFormat.getNumberInstance();
+   private final static NumberFormat _nf4 = NumberFormat.getNumberInstance();
 
-   public ValueFormatter_Number_1_2() {
+   public ValueFormatter_Number_1_4() {
 
-      _nf2.setMinimumFractionDigits(2);
-      _nf2.setMaximumFractionDigits(2);
+      _nf4.setMinimumFractionDigits(4);
+      _nf4.setMaximumFractionDigits(4);
    }
 
-   public ValueFormatter_Number_1_2(final boolean isGroupingUsed) {
+   public ValueFormatter_Number_1_4(final boolean isGroupingUsed) {
 
       this();
 
-      _nf2.setGroupingUsed(isGroupingUsed);
+      _nf4.setGroupingUsed(isGroupingUsed);
    }
 
    @Override
    public String printDouble(final double value) {
 
-      final String formattedValue = _nf2.format(value);
+      final String formattedValue = _nf4.format(value);
 
-      if (value > 0 && ZERO_VALUE_TEXT_0_00.equals(formattedValue)) {
+      if (value > 0 && ZERO_VALUE_TEXT_0_0000.equals(formattedValue)) {
          return BIGGER_THAN_ZERO;
       }
 
@@ -60,7 +60,7 @@ public class ValueFormatter_Number_1_2 implements IValueFormatter {
 
    @Override
    public String toString() {
-      return "ValueFormatter_Number_1_2 [" // //$NON-NLS-1$
+      return "ValueFormatter_Number_1_4 [" // //$NON-NLS-1$
             + "printDouble()" //$NON-NLS-1$
             + "]"; //$NON-NLS-1$
    }

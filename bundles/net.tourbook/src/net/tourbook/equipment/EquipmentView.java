@@ -1210,6 +1210,7 @@ public class EquipmentView extends ViewPart implements
 
       defineColumn_Equipment_Price();
       defineColumn_Equipment_PriceUnit();
+      defineColumn_Equipment_PriceByDistance();
       defineColumn_Equipment_Size();
       defineColumn_Equipment_Weight();
       defineColumn_Equipment_InitialDistance();
@@ -2085,6 +2086,31 @@ public class EquipmentView extends ViewPart implements
             if (element instanceof final TVIEquipmentView_Item viewItem) {
 
                final float price = viewItem.price;
+
+               colDef.printDoubleValue(cell, price, true);
+               setCellColor(cell, element);
+            }
+         }
+      });
+   }
+
+   /**
+    * Column: Price by distance
+    */
+   private void defineColumn_Equipment_PriceByDistance() {
+
+      final ColumnDefinition colDef = TreeColumnFactory.EQUIPMENT_PRICE_PER_DISTANCE.createColumn(_columnManager, _pc);
+
+      colDef.setLabelProvider(new CellLabelProvider() {
+
+         @Override
+         public void update(final ViewerCell cell) {
+
+            final Object element = cell.getElement();
+
+            if (element instanceof final TVIEquipmentView_Item viewItem) {
+
+               final float price = viewItem.colPricePerDistance;
 
                colDef.printDoubleValue(cell, price, true);
                setCellColor(cell, element);

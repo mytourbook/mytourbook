@@ -95,6 +95,8 @@ public abstract class TreeColumnFactory {
    public static final String            EQUIPMENT_MODEL_ID               = "EQUIPMENT_MODEL";                  //$NON-NLS-1$
    public static final TreeColumnFactory EQUIPMENT_PRICE;
    public static final String            EQUIPMENT_PRICE_ID               = "EQUIPMENT_PRICE";                  //$NON-NLS-1$
+   public static final TreeColumnFactory EQUIPMENT_PRICE_PER_DISTANCE;
+   public static final String            EQUIPMENT_PRICE_PER_DISTANCE_ID  = "EQUIPMENT_PRICE_PER_DISTANCE";     //$NON-NLS-1$
    public static final TreeColumnFactory EQUIPMENT_PRICE_UNIT;
    public static final String            EQUIPMENT_PRICE_UNIT_ID          = "EQUIPMENT_PRICE_UNIT";             //$NON-NLS-1$
    public static final TreeColumnFactory EQUIPMENT_RETIRED;
@@ -1086,6 +1088,29 @@ public abstract class TreeColumnFactory {
          }
       };
 
+      EQUIPMENT_PRICE_PER_DISTANCE = new TreeColumnFactory() {
+         @Override
+         public TreeColumnDefinition createColumn(final ColumnManager columnManager,
+                                                  final PixelConverter pixelConverter) {
+
+            final TreeColumnDefinition colDef = new TreeColumnDefinition(columnManager, EQUIPMENT_PRICE_PER_DISTANCE_ID, SWT.TRAIL);
+
+            colDef.setColumnCategory(           Messages.ColumnFactory_Category_Equipment);
+
+            colDef.setColumnLabel(              "Cost per %s".formatted(UI.UNIT_LABEL_DISTANCE));
+            colDef.setColumnHeaderText(			"Cost/%s".formatted(UI.UNIT_LABEL_DISTANCE));
+            colDef.setColumnHeaderToolTipText(  "Cost per distance (%s)".formatted(UI.UNIT_LABEL_DISTANCE));
+
+            colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(10));
+
+            colDef.setValueFormats(             ValueFormatSet.Number_5_Digits,
+                                                ValueFormat.NUMBER_1_0,
+                                                columnManager);
+
+            return colDef;
+         }
+      };
+
       EQUIPMENT_PRICE_UNIT = new TreeColumnFactory() {
          @Override
          public TreeColumnDefinition createColumn(final ColumnManager columnManager,
@@ -1101,11 +1126,9 @@ public abstract class TreeColumnFactory {
 
             colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(5));
 
-
             return colDef;
          }
       };
-
 
       EQUIPMENT_PURCHASE_LOCATION = new TreeColumnFactory() {
          @Override
@@ -1158,7 +1181,6 @@ public abstract class TreeColumnFactory {
 
             colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(15));
 
-
             return colDef;
          }
       };
@@ -1195,7 +1217,6 @@ public abstract class TreeColumnFactory {
             colDef.setColumnHeaderText(         Messages.ColumnFactory_Equipment_Type);
 
             colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(15));
-
 
             return colDef;
          }

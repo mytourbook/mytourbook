@@ -32,6 +32,10 @@ New / Improvements
 * 2D Map
   - Added new mouse zoom behaviour: keep cursor in place on map
     https://github.com/mytourbook/mytourbook/issues/1706
+    
+* Equipment
+  - Add a read-only computed field "Cost per mi/km"
+    https://github.com/mytourbook/mytourbook/issues/1644    
 
   
 

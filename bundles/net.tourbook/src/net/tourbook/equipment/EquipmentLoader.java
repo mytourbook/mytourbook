@@ -286,6 +286,14 @@ public class EquipmentLoader {
 
                equipmentItem.readCommonValues(result, 3);
 
+               // compute price per distance AFTER common values are set
+               final float distance = equipmentItem.colDistance / 1000 / UI.UNIT_VALUE_DISTANCE;
+               final float price = equipmentItem.price;
+
+               equipmentItem.colPricePerDistance = distance == 0
+                     ? 0
+                     : price / distance;
+
                // this equipment has a tour -> remove from list
                allEquipmentItemsWithoutTours.remove(equipmentID);
             }
@@ -390,9 +398,6 @@ public class EquipmentLoader {
 
    private static void loadSummarizedValues_Equipment_WithParts_Equipment_Runnable(final TVIEquipmentView_Equipment eqItem) {
 
-//      System.out.println(UI.timeStamp() + " eq id: " + eqItem.getEquipmentID());
-//// TODO remove SYSTEM.OUT.PRINTLN
-
       final long equipmentID = eqItem.getEquipmentID();
 
       final EquipmentViewerType viewerType = eqItem.getViewerType();
@@ -473,6 +478,14 @@ public class EquipmentLoader {
 
             eqItem.readCommonValues(result, 2);
 
+            // compute price per distance AFTER common values are set
+            final float distance = eqItem.colDistance / 1000 / UI.UNIT_VALUE_DISTANCE;
+            final float price = eqItem.price;
+
+            eqItem.colPricePerDistance = distance == 0
+                  ? 0
+                  : price / distance;
+
             // there should be only one part
             break;
          }
@@ -484,9 +497,6 @@ public class EquipmentLoader {
             // hide expand UI icon when there are no children
 
             eqItem.setChildren(new ArrayList<>());
-
-//            System.out.println(UI.timeStamp() + " numTours == 0 - id: " + eqItem.getEquipmentID());
-//// TODO remove SYSTEM.OUT.PRINTLN
          }
 
       } catch (final SQLException e) {
@@ -640,6 +650,14 @@ public class EquipmentLoader {
             partItem.numTours_IsCollated = numTours;
 
             partItem.readCommonValues(result, 2);
+
+            // compute price per distance AFTER common values are set
+            final float distance = partItem.colDistance / 1000 / UI.UNIT_VALUE_DISTANCE;
+            final float price = partItem.price;
+
+            partItem.colPricePerDistance = distance == 0
+                  ? 0
+                  : price / distance;
 
             // there should be only one part
             break;

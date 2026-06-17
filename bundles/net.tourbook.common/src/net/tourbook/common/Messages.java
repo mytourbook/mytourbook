@@ -431,6 +431,8 @@ public class Messages extends NLS {
    public static String        Value_Formatter_Number_1_1;
    public static String        Value_Formatter_Number_1_2;
    public static String        Value_Formatter_Number_1_3;
+   public static String        Value_Formatter_Number_1_4;
+   public static String        Value_Formatter_Number_1_5;
    public static String        Value_Formatter_Pace_MM_SS;
    public static String        Value_Formatter_Period_Day;
    public static String        Value_Formatter_Period_YearMonthDay;

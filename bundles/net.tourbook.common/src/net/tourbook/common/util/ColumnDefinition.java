@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2024 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2026 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -42,6 +42,7 @@ public class ColumnDefinition implements Cloneable {
    private static final NumberFormat _nf0;
    private static final NumberFormat _nf1;
    private static final NumberFormat _nf2;
+
    static {
 
       _nf0 = NumberFormat.getNumberInstance();
@@ -807,7 +808,7 @@ public class ColumnDefinition implements Cloneable {
     *
     * @param availableFormats
     * @param defaultDetailFormat
-    *           When <code>null</code> this format cannot be selected.
+    *           When <code>null</code> then this format cannot be selected
     * @param columnManager
     */
    public void setValueFormats(final ValueFormat[] availableFormats,

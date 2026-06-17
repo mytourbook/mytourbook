@@ -28,6 +28,8 @@ public enum ValueFormat {
    NUMBER_1_1, //
    NUMBER_1_2, //
    NUMBER_1_3, //
+   NUMBER_1_4, //
+   NUMBER_1_5, //
 
    DATE_TIME, //
    DATE_TIME_HH_MM_SS, //

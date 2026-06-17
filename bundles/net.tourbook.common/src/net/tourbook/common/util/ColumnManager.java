@@ -36,6 +36,8 @@ import net.tourbook.common.formatter.ValueFormatter_Number_1_0;
 import net.tourbook.common.formatter.ValueFormatter_Number_1_1;
 import net.tourbook.common.formatter.ValueFormatter_Number_1_2;
 import net.tourbook.common.formatter.ValueFormatter_Number_1_3;
+import net.tourbook.common.formatter.ValueFormatter_Number_1_4;
+import net.tourbook.common.formatter.ValueFormatter_Number_1_5;
 import net.tourbook.common.formatter.ValueFormatter_Time_HH;
 import net.tourbook.common.formatter.ValueFormatter_Time_HHMM;
 import net.tourbook.common.formatter.ValueFormatter_Time_HHMMSS;
@@ -220,6 +222,8 @@ public class ColumnManager {
    private IValueFormatter                   _valueFormatter_Number_1_1    = new ValueFormatter_Number_1_1();
    private IValueFormatter                   _valueFormatter_Number_1_2    = new ValueFormatter_Number_1_2();
    private IValueFormatter                   _valueFormatter_Number_1_3    = new ValueFormatter_Number_1_3();
+   private IValueFormatter                   _valueFormatter_Number_1_4    = new ValueFormatter_Number_1_4();
+   private IValueFormatter                   _valueFormatter_Number_1_5    = new ValueFormatter_Number_1_5();
    private IValueFormatter                   _valueFormatter_Time_HH       = new ValueFormatter_Time_HH();
    private IValueFormatter                   _valueFormatter_Time_HHMM     = new ValueFormatter_Time_HHMM();
    private IValueFormatter                   _valueFormatter_Time_HHMMSS   = new ValueFormatter_Time_HHMMSS();
@@ -2030,14 +2034,16 @@ public class ColumnManager {
       }
 
 // SET_FORMATTING_OFF
-      
+
       switch (valueFormat) {
 
       case NUMBER_1_0:              return _valueFormatter_Number_1_0;
       case NUMBER_1_1:              return _valueFormatter_Number_1_1;
       case NUMBER_1_2:              return _valueFormatter_Number_1_2;
       case NUMBER_1_3:              return _valueFormatter_Number_1_3;
-                                    
+      case NUMBER_1_4:              return _valueFormatter_Number_1_4;
+      case NUMBER_1_5:              return _valueFormatter_Number_1_5;
+
       case TIME_HH:                 return _valueFormatter_Time_HH;
       case TIME_HH_MM:              return _valueFormatter_Time_HHMM;
       case TIME_HH_MM_SS:           return _valueFormatter_Time_HHMMSS;
@@ -2056,7 +2062,7 @@ public class ColumnManager {
 
       default:                      return null;
       }
-      
+
 // SET_FORMATTING_ON
    }
 

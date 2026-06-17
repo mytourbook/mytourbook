@@ -199,6 +199,11 @@ public class DialogEquipment extends TitleAreaDialog {
       setDefaultImage(_imageDialog);
    }
 
+   public static String getDefaultPriceUnit() {
+
+      return Util.getStateString(_state, STATE_PRICE_UNIT_DEFAULT, "€/$/£"); //$NON-NLS-1$
+   }
+
    @Override
    protected void configureShell(final Shell shell) {
 
@@ -1129,7 +1134,7 @@ public class DialogEquipment extends TitleAreaDialog {
 
       _chkSyncDates           .setSelection(Util.getStateBoolean(_state, STATE_SYNC_DATES, true));
 
-      _comboPriceUnit         .setText(Util.getStateString(_state, STATE_PRICE_UNIT_DEFAULT, UI.EMPTY_STRING));
+      _comboPriceUnit         .setText(getDefaultPriceUnit());
 
 // SET_FORMATTING_ON
 
@@ -1141,7 +1146,6 @@ public class DialogEquipment extends TitleAreaDialog {
 
       _isInUIUpdate = false;
    }
-
    private void saveState() {
 
 // SET_FORMATTING_OFF
@@ -1152,6 +1156,7 @@ public class DialogEquipment extends TitleAreaDialog {
       _autocomplete_Size      .saveState(_state, STATE_AUTOCOMPLETE_POPUP_HEIGHT_SIZE);
       _autocomplete_Type      .saveState(_state, STATE_AUTOCOMPLETE_POPUP_HEIGHT_TYPE);
 
+      // keep the current price unit as default
       _state.put(STATE_PRICE_UNIT_DEFAULT,   _comboPriceUnit.getText().trim());
       _state.put(STATE_SYNC_DATES,           _chkSyncDates.getSelection());
 
