@@ -1743,6 +1743,13 @@ public class CSVExport {
 
    private String getFullTourDescription(final Long tourId) {
 
+      if (tourId == null) {
+
+         // this happens when a category item, e.g. year is exported
+
+         return UI.EMPTY_STRING;
+      }
+
       String description = null;
 
       final String select = "SELECT TourDescription" + NL //      //$NON-NLS-1$
