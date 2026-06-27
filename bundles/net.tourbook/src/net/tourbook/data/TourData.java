@@ -9712,8 +9712,18 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
          final float frontTeeth = gearRaw >> 24 & 0xff;
          final float rearTeeth = gearRaw >> 8 & 0xff;
 
-         final float frontGearNo = gearRaw >> 16 & 0xff;
+         float frontGearNo = gearRaw >> 16 & 0xff;
          final float rearGearNo = gearRaw >> 0 & 0xff;
+
+         if (frontGearNo == 255.0) {
+
+            /*
+             * It happened, that this value was 255 which is apparently a wrong value -> adjust to a
+             * "default" value that the graph do not have a wrong max value
+             */
+
+            frontGearNo = 0;
+         }
 
          if (isOnlyRearGearNumber) {
 
