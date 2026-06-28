@@ -5509,8 +5509,8 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
 
       if (_pulseSerie_Smoothed == null) {
          computePulseSmoothed();
-
       }
+
       _hrZoneContext = hrPerson.getHrZoneContext(
             hrPerson.getHrMaxFormula(),
             hrPerson.getMaxPulse(),

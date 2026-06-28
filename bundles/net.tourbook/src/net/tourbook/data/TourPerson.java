@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2025 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2026 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -383,55 +383,49 @@ public class TourPerson implements Comparable<Object>, Serializable {
       }
 
       final int age = getAge(personBirthDay, tourDateTime);
-      final HrZoneContext hrZoneMinMax = _hrZoneMinMaxBpm.get(age);
+      final HrZoneContext ageHrZoneMinMax = _hrZoneMinMaxBpm.get(age);
 
-      if (hrZoneMinMax != null) {
+      if (ageHrZoneMinMax != null) {
 
          // hr zones for the age is already available
-         return hrZoneMinMax;
+         return ageHrZoneMinMax;
       }
 
-      final int hrMax = getHrMax(hrMaxFormulaKey, hrMaxPulse, age);
-      final int zoneSize = hrZones.size();
+      final float hrMax = getHrMax(hrMaxFormulaKey, hrMaxPulse, age);
 
-      final float[] zoneMinBmps = new float[zoneSize];
-      final float[] zoneMaxBmps = new float[zoneSize];
+      final int numZones = hrZones.size();
+
+      final float[] zoneMinBmps = new float[numZones];
+      final float[] zoneMaxBmps = new float[numZones];
 
       final List<TourPersonHRZone> allHrZones = new ArrayList<>(hrZones);
       Collections.sort(allHrZones);
 
-      int prevMaxBpm = -1;
-
-      // fill zone min/max values
-      for (int zoneIndex = 0; zoneIndex < hrZones.size(); zoneIndex++) {
+      // fill zone min values
+      for (int zoneIndex = 0; zoneIndex < numZones; zoneIndex++) {
 
          final TourPersonHRZone hrZone = allHrZones.get(zoneIndex);
 
-         final int zoneMaxValue = hrZone.getZoneMaxValue();
+         final float zoneMinValue = hrZone.getZoneMinValue();
+         final float minBpm = zoneMinValue * hrMax / 100;
 
-         int minBpm = hrZone.getZoneMinValue() * hrMax / 100;
-
-         final int maxBpm = zoneMaxValue == Integer.MAX_VALUE ? //
-               Integer.MAX_VALUE
-               : (zoneMaxValue * hrMax / 100);
-
-         if (prevMaxBpm != -1) {
-
-            // make sure that "min" is last "max + 1"
-            minBpm = prevMaxBpm + 1;
-         }
-
-         zoneMinBmps[zoneIndex] = minBpm - 0.5f;
-         zoneMaxBmps[zoneIndex] = maxBpm + 0.5f;
-
-         prevMaxBpm = maxBpm;
+         zoneMinBmps[zoneIndex] = Math.round(minBpm);
       }
 
-      final HrZoneContext hrZoneMinMax1 = new HrZoneContext(zoneMinBmps, zoneMaxBmps, age, hrMax);
+      // fill zone max values
+      for (int zoneIndex = 1; zoneIndex < numZones; zoneIndex++) {
 
-      _hrZoneMinMaxBpm.put(age, hrZoneMinMax1);
+         final float minBpm = zoneMinBmps[zoneIndex];
+         final float prevMaxBpm = minBpm - 1;
 
-      return hrZoneMinMax1;
+         zoneMaxBmps[zoneIndex - 1] = Math.round(prevMaxBpm);
+      }
+
+      final HrZoneContext hrZoneMinMax = new HrZoneContext(zoneMinBmps, zoneMaxBmps, age, (int) hrMax);
+
+      _hrZoneMinMaxBpm.put(age, hrZoneMinMax);
+
+      return hrZoneMinMax;
    }
 
    /**

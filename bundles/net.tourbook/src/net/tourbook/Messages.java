@@ -425,10 +425,6 @@ public class Messages extends NLS {
    public static String        Compute_CadenceZonesTimes_Label_CadenceZonesDelimiter;
    public static String        Compute_CadenceZonesTimes_Label_Description_CadenceZonesDelimiter;
 
-   public static String        Compute_HrZones_Dialog_ComputeAllTours_Title;
-   public static String        Compute_HrZones_Dialog_ComputeAllTours_Title_Message;
-   public static String        Compute_HrZones_Job_ComputeAllTours_Result;
-   public static String        Compute_HrZones_Job_ComputeAllTours_SubTask;
    public static String        Compute_HrZone_Group;
    public static String        Compute_HrZone_Link;
 
@@ -2079,20 +2075,13 @@ public class Messages extends NLS {
    public static String        Pref_Nutrition_Button_RemoveRecentProducts_Tooltip;
 
    public static String        Pref_People_Action_add_person;
-   public static String        Pref_People_Button_HrZones_ComputeAllTours;
-   public static String        Pref_People_Button_HrZones_ComputeAllTours_Tooltip;
    public static String        Pref_People_Column_Birthday;
    public static String        Pref_People_Column_device;
    public static String        Pref_People_Column_first_name;
    public static String        Pref_People_Column_height;
    public static String        Pref_People_Column_last_name;
-   public static String        Pref_People_Dialog_ComputeHrZonesForAllToursIsCanceled_Message;
-   public static String        Pref_People_Dialog_ComputeHrZonesForAllToursIsCanceled_Message_Cancel;
-   public static String        Pref_People_Dialog_ComputeHrZonesForAllToursIsCanceled_Message_OK;
-   public static String        Pref_People_Dialog_ComputeHrZonesForAllTours_Message;
    public static String        Pref_People_Dialog_SaveModifiedPerson_Message;
    public static String        Pref_People_Dialog_SaveModifiedPerson_Title;
-   public static String        Pref_People_Error_ComputeHrZonesForAllTours;
    public static String        Pref_People_Error_first_name_is_required;
    public static String        Pref_People_Error_path_is_invalid;
    public static String        Pref_People_Label_Age;
