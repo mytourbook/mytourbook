@@ -625,7 +625,7 @@ public class EquipmentView extends ViewPart implements
             // 2st sort by collation type
             if (compareDiff == 0) {
 
-               compareDiff = part1.getPartType().compareTo(part2.getPartType());
+               compareDiff = part1.getPartCollateID().compareTo(part2.getPartCollateID());
             }
 
             // 3nd sort by date
@@ -3380,8 +3380,8 @@ public class EquipmentView extends ViewPart implements
 
          final Equipment equipmentFromDialog = dialogEquipment.getEquipment();
 
-         final String typeOld = selectedEquipment.getType();
-         final String typeNew = equipmentFromDialog.getType();
+         final String typeOld = selectedEquipment.getCollateID();
+         final String typeNew = equipmentFromDialog.getCollateID();
 
          final Set<String> allModifiedTypes = new HashSet<>(Arrays.asList(typeOld, typeNew));
 
@@ -3433,8 +3433,8 @@ public class EquipmentView extends ViewPart implements
             return;
          }
 
-         final String typeOld = selectedPart.getPartType();
-         final String typeNew = partFromDialog.getPartType();
+         final String typeOld = selectedPart.getPartCollateID();
+         final String typeNew = partFromDialog.getPartCollateID();
 
          final Set<String> allModifiedTypes = new HashSet<>(Arrays.asList(typeOld, typeNew));
 
@@ -3474,8 +3474,8 @@ public class EquipmentView extends ViewPart implements
 
          final boolean areCollatedFieldsModified = selectedEquipment.isCollatedFieldsModified(equipmentFromDialog);
 
-         final String typeOld = selectedEquipment.getType();
-         final String typeNew = equipmentFromDialog.getType();
+         final String typeOld = selectedEquipment.getCollateID();
+         final String typeNew = equipmentFromDialog.getCollateID();
 
          final Set<String> allModifiedTypes = new HashSet<>(Arrays.asList(typeOld, typeNew));
 
@@ -3505,7 +3505,7 @@ public class EquipmentView extends ViewPart implements
                for (final EquipmentPart part : allParts) {
 
                   if (part.isCollate()) {
-                     allPartTypes.add(part.getPartType());
+                     allPartTypes.add(part.getPartCollateID());
                   }
                }
 
@@ -3564,8 +3564,8 @@ public class EquipmentView extends ViewPart implements
 
          final boolean areCollatedFieldsModified = selectedPart.isCollatedFieldsModified(partFromDialog);
 
-         final String typeOld = selectedPart.getPartType();
-         final String typeNew = partFromDialog.getPartType();
+         final String typeOld = selectedPart.getPartCollateID();
+         final String typeNew = partFromDialog.getPartCollateID();
 
          final Set<String> allModifiedTypes = new HashSet<>(Arrays.asList(typeOld, typeNew));
 
@@ -3652,7 +3652,7 @@ public class EquipmentView extends ViewPart implements
 
       equipment.getParts().add(savedService);
 
-      final Set<String> allTypes = new HashSet<>(Arrays.asList(serviceFromDialog.getPartType()));
+      final Set<String> allTypes = new HashSet<>(Arrays.asList(serviceFromDialog.getPartCollateID()));
 
       EquipmentManager.updateUntilDate_Parts(equipment, allTypes, savedService.getCollateBetween());
 
@@ -4482,7 +4482,7 @@ public class EquipmentView extends ViewPart implements
 
    private void updateAfterModified_Equipment(final Equipment equipment) {
 
-      final Set<String> allTypes = new HashSet<>(Arrays.asList(equipment.getType()));
+      final Set<String> allTypes = new HashSet<>(Arrays.asList(equipment.getCollateID()));
 
       TourDatabase.saveEntity(equipment, equipment.getEquipmentId(), Equipment.class);
 
@@ -4497,7 +4497,7 @@ public class EquipmentView extends ViewPart implements
 
       equipment.getParts().add(savedPart);
 
-      final HashSet<String> allTypes = new HashSet<>(Arrays.asList(part.getPartType()));
+      final HashSet<String> allTypes = new HashSet<>(Arrays.asList(part.getPartCollateID()));
 
       EquipmentManager.updateUntilDate_Parts(equipment, allTypes, savedPart.getCollateBetween());
 

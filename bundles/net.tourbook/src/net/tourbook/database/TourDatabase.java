@@ -11858,7 +11858,7 @@ public class TourDatabase {
 
                   if (equipment.isCollate()) {
 
-                     allEquipmentTypes.add(equipment.getType());
+                     allEquipmentTypes.add(equipment.getCollateID());
 
                   } else {
 
@@ -11867,7 +11867,7 @@ public class TourDatabase {
                      // get all collated part types
                      for (final EquipmentPart part : equipment.getParts()) {
                         if (part.isCollate()) {
-                           allPartTypes.add(part.getPartType());
+                           allPartTypes.add(part.getPartCollateID());
                         }
                      }
 

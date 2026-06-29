@@ -86,9 +86,10 @@ public class EquipmentPart implements Cloneable, Comparable<Object>, Serializabl
    private String                     model;
 
    /**
-    *
     * The collation type, e.g. shoe xyz is used to combine it other parts with the same type but
     * different {@link #dateUsed}
+    * <p>
+    * In MT 26.6 the wording of this field in the UI was renamed into "Collate ID" but not in the backend
     */
    private String                     type;
 
@@ -536,22 +537,22 @@ public class EquipmentPart implements Cloneable, Comparable<Object>, Serializabl
    }
 
    /**
-    * @return Returns the primary key for a {@link EquipmentPart} entity
-    */
-   public long getPartId() {
-      return partId;
-   }
-
-   /**
     * @return Returns the part type {@link #type} or an empty string when <code>null</code>
     */
-   public String getPartType() {
+   public String getPartCollateID() {
 
       if (type == null) {
          return UI.EMPTY_STRING;
       }
 
       return type;
+   }
+
+   /**
+    * @return Returns the primary key for a {@link EquipmentPart} entity
+    */
+   public long getPartId() {
+      return partId;
    }
 
    public float getPrice() {
@@ -612,7 +613,7 @@ public class EquipmentPart implements Cloneable, Comparable<Object>, Serializabl
       if (isCollate != otherPart.isCollate()
             || collateBetween != otherPart.getCollateBetween()
             || dateUsed != otherPart.getDateUsed()
-            || type.equalsIgnoreCase(otherPart.getPartType()) == false) {
+            || type.equalsIgnoreCase(otherPart.getPartCollateID()) == false) {
 
          // collated fields are modified
 
@@ -780,7 +781,7 @@ public class EquipmentPart implements Cloneable, Comparable<Object>, Serializabl
       this.name = name;
    }
 
-   public void setPartType(final String type) {
+   public void setPartCollateID(final String type) {
       this.type = type;
    }
 
@@ -867,7 +868,7 @@ public class EquipmentPart implements Cloneable, Comparable<Object>, Serializabl
       setIsCollate         (otherPart.isCollate());
       setIsRetired         (otherPart.isRetired());
       setCollateBetween    (otherPart.getCollateBetween());
-      setPartType          (otherPart.getPartType());
+      setPartCollateID     (otherPart.getPartCollateID());
 
       setDistanceFirstUse  (otherPart.getDistanceFirstUse());
       setPrice             (otherPart.getPrice());

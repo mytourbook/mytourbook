@@ -69,6 +69,8 @@ public class Equipment implements Cloneable, Comparable<Object>, Serializable {
 
    /**
     * Collation type, e.g. backpack
+    * <p>
+    * In MT 26.6 the wording of this field in the UI was renamed into "Collate ID" but not in the backend
     */
    private String                     type;
 
@@ -302,6 +304,15 @@ public class Equipment implements Cloneable, Comparable<Object>, Serializable {
       return brand;
    }
 
+   public String getCollateID() {
+
+      if (type == null) {
+         return UI.EMPTY_STRING;
+      }
+
+      return type;
+   }
+
    public long getDateBuilt() {
 
       return dateBuilt;
@@ -487,15 +498,6 @@ public class Equipment implements Cloneable, Comparable<Object>, Serializable {
       return size;
    }
 
-   public String getType() {
-
-      if (type == null) {
-         return UI.EMPTY_STRING;
-      }
-
-      return type;
-   }
-
    public String getTypeEmptyChecked() {
 
       if (_checkedEmptyType == null) {
@@ -546,7 +548,7 @@ public class Equipment implements Cloneable, Comparable<Object>, Serializable {
 
       if (isCollate != otherEquipment.isCollate()
             || dateUsed != otherEquipment.getDateUsed()
-            || type.equalsIgnoreCase(otherEquipment.getType()) == false) {
+            || type.equalsIgnoreCase(otherEquipment.getCollateID()) == false) {
 
          // collated fields are modified
 
@@ -606,6 +608,13 @@ public class Equipment implements Cloneable, Comparable<Object>, Serializable {
       this.brand = brand;
 
       _equipmentName = null;
+   }
+
+   public void setCollateID(final String type) {
+
+      this.type = type;
+
+      _checkedEmptyType = null;
    }
 
    public void setDateBuilt(final long dateBuilt) {
@@ -690,13 +699,6 @@ public class Equipment implements Cloneable, Comparable<Object>, Serializable {
       this.size = size;
    }
 
-   public void setType(final String type) {
-
-      this.type = type;
-
-      _checkedEmptyType = null;
-   }
-
    public void setUrlAddress(final String urlAddress) {
 
       this.urlAddress = urlAddress;
@@ -777,7 +779,7 @@ public class Equipment implements Cloneable, Comparable<Object>, Serializable {
 
       setIsCollate         (otherEquipment.isCollate());
       setIsRetired         (otherEquipment.isRetired());
-      setType              (otherEquipment.getType());
+      setCollateID         (otherEquipment.getCollateID());
 
       setDistanceFirstUse  (otherEquipment.getDistanceFirstUse());
       setPrice             (otherEquipment.getPrice());

@@ -598,6 +598,7 @@ public class Messages extends NLS {
    public static String        Dialog_Equipment_Label_Brand;
    public static String        Dialog_Equipment_Label_Brand_Tooltip;
    public static String        Dialog_Equipment_Label_Collate;
+   public static String        Dialog_Equipment_Label_CollateID;
    public static String        Dialog_Equipment_Label_Date;
    public static String        Dialog_Equipment_Label_DateBuilt;
    public static String        Dialog_Equipment_Label_DateRetired;
@@ -609,11 +610,10 @@ public class Messages extends NLS {
    public static String        Dialog_Equipment_Label_Price;
    public static String        Dialog_Equipment_Label_PurchaseLocation;
    public static String        Dialog_Equipment_Label_Size;
-   public static String        Dialog_Equipment_Label_Type;
    public static String        Dialog_Equipment_Label_Weight;
    public static String        Dialog_Equipment_Link_Website;
-   public static String        Dialog_Equipment_Tooltip_1;
-   public static String        Dialog_Equipment_Tooltip_2;
+   public static String        Dialog_Equipment_Tooltip_1b;
+   public static String        Dialog_Equipment_Tooltip_2b;
 
    public static String        Dialog_EquipmentPart_Collate_Tooltip;
    public static String        Dialog_EquipmentPart_Dialog_Message_Part_Duplicate;

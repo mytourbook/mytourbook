@@ -1,6 +1,15 @@
 26.next.0                                                 ?. February 2026
 
 
+!!! fr, it and nl TRANSLATIONS !!!
+==================================
+
+Change wording from "Type" into "Collation ID" in
+
+Dialog_Equipment_Tooltip_1b
+Dialog_Equipment_Tooltip_2b
+
+
 TODO's
 ======
 
@@ -42,14 +51,17 @@ New / Improvements
 Changes
 =======
 
-* Eclipse 2026-06
-  - When using the the command line parameter, e.g. -Dswt.autoScale=200, this will not work anymore with an integer value. Additionally this command line parameter must also be set: -Dswt.autoScale.updateOnRuntime=false
-    https://eclipse.dev/eclipse/markdown/?f=news/4.39/platform_isv.md#monitor-specific-scaling-by-default-windows
-    
+* Equipment
+  - Changed wording from "Type" to "Collate ID"
+
 * HR-Zones
   - When HR-Zones are modified in the preferences, these modifications cannot be applied directly in the preferences. There is a new feature in the Tour Book view context menu "Adjust Tour Values/HR Zones" to apply these modifications to all or the selected tours.
     https://github.com/mytourbook/mytourbook/issues/1710
   
+* Eclipse 2026-06
+  - When using the the command line parameter, e.g. -Dswt.autoScale=200, this will not work anymore with an integer value. Additionally this command line parameter must also be set: -Dswt.autoScale.updateOnRuntime=false
+    https://eclipse.dev/eclipse/markdown/?f=news/4.39/platform_isv.md#monitor-specific-scaling-by-default-windows
+    
 
 Bugfix
 ======

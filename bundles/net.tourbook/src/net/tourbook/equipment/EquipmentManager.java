@@ -232,12 +232,12 @@ public class EquipmentManager {
    private static volatile Map<Long, EquipmentPart> _allParts_ByID;
 
    private static ConcurrentSkipListSet<String>     _allBrands;
+   private static ConcurrentSkipListSet<String>     _allCollateIDs;
    private static ConcurrentSkipListSet<String>     _allCompanies;
    private static ConcurrentSkipListSet<String>     _allModels;
    private static ConcurrentSkipListSet<String>     _allPriceUnits;
    private static ConcurrentSkipListSet<String>     _allServiceNames;
    private static ConcurrentSkipListSet<String>     _allSizes;
-   private static ConcurrentSkipListSet<String>     _allTypes;
 
    private static final List<EquipmentUIContent>    _allEquipmentUIContainer = new ArrayList<>();
 
@@ -313,9 +313,9 @@ public class EquipmentManager {
          _allSizes = null;
       }
 
-      if (_allTypes != null) {
-         _allTypes.clear();
-         _allTypes = null;
+      if (_allCollateIDs != null) {
+         _allCollateIDs.clear();
+         _allCollateIDs = null;
       }
    }
 
@@ -705,7 +705,7 @@ public class EquipmentManager {
                final Set<EquipmentPart> allEquipmentParts = equipment.getParts();
                allEquipmentParts.remove(part);
 
-               final Set<String> allTypes = new HashSet<>(Arrays.asList(part.getPartType()));
+               final Set<String> allTypes = new HashSet<>(Arrays.asList(part.getPartCollateID()));
 
                updateUntilDate_Parts(equipment, allTypes, part.getCollateBetween());
 
@@ -1020,6 +1020,30 @@ public class EquipmentManager {
       return _allBrands;
    }
 
+   public static ConcurrentSkipListSet<String> getCachedFields_AllCollateIDs() {
+
+      if (_allCollateIDs == null) {
+
+         synchronized (DB_LOCK) {
+
+            // recheck again, another thread could have it created
+            if (_allCollateIDs == null) {
+
+               _allCollateIDs = TourDatabase.getDistinctValuesWithExclude(
+
+                     "type", //$NON-NLS-1$
+
+                     EMPTY_TYPE_PREFIX, // exclude all which start with this value
+
+                     TourDatabase.TABLE_EQUIPMENT,
+                     TourDatabase.TABLE_EQUIPMENT_PART);
+            }
+         }
+      }
+
+      return _allCollateIDs;
+   }
+
    public static ConcurrentSkipListSet<String> getCachedFields_AllCompanies() {
 
       if (_allCompanies == null) {
@@ -1118,30 +1142,6 @@ public class EquipmentManager {
       }
 
       return _allSizes;
-   }
-
-   public static ConcurrentSkipListSet<String> getCachedFields_AllTypes() {
-
-      if (_allTypes == null) {
-
-         synchronized (DB_LOCK) {
-
-            // recheck again, another thread could have it created
-            if (_allTypes == null) {
-
-               _allTypes = TourDatabase.getDistinctValuesWithExclude(
-
-                     "type", //$NON-NLS-1$
-
-                     EMPTY_TYPE_PREFIX, // exclude all which start with this value
-
-                     TourDatabase.TABLE_EQUIPMENT,
-                     TourDatabase.TABLE_EQUIPMENT_PART);
-            }
-         }
-      }
-
-      return _allTypes;
    }
 
    /**
@@ -1323,7 +1323,7 @@ public class EquipmentManager {
 
             } else if (valueFormat.equals(ValueFormat.EQUIPMENT_TYPE)) {
 
-               allEquipmentNames.add(equipment.getType());
+               allEquipmentNames.add(equipment.getCollateID());
             }
 
          } else {
@@ -1884,7 +1884,7 @@ public class EquipmentManager {
          for (final Equipment equipment : allEquipment_ByID.values()) {
 
             if (equipment.isCollate()
-                  && modifiedType.equalsIgnoreCase(equipment.getType())) {
+                  && modifiedType.equalsIgnoreCase(equipment.getCollateID())) {
 
                allFilteredEquipment.add(equipment);
             }
@@ -2028,7 +2028,7 @@ public class EquipmentManager {
       for (final EquipmentPart part : allParts) {
 
          if (part.isCollate()
-               && modifiedPartType.equalsIgnoreCase(part.getPartType())) {
+               && modifiedPartType.equalsIgnoreCase(part.getPartCollateID())) {
 
             allFilteredParts.add(part);
          }

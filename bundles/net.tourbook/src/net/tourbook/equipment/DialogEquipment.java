@@ -131,7 +131,7 @@ public class DialogEquipment extends TitleAreaDialog {
    private Combo                     _comboModel;
    private Combo                     _comboPriceUnit;
    private Combo                     _comboSize;
-   private Combo                     _comboType;
+   private Combo                     _comboCollateID;
    private Combo                     _comboWeightUnit;
 
    private DateTime                  _dateUsed;
@@ -158,11 +158,11 @@ public class DialogEquipment extends TitleAreaDialog {
    private AutoComplete_ComboInputMT _autocomplete_Model;
    private AutoComplete_ComboInputMT _autocomplete_PriceUnit;
    private AutoComplete_ComboInputMT _autocomplete_Size;
-   private AutoComplete_ComboInputMT _autocomplete_Type;
+   private AutoComplete_ComboInputMT _autocomplete_CollateID;
 
    private ControlDecoration         _comboDecorator_Collate;
    private ControlDecoration         _comboDecorator_DateFrom;
-   private ControlDecoration         _comboDecorator_Type;
+   private ControlDecoration         _comboDecorator_CollateID;
 
    public DialogEquipment(final Shell parentShell,
                           final Equipment equipment,
@@ -277,8 +277,23 @@ public class DialogEquipment extends TitleAreaDialog {
 
    private void createUI(final Composite parent) {
 
-      final String tooltip = Messages.Dialog_Equipment_Tooltip_1;
-      final String tooltip2 = Messages.Dialog_Equipment_Tooltip_2;
+      /*
+       * Collated tours are a collection of tours to sum up values,
+       * e.g. distances or durations.
+       * Tours are collated by the "Collate ID" and "Date" fields.
+       * When an equipment is collated,
+       * then it cannot contain parts or services.
+       * When an equipment contains parts or services,
+       * then this option is disabled.
+       */
+      final String tooltip = Messages.Dialog_Equipment_Tooltip_1b;
+
+      /*
+       * With the "Collate ID" and "Date" fields, tours are collated to display
+       * e.g. all kilometers for one part or one service
+       */
+
+      final String tooltip2 = Messages.Dialog_Equipment_Tooltip_2b;
 
       final Image decorationImage = FieldDecorationRegistry.getDefault()
             .getFieldDecoration(FieldDecorationRegistry.DEC_INFORMATION)
@@ -333,26 +348,26 @@ public class DialogEquipment extends TitleAreaDialog {
          }
          {
             /*
-             * Type
+             * Collate ID
              */
-            UI.createLabel(_container, Messages.Dialog_Equipment_Label_Type);
+            UI.createLabel(_container, Messages.Dialog_Equipment_Label_CollateID);
 
             // autocomplete combo
-            _comboType = new Combo(_container, SWT.BORDER | SWT.FLAT);
-            _comboType.setText(UI.EMPTY_STRING);
-            _comboType.addModifyListener(_defaultModifyListener);
+            _comboCollateID = new Combo(_container, SWT.BORDER | SWT.FLAT);
+            _comboCollateID.setText(UI.EMPTY_STRING);
+            _comboCollateID.addModifyListener(_defaultModifyListener);
 
-            GridDataFactory.fillDefaults().grab(true, false).span(2, 1).applyTo(_comboType);
+            GridDataFactory.fillDefaults().grab(true, false).span(2, 1).applyTo(_comboCollateID);
 
-            _autocomplete_Type = new AutoComplete_ComboInputMT(_comboType);
+            _autocomplete_CollateID = new AutoComplete_ComboInputMT(_comboCollateID);
 
             /*
              * Add a decoration for this important field
              */
-            _comboDecorator_Type = new ControlDecoration(_comboType, SWT.CENTER | SWT.LEFT);
-            _comboDecorator_Type.setDescriptionText(tooltip2);
-            _comboDecorator_Type.setImage(decorationImage);
-            _comboDecorator_Type.setMarginWidth(decoratorDistance);
+            _comboDecorator_CollateID = new ControlDecoration(_comboCollateID, SWT.CENTER | SWT.LEFT);
+            _comboDecorator_CollateID.setDescriptionText(tooltip2);
+            _comboDecorator_CollateID.setImage(decorationImage);
+            _comboDecorator_CollateID.setMarginWidth(decoratorDistance);
          }
          UI.createSpacer_Horizontal(_container, 1);
          {
@@ -643,7 +658,7 @@ public class DialogEquipment extends TitleAreaDialog {
 
             _comboBrand,
             _comboModel,
-            _comboType,
+            _comboCollateID,
             _comboSize,
 
             _dateUsed,
@@ -699,12 +714,12 @@ public class DialogEquipment extends TitleAreaDialog {
       if (isCollate) {
 
          _comboDecorator_DateFrom.show();
-         _comboDecorator_Type.show();
+         _comboDecorator_CollateID.show();
 
       } else {
 
          _comboDecorator_DateFrom.hide();
-         _comboDecorator_Type.hide();
+         _comboDecorator_CollateID.hide();
       }
 
       final boolean isValid = _isNewEquipment && _isModified == false
@@ -722,11 +737,11 @@ public class DialogEquipment extends TitleAreaDialog {
 
 // SET_FORMATTING_OFF
 
-      UI.fillUI_Combobox(_comboBrand,     EquipmentManager.getCachedFields_AllBrands());
-      UI.fillUI_Combobox(_comboModel,     EquipmentManager.getCachedFields_AllModels());
-      UI.fillUI_Combobox(_comboPriceUnit, EquipmentManager.getCachedFields_AllPriceUnits());
-      UI.fillUI_Combobox(_comboSize,      EquipmentManager.getCachedFields_AllSizes());
-      UI.fillUI_Combobox(_comboType,      EquipmentManager.getCachedFields_AllTypes());
+      UI.fillUI_Combobox(_comboBrand,        EquipmentManager.getCachedFields_AllBrands());
+      UI.fillUI_Combobox(_comboModel,        EquipmentManager.getCachedFields_AllModels());
+      UI.fillUI_Combobox(_comboPriceUnit,    EquipmentManager.getCachedFields_AllPriceUnits());
+      UI.fillUI_Combobox(_comboSize,         EquipmentManager.getCachedFields_AllSizes());
+      UI.fillUI_Combobox(_comboCollateID,    EquipmentManager.getCachedFields_AllCollateIDs());
 
 // SET_FORMATTING_ON
 
@@ -1130,7 +1145,7 @@ public class DialogEquipment extends TitleAreaDialog {
       _autocomplete_Model     .restoreState(_state, STATE_AUTOCOMPLETE_POPUP_HEIGHT_MODEL);
       _autocomplete_PriceUnit .restoreState(_state, STATE_AUTOCOMPLETE_POPUP_HEIGHT_PRICE_UNIT);
       _autocomplete_Size      .restoreState(_state, STATE_AUTOCOMPLETE_POPUP_HEIGHT_SIZE);
-      _autocomplete_Type      .restoreState(_state, STATE_AUTOCOMPLETE_POPUP_HEIGHT_TYPE);
+      _autocomplete_CollateID .restoreState(_state, STATE_AUTOCOMPLETE_POPUP_HEIGHT_TYPE);
 
       _chkSyncDates           .setSelection(Util.getStateBoolean(_state, STATE_SYNC_DATES, true));
 
@@ -1146,6 +1161,7 @@ public class DialogEquipment extends TitleAreaDialog {
 
       _isInUIUpdate = false;
    }
+
    private void saveState() {
 
 // SET_FORMATTING_OFF
@@ -1154,7 +1170,7 @@ public class DialogEquipment extends TitleAreaDialog {
       _autocomplete_Model     .saveState(_state, STATE_AUTOCOMPLETE_POPUP_HEIGHT_MODEL);
       _autocomplete_PriceUnit .saveState(_state, STATE_AUTOCOMPLETE_POPUP_HEIGHT_PRICE_UNIT);
       _autocomplete_Size      .saveState(_state, STATE_AUTOCOMPLETE_POPUP_HEIGHT_SIZE);
-      _autocomplete_Type      .saveState(_state, STATE_AUTOCOMPLETE_POPUP_HEIGHT_TYPE);
+      _autocomplete_CollateID .saveState(_state, STATE_AUTOCOMPLETE_POPUP_HEIGHT_TYPE);
 
       // keep the current price unit as default
       _state.put(STATE_PRICE_UNIT_DEFAULT,   _comboPriceUnit.getText().trim());
@@ -1165,10 +1181,10 @@ public class DialogEquipment extends TitleAreaDialog {
 
    private void updateModelFromUI() {
 
-      String type = _comboType.getText().trim();
+      String collateID = _comboCollateID.getText().trim();
 
-      if (type.length() == 0) {
-         type = EquipmentManager.createEmptyEquipmentType();
+      if (collateID.length() == 0) {
+         collateID = EquipmentManager.createEmptyEquipmentType();
       }
 
 // SET_FORMATTING_OFF
@@ -1181,7 +1197,7 @@ public class DialogEquipment extends TitleAreaDialog {
 
       _equipment.setBrand(             _comboBrand.getText().trim());
       _equipment.setModel(             _comboModel.getText().trim());
-      _equipment.setType(              type);
+      _equipment.setCollateID(         collateID);
       _equipment.setPurchaseLocation(  _txtPurchaseLocation .getText().trim());
       _equipment.setDescription(       _txtDescription      .getText().trim());
       _equipment.setIsCollate(         _chkCollate          .getSelection());
@@ -1258,10 +1274,10 @@ public class DialogEquipment extends TitleAreaDialog {
 
       _isInUIUpdate = true;
 
-      String type = _equipment.getType();
+      String collateID = _equipment.getCollateID();
 
-      if (EquipmentManager.isEmptyEquipmentType(type)) {
-         type = UI.EMPTY_STRING;
+      if (EquipmentManager.isEmptyEquipmentType(collateID)) {
+         collateID = UI.EMPTY_STRING;
       }
 
 // SET_FORMATTING_OFF
@@ -1295,7 +1311,7 @@ public class DialogEquipment extends TitleAreaDialog {
       _comboBrand             .setText(_equipment.getBrand());
       _comboModel             .setText(_equipment.getModel());
       _comboSize              .setText(_equipment.getSize());
-      _comboType              .setText(type);
+      _comboCollateID         .setText(collateID);
 
       _comboWeightUnit        .select( _equipment.getWeightUnit());
 
