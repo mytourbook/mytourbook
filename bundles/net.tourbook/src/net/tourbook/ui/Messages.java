@@ -263,12 +263,15 @@ public class Messages extends NLS {
    public static String        ColumnFactory_Elevation_LossDelta_Label;
    public static String        ColumnFactory_Elevation_LossDelta_Tooltip;
 
-   public static String        ColumnFactory_Equipment_Brand;
-   public static String        ColumnFactory_Equipment_Collate_Label;
-   public static String        ColumnFactory_Equipment_Collate_Tooltip;
+   public static String        ColumnFactory_Equipment_IsCollate_Label;
+   public static String        ColumnFactory_Equipment_IsCollate_Tooltip;
+   public static String        ColumnFactory_Equipment_CollateID;
+   public static String        ColumnFactory_Equipment_CollateIDSaved_Label;
    public static String        ColumnFactory_Equipment_CollateBetween_Header;
    public static String        ColumnFactory_Equipment_CollateBetween_Label;
    public static String        ColumnFactory_Equipment_CollateBetween_Tooltip;
+   
+   public static String        ColumnFactory_Equipment_Brand;
    public static String        ColumnFactory_Equipment_Date_Header;
    public static String        ColumnFactory_Equipment_Date_Label;
    public static String        ColumnFactory_Equipment_Date_Tooltip;
@@ -303,8 +306,6 @@ public class Messages extends NLS {
    public static String        ColumnFactory_Equipment_Size;
    public static String        ColumnFactory_Equipment_TourStructure_Label;
    public static String        ColumnFactory_Equipment_TourStructure_Tooltip;
-   public static String        ColumnFactory_Equipment_Type;
-   public static String        ColumnFactory_Equipment_TypeSaved_Label;
    public static String        ColumnFactory_Equipment_Website_Label;
    public static String        ColumnFactory_Equipment_Weight;
 

@@ -1187,8 +1187,8 @@ public class EquipmentView extends ViewPart implements
 
       defineColumn_Equipment_Brand();
       defineColumn_Equipment_Model();
-      defineColumn_Equipment_Type();
-      defineColumn_Equipment_Collate();
+      defineColumn_Equipment_CollateID();
+      defineColumn_Equipment_IsCollate();
       defineColumn_Equipment_CollateBetween();
       defineColumn_Equipment_Retired();
 
@@ -1239,7 +1239,7 @@ public class EquipmentView extends ViewPart implements
 
       // system columns
       defineColumn_Equipment_ID();
-      defineColumn_Equipment_TypeRaw();
+      defineColumn_Equipment_CollateIDSaved();
       defineColumn_Equipment_TourStructure();
    }
 
@@ -1561,42 +1561,6 @@ public class EquipmentView extends ViewPart implements
    }
 
    /**
-    * Column: Collate
-    */
-   private void defineColumn_Equipment_Collate() {
-
-      final ColumnDefinition colDef = TreeColumnFactory.EQUIPMENT_COLLATE.createColumn(_columnManager, _pc);
-
-      colDef.setIsDefaultColumn();
-
-      colDef.setLabelProvider(new CellLabelProvider() {
-
-         @Override
-         public void update(final ViewerCell cell) {
-
-            final Object element = cell.getElement();
-
-            boolean isCollate = false;
-
-            if (element instanceof final TVIEquipmentView_Equipment equipmentItem) {
-
-               isCollate = equipmentItem.getEquipment().isCollate();
-
-            } else if (element instanceof final TVIEquipmentView_Part partItem) {
-
-               isCollate = partItem.getPart().isCollate();
-            }
-
-            if (isCollate) {
-
-               cell.setText(UI.SYMBOL_BOX);
-               setCellColor(cell, element);
-            }
-         }
-      });
-   }
-
-   /**
     * Column: Collate between
     */
    private void defineColumn_Equipment_CollateBetween() {
@@ -1615,6 +1579,63 @@ public class EquipmentView extends ViewPart implements
             if (element instanceof final TVIEquipmentView_Part partItem) {
 
                cell.setText(partItem.getPart().getCollateBetweenText());
+               setCellColor(cell, element);
+            }
+         }
+      });
+   }
+
+   /**
+    * Column: Collate ID
+    */
+   private void defineColumn_Equipment_CollateID() {
+
+      final ColumnDefinition colDef = TreeColumnFactory.EQUIPMENT_COLLATE_ID.createColumn(_columnManager, _pc);
+
+      colDef.setIsDefaultColumn();
+
+      colDef.setLabelProvider(new CellLabelProvider() {
+
+         @Override
+         public void update(final ViewerCell cell) {
+
+            final Object element = cell.getElement();
+
+            if (element instanceof final TVIEquipmentView_Item viewItem) {
+
+               final String type = viewItem.collateID;
+
+               if (EquipmentManager.isEmptyEquipmentType(type) == false) {
+
+                  cell.setText(type);
+                  setCellColor(cell, element);
+               }
+            }
+         }
+      });
+   }
+
+   /**
+    * Column: Collate ID saved
+    */
+   private void defineColumn_Equipment_CollateIDSaved() {
+
+      final ColumnDefinition colDef = TreeColumnFactory.EQUIPMENT_COLLATE_ID_SAVED.createColumn(_columnManager, _pc);
+
+      colDef.setIsDefaultColumn();
+
+      colDef.setLabelProvider(new CellLabelProvider() {
+
+         @Override
+         public void update(final ViewerCell cell) {
+
+            final Object element = cell.getElement();
+
+            if (element instanceof final TVIEquipmentView_Item viewItem) {
+
+               final String type = viewItem.collateID;
+
+               cell.setText(type);
                setCellColor(cell, element);
             }
          }
@@ -2042,6 +2063,42 @@ public class EquipmentView extends ViewPart implements
    }
 
    /**
+    * Column: Is collate
+    */
+   private void defineColumn_Equipment_IsCollate() {
+
+      final ColumnDefinition colDef = TreeColumnFactory.EQUIPMENT_IS_COLLATE.createColumn(_columnManager, _pc);
+
+      colDef.setIsDefaultColumn();
+
+      colDef.setLabelProvider(new CellLabelProvider() {
+
+         @Override
+         public void update(final ViewerCell cell) {
+
+            final Object element = cell.getElement();
+
+            boolean isCollate = false;
+
+            if (element instanceof final TVIEquipmentView_Equipment equipmentItem) {
+
+               isCollate = equipmentItem.getEquipment().isCollate();
+
+            } else if (element instanceof final TVIEquipmentView_Part partItem) {
+
+               isCollate = partItem.getPart().isCollate();
+            }
+
+            if (isCollate) {
+
+               cell.setText(UI.SYMBOL_BOX);
+               setCellColor(cell, element);
+            }
+         }
+      });
+   }
+
+   /**
     * Column: Model
     */
    private void defineColumn_Equipment_Model() {
@@ -2279,63 +2336,6 @@ public class EquipmentView extends ViewPart implements
             if (label != null) {
 
                cell.setText(label);
-               setCellColor(cell, element);
-            }
-         }
-      });
-   }
-
-   /**
-    * Column: Type
-    */
-   private void defineColumn_Equipment_Type() {
-
-      final ColumnDefinition colDef = TreeColumnFactory.EQUIPMENT_TYPE.createColumn(_columnManager, _pc);
-
-      colDef.setIsDefaultColumn();
-
-      colDef.setLabelProvider(new CellLabelProvider() {
-
-         @Override
-         public void update(final ViewerCell cell) {
-
-            final Object element = cell.getElement();
-
-            if (element instanceof final TVIEquipmentView_Item viewItem) {
-
-               final String type = viewItem.type;
-
-               if (EquipmentManager.isEmptyEquipmentType(type) == false) {
-
-                  cell.setText(type);
-                  setCellColor(cell, element);
-               }
-            }
-         }
-      });
-   }
-
-   /**
-    * Column: Type raw
-    */
-   private void defineColumn_Equipment_TypeRaw() {
-
-      final ColumnDefinition colDef = TreeColumnFactory.EQUIPMENT_TYPE_RAW.createColumn(_columnManager, _pc);
-
-      colDef.setIsDefaultColumn();
-
-      colDef.setLabelProvider(new CellLabelProvider() {
-
-         @Override
-         public void update(final ViewerCell cell) {
-
-            final Object element = cell.getElement();
-
-            if (element instanceof final TVIEquipmentView_Item viewItem) {
-
-               final String type = viewItem.type;
-
-               cell.setText(type);
                setCellColor(cell, element);
             }
          }

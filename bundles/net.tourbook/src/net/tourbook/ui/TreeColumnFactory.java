@@ -59,14 +59,19 @@ public abstract class TreeColumnFactory {
    public static final TreeColumnFactory DEVICE_DISTANCE;
    public static final TreeColumnFactory DEVICE_NAME;
 
+   public static final TreeColumnFactory EQUIPMENT_IS_COLLATE;
+   public static final String            EQUIPMENT_IS_COLLATE_ID          = "EQUIPMENT_COLLATE";                //$NON-NLS-1$
+   public static final TreeColumnFactory EQUIPMENT_COLLATE_ID;
+   public static final String            EQUIPMENT_COLLATE_ID_ID          = "EQUIPMENT_TYPE";                   //$NON-NLS-1$
+   public static final TreeColumnFactory EQUIPMENT_COLLATE_ID_SAVED;
+   public static final String            EQUIPMENT_COLLATE_ID_SAVED_ID    = "EQUIPMENT_COLLATE_ID_RAW";         //$NON-NLS-1$
+   public static final TreeColumnFactory EQUIPMENT_COLLATE_BETWEEN;
+   public static final String            EQUIPMENT_COLLATE_BETWEEN_ID     = "EQUIPMENT_COLLATE_BETWEEN";        //$NON-NLS-1$
+
    public static final TreeColumnFactory EQUIPMENT_AND_CATEGORY;
    public static final String            EQUIPMENT_AND_CATEGORY_ID        = "EQUIPMENT_AND_CATEGORY";           //$NON-NLS-1$
    public static final TreeColumnFactory EQUIPMENT_BRAND;
    public static final String            EQUIPMENT_BRAND_ID               = "EQUIPMENT_BRAND";                  //$NON-NLS-1$
-   public static final TreeColumnFactory EQUIPMENT_COLLATE;
-   public static final String            EQUIPMENT_COLLATE_ID             = "EQUIPMENT_COLLATE";                //$NON-NLS-1$
-   public static final TreeColumnFactory EQUIPMENT_COLLATE_BETWEEN;
-   public static final String            EQUIPMENT_COLLATE_BETWEEN_ID     = "EQUIPMENT_COLLATE_BETWEEN";        //$NON-NLS-1$
    public static final TreeColumnFactory EQUIPMENT_DATE_USED;
    public static final String            EQUIPMENT_DATE_USED_ID           = "EQUIPMENT_DATE_USED";              //$NON-NLS-1$
    public static final TreeColumnFactory EQUIPMENT_DATE_BUILT;
@@ -105,10 +110,6 @@ public abstract class TreeColumnFactory {
    public static final String            EQUIPMENT_SIZE_ID                = "EQUIPMENT_SIZE";                   //$NON-NLS-1$
    public static final TreeColumnFactory EQUIPMENT_TOUR_STRUCTURE;
    public static final String            EQUIPMENT_TOUR_STRUCTURE_ID      = "EQUIPMENT_TOUR_STRUCTURE";         //$NON-NLS-1$
-   public static final TreeColumnFactory EQUIPMENT_TYPE;
-   public static final String            EQUIPMENT_TYPE_ID                = "EQUIPMENT_TYPE";                   //$NON-NLS-1$
-   public static final TreeColumnFactory EQUIPMENT_TYPE_RAW;
-   public static final String            EQUIPMENT_TYPE_RAW_ID            = "EQUIPMENT_TYPE_RAW";               //$NON-NLS-1$
    public static final TreeColumnFactory EQUIPMENT_WEIGHT;
    public static final String            EQUIPMENT_WEIGHT_ID              = "EQUIPMENT_WEIGHT";                 //$NON-NLS-1$
 
@@ -771,6 +772,80 @@ public abstract class TreeColumnFactory {
        * Equipment
        */
 
+      EQUIPMENT_IS_COLLATE = new TreeColumnFactory() {
+         @Override
+         public TreeColumnDefinition createColumn(final ColumnManager columnManager,
+                                                  final PixelConverter pixelConverter) {
+
+            final TreeColumnDefinition colDef = new TreeColumnDefinition(columnManager, EQUIPMENT_IS_COLLATE_ID, SWT.CENTER);
+
+            colDef.setColumnCategory(           Messages.ColumnFactory_Category_Equipment);
+
+            colDef.setColumnLabel(              Messages.ColumnFactory_Equipment_IsCollate_Tooltip);
+            colDef.setColumnHeaderText(         Messages.ColumnFactory_Equipment_IsCollate_Label);
+            colDef.setColumnHeaderToolTipText(  Messages.ColumnFactory_Equipment_IsCollate_Tooltip);
+
+            colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(12));
+
+            return colDef;
+         }
+      };
+
+      EQUIPMENT_COLLATE_ID = new TreeColumnFactory() {
+         @Override
+         public TreeColumnDefinition createColumn(final ColumnManager columnManager,
+                                                  final PixelConverter pixelConverter) {
+
+            final TreeColumnDefinition colDef = new TreeColumnDefinition(columnManager, EQUIPMENT_COLLATE_ID_ID, SWT.LEAD);
+
+            colDef.setColumnCategory(           Messages.ColumnFactory_Category_Equipment);
+
+            colDef.setColumnLabel(              Messages.ColumnFactory_Equipment_CollateID);
+            colDef.setColumnHeaderText(         Messages.ColumnFactory_Equipment_CollateID);
+
+            colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(15));
+
+            return colDef;
+         }
+      };
+
+      EQUIPMENT_COLLATE_ID_SAVED = new TreeColumnFactory() {
+         @Override
+         public TreeColumnDefinition createColumn(final ColumnManager columnManager,
+                                                  final PixelConverter pixelConverter) {
+
+            final TreeColumnDefinition colDef = new TreeColumnDefinition(columnManager, EQUIPMENT_COLLATE_ID_SAVED_ID, SWT.LEAD);
+
+            colDef.setColumnCategory(           Messages.ColumnFactory_Category_Equipment);
+
+            colDef.setColumnLabel(              Messages.ColumnFactory_Equipment_CollateIDSaved_Label);
+            colDef.setColumnHeaderText(         Messages.ColumnFactory_Equipment_CollateIDSaved_Label);
+
+            colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(15));
+
+            return colDef;
+         }
+      };
+
+      EQUIPMENT_COLLATE_BETWEEN = new TreeColumnFactory() {
+         @Override
+         public TreeColumnDefinition createColumn(final ColumnManager columnManager,
+                                                  final PixelConverter pixelConverter) {
+
+            final TreeColumnDefinition colDef = new TreeColumnDefinition(columnManager, EQUIPMENT_COLLATE_BETWEEN_ID, SWT.CENTER);
+
+            colDef.setColumnCategory(           Messages.ColumnFactory_Category_Equipment);
+
+            colDef.setColumnLabel(              Messages.ColumnFactory_Equipment_CollateBetween_Label);
+            colDef.setColumnHeaderText(         Messages.ColumnFactory_Equipment_CollateBetween_Header);
+            colDef.setColumnHeaderToolTipText(  Messages.ColumnFactory_Equipment_CollateBetween_Tooltip);
+
+            colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(12));
+
+            return colDef;
+         }
+      };
+
       EQUIPMENT_AND_CATEGORY = new TreeColumnFactory() {
          @Override
          public TreeColumnDefinition createColumn(final ColumnManager columnManager,
@@ -804,44 +879,6 @@ public abstract class TreeColumnFactory {
             colDef.setColumnHeaderToolTipText(  Messages.ColumnFactory_Equipment_Brand);
 
             colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(20));
-
-            return colDef;
-         }
-      };
-
-      EQUIPMENT_COLLATE = new TreeColumnFactory() {
-         @Override
-         public TreeColumnDefinition createColumn(final ColumnManager columnManager,
-                                                  final PixelConverter pixelConverter) {
-
-            final TreeColumnDefinition colDef = new TreeColumnDefinition(columnManager, EQUIPMENT_COLLATE_ID, SWT.CENTER);
-
-            colDef.setColumnCategory(           Messages.ColumnFactory_Category_Equipment);
-
-            colDef.setColumnLabel(              Messages.ColumnFactory_Equipment_Collate_Tooltip);
-            colDef.setColumnHeaderText(         Messages.ColumnFactory_Equipment_Collate_Label);
-            colDef.setColumnHeaderToolTipText(  Messages.ColumnFactory_Equipment_Collate_Tooltip);
-
-            colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(12));
-
-            return colDef;
-         }
-      };
-
-      EQUIPMENT_COLLATE_BETWEEN = new TreeColumnFactory() {
-         @Override
-         public TreeColumnDefinition createColumn(final ColumnManager columnManager,
-                                                  final PixelConverter pixelConverter) {
-
-            final TreeColumnDefinition colDef = new TreeColumnDefinition(columnManager, EQUIPMENT_COLLATE_BETWEEN_ID, SWT.CENTER);
-
-            colDef.setColumnCategory(           Messages.ColumnFactory_Category_Equipment);
-
-            colDef.setColumnLabel(              Messages.ColumnFactory_Equipment_CollateBetween_Label);
-            colDef.setColumnHeaderText(         Messages.ColumnFactory_Equipment_CollateBetween_Header);
-            colDef.setColumnHeaderToolTipText(  Messages.ColumnFactory_Equipment_CollateBetween_Tooltip);
-
-            colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(12));
 
             return colDef;
          }
@@ -1205,42 +1242,6 @@ public abstract class TreeColumnFactory {
             colDef.setColumnHeaderToolTipText(  Messages.ColumnFactory_Equipment_TourStructure_Tooltip);
 
             colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(5));
-
-            return colDef;
-         }
-      };
-
-      EQUIPMENT_TYPE = new TreeColumnFactory() {
-         @Override
-         public TreeColumnDefinition createColumn(final ColumnManager columnManager,
-                                                  final PixelConverter pixelConverter) {
-
-            final TreeColumnDefinition colDef = new TreeColumnDefinition(columnManager, EQUIPMENT_TYPE_ID, SWT.LEAD);
-
-            colDef.setColumnCategory(           Messages.ColumnFactory_Category_Equipment);
-
-            colDef.setColumnLabel(              Messages.ColumnFactory_Equipment_Type);
-            colDef.setColumnHeaderText(         Messages.ColumnFactory_Equipment_Type);
-
-            colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(15));
-
-            return colDef;
-         }
-      };
-
-      EQUIPMENT_TYPE_RAW = new TreeColumnFactory() {
-         @Override
-         public TreeColumnDefinition createColumn(final ColumnManager columnManager,
-                                                  final PixelConverter pixelConverter) {
-
-            final TreeColumnDefinition colDef = new TreeColumnDefinition(columnManager, EQUIPMENT_TYPE_RAW_ID, SWT.LEAD);
-
-            colDef.setColumnCategory(           Messages.ColumnFactory_Category_Equipment);
-
-            colDef.setColumnLabel(              Messages.ColumnFactory_Equipment_TypeSaved_Label);
-            colDef.setColumnHeaderText(         Messages.ColumnFactory_Equipment_TypeSaved_Label);
-
-            colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(15));
 
             return colDef;
          }

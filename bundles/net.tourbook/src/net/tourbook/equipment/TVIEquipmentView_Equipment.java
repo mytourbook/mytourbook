@@ -59,7 +59,7 @@ public class TVIEquipmentView_Equipment extends TVIEquipmentView_Item {
 
       firstColumn    = equipment.getName();
 
-      type           = equipment.getCollateID();
+      collateID      = equipment.getCollateID();
       dateUsed       = equipment.getDateUsed_Local();
 
       price          = equipment.getPrice();
@@ -249,7 +249,7 @@ public class TVIEquipmentView_Equipment extends TVIEquipmentView_Item {
 
          partItem.firstColumn          = part.getName_Combined();
 
-         partItem.type                 = part.getPartCollateID();
+         partItem.collateID            = part.getPartCollateID();
          partItem.dateUsed             = part.getDateUsed_Local();
 
          partItem.price                = part.getPrice();
