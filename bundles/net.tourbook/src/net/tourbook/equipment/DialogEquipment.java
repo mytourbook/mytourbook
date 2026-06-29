@@ -104,15 +104,22 @@ public class DialogEquipment extends TitleAreaDialog {
    private boolean                      _isDuplicateEquipment;
 
    private PixelConverter               _pc;
+   private int                          _defaultWidth;
+   private int                          _currencyWidth;
+   private int                          _decoratorDistance;
+   private GridDataFactory              _gdVertCenter;
+   private String                       _tooltip1;
+   private String                       _tooltip2;
 
    /*
     * UI resources
     */
+   private Image _decorationImage;
    private Image _imageCamera;
    private Image _imageNow;
    private Image _imageTrash;
 
-   // must be created early
+   // must be created very early
    private Image _imageDialog = TourbookPlugin.getImageDescriptor(Images.Equipment_Only).createImage();
 
    /*
@@ -277,50 +284,32 @@ public class DialogEquipment extends TitleAreaDialog {
 
    private void createUI(final Composite parent) {
 
-      /*
-       * Collated tours are a collection of tours to sum up values,
-       * e.g. distances or durations.
-       * Tours are collated by the "Collate ID" and "Date" fields.
-       * When an equipment is collated,
-       * then it cannot contain parts or services.
-       * When an equipment contains parts or services,
-       * then this option is disabled.
-       */
-      final String tooltip = Messages.Dialog_Equipment_Tooltip_1b;
-
-      /*
-       * With the "Collate ID" and "Date" fields, tours are collated to display
-       * e.g. all kilometers for one part or one service
-       */
-
-      final String tooltip2 = Messages.Dialog_Equipment_Tooltip_2b;
-
-      final Image decorationImage = FieldDecorationRegistry.getDefault()
-            .getFieldDecoration(FieldDecorationRegistry.DEC_INFORMATION)
-            .getImage();
-
-      final int defaultWidth = convertWidthInCharsToPixels(40);
-      final int currencyWidth = UI.IS_WIN ? convertWidthInCharsToPixels(4) : convertWidthInCharsToPixels(12);
-
-      final int decoratorDistance = 3;
-
-      final GridDataFactory gdVertCenter = GridDataFactory.fillDefaults().align(SWT.BEGINNING, SWT.CENTER);
-
       _container = new Composite(parent, SWT.NONE);
       GridDataFactory.fillDefaults().grab(true, true).applyTo(_container);
-      GridLayoutFactory.swtDefaults().numColumns(7).applyTo(_container);
+      GridLayoutFactory.swtDefaults().numColumns(2).applyTo(_container);
 //      _container.setBackground(UI.SYS_COLOR_GREEN);
+
+      createUI_100_Col1(_container);
+      createUI_200_Col2(_container);
+      createUI_900_Bottom(_container);
+   }
+
+   private void createUI_100_Col1(final Composite parent) {
+
+      final Composite container = new Composite(parent, SWT.NONE);
+      GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
+      GridLayoutFactory.fillDefaults().numColumns(3).applyTo(container);
       {
          {
             /*
              * Brand/name
              */
 
-            final Label label = UI.createLabel(_container, Messages.Dialog_Equipment_Label_Brand, Messages.Dialog_Equipment_Label_Brand_Tooltip);
-            gdVertCenter.applyTo(label);
+            final Label label = UI.createLabel(container, Messages.Dialog_Equipment_Label_Brand, Messages.Dialog_Equipment_Label_Brand_Tooltip);
+            _gdVertCenter.applyTo(label);
 
             // autocomplete combo
-            _comboBrand = new Combo(_container, SWT.BORDER | SWT.FLAT);
+            _comboBrand = new Combo(container, SWT.BORDER | SWT.FLAT);
             _comboBrand.setText(UI.EMPTY_STRING);
             _comboBrand.addModifyListener(_defaultModifyListener);
 
@@ -328,32 +317,14 @@ public class DialogEquipment extends TitleAreaDialog {
 
             _autocomplete_Brand = new AutoComplete_ComboInputMT(_comboBrand);
          }
-         // force more space between the 2 data columns
-         UI.createSpacer_Horizontal(_container, _pc.convertWidthInCharsToPixels(3), 1);
-         {
-            /*
-             * Model/subname
-             */
-            final Label label = UI.createLabel(_container, Messages.Dialog_Equipment_Label_Model);
-            gdVertCenter.applyTo(label);
-
-            // autocomplete combo
-            _comboModel = new Combo(_container, SWT.BORDER | SWT.FLAT);
-            _comboModel.setText(UI.EMPTY_STRING);
-            _comboModel.addModifyListener(_defaultModifyListener);
-
-            GridDataFactory.fillDefaults().grab(true, false).span(2, 1).applyTo(_comboModel);
-
-            _autocomplete_Model = new AutoComplete_ComboInputMT(_comboModel);
-         }
          {
             /*
              * Collate ID
              */
-            UI.createLabel(_container, Messages.Dialog_Equipment_Label_CollateID);
+            UI.createLabel(container, Messages.Dialog_Equipment_Label_CollateID);
 
             // autocomplete combo
-            _comboCollateID = new Combo(_container, SWT.BORDER | SWT.FLAT);
+            _comboCollateID = new Combo(container, SWT.BORDER | SWT.FLAT);
             _comboCollateID.setText(UI.EMPTY_STRING);
             _comboCollateID.addModifyListener(_defaultModifyListener);
 
@@ -365,20 +336,135 @@ public class DialogEquipment extends TitleAreaDialog {
              * Add a decoration for this important field
              */
             _comboDecorator_CollateID = new ControlDecoration(_comboCollateID, SWT.CENTER | SWT.LEFT);
-            _comboDecorator_CollateID.setDescriptionText(tooltip2);
-            _comboDecorator_CollateID.setImage(decorationImage);
-            _comboDecorator_CollateID.setMarginWidth(decoratorDistance);
+            _comboDecorator_CollateID.setDescriptionText(_tooltip2);
+            _comboDecorator_CollateID.setImage(_decorationImage);
+            _comboDecorator_CollateID.setMarginWidth(_decoratorDistance);
          }
-         UI.createSpacer_Horizontal(_container, 1);
+         {
+            /*
+             * Is collate tours
+             */
+            _lblCollate = UI.createLabel(container, Messages.Dialog_Equipment_Label_Collate);
+            _lblCollate.setToolTipText(_tooltip1);
+            _gdVertCenter.applyTo(_lblCollate);
+
+            _chkCollate = new Button(container, SWT.CHECK);
+            _chkCollate.setText(Messages.Dialog_Equipment_Checkbox_Collate);
+            _chkCollate.setToolTipText(_tooltip1);
+
+            _chkCollate.addSelectionListener(_defaultSelectionListener);
+
+            GridDataFactory.fillDefaults()
+                  .span(2, 1)
+                  // align to the beginning, otherwise the decoration is partly hidden !!!
+                  .align(SWT.BEGINNING, SWT.FILL)
+                  .applyTo(_chkCollate);
+
+            /*
+             * Add a decoration for this important field
+             */
+            _comboDecorator_Collate = new ControlDecoration(_chkCollate, SWT.CENTER | SWT.RIGHT);
+            _comboDecorator_Collate.setDescriptionText(_tooltip1);
+            _comboDecorator_Collate.setImage(_decorationImage);
+            _comboDecorator_Collate.setMarginWidth(_decoratorDistance);
+         }
+         {
+            /*
+             * Date used
+             */
+            UI.createLabel(container, Messages.Dialog_Equipment_Label_Date);
+
+            _dateUsed = new DateTime(container, SWT.DATE | SWT.MEDIUM | SWT.DROP_DOWN);
+            _dateUsed.addSelectionListener(_defaultSelectionListener);
+
+            /*
+             * Add a decoration for this important field
+             */
+            _comboDecorator_DateFrom = new ControlDecoration(_dateUsed, SWT.CENTER | SWT.LEFT);
+            _comboDecorator_DateFrom.setDescriptionText(_tooltip2);
+            _comboDecorator_DateFrom.setImage(_decorationImage);
+            _comboDecorator_DateFrom.setMarginWidth(_decoratorDistance);
+
+            UI.createSpacer_Horizontal(container, 1);
+         }
+         {
+            /*
+             * Built date
+             */
+            final Label label = UI.createLabel(container, Messages.Dialog_Equipment_Label_DateBuilt);
+            _gdVertCenter.applyTo(label);
+
+            _dateBuilt = new DateTime(container, SWT.DATE | SWT.MEDIUM | SWT.DROP_DOWN);
+            _dateBuilt.addSelectionListener(_defaultSelectionListener);
+
+            _chkSyncDates = new Button(container, SWT.CHECK);
+            _chkSyncDates.setText(Messages.Dialog_Equipment_Checkbox_Sync);
+            _chkSyncDates.setToolTipText(Messages.Dialog_Equipment_Checkbox_Sync_Tooltip);
+            _chkSyncDates.addSelectionListener(_defaultSelectionListener);
+         }
+         {
+            /*
+             * Retired: Checkbox
+             */
+            final Label label = UI.createLabel(container, Messages.Dialog_Equipment_Label_DateRetired);
+            _gdVertCenter.applyTo(label);
+
+            _chkRetired = new Button(container, SWT.CHECK);
+            _chkRetired.setText(Messages.Dialog_Equipment_Checkbox_IsRetired);
+
+            _chkRetired.addSelectionListener(_defaultSelectionListener);
+
+            GridDataFactory.fillDefaults().grab(true, false).span(2, 1).applyTo(_chkRetired);
+         }
+         {
+            /*
+             * Retired: Date
+             */
+
+            UI.createSpacer_Horizontal(container, 1);
+
+            _dateRetired = new DateTime(container, SWT.DATE | SWT.MEDIUM | SWT.DROP_DOWN);
+            _dateRetired.addSelectionListener(_defaultSelectionListener);
+
+            _btnDateRetiredNow = new Button(container, SWT.PUSH);
+            _btnDateRetiredNow.setImage(_imageNow);
+            _btnDateRetiredNow.setToolTipText(Messages.Dialog_Equipment_Button_SetDateToToday_Tooltip);
+            _btnDateRetiredNow.addSelectionListener(SelectionListener.widgetSelectedAdapter(selectionEvent -> onSelect_RetireNow()));
+         }
+      }
+   }
+
+   private void createUI_200_Col2(final Composite parent) {
+
+      final Composite container = new Composite(parent, SWT.NONE);
+      GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
+      GridLayoutFactory.fillDefaults().numColumns(3).applyTo(container);
+      {
+         {
+            /*
+             * Model/subname
+             */
+            final Label label = UI.createLabel(container, Messages.Dialog_Equipment_Label_Model);
+            _gdVertCenter.applyTo(label);
+
+            // autocomplete combo
+            _comboModel = new Combo(container, SWT.BORDER | SWT.FLAT);
+            _comboModel.setText(UI.EMPTY_STRING);
+            _comboModel.addModifyListener(_defaultModifyListener);
+
+            GridDataFactory.fillDefaults().grab(true, false).span(2, 1).applyTo(_comboModel);
+
+            _autocomplete_Model = new AutoComplete_ComboInputMT(_comboModel);
+         }
          {
             /*
              * Size
              */
-            final Label label = UI.createLabel(_container, Messages.Dialog_Equipment_Label_Size);
-            gdVertCenter.applyTo(label);
+            final Label label = UI.createLabel(container, Messages.Dialog_Equipment_Label_Size);
+            _gdVertCenter.applyTo(label);
 
             // autocomplete combo
-            _comboSize = new Combo(_container, SWT.BORDER | SWT.FLAT);
+            _comboSize = new Combo(container, SWT.BORDER | SWT.FLAT);
             _comboSize.setText(UI.EMPTY_STRING);
             _comboSize.addModifyListener(_defaultModifyListener);
 
@@ -388,32 +474,13 @@ public class DialogEquipment extends TitleAreaDialog {
          }
          {
             /*
-             * Date used
-             */
-            UI.createLabel(_container, Messages.Dialog_Equipment_Label_Date);
-
-            _dateUsed = new DateTime(_container, SWT.DATE | SWT.MEDIUM | SWT.DROP_DOWN);
-            _dateUsed.addSelectionListener(_defaultSelectionListener);
-
-            /*
-             * Add a decoration for this important field
-             */
-            _comboDecorator_DateFrom = new ControlDecoration(_dateUsed, SWT.CENTER | SWT.LEFT);
-            _comboDecorator_DateFrom.setDescriptionText(tooltip2);
-            _comboDecorator_DateFrom.setImage(decorationImage);
-            _comboDecorator_DateFrom.setMarginWidth(decoratorDistance);
-         }
-         UI.createSpacer_Horizontal(_container, 1);
-         UI.createSpacer_Horizontal(_container, 1);
-         {
-            /*
              * Price
              */
 
-            UI.createLabel(_container, Messages.Dialog_Equipment_Label_Price);
+            UI.createLabel(container, Messages.Dialog_Equipment_Label_Price);
 
             // spinner
-            _spinPrice = new Spinner(_container, SWT.BORDER);
+            _spinPrice = new Spinner(container, SWT.BORDER);
 
             _spinPrice.setDigits(2);
             _spinPrice.setMinimum(-1_000_000_000);
@@ -423,43 +490,27 @@ public class DialogEquipment extends TitleAreaDialog {
             _spinPrice.addSelectionListener(_defaultSelectionListener);
 
             // autocomplete combo
-            _comboPriceUnit = new Combo(_container, SWT.BORDER | SWT.FLAT);
+            _comboPriceUnit = new Combo(container, SWT.BORDER | SWT.FLAT);
             _comboPriceUnit.setText(UI.EMPTY_STRING);
             _comboPriceUnit.setToolTipText(Messages.Dialog_Equipment_Combo_PriceUnit_Tooltip);
             _comboPriceUnit.addModifyListener(_defaultModifyListener);
 
             GridDataFactory.fillDefaults()
                   .align(SWT.BEGINNING, SWT.FILL)
-                  .hint(currencyWidth, SWT.DEFAULT)
+                  .hint(_currencyWidth, SWT.DEFAULT)
                   .applyTo(_comboPriceUnit);
 
             _autocomplete_PriceUnit = new AutoComplete_ComboInputMT(_comboPriceUnit);
          }
          {
             /*
-             * Built date
-             */
-            final Label label = UI.createLabel(_container, Messages.Dialog_Equipment_Label_DateBuilt);
-            gdVertCenter.applyTo(label);
-
-            _dateBuilt = new DateTime(_container, SWT.DATE | SWT.MEDIUM | SWT.DROP_DOWN);
-            _dateBuilt.addSelectionListener(_defaultSelectionListener);
-
-            _chkSyncDates = new Button(_container, SWT.CHECK);
-            _chkSyncDates.setText(Messages.Dialog_Equipment_Checkbox_Sync);
-            _chkSyncDates.setToolTipText(Messages.Dialog_Equipment_Checkbox_Sync_Tooltip);
-            _chkSyncDates.addSelectionListener(_defaultSelectionListener);
-         }
-         UI.createSpacer_Horizontal(_container, 1);
-         {
-            /*
              * Weight
              */
 
-            UI.createLabel(_container, Messages.Dialog_Equipment_Label_Weight);
+            UI.createLabel(container, Messages.Dialog_Equipment_Label_Weight);
 
             // spinner
-            _spinWeight = new Spinner(_container, SWT.BORDER);
+            _spinWeight = new Spinner(container, SWT.BORDER);
 
             _spinWeight.setDigits(3);
             _spinWeight.setMinimum(0);
@@ -469,37 +520,24 @@ public class DialogEquipment extends TitleAreaDialog {
             _spinWeight.addSelectionListener(_defaultSelectionListener);
 
             // combo: weight kg/g - lbs/oz
-            _comboWeightUnit = new Combo(_container, SWT.BORDER | SWT.READ_ONLY);
+            _comboWeightUnit = new Combo(container, SWT.BORDER | SWT.READ_ONLY);
             _comboWeightUnit.addSelectionListener(SelectionListener.widgetSelectedAdapter(selectionEvent -> onSelect_WeightUnit()));
 
             GridDataFactory.fillDefaults()
                   .align(SWT.BEGINNING, SWT.FILL)
-                  .hint(currencyWidth, SWT.DEFAULT)
+                  .hint(_currencyWidth, SWT.DEFAULT)
                   .applyTo(_comboWeightUnit);
          }
-         {
-            /*
-             * Retired: Checkbox
-             */
-            final Label label = UI.createLabel(_container, Messages.Dialog_Equipment_Label_DateRetired);
-            gdVertCenter.applyTo(label);
-
-            _chkRetired = new Button(_container, SWT.CHECK);
-            _chkRetired.setText(Messages.Dialog_Equipment_Checkbox_IsRetired);
-
-            _chkRetired.addSelectionListener(_defaultSelectionListener);
-         }
-         UI.createSpacer_Horizontal(_container, 2);
          {
             /*
              * Distance first use
              */
 
-            final Label label = UI.createLabel(_container, Messages.Dialog_Equipment_Label_InitialDistance);
+            final Label label = UI.createLabel(container, Messages.Dialog_Equipment_Label_InitialDistance);
             label.setToolTipText(Messages.Dialog_Equipment_Label_InitialDistance_Tooltip);
 
             // spinner
-            _spinDistance = new Spinner(_container, SWT.BORDER);
+            _spinDistance = new Spinner(container, SWT.BORDER);
 
             _spinDistance.setDigits(0);
             _spinDistance.setMinimum(0);
@@ -509,95 +547,61 @@ public class DialogEquipment extends TitleAreaDialog {
             _spinDistance.addSelectionListener(_defaultSelectionListener);
 
             // label: km/mi
-            UI.createLabel(_container, UI.UNIT_LABEL_DISTANCE);
+            UI.createLabel(container, UI.UNIT_LABEL_DISTANCE);
          }
-         UI.createSpacer_Horizontal(_container, 1);
-         {
-            /*
-             * Retired: Date
-             */
+      }
+   }
 
-            _dateRetired = new DateTime(_container, SWT.DATE | SWT.MEDIUM | SWT.DROP_DOWN);
-            _dateRetired.addSelectionListener(_defaultSelectionListener);
+   private void createUI_900_Bottom(final Composite parent) {
 
-            _btnDateRetiredNow = new Button(_container, SWT.PUSH);
-            _btnDateRetiredNow.setImage(_imageNow);
-            _btnDateRetiredNow.setToolTipText(Messages.Dialog_Equipment_Button_SetDateToToday_Tooltip);
-            _btnDateRetiredNow.addSelectionListener(SelectionListener.widgetSelectedAdapter(selectionEvent -> onSelect_RetireNow()));
-         }
-         UI.createSpacer_Horizontal(_container, 4);
-         {
-            /*
-             * Collate tours
-             */
-
-            _lblCollate = UI.createLabel(_container, Messages.Dialog_Equipment_Label_Collate);
-            _lblCollate.setToolTipText(tooltip);
-            gdVertCenter.applyTo(_lblCollate);
-
-            _chkCollate = new Button(_container, SWT.CHECK);
-            _chkCollate.setText(Messages.Dialog_Equipment_Checkbox_Collate);
-            _chkCollate.setToolTipText(tooltip);
-
-            _chkCollate.addSelectionListener(_defaultSelectionListener);
-
-            GridDataFactory.fillDefaults()
-                  .span(6, 1)
-                  // align to the beginning, otherwise the decoration is partly hidden !!!
-                  .align(SWT.BEGINNING, SWT.FILL)
-                  .applyTo(_chkCollate);
-
-            /*
-             * Add a decoration for this important field
-             */
-            _comboDecorator_Collate = new ControlDecoration(_chkCollate, SWT.CENTER | SWT.RIGHT);
-            _comboDecorator_Collate.setDescriptionText(tooltip);
-            _comboDecorator_Collate.setImage(decorationImage);
-            _comboDecorator_Collate.setMarginWidth(decoratorDistance);
-         }
+      final Composite container = new Composite(parent, SWT.NONE);
+      GridDataFactory.fillDefaults().grab(true, true).span(2, 1).applyTo(container);
+      GridLayoutFactory.swtDefaults().numColumns(2).applyTo(container);
+//      _container.setBackground(UI.SYS_COLOR_GREEN);
+      {
          {
             /*
              * Purchase location
              */
-            UI.createLabel(_container, Messages.Dialog_Equipment_Label_PurchaseLocation);
+            UI.createLabel(container, Messages.Dialog_Equipment_Label_PurchaseLocation);
 
-            _txtPurchaseLocation = new Text(_container, SWT.BORDER);
+            _txtPurchaseLocation = new Text(container, SWT.BORDER);
             _txtPurchaseLocation.addModifyListener(e -> onModify());
             GridDataFactory.fillDefaults()
                   .grab(true, false)
-                  .hint(defaultWidth, SWT.DEFAULT)
-                  .span(6, 1)
+                  .hint(_defaultWidth, SWT.DEFAULT)
+//                  .span(2, 1)
                   .applyTo(_txtPurchaseLocation);
          }
          {
             /*
              * Website
              */
-            _linkWebsite = new Link(_container, SWT.NONE);
+            _linkWebsite = new Link(container, SWT.NONE);
             _linkWebsite.setText(Messages.Dialog_Equipment_Link_Website);
             _linkWebsite.addSelectionListener(SelectionListener.widgetSelectedAdapter(selectionEvent -> onSelect_Website()));
 
-            _txtUrlAddress = new Text(_container, SWT.BORDER);
+            _txtUrlAddress = new Text(container, SWT.BORDER);
             _txtUrlAddress.addModifyListener(e -> onModify());
             GridDataFactory.fillDefaults()
                   .grab(true, false)
-                  .hint(defaultWidth, SWT.DEFAULT)
-                  .span(6, 1)
+                  .hint(_defaultWidth, SWT.DEFAULT)
+//                  .span(2, 1)
                   .applyTo(_txtUrlAddress);
          }
          {
             /*
              * Description
              */
-            final Label label = UI.createLabel(_container, Messages.Dialog_Equipment_Label_Description);
+            final Label label = UI.createLabel(container, Messages.Dialog_Equipment_Label_Description);
             GridDataFactory.fillDefaults().align(SWT.BEGINNING, SWT.BEGINNING).applyTo(label);
 
-            _txtDescription = new Text(_container, SWT.BORDER | SWT.WRAP | SWT.MULTI | SWT.V_SCROLL | SWT.H_SCROLL);
+            _txtDescription = new Text(container, SWT.BORDER | SWT.WRAP | SWT.MULTI | SWT.V_SCROLL | SWT.H_SCROLL);
             _txtDescription.addModifyListener(e -> onModify());
             GridDataFactory.fillDefaults()
                   .grab(true, true)
-                  .hint(defaultWidth, convertHeightInCharsToPixels(10))
-                  .span(6, 1)
+                  .hint(_defaultWidth, convertHeightInCharsToPixels(10))
+//                  .span(2, 1)
                   .applyTo(_txtDescription);
          }
          {
@@ -605,14 +609,14 @@ public class DialogEquipment extends TitleAreaDialog {
              * Image filename
              */
 
-            _lblImage = UI.createLabel(_container, UI.EMPTY_STRING);
+            _lblImage = UI.createLabel(container, UI.EMPTY_STRING);
             _lblImage.setText(Messages.Dialog_Equipment_Label_Image);
             GridDataFactory.fillDefaults().align(SWT.BEGINNING, SWT.CENTER).applyTo(_lblImage);
 
-            final Composite imageContainer = new Composite(_container, SWT.NONE);
+            final Composite imageContainer = new Composite(container, SWT.NONE);
             GridDataFactory.fillDefaults()
                   .grab(true, false)
-                  .span(6, 1)
+//                  .span(2, 1)
                   .applyTo(imageContainer);
             GridLayoutFactory.fillDefaults().numColumns(3).applyTo(imageContainer);
 //            imageContainer.setBackground(UI.SYS_COLOR_YELLOW);
@@ -640,13 +644,13 @@ public class DialogEquipment extends TitleAreaDialog {
                 * Equipment image
                 */
 
-               UI.createSpacer_Horizontal(_container);
+               UI.createSpacer_Horizontal(container);
 
                final int imageSize = TagManager.getTagContent_ImageSize();
 
-               _canvasEquipmentImage = new Label(_container, SWT.WRAP);
+               _canvasEquipmentImage = new Label(container, SWT.WRAP);
                GridDataFactory.fillDefaults()
-                     .span(6, 1)
+//                     .span(6, 1)
                      .hint(imageSize, imageSize)
                      .applyTo(_canvasEquipmentImage);
             }
@@ -654,33 +658,33 @@ public class DialogEquipment extends TitleAreaDialog {
       }
 
       // set tab ordering, cool feature but all controls MUST have the same parent !!!
-      _container.setTabList(new Control[] {
-
-            _comboBrand,
-            _comboModel,
-            _comboCollateID,
-            _comboSize,
-
-            _dateUsed,
-            _dateBuilt,
-            _chkSyncDates,
-            _chkRetired,
-            _dateRetired,
-            _btnDateRetiredNow,
-            _chkCollate,
-
-            _spinPrice,
-            _comboPriceUnit,
-            _spinWeight,
-            _comboWeightUnit,
-            _spinDistance,
-
-            _txtPurchaseLocation,
-            _linkWebsite,
-            _txtUrlAddress,
-            _txtDescription,
-            _lblImage,
-      });
+//      container.setTabList(new Control[] {
+//
+//            _comboBrand,
+//            _comboModel,
+//            _comboCollateID,
+//            _comboSize,
+//
+//            _dateUsed,
+//            _dateBuilt,
+//            _chkSyncDates,
+//            _chkRetired,
+//            _dateRetired,
+//            _btnDateRetiredNow,
+//            _chkCollate,
+//
+//            _spinPrice,
+//            _comboPriceUnit,
+//            _spinWeight,
+//            _comboWeightUnit,
+//            _spinDistance,
+//
+//            _txtPurchaseLocation,
+//            _linkWebsite,
+//            _txtUrlAddress,
+//            _txtDescription,
+//            _lblImage,
+//      });
    }
 
    private void enableControls() {
@@ -872,6 +876,31 @@ public class DialogEquipment extends TitleAreaDialog {
 
       _pc = new PixelConverter(_parent);
 
+      _gdVertCenter = GridDataFactory.fillDefaults().align(SWT.BEGINNING, SWT.CENTER);
+
+      /*
+       * Collated tours are a collection of tours to sum up values,
+       * e.g. distances or durations.
+       * Tours are collated by the "Collate ID" and "Date" fields.
+       * When an equipment is collated,
+       * then it cannot contain parts or services.
+       * When an equipment contains parts or services,
+       * then this option is disabled.
+       */
+      _tooltip1 = Messages.Dialog_Equipment_Tooltip_1b;
+
+      /*
+       * With the "Collate ID" and "Date" fields, tours are collated to display
+       * e.g. all kilometers for one part or one service
+       */
+
+      _tooltip2 = Messages.Dialog_Equipment_Tooltip_2b;
+
+      _defaultWidth = convertWidthInCharsToPixels(40);
+      _currencyWidth = UI.IS_WIN ? convertWidthInCharsToPixels(4) : convertWidthInCharsToPixels(12);
+
+      _decoratorDistance = 3;
+
 // SET_FORMATTING_OFF
 
       _imageCamera   = TourbookPlugin.getImageDescriptor(Images.Camera).createImage();
@@ -880,12 +909,14 @@ public class DialogEquipment extends TitleAreaDialog {
 
 // SET_FORMATTING_ON
 
+      _decorationImage = FieldDecorationRegistry.getDefault()
+            .getFieldDecoration(FieldDecorationRegistry.DEC_INFORMATION)
+            .getImage();
+
       _parent.addDisposeListener(disposeEvent -> onDispose());
 
       _defaultModifyListener = modifyEvent -> onModify();
-
       _defaultSelectionListener = SelectionListener.widgetSelectedAdapter(selectionEvent -> onModify());
-
       _defaultMouseWheelListener = mouseEvent -> {
 
          Util.adjustSpinnerValueOnMouseScroll(mouseEvent);
