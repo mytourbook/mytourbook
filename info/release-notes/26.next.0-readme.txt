@@ -4,7 +4,7 @@
 !!! fr, it and nl TRANSLATIONS !!!
 ==================================
 
-Change wording from "Type" into "Collation ID" in
+Change wording from "Type" into "Collate ID" in
 
 Dialog_Equipment_Tooltip_1b
 Dialog_Equipment_Tooltip_2b
