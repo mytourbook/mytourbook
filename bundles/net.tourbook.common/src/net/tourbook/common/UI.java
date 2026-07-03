@@ -122,6 +122,7 @@ import org.eclipse.swt.widgets.Sash;
 import org.eclipse.swt.widgets.Scale;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Spinner;
+import org.eclipse.swt.widgets.Text;
 import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.swt.widgets.Widget;
 import org.eclipse.ui.IEditorSite;
@@ -1859,6 +1860,23 @@ public class UI {
       }
 
       return container;
+   }
+
+   /**
+    * Creates a {@link Text} with a readonly text
+    *
+    * @param parent
+    * @param text
+    *
+    * @return
+    */
+   public static Text createReadOnlyText(final Composite parent, final String text) {
+
+      final Text textControl = new Text(parent, SWT.READ_ONLY);
+
+      textControl.setText(text);
+
+      return textControl;
    }
 
    /**

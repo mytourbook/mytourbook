@@ -32,7 +32,7 @@ TODO's
 All
 ===
 
-See milestone 26.6 https://github.com/mytourbook/mytourbook/milestone/29?closed=1
+See milestone 26.? https://github.com/mytourbook/mytourbook/milestone/29?closed=1
 
 
 New / Improvements
@@ -43,7 +43,7 @@ New / Improvements
     https://github.com/mytourbook/mytourbook/issues/1706
     
 * Equipment
-  - Add a read-only computed field "Cost per mi/km"
+  - Added a read-only computed field "Cost per mi/km"
     https://github.com/mytourbook/mytourbook/issues/1644    
 
   
@@ -53,6 +53,7 @@ Changes
 
 * Equipment
   - Changed wording from "Type" to "Collate ID"
+  - Reordered fields in the equipment/part and service dialogs
 
 * HR-Zones
   - When HR-Zones are modified in the preferences, these modifications cannot be applied directly in the preferences. There is a new feature in the Tour Book view context menu "Adjust Tour Values/HR Zones" to apply these modifications to all or the selected tours.

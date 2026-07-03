@@ -282,7 +282,7 @@ public class PrefPageAppearance extends PreferencePage implements IWorkbenchPref
          }
          {
             /*
-             * Tag image size
+             * Content image size
              */
 
             // label
@@ -602,7 +602,7 @@ public class PrefPageAppearance extends PreferencePage implements IWorkbenchPref
       enableControls();
 
       // run async because it can take time to reload the tag images
-      _spinnerContentImageSize.getDisplay().asyncExec(() -> TagManager.updateTagContent());
+      _spinnerContentImageSize.getDisplay().asyncExec(() -> TagManager.updateContentLayout());
    }
 
    private void onSelectDisabledIcons() {

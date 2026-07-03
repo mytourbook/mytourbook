@@ -777,7 +777,7 @@ public class TagManager {
    /**
     * This is called when the tag content layout was modified
     */
-   public static void updateTagContent() {
+   public static void updateContentLayout() {
 
       // get old values
       final ContentLayout tagContentLayout = _tagContentLayout;

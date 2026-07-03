@@ -637,7 +637,7 @@ public class SlideoutTourEditor_Options extends ToolbarSlideout implements IColo
       enableControls();
 
       // run async because it can take time to reload the tag images
-      _shellContainer.getDisplay().asyncExec(() -> TagManager.updateTagContent());
+      _shellContainer.getDisplay().asyncExec(() -> TagManager.updateContentLayout());
    }
 
    @Override
@@ -713,7 +713,7 @@ public class SlideoutTourEditor_Options extends ToolbarSlideout implements IColo
       _tourEditorView.updateUI_DescriptionNumLines(descriptionNumberOfLines, weatherDescriptionNumberOfLines);
       _tourEditorView.updateUI_LatLonDigits(latLonDigits);
 
-      TagManager.updateTagContent();
+      TagManager.updateContentLayout();
 
       enableControls();
    }

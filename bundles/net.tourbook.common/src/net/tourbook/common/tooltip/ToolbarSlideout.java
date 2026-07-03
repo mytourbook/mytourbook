@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2026 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -107,6 +107,12 @@ public abstract class ToolbarSlideout extends AnimatedToolTipShell {
          // align left
 
          devX += itemWidth - tipWidth;
+
+      } else if (isAlignRight()) {
+
+         // align right
+
+         devX += 0;
       }
 
       int devY = _toolTipItemBounds.y + itemHeight + 0;
@@ -131,6 +137,18 @@ public abstract class ToolbarSlideout extends AnimatedToolTipShell {
     *         it has historically a higher priority.
     */
    protected boolean isAlignLeft() {
+
+      return false;
+   }
+
+   /**
+    * @return When <code>true</code> is returned, then the slideout is aligned to the right of the
+    *         action button.
+    *         <p>
+    *         {@link ToolbarSlideout#isCenterHorizontal()} must return <code>false</code> because
+    *         it has historically a higher priority.
+    */
+   protected boolean isAlignRight() {
 
       return false;
    }
