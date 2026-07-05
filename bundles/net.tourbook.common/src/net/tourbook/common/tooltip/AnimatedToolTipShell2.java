@@ -868,6 +868,11 @@ public abstract class AnimatedToolTipShell2 {
 
             final Shell oldShell = oldShellWrapper.__shell;
 
+            // fix dispose exception
+            if (oldShell.isDisposed()) {
+               continue;
+            }
+
             try {
 
                int newAlpha;

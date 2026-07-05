@@ -306,10 +306,6 @@ public class TourDataEditorView extends ViewPart implements
    //
    public static final String            STATE_CONTENT_LAYOUT                             = "STATE_CONTENT_LAYOUT";                           //$NON-NLS-1$
    public static final ContentLayout     STATE_CONTENT_LAYOUT_DEFAULT                     = ContentLayout.IMAGE_AND_DATA;
-   public static final String            STATE_CONTENT_IMAGE_SIZE                         = "STATE_CONTENT_IMAGE_SIZE";                       //$NON-NLS-1$
-   public static final int               STATE_CONTENT_IMAGE_SIZE_DEFAULT                 = 100;
-   public static final int               STATE_CONTENT_IMAGE_SIZE_MIN                     = 10;
-   public static final int               STATE_CONTENT_IMAGE_SIZE_MAX                     = 500;
    public static final String            STATE_CONTENT_TEXT_WIDTH                         = "STATE_CONTENT_TEXT_WIDTH";                       //$NON-NLS-1$
    public static final int               STATE_CONTENT_TEXT_WIDTH_DEFAULT                 = 200;
    public static final int               STATE_CONTENT_TEXT_WIDTH_MIN                     = 20;
@@ -318,6 +314,18 @@ public class TourDataEditorView extends ViewPart implements
    public static final int               STATE_CONTENT_NUM_COLUMNS_DEFAULT                = 2;
    public static final int               STATE_CONTENT_NUM_CONTENT_COLUMNS_MIN            = 1;
    public static final int               STATE_CONTENT_NUM_CONTENT_COLUMNS_MAX            = 100;
+   //
+   public static final String            STATE_CONTENT_IMAGE_SIZE                         = "STATE_CONTENT_IMAGE_SIZE";                       //$NON-NLS-1$
+   public static final int               STATE_CONTENT_IMAGE_SIZE_DEFAULT                 = 100;
+   public static final int               STATE_CONTENT_IMAGE_SIZE_MIN                     = 10;
+   public static final int               STATE_CONTENT_IMAGE_SIZE_MAX                     = 500;
+   public static final String            STATE_CONTENT_IMAGE_SIZE_INDEX                   = "STATE_CONTENT_IMAGE_SIZE_INDEX";                 //$NON-NLS-1$
+   public static final String            STATE_CONTENT_IMAGE_SIZE_SMALL                   = "STATE_UI_WIDTH_SMALL";                           //$NON-NLS-1$
+   public static final String            STATE_CONTENT_IMAGE_SIZE_MEDIUM                  = "STATE_UI_WIDTH_MEDIUM";                          //$NON-NLS-1$
+   public static final String            STATE_CONTENT_IMAGE_SIZE_LARGE                   = "STATE_UI_WIDTH_LARGE";                           //$NON-NLS-1$
+   public static final int               STATE_CONTENT_IMAGE_SIZE_SMALL_DEFAULT           = 100;
+   public static final int               STATE_CONTENT_IMAGE_SIZE_MEDIUM_DEFAULT          = 300;
+   public static final int               STATE_CONTENT_IMAGE_SIZE_LARGE_DEFAULT           = 500;
    //
    public static final String            STATE_EQUIPMENT_IS_USE_VIEWER_DEFAULT_HEIGHT     = "STATE_EQUIPMENT_IS_USE_VIEWER_DEFAULT_HEIGHT";   //$NON-NLS-1$
    public static final String            STATE_EQUIPMENT_VIEWER_IMAGE_HEIGHT              = "STATE_EQUIPMENT_VIEWER_IMAGE_HEIGHT";            //$NON-NLS-1$

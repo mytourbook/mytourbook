@@ -150,6 +150,7 @@ public class DialogEquipment extends TitleAreaDialog {
 
    private Button                    _btnDateRetiredNow;
    private Button                    _btnDeleteImage;
+   private Button                    _btnSelectImage;
    private Button                    _chkCollate;
    private Button                    _chkRetired;
    private Button                    _chkSyncDates;
@@ -166,6 +167,7 @@ public class DialogEquipment extends TitleAreaDialog {
    private DateTime                  _dateRetired;
 
    private Label                     _lblCollate;
+   private Label                     _lblCollateID;
    private Label                     _lblImage;
 
    private Label                     _canvasEquipmentImage;
@@ -287,7 +289,7 @@ public class DialogEquipment extends TitleAreaDialog {
 
       _parent = parent;
 
-      setupListener(parent);
+      setupImageListener(parent);
 
       initUI();
 
@@ -334,20 +336,20 @@ public class DialogEquipment extends TitleAreaDialog {
       GridLayoutFactory.swtDefaults().numColumns(3).applyTo(_container);
 //      _container.setBackground(UI.SYS_COLOR_GREEN);
 
-      createUI_100_Col1(_container);
+      createUI_100_Top(_container);
+
+      createUI_200_Col1(_container);
       UI.createSpacer_Horizontal(_container, 20, 1);
-      createUI_200_Col2(_container);
+      createUI_300_Col2(_container);
 
       createUI_900_Bottom(_container);
-
    }
 
-   private void createUI_100_Col1(final Composite parent) {
+   private void createUI_100_Top(final Composite parent) {
 
       final Composite container = new Composite(parent, SWT.NONE);
-      GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
-      GridLayoutFactory.fillDefaults().numColumns(3).applyTo(container);
-//      container.setBackground(UI.SYS_COLOR_CYAN);
+      GridDataFactory.fillDefaults().grab(true, false).span(3, 1).applyTo(container);
+      GridLayoutFactory.fillDefaults().numColumns(2).applyTo(container);
       {
          {
             /*
@@ -365,7 +367,6 @@ public class DialogEquipment extends TitleAreaDialog {
 
             GridDataFactory.fillDefaults()
                   .grab(true, false)
-                  .span(2, 1)
                   // this will force that both columns have the same default width
                   .hint(_defaultEquipmentWidth, SWT.DEFAULT)
                   .applyTo(_comboBrand);
@@ -387,7 +388,6 @@ public class DialogEquipment extends TitleAreaDialog {
 
             GridDataFactory.fillDefaults()
                   .grab(true, false)
-                  .span(2, 1)
                   // this will force that both columns have the same default width
                   .hint(_defaultEquipmentWidth, SWT.DEFAULT)
                   .applyTo(_comboModel);
@@ -409,7 +409,6 @@ public class DialogEquipment extends TitleAreaDialog {
             _chkCollate.addSelectionListener(_defaultSelectionListener);
 
             GridDataFactory.fillDefaults()
-                  .span(2, 1)
                   // align to the beginning, otherwise the decoration is partly hidden !!!
                   .align(SWT.BEGINNING, SWT.FILL)
                   .applyTo(_chkCollate);
@@ -422,11 +421,21 @@ public class DialogEquipment extends TitleAreaDialog {
             _comboDecorator_Collate.setImage(_decorationImage);
             _comboDecorator_Collate.setMarginWidth(_decoratorDistance);
          }
+      }
+   }
+
+   private void createUI_200_Col1(final Composite parent) {
+
+      final Composite container = new Composite(parent, SWT.NONE);
+      GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
+      GridLayoutFactory.fillDefaults().numColumns(3).applyTo(container);
+//      container.setBackground(UI.SYS_COLOR_CYAN);
+      {
          {
             /*
              * Collate ID
              */
-            UI.createLabel(container, Messages.Dialog_Equipment_Label_CollateID);
+            _lblCollateID = UI.createLabel(container, Messages.Dialog_Equipment_Label_CollateID);
 
             // autocomplete combo
             _comboCollateID = new Combo(container, SWT.BORDER | SWT.FLAT);
@@ -440,7 +449,7 @@ public class DialogEquipment extends TitleAreaDialog {
             /*
              * Add a decoration for this important field
              */
-            _comboDecorator_CollateID = new ControlDecoration(_comboCollateID, SWT.CENTER | SWT.LEFT);
+            _comboDecorator_CollateID = new ControlDecoration(_lblCollateID, SWT.CENTER | SWT.RIGHT);
             _comboDecorator_CollateID.setDescriptionText(_tooltip2);
             _comboDecorator_CollateID.setImage(_decorationImage);
             _comboDecorator_CollateID.setMarginWidth(_decoratorDistance);
@@ -449,7 +458,8 @@ public class DialogEquipment extends TitleAreaDialog {
             /*
              * Date used
              */
-            UI.createLabel(container, Messages.Dialog_Equipment_Label_Date);
+            final Label label = UI.createLabel(container, Messages.Dialog_Equipment_Label_Date);
+            label.setToolTipText(Messages.Dialog_Equipment_Label_Date_Tooltip);
 
             _dateUsed = new DateTime(container, SWT.DATE | SWT.MEDIUM | SWT.DROP_DOWN);
             _dateUsed.addSelectionListener(_defaultSelectionListener);
@@ -457,7 +467,7 @@ public class DialogEquipment extends TitleAreaDialog {
             /*
              * Add a decoration for this important field
              */
-            _comboDecorator_DateFrom = new ControlDecoration(_dateUsed, SWT.CENTER | SWT.LEFT);
+            _comboDecorator_DateFrom = new ControlDecoration(label, SWT.CENTER | SWT.RIGHT);
             _comboDecorator_DateFrom.setDescriptionText(_tooltip2);
             _comboDecorator_DateFrom.setImage(_decorationImage);
             _comboDecorator_DateFrom.setMarginWidth(_decoratorDistance);
@@ -513,7 +523,7 @@ public class DialogEquipment extends TitleAreaDialog {
       }
    }
 
-   private void createUI_200_Col2(final Composite parent) {
+   private void createUI_300_Col2(final Composite parent) {
 
       final Composite container = new Composite(parent, SWT.NONE);
       GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
@@ -698,9 +708,9 @@ public class DialogEquipment extends TitleAreaDialog {
                         .applyTo(_txtImageFilePath);
                }
                {
-                  final Button btnSelectImage = new Button(imagePathContainer, SWT.PUSH);
-                  btnSelectImage.setText(Messages.app_btn_browse);
-                  btnSelectImage.addSelectionListener(SelectionListener.widgetSelectedAdapter(selectionEvent -> onImage_Select()));
+                  _btnSelectImage = new Button(imagePathContainer, SWT.PUSH);
+                  _btnSelectImage.setText(Messages.app_btn_browse);
+                  _btnSelectImage.addSelectionListener(SelectionListener.widgetSelectedAdapter(selectionEvent -> onImage_Select()));
                }
                {
                   _btnDeleteImage = new Button(imagePathContainer, SWT.PUSH);
@@ -770,9 +780,12 @@ public class DialogEquipment extends TitleAreaDialog {
       _actionSlideout_SetImageSize  .setEnabled(hasImage);
       _btnDateRetiredNow            .setEnabled(isRetired);
       _btnDeleteImage               .setEnabled(hasImage);
-      _chkCollate                   .setEnabled(canCollate);
       _dateBuilt                    .setEnabled(canEditBuiltDate);
       _dateRetired                  .setEnabled(isRetired);
+
+      _chkCollate                   .setEnabled(canCollate);
+      _comboCollateID               .setEnabled(canCollate && isCollate);
+      _lblCollateID                 .setEnabled(canCollate && isCollate);
 
 // SET_FORMATTING_ON
 
@@ -1090,7 +1103,12 @@ public class DialogEquipment extends TitleAreaDialog {
       _txtImageFilePath.setText(UI.EMPTY_STRING);
       _canvasEquipmentImage.setImage(_imageCamera);
 
+      // update UI
+      updateUI_EquipmentImage(null, getErrorMessage());
+
       enableControls();
+
+      _btnSelectImage.setFocus();
    }
 
    private void onImage_Select() {
@@ -1272,7 +1290,7 @@ public class DialogEquipment extends TitleAreaDialog {
 // SET_FORMATTING_ON
    }
 
-   private void setupListener(final Composite parent) {
+   private void setupImageListener(final Composite parent) {
 
       _tourEventListener = (workbenchPart, tourEventId, eventData) -> {
 

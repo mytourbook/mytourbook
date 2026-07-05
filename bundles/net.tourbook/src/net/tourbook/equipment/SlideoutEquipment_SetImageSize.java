@@ -15,9 +15,8 @@
  *******************************************************************************/
 package net.tourbook.equipment;
 
-import static org.eclipse.swt.events.SelectionListener.widgetSelectedAdapter;
-
 import net.tourbook.Messages;
+import net.tourbook.OtherMessages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.UI;
 import net.tourbook.common.tooltip.ToolbarSlideout;
@@ -30,6 +29,10 @@ import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.layout.PixelConverter;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.FocusEvent;
+import org.eclipse.swt.events.FocusListener;
+import org.eclipse.swt.events.SelectionListener;
+import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
@@ -43,6 +46,7 @@ public class SlideoutEquipment_SetImageSize extends ToolbarSlideout {
 
    private static final IDialogSettings _state = TourbookPlugin.getState(TourDataEditorView.ID);
 
+   private FocusListener                _keepOpenListener;
    private PixelConverter               _pc;
 
    /*
@@ -50,7 +54,8 @@ public class SlideoutEquipment_SetImageSize extends ToolbarSlideout {
     */
    private Composite _shellContainer;
 
-   private Spinner   _spinnerContentImageSize;
+   private Combo     _comboImageSize;
+   private Spinner   _spinnerImageSize;
 
    public SlideoutEquipment_SetImageSize(final Control ownerControl,
                                          final ToolBar toolBar) {
@@ -65,6 +70,8 @@ public class SlideoutEquipment_SetImageSize extends ToolbarSlideout {
 
       final Composite ui = createUI(parent);
 
+      fillUI();
+
       restoreState();
 
       return ui;
@@ -77,7 +84,7 @@ public class SlideoutEquipment_SetImageSize extends ToolbarSlideout {
       {
          final Composite container = new Composite(_shellContainer, SWT.NONE);
          GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
-         GridLayoutFactory.fillDefaults().numColumns(2).applyTo(container);
+         GridLayoutFactory.fillDefaults().numColumns(3).applyTo(container);
 //			container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_RED));
          {
             /*
@@ -91,27 +98,70 @@ public class SlideoutEquipment_SetImageSize extends ToolbarSlideout {
             GridDataFactory.fillDefaults().align(SWT.FILL, SWT.CENTER).applyTo(label);
 
             // spinner
-            _spinnerContentImageSize = new Spinner(container, SWT.BORDER);
-            _spinnerContentImageSize.setMinimum(TourDataEditorView.STATE_CONTENT_IMAGE_SIZE_MIN);
-            _spinnerContentImageSize.setMaximum(TourDataEditorView.STATE_CONTENT_IMAGE_SIZE_MAX);
-            _spinnerContentImageSize.addSelectionListener(widgetSelectedAdapter(selectionEvent -> onSelect_ContentImageLayout()));
-            _spinnerContentImageSize.addMouseWheelListener(mouseEvent -> {
+            _spinnerImageSize = new Spinner(container, SWT.BORDER);
+            _spinnerImageSize.setMinimum(TourDataEditorView.STATE_CONTENT_IMAGE_SIZE_MIN);
+            _spinnerImageSize.setMaximum(TourDataEditorView.STATE_CONTENT_IMAGE_SIZE_MAX);
+            _spinnerImageSize.addSelectionListener(SelectionListener.widgetSelectedAdapter(selectionEvent -> onSelect_ImageSize_Spinner()));
+            _spinnerImageSize.addMouseWheelListener(mouseEvent -> {
                UI.adjustSpinnerValueOnMouseScroll(mouseEvent, 10);
-               onSelect_ContentImageLayout();
+               onSelect_ImageSize_Spinner();
             });
             GridDataFactory.fillDefaults()
                   .hint(_pc.convertWidthInCharsToPixels(5), SWT.DEFAULT)
                   .align(SWT.BEGINNING, SWT.FILL)
-                  .applyTo(_spinnerContentImageSize);
+                  .applyTo(_spinnerImageSize);
+
+            // combo
+            _comboImageSize = new Combo(container, SWT.READ_ONLY | SWT.BORDER);
+            _comboImageSize.setVisibleItemCount(10);
+            _comboImageSize.setToolTipText("Image size\n\n• Small\n• Medium\n• Large");
+            _comboImageSize.addSelectionListener(SelectionListener.widgetSelectedAdapter(selectionEvent -> onSelect_ImageSize_Combo()));
+            _comboImageSize.addFocusListener(_keepOpenListener);
+
+            GridDataFactory.fillDefaults().align(SWT.FILL, SWT.CENTER).applyTo(_comboImageSize);
          }
       }
 
       return _shellContainer;
    }
 
+   private void fillUI() {
+
+      if (_comboImageSize != null && _comboImageSize.isDisposed() == false) {
+
+         _comboImageSize.add(OtherMessages.APP_SIZE_SMALL_SHORTCUT);
+         _comboImageSize.add(OtherMessages.APP_SIZE_MEDIUM_SHORTCUT);
+         _comboImageSize.add(OtherMessages.APP_SIZE_LARGE_SHORTCUT);
+      }
+   }
+
+   private int getSelectedImageSizeIndex() {
+
+      final int selectionIndex = _comboImageSize.getSelectionIndex();
+
+      return selectionIndex < 0
+            ? 0
+            : selectionIndex;
+   }
+
    private void initUI(final Composite parent) {
 
       _pc = new PixelConverter(parent);
+
+      _keepOpenListener = new FocusListener() {
+
+         @Override
+         public void focusGained(final FocusEvent e) {
+
+            setIsAnotherDialogOpened(true);
+         }
+
+         @Override
+         public void focusLost(final FocusEvent e) {
+
+            setIsAnotherDialogOpened(false);
+         }
+      };
    }
 
    @Override
@@ -120,12 +170,49 @@ public class SlideoutEquipment_SetImageSize extends ToolbarSlideout {
       return true;
    }
 
-   private void onSelect_ContentImageLayout() {
+   private void onSelect_ImageSize_Combo() {
 
-      _state.put(TourDataEditorView.STATE_CONTENT_IMAGE_SIZE, _spinnerContentImageSize.getSelection());
+      final int selectedImageSizeIndex = getSelectedImageSizeIndex();
 
-      // run async because it can take time to reload the tag images
-      _spinnerContentImageSize.getDisplay().asyncExec(() -> TagManager.updateContentLayout());
+      // save selected size
+      _state.put(TourDataEditorView.STATE_CONTENT_IMAGE_SIZE_INDEX, selectedImageSizeIndex);
+
+      int imageSize;
+
+      // set size from state
+      switch (selectedImageSizeIndex) {
+      case 1  -> imageSize = Util.getStateInt(_state,
+            TourDataEditorView.STATE_CONTENT_IMAGE_SIZE_MEDIUM,
+            TourDataEditorView.STATE_CONTENT_IMAGE_SIZE_MEDIUM_DEFAULT);
+
+      case 2  -> imageSize = Util.getStateInt(_state,
+            TourDataEditorView.STATE_CONTENT_IMAGE_SIZE_LARGE,
+            TourDataEditorView.STATE_CONTENT_IMAGE_SIZE_LARGE_DEFAULT);
+
+      default -> imageSize = Util.getStateInt(_state,
+            TourDataEditorView.STATE_CONTENT_IMAGE_SIZE_SMALL,
+            TourDataEditorView.STATE_CONTENT_IMAGE_SIZE_SMALL_DEFAULT);
+      }
+
+      // update UI
+      _spinnerImageSize.setSelection(imageSize);
+
+      saveState();
+   }
+
+   private void onSelect_ImageSize_Spinner() {
+
+      // get width
+      final int imageSize = _spinnerImageSize.getSelection();
+
+      // save state for the selected size
+      switch (getSelectedImageSizeIndex()) {
+      case 1  -> _state.put(TourDataEditorView.STATE_CONTENT_IMAGE_SIZE_MEDIUM, imageSize);
+      case 2  -> _state.put(TourDataEditorView.STATE_CONTENT_IMAGE_SIZE_LARGE, imageSize);
+      default -> _state.put(TourDataEditorView.STATE_CONTENT_IMAGE_SIZE_SMALL, imageSize);
+      }
+
+      saveState();
    }
 
    private void restoreState() {
@@ -133,11 +220,23 @@ public class SlideoutEquipment_SetImageSize extends ToolbarSlideout {
       /*
        * Content image
        */
-      _spinnerContentImageSize.setSelection(Util.getStateInt(_state,
+      _spinnerImageSize.setSelection(Util.getStateInt(_state,
             TourDataEditorView.STATE_CONTENT_IMAGE_SIZE,
             TourDataEditorView.STATE_CONTENT_IMAGE_SIZE_DEFAULT,
             TourDataEditorView.STATE_CONTENT_IMAGE_SIZE_MIN,
             TourDataEditorView.STATE_CONTENT_IMAGE_SIZE_MAX));
+
+      final int imageSizeIndex = Util.getStateInt(_state, TourDataEditorView.STATE_CONTENT_IMAGE_SIZE_INDEX, 0);
+
+      _comboImageSize.select(imageSizeIndex);
+   }
+
+   private void saveState() {
+
+      _state.put(TourDataEditorView.STATE_CONTENT_IMAGE_SIZE, _spinnerImageSize.getSelection());
+
+      // run async because it can take time to reload the tag images
+      _shellContainer.getDisplay().asyncExec(() -> TagManager.updateContentLayout());
    }
 
 }

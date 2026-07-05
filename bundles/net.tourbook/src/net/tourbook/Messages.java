@@ -600,6 +600,7 @@ public class Messages extends NLS {
    public static String        Dialog_Equipment_Label_Collate;
    public static String        Dialog_Equipment_Label_CollateID;
    public static String        Dialog_Equipment_Label_Date;
+   public static String        Dialog_Equipment_Label_Date_Tooltip;
    public static String        Dialog_Equipment_Label_DateBuilt;
    public static String        Dialog_Equipment_Label_DateRetired;
    public static String        Dialog_Equipment_Label_Description;

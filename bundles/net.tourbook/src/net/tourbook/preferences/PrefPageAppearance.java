@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2008, 2025 Wolfgang Schramm and Contributors
+ * Copyright (C) 2008, 2026 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -14,8 +14,6 @@
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
 package net.tourbook.preferences;
-
-import static org.eclipse.swt.events.SelectionListener.widgetSelectedAdapter;
 
 import de.byteholder.geoclipse.preferences.IMappingPreferences;
 
@@ -118,6 +116,8 @@ public class PrefPageAppearance extends PreferencePage implements IWorkbenchPref
    private Button  _chkShowInApp_ThemeSelector;
    private Button  _chkTaggingAnimation;
 
+   private Combo   _comboContentImageSize;
+
    private Label   _lblAutoOpenMS;
    private Label   _lblAutoTagDelay;
 
@@ -161,6 +161,8 @@ public class PrefPageAppearance extends PreferencePage implements IWorkbenchPref
       initUI(parent);
 
       final Composite container = createUI(parent);
+
+      fillUI();
 
       restoreState();
       enableControls();
@@ -291,19 +293,37 @@ public class PrefPageAppearance extends PreferencePage implements IWorkbenchPref
             label.setToolTipText(Messages.Pref_Appearance_Label_ImageSize_Tooltip);
             GridDataFactory.fillDefaults().align(SWT.FILL, SWT.CENTER).applyTo(label);
 
-            // spinner
-            _spinnerContentImageSize = new Spinner(group, SWT.BORDER);
-            _spinnerContentImageSize.setMinimum(TourDataEditorView.STATE_CONTENT_IMAGE_SIZE_MIN);
-            _spinnerContentImageSize.setMaximum(TourDataEditorView.STATE_CONTENT_IMAGE_SIZE_MAX);
-            _spinnerContentImageSize.addSelectionListener(widgetSelectedAdapter(selectionEvent -> onSelect_ContentImageLayout()));
-            _spinnerContentImageSize.addMouseWheelListener(mouseEvent -> {
-               UI.adjustSpinnerValueOnMouseScroll(mouseEvent, 10);
-               onSelect_ContentImageLayout();
-            });
-            GridDataFactory.fillDefaults()
-                  .hint(_pc.convertWidthInCharsToPixels(5), SWT.DEFAULT)
-                  .align(SWT.BEGINNING, SWT.FILL)
-                  .applyTo(_spinnerContentImageSize);
+            final Composite sizeContainer = new Composite(group, SWT.NONE);
+            GridDataFactory.fillDefaults().grab(true, false).applyTo(sizeContainer);
+            GridLayoutFactory.fillDefaults().numColumns(2).applyTo(sizeContainer);
+            {
+               // spinner
+               _spinnerContentImageSize = new Spinner(sizeContainer, SWT.BORDER);
+               _spinnerContentImageSize.setMinimum(TourDataEditorView.STATE_CONTENT_IMAGE_SIZE_MIN);
+               _spinnerContentImageSize.setMaximum(TourDataEditorView.STATE_CONTENT_IMAGE_SIZE_MAX);
+
+               _spinnerContentImageSize.addSelectionListener(SelectionListener.widgetSelectedAdapter(
+                     selectionEvent -> onSelect_ImageSize_Spinner()));
+
+               _spinnerContentImageSize.addMouseWheelListener(mouseEvent -> {
+                  UI.adjustSpinnerValueOnMouseScroll(mouseEvent, 10);
+                  onSelect_ImageSize_Spinner();
+               });
+
+               GridDataFactory.fillDefaults()
+                     .hint(_pc.convertWidthInCharsToPixels(5), SWT.DEFAULT)
+                     .align(SWT.BEGINNING, SWT.FILL)
+                     .applyTo(_spinnerContentImageSize);
+
+               // combo
+               _comboContentImageSize = new Combo(sizeContainer, SWT.READ_ONLY | SWT.BORDER);
+               _comboContentImageSize.setVisibleItemCount(10);
+               _comboContentImageSize.setToolTipText("Image size\n\n• Small\n• Medium\n• Large");
+               _comboContentImageSize.addSelectionListener(SelectionListener.widgetSelectedAdapter(
+                     selectionEvent -> onSelect_ImageSize_Combo()));
+
+               GridDataFactory.fillDefaults().align(SWT.FILL, SWT.CENTER).applyTo(_comboContentImageSize);
+            }
          }
       }
    }
@@ -499,6 +519,16 @@ public class PrefPageAppearance extends PreferencePage implements IWorkbenchPref
       _spinnerAutoOpenDelay.setEnabled(isEnabled && isTagAutoOpen);
    }
 
+   private void fillUI() {
+
+      if (_comboContentImageSize != null && _comboContentImageSize.isDisposed() == false) {
+
+         _comboContentImageSize.add(OtherMessages.APP_SIZE_SMALL_SHORTCUT);
+         _comboContentImageSize.add(OtherMessages.APP_SIZE_MEDIUM_SHORTCUT);
+         _comboContentImageSize.add(OtherMessages.APP_SIZE_LARGE_SHORTCUT);
+      }
+   }
+
    private DisabledIcons getPrefDisabledIcons(final boolean isDefault) {
 
       final String prefDisabledIcons = isDefault
@@ -523,6 +553,15 @@ public class PrefPageAppearance extends PreferencePage implements IWorkbenchPref
    private DisabledIcons getSelectedDisabledIcon() {
 
       return (DisabledIcons) (_comboViewer_DisabledIcons.getStructuredSelection().getFirstElement());
+   }
+
+   private int getSelectedImageSizeIndex() {
+
+      final int selectionIndex = _comboContentImageSize.getSelectionIndex();
+
+      return selectionIndex < 0
+            ? 0
+            : selectionIndex;
    }
 
    /**
@@ -595,14 +634,49 @@ public class PrefPageAppearance extends PreferencePage implements IWorkbenchPref
             Messages.Pref_Appearance_Dialog_ResetAllToggleDialogs_Message);
    }
 
-   private void onSelect_ContentImageLayout() {
+   private void onSelect_ImageSize_Combo() {
 
-      _state.put(TourDataEditorView.STATE_CONTENT_IMAGE_SIZE, _spinnerContentImageSize.getSelection());
+      final int selectedImageSizeIndex = getSelectedImageSizeIndex();
 
-      enableControls();
+      // save selected size
+      _state.put(TourDataEditorView.STATE_CONTENT_IMAGE_SIZE_INDEX, selectedImageSizeIndex);
 
-      // run async because it can take time to reload the tag images
-      _spinnerContentImageSize.getDisplay().asyncExec(() -> TagManager.updateContentLayout());
+      int imageSize;
+
+      // set size from state
+      switch (selectedImageSizeIndex) {
+      case 1  -> imageSize = Util.getStateInt(_state,
+            TourDataEditorView.STATE_CONTENT_IMAGE_SIZE_MEDIUM,
+            TourDataEditorView.STATE_CONTENT_IMAGE_SIZE_MEDIUM_DEFAULT);
+
+      case 2  -> imageSize = Util.getStateInt(_state,
+            TourDataEditorView.STATE_CONTENT_IMAGE_SIZE_LARGE,
+            TourDataEditorView.STATE_CONTENT_IMAGE_SIZE_LARGE_DEFAULT);
+
+      default -> imageSize = Util.getStateInt(_state,
+            TourDataEditorView.STATE_CONTENT_IMAGE_SIZE_SMALL,
+            TourDataEditorView.STATE_CONTENT_IMAGE_SIZE_SMALL_DEFAULT);
+      }
+
+      // update UI
+      _spinnerContentImageSize.setSelection(imageSize);
+
+      saveState_Image();
+   }
+
+   private void onSelect_ImageSize_Spinner() {
+
+      // get width
+      final int imageSize = _spinnerContentImageSize.getSelection();
+
+      // save state for the selected size
+      switch (getSelectedImageSizeIndex()) {
+      case 1  -> _state.put(TourDataEditorView.STATE_CONTENT_IMAGE_SIZE_MEDIUM, imageSize);
+      case 2  -> _state.put(TourDataEditorView.STATE_CONTENT_IMAGE_SIZE_LARGE, imageSize);
+      default -> _state.put(TourDataEditorView.STATE_CONTENT_IMAGE_SIZE_SMALL, imageSize);
+      }
+
+      saveState_Image();
    }
 
    private void onSelectDisabledIcons() {
@@ -880,6 +954,10 @@ public class PrefPageAppearance extends PreferencePage implements IWorkbenchPref
             TourDataEditorView.STATE_CONTENT_IMAGE_SIZE_MIN,
             TourDataEditorView.STATE_CONTENT_IMAGE_SIZE_MAX));
 
+      _comboContentImageSize.select(Util.getStateInt(_state,
+            TourDataEditorView.STATE_CONTENT_IMAGE_SIZE_INDEX,
+            0));
+
 // SET_FORMATTING_OFF
 
       final boolean isShowExtendedVersion = _prefStore_Common.getBoolean(ICommonPreferences.APPEARANCE_IS_SHOW_EXTENDED_VERSION_IN_APP_TITLE);
@@ -926,5 +1004,13 @@ public class PrefPageAppearance extends PreferencePage implements IWorkbenchPref
       _prefStore_Common.setValue(ICommonPreferences.THEME_IS_SHOW_THEME_SELECTOR_IN_APP,              _chkShowInApp_ThemeSelector            .getSelection());
 
 // SET_FORMATTING_ON
+   }
+
+   private void saveState_Image() {
+
+      _state.put(TourDataEditorView.STATE_CONTENT_IMAGE_SIZE, _spinnerContentImageSize.getSelection());
+
+      // run async because it can take time to reload the tag/equipment images
+      _spinnerContentImageSize.getDisplay().asyncExec(() -> TagManager.updateContentLayout());
    }
 }
