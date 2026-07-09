@@ -90,35 +90,38 @@ public class SlideoutEquipment_SetImageSize extends ToolbarSlideout {
             /*
              * Content image size
              */
+            {
+               // label
+               final Label label = new Label(container, SWT.NONE);
+               label.setText(Messages.Pref_Appearance_Label_ImageSize);
+               label.setToolTipText(Messages.Pref_Appearance_Label_ImageSize_Tooltip);
+               GridDataFactory.fillDefaults().align(SWT.FILL, SWT.CENTER).applyTo(label);
+            }
+            {
+               // spinner
+               _spinnerImageSize = new Spinner(container, SWT.BORDER);
+               _spinnerImageSize.setMinimum(TourDataEditorView.STATE_CONTENT_IMAGE_SIZE_MIN);
+               _spinnerImageSize.setMaximum(TourDataEditorView.STATE_CONTENT_IMAGE_SIZE_MAX);
+               _spinnerImageSize.addSelectionListener(SelectionListener.widgetSelectedAdapter(selectionEvent -> onSelect_ImageSize_Spinner()));
+               _spinnerImageSize.addMouseWheelListener(mouseEvent -> {
+                  UI.adjustSpinnerValueOnMouseScroll(mouseEvent, 10);
+                  onSelect_ImageSize_Spinner();
+               });
+               GridDataFactory.fillDefaults()
+                     .hint(_pc.convertWidthInCharsToPixels(5), SWT.DEFAULT)
+                     .align(SWT.BEGINNING, SWT.FILL)
+                     .applyTo(_spinnerImageSize);
+            }
+            {
+               // combo
+               _comboImageSize = new Combo(container, SWT.READ_ONLY | SWT.BORDER);
+               _comboImageSize.setVisibleItemCount(10);
+               _comboImageSize.setToolTipText("Image size\n\n• Small\n• Medium\n• Large");
+               _comboImageSize.addSelectionListener(SelectionListener.widgetSelectedAdapter(selectionEvent -> onSelect_ImageSize_Combo()));
+               _comboImageSize.addFocusListener(_keepOpenListener);
 
-            // label
-            final Label label = new Label(container, SWT.NONE);
-            label.setText(Messages.Pref_Appearance_Label_ImageSize);
-            label.setToolTipText(Messages.Pref_Appearance_Label_ImageSize_Tooltip);
-            GridDataFactory.fillDefaults().align(SWT.FILL, SWT.CENTER).applyTo(label);
-
-            // spinner
-            _spinnerImageSize = new Spinner(container, SWT.BORDER);
-            _spinnerImageSize.setMinimum(TourDataEditorView.STATE_CONTENT_IMAGE_SIZE_MIN);
-            _spinnerImageSize.setMaximum(TourDataEditorView.STATE_CONTENT_IMAGE_SIZE_MAX);
-            _spinnerImageSize.addSelectionListener(SelectionListener.widgetSelectedAdapter(selectionEvent -> onSelect_ImageSize_Spinner()));
-            _spinnerImageSize.addMouseWheelListener(mouseEvent -> {
-               UI.adjustSpinnerValueOnMouseScroll(mouseEvent, 10);
-               onSelect_ImageSize_Spinner();
-            });
-            GridDataFactory.fillDefaults()
-                  .hint(_pc.convertWidthInCharsToPixels(5), SWT.DEFAULT)
-                  .align(SWT.BEGINNING, SWT.FILL)
-                  .applyTo(_spinnerImageSize);
-
-            // combo
-            _comboImageSize = new Combo(container, SWT.READ_ONLY | SWT.BORDER);
-            _comboImageSize.setVisibleItemCount(10);
-            _comboImageSize.setToolTipText("Image size\n\n• Small\n• Medium\n• Large");
-            _comboImageSize.addSelectionListener(SelectionListener.widgetSelectedAdapter(selectionEvent -> onSelect_ImageSize_Combo()));
-            _comboImageSize.addFocusListener(_keepOpenListener);
-
-            GridDataFactory.fillDefaults().align(SWT.FILL, SWT.CENTER).applyTo(_comboImageSize);
+               GridDataFactory.fillDefaults().align(SWT.FILL, SWT.CENTER).applyTo(_comboImageSize);
+            }
          }
       }
 
@@ -226,9 +229,7 @@ public class SlideoutEquipment_SetImageSize extends ToolbarSlideout {
             TourDataEditorView.STATE_CONTENT_IMAGE_SIZE_MIN,
             TourDataEditorView.STATE_CONTENT_IMAGE_SIZE_MAX));
 
-      final int imageSizeIndex = Util.getStateInt(_state, TourDataEditorView.STATE_CONTENT_IMAGE_SIZE_INDEX, 0);
-
-      _comboImageSize.select(imageSizeIndex);
+      _comboImageSize.select(Util.getStateInt(_state, TourDataEditorView.STATE_CONTENT_IMAGE_SIZE_INDEX, 0));
    }
 
    private void saveState() {

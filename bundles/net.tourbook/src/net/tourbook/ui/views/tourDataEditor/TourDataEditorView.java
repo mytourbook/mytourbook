@@ -198,6 +198,7 @@ import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
+import org.eclipse.swt.internal.DPIUtil;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
@@ -318,7 +319,7 @@ public class TourDataEditorView extends ViewPart implements
    public static final String            STATE_CONTENT_IMAGE_SIZE                         = "STATE_CONTENT_IMAGE_SIZE";                       //$NON-NLS-1$
    public static final int               STATE_CONTENT_IMAGE_SIZE_DEFAULT                 = 100;
    public static final int               STATE_CONTENT_IMAGE_SIZE_MIN                     = 10;
-   public static final int               STATE_CONTENT_IMAGE_SIZE_MAX                     = 500;
+   public static final int               STATE_CONTENT_IMAGE_SIZE_MAX                     = 2000;
    public static final String            STATE_CONTENT_IMAGE_SIZE_INDEX                   = "STATE_CONTENT_IMAGE_SIZE_INDEX";                 //$NON-NLS-1$
    public static final String            STATE_CONTENT_IMAGE_SIZE_SMALL                   = "STATE_UI_WIDTH_SMALL";                           //$NON-NLS-1$
    public static final String            STATE_CONTENT_IMAGE_SIZE_MEDIUM                  = "STATE_UI_WIDTH_MEDIUM";                          //$NON-NLS-1$
@@ -476,9 +477,10 @@ public class TourDataEditorView extends ViewPart implements
    private MouseWheelListener               _mouseWheelListener;
    private Listener                         _mouseWheelListener_ScrollField;
    private MouseWheelListener               _mouseWheelListener_Temperature;
+   private Listener                         _parentZoomChangedListener;
+   private SelectionListener                _columnSortListener;
    private SelectionListener                _selectionListener;
    private SelectionListener                _selectionListener_Temperature;
-   private SelectionListener                _columnSortListener;
    private SelectionListener                _tourTimeListener;
    private ModifyListener                   _verifyFloatValue;
    private ModifyListener                   _verifyIntValue;
@@ -3742,7 +3744,7 @@ public class TourDataEditorView extends ViewPart implements
 
       final Composite sectionContainer = (Composite) _sectionTitle.getClient();
       GridLayoutFactory.fillDefaults().numColumns(2).applyTo(sectionContainer);
-//      container.setBackground(UI.SYS_COLOR_MAGENTA);
+//    sectionContainer.setBackground(UI.SYS_COLOR_MAGENTA);
       {
          {
             /*
@@ -5195,7 +5197,7 @@ public class TourDataEditorView extends ViewPart implements
       _sectionCharacteristics = createSection(parent, _tk, Messages.tour_editor_section_characteristics);
       final Composite container = (Composite) _sectionCharacteristics.getClient();
       GridLayoutFactory.fillDefaults().numColumns(4).applyTo(container);
-//    container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_GREEN));
+//      container.setBackground(UI.SYS_COLOR_GREEN);
       {
          {
             /*
@@ -5238,7 +5240,6 @@ public class TourDataEditorView extends ViewPart implements
                      .hint(2 * _hintTextColumnWidth, SWT.DEFAULT);
 
                _pageBook_Tags = new PageBook(container, SWT.NONE);
-//               _pageBook_Tags.setBackground(UI.SYS_COLOR_BLUE);
                gdForTagContent.grab(false, false).span(3, 1).applyTo(_pageBook_Tags);
                {
                   _lblTags = _tk.createLabel(_pageBook_Tags, UI.EMPTY_STRING, SWT.WRAP);
@@ -8149,7 +8150,11 @@ public class TourDataEditorView extends ViewPart implements
          }
       };
 
-      parent.addDisposeListener(e -> onDispose());
+      _parent.addDisposeListener(event -> onDispose());
+
+      // Listen for DPI and scaling changes
+      _parentZoomChangedListener = event -> onZoomChanged();
+      _parent.addListener(SWT.ZoomChanged, _parentZoomChangedListener);
    }
 
    private void invalidateSliceViewers() {
@@ -8341,6 +8346,8 @@ public class TourDataEditorView extends ViewPart implements
    }
 
    private void onDispose() {
+
+      _parent.removeListener(SWT.ZoomChanged, _parentZoomChangedListener);
 
       EquipmentManager.disposeEquipmentUIContent();
       TagManager.disposeTagUIContent();
@@ -8929,6 +8936,20 @@ public class TourDataEditorView extends ViewPart implements
       selectTimeSlice_InViewer(startPauseIndex, startPauseIndex);
    }
 
+   /**
+    * View was moved to another monitor
+    */
+   private void onZoomChanged() {
+
+      System.out.println(UI.timeStamp()
+
+            + " SWT.ZoomChanged"
+            + " - devZoom: " + DPIUtil.getDeviceZoom()
+            + " - nativeZoom: " + DPIUtil.getNativeDeviceZoom());
+
+      // TODO remove SYSTEM.OUT.PRINTLN
+   }
+
    @Override
    public void photoEvent(final IViewPart viewPart, final PhotoEventId photoEventId, final Object data) {
 
@@ -9466,7 +9487,16 @@ public class TourDataEditorView extends ViewPart implements
 
       _page_EditorForm.setFocus();
 
-      _parent.getDisplay().asyncExec(() -> updateUI_BackgroundColor());
+      _parent.getDisplay().asyncExec(() -> {
+
+         if (_tableComboWeather_AirQuality.getTable().isDisposed()) {
+
+            // this can happen when a detached editor is reattached
+            return;
+         }
+
+         updateUI_BackgroundColor();
+      });
    }
 
    /**
