@@ -144,7 +144,7 @@ public class DialogEquipment extends TitleAreaDialog {
    /*
     * UI controls
     */
-   private Composite                 _container;
+   private Composite                 _uiContainer;
    private Composite                 _imageContainer;
    private Composite                 _parent;
 
@@ -308,7 +308,7 @@ public class DialogEquipment extends TitleAreaDialog {
 
       UI.setEqualizeColumWidths(_firstColumnControls);
       // compute width for all controls and equalize column width for the first column
-      _container.layout(true, true);
+      _uiContainer.layout(true, true);
 
       /*
        * // ensure the UI is created
@@ -331,18 +331,20 @@ public class DialogEquipment extends TitleAreaDialog {
 
    private void createUI(final Composite parent) {
 
-      _container = new Composite(parent, SWT.NONE);
-      GridDataFactory.fillDefaults().grab(true, true).applyTo(_container);
-      GridLayoutFactory.swtDefaults().numColumns(3).applyTo(_container);
-//      _container.setBackground(UI.SYS_COLOR_GREEN);
+      _uiContainer = new Composite(parent, SWT.NONE);
+      GridDataFactory.fillDefaults().grab(true, true).applyTo(_uiContainer);
+      GridLayoutFactory.swtDefaults().numColumns(3).applyTo(_uiContainer);
+//      _uiContainer.setBackground(UI.SYS_COLOR_GREEN);
 
-      createUI_100_Top(_container);
+      createUI_100_Top(_uiContainer);
 
-      createUI_200_Col1(_container);
-      UI.createSpacer_Horizontal(_container, 20, 1);
-      createUI_300_Col2(_container);
+      UI.createSpacer_Vertical(_uiContainer, 8, 3);
 
-      createUI_900_Bottom(_container);
+      createUI_200_Col1(_uiContainer);
+      UI.createSpacer_Horizontal(_uiContainer, 20, 1);
+      createUI_300_Col2(_uiContainer);
+
+      createUI_900_Bottom(_uiContainer);
    }
 
    private void createUI_100_Top(final Composite parent) {
@@ -399,8 +401,8 @@ public class DialogEquipment extends TitleAreaDialog {
              * Is collate tours
              */
             _lblCollate = UI.createLabel(container, Messages.Dialog_Equipment_Label_Collate);
+            _lblCollate.setToolTipText(_tooltip1);
             _gdVertCenter.applyTo(_lblCollate);
-//            _firstColumnControls.add(_lblCollate);
 
             _chkCollate = new Button(container, SWT.CHECK);
             _chkCollate.setText(Messages.Dialog_Equipment_Checkbox_Collate);
@@ -421,6 +423,45 @@ public class DialogEquipment extends TitleAreaDialog {
             _comboDecorator_Collate.setImage(_decorationImage);
             _comboDecorator_Collate.setMarginWidth(_decoratorDistance);
          }
+         {
+            /*
+             * Collate ID
+             */
+
+            UI.createSpacer_Horizontal(container, 1);
+
+            final Composite idContainer = new Composite(container, SWT.NONE);
+            GridDataFactory.fillDefaults().grab(true, false).applyTo(idContainer);
+            GridLayoutFactory.fillDefaults().numColumns(2).applyTo(idContainer);
+            {
+               _lblCollateID = UI.createLabel(idContainer, Messages.Dialog_Equipment_Label_CollateID);
+               _lblCollateID.setToolTipText(_tooltip2);
+               GridDataFactory.fillDefaults()
+                     .align(SWT.FILL, SWT.CENTER)
+                     .indent(16, 0)
+                     .applyTo(_lblCollateID);
+
+               // autocomplete combo
+               _comboCollateID = new Combo(idContainer, SWT.BORDER | SWT.FLAT);
+               _comboCollateID.setText(UI.EMPTY_STRING);
+               _comboCollateID.addModifyListener(_defaultModifyListener);
+
+               GridDataFactory.fillDefaults()
+                     .grab(true, false)
+                     .indent(10, 0)
+                     .applyTo(_comboCollateID);
+
+               _autocomplete_CollateID = new AutoComplete_ComboInputMT(_comboCollateID);
+
+               /*
+                * Add a decoration for this important field
+                */
+               _comboDecorator_CollateID = new ControlDecoration(_lblCollateID, SWT.CENTER | SWT.RIGHT);
+               _comboDecorator_CollateID.setDescriptionText(_tooltip2);
+               _comboDecorator_CollateID.setImage(_decorationImage);
+               _comboDecorator_CollateID.setMarginWidth(_decoratorDistance);
+            }
+         }
       }
    }
 
@@ -431,29 +472,6 @@ public class DialogEquipment extends TitleAreaDialog {
       GridLayoutFactory.fillDefaults().numColumns(3).applyTo(container);
 //      container.setBackground(UI.SYS_COLOR_CYAN);
       {
-         {
-            /*
-             * Collate ID
-             */
-            _lblCollateID = UI.createLabel(container, Messages.Dialog_Equipment_Label_CollateID);
-
-            // autocomplete combo
-            _comboCollateID = new Combo(container, SWT.BORDER | SWT.FLAT);
-            _comboCollateID.setText(UI.EMPTY_STRING);
-            _comboCollateID.addModifyListener(_defaultModifyListener);
-
-            GridDataFactory.fillDefaults().grab(true, false).span(2, 1).applyTo(_comboCollateID);
-
-            _autocomplete_CollateID = new AutoComplete_ComboInputMT(_comboCollateID);
-
-            /*
-             * Add a decoration for this important field
-             */
-            _comboDecorator_CollateID = new ControlDecoration(_lblCollateID, SWT.CENTER | SWT.RIGHT);
-            _comboDecorator_CollateID.setDescriptionText(_tooltip2);
-            _comboDecorator_CollateID.setImage(_decorationImage);
-            _comboDecorator_CollateID.setMarginWidth(_decoratorDistance);
-         }
          {
             /*
              * Date used
@@ -799,6 +817,10 @@ public class DialogEquipment extends TitleAreaDialog {
          _comboDecorator_DateFrom.hide();
          _comboDecorator_CollateID.hide();
       }
+
+      // this is VERY important, otherwise parts of the old image is visible !!!
+      _comboDecorator_CollateID.getControl().getParent().redraw();
+      _comboDecorator_DateFrom.getControl().getParent().redraw();
 
       final boolean isValid = _isNewEquipment && _isModified == false
 
@@ -1313,7 +1335,7 @@ public class DialogEquipment extends TitleAreaDialog {
                   final Rectangle imageBounds = eqImage.getBounds();
                   gd.widthHint = imageBounds.width;
 
-                  _container.layout(true, true);
+                  _uiContainer.layout(true, true);
                }
             }
          }
@@ -1425,7 +1447,7 @@ public class DialogEquipment extends TitleAreaDialog {
       gd.widthHint = gdWidth;
       gd.heightHint = gdHeight;
 
-      _container.layout(true, true);
+      _uiContainer.layout(true, true);
    }
 
    private void updateUI_FromModel() {

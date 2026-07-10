@@ -135,8 +135,9 @@ public class DialogEquipmentPart extends TitleAreaDialog {
    /*
     * UI resources
     */
+   private Image _decorationImageInfo;
+
    private Image _imageCamera;
-   private Image _decorationImage;
    private Image _imageNow;
    private Image _imageTrash;
 
@@ -147,7 +148,6 @@ public class DialogEquipmentPart extends TitleAreaDialog {
     * UI controls
     */
    private Composite                 _uiContainer;
-   private Composite                 _imageContainer;
    private Composite                 _parent;
 
    private Button                    _btnDateRetiredNow;
@@ -341,6 +341,8 @@ public class DialogEquipmentPart extends TitleAreaDialog {
 
       createUI_100_Top(_uiContainer);
 
+      UI.createSpacer_Vertical(_uiContainer, 8, 3);
+
       createUI_200_Col1(_uiContainer);
       UI.createSpacer_Horizontal(_uiContainer, 20, 1);
       createUI_300_Col2(_uiContainer);
@@ -400,11 +402,11 @@ public class DialogEquipmentPart extends TitleAreaDialog {
          }
          {
             /*
-             * Is collate tours
+             * Collate
              */
             _lblCollate = UI.createLabel(container, Messages.Dialog_Equipment_Label_Collate);
+            _lblCollate.setToolTipText(_tooltip1);
             _gdVertCenter.applyTo(_lblCollate);
-//            _firstColumnControls.add(_lblCollate);
 
             _chkCollate = new Button(container, SWT.CHECK);
             _chkCollate.setText(Messages.Dialog_Equipment_Checkbox_Collate);
@@ -422,8 +424,46 @@ public class DialogEquipmentPart extends TitleAreaDialog {
              */
             _comboDecorator_Collate = new ControlDecoration(_lblCollate, SWT.CENTER | SWT.RIGHT);
             _comboDecorator_Collate.setDescriptionText(_tooltip1);
-            _comboDecorator_Collate.setImage(_decorationImage);
+            _comboDecorator_Collate.setImage(_decorationImageInfo);
             _comboDecorator_Collate.setMarginWidth(_decoratorDistance);
+         }
+         {
+            /*
+             * Collate ID
+             */
+            UI.createSpacer_Horizontal(container, 1);
+
+            final Composite idContainer = new Composite(container, SWT.NONE);
+            GridDataFactory.fillDefaults().grab(true, false).applyTo(idContainer);
+            GridLayoutFactory.fillDefaults().numColumns(2).applyTo(idContainer);
+            {
+               _lblCollateID = UI.createLabel(idContainer, Messages.Dialog_Equipment_Label_CollateID);
+               _lblCollateID.setToolTipText(_tooltip2);
+               GridDataFactory.fillDefaults()
+                     .align(SWT.FILL, SWT.CENTER)
+                     .indent(16, 0)
+                     .applyTo(_lblCollateID);
+
+               // autocomplete combo
+               _comboCollateID = new Combo(idContainer, SWT.BORDER | SWT.FLAT);
+               _comboCollateID.setText(UI.EMPTY_STRING);
+               _comboCollateID.addModifyListener(_defaultModifyListener);
+
+               GridDataFactory.fillDefaults()
+                     .grab(true, false)
+                     .indent(10, 0)
+                     .applyTo(_comboCollateID);
+
+               _autocomplete_CollateID = new AutoComplete_ComboInputMT(_comboCollateID);
+
+               /*
+                * Add a decoration for this important field
+                */
+               _comboDecorator_CollateID = new ControlDecoration(_lblCollateID, SWT.CENTER | SWT.RIGHT);
+               _comboDecorator_CollateID.setDescriptionText(_tooltip2);
+               _comboDecorator_CollateID.setImage(_decorationImageInfo);
+               _comboDecorator_CollateID.setMarginWidth(_decoratorDistance);
+            }
          }
          {
             /*
@@ -442,7 +482,7 @@ public class DialogEquipmentPart extends TitleAreaDialog {
                _lblCollateWith = UI.createLabel(collateContainer, Messages.Dialog_EquipmentPart_Label_CollateBetween);
                _lblCollateWith.setToolTipText(collateWithTooltip);
                GridDataFactory.fillDefaults()
-                     .indent(12, 0)
+                     .indent(16, 0)
                      .applyTo(_lblCollateWith);
 
                _rdoCollateWith_Previous = new Button(collateContainer, SWT.RADIO);
@@ -468,32 +508,10 @@ public class DialogEquipmentPart extends TitleAreaDialog {
       {
          {
             /*
-             * Collate ID
-             */
-            _lblCollateID = UI.createLabel(container, Messages.Dialog_Equipment_Label_CollateID);
-
-            // autocomplete combo
-            _comboCollateID = new Combo(container, SWT.BORDER | SWT.FLAT);
-            _comboCollateID.setText(UI.EMPTY_STRING);
-            _comboCollateID.addModifyListener(_defaultModifyListener);
-
-            GridDataFactory.fillDefaults().grab(true, false).span(2, 1).applyTo(_comboCollateID);
-
-            _autocomplete_CollateID = new AutoComplete_ComboInputMT(_comboCollateID);
-
-            /*
-             * Add a decoration for this important field
-             */
-            _comboDecorator_CollateID = new ControlDecoration(_lblCollateID, SWT.CENTER | SWT.RIGHT);
-            _comboDecorator_CollateID.setDescriptionText(_tooltip2);
-            _comboDecorator_CollateID.setImage(_decorationImage);
-            _comboDecorator_CollateID.setMarginWidth(_decoratorDistance);
-         }
-         {
-            /*
              * Date used
              */
             final Label label = UI.createLabel(container, Messages.Dialog_Equipment_Label_Date);
+            label.setToolTipText("Part date");
 
             _dateUsed = new DateTime(container, SWT.DATE | SWT.MEDIUM | SWT.DROP_DOWN);
             _dateUsed.addSelectionListener(_defaultSelectionListener);
@@ -503,7 +521,7 @@ public class DialogEquipmentPart extends TitleAreaDialog {
              */
             _comboDecorator_DateFrom = new ControlDecoration(label, SWT.CENTER | SWT.RIGHT);
             _comboDecorator_DateFrom.setDescriptionText(_tooltip2);
-            _comboDecorator_DateFrom.setImage(_decorationImage);
+            _comboDecorator_DateFrom.setImage(_decorationImageInfo);
             _comboDecorator_DateFrom.setMarginWidth(_decoratorDistance);
 
             UI.createSpacer_Horizontal(container, 1);
@@ -755,9 +773,9 @@ public class DialogEquipmentPart extends TitleAreaDialog {
 
             UI.createSpacer_Horizontal(container);
 
-            _imageContainer = new Composite(container, SWT.NONE);
-            GridDataFactory.fillDefaults().grab(true, false).applyTo(_imageContainer);
-            GridLayoutFactory.fillDefaults().numColumns(2).applyTo(_imageContainer);
+            final Composite imageContainer = new Composite(container, SWT.NONE);
+            GridDataFactory.fillDefaults().grab(true, false).applyTo(imageContainer);
+            GridLayoutFactory.fillDefaults().numColumns(2).applyTo(imageContainer);
             {
                {
                   /*
@@ -766,7 +784,7 @@ public class DialogEquipmentPart extends TitleAreaDialog {
 
                   final int imageSize = TagManager.getTagContent_ImageSize();
 
-                  _canvasEquipmentImage = new Label(_imageContainer, SWT.WRAP);
+                  _canvasEquipmentImage = new Label(imageContainer, SWT.WRAP);
                   GridDataFactory.fillDefaults()
                         .hint(imageSize, imageSize)
                         .applyTo(_canvasEquipmentImage);
@@ -775,7 +793,7 @@ public class DialogEquipmentPart extends TitleAreaDialog {
                   /*
                    * Options slideout to resize image
                    */
-                  final ToolBar toolbar = new ToolBar(_imageContainer, SWT.FLAT);
+                  final ToolBar toolbar = new ToolBar(imageContainer, SWT.FLAT);
 
                   GridDataFactory.fillDefaults()
                         .grab(true, false)
@@ -820,14 +838,18 @@ public class DialogEquipmentPart extends TitleAreaDialog {
 
       if (isCollate) {
 
-         _comboDecorator_DateFrom   .show();
          _comboDecorator_CollateID  .show();
+         _comboDecorator_DateFrom   .show();
 
       } else {
 
-         _comboDecorator_DateFrom   .hide();
          _comboDecorator_CollateID  .hide();
+         _comboDecorator_DateFrom   .hide();
       }
+
+      // this is VERY important, otherwise parts of the old image is visible !!!
+      _comboDecorator_CollateID.getControl().getParent().redraw();
+      _comboDecorator_DateFrom.getControl().getParent().redraw();
 
 // SET_FORMATTING_ON
 
@@ -979,8 +1001,6 @@ public class DialogEquipmentPart extends TitleAreaDialog {
 
    private void initUI() {
 
-      _gdVertCenter = GridDataFactory.fillDefaults().align(SWT.BEGINNING, SWT.CENTER);
-
       /*
        * Collated tours are a collection of tours to sum up values,
        * e.g. distances or durations.
@@ -999,9 +1019,10 @@ public class DialogEquipmentPart extends TitleAreaDialog {
 
       _tooltip2 = Messages.Dialog_Equipment_Tooltip_2b;
 
-      _decoratorDistance = 3;
-
    // SET_FORMATTING_OFF
+
+      _decoratorDistance         = 3;
+      _gdVertCenter              = GridDataFactory.fillDefaults().align(SWT.BEGINNING, SWT.CENTER);
 
       _defaultEquipmentWidth     = convertWidthInCharsToPixels(20);
       _defaultDescriptionWidth   = convertWidthInCharsToPixels(40);
@@ -1013,7 +1034,7 @@ public class DialogEquipmentPart extends TitleAreaDialog {
 
 // SET_FORMATTING_ON
 
-      _decorationImage = FieldDecorationRegistry.getDefault()
+      _decorationImageInfo = FieldDecorationRegistry.getDefault()
             .getFieldDecoration(FieldDecorationRegistry.DEC_INFORMATION)
             .getImage();
 
