@@ -4482,11 +4482,11 @@ public class EquipmentView extends ViewPart implements
 
    private void updateAfterModified_Equipment(final Equipment equipment) {
 
-      final Set<String> allTypes = new HashSet<>(Arrays.asList(equipment.getCollateID()));
+      final Set<String> allCollateIDs = new HashSet<>(Arrays.asList(equipment.getCollateID()));
 
       TourDatabase.saveEntity(equipment, equipment.getEquipmentId(), Equipment.class);
 
-      EquipmentManager.updateUntilDate_Equipment(allTypes);
+      EquipmentManager.updateUntilDate_Equipment(allCollateIDs);
 
       updateUI_ReloadViewer();
    }
@@ -4497,9 +4497,9 @@ public class EquipmentView extends ViewPart implements
 
       equipment.getParts().add(savedPart);
 
-      final HashSet<String> allTypes = new HashSet<>(Arrays.asList(part.getPartCollateID()));
+      final HashSet<String> allCollateIDs = new HashSet<>(Arrays.asList(part.getPartCollateID()));
 
-      EquipmentManager.updateUntilDate_Parts(equipment, allTypes, savedPart.getCollateBetween());
+      EquipmentManager.updateUntilDate_Parts(equipment, allCollateIDs, savedPart.getCollateBetween());
 
       updateUI_ReloadViewer();
    }

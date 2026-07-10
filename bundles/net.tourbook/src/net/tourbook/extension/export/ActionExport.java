@@ -128,10 +128,12 @@ public class ActionExport extends SubMenu {
       // needs to be at the end
       _exportTourContributionItems = new ArrayList<>();
 
-      final Optional<ActionExportTour> mtExtension = _exportTourActions.stream().filter(extension -> extension.getExportTourExtension()
-            .getFileExtension().equals(
-                  "mt")).findFirst(); //$NON-NLS-1$
+      final Optional<ActionExportTour> mtExtension = _exportTourActions.stream()
+            .filter(extension -> extension.getExportTourExtension().getFileExtension().equals("mt")) //$NON-NLS-1$
+            .findFirst();
+
       ActionExportTour mtActionExportTour = null;
+
       if (mtExtension.isPresent()) {
 
          mtActionExportTour = mtExtension.get();

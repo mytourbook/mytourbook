@@ -492,7 +492,6 @@ public class EquipmentMenuManager implements IActionProvider {
                                     final Set<Long> allEquipmentIDs_InTours,
                                     final Set<Long> allModifiedEquipmentIDs) {
 
-
       if (_allActions_RecentEquipment.length == 0) {
          return;
       }
@@ -851,7 +850,6 @@ public class EquipmentMenuManager implements IActionProvider {
     * @param allSelectedItems
     */
    public void enableActions(final List<Object> allSelectedItems) {
-
 
       final Set<Long> allSelectedEquipmentIDs_FromAllTours = new HashSet<>();
 
