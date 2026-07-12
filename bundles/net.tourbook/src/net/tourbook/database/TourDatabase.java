@@ -11873,7 +11873,7 @@ public class TourDatabase {
 
                      for (final String partType : allPartTypes) {
 
-                        EquipmentManager.updateUntilDate_Parts_OneType(equipment, partType, (short) -1);
+                        EquipmentManager.updateUntilDate_Parts_OneCollateID(equipment, partType, (short) -1);
                      }
                   }
                }

@@ -16,11 +16,15 @@
 package net.tourbook.ui.views.tagging;
 
 import java.time.LocalDateTime;
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import net.tourbook.common.time.TimeTools;
 import net.tourbook.common.ui.SubMenu;
 import net.tourbook.data.Equipment;
+import net.tourbook.data.EquipmentPart;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourTag;
 import net.tourbook.database.TourDatabase;
@@ -82,11 +86,11 @@ public class ActionCreateEquipmentFromTag extends SubMenu {
       }
    }
 
-   private class ActionEquipment extends Action {
+   private class ActionEquipmentWithParts extends Action {
 
       private final Equipment __equipment;
 
-      public ActionEquipment(final Equipment equipment) {
+      public ActionEquipmentWithParts(final Equipment equipment) {
 
          super(equipment.getName(), AS_CHECK_BOX);
 
@@ -102,6 +106,7 @@ public class ActionCreateEquipmentFromTag extends SubMenu {
       @Override
       public void run() {
 
+         onCreateEquipmentPart(__equipment);
       }
    }
 
@@ -122,6 +127,53 @@ public class ActionCreateEquipmentFromTag extends SubMenu {
       setText("&Create Equipment from Tag");
 
       createActions();
+   }
+
+   /**
+    * Tag and equipment expand types are differently, this has historical reasons
+    *
+    * @param tourTag
+    *
+    * @return
+    */
+   private int convertExpandType(final TourTag tourTag) {
+
+      /**
+       * When a part is expanded in the equipment viewer, the tours can be displayed in different
+       * structures
+       * <p>
+       * <li>0 ... EXPAND_TYPE_FLAT</li>
+       * <li>1 ... EXPAND_TYPE_YEAR_TOUR</li>
+       * <li>2 ... EXPAND_TYPE_YEAR_MONTH_TOUR</li>
+       */
+//      private int     expandType       = EquipmentManager.EXPAND_TYPE_FLAT;
+
+      /**
+       * When a tag is expanded in the tag tree viewer, the tours can be displayed in different
+       * structures
+       * <p>
+       * <li>1 ... {@link #EXPAND_TYPE__TAG_TOURS}</li>
+       * <li>2 ... {@link #EXPAND_TYPE__TAG_YEAR_TOURS}</li>
+       * <li>0 ... {@link #EXPAND_TYPE__TAG_YEAR_MONTH_TOURS}</li>
+       */
+//      private int     expandType = EXPAND_TYPE__TAG_TOURS;
+
+// SET_FORMATTING_OFF
+
+      switch (tourTag.getExpandType()) {
+
+      //                                              2 -> 1
+      case TourTag.EXPAND_TYPE__TAG_YEAR_TOURS:          return EquipmentManager.EXPAND_TYPE_YEAR_TOUR;
+
+      //                                              0 -> 2
+      case TourTag.EXPAND_TYPE__TAG_YEAR_MONTH_TOURS:    return EquipmentManager.EXPAND_TYPE_YEAR_MONTH_TOUR;
+
+      //                                              1 -> 0
+      case TourTag.EXPAND_TYPE__TAG_TOURS:
+      default:                                           return EquipmentManager.EXPAND_TYPE_FLAT;
+      }
+
+// SET_FORMATTING_ON
    }
 
    private void createActions() {
@@ -166,7 +218,7 @@ public class ActionCreateEquipmentFromTag extends SubMenu {
             continue;
          }
 
-         final ActionEquipment equipmentAction = new ActionEquipment(availableEquipment);
+         final ActionEquipmentWithParts equipmentAction = new ActionEquipmentWithParts(availableEquipment);
 
          addActionToMenu(menu, equipmentAction);
       }
@@ -176,6 +228,8 @@ public class ActionCreateEquipmentFromTag extends SubMenu {
 
       final IStructuredSelection structuredSelection = _taggingView.getViewer().getStructuredSelection();
 
+      boolean isEquipmentCreated = false;
+
       for (final Object selection : structuredSelection) {
 
          if (selection instanceof final TVITaggingView_Tag tagItem) {
@@ -183,36 +237,139 @@ public class ActionCreateEquipmentFromTag extends SubMenu {
             final TourTag tourTag = tagItem.getTourTag();
 
             final LocalDateTime now = LocalDateTime.now();
+            final String collateID = "From tag - %s".formatted(TimeTools.Formatter_DateTime_SM.format(now));
 
-            final Equipment equipment = new Equipment();
+            // convert expand type
+            final int eqExpandType = convertExpandType(tourTag);
+
+            final Equipment newEquipment = new Equipment();
 
 // SET_FORMATTING_OFF
 
-            equipment.setBrand         (tourTag.getTagName());
-            equipment.setDescription   (tourTag.getNotes());
-            equipment.setImageFilePath (tourTag.getImageFilePath());
+            newEquipment.setBrand            (tourTag.getTagName());
+            newEquipment.setDescription      (tourTag.getNotes());
+            newEquipment.setImageFilePath    (tourTag.getImageFilePath());
 
-            equipment.setModel         ("From tag - " + TimeTools.Formatter_DateTime_SM.format(now));
+            newEquipment.setModel            (collateID);
+
+            newEquipment.setIsCollate        (true);
+            newEquipment.setCollateID        (collateID);
+
+            newEquipment.setExpandType       (eqExpandType);
 
 // SET_FORMATTING_ON
 
-            TourDatabase.saveEntity(equipment, equipment.getEquipmentId(), Equipment.class);
+            // save new equipment
+            final Equipment savedEquipment = TourDatabase.saveEntity(newEquipment, newEquipment.getEquipmentId(), Equipment.class);
 
-            /*
-             * Clear caches and update UI
-             */
+            // set equipment into all tours with the same tag
+            final long firstUseDate = EquipmentManager.setEquipmentFromTag(savedEquipment, tourTag);
 
-            // remove old equipment from cached tours
-            EquipmentManager.clearCachedValues();
+            // set equipment first use date which is the oldest tour which contained the tag
+            savedEquipment.setDateUsed(firstUseDate);
+            savedEquipment.setDateBuilt(firstUseDate);
 
-            // this MUST be called after clearCachedValues()
-            EquipmentMenuManager.updateRecentEquipment();
+            // resave equipment
+            TourDatabase.saveEntity(savedEquipment, savedEquipment.getEquipmentId(), Equipment.class);
 
-            TourManager.getInstance().clearTourDataCache();
+            // update equipment from/until collate dates
+            final Set<String> allModifiedCollateIDs = new HashSet<>(Arrays.asList(collateID));
+            EquipmentManager.updateUntilDate_Equipment(allModifiedCollateIDs);
 
-            // fire modify event
-            TourManager.fireEvent(TourEventId.EQUIPMENT_STRUCTURE_CHANGED);
+            isEquipmentCreated = true;
          }
       }
+
+      if (isEquipmentCreated) {
+         updateUI();
+      }
+   }
+
+   private void onCreateEquipmentPart(final Equipment equipment) {
+
+      final IStructuredSelection structuredSelection = _taggingView.getViewer().getStructuredSelection();
+
+      boolean isPartCreated = false;
+
+      for (final Object selection : structuredSelection) {
+
+         if (selection instanceof final TVITaggingView_Tag tagItem) {
+
+            final TourTag tourTag = tagItem.getTourTag();
+
+            final LocalDateTime now = LocalDateTime.now();
+            final String collateID = "From tag - %s".formatted(TimeTools.Formatter_DateTime_SM.format(now));
+
+            // convert expand type
+            final int partExpandType = convertExpandType(tourTag);
+
+            final EquipmentPart newPart = new EquipmentPart();
+
+// SET_FORMATTING_OFF
+
+            newPart.setEquipment       (equipment);
+
+            newPart.setBrand           (tourTag.getTagName());
+            newPart.setDescription     (tourTag.getNotes());
+            newPart.setImageFilePath   (tourTag.getImageFilePath());
+
+            newPart.setModel           (collateID);
+
+            newPart.setIsCollate       (true);
+            newPart.setPartCollateID   (collateID);
+            newPart.setCollateBetween  (EquipmentPart.COLLATED_WITH_NEXT);
+
+            newPart.setExpandType      ((short) partExpandType);
+
+// SET_FORMATTING_ON
+
+            // save new part
+            final EquipmentPart savedPart = TourDatabase.saveEntity(newPart, newPart.getPartId(), EquipmentPart.class);
+
+            // set equipment into all tours with the same tag
+            final long firstUseDate = EquipmentManager.setEquipmentFromTag(equipment, tourTag);
+
+            // set equipment first use date which is the oldest tour which contained the tag
+            savedPart.setDateUsed(firstUseDate);
+            savedPart.setDateBuilt(firstUseDate);
+
+            // resave part
+            TourDatabase.saveEntity(savedPart, savedPart.getPartId(), EquipmentPart.class);
+
+            /*
+             * Add part to the equipment to correctly update the from/until dates, but this
+             * equipment is not saved, it is reloaded when the UI is updated
+             */
+            equipment.getParts().add(savedPart);
+
+            final HashSet<String> allCollateIDs = new HashSet<>(Arrays.asList(collateID));
+
+            // update part from/until collate dates
+            EquipmentManager.updateUntilDate_Parts(equipment, allCollateIDs, savedPart.getCollateBetween());
+
+            isPartCreated = true;
+         }
+      }
+
+      if (isPartCreated) {
+         updateUI();
+      }
+   }
+
+   /**
+    * Clear caches and update UI
+    */
+   private void updateUI() {
+
+      // remove old equipment from cached tours
+      EquipmentManager.clearCachedValues();
+
+      // this MUST be called after clearCachedValues()
+      EquipmentMenuManager.updateRecentEquipment();
+
+      TourManager.getInstance().clearTourDataCache();
+
+      // fire modify event
+      TourManager.fireEvent(TourEventId.EQUIPMENT_STRUCTURE_CHANGED);
    }
 }

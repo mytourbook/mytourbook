@@ -3511,7 +3511,7 @@ public class EquipmentView extends ViewPart implements
 
                for (final String partType : allPartTypes) {
 
-                  EquipmentManager.updateUntilDate_Parts_OneType(selectedEquipment, partType, (short) -1);
+                  EquipmentManager.updateUntilDate_Parts_OneCollateID(selectedEquipment, partType, (short) -1);
                }
             }
          }

@@ -39,6 +39,7 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.ConcurrentSkipListSet;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.atomic.AtomicLong;
 
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
@@ -57,6 +58,7 @@ import net.tourbook.common.util.Util;
 import net.tourbook.data.Equipment;
 import net.tourbook.data.EquipmentPart;
 import net.tourbook.data.TourData;
+import net.tourbook.data.TourTag;
 import net.tourbook.database.ITourDataUpdate_OnlyUpdate;
 import net.tourbook.database.MyTourbookException;
 import net.tourbook.database.TourDatabase;
@@ -1601,6 +1603,49 @@ public class EquipmentManager {
       _state.put(STATE_EQUIPMENT_FILTER_RETIRED, _equipmentFilter_Retired);
    }
 
+   /**
+    * Set equipment into all tours which do contain the provided tour tag
+    *
+    * @param equipment
+    * @param tourTag
+    *
+    * @return Returns the oldest tour start time or {@link Long#MIN_VALUE} when not available
+    */
+   public static long setEquipmentFromTag(final Equipment equipment, final TourTag tourTag) {
+
+      if (TourManager.isTourEditorModified()) {
+         return Long.MIN_VALUE;
+      }
+
+      final AtomicLong firstTourDateTime = new AtomicLong(Long.MAX_VALUE);
+
+      final ITourDataUpdate_OnlyUpdate tourDataUpdater = new ITourDataUpdate_OnlyUpdate() {
+
+         @Override
+         public boolean updateTourData(final TourData tourData) {
+
+            final Set<Equipment> allEquipment = tourData.getEquipment();
+
+            final boolean isAdded = allEquipment.add(equipment);
+
+            // get the oldest tour start time
+            final long newValue = tourData.getTourStartTimeMS();
+            firstTourDateTime.updateAndGet(currentValue -> newValue < currentValue ? newValue : currentValue);
+
+            return isAdded;
+         }
+      };
+
+      // get all tour ids for the tag
+      final List<Long> allTourIDs = TagManager.getTaggedTours(Arrays.asList(tourTag));
+      final Set<Long> allTourIDsSet = new HashSet<>(allTourIDs);
+
+      // save all tours with the added equipment
+      TourManager.updateTourData_Concurrent(allTourIDsSet, tourDataUpdater);
+
+      return firstTourDateTime.get();
+   }
+
    public static void setEquipmentImageSize_View(final int imageSize) {
 
       if (imageSize != _equipmentImageSize_View) {
@@ -1865,16 +1910,16 @@ public class EquipmentManager {
     * <b> !!! After calling this method, all equipment must be reloaded because they are updated
     * !!! </b>
     *
-    * @param allModifiedTypes
+    * @param allModifiedCollateIDs
     */
-   public static void updateUntilDate_Equipment(final Set<String> allModifiedTypes) {
+   public static void updateUntilDate_Equipment(final Set<String> allModifiedCollateIDs) {
 
       // force the reload of equipment because one of them was modified
       _allEquipment_ByID = null;
 
       final Map<Long, Equipment> allEquipment_ByID = getAllEquipment_ByID();
 
-      for (final String modifiedType : allModifiedTypes) {
+      for (final String modifiedCollateID : allModifiedCollateIDs) {
 
          final List<Equipment> allFilteredEquipment = new ArrayList<>();
 
@@ -1884,7 +1929,7 @@ public class EquipmentManager {
          for (final Equipment equipment : allEquipment_ByID.values()) {
 
             if (equipment.isCollate()
-                  && modifiedType.equalsIgnoreCase(equipment.getCollateID())) {
+                  && modifiedCollateID.equalsIgnoreCase(equipment.getCollateID())) {
 
                allFilteredEquipment.add(equipment);
             }
@@ -2000,7 +2045,7 @@ public class EquipmentManager {
 
          for (final String partType : allModifiedPartTypes) {
 
-            updateUntilDate_Parts_OneType(equipment, partType, collatedBetween);
+            updateUntilDate_Parts_OneCollateID(equipment, partType, collatedBetween);
          }
       }
    }
@@ -2014,9 +2059,9 @@ public class EquipmentManager {
     * @param collateBetween
     *           Can be <code>-1</code> to use the collateBetween value from the first filtered part
     */
-   public static void updateUntilDate_Parts_OneType(final Equipment equipment,
-                                                    final String modifiedPartType,
-                                                    short collateBetween) {
+   public static void updateUntilDate_Parts_OneCollateID(final Equipment equipment,
+                                                         final String modifiedPartType,
+                                                         short collateBetween) {
 
       final Set<EquipmentPart> allParts = equipment.getParts();
 

@@ -251,7 +251,7 @@ public class TagManager {
       String dialogMessage;
       String actionDeleteTags;
 
-      final ArrayList<Long> allTourIds = getTaggedTours(allTags);
+      final List<Long> allTourIds = getTaggedTours(allTags);
 
       if (allTags.size() == 1) {
 
@@ -633,15 +633,15 @@ public class TagManager {
    }
 
    /**
-    * Get all tours for a tag id.
+    * Get all tour ids for all tag ids
     *
     * @param allTags
     *
     * @return Returns a list with all tour id's which contain the tour tag.
     */
-   private static ArrayList<Long> getTaggedTours(final List<TourTag> allTags) {
+   public static List<Long> getTaggedTours(final List<TourTag> allTags) {
 
-      final ArrayList<Long> allTourIds = new ArrayList<>();
+      final List<Long> allTourIds = new ArrayList<>();
 
       final ArrayList<Long> sqlParameters = new ArrayList<>();
       final StringBuilder sqlParameterPlaceholder = new StringBuilder();
