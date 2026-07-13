@@ -85,7 +85,7 @@ System
 ======
 
 * Java 21                        https://adoptium.net/temurin/releases/?version=21
-* Eclipse 2025-12 (4.38)         https://archive.eclipse.org/eclipse/downloads/drops4/R-4.38-202512010920/
+* Eclipse 2026-06 (4.40)         https://download.eclipse.org/eclipse/downloads/drops4/R-4.40-202606010713
 * NatTable 2.6.0                 https://eclipse.dev/nattable/download
 * Nebula Widgets latest          https://download.eclipse.org/nebula/releases/latest
 * FIT SDK 21.205.0               https://forums.garmin.com/developer/fit-sdk/b/news-announcements

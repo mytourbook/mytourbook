@@ -20,6 +20,7 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
+import net.tourbook.Messages;
 import net.tourbook.common.time.TimeTools;
 import net.tourbook.data.Equipment;
 import net.tourbook.data.TourTag;
@@ -44,7 +45,7 @@ public class ActionCreateEquipmentFromTag extends Action {
     */
    public ActionCreateEquipmentFromTag(final TaggingView taggingView) {
 
-      super("&Create Equipment from Tag", AS_PUSH_BUTTON);
+      super(Messages.Action_Tag_CreateEquipmentFromTag, AS_PUSH_BUTTON);
 
       _taggingView = taggingView;
    }
@@ -109,7 +110,7 @@ public class ActionCreateEquipmentFromTag extends Action {
             final TourTag tourTag = tagItem.getTourTag();
 
             final LocalDateTime now = LocalDateTime.now();
-            final String collateID = "From tag - %s".formatted(TimeTools.Formatter_DateTime_SM.format(now));
+            final String collateID = Messages.Equipment_Info_FromTag.formatted(TimeTools.Formatter_DateTime_SM.format(now));
 
             // convert expand type
             final int eqExpandType = convertExpandType(tourTag);

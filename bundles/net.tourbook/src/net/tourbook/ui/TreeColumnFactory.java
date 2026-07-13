@@ -1140,9 +1140,9 @@ public abstract class TreeColumnFactory {
 
             colDef.setColumnCategory(           Messages.ColumnFactory_Category_Equipment);
 
-            colDef.setColumnLabel(              "Cost per %s".formatted(UI.UNIT_LABEL_DISTANCE));
-            colDef.setColumnHeaderText(			"Cost/%s".formatted(UI.UNIT_LABEL_DISTANCE));
-            colDef.setColumnHeaderToolTipText(  "Cost per distance (%s)".formatted(UI.UNIT_LABEL_DISTANCE));
+            colDef.setColumnLabel(              Messages.ColumnFactory_Equipment_Cost_Label.formatted(UI.UNIT_LABEL_DISTANCE));
+            colDef.setColumnHeaderText(			Messages.ColumnFactory_Equipment_Cost_Header.formatted(UI.UNIT_LABEL_DISTANCE));
+            colDef.setColumnHeaderToolTipText(  Messages.ColumnFactory_Equipment_Cost_Tooltip.formatted(UI.UNIT_LABEL_DISTANCE));
 
             colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(10));
 

@@ -69,6 +69,7 @@ public class Messages extends NLS {
    public static String        Action_Tag_AutoOpenOK;
    public static String        Action_Tag_CopyTags;
    public static String        Action_Tag_CopyTags_Tooltip;
+   public static String        Action_Tag_CreateEquipmentFromTag;
    public static String        Action_Tag_Delete;
    public static String        Action_Tag_DeleteCategory;
    public static String        Action_Tag_Edit;
@@ -1227,6 +1228,7 @@ public class Messages extends NLS {
    public static String        Equipment_ExpandType_ByYear;
    public static String        Equipment_ExpandType_ByYearMonth;
    public static String        Equipment_ExpandType_SortByDate;
+   public static String        Equipment_Info_FromTag;
    public static String        Equipment_Log_EquipmentIsDeleted;
    public static String        Equipment_Log_PartIsDeleted;
    public static String        Equipment_StatusLine_EquipmentCopiedToClipboard;
@@ -1820,6 +1822,7 @@ public class Messages extends NLS {
    public static String        Pref_Appearance_Check_ShowInAppToolbar_ScrambleData;
    public static String        Pref_Appearance_Check_ShowThemeSelectorInAppToolbar;
    public static String        Pref_Appearance_Check_TaggingAnimation;
+   public static String        Pref_Appearance_Combo_ImageSize_Tooltip;
    public static String        Pref_Appearance_Combo_Theme_Tooltip;
    public static String        Pref_Appearance_Dialog_ResetAllToggleDialogs_Message;
    public static String        Pref_Appearance_Dialog_ResetAllToggleDialogs_Title;
@@ -3345,6 +3348,11 @@ public class Messages extends NLS {
    public static String        Tour_Action_graph_speed_tooltip;
    public static String        Tour_Action_graph_temperature_tooltip;
    public static String        Tour_Action_graph_tour_compare_tooltip;
+   public static String        Tour_Action_HRZones;
+   public static String        Tour_Action_HRZones_InAllTours;
+   public static String        Tour_Action_HRZones_InAllTours_Tooltip;
+   public static String        Tour_Action_HRZones_InSelectedTours;
+   public static String        Tour_Action_HRZones_InSelectedTours_Tooltip;
    public static String        Tour_Action_InterpolatedValues_ReImport;
    public static String        Tour_Action_InterpolatedValues_ReImport_Tooltip;
    public static String        Tour_Action_InterpolatedValues_Remove;

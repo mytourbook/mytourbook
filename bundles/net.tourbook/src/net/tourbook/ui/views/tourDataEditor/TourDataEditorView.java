@@ -8943,9 +8943,9 @@ public class TourDataEditorView extends ViewPart implements
 
       System.out.println(UI.timeStamp()
 
-            + " SWT.ZoomChanged"
-            + " - devZoom: " + DPIUtil.getDeviceZoom()
-            + " - nativeZoom: " + DPIUtil.getNativeDeviceZoom());
+            + " SWT.ZoomChanged" //$NON-NLS-1$
+            + " - devZoom: " + DPIUtil.getDeviceZoom() //$NON-NLS-1$
+            + " - nativeZoom: " + DPIUtil.getNativeDeviceZoom()); //$NON-NLS-1$
 
       // TODO remove SYSTEM.OUT.PRINTLN
    }

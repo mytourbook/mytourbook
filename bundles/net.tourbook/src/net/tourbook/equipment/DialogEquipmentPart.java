@@ -511,7 +511,6 @@ public class DialogEquipmentPart extends TitleAreaDialog {
              * Date used
              */
             final Label label = UI.createLabel(container, Messages.Dialog_Equipment_Label_Date);
-            label.setToolTipText("Part date");
 
             _dateUsed = new DateTime(container, SWT.DATE | SWT.MEDIUM | SWT.DROP_DOWN);
             _dateUsed.addSelectionListener(_defaultSelectionListener);

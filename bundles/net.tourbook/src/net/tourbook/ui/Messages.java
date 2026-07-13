@@ -270,7 +270,9 @@ public class Messages extends NLS {
    public static String        ColumnFactory_Equipment_CollateBetween_Header;
    public static String        ColumnFactory_Equipment_CollateBetween_Label;
    public static String        ColumnFactory_Equipment_CollateBetween_Tooltip;
-   
+   public static String        ColumnFactory_Equipment_Cost_Header;
+   public static String        ColumnFactory_Equipment_Cost_Label;
+   public static String        ColumnFactory_Equipment_Cost_Tooltip;
    public static String        ColumnFactory_Equipment_Brand;
    public static String        ColumnFactory_Equipment_Date_Header;
    public static String        ColumnFactory_Equipment_Date_Label;

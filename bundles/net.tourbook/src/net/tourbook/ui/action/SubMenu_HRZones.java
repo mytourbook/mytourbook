@@ -15,6 +15,7 @@
  *******************************************************************************/
 package net.tourbook.ui.action;
 
+import net.tourbook.Messages;
 import net.tourbook.common.ui.SubMenu;
 import net.tourbook.ui.ITourProviderByID;
 
@@ -28,7 +29,7 @@ public class SubMenu_HRZones extends SubMenu {
 
    public SubMenu_HRZones(final ITourProviderByID tourProviderById) {
 
-      super("HR Zones", AS_DROP_DOWN_MENU);
+      super(Messages.Tour_Action_HRZones, AS_DROP_DOWN_MENU);
 
       _action_SetHRZones_AllTours = new ActionSetHRZones_AllTours();
       _action_SetHRZones_SelectedTours = new ActionSetHRZones_SelectedTours(tourProviderById);

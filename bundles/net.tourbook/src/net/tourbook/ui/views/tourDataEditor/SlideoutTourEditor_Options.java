@@ -417,7 +417,7 @@ public class SlideoutTourEditor_Options extends ToolbarSlideout implements IColo
                // combo
                _comboImageSize = new Combo(group, SWT.READ_ONLY | SWT.BORDER);
                _comboImageSize.setVisibleItemCount(10);
-               _comboImageSize.setToolTipText("Image size\n\n• Small\n• Medium\n• Large");
+               _comboImageSize.setToolTipText(Messages.Pref_Appearance_Combo_ImageSize_Tooltip);
                _comboImageSize.addSelectionListener(SelectionListener.widgetSelectedAdapter(selectionEvent -> onSelect_ImageSize_Combo()));
                _comboImageSize.addFocusListener(_keepOpenListener);
 

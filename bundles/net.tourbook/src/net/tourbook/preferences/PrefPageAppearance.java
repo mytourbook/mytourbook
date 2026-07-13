@@ -318,7 +318,7 @@ public class PrefPageAppearance extends PreferencePage implements IWorkbenchPref
                // combo
                _comboContentImageSize = new Combo(sizeContainer, SWT.READ_ONLY | SWT.BORDER);
                _comboContentImageSize.setVisibleItemCount(10);
-               _comboContentImageSize.setToolTipText("Image size\n\n• Small\n• Medium\n• Large");
+               _comboContentImageSize.setToolTipText(Messages.Pref_Appearance_Combo_ImageSize_Tooltip);
                _comboContentImageSize.addSelectionListener(SelectionListener.widgetSelectedAdapter(
                      selectionEvent -> onSelect_ImageSize_Combo()));
 

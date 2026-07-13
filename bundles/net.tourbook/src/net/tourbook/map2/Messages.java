@@ -126,6 +126,7 @@ public class Messages extends NLS {
    public static String Map_Action_SynchWith_ValuePoint;
    public static String Map_Action_SynchWithSlider_Centered;
    public static String Map_Action_SyncPhotoWithMap_Tooltip;
+   public static String Map_Action_Zoom_CenteredBy_Location_Tooltip;
    public static String Map_Action_Zoom_CenteredBy_Map_Tooltip;
    public static String Map_Action_Zoom_CenteredBy_Mouse_Tooltip;
    public static String Map_Action_Zoom_CenteredBy_Tour_Tooltip;

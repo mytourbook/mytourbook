@@ -55,7 +55,7 @@ public class ActionZoomCenterBy extends Action {
       
       case Location:
          
-         setToolTipText("When map is zoomed, keep current location.\n\nTip: Toggle reverse by pressing the <Ctrl> key");
+         setToolTipText(Messages.Map_Action_Zoom_CenteredBy_Location_Tooltip);
          setImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.Zoom_CenterBy_Location));
          break;
 

@@ -484,7 +484,6 @@ public class DialogEquipmentService extends TitleAreaDialog {
              * Date
              */
             final Label label = UI.createLabel(container, Messages.Dialog_Equipment_Label_Date);
-            label.setToolTipText("Service date");
             _gdVertCenter.applyTo(label);
 
             _dateUsed = new DateTime(container, SWT.DATE | SWT.MEDIUM | SWT.DROP_DOWN);

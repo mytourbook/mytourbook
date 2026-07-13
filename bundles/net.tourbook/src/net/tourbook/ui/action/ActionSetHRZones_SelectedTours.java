@@ -17,6 +17,7 @@ package net.tourbook.ui.action;
 
 import java.util.Set;
 
+import net.tourbook.Messages;
 import net.tourbook.data.TourData;
 import net.tourbook.database.ITourDataUpdate_OnlyUpdate;
 import net.tourbook.tour.TourManager;
@@ -34,8 +35,8 @@ public class ActionSetHRZones_SelectedTours extends Action implements ITourDataU
 
       _tourProvider = tourProvider;
 
-      setText("Set HR Zones in &selected Tours");
-      setToolTipText("The HR zones will be set in all selected tours\nto the configured HR zones of the contained person");
+      setText(Messages.Tour_Action_HRZones_InSelectedTours);
+      setToolTipText(Messages.Tour_Action_HRZones_InSelectedTours_Tooltip);
    }
 
    @Override
