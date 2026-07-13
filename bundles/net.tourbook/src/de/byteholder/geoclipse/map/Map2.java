@@ -7352,6 +7352,10 @@ public class Map2 extends Canvas {
           */
          synchronized (_allDisposableMapPointImages_SWT) {
 
+            if (isDisposed()) {
+               return;
+            }
+
             final CustomScalingImageDataProvider imageDataProvider = new CustomScalingImageDataProvider(awtImage);
 
             _mapPointImage = new Image(getDisplay(), imageDataProvider);
