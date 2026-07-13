@@ -43,6 +43,8 @@ New / Improvements
     https://github.com/mytourbook/mytourbook/issues/1706
     
 * Equipment
+  - Create an equipment from a tag
+    https://github.com/mytourbook/mytourbook/issues/1671
   - Added a read-only computed field "Cost per mi/km"
     https://github.com/mytourbook/mytourbook/issues/1644    
 
