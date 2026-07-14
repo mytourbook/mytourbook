@@ -655,7 +655,7 @@ public class DialogEquipment extends TitleAreaDialog {
              * Initial value
              */
 
-            final Label label = UI.createLabel(container, "Ini&tial value");
+            final Label label = UI.createLabel(container, Messages.Dialog_Equipment_Label_InitialValue);
             _firstColumnControls.add(label);
 
             // spinner
@@ -670,7 +670,7 @@ public class DialogEquipment extends TitleAreaDialog {
             // autocomplete combo
             _comboInitialValueUnit = new Combo(container, SWT.BORDER | SWT.FLAT);
             _comboInitialValueUnit.setText(UI.EMPTY_STRING);
-            _comboInitialValueUnit.setToolTipText("Initial value unit");
+            _comboInitialValueUnit.setToolTipText(Messages.Dialog_Equipment_Label_InitialValue_Unit);
             _comboInitialValueUnit.addModifyListener(_defaultModifyListener);
 
             GridDataFactory.fillDefaults()

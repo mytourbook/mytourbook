@@ -296,6 +296,12 @@ public class Messages extends NLS {
    public static String        ColumnFactory_Equipment_ImageFile_Tooltip;
    public static String        ColumnFactory_Equipment_InitialDistance;
    public static String        ColumnFactory_Equipment_InitialDistance_Tooltip;
+
+   public static String ColumnFactory_Equipment_InitialValue;
+   public static String ColumnFactory_Equipment_InitialValueUnit_Header;
+
+   public static String ColumnFactory_Equipment_InitialValueUnit_Label;
+
    public static String        ColumnFactory_Equipment_IsRetired_Header;
    public static String        ColumnFactory_Equipment_IsRetired_Label;
    public static String        ColumnFactory_Equipment_Model;

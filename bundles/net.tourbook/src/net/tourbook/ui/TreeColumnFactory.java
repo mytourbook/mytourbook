@@ -1102,7 +1102,7 @@ public abstract class TreeColumnFactory {
 
             colDef.setColumnCategory(           Messages.ColumnFactory_Category_Equipment);
 
-            colDef.setColumnName(              	"Initial Value");
+            colDef.setColumnName(              	Messages.ColumnFactory_Equipment_InitialValue);
 
             colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(12));
 
@@ -1119,8 +1119,8 @@ public abstract class TreeColumnFactory {
 
             colDef.setColumnCategory(           Messages.ColumnFactory_Category_Equipment);
 
-            colDef.setColumnLabel(              "Initial Value Unit");
-            colDef.setColumnHeaderText(         "Unit");
+            colDef.setColumnLabel(              Messages.ColumnFactory_Equipment_InitialValueUnit_Label);
+            colDef.setColumnHeaderText(         Messages.ColumnFactory_Equipment_InitialValueUnit_Header);
 
             colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(6));
 
