@@ -1214,6 +1214,8 @@ public class EquipmentView extends ViewPart implements
       defineColumn_Equipment_Size();
       defineColumn_Equipment_Weight();
       defineColumn_Equipment_InitialDistance();
+      defineColumn_Equipment_InitialValue();
+      defineColumn_Equipment_InitialValueUnit();
       defineColumn_Equipment_Website();
       defineColumn_Equipment_PurchaseLocation();
 
@@ -2056,6 +2058,74 @@ public class EquipmentView extends ViewPart implements
                distance = distance / UI.UNIT_VALUE_DISTANCE;
 
                cell.setText(_nf0.format(distance));
+               setCellColor(cell, element);
+            }
+         }
+      });
+   }
+
+   /**
+    * Column: Initial value
+    */
+   private void defineColumn_Equipment_InitialValue() {
+
+      final ColumnDefinition colDef = TreeColumnFactory.EQUIPMENT_INITIAL_VALUE.createColumn(_columnManager, _pc);
+
+      colDef.setLabelProvider(new CellLabelProvider() {
+
+         @Override
+         public void update(final ViewerCell cell) {
+
+            final Object element = cell.getElement();
+
+            float value = 0;
+
+            if (element instanceof final TVIEquipmentView_Equipment equipmentItem) {
+
+               value = equipmentItem.getEquipment().getInitialValue();
+
+            } else if (element instanceof final TVIEquipmentView_Part partItem) {
+
+               value = partItem.getPart().getInitialValue();
+            }
+
+            if (value != 0) {
+
+               cell.setText(_nf0.format(value));
+               setCellColor(cell, element);
+            }
+         }
+      });
+   }
+
+   /**
+    * Column: Initial value unit
+    */
+   private void defineColumn_Equipment_InitialValueUnit() {
+
+      final ColumnDefinition colDef = TreeColumnFactory.EQUIPMENT_INITIAL_VALUE_UNIT.createColumn(_columnManager, _pc);
+
+      colDef.setLabelProvider(new CellLabelProvider() {
+
+         @Override
+         public void update(final ViewerCell cell) {
+
+            final Object element = cell.getElement();
+
+            String value = null;
+
+            if (element instanceof final TVIEquipmentView_Equipment equipmentItem) {
+
+               value = equipmentItem.getEquipment().getInitialValueUnit();
+
+            } else if (element instanceof final TVIEquipmentView_Part partItem) {
+
+               value = partItem.getPart().getInitialValueUnit();
+            }
+
+            if (value != null) {
+
+               cell.setText(value);
                setCellColor(cell, element);
             }
          }

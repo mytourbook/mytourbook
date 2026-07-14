@@ -657,7 +657,7 @@ public class ColumnDefinition implements Cloneable {
    }
 
    /**
-    * Overwrite default column ID which is set in the constructor.
+    * Overwrite default column ID which is set in the constructor
     *
     * @param columnId
     */
@@ -667,7 +667,7 @@ public class ColumnDefinition implements Cloneable {
 
    /**
     * @param label
-    *           This text is displayed in the column modification dialog.
+    *           This text is displayed in the column modification dialog
     */
    public void setColumnLabel(final String label) {
       _label = label;

@@ -96,6 +96,10 @@ public abstract class TreeColumnFactory {
    public static final String            EQUIPMENT_PURCHASE_LOCATION_ID   = "EQUIPMENT_PURCHASE_LOCATION_ID";   //$NON-NLS-1$
    public static final TreeColumnFactory EQUIPMENT_INITIAL_DISTANCE;
    public static final String            EQUIPMENT_INITIAL_DISTANCE_ID    = "EQUIPMENT_INITIAL_DISTANCE";       //$NON-NLS-1$
+   public static final TreeColumnFactory EQUIPMENT_INITIAL_VALUE;
+   public static final String            EQUIPMENT_INITIAL_VALUE_ID       = "EQUIPMENT_INITIAL_VALUE";          //$NON-NLS-1$
+   public static final TreeColumnFactory EQUIPMENT_INITIAL_VALUE_UNIT;
+   public static final String            EQUIPMENT_INITIAL_VALUE_UNIT_ID  = "EQUIPMENT_INITIAL_VALUE_UNIT";     //$NON-NLS-1$
    public static final TreeColumnFactory EQUIPMENT_MODEL;
    public static final String            EQUIPMENT_MODEL_ID               = "EQUIPMENT_MODEL";                  //$NON-NLS-1$
    public static final TreeColumnFactory EQUIPMENT_PRICE;
@@ -1084,6 +1088,41 @@ public abstract class TreeColumnFactory {
             colDef.setColumnUnit(               UI.UNIT_LABEL_DISTANCE);
 
             colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(12));
+
+            return colDef;
+         }
+      };
+
+      EQUIPMENT_INITIAL_VALUE = new TreeColumnFactory() {
+         @Override
+         public TreeColumnDefinition createColumn(final ColumnManager columnManager,
+                                                  final PixelConverter pixelConverter) {
+
+            final TreeColumnDefinition colDef = new TreeColumnDefinition(columnManager, EQUIPMENT_INITIAL_VALUE_ID, SWT.TRAIL);
+
+            colDef.setColumnCategory(           Messages.ColumnFactory_Category_Equipment);
+
+            colDef.setColumnName(              	"Initial Value");
+
+            colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(12));
+
+            return colDef;
+         }
+      };
+
+      EQUIPMENT_INITIAL_VALUE_UNIT = new TreeColumnFactory() {
+         @Override
+         public TreeColumnDefinition createColumn(final ColumnManager columnManager,
+                                                  final PixelConverter pixelConverter) {
+
+            final TreeColumnDefinition colDef = new TreeColumnDefinition(columnManager, EQUIPMENT_INITIAL_VALUE_UNIT_ID, SWT.LEAD);
+
+            colDef.setColumnCategory(           Messages.ColumnFactory_Category_Equipment);
+
+            colDef.setColumnLabel(              "Initial Value Unit");
+            colDef.setColumnHeaderText(         "Unit");
+
+            colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(6));
 
             return colDef;
          }

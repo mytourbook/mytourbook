@@ -123,6 +123,16 @@ public class Equipment implements Cloneable, Comparable<Object>, Serializable {
    private String                     priceUnit;
 
    /**
+    * Initial value
+    */
+   private float                      initialValue;
+
+   /**
+    * Initial value unit
+    */
+   private String                     initialValueUnit;
+
+   /**
     * Initial distance, in meter
     */
    private float                      distanceFirstUse;
@@ -429,6 +439,19 @@ public class Equipment implements Cloneable, Comparable<Object>, Serializable {
       return imageFilePath;
    }
 
+   public float getInitialValue() {
+      return initialValue;
+   }
+
+   public String getInitialValueUnit() {
+
+      if (initialValueUnit == null) {
+         return UI.EMPTY_STRING;
+      }
+
+      return initialValueUnit;
+   }
+
    public String getModel() {
 
       if (model == null) {
@@ -668,6 +691,14 @@ public class Equipment implements Cloneable, Comparable<Object>, Serializable {
       this.imageFilePath = imageFilePath;
    }
 
+   public void setInitialValue(final float initialValue) {
+      this.initialValue = initialValue;
+   }
+
+   public void setInitialValueUnit(final String initialValueUnit) {
+      this.initialValueUnit = initialValueUnit;
+   }
+
    public void setIsCollate(final boolean isCollate) {
       this.isCollate = isCollate;
    }
@@ -782,6 +813,8 @@ public class Equipment implements Cloneable, Comparable<Object>, Serializable {
       setCollateID         (otherEquipment.getCollateID());
 
       setDistanceFirstUse  (otherEquipment.getDistanceFirstUse());
+      setInitialValue      (otherEquipment.getInitialValue());
+      setInitialValueUnit  (otherEquipment.getInitialValueUnit());
       setPrice             (otherEquipment.getPrice());
       setPriceUnit         (otherEquipment.getPriceUnit());
       setSize              (otherEquipment.getSize());

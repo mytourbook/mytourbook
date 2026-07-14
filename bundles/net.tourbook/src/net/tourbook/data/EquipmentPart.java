@@ -89,7 +89,8 @@ public class EquipmentPart implements Cloneable, Comparable<Object>, Serializabl
     * The collation type, e.g. shoe xyz is used to combine it other parts with the same type but
     * different {@link #dateUsed}
     * <p>
-    * In MT 26.6 the wording of this field in the UI was renamed into "Collate ID" but not in the backend
+    * In MT 26.6 the wording of this field in the UI was renamed into "Collate ID" but not in the
+    * backend
     */
    private String                     type;
 
@@ -187,6 +188,16 @@ public class EquipmentPart implements Cloneable, Comparable<Object>, Serializabl
     * Price unit
     */
    private String                     priceUnit;
+
+   /**
+    * Initial value
+    */
+   private float                      initialValue;
+
+   /**
+    * Initial value unit
+    */
+   private String                     initialValueUnit;
 
    /**
     * Initial distance, in meter
@@ -459,6 +470,19 @@ public class EquipmentPart implements Cloneable, Comparable<Object>, Serializabl
 
    public String getImageFilePath() {
       return imageFilePath;
+   }
+
+   public float getInitialValue() {
+      return initialValue;
+   }
+
+   public String getInitialValueUnit() {
+
+      if (initialValueUnit == null) {
+         return UI.EMPTY_STRING;
+      }
+
+      return initialValueUnit;
    }
 
    /**
@@ -762,6 +786,14 @@ public class EquipmentPart implements Cloneable, Comparable<Object>, Serializabl
       this.imageFilePath = imageFilePath;
    }
 
+   public void setInitialValue(final float initialValue) {
+      this.initialValue = initialValue;
+   }
+
+   public void setInitialValueUnit(final String initialValueUnit) {
+      this.initialValueUnit = initialValueUnit;
+   }
+
    public void setIsCollate(final boolean isCollate) {
       this.isCollate = isCollate;
    }
@@ -871,6 +903,8 @@ public class EquipmentPart implements Cloneable, Comparable<Object>, Serializabl
       setPartCollateID     (otherPart.getPartCollateID());
 
       setDistanceFirstUse  (otherPart.getDistanceFirstUse());
+      setInitialValue      (otherPart.getInitialValue());
+      setInitialValueUnit  (otherPart.getInitialValueUnit());
       setPrice             (otherPart.getPrice());
       setPriceUnit         (otherPart.getPriceUnit());
       setSize              (otherPart.getSize());
