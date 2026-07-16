@@ -348,7 +348,7 @@ public class UI {
    /**
     * Is <code>true</code> when the bright theme in the UI is selected
     */
-   public static boolean       IS_BRIGHT_THEME;
+   public static boolean       IS_BRIGHT_THEME   = true;
 
    /**
     * When <code>true</code> then HRD images are displayed on windows when the dark theme is
