@@ -49,6 +49,8 @@ New / Improvements
     https://github.com/mytourbook/mytourbook/issues/1644    
   - Added field: Intitial value
     https://github.com/mytourbook/mytourbook/issues/1666
+  - Add a purchase date field
+    https://github.com/mytourbook/mytourbook/issues/1677
 
   
 

@@ -70,7 +70,8 @@ public class Equipment implements Cloneable, Comparable<Object>, Serializable {
    /**
     * Collation type, e.g. backpack
     * <p>
-    * In MT 26.6 the wording of this field in the UI was renamed into "Collate ID" but not in the backend
+    * In MT 26.6 the wording of this field in the UI was renamed into "Collate ID" but not in the
+    * backend
     */
    private String                     type;
 
@@ -148,19 +149,24 @@ public class Equipment implements Cloneable, Comparable<Object>, Serializable {
    private boolean                    isRetired;
 
    /**
-    * When the equipment was firstly used, in milliseconds since 1970-01-01T00:00:00Z
-    */
-   private long                       dateUsed;
-
-   /**
     * When the equipment was created/build, in milliseconds since 1970-01-01T00:00:00Z
     */
    private long                       dateBuilt;
 
    /**
+    * When the equipment was purchased, in milliseconds since 1970-01-01T00:00:00Z
+    */
+   private long                       datePurchased;
+
+   /**
     * When the equipment was retired/sold, in milliseconds since 1970-01-01T00:00:00Z
     */
    private long                       dateRetired;
+   
+   /**
+    * When the equipment was firstly used, in milliseconds since 1970-01-01T00:00:00Z
+    */
+   private long                       dateUsed;
 
    /**
     * When the equipment was firstly used, in milliseconds since 1970-01-01T00:00:00Z
@@ -200,13 +206,16 @@ public class Equipment implements Cloneable, Comparable<Object>, Serializable {
    private long                       _createId        = 0;
 
    @Transient
-   private LocalDateTime              _dateUsed;
-
-   @Transient
    private LocalDateTime              _dateBuilt;
 
    @Transient
+   private LocalDateTime              _datePurchased;
+
+   @Transient
    private LocalDateTime              _dateRetired;
+
+   @Transient
+   private LocalDateTime              _dateUsed;
 
    @Transient
    private LocalDateTime              _dateCollateFrom;
@@ -363,6 +372,20 @@ public class Equipment implements Cloneable, Comparable<Object>, Serializable {
       }
 
       return _dateCollateUntil;
+   }
+
+   public long getDatePurchased() {
+      
+      return datePurchased;
+   }
+
+   public LocalDateTime getDatePurchased_Local() {
+
+      if (_datePurchased == null) {
+         _datePurchased = TimeTools.toLocalDateTime(datePurchased);
+      }
+
+      return _datePurchased;
    }
 
    public long getDateRetired() {
@@ -661,6 +684,13 @@ public class Equipment implements Cloneable, Comparable<Object>, Serializable {
       _dateCollateUntil = null;
    }
 
+   public void setDatePurchased(final long datePurchased) {
+
+      this.datePurchased = datePurchased;
+
+      _datePurchased = null;
+   }
+
    public void setDateRetired(final long dateRetired) {
 
       this.dateRetired = dateRetired;
@@ -821,9 +851,10 @@ public class Equipment implements Cloneable, Comparable<Object>, Serializable {
       setWeight            (otherEquipment.getWeight());
       setWeightUnit        (otherEquipment.getWeightUnit());
 
-      setDateUsed          (otherEquipment.getDateUsed());
       setDateBuilt         (otherEquipment.getDateBuilt());
+      setDatePurchased     (otherEquipment.getDatePurchased());
       setDateRetired       (otherEquipment.getDateRetired());
+      setDateUsed          (otherEquipment.getDateUsed());
 
 // SET_FORMATTING_ON
    }

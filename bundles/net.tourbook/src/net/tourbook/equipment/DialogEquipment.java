@@ -166,6 +166,7 @@ public class DialogEquipment extends TitleAreaDialog {
    private Combo                     _comboWeightUnit;
 
    private DateTime                  _dateBuilt;
+   private DateTime                  _datePurchased;
    private DateTime                  _dateRetired;
    private DateTime                  _dateUsed;
 
@@ -346,7 +347,7 @@ public class DialogEquipment extends TitleAreaDialog {
       UI.createSpacer_Vertical(_uiContainer, 8, 3);
 
       createUI_200_Col1(_uiContainer);
-      UI.createSpacer_Horizontal(_uiContainer, 20, 1);
+      UI.createSpacer_Horizontal(_uiContainer, 10, 1);
       createUI_300_Col2(_uiContainer);
 
       createUI_900_Bottom(_uiContainer);
@@ -473,7 +474,7 @@ public class DialogEquipment extends TitleAreaDialog {
    private void createUI_200_Col1(final Composite parent) {
 
       final Composite container = new Composite(parent, SWT.NONE);
-      GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
+      GridDataFactory.fillDefaults().applyTo(container);
       GridLayoutFactory.fillDefaults().numColumns(3).applyTo(container);
 //      container.setBackground(UI.SYS_COLOR_CYAN);
       {
@@ -512,6 +513,19 @@ public class DialogEquipment extends TitleAreaDialog {
             _chkSyncDates.setText(Messages.Dialog_Equipment_Checkbox_Sync);
             _chkSyncDates.setToolTipText(Messages.Dialog_Equipment_Checkbox_Sync_Tooltip);
             _chkSyncDates.addSelectionListener(_defaultSelectionListener);
+         }
+         {
+            /*
+             * Purchased date
+             */
+            final Label label = UI.createLabel(container, "Purc&hased");
+            _gdVertCenter.applyTo(label);
+            _firstColumnControls.add(label);
+
+            _datePurchased = new DateTime(container, SWT.DATE | SWT.MEDIUM | SWT.DROP_DOWN);
+            _datePurchased.addSelectionListener(_defaultSelectionListener);
+
+            UI.createSpacer_Horizontal(container, 1);
          }
          {
             /*
@@ -1399,9 +1413,10 @@ public class DialogEquipment extends TitleAreaDialog {
 
       final float distance          = _spinDistance.getSelection() * UI.UNIT_VALUE_DISTANCE;
 
-      final LocalDate dateUsed      = LocalDate.of(_dateUsed.getYear(),       _dateUsed.getMonth() + 1,     _dateUsed.getDay());
-      final LocalDate dateBuilt     = LocalDate.of(_dateBuilt.getYear(),      _dateBuilt.getMonth() + 1,    _dateBuilt.getDay());
-      final LocalDate dateRetired   = LocalDate.of(_dateRetired.getYear(),    _dateRetired.getMonth() + 1,  _dateRetired.getDay());
+      final LocalDate dateBuilt     = LocalDate.of(_dateBuilt.getYear(),      _dateBuilt     .getMonth() + 1,  _dateBuilt.getDay());
+      final LocalDate datePurchased = LocalDate.of(_datePurchased.getYear(),  _datePurchased .getMonth() + 1,  _datePurchased.getDay());
+      final LocalDate dateRetired   = LocalDate.of(_dateRetired.getYear(),    _dateRetired   .getMonth() + 1,  _dateRetired.getDay());
+      final LocalDate dateUsed      = LocalDate.of(_dateUsed.getYear(),       _dateUsed      .getMonth() + 1,  _dateUsed.getDay());
 
       _equipment.setBrand(             _comboBrand.getText().trim());
       _equipment.setModel(             _comboModel.getText().trim());
@@ -1423,9 +1438,10 @@ public class DialogEquipment extends TitleAreaDialog {
       _equipment.setWeight(            getWeight_FromUI());
       _equipment.setWeightUnit(        (short) _comboWeightUnit.getSelectionIndex());
 
-      _equipment.setDateUsed(          TimeTools.toEpochMilli(dateUsed));
       _equipment.setDateBuilt(         TimeTools.toEpochMilli(dateBuilt));
+      _equipment.setDatePurchased(     TimeTools.toEpochMilli(datePurchased));
       _equipment.setDateRetired(       TimeTools.toEpochMilli(dateRetired));
+      _equipment.setDateUsed(          TimeTools.toEpochMilli(dateUsed));
 
 // SET_FORMATTING_ON
    }
@@ -1502,25 +1518,20 @@ public class DialogEquipment extends TitleAreaDialog {
 
 // SET_FORMATTING_OFF
 
-      LocalDateTime dateUsed        = _equipment.getDateUsed_Local();
       LocalDateTime dateBuilt       = _equipment.getDateBuilt_Local();
+      LocalDateTime datePurchased   = _equipment.getDatePurchased_Local();
       LocalDateTime dateRetired     = _equipment.getDateRetired_Local();
+      LocalDateTime dateUsed        = _equipment.getDateUsed_Local();
 
-      final long dateUsedMS         = TimeTools.toEpochMilli(dateUsed);
       final long dateBuiltMS        = TimeTools.toEpochMilli(dateBuilt);
+      final long datePurchasedMS    = TimeTools.toEpochMilli(datePurchased);
       final long dateRetiredMS      = TimeTools.toEpochMilli(dateRetired);
+      final long dateUsedMS         = TimeTools.toEpochMilli(dateUsed);
 
-      if (dateUsedMS == 0) {
-         dateUsed = LocalDateTime.now();
-      }
-
-      if (dateBuiltMS == 0) {
-         dateBuilt = LocalDateTime.now();
-      }
-
-      if (dateRetiredMS == 0) {
-         dateRetired = LocalDateTime.of(2099, 1, 1, 0, 0);
-      }
+      if (dateBuiltMS      == 0) {  dateBuilt      = LocalDateTime.now();}
+      if (datePurchasedMS  == 0) {  datePurchased  = dateBuilt;}
+      if (dateRetiredMS    == 0) {  dateRetired    = LocalDateTime.of(2099, 1, 1, 0, 0);}
+      if (dateUsedMS       == 0) {  dateUsed       = LocalDateTime.now();}
 
       final float distance    = _equipment.getDistanceFirstUse() / UI.UNIT_VALUE_DISTANCE;
       final String urlAddress = _equipment.getUrlAddress();
@@ -1536,9 +1547,10 @@ public class DialogEquipment extends TitleAreaDialog {
 
       _comboWeightUnit        .select( _equipment.getWeightUnit());
 
-      _dateUsed               .setDate(dateUsed.getYear(),     dateUsed.getMonthValue() - 1,    dateUsed.getDayOfMonth());
-      _dateBuilt              .setDate(dateBuilt.getYear(),    dateBuilt.getMonthValue() - 1,   dateBuilt.getDayOfMonth());
-      _dateRetired            .setDate(dateRetired.getYear(),  dateRetired.getMonthValue() - 1, dateRetired.getDayOfMonth());
+      _dateBuilt              .setDate(dateBuilt.getYear(),       dateBuilt.getMonthValue() - 1,      dateBuilt.getDayOfMonth());
+      _datePurchased          .setDate(datePurchased.getYear(),   datePurchased.getMonthValue() - 1,  datePurchased.getDayOfMonth());
+      _dateRetired            .setDate(dateRetired.getYear(),     dateRetired.getMonthValue() - 1,    dateRetired.getDayOfMonth());
+      _dateUsed               .setDate(dateUsed.getYear(),        dateUsed.getMonthValue() - 1,       dateUsed.getDayOfMonth());
 
       _spinDistance           .setSelection((int) distance);
       _spinInitialValue       .setSelection((int) _equipment.getInitialValue());

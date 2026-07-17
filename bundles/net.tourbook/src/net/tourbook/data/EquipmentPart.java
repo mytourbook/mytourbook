@@ -140,19 +140,24 @@ public class EquipmentPart implements Cloneable, Comparable<Object>, Serializabl
    private boolean                    isRetired;
 
    /**
-    * When the part was firstly used, in milliseconds since 1970-01-01T00:00:00Z
-    */
-   private long                       dateUsed;
-
-   /**
     * When the part was created/build, in milliseconds since 1970-01-01T00:00:00Z
     */
    private long                       dateBuilt;
 
    /**
+    * When the part was purchased, in milliseconds since 1970-01-01T00:00:00Z
+    */
+   private long                       datePurchased;
+
+   /**
     * When the part was retired/sold, in milliseconds since 1970-01-01T00:00:00Z
     */
    private long                       dateRetired;
+   
+   /**
+    * When the part was firstly used, in milliseconds since 1970-01-01T00:00:00Z
+    */
+   private long                       dateUsed;
 
    /**
     * When the part was firstly used, in milliseconds since 1970-01-01T00:00:00Z
@@ -222,13 +227,16 @@ public class EquipmentPart implements Cloneable, Comparable<Object>, Serializabl
    private long                       _createId                       = 0;
 
    @Transient
-   private LocalDateTime              _dateUsed;
-
-   @Transient
    private LocalDateTime              _dateBuilt;
 
    @Transient
+   private LocalDateTime              _datePurchased;
+
+   @Transient
    private LocalDateTime              _dateRetired;
+
+   @Transient
+   private LocalDateTime              _dateUsed;
 
    @Transient
    private LocalDateTime              _dateCollateFrom;
@@ -402,6 +410,20 @@ public class EquipmentPart implements Cloneable, Comparable<Object>, Serializabl
       }
 
       return _dateCollateUntil;
+   }
+
+   public long getDatePurchased() {
+      
+      return datePurchased;
+   }
+
+   public LocalDateTime getDatePurchased_Local() {
+
+      if (_datePurchased == null) {
+         _datePurchased = TimeTools.toLocalDateTime(datePurchased);
+      }
+
+      return _datePurchased;
    }
 
    public long getDateRetired() {
@@ -751,6 +773,13 @@ public class EquipmentPart implements Cloneable, Comparable<Object>, Serializabl
       _dateCollateUntil = null;
    }
 
+   public void setDatePurchased(final long datePurchased) {
+
+      this.datePurchased = datePurchased;
+
+      _datePurchased = null;
+   }
+
    public void setDateRetired(final long dateRetired) {
 
       this.dateRetired = dateRetired;
@@ -911,9 +940,10 @@ public class EquipmentPart implements Cloneable, Comparable<Object>, Serializabl
       setWeight            (otherPart.getWeight());
       setWeightUnit        (otherPart.getWeightUnit());
 
-      setDateUsed          (otherPart.getDateUsed());
       setDateBuilt         (otherPart.getDateBuilt());
+      setDatePurchased     (otherPart.getDatePurchased());
       setDateRetired       (otherPart.getDateRetired());
+      setDateUsed          (otherPart.getDateUsed());
 
 // SET_FORMATTING_ON
    }

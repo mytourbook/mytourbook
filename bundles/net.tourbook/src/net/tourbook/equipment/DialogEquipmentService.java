@@ -323,7 +323,7 @@ public class DialogEquipmentService extends TitleAreaDialog {
       UI.createSpacer_Vertical(_uiContainer, 8, 3);
 
       createUI_200_Col1(_uiContainer);
-      UI.createSpacer_Horizontal(_uiContainer, 20, 1);
+      UI.createSpacer_Horizontal(_uiContainer, 10, 1);
       createUI_300_Col2(_uiContainer);
 
       createUI_900_Bottom(_uiContainer);
@@ -475,7 +475,7 @@ public class DialogEquipmentService extends TitleAreaDialog {
    private void createUI_200_Col1(final Composite parent) {
 
       final Composite container = new Composite(parent, SWT.NONE);
-      GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
+      GridDataFactory.fillDefaults().applyTo(container);
       GridLayoutFactory.fillDefaults().numColumns(3).applyTo(container);
 //      container.setBackground(UI.SYS_COLOR_CYAN);
       {

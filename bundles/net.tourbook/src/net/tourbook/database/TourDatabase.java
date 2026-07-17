@@ -128,7 +128,7 @@ public class TourDatabase {
     */
    private static final int TOURBOOK_DB_VERSION = 62;
 
-//   private static final int TOURBOOK_DB_VERSION = 61; // 26.6+++
+//   private static final int TOURBOOK_DB_VERSION = 62; // 26.6.next
 
 //   private static final int TOURBOOK_DB_VERSION = 61; // 26.6
 //   private static final int TOURBOOK_DB_VERSION = 60; // 26.3
@@ -4749,6 +4749,7 @@ public class TourDatabase {
 
                   // version 62 start
 
+                  + "   DatePurchased           BIGINT DEFAULT 0,                         " + NL //$NON-NLS-1$
                   + "   InitialValue            FLOAT DEFAULT 0,                          " + NL //$NON-NLS-1$
                   + "   InitialValueUnit        VARCHAR(" + DB_LENGTH_NAME + ")          	" + NL //$NON-NLS-1$ //$NON-NLS-2$
 
@@ -4852,6 +4853,7 @@ public class TourDatabase {
 
                   // version 62 start
 
+                  + "   DatePurchased           BIGINT DEFAULT 0,                         " + NL //$NON-NLS-1$
                   + "   InitialValue            FLOAT DEFAULT 0,                          " + NL //$NON-NLS-1$
                   + "   InitialValueUnit        VARCHAR(" + DB_LENGTH_NAME + ")           " + NL //$NON-NLS-1$ //$NON-NLS-2$
 
@@ -11928,9 +11930,11 @@ public class TourDatabase {
 
 // SET_FORMATTING_OFF
 
+            SQL.addColumn_BigInt    (stmt, TABLE_EQUIPMENT,       "DatePurchased",     DEFAULT_0);       //$NON-NLS-1$
             SQL.addColumn_Float     (stmt, TABLE_EQUIPMENT,       "initialValue",      DEFAULT_0);       //$NON-NLS-1$
             SQL.addColumn_VarCar    (stmt, TABLE_EQUIPMENT,       "initialValueUnit",  DB_LENGTH_NAME);  //$NON-NLS-1$
 
+            SQL.addColumn_BigInt    (stmt, TABLE_EQUIPMENT_PART,  "DatePurchased",     DEFAULT_0);       //$NON-NLS-1$
             SQL.addColumn_Float     (stmt, TABLE_EQUIPMENT_PART,  "initialValue",      DEFAULT_0);       //$NON-NLS-1$
             SQL.addColumn_VarCar    (stmt, TABLE_EQUIPMENT_PART,  "initialValueUnit",  DB_LENGTH_NAME);  //$NON-NLS-1$
 

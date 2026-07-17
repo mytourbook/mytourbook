@@ -1206,6 +1206,7 @@ public class EquipmentView extends ViewPart implements
       defineColumn_Equipment_Date_Collate_Until();
       defineColumn_Equipment_Date_UsageDuration();
       defineColumn_Equipment_Date_Built();
+      defineColumn_Equipment_Date_Purchased();
       defineColumn_Equipment_Date_Retired();
 
       defineColumn_Equipment_Price();
@@ -1782,6 +1783,55 @@ public class EquipmentView extends ViewPart implements
                }
 
                cell.setText(dateFormatted);
+               setCellColor(cell, element);
+            }
+         }
+      });
+   }
+
+   /**
+    * Column: Purchased date
+    */
+   private void defineColumn_Equipment_Date_Purchased() {
+
+      final ColumnDefinition colDef = TreeColumnFactory.EQUIPMENT_DATE_PURCHASED.createColumn(_columnManager, _pc);
+
+      colDef.setLabelProvider(new CellLabelProvider() {
+
+         @Override
+         public void update(final ViewerCell cell) {
+
+            final Object element = cell.getElement();
+            LocalDateTime date = null;
+
+            if (element instanceof final TVIEquipmentView_Equipment viewItem) {
+
+               final Equipment equipment = viewItem.getEquipment();
+
+               if (equipment.getDatePurchased() != 0) {
+
+                  // it can be 0 for parts which were created before MT 26.6.next
+
+                  date = equipment.getDatePurchased_Local();
+               }
+
+            } else if (element instanceof final TVIEquipmentView_Part viewItem) {
+
+               final EquipmentPart part = viewItem.getPart();
+
+               // a service has not a purchased date, so the value is 0 -> 01.01.1970
+               if (part.isItemType_Part()
+
+                     // it can be 0 for parts which were created before MT 26.6.next
+                     && part.getDatePurchased() != 0) {
+
+                  date = part.getDatePurchased_Local();
+               }
+            }
+
+            if (date != null) {
+
+               cell.setText(TimeTools.Formatter_Date_S.format(date));
                setCellColor(cell, element);
             }
          }
