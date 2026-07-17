@@ -166,7 +166,7 @@ public class EquipmentMenuManager implements IActionProvider {
 
          __allEquipmentGroupActions.clear();
 
-         final List<EquipmentGroup> allEquipmentGroups = EquipmentGroupManager.getEquipmentGroups();
+         final List<EquipmentGroup> allEquipmentGroups = EquipmentGroupManager.getEquipmentGroupsSorted();
 
          // create actions for each equipment group
          for (final EquipmentGroup equipmentGroup : allEquipmentGroups) {
