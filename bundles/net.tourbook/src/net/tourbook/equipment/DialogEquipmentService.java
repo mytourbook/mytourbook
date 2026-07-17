@@ -158,6 +158,7 @@ public class DialogEquipmentService extends TitleAreaDialog {
    private Combo                     _comboPriceUnit;
    private Combo                     _comboCollateID;
 
+   private DateTime                  _datePurchased;
    private DateTime                  _dateRetired;
    private DateTime                  _dateUsed;
 
@@ -323,7 +324,7 @@ public class DialogEquipmentService extends TitleAreaDialog {
       UI.createSpacer_Vertical(_uiContainer, 8, 3);
 
       createUI_200_Col1(_uiContainer);
-      UI.createSpacer_Horizontal(_uiContainer, 10, 1);
+      UI.createSpacer_Horizontal(_uiContainer, 2, 1);
       createUI_300_Col2(_uiContainer);
 
       createUI_900_Bottom(_uiContainer);
@@ -577,17 +578,26 @@ public class DialogEquipmentService extends TitleAreaDialog {
       {
          {
             /*
-             * Purchase location
+             * Purchased
              */
-            final Label label = UI.createLabel(container, Messages.Dialog_Equipment_Label_PurchaseLocation);
+            final Label label = UI.createLabel(container, Messages.Dialog_Equipment_Label_Purchased);
             _firstColumnControls.add(label);
 
-            _txtPurchaseLocation = new Text(container, SWT.BORDER);
-            _txtPurchaseLocation.addModifyListener(e -> onModify());
-            GridDataFactory.fillDefaults()
-                  .grab(true, false)
-                  .hint(_defaultDescriptionWidth, SWT.DEFAULT)
-                  .applyTo(_txtPurchaseLocation);
+            final Composite purchaseContainer = new Composite(container, SWT.NONE);
+            GridDataFactory.fillDefaults().grab(true, false).applyTo(purchaseContainer);
+            GridLayoutFactory.fillDefaults().numColumns(2).applyTo(purchaseContainer);
+            {
+               _datePurchased = new DateTime(purchaseContainer, SWT.DATE | SWT.MEDIUM | SWT.DROP_DOWN);
+               _datePurchased.addSelectionListener(_defaultSelectionListener);
+
+               _txtPurchaseLocation = new Text(purchaseContainer, SWT.BORDER);
+               _txtPurchaseLocation.setToolTipText(Messages.Dialog_Equipment_Label_Purchased_Tooltip);
+               _txtPurchaseLocation.addModifyListener(e -> onModify());
+               GridDataFactory.fillDefaults()
+                     .grab(true, false)
+                     .hint(_defaultDescriptionWidth, SWT.DEFAULT)
+                     .applyTo(_txtPurchaseLocation);
+            }
          }
          {
             /*
@@ -1084,7 +1094,8 @@ public class DialogEquipmentService extends TitleAreaDialog {
 
 // SET_FORMATTING_OFF
 
-      final LocalDate dateUsed      = LocalDate.of(_dateUsed.getYear(), _dateUsed.getMonth() + 1, _dateUsed.getDay());
+      final LocalDate dateUsed      = LocalDate.of(_dateUsed      .getYear(), _dateUsed      .getMonth() + 1,  _dateUsed      .getDay());
+      final LocalDate datePurchased = LocalDate.of(_datePurchased .getYear(), _datePurchased .getMonth() + 1,  _datePurchased .getDay());
 
       _service.setEquipment(        _serviceEquipment);
 
@@ -1106,6 +1117,7 @@ public class DialogEquipmentService extends TitleAreaDialog {
       _service.setPrice(            _spinPrice           .getSelection() / 100f);
       _service.setPriceUnit(        _comboPriceUnit      .getText());
 
+      _service.setDatePurchased(    TimeTools.toEpochMilli(datePurchased));
       _service.setDateUsed(         TimeTools.toEpochMilli(dateUsed));
 
 // SET_FORMATTING_ON
@@ -1175,18 +1187,19 @@ public class DialogEquipmentService extends TitleAreaDialog {
 
       _isInUIUpdate = true;
 
-      LocalDateTime dateUsed = _service.getDateUsed_Local();
-
-      final long dateUsedMS = TimeTools.toEpochMilli(dateUsed);
-
-      if (dateUsedMS == 0) {
-         dateUsed = LocalDateTime.now();
-      }
-
 // SET_FORMATTING_OFF
 
       final int collateWith      = _service.getCollateBetween();
       final String urlAddress    = _service.getUrlAddress();
+
+      LocalDateTime datePurchased   = _service.getDatePurchased_Local();
+      LocalDateTime dateUsed        = _service.getDateUsed_Local();
+
+      final long datePurchasedMS    = TimeTools.toEpochMilli(datePurchased);
+      final long dateUsedMS         = TimeTools.toEpochMilli(dateUsed);
+
+      if (datePurchasedMS  == 0) {  datePurchased  = LocalDateTime.now();}
+      if (dateUsedMS       == 0) {  dateUsed       = LocalDateTime.now();}
 
       _chkCollate                .setSelection(_service.isCollate());
       _chkRetired                .setSelection(_service.isRetired());
@@ -1195,7 +1208,8 @@ public class DialogEquipmentService extends TitleAreaDialog {
       _comboName                 .setText(_service.getName_Service());
       _comboCollateID            .setText(_service.getPartCollateID());
 
-      _dateUsed                  .setDate(dateUsed.getYear(), dateUsed.getMonthValue() - 1, dateUsed.getDayOfMonth());
+      _datePurchased             .setDate(datePurchased  .getYear(), datePurchased  .getMonthValue() - 1,   datePurchased  .getDayOfMonth());
+      _dateUsed                  .setDate(dateUsed       .getYear(), dateUsed       .getMonthValue() - 1,   dateUsed       .getDayOfMonth());
 
       _rdoCollateWith_Next       .setSelection(collateWith == EquipmentPart.COLLATED_WITH_NEXT);
       _rdoCollateWith_Previous   .setSelection(collateWith == EquipmentPart.COLLATED_WITH_PREVIOUS);

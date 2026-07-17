@@ -612,7 +612,8 @@ public class Messages extends NLS {
    public static String        Dialog_Equipment_Label_InitialValue_Unit;
    public static String        Dialog_Equipment_Label_Model;
    public static String        Dialog_Equipment_Label_Price;
-   public static String        Dialog_Equipment_Label_PurchaseLocation;
+   public static String        Dialog_Equipment_Label_Purchased;
+   public static String        Dialog_Equipment_Label_Purchased_Tooltip;
    public static String        Dialog_Equipment_Label_Size;
    public static String        Dialog_Equipment_Label_Weight;
    public static String        Dialog_Equipment_Link_Website;

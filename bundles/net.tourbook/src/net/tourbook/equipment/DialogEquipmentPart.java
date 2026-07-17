@@ -349,7 +349,7 @@ public class DialogEquipmentPart extends TitleAreaDialog {
       UI.createSpacer_Vertical(_uiContainer, 8, 3);
 
       createUI_200_Col1(_uiContainer);
-      UI.createSpacer_Horizontal(_uiContainer, 10, 1);
+      UI.createSpacer_Horizontal(_uiContainer, 2, 1);
       createUI_300_Col2(_uiContainer);
 
       createUI_900_Bottom(_uiContainer);
@@ -548,19 +548,6 @@ public class DialogEquipmentPart extends TitleAreaDialog {
          }
          {
             /*
-             * Purchased date
-             */
-            final Label label = UI.createLabel(container, "Purc&hased");
-            _gdVertCenter.applyTo(label);
-            _firstColumnControls.add(label);
-
-            _datePurchased = new DateTime(container, SWT.DATE | SWT.MEDIUM | SWT.DROP_DOWN);
-            _datePurchased.addSelectionListener(_defaultSelectionListener);
-
-            UI.createSpacer_Horizontal(container, 1);
-         }
-         {
-            /*
              * Retired: Checkbox
              */
             final Label label = UI.createLabel(container, Messages.Dialog_Equipment_Label_DateRetired);
@@ -738,17 +725,26 @@ public class DialogEquipmentPart extends TitleAreaDialog {
       {
          {
             /*
-             * Purchase location
+             * Purchased
              */
-            final Label label = UI.createLabel(container, Messages.Dialog_Equipment_Label_PurchaseLocation);
+            final Label label = UI.createLabel(container, Messages.Dialog_Equipment_Label_Purchased);
             _firstColumnControls.add(label);
 
-            _txtPurchaseLocation = new Text(container, SWT.BORDER);
-            _txtPurchaseLocation.addModifyListener(e -> onModify());
-            GridDataFactory.fillDefaults()
-                  .grab(true, false)
-                  .hint(_defaultDescriptionWidth, SWT.DEFAULT)
-                  .applyTo(_txtPurchaseLocation);
+            final Composite purchaseContainer = new Composite(container, SWT.NONE);
+            GridDataFactory.fillDefaults().grab(true, false).applyTo(purchaseContainer);
+            GridLayoutFactory.fillDefaults().numColumns(2).applyTo(purchaseContainer);
+            {
+               _datePurchased = new DateTime(purchaseContainer, SWT.DATE | SWT.MEDIUM | SWT.DROP_DOWN);
+               _datePurchased.addSelectionListener(_defaultSelectionListener);
+
+               _txtPurchaseLocation = new Text(purchaseContainer, SWT.BORDER);
+               _txtPurchaseLocation.setToolTipText(Messages.Dialog_Equipment_Label_Purchased_Tooltip);
+               _txtPurchaseLocation.addModifyListener(e -> onModify());
+               GridDataFactory.fillDefaults()
+                     .grab(true, false)
+                     .hint(_defaultDescriptionWidth, SWT.DEFAULT)
+                     .applyTo(_txtPurchaseLocation);
+            }
          }
          {
             /*
@@ -1574,7 +1570,6 @@ public class DialogEquipmentPart extends TitleAreaDialog {
       if (datePurchasedMS  == 0) {  datePurchased  = dateBuilt;}
       if (dateRetiredMS    == 0) {  dateRetired    = LocalDateTime.of(2099, 1, 1, 0, 0);}
       if (dateUsedMS       == 0) {  dateUsed       = LocalDateTime.now();}
-
 
       final int collateWith      = _part.getCollateBetween();
       final float distance       = _part.getDistanceFirstUse() / UI.UNIT_VALUE_DISTANCE;
