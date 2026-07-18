@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2026 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -42,20 +42,30 @@ public class DownloadSRTM3 {
     * Prefix used to identify redirects to URS for the purpose of adding authentication headers. For
     * test, this should be: https://uat.urs.earthdata.nasa.gov for test
     */
-   private static final String           HTTP_URS_EARTHDATA_NASA_GOV = "https://urs.earthdata.nasa.gov"; //$NON-NLS-1$
+   private static final String HTTP_URS_EARTHDATA_NASA_GOV = "https://urs.earthdata.nasa.gov";                                             //$NON-NLS-1$
 
    /**
     * SRTM example file
-    * https://e4ftl01.cr.usgs.gov/MEASURES/SRTMGL3.003/2000.02.11/N13E016.SRTMGL3.hgt.zip
+    *
+    * Source: https://dwtkns.com/srtm30m/#5.21/47.056/5.772
+    *
+    * https://data.lpdaac.earthdatacloud.nasa.gov/lp-prod-protected/SRTMGL1.003/N46E007.SRTMGL1.hgt/N46E007.SRTMGL1.hgt.zip
+    * https://data.lpdaac.earthdatacloud.nasa.gov/lp-prod-protected/SRTMGL3.003/N46E007.SRTMGL3.hgt/N46E007.SRTMGL3.hgt.zip
+    *
+    * Before 2026-07-18
+    * OLD: https://e4ftl01.cr.usgs.gov/MEASURES/SRTMGL3.003/2000.02.11/N13E016.SRTMGL3.hgt.zip
     */
-   private static final String           URL_BASE_PATH               = "https://e4ftl01.cr.usgs.gov/MEASURES/SRTMGL3.003/2000.02.11/"; //$NON-NLS-1$
+   private static final String URL_BASE_PATH               = "https://data.lpdaac.earthdatacloud.nasa.gov/lp-prod-protected/SRTMGL3.003/"; //$NON-NLS-1$
 
-   private static final int              MAX_REDIRECTS               = 10;
-   private static final int              MAX_REDIRECTED_LOGS         = MAX_REDIRECTS + 5;
+// Before 2026-07-18
+// private static final String URL_BASE_PATH               = "https://e4ftl01.cr.usgs.gov/MEASURES/SRTMGL3.003/2000.02.11/"; //$NON-NLS-1$
+
+   private static final int              MAX_REDIRECTS       = 10;
+   private static final int              MAX_REDIRECTED_LOGS = MAX_REDIRECTS + 5;
 
    private static int                    _numRedirectedLogs;
 
-   private static final IPreferenceStore _prefStore                  = TourbookPlugin.getPrefStore();
+   private static final IPreferenceStore _prefStore          = TourbookPlugin.getPrefStore();
 
    private class SRTM3_HTTPDownloader extends HTTPDownloader {
 
@@ -72,6 +82,7 @@ public class DownloadSRTM3 {
    /**
     * @param remoteFileName
     * @param localZipName
+    *
     * @throws Exception
     */
    public void get(final String remoteFileName, final String localZipName) throws Exception {
@@ -86,7 +97,9 @@ public class DownloadSRTM3 {
     * @param resourceUrl
     * @param username
     * @param password
+    *
     * @return
+    *
     * @throws Exception
     */
    public InputStream getResource(String resourceUrl,
@@ -140,6 +153,9 @@ public class DownloadSRTM3 {
           * information, such as the mime type or size ).
           */
          final int status = connection.getResponseCode();
+
+         System.out.println(this.getClass().getSimpleName() + " - Request: %d    %s".formatted(status, resourceUrl)); //$NON-NLS-1$
+
          if (status == 200) {
 
             return connection.getInputStream();
@@ -169,7 +185,7 @@ public class DownloadSRTM3 {
 
             _numRedirectedLogs++;
 
-            System.out.println(this.getClass().getCanonicalName() + " - Redirecting to: " + resourceUrl); //$NON-NLS-1$
+            System.out.println(this.getClass().getSimpleName() + " - Redirecting to: " + resourceUrl); //$NON-NLS-1$
          }
       }
 

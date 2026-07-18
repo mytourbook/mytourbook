@@ -57,9 +57,12 @@ public class PrefPageSRTMData extends PreferencePage implements IWorkbenchPrefer
 
 // SET_FORMATTING_OFF
 
-   private static final String HTTPS_NASA_EARTHDATA_LOGIN = "https://urs.earthdata.nasa.gov/home"; //$NON-NLS-1$
-   private static final String HTTPS_NASA_TEST_URL        = "https://e4ftl01.cr.usgs.gov/MEASURES/SRTMGL3.003/2000.02.11/N10E012.SRTMGL3.hgt.zip.xml";      //$NON-NLS-1$
+   private static final String HTTPS_NASA_EARTHDATA_LOGIN   = "https://urs.earthdata.nasa.gov/home"; //$NON-NLS-1$
+// private static final String HTTPS_NASA_TEST_URL          = "https://data.lpdaac.earthdatacloud.nasa.gov/lp-prod-protected/SRTMGL1.003/N46E007.SRTMGL1.hgt/N46E007.SRTMGL1.hgt.zip";      //$NON-NLS-1$
+// private static final String HTTPS_NASA_TEST_URL          = "https://data.lpdaac.earthdatacloud.nasa.gov/lp-prod-protected/SRTMGL3.003/N46E007.SRTMGL3.hgt/N46E007.SRTMGL3.hgt.zip";      //$NON-NLS-1$
+   private static final String HTTPS_NASA_TEST_URL          = "https://data.lpdaac.earthdatacloud.nasa.gov/lp-prod-protected/SRTMGL1.003/N48E009.SRTMGL1.hgt/N48E009.SRTMGL1.hgt.zip";      //$NON-NLS-1$
 
+// private static final String HTTPS_NASA_TEST_URL          = "https://e4ftl01.cr.usgs.gov/MEASURES/SRTMGL3.003/2000.02.11/N10E012.SRTMGL3.hgt.zip.xml";      //$NON-NLS-1$
 
    // Old url for SRTM 3 data
    //	http://dds.cr.usgs.gov/srtm/version2_1/SRTM3/Eurasia/N47E008.hgt.zip
