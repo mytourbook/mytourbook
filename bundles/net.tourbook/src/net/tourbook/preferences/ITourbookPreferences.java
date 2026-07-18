@@ -679,6 +679,7 @@ public interface ITourbookPreferences {
    /*
     * Equipment
     */
-   public static final String EQUIPMENT_NUMBER_OF_RECENT_EQUIPMENT = "EQUIPMENT_NUMBER_OF_RECENT_EQUIPMENT"; //$NON-NLS-1$
+   public static final String EQUIPMENT_IS_DISPLAY_IMAGE_IN_CONTEXT_MENU = "EQUIPMENT_IS_DISPLAY_IMAGE_IN_CONTEXT_MENU"; //$NON-NLS-1$
+   public static final String EQUIPMENT_NUMBER_OF_RECENT_EQUIPMENT       = "EQUIPMENT_NUMBER_OF_RECENT_EQUIPMENT";       //$NON-NLS-1$
 
 }

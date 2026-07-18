@@ -593,6 +593,7 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
       /*
        * Equipment
        */
+      store.setDefault(ITourbookPreferences.EQUIPMENT_IS_DISPLAY_IMAGE_IN_CONTEXT_MENU, true);
       store.setDefault(ITourbookPreferences.EQUIPMENT_NUMBER_OF_RECENT_EQUIPMENT, 3);
    }
 

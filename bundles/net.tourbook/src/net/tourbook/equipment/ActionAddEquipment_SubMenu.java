@@ -34,11 +34,13 @@ import net.tourbook.common.util.IAdvancedMenuForActions;
 import net.tourbook.common.util.Util;
 import net.tourbook.data.Equipment;
 import net.tourbook.data.TourData;
+import net.tourbook.preferences.ITourbookPreferences;
 
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.ActionContributionItem;
 import org.eclipse.jface.action.IMenuCreator;
 import org.eclipse.jface.action.Separator;
+import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.swt.custom.BusyIndicator;
 import org.eclipse.swt.events.MenuListener;
@@ -53,31 +55,35 @@ import org.eclipse.swt.widgets.MenuItem;
  */
 public class ActionAddEquipment_SubMenu extends Action implements IMenuCreator, IAdvancedMenuForActions {
 
-   private static final char        NL                      = UI.NEW_LINE;
+   private static final char             NL                      = UI.NEW_LINE;
 
-   private static final String      SPACE_PRE_EQUIPMENT     = "   ";                        //$NON-NLS-1$
+   private static final String           SPACE_PRE_EQUIPMENT     = "   ";                        //$NON-NLS-1$
 
-   private EquipmentMenuManager     _equipmentMenuManager;
-   private Menu                     _menu;
+   private static final IPreferenceStore _prefStore              = TourbookPlugin.getPrefStore();
 
-   private List<TourData>           _allSelectedTours;
-   private Set<Long>                _allEquipmentIDsInTours = new HashSet<>();
+   private EquipmentMenuManager          _equipmentMenuManager;
+   private Menu                          _menu;
 
-   private ActionShowEquipmentView  _actionManageEquipment  = new ActionShowEquipmentView();
+   private List<TourData>                _allSelectedTours;
+   private Set<Long>                     _allEquipmentIDsInTours = new HashSet<>();
+
+   private ActionShowEquipmentView       _actionManageEquipment  = new ActionShowEquipmentView();
 
    /**
     * Contains all equipment which will be added
     */
-   private HashMap<Long, Equipment> _allModifiedEquipment   = new HashMap<>();
+   private HashMap<Long, Equipment>      _allModifiedEquipment   = new HashMap<>();
 
-   private boolean                  _isAdvancedMenu;
-   private AdvancedMenuForActions   _advancedMenuProvider;
+   private boolean                       _isAdvancedMenu;
+   private AdvancedMenuForActions        _advancedMenuProvider;
 
-   private ActionOK                 _actionOK;
+   private ActionOK                      _actionOK;
 
-   private Action                   _actionTitle_AddEquipment;
-   private Action                   _actionTitle_ModifiedEquipment;
-   private Action                   _actionTitle_RecentEquipment;
+   private Action                        _actionTitle_AddEquipment;
+   private Action                        _actionTitle_ModifiedEquipment;
+   private Action                        _actionTitle_RecentEquipment;
+
+   private boolean                       _isDisplayContextMenuImages;
 
    private final class ActionCancel extends Action {
 
@@ -98,14 +104,17 @@ public class ActionAddEquipment_SubMenu extends Action implements IMenuCreator, 
 
       private final Equipment __equipment;
 
-      public ActionEquipment(final Equipment equipment) {
+      public ActionEquipment(final Equipment equipment, final String name) {
 
-         super(equipment.getName(), AS_CHECK_BOX);
+         super(name, AS_CHECK_BOX);
 
-         final Image eqImage = EquipmentManager.getEquipmentImage(equipment);
+         if (_isDisplayContextMenuImages) {
 
-         if (eqImage != null) {
-            setImageDescriptor(ImageDescriptor.createFromImage(eqImage));
+            final Image eqImage = EquipmentManager.getEquipmentImage(equipment);
+
+            if (eqImage != null) {
+               setImageDescriptor(ImageDescriptor.createFromImage(eqImage));
+            }
          }
 
          __equipment = equipment;
@@ -381,6 +390,8 @@ public class ActionAddEquipment_SubMenu extends Action implements IMenuCreator, 
             () -> allAvailableEquipment
                   .forEach(equipment -> EquipmentManager.getEquipmentImage(equipment)));
 
+      _isDisplayContextMenuImages = _prefStore.getBoolean(ITourbookPreferences.EQUIPMENT_IS_DISPLAY_IMAGE_IN_CONTEXT_MENU);
+
       for (final Equipment availableEquipment : allAvailableEquipment) {
 
          if (availableEquipment.isRetired()) {
@@ -389,7 +400,10 @@ public class ActionAddEquipment_SubMenu extends Action implements IMenuCreator, 
             continue;
          }
 
-         final ActionEquipment equipmentAction = new ActionEquipment(availableEquipment);
+         final String name = availableEquipment.getName();
+//       final String name = availableEquipment.getCollateID();
+
+         final ActionEquipment equipmentAction = new ActionEquipment(availableEquipment, name);
 
          final long equipmentId = availableEquipment.getEquipmentId();
 

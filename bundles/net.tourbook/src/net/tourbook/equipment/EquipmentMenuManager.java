@@ -129,7 +129,7 @@ public class EquipmentMenuManager implements IActionProvider {
 
    private Map<String, Object>                   _allEquipmentActions;
 
-   private ActionAddEquipment_SubMenu            _actionAddEquipment;
+   private ActionAddEquipment_SubMenu            _actionAddEquipment_SubMenu;
    private ActionAddEquipmentGroups_SubMenu      _actionAddEquipment_Groups;
    private ActionAddRecentEquipment              _actionAddRecentEquipment;
    private ActionClipboard_CopyEquipment         _actionClipboard_CopyEquipment;
@@ -442,7 +442,7 @@ public class EquipmentMenuManager implements IActionProvider {
          // static fields are not yet initialized
 
          addPrefListener();
-         setupRecentActions();
+         setupActions();
          restoreAutoOpen();
       }
 
@@ -459,7 +459,7 @@ public class EquipmentMenuManager implements IActionProvider {
          // check if the number of recent equipment has changed
          if (property.equals(ITourbookPreferences.EQUIPMENT_NUMBER_OF_RECENT_EQUIPMENT)) {
 
-            setupRecentActions();
+            setupActions();
 
          } else if (property.equals(ITourbookPreferences.APPEARANCE_IS_TAGGING_AUTO_OPEN)
                || property.equals(ITourbookPreferences.APPEARANCE_IS_TAGGING_ANIMATION)
@@ -681,7 +681,7 @@ public class EquipmentMenuManager implements IActionProvider {
    /**
     * Create actions for recent equipment
     */
-   private static void setupRecentActions() {
+   private static void setupActions() {
 
       _maxRecentEquipment = _prefStore.getInt(ITourbookPreferences.EQUIPMENT_NUMBER_OF_RECENT_EQUIPMENT);
 
@@ -818,7 +818,7 @@ public class EquipmentMenuManager implements IActionProvider {
       _advancedMenuToAddEquipment_Flat      = new AdvancedMenuForActions(_actionContribItem_AddEquipment_AutoOpen_Flat);
       _advancedMenuToAddEquipment_Tree      = new AdvancedMenuForActions(_actionContribItem_AddEquipment_AutoOpen_Tree);
 
-      _actionAddEquipment              = new ActionAddEquipment_SubMenu(this);
+      _actionAddEquipment_SubMenu      = new ActionAddEquipment_SubMenu(this);
       _actionAddEquipment_Groups       = new ActionAddEquipmentGroups_SubMenu();
       _actionAddRecentEquipment        = new ActionAddRecentEquipment(this);
       _actionRemoveEquipment           = new ActionRemoveEquipment_SubMenu(this);
@@ -832,7 +832,7 @@ public class EquipmentMenuManager implements IActionProvider {
 
       _allEquipmentActions             = new HashMap<>();
 
-      _allEquipmentActions.put(_actionAddEquipment             .getClass().getName(),  _actionAddEquipment);
+      _allEquipmentActions.put(_actionAddEquipment_SubMenu     .getClass().getName(),  _actionAddEquipment_SubMenu);
       _allEquipmentActions.put(_actionAddEquipment_Groups      .getClass().getName(),  _actionAddEquipment_Groups);
       _allEquipmentActions.put(_actionAddRecentEquipment       .getClass().getName(),  _actionAddRecentEquipment);
       _allEquipmentActions.put(_actionClipboard_CopyEquipment  .getClass().getName(),  _actionClipboard_CopyEquipment);
@@ -962,7 +962,7 @@ public class EquipmentMenuManager implements IActionProvider {
                                         final int numClipboardEquipment) {
 // SET_FORMATTING_OFF
 
-      _actionAddEquipment              .setEnabled(isEnabled_AddEquipment);
+      _actionAddEquipment_SubMenu      .setEnabled(isEnabled_AddEquipment);
       _actionAddEquipment_Groups       .setEnabled(isEnabled_AddEquipment);
 
       _actionRemoveEquipment           .setEnabled(isEnabled_RemoveEquipment);
@@ -1071,7 +1071,7 @@ public class EquipmentMenuManager implements IActionProvider {
 
       menuManager.add(new Separator());
       {
-         menuManager.add(_actionAddEquipment);
+         menuManager.add(_actionAddEquipment_SubMenu);
          menuManager.add(_actionAddEquipment_Groups);
 
          fillEquipmentMenu_WithRecentEquipment(menuManager, null);
