@@ -52,6 +52,8 @@ New / Improvements
   - Add a purchase date field
     https://github.com/mytourbook/mytourbook/issues/1677
   - Added option in the preferences to show/hide equipment images in the tour context menu
+  - Select contextual submenu separating the equipment per collate ID
+    https://github.com/mytourbook/mytourbook/issues/1673
 
   
 

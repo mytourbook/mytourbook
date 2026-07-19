@@ -1436,7 +1436,7 @@ public class DialogEquipmentPart extends TitleAreaDialog {
       String collateID = _comboCollateID.getText().trim();
 
       if (collateID.length() == 0) {
-         collateID = EquipmentManager.createEmptyEquipmentType();
+         collateID = EquipmentManager.createEmptyEquipmentCollateID();
       }
 
 // SET_FORMATTING_OFF
@@ -1547,7 +1547,7 @@ public class DialogEquipmentPart extends TitleAreaDialog {
 
       String collateID = _part.getPartCollateID();
 
-      if (EquipmentManager.isEmptyEquipmentType(collateID)) {
+      if (EquipmentManager.isEmptyEquipmentCollateID(collateID)) {
          collateID = UI.EMPTY_STRING;
       }
 

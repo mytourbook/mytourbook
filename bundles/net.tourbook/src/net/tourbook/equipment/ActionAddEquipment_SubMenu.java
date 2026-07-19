@@ -69,6 +69,8 @@ public class ActionAddEquipment_SubMenu extends Action implements IMenuCreator, 
 
    private ActionShowEquipmentView       _actionManageEquipment  = new ActionShowEquipmentView();
 
+   private boolean                       _isDisplayContextMenuImages;
+
    /**
     * Contains all equipment which will be added
     */
@@ -82,8 +84,6 @@ public class ActionAddEquipment_SubMenu extends Action implements IMenuCreator, 
    private Action                        _actionTitle_AddEquipment;
    private Action                        _actionTitle_ModifiedEquipment;
    private Action                        _actionTitle_RecentEquipment;
-
-   private boolean                       _isDisplayContextMenuImages;
 
    private final class ActionCancel extends Action {
 
@@ -379,18 +379,24 @@ public class ActionAddEquipment_SubMenu extends Action implements IMenuCreator, 
 
    private void fillMenu_10_EquipmentActions(final Menu menu) {
 
+      _isDisplayContextMenuImages = _prefStore.getBoolean(ITourbookPreferences.EQUIPMENT_IS_DISPLAY_IMAGE_IN_CONTEXT_MENU);
+      final boolean isDisplayCollateIdOrName = _prefStore.getBoolean(ITourbookPreferences.EQUIPMENT_IS_DISPLAY_COLLATE_ID_IN_CONTEXT_MENU);
+
       final int numSelectedTour = _allSelectedTours.size();
 
-      final List<Equipment> allAvailableEquipment = EquipmentManager.getAllEquipment_Name();
+      final List<Equipment> allAvailableEquipment = isDisplayCollateIdOrName
+            ? EquipmentManager.getAllEquipment_CollateIdOrName()
+            : EquipmentManager.getAllEquipment_Name();
 
-      // Preload the equipment images
-      // Note that the hourglass is only displayed on Windows (it doesn't seem
-      // to work on Linux)
-      BusyIndicator.showWhile(Display.getCurrent(),
-            () -> allAvailableEquipment
-                  .forEach(equipment -> EquipmentManager.getEquipmentImage(equipment)));
+      if (_isDisplayContextMenuImages) {
 
-      _isDisplayContextMenuImages = _prefStore.getBoolean(ITourbookPreferences.EQUIPMENT_IS_DISPLAY_IMAGE_IN_CONTEXT_MENU);
+         // Preload the equipment images
+         // Note that the hourglass is only displayed on Windows (it doesn't seem
+         // to work on Linux)
+         BusyIndicator.showWhile(Display.getCurrent(),
+               () -> allAvailableEquipment
+                     .forEach(equipment -> EquipmentManager.getEquipmentImage(equipment)));
+      }
 
       for (final Equipment availableEquipment : allAvailableEquipment) {
 
@@ -400,8 +406,17 @@ public class ActionAddEquipment_SubMenu extends Action implements IMenuCreator, 
             continue;
          }
 
-         final String name = availableEquipment.getName();
-//       final String name = availableEquipment.getCollateID();
+         String name = availableEquipment.getName();
+
+         if (isDisplayCollateIdOrName) {
+
+            final String collateID = availableEquipment.getCollateID();
+
+            if (collateID.length() > 0 && EquipmentManager.isEmptyEquipmentCollateID(collateID) == false) {
+
+               name = collateID + UI.SPACE + UI.SYMBOL_MIDDLE_DOT + UI.SPACE + "ID";
+            }
+         }
 
          final ActionEquipment equipmentAction = new ActionEquipment(availableEquipment, name);
 
@@ -412,7 +427,6 @@ public class ActionAddEquipment_SubMenu extends Action implements IMenuCreator, 
          if (modifiedEquipment != null) {
 
             equipmentAction.setChecked(true);
-//          equipmentAction.setEnabled(false);
 
          } else if (numSelectedTour == 1) {
 

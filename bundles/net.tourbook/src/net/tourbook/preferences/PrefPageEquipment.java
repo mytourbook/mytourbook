@@ -56,7 +56,8 @@ public class PrefPageEquipment extends PreferencePage implements IWorkbenchPrefe
    /*
     * UI controls
     */
-   private Button  _chkDisplayEquipmentImage;
+   private Button  _chkIsDisplayCollateIdOrName;
+   private Button  _chkIsDisplayEquipmentImage;
 
    private Spinner _spinnerRecentEquipment;
 
@@ -98,12 +99,24 @@ public class PrefPageEquipment extends PreferencePage implements IWorkbenchPrefe
             /*
              * Display equipment image
              */
-            _chkDisplayEquipmentImage = new Button(group, SWT.CHECK);
-            _chkDisplayEquipmentImage.setText("Display equipment &image in the tour context menu");
-            _chkDisplayEquipmentImage.addSelectionListener(_defaultSelectionListener);
+            _chkIsDisplayEquipmentImage = new Button(group, SWT.CHECK);
+            _chkIsDisplayEquipmentImage.setText("Display equipment &image");
+            _chkIsDisplayEquipmentImage.addSelectionListener(_defaultSelectionListener);
             GridDataFactory.fillDefaults()
                   .span(3, 1)
-                  .applyTo(_chkDisplayEquipmentImage);
+                  .applyTo(_chkIsDisplayEquipmentImage);
+         }
+         {
+            /*
+             * Display equipment collate ID or name
+             */
+            _chkIsDisplayCollateIdOrName = new Button(group, SWT.CHECK);
+            _chkIsDisplayCollateIdOrName.setText("Display &collate ID");
+            _chkIsDisplayCollateIdOrName.setToolTipText("When a collate ID is not available, then the equipment name is displayed");
+            _chkIsDisplayCollateIdOrName.addSelectionListener(_defaultSelectionListener);
+            GridDataFactory.fillDefaults()
+                  .span(3, 1)
+                  .applyTo(_chkIsDisplayCollateIdOrName);
          }
          {
             /*
@@ -182,7 +195,8 @@ public class PrefPageEquipment extends PreferencePage implements IWorkbenchPrefe
    @Override
    protected void performDefaults() {
 
-      _chkDisplayEquipmentImage.setSelection(_prefStore.getDefaultBoolean(ITourbookPreferences.EQUIPMENT_IS_DISPLAY_IMAGE_IN_CONTEXT_MENU));
+      _chkIsDisplayCollateIdOrName.setSelection(_prefStore.getDefaultBoolean(ITourbookPreferences.EQUIPMENT_IS_DISPLAY_COLLATE_ID_IN_CONTEXT_MENU));
+      _chkIsDisplayEquipmentImage.setSelection(_prefStore.getDefaultBoolean(ITourbookPreferences.EQUIPMENT_IS_DISPLAY_IMAGE_IN_CONTEXT_MENU));
       _spinnerRecentEquipment.setSelection(_prefStore.getDefaultInt(ITourbookPreferences.EQUIPMENT_NUMBER_OF_RECENT_EQUIPMENT));
 
       super.performDefaults();
@@ -200,13 +214,15 @@ public class PrefPageEquipment extends PreferencePage implements IWorkbenchPrefe
 
    private void restoreState() {
 
-      _chkDisplayEquipmentImage.setSelection(_prefStore.getBoolean(ITourbookPreferences.EQUIPMENT_IS_DISPLAY_IMAGE_IN_CONTEXT_MENU));
+      _chkIsDisplayCollateIdOrName.setSelection(_prefStore.getBoolean(ITourbookPreferences.EQUIPMENT_IS_DISPLAY_COLLATE_ID_IN_CONTEXT_MENU));
+      _chkIsDisplayEquipmentImage.setSelection(_prefStore.getBoolean(ITourbookPreferences.EQUIPMENT_IS_DISPLAY_IMAGE_IN_CONTEXT_MENU));
       _spinnerRecentEquipment.setSelection(_prefStore.getInt(ITourbookPreferences.EQUIPMENT_NUMBER_OF_RECENT_EQUIPMENT));
    }
 
    private void saveState() {
 
-      _prefStore.setValue(ITourbookPreferences.EQUIPMENT_IS_DISPLAY_IMAGE_IN_CONTEXT_MENU, _chkDisplayEquipmentImage.getSelection());
+      _prefStore.setValue(ITourbookPreferences.EQUIPMENT_IS_DISPLAY_COLLATE_ID_IN_CONTEXT_MENU, _chkIsDisplayCollateIdOrName.getSelection());
+      _prefStore.setValue(ITourbookPreferences.EQUIPMENT_IS_DISPLAY_IMAGE_IN_CONTEXT_MENU, _chkIsDisplayEquipmentImage.getSelection());
 
       // set as LAST which will trigger the listeners
       _prefStore.setValue(ITourbookPreferences.EQUIPMENT_NUMBER_OF_RECENT_EQUIPMENT, _spinnerRecentEquipment.getSelection());

@@ -1608,7 +1608,7 @@ public class EquipmentView extends ViewPart implements
 
                final String type = viewItem.collateID;
 
-               if (EquipmentManager.isEmptyEquipmentType(type) == false) {
+               if (EquipmentManager.isEmptyEquipmentCollateID(type) == false) {
 
                   cell.setText(type);
                   setCellColor(cell, element);

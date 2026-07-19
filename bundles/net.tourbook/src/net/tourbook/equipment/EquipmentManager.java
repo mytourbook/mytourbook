@@ -114,10 +114,10 @@ public class EquipmentManager {
    static final int                          FILTER_RETIRED_IS_ACTIVE     = 2;
 
    /**
-    * To identify an empty equipment type, they are not empty but filled with a random UUID. To
-    * identify an UUID type from a real type, the UUID type has this 'random' prefix
+    * To identify an empty equipment collate ID, they are not empty but filled with a random UUID.
+    * To identify an UUID collate ID from a real collate ID, the UUID type has this 'random' prefix.
     */
-   private static final String               EMPTY_TYPE_PREFIX            = "v4a1n9---"; //$NON-NLS-1$
+   private static final String               EMPTY_COLLATE_ID_PREFIX      = "v4a1n9---"; //$NON-NLS-1$
 
    public static final short                 EXPAND_TYPE_FLAT             = 0;
    public static final short                 EXPAND_TYPE_YEAR_TOUR        = 1;
@@ -231,6 +231,7 @@ public class EquipmentManager {
 
    private static volatile Map<Long, Equipment>     _allEquipment_ByID;
    private static volatile List<Equipment>          _allEquipment_ByName;
+   private static volatile List<Equipment>          _allEquipment_ByCollateIdOrName;
    private static volatile Map<Long, EquipmentPart> _allParts_ByID;
 
    private static ConcurrentSkipListSet<String>     _allBrands;
@@ -281,6 +282,11 @@ public class EquipmentManager {
          _allEquipment_ByName = null;
       }
 
+      if (_allEquipment_ByCollateIdOrName != null) {
+         _allEquipment_ByCollateIdOrName.clear();
+         _allEquipment_ByCollateIdOrName = null;
+      }
+
       if (_allParts_ByID != null) {
          _allParts_ByID.clear();
          _allParts_ByID = null;
@@ -328,14 +334,15 @@ public class EquipmentManager {
    }
 
    /**
-    * @return To identify an empty equipment type, they are not empty but filled with a random
-    *         UUID. To identify an UUID type from a real type, the UUID type has this prefix.
+    * @return To identify an empty equipment collate ID, they are not empty but filled with a random
+    *         UUID. To identify an UUID collate ID from a real collate ID, the UUID collate ID has
+    *         this prefix.
     *
-    *         Empty types can be tested with {@link #isEmptyEquipmentType(String)}
+    *         Empty collate ID can be tested with {@link #isEmptyEquipmentCollateID(String)}
     */
-   public static String createEmptyEquipmentType() {
+   public static String createEmptyEquipmentCollateID() {
 
-      return EMPTY_TYPE_PREFIX + UUID.randomUUID();
+      return EMPTY_COLLATE_ID_PREFIX + UUID.randomUUID();
    }
 
    private static SQLData createSQLEquipmentParameters(final Set<Equipment> allEquipment) {
@@ -979,6 +986,20 @@ public class EquipmentManager {
    }
 
    /**
+    * @return Returns a list with all equipments sorted by collate ID or name
+    */
+   public static List<Equipment> getAllEquipment_CollateIdOrName() {
+
+      if (_allEquipment_ByCollateIdOrName != null) {
+         return _allEquipment_ByCollateIdOrName;
+      }
+
+      loadEquipment();
+
+      return _allEquipment_ByCollateIdOrName;
+   }
+
+   /**
     * @return Returns a list with all equipments sorted by name
     */
    public static List<Equipment> getAllEquipment_Name() {
@@ -1041,7 +1062,7 @@ public class EquipmentManager {
 
                      "type", //$NON-NLS-1$
 
-                     EMPTY_TYPE_PREFIX, // exclude all which start with this value
+                     EMPTY_COLLATE_ID_PREFIX, // exclude all which start with this value
 
                      TourDatabase.TABLE_EQUIPMENT,
                      TourDatabase.TABLE_EQUIPMENT_PART);
@@ -1512,14 +1533,14 @@ public class EquipmentManager {
    }
 
    /**
-    * @param type
+    * @param collateID
     *
     * @return Returns <code>true</code> when the provided type is an empty type which is starting
-    *         with {@value #EMPTY_TYPE_PREFIX}
+    *         with {@value #EMPTY_COLLATE_ID_PREFIX}
     */
-   public static boolean isEmptyEquipmentType(final String type) {
+   public static boolean isEmptyEquipmentCollateID(final String collateID) {
 
-      return type != null && type.trim().startsWith(EMPTY_TYPE_PREFIX);
+      return collateID != null && collateID.trim().startsWith(EMPTY_COLLATE_ID_PREFIX);
    }
 
    /**
@@ -1543,6 +1564,7 @@ public class EquipmentManager {
          final Map<Long, EquipmentPart> allParts_ByID = new HashMap<>();
 
          final List<Equipment> allEquipments_ByName = new ArrayList<>();
+         final List<Equipment> allEquipments_ByCollateIdOrName = new ArrayList<>();
 
          final EntityManager em = TourDatabase.getInstance().getEntityManager();
          if (em != null) {
@@ -1553,7 +1575,7 @@ public class EquipmentManager {
                   + " FROM " + Equipment.class.getSimpleName() + " AS Equipment" + NL //     //$NON-NLS-1$ //$NON-NLS-2$
 
                   // sort by name
-                  + " ORDER BY Equipment.brand, Equipment.model" + NL //                     //$NON-NLS-1$
+                  + " ORDER BY UPPER(Equipment.brand), UPPER(Equipment.model)" + NL //       //$NON-NLS-1$
             );
 
             final List<?> resultList = query.getResultList();
@@ -1564,6 +1586,7 @@ public class EquipmentManager {
 
                   allEquipments_ByID.put(equipment.getEquipmentId(), equipment);
                   allEquipments_ByName.add(equipment);
+                  allEquipments_ByCollateIdOrName.add(equipment);
 
                   for (final EquipmentPart part : equipment.getParts()) {
 
@@ -1575,8 +1598,26 @@ public class EquipmentManager {
             em.close();
          }
 
+         // sort by collate ID or name
+         Collections.sort(allEquipments_ByCollateIdOrName, (eq1, eq2) -> {
+
+            String collateID1 = eq1.getCollateID();
+            String collateID2 = eq2.getCollateID();
+
+            if (collateID1.length() == 0 || isEmptyEquipmentCollateID(collateID1)) {
+               collateID1 = eq1.getName();
+            }
+
+            if (collateID2.length() == 0 || isEmptyEquipmentCollateID(collateID2)) {
+               collateID2 = eq2.getName();
+            }
+
+            return collateID1.compareToIgnoreCase(collateID2);
+         });
+
          _allEquipment_ByID = allEquipments_ByID;
          _allEquipment_ByName = allEquipments_ByName;
+         _allEquipment_ByCollateIdOrName = allEquipments_ByCollateIdOrName;
 
          _allParts_ByID = allParts_ByID;
       }
