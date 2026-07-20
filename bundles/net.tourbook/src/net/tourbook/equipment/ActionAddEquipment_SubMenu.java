@@ -414,7 +414,7 @@ public class ActionAddEquipment_SubMenu extends Action implements IMenuCreator, 
 
             if (collateID.length() > 0 && EquipmentManager.isEmptyEquipmentCollateID(collateID) == false) {
 
-               name = collateID + UI.SPACE + UI.SYMBOL_MIDDLE_DOT + UI.SPACE + "ID";
+               name = collateID + UI.SPACE + UI.SYMBOL_MIDDLE_DOT + UI.SPACE + Messages.Equipment_Action_SuffixID;
             }
          }
 

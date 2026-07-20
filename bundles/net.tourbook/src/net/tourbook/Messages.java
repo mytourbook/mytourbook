@@ -1209,6 +1209,7 @@ public class Messages extends NLS {
    public static String        Equipment_Action_SetTourStructure_All_Dialog_Message;
    public static String        Equipment_Action_SetTourStructure_All;
    public static String        Equipment_Action_SetTourStructure_All_Dialog_Title;
+   public static String        Equipment_Action_SuffixID;
    public static String        Equipment_Action_Title_AddEquipment;
    public static String        Equipment_Action_Title_EquipmentIsAddedWithOK;
    public static String        Equipment_Action_Title_RecentlyAddedEquipment;
@@ -1897,6 +1898,9 @@ public class Messages extends NLS {
    public static String        Pref_Equipment_Action_FilterEquipment_ShowOnlyChecked_Tooltip;
    public static String        Pref_Equipment_Button_RemoveRecentEquipment;
    public static String        Pref_Equipment_Button_RemoveRecentEquipment_Tooltip;
+   public static String        Pref_Equipment_Checkbox_DisplayCollateID;
+   public static String        Pref_Equipment_Checkbox_DisplayCollateID_Tooltip;
+   public static String        Pref_Equipment_Checkbox_DisplayImage;
    public static String        Pref_Equipment_Dialog_DeleteEquipment_Message;
    public static String        Pref_Equipment_Dialog_DeleteEquipment_Title;
    public static String        Pref_Equipment_Dialog_NewEquipment_Message;
@@ -1904,6 +1908,7 @@ public class Messages extends NLS {
    public static String        Pref_Equipment_Dialog_RenameEquipment_Message;
    public static String        Pref_Equipment_Dialog_RenameEquipment_Title;
    public static String        Pref_Equipment_Error_NameIsEmpty;
+   public static String        Pref_Equipment_Group_ContextMenu;
    public static String        Pref_Equipment_Label_AllEquipment;
    public static String        Pref_Equipment_Label_EquipmentGroups;
    public static String        Pref_Equipment_Label_NumberOfRecentEquipment;

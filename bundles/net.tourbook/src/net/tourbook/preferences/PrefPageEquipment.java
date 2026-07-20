@@ -90,7 +90,7 @@ public class PrefPageEquipment extends PreferencePage implements IWorkbenchPrefe
    private void createUI_20_ContextMenu(final Composite parent) {
 
       final Group group = new Group(parent, SWT.NONE);
-      group.setText("Equipment Context Menu");
+      group.setText(Messages.Pref_Equipment_Group_ContextMenu);
       GridDataFactory.fillDefaults().grab(true, false).applyTo(group);
       GridLayoutFactory.swtDefaults().numColumns(3).applyTo(group);
 //      group.setBackground(UI.SYS_COLOR_CYAN);
@@ -100,7 +100,7 @@ public class PrefPageEquipment extends PreferencePage implements IWorkbenchPrefe
              * Display equipment image
              */
             _chkIsDisplayEquipmentImage = new Button(group, SWT.CHECK);
-            _chkIsDisplayEquipmentImage.setText("Display equipment &image");
+            _chkIsDisplayEquipmentImage.setText(Messages.Pref_Equipment_Checkbox_DisplayImage);
             _chkIsDisplayEquipmentImage.addSelectionListener(_defaultSelectionListener);
             GridDataFactory.fillDefaults()
                   .span(3, 1)
@@ -111,8 +111,8 @@ public class PrefPageEquipment extends PreferencePage implements IWorkbenchPrefe
              * Display equipment collate ID or name
              */
             _chkIsDisplayCollateIdOrName = new Button(group, SWT.CHECK);
-            _chkIsDisplayCollateIdOrName.setText("Display &collate ID");
-            _chkIsDisplayCollateIdOrName.setToolTipText("When a collate ID is not available, then the equipment name is displayed");
+            _chkIsDisplayCollateIdOrName.setText(Messages.Pref_Equipment_Checkbox_DisplayCollateID);
+            _chkIsDisplayCollateIdOrName.setToolTipText(Messages.Pref_Equipment_Checkbox_DisplayCollateID_Tooltip);
             _chkIsDisplayCollateIdOrName.addSelectionListener(_defaultSelectionListener);
             GridDataFactory.fillDefaults()
                   .span(3, 1)

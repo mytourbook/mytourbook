@@ -918,7 +918,7 @@ public abstract class TreeColumnFactory {
 
             colDef.setColumnCategory(           Messages.ColumnFactory_Category_Equipment);
 
-            colDef.setColumnName(					"Purchased date");
+            colDef.setColumnName(					Messages.ColumnFactory_Equipment_DatePurchased_Name);
 
             colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(15));
 
