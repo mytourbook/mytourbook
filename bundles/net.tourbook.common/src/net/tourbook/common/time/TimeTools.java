@@ -100,6 +100,11 @@ public class TimeTools {
    public static WeekFields                      calendarWeek;
 
    /**
+    * Contains the short weekday strings. For example: "S", "M", etc.
+    */
+   public static String[]                        weekDays_Narrow;
+
+   /**
     * Contains the short weekday strings. For example: "Sun", "Mon", etc.
     */
    public static String[]                        weekDays_Short;
@@ -290,6 +295,10 @@ public class TimeTools {
        * Create week day names. Found no better solution, the old API contained
        * "DateFormatSymbols.getInstance().getShortWeekdays()"
        */
+      final DateTimeFormatter weekDayFormatter_Narrow = new DateTimeFormatterBuilder()
+            .appendText(DAY_OF_WEEK, TextStyle.NARROW)
+            .toFormatter();
+
       final DateTimeFormatter weekDayFormatter_Short = new DateTimeFormatterBuilder()
             .appendText(DAY_OF_WEEK, TextStyle.SHORT)
             .toFormatter();
@@ -297,6 +306,17 @@ public class TimeTools {
       final DateTimeFormatter weekDayFormatter_Full = new DateTimeFormatterBuilder()
             .appendText(DAY_OF_WEEK, TextStyle.FULL)
             .toFormatter();
+
+      weekDays_Narrow = new String[] {
+
+            weekDayFormatter_Narrow.format(DayOfWeek.MONDAY),
+            weekDayFormatter_Narrow.format(DayOfWeek.TUESDAY),
+            weekDayFormatter_Narrow.format(DayOfWeek.WEDNESDAY),
+            weekDayFormatter_Narrow.format(DayOfWeek.THURSDAY),
+            weekDayFormatter_Narrow.format(DayOfWeek.FRIDAY),
+            weekDayFormatter_Narrow.format(DayOfWeek.SATURDAY),
+            weekDayFormatter_Narrow.format(DayOfWeek.SUNDAY) //
+      };
 
       weekDays_Short = new String[] {
 

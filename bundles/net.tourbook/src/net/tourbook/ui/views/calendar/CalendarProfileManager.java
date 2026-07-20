@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2026 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -118,6 +118,7 @@ class CalendarProfileManager {
    private static final String    ATTR_IS_SHOW_TOUR_VALUE_UNIT           = "isShowTourValueUnit";       //$NON-NLS-1$
    private static final String    ATTR_IS_SHOW_YEAR_COLUMNS              = "isShowYearColumns";         //$NON-NLS-1$
    private static final String    ATTR_IS_SHOW_VALUE                     = "isShowValue";               //$NON-NLS-1$
+   private static final String    ATTR_IS_SHOW_WEEK_HEADER               = "isShowWeekHeader";          //$NON-NLS-1$
    private static final String    ATTR_IS_SHOW_WEEK_VALUE_UNIT           = "isShowWeekValueUnit";       //$NON-NLS-1$
    private static final String    ATTR_IS_TOGGLE_MONTH_COLOR             = "isToggleMonthColor";        //$NON-NLS-1$
    private static final String    ATTR_IS_TRUNCATE_TOUR_TEXT             = "isTruncateTourText";        //$NON-NLS-1$
@@ -164,6 +165,7 @@ class CalendarProfileManager {
    private static final String    ATTR_WEEK_ROWS                         = "weekRows";                  //$NON-NLS-1$
    private static final String    ATTR_WEEK_VALUE_COLOR                  = "weekValueColor";            //$NON-NLS-1$
    private static final String    ATTR_WEEK_VALUE_FONT                   = "weekValueFont";             //$NON-NLS-1$
+   private static final String    ATTR_WEEK_HEADER_FONT                  = "weekHeader_Font";           //$NON-NLS-1$
    private static final String    ATTR_YEAR_COLUMNS                      = "yearColumns";               //$NON-NLS-1$
    private static final String    ATTR_YEAR_COLUMNS_SPACING              = "yearColumnsSpacing";        //$NON-NLS-1$
    private static final String    ATTR_YEAR_COLUMNS_START                = "yearColumnsStart";          //$NON-NLS-1$
@@ -179,6 +181,7 @@ class CalendarProfileManager {
    static final int               DEFAULT_DAY_DATE_MARGIN_TOP            = 0;
    static final int               DEFAULT_DAY_DATE_MARGIN_LEFT           = 0;
    static final boolean           DEFAULT_IS_SHOW_DAY_DATE_WEEKEND_COLOR = false;
+   static final boolean           DEFAULT_IS_SHOW_WEEK_HEADER            = false;
    static final boolean           DEFAULT_IS_TRUNCATE_TOUR_TEXT          = true;
    static final boolean           DEFAULT_IS_WEEK_ROW_HEIGHT             = false;
    static final boolean           DEFAULT_IS_YEAR_COLUMN_DAY_WIDTH       = false;
@@ -3077,6 +3080,10 @@ class CalendarProfileManager {
       profile.weekValueFont            = Util.getXmlFont(xmlProfile,                   ATTR_WEEK_VALUE_FONT,            defaultFont.getFontData()[0]);
       profile.weekValueRGB             = Util.getXmlRgb_AsParent(xmlProfile,           TAG_WEEK_VALUE_RGB,              DEFAULT_WEEK_VALUE_RGB);
 
+      // week header
+      profile.isShowWeekHeader         = Util.getXmlBoolean(xmlProfile,                ATTR_IS_SHOW_WEEK_HEADER,        DEFAULT_IS_SHOW_WEEK_HEADER);
+      profile.weekHeaderFont           = Util.getXmlFont(xmlProfile,                   ATTR_WEEK_HEADER_FONT,           defaultFont.getFontData()[0]);
+
       // day date
       profile.isHideDayDateWhenNoTour  = Util.getXmlBoolean(xmlProfile,                ATTR_IS_HIDE_DAY_DATE_WHEN_NO_TOUR,    true);
       profile.isShowDayDate            = Util.getXmlBoolean(xmlProfile,                ATTR_IS_SHOW_DAY_DATE,                 true);
@@ -3234,6 +3241,10 @@ class CalendarProfileManager {
       Util.setXmlEnum(xmlProfile,   ATTR_WEEK_VALUE_COLOR,                 profile.weekValueColor);
       Util.setXmlFont(xmlProfile,   ATTR_WEEK_VALUE_FONT,                  profile.weekValueFont);
       Util.setXmlRgb(xmlProfile,    TAG_WEEK_VALUE_RGB,                    profile.weekValueRGB);
+
+      // week header
+      xmlProfile.putBoolean(        ATTR_IS_SHOW_WEEK_HEADER,              profile.isShowWeekHeader);
+      Util.setXmlFont(xmlProfile,   ATTR_WEEK_HEADER_FONT,                 profile.weekHeaderFont);
 
       // day date
       xmlProfile.putBoolean(        ATTR_IS_HIDE_DAY_DATE_WHEN_NO_TOUR,    profile.isHideDayDateWhenNoTour);
