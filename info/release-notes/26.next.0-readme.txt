@@ -55,6 +55,9 @@ New / Improvements
   - Select contextual submenu separating the equipment per collate ID
     https://github.com/mytourbook/mytourbook/issues/1673
 
+* Calendar
+  - Display weekday
+    https://github.com/mytourbook/mytourbook/issues/1711
   
 
 Changes
