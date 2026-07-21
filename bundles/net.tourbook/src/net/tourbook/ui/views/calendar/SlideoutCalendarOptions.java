@@ -43,6 +43,8 @@ import net.tourbook.ui.views.calendar.CalendarProfileManager.ICalendarProfileLis
 import net.tourbook.ui.views.calendar.CalendarProfileManager.ProfileDefaultId_ComboData;
 import net.tourbook.ui.views.calendar.CalendarProfileManager.TourBackground_ComboData;
 import net.tourbook.ui.views.calendar.CalendarProfileManager.TourBorder_ComboData;
+import net.tourbook.ui.views.calendar.CalendarProfileManager.WeekHeader_Align_ComboData;
+import net.tourbook.ui.views.calendar.CalendarProfileManager.WeekHeader_WeekdayShortcut_ComboData;
 
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.IDialogSettings;
@@ -207,6 +209,8 @@ class SlideoutCalendarOptions extends AdvancedSlideout implements ICalendarProfi
    private Combo                 _comboTour_TitleColor;
    private Combo                 _comboTour_ValueColor;
    private Combo                 _comboWeek_ValueColor;
+   private Combo                 _comboWeekHeader_WeekdayShortcut;
+   private Combo                 _comboWeekHeader_Alignment;
    private Combo                 _comboYear_ColumnStart;
    //
    private Combo[]               _comboTour_AllValues;
@@ -236,7 +240,9 @@ class SlideoutCalendarOptions extends AdvancedSlideout implements ICalendarProfi
    private Label                 _lblWeek_ColumnWidth;
    private Label                 _lblWeek_ValueFont;
    private Label                 _lblWeek_Margin;
+   private Label                 _lblWeekHeader_Align;
    private Label                 _lblWeekHeader_Font;
+   private Label                 _lblWeekHeader_Weekday;
    private Label                 _lblYearColumn_HeaderFont;
    private Label                 _lblYear_ColumnSpacing;
    private Label                 _lblYear_ColumnStart;
@@ -1469,9 +1475,46 @@ class SlideoutCalendarOptions extends AdvancedSlideout implements ICalendarProfi
 
       final Composite container = new Composite(parent, SWT.NONE);
       GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
-      GridLayoutFactory.fillDefaults().numColumns(1).applyTo(container);
+      GridLayoutFactory.fillDefaults().numColumns(2).applyTo(container);
       {
+         {
+            /*
+             * Weekday
+             */
 
+            // label
+            _lblWeekHeader_Weekday = new Label(container, SWT.NONE);
+            _lblWeekHeader_Weekday.setText("Weekda&y shortcut");
+            GridDataFactory.fillDefaults()
+                  .align(SWT.FILL, SWT.CENTER)
+                  .indent(_subItemIndent, 0)
+                  .applyTo(_lblWeekHeader_Weekday);
+
+            // value
+            _comboWeekHeader_WeekdayShortcut = new Combo(container, SWT.DROP_DOWN | SWT.READ_ONLY);
+            _comboWeekHeader_WeekdayShortcut.setVisibleItemCount(20);
+            _comboWeekHeader_WeekdayShortcut.addSelectionListener(_defaultSelectionListener);
+            _comboWeekHeader_WeekdayShortcut.addFocusListener(_keepOpenListener);
+         }
+         {
+            /*
+             * Weekday
+             */
+
+            // label
+            _lblWeekHeader_Align = new Label(container, SWT.NONE);
+            _lblWeekHeader_Align.setText("Ali&gn");
+            GridDataFactory.fillDefaults()
+                  .align(SWT.FILL, SWT.CENTER)
+                  .indent(_subItemIndent, 0)
+                  .applyTo(_lblWeekHeader_Align);
+
+            // value
+            _comboWeekHeader_Alignment = new Combo(container, SWT.DROP_DOWN | SWT.READ_ONLY);
+            _comboWeekHeader_Alignment.setVisibleItemCount(20);
+            _comboWeekHeader_Alignment.addSelectionListener(_defaultSelectionListener);
+            _comboWeekHeader_Alignment.addFocusListener(_keepOpenListener);
+         }
       }
    }
 
@@ -2560,99 +2603,103 @@ class SlideoutCalendarOptions extends AdvancedSlideout implements ICalendarProfi
       final TourBorder_ComboData selectedTourBorderData = getSelectedTourBorderData();
 
       // layout
-      _colorMonth_AlternateColor    .setEnabled(isShowMonthColor);
-      _colorMonth_AlternateColor2   .setEnabled(isShowMonthColor);
-      _spinnerWeek_Height           .setEnabled(isWeekRowHeight);
-      _spinnerWeek_Rows             .setEnabled(isWeekRowHeight == false);
-
-      // year columns
-      _comboYear_ColumnStart        .setEnabled(isYearColumns);
-      _fontEditorYearColumnHeader   .setEnabled(isYearColumns);
-      _lblYearColumn_HeaderFont     .setEnabled(isYearColumns);
-      _lblYear_ColumnSpacing        .setEnabled(isYearColumns);
-      _lblYear_ColumnStart          .setEnabled(isYearColumns);
-      _rdoYear_ColumnNumber         .setEnabled(isYearColumns);
-      _rdoYear_ColumnDayWidth       .setEnabled(isYearColumns);
-      _spinnerYear_Columns          .setEnabled(isYearColumns && isYearColumnWidth == false);
-      _spinnerYear_ColumnSpacing    .setEnabled(isYearColumns);
-      _spinnerYear_DayWidth         .setEnabled(isYearColumns && isYearColumnWidth);
-
-      // date column
-      _comboDateColumn              .setEnabled(isShowDateColumn);
-      _fontEditorDateColumn         .setEnabled(isShowDateColumn);
-      _lblDateColumn_Content        .setEnabled(isShowDateColumn);
-      _lblDateColumn_Font           .setEnabled(isShowDateColumn);
-      _lblDateColumn_Width          .setEnabled(isShowDateColumn);
-      _spinnerDateColumnWidth       .setEnabled(isShowDateColumn);
+      _colorMonth_AlternateColor       .setEnabled(isShowMonthColor);
+      _colorMonth_AlternateColor2      .setEnabled(isShowMonthColor);
+      _spinnerWeek_Height              .setEnabled(isWeekRowHeight);
+      _spinnerWeek_Rows                .setEnabled(isWeekRowHeight == false);
+                                       
+      // year columns                  
+      _comboYear_ColumnStart           .setEnabled(isYearColumns);
+      _fontEditorYearColumnHeader      .setEnabled(isYearColumns);
+      _lblYearColumn_HeaderFont        .setEnabled(isYearColumns);
+      _lblYear_ColumnSpacing           .setEnabled(isYearColumns);
+      _lblYear_ColumnStart             .setEnabled(isYearColumns);
+      _rdoYear_ColumnNumber            .setEnabled(isYearColumns);
+      _rdoYear_ColumnDayWidth          .setEnabled(isYearColumns);
+      _spinnerYear_Columns             .setEnabled(isYearColumns && isYearColumnWidth == false);
+      _spinnerYear_ColumnSpacing       .setEnabled(isYearColumns);
+      _spinnerYear_DayWidth            .setEnabled(isYearColumns && isYearColumnWidth);
+                                       
+      // date column                   
+      _comboDateColumn                 .setEnabled(isShowDateColumn);
+      _fontEditorDateColumn            .setEnabled(isShowDateColumn);
+      _lblDateColumn_Content           .setEnabled(isShowDateColumn);
+      _lblDateColumn_Font              .setEnabled(isShowDateColumn);
+      _lblDateColumn_Width             .setEnabled(isShowDateColumn);
+      _spinnerDateColumnWidth          .setEnabled(isShowDateColumn);
 
       // week header
-      _fontEditor_WeekHeader        .setEnabled(isShowWeekHeader);
-      _lblWeekHeader_Font           .setEnabled(isShowWeekHeader);
+      _comboWeekHeader_Alignment       .setEnabled(isShowWeekHeader);
+      _comboWeekHeader_WeekdayShortcut .setEnabled(isShowWeekHeader);
+      _fontEditor_WeekHeader           .setEnabled(isShowWeekHeader);
+      _lblWeekHeader_Align             .setEnabled(isShowWeekHeader);
+      _lblWeekHeader_Font              .setEnabled(isShowWeekHeader);
+      _lblWeekHeader_Weekday           .setEnabled(isShowWeekHeader);
 
       // day date
-      _chkIsShowDayDateWeekendColor .setEnabled(isShowDayDate);
-      _chkIsHideDayDateWhenNoTour   .setEnabled(isShowDayDate);
-      _comboDayHeaderDateFormat     .setEnabled(isShowDayDate);
-      _fontEditorDayDate            .setEnabled(isShowDayDate);
-      _lblDayHeader_Format          .setEnabled(isShowDayDate);
-      _lblDayHeader_Font            .setEnabled(isShowDayDate);
-      _lblDayDate_Margin            .setEnabled(isShowDayDate);
-      _spinnerDayDate_Margin_Top    .setEnabled(isShowDayDate);
-      _spinnerDayDate_Margin_Left   .setEnabled(isShowDayDate);
-
-      // tour fill
-      _colorTour_BackgroundColor1   .setEnabled(isBgColor1 && tourBgColor1 == CalendarColor.CUSTOM);
-      _colorTour_BackgroundColor2   .setEnabled(isBgColor2 && tourBgColor2 == CalendarColor.CUSTOM);
-      _colorTour_BorderColor        .setEnabled(tourBorderColor == CalendarColor.CUSTOM);
-      _colorTour_DraggedColor       .setEnabled(tourDraggedColor == CalendarColor.CUSTOM);
-      _colorTour_HoveredColor       .setEnabled(tourHoveredColor == CalendarColor.CUSTOM);
-      _colorTour_SelectedColor      .setEnabled(tourSelectedColor == CalendarColor.CUSTOM);
-      _comboTour_BackgroundColor1   .setEnabled(isBgColor1);
-      _comboTour_BackgroundColor2   .setEnabled(isBgColor2);
-      _comboTour_BorderColor        .setEnabled(selectedTourBorderData.isColor);
-      _spinnerTour_BackgroundWidth  .setEnabled(selectedTourBackgroundData.isWidth);
-      _spinnerTour_BorderWidth      .setEnabled(selectedTourBorderData.isWidth);
-
-      // tour content
-      _chkIsShowTourValueUnit       .setEnabled(isShowTourContent);
-      _chkIsTruncateTourText        .setEnabled(isShowTourContent);
-      _colorTour_ContentColor       .setEnabled(isShowTourContent && isCustomContentColor);
-      _colorTour_TitleColor         .setEnabled(isShowTourContent && isCustomTitleColor);
-      _colorTour_ValueColor         .setEnabled(isShowTourContent && isCustomValueColor);
-      _comboTour_ContentColor       .setEnabled(isShowTourContent);
-      _comboTour_TitleColor         .setEnabled(isShowTourContent);
-      _comboTour_ValueColor         .setEnabled(isShowTourContent);
-      _fontEditorTourContent        .setEnabled(isShowTourContent);
-      _fontEditorTourTitle          .setEnabled(isShowTourContent);
-      _fontEditorTourValue          .setEnabled(isShowTourContent);
-      _lblTour_ContentFont          .setEnabled(isShowTourContent);
-      _lblTour_Margin               .setEnabled(isShowTourContent);
-      _lblTour_TitleFont            .setEnabled(isShowTourContent);
-      _lblTour_TruncatedLines       .setEnabled(isShowTourContent && isTruncateText);
-      _lblTour_ValueColumns         .setEnabled(isShowTourContent);
-      _lblTour_ValueFont            .setEnabled(isShowTourContent);
-      _spinnerTour_Margin_Top       .setEnabled(isShowTourContent);
-      _spinnerTour_Margin_Bottom    .setEnabled(isShowTourContent);
-      _spinnerTour_Margin_Left      .setEnabled(isShowTourContent);
-      _spinnerTour_Margin_Right     .setEnabled(isShowTourContent);
-      _spinnerTour_TruncatedLines   .setEnabled(isShowTourContent && isTruncateText);
-      _spinnerTour_ValueColumns     .setEnabled(isShowTourContent);
-
-      enableControls_TourValues();
-
-      // week summary
-      _chkIsShowWeekValueUnit       .setEnabled(isShowWeekColumn);
-      _colorWeek_ValueColor         .setEnabled(isShowWeekColumn && isCustomWeekColor);
-      _comboWeek_ValueColor         .setEnabled(isShowWeekColumn);
-      _fontEditorWeekValue          .setEnabled(isShowWeekColumn);
-      _lblWeek_ColumnWidth          .setEnabled(isShowWeekColumn);
-      _lblWeek_Margin               .setEnabled(isShowWeekColumn);
-      _lblWeek_ValueFont            .setEnabled(isShowWeekColumn);
-      _spinnerWeek_ColumnWidth      .setEnabled(isShowWeekColumn);
-      _spinnerWeek_Margin_Top       .setEnabled(isShowWeekColumn);
-      _spinnerWeek_Margin_Bottom    .setEnabled(isShowWeekColumn);
-      _spinnerWeek_Margin_Left      .setEnabled(isShowWeekColumn);
-      _spinnerWeek_Margin_Right     .setEnabled(isShowWeekColumn);
+      _chkIsShowDayDateWeekendColor    .setEnabled(isShowDayDate);
+      _chkIsHideDayDateWhenNoTour      .setEnabled(isShowDayDate);
+      _comboDayHeaderDateFormat        .setEnabled(isShowDayDate);
+      _fontEditorDayDate               .setEnabled(isShowDayDate);
+      _lblDayHeader_Format             .setEnabled(isShowDayDate);
+      _lblDayHeader_Font               .setEnabled(isShowDayDate);
+      _lblDayDate_Margin               .setEnabled(isShowDayDate);
+      _spinnerDayDate_Margin_Top       .setEnabled(isShowDayDate);
+      _spinnerDayDate_Margin_Left      .setEnabled(isShowDayDate);
+                                       
+      // tour fill                     
+      _colorTour_BackgroundColor1      .setEnabled(isBgColor1 && tourBgColor1 == CalendarColor.CUSTOM);
+      _colorTour_BackgroundColor2      .setEnabled(isBgColor2 && tourBgColor2 == CalendarColor.CUSTOM);
+      _colorTour_BorderColor           .setEnabled(tourBorderColor == CalendarColor.CUSTOM);
+      _colorTour_DraggedColor          .setEnabled(tourDraggedColor == CalendarColor.CUSTOM);
+      _colorTour_HoveredColor          .setEnabled(tourHoveredColor == CalendarColor.CUSTOM);
+      _colorTour_SelectedColor         .setEnabled(tourSelectedColor == CalendarColor.CUSTOM);
+      _comboTour_BackgroundColor1      .setEnabled(isBgColor1);
+      _comboTour_BackgroundColor2      .setEnabled(isBgColor2);
+      _comboTour_BorderColor           .setEnabled(selectedTourBorderData.isColor);
+      _spinnerTour_BackgroundWidth     .setEnabled(selectedTourBackgroundData.isWidth);
+      _spinnerTour_BorderWidth         .setEnabled(selectedTourBorderData.isWidth);
+                                       
+      // tour content                  
+      _chkIsShowTourValueUnit          .setEnabled(isShowTourContent);
+      _chkIsTruncateTourText           .setEnabled(isShowTourContent);
+      _colorTour_ContentColor          .setEnabled(isShowTourContent && isCustomContentColor);
+      _colorTour_TitleColor            .setEnabled(isShowTourContent && isCustomTitleColor);
+      _colorTour_ValueColor            .setEnabled(isShowTourContent && isCustomValueColor);
+      _comboTour_ContentColor          .setEnabled(isShowTourContent);
+      _comboTour_TitleColor            .setEnabled(isShowTourContent);
+      _comboTour_ValueColor            .setEnabled(isShowTourContent);
+      _fontEditorTourContent           .setEnabled(isShowTourContent);
+      _fontEditorTourTitle             .setEnabled(isShowTourContent);
+      _fontEditorTourValue             .setEnabled(isShowTourContent);
+      _lblTour_ContentFont             .setEnabled(isShowTourContent);
+      _lblTour_Margin                  .setEnabled(isShowTourContent);
+      _lblTour_TitleFont               .setEnabled(isShowTourContent);
+      _lblTour_TruncatedLines          .setEnabled(isShowTourContent && isTruncateText);
+      _lblTour_ValueColumns            .setEnabled(isShowTourContent);
+      _lblTour_ValueFont               .setEnabled(isShowTourContent);
+      _spinnerTour_Margin_Top          .setEnabled(isShowTourContent);
+      _spinnerTour_Margin_Bottom       .setEnabled(isShowTourContent);
+      _spinnerTour_Margin_Left         .setEnabled(isShowTourContent);
+      _spinnerTour_Margin_Right        .setEnabled(isShowTourContent);
+      _spinnerTour_TruncatedLines      .setEnabled(isShowTourContent && isTruncateText);
+      _spinnerTour_ValueColumns        .setEnabled(isShowTourContent);
+                                       
+      enableControls_TourValues();     
+                                       
+      // week summary                  
+      _chkIsShowWeekValueUnit          .setEnabled(isShowWeekColumn);
+      _colorWeek_ValueColor            .setEnabled(isShowWeekColumn && isCustomWeekColor);
+      _comboWeek_ValueColor            .setEnabled(isShowWeekColumn);
+      _fontEditorWeekValue             .setEnabled(isShowWeekColumn);
+      _lblWeek_ColumnWidth             .setEnabled(isShowWeekColumn);
+      _lblWeek_Margin                  .setEnabled(isShowWeekColumn);
+      _lblWeek_ValueFont               .setEnabled(isShowWeekColumn);
+      _spinnerWeek_ColumnWidth         .setEnabled(isShowWeekColumn);
+      _spinnerWeek_Margin_Top          .setEnabled(isShowWeekColumn);
+      _spinnerWeek_Margin_Bottom       .setEnabled(isShowWeekColumn);
+      _spinnerWeek_Margin_Left         .setEnabled(isShowWeekColumn);
+      _spinnerWeek_Margin_Right        .setEnabled(isShowWeekColumn);
 
       enableControls_WeekValues();
 
@@ -2790,6 +2837,14 @@ class SlideoutCalendarOptions extends AdvancedSlideout implements ICalendarProfi
 
          for (final ColumnLayout_ComboData data : CalendarProfileManager.getAllColumnLayout_ComboData()) {
             _comboYear_ColumnStart.add(data.label);
+         }
+
+         for (final WeekHeader_Align_ComboData data : CalendarProfileManager.getAllWeekHeader_Align_ComboData()) {
+            _comboWeekHeader_Alignment.add(data.label);
+         }
+
+         for (final WeekHeader_WeekdayShortcut_ComboData data : CalendarProfileManager.getAllWeekHeader_Weekday_ComboData()) {
+            _comboWeekHeader_WeekdayShortcut.add(data.label);
          }
 
          /*
@@ -3140,8 +3195,7 @@ class SlideoutCalendarOptions extends AdvancedSlideout implements ICalendarProfi
          return DateColumnContent.WEEK_NUMBER;
       }
 
-      final DateColumn_ComboData selectedInfoColumnData = CalendarProfileManager
-            .getAllDateColumnData()[selectedIndex];
+      final DateColumn_ComboData selectedInfoColumnData = CalendarProfileManager.getAllDateColumnData()[selectedIndex];
 
       return selectedInfoColumnData.dateColumn;
    }
@@ -3279,6 +3333,32 @@ class SlideoutCalendarOptions extends AdvancedSlideout implements ICalendarProfi
       return allTourBorderData[selectedIndex];
    }
 
+   private int getSelectedWeekHeader_Alignment() {
+
+      final int selectedIndex = _comboWeekHeader_Alignment.getSelectionIndex();
+
+      if (selectedIndex < 0) {
+         return CalendarProfileManager.DEFAULT_WEEK_HEADER_ALIGN;
+      }
+
+      final WeekHeader_Align_ComboData selectedData = CalendarProfileManager.getAllWeekHeader_Align_ComboData()[selectedIndex];
+
+      return selectedData.align;
+   }
+
+   private int getSelectedWeekHeader_WeekdayShortcut() {
+
+      final int selectedIndex = _comboWeekHeader_WeekdayShortcut.getSelectionIndex();
+
+      if (selectedIndex < 0) {
+         return CalendarProfileManager.DEFAULT_WEEK_HEADER_WEEKDAY_SHORTCUT;
+      }
+
+      final WeekHeader_WeekdayShortcut_ComboData selectedData = CalendarProfileManager.getAllWeekHeader_Weekday_ComboData()[selectedIndex];
+
+      return selectedData.shortcut;
+   }
+
    private int getTourBackgroundIndex(final TourBackground requestedData) {
 
       final TourBackground_ComboData[] allData = CalendarProfileManager.getAllTourBackground_ComboData();
@@ -3327,6 +3407,38 @@ class SlideoutCalendarOptions extends AdvancedSlideout implements ICalendarProfi
       }
 
       // this should not happen
+      return 0;
+   }
+
+   private int getWeekHeader_AlignmentIndex(final int alignment) {
+
+      final WeekHeader_Align_ComboData[] allData = CalendarProfileManager.getAllWeekHeader_Align_ComboData();
+
+      for (int dataIndex = 0; dataIndex < allData.length; dataIndex++) {
+
+         final WeekHeader_Align_ComboData data = allData[dataIndex];
+
+         if (data.align == alignment) {
+            return dataIndex;
+         }
+      }
+
+      return 0;
+   }
+
+   private int getWeekHeader_WeekdayShortcutIndex(final int shortcut) {
+
+      final WeekHeader_WeekdayShortcut_ComboData[] allData = CalendarProfileManager.getAllWeekHeader_Weekday_ComboData();
+
+      for (int dataIndex = 0; dataIndex < allData.length; dataIndex++) {
+
+         final WeekHeader_WeekdayShortcut_ComboData data = allData[dataIndex];
+
+         if (data.shortcut == shortcut) {
+            return dataIndex;
+         }
+      }
+
       return 0;
    }
 
@@ -3415,6 +3527,9 @@ class SlideoutCalendarOptions extends AdvancedSlideout implements ICalendarProfi
 
          @Override
          public void fontSelected(final FontData font) {
+
+            _tabFolder.layout(true, true);
+
             onModify_Profile();
          }
       };
@@ -3781,101 +3896,105 @@ class SlideoutCalendarOptions extends AdvancedSlideout implements ICalendarProfi
          // get index AFTER getting the active profile because this could change the active profile
          final int activeProfileIndex = CalendarProfileManager.getActiveCalendarProfileIndex();
 
+// SET_FORMATTING_OFF
+
          // profile viewer/select
-         _comboProfiles.select(activeProfileIndex);
-         _profileViewer.setSelection(new StructuredSelection(profile), true);
+         _comboProfiles                   .select(activeProfileIndex);
+         _profileViewer                   .setSelection(new StructuredSelection(profile), true);
 
          // profile properties
-         _txtProfileName.setText(profile.profileName);
+         _txtProfileName                  .setText(profile.profileName);
          restore_DefaultIds(profile);
 
          // layout
-         _chkIsShowMonthColor.setSelection(profile.isToggleMonthColor);
-         _chkUseDraggedScrolling.setSelection(profile.useDraggedScrolling);
-         _colorMonth_AlternateColor.setColorValue(profile.alternateMonthRGB);
-         _colorMonth_AlternateColor2.setColorValue(profile.alternateMonth2RGB);
-         _colorCalendar_BackgroundColor.setColorValue(profile.calendarBackgroundRGB);
-         _colorCalendar_ForegroundColor.setColorValue(profile.calendarForegroundRGB);
-         _colorDay_HoveredColor.setColorValue(profile.dayHoveredRGB);
-         _colorDay_SelectedColor.setColorValue(profile.daySelectedRGB);
-         _colorDay_TodayColor.setColorValue(profile.dayTodayRGB);
-         _rdoWeekRow_Height.setSelection(profile.isWeekRowHeight);
-         _rdoWeekRow_Number.setSelection(profile.isWeekRowHeight == false);
-         _spinnerWeek_Height.setSelection(profile.weekHeight);
-         _spinnerWeek_Rows.setSelection(profile.weekRows);
+         _chkIsShowMonthColor             .setSelection(profile.isToggleMonthColor);
+         _chkUseDraggedScrolling          .setSelection(profile.useDraggedScrolling);
+         _colorMonth_AlternateColor       .setColorValue(profile.alternateMonthRGB);
+         _colorMonth_AlternateColor2      .setColorValue(profile.alternateMonth2RGB);
+         _colorCalendar_BackgroundColor   .setColorValue(profile.calendarBackgroundRGB);
+         _colorCalendar_ForegroundColor   .setColorValue(profile.calendarForegroundRGB);
+         _colorDay_HoveredColor           .setColorValue(profile.dayHoveredRGB);
+         _colorDay_SelectedColor          .setColorValue(profile.daySelectedRGB);
+         _colorDay_TodayColor             .setColorValue(profile.dayTodayRGB);
+         _rdoWeekRow_Height               .setSelection(profile.isWeekRowHeight);
+         _rdoWeekRow_Number               .setSelection(profile.isWeekRowHeight == false);
+         _spinnerWeek_Height              .setSelection(profile.weekHeight);
+         _spinnerWeek_Rows                .setSelection(profile.weekRows);
 
          // year columns
-         _chkIsShowYearColumns.setSelection(profile.isShowYearColumns);
-         _comboYear_ColumnStart.select(getCalendarColumLayoutIndex(profile.yearColumnsStart));
-         _fontEditorYearColumnHeader.setSelection(profile.yearHeaderFont);
-         _rdoYear_ColumnNumber.setSelection(profile.isYearColumnDayWidth == false);
-         _rdoYear_ColumnDayWidth.setSelection(profile.isYearColumnDayWidth);
-         _spinnerYear_Columns.setSelection(profile.yearColumns);
-         _spinnerYear_ColumnSpacing.setSelection(profile.yearColumnsSpacing);
-         _spinnerYear_DayWidth.setSelection(profile.yearColumnDayWidth);
+         _chkIsShowYearColumns            .setSelection(profile.isShowYearColumns);
+         _comboYear_ColumnStart           .select(getCalendarColumLayoutIndex(profile.yearColumnsStart));
+         _fontEditorYearColumnHeader      .setSelection(profile.yearHeaderFont);
+         _rdoYear_ColumnNumber            .setSelection(profile.isYearColumnDayWidth == false);
+         _rdoYear_ColumnDayWidth          .setSelection(profile.isYearColumnDayWidth);
+         _spinnerYear_Columns             .setSelection(profile.yearColumns);
+         _spinnerYear_ColumnSpacing       .setSelection(profile.yearColumnsSpacing);
+         _spinnerYear_DayWidth            .setSelection(profile.yearColumnDayWidth);
 
          // date column
-         _chkIsShowDateColumn.setSelection(profile.isShowDateColumn);
-         _spinnerDateColumnWidth.setSelection(profile.dateColumnWidth);
-         _comboDateColumn.select(getDateColumnIndex(profile.dateColumnContent));
-         _fontEditorDateColumn.setSelection(profile.dateColumnFont);
+         _chkIsShowDateColumn             .setSelection(profile.isShowDateColumn);
+         _comboDateColumn                 .select(getDateColumnIndex(profile.dateColumnContent));
+         _fontEditorDateColumn            .setSelection(profile.dateColumnFont);
+         _spinnerDateColumnWidth          .setSelection(profile.dateColumnWidth);
 
          // week header
-         _chkIsShowWeekHeader.setSelection(profile.isShowWeekHeader);
-         _fontEditor_WeekHeader.setSelection(profile.weekHeaderFont);
+         _chkIsShowWeekHeader             .setSelection(profile.isShowWeekHeader);
+         _fontEditor_WeekHeader           .setSelection(profile.weekHeader_Font);
+         _comboWeekHeader_Alignment       .select(getWeekHeader_AlignmentIndex         (profile.weekHeader_Align));
+         _comboWeekHeader_WeekdayShortcut .select(getWeekHeader_WeekdayShortcutIndex   (profile.weekHeader_WeekdayShortcut));
 
          // day date
-         _chkIsHideDayDateWhenNoTour.setSelection(profile.isHideDayDateWhenNoTour);
-         _chkIsShowDayDate.setSelection(profile.isShowDayDate);
-         _chkIsShowDayDateWeekendColor.setSelection(profile.isShowDayDateWeekendColor);
-         _comboDayHeaderDateFormat.select(getDayHeaderDateFormatIndex(profile.dayDateFormat));
-         _fontEditorDayDate.setSelection(profile.dayDateFont);
-         _spinnerDayDate_Margin_Top.setSelection(profile.dayDateMarginTop);
-         _spinnerDayDate_Margin_Left.setSelection(profile.dayDateMarginLeft);
+         _chkIsHideDayDateWhenNoTour      .setSelection(profile.isHideDayDateWhenNoTour);
+         _chkIsShowDayDate                .setSelection(profile.isShowDayDate);
+         _chkIsShowDayDateWeekendColor    .setSelection(profile.isShowDayDateWeekendColor);
+         _comboDayHeaderDateFormat        .select(getDayHeaderDateFormatIndex(profile.dayDateFormat));
+         _fontEditorDayDate               .setSelection(profile.dayDateFont);
+         _spinnerDayDate_Margin_Top       .setSelection(profile.dayDateMarginTop);
+         _spinnerDayDate_Margin_Left      .setSelection(profile.dayDateMarginLeft);
 
          // day layout
-         _rdoDayContent_Direction_Horizontal.setSelection(profile.isDayContentVertical == false);
-         _rdoDayContent_Direction_Vertical.setSelection(profile.isDayContentVertical);
+         _rdoDayContent_Direction_Horizontal .setSelection(profile.isDayContentVertical == false);
+         _rdoDayContent_Direction_Vertical   .setSelection(profile.isDayContentVertical);
 
          // tour background
-         _comboTour_Background.select(getTourBackgroundIndex(profile.tourBackground));
-         _comboTour_BackgroundColor1.select(getGraphColorIndex(profile.tourBackground1Color));
-         _comboTour_BackgroundColor2.select(getGraphColorIndex(profile.tourBackground2Color));
-         _comboTour_BorderLayout.select(getTourBorderIndex(profile.tourBorder));
-         _comboTour_BorderColor.select(getGraphColorIndex(profile.tourBorderColor));
-         _spinnerTour_BackgroundWidth.setSelection(profile.tourBackgroundWidth);
-         _spinnerTour_BorderWidth.setSelection(profile.tourBorderWidth);
+         _comboTour_Background            .select(getTourBackgroundIndex(profile.tourBackground));
+         _comboTour_BackgroundColor1      .select(getGraphColorIndex(profile.tourBackground1Color));
+         _comboTour_BackgroundColor2      .select(getGraphColorIndex(profile.tourBackground2Color));
+         _comboTour_BorderLayout          .select(getTourBorderIndex(profile.tourBorder));
+         _comboTour_BorderColor           .select(getGraphColorIndex(profile.tourBorderColor));
+         _spinnerTour_BackgroundWidth     .setSelection(profile.tourBackgroundWidth);
+         _spinnerTour_BorderWidth         .setSelection(profile.tourBorderWidth);
 
-         _comboTour_DraggedColor.select(getGraphColorIndex(profile.tourDraggedColor));
-         _comboTour_HoveredColor.select(getGraphColorIndex(profile.tourHoveredColor));
-         _comboTour_SelectedColor.select(getGraphColorIndex(profile.tourSelectedColor));
+         _comboTour_DraggedColor          .select(getGraphColorIndex(profile.tourDraggedColor));
+         _comboTour_HoveredColor          .select(getGraphColorIndex(profile.tourHoveredColor));
+         _comboTour_SelectedColor         .select(getGraphColorIndex(profile.tourSelectedColor));
 
-         _colorTour_BackgroundColor1.setColorValue(profile.tourBackground1RGB);
-         _colorTour_BackgroundColor2.setColorValue(profile.tourBackground2RGB);
-         _colorTour_BorderColor.setColorValue(profile.tourBorderRGB);
-         _colorTour_DraggedColor.setColorValue(profile.tourDraggedRGB);
-         _colorTour_HoveredColor.setColorValue(profile.tourHoveredRGB);
-         _colorTour_SelectedColor.setColorValue(profile.tourSelectedRGB);
+         _colorTour_BackgroundColor1      .setColorValue(profile.tourBackground1RGB);
+         _colorTour_BackgroundColor2      .setColorValue(profile.tourBackground2RGB);
+         _colorTour_BorderColor           .setColorValue(profile.tourBorderRGB);
+         _colorTour_DraggedColor          .setColorValue(profile.tourDraggedRGB);
+         _colorTour_HoveredColor          .setColorValue(profile.tourHoveredRGB);
+         _colorTour_SelectedColor         .setColorValue(profile.tourSelectedRGB);
 
          // tour content
-         _chkIsShowTourContent.setSelection(profile.isShowTourContent);
-         _chkIsShowTourValueUnit.setSelection(profile.isShowTourValueUnit);
-         _chkIsTruncateTourText.setSelection(profile.isTruncateTourText);
-         _colorTour_ContentColor.setColorValue(profile.tourContentRGB);
-         _colorTour_TitleColor.setColorValue(profile.tourTitleRGB);
-         _colorTour_ValueColor.setColorValue(profile.tourValueRGB);
-         _comboTour_ContentColor.select(getTourColorIndex(profile.tourContentColor));
-         _comboTour_TitleColor.select(getTourColorIndex(profile.tourTitleColor));
-         _comboTour_ValueColor.select(getTourColorIndex(profile.tourValueColor));
-         _fontEditorTourContent.setSelection(profile.tourContentFont);
-         _fontEditorTourTitle.setSelection(profile.tourTitleFont);
-         _fontEditorTourValue.setSelection(profile.tourValueFont);
-         _spinnerTour_Margin_Top.setSelection(profile.tourMarginTop);
-         _spinnerTour_Margin_Bottom.setSelection(profile.tourMarginBottom);
-         _spinnerTour_Margin_Left.setSelection(profile.tourMarginLeft);
-         _spinnerTour_Margin_Right.setSelection(profile.tourMarginRight);
-         _spinnerTour_TruncatedLines.setSelection(profile.tourTruncatedLines);
-         _spinnerTour_ValueColumns.setSelection(profile.tourValueColumns);
+         _chkIsShowTourContent            .setSelection(profile.isShowTourContent);
+         _chkIsShowTourValueUnit          .setSelection(profile.isShowTourValueUnit);
+         _chkIsTruncateTourText           .setSelection(profile.isTruncateTourText);
+         _colorTour_ContentColor          .setColorValue(profile.tourContentRGB);
+         _colorTour_TitleColor            .setColorValue(profile.tourTitleRGB);
+         _colorTour_ValueColor            .setColorValue(profile.tourValueRGB);
+         _comboTour_ContentColor          .select(getTourColorIndex(profile.tourContentColor));
+         _comboTour_TitleColor            .select(getTourColorIndex(profile.tourTitleColor));
+         _comboTour_ValueColor            .select(getTourColorIndex(profile.tourValueColor));
+         _fontEditorTourContent           .setSelection(profile.tourContentFont);
+         _fontEditorTourTitle             .setSelection(profile.tourTitleFont);
+         _fontEditorTourValue             .setSelection(profile.tourValueFont);
+         _spinnerTour_Margin_Top          .setSelection(profile.tourMarginTop);
+         _spinnerTour_Margin_Bottom       .setSelection(profile.tourMarginBottom);
+         _spinnerTour_Margin_Left         .setSelection(profile.tourMarginLeft);
+         _spinnerTour_Margin_Right        .setSelection(profile.tourMarginRight);
+         _spinnerTour_TruncatedLines      .setSelection(profile.tourTruncatedLines);
+         _spinnerTour_ValueColumns        .setSelection(profile.tourValueColumns);
          selectDataFormatter(
                profile.allTourFormatterData,
                CalendarProfileManager.allTourContentFormatter,
@@ -3885,16 +4004,19 @@ class SlideoutCalendarOptions extends AdvancedSlideout implements ICalendarProfi
                _tourFormatterContainer);
 
          // week summary column
-         _chkIsShowSummaryColumn.setSelection(profile.isShowSummaryColumn);
-         _chkIsShowWeekValueUnit.setSelection(profile.isShowWeekValueUnit);
-         _comboWeek_ValueColor.select(getGraphColorIndex(profile.weekValueColor));
-         _colorWeek_ValueColor.setColorValue(profile.weekValueRGB);
-         _fontEditorWeekValue.setSelection(profile.weekValueFont);
-         _spinnerWeek_ColumnWidth.setSelection(profile.weekColumnWidth);
-         _spinnerWeek_Margin_Top.setSelection(profile.weekMarginTop);
-         _spinnerWeek_Margin_Bottom.setSelection(profile.weekMarginBottom);
-         _spinnerWeek_Margin_Left.setSelection(profile.weekMarginLeft);
-         _spinnerWeek_Margin_Right.setSelection(profile.weekMarginRight);
+         _chkIsShowSummaryColumn          .setSelection(profile.isShowSummaryColumn);
+         _chkIsShowWeekValueUnit          .setSelection(profile.isShowWeekValueUnit);
+         _comboWeek_ValueColor            .select(getGraphColorIndex(profile.weekValueColor));
+         _colorWeek_ValueColor            .setColorValue(profile.weekValueRGB);
+         _fontEditorWeekValue             .setSelection(profile.weekValueFont);
+         _spinnerWeek_ColumnWidth         .setSelection(profile.weekColumnWidth);
+         _spinnerWeek_Margin_Top          .setSelection(profile.weekMarginTop);
+         _spinnerWeek_Margin_Bottom       .setSelection(profile.weekMarginBottom);
+         _spinnerWeek_Margin_Left         .setSelection(profile.weekMarginLeft);
+         _spinnerWeek_Margin_Right        .setSelection(profile.weekMarginRight);
+
+// SET_FORMATTING_ON
+
          selectDataFormatter(
                profile.allWeekFormatterData,
                CalendarProfileManager.allWeekFormatter,
@@ -3969,7 +4091,9 @@ class SlideoutCalendarOptions extends AdvancedSlideout implements ICalendarProfi
 
       // week header
       profile.isShowWeekHeader            = _chkIsShowWeekHeader.getSelection();
-      profile.weekHeaderFont              = _fontEditor_WeekHeader.getSelection();
+      profile.weekHeader_Font             = _fontEditor_WeekHeader.getSelection();
+      profile.weekHeader_Align            = getSelectedWeekHeader_Alignment();
+      profile.weekHeader_WeekdayShortcut  = getSelectedWeekHeader_WeekdayShortcut();
 
       // week summary column
       profile.isShowSummaryColumn         = _chkIsShowSummaryColumn.getSelection();
@@ -4171,5 +4295,4 @@ class SlideoutCalendarOptions extends AdvancedSlideout implements ICalendarProfi
       _txtProfileName.setFocus();
       _txtProfileName.selectAll();
    }
-
 }

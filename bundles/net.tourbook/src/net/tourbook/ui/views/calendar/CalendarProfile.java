@@ -141,7 +141,9 @@ public class CalendarProfile implements Cloneable {
    //
    // week header
    boolean           isShowWeekHeader           = CalendarProfileManager.DEFAULT_IS_SHOW_WEEK_HEADER;
-   FontData          weekHeaderFont             = createFont(2.8f, SWT.BOLD);
+   int               weekHeader_Align           = CalendarProfileManager.DEFAULT_WEEK_HEADER_ALIGN;
+   int               weekHeader_WeekdayShortcut = CalendarProfileManager.DEFAULT_WEEK_HEADER_WEEKDAY_SHORTCUT;
+   FontData          weekHeader_Font            = createFont(2.8f, SWT.BOLD);
    //
    // day date
    boolean           isHideDayDateWhenNoTour    = true;
@@ -258,7 +260,7 @@ public class CalendarProfile implements Cloneable {
          clonedProfile.tourContentFont    = createFont(tourContentFont);
          clonedProfile.tourTitleFont      = createFont(tourTitleFont);
          clonedProfile.tourValueFont      = createFont(tourValueFont);
-         clonedProfile.weekHeaderFont     = createFont(weekHeaderFont);
+         clonedProfile.weekHeader_Font     = createFont(weekHeader_Font);
          clonedProfile.weekValueFont      = createFont(weekValueFont);
          clonedProfile.yearHeaderFont     = createFont(yearHeaderFont);
 
@@ -288,6 +290,9 @@ public class CalendarProfile implements Cloneable {
       return clonedFormatterData;
    }
 
+   /**
+    * This is also used to create default profiles
+    */
    void dump() {
 
       if (_isLogCalendarProfile == false) {
@@ -360,7 +365,9 @@ public class CalendarProfile implements Cloneable {
         sb.append("                                                                                           \n"); //$NON-NLS-1$
         sb.append("// week header                                                                             \n"); //$NON-NLS-1$
         sb.append("profile.isShowWeekHeader              = " + isShowWeekHeader                           + ";\n"); //$NON-NLS-1$ //$NON-NLS-2$
-        sb.append("profile.weekHeaderFont                = " + dump_Font(weekHeaderFont)                  + ";\n"); //$NON-NLS-1$ //$NON-NLS-2$
+        sb.append("profile.weekHeader_Align              = " + weekHeader_Align                           + ";\n"); //$NON-NLS-1$ //$NON-NLS-2$
+        sb.append("profile.weekHeader_WeekdayShortcut    = " + weekHeader_WeekdayShortcut                 + ";\n"); //$NON-NLS-1$ //$NON-NLS-2$
+        sb.append("profile.weekHeaderFont                = " + dump_Font(weekHeader_Font)                 + ";\n"); //$NON-NLS-1$ //$NON-NLS-2$
         sb.append("                                                                                           \n"); //$NON-NLS-1$
         sb.append("// day date                                                                                \n"); //$NON-NLS-1$
         sb.append("profile.isHideDayDateWhenNoTour       = " + isHideDayDateWhenNoTour                    + ";\n"); //$NON-NLS-1$ //$NON-NLS-2$

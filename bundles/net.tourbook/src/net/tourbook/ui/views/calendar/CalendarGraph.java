@@ -915,7 +915,7 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
       getFont_YearHeader();
       getFont_WeekHeader();
 
-      final int weekHeaderHeight = isShowWeekHeader ? _fontHeight_WeekHeader + 0 : 0;
+      final int weekHeaderHeight = isShowWeekHeader ? _fontHeight_WeekHeader + 4 : 0;
       final int yearHeaderHeight = isShowYearColumns ? _fontHeight_YearHeader + 4 : 0;
 
       final int headerHeight = yearHeaderHeight + weekHeaderHeight;
@@ -2130,24 +2130,20 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
    }
 
    private void drawWeek_20_WeekHeader(final GC gc, final Rectangle headerRect) {
-      // TODO Auto-generated method stub
 
       final DayOfWeek firstDayOfWeek = TimeTools.getFirstDayOfWeek();
       final int firstDayOfWeekValue = firstDayOfWeek.getValue();
 
 // SET_FORMATTING_OFF
 
-      int weekDayTextIndex ;
-      weekDayTextIndex = 9;
-      weekDayTextIndex = 3;
-      weekDayTextIndex = 1;
-
       String[] allWeekDays;
-      switch (weekDayTextIndex) {
-      case 9:     allWeekDays = TimeTools.weekDays_Full;       break;
-      case 1:     allWeekDays = TimeTools.weekDays_Narrow;     break;
+
+      switch (_currentProfile.weekHeader_WeekdayShortcut) {
+      case 9:     allWeekDays = TimeTools.weekDays_Full;          break;
+      case 1:     allWeekDays = TimeTools.weekDays_Narrow;        break;
+      case 2:     allWeekDays = TimeTools.weekDays_TwoLetter;     break;
       case 3:
-      default:    allWeekDays = TimeTools.weekDays_Short;     break;
+      default:    allWeekDays = TimeTools.weekDays_Short;         break;
       }
 
 // SET_FORMATTING_ON
@@ -2173,16 +2169,11 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
          final int textWidth = textSize.x;
          final int dayOffset = (int) (dayWidth * dayIndex);
 
-         int textAlign = SWT.LEAD;
-         textAlign = SWT.LEAD;
-         textAlign = SWT.TRAIL;
-         textAlign = SWT.CENTER;
-
          int alignOffset;
 
 // SET_FORMATTING_OFF
 
-         switch (textAlign) {
+         switch (_currentProfile.weekHeader_Align) {
          case SWT.LEAD:       alignOffset = 0;                                      break;
          case SWT.TRAIL:      alignOffset = (int) (dayWidth - textWidth);           break;
          case SWT.CENTER:
@@ -2191,14 +2182,19 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 
 // SET_FORMATTING_ON
 
-         final int posX = headerRect.x + dayOffset + alignOffset;
-         final int posY = headerRect.y - 1;
+         final int posX = headerRect.x + dayOffset;
+         final int posY = headerRect.y;
 
-         gc.drawString(weekDayLabel, posX, posY);
+         final int labelPosX = posX + alignOffset;
+         final int labelPosY = posY - 1;
+
+         gc.setClipping(posX, posY, (int) dayWidth, headerRect.height);
+         gc.drawString(weekDayLabel, labelPosX, labelPosY);
+
+//         gc.setForeground(UI.SYS_COLOR_YELLOW);
+//         gc.drawRectangle(headerRect);
       }
 
-//      gc.setForeground(UI.SYS_COLOR_YELLOW);
-//      gc.drawRectangle(headerRect);
    }
 
    private void drawWeek_30_DateColumn(final GC gc,
@@ -2575,7 +2571,7 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 
       if (_fontWeekHeader == null) {
 
-         final FontData fontData = CalendarProfileManager.getActiveCalendarProfile().weekHeaderFont;
+         final FontData fontData = CalendarProfileManager.getActiveCalendarProfile().weekHeader_Font;
 
          _fontWeekHeader = new Font(_display, fontData);
 

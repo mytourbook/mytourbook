@@ -105,6 +105,11 @@ public class TimeTools {
    public static String[]                        weekDays_Narrow;
 
    /**
+    * Contains the weekday with 2 letters. For example: "Su", "Mo", etc.
+    */
+   public static String[]                        weekDays_TwoLetter;
+
+   /**
     * Contains the short weekday strings. For example: "Sun", "Mon", etc.
     */
    public static String[]                        weekDays_Short;
@@ -317,6 +322,21 @@ public class TimeTools {
             weekDayFormatter_Narrow.format(DayOfWeek.SATURDAY),
             weekDayFormatter_Narrow.format(DayOfWeek.SUNDAY) //
       };
+
+// SET_FORMATTING_OFF
+
+      weekDays_TwoLetter = new String[] {
+
+            weekDayFormatter_Full.format(DayOfWeek.MONDAY)     .substring(0, 2),
+            weekDayFormatter_Full.format(DayOfWeek.TUESDAY)    .substring(0, 2),
+            weekDayFormatter_Full.format(DayOfWeek.WEDNESDAY)  .substring(0, 2),
+            weekDayFormatter_Full.format(DayOfWeek.THURSDAY)   .substring(0, 2),
+            weekDayFormatter_Full.format(DayOfWeek.FRIDAY)     .substring(0, 2),
+            weekDayFormatter_Full.format(DayOfWeek.SATURDAY)   .substring(0, 2),
+            weekDayFormatter_Full.format(DayOfWeek.SUNDAY)     .substring(0, 2) //
+      };
+
+// SET_FORMATTING_ON
 
       weekDays_Short = new String[] {
 
