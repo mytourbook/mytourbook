@@ -671,7 +671,7 @@ public class DialogEquipment extends TitleAreaDialog {
             // autocomplete combo
             _comboInitialValueUnit = new Combo(container, SWT.BORDER | SWT.FLAT);
             _comboInitialValueUnit.setText(UI.EMPTY_STRING);
-            _comboInitialValueUnit.setToolTipText(Messages.Dialog_Equipment_Label_InitialValue_Unit);
+            _comboInitialValueUnit.setToolTipText(Messages.Dialog_Equipment_Label_InitialValue_Unit_Tooltip);
             _comboInitialValueUnit.addModifyListener(_defaultModifyListener);
 
             GridDataFactory.fillDefaults()
