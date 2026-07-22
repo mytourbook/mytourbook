@@ -630,10 +630,10 @@ class CalendarProfileManager {
 
       new WeekHeader_WeekdayShortcut_ComboData[] {
 
-         new WeekHeader_WeekdayShortcut_ComboData("Narrow",      1),
-         new WeekHeader_WeekdayShortcut_ComboData("2 Letter",    2),
-         new WeekHeader_WeekdayShortcut_ComboData("Short",       3),
-         new WeekHeader_WeekdayShortcut_ComboData("Full",        9),
+         new WeekHeader_WeekdayShortcut_ComboData(Messages.Calendar_Profile_WeekDay_Narrow,      1),
+         new WeekHeader_WeekdayShortcut_ComboData(Messages.Calendar_Profile_WeekDay_2Letter,    2),
+         new WeekHeader_WeekdayShortcut_ComboData(Messages.Calendar_Profile_WeekDay_Short,       3),
+         new WeekHeader_WeekdayShortcut_ComboData(Messages.Calendar_Profile_WeekDay_Full,        9),
       };
 
 // SET_FORMATTING_ON

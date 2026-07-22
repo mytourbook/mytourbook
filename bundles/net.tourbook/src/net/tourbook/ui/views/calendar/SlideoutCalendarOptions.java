@@ -1446,7 +1446,7 @@ class SlideoutCalendarOptions extends AdvancedSlideout implements ICalendarProfi
       // TODO Auto-generated method stub
 
       final Group group = new Group(parent, SWT.NONE);
-      group.setText("Week Header");
+      group.setText(Messages.Slideout_CalendarOptions_Group_WeekHeader);
       GridDataFactory.fillDefaults().applyTo(group);
       GridLayoutFactory.swtDefaults().numColumns(2).applyTo(group);
 //      group.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_YELLOW));
@@ -1458,7 +1458,7 @@ class SlideoutCalendarOptions extends AdvancedSlideout implements ICalendarProfi
 
             // checkbox
             _chkIsShowWeekHeader = new Button(group, SWT.CHECK);
-            _chkIsShowWeekHeader.setText("Show wee&k header");
+            _chkIsShowWeekHeader.setText(Messages.Slideout_CalendarOptions_Checkbox_IsShowWeekHeader);
             _chkIsShowWeekHeader.addSelectionListener(_defaultSelectionListener);
             GridDataFactory.fillDefaults()
                   .span(2, 1)
@@ -1484,7 +1484,7 @@ class SlideoutCalendarOptions extends AdvancedSlideout implements ICalendarProfi
 
             // label
             _lblWeekHeader_Weekday = new Label(container, SWT.NONE);
-            _lblWeekHeader_Weekday.setText("Weekda&y shortcut");
+            _lblWeekHeader_Weekday.setText(Messages.Slideout_CalendarOptions_Label_Weekday_Shortcut);
             GridDataFactory.fillDefaults()
                   .align(SWT.FILL, SWT.CENTER)
                   .indent(_subItemIndent, 0)
@@ -1503,7 +1503,7 @@ class SlideoutCalendarOptions extends AdvancedSlideout implements ICalendarProfi
 
             // label
             _lblWeekHeader_Align = new Label(container, SWT.NONE);
-            _lblWeekHeader_Align.setText("Ali&gn");
+            _lblWeekHeader_Align.setText(Messages.Slideout_CalendarOptions_Label_Weekday_Align);
             GridDataFactory.fillDefaults()
                   .align(SWT.FILL, SWT.CENTER)
                   .indent(_subItemIndent, 0)
@@ -1533,7 +1533,7 @@ class SlideoutCalendarOptions extends AdvancedSlideout implements ICalendarProfi
 
             // label
             _lblWeekHeader_Font = new Label(container, SWT.NONE);
-            _lblWeekHeader_Font.setText("Font");
+            _lblWeekHeader_Font.setText(Messages.Slideout_CalendarOptions_Label_Weekday_Font);
             GridDataFactory.fillDefaults()
                   .indent(0, _fontLabelVIndent)
                   .applyTo(_lblWeekHeader_Font);

@@ -343,6 +343,11 @@ public class Messages extends NLS {
    public static String        Calendar_Profile_Value_Title;
    public static String        Calendar_Profile_Value_TrainingStress_Tss;
    public static String        Calendar_Profile_Value_WeatherIcon;
+   public static String        Calendar_Profile_WeekDay_2Letter;
+   public static String        Calendar_Profile_WeekDay_Full;
+   public static String        Calendar_Profile_WeekDay_Narrow;
+   public static String        Calendar_Profile_WeekDay_Short;
+
    public static String        Calendar_View_Action_Back;
    public static String        Calendar_View_Action_Back_Tooltip;
    public static String        Calendar_View_Action_Forward;
@@ -2375,6 +2380,8 @@ public class Messages extends NLS {
    public static String        Slideout_CalendarOptions_Checkbox_IsShowTour_ValueUnit;
    public static String        Slideout_CalendarOptions_Checkbox_IsShowWeek_SummaryColumn;
    public static String        Slideout_CalendarOptions_Checkbox_IsShowWeek_ValueUnit;
+
+   public static String        Slideout_CalendarOptions_Checkbox_IsShowWeekHeader;
    public static String        Slideout_CalendarOptions_Checkbox_IsShowYearColumn;
    public static String        Slideout_CalendarOptions_Checkbox_IsShowYearColumn_Tooltip;
    public static String        Slideout_CalendarOptions_Checkbox_IsToggleMonthColor;
@@ -2397,6 +2404,7 @@ public class Messages extends NLS {
    public static String        Slideout_CalendarOptions_Group_DayDate;
    public static String        Slideout_CalendarOptions_Group_Layout;
    public static String        Slideout_CalendarOptions_Group_TourColor;
+   public static String        Slideout_CalendarOptions_Group_WeekHeader;
    public static String        Slideout_CalendarOptions_Group_YearColumns;
    public static String        Slideout_CalendarOptions_Label_AppPrefix;
    public static String        Slideout_CalendarOptions_Label_Calendar_BackgroundColor;
@@ -2438,6 +2446,9 @@ public class Messages extends NLS {
    public static String        Slideout_CalendarOptions_Label_UserPrefix;
    public static String        Slideout_CalendarOptions_Label_Week_ColumnWidth;
    public static String        Slideout_CalendarOptions_Label_Week_ValueFont;
+   public static String        Slideout_CalendarOptions_Label_Weekday_Align;
+   public static String        Slideout_CalendarOptions_Label_Weekday_Shortcut;
+   public static String        Slideout_CalendarOptions_Label_Weekday_Font;
    public static String        Slideout_CalendarOptions_Label_YearColumn_HeaderFont;
    public static String        Slideout_CalendarOptions_Label_YearColumn_Space;
    public static String        Slideout_CalendarOptions_Label_YearColumn_Space_Tooltip;
