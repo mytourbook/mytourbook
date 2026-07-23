@@ -21,7 +21,7 @@
    <classpathentry exported="true" kind="lib" path="lat-lon-timezone-converter-2019-04-30.jar" />                                                              <!-- https://github.com/drtimcooper/LatLongToTimezone/blob/master/src/main/java/com/skedgo/converter/TimezoneMapper.java -->
    <classpathentry exported="true" kind="lib" path="mchange-commons-java-0.5.0.jar"/>                                                                          <!-- https://mvnrepository.com/artifact/com.mchange/mchange-commons-java -->
    <classpathentry exported="true" kind="lib" path="simplelatlng-1.4.0.jar"               sourcepath="jar-sources/simplelatlng-1.4.0-sources.jar"/>            <!-- https://mvnrepository.com/artifact/com.javadocmd/simplelatlng -->
-   <classpathentry exported="true" kind="lib" path="url-detector-0.1.23.jar"/>                                                                                 <!-- https://mvnrepository.com/artifact/io.github.url-detector/url-detector -->
+   <classpathentry exported="true" kind="lib" path="url-detector-0.1.24.jar"/>                                                                                 <!-- https://mvnrepository.com/artifact/io.github.url-detector/url-detector -->
    <classpathentry exported="true" kind="lib" path="jsvg-2.0.0.jar"                       sourcepath="jar-sources/jsvg-2.0.0-sources.jar"/>                    <!-- https://mvnrepository.com/artifact/com.github.weisj/jsvg -->/>
    <classpathentry kind="output" path="bin"/>
 </classpath>
