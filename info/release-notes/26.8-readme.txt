@@ -1,15 +1,5 @@
 26.8.0                                                 ?. August 2026
 
-
-!!! fr, it and nl TRANSLATIONS !!!
-==================================
-
-Change wording from "Type" into "Collate ID" in
-
-Dialog_Equipment_Tooltip_1b
-Dialog_Equipment_Tooltip_2b
-
-
 All
 ===
 
@@ -60,7 +50,7 @@ Changes
 Bugfix
 ======
   
-* 
+* See milestone 26.8 https://github.com/mytourbook/mytourbook/milestone/30?closed=1
 
 
 Translation    
