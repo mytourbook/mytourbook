@@ -13,35 +13,53 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
-package net.tourbook.database;
+package net.tourbook.ui.action;
 
+import java.util.HashSet;
 import java.util.List;
 
+import net.tourbook.Messages;
 import net.tourbook.data.TourData;
+import net.tourbook.database.ITourDataUpdate_OnlyUpdate;
+import net.tourbook.database.TourDatabase;
+import net.tourbook.tour.TourManager;
 
-public class TourDataUpdate_061_to_062 implements ITourDataUpdate {
+import org.eclipse.jface.action.Action;
 
-   @Override
-   public int getDatabaseVersion() {
+public class ActionSetHRZones_AllTours extends Action implements ITourDataUpdate_OnlyUpdate {
 
-      return 62;
+   public ActionSetHRZones_AllTours() {
+
+      super(null, AS_PUSH_BUTTON);
+
+      setText(Messages.Tour_Action_HRZones_InAllTours);
+      setToolTipText(Messages.Tour_Action_HRZones_InAllTours_Tooltip);
    }
 
    @Override
-   public List<Long> getTourIDs() {
+   public void run() {
 
-      return null;
+      // check if the tour editor contains a modified tour
+      if (TourManager.isTourEditorModified()) {
+         return;
+      }
+
+      final List<Long> allTourIDs = TourDatabase.getAllTourIds();
+
+      TourManager.updateTourData_Concurrent(new HashSet<>(allTourIDs), this);
    }
 
    @Override
    public boolean updateTourData(final TourData tourData) {
 
-      if (tourData.getTourNutritionProducts().isEmpty()) {
+      // set HR zones
+      final int[] allHrZones = tourData.getHrZones();
+
+      if (allHrZones == null) {
          return false;
       }
 
-      tourData.computeTourNutritionData();
-
+      // save tour
       return true;
    }
 }

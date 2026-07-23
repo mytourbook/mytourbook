@@ -105,7 +105,7 @@ public class EquipmentPartFilter_AND_OR {
 
                      // get parts only for ONE equipment
 
-                     sqlEquipmentID = "   AND partOR.EQUIPMENT_EQUIPMENTID = ?" + NL;
+                     sqlEquipmentID = "   AND partOR.EQUIPMENT_EQUIPMENTID = ?" + NL; //$NON-NLS-1$
 
                      allSQLParameters.addFirst(_requestedEquipmentID);
                   }

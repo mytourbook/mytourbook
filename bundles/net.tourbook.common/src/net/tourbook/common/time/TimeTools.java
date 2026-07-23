@@ -100,6 +100,16 @@ public class TimeTools {
    public static WeekFields                      calendarWeek;
 
    /**
+    * Contains the short weekday strings. For example: "S", "M", etc.
+    */
+   public static String[]                        weekDays_Narrow;
+
+   /**
+    * Contains the weekday with 2 letters. For example: "Su", "Mo", etc.
+    */
+   public static String[]                        weekDays_TwoLetter;
+
+   /**
     * Contains the short weekday strings. For example: "Sun", "Mon", etc.
     */
    public static String[]                        weekDays_Short;
@@ -290,6 +300,10 @@ public class TimeTools {
        * Create week day names. Found no better solution, the old API contained
        * "DateFormatSymbols.getInstance().getShortWeekdays()"
        */
+      final DateTimeFormatter weekDayFormatter_Narrow = new DateTimeFormatterBuilder()
+            .appendText(DAY_OF_WEEK, TextStyle.NARROW)
+            .toFormatter();
+
       final DateTimeFormatter weekDayFormatter_Short = new DateTimeFormatterBuilder()
             .appendText(DAY_OF_WEEK, TextStyle.SHORT)
             .toFormatter();
@@ -297,6 +311,32 @@ public class TimeTools {
       final DateTimeFormatter weekDayFormatter_Full = new DateTimeFormatterBuilder()
             .appendText(DAY_OF_WEEK, TextStyle.FULL)
             .toFormatter();
+
+      weekDays_Narrow = new String[] {
+
+            weekDayFormatter_Narrow.format(DayOfWeek.MONDAY),
+            weekDayFormatter_Narrow.format(DayOfWeek.TUESDAY),
+            weekDayFormatter_Narrow.format(DayOfWeek.WEDNESDAY),
+            weekDayFormatter_Narrow.format(DayOfWeek.THURSDAY),
+            weekDayFormatter_Narrow.format(DayOfWeek.FRIDAY),
+            weekDayFormatter_Narrow.format(DayOfWeek.SATURDAY),
+            weekDayFormatter_Narrow.format(DayOfWeek.SUNDAY) //
+      };
+
+// SET_FORMATTING_OFF
+
+      weekDays_TwoLetter = new String[] {
+
+            weekDayFormatter_Full.format(DayOfWeek.MONDAY)     .substring(0, 2),
+            weekDayFormatter_Full.format(DayOfWeek.TUESDAY)    .substring(0, 2),
+            weekDayFormatter_Full.format(DayOfWeek.WEDNESDAY)  .substring(0, 2),
+            weekDayFormatter_Full.format(DayOfWeek.THURSDAY)   .substring(0, 2),
+            weekDayFormatter_Full.format(DayOfWeek.FRIDAY)     .substring(0, 2),
+            weekDayFormatter_Full.format(DayOfWeek.SATURDAY)   .substring(0, 2),
+            weekDayFormatter_Full.format(DayOfWeek.SUNDAY)     .substring(0, 2) //
+      };
+
+// SET_FORMATTING_ON
 
       weekDays_Short = new String[] {
 

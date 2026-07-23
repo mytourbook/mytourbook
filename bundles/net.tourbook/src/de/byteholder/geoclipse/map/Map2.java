@@ -7352,6 +7352,10 @@ public class Map2 extends Canvas {
           */
          synchronized (_allDisposableMapPointImages_SWT) {
 
+            if (isDisposed()) {
+               return;
+            }
+
             final CustomScalingImageDataProvider imageDataProvider = new CustomScalingImageDataProvider(awtImage);
 
             _mapPointImage = new Image(getDisplay(), imageDataProvider);
@@ -7427,7 +7431,28 @@ public class Map2 extends Canvas {
 //                     image));
 
                if (image != null) {
-                  image.dispose();
+
+                  try {
+
+                     image.dispose();
+
+                  } catch (final Exception e) {
+
+                     /**
+                      * Ignore, this is fixing a ConcurrentModificationException which occurred
+                      * within the image.dispose()
+                      *
+                      * <code>
+                      *
+                      * java.util.ConcurrentModificationException
+                      *         at java.base/java.util.ArrayList.forEach(Unknown Source)
+                      *         at org.eclipse.swt.graphics.Image.dispose(Image.java:1100)
+                      *         at de.byteholder.geoclipse.map.Map2.paint_MapPointImage_10_Runnable(Map2.java:7430)
+                      *         at de.byteholder.geoclipse.map.Map2.lambda$13(Map2.java:7170)
+                      *
+                      * </code>
+                      */
+                  }
                }
 
 //               _debugLog.append(String.format("%s - 3 - %6d - %10d - %s\n",

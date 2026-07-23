@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2022, 2025 Frédéric Bard
+ * Copyright (C) 2022, 2026 Frédéric Bard
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -44,7 +44,6 @@ public class PrefPagePeopleTests extends UITest {
       bot.button(Messages.Dialog_HRZone_Button_EditHrZones).click();
       Utils.clickOkButton(bot);
       Utils.clickApplyAndCloseButton(bot);
-      bot.button(Messages.Pref_People_Dialog_ComputeHrZonesForAllToursIsCanceled_Message_Cancel).click();
    }
 
    @Test

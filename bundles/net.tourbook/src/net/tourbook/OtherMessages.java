@@ -78,6 +78,10 @@ public class OtherMessages {
    public static final String APP_ACTION_CLOSE_TOOLTIP                     = net.tourbook.common.Messages.App_Action_Close_Tooltip;
    public static final String APP_ACTION_RESTORE_DEFAULT                   = net.tourbook.common.Messages.App_Action_RestoreDefault;
 
+   public static final String APP_ALIGNMENT_LEFT                           = net.tourbook.common.Messages.App_Alignment_Left;
+   public static final String APP_ALIGNMENT_CENTER                         = net.tourbook.common.Messages.App_Alignment_Center;
+   public static final String APP_ALIGNMENT_RIGHT                          = net.tourbook.common.Messages.App_Alignment_Right;
+
    public static final String APP_SIZE_LARGE_LABEL                         = net.tourbook.common.Messages.App_Size_Large_Label;
    public static final String APP_SIZE_LARGE_SHORTCUT                      = net.tourbook.common.Messages.App_Size_Large_Shortcut;
    public static final String APP_SIZE_LARGE_TEXT                          = net.tourbook.common.Messages.App_Size_Large_Text;

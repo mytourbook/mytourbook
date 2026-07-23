@@ -32,6 +32,7 @@ import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Spinner;
 import org.eclipse.ui.IWorkbench;
@@ -55,6 +56,9 @@ public class PrefPageEquipment extends PreferencePage implements IWorkbenchPrefe
    /*
     * UI controls
     */
+   private Button  _chkIsDisplayCollateIdOrName;
+   private Button  _chkIsDisplayEquipmentImage;
+
    private Spinner _spinnerRecentEquipment;
 
    @Override
@@ -73,21 +77,58 @@ public class PrefPageEquipment extends PreferencePage implements IWorkbenchPrefe
    private Composite createUI(final Composite parent) {
 
       final Composite container = new Composite(parent, SWT.NONE);
-      GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
-      GridLayoutFactory.fillDefaults().numColumns(3).applyTo(container);
-//      container.setBackground(UI.SYS_COLOR_CYAN);
+      GridDataFactory.fillDefaults().grab(true, true).applyTo(container);
+      GridLayoutFactory.fillDefaults().numColumns(1).applyTo(container);
+//      container.setBackground(UI.SYS_COLOR_BLUE);
       {
+         createUI_20_ContextMenu(container);
+      }
+
+      return container;
+   }
+
+   private void createUI_20_ContextMenu(final Composite parent) {
+
+      final Group group = new Group(parent, SWT.NONE);
+      group.setText(Messages.Pref_Equipment_Group_ContextMenu);
+      GridDataFactory.fillDefaults().grab(true, false).applyTo(group);
+      GridLayoutFactory.swtDefaults().numColumns(3).applyTo(group);
+//      group.setBackground(UI.SYS_COLOR_CYAN);
+      {
+         {
+            /*
+             * Display equipment image
+             */
+            _chkIsDisplayEquipmentImage = new Button(group, SWT.CHECK);
+            _chkIsDisplayEquipmentImage.setText(Messages.Pref_Equipment_Checkbox_DisplayImage);
+            _chkIsDisplayEquipmentImage.addSelectionListener(_defaultSelectionListener);
+            GridDataFactory.fillDefaults()
+                  .span(3, 1)
+                  .applyTo(_chkIsDisplayEquipmentImage);
+         }
+         {
+            /*
+             * Display equipment collate ID or name
+             */
+            _chkIsDisplayCollateIdOrName = new Button(group, SWT.CHECK);
+            _chkIsDisplayCollateIdOrName.setText(Messages.Pref_Equipment_Checkbox_DisplayCollateID);
+            _chkIsDisplayCollateIdOrName.setToolTipText(Messages.Pref_Equipment_Checkbox_DisplayCollateID_Tooltip);
+            _chkIsDisplayCollateIdOrName.addSelectionListener(_defaultSelectionListener);
+            GridDataFactory.fillDefaults()
+                  .span(3, 1)
+                  .applyTo(_chkIsDisplayCollateIdOrName);
+         }
          {
             /*
              * Number of recent equipment
              */
             final String tooltip = Messages.Pref_Equipment_Label_NumberOfRecentEquipment_Tooltip;
 
-            final Label label = UI.createLabel(container, Messages.Pref_Equipment_Label_NumberOfRecentEquipment);
+            final Label label = UI.createLabel(group, Messages.Pref_Equipment_Label_NumberOfRecentEquipment);
             label.setToolTipText(tooltip);
 
             // spinner
-            _spinnerRecentEquipment = new Spinner(container, SWT.BORDER);
+            _spinnerRecentEquipment = new Spinner(group, SWT.BORDER);
             _spinnerRecentEquipment.setToolTipText(tooltip);
             _spinnerRecentEquipment.setMinimum(0);
             _spinnerRecentEquipment.setMaximum(9);
@@ -99,15 +140,13 @@ public class PrefPageEquipment extends PreferencePage implements IWorkbenchPrefe
                   .applyTo(_spinnerRecentEquipment);
 
             // button: Remove recent equipment
-            final Button btnRemoveRecentEquipment = new Button(container, SWT.PUSH);
+            final Button btnRemoveRecentEquipment = new Button(group, SWT.PUSH);
             btnRemoveRecentEquipment.setText(Messages.Pref_Equipment_Button_RemoveRecentEquipment);
             btnRemoveRecentEquipment.setToolTipText(Messages.Pref_Equipment_Button_RemoveRecentEquipment_Tooltip);
             btnRemoveRecentEquipment.addSelectionListener(SelectionListener.widgetSelectedAdapter(
                   selectionEvent -> EquipmentMenuManager.clearPreviousAndRecentEquipment()));
          }
       }
-
-      return container;
    }
 
    private void enableControls() {
@@ -156,6 +195,8 @@ public class PrefPageEquipment extends PreferencePage implements IWorkbenchPrefe
    @Override
    protected void performDefaults() {
 
+      _chkIsDisplayCollateIdOrName.setSelection(_prefStore.getDefaultBoolean(ITourbookPreferences.EQUIPMENT_IS_DISPLAY_COLLATE_ID_IN_CONTEXT_MENU));
+      _chkIsDisplayEquipmentImage.setSelection(_prefStore.getDefaultBoolean(ITourbookPreferences.EQUIPMENT_IS_DISPLAY_IMAGE_IN_CONTEXT_MENU));
       _spinnerRecentEquipment.setSelection(_prefStore.getDefaultInt(ITourbookPreferences.EQUIPMENT_NUMBER_OF_RECENT_EQUIPMENT));
 
       super.performDefaults();
@@ -173,11 +214,17 @@ public class PrefPageEquipment extends PreferencePage implements IWorkbenchPrefe
 
    private void restoreState() {
 
+      _chkIsDisplayCollateIdOrName.setSelection(_prefStore.getBoolean(ITourbookPreferences.EQUIPMENT_IS_DISPLAY_COLLATE_ID_IN_CONTEXT_MENU));
+      _chkIsDisplayEquipmentImage.setSelection(_prefStore.getBoolean(ITourbookPreferences.EQUIPMENT_IS_DISPLAY_IMAGE_IN_CONTEXT_MENU));
       _spinnerRecentEquipment.setSelection(_prefStore.getInt(ITourbookPreferences.EQUIPMENT_NUMBER_OF_RECENT_EQUIPMENT));
    }
 
    private void saveState() {
 
+      _prefStore.setValue(ITourbookPreferences.EQUIPMENT_IS_DISPLAY_COLLATE_ID_IN_CONTEXT_MENU, _chkIsDisplayCollateIdOrName.getSelection());
+      _prefStore.setValue(ITourbookPreferences.EQUIPMENT_IS_DISPLAY_IMAGE_IN_CONTEXT_MENU, _chkIsDisplayEquipmentImage.getSelection());
+
+      // set as LAST which will trigger the listeners
       _prefStore.setValue(ITourbookPreferences.EQUIPMENT_NUMBER_OF_RECENT_EQUIPMENT, _spinnerRecentEquipment.getSelection());
    }
 }

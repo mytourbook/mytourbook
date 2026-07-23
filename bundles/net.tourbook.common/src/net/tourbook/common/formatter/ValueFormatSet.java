@@ -35,6 +35,19 @@ public class ValueFormatSet {
          ValueFormat.NUMBER_1_2,
    };
 
+   /**
+    * Formats are available with max of 5 digits
+    */
+   public static ValueFormat[] Number_5_Digits = new ValueFormat[] {
+
+         ValueFormat.NUMBER_1_0,
+         ValueFormat.NUMBER_1_1,
+         ValueFormat.NUMBER_1_2,
+         ValueFormat.NUMBER_1_3,
+         ValueFormat.NUMBER_1_4,
+         ValueFormat.NUMBER_1_5,
+   };
+
    public static ValueFormat[] Time            = new ValueFormat[] {
 
          ValueFormat.TIME_HH,

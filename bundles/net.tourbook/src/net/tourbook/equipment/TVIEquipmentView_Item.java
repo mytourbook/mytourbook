@@ -129,6 +129,7 @@ public abstract class TVIEquipmentView_Item extends TreeViewerItem {
     * All these fields must be public otherwise the scramble feature causes an exception
     */
    public float         colDistance;
+   public float         colPricePerDistance;
 
    public long          colElapsedTime;
    public long          colRecordedTime;
@@ -149,12 +150,12 @@ public abstract class TVIEquipmentView_Item extends TreeViewerItem {
    public float         colAvgTemperature_Device;
 
    /**
-    * {@link #type} and {@link #dateUsed} are the key parts to collated (summarize) tour values
+    * {@link #collateID} and {@link #dateUsed} are the key parts to collated (summarize) tour values
     */
-   public String        type;
+   public String        collateID;
 
    /**
-    * {@link #type} and {@link #dateUsed} are the key parts to collated (summarize) tour values
+    * {@link #collateID} and {@link #dateUsed} are the key parts to collated (summarize) tour values
     */
    public LocalDateTime dateUsed;
 

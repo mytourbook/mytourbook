@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2024 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2026 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -33,6 +33,8 @@ import org.eclipse.swt.graphics.RGB;
 
 @Entity
 public class TourPersonHRZone implements Cloneable, Comparable<TourPersonHRZone>, Serializable {
+
+   private static final char   NL                    = UI.NEW_LINE;
 
    private static final long   serialVersionUID      = 1L;
 
@@ -175,10 +177,8 @@ public class TourPersonHRZone implements Cloneable, Comparable<TourPersonHRZone>
    @Override
    public int compareTo(final TourPersonHRZone otherHrZone) {
 
-      return zoneMinValue < otherHrZone.zoneMinValue ? //
-            -1
-            : zoneMinValue == otherHrZone.zoneMinValue ? //
-                  0
+      return zoneMinValue < otherHrZone.zoneMinValue ? -1
+            : zoneMinValue == otherHrZone.zoneMinValue ? 0
                   : 1;
    }
 
@@ -380,13 +380,16 @@ public class TourPersonHRZone implements Cloneable, Comparable<TourPersonHRZone>
 
    @Override
    public String toString() {
-      return "TourPersonHRZone [zoneMinValue=" //$NON-NLS-1$
-            + zoneMinValue
-            + ", zoneMaxValue=" //$NON-NLS-1$
-            + zoneMaxValue
-            + ", zoneName=" //$NON-NLS-1$
-            + zoneName
-            + "]"; //$NON-NLS-1$
+
+      return UI.EMPTY_STRING
+
+            + "TourPersonHRZone" + NL //                          //$NON-NLS-1$
+
+            + "  zoneMinValue = " + zoneMinValue + NL //          //$NON-NLS-1$
+            + "  zoneMaxValue = " + zoneMaxValue + NL //          //$NON-NLS-1$
+            + "  zoneName		= " + zoneName + NL //              //$NON-NLS-1$
+
+      ;
    }
 
 }

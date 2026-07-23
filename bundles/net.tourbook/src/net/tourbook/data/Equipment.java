@@ -68,7 +68,10 @@ public class Equipment implements Cloneable, Comparable<Object>, Serializable {
    private String                     model;
 
    /**
-    * Collation type, e.g. backpack
+    * Collation ID, e.g. backpack
+    * <p>
+    * In MT 26.6 the wording of this field in the UI was renamed into "Collate ID" but not in the
+    * backend
     */
    private String                     type;
 
@@ -121,6 +124,16 @@ public class Equipment implements Cloneable, Comparable<Object>, Serializable {
    private String                     priceUnit;
 
    /**
+    * Initial value
+    */
+   private float                      initialValue;
+
+   /**
+    * Initial value unit
+    */
+   private String                     initialValueUnit;
+
+   /**
     * Initial distance, in meter
     */
    private float                      distanceFirstUse;
@@ -136,19 +149,24 @@ public class Equipment implements Cloneable, Comparable<Object>, Serializable {
    private boolean                    isRetired;
 
    /**
-    * When the equipment was firstly used, in milliseconds since 1970-01-01T00:00:00Z
-    */
-   private long                       dateUsed;
-
-   /**
     * When the equipment was created/build, in milliseconds since 1970-01-01T00:00:00Z
     */
    private long                       dateBuilt;
 
    /**
+    * When the equipment was purchased, in milliseconds since 1970-01-01T00:00:00Z
+    */
+   private long                       datePurchased;
+
+   /**
     * When the equipment was retired/sold, in milliseconds since 1970-01-01T00:00:00Z
     */
    private long                       dateRetired;
+
+   /**
+    * When the equipment was firstly used, in milliseconds since 1970-01-01T00:00:00Z
+    */
+   private long                       dateUsed;
 
    /**
     * When the equipment was firstly used, in milliseconds since 1970-01-01T00:00:00Z
@@ -188,13 +206,16 @@ public class Equipment implements Cloneable, Comparable<Object>, Serializable {
    private long                       _createId        = 0;
 
    @Transient
-   private LocalDateTime              _dateUsed;
-
-   @Transient
    private LocalDateTime              _dateBuilt;
 
    @Transient
+   private LocalDateTime              _datePurchased;
+
+   @Transient
    private LocalDateTime              _dateRetired;
+
+   @Transient
+   private LocalDateTime              _dateUsed;
 
    @Transient
    private LocalDateTime              _dateCollateFrom;
@@ -205,8 +226,6 @@ public class Equipment implements Cloneable, Comparable<Object>, Serializable {
    @Transient
    private String                     _equipmentName;
 
-   @Transient
-   private String                     _checkedEmptyType;
 
    /**
     * Default constructor used in EJB
@@ -302,6 +321,15 @@ public class Equipment implements Cloneable, Comparable<Object>, Serializable {
       return brand;
    }
 
+   public String getCollateID() {
+
+      if (type == null) {
+         return UI.EMPTY_STRING;
+      }
+
+      return type;
+   }
+
    public long getDateBuilt() {
 
       return dateBuilt;
@@ -342,6 +370,20 @@ public class Equipment implements Cloneable, Comparable<Object>, Serializable {
       }
 
       return _dateCollateUntil;
+   }
+
+   public long getDatePurchased() {
+
+      return datePurchased;
+   }
+
+   public LocalDateTime getDatePurchased_Local() {
+
+      if (_datePurchased == null) {
+         _datePurchased = TimeTools.toLocalDateTime(datePurchased);
+      }
+
+      return _datePurchased;
    }
 
    public long getDateRetired() {
@@ -418,6 +460,19 @@ public class Equipment implements Cloneable, Comparable<Object>, Serializable {
       return imageFilePath;
    }
 
+   public float getInitialValue() {
+      return initialValue;
+   }
+
+   public String getInitialValueUnit() {
+
+      if (initialValueUnit == null) {
+         return UI.EMPTY_STRING;
+      }
+
+      return initialValueUnit;
+   }
+
    public String getModel() {
 
       if (model == null) {
@@ -487,25 +542,6 @@ public class Equipment implements Cloneable, Comparable<Object>, Serializable {
       return size;
    }
 
-   public String getType() {
-
-      if (type == null) {
-         return UI.EMPTY_STRING;
-      }
-
-      return type;
-   }
-
-   public String getTypeEmptyChecked() {
-
-      if (_checkedEmptyType == null) {
-
-         _checkedEmptyType = EquipmentManager.isEmptyEquipmentType(type) ? UI.EMPTY_STRING : type;
-      }
-
-      return _checkedEmptyType;
-   }
-
    public String getUrlAddress() {
 
       if (urlAddress == null) {
@@ -546,7 +582,7 @@ public class Equipment implements Cloneable, Comparable<Object>, Serializable {
 
       if (isCollate != otherEquipment.isCollate()
             || dateUsed != otherEquipment.getDateUsed()
-            || type.equalsIgnoreCase(otherEquipment.getType()) == false) {
+            || type.equalsIgnoreCase(otherEquipment.getCollateID()) == false) {
 
          // collated fields are modified
 
@@ -608,6 +644,11 @@ public class Equipment implements Cloneable, Comparable<Object>, Serializable {
       _equipmentName = null;
    }
 
+   public void setCollateID(final String collateID) {
+
+      this.type = collateID;
+   }
+
    public void setDateBuilt(final long dateBuilt) {
 
       this.dateBuilt = dateBuilt;
@@ -627,6 +668,13 @@ public class Equipment implements Cloneable, Comparable<Object>, Serializable {
       this.dateCollateUntil = dateCollateUntil;
 
       _dateCollateUntil = null;
+   }
+
+   public void setDatePurchased(final long datePurchased) {
+
+      this.datePurchased = datePurchased;
+
+      _datePurchased = null;
    }
 
    public void setDateRetired(final long dateRetired) {
@@ -659,6 +707,14 @@ public class Equipment implements Cloneable, Comparable<Object>, Serializable {
       this.imageFilePath = imageFilePath;
    }
 
+   public void setInitialValue(final float initialValue) {
+      this.initialValue = initialValue;
+   }
+
+   public void setInitialValueUnit(final String initialValueUnit) {
+      this.initialValueUnit = initialValueUnit;
+   }
+
    public void setIsCollate(final boolean isCollate) {
       this.isCollate = isCollate;
    }
@@ -688,13 +744,6 @@ public class Equipment implements Cloneable, Comparable<Object>, Serializable {
 
    public void setSize(final String size) {
       this.size = size;
-   }
-
-   public void setType(final String type) {
-
-      this.type = type;
-
-      _checkedEmptyType = null;
    }
 
    public void setUrlAddress(final String urlAddress) {
@@ -729,12 +778,14 @@ public class Equipment implements Cloneable, Comparable<Object>, Serializable {
             + "  brand            = " + brand + NL //                         //$NON-NLS-1$
             + "  model            = " + model + NL //                         //$NON-NLS-1$
 
-            + "  isCollate        = " + isCollate + NL //                     //$NON-NLS-1$
-            + "  isRetired    	 = " + isRetired + NL //                     //$NON-NLS-1$
-            + "  type             = " + type + NL //                          //$NON-NLS-1$
-            + "  dateUsed         = " + getDateUsed_Local() + NL //           //$NON-NLS-1$
-            + "  dateCollateFrom  = " + getDateCollateFrom_Local() + NL //    //$NON-NLS-1$
-            + "  dateCollateUntil = " + getDateCollateUntil_Local() + NL //   //$NON-NLS-1$
+//            + "  isCollate        = " + isCollate + NL //                     //$NON-NLS-1$
+//            + "  isRetired        = " + isRetired + NL //                     //$NON-NLS-1$
+            + "  collateID        = " + type + NL //                          //$NON-NLS-1$
+            + "  name             = " + getName() + NL //                     //$NON-NLS-1$
+
+//            + "  dateUsed         = " + getDateUsed_Local() + NL //           //$NON-NLS-1$
+//            + "  dateCollateFrom  = " + getDateCollateFrom_Local() + NL //    //$NON-NLS-1$
+//            + "  dateCollateUntil = " + getDateCollateUntil_Local() + NL //   //$NON-NLS-1$
 
 //            + " description      = " + description + NL //                  //$NON-NLS-1$
 //            + " equipmentType    = " + equipmentType + NL //                //$NON-NLS-1$
@@ -745,7 +796,7 @@ public class Equipment implements Cloneable, Comparable<Object>, Serializable {
 //
 //            + " weight           = " + weight + NL //                       //$NON-NLS-1$
 //
-            + " parts            = " + partValues + NL //$NON-NLS-1$
+//            + " parts            = " + partValues + NL //$NON-NLS-1$
       ;
    }
 
@@ -777,18 +828,21 @@ public class Equipment implements Cloneable, Comparable<Object>, Serializable {
 
       setIsCollate         (otherEquipment.isCollate());
       setIsRetired         (otherEquipment.isRetired());
-      setType              (otherEquipment.getType());
+      setCollateID         (otherEquipment.getCollateID());
 
       setDistanceFirstUse  (otherEquipment.getDistanceFirstUse());
+      setInitialValue      (otherEquipment.getInitialValue());
+      setInitialValueUnit  (otherEquipment.getInitialValueUnit());
       setPrice             (otherEquipment.getPrice());
       setPriceUnit         (otherEquipment.getPriceUnit());
       setSize              (otherEquipment.getSize());
       setWeight            (otherEquipment.getWeight());
       setWeightUnit        (otherEquipment.getWeightUnit());
 
-      setDateUsed          (otherEquipment.getDateUsed());
       setDateBuilt         (otherEquipment.getDateBuilt());
+      setDatePurchased     (otherEquipment.getDatePurchased());
       setDateRetired       (otherEquipment.getDateRetired());
+      setDateUsed          (otherEquipment.getDateUsed());
 
 // SET_FORMATTING_ON
    }

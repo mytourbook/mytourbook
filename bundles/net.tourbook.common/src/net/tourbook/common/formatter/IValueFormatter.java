@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2026 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -23,12 +23,15 @@ public interface IValueFormatter {
    static final String ZERO_VALUE_TEXT_0_0      = "0.0";     //$NON-NLS-1$
    static final String ZERO_VALUE_TEXT_0_00     = "0.00";    //$NON-NLS-1$
    static final String ZERO_VALUE_TEXT_0_000    = "0.000";   //$NON-NLS-1$
+   static final String ZERO_VALUE_TEXT_0_0000   = "0.0000";  //$NON-NLS-1$
+   static final String ZERO_VALUE_TEXT_0_00000  = "0.00000"; //$NON-NLS-1$
 
    static final String ZERO_VALUE_TEXT_HH_MM    = "0:00";    //$NON-NLS-1$
    static final String ZERO_VALUE_TEXT_HH_MM_SS = "0:00:00"; //$NON-NLS-1$
 
    /**
     * @param value
+    *
     * @return
     */
    String printDouble(double value);
@@ -38,6 +41,7 @@ public interface IValueFormatter {
     * ">0" is displayed when the formatted text is "0" but the value is larger than 0.
     *
     * @param value
+    *
     * @return
     */
    String printLong(long value);
@@ -49,6 +53,7 @@ public interface IValueFormatter {
     * @param isShowBiggerThan0
     *           When <code>false</code> then ">0" is displayed when the formatted text is "0" but
     *           the values larger than 0.
+    *
     * @return
     */
    String printLong(long value, boolean isHide0Value, boolean isShowBiggerThan0);

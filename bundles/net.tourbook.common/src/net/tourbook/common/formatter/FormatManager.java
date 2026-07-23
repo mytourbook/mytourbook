@@ -33,6 +33,8 @@ public class FormatManager {
    private static IValueFormatter        _valueFormatter_Number_1_1  = new ValueFormatter_Number_1_1();
    private static IValueFormatter        _valueFormatter_Number_1_2  = new ValueFormatter_Number_1_2();
    private static IValueFormatter        _valueFormatter_Number_1_3  = new ValueFormatter_Number_1_3();
+   private static IValueFormatter        _valueFormatter_Number_1_4  = new ValueFormatter_Number_1_4();
+   private static IValueFormatter        _valueFormatter_Number_1_5  = new ValueFormatter_Number_1_5();
    private static IValueFormatter        _valueFormatter_Time_HH     = new ValueFormatter_Time_HH();
    private static IValueFormatter        _valueFormatter_Time_HHMM   = new ValueFormatter_Time_HHMM();
    private static IValueFormatter        _valueFormatter_Time_HHMMSS = new ValueFormatter_Time_HHMMSS();
@@ -142,6 +144,7 @@ public class FormatManager {
 
    /**
     * @param value
+    * 
     * @return Format a number with 0 digits but with thousender markers.
     */
    public static String formatPausedTime(final long value) {
@@ -150,6 +153,7 @@ public class FormatManager {
 
    /**
     * @param value
+    * 
     * @return Format a number with 0 digits but with thousender markers.
     */
    public static String formatPausedTime_Summary(final long value) {
@@ -226,6 +230,14 @@ public class FormatManager {
 
          return _valueFormatter_Number_1_3;
 
+      } else if (formatName.equals(ValueFormat.NUMBER_1_4.name())) {
+
+         return _valueFormatter_Number_1_4;
+
+      } else if (formatName.equals(ValueFormat.NUMBER_1_5.name())) {
+
+         return _valueFormatter_Number_1_5;
+
       } else {
 
          return _valueFormatter_Number_1_0;
@@ -271,6 +283,12 @@ public class FormatManager {
 
       case NUMBER_1_3:
          return Messages.Value_Formatter_Number_1_3;
+
+      case NUMBER_1_4:
+         return Messages.Value_Formatter_Number_1_4;
+
+      case NUMBER_1_5:
+         return Messages.Value_Formatter_Number_1_5;
 
       case PACE_MM_SS:
          return Messages.Value_Formatter_Pace_MM_SS;

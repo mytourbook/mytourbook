@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2023, 2024 Frédéric Bard
+ * Copyright (C) 2023, 2026 Frédéric Bard
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -79,6 +79,11 @@ public abstract class SubMenu extends Action implements IMenuCreator {
 
    public abstract void enableActions();
 
+   /**
+    * The old menu items will be disposed before new menu items are added
+    *
+    * @param menu
+    */
    public abstract void fillMenu(final Menu menu);
 
    @Override

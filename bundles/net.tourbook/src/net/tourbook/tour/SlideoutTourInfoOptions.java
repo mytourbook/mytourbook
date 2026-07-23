@@ -458,7 +458,7 @@ public class SlideoutTourInfoOptions extends ToolbarSlideout implements IColorSe
       int uiWidth_Pixel;
 
       // set size from state
-      switch (getSelectedUIWidthSizeIndex()) {
+      switch (selectedUIWidthSizeIndex) {
       case 1  -> uiWidth_Pixel = Util.getStateInt(_state, STATE_UI_WIDTH_MEDIUM, STATE_UI_WIDTH_MEDIUM_DEFAULT);
       case 2  -> uiWidth_Pixel = Util.getStateInt(_state, STATE_UI_WIDTH_LARGE, STATE_UI_WIDTH_LARGE_DEFAULT);
       default -> uiWidth_Pixel = Util.getStateInt(_state, STATE_UI_WIDTH_SMALL, STATE_UI_WIDTH_SMALL_DEFAULT);

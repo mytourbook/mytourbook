@@ -243,6 +243,7 @@ public class TaggingView extends ViewPart implements
 
    private Action_CollapseAll_WithoutSelection _actionCollapseAll_WithoutSelection;
    private ActionCollapseOthers                _actionCollapseOthers;
+   private ActionCreateEquipmentFromTag        _actionCreateEquipmentFromTag;
    private Action_DeleteTag                    _actionDeleteTag;
    private Action_DeleteTagCategory            _actionDeleteTagCategory;
    private ActionEditQuick                     _actionEditQuick;
@@ -701,6 +702,7 @@ public class TaggingView extends ViewPart implements
 
       _actionCollapseAll_WithoutSelection  = new Action_CollapseAll_WithoutSelection();
       _actionCollapseOthers                = new ActionCollapseOthers(this);
+      _actionCreateEquipmentFromTag        = new ActionCreateEquipmentFromTag(this);
       _actionDeleteTag                     = new Action_DeleteTag();
       _actionDeleteTagCategory             = new Action_DeleteTagCategory();
       _actionEditQuick                     = new ActionEditQuick(this);
@@ -2068,6 +2070,7 @@ public class TaggingView extends ViewPart implements
 
       // equipment actions
       _equipmentMenuManager.fillEquipmentMenu_WithActiveActions(menuMgr, this);
+      menuMgr.add(_actionCreateEquipmentFromTag);
 
       // export actions
       TourActionManager.fillContextMenu(menuMgr, TourActionCategory.EXPORT, _allTourActions_Export, this);

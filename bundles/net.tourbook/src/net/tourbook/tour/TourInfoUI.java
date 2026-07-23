@@ -504,6 +504,15 @@ public class TourInfoUI implements ICanHideTooltip {
 
    private Composite createUI(final Composite parent) {
 
+      if (_shellContainer != null && _shellContainer.isDisposed() == false) {
+
+         /*
+          * Sometimes the tooltip is not closed when the close button in presses -> force the close
+          */
+
+         _shellContainer.getShell().close();
+      }
+
       /*
        * The shell container is necessary because the margins of the inner container will hide the
        * tooltip when the mouse is hovered, which is not as it should be.

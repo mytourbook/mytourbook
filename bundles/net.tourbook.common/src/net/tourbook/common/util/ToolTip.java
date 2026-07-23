@@ -792,6 +792,13 @@ public abstract class ToolTip {
          currentArea = null;
          passOnEvent(tooltipShell, event);
 
+         /*
+          * Sometimes the tooltip is not closed when the close button in presses -> force the close
+          */
+         if (event == null) {
+            tooltipShell.close();
+         }
+
          tooltipShell.dispose();
          _tooltipShell = null;
 

@@ -86,9 +86,11 @@ public class EquipmentPart implements Cloneable, Comparable<Object>, Serializabl
    private String                     model;
 
    /**
-    *
     * The collation type, e.g. shoe xyz is used to combine it other parts with the same type but
     * different {@link #dateUsed}
+    * <p>
+    * In MT 26.6 the wording of this field in the UI was renamed into "Collate ID" but not in the
+    * backend
     */
    private String                     type;
 
@@ -138,19 +140,24 @@ public class EquipmentPart implements Cloneable, Comparable<Object>, Serializabl
    private boolean                    isRetired;
 
    /**
-    * When the part was firstly used, in milliseconds since 1970-01-01T00:00:00Z
-    */
-   private long                       dateUsed;
-
-   /**
     * When the part was created/build, in milliseconds since 1970-01-01T00:00:00Z
     */
    private long                       dateBuilt;
 
    /**
+    * When the part was purchased, in milliseconds since 1970-01-01T00:00:00Z
+    */
+   private long                       datePurchased;
+
+   /**
     * When the part was retired/sold, in milliseconds since 1970-01-01T00:00:00Z
     */
    private long                       dateRetired;
+   
+   /**
+    * When the part was firstly used, in milliseconds since 1970-01-01T00:00:00Z
+    */
+   private long                       dateUsed;
 
    /**
     * When the part was firstly used, in milliseconds since 1970-01-01T00:00:00Z
@@ -188,6 +195,16 @@ public class EquipmentPart implements Cloneable, Comparable<Object>, Serializabl
    private String                     priceUnit;
 
    /**
+    * Initial value
+    */
+   private float                      initialValue;
+
+   /**
+    * Initial value unit
+    */
+   private String                     initialValueUnit;
+
+   /**
     * Initial distance, in meter
     */
    private float                      distanceFirstUse;
@@ -210,13 +227,16 @@ public class EquipmentPart implements Cloneable, Comparable<Object>, Serializabl
    private long                       _createId                       = 0;
 
    @Transient
-   private LocalDateTime              _dateUsed;
-
-   @Transient
    private LocalDateTime              _dateBuilt;
 
    @Transient
+   private LocalDateTime              _datePurchased;
+
+   @Transient
    private LocalDateTime              _dateRetired;
+
+   @Transient
+   private LocalDateTime              _dateUsed;
 
    @Transient
    private LocalDateTime              _dateCollateFrom;
@@ -392,6 +412,20 @@ public class EquipmentPart implements Cloneable, Comparable<Object>, Serializabl
       return _dateCollateUntil;
    }
 
+   public long getDatePurchased() {
+      
+      return datePurchased;
+   }
+
+   public LocalDateTime getDatePurchased_Local() {
+
+      if (_datePurchased == null) {
+         _datePurchased = TimeTools.toLocalDateTime(datePurchased);
+      }
+
+      return _datePurchased;
+   }
+
    public long getDateRetired() {
 
       return dateRetired;
@@ -458,6 +492,19 @@ public class EquipmentPart implements Cloneable, Comparable<Object>, Serializabl
 
    public String getImageFilePath() {
       return imageFilePath;
+   }
+
+   public float getInitialValue() {
+      return initialValue;
+   }
+
+   public String getInitialValueUnit() {
+
+      if (initialValueUnit == null) {
+         return UI.EMPTY_STRING;
+      }
+
+      return initialValueUnit;
    }
 
    /**
@@ -536,22 +583,22 @@ public class EquipmentPart implements Cloneable, Comparable<Object>, Serializabl
    }
 
    /**
-    * @return Returns the primary key for a {@link EquipmentPart} entity
-    */
-   public long getPartId() {
-      return partId;
-   }
-
-   /**
     * @return Returns the part type {@link #type} or an empty string when <code>null</code>
     */
-   public String getPartType() {
+   public String getPartCollateID() {
 
       if (type == null) {
          return UI.EMPTY_STRING;
       }
 
       return type;
+   }
+
+   /**
+    * @return Returns the primary key for a {@link EquipmentPart} entity
+    */
+   public long getPartId() {
+      return partId;
    }
 
    public float getPrice() {
@@ -612,7 +659,7 @@ public class EquipmentPart implements Cloneable, Comparable<Object>, Serializabl
       if (isCollate != otherPart.isCollate()
             || collateBetween != otherPart.getCollateBetween()
             || dateUsed != otherPart.getDateUsed()
-            || type.equalsIgnoreCase(otherPart.getPartType()) == false) {
+            || type.equalsIgnoreCase(otherPart.getPartCollateID()) == false) {
 
          // collated fields are modified
 
@@ -726,6 +773,13 @@ public class EquipmentPart implements Cloneable, Comparable<Object>, Serializabl
       _dateCollateUntil = null;
    }
 
+   public void setDatePurchased(final long datePurchased) {
+
+      this.datePurchased = datePurchased;
+
+      _datePurchased = null;
+   }
+
    public void setDateRetired(final long dateRetired) {
 
       this.dateRetired = dateRetired;
@@ -761,6 +815,14 @@ public class EquipmentPart implements Cloneable, Comparable<Object>, Serializabl
       this.imageFilePath = imageFilePath;
    }
 
+   public void setInitialValue(final float initialValue) {
+      this.initialValue = initialValue;
+   }
+
+   public void setInitialValueUnit(final String initialValueUnit) {
+      this.initialValueUnit = initialValueUnit;
+   }
+
    public void setIsCollate(final boolean isCollate) {
       this.isCollate = isCollate;
    }
@@ -780,7 +842,7 @@ public class EquipmentPart implements Cloneable, Comparable<Object>, Serializabl
       this.name = name;
    }
 
-   public void setPartType(final String type) {
+   public void setPartCollateID(final String type) {
       this.type = type;
    }
 
@@ -867,18 +929,21 @@ public class EquipmentPart implements Cloneable, Comparable<Object>, Serializabl
       setIsCollate         (otherPart.isCollate());
       setIsRetired         (otherPart.isRetired());
       setCollateBetween    (otherPart.getCollateBetween());
-      setPartType          (otherPart.getPartType());
+      setPartCollateID     (otherPart.getPartCollateID());
 
       setDistanceFirstUse  (otherPart.getDistanceFirstUse());
+      setInitialValue      (otherPart.getInitialValue());
+      setInitialValueUnit  (otherPart.getInitialValueUnit());
       setPrice             (otherPart.getPrice());
       setPriceUnit         (otherPart.getPriceUnit());
       setSize              (otherPart.getSize());
       setWeight            (otherPart.getWeight());
       setWeightUnit        (otherPart.getWeightUnit());
 
-      setDateUsed          (otherPart.getDateUsed());
       setDateBuilt         (otherPart.getDateBuilt());
+      setDatePurchased     (otherPart.getDatePurchased());
       setDateRetired       (otherPart.getDateRetired());
+      setDateUsed          (otherPart.getDateUsed());
 
 // SET_FORMATTING_ON
    }

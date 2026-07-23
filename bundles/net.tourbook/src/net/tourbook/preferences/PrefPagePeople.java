@@ -22,7 +22,6 @@ import java.time.Period;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -35,15 +34,11 @@ import net.tourbook.common.time.TimeTools;
 import net.tourbook.common.util.StringUtils;
 import net.tourbook.common.util.Util;
 import net.tourbook.data.HrZoneContext;
-import net.tourbook.data.TourData;
 import net.tourbook.data.TourPerson;
 import net.tourbook.data.TourPersonHRZone;
-import net.tourbook.database.IComputeTourValues;
 import net.tourbook.database.PersonManager;
-import net.tourbook.database.TourDatabase;
 import net.tourbook.importdata.DeviceManager;
 import net.tourbook.importdata.ExternalDevice;
-import net.tourbook.tour.TourEventId;
 import net.tourbook.tour.TourManager;
 import net.tourbook.training.DialogHRZones;
 import net.tourbook.training.TrainingManager;
@@ -141,31 +136,28 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
       _nf2.setMaximumFractionDigits(2);
    }
 
-   private SelectionListener         _defaultSelectionListener;
-   private MouseWheelListener        _defaultMouseWheelListener;
-   private ModifyListener            _defaultModifyListener;
-   private MouseListener             _hrZoneMouseListener;
-   private IPropertyChangeListener   _prefChangeListener;
+   private SelectionListener       _defaultSelectionListener;
+   private MouseWheelListener      _defaultMouseWheelListener;
+   private ModifyListener          _defaultModifyListener;
+   private MouseListener           _hrZoneMouseListener;
+   private IPropertyChangeListener _prefChangeListener;
 
-   private boolean                   _isFireModifyEvent         = false;
-   private boolean                   _isPersonModified          = false;
-   private boolean                   _isUpdateUI                = false;
+   private boolean                 _isFireModifyEvent = false;
+   private boolean                 _isPersonModified  = false;
+   private boolean                 _isUpdateUI        = false;
 
-   private HashMap<Long, TourPerson> _peopleWithModifiedHrZones = new HashMap<>();
-   private boolean                   _isHrZoneModified          = false;
+   private TourPerson              _selectedPerson;
+   private TourPerson              _newPerson;
+   private Set<TourPersonHRZone>   _backupSelectedPersonHrZones;
 
-   private TourPerson                _selectedPerson;
-   private TourPerson                _newPerson;
-   private Set<TourPersonHRZone>     _backupSelectedPersonHrZones;
+   private ZonedDateTime           _today             = TimeTools.now();
 
-   private ZonedDateTime             _today                     = TimeTools.now();
-
-   private Font                      _fontItalic;
+   private Font                    _fontItalic;
 
    /**
     * Is <code>true</code> when a tour in the tour editor is modified.
     */
-   private boolean                   _isNoUI                    = false;
+   private boolean                 _isNoUI            = false;
 
    /*
     * UI controls
@@ -184,7 +176,7 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
    private Combo                _cboSportComputer;
    private Spinner              _spinnerWeight;
    private Spinner              _spinnerHeight_MeterOrFeet;
-   private Spinner              _spinnerHeight_Inches;        // If needed for imperial units
+   private Spinner              _spinnerHeight_Inches;     // If needed for imperial units
    private Spinner              _spinnerRestingHR;
    private Spinner              _spinnerMaxHR;
    private Button               _rdoGenderMale;
@@ -193,7 +185,6 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 
    private ScrolledComposite    _hrZoneScrolledContainer;
    private Button               _btnModifyHrZones;
-   private Button               _btnComputeHrZonesForAllTours;
    private Combo                _cboTemplate;
    private Combo                _cboHrMaxFormula;
    private DateTime             _dtBirthday;
@@ -326,101 +317,6 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
       }
 
       return hrZonesClone;
-   }
-
-   /**
-    * @param isCheckPeople
-    *
-    * @return Returns <code>true</code> when all tours has been updated and the update process was
-    *         not canceled.
-    */
-   private boolean computeHrZonesForAllTours(final boolean isCheckPeople) {
-
-      setErrorMessage(null);
-
-      final int[] tourCounter = { 0 };
-      final int[] tourCounterWithHrZones = { 0 };
-
-      final IComputeTourValues computeTourValueConfig = new IComputeTourValues() {
-
-         @Override
-         public boolean computeTourValues(final TourData originalTourData) {
-
-            tourCounter[0]++;
-
-            if (isCheckPeople) {
-
-               // check if hr zone was modified for the person which owns the tour
-               final long personId = originalTourData.getTourPerson().getPersonId();
-               if (_peopleWithModifiedHrZones.containsKey(personId) == false) {
-                  return false;
-               }
-            }
-
-            /*
-             * algorithm for avg pulse is changed in version 11.7 (break time is now ignored)
-             */
-            originalTourData.computeAvg_Pulse();
-
-            final int[] allHrZones = originalTourData.getHrZones();
-            if (allHrZones == null) {
-               return false;
-            }
-
-            // check if hr zones are computed
-            for (final int hrZone : allHrZones) {
-               if (hrZone != -1) {
-                  // hr zone is set
-                  tourCounterWithHrZones[0]++;
-                  return true;
-               }
-            }
-
-            return false;
-         }
-
-         @Override
-         public String getResultText() {
-
-            return NLS.bind(Messages.Compute_HrZones_Job_ComputeAllTours_Result, //
-                  new Object[] { tourCounterWithHrZones[0] });
-         }
-
-         @Override
-         public String getSubTaskText(final TourData savedTourData) {
-            return NLS.bind(Messages.Compute_HrZones_Job_ComputeAllTours_SubTask, //
-                  new Object[] { tourCounterWithHrZones[0], tourCounter[0] });
-         }
-      };
-
-      final boolean isCanceled = TourDatabase.computeAnyValues_ForAllTours(computeTourValueConfig, null);
-
-      boolean returnValue = true;
-
-      if (isCheckPeople && isCanceled) {
-
-         setErrorMessage(Messages.Pref_People_Error_ComputeHrZonesForAllTours);
-
-         MessageDialog.openInformation(
-               getShell(),
-               Messages.Compute_HrZones_Dialog_ComputeAllTours_Title,
-               Messages.Pref_People_Dialog_ComputeHrZonesForAllToursIsCanceled_Message);
-
-         returnValue = false;
-      }
-
-      TourManager.getInstance().removeAllToursFromCache();
-      TourManager.fireEvent(TourEventId.CLEAR_DISPLAYED_TOUR);
-
-      // fire unique event for all changes
-      TourManager.fireEvent(TourEventId.ALL_TOURS_ARE_MODIFIED);
-
-      _isFireModifyEvent = true;
-      fireModifyEvent();
-
-      _peopleWithModifiedHrZones.clear();
-
-      return returnValue;
    }
 
    @Override
@@ -1101,30 +997,11 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
             .indent(0, 20)
             .grab(true, false)
             .applyTo(container);
-      GridLayoutFactory.fillDefaults().numColumns(3).applyTo(container);
+      GridLayoutFactory.fillDefaults().numColumns(2).applyTo(container);
 //		container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_BLUE));
       {
          /*
-          * Button: compute HR zones
-          */
-         _btnComputeHrZonesForAllTours = new Button(container, SWT.NONE);
-         _btnComputeHrZonesForAllTours.setText(Messages.Pref_People_Button_HrZones_ComputeAllTours);
-         _btnComputeHrZonesForAllTours.setToolTipText(Messages.Pref_People_Button_HrZones_ComputeAllTours_Tooltip);
-         _btnComputeHrZonesForAllTours.addSelectionListener(widgetSelectedAdapter(selectionEvent -> {
-
-            if (MessageDialog.openConfirm(
-                  Display.getCurrent().getActiveShell(),
-                  Messages.Compute_HrZones_Dialog_ComputeAllTours_Title,
-                  Messages.Compute_HrZones_Dialog_ComputeAllTours_Title_Message)) {
-
-               computeHrZonesForAllTours(false);
-            }
-
-         }));
-         GridDataFactory.fillDefaults().applyTo(_btnComputeHrZonesForAllTours);
-
-         /*
-          * button: edit hr zones
+          * Button: Edit hr zones
           */
          _btnModifyHrZones = new Button(container, SWT.PUSH);
          _btnModifyHrZones.setText(Messages.Dialog_HRZone_Button_EditHrZones);
@@ -1135,7 +1012,7 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
                .applyTo(_btnModifyHrZones);
 
          /*
-          * combo: formula to compute hr max
+          * Combo: Formula to compute hr max
           */
          _cboTemplate = new Combo(container, SWT.READ_ONLY | SWT.DROP_DOWN);
          _cboTemplate.setToolTipText(Messages.Pref_People_Label_HrZoneTemplate_Tooltip);
@@ -1647,8 +1524,6 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
       _spinnerMaxHR.setEnabled(getSelectedHrMaxFormulaKey() == TrainingManager.HR_MAX_NOT_COMPUTED);
 
       _btnModifyHrZones.setEnabled(isHrZoneAvailable);
-//		_btnComputeHrZonesForAllTours.setEnabled(_isPersonModified && isValid);
-      _btnComputeHrZonesForAllTours.setEnabled(_isPersonModified == false);
 
       _txtBodyMassIndex.setText(String.valueOf(
             UI.computeBodyMassIndex(_spinnerWeight.getSelection() / 10.0,
@@ -1792,13 +1667,6 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
       saveState();
       savePerson(true, true);
 
-      // enable action because the user can go back to this pref page
-      enableActions();
-
-      if (updateToursWithModifiedHrZones() == false) {
-         return false;
-      }
-
       return super.okToLeave();
    }
 
@@ -1890,8 +1758,6 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 
    private void onEditHrZonesIsOK(final TourPerson person) {
 
-      _isHrZoneModified = true;
-
       final int hrMaxFormulaKey = person.getHrMaxFormula();
       final int maxPulse = person.getMaxPulse();
 
@@ -1965,10 +1831,6 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
       saveState();
       fireModifyEvent();
 
-      if (updateToursWithModifiedHrZones() == false) {
-         return false;
-      }
-
       return super.performCancel();
    }
 
@@ -2003,10 +1865,6 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 
       saveState();
       fireModifyEvent();
-
-      if (updateToursWithModifiedHrZones() == false) {
-         return false;
-      }
 
       return true;
    }
@@ -2107,13 +1965,6 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
             _peopleViewer.refresh();
          }
 
-         if (_isHrZoneModified) {
-            // keep person which hr zone was modified
-            _peopleWithModifiedHrZones.put(person.getPersonId(), person);
-         }
-
-         _isHrZoneModified = false;
-
          // select updated/new person
          _peopleViewer.setSelection(new StructuredSelection(person), true);
       }
@@ -2174,47 +2025,6 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
       final int hrMaxSelectionIndex = _cboHrMaxFormula.getSelectionIndex();
       person.setHrMaxFormula(TrainingManager.HRMaxFormulaKeys[hrMaxSelectionIndex]);
       person.setMaxPulse(_spinnerMaxHR.getSelection());
-   }
-
-   /**
-    * @return Return <code>true</code> when HR zones are not modified or when HR zones has been
-    *         updated. Returns <code>false</code> when tour data update has been canceled.
-    */
-   private boolean updateToursWithModifiedHrZones() {
-
-      setErrorMessage(null);
-
-      if (_peopleWithModifiedHrZones.isEmpty()) {
-         return true;
-      }
-
-      final int messageDialogResult = new MessageDialog(
-
-            getShell(),
-
-            Messages.Compute_HrZones_Dialog_ComputeAllTours_Title,
-            null,
-
-            Messages.Pref_People_Dialog_ComputeHrZonesForAllTours_Message,
-            MessageDialog.QUESTION,
-
-            // default index
-            0,
-
-            Messages.Pref_People_Dialog_ComputeHrZonesForAllToursIsCanceled_Message_OK,
-            Messages.Pref_People_Dialog_ComputeHrZonesForAllToursIsCanceled_Message_Cancel
-
-      ).open();
-
-      if (messageDialogResult == 0) {
-
-         return computeHrZonesForAllTours(true);
-
-      } else {
-
-         // user has canceled and the user is informed that hr zones can be inconsistent
-         return true;
-      }
    }
 
    /**
@@ -2346,7 +2156,6 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
       updateUIHrMax(selectedHrMaxFormulaKey, maxPulse);
 
       getCurrentPerson().resetHrZones();
-      _isHrZoneModified = true;
 
       // update modified bpm in hr zones
       createUI_80_HrZone_InnerContainer(selectedHrMaxFormulaKey, maxPulse, getBirthdayFromUI());

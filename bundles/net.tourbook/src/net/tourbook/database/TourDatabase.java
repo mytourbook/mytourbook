@@ -126,9 +126,9 @@ public class TourDatabase {
     * <li>/net.tourbook.export/format-templates/mt-1.0.vm</li>
     * <li>net.tourbook.device.mt.MT_StAXHandler</li>
     */
-   private static final int TOURBOOK_DB_VERSION = 62;
+   private static final int TOURBOOK_DB_VERSION = 63;
 
-//   private static final int TOURBOOK_DB_VERSION = 62; // 26.6+
+//   private static final int TOURBOOK_DB_VERSION = 62; // 26.6.next
 
 //   private static final int TOURBOOK_DB_VERSION = 61; // 26.6
 //   private static final int TOURBOOK_DB_VERSION = 60; // 26.3
@@ -4743,9 +4743,17 @@ public class TourDatabase {
 
                   + "   IsRetired               BOOLEAN DEFAULT FALSE,                    " + NL //$NON-NLS-1$
                   + "   PurchaseLocation        VARCHAR(" + DB_LENGTH_NAME + "),          " + NL //$NON-NLS-1$ //$NON-NLS-2$
-                  + "   WeightUnit              SMALLINT DEFAULT 0                        " + NL //$NON-NLS-1$
+                  + "   WeightUnit              SMALLINT DEFAULT 0,                       " + NL //$NON-NLS-1$
 
                   // version 61 end
+
+                  // version 62 start
+
+                  + "   DatePurchased           BIGINT DEFAULT 0,                         " + NL //$NON-NLS-1$
+                  + "   InitialValue            FLOAT DEFAULT 0,                          " + NL //$NON-NLS-1$
+                  + "   InitialValueUnit        VARCHAR(" + DB_LENGTH_NAME + ")          	" + NL //$NON-NLS-1$ //$NON-NLS-2$
+
+                  // version 62 end
 
                   + ")" //                                                                       //$NON-NLS-1$
       );
@@ -4839,9 +4847,17 @@ public class TourDatabase {
 
                   + "   IsRetired               BOOLEAN DEFAULT FALSE,                    " + NL //$NON-NLS-1$
                   + "   PurchaseLocation        VARCHAR(" + DB_LENGTH_NAME + "),          " + NL //$NON-NLS-1$ //$NON-NLS-2$
-                  + "   WeightUnit              SMALLINT DEFAULT 0                        " + NL //$NON-NLS-1$
+                  + "   WeightUnit              SMALLINT DEFAULT 0,                       " + NL //$NON-NLS-1$
 
                   // version 61 end
+
+                  // version 62 start
+
+                  + "   DatePurchased           BIGINT DEFAULT 0,                         " + NL //$NON-NLS-1$
+                  + "   InitialValue            FLOAT DEFAULT 0,                          " + NL //$NON-NLS-1$
+                  + "   InitialValueUnit        VARCHAR(" + DB_LENGTH_NAME + ")           " + NL //$NON-NLS-1$ //$NON-NLS-2$
+
+                  // version 62 end
 
                   + ")" //                                                                       //$NON-NLS-1$
       );
@@ -7432,6 +7448,11 @@ public class TourDatabase {
             currentDbVersion = _dbDesignVersion_New = updateDb_061_To_062(conn, splashManager);
          }
 
+         // 62 -> 63    26.6+++
+         if (currentDbVersion == 62) {
+            currentDbVersion = _dbDesignVersion_New = updateDb_062_To_063(conn, splashManager);
+         }
+
          // update db design version number
          updateVersionNumber_10_AfterDesignUpdate(conn, _dbDesignVersion_New);
 
@@ -7502,7 +7523,7 @@ public class TourDatabase {
 
          updateDb_060_To_061_DataUpdate(conn, splashManager); //                                   61 - 26.6
 
-         updateDb__3_Data_Concurrent(conn, splashManager, new TourDataUpdate_061_to_062()); //     62 - 26.6++
+         updateDb__3_Data_Concurrent(conn, splashManager, new TourDataUpdate_062_to_063()); //     62 - 26.6++
 
       } catch (final SQLException e) {
 
@@ -11872,7 +11893,7 @@ public class TourDatabase {
 
                   if (equipment.isCollate()) {
 
-                     allEquipmentTypes.add(equipment.getType());
+                     allEquipmentTypes.add(equipment.getCollateID());
 
                   } else {
 
@@ -11881,13 +11902,13 @@ public class TourDatabase {
                      // get all collated part types
                      for (final EquipmentPart part : equipment.getParts()) {
                         if (part.isCollate()) {
-                           allPartTypes.add(part.getPartType());
+                           allPartTypes.add(part.getPartCollateID());
                         }
                      }
 
                      for (final String partType : allPartTypes) {
 
-                        EquipmentManager.updateUntilDate_Parts_OneType(equipment, partType, (short) -1);
+                        EquipmentManager.updateUntilDate_Parts_OneCollateID(equipment, partType, (short) -1);
                      }
                   }
                }
@@ -11907,6 +11928,40 @@ public class TourDatabase {
    }
 
    private int updateDb_061_To_062(final Connection conn, final SplashManager splashManager) throws SQLException {
+
+      final int newDbVersion = 62;
+
+      logDbUpdate_Start(newDbVersion);
+      updateMonitor(splashManager, newDbVersion);
+
+      // double check if column already exists
+      if (isColumnAvailable(conn, TABLE_EQUIPMENT, "initialValue") == false) { //$NON-NLS-1$
+
+         final Statement stmt = conn.createStatement();
+         {
+            // alter columns
+
+// SET_FORMATTING_OFF
+
+            SQL.addColumn_BigInt    (stmt, TABLE_EQUIPMENT,       "DatePurchased",     DEFAULT_0);       //$NON-NLS-1$
+            SQL.addColumn_Float     (stmt, TABLE_EQUIPMENT,       "initialValue",      DEFAULT_0);       //$NON-NLS-1$
+            SQL.addColumn_VarCar    (stmt, TABLE_EQUIPMENT,       "initialValueUnit",  DB_LENGTH_NAME);  //$NON-NLS-1$
+
+            SQL.addColumn_BigInt    (stmt, TABLE_EQUIPMENT_PART,  "DatePurchased",     DEFAULT_0);       //$NON-NLS-1$
+            SQL.addColumn_Float     (stmt, TABLE_EQUIPMENT_PART,  "initialValue",      DEFAULT_0);       //$NON-NLS-1$
+            SQL.addColumn_VarCar    (stmt, TABLE_EQUIPMENT_PART,  "initialValueUnit",  DB_LENGTH_NAME);  //$NON-NLS-1$
+
+// SET_FORMATTING_ON
+         }
+         stmt.close();
+      }
+
+      logDbUpdate_End(newDbVersion);
+
+      return newDbVersion;
+   }
+
+   private int updateDb_062_To_063(final Connection conn, final SplashManager splashManager) throws SQLException {
 
       final int newDbVersion = 62;
 

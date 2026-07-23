@@ -69,6 +69,7 @@ public class Messages extends NLS {
    public static String        Action_Tag_AutoOpenOK;
    public static String        Action_Tag_CopyTags;
    public static String        Action_Tag_CopyTags_Tooltip;
+   public static String        Action_Tag_CreateEquipmentFromTag;
    public static String        Action_Tag_Delete;
    public static String        Action_Tag_DeleteCategory;
    public static String        Action_Tag_Edit;
@@ -343,6 +344,11 @@ public class Messages extends NLS {
    public static String        Calendar_Profile_Value_Title;
    public static String        Calendar_Profile_Value_TrainingStress_Tss;
    public static String        Calendar_Profile_Value_WeatherIcon;
+   public static String        Calendar_Profile_WeekDay_2Letter;
+   public static String        Calendar_Profile_WeekDay_Full;
+   public static String        Calendar_Profile_WeekDay_Narrow;
+   public static String        Calendar_Profile_WeekDay_Short;
+
    public static String        Calendar_View_Action_Back;
    public static String        Calendar_View_Action_Back_Tooltip;
    public static String        Calendar_View_Action_Forward;
@@ -426,10 +432,6 @@ public class Messages extends NLS {
    public static String        Compute_CadenceZonesTimes_Label_CadenceZonesDelimiter;
    public static String        Compute_CadenceZonesTimes_Label_Description_CadenceZonesDelimiter;
 
-   public static String        Compute_HrZones_Dialog_ComputeAllTours_Title;
-   public static String        Compute_HrZones_Dialog_ComputeAllTours_Title_Message;
-   public static String        Compute_HrZones_Job_ComputeAllTours_Result;
-   public static String        Compute_HrZones_Job_ComputeAllTours_SubTask;
    public static String        Compute_HrZone_Group;
    public static String        Compute_HrZone_Link;
 
@@ -603,22 +605,26 @@ public class Messages extends NLS {
    public static String        Dialog_Equipment_Label_Brand;
    public static String        Dialog_Equipment_Label_Brand_Tooltip;
    public static String        Dialog_Equipment_Label_Collate;
+   public static String        Dialog_Equipment_Label_CollateID;
    public static String        Dialog_Equipment_Label_Date;
+   public static String        Dialog_Equipment_Label_Date_Tooltip;
    public static String        Dialog_Equipment_Label_DateBuilt;
    public static String        Dialog_Equipment_Label_DateRetired;
    public static String        Dialog_Equipment_Label_Description;
    public static String        Dialog_Equipment_Label_Image;
    public static String        Dialog_Equipment_Label_InitialDistance;
    public static String        Dialog_Equipment_Label_InitialDistance_Tooltip;
+   public static String        Dialog_Equipment_Label_InitialValue;
+   public static String        Dialog_Equipment_Label_InitialValue_Unit_Tooltip;
    public static String        Dialog_Equipment_Label_Model;
    public static String        Dialog_Equipment_Label_Price;
-   public static String        Dialog_Equipment_Label_PurchaseLocation;
+   public static String        Dialog_Equipment_Label_Purchased;
+   public static String        Dialog_Equipment_Label_Purchased_Tooltip;
    public static String        Dialog_Equipment_Label_Size;
-   public static String        Dialog_Equipment_Label_Type;
    public static String        Dialog_Equipment_Label_Weight;
    public static String        Dialog_Equipment_Link_Website;
-   public static String        Dialog_Equipment_Tooltip_1;
-   public static String        Dialog_Equipment_Tooltip_2;
+   public static String        Dialog_Equipment_Tooltip_1b;
+   public static String        Dialog_Equipment_Tooltip_2b;
 
    public static String        Dialog_EquipmentPart_Collate_Tooltip;
    public static String        Dialog_EquipmentPart_Dialog_Message_Part_Duplicate;
@@ -1209,6 +1215,7 @@ public class Messages extends NLS {
    public static String        Equipment_Action_SetTourStructure_All_Dialog_Message;
    public static String        Equipment_Action_SetTourStructure_All;
    public static String        Equipment_Action_SetTourStructure_All_Dialog_Title;
+   public static String        Equipment_Action_SuffixID;
    public static String        Equipment_Action_Title_AddEquipment;
    public static String        Equipment_Action_Title_EquipmentIsAddedWithOK;
    public static String        Equipment_Action_Title_RecentlyAddedEquipment;
@@ -1231,6 +1238,7 @@ public class Messages extends NLS {
    public static String        Equipment_ExpandType_ByYear;
    public static String        Equipment_ExpandType_ByYearMonth;
    public static String        Equipment_ExpandType_SortByDate;
+   public static String        Equipment_Info_FromTag;
    public static String        Equipment_Log_EquipmentIsDeleted;
    public static String        Equipment_Log_PartIsDeleted;
    public static String        Equipment_StatusLine_EquipmentCopiedToClipboard;
@@ -1824,6 +1832,7 @@ public class Messages extends NLS {
    public static String        Pref_Appearance_Check_ShowInAppToolbar_ScrambleData;
    public static String        Pref_Appearance_Check_ShowThemeSelectorInAppToolbar;
    public static String        Pref_Appearance_Check_TaggingAnimation;
+   public static String        Pref_Appearance_Combo_ImageSize_Tooltip;
    public static String        Pref_Appearance_Combo_Theme_Tooltip;
    public static String        Pref_Appearance_Dialog_ResetAllToggleDialogs_Message;
    public static String        Pref_Appearance_Dialog_ResetAllToggleDialogs_Title;
@@ -1895,6 +1904,9 @@ public class Messages extends NLS {
    public static String        Pref_Equipment_Action_FilterEquipment_ShowOnlyChecked_Tooltip;
    public static String        Pref_Equipment_Button_RemoveRecentEquipment;
    public static String        Pref_Equipment_Button_RemoveRecentEquipment_Tooltip;
+   public static String        Pref_Equipment_Checkbox_DisplayCollateID;
+   public static String        Pref_Equipment_Checkbox_DisplayCollateID_Tooltip;
+   public static String        Pref_Equipment_Checkbox_DisplayImage;
    public static String        Pref_Equipment_Dialog_DeleteEquipment_Message;
    public static String        Pref_Equipment_Dialog_DeleteEquipment_Title;
    public static String        Pref_Equipment_Dialog_NewEquipment_Message;
@@ -1902,6 +1914,7 @@ public class Messages extends NLS {
    public static String        Pref_Equipment_Dialog_RenameEquipment_Message;
    public static String        Pref_Equipment_Dialog_RenameEquipment_Title;
    public static String        Pref_Equipment_Error_NameIsEmpty;
+   public static String        Pref_Equipment_Group_ContextMenu;
    public static String        Pref_Equipment_Label_AllEquipment;
    public static String        Pref_Equipment_Label_EquipmentGroups;
    public static String        Pref_Equipment_Label_NumberOfRecentEquipment;
@@ -2080,20 +2093,13 @@ public class Messages extends NLS {
    public static String        Pref_Nutrition_Button_RemoveRecentProducts_Tooltip;
 
    public static String        Pref_People_Action_add_person;
-   public static String        Pref_People_Button_HrZones_ComputeAllTours;
-   public static String        Pref_People_Button_HrZones_ComputeAllTours_Tooltip;
    public static String        Pref_People_Column_Birthday;
    public static String        Pref_People_Column_device;
    public static String        Pref_People_Column_first_name;
    public static String        Pref_People_Column_height;
    public static String        Pref_People_Column_last_name;
-   public static String        Pref_People_Dialog_ComputeHrZonesForAllToursIsCanceled_Message;
-   public static String        Pref_People_Dialog_ComputeHrZonesForAllToursIsCanceled_Message_Cancel;
-   public static String        Pref_People_Dialog_ComputeHrZonesForAllToursIsCanceled_Message_OK;
-   public static String        Pref_People_Dialog_ComputeHrZonesForAllTours_Message;
    public static String        Pref_People_Dialog_SaveModifiedPerson_Message;
    public static String        Pref_People_Dialog_SaveModifiedPerson_Title;
-   public static String        Pref_People_Error_ComputeHrZonesForAllTours;
    public static String        Pref_People_Error_first_name_is_required;
    public static String        Pref_People_Error_path_is_invalid;
    public static String        Pref_People_Label_Age;
@@ -2375,6 +2381,8 @@ public class Messages extends NLS {
    public static String        Slideout_CalendarOptions_Checkbox_IsShowTour_ValueUnit;
    public static String        Slideout_CalendarOptions_Checkbox_IsShowWeek_SummaryColumn;
    public static String        Slideout_CalendarOptions_Checkbox_IsShowWeek_ValueUnit;
+
+   public static String        Slideout_CalendarOptions_Checkbox_IsShowWeekHeader;
    public static String        Slideout_CalendarOptions_Checkbox_IsShowYearColumn;
    public static String        Slideout_CalendarOptions_Checkbox_IsShowYearColumn_Tooltip;
    public static String        Slideout_CalendarOptions_Checkbox_IsToggleMonthColor;
@@ -2397,6 +2405,7 @@ public class Messages extends NLS {
    public static String        Slideout_CalendarOptions_Group_DayDate;
    public static String        Slideout_CalendarOptions_Group_Layout;
    public static String        Slideout_CalendarOptions_Group_TourColor;
+   public static String        Slideout_CalendarOptions_Group_WeekHeader;
    public static String        Slideout_CalendarOptions_Group_YearColumns;
    public static String        Slideout_CalendarOptions_Label_AppPrefix;
    public static String        Slideout_CalendarOptions_Label_Calendar_BackgroundColor;
@@ -2438,6 +2447,9 @@ public class Messages extends NLS {
    public static String        Slideout_CalendarOptions_Label_UserPrefix;
    public static String        Slideout_CalendarOptions_Label_Week_ColumnWidth;
    public static String        Slideout_CalendarOptions_Label_Week_ValueFont;
+   public static String        Slideout_CalendarOptions_Label_Weekday_Align;
+   public static String        Slideout_CalendarOptions_Label_Weekday_Shortcut;
+   public static String        Slideout_CalendarOptions_Label_Weekday_Font;
    public static String        Slideout_CalendarOptions_Label_YearColumn_HeaderFont;
    public static String        Slideout_CalendarOptions_Label_YearColumn_Space;
    public static String        Slideout_CalendarOptions_Label_YearColumn_Space_Tooltip;
@@ -3356,6 +3368,11 @@ public class Messages extends NLS {
    public static String        Tour_Action_graph_speed_tooltip;
    public static String        Tour_Action_graph_temperature_tooltip;
    public static String        Tour_Action_graph_tour_compare_tooltip;
+   public static String        Tour_Action_HRZones;
+   public static String        Tour_Action_HRZones_InAllTours;
+   public static String        Tour_Action_HRZones_InAllTours_Tooltip;
+   public static String        Tour_Action_HRZones_InSelectedTours;
+   public static String        Tour_Action_HRZones_InSelectedTours_Tooltip;
    public static String        Tour_Action_InterpolatedValues_ReImport;
    public static String        Tour_Action_InterpolatedValues_ReImport_Tooltip;
    public static String        Tour_Action_InterpolatedValues_Remove;

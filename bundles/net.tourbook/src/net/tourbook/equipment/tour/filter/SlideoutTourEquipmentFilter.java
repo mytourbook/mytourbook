@@ -341,7 +341,7 @@ public class SlideoutTourEquipmentFilter extends AdvancedSlideout implements ITr
             final EquipmentPart part2 = item2.getPart();
 
             // 1st compare by type
-            int compareDiff = part1.getPartType().compareTo(part2.getPartType());
+            int compareDiff = part1.getPartCollateID().compareTo(part2.getPartCollateID());
 
             // 2nd compare by date
             if (compareDiff == 0) {
@@ -530,7 +530,7 @@ public class SlideoutTourEquipmentFilter extends AdvancedSlideout implements ITr
                   // collated equipment
 
                   // 1st compare by type
-                  int compareDiff = equipment1.getType().compareTo(equipment2.getType());
+                  int compareDiff = equipment1.getCollateID().compareTo(equipment2.getCollateID());
 
                   // 2nd compare by date
                   if (compareDiff == 0) {

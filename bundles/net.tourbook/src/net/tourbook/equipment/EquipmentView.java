@@ -625,7 +625,7 @@ public class EquipmentView extends ViewPart implements
             // 2st sort by collation type
             if (compareDiff == 0) {
 
-               compareDiff = part1.getPartType().compareTo(part2.getPartType());
+               compareDiff = part1.getPartCollateID().compareTo(part2.getPartCollateID());
             }
 
             // 3nd sort by date
@@ -1187,8 +1187,8 @@ public class EquipmentView extends ViewPart implements
 
       defineColumn_Equipment_Brand();
       defineColumn_Equipment_Model();
-      defineColumn_Equipment_Type();
-      defineColumn_Equipment_Collate();
+      defineColumn_Equipment_CollateID();
+      defineColumn_Equipment_IsCollate();
       defineColumn_Equipment_CollateBetween();
       defineColumn_Equipment_Retired();
 
@@ -1206,13 +1206,17 @@ public class EquipmentView extends ViewPart implements
       defineColumn_Equipment_Date_Collate_Until();
       defineColumn_Equipment_Date_UsageDuration();
       defineColumn_Equipment_Date_Built();
+      defineColumn_Equipment_Date_Purchased();
       defineColumn_Equipment_Date_Retired();
 
       defineColumn_Equipment_Price();
       defineColumn_Equipment_PriceUnit();
+      defineColumn_Equipment_PriceByDistance();
       defineColumn_Equipment_Size();
       defineColumn_Equipment_Weight();
       defineColumn_Equipment_InitialDistance();
+      defineColumn_Equipment_InitialValue();
+      defineColumn_Equipment_InitialValueUnit();
       defineColumn_Equipment_Website();
       defineColumn_Equipment_PurchaseLocation();
 
@@ -1238,7 +1242,7 @@ public class EquipmentView extends ViewPart implements
 
       // system columns
       defineColumn_Equipment_ID();
-      defineColumn_Equipment_TypeRaw();
+      defineColumn_Equipment_CollateIDSaved();
       defineColumn_Equipment_TourStructure();
    }
 
@@ -1560,42 +1564,6 @@ public class EquipmentView extends ViewPart implements
    }
 
    /**
-    * Column: Collate
-    */
-   private void defineColumn_Equipment_Collate() {
-
-      final ColumnDefinition colDef = TreeColumnFactory.EQUIPMENT_COLLATE.createColumn(_columnManager, _pc);
-
-      colDef.setIsDefaultColumn();
-
-      colDef.setLabelProvider(new CellLabelProvider() {
-
-         @Override
-         public void update(final ViewerCell cell) {
-
-            final Object element = cell.getElement();
-
-            boolean isCollate = false;
-
-            if (element instanceof final TVIEquipmentView_Equipment equipmentItem) {
-
-               isCollate = equipmentItem.getEquipment().isCollate();
-
-            } else if (element instanceof final TVIEquipmentView_Part partItem) {
-
-               isCollate = partItem.getPart().isCollate();
-            }
-
-            if (isCollate) {
-
-               cell.setText(UI.SYMBOL_BOX);
-               setCellColor(cell, element);
-            }
-         }
-      });
-   }
-
-   /**
     * Column: Collate between
     */
    private void defineColumn_Equipment_CollateBetween() {
@@ -1614,6 +1582,63 @@ public class EquipmentView extends ViewPart implements
             if (element instanceof final TVIEquipmentView_Part partItem) {
 
                cell.setText(partItem.getPart().getCollateBetweenText());
+               setCellColor(cell, element);
+            }
+         }
+      });
+   }
+
+   /**
+    * Column: Collate ID
+    */
+   private void defineColumn_Equipment_CollateID() {
+
+      final ColumnDefinition colDef = TreeColumnFactory.EQUIPMENT_COLLATE_ID.createColumn(_columnManager, _pc);
+
+      colDef.setIsDefaultColumn();
+
+      colDef.setLabelProvider(new CellLabelProvider() {
+
+         @Override
+         public void update(final ViewerCell cell) {
+
+            final Object element = cell.getElement();
+
+            if (element instanceof final TVIEquipmentView_Item viewItem) {
+
+               final String type = viewItem.collateID;
+
+               if (EquipmentManager.isEmptyEquipmentCollateID(type) == false) {
+
+                  cell.setText(type);
+                  setCellColor(cell, element);
+               }
+            }
+         }
+      });
+   }
+
+   /**
+    * Column: Collate ID saved
+    */
+   private void defineColumn_Equipment_CollateIDSaved() {
+
+      final ColumnDefinition colDef = TreeColumnFactory.EQUIPMENT_COLLATE_ID_SAVED.createColumn(_columnManager, _pc);
+
+      colDef.setIsDefaultColumn();
+
+      colDef.setLabelProvider(new CellLabelProvider() {
+
+         @Override
+         public void update(final ViewerCell cell) {
+
+            final Object element = cell.getElement();
+
+            if (element instanceof final TVIEquipmentView_Item viewItem) {
+
+               final String type = viewItem.collateID;
+
+               cell.setText(type);
                setCellColor(cell, element);
             }
          }
@@ -1758,6 +1783,55 @@ public class EquipmentView extends ViewPart implements
                }
 
                cell.setText(dateFormatted);
+               setCellColor(cell, element);
+            }
+         }
+      });
+   }
+
+   /**
+    * Column: Purchased date
+    */
+   private void defineColumn_Equipment_Date_Purchased() {
+
+      final ColumnDefinition colDef = TreeColumnFactory.EQUIPMENT_DATE_PURCHASED.createColumn(_columnManager, _pc);
+
+      colDef.setLabelProvider(new CellLabelProvider() {
+
+         @Override
+         public void update(final ViewerCell cell) {
+
+            final Object element = cell.getElement();
+            LocalDateTime date = null;
+
+            if (element instanceof final TVIEquipmentView_Equipment viewItem) {
+
+               final Equipment equipment = viewItem.getEquipment();
+
+               if (equipment.getDatePurchased() != 0) {
+
+                  // it can be 0 for parts which were created before MT 26.6.next
+
+                  date = equipment.getDatePurchased_Local();
+               }
+
+            } else if (element instanceof final TVIEquipmentView_Part viewItem) {
+
+               final EquipmentPart part = viewItem.getPart();
+
+               // a service has not a purchased date, so the value is 0 -> 01.01.1970
+               if (part.isItemType_Part()
+
+                     // it can be 0 for parts which were created before MT 26.6.next
+                     && part.getDatePurchased() != 0) {
+
+                  date = part.getDatePurchased_Local();
+               }
+            }
+
+            if (date != null) {
+
+               cell.setText(TimeTools.Formatter_Date_S.format(date));
                setCellColor(cell, element);
             }
          }
@@ -2041,6 +2115,110 @@ public class EquipmentView extends ViewPart implements
    }
 
    /**
+    * Column: Initial value
+    */
+   private void defineColumn_Equipment_InitialValue() {
+
+      final ColumnDefinition colDef = TreeColumnFactory.EQUIPMENT_INITIAL_VALUE.createColumn(_columnManager, _pc);
+
+      colDef.setLabelProvider(new CellLabelProvider() {
+
+         @Override
+         public void update(final ViewerCell cell) {
+
+            final Object element = cell.getElement();
+
+            float value = 0;
+
+            if (element instanceof final TVIEquipmentView_Equipment equipmentItem) {
+
+               value = equipmentItem.getEquipment().getInitialValue();
+
+            } else if (element instanceof final TVIEquipmentView_Part partItem) {
+
+               value = partItem.getPart().getInitialValue();
+            }
+
+            if (value != 0) {
+
+               cell.setText(_nf0.format(value));
+               setCellColor(cell, element);
+            }
+         }
+      });
+   }
+
+   /**
+    * Column: Initial value unit
+    */
+   private void defineColumn_Equipment_InitialValueUnit() {
+
+      final ColumnDefinition colDef = TreeColumnFactory.EQUIPMENT_INITIAL_VALUE_UNIT.createColumn(_columnManager, _pc);
+
+      colDef.setLabelProvider(new CellLabelProvider() {
+
+         @Override
+         public void update(final ViewerCell cell) {
+
+            final Object element = cell.getElement();
+
+            String value = null;
+
+            if (element instanceof final TVIEquipmentView_Equipment equipmentItem) {
+
+               value = equipmentItem.getEquipment().getInitialValueUnit();
+
+            } else if (element instanceof final TVIEquipmentView_Part partItem) {
+
+               value = partItem.getPart().getInitialValueUnit();
+            }
+
+            if (value != null) {
+
+               cell.setText(value);
+               setCellColor(cell, element);
+            }
+         }
+      });
+   }
+
+   /**
+    * Column: Is collate
+    */
+   private void defineColumn_Equipment_IsCollate() {
+
+      final ColumnDefinition colDef = TreeColumnFactory.EQUIPMENT_IS_COLLATE.createColumn(_columnManager, _pc);
+
+      colDef.setIsDefaultColumn();
+
+      colDef.setLabelProvider(new CellLabelProvider() {
+
+         @Override
+         public void update(final ViewerCell cell) {
+
+            final Object element = cell.getElement();
+
+            boolean isCollate = false;
+
+            if (element instanceof final TVIEquipmentView_Equipment equipmentItem) {
+
+               isCollate = equipmentItem.getEquipment().isCollate();
+
+            } else if (element instanceof final TVIEquipmentView_Part partItem) {
+
+               isCollate = partItem.getPart().isCollate();
+            }
+
+            if (isCollate) {
+
+               cell.setText(UI.SYMBOL_BOX);
+               setCellColor(cell, element);
+            }
+         }
+      });
+   }
+
+   /**
     * Column: Model
     */
    private void defineColumn_Equipment_Model() {
@@ -2085,6 +2263,31 @@ public class EquipmentView extends ViewPart implements
             if (element instanceof final TVIEquipmentView_Item viewItem) {
 
                final float price = viewItem.price;
+
+               colDef.printDoubleValue(cell, price, true);
+               setCellColor(cell, element);
+            }
+         }
+      });
+   }
+
+   /**
+    * Column: Price by distance
+    */
+   private void defineColumn_Equipment_PriceByDistance() {
+
+      final ColumnDefinition colDef = TreeColumnFactory.EQUIPMENT_PRICE_PER_DISTANCE.createColumn(_columnManager, _pc);
+
+      colDef.setLabelProvider(new CellLabelProvider() {
+
+         @Override
+         public void update(final ViewerCell cell) {
+
+            final Object element = cell.getElement();
+
+            if (element instanceof final TVIEquipmentView_Item viewItem) {
+
+               final float price = viewItem.colPricePerDistance;
 
                colDef.printDoubleValue(cell, price, true);
                setCellColor(cell, element);
@@ -2253,63 +2456,6 @@ public class EquipmentView extends ViewPart implements
             if (label != null) {
 
                cell.setText(label);
-               setCellColor(cell, element);
-            }
-         }
-      });
-   }
-
-   /**
-    * Column: Type
-    */
-   private void defineColumn_Equipment_Type() {
-
-      final ColumnDefinition colDef = TreeColumnFactory.EQUIPMENT_TYPE.createColumn(_columnManager, _pc);
-
-      colDef.setIsDefaultColumn();
-
-      colDef.setLabelProvider(new CellLabelProvider() {
-
-         @Override
-         public void update(final ViewerCell cell) {
-
-            final Object element = cell.getElement();
-
-            if (element instanceof final TVIEquipmentView_Item viewItem) {
-
-               final String type = viewItem.type;
-
-               if (EquipmentManager.isEmptyEquipmentType(type) == false) {
-
-                  cell.setText(type);
-                  setCellColor(cell, element);
-               }
-            }
-         }
-      });
-   }
-
-   /**
-    * Column: Type raw
-    */
-   private void defineColumn_Equipment_TypeRaw() {
-
-      final ColumnDefinition colDef = TreeColumnFactory.EQUIPMENT_TYPE_RAW.createColumn(_columnManager, _pc);
-
-      colDef.setIsDefaultColumn();
-
-      colDef.setLabelProvider(new CellLabelProvider() {
-
-         @Override
-         public void update(final ViewerCell cell) {
-
-            final Object element = cell.getElement();
-
-            if (element instanceof final TVIEquipmentView_Item viewItem) {
-
-               final String type = viewItem.type;
-
-               cell.setText(type);
                setCellColor(cell, element);
             }
          }
@@ -3354,8 +3500,8 @@ public class EquipmentView extends ViewPart implements
 
          final Equipment equipmentFromDialog = dialogEquipment.getEquipment();
 
-         final String typeOld = selectedEquipment.getType();
-         final String typeNew = equipmentFromDialog.getType();
+         final String typeOld = selectedEquipment.getCollateID();
+         final String typeNew = equipmentFromDialog.getCollateID();
 
          final Set<String> allModifiedTypes = new HashSet<>(Arrays.asList(typeOld, typeNew));
 
@@ -3407,8 +3553,8 @@ public class EquipmentView extends ViewPart implements
             return;
          }
 
-         final String typeOld = selectedPart.getPartType();
-         final String typeNew = partFromDialog.getPartType();
+         final String typeOld = selectedPart.getPartCollateID();
+         final String typeNew = partFromDialog.getPartCollateID();
 
          final Set<String> allModifiedTypes = new HashSet<>(Arrays.asList(typeOld, typeNew));
 
@@ -3448,8 +3594,8 @@ public class EquipmentView extends ViewPart implements
 
          final boolean areCollatedFieldsModified = selectedEquipment.isCollatedFieldsModified(equipmentFromDialog);
 
-         final String typeOld = selectedEquipment.getType();
-         final String typeNew = equipmentFromDialog.getType();
+         final String typeOld = selectedEquipment.getCollateID();
+         final String typeNew = equipmentFromDialog.getCollateID();
 
          final Set<String> allModifiedTypes = new HashSet<>(Arrays.asList(typeOld, typeNew));
 
@@ -3479,13 +3625,13 @@ public class EquipmentView extends ViewPart implements
                for (final EquipmentPart part : allParts) {
 
                   if (part.isCollate()) {
-                     allPartTypes.add(part.getPartType());
+                     allPartTypes.add(part.getPartCollateID());
                   }
                }
 
                for (final String partType : allPartTypes) {
 
-                  EquipmentManager.updateUntilDate_Parts_OneType(selectedEquipment, partType, (short) -1);
+                  EquipmentManager.updateUntilDate_Parts_OneCollateID(selectedEquipment, partType, (short) -1);
                }
             }
          }
@@ -3538,8 +3684,8 @@ public class EquipmentView extends ViewPart implements
 
          final boolean areCollatedFieldsModified = selectedPart.isCollatedFieldsModified(partFromDialog);
 
-         final String typeOld = selectedPart.getPartType();
-         final String typeNew = partFromDialog.getPartType();
+         final String typeOld = selectedPart.getPartCollateID();
+         final String typeNew = partFromDialog.getPartCollateID();
 
          final Set<String> allModifiedTypes = new HashSet<>(Arrays.asList(typeOld, typeNew));
 
@@ -3626,7 +3772,7 @@ public class EquipmentView extends ViewPart implements
 
       equipment.getParts().add(savedService);
 
-      final Set<String> allTypes = new HashSet<>(Arrays.asList(serviceFromDialog.getPartType()));
+      final Set<String> allTypes = new HashSet<>(Arrays.asList(serviceFromDialog.getPartCollateID()));
 
       EquipmentManager.updateUntilDate_Parts(equipment, allTypes, savedService.getCollateBetween());
 
@@ -4456,11 +4602,11 @@ public class EquipmentView extends ViewPart implements
 
    private void updateAfterModified_Equipment(final Equipment equipment) {
 
-      final Set<String> allTypes = new HashSet<>(Arrays.asList(equipment.getType()));
+      final Set<String> allCollateIDs = new HashSet<>(Arrays.asList(equipment.getCollateID()));
 
       TourDatabase.saveEntity(equipment, equipment.getEquipmentId(), Equipment.class);
 
-      EquipmentManager.updateUntilDate_Equipment(allTypes);
+      EquipmentManager.updateUntilDate_Equipment(allCollateIDs);
 
       updateUI_ReloadViewer();
    }
@@ -4471,9 +4617,9 @@ public class EquipmentView extends ViewPart implements
 
       equipment.getParts().add(savedPart);
 
-      final HashSet<String> allTypes = new HashSet<>(Arrays.asList(part.getPartType()));
+      final HashSet<String> allCollateIDs = new HashSet<>(Arrays.asList(part.getPartCollateID()));
 
-      EquipmentManager.updateUntilDate_Parts(equipment, allTypes, savedPart.getCollateBetween());
+      EquipmentManager.updateUntilDate_Parts(equipment, allCollateIDs, savedPart.getCollateBetween());
 
       updateUI_ReloadViewer();
    }

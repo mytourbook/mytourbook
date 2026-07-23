@@ -15,8 +15,6 @@
  *******************************************************************************/
 package net.tourbook.common;
 
-import static org.eclipse.swt.events.ControlListener.controlResizedAdapter;
-
 import java.awt.Font;
 import java.awt.GraphicsEnvironment;
 import java.awt.Toolkit;
@@ -85,6 +83,7 @@ import org.eclipse.swt.custom.ScrolledComposite;
 import org.eclipse.swt.dnd.Clipboard;
 import org.eclipse.swt.dnd.TextTransfer;
 import org.eclipse.swt.dnd.Transfer;
+import org.eclipse.swt.events.ControlListener;
 import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseTrackListener;
@@ -122,6 +121,7 @@ import org.eclipse.swt.widgets.Sash;
 import org.eclipse.swt.widgets.Scale;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Spinner;
+import org.eclipse.swt.widgets.Text;
 import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.swt.widgets.Widget;
 import org.eclipse.ui.IEditorSite;
@@ -348,7 +348,7 @@ public class UI {
    /**
     * Is <code>true</code> when the bright theme in the UI is selected
     */
-   public static boolean       IS_BRIGHT_THEME;
+   public static boolean       IS_BRIGHT_THEME   = true;
 
    /**
     * When <code>true</code> then HRD images are displayed on windows when the dark theme is
@@ -821,36 +821,9 @@ public class UI {
 
    private static final IPreferenceStore _prefStore_Common           = CommonActivator.getPrefStore();
 
-   private static final String           SYS_PROP__SWT_AUTOSCALE     = "swt.autoScale";                                              //$NON-NLS-1$
-   private static final String           SYS_PROP__SWT_AUTOSCALE_NO  = "noAutoScale";                                                //$NON-NLS-1$
-   private static final String           _swtAutoScale               = System.getProperty(SYS_PROP__SWT_AUTOSCALE);
-   private static final String           _swtAutoScale_No            = System.getProperty(SYS_PROP__SWT_AUTOSCALE_NO);
-
    private static AtomicInteger          _statusMessageCounter       = new AtomicInteger();
 
    static {
-
-      if (_swtAutoScale == null) {
-
-         if (_swtAutoScale_No == null) {
-
-            System.setProperty(SYS_PROP__SWT_AUTOSCALE, "100"); //$NON-NLS-1$
-
-            StatusUtil.logInfo(UI.EMPTY_STRING
-                  + "\"swt.autoScale\" is not set externally, " //$NON-NLS-1$
-                  + " therefore the default value is used \"swt.autoScale=100\"." //$NON-NLS-1$
-                  + " The default can be prevented by setting \"noAutoScale\"");//$NON-NLS-1$
-         } else {
-
-            StatusUtil.logInfo(UI.EMPTY_STRING
-                  + "\"swt.autoScale\" is not set externally," //$NON-NLS-1$
-                  + " the default value was prevented with \"noAutoScale\"");//$NON-NLS-1$
-         }
-
-      } else {
-
-         StatusUtil.logInfo("\"swt.autoScale=%s\" is set externally".formatted(_swtAutoScale));//$NON-NLS-1$
-      }
 
       /**
        * This creates a display which may contain also sleak options, otherwise sleak would not
@@ -1125,7 +1098,7 @@ public class UI {
       sash.addMouseTrackListener(MouseTrackListener.mouseExitAdapter(mouseEvent -> sash.setBackground(mouseExitColor)));
 
       // set color when sash is initially displayed
-      sash.addControlListener(controlResizedAdapter(controlEvent -> sash.setBackground(mouseExitColor)));
+      sash.addControlListener(ControlListener.controlResizedAdapter(controlEvent -> sash.setBackground(mouseExitColor)));
 
       sash.addSelectionListener(SelectionListener.widgetSelectedAdapter(selectionEvent -> {
 
@@ -1859,6 +1832,23 @@ public class UI {
       }
 
       return container;
+   }
+
+   /**
+    * Creates a {@link Text} with a readonly text
+    *
+    * @param parent
+    * @param text
+    *
+    * @return
+    */
+   public static Text createReadOnlyText(final Composite parent, final String text) {
+
+      final Text textControl = new Text(parent, SWT.READ_ONLY);
+
+      textControl.setText(text);
+
+      return textControl;
    }
 
    /**
