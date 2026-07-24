@@ -1,5 +1,11 @@
 26.next.0                                                 ?. February 2026
 
+Fix type -> collate ID in :
+
+   Value_Formatter_Equipment_Type
+
+
+
 TODO's
 ======
 
