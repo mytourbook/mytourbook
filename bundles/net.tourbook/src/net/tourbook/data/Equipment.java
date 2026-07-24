@@ -226,6 +226,8 @@ public class Equipment implements Cloneable, Comparable<Object>, Serializable {
    @Transient
    private String                     _equipmentName;
 
+   @Transient
+   private String                     _checkedEmptyCollateID;
 
    /**
     * Default constructor used in EJB
@@ -542,6 +544,16 @@ public class Equipment implements Cloneable, Comparable<Object>, Serializable {
       return size;
    }
 
+   public String getCollateIdEmptyChecked() {
+
+      if (_checkedEmptyCollateID == null) {
+
+         _checkedEmptyCollateID = EquipmentManager.isEmptyEquipmentCollateID(type) ? UI.EMPTY_STRING : type;
+      }
+
+      return _checkedEmptyCollateID;
+   }
+
    public String getUrlAddress() {
 
       if (urlAddress == null) {
@@ -647,6 +659,8 @@ public class Equipment implements Cloneable, Comparable<Object>, Serializable {
    public void setCollateID(final String collateID) {
 
       this.type = collateID;
+
+      _checkedEmptyCollateID = null;
    }
 
    public void setDateBuilt(final long dateBuilt) {

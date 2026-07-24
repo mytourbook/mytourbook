@@ -586,28 +586,28 @@ public class EquipmentView extends ViewPart implements
             final Equipment equipment1 = item1.getEquipment();
             final Equipment equipment2 = item2.getEquipment();
 
-//            // 1st sort by collation type
-//            int compareDiff = equipment1.getTypeEmptyChecked().compareTo(equipment2.getTypeEmptyChecked());
-//
-//            // 2nd sort by date
-//            if (compareDiff == 0) {
-//
-//               final long date1 = equipment1.getDateUsed();
-//               final long date2 = equipment2.getDateUsed();
-//
-//               final long dateDiff = date1 - date2;
-//
-//               // diff value can be larger than Integer.MAX_VALUE
-//               if (dateDiff > 0) {
-//                  compareDiff = 1;
-//               } else if (dateDiff < 0) {
-//                  compareDiff = -1;
-//               }
-//            }
-//
-//            return compareDiff;
+            // 1st sort by collation ID
+            int compareDiff = equipment1.getCollateIdEmptyChecked().compareTo(equipment2.getCollateIdEmptyChecked());
 
-            return equipment1.getName().compareToIgnoreCase(equipment2.getName());
+            // 2nd sort by date
+            if (compareDiff == 0) {
+
+               final long date1 = equipment1.getDateUsed();
+               final long date2 = equipment2.getDateUsed();
+
+               final long dateDiff = date1 - date2;
+
+               // diff value can be larger than Integer.MAX_VALUE
+               if (dateDiff > 0) {
+                  compareDiff = 1;
+               } else if (dateDiff < 0) {
+                  compareDiff = -1;
+               }
+            }
+
+            return compareDiff;
+
+//            return equipment1.getName().compareToIgnoreCase(equipment2.getName());
 
          } else if (obj1 instanceof final TVIEquipmentView_Part item1
                && obj2 instanceof final TVIEquipmentView_Part item2) {
