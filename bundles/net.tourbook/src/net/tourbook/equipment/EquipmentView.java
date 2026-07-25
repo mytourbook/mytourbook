@@ -35,10 +35,9 @@ import net.tourbook.common.UI;
 import net.tourbook.common.formatter.ValueFormat;
 import net.tourbook.common.preferences.ICommonPreferences;
 import net.tourbook.common.time.TimeTools;
-import net.tourbook.common.tooltip.ActionToolbarSlideout;
-import net.tourbook.common.tooltip.IOpeningDialog;
-import net.tourbook.common.tooltip.OpenDialogManager;
-import net.tourbook.common.tooltip.ToolbarSlideout;
+import net.tourbook.common.tooltip.ActionToolbarSlideoutAdv;
+import net.tourbook.common.tooltip.AdvancedSlideout;
+import net.tourbook.common.tooltip.SlideoutLocation;
 import net.tourbook.common.ui.SelectionCellLabelProvider;
 import net.tourbook.common.util.ColumnDefinition;
 import net.tourbook.common.util.ColumnManager;
@@ -129,7 +128,7 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Menu;
-import org.eclipse.swt.widgets.ToolBar;
+import org.eclipse.swt.widgets.ToolItem;
 import org.eclipse.swt.widgets.Tree;
 import org.eclipse.swt.widgets.TreeColumn;
 import org.eclipse.swt.widgets.TreeItem;
@@ -211,8 +210,6 @@ public class EquipmentView extends ViewPart implements
    private int                                _columnWidth_EquipmentImage;
    private int                                _defaultTreeItemHeight;
    private int                                _selectedTreeItemHeight;
-
-   private OpenDialogManager                  _openDlgMgr                              = new OpenDialogManager();
 
    private EquipmentMenuManager               _equipmentMenuManager;
    private TagMenuManager                     _tagMenuManager;
@@ -332,7 +329,6 @@ public class EquipmentView extends ViewPart implements
          onAction_DeleteEquipment();
       }
    }
-
    private class ActionDeletePart extends Action {
 
       ActionDeletePart() {
@@ -459,17 +455,35 @@ public class EquipmentView extends ViewPart implements
       }
    }
 
-   private class ActionEquipmentOptions extends ActionToolbarSlideout {
+   private class ActionEquipmentOptions extends ActionToolbarSlideoutAdv {
 
-      @Override
-      protected ToolbarSlideout createSlideout(final ToolBar toolbar) {
 
-         return new SlideoutEquipmentOptions(_parent, toolbar, EquipmentView.this, _state);
+      private SlideoutEquipmentOptions    _slideoutEquipmentOptions;
+
+
+      /**
+       * @param equipmentView
+       * @param image
+       * @param state
+       * @param state
+       */
+      public ActionEquipmentOptions() {
+
+         /*
+          * !!! Needed to create images, otherwise they are disposed sometimes and the action
+          * is not displayed in the toolbar, very strange, in other views it works without creating
+          * images !!!
+          */
+         super(_equipmentOptionsImage);
       }
 
       @Override
-      protected void onBeforeOpenSlideout() {
-         closeOpenedDialogs(this);
+      protected AdvancedSlideout createSlideout(final ToolItem toolItem) {
+
+         _slideoutEquipmentOptions = new SlideoutEquipmentOptions(toolItem, EquipmentView.this, _state);
+         _slideoutEquipmentOptions.setSlideoutLocation(SlideoutLocation.BELOW_CENTER);
+
+         return _slideoutEquipmentOptions;
       }
    }
 
@@ -882,16 +896,6 @@ public class EquipmentView extends ViewPart implements
       };
 
       TourManager.getInstance().addTourEventListener(_tourEventListener);
-   }
-
-   /**
-    * Close all opened dialogs except the opening dialog
-    *
-    * @param openingDialog
-    */
-   private void closeOpenedDialogs(final IOpeningDialog openingDialog) {
-
-      _openDlgMgr.closeOpenedDialogs(openingDialog);
    }
 
    private void createActions() {
@@ -2935,6 +2939,7 @@ public class EquipmentView extends ViewPart implements
       _imgTours_All                 .dispose();
 
       _equipmentFilterImage         .dispose();
+      _equipmentOptionsImage        .dispose();
 
 // SET_FORMATTING_ON
 

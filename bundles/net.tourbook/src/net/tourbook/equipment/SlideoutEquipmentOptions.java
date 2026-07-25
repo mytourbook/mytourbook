@@ -20,31 +20,32 @@ import net.tourbook.common.UI;
 import net.tourbook.common.action.ActionOpenPrefDialog;
 import net.tourbook.common.action.ActionResetToDefaults;
 import net.tourbook.common.action.IActionResetToDefault;
-import net.tourbook.common.font.MTFont;
-import net.tourbook.common.tooltip.ToolbarSlideout;
+import net.tourbook.common.tooltip.AdvancedSlideout;
 import net.tourbook.common.util.Util;
 import net.tourbook.preferences.PrefPageEquipment;
 import net.tourbook.ui.views.tourDataEditor.TourDataEditorView;
 
+import org.eclipse.jface.action.Separator;
 import org.eclipse.jface.action.ToolBarManager;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
-import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.MouseWheelListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.graphics.Point;
+import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Spinner;
-import org.eclipse.swt.widgets.ToolBar;
+import org.eclipse.swt.widgets.ToolItem;
 
-public class SlideoutEquipmentOptions extends ToolbarSlideout implements IActionResetToDefault {
-
-   private IDialogSettings       _state;
+/**
+ * Slidout for equipment view options
+ */
+public class SlideoutEquipmentOptions extends AdvancedSlideout implements IActionResetToDefault {
 
    private EquipmentView         _equipmentView;
 
@@ -54,29 +55,34 @@ public class SlideoutEquipmentOptions extends ToolbarSlideout implements IAction
    private ActionResetToDefaults _actionRestoreDefaults;
    private ActionOpenPrefDialog  _actionPrefDialog;
 
+   private ToolItem              _toolItem;
+
    /*
     * UI controls
     */
-   private Spinner _spinnerViewerImageHeight;
+   private Composite       _shellContainer;
 
-   private Button  _rdoShowCustomHeight;
-   private Button  _rdoShowDefaultHeight;
+   private Button          _rdoShowCustomHeight;
+   private Button          _rdoShowDefaultHeight;
 
-   /**
-    * @param ownerControl
-    * @param toolBar
-    * @param equipmentView
-    * @param state
-    */
-   public SlideoutEquipmentOptions(final Control ownerControl,
-                                   final ToolBar toolBar,
+   private Spinner         _spinnerViewerImageHeight;
+
+   private IDialogSettings _state;
+
+   public SlideoutEquipmentOptions(final ToolItem toolItem,
                                    final EquipmentView equipmentView,
                                    final IDialogSettings state) {
 
-      super(ownerControl, toolBar);
+      super(toolItem.getParent(), state, null);
 
+      _toolItem = toolItem;
       _equipmentView = equipmentView;
       _state = state;
+
+      setTitleText(Messages.Slideout_EquipmentOptions_Title);
+
+      // prevent that the opened slideout is partly hidden
+      setIsForceBoundsToBeInsideOfViewport(true);
    }
 
    private void createActions() {
@@ -89,72 +95,34 @@ public class SlideoutEquipmentOptions extends ToolbarSlideout implements IAction
    }
 
    @Override
-   protected Composite createToolTipContentArea(final Composite parent) {
+   protected void createSlideoutContent(final Composite parent) {
 
       initUI();
 
       createActions();
 
-      final Composite ui = createUI(parent);
+      createUI(parent);
 
       restoreState();
-      enableControls();
 
-      return ui;
+      enableControls();
    }
 
    private Composite createUI(final Composite parent) {
 
-      final Composite shellContainer = new Composite(parent, SWT.NONE);
-      GridLayoutFactory.swtDefaults().applyTo(shellContainer);
+      _shellContainer = new Composite(parent, SWT.NONE);
+      GridLayoutFactory.swtDefaults().applyTo(_shellContainer);
       {
-         final Composite container = new Composite(shellContainer, SWT.NONE);
+         final Composite container = new Composite(_shellContainer, SWT.NONE);
          GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
          GridLayoutFactory.fillDefaults().applyTo(container);
-//       container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_BLUE));
+         container.setBackground(UI.SYS_COLOR_GREEN);
          {
-            final Composite titleContainer = new Composite(container, SWT.NONE);
-            GridDataFactory.fillDefaults().grab(true, false).applyTo(titleContainer);
-            GridLayoutFactory.fillDefaults().numColumns(2).applyTo(titleContainer);
-            {
-               createUI_10_Title(titleContainer);
-               createUI_12_Actions(titleContainer);
-            }
-
             createUI_20_Options(container);
          }
       }
 
-      return shellContainer;
-   }
-
-   private void createUI_10_Title(final Composite parent) {
-
-      /*
-       * Label: Slideout title
-       */
-      final Label label = new Label(parent, SWT.NONE);
-      GridDataFactory.fillDefaults().applyTo(label);
-      label.setText(Messages.Slideout_EquipmentOptions_Title);
-      label.setFont(JFaceResources.getBannerFont());
-
-      MTFont.setBannerFont(label);
-   }
-
-   private void createUI_12_Actions(final Composite parent) {
-
-      final ToolBar toolbar = new ToolBar(parent, SWT.FLAT);
-      GridDataFactory.fillDefaults()
-            .grab(true, false)
-            .align(SWT.END, SWT.BEGINNING)
-            .applyTo(toolbar);
-
-      final ToolBarManager tbm = new ToolBarManager(toolbar);
-
-      tbm.add(_actionRestoreDefaults);
-      tbm.add(_actionPrefDialog);
-
-      tbm.update(true);
+      return _shellContainer;
    }
 
    private void createUI_20_Options(final Composite parent) {
@@ -218,6 +186,15 @@ public class SlideoutEquipmentOptions extends ToolbarSlideout implements IAction
       _spinnerViewerImageHeight.setEnabled(isUseCustomHeight);
    }
 
+   @Override
+   protected void fillHeaderToolbar(final ToolBarManager toolbarManager) {
+
+      toolbarManager.add(_actionRestoreDefaults);
+      toolbarManager.add(_actionPrefDialog);
+
+      toolbarManager.add(new Separator());
+   }
+
    /**
     * This looks complicated but the slideout is created twice, so we retrieve the current value
     *
@@ -226,6 +203,18 @@ public class SlideoutEquipmentOptions extends ToolbarSlideout implements IAction
    private int getDefaultItemHeight() {
 
       return _equipmentView.getDefaultItemHeight();
+   }
+
+   @Override
+   protected Rectangle getParentBounds() {
+
+      final Rectangle itemBounds = _toolItem.getBounds();
+      final Point itemDisplayPosition = _toolItem.getParent().toDisplay(itemBounds.x, itemBounds.y);
+
+      itemBounds.x = itemDisplayPosition.x;
+      itemBounds.y = itemDisplayPosition.y;
+
+      return itemBounds;
    }
 
    private void initUI() {
@@ -250,7 +239,30 @@ public class SlideoutEquipmentOptions extends ToolbarSlideout implements IAction
 
       enableControls();
 
-      _equipmentView.updateUI_Viewer();
+      // run async to update the slideout immediately
+      _shellContainer.getDisplay().asyncExec(() -> _equipmentView.updateUI_Viewer());
+   }
+
+   @Override
+   protected void onFocus() {
+
+//      _rdoFilter_Equipment_ContainsTours_Ignore.setFocus();
+   }
+
+   @Override
+   protected Point onResize(final int newContentWidth, final int newContentHeight) {
+
+      if (_shellContainer.isDisposed()) {
+
+         // this happened during debugging
+
+         return null;
+      }
+
+      // prevent the dialog resize, there is no need
+      final Point defaultSize = _shellContainer.getShell().computeSize(SWT.DEFAULT, SWT.DEFAULT);
+
+      return defaultSize;
    }
 
    @Override
@@ -283,7 +295,8 @@ public class SlideoutEquipmentOptions extends ToolbarSlideout implements IAction
 // SET_FORMATTING_ON
    }
 
-   private void saveState() {
+   @Override
+   protected void saveState() {
 
 // SET_FORMATTING_OFF
 
@@ -291,6 +304,9 @@ public class SlideoutEquipmentOptions extends ToolbarSlideout implements IAction
       _state.put(TourDataEditorView.STATE_EQUIPMENT_VIEWER_IMAGE_HEIGHT,            _spinnerViewerImageHeight  .getSelection());
 
 // SET_FORMATTING_ON
+
+      // save slideout position/size
+      super.saveState();
    }
 
 }
