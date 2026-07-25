@@ -293,6 +293,7 @@ public class EquipmentView extends ViewPart implements
    private final Image _imgTours_All                 = TourbookPlugin.getImage(Images.TourInView);
 
    private Image       _equipmentFilterImage         = CommonActivator.getThemedImageDescriptor(CommonImages.App_Filter).createImage();
+   private Image       _equipmentOptionsImage        = CommonActivator.getThemedImageDescriptor(CommonImages.TourOptions).createImage();
 
    /*
     * UI controls
@@ -622,10 +623,10 @@ public class EquipmentView extends ViewPart implements
             final int itemType2 = part2.getItemType();
             int compareDiff = itemType1 - itemType2;
 
-            // 2st sort by collation type
+            // 2st sort by collation ID
             if (compareDiff == 0) {
 
-               compareDiff = part1.getPartCollateID().compareTo(part2.getPartCollateID());
+               compareDiff = part1.getCollateIdEmptyChecked().compareTo(part2.getCollateIdEmptyChecked());
             }
 
             // 3nd sort by date
@@ -918,6 +919,7 @@ public class EquipmentView extends ViewPart implements
       _actionSetTourStructure_All            = new ActionSetTourStructure_All();
       _actionToggleCollatedTours             = new ActionToggleCollatedTours();
       _actionToggleRetiredAsset              = new ActionToggleRetiredAsset();
+
 
       // collapse/expand actions
       _actionCollapseAll_WithoutSelection    = new ActionCollapseAll_WithoutSelection();
