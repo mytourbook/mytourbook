@@ -4500,6 +4500,7 @@ public class EquipmentView extends ViewPart implements
    private void saveState() {
 
       _columnManager.saveState(_state);
+      EquipmentConfigManager.saveState();
 
       _state.put(STATE_IS_SINGLE_EXPAND_COLLAPSE_OTHERS, _actionSingleExpand_CollapseOthers.isChecked());
       _state.put(STATE_IS_ON_SELECT_EXPAND_COLLAPSE, _actionOnMouseSelect_ExpandCollapse.isChecked());

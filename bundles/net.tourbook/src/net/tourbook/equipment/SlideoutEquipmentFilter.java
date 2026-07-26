@@ -66,9 +66,6 @@ public class SlideoutEquipmentFilter extends AdvancedSlideout {
       _equipmentView = equipmentView;
 
       setTitleText(Messages.Slideout_EquipmentSubFilter_Title);
-
-      // prevent that the opened slideout is partly hidden
-      setIsForceBoundsToBeInsideOfViewport(true);
    }
 
    @Override
