@@ -50,7 +50,6 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Spinner;
-import org.eclipse.swt.widgets.Text;
 import org.eclipse.swt.widgets.ToolItem;
 
 /**
@@ -69,7 +68,7 @@ public class SlideoutEquipmentOptions extends AdvancedSlideout implements IActio
    private ActionResetToDefaults _actionRestoreDefaults;
    private ActionOpenPrefDialog  _actionPrefDialog;
 
-   private boolean               _isUpdateUI;
+   private boolean               _isInUpdateUI;
 
    private ToolItem              _toolItem;
 
@@ -92,11 +91,9 @@ public class SlideoutEquipmentOptions extends AdvancedSlideout implements IActio
    private Combo     _comboPartServiceSort2;
    private Combo     _comboPartServiceSort3;
 
-   private Label     _lblConfigName;
-
    private Spinner   _spinnerViewerImageHeight;
 
-   private Text      _textConfigName;
+   private int       _activeConfigIndex;
 
    public SlideoutEquipmentOptions(final ToolItem toolItem,
                                    final EquipmentView equipmentView,
@@ -132,7 +129,7 @@ public class SlideoutEquipmentOptions extends AdvancedSlideout implements IActio
       fillUI();
       fillUI_Config();
 
-      restoreState();
+      updateUIFromModel();
 
       enableControls();
    }
@@ -150,7 +147,6 @@ public class SlideoutEquipmentOptions extends AdvancedSlideout implements IActio
             createUI_000_ConfigHeader(container);
             createUI_100_Sorting(container);
             createUI_500_Options(container);
-            createUI_900_ConfigName(container);
          }
       }
 
@@ -181,10 +177,13 @@ public class SlideoutEquipmentOptions extends AdvancedSlideout implements IActio
             /*
              * Combo: Configuration
              */
-            _comboConfigName = new Combo(container, SWT.READ_ONLY | SWT.BORDER);
+            _comboConfigName = new Combo(container, SWT.BORDER);
             _comboConfigName.setVisibleItemCount(20);
+
             _comboConfigName.addFocusListener(_keepOpenListener);
+            _comboConfigName.addModifyListener(modifyEvent -> onModifyConfigName());
             _comboConfigName.addSelectionListener(SelectionListener.widgetSelectedAdapter(selectionEvent -> onSelectConfig()));
+
             GridDataFactory.fillDefaults()
                   .grab(true, false)
                   .align(SWT.FILL, SWT.CENTER)
@@ -215,13 +214,13 @@ public class SlideoutEquipmentOptions extends AdvancedSlideout implements IActio
       final GridDataFactory gd = GridDataFactory.fillDefaults().grab(true, false);
 
       final Group group = new Group(parent, SWT.NONE);
-      group.setText("Sorting");
+      group.setText("Sort");
       gd.applyTo(group);
       GridLayoutFactory.swtDefaults().numColumns(2).applyTo(group);
 //      group.setBackground(UI.SYS_COLOR_YELLOW);
       {
          {
-            UI.createLabel(group, "Equipment &1st field");
+            UI.createLabel(group, "Equipment by");
 
             _comboEquipmentSort1 = new Combo(group, SWT.READ_ONLY | SWT.BORDER);
             _comboEquipmentSort1.addFocusListener(_keepOpenListener);
@@ -230,7 +229,7 @@ public class SlideoutEquipmentOptions extends AdvancedSlideout implements IActio
             gd.applyTo(_comboEquipmentSort1);
          }
          {
-            UI.createLabel(group, "Equipment &2nd field");
+            UI.createSpacer_Horizontal(group);
 
             _comboEquipmentSort2 = new Combo(group, SWT.READ_ONLY | SWT.BORDER);
             _comboEquipmentSort2.addFocusListener(_keepOpenListener);
@@ -239,7 +238,7 @@ public class SlideoutEquipmentOptions extends AdvancedSlideout implements IActio
             gd.applyTo(_comboEquipmentSort2);
          }
          {
-            UI.createLabel(group, "Equipment &3rd field");
+            UI.createSpacer_Horizontal(group);
 
             _comboEquipmentSort3 = new Combo(group, SWT.READ_ONLY | SWT.BORDER);
             _comboEquipmentSort3.addFocusListener(_keepOpenListener);
@@ -247,9 +246,8 @@ public class SlideoutEquipmentOptions extends AdvancedSlideout implements IActio
 
             gd.applyTo(_comboEquipmentSort3);
          }
-
          {
-            UI.createLabel(group, "Part/Service 1s&t field");
+            UI.createLabel(group, "Part/Service by");
 
             _comboPartServiceSort1 = new Combo(group, SWT.READ_ONLY | SWT.BORDER);
             _comboPartServiceSort1.addFocusListener(_keepOpenListener);
@@ -258,7 +256,7 @@ public class SlideoutEquipmentOptions extends AdvancedSlideout implements IActio
             gd.applyTo(_comboPartServiceSort1);
          }
          {
-            UI.createLabel(group, "Part/Service 2&nd field");
+            UI.createSpacer_Horizontal(group);
 
             _comboPartServiceSort2 = new Combo(group, SWT.READ_ONLY | SWT.BORDER);
             _comboPartServiceSort2.addFocusListener(_keepOpenListener);
@@ -267,7 +265,7 @@ public class SlideoutEquipmentOptions extends AdvancedSlideout implements IActio
             gd.applyTo(_comboPartServiceSort2);
          }
          {
-            UI.createLabel(group, "Part/Service 3&rd field");
+            UI.createSpacer_Horizontal(group);
 
             _comboPartServiceSort3 = new Combo(group, SWT.READ_ONLY | SWT.BORDER);
             _comboPartServiceSort3.addFocusListener(_keepOpenListener);
@@ -332,31 +330,6 @@ public class SlideoutEquipmentOptions extends AdvancedSlideout implements IActio
       }
    }
 
-   private void createUI_900_ConfigName(final Composite parent) {
-
-      final Composite container = new Composite(parent, SWT.NONE);
-      GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
-      GridLayoutFactory.fillDefaults().numColumns(2).applyTo(container);
-      {
-         {
-            /*
-             * Config name
-             */
-
-            // Label
-            _lblConfigName = new Label(container, SWT.NONE);
-            _lblConfigName.setText("&Name");
-            _lblConfigName.setToolTipText("Name for the currently selected configuration");
-            UI.gridLayoutData_AlignFillCenter().applyTo(_lblConfigName);
-
-            // Text
-            _textConfigName = new Text(container, SWT.BORDER);
-            _textConfigName.addModifyListener(modifyEvent -> onModifyName());
-            UI.gridLayoutData_AlignFillCenter().grab(true, false).applyTo(_textConfigName);
-         }
-      }
-   }
-
    private void enableControls() {
 
       final boolean isUseCustomHeight = _rdoShowCustomHeight.getSelection();
@@ -402,8 +375,8 @@ public class SlideoutEquipmentOptions extends AdvancedSlideout implements IActio
 
    private void fillUI_Config() {
 
-      final boolean backupIsUpdateUI = _isUpdateUI;
-      _isUpdateUI = true;
+      final boolean backupIsUpdateUI = _isInUpdateUI;
+      _isInUpdateUI = true;
       {
          _comboConfigName.removeAll();
 
@@ -411,7 +384,7 @@ public class SlideoutEquipmentOptions extends AdvancedSlideout implements IActio
             _comboConfigName.add(config.name);
          }
       }
-      _isUpdateUI = backupIsUpdateUI;
+      _isInUpdateUI = backupIsUpdateUI;
    }
 
    /**
@@ -424,6 +397,38 @@ public class SlideoutEquipmentOptions extends AdvancedSlideout implements IActio
       return _equipmentView.getDefaultItemHeight();
    }
 
+   private int getEquipmentPartServiceSortIndex(final SortField requestedSortField) {
+
+      final SortFieldUI[] allSortFields = EquipmentConfigManager.PART_SORT_FIELDS;
+
+      for (int fieldIndex = 0; fieldIndex < allSortFields.length; fieldIndex++) {
+
+         final SortFieldUI sortFieldUI = allSortFields[fieldIndex];
+
+         if (sortFieldUI.sortField.equals(requestedSortField)) {
+            return fieldIndex;
+         }
+      }
+
+      return 0;
+   }
+
+   private int getEquipmentSortIndex(final SortField requestedSortField) {
+
+      final SortFieldUI[] allSortFields = EquipmentConfigManager.EQUIPMENT_SORT_FIELDS;
+
+      for (int fieldIndex = 0; fieldIndex < allSortFields.length; fieldIndex++) {
+
+         final SortFieldUI sortFieldUI = allSortFields[fieldIndex];
+
+         if (sortFieldUI.sortField.equals(requestedSortField)) {
+            return fieldIndex;
+         }
+      }
+
+      return 0;
+   }
+
    @Override
    protected Rectangle getParentBounds() {
 
@@ -434,6 +439,32 @@ public class SlideoutEquipmentOptions extends AdvancedSlideout implements IActio
       itemBounds.y = itemDisplayPosition.y;
 
       return itemBounds;
+   }
+
+   private SortField getSelectedEquipmentPartSort(final Combo combo) {
+
+      final int selectionIndex = combo.getSelectionIndex();
+
+      if (selectionIndex == -1) {
+         return SortField.None;
+      }
+
+      final SortFieldUI sortFieldUI = EquipmentConfigManager.PART_SORT_FIELDS[selectionIndex];
+
+      return sortFieldUI.sortField;
+   }
+
+   private SortField getSelectedEquipmentSort(final Combo combo) {
+
+      final int selectionIndex = combo.getSelectionIndex();
+
+      if (selectionIndex == -1) {
+         return SortField.None;
+      }
+
+      final SortFieldUI sortFieldUI = EquipmentConfigManager.EQUIPMENT_SORT_FIELDS[selectionIndex];
+
+      return sortFieldUI.sortField;
    }
 
    private void initUI(final Composite parent) {
@@ -474,7 +505,7 @@ public class SlideoutEquipmentOptions extends AdvancedSlideout implements IActio
 
    private void onChangeUI() {
 
-      saveState();
+      updateModelFromUI();
 
       enableControls();
 
@@ -484,22 +515,44 @@ public class SlideoutEquipmentOptions extends AdvancedSlideout implements IActio
    @Override
    protected void onFocus() {
 
-//      _rdoFilter_Equipment_ContainsTours_Ignore.setFocus();
+      _comboConfigName.setFocus();
    }
 
-   private void onModifyName() {
+   private void onModifyConfigName() {
 
-      if (_isUpdateUI) {
+      if (_isInUpdateUI) {
          return;
       }
 
-      // update text in the combo
       final int selectedIndex = _comboConfigName.getSelectionIndex();
+      final String newConfigName = _comboConfigName.getText();
 
-      _comboConfigName.setItem(selectedIndex, _textConfigName.getText());
-      _comboConfigName.select(selectedIndex);
+      if (selectedIndex != -1) {
 
-      saveState();
+         // this occurs when an item is selected -> ignore
+
+         return;
+      }
+
+      /*
+       * selectedIndex == -1 -> the previous selected item is modified -> update previous item
+       */
+
+      // update model
+      final EquipmentViewConfig previousSelectedConfig = EquipmentConfigManager.getActiveConfig();
+      previousSelectedConfig.name = newConfigName;
+
+      _shellContainer.getDisplay().asyncExec(() -> {
+
+         // because the index is -1 -> reselect it
+
+         // update UI
+         _comboConfigName.setItem(_activeConfigIndex, newConfigName);
+         _comboConfigName.select(_activeConfigIndex);
+
+         // by default the text is selected -> remove annoying selection
+         _comboConfigName.clearSelection();
+      });
    }
 
    @Override
@@ -521,6 +574,13 @@ public class SlideoutEquipmentOptions extends AdvancedSlideout implements IActio
    private void onSelectConfig() {
 
       final int selectedIndex = _comboConfigName.getSelectionIndex();
+
+      if (selectedIndex < 0) {
+         return;
+      }
+
+      _activeConfigIndex = selectedIndex;
+
       final List<EquipmentViewConfig> allConfigurations = EquipmentConfigManager.getAllConfigs();
 
       final EquipmentViewConfig selectedConfig = allConfigurations.get(selectedIndex);
@@ -533,14 +593,21 @@ public class SlideoutEquipmentOptions extends AdvancedSlideout implements IActio
       }
 
       // keep data from previous config
-      saveState();
+      updateModelFromUI();
 
       EquipmentConfigManager.setActiveConfig(selectedConfig);
 
-      restoreState();
+      updateUIFromModel();
       enableControls();
 
       updateUI();
+
+      _shellContainer.getDisplay().asyncExec(() -> {
+
+         // by default the text is selected -> remove annoying selection
+         _comboConfigName.clearSelection();
+
+      });
    }
 
    private void onSelectConfig_Default(final SelectionEvent selectionEvent) {
@@ -560,7 +627,7 @@ public class SlideoutEquipmentOptions extends AdvancedSlideout implements IActio
          EquipmentConfigManager.resetActiveConfiguration();
       }
 
-      restoreState();
+      updateUIFromModel();
       enableControls();
 
       updateUI();
@@ -575,11 +642,39 @@ public class SlideoutEquipmentOptions extends AdvancedSlideout implements IActio
       onChangeUI();
    }
 
-   private void restoreState() {
+   private void updateModelFromUI() {
+
+      // update config
+
+      final EquipmentViewConfig config = EquipmentConfigManager.getActiveConfig();
+
+// SET_FORMATTING_OFF
+
+      config.equipmentSort1      = getSelectedEquipmentSort(_comboEquipmentSort1);
+      config.equipmentSort2      = getSelectedEquipmentSort(_comboEquipmentSort2);
+      config.equipmentSort3      = getSelectedEquipmentSort(_comboEquipmentSort3);
+
+      config.partServiceSort1    = getSelectedEquipmentPartSort(_comboPartServiceSort1);
+      config.partServiceSort2    = getSelectedEquipmentPartSort(_comboPartServiceSort2);
+      config.partServiceSort3    = getSelectedEquipmentPartSort(_comboPartServiceSort3);
+
+      _state.put(TourDataEditorView.STATE_EQUIPMENT_IS_USE_VIEWER_DEFAULT_HEIGHT,   _rdoShowDefaultHeight      .getSelection());
+      _state.put(TourDataEditorView.STATE_EQUIPMENT_VIEWER_IMAGE_HEIGHT,            _spinnerViewerImageHeight  .getSelection());
+
+// SET_FORMATTING_ON
+   }
+
+   private void updateUI() {
+
+      // run async to update the slideout immediately
+      _shellContainer.getDisplay().asyncExec(() -> _equipmentView.updateUI_Viewer());
+   }
+
+   private void updateUIFromModel() {
 
       // get active config AFTER getting the index because this could change the active config
       final EquipmentViewConfig config = EquipmentConfigManager.getActiveConfig();
-      final int activeConfigIndex = EquipmentConfigManager.getActiveConfigIndex();
+      _activeConfigIndex = EquipmentConfigManager.getActiveConfigIndex();
 
       final int defaultItemHeight = getDefaultItemHeight();
 
@@ -593,45 +688,26 @@ public class SlideoutEquipmentOptions extends AdvancedSlideout implements IActio
 
 // SET_FORMATTING_OFF
 
-      _isUpdateUI = true;
+      _isInUpdateUI = true;
       {
-         _comboConfigName           .select(activeConfigIndex);
-         _textConfigName            .setText(config.name);
+         _comboConfigName           .select(_activeConfigIndex);
+
+         _comboEquipmentSort1       .select(getEquipmentSortIndex(config.equipmentSort1));
+         _comboEquipmentSort2       .select(getEquipmentSortIndex(config.equipmentSort2));
+         _comboEquipmentSort3       .select(getEquipmentSortIndex(config.equipmentSort3));
+
+         _comboPartServiceSort1     .select(getEquipmentPartServiceSortIndex(config.partServiceSort1));
+         _comboPartServiceSort2     .select(getEquipmentPartServiceSortIndex(config.partServiceSort2));
+         _comboPartServiceSort3     .select(getEquipmentPartServiceSortIndex(config.partServiceSort3));
 
          _rdoShowDefaultHeight      .setSelection(isUseDefaultHeight);
          _rdoShowCustomHeight       .setSelection(isUseDefaultHeight == false);
          _spinnerViewerImageHeight  .setSelection(itemHeight);
 
       }
-      _isUpdateUI = false;
+      _isInUpdateUI = false;
 
 // SET_FORMATTING_ON
-   }
-
-   @Override
-   protected void saveState() {
-
-      // update config
-
-      final EquipmentViewConfig config = EquipmentConfigManager.getActiveConfig();
-
-      config.name = _textConfigName.getText();
-
-// SET_FORMATTING_OFF
-
-      _state.put(TourDataEditorView.STATE_EQUIPMENT_IS_USE_VIEWER_DEFAULT_HEIGHT,   _rdoShowDefaultHeight      .getSelection());
-      _state.put(TourDataEditorView.STATE_EQUIPMENT_VIEWER_IMAGE_HEIGHT,            _spinnerViewerImageHeight  .getSelection());
-
-// SET_FORMATTING_ON
-
-      // save slideout position/size
-      super.saveState();
-   }
-
-   private void updateUI() {
-
-      // run async to update the slideout immediately
-      _shellContainer.getDisplay().asyncExec(() -> _equipmentView.updateUI_Viewer());
    }
 
 }

@@ -17,18 +17,44 @@ package net.tourbook.equipment;
 
 import java.util.UUID;
 
+import net.tourbook.common.UI;
+
 public class EquipmentViewConfig {
 
-   String    id        = UUID.randomUUID().toString();
+   private static final char NL        = UI.NEW_LINE;
 
-   String    defaultId = EquipmentConfigManager.CONFIG_DEFAULT_ID_1;
-   String    name      = EquipmentConfigManager.CONFIG_DEFAULT_ID_1;
+   String                    id        = UUID.randomUUID().toString();
 
-   SortField equipmentSort1;
-   SortField equipmentSort2;
-   SortField equipmentSort3;
+   String                    defaultId = EquipmentConfigManager.CONFIG_DEFAULT_ID_1;
+   String                    name      = EquipmentConfigManager.CONFIG_DEFAULT_ID_1;
 
-   SortField partServiceSort1;
-   SortField partServiceSort2;
-   SortField partServiceSort3;
+   SortField                 equipmentSort1;
+   SortField                 equipmentSort2;
+   SortField                 equipmentSort3;
+
+   SortField                 partServiceSort1;
+   SortField                 partServiceSort2;
+   SortField                 partServiceSort3;
+
+   @Override
+   public String toString() {
+
+      return UI.EMPTY_STRING
+
+            + "EquipmentViewConfig"
+
+            + " id           = " + id + NL //                              //$NON-NLS-1$
+            + " defaultId    = " + defaultId + NL //                       //$NON-NLS-1$
+            + " name         = " + name + NL //                            //$NON-NLS-1$
+
+            + " equipmentSort1   = " + equipmentSort1 + NL //              //$NON-NLS-1$
+            + " equipmentSort2   = " + equipmentSort2 + NL //              //$NON-NLS-1$
+            + " equipmentSort3   = " + equipmentSort3 + NL //              //$NON-NLS-1$
+
+            + " partServiceSort1 = " + partServiceSort1 + NL //            //$NON-NLS-1$
+            + " partServiceSort2 = " + partServiceSort2 + NL //            //$NON-NLS-1$
+            + " partServiceSort3 = " + partServiceSort3 + NL //            //$NON-NLS-1$
+
+      ;
+   }
 }

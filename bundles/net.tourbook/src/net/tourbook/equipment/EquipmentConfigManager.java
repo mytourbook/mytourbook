@@ -89,7 +89,8 @@ public class EquipmentConfigManager {
 
    static final SortFieldUI[]                EQUIPMENT_SORT_FIELDS        = {
 
-         new SortFieldUI("<NONE>",                 SortField.None),
+         new SortFieldUI(UI.EMPTY_STRING,          SortField.None),
+
          new SortFieldUI("Equipment name",         SortField.EquipmentName),
          new SortFieldUI("Equipment brand",        SortField.EquipmentBrand),
          new SortFieldUI("Equipment model",        SortField.EquipmentModel),
@@ -102,10 +103,11 @@ public class EquipmentConfigManager {
 
    static final SortFieldUI[]                PART_SORT_FIELDS        = {
 
-         new SortFieldUI("<NONE>",                 SortField.None),
-         new SortFieldUI("Part name",              SortField.EquipmentName),
-         new SortFieldUI("Part brand",             SortField.EquipmentBrand),
-         new SortFieldUI("Part model",             SortField.EquipmentModel),
+         new SortFieldUI(UI.EMPTY_STRING,          SortField.None),
+
+         new SortFieldUI("Part name",              SortField.PartName),
+         new SortFieldUI("Part brand",             SortField.PartBrand),
+         new SortFieldUI("Part model",             SortField.PartModel),
 
          new SortFieldUI("Collate ID",             SortField.CollateID),
 
@@ -176,11 +178,29 @@ public class EquipmentConfigManager {
       switch (configIndex) {
 
       case 1:
-         config.name                   = config.defaultId = CONFIG_DEFAULT_ID_1;
+
+         config.name                   = config.defaultId = CONFIG_DEFAULT_ID_1 +UI.SPACE+" By Name";
+
+         config.equipmentSort1         = SortField.EquipmentName;
+         config.equipmentSort2         = SortField.DateFirstUsed;
+
+         config.partServiceSort1       = SortField.PartsBeforeServices;
+         config.partServiceSort2       = SortField.PartName;
+         config.partServiceSort3       = SortField.DateFirstUsed;
+
          break;
 
       case 2:
-         config.name                   = config.defaultId = CONFIG_DEFAULT_ID_2;
+
+         config.name                   = config.defaultId = CONFIG_DEFAULT_ID_2 +UI.SPACE+" By Collate ID";
+
+         config.equipmentSort1         = SortField.CollateID;
+         config.equipmentSort2         = SortField.DateFirstUsed;
+
+         config.partServiceSort1       = SortField.PartsBeforeServices;
+         config.partServiceSort2       = SortField.CollateID;
+         config.partServiceSort3       = SortField.DateFirstUsed;
+
          break;
 
       case 3:
