@@ -293,6 +293,7 @@ public class EquipmentView extends ViewPart implements
    private final Image _imgTours_All                 = TourbookPlugin.getImage(Images.TourInView);
 
    private Image       _equipmentFilterImage         = CommonActivator.getThemedImageDescriptor(CommonImages.App_Filter).createImage();
+   private Image       _equipmentOptionsImage        = CommonActivator.getThemedImageDescriptor(CommonImages.TourOptions).createImage();
 
    /*
     * UI controls
@@ -586,28 +587,28 @@ public class EquipmentView extends ViewPart implements
             final Equipment equipment1 = item1.getEquipment();
             final Equipment equipment2 = item2.getEquipment();
 
-//            // 1st sort by collation type
-//            int compareDiff = equipment1.getTypeEmptyChecked().compareTo(equipment2.getTypeEmptyChecked());
-//
-//            // 2nd sort by date
-//            if (compareDiff == 0) {
-//
-//               final long date1 = equipment1.getDateUsed();
-//               final long date2 = equipment2.getDateUsed();
-//
-//               final long dateDiff = date1 - date2;
-//
-//               // diff value can be larger than Integer.MAX_VALUE
-//               if (dateDiff > 0) {
-//                  compareDiff = 1;
-//               } else if (dateDiff < 0) {
-//                  compareDiff = -1;
-//               }
-//            }
-//
-//            return compareDiff;
+            // 1st sort by collation ID
+            int compareDiff = equipment1.getCollateIdEmptyChecked().compareTo(equipment2.getCollateIdEmptyChecked());
 
-            return equipment1.getName().compareToIgnoreCase(equipment2.getName());
+            // 2nd sort by date
+            if (compareDiff == 0) {
+
+               final long date1 = equipment1.getDateUsed();
+               final long date2 = equipment2.getDateUsed();
+
+               final long dateDiff = date1 - date2;
+
+               // diff value can be larger than Integer.MAX_VALUE
+               if (dateDiff > 0) {
+                  compareDiff = 1;
+               } else if (dateDiff < 0) {
+                  compareDiff = -1;
+               }
+            }
+
+            return compareDiff;
+
+//            return equipment1.getName().compareToIgnoreCase(equipment2.getName());
 
          } else if (obj1 instanceof final TVIEquipmentView_Part item1
                && obj2 instanceof final TVIEquipmentView_Part item2) {
@@ -622,10 +623,10 @@ public class EquipmentView extends ViewPart implements
             final int itemType2 = part2.getItemType();
             int compareDiff = itemType1 - itemType2;
 
-            // 2st sort by collation type
+            // 2st sort by collation ID
             if (compareDiff == 0) {
 
-               compareDiff = part1.getPartCollateID().compareTo(part2.getPartCollateID());
+               compareDiff = part1.getCollateIdEmptyChecked().compareTo(part2.getCollateIdEmptyChecked());
             }
 
             // 3nd sort by date
@@ -918,6 +919,7 @@ public class EquipmentView extends ViewPart implements
       _actionSetTourStructure_All            = new ActionSetTourStructure_All();
       _actionToggleCollatedTours             = new ActionToggleCollatedTours();
       _actionToggleRetiredAsset              = new ActionToggleRetiredAsset();
+
 
       // collapse/expand actions
       _actionCollapseAll_WithoutSelection    = new ActionCollapseAll_WithoutSelection();

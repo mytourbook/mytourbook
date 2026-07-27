@@ -86,7 +86,7 @@ public class EquipmentPart implements Cloneable, Comparable<Object>, Serializabl
    private String                     model;
 
    /**
-    * The collation type, e.g. shoe xyz is used to combine it other parts with the same type but
+    * The collate ID, e.g. shoe xyz is used to combine it other parts with the same type but
     * different {@link #dateUsed}
     * <p>
     * In MT 26.6 the wording of this field in the UI was renamed into "Collate ID" but not in the
@@ -153,7 +153,7 @@ public class EquipmentPart implements Cloneable, Comparable<Object>, Serializabl
     * When the part was retired/sold, in milliseconds since 1970-01-01T00:00:00Z
     */
    private long                       dateRetired;
-   
+
    /**
     * When the part was firstly used, in milliseconds since 1970-01-01T00:00:00Z
     */
@@ -246,6 +246,9 @@ public class EquipmentPart implements Cloneable, Comparable<Object>, Serializabl
 
    @Transient
    private String                     _partName;
+
+   @Transient
+   private String                     _checkedEmptyCollateID;
 
    /**
     * Default constructor used in EJB
@@ -362,6 +365,16 @@ public class EquipmentPart implements Cloneable, Comparable<Object>, Serializabl
       }
    }
 
+   public String getCollateIdEmptyChecked() {
+
+      if (_checkedEmptyCollateID == null) {
+
+         _checkedEmptyCollateID = EquipmentManager.isEmptyEquipmentCollateID(type) ? UI.EMPTY_STRING : type;
+      }
+
+      return _checkedEmptyCollateID;
+   }
+
    public String getCompany() {
 
       if (company == null) {
@@ -413,7 +426,7 @@ public class EquipmentPart implements Cloneable, Comparable<Object>, Serializabl
    }
 
    public long getDatePurchased() {
-      
+
       return datePurchased;
    }
 
@@ -842,8 +855,11 @@ public class EquipmentPart implements Cloneable, Comparable<Object>, Serializabl
       this.name = name;
    }
 
-   public void setPartCollateID(final String type) {
-      this.type = type;
+   public void setPartCollateID(final String collateID) {
+
+      this.type = collateID;
+
+      _checkedEmptyCollateID = null;
    }
 
    public void setPrice(final float price) {
@@ -886,7 +902,7 @@ public class EquipmentPart implements Cloneable, Comparable<Object>, Serializabl
 
             + "  brand            = " + brand + NL //                         //$NON-NLS-1$
             + "  model            = " + model + NL //                         //$NON-NLS-1$
-            + "  type             = " + type + NL //                          //$NON-NLS-1$
+            + "  type (collateID) = " + type + NL //                          //$NON-NLS-1$
 
             + "  dateUsed         = " + getDateUsed_Local() + NL //           //$NON-NLS-1$
             + "  dateCollateFrom  = " + getDateCollateFrom_Local() + NL //    //$NON-NLS-1$
