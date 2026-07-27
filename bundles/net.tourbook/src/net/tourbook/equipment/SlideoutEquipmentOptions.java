@@ -87,9 +87,11 @@ public class SlideoutEquipmentOptions extends AdvancedSlideout implements IActio
    private Combo     _comboEquipmentSort1;
    private Combo     _comboEquipmentSort2;
    private Combo     _comboEquipmentSort3;
+   private Combo     _comboEquipmentSort4;
    private Combo     _comboPartServiceSort1;
    private Combo     _comboPartServiceSort2;
    private Combo     _comboPartServiceSort3;
+   private Combo     _comboPartServiceSort4;
 
    private Spinner   _spinnerViewerImageHeight;
 
@@ -211,6 +213,8 @@ public class SlideoutEquipmentOptions extends AdvancedSlideout implements IActio
 
    private void createUI_100_Sorting(final Composite parent) {
 
+      final String sortTooltip = "The view items are sorted firstly by the first sort field which is not empty, then by the second and so on";
+
       final GridDataFactory gd = GridDataFactory.fillDefaults().grab(true, false);
 
       final Group group = new Group(parent, SWT.NONE);
@@ -220,7 +224,8 @@ public class SlideoutEquipmentOptions extends AdvancedSlideout implements IActio
 //      group.setBackground(UI.SYS_COLOR_YELLOW);
       {
          {
-            UI.createLabel(group, "Equipment by");
+            final Label label = UI.createLabel(group, "Equipment by");
+            label.setToolTipText(sortTooltip);
 
             _comboEquipmentSort1 = new Combo(group, SWT.READ_ONLY | SWT.BORDER);
             _comboEquipmentSort1.addFocusListener(_keepOpenListener);
@@ -247,7 +252,17 @@ public class SlideoutEquipmentOptions extends AdvancedSlideout implements IActio
             gd.applyTo(_comboEquipmentSort3);
          }
          {
-            UI.createLabel(group, "Part/Service by");
+            UI.createSpacer_Horizontal(group);
+
+            _comboEquipmentSort4 = new Combo(group, SWT.READ_ONLY | SWT.BORDER);
+            _comboEquipmentSort4.addFocusListener(_keepOpenListener);
+            _comboEquipmentSort4.addSelectionListener(_defaultSelectionListener);
+
+            gd.applyTo(_comboEquipmentSort4);
+         }
+         {
+            final Label label = UI.createLabel(group, "Part/Service by");
+            label.setToolTipText(sortTooltip);
 
             _comboPartServiceSort1 = new Combo(group, SWT.READ_ONLY | SWT.BORDER);
             _comboPartServiceSort1.addFocusListener(_keepOpenListener);
@@ -272,6 +287,15 @@ public class SlideoutEquipmentOptions extends AdvancedSlideout implements IActio
             _comboPartServiceSort3.addSelectionListener(_defaultSelectionListener);
 
             gd.applyTo(_comboPartServiceSort3);
+         }
+         {
+            UI.createSpacer_Horizontal(group);
+
+            _comboPartServiceSort4 = new Combo(group, SWT.READ_ONLY | SWT.BORDER);
+            _comboPartServiceSort4.addFocusListener(_keepOpenListener);
+            _comboPartServiceSort4.addSelectionListener(_defaultSelectionListener);
+
+            gd.applyTo(_comboPartServiceSort4);
          }
       }
    }
@@ -360,6 +384,10 @@ public class SlideoutEquipmentOptions extends AdvancedSlideout implements IActio
          _comboEquipmentSort3.add(sortFieldUI.label);
       }
 
+      for (final SortFieldUI sortFieldUI : EquipmentConfigManager.EQUIPMENT_SORT_FIELDS) {
+         _comboEquipmentSort4.add(sortFieldUI.label);
+      }
+
       for (final SortFieldUI sortFieldUI : EquipmentConfigManager.PART_SORT_FIELDS) {
          _comboPartServiceSort1.add(sortFieldUI.label);
       }
@@ -370,6 +398,10 @@ public class SlideoutEquipmentOptions extends AdvancedSlideout implements IActio
 
       for (final SortFieldUI sortFieldUI : EquipmentConfigManager.PART_SORT_FIELDS) {
          _comboPartServiceSort3.add(sortFieldUI.label);
+      }
+
+      for (final SortFieldUI sortFieldUI : EquipmentConfigManager.PART_SORT_FIELDS) {
+         _comboPartServiceSort4.add(sortFieldUI.label);
       }
    }
 
@@ -516,6 +548,9 @@ public class SlideoutEquipmentOptions extends AdvancedSlideout implements IActio
    protected void onFocus() {
 
       _comboConfigName.setFocus();
+
+      // by default the text is selected -> remove annoying selection
+      _comboConfigName.clearSelection();
    }
 
    private void onModifyConfigName() {
@@ -653,10 +688,12 @@ public class SlideoutEquipmentOptions extends AdvancedSlideout implements IActio
       config.equipmentSort1      = getSelectedEquipmentSort(_comboEquipmentSort1);
       config.equipmentSort2      = getSelectedEquipmentSort(_comboEquipmentSort2);
       config.equipmentSort3      = getSelectedEquipmentSort(_comboEquipmentSort3);
+      config.equipmentSort4      = getSelectedEquipmentSort(_comboEquipmentSort4);
 
       config.partServiceSort1    = getSelectedEquipmentPartSort(_comboPartServiceSort1);
       config.partServiceSort2    = getSelectedEquipmentPartSort(_comboPartServiceSort2);
       config.partServiceSort3    = getSelectedEquipmentPartSort(_comboPartServiceSort3);
+      config.partServiceSort4    = getSelectedEquipmentPartSort(_comboPartServiceSort4);
 
       _state.put(TourDataEditorView.STATE_EQUIPMENT_IS_USE_VIEWER_DEFAULT_HEIGHT,   _rdoShowDefaultHeight      .getSelection());
       _state.put(TourDataEditorView.STATE_EQUIPMENT_VIEWER_IMAGE_HEIGHT,            _spinnerViewerImageHeight  .getSelection());
@@ -695,10 +732,12 @@ public class SlideoutEquipmentOptions extends AdvancedSlideout implements IActio
          _comboEquipmentSort1       .select(getEquipmentSortIndex(config.equipmentSort1));
          _comboEquipmentSort2       .select(getEquipmentSortIndex(config.equipmentSort2));
          _comboEquipmentSort3       .select(getEquipmentSortIndex(config.equipmentSort3));
+         _comboEquipmentSort4       .select(getEquipmentSortIndex(config.equipmentSort4));
 
          _comboPartServiceSort1     .select(getEquipmentPartServiceSortIndex(config.partServiceSort1));
          _comboPartServiceSort2     .select(getEquipmentPartServiceSortIndex(config.partServiceSort2));
          _comboPartServiceSort3     .select(getEquipmentPartServiceSortIndex(config.partServiceSort3));
+         _comboPartServiceSort4     .select(getEquipmentPartServiceSortIndex(config.partServiceSort4));
 
          _rdoShowDefaultHeight      .setSelection(isUseDefaultHeight);
          _rdoShowCustomHeight       .setSelection(isUseDefaultHeight == false);

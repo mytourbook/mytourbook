@@ -65,9 +65,11 @@ public class EquipmentConfigManager {
    private static final String                    ATTR_EQUIPMENT_SORT_1    = "equipmentSort1";         //$NON-NLS-1$
    private static final String                    ATTR_EQUIPMENT_SORT_2    = "equipmentSort2";         //$NON-NLS-1$
    private static final String                    ATTR_EQUIPMENT_SORT_3    = "equipmentSort3";         //$NON-NLS-1$
+   private static final String                    ATTR_EQUIPMENT_SORT_4    = "equipmentSort4";         //$NON-NLS-1$
    private static final String                    ATTR_PART_SERVICE_SORT_1 = "partServiceSort1";       //$NON-NLS-1$
    private static final String                    ATTR_PART_SERVICE_SORT_2 = "partServiceSort2";       //$NON-NLS-1$
    private static final String                    ATTR_PART_SERVICE_SORT_3 = "partServiceSort3";       //$NON-NLS-1$
+   private static final String                    ATTR_PART_SERVICE_SORT_4 = "partServiceSort4";       //$NON-NLS-1$
 
    static final String                            CONFIG_DEFAULT_ID_1      = "#1";                     //$NON-NLS-1$
    static final String                            CONFIG_DEFAULT_ID_2      = "#2";                     //$NON-NLS-1$
@@ -105,7 +107,7 @@ public class EquipmentConfigManager {
 
          new SortFieldUI(UI.EMPTY_STRING,          SortField.None),
 
-         new SortFieldUI("Part name",              SortField.PartName),
+         new SortFieldUI("Part/service name",      SortField.PartServiceName),
          new SortFieldUI("Part brand",             SortField.PartBrand),
          new SortFieldUI("Part model",             SortField.PartModel),
 
@@ -185,7 +187,7 @@ public class EquipmentConfigManager {
          config.equipmentSort2         = SortField.DateFirstUsed;
 
          config.partServiceSort1       = SortField.PartsBeforeServices;
-         config.partServiceSort2       = SortField.PartName;
+         config.partServiceSort2       = SortField.PartServiceName;
          config.partServiceSort3       = SortField.DateFirstUsed;
 
          break;
@@ -252,10 +254,12 @@ public class EquipmentConfigManager {
          Util.setXmlEnum(xmlConfig, ATTR_EQUIPMENT_SORT_1, config.equipmentSort1);
          Util.setXmlEnum(xmlConfig, ATTR_EQUIPMENT_SORT_2, config.equipmentSort2);
          Util.setXmlEnum(xmlConfig, ATTR_EQUIPMENT_SORT_3, config.equipmentSort3);
+         Util.setXmlEnum(xmlConfig, ATTR_EQUIPMENT_SORT_4, config.equipmentSort4);
 
          Util.setXmlEnum(xmlConfig, ATTR_PART_SERVICE_SORT_1, config.partServiceSort1);
          Util.setXmlEnum(xmlConfig, ATTR_PART_SERVICE_SORT_2, config.partServiceSort2);
          Util.setXmlEnum(xmlConfig, ATTR_PART_SERVICE_SORT_3, config.partServiceSort3);
+         Util.setXmlEnum(xmlConfig, ATTR_PART_SERVICE_SORT_4, config.partServiceSort4);
       }
    }
 
@@ -345,14 +349,15 @@ public class EquipmentConfigManager {
       config.id                  = Util.getXmlString(xmlConfig,            ATTR_ID,                   UUID.randomUUID().toString());
       config.name                = Util.getXmlString(xmlConfig,            ATTR_CONFIG_NAME,          UI.EMPTY_STRING);
 
-
       config.equipmentSort1      = (SortField) Util.getXmlEnum(xmlConfig,  ATTR_EQUIPMENT_SORT_1,     SortField.None);
       config.equipmentSort2      = (SortField) Util.getXmlEnum(xmlConfig,  ATTR_EQUIPMENT_SORT_2,     SortField.None);
       config.equipmentSort3      = (SortField) Util.getXmlEnum(xmlConfig,  ATTR_EQUIPMENT_SORT_3,     SortField.None);
+      config.equipmentSort4      = (SortField) Util.getXmlEnum(xmlConfig,  ATTR_EQUIPMENT_SORT_4,     SortField.None);
 
       config.partServiceSort1    = (SortField) Util.getXmlEnum(xmlConfig,  ATTR_PART_SERVICE_SORT_1,  SortField.None);
       config.partServiceSort2    = (SortField) Util.getXmlEnum(xmlConfig,  ATTR_PART_SERVICE_SORT_2,  SortField.None);
       config.partServiceSort3    = (SortField) Util.getXmlEnum(xmlConfig,  ATTR_PART_SERVICE_SORT_3,  SortField.None);
+      config.partServiceSort4    = (SortField) Util.getXmlEnum(xmlConfig,  ATTR_PART_SERVICE_SORT_4,  SortField.None);
 
 // SET_FORMATTING_ON
    }

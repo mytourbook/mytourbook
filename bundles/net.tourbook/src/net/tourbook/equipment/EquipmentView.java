@@ -198,6 +198,7 @@ public class EquipmentView extends ViewPart implements
    private ColumnManager                      _columnManager;
    private TVIEquipmentView_Root              _rootItem;
    private TourDoubleClickState               _tourDoubleClickState                    = new TourDoubleClickState();
+   private EquipmentViewConfig                _activeConfig;
 
    private MenuManager                        _viewerMenuManager;
    private Menu                               _treeContextMenu;
@@ -329,6 +330,7 @@ public class EquipmentView extends ViewPart implements
          onAction_DeleteEquipment();
       }
    }
+
    private class ActionDeletePart extends Action {
 
       ActionDeletePart() {
@@ -457,9 +459,7 @@ public class EquipmentView extends ViewPart implements
 
    private class ActionEquipmentOptions extends ActionToolbarSlideoutAdv {
 
-
-      private SlideoutEquipmentOptions    _slideoutEquipmentOptions;
-
+      private SlideoutEquipmentOptions _slideoutEquipmentOptions;
 
       /**
        * @param equipmentView
@@ -593,76 +593,10 @@ public class EquipmentView extends ViewPart implements
     */
    private final class EquipmentComparator extends ViewerComparator {
       @Override
+
       public int compare(final Viewer viewer, final Object obj1, final Object obj2) {
 
-         if (obj1 instanceof final TVIEquipmentView_Equipment item1
-               && obj2 instanceof final TVIEquipmentView_Equipment item2) {
-
-            final Equipment equipment1 = item1.getEquipment();
-            final Equipment equipment2 = item2.getEquipment();
-
-            // 1st sort by collation ID
-            int compareDiff = equipment1.getCollateIdEmptyChecked().compareTo(equipment2.getCollateIdEmptyChecked());
-
-            // 2nd sort by date
-            if (compareDiff == 0) {
-
-               final long date1 = equipment1.getDateUsed();
-               final long date2 = equipment2.getDateUsed();
-
-               final long dateDiff = date1 - date2;
-
-               // diff value can be larger than Integer.MAX_VALUE
-               if (dateDiff > 0) {
-                  compareDiff = 1;
-               } else if (dateDiff < 0) {
-                  compareDiff = -1;
-               }
-            }
-
-            return compareDiff;
-
-//            return equipment1.getName().compareToIgnoreCase(equipment2.getName());
-
-         } else if (obj1 instanceof final TVIEquipmentView_Part item1
-               && obj2 instanceof final TVIEquipmentView_Part item2) {
-
-            // sort parts/services
-
-            final EquipmentPart part1 = item1.getPart();
-            final EquipmentPart part2 = item2.getPart();
-
-            // 1st sort parts before services
-            final int itemType1 = part1.getItemType();
-            final int itemType2 = part2.getItemType();
-            int compareDiff = itemType1 - itemType2;
-
-            // 2st sort by collation ID
-            if (compareDiff == 0) {
-
-               compareDiff = part1.getCollateIdEmptyChecked().compareTo(part2.getCollateIdEmptyChecked());
-            }
-
-            // 3nd sort by date
-            if (compareDiff == 0) {
-
-               final long date1 = part1.getDateUsed();
-               final long date2 = part2.getDateUsed();
-
-               final long dateDiff = date1 - date2;
-
-               // diff value can be larger than Integer.MAX_VALUE
-               if (dateDiff > 0) {
-                  compareDiff = 1;
-               } else if (dateDiff < 0) {
-                  compareDiff = -1;
-               }
-            }
-
-            return compareDiff;
-         }
-
-         return 0;
+         return onCompare(viewer, obj1, obj2);
       }
    }
 
@@ -3947,6 +3881,214 @@ public class EquipmentView extends ViewPart implements
       }
    }
 
+   private int onCompare(final Viewer viewer, final Object obj1, final Object obj2) {
+
+      long compareDiff = 0;
+
+      if (obj1 instanceof final TVIEquipmentView_Equipment item1
+            && obj2 instanceof final TVIEquipmentView_Equipment item2) {
+
+         // sort equipment
+
+         final Equipment equipment1 = item1.getEquipment();
+         final Equipment equipment2 = item2.getEquipment();
+
+         final SortField sort1 = _activeConfig.equipmentSort1;
+         if (sort1.equals(SortField.None) == false) {
+            compareDiff = onCompare_Equipment(sort1, equipment1, equipment2);
+         }
+
+         if (compareDiff == 0) {
+            final SortField sort2 = _activeConfig.equipmentSort2;
+            if (sort2.equals(SortField.None) == false) {
+               compareDiff = onCompare_Equipment(sort2, equipment1, equipment2);
+            }
+         }
+
+         if (compareDiff == 0) {
+            final SortField sort3 = _activeConfig.equipmentSort3;
+            if (sort3.equals(SortField.None) == false) {
+               compareDiff = onCompare_Equipment(sort3, equipment1, equipment2);
+            }
+         }
+
+         if (compareDiff == 0) {
+            final SortField sort4 = _activeConfig.equipmentSort4;
+            if (sort4.equals(SortField.None) == false) {
+               compareDiff = onCompare_Equipment(sort4, equipment1, equipment2);
+            }
+         }
+
+      } else if (obj1 instanceof final TVIEquipmentView_Part item1
+            && obj2 instanceof final TVIEquipmentView_Part item2) {
+
+         // sort parts/services
+
+         final EquipmentPart part1 = item1.getPart();
+         final EquipmentPart part2 = item2.getPart();
+
+         final SortField sort1 = _activeConfig.partServiceSort1;
+         if (sort1.equals(SortField.None) == false) {
+            compareDiff = onCompare_Part(sort1, part1, part2);
+         }
+
+         if (compareDiff == 0) {
+            final SortField sort2 = _activeConfig.partServiceSort2;
+            compareDiff = onCompare_Part(sort2, part1, part2);
+         }
+
+         if (compareDiff == 0) {
+            final SortField sort3 = _activeConfig.partServiceSort3;
+            if (sort3.equals(SortField.None) == false) {
+               compareDiff = onCompare_Part(sort3, part1, part2);
+            }
+         }
+
+         if (compareDiff == 0) {
+            final SortField sort4 = _activeConfig.partServiceSort4;
+            if (sort4.equals(SortField.None) == false) {
+               compareDiff = onCompare_Part(sort4, part1, part2);
+            }
+         }
+      }
+
+      // diff value can be larger than Integer.MAX_VALUE
+      if (compareDiff > 0) {
+         compareDiff = 1;
+      } else if (compareDiff < 0) {
+         compareDiff = -1;
+      }
+
+      return (int) compareDiff;
+   }
+
+   private long onCompare_Equipment(final SortField sortField,
+                                    final Equipment equipment1,
+                                    final Equipment equipment2) {
+
+// SET_FORMATTING_OFF
+
+      switch (sortField) {
+
+      case EquipmentName:     return equipment1.getName()                  .compareToIgnoreCase(equipment2.getName());
+      case EquipmentBrand:    return equipment1.getBrand()                 .compareToIgnoreCase(equipment2.getBrand());
+      case EquipmentModel:    return equipment1.getModel()                 .compareToIgnoreCase(equipment2.getModel());
+
+      case CollateID:         return equipment1.getCollateIdEmptyChecked() .compareToIgnoreCase(equipment2.getCollateIdEmptyChecked());
+
+      case DateFirstUsed:     return equipment1.getDateUsed()        - equipment2.getDateUsed();
+      case DatePurchased:     return equipment1.getDatePurchased()   - equipment2.getDatePurchased();
+
+      case None:
+      default:
+         break;
+      }
+// SET_FORMATTING_ON
+
+      return 0;
+   }
+
+   private long onCompare_Part(final SortField sortField,
+                               final EquipmentPart part1,
+                               final EquipmentPart part2) {
+
+// SET_FORMATTING_OFF
+
+      switch (sortField) {
+
+      case PartServiceName:      return part1.getName_Combined()           .compareToIgnoreCase(part2.getName_Combined());
+      case PartBrand:            return part1.getBrand()                   .compareToIgnoreCase(part2.getBrand());
+      case PartModel:            return part1.getModel()                   .compareToIgnoreCase(part2.getModel());
+
+      case CollateID:            return part1.getCollateIdEmptyChecked()   .compareToIgnoreCase(part2.getCollateIdEmptyChecked());
+
+      case DateFirstUsed:        return part1.getDateUsed()       - part2.getDateUsed();
+      case DatePurchased:        return part1.getDatePurchased()  - part2.getDatePurchased();
+
+      case PartsBeforeServices:  return part1.getItemType()       - part2.getItemType();
+      case ServicesBeforeParts:  return part2.getItemType()       - part1.getItemType();
+
+      case None:
+      default:
+         break;
+      }
+// SET_FORMATTING_ON
+
+      return 0;
+   }
+
+   public int onCompareZ_OLD(final Viewer viewer, final Object obj1, final Object obj2) {
+
+      if (obj1 instanceof final TVIEquipmentView_Equipment item1
+            && obj2 instanceof final TVIEquipmentView_Equipment item2) {
+
+         final Equipment equipment1 = item1.getEquipment();
+         final Equipment equipment2 = item2.getEquipment();
+
+         // 1st sort by collation ID
+         int compareDiff = equipment1.getCollateIdEmptyChecked().compareTo(equipment2.getCollateIdEmptyChecked());
+
+         // 2nd sort by date
+         if (compareDiff == 0) {
+
+            final long date1 = equipment1.getDateUsed();
+            final long date2 = equipment2.getDateUsed();
+
+            final long dateDiff = date1 - date2;
+
+            // diff value can be larger than Integer.MAX_VALUE
+            if (dateDiff > 0) {
+               compareDiff = 1;
+            } else if (dateDiff < 0) {
+               compareDiff = -1;
+            }
+         }
+
+         return compareDiff;
+
+//         return equipment1.getName().compareToIgnoreCase(equipment2.getName());
+
+      } else if (obj1 instanceof final TVIEquipmentView_Part item1
+            && obj2 instanceof final TVIEquipmentView_Part item2) {
+
+         // sort parts/services
+
+         final EquipmentPart part1 = item1.getPart();
+         final EquipmentPart part2 = item2.getPart();
+
+         // 1st sort parts before services
+         final int itemType1 = part1.getItemType();
+         final int itemType2 = part2.getItemType();
+         int compareDiff = itemType1 - itemType2;
+
+         // 2st sort by collation ID
+         if (compareDiff == 0) {
+
+            compareDiff = part1.getCollateIdEmptyChecked().compareTo(part2.getCollateIdEmptyChecked());
+         }
+
+         // 3nd sort by date
+         if (compareDiff == 0) {
+
+            final long date1 = part1.getDateUsed();
+            final long date2 = part2.getDateUsed();
+
+            final long dateDiff = date1 - date2;
+
+            // diff value can be larger than Integer.MAX_VALUE
+            if (dateDiff > 0) {
+               compareDiff = 1;
+            } else if (dateDiff < 0) {
+               compareDiff = -1;
+            }
+         }
+
+         return compareDiff;
+      }
+
+      return 0;
+   }
+
    private void onEquipmentTree_MouseDown(final Event event) {
 
       _isMouseContextMenu = event.button == 3;
@@ -4243,6 +4385,8 @@ public class EquipmentView extends ViewPart implements
       // single expand -> collapse others
       _isBehaviour_SingleExpand_CollapseOthers = Util.getStateBoolean(_state, STATE_IS_SINGLE_EXPAND_COLLAPSE_OTHERS, true);
       _actionSingleExpand_CollapseOthers.setChecked(_isBehaviour_SingleExpand_CollapseOthers);
+
+      _activeConfig = EquipmentConfigManager.getActiveConfig();
 
       restoreState_TreeItemHeight();
 
@@ -4715,6 +4859,8 @@ public class EquipmentView extends ViewPart implements
 
       // ensure to keep column width otherwise the columns are resized to the default width
       _columnManager.saveState(_state);
+
+      _activeConfig = EquipmentConfigManager.getActiveConfig();
 
       // prevent a selection which could expand/collapse a category item
       _isInExpandingSelection = true;

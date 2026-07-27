@@ -21,20 +21,22 @@ import net.tourbook.common.UI;
 
 public class EquipmentViewConfig {
 
-   private static final char NL        = UI.NEW_LINE;
+   private static final char NL               = UI.NEW_LINE;
 
-   String                    id        = UUID.randomUUID().toString();
+   String                    id               = UUID.randomUUID().toString();
 
-   String                    defaultId = EquipmentConfigManager.CONFIG_DEFAULT_ID_1;
-   String                    name      = EquipmentConfigManager.CONFIG_DEFAULT_ID_1;
+   String                    defaultId        = EquipmentConfigManager.CONFIG_DEFAULT_ID_1;
+   String                    name             = EquipmentConfigManager.CONFIG_DEFAULT_ID_1;
 
-   SortField                 equipmentSort1;
-   SortField                 equipmentSort2;
-   SortField                 equipmentSort3;
+   SortField                 equipmentSort1   = SortField.None;
+   SortField                 equipmentSort2   = SortField.None;
+   SortField                 equipmentSort3   = SortField.None;
+   SortField                 equipmentSort4   = SortField.None;
 
-   SortField                 partServiceSort1;
-   SortField                 partServiceSort2;
-   SortField                 partServiceSort3;
+   SortField                 partServiceSort1 = SortField.None;
+   SortField                 partServiceSort2 = SortField.None;
+   SortField                 partServiceSort3 = SortField.None;
+   SortField                 partServiceSort4 = SortField.None;
 
    @Override
    public String toString() {
@@ -50,11 +52,12 @@ public class EquipmentViewConfig {
             + " equipmentSort1   = " + equipmentSort1 + NL //              //$NON-NLS-1$
             + " equipmentSort2   = " + equipmentSort2 + NL //              //$NON-NLS-1$
             + " equipmentSort3   = " + equipmentSort3 + NL //              //$NON-NLS-1$
+            + " equipmentSort4   = " + equipmentSort4 + NL //              //$NON-NLS-1$
 
             + " partServiceSort1 = " + partServiceSort1 + NL //            //$NON-NLS-1$
             + " partServiceSort2 = " + partServiceSort2 + NL //            //$NON-NLS-1$
             + " partServiceSort3 = " + partServiceSort3 + NL //            //$NON-NLS-1$
-
+            + " partServiceSort4 = " + partServiceSort4 + NL //            //$NON-NLS-1$
       ;
    }
 }

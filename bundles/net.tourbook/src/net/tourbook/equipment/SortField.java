@@ -26,7 +26,7 @@ public enum SortField {
    EquipmentBrand, //
    EquipmentModel, //
 
-   PartName, //
+   PartServiceName, //
    PartBrand, //
    PartModel, //
 
