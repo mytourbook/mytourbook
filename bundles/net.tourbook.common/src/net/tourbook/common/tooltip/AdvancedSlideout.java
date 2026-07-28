@@ -141,6 +141,7 @@ public abstract class AdvancedSlideout extends AdvancedSlideoutShell {
    /**
     * @param ownerControl
     * @param state
+    *           This state is used to keep e.g. the slideout window size/position
     * @param slideoutDefaultSize
     *           Slideout default size or <code>null</code> when not available.
     *           <p>
