@@ -80,6 +80,14 @@ public class SlideoutEquipmentOptions extends AdvancedSlideout implements IActio
    private Composite _shellContainer;
 
    private Button    _btnReset;
+   private Button    _chkEquipmentSortInvers1;
+   private Button    _chkEquipmentSortInvers2;
+   private Button    _chkEquipmentSortInvers3;
+   private Button    _chkEquipmentSortInvers4;
+   private Button    _chkPartServiceSortInvers1;
+   private Button    _chkPartServiceSortInvers2;
+   private Button    _chkPartServiceSortInvers3;
+   private Button    _chkPartServiceSortInvers4;
    private Button    _rdoShowCustomHeight;
    private Button    _rdoShowDefaultHeight;
 
@@ -213,16 +221,21 @@ public class SlideoutEquipmentOptions extends AdvancedSlideout implements IActio
 
    private void createUI_100_Sorting(final Composite parent) {
 
+      final String inversLabel = UI.SYMBOL_ARROW_UP_DOWN_II;
       final String sortTooltip = "The view items are sorted firstly by the first sort field which is not empty, then by the second and so on";
+      final String inverseTooltip = "Toggle sort direction";
 
       final GridDataFactory gd = GridDataFactory.fillDefaults().grab(true, false);
 
       final Group group = new Group(parent, SWT.NONE);
       group.setText("Sort");
       gd.applyTo(group);
-      GridLayoutFactory.swtDefaults().numColumns(2).applyTo(group);
+      GridLayoutFactory.swtDefaults().numColumns(3).applyTo(group);
 //      group.setBackground(UI.SYS_COLOR_YELLOW);
       {
+         /*
+          * Equipment
+          */
          {
             final Label label = UI.createLabel(group, "Equipment by");
             label.setToolTipText(sortTooltip);
@@ -230,8 +243,12 @@ public class SlideoutEquipmentOptions extends AdvancedSlideout implements IActio
             _comboEquipmentSort1 = new Combo(group, SWT.READ_ONLY | SWT.BORDER);
             _comboEquipmentSort1.addFocusListener(_keepOpenListener);
             _comboEquipmentSort1.addSelectionListener(_defaultSelectionListener);
-
             gd.applyTo(_comboEquipmentSort1);
+
+            _chkEquipmentSortInvers1 = new Button(group, SWT.CHECK);
+            _chkEquipmentSortInvers1.setText(inversLabel);
+            _chkEquipmentSortInvers1.setToolTipText(inverseTooltip);
+            _chkEquipmentSortInvers1.addSelectionListener(_defaultSelectionListener);
          }
          {
             UI.createSpacer_Horizontal(group);
@@ -239,17 +256,25 @@ public class SlideoutEquipmentOptions extends AdvancedSlideout implements IActio
             _comboEquipmentSort2 = new Combo(group, SWT.READ_ONLY | SWT.BORDER);
             _comboEquipmentSort2.addFocusListener(_keepOpenListener);
             _comboEquipmentSort2.addSelectionListener(_defaultSelectionListener);
-
             gd.applyTo(_comboEquipmentSort2);
+
+            _chkEquipmentSortInvers2 = new Button(group, SWT.CHECK);
+            _chkEquipmentSortInvers2.setText(inversLabel);
+            _chkEquipmentSortInvers2.setToolTipText(inverseTooltip);
+            _chkEquipmentSortInvers2.addSelectionListener(_defaultSelectionListener);
          }
          {
             UI.createSpacer_Horizontal(group);
 
             _comboEquipmentSort3 = new Combo(group, SWT.READ_ONLY | SWT.BORDER);
             _comboEquipmentSort3.addFocusListener(_keepOpenListener);
+            gd.applyTo(_comboEquipmentSort3);
             _comboEquipmentSort3.addSelectionListener(_defaultSelectionListener);
 
-            gd.applyTo(_comboEquipmentSort3);
+            _chkEquipmentSortInvers3 = new Button(group, SWT.CHECK);
+            _chkEquipmentSortInvers3.setText(inversLabel);
+            _chkEquipmentSortInvers3.setToolTipText(inverseTooltip);
+            _chkEquipmentSortInvers3.addSelectionListener(_defaultSelectionListener);
          }
          {
             UI.createSpacer_Horizontal(group);
@@ -257,9 +282,17 @@ public class SlideoutEquipmentOptions extends AdvancedSlideout implements IActio
             _comboEquipmentSort4 = new Combo(group, SWT.READ_ONLY | SWT.BORDER);
             _comboEquipmentSort4.addFocusListener(_keepOpenListener);
             _comboEquipmentSort4.addSelectionListener(_defaultSelectionListener);
-
             gd.applyTo(_comboEquipmentSort4);
+
+            _chkEquipmentSortInvers4 = new Button(group, SWT.CHECK);
+            _chkEquipmentSortInvers4.setText(inversLabel);
+            _chkEquipmentSortInvers4.setToolTipText(inverseTooltip);
+            _chkEquipmentSortInvers4.addSelectionListener(_defaultSelectionListener);
          }
+
+         /*
+          * Part/Service
+          */
          {
             final Label label = UI.createLabel(group, "Part/Service by");
             label.setToolTipText(sortTooltip);
@@ -267,8 +300,12 @@ public class SlideoutEquipmentOptions extends AdvancedSlideout implements IActio
             _comboPartServiceSort1 = new Combo(group, SWT.READ_ONLY | SWT.BORDER);
             _comboPartServiceSort1.addFocusListener(_keepOpenListener);
             _comboPartServiceSort1.addSelectionListener(_defaultSelectionListener);
-
             gd.applyTo(_comboPartServiceSort1);
+
+            _chkPartServiceSortInvers1 = new Button(group, SWT.CHECK);
+            _chkPartServiceSortInvers1.setText(inversLabel);
+            _chkPartServiceSortInvers1.setToolTipText(inverseTooltip);
+            _chkPartServiceSortInvers1.addSelectionListener(_defaultSelectionListener);
          }
          {
             UI.createSpacer_Horizontal(group);
@@ -276,8 +313,12 @@ public class SlideoutEquipmentOptions extends AdvancedSlideout implements IActio
             _comboPartServiceSort2 = new Combo(group, SWT.READ_ONLY | SWT.BORDER);
             _comboPartServiceSort2.addFocusListener(_keepOpenListener);
             _comboPartServiceSort2.addSelectionListener(_defaultSelectionListener);
-
             gd.applyTo(_comboPartServiceSort2);
+
+            _chkPartServiceSortInvers2 = new Button(group, SWT.CHECK);
+            _chkPartServiceSortInvers2.setText(inversLabel);
+            _chkPartServiceSortInvers2.setToolTipText(inverseTooltip);
+            _chkPartServiceSortInvers2.addSelectionListener(_defaultSelectionListener);
          }
          {
             UI.createSpacer_Horizontal(group);
@@ -285,8 +326,12 @@ public class SlideoutEquipmentOptions extends AdvancedSlideout implements IActio
             _comboPartServiceSort3 = new Combo(group, SWT.READ_ONLY | SWT.BORDER);
             _comboPartServiceSort3.addFocusListener(_keepOpenListener);
             _comboPartServiceSort3.addSelectionListener(_defaultSelectionListener);
-
             gd.applyTo(_comboPartServiceSort3);
+
+            _chkPartServiceSortInvers3 = new Button(group, SWT.CHECK);
+            _chkPartServiceSortInvers3.setText(inversLabel);
+            _chkPartServiceSortInvers3.setToolTipText(inverseTooltip);
+            _chkPartServiceSortInvers3.addSelectionListener(_defaultSelectionListener);
          }
          {
             UI.createSpacer_Horizontal(group);
@@ -294,8 +339,12 @@ public class SlideoutEquipmentOptions extends AdvancedSlideout implements IActio
             _comboPartServiceSort4 = new Combo(group, SWT.READ_ONLY | SWT.BORDER);
             _comboPartServiceSort4.addFocusListener(_keepOpenListener);
             _comboPartServiceSort4.addSelectionListener(_defaultSelectionListener);
-
             gd.applyTo(_comboPartServiceSort4);
+
+            _chkPartServiceSortInvers4 = new Button(group, SWT.CHECK);
+            _chkPartServiceSortInvers4.setText(inversLabel);
+            _chkPartServiceSortInvers4.setToolTipText(inverseTooltip);
+            _chkPartServiceSortInvers4.addSelectionListener(_defaultSelectionListener);
          }
       }
    }
@@ -695,6 +744,16 @@ public class SlideoutEquipmentOptions extends AdvancedSlideout implements IActio
       config.partServiceSort3    = getSelectedEquipmentPartSort(_comboPartServiceSort3);
       config.partServiceSort4    = getSelectedEquipmentPartSort(_comboPartServiceSort4);
 
+      config.equipmentSortInverse1     = _chkEquipmentSortInvers1.getSelection();
+      config.equipmentSortInverse2     = _chkEquipmentSortInvers2.getSelection();
+      config.equipmentSortInverse3     = _chkEquipmentSortInvers3.getSelection();
+      config.equipmentSortInverse4     = _chkEquipmentSortInvers4.getSelection();
+
+      config.partServiceSortInverse1   = _chkPartServiceSortInvers1.getSelection();
+      config.partServiceSortInverse2   = _chkPartServiceSortInvers2.getSelection();
+      config.partServiceSortInverse3   = _chkPartServiceSortInvers3.getSelection();
+      config.partServiceSortInverse4   = _chkPartServiceSortInvers4.getSelection();
+
       _state.put(TourDataEditorView.STATE_EQUIPMENT_IS_USE_VIEWER_DEFAULT_HEIGHT,   _rdoShowDefaultHeight      .getSelection());
       _state.put(TourDataEditorView.STATE_EQUIPMENT_VIEWER_IMAGE_HEIGHT,            _spinnerViewerImageHeight  .getSelection());
 
@@ -738,6 +797,16 @@ public class SlideoutEquipmentOptions extends AdvancedSlideout implements IActio
          _comboPartServiceSort2     .select(getEquipmentPartServiceSortIndex(config.partServiceSort2));
          _comboPartServiceSort3     .select(getEquipmentPartServiceSortIndex(config.partServiceSort3));
          _comboPartServiceSort4     .select(getEquipmentPartServiceSortIndex(config.partServiceSort4));
+
+         _chkEquipmentSortInvers1   .setSelection(config.equipmentSortInverse1);
+         _chkEquipmentSortInvers2   .setSelection(config.equipmentSortInverse2);
+         _chkEquipmentSortInvers3   .setSelection(config.equipmentSortInverse3);
+         _chkEquipmentSortInvers4   .setSelection(config.equipmentSortInverse4);
+
+         _chkPartServiceSortInvers1 .setSelection(config.partServiceSortInverse1);
+         _chkPartServiceSortInvers2 .setSelection(config.partServiceSortInverse2);
+         _chkPartServiceSortInvers3 .setSelection(config.partServiceSortInverse3);
+         _chkPartServiceSortInvers4 .setSelection(config.partServiceSortInverse4);
 
          _rdoShowDefaultHeight      .setSelection(isUseDefaultHeight);
          _rdoShowCustomHeight       .setSelection(isUseDefaultHeight == false);

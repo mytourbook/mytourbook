@@ -33,10 +33,20 @@ public class EquipmentViewConfig {
    SortField                 equipmentSort3   = SortField.None;
    SortField                 equipmentSort4   = SortField.None;
 
+   boolean                   equipmentSortInverse1;
+   boolean                   equipmentSortInverse2;
+   boolean                   equipmentSortInverse3;
+   boolean                   equipmentSortInverse4;
+
    SortField                 partServiceSort1 = SortField.None;
    SortField                 partServiceSort2 = SortField.None;
    SortField                 partServiceSort3 = SortField.None;
    SortField                 partServiceSort4 = SortField.None;
+
+   boolean                   partServiceSortInverse1;
+   boolean                   partServiceSortInverse2;
+   boolean                   partServiceSortInverse3;
+   boolean                   partServiceSortInverse4;
 
    @Override
    public String toString() {

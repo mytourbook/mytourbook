@@ -56,33 +56,41 @@ public class EquipmentConfigManager {
    /*
     * Root
     */
-   private static final String                    TAG_ROOT                 = "EquipmentConfiguration"; //$NON-NLS-1$
-   private static final String                    ATTR_CONFIG_VERSION      = "configVersion";          //$NON-NLS-1$
+   private static final String                    TAG_ROOT                         = "EquipmentConfiguration"; //$NON-NLS-1$
+   private static final String                    ATTR_CONFIG_VERSION              = "configVersion";          //$NON-NLS-1$
 
-   private static final String                    TAG_SORT_VIEW            = "SortView";               //$NON-NLS-1$
-   private static final String                    TAG_SORT_FIELDS          = "SortField";              //$NON-NLS-1$
+   private static final String                    TAG_SORT_VIEW                    = "SortView";               //$NON-NLS-1$
+   private static final String                    TAG_SORT_FIELDS                  = "SortField";              //$NON-NLS-1$
 
-   private static final String                    ATTR_EQUIPMENT_SORT_1    = "equipmentSort1";         //$NON-NLS-1$
-   private static final String                    ATTR_EQUIPMENT_SORT_2    = "equipmentSort2";         //$NON-NLS-1$
-   private static final String                    ATTR_EQUIPMENT_SORT_3    = "equipmentSort3";         //$NON-NLS-1$
-   private static final String                    ATTR_EQUIPMENT_SORT_4    = "equipmentSort4";         //$NON-NLS-1$
-   private static final String                    ATTR_PART_SERVICE_SORT_1 = "partServiceSort1";       //$NON-NLS-1$
-   private static final String                    ATTR_PART_SERVICE_SORT_2 = "partServiceSort2";       //$NON-NLS-1$
-   private static final String                    ATTR_PART_SERVICE_SORT_3 = "partServiceSort3";       //$NON-NLS-1$
-   private static final String                    ATTR_PART_SERVICE_SORT_4 = "partServiceSort4";       //$NON-NLS-1$
+   private static final String                    ATTR_EQUIPMENT_SORT_1            = "equipmentSort1";         //$NON-NLS-1$
+   private static final String                    ATTR_EQUIPMENT_SORT_2            = "equipmentSort2";         //$NON-NLS-1$
+   private static final String                    ATTR_EQUIPMENT_SORT_3            = "equipmentSort3";         //$NON-NLS-1$
+   private static final String                    ATTR_EQUIPMENT_SORT_4            = "equipmentSort4";         //$NON-NLS-1$
+   private static final String                    ATTR_EQUIPMENT_SORT_INVERSE_1    = "equipmentSortInverse1";  //$NON-NLS-1$
+   private static final String                    ATTR_EQUIPMENT_SORT_INVERSE_2    = "equipmentSortInverse2";  //$NON-NLS-1$
+   private static final String                    ATTR_EQUIPMENT_SORT_INVERSE_3    = "equipmentSortInverse3";  //$NON-NLS-1$
+   private static final String                    ATTR_EQUIPMENT_SORT_INVERSE_4    = "equipmentSortInverse4";  //$NON-NLS-1$
+   private static final String                    ATTR_PART_SERVICE_SORT_1         = "partServiceSort1";       //$NON-NLS-1$
+   private static final String                    ATTR_PART_SERVICE_SORT_2         = "partServiceSort2";       //$NON-NLS-1$
+   private static final String                    ATTR_PART_SERVICE_SORT_3         = "partServiceSort3";       //$NON-NLS-1$
+   private static final String                    ATTR_PART_SERVICE_SORT_4         = "partServiceSort4";       //$NON-NLS-1$
+   private static final String                    ATTR_PART_SERVICE_SORT_INVERSE_1 = "partServiceSort1";       //$NON-NLS-1$
+   private static final String                    ATTR_PART_SERVICE_SORT_INVERSE_2 = "partServiceSort2";       //$NON-NLS-1$
+   private static final String                    ATTR_PART_SERVICE_SORT_INVERSE_3 = "partServiceSort3";       //$NON-NLS-1$
+   private static final String                    ATTR_PART_SERVICE_SORT_INVERSE_4 = "partServiceSort4";       //$NON-NLS-1$
 
-   static final String                            CONFIG_DEFAULT_ID_1      = "#1";                     //$NON-NLS-1$
-   static final String                            CONFIG_DEFAULT_ID_2      = "#2";                     //$NON-NLS-1$
-   static final String                            CONFIG_DEFAULT_ID_3      = "#3";                     //$NON-NLS-1$
-   static final String                            CONFIG_DEFAULT_ID_4      = "#4";                     //$NON-NLS-1$
-   static final String                            CONFIG_DEFAULT_ID_5      = "#5";                     //$NON-NLS-1$
-   static final String                            CONFIG_DEFAULT_ID_6      = "#6";                     //$NON-NLS-1$
-   static final String                            CONFIG_DEFAULT_ID_7      = "#7";                     //$NON-NLS-1$
-   static final String                            CONFIG_DEFAULT_ID_8      = "#8";                     //$NON-NLS-1$
-   static final String                            CONFIG_DEFAULT_ID_9      = "#9";                     //$NON-NLS-1$
-   static final String                            CONFIG_DEFAULT_ID_10     = "#10";                    //$NON-NLS-1$
+   static final String                            CONFIG_DEFAULT_ID_1              = "#1";                     //$NON-NLS-1$
+   static final String                            CONFIG_DEFAULT_ID_2              = "#2";                     //$NON-NLS-1$
+   static final String                            CONFIG_DEFAULT_ID_3              = "#3";                     //$NON-NLS-1$
+   static final String                            CONFIG_DEFAULT_ID_4              = "#4";                     //$NON-NLS-1$
+   static final String                            CONFIG_DEFAULT_ID_5              = "#5";                     //$NON-NLS-1$
+   static final String                            CONFIG_DEFAULT_ID_6              = "#6";                     //$NON-NLS-1$
+   static final String                            CONFIG_DEFAULT_ID_7              = "#7";                     //$NON-NLS-1$
+   static final String                            CONFIG_DEFAULT_ID_8              = "#8";                     //$NON-NLS-1$
+   static final String                            CONFIG_DEFAULT_ID_9              = "#9";                     //$NON-NLS-1$
+   static final String                            CONFIG_DEFAULT_ID_10             = "#10";                    //$NON-NLS-1$
 
-   private static final List<EquipmentViewConfig> _allEquipmentViewConfigs = new ArrayList<>();
+   private static final List<EquipmentViewConfig> _allEquipmentViewConfigs         = new ArrayList<>();
 
    private static EquipmentViewConfig             _activeConfig;
    private static String                          _fromXml_ActiveConfigId;
@@ -117,7 +125,6 @@ public class EquipmentConfigManager {
          new SortFieldUI("Purchased date",         SortField.DatePurchased),
 
          new SortFieldUI("Parts before services",  SortField.PartsBeforeServices),
-         new SortFieldUI("Services before parts",  SortField.ServicesBeforeParts),
    };
 
 // SET_FORMATTING_ON
@@ -248,18 +255,32 @@ public class EquipmentConfigManager {
       // <SortFields>
       final IMemento xmlConfig = xmlAllConfigs.createChild(TAG_SORT_FIELDS);
       {
-         xmlConfig.putString(ATTR_ID, config.id);
-         xmlConfig.putString(ATTR_CONFIG_NAME, config.name);
+// SET_FORMATTING_OFF
+         
+         xmlConfig.putString(ATTR_ID,                             config.id);
+         xmlConfig.putString(ATTR_CONFIG_NAME,                    config.name);
 
-         Util.setXmlEnum(xmlConfig, ATTR_EQUIPMENT_SORT_1, config.equipmentSort1);
-         Util.setXmlEnum(xmlConfig, ATTR_EQUIPMENT_SORT_2, config.equipmentSort2);
-         Util.setXmlEnum(xmlConfig, ATTR_EQUIPMENT_SORT_3, config.equipmentSort3);
-         Util.setXmlEnum(xmlConfig, ATTR_EQUIPMENT_SORT_4, config.equipmentSort4);
+         xmlConfig.putBoolean(ATTR_EQUIPMENT_SORT_INVERSE_1,      config.equipmentSortInverse1);
+         xmlConfig.putBoolean(ATTR_EQUIPMENT_SORT_INVERSE_2,      config.equipmentSortInverse2);
+         xmlConfig.putBoolean(ATTR_EQUIPMENT_SORT_INVERSE_3,      config.equipmentSortInverse3);
+         xmlConfig.putBoolean(ATTR_EQUIPMENT_SORT_INVERSE_4,      config.equipmentSortInverse4);
 
-         Util.setXmlEnum(xmlConfig, ATTR_PART_SERVICE_SORT_1, config.partServiceSort1);
-         Util.setXmlEnum(xmlConfig, ATTR_PART_SERVICE_SORT_2, config.partServiceSort2);
-         Util.setXmlEnum(xmlConfig, ATTR_PART_SERVICE_SORT_3, config.partServiceSort3);
-         Util.setXmlEnum(xmlConfig, ATTR_PART_SERVICE_SORT_4, config.partServiceSort4);
+         xmlConfig.putBoolean(ATTR_PART_SERVICE_SORT_INVERSE_1,   config.partServiceSortInverse1);
+         xmlConfig.putBoolean(ATTR_PART_SERVICE_SORT_INVERSE_2,   config.partServiceSortInverse2);
+         xmlConfig.putBoolean(ATTR_PART_SERVICE_SORT_INVERSE_3,   config.partServiceSortInverse3);
+         xmlConfig.putBoolean(ATTR_PART_SERVICE_SORT_INVERSE_4,   config.partServiceSortInverse4);
+
+         Util.setXmlEnum(xmlConfig, ATTR_EQUIPMENT_SORT_1,        config.equipmentSort1);
+         Util.setXmlEnum(xmlConfig, ATTR_EQUIPMENT_SORT_2,        config.equipmentSort2);
+         Util.setXmlEnum(xmlConfig, ATTR_EQUIPMENT_SORT_3,        config.equipmentSort3);
+         Util.setXmlEnum(xmlConfig, ATTR_EQUIPMENT_SORT_4,        config.equipmentSort4);
+                                                                  
+         Util.setXmlEnum(xmlConfig, ATTR_PART_SERVICE_SORT_1,     config.partServiceSort1);
+         Util.setXmlEnum(xmlConfig, ATTR_PART_SERVICE_SORT_2,     config.partServiceSort2);
+         Util.setXmlEnum(xmlConfig, ATTR_PART_SERVICE_SORT_3,     config.partServiceSort3);
+         Util.setXmlEnum(xmlConfig, ATTR_PART_SERVICE_SORT_4,     config.partServiceSort4);
+         
+// SET_FORMATTING_ON
       }
    }
 
@@ -346,18 +367,28 @@ public class EquipmentConfigManager {
 
 // SET_FORMATTING_OFF
 
-      config.id                  = Util.getXmlString(xmlConfig,            ATTR_ID,                   UUID.randomUUID().toString());
-      config.name                = Util.getXmlString(xmlConfig,            ATTR_CONFIG_NAME,          UI.EMPTY_STRING);
+      config.id                        = Util.getXmlString(xmlConfig,      ATTR_ID,             UUID.randomUUID().toString());
+      config.name                      = Util.getXmlString(xmlConfig,      ATTR_CONFIG_NAME,    UI.EMPTY_STRING);
+      
+      config.equipmentSortInverse1     = Util.getXmlBoolean(xmlConfig,     ATTR_EQUIPMENT_SORT_INVERSE_1,      false);
+      config.equipmentSortInverse2     = Util.getXmlBoolean(xmlConfig,     ATTR_EQUIPMENT_SORT_INVERSE_2,      false);
+      config.equipmentSortInverse3     = Util.getXmlBoolean(xmlConfig,     ATTR_EQUIPMENT_SORT_INVERSE_3,      false);
+      config.equipmentSortInverse4     = Util.getXmlBoolean(xmlConfig,     ATTR_EQUIPMENT_SORT_INVERSE_4,      false);
+      
+      config.partServiceSortInverse1   = Util.getXmlBoolean(xmlConfig,     ATTR_PART_SERVICE_SORT_INVERSE_1,   false);
+      config.partServiceSortInverse2   = Util.getXmlBoolean(xmlConfig,     ATTR_PART_SERVICE_SORT_INVERSE_2,   false);
+      config.partServiceSortInverse3   = Util.getXmlBoolean(xmlConfig,     ATTR_PART_SERVICE_SORT_INVERSE_3,   false);
+      config.partServiceSortInverse4   = Util.getXmlBoolean(xmlConfig,     ATTR_PART_SERVICE_SORT_INVERSE_4,   false);
 
-      config.equipmentSort1      = (SortField) Util.getXmlEnum(xmlConfig,  ATTR_EQUIPMENT_SORT_1,     SortField.None);
-      config.equipmentSort2      = (SortField) Util.getXmlEnum(xmlConfig,  ATTR_EQUIPMENT_SORT_2,     SortField.None);
-      config.equipmentSort3      = (SortField) Util.getXmlEnum(xmlConfig,  ATTR_EQUIPMENT_SORT_3,     SortField.None);
-      config.equipmentSort4      = (SortField) Util.getXmlEnum(xmlConfig,  ATTR_EQUIPMENT_SORT_4,     SortField.None);
+      config.equipmentSort1            = (SortField) Util.getXmlEnum(xmlConfig,  ATTR_EQUIPMENT_SORT_1,     SortField.None);
+      config.equipmentSort2            = (SortField) Util.getXmlEnum(xmlConfig,  ATTR_EQUIPMENT_SORT_2,     SortField.None);
+      config.equipmentSort3            = (SortField) Util.getXmlEnum(xmlConfig,  ATTR_EQUIPMENT_SORT_3,     SortField.None);
+      config.equipmentSort4            = (SortField) Util.getXmlEnum(xmlConfig,  ATTR_EQUIPMENT_SORT_4,     SortField.None);
 
-      config.partServiceSort1    = (SortField) Util.getXmlEnum(xmlConfig,  ATTR_PART_SERVICE_SORT_1,  SortField.None);
-      config.partServiceSort2    = (SortField) Util.getXmlEnum(xmlConfig,  ATTR_PART_SERVICE_SORT_2,  SortField.None);
-      config.partServiceSort3    = (SortField) Util.getXmlEnum(xmlConfig,  ATTR_PART_SERVICE_SORT_3,  SortField.None);
-      config.partServiceSort4    = (SortField) Util.getXmlEnum(xmlConfig,  ATTR_PART_SERVICE_SORT_4,  SortField.None);
+      config.partServiceSort1          = (SortField) Util.getXmlEnum(xmlConfig,  ATTR_PART_SERVICE_SORT_1,  SortField.None);
+      config.partServiceSort2          = (SortField) Util.getXmlEnum(xmlConfig,  ATTR_PART_SERVICE_SORT_2,  SortField.None);
+      config.partServiceSort3          = (SortField) Util.getXmlEnum(xmlConfig,  ATTR_PART_SERVICE_SORT_3,  SortField.None);
+      config.partServiceSort4          = (SortField) Util.getXmlEnum(xmlConfig,  ATTR_PART_SERVICE_SORT_4,  SortField.None);
 
 // SET_FORMATTING_ON
    }

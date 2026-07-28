@@ -36,5 +36,4 @@ public enum SortField {
    CollateID, //
 
    PartsBeforeServices, //
-   ServicesBeforeParts, //
 }

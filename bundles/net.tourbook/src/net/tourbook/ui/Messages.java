@@ -287,6 +287,7 @@ public class Messages extends NLS {
    public static String        ColumnFactory_Equipment_DateCollate_Until_Tooltip;
    public static String        ColumnFactory_Equipment_DateDuration;
    public static String        ColumnFactory_Equipment_DateDuration_Tooltip;
+   public static String        ColumnFactory_Equipment_DatePurchased_Header;
    public static String        ColumnFactory_Equipment_DatePurchased_Name;
    public static String        ColumnFactory_Equipment_DateRetired_Label;
    public static String        ColumnFactory_Equipment_DateRetired_Tooltip;

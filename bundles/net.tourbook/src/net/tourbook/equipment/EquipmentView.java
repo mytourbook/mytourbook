@@ -3896,12 +3896,14 @@ public class EquipmentView extends ViewPart implements
          final SortField sort1 = _activeConfig.equipmentSort1;
          if (sort1.equals(SortField.None) == false) {
             compareDiff = onCompare_Equipment(sort1, equipment1, equipment2);
+            compareDiff = _activeConfig.equipmentSortInverse1 ? compareDiff * -1 : compareDiff;
          }
 
          if (compareDiff == 0) {
             final SortField sort2 = _activeConfig.equipmentSort2;
             if (sort2.equals(SortField.None) == false) {
                compareDiff = onCompare_Equipment(sort2, equipment1, equipment2);
+               compareDiff = _activeConfig.equipmentSortInverse2 ? compareDiff * -1 : compareDiff;
             }
          }
 
@@ -3909,6 +3911,7 @@ public class EquipmentView extends ViewPart implements
             final SortField sort3 = _activeConfig.equipmentSort3;
             if (sort3.equals(SortField.None) == false) {
                compareDiff = onCompare_Equipment(sort3, equipment1, equipment2);
+               compareDiff = _activeConfig.equipmentSortInverse3 ? compareDiff * -1 : compareDiff;
             }
          }
 
@@ -3916,6 +3919,7 @@ public class EquipmentView extends ViewPart implements
             final SortField sort4 = _activeConfig.equipmentSort4;
             if (sort4.equals(SortField.None) == false) {
                compareDiff = onCompare_Equipment(sort4, equipment1, equipment2);
+               compareDiff = _activeConfig.equipmentSortInverse4 ? compareDiff * -1 : compareDiff;
             }
          }
 
@@ -3930,17 +3934,22 @@ public class EquipmentView extends ViewPart implements
          final SortField sort1 = _activeConfig.partServiceSort1;
          if (sort1.equals(SortField.None) == false) {
             compareDiff = onCompare_Part(sort1, part1, part2);
+            compareDiff = _activeConfig.partServiceSortInverse1 ? compareDiff * -1 : compareDiff;
          }
 
          if (compareDiff == 0) {
             final SortField sort2 = _activeConfig.partServiceSort2;
-            compareDiff = onCompare_Part(sort2, part1, part2);
+            if (sort2.equals(SortField.None) == false) {
+               compareDiff = onCompare_Part(sort2, part1, part2);
+               compareDiff = _activeConfig.partServiceSortInverse2 ? compareDiff * -1 : compareDiff;
+            }
          }
 
          if (compareDiff == 0) {
             final SortField sort3 = _activeConfig.partServiceSort3;
             if (sort3.equals(SortField.None) == false) {
                compareDiff = onCompare_Part(sort3, part1, part2);
+               compareDiff = _activeConfig.partServiceSortInverse3 ? compareDiff * -1 : compareDiff;
             }
          }
 
@@ -3948,6 +3957,7 @@ public class EquipmentView extends ViewPart implements
             final SortField sort4 = _activeConfig.partServiceSort4;
             if (sort4.equals(SortField.None) == false) {
                compareDiff = onCompare_Part(sort4, part1, part2);
+               compareDiff = _activeConfig.partServiceSortInverse4 ? compareDiff * -1 : compareDiff;
             }
          }
       }
@@ -4006,7 +4016,6 @@ public class EquipmentView extends ViewPart implements
       case DatePurchased:        return part1.getDatePurchased()  - part2.getDatePurchased();
 
       case PartsBeforeServices:  return part1.getItemType()       - part2.getItemType();
-      case ServicesBeforeParts:  return part2.getItemType()       - part1.getItemType();
 
       case None:
       default:
