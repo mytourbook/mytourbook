@@ -59,11 +59,9 @@ public class PrefPageImport extends PreferencePage implements IWorkbenchPreferen
     * UI controls
     */
    private Button             _chkCreateTourIdWithTime;
-   private Button             _chkIgnoreInvalidFile;
    private Button             _chkSetBodyWeight;
 
    private Label              _lblIdInfo;
-   private Label              _lblInvalidFilesInfo;
 
    private PreferenceLinkArea _linkBodyWeight;
    private ComboViewerCadence _comboDefaultCadence;
@@ -133,17 +131,6 @@ public class PrefPageImport extends PreferencePage implements IWorkbenchPreferen
             }
          }
          {
-            {
-               /*
-                * Checkbox: Ignore invalid files
-                */
-               _chkIgnoreInvalidFile = new Button(container, SWT.CHECK);
-               _chkIgnoreInvalidFile.setText(Messages.PrefPage_Import_Checkbox_IgnoreInvalidFiles);
-               _chkIgnoreInvalidFile.addSelectionListener(_defaultSelectionListener);
-               GridDataFactory.fillDefaults()
-                     .indent(0, VERTICAL_SPACING)
-                     .applyTo(_chkIgnoreInvalidFile);
-            }
             {
                /*
                 * Label: Info
@@ -221,9 +208,6 @@ public class PrefPageImport extends PreferencePage implements IWorkbenchPreferen
       final boolean isTourIdWithTime = _chkCreateTourIdWithTime.getSelection();
       _lblIdInfo.setEnabled(isTourIdWithTime);
 
-      final boolean areInvalidFilesToBeIgnored = _chkIgnoreInvalidFile.getSelection();
-      _lblInvalidFilesInfo.setEnabled(areInvalidFilesToBeIgnored);
-
       final boolean isSetBodyWeight = _chkSetBodyWeight.getSelection();
       _linkBodyWeight.getControl().setEnabled(isSetBodyWeight);
    }
@@ -276,10 +260,6 @@ public class PrefPageImport extends PreferencePage implements IWorkbenchPreferen
 
       _chkCreateTourIdWithTime.setSelection(isCreateTourIdWithTime);
 
-      final boolean isIgnoreInvalidFile = Util.getStateBoolean(
-            _state,
-            RawDataView.STATE_IS_IGNORE_INVALID_FILE,
-            RawDataView.STATE_IS_IGNORE_INVALID_FILE_DEFAULT);
       _chkIgnoreInvalidFile.setSelection(isIgnoreInvalidFile);
 
       final boolean isSetBodyWeight = Util.getStateBoolean(
@@ -298,12 +278,10 @@ public class PrefPageImport extends PreferencePage implements IWorkbenchPreferen
    private void saveState() {
 
       final boolean isCreateTourIdWithTime = _chkCreateTourIdWithTime.getSelection();
-      final boolean isIgnoreInvalidFile = _chkIgnoreInvalidFile.getSelection();
       final boolean isSetBodyWeight = _chkSetBodyWeight.getSelection();
       final CadenceMultiplier defaultCadenceMultiplier = _comboDefaultCadence.getSelectedCadence();
 
       _state.put(RawDataView.STATE_IS_CREATE_TOUR_ID_WITH_TIME, isCreateTourIdWithTime);
-      _state.put(RawDataView.STATE_IS_IGNORE_INVALID_FILE, isIgnoreInvalidFile);
       _state.put(RawDataView.STATE_IS_SET_BODY_WEIGHT, isSetBodyWeight);
       Util.setStateEnum(_state, RawDataView.STATE_DEFAULT_CADENCE_MULTIPLIER, defaultCadenceMultiplier);
 

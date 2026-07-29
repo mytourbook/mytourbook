@@ -312,8 +312,6 @@ public class RawDataView extends ViewPart implements
    public static final boolean           STATE_IS_CONVERT_WAYPOINTS_DEFAULT        = true;
    public static final String            STATE_IS_CREATE_TOUR_ID_WITH_TIME         = "isCreateTourIdWithTime";                 //$NON-NLS-1$
    public static final boolean           STATE_IS_CREATE_TOUR_ID_WITH_TIME_DEFAULT = false;
-   public static final String            STATE_IS_IGNORE_INVALID_FILE              = "isIgnoreInvalidFile";                    //$NON-NLS-1$
-   public static final boolean           STATE_IS_IGNORE_INVALID_FILE_DEFAULT      = true;
    public static final String            STATE_IS_MERGE_TRACKS                     = "isMergeTracks";                          //$NON-NLS-1$
    public static final boolean           STATE_IS_MERGE_TRACKS_DEFAULT             = false;
    private static final String           STATE_IS_REMOVE_TOURS_WHEN_VIEW_CLOSED    = "STATE_IS_REMOVE_TOURS_WHEN_VIEW_CLOSED"; //$NON-NLS-1$
