@@ -15,14 +15,11 @@
  *******************************************************************************/
 package net.tourbook.importdata;
 
-import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.OutputStreamWriter;
 import java.lang.reflect.InvocationTargetException;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -942,50 +939,6 @@ public class RawDataManager {
       return _isSingleThreadTourImport;
    }
 
-   /**
-    * Writes the list of files to ignore into a text file.
-    */
-   private static void save_InvalidFilesToIgnore_InTxt() {
-
-      final File file = getInvalidFilesToIgnoreFile();
-
-      try {
-         if (!file.exists()) {
-            file.createNewFile();
-         }
-      } catch (final IOException e) {
-         e.printStackTrace();
-      }
-
-      try (FileOutputStream fileOutputStream = new FileOutputStream(file, true);
-            OutputStreamWriter outputStreamWriter = new OutputStreamWriter(fileOutputStream, UI.UTF_8);
-            BufferedWriter writer = new BufferedWriter(outputStreamWriter)) {
-
-         final ImportConfig importConfig = getEasyConfig().getActiveImportConfig();
-
-         for (final String invalidFile : _allInvalidFiles.keySet()) {
-
-            Path invalidFilePath = Paths.get(invalidFile);
-
-            //If the invalid files are backed up and deleted from the device folder,
-            //then we save their backup path and not their device path.
-            if (importConfig.isCreateBackup && importConfig.isDeleteDeviceFiles) {
-               invalidFilePath = Paths.get(importConfig.getBackupFolder(), Paths.get(invalidFile).getFileName().toString());
-            }
-
-            // We check if the file still exists (it could have been deleted recently)
-            // and that it's not already in the text file
-            if (Files.exists(invalidFilePath) && !doesInvalidFileExist(invalidFilePath.getFileName().toString())) {
-               writer.write(invalidFilePath.toString());
-               writer.newLine();
-            }
-         }
-
-      } catch (final IOException e) {
-         e.printStackTrace();
-      }
-   }
-
    public static void setIsDeleteValuesActive(final boolean isDeleteValuesActive) {
 
       _isDeleteValuesActive = isDeleteValuesActive;
@@ -1533,10 +1486,6 @@ public class RawDataManager {
       }
 
       return false;
-   }
-
-   public void clearInvalidFilesList() {
-      _allInvalidFiles.clear();
    }
 
    public TourData createTourDataDummyClone(final List<TourValueType> tourValueTypes, final TourData oldTourData) {
@@ -2105,10 +2054,6 @@ public class RawDataManager {
       return _importState_ImportYear;
    }
 
-   public ConcurrentHashMap<String, Object> getInvalidFilesList() {
-      return _allInvalidFiles;
-   }
-
    /**
     * Ask user for the replacement options and set the selected replacement options into
     * {@link #_selectedImportFilenameReplacementOption}
@@ -2354,8 +2299,6 @@ public class RawDataManager {
             /*
              * Do post import actions
              */
-            save_InvalidFilesToIgnore_InTxt();
-
             if (numImportedFiles.get() > 0) {
 
                updateTourData_InImportView_FromDb(monitor);

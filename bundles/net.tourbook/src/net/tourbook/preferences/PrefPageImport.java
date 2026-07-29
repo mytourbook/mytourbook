@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2026 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -131,20 +131,6 @@ public class PrefPageImport extends PreferencePage implements IWorkbenchPreferen
             }
          }
          {
-            {
-               /*
-                * Label: Info
-                */
-               _lblInvalidFilesInfo = new Label(container, SWT.WRAP | SWT.READ_ONLY);
-               _lblInvalidFilesInfo.setText(Messages.PrefPage_Import_Checkbox_IgnoreInvalidFiles_Tooltip);
-               GridDataFactory.fillDefaults()
-                     .grab(true, false)
-                     .indent(_checkboxIndent, 0)
-                     .hint(_pc.convertWidthInCharsToPixels(40), SWT.DEFAULT)
-                     .applyTo(_lblInvalidFilesInfo);
-            }
-         }
-         {
             /*
              * Set the person's body weight when importing and saving a tour
              */
@@ -230,7 +216,6 @@ public class PrefPageImport extends PreferencePage implements IWorkbenchPreferen
    protected void performDefaults() {
 
       _chkCreateTourIdWithTime.setSelection(RawDataView.STATE_IS_CREATE_TOUR_ID_WITH_TIME_DEFAULT);
-      _chkIgnoreInvalidFile.setSelection(RawDataView.STATE_IS_IGNORE_INVALID_FILE_DEFAULT);
       _chkSetBodyWeight.setSelection(RawDataView.STATE_IS_SET_BODY_WEIGHT_DEFAULT);
       _comboDefaultCadence.setSelection(RawDataView.STATE_DEFAULT_CADENCE_MULTIPLIER_DEFAULT);
 
@@ -260,8 +245,6 @@ public class PrefPageImport extends PreferencePage implements IWorkbenchPreferen
 
       _chkCreateTourIdWithTime.setSelection(isCreateTourIdWithTime);
 
-      _chkIgnoreInvalidFile.setSelection(isIgnoreInvalidFile);
-
       final boolean isSetBodyWeight = Util.getStateBoolean(
             _state,
             RawDataView.STATE_IS_SET_BODY_WEIGHT,
@@ -286,7 +269,6 @@ public class PrefPageImport extends PreferencePage implements IWorkbenchPreferen
       Util.setStateEnum(_state, RawDataView.STATE_DEFAULT_CADENCE_MULTIPLIER, defaultCadenceMultiplier);
 
       _rawDataMgr.setState_CreateTourIdWithTime(isCreateTourIdWithTime);
-      _rawDataMgr.setState_IsIgnoreInvalidFile(isIgnoreInvalidFile);
       _rawDataMgr.setState_IsSetBodyWeight(isSetBodyWeight);
       _rawDataMgr.setState_DefaultCadenceMultiplier(defaultCadenceMultiplier);
    }
