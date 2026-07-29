@@ -369,7 +369,7 @@ public class EquipmentView extends ViewPart implements
 
          setToolTipText(Messages.Equipment_Action_DuplicateEquipment_Tooltip);
 
-         setImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.Equipment_Duplicate));
+         setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.Equipment_Duplicate));
       }
 
       @Override
@@ -386,7 +386,7 @@ public class EquipmentView extends ViewPart implements
 
          setToolTipText(Messages.Equipment_Action_DuplicatePart_Tooltip);
 
-         setImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.Equipment_Part_Duplicate));
+         setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.Equipment_Part_Duplicate));
       }
 
       @Override
@@ -403,7 +403,7 @@ public class EquipmentView extends ViewPart implements
 
          setToolTipText(Messages.Equipment_Action_DuplicateService_Tooltip);
 
-         setImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.Equipment_Service_Duplicate));
+         setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.Equipment_Service_Duplicate));
       }
 
       @Override
@@ -493,7 +493,7 @@ public class EquipmentView extends ViewPart implements
 
          super(Messages.Equipment_Action_NewEquipment, AS_PUSH_BUTTON);
 
-         setImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.Equipment_New));
+         setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.Equipment_New));
       }
 
       @Override
@@ -508,7 +508,7 @@ public class EquipmentView extends ViewPart implements
 
          super(Messages.Equipment_Action_NewPart, AS_PUSH_BUTTON);
 
-         setImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.Equipment_Part_New));
+         setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.Equipment_Part_New));
       }
 
       @Override
@@ -523,7 +523,7 @@ public class EquipmentView extends ViewPart implements
 
          super(Messages.Equipment_Action_NewService, AS_PUSH_BUTTON);
 
-         setImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.Equipment_Service_New));
+         setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.Equipment_Service_New));
       }
 
       @Override
@@ -564,7 +564,7 @@ public class EquipmentView extends ViewPart implements
 
          setToolTipText(Messages.Equipment_Action_ToggleCollatedTours_Tooltip);
 
-         setImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.Equipment_Asset_Collated));
+         setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.Equipment_Asset_Collated));
       }
 
       @Override
