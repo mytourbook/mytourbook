@@ -1048,7 +1048,7 @@ public abstract class TreeColumnFactory {
 
             colDef.setColumnLabel(              Messages.ColumnFactory_Equipment_ID);
             colDef.setColumnHeaderText(         Messages.ColumnFactory_Equipment_ID);
-            colDef.setColumnHeaderToolTipText(  Messages.ColumnFactory_Equipment_ID_Tootip);
+            colDef.setColumnHeaderToolTipText(  Messages.ColumnFactory_Equipment_ID_Tooltip);
 
             colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(5));
 

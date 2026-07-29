@@ -296,7 +296,7 @@ public class Messages extends NLS {
    public static String        ColumnFactory_Equipment_Equipment;
    public static String        ColumnFactory_Equipment_Equipment_Tooltip;
    public static String        ColumnFactory_Equipment_ID;
-   public static String        ColumnFactory_Equipment_ID_Tootip;
+   public static String        ColumnFactory_Equipment_ID_Tooltip;
    public static String        ColumnFactory_Equipment_ImageFile_Tooltip;
    public static String        ColumnFactory_Equipment_InitialDistance;
    public static String        ColumnFactory_Equipment_InitialDistance_Tooltip;
