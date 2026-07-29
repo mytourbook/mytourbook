@@ -3,7 +3,6 @@ derby-database/lucene-index
 derby-database/*.log
 .metadata/*.log
 .metadata/.plugins/org.eclipse.core.resources/*
-.metadata/.plugins/net.tourbook.common/invalidfiles_to_ignore.txt
 .metadata/.plugins/org.eclipse.jdt.ui/*
 .metadata/.plugins/net.tourbook/srtmprofiles.xml
 .metadata/.plugins/net.tourbook/map-bookmarks.xml
