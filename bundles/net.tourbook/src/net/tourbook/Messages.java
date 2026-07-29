@@ -1765,8 +1765,6 @@ public class Messages extends NLS {
 
    public static String        PrefPage_Import_Checkbox_CreateTourIdWithTime;
    public static String        PrefPage_Import_Checkbox_CreateTourIdWithTime_Tooltip;
-   public static String        PrefPage_Import_Checkbox_IgnoreInvalidFiles;
-   public static String        PrefPage_Import_Checkbox_IgnoreInvalidFiles_Tooltip;
    public static String        PrefPage_Import_Checkbox_SetBodyWeight;
    public static String        PrefPage_Import_Default_Cadence;
    public static String        PrefPage_Import_Default_CadenceValue_Tooltip;
