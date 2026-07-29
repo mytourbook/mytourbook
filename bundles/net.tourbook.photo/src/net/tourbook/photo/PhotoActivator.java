@@ -115,11 +115,13 @@ public class PhotoActivator extends AbstractUIPlugin {
          return winDarkImageDescriptor;
       }
 
-      final ImageDescriptor themedImageDescriptor = getImageDescriptor(ThemeUtil.getThemedImageName(imageName));
+      final String themedImageName = ThemeUtil.getThemedImageName(imageName);
+      final ImageDescriptor themedImageDescriptor = getImageDescriptor(themedImageName);
 
       if (themedImageDescriptor == null) {
 
-         StatusUtil.logError("Cannot get themed image descriptor for '%s'".formatted(imageName)); //$NON-NLS-1$
+         StatusUtil.logError("net.tourbook.photo.PhotoActivator: Cannot get themed image descriptor from \"?%s\" for \"%s\"" //$NON-NLS-1$
+               .formatted(imageName, themedImageName));
 
       } else {
 
