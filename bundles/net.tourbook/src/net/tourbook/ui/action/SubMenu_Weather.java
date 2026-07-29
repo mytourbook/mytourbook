@@ -38,7 +38,7 @@ public class SubMenu_Weather extends SubMenu {
    public SubMenu_Weather(final ITourProvider2 tourProvider) {
 
       super(Messages.Tour_Action_Weather, AS_DROP_DOWN_MENU);
-      setImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.State_RetrieveWeatherData));
+      setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.State_RetrieveWeatherData));
 
       _tourProvider = tourProvider;
 
