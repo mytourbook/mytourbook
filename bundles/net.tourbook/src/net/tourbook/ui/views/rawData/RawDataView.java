@@ -1047,7 +1047,7 @@ public class RawDataView extends ViewPart implements
 
       final ArrayList<TourData> selectedTours = getAnySelectedTours();
 
-      runEasyImport_100_DeleteTourFiles(true, selectedTours, null, false);
+      runEasyImport_100_DeleteTourFiles(true, selectedTours, false);
    }
 
    void actionMergeTours(final TourData mergeFromTour, final TourData mergeIntoTour) {
@@ -5866,10 +5866,6 @@ public class RawDataView extends ViewPart implements
       final boolean isCreateTourIdWithTime = _state.getBoolean(STATE_IS_CREATE_TOUR_ID_WITH_TIME);
       _rawDataMgr.setState_CreateTourIdWithTime(isCreateTourIdWithTime);
 
-      // restore: set ignore invalid files status before the tours are imported
-      final boolean isIgnoreInvalidFile = _state.getBoolean(STATE_IS_IGNORE_INVALID_FILE);
-      _rawDataMgr.setState_IsIgnoreInvalidFile(isIgnoreInvalidFile);
-
       // restore: set body weight status before the tours are imported
       final boolean isSetBodyWeight = Util.getStateBoolean(_state, STATE_IS_SET_BODY_WEIGHT, STATE_IS_SET_BODY_WEIGHT_DEFAULT);
       _rawDataMgr.setState_IsSetBodyWeight(isSetBodyWeight);
@@ -6031,8 +6027,6 @@ public class RawDataView extends ViewPart implements
       final Collection<TourData> importedToursCollection = RawDataManager.getInstance().getImportedTours().values();
       final ArrayList<TourData> importedTours = new ArrayList<>(importedToursCollection);
 
-      final boolean isIgnoreInvalidFile = RawDataManager.isIgnoreInvalidFile();
-
       try {
 
          // stop all other actions when canceled
@@ -6139,13 +6133,7 @@ public class RawDataView extends ViewPart implements
 
             // use newly saved/not saved tours
 
-            final String[] invalidFilesSet = _rawDataMgr.getInvalidFilesList().keySet().toArray(String[]::new);
-
-            final String[] invalidFiles = isIgnoreInvalidFile
-                  ? invalidFilesSet
-                  : null;
-
-            runEasyImport_100_DeleteTourFiles(false, importedAndSavedTours, invalidFiles, true);
+            runEasyImport_100_DeleteTourFiles(false, importedAndSavedTours, true);
          }
 
          /*
@@ -6177,10 +6165,6 @@ public class RawDataView extends ViewPart implements
 
             selectFirstTour();
          }
-      }
-
-      if (isIgnoreInvalidFile) {
-         _rawDataMgr.clearInvalidFilesList();
       }
    }
 
@@ -6604,7 +6588,6 @@ public class RawDataView extends ViewPart implements
     */
    private void runEasyImport_100_DeleteTourFiles(final boolean isDeleteAllFiles,
                                                   final ArrayList<TourData> allTourData,
-                                                  final String[] invalidFiles,
                                                   final boolean isEasyImport) {
 
       // open log view always when tour files are deleted
@@ -6646,8 +6629,7 @@ public class RawDataView extends ViewPart implements
 
             int saveCounter = 0;
 
-            int selectionSize = allTourData.size();
-            selectionSize += invalidFiles != null ? invalidFiles.length : 0;
+            final int selectionSize = allTourData.size();
 
             monitor.beginTask(Messages.Import_Data_Monitor_DeleteTourFiles, selectionSize);
 
@@ -6701,21 +6683,6 @@ public class RawDataView extends ViewPart implements
                   tourData.isTourFileMoved = true;
                }
 
-            }
-
-            if (invalidFiles != null) {
-
-               for (final String invalidFilePath : invalidFiles) {
-
-                  deleteFile(
-                        deletedFiles,
-                        notDeletedFiles,
-                        Paths.get(invalidFilePath).getParent().toString(),
-                        Paths.get(invalidFilePath).getFileName().toString(),
-                        TourLogState.EASY_IMPORT_DELETE_DEVICE);
-
-                  monitor.worked(1);
-               }
             }
          }
       };

@@ -466,25 +466,7 @@ public class EasyImportManager {
          throw new InterruptedException();
       }
 
-      final HashSet<String> dbFileNames = getDbFileNames(availableFiles);
       RawDataView.THREAD_WATCHER_LOCK.unlock();
-
-      for (final OSFile deviceFile : availableFiles) {
-
-         if (dbFileNames.contains(deviceFile.getFileName()) == false) {
-
-            if (!RawDataManager.isIgnoreInvalidFile()) {
-
-               notImportedFiles.add(deviceFile);
-
-            } else {// RawDataManager.isIgnoreInvalidFile() == true
-
-               if (!RawDataManager.doesInvalidFileExist(deviceFile.getFileName())) {
-                  notImportedFiles.add(deviceFile);
-               }
-            }
-         }
-      }
 
       // sort by filename
       Collections.sort(notImportedFiles, (file1, file2) -> file1.getFileName().compareTo(file2.getFileName()));
