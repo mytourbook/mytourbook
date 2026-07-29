@@ -164,7 +164,7 @@ public class CommonActivator extends AbstractUIPlugin {
 
       if (themedImageDescriptor == null) {
 
-         StatusUtil.logError("net.tourbook.common.CommonActivator: Cannot get themed image descriptor from \"?%s\" for \"%s\"" //$NON-NLS-1$
+         StatusUtil.logError("net.tourbook.common.CommonActivator: Cannot get themed image descriptor from \"%s\" for \"%s\"" //$NON-NLS-1$
                .formatted(imageName, themedImageName));
 
       } else {

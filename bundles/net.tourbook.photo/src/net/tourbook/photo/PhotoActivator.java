@@ -120,7 +120,7 @@ public class PhotoActivator extends AbstractUIPlugin {
 
       if (themedImageDescriptor == null) {
 
-         StatusUtil.logError("net.tourbook.photo.PhotoActivator: Cannot get themed image descriptor from \"?%s\" for \"%s\"" //$NON-NLS-1$
+         StatusUtil.logError("net.tourbook.photo.PhotoActivator: Cannot get themed image descriptor from \"%s\" for \"%s\"" //$NON-NLS-1$
                .formatted(imageName, themedImageName));
 
       } else {

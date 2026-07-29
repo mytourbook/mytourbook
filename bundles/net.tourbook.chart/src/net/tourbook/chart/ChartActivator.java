@@ -123,7 +123,7 @@ public class ChartActivator extends AbstractUIPlugin {
 
       if (themedImageDescriptor == null) {
 
-         StatusUtil.logError("net.tourbook.chart.ChartActivator: Cannot get themed image descriptor from \"?%s\" for \"%s\"" //$NON-NLS-1$
+         StatusUtil.logError("net.tourbook.chart.ChartActivator: Cannot get themed image descriptor from \"%s\" for \"%s\"" //$NON-NLS-1$
                .formatted(imageName, themedImageName));
 
       } else {
