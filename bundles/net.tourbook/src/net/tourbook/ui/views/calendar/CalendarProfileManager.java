@@ -3519,79 +3519,12 @@ class CalendarProfileManager {
 
          switch (formatterData.id) {
 
-<<<<<<< HEAD
-         case DISTANCE:
-            _tourFormatter_Distance.setValueFormat(valueFormat);
-            break;
-
-         case ELEVATION:
-            _tourFormatter_Elevation.setValueFormat(valueFormat);
-            break;
-
-         case ELEVATION_CHANGE:
-            _tourFormatter_Elevation_Change.setValueFormat(valueFormat);
-            break;
-
-         case ENERGY_KCAL:
-            _tourFormatter_Energy_kcal.setValueFormat(valueFormat);
-            break;
-
-         case ENERGY_MJ:
-            _tourFormatter_Energy_MJ.setValueFormat(valueFormat);
-            break;
-
-         case NUTRITION_CARBOHYDRATES_AVG_PER_HOUR:
-            _tourFormatter_Nutrition_Carbohydrates_Avg_Per_Hour.setValueFormat(valueFormat);
-            break;
-
-         case PACE:
-            _tourFormatter_Pace.setValueFormat(valueFormat);
-            break;
-
-         case POWER_AVG:
-            _tourFormatter_Power_Avg.setValueFormat(valueFormat);
-            break;
-
-         case PULSE_AVG:
-            _tourFormatter_Pulse_Avg.setValueFormat(valueFormat);
-            break;
-
-         case SPEED:
-            _tourFormatter_Speed.setValueFormat(valueFormat);
-            break;
-
-         case TIME_ELAPSED:
-            _tourFormatter_Time_Elapsed.setValueFormat(valueFormat);
-            break;
-
-         case TIME_RECORDED:
-            _tourFormatter_Time_Recorded.setValueFormat(valueFormat);
-            break;
-
-         case TIME_PAUSED:
-            _tourFormatter_Time_Paused.setValueFormat(valueFormat);
-            break;
-
-         case TIME_MOVING:
-            _tourFormatter_Time_Moving.setValueFormat(valueFormat);
-            break;
-
-         case TIME_BREAK:
-            _tourFormatter_Time_Break.setValueFormat(valueFormat);
-            break;
-
-         case WEATHER_ICON:
-            _tourFormatter_Weather_Icon.setValueFormat(valueFormat);
-            break;
-
-         default:
-            break;
-=======
          case DISTANCE:             _tourFormatter_Distance          .setValueFormat(valueFormat);       break;
          case ELEVATION:            _tourFormatter_Elevation         .setValueFormat(valueFormat);       break;
          case ELEVATION_CHANGE:     _tourFormatter_Elevation_Change  .setValueFormat(valueFormat);       break;
          case ENERGY_KCAL:          _tourFormatter_Energy_kcal       .setValueFormat(valueFormat);       break;
          case ENERGY_MJ:            _tourFormatter_Energy_MJ         .setValueFormat(valueFormat);       break;
+         case NUTRITION_CARBOHYDRATES_AVG_PER_HOUR: _tourFormatter_Nutrition_Carbohydrates_Avg_Per_Hour.setValueFormat(valueFormat); break;
          case PACE:                 _tourFormatter_Pace              .setValueFormat(valueFormat);       break;
          case POWER_AVG:            _tourFormatter_Power_Avg         .setValueFormat(valueFormat);       break;
          case PULSE_AVG:            _tourFormatter_Pulse_Avg         .setValueFormat(valueFormat);       break;
@@ -3603,7 +3536,6 @@ class CalendarProfileManager {
          case TIME_BREAK:           _tourFormatter_Time_Break        .setValueFormat(valueFormat);       break;
          case WEATHER_ICON:         _tourFormatter_Weather_Icon      .setValueFormat(valueFormat);       break;
          default:                                                                                        break;
->>>>>>> refs/remotes/Wolfgang/main
          }
       }
 
