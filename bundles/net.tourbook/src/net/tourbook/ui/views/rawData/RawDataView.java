@@ -5977,7 +5977,7 @@ public class RawDataView extends ViewPart implements
             MessageDialog.openError(
                   _parent.getShell(),
                   Messages.Import_Data_Dialog_EasyImport_Title,
-                  Messages.Import_Data_Dialog_NoActivePersion_Message);
+                  Messages.Import_Data_Dialog_NoActivePerson_Message);
             return;
          }
       }

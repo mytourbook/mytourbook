@@ -1370,10 +1370,9 @@ public class Messages extends NLS {
    public static String        Import_Data_Dialog_GetReimportedFilePath_Message;
    public static String        Import_Data_Dialog_IsCancelTourValuesDeletion_Message;
    public static String        Import_Data_Dialog_IsCancelTourValuesDeletion_Title;
-   public static String        Import_Data_Dialog_NoActivePersion_Message;
+   public static String        Import_Data_Dialog_NoActivePerson_Message;
    public static String        Import_Data_Dialog_Radio_CancelReimport;
    public static String        Import_Data_Dialog_Radio_SelectFile;
-   public static String        Import_Data_Dialog_Radio_SkipAllInvalidFiles;
    public static String        Import_Data_Dialog_Radio_SkipFile;
    public static String        Import_Data_Dialog_ReimportFile_Title;
    public static String        Import_Data_Dialog_Reimport_SubTask;
@@ -1550,7 +1549,6 @@ public class Messages extends NLS {
    public static String        Log_Reimport_PreviousFiles_End;
    public static String        Log_Reimport_Text;
    public static String        Log_Reimport_Tour_Skipped;
-   public static String        Log_Reimport_Tour_Skipped_AllInvalidFiles_ByUser;
    public static String        Log_Reimport_Tour_Skipped_FileLocationDialog_Auto;
    public static String        Log_Reimport_Tour_Skipped_FileLocationDialog_ByUser;
    public static String        Log_Reimport_Tour_Skipped_FilePathIsEmpty;
