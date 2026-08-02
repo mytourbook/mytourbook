@@ -5130,6 +5130,20 @@ public class RawDataView extends ViewPart implements
       return _watchingStoresThread != null;
    }
 
+   private void mountImportDevice_1_On() {
+      // TODO Auto-generated method stub
+
+//      mountImportDevice_3();
+   }
+
+   private void mountImportDevice_2_Off() {
+      // TODO Auto-generated method stub
+
+   }
+
+
+
+
    private void onBrowser_Completed() {
 
       _isBrowserCompleted = true;
@@ -7137,6 +7151,8 @@ public class RawDataView extends ViewPart implements
          return;
       }
 
+      mountImportDevice_1_On();
+
       if (_importUI == ImportUI.EASY_IMPORT_FANCY) {
 
          updateUI_WatcherAnimation(DOM_CLASS_DEVICE_ON_ANIMATED);
@@ -7162,41 +7178,44 @@ public class RawDataView extends ViewPart implements
     */
    private void setWatcher_2_Off(final boolean isUpdateUI) {
 
-      if (isWatchingOn()) {
+      if (isWatchingOn() == false) {
+         return;
+      }
 
-         /*
-          * !!! Store watching must be canceled before the watch folder thread because it could
-          * launch a new watch folder thread !!!
-          */
-         thread_WatchStores_Cancel();
+      /*
+       * !!! Store watching must be canceled before the watch folder thread because it could
+       * launch a new watch folder thread !!!
+       */
+      thread_WatchStores_Cancel();
 
-         // thread_WatchFolders(false);
+      // thread_WatchFolders(false);
 
-         try {
+      try {
 
-            if (_watchingStoresThread != null) {
-               _watchingStoresThread.join();
-            }
-
-            if (isUpdateUI) {
-
-               if (_importUI == ImportUI.EASY_IMPORT_FANCY) {
-
-                  updateUI_WatcherAnimation(DOM_CLASS_DEVICE_OFF_ANIMATED);
-
-               } else {
-
-                  // simple UI
-
-                  updateUI_DeviceState_SimpleUI();
-
-                  enableSimpleUI(false);
-               }
-            }
-
-         } catch (final InterruptedException e) {
-            TourLogManager.log_EXCEPTION_WithStacktrace(e);
+         if (_watchingStoresThread != null) {
+            _watchingStoresThread.join();
          }
+
+         if (isUpdateUI) {
+
+            if (_importUI == ImportUI.EASY_IMPORT_FANCY) {
+
+               updateUI_WatcherAnimation(DOM_CLASS_DEVICE_OFF_ANIMATED);
+
+            } else {
+
+               // simple UI
+
+               updateUI_DeviceState_SimpleUI();
+
+               enableSimpleUI(false);
+            }
+         }
+
+         mountImportDevice_2_Off();
+
+      } catch (final InterruptedException e) {
+         TourLogManager.log_EXCEPTION_WithStacktrace(e);
       }
    }
 

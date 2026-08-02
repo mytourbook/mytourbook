@@ -34,7 +34,9 @@ See milestone 26.? https://github.com/mytourbook/mytourbook/milestone/29?closed=
 New / Improvements
 ==================
 
-* 
+* Easy Import
+  - Added action to mount/unmount a device
+    https://github.com/mytourbook/mytourbook/issues/1720
   
 
 Changes

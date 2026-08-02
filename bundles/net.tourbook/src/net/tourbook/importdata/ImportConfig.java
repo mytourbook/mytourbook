@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
+ * Copyright (C) 2015, 2026 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -47,6 +47,16 @@ public class ImportConfig implements Cloneable {
    public boolean             isDeleteDeviceFiles  = false;
 
    private long               _id;
+
+   public boolean             isMountDevice;
+   public boolean             isUnmountDevice;
+   public boolean             isVerifyMountCommand;
+   public boolean             isVerifyUnmountCommand;
+   public String              commandDeviceInfo    = UI.EMPTY_STRING;
+   public String              commandMount         = UI.EMPTY_STRING;
+   public String              commandMount_IsOK    = UI.EMPTY_STRING;
+   public String              commandUnmount       = UI.EMPTY_STRING;
+   public String              commandUnmount_IsOK  = UI.EMPTY_STRING;
 
    public ImportConfig() {
 

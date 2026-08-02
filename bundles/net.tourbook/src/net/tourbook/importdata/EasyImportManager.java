@@ -15,7 +15,9 @@
  *******************************************************************************/
 package net.tourbook.importdata;
 
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.io.Reader;
 import java.io.StringReader;
 import java.io.StringWriter;
@@ -33,12 +35,15 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.ReentrantLock;
+import java.util.stream.Collectors;
 
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
@@ -104,6 +109,16 @@ public class EasyImportManager {
    private static final String      ATTR_NAME                                             = "name";                                                   //$NON-NLS-1$
    private static final String      ATTR_TOUR_TYPE_ID                                     = "tourTypeId";                                             //$NON-NLS-1$
    private static final String      ATTR_TOUR_TYPE_NAME                                   = "tourTypeName";                                           //$NON-NLS-1$
+   //
+   private static final String      ATTR_IS_MOUNT_DEVICE                                  = "isMountDevice";                                          //$NON-NLS-1$
+   private static final String      ATTR_IS_UNMOUNT_DEVICE                                = "isUnmountDevice";                                        //$NON-NLS-1$
+   private static final String      ATTR_IS_VERIFY_MOUNT_COMMAND                          = "isVerifyMountCommand";                                   //$NON-NLS-1$
+   private static final String      ATTR_IS_VERIFY_UNMOUNT_COMMAND                        = "isVerifyUnmountCommand";                                 //$NON-NLS-1$
+   private static final String      ATTR_COMMAND_DEVICE_INFO                              = "deviceInfoCommand";                                      //$NON-NLS-1$
+   private static final String      ATTR_COMMAND_MOUNT                                    = "mountCommand";                                           //$NON-NLS-1$
+   private static final String      ATTR_COMMAND_MOUNT_IS_OK                              = "mountCommand_IsOK";                                      //$NON-NLS-1$
+   private static final String      ATTR_COMMAND_UNMOUNT                                  = "unmountCommand";                                         //$NON-NLS-1$
+   private static final String      ATTR_COMMAND_UNMOUNT_IS_OK                            = "unmountCommand_IsOK";                                    //$NON-NLS-1$
    //
    private static final String      ATTR_DASH_BACKGROUND_OPACITY                          = "backgroundOpacity";                                      //$NON-NLS-1$
    private static final String      ATTR_DASH_ANIMATION_CRAZY_FACTOR                      = "animationCrazyFactor";                                   //$NON-NLS-1$
@@ -185,6 +200,86 @@ public class EasyImportManager {
       }
 
       return _instance;
+   }
+
+   /**
+    * @param allCommandsArray
+    *
+    * @return Returns in [0] the command log, in [1] the error message when available
+    */
+   public static String[] runProcess(final String... allCommandsArray) {
+
+//      C:\BIN\MTP\mtpmount.exe list available
+//      C:\BIN\MTP\mtpmount.exe mount #0 g:
+//      C:\BIN\MTP\mtpmount.exe unmount g:
+
+      final List<String> allCommandsList = new ArrayList<>();
+      allCommandsList.addAll(Arrays.asList(allCommandsArray));
+
+      Process process = null;
+      final String[] commandOutput = { null, null };
+
+      try {
+
+         final ProcessBuilder processBuilder = new ProcessBuilder(allCommandsList);
+
+         // Merge error stream with input stream to read everything together
+         processBuilder.redirectErrorStream(true);
+
+         process = processBuilder.start();
+
+         final boolean isFinished = process.waitFor(10, TimeUnit.SECONDS);
+
+         if (isFinished == false) {
+
+            // Timeout occurred, forcefully destroy the process
+
+            process.destroyForcibly();
+            commandOutput[1] = "Process timed out in 10 seconds and was killed";
+
+         } else {
+
+            // Read the combined output and error streams
+            try (BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()))) {
+               final String output = reader.lines().collect(Collectors.joining(System.lineSeparator()));
+               commandOutput[0] = output;
+            }
+
+            final String commandLine = String.join(UI.SPACE1, allCommandsList);
+
+            final String mtLog = "%s\n\nProcess state: %b - %d\n\n%s".formatted(
+
+                  commandLine,
+
+                  isFinished,
+                  process.exitValue(),
+
+                  commandOutput[0]);
+
+            TourLogManager.log_DEFAULT(mtLog);
+         }
+
+      } catch (final IOException e) {
+
+         commandOutput[1] = e.getMessage();
+
+         StatusUtil.log(e);
+
+      } catch (final InterruptedException e) {
+
+         commandOutput[1] = e.getMessage();
+
+         TourLogManager.log_EXCEPTION_WithStacktrace(e);
+         Thread.currentThread().interrupt();
+
+      } finally {
+
+         if (process != null) {
+            process.destroy();
+         }
+      }
+
+      return commandOutput;
    }
 
    /**
@@ -781,22 +876,33 @@ public class EasyImportManager {
 
       final ImportConfig importConfig = new ImportConfig();
 
+// SET_FORMATTING_OFF
+
       dashConfig.importConfigs.add(importConfig);
 
-      importConfig.name = Util.getXmlString(xmlConfig, ATTR_NAME, UI.EMPTY_STRING);
+      importConfig.name                   = Util.getXmlString(xmlConfig,   ATTR_NAME,                       UI.EMPTY_STRING);
 
-      importConfig.isCreateBackup = Util.getXmlBoolean(xmlConfig, ATTR_IS_CREATE_BACKUP, true);
-      importConfig.isDeleteDeviceFiles = Util.getXmlBoolean(xmlConfig, ATTR_IS_DELETE_DEVICE_FILES, false);
-      importConfig.isTurnOffWatching = Util.getXmlBoolean(xmlConfig, ATTR_IS_TURN_OFF_WATCHING, false);
+      importConfig.isCreateBackup         = Util.getXmlBoolean(xmlConfig,  ATTR_IS_CREATE_BACKUP,           true);
+      importConfig.isDeleteDeviceFiles    = Util.getXmlBoolean(xmlConfig,  ATTR_IS_DELETE_DEVICE_FILES,     false);
+      importConfig.isTurnOffWatching      = Util.getXmlBoolean(xmlConfig,  ATTR_IS_TURN_OFF_WATCHING,       false);
 
-      importConfig.setBackupFolder(Util.getXmlString(xmlConfig, ATTR_BACKUP_FOLDER, UI.EMPTY_STRING));
-      importConfig.setDeviceFolder(Util.getXmlString(xmlConfig, ATTR_DEVICE_FOLDER, UI.EMPTY_STRING));
-      importConfig.setDeviceType(Util.getXmlInteger(xmlConfig, ATTR_DEVICE_TYPE, 0));
+      importConfig.setBackupFolder        (Util.getXmlString(xmlConfig,    ATTR_BACKUP_FOLDER,              UI.EMPTY_STRING));
+      importConfig.setDeviceFolder        (Util.getXmlString(xmlConfig,    ATTR_DEVICE_FOLDER,              UI.EMPTY_STRING));
+      importConfig.setDeviceType          (Util.getXmlInteger(xmlConfig,   ATTR_DEVICE_TYPE,                0));
 
-      importConfig.fileGlobPattern = Util.getXmlString(
-            xmlConfig,
-            ATTR_DEVICE_FILES,
-            ImportConfig.DEVICE_FILES_DEFAULT);
+      importConfig.fileGlobPattern        = Util.getXmlString( xmlConfig,  ATTR_DEVICE_FILES, ImportConfig.DEVICE_FILES_DEFAULT);
+
+      importConfig.isMountDevice          = Util.getXmlBoolean(xmlConfig,  ATTR_IS_MOUNT_DEVICE,            false);
+      importConfig.isUnmountDevice        = Util.getXmlBoolean(xmlConfig,  ATTR_IS_UNMOUNT_DEVICE,          false);
+      importConfig.isVerifyMountCommand   = Util.getXmlBoolean(xmlConfig,  ATTR_IS_VERIFY_MOUNT_COMMAND,    false);
+      importConfig.isVerifyMountCommand   = Util.getXmlBoolean(xmlConfig,  ATTR_IS_VERIFY_UNMOUNT_COMMAND,  false);
+      importConfig.commandDeviceInfo      = Util.getXmlString(xmlConfig,   ATTR_COMMAND_DEVICE_INFO,        UI.EMPTY_STRING);
+      importConfig.commandMount           = Util.getXmlString(xmlConfig,   ATTR_COMMAND_MOUNT,              UI.EMPTY_STRING);
+      importConfig.commandMount_IsOK      = Util.getXmlString(xmlConfig,   ATTR_COMMAND_MOUNT_IS_OK,        UI.EMPTY_STRING);
+      importConfig.commandUnmount         = Util.getXmlString(xmlConfig,   ATTR_COMMAND_UNMOUNT,            UI.EMPTY_STRING);
+      importConfig.commandUnmount_IsOK    = Util.getXmlString(xmlConfig,   ATTR_COMMAND_UNMOUNT_IS_OK,      UI.EMPTY_STRING);
+
+// SET_FORMATTING_ON
 
       /*
        * Set active config
@@ -1361,6 +1467,15 @@ public class EasyImportManager {
          xmlImportConfig.putInteger(ATTR_DEVICE_TYPE,             importConfig.getDeviceType());
 
          xmlImportConfig.putString( ATTR_DEVICE_FILES,            importConfig.fileGlobPattern);
+
+         // mount/unmount
+         xmlImportConfig.putBoolean(ATTR_IS_MOUNT_DEVICE,         importConfig.isMountDevice);
+         xmlImportConfig.putBoolean(ATTR_IS_UNMOUNT_DEVICE,       importConfig.isUnmountDevice);
+         xmlImportConfig.putString( ATTR_COMMAND_DEVICE_INFO,     importConfig.commandDeviceInfo);
+         xmlImportConfig.putString( ATTR_COMMAND_MOUNT,           importConfig.commandMount);
+         xmlImportConfig.putString( ATTR_COMMAND_MOUNT_IS_OK,     importConfig.commandMount_IsOK);
+         xmlImportConfig.putString( ATTR_COMMAND_UNMOUNT,         importConfig.commandUnmount);
+         xmlImportConfig.putString( ATTR_COMMAND_UNMOUNT_IS_OK,   importConfig.commandUnmount_IsOK);
       }
 
       /*
