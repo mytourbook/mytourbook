@@ -142,11 +142,13 @@ public class ChartActivator extends AbstractUIPlugin {
     */
    public static ImageDescriptor getThemedImageDescriptor_NoHDR(final String imageName) {
 
-      final ImageDescriptor themedImageDescriptor = getImageDescriptor(ThemeUtil.getThemedImageName(imageName));
+      final String themedImageName = ThemeUtil.getThemedImageName(imageName);
+      final ImageDescriptor themedImageDescriptor = getImageDescriptor(themedImageName);
 
       if (themedImageDescriptor == null) {
 
-         StatusUtil.logError("Cannot get themed image descriptor for '%s'".formatted(imageName)); //$NON-NLS-1$
+         StatusUtil.logError("net.tourbook.chart.ChartActivator: Cannot get (no HDR) themed image descriptor from \"%s\" for \"%s\"" //$NON-NLS-1$
+               .formatted(imageName, themedImageName));
 
       } else {
 

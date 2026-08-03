@@ -395,8 +395,8 @@ public class TourPerson implements Comparable<Object>, Serializable {
 
       final int numZones = hrZones.size();
 
-      final float[] zoneMinBmps = new float[numZones];
-      final float[] zoneMaxBmps = new float[numZones];
+      final float[] allZoneMinBpm = new float[numZones];
+      final float[] allZoneMaxBpm = new float[numZones];
 
       final List<TourPersonHRZone> allHrZones = new ArrayList<>(hrZones);
       Collections.sort(allHrZones);
@@ -409,23 +409,29 @@ public class TourPerson implements Comparable<Object>, Serializable {
          final float zoneMinValue = hrZone.getZoneMinValue();
          final float minBpm = zoneMinValue * hrMax / 100;
 
-         zoneMinBmps[zoneIndex] = Math.round(minBpm);
+         allZoneMinBpm[zoneIndex] = Math.round(minBpm);
       }
 
       // fill zone max values
       for (int zoneIndex = 1; zoneIndex < numZones; zoneIndex++) {
 
-         final float minBpm = zoneMinBmps[zoneIndex];
+         final float minBpm = allZoneMinBpm[zoneIndex];
          final float prevMaxBpm = minBpm - 1;
 
-         zoneMaxBmps[zoneIndex - 1] = Math.round(prevMaxBpm);
+         allZoneMaxBpm[zoneIndex - 1] = Math.round(prevMaxBpm);
       }
 
-      final HrZoneContext hrZoneMinMax = new HrZoneContext(zoneMinBmps, zoneMaxBmps, age, (int) hrMax);
+      /*
+       * The last zone max is always Integer.MAX_VALUE to fix
+       * https://github.com/mytourbook/mytourbook/issues/1710#issuecomment-5157160956
+       */
+      allZoneMaxBpm[numZones - 1] = Integer.MAX_VALUE;
 
-      _hrZoneMinMaxBpm.put(age, hrZoneMinMax);
+      final HrZoneContext hrZoneContext = new HrZoneContext(allZoneMinBpm, allZoneMaxBpm, age, (int) hrMax);
 
-      return hrZoneMinMax;
+      _hrZoneMinMaxBpm.put(age, hrZoneContext);
+
+      return hrZoneContext;
    }
 
    /**

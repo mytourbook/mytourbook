@@ -5988,28 +5988,21 @@ public class Map2View extends ViewPart implements
        */
       MapGraphId colorId;
 
-      if (_actionTourColor_Gradient.isChecked()) {
-         colorId = MapGraphId.Gradient;
+// SET_FORMATTING_OFF
 
-      } else if (_actionTourColor_Pulse.isChecked()) {
-         colorId = MapGraphId.Pulse;
+      if (     _actionTourColor_Gradient           .isChecked()) {   colorId = MapGraphId.Gradient;}
+      else if (_actionTourColor_HrZone             .isChecked()) {   colorId = MapGraphId.HrZone;}
+      else if (_actionTourColor_Pace               .isChecked()) {   colorId = MapGraphId.Pace;}
+      else if (_actionTourColor_Power              .isChecked()) {   colorId = MapGraphId.Power;}
+      else if (_actionTourColor_Pulse              .isChecked()) {   colorId = MapGraphId.Pulse;}
+      else if (_actionTourColor_RunDyn_StepLength  .isChecked()) {   colorId = MapGraphId.RunDyn_StepLength;}
+      else if (_actionTourColor_Speed              .isChecked()) {   colorId = MapGraphId.Speed;}
 
-      } else if (_actionTourColor_Speed.isChecked()) {
-         colorId = MapGraphId.Speed;
+      // use elevation as default
+      else {                                                         colorId = MapGraphId.Altitude;}
 
-      } else if (_actionTourColor_Pace.isChecked()) {
-         colorId = MapGraphId.Pace;
+// SET_FORMATTING_ON
 
-      } else if (_actionTourColor_HrZone.isChecked()) {
-         colorId = MapGraphId.HrZone;
-
-      } else if (_actionTourColor_RunDyn_StepLength.isChecked()) {
-         colorId = MapGraphId.RunDyn_StepLength;
-
-      } else {
-         // use altitude as default
-         colorId = MapGraphId.Altitude;
-      }
       _state.put(STATE_TOUR_COLOR_ID, colorId.name());
 
       // value point tooltip
