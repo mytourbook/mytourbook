@@ -491,8 +491,9 @@ public class EquipmentLoader {
          }
 
          final long numTours = eqItem.numTours_IsNotCollated;
+         final boolean arePartsInEquipment = eqItem.getEquipment().getParts().size() > 0;
 
-         if (numTours == 0) {
+         if (numTours == 0 && arePartsInEquipment == false) {
 
             // hide expand UI icon when there are no children
 

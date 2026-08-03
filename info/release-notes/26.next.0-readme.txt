@@ -3,7 +3,7 @@
 Fix type -> collate ID in :
 
    Value_Formatter_Equipment_Type
-
+   Dialog_EquipmentPart_Collate_Tooltip
 
 
 TODO's
