@@ -201,7 +201,7 @@ public class TrainingView extends ViewPart {
    private Composite _hrZoneDataContainerContent;
 
    private Canvas    _canvasHrZoneImage;
-   private Label[]   _lblTourMinMaxValue;
+   private Label[]   _lblTourMinMaxBpm;
    private Label[]   _lblTourMinMaxHours;
    private Label[]   _lblHRZoneName;
    private Label[]   _lblHRZoneColor;
@@ -746,7 +746,7 @@ public class TrainingView extends ViewPart {
       /*
        * fields
        */
-      _lblTourMinMaxValue = new Label[numHrZones];
+      _lblTourMinMaxBpm = new Label[numHrZones];
       _lblTourMinMaxHours = new Label[numHrZones];
       _lblHRZoneName = new Label[numHrZones];
       _lblHRZoneColor = new Label[numHrZones];
@@ -797,7 +797,7 @@ public class TrainingView extends ViewPart {
          /*
           * label: tour hr min/max %
           */
-         final Label lblTourMinMaxBpm = _lblTourMinMaxValue[zoneIndex] = _tk.createLabel(
+         final Label lblTourMinMaxBpm = _lblTourMinMaxBpm[zoneIndex] = _tk.createLabel(
                parent,
                null,
                SWT.TRAIL);
@@ -1414,7 +1414,7 @@ public class TrainingView extends ViewPart {
 
    /**
     * @param zoneContext
-    *           Contains age and HR max values.
+    *           Contains age and HR max values
     */
    private void updateUI_42_HrZoneData(final HrZoneContext zoneContext) {
 
@@ -1515,8 +1515,8 @@ public class TrainingView extends ViewPart {
          _lblHrZonePercent[tourZoneIndex].setToolTipText(hrZoneTooltip);
 
          // bpm values
-         _lblTourMinMaxValue[tourZoneIndex].setText(((int) zoneMinBpm) + UI.DASH + zoneMaxBpmText);
-         _lblTourMinMaxValue[tourZoneIndex].setToolTipText(hrZoneTooltip);
+         _lblTourMinMaxBpm[tourZoneIndex].setText(((int) zoneMinBpm) + UI.DASH + zoneMaxBpmText);
+         _lblTourMinMaxBpm[tourZoneIndex].setToolTipText(hrZoneTooltip);
 
          _lblTourMinMaxHours[tourZoneIndex].setText(UI.format_hh_mm((long) (zoneTime + 30)).toString());
          _lblTourMinMaxHours[tourZoneIndex].setToolTipText(hrZoneTooltip);
