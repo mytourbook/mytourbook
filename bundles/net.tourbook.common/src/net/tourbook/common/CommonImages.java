@@ -56,6 +56,8 @@ public class CommonImages {
    public static final String App_Yes                      = "app-yes.svg";                               //$NON-NLS-1$
    public static final String App_No                       = "app-no.svg";                                //$NON-NLS-1$
 
+   public static final String WordWrap                     = "wordwrap.svg";                              // copied from Eclipse //$NON-NLS-1$
+
    public static final String Arrow_Left                   = "arrow-left.svg";                            //$NON-NLS-1$
    public static final String Arrow_Right                  = "arrow-right.svg";                           //$NON-NLS-1$
    public static final String ColumnCategory               = "column-category.svg";                       //$NON-NLS-1$

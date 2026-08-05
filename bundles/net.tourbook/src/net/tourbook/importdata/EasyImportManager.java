@@ -215,6 +215,7 @@ public class EasyImportManager {
 
       final List<String> allCommandsList = new ArrayList<>();
       allCommandsList.addAll(Arrays.asList(allCommandsArray));
+      final String commandLine = String.join(UI.SPACE1, allCommandsList);
 
       Process process = null;
       final String[] commandOutput = { null, null };
@@ -235,17 +236,19 @@ public class EasyImportManager {
             // Timeout occurred, forcefully destroy the process
 
             process.destroyForcibly();
-            commandOutput[1] = "Process timed out in 10 seconds and was killed";
+
+            // set error message
+            commandOutput[1] = "Process timed out in 10 seconds and was killed: %s".formatted(commandLine);
 
          } else {
 
             // Read the combined output and error streams
             try (BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()))) {
                final String output = reader.lines().collect(Collectors.joining(System.lineSeparator()));
+
+               // set normal output
                commandOutput[0] = output;
             }
-
-            final String commandLine = String.join(UI.SPACE1, allCommandsList);
 
             final String mtLog = "%s\n\nProcess state: %b - %d\n\n%s".formatted(
 
@@ -261,6 +264,7 @@ public class EasyImportManager {
 
       } catch (final IOException e) {
 
+         // set error message
          commandOutput[1] = e.getMessage();
 
          StatusUtil.log(e);
@@ -895,7 +899,7 @@ public class EasyImportManager {
       importConfig.isMountDevice          = Util.getXmlBoolean(xmlConfig,  ATTR_IS_MOUNT_DEVICE,            false);
       importConfig.isUnmountDevice        = Util.getXmlBoolean(xmlConfig,  ATTR_IS_UNMOUNT_DEVICE,          false);
       importConfig.isVerifyMountCommand   = Util.getXmlBoolean(xmlConfig,  ATTR_IS_VERIFY_MOUNT_COMMAND,    false);
-      importConfig.isVerifyMountCommand   = Util.getXmlBoolean(xmlConfig,  ATTR_IS_VERIFY_UNMOUNT_COMMAND,  false);
+      importConfig.isVerifyUnmountCommand = Util.getXmlBoolean(xmlConfig,  ATTR_IS_VERIFY_UNMOUNT_COMMAND,  false);
       importConfig.commandDeviceInfo      = Util.getXmlString(xmlConfig,   ATTR_COMMAND_DEVICE_INFO,        UI.EMPTY_STRING);
       importConfig.commandMount           = Util.getXmlString(xmlConfig,   ATTR_COMMAND_MOUNT,              UI.EMPTY_STRING);
       importConfig.commandMount_IsOK      = Util.getXmlString(xmlConfig,   ATTR_COMMAND_MOUNT_IS_OK,        UI.EMPTY_STRING);
@@ -1455,27 +1459,29 @@ public class EasyImportManager {
 
          final IMemento xmlImportConfig = xmlMemento.createChild(TAG_IMPORT_CONFIG);
 
-         xmlImportConfig.putString( ATTR_NAME,                    importConfig.name);
+         xmlImportConfig.putString( ATTR_NAME,                       importConfig.name);
 
-         xmlImportConfig.putBoolean(ATTR_IS_ACTIVE_CONFIG,        isActiveConfig);
-         xmlImportConfig.putBoolean(ATTR_IS_CREATE_BACKUP,        importConfig.isCreateBackup);
-         xmlImportConfig.putBoolean(ATTR_IS_DELETE_DEVICE_FILES,  importConfig.isDeleteDeviceFiles);
-         xmlImportConfig.putBoolean(ATTR_IS_TURN_OFF_WATCHING,    importConfig.isTurnOffWatching);
+         xmlImportConfig.putBoolean(ATTR_IS_ACTIVE_CONFIG,           isActiveConfig);
+         xmlImportConfig.putBoolean(ATTR_IS_CREATE_BACKUP,           importConfig.isCreateBackup);
+         xmlImportConfig.putBoolean(ATTR_IS_DELETE_DEVICE_FILES,     importConfig.isDeleteDeviceFiles);
+         xmlImportConfig.putBoolean(ATTR_IS_TURN_OFF_WATCHING,       importConfig.isTurnOffWatching);
 
-         xmlImportConfig.putString( ATTR_BACKUP_FOLDER,           importConfig.getBackupFolder());
-         xmlImportConfig.putString( ATTR_DEVICE_FOLDER,           importConfig.getDeviceFolder());
-         xmlImportConfig.putInteger(ATTR_DEVICE_TYPE,             importConfig.getDeviceType());
+         xmlImportConfig.putString( ATTR_BACKUP_FOLDER,              importConfig.getBackupFolder());
+         xmlImportConfig.putString( ATTR_DEVICE_FOLDER,              importConfig.getDeviceFolder());
+         xmlImportConfig.putInteger(ATTR_DEVICE_TYPE,                importConfig.getDeviceType());
 
-         xmlImportConfig.putString( ATTR_DEVICE_FILES,            importConfig.fileGlobPattern);
+         xmlImportConfig.putString( ATTR_DEVICE_FILES,               importConfig.fileGlobPattern);
 
          // mount/unmount
-         xmlImportConfig.putBoolean(ATTR_IS_MOUNT_DEVICE,         importConfig.isMountDevice);
-         xmlImportConfig.putBoolean(ATTR_IS_UNMOUNT_DEVICE,       importConfig.isUnmountDevice);
-         xmlImportConfig.putString( ATTR_COMMAND_DEVICE_INFO,     importConfig.commandDeviceInfo);
-         xmlImportConfig.putString( ATTR_COMMAND_MOUNT,           importConfig.commandMount);
-         xmlImportConfig.putString( ATTR_COMMAND_MOUNT_IS_OK,     importConfig.commandMount_IsOK);
-         xmlImportConfig.putString( ATTR_COMMAND_UNMOUNT,         importConfig.commandUnmount);
-         xmlImportConfig.putString( ATTR_COMMAND_UNMOUNT_IS_OK,   importConfig.commandUnmount_IsOK);
+         xmlImportConfig.putBoolean(ATTR_IS_MOUNT_DEVICE,            importConfig.isMountDevice);
+         xmlImportConfig.putBoolean(ATTR_IS_UNMOUNT_DEVICE,          importConfig.isUnmountDevice);
+         xmlImportConfig.putBoolean(ATTR_IS_VERIFY_MOUNT_COMMAND,    importConfig.isVerifyMountCommand);
+         xmlImportConfig.putBoolean(ATTR_IS_VERIFY_UNMOUNT_COMMAND,  importConfig.isVerifyUnmountCommand);
+         xmlImportConfig.putString( ATTR_COMMAND_DEVICE_INFO,        importConfig.commandDeviceInfo);
+         xmlImportConfig.putString( ATTR_COMMAND_MOUNT,              importConfig.commandMount);
+         xmlImportConfig.putString( ATTR_COMMAND_MOUNT_IS_OK,        importConfig.commandMount_IsOK);
+         xmlImportConfig.putString( ATTR_COMMAND_UNMOUNT,            importConfig.commandUnmount);
+         xmlImportConfig.putString( ATTR_COMMAND_UNMOUNT_IS_OK,      importConfig.commandUnmount_IsOK);
       }
 
       /*

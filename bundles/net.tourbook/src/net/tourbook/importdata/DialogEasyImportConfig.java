@@ -89,6 +89,7 @@ import org.eclipse.swt.custom.BusyIndicator;
 import org.eclipse.swt.custom.CTabFolder;
 import org.eclipse.swt.custom.CTabItem;
 import org.eclipse.swt.custom.ScrolledComposite;
+import org.eclipse.swt.custom.StyledText;
 import org.eclipse.swt.dnd.DND;
 import org.eclipse.swt.dnd.DragSourceEvent;
 import org.eclipse.swt.dnd.DragSourceListener;
@@ -151,6 +152,7 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements IActionRe
    private static final String           STATE_BACKUP_FOLDER_HISTORY_ITEMS  = "STATE_BACKUP_FOLDER_HISTORY_ITEMS";         //$NON-NLS-1$
    private static final String           STATE_DEVICE_DEVICE_HISTORY_ITEMS  = "STATE_DEVICE_DEVICE_HISTORY_ITEMS";         //$NON-NLS-1$
    public static final String            STATE_DEVICE_FOLDER_HISTORY_ITEMS  = "STATE_DEVICE_FOLDER_HISTORY_ITEMS";         //$NON-NLS-1$
+   private static final String           STATE_IS_WORD_WRAP                 = "STATE_IS_WORD_WRAP";                        //$NON-NLS-1$
    private static final String           STATE_SELECTED_IMPORT_LAUNCHER     = "STATE_SELECTED_IMPORT_LAUNCHER";            //$NON-NLS-1$
    private static final String           STATE_SELECTED_TAB_FOLDER_LAUNCHER = "STATE_SELECTED_TAB_FOLDER_LAUNCHER";        //$NON-NLS-1$
    private static final String           STATE_SELECTED_TAB_FOLDER_MAIN     = "STATE_SELECTED_TAB_FOLDER_MAIN";            //$NON-NLS-1$
@@ -194,6 +196,7 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements IActionRe
    private ActionSpeedTourType_Add       _action_ILTT_Speed_Add;
    private ActionSpeedTourType_Sort      _action_ILTT_Speed_Sort;
    private ActionSpeedTourType_Delete[]  _allAction_TT_Speed_Delete;
+   private ActionToggleWordWrap          _actionToggleWordwrap;
    //
    private PixelConverter                _pc;
 
@@ -225,6 +228,7 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements IActionRe
    private int                           _leftPadding;
    private int                           _defaultPaneWidth;
    private boolean                       _isInUIUpdate;
+   private boolean                       _isWordWrap;
 
    private int                           _initialMainTab;
 
@@ -389,13 +393,13 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements IActionRe
    private Text                 _txtIC_ConfigName;
    private Text                 _txtIC_DeviceFiles;
    private Text                 _txtIC_Command_DeviceInfo;
-   private Text                 _txtIC_Command_DeviceInfo_Log;
+   private StyledText           _txtIC_Command_DeviceInfo_Log;
    private Text                 _txtIC_Command_Mount;
-   private Text                 _txtIC_Command_Mount_VerifyLog;
-   private Text                 _txtIC_Command_Mount_TestLog;
+   private StyledText           _txtIC_Command_Mount_TestLog;
+   private StyledText           _txtIC_Command_Mount_VerifyLog;
    private Text                 _txtIC_Command_Unmount;
-   private Text                 _txtIC_Command_Unmount_VerifyLog;
-   private Text                 _txtIC_Command_Unmount_TestLog;
+   private StyledText           _txtIC_Command_Unmount_VerifyLog;
+   private StyledText           _txtIC_Command_Unmount_TestLog;
 
    private Text                 _txtIL_ConfigDescription;
    private Text                 _txtIL_ConfigName;
@@ -667,6 +671,22 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements IActionRe
       }
    }
 
+   private class ActionToggleWordWrap extends Action {
+
+      public ActionToggleWordWrap() {
+
+         super(null, AS_PUSH_BUTTON);
+
+         setToolTipText("Toggle word wrap");
+         setImageDescriptor(CommonActivator.getImageDescriptor(CommonImages.WordWrap));
+      }
+
+      @Override
+      public void run() {
+         onToggleWordWrap();
+      }
+   }
+
    public class ICColumnViewer implements ITourViewer {
 
       @Override
@@ -926,6 +946,7 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements IActionRe
       setMessage(Messages.Dialog_ImportConfig_Dialog_Message);
 
       restoreState();
+      updateUI_WordWrap();
 
       enable_IC_Controls();
       enable_IL_Controls();
@@ -947,6 +968,7 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements IActionRe
 
       _actionOpenTourTypePrefs   = new ActionOpenPrefDialog(Messages.action_tourType_modify_tourTypes, PrefPageTourType_Definitions.ID);
       _actionRestoreDefaults     = new ActionResetToDefaults(this);
+      _actionToggleWordwrap      = new ActionToggleWordWrap();
 
 // SET_FORMATTING_ON
    }
@@ -1663,7 +1685,6 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements IActionRe
    }
 
    private Control createUI_300_Tab_Device(final Composite parent) {
-      // TODO Auto-generated method stub
 
       final Composite container = new Composite(parent, SWT.NONE);
       GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
@@ -1696,9 +1717,19 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements IActionRe
 
          GridDataFactory.fillDefaults()
                .align(SWT.FILL, SWT.CENTER)
+               .grab(true, false)
                .applyTo(_lblIC_Dev_SelectedConfig);
 
-         UI.createSpacer_Horizontal(parent);
+         {
+            /*
+             * Action: Word wrap
+             */
+            final ToolBar toolbarAction = UI.createToolbarAction(parent, _actionToggleWordwrap);
+            GridDataFactory.fillDefaults()
+                  .align(SWT.END, SWT.FILL)
+                  .applyTo(toolbarAction);
+
+         }
       }
    }
 
@@ -1734,7 +1765,7 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements IActionRe
          _btnIC_RunCommand_DeviceInfo.setText("Run Info");
          _btnIC_RunCommand_DeviceInfo.addSelectionListener(SelectionListener.widgetSelectedAdapter(
                selectionEvent -> {
-                  onSelect_IC_TestCommand(_txtIC_Command_DeviceInfo.getText(), _txtIC_Command_DeviceInfo_Log);
+                  onSelect_IC_RunCommand(_txtIC_Command_DeviceInfo.getText(), _txtIC_Command_DeviceInfo_Log);
                }));
          GridDataFactory.fillDefaults()
                .align(SWT.FILL, SWT.CENTER)
@@ -1748,7 +1779,7 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements IActionRe
 
          UI.createSpacer_Horizontal(parent);
 
-         _txtIC_Command_DeviceInfo_Log = new Text(parent,
+         _txtIC_Command_DeviceInfo_Log = new StyledText(parent,
                SWT.BORDER
 //                     | SWT.WRAP
                      | SWT.MULTI
@@ -1806,7 +1837,7 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements IActionRe
          _btnIC_RunCommand_Mount.setText("Run Mount");
          _btnIC_RunCommand_Mount.addSelectionListener(SelectionListener.widgetSelectedAdapter(
                selectionEvent -> {
-                  onSelect_IC_TestCommand(_txtIC_Command_Mount.getText(), _txtIC_Command_Mount_TestLog);
+                  onSelect_IC_RunCommand(_txtIC_Command_Mount.getText(), _txtIC_Command_Mount_TestLog);
                }));
          GridDataFactory.fillDefaults()
                .align(SWT.FILL, SWT.CENTER)
@@ -1857,7 +1888,7 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements IActionRe
                   /*
                    * Text: Mount command is OK
                    */
-                  _txtIC_Command_Mount_VerifyLog = new Text(container,
+                  _txtIC_Command_Mount_VerifyLog = new StyledText(container,
                         SWT.BORDER
 //                     | SWT.WRAP
                               | SWT.MULTI
@@ -1887,7 +1918,7 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements IActionRe
                   /*
                    * Text: Mount log
                    */
-                  _txtIC_Command_Mount_TestLog = new Text(container,
+                  _txtIC_Command_Mount_TestLog = new StyledText(container,
                         SWT.BORDER
 //                        | SWT.WRAP
                               | SWT.MULTI
@@ -1948,7 +1979,7 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements IActionRe
          _btnIC_RunCommand_Unmount.setText("Run Unmount");
          _btnIC_RunCommand_Unmount.addSelectionListener(SelectionListener.widgetSelectedAdapter(
                selectionEvent -> {
-                  onSelect_IC_TestCommand(_txtIC_Command_Unmount.getText(), _txtIC_Command_Unmount_TestLog);
+                  onSelect_IC_RunCommand(_txtIC_Command_Unmount.getText(), _txtIC_Command_Unmount_TestLog);
                }));
          GridDataFactory.fillDefaults()
                .align(SWT.FILL, SWT.CENTER)
@@ -1999,7 +2030,7 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements IActionRe
                   /*
                    * Text: Unmount command is OK
                    */
-                  _txtIC_Command_Unmount_VerifyLog = new Text(container,
+                  _txtIC_Command_Unmount_VerifyLog = new StyledText(container,
                         SWT.BORDER
 //                        | SWT.WRAP
                               | SWT.MULTI
@@ -2029,7 +2060,7 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements IActionRe
                   /*
                    * Text: Unmount log
                    */
-                  _txtIC_Command_Unmount_TestLog = new Text(container,
+                  _txtIC_Command_Unmount_TestLog = new StyledText(container,
                         SWT.BORDER
 //                           | SWT.WRAP
                               | SWT.MULTI
@@ -5080,7 +5111,7 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements IActionRe
       }
    }
 
-   private void onIC_CopyLog(final Text txtFrom, final Text txtInto) {
+   private void onIC_CopyLog(final StyledText txtFrom, final StyledText txtInto) {
 
       txtInto.setText(txtFrom.getText());
    }
@@ -5514,7 +5545,7 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements IActionRe
       _tabFolderEasy.setSelection(1);
    }
 
-   private void onSelect_IC_TestCommand(final String command, final Text logResult) {
+   private void onSelect_IC_RunCommand(final String command, final StyledText txtLog) {
 
       BusyIndicator.showWhile(Display.getDefault(), () -> {
 
@@ -5526,13 +5557,13 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements IActionRe
 
             // display error message
 
-            logResult.setForeground(UI.IS_DARK_THEME ? UI.SYS_COLOR_YELLOW : UI.SYS_COLOR_RED);
-            logResult.setText(processResult[1]);
+            txtLog.setForeground(UI.IS_DARK_THEME ? UI.SYS_COLOR_YELLOW : UI.SYS_COLOR_RED);
+            txtLog.setText(processResult[1]);
 
          } else {
 
-            logResult.setForeground(ThemeUtil.getDefaultForegroundColor_Shell());
-            logResult.setText(processResult[0]);
+            txtLog.setForeground(ThemeUtil.getDefaultForegroundColor_Shell());
+            txtLog.setText(processResult[0]);
          }
 
          // setting the text can resize the text boxes
@@ -5849,6 +5880,15 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements IActionRe
       updateUI_IL_ViewerRedraw();
    }
 
+   private void onToggleWordWrap() {
+
+      _isWordWrap = !_isWordWrap;
+
+      updateUI_WordWrap();
+
+      _parent.requestLayout();
+   }
+
    @Override
    public void resetToDefaults() {
 
@@ -5927,6 +5967,11 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements IActionRe
       icTable.setSelection(icTable.getSelectionIndex());
 
       /*
+       * Device
+       */
+      _isWordWrap = Util.getStateBoolean(_state, STATE_IS_WORD_WRAP, false);
+
+      /*
        * Import Launcher
        */
       final int stateILIndex = Util.getStateInt(_state, STATE_SELECTED_IMPORT_LAUNCHER, 0);
@@ -5979,9 +6024,8 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements IActionRe
 
    private void saveState() {
 
-      final int selectedILIndex = _ilViewer.getTable().getSelectionIndex();
-
-      _state.put(STATE_SELECTED_IMPORT_LAUNCHER, selectedILIndex);
+      _state.put(STATE_IS_WORD_WRAP, _isWordWrap);
+      _state.put(STATE_SELECTED_IMPORT_LAUNCHER, _ilViewer.getTable().getSelectionIndex());
 
       _icColumnManager.saveState(_stateIC);
       _ilColumnManager.saveState(_stateIL);
@@ -6394,6 +6438,11 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements IActionRe
          _txtIC_Command_Mount_VerifyLog   .setText(_selectedIC.commandMount_IsOK);
          _txtIC_Command_Unmount           .setText(_selectedIC.commandUnmount);
          _txtIC_Command_Unmount_VerifyLog .setText(_selectedIC.commandUnmount_IsOK);
+
+         // cleanup logs
+         _txtIC_Command_DeviceInfo_Log    .setText(UI.EMPTY_STRING);
+         _txtIC_Command_Mount_TestLog     .setText(UI.EMPTY_STRING);
+         _txtIC_Command_Unmount_TestLog   .setText(UI.EMPTY_STRING);
 
 // SET_FORMATTING_ON
       }
@@ -6873,5 +6922,18 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements IActionRe
       final Period durationPeriod = new Period(0, duration * 1000, _durationTemplate);
 
       _lblIL_TemperatureAdjustmentDuration_Unit.setText(durationPeriod.toString(UI.DEFAULT_DURATION_FORMATTER));
+   }
+
+   private void updateUI_WordWrap() {
+
+// SET_FORMATTING_OFF
+
+      _txtIC_Command_DeviceInfo_Log    .setWordWrap(_isWordWrap);
+      _txtIC_Command_Mount_TestLog     .setWordWrap(_isWordWrap);
+      _txtIC_Command_Mount_VerifyLog   .setWordWrap(_isWordWrap);
+      _txtIC_Command_Unmount_TestLog   .setWordWrap(_isWordWrap);
+      _txtIC_Command_Unmount_VerifyLog .setWordWrap(_isWordWrap);
+
+// SET_FORMATTING_ON
    }
 }
