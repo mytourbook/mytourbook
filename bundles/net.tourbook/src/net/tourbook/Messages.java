@@ -1373,8 +1373,8 @@ public class Messages extends NLS {
    public static String        Import_Data_Dialog_NoActivePerson_Message;
    public static String        Import_Data_Dialog_Radio_CancelReimport;
    public static String        Import_Data_Dialog_Radio_SelectFile;
-   public static String        Import_Data_Dialog_Radio_SkipFile;
    public static String        Import_Data_Dialog_Radio_SkipAllInvalidFiles;
+   public static String        Import_Data_Dialog_Radio_SkipFile;
    public static String        Import_Data_Dialog_ReimportFile_Title;
    public static String        Import_Data_Dialog_Reimport_SubTask;
    public static String        Import_Data_Dialog_Reimport_Task;
