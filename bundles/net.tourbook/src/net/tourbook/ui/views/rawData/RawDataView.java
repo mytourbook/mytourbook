@@ -86,6 +86,7 @@ import net.tourbook.common.util.ITourViewer;
 import net.tourbook.common.util.ITourViewer3;
 import net.tourbook.common.util.PostSelectionProvider;
 import net.tourbook.common.util.StatusUtil;
+import net.tourbook.common.util.StringUtils;
 import net.tourbook.common.util.TableColumnDefinition;
 import net.tourbook.common.util.Util;
 import net.tourbook.data.Equipment;
@@ -118,6 +119,7 @@ import net.tourbook.importdata.ImportState_Easy;
 import net.tourbook.importdata.ImportState_File;
 import net.tourbook.importdata.ImportState_Process;
 import net.tourbook.importdata.OSFile;
+import net.tourbook.importdata.ProcessContext;
 import net.tourbook.importdata.RawDataManager;
 import net.tourbook.importdata.SpeedCadence;
 import net.tourbook.importdata.SpeedEquipment;
@@ -1702,7 +1704,7 @@ public class RawDataView extends ViewPart implements
             // selected config
             + "      <td>" //$NON-NLS-1$
             + "         <div id='" + DOM_ID_IMPORT_CONFIG + "' class='" + watchClass + "'>" //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-            + createHTML_60_SelectImportConfig()
+            + createHTML_70_SelectImportConfig()
             + "         </div>" //                                //$NON-NLS-1$
             + "      </td>" //                                    //$NON-NLS-1$
 
@@ -1896,6 +1898,40 @@ public class RawDataView extends ViewPart implements
                folderInfo);
 
          isFolderOK &= isDeviceFolderOK;
+      }
+
+      /*
+       * Mount/unmount
+       */
+      {
+         final String commandMount = importConfig.commandMount.replace("\\", "\\\\");
+         final String commandUnmount = importConfig.commandUnmount.replace("\\", "\\\\");
+
+         // mount
+         sb.append(HTML_TR);
+
+         sb.append(HTML_TD_SPACE + HTML_STYLE_TITLE_VERTICAL_PADDING + " class='folderTitle'>"); //$NON-NLS-1$
+         sb.append("Mount");
+         sb.append(HTML_TD_END);
+
+         sb.append(HTML_TD_SPACE + HTML_STYLE_TITLE_VERTICAL_PADDING + " class='folderLocation'>"); //$NON-NLS-1$
+         sb.append("%s".formatted(importConfig.isMountDevice ? commandMount : "NO"));
+         sb.append(HTML_TD_END);
+
+         sb.append(HTML_TR_END);
+
+         // unmount
+         sb.append(HTML_TR);
+
+         sb.append(HTML_TD_SPACE + " class='folderTitle'>"); //$NON-NLS-1$
+         sb.append("Unmount");
+         sb.append(HTML_TD_END);
+
+         sb.append(HTML_TD_SPACE + " class='folderLocation'>"); //$NON-NLS-1$
+         sb.append("%s".formatted(importConfig.isUnmountDevice ? commandUnmount : "NO"));
+         sb.append(HTML_TD_END);
+
+         sb.append(HTML_TR_END);
       }
 
       /*
@@ -2158,7 +2194,7 @@ public class RawDataView extends ViewPart implements
       sb.append("</tbody></table>"); //$NON-NLS-1$
    }
 
-   private String createHTML_60_SelectImportConfig() {
+   private String createHTML_70_SelectImportConfig() {
 
       final String onChange = "onchange='" + JS_FUNCTION_ON_SELECT_IMPORT_CONFIG + "(this.selectedIndex)'"; //$NON-NLS-1$ //$NON-NLS-2$
 
@@ -5131,18 +5167,120 @@ public class RawDataView extends ViewPart implements
    }
 
    private void mountImportDevice_1_On() {
-      // TODO Auto-generated method stub
 
-//      mountImportDevice_3();
+      final EasyConfig easyConfig = getEasyConfig();
+      final ImportConfig selectedConfig = easyConfig.getActiveImportConfig();
+
+      if (selectedConfig.isMountDevice == false) {
+         // nothing is mounted
+         return;
+      }
+
+      TourLogManager.log_TITLE("Mount Device");
+
+      final String commandMount = selectedConfig.commandMount;
+
+      if (StringUtils.isNullOrEmpty(commandMount)) {
+         TourLogManager.log_ERROR("Mount device: Mount command cannot be empty");
+         return;
+      }
+
+      final String[] allCommands = commandMount.split(UI.SPACE1);
+
+      final ProcessContext processResult = EasyImportManager.runProcess(allCommands);
+
+      final String successLogText = processResult.output;
+      final String failedLogText = processResult.error;
+
+      if (failedLogText != null) {
+
+         // log error message
+
+         TourLogManager.log_ERROR("Mount device: Mount command failed:\n%s".formatted(failedLogText));
+
+         return;
+      }
+
+      // mount succeeded
+
+      if (selectedConfig.isVerifyMountCommand == false) {
+
+         TourLogManager.log_INFO("Mount device: Mount command was run but with no verify check");
+
+         return;
+      }
+
+      // verify log text
+
+      final String commandMount_VerifyLog = selectedConfig.commandMount_VerifyLog;
+
+      if (commandMount_VerifyLog.equals(successLogText)) {
+
+         TourLogManager.log_OK("Mount device: Mount command succeeded and was verified");
+
+      } else {
+
+         TourLogManager.log_ERROR("Mount device: Mount command was run but the verification failed");
+      }
    }
 
    private void mountImportDevice_2_Off() {
-      // TODO Auto-generated method stub
 
+      final EasyConfig easyConfig = getEasyConfig();
+      final ImportConfig selectedConfig = easyConfig.getActiveImportConfig();
+
+      if (selectedConfig.isMountDevice == false) {
+         // nothing is unmounted
+         return;
+      }
+
+      TourLogManager.log_TITLE("Unmount Device");
+
+      final String commandUnmount = selectedConfig.commandUnmount;
+
+      if (StringUtils.isNullOrEmpty(commandUnmount)) {
+         TourLogManager.log_ERROR("Unmount device: Unmount command cannot be empty");
+         return;
+      }
+
+      final String[] allCommands = commandUnmount.split(UI.SPACE1);
+
+      final ProcessContext processResult = EasyImportManager.runProcess(allCommands);
+
+      final String successLogText = processResult.output;
+      final String failedLogText = processResult.error;
+
+      if (failedLogText != null) {
+
+         // log error message
+
+         TourLogManager.log_ERROR("Unmount device: Unmount command failed:\n%s".formatted(failedLogText));
+
+         return;
+      }
+
+      // unmount succeeded
+
+      if (selectedConfig.isVerifyUnmountCommand == false) {
+
+         TourLogManager.log_INFO("Unmount device: Unmount command was run but with no verify check");
+
+         return;
+      }
+
+      // verify log text
+
+      final String commandUnmount_VerifyLog = selectedConfig.commandUnmount_VerifyLog;
+
+      if (commandUnmount_VerifyLog.equals(successLogText)) {
+
+         TourLogManager.log_OK("Unmount device: Unmount command succeeded and was verified");
+
+      } else {
+
+         TourLogManager.log_ERROR("Unmount device: Unmount command was run but the verification failed");
+      }
    }
-
-
-
 
    private void onBrowser_Completed() {
 
@@ -7182,6 +7320,11 @@ public class RawDataView extends ViewPart implements
          return;
       }
 
+      /**
+       * A BusyIndicator DO NOT WORK !!!
+       */
+//      BusyIndicator.showWhile(Display.getCurrent(), (() -> {}));
+
       /*
        * !!! Store watching must be canceled before the watch folder thread because it could
        * launch a new watch folder thread !!!
@@ -7215,6 +7358,7 @@ public class RawDataView extends ViewPart implements
          mountImportDevice_2_Off();
 
       } catch (final InterruptedException e) {
+
          TourLogManager.log_EXCEPTION_WithStacktrace(e);
       }
    }

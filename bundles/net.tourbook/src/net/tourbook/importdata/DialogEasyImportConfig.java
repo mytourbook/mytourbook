@@ -675,9 +675,9 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements IActionRe
 
       public ActionToggleWordWrap() {
 
-         super(null, AS_PUSH_BUTTON);
+         super(null, AS_CHECK_BOX);
 
-         setToolTipText("Toggle word wrap");
+         setToolTipText("Toggle word wrap in the log texts");
          setImageDescriptor(CommonActivator.getImageDescriptor(CommonImages.WordWrap));
       }
 
@@ -1765,7 +1765,9 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements IActionRe
          _btnIC_RunCommand_DeviceInfo.setText("Run Info");
          _btnIC_RunCommand_DeviceInfo.addSelectionListener(SelectionListener.widgetSelectedAdapter(
                selectionEvent -> {
-                  onSelect_IC_RunCommand(_txtIC_Command_DeviceInfo.getText(), _txtIC_Command_DeviceInfo_Log);
+                  onSelect_IC_RunMountCommand(
+                        _txtIC_Command_DeviceInfo.getText(),
+                        _txtIC_Command_DeviceInfo_Log);
                }));
          GridDataFactory.fillDefaults()
                .align(SWT.FILL, SWT.CENTER)
@@ -1837,7 +1839,9 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements IActionRe
          _btnIC_RunCommand_Mount.setText("Run Mount");
          _btnIC_RunCommand_Mount.addSelectionListener(SelectionListener.widgetSelectedAdapter(
                selectionEvent -> {
-                  onSelect_IC_RunCommand(_txtIC_Command_Mount.getText(), _txtIC_Command_Mount_TestLog);
+                  onSelect_IC_RunMountCommand(
+                        _txtIC_Command_Mount.getText(),
+                        _txtIC_Command_Mount_TestLog);
                }));
          GridDataFactory.fillDefaults()
                .align(SWT.FILL, SWT.CENTER)
@@ -1979,7 +1983,9 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements IActionRe
          _btnIC_RunCommand_Unmount.setText("Run Unmount");
          _btnIC_RunCommand_Unmount.addSelectionListener(SelectionListener.widgetSelectedAdapter(
                selectionEvent -> {
-                  onSelect_IC_RunCommand(_txtIC_Command_Unmount.getText(), _txtIC_Command_Unmount_TestLog);
+                  onSelect_IC_RunMountCommand(
+                        _txtIC_Command_Unmount.getText(),
+                        _txtIC_Command_Unmount_TestLog);
                }));
          GridDataFactory.fillDefaults()
                .align(SWT.FILL, SWT.CENTER)
@@ -5545,25 +5551,25 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements IActionRe
       _tabFolderEasy.setSelection(1);
    }
 
-   private void onSelect_IC_RunCommand(final String command, final StyledText txtLog) {
+   private void onSelect_IC_RunMountCommand(final String command, final StyledText txtLog) {
 
       BusyIndicator.showWhile(Display.getDefault(), () -> {
 
          final String[] allCommands = command.split(UI.SPACE1);
 
-         final String[] processResult = EasyImportManager.runProcess(allCommands);
+         final ProcessContext processContext = EasyImportManager.runProcess(allCommands);
 
-         if (processResult[1] != null) {
+         if (processContext.error != null) {
 
             // display error message
 
             txtLog.setForeground(UI.IS_DARK_THEME ? UI.SYS_COLOR_YELLOW : UI.SYS_COLOR_RED);
-            txtLog.setText(processResult[1]);
+            txtLog.setText(processContext.error);
 
          } else {
 
             txtLog.setForeground(ThemeUtil.getDefaultForegroundColor_Shell());
-            txtLog.setText(processResult[0]);
+            txtLog.setText(processContext.output);
          }
 
          // setting the text can resize the text boxes
@@ -6117,9 +6123,9 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements IActionRe
       _selectedIC.isVerifyUnmountCommand  = _chkIC_IsVerifyUnmountCommand     .getSelection();
       _selectedIC.commandDeviceInfo       = _txtIC_Command_DeviceInfo         .getText();
       _selectedIC.commandMount            = _txtIC_Command_Mount              .getText();
-      _selectedIC.commandMount_IsOK       = _txtIC_Command_Mount_VerifyLog    .getText();
+      _selectedIC.commandMount_VerifyLog       = _txtIC_Command_Mount_VerifyLog    .getText();
       _selectedIC.commandUnmount          = _txtIC_Command_Unmount            .getText();
-      _selectedIC.commandUnmount_IsOK     = _txtIC_Command_Unmount_VerifyLog  .getText();
+      _selectedIC.commandUnmount_VerifyLog     = _txtIC_Command_Unmount_VerifyLog  .getText();
 
 // SET_FORMATTING_ON
    }
@@ -6435,9 +6441,9 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements IActionRe
          _chkIC_IsVerifyUnmountCommand    .setSelection(_selectedIC.isVerifyUnmountCommand);
          _txtIC_Command_DeviceInfo        .setText(_selectedIC.commandDeviceInfo);
          _txtIC_Command_Mount             .setText(_selectedIC.commandMount);
-         _txtIC_Command_Mount_VerifyLog   .setText(_selectedIC.commandMount_IsOK);
+         _txtIC_Command_Mount_VerifyLog   .setText(_selectedIC.commandMount_VerifyLog);
          _txtIC_Command_Unmount           .setText(_selectedIC.commandUnmount);
-         _txtIC_Command_Unmount_VerifyLog .setText(_selectedIC.commandUnmount_IsOK);
+         _txtIC_Command_Unmount_VerifyLog .setText(_selectedIC.commandUnmount_VerifyLog);
 
          // cleanup logs
          _txtIC_Command_DeviceInfo_Log    .setText(UI.EMPTY_STRING);
@@ -6925,6 +6931,8 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements IActionRe
    }
 
    private void updateUI_WordWrap() {
+
+      _actionToggleWordwrap.setChecked(_isWordWrap);
 
 // SET_FORMATTING_OFF
 
