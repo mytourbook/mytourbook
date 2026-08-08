@@ -1429,7 +1429,6 @@ public class RawDataManager {
 
             Messages.Import_Data_Dialog_Radio_SelectFile, //           0
             Messages.Import_Data_Dialog_Radio_SkipFile, //             1
-            //todo fb?
             Messages.Import_Data_Dialog_Radio_SkipAllInvalidFiles, //  2
             Messages.Import_Data_Dialog_Radio_CancelReimport //        3
       };
