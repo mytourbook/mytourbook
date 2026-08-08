@@ -3014,8 +3014,8 @@ public class RawDataManager {
             reason = Messages.Log_Reimport_Tour_Skipped_FileLocationDialog_Auto;
 
             // THIS if() MUST BE BEFORE THE NEXT if() otherwise the wrong message is displayed !
-         } else if (reImportStatus.isCanceled_ByUser_SkipAllInvalidFiles) {
-            reason = Messages.Log_Reimport_Tour_Skipped_AllInvalidFiles_ByUser;
+            //} else if (reImportStatus.isCanceled_ByUser_SkipAllInvalidFiles) {
+            // reason = Messages.Log_Reimport_Tour_Skipped_AllInvalidFiles_ByUser;
 
          } else if (reImportStatus.isCanceled_ByUser_TheFileLocationDialog) {
             reason = Messages.Log_Reimport_Tour_Skipped_FileLocationDialog_ByUser;
