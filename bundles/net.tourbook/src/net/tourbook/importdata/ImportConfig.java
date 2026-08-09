@@ -52,6 +52,7 @@ public class ImportConfig implements Cloneable {
    public boolean             isUnmountDevice;
    public boolean             isVerifyMountCommand;
    public boolean             isVerifyUnmountCommand;
+   
    public String              commandDeviceInfo        = UI.EMPTY_STRING;
    public String              commandMount             = UI.EMPTY_STRING;
    public String              commandMount_VerifyLog   = UI.EMPTY_STRING;

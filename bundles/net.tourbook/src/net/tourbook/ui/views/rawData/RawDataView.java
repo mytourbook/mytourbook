@@ -5551,6 +5551,7 @@ public class RawDataView extends ViewPart implements
 
       final ImportConfig selectedConfig = easyConfig.importConfigs.get(selectedIndex);
 
+      // set watcher off for the old config, this will also unmount the device
       setWatcher_2_Off();
       {
          easyConfig.setActiveImportConfig(selectedConfig);
