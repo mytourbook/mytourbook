@@ -5572,7 +5572,7 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements IActionRe
             txtLog.setText(processContext.output);
          }
 
-         // setting the text can resize the text boxes
+         // when setting the text, it can resize the text boxes
          _parent.layout(true, true);
       });
    }

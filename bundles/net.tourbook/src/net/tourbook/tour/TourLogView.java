@@ -468,6 +468,8 @@ public class TourLogView extends ViewPart {
 
       String jsText = UI.replaceJS_BackSlash(tourLog.message);
       jsText = UI.replaceJS_Apostrophe(jsText);
+      jsText = WEB.convertHTML_LineBreaks(jsText);
+
       final String message = jsText;
 
       final String subItem = tourLog.isSubLogItem

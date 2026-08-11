@@ -203,6 +203,9 @@ public class EasyImportManager {
    }
 
    /**
+    * Run the mount or unmount commands for <a href=
+    * "https://github.com/mytourbook/mytourbook/issues/1720">https://github.com/mytourbook/mytourbook/issues/1720</a>
+    *
     * @param allCommands
     * @param string
     *
@@ -213,6 +216,8 @@ public class EasyImportManager {
 //      C:\BIN\MTP\mtpmount.exe list available
 //      C:\BIN\MTP\mtpmount.exe mount #0 g:
 //      C:\BIN\MTP\mtpmount.exe unmount g:
+
+      final int timeout = 10;
 
       final List<String> allCommandsAsList = new ArrayList<>();
       allCommandsAsList.addAll(Arrays.asList(allCommands));
@@ -230,7 +235,7 @@ public class EasyImportManager {
 
          process = processBuilder.start();
 
-         final boolean isFinished = process.waitFor(10, TimeUnit.SECONDS);
+         final boolean isFinished = process.waitFor(timeout, TimeUnit.SECONDS);
 
          if (isFinished == false) {
 
@@ -239,7 +244,8 @@ public class EasyImportManager {
             process.destroyForcibly();
 
             // set error message
-            processContext.error = "Run command\n\n%s\n\nCommand timed out in 10 seconds and was killed".formatted(commandLine);
+            processContext.error = "Run command\n\n%s\n\nCommand timed out in %d seconds and was killed"
+                  .formatted(commandLine, timeout);
 
          } else {
 
@@ -885,17 +891,17 @@ public class EasyImportManager {
       dashConfig.importConfigs.add(importConfig);
 
       importConfig.name                      = Util.getXmlString(xmlConfig,   ATTR_NAME,                       UI.EMPTY_STRING);
-                                             
+
       importConfig.isCreateBackup            = Util.getXmlBoolean(xmlConfig,  ATTR_IS_CREATE_BACKUP,           true);
       importConfig.isDeleteDeviceFiles       = Util.getXmlBoolean(xmlConfig,  ATTR_IS_DELETE_DEVICE_FILES,     false);
       importConfig.isTurnOffWatching         = Util.getXmlBoolean(xmlConfig,  ATTR_IS_TURN_OFF_WATCHING,       false);
-                                             
+
       importConfig.setBackupFolder           (Util.getXmlString(xmlConfig,    ATTR_BACKUP_FOLDER,              UI.EMPTY_STRING));
       importConfig.setDeviceFolder           (Util.getXmlString(xmlConfig,    ATTR_DEVICE_FOLDER,              UI.EMPTY_STRING));
       importConfig.setDeviceType             (Util.getXmlInteger(xmlConfig,   ATTR_DEVICE_TYPE,                0));
-                                             
+
       importConfig.fileGlobPattern           = Util.getXmlString( xmlConfig,  ATTR_DEVICE_FILES, ImportConfig.DEVICE_FILES_DEFAULT);
-                                             
+
       importConfig.isMountDevice             = Util.getXmlBoolean(xmlConfig,  ATTR_IS_MOUNT_DEVICE,            false);
       importConfig.isUnmountDevice           = Util.getXmlBoolean(xmlConfig,  ATTR_IS_UNMOUNT_DEVICE,          false);
       importConfig.isVerifyMountCommand      = Util.getXmlBoolean(xmlConfig,  ATTR_IS_VERIFY_MOUNT_COMMAND,    false);
