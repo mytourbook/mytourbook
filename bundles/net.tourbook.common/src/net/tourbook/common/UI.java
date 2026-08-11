@@ -129,6 +129,7 @@ import org.eclipse.ui.IMemento;
 import org.eclipse.ui.IViewPart;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchPart;
+import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.forms.widgets.FormToolkit;
@@ -2640,7 +2641,12 @@ public class UI {
     */
    public static IStatusLineManager getStatusLineManager() {
 
-      final IWorkbenchPage activePage = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
+      final IWorkbenchWindow activeWorkbenchWindow = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
+      if (activeWorkbenchWindow == null) {
+         return null;
+      }
+
+      final IWorkbenchPage activePage = activeWorkbenchWindow.getActivePage();
 
       final IWorkbenchPart activePart = activePage.getActivePart();
       if (activePart instanceof final IViewPart viewPart) {

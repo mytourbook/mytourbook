@@ -119,6 +119,7 @@ public class EasyImportManager {
    private static final String      ATTR_COMMAND_MOUNT_IS_OK                              = "mountCommand_IsOK";                                      //$NON-NLS-1$
    private static final String      ATTR_COMMAND_UNMOUNT                                  = "unmountCommand";                                         //$NON-NLS-1$
    private static final String      ATTR_COMMAND_UNMOUNT_IS_OK                            = "unmountCommand_IsOK";                                    //$NON-NLS-1$
+   private static final String      ATTR_MOUNT_UNMOUNT_TIMEOUT                            = "mountUnmountTimeout";                                    //$NON-NLS-1$
    //
    private static final String      ATTR_DASH_BACKGROUND_OPACITY                          = "backgroundOpacity";                                      //$NON-NLS-1$
    private static final String      ATTR_DASH_ANIMATION_CRAZY_FACTOR                      = "animationCrazyFactor";                                   //$NON-NLS-1$
@@ -211,13 +212,11 @@ public class EasyImportManager {
     *
     * @return Returns in [0] the command log, in [1] the error message when available
     */
-   public static ProcessContext runProcess(final String... allCommands) {
+   public static ProcessContext runProcess(final int timeout, final String... allCommands) {
 
 //      C:\BIN\MTP\mtpmount.exe list available
 //      C:\BIN\MTP\mtpmount.exe mount #0 g:
 //      C:\BIN\MTP\mtpmount.exe unmount g:
-
-      final int timeout = 10;
 
       final List<String> allCommandsAsList = new ArrayList<>();
       allCommandsAsList.addAll(Arrays.asList(allCommands));
@@ -911,6 +910,7 @@ public class EasyImportManager {
       importConfig.commandMount_VerifyLog    = Util.getXmlString(xmlConfig,   ATTR_COMMAND_MOUNT_IS_OK,        UI.EMPTY_STRING);
       importConfig.commandUnmount            = Util.getXmlString(xmlConfig,   ATTR_COMMAND_UNMOUNT,            UI.EMPTY_STRING);
       importConfig.commandUnmount_VerifyLog  = Util.getXmlString(xmlConfig,   ATTR_COMMAND_UNMOUNT_IS_OK,      UI.EMPTY_STRING);
+      importConfig.mountUnmountTimeout       = Util.getXmlInteger(xmlConfig,  ATTR_MOUNT_UNMOUNT_TIMEOUT,      ImportConfig.MOUNT_UNMOUNT_TIMEOUT_DEFAULT);
 
 // SET_FORMATTING_ON
 
@@ -1488,6 +1488,7 @@ public class EasyImportManager {
          xmlImportConfig.putString( ATTR_COMMAND_MOUNT_IS_OK,        importConfig.commandMount_VerifyLog);
          xmlImportConfig.putString( ATTR_COMMAND_UNMOUNT,            importConfig.commandUnmount);
          xmlImportConfig.putString( ATTR_COMMAND_UNMOUNT_IS_OK,      importConfig.commandUnmount_VerifyLog);
+         xmlImportConfig.putInteger(ATTR_MOUNT_UNMOUNT_TIMEOUT,      importConfig.mountUnmountTimeout);
       }
 
       /*

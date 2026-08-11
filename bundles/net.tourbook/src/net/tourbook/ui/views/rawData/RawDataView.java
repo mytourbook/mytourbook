@@ -5199,7 +5199,9 @@ public class RawDataView extends ViewPart implements
 
             final long start = System.currentTimeMillis();
 
-            final ProcessContext processResult = EasyImportManager.runProcess(allCommands);
+            final ProcessContext processResult = EasyImportManager.runProcess(
+                  selectedConfig.mountUnmountTimeout,
+                  allCommands);
 
             final double processDuration = (System.currentTimeMillis() - start) / 1000.0;
 
@@ -5270,7 +5272,9 @@ public class RawDataView extends ViewPart implements
 
             final long start = System.currentTimeMillis();
 
-            final ProcessContext processResult = EasyImportManager.runProcess(allCommands);
+            final ProcessContext processResult = EasyImportManager.runProcess(
+                  selectedConfig.mountUnmountTimeout,
+                  allCommands);
 
             final double processDuration = (System.currentTimeMillis() - start) / 1000.0;
 

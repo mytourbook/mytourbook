@@ -380,6 +380,7 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements IActionRe
    private Spinner              _spinnerDash_NumHTiles;
    private Spinner              _spinnerDash_StateTooltipWidth;
    private Spinner              _spinnerDash_TileSize;
+   private Spinner              _spinnerIC_CommandTimeout;
    private Spinner              _spinnerIL_AvgTemperature;
    private Spinner              _spinnerIL_LastMarkerDistance;
    private Spinner              _spinnerIL_TemperatureAdjustmentDuration;
@@ -1728,15 +1729,15 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements IActionRe
             GridDataFactory.fillDefaults()
                   .align(SWT.END, SWT.FILL)
                   .applyTo(toolbarAction);
-
          }
       }
    }
 
    private void createUI_310_Dev_Info(final Composite parent) {
 
-      UI.createSpacer_Vertical(parent, 6, 3);
+      final GridDataFactory gd = GridDataFactory.fillDefaults().align(SWT.FILL, SWT.CENTER);
 
+      UI.createSpacer_Vertical(parent, 6, 3);
       {
          /*
           * Label: Device info
@@ -1744,9 +1745,7 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements IActionRe
          final Label label = new Label(parent, SWT.NONE);
          label.setText("Device inf&o command");
          label.setToolTipText("This command can be used to provide device info,\ne.g. list all available devices");
-         GridDataFactory.fillDefaults()
-               .align(SWT.FILL, SWT.CENTER)
-               .applyTo(label);
+         gd.applyTo(label);
 
          /*
           * Text: Device info
@@ -1769,9 +1768,7 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements IActionRe
                         _txtIC_Command_DeviceInfo.getText(),
                         _txtIC_Command_DeviceInfo_Log);
                }));
-         GridDataFactory.fillDefaults()
-               .align(SWT.FILL, SWT.CENTER)
-               .applyTo(_btnIC_RunCommand_DeviceInfo);
+         gd.applyTo(_btnIC_RunCommand_DeviceInfo);
          setButtonLayoutData(_btnIC_RunCommand_DeviceInfo);
       }
       {
@@ -1783,7 +1780,6 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements IActionRe
 
          _txtIC_Command_DeviceInfo_Log = new StyledText(parent,
                SWT.BORDER
-//                     | SWT.WRAP
                      | SWT.MULTI
                      | SWT.V_SCROLL
                      | SWT.H_SCROLL);
@@ -1793,6 +1789,35 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements IActionRe
                .grab(true, true)
                .span(2, 1)
                .applyTo(_txtIC_Command_DeviceInfo_Log);
+      }
+      {
+         /*
+          * Timeout
+          */
+         final Label label = new Label(parent, SWT.NONE);
+         label.setText("&Timeout");
+         label.setToolTipText("Timeout before the command is killed");
+         gd.applyTo(label);
+
+         final Composite container = new Composite(parent, SWT.NONE);
+         GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
+         GridLayoutFactory.fillDefaults().numColumns(2).applyTo(container);
+         {
+
+            // spinner
+            _spinnerIC_CommandTimeout = new Spinner(container, SWT.BORDER);
+            _spinnerIC_CommandTimeout.setMinimum(1);
+            _spinnerIC_CommandTimeout.setMaximum(100);
+            _spinnerIC_CommandTimeout.addSelectionListener(_icSelectionListener);
+            _spinnerIC_CommandTimeout.addMouseWheelListener(_defaultMouseWheelListener);
+            gd.applyTo(_spinnerIC_CommandTimeout);
+
+            // sec
+            final Label labelUnit = UI.createLabel(container, Messages.App_Unit_Seconds_Small);
+            gd.applyTo(labelUnit);
+         }
+
+         UI.createSpacer_Horizontal(parent);
       }
    }
 
@@ -1894,7 +1919,6 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements IActionRe
                    */
                   _txtIC_Command_Mount_VerifyLog = new StyledText(container,
                         SWT.BORDER
-//                     | SWT.WRAP
                               | SWT.MULTI
                               | SWT.V_SCROLL
                               | SWT.H_SCROLL);
@@ -1924,7 +1948,6 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements IActionRe
                    */
                   _txtIC_Command_Mount_TestLog = new StyledText(container,
                         SWT.BORDER
-//                        | SWT.WRAP
                               | SWT.MULTI
                               | SWT.V_SCROLL
                               | SWT.H_SCROLL);
@@ -2038,7 +2061,6 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements IActionRe
                    */
                   _txtIC_Command_Unmount_VerifyLog = new StyledText(container,
                         SWT.BORDER
-//                        | SWT.WRAP
                               | SWT.MULTI
                               | SWT.V_SCROLL
                               | SWT.H_SCROLL);
@@ -2068,7 +2090,6 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements IActionRe
                    */
                   _txtIC_Command_Unmount_TestLog = new StyledText(container,
                         SWT.BORDER
-//                           | SWT.WRAP
                               | SWT.MULTI
                               | SWT.V_SCROLL
                               | SWT.H_SCROLL);
@@ -5514,6 +5535,7 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements IActionRe
 
       final TourbookFileSystem fileSystem = FileSystemManager.getTourbookFileSystem(filterOSPath);
       if (fileSystem != null) {
+
          // The current device is an external device (Dropbox...)
 
          try {
@@ -5526,7 +5548,9 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements IActionRe
          } catch (final Exception e) {
             StatusUtil.log(e);
          }
+
       } else {
+
          final DirectoryDialog dialog = new DirectoryDialog(_parent.getShell(), SWT.SAVE);
 
          dialog.setText(Messages.Dialog_ImportConfig_Dialog_DeviceFolder_Title);
@@ -5557,7 +5581,9 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements IActionRe
 
          final String[] allCommands = command.split(UI.SPACE1);
 
-         final ProcessContext processContext = EasyImportManager.runProcess(allCommands);
+         final ProcessContext processContext = EasyImportManager.runProcess(
+               _selectedIC.mountUnmountTimeout,
+               allCommands);
 
          if (processContext.error != null) {
 
@@ -6105,27 +6131,28 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements IActionRe
 
 // SET_FORMATTING_OFF
 
-      _selectedIC.name                    = _txtIC_ConfigName                 .getText();
+      _selectedIC.name                       = _txtIC_ConfigName                 .getText();
 
-      _selectedIC.isCreateBackup          = _chkIC_CreateBackup               .getSelection();
-      _selectedIC.isDeleteDeviceFiles     = _chkIC_DeleteDeviceFiles          .getSelection();
-      _selectedIC.isTurnOffWatching       = _chkIC_TurnOffWatching            .getSelection();
+      _selectedIC.isCreateBackup             = _chkIC_CreateBackup               .getSelection();
+      _selectedIC.isDeleteDeviceFiles        = _chkIC_DeleteDeviceFiles          .getSelection();
+      _selectedIC.isTurnOffWatching          = _chkIC_TurnOffWatching            .getSelection();
 
-      _selectedIC.setBackupFolder(        _comboIC_BackupFolder               .getText());
-      _selectedIC.setDeviceType(          _comboIC_DeviceType                 .getSelectionIndex());
-      _selectedIC.setDeviceFolder(        _comboIC_DeviceFolder               .getText());
+      _selectedIC.setBackupFolder(           _comboIC_BackupFolder               .getText());
+      _selectedIC.setDeviceType(             _comboIC_DeviceType                 .getSelectionIndex());
+      _selectedIC.setDeviceFolder(           _comboIC_DeviceFolder               .getText());
 
-      _selectedIC.fileGlobPattern         = _txtIC_DeviceFiles                .getText();
+      _selectedIC.fileGlobPattern            = _txtIC_DeviceFiles                .getText();
 
-      _selectedIC.isMountDevice           = _chkIC_IsMountDevice              .getSelection();
-      _selectedIC.isUnmountDevice         = _chkIC_IsUnmountDevice            .getSelection();
-      _selectedIC.isVerifyMountCommand    = _chkIC_IsVerifyMountCommand       .getSelection();
-      _selectedIC.isVerifyUnmountCommand  = _chkIC_IsVerifyUnmountCommand     .getSelection();
-      _selectedIC.commandDeviceInfo       = _txtIC_Command_DeviceInfo         .getText();
-      _selectedIC.commandMount            = _txtIC_Command_Mount              .getText();
-      _selectedIC.commandMount_VerifyLog       = _txtIC_Command_Mount_VerifyLog    .getText();
-      _selectedIC.commandUnmount          = _txtIC_Command_Unmount            .getText();
-      _selectedIC.commandUnmount_VerifyLog     = _txtIC_Command_Unmount_VerifyLog  .getText();
+      _selectedIC.isMountDevice              = _chkIC_IsMountDevice              .getSelection();
+      _selectedIC.isUnmountDevice            = _chkIC_IsUnmountDevice            .getSelection();
+      _selectedIC.isVerifyMountCommand       = _chkIC_IsVerifyMountCommand       .getSelection();
+      _selectedIC.isVerifyUnmountCommand     = _chkIC_IsVerifyUnmountCommand     .getSelection();
+      _selectedIC.commandDeviceInfo          = _txtIC_Command_DeviceInfo         .getText();
+      _selectedIC.commandMount               = _txtIC_Command_Mount              .getText();
+      _selectedIC.commandMount_VerifyLog     = _txtIC_Command_Mount_VerifyLog    .getText();
+      _selectedIC.commandUnmount             = _txtIC_Command_Unmount            .getText();
+      _selectedIC.commandUnmount_VerifyLog   = _txtIC_Command_Unmount_VerifyLog  .getText();
+      _selectedIC.mountUnmountTimeout        = _spinnerIC_CommandTimeout         .getSelection();
 
 // SET_FORMATTING_ON
    }
@@ -6420,35 +6447,36 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements IActionRe
       {
 // SET_FORMATTING_OFF
 
-         _txtIC_ConfigName                .setText(_selectedIC.name);
+         _txtIC_ConfigName                   .setText(      _selectedIC.name);
 
-         _chkIC_CreateBackup              .setSelection(_selectedIC.isCreateBackup);
-         _chkIC_DeleteDeviceFiles         .setSelection(_selectedIC.isDeleteDeviceFiles);
-         _chkIC_TurnOffWatching           .setSelection(_selectedIC.isTurnOffWatching);
+         _chkIC_CreateBackup                 .setSelection( _selectedIC.isCreateBackup);
+         _chkIC_DeleteDeviceFiles            .setSelection( _selectedIC.isDeleteDeviceFiles);
+         _chkIC_TurnOffWatching              .setSelection( _selectedIC.isTurnOffWatching);
 
-         _comboIC_BackupFolder            .setText(_selectedIC.getBackupFolder());
-         _comboIC_DeviceFolder            .setText(_selectedIC.getDeviceFolder());
-         _comboIC_DeviceType              .select(_selectedIC.getDeviceType());
+         _comboIC_BackupFolder               .setText(      _selectedIC.getBackupFolder());
+         _comboIC_DeviceFolder               .setText(      _selectedIC.getDeviceFolder());
+         _comboIC_DeviceType                 .select(       _selectedIC.getDeviceType());
 
-         _txtIC_DeviceFiles               .setText(_selectedIC.fileGlobPattern);
-         _lblIC_DeleteFilesInfo           .setText(createUIText_MovedFiles());
+         _txtIC_DeviceFiles                  .setText(      _selectedIC.fileGlobPattern);
+         _lblIC_DeleteFilesInfo              .setText(      createUIText_MovedFiles());
 
          // mount/unmount
-         _lblIC_Dev_SelectedConfig        .setText(_selectedIC.name);
-         _chkIC_IsMountDevice             .setSelection(_selectedIC.isMountDevice);
-         _chkIC_IsUnmountDevice           .setSelection(_selectedIC.isUnmountDevice);
-         _chkIC_IsVerifyMountCommand      .setSelection(_selectedIC.isVerifyMountCommand);
-         _chkIC_IsVerifyUnmountCommand    .setSelection(_selectedIC.isVerifyUnmountCommand);
-         _txtIC_Command_DeviceInfo        .setText(_selectedIC.commandDeviceInfo);
-         _txtIC_Command_Mount             .setText(_selectedIC.commandMount);
-         _txtIC_Command_Mount_VerifyLog   .setText(_selectedIC.commandMount_VerifyLog);
-         _txtIC_Command_Unmount           .setText(_selectedIC.commandUnmount);
-         _txtIC_Command_Unmount_VerifyLog .setText(_selectedIC.commandUnmount_VerifyLog);
+         _lblIC_Dev_SelectedConfig           .setText(      _selectedIC.name);
+         _chkIC_IsMountDevice                .setSelection( _selectedIC.isMountDevice);
+         _chkIC_IsUnmountDevice              .setSelection( _selectedIC.isUnmountDevice);
+         _chkIC_IsVerifyMountCommand         .setSelection( _selectedIC.isVerifyMountCommand);
+         _chkIC_IsVerifyUnmountCommand       .setSelection( _selectedIC.isVerifyUnmountCommand);
+         _txtIC_Command_DeviceInfo           .setText(      _selectedIC.commandDeviceInfo);
+         _txtIC_Command_Mount                .setText(      _selectedIC.commandMount);
+         _txtIC_Command_Mount_VerifyLog      .setText(      _selectedIC.commandMount_VerifyLog);
+         _txtIC_Command_Unmount              .setText(      _selectedIC.commandUnmount);
+         _txtIC_Command_Unmount_VerifyLog    .setText(      _selectedIC.commandUnmount_VerifyLog);
+         _spinnerIC_CommandTimeout           .setSelection( _selectedIC.mountUnmountTimeout);
 
          // cleanup logs
-         _txtIC_Command_DeviceInfo_Log    .setText(UI.EMPTY_STRING);
-         _txtIC_Command_Mount_TestLog     .setText(UI.EMPTY_STRING);
-         _txtIC_Command_Unmount_TestLog   .setText(UI.EMPTY_STRING);
+         _txtIC_Command_DeviceInfo_Log       .setText(      UI.EMPTY_STRING);
+         _txtIC_Command_Mount_TestLog        .setText(      UI.EMPTY_STRING);
+         _txtIC_Command_Unmount_TestLog      .setText(      UI.EMPTY_STRING);
 
 // SET_FORMATTING_ON
       }
