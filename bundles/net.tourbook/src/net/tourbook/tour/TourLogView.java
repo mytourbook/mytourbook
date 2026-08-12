@@ -253,7 +253,7 @@ public class TourLogView extends ViewPart {
 
    private void addLog_10_UpdateUI() {
 
-      List<TourLog> allLogItems;
+      List<TourLog> allNewLogItems;
 
       // get current log items and cleanup queue
       synchronized (_tourLog_Queue) {
@@ -262,28 +262,30 @@ public class TourLogView extends ViewPart {
             return;
          }
 
-         allLogItems = _tourLog_Queue.stream().toList();
+         allNewLogItems = _tourLog_Queue.stream().toList();
          _tourLog_Queue.clear();
       }
 
       /*
        * Create log text
        */
-      final StringBuilder logsWithJs = new StringBuilder();
+      final StringBuilder sbAllNewJsLogs = new StringBuilder();
       final ArrayList<String> allSimple = new ArrayList<>();
 
-      allLogItems.forEach(tourLog_InQueue -> {
+      allNewLogItems.forEach(newLogItem -> {
 
-         logsWithJs.append(createLogMessage_Js(tourLog_InQueue));
+         sbAllNewJsLogs.append(createLogMessage_Js(newLogItem));
 
-         allSimple.add(createLogMessage_NoJs(tourLog_InQueue, getStateImage_NoBrowser(tourLog_InQueue.state)));
+         final String stateImage_NoBrowser = getStateImage_NoBrowser(newLogItem.state);
+
+         allSimple.add(createLogMessage_NoJs(newLogItem, stateImage_NoBrowser));
       });
 
       if (isBrowserAvailable() && _isUIColorfull) {
 
          // show browser log text
 
-         _browser.execute(logsWithJs.toString());
+         _browser.execute(sbAllNewJsLogs.toString());
 
          // scroll to the bottom
          _browser.execute(UI.EMPTY_STRING
@@ -802,16 +804,6 @@ public class TourLogView extends ViewPart {
       return UI.EMPTY_STRING;
    }
 
-   private boolean httpAction(final String location) {
-
-      if (location.toLowerCase().startsWith("http://") || //$NON-NLS-1$
-            location.toLowerCase().startsWith("https://")) { //$NON-NLS-1$
-         WEB.openUrl(location);
-         return true;
-      }
-      return false;
-   }
-
    private void initUI() {
 
       /*
@@ -837,6 +829,21 @@ public class TourLogView extends ViewPart {
    public boolean isDisposed() {
 
       return _pageBook == null || _pageBook.isDisposed();
+   }
+
+   private boolean isHttpAction(final String location) {
+
+      final String locationLowerCase = location.toLowerCase();
+
+      if (locationLowerCase.startsWith("http://") || //$NON-NLS-1$
+            locationLowerCase.startsWith("https://")) { //$NON-NLS-1$
+
+         WEB.openUrl(location);
+
+         return true;
+      }
+
+      return false;
    }
 
    private String js_SetStyleBgImage(final String imageUrl) {
@@ -937,15 +944,13 @@ public class TourLogView extends ViewPart {
       _browser.setRedraw(true);
 
       // show already logged items
-      final CopyOnWriteArrayList<TourLog> importLogs = TourLogManager.getLogs();
+      final CopyOnWriteArrayList<TourLog> allLogs = TourLogManager.getLogs();
 
-      final TourLog[] allImportLogs = importLogs.toArray(new TourLog[importLogs.size()]);
-
-      final int numLogs = allImportLogs.length;
+      final int numLogs = allLogs.size();
       final int logIndexStart = Math.max(0, numLogs - MAX_BROWSER_ITEMS);
 
       for (int logIndex = logIndexStart; logIndex < numLogs; logIndex++) {
-         addLog(allImportLogs[logIndex]);
+         addLog(allLogs.get(logIndex));
       }
 
       _isBrowserContentSet = numLogs > 0;
@@ -953,7 +958,7 @@ public class TourLogView extends ViewPart {
 
    private void onBrowser_LocationChanging(final LocationEvent event) {
 
-      if (httpAction(event.location)) {
+      if (isHttpAction(event.location)) {
 
          // keep current page when an action is performed, OTHERWISE the current page will disappear or is replaced :-(
          event.doit = false;
@@ -1016,7 +1021,7 @@ public class TourLogView extends ViewPart {
    }
 
    /**
-    * Set/create dashboard page.
+    * Set/create log page
     */
    private void updateUI() {
 

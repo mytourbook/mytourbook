@@ -4332,10 +4332,14 @@ public class RawDataView extends ViewPart implements
    @Override
    public void dispose() {
 
-      resetEasyImport(false);
-
+      /*
+       * VERY IMPORTANT: _imageSensor MUST be disposed BEFORE resetting the import, otherwise the
+       * statusline can contain a disposed image which is causing an exception !!!
+       */
       _images.dispose();
       _imageSensor.dispose();
+
+      resetEasyImport(false);
 
       // don't throw the selection again
       _postSelectionProvider.clearSelection();
@@ -5195,51 +5199,56 @@ public class RawDataView extends ViewPart implements
 
          BusyIndicator.showWhile(_display, (() -> {
 
-            final String[] allCommands = commandMount.split(UI.SPACE1);
-
-            final long start = System.currentTimeMillis();
-
-            final ProcessContext processResult = EasyImportManager.runProcess(
-                  selectedConfig.mountUnmountTimeout,
-                  allCommands);
-
-            final double processDuration = (System.currentTimeMillis() - start) / 1000.0;
-
-            final String successLogText = processResult.output;
-            final String failedLogText = processResult.error;
-
-            if (failedLogText != null) {
-
-               // log error message
-
-               TourLogManager.log_ERROR("Mount device: Mount command failed:\n%s".formatted(failedLogText));
-
-               return;
-            }
-
-            // mount succeeded
-
-            if (selectedConfig.isVerifyMountCommand == false) {
-
-               TourLogManager.log_INFO("Mount device: Mount command was run but with no verify check in %.1f s".formatted(processDuration));
-
-               return;
-            }
-
-            // verify log text
-
-            final String commandMount_VerifyLog = selectedConfig.commandMount_VerifyLog;
-
-            if (commandMount_VerifyLog.equals(successLogText)) {
-
-               TourLogManager.log_OK("Mount device: Mount command succeeded and was verified in %.1f s".formatted(processDuration));
-
-            } else {
-
-               TourLogManager.log_ERROR("Mount device: Mount command was run but the verification failed in %.1f s".formatted(processDuration));
-            }
+            mountImportDevice_1_On_Async(selectedConfig, commandMount);
          }));
       });
+   }
+
+   private void mountImportDevice_1_On_Async(final ImportConfig selectedConfig, final String commandMount) {
+
+      final String[] allCommands = commandMount.split(UI.SPACE1);
+
+      final long start = System.currentTimeMillis();
+
+      final ProcessContext processResult = EasyImportManager.runProcess(
+            selectedConfig.mountUnmountTimeout,
+            allCommands);
+
+      final double processDuration = (System.currentTimeMillis() - start) / 1000.0;
+
+      final String successLogText = processResult.output;
+      final String failedLogText = processResult.error;
+
+      if (failedLogText != null) {
+
+         // log error message
+
+         TourLogManager.log_ERROR("Mount device: Mount command failed:\n%s".formatted(failedLogText));
+
+         return;
+      }
+
+      // mount succeeded
+
+      if (selectedConfig.isVerifyMountCommand == false) {
+
+         TourLogManager.log_INFO("Mount device: Mount command was run but with no verify check in %.1f s".formatted(processDuration));
+
+         return;
+      }
+
+      // verify log text
+
+      final String commandMount_VerifyLog = selectedConfig.commandMount_VerifyLog;
+
+      if (commandMount_VerifyLog.equals(successLogText)) {
+
+         TourLogManager.log_OK("Mount device: Mount command succeeded and was verified in %.1f s".formatted(processDuration));
+
+      } else {
+
+         TourLogManager.log_ERROR("Mount device: Mount command was run but the verification failed in %.1f s".formatted(processDuration));
+      }
    }
 
    private void mountImportDevice_2_Off() {
@@ -5261,58 +5270,65 @@ public class RawDataView extends ViewPart implements
          return;
       }
 
-      UI.showStatusLineMessage("Unmounting device", _imageSensor);
+      final Image sensorImage = _imageSensor.isDisposed() ? null : _imageSensor;
+
+      UI.showStatusLineMessage("Unmounting device", sensorImage);
 
       // run async that the status message is displayed before the UI is locked
       _display.asyncExec(() -> {
 
          BusyIndicator.showWhile(_display, (() -> {
 
-            final String[] allCommands = commandUnmount.split(UI.SPACE1);
-
-            final long start = System.currentTimeMillis();
-
-            final ProcessContext processResult = EasyImportManager.runProcess(
-                  selectedConfig.mountUnmountTimeout,
-                  allCommands);
-
-            final double processDuration = (System.currentTimeMillis() - start) / 1000.0;
-
-            final String successLogText = processResult.output;
-            final String failedLogText = processResult.error;
-
-            if (failedLogText != null) {
-
-               // log error message
-
-               TourLogManager.log_ERROR("Unmount device: Unmount command failed:\n%s".formatted(failedLogText));
-
-               return;
-            }
-
-            // unmount succeeded
-
-            if (selectedConfig.isVerifyUnmountCommand == false) {
-
-               TourLogManager.log_INFO("Unmount device: Unmount command was run but with no verify check in %.1f s".formatted(processDuration));
-
-               return;
-            }
-
-            // verify log text
-
-            final String commandUnmount_VerifyLog = selectedConfig.commandUnmount_VerifyLog;
-
-            if (commandUnmount_VerifyLog.equals(successLogText)) {
-
-               TourLogManager.log_OK("Unmount device: Unmount command succeeded and was verified in %.1f s".formatted(processDuration));
-
-            } else {
-
-               TourLogManager.log_ERROR("Unmount device: Unmount command was run but the verification failed in %.1f s".formatted(processDuration));
-            }
+            mountImportDevice_2_Off_Async(selectedConfig, commandUnmount);
          }));
       });
+   }
+
+   private void mountImportDevice_2_Off_Async(final ImportConfig selectedConfig, final String commandUnmount) {
+
+      final String[] allCommands = commandUnmount.split(UI.SPACE1);
+
+      final long start = System.currentTimeMillis();
+
+      final ProcessContext processResult = EasyImportManager.runProcess(
+            selectedConfig.mountUnmountTimeout,
+            allCommands);
+
+      final double processDuration = (System.currentTimeMillis() - start) / 1000.0;
+
+      final String successLogText = processResult.output;
+      final String failedLogText = processResult.error;
+
+      if (failedLogText != null) {
+
+         // log error message
+
+         TourLogManager.log_ERROR("Unmount device: Unmount command failed:\n%s".formatted(failedLogText));
+
+         return;
+      }
+
+      // unmount succeeded
+
+      if (selectedConfig.isVerifyUnmountCommand == false) {
+
+         TourLogManager.log_INFO("Unmount device: Unmount command was run but with no verify check in %.1f s".formatted(processDuration));
+
+         return;
+      }
+
+      // verify log text
+
+      final String commandUnmount_VerifyLog = selectedConfig.commandUnmount_VerifyLog;
+
+      if (commandUnmount_VerifyLog.equals(successLogText)) {
+
+         TourLogManager.log_OK("Unmount device: Unmount command succeeded and was verified in %.1f s".formatted(processDuration));
+
+      } else {
+
+         TourLogManager.log_ERROR("Unmount device: Unmount command was run but the verification failed in %.1f s".formatted(processDuration));
+      }
    }
 
    private void onBrowser_Completed() {
