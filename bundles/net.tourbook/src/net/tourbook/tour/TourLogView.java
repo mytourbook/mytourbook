@@ -199,13 +199,17 @@ public class TourLogView extends ViewPart {
 
    void addLog(final TourLog tourLog) {
 
-      _tourLog_Queue.add(tourLog);
-
       if (isBrowserAvailable() && _isBrowserCompleted == false) {
 
          // this occurs when the view is opening but not yet ready
          return;
       }
+
+      /*
+       * Very Important: Add item to the log only, when the browser is ready, otherwise some logs
+       * could be duplicated !!!
+       */
+      _tourLog_Queue.add(tourLog);
 
       final long now = System.currentTimeMillis();
 
