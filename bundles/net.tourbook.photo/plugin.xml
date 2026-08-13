@@ -118,24 +118,18 @@
             category="net.tourbook.preferences.PrefPagePhotoID"
             name="%PrefPage_Photo_PhotoViewer">
          </page>
-   
-         <page id="net.tourbook.preferences.PrefPagePhotoSystemID"
-            class="net.tourbook.photo.internal.preferences.PrefPagePhotoSystem"
+            
+         <page id="net.tourbook.preferences.PrefPagePhotoImageCacheID"
+            class="net.tourbook.photo.internal.preferences.PrefPagePhotoImageCache"
             category="net.tourbook.preferences.PrefPagePhotoID"
-            name="%PrefPage_Photo_Sytem">
+            name="%PrefPage_Photo_ImageCache">
          </page>
          
-            <page id="net.tourbook.preferences.PrefPagePhotoImageCacheID"
-               class="net.tourbook.photo.internal.preferences.PrefPagePhotoImageCache"
-               category="net.tourbook.preferences.PrefPagePhotoSystemID"
-               name="%PrefPage_Photo_ImageCache">
-            </page>
-            
-            <page id="net.tourbook.preferences.PrefPagePhotoThumbnailStoreID"
-               class="net.tourbook.photo.internal.preferences.PrefPagePhotoThumbnailStore"
-               category="net.tourbook.preferences.PrefPagePhotoSystemID"
-               name="%PrefPage_Photo_ThumbnailStore">
-            </page>
+         <page id="net.tourbook.preferences.PrefPagePhotoThumbnailStoreID"
+            class="net.tourbook.photo.internal.preferences.PrefPagePhotoThumbnailStore"
+            category="net.tourbook.preferences.PrefPagePhotoID"
+            name="%PrefPage_Photo_ThumbnailStore">
+         </page>
 
    </extension>
 
