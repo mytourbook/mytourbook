@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2026 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -41,7 +41,7 @@ class TourLog {
 
       this.time = TimeTools.now().format(TimeTools.Formatter_Time_ISO);
 
-      this.threadName = Thread.currentThread().getName() + UI.DASH_WITH_SPACE + Thread.currentThread().getId();
+      this.threadName = Thread.currentThread().getName() + UI.DASH_WITH_SPACE + Thread.currentThread().threadId();
 
       this.state = state;
       this.message = message;
@@ -59,16 +59,16 @@ class TourLog {
 
       return UI.EMPTY_STRING
 
-            + "TourLog [" + NL //                        //$NON-NLS-1$
+            + "TourLog" + NL //                             //$NON-NLS-1$
 
-            + "threadName   = " + threadName + NL //     //$NON-NLS-1$
-            + "time         = " + time + NL //           //$NON-NLS-1$
-            + "state        = " + state + NL //          //$NON-NLS-1$
-            + "isSubLogItem = " + isSubLogItem + NL //   //$NON-NLS-1$
-            + "css          = " + css + NL //            //$NON-NLS-1$
-            + "message      = " + message + NL //        //$NON-NLS-1$
-
-            + "]"; //                                    //$NON-NLS-1$
+            + " threadName    = " + threadName + NL //      //$NON-NLS-1$
+            + " logNumber     = " + logNumber + NL //      //$NON-NLS-1$
+            + " time          = " + time + NL //            //$NON-NLS-1$
+//            + " state         = " + state + NL //           //$NON-NLS-1$
+//            + " isSubLogItem  = " + isSubLogItem + NL //    //$NON-NLS-1$
+//            + " css           = " + css + NL //             //$NON-NLS-1$
+            + " message       = " + message + NL //         //$NON-NLS-1$
+      ;
    }
 
 }

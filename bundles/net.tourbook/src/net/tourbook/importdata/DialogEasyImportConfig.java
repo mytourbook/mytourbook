@@ -23,6 +23,8 @@ import java.util.List;
 import net.tourbook.Images;
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
+import net.tourbook.common.CommonActivator;
+import net.tourbook.common.CommonImages;
 import net.tourbook.common.FileSystemManager;
 import net.tourbook.common.NIO;
 import net.tourbook.common.TourbookFileSystem;
@@ -31,6 +33,7 @@ import net.tourbook.common.action.ActionOpenPrefDialog;
 import net.tourbook.common.action.ActionResetToDefaults;
 import net.tourbook.common.action.IActionResetToDefault;
 import net.tourbook.common.color.ThemeUtil;
+import net.tourbook.common.font.MTFont;
 import net.tourbook.common.util.ColumnDefinition;
 import net.tourbook.common.util.ColumnManager;
 import net.tourbook.common.util.EmptyContextMenuProvider;
@@ -82,9 +85,11 @@ import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerCell;
 import org.eclipse.jface.viewers.ViewerDropAdapter;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.custom.BusyIndicator;
 import org.eclipse.swt.custom.CTabFolder;
 import org.eclipse.swt.custom.CTabItem;
 import org.eclipse.swt.custom.ScrolledComposite;
+import org.eclipse.swt.custom.StyledText;
 import org.eclipse.swt.dnd.DND;
 import org.eclipse.swt.dnd.DragSourceEvent;
 import org.eclipse.swt.dnd.DragSourceListener;
@@ -100,6 +105,7 @@ import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.MouseWheelListener;
 import org.eclipse.swt.events.SelectionListener;
+import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
@@ -109,6 +115,7 @@ import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.DirectoryDialog;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
@@ -145,6 +152,7 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements IActionRe
    private static final String           STATE_BACKUP_FOLDER_HISTORY_ITEMS  = "STATE_BACKUP_FOLDER_HISTORY_ITEMS";         //$NON-NLS-1$
    private static final String           STATE_DEVICE_DEVICE_HISTORY_ITEMS  = "STATE_DEVICE_DEVICE_HISTORY_ITEMS";         //$NON-NLS-1$
    public static final String            STATE_DEVICE_FOLDER_HISTORY_ITEMS  = "STATE_DEVICE_FOLDER_HISTORY_ITEMS";         //$NON-NLS-1$
+   private static final String           STATE_IS_WORD_WRAP                 = "STATE_IS_WORD_WRAP";                        //$NON-NLS-1$
    private static final String           STATE_SELECTED_IMPORT_LAUNCHER     = "STATE_SELECTED_IMPORT_LAUNCHER";            //$NON-NLS-1$
    private static final String           STATE_SELECTED_TAB_FOLDER_LAUNCHER = "STATE_SELECTED_TAB_FOLDER_LAUNCHER";        //$NON-NLS-1$
    private static final String           STATE_SELECTED_TAB_FOLDER_MAIN     = "STATE_SELECTED_TAB_FOLDER_MAIN";            //$NON-NLS-1$
@@ -188,6 +196,7 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements IActionRe
    private ActionSpeedTourType_Add       _action_ILTT_Speed_Add;
    private ActionSpeedTourType_Sort      _action_ILTT_Speed_Sort;
    private ActionSpeedTourType_Delete[]  _allAction_TT_Speed_Delete;
+   private ActionToggleWordWrap          _actionToggleWordwrap;
    //
    private PixelConverter                _pc;
 
@@ -219,6 +228,7 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements IActionRe
    private int                           _leftPadding;
    private int                           _defaultPaneWidth;
    private boolean                       _isInUIUpdate;
+   private boolean                       _isWordWrap;
 
    private int                           _initialMainTab;
 
@@ -270,6 +280,10 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements IActionRe
    private Button               _chkIC_CreateBackup;
    private Button               _chkIC_DeleteDeviceFiles;
    private Button               _chkIC_ImportFiles;
+   private Button               _chkIC_IsMountDevice;
+   private Button               _chkIC_IsUnmountDevice;
+   private Button               _chkIC_IsVerifyMountCommand;
+   private Button               _chkIC_IsVerifyUnmountCommand;
    private Button               _chkIC_TurnOffWatching;
    //
    private Button               _chkIL_AdjustTemperature;
@@ -292,11 +306,17 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements IActionRe
    private Button               _chkOptions_ShowTile_SerialPort;
    private Button               _chkOptions_ShowTile_SerialPortWithConfig;
    //
+   private Button               _btnIC_CopyLeft_Mount;
+   private Button               _btnIC_CopyLeft_Unmount;
    private Button               _btnIC_Duplicate;
    private Button               _btnIC_New;
    private Button               _btnIC_Remove;
+   private Button               _btnIC_RunCommand_DeviceInfo;
+   private Button               _btnIC_RunCommand_Mount;
+   private Button               _btnIC_RunCommand_Unmount;
    private Button               _btnIC_SelectBackupFolder;
    private Button               _btnIC_SelectDeviceFolder;
+   //
    private Button               _btnIL_Duplicate;
    private Button               _btnIL_New;
    private Button               _btnIL_NewOne;
@@ -322,7 +342,13 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements IActionRe
    private Label                _lblIC_BackupFolder;
    private Label                _lblIC_DeleteFilesInfo;
    private Label                _lblIC_DeviceFolder;
+   private Label                _lblIC_Dev_SelectedConfig;
    private Label                _lblIC_FileSystemImage;
+   private Label                _lblIC_MountCommand;
+   private Label                _lblIC_MountCommand_Log;
+   private Label                _lblIC_UnmountCommand;
+   private Label                _lblIC_UnmountCommand_Log;
+
    private Label                _lblIL_AvgTemperature;
    private Label                _lblIL_AvgTemperature_Unit;
    private Label                _lblIL_CadenceOne;
@@ -343,6 +369,7 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements IActionRe
    //
    private Link                 _linkTT_TourType_One;
    private Link[]               _allLinkTT_TourType_Speed;
+
    private Link                 _linkIC_LocalFolderPath;
    private Link                 _linkIC_DeviceFolderPath;
    private Link                 _linkIC_ILActions;
@@ -353,6 +380,7 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements IActionRe
    private Spinner              _spinnerDash_NumHTiles;
    private Spinner              _spinnerDash_StateTooltipWidth;
    private Spinner              _spinnerDash_TileSize;
+   private Spinner              _spinnerIC_CommandTimeout;
    private Spinner              _spinnerIL_AvgTemperature;
    private Spinner              _spinnerIL_LastMarkerDistance;
    private Spinner              _spinnerIL_TemperatureAdjustmentDuration;
@@ -363,12 +391,24 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements IActionRe
    private CTabFolder           _tabFolderEasy;
    private CTabFolder           _tabFolderIL;
    //
-   private Text                 _txtIC_DeviceFiles;
    private Text                 _txtIC_ConfigName;
+   private Text                 _txtIC_DeviceFiles;
+   private Text                 _txtIC_Command_DeviceInfo;
+   private StyledText           _txtIC_Command_DeviceInfo_Log;
+   private Text                 _txtIC_Command_Mount;
+   private StyledText           _txtIC_Command_Mount_TestLog;
+   private StyledText           _txtIC_Command_Mount_VerifyLog;
+   private Text                 _txtIC_Command_Unmount;
+   private StyledText           _txtIC_Command_Unmount_VerifyLog;
+   private StyledText           _txtIC_Command_Unmount_TestLog;
+
    private Text                 _txtIL_ConfigDescription;
    private Text                 _txtIL_ConfigName;
    private Text                 _txtIL_LastMarker;
    private Text                 _txtIL_TourTagGroupItems;
+
+   private Font                 _logFont;
+   private Image                _imageCopyLeft;
 
    private class ActionIL_NewOneTourType extends Action {
 
@@ -632,6 +672,22 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements IActionRe
       }
    }
 
+   private class ActionToggleWordWrap extends Action {
+
+      public ActionToggleWordWrap() {
+
+         super(null, AS_CHECK_BOX);
+
+         setToolTipText("Toggle word wrap in the log texts");
+         setImageDescriptor(CommonActivator.getImageDescriptor(CommonImages.WordWrap));
+      }
+
+      @Override
+      public void run() {
+         onToggleWordWrap();
+      }
+   }
+
    public class ICColumnViewer implements ITourViewer {
 
       @Override
@@ -891,6 +947,7 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements IActionRe
       setMessage(Messages.Dialog_ImportConfig_Dialog_Message);
 
       restoreState();
+      updateUI_WordWrap();
 
       enable_IC_Controls();
       enable_IL_Controls();
@@ -912,6 +969,7 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements IActionRe
 
       _actionOpenTourTypePrefs   = new ActionOpenPrefDialog(Messages.action_tourType_modify_tourTypes, PrefPageTourType_Definitions.ID);
       _actionRestoreDefaults     = new ActionResetToDefaults(this);
+      _actionToggleWordwrap      = new ActionToggleWordWrap();
 
 // SET_FORMATTING_ON
    }
@@ -966,17 +1024,22 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements IActionRe
                .grab(true, true)
                .applyTo(_tabFolderEasy);
          {
-            // tab: config
+            // tab: Config
             final CTabItem tabConfig = new CTabItem(_tabFolderEasy, SWT.NONE);
             tabConfig.setText(Messages.Dialog_ImportConfig_Tab_Configuration);
             tabConfig.setControl(createUI_200_Tab_ImportActions(_tabFolderEasy));
 
-            // tab: launcher
+            // tab: Device
+            final CTabItem tabDevice = new CTabItem(_tabFolderEasy, SWT.NONE);
+            tabDevice.setText("Device");
+            tabDevice.setControl(createUI_300_Tab_Device(_tabFolderEasy));
+
+            // tab: Launcher
             final CTabItem tabLauncher = new CTabItem(_tabFolderEasy, SWT.NONE);
             tabLauncher.setText(Messages.Dialog_ImportConfig_Tab_Launcher);
             tabLauncher.setControl(createUI_500_Tab_IL_ImportLauncher(_tabFolderEasy));
 
-            // tab: options
+            // tab: Options
             final CTabItem tabOptions = new CTabItem(_tabFolderEasy, SWT.NONE);
             tabOptions.setText(Messages.Dialog_ImportConfig_Tab_Options);
             tabOptions.setControl(createUI_900_Tab_Options(_tabFolderEasy));
@@ -1014,8 +1077,7 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements IActionRe
             createUI_210_IC_Viewer(icContainer);
             createUI_230_IC_Actions(icContainer);
             createUI_239_IC_DragDropHint(icContainer);
-
-            createUI_240_IC_Detail(icContainer);
+            createUI_250_IC_Detail(icContainer);
          }
       }
 
@@ -1043,7 +1105,7 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements IActionRe
             .grab(true, true)
             .applyTo(_icViewerContainer);
       GridLayoutFactory.fillDefaults().applyTo(_icViewerContainer);
-//      _viewerContainer.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_RED));
+//      _icViewerContainer.setBackground(UI.SYS_COLOR_RED);
       {
          createUI_212_IC_ViewerTable(_icViewerContainer);
       }
@@ -1234,7 +1296,7 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements IActionRe
       final Composite container = new Composite(parent, SWT.NONE);
       GridDataFactory.fillDefaults().applyTo(container);
       GridLayoutFactory.fillDefaults().numColumns(1).applyTo(container);
-//      container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_BLUE));
+//      container.setBackground(UI.SYS_COLOR_BLUE);
       {
          {
             /*
@@ -1283,29 +1345,25 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements IActionRe
             .applyTo(label);
    }
 
-   private void createUI_240_IC_Detail(final Composite parent) {
+   private void createUI_250_IC_Detail(final Composite parent) {
 
       final Group group = new Group(parent, SWT.NONE);
       group.setText(Messages.Dialog_ImportConfig_Group_ImportActions);
       GridDataFactory.fillDefaults()
-            .grab(true, false)
-            .indent(0, 8)
             .span(2, 1)
             .applyTo(group);
-      GridLayoutFactory.swtDefaults()
-            .numColumns(2)
-            .applyTo(group);
-//      group.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_GREEN));
+      GridLayoutFactory.swtDefaults().numColumns(2).applyTo(group);
+//      group.setBackground(UI.SYS_COLOR_CYAN);
       {
-         createUI_250_IC_Name(group);
-         createUI_252_IC_1_BackupFolder(group);
-         createUI_254_IC_2_DeviceFileFolder(group);
-         createUI_270_IC_3_99_Actions(group);
-         createUI_280_IC_100(group);
+         createUI_252_IC_Name(group);
+         createUI_260_IC_1_BackupFolder(group);
+         createUI_270_IC_2_DeviceFileFolder(group);
+         createUI_280_IC_3_99_Actions(group);
+         createUI_290_IC_100(group);
       }
    }
 
-   private void createUI_250_IC_Name(final Composite parent) {
+   private void createUI_252_IC_Name(final Composite parent) {
 
       {
          /*
@@ -1330,7 +1388,7 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements IActionRe
       }
    }
 
-   private void createUI_252_IC_1_BackupFolder(final Composite parent) {
+   private void createUI_260_IC_1_BackupFolder(final Composite parent) {
 
       {
          /*
@@ -1417,14 +1475,14 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements IActionRe
       }
    }
 
-   private void createUI_254_IC_2_DeviceFileFolder(final Composite parent) {
+   private void createUI_270_IC_2_DeviceFileFolder(final Composite parent) {
 
       final ModifyListener deviceTypeListener = modifyEvent -> onSelectDevice();
 
       final Composite importContainer = new Composite(parent, SWT.NONE);
       GridDataFactory.fillDefaults().applyTo(importContainer);
       GridLayoutFactory.fillDefaults().numColumns(2).applyTo(importContainer);
-//      importContainer.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_RED));
+//      importContainer.setBackground(UI.SYS_COLOR_RED);
       {
          {
             /*
@@ -1561,7 +1619,7 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements IActionRe
       }
    }
 
-   private void createUI_270_IC_3_99_Actions(final Composite parent) {
+   private void createUI_280_IC_3_99_Actions(final Composite parent) {
 
       // V-spacer
       new Label(parent, SWT.NONE);
@@ -1581,7 +1639,7 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements IActionRe
       new Label(parent, SWT.NONE);
    }
 
-   private void createUI_280_IC_100(final Composite parent) {
+   private void createUI_290_IC_100(final Composite parent) {
 
       final Composite container = new Composite(parent, SWT.NONE);
       GridDataFactory.fillDefaults()
@@ -1627,6 +1685,426 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements IActionRe
       }
    }
 
+   private Control createUI_300_Tab_Device(final Composite parent) {
+
+      final Composite container = new Composite(parent, SWT.NONE);
+      GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
+      GridLayoutFactory.swtDefaults().numColumns(3).applyTo(container);
+//      container.setBackground(UI.SYS_COLOR_GREEN);
+      {
+         createUI_305_Dev_Config(container);
+         createUI_310_Dev_Info(container);
+         createUI_320_Dev_Mount(container);
+         createUI_330_Dev_Unmount(container);
+      }
+
+      return container;
+   }
+
+   private void createUI_305_Dev_Config(final Composite parent) {
+
+      {
+         /*
+          * Label: Selected config
+          */
+         final Label label = new Label(parent, SWT.NONE);
+         label.setText("For configuration");
+         GridDataFactory.fillDefaults()
+               .align(SWT.FILL, SWT.CENTER)
+               .applyTo(label);
+
+         _lblIC_Dev_SelectedConfig = new Label(parent, SWT.NONE);
+         _lblIC_Dev_SelectedConfig.setFont(MTFont.getBannerFont());
+
+         GridDataFactory.fillDefaults()
+               .align(SWT.FILL, SWT.CENTER)
+               .grab(true, false)
+               .applyTo(_lblIC_Dev_SelectedConfig);
+
+         {
+            /*
+             * Action: Word wrap
+             */
+            final ToolBar toolbarAction = UI.createToolbarAction(parent, _actionToggleWordwrap);
+            GridDataFactory.fillDefaults()
+                  .align(SWT.END, SWT.FILL)
+                  .applyTo(toolbarAction);
+         }
+      }
+   }
+
+   private void createUI_310_Dev_Info(final Composite parent) {
+
+      final GridDataFactory gd = GridDataFactory.fillDefaults().align(SWT.FILL, SWT.CENTER);
+
+      UI.createSpacer_Vertical(parent, 6, 3);
+      {
+         /*
+          * Label: Device info
+          */
+         final Label label = new Label(parent, SWT.NONE);
+         label.setText("Device inf&o command");
+         label.setToolTipText("This command can be used to provide device info,\ne.g. list all available devices");
+         gd.applyTo(label);
+
+         /*
+          * Text: Device info
+          */
+         _txtIC_Command_DeviceInfo = new Text(parent, SWT.BORDER);
+         _txtIC_Command_DeviceInfo.setFont(_logFont);
+         _txtIC_Command_DeviceInfo.addModifyListener(_icModifyListener);
+         GridDataFactory.fillDefaults()
+               .grab(true, false)
+               .applyTo(_txtIC_Command_DeviceInfo);
+
+         /*
+          * Button: Device info
+          */
+         _btnIC_RunCommand_DeviceInfo = new Button(parent, SWT.PUSH);
+         _btnIC_RunCommand_DeviceInfo.setText("Run Info");
+         _btnIC_RunCommand_DeviceInfo.addSelectionListener(SelectionListener.widgetSelectedAdapter(
+               selectionEvent -> {
+                  onSelect_IC_RunMountCommand(
+                        _txtIC_Command_DeviceInfo.getText(),
+                        _txtIC_Command_DeviceInfo_Log);
+               }));
+         gd.applyTo(_btnIC_RunCommand_DeviceInfo);
+         setButtonLayoutData(_btnIC_RunCommand_DeviceInfo);
+      }
+      {
+         /*
+          * Text: Device info log
+          */
+
+         UI.createSpacer_Horizontal(parent);
+
+         _txtIC_Command_DeviceInfo_Log = new StyledText(parent,
+               SWT.BORDER
+                     | SWT.MULTI
+                     | SWT.V_SCROLL
+                     | SWT.H_SCROLL);
+         _txtIC_Command_DeviceInfo_Log.setFont(_logFont);
+
+         GridDataFactory.fillDefaults()
+               .grab(true, true)
+               .span(2, 1)
+               .applyTo(_txtIC_Command_DeviceInfo_Log);
+      }
+      {
+         /*
+          * Timeout
+          */
+         final Label label = new Label(parent, SWT.NONE);
+         label.setText("&Timeout");
+         label.setToolTipText("Timeout before the command is killed");
+         gd.applyTo(label);
+
+         final Composite container = new Composite(parent, SWT.NONE);
+         GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
+         GridLayoutFactory.fillDefaults().numColumns(2).applyTo(container);
+         {
+
+            // spinner
+            _spinnerIC_CommandTimeout = new Spinner(container, SWT.BORDER);
+            _spinnerIC_CommandTimeout.setMinimum(1);
+            _spinnerIC_CommandTimeout.setMaximum(100);
+            _spinnerIC_CommandTimeout.addSelectionListener(_icSelectionListener);
+            _spinnerIC_CommandTimeout.addMouseWheelListener(_defaultMouseWheelListener);
+            gd.applyTo(_spinnerIC_CommandTimeout);
+
+            // sec
+            final Label labelUnit = UI.createLabel(container, Messages.App_Unit_Seconds_Small);
+            gd.applyTo(labelUnit);
+         }
+
+         UI.createSpacer_Horizontal(parent);
+      }
+   }
+
+   private void createUI_320_Dev_Mount(final Composite parent) {
+
+      {
+         /*
+          * Checkbox: Mount
+          */
+         _chkIC_IsMountDevice = new Button(parent, SWT.CHECK);
+         _chkIC_IsMountDevice.setText("Mount device before watching the device folder");
+         _chkIC_IsMountDevice.setToolTipText("");
+         _chkIC_IsMountDevice.addSelectionListener(_icSelectionListener);
+         GridDataFactory.fillDefaults()
+               .span(3, 1)
+               .indent(0, 10)
+               .applyTo(_chkIC_IsMountDevice);
+      }
+      {
+         /*
+          * Label: Mount command
+          */
+         _lblIC_MountCommand = new Label(parent, SWT.NONE);
+         _lblIC_MountCommand.setText("&Mount command");
+         GridDataFactory.fillDefaults()
+               .align(SWT.FILL, SWT.CENTER)
+               .indent(_leftPadding, 0)
+               .applyTo(_lblIC_MountCommand);
+
+         /*
+          * Text: Mount command
+          */
+         _txtIC_Command_Mount = new Text(parent, SWT.BORDER);
+         _txtIC_Command_Mount.setFont(_logFont);
+         _txtIC_Command_Mount.addModifyListener(_icModifyListener);
+         GridDataFactory.fillDefaults()
+               .grab(true, false)
+               .applyTo(_txtIC_Command_Mount);
+
+         /*
+          * Button: Test mount command
+          */
+         _btnIC_RunCommand_Mount = new Button(parent, SWT.PUSH);
+         _btnIC_RunCommand_Mount.setText("Run Mount");
+         _btnIC_RunCommand_Mount.addSelectionListener(SelectionListener.widgetSelectedAdapter(
+               selectionEvent -> {
+                  onSelect_IC_RunMountCommand(
+                        _txtIC_Command_Mount.getText(),
+                        _txtIC_Command_Mount_TestLog);
+               }));
+         GridDataFactory.fillDefaults()
+               .align(SWT.FILL, SWT.CENTER)
+               .applyTo(_btnIC_RunCommand_Mount);
+         setButtonLayoutData(_btnIC_RunCommand_Mount);
+      }
+      {
+
+         final Composite container = new Composite(parent, SWT.NONE);
+         GridDataFactory.fillDefaults()
+               .grab(true, true)
+               .span(3, 1)
+               .indent(_leftPadding, 0)
+               .applyTo(container);
+         GridLayoutFactory.fillDefaults().numColumns(3)
+               .applyTo(container);
+//         container.setBackground(UI.SYS_COLOR_MAGENTA);
+         {
+            {
+               {
+                  /*
+                   * Checkbox: Verify mount command
+                   */
+                  _chkIC_IsVerifyMountCommand = new Button(container, SWT.CHECK);
+                  _chkIC_IsVerifyMountCommand.setText("Verify mount command with this log");
+                  _chkIC_IsVerifyMountCommand.setToolTipText("This log is expected when the mount command was performed successfully");
+                  _chkIC_IsVerifyMountCommand.addSelectionListener(_icSelectionListener);
+                  GridDataFactory.fillDefaults()
+                        .align(SWT.FILL, SWT.BEGINNING)
+                        .applyTo(_chkIC_IsVerifyMountCommand);
+               }
+               UI.createSpacer_Horizontal(container);
+               {
+                  /*
+                   * Label: Mount command
+                   */
+                  _lblIC_MountCommand_Log = new Label(container, SWT.NONE);
+                  _lblIC_MountCommand_Log.setText("Mount command log");
+                  GridDataFactory.fillDefaults()
+                        .align(SWT.FILL, SWT.CENTER)
+                        .applyTo(_lblIC_MountCommand_Log);
+
+               }
+            }
+            {
+               final int xHint = 100;
+               {
+                  /*
+                   * Text: Mount command is OK
+                   */
+                  _txtIC_Command_Mount_VerifyLog = new StyledText(container,
+                        SWT.BORDER
+                              | SWT.MULTI
+                              | SWT.V_SCROLL
+                              | SWT.H_SCROLL);
+                  _txtIC_Command_Mount_VerifyLog.setFont(_logFont);
+                  _txtIC_Command_Mount_VerifyLog.addModifyListener(_icModifyListener);
+
+                  GridDataFactory.fillDefaults()
+                        .grab(true, true)
+                        .indent(_leftPadding, 0)
+                        .hint(xHint, SWT.DEFAULT)
+                        .applyTo(_txtIC_Command_Mount_VerifyLog);
+               }
+               {
+                  /*
+                   * Button: Copy left
+                   */
+                  _btnIC_CopyLeft_Mount = new Button(container, SWT.PUSH);
+                  _btnIC_CopyLeft_Mount.setToolTipText("Copy the mount command log into the verify log field");
+                  _btnIC_CopyLeft_Mount.setImage(_imageCopyLeft);
+                  _btnIC_CopyLeft_Mount.addSelectionListener(SelectionListener.widgetSelectedAdapter(selectionEvent -> {
+                     onIC_CopyLog(_txtIC_Command_Mount_TestLog, _txtIC_Command_Mount_VerifyLog);
+                  }));
+               }
+               {
+                  /*
+                   * Text: Mount log
+                   */
+                  _txtIC_Command_Mount_TestLog = new StyledText(container,
+                        SWT.BORDER
+                              | SWT.MULTI
+                              | SWT.V_SCROLL
+                              | SWT.H_SCROLL);
+                  _txtIC_Command_Mount_TestLog.setFont(_logFont);
+
+                  GridDataFactory.fillDefaults()
+                        .grab(true, true)
+                        .hint(xHint, SWT.DEFAULT)
+                        .applyTo(_txtIC_Command_Mount_TestLog);
+               }
+            }
+         }
+      }
+   }
+
+   private void createUI_330_Dev_Unmount(final Composite parent) {
+
+      {
+         /*
+          * Checkbox: Unmount
+          */
+         _chkIC_IsUnmountDevice = new Button(parent, SWT.CHECK);
+         _chkIC_IsUnmountDevice.setText("Unmount device after watching the device folder");
+         _chkIC_IsUnmountDevice.addSelectionListener(_icSelectionListener);
+         GridDataFactory.fillDefaults()
+               .span(3, 1)
+               .indent(0, 10)
+               .applyTo(_chkIC_IsUnmountDevice);
+      }
+      {
+         /*
+          * Label: Unmount command
+          */
+         _lblIC_UnmountCommand = new Label(parent, SWT.NONE);
+         _lblIC_UnmountCommand.setText("&Unmount command");
+         _lblIC_UnmountCommand.setToolTipText("");
+         GridDataFactory.fillDefaults()
+               .align(SWT.FILL, SWT.CENTER)
+               .indent(_leftPadding, 0)
+               .applyTo(_lblIC_UnmountCommand);
+
+         /*
+          * Text: Unmount command
+          */
+         _txtIC_Command_Unmount = new Text(parent, SWT.BORDER);
+         _txtIC_Command_Unmount.setFont(_logFont);
+         _txtIC_Command_Unmount.addModifyListener(_icModifyListener);
+         GridDataFactory.fillDefaults()
+               .grab(true, false)
+               .applyTo(_txtIC_Command_Unmount);
+
+         /*
+          * Button: Test unmount command
+          */
+         _btnIC_RunCommand_Unmount = new Button(parent, SWT.PUSH);
+         _btnIC_RunCommand_Unmount.setText("Run Unmount");
+         _btnIC_RunCommand_Unmount.addSelectionListener(SelectionListener.widgetSelectedAdapter(
+               selectionEvent -> {
+                  onSelect_IC_RunMountCommand(
+                        _txtIC_Command_Unmount.getText(),
+                        _txtIC_Command_Unmount_TestLog);
+               }));
+         GridDataFactory.fillDefaults()
+               .align(SWT.FILL, SWT.CENTER)
+               .applyTo(_btnIC_RunCommand_Unmount);
+         setButtonLayoutData(_btnIC_RunCommand_Unmount);
+      }
+      {
+
+         final Composite container = new Composite(parent, SWT.NONE);
+         GridDataFactory.fillDefaults()
+               .grab(true, true)
+               .span(3, 1)
+               .indent(_leftPadding, 0)
+               .applyTo(container);
+         GridLayoutFactory.fillDefaults()
+               .numColumns(3)
+               .applyTo(container);
+         {
+            {
+               {
+                  /*
+                   * Checkbox: Verify unmount command
+                   */
+                  _chkIC_IsVerifyUnmountCommand = new Button(container, SWT.CHECK);
+                  _chkIC_IsVerifyUnmountCommand.setText("Verify unmount command with this log");
+                  _chkIC_IsVerifyUnmountCommand.setToolTipText("This log is expected when the unmount command was performed successfully");
+                  _chkIC_IsVerifyUnmountCommand.addSelectionListener(_icSelectionListener);
+                  GridDataFactory.fillDefaults()
+                        .align(SWT.FILL, SWT.BEGINNING)
+                        .applyTo(_chkIC_IsVerifyUnmountCommand);
+               }
+               UI.createSpacer_Horizontal(container);
+               {
+                  /*
+                   * Label: Mount command
+                   */
+                  _lblIC_UnmountCommand_Log = new Label(container, SWT.NONE);
+                  _lblIC_UnmountCommand_Log.setText("Unmount command log");
+                  GridDataFactory.fillDefaults()
+                        .align(SWT.FILL, SWT.CENTER)
+                        .applyTo(_lblIC_UnmountCommand_Log);
+
+               }
+            }
+            {
+               final int xHint = 100;
+               {
+                  /*
+                   * Text: Unmount command is OK
+                   */
+                  _txtIC_Command_Unmount_VerifyLog = new StyledText(container,
+                        SWT.BORDER
+                              | SWT.MULTI
+                              | SWT.V_SCROLL
+                              | SWT.H_SCROLL);
+                  _txtIC_Command_Unmount_VerifyLog.setFont(_logFont);
+                  _txtIC_Command_Unmount_VerifyLog.addModifyListener(_icModifyListener);
+
+                  GridDataFactory.fillDefaults()
+                        .grab(true, true)
+                        .indent(_leftPadding, 0)
+                        .hint(xHint, SWT.DEFAULT)
+                        .applyTo(_txtIC_Command_Unmount_VerifyLog);
+               }
+               {
+                  /*
+                   * Button: Copy left
+                   */
+                  _btnIC_CopyLeft_Unmount = new Button(container, SWT.PUSH);
+                  _btnIC_CopyLeft_Unmount.setToolTipText("Copy the unmount command log into the verify log field");
+                  _btnIC_CopyLeft_Unmount.setImage(_imageCopyLeft);
+                  _btnIC_CopyLeft_Unmount.addSelectionListener(SelectionListener.widgetSelectedAdapter(selectionEvent -> {
+                     onIC_CopyLog(_txtIC_Command_Unmount_TestLog, _txtIC_Command_Unmount_VerifyLog);
+                  }));
+               }
+               {
+                  /*
+                   * Text: Unmount log
+                   */
+                  _txtIC_Command_Unmount_TestLog = new StyledText(container,
+                        SWT.BORDER
+                              | SWT.MULTI
+                              | SWT.V_SCROLL
+                              | SWT.H_SCROLL);
+                  _txtIC_Command_Unmount_TestLog.setFont(_logFont);
+
+                  GridDataFactory.fillDefaults()
+                        .grab(true, true)
+                        .hint(xHint, SWT.DEFAULT)
+                        .applyTo(_txtIC_Command_Unmount_TestLog);
+               }
+            }
+         }
+      }
+   }
+
    private Composite createUI_500_Tab_IL_ImportLauncher(final Composite parent) {
 
       final Composite container = new Composite(parent, SWT.NONE);
@@ -1668,7 +2146,7 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements IActionRe
             .hint(_defaultPaneWidth, SWT.DEFAULT)
             .applyTo(_ilViewerContainer);
       GridLayoutFactory.fillDefaults().applyTo(_ilViewerContainer);
-//      _viewerContainer.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_RED));
+//      _ilViewerContainer.setBackground(UI.SYS_COLOR_RED);
       {
          createUI_512_IL_ViewerTable(_ilViewerContainer);
       }
@@ -1884,7 +2362,7 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements IActionRe
 //            .hint(1, SWT.DEFAULT)
             .applyTo(container);
       GridLayoutFactory.fillDefaults().numColumns(1).applyTo(container);
-//      container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_BLUE));
+//      container.setBackground(UI.SYS_COLOR_BLUE);
       {
          /*
           * Button: New one tour type
@@ -1952,7 +2430,6 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements IActionRe
 
       GridDataFactory.fillDefaults()
             .span(2, 1)
-            .indent(0, 10)
             .applyTo(group);
       GridLayoutFactory.swtDefaults().applyTo(group);
 //      container.setBackground(UI.SYS_COLOR_CYAN);
@@ -3088,7 +3565,7 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements IActionRe
       GridLayoutFactory.fillDefaults()
             .numColumns(3)
             .applyTo(container);
-//      container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_GREEN));
+//      container.setBackground(UI.SYS_COLOR_GREEN);
       {
          {
             /*
@@ -3284,7 +3761,7 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements IActionRe
       GridLayoutFactory.swtDefaults()
             .numColumns(1)
             .applyTo(container);
-//      container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_BLUE));
+//      container.setBackground(UI.SYS_COLOR_BLUE);
       {
          createUI_902_Dashboard(container);
          createUI_990_Actions(container);
@@ -3594,7 +4071,7 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements IActionRe
       final Composite container = new Composite(parent, SWT.NONE);
       GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
       GridLayoutFactory.fillDefaults().numColumns(2).applyTo(container);
-//      container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_YELLOW));
+//      container.setBackground(UI.SYS_COLOR_YELLOW);
       {
          {
             /*
@@ -3649,18 +4126,20 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements IActionRe
 
    private void defineAll_ICColumns() {
 
-      defineColumnIC_10_LauncherName();
-      defineColumnIC_20_Backup();
-      defineColumnIC_30_DeviceFolder();
-      defineColumnIC_32_DeviceFiles();
-      defineColumnIC_90_DeviceFiles_Delete();
-      defineColumnIC_99_TurnOFF();
+      defineColumnIC_010_LauncherName();
+      defineColumnIC_020_Backup();
+      defineColumnIC_030_DeviceFolder();
+      defineColumnIC_032_DeviceFiles();
+      defineColumnIC_090_DeviceFiles_Delete();
+      defineColumnIC_099_TurnOFF();
+      defineColumnIC_100_MountDevice();
+      defineColumnIC_110_UnmountDevice();
    }
 
    /**
     * Column: Item name
     */
-   private void defineColumnIC_10_LauncherName() {
+   private void defineColumnIC_010_LauncherName() {
 
       final TableColumnDefinition colDef = new TableColumnDefinition(_icColumnManager, "configName", SWT.LEAD); //$NON-NLS-1$
 
@@ -3684,7 +4163,7 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements IActionRe
    /**
     * Column: Backup
     */
-   private void defineColumnIC_20_Backup() {
+   private void defineColumnIC_020_Backup() {
 
       final TableColumnDefinition colDef = new TableColumnDefinition(_icColumnManager, "backup", SWT.LEAD); //$NON-NLS-1$
 
@@ -3713,7 +4192,7 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements IActionRe
    /**
     * Column: Device folder
     */
-   private void defineColumnIC_30_DeviceFolder() {
+   private void defineColumnIC_030_DeviceFolder() {
 
       final TableColumnDefinition colDef = new TableColumnDefinition(_icColumnManager, "deviceFolder", SWT.LEAD); //$NON-NLS-1$
 
@@ -3739,7 +4218,7 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements IActionRe
    /**
     * Column: Device files
     */
-   private void defineColumnIC_32_DeviceFiles() {
+   private void defineColumnIC_032_DeviceFiles() {
 
       final TableColumnDefinition colDef = new TableColumnDefinition(_icColumnManager, "deviceFiles", SWT.LEAD); //$NON-NLS-1$
 
@@ -3765,7 +4244,7 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements IActionRe
    /**
     * Column: Delete device files
     */
-   private void defineColumnIC_90_DeviceFiles_Delete() {
+   private void defineColumnIC_090_DeviceFiles_Delete() {
 
       final TableColumnDefinition colDef = new TableColumnDefinition(_icColumnManager, "deleteFiles", SWT.CENTER); //$NON-NLS-1$
 
@@ -3805,7 +4284,7 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements IActionRe
    /**
     * Column: Turn watching OFF
     */
-   private void defineColumnIC_99_TurnOFF() {
+   private void defineColumnIC_099_TurnOFF() {
 
       final TableColumnDefinition colDef = new TableColumnDefinition(_icColumnManager, "turnOFF", SWT.CENTER); //$NON-NLS-1$
 
@@ -3824,10 +4303,67 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements IActionRe
 
             final ImportConfig importConfig = (ImportConfig) cell.getElement();
 
-            cell.setText(
-                  importConfig.isTurnOffWatching
-                        ? Messages.Dialog_ImportConfig_State_OFF
-                        : Messages.Dialog_ImportConfig_State_ON);
+            cell.setText(importConfig.isTurnOffWatching
+                  ? Messages.Dialog_ImportConfig_State_OFF
+                  : Messages.Dialog_ImportConfig_State_ON);
+         }
+      });
+   }
+
+   /**
+    * Column: Mount device
+    */
+   private void defineColumnIC_100_MountDevice() {
+
+      final TableColumnDefinition colDef = new TableColumnDefinition(_icColumnManager, "mountDevice", SWT.LEAD); //$NON-NLS-1$
+
+      colDef.setColumnLabel("Mount device");
+      colDef.setColumnHeaderText("Mount");
+      colDef.setColumnHeaderToolTipText("Mount device command");
+
+      colDef.setDefaultColumnWidth(convertWidthInCharsToPixels(10));
+      colDef.setColumnWeightData(new ColumnWeightData(10));
+
+      colDef.setIsDefaultColumn();
+
+      colDef.setLabelProvider(new CellLabelProvider() {
+         @Override
+         public void update(final ViewerCell cell) {
+
+            final ImportConfig importConfig = (ImportConfig) cell.getElement();
+
+            cell.setText(importConfig.isMountDevice
+                  ? importConfig.commandMount
+                  : UI.EMPTY_STRING);
+         }
+      });
+   }
+
+   /**
+    * Column: Unmount device
+    */
+   private void defineColumnIC_110_UnmountDevice() {
+
+      final TableColumnDefinition colDef = new TableColumnDefinition(_icColumnManager, "unmountDevice", SWT.LEAD); //$NON-NLS-1$
+
+      colDef.setColumnLabel("Unmount device");
+      colDef.setColumnHeaderText("Unmount");
+      colDef.setColumnHeaderToolTipText("Unmount device command");
+
+      colDef.setDefaultColumnWidth(convertWidthInCharsToPixels(10));
+      colDef.setColumnWeightData(new ColumnWeightData(10));
+
+      colDef.setIsDefaultColumn();
+
+      colDef.setLabelProvider(new CellLabelProvider() {
+         @Override
+         public void update(final ViewerCell cell) {
+
+            final ImportConfig importConfig = (ImportConfig) cell.getElement();
+
+            cell.setText(importConfig.isUnmountDevice
+                  ? importConfig.commandUnmount
+                  : UI.EMPTY_STRING);
          }
       });
    }
@@ -3869,22 +4405,53 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements IActionRe
 
    private void enable_IC_Controls() {
 
-      final int numConfigs = _dialogEasyConfig.importConfigs.size();
-      final boolean isBackup = _chkIC_CreateBackup.getSelection();
+// SET_FORMATTING_OFF
 
-      _btnIC_SelectBackupFolder.setEnabled(isBackup);
-      _comboIC_BackupFolder.setEnabled(isBackup);
-      _lblIC_BackupFolder.setEnabled(isBackup);
+      final int numConfigs          = _dialogEasyConfig.importConfigs.size();
+      final boolean isBackup        = _chkIC_CreateBackup.getSelection();
+      final boolean isMount         = _chkIC_IsMountDevice.getSelection();
+      final boolean isUnmount       = _chkIC_IsUnmountDevice.getSelection();
+      final boolean isVerifyMount   = _chkIC_IsVerifyMountCommand.getSelection()    && isMount;
+      final boolean isVerifyUnmount = _chkIC_IsVerifyUnmountCommand.getSelection()  && isUnmount;
 
-      _chkIC_DeleteDeviceFiles.setEnabled(isBackup);
-      _lblIC_DeleteFilesInfo.setEnabled(isBackup);
+      _btnIC_SelectBackupFolder     .setEnabled(isBackup);
+      _comboIC_BackupFolder         .setEnabled(isBackup);
+      _lblIC_BackupFolder           .setEnabled(isBackup);
 
-      _backupHistoryItems.setIsValidateFolder(isBackup);
-      _backupHistoryItems.validateModifiedPath();
+      _chkIC_DeleteDeviceFiles      .setEnabled(isBackup);
+      _lblIC_DeleteFilesInfo        .setEnabled(isBackup);
 
-      _btnIC_Remove.setEnabled(numConfigs > 1);
+      _backupHistoryItems           .setIsValidateFolder(isBackup);
+      _backupHistoryItems           .validateModifiedPath();
 
-      _comboIC_DeviceType.setEnabled(_chkIC_ImportFiles.getSelection());
+      _btnIC_Remove                 .setEnabled(numConfigs > 1);
+
+      _comboIC_DeviceType           .setEnabled(_chkIC_ImportFiles.getSelection());
+
+      /*
+       * Mount/unmout
+       */
+      _btnIC_RunCommand_Mount          .setEnabled(isMount);
+      _btnIC_RunCommand_Unmount        .setEnabled(isUnmount);
+      _btnIC_CopyLeft_Mount            .setEnabled(isVerifyMount);
+      _btnIC_CopyLeft_Unmount          .setEnabled(isVerifyUnmount);
+
+      _chkIC_IsVerifyMountCommand      .setEnabled(isMount);
+      _chkIC_IsVerifyUnmountCommand    .setEnabled(isUnmount);
+
+      _lblIC_MountCommand              .setEnabled(isMount);
+      _lblIC_MountCommand_Log          .setEnabled(isMount);
+      _lblIC_UnmountCommand            .setEnabled(isUnmount);
+      _lblIC_UnmountCommand_Log        .setEnabled(isUnmount);
+
+      _txtIC_Command_Mount             .setEnabled(isMount);
+      _txtIC_Command_Mount_TestLog     .setEnabled(isMount);
+      _txtIC_Command_Mount_VerifyLog   .setEnabled(isVerifyMount);
+      _txtIC_Command_Unmount           .setEnabled(isUnmount);
+      _txtIC_Command_Unmount_TestLog   .setEnabled(isUnmount);
+      _txtIC_Command_Unmount_VerifyLog .setEnabled(isVerifyUnmount);
+
+// SET_FORMATTING_ON
    }
 
    private void enable_IL_Controls() {
@@ -4439,10 +5006,14 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements IActionRe
 
       _pc = new PixelConverter(parent);
 
+      _logFont = net.tourbook.ui.UI.getLogFont();
+
       _leftPadding = convertHorizontalDLUsToPixels(11);
       _defaultPaneWidth = convertWidthInCharsToPixels(50);
 
       parent.addDisposeListener(disposeEvent -> onDispose());
+
+      _imageCopyLeft = CommonActivator.getThemedImageDescriptor(CommonImages.App_Move_Left).createImage();
 
       /*
        * IC listener
@@ -4522,6 +5093,8 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements IActionRe
 
    private void onDispose() {
 
+      UI.disposeResource(_imageCopyLeft);
+
       disposeConfigImages();
 
       _prefStore.removePropertyChangeListener(_prefChangeListener);
@@ -4563,6 +5136,11 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements IActionRe
       if (isCopy) {
          _txtIC_ConfigName.selectAll();
       }
+   }
+
+   private void onIC_CopyLog(final StyledText txtFrom, final StyledText txtInto) {
+
+      txtInto.setText(txtFrom.getText());
    }
 
    private void onIC_DblClick() {
@@ -4957,6 +5535,7 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements IActionRe
 
       final TourbookFileSystem fileSystem = FileSystemManager.getTourbookFileSystem(filterOSPath);
       if (fileSystem != null) {
+
          // The current device is an external device (Dropbox...)
 
          try {
@@ -4969,7 +5548,9 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements IActionRe
          } catch (final Exception e) {
             StatusUtil.log(e);
          }
+
       } else {
+
          final DirectoryDialog dialog = new DirectoryDialog(_parent.getShell(), SWT.SAVE);
 
          dialog.setText(Messages.Dialog_ImportConfig_Dialog_DeviceFolder_Title);
@@ -4992,6 +5573,34 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements IActionRe
 
       // show launcher actions
       _tabFolderEasy.setSelection(1);
+   }
+
+   private void onSelect_IC_RunMountCommand(final String command, final StyledText txtLog) {
+
+      BusyIndicator.showWhile(Display.getDefault(), () -> {
+
+         final String[] allCommands = command.split(UI.SPACE1);
+
+         final ProcessContext processContext = EasyImportManager.runProcess(
+               _selectedIC.mountUnmountTimeout,
+               allCommands);
+
+         if (processContext.error != null) {
+
+            // display error message
+
+            txtLog.setForeground(UI.IS_DARK_THEME ? UI.SYS_COLOR_YELLOW : UI.SYS_COLOR_RED);
+            txtLog.setText(processContext.error);
+
+         } else {
+
+            txtLog.setForeground(ThemeUtil.getDefaultForegroundColor_Shell());
+            txtLog.setText(processContext.output);
+         }
+
+         // when setting the text, it can resize the text boxes
+         _parent.layout(true, true);
+      });
    }
 
    private void onSelect_IL(final ISelection selection) {
@@ -5303,6 +5912,15 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements IActionRe
       updateUI_IL_ViewerRedraw();
    }
 
+   private void onToggleWordWrap() {
+
+      _isWordWrap = !_isWordWrap;
+
+      updateUI_WordWrap();
+
+      _parent.requestLayout();
+   }
+
    @Override
    public void resetToDefaults() {
 
@@ -5381,6 +5999,11 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements IActionRe
       icTable.setSelection(icTable.getSelectionIndex());
 
       /*
+       * Device
+       */
+      _isWordWrap = Util.getStateBoolean(_state, STATE_IS_WORD_WRAP, false);
+
+      /*
        * Import Launcher
        */
       final int stateILIndex = Util.getStateInt(_state, STATE_SELECTED_IMPORT_LAUNCHER, 0);
@@ -5433,9 +6056,8 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements IActionRe
 
    private void saveState() {
 
-      final int selectedILIndex = _ilViewer.getTable().getSelectionIndex();
-
-      _state.put(STATE_SELECTED_IMPORT_LAUNCHER, selectedILIndex);
+      _state.put(STATE_IS_WORD_WRAP, _isWordWrap);
+      _state.put(STATE_SELECTED_IMPORT_LAUNCHER, _ilViewer.getTable().getSelectionIndex());
 
       _icColumnManager.saveState(_stateIC);
       _ilColumnManager.saveState(_stateIL);
@@ -5509,17 +6131,28 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements IActionRe
 
 // SET_FORMATTING_OFF
 
-      _selectedIC.name                 = _txtIC_ConfigName.getText();
+      _selectedIC.name                       = _txtIC_ConfigName                 .getText();
 
-      _selectedIC.isCreateBackup       = _chkIC_CreateBackup.getSelection();
-      _selectedIC.isDeleteDeviceFiles  = _chkIC_DeleteDeviceFiles.getSelection();
-      _selectedIC.isTurnOffWatching    = _chkIC_TurnOffWatching.getSelection();
+      _selectedIC.isCreateBackup             = _chkIC_CreateBackup               .getSelection();
+      _selectedIC.isDeleteDeviceFiles        = _chkIC_DeleteDeviceFiles          .getSelection();
+      _selectedIC.isTurnOffWatching          = _chkIC_TurnOffWatching            .getSelection();
 
-      _selectedIC.setBackupFolder(     _comboIC_BackupFolder.getText());
-      _selectedIC.setDeviceType(       _comboIC_DeviceType.getSelectionIndex());
-      _selectedIC.setDeviceFolder(     _comboIC_DeviceFolder.getText());
+      _selectedIC.setBackupFolder(           _comboIC_BackupFolder               .getText());
+      _selectedIC.setDeviceType(             _comboIC_DeviceType                 .getSelectionIndex());
+      _selectedIC.setDeviceFolder(           _comboIC_DeviceFolder               .getText());
 
-      _selectedIC.fileGlobPattern      = _txtIC_DeviceFiles.getText();
+      _selectedIC.fileGlobPattern            = _txtIC_DeviceFiles                .getText();
+
+      _selectedIC.isMountDevice              = _chkIC_IsMountDevice              .getSelection();
+      _selectedIC.isUnmountDevice            = _chkIC_IsUnmountDevice            .getSelection();
+      _selectedIC.isVerifyMountCommand       = _chkIC_IsVerifyMountCommand       .getSelection();
+      _selectedIC.isVerifyUnmountCommand     = _chkIC_IsVerifyUnmountCommand     .getSelection();
+      _selectedIC.commandDeviceInfo          = _txtIC_Command_DeviceInfo         .getText();
+      _selectedIC.commandMount               = _txtIC_Command_Mount              .getText();
+      _selectedIC.commandMount_VerifyLog     = _txtIC_Command_Mount_VerifyLog    .getText();
+      _selectedIC.commandUnmount             = _txtIC_Command_Unmount            .getText();
+      _selectedIC.commandUnmount_VerifyLog   = _txtIC_Command_Unmount_VerifyLog  .getText();
+      _selectedIC.mountUnmountTimeout        = _spinnerIC_CommandTimeout         .getSelection();
 
 // SET_FORMATTING_ON
    }
@@ -5812,18 +6445,40 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements IActionRe
 
       _isInUIUpdate = true;
       {
-         _txtIC_ConfigName.setText(_selectedIC.name);
+// SET_FORMATTING_OFF
 
-         _chkIC_CreateBackup.setSelection(_selectedIC.isCreateBackup);
-         _chkIC_DeleteDeviceFiles.setSelection(_selectedIC.isDeleteDeviceFiles);
-         _chkIC_TurnOffWatching.setSelection(_selectedIC.isTurnOffWatching);
+         _txtIC_ConfigName                   .setText(      _selectedIC.name);
 
-         _comboIC_BackupFolder.setText(_selectedIC.getBackupFolder());
-         _comboIC_DeviceFolder.setText(_selectedIC.getDeviceFolder());
-         _comboIC_DeviceType.select(_selectedIC.getDeviceType());
+         _chkIC_CreateBackup                 .setSelection( _selectedIC.isCreateBackup);
+         _chkIC_DeleteDeviceFiles            .setSelection( _selectedIC.isDeleteDeviceFiles);
+         _chkIC_TurnOffWatching              .setSelection( _selectedIC.isTurnOffWatching);
 
-         _txtIC_DeviceFiles.setText(_selectedIC.fileGlobPattern);
-         _lblIC_DeleteFilesInfo.setText(createUIText_MovedFiles());
+         _comboIC_BackupFolder               .setText(      _selectedIC.getBackupFolder());
+         _comboIC_DeviceFolder               .setText(      _selectedIC.getDeviceFolder());
+         _comboIC_DeviceType                 .select(       _selectedIC.getDeviceType());
+
+         _txtIC_DeviceFiles                  .setText(      _selectedIC.fileGlobPattern);
+         _lblIC_DeleteFilesInfo              .setText(      createUIText_MovedFiles());
+
+         // mount/unmount
+         _lblIC_Dev_SelectedConfig           .setText(      _selectedIC.name);
+         _chkIC_IsMountDevice                .setSelection( _selectedIC.isMountDevice);
+         _chkIC_IsUnmountDevice              .setSelection( _selectedIC.isUnmountDevice);
+         _chkIC_IsVerifyMountCommand         .setSelection( _selectedIC.isVerifyMountCommand);
+         _chkIC_IsVerifyUnmountCommand       .setSelection( _selectedIC.isVerifyUnmountCommand);
+         _txtIC_Command_DeviceInfo           .setText(      _selectedIC.commandDeviceInfo);
+         _txtIC_Command_Mount                .setText(      _selectedIC.commandMount);
+         _txtIC_Command_Mount_VerifyLog      .setText(      _selectedIC.commandMount_VerifyLog);
+         _txtIC_Command_Unmount              .setText(      _selectedIC.commandUnmount);
+         _txtIC_Command_Unmount_VerifyLog    .setText(      _selectedIC.commandUnmount_VerifyLog);
+         _spinnerIC_CommandTimeout           .setSelection( _selectedIC.mountUnmountTimeout);
+
+         // cleanup logs
+         _txtIC_Command_DeviceInfo_Log       .setText(      UI.EMPTY_STRING);
+         _txtIC_Command_Mount_TestLog        .setText(      UI.EMPTY_STRING);
+         _txtIC_Command_Unmount_TestLog      .setText(      UI.EMPTY_STRING);
+
+// SET_FORMATTING_ON
       }
       _isInUIUpdate = false;
    }
@@ -6301,5 +6956,20 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements IActionRe
       final Period durationPeriod = new Period(0, duration * 1000, _durationTemplate);
 
       _lblIL_TemperatureAdjustmentDuration_Unit.setText(durationPeriod.toString(UI.DEFAULT_DURATION_FORMATTER));
+   }
+
+   private void updateUI_WordWrap() {
+
+      _actionToggleWordwrap.setChecked(_isWordWrap);
+
+// SET_FORMATTING_OFF
+
+      _txtIC_Command_DeviceInfo_Log    .setWordWrap(_isWordWrap);
+      _txtIC_Command_Mount_TestLog     .setWordWrap(_isWordWrap);
+      _txtIC_Command_Mount_VerifyLog   .setWordWrap(_isWordWrap);
+      _txtIC_Command_Unmount_TestLog   .setWordWrap(_isWordWrap);
+      _txtIC_Command_Unmount_VerifyLog .setWordWrap(_isWordWrap);
+
+// SET_FORMATTING_ON
    }
 }

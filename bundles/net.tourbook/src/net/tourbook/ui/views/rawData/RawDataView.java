@@ -86,6 +86,7 @@ import net.tourbook.common.util.ITourViewer;
 import net.tourbook.common.util.ITourViewer3;
 import net.tourbook.common.util.PostSelectionProvider;
 import net.tourbook.common.util.StatusUtil;
+import net.tourbook.common.util.StringUtils;
 import net.tourbook.common.util.TableColumnDefinition;
 import net.tourbook.common.util.Util;
 import net.tourbook.data.Equipment;
@@ -118,6 +119,7 @@ import net.tourbook.importdata.ImportState_Easy;
 import net.tourbook.importdata.ImportState_File;
 import net.tourbook.importdata.ImportState_Process;
 import net.tourbook.importdata.OSFile;
+import net.tourbook.importdata.ProcessContext;
 import net.tourbook.importdata.RawDataManager;
 import net.tourbook.importdata.SpeedCadence;
 import net.tourbook.importdata.SpeedEquipment;
@@ -203,6 +205,7 @@ import org.eclipse.swt.browser.LocationAdapter;
 import org.eclipse.swt.browser.LocationEvent;
 import org.eclipse.swt.browser.ProgressAdapter;
 import org.eclipse.swt.browser.ProgressEvent;
+import org.eclipse.swt.custom.BusyIndicator;
 import org.eclipse.swt.custom.CLabel;
 import org.eclipse.swt.events.ControlListener;
 import org.eclipse.swt.events.KeyListener;
@@ -566,10 +569,13 @@ public class RawDataView extends ViewPart implements
     * Resources
     */
    private ImageRegistry _images;
+   private Image         _imageSensor = TourbookPlugin.getThemedImageDescriptor(Images.Sensor).createImage();
 
    /*
     * UI controls
     */
+   private Display   _display;
+
    private Browser   _browser;
 
    private PageBook  _topPage_PageBook;
@@ -711,7 +717,7 @@ public class RawDataView extends ViewPart implements
 
          final int selectedIndex = ((Number) arguments[0]).intValue();
 
-         _parent.getDisplay().asyncExec(() -> onSelect_ImportConfig_Fancy(selectedIndex));
+         _display.asyncExec(() -> onSelect_ImportConfig_Fancy(selectedIndex));
 
 //// this can be used to show created JS in the debugger
 //         if (true) {
@@ -1068,7 +1074,7 @@ public class RawDataView extends ViewPart implements
       // set temp data, this is required by the dialog because the merge from tour could not be saved
       mergeIntoTour.setMergeSourceTour(mergeFromTour);
 
-      if (new DialogMergeTours(Display.getCurrent().getActiveShell(), mergeFromTour, mergeIntoTour).open() != Window.OK) {
+      if (new DialogMergeTours(_display.getActiveShell(), mergeFromTour, mergeIntoTour).open() != Window.OK) {
 
          // dialog is canceled, restore modified values
 
@@ -1700,7 +1706,7 @@ public class RawDataView extends ViewPart implements
             // selected config
             + "      <td>" //$NON-NLS-1$
             + "         <div id='" + DOM_ID_IMPORT_CONFIG + "' class='" + watchClass + "'>" //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-            + createHTML_60_SelectImportConfig()
+            + createHTML_70_SelectImportConfig()
             + "         </div>" //                                //$NON-NLS-1$
             + "      </td>" //                                    //$NON-NLS-1$
 
@@ -1894,6 +1900,40 @@ public class RawDataView extends ViewPart implements
                folderInfo);
 
          isFolderOK &= isDeviceFolderOK;
+      }
+
+      /*
+       * Mount/unmount
+       */
+      {
+         final String commandMount = importConfig.commandMount.replace("\\", "\\\\");
+         final String commandUnmount = importConfig.commandUnmount.replace("\\", "\\\\");
+
+         // mount
+         sb.append(HTML_TR);
+
+         sb.append(HTML_TD_SPACE + HTML_STYLE_TITLE_VERTICAL_PADDING + " class='folderTitle'>"); //$NON-NLS-1$
+         sb.append("Mount");
+         sb.append(HTML_TD_END);
+
+         sb.append(HTML_TD_SPACE + HTML_STYLE_TITLE_VERTICAL_PADDING + " class='folderLocation'>"); //$NON-NLS-1$
+         sb.append("%s".formatted(importConfig.isMountDevice ? commandMount : "NO"));
+         sb.append(HTML_TD_END);
+
+         sb.append(HTML_TR_END);
+
+         // unmount
+         sb.append(HTML_TR);
+
+         sb.append(HTML_TD_SPACE + " class='folderTitle'>"); //$NON-NLS-1$
+         sb.append("Unmount");
+         sb.append(HTML_TD_END);
+
+         sb.append(HTML_TD_SPACE + " class='folderLocation'>"); //$NON-NLS-1$
+         sb.append("%s".formatted(importConfig.isUnmountDevice ? commandUnmount : "NO"));
+         sb.append(HTML_TD_END);
+
+         sb.append(HTML_TR_END);
       }
 
       /*
@@ -2156,7 +2196,7 @@ public class RawDataView extends ViewPart implements
       sb.append("</tbody></table>"); //$NON-NLS-1$
    }
 
-   private String createHTML_60_SelectImportConfig() {
+   private String createHTML_70_SelectImportConfig() {
 
       final String onChange = "onchange='" + JS_FUNCTION_ON_SELECT_IMPORT_CONFIG + "(this.selectedIndex)'"; //$NON-NLS-1$ //$NON-NLS-2$
 
@@ -3105,7 +3145,7 @@ public class RawDataView extends ViewPart implements
 
    private Composite createUI_20_Page_EasyImporFancy(final Composite parent) {
 
-      final Color bgColor = Display.getCurrent().getSystemColor(SWT.COLOR_LIST_BACKGROUND);
+      final Color bgColor = _display.getSystemColor(SWT.COLOR_LIST_BACKGROUND);
 
       _easyImportFancy_PageBook = new PageBook(parent, SWT.NONE);
       GridDataFactory.fillDefaults().grab(true, true).applyTo(_easyImportFancy_PageBook);
@@ -3291,7 +3331,7 @@ public class RawDataView extends ViewPart implements
             .grab(true, true)
             .applyTo(_simpleUI_ViewerContainer);
       GridLayoutFactory.fillDefaults().applyTo(_simpleUI_ViewerContainer);
-//      _viewerContainer.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_RED));
+//      _viewerContainer.setBackground(_display.getSystemColor(SWT.COLOR_RED));
       {
          createUI_57_SimpleUI_ViewerTable(_simpleUI_ViewerContainer);
       }
@@ -3509,7 +3549,7 @@ public class RawDataView extends ViewPart implements
          @Override
          public void menuShown(final MenuEvent menuEvent) {
 
-            final Point cursorLocation = Display.getCurrent().getCursorLocation();
+            final Point cursorLocation = _display.getCursorLocation();
 
             _tagMenuManager.onShowMenu(menuEvent,
                   table,
@@ -4290,9 +4330,14 @@ public class RawDataView extends ViewPart implements
    @Override
    public void dispose() {
 
-      resetEasyImport(false);
-
+      /*
+       * VERY IMPORTANT: _imageSensor MUST be disposed BEFORE resetting the import, otherwise the
+       * statusline can contain a disposed image which is causing an exception !!!
+       */
       _images.dispose();
+      _imageSensor.dispose();
+
+      resetEasyImport(false);
 
       // don't throw the selection again
       _postSelectionProvider.clearSelection();
@@ -4817,8 +4862,6 @@ public class RawDataView extends ViewPart implements
        * Config image is not yet created
        */
 
-      final Display display = _parent.getDisplay();
-
       final Enum<TourTypeConfig> tourTypeConfig = importConfig.tourTypeConfig;
 
       if (TourTypeConfig.TOUR_TYPE_CONFIG_BY_SPEED.equals(tourTypeConfig)) {
@@ -4835,7 +4878,7 @@ public class RawDataView extends ViewPart implements
 
          swtImageData.alphaData = new byte[configWidthScaled * imageSizeScaled];
 
-         final Image tempImage = new Image(display, new CustomScalingImageDataProvider(swtImageData));
+         final Image tempImage = new Image(_display, new CustomScalingImageDataProvider(swtImageData));
          {
             final GC gcTempImage = new GC(tempImage);
             {
@@ -4867,7 +4910,7 @@ public class RawDataView extends ViewPart implements
                tempImageData = tempImage.getImageData(DPIUtil.getDeviceZoom());
             }
 
-            configImage = new Image(display, new CustomScalingImageDataProvider(tempImageData));
+            configImage = new Image(_display, new CustomScalingImageDataProvider(tempImageData));
          }
          tempImage.dispose();
 
@@ -4887,7 +4930,7 @@ public class RawDataView extends ViewPart implements
 
             swtImageData.alphaData = new byte[configWidthScaled * imageSizeScaled];
 
-            final Image tempImage = new Image(display, new CustomScalingImageDataProvider(swtImageData));
+            final Image tempImage = new Image(_display, new CustomScalingImageDataProvider(swtImageData));
             {
                /*
                 * Paint tour type image into the displayed image
@@ -4915,7 +4958,7 @@ public class RawDataView extends ViewPart implements
                   tempImageData = tempImage.getImageData(DPIUtil.getDeviceZoom());
                }
 
-               configImage = new Image(display, new CustomScalingImageDataProvider(tempImageData));
+               configImage = new Image(_display, new CustomScalingImageDataProvider(tempImageData));
 
             }
             tempImage.dispose();
@@ -5065,6 +5108,7 @@ public class RawDataView extends ViewPart implements
    private void initUI(final Composite parent) {
 
       _parent = parent;
+      _display = parent.getDisplay();
       _pc = new PixelConverter(parent);
 
       createResources_Image();
@@ -5128,6 +5172,163 @@ public class RawDataView extends ViewPart implements
       return _watchingStoresThread != null;
    }
 
+   private void mountImportDevice_1_On() {
+
+      final EasyConfig easyConfig = getEasyConfig();
+      final ImportConfig selectedConfig = easyConfig.getActiveImportConfig();
+
+      if (selectedConfig.isMountDevice == false) {
+         // nothing is mounted
+         return;
+      }
+
+      TourLogManager.log_TITLE("Mount Device");
+
+      final String commandMount = selectedConfig.commandMount;
+
+      if (StringUtils.isNullOrEmpty(commandMount)) {
+         TourLogManager.log_ERROR("Mount device: Mount command cannot be empty");
+         return;
+      }
+
+      UI.showStatusLineMessage("Mounting device", _imageSensor);
+
+      _display.asyncExec(() -> {
+
+         BusyIndicator.showWhile(_display, (() -> {
+
+            mountImportDevice_1_On_Async(selectedConfig, commandMount);
+         }));
+      });
+   }
+
+   private void mountImportDevice_1_On_Async(final ImportConfig selectedConfig, final String commandMount) {
+
+      final String[] allCommands = commandMount.split(UI.SPACE1);
+
+      final long start = System.currentTimeMillis();
+
+      final ProcessContext processResult = EasyImportManager.runProcess(
+            selectedConfig.mountUnmountTimeout,
+            allCommands);
+
+      final double processDuration = (System.currentTimeMillis() - start) / 1000.0;
+
+      final String successLogText = processResult.output;
+      final String failedLogText = processResult.error;
+
+      if (failedLogText != null) {
+
+         // log error message
+
+         TourLogManager.log_ERROR("Mount device: Mount command failed:\n%s".formatted(failedLogText));
+
+         return;
+      }
+
+      // mount succeeded
+
+      if (selectedConfig.isVerifyMountCommand == false) {
+
+         TourLogManager.log_INFO("Mount device: Mount command was run but with no verify check in %.1f s".formatted(processDuration));
+
+         return;
+      }
+
+      // verify log text
+
+      final String commandMount_VerifyLog = selectedConfig.commandMount_VerifyLog;
+
+      if (commandMount_VerifyLog.equals(successLogText)) {
+
+         TourLogManager.log_OK("Mount device: Mount command succeeded and was verified in %.1f s".formatted(processDuration));
+
+      } else {
+
+         TourLogManager.log_ERROR("Mount device: Mount command was run but the verification failed in %.1f s".formatted(processDuration));
+      }
+   }
+
+   private void mountImportDevice_2_Off() {
+
+      final EasyConfig easyConfig = getEasyConfig();
+      final ImportConfig selectedConfig = easyConfig.getActiveImportConfig();
+
+      if (selectedConfig.isMountDevice == false) {
+         // nothing is unmounted
+         return;
+      }
+
+      TourLogManager.log_TITLE("Unmount Device");
+
+      final String commandUnmount = selectedConfig.commandUnmount;
+
+      if (StringUtils.isNullOrEmpty(commandUnmount)) {
+         TourLogManager.log_ERROR("Unmount device: Unmount command cannot be empty");
+         return;
+      }
+
+      final Image sensorImage = _imageSensor.isDisposed() ? null : _imageSensor;
+
+      UI.showStatusLineMessage("Unmounting device", sensorImage);
+
+      // run async that the status message is displayed before the UI is locked
+      _display.asyncExec(() -> {
+
+         BusyIndicator.showWhile(_display, (() -> {
+
+            mountImportDevice_2_Off_Async(selectedConfig, commandUnmount);
+         }));
+      });
+   }
+
+   private void mountImportDevice_2_Off_Async(final ImportConfig selectedConfig, final String commandUnmount) {
+
+      final String[] allCommands = commandUnmount.split(UI.SPACE1);
+
+      final long start = System.currentTimeMillis();
+
+      final ProcessContext processResult = EasyImportManager.runProcess(
+            selectedConfig.mountUnmountTimeout,
+            allCommands);
+
+      final double processDuration = (System.currentTimeMillis() - start) / 1000.0;
+
+      final String successLogText = processResult.output;
+      final String failedLogText = processResult.error;
+
+      if (failedLogText != null) {
+
+         // log error message
+
+         TourLogManager.log_ERROR("Unmount device: Unmount command failed:\n%s".formatted(failedLogText));
+
+         return;
+      }
+
+      // unmount succeeded
+
+      if (selectedConfig.isVerifyUnmountCommand == false) {
+
+         TourLogManager.log_INFO("Unmount device: Unmount command was run but with no verify check in %.1f s".formatted(processDuration));
+
+         return;
+      }
+
+      // verify log text
+
+      final String commandUnmount_VerifyLog = selectedConfig.commandUnmount_VerifyLog;
+
+      if (commandUnmount_VerifyLog.equals(successLogText)) {
+
+         TourLogManager.log_OK("Unmount device: Unmount command succeeded and was verified in %.1f s".formatted(processDuration));
+
+      } else {
+
+         TourLogManager.log_ERROR("Unmount device: Unmount command was run but the verification failed in %.1f s".formatted(processDuration));
+      }
+   }
+
    private void onBrowser_Completed() {
 
       _isBrowserCompleted = true;
@@ -5166,7 +5367,7 @@ public class RawDataView extends ViewPart implements
       if (locationParts.length > 1) {
 
          // finalize loading of the browser page and then start the action
-         _browser.getDisplay().asyncExec(() -> onBrowser_LocationChanging_Runnable(locationParts));
+         _display.asyncExec(() -> onBrowser_LocationChanging_Runnable(locationParts));
       }
 
       // prevent to load a new url
@@ -5397,6 +5598,7 @@ public class RawDataView extends ViewPart implements
 
       final ImportConfig selectedConfig = easyConfig.importConfigs.get(selectedIndex);
 
+      // set watcher off for the old config, this will also unmount the device
       setWatcher_2_Off();
       {
          easyConfig.setActiveImportConfig(selectedConfig);
@@ -5431,7 +5633,7 @@ public class RawDataView extends ViewPart implements
 
          // reselect last config
 
-         _comboSimpleUI_Config.getDisplay().asyncExec(() -> {
+         _display.asyncExec(() -> {
 
             final int activeEasyConfigSelectionIndex = getActiveEasyConfigSelectionIndex();
 
@@ -5500,7 +5702,7 @@ public class RawDataView extends ViewPart implements
          return;
       }
 
-      final Shell shell = Display.getDefault().getActiveShell();
+      final Shell shell = _display.getActiveShell();
 
       final EasyConfig easyConfig = getEasyConfig();
 
@@ -5645,7 +5847,7 @@ public class RawDataView extends ViewPart implements
       TourLogManager.showLogView(AutoOpenEvent.TOUR_IMPORT);
 
       try {
-         new ProgressMonitorDialog(Display.getDefault().getActiveShell()).run(
+         new ProgressMonitorDialog(_display.getActiveShell()).run(
 
                true,
                canCancelProcess,
@@ -5661,7 +5863,7 @@ public class RawDataView extends ViewPart implements
                         importState_Process);
 
                   // fix: org.eclipse.swt.SWTException: Invalid thread access
-                  _parent.getDisplay().syncExec(() -> importState_Process.runPostProcess());
+                  _display.syncExec(() -> importState_Process.runPostProcess());
                });
 
       } catch (final Exception e) {
@@ -5756,7 +5958,7 @@ public class RawDataView extends ViewPart implements
 
          _rawDataMgr.updateTourData_InImportView_FromDb(monitor);
 
-         Display.getDefault().asyncExec(() -> {
+         _display.asyncExec(() -> {
 
             reloadViewer();
 
@@ -5886,7 +6088,7 @@ public class RawDataView extends ViewPart implements
       _comboSimpleUI_Config.select(getActiveEasyConfigSelectionIndex());
       _simpleUI_ImportLauncher_Viewer.setInput(new Object());
 
-      Display.getCurrent().asyncExec(() -> reimportAllImportFiles(true));
+      _display.asyncExec(() -> reimportAllImportFiles(true));
    }
 
    /**
@@ -6037,7 +6239,7 @@ public class RawDataView extends ViewPart implements
          // open import config dialog to solve problems
          if (importState_Easy.isOpenSetup) {
 
-            _parent.getDisplay().asyncExec(() -> onSelect_SetupEasyImport(0));
+            _display.asyncExec(() -> onSelect_SetupEasyImport(0));
 
             return;
          }
@@ -6157,7 +6359,7 @@ public class RawDataView extends ViewPart implements
 
          // update viewer when required
 
-         Display.getDefault().asyncExec(() -> importState_Process.runPostProcess());
+         _display.asyncExec(() -> importState_Process.runPostProcess());
 
          if (importState_Easy.isUpdateImportViewer) {
 
@@ -6569,7 +6771,6 @@ public class RawDataView extends ViewPart implements
       TourLogManager.subLog_DEFAULT(String.format(
             Messages.Log_TourLocation_Retrieve_End,
             (System.currentTimeMillis() - start) / 1000.0));
-
    }
 
    private ArrayList<TourData> runEasyImport_099_SaveTour(final TourPerson person, final ArrayList<TourData> importedTours) {
@@ -6808,7 +7009,7 @@ public class RawDataView extends ViewPart implements
 
       try {
 
-         new ProgressMonitorDialog(Display.getCurrent().getActiveShell()).run(true, false, saveRunnable);
+         new ProgressMonitorDialog(_display.getActiveShell()).run(true, false, saveRunnable);
 
       } catch (final Exception e) {
 
@@ -7090,7 +7291,7 @@ public class RawDataView extends ViewPart implements
       if (_postSelectionProvider.getSelection() == null) {
 
          // fire a selected tour when the selection provider was cleared sometime before
-         Display.getCurrent().asyncExec(() -> fireSelectedTour());
+         _display.asyncExec(() -> fireSelectedTour());
       }
    }
 
@@ -7101,6 +7302,8 @@ public class RawDataView extends ViewPart implements
          // do not start twice
          return;
       }
+
+      mountImportDevice_1_On();
 
       if (_importUI == ImportUI.EASY_IMPORT_FANCY) {
 
@@ -7127,41 +7330,50 @@ public class RawDataView extends ViewPart implements
     */
    private void setWatcher_2_Off(final boolean isUpdateUI) {
 
-      if (isWatchingOn()) {
+      if (isWatchingOn() == false) {
+         return;
+      }
 
-         /*
-          * !!! Store watching must be canceled before the watch folder thread because it could
-          * launch a new watch folder thread !!!
-          */
-         thread_WatchStores_Cancel();
+      /**
+       * A BusyIndicator DO NOT WORK !!!
+       */
+//    BusyIndicator.showWhile(_display, (() -> {}));
 
-         // thread_WatchFolders(false);
+      /*
+       * !!! Store watching must be canceled before the watch folder thread because it could
+       * launch a new watch folder thread !!!
+       */
+      thread_WatchStores_Cancel();
 
-         try {
+      // thread_WatchFolders(false);
 
-            if (_watchingStoresThread != null) {
-               _watchingStoresThread.join();
-            }
+      try {
 
-            if (isUpdateUI) {
-
-               if (_importUI == ImportUI.EASY_IMPORT_FANCY) {
-
-                  updateUI_WatcherAnimation(DOM_CLASS_DEVICE_OFF_ANIMATED);
-
-               } else {
-
-                  // simple UI
-
-                  updateUI_DeviceState_SimpleUI();
-
-                  enableSimpleUI(false);
-               }
-            }
-
-         } catch (final InterruptedException e) {
-            TourLogManager.log_EXCEPTION_WithStacktrace(e);
+         if (_watchingStoresThread != null) {
+            _watchingStoresThread.join();
          }
+
+         if (isUpdateUI) {
+
+            if (_importUI == ImportUI.EASY_IMPORT_FANCY) {
+
+               updateUI_WatcherAnimation(DOM_CLASS_DEVICE_OFF_ANIMATED);
+
+            } else {
+
+               // simple UI
+
+               updateUI_DeviceState_SimpleUI();
+
+               enableSimpleUI(false);
+            }
+         }
+
+         mountImportDevice_2_Off();
+
+      } catch (final InterruptedException e) {
+
+         TourLogManager.log_EXCEPTION_WithStacktrace(e);
       }
    }
 
@@ -7170,7 +7382,7 @@ public class RawDataView extends ViewPart implements
       if (_browser == null || _browser.isDisposed()) {
 
          // show OLD UI after 5 seconds
-         Display.getDefault().timerExec(5000, () -> {
+         _display.timerExec(5000, () -> {
 
             if (_parent.isDisposed()) {
                return;
@@ -7635,7 +7847,7 @@ public class RawDataView extends ViewPart implements
              * flickering when the view toolbar is first drawn on the left side of the view !!!
              */
 
-            _parent.getDisplay().asyncExec(() -> {
+            _display.asyncExec(() -> {
 
                _isInFancyUIStartup = isInStartUp;
 
@@ -7746,7 +7958,7 @@ public class RawDataView extends ViewPart implements
       }
 
       // must be running in the UI thread, is called from other threads
-      _parent.getDisplay().asyncExec(() -> {
+      _display.asyncExec(() -> {
 
          if (_importUI == ImportUI.EASY_IMPORT_FANCY) {
 
