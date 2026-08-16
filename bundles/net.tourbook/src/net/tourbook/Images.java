@@ -176,6 +176,7 @@ public class Images {
    public static final String PhotoLinkWithTour                    = "photo-link-photo-with-tour.svg";              //$NON-NLS-1$
    public static final String PhotoSyncTour                        = "photo-sync-tour.svg";                         //$NON-NLS-1$
    public static final String PhotoTourPhotos                      = "photo-tour-photos.svg";                       //$NON-NLS-1$
+   public static final String PhotoTourPhotosAll                   = "photo-tour-photos-all.svg";                   //$NON-NLS-1$
    public static final String PhotoTimeAdjustment                  = "photo-time-adjustment.svg";                   //$NON-NLS-1$
    public static final String POI_InMap                            = "poi-in-map.svg";                              //$NON-NLS-1$
    public static final String POI_Anchor                           = "poi-anchor.svg";                              //$NON-NLS-1$

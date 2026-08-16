@@ -142,6 +142,11 @@ public class TourPhoto implements Serializable {
    @Transient
    private PhotoAdjustments           _photoAdjustments;
 
+   @Transient
+   private String                     _imageFilePath_NoOS;
+   @Transient
+   private String                     _imageFilePathName_NoOS;
+
    // constructor is required for hibernate
    public TourPhoto() {}
 
@@ -189,6 +194,21 @@ public class TourPhoto implements Serializable {
 //
 //      latitude = photo.getLatitude();
 //      longitude = photo.getLongitude();
+   }
+
+   private void convertPath_Linux2Windows() {
+      // TODO Auto-generated method stub
+
+      final String fromLinux = "/mnt/hgfs/MEDIA/Wolfgang/2026/DSC06369.JPG";
+      final String toWin = "D:\\MEDIA\\Wolfgang\\2026\\DSC06369.JPG";
+
+      final IPath filePath = new Path(imageFilePathName);
+
+   }
+
+   private void convertPath_Windows2Linux() {
+      // TODO Auto-generated method stub
+
    }
 
    @Override
@@ -248,14 +268,26 @@ public class TourPhoto implements Serializable {
    }
 
    public String getImageFilePath() {
-      return imageFilePath;
+
+      if (_imageFilePath_NoOS == null) {
+
+         setupImageFilePathForCurrentOS();
+      }
+
+      return _imageFilePath_NoOS;
    }
 
    /**
     * @return Returns the full filepathname
     */
    public String getImageFilePathName() {
-      return imageFilePathName;
+
+      if (_imageFilePathName_NoOS == null) {
+
+         setupImageFilePathForCurrentOS();
+      }
+
+      return _imageFilePathName_NoOS;
    }
 
    /**
@@ -383,6 +415,7 @@ public class TourPhoto implements Serializable {
 
       imageFileName = filePath.lastSegment();
       imageFileExt = fileExtension == null ? UI.EMPTY_STRING : fileExtension;
+
       imageFilePath = filePath.removeLastSegments(1).toOSString();
       imageFilePathName = filePathName;
    }
@@ -467,6 +500,35 @@ public class TourPhoto implements Serializable {
       photoId = TourDatabase.ENTITY_IS_NOT_SAVED;
 
       tourData = tourDataFromClone;
+   }
+
+   private void setupImageFilePathForCurrentOS() {
+      // TODO Auto-generated method stub
+
+      // set default
+      _imageFilePath_NoOS = imageFilePath;
+      _imageFilePathName_NoOS = imageFilePathName;
+
+      if (UI.IS_WIN) {
+
+         // Windows cannot contain Unix slashes in the path
+         if (imageFilePath.indexOf('/') != -1) {
+
+            // Linux path is detected
+
+            convertPath_Linux2Windows();
+         }
+
+      } else {
+
+         // Unix/Mac/Linux cannot contain Windows backslashes
+         if (imageFilePath.indexOf('\\') != -1) {
+
+            // Windows path is detected
+
+            convertPath_Windows2Linux();
+         }
+      }
    }
 
    /**
