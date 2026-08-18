@@ -98,38 +98,32 @@
       <page
          class="net.tourbook.photo.internal.preferences.PrefPagePhoto"
          id="net.tourbook.preferences.PrefPagePhotoID"
-         name="%PrefPage_Photo">
-      </page>
+         name="%PrefPage_Photo"/>
       
          <page id="net.tourbook.preferences.PrefPagePhotoExternalAppID"
             class="net.tourbook.photo.internal.preferences.PrefPagePhotoExternalApp"
             category="net.tourbook.preferences.PrefPagePhotoID"
-            name="%PrefPage_Photo_PhotoExternalApp">
-         </page>
+            name="%PrefPage_Photo_PhotoExternalApp"/>
    
          <page id="net.tourbook.preferences.PrefPagePhotoFullsizeViewerID"
             class="net.tourbook.photo.internal.preferences.PrefPagePhotoFullsizeViewer"
             category="net.tourbook.preferences.PrefPagePhotoID"
-            name="%PrefPage_Photo_PhotoFullsizeViewer">
-         </page>
+            name="%PrefPage_Photo_PhotoFullsizeViewer"/>
          
          <page id="net.tourbook.preferences.PrefPagePhotoDirectoryID"
             class="net.tourbook.photo.internal.preferences.PrefPagePhotoDirectory"
             category="net.tourbook.preferences.PrefPagePhotoID"
-            name="%PrefPage_Photo_PhotoViewer">
-         </page>
+            name="%PrefPage_Photo_PhotoViewer"/>
             
          <page id="net.tourbook.preferences.PrefPagePhotoImageCacheID"
             class="net.tourbook.photo.internal.preferences.PrefPagePhotoImageCache"
             category="net.tourbook.preferences.PrefPagePhotoID"
-            name="%PrefPage_Photo_ImageCache">
-         </page>
+            name="%PrefPage_Photo_ImageCache"/>
          
          <page id="net.tourbook.preferences.PrefPagePhotoThumbnailStoreID"
             class="net.tourbook.photo.internal.preferences.PrefPagePhotoThumbnailStore"
             category="net.tourbook.preferences.PrefPagePhotoID"
-            name="%PrefPage_Photo_ThumbnailStore">
-         </page>
+            name="%PrefPage_Photo_ThumbnailStore"/>
 
    </extension>
 

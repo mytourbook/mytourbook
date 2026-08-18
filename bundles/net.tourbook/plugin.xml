@@ -388,6 +388,15 @@
          class="net.tourbook.preferences.PrefPagePeople"
       />
 
+
+      <!--
+         Photo
+      -->
+         
+      <page id="net.tourbook.preferences.PrefPagePhoto_PathConversion"
+         class="net.tourbook.preferences.PrefPagePhoto_PathConversion"
+         category="net.tourbook.preferences.PrefPagePhotoID"
+         name="%PrefPage_Photo_PathConversion"/>
         
       <!--
          Proxy

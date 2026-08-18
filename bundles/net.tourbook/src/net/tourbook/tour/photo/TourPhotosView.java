@@ -447,7 +447,7 @@ public class TourPhotosView extends ViewPart implements
 
                // ensure that not the wrong data are displayed
                clearView();
-//               showTourPhotos_FromDefaultSelection();
+               showTourPhotos_FromDefaultSelection();
 
             } else if (eventId == TourEventId.MARKER_SELECTION && eventData instanceof SelectionTourMarker) {
 

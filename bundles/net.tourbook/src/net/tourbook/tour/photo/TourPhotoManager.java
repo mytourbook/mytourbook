@@ -56,6 +56,7 @@ import net.tourbook.photo.PhotoManager;
 import net.tourbook.photo.PhotosWithExifSelection;
 import net.tourbook.photo.TourPhotoReference;
 import net.tourbook.preferences.ITourbookPreferences;
+import net.tourbook.preferences.PrefPagePhoto_PathConversion;
 import net.tourbook.tour.SelectionTourId;
 import net.tourbook.tour.TourManager;
 import net.tourbook.tour.photo.TourPhotoLinkView.TimeAdjustmentType;
@@ -106,6 +107,12 @@ public class TourPhotoManager implements IPhotoServiceProvider {
     */
    private static HashMap<String, Camera>        _allAvailableCameras         = new HashMap<>();
    private static String                         _replaceImageFolder;
+
+   private static final int                      NUM_PATH_CONVERSIONS         = 3;
+
+   public static boolean[]                       allIsPathConversion          = new boolean[NUM_PATH_CONVERSIONS];
+   public static String[]                        allPathConversions_Linux     = new String[NUM_PATH_CONVERSIONS];
+   public static String[]                        allPathConversions_Windows   = new String[NUM_PATH_CONVERSIONS];
 
    /**
     * Compares 2 photos by the adjusted time
@@ -315,9 +322,11 @@ public class TourPhotoManager implements IPhotoServiceProvider {
       }
 
       /*
-       * replace image folder
+       * Replace image folder
        */
       _replaceImageFolder = _state.get(STATE_REPLACE_IMAGE_FOLDER);
+
+      updatePathConversions();
    }
 
    public static void saveState() {
@@ -367,6 +376,23 @@ public class TourPhotoManager implements IPhotoServiceProvider {
       }
 
       photoLink.tourCameras = sb.toString();
+   }
+
+   public static void updatePathConversions() {
+
+      final IDialogSettings state = TourbookPlugin.getState(PrefPagePhoto_PathConversion.ID);
+
+      allIsPathConversion[0] = state.getBoolean(PrefPagePhoto_PathConversion.STATE_IS_CONVERSION_1);
+      allIsPathConversion[1] = state.getBoolean(PrefPagePhoto_PathConversion.STATE_IS_CONVERSION_2);
+      allIsPathConversion[2] = state.getBoolean(PrefPagePhoto_PathConversion.STATE_IS_CONVERSION_3);
+
+      allPathConversions_Linux[0] = Util.getStateString(state, PrefPagePhoto_PathConversion.STATE_CONVERSION_LINUX_1, UI.EMPTY_STRING);
+      allPathConversions_Linux[1] = Util.getStateString(state, PrefPagePhoto_PathConversion.STATE_CONVERSION_LINUX_2, UI.EMPTY_STRING);
+      allPathConversions_Linux[2] = Util.getStateString(state, PrefPagePhoto_PathConversion.STATE_CONVERSION_LINUX_3, UI.EMPTY_STRING);
+
+      allPathConversions_Windows[0] = Util.getStateString(state, PrefPagePhoto_PathConversion.STATE_CONVERSION_WINDOWS_1, UI.EMPTY_STRING);
+      allPathConversions_Windows[1] = Util.getStateString(state, PrefPagePhoto_PathConversion.STATE_CONVERSION_WINDOWS_2, UI.EMPTY_STRING);
+      allPathConversions_Windows[2] = Util.getStateString(state, PrefPagePhoto_PathConversion.STATE_CONVERSION_WINDOWS_3, UI.EMPTY_STRING);
    }
 
    /**

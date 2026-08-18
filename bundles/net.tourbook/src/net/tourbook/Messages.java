@@ -2128,6 +2128,13 @@ public class Messages extends NLS {
    public static String        Pref_People_Tab_Person;
    public static String        Pref_People_Title;
 
+   public static String        Pref_Photo_Convert_Checkbox_Conversion1;
+   public static String        Pref_Photo_Convert_Checkbox_Conversion2;
+   public static String        Pref_Photo_Convert_Checkbox_Conversion3;
+   public static String        Pref_Photo_Convert_Label_ConvertSavedPhotoImageFilepath;
+   public static String        Pref_Photo_Convert_Label_Linux;
+   public static String        Pref_Photo_Convert_Label_Windows;
+
    public static String        Pref_Statistic_Action_SortByData;
    public static String        Pref_Statistic_Action_SortByTime;
    public static String        Pref_Statistic_Label_Info;
