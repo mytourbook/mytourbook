@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2012, 2025 Wolfgang Schramm and Contributors
+ * Copyright (C) 2012, 2026 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -35,6 +35,7 @@ import net.tourbook.common.util.StatusUtil;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.photo.Photo;
 import net.tourbook.photo.PhotoAdjustments;
+import net.tourbook.tour.photo.TourPhotoManager;
 
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
@@ -142,6 +143,11 @@ public class TourPhoto implements Serializable {
    @Transient
    private PhotoAdjustments           _photoAdjustments;
 
+   @Transient
+   private String                     _imageFilePath_NoOS;
+   @Transient
+   private String                     _imageFilePathName_NoOS;
+
    // constructor is required for hibernate
    public TourPhoto() {}
 
@@ -189,6 +195,117 @@ public class TourPhoto implements Serializable {
 //
 //      latitude = photo.getLatitude();
 //      longitude = photo.getLongitude();
+   }
+
+   /**
+    * @param linuxImageFilePathName
+    */
+   private void convertPath_Linux2Windows(final String linuxImageFilePathName) {
+
+      final boolean[] isConversion = TourPhotoManager.allIsPathConversion;
+      final String[] fromLinux = TourPhotoManager.allPathConversions_Linux;
+      final String[] intoWindows = TourPhotoManager.allPathConversions_Windows;
+
+      boolean isConverted = false;
+
+      if (isConverted == false && isConversion[0]) {
+         isConverted = convertPath_Linux2Windows_One(linuxImageFilePathName, fromLinux[0], intoWindows[0]);
+      }
+
+      if (isConverted == false && isConversion[1]) {
+         isConverted = convertPath_Linux2Windows_One(linuxImageFilePathName, fromLinux[1], intoWindows[1]);
+      }
+
+      if (isConverted == false && isConversion[2]) {
+         isConverted = convertPath_Linux2Windows_One(linuxImageFilePathName, fromLinux[2], intoWindows[2]);
+      }
+   }
+
+   /**
+    * @param linuxImageFilePathName
+    * @param replaceFromLinux
+    * @param replaceToWindows
+    *
+    * @return Returns <code>true</code> when it was converted
+    */
+   private boolean convertPath_Linux2Windows_One(final String linuxImageFilePathName,
+                                                 final String replaceFromLinux,
+                                                 final String replaceToWindows) {
+
+      String winFilePathName = UI.EMPTY_STRING;
+
+      if (linuxImageFilePathName.startsWith(replaceFromLinux)) {
+
+         final int numLinuxChars = replaceFromLinux.length();
+
+         final String remainingLinuxPath = linuxImageFilePathName.substring(numLinuxChars);
+         final String remainingWinPath = remainingLinuxPath.replaceAll("/", "\\\\");
+
+         winFilePathName = replaceToWindows + remainingWinPath;
+
+         final IPath winFilePath = new Path(winFilePathName);
+
+         _imageFilePath_NoOS = winFilePath.removeLastSegments(1).toOSString();
+         _imageFilePathName_NoOS = winFilePathName;
+
+         return true;
+      }
+
+      return false;
+   }
+
+   private void convertPath_Windows2Linux(final String linuxImageFilePathName) {
+
+      final boolean[] isConversion = TourPhotoManager.allIsPathConversion;
+      final String[] fromWindows = TourPhotoManager.allPathConversions_Windows;
+      final String[] intoLinux = TourPhotoManager.allPathConversions_Linux;
+
+      boolean isConverted = false;
+
+      if (isConverted == false && isConversion[0]) {
+         isConverted = convertPath_Windows2Linux_One(linuxImageFilePathName, fromWindows[0], intoLinux[0]);
+      }
+
+      if (isConverted == false && isConversion[1]) {
+         isConverted = convertPath_Windows2Linux_One(linuxImageFilePathName, fromWindows[1], intoLinux[1]);
+      }
+
+      if (isConverted == false && isConversion[2]) {
+         isConverted = convertPath_Windows2Linux_One(linuxImageFilePathName, fromWindows[2], intoLinux[2]);
+      }
+   }
+
+   /**
+    * @param winImageFilePathName
+    * @param replaceFromWindows
+    * @param replaceToLinux
+    *
+    * @return Returns <code>true</code> when it was converted
+    */
+   private boolean convertPath_Windows2Linux_One(final String winImageFilePathName,
+                                                 final String replaceFromWindows,
+                                                 final String replaceToLinux) {
+
+      String linuxFilePathName = UI.EMPTY_STRING;
+
+      if (winImageFilePathName.startsWith(replaceFromWindows)) {
+
+         final int numWinChars = replaceFromWindows.length();
+
+         final String remainingWinPath = winImageFilePathName.substring(numWinChars);
+         final String remainingLinuxPath = remainingWinPath.replaceAll("\\\\", "/");
+
+         linuxFilePathName = replaceToLinux + remainingLinuxPath;
+
+         final IPath linuxFilePath = new Path(linuxFilePathName);
+
+         _imageFilePath_NoOS = linuxFilePath.removeLastSegments(1).toOSString();
+         _imageFilePathName_NoOS = linuxFilePathName;
+
+         return true;
+      }
+
+      return false;
    }
 
    @Override
@@ -248,14 +365,26 @@ public class TourPhoto implements Serializable {
    }
 
    public String getImageFilePath() {
-      return imageFilePath;
+
+      if (_imageFilePath_NoOS == null) {
+
+         setupImageFilePathForCurrentOS();
+      }
+
+      return _imageFilePath_NoOS;
    }
 
    /**
     * @return Returns the full filepathname
     */
    public String getImageFilePathName() {
-      return imageFilePathName;
+
+      if (_imageFilePathName_NoOS == null) {
+
+         setupImageFilePathForCurrentOS();
+      }
+
+      return _imageFilePathName_NoOS;
    }
 
    /**
@@ -383,8 +512,12 @@ public class TourPhoto implements Serializable {
 
       imageFileName = filePath.lastSegment();
       imageFileExt = fileExtension == null ? UI.EMPTY_STRING : fileExtension;
+
       imageFilePath = filePath.removeLastSegments(1).toOSString();
       imageFilePathName = filePathName;
+
+      _imageFilePath_NoOS = null;
+      _imageFilePathName_NoOS = null;
    }
 
    /**
@@ -467,6 +600,34 @@ public class TourPhoto implements Serializable {
       photoId = TourDatabase.ENTITY_IS_NOT_SAVED;
 
       tourData = tourDataFromClone;
+   }
+
+   private void setupImageFilePathForCurrentOS() {
+
+      // set default
+      _imageFilePath_NoOS = imageFilePath;
+      _imageFilePathName_NoOS = imageFilePathName;
+
+      if (UI.IS_WIN) {
+
+         // Windows cannot contain Linux slashes in the path
+         if (imageFilePath.indexOf('/') != -1) {
+
+            // Linux path is detected
+
+            convertPath_Linux2Windows(imageFilePathName);
+         }
+
+      } else {
+
+         // Linux cannot contain Windows backslashes
+         if (imageFilePath.indexOf('\\') != -1) {
+
+            // Windows path is detected
+
+            convertPath_Windows2Linux(imageFilePathName);
+         }
+      }
    }
 
    /**

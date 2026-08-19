@@ -427,6 +427,7 @@ public class TourDatabase {
    /*
     * Cached distinct fields
     */
+   private static ConcurrentSkipListSet<String>  _dbPhotoImageFilePath;
    private static ConcurrentSkipListSet<String>  _dbTourTitles;
    private static ConcurrentSkipListSet<String>  _dbTourStartPlace;
    private static ConcurrentSkipListSet<String>  _dbTourEndPlace;
@@ -1901,6 +1902,23 @@ public class TourDatabase {
       loadAllTourTypes();
 
       return _allDbTourTypes_ByName;
+   }
+
+   public static ConcurrentSkipListSet<String> getCachedFields_AllPhotoImageFilePath() {
+
+      if (_dbPhotoImageFilePath == null) {
+
+         synchronized (CACHE_LOCK) {
+
+            // recheck again, another thread could have it created
+            if (_dbPhotoImageFilePath == null) {
+
+               _dbPhotoImageFilePath = getDistinctValues(TourDatabase.TABLE_TOUR_PHOTO, "imageFilePath"); //$NON-NLS-1$
+            }
+         }
+      }
+
+      return _dbPhotoImageFilePath;
    }
 
    public static ConcurrentSkipListSet<String> getCachedFields_AllTourMarkerNames() {

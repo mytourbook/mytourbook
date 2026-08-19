@@ -37,6 +37,10 @@ New / Improvements
 * Easy Import
   - Added action to mount/unmount a device
     https://github.com/mytourbook/mytourbook/issues/1720
+
+* Photo
+  - Support photo locations across all platforms    
+    https://github.com/mytourbook/mytourbook/issues/1727
   
 
 Changes
