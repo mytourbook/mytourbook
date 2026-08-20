@@ -363,6 +363,7 @@ public class TourNutritionProductMenuManager {
 
                // update the tour nutrition product in the list
                recentTourNutritionProduct.setValue(tourNutritionProduct);
+
                break;
             }
          }
