@@ -9489,6 +9489,11 @@ public class TourDataEditorView extends ViewPart implements
 
       _parent.getDisplay().asyncExec(() -> {
 
+         // this happend during debugging
+         if (_parent.isDisposed()) {
+            return;
+         }
+
          if (_tableComboWeather_AirQuality.getTable().isDisposed()) {
 
             // this can happen when a detached editor is reattached

@@ -905,7 +905,7 @@ public class EquipmentManager {
 
       final SQLData sqlTagData = createSQLEquipmentParameters(allEquipment);
 
-      final String sqlQuery = UI.EMPTY_STRING
+      final String sql = UI.EMPTY_STRING
 
             + "--" + NL //                                                                         //$NON-NLS-1$
             + NL
@@ -917,36 +917,60 @@ public class EquipmentManager {
             + "SELECT" + NL //                                                                     //$NON-NLS-1$
 
             + "   jTdEq.Equipment_EquipmentID," + NL //                                         1  //$NON-NLS-1$
-            + "   SUM(tourData.TOURDISTANCE)             AS TOTALDISTANCE," + NL //             2  //$NON-NLS-1$
-            + "   SUM(tourData.TOURDEVICETIME_RECORDED)  AS TOTALRECORDEDTIME" + NL //          3  //$NON-NLS-1$
+            + "   jEquip.distanceFirstUse," + NL //                                             2  //$NON-NLS-1$
+            + "   SUM(tourData.TOURDISTANCE)             AS TOTALDISTANCE," + NL //             3  //$NON-NLS-1$
+            + "   SUM(tourData.TOURDEVICETIME_RECORDED)  AS TOTALRECORDEDTIME" + NL //          4  //$NON-NLS-1$
 
             + "FROM " + TourDatabase.JOINTABLE__TOURDATA__EQUIPMENT + " AS jTdEq" + NL //          //$NON-NLS-1$ //$NON-NLS-2$
 
             + "JOIN " + TourDatabase.TABLE_TOUR_DATA + " AS TourData"//                            //$NON-NLS-1$ //$NON-NLS-2$
-            + " ON jTdEq.TourData_TourID = TourData.TOURID" + NL //                                //$NON-NLS-1$
+            + "   ON jTdEq.TourData_TourID = TourData.TOURID" + NL //                              //$NON-NLS-1$
 
-            + "WHERE jTdEq.Equipment_EquipmentID IN (" + sqlTagData.getSqlString() + ")" + NL //   //$NON-NLS-1$ //$NON-NLS-2$
+            + "JOIN " + TourDatabase.TABLE_EQUIPMENT + " AS jEquip" + NL //                        //$NON-NLS-1$
+            + "   ON jTdEq.Equipment_EquipmentID = jEquip.EquipmentID" + NL //                     //$NON-NLS-1$
 
-            + "GROUP BY jTdEq.Equipment_EquipmentID" + NL //                                       //$NON-NLS-1$
+            + "WHERE jTdEq.Equipment_EquipmentID IN (" + sqlTagData.getSqlString() + ")" + NL //   //$NON-NLS-1$
+
+            + "GROUP BY " + NL //                                                                  //$NON-NLS-1$
+            + "   jTdEq.Equipment_EquipmentID," + NL //                                            //$NON-NLS-1$
+            + "   jEquip.distanceFirstUse" + NL //                                                 //$NON-NLS-1$
 
             + NL;
 
       final Map<Long, String> allAccumulatedValues = new HashMap<>();
 
       try (Connection connection = TourDatabase.getInstance().getConnection();
-            final PreparedStatement preparedStatement = connection.prepareStatement(sqlQuery)) {
+            final PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
 
          sqlTagData.setParameters(preparedStatement, 1);
 
          final ResultSet result = preparedStatement.executeQuery();
 
+         final float unitValueDistance = net.tourbook.common.UI.UNIT_VALUE_DISTANCE;
+
          while (result.next()) {
 
-            final long tagId = result.getLong(1);
-            final float distance = result.getLong(2);
-            final long timeRecorded = result.getLong(3);
+// SET_FORMATTING_OFF
 
-            final float distanceConverted = distance / 1000 / net.tourbook.common.UI.UNIT_VALUE_DISTANCE;
+            final long equipmentId        = result.getLong(1);
+            final float initialDistance   = result.getLong(2);
+            final float distance          = result.getLong(3);
+            final long timeRecorded       = result.getLong(4);
+
+            final float distanceConverted       = distance / 1000 / unitValueDistance;
+            final float initDistanceConverted   = initialDistance / unitValueDistance;
+            final float totalDistance           = initDistanceConverted + distanceConverted;
+
+// SET_FORMATTING_ON
+
+            final String distanceText = initDistanceConverted == 0
+
+                  ? Integer.toString(Math.round(distanceConverted))
+
+                  : "%d + %d = %d".formatted(
+                        Math.round(initDistanceConverted),
+                        Math.round(distanceConverted),
+                        Math.round(totalDistance));
 
             final StringBuilder sb = new StringBuilder();
 
@@ -956,16 +980,16 @@ public class EquipmentManager {
 
             sb.append(NL);
 
-            sb.append(Math.round(distanceConverted));
+            sb.append(distanceText);
             sb.append(UI.SPACE);
             sb.append(net.tourbook.common.UI.UNIT_LABEL_DISTANCE);
 
-            allAccumulatedValues.put(tagId, sb.toString());
+            allAccumulatedValues.put(equipmentId, sb.toString());
          }
 
       } catch (final SQLException e) {
 
-         SQL.showException(e, sqlQuery);
+         SQL.showException(e, sql);
       }
 
       return allAccumulatedValues;

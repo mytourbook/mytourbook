@@ -134,7 +134,7 @@ public class Equipment implements Cloneable, Comparable<Object>, Serializable {
    private String                     initialValueUnit;
 
    /**
-    * Initial distance, in meter
+    * Initial distance, in kilometer
     */
    private float                      distanceFirstUse;
 
@@ -330,6 +330,16 @@ public class Equipment implements Cloneable, Comparable<Object>, Serializable {
       }
 
       return type;
+   }
+
+   public String getCollateIdEmptyChecked() {
+
+      if (_checkedEmptyCollateID == null) {
+
+         _checkedEmptyCollateID = EquipmentManager.isEmptyEquipmentCollateID(type) ? UI.EMPTY_STRING : type;
+      }
+
+      return _checkedEmptyCollateID;
    }
 
    public long getDateBuilt() {
@@ -542,16 +552,6 @@ public class Equipment implements Cloneable, Comparable<Object>, Serializable {
       }
 
       return size;
-   }
-
-   public String getCollateIdEmptyChecked() {
-
-      if (_checkedEmptyCollateID == null) {
-
-         _checkedEmptyCollateID = EquipmentManager.isEmptyEquipmentCollateID(type) ? UI.EMPTY_STRING : type;
-      }
-
-      return _checkedEmptyCollateID;
    }
 
    public String getUrlAddress() {

@@ -388,6 +388,15 @@
          class="net.tourbook.preferences.PrefPagePeople"
       />
 
+
+      <!--
+         Photo
+      -->
+         
+      <page id="net.tourbook.preferences.PrefPagePhoto_PathConversion"
+         class="net.tourbook.preferences.PrefPagePhoto_PathConversion"
+         category="net.tourbook.preferences.PrefPagePhotoID"
+         name="%PrefPage_Photo_PathConversion"/>
         
       <!--
          Proxy
@@ -673,6 +682,12 @@
                name        ="net.tourbook.separator.OtherDirectories"
                visible     ="true"/>
 
+               <!-- All Tour Photos -->
+               <command
+                  commandId   ="command.net.tourbook.photo.TourPhotosAllView"
+                  label       ="%View_Name_AllTourPhotos"
+                  mnemonic    ="%View_Name_AllTourPhotos_Mnemonic"/>
+                  
                <!-- All Tour Marker -->
                <command
                   commandId   ="command.net.tourbook.ui.views.TourMarkerAllView"
@@ -1555,6 +1570,11 @@
          id             ="command.net.tourbook.photo.TourPhotosView"
          name           ="%View_Name_PhotoTourPhotos"
          defaultHandler ="net.tourbook.tour.photo.ActionHandler_OpenView_TourPhotos"/>
+         
+      <command 
+         id             ="command.net.tourbook.photo.TourPhotosAllView"
+         name           ="%View_Name_AllTourPhotos"
+         defaultHandler ="net.tourbook.tour.photo.ActionHandler_OpenView_TourPhotosAll"/>
 
       <command
          id             ="command.net.tourbook.PicDir.SyncPhotoWithTour"
@@ -1906,7 +1926,14 @@
       <category
          id          ="net.tourbook.category.photo"
          name        ="%View_Category_Photo"/>
-               
+
+         <view
+            category    ="net.tourbook.category.photo"
+            id          ="net.tourbook.tour.photo.TourPhotosAllView"
+            class       ="net.tourbook.tour.photo.TourPhotosAllView"
+            icon        ="icons/photo-tour-photos-all.svg"
+            name        ="%View_Name_AllTourPhotos"/>
+
          <view
             category    ="net.tourbook.category.photo"
             id          ="net.tourbook.photo.PhotosAndToursView.ID"
@@ -2066,6 +2093,15 @@
          sequence    ="%Shortcut_Key_App_TourMarker"
          contextId   ="org.eclipse.ui.contexts.window"
          schemeId    ="net.tourbook.scheme"/>
+         
+<!-- could not find a suitable key
+
+      <key
+         commandId   ="command.net.tourbook.photo.TourPhotosAllView"
+         sequence    ="%Shortcut_Key_App_TourPhotosAll"
+         contextId   ="org.eclipse.ui.contexts.window"
+         schemeId    ="net.tourbook.scheme"/>
+-->
 
       <key
          commandId   ="command.net.tourbook.ui.views.sensors.SensorView"

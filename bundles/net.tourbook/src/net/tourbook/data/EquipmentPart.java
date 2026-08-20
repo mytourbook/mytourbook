@@ -205,7 +205,7 @@ public class EquipmentPart implements Cloneable, Comparable<Object>, Serializabl
    private String                     initialValueUnit;
 
    /**
-    * Initial distance, in meter
+    * Initial distance, in kilometer
     */
    private float                      distanceFirstUse;
 
