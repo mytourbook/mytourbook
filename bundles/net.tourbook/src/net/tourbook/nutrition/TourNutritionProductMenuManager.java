@@ -367,9 +367,10 @@ public class TourNutritionProductMenuManager {
                break;
             }
          }
+
+         _recentTourNutritionProducts.remove(tourNutritionProductId);
       }
 
-      _recentTourNutritionProducts.remove(tourNutritionProductId);
       _recentTourNutritionProducts.putFirst(
             tourNutritionProductId,
             tourNutritionProduct);

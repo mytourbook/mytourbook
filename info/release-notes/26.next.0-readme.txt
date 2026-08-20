@@ -56,7 +56,8 @@ Changes
 Bugfix
 ======
   
-* 
+* Tour Nutrition (Frederic)
+ - When selecting a recent product, it should appear first in the list
 
 
 Translation    
