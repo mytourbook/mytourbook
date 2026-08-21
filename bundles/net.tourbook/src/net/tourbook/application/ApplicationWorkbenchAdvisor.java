@@ -40,6 +40,7 @@ import net.tourbook.tour.filter.geo.TourGeoFilter_Manager;
 import net.tourbook.tour.location.CommonLocationManager;
 import net.tourbook.tour.location.TourLocationManager;
 import net.tourbook.tour.photo.TourPhotoManager;
+import net.tourbook.tourMarker.TourMarkerManager;
 import net.tourbook.tourType.TourTypeManager;
 import net.tourbook.ui.action.TourActionManager;
 import net.tourbook.ui.views.referenceTour.ElevationCompareManager;
@@ -172,6 +173,7 @@ public class ApplicationWorkbenchAdvisor extends WorkbenchAdvisor {
       SwimStrokeManager.saveState();
       TourLocationManager.saveState();
       TourActionManager.saveState();
+      TourMarkerManager.saveState();
 
       FTSearchManager.closeIndexReaderSuggester();
       WebContentServer.stop();

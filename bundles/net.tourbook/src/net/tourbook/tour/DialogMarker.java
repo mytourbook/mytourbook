@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2025 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2026 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -47,6 +47,7 @@ import net.tourbook.data.TourData;
 import net.tourbook.data.TourMarker;
 import net.tourbook.data.TourMarkerType;
 import net.tourbook.database.TourDatabase;
+import net.tourbook.tourMarker.TourMarkerManager;
 import net.tourbook.ui.tourChart.ChartLabelMarker;
 import net.tourbook.ui.tourChart.ITourMarkerSelectionListener;
 import net.tourbook.ui.tourChart.TourChart;
@@ -1153,7 +1154,7 @@ public class DialogMarker extends TitleAreaDialog implements ITourMarkerSelectio
          _btnUndo.addSelectionListener(widgetSelectedAdapter(selectionEvent -> {
             _selectedTourMarker.restoreMarkerFromBackup(_backupMarker);
             updateUI_FromModel();
-            onChangeMarkerUI();
+            onChangeMarkerUI(false);
          }));
          setButtonLayoutData(_btnUndo);
 
@@ -1629,18 +1630,21 @@ public class DialogMarker extends TitleAreaDialog implements ITourMarkerSelectio
 
       _contentWidthHint = _pc.convertWidthInCharsToPixels(20);
 
-      _defaultSelectionListener = SelectionListener.widgetSelectedAdapter(selectionEvent -> onChangeMarkerUI());
+      _defaultSelectionListener = SelectionListener.widgetSelectedAdapter(selectionEvent -> onChangeMarkerUI(true));
 
       _defaultMouseWheelListener = mouseEvent -> {
+
          UI.adjustSpinnerValueOnMouseScroll(mouseEvent);
-         onChangeMarkerUI();
+         onChangeMarkerUI(true);
       };
 
       _defaultModifyListener = modifyEvent -> {
+
          if (_isUpdateUI) {
             return;
          }
-         onChangeMarkerUI();
+
+         onChangeMarkerUI(true);
       };
    }
 
@@ -1659,15 +1663,22 @@ public class DialogMarker extends TitleAreaDialog implements ITourMarkerSelectio
    }
 
    /**
-    * save marker modifications and update chart and viewer
+    * Save marker modifications and update chart and viewer
+    *
+    * @param isUpdateRecentMarker
     */
-   private void onChangeMarkerUI() {
+   private void onChangeMarkerUI(final boolean isUpdateRecentMarker) {
 
       updateModel_FromUI(_selectedTourMarker);
 
       _tourChart.updateUI_MarkerLayer(true);
 
       _markerViewer.update(_selectedTourMarker, null);
+
+      if (isUpdateRecentMarker) {
+
+         TourMarkerManager.addRecentMarker(_selectedTourMarker);
+      }
 
       enableControls();
    }
@@ -1691,7 +1702,7 @@ public class DialogMarker extends TitleAreaDialog implements ITourMarkerSelectio
       _selectedTourMarker.setMarkerBackup(_backupMarker);
 
       updateUI_FromModel();
-      onChangeMarkerUI();
+      onChangeMarkerUI(false);
 
       if (_isSetXSlider) {
 
@@ -1809,6 +1820,8 @@ public class DialogMarker extends TitleAreaDialog implements ITourMarkerSelectio
          // chart
          _tourChart.updateUI_MarkerLayer(true);
 
+         TourMarkerManager.addRecentMarker(tourMarker);
+
          enableControls();
       }
    }
@@ -1849,19 +1862,23 @@ public class DialogMarker extends TitleAreaDialog implements ITourMarkerSelectio
             _selectedTourMarker.setVisibleType(ChartLabelMarker.VISIBLE_TYPE_TYPE_EDIT);
          }
 
-         _chkVisibility.setSelection(isTourMarker ? _selectedTourMarker.isMarkerVisible() : false);
+// SET_FORMATTING_OFF
 
-         _comboMarkerName.setText(isTourMarker ? _selectedTourMarker.getLabel() : UI.EMPTY_STRING);
-         _comboLabelPosition.select(isTourMarker ? _selectedTourMarker.getLabelPosition() : 0);
+         _chkVisibility       .setSelection(isTourMarker ? _selectedTourMarker.isMarkerVisible()   : false);
 
-         _spinLabelOffsetX.setSelection(isTourMarker ? _selectedTourMarker.getLabelXOffset() : 0);
-         _spinLabelOffsetY.setSelection(isTourMarker ? _selectedTourMarker.getLabelYOffset() : 0);
+         _comboMarkerName     .setText(isTourMarker      ? _selectedTourMarker.getLabel()          : UI.EMPTY_STRING);
+         _comboLabelPosition  .select(isTourMarker       ? _selectedTourMarker.getLabelPosition()  : 0);
 
-         _txtDescription.setText(isTourMarker ? _selectedTourMarker.getDescription() : UI.EMPTY_STRING);
-         _txtUrlAddress.setText(isTourMarker ? _selectedTourMarker.getUrlAddress() : UI.EMPTY_STRING);
-         _txtUrlText.setText(isTourMarker ? _selectedTourMarker.getUrlText() : UI.EMPTY_STRING);
+         _spinLabelOffsetX    .setSelection(isTourMarker ? _selectedTourMarker.getLabelXOffset()   : 0);
+         _spinLabelOffsetY    .setSelection(isTourMarker ? _selectedTourMarker.getLabelYOffset()   : 0);
 
-         _tableMarkerType.select(isTourMarker ? getMarkerTypeIndex(_selectedTourMarker) : 0);
+         _txtDescription      .setText(isTourMarker      ? _selectedTourMarker.getDescription()    : UI.EMPTY_STRING);
+         _txtUrlAddress       .setText(isTourMarker      ? _selectedTourMarker.getUrlAddress()     : UI.EMPTY_STRING);
+         _txtUrlText          .setText(isTourMarker      ? _selectedTourMarker.getUrlText()        : UI.EMPTY_STRING);
+
+         _tableMarkerType     .select(isTourMarker       ? getMarkerTypeIndex(_selectedTourMarker) : 0);
+
+// SET_FORMATTING_ON
       }
       _isUpdateUI = false;
    }
