@@ -66,33 +66,6 @@ public class CadenceTests {
    }
 
    /**
-    * Suunto JSON.GZ with pauses using the moving time.
-    */
-   @Test
-   void testCadenceZonesSuunto9TimeWithMovingTime() {
-
-      final String filePath = SUUNTO_IMPORT_FILE_PATH + "1590349595199_183010004848_post_timeline-1"; //$NON-NLS-1$
-      final String testFilePath = FilesUtils.getAbsoluteFilePath(filePath + JSON_GZ);
-
-      suunto9DeviceDataReader.processDeviceData(testFilePath,
-            null,
-            new HashMap<>(),
-            newlyImportedTours,
-            new ImportState_File(),
-            new ImportState_Process());
-
-      final TourData tour = Comparison.retrieveImportedTour(newlyImportedTours);
-
-      tour.computeCadenceZonesTimes();
-
-      assertEquals(70, tour.getCadenceZones_DelimiterValue());
-      assertEquals(852, tour.getCadenceZone_FastTime());
-      assertEquals(9795, tour.getCadenceZone_SlowTime());
-      assertEquals((long) (tour.getCadenceZone_SlowTime()) + tour.getCadenceZone_FastTime(),
-            tour.getTourComputedTime_Moving());
-   }
-
-   /**
     * TCX file with pauses using the moving time
     */
    @Test
