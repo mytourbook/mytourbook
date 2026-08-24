@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2020, 2024 Frédéric Bard
+ * Copyright (C) 2020, 2026 Frédéric Bard
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -200,7 +200,8 @@ public class PrefPageStrava extends FieldEditorPreferencePage implements IWorkbe
 
             final Link linkWebPage = new Link(group, SWT.NONE);
             linkWebPage.setText(UI.LINK_TAG_START + STRAVA_APP_WEBPAGE_LINK + UI.LINK_TAG_END);
-            linkWebPage.setEnabled(true);
+            linkWebPage.setEnabled(false);
+            // See issue: https://github.com/mytourbook/mytourbook/discussions/1698
             linkWebPage.addSelectionListener(widgetSelectedAdapter(selectionEvent -> WEB.openUrl(
                   STRAVA_APP_WEBPAGE_LINK)));
             GridDataFactory.fillDefaults().grab(true, false).applyTo(linkWebPage);
