@@ -22,7 +22,6 @@ import java.util.HashMap;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.data.TourData;
 import net.tourbook.device.garmin.GarminTCX_DeviceDataReader;
-import net.tourbook.device.suunto.Suunto9_DeviceDataReader;
 import net.tourbook.importdata.ImportState_File;
 import net.tourbook.importdata.ImportState_Process;
 import net.tourbook.preferences.ITourbookPreferences;
@@ -38,22 +37,18 @@ import utils.FilesUtils;
 
 public class CadenceTests {
 
-   private static final String               GARMIN_IMPORT_PATH      = GarminTCX_DeviceDataReaderTests.FILES_PATH;
-   private static final String               SUUNTO_IMPORT_FILE_PATH = FilesUtils.rootPath + "device/suunto/files/"; //$NON-NLS-1$
-   private static final String               JSON_GZ                 = ".json.gz";                                   //$NON-NLS-1$
+   private static final String               GARMIN_IMPORT_PATH = GarminTCX_DeviceDataReaderTests.FILES_PATH;
 
    private static HashMap<Long, TourData>    newlyImportedTours;
    private static GarminTCX_DeviceDataReader garminDeviceDataReader;
-   private static Suunto9_DeviceDataReader   suunto9DeviceDataReader;
 
-   private static final IPreferenceStore     _prefStore              = TourbookPlugin.getPrefStore();
+   private static final IPreferenceStore     _prefStore         = TourbookPlugin.getPrefStore();
 
    @BeforeAll
    static void initAll() {
 
       newlyImportedTours = new HashMap<>();
       garminDeviceDataReader = new GarminTCX_DeviceDataReader();
-      suunto9DeviceDataReader = new Suunto9_DeviceDataReader();
    }
 
    @AfterEach
