@@ -50,7 +50,7 @@ New / Improvements
 Changes
 =======
 
-* 
+* Removed the Suunto 9 import (Frederic)
     
 
 Bugfix
