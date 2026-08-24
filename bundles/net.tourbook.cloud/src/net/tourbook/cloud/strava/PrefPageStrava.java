@@ -165,6 +165,8 @@ public class PrefPageStrava extends FieldEditorPreferencePage implements IWorkbe
 
          final Button buttonConnect = new Button(container, SWT.NONE);
          buttonConnect.setImage(_imageStravaConnect);
+         // See issue: https://github.com/mytourbook/mytourbook/discussions/1698
+         buttonConnect.setEnabled(false);
          buttonConnect.addSelectionListener(widgetSelectedAdapter(selectionEvent -> onClickAuthorize()));
          GridDataFactory.fillDefaults().align(SWT.CENTER, SWT.FILL).grab(true, true).applyTo(buttonConnect);
       }
@@ -200,8 +202,7 @@ public class PrefPageStrava extends FieldEditorPreferencePage implements IWorkbe
 
             final Link linkWebPage = new Link(group, SWT.NONE);
             linkWebPage.setText(UI.LINK_TAG_START + STRAVA_APP_WEBPAGE_LINK + UI.LINK_TAG_END);
-            linkWebPage.setEnabled(false);
-            // See issue: https://github.com/mytourbook/mytourbook/discussions/1698
+            linkWebPage.setEnabled(true);
             linkWebPage.addSelectionListener(widgetSelectedAdapter(selectionEvent -> WEB.openUrl(
                   STRAVA_APP_WEBPAGE_LINK)));
             GridDataFactory.fillDefaults().grab(true, false).applyTo(linkWebPage);
