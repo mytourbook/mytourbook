@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2022 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2026 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -18,8 +18,4 @@ package net.tourbook.device;
 public interface IPreferences {
 
    String GPX_IS_RELATIVE_DISTANCE_VALUE = "GPX_IS_RELATIVE_DISTANCE_VALUE"; //$NON-NLS-1$
-
-   String SUUNTO9_ALTITUDE_DATA_SOURCE   = "SUUNTO9_ALTITUDE_DATA_SOURCE";   //$NON-NLS-1$
-   String SUUNTO9_DISTANCE_DATA_SOURCE   = "Suunto9_DISTANCE_DATA_SOURCE";   //$NON-NLS-1$
-
 }
