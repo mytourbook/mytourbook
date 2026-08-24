@@ -46,7 +46,7 @@ import net.tourbook.ui.tourChart.action.ActionCreateMarkerFromSlider;
 import net.tourbook.ui.tourChart.action.ActionCreateMarkerFromValuePoint;
 import net.tourbook.ui.tourChart.action.ActionCreateRefTour;
 import net.tourbook.ui.tourChart.action.ActionDeleteMarker;
-import net.tourbook.ui.tourChart.action.ActionSetLabelFromRecentMarker_SubMenu;
+import net.tourbook.ui.tourChart.action.ActionRenameMarkerFromRecentMarker_SubMenu;
 import net.tourbook.ui.tourChart.action.ActionSetMarkerLabelPositionMenu;
 import net.tourbook.ui.tourChart.action.ActionSetMarkerVisible;
 
@@ -77,10 +77,10 @@ public class TourChartContextProvider implements IChartContextProvider, ITourPro
    private ActionOpenMarkerDialog                     _actionOpenMarkerDialog;
    private ActionOpenPrefDialog                       _actionPrefDialog;
    private ActionOpenTour                             _actionOpenTour;
+   private ActionRenameMarkerFromRecentMarker_SubMenu _actionRenameMarkerFromRecentMarker;
    private ActionSetTourTypeMenu                      _actionSetTourType;
    private ActionSetMarkerVisible                     _actionSetMarkerVisible;
    private ActionSetMarkerLabelPositionMenu           _actionSetMarkerPosition;
-   private ActionSetLabelFromRecentMarker_SubMenu     _actionSetRecentMarker;
 
    private ChartXSlider                               _leftSlider;
    private ChartXSlider                               _rightSlider;
@@ -108,6 +108,7 @@ public class TourChartContextProvider implements IChartContextProvider, ITourPro
       _actionCreateRefTour = new ActionCreateRefTour(tourChart);
 
       _actionCreateMarkerFromRecentMarker = new ActionCreateMarkerFromRecentMarker_SubMenu(this);
+      _actionRenameMarkerFromRecentMarker = new ActionRenameMarkerFromRecentMarker_SubMenu(tourChart);
 
       _actionCreateMarkerFromSlider = new ActionCreateMarkerFromSlider(
             this,
@@ -148,8 +149,6 @@ public class TourChartContextProvider implements IChartContextProvider, ITourPro
       _actionPrefDialog = new ActionOpenPrefDialog(
             Messages.Tour_Action_EditChartPreferences,
             PrefPageAppearanceTourChart.ID);
-
-      _actionSetRecentMarker = new ActionSetLabelFromRecentMarker_SubMenu(tourChart);
    }
 
    @Override
@@ -258,11 +257,11 @@ public class TourChartContextProvider implements IChartContextProvider, ITourPro
       _actionOpenMarkerDialog.setTourMarker(tourMarker);
       _actionSetMarkerVisible.setTourMarker(tourMarker, !tourMarker.isMarkerVisible());
       _actionSetMarkerPosition.setTourMarker(tourMarker);
-      _actionSetRecentMarker.setTourMarker(tourMarker);
+      _actionRenameMarkerFromRecentMarker.setTourMarker(tourMarker);
 
       // fill actions
       menuMgr.add(_actionSetMarkerPosition);
-      menuMgr.add(_actionSetRecentMarker);
+      menuMgr.add(_actionRenameMarkerFromRecentMarker);
       menuMgr.add(_actionSetMarkerVisible);
       menuMgr.add(_actionDeleteMarker);
       menuMgr.add(_actionOpenMarkerDialog);
@@ -288,7 +287,7 @@ public class TourChartContextProvider implements IChartContextProvider, ITourPro
       _actionOpenMarkerDialog.setEnabled(isTourSaved);
       _actionSetMarkerVisible.setEnabled(isTourSaved);
       _actionSetMarkerPosition.setEnabled(isTourSaved);
-      _actionSetRecentMarker.setEnabled(isTourSaved && isRecentMarkersAvailable);
+      _actionRenameMarkerFromRecentMarker.setEnabled(isTourSaved && isRecentMarkersAvailable);
    }
 
    @Override

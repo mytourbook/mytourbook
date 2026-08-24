@@ -32,7 +32,7 @@ import org.eclipse.swt.widgets.Menu;
 /**
  * Set the label of an existing {@link TourMarker} from recently used tour marker labels
  */
-public class ActionSetLabelFromRecentMarker_SubMenu extends SubMenu {
+public class ActionRenameMarkerFromRecentMarker_SubMenu extends SubMenu {
 
    private TourMarker               _tourMarker;
    private ITourMarkerUpdater       _tourMarkerUpdater;
@@ -56,14 +56,13 @@ public class ActionSetLabelFromRecentMarker_SubMenu extends SubMenu {
          _tourMarkerUpdater.updateModifiedTourMarker(_tourMarker);
 
          // set last used marker to the top of the list
-         TourMarkerManager.addRecentMarker(_tourMarker);
+         TourMarkerManager.addRecentMarker(_tourMarker.getLabel());
       }
    }
 
-   public ActionSetLabelFromRecentMarker_SubMenu(final ITourMarkerUpdater tourMarkerUpdater) {
+   public ActionRenameMarkerFromRecentMarker_SubMenu(final ITourMarkerUpdater tourMarkerUpdater) {
 
-      super("Set Tour Marker Values &from", AS_DROP_DOWN_MENU);
-
+      super("Replace Marker Label &with", AS_DROP_DOWN_MENU);
 
       _tourMarkerUpdater = tourMarkerUpdater;
 
@@ -74,9 +73,7 @@ public class ActionSetLabelFromRecentMarker_SubMenu extends SubMenu {
    }
 
    @Override
-   public void enableActions() {
-
-   }
+   public void enableActions() {}
 
    @Override
    public void fillMenu(final Menu menu) {

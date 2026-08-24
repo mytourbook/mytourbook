@@ -7465,8 +7465,11 @@ public class Map2 extends Canvas {
             _allDisposableMapPointImages_SWT.clear();
             _allDisposableMapPointImages_SWT.add(_mapPointImage);
 
-//            System.out.println(_debugLog.toString());
-//            _debugLog.setLength(0);
+//            synchronized (_debugLog) {
+//               System.out.println(Thread.currentThread().getName());
+//               System.out.println(_debugLog.toString());
+//               _debugLog.setLength(0);
+//            }
          }
 
          _mapPointPainter_Viewport_WhenPainted = _mapPointPainter_Viewport_DuringPainting;

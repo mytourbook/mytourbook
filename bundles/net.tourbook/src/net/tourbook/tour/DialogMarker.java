@@ -1154,7 +1154,7 @@ public class DialogMarker extends TitleAreaDialog implements ITourMarkerSelectio
          _btnUndo.addSelectionListener(widgetSelectedAdapter(selectionEvent -> {
             _selectedTourMarker.restoreMarkerFromBackup(_backupMarker);
             updateUI_FromModel();
-            onChangeMarkerUI(false);
+            onChangeMarkerUI();
          }));
          setButtonLayoutData(_btnUndo);
 
@@ -1630,12 +1630,12 @@ public class DialogMarker extends TitleAreaDialog implements ITourMarkerSelectio
 
       _contentWidthHint = _pc.convertWidthInCharsToPixels(20);
 
-      _defaultSelectionListener = SelectionListener.widgetSelectedAdapter(selectionEvent -> onChangeMarkerUI(true));
+      _defaultSelectionListener = SelectionListener.widgetSelectedAdapter(selectionEvent -> onChangeMarkerUI());
 
       _defaultMouseWheelListener = mouseEvent -> {
 
          UI.adjustSpinnerValueOnMouseScroll(mouseEvent);
-         onChangeMarkerUI(true);
+         onChangeMarkerUI();
       };
 
       _defaultModifyListener = modifyEvent -> {
@@ -1644,7 +1644,7 @@ public class DialogMarker extends TitleAreaDialog implements ITourMarkerSelectio
             return;
          }
 
-         onChangeMarkerUI(true);
+         onChangeMarkerUI();
       };
    }
 
@@ -1667,18 +1667,13 @@ public class DialogMarker extends TitleAreaDialog implements ITourMarkerSelectio
     *
     * @param isUpdateRecentMarker
     */
-   private void onChangeMarkerUI(final boolean isUpdateRecentMarker) {
+   private void onChangeMarkerUI() {
 
       updateModel_FromUI(_selectedTourMarker);
 
       _tourChart.updateUI_MarkerLayer(true);
 
       _markerViewer.update(_selectedTourMarker, null);
-
-      if (isUpdateRecentMarker) {
-
-         TourMarkerManager.addRecentMarker(_selectedTourMarker);
-      }
 
       enableControls();
    }
@@ -1702,7 +1697,7 @@ public class DialogMarker extends TitleAreaDialog implements ITourMarkerSelectio
       _selectedTourMarker.setMarkerBackup(_backupMarker);
 
       updateUI_FromModel();
-      onChangeMarkerUI(false);
+      onChangeMarkerUI();
 
       if (_isSetXSlider) {
 
@@ -1820,10 +1815,11 @@ public class DialogMarker extends TitleAreaDialog implements ITourMarkerSelectio
          // chart
          _tourChart.updateUI_MarkerLayer(true);
 
-         TourMarkerManager.addRecentMarker(tourMarker);
-
          enableControls();
       }
+
+      // set last used marker to the top of the recent markers
+      TourMarkerManager.addRecentMarker(tourMarker.getLabel());
    }
 
    private void updateModel_FromUI(final TourMarker tourMarker) {

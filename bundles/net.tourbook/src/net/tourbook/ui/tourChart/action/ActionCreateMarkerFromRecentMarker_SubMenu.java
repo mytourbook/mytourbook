@@ -83,7 +83,7 @@ public class ActionCreateMarkerFromRecentMarker_SubMenu extends SubMenu {
       }
    }
 
-   public void actionCreateMarker(final RecentMarker recentMarker) {
+   private void actionCreateMarker(final RecentMarker recentMarker) {
 
       final Chart chart = _chartContextProvider.getChart();
 
@@ -123,7 +123,7 @@ public class ActionCreateMarkerFromRecentMarker_SubMenu extends SubMenu {
          TourManager.saveModifiedTour(tourData);
 
          // set created marker to the top of the recent markers
-         TourMarkerManager.addRecentMarker(newTourMarker);
+         TourMarkerManager.addRecentMarker(newTourMarker.getLabel());
       }
    }
 

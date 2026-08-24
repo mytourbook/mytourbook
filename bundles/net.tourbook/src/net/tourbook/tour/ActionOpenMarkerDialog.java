@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2025 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2026 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -22,6 +22,7 @@ import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourMarker;
+import net.tourbook.tourMarker.TourMarkerManager;
 import net.tourbook.ui.ITourProvider;
 import net.tourbook.ui.views.tourDataEditor.TourDataEditorView;
 
@@ -52,18 +53,23 @@ public class ActionOpenMarkerDialog extends Action {
       setEnabled(false);
    }
 
+   /**
+    * @param tourProvider
+    * @param isSaveTour
+    * @param selectedTourMarker
+    */
    public static void doAction(final ITourProvider tourProvider,
                                final boolean isSaveTour,
                                final TourMarker selectedTourMarker) {
 
-      final ArrayList<TourData> selectedTours = tourProvider.getSelectedTours();
+      final ArrayList<TourData> allSelectedTours = tourProvider.getSelectedTours();
 
       // check if one tour is selected
-      if (selectedTours == null || selectedTours.size() != 1 || selectedTours.get(0) == null) {
+      if (allSelectedTours == null || allSelectedTours.size() != 1 || allSelectedTours.get(0) == null) {
          return;
       }
 
-      final TourData tourData = selectedTours.get(0);
+      final TourData tourData = allSelectedTours.get(0);
 
       if (tourData.isManualTour()) {
          // a manually created tour do not have time slices -> no markers
@@ -79,7 +85,26 @@ public class ActionOpenMarkerDialog extends Action {
 
          if (isSaveTour) {
 
-            TourManager.saveModifiedTours(selectedTours);
+            /*
+             * Save tour
+             */
+            final TourData savedTourData = TourManager.saveModifiedTour(tourData);
+
+            /*
+             * Get saved marker
+             */
+            final long modifiedMarkerId = selectedTourMarker.getMarkerId();
+
+            for (final TourMarker savedMarker : savedTourData.getTourMarkers()) {
+
+               if (savedMarker.getMarkerId() == modifiedMarkerId) {
+
+                  // set last used marker to the top of the recent markers
+                  TourMarkerManager.addRecentMarker(savedMarker.getLabel());
+
+                  break;
+               }
+            }
 
          } else {
 

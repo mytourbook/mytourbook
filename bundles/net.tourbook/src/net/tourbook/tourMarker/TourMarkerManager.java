@@ -27,7 +27,6 @@ import net.tourbook.common.UI;
 import net.tourbook.common.time.TimeTools;
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.Util;
-import net.tourbook.data.TourMarker;
 
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Platform;
@@ -76,11 +75,9 @@ public class TourMarkerManager {
     *
     * @param tourMarker
     */
-   public static void addRecentMarker(final TourMarker tourMarker) {
+   public static void addRecentMarker(final String markerLabel) {
 
-      final String markerKey = tourMarker.getLabel();
-
-      final RecentMarker existingMarker = _allRecentMarkerMap.get(markerKey);
+      final RecentMarker existingMarker = _allRecentMarkerMap.get(markerLabel);
 
       if (existingMarker == null) {
 
@@ -89,11 +86,11 @@ public class TourMarkerManager {
          /*
           * Create a new marker
           */
-         final RecentMarker newMarker = new RecentMarker(markerKey);
+         final RecentMarker newMarker = new RecentMarker(markerLabel);
 
          _allRecentMarker.addFirst(newMarker);
 
-         _allRecentMarkerMap.put(markerKey, newMarker);
+         _allRecentMarkerMap.put(markerLabel, newMarker);
 
          /*
           * Check number of max markers, remove last used marker

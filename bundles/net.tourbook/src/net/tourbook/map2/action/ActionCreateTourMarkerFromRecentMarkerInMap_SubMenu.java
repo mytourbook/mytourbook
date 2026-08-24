@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2019, 2026 Frédéric Bard
+ * Copyright (C) 2026 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -19,37 +19,70 @@ import com.javadocmd.simplelatlng.LatLng;
 import com.javadocmd.simplelatlng.LatLngTool;
 import com.javadocmd.simplelatlng.util.LengthUnit;
 
+import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
+
 import net.tourbook.Images;
 import net.tourbook.application.TourbookPlugin;
+import net.tourbook.common.UI;
 import net.tourbook.common.map.GeoPosition;
+import net.tourbook.common.ui.SubMenu;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourMarker;
-import net.tourbook.map2.Messages;
 import net.tourbook.map2.view.Map2View;
 import net.tourbook.tour.DialogMarker;
 import net.tourbook.tour.TourManager;
+import net.tourbook.tourMarker.RecentMarker;
+import net.tourbook.tourMarker.TourMarkerManager;
 import net.tourbook.ui.tourChart.ChartLabelMarker;
 import net.tourbook.ui.views.tourDataEditor.TourDataEditorView;
 
 import org.eclipse.jface.action.Action;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Menu;
 
-public class ActionCreateTourMarkerFromMap extends Action {
+/**
+ * Create a {@link TourMarker} from a recently used tour marker
+ */
+public class ActionCreateTourMarkerFromRecentMarkerInMap_SubMenu extends SubMenu {
 
-   private Map2View _mapView;
-   private Long     _currentHoveredTourId;
+   private Map2View                 _mapView;
+   private Long                     _currentHoveredTourId;
 
-   public ActionCreateTourMarkerFromMap(final Map2View mapView) {
+   private List<ActionRecentMarker> _allRecentMarkerActions = new ArrayList<>();
 
-      super(Messages.Map_Action_CreateTourMarkerFromMap, AS_PUSH_BUTTON);
+   private class ActionRecentMarker extends Action {
+
+      private RecentMarker __recentMarker;
+
+      public ActionRecentMarker() {
+
+         super(UI.EMPTY_STRING, AS_PUSH_BUTTON);
+      }
+
+      @Override
+      public void run() {
+
+         actionCreateMarker(__recentMarker);
+      }
+   }
+
+   public ActionCreateTourMarkerFromRecentMarkerInMap_SubMenu(final Map2View mapView) {
+
+      super("Create Tour Marker from &Recent Marker", AS_DROP_DOWN_MENU);
+
+      setImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.TourMarker_New));
 
       _mapView = mapView;
 
-      setImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.TourMarker_New));
+      for (int actionIndex = 0; actionIndex < TourMarkerManager.MAX_NUMBER_OF_RECENT_MARKERS; actionIndex++) {
+
+         _allRecentMarkerActions.add(new ActionRecentMarker());
+      }
    }
 
-   @Override
-   public void run() {
+   private void actionCreateMarker(final RecentMarker recentMarker) {
 
       final TourData tourData = TourManager.getTour(_currentHoveredTourId);
       if (tourData == null
@@ -98,7 +131,7 @@ public class ActionCreateTourMarkerFromMap extends Action {
 
       tourMarker.setSerieIndex(closestLatLonIndex);
       tourMarker.setTime(relativeTourTime, tourData.getTourStartTimeMS() + (relativeTourTime * 1000));
-      tourMarker.setLabel(Messages.Default_Label_NewTourMarker);
+      tourMarker.setLabel(recentMarker.label);
 
       if (altitudeSerie != null) {
          tourMarker.setAltitude(altitudeSerie[closestLatLonIndex]);
@@ -123,6 +156,36 @@ public class ActionCreateTourMarkerFromMap extends Action {
 
       //We save the tour again to take into account the action of the user (renamed the marker, cancelled the dialog...)
       saveModifiedTour(tourData);
+
+      // set last used marker to the top of the list
+      TourMarkerManager.addRecentMarker(tourMarker.getLabel());
+   }
+
+   @Override
+   public void enableActions() {}
+
+   @Override
+   public void fillMenu(final Menu menu) {
+
+      final LinkedList<RecentMarker> allRecentMarkers = TourMarkerManager.getRecentMarkers();
+      final int numRecentMarkers = allRecentMarkers.size();
+
+      for (int markerIndex = 0; markerIndex < numRecentMarkers; markerIndex++) {
+
+         final RecentMarker recentMarker = allRecentMarkers.get(markerIndex);
+
+         if (recentMarker == null) {
+            break;
+         }
+
+         // update recycled marker action
+         final ActionRecentMarker actionRecentMarker = _allRecentMarkerActions.get(markerIndex);
+
+         actionRecentMarker.setText(recentMarker.label);
+         actionRecentMarker.__recentMarker = recentMarker;
+
+         addActionToMenu(actionRecentMarker);
+      }
    }
 
    /**
@@ -149,5 +212,4 @@ public class ActionCreateTourMarkerFromMap extends Action {
    public void setCurrentHoveredTourId(final Long hoveredTourId) {
       _currentHoveredTourId = hoveredTourId;
    }
-
 }
