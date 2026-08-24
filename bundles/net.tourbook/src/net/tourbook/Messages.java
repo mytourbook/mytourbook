@@ -1369,7 +1369,7 @@ public class Messages extends NLS {
    public static String        Import_Data_Dialog_GetReimportedFilePath_Message;
    public static String        Import_Data_Dialog_IsCancelTourValuesDeletion_Message;
    public static String        Import_Data_Dialog_IsCancelTourValuesDeletion_Title;
-   public static String        Import_Data_Dialog_NoActivePersion_Message;
+   public static String        Import_Data_Dialog_NoActivePerson_Message;
    public static String        Import_Data_Dialog_Radio_CancelReimport;
    public static String        Import_Data_Dialog_Radio_SelectFile;
    public static String        Import_Data_Dialog_Radio_SkipAllInvalidFiles;
