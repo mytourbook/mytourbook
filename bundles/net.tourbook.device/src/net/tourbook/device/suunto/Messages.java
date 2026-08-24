@@ -21,6 +21,7 @@ class Messages extends NLS {
 
    private static final String BUNDLE_NAME = "net.tourbook.device.suunto.messages"; //$NON-NLS-1$
 
+   //TODO FB
    public static String        pref_data_source;
    public static String        pref_altitude_source;
    public static String        pref_altitude_gps;
