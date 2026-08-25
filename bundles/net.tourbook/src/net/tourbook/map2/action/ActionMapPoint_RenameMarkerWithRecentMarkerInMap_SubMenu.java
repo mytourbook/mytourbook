@@ -15,6 +15,8 @@
  *******************************************************************************/
 package net.tourbook.map2.action;
 
+import de.byteholder.geoclipse.map.PaintedMapPoint;
+
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
@@ -39,6 +41,26 @@ public class ActionMapPoint_RenameMarkerWithRecentMarkerInMap_SubMenu extends Su
 
    private List<ActionRecentMarker> _allRecentMarkerActions = new ArrayList<>();
 
+   private Action                   _actionPickRecentMarker;
+
+   private class ActionPickRecentMarker extends Action {
+
+      public ActionPickRecentMarker() {
+
+         super("&Pick Recent Marker", AS_PUSH_BUTTON);
+      }
+
+      @Override
+      public void run() {
+
+         final PaintedMapPoint hoveredMapPoint = _map2View.getHoveredMapPoint();
+         final TourMarker tourMarker = hoveredMapPoint.mapPoint.tourMarker;
+
+         // set last used marker to the top of the recent markers
+         TourMarkerManager.addRecentMarker(tourMarker.getLabel());
+      }
+   }
+
    private class ActionRecentMarker extends Action {
 
       private RecentMarker __recentMarker;
@@ -58,14 +80,14 @@ public class ActionMapPoint_RenameMarkerWithRecentMarkerInMap_SubMenu extends Su
 
          final TourMarker tourMarker = _map2View.updateTourMarker(__recentMarker);
 
-         // set last used marker to the top of the list
+         // set last used marker to the top of the recent markers
          TourMarkerManager.addRecentMarker(tourMarker.getLabel());
       }
    }
 
    public ActionMapPoint_RenameMarkerWithRecentMarkerInMap_SubMenu(final Map2View map2View) {
 
-      super("Replace Marker Label &with", AS_DROP_DOWN_MENU);
+      super("&Replace Marker Label with", AS_DROP_DOWN_MENU);
 
       _map2View = map2View;
 
@@ -73,6 +95,8 @@ public class ActionMapPoint_RenameMarkerWithRecentMarkerInMap_SubMenu extends Su
       for (int actionIndex = 0; actionIndex < TourMarkerManager.MAX_NUMBER_OF_RECENT_MARKERS; actionIndex++) {
          _allRecentMarkerActions.add(new ActionRecentMarker());
       }
+
+      _actionPickRecentMarker = new ActionPickRecentMarker();
    }
 
    @Override
@@ -100,5 +124,8 @@ public class ActionMapPoint_RenameMarkerWithRecentMarkerInMap_SubMenu extends Su
 
          addActionToMenu(actionRecentMarker);
       }
+
+      addSeparatorToMenu();
+      addActionToMenu(_actionPickRecentMarker);
    }
 }

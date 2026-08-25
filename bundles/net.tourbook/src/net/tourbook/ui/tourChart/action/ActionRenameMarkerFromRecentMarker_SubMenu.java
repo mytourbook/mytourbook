@@ -37,7 +37,23 @@ public class ActionRenameMarkerFromRecentMarker_SubMenu extends SubMenu {
    private TourMarker               _tourMarker;
    private ITourMarkerUpdater       _tourMarkerUpdater;
 
+   private ActionPickRecentMarker   _actionPickRecentMarker;
    private List<ActionRecentMarker> _allRecentMarkerActions = new ArrayList<>();
+
+   private class ActionPickRecentMarker extends Action {
+
+      public ActionPickRecentMarker() {
+
+         super("&Pick Recent Marker", AS_PUSH_BUTTON);
+      }
+
+      @Override
+      public void run() {
+
+         // set last used marker to the top of the recent markers
+         TourMarkerManager.addRecentMarker(_tourMarker.getLabel());
+      }
+   }
 
    private class ActionRecentMarker extends Action {
 
@@ -62,7 +78,7 @@ public class ActionRenameMarkerFromRecentMarker_SubMenu extends SubMenu {
 
    public ActionRenameMarkerFromRecentMarker_SubMenu(final ITourMarkerUpdater tourMarkerUpdater) {
 
-      super("Replace Marker Label &with", AS_DROP_DOWN_MENU);
+      super("&Replace Marker Label with", AS_DROP_DOWN_MENU);
 
       _tourMarkerUpdater = tourMarkerUpdater;
 
@@ -70,6 +86,8 @@ public class ActionRenameMarkerFromRecentMarker_SubMenu extends SubMenu {
       for (int actionIndex = 0; actionIndex < TourMarkerManager.MAX_NUMBER_OF_RECENT_MARKERS; actionIndex++) {
          _allRecentMarkerActions.add(new ActionRecentMarker());
       }
+
+      _actionPickRecentMarker = new ActionPickRecentMarker();
    }
 
    @Override
@@ -97,6 +115,9 @@ public class ActionRenameMarkerFromRecentMarker_SubMenu extends SubMenu {
 
          addActionToMenu(actionRecentMarker);
       }
+
+      addSeparatorToMenu();
+      addActionToMenu(_actionPickRecentMarker);
    }
 
    /**

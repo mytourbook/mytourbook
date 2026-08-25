@@ -3749,6 +3749,10 @@ public class Map2View extends ViewPart implements
       return _filteredPhotos;
    }
 
+   public PaintedMapPoint getHoveredMapPoint() {
+      return _contextMenu_HoveredMapPoint;
+   }
+
    public Long getHoveredTourId() {
 
       return _map.getHoveredTourId();
