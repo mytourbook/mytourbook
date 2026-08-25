@@ -21,6 +21,7 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
+import net.tourbook.Messages;
 import net.tourbook.common.UI;
 import net.tourbook.common.ui.SubMenu;
 import net.tourbook.data.TourMarker;
@@ -47,7 +48,7 @@ public class ActionMapPoint_RenameMarkerWithRecentMarkerInMap_SubMenu extends Su
 
       public ActionPickRecentMarker() {
 
-         super("&Pick Recent Marker", AS_PUSH_BUTTON);
+         super(Messages.Action_TourMarker_PickRecentMarker, AS_PUSH_BUTTON);
       }
 
       @Override
@@ -87,7 +88,7 @@ public class ActionMapPoint_RenameMarkerWithRecentMarkerInMap_SubMenu extends Su
 
    public ActionMapPoint_RenameMarkerWithRecentMarkerInMap_SubMenu(final Map2View map2View) {
 
-      super("&Replace Marker Label with", AS_DROP_DOWN_MENU);
+      super(Messages.Action_TourMarker_ReplaceWithRecentMarker, AS_DROP_DOWN_MENU);
 
       _map2View = map2View;
 

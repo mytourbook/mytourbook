@@ -24,6 +24,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import net.tourbook.Images;
+import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.UI;
 import net.tourbook.common.map.GeoPosition;
@@ -70,7 +71,7 @@ public class ActionCreateTourMarkerFromRecentMarkerInMap_SubMenu extends SubMenu
 
    public ActionCreateTourMarkerFromRecentMarkerInMap_SubMenu(final Map2View mapView) {
 
-      super("Create Tour Marker from &Recent Marker", AS_DROP_DOWN_MENU);
+      super(Messages.Action_TourMarker_CreateFromRecentMarker, AS_DROP_DOWN_MENU);
 
       setImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.TourMarker_New));
 

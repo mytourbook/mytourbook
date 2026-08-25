@@ -71,7 +71,7 @@ public class ActionCreateMarkerFromRecentMarker_SubMenu extends SubMenu {
 
    public ActionCreateMarkerFromRecentMarker_SubMenu(final TourChartContextProvider tourChartContextProvider) {
 
-      super("Create Tour Marker from &Recent Marker", AS_DROP_DOWN_MENU);
+      super(Messages.Action_TourMarker_CreateFromRecentMarker, AS_DROP_DOWN_MENU);
 
       setImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.TourMarker_New));
 
