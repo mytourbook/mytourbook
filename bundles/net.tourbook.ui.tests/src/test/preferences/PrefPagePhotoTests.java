@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2022 Frédéric Bard
+ * Copyright (C) 2022, 2026 Frédéric Bard
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -30,13 +30,11 @@ public class PrefPagePhotoTests extends UITest {
       final SWTBotTreeItem photoTreeItem = bot.tree().getTreeItem("Photo").select().expand(); //$NON-NLS-1$
 
       photoTreeItem.getNode("External Apps").select(); //$NON-NLS-1$
+      photoTreeItem.getNode("Image Cache").select(); //$NON-NLS-1$
+      photoTreeItem.getNode("Path Conversion").select(); //$NON-NLS-1$
       photoTreeItem.getNode("Photo Directory").select(); //$NON-NLS-1$
       photoTreeItem.getNode("Photo Fullsize Viewer").select(); //$NON-NLS-1$
-      final SWTBotTreeItem systemTreeItem = photoTreeItem.getNode("System").select(); //$NON-NLS-1$
-      systemTreeItem.expand();
-
-      systemTreeItem.getNode("Image Cache").select(); //$NON-NLS-1$
-      systemTreeItem.getNode("Thumbnail Store").select(); //$NON-NLS-1$
+      photoTreeItem.getNode("Thumbnail Store").select(); //$NON-NLS-1$
 
       Utils.clickApplyAndCloseButton(bot);
    }

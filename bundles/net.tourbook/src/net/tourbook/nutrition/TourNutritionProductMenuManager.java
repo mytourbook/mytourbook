@@ -344,38 +344,33 @@ public class TourNutritionProductMenuManager {
       final String tourNutritionProductId = getTourNutritionProductId(tourNutritionProduct);
 
       // If the tour nutrition product Id is not in the list
-      if (_recentTourNutritionProducts.containsKey(tourNutritionProductId) == false) {
+      if (_recentTourNutritionProducts.containsKey(tourNutritionProductId)) {
+
+         // iterate over the recent tour nutrition products and check if the tour nutrition
+         // product is already in the list
+         for (final Map.Entry<String, TourNutritionProduct> recentTourNutritionProduct : _recentTourNutritionProducts.entrySet()) {
+
+            final String recentTourNutritionProductCode =
+                  getProductCodeFromTourNutritionProductId(
+                        recentTourNutritionProduct.getKey());
+
+            // If the tour nutrition product Id is already in the list and it doesn't have
+            // a TourNutritionProduct object, or that object is tied to a beverage container,
+            // we insert the TourNutritionProduct object into the list
+            if (!StringUtils.isNullOrEmpty(recentTourNutritionProductCode) &&
+                  recentTourNutritionProductCode.equals(tourNutritionProduct.getProductCode()) &&
+                  recentTourNutritionProduct.getValue() == null) {
+
+               // update the tour nutrition product in the list
+               recentTourNutritionProduct.setValue(tourNutritionProduct);
+
+               break;
+            }
+         }
 
          _recentTourNutritionProducts.remove(tourNutritionProductId);
-         _recentTourNutritionProducts.putFirst(
-               tourNutritionProductId,
-               tourNutritionProduct);
-
-         return;
       }
 
-      // iterate over the recent tour nutrition products and check if the tour nutrition
-      // product is already in the list
-      for (final Map.Entry<String, TourNutritionProduct> recentTourNutritionProduct : _recentTourNutritionProducts.entrySet()) {
-
-         final String recentTourNutritionProductCode =
-               getProductCodeFromTourNutritionProductId(recentTourNutritionProduct.getKey());
-
-         // If the tour nutrition product Id is already in the list and it doesn't have
-         // a TourNutritionProduct object, or that object is tied to a beverage container,
-         // we insert the TourNutritionProduct object into the list
-         if (!StringUtils.isNullOrEmpty(recentTourNutritionProductCode) &&
-               recentTourNutritionProductCode.equals(tourNutritionProduct.getProductCode()) &&
-               recentTourNutritionProduct.getValue() == null) {
-
-            // update the tour nutrition product in the list
-            recentTourNutritionProduct.setValue(tourNutritionProduct);
-
-            return;
-         }
-      }
-
-      _recentTourNutritionProducts.remove(tourNutritionProductId);
       _recentTourNutritionProducts.putFirst(
             tourNutritionProductId,
             tourNutritionProduct);

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2021, 2022 Frédéric Bard
+ * Copyright (C) 2021, 2026 Frédéric Bard
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -22,7 +22,6 @@ import java.util.HashMap;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.data.TourData;
 import net.tourbook.device.garmin.GarminTCX_DeviceDataReader;
-import net.tourbook.device.suunto.Suunto9_DeviceDataReader;
 import net.tourbook.importdata.ImportState_File;
 import net.tourbook.importdata.ImportState_Process;
 import net.tourbook.preferences.ITourbookPreferences;
@@ -38,22 +37,18 @@ import utils.FilesUtils;
 
 public class CadenceTests {
 
-   private static final String               GARMIN_IMPORT_PATH      = GarminTCX_DeviceDataReaderTests.FILES_PATH;
-   private static final String               SUUNTO_IMPORT_FILE_PATH = FilesUtils.rootPath + "device/suunto/files/"; //$NON-NLS-1$
-   private static final String               JSON_GZ                 = ".json.gz";                                   //$NON-NLS-1$
+   private static final String               GARMIN_IMPORT_PATH = GarminTCX_DeviceDataReaderTests.FILES_PATH;
 
    private static HashMap<Long, TourData>    newlyImportedTours;
    private static GarminTCX_DeviceDataReader garminDeviceDataReader;
-   private static Suunto9_DeviceDataReader   suunto9DeviceDataReader;
 
-   private static final IPreferenceStore     _prefStore              = TourbookPlugin.getPrefStore();
+   private static final IPreferenceStore     _prefStore         = TourbookPlugin.getPrefStore();
 
    @BeforeAll
    static void initAll() {
 
       newlyImportedTours = new HashMap<>();
       garminDeviceDataReader = new GarminTCX_DeviceDataReader();
-      suunto9DeviceDataReader = new Suunto9_DeviceDataReader();
    }
 
    @AfterEach
@@ -63,67 +58,6 @@ public class CadenceTests {
 
       // Restoring the default values
       _prefStore.setValue(ITourbookPreferences.APPEARANCE_IS_PACEANDSPEED_FROM_RECORDED_TIME, false);
-   }
-
-   /**
-    * Suunto JSON.GZ with pauses using the moving time.
-    */
-   @Test
-   void testCadenceZonesSuunto9TimeWithMovingTime() {
-
-      final String filePath = SUUNTO_IMPORT_FILE_PATH + "1590349595199_183010004848_post_timeline-1"; //$NON-NLS-1$
-      final String testFilePath = FilesUtils.getAbsoluteFilePath(filePath + JSON_GZ);
-
-      suunto9DeviceDataReader.processDeviceData(testFilePath,
-            null,
-            new HashMap<>(),
-            newlyImportedTours,
-            new ImportState_File(),
-            new ImportState_Process());
-
-      final TourData tour = Comparison.retrieveImportedTour(newlyImportedTours);
-
-      tour.computeCadenceZonesTimes();
-
-      assertEquals(70, tour.getCadenceZones_DelimiterValue());
-      assertEquals(852, tour.getCadenceZone_FastTime());
-      assertEquals(9795, tour.getCadenceZone_SlowTime());
-      assertEquals((long) (tour.getCadenceZone_SlowTime()) + tour.getCadenceZone_FastTime(),
-            tour.getTourComputedTime_Moving());
-   }
-
-   /**
-    * Suunto JSON.GZ with pauses using the recorded time. It's a special case
-    * because the total time for both cadence zones could be at most 1 second
-    * different than the total tour recorded time as the milliseconds omitted
-    * when calling {@link TourData#getPausedTime()} can create this
-    * discrepancy. It does not exist for the FIT files for example since the
-    * pause times don't contain milliseconds
-    */
-   @Test
-   void testCadenceZonesSuunto9TimeWithRecordedTime() {
-
-      _prefStore.setValue(ITourbookPreferences.APPEARANCE_IS_PACEANDSPEED_FROM_RECORDED_TIME, true);
-
-      final String filePath = SUUNTO_IMPORT_FILE_PATH + "1590349595199_183010004848_post_timeline-1"; //$NON-NLS-1$
-      final String testFilePath = FilesUtils.getAbsoluteFilePath(filePath + JSON_GZ);
-
-      suunto9DeviceDataReader.processDeviceData(testFilePath,
-            null,
-            new HashMap<>(),
-            newlyImportedTours,
-            new ImportState_File(),
-            new ImportState_Process());
-
-      final TourData tour = Comparison.retrieveImportedTour(newlyImportedTours);
-
-      tour.computeCadenceZonesTimes();
-
-      assertEquals(70, tour.getCadenceZones_DelimiterValue());
-      assertEquals(2125, tour.getCadenceZone_FastTime());
-      assertEquals(14663, tour.getCadenceZone_SlowTime());
-      assertEquals((long) (tour.getCadenceZone_SlowTime()) + tour.getCadenceZone_FastTime(),
-            tour.getTourDeviceTime_Recorded() - 1);
    }
 
    /**

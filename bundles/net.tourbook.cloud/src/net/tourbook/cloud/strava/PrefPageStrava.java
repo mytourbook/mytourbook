@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2020, 2024 Frédéric Bard
+ * Copyright (C) 2020, 2026 Frédéric Bard
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -165,6 +165,8 @@ public class PrefPageStrava extends FieldEditorPreferencePage implements IWorkbe
 
          final Button buttonConnect = new Button(container, SWT.NONE);
          buttonConnect.setImage(_imageStravaConnect);
+         // See issue: https://github.com/mytourbook/mytourbook/discussions/1698
+         buttonConnect.setEnabled(false);
          buttonConnect.addSelectionListener(widgetSelectedAdapter(selectionEvent -> onClickAuthorize()));
          GridDataFactory.fillDefaults().align(SWT.CENTER, SWT.FILL).grab(true, true).applyTo(buttonConnect);
       }

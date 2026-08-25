@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2022, 2025 Frédéric Bard
+ * Copyright (C) 2022, 2026 Frédéric Bard
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -39,12 +39,14 @@ import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 
 import utils.UITest;
 import utils.Utils;
 
+@Disabled("Disabled because of the external connection to Strava")
 public class StravaUploaderTests extends UITest {
 
    private static final String           OAUTH_PASSEUR_APP_URL_TOKEN = OAuth2Utils.createOAuthPasseurUri("/strava/token").toString();   //$NON-NLS-1$
