@@ -545,7 +545,7 @@ public class Map2View extends ViewPart implements
    private ActionMap2_Graphs                                        _actionMap2Slideout_TourColors;
    private ActionMapPoint_CenterMap                                 _actionMapPoint_CenterMap;
    private ActionMapPoint_EditTourMarker                            _actionMapPoint_TourMarker_Edit;
-   private ActionMapPoint_RenameMarkerWithRecentMarkerInMap_SubMenu _actionMapPoint_SetTourMarker_FromRecentMarker;
+   private ActionMapPoint_RenameMarkerWithRecentMarkerInMap_SubMenu _actionMapPoint_RenameTourMarker_FromRecentMarker;
    private ActionMapPoint_Photo_AutoSelect                          _actionMapPoint_Photo_AutoSelect;
    private ActionMapPoint_Photo_Deselect                            _actionMapPoint_Photo_Deselect;
    private ActionMapPoint_Photo_EditLabel                           _actionMapPoint_Photo_EditLabel;
@@ -2723,80 +2723,80 @@ public class Map2View extends ViewPart implements
       _allTourColor_Actions.put(MapGraphId.RunDyn_StepLength,  _actionTourColor_RunDyn_StepLength);
 
       // actions with slideouts
-      _actionMap2Slideout_Bookmarks                   = new ActionMapBookmarks(this._parent, this);
-      _actionMap2Slideout_Color                       = new ActionMap2Color();
-      _actionMap2Slideout_MapPoints                   = new ActionMap2_MapPoints();
-      _actionMap2Slideout_MapProvider                 = new ActionMap2_MapProvider(this, _state_MapProvider);
-      _actionMap2Slideout_PhotoFilter                 = new ActionMap2_PhotoFilter(this, _state_PhotoFilter);
-      _actionMap2Slideout_Options                     = new ActionMap2_Options();
-      _actionMap2Slideout_SyncMap                     = new ActionSyncMap();
-      _actionMap2Slideout_TourColors                  = new ActionMap2_Graphs();
+      _actionMap2Slideout_Bookmarks                      = new ActionMapBookmarks(this._parent, this);
+      _actionMap2Slideout_Color                          = new ActionMap2Color();
+      _actionMap2Slideout_MapPoints                      = new ActionMap2_MapPoints();
+      _actionMap2Slideout_MapProvider                    = new ActionMap2_MapProvider(this, _state_MapProvider);
+      _actionMap2Slideout_PhotoFilter                    = new ActionMap2_PhotoFilter(this, _state_PhotoFilter);
+      _actionMap2Slideout_Options                        = new ActionMap2_Options();
+      _actionMap2Slideout_SyncMap                        = new ActionSyncMap();
+      _actionMap2Slideout_TourColors                     = new ActionMap2_Graphs();
 
-      _actionZoom_CenterMapBy                         = new ActionZoomCenterBy(this);
-      _actionZoom_In                                  = new ActionZoomIn(this);
-      _actionZoom_Out                                 = new ActionZoomOut(this);
-      _actionZoom_ShowEntireMap                       = new ActionZoomShowEntireMap(this);
-      _actionZoom_ShowEntireTour                      = new ActionZoomShowEntireTour(this);
+      _actionZoom_CenterMapBy                            = new ActionZoomCenterBy(this);
+      _actionZoom_In                                     = new ActionZoomIn(this);
+      _actionZoom_Out                                    = new ActionZoomOut(this);
+      _actionZoom_ShowEntireMap                          = new ActionZoomShowEntireMap(this);
+      _actionZoom_ShowEntireTour                         = new ActionZoomShowEntireTour(this);
 
-      _actionRunExternalAppTitle                      = new ActionRunExternalAppTitle();
-      _actionRunExternalAppPrefPage                   = new ActionRunExternalAppPrefPage();
-      _actionRunExternalApp1                          = new ActionRunExternalApp();
-      _actionRunExternalApp2                          = new ActionRunExternalApp();
-      _actionRunExternalApp3                          = new ActionRunExternalApp();
+      _actionRunExternalAppTitle                         = new ActionRunExternalAppTitle();
+      _actionRunExternalAppPrefPage                      = new ActionRunExternalAppPrefPage();
+      _actionRunExternalApp1                             = new ActionRunExternalApp();
+      _actionRunExternalApp2                             = new ActionRunExternalApp();
+      _actionRunExternalApp3                             = new ActionRunExternalApp();
 
-      _actionCopyLocation                             = new ActionCopyLocation();
-      _actionCreateTourMarkerFromMap                  = new ActionCreateTourMarkerFromMap(this);
-      _actionCreateTourMarkerFromMapAndRecentMarker   = new ActionCreateTourMarkerFromRecentMarkerInMap_SubMenu(this);
-      _actionGotoLocation                             = new ActionGotoLocation();
-      _actionLookupTourLocation                       = new ActionLookupCommonLocation(this);
-      _actionManageMapProvider                        = new ActionManageMapProviders(this);
-      _actionMapPoint_CenterMap                       = new ActionMapPoint_CenterMap();
-      _actionMapPoint_TourMarker_Edit                 = new ActionMapPoint_EditTourMarker();
-      _actionMapPoint_SetTourMarker_FromRecentMarker  = new ActionMapPoint_RenameMarkerWithRecentMarkerInMap_SubMenu(this);
-      _actionMapPoint_Photo_AutoSelect                = new ActionMapPoint_Photo_AutoSelect();
-      _actionMapPoint_Photo_Deselect                  = new ActionMapPoint_Photo_Deselect();
-      _actionMapPoint_Photo_EditLabel                 = new ActionMapPoint_Photo_EditLabel();
-      _actionMapPoint_Photo_RemoveFromTour            = new ActionMapPoint_Photo_RemoveFromTour();
-      _actionMapPoint_Photo_ReplaceGeoPosition        = new ActionMapPoint_Photo_ReplaceGeoPosition();
-      _actionMapPoint_Photo_ShowAnnotations           = new ActionMapPoint_Photo_ShowAnnotations();
-      _actionMapPoint_Photo_ShowHistogram             = new ActionMapPoint_Photo_ShowHistogram();
-      _actionMapPoint_Photo_ShowLabel                 = new ActionMapPoint_Photo_ShowLabel();
-      _actionMapPoint_Photo_ShowRating                = new ActionMapPoint_Photo_ShowRating();
-      _actionMapPoint_Photo_ShowTooltip               = new ActionMapPoint_Photo_ShowTooltip();
-      _actionMapPoint_Photo_Tonality_Copy             = new ActionMapPoint_Photo_Tonality_Copy();
-      _actionMapPoint_Photo_Tonality_Paste            = new ActionMapPoint_Photo_Tonality_Paste();
-      _actionMapPoint_ShowOnlyThisTour                = new ActionMapPoint_ShowOnlyThisTour();
-      _actionMapPoint_ZoomIn                          = new ActionMapPoint_ZoomIn();
-      _actionReloadFailedMapImages                    = new ActionReloadFailedMapImages(this);
-      _actionSaveDefaultPosition                      = new ActionSaveDefaultPosition(this);
-      _actionExportMap_SubMenu                        = new Action_ExportMap_SubMenu(this);
-      _actionSearchTourByLocation                     = new ActionSearchTourByLocation();
-      _actionSetDefaultPosition                       = new ActionSetDefaultPosition(this);
-      _actionShowAllFilteredPhotos                    = new ActionShowAllFilteredPhotos(this);
-      _actionShowLegendInMap                          = new ActionShowLegendInMap(this);
-      _actionMap2Slideout_PhotoOptions                = new ActionMap2_PhotoOptions();
-      _actionSetGeoPositionForGeoMarker               = new ActionSetGeoPositionForGeoMarker();
-      _actionSetGeoPositionForPhotoTours              = new ActionSetGeoPositionForPhotoTours(this);
-      _actionShowScaleInMap                           = new ActionShowScaleInMap(this);
-      _actionShowSliderInMap                          = new ActionShowSliderInMap(this);
-      _actionShowSliderInLegend                       = new ActionShowSliderInLegend(this);
-      _actionShowStartEndInMap                        = new ActionShowStartEndInMap(this);
-      _actionShowValuePoint                           = new ActionShowValuePoint(this);
-      _actionShowPOI                                  = new ActionShowPOI(this);
-      _actionShowTour                                 = new ActionShowTour();
-      _actionShowTourInfoInMap                        = new ActionShowTourInfoInMap(this);
-      _actionShowTourWeatherInMap                     = new ActionShowTourWeatherInMap(this);
-      _actionSubMenu_SetTourMarkerType                = new SubMenu_SetTourMarkerType();
-      _actionZoomLevelAdjustment                      = new ActionZoomLevelAdjustment();
+      _actionCopyLocation                                = new ActionCopyLocation();
+      _actionCreateTourMarkerFromMap                     = new ActionCreateTourMarkerFromMap(this);
+      _actionCreateTourMarkerFromMapAndRecentMarker      = new ActionCreateTourMarkerFromRecentMarkerInMap_SubMenu(this);
+      _actionGotoLocation                                = new ActionGotoLocation();
+      _actionLookupTourLocation                          = new ActionLookupCommonLocation(this);
+      _actionManageMapProvider                           = new ActionManageMapProviders(this);
+      _actionMapPoint_CenterMap                          = new ActionMapPoint_CenterMap();
+      _actionMapPoint_TourMarker_Edit                    = new ActionMapPoint_EditTourMarker();
+      _actionMapPoint_RenameTourMarker_FromRecentMarker  = new ActionMapPoint_RenameMarkerWithRecentMarkerInMap_SubMenu(this);
+      _actionMapPoint_Photo_AutoSelect                   = new ActionMapPoint_Photo_AutoSelect();
+      _actionMapPoint_Photo_Deselect                     = new ActionMapPoint_Photo_Deselect();
+      _actionMapPoint_Photo_EditLabel                    = new ActionMapPoint_Photo_EditLabel();
+      _actionMapPoint_Photo_RemoveFromTour               = new ActionMapPoint_Photo_RemoveFromTour();
+      _actionMapPoint_Photo_ReplaceGeoPosition           = new ActionMapPoint_Photo_ReplaceGeoPosition();
+      _actionMapPoint_Photo_ShowAnnotations              = new ActionMapPoint_Photo_ShowAnnotations();
+      _actionMapPoint_Photo_ShowHistogram                = new ActionMapPoint_Photo_ShowHistogram();
+      _actionMapPoint_Photo_ShowLabel                    = new ActionMapPoint_Photo_ShowLabel();
+      _actionMapPoint_Photo_ShowRating                   = new ActionMapPoint_Photo_ShowRating();
+      _actionMapPoint_Photo_ShowTooltip                  = new ActionMapPoint_Photo_ShowTooltip();
+      _actionMapPoint_Photo_Tonality_Copy                = new ActionMapPoint_Photo_Tonality_Copy();
+      _actionMapPoint_Photo_Tonality_Paste               = new ActionMapPoint_Photo_Tonality_Paste();
+      _actionMapPoint_ShowOnlyThisTour                   = new ActionMapPoint_ShowOnlyThisTour();
+      _actionMapPoint_ZoomIn                             = new ActionMapPoint_ZoomIn();
+      _actionReloadFailedMapImages                       = new ActionReloadFailedMapImages(this);
+      _actionSaveDefaultPosition                         = new ActionSaveDefaultPosition(this);
+      _actionExportMap_SubMenu                           = new Action_ExportMap_SubMenu(this);
+      _actionSearchTourByLocation                        = new ActionSearchTourByLocation();
+      _actionSetDefaultPosition                          = new ActionSetDefaultPosition(this);
+      _actionShowAllFilteredPhotos                       = new ActionShowAllFilteredPhotos(this);
+      _actionShowLegendInMap                             = new ActionShowLegendInMap(this);
+      _actionMap2Slideout_PhotoOptions                   = new ActionMap2_PhotoOptions();
+      _actionSetGeoPositionForGeoMarker                  = new ActionSetGeoPositionForGeoMarker();
+      _actionSetGeoPositionForPhotoTours                 = new ActionSetGeoPositionForPhotoTours(this);
+      _actionShowScaleInMap                              = new ActionShowScaleInMap(this);
+      _actionShowSliderInMap                             = new ActionShowSliderInMap(this);
+      _actionShowSliderInLegend                          = new ActionShowSliderInLegend(this);
+      _actionShowStartEndInMap                           = new ActionShowStartEndInMap(this);
+      _actionShowValuePoint                              = new ActionShowValuePoint(this);
+      _actionShowPOI                                     = new ActionShowPOI(this);
+      _actionShowTour                                    = new ActionShowTour();
+      _actionShowTourInfoInMap                           = new ActionShowTourInfoInMap(this);
+      _actionShowTourWeatherInMap                        = new ActionShowTourWeatherInMap(this);
+      _actionSubMenu_SetTourMarkerType                   = new SubMenu_SetTourMarkerType();
+      _actionZoomLevelAdjustment                         = new ActionZoomLevelAdjustment();
 
       // map sync actions
-      _actionSyncMapWith_OtherMap                     = new ActionSyncMapWith_OtherMap(this);
-      _actionSyncMapWith_Photo                        = new ActionSyncMapWith_Photo(this);
-      _actionSyncMapWith_Slider_Centered              = new ActionSyncMapWith_Slider_Centered(this);
-      _actionSyncMapWith_Slider_One                   = new ActionSyncMapWith_Slider_One(this);
-      _actionSyncMapWith_Tour                         = new ActionSyncMapWith_Tour(this);
-      _actionSyncMapWith_TourLocation                 = new ActionSyncMapWith_TourLocation();
-      _actionSyncMapWith_ValuePoint                   = new ActionSyncMapWith_ValuePoint(this);
+      _actionSyncMapWith_OtherMap                        = new ActionSyncMapWith_OtherMap(this);
+      _actionSyncMapWith_Photo                           = new ActionSyncMapWith_Photo(this);
+      _actionSyncMapWith_Slider_Centered                 = new ActionSyncMapWith_Slider_Centered(this);
+      _actionSyncMapWith_Slider_One                      = new ActionSyncMapWith_Slider_One(this);
+      _actionSyncMapWith_Tour                            = new ActionSyncMapWith_Tour(this);
+      _actionSyncMapWith_TourLocation                    = new ActionSyncMapWith_TourLocation();
+      _actionSyncMapWith_ValuePoint                      = new ActionSyncMapWith_ValuePoint(this);
 
       _allSyncMapActions.put(MapSyncId.SyncMapWith_OtherMap,            _actionSyncMapWith_OtherMap);
       _allSyncMapActions.put(MapSyncId.SyncMapWith_Photo,               _actionSyncMapWith_Photo);
@@ -3279,16 +3279,16 @@ public class Map2View extends ViewPart implements
       final boolean  isTourMarker      = pointType.equals(MapPointType.TOUR_MARKER);
       final boolean  isTourAvailable   = isTourMarker || pointType.equals(MapPointType.TOUR_PAUSE);
 
-      _actionMapPoint_SetTourMarker_FromRecentMarker  .setEnabled(isTourMarker);
-      _actionMapPoint_TourMarker_Edit                 .setEnabled(isTourMarker);
-      _actionMapPoint_ShowOnlyThisTour                .setEnabled(isMultipleTours && isTourAvailable);
-      _actionMapPoint_Photo_ReplaceGeoPosition        .setEnabled(isGeoPositionSet);
+      _actionMapPoint_RenameTourMarker_FromRecentMarker  .setEnabled(isTourMarker);
+      _actionMapPoint_TourMarker_Edit                    .setEnabled(isTourMarker);
+      _actionMapPoint_ShowOnlyThisTour                   .setEnabled(isMultipleTours && isTourAvailable);
+      _actionMapPoint_Photo_ReplaceGeoPosition           .setEnabled(isGeoPositionSet);
 
-      _actionMapPoint_Photo_Tonality_Copy             .setEnabled(isOneTour && isPhotoAdjustTonality);
-      _actionMapPoint_Photo_Tonality_Paste            .setEnabled(canPasteTonality);
+      _actionMapPoint_Photo_Tonality_Copy                .setEnabled(isOneTour && isPhotoAdjustTonality);
+      _actionMapPoint_Photo_Tonality_Paste               .setEnabled(canPasteTonality);
 
       // currently it is not supported to remove photos from a photo tour
-      _actionMapPoint_Photo_RemoveFromTour            .setEnabled(isPhotoTour == false);
+      _actionMapPoint_Photo_RemoveFromTour               .setEnabled(isPhotoTour == false);
 
 // SET_FORMATTING_ON
 
@@ -3427,7 +3427,7 @@ public class Map2View extends ViewPart implements
          menuMgr.add(new Separator());
 
          menuMgr.add(_actionMapPoint_ShowOnlyThisTour);
-         menuMgr.add(_actionMapPoint_SetTourMarker_FromRecentMarker);
+         menuMgr.add(_actionMapPoint_RenameTourMarker_FromRecentMarker);
          menuMgr.add(_actionMapPoint_TourMarker_Edit);
 
       } else {

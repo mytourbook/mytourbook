@@ -21,7 +21,9 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
+import net.tourbook.Images;
 import net.tourbook.Messages;
+import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.UI;
 import net.tourbook.common.ui.SubMenu;
 import net.tourbook.data.TourMarker;
@@ -49,6 +51,8 @@ public class ActionMapPoint_RenameMarkerWithRecentMarkerInMap_SubMenu extends Su
       public ActionPickRecentMarker() {
 
          super(Messages.Action_TourMarker_PickRecentMarker, AS_PUSH_BUTTON);
+
+         setImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.TourMarker_New));
       }
 
       @Override
@@ -108,6 +112,7 @@ public class ActionMapPoint_RenameMarkerWithRecentMarkerInMap_SubMenu extends Su
 
       final LinkedList<RecentMarker> allRecentMarkers = TourMarkerManager.getRecentMarkers();
       final int numRecentMarkers = allRecentMarkers.size();
+      int numAddedMarker = 0;
 
       for (int markerIndex = 0; markerIndex < numRecentMarkers; markerIndex++) {
 
@@ -124,9 +129,14 @@ public class ActionMapPoint_RenameMarkerWithRecentMarkerInMap_SubMenu extends Su
          actionRecentMarker.__recentMarker = recentMarker;
 
          addActionToMenu(actionRecentMarker);
+
+         numAddedMarker++;
       }
 
-      addSeparatorToMenu();
+      if (numAddedMarker > 0) {
+         addSeparatorToMenu();
+      }
+
       addActionToMenu(_actionPickRecentMarker);
    }
 }

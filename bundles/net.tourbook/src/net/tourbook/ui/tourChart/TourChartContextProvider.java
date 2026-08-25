@@ -34,7 +34,6 @@ import net.tourbook.tag.TagMenuManager;
 import net.tourbook.tour.ActionOpenAdjustAltitudeDialog;
 import net.tourbook.tour.ActionOpenMarkerDialog;
 import net.tourbook.tour.TourTypeMenuManager;
-import net.tourbook.tourMarker.TourMarkerManager;
 import net.tourbook.ui.ITourChartViewer;
 import net.tourbook.ui.ITourProvider;
 import net.tourbook.ui.action.ActionEditQuick;
@@ -281,13 +280,11 @@ public class TourChartContextProvider implements IChartContextProvider, ITourPro
          //isGeoTour = true;
       }
 
-      final boolean isRecentMarkersAvailable = TourMarkerManager.getRecentMarkers().size() > 0;
-
       _actionDeleteMarker.setEnabled(isTourSaved);
       _actionOpenMarkerDialog.setEnabled(isTourSaved);
       _actionSetMarkerVisible.setEnabled(isTourSaved);
       _actionSetMarkerPosition.setEnabled(isTourSaved);
-      _actionRenameMarkerFromRecentMarker.setEnabled(isTourSaved && isRecentMarkersAvailable);
+      _actionRenameMarkerFromRecentMarker.setEnabled(isTourSaved);
    }
 
    @Override
