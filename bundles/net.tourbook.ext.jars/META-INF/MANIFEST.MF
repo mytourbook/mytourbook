@@ -20,7 +20,7 @@ Bundle-ClassPath:
  jackson-databind-2.20.0.jar,
  jakarta.inject-api-2.0.1.jar,
  joda-time-2.14.3.jar,
- json-20260719.jar,
+ json-20260814.jar,
  lat-lon-timezone-converter-2019-04-30.jar,
  mchange-commons-java-0.6.1.jar,
  simplelatlng-1.4.0.jar,

@@ -37,12 +37,12 @@ import utils.FilesUtils;
 
 public class CadenceTests {
 
-   private static final String               GARMIN_IMPORT_PATH      = GarminTCX_DeviceDataReaderTests.FILES_PATH;
+   private static final String               GARMIN_IMPORT_PATH = GarminTCX_DeviceDataReaderTests.FILES_PATH;
 
    private static HashMap<Long, TourData>    newlyImportedTours;
    private static GarminTCX_DeviceDataReader garminDeviceDataReader;
 
-   private static final IPreferenceStore     _prefStore              = TourbookPlugin.getPrefStore();
+   private static final IPreferenceStore     _prefStore         = TourbookPlugin.getPrefStore();
 
    @BeforeAll
    static void initAll() {

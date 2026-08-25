@@ -94,6 +94,10 @@ public class Messages extends NLS {
 
    public static String        action_tourbook_select_year_month_tours;
 
+   public static String        Action_TourMarker_CreateFromRecentMarker;
+   public static String        Action_TourMarker_PickRecentMarker;
+   public static String        Action_TourMarker_ReplaceWithRecentMarker;
+
    public static String        Action_TourType_AddRecentTourTypes;
    public static String        Action_TourType_ModifyTourTypeFilter;
    public static String        action_tourType_modify_tourTypes;

@@ -48,17 +48,22 @@ New / Improvements
 * Equipment
   - Display the initial distance values in the tour blog
     https://github.com/mytourbook/mytourbook/issues/1734    
+    
+* Tour Marker
+  - Create or update a tour marker from a recent marker     
+    https://github.com/mytourbook/mytourbook/issues/1736    
   
 Changes
 =======
 
-* 
+* Removed the Suunto 9 import (Frederic)
     
 
 Bugfix
 ======
   
-* 
+* Tour Nutrition (Frederic)
+ - When selecting a recent product, it should appear first in the list
 
 
 Translation    

@@ -53,7 +53,7 @@ public class EquipmentViewConfig {
 
       return UI.EMPTY_STRING
 
-            + "EquipmentViewConfig"
+            + "EquipmentViewConfig" //                                     //$NON-NLS-1$
 
             + " id           = " + id + NL //                              //$NON-NLS-1$
             + " defaultId    = " + defaultId + NL //                       //$NON-NLS-1$

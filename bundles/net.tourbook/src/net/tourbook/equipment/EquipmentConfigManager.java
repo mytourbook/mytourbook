@@ -141,7 +141,7 @@ public class EquipmentConfigManager {
       }
    }
 
-   private static XMLMemento create_Root() {
+   private static XMLMemento create_WriteRoot() {
 
       final XMLMemento xmlRoot = XMLMemento.createWriteRoot(TAG_ROOT);
 
@@ -256,7 +256,7 @@ public class EquipmentConfigManager {
       final IMemento xmlConfig = xmlAllConfigs.createChild(TAG_SORT_FIELDS);
       {
 // SET_FORMATTING_OFF
-         
+
          xmlConfig.putString(ATTR_ID,                             config.id);
          xmlConfig.putString(ATTR_CONFIG_NAME,                    config.name);
 
@@ -274,12 +274,12 @@ public class EquipmentConfigManager {
          Util.setXmlEnum(xmlConfig, ATTR_EQUIPMENT_SORT_2,        config.equipmentSort2);
          Util.setXmlEnum(xmlConfig, ATTR_EQUIPMENT_SORT_3,        config.equipmentSort3);
          Util.setXmlEnum(xmlConfig, ATTR_EQUIPMENT_SORT_4,        config.equipmentSort4);
-                                                                  
+
          Util.setXmlEnum(xmlConfig, ATTR_PART_SERVICE_SORT_1,     config.partServiceSort1);
          Util.setXmlEnum(xmlConfig, ATTR_PART_SERVICE_SORT_2,     config.partServiceSort2);
          Util.setXmlEnum(xmlConfig, ATTR_PART_SERVICE_SORT_3,     config.partServiceSort3);
          Util.setXmlEnum(xmlConfig, ATTR_PART_SERVICE_SORT_4,     config.partServiceSort4);
-         
+
 // SET_FORMATTING_ON
       }
    }
@@ -369,12 +369,12 @@ public class EquipmentConfigManager {
 
       config.id                        = Util.getXmlString(xmlConfig,      ATTR_ID,             UUID.randomUUID().toString());
       config.name                      = Util.getXmlString(xmlConfig,      ATTR_CONFIG_NAME,    UI.EMPTY_STRING);
-      
+
       config.equipmentSortInverse1     = Util.getXmlBoolean(xmlConfig,     ATTR_EQUIPMENT_SORT_INVERSE_1,      false);
       config.equipmentSortInverse2     = Util.getXmlBoolean(xmlConfig,     ATTR_EQUIPMENT_SORT_INVERSE_2,      false);
       config.equipmentSortInverse3     = Util.getXmlBoolean(xmlConfig,     ATTR_EQUIPMENT_SORT_INVERSE_3,      false);
       config.equipmentSortInverse4     = Util.getXmlBoolean(xmlConfig,     ATTR_EQUIPMENT_SORT_INVERSE_4,      false);
-      
+
       config.partServiceSortInverse1   = Util.getXmlBoolean(xmlConfig,     ATTR_PART_SERVICE_SORT_INVERSE_1,   false);
       config.partServiceSortInverse2   = Util.getXmlBoolean(xmlConfig,     ATTR_PART_SERVICE_SORT_INVERSE_2,   false);
       config.partServiceSortInverse3   = Util.getXmlBoolean(xmlConfig,     ATTR_PART_SERVICE_SORT_INVERSE_3,   false);
@@ -517,7 +517,7 @@ public class EquipmentConfigManager {
          return;
       }
 
-      final XMLMemento xmlRoot = create_Root();
+      final XMLMemento xmlRoot = create_WriteRoot();
 
       saveState_SortView(xmlRoot);
 

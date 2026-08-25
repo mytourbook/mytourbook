@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2025 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2026 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -47,6 +47,7 @@ import net.tourbook.data.TourData;
 import net.tourbook.data.TourMarker;
 import net.tourbook.data.TourMarkerType;
 import net.tourbook.database.TourDatabase;
+import net.tourbook.tourMarker.TourMarkerManager;
 import net.tourbook.ui.tourChart.ChartLabelMarker;
 import net.tourbook.ui.tourChart.ITourMarkerSelectionListener;
 import net.tourbook.ui.tourChart.TourChart;
@@ -1632,14 +1633,17 @@ public class DialogMarker extends TitleAreaDialog implements ITourMarkerSelectio
       _defaultSelectionListener = SelectionListener.widgetSelectedAdapter(selectionEvent -> onChangeMarkerUI());
 
       _defaultMouseWheelListener = mouseEvent -> {
+
          UI.adjustSpinnerValueOnMouseScroll(mouseEvent);
          onChangeMarkerUI();
       };
 
       _defaultModifyListener = modifyEvent -> {
+
          if (_isUpdateUI) {
             return;
          }
+
          onChangeMarkerUI();
       };
    }
@@ -1659,7 +1663,9 @@ public class DialogMarker extends TitleAreaDialog implements ITourMarkerSelectio
    }
 
    /**
-    * save marker modifications and update chart and viewer
+    * Save marker modifications and update chart and viewer
+    *
+    * @param isUpdateRecentMarker
     */
    private void onChangeMarkerUI() {
 
@@ -1811,6 +1817,9 @@ public class DialogMarker extends TitleAreaDialog implements ITourMarkerSelectio
 
          enableControls();
       }
+
+      // set last used marker to the top of the recent markers
+      TourMarkerManager.addRecentMarker(tourMarker.getLabel());
    }
 
    private void updateModel_FromUI(final TourMarker tourMarker) {
@@ -1849,19 +1858,23 @@ public class DialogMarker extends TitleAreaDialog implements ITourMarkerSelectio
             _selectedTourMarker.setVisibleType(ChartLabelMarker.VISIBLE_TYPE_TYPE_EDIT);
          }
 
-         _chkVisibility.setSelection(isTourMarker ? _selectedTourMarker.isMarkerVisible() : false);
+// SET_FORMATTING_OFF
 
-         _comboMarkerName.setText(isTourMarker ? _selectedTourMarker.getLabel() : UI.EMPTY_STRING);
-         _comboLabelPosition.select(isTourMarker ? _selectedTourMarker.getLabelPosition() : 0);
+         _chkVisibility       .setSelection(isTourMarker ? _selectedTourMarker.isMarkerVisible()   : false);
 
-         _spinLabelOffsetX.setSelection(isTourMarker ? _selectedTourMarker.getLabelXOffset() : 0);
-         _spinLabelOffsetY.setSelection(isTourMarker ? _selectedTourMarker.getLabelYOffset() : 0);
+         _comboMarkerName     .setText(isTourMarker      ? _selectedTourMarker.getLabel()          : UI.EMPTY_STRING);
+         _comboLabelPosition  .select(isTourMarker       ? _selectedTourMarker.getLabelPosition()  : 0);
 
-         _txtDescription.setText(isTourMarker ? _selectedTourMarker.getDescription() : UI.EMPTY_STRING);
-         _txtUrlAddress.setText(isTourMarker ? _selectedTourMarker.getUrlAddress() : UI.EMPTY_STRING);
-         _txtUrlText.setText(isTourMarker ? _selectedTourMarker.getUrlText() : UI.EMPTY_STRING);
+         _spinLabelOffsetX    .setSelection(isTourMarker ? _selectedTourMarker.getLabelXOffset()   : 0);
+         _spinLabelOffsetY    .setSelection(isTourMarker ? _selectedTourMarker.getLabelYOffset()   : 0);
 
-         _tableMarkerType.select(isTourMarker ? getMarkerTypeIndex(_selectedTourMarker) : 0);
+         _txtDescription      .setText(isTourMarker      ? _selectedTourMarker.getDescription()    : UI.EMPTY_STRING);
+         _txtUrlAddress       .setText(isTourMarker      ? _selectedTourMarker.getUrlAddress()     : UI.EMPTY_STRING);
+         _txtUrlText          .setText(isTourMarker      ? _selectedTourMarker.getUrlText()        : UI.EMPTY_STRING);
+
+         _tableMarkerType     .select(isTourMarker       ? getMarkerTypeIndex(_selectedTourMarker) : 0);
+
+// SET_FORMATTING_ON
       }
       _isUpdateUI = false;
    }

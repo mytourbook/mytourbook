@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2026 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -45,10 +45,9 @@ class DialogMarkerTourChartContextProvider implements IChartContextProvider, IMa
    private ActionCreateMarkerFromValuePoint _actionCreateMarkerFromValuePoint;
    private ActionSetMarkerVisible           _actionSetMarkerVisible;
    private ActionSetMarkerLabelPositionMenu _actionSetMarkerPosition;
-//	private ActionSetMarkerImageMenu			_actionSetMarkerImageMenu;
 
-   private ChartXSlider _leftSlider;
-   private ChartXSlider _rightSlider;
+   private ChartXSlider                     _leftSlider;
+   private ChartXSlider                     _rightSlider;
 
    /**
     * @param markerDialog
@@ -96,7 +95,6 @@ class DialogMarkerTourChartContextProvider implements IChartContextProvider, IMa
       _actionDeleteMarker = new ActionDeleteMarker(_markerDialog.getTourChart());
       _actionSetMarkerVisible = new ActionSetMarkerVisible(tourMarkerUpdater);
       _actionSetMarkerPosition = new ActionSetMarkerLabelPositionMenu(tourMarkerUpdater);
-//		_actionSetMarkerImageMenu = new ActionSetMarkerImageMenu(tourMarkerUpdater);
    }
 
    @Override
@@ -127,12 +125,10 @@ class DialogMarkerTourChartContextProvider implements IChartContextProvider, IMa
       if (tourMarker != null) {
 
          _actionDeleteMarker.setTourMarker(tourMarker, false);
-//			_actionSetMarkerImageMenu.setTourMarker(tourMarker);
          _actionSetMarkerPosition.setTourMarker(tourMarker);
          _actionSetMarkerVisible.setTourMarker(tourMarker, !tourMarker.isMarkerVisible());
 
          menuMgr.add(_actionSetMarkerPosition);
-//			menuMgr.add(_actionSetMarkerImageMenu);
 
 //			menuMgr.add(new Separator());
          menuMgr.add(_actionSetMarkerVisible);

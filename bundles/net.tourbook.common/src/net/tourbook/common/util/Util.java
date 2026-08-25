@@ -2100,8 +2100,6 @@ public class Util {
       return year;
    }
 
-
-
    /**
     * @param event
     *

@@ -926,10 +926,10 @@ public class EquipmentManager {
             + "JOIN " + TourDatabase.TABLE_TOUR_DATA + " AS TourData"//                            //$NON-NLS-1$ //$NON-NLS-2$
             + "   ON jTdEq.TourData_TourID = TourData.TOURID" + NL //                              //$NON-NLS-1$
 
-            + "JOIN " + TourDatabase.TABLE_EQUIPMENT + " AS jEquip" + NL //                        //$NON-NLS-1$
+            + "JOIN " + TourDatabase.TABLE_EQUIPMENT + " AS jEquip" + NL //                        //$NON-NLS-1$ //$NON-NLS-2$
             + "   ON jTdEq.Equipment_EquipmentID = jEquip.EquipmentID" + NL //                     //$NON-NLS-1$
 
-            + "WHERE jTdEq.Equipment_EquipmentID IN (" + sqlTagData.getSqlString() + ")" + NL //   //$NON-NLS-1$
+            + "WHERE jTdEq.Equipment_EquipmentID IN (" + sqlTagData.getSqlString() + ")" + NL //   //$NON-NLS-1$ //$NON-NLS-2$
 
             + "GROUP BY " + NL //                                                                  //$NON-NLS-1$
             + "   jTdEq.Equipment_EquipmentID," + NL //                                            //$NON-NLS-1$
@@ -967,7 +967,7 @@ public class EquipmentManager {
 
                   ? Integer.toString(Math.round(distanceConverted))
 
-                  : "%d + %d = %d".formatted(
+                  : "%d + %d = %d".formatted( //$NON-NLS-1$
                         Math.round(initDistanceConverted),
                         Math.round(distanceConverted),
                         Math.round(totalDistance));

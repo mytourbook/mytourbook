@@ -239,7 +239,7 @@ public class TourPhoto implements Serializable {
          final int numLinuxChars = replaceFromLinux.length();
 
          final String remainingLinuxPath = linuxImageFilePathName.substring(numLinuxChars);
-         final String remainingWinPath = remainingLinuxPath.replaceAll("/", "\\\\");
+         final String remainingWinPath = remainingLinuxPath.replaceAll("/", "\\\\"); //$NON-NLS-1$ //$NON-NLS-2$
 
          winFilePathName = replaceToWindows + remainingWinPath;
 
@@ -293,7 +293,7 @@ public class TourPhoto implements Serializable {
          final int numWinChars = replaceFromWindows.length();
 
          final String remainingWinPath = winImageFilePathName.substring(numWinChars);
-         final String remainingLinuxPath = remainingWinPath.replaceAll("\\\\", "/");
+         final String remainingLinuxPath = remainingWinPath.replaceAll("\\\\", "/"); //$NON-NLS-1$ //$NON-NLS-2$
 
          linuxFilePathName = replaceToLinux + remainingLinuxPath;
 

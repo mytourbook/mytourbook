@@ -40,10 +40,12 @@ import net.tourbook.ui.action.ActionEditQuick;
 import net.tourbook.ui.action.ActionEditTour;
 import net.tourbook.ui.action.ActionOpenTour;
 import net.tourbook.ui.action.ActionSetTourTypeMenu;
+import net.tourbook.ui.tourChart.action.ActionCreateMarkerFromRecentMarker_SubMenu;
 import net.tourbook.ui.tourChart.action.ActionCreateMarkerFromSlider;
 import net.tourbook.ui.tourChart.action.ActionCreateMarkerFromValuePoint;
 import net.tourbook.ui.tourChart.action.ActionCreateRefTour;
 import net.tourbook.ui.tourChart.action.ActionDeleteMarker;
+import net.tourbook.ui.tourChart.action.ActionRenameMarkerFromRecentMarker_SubMenu;
 import net.tourbook.ui.tourChart.action.ActionSetMarkerLabelPositionMenu;
 import net.tourbook.ui.tourChart.action.ActionSetMarkerVisible;
 
@@ -55,30 +57,32 @@ import org.eclipse.swt.widgets.Display;
 
 public class TourChartContextProvider implements IChartContextProvider, ITourProvider {
 
-   private final ITourChartViewer           _tourChartViewer;
+   private final ITourChartViewer                     _tourChartViewer;
 
-   private TagMenuManager                   _tagMenuManager;
-   private TourTypeMenuManager              _tourTypeMenuManager;
+   private TagMenuManager                             _tagMenuManager;
+   private TourTypeMenuManager                        _tourTypeMenuManager;
 
-   private ActionCreateRefTour              _actionCreateRefTour;
-   private ActionCreateMarkerFromSlider     _actionCreateMarkerFromSlider;
-   private ActionCreateMarkerFromSlider     _actionCreateMarkerFromSliderLeft;
-   private ActionCreateMarkerFromSlider     _actionCreateMarkerFromSliderRight;
-   private ActionCreateMarkerFromValuePoint _actionCreateMarkerFromValuePoint;
-   private ActionEditQuick                  _actionQuickEdit;
-   private ActionDeleteMarker               _actionDeleteMarker;
-   private ActionEditTour                   _actionEditTour;
-   private ActionExport                     _actionExportTour;
-   private ActionOpenAdjustAltitudeDialog   _actionOpenAdjustAltitudeDialog;
-   private ActionOpenMarkerDialog           _actionOpenMarkerDialog;
-   private ActionOpenPrefDialog             _actionPrefDialog;
-   private ActionOpenTour                   _actionOpenTour;
-   private ActionSetTourTypeMenu            _actionSetTourType;
-   private ActionSetMarkerVisible           _actionSetMarkerVisible;
-   private ActionSetMarkerLabelPositionMenu _actionSetMarkerPosition;
+   private ActionCreateRefTour                        _actionCreateRefTour;
+   private ActionCreateMarkerFromRecentMarker_SubMenu _actionCreateMarkerFromRecentMarker;
+   private ActionCreateMarkerFromSlider               _actionCreateMarkerFromSlider;
+   private ActionCreateMarkerFromSlider               _actionCreateMarkerFromSliderLeft;
+   private ActionCreateMarkerFromSlider               _actionCreateMarkerFromSliderRight;
+   private ActionCreateMarkerFromValuePoint           _actionCreateMarkerFromValuePoint;
+   private ActionEditQuick                            _actionQuickEdit;
+   private ActionDeleteMarker                         _actionDeleteMarker;
+   private ActionEditTour                             _actionEditTour;
+   private ActionExport                               _actionExportTour;
+   private ActionOpenAdjustAltitudeDialog             _actionOpenAdjustAltitudeDialog;
+   private ActionOpenMarkerDialog                     _actionOpenMarkerDialog;
+   private ActionOpenPrefDialog                       _actionPrefDialog;
+   private ActionOpenTour                             _actionOpenTour;
+   private ActionRenameMarkerFromRecentMarker_SubMenu _actionRenameMarkerFromRecentMarker;
+   private ActionSetTourTypeMenu                      _actionSetTourType;
+   private ActionSetMarkerVisible                     _actionSetMarkerVisible;
+   private ActionSetMarkerLabelPositionMenu           _actionSetMarkerPosition;
 
-   private ChartXSlider                     _leftSlider;
-   private ChartXSlider                     _rightSlider;
+   private ChartXSlider                               _leftSlider;
+   private ChartXSlider                               _rightSlider;
 
    /**
     * Provides a context menu for a tour chart
@@ -101,6 +105,9 @@ public class TourChartContextProvider implements IChartContextProvider, ITourPro
       final TourChart tourChart = _tourChartViewer.getTourChart();
 
       _actionCreateRefTour = new ActionCreateRefTour(tourChart);
+
+      _actionCreateMarkerFromRecentMarker = new ActionCreateMarkerFromRecentMarker_SubMenu(this);
+      _actionRenameMarkerFromRecentMarker = new ActionRenameMarkerFromRecentMarker_SubMenu(tourChart);
 
       _actionCreateMarkerFromSlider = new ActionCreateMarkerFromSlider(
             this,
@@ -249,9 +256,11 @@ public class TourChartContextProvider implements IChartContextProvider, ITourPro
       _actionOpenMarkerDialog.setTourMarker(tourMarker);
       _actionSetMarkerVisible.setTourMarker(tourMarker, !tourMarker.isMarkerVisible());
       _actionSetMarkerPosition.setTourMarker(tourMarker);
+      _actionRenameMarkerFromRecentMarker.setTourMarker(tourMarker);
 
       // fill actions
       menuMgr.add(_actionSetMarkerPosition);
+      menuMgr.add(_actionRenameMarkerFromRecentMarker);
       menuMgr.add(_actionSetMarkerVisible);
       menuMgr.add(_actionDeleteMarker);
       menuMgr.add(_actionOpenMarkerDialog);
@@ -259,7 +268,7 @@ public class TourChartContextProvider implements IChartContextProvider, ITourPro
       menuMgr.add(new Separator());
 
       /*
-       * enable actions
+       * Enable actions
        */
       final TourData tourData = tourChart.getTourData();
 
@@ -275,6 +284,7 @@ public class TourChartContextProvider implements IChartContextProvider, ITourPro
       _actionOpenMarkerDialog.setEnabled(isTourSaved);
       _actionSetMarkerVisible.setEnabled(isTourSaved);
       _actionSetMarkerPosition.setEnabled(isTourSaved);
+      _actionRenameMarkerFromRecentMarker.setEnabled(isTourSaved);
    }
 
    @Override
@@ -290,6 +300,7 @@ public class TourChartContextProvider implements IChartContextProvider, ITourPro
          // slider marker actions
          if (leftSlider != null && rightSlider == null) {
             menuMgr.add(_actionCreateMarkerFromSlider);
+            menuMgr.add(_actionCreateMarkerFromRecentMarker);
          } else {
             menuMgr.add(_actionCreateMarkerFromSliderLeft);
             menuMgr.add(_actionCreateMarkerFromSliderRight);

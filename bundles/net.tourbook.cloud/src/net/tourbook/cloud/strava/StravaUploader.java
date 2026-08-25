@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2020, 2024 Frédéric Bard
+ * Copyright (C) 2020, 2026 Frédéric Bard
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -270,7 +270,9 @@ public class StravaUploader extends TourbookCloudUploader {
 
    @Override
    protected boolean isReady() {
-      return StringUtils.hasContent(getAccessToken()) && StringUtils.hasContent(getRefreshToken());
+      return false;
+      // See issue: https://github.com/mytourbook/mytourbook/discussions/1698
+      //return StringUtils.hasContent(getAccessToken()) && StringUtils.hasContent(getRefreshToken());
    }
 
    private boolean logUploadResult(final ActivityUpload activityUpload) {

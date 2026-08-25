@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2020, 2024 Wolfgang Schramm and Contributors
+ * Copyright (C) 2020, 2026 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -85,7 +85,8 @@ public class TourInfoView extends ViewPart {
 
          final String property = propertyChangeEvent.getProperty();
 
-         if (property.equals(ITourbookPreferences.GRAPH_MARKER_IS_MODIFIED)) {
+         if (property.equals(ITourbookPreferences.GRAPH_MARKER_IS_MODIFIED)
+               || property.equals(ITourbookPreferences.VIEW_LAYOUT_CHANGED)) {
 
             updateUI();
          }
