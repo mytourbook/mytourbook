@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2026 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -18,6 +18,7 @@ package net.tourbook.preferences;
 import static org.eclipse.swt.events.SelectionListener.widgetSelectedAdapter;
 
 import net.tourbook.Messages;
+import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.CommonActivator;
 import net.tourbook.common.formatter.FormatManager;
 import net.tourbook.common.formatter.ValueFormat;
@@ -42,13 +43,14 @@ import org.eclipse.ui.IWorkbenchPreferencePage;
 
 public class PrefPageAppearanceDisplayFormat extends PreferencePage implements IWorkbenchPreferencePage {
 
-   public static final String     ID                = "net.tourbook.preferences.PrefPageAppearanceDisplayFormat"; //$NON-NLS-1$
+   public static final String            ID                = "net.tourbook.preferences.PrefPageAppearanceDisplayFormat"; //$NON-NLS-1$
 
-   private final IPreferenceStore _prefStore_Common = CommonActivator.getPrefStore();
+   private static final IPreferenceStore _prefStore        = TourbookPlugin.getPrefStore();
+   private static final IPreferenceStore _prefStore_Common = CommonActivator.getPrefStore();
 
-   private PixelConverter         _pc;
+   private PixelConverter                _pc;
 
-   private SelectionListener      _defaultSelectionListener;
+   private SelectionListener             _defaultSelectionListener;
 
    /*
     * UI controls
@@ -1558,7 +1560,7 @@ public class PrefPageAppearanceDisplayFormat extends PreferencePage implements I
       FormatManager.updateDisplayFormats();
 
       // fire one event for all modifications
-      _prefStore_Common.setValue(ITourbookPreferences.VIEW_LAYOUT_CHANGED, Math.random());
+      _prefStore.setValue(ITourbookPreferences.VIEW_LAYOUT_CHANGED, Math.random());
    }
 
    private void saveUIState() {
