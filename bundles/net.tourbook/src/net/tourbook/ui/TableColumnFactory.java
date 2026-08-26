@@ -2498,8 +2498,9 @@ public abstract class TableColumnFactory {
          public TableColumnDefinition createColumn(final ColumnManager columnManager,
                                                    final PixelConverter pixelConverter) {
 
-            //TODO FB, when modifying the quantity, it doesnt update the calendar or the thourbook view
-            // the monthly averages are wrong because the deviceelapsed time contains the time for tours that dont have nutitritions
+            //TODO FB
+            // the monthly averages are wrong because the deviceelapsed time
+            // contains the time for tours that dont have nutritions
 
             //todo fb export it in the csv export to be able to make graph in excel
             final TableColumnDefinition colDef = new TableColumnDefinition(columnManager, NUTRITION_CARBOHYDRATES_AVG_PER_HOUR_ID, SWT.TRAIL);
