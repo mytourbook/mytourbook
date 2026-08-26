@@ -53,6 +53,7 @@ New / Improvements
   - Create or update a tour marker from a recent marker     
     https://github.com/mytourbook/mytourbook/issues/1736    
   
+
 Changes
 =======
 
