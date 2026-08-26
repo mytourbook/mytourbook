@@ -27,7 +27,7 @@ import org.eclipse.jface.preference.IPreferenceStore;
  */
 public class FormatManager {
 
-   private static final IPreferenceStore _prefStore                  = CommonActivator.getPrefStore();
+   private static final IPreferenceStore _prefStore_Common           = CommonActivator.getPrefStore();
 
    private static IValueFormatter        _valueFormatter_Number_1_0  = new ValueFormatter_Number_1_0();
    private static IValueFormatter        _valueFormatter_Number_1_1  = new ValueFormatter_Number_1_1();
@@ -144,7 +144,7 @@ public class FormatManager {
 
    /**
     * @param value
-    * 
+    *
     * @return Format a number with 0 digits but with thousender markers.
     */
    public static String formatPausedTime(final long value) {
@@ -153,7 +153,7 @@ public class FormatManager {
 
    /**
     * @param value
-    * 
+    *
     * @return Format a number with 0 digits but with thousender markers.
     */
    public static String formatPausedTime_Summary(final long value) {
@@ -342,34 +342,34 @@ public class FormatManager {
 
 // SET_FORMATTING_OFF
 
-      final String cadence                = _prefStore.getString(ICommonPreferences.DISPLAY_FORMAT_CADENCE);
-      final String distance               = _prefStore.getString(ICommonPreferences.DISPLAY_FORMAT_DISTANCE);
-      final String elevation              = _prefStore.getString(ICommonPreferences.DISPLAY_FORMAT_ALTITUDE);
-      final String power                  = _prefStore.getString(ICommonPreferences.DISPLAY_FORMAT_POWER);
-      final String pulse                  = _prefStore.getString(ICommonPreferences.DISPLAY_FORMAT_PULSE);
-      final String relative               = _prefStore.getString(ICommonPreferences.DISPLAY_FORMAT_RELATIVE);
-      final String speed                  = _prefStore.getString(ICommonPreferences.DISPLAY_FORMAT_SPEED);
-      final String temperature            = _prefStore.getString(ICommonPreferences.DISPLAY_FORMAT_TEMPERATURE);
+      final String cadence                = _prefStore_Common.getString(ICommonPreferences.DISPLAY_FORMAT_CADENCE);
+      final String distance               = _prefStore_Common.getString(ICommonPreferences.DISPLAY_FORMAT_DISTANCE);
+      final String elevation              = _prefStore_Common.getString(ICommonPreferences.DISPLAY_FORMAT_ALTITUDE);
+      final String power                  = _prefStore_Common.getString(ICommonPreferences.DISPLAY_FORMAT_POWER);
+      final String pulse                  = _prefStore_Common.getString(ICommonPreferences.DISPLAY_FORMAT_PULSE);
+      final String relative               = _prefStore_Common.getString(ICommonPreferences.DISPLAY_FORMAT_RELATIVE);
+      final String speed                  = _prefStore_Common.getString(ICommonPreferences.DISPLAY_FORMAT_SPEED);
+      final String temperature            = _prefStore_Common.getString(ICommonPreferences.DISPLAY_FORMAT_TEMPERATURE);
 
-      final String elapsedTime            = _prefStore.getString(ICommonPreferences.DISPLAY_FORMAT_ELAPSED_TIME);
-      final String recordedTime           = _prefStore.getString(ICommonPreferences.DISPLAY_FORMAT_RECORDED_TIME);
-      final String pausedTime             = _prefStore.getString(ICommonPreferences.DISPLAY_FORMAT_PAUSED_TIME);
-      final String movingTime             = _prefStore.getString(ICommonPreferences.DISPLAY_FORMAT_MOVING_TIME);
-      final String breakTime              = _prefStore.getString(ICommonPreferences.DISPLAY_FORMAT_BREAK_TIME);
+      final String elapsedTime            = _prefStore_Common.getString(ICommonPreferences.DISPLAY_FORMAT_ELAPSED_TIME);
+      final String recordedTime           = _prefStore_Common.getString(ICommonPreferences.DISPLAY_FORMAT_RECORDED_TIME);
+      final String pausedTime             = _prefStore_Common.getString(ICommonPreferences.DISPLAY_FORMAT_PAUSED_TIME);
+      final String movingTime             = _prefStore_Common.getString(ICommonPreferences.DISPLAY_FORMAT_MOVING_TIME);
+      final String breakTime              = _prefStore_Common.getString(ICommonPreferences.DISPLAY_FORMAT_BREAK_TIME);
 
-      final String cadence_Summary        = _prefStore.getString(ICommonPreferences.DISPLAY_FORMAT_CADENCE_SUMMARY);
-      final String distance_Summary       = _prefStore.getString(ICommonPreferences.DISPLAY_FORMAT_DISTANCE_SUMMARY);
-      final String elevation_Summary      = _prefStore.getString(ICommonPreferences.DISPLAY_FORMAT_ALTITUDE_SUMMARY);
-      final String power_Summary          = _prefStore.getString(ICommonPreferences.DISPLAY_FORMAT_POWER_SUMMARY);
-      final String pulse_Summary          = _prefStore.getString(ICommonPreferences.DISPLAY_FORMAT_PULSE_SUMMARY);
-      final String speed_Summary          = _prefStore.getString(ICommonPreferences.DISPLAY_FORMAT_SPEED_SUMMARY);
-      final String temperature_Summary    = _prefStore.getString(ICommonPreferences.DISPLAY_FORMAT_TEMPERATURE_SUMMARY);
+      final String cadence_Summary        = _prefStore_Common.getString(ICommonPreferences.DISPLAY_FORMAT_CADENCE_SUMMARY);
+      final String distance_Summary       = _prefStore_Common.getString(ICommonPreferences.DISPLAY_FORMAT_DISTANCE_SUMMARY);
+      final String elevation_Summary      = _prefStore_Common.getString(ICommonPreferences.DISPLAY_FORMAT_ALTITUDE_SUMMARY);
+      final String power_Summary          = _prefStore_Common.getString(ICommonPreferences.DISPLAY_FORMAT_POWER_SUMMARY);
+      final String pulse_Summary          = _prefStore_Common.getString(ICommonPreferences.DISPLAY_FORMAT_PULSE_SUMMARY);
+      final String speed_Summary          = _prefStore_Common.getString(ICommonPreferences.DISPLAY_FORMAT_SPEED_SUMMARY);
+      final String temperature_Summary    = _prefStore_Common.getString(ICommonPreferences.DISPLAY_FORMAT_TEMPERATURE_SUMMARY);
 
-      final String elapsedTime_Summary    = _prefStore.getString(ICommonPreferences.DISPLAY_FORMAT_ELAPSED_TIME_SUMMARY);
-      final String recordedTime_Summary   = _prefStore.getString(ICommonPreferences.DISPLAY_FORMAT_RECORDED_TIME_SUMMARY);
-      final String pausedTime_Summary     = _prefStore.getString(ICommonPreferences.DISPLAY_FORMAT_PAUSED_TIME_SUMMARY);
-      final String movingTime_Summary     = _prefStore.getString(ICommonPreferences.DISPLAY_FORMAT_MOVING_TIME_SUMMARY);
-      final String breakTime_Summary      = _prefStore.getString(ICommonPreferences.DISPLAY_FORMAT_BREAK_TIME_SUMMARY);
+      final String elapsedTime_Summary    = _prefStore_Common.getString(ICommonPreferences.DISPLAY_FORMAT_ELAPSED_TIME_SUMMARY);
+      final String recordedTime_Summary   = _prefStore_Common.getString(ICommonPreferences.DISPLAY_FORMAT_RECORDED_TIME_SUMMARY);
+      final String pausedTime_Summary     = _prefStore_Common.getString(ICommonPreferences.DISPLAY_FORMAT_PAUSED_TIME_SUMMARY);
+      final String movingTime_Summary     = _prefStore_Common.getString(ICommonPreferences.DISPLAY_FORMAT_MOVING_TIME_SUMMARY);
+      final String breakTime_Summary      = _prefStore_Common.getString(ICommonPreferences.DISPLAY_FORMAT_BREAK_TIME_SUMMARY);
 
       _cadenceFormatter                   = getNumberFormatter(cadence);
       _distanceFormatter                  = getNumberFormatter(distance);

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2025 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2026 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -31,6 +31,7 @@ import net.tourbook.common.CommonImages;
 import net.tourbook.common.UI;
 import net.tourbook.common.font.MTFont;
 import net.tourbook.common.formatter.FormatManager;
+import net.tourbook.common.formatter.ValueFormat;
 import net.tourbook.common.preferences.ICommonPreferences;
 import net.tourbook.common.time.TimeTools;
 import net.tourbook.common.time.TourDateTime;
@@ -103,7 +104,7 @@ public class TourInfoUI implements ICanHideTooltip {
    private static final String            BATTERY_FORMAT      = "... %d %%";                          //$NON-NLS-1$
    private static final String            GEAR_SHIFT_FORMAT   = "%d / %d";                            //$NON-NLS-1$
 
-   private static final IPreferenceStore  _prefStoreCommon    = CommonActivator.getPrefStore();
+   private static final String            HH_MM_SS            = ValueFormat.TIME_HH_MM_SS.name();
 
    private static final DateTimeFormatter _dtHistoryFormatter = DateTimeFormatter.ofLocalizedDateTime(
          FormatStyle.FULL,
@@ -120,6 +121,7 @@ public class TourInfoUI implements ICanHideTooltip {
    ;
 
    private static final IPreferenceStore  _prefStore          = TourbookPlugin.getPrefStore();
+   private static final IPreferenceStore  _prefStore_Common   = CommonActivator.getPrefStore();
    private static final IDialogSettings   _state              = TourbookPlugin.getState(ID);
 
    private final NumberFormat             _nf0                = NumberFormat.getNumberInstance();
@@ -880,6 +882,11 @@ public class TourInfoUI implements ICanHideTooltip {
 
       createUI_Spacer(container);
 
+      final boolean isRecordedWithSeconds = HH_MM_SS.equals(_prefStore_Common.getString(ICommonPreferences.DISPLAY_FORMAT_RECORDED_TIME));
+      final String lblTimeUnit = isRecordedWithSeconds
+            ? UI.EMPTY_STRING
+            : UI.SPACE + Messages.Tour_Tooltip_Label_Hour;
+
       final List<TourPersonHRZone> tourPersonHrZones = _tourData.getDataPerson().getHrZonesSorted();
 
       final long movingTime = _tourData.getTourComputedTime_Moving();
@@ -898,9 +905,7 @@ public class TourInfoUI implements ICanHideTooltip {
                + UI.SPACE
                + UI.SYMBOL_PERCENTAGE;
 
-         final String lblTimeText = FormatManager.formatRecordedTime(timeInTimeZone)
-               + UI.SPACE
-               + Messages.Tour_Tooltip_Label_Hour;
+         final String lblTimeText = FormatManager.formatRecordedTime(timeInTimeZone) + lblTimeUnit;
 
          // label: HR zone
          createUI_Label(container, currentHrZone.getNameShort());
@@ -2183,14 +2188,33 @@ public class TourInfoUI implements ICanHideTooltip {
       /*
        * Column: Left
        */
-      final long elapsedTime = _tourData.getTourDeviceTime_Elapsed();
-      final long recordedTime = _tourData.getTourDeviceTime_Recorded();
-      final long pausedTime = _tourData.getTourDeviceTime_Paused();
-      final long movingTime = _tourData.getTourComputedTime_Moving();
-      final long breakTime = elapsedTime - movingTime;
+// SET_FORMATTING_OFF
 
-      final ZonedDateTime zdtTourStart = _tourData.getTourStartTime();
-      final ZonedDateTime zdtTourEnd = zdtTourStart.plusSeconds(elapsedTime);
+      final long elapsedTime  = _tourData.getTourDeviceTime_Elapsed();
+      final long recordedTime = _tourData.getTourDeviceTime_Recorded();
+      final long pausedTime   = _tourData.getTourDeviceTime_Paused();
+      final long movingTime   = _tourData.getTourComputedTime_Moving();
+      final long breakTime    = elapsedTime - movingTime;
+
+      final ZonedDateTime zdtTourStart    = _tourData.getTourStartTime();
+      final ZonedDateTime zdtTourEnd      = zdtTourStart.plusSeconds(elapsedTime);
+
+
+      final boolean isElapsedWithSeconds  = HH_MM_SS.equals(_prefStore_Common.getString(ICommonPreferences.DISPLAY_FORMAT_ELAPSED_TIME));
+      final boolean isRecordedWithSeconds = HH_MM_SS.equals(_prefStore_Common.getString(ICommonPreferences.DISPLAY_FORMAT_RECORDED_TIME));
+      final boolean isPausedWithSeconds   = HH_MM_SS.equals(_prefStore_Common.getString(ICommonPreferences.DISPLAY_FORMAT_PAUSED_TIME));
+      final boolean isMovingWithSeconds   = HH_MM_SS.equals(_prefStore_Common.getString(ICommonPreferences.DISPLAY_FORMAT_MOVING_TIME));
+      final boolean isBreakWithSeconds    = HH_MM_SS.equals(_prefStore_Common.getString(ICommonPreferences.DISPLAY_FORMAT_BREAK_TIME));
+
+// SET_FORMATTING_ON
+
+      final boolean isAllWithSeconds = isElapsedWithSeconds
+            && isRecordedWithSeconds
+            && isPausedWithSeconds
+            && isMovingWithSeconds
+            && isBreakWithSeconds;
+
+      final boolean isAllWithoutSeconds = !isAllWithSeconds;
 
       if (isSimpleTour()) {
 
@@ -2205,18 +2229,22 @@ public class TourInfoUI implements ICanHideTooltip {
 
          ));
 
+// SET_FORMATTING_OFF
+         
          // show units only when data are available
-         _lblElapsedTime_Unit.setVisible(elapsedTime > 0);
-         _lblRecordedTime_Unit.setVisible(recordedTime > 0);
-         _lblPausedTime_Unit.setVisible(pausedTime > 0);
-         _lblMovingTime_Unit.setVisible(movingTime > 0);
-         _lblBreakTime_Unit.setVisible(breakTime > 0);
+         _lblElapsedTime_Unit .setVisible(isAllWithoutSeconds && elapsedTime > 0);
+         _lblRecordedTime_Unit.setVisible(isAllWithoutSeconds && recordedTime > 0);
+         _lblPausedTime_Unit  .setVisible(isAllWithoutSeconds && pausedTime > 0);
+         _lblMovingTime_Unit  .setVisible(isAllWithoutSeconds && movingTime > 0);
+         _lblBreakTime_Unit   .setVisible(isAllWithoutSeconds && breakTime > 0);
 
-         _lblElapsedTime.setText(FormatManager.formatElapsedTime(elapsedTime));
-         _lblRecordedTime.setText(FormatManager.formatRecordedTime(recordedTime));
-         _lblPausedTime.setText(FormatManager.formatPausedTime(pausedTime));
-         _lblMovingTime.setText(FormatManager.formatMovingTime(movingTime));
-         _lblBreakTime.setText(FormatManager.formatBreakTime(breakTime));
+         _lblElapsedTime      .setText(FormatManager.formatElapsedTime(elapsedTime));
+         _lblRecordedTime     .setText(FormatManager.formatRecordedTime(recordedTime));
+         _lblPausedTime       .setText(FormatManager.formatPausedTime(pausedTime));
+         _lblMovingTime       .setText(FormatManager.formatMovingTime(movingTime));
+         _lblBreakTime        .setText(FormatManager.formatBreakTime(breakTime));
+         
+// SET_FORMATTING_ON
 
          /*
           * Time zone
@@ -2227,7 +2255,7 @@ public class TourInfoUI implements ICanHideTooltip {
          _lblTimeZoneDifference_Value.setText(tourDateTime.timeZoneOffsetLabel);
 
          // set tooltip text
-         final String defaultTimeZoneId = _prefStoreCommon.getString(ICommonPreferences.TIME_ZONE_LOCAL_ID);
+         final String defaultTimeZoneId = _prefStore_Common.getString(ICommonPreferences.TIME_ZONE_LOCAL_ID);
          final String timeZoneTooltip = NLS.bind(
                Messages.ColumnFactory_TimeZoneDifference_Tooltip,
                defaultTimeZoneId);
