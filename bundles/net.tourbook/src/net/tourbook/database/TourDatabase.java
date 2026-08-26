@@ -126,9 +126,9 @@ public class TourDatabase {
     * <li>/net.tourbook.export/format-templates/mt-1.0.vm</li>
     * <li>net.tourbook.device.mt.MT_StAXHandler</li>
     */
-   private static final int TOURBOOK_DB_VERSION = 63;
+   private static final int TOURBOOK_DB_VERSION = 63; // 26.8.next
 
-//   private static final int TOURBOOK_DB_VERSION = 62; // 26.6.next
+//   private static final int TOURBOOK_DB_VERSION = 62; // 26.8
 
 //   private static final int TOURBOOK_DB_VERSION = 61; // 26.6
 //   private static final int TOURBOOK_DB_VERSION = 60; // 26.3
