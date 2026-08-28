@@ -53,7 +53,8 @@ public class ValueFormatSet {
          ValueFormat.TIME_HH,
          ValueFormat.TIME_HH_MM,
          ValueFormat.TIME_HH_MM_SS,
-         ValueFormat.TIME_SSS
+         ValueFormat.TIME_SSS,
+         ValueFormat.TIME_DURATION
    };
 
    public static ValueFormat[] DateTime        = new ValueFormat[] {

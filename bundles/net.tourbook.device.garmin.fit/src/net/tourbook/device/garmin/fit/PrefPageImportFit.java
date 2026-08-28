@@ -745,6 +745,6 @@ public class PrefPageImportFit extends PreferencePage implements IWorkbenchPrefe
 
       final Period tourPeriod = new Period(0, duration * 1000, _tourPeriodTemplate);
 
-      _lblSplitTour_DurationUnit.setText(tourPeriod.toString(UI.DEFAULT_DURATION_FORMATTER_SHORT));
+      _lblSplitTour_DurationUnit.setText(tourPeriod.toString(UI.DURATION_FORMATTER_YYYY_MM_DD_HH_MM_SS_MS));
    }
 }

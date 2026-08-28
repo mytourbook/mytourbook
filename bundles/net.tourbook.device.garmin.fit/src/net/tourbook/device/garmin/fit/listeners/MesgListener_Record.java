@@ -189,7 +189,7 @@ public class MesgListener_Record extends AbstractMesgListener implements RecordM
                tourMarker.setLabel(
                      NLS.bind(
                            Messages.Import_Error_TourMarkerLabel_ExceededTimeSlice,
-                           duration.toString(UI.DEFAULT_DURATION_FORMATTER_SHORT)));
+                           duration.toString(UI.DURATION_FORMATTER_YYYY_MM_DD_HH_MM_SS_MS)));
 
                if (distance != null) {
                   tourMarker.setDistance(distance);

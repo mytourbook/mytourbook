@@ -38,6 +38,10 @@ New / Improvements
   - Added action to mount/unmount a device
     https://github.com/mytourbook/mytourbook/issues/1720
 
+* Tour Info    
+  - Display time values in [ddd:]hh:mm:ss format 
+    https://github.com/mytourbook/mytourbook/issues/1735
+
 * Photo
   - Support photo locations across all platforms    
     https://github.com/mytourbook/mytourbook/issues/1727

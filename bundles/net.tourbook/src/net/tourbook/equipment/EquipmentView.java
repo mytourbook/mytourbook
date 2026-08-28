@@ -1873,7 +1873,7 @@ public class EquipmentView extends ViewPart implements
                } else {
 
                   final Period durationPeriod = new Period(0, durationMS, _tourPeriodTemplate);
-                  final String formattedDuration = durationPeriod.toString(UI.DURATION_FORMATTER_YEAR_MONTH_DAY);
+                  final String formattedDuration = durationPeriod.toString(UI.DURATION_FORMATTER_YYYY_MM_DD);
 
                   formattedText = durationText.formatted(formattedDuration);
                }

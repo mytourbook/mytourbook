@@ -27,18 +27,19 @@ import org.eclipse.jface.preference.IPreferenceStore;
  */
 public class FormatManager {
 
-   private static final IPreferenceStore _prefStore_Common           = CommonActivator.getPrefStore();
+   private static final IPreferenceStore _prefStore_Common             = CommonActivator.getPrefStore();
 
-   private static IValueFormatter        _valueFormatter_Number_1_0  = new ValueFormatter_Number_1_0();
-   private static IValueFormatter        _valueFormatter_Number_1_1  = new ValueFormatter_Number_1_1();
-   private static IValueFormatter        _valueFormatter_Number_1_2  = new ValueFormatter_Number_1_2();
-   private static IValueFormatter        _valueFormatter_Number_1_3  = new ValueFormatter_Number_1_3();
-   private static IValueFormatter        _valueFormatter_Number_1_4  = new ValueFormatter_Number_1_4();
-   private static IValueFormatter        _valueFormatter_Number_1_5  = new ValueFormatter_Number_1_5();
-   private static IValueFormatter        _valueFormatter_Time_HH     = new ValueFormatter_Time_HH();
-   private static IValueFormatter        _valueFormatter_Time_HHMM   = new ValueFormatter_Time_HHMM();
-   private static IValueFormatter        _valueFormatter_Time_HHMMSS = new ValueFormatter_Time_HHMMSS();
-   private static IValueFormatter        _valueFormatter_Time_SSS    = new ValueFormatter_Time_SSS();
+   private static IValueFormatter        _valueFormatter_Number_1_0    = new ValueFormatter_Number_1_0();
+   private static IValueFormatter        _valueFormatter_Number_1_1    = new ValueFormatter_Number_1_1();
+   private static IValueFormatter        _valueFormatter_Number_1_2    = new ValueFormatter_Number_1_2();
+   private static IValueFormatter        _valueFormatter_Number_1_3    = new ValueFormatter_Number_1_3();
+   private static IValueFormatter        _valueFormatter_Number_1_4    = new ValueFormatter_Number_1_4();
+   private static IValueFormatter        _valueFormatter_Number_1_5    = new ValueFormatter_Number_1_5();
+   private static IValueFormatter        _valueFormatter_Time_HH       = new ValueFormatter_Time_HH();
+   private static IValueFormatter        _valueFormatter_Time_HHMM     = new ValueFormatter_Time_HHMM();
+   private static IValueFormatter        _valueFormatter_Time_HHMMSS   = new ValueFormatter_Time_HHMMSS();
+   private static IValueFormatter        _valueFormatter_Time_SSS      = new ValueFormatter_Time_SSS();
+   private static IValueFormatter        _valueFormatter_Time_Duration = new ValueFormatter_Time_Duration();
 
    private static IValueFormatter        _cadenceFormatter;
    private static IValueFormatter        _distanceFormatter;
@@ -214,126 +215,74 @@ public class FormatManager {
 
    public static IValueFormatter getNumberFormatter(final String formatName) {
 
-      if (formatName.equals(ValueFormat.NUMBER_1_0.name())) {
+// SET_FORMATTING_OFF
 
-         return _valueFormatter_Number_1_0;
-
-      } else if (formatName.equals(ValueFormat.NUMBER_1_1.name())) {
-
-         return _valueFormatter_Number_1_1;
-
-      } else if (formatName.equals(ValueFormat.NUMBER_1_2.name())) {
-
-         return _valueFormatter_Number_1_2;
-
-      } else if (formatName.equals(ValueFormat.NUMBER_1_3.name())) {
-
-         return _valueFormatter_Number_1_3;
-
-      } else if (formatName.equals(ValueFormat.NUMBER_1_4.name())) {
-
-         return _valueFormatter_Number_1_4;
-
-      } else if (formatName.equals(ValueFormat.NUMBER_1_5.name())) {
-
-         return _valueFormatter_Number_1_5;
-
-      } else {
-
-         return _valueFormatter_Number_1_0;
+      if (       formatName.equals(ValueFormat.NUMBER_1_0.name())) {    return _valueFormatter_Number_1_0;
+      } else if (formatName.equals(ValueFormat.NUMBER_1_1.name())) {    return _valueFormatter_Number_1_1;
+      } else if (formatName.equals(ValueFormat.NUMBER_1_2.name())) {    return _valueFormatter_Number_1_2;
+      } else if (formatName.equals(ValueFormat.NUMBER_1_3.name())) {    return _valueFormatter_Number_1_3;
+      } else if (formatName.equals(ValueFormat.NUMBER_1_4.name())) {    return _valueFormatter_Number_1_4;
+      } else if (formatName.equals(ValueFormat.NUMBER_1_5.name())) {    return _valueFormatter_Number_1_5;
+      } else {                                                          return _valueFormatter_Number_1_0;
       }
+
+// SET_FORMATTING_ON
    }
 
    public static IValueFormatter getTimeFormatter(final String formatName) {
 
-      if (formatName.equals(ValueFormat.TIME_HH.name())) {
+// SET_FORMATTING_OFF
 
-         return _valueFormatter_Time_HH;
-
-      } else if (formatName.equals(ValueFormat.TIME_HH_MM.name())) {
-
-         return _valueFormatter_Time_HHMM;
-
-      } else if (formatName.equals(ValueFormat.TIME_HH_MM_SS.name())) {
-
-         return _valueFormatter_Time_HHMMSS;
-
-      } else if (formatName.equals(ValueFormat.TIME_SSS.name())) {
-
-         return _valueFormatter_Time_SSS;
-
-      } else {
-
-         return _valueFormatter_Time_HHMMSS;
+      if (       formatName.equals(ValueFormat.TIME_HH.name())) {          return _valueFormatter_Time_HH;
+      } else if (formatName.equals(ValueFormat.TIME_HH_MM.name())) {       return _valueFormatter_Time_HHMM;
+      } else if (formatName.equals(ValueFormat.TIME_HH_MM_SS.name())) {    return _valueFormatter_Time_HHMMSS;
+      } else if (formatName.equals(ValueFormat.TIME_SSS.name())) {         return _valueFormatter_Time_SSS;
+      } else if (formatName.equals(ValueFormat.TIME_DURATION.name())) {    return _valueFormatter_Time_Duration;
+      } else {                                                             return _valueFormatter_Time_HHMMSS;
       }
+
+// SET_FORMATTING_ON
    }
 
    public static String getValueFormatterName(final ValueFormat valueFormat) {
 
+// SET_FORMATTING_OFF
+
       switch (valueFormat) {
 
-      case NUMBER_1_0:
-         return Messages.Value_Formatter_Number_1_0;
+      case NUMBER_1_0:              return Messages.Value_Formatter_Number_1_0;
+      case NUMBER_1_1:              return Messages.Value_Formatter_Number_1_1;
+      case NUMBER_1_2:              return Messages.Value_Formatter_Number_1_2;
+      case NUMBER_1_3:              return Messages.Value_Formatter_Number_1_3;
+      case NUMBER_1_4:              return Messages.Value_Formatter_Number_1_4;
+      case NUMBER_1_5:              return Messages.Value_Formatter_Number_1_5;
 
-      case NUMBER_1_1:
-         return Messages.Value_Formatter_Number_1_1;
+      case PACE_MM_SS:              return Messages.Value_Formatter_Pace_MM_SS;
 
-      case NUMBER_1_2:
-         return Messages.Value_Formatter_Number_1_2;
+      case DATE_TIME:               return Messages.Value_Formatter_Time_DD_MM_YYY;
+      case DATE_TIME_HH_MM_SS:      return Messages.Value_Formatter_Time_DD_MM_YYY__HH_MM_SS;
 
-      case NUMBER_1_3:
-         return Messages.Value_Formatter_Number_1_3;
+      case EQUIPMENT_BRAND:         return Messages.Value_Formatter_Equipment_Brand;
+      case EQUIPMENT_MODEL:         return Messages.Value_Formatter_Equipment_Model;
+      case EQUIPMENT_BRAND_MODEL:   return Messages.Value_Formatter_Equipment_BrandModel;
+      case EQUIPMENT_TYPE:          return Messages.Value_Formatter_Equipment_Type;
 
-      case NUMBER_1_4:
-         return Messages.Value_Formatter_Number_1_4;
+      case PERIOD_DAY:              return Messages.Value_Formatter_Period_Day;
+      case PERIOD_YEAR_MONTH_DAY:   return Messages.Value_Formatter_Period_YearMonthDay;
 
-      case NUMBER_1_5:
-         return Messages.Value_Formatter_Number_1_5;
-
-      case PACE_MM_SS:
-         return Messages.Value_Formatter_Pace_MM_SS;
-
-      case DATE_TIME:
-         return Messages.Value_Formatter_Time_DD_MM_YYY;
-
-      case DATE_TIME_HH_MM_SS:
-         return Messages.Value_Formatter_Time_DD_MM_YYY__HH_MM_SS;
-
-      case EQUIPMENT_BRAND:
-         return Messages.Value_Formatter_Equipment_Brand;
-
-      case EQUIPMENT_MODEL:
-         return Messages.Value_Formatter_Equipment_Model;
-
-      case EQUIPMENT_BRAND_MODEL:
-         return Messages.Value_Formatter_Equipment_BrandModel;
-
-      case EQUIPMENT_TYPE:
-         return Messages.Value_Formatter_Equipment_Type;
-
-      case PERIOD_DAY:
-         return Messages.Value_Formatter_Period_Day;
-
-      case PERIOD_YEAR_MONTH_DAY:
-         return Messages.Value_Formatter_Period_YearMonthDay;
-
-      case TIME_HH:
-         return Messages.Value_Formatter_Time_HH;
-
-      case TIME_HH_MM:
-         return Messages.Value_Formatter_Time_HH_MM;
-
-      case TIME_HH_MM_SS:
-         return Messages.Value_Formatter_Time_HH_MM_SS;
-
-      case TIME_SSS:
-         return Messages.Value_Formatter_Time_SSS;
+      case TIME_HH:                 return Messages.Value_Formatter_Time_HH;
+      case TIME_HH_MM:              return Messages.Value_Formatter_Time_HH_MM;
+      case TIME_HH_MM_SS:           return Messages.Value_Formatter_Time_HH_MM_SS;
+      case TIME_SSS:                return Messages.Value_Formatter_Time_SSS;
+      case TIME_DURATION:           return Messages.Value_Formatter_Time_Duration;
 
       case DEFAULT:
       case DUMMY_VALUE:
       default:
          break;
       }
+
+// SET_FORMATTING_ON
 
       return UI.EMPTY_STRING;
    }

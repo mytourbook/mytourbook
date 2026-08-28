@@ -679,8 +679,9 @@ public class UI {
    private static final String                  DISTANCE_MILES_7_8         = "7/8";                      //$NON-NLS-1$
    //
    public static final PeriodFormatter          DEFAULT_DURATION_FORMATTER;
-   public static final PeriodFormatter          DEFAULT_DURATION_FORMATTER_SHORT;
-   public static final PeriodFormatter          DURATION_FORMATTER_YEAR_MONTH_DAY;
+   public static final PeriodFormatter          DURATION_FORMATTER_DDD_HH_MM_SS;
+   public static final PeriodFormatter          DURATION_FORMATTER_YYYY_MM_DD_HH_MM_SS_MS;
+   public static final PeriodFormatter          DURATION_FORMATTER_YYYY_MM_DD;
 
    private static StringBuilder                 _formatterSB               = new StringBuilder();
    private static Formatter                     _formatter                 = new Formatter(_formatterSB);
@@ -913,8 +914,8 @@ public class UI {
 
 // SET_FORMATTING_ON
 
-      final String commaSpace = Messages.Period_Format_CommaSpace;
-      final String space2 = Messages.Period_Format_SpaceAndSpace;
+      final String commaSpace = Messages.Period_Format_CommaSpace; // ,_
+      final String spaceANDspace = Messages.Period_Format_SpaceAndSpace; // _and_
 
       final String[] variants = {
 
@@ -928,73 +929,97 @@ public class UI {
 
             .appendYears()
             .appendSuffix(Messages.Period_Format_Year, Messages.Period_Format_Years)
-            .appendSeparator(commaSpace, space2, variants)
+            .appendSeparator(commaSpace, spaceANDspace, variants)
 
             .appendMonths()
             .appendSuffix(Messages.Period_Format_Month, Messages.Period_Format_Months)
-            .appendSeparator(commaSpace, space2, variants)
+            .appendSeparator(commaSpace, spaceANDspace, variants)
 
             .appendWeeks()
             .appendSuffix(Messages.Period_Format_Week, Messages.Period_Format_Weeks)
-            .appendSeparator(commaSpace, space2, variants)
+            .appendSeparator(commaSpace, spaceANDspace, variants)
 
             .appendDays()
             .appendSuffix(Messages.Period_Format_Day, Messages.Period_Format_Days)
-            .appendSeparator(commaSpace, space2, variants)
+            .appendSeparator(commaSpace, spaceANDspace, variants)
 
             .appendHours()
             .appendSuffix(Messages.Period_Format_Hour, Messages.Period_Format_Hours)
-            .appendSeparator(commaSpace, space2, variants)
+            .appendSeparator(commaSpace, spaceANDspace, variants)
 
             .appendMinutes()
             .appendSuffix(Messages.Period_Format_Minute, Messages.Period_Format_Minutes)
-            .appendSeparator(commaSpace, space2, variants)
+            .appendSeparator(commaSpace, spaceANDspace, variants)
 
             .appendSeconds()
             .appendSuffix(Messages.Period_Format_Second, Messages.Period_Format_Seconds)
-            .appendSeparator(commaSpace, space2, variants)
+            .appendSeparator(commaSpace, spaceANDspace, variants)
 
             .appendMillis()
             .appendSuffix(Messages.Period_Format_Millisecond, Messages.Period_Format_Milliseconds)
 
             .toFormatter();
 
-      DEFAULT_DURATION_FORMATTER_SHORT = new PeriodFormatterBuilder()
+      DURATION_FORMATTER_DDD_HH_MM_SS = new PeriodFormatterBuilder()
+
+            .appendDays()
+            .appendSuffix(UI.SYMBOL_COLON)
+
+            // forces 2 digits for subsequent fields
+            .minimumPrintedDigits(2)
+
+            // always print zero values
+            .printZeroAlways()
+//          .printZeroRarelyFirst()
+//          .printZeroRarelyLast()
+//          .printZeroIfSupported()
+
+            .appendHours()
+            .appendSuffix(UI.SYMBOL_COLON)
+
+            .appendMinutes()
+            .appendSuffix(UI.SYMBOL_COLON)
+
+            .appendSeconds()
+
+            .toFormatter();
+
+      DURATION_FORMATTER_YYYY_MM_DD_HH_MM_SS_MS = new PeriodFormatterBuilder()
 
             .appendYears()
             .appendSuffix(Messages.Period_Format_Year_Short, Messages.Period_Format_Year_Short)
-            .appendSeparator(commaSpace, space2, variants)
+            .appendSeparator(commaSpace, spaceANDspace, variants)
 
             .appendMonths()
             .appendSuffix(Messages.Period_Format_Month_Short, Messages.Period_Format_Month_Short)
-            .appendSeparator(commaSpace, space2, variants)
+            .appendSeparator(commaSpace, spaceANDspace, variants)
 
             .appendWeeks()
             .appendSuffix(Messages.Period_Format_Week_Short, Messages.Period_Format_Week_Short)
-            .appendSeparator(commaSpace, space2, variants)
+            .appendSeparator(commaSpace, spaceANDspace, variants)
 
             .appendDays()
             .appendSuffix(Messages.Period_Format_Day_Short, Messages.Period_Format_Day_Short)
-            .appendSeparator(commaSpace, space2, variants)
+            .appendSeparator(commaSpace, spaceANDspace, variants)
 
             .appendHours()
             .appendSuffix(Messages.Period_Format_Hour_Short, Messages.Period_Format_Hour_Short)
-            .appendSeparator(commaSpace, space2, variants)
+            .appendSeparator(commaSpace, spaceANDspace, variants)
 
             .appendMinutes()
             .appendSuffix(Messages.Period_Format_Minute_Short, Messages.Period_Format_Minute_Short)
-            .appendSeparator(commaSpace, space2, variants)
+            .appendSeparator(commaSpace, spaceANDspace, variants)
 
             .appendSeconds()
             .appendSuffix(Messages.Period_Format_Second_Short, Messages.Period_Format_Second_Short)
-            .appendSeparator(commaSpace, space2, variants)
+            .appendSeparator(commaSpace, spaceANDspace, variants)
 
             .appendMillis()
             .appendSuffix(Messages.Period_Format_Millisecond_Short, Messages.Period_Format_Millisecond_Short)
 
             .toFormatter();
 
-      DURATION_FORMATTER_YEAR_MONTH_DAY = new PeriodFormatterBuilder()
+      DURATION_FORMATTER_YYYY_MM_DD = new PeriodFormatterBuilder()
 
             .appendYears()
             .appendSuffix(Messages.Period_Format_Year_Short, Messages.Period_Format_Year_Short)
