@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2025 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2026 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -31,6 +31,7 @@ import net.tourbook.common.CommonImages;
 import net.tourbook.common.UI;
 import net.tourbook.common.font.MTFont;
 import net.tourbook.common.formatter.FormatManager;
+import net.tourbook.common.formatter.ValueFormat;
 import net.tourbook.common.preferences.ICommonPreferences;
 import net.tourbook.common.time.TimeTools;
 import net.tourbook.common.time.TourDateTime;
@@ -92,6 +93,7 @@ import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.ui.IWorkbenchPart;
 import org.joda.time.Period;
 import org.joda.time.PeriodType;
+import org.joda.time.format.PeriodFormatterBuilder;
 
 public class TourInfoUI implements ICanHideTooltip {
 
@@ -103,23 +105,24 @@ public class TourInfoUI implements ICanHideTooltip {
    private static final String            BATTERY_FORMAT      = "... %d %%";                          //$NON-NLS-1$
    private static final String            GEAR_SHIFT_FORMAT   = "%d / %d";                            //$NON-NLS-1$
 
-   private static final IPreferenceStore  _prefStoreCommon    = CommonActivator.getPrefStore();
+   private static final String            HH_MM_SS            = ValueFormat.TIME_HH_MM_SS.name();
+   private static final String            DURATION            = ValueFormat.TIME_DURATION.name();
 
    private static final DateTimeFormatter _dtHistoryFormatter = DateTimeFormatter.ofLocalizedDateTime(
          FormatStyle.FULL,
          FormatStyle.MEDIUM);
 
-   private static PeriodType              _tourPeriodTemplate = PeriodType.yearMonthDayTime()
+   private static PeriodType              _usedDurationFields = PeriodType.yearMonthDayTime()
 
-         // hide these components
-         // .withMinutesRemoved()
+         // exclude these fields that days are cumulating months and years
 
-         .withSecondsRemoved()
-         .withMillisRemoved()
-//
-   ;
+         .withYearsRemoved()
+         .withMonthsRemoved()
+
+         .withMillisRemoved();
 
    private static final IPreferenceStore  _prefStore          = TourbookPlugin.getPrefStore();
+   private static final IPreferenceStore  _prefStore_Common   = CommonActivator.getPrefStore();
    private static final IDialogSettings   _state              = TourbookPlugin.getState(ID);
 
    private final NumberFormat             _nf0                = NumberFormat.getNumberInstance();
@@ -745,7 +748,7 @@ public class TourInfoUI implements ICanHideTooltip {
          _lblBreakTime_Unit = createUI_Label(container, Messages.Tour_Tooltip_Label_Hour);
       }
 
-      if (isSimpleTour()) {
+      if (isOneOrLess24hTour()) {
 
          createUI_Spacer(container);
 
@@ -880,6 +883,11 @@ public class TourInfoUI implements ICanHideTooltip {
 
       createUI_Spacer(container);
 
+      final boolean isRecordedWithSeconds = HH_MM_SS.equals(_prefStore_Common.getString(ICommonPreferences.DISPLAY_FORMAT_RECORDED_TIME));
+      final String lblTimeUnit = isRecordedWithSeconds
+            ? UI.EMPTY_STRING
+            : UI.SPACE + Messages.Tour_Tooltip_Label_Hour;
+
       final List<TourPersonHRZone> tourPersonHrZones = _tourData.getDataPerson().getHrZonesSorted();
 
       final long movingTime = _tourData.getTourComputedTime_Moving();
@@ -898,9 +906,7 @@ public class TourInfoUI implements ICanHideTooltip {
                + UI.SPACE
                + UI.SYMBOL_PERCENTAGE;
 
-         final String lblTimeText = FormatManager.formatRecordedTime(timeInTimeZone)
-               + UI.SPACE
-               + Messages.Tour_Tooltip_Label_Hour;
+         final String lblTimeText = FormatManager.formatRecordedTime(timeInTimeZone) + lblTimeUnit;
 
          // label: HR zone
          createUI_Label(container, currentHrZone.getNameShort());
@@ -1896,14 +1902,17 @@ public class TourInfoUI implements ICanHideTooltip {
 // SET_FORMATTING_ON
    }
 
-   private boolean isSimpleTour() {
+   /**
+    * @return Return <code>true</code> when the tour is less 24h or only one tour
+    */
+   private boolean isOneOrLess24hTour() {
 
       final long elapsedTime = _tourData.getTourDeviceTime_Elapsed();
 
-      final boolean isShortTour = elapsedTime < UI.DAY_IN_SECONDS;
+      final boolean isLess24h = elapsedTime < UI.DAY_IN_SECONDS;
       final boolean isSingleTour = !_tourData.isMultipleTours();
 
-      return isShortTour || isSingleTour;
+      return isLess24h || isSingleTour;
    }
 
    public boolean isUIEmbedded() {
@@ -1949,6 +1958,22 @@ public class TourInfoUI implements ICanHideTooltip {
                new SelectionSensor(deviceSensor, _tourData.getTourId()),
                _part);
       }
+   }
+
+   /**
+    * Could not find a method in the {@link PeriodFormatterBuilder} to remove the first leading 0
+    *
+    * @param valueText
+    *
+    * @return
+    */
+   private String removeLeading0(final String valueText) {
+
+      if (valueText.startsWith(UI.ZERO)) {
+         return valueText.substring(1, valueText.length());
+      }
+
+      return valueText;
    }
 
    private void restoreState_BeforeUI(final Composite parent) {
@@ -2183,21 +2208,56 @@ public class TourInfoUI implements ICanHideTooltip {
       /*
        * Column: Left
        */
-      final long elapsedTime = _tourData.getTourDeviceTime_Elapsed();
+// SET_FORMATTING_OFF
+
+      final long elapsedTime  = _tourData.getTourDeviceTime_Elapsed();
       final long recordedTime = _tourData.getTourDeviceTime_Recorded();
-      final long pausedTime = _tourData.getTourDeviceTime_Paused();
-      final long movingTime = _tourData.getTourComputedTime_Moving();
-      final long breakTime = elapsedTime - movingTime;
+      final long pausedTime   = _tourData.getTourDeviceTime_Paused();
+      final long movingTime   = _tourData.getTourComputedTime_Moving();
+      final long breakTime    = elapsedTime - movingTime;
 
-      final ZonedDateTime zdtTourStart = _tourData.getTourStartTime();
-      final ZonedDateTime zdtTourEnd = zdtTourStart.plusSeconds(elapsedTime);
+      final ZonedDateTime zdtTourStart    = _tourData.getTourStartTime();
+      final ZonedDateTime zdtTourEnd      = zdtTourStart.plusSeconds(elapsedTime);
 
-      if (isSimpleTour()) {
+
+      final String formatElapsed    = _prefStore_Common.getString(ICommonPreferences.DISPLAY_FORMAT_ELAPSED_TIME);
+      final String formatRecorded   = _prefStore_Common.getString(ICommonPreferences.DISPLAY_FORMAT_RECORDED_TIME);
+      final String formatPaused     = _prefStore_Common.getString(ICommonPreferences.DISPLAY_FORMAT_PAUSED_TIME);
+      final String formatMoving     = _prefStore_Common.getString(ICommonPreferences.DISPLAY_FORMAT_MOVING_TIME);
+      final String formatBreak      = _prefStore_Common.getString(ICommonPreferences.DISPLAY_FORMAT_BREAK_TIME);
+
+      final boolean isElapsedWithSeconds     = HH_MM_SS.equals(formatElapsed);
+      final boolean isRecordedWithSeconds    = HH_MM_SS.equals(formatRecorded);
+      final boolean isPausedWithSeconds      = HH_MM_SS.equals(formatPaused);
+      final boolean isMovingWithSeconds      = HH_MM_SS.equals(formatMoving);
+      final boolean isBreakWithSeconds       = HH_MM_SS.equals(formatBreak);
+
+      final boolean isElapsedWithDuration    = DURATION.equals(formatElapsed);
+      final boolean isRecordedWithDuration   = DURATION.equals(formatRecorded);
+      final boolean isPausedWithDuration     = DURATION.equals(formatPaused);
+      final boolean isMovingWithDuration     = DURATION.equals(formatMoving);
+      final boolean isBreakWithDuration      = DURATION.equals(formatBreak);
+
+      final boolean isAllWithSeconds = true
+               && (isElapsedWithSeconds    || isElapsedWithDuration )
+               && (isRecordedWithSeconds   || isRecordedWithDuration)
+               && (isPausedWithSeconds     || isPausedWithDuration  )
+               && (isMovingWithSeconds     || isMovingWithDuration  )
+               && (isBreakWithSeconds      || isBreakWithDuration   );
+
+      final boolean isAllWithoutSeconds         = !isAllWithSeconds;
+
+      final boolean isElapsedWithoutDuration    = !isElapsedWithDuration;
+      final boolean isRecordedWithoutDuration   = !isRecordedWithDuration;
+      final boolean isPausedWithoutDuration     = !isPausedWithDuration;
+      final boolean isMovingWithoutDuration     = !isMovingWithDuration;
+      final boolean isBreakWithoutDuration      = !isBreakWithDuration;
+
+      if (isOneOrLess24hTour()) {
 
          // < 1 day
 
-         _lblDate.setText(String.format(
-               Messages.Tour_Tooltip_Format_DateWeekTime,
+         _lblDate.setText(Messages.Tour_Tooltip_Format_DateWeekTime.formatted(
                zdtTourStart.format(TimeTools.Formatter_Date_F),
                zdtTourStart.format(TimeTools.Formatter_Time_M),
                zdtTourEnd.format(TimeTools.Formatter_Time_M),
@@ -2205,18 +2265,20 @@ public class TourInfoUI implements ICanHideTooltip {
 
          ));
 
-         // show units only when data are available
-         _lblElapsedTime_Unit.setVisible(elapsedTime > 0);
-         _lblRecordedTime_Unit.setVisible(recordedTime > 0);
-         _lblPausedTime_Unit.setVisible(pausedTime > 0);
-         _lblMovingTime_Unit.setVisible(movingTime > 0);
-         _lblBreakTime_Unit.setVisible(breakTime > 0);
+         // show units only when data are available and not a period is displayed
+         _lblElapsedTime_Unit    .setVisible(isAllWithoutSeconds && isElapsedWithoutDuration    && elapsedTime    > 0);
+         _lblRecordedTime_Unit   .setVisible(isAllWithoutSeconds && isRecordedWithoutDuration   && recordedTime   > 0);
+         _lblPausedTime_Unit     .setVisible(isAllWithoutSeconds && isPausedWithoutDuration     && pausedTime     > 0);
+         _lblMovingTime_Unit     .setVisible(isAllWithoutSeconds && isMovingWithoutDuration     && movingTime     > 0);
+         _lblBreakTime_Unit      .setVisible(isAllWithoutSeconds && isBreakWithoutDuration      && breakTime      > 0);
 
-         _lblElapsedTime.setText(FormatManager.formatElapsedTime(elapsedTime));
-         _lblRecordedTime.setText(FormatManager.formatRecordedTime(recordedTime));
-         _lblPausedTime.setText(FormatManager.formatPausedTime(pausedTime));
-         _lblMovingTime.setText(FormatManager.formatMovingTime(movingTime));
-         _lblBreakTime.setText(FormatManager.formatBreakTime(breakTime));
+         _lblElapsedTime         .setText(removeLeading0(FormatManager.formatElapsedTime  (elapsedTime)));
+         _lblRecordedTime        .setText(removeLeading0(FormatManager.formatRecordedTime (recordedTime)));
+         _lblPausedTime          .setText(removeLeading0(FormatManager.formatPausedTime   (pausedTime)));
+         _lblMovingTime          .setText(removeLeading0(FormatManager.formatMovingTime   (movingTime)));
+         _lblBreakTime           .setText(removeLeading0(FormatManager.formatBreakTime    (breakTime)));
+
+// SET_FORMATTING_ON
 
          /*
           * Time zone
@@ -2227,7 +2289,7 @@ public class TourInfoUI implements ICanHideTooltip {
          _lblTimeZoneDifference_Value.setText(tourDateTime.timeZoneOffsetLabel);
 
          // set tooltip text
-         final String defaultTimeZoneId = _prefStoreCommon.getString(ICommonPreferences.TIME_ZONE_LOCAL_ID);
+         final String defaultTimeZoneId = _prefStore_Common.getString(ICommonPreferences.TIME_ZONE_LOCAL_ID);
          final String timeZoneTooltip = NLS.bind(
                Messages.ColumnFactory_TimeZoneDifference_Tooltip,
                defaultTimeZoneId);
@@ -2237,34 +2299,37 @@ public class TourInfoUI implements ICanHideTooltip {
 
       } else {
 
-         // > 1 day
+         // > 1 day || multiple tours
 
-         _lblDate.setText(String.format(
-               Messages.Tour_Tooltip_Format_HistoryDateTime,
+         _lblDate.setText(Messages.Tour_Tooltip_Format_HistoryDateTime.formatted(
                zdtTourStart.format(_dtHistoryFormatter),
                zdtTourEnd.format(_dtHistoryFormatter)));
 
-         // hide labels, they are displayed with the period values
-         _lblElapsedTime_Unit.setVisible(false);
-         _lblRecordedTime_Unit.setVisible(false);
-         _lblPausedTime_Unit.setVisible(false);
-         _lblMovingTime_Unit.setVisible(false);
-         _lblBreakTime_Unit.setVisible(false);
+// SET_FORMATTING_OFF
 
-         final Period elapsedPeriod = new Period(
-               _tourData.getTourStartTimeMS(),
-               _tourData.getTourEndTimeMS(),
-               _tourPeriodTemplate);
-         final Period recordedPeriod = new Period(0, recordedTime * 1000, _tourPeriodTemplate);
-         final Period pausedPeriod = new Period(0, pausedTime * 1000, _tourPeriodTemplate);
-         final Period movingPeriod = new Period(0, movingTime * 1000, _tourPeriodTemplate);
-         final Period breakPeriod = new Period(0, breakTime * 1000, _tourPeriodTemplate);
+         // hide labels
+         _lblElapsedTime_Unit    .setVisible(false);
+         _lblRecordedTime_Unit   .setVisible(false);
+         _lblPausedTime_Unit     .setVisible(false);
+         _lblMovingTime_Unit     .setVisible(false);
+         _lblBreakTime_Unit      .setVisible(false);
 
-         _lblElapsedTime.setText(elapsedPeriod.toString(UI.DEFAULT_DURATION_FORMATTER_SHORT));
-         _lblRecordedTime.setText(recordedPeriod.toString(UI.DEFAULT_DURATION_FORMATTER_SHORT));
-         _lblPausedTime.setText(pausedPeriod.toString(UI.DEFAULT_DURATION_FORMATTER_SHORT));
-         _lblMovingTime.setText(movingPeriod.toString(UI.DEFAULT_DURATION_FORMATTER_SHORT));
-         _lblBreakTime.setText(breakPeriod.toString(UI.DEFAULT_DURATION_FORMATTER_SHORT));
+         final long tourStartTimeMS = _tourData.getTourStartTimeMS();
+         final long tourEndTimeMS   = _tourData.getTourEndTimeMS();
+
+         final Period elapsedPeriod    = new Period(tourStartTimeMS, tourEndTimeMS, _usedDurationFields);
+         final Period recordedPeriod   = new Period(0, recordedTime  * 1000, _usedDurationFields);
+         final Period pausedPeriod     = new Period(0, pausedTime    * 1000, _usedDurationFields);
+         final Period movingPeriod     = new Period(0, movingTime    * 1000, _usedDurationFields);
+         final Period breakPeriod      = new Period(0, breakTime     * 1000, _usedDurationFields);
+
+         _lblElapsedTime   .setText(removeLeading0(elapsedPeriod  .toString(UI.DURATION_FORMATTER_DDD_HH_MM_SS)));
+         _lblRecordedTime  .setText(removeLeading0(recordedPeriod .toString(UI.DURATION_FORMATTER_DDD_HH_MM_SS)));
+         _lblPausedTime    .setText(removeLeading0(pausedPeriod   .toString(UI.DURATION_FORMATTER_DDD_HH_MM_SS)));
+         _lblMovingTime    .setText(removeLeading0(movingPeriod   .toString(UI.DURATION_FORMATTER_DDD_HH_MM_SS)));
+         _lblBreakTime     .setText(removeLeading0(breakPeriod    .toString(UI.DURATION_FORMATTER_DDD_HH_MM_SS)));
+
+// SET_FORMATTING_ON
       }
 
       /*

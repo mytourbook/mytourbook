@@ -438,6 +438,7 @@ public class Messages extends NLS {
    public static String        Value_Formatter_Period_YearMonthDay;
    public static String        Value_Formatter_Time_DD_MM_YYY;
    public static String        Value_Formatter_Time_DD_MM_YYY__HH_MM_SS;
+   public static String        Value_Formatter_Time_Duration;
    public static String        Value_Formatter_Time_HH;
    public static String        Value_Formatter_Time_HH_MM;
    public static String        Value_Formatter_Time_HH_MM_SS;

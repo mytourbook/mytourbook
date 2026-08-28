@@ -15,11 +15,10 @@
  *******************************************************************************/
 package net.tourbook.preferences;
 
-import static org.eclipse.swt.events.SelectionListener.widgetSelectedAdapter;
-
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.CommonActivator;
+import net.tourbook.common.UI;
 import net.tourbook.common.formatter.FormatManager;
 import net.tourbook.common.formatter.ValueFormat;
 import net.tourbook.common.preferences.ICommonPreferences;
@@ -32,12 +31,14 @@ import org.eclipse.jface.preference.PreferencePage;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CTabFolder;
 import org.eclipse.swt.custom.CTabItem;
+import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Widget;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
 
@@ -58,6 +59,11 @@ public class PrefPageAppearanceDisplayFormat extends PreferencePage implements I
    private CTabFolder _tabFolder;
    private CTabItem   _tab1_OneTour;
    private CTabItem   _tab2_MultipleTours;
+
+   private Button     _btnAll_HH;
+   private Button     _btnAll_HH_MM;
+   private Button     _btnAll_HH_MM_SS;
+   private Button     _btnAll_DDD_HH_MM_SS;
 
    private Button     _chkLiveUpdate;
 
@@ -84,18 +90,23 @@ public class PrefPageAppearanceDisplayFormat extends PreferencePage implements I
    private Button     _rdoTime_Elapsed_HH;
    private Button     _rdoTime_Elapsed_HH_MM;
    private Button     _rdoTime_Elapsed_HH_MM_SS;
+   private Button     _rdoTime_Elapsed_DDD_HH_MM_SS;
    private Button     _rdoTime_Recorded_HH;
    private Button     _rdoTime_Recorded_HH_MM;
    private Button     _rdoTime_Recorded_HH_MM_SS;
+   private Button     _rdoTime_Recorded_DURATION;
    private Button     _rdoTime_Paused_HH;
    private Button     _rdoTime_Paused_HH_MM;
    private Button     _rdoTime_Paused_HH_MM_SS;
+   private Button     _rdoTime_Paused_DURATION;
    private Button     _rdoTime_Moving_HH;
    private Button     _rdoTime_Moving_HH_MM;
    private Button     _rdoTime_Moving_HH_MM_SS;
+   private Button     _rdoTime_Moving_DURATION;
    private Button     _rdoTime_Break_HH;
    private Button     _rdoTime_Break_HH_MM;
    private Button     _rdoTime_Break_HH_MM_SS;
+   private Button     _rdoTime_Break_DURATION;
 
    private Button     _rdoCadence_1_0_Summary;
    private Button     _rdoCadence_1_1_Summary;
@@ -135,6 +146,8 @@ public class PrefPageAppearanceDisplayFormat extends PreferencePage implements I
    private Button     _rdoTime_Break_HH_MM_Summary;
    private Button     _rdoTime_Break_HH_MM_SS_Summary;
 
+   private Composite  _parent;
+
    /*
     * UI controls
     */
@@ -162,6 +175,8 @@ public class PrefPageAppearanceDisplayFormat extends PreferencePage implements I
 
       restoreState();
 
+      updateUI_Layout();
+
       return container;
    }
 
@@ -177,7 +192,7 @@ public class PrefPageAppearanceDisplayFormat extends PreferencePage implements I
              */
             final Label label = new Label(container, SWT.NONE);
             label.setText(Messages.Pref_DisplayFormat_Label_Info);
-            GridDataFactory.fillDefaults()//
+            GridDataFactory.fillDefaults()
                   .span(2, 1)
                   .applyTo(label);
          }
@@ -226,6 +241,47 @@ public class PrefPageAppearanceDisplayFormat extends PreferencePage implements I
       final String formatName_HH = FormatManager.getValueFormatterName(ValueFormat.TIME_HH);
       final String formatName_HH_MM = FormatManager.getValueFormatterName(ValueFormat.TIME_HH_MM);
       final String formatName_HH_MM_SS = FormatManager.getValueFormatterName(ValueFormat.TIME_HH_MM_SS);
+      final String formatName_DURATION = FormatManager.getValueFormatterName(ValueFormat.TIME_DURATION);
+
+      final GridDataFactory gd = GridDataFactory.fillDefaults();
+      final SelectionListener allSelectionListener = SelectionListener.widgetSelectedAdapter(selectionEvent -> onModified_All(selectionEvent));
+
+      {
+         UI.createSpacer_Horizontal(parent);
+
+         /*
+          * All
+          */
+         final Composite container = new Composite(parent, SWT.NONE);
+
+         GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
+         GridLayoutFactory.fillDefaults().numColumns(4).applyTo(container);
+//         container.setBackground(UI.SYS_COLOR_GREEN);
+         {
+            /*
+             * Button: All
+             */
+            _btnAll_HH = new Button(container, SWT.PUSH);
+            _btnAll_HH.setText(Messages.PrefPage_ViewActions_Checkbox_All);
+            _btnAll_HH.addSelectionListener(allSelectionListener);
+            gd.applyTo(_btnAll_HH);
+
+            _btnAll_HH_MM = new Button(container, SWT.PUSH);
+            _btnAll_HH_MM.setText(Messages.PrefPage_ViewActions_Checkbox_All);
+            _btnAll_HH_MM.addSelectionListener(allSelectionListener);
+            gd.applyTo(_btnAll_HH_MM);
+
+            _btnAll_HH_MM_SS = new Button(container, SWT.PUSH);
+            _btnAll_HH_MM_SS.setText(Messages.PrefPage_ViewActions_Checkbox_All);
+            _btnAll_HH_MM_SS.addSelectionListener(allSelectionListener);
+            gd.applyTo(_btnAll_HH_MM_SS);
+
+            _btnAll_DDD_HH_MM_SS = new Button(container, SWT.PUSH);
+            _btnAll_DDD_HH_MM_SS.setText(Messages.PrefPage_ViewActions_Checkbox_All);
+            _btnAll_DDD_HH_MM_SS.addSelectionListener(allSelectionListener);
+            gd.applyTo(_btnAll_DDD_HH_MM_SS);
+         }
+      }
       {
          /*
           * Elapsed time format: hh ... hh:mm:ss
@@ -235,19 +291,27 @@ public class PrefPageAppearanceDisplayFormat extends PreferencePage implements I
          label.setText(Messages.pref_view_layout_label_elapsed_time_format);
 
          final Composite container = new Composite(parent, SWT.NONE);
-         GridLayoutFactory.fillDefaults().numColumns(3).applyTo(container);
+         GridLayoutFactory.fillDefaults().numColumns(4).applyTo(container);
          {
             _rdoTime_Elapsed_HH = new Button(container, SWT.RADIO);
             _rdoTime_Elapsed_HH.setText(formatName_HH);
             _rdoTime_Elapsed_HH.addSelectionListener(_defaultSelectionListener);
+            gd.applyTo(_rdoTime_Elapsed_HH);
 
             _rdoTime_Elapsed_HH_MM = new Button(container, SWT.RADIO);
             _rdoTime_Elapsed_HH_MM.setText(formatName_HH_MM);
             _rdoTime_Elapsed_HH_MM.addSelectionListener(_defaultSelectionListener);
+            gd.applyTo(_rdoTime_Elapsed_HH_MM);
 
             _rdoTime_Elapsed_HH_MM_SS = new Button(container, SWT.RADIO);
             _rdoTime_Elapsed_HH_MM_SS.setText(formatName_HH_MM_SS);
             _rdoTime_Elapsed_HH_MM_SS.addSelectionListener(_defaultSelectionListener);
+            gd.applyTo(_rdoTime_Elapsed_HH_MM_SS);
+
+            _rdoTime_Elapsed_DDD_HH_MM_SS = new Button(container, SWT.RADIO);
+            _rdoTime_Elapsed_DDD_HH_MM_SS.setText(formatName_DURATION);
+            _rdoTime_Elapsed_DDD_HH_MM_SS.addSelectionListener(_defaultSelectionListener);
+            gd.applyTo(_rdoTime_Elapsed_DDD_HH_MM_SS);
          }
       }
 
@@ -260,7 +324,7 @@ public class PrefPageAppearanceDisplayFormat extends PreferencePage implements I
          label.setText(Messages.pref_view_layout_label_recorded_time_format);
 
          final Composite container = new Composite(parent, SWT.NONE);
-         GridLayoutFactory.fillDefaults().numColumns(3).applyTo(container);
+         GridLayoutFactory.fillDefaults().numColumns(4).applyTo(container);
          {
             _rdoTime_Recorded_HH = new Button(container, SWT.RADIO);
             _rdoTime_Recorded_HH.setText(formatName_HH);
@@ -273,6 +337,10 @@ public class PrefPageAppearanceDisplayFormat extends PreferencePage implements I
             _rdoTime_Recorded_HH_MM_SS = new Button(container, SWT.RADIO);
             _rdoTime_Recorded_HH_MM_SS.setText(formatName_HH_MM_SS);
             _rdoTime_Recorded_HH_MM_SS.addSelectionListener(_defaultSelectionListener);
+
+            _rdoTime_Recorded_DURATION = new Button(container, SWT.RADIO);
+            _rdoTime_Recorded_DURATION.setText(formatName_DURATION);
+            _rdoTime_Recorded_DURATION.addSelectionListener(_defaultSelectionListener);
          }
       }
 
@@ -285,7 +353,7 @@ public class PrefPageAppearanceDisplayFormat extends PreferencePage implements I
          label.setText(Messages.pref_view_layout_label_paused_time_format);
 
          final Composite container = new Composite(parent, SWT.NONE);
-         GridLayoutFactory.fillDefaults().numColumns(3).applyTo(container);
+         GridLayoutFactory.fillDefaults().numColumns(4).applyTo(container);
          {
             _rdoTime_Paused_HH = new Button(container, SWT.RADIO);
             _rdoTime_Paused_HH.setText(formatName_HH);
@@ -298,6 +366,10 @@ public class PrefPageAppearanceDisplayFormat extends PreferencePage implements I
             _rdoTime_Paused_HH_MM_SS = new Button(container, SWT.RADIO);
             _rdoTime_Paused_HH_MM_SS.setText(formatName_HH_MM_SS);
             _rdoTime_Paused_HH_MM_SS.addSelectionListener(_defaultSelectionListener);
+
+            _rdoTime_Paused_DURATION = new Button(container, SWT.RADIO);
+            _rdoTime_Paused_DURATION.setText(formatName_DURATION);
+            _rdoTime_Paused_DURATION.addSelectionListener(_defaultSelectionListener);
          }
       }
 
@@ -310,7 +382,7 @@ public class PrefPageAppearanceDisplayFormat extends PreferencePage implements I
          label.setText(Messages.pref_view_layout_label_moving_time_format);
 
          final Composite container = new Composite(parent, SWT.NONE);
-         GridLayoutFactory.fillDefaults().numColumns(3).applyTo(container);
+         GridLayoutFactory.fillDefaults().numColumns(4).applyTo(container);
          {
             _rdoTime_Moving_HH = new Button(container, SWT.RADIO);
             _rdoTime_Moving_HH.setText(formatName_HH);
@@ -323,6 +395,10 @@ public class PrefPageAppearanceDisplayFormat extends PreferencePage implements I
             _rdoTime_Moving_HH_MM_SS = new Button(container, SWT.RADIO);
             _rdoTime_Moving_HH_MM_SS.setText(formatName_HH_MM_SS);
             _rdoTime_Moving_HH_MM_SS.addSelectionListener(_defaultSelectionListener);
+
+            _rdoTime_Moving_DURATION = new Button(container, SWT.RADIO);
+            _rdoTime_Moving_DURATION.setText(formatName_DURATION);
+            _rdoTime_Moving_DURATION.addSelectionListener(_defaultSelectionListener);
          }
       }
 
@@ -335,7 +411,7 @@ public class PrefPageAppearanceDisplayFormat extends PreferencePage implements I
          label.setText(Messages.pref_view_layout_label_break_time_format);
 
          final Composite container = new Composite(parent, SWT.NONE);
-         GridLayoutFactory.fillDefaults().numColumns(3).applyTo(container);
+         GridLayoutFactory.fillDefaults().numColumns(4).applyTo(container);
          {
             _rdoTime_Break_HH = new Button(container, SWT.RADIO);
             _rdoTime_Break_HH.setText(formatName_HH);
@@ -348,6 +424,10 @@ public class PrefPageAppearanceDisplayFormat extends PreferencePage implements I
             _rdoTime_Break_HH_MM_SS = new Button(container, SWT.RADIO);
             _rdoTime_Break_HH_MM_SS.setText(formatName_HH_MM_SS);
             _rdoTime_Break_HH_MM_SS.addSelectionListener(_defaultSelectionListener);
+
+            _rdoTime_Break_DURATION = new Button(container, SWT.RADIO);
+            _rdoTime_Break_DURATION.setText(formatName_DURATION);
+            _rdoTime_Break_DURATION.addSelectionListener(_defaultSelectionListener);
          }
       }
    }
@@ -892,7 +972,7 @@ public class PrefPageAppearanceDisplayFormat extends PreferencePage implements I
    private void doLiveUpdate() {
 
       if (_chkLiveUpdate.getSelection()) {
-         performApply();
+         saveState();
       }
    }
 
@@ -903,9 +983,11 @@ public class PrefPageAppearanceDisplayFormat extends PreferencePage implements I
 
    private void initUI(final Composite parent) {
 
+      _parent = parent;
+
       _pc = new PixelConverter(parent);
 
-      _defaultSelectionListener = widgetSelectedAdapter(selectionEvent -> onSelection());
+      _defaultSelectionListener = SelectionListener.widgetSelectedAdapter(selectionEvent -> onModified(selectionEvent));
    }
 
    @Override
@@ -916,17 +998,88 @@ public class PrefPageAppearanceDisplayFormat extends PreferencePage implements I
       return super.okToLeave();
    }
 
-   private void onSelection() {
+   private void onModified(final SelectionEvent selectionEvent) {
 
-      doLiveUpdate();
+      final Widget widget = selectionEvent.widget;
+
+      if (widget instanceof final Button button) {
+
+         /*
+          * The radio button is fire the selection event twice, not selected and selected
+          */
+         if (button.getSelection()) {
+
+            doLiveUpdate();
+         }
+      }
    }
 
-   @Override
-   protected void performApply() {
+   private void onModified_All(final SelectionEvent selectionEvent) {
 
-      saveState();
+      final Widget selectedWidget = selectionEvent.widget;
 
-      super.performApply();
+// SET_FORMATTING_OFF
+
+      _rdoTime_Elapsed_HH              .setSelection(false);
+      _rdoTime_Recorded_HH             .setSelection(false);
+      _rdoTime_Paused_HH               .setSelection(false);
+      _rdoTime_Moving_HH               .setSelection(false);
+      _rdoTime_Break_HH                .setSelection(false);
+
+      _rdoTime_Elapsed_HH_MM           .setSelection(false);
+      _rdoTime_Recorded_HH_MM          .setSelection(false);
+      _rdoTime_Paused_HH_MM            .setSelection(false);
+      _rdoTime_Moving_HH_MM            .setSelection(false);
+      _rdoTime_Break_HH_MM             .setSelection(false);
+
+      _rdoTime_Elapsed_HH_MM_SS        .setSelection(false);
+      _rdoTime_Recorded_HH_MM_SS       .setSelection(false);
+      _rdoTime_Paused_HH_MM_SS         .setSelection(false);
+      _rdoTime_Moving_HH_MM_SS         .setSelection(false);
+      _rdoTime_Break_HH_MM_SS          .setSelection(false);
+
+      _rdoTime_Elapsed_DDD_HH_MM_SS    .setSelection(false);
+      _rdoTime_Recorded_DURATION       .setSelection(false);
+      _rdoTime_Paused_DURATION         .setSelection(false);
+      _rdoTime_Moving_DURATION         .setSelection(false);
+      _rdoTime_Break_DURATION          .setSelection(false);
+
+      if (selectedWidget == _btnAll_HH) {
+
+         _rdoTime_Elapsed_HH           .setSelection(true);
+         _rdoTime_Recorded_HH          .setSelection(true);
+         _rdoTime_Paused_HH            .setSelection(true);
+         _rdoTime_Moving_HH            .setSelection(true);
+         _rdoTime_Break_HH             .setSelection(true);
+
+      } else if (selectedWidget == _btnAll_HH_MM) {
+
+         _rdoTime_Elapsed_HH_MM        .setSelection(true);
+         _rdoTime_Recorded_HH_MM       .setSelection(true);
+         _rdoTime_Paused_HH_MM         .setSelection(true);
+         _rdoTime_Moving_HH_MM         .setSelection(true);
+         _rdoTime_Break_HH_MM          .setSelection(true);
+
+      } else if (selectedWidget == _btnAll_HH_MM_SS) {
+
+         _rdoTime_Elapsed_HH_MM_SS     .setSelection(true);
+         _rdoTime_Recorded_HH_MM_SS    .setSelection(true);
+         _rdoTime_Paused_HH_MM_SS      .setSelection(true);
+         _rdoTime_Moving_HH_MM_SS      .setSelection(true);
+         _rdoTime_Break_HH_MM_SS       .setSelection(true);
+
+      } else if (selectedWidget == _btnAll_DDD_HH_MM_SS) {
+
+         _rdoTime_Elapsed_DDD_HH_MM_SS .setSelection(true);
+         _rdoTime_Recorded_DURATION    .setSelection(true);
+         _rdoTime_Paused_DURATION      .setSelection(true);
+         _rdoTime_Moving_DURATION      .setSelection(true);
+         _rdoTime_Break_DURATION       .setSelection(true);
+      }
+
+// SET_FORMATTING_ON
+
+      doLiveUpdate();
    }
 
    @Override
@@ -1015,6 +1168,7 @@ public class PrefPageAppearanceDisplayFormat extends PreferencePage implements I
       final boolean isElapsed_HH                = ValueFormat.TIME_HH.name()        .equals(elapsedTime);
       final boolean isElapsed_HH_MM             = ValueFormat.TIME_HH_MM.name()     .equals(elapsedTime);
       final boolean isElapsed_HH_MM_SS          = ValueFormat.TIME_HH_MM_SS.name()  .equals(elapsedTime);
+      final boolean isElapsed_DURATION          = ValueFormat.TIME_DURATION.name()  .equals(elapsedTime);
       final boolean isElapsed_HH_Summary        = ValueFormat.TIME_HH.name()        .equals(elapsedTime_Summary);
       final boolean isElapsed_HH_MM_Summary     = ValueFormat.TIME_HH_MM.name()     .equals(elapsedTime_Summary);
       final boolean isElapsed_HH_MM_SS_Summary  = ValueFormat.TIME_HH_MM_SS.name()  .equals(elapsedTime_Summary);
@@ -1022,6 +1176,7 @@ public class PrefPageAppearanceDisplayFormat extends PreferencePage implements I
       final boolean isRecorded_HH               = ValueFormat.TIME_HH.name()        .equals(recordedTime);
       final boolean isRecorded_HH_MM            = ValueFormat.TIME_HH_MM.name()     .equals(recordedTime);
       final boolean isRecorded_HH_MM_SS         = ValueFormat.TIME_HH_MM_SS.name()  .equals(recordedTime);
+      final boolean isRecorded_DURATION         = ValueFormat.TIME_DURATION.name()  .equals(recordedTime);
       final boolean isRecorded_HH_Summary       = ValueFormat.TIME_HH.name()        .equals(recordedTime_Summary);
       final boolean isRecorded_HH_MM_Summary    = ValueFormat.TIME_HH_MM.name()     .equals(recordedTime_Summary);
       final boolean isRecorded_HH_MM_SS_Summary = ValueFormat.TIME_HH_MM_SS.name()  .equals(recordedTime_Summary);
@@ -1029,6 +1184,7 @@ public class PrefPageAppearanceDisplayFormat extends PreferencePage implements I
       final boolean isPaused_HH                 = ValueFormat.TIME_HH.name()        .equals(pausedTime);
       final boolean isPaused_HH_MM              = ValueFormat.TIME_HH_MM.name()     .equals(pausedTime);
       final boolean isPaused_HH_MM_SS           = ValueFormat.TIME_HH_MM_SS.name()  .equals(pausedTime);
+      final boolean isPaused_DURATION           = ValueFormat.TIME_DURATION.name()  .equals(pausedTime);
       final boolean isPaused_HH_Summary         = ValueFormat.TIME_HH.name()        .equals(pausedTime_Summary);
       final boolean isPaused_HH_MM_Summary      = ValueFormat.TIME_HH_MM.name()     .equals(pausedTime_Summary);
       final boolean isPaused_HH_MM_SS_Summary   = ValueFormat.TIME_HH_MM_SS.name()  .equals(pausedTime_Summary);
@@ -1036,6 +1192,7 @@ public class PrefPageAppearanceDisplayFormat extends PreferencePage implements I
       final boolean isMoving_HH                 = ValueFormat.TIME_HH.name()        .equals(movingTime);
       final boolean isMoving_HH_MM              = ValueFormat.TIME_HH_MM.name()     .equals(movingTime);
       final boolean isMoving_HH_MM_SS           = ValueFormat.TIME_HH_MM_SS.name()  .equals(movingTime);
+      final boolean isMoving_DURATION           = ValueFormat.TIME_DURATION.name()  .equals(movingTime);
       final boolean isMoving_HH_Summary         = ValueFormat.TIME_HH.name()        .equals(movingTime_Summary);
       final boolean isMoving_HH_MM_Summary      = ValueFormat.TIME_HH_MM.name()     .equals(movingTime_Summary);
       final boolean isMoving_HH_MM_SS_Summary   = ValueFormat.TIME_HH_MM_SS.name()  .equals(movingTime_Summary);
@@ -1043,6 +1200,7 @@ public class PrefPageAppearanceDisplayFormat extends PreferencePage implements I
       final boolean isBreak_HH                  = ValueFormat.TIME_HH.name()        .equals(breakTime);
       final boolean isBreak_HH_MM               = ValueFormat.TIME_HH_MM.name()     .equals(breakTime);
       final boolean isBreak_HH_MM_SS            = ValueFormat.TIME_HH_MM_SS.name()  .equals(breakTime);
+      final boolean isBreak_DURATION            = ValueFormat.TIME_DURATION.name()  .equals(breakTime);
       final boolean isBreak_HH_Summary          = ValueFormat.TIME_HH.name()        .equals(breakTime_Summary);
       final boolean isBreak_HH_MM_Summary       = ValueFormat.TIME_HH_MM.name()     .equals(breakTime_Summary);
       final boolean isBreak_HH_MM_SS_Summary    = ValueFormat.TIME_HH_MM_SS.name()  .equals(breakTime_Summary);
@@ -1085,22 +1243,27 @@ public class PrefPageAppearanceDisplayFormat extends PreferencePage implements I
          _rdoTime_Elapsed_HH                    .setSelection(isElapsed_HH);
          _rdoTime_Elapsed_HH_MM                 .setSelection(isElapsed_HH_MM);
          _rdoTime_Elapsed_HH_MM_SS              .setSelection(isElapsed_HH_MM_SS);
+         _rdoTime_Elapsed_DDD_HH_MM_SS          .setSelection(isElapsed_DURATION);
 
          _rdoTime_Recorded_HH                   .setSelection(isRecorded_HH);
          _rdoTime_Recorded_HH_MM                .setSelection(isRecorded_HH_MM);
          _rdoTime_Recorded_HH_MM_SS             .setSelection(isRecorded_HH_MM_SS);
+         _rdoTime_Recorded_DURATION             .setSelection(isRecorded_DURATION);
 
          _rdoTime_Paused_HH                     .setSelection(isPaused_HH);
          _rdoTime_Paused_HH_MM                  .setSelection(isPaused_HH_MM);
          _rdoTime_Paused_HH_MM_SS               .setSelection(isPaused_HH_MM_SS);
+         _rdoTime_Paused_DURATION               .setSelection(isPaused_DURATION);
 
          _rdoTime_Moving_HH                     .setSelection(isMoving_HH);
          _rdoTime_Moving_HH_MM                  .setSelection(isMoving_HH_MM);
          _rdoTime_Moving_HH_MM_SS               .setSelection(isMoving_HH_MM_SS);
+         _rdoTime_Moving_DURATION               .setSelection(isMoving_DURATION);
 
          _rdoTime_Break_HH                      .setSelection(isBreak_HH);
          _rdoTime_Break_HH_MM                   .setSelection(isBreak_HH_MM);
          _rdoTime_Break_HH_MM_SS                .setSelection(isBreak_HH_MM_SS);
+         _rdoTime_Break_DURATION                .setSelection(isBreak_DURATION);
 
 
       } else if (selectedTab == 1) {
@@ -1248,6 +1411,7 @@ public class PrefPageAppearanceDisplayFormat extends PreferencePage implements I
       final boolean isElapsed_HH                = ValueFormat.TIME_HH.name()        .equals(elapsedTime);
       final boolean isElapsed_HH_MM             = ValueFormat.TIME_HH_MM.name()     .equals(elapsedTime);
       final boolean isElapsed_HH_MM_SS          = ValueFormat.TIME_HH_MM_SS.name()  .equals(elapsedTime);
+      final boolean isElapsed_DURATION          = ValueFormat.TIME_DURATION.name()  .equals(elapsedTime);
       final boolean isElapsed_HH_Summary        = ValueFormat.TIME_HH.name()        .equals(elapsedTime_Summary);
       final boolean isElapsed_HH_MM_Summary     = ValueFormat.TIME_HH_MM.name()     .equals(elapsedTime_Summary);
       final boolean isElapsed_HH_MM_SS_Summary  = ValueFormat.TIME_HH_MM_SS.name()  .equals(elapsedTime_Summary);
@@ -1255,6 +1419,7 @@ public class PrefPageAppearanceDisplayFormat extends PreferencePage implements I
       final boolean isRecorded_HH               = ValueFormat.TIME_HH.name()        .equals(recordedTime);
       final boolean isRecorded_HH_MM            = ValueFormat.TIME_HH_MM.name()     .equals(recordedTime);
       final boolean isRecorded_HH_MM_SS         = ValueFormat.TIME_HH_MM_SS.name()  .equals(recordedTime);
+      final boolean isRecorded_DURATION         = ValueFormat.TIME_DURATION.name() .equals(recordedTime);
       final boolean isRecorded_HH_Summary       = ValueFormat.TIME_HH.name()        .equals(recordedTime_Summary);
       final boolean isRecorded_HH_MM_Summary    = ValueFormat.TIME_HH_MM.name()     .equals(recordedTime_Summary);
       final boolean isRecorded_HH_MM_SS_Summary = ValueFormat.TIME_HH_MM_SS.name()  .equals(recordedTime_Summary);
@@ -1262,6 +1427,7 @@ public class PrefPageAppearanceDisplayFormat extends PreferencePage implements I
       final boolean isPaused_HH                 = ValueFormat.TIME_HH.name()        .equals(pausedTime);
       final boolean isPaused_HH_MM              = ValueFormat.TIME_HH_MM.name()     .equals(pausedTime);
       final boolean isPaused_HH_MM_SS           = ValueFormat.TIME_HH_MM_SS.name()  .equals(pausedTime);
+      final boolean isPaused_DURATION           = ValueFormat.TIME_DURATION.name()   .equals(pausedTime);
       final boolean isPaused_HH_Summary         = ValueFormat.TIME_HH.name()        .equals(pausedTime_Summary);
       final boolean isPaused_HH_MM_Summary      = ValueFormat.TIME_HH_MM.name()     .equals(pausedTime_Summary);
       final boolean isPaused_HH_MM_SS_Summary   = ValueFormat.TIME_HH_MM_SS.name()  .equals(pausedTime_Summary);
@@ -1269,6 +1435,7 @@ public class PrefPageAppearanceDisplayFormat extends PreferencePage implements I
       final boolean isMoving_HH                 = ValueFormat.TIME_HH.name()        .equals(movingTime);
       final boolean isMoving_HH_MM              = ValueFormat.TIME_HH_MM.name()     .equals(movingTime);
       final boolean isMoving_HH_MM_SS           = ValueFormat.TIME_HH_MM_SS.name()  .equals(movingTime);
+      final boolean isMoving_DURATION           = ValueFormat.TIME_DURATION.name()   .equals(movingTime);
       final boolean isMoving_HH_Summary         = ValueFormat.TIME_HH.name()        .equals(movingTime_Summary);
       final boolean isMoving_HH_MM_Summary      = ValueFormat.TIME_HH_MM.name()     .equals(movingTime_Summary);
       final boolean isMoving_HH_MM_SS_Summary   = ValueFormat.TIME_HH_MM_SS.name()  .equals(movingTime_Summary);
@@ -1276,6 +1443,7 @@ public class PrefPageAppearanceDisplayFormat extends PreferencePage implements I
       final boolean isBreak_HH                  = ValueFormat.TIME_HH.name()        .equals(breakTime);
       final boolean isBreak_HH_MM               = ValueFormat.TIME_HH_MM.name()     .equals(breakTime);
       final boolean isBreak_HH_MM_SS            = ValueFormat.TIME_HH_MM_SS.name()  .equals(breakTime);
+      final boolean isBreak_DURATION            = ValueFormat.TIME_DURATION.name()    .equals(breakTime);
       final boolean isBreak_HH_Summary          = ValueFormat.TIME_HH.name()        .equals(breakTime_Summary);
       final boolean isBreak_HH_MM_Summary       = ValueFormat.TIME_HH_MM.name()     .equals(breakTime_Summary);
       final boolean isBreak_HH_MM_SS_Summary    = ValueFormat.TIME_HH_MM_SS.name()  .equals(breakTime_Summary);
@@ -1331,6 +1499,7 @@ public class PrefPageAppearanceDisplayFormat extends PreferencePage implements I
       _rdoTime_Elapsed_HH                       .setSelection(isElapsed_HH);
       _rdoTime_Elapsed_HH_MM                    .setSelection(isElapsed_HH_MM);
       _rdoTime_Elapsed_HH_MM_SS                 .setSelection(isElapsed_HH_MM_SS);
+      _rdoTime_Elapsed_DDD_HH_MM_SS             .setSelection(isElapsed_DURATION);
       _rdoTime_Elapsed_HH_Summary               .setSelection(isElapsed_HH_Summary);
       _rdoTime_Elapsed_HH_MM_Summary            .setSelection(isElapsed_HH_MM_Summary);
       _rdoTime_Elapsed_HH_MM_SS_Summary         .setSelection(isElapsed_HH_MM_SS_Summary);
@@ -1338,6 +1507,7 @@ public class PrefPageAppearanceDisplayFormat extends PreferencePage implements I
       _rdoTime_Recorded_HH                      .setSelection(isRecorded_HH);
       _rdoTime_Recorded_HH_MM                   .setSelection(isRecorded_HH_MM);
       _rdoTime_Recorded_HH_MM_SS                .setSelection(isRecorded_HH_MM_SS);
+      _rdoTime_Recorded_DURATION                .setSelection(isRecorded_DURATION);
       _rdoTime_Recorded_HH_Summary              .setSelection(isRecorded_HH_Summary);
       _rdoTime_Recorded_HH_MM_Summary           .setSelection(isRecorded_HH_MM_Summary);
       _rdoTime_Recorded_HH_MM_SS_Summary        .setSelection(isRecorded_HH_MM_SS_Summary);
@@ -1345,6 +1515,7 @@ public class PrefPageAppearanceDisplayFormat extends PreferencePage implements I
       _rdoTime_Paused_HH                        .setSelection(isPaused_HH);
       _rdoTime_Paused_HH_MM                     .setSelection(isPaused_HH_MM);
       _rdoTime_Paused_HH_MM_SS                  .setSelection(isPaused_HH_MM_SS);
+      _rdoTime_Paused_DURATION                  .setSelection(isPaused_DURATION);
       _rdoTime_Paused_HH_Summary                .setSelection(isPaused_HH_Summary);
       _rdoTime_Paused_HH_MM_Summary             .setSelection(isPaused_HH_MM_Summary);
       _rdoTime_Paused_HH_MM_SS_Summary          .setSelection(isPaused_HH_MM_SS_Summary);
@@ -1352,6 +1523,7 @@ public class PrefPageAppearanceDisplayFormat extends PreferencePage implements I
       _rdoTime_Moving_HH                        .setSelection(isMoving_HH);
       _rdoTime_Moving_HH_MM                     .setSelection(isMoving_HH_MM);
       _rdoTime_Moving_HH_MM_SS                  .setSelection(isMoving_HH_MM_SS);
+      _rdoTime_Moving_DURATION                  .setSelection(isMoving_DURATION);
       _rdoTime_Moving_HH_Summary                .setSelection(isMoving_HH_Summary);
       _rdoTime_Moving_HH_MM_Summary             .setSelection(isMoving_HH_MM_Summary);
       _rdoTime_Moving_HH_MM_SS_Summary          .setSelection(isMoving_HH_MM_SS_Summary);
@@ -1359,6 +1531,7 @@ public class PrefPageAppearanceDisplayFormat extends PreferencePage implements I
       _rdoTime_Break_HH                         .setSelection(isBreak_HH);
       _rdoTime_Break_HH_MM                      .setSelection(isBreak_HH_MM);
       _rdoTime_Break_HH_MM_SS                   .setSelection(isBreak_HH_MM_SS);
+      _rdoTime_Break_DURATION                   .setSelection(isBreak_DURATION);
       _rdoTime_Break_HH_Summary                 .setSelection(isBreak_HH_Summary);
       _rdoTime_Break_HH_MM_Summary              .setSelection(isBreak_HH_MM_Summary);
       _rdoTime_Break_HH_MM_SS_Summary           .setSelection(isBreak_HH_MM_SS_Summary);
@@ -1374,73 +1547,73 @@ public class PrefPageAppearanceDisplayFormat extends PreferencePage implements I
 
    private void saveState() {
 
-      final String cadenceFormat = _rdoCadence_1_0.getSelection()
-            ? ValueFormat.NUMBER_1_0.name()
-            : _rdoCadence_1_1.getSelection()
-                  ? ValueFormat.NUMBER_1_1.name()
-                  : ValueFormat.NUMBER_1_2.name();
+// SET_FORMATTING_OFF
 
-      final String distanceFormat = _rdoDistance_1_0.getSelection()
-            ? ValueFormat.NUMBER_1_0.name()
-            : _rdoDistance_1_1.getSelection()
-                  ? ValueFormat.NUMBER_1_1.name()
-                  : _rdoDistance_1_2.getSelection()
-                        ? ValueFormat.NUMBER_1_2.name()
-                        : ValueFormat.NUMBER_1_3.name();
+      final String cadenceFormat =
+                 _rdoCadence_1_0                .getSelection()   ? ValueFormat.NUMBER_1_0.name()
+               : _rdoCadence_1_1                .getSelection()   ? ValueFormat.NUMBER_1_1.name()
+               : ValueFormat.NUMBER_1_2.name();
 
-      final String elevationFormat = _rdoElevation_1_0.getSelection()
-            ? ValueFormat.NUMBER_1_0.name()
-            : ValueFormat.NUMBER_1_1.name();
+      final String distanceFormat =
+                 _rdoDistance_1_0               .getSelection()   ? ValueFormat.NUMBER_1_0.name()
+               : _rdoDistance_1_1               .getSelection()   ? ValueFormat.NUMBER_1_1.name()
+               : _rdoDistance_1_2               .getSelection()   ? ValueFormat.NUMBER_1_2.name()
+               : ValueFormat.NUMBER_1_3.name();
 
-      final String powerFormat = _rdoPower_1_0.getSelection()
-            ? ValueFormat.NUMBER_1_0.name()
-            : ValueFormat.NUMBER_1_1.name();
+      final String elevationFormat =
+                 _rdoElevation_1_0              .getSelection()   ? ValueFormat.NUMBER_1_0.name()
+               : ValueFormat.NUMBER_1_1.name();
 
-      final String pulseFormat = _rdoPulse_1_0.getSelection()
-            ? ValueFormat.NUMBER_1_0.name()
-            : ValueFormat.NUMBER_1_1.name();
+      final String powerFormat =
+                 _rdoPower_1_0                  .getSelection()   ? ValueFormat.NUMBER_1_0.name()
+               : ValueFormat.NUMBER_1_1.name();
 
-      final String speedFormat = _rdoSpeed_1_0.getSelection()
-            ? ValueFormat.NUMBER_1_0.name()
-            : _rdoSpeed_1_1.getSelection()
-                  ? ValueFormat.NUMBER_1_1.name()
-                  : ValueFormat.NUMBER_1_2.name();
+      final String pulseFormat =
+                 _rdoPulse_1_0                  .getSelection()   ? ValueFormat.NUMBER_1_0.name()
+               : ValueFormat.NUMBER_1_1.name();
 
-      final String temperatureFormat = _rdoTemperature_1_0.getSelection()
-            ? ValueFormat.NUMBER_1_0.name()
-            : _rdoTemperature_1_1.getSelection()
-                  ? ValueFormat.NUMBER_1_1.name()
-                  : ValueFormat.NUMBER_1_2.name();
+      final String speedFormat =
+                 _rdoSpeed_1_0                  .getSelection()   ? ValueFormat.NUMBER_1_0.name()
+               : _rdoSpeed_1_1                  .getSelection()   ? ValueFormat.NUMBER_1_1.name()
+               : ValueFormat.NUMBER_1_2.name();
 
-      final String elapsedFormat = _rdoTime_Elapsed_HH.getSelection()
-            ? ValueFormat.TIME_HH.name()
-            : _rdoTime_Elapsed_HH_MM.getSelection()
-                  ? ValueFormat.TIME_HH_MM.name()
-                  : ValueFormat.TIME_HH_MM_SS.name();
+      final String temperatureFormat =
+                 _rdoTemperature_1_0            .getSelection()   ? ValueFormat.NUMBER_1_0.name()
+               : _rdoTemperature_1_1            .getSelection()   ? ValueFormat.NUMBER_1_1.name()
+               : ValueFormat.NUMBER_1_2.name();
 
-      final String recordedFormat = _rdoTime_Recorded_HH.getSelection()
-            ? ValueFormat.TIME_HH.name()
-            : _rdoTime_Recorded_HH_MM.getSelection()
-                  ? ValueFormat.TIME_HH_MM.name()
-                  : ValueFormat.TIME_HH_MM_SS.name();
 
-      final String pausedFormat = _rdoTime_Paused_HH.getSelection()
-            ? ValueFormat.TIME_HH.name()
-            : _rdoTime_Paused_HH_MM.getSelection()
-                  ? ValueFormat.TIME_HH_MM.name()
-                  : ValueFormat.TIME_HH_MM_SS.name();
+      final String elapsedFormat =
+                  _rdoTime_Elapsed_HH           .getSelection()   ? ValueFormat.TIME_HH.name()
+               : _rdoTime_Elapsed_HH_MM         .getSelection()   ? ValueFormat.TIME_HH_MM.name()
+               : _rdoTime_Elapsed_DDD_HH_MM_SS  .getSelection()   ? ValueFormat.TIME_DURATION.name()
+               : ValueFormat.TIME_HH_MM_SS.name();
 
-      final String movingFormat = _rdoTime_Moving_HH.getSelection()
-            ? ValueFormat.TIME_HH.name()
-            : _rdoTime_Moving_HH_MM.getSelection()
-                  ? ValueFormat.TIME_HH_MM.name()
-                  : ValueFormat.TIME_HH_MM_SS.name();
+      final String recordedFormat =
+                 _rdoTime_Recorded_HH           .getSelection()   ? ValueFormat.TIME_HH.name()
+               : _rdoTime_Recorded_HH_MM        .getSelection()   ? ValueFormat.TIME_HH_MM.name()
+               : _rdoTime_Recorded_DURATION     .getSelection()   ? ValueFormat.TIME_DURATION.name()
+               : ValueFormat.TIME_HH_MM_SS.name();
 
-      final String breakFormat = _rdoTime_Break_HH.getSelection()
-            ? ValueFormat.TIME_HH.name()
-            : _rdoTime_Break_HH_MM.getSelection()
-                  ? ValueFormat.TIME_HH_MM.name()
-                  : ValueFormat.TIME_HH_MM_SS.name();
+      final String pausedFormat =
+                 _rdoTime_Paused_HH             .getSelection()   ? ValueFormat.TIME_HH.name()
+               : _rdoTime_Paused_HH_MM          .getSelection()   ? ValueFormat.TIME_HH_MM.name()
+               : _rdoTime_Paused_DURATION       .getSelection()   ? ValueFormat.TIME_DURATION.name()
+               : ValueFormat.TIME_HH_MM_SS.name();
+
+      final String movingFormat =
+                 _rdoTime_Moving_HH             .getSelection()   ? ValueFormat.TIME_HH.name()
+               : _rdoTime_Moving_HH_MM          .getSelection()   ? ValueFormat.TIME_HH_MM.name()
+               : _rdoTime_Moving_DURATION       .getSelection()   ? ValueFormat.TIME_DURATION.name()
+               : ValueFormat.TIME_HH_MM_SS.name();
+
+      final String breakFormat =
+                 _rdoTime_Break_HH              .getSelection()   ? ValueFormat.TIME_HH.name()
+               : _rdoTime_Break_HH_MM           .getSelection()   ? ValueFormat.TIME_HH_MM.name()
+               : _rdoTime_Break_DURATION        .getSelection()   ? ValueFormat.TIME_DURATION.name()
+               : ValueFormat.TIME_HH_MM_SS.name();
+
+// SET_FORMATTING_ON
 
       //
       // SUMMARY   SUMMARY   SUMMARY   SUMMARY   SUMMARY   SUMMARY   SUMMARY
@@ -1570,5 +1743,29 @@ public class PrefPageAppearanceDisplayFormat extends PreferencePage implements I
       }
 
       _prefStore_Common.setValue(ICommonPreferences.DISPLAY_FORMAT_SELECTED_TAB, _tabFolder.getSelectionIndex());
+   }
+
+   private void updateUI_Layout() {
+
+      final int horizontalAdjustment = 0;
+
+      _parent.getDisplay().asyncExec(() -> {
+
+// SET_FORMATTING_OFF
+
+         final int width_HH         = _rdoTime_Elapsed_HH            .getBounds().width;
+         final int width_HH_MM      = _rdoTime_Elapsed_HH_MM         .getBounds().width;
+         final int width_HH_MM_SS   = _rdoTime_Elapsed_HH_MM_SS      .getBounds().width;
+         final int width_DURATION   = _rdoTime_Elapsed_DDD_HH_MM_SS  .getBounds().width;
+
+         ((GridData) _btnAll_HH           .getLayoutData()).widthHint = width_HH       - horizontalAdjustment;
+         ((GridData) _btnAll_HH_MM        .getLayoutData()).widthHint = width_HH_MM    - horizontalAdjustment;
+         ((GridData) _btnAll_HH_MM_SS     .getLayoutData()).widthHint = width_HH_MM_SS - horizontalAdjustment;
+         ((GridData) _btnAll_DDD_HH_MM_SS .getLayoutData()).widthHint = width_DURATION - horizontalAdjustment;
+
+// SET_FORMATTING_ON
+
+         _parent.layout(true, true);
+      });
    }
 }

@@ -42,6 +42,7 @@ public enum ValueFormat {
    PERIOD_DAY, //
    PERIOD_YEAR_MONTH_DAY, //
 
+   TIME_DURATION, //
    TIME_HH, //
    TIME_HH_MM, //
    TIME_HH_MM_SS, //
