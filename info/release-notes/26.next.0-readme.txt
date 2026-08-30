@@ -34,6 +34,10 @@ See milestone 26.? https://github.com/mytourbook/mytourbook/milestone/29?closed=
 New / Improvements
 ==================
 
+* App Start
+  - Prevent that MyTourbook is started a second time
+    https://github.com/mytourbook/mytourbook/issues/1742
+
 * Easy Import
   - Added action to mount/unmount a device
     https://github.com/mytourbook/mytourbook/issues/1720
