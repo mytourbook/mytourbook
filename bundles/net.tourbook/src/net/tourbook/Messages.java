@@ -245,6 +245,7 @@ public class Messages extends NLS {
    public static String        app_dlg_confirmFileOverwrite_message;
    public static String        app_dlg_confirmFileOverwrite_title;
 
+   public static String        App_Info_AnotherInstanceOfMyTourbookIsRunning;
    public static String        App_Label_BooleanNo;
    public static String        App_Label_BooleanYes;
    public static String        App_Label_H_MM;
