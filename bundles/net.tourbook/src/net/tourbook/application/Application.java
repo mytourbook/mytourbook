@@ -16,6 +16,7 @@
 package net.tourbook.application;
 
 import java.io.BufferedReader;
+import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.InetAddress;
@@ -97,9 +98,8 @@ public class Application implements IApplication {
 
       } catch (final Exception e) {
 
-         StatusUtil.logError("Could not contact the primary instance of MyTourbook on port: %d - %s".formatted(
-               PORT,
-               e.getMessage()));
+         StatusUtil.logError("Could not contact the primary instance of MyTourbook on port: %d - %s" //$NON-NLS-1$
+               .formatted(PORT, e.getMessage()));
       }
    }
 
@@ -128,7 +128,7 @@ public class Application implements IApplication {
                }
                shell.dispose();
 
-               // this is a duplicate instance. Tell the first instance to focus.
+               // this is a duplicate instance
                notifyFirstInstance();
 
                // exit immediately
@@ -151,14 +151,12 @@ public class Application implements IApplication {
       } finally {
 
          display.dispose();
-
-         if (_serverSocket != null && !_serverSocket.isClosed()) {
-            _serverSocket.close();
-         }
       }
    }
 
    private void startInstanceListenerThread() {
+
+      final String threadName = "MyTourbook 2nd Instance Listener Thread"; //$NON-NLS-1$
 
       final Thread listenerThread = new Thread(() -> {
 
@@ -173,6 +171,9 @@ public class Application implements IApplication {
                   BufferedReader in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()))) {
 
                final String message = in.readLine();
+
+               StatusUtil.logInfo("[%s] Connection detected from another MyTourbook instance on port %d with message: %s" //$NON-NLS-1$
+                     .formatted(threadName, PORT, message));
 
                if (INSTANCE_MESSAGE_SET_FOCUS.equals(message)) {
 
@@ -211,15 +212,16 @@ public class Application implements IApplication {
                      });
                   }
                }
+
             } catch (final Exception e) {
 
                // Loop ends if socket closes during shutdown
 
-               StatusUtil.log(e);
+               StatusUtil.log("[%s] Exception".formatted(threadName), e); //$NON-NLS-1$
             }
          }
 
-      }, "MyTourbook 2nd Instance Listener Thread"); //$NON-NLS-1$
+      }, threadName);
 
       listenerThread.setDaemon(true);
       listenerThread.start();
@@ -227,6 +229,8 @@ public class Application implements IApplication {
 
    @Override
    public void stop() {
+
+      stopServerSocket();
 
       if (PlatformUI.isWorkbenchRunning() == false) {
          return;
@@ -245,5 +249,20 @@ public class Application implements IApplication {
             workbench.close();
          }
       });
+   }
+
+   private void stopServerSocket() {
+
+      if (_serverSocket != null && !_serverSocket.isClosed()) {
+
+         try {
+
+            _serverSocket.close();
+
+         } catch (final IOException e) {
+
+            StatusUtil.log("Exception when closing server socket".formatted(), e); //$NON-NLS-1$
+         }
+      }
    }
 }
