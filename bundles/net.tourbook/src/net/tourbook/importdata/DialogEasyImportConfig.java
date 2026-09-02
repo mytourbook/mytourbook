@@ -1761,7 +1761,7 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements IActionRe
           * Button: Device info
           */
          _btnIC_RunCommand_DeviceInfo = new Button(parent, SWT.PUSH);
-         _btnIC_RunCommand_DeviceInfo.setText(Messages.Dialog_ImportConfig_Label_RunInfo);
+         _btnIC_RunCommand_DeviceInfo.setText(Messages.Dialog_ImportConfig_Button_RunCommand_Info);
          _btnIC_RunCommand_DeviceInfo.addSelectionListener(SelectionListener.widgetSelectedAdapter(
                selectionEvent -> {
                   onSelect_IC_RunMountCommand(
@@ -1860,7 +1860,7 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements IActionRe
           * Button: Test mount command
           */
          _btnIC_RunCommand_Mount = new Button(parent, SWT.PUSH);
-         _btnIC_RunCommand_Mount.setText(Messages.Dialog_ImportConfig_Button_RunMount);
+         _btnIC_RunCommand_Mount.setText(Messages.Dialog_ImportConfig_Button_RunCommand_Mount);
          _btnIC_RunCommand_Mount.addSelectionListener(SelectionListener.widgetSelectedAdapter(
                selectionEvent -> {
                   onSelect_IC_RunMountCommand(

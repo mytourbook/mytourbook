@@ -767,8 +767,9 @@ public class Messages extends NLS {
    public static String        Dialog_ImportConfig_Action_ToggleWordWrap_Tooltip;
    public static String        Dialog_ImportConfig_Button_CopyLeft_Mount_Tooltip;
    public static String        Dialog_ImportConfig_Button_CopyLeft_Unmount;
+   public static String        Dialog_ImportConfig_Button_RunCommand_Info;
+   public static String        Dialog_ImportConfig_Button_RunCommand_Mount;
    public static String        Dialog_ImportConfig_Button_RunCommand_Unmount;
-   public static String        Dialog_ImportConfig_Button_RunMount;
    public static String        Dialog_ImportConfig_Checkbox_AdjustTemperature;
    public static String        Dialog_ImportConfig_Checkbox_CreateBackup;
    public static String        Dialog_ImportConfig_Checkbox_CreateBackup_Tooltip;
@@ -905,7 +906,6 @@ public class Messages extends NLS {
    public static String        Dialog_ImportConfig_Label_LocationProfile_Tooltip;
    public static String        Dialog_ImportConfig_Label_MountCommand;
    public static String        Dialog_ImportConfig_Label_MountCommandLog;
-   public static String        Dialog_ImportConfig_Label_RunInfo;
    public static String        Dialog_ImportConfig_Label_SelectEquipmentGroup;
    public static String        Dialog_ImportConfig_Label_ShowTheseTiles;
    public static String        Dialog_ImportConfig_Label_StateTooltipWidth;
