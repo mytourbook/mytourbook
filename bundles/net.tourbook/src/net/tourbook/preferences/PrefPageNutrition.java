@@ -30,6 +30,7 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.MouseWheelListener;
 import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.widgets.Button;
+import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
@@ -39,19 +40,35 @@ import org.eclipse.ui.IWorkbenchPreferencePage;
 
 public class PrefPageNutrition extends PreferencePage implements IWorkbenchPreferencePage {
 
-   public static final String     ID         = "net.tourbook.preferences.PrefPageNutrition"; //$NON-NLS-1$
+   public static final String            ID         = "net.tourbook.preferences.PrefPageNutrition"; //$NON-NLS-1$
 
-   private final IPreferenceStore _prefStore = TourbookPlugin.getPrefStore();
+   private static final IPreferenceStore _prefStore = TourbookPlugin.getPrefStore();
 
-   private PixelConverter         _pc;
-   private MouseWheelListener     _defaultMouseWheelListener;
+// SET_FORMATTING_OFF
 
-   private int                    _hintDefaultSpinnerWidth;
+   public static final String PRODUCT_VIEW_DOUBLE_CLICK_ACTION__EDIT_PRODUCT         = "PRODUCT_VIEW_DOUBLE_CLICK_ACTION__EDIT_PRODUCT"; //$NON-NLS-1$
+   public static final String PRODUCT_VIEW_DOUBLE_CLICK_ACTION__OPEN_PRODUCT_WEBSITE = "PRODUCT_VIEW_DOUBLE_CLICK_ACTION__OPEN_PRODUCT_WEBSITE";                                                                                  //$NON-NLS-1$
+
+
+   private String[][] _allDoubleClickActions = new String[][]
+   {
+      { "Open Product Website",  PRODUCT_VIEW_DOUBLE_CLICK_ACTION__EDIT_PRODUCT },
+      { "Edit Product",          PRODUCT_VIEW_DOUBLE_CLICK_ACTION__OPEN_PRODUCT_WEBSITE },
+   };
+
+// SET_FORMATTING_ON
+
+   private PixelConverter     _pc;
+   private MouseWheelListener _defaultMouseWheelListener;
+
+   private int                _hintDefaultSpinnerWidth;
 
    /*
     * UI controls
     */
    private Button  _chkIgnoreFirstHour;
+
+   private Combo   _comboProductDoubleClick;
 
    private Spinner _spinnerRecentProducts;
 
@@ -61,6 +78,8 @@ public class PrefPageNutrition extends PreferencePage implements IWorkbenchPrefe
       initUI(parent);
 
       final Composite container = createUI(parent);
+
+      fillUI();
 
       restoreState();
 
@@ -72,7 +91,7 @@ public class PrefPageNutrition extends PreferencePage implements IWorkbenchPrefe
       final Composite container = new Composite(parent, SWT.NONE);
       GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
       GridLayoutFactory.fillDefaults()
-            .spacing(5, 15)
+//            .spacing(5, 15)
             .numColumns(3)
             .applyTo(container);
       {
@@ -113,15 +132,41 @@ public class PrefPageNutrition extends PreferencePage implements IWorkbenchPrefe
             btnRemoveRecentProducts.addSelectionListener(SelectionListener.widgetSelectedAdapter(
                   selectionEvent -> TourNutritionProductMenuManager.clearRecentProducts()));
          }
+         {
+            /*
+             * Default double click
+             */
+            {
+               final Label lblDefaultCadence = new Label(container, SWT.FILL | SWT.LEFT);
+               lblDefaultCadence.setText("Product view &double click action");
+               lblDefaultCadence.setToolTipText("Action when a product is double clicked in the product view");
+
+               _comboProductDoubleClick = new Combo(container, SWT.READ_ONLY | SWT.BORDER);
+               _comboProductDoubleClick.setVisibleItemCount(10);
+               _comboProductDoubleClick.addSelectionListener(SelectionListener.widgetSelectedAdapter(
+                     selectionEvent -> onSelect_ProductDoubleClick()));
+
+               GridDataFactory.fillDefaults()
+                     .align(SWT.FILL, SWT.CENTER)
+                     .span(2, 1)
+                     .applyTo(_comboProductDoubleClick);
+            }
+         }
       }
 
       return container;
    }
 
-   @Override
-   public void init(final IWorkbench workbench) {
-      // Nothing to do
+   private void fillUI() {
+
+      // fill action labels
+      for (final String[] action : _allDoubleClickActions) {
+         _comboProductDoubleClick.add(action[0]);
+      }
    }
+
+   @Override
+   public void init(final IWorkbench workbench) {}
 
    private void initUI(final Composite parent) {
 
@@ -133,6 +178,11 @@ public class PrefPageNutrition extends PreferencePage implements IWorkbenchPrefe
 
          Util.adjustSpinnerValueOnMouseScroll(mouseEvent);
       };
+   }
+
+   private void onSelect_ProductDoubleClick() {
+      // TODO Auto-generated method stub
+
    }
 
    @Override
