@@ -401,6 +401,7 @@ public class Messages extends NLS {
 
    public static String        ColumnFactory_Photo_FilePath_Label;
    public static String        ColumnFactory_Photo_FilePath_Tooltip;
+   public static String        ColumnFactory_Photo_ImageFilepath;
    public static String        ColumnFactory_Photo_NumberOfGPSPhotos_Header;
    public static String        ColumnFactory_Photo_NumberOfGPSPhotos_Label;
    public static String        ColumnFactory_Photo_NumberOfGPSPhotos_Tooltip;
@@ -410,6 +411,7 @@ public class Messages extends NLS {
    public static String        ColumnFactory_Photo_NumberOfTourPhotos_Header;
    public static String        ColumnFactory_Photo_NumberOfTourPhotos_Label;
    public static String        ColumnFactory_Photo_NumberOfTourPhotos_Tooltip;
+   public static String        ColumnFactory_Photo_PhotoID;
    public static String        ColumnFactory_Photo_Positioned_Header;
    public static String        ColumnFactory_Photo_Positioned_Label;
    public static String        ColumnFactory_Photo_Positioned_Tooltip;

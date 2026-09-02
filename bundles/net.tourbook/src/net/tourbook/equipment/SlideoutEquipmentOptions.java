@@ -178,7 +178,7 @@ public class SlideoutEquipmentOptions extends AdvancedSlideout implements IActio
              * Label: Title
              */
             final Label title = new Label(container, SWT.LEAD);
-            title.setText("Configuration");
+            title.setText(Messages.Slideout_EquipmentOptions_Label_Title);
             GridDataFactory.fillDefaults()
                   .align(SWT.BEGINNING, SWT.CENTER)
                   .applyTo(title);
@@ -222,13 +222,13 @@ public class SlideoutEquipmentOptions extends AdvancedSlideout implements IActio
    private void createUI_100_Sorting(final Composite parent) {
 
       final String inversLabel = UI.SYMBOL_ARROW_UP_DOWN_II;
-      final String sortTooltip = "The view items are sorted firstly by the first sort field which is not empty, then by the second and so on";
-      final String inverseTooltip = "Toggle sort direction";
+      final String sortTooltip = Messages.Slideout_EquipmentOptions_Label_Sort_Tooltip;
+      final String inverseTooltip = Messages.Slideout_EquipmentOptions_Label_SortInverse_Tooltip;
 
       final GridDataFactory gd = GridDataFactory.fillDefaults().grab(true, false);
 
       final Group group = new Group(parent, SWT.NONE);
-      group.setText("Sort");
+      group.setText(Messages.Slideout_EquipmentOptions_Group_Sort);
       gd.applyTo(group);
       GridLayoutFactory.swtDefaults().numColumns(3).applyTo(group);
 //      group.setBackground(UI.SYS_COLOR_YELLOW);
@@ -237,7 +237,7 @@ public class SlideoutEquipmentOptions extends AdvancedSlideout implements IActio
           * Equipment
           */
          {
-            final Label label = UI.createLabel(group, "Equipment by");
+            final Label label = UI.createLabel(group, Messages.Slideout_EquipmentOptions_Label_EquipmentBy);
             label.setToolTipText(sortTooltip);
 
             _comboEquipmentSort1 = new Combo(group, SWT.READ_ONLY | SWT.BORDER);
@@ -294,7 +294,7 @@ public class SlideoutEquipmentOptions extends AdvancedSlideout implements IActio
           * Part/Service
           */
          {
-            final Label label = UI.createLabel(group, "Part/Service by");
+            final Label label = UI.createLabel(group, Messages.Slideout_EquipmentOptions_Label_PartService);
             label.setToolTipText(sortTooltip);
 
             _comboPartServiceSort1 = new Combo(group, SWT.READ_ONLY | SWT.BORDER);
