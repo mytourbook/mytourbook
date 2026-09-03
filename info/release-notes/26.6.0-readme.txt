@@ -18,7 +18,7 @@ New / Improvements
   - Select a product from a list of the most recent products used
 
 * Equipment
-  - Add a contextual menu to add several equiments at a time
+  - Add a contextual menu to add several equipments at a time
     https://github.com/mytourbook/mytourbook/issues/1657
 
   - Display equipment mileage for equipment containing parts
