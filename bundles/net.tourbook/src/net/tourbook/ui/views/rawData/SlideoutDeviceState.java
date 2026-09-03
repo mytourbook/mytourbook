@@ -248,18 +248,18 @@ public class SlideoutDeviceState extends AdvancedSlideout {
          /*
           * Mount/unmount
           */
-         final String commandMount = activeConfig.commandMount.replace("\\", "\\\\");
-         final String commandUnmount = activeConfig.commandUnmount.replace("\\", "\\\\");
+         final String commandMount = activeConfig.commandMount.replace("\\", "\\\\"); //$NON-NLS-1$ //$NON-NLS-2$
+         final String commandUnmount = activeConfig.commandUnmount.replace("\\", "\\\\"); //$NON-NLS-1$ //$NON-NLS-2$
 
          /*
           * Mount
           */
          {
             // label
-            UI.createLabel(parent, "Mount");
+            UI.createLabel(parent, Messages.Import_Data_HTML_Mount);
 
             // state
-            UI.createLabel(parent, "%s".formatted(activeConfig.isMountDevice ? commandMount : "NO"));
+            UI.createLabel(parent, "%s".formatted(activeConfig.isMountDevice ? commandMount : Messages.Import_Data_HTML_NO)); //$NON-NLS-1$
          }
 
          /*
@@ -267,10 +267,10 @@ public class SlideoutDeviceState extends AdvancedSlideout {
           */
          {
             // label
-            UI.createLabel(parent, "Unmount");
+            UI.createLabel(parent, Messages.Import_Data_HTML_Unmount);
 
             // state
-            UI.createLabel(parent, "%s".formatted(activeConfig.isUnmountDevice ? commandUnmount : "NO"));
+            UI.createLabel(parent, "%s".formatted(activeConfig.isUnmountDevice ? commandUnmount : Messages.Import_Data_HTML_NO)); //$NON-NLS-1$
          }
       }
       {

@@ -1906,18 +1906,18 @@ public class RawDataView extends ViewPart implements
        * Mount/unmount
        */
       {
-         final String commandMount = importConfig.commandMount.replace("\\", "\\\\");
-         final String commandUnmount = importConfig.commandUnmount.replace("\\", "\\\\");
+         final String commandMount = importConfig.commandMount.replace("\\", "\\\\"); //$NON-NLS-1$ //$NON-NLS-2$
+         final String commandUnmount = importConfig.commandUnmount.replace("\\", "\\\\"); //$NON-NLS-1$ //$NON-NLS-2$
 
          // mount
          sb.append(HTML_TR);
 
          sb.append(HTML_TD_SPACE + HTML_STYLE_TITLE_VERTICAL_PADDING + " class='folderTitle'>"); //$NON-NLS-1$
-         sb.append("Mount");
+         sb.append(Messages.Import_Data_HTML_Mount);
          sb.append(HTML_TD_END);
 
          sb.append(HTML_TD_SPACE + HTML_STYLE_TITLE_VERTICAL_PADDING + " class='folderLocation'>"); //$NON-NLS-1$
-         sb.append("%s".formatted(importConfig.isMountDevice ? commandMount : "NO"));
+         sb.append("%s".formatted(importConfig.isMountDevice ? commandMount : Messages.Import_Data_HTML_NO)); //$NON-NLS-1$
          sb.append(HTML_TD_END);
 
          sb.append(HTML_TR_END);
@@ -1926,11 +1926,11 @@ public class RawDataView extends ViewPart implements
          sb.append(HTML_TR);
 
          sb.append(HTML_TD_SPACE + " class='folderTitle'>"); //$NON-NLS-1$
-         sb.append("Unmount");
+         sb.append(Messages.Import_Data_HTML_Unmount);
          sb.append(HTML_TD_END);
 
          sb.append(HTML_TD_SPACE + " class='folderLocation'>"); //$NON-NLS-1$
-         sb.append("%s".formatted(importConfig.isUnmountDevice ? commandUnmount : "NO"));
+         sb.append("%s".formatted(importConfig.isUnmountDevice ? commandUnmount : Messages.Import_Data_HTML_NO)); //$NON-NLS-1$
          sb.append(HTML_TD_END);
 
          sb.append(HTML_TR_END);
@@ -5182,16 +5182,16 @@ public class RawDataView extends ViewPart implements
          return;
       }
 
-      TourLogManager.log_TITLE("Mount Device");
+      TourLogManager.log_TITLE(Messages.Import_Data_Log_MountDevice);
 
       final String commandMount = selectedConfig.commandMount;
 
       if (StringUtils.isNullOrEmpty(commandMount)) {
-         TourLogManager.log_ERROR("Mount device: Mount command cannot be empty");
+         TourLogManager.log_ERROR(Messages.Import_Data_Log_MountDevice_MountCommandCannotBeEmpty);
          return;
       }
 
-      UI.showStatusLineMessage("Mounting device", _imageSensor);
+      UI.showStatusLineMessage(Messages.Import_Data_StatusLine_MountingDevice, _imageSensor);
 
       _display.asyncExec(() -> {
 
@@ -5221,7 +5221,7 @@ public class RawDataView extends ViewPart implements
 
          // log error message
 
-         TourLogManager.log_ERROR("Mount device: Mount command failed:\n%s".formatted(failedLogText));
+         TourLogManager.log_ERROR(Messages.Import_Data_Log_MountDevice_MountCommandFailed.formatted(failedLogText));
 
          return;
       }
@@ -5230,7 +5230,7 @@ public class RawDataView extends ViewPart implements
 
       if (selectedConfig.isVerifyMountCommand == false) {
 
-         TourLogManager.log_INFO("Mount device: Mount command was run but with no verify check in %.1f s".formatted(processDuration));
+         TourLogManager.log_INFO(Messages.Import_Data_Log_MountDevice_MountCommand_IsRun_NoVerification.formatted(processDuration));
 
          return;
       }
@@ -5241,11 +5241,11 @@ public class RawDataView extends ViewPart implements
 
       if (commandMount_VerifyLog.equals(successLogText)) {
 
-         TourLogManager.log_OK("Mount device: Mount command succeeded and was verified in %.1f s".formatted(processDuration));
+         TourLogManager.log_OK(Messages.Import_Data_Log_MountDevice_MountCommand_IsRun_WithVerification.formatted(processDuration));
 
       } else {
 
-         TourLogManager.log_ERROR("Mount device: Mount command was run but the verification failed in %.1f s".formatted(processDuration));
+         TourLogManager.log_ERROR(Messages.Import_Data_Log_MountDevice_MountCommand_IsRun_WithVerification_Error.formatted(processDuration));
       }
    }
 
@@ -5259,18 +5259,18 @@ public class RawDataView extends ViewPart implements
          return;
       }
 
-      TourLogManager.log_TITLE("Unmount Device");
+      TourLogManager.log_TITLE(Messages.Import_Data_Log_UnmountDevice);
 
       final String commandUnmount = selectedConfig.commandUnmount;
 
       if (StringUtils.isNullOrEmpty(commandUnmount)) {
-         TourLogManager.log_ERROR("Unmount device: Unmount command cannot be empty");
+         TourLogManager.log_ERROR(Messages.Import_Data_Log_UnmountDevice_UnmountCommandCannotBeEmpty);
          return;
       }
 
       final Image sensorImage = _imageSensor.isDisposed() ? null : _imageSensor;
 
-      UI.showStatusLineMessage("Unmounting device", sensorImage);
+      UI.showStatusLineMessage(Messages.Import_Data_StatusLine_UnmountingDevice, sensorImage);
 
       // run async that the status message is displayed before the UI is locked
       _display.asyncExec(() -> {
@@ -5301,7 +5301,7 @@ public class RawDataView extends ViewPart implements
 
          // log error message
 
-         TourLogManager.log_ERROR("Unmount device: Unmount command failed:\n%s".formatted(failedLogText));
+         TourLogManager.log_ERROR(Messages.Import_Data_Log_UnmountDevice_UnmountCommandFailed.formatted(failedLogText));
 
          return;
       }
@@ -5310,7 +5310,7 @@ public class RawDataView extends ViewPart implements
 
       if (selectedConfig.isVerifyUnmountCommand == false) {
 
-         TourLogManager.log_INFO("Unmount device: Unmount command was run but with no verify check in %.1f s".formatted(processDuration));
+         TourLogManager.log_INFO(Messages.Import_Data_Log_UnmountDevice_UnmountCommand_IsRun_NoVerification.formatted(processDuration));
 
          return;
       }
@@ -5321,11 +5321,11 @@ public class RawDataView extends ViewPart implements
 
       if (commandUnmount_VerifyLog.equals(successLogText)) {
 
-         TourLogManager.log_OK("Unmount device: Unmount command succeeded and was verified in %.1f s".formatted(processDuration));
+         TourLogManager.log_OK(Messages.Import_Data_Log_UnmountDevice_UnmountCommand_IsRun_WithVerification.formatted(processDuration));
 
       } else {
 
-         TourLogManager.log_ERROR("Unmount device: Unmount command was run but the verification failed in %.1f s".formatted(processDuration));
+         TourLogManager.log_ERROR(Messages.Import_Data_Log_UnmountDevice_UnmountCommand_IsRun_WithVerification_Error.formatted(processDuration));
       }
    }
 

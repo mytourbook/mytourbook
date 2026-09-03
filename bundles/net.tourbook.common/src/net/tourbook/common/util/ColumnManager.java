@@ -38,6 +38,7 @@ import net.tourbook.common.formatter.ValueFormatter_Number_1_2;
 import net.tourbook.common.formatter.ValueFormatter_Number_1_3;
 import net.tourbook.common.formatter.ValueFormatter_Number_1_4;
 import net.tourbook.common.formatter.ValueFormatter_Number_1_5;
+import net.tourbook.common.formatter.ValueFormatter_Time_Duration;
 import net.tourbook.common.formatter.ValueFormatter_Time_HH;
 import net.tourbook.common.formatter.ValueFormatter_Time_HHMM;
 import net.tourbook.common.formatter.ValueFormatter_Time_HHMMSS;
@@ -228,6 +229,7 @@ public class ColumnManager {
    private IValueFormatter                   _valueFormatter_Time_HHMM     = new ValueFormatter_Time_HHMM();
    private IValueFormatter                   _valueFormatter_Time_HHMMSS   = new ValueFormatter_Time_HHMMSS();
    private IValueFormatter                   _valueFormatter_Time_SSS      = new ValueFormatter_Time_SSS();
+   private IValueFormatter                   _valueFormatter_Time_Duration = new ValueFormatter_Time_Duration();
    private ValueFormatter_Dummy              _valueFormatter_Dummy         = new ValueFormatter_Dummy();
 
    {
@@ -2048,6 +2050,7 @@ public class ColumnManager {
       case TIME_HH_MM:              return _valueFormatter_Time_HHMM;
       case TIME_HH_MM_SS:           return _valueFormatter_Time_HHMMSS;
       case TIME_SSS:                return _valueFormatter_Time_SSS;
+      case TIME_DURATION:           return _valueFormatter_Time_Duration;
 
       case DATE_TIME:
       case DATE_TIME_HH_MM_SS:

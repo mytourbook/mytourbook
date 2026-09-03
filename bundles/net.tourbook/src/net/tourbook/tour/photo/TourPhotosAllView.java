@@ -601,7 +601,7 @@ public class TourPhotosAllView extends ViewPart implements ITourProvider, ITourV
 
       final ColumnDefinition colDef = new TableColumnDefinition(_columnManager, COLUMN_IMAGE_FILE_PATH, SWT.LEAD);
 
-      colDef.setColumnName("Image Filepath");
+      colDef.setColumnName(Messages.ColumnFactory_Photo_ImageFilepath);
 
       colDef.setIsDefaultColumn();
       colDef.setDefaultColumnWidth(_pc.convertWidthInCharsToPixels(12));
@@ -686,7 +686,7 @@ public class TourPhotosAllView extends ViewPart implements ITourProvider, ITourV
 
       final ColumnDefinition colDef = new TableColumnDefinition(_columnManager, COLUMN_PHOTO_ID, SWT.LEAD);
 
-      colDef.setColumnName("Photo ID");
+      colDef.setColumnName(Messages.ColumnFactory_Photo_PhotoID);
 
       colDef.setDefaultColumnWidth(_pc.convertWidthInCharsToPixels(12));
       colDef.setColumnSelectionListener(_columnSortListener);

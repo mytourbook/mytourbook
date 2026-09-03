@@ -37,6 +37,10 @@ New / Improvements
 * Tour Nutrition (Frederic)
   - Added the display of average carbohydrates/h in the Tour Book view (tour, month, year) and in the Calendar view
 
+* App Start
+  - Prevent that MyTourbook is started a second time
+    https://github.com/mytourbook/mytourbook/issues/1742
+
 * Easy Import
   - Added action to mount/unmount a device
     https://github.com/mytourbook/mytourbook/issues/1720

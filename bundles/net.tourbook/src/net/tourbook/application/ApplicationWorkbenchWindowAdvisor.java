@@ -463,9 +463,10 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
 //		IWorkbenchPage activePage = getWindowConfigurer().getWindow().getActivePage();
 //		activePage.setEditorAreaVisible(true);
 
-      final IWorkbenchWindowConfigurer configurer = getWindowConfigurer();
-
-      configurer.setTitle(_appTitle);
+// this will display the title without the DEV appendix      
+//    final IWorkbenchWindowConfigurer configurer = getWindowConfigurer();
+//
+//    configurer.setTitle(_appTitle);
 
       /**
        * THIS IS VERY CRITICAL TO BE SET BEFORE THE ASYNC RUNNABLE STARTS, OTHERWISE THE VIEWS
