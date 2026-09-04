@@ -60,26 +60,26 @@ public abstract class TreeColumnFactory {
    public static final TreeColumnFactory DEVICE_NAME;
 
    public static final TreeColumnFactory EQUIPMENT_IS_COLLATE;
-   public static final String            EQUIPMENT_IS_COLLATE_ID          = "EQUIPMENT_COLLATE";                //$NON-NLS-1$
+   public static final String            EQUIPMENT_IS_COLLATE_ID                 = "EQUIPMENT_COLLATE";                    //$NON-NLS-1$
    public static final TreeColumnFactory EQUIPMENT_COLLATE_ID;
-   public static final String            EQUIPMENT_COLLATE_ID_ID          = "EQUIPMENT_TYPE";                   //$NON-NLS-1$
+   public static final String            EQUIPMENT_COLLATE_ID_ID                 = "EQUIPMENT_TYPE";                       //$NON-NLS-1$
    public static final TreeColumnFactory EQUIPMENT_COLLATE_ID_SAVED;
-   public static final String            EQUIPMENT_COLLATE_ID_SAVED_ID    = "EQUIPMENT_COLLATE_ID_RAW";         //$NON-NLS-1$
+   public static final String            EQUIPMENT_COLLATE_ID_SAVED_ID           = "EQUIPMENT_COLLATE_ID_RAW";             //$NON-NLS-1$
    public static final TreeColumnFactory EQUIPMENT_COLLATE_BETWEEN;
-   public static final String            EQUIPMENT_COLLATE_BETWEEN_ID     = "EQUIPMENT_COLLATE_BETWEEN";        //$NON-NLS-1$
+   public static final String            EQUIPMENT_COLLATE_BETWEEN_ID            = "EQUIPMENT_COLLATE_BETWEEN";            //$NON-NLS-1$
 
    public static final TreeColumnFactory EQUIPMENT_AND_CATEGORY;
    public static final String            EQUIPMENT_AND_CATEGORY_ID               = "EQUIPMENT_AND_CATEGORY";               //$NON-NLS-1$
    public static final TreeColumnFactory EQUIPMENT_BRAND;
-   public static final String            EQUIPMENT_BRAND_ID               = "EQUIPMENT_BRAND";                  //$NON-NLS-1$
+   public static final String            EQUIPMENT_BRAND_ID                      = "EQUIPMENT_BRAND";                      //$NON-NLS-1$
    public static final TreeColumnFactory EQUIPMENT_DATE_BUILT;
-   public static final String            EQUIPMENT_DATE_BUILT_ID          = "EQUIPMENT_DATE_BUILT";             //$NON-NLS-1$
+   public static final String            EQUIPMENT_DATE_BUILT_ID                 = "EQUIPMENT_DATE_BUILT";                 //$NON-NLS-1$
    public static final TreeColumnFactory EQUIPMENT_DATE_PURCHASED;
-   public static final String            EQUIPMENT_DATE_PURCHASED_ID      = "EQUIPMENT_DATE_PURCHASED";         //$NON-NLS-1$
+   public static final String            EQUIPMENT_DATE_PURCHASED_ID             = "EQUIPMENT_DATE_PURCHASED";             //$NON-NLS-1$
    public static final TreeColumnFactory EQUIPMENT_DATE_RETIRED;
-   public static final String            EQUIPMENT_DATE_RETIRED_ID        = "EQUIPMENT_DATE_RETIRED";           //$NON-NLS-1$
+   public static final String            EQUIPMENT_DATE_RETIRED_ID               = "EQUIPMENT_DATE_RETIRED";               //$NON-NLS-1$
    public static final TreeColumnFactory EQUIPMENT_DATE_USED;
-   public static final String            EQUIPMENT_DATE_USED_ID           = "EQUIPMENT_DATE_USED";              //$NON-NLS-1$
+   public static final String            EQUIPMENT_DATE_USED_ID                  = "EQUIPMENT_DATE_USED";                  //$NON-NLS-1$
    public static final TreeColumnFactory EQUIPMENT_DATE_COLLATE_FROM;
    public static final String            EQUIPMENT_DATE_COLLATE_FROM_ID          = "EQUIPMENT_DATE_COLLATE_FROM";          //$NON-NLS-1$
    public static final TreeColumnFactory EQUIPMENT_DATE_COLLATE_UNTIL;
@@ -97,17 +97,17 @@ public abstract class TreeColumnFactory {
    public static final TreeColumnFactory EQUIPMENT_PURCHASE_LOCATION;
    public static final String            EQUIPMENT_PURCHASE_LOCATION_ID          = "EQUIPMENT_PURCHASE_LOCATION_ID";       //$NON-NLS-1$
    public static final TreeColumnFactory EQUIPMENT_INITIAL_DISTANCE;
-   public static final String            EQUIPMENT_INITIAL_DISTANCE_ID    = "EQUIPMENT_INITIAL_DISTANCE";       //$NON-NLS-1$
+   public static final String            EQUIPMENT_INITIAL_DISTANCE_ID           = "EQUIPMENT_INITIAL_DISTANCE";           //$NON-NLS-1$
    public static final TreeColumnFactory EQUIPMENT_INITIAL_VALUE;
-   public static final String            EQUIPMENT_INITIAL_VALUE_ID       = "EQUIPMENT_INITIAL_VALUE";          //$NON-NLS-1$
+   public static final String            EQUIPMENT_INITIAL_VALUE_ID              = "EQUIPMENT_INITIAL_VALUE";              //$NON-NLS-1$
    public static final TreeColumnFactory EQUIPMENT_INITIAL_VALUE_UNIT;
-   public static final String            EQUIPMENT_INITIAL_VALUE_UNIT_ID  = "EQUIPMENT_INITIAL_VALUE_UNIT";     //$NON-NLS-1$
+   public static final String            EQUIPMENT_INITIAL_VALUE_UNIT_ID         = "EQUIPMENT_INITIAL_VALUE_UNIT";         //$NON-NLS-1$
    public static final TreeColumnFactory EQUIPMENT_MODEL;
    public static final String            EQUIPMENT_MODEL_ID                      = "EQUIPMENT_MODEL";                      //$NON-NLS-1$
    public static final TreeColumnFactory EQUIPMENT_PRICE;
-   public static final String            EQUIPMENT_PRICE_ID               = "EQUIPMENT_PRICE";                  //$NON-NLS-1$
+   public static final String            EQUIPMENT_PRICE_ID                      = "EQUIPMENT_PRICE";                      //$NON-NLS-1$
    public static final TreeColumnFactory EQUIPMENT_PRICE_PER_DISTANCE;
-   public static final String            EQUIPMENT_PRICE_PER_DISTANCE_ID  = "EQUIPMENT_PRICE_PER_DISTANCE";     //$NON-NLS-1$
+   public static final String            EQUIPMENT_PRICE_PER_DISTANCE_ID         = "EQUIPMENT_PRICE_PER_DISTANCE";         //$NON-NLS-1$
    public static final TreeColumnFactory EQUIPMENT_PRICE_UNIT;
    public static final String            EQUIPMENT_PRICE_UNIT_ID                 = "EQUIPMENT_PRICE_UNIT";                 //$NON-NLS-1$
    public static final TreeColumnFactory EQUIPMENT_RETIRED;
@@ -115,7 +115,7 @@ public abstract class TreeColumnFactory {
    public static final TreeColumnFactory EQUIPMENT_SIZE;
    public static final String            EQUIPMENT_SIZE_ID                       = "EQUIPMENT_SIZE";                       //$NON-NLS-1$
    public static final TreeColumnFactory EQUIPMENT_TOUR_STRUCTURE;
-   public static final String            EQUIPMENT_TOUR_STRUCTURE_ID      = "EQUIPMENT_TOUR_STRUCTURE";         //$NON-NLS-1$
+   public static final String            EQUIPMENT_TOUR_STRUCTURE_ID             = "EQUIPMENT_TOUR_STRUCTURE";             //$NON-NLS-1$
    public static final TreeColumnFactory EQUIPMENT_WEIGHT;
    public static final String            EQUIPMENT_WEIGHT_ID                     = "EQUIPMENT_WEIGHT";                     //$NON-NLS-1$
 
