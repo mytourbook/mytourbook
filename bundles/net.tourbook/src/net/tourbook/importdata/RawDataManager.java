@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2025 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2026 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -3014,8 +3014,8 @@ public class RawDataManager {
             reason = Messages.Log_Reimport_Tour_Skipped_FileLocationDialog_Auto;
 
             // THIS if() MUST BE BEFORE THE NEXT if() otherwise the wrong message is displayed !
-            //} else if (reImportStatus.isCanceled_ByUser_SkipAllInvalidFiles) {
-            // reason = Messages.Log_Reimport_Tour_Skipped_AllInvalidFiles_ByUser;
+         } else if (reImportStatus.isCanceled_ByUser_SkipAllInvalidFiles) {
+            reason = Messages.Log_Reimport_Tour_Skipped_AllInvalidFiles_ByUser;
 
          } else if (reImportStatus.isCanceled_ByUser_TheFileLocationDialog) {
             reason = Messages.Log_Reimport_Tour_Skipped_FileLocationDialog_ByUser;
