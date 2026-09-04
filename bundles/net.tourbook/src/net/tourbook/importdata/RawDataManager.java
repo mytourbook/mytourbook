@@ -120,23 +120,23 @@ public class RawDataManager {
       }
    }
 
-   private static final String           RAW_DATA_LAST_SELECTED_PATH      = "raw-data-view.last-selected-import-path";       //$NON-NLS-1$
-   private static final String           TEMP_IMPORTED_FILE               = "received-device-data.txt";                      //$NON-NLS-1$
+   private static final String           RAW_DATA_LAST_SELECTED_PATH    = "raw-data-view.last-selected-import-path";   //$NON-NLS-1$
+   private static final String           TEMP_IMPORTED_FILE             = "received-device-data.txt";                  //$NON-NLS-1$
 
-   private static final String           FILE_EXTENSION_FIT               = ".fit";                                          //$NON-NLS-1$
-   private static final String           FILE_EXTENSION_FIT_LOG           = ".fitlog";                                       //$NON-NLS-1$
-   private static final String           FILE_EXTENSION_FIT_LOG_EX        = ".fitlogex";                                     //$NON-NLS-1$
+   private static final String           FILE_EXTENSION_FIT             = ".fit";                                      //$NON-NLS-1$
+   private static final String           FILE_EXTENSION_FIT_LOG         = ".fitlog";                                   //$NON-NLS-1$
+   private static final String           FILE_EXTENSION_FIT_LOG_EX      = ".fitlogex";                                 //$NON-NLS-1$
 
-   private static final IPreferenceStore _prefStore                       = TourbookPlugin.getPrefStore();
-   private static final IDialogSettings  _state_RawDataView               = TourbookPlugin.getState(RawDataView.ID);
+   private static final IPreferenceStore _prefStore                     = TourbookPlugin.getPrefStore();
+   private static final IDialogSettings  _state_RawDataView             = TourbookPlugin.getState(RawDataView.ID);
 
-   public static final int               ADJUST_IMPORT_YEAR_IS_DISABLED   = -1;
+   public static final int               ADJUST_IMPORT_YEAR_IS_DISABLED = -1;
 
    static final ComboEnumEntry<?>[]      ALL_IMPORT_CADENCE_CONFIG;
    static final ComboEnumEntry<?>[]      ALL_IMPORT_EQUIPMENT_CONFIG;
    static final ComboEnumEntry<?>[]      ALL_IMPORT_TOUR_TYPE_CONFIG;
 
-   private static boolean                _importState_IsSetBodyWeight     = RawDataView.STATE_IS_SET_BODY_WEIGHT_DEFAULT;
+   private static boolean                _importState_IsSetBodyWeight   = RawDataView.STATE_IS_SET_BODY_WEIGHT_DEFAULT;
    private static CadenceMultiplier      _importState_DefaultCadenceMultiplier;
 
    static {
