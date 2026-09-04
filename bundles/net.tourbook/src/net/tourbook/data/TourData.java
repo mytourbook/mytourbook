@@ -92,6 +92,7 @@ import net.tourbook.importdata.ImportState_Process;
 import net.tourbook.importdata.RawDataManager;
 import net.tourbook.importdata.TourbookDevice;
 import net.tourbook.math.Smooth;
+import net.tourbook.nutrition.NutritionUtils;
 import net.tourbook.photo.Photo;
 import net.tourbook.photo.PhotoAdjustments;
 import net.tourbook.photo.PhotoCache;
@@ -951,6 +952,10 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
     * When this value is not 0 then there should also be swimming data
     */
    private int                   poolLength;
+
+   // ############################################# NUTRITION #############################################
+
+   private float                 nutrition_TotalCarbohydrates;
 
    // ############################################# UNUSED FIELDS - START #############################################
    /**
@@ -2204,6 +2209,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
    public void addNutritionProduct(final TourNutritionProduct nutritionProduct) {
 
       tourNutritionProducts.add(nutritionProduct);
+      this.computeTourNutritionData();
    }
 
    /**
@@ -6604,6 +6610,12 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
 
          tourComputedTime_Moving = Math.max(0, tourMovingTimeRaw);
       }
+   }
+
+   public void computeTourNutritionData() {
+
+      this.nutrition_TotalCarbohydrates =
+            NutritionUtils.getTotalCarbohydrates(tourNutritionProducts);
    }
 
    /**
@@ -14350,7 +14362,10 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
    }
 
    public void setTourNutritionProducts(final Set<TourNutritionProduct> tourNutritionProducts) {
+
       this.tourNutritionProducts = tourNutritionProducts;
+
+      this.computeTourNutritionData();
    }
 
    /**
@@ -15526,6 +15541,11 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
          if (existingProduct.updateProductInfo(updatedProduct)) {
             tourNutritionProductsUpdated = true;
          }
+      }
+
+      if (tourNutritionProductsUpdated) {
+
+         this.computeTourNutritionData();
       }
 
       return tourNutritionProductsUpdated;

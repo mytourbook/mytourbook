@@ -126,10 +126,9 @@ public class TourDatabase {
     * <li>/net.tourbook.export/format-templates/mt-1.0.vm</li>
     * <li>net.tourbook.device.mt.MT_StAXHandler</li>
     */
-   private static final int TOURBOOK_DB_VERSION = 62;
+   private static final int TOURBOOK_DB_VERSION = 63; // 26.8.next
 
-//   private static final int TOURBOOK_DB_VERSION = 62; // 26.6.next
-
+//   private static final int TOURBOOK_DB_VERSION = 62; // 26.8
 //   private static final int TOURBOOK_DB_VERSION = 61; // 26.6
 //   private static final int TOURBOOK_DB_VERSION = 60; // 26.3
 //   private static final int TOURBOOK_DB_VERSION = 59; // 25.11
@@ -5385,6 +5384,12 @@ public class TourDatabase {
 
             // version 59 end
 
+            // version 63 start  -  26.next
+
+            + "   nutrition_TotalCarbohydrates           FLOAT DEFAULT 0,            " + NL //$NON-NLS-1$
+
+            // version 63 end
+
             // version 5 start
             /**
              * Disabled because when two blob object's are deserialized then the error occurs:
@@ -7460,6 +7465,11 @@ public class TourDatabase {
             currentDbVersion = _dbDesignVersion_New = updateDb_061_To_062(conn, splashManager);
          }
 
+         // 62 -> 63    26.8+++
+         if (currentDbVersion == 62) {
+            currentDbVersion = _dbDesignVersion_New = updateDb_062_To_063(conn, splashManager);
+         }
+
          // update db design version number
          updateVersionNumber_10_AfterDesignUpdate(conn, _dbDesignVersion_New);
 
@@ -7529,6 +7539,8 @@ public class TourDatabase {
          updateDb__3_Data_Concurrent(conn, splashManager, new TourDataUpdate_058_to_059()); //     59 - 25.11
 
          updateDb_060_To_061_DataUpdate(conn, splashManager); //                                   61 - 26.6
+
+         updateDb__3_Data_Concurrent(conn, splashManager, new TourDataUpdate_062_to_063()); //     63 - 26.8++
 
       } catch (final SQLException e) {
 
@@ -11960,6 +11972,30 @@ public class TourDatabase {
          }
          stmt.close();
       }
+
+      logDbUpdate_End(newDbVersion);
+
+      return newDbVersion;
+   }
+
+   private int updateDb_062_To_063(final Connection conn, final SplashManager splashManager) throws SQLException {
+
+      final int newDbVersion = 62;
+
+      logDbUpdate_Start(newDbVersion);
+      updateMonitor(splashManager, newDbVersion);
+
+      final Statement stmt = conn.createStatement();
+      {
+
+// SET_FORMATTING_OFF
+
+         SQL.addColumn_Float(stmt, TABLE_TOUR_DATA, "nutrition_TotalCarbohydrates", DEFAULT_0); //$NON-NLS-1$
+
+// SET_FORMATTING_ON
+      }
+
+      stmt.close();
 
       logDbUpdate_End(newDbVersion);
 

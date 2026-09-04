@@ -433,6 +433,8 @@ class CalendarTourDataProvider {
 
          final ArrayList<Boolean> allIsManualTour        = new ArrayList<>();
 
+         final List<Float> allTotalCarbohydrates        = new ArrayList<>();
+
 // SET_FORMATTING_ON
 
          final AppFilter appFilter = new AppFilter(AppFilter.ANY_APP_FILTERS);
@@ -462,7 +464,8 @@ class CalendarTourDataProvider {
                + "   AvgPulse," + NL //                           18 //$NON-NLS-1$
                + "   Power_Avg," + NL //                          19 //$NON-NLS-1$
                + "   TourDeviceTime_Recorded," + NL //            20 //$NON-NLS-1$
-               + "   weather_Clouds" + NL //                      21 //$NON-NLS-1$
+               + "   weather_Clouds," + NL //                     21 //$NON-NLS-1$
+               + "   nutrition_TotalCarbohydrates" + NL //        22 //$NON-NLS-1$
 
                + "FROM " + TourDatabase.TABLE_TOUR_DATA + NL //      //$NON-NLS-1$
 
@@ -532,6 +535,8 @@ class CalendarTourDataProvider {
 
                   allIsManualTour               .clear();
 
+                  allTotalCarbohydrates         .clear();
+
 // SET_FORMATTING_ON
 
                   firstTourOfDay = false;
@@ -583,6 +588,7 @@ class CalendarTourDataProvider {
                allPulseAvg                .add(result.getFloat(18));
                allPowerAvg                .add(result.getFloat(19));
                allTourWeatherClouds       .add(result.getString(21));
+               allTotalCarbohydrates      .add(result.getFloat(22));
 
 // SET_FORMATTING_ON
 
@@ -619,41 +625,43 @@ class CalendarTourDataProvider {
 
 // SET_FORMATTING_OFF
 
-               data.tourId          = allTourIDs            .get(tourIndex);
+               data.tourId                     = allTourIDs            .get(tourIndex);
 
-               data.typeId          = allTypeIds            .get(tourIndex);
-               data.typeColorIndex  = allTypeColorIndex     .get(tourIndex);
+               data.typeId                     = allTypeIds            .get(tourIndex);
+               data.typeColorIndex             = allTypeColorIndex     .get(tourIndex);
 
-               data.year            = allTourYear           .get(tourIndex);
-               data.month           = allTourMonth          .get(tourIndex);
-               data.day             = allTourDay            .get(tourIndex);
-               data.week            = allTourStartWeek      .get(tourIndex);
+               data.year                       = allTourYear           .get(tourIndex);
+               data.month                      = allTourMonth          .get(tourIndex);
+               data.day                        = allTourDay            .get(tourIndex);
+               data.week                       = allTourStartWeek      .get(tourIndex);
 
-               data.startTime       = allTourStartTime      .get(tourIndex);
-               data.endTime         = allTourEndTime        .get(tourIndex);
+               data.startTime                  = allTourStartTime      .get(tourIndex);
+               data.endTime                    = allTourEndTime        .get(tourIndex);
 
-               data.distance        = allDistance           .get(tourIndex);
-               data.elevationGain   = allElevationGain      .get(tourIndex);
-               data.elevationLoss   = allElevationLoss      .get(tourIndex);
+               data.distance                   = allDistance           .get(tourIndex);
+               data.elevationGain              = allElevationGain      .get(tourIndex);
+               data.elevationLoss              = allElevationLoss      .get(tourIndex);
 
-               data.elapsedTime     = allTourElapsedTime    .get(tourIndex);
-               data.recordedTime    = allTourDeviceTime_Recorded.get(tourIndex);
-               data.movingTime      = allTourMovingTime     .get(tourIndex);
+               data.elapsedTime                = allTourElapsedTime    .get(tourIndex);
+               data.recordedTime               = allTourDeviceTime_Recorded.get(tourIndex);
+               data.movingTime                 = allTourMovingTime     .get(tourIndex);
 
-               data.calories        = allCalories           .get(tourIndex);
-               data.power_Avg       = allPowerAvg           .get(tourIndex);
-               data.pulse_Avg       = allPulseAvg           .get(tourIndex);
+               data.calories                   = allCalories           .get(tourIndex);
+               data.power_Avg                  = allPowerAvg           .get(tourIndex);
+               data.pulse_Avg                  = allPulseAvg           .get(tourIndex);
 
-               data.tourTitle       = allTourTitle          .get(tourIndex);
-               data.tourDescription = allTourDescription    .get(tourIndex);
+               data.tourTitle                  = allTourTitle          .get(tourIndex);
+               data.tourDescription            = allTourDescription    .get(tourIndex);
 
-               data.weatherClouds   = allTourWeatherClouds  .get(tourIndex);
+               data.weatherClouds              = allTourWeatherClouds  .get(tourIndex);
 
                final LocalDate tourDate = LocalDate.of(year, month, data.day);
-               data.tourDate        = tourDate;
-               data.dayOfWeek       = tourDate.getDayOfWeek().getValue();
+               data.tourDate                   = tourDate;
+               data.dayOfWeek                  = tourDate.getDayOfWeek().getValue();
 
-               data.isManualTour    = allIsManualTour       .get(tourIndex);
+               data.isManualTour               = allIsManualTour       .get(tourIndex);
+
+               data.nutrition_TotalCarbohydrates = allTotalCarbohydrates .get(tourIndex);
 
                dayData[tourIndex] = data;
 
@@ -732,7 +740,9 @@ class CalendarTourDataProvider {
 
                + " SUM(TourDeviceTime_Recorded)," + NL //            10 //$NON-NLS-1$
 
-               + " SUM(power_TrainingStressScore)" + NL //           11 //$NON-NLS-1$
+               + " SUM(power_TrainingStressScore)," + NL //          11 //$NON-NLS-1$
+
+               + " SUM(nutrition_TotalCarbohydrates)" + NL //        12 //$NON-NLS-1$
 
                + "FROM " + TourDatabase.TABLE_TOUR_DATA + NL //         //$NON-NLS-1$
 
@@ -776,6 +786,8 @@ class CalendarTourDataProvider {
             weekData.recordedTime         = result.getInt(10);
 
             weekData.trainingLoad_Tss     = result.getInt(11);
+
+            weekData.nutrition_TotalCarbohydrates    = result.getFloat(12);
 
             if (UI.IS_SCRAMBLE_DATA) {
 

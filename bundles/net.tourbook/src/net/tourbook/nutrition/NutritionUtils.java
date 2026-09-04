@@ -89,8 +89,11 @@ public class NutritionUtils {
    public static String computeAverageCaloriesPerHour(final TourData tourData) {
 
       final int totalCalories = getTotalCalories(tourData.getTourNutritionProducts());
-      final float averageCaloriesPerHour = computeAveragePerHour(tourData, totalCalories);
-      final String averageCaloriesPerHourFormatted = FormatManager.formatNumber_0(averageCaloriesPerHour);
+      final float averageCaloriesPerHour = computeAveragePerHour(
+            tourData.getTourDeviceTime_Elapsed(),
+            totalCalories);
+      final String averageCaloriesPerHourFormatted =
+            FormatManager.formatNumber_0(averageCaloriesPerHour);
 
       return averageCaloriesPerHourFormatted;
    }
@@ -98,8 +101,11 @@ public class NutritionUtils {
    public static String computeAverageCarbohydratesPerHour(final TourData tourData) {
 
       final int totalCarbohydrates = getTotalCarbohydrates(tourData.getTourNutritionProducts());
-      final float averageCarbohydratesPerHour = computeAveragePerHour(tourData, totalCarbohydrates);
-      final String averageCarbohydratesPerHourFormatted = FormatManager.formatNumber_0(averageCarbohydratesPerHour);
+      final float averageCarbohydratesPerHour = computeAveragePerHour(
+            tourData.getTourDeviceTime_Elapsed(),
+            totalCarbohydrates);
+      final String averageCarbohydratesPerHourFormatted =
+            FormatManager.formatNumber_0(averageCarbohydratesPerHour);
 
       return averageCarbohydratesPerHourFormatted;
    }
@@ -107,7 +113,9 @@ public class NutritionUtils {
    public static String computeAverageFluidsPerHour(final TourData tourData) {
 
       final float totalFluids = getTotalFluids(tourData.getTourNutritionProducts()) * 100 / 100;
-      final float averageFluidsPerHour = computeAveragePerHour(tourData, totalFluids);
+      final float averageFluidsPerHour = computeAveragePerHour(
+            tourData.getTourDeviceTime_Elapsed(),
+            totalFluids);
 
       _nf2.setMinimumFractionDigits(0);
       _nf2.setMaximumFractionDigits(2);
@@ -116,9 +124,7 @@ public class NutritionUtils {
       return averageFluidsPerHourFormatted.equals("0") ? UI.EMPTY_STRING : averageFluidsPerHourFormatted; //$NON-NLS-1$
    }
 
-   private static float computeAveragePerHour(final TourData tourData, final float totalAmount) {
-
-      long tourDeviceTime_Elapsed = tourData.getTourDeviceTime_Elapsed();
+   public static float computeAveragePerHour(long tourDeviceTime_Elapsed, final float totalAmount) {
 
       if (tourDeviceTime_Elapsed > 7200 && _prefStore.getBoolean(ITourbookPreferences.NUTRITION_IGNORE_FIRST_HOUR)) {
          tourDeviceTime_Elapsed -= 3600;

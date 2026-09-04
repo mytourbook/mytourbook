@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2026 Wolfgang Schramm and Contributors
+ * Copyright (C) 2026 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -13,40 +13,35 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
-package net.tourbook.ui.views.calendar;
+package net.tourbook.database;
 
-public enum FormatterID {
+import java.util.List;
 
-   EMPTY, //
+import net.tourbook.data.TourData;
 
-   TOUR_TITLE, //
-   TOUR_DESCRIPTION, //
+public class TourDataUpdate_062_to_063 implements ITourDataUpdate {
 
-   DISTANCE, //
-   ELEVATION, //
-   ELEVATION_CHANGE, //
+   @Override
+   public int getDatabaseVersion() {
 
-   CADENCE_ZONES_TIMES, //
+      return 62;
+   }
 
-   SPEED, //
-   PACE, //
+   @Override
+   public List<Long> getTourIDs() {
 
-   POWER_AVG, //
-   PULSE_AVG, //
+      return null;
+   }
 
-   ENERGY_KCAL, //
-   ENERGY_MJ, //
+   @Override
+   public boolean updateTourData(final TourData tourData) {
 
-   NUTRITION_CARBOHYDRATES_AVG_PER_HOUR, //
+      if (tourData.getTourNutritionProducts().isEmpty()) {
+         return false;
+      }
 
-   TIME_ELAPSED, //
-   TIME_RECORDED, //
-   TIME_PAUSED, //
-   TIME_MOVING, //
-   TIME_BREAK, //
+      tourData.computeTourNutritionData();
 
-   TRAININGLOAD_TSS, //
-
-   WEATHER_ICON
-
+      return true;
+   }
 }

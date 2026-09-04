@@ -577,16 +577,7 @@ public class EasyImportManager {
 
          if (dbFileNames.contains(deviceFile.getFileName()) == false) {
 
-            if (!RawDataManager.isIgnoreInvalidFile()) {
-
-               notImportedFiles.add(deviceFile);
-
-            } else {// RawDataManager.isIgnoreInvalidFile() == true
-
-               if (!RawDataManager.doesInvalidFileExist(deviceFile.getFileName())) {
-                  notImportedFiles.add(deviceFile);
-               }
-            }
+            notImportedFiles.add(deviceFile);
          }
       }
 

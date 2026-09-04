@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2025 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2026 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -15,14 +15,11 @@
  *******************************************************************************/
 package net.tourbook.importdata;
 
-import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.OutputStreamWriter;
 import java.lang.reflect.InvocationTargetException;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -34,7 +31,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Scanner;
 import java.util.Set;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.ConcurrentHashMap;
@@ -49,7 +45,6 @@ import net.tourbook.Messages;
 import net.tourbook.OtherMessages;
 import net.tourbook.application.PerspectiveFactoryRawData;
 import net.tourbook.application.TourbookPlugin;
-import net.tourbook.common.CommonActivator;
 import net.tourbook.common.FileSystemManager;
 import net.tourbook.common.UI;
 import net.tourbook.common.dialog.MessageDialogWithRadioOptions;
@@ -83,7 +78,6 @@ import net.tourbook.weather.WeatherUtils;
 
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.dialogs.MessageDialog;
@@ -126,26 +120,23 @@ public class RawDataManager {
       }
    }
 
-   private static final String           RAW_DATA_LAST_SELECTED_PATH      = "raw-data-view.last-selected-import-path";       //$NON-NLS-1$
-   private static final String           TEMP_IMPORTED_FILE               = "received-device-data.txt";                      //$NON-NLS-1$
+   private static final String           RAW_DATA_LAST_SELECTED_PATH    = "raw-data-view.last-selected-import-path";   //$NON-NLS-1$
+   private static final String           TEMP_IMPORTED_FILE             = "received-device-data.txt";                  //$NON-NLS-1$
 
-   private static final String           FILE_EXTENSION_FIT               = ".fit";                                          //$NON-NLS-1$
-   private static final String           FILE_EXTENSION_FIT_LOG           = ".fitlog";                                       //$NON-NLS-1$
-   private static final String           FILE_EXTENSION_FIT_LOG_EX        = ".fitlogex";                                     //$NON-NLS-1$
+   private static final String           FILE_EXTENSION_FIT             = ".fit";                                      //$NON-NLS-1$
+   private static final String           FILE_EXTENSION_FIT_LOG         = ".fitlog";                                   //$NON-NLS-1$
+   private static final String           FILE_EXTENSION_FIT_LOG_EX      = ".fitlogex";                                 //$NON-NLS-1$
 
-   private static final IPreferenceStore _prefStore                       = TourbookPlugin.getPrefStore();
-   private static final IDialogSettings  _state_RawDataView               = TourbookPlugin.getState(RawDataView.ID);
+   private static final IPreferenceStore _prefStore                     = TourbookPlugin.getPrefStore();
+   private static final IDialogSettings  _state_RawDataView             = TourbookPlugin.getState(RawDataView.ID);
 
-   private static final String           INVALIDFILES_TO_IGNORE           = "invalidfiles_to_ignore.txt";                    //$NON-NLS-1$
-
-   public static final int               ADJUST_IMPORT_YEAR_IS_DISABLED   = -1;
+   public static final int               ADJUST_IMPORT_YEAR_IS_DISABLED = -1;
 
    static final ComboEnumEntry<?>[]      ALL_IMPORT_CADENCE_CONFIG;
    static final ComboEnumEntry<?>[]      ALL_IMPORT_EQUIPMENT_CONFIG;
    static final ComboEnumEntry<?>[]      ALL_IMPORT_TOUR_TYPE_CONFIG;
 
-   private static boolean                _importState_IsIgnoreInvalidFile = RawDataView.STATE_IS_IGNORE_INVALID_FILE_DEFAULT;
-   private static boolean                _importState_IsSetBodyWeight     = RawDataView.STATE_IS_SET_BODY_WEIGHT_DEFAULT;
+   private static boolean                _importState_IsSetBodyWeight   = RawDataView.STATE_IS_SET_BODY_WEIGHT_DEFAULT;
    private static CadenceMultiplier      _importState_DefaultCadenceMultiplier;
 
    static {
@@ -197,13 +188,6 @@ public class RawDataManager {
 
       createDeviceLists();
    }
-
-   /**
-    * Contains files which could not be imported, the key is the OS filepath name.
-    * <p>
-    * Only the KeySet is used
-    */
-   private static final ConcurrentHashMap<String, Object>       _allInvalidFiles                         = new ConcurrentHashMap<>();
 
    /**
     * Contains alternative filepaths from previous re-imported tours, the key is the {@link IPath}.
@@ -763,15 +747,6 @@ public class RawDataManager {
       }
    }
 
-   static boolean doesInvalidFileExist(final String fileName) {
-
-      final ArrayList<String> invalidFilesList = readInvalidFilesToIgnoreFile();
-
-      return invalidFilesList
-            .stream()
-            .anyMatch(invalidFilePath -> Paths.get(invalidFilePath).getFileName().toString().equals(fileName));
-   }
-
    private static void getAvailable_TagsWithNotes(final Map<String, TagWithNotes> allRequestedTagsWithNotes,
                                                   final Map<String, TourTag> allOldTags,
                                                   final Map<String, TagWithNotes> allNewTags) {
@@ -935,11 +910,6 @@ public class RawDataManager {
       return _instance;
    }
 
-   private static File getInvalidFilesToIgnoreFile() {
-      final IPath stateLocation = Platform.getStateLocation(CommonActivator.getDefault().getBundle());
-      return stateLocation.append(INVALIDFILES_TO_IGNORE).toFile();
-   }
-
    /**
     * @return temporary directory where received data are stored temporarily
     */
@@ -952,10 +922,6 @@ public class RawDataManager {
     */
    public static boolean isDeleteValuesActive() {
       return _isDeleteValuesActive;
-   }
-
-   public static boolean isIgnoreInvalidFile() {
-      return _importState_IsIgnoreInvalidFile;
    }
 
    /**
@@ -971,69 +937,6 @@ public class RawDataManager {
 
    public static boolean isSingleThreadTourImport() {
       return _isSingleThreadTourImport;
-   }
-
-   private static ArrayList<String> readInvalidFilesToIgnoreFile() {
-      final ArrayList<String> invalidFilesList = new ArrayList<>();
-
-      final File invalidFilesToIgnoreFile = getInvalidFilesToIgnoreFile();
-      if (!invalidFilesToIgnoreFile.exists()) {
-         return invalidFilesList;
-      }
-
-      try (Scanner s = new Scanner(invalidFilesToIgnoreFile)) {
-         while (s.hasNext()) {
-            invalidFilesList.add(s.next());
-         }
-      } catch (final IOException e) {
-         e.printStackTrace();
-      }
-
-      return invalidFilesList;
-   }
-
-   /**
-    * Writes the list of files to ignore into a text file.
-    */
-   private static void save_InvalidFilesToIgnore_InTxt() {
-
-      final File file = getInvalidFilesToIgnoreFile();
-
-      try {
-         if (!file.exists()) {
-            file.createNewFile();
-         }
-      } catch (final IOException e) {
-         e.printStackTrace();
-      }
-
-      try (FileOutputStream fileOutputStream = new FileOutputStream(file, true);
-            OutputStreamWriter outputStreamWriter = new OutputStreamWriter(fileOutputStream, UI.UTF_8);
-            BufferedWriter writer = new BufferedWriter(outputStreamWriter)) {
-
-         final ImportConfig importConfig = getEasyConfig().getActiveImportConfig();
-
-         for (final String invalidFile : _allInvalidFiles.keySet()) {
-
-            Path invalidFilePath = Paths.get(invalidFile);
-
-            //If the invalid files are backed up and deleted from the device folder,
-            //then we save their backup path and not their device path.
-            if (importConfig.isCreateBackup && importConfig.isDeleteDeviceFiles) {
-               invalidFilePath = Paths.get(importConfig.getBackupFolder(), Paths.get(invalidFile).getFileName().toString());
-            }
-
-            // We check if the file still exists (it could have been deleted recently)
-            // and that it's not already in the text file
-            if (Files.exists(invalidFilePath) && !doesInvalidFileExist(invalidFilePath.getFileName().toString())) {
-               writer.write(invalidFilePath.toString());
-               writer.newLine();
-            }
-         }
-
-      } catch (final IOException e) {
-         e.printStackTrace();
-      }
    }
 
    public static void setIsDeleteValuesActive(final boolean isDeleteValuesActive) {
@@ -1583,10 +1486,6 @@ public class RawDataManager {
       }
 
       return false;
-   }
-
-   public void clearInvalidFilesList() {
-      _allInvalidFiles.clear();
    }
 
    public TourData createTourDataDummyClone(final List<TourValueType> tourValueTypes, final TourData oldTourData) {
@@ -2155,10 +2054,6 @@ public class RawDataManager {
       return _importState_ImportYear;
    }
 
-   public ConcurrentHashMap<String, Object> getInvalidFilesList() {
-      return _allInvalidFiles;
-   }
-
    /**
     * Ask user for the replacement options and set the selected replacement options into
     * {@link #_selectedImportFilenameReplacementOption}
@@ -2404,8 +2299,6 @@ public class RawDataManager {
             /*
              * Do post import actions
              */
-            save_InvalidFilesToIgnore_InTxt();
-
             if (numImportedFiles.get() > 0) {
 
                updateTourData_InImportView_FromDb(monitor);
@@ -2548,8 +2441,6 @@ public class RawDataManager {
       } else {
 
          // import failed
-
-         _allInvalidFiles.put(osFilePath, new Object());
 
          if (importState_File.isImportLogged == false) {
 
@@ -4064,10 +3955,6 @@ public class RawDataManager {
 
    public void setState_DefaultCadenceMultiplier(final CadenceMultiplier defaultCadenceMultiplier) {
       _importState_DefaultCadenceMultiplier = defaultCadenceMultiplier;
-   }
-
-   public void setState_IsIgnoreInvalidFile(final boolean isIgnoreInvalidFile) {
-      _importState_IsIgnoreInvalidFile = isIgnoreInvalidFile;
    }
 
    public void setState_IsSetBodyWeight(final boolean isSetBodyWeight) {

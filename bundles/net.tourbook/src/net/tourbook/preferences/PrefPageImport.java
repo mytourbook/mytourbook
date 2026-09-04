@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2026 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -59,11 +59,9 @@ public class PrefPageImport extends PreferencePage implements IWorkbenchPreferen
     * UI controls
     */
    private Button             _chkCreateTourIdWithTime;
-   private Button             _chkIgnoreInvalidFile;
    private Button             _chkSetBodyWeight;
 
    private Label              _lblIdInfo;
-   private Label              _lblInvalidFilesInfo;
 
    private PreferenceLinkArea _linkBodyWeight;
    private ComboViewerCadence _comboDefaultCadence;
@@ -133,31 +131,6 @@ public class PrefPageImport extends PreferencePage implements IWorkbenchPreferen
             }
          }
          {
-            {
-               /*
-                * Checkbox: Ignore invalid files
-                */
-               _chkIgnoreInvalidFile = new Button(container, SWT.CHECK);
-               _chkIgnoreInvalidFile.setText(Messages.PrefPage_Import_Checkbox_IgnoreInvalidFiles);
-               _chkIgnoreInvalidFile.addSelectionListener(_defaultSelectionListener);
-               GridDataFactory.fillDefaults()
-                     .indent(0, VERTICAL_SPACING)
-                     .applyTo(_chkIgnoreInvalidFile);
-            }
-            {
-               /*
-                * Label: Info
-                */
-               _lblInvalidFilesInfo = new Label(container, SWT.WRAP | SWT.READ_ONLY);
-               _lblInvalidFilesInfo.setText(Messages.PrefPage_Import_Checkbox_IgnoreInvalidFiles_Tooltip);
-               GridDataFactory.fillDefaults()
-                     .grab(true, false)
-                     .indent(_checkboxIndent, 0)
-                     .hint(_pc.convertWidthInCharsToPixels(40), SWT.DEFAULT)
-                     .applyTo(_lblInvalidFilesInfo);
-            }
-         }
-         {
             /*
              * Set the person's body weight when importing and saving a tour
              */
@@ -221,9 +194,6 @@ public class PrefPageImport extends PreferencePage implements IWorkbenchPreferen
       final boolean isTourIdWithTime = _chkCreateTourIdWithTime.getSelection();
       _lblIdInfo.setEnabled(isTourIdWithTime);
 
-      final boolean areInvalidFilesToBeIgnored = _chkIgnoreInvalidFile.getSelection();
-      _lblInvalidFilesInfo.setEnabled(areInvalidFilesToBeIgnored);
-
       final boolean isSetBodyWeight = _chkSetBodyWeight.getSelection();
       _linkBodyWeight.getControl().setEnabled(isSetBodyWeight);
    }
@@ -246,7 +216,6 @@ public class PrefPageImport extends PreferencePage implements IWorkbenchPreferen
    protected void performDefaults() {
 
       _chkCreateTourIdWithTime.setSelection(RawDataView.STATE_IS_CREATE_TOUR_ID_WITH_TIME_DEFAULT);
-      _chkIgnoreInvalidFile.setSelection(RawDataView.STATE_IS_IGNORE_INVALID_FILE_DEFAULT);
       _chkSetBodyWeight.setSelection(RawDataView.STATE_IS_SET_BODY_WEIGHT_DEFAULT);
       _comboDefaultCadence.setSelection(RawDataView.STATE_DEFAULT_CADENCE_MULTIPLIER_DEFAULT);
 
@@ -276,12 +245,6 @@ public class PrefPageImport extends PreferencePage implements IWorkbenchPreferen
 
       _chkCreateTourIdWithTime.setSelection(isCreateTourIdWithTime);
 
-      final boolean isIgnoreInvalidFile = Util.getStateBoolean(
-            _state,
-            RawDataView.STATE_IS_IGNORE_INVALID_FILE,
-            RawDataView.STATE_IS_IGNORE_INVALID_FILE_DEFAULT);
-      _chkIgnoreInvalidFile.setSelection(isIgnoreInvalidFile);
-
       final boolean isSetBodyWeight = Util.getStateBoolean(
             _state,
             RawDataView.STATE_IS_SET_BODY_WEIGHT,
@@ -298,17 +261,14 @@ public class PrefPageImport extends PreferencePage implements IWorkbenchPreferen
    private void saveState() {
 
       final boolean isCreateTourIdWithTime = _chkCreateTourIdWithTime.getSelection();
-      final boolean isIgnoreInvalidFile = _chkIgnoreInvalidFile.getSelection();
       final boolean isSetBodyWeight = _chkSetBodyWeight.getSelection();
       final CadenceMultiplier defaultCadenceMultiplier = _comboDefaultCadence.getSelectedCadence();
 
       _state.put(RawDataView.STATE_IS_CREATE_TOUR_ID_WITH_TIME, isCreateTourIdWithTime);
-      _state.put(RawDataView.STATE_IS_IGNORE_INVALID_FILE, isIgnoreInvalidFile);
       _state.put(RawDataView.STATE_IS_SET_BODY_WEIGHT, isSetBodyWeight);
       Util.setStateEnum(_state, RawDataView.STATE_DEFAULT_CADENCE_MULTIPLIER, defaultCadenceMultiplier);
 
       _rawDataMgr.setState_CreateTourIdWithTime(isCreateTourIdWithTime);
-      _rawDataMgr.setState_IsIgnoreInvalidFile(isIgnoreInvalidFile);
       _rawDataMgr.setState_IsSetBodyWeight(isSetBodyWeight);
       _rawDataMgr.setState_DefaultCadenceMultiplier(defaultCadenceMultiplier);
    }
