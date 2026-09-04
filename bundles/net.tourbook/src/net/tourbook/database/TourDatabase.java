@@ -7540,7 +7540,7 @@ public class TourDatabase {
 
          updateDb_060_To_061_DataUpdate(conn, splashManager); //                                   61 - 26.6
 
-         updateDb__3_Data_Concurrent(conn, splashManager, new TourDataUpdate_062_to_063()); //     62 - 26.6++
+         updateDb__3_Data_Concurrent(conn, splashManager, new TourDataUpdate_062_to_063()); //     63 - 26.8++
 
       } catch (final SQLException e) {
 
