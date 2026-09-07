@@ -1515,7 +1515,7 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements IActionRe
 
       {
          /*
-          * Drop down menu: device type
+          * Combo: Device type
           */
          _comboIC_DeviceType = new Combo(parent, SWT.READ_ONLY | SWT.BORDER);
          _comboIC_DeviceType.setToolTipText(Messages.Dialog_ImportConfig_Label_DeviceType_Tooltip);
@@ -1743,8 +1743,8 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements IActionRe
           * Label: Device info
           */
          final Label label = new Label(parent, SWT.NONE);
-         label.setText(Messages.Dialog_ImportConfig_Label_DeviceInfoCommand);
-         label.setToolTipText(Messages.Dialog_ImportConfig_Label_DeviceInfoCommand_Tooltip);
+         label.setText(Messages.Dialog_ImportConfig_Label_Command_DeviceInfo);
+         label.setToolTipText(Messages.Dialog_ImportConfig_Label_Command_DeviceInfo_Tooltip);
          gd.applyTo(label);
 
          /*
@@ -1766,7 +1766,8 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements IActionRe
                selectionEvent -> {
                   onSelect_IC_RunMountCommand(
                         _txtIC_Command_DeviceInfo.getText(),
-                        _txtIC_Command_DeviceInfo_Log);
+                        _txtIC_Command_DeviceInfo_Log,
+                        false);
                }));
          gd.applyTo(_btnIC_RunCommand_DeviceInfo);
          setButtonLayoutData(_btnIC_RunCommand_DeviceInfo);
@@ -1840,7 +1841,7 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements IActionRe
           * Label: Mount command
           */
          _lblIC_MountCommand = new Label(parent, SWT.NONE);
-         _lblIC_MountCommand.setText(Messages.Dialog_ImportConfig_Label_MountCommand);
+         _lblIC_MountCommand.setText(Messages.Dialog_ImportConfig_Label_Command_Mount);
          GridDataFactory.fillDefaults()
                .align(SWT.FILL, SWT.CENTER)
                .indent(_leftPadding, 0)
@@ -1865,7 +1866,8 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements IActionRe
                selectionEvent -> {
                   onSelect_IC_RunMountCommand(
                         _txtIC_Command_Mount.getText(),
-                        _txtIC_Command_Mount_TestLog);
+                        _txtIC_Command_Mount_TestLog,
+                        true);
                }));
          GridDataFactory.fillDefaults()
                .align(SWT.FILL, SWT.CENTER)
@@ -1903,7 +1905,7 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements IActionRe
                    * Label: Mount command
                    */
                   _lblIC_MountCommand_Log = new Label(container, SWT.NONE);
-                  _lblIC_MountCommand_Log.setText(Messages.Dialog_ImportConfig_Label_MountCommandLog);
+                  _lblIC_MountCommand_Log.setText(Messages.Dialog_ImportConfig_Label_Command_MountLog);
                   GridDataFactory.fillDefaults()
                         .align(SWT.FILL, SWT.CENTER)
                         .applyTo(_lblIC_MountCommand_Log);
@@ -1911,7 +1913,8 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements IActionRe
                }
             }
             {
-               final int xHint = 100;
+               // "force" equal width for the log fields
+               final int widthHint = 1000;
                {
                   /*
                    * Text: Mount command is OK
@@ -1927,7 +1930,7 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements IActionRe
                   GridDataFactory.fillDefaults()
                         .grab(true, true)
                         .indent(_leftPadding, 0)
-                        .hint(xHint, SWT.DEFAULT)
+                        .hint(widthHint, SWT.DEFAULT)
                         .applyTo(_txtIC_Command_Mount_VerifyLog);
                }
                {
@@ -1954,7 +1957,7 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements IActionRe
 
                   GridDataFactory.fillDefaults()
                         .grab(true, true)
-                        .hint(xHint, SWT.DEFAULT)
+                        .hint(widthHint, SWT.DEFAULT)
                         .applyTo(_txtIC_Command_Mount_TestLog);
                }
             }
@@ -1981,7 +1984,7 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements IActionRe
           * Label: Unmount command
           */
          _lblIC_UnmountCommand = new Label(parent, SWT.NONE);
-         _lblIC_UnmountCommand.setText(Messages.Dialog_ImportConfig_Label_UnmouontCommand);
+         _lblIC_UnmountCommand.setText(Messages.Dialog_ImportConfig_Label_Command_Unmount);
          GridDataFactory.fillDefaults()
                .align(SWT.FILL, SWT.CENTER)
                .indent(_leftPadding, 0)
@@ -2006,7 +2009,8 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements IActionRe
                selectionEvent -> {
                   onSelect_IC_RunMountCommand(
                         _txtIC_Command_Unmount.getText(),
-                        _txtIC_Command_Unmount_TestLog);
+                        _txtIC_Command_Unmount_TestLog,
+                        true);
                }));
          GridDataFactory.fillDefaults()
                .align(SWT.FILL, SWT.CENTER)
@@ -2044,7 +2048,7 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements IActionRe
                    * Label: Mount command
                    */
                   _lblIC_UnmountCommand_Log = new Label(container, SWT.NONE);
-                  _lblIC_UnmountCommand_Log.setText(Messages.Dialog_ImportConfig_Label_UnmountCommandLog);
+                  _lblIC_UnmountCommand_Log.setText(Messages.Dialog_ImportConfig_Label_Command_UnmountLog);
                   GridDataFactory.fillDefaults()
                         .align(SWT.FILL, SWT.CENTER)
                         .applyTo(_lblIC_UnmountCommand_Log);
@@ -2052,7 +2056,7 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements IActionRe
                }
             }
             {
-               final int xHint = 100;
+               final int widthHint = 1000;
                {
                   /*
                    * Text: Unmount command is OK
@@ -2068,7 +2072,7 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements IActionRe
                   GridDataFactory.fillDefaults()
                         .grab(true, true)
                         .indent(_leftPadding, 0)
-                        .hint(xHint, SWT.DEFAULT)
+                        .hint(widthHint, SWT.DEFAULT)
                         .applyTo(_txtIC_Command_Unmount_VerifyLog);
                }
                {
@@ -2095,7 +2099,7 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements IActionRe
 
                   GridDataFactory.fillDefaults()
                         .grab(true, true)
-                        .hint(xHint, SWT.DEFAULT)
+                        .hint(widthHint, SWT.DEFAULT)
                         .applyTo(_txtIC_Command_Unmount_TestLog);
                }
             }
@@ -5573,31 +5577,44 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements IActionRe
       _tabFolderEasy.setSelection(1);
    }
 
-   private void onSelect_IC_RunMountCommand(final String command, final StyledText txtLog) {
+   private void onSelect_IC_RunMountCommand(final String command,
+                                            final StyledText txtLog,
+                                            final boolean isPostUpdate) {
 
-      BusyIndicator.showWhile(Display.getDefault(), () -> {
+      // clear old log
+      txtLog.setText(UI.EMPTY_STRING);
 
-         final String[] allCommands = command.split(UI.SPACE1);
+      _parent.getDisplay().asyncExec(() -> {
 
-         final ProcessContext processContext = EasyImportManager.runProcess(
-               _selectedIC.mountUnmountTimeout,
-               allCommands);
+         BusyIndicator.showWhile(Display.getDefault(), () -> {
 
-         if (processContext.error != null) {
+            final String[] allCommands = command.split(UI.SPACE1);
 
-            // display error message
+            final ProcessContext processContext = EasyImportManager.runProcess(
+                  _selectedIC.mountUnmountTimeout,
+                  allCommands);
 
-            txtLog.setForeground(UI.IS_DARK_THEME ? UI.SYS_COLOR_YELLOW : UI.SYS_COLOR_RED);
-            txtLog.setText(processContext.error);
+            if (processContext.error != null) {
 
-         } else {
+               // display error message
 
-            txtLog.setForeground(ThemeUtil.getDefaultForegroundColor_Shell());
-            txtLog.setText(processContext.output);
-         }
+               txtLog.setForeground(UI.IS_DARK_THEME ? UI.SYS_COLOR_YELLOW : UI.SYS_COLOR_RED);
+               txtLog.setText(processContext.error);
 
-         // when setting the text, it can resize the text boxes
-         _parent.layout(true, true);
+            } else {
+
+               txtLog.setForeground(ThemeUtil.getDefaultForegroundColor_Shell());
+               txtLog.setText(processContext.output);
+            }
+
+            // when setting the text, it can resize the text boxes
+            _parent.layout(true, true);
+
+            // update device folder
+            if (isPostUpdate) {
+               _deviceHistoryItems.updateHistory();
+            }
+         });
       });
    }
 
