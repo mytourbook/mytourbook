@@ -133,7 +133,7 @@
                                                                      <version>${tycho.version}</version>
             <configuration>
 
-               <!-- Fix this problem (and propably others)
+               <!-- Fix this problem (and probably others)
 
                 Access restriction: The method 'BaseDateTime.getMillis()' is not API 
                 (restriction on classpath entry 'C:\DAT\MT\mytourbook\bundles\net.tourbook.ext.jars\joda-time-2.1.jar')
