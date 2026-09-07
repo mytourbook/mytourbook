@@ -36,19 +36,17 @@ public class TourDataUpdate_062_to_063 implements ITourDataUpdate {
    @Override
    public List<Long> getTourIDs() {
 
-      return null;
-   }
-
-   @Override
-   public boolean updateTourData(final TourData tourData) {
-
       final IPath stateLocation =
             Platform.getStateLocation(CommonActivator.getDefault().getBundle());
       final File invalidFiles =
             stateLocation.append("invalidfiles_to_ignore.txt").toFile(); //$NON-NLS-1$
-      if (invalidFiles.exists()) {
-         FileUtils.deleteIfExists(invalidFiles.toPath());
-      }
+      FileUtils.deleteIfExists(invalidFiles.toPath());
+
+      return List.of();
+   }
+
+   @Override
+   public boolean updateTourData(final TourData tourData) {
 
       if (tourData.getTourNutritionProducts().isEmpty()) {
          return false;
