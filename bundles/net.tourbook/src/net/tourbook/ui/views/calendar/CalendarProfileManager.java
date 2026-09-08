@@ -31,6 +31,7 @@ import net.tourbook.common.formatter.ValueFormat;
 import net.tourbook.common.time.TimeTools;
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.Util;
+import net.tourbook.nutrition.NutritionUtils;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.tour.TourManager;
 import net.tourbook.weather.WeatherUtils;
@@ -283,6 +284,7 @@ class CalendarProfileManager {
    private static final DataFormatter _tourFormatter_Elevation_Change;
    private static final DataFormatter _tourFormatter_Energy_kcal;
    private static final DataFormatter _tourFormatter_Energy_MJ;
+   private static final DataFormatter _tourFormatter_Nutrition_Carbohydrates_Avg_Per_Hour;
    private static final DataFormatter _tourFormatter_Pace;
    private static final DataFormatter _tourFormatter_Power_Avg;
    private static final DataFormatter _tourFormatter_Pulse_Avg;
@@ -321,32 +323,34 @@ class CalendarProfileManager {
       /*
        * Formatter
        */
-      DEFAULT_EMPTY_FORMATTER          = createFormatter_Empty();
+      DEFAULT_EMPTY_FORMATTER                    = createFormatter_Empty();
 
       // Tour
-      _tourFormatter_TourDescription   = createFormatter_Tour_Description();
-      _tourFormatter_TourTitle         = createFormatter_Tour_Title();
+      _tourFormatter_TourDescription             = createFormatter_Tour_Description();
+      _tourFormatter_TourTitle                   = createFormatter_Tour_Title();
 
-      _tourFormatter_Elevation         = createFormatter_Elevation();
-      _tourFormatter_Elevation_Change  = createFormatter_Elevation_Change();
-      _tourFormatter_Distance          = createFormatter_Distance();
+      _tourFormatter_Elevation                   = createFormatter_Elevation();
+      _tourFormatter_Elevation_Change            = createFormatter_Elevation_Change();
+      _tourFormatter_Distance                    = createFormatter_Distance();
 
-      _tourFormatter_Pace              = createFormatter_Pace();
-      _tourFormatter_Speed             = createFormatter_Speed();
+      _tourFormatter_Pace                        = createFormatter_Pace();
+      _tourFormatter_Speed                       = createFormatter_Speed();
 
-      _tourFormatter_Pulse_Avg         = createFormatter_Pulse_Avg();
-      _tourFormatter_Power_Avg         = createFormatter_Power_Avg();
+      _tourFormatter_Pulse_Avg                   = createFormatter_Pulse_Avg();
+      _tourFormatter_Power_Avg                   = createFormatter_Power_Avg();
 
-      _tourFormatter_Energy_kcal       = createFormatter_Energy_kcal();
-      _tourFormatter_Energy_MJ         = createFormatter_Energy_MJ();
+      _tourFormatter_Energy_kcal                 = createFormatter_Energy_kcal();
+      _tourFormatter_Energy_MJ                   = createFormatter_Energy_MJ();
 
-      _tourFormatter_Time_Elapsed      = createFormatter_Time_Elapsed();
-      _tourFormatter_Time_Recorded     = createFormatter_Time_Recorded();
-      _tourFormatter_Time_Paused       = createFormatter_Time_Paused();
-      _tourFormatter_Time_Moving       = createFormatter_Time_Moving();
-      _tourFormatter_Time_Break        = createFormatter_Time_Break();
+      _tourFormatter_Nutrition_Carbohydrates_Avg_Per_Hour = createFormatter_Nutrition_Avg_Carbohydrates();
 
-      _tourFormatter_Weather_Icon      = createFormatter_Weather_Icon();
+      _tourFormatter_Time_Elapsed                = createFormatter_Time_Elapsed();
+      _tourFormatter_Time_Recorded               = createFormatter_Time_Recorded();
+      _tourFormatter_Time_Paused                 = createFormatter_Time_Paused();
+      _tourFormatter_Time_Moving                 = createFormatter_Time_Moving();
+      _tourFormatter_Time_Break                  = createFormatter_Time_Break();
+
+      _tourFormatter_Weather_Icon                = createFormatter_Weather_Icon();
 
       allTourContentFormatter = new DataFormatter[] {
 
@@ -367,6 +371,8 @@ class CalendarProfileManager {
 
             _tourFormatter_Energy_kcal,
             _tourFormatter_Energy_MJ,
+
+            _tourFormatter_Nutrition_Carbohydrates_Avg_Per_Hour,
 
             _tourFormatter_Time_Elapsed,
             _tourFormatter_Time_Recorded,
@@ -1156,6 +1162,50 @@ class CalendarProfileManager {
                   ValueFormat.NUMBER_1_1,
                   ValueFormat.NUMBER_1_2,
                   ValueFormat.NUMBER_1_3 };
+         }
+      };
+
+      // setup default formatter
+      dataFormatter.setValueFormat(dataFormatter.getDefaultFormat());
+
+      return dataFormatter;
+   }
+
+   private static DataFormatter createFormatter_Nutrition_Avg_Carbohydrates() {
+
+      final NumberDataFormatter dataFormatter = new NumberDataFormatter(
+            FormatterID.NUTRITION_CARBOHYDRATES_AVG_PER_HOUR,
+            Messages.Calendar_Profile_Value_Nutrition_Carbohydrates_Avg_Per_Hour,
+            GraphColorManager.PREF_GRAPH_TOUR) {
+
+         @Override
+         String format(final CalendarTourData data,
+                       final ValueFormat valueFormat,
+                       final boolean isShowValueUnit) {
+
+            final float carbohydrates_Avg = NutritionUtils.computeAveragePerHour(
+                  data.elapsedTime,
+                  data.nutrition_TotalCarbohydrates);
+            if (carbohydrates_Avg > 0) {
+
+               final String valueText = valueFormatter.printDouble(carbohydrates_Avg);
+
+               return isShowValueUnit
+                     ? valueText + UI.SPACE + UI.UNIT_WEIGHT_G + UI.SLASH + UI.UNIT_LABEL_TIME
+                           + UI.SPACE
+                     : valueText + UI.SPACE;
+            }
+
+            return UI.EMPTY_STRING;
+
+         }
+
+         @Override
+         public ValueFormat[] getValueFormats() {
+
+            return new ValueFormat[] {
+
+                  ValueFormat.NUMBER_1_0 };
          }
       };
 
@@ -3474,6 +3524,7 @@ class CalendarProfileManager {
          case ELEVATION_CHANGE:     _tourFormatter_Elevation_Change  .setValueFormat(valueFormat);       break;
          case ENERGY_KCAL:          _tourFormatter_Energy_kcal       .setValueFormat(valueFormat);       break;
          case ENERGY_MJ:            _tourFormatter_Energy_MJ         .setValueFormat(valueFormat);       break;
+         case NUTRITION_CARBOHYDRATES_AVG_PER_HOUR: _tourFormatter_Nutrition_Carbohydrates_Avg_Per_Hour.setValueFormat(valueFormat); break;
          case PACE:                 _tourFormatter_Pace              .setValueFormat(valueFormat);       break;
          case POWER_AVG:            _tourFormatter_Power_Avg         .setValueFormat(valueFormat);       break;
          case PULSE_AVG:            _tourFormatter_Pulse_Avg         .setValueFormat(valueFormat);       break;

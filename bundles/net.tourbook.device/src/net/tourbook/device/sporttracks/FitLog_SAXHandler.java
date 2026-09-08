@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2025 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2026 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -198,7 +198,7 @@ public class FitLog_SAXHandler extends DefaultHandler {
       private List<TimeData>  timeSlices         = new ArrayList<>();
       private List<Lap>       laps               = new ArrayList<>();
       private List<Pause>     pauses             = new ArrayList<>();
-      private List<Equipment> equipments         = new ArrayList<>();
+      private List<Equipment> equipment          = new ArrayList<>();
 
       private ZonedDateTime   tourStartTime;
       private long            tourStartTimeMills = Long.MIN_VALUE;
@@ -408,7 +408,7 @@ public class FitLog_SAXHandler extends DefaultHandler {
 
          // normal import
 
-         // create a list with all equipments which can be used to create TourTag's
+         // create a list with all equipment which can be used to create TourTag's
 
          final List<Equipment> allEquipments_FromFitLogEx = fitLogEx_SaxHandler.getEquipments();
 
@@ -769,7 +769,7 @@ public class FitLog_SAXHandler extends DefaultHandler {
       // cleanup
       _currentActivity.timeSlices.clear();
       _currentActivity.laps.clear();
-      _currentActivity.equipments.clear();
+      _currentActivity.equipment.clear();
 
       _importState_File.isFileImportedWithValidData = true;
    }
@@ -795,7 +795,7 @@ public class FitLog_SAXHandler extends DefaultHandler {
    }
 
    /**
-    * Set tags from all equipments by using it's names AND equipment IDs
+    * Set tags from all equipment by using it's names AND equipment IDs
     *
     * @param tourData
     */
@@ -956,7 +956,7 @@ public class FitLog_SAXHandler extends DefaultHandler {
          newEquipment.Name = attributes.getValue(ATTRIB_NAME);
          newEquipment.Id = attributes.getValue(ATTRIB_EQUIPMENT_ID);
 
-         _currentActivity.equipments.add(newEquipment);
+         _currentActivity.equipment.add(newEquipment);
          break;
 
       case TAG_ACTIVITY_CALORIES:

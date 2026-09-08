@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2025 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2026 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -306,6 +306,8 @@ public abstract class TableColumnFactory {
 
    public static final TableColumnFactory NUTRITION_NUM_PRODUCTS;
    public static final String             NUTRITION_NUM_PRODUCTS_ID                          = "NUTRITION_NUM_PRODUCTS";                          //$NON-NLS-1$
+   public static final TableColumnFactory NUTRITION_CARBOHYDRATES_AVG_PER_HOUR;
+   public static final String             NUTRITION_CARBOHYDRATES_AVG_PER_HOUR_ID            = "NUTRITION_CARBOHYDRATES_AVG_PER_HOUR";            //$NON-NLS-1$
 
    public static final TableColumnFactory PHOTO_FILE_PATH;
    public static final TableColumnFactory PHOTO_NUMBER_OF_GPS_PHOTOS;
@@ -2486,6 +2488,30 @@ public abstract class TableColumnFactory {
             colDef.setColumnHeaderToolTipText(  Messages.ColumnFactory_Nutrition_NumberOfProducts_Tooltip);
 
             colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(5));
+
+            return colDef;
+         }
+      };
+
+      NUTRITION_CARBOHYDRATES_AVG_PER_HOUR = new TableColumnFactory() {
+         @Override
+         public TableColumnDefinition createColumn(final ColumnManager columnManager,
+                                                   final PixelConverter pixelConverter) {
+
+            final TableColumnDefinition colDef = new TableColumnDefinition(columnManager, NUTRITION_CARBOHYDRATES_AVG_PER_HOUR_ID, SWT.TRAIL);
+
+            colDef.setColumnCategory(           Messages.ColumnFactory_Category_Nutrition);
+
+            colDef.setColumnLabel(              Messages.ColumnFactory_Nutrition_CarbohydratesAvgPerHour_Label);
+            colDef.setColumnHeaderText(         Messages.ColumnFactory_Nutrition_CarbohydratesAvgPerHour_Header);
+            colDef.setColumnHeaderToolTipText(  Messages.ColumnFactory_Nutrition_CarbohydratesAvgPerHour_Tooltip);
+            colDef.setColumnUnit(               UI.UNIT_WEIGHT_G + UI.SLASH + UI.UNIT_LABEL_TIME);
+
+            colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(10));
+            colDef.setValueFormats(
+                  ValueFormatSet.Number,
+                  ValueFormat.NUMBER_1_0,
+                  columnManager);
 
             return colDef;
          }

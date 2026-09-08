@@ -84,12 +84,12 @@ public class TVIEquipmentView_Root extends TVIEquipmentView_Item {
          final Query query = em.createQuery(sql);
 
          final TreeViewer equipmentViewer = getEquipmentViewer();
-         final List<Equipment> allEquipments = query.getResultList();
+         final List<Equipment> allEquipment = query.getResultList();
 
          /*
           * Create all equipment top items
           */
-         for (final Equipment equipment : allEquipments) {
+         for (final Equipment equipment : allEquipment) {
 
             if (useFilter) {
 

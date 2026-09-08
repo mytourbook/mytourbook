@@ -519,7 +519,7 @@ public class TourActionManager {
             Messages.Dialog_ReimportTours_Action_OpenDialog,
             TourActionCategory.ADJUST);
 
-      final TourAction actionSetOtherPersion             = new TourAction(
+      final TourAction actionSetOtherPerson             = new TourAction(
             ActionSetPerson.class.getName(),
             Messages.App_Action_SetPerson,
             TourActionCategory.ADJUST);
@@ -536,7 +536,7 @@ public class TourActionManager {
       _allDefinedActions.add(actionAdjustTourValues);
       _allDefinedActions.add(actionDeletTourValues);
       _allDefinedActions.add(actionReimportTours);
-      _allDefinedActions.add(actionSetOtherPersion);
+      _allDefinedActions.add(actionSetOtherPerson);
       _allDefinedActions.add(actionDeleteTourMenu);
 
       _allDefinedActionsMap.put(categoryAction_Adjust           .getCategoryClassName(),   categoryAction_Adjust);
@@ -544,7 +544,7 @@ public class TourActionManager {
       _allDefinedActionsMap.put(SubMenu_AdjustTourValues        .class.getName(),          actionAdjustTourValues);
       _allDefinedActionsMap.put(ActionDeleteTourValues          .class.getName(),          actionDeletTourValues);
       _allDefinedActionsMap.put(ActionReimportTours             .class.getName(),          actionReimportTours);
-      _allDefinedActionsMap.put(ActionSetPerson                 .class.getName(),          actionSetOtherPersion);
+      _allDefinedActionsMap.put(ActionSetPerson                 .class.getName(),          actionSetOtherPerson);
       _allDefinedActionsMap.put(ActionDeleteTourMenu            .class.getName(),          actionDeleteTourMenu);
 
 // SET_FORMATTING_ON

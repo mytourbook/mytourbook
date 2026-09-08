@@ -976,11 +976,11 @@ public class EquipmentMenuManager implements IActionProvider {
 
    private void enableActions_OneTour() {
 
-      final Map<Long, Equipment> allUsedEquipments = getAllUsedEquipments();
+      final Map<Long, Equipment> allUsedEquipment = getAllUsedEquipments();
 
       final int numClipboardEquipment = setupPasteAction();
 
-      final boolean isEnabled_RemoveEquipment = allUsedEquipments.size() > 0;
+      final boolean isEnabled_RemoveEquipment = allUsedEquipment.size() > 0;
 
       enableActions_Equipment(true, isEnabled_RemoveEquipment, numClipboardEquipment);
       enableActions_Recent();

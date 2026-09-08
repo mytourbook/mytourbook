@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2026 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -36,6 +36,8 @@ public enum FormatterID {
 
    ENERGY_KCAL, //
    ENERGY_MJ, //
+
+   NUTRITION_CARBOHYDRATES_AVG_PER_HOUR, //
 
    TIME_ELAPSED, //
    TIME_RECORDED, //

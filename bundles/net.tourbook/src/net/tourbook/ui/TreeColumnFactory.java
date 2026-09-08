@@ -32,9 +32,9 @@ public abstract class TreeColumnFactory {
    public static final TreeColumnFactory ALTITUDE_UP;
    public static final TreeColumnFactory ALTITUDE_MAX;
    public static final TreeColumnFactory ALTITUDE_ELEVATION_TOTAL_GAIN;
-   public static final String            ALTITUDE_ELEVATION_TOTAL_GAIN_ID = "ALTITUDE_ELEVATION_TOTAL_GAIN_ID"; //$NON-NLS-1$
+   public static final String            ALTITUDE_ELEVATION_TOTAL_GAIN_ID        = "ALTITUDE_ELEVATION_TOTAL_GAIN_ID";     //$NON-NLS-1$
    public static final TreeColumnFactory ALTITUDE_ELEVATION_TOTAL_LOSS;
-   public static final String            ALTITUDE_ELEVATION_TOTAL_LOSS_ID = "ALTITUDE_ELEVATION_TOTAL_LOSS_ID"; //$NON-NLS-1$
+   public static final String            ALTITUDE_ELEVATION_TOTAL_LOSS_ID        = "ALTITUDE_ELEVATION_TOTAL_LOSS_ID";     //$NON-NLS-1$
 
    public static final TreeColumnFactory BODY_CALORIES;
    public static final TreeColumnFactory BODY_PERSON;
@@ -53,71 +53,71 @@ public abstract class TreeColumnFactory {
    public static final TreeColumnFactory DATA_TOUR_ID;
 
    public static final TreeColumnFactory DEVICE_BATTERY_SOC_END;
-   public static final String            DEVICE_BATTERY_SOC_END_ID        = "DEVICE_BATTERY_SOC_END_ID";        //$NON-NLS-1$
+   public static final String            DEVICE_BATTERY_SOC_END_ID               = "DEVICE_BATTERY_SOC_END_ID";            //$NON-NLS-1$
    public static final TreeColumnFactory DEVICE_BATTERY_SOC_START;
-   public static final String            DEVICE_BATTERY_SOC_START_ID      = "DEVICE_BATTERY_SOC_START_ID";      //$NON-NLS-1$
+   public static final String            DEVICE_BATTERY_SOC_START_ID             = "DEVICE_BATTERY_SOC_START_ID";          //$NON-NLS-1$
    public static final TreeColumnFactory DEVICE_DISTANCE;
    public static final TreeColumnFactory DEVICE_NAME;
 
    public static final TreeColumnFactory EQUIPMENT_IS_COLLATE;
-   public static final String            EQUIPMENT_IS_COLLATE_ID          = "EQUIPMENT_COLLATE";                //$NON-NLS-1$
+   public static final String            EQUIPMENT_IS_COLLATE_ID                 = "EQUIPMENT_COLLATE";                    //$NON-NLS-1$
    public static final TreeColumnFactory EQUIPMENT_COLLATE_ID;
-   public static final String            EQUIPMENT_COLLATE_ID_ID          = "EQUIPMENT_TYPE";                   //$NON-NLS-1$
+   public static final String            EQUIPMENT_COLLATE_ID_ID                 = "EQUIPMENT_TYPE";                       //$NON-NLS-1$
    public static final TreeColumnFactory EQUIPMENT_COLLATE_ID_SAVED;
-   public static final String            EQUIPMENT_COLLATE_ID_SAVED_ID    = "EQUIPMENT_COLLATE_ID_RAW";         //$NON-NLS-1$
+   public static final String            EQUIPMENT_COLLATE_ID_SAVED_ID           = "EQUIPMENT_COLLATE_ID_RAW";             //$NON-NLS-1$
    public static final TreeColumnFactory EQUIPMENT_COLLATE_BETWEEN;
-   public static final String            EQUIPMENT_COLLATE_BETWEEN_ID     = "EQUIPMENT_COLLATE_BETWEEN";        //$NON-NLS-1$
+   public static final String            EQUIPMENT_COLLATE_BETWEEN_ID            = "EQUIPMENT_COLLATE_BETWEEN";            //$NON-NLS-1$
 
    public static final TreeColumnFactory EQUIPMENT_AND_CATEGORY;
-   public static final String            EQUIPMENT_AND_CATEGORY_ID        = "EQUIPMENT_AND_CATEGORY";           //$NON-NLS-1$
+   public static final String            EQUIPMENT_AND_CATEGORY_ID               = "EQUIPMENT_AND_CATEGORY";               //$NON-NLS-1$
    public static final TreeColumnFactory EQUIPMENT_BRAND;
-   public static final String            EQUIPMENT_BRAND_ID               = "EQUIPMENT_BRAND";                  //$NON-NLS-1$
+   public static final String            EQUIPMENT_BRAND_ID                      = "EQUIPMENT_BRAND";                      //$NON-NLS-1$
    public static final TreeColumnFactory EQUIPMENT_DATE_BUILT;
-   public static final String            EQUIPMENT_DATE_BUILT_ID          = "EQUIPMENT_DATE_BUILT";             //$NON-NLS-1$
+   public static final String            EQUIPMENT_DATE_BUILT_ID                 = "EQUIPMENT_DATE_BUILT";                 //$NON-NLS-1$
    public static final TreeColumnFactory EQUIPMENT_DATE_PURCHASED;
-   public static final String            EQUIPMENT_DATE_PURCHASED_ID      = "EQUIPMENT_DATE_PURCHASED";         //$NON-NLS-1$
+   public static final String            EQUIPMENT_DATE_PURCHASED_ID             = "EQUIPMENT_DATE_PURCHASED";             //$NON-NLS-1$
    public static final TreeColumnFactory EQUIPMENT_DATE_RETIRED;
-   public static final String            EQUIPMENT_DATE_RETIRED_ID        = "EQUIPMENT_DATE_RETIRED";           //$NON-NLS-1$
+   public static final String            EQUIPMENT_DATE_RETIRED_ID               = "EQUIPMENT_DATE_RETIRED";               //$NON-NLS-1$
    public static final TreeColumnFactory EQUIPMENT_DATE_USED;
-   public static final String            EQUIPMENT_DATE_USED_ID           = "EQUIPMENT_DATE_USED";              //$NON-NLS-1$
+   public static final String            EQUIPMENT_DATE_USED_ID                  = "EQUIPMENT_DATE_USED";                  //$NON-NLS-1$
    public static final TreeColumnFactory EQUIPMENT_DATE_COLLATE_FROM;
-   public static final String            EQUIPMENT_DATE_COLLATE_FROM_ID   = "EQUIPMENT_DATE_COLLATE_FROM";      //$NON-NLS-1$
+   public static final String            EQUIPMENT_DATE_COLLATE_FROM_ID          = "EQUIPMENT_DATE_COLLATE_FROM";          //$NON-NLS-1$
    public static final TreeColumnFactory EQUIPMENT_DATE_COLLATE_UNTIL;
-   public static final String            EQUIPMENT_DATE_COLLATE_UNTIL_ID  = "EQUIPMENT_DATE_COLLATE_UNTIL";     //$NON-NLS-1$
+   public static final String            EQUIPMENT_DATE_COLLATE_UNTIL_ID         = "EQUIPMENT_DATE_COLLATE_UNTIL";         //$NON-NLS-1$
    public static final TreeColumnFactory EQUIPMENT_DATE_USAGE_DURATION;
-   public static final String            EQUIPMENT_DATE_USAGE_DURATION_ID = "EQUIPMENT_DATE_USAGE_DURATION";    //$NON-NLS-1$
+   public static final String            EQUIPMENT_DATE_USAGE_DURATION_ID        = "EQUIPMENT_DATE_USAGE_DURATION";        //$NON-NLS-1$
    public static final TreeColumnFactory EQUIPMENT_ID;
-   public static final String            EQUIPMENT_ID_ID                  = "EQUIPMENT_ID";                     //$NON-NLS-1$
+   public static final String            EQUIPMENT_ID_ID                         = "EQUIPMENT_ID";                         //$NON-NLS-1$
    public static final TreeColumnFactory EQUIPMENT_IMAGE;
-   public static final String            EQUIPMENT_IMAGE_ID               = "EQUIPMENT_IMAGE_id";               //$NON-NLS-1$
+   public static final String            EQUIPMENT_IMAGE_ID                      = "EQUIPMENT_IMAGE_id";                   //$NON-NLS-1$
    public static final TreeColumnFactory EQUIPMENT_IMAGE_FILE_PATH;
-   public static final String            EQUIPMENT_IMAGE_FILE_PATH_ID     = "EQUIPMENT_IMAGE_FILE_PATH_ID";     //$NON-NLS-1$
+   public static final String            EQUIPMENT_IMAGE_FILE_PATH_ID            = "EQUIPMENT_IMAGE_FILE_PATH_ID";         //$NON-NLS-1$
    public static final TreeColumnFactory EQUIPMENT_WEBSITE;
-   public static final String            EQUIPMENT_WEBSITE_ID             = "EQUIPMENT_WEBSITE_ID";             //$NON-NLS-1$
+   public static final String            EQUIPMENT_WEBSITE_ID                    = "EQUIPMENT_WEBSITE_ID";                 //$NON-NLS-1$
    public static final TreeColumnFactory EQUIPMENT_PURCHASE_LOCATION;
-   public static final String            EQUIPMENT_PURCHASE_LOCATION_ID   = "EQUIPMENT_PURCHASE_LOCATION_ID";   //$NON-NLS-1$
+   public static final String            EQUIPMENT_PURCHASE_LOCATION_ID          = "EQUIPMENT_PURCHASE_LOCATION_ID";       //$NON-NLS-1$
    public static final TreeColumnFactory EQUIPMENT_INITIAL_DISTANCE;
-   public static final String            EQUIPMENT_INITIAL_DISTANCE_ID    = "EQUIPMENT_INITIAL_DISTANCE";       //$NON-NLS-1$
+   public static final String            EQUIPMENT_INITIAL_DISTANCE_ID           = "EQUIPMENT_INITIAL_DISTANCE";           //$NON-NLS-1$
    public static final TreeColumnFactory EQUIPMENT_INITIAL_VALUE;
-   public static final String            EQUIPMENT_INITIAL_VALUE_ID       = "EQUIPMENT_INITIAL_VALUE";          //$NON-NLS-1$
+   public static final String            EQUIPMENT_INITIAL_VALUE_ID              = "EQUIPMENT_INITIAL_VALUE";              //$NON-NLS-1$
    public static final TreeColumnFactory EQUIPMENT_INITIAL_VALUE_UNIT;
-   public static final String            EQUIPMENT_INITIAL_VALUE_UNIT_ID  = "EQUIPMENT_INITIAL_VALUE_UNIT";     //$NON-NLS-1$
+   public static final String            EQUIPMENT_INITIAL_VALUE_UNIT_ID         = "EQUIPMENT_INITIAL_VALUE_UNIT";         //$NON-NLS-1$
    public static final TreeColumnFactory EQUIPMENT_MODEL;
-   public static final String            EQUIPMENT_MODEL_ID               = "EQUIPMENT_MODEL";                  //$NON-NLS-1$
+   public static final String            EQUIPMENT_MODEL_ID                      = "EQUIPMENT_MODEL";                      //$NON-NLS-1$
    public static final TreeColumnFactory EQUIPMENT_PRICE;
-   public static final String            EQUIPMENT_PRICE_ID               = "EQUIPMENT_PRICE";                  //$NON-NLS-1$
+   public static final String            EQUIPMENT_PRICE_ID                      = "EQUIPMENT_PRICE";                      //$NON-NLS-1$
    public static final TreeColumnFactory EQUIPMENT_PRICE_PER_DISTANCE;
-   public static final String            EQUIPMENT_PRICE_PER_DISTANCE_ID  = "EQUIPMENT_PRICE_PER_DISTANCE";     //$NON-NLS-1$
+   public static final String            EQUIPMENT_PRICE_PER_DISTANCE_ID         = "EQUIPMENT_PRICE_PER_DISTANCE";         //$NON-NLS-1$
    public static final TreeColumnFactory EQUIPMENT_PRICE_UNIT;
-   public static final String            EQUIPMENT_PRICE_UNIT_ID          = "EQUIPMENT_PRICE_UNIT";             //$NON-NLS-1$
+   public static final String            EQUIPMENT_PRICE_UNIT_ID                 = "EQUIPMENT_PRICE_UNIT";                 //$NON-NLS-1$
    public static final TreeColumnFactory EQUIPMENT_RETIRED;
-   public static final String            EQUIPMENT_RETIRED_ID             = "EQUIPMENT_RETIRED";                //$NON-NLS-1$
+   public static final String            EQUIPMENT_RETIRED_ID                    = "EQUIPMENT_RETIRED";                    //$NON-NLS-1$
    public static final TreeColumnFactory EQUIPMENT_SIZE;
-   public static final String            EQUIPMENT_SIZE_ID                = "EQUIPMENT_SIZE";                   //$NON-NLS-1$
+   public static final String            EQUIPMENT_SIZE_ID                       = "EQUIPMENT_SIZE";                       //$NON-NLS-1$
    public static final TreeColumnFactory EQUIPMENT_TOUR_STRUCTURE;
-   public static final String            EQUIPMENT_TOUR_STRUCTURE_ID      = "EQUIPMENT_TOUR_STRUCTURE";         //$NON-NLS-1$
+   public static final String            EQUIPMENT_TOUR_STRUCTURE_ID             = "EQUIPMENT_TOUR_STRUCTURE";             //$NON-NLS-1$
    public static final TreeColumnFactory EQUIPMENT_WEIGHT;
-   public static final String            EQUIPMENT_WEIGHT_ID              = "EQUIPMENT_WEIGHT";                 //$NON-NLS-1$
+   public static final String            EQUIPMENT_WEIGHT_ID                     = "EQUIPMENT_WEIGHT";                     //$NON-NLS-1$
 
    public static final TreeColumnFactory MOTION_AVG_PACE;
    public static final TreeColumnFactory MOTION_AVG_SPEED;
@@ -125,7 +125,9 @@ public abstract class TreeColumnFactory {
    public static final TreeColumnFactory MOTION_MAX_SPEED;
 
    public static final TreeColumnFactory NUTRITION_NUM_PRODUCTS;
-   private static final String           NUTRITION_NUM_PRODUCTS_ID        = "NUTRITION_NUM_PRODUCTS";           //$NON-NLS-1$
+   private static final String           NUTRITION_NUM_PRODUCTS_ID               = "NUTRITION_NUM_PRODUCTS";               //$NON-NLS-1$
+   public static final TreeColumnFactory NUTRITION_CARBOHYDRATES_AVG_PER_HOUR;
+   public static final String            NUTRITION_CARBOHYDRATES_AVG_PER_HOUR_ID = "NUTRITION_CARBOHYDRATES_AVG_PER_HOUR"; //$NON-NLS-1$
 
    public static final TreeColumnFactory POWER_AVG;
    public static final TreeColumnFactory POWER_MAX;
@@ -145,7 +147,7 @@ public abstract class TreeColumnFactory {
    public static final TreeColumnFactory POWERTRAIN_SLOW_VS_FAST_CADENCE_ZONES_DELIMITER;
 
    public static final TreeColumnFactory RADAR_PASSED_VEHICLES;
-   public static final String            RADAR_PASSED_VEHICLES_ID         = "RADAR_PASSED_VEHICLES_ID";         //$NON-NLS-1$
+   public static final String            RADAR_PASSED_VEHICLES_ID                = "RADAR_PASSED_VEHICLES_ID";             //$NON-NLS-1$
 
    public static final TreeColumnFactory RUN_DYN_STANCE_TIME_MIN;
    public static final TreeColumnFactory RUN_DYN_STANCE_TIME_MAX;
@@ -189,17 +191,17 @@ public abstract class TreeColumnFactory {
    public static final TreeColumnFactory TOUR_COLLATE_EVENT;
    public static final TreeColumnFactory TOUR_COUNTER;
    public static final TreeColumnFactory TOUR_DESCRIPTION;
-   public static final String            TOUR_DESCRIPTION_ID              = "TOUR_DESCRIPTION";                 //$NON-NLS-1$
+   public static final String            TOUR_DESCRIPTION_ID                     = "TOUR_DESCRIPTION";                     //$NON-NLS-1$
    public static final TreeColumnFactory TOUR_EQUIPMENT;
-   public static final String            TOUR_EQUIPMENT_ID                = "TOUR_EQUIPMENT";                   //$NON-NLS-1$
+   public static final String            TOUR_EQUIPMENT_ID                       = "TOUR_EQUIPMENT";                       //$NON-NLS-1$
    public static final TreeColumnFactory TOUR_LOCATION_START;
-   public static final String            TOUR_LOCATION_START_ID           = "TOUR_LOCATION_START";              //$NON-NLS-1$
+   public static final String            TOUR_LOCATION_START_ID                  = "TOUR_LOCATION_START";                  //$NON-NLS-1$
    public static final TreeColumnFactory TOUR_LOCATION_END;
-   public static final String            TOUR_LOCATION_END_ID             = "TOUR_LOCATION_END";                //$NON-NLS-1$
+   public static final String            TOUR_LOCATION_END_ID                    = "TOUR_LOCATION_END";                    //$NON-NLS-1$
    public static final TreeColumnFactory TOUR_LOCATION_ID_START;
-   public static final String            TOUR_LOCATION_ID_START_ID        = "TOUR_LOCATION_ID_START_ID";        //$NON-NLS-1$
+   public static final String            TOUR_LOCATION_ID_START_ID               = "TOUR_LOCATION_ID_START_ID";            //$NON-NLS-1$
    public static final TreeColumnFactory TOUR_LOCATION_ID_END;
-   public static final String            TOUR_LOCATION_ID_END_ID          = "TOUR_LOCATION_ID_END_ID";          //$NON-NLS-1$
+   public static final String            TOUR_LOCATION_ID_END_ID                 = "TOUR_LOCATION_ID_END_ID";              //$NON-NLS-1$
    public static final TreeColumnFactory TOUR_NUM_MARKERS;
    public static final TreeColumnFactory TOUR_NUM_PHOTOS;
    public static final TreeColumnFactory TOUR_REFTOUR_TOUR;
@@ -210,18 +212,18 @@ public abstract class TreeColumnFactory {
 
    public static final TreeColumnFactory TOUR_TAG_AND_CATEGORY;
    public static final TreeColumnFactory TOUR_TAG_AND_CATEGORY_NOTES;
-   public static final String            TOUR_TAG_AND_CATEGORY_NOTES_ID   = "TOUR_TAG_AND_CATEGORY_NOTES";      //$NON-NLS-1$
+   public static final String            TOUR_TAG_AND_CATEGORY_NOTES_ID          = "TOUR_TAG_AND_CATEGORY_NOTES";          //$NON-NLS-1$
    public static final TreeColumnFactory TOUR_TAG_ID;
    public static final TreeColumnFactory TOUR_TAG_IMAGE;
-   public static final String            TOUR_TAG_IMAGE_ID                = "TOUR_TAG_IMAGE";                   //$NON-NLS-1$
+   public static final String            TOUR_TAG_IMAGE_ID                       = "TOUR_TAG_IMAGE";                       //$NON-NLS-1$
    public static final TreeColumnFactory TOUR_TAG_IMAGE_FILE_PATH;
-   public static final String            TOUR_TAG_IMAGE_FILE_PATH_ID      = "TOUR_TAG_IMAGE_FILE_PATH";         //$NON-NLS-1$
+   public static final String            TOUR_TAG_IMAGE_FILE_PATH_ID             = "TOUR_TAG_IMAGE_FILE_PATH";             //$NON-NLS-1$
    public static final TreeColumnFactory TOUR_TAG_NUM_TOURS;
-   public static final String            TOUR_TAG_NUM_TOURS_ID            = "TOUR_TAG_NUM_TOURS";               //$NON-NLS-1$
+   public static final String            TOUR_TAG_NUM_TOURS_ID                   = "TOUR_TAG_NUM_TOURS";                   //$NON-NLS-1$
    public static final TreeColumnFactory TOUR_TAG_PARENT;
-   public static final String            TOUR_TAG_PARENT_ID               = "TOUR_TAG_PARENT";                  //$NON-NLS-1$
+   public static final String            TOUR_TAG_PARENT_ID                      = "TOUR_TAG_PARENT";                      //$NON-NLS-1$
    public static final TreeColumnFactory TOUR_TAG_STRUCTURE;
-   public static final String            TOUR_TAG_STRUCTURE_ID            = "TOUR_TAG_STRUCTURE";               //$NON-NLS-1$
+   public static final String            TOUR_TAG_STRUCTURE_ID                   = "TOUR_TAG_STRUCTURE";                   //$NON-NLS-1$
 
    public static final TreeColumnFactory TRAINING_FTP;
    public static final TreeColumnFactory TRAINING_INTENSITY_FACTOR;
@@ -232,7 +234,7 @@ public abstract class TreeColumnFactory {
    public static final TreeColumnFactory TRAINING_TRAINING_PERFORMANCE;
 
    public static final TreeColumnFactory WEATHER_AIR_QUALITY;
-   public static final String            WEATHER_AIR_QUALITY_ID           = "WEATHER_AIR_QUALITY";              //$NON-NLS-1$
+   public static final String            WEATHER_AIR_QUALITY_ID                  = "WEATHER_AIR_QUALITY";                  //$NON-NLS-1$
    public static final TreeColumnFactory WEATHER_CLOUDS;
    public static final TreeColumnFactory WEATHER_TEMPERATURE_AVG;
    public static final TreeColumnFactory WEATHER_TEMPERATURE_AVG_COMBINED;
@@ -1046,7 +1048,7 @@ public abstract class TreeColumnFactory {
 
             colDef.setColumnLabel(              Messages.ColumnFactory_Equipment_ID);
             colDef.setColumnHeaderText(         Messages.ColumnFactory_Equipment_ID);
-            colDef.setColumnHeaderToolTipText(  Messages.ColumnFactory_Equipment_ID_Tootip);
+            colDef.setColumnHeaderToolTipText(  Messages.ColumnFactory_Equipment_ID_Tooltip);
 
             colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(5));
 
@@ -1470,6 +1472,31 @@ public abstract class TreeColumnFactory {
             colDef.setColumnHeaderToolTipText(  Messages.ColumnFactory_Nutrition_NumberOfProducts_Tooltip);
 
             colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(14));
+
+            return colDef;
+         }
+      };
+
+      NUTRITION_CARBOHYDRATES_AVG_PER_HOUR = new TreeColumnFactory() {
+         @Override
+         public TreeColumnDefinition createColumn(final ColumnManager columnManager,
+                                                   final PixelConverter pixelConverter) {
+
+            final TreeColumnDefinition colDef = new TreeColumnDefinition(columnManager, NUTRITION_CARBOHYDRATES_AVG_PER_HOUR_ID, SWT.TRAIL);
+
+            colDef.setColumnCategory(           Messages.ColumnFactory_Category_Nutrition);
+
+            colDef.setColumnLabel(              Messages.ColumnFactory_Nutrition_CarbohydratesAvgPerHour_Label);
+            colDef.setColumnHeaderText(         Messages.ColumnFactory_Nutrition_CarbohydratesAvgPerHour_Header);
+            colDef.setColumnHeaderToolTipText(  Messages.ColumnFactory_Nutrition_CarbohydratesAvgPerHour_Tooltip);
+
+            colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(14));
+
+            colDef.setValueFormats(             ValueFormatSet.Number,
+                  ValueFormat.NUMBER_1_0,
+                  ValueFormat.NUMBER_1_0,
+                  columnManager);
+
 
             return colDef;
          }
