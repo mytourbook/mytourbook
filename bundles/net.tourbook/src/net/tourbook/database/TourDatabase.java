@@ -11980,7 +11980,7 @@ public class TourDatabase {
 
    private int updateDb_062_To_063(final Connection conn, final SplashManager splashManager) throws SQLException {
 
-      final int newDbVersion = 62;
+      final int newDbVersion = 63;
 
       logDbUpdate_Start(newDbVersion);
       updateMonitor(splashManager, newDbVersion);
