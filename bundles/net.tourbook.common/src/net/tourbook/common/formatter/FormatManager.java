@@ -265,7 +265,7 @@ public class FormatManager {
       case EQUIPMENT_BRAND:         return Messages.Value_Formatter_Equipment_Brand;
       case EQUIPMENT_MODEL:         return Messages.Value_Formatter_Equipment_Model;
       case EQUIPMENT_BRAND_MODEL:   return Messages.Value_Formatter_Equipment_BrandModel;
-      case EQUIPMENT_TYPE:          return Messages.Value_Formatter_Equipment_Type;
+      case EQUIPMENT_TYPE:          return Messages.Value_Formatter_Equipment_CollateID;
 
       case PERIOD_DAY:              return Messages.Value_Formatter_Period_Day;
       case PERIOD_YEAR_MONTH_DAY:   return Messages.Value_Formatter_Period_YearMonthDay;

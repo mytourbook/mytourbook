@@ -1,10 +1,5 @@
 26.next.0                                                 ?. February 2026
 
-Fix type -> collate ID in :
-
-   Value_Formatter_Equipment_Type
-   Dialog_EquipmentPart_Collate_Tooltip
-
 
 TODO's
 ======
@@ -34,32 +29,7 @@ See milestone 26.? https://github.com/mytourbook/mytourbook/milestone/29?closed=
 New / Improvements
 ==================
 
-* Tour Nutrition (Frederic)
-  - Added the display of average carbohydrates/h in the Tour Book view (tour, month, year) and in the Calendar view
-
-* App Start
-  - Prevent that MyTourbook is started a second time
-    https://github.com/mytourbook/mytourbook/issues/1742
-
-* Easy Import
-  - Added action to mount/unmount a device
-    https://github.com/mytourbook/mytourbook/issues/1720
-
-* Tour Info    
-  - Display time values in [ddd:]hh:mm:ss format 
-    https://github.com/mytourbook/mytourbook/issues/1735
-
-* Photo
-  - Support photo locations across all platforms    
-    https://github.com/mytourbook/mytourbook/issues/1727
-    
-* Equipment
-  - Display the initial distance values in the tour blog
-    https://github.com/mytourbook/mytourbook/issues/1734    
-    
-* Tour Marker
-  - Create or update a tour marker from a recent marker     
-    https://github.com/mytourbook/mytourbook/issues/1736    
+* 
   
 
 Changes
@@ -71,8 +41,7 @@ Changes
 Bugfix
 ======
   
-* Tour Nutrition (Frederic)
- - When selecting a recent product, it should appear first in the list
+* 
 
 
 Translation    

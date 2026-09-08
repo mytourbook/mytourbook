@@ -426,7 +426,7 @@ public class Messages extends NLS {
    public static String        Value_Formatter_Equipment_Brand;
    public static String        Value_Formatter_Equipment_BrandModel;
    public static String        Value_Formatter_Equipment_Model;
-   public static String        Value_Formatter_Equipment_Type;
+   public static String        Value_Formatter_Equipment_CollateID;
    public static String        Value_Formatter_Number_1_0;
    public static String        Value_Formatter_Number_1_1;
    public static String        Value_Formatter_Number_1_2;
