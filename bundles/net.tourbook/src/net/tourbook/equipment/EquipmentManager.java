@@ -1010,7 +1010,7 @@ public class EquipmentManager {
    }
 
    /**
-    * @return Returns a list with all equipments sorted by collate ID or name
+    * @return Returns a list with all equipment sorted by collate ID or name
     */
    public static List<Equipment> getAllEquipment_CollateIdOrName() {
 
@@ -1024,7 +1024,7 @@ public class EquipmentManager {
    }
 
    /**
-    * @return Returns a list with all equipments sorted by name
+    * @return Returns a list with all equipment sorted by name
     */
    public static List<Equipment> getAllEquipment_Name() {
 
@@ -2255,7 +2255,7 @@ public class EquipmentManager {
 
                if (partIndex == 0) {
 
-                  // this is the first part -> collate to the equipments used date
+                  // this is the first part -> collate to the equipment used date
 
                   newDateFrom = equipmentDateUsed;
 

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2025 Wolfgang Schramm and Contributors
+ * Copyright (C) 2025, 2026 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -30,7 +30,7 @@ import org.eclipse.jface.action.Action;
 import org.eclipse.swt.widgets.Menu;
 
 /**
- * Add equipments from the selected tours
+ * Add equipment from the selected tours
  */
 public class ActionRemoveEquipment_SubMenu extends SubMenu {
 

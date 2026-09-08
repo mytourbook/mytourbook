@@ -243,7 +243,7 @@ public class EasyImportManager {
             process.destroyForcibly();
 
             // set error message
-            processContext.error = "Run command\n\n%s\n\nCommand timed out in %d seconds and was killed"
+            processContext.error = Messages.Import_Data_EasyImport_RunCommand_Timeout
                   .formatted(commandLine, timeout);
 
          } else {
@@ -258,7 +258,7 @@ public class EasyImportManager {
 
             processContext.exitValue = process.exitValue();
 
-            final String mtLog = "Run command\n\n%s\n\nExit value: %d\n\n%s".formatted(
+            final String mtLog = Messages.Import_Data_EasyImport_RunCommand_Successful.formatted(
 
                   commandLine,
                   processContext.exitValue,
@@ -577,16 +577,7 @@ public class EasyImportManager {
 
          if (dbFileNames.contains(deviceFile.getFileName()) == false) {
 
-            if (!RawDataManager.isIgnoreInvalidFile()) {
-
-               notImportedFiles.add(deviceFile);
-
-            } else {// RawDataManager.isIgnoreInvalidFile() == true
-
-               if (!RawDataManager.doesInvalidFileExist(deviceFile.getFileName())) {
-                  notImportedFiles.add(deviceFile);
-               }
-            }
+            notImportedFiles.add(deviceFile);
          }
       }
 

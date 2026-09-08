@@ -123,7 +123,7 @@ Import
     imported in the tour notes
   - Setting the start time (when present) and time zone (when GPS 
     coordinates are not present) using the UTC time offset
-  - Importing and mapping unique equipments based on their GUIDs
+  - Importing and mapping unique equipment based on their GUIDs
 
  
 * FIT File (Frederic)

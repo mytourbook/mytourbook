@@ -22,6 +22,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.UI;
 import net.tourbook.common.time.TimeTools;
@@ -101,30 +102,30 @@ public class EquipmentConfigManager {
 
          new SortFieldUI(UI.EMPTY_STRING,          SortField.None),
 
-         new SortFieldUI("Equipment name",         SortField.EquipmentName),
-         new SortFieldUI("Equipment brand",        SortField.EquipmentBrand),
-         new SortFieldUI("Equipment model",        SortField.EquipmentModel),
+         new SortFieldUI(Messages.Equipment_Config_SortField_EquipmentName,         SortField.EquipmentName),
+         new SortFieldUI(Messages.Equipment_Config_SortField_EquipmentBrand,        SortField.EquipmentBrand),
+         new SortFieldUI(Messages.Equipment_Config_SortField_EquipmentModel,        SortField.EquipmentModel),
 
-         new SortFieldUI("Collate ID",             SortField.CollateID),
+         new SortFieldUI(Messages.Equipment_Config_SortField_CollateID,             SortField.CollateID),
 
-         new SortFieldUI("First used date",        SortField.DateFirstUsed),
-         new SortFieldUI("Purchased date",         SortField.DatePurchased),
+         new SortFieldUI(Messages.Equipment_Config_SortField_FirstUsedDate,         SortField.DateFirstUsed),
+         new SortFieldUI(Messages.Equipment_Config_SortField_PurchasedDate,         SortField.DatePurchased),
    };
 
    static final SortFieldUI[]                PART_SORT_FIELDS        = {
 
          new SortFieldUI(UI.EMPTY_STRING,          SortField.None),
 
-         new SortFieldUI("Part/service name",      SortField.PartServiceName),
-         new SortFieldUI("Part brand",             SortField.PartBrand),
-         new SortFieldUI("Part model",             SortField.PartModel),
+         new SortFieldUI(Messages.Equipment_Config_SortField_PartServiceName,       SortField.PartServiceName),
+         new SortFieldUI(Messages.Equipment_Config_SortField_PartBrand,             SortField.PartBrand),
+         new SortFieldUI(Messages.Equipment_Config_SortField_PartModel,             SortField.PartModel),
 
-         new SortFieldUI("Collate ID",             SortField.CollateID),
+         new SortFieldUI(Messages.Equipment_Config_SortField_CollateID,             SortField.CollateID),
 
-         new SortFieldUI("First used date",        SortField.DateFirstUsed),
-         new SortFieldUI("Purchased date",         SortField.DatePurchased),
+         new SortFieldUI(Messages.Equipment_Config_SortField_FirstUsedDate,         SortField.DateFirstUsed),
+         new SortFieldUI(Messages.Equipment_Config_SortField_PurchasedDate,         SortField.DatePurchased),
 
-         new SortFieldUI("Parts before services",  SortField.PartsBeforeServices),
+         new SortFieldUI(Messages.Equipment_Config_SortField_PartsBeforeServices,   SortField.PartsBeforeServices),
    };
 
 // SET_FORMATTING_ON
@@ -188,7 +189,7 @@ public class EquipmentConfigManager {
 
       case 1:
 
-         config.name                   = config.defaultId = CONFIG_DEFAULT_ID_1 +UI.SPACE+" By Name";
+         config.name                   = config.defaultId = CONFIG_DEFAULT_ID_1 + UI.SPACE + Messages.Equipment_Config_SortField_DefaulName_ByName;
 
          config.equipmentSort1         = SortField.EquipmentName;
          config.equipmentSort2         = SortField.DateFirstUsed;
@@ -201,7 +202,7 @@ public class EquipmentConfigManager {
 
       case 2:
 
-         config.name                   = config.defaultId = CONFIG_DEFAULT_ID_2 +UI.SPACE+" By Collate ID";
+         config.name                   = config.defaultId = CONFIG_DEFAULT_ID_2 + UI.SPACE + Messages.Equipment_Config_SortField_DefaultName_ByCollateID;
 
          config.equipmentSort1         = SortField.CollateID;
          config.equipmentSort2         = SortField.DateFirstUsed;

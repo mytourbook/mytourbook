@@ -1025,7 +1025,8 @@ public class NatTable_DataLoader {
       /*
        * NUTRITION
        */
-      case TableColumnFactory.NUTRITION_NUM_PRODUCTS_ID:             return FIELD_WITHOUT_SORTING;
+      case TableColumnFactory.NUTRITION_NUM_PRODUCTS_ID:               return FIELD_WITHOUT_SORTING;
+      case TableColumnFactory.NUTRITION_CARBOHYDRATES_AVG_PER_HOUR_ID: return FIELD_WITHOUT_SORTING;
 
 
       default:

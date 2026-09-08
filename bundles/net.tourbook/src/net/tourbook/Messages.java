@@ -340,6 +340,7 @@ public class Messages extends NLS {
    public static String        Calendar_Profile_Value_MovingTime;
    public static String        Calendar_Profile_Value_Pace;
    public static String        Calendar_Profile_Value_PausedTime;
+   public static String        Calendar_Profile_Value_Nutrition_Carbohydrates_Avg_Per_Hour;
    public static String        Calendar_Profile_Value_PowerAvg;
    public static String        Calendar_Profile_Value_PulseAvg;
    public static String        Calendar_Profile_Value_RecordedTime;
@@ -764,6 +765,12 @@ public class Messages extends NLS {
    public static String        Dialog_ImportConfig_Action_SortBySpeed_Tooltip;
    public static String        Dialog_ImportConfig_Action_SortCadenceBySpeed_Tooltip;
    public static String        Dialog_ImportConfig_Action_SortEquipmentBySpeed_Tooltip;
+   public static String        Dialog_ImportConfig_Action_ToggleWordWrap_Tooltip;
+   public static String        Dialog_ImportConfig_Button_CopyLeft_Mount_Tooltip;
+   public static String        Dialog_ImportConfig_Button_CopyLeft_Unmount;
+   public static String        Dialog_ImportConfig_Button_RunCommand_Info;
+   public static String        Dialog_ImportConfig_Button_RunCommand_Mount;
+   public static String        Dialog_ImportConfig_Button_RunCommand_Unmount;
    public static String        Dialog_ImportConfig_Checkbox_AdjustTemperature;
    public static String        Dialog_ImportConfig_Checkbox_CreateBackup;
    public static String        Dialog_ImportConfig_Checkbox_CreateBackup_Tooltip;
@@ -771,6 +778,12 @@ public class Messages extends NLS {
    public static String        Dialog_ImportConfig_Checkbox_DeleteDeviceFiles_Tooltip;
    public static String        Dialog_ImportConfig_Checkbox_DeviceWatching;
    public static String        Dialog_ImportConfig_Checkbox_ImportFiles;
+   public static String        Dialog_ImportConfig_Checkbox_IsMountDevice;
+   public static String        Dialog_ImportConfig_Checkbox_IsUnmountDevice;
+   public static String        Dialog_ImportConfig_Checkbox_IsVerifyMountCommand;
+   public static String        Dialog_ImportConfig_Checkbox_IsVerifyMountCommand_Tooltip;
+   public static String        Dialog_ImportConfig_Checkbox_IsVerifyUnmountCommand;
+   public static String        Dialog_ImportConfig_Checkbox_IsVerifyUnmountCommand_Tooltip;
    public static String        Dialog_ImportConfig_Checkbox_LastMarker;
    public static String        Dialog_ImportConfig_Checkbox_LastMarker_Tooltip;
    public static String        Dialog_ImportConfig_Checkbox_LiveUpdate;
@@ -820,6 +833,9 @@ public class Messages extends NLS {
    public static String        Dialog_ImportConfig_Column_LastMarker_Header;
    public static String        Dialog_ImportConfig_Column_LastMarker_Label;
    public static String        Dialog_ImportConfig_Column_LastMarker_Tooltip;
+   public static String        Dialog_ImportConfig_Column_MountDevice_Header;
+   public static String        Dialog_ImportConfig_Column_MountDevice_Label;
+   public static String        Dialog_ImportConfig_Column_MountDevice_Tooltip;
    public static String        Dialog_ImportConfig_Column_Name;
    public static String        Dialog_ImportConfig_Column_Remove2ndLastTimeSliceMarker_Header;
    public static String        Dialog_ImportConfig_Column_Remove2ndLastTimeSliceMarker_Label;
@@ -837,6 +853,9 @@ public class Messages extends NLS {
    public static String        Dialog_ImportConfig_Column_TurnOFF_Header;
    public static String        Dialog_ImportConfig_Column_TurnOFF_Label;
    public static String        Dialog_ImportConfig_Column_TurnOFF_Tooltip;
+   public static String        Dialog_ImportConfig_Column_UnmountDevice_Header;
+   public static String        Dialog_ImportConfig_Column_UnmountDevice_Label;
+   public static String        Dialog_ImportConfig_Column_UnmountDevice_Tooltip;
    public static String        Dialog_ImportConfig_Combo_Device_LocalDevice;
    public static String        Dialog_ImportConfig_Combo_Folder_Tooltip;
    public static String        Dialog_ImportConfig_Dialog_BackupFolder_Message;
@@ -866,6 +885,12 @@ public class Messages extends NLS {
    public static String        Dialog_ImportConfig_Label_BackupFolder;
    public static String        Dialog_ImportConfig_Label_BackupFolder_Tooltip;
    public static String        Dialog_ImportConfig_Label_Cadence;
+   public static String        Dialog_ImportConfig_Label_Command_DeviceInfo;
+   public static String        Dialog_ImportConfig_Label_Command_DeviceInfo_Tooltip;
+   public static String        Dialog_ImportConfig_Label_Command_Mount;
+   public static String        Dialog_ImportConfig_Label_Command_MountLog;
+   public static String        Dialog_ImportConfig_Label_Command_Unmount;
+   public static String        Dialog_ImportConfig_Label_Command_UnmountLog;
    public static String        Dialog_ImportConfig_Label_ConfigName;
    public static String        Dialog_ImportConfig_Label_ConfigTileSize;
    public static String        Dialog_ImportConfig_Label_ConfigTileSize_Tooltip;
@@ -875,6 +900,7 @@ public class Messages extends NLS {
    public static String        Dialog_ImportConfig_Label_DeviceFolder_Tooltip;
    public static String        Dialog_ImportConfig_Label_DeviceType_Tooltip;
    public static String        Dialog_ImportConfig_Label_EquipmentGroup;
+   public static String        Dialog_ImportConfig_Label_ForConfiguration;
    public static String        Dialog_ImportConfig_Label_ImportColumns;
    public static String        Dialog_ImportConfig_Label_ImportColumns_Tooltip;
    public static String        Dialog_ImportConfig_Label_ImportLauncher;
@@ -888,6 +914,8 @@ public class Messages extends NLS {
    public static String        Dialog_ImportConfig_Label_StateTooltipWidth;
    public static String        Dialog_ImportConfig_Label_StateTooltip_DisplayAbsoluteFilePath;
    public static String        Dialog_ImportConfig_Label_StateTooltip_DisplayAbsoluteFilePath_Tooltip;
+   public static String        Dialog_ImportConfig_Label_Timeout;
+   public static String        Dialog_ImportConfig_Label_Timeout_Tooltip;
    public static String        Dialog_ImportConfig_Label_TourTag;
    public static String        Dialog_ImportConfig_Link_FileSystem_Preferences;
    public static String        Dialog_ImportConfig_Link_OtherActions;
@@ -900,6 +928,7 @@ public class Messages extends NLS {
    public static String        Dialog_ImportConfig_Tab_Cadence;
    public static String        Dialog_ImportConfig_Tab_Configuration;
    public static String        Dialog_ImportConfig_Tab_Description;
+   public static String        Dialog_ImportConfig_Tab_Device;
    public static String        Dialog_ImportConfig_Tab_Equipment;
    public static String        Dialog_ImportConfig_Tab_Launcher;
    public static String        Dialog_ImportConfig_Tab_Options;
@@ -1227,6 +1256,18 @@ public class Messages extends NLS {
    public static String        Equipment_Action_ToggleCollatedTours_Tooltip;
    public static String        Equipment_Action_ToggleRetiredAsset;
    public static String        Equipment_Action_ToggleRetiredAsset_Tooltip;
+   public static String        Equipment_Config_SortField_CollateID;
+   public static String        Equipment_Config_SortField_DefaulName_ByName;
+   public static String        Equipment_Config_SortField_DefaultName_ByCollateID;
+   public static String        Equipment_Config_SortField_EquipmentBrand;
+   public static String        Equipment_Config_SortField_EquipmentModel;
+   public static String        Equipment_Config_SortField_EquipmentName;
+   public static String        Equipment_Config_SortField_FirstUsedDate;
+   public static String        Equipment_Config_SortField_PartBrand;
+   public static String        Equipment_Config_SortField_PartModel;
+   public static String        Equipment_Config_SortField_PartsBeforeServices;
+   public static String        Equipment_Config_SortField_PartServiceName;
+   public static String        Equipment_Config_SortField_PurchasedDate;
    public static String        Equipment_Dialog_DeleteEquipment_Action;
    public static String        Equipment_Dialog_DeleteEquipment_Message_Multiple;
    public static String        Equipment_Dialog_DeleteEquipment_Message_One;
@@ -1385,6 +1426,8 @@ public class Messages extends NLS {
    public static String        Import_Data_Dialog_Reimport_Title;
    public static String        import_data_dlg_save_tour_msg;
    public static String        import_data_dlg_save_tour_title;
+   public static String        Import_Data_EasyImport_RunCommand_Successful;
+   public static String        Import_Data_EasyImport_RunCommand_Timeout;
    public static String        Import_Data_EquipmentConfig_BySpeed;
    public static String        Import_Data_EquipmentConfig_OneForAll;
    public static String        Import_Data_Error_CreatingFileName_Message;
@@ -1410,6 +1453,7 @@ public class Messages extends NLS {
    public static String        Import_Data_HTML_ImportFromFiles_ActionTooltip;
    public static String        Import_Data_HTML_LastMarker_No;
    public static String        Import_Data_HTML_LastMarker_Yes;
+   public static String        Import_Data_HTML_Mount;
    public static String        Import_Data_HTML_MovedFiles;
    public static String        Import_Data_HTML_NO;
    public static String        Import_Data_HTML_NotBackedUpFiles;
@@ -1448,15 +1492,28 @@ public class Messages extends NLS {
    public static String        Import_Data_HTML_Title_Files;
    public static String        Import_Data_HTML_Title_Moved;
    public static String        Import_Data_HTML_Title_Moved_State;
+   public static String        Import_Data_HTML_Unmount;
    public static String        Import_Data_HTML_WatchingIsOff;
    public static String        Import_Data_HTML_WatchingOff;
    public static String        Import_Data_HTML_WatchingOn;
    public static String        import_data_importTours_subTask;
    public static String        import_data_importTours_task;
    public static String        Import_Data_Label_NumNotImportedFiles;
+   public static String        Import_Data_Log_MountDevice;
+   public static String        Import_Data_Log_MountDevice_MountCommand_IsRun_NoVerification;
+   public static String        Import_Data_Log_MountDevice_MountCommand_IsRun_WithVerification;
+   public static String        Import_Data_Log_MountDevice_MountCommand_IsRun_WithVerification_Error;
+   public static String        Import_Data_Log_MountDevice_MountCommandCannotBeEmpty;
+   public static String        Import_Data_Log_MountDevice_MountCommandFailed;
    public static String        Import_Data_Log_ReimportIsInvalid_DifferentTourId_Message;
    public static String        Import_Data_Log_ReimportIsInvalid_TourNotFoundInFile_Message;
    public static String        Import_Data_Log_ReimportIsInvalid_WrongSliceNumbers;
+   public static String        Import_Data_Log_UnmountDevice;
+   public static String        Import_Data_Log_UnmountDevice_UnmountCommand_IsRun_NoVerification;
+   public static String        Import_Data_Log_UnmountDevice_UnmountCommand_IsRun_WithVerification;
+   public static String        Import_Data_Log_UnmountDevice_UnmountCommand_IsRun_WithVerification_Error;
+   public static String        Import_Data_Log_UnmountDevice_UnmountCommandCannotBeEmpty;
+   public static String        Import_Data_Log_UnmountDevice_UnmountCommandFailed;
    public static String        Import_Data_Monitor_Backup;
    public static String        Import_Data_Monitor_Backup_SubTask;
    public static String        Import_Data_Monitor_DeleteTourFiles;
@@ -1467,6 +1524,8 @@ public class Messages extends NLS {
    public static String        Import_Data_OldUI_Link_ReceiveFromSerialPort_Configured;
    public static String        Import_Data_OldUI_Link_ReceiveFromSerialPort_Directly;
    public static String        Import_Data_OldUI_Link_ShowNewUI;
+   public static String        Import_Data_StatusLine_MountingDevice;
+   public static String        Import_Data_StatusLine_UnmountingDevice;
    public static String        Import_Data_Task_CloseDeviceInfo;
    public static String        Import_Data_Task_CloseDeviceInfo_CannotClose;
    public static String        Import_Data_TourTypeConfig_BySpeed;
@@ -1769,8 +1828,6 @@ public class Messages extends NLS {
 
    public static String        PrefPage_Import_Checkbox_CreateTourIdWithTime;
    public static String        PrefPage_Import_Checkbox_CreateTourIdWithTime_Tooltip;
-   public static String        PrefPage_Import_Checkbox_IgnoreInvalidFiles;
-   public static String        PrefPage_Import_Checkbox_IgnoreInvalidFiles_Tooltip;
    public static String        PrefPage_Import_Checkbox_SetBodyWeight;
    public static String        PrefPage_Import_Default_Cadence;
    public static String        PrefPage_Import_Default_CadenceValue_Tooltip;
@@ -2527,7 +2584,13 @@ public class Messages extends NLS {
    public static String        Slideout_EquipmentFilter_Title;
 
    public static String        Slideout_EquipmentOptions_Action_EquipmentPreferences;
+   public static String        Slideout_EquipmentOptions_Group_Sort;
+   public static String        Slideout_EquipmentOptions_Label_EquipmentBy;
+   public static String        Slideout_EquipmentOptions_Label_PartService;
    public static String        Slideout_EquipmentOptions_Label_RowHeight;
+   public static String        Slideout_EquipmentOptions_Label_Sort_Tooltip;
+   public static String        Slideout_EquipmentOptions_Label_SortInverse_Tooltip;
+   public static String        Slideout_EquipmentOptions_Label_Title;
    public static String        Slideout_EquipmentOptions_Radio_CustomHeight;
    public static String        Slideout_EquipmentOptions_Radio_CustomHeight_Tooltip;
    public static String        Slideout_EquipmentOptions_Radio_DefaultHeight;

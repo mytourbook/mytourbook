@@ -294,7 +294,7 @@ public class Messages extends NLS {
    public static String        ColumnFactory_Equipment_Equipment;
    public static String        ColumnFactory_Equipment_Equipment_Tooltip;
    public static String        ColumnFactory_Equipment_ID;
-   public static String        ColumnFactory_Equipment_ID_Tootip;
+   public static String        ColumnFactory_Equipment_ID_Tooltip;
    public static String        ColumnFactory_Equipment_ImageFile_Tooltip;
    public static String        ColumnFactory_Equipment_InitialDistance;
    public static String        ColumnFactory_Equipment_InitialDistance_Tooltip;
@@ -398,9 +398,13 @@ public class Messages extends NLS {
    public static String        ColumnFactory_Nutrition_NumberOfProducts_Header;
    public static String        ColumnFactory_Nutrition_NumberOfProducts_Label;
    public static String        ColumnFactory_Nutrition_NumberOfProducts_Tooltip;
+   public static String        ColumnFactory_Nutrition_CarbohydratesAvgPerHour_Header;
+   public static String        ColumnFactory_Nutrition_CarbohydratesAvgPerHour_Label;
+   public static String        ColumnFactory_Nutrition_CarbohydratesAvgPerHour_Tooltip;
 
    public static String        ColumnFactory_Photo_FilePath_Label;
    public static String        ColumnFactory_Photo_FilePath_Tooltip;
+   public static String        ColumnFactory_Photo_ImageFilepath;
    public static String        ColumnFactory_Photo_NumberOfGPSPhotos_Header;
    public static String        ColumnFactory_Photo_NumberOfGPSPhotos_Label;
    public static String        ColumnFactory_Photo_NumberOfGPSPhotos_Tooltip;
@@ -410,6 +414,7 @@ public class Messages extends NLS {
    public static String        ColumnFactory_Photo_NumberOfTourPhotos_Header;
    public static String        ColumnFactory_Photo_NumberOfTourPhotos_Label;
    public static String        ColumnFactory_Photo_NumberOfTourPhotos_Tooltip;
+   public static String        ColumnFactory_Photo_PhotoID;
    public static String        ColumnFactory_Photo_Positioned_Header;
    public static String        ColumnFactory_Photo_Positioned_Label;
    public static String        ColumnFactory_Photo_Positioned_Tooltip;

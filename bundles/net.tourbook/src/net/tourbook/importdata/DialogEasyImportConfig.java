@@ -678,7 +678,7 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements IActionRe
 
          super(null, AS_CHECK_BOX);
 
-         setToolTipText("Toggle word wrap in the log texts");
+         setToolTipText(Messages.Dialog_ImportConfig_Action_ToggleWordWrap_Tooltip);
          setImageDescriptor(CommonActivator.getImageDescriptor(CommonImages.WordWrap));
       }
 
@@ -1031,7 +1031,7 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements IActionRe
 
             // tab: Device
             final CTabItem tabDevice = new CTabItem(_tabFolderEasy, SWT.NONE);
-            tabDevice.setText("Device");
+            tabDevice.setText(Messages.Dialog_ImportConfig_Tab_Device);
             tabDevice.setControl(createUI_300_Tab_Device(_tabFolderEasy));
 
             // tab: Launcher
@@ -1515,7 +1515,7 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements IActionRe
 
       {
          /*
-          * Drop down menu: device type
+          * Combo: Device type
           */
          _comboIC_DeviceType = new Combo(parent, SWT.READ_ONLY | SWT.BORDER);
          _comboIC_DeviceType.setToolTipText(Messages.Dialog_ImportConfig_Label_DeviceType_Tooltip);
@@ -1708,7 +1708,7 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements IActionRe
           * Label: Selected config
           */
          final Label label = new Label(parent, SWT.NONE);
-         label.setText("For configuration");
+         label.setText(Messages.Dialog_ImportConfig_Label_ForConfiguration);
          GridDataFactory.fillDefaults()
                .align(SWT.FILL, SWT.CENTER)
                .applyTo(label);
@@ -1743,8 +1743,8 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements IActionRe
           * Label: Device info
           */
          final Label label = new Label(parent, SWT.NONE);
-         label.setText("Device inf&o command");
-         label.setToolTipText("This command can be used to provide device info,\ne.g. list all available devices");
+         label.setText(Messages.Dialog_ImportConfig_Label_Command_DeviceInfo);
+         label.setToolTipText(Messages.Dialog_ImportConfig_Label_Command_DeviceInfo_Tooltip);
          gd.applyTo(label);
 
          /*
@@ -1761,12 +1761,13 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements IActionRe
           * Button: Device info
           */
          _btnIC_RunCommand_DeviceInfo = new Button(parent, SWT.PUSH);
-         _btnIC_RunCommand_DeviceInfo.setText("Run Info");
+         _btnIC_RunCommand_DeviceInfo.setText(Messages.Dialog_ImportConfig_Button_RunCommand_Info);
          _btnIC_RunCommand_DeviceInfo.addSelectionListener(SelectionListener.widgetSelectedAdapter(
                selectionEvent -> {
                   onSelect_IC_RunMountCommand(
                         _txtIC_Command_DeviceInfo.getText(),
-                        _txtIC_Command_DeviceInfo_Log);
+                        _txtIC_Command_DeviceInfo_Log,
+                        false);
                }));
          gd.applyTo(_btnIC_RunCommand_DeviceInfo);
          setButtonLayoutData(_btnIC_RunCommand_DeviceInfo);
@@ -1795,8 +1796,8 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements IActionRe
           * Timeout
           */
          final Label label = new Label(parent, SWT.NONE);
-         label.setText("&Timeout");
-         label.setToolTipText("Timeout before the command is killed");
+         label.setText(Messages.Dialog_ImportConfig_Label_Timeout);
+         label.setToolTipText(Messages.Dialog_ImportConfig_Label_Timeout_Tooltip);
          gd.applyTo(label);
 
          final Composite container = new Composite(parent, SWT.NONE);
@@ -1828,8 +1829,7 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements IActionRe
           * Checkbox: Mount
           */
          _chkIC_IsMountDevice = new Button(parent, SWT.CHECK);
-         _chkIC_IsMountDevice.setText("Mount device before watching the device folder");
-         _chkIC_IsMountDevice.setToolTipText("");
+         _chkIC_IsMountDevice.setText(Messages.Dialog_ImportConfig_Checkbox_IsMountDevice);
          _chkIC_IsMountDevice.addSelectionListener(_icSelectionListener);
          GridDataFactory.fillDefaults()
                .span(3, 1)
@@ -1841,7 +1841,7 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements IActionRe
           * Label: Mount command
           */
          _lblIC_MountCommand = new Label(parent, SWT.NONE);
-         _lblIC_MountCommand.setText("&Mount command");
+         _lblIC_MountCommand.setText(Messages.Dialog_ImportConfig_Label_Command_Mount);
          GridDataFactory.fillDefaults()
                .align(SWT.FILL, SWT.CENTER)
                .indent(_leftPadding, 0)
@@ -1861,12 +1861,13 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements IActionRe
           * Button: Test mount command
           */
          _btnIC_RunCommand_Mount = new Button(parent, SWT.PUSH);
-         _btnIC_RunCommand_Mount.setText("Run Mount");
+         _btnIC_RunCommand_Mount.setText(Messages.Dialog_ImportConfig_Button_RunCommand_Mount);
          _btnIC_RunCommand_Mount.addSelectionListener(SelectionListener.widgetSelectedAdapter(
                selectionEvent -> {
                   onSelect_IC_RunMountCommand(
                         _txtIC_Command_Mount.getText(),
-                        _txtIC_Command_Mount_TestLog);
+                        _txtIC_Command_Mount_TestLog,
+                        true);
                }));
          GridDataFactory.fillDefaults()
                .align(SWT.FILL, SWT.CENTER)
@@ -1891,8 +1892,8 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements IActionRe
                    * Checkbox: Verify mount command
                    */
                   _chkIC_IsVerifyMountCommand = new Button(container, SWT.CHECK);
-                  _chkIC_IsVerifyMountCommand.setText("Verify mount command with this log");
-                  _chkIC_IsVerifyMountCommand.setToolTipText("This log is expected when the mount command was performed successfully");
+                  _chkIC_IsVerifyMountCommand.setText(Messages.Dialog_ImportConfig_Checkbox_IsVerifyMountCommand);
+                  _chkIC_IsVerifyMountCommand.setToolTipText(Messages.Dialog_ImportConfig_Checkbox_IsVerifyMountCommand_Tooltip);
                   _chkIC_IsVerifyMountCommand.addSelectionListener(_icSelectionListener);
                   GridDataFactory.fillDefaults()
                         .align(SWT.FILL, SWT.BEGINNING)
@@ -1904,7 +1905,7 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements IActionRe
                    * Label: Mount command
                    */
                   _lblIC_MountCommand_Log = new Label(container, SWT.NONE);
-                  _lblIC_MountCommand_Log.setText("Mount command log");
+                  _lblIC_MountCommand_Log.setText(Messages.Dialog_ImportConfig_Label_Command_MountLog);
                   GridDataFactory.fillDefaults()
                         .align(SWT.FILL, SWT.CENTER)
                         .applyTo(_lblIC_MountCommand_Log);
@@ -1912,7 +1913,8 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements IActionRe
                }
             }
             {
-               final int xHint = 100;
+               // "force" equal width for the log fields
+               final int widthHint = 1000;
                {
                   /*
                    * Text: Mount command is OK
@@ -1928,7 +1930,7 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements IActionRe
                   GridDataFactory.fillDefaults()
                         .grab(true, true)
                         .indent(_leftPadding, 0)
-                        .hint(xHint, SWT.DEFAULT)
+                        .hint(widthHint, SWT.DEFAULT)
                         .applyTo(_txtIC_Command_Mount_VerifyLog);
                }
                {
@@ -1936,7 +1938,7 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements IActionRe
                    * Button: Copy left
                    */
                   _btnIC_CopyLeft_Mount = new Button(container, SWT.PUSH);
-                  _btnIC_CopyLeft_Mount.setToolTipText("Copy the mount command log into the verify log field");
+                  _btnIC_CopyLeft_Mount.setToolTipText(Messages.Dialog_ImportConfig_Button_CopyLeft_Mount_Tooltip);
                   _btnIC_CopyLeft_Mount.setImage(_imageCopyLeft);
                   _btnIC_CopyLeft_Mount.addSelectionListener(SelectionListener.widgetSelectedAdapter(selectionEvent -> {
                      onIC_CopyLog(_txtIC_Command_Mount_TestLog, _txtIC_Command_Mount_VerifyLog);
@@ -1955,7 +1957,7 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements IActionRe
 
                   GridDataFactory.fillDefaults()
                         .grab(true, true)
-                        .hint(xHint, SWT.DEFAULT)
+                        .hint(widthHint, SWT.DEFAULT)
                         .applyTo(_txtIC_Command_Mount_TestLog);
                }
             }
@@ -1970,7 +1972,7 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements IActionRe
           * Checkbox: Unmount
           */
          _chkIC_IsUnmountDevice = new Button(parent, SWT.CHECK);
-         _chkIC_IsUnmountDevice.setText("Unmount device after watching the device folder");
+         _chkIC_IsUnmountDevice.setText(Messages.Dialog_ImportConfig_Checkbox_IsUnmountDevice);
          _chkIC_IsUnmountDevice.addSelectionListener(_icSelectionListener);
          GridDataFactory.fillDefaults()
                .span(3, 1)
@@ -1982,8 +1984,7 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements IActionRe
           * Label: Unmount command
           */
          _lblIC_UnmountCommand = new Label(parent, SWT.NONE);
-         _lblIC_UnmountCommand.setText("&Unmount command");
-         _lblIC_UnmountCommand.setToolTipText("");
+         _lblIC_UnmountCommand.setText(Messages.Dialog_ImportConfig_Label_Command_Unmount);
          GridDataFactory.fillDefaults()
                .align(SWT.FILL, SWT.CENTER)
                .indent(_leftPadding, 0)
@@ -2003,12 +2004,13 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements IActionRe
           * Button: Test unmount command
           */
          _btnIC_RunCommand_Unmount = new Button(parent, SWT.PUSH);
-         _btnIC_RunCommand_Unmount.setText("Run Unmount");
+         _btnIC_RunCommand_Unmount.setText(Messages.Dialog_ImportConfig_Button_RunCommand_Unmount);
          _btnIC_RunCommand_Unmount.addSelectionListener(SelectionListener.widgetSelectedAdapter(
                selectionEvent -> {
                   onSelect_IC_RunMountCommand(
                         _txtIC_Command_Unmount.getText(),
-                        _txtIC_Command_Unmount_TestLog);
+                        _txtIC_Command_Unmount_TestLog,
+                        true);
                }));
          GridDataFactory.fillDefaults()
                .align(SWT.FILL, SWT.CENTER)
@@ -2033,8 +2035,8 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements IActionRe
                    * Checkbox: Verify unmount command
                    */
                   _chkIC_IsVerifyUnmountCommand = new Button(container, SWT.CHECK);
-                  _chkIC_IsVerifyUnmountCommand.setText("Verify unmount command with this log");
-                  _chkIC_IsVerifyUnmountCommand.setToolTipText("This log is expected when the unmount command was performed successfully");
+                  _chkIC_IsVerifyUnmountCommand.setText(Messages.Dialog_ImportConfig_Checkbox_IsVerifyUnmountCommand);
+                  _chkIC_IsVerifyUnmountCommand.setToolTipText(Messages.Dialog_ImportConfig_Checkbox_IsVerifyUnmountCommand_Tooltip);
                   _chkIC_IsVerifyUnmountCommand.addSelectionListener(_icSelectionListener);
                   GridDataFactory.fillDefaults()
                         .align(SWT.FILL, SWT.BEGINNING)
@@ -2046,7 +2048,7 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements IActionRe
                    * Label: Mount command
                    */
                   _lblIC_UnmountCommand_Log = new Label(container, SWT.NONE);
-                  _lblIC_UnmountCommand_Log.setText("Unmount command log");
+                  _lblIC_UnmountCommand_Log.setText(Messages.Dialog_ImportConfig_Label_Command_UnmountLog);
                   GridDataFactory.fillDefaults()
                         .align(SWT.FILL, SWT.CENTER)
                         .applyTo(_lblIC_UnmountCommand_Log);
@@ -2054,7 +2056,7 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements IActionRe
                }
             }
             {
-               final int xHint = 100;
+               final int widthHint = 1000;
                {
                   /*
                    * Text: Unmount command is OK
@@ -2070,7 +2072,7 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements IActionRe
                   GridDataFactory.fillDefaults()
                         .grab(true, true)
                         .indent(_leftPadding, 0)
-                        .hint(xHint, SWT.DEFAULT)
+                        .hint(widthHint, SWT.DEFAULT)
                         .applyTo(_txtIC_Command_Unmount_VerifyLog);
                }
                {
@@ -2078,7 +2080,7 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements IActionRe
                    * Button: Copy left
                    */
                   _btnIC_CopyLeft_Unmount = new Button(container, SWT.PUSH);
-                  _btnIC_CopyLeft_Unmount.setToolTipText("Copy the unmount command log into the verify log field");
+                  _btnIC_CopyLeft_Unmount.setToolTipText(Messages.Dialog_ImportConfig_Button_CopyLeft_Unmount);
                   _btnIC_CopyLeft_Unmount.setImage(_imageCopyLeft);
                   _btnIC_CopyLeft_Unmount.addSelectionListener(SelectionListener.widgetSelectedAdapter(selectionEvent -> {
                      onIC_CopyLog(_txtIC_Command_Unmount_TestLog, _txtIC_Command_Unmount_VerifyLog);
@@ -2097,7 +2099,7 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements IActionRe
 
                   GridDataFactory.fillDefaults()
                         .grab(true, true)
-                        .hint(xHint, SWT.DEFAULT)
+                        .hint(widthHint, SWT.DEFAULT)
                         .applyTo(_txtIC_Command_Unmount_TestLog);
                }
             }
@@ -4317,9 +4319,9 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements IActionRe
 
       final TableColumnDefinition colDef = new TableColumnDefinition(_icColumnManager, "mountDevice", SWT.LEAD); //$NON-NLS-1$
 
-      colDef.setColumnLabel("Mount device");
-      colDef.setColumnHeaderText("Mount");
-      colDef.setColumnHeaderToolTipText("Mount device command");
+      colDef.setColumnLabel(Messages.Dialog_ImportConfig_Column_MountDevice_Label);
+      colDef.setColumnHeaderText(Messages.Dialog_ImportConfig_Column_MountDevice_Header);
+      colDef.setColumnHeaderToolTipText(Messages.Dialog_ImportConfig_Column_MountDevice_Tooltip);
 
       colDef.setDefaultColumnWidth(convertWidthInCharsToPixels(10));
       colDef.setColumnWeightData(new ColumnWeightData(10));
@@ -4346,9 +4348,9 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements IActionRe
 
       final TableColumnDefinition colDef = new TableColumnDefinition(_icColumnManager, "unmountDevice", SWT.LEAD); //$NON-NLS-1$
 
-      colDef.setColumnLabel("Unmount device");
-      colDef.setColumnHeaderText("Unmount");
-      colDef.setColumnHeaderToolTipText("Unmount device command");
+      colDef.setColumnLabel(Messages.Dialog_ImportConfig_Column_UnmountDevice_Label);
+      colDef.setColumnHeaderText(Messages.Dialog_ImportConfig_Column_UnmountDevice_Header);
+      colDef.setColumnHeaderToolTipText(Messages.Dialog_ImportConfig_Column_UnmountDevice_Tooltip);
 
       colDef.setDefaultColumnWidth(convertWidthInCharsToPixels(10));
       colDef.setColumnWeightData(new ColumnWeightData(10));
@@ -5575,31 +5577,44 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements IActionRe
       _tabFolderEasy.setSelection(1);
    }
 
-   private void onSelect_IC_RunMountCommand(final String command, final StyledText txtLog) {
+   private void onSelect_IC_RunMountCommand(final String command,
+                                            final StyledText txtLog,
+                                            final boolean isPostUpdate) {
 
-      BusyIndicator.showWhile(Display.getDefault(), () -> {
+      // clear old log
+      txtLog.setText(UI.EMPTY_STRING);
 
-         final String[] allCommands = command.split(UI.SPACE1);
+      _parent.getDisplay().asyncExec(() -> {
 
-         final ProcessContext processContext = EasyImportManager.runProcess(
-               _selectedIC.mountUnmountTimeout,
-               allCommands);
+         BusyIndicator.showWhile(Display.getDefault(), () -> {
 
-         if (processContext.error != null) {
+            final String[] allCommands = command.split(UI.SPACE1);
 
-            // display error message
+            final ProcessContext processContext = EasyImportManager.runProcess(
+                  _selectedIC.mountUnmountTimeout,
+                  allCommands);
 
-            txtLog.setForeground(UI.IS_DARK_THEME ? UI.SYS_COLOR_YELLOW : UI.SYS_COLOR_RED);
-            txtLog.setText(processContext.error);
+            if (processContext.error != null) {
 
-         } else {
+               // display error message
 
-            txtLog.setForeground(ThemeUtil.getDefaultForegroundColor_Shell());
-            txtLog.setText(processContext.output);
-         }
+               txtLog.setForeground(UI.IS_DARK_THEME ? UI.SYS_COLOR_YELLOW : UI.SYS_COLOR_RED);
+               txtLog.setText(processContext.error);
 
-         // when setting the text, it can resize the text boxes
-         _parent.layout(true, true);
+            } else {
+
+               txtLog.setForeground(ThemeUtil.getDefaultForegroundColor_Shell());
+               txtLog.setText(processContext.output);
+            }
+
+            // when setting the text, it can resize the text boxes
+            _parent.layout(true, true);
+
+            // update device folder
+            if (isPostUpdate) {
+               _deviceHistoryItems.updateHistory();
+            }
+         });
       });
    }
 

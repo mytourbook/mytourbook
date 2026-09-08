@@ -10,7 +10,7 @@
    <name>MyTourbook App</name>
 
    <artifactId>mytourbook-app</artifactId>   <groupId>net.tourbook</groupId>
-                                             <version>26.8.0-SNAPSHOT</version>
+                                             <version>26.9.0-SNAPSHOT</version>
    <packaging>pom</packaging>
    
    <dependencies>
@@ -23,7 +23,7 @@
 
    <properties>
       <tycho.version>5.0.4</tycho.version>     
-      <surefire.version>3.5.6</surefire.version>
+      <surefire.version>3.6.0</surefire.version>
       <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>  
    </properties>
 
@@ -133,7 +133,7 @@
                                                                      <version>${tycho.version}</version>
             <configuration>
 
-               <!-- Fix this problem (and propably others)
+               <!-- Fix this problem (and probably others)
 
                 Access restriction: The method 'BaseDateTime.getMillis()' is not API 
                 (restriction on classpath entry 'C:\DAT\MT\mytourbook\bundles\net.tourbook.ext.jars\joda-time-2.1.jar')
@@ -213,7 +213,7 @@
       
       <plugin>
          <artifactId>maven-compiler-plugin</artifactId>        <groupId>org.apache.maven.plugins</groupId>
-                                                               <version>3.15.0</version>
+                                                               <version>3.16.0</version>
          <executions>
             <execution>
                <id>compiletests</id>

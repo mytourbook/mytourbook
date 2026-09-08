@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2020, 2021 Frédéric Bard
+ * Copyright (C) 2020, 2026 Frédéric Bard
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -46,7 +46,7 @@ public class FitLogEx_SAXHandler extends DefaultHandler {
    private static final String            TAG_EQUIPMENT_BRAND                         = "Brand";                                         //$NON-NLS-1$
 
    private LinkedHashMap<String, Integer> _customDataFieldDefinitions;
-   private ArrayList<Equipment>           _equipments;
+   private ArrayList<Equipment>           _equipment;
 
    private boolean                        _isInCustomDataFieldDefinitions;
 
@@ -67,7 +67,7 @@ public class FitLogEx_SAXHandler extends DefaultHandler {
    public FitLogEx_SAXHandler() {
 
       _customDataFieldDefinitions = new LinkedHashMap<>();
-      _equipments = new ArrayList<>();
+      _equipment = new ArrayList<>();
    }
 
    @Override
@@ -111,12 +111,12 @@ public class FitLogEx_SAXHandler extends DefaultHandler {
 
    private void endElement_InEquipment(final String name) {
 
-      final int numberOfEquipments = _equipments.size();
-      if (numberOfEquipments == 0) {
+      final int numberOfEquipment = _equipment.size();
+      if (numberOfEquipment == 0) {
          return;
       }
 
-      final Equipment currentEquipment = _equipments.get(numberOfEquipments - 1);
+      final Equipment currentEquipment = _equipment.get(numberOfEquipment - 1);
 
       if (name.equals(TAG_EQUIPMENT_BRAND)) {
 
@@ -176,7 +176,7 @@ public class FitLogEx_SAXHandler extends DefaultHandler {
    }
 
    public List<Equipment> getEquipments() {
-      return _equipments;
+      return _equipment;
    }
 
    @Override
@@ -220,7 +220,7 @@ public class FitLogEx_SAXHandler extends DefaultHandler {
       } else if (name.equals(TAG_ACTIVITY_EQUIPMENT)) {
 
          // It's very important to test if we are in an <Equipment>
-         // element as there can be equipments within equipments as below:
+         // element as there can be equipmens within equipmens as below:
          // <Equipment Id="1">
          //    <Equipment Id="2" partOf="1">
          //    </Equipment>
@@ -231,7 +231,7 @@ public class FitLogEx_SAXHandler extends DefaultHandler {
          final Equipment newEquipment = new Equipment();
          newEquipment.Id = attributes.getValue(FitLog_SAXHandler.ATTRIB_EQUIPMENT_ID);
 
-         _equipments.add(newEquipment);
+         _equipment.add(newEquipment);
 
       } else if (_isInEquipment) {
 

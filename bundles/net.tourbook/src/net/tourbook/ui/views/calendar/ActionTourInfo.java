@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2025 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2026 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -127,9 +127,9 @@ public class ActionTourInfo extends ContributionItem implements IOpeningDialog {
 
    private void onAction() {
 
-      updateUI();
-
       _stateIsSelected = _actionToolItem.getSelection();
+
+      updateUI();
 
       if (_stateIsSelected) {
 
