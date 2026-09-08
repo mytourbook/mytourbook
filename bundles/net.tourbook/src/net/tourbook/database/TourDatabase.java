@@ -126,8 +126,9 @@ public class TourDatabase {
     * <li>/net.tourbook.export/format-templates/mt-1.0.vm</li>
     * <li>net.tourbook.device.mt.MT_StAXHandler</li>
     */
-   private static final int TOURBOOK_DB_VERSION = 63; // 26.8.next
+   private static final int TOURBOOK_DB_VERSION = 63; // 26.9
 
+//   private static final int TOURBOOK_DB_VERSION = 63; // 26.9
 //   private static final int TOURBOOK_DB_VERSION = 62; // 26.8
 //   private static final int TOURBOOK_DB_VERSION = 61; // 26.6
 //   private static final int TOURBOOK_DB_VERSION = 60; // 26.3
@@ -5372,19 +5373,19 @@ public class TourDatabase {
 
             // version 52 end
 
-            // version 58 start  -  25.x
+            // version 58 start  -  25.6
 
             + "   poolLength                             INTEGER DEFAULT 0,            " + NL //$NON-NLS-1$
 
             // version 58 end
 
-            // version 59 start  -  after 25.8
+            // version 59 start  -  25.11
 
             + "   numberOfPassedVehicles                 INTEGER DEFAULT 0,            " + NL //$NON-NLS-1$
 
             // version 59 end
 
-            // version 63 start  -  26.next
+            // version 63 start  -  26.9
 
             + "   nutrition_TotalCarbohydrates           FLOAT DEFAULT 0,            " + NL //$NON-NLS-1$
 
@@ -7460,12 +7461,12 @@ public class TourDatabase {
             currentDbVersion = _dbDesignVersion_New = updateDb_060_To_061(conn, splashManager);
          }
 
-         // 61 -> 62    26.6+++
+         // 61 -> 62    26.8
          if (currentDbVersion == 61) {
             currentDbVersion = _dbDesignVersion_New = updateDb_061_To_062(conn, splashManager);
          }
 
-         // 62 -> 63    26.8+++
+         // 62 -> 63    26.9
          if (currentDbVersion == 62) {
             currentDbVersion = _dbDesignVersion_New = updateDb_062_To_063(conn, splashManager);
          }
