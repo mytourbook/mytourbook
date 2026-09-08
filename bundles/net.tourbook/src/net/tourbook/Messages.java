@@ -885,6 +885,12 @@ public class Messages extends NLS {
    public static String        Dialog_ImportConfig_Label_BackupFolder;
    public static String        Dialog_ImportConfig_Label_BackupFolder_Tooltip;
    public static String        Dialog_ImportConfig_Label_Cadence;
+   public static String        Dialog_ImportConfig_Label_Command_DeviceInfo;
+   public static String        Dialog_ImportConfig_Label_Command_DeviceInfo_Tooltip;
+   public static String        Dialog_ImportConfig_Label_Command_Mount;
+   public static String        Dialog_ImportConfig_Label_Command_MountLog;
+   public static String        Dialog_ImportConfig_Label_Command_Unmount;
+   public static String        Dialog_ImportConfig_Label_Command_UnmountLog;
    public static String        Dialog_ImportConfig_Label_ConfigName;
    public static String        Dialog_ImportConfig_Label_ConfigTileSize;
    public static String        Dialog_ImportConfig_Label_ConfigTileSize_Tooltip;
@@ -892,8 +898,6 @@ public class Messages extends NLS {
    public static String        Dialog_ImportConfig_Label_DeviceFiles_Tooltip;
    public static String        Dialog_ImportConfig_Label_DeviceFolder;
    public static String        Dialog_ImportConfig_Label_DeviceFolder_Tooltip;
-   public static String        Dialog_ImportConfig_Label_DeviceInfoCommand;
-   public static String        Dialog_ImportConfig_Label_DeviceInfoCommand_Tooltip;
    public static String        Dialog_ImportConfig_Label_DeviceType_Tooltip;
    public static String        Dialog_ImportConfig_Label_EquipmentGroup;
    public static String        Dialog_ImportConfig_Label_ForConfiguration;
@@ -905,8 +909,6 @@ public class Messages extends NLS {
    public static String        Dialog_ImportConfig_Label_LastMarkerText;
    public static String        Dialog_ImportConfig_Label_LocationProfile;
    public static String        Dialog_ImportConfig_Label_LocationProfile_Tooltip;
-   public static String        Dialog_ImportConfig_Label_MountCommand;
-   public static String        Dialog_ImportConfig_Label_MountCommandLog;
    public static String        Dialog_ImportConfig_Label_SelectEquipmentGroup;
    public static String        Dialog_ImportConfig_Label_ShowTheseTiles;
    public static String        Dialog_ImportConfig_Label_StateTooltipWidth;
@@ -915,8 +917,6 @@ public class Messages extends NLS {
    public static String        Dialog_ImportConfig_Label_Timeout;
    public static String        Dialog_ImportConfig_Label_Timeout_Tooltip;
    public static String        Dialog_ImportConfig_Label_TourTag;
-   public static String        Dialog_ImportConfig_Label_UnmountCommandLog;
-   public static String        Dialog_ImportConfig_Label_UnmouontCommand;
    public static String        Dialog_ImportConfig_Link_FileSystem_Preferences;
    public static String        Dialog_ImportConfig_Link_OtherActions;
    public static String        Dialog_ImportConfig_Link_TourType;
