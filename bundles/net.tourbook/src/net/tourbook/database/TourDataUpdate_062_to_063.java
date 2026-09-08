@@ -30,7 +30,7 @@ public class TourDataUpdate_062_to_063 implements ITourDataUpdate {
    @Override
    public int getDatabaseVersion() {
 
-      return 62;
+      return 63;
    }
 
    @Override
