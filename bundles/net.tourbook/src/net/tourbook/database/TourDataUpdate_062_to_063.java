@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2026 Wolfgang Schramm and Contributors
+ * Copyright (C) 2026 Frédéric Bard and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -36,13 +36,11 @@ public class TourDataUpdate_062_to_063 implements ITourDataUpdate {
    @Override
    public List<Long> getTourIDs() {
 
-      final IPath stateLocation =
-            Platform.getStateLocation(CommonActivator.getDefault().getBundle());
-      final File invalidFiles =
-            stateLocation.append("invalidfiles_to_ignore.txt").toFile(); //$NON-NLS-1$
+      final IPath stateLocation = Platform.getStateLocation(CommonActivator.getDefault().getBundle());
+      final File invalidFiles = stateLocation.append("invalidfiles_to_ignore.txt").toFile(); //$NON-NLS-1$
       FileUtils.deleteIfExists(invalidFiles.toPath());
 
-      return List.of();
+      return null;
    }
 
    @Override
