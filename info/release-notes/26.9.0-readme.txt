@@ -3,7 +3,7 @@
 All
 ===
 
-See milestone 26.9 https://github.com/mytourbook/mytourbook/milestone/29?closed=1
+See milestone 26.9 https://github.com/mytourbook/mytourbook/milestone/31?closed=1
 
 
 New / Improvements
