@@ -711,7 +711,7 @@ public class CalendarView extends ViewPart implements ITourProvider, ICalendarPr
       }
 
       final Long selectedTourId = Util.getStateLong(_state, STATE_SELECTED_TOURS, -1);
-      _calendarGraph.setSelectionTourId(selectedTourId);
+      _calendarGraph.setTourSelection(selectedTourId);
 
       // tooltip
       _tourInfoToolTip.setPopupDelay(Util.getStateInt(_state, STATE_TOUR_TOOLTIP_DELAY, DEFAULT_TOUR_TOOLTIP_DELAY));

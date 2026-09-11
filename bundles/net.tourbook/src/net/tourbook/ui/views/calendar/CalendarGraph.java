@@ -2322,6 +2322,18 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
       gc.setClipping(_nullRec);
    }
 
+   private void fireTourSelection(final long tourId) {
+
+      getDisplay().asyncExec(() -> {
+
+         if (isDisposed()) {
+            return;
+         }
+
+         _calendarView.fireSelection(tourId);
+      });
+   }
+
    @Override
    public ArrayList<TourData> getAllSelectedTours() {
       return getSelectedTours();
@@ -2783,7 +2795,7 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
       if (tourId != null) {
 
          // select todays tour when available
-         _selectedItem = new CalendarSelectItem(tourId, ItemType.TOUR);
+         setTourSelection(tourId);
 
       } else {
 
@@ -2809,6 +2821,8 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
          return;
       }
 
+      long selectedTourID = -1;
+
       /*
        * If no tour is selected, count from first/last tour and select this tour
        */
@@ -2821,16 +2835,16 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
             // select first tour
 
             direction++;
-            _selectedItem = new CalendarSelectItem(_allTourFocusItems.get(0).id, ItemType.TOUR);
+
+            selectedTourID = _allTourFocusItems.get(0).id;
 
          } else {
 
             // select last tour
 
             direction--;
-            _selectedItem = new CalendarSelectItem(
-                  _allTourFocusItems.get(_allTourFocusItems.size() - 1).id,
-                  ItemType.TOUR);
+
+            selectedTourID = _allTourFocusItems.get(_allTourFocusItems.size() - 1).id;
          }
       }
 
@@ -2868,10 +2882,14 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 
       } else {
 
-         _selectedItem = new CalendarSelectItem(_allTourFocusItems.get(newIndex).id, ItemType.TOUR);
+         selectedTourID = _allTourFocusItems.get(newIndex).id;
 
          _isGraphDirty = true;
          redraw();
+      }
+
+      if (selectedTourID != -1) {
+         setTourSelection(selectedTourID);
       }
    }
 
@@ -2888,7 +2906,7 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
       if (tourId != null) {
 
          // select first tour
-         _selectedItem = new CalendarSelectItem(tourId, ItemType.TOUR);
+         setTourSelection(tourId);
 
       } else {
 
@@ -2905,7 +2923,7 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 
       final LocalDateTime dt = _dataProvider.getCalendarTourDateTime(tourId);
 
-      _selectedItem = new CalendarSelectItem(tourId, ItemType.TOUR);
+      setTourSelection(tourId);
 
       if (dt.isBefore(_firstVisibleDay) || dt.isAfter(_firstVisibleDay.plusWeeks(_numWeeksInOneColumn))) {
 
@@ -2927,14 +2945,18 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
       }
 
       if (!_selectedItem.isTour()) { // if no tour is selected, count from first/last tour and select this tour
+
          if (direction > 0) {
-            _selectedItem = new CalendarSelectItem(_allTourFocusItems.get(0).id, ItemType.TOUR);
+
+            setTourSelection(_allTourFocusItems.get(0).id);
+
          } else {
-            _selectedItem = new CalendarSelectItem(
-                  _allTourFocusItems.get(_allTourFocusItems.size() - 1).id,
-                  ItemType.TOUR);
+
+            setTourSelection(_allTourFocusItems.get(_allTourFocusItems.size() - 1).id);
          }
+
          redraw();
+
          return;
       }
 
@@ -2964,8 +2986,10 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 
             if (dayOfWeekToGoTo == (focusItem.calendarTourData).dayOfWeek) {
 
-               _selectedItem = new CalendarSelectItem(focusItem.id, ItemType.TOUR);
+               setTourSelection(focusItem.id);
+
                _lastDayOfWeekToGoTo = dayOfWeekToGoTo;
+
 
                redraw();
 
@@ -3096,7 +3120,6 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
          _selectedItem = _emptyItem;
       }
 
-      final long tourId[] = { -1 };
       boolean isTourHovered = false;
 
       // check if a tour is hovered
@@ -3117,7 +3140,7 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
                _selectedItem.calendarTourData = calendarTourData;
                _selectedItem.canItemBeDragged = calendarTourData.isManualTour;
 
-               tourId[0] = id;
+               fireTourSelection(id);
             }
 
             isTourHovered = true;
@@ -3143,20 +3166,6 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
                break;
             }
          }
-      }
-
-      if (tourId[0] != -1) {
-
-         // fire tour selection
-
-         getDisplay().asyncExec(() -> {
-
-            if (isDisposed()) {
-               return;
-            }
-
-            _calendarView.fireSelection(tourId[0]);
-         });
       }
 
       if (!oldSelectedItem.equals(_selectedItem)) {
@@ -3692,9 +3701,16 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
       }
    }
 
-   public void setSelectionTourId(final long selectedTourId) {
+   /**
+    * Set {@link #_selectedItem} to a tour and fire the selection
+    *
+    * @param selectedTourId
+    */
+   public void setTourSelection(final long selectedTourId) {
 
       _selectedItem = new CalendarSelectItem(selectedTourId, ItemType.TOUR);
+
+      fireTourSelection(selectedTourId);
    }
 
    private void setupProfile() {
