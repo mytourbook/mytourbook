@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2024 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2026 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -16,6 +16,7 @@
 package net.tourbook.ui.tourChart;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
@@ -63,6 +64,9 @@ import net.tourbook.ui.views.referenceTour.TVIRefTour_RefTourItem;
 import net.tourbook.ui.views.referenceTour.TourCompareConfig;
 import net.tourbook.ui.views.tourSegmenter.TourSegmenterView;
 
+import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.jface.action.IToolBarManager;
+import org.eclipse.jface.action.Separator;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.util.IPropertyChangeListener;
@@ -72,6 +76,7 @@ import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.IPartListener2;
+import org.eclipse.ui.ISaveablePart;
 import org.eclipse.ui.ISelectionListener;
 import org.eclipse.ui.IViewPart;
 import org.eclipse.ui.IWorkbenchPart;
@@ -88,16 +93,19 @@ import org.eclipse.ui.part.ViewPart;
  */
 public class TourChartView extends ViewPart implements
 
+      ISaveablePart,
       ITourChartViewer,
       IPhotoEventListener,
       IGeoCompareListener
 
 {
 
-   public static final String      ID         = "net.tourbook.views.TourChartView"; //$NON-NLS-1$
+   public static final String      ID                                  = "net.tourbook.views.TourChartView"; //$NON-NLS-1$
 
-   private final IDialogSettings   _state     = TourbookPlugin.getState(ID);
-   private final IPreferenceStore  _prefStore = TourbookPlugin.getPrefStore();
+   static final String             TOOLBAR_GROUP_SAVE_AND_UNDO_ACTIONS = "group_SaveAndUndoActions";         //$NON-NLS-1$
+
+   private final IDialogSettings   _state                              = TourbookPlugin.getState(ID);
+   private final IPreferenceStore  _prefStore                          = TourbookPlugin.getPrefStore();
 
    private TourChartConfiguration  _tourChartConfig;
    private TourData                _tourData;
@@ -127,6 +135,7 @@ public class TourChartView extends ViewPart implements
 //
 //   @Inject
 //   private IThemeEngine            engine;
+
    /*
     * UI controls
     */
@@ -307,48 +316,11 @@ public class TourChartView extends ViewPart implements
                   return;
                }
 
-               try {
+               // get modified tours
+               final List<TourData> allModifiedTours = ((TourEvent) eventData).getModifiedTours();
+               if (allModifiedTours != null) {
 
-                  _isInTourModified = true;
-
-                  // get modified tours
-                  final ArrayList<TourData> modifiedTours = ((TourEvent) eventData).getModifiedTours();
-                  if (modifiedTours != null) {
-
-                     final long chartTourId = _tourData.getTourId();
-
-                     // update chart with the modified tour
-                     for (final TourData tourData : modifiedTours) {
-
-                        if (tourData == null) {
-
-                           /*
-                            * tour is not set, this can be the case when a manual tour is discarded
-                            */
-
-                           clearView();
-
-                           return;
-                        }
-
-                        if (tourData.getTourId() == chartTourId) {
-
-                           updateChart(tourData);
-
-                           // removed old tour data from the selection provider
-                           _postSelectionProvider.clearSelection();
-
-                           return;
-                        }
-                     }
-
-                     // ensure that wrong data are not displayed
-                     clearView();
-                  }
-
-               } finally {
-
-                  _isInTourModified = false;
+                  discardModifications(allModifiedTours);
                }
 
             } else if (eventId == TourEventId.TOUR_CHANGED) {
@@ -483,6 +455,19 @@ public class TourChartView extends ViewPart implements
       // set this view part as selection provider
       getSite().setSelectionProvider(_postSelectionProvider = new PostSelectionProvider(ID));
 
+      final IToolBarManager tbm = getViewSite().getActionBars().getToolBarManager();
+
+      /*
+       * Moving the save action to the right side do NOT work, this will partly scamble the actions
+       * and some are hidden. It took me hours to finally find this problem
+       */
+      tbm.add(new Separator(TOOLBAR_GROUP_SAVE_AND_UNDO_ACTIONS));
+
+// this is just as in info which is a remaining from the debugging
+//    tbm.add(new Separator(TOOLBAR_GROUP_1_GRAPHS));
+//    tbm.add(new Separator(TOOLBAR_GROUP_2));
+//    tbm.add(new Separator(TOOLBAR_GROUP_3));
+
       showTour();
    }
 
@@ -511,6 +496,48 @@ public class TourChartView extends ViewPart implements
       _tourChart.addTourModifyListener(tourData -> chartListener_TourIsModified(tourData));
    }
 
+   private void discardModifications(final List<TourData> allModifiedTours) {
+
+      try {
+
+         _isInTourModified = true;
+
+         final long chartTourId = _tourData.getTourId();
+
+         // update chart with the modified tour
+         for (final TourData modifiedTourData : allModifiedTours) {
+
+            if (modifiedTourData == null) {
+
+               /*
+                * tour is not set, this can be the case when a manual tour is discarded
+                */
+
+               clearView();
+
+               return;
+            }
+
+            if (modifiedTourData.getTourId() == chartTourId) {
+
+               updateChart(modifiedTourData);
+
+               // removed old tour data from the selection provider
+               _postSelectionProvider.clearSelection();
+
+               return;
+            }
+         }
+
+         // ensure that wrong data are not displayed
+         clearView();
+
+      } finally {
+
+         _isInTourModified = false;
+      }
+   }
+
    @Override
    public void dispose() {
 
@@ -531,6 +558,16 @@ public class TourChartView extends ViewPart implements
 
       super.dispose();
    }
+
+   @Override
+   public void doSave(final IProgressMonitor monitor) {
+      // TODO Auto-generated method stub
+
+      _tourChart.setTourDirty(false);
+   }
+
+   @Override
+   public void doSaveAs() {}
 
    private void fireHoveredValue(final int hoveredValuePointIndex) {
 
@@ -578,6 +615,11 @@ public class TourChartView extends ViewPart implements
             TourEventId.HOVERED_VALUE_POSITION,
             hoveredValueData,
             TourChartView.this);
+   }
+
+   void firePropertyChange() {
+
+      firePropertyChange(ISaveablePart.PROP_DIRTY);
    }
 
    /**
@@ -664,6 +706,28 @@ public class TourChartView extends ViewPart implements
    private void initUI(final Composite parent) {
 
       _tk = new FormToolkit(parent.getDisplay());
+   }
+
+   @Override
+   public boolean isDirty() {
+
+      if (_tourData == null) {
+         return false;
+      }
+
+      return _tourChart.isTourDirty();
+   }
+
+   @Override
+   public boolean isSaveAsAllowed() {
+
+      return false;
+   }
+
+   @Override
+   public boolean isSaveOnCloseNeeded() {
+
+      return isDirty();
    }
 
    private void onSelection_HoveredValue(final HoveredValueData eventData) {

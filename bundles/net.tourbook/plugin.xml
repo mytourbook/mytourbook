@@ -2600,8 +2600,35 @@
          </command>
    
       </menuContribution>
-
+   
    </extension>
+
+
+   <!--
+   
+      TOUR CHART
+   
+   -->
+   
+   <extension point="org.eclipse.ui.menus">
+   
+      <!-- 
+            Show save/undo actions in the tour chart toolbar
+      -->
+
+      <menuContribution locationURI="toolbar:net.tourbook.views.TourChartView?after=group_SaveAndUndoActions">
+   
+         <!-- Save Tour -->
+         <command
+            commandId      ="command.net.tourbook.tour.SaveTour"
+            mnemonic       ="%Command_Tour_SaveTour_Mnemonic"
+            tooltip        ="%Command_Tour_SaveTour_Tooltip">
+         </command>
+   
+      </menuContribution>
+      
+   </extension>
+
 
    <!--
    
