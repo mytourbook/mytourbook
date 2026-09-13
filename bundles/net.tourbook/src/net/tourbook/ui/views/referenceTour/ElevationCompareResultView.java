@@ -189,7 +189,7 @@ public class ElevationCompareResultView extends ViewPart implements
    private ActionAppTourFilter                 _actionAppTourFilter;
    private ActionCollapseAll                   _actionCollapseAll;
    private ActionElevationCompareFilter        _actionElevationCompareFilter;
-   private ActionReRunComparision              _actionReRunComparision;
+   private ActionReRunComparison               _actionReRunComparison;
 
    private ActionCheckTours                    _actionCheckTours;
    private ActionCompareByElevation_AllTours   _actionCompare_AllTours;
@@ -252,9 +252,9 @@ public class ElevationCompareResultView extends ViewPart implements
       }
    }
 
-   private class ActionReRunComparision extends Action {
+   private class ActionReRunComparison extends Action {
 
-      public ActionReRunComparision() {
+      public ActionReRunComparison() {
 
          super(null, AS_PUSH_BUTTON);
 
@@ -265,7 +265,7 @@ public class ElevationCompareResultView extends ViewPart implements
 
       @Override
       public void run() {
-         action_ReRunComparision();
+         action_ReRunComparison();
       }
    }
 
@@ -439,7 +439,7 @@ public class ElevationCompareResultView extends ViewPart implements
       tree.setRedraw(true);
    }
 
-   private void action_ReRunComparision() {
+   private void action_ReRunComparison() {
 
       final ArrayList<RefTourItem> selectedRefTourItems = ElevationCompareManager.getComparedReferenceTours();
 
@@ -694,7 +694,7 @@ public class ElevationCompareResultView extends ViewPart implements
       _actionAppTourFilter                = new ActionAppTourFilter();
       _actionCollapseAll                  = new ActionCollapseAll(this);
       _actionElevationCompareFilter       = new ActionElevationCompareFilter();
-      _actionReRunComparision             = new ActionReRunComparision();
+      _actionReRunComparison             = new ActionReRunComparison();
 
       _actionCheckTours                   = new ActionCheckTours(this);
       _actionCompare_AllTours             = new ActionCompareByElevation_AllTours(this);
@@ -1525,7 +1525,7 @@ public class ElevationCompareResultView extends ViewPart implements
       _colDef_TourTypeImage.setLabelProvider(new CellLabelProvider() {
 
          // !!! When using cell.setImage() then it is not centered !!!
-         // !!! Set dummy label provider, otherwise an error occures !!!
+         // !!! Set dummy label provider, otherwise an error occurs !!!
          @Override
          public void update(final ViewerCell cell) {}
       });
@@ -1549,11 +1549,11 @@ public class ElevationCompareResultView extends ViewPart implements
 
    private void enableActions() {
 
-      final boolean canReRunComparision = _rootItem != null
+      final boolean canReRunComparison = _rootItem != null
             && _rootItem.getUnfetchedChildren() != null
             && _rootItem.getUnfetchedChildren().size() > 0;
 
-      _actionReRunComparision.setEnabled(canReRunComparision);
+      _actionReRunComparison.setEnabled(canReRunComparison);
    }
 
    private void enableActions_ContextMenu() {
@@ -1728,7 +1728,7 @@ public class ElevationCompareResultView extends ViewPart implements
 
       tbm.add(_actionElevationCompareFilter);
       tbm.add(_actionAppTourFilter);
-      tbm.add(_actionReRunComparision);
+      tbm.add(_actionReRunComparison);
       tbm.add(_actionCollapseAll);
 
       tbm.update(true);

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2023 Wolfgang Schramm and Contributors
+ * Copyright (C) 2023, 2026 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -363,8 +363,8 @@ public class DialogMapModel extends TitleAreaDialog {
 
          // with Linux the file select dialog is empty when using these filters !!!
 
-         dialog.setFileName("*." + MapModelManager.MAP_MODEL_FILE_EXTENTION);//$NON-NLS-1$
-         dialog.setFilterExtensions(new String[] { MapModelManager.MAP_MODEL_FILE_EXTENTION });
+         dialog.setFileName("*." + MapModelManager.MAP_MODEL_FILE_EXTENSION);//$NON-NLS-1$
+         dialog.setFilterExtensions(new String[] { MapModelManager.MAP_MODEL_FILE_EXTENSION });
       }
 
       final String selectedFilepath = dialog.open();

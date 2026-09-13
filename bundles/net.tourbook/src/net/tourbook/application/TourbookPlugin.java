@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2025 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2026 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -334,7 +334,7 @@ public class TourbookPlugin extends AbstractUIPlugin {
          _version = abstractBundle.getVersion();
       }
 
-      // log version that this info is easier accessable
+      // log version that this info is easier accessible
       final Version version = TourbookPlugin.getDefault().getVersion();
 
       /**

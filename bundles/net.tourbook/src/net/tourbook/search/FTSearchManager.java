@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2024 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2026 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -1036,7 +1036,7 @@ public class FTSearchManager {
 
       } catch (final IndexFormatTooOldException e) {
 
-         // this occures when an old index exists -> delete index
+         // this occurs when an old index exists -> delete index
 
          TourLogManager.log_ERROR(e.getMessage());
 
@@ -1448,7 +1448,7 @@ public class FTSearchManager {
 
    /**
     * Creating the result is complicated because the highlights are listed by field and not by hit,
-    * therefor the structure must be inverted.
+    * therefore the structure must be inverted.
     *
     * @param highlightedSearchResults
     * @param indexReader
@@ -1825,7 +1825,7 @@ public class FTSearchManager {
                // java.lang.IllegalArgumentException: need at least one suggestion
 
                /*
-                * This exception can occure when there are documents available but do not
+                * This exception can occur when there are documents available but do not
                 * contain any content which the suggester can use.
                 */
             }
@@ -1840,7 +1840,7 @@ public class FTSearchManager {
 
    /**
     * Update fulltext search index when tours are saved. This is not very efficient because all
-    * tours and their markers/waypoints are deleted and recreated, however it is fast enought for a
+    * tours and their markers/waypoints are deleted and recreated, however it is fast enough for a
     * few thousand items otherwise it would be more complex.
     *
     * @param allTourIDs

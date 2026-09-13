@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2026 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -76,7 +76,7 @@ public class PrefPageMap25_Provider extends PreferencePage implements IWorkbench
 
    public static final String              ID                               = "net.tourbook.preferences.PrefPageMap25_Provider"; //$NON-NLS-1$
 
-   private static final String             STATE_LAST_SELECTED_MAP_PROVIDER = "STATE_LAST_SELECTED_MAP_PROVIDER";                 //$NON-NLS-1$
+   private static final String             STATE_LAST_SELECTED_MAP_PROVIDER = "STATE_LAST_SELECTED_MAP_PROVIDER";                //$NON-NLS-1$
 
    /**
     * First encoding is the default.
@@ -113,7 +113,7 @@ public class PrefPageMap25_Provider extends PreferencePage implements IWorkbench
    //
    /**
     * Contains the controls which are displayed in the first column, these controls are used to get
-    * the maximum width and set the first column within the differenct section to the same width
+    * the maximum width and set the first column within the different section to the same width
     */
    private final ArrayList<Control>        _firstColumnControls             = new ArrayList<>();
    //
@@ -976,7 +976,7 @@ public class PrefPageMap25_Provider extends PreferencePage implements IWorkbench
       final int selectedIndex = _comboTheme.getSelectionIndex();
 
       if (selectedIndex < 0) {
-         // this should not occure
+         // this should not occur
          return null;
       }
 
@@ -1302,8 +1302,8 @@ public class PrefPageMap25_Provider extends PreferencePage implements IWorkbench
 
          // with Linux the file select dialog is empty when using these filters !!!
 
-         dialog.setFileName("*." + Map25ProviderManager.MAPSFORGE_MAP_FILE_EXTENTION);//$NON-NLS-1$
-         dialog.setFilterExtensions(new String[] { Map25ProviderManager.MAPSFORGE_MAP_FILE_EXTENTION });
+         dialog.setFileName("*." + Map25ProviderManager.MAPSFORGE_MAP_FILE_EXTENSION);//$NON-NLS-1$
+         dialog.setFilterExtensions(new String[] { Map25ProviderManager.MAPSFORGE_MAP_FILE_EXTENSION });
       }
 
       final String selectedFilepath = dialog.open();
@@ -1329,7 +1329,7 @@ public class PrefPageMap25_Provider extends PreferencePage implements IWorkbench
          updateUI_FromProvider(_selectedMapProvider);
 
       } else {
-         // irgnore, this can happen when a refresh() of the table viewer is done
+         // ignore, this can happen when a refresh() of the table viewer is done
       }
 
       // show error message when selected map provider is not valid
@@ -1362,8 +1362,8 @@ public class PrefPageMap25_Provider extends PreferencePage implements IWorkbench
       if (UI.IS_WIN) {
 
          // with Linux the file select dialog is empty when using these filters !!!
-         dialog.setFileName("*." + Map25ProviderManager.MAPSFORGE_STYLE_FILE_EXTENTION);//$NON-NLS-1$
-         dialog.setFilterExtensions(new String[] { Map25ProviderManager.MAPSFORGE_STYLE_FILE_EXTENTION });
+         dialog.setFileName("*." + Map25ProviderManager.MAPSFORGE_STYLE_FILE_EXTENSION);//$NON-NLS-1$
+         dialog.setFilterExtensions(new String[] { Map25ProviderManager.MAPSFORGE_STYLE_FILE_EXTENSION });
       }
 
       final String selectedFilepath = dialog.open();
@@ -1424,6 +1424,7 @@ public class PrefPageMap25_Provider extends PreferencePage implements IWorkbench
 
    /**
     * @param isAskToSave
+    *
     * @return Returns <code>false</code> when map provider is not saved.
     */
    private void saveMapProviders(final boolean isAskToSave) {

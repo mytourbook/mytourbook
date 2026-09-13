@@ -2179,7 +2179,7 @@ public class RawDataView extends ViewPart implements
 
             final String nbspFilePathName = UI.EMPTY_STRING
 
-                  // add additonal space before the text otherwise it is too narrow to the previous column
+                  // add additional space before the text otherwise it is too narrow to the previous column
                   + WEB.NONE_BREAKING_SPACE
                   + WEB.NONE_BREAKING_SPACE
 
@@ -3143,7 +3143,7 @@ public class RawDataView extends ViewPart implements
       return container;
    }
 
-   private Composite createUI_20_Page_EasyImporFancy(final Composite parent) {
+   private Composite createUI_20_Page_EasyImportFancy(final Composite parent) {
 
       final Color bgColor = _display.getSystemColor(SWT.COLOR_LIST_BACKGROUND);
 
@@ -4249,7 +4249,7 @@ public class RawDataView extends ViewPart implements
       _colDef_TourTypeImage.setLabelProvider(new CellLabelProvider() {
 
          // !!! When using cell.setImage() then it is not centered !!!
-         // !!! Set dummy label provider, otherwise an error occures !!!
+         // !!! Set dummy label provider, otherwise an error occurs !!!
          @Override
          public void update(final ViewerCell cell) {}
       });
@@ -4286,7 +4286,7 @@ public class RawDataView extends ViewPart implements
       _colDef_WeatherClouds.setLabelProvider(new CellLabelProvider() {
 
          // !!! When using cell.setImage() then it is not centered !!!
-         // !!! Set dummy label provider, otherwise an error occures !!!
+         // !!! Set dummy label provider, otherwise an error occurs !!!
          @Override
          public void update(final ViewerCell cell) {}
       });
@@ -6425,8 +6425,8 @@ public class RawDataView extends ViewPart implements
       for (final TourData tourData : importedTours) {
 
          // check if distance is available
-         final float[] distancSerie = tourData.distanceSerie;
-         if (distancSerie == null || distancSerie.length == 0) {
+         final float[] distanceSerie = tourData.distanceSerie;
+         if (distanceSerie == null || distanceSerie.length == 0) {
             continue;
          }
 
@@ -6443,7 +6443,7 @@ public class RawDataView extends ViewPart implements
 
          final int markerIndex = lastMarker.getSerieIndex();
 
-         final float lastMarkerDistance = distancSerie[markerIndex];
+         final float lastMarkerDistance = distanceSerie[markerIndex];
          final float tourDistance = tourData.getTourDistance();
          final float distanceDiff = tourDistance - lastMarkerDistance;
 
@@ -7246,7 +7246,7 @@ public class RawDataView extends ViewPart implements
    public void setFocus() {
 
       /*
-       * When imported tours are available then the import viewer page will ALLWAYS be displayed.
+       * When imported tours are available then the import viewer page will ALWAYS be displayed.
        */
       final int numImportedTours = _rawDataMgr.getImportedTours().size();
       if (numImportedTours > 0) {
@@ -7827,7 +7827,7 @@ public class RawDataView extends ViewPart implements
    private void updateUI_1_TopPage(final boolean isInStartUp) {
 
       /*
-       * When imported tours are available then the import viewer page will ALLWAYS be displayed.
+       * When imported tours are available then the import viewer page will ALWAYS be displayed.
        */
       final int numImportedTours = _rawDataMgr.getImportedTours().size();
       if (numImportedTours > 0) {
@@ -7857,7 +7857,7 @@ public class RawDataView extends ViewPart implements
                 */
                if (_topPage_ImportUI_EasyImport_Fancy == null) {
 
-                  _topPage_ImportUI_EasyImport_Fancy = createUI_20_Page_EasyImporFancy(_topPage_PageBook);
+                  _topPage_ImportUI_EasyImport_Fancy = createUI_20_Page_EasyImportFancy(_topPage_PageBook);
                }
 
                _topPage_PageBook.showPage(_topPage_ImportUI_EasyImport_Fancy);

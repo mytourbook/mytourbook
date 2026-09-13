@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2020, 2024 Wolfgang Schramm and Contributors
+ * Copyright (C) 2020, 2026 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -192,7 +192,7 @@ public class ChartBarToolTip extends AnimatedToolTipShell2 implements IToolTipPr
       if (_hoveredBar_Value_HorizontalIndex != -1 && isTooltipClosing()) {
 
          /**
-          * This case occures when the tooltip is opened but is currently closing and the mouse
+          * This case occurs when the tooltip is opened but is currently closing and the mouse
           * is moved from the tooltip back to the hovered label.
           * <p>
           * This prevents that when the mouse is over the hovered label but not moved, that the

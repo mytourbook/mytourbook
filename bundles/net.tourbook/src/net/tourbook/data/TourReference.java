@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2024 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2026 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -201,7 +201,7 @@ public class TourReference implements Serializable {
 
       /*
        * Ensure to have the correct tour data, load tour data because tour data in the ref tour
-       * could be changed, this is a wrong concept which could be changed but requires additonal
+       * could be changed, this is a wrong concept which could be changed but requires additional
        * work
        */
       return TourManager.getInstance().getTourData(tourData.getTourId());

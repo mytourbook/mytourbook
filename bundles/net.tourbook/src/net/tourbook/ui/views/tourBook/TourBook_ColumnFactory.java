@@ -3918,7 +3918,7 @@ class TourBook_ColumnFactory {
       _colDef_TourTypeImage_Tree.setLabelProvider(new SelectionCellLabelProvider() {
 
          // !!! When using cell.setImage() then it is not centered !!!
-         // !!! Set dummy label provider, otherwise an error occures !!!
+         // !!! Set dummy label provider, otherwise an error occurs !!!
          @Override
          public void update(final ViewerCell cell) {}
       });
@@ -4265,7 +4265,7 @@ class TourBook_ColumnFactory {
       _colDef_WeatherClouds_Tree.setLabelProvider(new SelectionCellLabelProvider() {
 
          // !!! When using cell.setImage() then it is not centered !!!
-         // !!! Set dummy label provider, otherwise an error occures !!!
+         // !!! Set dummy label provider, otherwise an error occurs !!!
          @Override
          public void update(final ViewerCell cell) {}
       });

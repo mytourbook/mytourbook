@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2026 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -50,8 +50,8 @@ public class Map25ProviderManager {
    private static final String                             MAP_PROVIDER_FILE_NAME          = "map25-provider.xml";                     //$NON-NLS-1$
    private static final int                                MAP_PROVIDER_VERSION            = 1;
 
-   public static final String                              MAPSFORGE_MAP_FILE_EXTENTION    = "map";                                    //$NON-NLS-1$
-   public static final String                              MAPSFORGE_STYLE_FILE_EXTENTION  = "xml";                                    //$NON-NLS-1$
+   public static final String                              MAPSFORGE_MAP_FILE_EXTENSION    = "map";                                    //$NON-NLS-1$
+   public static final String                              MAPSFORGE_STYLE_FILE_EXTENSION  = "xml";                                    //$NON-NLS-1$
 
    private static final String                             TAG_ROOT                        = "Map25Providers";                         //$NON-NLS-1$
    private static final String                             TAG_MAP_PROVIDER                = "MapProvider";                            //$NON-NLS-1$
@@ -382,6 +382,7 @@ public class Map25ProviderManager {
 
    /**
     * @param themeFilePathname
+    *
     * @return Returns all styles in the theme file or <code>null</code> when the theme file is not
     *         available.
     */

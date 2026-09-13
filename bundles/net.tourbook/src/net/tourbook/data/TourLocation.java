@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2023, 2024 Wolfgang Schramm and Contributors
+ * Copyright (C) 2023, 2026 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -595,17 +595,17 @@ public class TourLocation implements Serializable {
    }
 
    /**
-    * @param reqestedZoomlevel
+    * @param requestedZoomLevel
     * @param latitudeE6_Normalized
     * @param longitudeE6_Normalized
     *
     * @return Returns <code>true</code> when the requested location is within this location
     */
-   public boolean isInBoundingBox(final int reqestedZoomlevel,
+   public boolean isInBoundingBox(final int requestedZoomLevel,
                                   final int latitudeE6_Normalized,
                                   final int longitudeE6_Normalized) {
 
-      if (zoomlevel >= reqestedZoomlevel
+      if (zoomlevel >= requestedZoomLevel
 
             && latitudeMinE6_Resized_Normalized <= latitudeE6_Normalized
             && latitudeMaxE6_Resized_Normalized >= latitudeE6_Normalized

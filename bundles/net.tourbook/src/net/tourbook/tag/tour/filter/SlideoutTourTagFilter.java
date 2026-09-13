@@ -1130,7 +1130,7 @@ public class SlideoutTourTagFilter extends AdvancedSlideout implements ITreeView
        * Sometimes (but not always) the action buttons are more than 200px wide, this layout request
        * may help to force the correct size.
        * <p>
-       * It's difficult to debug because sometimes it occures and sometimes not
+       * It's difficult to debug because sometimes it occurs and sometimes not
        */
       container.computeSize(SWT.DEFAULT, SWT.DEFAULT);
 

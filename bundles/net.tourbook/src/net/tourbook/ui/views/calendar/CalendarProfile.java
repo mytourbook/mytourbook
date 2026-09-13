@@ -104,7 +104,7 @@ public class CalendarProfile implements Cloneable {
    RGB               alternateMonthRGB          = CalendarProfileManager.DEFAULT_ALTERNATE_MONTH_RGB;
    RGB               alternateMonth2RGB         = CalendarProfileManager.DEFAULT_ALTERNATE_MONTH2_RGB;
    RGB               calendarBackgroundRGB      = CalendarProfileManager.DEFAULT_CALENDAR_BACKGROUND_RGB;
-   RGB               calendarForegroundRGB      = CalendarProfileManager.DEFAULT_CALENDAR_FOREBACKGROUND_RGB;
+   RGB               calendarForegroundRGB      = CalendarProfileManager.DEFAULT_CALENDAR_FOREGROUND_RGB;
    RGB               dayHoveredRGB              = CalendarProfileManager.DEFAULT_DAY_HOVERED_RGB;
    RGB               daySelectedRGB             = CalendarProfileManager.DEFAULT_DAY_SELECTED_RGB;
    RGB               dayTodayRGB                = CalendarProfileManager.DEFAULT_DAY_TODAY_RGB;

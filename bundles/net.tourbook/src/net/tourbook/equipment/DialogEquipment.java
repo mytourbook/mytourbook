@@ -308,7 +308,7 @@ public class DialogEquipment extends TitleAreaDialog {
 
       updateUI_FromModel();
 
-      resoreState();
+      restoreState();
 
       _comboBrand.setFocus();
 
@@ -1314,7 +1314,7 @@ public class DialogEquipment extends TitleAreaDialog {
       updateUI_WeightUnits();
    }
 
-   private void resoreState() {
+   private void restoreState() {
 
       _isInUIUpdate = true;
 

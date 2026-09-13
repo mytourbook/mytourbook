@@ -1395,7 +1395,7 @@ public class ReferenceTourView extends ViewPart implements
       _colDef_TourTypeImage.setLabelProvider(new SelectionCellLabelProvider() {
 
          // !!! When using cell.setImage() then it is not centered !!!
-         // !!! Set dummy label provider, otherwise an error occures !!!
+         // !!! Set dummy label provider, otherwise an error occurs !!!
          @Override
          public void update(final ViewerCell cell) {}
       });
@@ -2009,7 +2009,7 @@ public class ReferenceTourView extends ViewPart implements
 
    /**
     * This is not yet working thoroughly because the expanded position moves up or down and all
-    * expanded childrens are not visible (but they could) like when the triangle (+/-) icon in the
+    * expanded children are not visible (but they could) like when the triangle (+/-) icon in the
     * tree is clicked.
     *
     * @param treeSelection
@@ -2038,7 +2038,7 @@ public class ReferenceTourView extends ViewPart implements
             @Override
             public void run() {
 
-               // check if a newer expand event occured
+               // check if a newer expand event occurred
                if (__expandRunnableCounter != _expandRunnableCounter) {
                   return;
                }

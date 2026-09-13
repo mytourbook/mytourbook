@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2026 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -73,7 +73,7 @@ class TourDataCache {
 
             final int fifoQueueSize = _fifoQueue.size();
 
-            // MUST test with >= otherwise a Queue full exceptions occures
+            // MUST test with >= otherwise a Queue full exceptions occurs
             if (fifoQueueSize >= _cacheSize) {
 
 //               final long start = System.nanoTime();

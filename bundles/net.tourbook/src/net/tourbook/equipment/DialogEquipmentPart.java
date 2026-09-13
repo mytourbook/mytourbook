@@ -314,7 +314,7 @@ public class DialogEquipmentPart extends TitleAreaDialog {
 
       updateUI_FromModel();
 
-      resoreState();
+      restoreState();
 
       // compute width for all controls and equalize column width for the first column
       UI.setEqualizeColumWidths(_firstColumnControls);
@@ -1349,7 +1349,7 @@ public class DialogEquipmentPart extends TitleAreaDialog {
       updateUI_WeightUnits();
    }
 
-   private void resoreState() {
+   private void restoreState() {
 
       _isInUIUpdate = true;
 

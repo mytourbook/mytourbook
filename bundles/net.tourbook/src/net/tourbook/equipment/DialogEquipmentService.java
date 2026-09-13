@@ -290,7 +290,7 @@ public class DialogEquipmentService extends TitleAreaDialog {
 
       fillUI();
 
-      resoreState();
+      restoreState();
 
       updateUIFromModel();
 
@@ -1029,7 +1029,7 @@ public class DialogEquipmentService extends TitleAreaDialog {
       }
    }
 
-   private void resoreState() {
+   private void restoreState() {
 
       _isInUIUpdate = true;
 

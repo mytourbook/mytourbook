@@ -6439,15 +6439,15 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements IActionRe
       /*
        * Import launchers
        */
-      final ArrayList<ImportLauncher> importLauchers = _dialogEasyConfig.importLaunchers;
-      importLauchers.clear();
+      final ArrayList<ImportLauncher> importLaunchers = _dialogEasyConfig.importLaunchers;
+      importLaunchers.clear();
 
       for (final TableItem tableItem : _ilViewer.getTable().getItems()) {
 
          final Object itemData = tableItem.getData();
 
          if (itemData instanceof ImportLauncher) {
-            importLauchers.add((ImportLauncher) itemData);
+            importLaunchers.add((ImportLauncher) itemData);
          }
       }
    }
