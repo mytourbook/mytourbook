@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2025 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2026 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -164,7 +164,7 @@ public abstract class PhotoToolTipUI extends AdvancedSlideoutShell implements IT
 
          super(null, Action.AS_PUSH_BUTTON);
 
-         // an image must be set otherwise the toolbar icons can be too small, this happens not allways :-(
+         // an image must be set otherwise the toolbar icons can be too small, this happens not always :-(
          setImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.PhotoGallery_Horizontal));
       }
 
@@ -265,7 +265,7 @@ public abstract class PhotoToolTipUI extends AdvancedSlideoutShell implements IT
       // toggle gallery
       _isVerticalGallery = !_isVerticalGallery;
 
-      updateUI_ToogleAction();
+      updateUI_ToggleAction();
 
       /*
        * set tooltip shell to the correct size, each orientation has it's own size
@@ -642,7 +642,7 @@ public abstract class PhotoToolTipUI extends AdvancedSlideoutShell implements IT
       _isVerticalGallery = Util.getStateBoolean(_state, STATE_PHOTO_GALLERY_IS_VERTICAL, true);
       _toolTipLocationUpDown = Util.getStateInt(_state, STATE_TOOL_TIP_LOCATION, 1);
 
-      updateUI_ToogleAction();
+      updateUI_ToggleAction();
       updateUI_ToolTipLocation();
 
       enableControls();
@@ -717,7 +717,7 @@ public abstract class PhotoToolTipUI extends AdvancedSlideoutShell implements IT
       _photoGallery.updateColors(fgColor, bgColor, selectionFgColor, noFocusSelectionFgColor, true);
    }
 
-   private void updateUI_ToogleAction() {
+   private void updateUI_ToggleAction() {
 
       if (_isVerticalGallery) {
 

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2026 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -43,12 +43,15 @@ public class ElevationFile {
       case ElevationType.ETOPO:
          initETOPO(localFilePath);
          break;
+
       case ElevationType.GLOBE:
          initGLOBE(localFilePath);
          break;
+
       case ElevationType.SRTM3:
          initSRTM3(localFilePath, localFilePathUnzipped);
          break;
+
       case ElevationType.SRTM1:
          initSRTM1(localFilePath);
          break;
@@ -85,7 +88,7 @@ public class ElevationFile {
       }
 
       _isFileAvailable = false;
-      // dont return exception
+      // don't return exception
    }
 
    private void initETOPO(final String fileName) throws Exception {
@@ -165,7 +168,7 @@ public class ElevationFile {
                _isLocalFileError = true;
 
                /*
-                * This case occures when an internet connection do not exists. Delete file that
+                * This case occurs when an internet connection do not exists. Delete file that
                 * it is downloaded when an internet connection is available and the application
                 * is restarted
                 */

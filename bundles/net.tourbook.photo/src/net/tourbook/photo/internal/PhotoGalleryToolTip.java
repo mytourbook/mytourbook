@@ -303,7 +303,7 @@ public class PhotoGalleryToolTip extends AnimatedToolTipShell {
    private void createUI_MetadataLine(final Composite container, final String name, final String value) {
 
       /*
-       * use hint only when text is too large, otherwise it will displays the white space allways
+       * use hint only when text is too large, otherwise it will displays the white space always
        */
       final String valueText = getMaxValueText(value);
       final int hintX = valueText.length() > DEFAULT_TEXT_WIDTH ? _defaultTextWidthPixel : SWT.DEFAULT;
@@ -333,7 +333,7 @@ public class PhotoGalleryToolTip extends AnimatedToolTipShell {
                                        final String value2) {
 
       /*
-       * use hint only when text is too large, otherwise it will displays the white space allways
+       * use hint only when text is too large, otherwise it will displays the white space always
        */
       final int hintX = value.length() > DEFAULT_TEXT_WIDTH ? _defaultTextWidthPixel : SWT.DEFAULT;
 
@@ -480,7 +480,7 @@ public class PhotoGalleryToolTip extends AnimatedToolTipShell {
    private String getMaxValueText(final String value) {
 
       /*
-       * use hint only when text is too large, otherwise it will displays the white space allways
+       * use hint only when text is too large, otherwise it will displays the white space always
        */
       final boolean isLargeText = value.length() > DEFAULT_TEXT_WIDTH;
       if (isLargeText) {

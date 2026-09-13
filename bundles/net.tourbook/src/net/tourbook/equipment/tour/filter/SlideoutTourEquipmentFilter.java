@@ -676,7 +676,7 @@ public class SlideoutTourEquipmentFilter extends AdvancedSlideout implements ITr
       addTourEventListener();
 
       /*
-       * Run async that the UI is created immediately and loaded afterwards, othewise the UI seems
+       * Run async that the UI is created immediately and loaded afterwards, otherwise the UI seems
        * to be not working because of a longer delay
        */
       parent.getDisplay().asyncExec(() -> {
@@ -1444,7 +1444,7 @@ public class SlideoutTourEquipmentFilter extends AdvancedSlideout implements ITr
        * Sometimes (but not always) the action buttons are more than 200px wide, this layout request
        * may help to force the correct size.
        * <p>
-       * It's difficult to debug because sometimes it occures and sometimes not
+       * It's difficult to debug because sometimes it occurs and sometimes not
        */
       container.computeSize(SWT.DEFAULT, SWT.DEFAULT);
 
@@ -1779,13 +1779,13 @@ public class SlideoutTourEquipmentFilter extends AdvancedSlideout implements ITr
 
          if (equipment.isCollate()) {
 
-            // do not digg deeper, children are fetched when the parent item is expanded
+            // do not dig deeper, children are fetched when the parent item is expanded
             return;
          }
 
       } else if (parentItem instanceof TVIEquipmentView_Part) {
 
-         // do not digg deeper, children are fetched when the parent item is expanded
+         // do not dig deeper, children are fetched when the parent item is expanded
          return;
       }
 

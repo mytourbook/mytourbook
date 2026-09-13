@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2025 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2026 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -329,7 +329,7 @@ public class TourPhotosView extends ViewPart implements
       // toggle gallery
       _isVerticalGallery = !_isVerticalGallery;
 
-      updateUI_ToogleAction();
+      updateUI_ToggleAction();
 
       _photoGallery.setVertical(_isVerticalGallery);
    }
@@ -932,7 +932,7 @@ public class TourPhotosView extends ViewPart implements
       _isVerticalGallery = Util.getStateBoolean(_state, STATE_PHOTO_GALLERY_IS_VERTICAL, false);
       _photoGallery.setVertical(_isVerticalGallery);
 
-      updateUI_ToogleAction();
+      updateUI_ToggleAction();
    }
 
    @PersistState
@@ -1031,7 +1031,7 @@ public class TourPhotosView extends ViewPart implements
       _photoGallery.updateColors(fgColor, bgColor, selectionFgColor, noFocusSelectionFgColor, isRestore);
    }
 
-   private void updateUI_ToogleAction() {
+   private void updateUI_ToggleAction() {
 
       if (_isVerticalGallery) {
 

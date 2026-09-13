@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2025 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2026 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -32,7 +32,7 @@ import org.eclipse.ui.menus.UIElement;
 
 public class RestoreTour_Handler extends AbstractHandler implements IElementUpdater {
 
-   private static final ImageDescriptor _iconRestoreTour          = TourbookPlugin.getThemedImageDescriptor(Images.RestoreTour);
+   private static final ImageDescriptor _iconRestoreTour = TourbookPlugin.getThemedImageDescriptor(Images.RestoreTour);
 
    @Override
    public Object execute(final ExecutionEvent event) throws ExecutionException {
@@ -63,7 +63,7 @@ public class RestoreTour_Handler extends AbstractHandler implements IElementUpda
        * This method will be called from partActivated() with
        * org.eclipse.ui.commands.ICommandService.refreshElements(..)
        * <p>
-       * -> Higly complicated
+       * -> Highly complicated
        */
 
       uiElement.setIcon(_iconRestoreTour);

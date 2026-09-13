@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2025 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2026 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -3477,10 +3477,10 @@ public class ChartComponentGraph extends Canvas {
       final int valueLength = xValues.length;
 
       // keep the bar rectangles for all canvas
-      final Rectangle[][] barRecangles = new Rectangle[serieLength][valueLength];
-      final Rectangle[][] barFocusRecangles = new Rectangle[serieLength][valueLength];
-      drawingData.setBarRectangles(barRecangles);
-      drawingData.setBarFocusRectangles(barFocusRecangles);
+      final Rectangle[][] barRectangles = new Rectangle[serieLength][valueLength];
+      final Rectangle[][] barFocusRectangles = new Rectangle[serieLength][valueLength];
+      drawingData.setBarRectangles(barRectangles);
+      drawingData.setBarFocusRectangles(barFocusRectangles);
 
       // keep the height for stacked bar charts
       final int[] devHeightSummary = new int[valueLength];
@@ -3708,13 +3708,13 @@ public class ChartComponentGraph extends Canvas {
                      barShapeCanvas.y + barShapeCanvas.height);
             }
 
-            barRecangles[serieIndex][valueIndex] = new Rectangle(
+            barRectangles[serieIndex][valueIndex] = new Rectangle(
                   devXPosShape,
                   devYPosChart,
                   devShapeBarWidth,
                   devBarHeight);
 
-            barFocusRecangles[serieIndex][valueIndex] = new Rectangle(
+            barFocusRectangles[serieIndex][valueIndex] = new Rectangle(
                   devXPosShape - 2,
                   devYPosChart - 2,
                   devShapeBarWidth + 4,
@@ -4983,10 +4983,10 @@ public class ChartComponentGraph extends Canvas {
       final int valueLength = xValues.length;
 
       // keep the bar rectangles for all canvas
-      final Rectangle[][] symbolRecangles = new Rectangle[serieLength][valueLength];
-      final Rectangle[][] symbolFocusRecangles = new Rectangle[serieLength][valueLength];
-      drawingData.setBarRectangles(symbolRecangles);
-      drawingData.setBarFocusRectangles(symbolFocusRecangles);
+      final Rectangle[][] symbolRectangles = new Rectangle[serieLength][valueLength];
+      final Rectangle[][] symbolFocusRectangles = new Rectangle[serieLength][valueLength];
+      drawingData.setBarRectangles(symbolRectangles);
+      drawingData.setBarFocusRectangles(symbolFocusRectangles);
 
       final int devSymbolSize_Original = drawingData.getSymbolSize();
       final int devSymbolSize = Math.max(1, devSymbolSize_Original);
@@ -5092,13 +5092,13 @@ public class ChartComponentGraph extends Canvas {
 //                  barShapeCanvas.height);
 
             // keep symbol positions
-            symbolRecangles[serieIndex][valueIndex] = new Rectangle(
+            symbolRectangles[serieIndex][valueIndex] = new Rectangle(
                   devXPosShape,
                   devYPosChart,
                   devShapeSize,
                   devShapeSize);
 
-            symbolFocusRecangles[serieIndex][valueIndex] = new Rectangle(
+            symbolFocusRectangles[serieIndex][valueIndex] = new Rectangle(
                   devXPosShape - 2,
                   devYPosChart - 2,
                   devShapeSize + 4,
@@ -6764,9 +6764,9 @@ public class ChartComponentGraph extends Canvas {
       final int devYBottom = drawingData.getDevYBottom();
       final int devYTop = drawingData.getDevYTop();
 
-      final Rectangle[][] barRectangeleSeries = drawingData.getBarRectangles();
+      final Rectangle[][] barRectangleSeries = drawingData.getBarRectangles();
 
-      if (barRectangeleSeries == null) {
+      if (barRectangleSeries == null) {
          return;
       }
 
@@ -6777,10 +6777,10 @@ public class ChartComponentGraph extends Canvas {
       gc.setLineStyle(SWT.LINE_SOLID);
 
       // loop: all data series
-      for (int serieIndex = 0; serieIndex < barRectangeleSeries.length; serieIndex++) {
+      for (int serieIndex = 0; serieIndex < barRectangleSeries.length; serieIndex++) {
 
          // get selected rectangle
-         final Rectangle[] barRectangles = barRectangeleSeries[serieIndex];
+         final Rectangle[] barRectangles = barRectangleSeries[serieIndex];
          if (barRectangles == null || selectedIndex >= barRectangles.length) {
             continue;
          }
@@ -6942,9 +6942,9 @@ public class ChartComponentGraph extends Canvas {
          final RGB[] rgbDark = yData.getRgbBar_Gradient_Dark();
          final RGB[] rgbBright = yData.getRgbBar_Gradient_Bright();
 
-         final Rectangle[][] barRectangeleSeries = drawingData.getBarRectangles();
+         final Rectangle[][] barRectangleSeries = drawingData.getBarRectangles();
 
-         if (barRectangeleSeries == null) {
+         if (barRectangleSeries == null) {
             // this occurred
             continue;
          }
@@ -6959,10 +6959,10 @@ public class ChartComponentGraph extends Canvas {
          final int markerWidth2 = markerWidth / 2;
 
          // loop: all data series
-         for (int serieIndex = 0; serieIndex < barRectangeleSeries.length; serieIndex++) {
+         for (int serieIndex = 0; serieIndex < barRectangleSeries.length; serieIndex++) {
 
             // get hovered rectangle
-            final Rectangle hoveredRectangle = barRectangeleSeries[serieIndex][_hoveredBarValueIndex];
+            final Rectangle hoveredRectangle = barRectangleSeries[serieIndex][_hoveredBarValueIndex];
 
             if (hoveredRectangle == null) {
                continue;

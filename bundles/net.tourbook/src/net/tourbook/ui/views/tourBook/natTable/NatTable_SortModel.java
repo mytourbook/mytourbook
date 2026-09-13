@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2020, 2026 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -107,11 +107,11 @@ public class NatTable_SortModel implements ISortModel {
          final String columnId = allSortColumnIds[columnIdIndex];
          final SortDirectionEnum sortDirection = allSortDirections.get(columnIdIndex);
 
-         final ArrayList<ColumnDefinition> allVisibleColums = _columnManager.getVisibleAndSortedColumns();
+         final ArrayList<ColumnDefinition> allVisibleColumns = _columnManager.getVisibleAndSortedColumns();
 
-         for (int columnIndex = 0; columnIndex < allVisibleColums.size(); columnIndex++) {
+         for (int columnIndex = 0; columnIndex < allVisibleColumns.size(); columnIndex++) {
 
-            final ColumnDefinition colDef = allVisibleColums.get(columnIndex);
+            final ColumnDefinition colDef = allVisibleColumns.get(columnIndex);
             if (columnId.equals(colDef.getColumnId())) {
 
                _allSortedColumnIndexes.add(columnIndex);
@@ -137,7 +137,7 @@ public class NatTable_SortModel implements ISortModel {
 
          if (sortDirection.equals(SortDirectionEnum.NONE)) {
 
-            // do not sort anything, this occures when the sort direction is toggled
+            // do not sort anything, this occurs when the sort direction is toggled
 
          } else {
 
@@ -150,7 +150,7 @@ public class NatTable_SortModel implements ISortModel {
 
       } else {
 
-         // accumulate colum sortings
+         // accumulate column sortings
 
          // check if an already sorting column is clicked again
          if (isColumnIndexSorted(columnIndex) == false) {

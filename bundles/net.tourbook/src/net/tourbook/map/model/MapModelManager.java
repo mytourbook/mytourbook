@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2023, 2024 Wolfgang Schramm and Contributors
+ * Copyright (C) 2023, 2026 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -74,7 +74,7 @@ public class MapModelManager {
    private static final String            TAG_OPTIONS                      = "Options";                              //$NON-NLS-1$
    private static final String            ATTR_SELECTED_MODEL_ID           = "selectedModelId";                      //$NON-NLS-1$
 
-   public static final String             MAP_MODEL_FILE_EXTENTION         = "gltf";                                 //$NON-NLS-1$
+   public static final String             MAP_MODEL_FILE_EXTENSION         = "gltf";                                 //$NON-NLS-1$
 
    private static final String            DEFAULT_MODEL_SKATEBOARD_ID      = "35417da1-d92a-4c33-8d0f-41e2d81d94bd"; //$NON-NLS-1$
    private static final String            DEFAULT_MODEL_HIGH_WHEELER_ID    = "76f66cbb-d3ca-447a-9874-643c9ec42399"; //$NON-NLS-1$

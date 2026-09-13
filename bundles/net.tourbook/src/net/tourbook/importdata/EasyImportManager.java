@@ -970,17 +970,17 @@ public class EasyImportManager {
       // replace elevation from SRTM
       importLauncher.isReplaceElevationFromSRTM = Util.getXmlBoolean(xmlLauncherConfig, ATTR_IL_IS_REPLACE_ELEVATION_FROM_SRTM, false);
 
-      loadEasyConfig_41_Laucher_Cadence   (xmlLauncherConfig, importLauncher);
-      loadEasyConfig_42_Laucher_Equipment (xmlLauncherConfig, importLauncher);
-      loadEasyConfig_43_Laucher_TourType  (xmlLauncherConfig, importLauncher);
+      loadEasyConfig_41_Launcher_Cadence   (xmlLauncherConfig, importLauncher);
+      loadEasyConfig_42_Launcher_Equipment (xmlLauncherConfig, importLauncher);
+      loadEasyConfig_43_Launcher_TourType  (xmlLauncherConfig, importLauncher);
 
 // SET_FORMATTING_ON
 
       importLauncher.setupItemImage();
    }
 
-   private void loadEasyConfig_41_Laucher_Cadence(final XMLMemento xmlConfig,
-                                                  final ImportLauncher importLauncher) {
+   private void loadEasyConfig_41_Launcher_Cadence(final XMLMemento xmlConfig,
+                                                   final ImportLauncher importLauncher) {
 
       // set cadence
       importLauncher.isSetCadence = Util.getXmlBoolean(xmlConfig, ATTR_IL_IS_SET_TOUR_CADENCE, false);
@@ -1034,8 +1034,8 @@ public class EasyImportManager {
       }
    }
 
-   private void loadEasyConfig_42_Laucher_Equipment(final XMLMemento xmlConfig,
-                                                    final ImportLauncher importLauncher) {
+   private void loadEasyConfig_42_Launcher_Equipment(final XMLMemento xmlConfig,
+                                                     final ImportLauncher importLauncher) {
 
       // set equipment
       importLauncher.isSetEquipment = Util.getXmlBoolean(xmlConfig, ATTR_IL_IS_SET_TOUR_EQUIPMENT, false);
@@ -1092,8 +1092,8 @@ public class EasyImportManager {
       }
    }
 
-   private void loadEasyConfig_43_Laucher_TourType(final XMLMemento xmlLauncherConfig,
-                                                   final ImportLauncher importLauncher) {
+   private void loadEasyConfig_43_Launcher_TourType(final XMLMemento xmlLauncherConfig,
+                                                    final ImportLauncher importLauncher) {
 
       // set your type, default is true to preserve previous saved tour types before this field was introduced
       importLauncher.isSetTourType = Util.getXmlBoolean(xmlLauncherConfig, ATTR_IL_IS_SET_TOUR_TYPE, true);

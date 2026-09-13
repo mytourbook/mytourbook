@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2025 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2026 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -42,7 +42,7 @@ public class ActionMouseWheelMode extends Action {
    @Override
    public void run() {
 
-      // toogle mode
+      // toggle mode
       _mouseWheelMode = _mouseWheelMode == MouseWheelMode.Zoom
 
             ? MouseWheelMode.Selection

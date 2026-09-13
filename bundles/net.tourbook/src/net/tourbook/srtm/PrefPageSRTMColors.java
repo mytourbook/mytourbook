@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2024 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2026 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -862,7 +862,7 @@ public final class PrefPageSRTMColors extends PreferencePage implements IWorkben
       colDef.setCanModifyVisibility(false);
       colDef.setLabelProvider(new CellLabelProvider() {
          /*
-          * !!! set dummy label provider, otherwise an error occures !!!
+          * !!! set dummy label provider, otherwise an error occurs !!!
           */
          @Override
          public void update(final ViewerCell cell) {}

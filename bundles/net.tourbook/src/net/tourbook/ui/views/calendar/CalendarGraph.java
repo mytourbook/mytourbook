@@ -872,7 +872,7 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 
             /*
              * Complex: Ensure with _isHoveredPainted that the hovered state is also painted
-             * even when _isHoveredModified is set back to false. This problem occured when a
+             * even when _isHoveredModified is set back to false. This problem occurred when a
              * tour tooltip is displayed (and took some hours to fix this problem) !!!
              */
             if (_isHoveredModified || _isHoveredPainted == false) {
@@ -1124,7 +1124,7 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
                lastWeek = lastWeek.with(getFirstDayOfWeek_SameOrNext());
 
                /*
-                * The algorithm is a litte bit complex, this will fix an issue which occures
+                * The algorithm is a little bit complex, this will fix an issue which occurs
                 */
                if (lastWeek.getDayOfMonth() == 8) {
                   lastWeek = lastWeek.minusWeeks(1);
@@ -1314,11 +1314,11 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
                      boolean isDateTransparent = true;
                      Color dayDateForegroundColor;
 
-                     /////////////debugg on
+                     /////////////debug on
 
 //							dayDateLabel = dayDateLabel + " " + dayItem.dayId;
 
-                     /////////////debugg off
+                     /////////////debug off
 
                      if (dayItem.dayId == 0) {
 
@@ -1358,12 +1358,12 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
                         gc.setBackground(_calendarBgColor);
                      }
 
-                     /////////////debugg on
+                     /////////////debug on
 
 //							gc.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_MAGENTA));
 //							isDateTransparent = false;
 
-                     /////////////debugg off
+                     /////////////debug off
 
                      // day header label
                      gc.setFont(dayDateFont);
@@ -2098,10 +2098,10 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 
       final Point textSize = gc.stringExtent(yearText);
 
-      final int vertialOffset = 0;
+      final int verticalOffset = 0;
 
       final int posX = headerRect.x + headerRect.width / 2 - textSize.x / 2;
-      final int posY = headerRect.y + vertialOffset;
+      final int posY = headerRect.y + verticalOffset;
 
       gc.drawString(yearText, posX, posY);
 
@@ -3028,12 +3028,12 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
          return;
       }
 
-      final TourData dragedTourData = TourManager.getInstance().getTourData(tourId);
+      final TourData draggedTourData = TourManager.getInstance().getTourData(tourId);
 
-      Assert.isNotNull(dragedTourData);
+      Assert.isNotNull(draggedTourData);
 
       // adjust tour start date
-      final ZonedDateTime tourStartTime = dragedTourData.getTourStartTime();
+      final ZonedDateTime tourStartTime = draggedTourData.getTourStartTime();
       final ZonedDateTime newTourStartTime = tourStartTime//
             .withYear(_dragOverDate.getYear())
             .withMonth(_dragOverDate.getMonthValue())
@@ -3050,9 +3050,9 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 
             // move tour to another date
 
-            dragedTourData.setTourStartTime(newTourStartTime);
+            draggedTourData.setTourStartTime(newTourStartTime);
 
-            TourManager.saveModifiedTour(dragedTourData);
+            TourManager.saveModifiedTour(draggedTourData);
 
             TourLogManager.log_DEFAULT(
                   NLS.bind(
@@ -3066,7 +3066,7 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 
             try {
 
-               final TourData tourDataCopy = (TourData) dragedTourData.clonePartly();
+               final TourData tourDataCopy = (TourData) draggedTourData.clonePartly();
 
                // set tour start date/time AFTER tour is copied !!!
                tourDataCopy.setTourStartTime(newTourStartTime);
@@ -3755,7 +3755,7 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
       }
 
       /*
-       * Do a redraw always, it occured when selecting another profile the UI is not updated
+       * Do a redraw always, it occurred when selecting another profile the UI is not updated
        */
       redraw();
 

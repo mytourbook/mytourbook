@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2025 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2026 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -149,7 +149,7 @@ public class ChartDataYSerie extends ChartDataSerie {
    private boolean                _isShowBarsMoreVisible;
 
    /**
-    * Width/height when a sympol is displayed
+    * Width/height when a symbol is displayed
     */
    private int                    _symbolSize                       = 8;
 
