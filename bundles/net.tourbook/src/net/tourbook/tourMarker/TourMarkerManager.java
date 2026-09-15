@@ -30,6 +30,7 @@ import net.tourbook.common.util.Util;
 
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Platform;
+import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.ui.IMemento;
 import org.eclipse.ui.XMLMemento;
 import org.osgi.framework.Bundle;
@@ -40,30 +41,35 @@ import org.osgi.framework.Version;
  */
 public class TourMarkerManager {
 
-   private static final String              CONFIG_FILE_NAME             = "tour-marker.xml";                      //$NON-NLS-1$
+   private static final String              ID                                     = "net.tourbook.tourMarker.TourMarkerManager"; //$NON-NLS-1$
 
-   private static final Bundle              _bundle                      = TourbookPlugin.getDefault().getBundle();
-   private static final IPath               _stateLocation               = Platform.getStateLocation(_bundle);
+   private static final String              CONFIG_FILE_NAME                       = "tour-marker.xml";                           //$NON-NLS-1$
+
+   private static final String              STATE_IS_RECENT_MARKER_CREATE_AND_SAVE = "STATE_IS_RECENT_MARKER_CREATE_AND_SAVE";    //$NON-NLS-1$
+
+   private static final Bundle              _bundle                                = TourbookPlugin.getDefault().getBundle();
+   private static final IDialogSettings     _state                                 = TourbookPlugin.getState(ID);
+   private static final IPath               _stateLocation                         = Platform.getStateLocation(_bundle);
 
    /**
     * Version number is not yet used.
     */
-   private static final int                 CONFIG_VERSION               = 1;
-   private static final String              ATTR_CONFIG_VERSION          = "configVersion";                        //$NON-NLS-1$
+   private static final int                 CONFIG_VERSION                         = 1;
+   private static final String              ATTR_CONFIG_VERSION                    = "configVersion";                             //$NON-NLS-1$
 
-   private static final String              RECENT_MARKER_ROOT           = "RecentMarkers";                        //$NON-NLS-1$
-   private static final String              RECENT_MARKER                = "RecentMarker";                         //$NON-NLS-1$
+   private static final String              RECENT_MARKER_ROOT                     = "RecentMarkers";                             //$NON-NLS-1$
+   private static final String              RECENT_MARKER                          = "RecentMarker";                              //$NON-NLS-1$
 
-   private static final String              ATTR_LABEL                   = "label";                                //$NON-NLS-1$
+   private static final String              ATTR_LABEL                             = "label";                                     //$NON-NLS-1$
 
-   public static final int                  MAX_NUMBER_OF_RECENT_MARKERS = 20;
+   public static final int                  MAX_NUMBER_OF_RECENT_MARKERS           = 20;
 
-   private static LinkedList<RecentMarker>  _allRecentMarker             = new LinkedList<>();
+   private static LinkedList<RecentMarker>  _allRecentMarker                       = new LinkedList<>();
 
    /**
     * Key is the marker label
     */
-   private static Map<String, RecentMarker> _allRecentMarkerMap          = new HashMap<>();
+   private static Map<String, RecentMarker> _allRecentMarkerMap                    = new HashMap<>();
 
    static {
 
@@ -111,6 +117,11 @@ public class TourMarkerManager {
       }
    }
 
+   public static void clearRecentMarkers() {
+
+      _allRecentMarker.clear();
+   }
+
    private static XMLMemento createXML_WriteRoot() {
 
       final XMLMemento xmlRoot = XMLMemento.createWriteRoot(RECENT_MARKER_ROOT);
@@ -141,6 +152,11 @@ public class TourMarkerManager {
       final File xmlFile = _stateLocation.append(CONFIG_FILE_NAME).toFile();
 
       return xmlFile;
+   }
+
+   public static boolean isCreateAndSave() {
+
+      return Util.getStateBoolean(_state, STATE_IS_RECENT_MARKER_CREATE_AND_SAVE, false);
    }
 
    public static void removeRecentMarker(final RecentMarker recentMarker) {
@@ -257,6 +273,11 @@ public class TourMarkerManager {
             xmlRecentMarker.putString(ATTR_LABEL, recentMarker.label);
          }
       }
+   }
+
+   public static void setIsCreateAndSave(final boolean isCreateAndSave) {
+
+      _state.put(STATE_IS_RECENT_MARKER_CREATE_AND_SAVE, isCreateAndSave);
    }
 
 }

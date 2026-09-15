@@ -39,6 +39,7 @@ import net.tourbook.ui.tourChart.TourChartContextProvider;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.window.Window;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Menu;
 
 /**
@@ -46,6 +47,9 @@ import org.eclipse.swt.widgets.Menu;
  */
 public class ActionCreateMarkerFromRecentMarker_SubMenu extends SubMenu {
 
+   private ActionClearRecentMarkers    _actionClearRecentMarkers;
+   private ActionCreateAndSave         _actionCreateAndSave;
+   private ActionHeader                _actionHeader;
    private List<ActionRecentMarker>    _allRecentMarkerActions = new ArrayList<>();
 
    private final IChartContextProvider _chartContextProvider;
@@ -54,6 +58,49 @@ public class ActionCreateMarkerFromRecentMarker_SubMenu extends SubMenu {
    private IMarkerReceiver             _markerReceiver;
 
    private int                         _serieIndex             = -1;
+
+   private class ActionClearRecentMarkers extends Action {
+
+      public ActionClearRecentMarkers() {
+
+         super("&Clear all Recent Markers", AS_PUSH_BUTTON);
+
+         setToolTipText("A single recent marker can be removed\nby also pressing <Ctrl> when selecting the marker");
+      }
+
+      @Override
+      public void run() {
+
+         TourMarkerManager.clearRecentMarkers();
+      }
+   }
+
+   private class ActionCreateAndSave extends Action {
+
+      public ActionCreateAndSave() {
+
+         super("Create and &Save", AS_CHECK_BOX);
+
+         setToolTipText("Create and save the new tour marker\nwithout opening the tour marker dialog");
+      }
+
+      @Override
+      public void run() {
+
+         TourMarkerManager.setIsCreateAndSave(isChecked());
+      }
+   }
+
+   private class ActionHeader extends Action {
+
+      public ActionHeader() {
+
+         super("» Customize Recent Markers «", AS_PUSH_BUTTON);
+
+         // this action is just a header
+         setEnabled(false);
+      }
+   }
 
    private class ActionRecentMarker extends Action {
 
@@ -65,9 +112,9 @@ public class ActionCreateMarkerFromRecentMarker_SubMenu extends SubMenu {
       }
 
       @Override
-      public void run() {
+      public void runWithEvent(final Event event) {
 
-         actionCreateMarker(__recentMarker);
+         actionCreateMarker(__recentMarker, event);
       }
    }
 
@@ -79,13 +126,19 @@ public class ActionCreateMarkerFromRecentMarker_SubMenu extends SubMenu {
 
       _chartContextProvider = tourChartContextProvider;
 
-      for (int actionIndex = 0; actionIndex < TourMarkerManager.MAX_NUMBER_OF_RECENT_MARKERS; actionIndex++) {
-
-         _allRecentMarkerActions.add(new ActionRecentMarker());
-      }
+      createActions();
    }
 
-   private void actionCreateMarker(final RecentMarker recentMarker) {
+   private void actionCreateMarker(final RecentMarker recentMarker, final Event event) {
+
+      if (UI.isCtrlKey(event)) {
+
+         // remove this marker
+
+         TourMarkerManager.removeRecentMarker(recentMarker);
+
+         return;
+      }
 
       final Chart chart = _chartContextProvider.getChart();
 
@@ -104,14 +157,32 @@ public class ActionCreateMarkerFromRecentMarker_SubMenu extends SubMenu {
          return;
       }
 
+      final String newMarkerLabel = recentMarker.label;
+
       // set data from the recent marker
-      newTourMarker.setLabel(recentMarker.label);
+      newTourMarker.setLabel(newMarkerLabel);
 
       if (_markerReceiver != null) {
 
          _markerReceiver.addTourMarker(newTourMarker);
 
+         // set created marker to the top of the recent markers
+         TourMarkerManager.addRecentMarker(newMarkerLabel);
+
          // the marker dialog will not be opened
+         return;
+      }
+
+      if (TourMarkerManager.isCreateAndSave()) {
+
+         // update model
+         tourData.getTourMarkers().add(newTourMarker);
+
+         TourManager.saveModifiedTour(tourData);
+
+         // set created marker to the top of the recent markers
+         TourMarkerManager.addRecentMarker(newMarkerLabel);
+
          return;
       }
 
@@ -125,8 +196,19 @@ public class ActionCreateMarkerFromRecentMarker_SubMenu extends SubMenu {
          TourManager.saveModifiedTour(tourData);
 
          // set created marker to the top of the recent markers
-         TourMarkerManager.addRecentMarker(newTourMarker.getLabel());
+         TourMarkerManager.addRecentMarker(newMarkerLabel);
       }
+   }
+
+   private void createActions() {
+
+      for (int actionIndex = 0; actionIndex < TourMarkerManager.MAX_NUMBER_OF_RECENT_MARKERS; actionIndex++) {
+         _allRecentMarkerActions.add(new ActionRecentMarker());
+      }
+
+      _actionClearRecentMarkers = new ActionClearRecentMarkers();
+      _actionCreateAndSave = new ActionCreateAndSave();
+      _actionHeader = new ActionHeader();
    }
 
    /**
@@ -221,6 +303,11 @@ public class ActionCreateMarkerFromRecentMarker_SubMenu extends SubMenu {
 
          addActionToMenu(actionRecentMarker);
       }
+
+      addSeparatorToMenu();
+      addActionToMenu(_actionHeader);
+      addActionToMenu(_actionCreateAndSave);
+      addActionToMenu(_actionClearRecentMarkers);
    }
 
    public void setMarkerReceiver(final IMarkerReceiver markerReceiver) {
