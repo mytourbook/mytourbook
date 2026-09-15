@@ -53,6 +53,8 @@ public class ActionCreateMarkerFromRecentMarker_SubMenu extends SubMenu {
 
    private IMarkerReceiver             _markerReceiver;
 
+   private int                         _serieIndex             = -1;
+
    private class ActionRecentMarker extends Action {
 
       private RecentMarker __recentMarker;
@@ -136,20 +138,34 @@ public class ActionCreateMarkerFromRecentMarker_SubMenu extends SubMenu {
     */
    private TourMarker createTourMarker(final TourData tourData) {
 
-      final ChartXSlider leftSlider = _chartContextProvider.getLeftSlider();
-      final ChartXSlider rightSlider = _chartContextProvider.getRightSlider();
+      int serieIndex;
 
-      final ChartXSlider slider = rightSlider == null
-            ? leftSlider
-            : _isLeftSlider
-                  ? leftSlider
-                  : rightSlider;
+      if (_serieIndex == -1) {
 
-      if (slider == null || tourData.timeSerie == null) {
-         return null;
+         // get serie index from slider
+
+         final ChartXSlider leftSlider = _chartContextProvider.getLeftSlider();
+         final ChartXSlider rightSlider = _chartContextProvider.getRightSlider();
+
+         final ChartXSlider slider = rightSlider == null
+               ? leftSlider
+               : _isLeftSlider
+                     ? leftSlider
+                     : rightSlider;
+
+         if (slider == null || tourData.timeSerie == null) {
+            return null;
+         }
+
+         serieIndex = slider.getValuesIndex();
+
+      } else {
+
+         // use provided serie index
+
+         serieIndex = _serieIndex;
       }
 
-      final int serieIndex = slider.getValuesIndex();
       final int relativeTourTime = tourData.timeSerie[serieIndex];
       final float[] altitudeSerie = tourData.altitudeSerie;
       final float[] distSerie = tourData.getMetricDistanceSerie();
@@ -209,6 +225,17 @@ public class ActionCreateMarkerFromRecentMarker_SubMenu extends SubMenu {
 
    public void setMarkerReceiver(final IMarkerReceiver markerReceiver) {
       _markerReceiver = markerReceiver;
+   }
+
+   /**
+    * Set the serie index which is used to get the marker position, when <code>-1</code> is set then
+    * the slider position serie index is used
+    *
+    * @param serieIndex
+    */
+   public void setSerieIndex(final int serieIndex) {
+
+      _serieIndex = serieIndex;
    }
 
 }
