@@ -73,7 +73,7 @@ public class ActionCreateMarkerFromRecentMarker_SubMenu extends SubMenu {
 
          super(UI.EMPTY_STRING, AS_PUSH_BUTTON);
 
-         setToolTipText("This marker can be removed from this list\nby also pressing <Ctrl> when selecting the marker");
+         setToolTipText(Messages.Action_TourMarker_RecentMarker_Tooltip);
       }
 
       @Override
@@ -102,6 +102,11 @@ public class ActionCreateMarkerFromRecentMarker_SubMenu extends SubMenu {
 
          TourMarkerManager.removeRecentMarker(recentMarker);
 
+         return;
+      }
+
+      // make sure the tour editor does not contain a modified tour
+      if (TourManager.isTourEditorModified()) {
          return;
       }
 
@@ -161,13 +166,13 @@ public class ActionCreateMarkerFromRecentMarker_SubMenu extends SubMenu {
       }
 
 // SET_FORMATTING_OFF
-      
+
       _actionHeader_AllRecentMarkers         = new ActionHeader_AllRecentMarkers();
       _actionHeader_CustomizeRecentMarkers   = new ActionHeader_CustomizeRecentMarkers();
       _actionClearRecentMarkers              = new ActionClearRecentMarkers();
       _actionCreateAndSave                   = new ActionCreateAndSave();
       _actionSortRecentMarkers               = new ActionSortRecentMarkers();
-      
+
 // SET_FORMATTING_ON
    }
 

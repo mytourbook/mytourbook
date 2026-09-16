@@ -25,6 +25,7 @@ import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.UI;
 import net.tourbook.common.ui.SubMenu;
 import net.tourbook.data.TourMarker;
+import net.tourbook.tour.TourManager;
 import net.tourbook.tourMarker.ActionClearRecentMarkers;
 import net.tourbook.tourMarker.ActionHeader_AllRecentMarkers;
 import net.tourbook.tourMarker.ActionHeader_CustomizeRecentMarkers;
@@ -59,7 +60,7 @@ public class ActionRenameMarkerFromRecentMarker_SubMenu extends SubMenu {
 
          super(Messages.Action_TourMarker_PickRecentMarker, AS_PUSH_BUTTON);
 
-         setToolTipText("Add this marker to the recent marker list");
+         setToolTipText(Messages.Action_TourMarker_PickRecentMarker_Tooltip);
 
          setImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.TourMarker_New));
       }
@@ -80,7 +81,7 @@ public class ActionRenameMarkerFromRecentMarker_SubMenu extends SubMenu {
 
          super(UI.EMPTY_STRING, AS_PUSH_BUTTON);
 
-         setToolTipText("This marker can be removed from this list\nby also pressing <Ctrl> when selecting the marker");
+         setToolTipText(Messages.Action_TourMarker_RecentMarker_Tooltip);
       }
 
       @Override
@@ -110,6 +111,11 @@ public class ActionRenameMarkerFromRecentMarker_SubMenu extends SubMenu {
          return;
       }
 
+      // make sure the tour editor does not contain a modified tour
+      if (TourManager.isTourEditorModified()) {
+         return;
+      }
+
       _tourMarker.setLabel(recentMarker.label);
 
       _tourMarkerUpdater.updateModifiedTourMarker(_tourMarker);
@@ -126,13 +132,13 @@ public class ActionRenameMarkerFromRecentMarker_SubMenu extends SubMenu {
       }
 
 // SET_FORMATTING_OFF
-      
+
       _actionHeader_AllRecentMarkers         = new ActionHeader_AllRecentMarkers();
       _actionHeader_CustomizeRecentMarkers   = new ActionHeader_CustomizeRecentMarkers();
       _actionPickRecentMarker                = new ActionPickRecentMarker();
       _actionClearRecentMarkers              = new ActionClearRecentMarkers();
       _actionSortRecentMarkers               = new ActionSortRecentMarkers();
-      
+
 // SET_FORMATTING_ON
    }
 
@@ -148,7 +154,6 @@ public class ActionRenameMarkerFromRecentMarker_SubMenu extends SubMenu {
 
       final LinkedList<RecentMarker> allRecentMarkers = TourMarkerManager.getRecentMarkers();
       final int numRecentMarkers = allRecentMarkers.size();
-      int numAddedMarker = 0;
 
       for (int markerIndex = 0; markerIndex < numRecentMarkers; markerIndex++) {
 
@@ -165,14 +170,9 @@ public class ActionRenameMarkerFromRecentMarker_SubMenu extends SubMenu {
          actionRecentMarker.__recentMarker = recentMarker;
 
          addActionToMenu(actionRecentMarker);
-
-         numAddedMarker++;
       }
 
-      if (numAddedMarker > 0) {
-         addSeparatorToMenu();
-      }
-
+      addSeparatorToMenu();
       addActionToMenu(_actionHeader_CustomizeRecentMarkers);
       addActionToMenu(_actionPickRecentMarker);
       addActionToMenu(_actionSortRecentMarkers);

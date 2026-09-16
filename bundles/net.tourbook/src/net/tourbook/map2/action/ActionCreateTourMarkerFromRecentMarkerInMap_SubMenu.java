@@ -34,6 +34,11 @@ import net.tourbook.data.TourMarker;
 import net.tourbook.map2.view.Map2View;
 import net.tourbook.tour.DialogMarker;
 import net.tourbook.tour.TourManager;
+import net.tourbook.tourMarker.ActionClearRecentMarkers;
+import net.tourbook.tourMarker.ActionCreateAndSave;
+import net.tourbook.tourMarker.ActionHeader_AllRecentMarkers;
+import net.tourbook.tourMarker.ActionHeader_CustomizeRecentMarkers;
+import net.tourbook.tourMarker.ActionSortRecentMarkers;
 import net.tourbook.tourMarker.RecentMarker;
 import net.tourbook.tourMarker.TourMarkerManager;
 import net.tourbook.ui.tourChart.ChartLabelMarker;
@@ -41,6 +46,7 @@ import net.tourbook.ui.views.tourDataEditor.TourDataEditorView;
 
 import org.eclipse.jface.action.Action;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Menu;
 
 /**
@@ -48,10 +54,16 @@ import org.eclipse.swt.widgets.Menu;
  */
 public class ActionCreateTourMarkerFromRecentMarkerInMap_SubMenu extends SubMenu {
 
-   private Map2View                 _mapView;
-   private Long                     _currentHoveredTourId;
+   private Map2View                            _mapView;
+   private Long                                _currentHoveredTourId;
 
-   private List<ActionRecentMarker> _allRecentMarkerActions = new ArrayList<>();
+   private ActionHeader_AllRecentMarkers       _actionHeader_AllRecentMarkers;
+   private ActionHeader_CustomizeRecentMarkers _actionHeader_CustomizeRecentMarkers;
+   private ActionClearRecentMarkers            _actionClearRecentMarkers;
+   private ActionCreateAndSave                 _actionCreateAndSave;
+   private ActionSortRecentMarkers             _actionSortRecentMarkers;
+
+   private List<ActionRecentMarker>            _allRecentMarkerActions = new ArrayList<>();
 
    private class ActionRecentMarker extends Action {
 
@@ -60,12 +72,14 @@ public class ActionCreateTourMarkerFromRecentMarkerInMap_SubMenu extends SubMenu
       public ActionRecentMarker() {
 
          super(UI.EMPTY_STRING, AS_PUSH_BUTTON);
+
+         setToolTipText(Messages.Action_TourMarker_RecentMarker_Tooltip);
       }
 
       @Override
-      public void run() {
+      public void runWithEvent(final Event event) {
 
-         actionCreateMarker(__recentMarker);
+         actionCreateMarker(__recentMarker, event);
       }
    }
 
@@ -77,20 +91,27 @@ public class ActionCreateTourMarkerFromRecentMarkerInMap_SubMenu extends SubMenu
 
       _mapView = mapView;
 
-      for (int actionIndex = 0; actionIndex < TourMarkerManager.MAX_NUMBER_OF_RECENT_MARKERS; actionIndex++) {
-
-         _allRecentMarkerActions.add(new ActionRecentMarker());
-      }
+      createActions();
    }
 
-   private void actionCreateMarker(final RecentMarker recentMarker) {
+   private void actionCreateMarker(final RecentMarker recentMarker, final Event event) {
+
+      if (UI.isCtrlKey(event)) {
+
+         // remove this marker
+
+         TourMarkerManager.removeRecentMarker(recentMarker);
+
+         return;
+      }
+
+      // make sure the tour editor does not contain a modified tour
+      if (TourManager.isTourEditorModified()) {
+         return;
+      }
 
       final TourData tourData = TourManager.getTour(_currentHoveredTourId);
-      if (tourData == null
-
-            // make sure the tour editor does not contain a modified tour
-            || TourManager.isTourEditorModified()) {
-
+      if (tourData == null) {
          return;
       }
 
@@ -127,27 +148,42 @@ public class ActionCreateTourMarkerFromRecentMarkerInMap_SubMenu extends SubMenu
       final float[] altitudeSerie = tourData.altitudeSerie;
       final float[] distSerie = tourData.getMetricDistanceSerie();
 
-      // create a new marker
-      final TourMarker tourMarker = new TourMarker(tourData, ChartLabelMarker.MARKER_TYPE_CUSTOM);
+      final String newMarkerLabel = recentMarker.label;
 
-      tourMarker.setSerieIndex(closestLatLonIndex);
-      tourMarker.setTime(relativeTourTime, tourData.getTourStartTimeMS() + (relativeTourTime * 1000));
-      tourMarker.setLabel(recentMarker.label);
+      // create a new marker
+      final TourMarker newTourMarker = new TourMarker(tourData, ChartLabelMarker.MARKER_TYPE_CUSTOM);
+
+      newTourMarker.setSerieIndex(closestLatLonIndex);
+      newTourMarker.setTime(relativeTourTime, tourData.getTourStartTimeMS() + (relativeTourTime * 1000));
+      newTourMarker.setLabel(newMarkerLabel);
 
       if (altitudeSerie != null) {
-         tourMarker.setAltitude(altitudeSerie[closestLatLonIndex]);
+         newTourMarker.setAltitude(altitudeSerie[closestLatLonIndex]);
       }
 
       if (distSerie != null) {
-         tourMarker.setDistance(distSerie[closestLatLonIndex]);
+         newTourMarker.setDistance(distSerie[closestLatLonIndex]);
       }
 
-      tourMarker.setGeoPosition(latSerie[closestLatLonIndex], lonSerie[closestLatLonIndex]);
+      newTourMarker.setGeoPosition(latSerie[closestLatLonIndex], lonSerie[closestLatLonIndex]);
+
+      if (TourMarkerManager.isCreateAndSave()) {
+
+         // update model
+         tourData.getTourMarkers().add(newTourMarker);
+
+         TourManager.saveModifiedTour(tourData);
+
+         // set created marker to the top of the recent markers
+         TourMarkerManager.addRecentMarker(newMarkerLabel);
+
+         return;
+      }
 
       final DialogMarker markerDialog = new DialogMarker(Display.getCurrent().getActiveShell(), tourData, null);
 
       markerDialog.create();
-      markerDialog.addTourMarker(tourMarker);
+      markerDialog.addTourMarker(newTourMarker);
 
       //We save instantly the marker so that it is displayed on the map while the user renames the marker name.
       //I found that otherwise, it's easy for the user to forget where the click was made.
@@ -159,14 +195,37 @@ public class ActionCreateTourMarkerFromRecentMarkerInMap_SubMenu extends SubMenu
       saveModifiedTour(tourData);
 
       // set last used marker to the top of the list
-      TourMarkerManager.addRecentMarker(tourMarker.getLabel());
+      TourMarkerManager.addRecentMarker(newTourMarker.getLabel());
+   }
+
+   private void createActions() {
+
+      for (int actionIndex = 0; actionIndex < TourMarkerManager.MAX_NUMBER_OF_RECENT_MARKERS; actionIndex++) {
+
+         _allRecentMarkerActions.add(new ActionRecentMarker());
+      }
+
+// SET_FORMATTING_OFF
+
+      _actionHeader_AllRecentMarkers         = new ActionHeader_AllRecentMarkers();
+      _actionHeader_CustomizeRecentMarkers   = new ActionHeader_CustomizeRecentMarkers();
+      _actionClearRecentMarkers              = new ActionClearRecentMarkers();
+      _actionCreateAndSave                   = new ActionCreateAndSave();
+      _actionSortRecentMarkers               = new ActionSortRecentMarkers();
+
+// SET_FORMATTING_ON
    }
 
    @Override
-   public void enableActions() {}
+   public void enableActions() {
+
+      _actionCreateAndSave.setChecked(TourMarkerManager.isCreateAndSave());
+   }
 
    @Override
    public void fillMenu(final Menu menu) {
+
+      addActionToMenu(_actionHeader_AllRecentMarkers);
 
       final LinkedList<RecentMarker> allRecentMarkers = TourMarkerManager.getRecentMarkers();
       final int numRecentMarkers = allRecentMarkers.size();
@@ -187,6 +246,12 @@ public class ActionCreateTourMarkerFromRecentMarkerInMap_SubMenu extends SubMenu
 
          addActionToMenu(actionRecentMarker);
       }
+
+      addSeparatorToMenu();
+      addActionToMenu(_actionHeader_CustomizeRecentMarkers);
+      addActionToMenu(_actionCreateAndSave);
+      addActionToMenu(_actionSortRecentMarkers);
+      addActionToMenu(_actionClearRecentMarkers);
    }
 
    /**

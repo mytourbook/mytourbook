@@ -15,13 +15,15 @@
  *******************************************************************************/
 package net.tourbook.tourMarker;
 
+import net.tourbook.Messages;
+
 import org.eclipse.jface.action.Action;
 
 public class ActionSortRecentMarkers extends Action {
 
    public ActionSortRecentMarkers() {
 
-      super("S&ort Recent Markers", AS_PUSH_BUTTON);
+      super(Messages.Action_TourMarker_SortRecentMarkers, AS_PUSH_BUTTON);
    }
 
    @Override

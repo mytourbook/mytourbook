@@ -28,9 +28,9 @@ public class ActionClearRecentMarkers extends Action {
 
    public ActionClearRecentMarkers() {
 
-      super("&Clear Recent Markers...", AS_PUSH_BUTTON);
+      super(Messages.Action_TourMarker_ClearRecentMarkers, AS_PUSH_BUTTON);
 
-      setToolTipText("A single recent marker can be removed\nby also pressing <Ctrl> when selecting the marker");
+      setToolTipText(Messages.Action_TourMarker_ClearRecentMarkers_Tooltip);
 
       setImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.App_Delete));
    }
@@ -42,16 +42,16 @@ public class ActionClearRecentMarkers extends Action {
 
             Display.getDefault().getActiveShell(),
 
-            "Clear Recent Markers",
+            Messages.Action_TourMarker_Dialog_ClearRecentMarkers_Title,
             null, // no title image
 
-            "Remove all %d recent markers?".formatted(TourMarkerManager.getRecentMarkers().size()),
+            Messages.Action_TourMarker_Dialog_ClearRecentMarkers_Message.formatted(TourMarkerManager.getRecentMarkers().size()),
 
             MessageDialog.CONFIRM,
 
             0, // default index
 
-            "Remove &All",
+            Messages.App_Action_RemoveAll,
             Messages.App_Action_Cancel);
 
       if (dialog.open() == IDialogConstants.OK_ID) {

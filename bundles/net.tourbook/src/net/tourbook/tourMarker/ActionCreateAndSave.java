@@ -15,15 +15,17 @@
  *******************************************************************************/
 package net.tourbook.tourMarker;
 
+import net.tourbook.Messages;
+
 import org.eclipse.jface.action.Action;
 
 public class ActionCreateAndSave extends Action {
 
    public ActionCreateAndSave() {
 
-      super("Create and &Save", AS_CHECK_BOX);
+      super(Messages.Action_TourMarker_CreateAndSave, AS_CHECK_BOX);
 
-      setToolTipText("Create and save the new tour marker\nwithout opening the tour marker dialog");
+      setToolTipText(Messages.Action_TourMarker_CreateAndSave_Tooltip);
    }
 
    @Override

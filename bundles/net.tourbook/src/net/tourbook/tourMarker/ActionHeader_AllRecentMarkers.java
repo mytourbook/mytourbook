@@ -15,13 +15,15 @@
  *******************************************************************************/
 package net.tourbook.tourMarker;
 
+import net.tourbook.Messages;
+
 import org.eclipse.jface.action.Action;
 
 public class ActionHeader_AllRecentMarkers extends Action {
 
    public ActionHeader_AllRecentMarkers() {
 
-      super("» Recent Markers «", AS_PUSH_BUTTON);
+      super(Messages.Action_TourMarker_Header_RecentMarker, AS_PUSH_BUTTON);
 
       // this action is just a header
       setEnabled(false);
