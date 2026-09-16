@@ -64,7 +64,7 @@ public class TourMarkerManager {
 
    public static final int                  MAX_NUMBER_OF_RECENT_MARKERS           = 20;
 
-   private static LinkedList<RecentMarker>  _allRecentMarker                       = new LinkedList<>();
+   private static LinkedList<RecentMarker>  _allRecentMarkers                      = new LinkedList<>();
 
    /**
     * Key is the marker label
@@ -94,16 +94,16 @@ public class TourMarkerManager {
           */
          final RecentMarker newMarker = new RecentMarker(markerLabel);
 
-         _allRecentMarker.addFirst(newMarker);
+         _allRecentMarkers.addFirst(newMarker);
 
          _allRecentMarkerMap.put(markerLabel, newMarker);
 
          /*
           * Check number of max markers, remove last used marker
           */
-         if (_allRecentMarker.size() > MAX_NUMBER_OF_RECENT_MARKERS) {
+         if (_allRecentMarkers.size() > MAX_NUMBER_OF_RECENT_MARKERS) {
 
-            final RecentMarker lastMarker = _allRecentMarker.removeLast();
+            final RecentMarker lastMarker = _allRecentMarkers.removeLast();
 
             _allRecentMarkerMap.remove(lastMarker.label);
          }
@@ -112,14 +112,14 @@ public class TourMarkerManager {
 
          // marker exists -> move it to the top
 
-         _allRecentMarker.remove(existingMarker);
-         _allRecentMarker.addFirst(existingMarker);
+         _allRecentMarkers.remove(existingMarker);
+         _allRecentMarkers.addFirst(existingMarker);
       }
    }
 
    public static void clearRecentMarkers() {
 
-      _allRecentMarker.clear();
+      _allRecentMarkers.clear();
    }
 
    private static XMLMemento createXML_WriteRoot() {
@@ -144,7 +144,7 @@ public class TourMarkerManager {
 
    public static LinkedList<RecentMarker> getRecentMarkers() {
 
-      return _allRecentMarker;
+      return _allRecentMarkers;
    }
 
    private static File getXmlFile() {
@@ -162,7 +162,7 @@ public class TourMarkerManager {
    public static void removeRecentMarker(final RecentMarker recentMarker) {
 
       // update model
-      _allRecentMarker.remove(recentMarker);
+      _allRecentMarkers.remove(recentMarker);
    }
 
    /**
@@ -235,7 +235,7 @@ public class TourMarkerManager {
                   continue;
                }
 
-               _allRecentMarker.add(recentMarker);
+               _allRecentMarkers.add(recentMarker);
                _allRecentMarkerMap.put(markerKey, recentMarker);
             }
 
@@ -265,7 +265,7 @@ public class TourMarkerManager {
 
    private static void saveState_10_RecentMarker(final XMLMemento xmlRoot) {
 
-      for (final RecentMarker recentMarker : _allRecentMarker) {
+      for (final RecentMarker recentMarker : _allRecentMarkers) {
 
          // <RecentMarker>
          final IMemento xmlRecentMarker = xmlRoot.createChild(RECENT_MARKER);
@@ -278,6 +278,14 @@ public class TourMarkerManager {
    public static void setIsCreateAndSave(final boolean isCreateAndSave) {
 
       _state.put(STATE_IS_RECENT_MARKER_CREATE_AND_SAVE, isCreateAndSave);
+   }
+
+   public static void sortRecentMarkers() {
+
+      _allRecentMarkers.sort((o1, o2) -> {
+
+         return o1.label.compareToIgnoreCase(o2.label);
+      });
    }
 
 }

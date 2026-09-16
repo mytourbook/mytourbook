@@ -15,20 +15,48 @@
  *******************************************************************************/
 package net.tourbook.tourMarker;
 
+import net.tourbook.Images;
+import net.tourbook.Messages;
+import net.tourbook.application.TourbookPlugin;
+
 import org.eclipse.jface.action.Action;
+import org.eclipse.jface.dialogs.IDialogConstants;
+import org.eclipse.jface.dialogs.MessageDialog;
+import org.eclipse.swt.widgets.Display;
 
 public class ActionClearRecentMarkers extends Action {
 
    public ActionClearRecentMarkers() {
 
-      super("&Clear all Recent Markers", AS_PUSH_BUTTON);
+      super("&Clear Recent Markers...", AS_PUSH_BUTTON);
 
       setToolTipText("A single recent marker can be removed\nby also pressing <Ctrl> when selecting the marker");
+
+      setImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.App_Delete));
    }
 
    @Override
    public void run() {
 
-      TourMarkerManager.clearRecentMarkers();
+      final MessageDialog dialog = new MessageDialog(
+
+            Display.getDefault().getActiveShell(),
+
+            "Clear Recent Markers",
+            null, // no title image
+
+            "Remove all %d recent markers?".formatted(TourMarkerManager.getRecentMarkers().size()),
+
+            MessageDialog.CONFIRM,
+
+            0, // default index
+
+            "Remove &All",
+            Messages.App_Action_Cancel);
+
+      if (dialog.open() == IDialogConstants.OK_ID) {
+
+         TourMarkerManager.clearRecentMarkers();
+      }
    }
 }

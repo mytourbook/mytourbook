@@ -34,6 +34,7 @@ import net.tourbook.tour.TourManager;
 import net.tourbook.tourMarker.ActionClearRecentMarkers;
 import net.tourbook.tourMarker.ActionCreateAndSave;
 import net.tourbook.tourMarker.ActionHeader;
+import net.tourbook.tourMarker.ActionSortRecentMarkers;
 import net.tourbook.tourMarker.RecentMarker;
 import net.tourbook.tourMarker.TourMarkerManager;
 import net.tourbook.ui.tourChart.ChartLabelMarker;
@@ -50,9 +51,10 @@ import org.eclipse.swt.widgets.Menu;
  */
 public class ActionCreateMarkerFromRecentMarker_SubMenu extends SubMenu {
 
+   private ActionHeader                _actionHeader;
    private ActionClearRecentMarkers    _actionClearRecentMarkers;
    private ActionCreateAndSave         _actionCreateAndSave;
-   private ActionHeader                _actionHeader;
+   private ActionSortRecentMarkers     _actionSortRecentMarkers;
 
    private List<ActionRecentMarker>    _allRecentMarkerActions = new ArrayList<>();
 
@@ -156,9 +158,10 @@ public class ActionCreateMarkerFromRecentMarker_SubMenu extends SubMenu {
          _allRecentMarkerActions.add(new ActionRecentMarker());
       }
 
+      _actionHeader = new ActionHeader();
       _actionClearRecentMarkers = new ActionClearRecentMarkers();
       _actionCreateAndSave = new ActionCreateAndSave();
-      _actionHeader = new ActionHeader();
+      _actionSortRecentMarkers = new ActionSortRecentMarkers();
    }
 
    /**
@@ -258,6 +261,7 @@ public class ActionCreateMarkerFromRecentMarker_SubMenu extends SubMenu {
       addSeparatorToMenu();
       addActionToMenu(_actionHeader);
       addActionToMenu(_actionCreateAndSave);
+      addActionToMenu(_actionSortRecentMarkers);
       addActionToMenu(_actionClearRecentMarkers);
    }
 

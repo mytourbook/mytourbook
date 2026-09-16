@@ -27,6 +27,7 @@ import net.tourbook.common.ui.SubMenu;
 import net.tourbook.data.TourMarker;
 import net.tourbook.tourMarker.ActionClearRecentMarkers;
 import net.tourbook.tourMarker.ActionHeader;
+import net.tourbook.tourMarker.ActionSortRecentMarkers;
 import net.tourbook.tourMarker.RecentMarker;
 import net.tourbook.tourMarker.TourMarkerManager;
 import net.tourbook.ui.tourChart.ITourMarkerUpdater;
@@ -43,9 +44,10 @@ public class ActionRenameMarkerFromRecentMarker_SubMenu extends SubMenu {
    private TourMarker               _tourMarker;
    private ITourMarkerUpdater       _tourMarkerUpdater;
 
-   private ActionClearRecentMarkers _actionClearRecentMarkers;
    private ActionHeader             _actionHeader;
+   private ActionClearRecentMarkers _actionClearRecentMarkers;
    private ActionPickRecentMarker   _actionPickRecentMarker;
+   private ActionSortRecentMarkers  _actionSortRecentMarkers;
 
    private List<ActionRecentMarker> _allRecentMarkerActions = new ArrayList<>();
 
@@ -121,10 +123,10 @@ public class ActionRenameMarkerFromRecentMarker_SubMenu extends SubMenu {
          _allRecentMarkerActions.add(new ActionRecentMarker());
       }
 
+      _actionHeader = new ActionHeader();
       _actionPickRecentMarker = new ActionPickRecentMarker();
       _actionClearRecentMarkers = new ActionClearRecentMarkers();
-      _actionHeader = new ActionHeader();
-
+      _actionSortRecentMarkers = new ActionSortRecentMarkers();
    }
 
    @Override
@@ -164,6 +166,7 @@ public class ActionRenameMarkerFromRecentMarker_SubMenu extends SubMenu {
 
       addActionToMenu(_actionHeader);
       addActionToMenu(_actionPickRecentMarker);
+      addActionToMenu(_actionSortRecentMarkers);
       addActionToMenu(_actionClearRecentMarkers);
    }
 
