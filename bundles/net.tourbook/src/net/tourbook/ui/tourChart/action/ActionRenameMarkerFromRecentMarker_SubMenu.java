@@ -25,11 +25,14 @@ import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.UI;
 import net.tourbook.common.ui.SubMenu;
 import net.tourbook.data.TourMarker;
+import net.tourbook.tourMarker.ActionClearRecentMarkers;
+import net.tourbook.tourMarker.ActionHeader;
 import net.tourbook.tourMarker.RecentMarker;
 import net.tourbook.tourMarker.TourMarkerManager;
 import net.tourbook.ui.tourChart.ITourMarkerUpdater;
 
 import org.eclipse.jface.action.Action;
+import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Menu;
 
 /**
@@ -40,7 +43,10 @@ public class ActionRenameMarkerFromRecentMarker_SubMenu extends SubMenu {
    private TourMarker               _tourMarker;
    private ITourMarkerUpdater       _tourMarkerUpdater;
 
+   private ActionClearRecentMarkers _actionClearRecentMarkers;
+   private ActionHeader             _actionHeader;
    private ActionPickRecentMarker   _actionPickRecentMarker;
+
    private List<ActionRecentMarker> _allRecentMarkerActions = new ArrayList<>();
 
    private class ActionPickRecentMarker extends Action {
@@ -48,6 +54,8 @@ public class ActionRenameMarkerFromRecentMarker_SubMenu extends SubMenu {
       public ActionPickRecentMarker() {
 
          super(Messages.Action_TourMarker_PickRecentMarker, AS_PUSH_BUTTON);
+
+         setToolTipText("Add this marker to the recent marker list");
 
          setImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.TourMarker_New));
       }
@@ -67,17 +75,14 @@ public class ActionRenameMarkerFromRecentMarker_SubMenu extends SubMenu {
       public ActionRecentMarker() {
 
          super(UI.EMPTY_STRING, AS_PUSH_BUTTON);
+
+         setToolTipText("This marker can be removed from this list\nby also pressing <Ctrl> when selecting the marker");
       }
 
       @Override
-      public void run() {
+      public void runWithEvent(final Event event) {
 
-         _tourMarker.setLabel(__recentMarker.label);
-
-         _tourMarkerUpdater.updateModifiedTourMarker(_tourMarker);
-
-         // set last used marker to the top of the list
-         TourMarkerManager.addRecentMarker(_tourMarker.getLabel());
+         actionRenameMarker(__recentMarker, event);
       }
    }
 
@@ -87,16 +92,45 @@ public class ActionRenameMarkerFromRecentMarker_SubMenu extends SubMenu {
 
       _tourMarkerUpdater = tourMarkerUpdater;
 
+      createActions();
+   }
+
+   private void actionRenameMarker(final RecentMarker recentMarker, final Event event) {
+
+      if (UI.isCtrlKey(event)) {
+
+         // remove this marker
+
+         TourMarkerManager.removeRecentMarker(recentMarker);
+
+         return;
+      }
+
+      _tourMarker.setLabel(recentMarker.label);
+
+      _tourMarkerUpdater.updateModifiedTourMarker(_tourMarker);
+
+      // set last used marker to the top of the list
+      TourMarkerManager.addRecentMarker(_tourMarker.getLabel());
+   }
+
+   private void createActions() {
+
       // create submenu actions which will be updated when displayed
       for (int actionIndex = 0; actionIndex < TourMarkerManager.MAX_NUMBER_OF_RECENT_MARKERS; actionIndex++) {
          _allRecentMarkerActions.add(new ActionRecentMarker());
       }
 
       _actionPickRecentMarker = new ActionPickRecentMarker();
+      _actionClearRecentMarkers = new ActionClearRecentMarkers();
+      _actionHeader = new ActionHeader();
+
    }
 
    @Override
-   public void enableActions() {}
+   public void enableActions() {
+
+   }
 
    @Override
    public void fillMenu(final Menu menu) {
@@ -128,7 +162,9 @@ public class ActionRenameMarkerFromRecentMarker_SubMenu extends SubMenu {
          addSeparatorToMenu();
       }
 
+      addActionToMenu(_actionHeader);
       addActionToMenu(_actionPickRecentMarker);
+      addActionToMenu(_actionClearRecentMarkers);
    }
 
    /**

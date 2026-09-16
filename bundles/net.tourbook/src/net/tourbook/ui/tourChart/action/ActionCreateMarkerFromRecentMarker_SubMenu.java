@@ -31,6 +31,9 @@ import net.tourbook.data.TourData;
 import net.tourbook.data.TourMarker;
 import net.tourbook.tour.DialogMarker;
 import net.tourbook.tour.TourManager;
+import net.tourbook.tourMarker.ActionClearRecentMarkers;
+import net.tourbook.tourMarker.ActionCreateAndSave;
+import net.tourbook.tourMarker.ActionHeader;
 import net.tourbook.tourMarker.RecentMarker;
 import net.tourbook.tourMarker.TourMarkerManager;
 import net.tourbook.ui.tourChart.ChartLabelMarker;
@@ -50,57 +53,13 @@ public class ActionCreateMarkerFromRecentMarker_SubMenu extends SubMenu {
    private ActionClearRecentMarkers    _actionClearRecentMarkers;
    private ActionCreateAndSave         _actionCreateAndSave;
    private ActionHeader                _actionHeader;
+
    private List<ActionRecentMarker>    _allRecentMarkerActions = new ArrayList<>();
 
    private final IChartContextProvider _chartContextProvider;
    private boolean                     _isLeftSlider;
 
-   private IMarkerReceiver             _markerReceiver;
-
    private int                         _serieIndex             = -1;
-
-   private class ActionClearRecentMarkers extends Action {
-
-      public ActionClearRecentMarkers() {
-
-         super("&Clear all Recent Markers", AS_PUSH_BUTTON);
-
-         setToolTipText("A single recent marker can be removed\nby also pressing <Ctrl> when selecting the marker");
-      }
-
-      @Override
-      public void run() {
-
-         TourMarkerManager.clearRecentMarkers();
-      }
-   }
-
-   private class ActionCreateAndSave extends Action {
-
-      public ActionCreateAndSave() {
-
-         super("Create and &Save", AS_CHECK_BOX);
-
-         setToolTipText("Create and save the new tour marker\nwithout opening the tour marker dialog");
-      }
-
-      @Override
-      public void run() {
-
-         TourMarkerManager.setIsCreateAndSave(isChecked());
-      }
-   }
-
-   private class ActionHeader extends Action {
-
-      public ActionHeader() {
-
-         super("» Customize Recent Markers «", AS_PUSH_BUTTON);
-
-         // this action is just a header
-         setEnabled(false);
-      }
-   }
 
    private class ActionRecentMarker extends Action {
 
@@ -109,6 +68,8 @@ public class ActionCreateMarkerFromRecentMarker_SubMenu extends SubMenu {
       public ActionRecentMarker() {
 
          super(UI.EMPTY_STRING, AS_PUSH_BUTTON);
+
+         setToolTipText("This marker can be removed from this list\nby also pressing <Ctrl> when selecting the marker");
       }
 
       @Override
@@ -161,17 +122,6 @@ public class ActionCreateMarkerFromRecentMarker_SubMenu extends SubMenu {
 
       // set data from the recent marker
       newTourMarker.setLabel(newMarkerLabel);
-
-      if (_markerReceiver != null) {
-
-         _markerReceiver.addTourMarker(newTourMarker);
-
-         // set created marker to the top of the recent markers
-         TourMarkerManager.addRecentMarker(newMarkerLabel);
-
-         // the marker dialog will not be opened
-         return;
-      }
 
       if (TourMarkerManager.isCreateAndSave()) {
 
@@ -279,6 +229,7 @@ public class ActionCreateMarkerFromRecentMarker_SubMenu extends SubMenu {
    @Override
    public void enableActions() {
 
+      _actionCreateAndSave.setChecked(TourMarkerManager.isCreateAndSave());
    }
 
    @Override
@@ -308,10 +259,6 @@ public class ActionCreateMarkerFromRecentMarker_SubMenu extends SubMenu {
       addActionToMenu(_actionHeader);
       addActionToMenu(_actionCreateAndSave);
       addActionToMenu(_actionClearRecentMarkers);
-   }
-
-   public void setMarkerReceiver(final IMarkerReceiver markerReceiver) {
-      _markerReceiver = markerReceiver;
    }
 
    /**
