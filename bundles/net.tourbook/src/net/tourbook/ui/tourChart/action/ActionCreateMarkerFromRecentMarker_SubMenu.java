@@ -33,7 +33,8 @@ import net.tourbook.tour.DialogMarker;
 import net.tourbook.tour.TourManager;
 import net.tourbook.tourMarker.ActionClearRecentMarkers;
 import net.tourbook.tourMarker.ActionCreateAndSave;
-import net.tourbook.tourMarker.ActionHeader;
+import net.tourbook.tourMarker.ActionHeader_AllRecentMarkers;
+import net.tourbook.tourMarker.ActionHeader_CustomizeRecentMarkers;
 import net.tourbook.tourMarker.ActionSortRecentMarkers;
 import net.tourbook.tourMarker.RecentMarker;
 import net.tourbook.tourMarker.TourMarkerManager;
@@ -51,17 +52,18 @@ import org.eclipse.swt.widgets.Menu;
  */
 public class ActionCreateMarkerFromRecentMarker_SubMenu extends SubMenu {
 
-   private ActionHeader                _actionHeader;
-   private ActionClearRecentMarkers    _actionClearRecentMarkers;
-   private ActionCreateAndSave         _actionCreateAndSave;
-   private ActionSortRecentMarkers     _actionSortRecentMarkers;
+   private ActionHeader_AllRecentMarkers       _actionHeader_AllRecentMarkers;
+   private ActionHeader_CustomizeRecentMarkers _actionHeader_CustomizeRecentMarkers;
+   private ActionClearRecentMarkers            _actionClearRecentMarkers;
+   private ActionCreateAndSave                 _actionCreateAndSave;
+   private ActionSortRecentMarkers             _actionSortRecentMarkers;
 
-   private List<ActionRecentMarker>    _allRecentMarkerActions = new ArrayList<>();
+   private List<ActionRecentMarker>            _allRecentMarkerActions = new ArrayList<>();
 
-   private final IChartContextProvider _chartContextProvider;
-   private boolean                     _isLeftSlider;
+   private final IChartContextProvider         _chartContextProvider;
+   private boolean                             _isLeftSlider;
 
-   private int                         _serieIndex             = -1;
+   private int                                 _serieIndex             = -1;
 
    private class ActionRecentMarker extends Action {
 
@@ -158,10 +160,15 @@ public class ActionCreateMarkerFromRecentMarker_SubMenu extends SubMenu {
          _allRecentMarkerActions.add(new ActionRecentMarker());
       }
 
-      _actionHeader = new ActionHeader();
-      _actionClearRecentMarkers = new ActionClearRecentMarkers();
-      _actionCreateAndSave = new ActionCreateAndSave();
-      _actionSortRecentMarkers = new ActionSortRecentMarkers();
+// SET_FORMATTING_OFF
+      
+      _actionHeader_AllRecentMarkers         = new ActionHeader_AllRecentMarkers();
+      _actionHeader_CustomizeRecentMarkers   = new ActionHeader_CustomizeRecentMarkers();
+      _actionClearRecentMarkers              = new ActionClearRecentMarkers();
+      _actionCreateAndSave                   = new ActionCreateAndSave();
+      _actionSortRecentMarkers               = new ActionSortRecentMarkers();
+      
+// SET_FORMATTING_ON
    }
 
    /**
@@ -238,6 +245,8 @@ public class ActionCreateMarkerFromRecentMarker_SubMenu extends SubMenu {
    @Override
    public void fillMenu(final Menu menu) {
 
+      addActionToMenu(_actionHeader_AllRecentMarkers);
+
       final LinkedList<RecentMarker> allRecentMarkers = TourMarkerManager.getRecentMarkers();
       final int numRecentMarkers = allRecentMarkers.size();
 
@@ -259,7 +268,7 @@ public class ActionCreateMarkerFromRecentMarker_SubMenu extends SubMenu {
       }
 
       addSeparatorToMenu();
-      addActionToMenu(_actionHeader);
+      addActionToMenu(_actionHeader_CustomizeRecentMarkers);
       addActionToMenu(_actionCreateAndSave);
       addActionToMenu(_actionSortRecentMarkers);
       addActionToMenu(_actionClearRecentMarkers);

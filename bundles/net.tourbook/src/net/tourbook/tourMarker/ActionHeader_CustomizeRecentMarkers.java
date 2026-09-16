@@ -17,9 +17,9 @@ package net.tourbook.tourMarker;
 
 import org.eclipse.jface.action.Action;
 
-public class ActionHeader extends Action {
+public class ActionHeader_CustomizeRecentMarkers extends Action {
 
-   public ActionHeader() {
+   public ActionHeader_CustomizeRecentMarkers() {
 
       super("» Customize Recent Markers «", AS_PUSH_BUTTON);
 
