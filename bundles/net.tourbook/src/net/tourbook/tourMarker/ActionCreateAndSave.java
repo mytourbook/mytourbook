@@ -15,57 +15,22 @@
  *******************************************************************************/
 package net.tourbook.tourMarker;
 
-import java.util.Objects;
+import net.tourbook.Messages;
 
-import net.tourbook.common.UI;
+import org.eclipse.jface.action.Action;
 
-public class RecentMarker {
+public class ActionCreateAndSave extends Action {
 
-   private static final char NL = UI.NEW_LINE;
+   public ActionCreateAndSave() {
 
-   public String             label;
+      super(Messages.Action_TourMarker_CreateAndSave, AS_CHECK_BOX);
 
-   public RecentMarker() {}
-
-   public RecentMarker(final String label) {
-
-      this.label = label;
+      setToolTipText(Messages.Action_TourMarker_CreateAndSave_Tooltip);
    }
 
    @Override
-   public boolean equals(final Object obj) {
+   public void run() {
 
-      if (this == obj) {
-         return true;
-      }
-
-      if (obj == null) {
-         return false;
-      }
-
-      if (getClass() != obj.getClass()) {
-         return false;
-      }
-
-      final RecentMarker other = (RecentMarker) obj;
-
-      return Objects.equals(label, other.label);
+      TourMarkerManager.setIsCreateAndSave(isChecked());
    }
-
-   @Override
-   public int hashCode() {
-      return Objects.hash(label);
-   }
-
-   @Override
-   public String toString() {
-
-      return UI.EMPTY_STRING
-
-            + "RecentMarker" + NL //               //$NON-NLS-1$
-
-            + " label = " + label + NL //          //$NON-NLS-1$
-      ;
-   }
-
 }

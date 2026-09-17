@@ -29,10 +29,15 @@ import net.tourbook.common.ui.SubMenu;
 import net.tourbook.data.TourMarker;
 import net.tourbook.map2.view.Map2View;
 import net.tourbook.tour.TourManager;
+import net.tourbook.tourMarker.ActionClearRecentMarkers;
+import net.tourbook.tourMarker.ActionHeader_AllRecentMarkers;
+import net.tourbook.tourMarker.ActionHeader_CustomizeRecentMarkers;
+import net.tourbook.tourMarker.ActionSortRecentMarkers;
 import net.tourbook.tourMarker.RecentMarker;
 import net.tourbook.tourMarker.TourMarkerManager;
 
 import org.eclipse.jface.action.Action;
+import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Menu;
 
 /**
@@ -40,11 +45,15 @@ import org.eclipse.swt.widgets.Menu;
  */
 public class ActionMapPoint_RenameMarkerWithRecentMarkerInMap_SubMenu extends SubMenu {
 
-   private Map2View                 _map2View;
+   private Map2View                            _map2View;
 
-   private List<ActionRecentMarker> _allRecentMarkerActions = new ArrayList<>();
+   private ActionHeader_AllRecentMarkers       _actionHeader_AllRecentMarkers;
+   private ActionHeader_CustomizeRecentMarkers _actionHeader_CustomizeRecentMarkers;
+   private ActionClearRecentMarkers            _actionClearRecentMarkers;
+   private ActionPickRecentMarker              _actionPickRecentMarker;
+   private ActionSortRecentMarkers             _actionSortRecentMarkers;
 
-   private Action                   _actionPickRecentMarker;
+   private List<ActionRecentMarker>            _allRecentMarkerActions = new ArrayList<>();
 
    private class ActionPickRecentMarker extends Action {
 
@@ -73,20 +82,14 @@ public class ActionMapPoint_RenameMarkerWithRecentMarkerInMap_SubMenu extends Su
       public ActionRecentMarker() {
 
          super(UI.EMPTY_STRING, AS_PUSH_BUTTON);
+
+         setToolTipText(Messages.Action_TourMarker_RecentMarker_Tooltip);
       }
 
       @Override
-      public void run() {
+      public void runWithEvent(final Event event) {
 
-         // make sure the tour editor does not contain a modified tour
-         if (TourManager.isTourEditorModified()) {
-            return;
-         }
-
-         final TourMarker tourMarker = _map2View.updateTourMarker(__recentMarker);
-
-         // set last used marker to the top of the recent markers
-         TourMarkerManager.addRecentMarker(tourMarker.getLabel());
+         actionRenameMarker(__recentMarker, event);
       }
    }
 
@@ -96,12 +99,47 @@ public class ActionMapPoint_RenameMarkerWithRecentMarkerInMap_SubMenu extends Su
 
       _map2View = map2View;
 
+      createActions();
+   }
+
+   private void actionRenameMarker(final RecentMarker recentMarker, final Event event) {
+
+      if (UI.isCtrlKey(event)) {
+
+         // remove this marker
+
+         TourMarkerManager.removeRecentMarker(recentMarker);
+
+         return;
+      }
+
+      // make sure the tour editor does not contain a modified tour
+      if (TourManager.isTourEditorModified()) {
+         return;
+      }
+
+      final TourMarker tourMarker = _map2View.updateTourMarker(recentMarker);
+
+      // set last used marker to the top of the recent markers
+      TourMarkerManager.addRecentMarker(tourMarker.getLabel());
+   }
+
+   private void createActions() {
+
       // create submenu actions which will be updated when displayed
       for (int actionIndex = 0; actionIndex < TourMarkerManager.MAX_NUMBER_OF_RECENT_MARKERS; actionIndex++) {
          _allRecentMarkerActions.add(new ActionRecentMarker());
       }
 
-      _actionPickRecentMarker = new ActionPickRecentMarker();
+// SET_FORMATTING_OFF
+
+      _actionHeader_AllRecentMarkers         = new ActionHeader_AllRecentMarkers();
+      _actionHeader_CustomizeRecentMarkers   = new ActionHeader_CustomizeRecentMarkers();
+      _actionPickRecentMarker                = new ActionPickRecentMarker();
+      _actionClearRecentMarkers              = new ActionClearRecentMarkers();
+      _actionSortRecentMarkers               = new ActionSortRecentMarkers();
+
+// SET_FORMATTING_ON
    }
 
    @Override
@@ -110,9 +148,10 @@ public class ActionMapPoint_RenameMarkerWithRecentMarkerInMap_SubMenu extends Su
    @Override
    public void fillMenu(final Menu menu) {
 
+      addActionToMenu(_actionHeader_AllRecentMarkers);
+
       final LinkedList<RecentMarker> allRecentMarkers = TourMarkerManager.getRecentMarkers();
       final int numRecentMarkers = allRecentMarkers.size();
-      int numAddedMarker = 0;
 
       for (int markerIndex = 0; markerIndex < numRecentMarkers; markerIndex++) {
 
@@ -129,14 +168,12 @@ public class ActionMapPoint_RenameMarkerWithRecentMarkerInMap_SubMenu extends Su
          actionRecentMarker.__recentMarker = recentMarker;
 
          addActionToMenu(actionRecentMarker);
-
-         numAddedMarker++;
       }
 
-      if (numAddedMarker > 0) {
-         addSeparatorToMenu();
-      }
-
+      addSeparatorToMenu();
+      addActionToMenu(_actionHeader_CustomizeRecentMarkers);
       addActionToMenu(_actionPickRecentMarker);
+      addActionToMenu(_actionSortRecentMarkers);
+      addActionToMenu(_actionClearRecentMarkers);
    }
 }

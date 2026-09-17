@@ -40,7 +40,8 @@ New / Improvements
 Changes
 =======
 
-* Removed the Suunto 9 import (Frederic)
+* Import
+  - Removed the Suunto 9 import (Frederic)
     
 
 Bugfix

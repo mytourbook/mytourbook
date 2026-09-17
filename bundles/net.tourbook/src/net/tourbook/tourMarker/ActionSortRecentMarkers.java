@@ -15,57 +15,20 @@
  *******************************************************************************/
 package net.tourbook.tourMarker;
 
-import java.util.Objects;
+import net.tourbook.Messages;
 
-import net.tourbook.common.UI;
+import org.eclipse.jface.action.Action;
 
-public class RecentMarker {
+public class ActionSortRecentMarkers extends Action {
 
-   private static final char NL = UI.NEW_LINE;
+   public ActionSortRecentMarkers() {
 
-   public String             label;
-
-   public RecentMarker() {}
-
-   public RecentMarker(final String label) {
-
-      this.label = label;
+      super(Messages.Action_TourMarker_SortRecentMarkers, AS_PUSH_BUTTON);
    }
 
    @Override
-   public boolean equals(final Object obj) {
+   public void run() {
 
-      if (this == obj) {
-         return true;
-      }
-
-      if (obj == null) {
-         return false;
-      }
-
-      if (getClass() != obj.getClass()) {
-         return false;
-      }
-
-      final RecentMarker other = (RecentMarker) obj;
-
-      return Objects.equals(label, other.label);
+      TourMarkerManager.sortRecentMarkers();
    }
-
-   @Override
-   public int hashCode() {
-      return Objects.hash(label);
-   }
-
-   @Override
-   public String toString() {
-
-      return UI.EMPTY_STRING
-
-            + "RecentMarker" + NL //               //$NON-NLS-1$
-
-            + " label = " + label + NL //          //$NON-NLS-1$
-      ;
-   }
-
 }

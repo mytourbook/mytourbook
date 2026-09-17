@@ -31,6 +31,11 @@ import net.tourbook.data.TourData;
 import net.tourbook.data.TourMarker;
 import net.tourbook.tour.DialogMarker;
 import net.tourbook.tour.TourManager;
+import net.tourbook.tourMarker.ActionClearRecentMarkers;
+import net.tourbook.tourMarker.ActionCreateAndSave;
+import net.tourbook.tourMarker.ActionHeader_AllRecentMarkers;
+import net.tourbook.tourMarker.ActionHeader_CustomizeRecentMarkers;
+import net.tourbook.tourMarker.ActionSortRecentMarkers;
 import net.tourbook.tourMarker.RecentMarker;
 import net.tourbook.tourMarker.TourMarkerManager;
 import net.tourbook.ui.tourChart.ChartLabelMarker;
@@ -39,6 +44,7 @@ import net.tourbook.ui.tourChart.TourChartContextProvider;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.window.Window;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Menu;
 
 /**
@@ -46,12 +52,18 @@ import org.eclipse.swt.widgets.Menu;
  */
 public class ActionCreateMarkerFromRecentMarker_SubMenu extends SubMenu {
 
-   private List<ActionRecentMarker>    _allRecentMarkerActions = new ArrayList<>();
+   private ActionHeader_AllRecentMarkers       _actionHeader_AllRecentMarkers;
+   private ActionHeader_CustomizeRecentMarkers _actionHeader_CustomizeRecentMarkers;
+   private ActionClearRecentMarkers            _actionClearRecentMarkers;
+   private ActionCreateAndSave                 _actionCreateAndSave;
+   private ActionSortRecentMarkers             _actionSortRecentMarkers;
 
-   private final IChartContextProvider _chartContextProvider;
-   private boolean                     _isLeftSlider;
+   private List<ActionRecentMarker>            _allRecentMarkerActions = new ArrayList<>();
 
-   private IMarkerReceiver             _markerReceiver;
+   private final IChartContextProvider         _chartContextProvider;
+   private boolean                             _isLeftSlider;
+
+   private int                                 _serieIndex             = -1;
 
    private class ActionRecentMarker extends Action {
 
@@ -60,12 +72,14 @@ public class ActionCreateMarkerFromRecentMarker_SubMenu extends SubMenu {
       public ActionRecentMarker() {
 
          super(UI.EMPTY_STRING, AS_PUSH_BUTTON);
+
+         setToolTipText(Messages.Action_TourMarker_RecentMarker_Tooltip);
       }
 
       @Override
-      public void run() {
+      public void runWithEvent(final Event event) {
 
-         actionCreateMarker(__recentMarker);
+         actionCreateMarker(__recentMarker, event);
       }
    }
 
@@ -77,13 +91,24 @@ public class ActionCreateMarkerFromRecentMarker_SubMenu extends SubMenu {
 
       _chartContextProvider = tourChartContextProvider;
 
-      for (int actionIndex = 0; actionIndex < TourMarkerManager.MAX_NUMBER_OF_RECENT_MARKERS; actionIndex++) {
-
-         _allRecentMarkerActions.add(new ActionRecentMarker());
-      }
+      createActions();
    }
 
-   private void actionCreateMarker(final RecentMarker recentMarker) {
+   private void actionCreateMarker(final RecentMarker recentMarker, final Event event) {
+
+      if (UI.isCtrlKey(event)) {
+
+         // remove this marker
+
+         TourMarkerManager.removeRecentMarker(recentMarker);
+
+         return;
+      }
+
+      // make sure the tour editor does not contain a modified tour
+      if (TourManager.isTourEditorModified()) {
+         return;
+      }
 
       final Chart chart = _chartContextProvider.getChart();
 
@@ -102,14 +127,21 @@ public class ActionCreateMarkerFromRecentMarker_SubMenu extends SubMenu {
          return;
       }
 
+      final String newMarkerLabel = recentMarker.label;
+
       // set data from the recent marker
-      newTourMarker.setLabel(recentMarker.label);
+      newTourMarker.setLabel(newMarkerLabel);
 
-      if (_markerReceiver != null) {
+      if (TourMarkerManager.isCreateAndSave()) {
 
-         _markerReceiver.addTourMarker(newTourMarker);
+         // update model
+         tourData.getTourMarkers().add(newTourMarker);
 
-         // the marker dialog will not be opened
+         TourManager.saveModifiedTour(tourData);
+
+         // set created marker to the top of the recent markers
+         TourMarkerManager.addRecentMarker(newMarkerLabel);
+
          return;
       }
 
@@ -123,8 +155,25 @@ public class ActionCreateMarkerFromRecentMarker_SubMenu extends SubMenu {
          TourManager.saveModifiedTour(tourData);
 
          // set created marker to the top of the recent markers
-         TourMarkerManager.addRecentMarker(newTourMarker.getLabel());
+         TourMarkerManager.addRecentMarker(newMarkerLabel);
       }
+   }
+
+   private void createActions() {
+
+      for (int actionIndex = 0; actionIndex < TourMarkerManager.MAX_NUMBER_OF_RECENT_MARKERS; actionIndex++) {
+         _allRecentMarkerActions.add(new ActionRecentMarker());
+      }
+
+// SET_FORMATTING_OFF
+
+      _actionHeader_AllRecentMarkers         = new ActionHeader_AllRecentMarkers();
+      _actionHeader_CustomizeRecentMarkers   = new ActionHeader_CustomizeRecentMarkers();
+      _actionClearRecentMarkers              = new ActionClearRecentMarkers();
+      _actionCreateAndSave                   = new ActionCreateAndSave();
+      _actionSortRecentMarkers               = new ActionSortRecentMarkers();
+
+// SET_FORMATTING_ON
    }
 
    /**
@@ -136,20 +185,34 @@ public class ActionCreateMarkerFromRecentMarker_SubMenu extends SubMenu {
     */
    private TourMarker createTourMarker(final TourData tourData) {
 
-      final ChartXSlider leftSlider = _chartContextProvider.getLeftSlider();
-      final ChartXSlider rightSlider = _chartContextProvider.getRightSlider();
+      int serieIndex;
 
-      final ChartXSlider slider = rightSlider == null
-            ? leftSlider
-            : _isLeftSlider
-                  ? leftSlider
-                  : rightSlider;
+      if (_serieIndex == -1) {
 
-      if (slider == null || tourData.timeSerie == null) {
-         return null;
+         // get serie index from slider
+
+         final ChartXSlider leftSlider = _chartContextProvider.getLeftSlider();
+         final ChartXSlider rightSlider = _chartContextProvider.getRightSlider();
+
+         final ChartXSlider slider = rightSlider == null
+               ? leftSlider
+               : _isLeftSlider
+                     ? leftSlider
+                     : rightSlider;
+
+         if (slider == null || tourData.timeSerie == null) {
+            return null;
+         }
+
+         serieIndex = slider.getValuesIndex();
+
+      } else {
+
+         // use provided serie index
+
+         serieIndex = _serieIndex;
       }
 
-      final int serieIndex = slider.getValuesIndex();
       final int relativeTourTime = tourData.timeSerie[serieIndex];
       final float[] altitudeSerie = tourData.altitudeSerie;
       final float[] distSerie = tourData.getMetricDistanceSerie();
@@ -181,10 +244,13 @@ public class ActionCreateMarkerFromRecentMarker_SubMenu extends SubMenu {
    @Override
    public void enableActions() {
 
+      _actionCreateAndSave.setChecked(TourMarkerManager.isCreateAndSave());
    }
 
    @Override
    public void fillMenu(final Menu menu) {
+
+      addActionToMenu(_actionHeader_AllRecentMarkers);
 
       final LinkedList<RecentMarker> allRecentMarkers = TourMarkerManager.getRecentMarkers();
       final int numRecentMarkers = allRecentMarkers.size();
@@ -205,10 +271,23 @@ public class ActionCreateMarkerFromRecentMarker_SubMenu extends SubMenu {
 
          addActionToMenu(actionRecentMarker);
       }
+
+      addSeparatorToMenu();
+      addActionToMenu(_actionHeader_CustomizeRecentMarkers);
+      addActionToMenu(_actionCreateAndSave);
+      addActionToMenu(_actionSortRecentMarkers);
+      addActionToMenu(_actionClearRecentMarkers);
    }
 
-   public void setMarkerReceiver(final IMarkerReceiver markerReceiver) {
-      _markerReceiver = markerReceiver;
+   /**
+    * Set the serie index which is used to get the marker position, when <code>-1</code> is set then
+    * the slider position serie index is used
+    *
+    * @param serieIndex
+    */
+   public void setSerieIndex(final int serieIndex) {
+
+      _serieIndex = serieIndex;
    }
 
 }

@@ -182,12 +182,16 @@ public class TourChartContextProvider implements IChartContextProvider, ITourPro
    private void fillContextMenu_Default(final IMenuManager menuMgr, final TourChart tourChart) {
 
       /*
-       * Show "Create Marker..." when a value point is hovered.
+       * Show "Create Marker..." when a value point is hovered
        */
-      final int vpIndex = tourChart.getHoveredValuePointIndex();
-      if (vpIndex != -1) {
-         _actionCreateMarkerFromValuePoint.setValuePointIndex(vpIndex);
+      final int valuePointIndex = tourChart.getHoveredValuePointIndex();
+      if (valuePointIndex != -1) {
+
+         _actionCreateMarkerFromValuePoint.setValuePointIndex(valuePointIndex);
+         _actionCreateMarkerFromRecentMarker.setSerieIndex(valuePointIndex);
+
          menuMgr.add(_actionCreateMarkerFromValuePoint);
+         menuMgr.add(_actionCreateMarkerFromRecentMarker);
       }
 
       menuMgr.add(new Separator());
@@ -294,6 +298,9 @@ public class TourChartContextProvider implements IChartContextProvider, ITourPro
       _rightSlider = rightSlider;
 
       if (leftSlider != null || rightSlider != null) {
+
+         // reset value point that the slider position is used
+         _actionCreateMarkerFromRecentMarker.setSerieIndex(-1);
 
          // slider marker actions
          if (leftSlider != null && rightSlider == null) {

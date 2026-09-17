@@ -94,9 +94,20 @@ public class Messages extends NLS {
 
    public static String        action_tourbook_select_year_month_tours;
 
+   public static String        Action_TourMarker_ClearRecentMarkers;
+   public static String        Action_TourMarker_ClearRecentMarkers_Tooltip;
+   public static String        Action_TourMarker_CreateAndSave;
+   public static String        Action_TourMarker_CreateAndSave_Tooltip;
    public static String        Action_TourMarker_CreateFromRecentMarker;
+   public static String        Action_TourMarker_Dialog_ClearRecentMarkers_Message;
+   public static String        Action_TourMarker_Dialog_ClearRecentMarkers_Title;
+   public static String        Action_TourMarker_Header_CustomizeRecentMarker;
+   public static String        Action_TourMarker_Header_RecentMarker;
    public static String        Action_TourMarker_PickRecentMarker;
+   public static String        Action_TourMarker_PickRecentMarker_Tooltip;
+   public static String        Action_TourMarker_RecentMarker_Tooltip;
    public static String        Action_TourMarker_ReplaceWithRecentMarker;
+   public static String        Action_TourMarker_SortRecentMarkers;
 
    public static String        Action_TourType_AddRecentTourTypes;
    public static String        Action_TourType_ModifyTourTypeFilter;
@@ -190,6 +201,7 @@ public class Messages extends NLS {
    public static String        App_Action_Remove;
    public static String        App_Action_RemoveTourPhotos;
    public static String        App_Action_Remove_Immediate;
+   public static String        App_Action_RemoveAll;
    public static String        App_Action_Rename;
    public static String        App_Action_ResetValue_Tooltip;
    public static String        App_Action_RestartApp;
