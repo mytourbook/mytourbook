@@ -25,8 +25,11 @@ import net.tourbook.chart.ChartDataModel;
 import net.tourbook.chart.MouseWheelMode;
 import net.tourbook.chart.SelectionChartInfo;
 import net.tourbook.chart.SelectionChartXSliderPosition;
+import net.tourbook.commands.ISaveAndRestorePart;
 import net.tourbook.common.UI;
+import net.tourbook.common.time.TimeTools;
 import net.tourbook.common.util.PostSelectionProvider;
+import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.Util;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourMarker;
@@ -64,6 +67,10 @@ import net.tourbook.ui.views.referenceTour.TVIRefTour_RefTourItem;
 import net.tourbook.ui.views.referenceTour.TourCompareConfig;
 import net.tourbook.ui.views.tourSegmenter.TourSegmenterView;
 
+import org.eclipse.core.commands.ExecutionException;
+import org.eclipse.core.commands.operations.IOperationHistory;
+import org.eclipse.core.commands.operations.IUndoContext;
+import org.eclipse.core.commands.operations.UndoContext;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.action.Separator;
@@ -75,13 +82,19 @@ import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.ui.IActionBars;
 import org.eclipse.ui.IPartListener2;
 import org.eclipse.ui.ISaveablePart;
 import org.eclipse.ui.ISelectionListener;
 import org.eclipse.ui.IViewPart;
+import org.eclipse.ui.IViewSite;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.IWorkbenchPartReference;
+import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.actions.ActionFactory;
 import org.eclipse.ui.forms.widgets.FormToolkit;
+import org.eclipse.ui.operations.RedoActionHandler;
+import org.eclipse.ui.operations.UndoActionHandler;
 import org.eclipse.ui.part.PageBook;
 import org.eclipse.ui.part.ViewPart;
 
@@ -94,6 +107,7 @@ import org.eclipse.ui.part.ViewPart;
 public class TourChartView extends ViewPart implements
 
       ISaveablePart,
+      ISaveAndRestorePart,
       ITourChartViewer,
       IPhotoEventListener,
       IGeoCompareListener
@@ -130,11 +144,10 @@ public class TourChartView extends ViewPart implements
 
    private FormToolkit             _tk;
 
-//   @Inject
-//   private IThemeManager           manager;
-//
-//   @Inject
-//   private IThemeEngine            engine;
+   private IUndoContext            _undoContext;
+   private UndoActionHandler       _undoActionHandler;
+   private RedoActionHandler       _redoActionHandler;
+   private int                     _undoCounter;
 
    /*
     * UI controls
@@ -161,7 +174,12 @@ public class TourChartView extends ViewPart implements
          public void partBroughtToTop(final IWorkbenchPartReference partRef) {}
 
          @Override
-         public void partClosed(final IWorkbenchPartReference partRef) {}
+         public void partClosed(final IWorkbenchPartReference partRef) {
+
+            if (partRef.getPart(false) == TourChartView.this) {
+               TourManager.setTourChartEditor(null);
+            }
+         }
 
          @Override
          public void partDeactivated(final IWorkbenchPartReference partRef) {
@@ -177,6 +195,7 @@ public class TourChartView extends ViewPart implements
 
          @Override
          public void partHidden(final IWorkbenchPartReference partRef) {
+
             if (partRef.getPart(false) == TourChartView.this) {
                _tourChart.partIsHidden();
             }
@@ -186,7 +205,12 @@ public class TourChartView extends ViewPart implements
          public void partInputChanged(final IWorkbenchPartReference partRef) {}
 
          @Override
-         public void partOpened(final IWorkbenchPartReference partRef) {}
+         public void partOpened(final IWorkbenchPartReference partRef) {
+
+            if (partRef.getPart(false) == TourChartView.this) {
+               TourManager.setTourChartEditor(TourChartView.this);
+            }
+         }
 
          @Override
          public void partVisible(final IWorkbenchPartReference partRef) {
@@ -468,6 +492,8 @@ public class TourChartView extends ViewPart implements
 //    tbm.add(new Separator(TOOLBAR_GROUP_2));
 //    tbm.add(new Separator(TOOLBAR_GROUP_3));
 
+      setupUndoContext();
+
       showTour();
    }
 
@@ -556,7 +582,48 @@ public class TourChartView extends ViewPart implements
 
       _prefStore.removePropertyChangeListener(_prefChangeListener);
 
+      final IActionBars actionBars = getViewSite().getActionBars();
+      if (actionBars != null) {
+         actionBars.setGlobalActionHandler(ActionFactory.UNDO.getId(), null);
+         actionBars.setGlobalActionHandler(ActionFactory.REDO.getId(), null);
+      }
+
+      if (_undoActionHandler != null) {
+         _undoActionHandler.dispose();
+      }
+      if (_redoActionHandler != null) {
+         _redoActionHandler.dispose();
+      }
+
+      disposeUndo();
+
       super.dispose();
+   }
+
+   private void disposeUndo() {
+
+      final IOperationHistory operationHistory = PlatformUI.getWorkbench().getOperationSupport().getOperationHistory();
+      operationHistory.dispose(_undoContext, true, true, false);
+   }
+
+   @Override
+   public void doRestore() {
+
+      disposeUndo();
+
+      // removed old tour data from the selection provider
+      _postSelectionProvider.clearSelection();
+
+      final Long tourId = _tourData.getTourId();
+      final TourData tourData = TourManager.getInstance().getTourDataFromDb(tourId);
+
+      updateChart(tourData, true);
+   }
+
+   @Override
+   public void doSave() {
+
+      doSave(null);
    }
 
    @Override
@@ -619,7 +686,10 @@ public class TourChartView extends ViewPart implements
 
    void firePropertyChange() {
 
-      firePropertyChange(ISaveablePart.PROP_DIRTY);
+      _tourChart.getDisplay().asyncExec(() -> {
+
+         firePropertyChange(ISaveablePart.PROP_DIRTY);
+      });
    }
 
    /**
@@ -849,14 +919,7 @@ public class TourChartView extends ViewPart implements
                }
             }
 
-            final SelectionChartXSliderPosition xSliderPosition = new SelectionChartXSliderPosition(
-                  _tourChart,
-                  leftSliderValueIndex,
-                  rightSliderValueIndex);
-
-            xSliderPosition.setCenterSliderPosition(true);
-
-            _tourChart.selectXSliders(xSliderPosition);
+            setSliderPositions(leftSliderValueIndex, rightSliderValueIndex, true);
          }
       }
       _isInSelectionChanged = false;
@@ -1148,6 +1211,40 @@ public class TourChartView extends ViewPart implements
       }
    }
 
+   private void setSliderPositions(final int leftSliderValuesIndex,
+                                   final int rightSliderValuesIndex,
+                                   final boolean isCenterSliderPosition) {
+
+      final SelectionChartXSliderPosition xSliderPosition = new SelectionChartXSliderPosition(
+            _tourChart,
+            leftSliderValuesIndex,
+            rightSliderValuesIndex);
+
+      xSliderPosition.setCenterSliderPosition(isCenterSliderPosition);
+
+      _tourChart.selectXSliders(xSliderPosition);
+   }
+
+   private void setupUndoContext() {
+
+      final IViewSite viewSite = getViewSite();
+      final IActionBars actionBars = viewSite.getActionBars();
+
+      // 1. Get or create your unique Undo Context
+      // Usually specific to your editor instance to avoid affecting other parts
+      _undoContext = new UndoContext();
+
+      _undoActionHandler = new UndoActionHandler(getViewSite(), _undoContext);
+      _redoActionHandler = new RedoActionHandler(getViewSite(), _undoContext);
+
+      // 3. Register it as the global Action Handler for the Undo command
+      actionBars.setGlobalActionHandler(ActionFactory.UNDO.getId(), _undoActionHandler);
+      actionBars.setGlobalActionHandler(ActionFactory.REDO.getId(), _redoActionHandler);
+
+      // 4. Update the action bars to apply changes
+      actionBars.updateActionBars();
+   }
+
    private void showTour() {
 
       final ISelection selection = getSite().getWorkbenchWindow().getSelectionService().getSelection();
@@ -1180,6 +1277,62 @@ public class TourChartView extends ViewPart implements
       }
    }
 
+   void undoRedo_DeleteTimeSlice(final TourData tourData, final int firstIndex, final int lastIndex) {
+
+      // Inside an action listener or command handler
+      final TourDataUndoOperation op = new TourDataUndoOperation(
+
+            "%d: %s".formatted(
+                  ++_undoCounter,
+                  TimeTools.Formatter_DateTime_SM.format(TimeTools.now())),
+
+            this,
+            tourData,
+            firstIndex,
+            lastIndex);
+
+      // Assign the context scope
+      op.addContext(_undoContext);
+
+      try {
+
+         // Execute via the history framework
+         final IOperationHistory opHistory = PlatformUI.getWorkbench().getOperationSupport().getOperationHistory();
+
+         opHistory.execute(op, null, null);
+
+      } catch (final ExecutionException e) {
+
+         StatusUtil.log(e);
+      }
+   }
+
+   TourData undoRedo_GetOldData() {
+
+      return _tourChart.getUndoTourData();
+   }
+
+   void undoRedo_SetNewData(final TourData newTourData, final int firstIndex, final int lastIndex) {
+
+      _tourChart.setTourDirty(true);
+
+      // compute break time
+      newTourData.getBreakTimeSerie();
+
+      updateChart(newTourData, true);
+
+      final int indexDiff = lastIndex - firstIndex;
+      final int newLastIndex = lastIndex - indexDiff;
+
+      setSliderPositions(
+            newLastIndex - 1,
+            newLastIndex,
+            false);
+
+      // update undo/redo enablement
+      getViewSite().getActionBars().updateActionBars();
+   }
+
    /**
     * Create virtual tour which contains multiple tours.
     *
@@ -1208,7 +1361,9 @@ public class TourChartView extends ViewPart implements
       fireSliderPosition();
    }
 
-   private void updateChart(final long tourId, final int leftSliderValuesIndex, final int rightSliderValuesIndex) {
+   private void updateChart(final long tourId,
+                            final int leftSliderValuesIndex,
+                            final int rightSliderValuesIndex) {
 
       final TourData tourData = TourManager.getInstance().getTourData(tourId);
 
@@ -1220,25 +1375,41 @@ public class TourChartView extends ViewPart implements
          updateChart(tourData);
       }
 
-      // set slider position
-      final SelectionChartXSliderPosition xSliderPosition = new SelectionChartXSliderPosition(
-            _tourChart,
-            leftSliderValuesIndex,
-            rightSliderValuesIndex);
-
-      xSliderPosition.setCenterSliderPosition(true);
-
-      _tourChart.selectXSliders(xSliderPosition);
+      setSliderPositions(leftSliderValuesIndex, rightSliderValuesIndex, true);
    }
 
    private void updateChart(final TourData tourData) {
+
+      updateChart(tourData, false);
+   }
+
+   private void updateChart(final TourData tourData, final boolean keepMinMaxValues) {
 
       if (tourData == null) {
          // nothing to do
          return;
       }
 
+      boolean isOtherTourID = true;
+
+      if (_tourData != null) {
+
+         final Long oldTourID = _tourData.getTourId();
+         final Long newTourID = tourData.getTourId();
+
+         isOtherTourID = oldTourID.equals(newTourID) == false;
+      }
+
       _tourData = tourData;
+
+      if (isOtherTourID) {
+
+         // clear undo and redo history for a new tour
+
+         disposeUndo();
+
+         _undoCounter = 0;
+      }
 
       TourManager.getInstance().setActiveTourChart(_tourChart);
 
@@ -1247,7 +1418,7 @@ public class TourChartView extends ViewPart implements
       // set or reset photo link
       _tourData.tourPhotoLink = _tourPhotoLink;
 
-      _tourChart.updateTourChart(_tourData, _tourChartConfig, false);
+      _tourChart.updateTourChart(_tourData, _tourChartConfig, keepMinMaxValues);
 
       // set application window title tool tip
       setTitleToolTip(TourManager.getTourDateShort(_tourData));

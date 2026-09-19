@@ -43,7 +43,7 @@ public class ActionDeleteTimeSlices_KeepTime extends Action {
    @Override
    public void run() {
 
-      _tourChart.actionDelete_TimeSlices(
+      _tourChart.actionDeleteTimeSlices(
 
             false, // isRemoveTime
 

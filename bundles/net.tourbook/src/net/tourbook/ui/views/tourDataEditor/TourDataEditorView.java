@@ -125,6 +125,7 @@ import net.tourbook.ui.action.ActionSetTourTypeMenu;
 import net.tourbook.ui.action.ActionSplitTour;
 import net.tourbook.ui.tourChart.ChartLabelMarker;
 import net.tourbook.ui.tourChart.TourChart;
+import net.tourbook.ui.tourChart.TourChartView;
 import net.tourbook.ui.views.WeatherProvider;
 import net.tourbook.ui.views.WeatherProvidersUI;
 import net.tourbook.ui.views.referenceTour.SelectionReferenceTourView;
@@ -2806,8 +2807,8 @@ public class TourDataEditorView extends ViewPart implements
                 */
                final ICommandService cs = PlatformUI.getWorkbench().getService(ICommandService.class);
 
-               cs.refreshElements(AppCommands.COMMAND_NET_TOURBOOK_TOUR_SAVE_TOUR, null);
-               cs.refreshElements(AppCommands.COMMAND_NET_TOURBOOK_TOUR_RESTORE_TOUR, null);
+               cs.refreshElements(AppCommands.COMMAND_NET_TOURBOOK_TOUR_SAVE_TOUR_IN_EDITOR, null);
+               cs.refreshElements(AppCommands.COMMAND_NET_TOURBOOK_TOUR_RESTORE_TOUR_IN_EDITOR, null);
             }
          }
       };
@@ -2988,7 +2989,31 @@ public class TourDataEditorView extends ViewPart implements
                   return;
                }
 
+               if (workbenchPart instanceof TourChartView) {
+
+                  /*
+                   * Currently the modifications in the tour chart are not synched with the tour
+                   * editor -> too complicated
+                   */
+
+                  // set tour editor into the readonly mode
+
+                  if (_isEditMode) {
+
+                     _isEditMode = false;
+
+                     _actionToggleReadEditMode.setChecked(false);
+                     _actionToggleReadEditMode.setEnabled(false);
+
+                     enableActions();
+                     enableControls();
+                  }
+
+                  return;
+               }
+
                for (final TourData tourData : modifiedTours) {
+
                   if (tourData.getTourId() == tourDataEditorTourId) {
 
                      // update modified tour
@@ -7237,6 +7262,8 @@ public class TourDataEditorView extends ViewPart implements
       final boolean canEdit = _isEditMode && isTourInDb;
       final boolean canEditDistance = _isManualTour == false;
 
+      final boolean isTourModifiedInChart = TourManager.isTourModified_InChart();
+
       // all actions are disabled when a cell editor is activated
       final boolean isCellEditorInactive = _isCellEditorActive == false;
 
@@ -7268,7 +7295,7 @@ public class TourDataEditorView extends ViewPart implements
                   && (isTimeSlice_ViewerTab || isSwimSlice_ViewerTab)
                   && isTourValid
                   && (_isManualTour == false));
-      _actionToggleReadEditMode.setEnabled(isCellEditorInactive && isTourInDb);
+      _actionToggleReadEditMode.setEnabled(isCellEditorInactive && isTourInDb && isTourModifiedInChart == false);
 
       _actionSetStartDistanceTo_0.setEnabled(isCellEditorInactive && canEditDistance && canEdit && isDistanceLargerThan0);
       _actionDeleteDistanceValues.setEnabled(isCellEditorInactive && canEditDistance && canEdit && isDistanceAvailable);

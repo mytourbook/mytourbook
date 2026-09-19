@@ -311,6 +311,8 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
     * Part in which the tour chart is created, can be <code>null</code> when created in a dialog.
     */
    private IWorkbenchPart                                   _part;
+   private TourChartView                                    _tourChartView;
+   private boolean                                          _isWithUndo;
    //
    private TourData                                         _tourData;
    private TourChartConfiguration                           _tcc;
@@ -868,6 +870,12 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
       _part = part;
       _state = state;
 
+      if (_part instanceof final TourChartView view) {
+
+         _tourChartView = view;
+         _isWithUndo = true;
+      }
+
 //      /*
 //       * when the focus is changed, fire a tour chart selection, this is necessary to update the
 //       * tour markers when a tour chart got the focus
@@ -995,9 +1003,9 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
     * @param isRemoveDistance
     * @param isAdjustTourStartTime
     */
-   public void actionDelete_TimeSlices(final boolean isRemoveTime,
-                                       final boolean isRemoveDistance,
-                                       final boolean isAdjustTourStartTime) {
+   public void actionDeleteTimeSlices(final boolean isRemoveTime,
+                                      final boolean isRemoveDistance,
+                                      final boolean isAdjustTourStartTime) {
 
       // check if the tour editor contains a modified tour
       if (TourManager.isTourEditorModified()) {
@@ -1026,30 +1034,44 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
       }
 
       // get selected time slices
-      final int firstIndex = getLeftSlider().getValuesIndex();
-      final int lastIndex = getRightSlider().getValuesIndex();
+      final int firstIndex = getLeftSlider().getValuesIndex() + 1;
+      final int lastIndex = getRightSlider().getValuesIndex() - 1;
 
       // check if markers are within the selection
       if (canDeleteMarkers(firstIndex, lastIndex) == false) {
          return;
       }
 
+      final TourData modifiedTourData = _isWithUndo
+            ? _tourData.clone()
+            : _tourData;
+
       TourManager.removeTimeSlices(
 
-            _tourData,
+            modifiedTourData,
             firstIndex,
             lastIndex,
             isRemoveTime,
             isRemoveDistance,
             isAdjustTourStartTime);
 
-      updateTourChart();
+      if (_isWithUndo) {
 
-      // notify other viewers
-      fireTourIsModified();
+         _tourChartView.undoRedo_DeleteTimeSlice(modifiedTourData, firstIndex, lastIndex);
 
-      // VERY IMPORTANT to run async, it took me hours to fix this
-      _parent.getDisplay().asyncExec(() -> setTourDirty(true));
+      } else {
+
+         updateTourChart();
+      }
+
+      _parent.getDisplay().asyncExec(() -> {
+
+         // VERY IMPORTANT to run async, it took me hours to fix this
+         setTourDirty(true);
+
+         // notify other viewers AFTER it is dirty to disable the tour editor
+         fireTourIsModified();
+      });
    }
 
    public void actionGraphOverlapped(final boolean isItemChecked) {
@@ -1405,9 +1427,9 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
     */
    private boolean canDeleteMarkers(final int firstSliceIndex, final int lastSliceIndex) {
 
-      final Integer[] markerSerieIndex = _allMarkerBySerieIndex.keySet().toArray(new Integer[_allMarkerBySerieIndex.size()]);
+      final Integer[] allMarkerSerieIndex = _allMarkerBySerieIndex.keySet().toArray(new Integer[_allMarkerBySerieIndex.size()]);
 
-      for (final Integer markerIndex : markerSerieIndex) {
+      for (final Integer markerIndex : allMarkerSerieIndex) {
 
          if ((markerIndex >= firstSliceIndex) && (markerIndex <= lastSliceIndex)) {
 
@@ -3754,6 +3776,11 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
       return null;
    }
 
+   TourData getUndoTourData() {
+
+      return _tourData;
+   }
+
    Font getValueFont() {
 
       if (_segmenterValueFont == null) {
@@ -5754,7 +5781,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 
       final IContributionItem[] allItems = tbm.getItems();
 
-      final IContributionItem contItemSave = tbm.find(AppCommands.COMMAND_NET_TOURBOOK_TOUR_SAVE_TOUR);
+      final IContributionItem contItemSave = tbm.find(AppCommands.COMMAND_NET_TOURBOOK_TOUR_SAVE_TOUR_IN_CHART);
 
       if (contItemSave != null) {
 
@@ -5773,9 +5800,8 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
          /**
           * The property change must be fired to show the star "*" marker in the part name
           */
-         if (_part instanceof final TourChartView view) {
-
-            view.firePropertyChange();
+         if (_tourChartView != null) {
+            _tourChartView.firePropertyChange();
          }
 
          setSaveActionVisible(isDirty);

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2026 Wolfgang Schramm and Contributors
+ * Copyright (C) 2026 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -20,7 +20,7 @@ import java.util.Map;
 import net.tourbook.Images;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.tour.TourManager;
-import net.tourbook.ui.views.tourDataEditor.TourDataEditorView;
+import net.tourbook.ui.tourChart.TourChartView;
 
 import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
@@ -31,7 +31,7 @@ import org.eclipse.ui.commands.IElementUpdater;
 import org.eclipse.ui.handlers.HandlerUtil;
 import org.eclipse.ui.menus.UIElement;
 
-public class SaveTour_Handler extends AbstractHandler implements IElementUpdater {
+public class SaveTour_Handler_InChart extends AbstractHandler implements IElementUpdater {
 
    private static final ImageDescriptor _iconSaveTour = TourbookPlugin.getThemedImageDescriptor(Images.SaveTour);
 
@@ -40,9 +40,9 @@ public class SaveTour_Handler extends AbstractHandler implements IElementUpdater
 
       final IWorkbenchPart part = HandlerUtil.getActivePart(event);
 
-      if (part instanceof final TourDataEditorView editorView) {
+      if (part instanceof final TourChartView chartView) {
 
-         editorView.doSave(null);
+         chartView.doSave(null);
       }
 
       return null;
@@ -51,7 +51,7 @@ public class SaveTour_Handler extends AbstractHandler implements IElementUpdater
    @Override
    public boolean isEnabled() {
 
-      return TourManager.isTourModified_InEditor();
+      return TourManager.isTourModified_InChart();
    }
 
    @SuppressWarnings("rawtypes")

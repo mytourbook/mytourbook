@@ -827,7 +827,7 @@
 
          <!-- Save Tour -->
          <command
-            commandId      ="command.net.tourbook.tour.SaveTour"
+            commandId      ="command.net.tourbook.tour.SaveTour_InEditor"
             mnemonic       ="%Command_Tour_SaveTour_Mnemonic"
             tooltip        ="%Command_Tour_SaveTour_Tooltip">
             
@@ -838,7 +838,7 @@
 
          <!-- Restore Tour -->
          <command
-            commandId      ="command.net.tourbook.tour.RestoreTour"
+            commandId      ="command.net.tourbook.tour.RestoreTour_InEditor"
             mnemonic       ="%Command_Tour_RestoreTour_Mnemonic"
             tooltip        ="%Command_Tour_RestoreTour_Tooltip">
             
@@ -1609,26 +1609,42 @@
       <!--
          Tour
       -->
+
+      <command
+         id             ="command.net.tourbook.tour.SaveTour_InEditor"
+         name           ="%Command_Tour_SaveTour"/>
       
       <command
-         id             ="command.net.tourbook.tour.RestoreTour"
+         id             ="command.net.tourbook.tour.RestoreTour_InEditor"
          name           ="%Command_Tour_RestoreTour"/>
+         
       <command
-         id             ="command.net.tourbook.tour.SaveTour"
+         id             ="command.net.tourbook.tour.SaveTour_InChart"
          name           ="%Command_Tour_SaveTour"/>
+
+      <command
+         id             ="command.net.tourbook.tour.RestoreTour_InChart"
+         name           ="%Command_Tour_RestoreTour"/>
 
    </extension>
 
    <extension point="org.eclipse.ui.commandImages">
+
+      <image   
+         commandId      ="command.net.tourbook.tour.SaveTour_InEditor"
+         icon           ="icons/save-tour.svg"/>
    
       <image   
-         commandId      ="command.net.tourbook.tour.RestoreTour"
-         icon           ="icons/restore-tour.svg"
-      />
+         commandId      ="command.net.tourbook.tour.RestoreTour_InEditor"
+         icon           ="icons/restore-tour.svg"/>
+
       <image   
-         commandId      ="command.net.tourbook.tour.SaveTour"
-         icon           ="icons/save-tour.svg"
-      />
+         commandId      ="command.net.tourbook.tour.SaveTour_InChart"
+         icon           ="icons/save-tour.svg"/>
+   
+      <image   
+         commandId      ="command.net.tourbook.tour.RestoreTour_InChart"
+         icon           ="icons/restore-tour.svg"/>
 
    </extension>
    
@@ -2137,13 +2153,13 @@
          schemeId    ="net.tourbook.scheme"/>
 
       <key
-         commandId   ="command.net.tourbook.tour.RestoreTour"
+         commandId   ="command.net.tourbook.tour.RestoreTour_InEditor"
          sequence    ="%Shortcut_Key_App_RestoreTour"
          contextId   ="org.eclipse.ui.contexts.window"
          schemeId    ="net.tourbook.scheme"/>
          
       <key
-         commandId   ="command.net.tourbook.tour.SaveTour"
+         commandId   ="command.net.tourbook.tour.SaveTour_InEditor"
          sequence    ="%Shortcut_Key_App_SaveTour"
          contextId   ="org.eclipse.ui.contexts.window"
          schemeId    ="net.tourbook.scheme"/>
@@ -2187,10 +2203,10 @@
       <!-- Preferences -->            
 
       <key
-         commandId="command.net.tourbook.preferences"
-         sequence="%Shortcut_Key_App_Preferences"
-         contextId="org.eclipse.ui.contexts.window"
-         schemeId="net.tourbook.scheme"/>
+         commandId   ="command.net.tourbook.preferences"
+         sequence    ="%Shortcut_Key_App_Preferences"
+         contextId   ="org.eclipse.ui.contexts.window"
+         schemeId    ="net.tourbook.scheme"/>
 
       <!-- Tools -->
    
@@ -2221,10 +2237,9 @@
    <extension point="org.eclipse.ui.commands">
 
       <command
-            id="net.tourbook.map25.command.TourMap25"
-            name="%View_Name_TourMap25"
-            defaultHandler="net.tourbook.map25.action.ActionHandler_OpenView_Map25"
-            />
+         id             ="net.tourbook.map25.command.TourMap25"
+         name           ="%View_Name_TourMap25"
+         defaultHandler ="net.tourbook.map25.action.ActionHandler_OpenView_Map25"/>
                
    </extension>
 
@@ -2504,11 +2519,11 @@
    -->
 
    <extension
-      id="net.tourbook.fragment"
-      point="org.eclipse.e4.workbench.model">
+      id    = "net.tourbook.fragment"
+      point = "org.eclipse.e4.workbench.model">
       
       <fragment
-         uri="fragment.e4xmi">
+         uri   =  "fragment.e4xmi">
       </fragment>
    </extension>
    
@@ -2535,23 +2550,29 @@
    -->
    
    <extension point="org.eclipse.ui.handlers">
+   
+      <!-- 
+         TOUR EDITOR 
+      -->
 
-      <!-- this handler is enabled/disabled in the command handler: net.tourbook.commands.RestoreTour_Handler.isEnabled() -->
+      <!-- This handler is enabled/disabled in the command handler: .isEnabled() -->
       <handler
-         commandId   ="command.net.tourbook.tour.RestoreTour"
-         class       ="net.tourbook.commands.RestoreTour_Handler"
-      />
+         commandId   = "command.net.tourbook.tour.SaveTour_InEditor"
+         class       = "net.tourbook.commands.SaveTour_Handler"/>
 
-      <!-- this handler is enabled/disabled in the command handler: net.tourbook.commands.SaveTour_Handler.isEnabled() -->
+      <!-- This handler is enabled/disabled in the command handler: .isEnabled() -->
       <handler
-         commandId   ="command.net.tourbook.tour.SaveTour"
-         class       ="net.tourbook.commands.SaveTour_Handler"
-      />
+         commandId   = "command.net.tourbook.tour.RestoreTour_InEditor"
+         class       = "net.tourbook.commands.RestoreTour_Handler"/>
+         
+      <!-- 
+         ALL PARTS
+      -->
 
       <!-- This handler is enabled when at least one part is opened -->
       <handler
-            commandId   ="net.tourbook.command.App_ClosePart"
-            class       ="net.tourbook.commands.ClosePart_Handler"
+         commandId   = "net.tourbook.command.App_ClosePart"
+         class       = "net.tourbook.commands.ClosePart_Handler"
       >
          <enabledWhen>
             <with variable="activePart">
@@ -2587,17 +2608,15 @@
    
          <!-- Save Tour -->
          <command
-            commandId      ="command.net.tourbook.tour.SaveTour"
-            mnemonic       ="%Command_Tour_SaveTour_Mnemonic"
-            tooltip        ="%Command_Tour_SaveTour_Tooltip">
-         </command>
+            commandId      = "command.net.tourbook.tour.SaveTour_InEditor"
+            mnemonic       = "%Command_Tour_SaveTour_Mnemonic"
+            tooltip        = "%Command_Tour_SaveTour_Tooltip"/>
 
          <!-- Restore Tour -->
          <command
-            commandId      ="command.net.tourbook.tour.RestoreTour"
-            mnemonic       ="%Command_Tour_RestoreTour_Mnemonic"
-            tooltip        ="%Command_Tour_RestoreTour_Tooltip">
-         </command>
+            commandId      = "command.net.tourbook.tour.RestoreTour_InEditor"
+            mnemonic       = "%Command_Tour_RestoreTour_Mnemonic"
+            tooltip        = "%Command_Tour_RestoreTour_Tooltip"/>
    
       </menuContribution>
    
@@ -2609,22 +2628,58 @@
       TOUR CHART
    
    -->
+
+   <extension point="org.eclipse.ui.handlers">
+
+      <!-- This handler is enabled/disabled in the command handler: .isEnabled() -->
+      <handler
+         commandId   = "command.net.tourbook.tour.SaveTour_InChart"
+         class       = "net.tourbook.commands.SaveTour_Handler_InChart"/>
+
+      <!-- This handler is enabled/disabled in the command handler: .isEnabled() -->
+      <handler
+         commandId   = "command.net.tourbook.tour.RestoreTour_InChart"
+         class       = "net.tourbook.commands.RestoreTour_Handler_InChart"/>
+      
+   </extension>
+   
    
    <extension point="org.eclipse.ui.menus">
    
       <!-- 
-            Show save/undo actions in the tour chart toolbar
+         Show save/undo actions in the tour chart toolbar
       -->
 
       <menuContribution locationURI="toolbar:net.tourbook.views.TourChartView?after=group_SaveAndUndoActions">
    
          <!-- Save Tour -->
          <command
-            commandId      ="command.net.tourbook.tour.SaveTour"
+            commandId      ="command.net.tourbook.tour.SaveTour_InChart"
             mnemonic       ="%Command_Tour_SaveTour_Mnemonic"
-            tooltip        ="%Command_Tour_SaveTour_Tooltip">
-         </command>
+            tooltip        ="%Command_Tour_SaveTour_Tooltip"
+         />
+
+         <!-- Restore Tour -->
+         <command
+            commandId      ="command.net.tourbook.tour.RestoreTour_InChart"
+            mnemonic       ="%Command_Tour_RestoreTour_Mnemonic"
+            tooltip        ="%Command_Tour_RestoreTour_Tooltip"
+         />
    
+         <!-- Undo -->
+         <command
+            commandId   = "org.eclipse.ui.edit.undo"
+            id          = "undoredo.undo"
+            style       = "push"
+         />
+      
+         <!-- Redo -->
+         <command
+            commandId   = "org.eclipse.ui.edit.redo"
+            id          = "undoredo.redo"
+            style       = "push"
+         />
+            
       </menuContribution>
       
    </extension>

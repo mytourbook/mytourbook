@@ -71,6 +71,7 @@ public class TourChartContextProvider implements IChartContextProvider, ITourPro
    private ActionCreateMarkerFromValuePoint           _actionCreateMarkerFromValuePoint;
    private ActionEditQuick                            _actionQuickEdit;
    private ActionDeleteMarker                         _actionDeleteMarker;
+   private ActionDeleteTimeSlices_KeepTime            _actionDeleteTimeSlices_KeepTime;
    private ActionEditTour                             _actionEditTour;
    private ActionExport                               _actionExportTour;
    private ActionOpenAdjustAltitudeDialog             _actionOpenAdjustAltitudeDialog;
@@ -84,8 +85,6 @@ public class TourChartContextProvider implements IChartContextProvider, ITourPro
 
    private ChartXSlider                               _leftSlider;
    private ChartXSlider                               _rightSlider;
-
-   private ActionDeleteTimeSlices_KeepTime            _actionDeleteTimeSlices_KeepTime;
 
    /**
     * Provides a context menu for a tour chart
@@ -122,9 +121,9 @@ public class TourChartContextProvider implements IChartContextProvider, ITourPro
       _actionDeleteMarker                 = new ActionDeleteMarker(tourChart);
       _actionSetMarkerVisible             = new ActionSetMarkerVisible(tourChart);
       _actionSetMarkerPosition            = new ActionSetMarkerLabelPositionMenu(tourChart);
-                                          
+
       _actionExportTour                   = new ActionExport(this);
-                                          
+
       _actionOpenMarkerDialog             = new ActionOpenMarkerDialog(this, true);
       _actionOpenMarkerDialog.setEnabled(true);
 
@@ -132,10 +131,10 @@ public class TourChartContextProvider implements IChartContextProvider, ITourPro
       _actionOpenAdjustAltitudeDialog.setEnabled(true);
 
       _actionSetTourType                  = new ActionSetTourTypeMenu(this);
-                                          
+
       _tagMenuManager                     = new TagMenuManager(this, true);
       _tourTypeMenuManager                = new TourTypeMenuManager(this);
-                                          
+
       _actionPrefDialog                   = new ActionOpenPrefDialog(Messages.Tour_Action_EditChartPreferences, PrefPageAppearanceTourChart.ID);
 
       _actionDeleteTimeSlices_KeepTime                            = new ActionDeleteTimeSlices_KeepTime(tourChart);
@@ -344,6 +343,7 @@ public class TourChartContextProvider implements IChartContextProvider, ITourPro
 
          _actionOpenMarkerDialog.setEnabled(isTourSaved);
          _actionDeleteMarker.setEnabled(isTourSaved);
+         _actionDeleteTimeSlices_KeepTime.setEnabled(isTourSaved);
       }
    }
 

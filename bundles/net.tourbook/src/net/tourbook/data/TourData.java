@@ -140,7 +140,7 @@ import pixelitor.filters.curves.ToneCurvesFilter;
 @XmlAccessorType(XmlAccessType.NONE)
 @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "tourId")
 
-public class TourData implements Comparable<Object>, IXmlSerializable, Serializable {
+public class TourData implements Cloneable, Comparable<Object>, IXmlSerializable, Serializable {
 
    private static final long             serialVersionUID                  = 1L;
 
@@ -955,6 +955,10 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
 
    // ############################################# NUTRITION #############################################
 
+   /**
+    * This field is used but the read access is currently only with SQL
+    */
+   @SuppressWarnings("unused")
    private float                 nutrition_TotalCarbohydrates;
 
    // ############################################# UNUSED FIELDS - START #############################################
@@ -2725,6 +2729,84 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
    }
 
    /**
+    * This is needed for the undo/redo feature
+    */
+   @Override
+   public TourData clone() {
+
+      TourData clonedTourData = null;
+
+      try {
+
+         clonedTourData = (TourData) super.clone();
+
+         clonedTourData.tourMarkers = cloneTourMarkers();
+
+         // clone value series
+
+// SET_FORMATTING_OFF
+
+         clonedTourData.timeSerie                     = cloneSerie(timeSerie);
+         clonedTourData.altitudeSerie                 = cloneSerie(altitudeSerie);
+         clonedTourData.cadenceSerie                  = cloneSerie(cadenceSerie);
+         clonedTourData.distanceSerie                 = cloneSerie(distanceSerie);
+         clonedTourData.pulseSerie                    = cloneSerie(pulseSerie);
+         clonedTourData.temperatureSerie              = cloneSerie(temperatureSerie);
+         clonedTourData.powerSerie                    = cloneSerie(powerSerie);
+         clonedTourData.speedSerie                    = cloneSerie(speedSerie);
+         clonedTourData.pausedTime_Start              = cloneSerie(pausedTime_Start);
+         clonedTourData.pausedTime_End                = cloneSerie(pausedTime_End);
+         clonedTourData.pausedTime_Data               = cloneSerie(pausedTime_Data);
+
+         if (latitudeSerie != null) {
+
+            clonedTourData.latitudeSerie              = cloneSerie(latitudeSerie);
+            clonedTourData.longitudeSerie             = cloneSerie(longitudeSerie);
+         }
+
+         clonedTourData.gearSerieCombined             = cloneSerie(gearSerieCombined);
+
+         clonedTourData.pulseTime_Milliseconds        = cloneSerie(pulseTime_Milliseconds);
+         clonedTourData.pulseTime_TimeIndex           = cloneSerie(pulseTime_TimeIndex);
+
+         // running dynamics
+         clonedTourData.runDyn_StanceTime             = cloneSerie(runDyn_StanceTime);
+         clonedTourData.runDyn_StanceTimeBalance      = cloneSerie(runDyn_StanceTimeBalance);
+         clonedTourData.runDyn_StepLength             = cloneSerie(runDyn_StepLength);
+         clonedTourData.runDyn_VerticalOscillation    = cloneSerie(runDyn_VerticalOscillation);
+         clonedTourData.runDyn_VerticalRatio          = cloneSerie(runDyn_VerticalRatio);
+
+         // swimming
+         clonedTourData.swim_LengthType               = cloneSerie(swim_LengthType);
+         clonedTourData.swim_Cadence                  = cloneSerie(swim_Cadence);
+         clonedTourData.swim_Strokes                  = cloneSerie(swim_Strokes);
+         clonedTourData.swim_StrokeStyle              = cloneSerie(swim_StrokeStyle);
+         clonedTourData.swim_Time                     = cloneSerie(swim_Time);
+
+         // currently only surfing data can be made visible
+         clonedTourData.visibleDataPointSerie         = cloneSerie(visiblePoints_ForSurfing);
+
+         // battery
+         clonedTourData.battery_Percentage            = cloneSerie(battery_Percentage);
+         clonedTourData.battery_Time                  = cloneSerie(battery_Time);
+
+         // radar
+         clonedTourData.radar_PassedVehicles          = cloneSerie(radar_PassedVehicles);
+         clonedTourData.radar_DistanceToVehicle       = cloneSerie(radar_DistanceToVehicle);
+         clonedTourData.radar_PassingSpeed_Absolute   = cloneSerie(radar_PassingSpeed_Absolute);
+         clonedTourData.radar_PassingSpeed_Relative   = cloneSerie(radar_PassingSpeed_Relative);
+
+// SET_FORMATTING_ON
+
+      } catch (final CloneNotSupportedException e) {
+
+         StatusUtil.log(e);
+      }
+
+      return clonedTourData;
+   }
+
+   /**
     * This method is cloning only a part of the tour, e.g. {@link #serieData} is not
     * cloned
     */
@@ -2751,6 +2833,41 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
 // SET_FORMATTING_ON
 
       return tourDataCopy;
+   }
+
+   private boolean[] cloneSerie(final boolean[] valueSerie) {
+      return valueSerie == null ? null : valueSerie.clone();
+   }
+
+   private double[] cloneSerie(final double[] valueSerie) {
+      return valueSerie == null ? null : valueSerie.clone();
+   }
+
+   private float[] cloneSerie(final float[] valueSerie) {
+      return valueSerie == null ? null : valueSerie.clone();
+   }
+
+   private int[] cloneSerie(final int[] valueSerie) {
+      return valueSerie == null ? null : valueSerie.clone();
+   }
+
+   private long[] cloneSerie(final long[] valueSerie) {
+      return valueSerie == null ? null : valueSerie.clone();
+   }
+
+   private short[] cloneSerie(final short[] valueSerie) {
+      return valueSerie == null ? null : valueSerie.clone();
+   }
+
+   private Set<TourMarker> cloneTourMarkers() {
+
+      final Set<TourMarker> allClonedTourMarkers = new HashSet<>();
+
+      for (final TourMarker tourMarker : tourMarkers) {
+         allClonedTourMarkers.add(tourMarker.clone());
+      }
+
+      return allClonedTourMarkers;
    }
 
    /**

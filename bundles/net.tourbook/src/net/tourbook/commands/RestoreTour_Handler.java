@@ -20,6 +20,7 @@ import java.util.Map;
 import net.tourbook.Images;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.tour.TourManager;
+import net.tourbook.ui.views.tourDataEditor.TourDataEditorView;
 
 import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
@@ -39,9 +40,9 @@ public class RestoreTour_Handler extends AbstractHandler implements IElementUpda
 
       final IWorkbenchPart part = HandlerUtil.getActivePart(event);
 
-      if (part instanceof ISaveAndRestorePart) {
+      if (part instanceof final TourDataEditorView editorView) {
 
-         ((ISaveAndRestorePart) part).doRestore();
+         editorView.doRestore();
       }
 
       return null;
@@ -50,7 +51,7 @@ public class RestoreTour_Handler extends AbstractHandler implements IElementUpda
    @Override
    public boolean isEnabled() {
 
-      return TourManager.isTourModified();
+      return TourManager.isTourModified_InEditor();
    }
 
    @SuppressWarnings("rawtypes")
