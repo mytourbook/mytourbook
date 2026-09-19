@@ -52,6 +52,7 @@ public class ImportConfig implements Cloneable {
    private long               _id;
 
    public boolean             isMountDevice;
+   public boolean             isPremountDevice;
    public boolean             isUnmountDevice;
    public boolean             isVerifyMountCommand;
    public boolean             isVerifyUnmountCommand;
