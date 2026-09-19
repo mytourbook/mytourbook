@@ -111,6 +111,7 @@ public class EasyImportManager {
    private static final String      ATTR_TOUR_TYPE_NAME                                   = "tourTypeName";                                           //$NON-NLS-1$
    //
    private static final String      ATTR_IS_MOUNT_DEVICE                                  = "isMountDevice";                                          //$NON-NLS-1$
+   private static final String      ATTR_IS_PREMOUNT_DEVICE                               = "isPremountDevice";                                       //$NON-NLS-1$
    private static final String      ATTR_IS_UNMOUNT_DEVICE                                = "isUnmountDevice";                                        //$NON-NLS-1$
    private static final String      ATTR_IS_VERIFY_MOUNT_COMMAND                          = "isVerifyMountCommand";                                   //$NON-NLS-1$
    private static final String      ATTR_IS_VERIFY_UNMOUNT_COMMAND                        = "isVerifyUnmountCommand";                                 //$NON-NLS-1$
@@ -893,6 +894,7 @@ public class EasyImportManager {
       importConfig.fileGlobPattern           = Util.getXmlString( xmlConfig,  ATTR_DEVICE_FILES, ImportConfig.DEVICE_FILES_DEFAULT);
 
       importConfig.isMountDevice             = Util.getXmlBoolean(xmlConfig,  ATTR_IS_MOUNT_DEVICE,            false);
+      importConfig.isPremountDevice          = Util.getXmlBoolean(xmlConfig,  ATTR_IS_PREMOUNT_DEVICE,         false);
       importConfig.isUnmountDevice           = Util.getXmlBoolean(xmlConfig,  ATTR_IS_UNMOUNT_DEVICE,          false);
       importConfig.isVerifyMountCommand      = Util.getXmlBoolean(xmlConfig,  ATTR_IS_VERIFY_MOUNT_COMMAND,    false);
       importConfig.isVerifyUnmountCommand    = Util.getXmlBoolean(xmlConfig,  ATTR_IS_VERIFY_UNMOUNT_COMMAND,  false);
@@ -1471,6 +1473,7 @@ public class EasyImportManager {
 
          // mount/unmount
          xmlImportConfig.putBoolean(ATTR_IS_MOUNT_DEVICE,            importConfig.isMountDevice);
+         xmlImportConfig.putBoolean(ATTR_IS_PREMOUNT_DEVICE,         importConfig.isPremountDevice);
          xmlImportConfig.putBoolean(ATTR_IS_UNMOUNT_DEVICE,          importConfig.isUnmountDevice);
          xmlImportConfig.putBoolean(ATTR_IS_VERIFY_MOUNT_COMMAND,    importConfig.isVerifyMountCommand);
          xmlImportConfig.putBoolean(ATTR_IS_VERIFY_UNMOUNT_COMMAND,  importConfig.isVerifyUnmountCommand);

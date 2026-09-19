@@ -281,6 +281,7 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements IActionRe
    private Button               _chkIC_DeleteDeviceFiles;
    private Button               _chkIC_ImportFiles;
    private Button               _chkIC_IsMountDevice;
+   private Button               _chkIC_IsPremountDevice;
    private Button               _chkIC_IsUnmountDevice;
    private Button               _chkIC_IsVerifyMountCommand;
    private Button               _chkIC_IsVerifyUnmountCommand;
@@ -1790,6 +1791,22 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements IActionRe
                .grab(true, true)
                .span(2, 1)
                .applyTo(_txtIC_Command_DeviceInfo_Log);
+      }
+      {
+         /*
+          * Pre-mount command
+          */
+
+         UI.createSpacer_Horizontal(parent);
+
+         _chkIC_IsPremountDevice = new Button(parent, SWT.CHECK);
+         _chkIC_IsPremountDevice.setText("Run this command &before the mount command");
+         _chkIC_IsPremountDevice.setToolTipText("This command can be used to initialize the mount tool");
+         _chkIC_IsPremountDevice.addSelectionListener(_icSelectionListener);
+
+         GridDataFactory.fillDefaults()
+               .span(2, 1)
+               .applyTo(_chkIC_IsPremountDevice);
       }
       {
          /*
@@ -6159,6 +6176,7 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements IActionRe
       _selectedIC.fileGlobPattern            = _txtIC_DeviceFiles                .getText();
 
       _selectedIC.isMountDevice              = _chkIC_IsMountDevice              .getSelection();
+      _selectedIC.isPremountDevice           = _chkIC_IsPremountDevice           .getSelection();
       _selectedIC.isUnmountDevice            = _chkIC_IsUnmountDevice            .getSelection();
       _selectedIC.isVerifyMountCommand       = _chkIC_IsVerifyMountCommand       .getSelection();
       _selectedIC.isVerifyUnmountCommand     = _chkIC_IsVerifyUnmountCommand     .getSelection();
@@ -6478,6 +6496,7 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements IActionRe
          // mount/unmount
          _lblIC_Dev_SelectedConfig           .setText(      _selectedIC.name);
          _chkIC_IsMountDevice                .setSelection( _selectedIC.isMountDevice);
+         _chkIC_IsPremountDevice             .setSelection( _selectedIC.isPremountDevice);
          _chkIC_IsUnmountDevice              .setSelection( _selectedIC.isUnmountDevice);
          _chkIC_IsVerifyMountCommand         .setSelection( _selectedIC.isVerifyMountCommand);
          _chkIC_IsVerifyUnmountCommand       .setSelection( _selectedIC.isVerifyUnmountCommand);

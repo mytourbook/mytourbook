@@ -5184,8 +5184,18 @@ public class RawDataView extends ViewPart implements
 
       TourLogManager.log_TITLE(Messages.Import_Data_Log_MountDevice);
 
+      final boolean isPremount = selectedConfig.isPremountDevice;
+      final String commandPremount = selectedConfig.commandDeviceInfo;
+
+      // check pre-mount command
+      if (isPremount && StringUtils.isNullOrEmpty(commandPremount)) {
+         TourLogManager.log_ERROR("Mount device: Pre-mount command cannot be empty");
+         return;
+      }
+
       final String commandMount = selectedConfig.commandMount;
 
+      // check mount command
       if (StringUtils.isNullOrEmpty(commandMount)) {
          TourLogManager.log_ERROR(Messages.Import_Data_Log_MountDevice_MountCommandCannotBeEmpty);
          return;
@@ -5197,12 +5207,44 @@ public class RawDataView extends ViewPart implements
 
          BusyIndicator.showWhile(_display, (() -> {
 
-            mountImportDevice_1_On_Async(selectedConfig, commandMount);
+            if (isPremount) {
+               mountImportDevice_2_On_Async_Premount(selectedConfig, commandPremount);
+            }
+
+            mountImportDevice_3_On_Async_Mount(selectedConfig, commandMount);
          }));
       });
    }
 
-   private void mountImportDevice_1_On_Async(final ImportConfig selectedConfig, final String commandMount) {
+   private void mountImportDevice_2_On_Async_Premount(final ImportConfig selectedConfig, final String commandPremount) {
+
+      final String[] allCommands = commandPremount.split(UI.SPACE1);
+
+      final long start = System.currentTimeMillis();
+
+      final ProcessContext processResult = EasyImportManager.runProcess(
+            selectedConfig.mountUnmountTimeout,
+            allCommands);
+
+      final double processDuration = (System.currentTimeMillis() - start) / 1000.0;
+
+      final String failedLogText = processResult.error;
+
+      if (failedLogText != null) {
+
+         // log error message
+
+         TourLogManager.log_ERROR("Mount device: Pre-mount command failed:\n\n%s".formatted(failedLogText));
+
+         return;
+      }
+
+      // pre-mount succeeded
+
+      TourLogManager.log_INFO("Mount device: Pre-mount command was run in %.1f s".formatted(processDuration));
+   }
+
+   private void mountImportDevice_3_On_Async_Mount(final ImportConfig selectedConfig, final String commandMount) {
 
       final String[] allCommands = commandMount.split(UI.SPACE1);
 
@@ -5249,7 +5291,7 @@ public class RawDataView extends ViewPart implements
       }
    }
 
-   private void mountImportDevice_2_Off() {
+   private void mountImportDevice_5_Off() {
 
       final EasyConfig easyConfig = getEasyConfig();
       final ImportConfig selectedConfig = easyConfig.getActiveImportConfig();
@@ -5277,12 +5319,12 @@ public class RawDataView extends ViewPart implements
 
          BusyIndicator.showWhile(_display, (() -> {
 
-            mountImportDevice_2_Off_Async(selectedConfig, commandUnmount);
+            mountImportDevice_5_Off_Async(selectedConfig, commandUnmount);
          }));
       });
    }
 
-   private void mountImportDevice_2_Off_Async(final ImportConfig selectedConfig, final String commandUnmount) {
+   private void mountImportDevice_5_Off_Async(final ImportConfig selectedConfig, final String commandUnmount) {
 
       final String[] allCommands = commandUnmount.split(UI.SPACE1);
 
@@ -7369,7 +7411,7 @@ public class RawDataView extends ViewPart implements
             }
          }
 
-         mountImportDevice_2_Off();
+         mountImportDevice_5_Off();
 
       } catch (final InterruptedException e) {
 
