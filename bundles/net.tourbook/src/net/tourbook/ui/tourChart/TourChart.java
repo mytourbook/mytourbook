@@ -105,6 +105,9 @@ import net.tourbook.ui.views.tourSegmenter.SelectedTourSegmenterSegments;
 import net.tourbook.ui.views.tourSegmenter.TourSegmenterView;
 
 import org.eclipse.collections.impl.list.mutable.primitive.IntArrayList;
+import org.eclipse.core.commands.operations.IOperationHistory;
+import org.eclipse.core.commands.operations.IUndoContext;
+import org.eclipse.core.commands.operations.IUndoableOperation;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.ListenerList;
 import org.eclipse.jface.action.Action;
@@ -139,6 +142,7 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.ui.IViewPart;
 import org.eclipse.ui.IWorkbenchPart;
+import org.eclipse.ui.PlatformUI;
 
 /**
  * The tour chart extends the chart with all the functionality for a tour chart
@@ -312,7 +316,6 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
     */
    private IWorkbenchPart                                   _part;
    private TourChartView                                    _tourChartView;
-   private boolean                                          _isWithUndo;
    //
    private TourData                                         _tourData;
    private TourChartConfiguration                           _tcc;
@@ -873,7 +876,6 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
       if (_part instanceof final TourChartView view) {
 
          _tourChartView = view;
-         _isWithUndo = true;
       }
 
 //      /*
@@ -955,6 +957,8 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 
       setHoveredValueTooltipListener(new HoveredValueTooltipListener());
       setLineSelectionPainter(this);
+
+      getDisplay().asyncExec(() -> setSaveActionVisible(false));
    }
 
    public void actionCanAutoMoveSliders(final boolean isItemChecked) {
@@ -997,7 +1001,8 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
    }
 
    /**
-    * Delete selected time slices
+    * Delete selected time slices, this is only available in the {@link TourChartView} and not in an
+    * embedded dialog
     *
     * @param isRemoveTime
     * @param isRemoveDistance
@@ -1042,32 +1047,29 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
          return;
       }
 
-      final TourData modifiedTourData = _isWithUndo
-            ? _tourData.clone()
-            : _tourData;
+      // modify cloned tour
+      final TourData tourData_Cloned_Before = _tourData.undoRedo_CloneData();
 
       TourManager.removeTimeSlices(
 
-            modifiedTourData,
+            _tourData,
             firstIndex,
             lastIndex,
             isRemoveTime,
             isRemoveDistance,
             isAdjustTourStartTime);
 
-      if (_isWithUndo) {
+      final TourData tourData_Cloned_WithRemovedTimeSliced = _tourData.undoRedo_CloneData();
 
-         _tourChartView.undoRedo_DeleteTimeSlice(modifiedTourData, firstIndex, lastIndex);
+      _tourChartView.undoRedo_DeleteTimeSlice(
 
-      } else {
+            tourData_Cloned_Before,
+            tourData_Cloned_WithRemovedTimeSliced,
 
-         updateTourChart();
-      }
+            firstIndex,
+            lastIndex);
 
       _parent.getDisplay().asyncExec(() -> {
-
-         // VERY IMPORTANT to run async, it took me hours to fix this
-         setTourDirty(true);
 
          // notify other viewers AFTER it is dirty to disable the tour editor
          fireTourIsModified();
@@ -3776,11 +3778,6 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
       return null;
    }
 
-   TourData getUndoTourData() {
-
-      return _tourData;
-   }
-
    Font getValueFont() {
 
       if (_segmenterValueFont == null) {
@@ -5775,17 +5772,36 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
       _isToolbarPack = false;
    }
 
-   private void setSaveActionVisible(final boolean isVisible) {
+   private void setSaveActionVisible(final boolean isDirty) {
+
+      boolean isUndoAvailable = false;
+
+      if (_tourChartView != null) {
+
+         final IUndoContext undoContext = _tourChartView.getUndoContext();
+
+         final IOperationHistory opHistory = PlatformUI.getWorkbench().getOperationSupport().getOperationHistory();
+         final IUndoableOperation[] undoHistory = opHistory.getUndoHistory(undoContext);
+         final IUndoableOperation[] redoHistory = opHistory.getRedoHistory(undoContext);
+
+         isUndoAvailable = undoHistory.length > 0 || redoHistory.length > 0;
+      }
+
+      final boolean isVisible = isDirty || isUndoAvailable;
 
       final IToolBarManager tbm = getToolBarManager();
 
-      final IContributionItem[] allItems = tbm.getItems();
-
       final IContributionItem contItemSave = tbm.find(AppCommands.COMMAND_NET_TOURBOOK_TOUR_SAVE_TOUR_IN_CHART);
+      final IContributionItem contItemRestore = tbm.find(AppCommands.COMMAND_NET_TOURBOOK_TOUR_RESTORE_TOUR_IN_CHART);
+      final IContributionItem contItemUndo = tbm.find("undoredo.undo");
+      final IContributionItem contItemRedo = tbm.find("undoredo.redo");
 
       if (contItemSave != null) {
 
-//         contItemSave.setVisible(isVisible);
+         contItemSave.setVisible(isVisible);
+         contItemRestore.setVisible(isVisible);
+         contItemUndo.setVisible(isVisible);
+         contItemRedo.setVisible(isVisible);
       }
 
       tbm.update(true);
@@ -5801,10 +5817,19 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
           * The property change must be fired to show the star "*" marker in the part name
           */
          if (_tourChartView != null) {
-            _tourChartView.firePropertyChange();
-         }
 
-         setSaveActionVisible(isDirty);
+            // run async otherwise it is not always immediately visible
+            getDisplay().asyncExec(() -> {
+
+               if (isDisposed()) {
+                  return;
+               }
+
+               _tourChartView.firePropertyChange();
+
+               setSaveActionVisible(isDirty);
+            });
+         }
       }
    }
 
@@ -6289,7 +6314,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 
       if (chartDataModel == null) {
 
-         setTourDirty(true);
+         setTourDirty(false);
 
          _tourData = null;
          _tcc = null;
@@ -6542,7 +6567,8 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
     * Update the tour chart with the previous data, configuration and min/max values.
     */
    public void updateTourChart() {
-      updateTourChart_Internal(_tourData, _tcc, true, false);
+
+      updateTourChart_Internal(_tourData, _tcc, true, false, false);
    }
 
    /**
@@ -6552,7 +6578,8 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
     *           <code>true</code> keeps the min/max values from the previous chart
     */
    public void updateTourChart(final boolean keepMinMaxValues) {
-      updateTourChart_Internal(_tourData, _tcc, keepMinMaxValues, false);
+
+      updateTourChart_Internal(_tourData, _tcc, keepMinMaxValues, false, false);
    }
 
    /**
@@ -6560,16 +6587,17 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
     *
     * @param keepMinMaxValues
     *           <code>true</code> keeps the min/max values from the previous chart
-    * @param isPropertyChanged
+    * @param isClearComputedSeries
     *           when <code>true</code> the properties for the tour chart have changed
     */
-   public void updateTourChart(final boolean keepMinMaxValues, final boolean isPropertyChanged) {
-      updateTourChart_Internal(_tourData, _tcc, keepMinMaxValues, isPropertyChanged);
+   public void updateTourChart(final boolean keepMinMaxValues, final boolean isClearComputedSeries) {
+
+      updateTourChart_Internal(_tourData, _tcc, keepMinMaxValues, isClearComputedSeries, false);
    }
 
    public void updateTourChart(final TourData tourData, final boolean keepMinMaxValues) {
-      updateTourChart_Internal(tourData, _tcc, keepMinMaxValues, false);
 
+      updateTourChart_Internal(tourData, _tcc, keepMinMaxValues, false, false);
    }
 
    /**
@@ -6584,7 +6612,26 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
                                final TourChartConfiguration tourChartConfig,
                                final boolean keepMinMaxValues) {
 
-      updateTourChart_Internal(tourData, tourChartConfig, keepMinMaxValues, false);
+      updateTourChart_Internal(tourData, tourChartConfig, keepMinMaxValues, false, false);
+   }
+
+   /**
+    * Set {@link TourData} and {@link TourChartConfiguration} to create a new chart data model
+    *
+    * @param tourData
+    * @param tourChartConfig
+    * @param keepMinMaxValues
+    *           <code>true</code> keeps the min/max values from the previous chart
+    * @param isTourDirty
+    *           When <code>true</code> then the tour dirty state is set to <code>true</code>
+    *           otherwise <code>false</code>
+    */
+   public void updateTourChart(final TourData tourData,
+                               final TourChartConfiguration tourChartConfig,
+                               final boolean keepMinMaxValues,
+                               final boolean isTourDirty) {
+
+      updateTourChart_Internal(tourData, tourChartConfig, keepMinMaxValues, false, isTourDirty);
    }
 
    /**
@@ -6595,13 +6642,17 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
     *
     * @param newTourData
     * @param newTCC
-    * @param keepMinMaxValues
-    * @param isPropertyChanged
+    * @param isKeepMinMaxValues
+    * @param isClearComputedSeries
+    * @param isTourDirty
+    *           When <code>true</code> then the tour dirty state is set to <code>true</code>
+    *           otherwise <code>false</code>
     */
    private synchronized void updateTourChart_Internal(final TourData newTourData,
                                                       final TourChartConfiguration newTCC,
-                                                      final boolean keepMinMaxValues,
-                                                      final boolean isPropertyChanged) {
+                                                      final boolean isKeepMinMaxValues,
+                                                      final boolean isClearComputedSeries,
+                                                      final boolean isTourDirty) {
 
       if (newTourData == null || newTCC == null) {
 
@@ -6613,7 +6664,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
       }
 
       // keep min/max values for the 'old' chart in the chart config
-      if (_tcc != null && keepMinMaxValues) {
+      if (_tcc != null && isKeepMinMaxValues) {
 
          final ChartYDataMinMaxKeeper oldMinMaxKeeper = _tcc.getMinMaxKeeper();
 
@@ -6636,7 +6687,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
       final ChartDataModel newChartDataModel = TourManager.getInstance().createChartDataModel(
             _tourData,
             _tcc,
-            isPropertyChanged);
+            isClearComputedSeries);
 
       // set the model BEFORE actions are created/enabled/checked
       setDataModel(newChartDataModel);
@@ -6645,11 +6696,12 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
       createActions();
       fillToolbar();
       updateTourActions();
-      setTourDirty(false);
+
+      setTourDirty(isTourDirty);
 
       // restore min/max values from the tour chart config
       final ChartYDataMinMaxKeeper newMinMaxKeeper = _tcc.getMinMaxKeeper();
-      final boolean isMinMaxKeeper = (newMinMaxKeeper != null) && keepMinMaxValues;
+      final boolean isMinMaxKeeper = (newMinMaxKeeper != null) && isKeepMinMaxValues;
       if (isMinMaxKeeper) {
          newMinMaxKeeper.setMinMaxValues(newChartDataModel);
       }

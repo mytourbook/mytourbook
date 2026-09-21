@@ -28,8 +28,8 @@ public class TourDataUndoOperation extends AbstractOperation {
 
    private TourChartView _tourChartView;
 
-   private TourData      _newTourData;
-   private TourData      _oldTourData;
+   private TourData      _tourData_Cloned_WithRemovedTimeSliced;
+   private TourData      _tourData_Cloned_Before;
 
    private int           _firstSerieIndex;
    private int           _lastSerieIndex;
@@ -38,13 +38,17 @@ public class TourDataUndoOperation extends AbstractOperation {
     * @param label
     *           This label will show in the menu (e.g., "Undo Modify Name")
     * @param tourChartView
-    * @param newTourData
-    * @param lastSerieIndex
+    * @param tourData_Cloned_Before
+    * @param tourData_Cloned_WithRemovedTimeSliced
     * @param firstSerieIndex
+    * @param lastSerieIndex
     */
    public TourDataUndoOperation(final String label,
                                 final TourChartView tourChartView,
-                                final TourData newTourData,
+
+                                final TourData tourData_Cloned_Before,
+                                final TourData tourData_Cloned_WithRemovedTimeSliced,
+
                                 final int firstSerieIndex,
                                 final int lastSerieIndex) {
 
@@ -52,8 +56,8 @@ public class TourDataUndoOperation extends AbstractOperation {
 
       _tourChartView = tourChartView;
 
-      _newTourData = newTourData;
-      _oldTourData = tourChartView.undoRedo_GetOldData();
+      _tourData_Cloned_Before = tourData_Cloned_Before;
+      _tourData_Cloned_WithRemovedTimeSliced = tourData_Cloned_WithRemovedTimeSliced;
 
       _firstSerieIndex = firstSerieIndex;
       _lastSerieIndex = lastSerieIndex;
@@ -62,13 +66,15 @@ public class TourDataUndoOperation extends AbstractOperation {
    @Override
    public IStatus execute(final IProgressMonitor monitor, final IAdaptable info) throws ExecutionException {
 
-      return redo(monitor, info);
+      _tourChartView.undoRedo_Execute(_firstSerieIndex, _lastSerieIndex);
+
+      return Status.OK_STATUS;
    }
 
    @Override
    public IStatus redo(final IProgressMonitor monitor, final IAdaptable info) throws ExecutionException {
 
-      _tourChartView.undoRedo_SetNewData(_newTourData, _firstSerieIndex, _lastSerieIndex);
+      _tourChartView.undoRedo_Redo(_tourData_Cloned_WithRemovedTimeSliced, _firstSerieIndex, _lastSerieIndex);
 
       return Status.OK_STATUS;
    }
@@ -76,7 +82,7 @@ public class TourDataUndoOperation extends AbstractOperation {
    @Override
    public IStatus undo(final IProgressMonitor monitor, final IAdaptable info) throws ExecutionException {
 
-      _tourChartView.undoRedo_SetNewData(_oldTourData, _firstSerieIndex, _lastSerieIndex);
+      _tourChartView.undoRedo_Undo(_tourData_Cloned_Before, _firstSerieIndex, _lastSerieIndex);
 
       return Status.OK_STATUS;
    }

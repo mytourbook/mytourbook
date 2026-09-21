@@ -140,7 +140,7 @@ import pixelitor.filters.curves.ToneCurvesFilter;
 @XmlAccessorType(XmlAccessType.NONE)
 @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "tourId")
 
-public class TourData implements Cloneable, Comparable<Object>, IXmlSerializable, Serializable {
+public class TourData implements Comparable<Object>, IXmlSerializable, Serializable {
 
    private static final long             serialVersionUID                  = 1L;
 
@@ -2729,84 +2729,6 @@ public class TourData implements Cloneable, Comparable<Object>, IXmlSerializable
    }
 
    /**
-    * This is needed for the undo/redo feature
-    */
-   @Override
-   public TourData clone() {
-
-      TourData clonedTourData = null;
-
-      try {
-
-         clonedTourData = (TourData) super.clone();
-
-         clonedTourData.tourMarkers = cloneTourMarkers();
-
-         // clone value series
-
-// SET_FORMATTING_OFF
-
-         clonedTourData.timeSerie                     = cloneSerie(timeSerie);
-         clonedTourData.altitudeSerie                 = cloneSerie(altitudeSerie);
-         clonedTourData.cadenceSerie                  = cloneSerie(cadenceSerie);
-         clonedTourData.distanceSerie                 = cloneSerie(distanceSerie);
-         clonedTourData.pulseSerie                    = cloneSerie(pulseSerie);
-         clonedTourData.temperatureSerie              = cloneSerie(temperatureSerie);
-         clonedTourData.powerSerie                    = cloneSerie(powerSerie);
-         clonedTourData.speedSerie                    = cloneSerie(speedSerie);
-         clonedTourData.pausedTime_Start              = cloneSerie(pausedTime_Start);
-         clonedTourData.pausedTime_End                = cloneSerie(pausedTime_End);
-         clonedTourData.pausedTime_Data               = cloneSerie(pausedTime_Data);
-
-         if (latitudeSerie != null) {
-
-            clonedTourData.latitudeSerie              = cloneSerie(latitudeSerie);
-            clonedTourData.longitudeSerie             = cloneSerie(longitudeSerie);
-         }
-
-         clonedTourData.gearSerieCombined             = cloneSerie(gearSerieCombined);
-
-         clonedTourData.pulseTime_Milliseconds        = cloneSerie(pulseTime_Milliseconds);
-         clonedTourData.pulseTime_TimeIndex           = cloneSerie(pulseTime_TimeIndex);
-
-         // running dynamics
-         clonedTourData.runDyn_StanceTime             = cloneSerie(runDyn_StanceTime);
-         clonedTourData.runDyn_StanceTimeBalance      = cloneSerie(runDyn_StanceTimeBalance);
-         clonedTourData.runDyn_StepLength             = cloneSerie(runDyn_StepLength);
-         clonedTourData.runDyn_VerticalOscillation    = cloneSerie(runDyn_VerticalOscillation);
-         clonedTourData.runDyn_VerticalRatio          = cloneSerie(runDyn_VerticalRatio);
-
-         // swimming
-         clonedTourData.swim_LengthType               = cloneSerie(swim_LengthType);
-         clonedTourData.swim_Cadence                  = cloneSerie(swim_Cadence);
-         clonedTourData.swim_Strokes                  = cloneSerie(swim_Strokes);
-         clonedTourData.swim_StrokeStyle              = cloneSerie(swim_StrokeStyle);
-         clonedTourData.swim_Time                     = cloneSerie(swim_Time);
-
-         // currently only surfing data can be made visible
-         clonedTourData.visibleDataPointSerie         = cloneSerie(visiblePoints_ForSurfing);
-
-         // battery
-         clonedTourData.battery_Percentage            = cloneSerie(battery_Percentage);
-         clonedTourData.battery_Time                  = cloneSerie(battery_Time);
-
-         // radar
-         clonedTourData.radar_PassedVehicles          = cloneSerie(radar_PassedVehicles);
-         clonedTourData.radar_DistanceToVehicle       = cloneSerie(radar_DistanceToVehicle);
-         clonedTourData.radar_PassingSpeed_Absolute   = cloneSerie(radar_PassingSpeed_Absolute);
-         clonedTourData.radar_PassingSpeed_Relative   = cloneSerie(radar_PassingSpeed_Relative);
-
-// SET_FORMATTING_ON
-
-      } catch (final CloneNotSupportedException e) {
-
-         StatusUtil.log(e);
-      }
-
-      return clonedTourData;
-   }
-
-   /**
     * This method is cloning only a part of the tour, e.g. {@link #serieData} is not
     * cloned
     */
@@ -2857,17 +2779,6 @@ public class TourData implements Cloneable, Comparable<Object>, IXmlSerializable
 
    private short[] cloneSerie(final short[] valueSerie) {
       return valueSerie == null ? null : valueSerie.clone();
-   }
-
-   private Set<TourMarker> cloneTourMarkers() {
-
-      final Set<TourMarker> allClonedTourMarkers = new HashSet<>();
-
-      for (final TourMarker tourMarker : tourMarkers) {
-         allClonedTourMarkers.add(tourMarker.clone());
-      }
-
-      return allClonedTourMarkers;
    }
 
    /**
@@ -13104,7 +13015,6 @@ public class TourData implements Cloneable, Comparable<Object>, IXmlSerializable
       battery_Percentage            = serieData.battery_Percentage;
       battery_Time                  = serieData.battery_Time;
 
-
       // radar
       radar_PassedVehicles          = serieData.radar_PassedVehicles;
       radar_DistanceToVehicle       = serieData.radar_DistanceToVehicle;
@@ -15604,6 +15514,160 @@ public class TourData implements Cloneable, Comparable<Object>, IXmlSerializable
       }
 
       return null;
+   }
+
+   /**
+    * This is needed for the undo/redo feature
+    */
+   public TourData undoRedo_CloneData() {
+
+      final TourData clonedTourData = new TourData();
+
+// SET_FORMATTING_OFF
+
+      clonedTourData.tourMarkers                   = undoRedo_CloneTourMarkers();
+
+      // clone value series
+
+      clonedTourData.timeSerie                     = cloneSerie(timeSerie);
+      clonedTourData.altitudeSerie                 = cloneSerie(altitudeSerie);
+      clonedTourData.cadenceSerie                  = cloneSerie(cadenceSerie);
+      clonedTourData.distanceSerie                 = cloneSerie(distanceSerie);
+      clonedTourData.pulseSerie                    = cloneSerie(pulseSerie);
+      clonedTourData.temperatureSerie              = cloneSerie(temperatureSerie);
+      clonedTourData.powerSerie                    = cloneSerie(powerSerie);
+      clonedTourData.speedSerie                    = cloneSerie(speedSerie);
+      clonedTourData.pausedTime_Start              = cloneSerie(pausedTime_Start);
+      clonedTourData.pausedTime_End                = cloneSerie(pausedTime_End);
+      clonedTourData.pausedTime_Data               = cloneSerie(pausedTime_Data);
+
+      if (latitudeSerie != null) {
+
+         clonedTourData.latitudeSerie              = cloneSerie(latitudeSerie);
+         clonedTourData.longitudeSerie             = cloneSerie(longitudeSerie);
+      }
+
+      clonedTourData.gearSerieCombined             = cloneSerie(gearSerieCombined);
+
+      clonedTourData.pulseTime_Milliseconds        = cloneSerie(pulseTime_Milliseconds);
+      clonedTourData.pulseTime_TimeIndex           = cloneSerie(pulseTime_TimeIndex);
+
+      // running dynamics
+      clonedTourData.runDyn_StanceTime             = cloneSerie(runDyn_StanceTime);
+      clonedTourData.runDyn_StanceTimeBalance      = cloneSerie(runDyn_StanceTimeBalance);
+      clonedTourData.runDyn_StepLength             = cloneSerie(runDyn_StepLength);
+      clonedTourData.runDyn_VerticalOscillation    = cloneSerie(runDyn_VerticalOscillation);
+      clonedTourData.runDyn_VerticalRatio          = cloneSerie(runDyn_VerticalRatio);
+
+      // swimming
+      clonedTourData.swim_LengthType               = cloneSerie(swim_LengthType);
+      clonedTourData.swim_Cadence                  = cloneSerie(swim_Cadence);
+      clonedTourData.swim_Strokes                  = cloneSerie(swim_Strokes);
+      clonedTourData.swim_StrokeStyle              = cloneSerie(swim_StrokeStyle);
+      clonedTourData.swim_Time                     = cloneSerie(swim_Time);
+
+      // currently only surfing data can be made visible
+      clonedTourData.visibleDataPointSerie         = cloneSerie(visiblePoints_ForSurfing);
+
+      // battery
+      clonedTourData.battery_Percentage            = cloneSerie(battery_Percentage);
+      clonedTourData.battery_Time                  = cloneSerie(battery_Time);
+
+      // radar
+      clonedTourData.radar_PassedVehicles          = cloneSerie(radar_PassedVehicles);
+      clonedTourData.radar_DistanceToVehicle       = cloneSerie(radar_DistanceToVehicle);
+      clonedTourData.radar_PassingSpeed_Absolute   = cloneSerie(radar_PassingSpeed_Absolute);
+      clonedTourData.radar_PassingSpeed_Relative   = cloneSerie(radar_PassingSpeed_Relative);
+
+// SET_FORMATTING_ON
+
+      return clonedTourData;
+   }
+
+   private Set<TourMarker> undoRedo_CloneTourMarkers() {
+
+      final Set<TourMarker> allClonedTourMarkers = new HashSet<>();
+
+      for (final TourMarker tourMarker : tourMarkers) {
+         allClonedTourMarkers.add(tourMarker.clone());
+      }
+
+      return allClonedTourMarkers;
+   }
+
+   public void undoRedo_RevertTourData(final TourData clonedTourData,
+                                       final int firstIndex,
+                                       final int lastIndex) {
+
+// SET_FORMATTING_OFF
+
+      tourMarkers                   = undoRedo_RevertTourMarkers(clonedTourData, firstIndex, lastIndex);
+
+      // clone value series
+
+      timeSerie                     = clonedTourData.timeSerie;
+      altitudeSerie                 = clonedTourData.altitudeSerie;
+      cadenceSerie                  = clonedTourData.cadenceSerie;
+      distanceSerie                 = clonedTourData.distanceSerie;
+      pulseSerie                    = clonedTourData.pulseSerie;
+      temperatureSerie              = clonedTourData.temperatureSerie;
+      powerSerie                    = clonedTourData.powerSerie;
+      speedSerie                    = clonedTourData.speedSerie;
+      pausedTime_Start              = clonedTourData.pausedTime_Start;
+      pausedTime_End                = clonedTourData.pausedTime_End;
+      pausedTime_Data               = clonedTourData.pausedTime_Data;
+
+      if (latitudeSerie != null) {
+
+         latitudeSerie              = clonedTourData.latitudeSerie;
+         longitudeSerie             = clonedTourData.longitudeSerie;
+      }
+
+      gearSerieCombined             = clonedTourData.gearSerieCombined;
+
+      pulseTime_Milliseconds        = clonedTourData.pulseTime_Milliseconds;
+      pulseTime_TimeIndex           = clonedTourData.pulseTime_TimeIndex;
+
+      // running dynamics
+      runDyn_StanceTime             = clonedTourData.runDyn_StanceTime;
+      runDyn_StanceTimeBalance      = clonedTourData.runDyn_StanceTimeBalance;
+      runDyn_StepLength             = clonedTourData.runDyn_StepLength;
+      runDyn_VerticalOscillation    = clonedTourData.runDyn_VerticalOscillation;
+      runDyn_VerticalRatio          = clonedTourData.runDyn_VerticalRatio;
+
+      // swimming
+      swim_LengthType               = clonedTourData.swim_LengthType;
+      swim_Cadence                  = clonedTourData.swim_Cadence;
+      swim_Strokes                  = clonedTourData.swim_Strokes;
+      swim_StrokeStyle              = clonedTourData.swim_StrokeStyle;
+      swim_Time                     = clonedTourData.swim_Time;
+
+      // currently only surfing data can be made visible
+      visibleDataPointSerie         = clonedTourData.visibleDataPointSerie;
+
+      // battery
+      battery_Percentage            = clonedTourData.battery_Percentage;
+      battery_Time                  = clonedTourData.battery_Time;
+
+      // radar
+      radar_PassedVehicles          = clonedTourData.radar_PassedVehicles;
+      radar_DistanceToVehicle       = clonedTourData.radar_DistanceToVehicle;
+      radar_PassingSpeed_Absolute   = clonedTourData.radar_PassingSpeed_Absolute;
+      radar_PassingSpeed_Relative   = clonedTourData.radar_PassingSpeed_Relative;
+
+// SET_FORMATTING_ON
+
+      clearComputedSeries();
+   }
+
+   private Set<TourMarker> undoRedo_RevertTourMarkers(final TourData clonedTourData,
+                                                      final int firstIndex,
+                                                      final int lastIndex) {
+      // TODO Auto-generated method stub
+
+      final Set<TourMarker> allTourMarkers = new HashSet<>();
+
+      return allTourMarkers;
    }
 
    /**

@@ -4598,14 +4598,14 @@ public class TourManager {
 
    public ChartDataModel createChartDataModel(final TourData tourData,
                                               final TourChartConfiguration tcc,
-                                              final boolean hasPropertyChanged) {
+                                              final boolean isClearComputedSeries) {
 
-      return createChartDataModel_10(tourData, tcc, hasPropertyChanged);
+      return createChartDataModel_10(tourData, tcc, isClearComputedSeries);
    }
 
    private ChartDataModel createChartDataModel_10(final TourData tourData,
                                                   final TourChartConfiguration tcc,
-                                                  final boolean hasPropertyChanged) {
+                                                  final boolean isClearComputedSeries) {
 
       final ChartDataModel chartDataModel = new ChartDataModel(ChartType.LINE);
 
@@ -4631,7 +4631,7 @@ public class TourManager {
       final RGB rgbText_Distance = PreferenceConverter.getColor(_prefStore_Common, prefColorName_Distance + prefColorTextThemed);
       final RGB rgbText_Time = PreferenceConverter.getColor(_prefStore_Common, prefColorName_Time + prefColorTextThemed);
 
-      if (hasPropertyChanged) {
+      if (isClearComputedSeries) {
          tourData.clearComputedSeries();
       }
 

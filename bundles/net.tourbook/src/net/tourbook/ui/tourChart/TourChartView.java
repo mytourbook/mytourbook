@@ -70,6 +70,7 @@ import net.tourbook.ui.views.tourSegmenter.TourSegmenterView;
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.commands.operations.IOperationHistory;
 import org.eclipse.core.commands.operations.IUndoContext;
+import org.eclipse.core.commands.operations.IUndoableOperation;
 import org.eclipse.core.commands.operations.UndoContext;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.action.IToolBarManager;
@@ -602,8 +603,9 @@ public class TourChartView extends ViewPart implements
 
    private void disposeUndo() {
 
-      final IOperationHistory operationHistory = PlatformUI.getWorkbench().getOperationSupport().getOperationHistory();
-      operationHistory.dispose(_undoContext, true, true, false);
+      final IOperationHistory undoHistory = PlatformUI.getWorkbench().getOperationSupport().getOperationHistory();
+
+      undoHistory.dispose(_undoContext, true, true, true);
    }
 
    @Override
@@ -617,7 +619,7 @@ public class TourChartView extends ViewPart implements
       final Long tourId = _tourData.getTourId();
       final TourData tourData = TourManager.getInstance().getTourDataFromDb(tourId);
 
-      updateChart(tourData, true);
+      updateChart(tourData, true, false);
    }
 
    @Override
@@ -771,6 +773,11 @@ public class TourChartView extends ViewPart implements
    @Override
    public TourChart getTourChart() {
       return _tourChart;
+   }
+
+   public IUndoContext getUndoContext() {
+
+      return _undoContext;
    }
 
    private void initUI(final Composite parent) {
@@ -1277,7 +1284,16 @@ public class TourChartView extends ViewPart implements
       }
    }
 
-   void undoRedo_DeleteTimeSlice(final TourData tourData, final int firstIndex, final int lastIndex) {
+   /**
+    * @param tourData_Cloned_Before
+    * @param tourData_Cloned_WithRemovedTimeSliced
+    * @param firstIndex
+    * @param lastIndex
+    */
+   void undoRedo_DeleteTimeSlice(final TourData tourData_Cloned_Before,
+                                 final TourData tourData_Cloned_WithRemovedTimeSliced,
+                                 final int firstIndex,
+                                 final int lastIndex) {
 
       // Inside an action listener or command handler
       final TourDataUndoOperation op = new TourDataUndoOperation(
@@ -1287,7 +1303,10 @@ public class TourChartView extends ViewPart implements
                   TimeTools.Formatter_DateTime_SM.format(TimeTools.now())),
 
             this,
-            tourData,
+
+            tourData_Cloned_Before, // old
+            tourData_Cloned_WithRemovedTimeSliced, // new
+
             firstIndex,
             lastIndex);
 
@@ -1307,22 +1326,56 @@ public class TourChartView extends ViewPart implements
       }
    }
 
-   TourData undoRedo_GetOldData() {
+   public void undoRedo_Execute(final int firstSerieIndex, final int lastSerieIndex) {
 
-      return _tourChart.getUndoTourData();
+      undoRedo_UpdateChart(_tourData, firstSerieIndex, lastSerieIndex, true);
    }
 
-   void undoRedo_SetNewData(final TourData newTourData, final int firstIndex, final int lastIndex) {
+   public void undoRedo_Redo(final TourData tourData_Cloned_WithRemovedTimeSliced,
+                             final int firstSerieIndex,
+                             final int lastSerieIndex) {
 
-      _tourChart.setTourDirty(true);
+      _tourData.undoRedo_RevertTourData(tourData_Cloned_WithRemovedTimeSliced, firstSerieIndex, lastSerieIndex);
 
-      // compute break time
-      newTourData.getBreakTimeSerie();
+      undoRedo_UpdateChart(_tourData, firstSerieIndex, lastSerieIndex, true);
+   }
 
-      updateChart(newTourData, true);
+   public void undoRedo_Undo(final TourData tourData_Cloned_Before,
+                             final int firstSerieIndex,
+                             final int lastSerieIndex) {
 
-      final int indexDiff = lastIndex - firstIndex;
-      final int newLastIndex = lastIndex - indexDiff;
+      final IOperationHistory opHistory = PlatformUI.getWorkbench().getOperationSupport().getOperationHistory();
+      final IUndoableOperation[] undoHistory = opHistory.getUndoHistory(_undoContext);
+
+      boolean isTourDirty = true;
+
+      if (undoHistory.length == 1) {
+
+         /*
+          * Because we are currently performing an undo, so when this undo is done, then the
+          * undo history is empty -> all is undone -> tour is not dirty anymore
+          */
+
+         isTourDirty = false;
+      }
+
+      _tourData.undoRedo_RevertTourData(tourData_Cloned_Before, firstSerieIndex, lastSerieIndex);
+
+      undoRedo_UpdateChart(_tourData, firstSerieIndex, lastSerieIndex, isTourDirty);
+   }
+
+   private void undoRedo_UpdateChart(final TourData tourData,
+                                     final int firstSerieIndex,
+                                     final int lastSerieIndex,
+                                     final boolean isTourDirty) {
+
+      updateChart(tourData,
+
+            true, // isKeepMinMaxValues
+            isTourDirty);
+
+      final int indexDiff = lastSerieIndex - firstSerieIndex;
+      final int newLastIndex = lastSerieIndex - indexDiff;
 
       setSliderPositions(
             newLastIndex - 1,
@@ -1380,10 +1433,12 @@ public class TourChartView extends ViewPart implements
 
    private void updateChart(final TourData tourData) {
 
-      updateChart(tourData, false);
+      updateChart(tourData, false, false);
    }
 
-   private void updateChart(final TourData tourData, final boolean keepMinMaxValues) {
+   private void updateChart(final TourData tourData,
+                            final boolean isKeepMinMaxValues,
+                            final boolean isTourDirty) {
 
       if (tourData == null) {
          // nothing to do
@@ -1418,7 +1473,7 @@ public class TourChartView extends ViewPart implements
       // set or reset photo link
       _tourData.tourPhotoLink = _tourPhotoLink;
 
-      _tourChart.updateTourChart(_tourData, _tourChartConfig, keepMinMaxValues);
+      _tourChart.updateTourChart(_tourData, _tourChartConfig, isKeepMinMaxValues, isTourDirty);
 
       // set application window title tool tip
       setTitleToolTip(TourManager.getTourDateShort(_tourData));
