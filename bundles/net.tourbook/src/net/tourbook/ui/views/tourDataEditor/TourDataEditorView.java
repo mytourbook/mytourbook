@@ -6264,7 +6264,7 @@ public class TourDataEditorView extends ViewPart implements
    }
 
    /**
-    * column: distance difference in seconds to previous slice
+    * Column: Distance difference in seconds to previous slice
     */
    private void defineColumn_TimeSlice_Motion_DistanceDiff() {
 
@@ -6294,13 +6294,7 @@ public class TourDataEditorView extends ViewPart implements
                   distanceDiff = distance - distancePrevious;
                }
 
-               if (distanceDiff == 0) {
-                  cell.setText(UI.EMPTY_STRING);
-               } else if (distanceDiff < 0.001) {
-                  cell.setText(_nf6.format(distanceDiff));
-               } else {
-                  cell.setText(_nf3.format(distanceDiff));
-               }
+               cell.setText(colDef.printDoubleValue(distanceDiff));
 
             } else {
                cell.setText(UI.EMPTY_STRING);

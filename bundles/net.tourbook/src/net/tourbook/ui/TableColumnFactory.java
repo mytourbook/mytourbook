@@ -2302,6 +2302,7 @@ public abstract class TableColumnFactory {
             colDef.setColumnUnit(               UI.UNIT_LABEL_DISTANCE);
 
             colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(10));
+            colDef.setValueFormats(ValueFormatSet.Number_5_Digits, ValueFormat.NUMBER_1_5,columnManager);
 
             return colDef;
          }
@@ -2327,10 +2328,7 @@ public abstract class TableColumnFactory {
 
             colDef.setDefaultColumnWidth(pixelWidth);
             colDef.setColumnWeightData(new ColumnPixelData(pixelWidth, true));
-            colDef.setValueFormats(
-                  ValueFormatSet.Number,
-                  ValueFormat.NUMBER_1_3,
-                  columnManager);
+            colDef.setValueFormats(ValueFormatSet.Number, ValueFormat.NUMBER_1_3, columnManager);
 
             return colDef;
          }
