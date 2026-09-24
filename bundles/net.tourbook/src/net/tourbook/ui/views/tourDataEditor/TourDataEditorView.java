@@ -2985,7 +2985,7 @@ public class TourDataEditorView extends ViewPart implements
 
                final ArrayList<TourData> modifiedTours = tourEvent.getModifiedTours();
 
-               if (modifiedTours == null) {
+               if (modifiedTours == null || modifiedTours.isEmpty()) {
                   return;
                }
 
@@ -3008,6 +3008,10 @@ public class TourDataEditorView extends ViewPart implements
                      enableActions();
                      enableControls();
                   }
+
+                  final TourData modifiedTourData = modifiedTours.get(0);
+
+                  updateUI_FromModel(modifiedTourData, true, true);
 
                   return;
                }

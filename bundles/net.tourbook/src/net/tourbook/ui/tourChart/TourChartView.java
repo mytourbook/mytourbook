@@ -1326,23 +1326,23 @@ public class TourChartView extends ViewPart implements
       }
    }
 
-   public void undoRedo_Execute(final int firstSerieIndex, final int lastSerieIndex) {
+   void undoRedo_Execute(final int firstSerieIndex, final int lastSerieIndex) {
 
-      undoRedo_UpdateChart(_tourData, firstSerieIndex, lastSerieIndex, true);
+      undoRedo_UpdateChart(_tourData, firstSerieIndex, lastSerieIndex, true, false);
    }
 
-   public void undoRedo_Redo(final TourData tourData_Cloned_WithRemovedTimeSliced,
-                             final int firstSerieIndex,
-                             final int lastSerieIndex) {
+   void undoRedo_Redo(final TourData tourData_Cloned_WithRemovedTimeSliced,
+                      final int firstSerieIndex,
+                      final int lastSerieIndex) {
 
       _tourData.undoRedo_RevertTourData(tourData_Cloned_WithRemovedTimeSliced, firstSerieIndex, lastSerieIndex);
 
-      undoRedo_UpdateChart(_tourData, firstSerieIndex, lastSerieIndex, true);
+      undoRedo_UpdateChart(_tourData, firstSerieIndex, lastSerieIndex, true, false);
    }
 
-   public void undoRedo_Undo(final TourData tourData_Cloned_Before,
-                             final int firstSerieIndex,
-                             final int lastSerieIndex) {
+   void undoRedo_Undo(final TourData tourData_Cloned_Before,
+                      final int firstSerieIndex,
+                      final int lastSerieIndex) {
 
       final IOperationHistory opHistory = PlatformUI.getWorkbench().getOperationSupport().getOperationHistory();
       final IUndoableOperation[] undoHistory = opHistory.getUndoHistory(_undoContext);
@@ -1361,13 +1361,14 @@ public class TourChartView extends ViewPart implements
 
       _tourData.undoRedo_RevertTourData(tourData_Cloned_Before, firstSerieIndex, lastSerieIndex);
 
-      undoRedo_UpdateChart(_tourData, firstSerieIndex, lastSerieIndex, isTourDirty);
+      undoRedo_UpdateChart(_tourData, firstSerieIndex, lastSerieIndex, isTourDirty, true);
    }
 
    private void undoRedo_UpdateChart(final TourData tourData,
                                      final int firstSerieIndex,
                                      final int lastSerieIndex,
-                                     final boolean isTourDirty) {
+                                     final boolean isTourDirty,
+                                     final boolean isUndo) {
 
       updateChart(tourData,
 
@@ -1375,10 +1376,17 @@ public class TourChartView extends ViewPart implements
             isTourDirty);
 
       final int indexDiff = lastSerieIndex - firstSerieIndex;
-      final int newLastIndex = lastSerieIndex - indexDiff;
+
+      final int newLastIndex = isUndo
+            ? lastSerieIndex + 1
+            : lastSerieIndex - indexDiff;
+
+      final int newFirstIndex = isUndo
+            ? firstSerieIndex - 1
+            : newLastIndex - 1;
 
       setSliderPositions(
-            newLastIndex - 1,
+            newFirstIndex,
             newLastIndex,
             false);
 

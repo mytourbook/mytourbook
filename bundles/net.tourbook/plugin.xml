@@ -2669,14 +2669,14 @@
          <!-- Undo -->
          <command
             commandId   = "org.eclipse.ui.edit.undo"
-            id          = "undoredo.undo"
+            id          = "net.tourbook.views.TourChartView.undo"
             style       = "push"
          />
       
          <!-- Redo -->
          <command
             commandId   = "org.eclipse.ui.edit.redo"
-            id          = "undoredo.redo"
+            id          = "net.tourbook.views.TourChartView.redo"
             style       = "push"
          />
             

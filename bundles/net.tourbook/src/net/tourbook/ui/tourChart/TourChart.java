@@ -52,7 +52,6 @@ import net.tourbook.chart.IMouseListener;
 import net.tourbook.chart.MouseAdapter;
 import net.tourbook.chart.MouseWheelMode;
 import net.tourbook.chart.SelectionChartXSliderPosition;
-import net.tourbook.commands.AppCommands;
 import net.tourbook.common.CommonActivator;
 import net.tourbook.common.PointLong;
 import net.tourbook.common.UI;
@@ -149,9 +148,14 @@ import org.eclipse.ui.PlatformUI;
  */
 public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdater, ILineSelectionPainter {
 
-   static final String TOOLBAR_GROUP_1_GRAPHS = "group_Graphs"; //$NON-NLS-1$
-   static final String TOOLBAR_GROUP_2        = "group_2";      //$NON-NLS-1$
-   static final String TOOLBAR_GROUP_3        = "group_3";      //$NON-NLS-1$
+   static final String         TOOLBAR_GROUP_1_GRAPHS                          = "group_Graphs";                                 //$NON-NLS-1$
+   static final String         TOOLBAR_GROUP_2                                 = "group_2";                                      //$NON-NLS-1$
+   static final String         TOOLBAR_GROUP_3                                 = "group_3";                                      //$NON-NLS-1$
+
+   private static final String COMMAND_NET_TOURBOOK_TOUR_RESTORE_TOUR_IN_CHART = "command.net.tourbook.tour.RestoreTour_InChart";
+   private static final String COMMAND_NET_TOURBOOK_TOUR_SAVE_TOUR_IN_CHART    = "command.net.tourbook.tour.SaveTour_InChart";
+   private static final String NET_TOURBOOK_VIEWS_TOUR_CHART_VIEW_REDO         = "net.tourbook.views.TourChartView.redo";
+   private static final String NET_TOURBOOK_VIEWS_TOUR_CHART_VIEW_UNDO         = "net.tourbook.views.TourChartView.undo";
 
 //SET_FORMATTING_OFF
 
@@ -1047,7 +1051,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
          return;
       }
 
-      // modify cloned tour
+      // get tour data BEFORE
       final TourData tourData_Cloned_Before = _tourData.undoRedo_CloneData();
 
       TourManager.removeTimeSlices(
@@ -1068,12 +1072,6 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 
             firstIndex,
             lastIndex);
-
-      _parent.getDisplay().asyncExec(() -> {
-
-         // notify other viewers AFTER it is dirty to disable the tour editor
-         fireTourIsModified();
-      });
    }
 
    public void actionGraphOverlapped(final boolean isItemChecked) {
@@ -3529,17 +3527,6 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
    }
 
    /**
-    * Fire notification for the reverted tour data
-    */
-   private void fireTourIsReverted() {
-
-      final TourEvent tourEvent = new TourEvent(_tourData);
-      tourEvent.isReverted = true;
-
-      TourManager.fireEvent(TourEventId.TOUR_CHANGED, tourEvent, _part);
-   }
-
-   /**
     * Fires an event when the x-axis values were changed by the user
     *
     * @param isShowTimeOnXAxis
@@ -5791,20 +5778,20 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 
       final IToolBarManager tbm = getToolBarManager();
 
-      final IContributionItem contItemSave = tbm.find(AppCommands.COMMAND_NET_TOURBOOK_TOUR_SAVE_TOUR_IN_CHART);
-      final IContributionItem contItemRestore = tbm.find(AppCommands.COMMAND_NET_TOURBOOK_TOUR_RESTORE_TOUR_IN_CHART);
-      final IContributionItem contItemUndo = tbm.find("undoredo.undo");
-      final IContributionItem contItemRedo = tbm.find("undoredo.redo");
+      final IContributionItem contribItem_Save = tbm.find(COMMAND_NET_TOURBOOK_TOUR_SAVE_TOUR_IN_CHART);
+      final IContributionItem contribItem_Restore = tbm.find(COMMAND_NET_TOURBOOK_TOUR_RESTORE_TOUR_IN_CHART);
+      final IContributionItem contribItem_Undo = tbm.find(NET_TOURBOOK_VIEWS_TOUR_CHART_VIEW_UNDO);
+      final IContributionItem contribItem_Redo = tbm.find(NET_TOURBOOK_VIEWS_TOUR_CHART_VIEW_REDO);
 
-      if (contItemSave != null) {
+      if (contribItem_Save != null) {
 
-         contItemSave.setVisible(isVisible);
-         contItemRestore.setVisible(isVisible);
-         contItemUndo.setVisible(isVisible);
-         contItemRedo.setVisible(isVisible);
+         contribItem_Save.setVisible(isVisible);
+         contribItem_Restore.setVisible(isVisible);
+         contribItem_Undo.setVisible(isVisible);
+         contribItem_Redo.setVisible(isVisible);
+
+         tbm.update(true);
       }
-
-      tbm.update(true);
    }
 
    void setTourDirty(final boolean isDirty) {
@@ -5831,6 +5818,12 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
             });
          }
       }
+
+      _parent.getDisplay().asyncExec(() -> {
+
+         // notify other viewers AFTER it is dirty to disable the tour editor
+         fireTourIsModified();
+      });
    }
 
    /**
