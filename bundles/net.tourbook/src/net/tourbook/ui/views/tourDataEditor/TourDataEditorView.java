@@ -6234,7 +6234,6 @@ public class TourDataEditorView extends ViewPart implements
       final ColumnDefinition colDef = TableColumnFactory.MOTION_DISTANCE.createColumn(_timeSlice_ColumnManager, _pc);
 
       colDef.setIsDefaultColumn();
-      colDef.disableValueFormatter();
 
       colDef.setLabelProvider(new CellLabelProvider() {
          @Override
@@ -6247,13 +6246,7 @@ public class TourDataEditorView extends ViewPart implements
 
                final float distance = _serieDistance[serieIndex] / 1000 / _unitValueDistance;
 
-               if (distance == 0) {
-                  cell.setText(UI.EMPTY_STRING);
-               } else if (distance < 0.001) {
-                  cell.setText(_nf6.format(distance));
-               } else {
-                  cell.setText(_nf3.format(distance));
-               }
+               cell.setText(colDef.printDoubleValue(distance));
 
             } else {
 

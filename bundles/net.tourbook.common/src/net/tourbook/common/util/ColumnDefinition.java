@@ -220,7 +220,8 @@ public class ColumnDefinition implements Cloneable {
     * The formatter is set in the column factory but it do not always make sense to have it, e.g.
     * tour data editor time slice columns.
     */
-   public void disableValueFormatter() {
+   @SuppressWarnings("unused")
+   private void disableValueFormatter() {
 
       _availableFormats = null;
 

@@ -1043,8 +1043,22 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
       }
 
       // get selected time slices
-      final int firstIndex = getLeftSlider().getValuesIndex() + 1;
-      final int lastIndex = getRightSlider().getValuesIndex() - 1;
+      int firstIndex = getLeftSlider().getValuesIndex() + 1;
+      int lastIndex = getRightSlider().getValuesIndex() - 1;
+
+      // check bounds
+      if (lastIndex < firstIndex) {
+         lastIndex = firstIndex;
+      }
+
+      final int numSlices = _tourData.timeSerie.length;
+
+      if (firstIndex >= numSlices) {
+         firstIndex = numSlices - 1;
+      }
+      if (lastIndex >= numSlices) {
+         lastIndex = numSlices - 1;
+      }
 
       // check if markers are within the selection
       if (canDeleteMarkers(firstIndex, lastIndex) == false) {
@@ -5815,11 +5829,12 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
                _tourChartView.firePropertyChange();
 
                setSaveActionVisible(isDirty);
+
             });
          }
       }
 
-      _parent.getDisplay().asyncExec(() -> {
+      getDisplay().asyncExec(() -> {
 
          // notify other viewers AFTER it is dirty to disable the tour editor
          fireTourIsModified();
