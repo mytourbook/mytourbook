@@ -840,7 +840,7 @@
          <command
             commandId      ="command.net.tourbook.tour.RestoreTour_InEditor"
             mnemonic       ="%Command_Tour_RestoreTour_Mnemonic"
-            tooltip        ="%Command_Tour_RestoreTour_Tooltip">
+            tooltip        ="%Command_Tour_RestoreTour_Tooltip_2">
             
             <visibleWhen   checkEnabled="false">
                <reference  definitionId="net.tourbook.definition.isTourEditorActive"/>
@@ -2616,7 +2616,7 @@
          <command
             commandId      = "command.net.tourbook.tour.RestoreTour_InEditor"
             mnemonic       = "%Command_Tour_RestoreTour_Mnemonic"
-            tooltip        = "%Command_Tour_RestoreTour_Tooltip"/>
+            tooltip        = "%Command_Tour_RestoreTour_Tooltip_2"/>
    
       </menuContribution>
    
@@ -2663,7 +2663,7 @@
          <command
             commandId      ="command.net.tourbook.tour.RestoreTour_InChart"
             mnemonic       ="%Command_Tour_RestoreTour_Mnemonic"
-            tooltip        ="%Command_Tour_RestoreTour_Tooltip"
+            tooltip        ="%Command_Tour_RestoreTour_Tooltip_2"
          />
    
          <!-- Undo -->
