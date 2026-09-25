@@ -47,7 +47,7 @@ import net.tourbook.application.PerspectiveFactoryRawData;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.FileSystemManager;
 import net.tourbook.common.UI;
-import net.tourbook.common.dialog.MessageDialogWithRadioOptions;
+import net.tourbook.common.dialog.MessageDialog_WithRadioOptions;
 import net.tourbook.common.time.TimeTools;
 import net.tourbook.common.util.FileUtils;
 import net.tourbook.common.util.ITourViewer3;
@@ -1410,7 +1410,7 @@ public class RawDataManager {
                                                           final String dialogMessage,
                                                           final ReImportStatus reImportStatus) {
 
-      final MessageDialogWithRadioOptions dialog = new MessageDialogWithRadioOptions(
+      final MessageDialog_WithRadioOptions dialog = new MessageDialog_WithRadioOptions(
 
             Display.getDefault().getActiveShell(),
 
@@ -2096,7 +2096,7 @@ public class RawDataManager {
                   : 0 // ReplaceImportFilenameAction.DO_NOTHING
             ;
 
-            final MessageDialogWithRadioOptions dialog = new MessageDialogWithRadioOptions(
+            final MessageDialog_WithRadioOptions dialog = new MessageDialog_WithRadioOptions(
                   Display.getDefault().getActiveShell(),
                   Messages.Dialog_ReplaceImportFilename_Title,
                   null,

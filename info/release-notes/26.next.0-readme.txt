@@ -1,5 +1,10 @@
 26.next.0                                                 ?. February 2026
 
+TRANSLATION Texts
+
+* [Tour Chart] Replaced "Command_Tour_RestoreTour_Tooltip" with "Command_Tour_RestoreTour_Tooltip_2" because now a tour can be restored partly
+               c8391aa566909c8825b61307a6c4be559d5a9e7f
+
 
 TODO's
 ======

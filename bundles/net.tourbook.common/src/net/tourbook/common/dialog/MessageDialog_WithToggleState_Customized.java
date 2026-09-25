@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2026 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -22,17 +22,17 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Shell;
 
-public class MessageDialogWithToggleState_Customized extends MessageDialogWithToggle {
+public class MessageDialog_WithToggleState_Customized extends MessageDialogWithToggle {
 
-   public MessageDialogWithToggleState_Customized(final Shell parentShell,
-                                                  final String dialogTitle,
-                                                  final Image image,
-                                                  final String message,
-                                                  final int dialogImageType,
-                                                  final LinkedHashMap<String, Integer> buttonLabelToIdMap,
-                                                  final int defaultIndex,
-                                                  final String toggleMessage,
-                                                  final boolean toggleState) {
+   public MessageDialog_WithToggleState_Customized(final Shell parentShell,
+                                                   final String dialogTitle,
+                                                   final Image image,
+                                                   final String message,
+                                                   final int dialogImageType,
+                                                   final LinkedHashMap<String, Integer> buttonLabelToIdMap,
+                                                   final int defaultIndex,
+                                                   final String toggleMessage,
+                                                   final boolean toggleState) {
 
       super(parentShell, dialogTitle, image, message, dialogImageType, buttonLabelToIdMap, defaultIndex, toggleMessage, toggleState);
    }
@@ -42,7 +42,7 @@ public class MessageDialogWithToggleState_Customized extends MessageDialogWithTo
     *
     * @return
     */
-   public MessageDialogWithToggleState_Customized withStyleOnTop() {
+   public MessageDialog_WithToggleState_Customized withStyleOnTop() {
 
       setShellStyle(getShellStyle() | SWT.ON_TOP);
 

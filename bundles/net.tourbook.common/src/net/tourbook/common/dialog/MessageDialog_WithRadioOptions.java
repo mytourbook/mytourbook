@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2021, 2023 Wolfgang Schramm and Contributors
+ * Copyright (C) 2021, 2026 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -31,7 +31,7 @@ import org.eclipse.swt.widgets.Shell;
 /**
  * This {@link MessageDialog} shows radio buttons
  */
-public class MessageDialogWithRadioOptions extends MessageDialog {
+public class MessageDialog_WithRadioOptions extends MessageDialog {
 
    private String[] _allOptionLabels;
 
@@ -89,15 +89,16 @@ public class MessageDialogWithRadioOptions extends MessageDialog {
     * @param dialogButtonLabels
     *           varargs of Strings for the button labels in the
     *           button bar
+    *
     * @since 3.12
     */
-   public MessageDialogWithRadioOptions(final Shell parentShell,
-                                        final String dialogTitle,
-                                        final Image dialogTitleImage,
-                                        final String dialogMessage,
-                                        final int dialogImageType,
-                                        final int defaultIndex,
-                                        final String... dialogButtonLabels) {
+   public MessageDialog_WithRadioOptions(final Shell parentShell,
+                                         final String dialogTitle,
+                                         final Image dialogTitleImage,
+                                         final String dialogMessage,
+                                         final int dialogImageType,
+                                         final int defaultIndex,
+                                         final String... dialogButtonLabels) {
 
       super(parentShell, dialogTitle, dialogTitleImage, dialogMessage, dialogImageType, defaultIndex, dialogButtonLabels);
    }

@@ -30,7 +30,7 @@ import net.tourbook.common.action.ActionResetToDefaults;
 import net.tourbook.common.action.IActionResetToDefault;
 import net.tourbook.common.color.ColorSelectorExtended;
 import net.tourbook.common.color.IColorSelectorListener;
-import net.tourbook.common.dialog.MessageDialogWithToggleState_Customized;
+import net.tourbook.common.dialog.MessageDialog_WithToggleState_Customized;
 import net.tourbook.common.time.TimeTools;
 import net.tourbook.common.tooltip.AdvancedSlideout;
 import net.tourbook.common.util.ColumnDefinition;
@@ -1310,11 +1310,11 @@ public class SlideoutTourGeoFilter extends AdvancedSlideout implements ITourView
          buttonLabelToIdMap.put(Messages.Slideout_TourGeoFilter_Action_Delete_AllWithoutName, IDialogConstants.OK_ID);
          buttonLabelToIdMap.put(Messages.App_Action_Cancel, IDialogConstants.CANCEL_ID);
 
-         MessageDialogWithToggleState_Customized dialog;
+         MessageDialog_WithToggleState_Customized dialog;
          int dialogReturnCode;
          setIsAnotherDialogOpened(true);
          {
-            dialog = new MessageDialogWithToggleState_Customized(
+            dialog = new MessageDialog_WithToggleState_Customized(
 
                   getToolTipShell(),
 

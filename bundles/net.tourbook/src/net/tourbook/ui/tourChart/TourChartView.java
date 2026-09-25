@@ -27,7 +27,7 @@ import net.tourbook.chart.SelectionChartInfo;
 import net.tourbook.chart.SelectionChartXSliderPosition;
 import net.tourbook.commands.ISaveAndRestorePart;
 import net.tourbook.common.UI;
-import net.tourbook.common.dialog.MessageDialogWithRadioOptions;
+import net.tourbook.common.dialog.MessageDialog_WithRadioOptions;
 import net.tourbook.common.time.TimeTools;
 import net.tourbook.common.util.PostSelectionProvider;
 import net.tourbook.common.util.StatusUtil;
@@ -435,64 +435,60 @@ public class TourChartView extends ViewPart implements
     */
    private boolean askUser_ForModifiedTour() {
 
-      final MessageDialogWithRadioOptions dialog = new MessageDialogWithRadioOptions(
+      final MessageDialog_WithRadioOptions dialog = new MessageDialog_WithRadioOptions(
 
             Display.getDefault().getActiveShell(),
 
             "Tour Chart",
             null,
-
-            "The tour in the tour chart was modified but another tour is selected, select an option:",
+            "The tour in the tour chart is modified and not yet saved but another tour is selected to be displayed in the tour chart, select an option:",
 
             MessageDialog.QUESTION,
 
             0, // default button index
-            IDialogConstants.OK_LABEL,
-            IDialogConstants.CANCEL_LABEL);
+            IDialogConstants.OK_LABEL);
 
       final String[] allOptions = new String[] {
 
-            "Cancel", //                                                0
-            "Discard tour modifications and display the new tour", //        1
-            "Save modified tour", //                                    2
+            "&Save modified tour", // 0
+            "&Discard tour modifications and display the new tour", // 1
+            "&Cancel and keep tour modifications", // 2
       };
 
-      dialog.setRadioOptions(allOptions, 0);
-
-      int selectedOption = 0;
+      dialog.setRadioOptions(allOptions, 2);
 
       if (dialog.open() == Window.OK) {
 
-         selectedOption = dialog.getSelectedOption();
-      }
+         switch (dialog.getSelectedOption()) {
 
-      switch (selectedOption) {
+         case 0:
 
-      case 1:
+            // save tour
 
-         // discard modifications
+            doSave();
 
-         doRestore();
+            return true;
 
-         return true;
+         case 1:
 
-      case 2:
+            // discard modifications
 
-         // save tour
+            doRestore();
 
-         doSave();
+            return true;
 
-         return true;
+         case 2: // canceled
+         default:
 
-      case 0: // canceled
-      default:
+            // activate this view
 
-         // activate this view
-
+// this produces a lot of tour change events
 //         Util.showView(ID, true);
 
-         return false;
+         }
       }
+
+      return false;
    }
 
    private void chartListener_HoveredValue(final int hoveredValuePointIndex) {
