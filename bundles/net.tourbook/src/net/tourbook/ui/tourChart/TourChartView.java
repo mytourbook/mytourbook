@@ -27,6 +27,7 @@ import net.tourbook.chart.SelectionChartInfo;
 import net.tourbook.chart.SelectionChartXSliderPosition;
 import net.tourbook.commands.ISaveAndRestorePart;
 import net.tourbook.common.UI;
+import net.tourbook.common.dialog.MessageDialogWithRadioOptions;
 import net.tourbook.common.time.TimeTools;
 import net.tourbook.common.util.PostSelectionProvider;
 import net.tourbook.common.util.StatusUtil;
@@ -75,14 +76,18 @@ import org.eclipse.core.commands.operations.UndoContext;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.action.Separator;
+import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.IDialogSettings;
+import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.StructuredSelection;
+import org.eclipse.jface.window.Window;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.IActionBars;
 import org.eclipse.ui.IPartListener2;
 import org.eclipse.ui.ISaveablePart;
@@ -423,6 +428,73 @@ public class TourChartView extends ViewPart implements
       TourManager.getInstance().addTourEventListener(_tourEventListener);
    }
 
+   /**
+    * @param tourData
+    *
+    * @return Returns <code>false</code> when user has canceled the action
+    */
+   private boolean askUser_ForModifiedTour() {
+
+      final MessageDialogWithRadioOptions dialog = new MessageDialogWithRadioOptions(
+
+            Display.getDefault().getActiveShell(),
+
+            "Tour Chart",
+            null,
+
+            "The tour in the tour chart was modified but another tour is selected, select an option:",
+
+            MessageDialog.QUESTION,
+
+            0, // default button index
+            IDialogConstants.OK_LABEL,
+            IDialogConstants.CANCEL_LABEL);
+
+      final String[] allOptions = new String[] {
+
+            "Cancel", //                                                0
+            "Discard tour modifications and display the new tour", //        1
+            "Save modified tour", //                                    2
+      };
+
+      dialog.setRadioOptions(allOptions, 0);
+
+      int selectedOption = 0;
+
+      if (dialog.open() == Window.OK) {
+
+         selectedOption = dialog.getSelectedOption();
+      }
+
+      switch (selectedOption) {
+
+      case 1:
+
+         // discard modifications
+
+         doRestore();
+
+         return true;
+
+      case 2:
+
+         // save tour
+
+         doSave();
+
+         return true;
+
+      case 0: // canceled
+      default:
+
+         // activate this view
+
+//         Util.showView(ID, true);
+
+         return false;
+      }
+   }
+
    private void chartListener_HoveredValue(final int hoveredValuePointIndex) {
 
       fireHoveredValue(hoveredValuePointIndex);
@@ -606,6 +678,8 @@ public class TourChartView extends ViewPart implements
       final IOperationHistory undoHistory = PlatformUI.getWorkbench().getOperationSupport().getOperationHistory();
 
       undoHistory.dispose(_undoContext, true, true, true);
+
+      _undoCounter = 0;
    }
 
    @Override
@@ -1453,26 +1527,38 @@ public class TourChartView extends ViewPart implements
          return;
       }
 
-      boolean isOtherTourID = true;
+      boolean isSameTourID = false;
 
       if (_tourData != null) {
 
          final Long oldTourID = _tourData.getTourId();
          final Long newTourID = tourData.getTourId();
 
-         isOtherTourID = oldTourID.equals(newTourID) == false;
+         isSameTourID = oldTourID.equals(newTourID) == true;
+      }
+
+      if (isSameTourID == false) {
+
+         // this is another tour
+
+         if (_tourChart.isTourDirty()) {
+
+            // tour is dirty -> ask user what to do
+
+            if (askUser_ForModifiedTour()) {
+
+               // tour is saved or reverted
+
+            } else {
+
+               // dialog is canceled -> keep current state
+
+               return;
+            }
+         }
       }
 
       _tourData = tourData;
-
-      if (isOtherTourID) {
-
-         // clear undo and redo history for a new tour
-
-         disposeUndo();
-
-         _undoCounter = 0;
-      }
 
       TourManager.getInstance().setActiveTourChart(_tourChart);
 
@@ -1486,5 +1572,4 @@ public class TourChartView extends ViewPart implements
       // set application window title tool tip
       setTitleToolTip(TourManager.getTourDateShort(_tourData));
    }
-
 }

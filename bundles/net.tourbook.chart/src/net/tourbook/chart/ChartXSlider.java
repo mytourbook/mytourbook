@@ -80,7 +80,7 @@ public class ChartXSlider {
       _chartGraph = graph;
       this.sliderType = sliderType;
 
-      moveToXXDevPosition(xxDevSliderPosition, true, true, false);
+      moveToXXDevPosition(xxDevSliderPosition, true, true);
    }
 
    /**
@@ -161,7 +161,12 @@ public class ChartXSlider {
                 */
                final long xxDevGraphWidth = _chartGraph.getXXDevGraphWidth();
 
-               moveToXXDevPosition(xxDevGraphWidth, true, true, true, isFireEvent);
+               moveToXXDevPosition(
+                     xxDevGraphWidth,
+                     true,
+                     true,
+                     true,
+                     isFireEvent);
             }
          });
 
@@ -179,15 +184,15 @@ public class ChartXSlider {
 
    void moveToXXDevPosition(final double xxDevLinePos,
                             final boolean isAdjustToImageWidth,
-                            final boolean isAdjustPositionRatio,
-                            final boolean isUpdateValueFromRatio) {
+                            final boolean isAdjustPositionRatio) {
 
-      moveToXXDevPosition(//
+      moveToXXDevPosition(
             xxDevLinePos,
             isAdjustToImageWidth,
             isAdjustPositionRatio,
-            isUpdateValueFromRatio,
-            true);
+            false, //   isUpdateValueFromRatio
+            true //     isFireEvent
+      );
    }
 
    /**
@@ -250,7 +255,7 @@ public class ChartXSlider {
       xxDevSliderPos = xxDevSliderPos < 0 ? 0 : xxDevSliderPos;
 
       _chartGraph.setXSliderValue_FromRatio(this);
-      moveToXXDevPosition(xxDevSliderPos, true, true, false);
+      moveToXXDevPosition(xxDevSliderPos, true, true);
    }
 
    /**
@@ -269,6 +274,7 @@ public class ChartXSlider {
     * Set position of the slider within value array.
     *
     * @param valueIndex
+    *
     * @return Returns <code>true</code> when the value has changed
     */
    boolean setValueIndex(final int valueIndex) {

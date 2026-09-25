@@ -7813,7 +7813,7 @@ public class ChartComponentGraph extends Canvas {
       final long xxDevLeftPosition = _xxDevViewPortLeftBorder + _devXMouseDown;
 
       setXSliderValue_FromHoveredValuePoint(leftSlider);
-      leftSlider.moveToXXDevPosition(xxDevLeftPosition, true, true, false);
+      leftSlider.moveToXXDevPosition(xxDevLeftPosition, true, true);
 
       setZoomInPosition();
 
@@ -7830,7 +7830,7 @@ public class ChartComponentGraph extends Canvas {
       final long xxDevRightPosition = _xxDevViewPortLeftBorder + _devXMouseDown;
 
       setXSliderValue_FromHoveredValuePoint(rightSlider);
-      rightSlider.moveToXXDevPosition(xxDevRightPosition, true, true, false);
+      rightSlider.moveToXXDevPosition(xxDevRightPosition, true, true);
 
       setZoomInPosition();
 
@@ -7850,27 +7850,39 @@ public class ChartComponentGraph extends Canvas {
    void moveSlidersToBorderWithoutCheck() {
 
       /*
-       * get the sliders first before they are moved
+       * Get the sliders first before they are moved
        */
       final ChartXSlider leftSlider = getLeftSlider();
       final ChartXSlider rightSlider = getRightSlider();
 
-      /*
-       * adjust left slider
-       */
       final long xxDevLeftPosition = _xxDevViewPortLeftBorder;
-
-      setXSliderValue_FromHoveredValuePoint(leftSlider);
-      leftSlider.moveToXXDevPosition(xxDevLeftPosition, true, true, false);
-
-      /*
-       * adjust right slider
-       */
       final long xxDevRightPosition = _xxDevViewPortLeftBorder + getDevVisibleChartWidth() - 1;
 
-      setXSliderValue_FromHoveredValuePoint(rightSlider);
-      rightSlider.moveToXXDevPosition(xxDevRightPosition, true, true, false);
+      /*
+       * Adjust left slider
+       */
+      setXSliderValue_FromHoveredValuePoint(leftSlider);
 
+      // set position ratio
+      leftSlider.moveToXXDevPosition(xxDevLeftPosition, true, true);
+
+      // set value index from ratio
+      setXSliderValue_FromRatio(leftSlider);
+
+      /*
+       * Adjust right slider
+       */
+      setXSliderValue_FromHoveredValuePoint(rightSlider);
+
+      // set position ratio
+      rightSlider.moveToXXDevPosition(xxDevRightPosition, true, true);
+
+      // set value index from ratio
+      setXSliderValue_FromRatio(rightSlider);
+
+      /*
+       * Update UI
+       */
       _isSliderDirty = true;
       redraw();
    }
@@ -7946,7 +7958,7 @@ public class ChartComponentGraph extends Canvas {
 
       // set new slider line position
       final boolean isSliderPositionModified = setXSliderValue_FromHoveredValuePoint(xSlider);
-      xSlider.moveToXXDevPosition(xxDevSliderLinePos, true, true, false);
+      xSlider.moveToXXDevPosition(xxDevSliderLinePos, true, true);
 
       return isSliderPositionModified;
    }
@@ -9977,8 +9989,8 @@ public class ChartComponentGraph extends Canvas {
       _xxDevViewPortLeftBorder = xxDevViewPortOffset;
       _graphZoomRatio = graphZoomRatio;
 
-      _xSliderA.moveToXXDevPosition(xxDevViewPortOffset, false, true, false);
-      _xSliderB.moveToXXDevPosition(xxDevGraphWidth, false, true, false);
+      _xSliderA.moveToXXDevPosition(xxDevViewPortOffset, false, true);
+      _xSliderB.moveToXXDevPosition(xxDevGraphWidth, false, true);
    }
 
    void setHovered_ValuePoint_Index(final int newHoveredValuePointIndex) {
@@ -10385,7 +10397,7 @@ public class ChartComponentGraph extends Canvas {
 
          final double linePos = _xxDevGraphWidth * (xValues[valueIndex] / xValues[xValues.length - 1]);
 
-         slider.moveToXXDevPosition(linePos, true, true, false);
+         slider.moveToXXDevPosition(linePos, true, true);
 
       } catch (final ArrayIndexOutOfBoundsException e) {
          // ignore
