@@ -949,9 +949,6 @@ public class Messages extends NLS {
    public static String        Dialog_ImportConfig_Tab_Tag;
    public static String        Dialog_ImportConfig_Tab_TourType;
 
-   public static String        dialog_is_tour_editor_modified_message;
-   public static String        dialog_is_tour_editor_modified_title;
-
    public static String        Dialog_JoinTours_Checkbox_CreateTourMarker;
    public static String        Dialog_JoinTours_Checkbox_DeleteSourceTours;
    public static String        Dialog_JoinTours_Checkbox_IncludeDescription;
@@ -3411,6 +3408,8 @@ public class Messages extends NLS {
    public static String        TourManager_Dialog_OutOfSyncError_Message;
    public static String        TourManager_Dialog_OutOfSyncError_Title;
    public static String        TourManager_Dialog_RemovePhoto_Message;
+   public static String        TourManager_Dialog_TourEditorIsModified_Message;
+   public static String        TourManager_Dialog_TourEditorIsModified_Title;
 
    public static String        Tour_Action_AdjustTemperature;
    public static String        Tour_Action_AdjustTourValues;

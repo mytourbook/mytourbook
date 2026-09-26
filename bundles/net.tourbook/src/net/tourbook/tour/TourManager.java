@@ -2137,7 +2137,7 @@ public class TourManager {
     */
    public static boolean isTourEditorModified(final boolean isOpenEditor) {
 
-      if (_tourDataEditor != null && _tourDataEditor.isDirty()) {
+      if (isTourModified_InEditor()) {
 
          if (isOpenEditor) {
             openTourEditor(true);
@@ -2145,8 +2145,8 @@ public class TourManager {
 
          MessageDialog.openInformation(
                Display.getCurrent().getActiveShell(),
-               Messages.dialog_is_tour_editor_modified_title,
-               Messages.dialog_is_tour_editor_modified_message);
+               Messages.TourManager_Dialog_TourEditorIsModified_Title,
+               Messages.TourManager_Dialog_TourEditorIsModified_Message);
 
          return true;
       }
