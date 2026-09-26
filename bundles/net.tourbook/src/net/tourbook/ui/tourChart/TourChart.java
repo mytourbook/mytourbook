@@ -3214,11 +3214,12 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 
       final IToolBarManager tbm = getToolBarManager();
 
+      /**
+       * The save/undo actions are set in {@link TourChartView#TOOLBAR_GROUP_SAVE_AND_UNDO_ACTIONS}
+       */
       tbm.add(new Separator(TOOLBAR_GROUP_1_GRAPHS));
       tbm.add(new Separator(TOOLBAR_GROUP_2));
       tbm.add(new Separator(TOOLBAR_GROUP_3));
-
-//      tbm.insertBefore("group_SaveAndUndoActions", new Separator(TOOLBAR_GROUP_3));
 
       /*
        * Add actions to the toolbar
@@ -5810,7 +5811,9 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 
    void setTourDirty(final boolean isDirty) {
 
-      if (_isTourDirty != isDirty) {
+      final boolean isDirtyModified = _isTourDirty != isDirty;
+
+      if (isDirtyModified) {
 
          _isTourDirty = isDirty;
 
@@ -5827,18 +5830,17 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
                }
 
                _tourChartView.firePropertyChange();
-
-               setSaveActionVisible(isDirty);
-
             });
          }
+
+         getDisplay().asyncExec(() -> {
+
+            // notify other viewers AFTER it is dirty to disable the tour editor
+            fireTourIsModified();
+         });
       }
 
-      getDisplay().asyncExec(() -> {
-
-         // notify other viewers AFTER it is dirty to disable the tour editor
-         fireTourIsModified();
-      });
+      setSaveActionVisible(isDirty);
    }
 
    /**

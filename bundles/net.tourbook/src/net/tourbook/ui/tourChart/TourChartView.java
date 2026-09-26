@@ -428,69 +428,6 @@ public class TourChartView extends ViewPart implements
       TourManager.getInstance().addTourEventListener(_tourEventListener);
    }
 
-   /**
-    * @param tourData
-    *
-    * @return Returns <code>false</code> when user has canceled the action
-    */
-   private boolean askUser_ForModifiedTour() {
-
-      final MessageDialog_WithRadioOptions dialog = new MessageDialog_WithRadioOptions(
-
-            Display.getDefault().getActiveShell(),
-
-            "Tour Chart",
-            null,
-            "The tour in the tour chart is modified and not yet saved but another tour is selected to be displayed in the tour chart, select an option:",
-
-            MessageDialog.QUESTION,
-
-            0, // default button index
-            IDialogConstants.OK_LABEL);
-
-      final String[] allOptions = new String[] {
-
-            "&Save modified tour", // 0
-            "&Discard tour modifications and display the new tour", // 1
-            "&Cancel and keep tour modifications", // 2
-      };
-
-      dialog.setRadioOptions(allOptions, 2);
-
-      if (dialog.open() == Window.OK) {
-
-         switch (dialog.getSelectedOption()) {
-
-         case 0:
-
-            // save tour
-
-            doSave();
-
-            return true;
-
-         case 1:
-
-            // discard modifications
-
-            doRestore();
-
-            return true;
-
-         case 2: // canceled
-         default:
-
-            // activate this view
-
-// this produces a lot of tour change events
-//         Util.showView(ID, true);
-
-         }
-      }
-
-      return false;
-   }
-
    private void chartListener_HoveredValue(final int hoveredValuePointIndex) {
 
       fireHoveredValue(hoveredValuePointIndex);
@@ -700,9 +637,10 @@ public class TourChartView extends ViewPart implements
 
    @Override
    public void doSave(final IProgressMonitor monitor) {
-      // TODO Auto-generated method stub
 
       _tourChart.setTourDirty(false);
+
+      TourManager.saveModifiedTour(_tourData);
    }
 
    @Override
@@ -1355,6 +1293,72 @@ public class TourChartView extends ViewPart implements
    }
 
    /**
+    * @param tourData
+    *
+    * @return Returns <code>false</code> when user has canceled the action
+    */
+   private boolean undoRedo_AskUser_ForModifiedTour() {
+
+      final MessageDialog_WithRadioOptions dialog = new MessageDialog_WithRadioOptions(
+
+            Display.getDefault().getActiveShell(),
+
+            "Tour Chart",
+            null,
+//            "The current tour\n\n\"%s\"\n\nhas been modified but not saved. Selecting another tour will overwrite these modifications, select an option:"
+//            "The current tour\n\n\"%s\"\n\nhas been modified but not saved. Another tour is selected, what should be done?"
+//            "Your changes to the current tour \n\n\"%s\"\n\n have not been saved. Another tour was selected, what should be done?"
+            "You selected a new tour.\n\nDo you want to save your changes to \"%s\" ?"
+                  .formatted(TourManager.getTourTitleDetailed(_tourData)),
+
+            MessageDialog.QUESTION,
+
+            0, // default button index
+            IDialogConstants.OK_LABEL);
+
+      final String[] allOptions = new String[] {
+
+            "&Cancel and keep changes", // 0
+            "&Save changes", // 1
+            "&Discard changes", // 2
+      };
+
+      dialog.setRadioOptions(allOptions, 0);
+
+      if (dialog.open() == Window.OK) {
+
+         switch (dialog.getSelectedOption()) {
+
+         case 1:
+
+            // save tour
+
+            doSave();
+
+            return true;
+
+         case 2:
+
+            // discard modifications
+
+            doRestore();
+
+            return true;
+
+         case 0: // canceled
+         default:
+
+            // activate this view
+
+// this produces a lot of tour change events
+//          Util.showView(ID, true);
+         }
+      }
+
+      return false;
+   }
+
+   /**
     * @param tourData_Cloned_Before
     * @param tourData_Cloned_WithRemovedTimeSliced
     * @param firstIndex
@@ -1388,6 +1392,7 @@ public class TourChartView extends ViewPart implements
          // Execute via the history framework
          final IOperationHistory opHistory = PlatformUI.getWorkbench().getOperationSupport().getOperationHistory();
 
+         // this will call undoRedo_Execute()
          opHistory.execute(op, null, null);
 
       } catch (final ExecutionException e) {
@@ -1523,17 +1528,17 @@ public class TourChartView extends ViewPart implements
          return;
       }
 
-      boolean isSameTourID = false;
+      boolean isOtherTourID = true;
 
       if (_tourData != null) {
 
          final Long oldTourID = _tourData.getTourId();
          final Long newTourID = tourData.getTourId();
 
-         isSameTourID = oldTourID.equals(newTourID) == true;
+         isOtherTourID = oldTourID.equals(newTourID) == false;
       }
 
-      if (isSameTourID == false) {
+      if (isOtherTourID) {
 
          // this is another tour
 
@@ -1541,7 +1546,7 @@ public class TourChartView extends ViewPart implements
 
             // tour is dirty -> ask user what to do
 
-            if (askUser_ForModifiedTour()) {
+            if (undoRedo_AskUser_ForModifiedTour()) {
 
                // tour is saved or reverted
 
@@ -1552,6 +1557,9 @@ public class TourChartView extends ViewPart implements
                return;
             }
          }
+
+         // dispose undo from the last tour
+         disposeUndo();
       }
 
       _tourData = tourData;
