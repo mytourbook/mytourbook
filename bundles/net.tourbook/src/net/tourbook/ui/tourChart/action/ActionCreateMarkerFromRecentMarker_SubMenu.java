@@ -96,17 +96,17 @@ public class ActionCreateMarkerFromRecentMarker_SubMenu extends SubMenu {
 
    private void actionCreateMarker(final RecentMarker recentMarker, final Event event) {
 
+      // make sure the tour editor does not contain a modified tour
+      if (TourManager.isTourEditorModified()) {
+         return;
+      }
+
       if (UI.isCtrlKey(event)) {
 
          // remove this marker
 
          TourMarkerManager.removeRecentMarker(recentMarker);
 
-         return;
-      }
-
-      // make sure the tour editor does not contain a modified tour
-      if (TourManager.isTourEditorModified()) {
          return;
       }
 

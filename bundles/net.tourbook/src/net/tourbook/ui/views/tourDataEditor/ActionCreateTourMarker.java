@@ -91,6 +91,10 @@ class ActionCreateTourMarker extends Action {
    @Override
    public void run() {
 
+      if (TourManager.isTourEditorModified()) {
+         return;
+      }
+
       final TourData tourData = _tourDataEditor.getTourData();
 
       final DialogMarker markerDialog = new DialogMarker(Display.getCurrent().getActiveShell(), tourData, null);

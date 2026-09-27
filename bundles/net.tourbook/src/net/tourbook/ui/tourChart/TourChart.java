@@ -1017,7 +1017,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
                                       final boolean isAdjustTourStartTime) {
 
       // check if the tour editor contains a modified tour
-      if (TourManager.isTourEditorModified()) {
+      if (TourManager.isTourModified_InEditor_WithInfo(true)) {
          return;
       }
 

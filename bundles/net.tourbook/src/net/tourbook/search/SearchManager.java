@@ -461,6 +461,10 @@ public class SearchManager implements XHRHandler {
 
    private static void hrefAction_Marker_Edit(final TourData tourData, final TourMarker tourMarker) {
 
+      if (TourManager.isTourEditorModified()) {
+         return;
+      }
+
       final Shell activeShell = getActiveShell();
 
       // ensure this dialog is modal (only one dialog can be opened)
@@ -518,6 +522,10 @@ public class SearchManager implements XHRHandler {
    }
 
    private static void hrefAction_Tour_Edit(final Long tourId) {
+
+      if (TourManager.isTourEditorModified()) {
+         return;
+      }
 
       final Shell activeShell = getActiveShell();
 

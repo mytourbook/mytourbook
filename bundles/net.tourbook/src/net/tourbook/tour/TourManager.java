@@ -2115,9 +2115,9 @@ public class TourManager {
    }
 
    /**
-    * Checks if a tour in the {@link TourDataEditorView} is modified and shows the editor when it's
-    * modified. A message dialog informs the user about the modified tour and that the requested
-    * actions cannot be done.
+    * Checks if a tour in the {@link TourDataEditorView} or {@link TourChartView} is modified and
+    * shows the editor when its modified. A message dialog informs the user about the modified tour
+    * and that the requested actions cannot be done.
     *
     * @return Returns <code>true</code> when the tour is modified in the {@link TourDataEditorView}
     */
@@ -2126,34 +2126,33 @@ public class TourManager {
    }
 
    /**
-    * Checks if a tour in the {@link TourDataEditorView} is modified and shows the editor when it's
-    * modified. A message dialog informs the user about the modified tour and that the requested
-    * actions cannot be done.
+    * Checks if a tour in the {@link TourDataEditorView} or {@link TourChartView} is modified and
+    * shows the editor when its modified. A message dialog informs the user about the modified tour
+    * and that the requested actions cannot be done.
     *
-    * @param isOpenEditor
-    *           When <code>true</code> then the tour editor is displayed.
+    * @param isOpenView
+    *           When <code>true</code> then the view is displayed
     *
     * @return Returns <code>true</code> when the tour is modified in the {@link TourDataEditorView}
     */
-   public static boolean isTourEditorModified(final boolean isOpenEditor) {
+   public static boolean isTourEditorModified(final boolean isOpenView) {
 
-      if (isTourModified_InEditor()) {
+      if (isTourModified_InEditor_WithInfo(isOpenView)) {
+         return true;
+      }
 
-         if (isOpenEditor) {
-            openTourEditor(true);
-         }
-
-         MessageDialog.openInformation(
-               Display.getCurrent().getActiveShell(),
-               Messages.TourManager_Dialog_TourEditorIsModified_Title,
-               Messages.TourManager_Dialog_TourEditorIsModified_Message);
-
+      if (isTourModified_InChart_WithInfo(isOpenView)) {
          return true;
       }
 
       return false;
    }
 
+   /**
+    * Is just checking the {@link TourChartView} if dirty or not
+    *
+    * @return
+    */
    public static boolean isTourModified_InChart() {
 
       if (_tourChartView != null && _tourChartView.isDirty()) {
@@ -2164,9 +2163,66 @@ public class TourManager {
       return false;
    }
 
+   /**
+    * The user is notified with an info dialog when the tour chart is modified
+    *
+    * @param isOpenView
+    *
+    * @return
+    */
+   private static boolean isTourModified_InChart_WithInfo(final boolean isOpenView) {
+
+      if (isTourModified_InChart()) {
+
+         if (isOpenView) {
+            openTourChart();
+         }
+
+         MessageDialog.openInformation(
+               Display.getCurrent().getActiveShell(),
+               "Tour chart is modified",
+               "A tour in the tour chart is modified, this tour must be saved or reverted, before other actions can be done.");
+
+         return true;
+      }
+
+      return false;
+   }
+
+   /**
+    * Is just checking the {@link TourDataEditorView} if dirty or not
+    *
+    * @return
+    */
    public static boolean isTourModified_InEditor() {
 
       if (_tourDataEditor != null && _tourDataEditor.isDirty()) {
+
+         return true;
+      }
+
+      return false;
+   }
+
+   /**
+    * The user is notified with an info dialog when the tour editor is modified
+    *
+    * @param isOpenView
+    *
+    * @return
+    */
+   public static boolean isTourModified_InEditor_WithInfo(final boolean isOpenView) {
+
+      if (isTourModified_InEditor()) {
+
+         if (isOpenView) {
+            openTourEditor(true);
+         }
+
+         MessageDialog.openInformation(
+               Display.getCurrent().getActiveShell(),
+               Messages.TourManager_Dialog_TourEditorIsModified_Title,
+               Messages.TourManager_Dialog_TourEditorIsModified_Message);
 
          return true;
       }
@@ -2458,6 +2514,38 @@ public class TourManager {
    }
 
    /**
+    *
+    * @return
+    */
+   private static void openTourChart() {
+
+      /*
+       * Must be run in the UI thread because PlatformUI.getWorkbench().getActiveWorkbenchWindow()
+       * returns null in none UI threads
+       */
+      Display.getDefault().syncExec(() -> {
+
+         try {
+
+            final IWorkbenchWindow activeWorkbenchWindow = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
+            final IWorkbenchPage page = activeWorkbenchWindow.getActivePage();
+            final IViewPart viewPart = page.showView(TourChartView.ID, null, IWorkbenchPage.VIEW_VISIBLE);
+
+            if (viewPart instanceof TourChartView) {
+
+               if (page.isPartVisible(viewPart) == false) {
+
+                  page.bringToTop(viewPart);
+               }
+            }
+
+         } catch (final PartInitException e) {
+            StatusUtil.log(e);
+         }
+      });
+   }
+
+   /**
     * @param isActive
     *
     * @return
@@ -2475,9 +2563,7 @@ public class TourManager {
          try {
 
             final IWorkbenchWindow activeWorkbenchWindow = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
-
             final IWorkbenchPage page = activeWorkbenchWindow.getActivePage();
-
             final IViewPart viewPart = page.showView(TourDataEditorView.ID, null, IWorkbenchPage.VIEW_VISIBLE);
 
             if (viewPart instanceof final TourDataEditorView tourDataEditorViewPart) {

@@ -91,6 +91,7 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.IActionBars;
 import org.eclipse.ui.IPartListener2;
 import org.eclipse.ui.ISaveablePart;
+import org.eclipse.ui.ISaveablePart2;
 import org.eclipse.ui.ISelectionListener;
 import org.eclipse.ui.IViewPart;
 import org.eclipse.ui.IViewSite;
@@ -112,7 +113,7 @@ import org.eclipse.ui.part.ViewPart;
  */
 public class TourChartView extends ViewPart implements
 
-      ISaveablePart,
+      ISaveablePart2,
       ISaveAndRestorePart,
       ITourChartViewer,
       IPhotoEventListener,
@@ -1189,6 +1190,53 @@ public class TourChartView extends ViewPart implements
       }
    }
 
+   @Override
+   public int promptToSaveOnClose() {
+
+      // confirm save/discard/cancel
+      final int returnCode = new MessageDialog(
+
+            getSite().getShell(),
+
+            Messages.tour_editor_dlg_save_tour_title,
+            null,
+            "The tour \"%s\" is modified in the tour chart".formatted(TourManager.getTourDateFull(_tourData)),
+
+            MessageDialog.QUESTION,
+
+            new String[] {
+                  Messages.Tour_Editor_Button_SaveTour,
+                  Messages.Tour_Editor_Button_DiscardModifications,
+                  IDialogConstants.CANCEL_LABEL },
+
+            0 // default index
+
+      ).open();
+
+      if (returnCode == 0) {
+
+         // button YES: save tour
+
+         doSave();
+
+         return YES;
+
+      } else if (returnCode == 1) {
+
+         // button NO: discard modifications
+
+         doRestore();
+
+         return NO;
+
+      } else {
+
+         // button CANCEL / dialog is canceled: tour is not saved and not discarded
+
+         return CANCEL;
+      }
+   }
+
    private void restoreState() {
 
       _tourChart.restoreState();
@@ -1305,10 +1353,9 @@ public class TourChartView extends ViewPart implements
 
             "Tour Chart",
             null,
-//            "The current tour\n\n\"%s\"\n\nhas been modified but not saved. Selecting another tour will overwrite these modifications, select an option:"
-//            "The current tour\n\n\"%s\"\n\nhas been modified but not saved. Another tour is selected, what should be done?"
+            "The current tour\n\n\"%s\"\n\nhas been modified but not saved. Another tour is selected, what should be done?"
 //            "Your changes to the current tour \n\n\"%s\"\n\n have not been saved. Another tour was selected, what should be done?"
-            "You selected a new tour.\n\nDo you want to save your changes to \"%s\" ?"
+//            "You selected a new tour.\n\nDo you want to save your changes to \"%s\" ?"
                   .formatted(TourManager.getTourTitleDetailed(_tourData)),
 
             MessageDialog.QUESTION,

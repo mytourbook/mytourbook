@@ -50,6 +50,10 @@ public class ActionEditQuick extends Action {
 
    public static void doAction(final ITourProvider tourProvider) {
 
+      if (TourManager.isTourEditorModified()) {
+         return;
+      }
+
       // check tour, make sure only one tour is selected
       final ArrayList<TourData> selectedTours = tourProvider.getSelectedTours();
       if (selectedTours == null || selectedTours.size() != 1) {

@@ -62,6 +62,10 @@ public class ActionOpenMarkerDialog extends Action {
                                final boolean isSaveTour,
                                final TourMarker selectedTourMarker) {
 
+      if (TourManager.isTourEditorModified()) {
+         return;
+      }
+
       final ArrayList<TourData> allSelectedTours = tourProvider.getSelectedTours();
 
       // check if one tour is selected

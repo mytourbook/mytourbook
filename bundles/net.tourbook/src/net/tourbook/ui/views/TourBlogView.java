@@ -1287,6 +1287,10 @@ public class TourBlogView extends ViewPart {
 
    private void hrefActionEditMarker(final TourMarker selectedTourMarker) {
 
+      if (TourManager.isTourEditorModified()) {
+         return;
+      }
+
       if (_tourData.isManualTour()) {
          // a manually created tour do not have time slices -> no markers
          return;
@@ -1304,9 +1308,11 @@ public class TourBlogView extends ViewPart {
 
    private void hrefActionEditTour() {
 
-      if (new DialogQuickEdit(//
-            Display.getCurrent().getActiveShell(),
-            _tourData).open() == Window.OK) {
+      if (TourManager.isTourEditorModified()) {
+         return;
+      }
+
+      if (new DialogQuickEdit(Display.getCurrent().getActiveShell(), _tourData).open() == Window.OK) {
 
          saveModifiedTour();
       }

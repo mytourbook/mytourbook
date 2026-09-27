@@ -51,12 +51,12 @@ public class ActionCreateTourMarkerFromMap extends Action {
    @Override
    public void run() {
 
+      if (TourManager.isTourEditorModified()) {
+         return;
+      }
+
       final TourData tourData = TourManager.getTour(_currentHoveredTourId);
-      if (tourData == null
-
-            // make sure the tour editor does not contain a modified tour
-            || TourManager.isTourEditorModified()) {
-
+      if (tourData == null) {
          return;
       }
 

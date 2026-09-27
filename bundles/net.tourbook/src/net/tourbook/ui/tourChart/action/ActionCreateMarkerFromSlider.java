@@ -104,6 +104,10 @@ public class ActionCreateMarkerFromSlider extends Action {
    @Override
    public void run() {
 
+      if (TourManager.isTourEditorModified()) {
+         return;
+      }
+
       final Chart chart = _chartContextProvider.getChart();
 
       TourData tourData = null;
