@@ -35,6 +35,7 @@ import net.tourbook.data.TourTag;
 import net.tourbook.data.TourTagCategory;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.preferences.PrefPageTags;
+import net.tourbook.tour.TourManager;
 
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.ActionContributionItem;
@@ -133,6 +134,11 @@ public class ActionAddTourTag_SubMenu extends Action implements IMenuCreator, IA
 
       @Override
       public void run() {
+
+         if (TourManager.isTourEditorModified()) {
+            return;
+         }
+
          saveTags();
       }
    }
@@ -583,10 +589,18 @@ public class ActionAddTourTag_SubMenu extends Action implements IMenuCreator, IA
    @Override
    public void run() {
 
+      if (TourManager.isTourEditorModified()) {
+         return;
+      }
+
       _advancedMenuProvider.openAdvancedMenu();
    }
 
    private void saveOrReopenTagMenu(final boolean isAddTag) {
+
+      if (TourManager.isTourEditorModified()) {
+         return;
+      }
 
       if (_isAdvancedMenu) {
 

@@ -214,6 +214,10 @@ public class TagMenuManager implements IActionProvider {
       @Override
       public void run() {
 
+         if (TourManager.isTourEditorModified()) {
+            return;
+         }
+
          if (_isAdvMenu) {
 
             final ActionAddTourTag_SubMenu actionAddTagAdvanced =
@@ -1192,6 +1196,10 @@ public class TagMenuManager implements IActionProvider {
                           final Point menuPosition,
                           final ToolTip toolTip,
                           final Boolean isFlatView) {
+
+      if (TourManager.isTourEditorModified()) {
+         return;
+      }
 
       updateTagAutoOpenAction(isFlatView);
 

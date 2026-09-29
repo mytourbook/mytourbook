@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2026 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -101,9 +101,11 @@ public class SubMenu_SetCadence extends SubMenu {
          case 0:
             numNone++;
             break;
+
          case 1:
             numRpm++;
             break;
+
          case 2:
             numSpm++;
             break;
@@ -124,6 +126,10 @@ public class SubMenu_SetCadence extends SubMenu {
    }
 
    private void setCadenceMultiplier(final float cadenceMultiplier) {
+
+      if (TourManager.isTourEditorModified()) {
+         return;
+      }
 
 //		 * 1.0f = Revolutions per minute (RPM)
 //		 * 2.0f = Steps per minute (SPM)

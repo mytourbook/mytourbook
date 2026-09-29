@@ -44,6 +44,7 @@ import net.tourbook.data.TourData;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.preferences.PrefPageEquipment;
 import net.tourbook.preferences.PrefPageEquipmentGroups;
+import net.tourbook.tour.TourManager;
 import net.tourbook.ui.ITourProvider;
 import net.tourbook.ui.action.IActionProvider;
 import net.tourbook.ui.action.TourActionCategory;
@@ -1398,6 +1399,10 @@ public class EquipmentMenuManager implements IActionProvider {
                           final Point menuPosition,
                           final ToolTip toolTip,
                           final Boolean isFlatView) {
+
+      if (TourManager.isTourEditorModified()) {
+         return;
+      }
 
       updateEquipmentAutoOpenAction(isFlatView);
 

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2025 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2026 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -2115,9 +2115,10 @@ public class TourManager {
    }
 
    /**
-    * Checks if a tour in the {@link TourDataEditorView} or {@link TourChartView} is modified and
-    * shows the editor when its modified. A message dialog informs the user about the modified tour
-    * and that the requested actions cannot be done.
+    * Checks if a tour is modified in {@link TourDataEditorView} or {@link TourChartView} and
+    * shows the editor when it is modified.
+    * <p>
+    * A message dialog informs the user about the modified tour.
     *
     * @return Returns <code>true</code> when the tour is modified in the {@link TourDataEditorView}
     */
