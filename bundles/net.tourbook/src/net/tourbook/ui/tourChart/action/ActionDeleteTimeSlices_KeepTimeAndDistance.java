@@ -22,18 +22,13 @@ import net.tourbook.ui.tourChart.TourChart;
 
 import org.eclipse.jface.action.Action;
 
-/**
- * This delete action can be used to remove movements within a pause.
- * <p>
- * The time is kept but distances are removed and the tour start time is not adjusted
- */
-public class ActionDeleteTimeSlices_KeepTime extends Action {
+public class ActionDeleteTimeSlices_KeepTimeAndDistance extends Action {
 
    private final TourChart _tourChart;
 
-   public ActionDeleteTimeSlices_KeepTime(final TourChart tourChart) {
+   public ActionDeleteTimeSlices_KeepTimeAndDistance(final TourChart tourChart) {
 
-      super(Messages.Tour_Editor_Action_DeleteTimeSlices_KeepTime, AS_PUSH_BUTTON);
+      super(Messages.Tour_Editor_Action_DeleteTimeSlices_KeepTimeAndDistance, AS_PUSH_BUTTON);
 
       setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.App_Delete));
 
@@ -47,7 +42,7 @@ public class ActionDeleteTimeSlices_KeepTime extends Action {
 
             false, // isRemoveTime
 
-            true, //  isRemoveDistance
+            false, // isRemoveDistance
 
             false //  isAdjustTourStartTime
       );
