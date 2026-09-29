@@ -2607,20 +2607,22 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
     */
    public void clearComputedSeries() {
 
+// SET_FORMATTING_OFF
+
       if (isSpeedSerieFromDevice == false) {
          speedSerie = null;
       }
 
-      speedSerie_Mile = null;
-      speedSerie_NauticalMile = null;
+      speedSerie_Mile                              = null;
+      speedSerie_NauticalMile                      = null;
 
-      speedSerie_Interval = null;
-      speedSerie_Interval_Mile = null;
-      speedSerie_Interval_NauticalMile = null;
+      speedSerie_Interval                          = null;
+      speedSerie_Interval_Mile                     = null;
+      speedSerie_Interval_NauticalMile             = null;
 
-      speedSerie_Summarized = null;
-      speedSerie_Summarized_Mile = null;
-      speedSerie_Summarized_NauticalMile = null;
+      speedSerie_Summarized                        = null;
+      speedSerie_Summarized_Mile                   = null;
+      speedSerie_Summarized_NauticalMile           = null;
 
       verticalSpeed_DPTolerance = -1;
 
@@ -2628,71 +2630,71 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
          powerSerie = null;
       }
 
-      timeSerieDouble = null;
-      timeSerieWithTimeZoneAdjustment = null;
+      timeSerieDouble                              = null;
+      timeSerieWithTimeZoneAdjustment              = null;
 
-      distanceSerieDouble_Kilometer = null;
-      distanceSerieDouble_Mile = null;
-      distanceSerieDouble_NauticalMile = null;
+      distanceSerieDouble_Kilometer                = null;
+      distanceSerieDouble_Mile                     = null;
+      distanceSerieDouble_NauticalMile             = null;
 
-      breakTimeSerie = null;
-      pausedTimeSerie = null;
-      movingTimeSerie = null;
-      recordedTimeSerie = null;
+      breakTimeSerie                               = null;
+      pausedTimeSerie                              = null;
+      movingTimeSerie                              = null;
+      recordedTimeSerie                            = null;
 
-      _pulseSerie_Smoothed = null;
-      pulseSerie_FromTime = null;
-      pulseSerie_RRIntervals = null;
+      _pulseSerie_Smoothed                         = null;
+      pulseSerie_FromTime                          = null;
+      pulseSerie_RRIntervals                       = null;
 
-      gradientSerie = null;
+      gradientSerie                                = null;
 
-      paceSerie_Seconds = null;
-      paceSerie_Seconds_Imperial = null;
-      paceSerie_Minute = null;
-      paceSerie_Minute_Imperial = null;
+      paceSerie_Seconds                            = null;
+      paceSerie_Seconds_Imperial                   = null;
+      paceSerie_Minute                             = null;
+      paceSerie_Minute_Imperial                    = null;
 
-      paceSerie_Interval_Seconds = null;
-      paceSerie_Interval_Seconds_Imperial = null;
+      paceSerie_Interval_Seconds                   = null;
+      paceSerie_Interval_Seconds_Imperial          = null;
 
-      paceSerie_Summarized_Seconds = null;
-      paceSerie_Summarized_Seconds_Imperial = null;
+      paceSerie_Summarized_Seconds                 = null;
+      paceSerie_Summarized_Seconds_Imperial        = null;
 
-      altimeterSerie = null;
-      altimeterSerieImperial = null;
+      altimeterSerie                               = null;
+      altimeterSerieImperial                       = null;
 
-      altitudeSerieSmoothed = null;
-      altitudeSerieImperial = null;
-      altitudeSerieImperialSmoothed = null;
+      altitudeSerieSmoothed                        = null;
+      altitudeSerieImperial                        = null;
+      altitudeSerieImperialSmoothed                = null;
 
-      cadenceSerieWithMultiplier = null;
+      cadenceSerieWithMultiplier                   = null;
 
-      _radar_VehicleStates = null;
-      _radar_PassedVehicles_UI = null;
+      _radar_VehicleStates                         = null;
+      _radar_PassedVehicles_UI                     = null;
 
-      _radar_DistanceToVehicle_Meter = null;
-      _radar_DistanceToVehicle_Yard = null;
+      _radar_DistanceToVehicle_Meter               = null;
+      _radar_DistanceToVehicle_Yard                = null;
 
-      _radar_PassingSpeed_Absolute_Kilometer = null;
-      _radar_PassingSpeed_Absolute_Mile = null;
-      _radar_PassingSpeed_Absolute_NauticalMile = null;
+      _radar_PassingSpeed_Absolute_Kilometer       = null;
+      _radar_PassingSpeed_Absolute_Mile            = null;
+      _radar_PassingSpeed_Absolute_NauticalMile    = null;
 
-      _radar_PassingSpeed_Relative_Kilometer = null;
-      _radar_PassingSpeed_Relative_Mile = null;
-      _radar_PassingSpeed_Relative_NauticalMile = null;
+      _radar_PassingSpeed_Relative_Kilometer       = null;
+      _radar_PassingSpeed_Relative_Mile            = null;
+      _radar_PassingSpeed_Relative_NauticalMile    = null;
 
-      _runDyn_StanceTime_UI = null;
-      _runDyn_StanceTimeBalance_UI = null;
-      _runDyn_StepLength_UI = null;
-      _runDyn_StepLength_UI_Imperial = null;
-      _runDyn_VerticalOscillation_UI = null;
-      _runDyn_VerticalOscillation_UI_Imperial = null;
-      _runDyn_VerticalRatio_UI = null;
+      _runDyn_StanceTime_UI                        = null;
+      _runDyn_StanceTimeBalance_UI                 = null;
+      _runDyn_StepLength_UI                        = null;
+      _runDyn_StepLength_UI_Imperial               = null;
+      _runDyn_VerticalOscillation_UI               = null;
+      _runDyn_VerticalOscillation_UI_Imperial      = null;
+      _runDyn_VerticalRatio_UI                     = null;
 
-      _swim_LengthType_UI = null;
-      _swim_Cadence_UI = null;
-      _swim_Strokes_UI = null;
-      _swim_StrokeStyle_UI = null;
-      _swim_Swolf = null;
+      _swim_LengthType_UI                          = null;
+      _swim_Cadence_UI                             = null;
+      _swim_Strokes_UI                             = null;
+      _swim_StrokeStyle_UI                         = null;
+      _swim_Swolf                                  = null;
 
       if (swim_Cadence != null) {
 
@@ -2700,23 +2702,25 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
          cadenceSerie = null;
       }
 
-      srtmSerie = null;
-      srtmSerieImperial = null;
-      _isSRTM1Values = false;
+      srtmSerie                                    = null;
+      srtmSerieImperial                            = null;
+      _isSRTM1Values                               = false;
 
-      _geoBounds = null;
-      _worldPixelBounds = null;
-      _isGeoBoundsChecked = false;
+      _geoBounds                                   = null;
+      _worldPixelBounds                            = null;
+      _isGeoBoundsChecked                          = false;
 
-      _rasterizedLatLon = null;
-      geoGrid = null;
+      _rasterizedLatLon                            = null;
+      geoGrid                                      = null;
 
-      _hrZones = null;
-      _hrZoneContext = null;
+      _hrZones                                     = null;
+      _hrZoneContext                               = null;
 
-      _gearValues = null;
+      _gearValues                                  = null;
 
-      _cadenceGaps = null;
+      _cadenceGaps                                 = null;
+
+// SET_FORMATTING_ON
    }
 
    /**
@@ -15523,6 +15527,8 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
 
       final TourData clonedTourData = new TourData();
 
+      clonedTourData.setTourStartTime(getTourStartTime());
+
 // SET_FORMATTING_OFF
 
       clonedTourData.tourMarkers                   = undoRedo_CloneTourMarkers();
@@ -15598,6 +15604,8 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
    public void undoRedo_RevertTourData(final TourData clonedTourData,
                                        final int firstIndex,
                                        final int lastIndex) {
+
+      setTourStartTime(clonedTourData.getTourStartTime());
 
 // SET_FORMATTING_OFF
 
