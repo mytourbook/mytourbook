@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2026 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -27,6 +27,7 @@ import net.tourbook.Messages;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourTag;
 import net.tourbook.database.TourDatabase;
+import net.tourbook.tour.TourManager;
 
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.ActionContributionItem;
@@ -73,6 +74,11 @@ public class Action_RemoveTourTag_SubMenu extends Action implements IMenuCreator
 
       @Override
       public void run() {
+
+         if (_tagMenuMgr.isSaveTour() && TourManager.isTourEditorModified()) {
+            return;
+         }
+
          _tagMenuMgr.saveTourTags(_tourTag, false);
       }
    }

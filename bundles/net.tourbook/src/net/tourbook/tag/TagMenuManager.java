@@ -166,6 +166,10 @@ public class TagMenuManager implements IActionProvider {
       @Override
       public void run() {
 
+         if (_currentInstance._isSaveTour && TourManager.isTourEditorModified()) {
+            return;
+         }
+
          BusyIndicator.showWhile(Display.getCurrent(), () -> removeAllTags());
       }
    }
@@ -196,6 +200,10 @@ public class TagMenuManager implements IActionProvider {
       @Override
       public void run() {
 
+         if (_currentInstance._isSaveTour && TourManager.isTourEditorModified()) {
+            return;
+         }
+
          clipboard_PasteTags();
       }
    }
@@ -214,7 +222,7 @@ public class TagMenuManager implements IActionProvider {
       @Override
       public void run() {
 
-         if (TourManager.isTourEditorModified()) {
+         if (_currentInstance._isSaveTour && TourManager.isTourEditorModified()) {
             return;
          }
 
@@ -275,6 +283,10 @@ public class TagMenuManager implements IActionProvider {
 
       @Override
       public void run() {
+
+         if (_currentInstance._isSaveTour && TourManager.isTourEditorModified()) {
+            return;
+         }
 
          saveTourTags(__tagGroup);
       }
@@ -337,6 +349,10 @@ public class TagMenuManager implements IActionProvider {
 
       @Override
       public void run() {
+
+         if (_currentInstance._isSaveTour && TourManager.isTourEditorModified()) {
+            return;
+         }
 
          if (_isAdvMenu) {
 
@@ -1148,7 +1164,13 @@ public class TagMenuManager implements IActionProvider {
    }
 
    ITourProvider getTourProvider() {
+
       return _tourProvider;
+   }
+
+   boolean isSaveTour() {
+
+      return _isSaveTour;
    }
 
    /**
@@ -1196,10 +1218,6 @@ public class TagMenuManager implements IActionProvider {
                           final Point menuPosition,
                           final ToolTip toolTip,
                           final Boolean isFlatView) {
-
-      if (TourManager.isTourEditorModified()) {
-         return;
-      }
 
       updateTagAutoOpenAction(isFlatView);
 

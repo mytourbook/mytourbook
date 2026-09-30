@@ -219,6 +219,10 @@ public class EquipmentMenuManager implements IActionProvider {
       @Override
       public void run() {
 
+         if (_currentInstance._isSaveTour && TourManager.isTourEditorModified()) {
+            return;
+         }
+
          clipboard_PasteEquipment();
       }
    }
@@ -239,6 +243,10 @@ public class EquipmentMenuManager implements IActionProvider {
       @Override
       public void run() {
 
+         if (_currentInstance._isSaveTour && TourManager.isTourEditorModified()) {
+            return;
+         }
+
          equipment_Add(__equipmentGroup);
       }
    }
@@ -253,6 +261,10 @@ public class EquipmentMenuManager implements IActionProvider {
 
       @Override
       public void run() {
+
+         if (_currentInstance._isSaveTour && TourManager.isTourEditorModified()) {
+            return;
+         }
 
          if (_isAdvMenu) {
 
@@ -300,6 +312,10 @@ public class EquipmentMenuManager implements IActionProvider {
       @Override
       public void run() {
 
+         if (_currentInstance._isSaveTour && TourManager.isTourEditorModified()) {
+            return;
+         }
+
          EquipmentManager.equipment_RemoveAll(_tourProvider, _isSaveTour, _isCheckTourEditor);
       }
    }
@@ -316,6 +332,10 @@ public class EquipmentMenuManager implements IActionProvider {
 
       @Override
       public void run() {
+
+         if (_currentInstance._isSaveTour && TourManager.isTourEditorModified()) {
+            return;
+         }
 
          final boolean isChecked = isChecked();
 
@@ -1399,10 +1419,6 @@ public class EquipmentMenuManager implements IActionProvider {
                           final Point menuPosition,
                           final ToolTip toolTip,
                           final Boolean isFlatView) {
-
-      if (TourManager.isTourEditorModified()) {
-         return;
-      }
 
       updateEquipmentAutoOpenAction(isFlatView);
 
