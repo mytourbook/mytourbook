@@ -353,6 +353,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
    //
    private boolean                                          _is2ndAltiLayerVisible;
    private boolean                                          _isDisplayedInDialog;
+   private boolean                                          _isForceFireModify;
    private boolean                                          _isMouseModeSet;
    private boolean                                          _isTourChartToolbarCreated;
    private boolean                                          _isTourDirty;
@@ -1043,8 +1044,21 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
       }
 
       // get selected time slices
-      int firstIndex = getLeftSlider().getValuesIndex() + 1;
-      int lastIndex = getRightSlider().getValuesIndex() - 1;
+      int firstIndex = getLeftSlider().getValuesIndex();
+      int lastIndex = getRightSlider().getValuesIndex();
+
+      if (firstIndex == lastIndex) {
+
+         // sliders are at the same position -> do nothing
+
+         return;
+      }
+
+      /*
+       * Complicated: The last index is the next which will not be removed
+       */
+      firstIndex = firstIndex == 0 ? 0 : firstIndex + 1;
+      lastIndex -= 1;
 
       // check bounds
       if (lastIndex < firstIndex) {
@@ -5153,6 +5167,14 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
       }
    }
 
+   /**
+    * Ensure that TourEventId.TOUR_CHANGED is fired
+    */
+   void setForceFireModify() {
+
+      _isForceFireModify = true;
+   }
+
    public void setGraphActionImage(final int graphId, final ImageDescriptor imageDescriptor) {
 
       if (_allTourChartActions == null) {
@@ -5832,6 +5854,11 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
                _tourChartView.firePropertyChange();
             });
          }
+      }
+
+      if (isDirtyModified || _isForceFireModify) {
+
+         _isForceFireModify = false;
 
          getDisplay().asyncExec(() -> {
 

@@ -784,7 +784,7 @@ public class TourChartView extends ViewPart implements
       return _tourChart;
    }
 
-   public IUndoContext getUndoContext() {
+   IUndoContext getUndoContext() {
 
       return _undoContext;
    }
@@ -1491,6 +1491,9 @@ public class TourChartView extends ViewPart implements
                                      final int lastSerieIndex,
                                      final boolean isTourDirty,
                                      final boolean isUndo) {
+
+      // any undo/redo action should notify other views that the tour is modified
+      _tourChart.setForceFireModify();
 
       updateChart(tourData,
 
