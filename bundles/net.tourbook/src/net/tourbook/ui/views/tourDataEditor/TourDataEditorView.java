@@ -286,12 +286,12 @@ public class TourDataEditorView extends ViewPart implements
    //
    static final String                   STATE_DESCRIPTION_NUMBER_OF_LINES                = "STATE_DESCRIPTION_NUMBER_OF_LINES";              //$NON-NLS-1$
    static final int                      STATE_DESCRIPTION_NUMBER_OF_LINES_DEFAULT        = 3;
-   static final String                   STATE_IS_ADJUST_TOUR_START_TIME                  = "STATE_IS_ADJUST_TOUR_START_TIME";                //$NON-NLS-1$
-   static final boolean                  STATE_IS_ADJUST_TOUR_START_TIME_DEFAULT          = true;
-   static final String                   STATE_IS_DELETE_KEEP_DISTANCE                    = "STATE_IS_DELETE_KEEP_DISTANCE";                  //$NON-NLS-1$
-   static final boolean                  STATE_IS_DELETE_KEEP_DISTANCE_DEFAULT            = false;
-   static final String                   STATE_IS_DELETE_KEEP_TIME                        = "STATE_IS_DELETE_KEEP_TIME";                      //$NON-NLS-1$
-   static final boolean                  STATE_IS_DELETE_KEEP_TIME_DEFAULT                = false;
+   public static final String            STATE_IS_ADJUST_TOUR_START_TIME                  = "STATE_IS_ADJUST_TOUR_START_TIME";                //$NON-NLS-1$
+   public static final boolean           STATE_IS_ADJUST_TOUR_START_TIME_DEFAULT          = true;
+   public static final String            STATE_IS_DELETE_KEEP_DISTANCE                    = "STATE_IS_DELETE_KEEP_DISTANCE";                  //$NON-NLS-1$
+   public static final boolean           STATE_IS_DELETE_KEEP_DISTANCE_DEFAULT            = false;
+   public static final String            STATE_IS_DELETE_KEEP_TIME                        = "STATE_IS_DELETE_KEEP_TIME";                      //$NON-NLS-1$
+   public static final boolean           STATE_IS_DELETE_KEEP_TIME_DEFAULT                = false;
    static final String                   STATE_IS_ELEVATION_FROM_DEVICE                   = "STATE_IS_ELEVATION_FROM_DEVICE";                 //$NON-NLS-1$
    static final boolean                  STATE_IS_ELEVATION_FROM_DEVICE_DEFAULT           = true;
    static final String                   STATE_IS_RECOMPUTE_ELEVATION_UP_DOWN             = "STATE_IS_RECOMPUTE_ELEVATION_UP_DOWN";           //$NON-NLS-1$

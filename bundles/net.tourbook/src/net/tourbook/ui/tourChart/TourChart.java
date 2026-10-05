@@ -100,6 +100,7 @@ import net.tourbook.ui.tourChart.action.ActionXAxisTime;
 import net.tourbook.ui.tourChart.action.Action_TourChart_Info;
 import net.tourbook.ui.views.geoCompare.GeoCompareManager;
 import net.tourbook.ui.views.geoCompare.GeoCompareView;
+import net.tourbook.ui.views.tourDataEditor.TourDataEditorView;
 import net.tourbook.ui.views.tourSegmenter.SelectedTourSegmenterSegments;
 import net.tourbook.ui.views.tourSegmenter.TourSegmenterView;
 
@@ -385,7 +386,6 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
    private ValuePoint_ToolTip_UI         _valuePointTooltipUI;
    //
    private ControlListener               _ttControlListener              = new ControlListener();
-   private IKeyListener                  _chartKeyListener               = new ChartKeyListener();
    private IMouseListener                _mouseMarkerListener            = new MouseMarkerListener();
    private IMouseListener                _mousePauseListener             = new MousePauseListener();
    private IMouseListener                _mousePhotoListener             = new MousePhotoListener();
@@ -895,6 +895,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 
       addDisposeListener(disposeEvent -> onDispose());
 
+      addChartKeyListener(new ChartKeyListener());
       addControlListener(this);
       addPrefListeners();
 
@@ -1046,8 +1047,14 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
       // get selected time slices
       int firstIndex = getLeftSlider().getValuesIndex();
       int lastIndex = getRightSlider().getValuesIndex();
+      final int indexDiff = lastIndex - firstIndex;
 
-      if (firstIndex == lastIndex) {
+      System.out.println(UI.timeStamp() + " deleteTimeSlices: " + firstIndex + " - " + lastIndex);
+//    System.out.println(UI.timeStamp() + " indexDiff: " + indexDiff);
+//    System.out.println(UI.timeStamp() + " isRemoveTime: " + isRemoveTime);
+// TODO remove SYSTEM.OUT.PRINTLN
+
+      if (indexDiff == 0) {
 
          // sliders are at the same position -> do nothing
 
@@ -1055,10 +1062,24 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
       }
 
       /*
-       * Complicated: The last index is the next which will not be removed
+       * Complicated: The last index is the next which will NOT be removed
        */
-      firstIndex = firstIndex == 0 ? 0 : firstIndex + 1;
-      lastIndex -= 1;
+      if (isRemoveTime) {
+
+         if (firstIndex == 0) {
+
+         } else {
+
+            firstIndex += 1;
+         }
+
+//         lastIndex = indexDiff == 1
+//               ? lastIndex - 1
+//               : lastIndex - 1;
+
+      } else {
+
+      }
 
       // check bounds
       if (lastIndex < firstIndex) {
@@ -3963,7 +3984,30 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
    private void onChart_KeyDown(final ChartKeyEvent keyEvent) {
 
       if (_isTourSegmenterVisible) {
+
          selectSegmenterSegment(keyEvent);
+
+      } else if (keyEvent.keyCode == SWT.DEL) {
+
+         final boolean isAdjustTourStartTime = Util.getStateBoolean(_state,
+               TourDataEditorView.STATE_IS_ADJUST_TOUR_START_TIME,
+               TourDataEditorView.STATE_IS_ADJUST_TOUR_START_TIME_DEFAULT);
+
+         final boolean isKeepDistance = Util.getStateBoolean(_state,
+               TourDataEditorView.STATE_IS_DELETE_KEEP_DISTANCE,
+               TourDataEditorView.STATE_IS_DELETE_KEEP_DISTANCE_DEFAULT);
+
+         final boolean isKeepTime = Util.getStateBoolean(_state,
+               TourDataEditorView.STATE_IS_DELETE_KEEP_TIME,
+               TourDataEditorView.STATE_IS_DELETE_KEEP_TIME_DEFAULT);
+
+         final boolean isRemoveDistance = isKeepDistance == false;
+         final boolean isRemoveTime = isKeepTime == false;
+
+         actionDeleteTimeSlices(isRemoveTime, isRemoveDistance, isAdjustTourStartTime);
+
+         // prevent other actions in the chart
+         keyEvent.isWorked = true;
       }
    }
 
@@ -6247,7 +6291,6 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 
          addChartMouseListener(_mouseSegmentLabel_Listener);
          addChartMouseMoveListener(_mouseSegmentLabel_MoveListener);
-         addChartKeyListener(_chartKeyListener);
 
       } else {
 
@@ -6262,7 +6305,6 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 
          removeChartMouseListener(_mouseSegmentLabel_Listener);
          removeChartMouseMoveListener(_mouseSegmentLabel_MoveListener);
-         removeChartKeyListener(_chartKeyListener);
       }
    }
 

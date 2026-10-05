@@ -2598,7 +2598,7 @@ public class TourManager {
    }
 
    /**
-    * Remove time slices from {@link TourData}
+    * Remove time slices from {@link TourData} this includes the first and the last index
     *
     * @param tourData
     * @param firstIndex
@@ -2613,6 +2613,9 @@ public class TourManager {
                                        final boolean isRemoveTime,
                                        final boolean isRemoveDistance,
                                        final boolean isAdjustTourStartTime) {
+
+      System.out.println(UI.timeStamp() + " removeTimeSlices: " + firstIndex + " - " + lastIndex);
+// TODO remove SYSTEM.OUT.PRINTLN
 
       // this must be done before the time series are modified
       tourData.removePhotos(firstIndex, lastIndex);
@@ -2932,9 +2935,10 @@ public class TourManager {
       final boolean isRemovePhotoSlices = isAdjustTourStartTime && firstIndex == 0;
 
       final boolean isRemoveTimeValues = isRemoveTime || isRemovePhotoSlices;
+      final int nextIndex = lastIndex + 1;
 
       final int timeFirstIndex = timeSerie[firstIndex];
-      final int timeNextIndex = timeSerie[lastIndex + 1];
+      final int timeNextIndex = timeSerie[nextIndex];
 
       int timeDiff = 0;
       if (isRemoveTimeValues) {
@@ -2943,11 +2947,11 @@ public class TourManager {
 
       float distDiff = -1;
       if (isRemoveDistance && distSerie != null) {
-         distDiff = distSerie[lastIndex + 1] - distSerie[firstIndex];
+         distDiff = distSerie[nextIndex] - distSerie[firstIndex];
       }
 
       // update remaining time and distance data series
-      for (int serieIndex = lastIndex + 1; serieIndex < timeSerie.length; serieIndex++) {
+      for (int serieIndex = nextIndex; serieIndex < timeSerie.length; serieIndex++) {
 
          if (isRemoveTimeValues) {
             timeSerie[serieIndex] = timeSerie[serieIndex] - timeDiff;
