@@ -1647,13 +1647,6 @@
          icon           ="icons/restore-tour.svg"/>
 
    </extension>
-   
-   <extension  point="org.eclipse.ui.contexts">
-      <context
-            id="net.tourbook.chart.context.isTourChart"
-            name="net.tourbook.chart.context.isTourChart">
-      </context>
-   </extension>
 
    <extension   point="org.eclipse.ui.views">
 
@@ -2032,6 +2025,16 @@
 
    </extension>
 
+   
+   <extension  point="org.eclipse.ui.contexts">
+   
+      <context
+         id          ="net.tourbook.context.tourEditor"
+         name        ="net.tourbook.context.tourEditor"
+         parentId    ="org.eclipse.ui.contexts.window"/>
+   
+   </extension>
+
 
    <extension  point="org.eclipse.ui.bindings">
 
@@ -2155,7 +2158,7 @@
       <key
          commandId   ="command.net.tourbook.tour.RestoreTour_InEditor"
          sequence    ="%Shortcut_Key_App_RestoreTour"
-         contextId   ="org.eclipse.ui.contexts.window"
+         contextId   ="net.tourbook.context.tourEditor"
          schemeId    ="net.tourbook.scheme"/>
          
       <key

@@ -28,7 +28,6 @@ import net.tourbook.chart.SelectionChartXSliderPosition;
 import net.tourbook.commands.ISaveAndRestorePart;
 import net.tourbook.common.UI;
 import net.tourbook.common.dialog.MessageDialog_WithRadioOptions;
-import net.tourbook.common.time.TimeTools;
 import net.tourbook.common.util.PostSelectionProvider;
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.Util;
@@ -95,6 +94,7 @@ import org.eclipse.ui.ISaveablePart2;
 import org.eclipse.ui.ISelectionListener;
 import org.eclipse.ui.IViewPart;
 import org.eclipse.ui.IViewSite;
+import org.eclipse.ui.IWorkbenchCommandConstants;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.IWorkbenchPartReference;
 import org.eclipse.ui.PlatformUI;
@@ -607,19 +607,32 @@ public class TourChartView extends ViewPart implements
       super.dispose();
    }
 
-   private void disposeUndo() {
+   /**
+    * @return Returns the first undo operation which can be used to retrieve the first slider
+    *         positions
+    */
+   private IUndoableOperation disposeUndo() {
 
       final IOperationHistory undoHistory = PlatformUI.getWorkbench().getOperationSupport().getOperationHistory();
+
+      final IUndoableOperation[] allUndoableOperations = undoHistory.getUndoHistory(_undoContext);
+      IUndoableOperation firstUndoOp = null;
+
+      if (allUndoableOperations.length > 0) {
+         firstUndoOp = allUndoableOperations[0];
+      }
 
       undoHistory.dispose(_undoContext, true, true, true);
 
       _undoCounter = 0;
+
+      return firstUndoOp;
    }
 
    @Override
    public void doRestore() {
 
-      disposeUndo();
+      final IUndoableOperation disposeUndo = disposeUndo();
 
       // removed old tour data from the selection provider
       _postSelectionProvider.clearSelection();
@@ -628,6 +641,17 @@ public class TourChartView extends ViewPart implements
       final TourData tourData = TourManager.getInstance().getTourDataFromDb(tourId);
 
       updateChart(tourData, true, false);
+
+      /*
+       * Set slider to the initial positions, when available
+       */
+      if (disposeUndo instanceof final TourDataUndoOperation tourDataUndoOperation) {
+
+         setSliderPositions(
+               tourDataUndoOperation.getSliderFirstIndex(),
+               tourDataUndoOperation.getSliderLastIndex(),
+               false);
+      }
    }
 
    @Override
@@ -1278,6 +1302,9 @@ public class TourChartView extends ViewPart implements
                                    final int rightSliderValuesIndex,
                                    final boolean isCenterSliderPosition) {
 
+      System.out.println(UI.timeStamp() + " setSliderPositions: " + leftSliderValuesIndex + " - " + rightSliderValuesIndex);
+// TODO remove SYSTEM.OUT.PRINTLN
+
       final SelectionChartXSliderPosition xSliderPosition = new SelectionChartXSliderPosition(
             _tourChart,
             leftSliderValuesIndex,
@@ -1306,6 +1333,15 @@ public class TourChartView extends ViewPart implements
 
       // 4. Update the action bars to apply changes
       actionBars.updateActionBars();
+
+//      final IUndoContext undoContext = getUndoContext();
+//      final UndoActionHandler undoAction = new UndoActionHandler(getSite(), undoContext);
+//      undoAction.setActionDefinitionId(IWorkbenchCommandConstants.EDIT_UNDO);
+//      final RedoActionHandler redoAction = new RedoActionHandler(getSite(), undoContext);
+//      redoAction.setActionDefinitionId(IWorkbenchCommandConstants.EDIT_REDO);
+//      getViewSite().getActionBars().setGlobalActionHandler(ActionFactory.UNDO.getId(), undoAction);
+//      getViewSite().getActionBars().setGlobalActionHandler(ActionFactory.REDO.getId(), redoAction);
+
    }
 
    private void showTour() {
@@ -1408,28 +1444,32 @@ public class TourChartView extends ViewPart implements
    /**
     * @param tourData_Cloned_Before
     * @param tourData_Cloned_WithRemovedTimeSliced
-    * @param firstIndex
-    * @param lastIndex
+    * @param sliderFirstIndex
+    * @param sliderLastIndex
     */
    void undoRedo_DeleteTimeSlice(final TourData tourData_Cloned_Before,
                                  final TourData tourData_Cloned_WithRemovedTimeSliced,
-                                 final int firstIndex,
-                                 final int lastIndex) {
+                                 final int sliderFirstIndex,
+                                 final int sliderLastIndex) {
 
       // Inside an action listener or command handler
+
+      final String opLabel = "%d: Removed %d time slices".formatted(
+
+            ++_undoCounter,
+            sliderLastIndex - sliderFirstIndex);
+
       final TourDataUndoOperation op = new TourDataUndoOperation(
 
-            "%d: %s".formatted(
-                  ++_undoCounter,
-                  TimeTools.Formatter_DateTime_SM.format(TimeTools.now())),
+            opLabel,
 
             this,
 
             tourData_Cloned_Before, // old
             tourData_Cloned_WithRemovedTimeSliced, // new
 
-            firstIndex,
-            lastIndex);
+            sliderFirstIndex,
+            sliderLastIndex);
 
       // Assign the context scope
       op.addContext(_undoContext);
@@ -1448,23 +1488,23 @@ public class TourChartView extends ViewPart implements
       }
    }
 
-   void undoRedo_Execute(final int firstSerieIndex, final int lastSerieIndex) {
+   void undoRedo_Execute(final int sliderFirstIndex, final int sliderLastIndex) {
 
-      undoRedo_UpdateChart(_tourData, firstSerieIndex, lastSerieIndex, true, false);
+      undoRedo_UpdateChart(_tourData, sliderFirstIndex, sliderLastIndex, true, false);
    }
 
    void undoRedo_Redo(final TourData tourData_Cloned_WithRemovedTimeSliced,
-                      final int firstSerieIndex,
-                      final int lastSerieIndex) {
+                      final int sliderFirstIndex,
+                      final int sliderLastIndex) {
 
-      _tourData.undoRedo_RevertTourData(tourData_Cloned_WithRemovedTimeSliced, firstSerieIndex, lastSerieIndex);
+      _tourData.undoRedo_RevertTourData(tourData_Cloned_WithRemovedTimeSliced, sliderFirstIndex, sliderLastIndex);
 
-      undoRedo_UpdateChart(_tourData, firstSerieIndex, lastSerieIndex, true, false);
+      undoRedo_UpdateChart(_tourData, sliderFirstIndex, sliderLastIndex, true, false);
    }
 
    void undoRedo_Undo(final TourData tourData_Cloned_Before,
-                      final int firstSerieIndex,
-                      final int lastSerieIndex) {
+                      final int sliderFirstIndex,
+                      final int sliderLastIndex) {
 
       final IOperationHistory opHistory = PlatformUI.getWorkbench().getOperationSupport().getOperationHistory();
       final IUndoableOperation[] undoHistory = opHistory.getUndoHistory(_undoContext);
@@ -1481,14 +1521,14 @@ public class TourChartView extends ViewPart implements
          isTourDirty = false;
       }
 
-      _tourData.undoRedo_RevertTourData(tourData_Cloned_Before, firstSerieIndex, lastSerieIndex);
+      _tourData.undoRedo_RevertTourData(tourData_Cloned_Before, sliderFirstIndex, sliderLastIndex);
 
-      undoRedo_UpdateChart(_tourData, firstSerieIndex, lastSerieIndex, isTourDirty, true);
+      undoRedo_UpdateChart(_tourData, sliderFirstIndex, sliderLastIndex, isTourDirty, true);
    }
 
    private void undoRedo_UpdateChart(final TourData tourData,
-                                     final int firstSerieIndex,
-                                     final int lastSerieIndex,
+                                     final int sliderFirstIndex,
+                                     final int sliderLastIndex,
                                      final boolean isTourDirty,
                                      final boolean isUndo) {
 
@@ -1500,19 +1540,14 @@ public class TourChartView extends ViewPart implements
             true, // isKeepMinMaxValues
             isTourDirty);
 
-      final int indexDiff = lastSerieIndex - firstSerieIndex;
+      final int indexDiff = sliderLastIndex - sliderFirstIndex;
 
-      final int newLastIndex = isUndo
-            ? lastSerieIndex + 1
-            : lastSerieIndex - indexDiff;
-
-      final int newFirstIndex = isUndo
-            ? firstSerieIndex - 1
-            : newLastIndex - 1;
+      final int newSliderFirstIndex = sliderFirstIndex;
+      final int newSliderLastIndex = sliderLastIndex;
 
       setSliderPositions(
-            newFirstIndex,
-            newLastIndex,
+            newSliderFirstIndex,
+            newSliderLastIndex,
             false);
 
       // update undo/redo enablement

@@ -1044,12 +1044,16 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
          return;
       }
 
-      // get selected time slices
-      int firstIndex = getLeftSlider().getValuesIndex();
-      int lastIndex = getRightSlider().getValuesIndex();
-      final int indexDiff = lastIndex - firstIndex;
+      // get selected time slice indices
+      final int sliderLeftIndex = getLeftSlider().getValuesIndex();
+      final int sliderRightIndex = getRightSlider().getValuesIndex();
 
-      System.out.println(UI.timeStamp() + " deleteTimeSlices: " + firstIndex + " - " + lastIndex);
+      int deleteFirstIndex = sliderLeftIndex;
+      int deleteLastIndex = sliderRightIndex;
+
+      final int indexDiff = deleteLastIndex - deleteFirstIndex;
+
+      System.out.println(UI.timeStamp() + " deleteTimeSlices: " + deleteFirstIndex + " - " + deleteLastIndex);
 //    System.out.println(UI.timeStamp() + " indexDiff: " + indexDiff);
 //    System.out.println(UI.timeStamp() + " isRemoveTime: " + isRemoveTime);
 // TODO remove SYSTEM.OUT.PRINTLN
@@ -1066,11 +1070,11 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
        */
       if (isRemoveTime) {
 
-         if (firstIndex == 0) {
+         if (deleteFirstIndex == 0) {
 
          } else {
 
-            firstIndex += 1;
+            deleteFirstIndex += 1;
          }
 
 //         lastIndex = indexDiff == 1
@@ -1082,21 +1086,21 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
       }
 
       // check bounds
-      if (lastIndex < firstIndex) {
-         lastIndex = firstIndex;
+      if (deleteLastIndex < deleteFirstIndex) {
+         deleteLastIndex = deleteFirstIndex;
       }
 
       final int numSlices = _tourData.timeSerie.length;
 
-      if (firstIndex >= numSlices) {
-         firstIndex = numSlices - 1;
+      if (deleteFirstIndex >= numSlices) {
+         deleteFirstIndex = numSlices - 1;
       }
-      if (lastIndex >= numSlices) {
-         lastIndex = numSlices - 1;
+      if (deleteLastIndex >= numSlices) {
+         deleteLastIndex = numSlices - 1;
       }
 
       // check if markers are within the selection
-      if (canDeleteMarkers(firstIndex, lastIndex) == false) {
+      if (canDeleteMarkers(deleteFirstIndex, deleteLastIndex) == false) {
          return;
       }
 
@@ -1106,8 +1110,8 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
       TourManager.removeTimeSlices(
 
             _tourData,
-            firstIndex,
-            lastIndex,
+            deleteFirstIndex,
+            deleteLastIndex,
             isRemoveTime,
             isRemoveDistance,
             isAdjustTourStartTime);
@@ -1119,8 +1123,8 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
             tourData_Cloned_Before,
             tourData_Cloned_WithRemovedTimeSliced,
 
-            firstIndex,
-            lastIndex);
+            sliderLeftIndex,
+            sliderRightIndex);
    }
 
    public void actionGraphOverlapped(final boolean isItemChecked) {

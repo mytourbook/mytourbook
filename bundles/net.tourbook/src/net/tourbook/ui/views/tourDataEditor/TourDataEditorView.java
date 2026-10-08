@@ -230,6 +230,7 @@ import org.eclipse.ui.IWorkbenchPartReference;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.commands.ICommandService;
+import org.eclipse.ui.contexts.IContextService;
 import org.eclipse.ui.dialogs.PreferencesUtil;
 import org.eclipse.ui.forms.events.IExpansionListener;
 import org.eclipse.ui.forms.widgets.ExpandableComposite;
@@ -3655,6 +3656,8 @@ public class TourDataEditorView extends ViewPart implements
       addTourSaveListener();
 
       PhotoManager.addPhotoEventListener(this);
+
+      setupContext();
 
       // this part is a selection provider
       getSite().setSelectionProvider(_postSelectionProvider = new PostSelectionProvider(ID));
@@ -9687,6 +9690,19 @@ public class TourDataEditorView extends ViewPart implements
 
       _nfLatLon.setMinimumFractionDigits(_latLonDigits);
       _nfLatLon.setMaximumFractionDigits(_latLonDigits);
+   }
+
+   /**
+    * This context is used for key bindings that Ctrl-Z is working also in other parts, e.g. tour
+    * chart
+    */
+   private void setupContext() {
+
+      // Get the site's local context service
+      final IContextService contextService = getSite().getService(IContextService.class);
+
+      // Activate it. The workbench cleans this up automatically on part disposal.
+      contextService.activateContext("net.tourbook.context.tourEditor"); //$NON-NLS-1$
    }
 
    /**

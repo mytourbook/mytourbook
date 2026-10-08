@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2026 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -21,6 +21,7 @@ package net.tourbook.chart;
 import java.util.ArrayList;
 
 import net.tourbook.common.RectangleLong;
+import net.tourbook.common.UI;
 
 /**
  * The slider is moved on the x-axis and displays the current position in the slider label.
@@ -37,7 +38,7 @@ public class ChartXSlider {
     */
    public final static int              SLIDER_LINE_WIDTH       = 10;
 
-   int                                  sliderType              = SLIDER_TYPE_NONE;
+   private int                          _sliderType             = SLIDER_TYPE_NONE;
 
    private final RectangleLong          _hitRectangle           = new RectangleLong(0, 0, SLIDER_LINE_WIDTH * 2, 0);
 
@@ -78,7 +79,7 @@ public class ChartXSlider {
    ChartXSlider(final ChartComponentGraph graph, final int xxDevSliderPosition, final int sliderType) {
 
       _chartGraph = graph;
-      this.sliderType = sliderType;
+      this._sliderType = sliderType;
 
       moveToXXDevPosition(xxDevSliderPosition, true, true);
    }
@@ -145,10 +146,10 @@ public class ChartXSlider {
       // resize the hit rectangle
       _hitRectangle.height = devGraphHeight;
 
-      if (sliderType == SLIDER_TYPE_RIGHT) {
-         // position the right slider to the right side, this is done only
-         // the first time
-         sliderType = SLIDER_TYPE_NONE;
+      if (_sliderType == SLIDER_TYPE_RIGHT) {
+
+         // position the right slider to the right side, this is done only the first time
+         _sliderType = SLIDER_TYPE_NONE;
 
          // run the positioning after all is done, otherwise not all is
          // initialized
@@ -279,6 +280,12 @@ public class ChartXSlider {
     */
    boolean setValueIndex(final int valueIndex) {
 
+      if (_sliderType == SLIDER_TYPE_LEFT || _sliderType == SLIDER_TYPE_NONE) {
+
+         System.out.println(UI.timeStamp() + " setValueIndex: %d : %d".formatted(_sliderType, valueIndex));
+      }
+// TODO remove SYSTEM.OUT.PRINTLN
+
       final int oldValue = _valueIndex;
 
       _valueIndex = valueIndex;
@@ -294,7 +301,7 @@ public class ChartXSlider {
             + "_positionRatio=" + _positionRatio + " " //               //$NON-NLS-1$ //$NON-NLS-2$
             + "_valueIndex=" + _valueIndex + " " //                     //$NON-NLS-1$ //$NON-NLS-2$
             + "_xxDevSliderLinePos=" + _xxDevSliderLinePos + " " //     //$NON-NLS-1$ //$NON-NLS-2$
-            + "sliderType=" + sliderType + " " //                       //$NON-NLS-1$ //$NON-NLS-2$
+            + "sliderType=" + _sliderType + " " //                       //$NON-NLS-1$ //$NON-NLS-2$
 
             + "]"; //                                                   //$NON-NLS-1$
    }

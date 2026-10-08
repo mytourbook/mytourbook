@@ -34,13 +34,15 @@ See milestone 26.? https://github.com/mytourbook/mytourbook/milestone/29?closed=
 New / Improvements
 ==================
 
-* 
+* Tour Chart
+  - Delete time slices, the tour chart is now a more functional tour editor with an undo/redo feature, before only e.g. tour markers could be modified
   
 
 Changes
 =======
 
-* Removed the Suunto 9 import (Frederic)
+* Tour Chart
+  - Toggle active vertical slider with the keyboard is now Ctrl-T, before it was only the Ctrl key
     
 
 Bugfix

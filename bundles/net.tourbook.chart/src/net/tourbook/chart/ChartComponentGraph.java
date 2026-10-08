@@ -8079,10 +8079,12 @@ public class ChartComponentGraph extends Canvas {
          }
       }
 
-      // toggle selected slider with the ctrl key, key changed in 15.10 to select multiple segments which shift
-      if (isCtrl && isShift == false) {
+      // toggle selected slider with the Ctrl-T, key changed in 15.10 to select multiple segments which shift
+      if (isCtrl && keyCode == 't' && isShift == false) {
+
          _selectedXSlider = _selectedXSlider == _xSliderA ? _xSliderB : _xSliderA;
          _isSliderDirty = true;
+
          redraw();
 
          return;
