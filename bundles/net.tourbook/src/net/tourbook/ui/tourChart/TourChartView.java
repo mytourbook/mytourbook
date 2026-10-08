@@ -94,7 +94,6 @@ import org.eclipse.ui.ISaveablePart2;
 import org.eclipse.ui.ISelectionListener;
 import org.eclipse.ui.IViewPart;
 import org.eclipse.ui.IViewSite;
-import org.eclipse.ui.IWorkbenchCommandConstants;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.IWorkbenchPartReference;
 import org.eclipse.ui.PlatformUI;
@@ -808,7 +807,7 @@ public class TourChartView extends ViewPart implements
       return _tourChart;
    }
 
-   IUndoContext getUndoContext() {
+   public IUndoContext getUndoContext() {
 
       return _undoContext;
    }
@@ -1302,7 +1301,7 @@ public class TourChartView extends ViewPart implements
                                    final int rightSliderValuesIndex,
                                    final boolean isCenterSliderPosition) {
 
-      System.out.println(UI.timeStamp() + " setSliderPositions: " + leftSliderValuesIndex + " - " + rightSliderValuesIndex);
+//      System.out.println(UI.timeStamp() + " setSliderPositions: " + leftSliderValuesIndex + " - " + rightSliderValuesIndex);
 // TODO remove SYSTEM.OUT.PRINTLN
 
       final SelectionChartXSliderPosition xSliderPosition = new SelectionChartXSliderPosition(
@@ -1454,7 +1453,7 @@ public class TourChartView extends ViewPart implements
 
       // Inside an action listener or command handler
 
-      final String opLabel = "%d: Removed %d time slices".formatted(
+      final String opLabel = "%d: Remove %d time slices".formatted(
 
             ++_undoCounter,
             sliderLastIndex - sliderFirstIndex);

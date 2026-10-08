@@ -51,7 +51,7 @@ public class RestoreTour_Handler_InChart extends AbstractHandler implements IEle
    @Override
    public boolean isEnabled() {
 
-      return TourManager.isTourModified_InChart();
+      return TourManager.isTourModified_InChart() || TourManager.isUndoHistoryAvailable_InChart();
    }
 
    @SuppressWarnings("rawtypes")

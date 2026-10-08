@@ -21,7 +21,6 @@ package net.tourbook.chart;
 import java.util.ArrayList;
 
 import net.tourbook.common.RectangleLong;
-import net.tourbook.common.UI;
 
 /**
  * The slider is moved on the x-axis and displays the current position in the slider label.
@@ -282,7 +281,7 @@ public class ChartXSlider {
 
       if (_sliderType == SLIDER_TYPE_LEFT || _sliderType == SLIDER_TYPE_NONE) {
 
-         System.out.println(UI.timeStamp() + " setValueIndex: %d : %d".formatted(_sliderType, valueIndex));
+//         System.out.println(UI.timeStamp() + " setValueIndex: %d : %d".formatted(_sliderType, valueIndex));
       }
 // TODO remove SYSTEM.OUT.PRINTLN
 

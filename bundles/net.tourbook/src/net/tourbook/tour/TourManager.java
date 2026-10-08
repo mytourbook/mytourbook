@@ -111,6 +111,9 @@ import net.tourbook.weather.TourWeatherRetriever;
 import org.eclipse.collections.impl.list.mutable.primitive.DoubleArrayList;
 import org.eclipse.collections.impl.list.mutable.primitive.FloatArrayList;
 import org.eclipse.collections.impl.list.mutable.primitive.LongArrayList;
+import org.eclipse.core.commands.operations.IOperationHistory;
+import org.eclipse.core.commands.operations.IUndoContext;
+import org.eclipse.core.commands.operations.IUndoableOperation;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.ListenerList;
 import org.eclipse.jface.dialogs.IDialogConstants;
@@ -2226,6 +2229,24 @@ public class TourManager {
                Messages.TourManager_Dialog_TourEditorIsModified_Message);
 
          return true;
+      }
+
+      return false;
+   }
+
+   public static boolean isUndoHistoryAvailable_InChart() {
+
+      if (_tourChartView != null) {
+
+         final IUndoContext undoContext = _tourChartView.getUndoContext();
+
+         final IOperationHistory opHistory = PlatformUI.getWorkbench().getOperationSupport().getOperationHistory();
+         final IUndoableOperation[] undoHistory = opHistory.getUndoHistory(undoContext);
+         final IUndoableOperation[] redoHistory = opHistory.getRedoHistory(undoContext);
+
+         final boolean isUndoAvailable = undoHistory.length > 0 || redoHistory.length > 0;
+
+         return isUndoAvailable;
       }
 
       return false;

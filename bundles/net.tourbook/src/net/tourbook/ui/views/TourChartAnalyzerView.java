@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2026 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -728,6 +728,7 @@ public class TourChartAnalyzerView extends ViewPart {
 
    /**
     * @param rgb
+    *
     * @return Returns the color from the color cache, the color must not be disposed this is done
     *         when the cache is disposed
     */
@@ -1090,6 +1091,18 @@ public class TourChartAnalyzerView extends ViewPart {
          valuesIndexLeft = Math.max(0, valuesIndexLeft);
          valuesIndexRight = Math.max(0, valuesIndexRight);
 
+         if (valuesIndexLeft > valuesIndexRight) {
+            
+            /*
+             * This happened but the reason is somewhere deeper
+             */
+
+            final int tempLeft = valuesIndexRight;
+
+            valuesIndexRight = valuesIndexLeft;
+            valuesIndexLeft = tempLeft;
+         }
+
          // values at the left/right slider
          final double leftValue = values[valuesIndexLeft];
          final double rightValue = values[valuesIndexRight];
@@ -1098,6 +1111,7 @@ public class TourChartAnalyzerView extends ViewPart {
 
             // this can happen when a data serie contains multiple tours and not all tours have all data
             updateUI_EmptyValues(graphInfo);
+
             continue;
          }
 

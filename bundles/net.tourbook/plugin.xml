@@ -2666,7 +2666,7 @@
          <command
             commandId      ="command.net.tourbook.tour.RestoreTour_InChart"
             mnemonic       ="%Command_Tour_RestoreTour_Mnemonic"
-            tooltip        ="%Command_Tour_RestoreTour_Tooltip_2"
+            tooltip        ="%Command_Tour_RestoreTourAndClearUndoHistory_Tooltip"
          />
    
          <!-- Undo -->
