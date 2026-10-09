@@ -2569,8 +2569,9 @@ public class ChartComponents extends Composite {
    void setXSliderPosition(final SelectionChartXSliderPosition sliderPosition, final boolean isFireEvent) {
 
       if (sliderPosition == null) {
+
          /*
-          * nothing to do when the position was not set, this can happen when the chart was not
+          * Nothing to do when the position was not set, this can happen when the chart was not
           * yet created
           */
          return;
@@ -2583,7 +2584,7 @@ public class ChartComponents extends Composite {
       final ChartXSlider leftSlider = componentGraph.getLeftSlider();
       final ChartXSlider rightSlider = componentGraph.getRightSlider();
 
-      final int slider0ValueIndex = sliderPosition.getBeforeLeftSliderIndex();
+      final int sliderOneSliceValueIndex = sliderPosition.getSliderOneSliceValueIndex();
       final int slider1ValueIndex = sliderPosition.getLeftSliderValueIndex();
       final int slider2ValueIndex = sliderPosition.getRightSliderValueIndex();
 
@@ -2595,7 +2596,9 @@ public class ChartComponents extends Composite {
       /*
        * Move left slider
        */
-      if (slider1ValueIndex == SelectionChartXSliderPosition.SLIDER_POSITION_AT_CHART_BORDER) {
+      if (slider1ValueIndex == SelectionChartXSliderPosition.SLIDER_POSITION_SELECT_WHOLE_TOUR) {
+
+         // move to 1st time slice
 
          componentGraph.moveXSlider(
                leftSlider,
@@ -2619,13 +2622,13 @@ public class ChartComponents extends Composite {
       /*
        * Move right slider
        */
-      if (slider0ValueIndex != SelectionChartXSliderPosition.IGNORE_SLIDER_POSITION) {
+      if (sliderOneSliceValueIndex != SelectionChartXSliderPosition.IGNORE_SLIDER_POSITION) {
 
-         // move second slider before the first slider
+         // move second slider to the same position as the first slider
 
          componentGraph.moveXSlider(
                rightSlider,
-               slider0ValueIndex,
+               sliderOneSliceValueIndex,
                isCenterSliderPosition,
                isMoveChartToShowSlider,
                isFireEvent,
@@ -2634,7 +2637,10 @@ public class ChartComponents extends Composite {
       } else {
 
          // move right slider
-         if (slider2ValueIndex == SelectionChartXSliderPosition.SLIDER_POSITION_AT_CHART_BORDER) {
+
+         if (slider2ValueIndex == SelectionChartXSliderPosition.SLIDER_POSITION_SELECT_WHOLE_TOUR) {
+
+            // move to last time slice
 
             componentGraph.moveXSlider(
                   rightSlider,

@@ -8061,13 +8061,6 @@ public class ChartComponentGraph extends Canvas {
 
       final int keyCode = event.keyCode;
 
-      /*
-       * keyboard events behaves different than the mouse event, shift & ctrl can be set in both
-       * event fields
-       */
-      boolean isShift = (event.stateMask & SWT.SHIFT) != 0 || (keyCode & SWT.SHIFT) != 0;
-      boolean isCtrl = (event.stateMask & SWT.CTRL) != 0 || (keyCode & SWT.CTRL) != 0;
-
       // ensure a slider is selected
       if (_selectedXSlider == null) {
          final ChartXSlider leftSlider = getLeftSlider();
@@ -8079,8 +8072,8 @@ public class ChartComponentGraph extends Canvas {
          }
       }
 
-      // toggle selected slider with the Ctrl-T, key changed in 15.10 to select multiple segments which shift
-      if (isCtrl && keyCode == 't' && isShift == false) {
+      // toggle selected slider with the T key
+      if (keyCode == 't') {
 
          _selectedXSlider = _selectedXSlider == _xSliderA ? _xSliderB : _xSliderA;
          _isSliderDirty = true;
@@ -8089,6 +8082,13 @@ public class ChartComponentGraph extends Canvas {
 
          return;
       }
+
+      /*
+       * Keyboard events behaves different than the mouse event, shift & ctrl can be set in both
+       * event fields
+       */
+      boolean isShift = (event.stateMask & SWT.SHIFT) != 0 || (keyCode & SWT.SHIFT) != 0;
+      boolean isCtrl = (event.stateMask & SWT.CTRL) != 0 || (keyCode & SWT.CTRL) != 0;
 
       // accelerate with page up/down
       if (keyCode == SWT.PAGE_UP || keyCode == SWT.PAGE_DOWN) {

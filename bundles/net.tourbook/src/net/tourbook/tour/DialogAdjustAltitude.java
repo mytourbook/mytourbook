@@ -2130,8 +2130,8 @@ public class DialogAdjustAltitude extends TitleAreaDialog implements I2ndAltiLay
 
       final SelectionChartXSliderPosition sliderPosition = new SelectionChartXSliderPosition(
             _tourChart,
-            SelectionChartXSliderPosition.SLIDER_POSITION_AT_CHART_BORDER,
-            SelectionChartXSliderPosition.SLIDER_POSITION_AT_CHART_BORDER);
+            SelectionChartXSliderPosition.SLIDER_POSITION_SELECT_WHOLE_TOUR,
+            SelectionChartXSliderPosition.SLIDER_POSITION_SELECT_WHOLE_TOUR);
 
       _tourChart.setXSliderPosition(sliderPosition);
    }

@@ -24,25 +24,28 @@ import org.eclipse.jface.viewers.ISelection;
  */
 public class SelectionChartXSliderPosition implements ISelection {
 
-   private static final char NL                              = UI.NEW_LINE;
+   private static final char NL                                = UI.NEW_LINE;
 
-   public static final int   IGNORE_SLIDER_POSITION          = -1;
-   public static final int   SLIDER_POSITION_AT_CHART_BORDER = -2;
+   public static final int   IGNORE_SLIDER_POSITION            = -1;
+   public static final int   SLIDER_POSITION_SELECT_WHOLE_TOUR = -2;
 
-   private int               _beforeLeftSliderIndex          = IGNORE_SLIDER_POSITION;
-   private int               _leftSliderValueIndex           = IGNORE_SLIDER_POSITION;
-   private int               _rightSliderValueIndex          = IGNORE_SLIDER_POSITION;
+   /**
+    * This value is only set when just 1 time slice is selected
+    */
+   private int               _sliderOneSliceValueIndex         = IGNORE_SLIDER_POSITION;
+   private int               _leftSliderValueIndex             = IGNORE_SLIDER_POSITION;
+   private int               _rightSliderValueIndex            = IGNORE_SLIDER_POSITION;
 
    /**
     * When <code>true</code> the slider will be positioned in the center of the chart.
     */
-   private boolean           _isCenterSliderPosition         = false;
+   private boolean           _isCenterSliderPosition           = false;
 
    /**
     * When <code>true</code> then the slider will be set visible in the chart by repositioning the
     * graph (this is the old default behavior), otherwise <code>false</code>.
     */
-   private boolean           _isMoveChartToShowSlider        = true;
+   private boolean           _isMoveChartToShowSlider          = true;
 
    private Chart             _chart;
 
@@ -64,6 +67,13 @@ public class SelectionChartXSliderPosition implements ISelection {
       _rightSliderValueIndex = rightValueIndex;
    }
 
+   /**
+    * @param chart
+    * @param serieIndex0
+    *           This value is only set when just 1 time slice is selected
+    * @param serieIndex1
+    * @param serieIndex2
+    */
    public SelectionChartXSliderPosition(final Chart chart,
                                         final int serieIndex0,
                                         final int serieIndex1,
@@ -71,11 +81,7 @@ public class SelectionChartXSliderPosition implements ISelection {
 
       this(chart, serieIndex1, serieIndex2);
 
-      _beforeLeftSliderIndex = serieIndex0;
-   }
-
-   public int getBeforeLeftSliderIndex() {
-      return _beforeLeftSliderIndex;
+      _sliderOneSliceValueIndex = serieIndex0;
    }
 
    public Chart getChart() {
@@ -92,6 +98,14 @@ public class SelectionChartXSliderPosition implements ISelection {
     */
    public int getLeftSliderValueIndex() {
       return _leftSliderValueIndex;
+   }
+
+   /**
+    * @return Returns {@link #_sliderOneSliceValueIndex}
+    */
+   public int getSliderOneSliceValueIndex() {
+
+      return _sliderOneSliceValueIndex;
    }
 
    public int getRightSliderValueIndex() {
@@ -150,12 +164,13 @@ public class SelectionChartXSliderPosition implements ISelection {
 
       return UI.EMPTY_STRING
 
-            + "SelectionChartXSliderPosition" + NL //                            //$NON-NLS-1$
+            + "SelectionChartXSliderPosition" + NL //                                  //$NON-NLS-1$
 
-            + "   _beforeLeftSliderIndex  = " + _beforeLeftSliderIndex + NL //   //$NON-NLS-1$
-            + "   _leftSliderValueIndex   = " + _leftSliderValueIndex + NL //    //$NON-NLS-1$
-            + "   _rightSliderValueIndex  = " + _rightSliderValueIndex + NL //   //$NON-NLS-1$
-            + "   _isCenterSliderPosition = " + _isCenterSliderPosition + NL //  //$NON-NLS-1$
+            + "   _sliderOneSliceValueIndex  = " + _sliderOneSliceValueIndex + NL //   //$NON-NLS-1$
+            + "   _leftSliderValueIndex      = " + _leftSliderValueIndex + NL //       //$NON-NLS-1$
+            + "   _rightSliderValueIndex     = " + _rightSliderValueIndex + NL //      //$NON-NLS-1$
+
+//          + "   _isCenterSliderPosition = " + _isCenterSliderPosition + NL //        //$NON-NLS-1$
 
 //				+ "  _chart=" + _chart + NL //
 //				+ "  _customData=" + _customData+ NL //

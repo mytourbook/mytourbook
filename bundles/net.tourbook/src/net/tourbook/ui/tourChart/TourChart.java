@@ -5051,6 +5051,9 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 
    void selectXSliders(final SelectionChartXSliderPosition xSliderPosition) {
 
+      System.out.println(UI.timeStamp() + " xSliderPosition: " + xSliderPosition);
+// TODO remove SYSTEM.OUT.PRINTLN
+
       if (_tourData == null) {
          // this occurred
          return;

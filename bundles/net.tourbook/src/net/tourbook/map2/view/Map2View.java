@@ -4843,18 +4843,18 @@ public class Map2View extends ViewPart implements
                final TourData tourData = TourManager.getInstance().getTourData(tourIdLong);
                if (tourData != null) {
 
-                  final int beforeLeftSliderIndex = xSliderPos.getBeforeLeftSliderIndex();
+                  final int sliderOneSliceValueIndex = xSliderPos.getSliderOneSliceValueIndex();
                   int leftSliderValueIndex = xSliderPos.getLeftSliderValueIndex();
                   int rightSliderValueIndex = xSliderPos.getRightSliderValueIndex();
 
                   /*
                    * These values are tested with the selection from the tour editor
                    */
-                  if (beforeLeftSliderIndex != SelectionChartXSliderPosition.IGNORE_SLIDER_POSITION) {
+                  if (sliderOneSliceValueIndex != SelectionChartXSliderPosition.IGNORE_SLIDER_POSITION) {
 
                      // one slice is selected
 
-                     leftSliderValueIndex = beforeLeftSliderIndex;
+                     leftSliderValueIndex = sliderOneSliceValueIndex;
                      rightSliderValueIndex = leftSliderValueIndex;
                   }
 

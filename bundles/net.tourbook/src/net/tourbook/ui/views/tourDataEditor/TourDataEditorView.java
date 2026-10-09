@@ -7696,10 +7696,12 @@ public class TourDataEditorView extends ViewPart implements
 
             final int sliceSerieIndex = timeSlice.serieIndex;
 
+            /*
+             * Position both sliders at the same time slice that it can be distinguished between
+             * multiple time slices !!!
+             */
             sliderSerieIndex0 = sliceSerieIndex;
-            sliderSerieIndex1 = sliceSerieIndex < numTimeSlices - 1
-                  ? sliceSerieIndex + 1
-                  : sliceSerieIndex;
+            sliderSerieIndex1 = sliceSerieIndex;
 
             sliderSerieIndex2 = SelectionChartXSliderPosition.IGNORE_SLIDER_POSITION;
          }
@@ -9434,16 +9436,16 @@ public class TourDataEditorView extends ViewPart implements
          return;
       }
 
-      final int beforeLeftSliderIndex = sliderPosition.getBeforeLeftSliderIndex();
+      final int sliderOneSliceValueIndex = sliderPosition.getSliderOneSliceValueIndex();
       final int leftSliderValueIndex = sliderPosition.getLeftSliderValueIndex();
       final int rightSliderValueIndex = sliderPosition.getRightSliderValueIndex();
 
       int valueIndex_Start;
       int valueIndex_End;
 
-      if (beforeLeftSliderIndex != SelectionChartXSliderPosition.IGNORE_SLIDER_POSITION) {
+      if (sliderOneSliceValueIndex != SelectionChartXSliderPosition.IGNORE_SLIDER_POSITION) {
 
-         valueIndex_Start = beforeLeftSliderIndex;
+         valueIndex_Start = sliderOneSliceValueIndex;
          valueIndex_End = leftSliderValueIndex;
 
       } else {

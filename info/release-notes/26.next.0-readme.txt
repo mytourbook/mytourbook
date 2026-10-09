@@ -42,7 +42,12 @@ Changes
 =======
 
 * Tour Chart
-  - Toggle active vertical slider with the keyboard is now Ctrl-T, before it was only the Ctrl key
+  - Toggle active vertical slider with the keyboard is now T, before it was the Ctrl key
+  
+
+* Tour Editor
+  - When only one time slice is selected in the tour editor, then the tour chart is positioning both vertical sliders at the same position, before there was a gap of 1 time slice
+  
     
 
 Bugfix
