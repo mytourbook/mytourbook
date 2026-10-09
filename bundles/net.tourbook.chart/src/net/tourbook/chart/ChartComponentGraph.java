@@ -8083,6 +8083,13 @@ public class ChartComponentGraph extends Canvas {
          return;
       }
 
+      if (getXData() == null) {
+
+         // this happened when deleting all time slices and the last was deleted
+
+         return;
+      }
+
       /*
        * Keyboard events behaves different than the mouse event, shift & ctrl can be set in both
        * event fields

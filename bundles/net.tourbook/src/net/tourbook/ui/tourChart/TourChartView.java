@@ -1456,7 +1456,7 @@ public class TourChartView extends ViewPart implements
       final String opLabel = "%d: Remove %d time slices".formatted(
 
             ++_undoCounter,
-            sliderLastIndex - sliderFirstIndex);
+            sliderLastIndex - sliderFirstIndex + 1);
 
       final TourDataUndoOperation op = new TourDataUndoOperation(
 

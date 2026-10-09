@@ -287,12 +287,12 @@ public class TourDataEditorView extends ViewPart implements
    //
    static final String                   STATE_DESCRIPTION_NUMBER_OF_LINES                = "STATE_DESCRIPTION_NUMBER_OF_LINES";              //$NON-NLS-1$
    static final int                      STATE_DESCRIPTION_NUMBER_OF_LINES_DEFAULT        = 3;
-   public static final String            STATE_IS_ADJUST_TOUR_START_TIME                  = "STATE_IS_ADJUST_TOUR_START_TIME";                //$NON-NLS-1$
-   public static final boolean           STATE_IS_ADJUST_TOUR_START_TIME_DEFAULT          = true;
-   public static final String            STATE_IS_DELETE_KEEP_DISTANCE                    = "STATE_IS_DELETE_KEEP_DISTANCE";                  //$NON-NLS-1$
-   public static final boolean           STATE_IS_DELETE_KEEP_DISTANCE_DEFAULT            = false;
-   public static final String            STATE_IS_DELETE_KEEP_TIME                        = "STATE_IS_DELETE_KEEP_TIME";                      //$NON-NLS-1$
-   public static final boolean           STATE_IS_DELETE_KEEP_TIME_DEFAULT                = false;
+   public static final String            STATE_DELETE_IS_KEEP_TIME                        = "STATE_IS_DELETE_KEEP_TIME";                      //$NON-NLS-1$
+   public static final boolean           STATE_DELETE_IS_KEEP_TIME_DEFAULT                = false;
+   public static final String            STATE_DELETE_IS_KEEP_DISTANCE                    = "STATE_IS_DELETE_KEEP_DISTANCE";                  //$NON-NLS-1$
+   public static final boolean           STATE_DELETE_IS_KEEP_DISTANCE_DEFAULT            = false;
+   public static final String            STATE_DELETE_IS_ADJUST_TOUR_START_TIME           = "STATE_IS_ADJUST_TOUR_START_TIME";                //$NON-NLS-1$
+   public static final boolean           STATE_DELETE_IS_ADJUST_TOUR_START_TIME_DEFAULT   = true;
    static final String                   STATE_IS_ELEVATION_FROM_DEVICE                   = "STATE_IS_ELEVATION_FROM_DEVICE";                 //$NON-NLS-1$
    static final boolean                  STATE_IS_ELEVATION_FROM_DEVICE_DEFAULT           = true;
    static final String                   STATE_IS_RECOMPUTE_ELEVATION_UP_DOWN             = "STATE_IS_RECOMPUTE_ELEVATION_UP_DOWN";           //$NON-NLS-1$
@@ -353,7 +353,7 @@ public class TourDataEditorView extends ViewPart implements
    //
    private static final boolean          IS_LINUX                                         = UI.IS_LINUX;
    private static final boolean          IS_OSX                                           = UI.IS_OSX;
-   private static final boolean          IS_DARK_THEME                                    = UI.IS_DARK_THEME;
+   private static boolean                IS_DARK_THEME                                    = UI.IS_DARK_THEME;
    /**
     * this width is used as a hint for the width of the description field, this value also
     * influences the width of the columns in this editor
@@ -3622,6 +3622,9 @@ public class TourDataEditorView extends ViewPart implements
    @Override
    public void createPartControl(final Composite parent) {
 
+      // suddenly the dark theme was not set correctly as before
+      IS_DARK_THEME = UI.IS_DARK_THEME;
+
       initUI(parent);
       createMenuManager();
 
@@ -5494,20 +5497,20 @@ public class TourDataEditorView extends ViewPart implements
 
          if (keyEvent.keyCode == SWT.DEL) {
 
-            final boolean isAdjustTourStartTime = Util.getStateBoolean(_state,
-                  STATE_IS_ADJUST_TOUR_START_TIME,
-                  STATE_IS_ADJUST_TOUR_START_TIME_DEFAULT);
+            final boolean isKeepTime = Util.getStateBoolean(_state,
+                  STATE_DELETE_IS_KEEP_TIME,
+                  STATE_DELETE_IS_KEEP_TIME_DEFAULT);
 
             final boolean isKeepDistance = Util.getStateBoolean(_state,
-                  STATE_IS_DELETE_KEEP_DISTANCE,
-                  STATE_IS_DELETE_KEEP_DISTANCE_DEFAULT);
+                  STATE_DELETE_IS_KEEP_DISTANCE,
+                  STATE_DELETE_IS_KEEP_DISTANCE_DEFAULT);
 
-            final boolean isKeepTime = Util.getStateBoolean(_state,
-                  STATE_IS_DELETE_KEEP_TIME,
-                  STATE_IS_DELETE_KEEP_TIME_DEFAULT);
+            final boolean isAdjustTourStartTime = Util.getStateBoolean(_state,
+                  STATE_DELETE_IS_ADJUST_TOUR_START_TIME,
+                  STATE_DELETE_IS_ADJUST_TOUR_START_TIME_DEFAULT);
 
-            final boolean isRemoveDistance = isKeepDistance == false;
             final boolean isRemoveTime = isKeepTime == false;
+            final boolean isRemoveDistance = isKeepDistance == false;
 
             actionDelete_TimeSlices(isRemoveTime, isRemoveDistance, isAdjustTourStartTime);
          }

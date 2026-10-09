@@ -724,9 +724,9 @@ public class SlideoutTourEditor_Options extends ToolbarSlideout implements IColo
       final int latLonDigits                       = TourDataEditorView.STATE_LAT_LON_DIGITS_DEFAULT;
       final int weatherDescriptionNumberOfLines    = TourDataEditorView.STATE_WEATHERDESCRIPTION_NUMBER_OF_LINES_DEFAULT;
 
-      final boolean isAdjustTourStartTime          = TourDataEditorView.STATE_IS_ADJUST_TOUR_START_TIME_DEFAULT;
-      final boolean isDeleteKeepDistance           = TourDataEditorView.STATE_IS_DELETE_KEEP_DISTANCE_DEFAULT;
-      final boolean isDeleteKeepTime               = TourDataEditorView.STATE_IS_DELETE_KEEP_TIME_DEFAULT;
+      final boolean isDeleteKeepTime               = TourDataEditorView.STATE_DELETE_IS_KEEP_TIME_DEFAULT;
+      final boolean isDeleteKeepDistance           = TourDataEditorView.STATE_DELETE_IS_KEEP_DISTANCE_DEFAULT;
+      final boolean isAdjustTourStartTime          = TourDataEditorView.STATE_DELETE_IS_ADJUST_TOUR_START_TIME_DEFAULT;
       final boolean isElevationFromDevice          = TourDataEditorView.STATE_IS_ELEVATION_FROM_DEVICE_DEFAULT;
       final boolean isRecomputeElevation           = TourDataEditorView.STATE_IS_RECOMPUTE_ELEVATION_UP_DOWN_DEFAULT;
 
@@ -741,9 +741,9 @@ public class SlideoutTourEditor_Options extends ToolbarSlideout implements IColo
       /*
        * Update model
        */
-      _state.put(TourDataEditorView.STATE_IS_ADJUST_TOUR_START_TIME,                isAdjustTourStartTime);
-      _state.put(TourDataEditorView.STATE_IS_DELETE_KEEP_DISTANCE,                  isDeleteKeepDistance);
-      _state.put(TourDataEditorView.STATE_IS_DELETE_KEEP_TIME,                      isDeleteKeepTime);
+      _state.put(TourDataEditorView.STATE_DELETE_IS_KEEP_TIME,                      isDeleteKeepTime);
+      _state.put(TourDataEditorView.STATE_DELETE_IS_KEEP_DISTANCE,                  isDeleteKeepDistance);
+      _state.put(TourDataEditorView.STATE_DELETE_IS_ADJUST_TOUR_START_TIME,         isAdjustTourStartTime);
       _state.put(TourDataEditorView.STATE_IS_ELEVATION_FROM_DEVICE,                 isElevationFromDevice);
       _state.put(TourDataEditorView.STATE_IS_RECOMPUTE_ELEVATION_UP_DOWN,           isRecomputeElevation);
 
@@ -798,17 +798,17 @@ public class SlideoutTourEditor_Options extends ToolbarSlideout implements IColo
 
       _comboElevationOptions.select(getElevationFromDeviceIndex(isElevationFromDevice));
 
-      _chkDelete_AdjustTourStartTime.setSelection(Util.getStateBoolean(_state,
-            TourDataEditorView.STATE_IS_ADJUST_TOUR_START_TIME,
-            TourDataEditorView.STATE_IS_ADJUST_TOUR_START_TIME_DEFAULT));
+      _chkDelete_KeepTime.setSelection(Util.getStateBoolean(_state,
+            TourDataEditorView.STATE_DELETE_IS_KEEP_TIME,
+            TourDataEditorView.STATE_DELETE_IS_KEEP_TIME_DEFAULT));
 
       _chkDelete_KeepDistance.setSelection(Util.getStateBoolean(_state,
-            TourDataEditorView.STATE_IS_DELETE_KEEP_DISTANCE,
-            TourDataEditorView.STATE_IS_DELETE_KEEP_DISTANCE_DEFAULT));
+            TourDataEditorView.STATE_DELETE_IS_KEEP_DISTANCE,
+            TourDataEditorView.STATE_DELETE_IS_KEEP_DISTANCE_DEFAULT));
 
-      _chkDelete_KeepTime.setSelection(Util.getStateBoolean(_state,
-            TourDataEditorView.STATE_IS_DELETE_KEEP_TIME,
-            TourDataEditorView.STATE_IS_DELETE_KEEP_TIME_DEFAULT));
+      _chkDelete_AdjustTourStartTime.setSelection(Util.getStateBoolean(_state,
+            TourDataEditorView.STATE_DELETE_IS_ADJUST_TOUR_START_TIME,
+            TourDataEditorView.STATE_DELETE_IS_ADJUST_TOUR_START_TIME_DEFAULT));
 
       _chkRecomputeElevation.setSelection(Util.getStateBoolean(_state,
             TourDataEditorView.STATE_IS_RECOMPUTE_ELEVATION_UP_DOWN,
@@ -869,10 +869,10 @@ public class SlideoutTourEditor_Options extends ToolbarSlideout implements IColo
 
 // SET_FORMATTING_OFF
 
-      _state.put(TourDataEditorView.STATE_IS_ADJUST_TOUR_START_TIME,       _chkDelete_AdjustTourStartTime.getSelection());
-      _state.put(TourDataEditorView.STATE_IS_DELETE_KEEP_DISTANCE,         _chkDelete_KeepDistance.getSelection());
-      _state.put(TourDataEditorView.STATE_IS_DELETE_KEEP_TIME,             _chkDelete_KeepTime.getSelection());
-      _state.put(TourDataEditorView.STATE_IS_RECOMPUTE_ELEVATION_UP_DOWN,  _chkRecomputeElevation.getSelection());
+      _state.put(TourDataEditorView.STATE_DELETE_IS_KEEP_TIME,                _chkDelete_KeepTime.getSelection());
+      _state.put(TourDataEditorView.STATE_DELETE_IS_KEEP_DISTANCE,            _chkDelete_KeepDistance.getSelection());
+      _state.put(TourDataEditorView.STATE_DELETE_IS_ADJUST_TOUR_START_TIME,   _chkDelete_AdjustTourStartTime.getSelection());
+      _state.put(TourDataEditorView.STATE_IS_RECOMPUTE_ELEVATION_UP_DOWN,     _chkRecomputeElevation.getSelection());
 
       _state.put(TourDataEditorView.STATE_IS_ELEVATION_FROM_DEVICE,        getIsElevationFromDevice());
 

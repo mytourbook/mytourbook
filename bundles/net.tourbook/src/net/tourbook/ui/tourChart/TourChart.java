@@ -299,22 +299,23 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 
 //SET_FORMATTING_ON
 
-   private static ImageDescriptor _imagePhoto;
-   private static ImageDescriptor _imagePhotoTooltip;
+   private static ImageDescriptor                           _imagePhoto;
+   private static ImageDescriptor                           _imagePhotoTooltip;
 
-   public static final PulseGraph PULSE_GRAPH_DEFAULT = PulseGraph.DEVICE_BPM___2ND_RR_AVERAGE;
+   public static final PulseGraph                           PULSE_GRAPH_DEFAULT          = PulseGraph.DEVICE_BPM___2ND_RR_AVERAGE;
 
    /**
     * 1e-5 is too small for the min value, it do not correct the graph.
     */
-   public static final double     MIN_ADJUSTMENT      = 1e-3;
-   public static final double     MAX_ADJUSTMENT      = 1e-5;
-
+   public static final double                               MIN_ADJUSTMENT               = 1e-3;
+   public static final double                               MAX_ADJUSTMENT               = 1e-5;
+   //
+   private static final IPreferenceStore                    _prefStore                   = TourbookPlugin.getPrefStore();
+   private static final IPreferenceStore                    _prefStore_Common            = CommonActivator.getPrefStore();
+   private static final IDialogSettings                     _stateTourEditor             = TourDataEditorView.getState();
+   private static final IDialogSettings                     _stateTourSegmenter          = TourSegmenterView.getState();
    //
    private final IDialogSettings                            _state;
-   private final IPreferenceStore                           _prefStore                   = TourbookPlugin.getPrefStore();
-   private final IPreferenceStore                           _prefStore_Common            = CommonActivator.getPrefStore();
-   private final IDialogSettings                            _tourSegmenterState          = TourSegmenterView.getState();
    //
    /**
     * Part in which the tour chart is created, can be <code>null</code> when created in a dialog.
@@ -870,7 +871,10 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
     *           dialog.
     * @param state
     */
-   public TourChart(final Composite parent, final int style, final IWorkbenchPart part, final IDialogSettings state) {
+   public TourChart(final Composite parent,
+                    final int style,
+                    final IWorkbenchPart part,
+                    final IDialogSettings state) {
 
       super(parent, style);
 
@@ -1044,6 +1048,15 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
          return;
       }
 
+      final int numSlices = _tourData.timeSerie.length;
+
+      if (numSlices == 0) {
+
+         // this can happen when all time slices are deleted
+
+         return;
+      }
+
       // get selected time slice indices
       final int sliderLeftIndex = getLeftSlider().getValuesIndex();
       final int sliderRightIndex = getRightSlider().getValuesIndex();
@@ -1051,46 +1064,15 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
       int deleteFirstIndex = sliderLeftIndex;
       int deleteLastIndex = sliderRightIndex;
 
-      final int indexDiff = deleteLastIndex - deleteFirstIndex;
-
       System.out.println(UI.timeStamp() + " deleteTimeSlices: " + deleteFirstIndex + " - " + deleteLastIndex);
 //    System.out.println(UI.timeStamp() + " indexDiff: " + indexDiff);
 //    System.out.println(UI.timeStamp() + " isRemoveTime: " + isRemoveTime);
 // TODO remove SYSTEM.OUT.PRINTLN
 
-      if (indexDiff == 0) {
-
-         // sliders are at the same position -> do nothing
-
-         return;
-      }
-
-      /*
-       * Complicated: The last index is the next which will NOT be removed
-       */
-      if (isRemoveTime) {
-
-         if (deleteFirstIndex == 0) {
-
-         } else {
-
-            deleteFirstIndex += 1;
-         }
-
-//         lastIndex = indexDiff == 1
-//               ? lastIndex - 1
-//               : lastIndex - 1;
-
-      } else {
-
-      }
-
       // check bounds
       if (deleteLastIndex < deleteFirstIndex) {
          deleteLastIndex = deleteFirstIndex;
       }
-
-      final int numSlices = _tourData.timeSerie.length;
 
       if (deleteFirstIndex >= numSlices) {
          deleteFirstIndex = numSlices - 1;
@@ -2759,46 +2741,46 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 
       // show hidden values
       final boolean isHideSmallValues = Util.getStateBoolean(
-            _tourSegmenterState,
+            _stateTourSegmenter,
             TourSegmenterView.STATE_IS_HIDE_SMALL_VALUES,
             TourSegmenterView.STATE_IS_HIDE_SMALL_VALUES_DEFAULT);
       final int smallValueSize = Util.getStateInt(
-            _tourSegmenterState,
+            _stateTourSegmenter,
             TourSegmenterView.STATE_SMALL_VALUE_SIZE,
             TourSegmenterView.STATE_SMALL_VALUE_SIZE_DEFAULT);
 
       // show segment lines
       final boolean isShowSegmenterLine = Util.getStateBoolean(
-            _tourSegmenterState,
+            _stateTourSegmenter,
             TourSegmenterView.STATE_IS_SHOW_SEGMENTER_LINE,
             TourSegmenterView.STATE_IS_SHOW_SEGMENTER_LINE_DEFAULT);
       final int lineOpacity = Util.getStateInt(
-            _tourSegmenterState,
+            _stateTourSegmenter,
             TourSegmenterView.STATE_LINE_OPACITY,
             TourSegmenterView.STATE_LINE_OPACITY_DEFAULT);
 
       final boolean isShowSegmenterMarker = Util.getStateBoolean(
-            _tourSegmenterState,
+            _stateTourSegmenter,
             TourSegmenterView.STATE_IS_SHOW_SEGMENTER_MARKER,
             TourSegmenterView.STATE_IS_SHOW_SEGMENTER_MARKER_DEFAULT);
 
       final boolean isShowSegmenterValue = Util.getStateBoolean(
-            _tourSegmenterState,
+            _stateTourSegmenter,
             TourSegmenterView.STATE_IS_SHOW_SEGMENTER_VALUE,
             TourSegmenterView.STATE_IS_SHOW_SEGMENTER_VALUE_DEFAULT);
 
       final boolean isShowDecimalPlaces = Util.getStateBoolean(
-            _tourSegmenterState,
+            _stateTourSegmenter,
             TourSegmenterView.STATE_IS_SHOW_SEGMENTER_DECIMAL_PLACES,
             TourSegmenterView.STATE_IS_SHOW_SEGMENTER_DECIMAL_PLACES_DEFAULT);
 
       final int stackedValues = Util.getStateInt(
-            _tourSegmenterState,
+            _stateTourSegmenter,
             TourSegmenterView.STATE_STACKED_VISIBLE_VALUES,
             TourSegmenterView.STATE_STACKED_VISIBLE_VALUES_DEFAULT);
 
       final int graphOpacity = Util.getStateInt(
-            _tourSegmenterState,
+            _stateTourSegmenter,
             TourSegmenterView.STATE_GRAPH_OPACITY,
             TourSegmenterView.STATE_GRAPH_OPACITY_DEFAULT);
 
@@ -3993,20 +3975,20 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 
       } else if (keyEvent.keyCode == SWT.DEL) {
 
-         final boolean isAdjustTourStartTime = Util.getStateBoolean(_state,
-               TourDataEditorView.STATE_IS_ADJUST_TOUR_START_TIME,
-               TourDataEditorView.STATE_IS_ADJUST_TOUR_START_TIME_DEFAULT);
+         final boolean isKeepTime = Util.getStateBoolean(_stateTourEditor,
+               TourDataEditorView.STATE_DELETE_IS_KEEP_TIME,
+               TourDataEditorView.STATE_DELETE_IS_KEEP_TIME_DEFAULT);
 
-         final boolean isKeepDistance = Util.getStateBoolean(_state,
-               TourDataEditorView.STATE_IS_DELETE_KEEP_DISTANCE,
-               TourDataEditorView.STATE_IS_DELETE_KEEP_DISTANCE_DEFAULT);
+         final boolean isKeepDistance = Util.getStateBoolean(_stateTourEditor,
+               TourDataEditorView.STATE_DELETE_IS_KEEP_DISTANCE,
+               TourDataEditorView.STATE_DELETE_IS_KEEP_DISTANCE_DEFAULT);
 
-         final boolean isKeepTime = Util.getStateBoolean(_state,
-               TourDataEditorView.STATE_IS_DELETE_KEEP_TIME,
-               TourDataEditorView.STATE_IS_DELETE_KEEP_TIME_DEFAULT);
+         final boolean isAdjustTourStartTime = Util.getStateBoolean(_stateTourEditor,
+               TourDataEditorView.STATE_DELETE_IS_ADJUST_TOUR_START_TIME,
+               TourDataEditorView.STATE_DELETE_IS_ADJUST_TOUR_START_TIME_DEFAULT);
 
-         final boolean isRemoveDistance = isKeepDistance == false;
          final boolean isRemoveTime = isKeepTime == false;
+         final boolean isRemoveDistance = isKeepDistance == false;
 
          actionDeleteTimeSlices(isRemoveTime, isRemoveDistance, isAdjustTourStartTime);
 
@@ -5051,8 +5033,8 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 
    void selectXSliders(final SelectionChartXSliderPosition xSliderPosition) {
 
-      System.out.println(UI.timeStamp() + " xSliderPosition: " + xSliderPosition);
-// TODO remove SYSTEM.OUT.PRINTLN
+//      System.out.println(UI.timeStamp() + " xSliderPosition: " + xSliderPosition);
+//// TODO remove SYSTEM.OUT.PRINTLN
 
       if (_tourData == null) {
          // this occurred
@@ -6278,17 +6260,17 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
    private void setupTourSegmenter() {
 
       final boolean isSegmenterActive = Util.getStateBoolean(
-            _tourSegmenterState,
+            _stateTourSegmenter,
             TourSegmenterView.STATE_IS_SEGMENTER_ACTIVE,
             false);
 
       final boolean isShowTourSegments = Util.getStateBoolean(
-            _tourSegmenterState,
+            _stateTourSegmenter,
             TourSegmenterView.STATE_IS_SHOW_TOUR_SEGMENTS,
             TourSegmenterView.STATE_IS_SHOW_TOUR_SEGMENTS_DEFAULT);
 
       _isShowSegmenterTooltip = Util.getStateBoolean(
-            _tourSegmenterState,
+            _stateTourSegmenter,
             TourSegmenterView.STATE_IS_SHOW_SEGMENTER_TOOLTIP,
             TourSegmenterView.STATE_IS_SHOW_SEGMENTER_TOOLTIP_DEFAULT);
 

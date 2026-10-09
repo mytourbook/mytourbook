@@ -2619,7 +2619,7 @@ public class TourManager {
    }
 
    /**
-    * Remove time slices from {@link TourData} this includes the first and the last index
+    * Remove time slices from {@link TourData} which includes the first and the last index
     *
     * @param tourData
     * @param firstIndex
@@ -2635,7 +2635,14 @@ public class TourManager {
                                        final boolean isRemoveDistance,
                                        final boolean isAdjustTourStartTime) {
 
-      System.out.println(UI.timeStamp() + " removeTimeSlices: " + firstIndex + " - " + lastIndex);
+      System.out.println(UI.timeStamp() + " removeTimeSlices: " + firstIndex
+
+            + " - " + lastIndex
+            + " - " + isRemoveTime
+            + " - " + isRemoveDistance
+            + " - " + isAdjustTourStartTime
+
+      );
 // TODO remove SYSTEM.OUT.PRINTLN
 
       // this must be done before the time series are modified

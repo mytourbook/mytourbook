@@ -66,7 +66,7 @@ import org.eclipse.ui.dialogs.PreferencesUtil;
 public class SlideoutTourChartOptions extends ToolbarSlideout implements IActionResetToDefault {
 
    private static final IPreferenceStore _prefStore           = TourbookPlugin.getPrefStore();
-   private static final IDialogSettings  _stateTourEditor     = TourbookPlugin.getState(TourDataEditorView.ID);
+   private static final IDialogSettings  _stateTourEditor     = TourDataEditorView.getState();
 
    private SelectionListener             _defaultSelectionListener;
    private MouseWheelListener            _defaultMouseWheelListener;
@@ -667,9 +667,10 @@ public class SlideoutTourChartOptions extends ToolbarSlideout implements IAction
       /*
        * Get default values
        */
-      final boolean isAdjustTourStartTime          = TourDataEditorView.STATE_IS_ADJUST_TOUR_START_TIME_DEFAULT;
-      final boolean isDeleteKeepDistance           = TourDataEditorView.STATE_IS_DELETE_KEEP_DISTANCE_DEFAULT;
-      final boolean isDeleteKeepTime               = TourDataEditorView.STATE_IS_DELETE_KEEP_TIME_DEFAULT;
+      final boolean delete_IsKeepTime              = TourDataEditorView.STATE_DELETE_IS_KEEP_TIME_DEFAULT;
+      final boolean delete_IsKeepDistance          = TourDataEditorView.STATE_DELETE_IS_KEEP_DISTANCE_DEFAULT;
+      final boolean delete_IsAdjustTourStartTime   = TourDataEditorView.STATE_DELETE_IS_ADJUST_TOUR_START_TIME_DEFAULT;
+
       final boolean isGraphAntialiasing            = _prefStore.getDefaultBoolean(ITourbookPreferences.GRAPH_ANTIALIASING);
       final boolean isSelectInBetweenTimeSlices    = _prefStore.getDefaultBoolean(ITourbookPreferences.GRAPH_IS_SELECT_INBETWEEN_TIME_SLICES);
       final boolean isShowBreaktimeValues          = _prefStore.getDefaultBoolean(ITourbookPreferences.GRAPH_IS_BREAKTIME_VALUES_VISIBLE);
@@ -693,9 +694,9 @@ public class SlideoutTourChartOptions extends ToolbarSlideout implements IAction
       /*
        * Update model
        */
-      _stateTourEditor.put(TourDataEditorView.STATE_IS_ADJUST_TOUR_START_TIME,   isAdjustTourStartTime);
-      _stateTourEditor.put(TourDataEditorView.STATE_IS_DELETE_KEEP_DISTANCE,     isDeleteKeepDistance);
-      _stateTourEditor.put(TourDataEditorView.STATE_IS_DELETE_KEEP_TIME,         isDeleteKeepTime);
+      _stateTourEditor.put(TourDataEditorView.STATE_DELETE_IS_KEEP_TIME,         delete_IsKeepTime);
+      _stateTourEditor.put(TourDataEditorView.STATE_DELETE_IS_KEEP_DISTANCE,     delete_IsKeepDistance);
+      _stateTourEditor.put(TourDataEditorView.STATE_DELETE_IS_ADJUST_TOUR_START_TIME,   delete_IsAdjustTourStartTime);
 
       /*
        * Update UI
@@ -707,9 +708,9 @@ public class SlideoutTourChartOptions extends ToolbarSlideout implements IAction
       tcc.pulseGraph                   = TourChart.PULSE_GRAPH_DEFAULT;
       tcc.xAxisTime                    = xAxisStartTime;
 
-      _chkDelete_AdjustTourStartTime   .setSelection(isAdjustTourStartTime);
-      _chkDelete_KeepDistance          .setSelection(isDeleteKeepDistance);
-      _chkDelete_KeepTime              .setSelection(isDeleteKeepTime);
+      _chkDelete_AdjustTourStartTime   .setSelection(delete_IsAdjustTourStartTime);
+      _chkDelete_KeepDistance          .setSelection(delete_IsKeepDistance);
+      _chkDelete_KeepTime              .setSelection(delete_IsKeepTime);
 
       _chkGraphAntialiasing            .setSelection(isGraphAntialiasing);
       _chkInvertPaceGraph              .setSelection(isShowPaceGraphInverted);
@@ -780,17 +781,17 @@ public class SlideoutTourChartOptions extends ToolbarSlideout implements IAction
       _rdoShowSrtm1Values           .setSelection(isShowSrtm1Values);
       _rdoShowSrtm3Values           .setSelection(isShowSrtm1Values == false);
 
-      _chkDelete_AdjustTourStartTime.setSelection(Util.getStateBoolean(_stateTourEditor,
-            TourDataEditorView.STATE_IS_ADJUST_TOUR_START_TIME,
-            TourDataEditorView.STATE_IS_ADJUST_TOUR_START_TIME_DEFAULT));
+      _chkDelete_KeepTime           .setSelection(Util.getStateBoolean(_stateTourEditor,
+            TourDataEditorView.STATE_DELETE_IS_KEEP_TIME,
+            TourDataEditorView.STATE_DELETE_IS_KEEP_TIME_DEFAULT));
 
       _chkDelete_KeepDistance       .setSelection(Util.getStateBoolean(_stateTourEditor,
-            TourDataEditorView.STATE_IS_DELETE_KEEP_DISTANCE,
-            TourDataEditorView.STATE_IS_DELETE_KEEP_DISTANCE_DEFAULT));
+            TourDataEditorView.STATE_DELETE_IS_KEEP_DISTANCE,
+            TourDataEditorView.STATE_DELETE_IS_KEEP_DISTANCE_DEFAULT));
 
-      _chkDelete_KeepTime           .setSelection(Util.getStateBoolean(_stateTourEditor,
-            TourDataEditorView.STATE_IS_DELETE_KEEP_TIME,
-            TourDataEditorView.STATE_IS_DELETE_KEEP_TIME_DEFAULT));
+      _chkDelete_AdjustTourStartTime.setSelection(Util.getStateBoolean(_stateTourEditor,
+            TourDataEditorView.STATE_DELETE_IS_ADJUST_TOUR_START_TIME,
+            TourDataEditorView.STATE_DELETE_IS_ADJUST_TOUR_START_TIME_DEFAULT));
 
       setSelection_PulseGraph(
 
@@ -857,9 +858,9 @@ public class SlideoutTourChartOptions extends ToolbarSlideout implements IAction
       /*
        * Update state
        */
-      _stateTourEditor.put(TourDataEditorView.STATE_IS_ADJUST_TOUR_START_TIME,         _chkDelete_AdjustTourStartTime.getSelection());
-      _stateTourEditor.put(TourDataEditorView.STATE_IS_DELETE_KEEP_DISTANCE,           _chkDelete_KeepDistance.getSelection());
-      _stateTourEditor.put(TourDataEditorView.STATE_IS_DELETE_KEEP_TIME,               _chkDelete_KeepTime.getSelection());
+      _stateTourEditor.put(TourDataEditorView.STATE_DELETE_IS_KEEP_TIME,               _chkDelete_KeepTime.getSelection());
+      _stateTourEditor.put(TourDataEditorView.STATE_DELETE_IS_KEEP_DISTANCE,           _chkDelete_KeepDistance.getSelection());
+      _stateTourEditor.put(TourDataEditorView.STATE_DELETE_IS_ADJUST_TOUR_START_TIME,  _chkDelete_AdjustTourStartTime.getSelection());
 
       _tourChart.setupChartConfig();
 
