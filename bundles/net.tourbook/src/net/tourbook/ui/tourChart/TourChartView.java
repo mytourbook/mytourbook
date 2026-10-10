@@ -1301,9 +1301,6 @@ public class TourChartView extends ViewPart implements
                                    final int rightSliderValuesIndex,
                                    final boolean isCenterSliderPosition) {
 
-//      System.out.println(UI.timeStamp() + " setSliderPositions: " + leftSliderValuesIndex + " - " + rightSliderValuesIndex);
-// TODO remove SYSTEM.OUT.PRINTLN
-
       final SelectionChartXSliderPosition xSliderPosition = new SelectionChartXSliderPosition(
             _tourChart,
             leftSliderValuesIndex,
@@ -1323,8 +1320,8 @@ public class TourChartView extends ViewPart implements
       // Usually specific to your editor instance to avoid affecting other parts
       _undoContext = new UndoContext();
 
-      _undoActionHandler = new UndoActionHandler(getViewSite(), _undoContext);
-      _redoActionHandler = new RedoActionHandler(getViewSite(), _undoContext);
+      _undoActionHandler = new UndoActionHandler(viewSite, _undoContext);
+      _redoActionHandler = new RedoActionHandler(viewSite, _undoContext);
 
       // 3. Register it as the global Action Handler for the Undo command
       actionBars.setGlobalActionHandler(ActionFactory.UNDO.getId(), _undoActionHandler);
@@ -1332,15 +1329,6 @@ public class TourChartView extends ViewPart implements
 
       // 4. Update the action bars to apply changes
       actionBars.updateActionBars();
-
-//      final IUndoContext undoContext = getUndoContext();
-//      final UndoActionHandler undoAction = new UndoActionHandler(getSite(), undoContext);
-//      undoAction.setActionDefinitionId(IWorkbenchCommandConstants.EDIT_UNDO);
-//      final RedoActionHandler redoAction = new RedoActionHandler(getSite(), undoContext);
-//      redoAction.setActionDefinitionId(IWorkbenchCommandConstants.EDIT_REDO);
-//      getViewSite().getActionBars().setGlobalActionHandler(ActionFactory.UNDO.getId(), undoAction);
-//      getViewSite().getActionBars().setGlobalActionHandler(ActionFactory.REDO.getId(), redoAction);
-
    }
 
    private void showTour() {
@@ -1458,7 +1446,7 @@ public class TourChartView extends ViewPart implements
             ++_undoCounter,
             sliderLastIndex - sliderFirstIndex + 1);
 
-      final TourDataUndoOperation op = new TourDataUndoOperation(
+      final TourDataUndoOperation undoOperation = new TourDataUndoOperation(
 
             opLabel,
 
@@ -1471,15 +1459,28 @@ public class TourChartView extends ViewPart implements
             sliderLastIndex);
 
       // Assign the context scope
-      op.addContext(_undoContext);
+      undoOperation.addContext(_undoContext);
 
       try {
 
          // Execute via the history framework
          final IOperationHistory opHistory = PlatformUI.getWorkbench().getOperationSupport().getOperationHistory();
 
+         /*
+          * Increase undo limit, the default is 20.
+          * .
+          * Setting this limit in setupUndoContext() did not work !!!
+          */
+         final int undoLimitRequested = 100;
+         final int undoLimit = opHistory.getLimit(_undoContext);
+
+         if (undoLimit != undoLimitRequested) {
+
+            opHistory.setLimit(_undoContext, undoLimitRequested);
+         }
+
          // this will call undoRedo_Execute()
-         opHistory.execute(op, null, null);
+         opHistory.execute(undoOperation, null, null);
 
       } catch (final ExecutionException e) {
 
@@ -1539,14 +1540,9 @@ public class TourChartView extends ViewPart implements
             true, // isKeepMinMaxValues
             isTourDirty);
 
-      final int indexDiff = sliderLastIndex - sliderFirstIndex;
-
-      final int newSliderFirstIndex = sliderFirstIndex;
-      final int newSliderLastIndex = sliderLastIndex;
-
       setSliderPositions(
-            newSliderFirstIndex,
-            newSliderLastIndex,
+            sliderFirstIndex,
+            sliderLastIndex,
             false);
 
       // update undo/redo enablement
