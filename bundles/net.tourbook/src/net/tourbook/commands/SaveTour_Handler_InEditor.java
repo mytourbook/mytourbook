@@ -31,7 +31,7 @@ import org.eclipse.ui.commands.IElementUpdater;
 import org.eclipse.ui.handlers.HandlerUtil;
 import org.eclipse.ui.menus.UIElement;
 
-public class SaveTour_Handler extends AbstractHandler implements IElementUpdater {
+public class SaveTour_Handler_InEditor extends AbstractHandler implements IElementUpdater {
 
    private static final ImageDescriptor _iconSaveTour = TourbookPlugin.getThemedImageDescriptor(Images.SaveTour);
 

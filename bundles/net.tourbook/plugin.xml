@@ -2571,12 +2571,12 @@
       <!-- This handler is enabled/disabled in the command handler: .isEnabled() -->
       <handler
          commandId   = "command.net.tourbook.tour.SaveTour_InEditor"
-         class       = "net.tourbook.commands.SaveTour_Handler"/>
+         class       = "net.tourbook.commands.SaveTour_Handler_InEditor"/>
 
       <!-- This handler is enabled/disabled in the command handler: .isEnabled() -->
       <handler
          commandId   = "command.net.tourbook.tour.RestoreTour_InEditor"
-         class       = "net.tourbook.commands.RestoreTour_Handler"/>
+         class       = "net.tourbook.commands.RestoreTour_Handler_InEditor"/>
          
       <!-- 
          ALL PARTS
