@@ -47,6 +47,7 @@ Changes
 
 * Tour Editor
   - When only one time slice is selected in the tour editor, then the tour chart is positioning both vertical sliders at the same position, before there was a gap of 1 time slice
+  - Changed shortcut to revert all tour modifications from Ctrl-Z to Ctrl-R, Ctrl-Z is now the undo action in the tour chart
   
     
 

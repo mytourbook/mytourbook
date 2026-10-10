@@ -7259,7 +7259,13 @@ public class TourDataEditorView extends ViewPart implements
       final boolean canEdit = _isEditMode && isTourInDb;
       final boolean canEditDistance = _isManualTour == false;
 
-      final boolean isTourModifiedInChart = TourManager.isTourModified_InChart();
+      final boolean isTourModifiedInChart = TourManager.isTourModified_InChart()
+
+            /*
+             * Prevent that the tour can be edited when the tour chart hast undo actions because
+             * this could cause conflicts
+             */
+            || TourManager.isTourModified_InChart_History();
 
       // all actions are disabled when a cell editor is activated
       final boolean isCellEditorInactive = _isCellEditorActive == false;

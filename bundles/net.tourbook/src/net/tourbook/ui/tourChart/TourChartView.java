@@ -98,6 +98,7 @@ import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.IWorkbenchPartReference;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.actions.ActionFactory;
+import org.eclipse.ui.contexts.IContextService;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.eclipse.ui.operations.RedoActionHandler;
 import org.eclipse.ui.operations.UndoActionHandler;
@@ -498,6 +499,7 @@ public class TourChartView extends ViewPart implements
 //    tbm.add(new Separator(TOOLBAR_GROUP_2));
 //    tbm.add(new Separator(TOOLBAR_GROUP_3));
 
+      setupShortcutKeyContext();
       setupUndoContext();
 
       showTour();
@@ -1309,6 +1311,19 @@ public class TourChartView extends ViewPart implements
       xSliderPosition.setCenterSliderPosition(isCenterSliderPosition);
 
       _tourChart.selectXSliders(xSliderPosition);
+   }
+
+   /**
+    * This context is used for key bindings that Ctrl-Z is working also in other parts, e.g. tour
+    * chart
+    */
+   private void setupShortcutKeyContext() {
+
+      // Get the site's local context service
+      final IContextService contextService = getSite().getService(IContextService.class);
+
+      // Activate it. The workbench cleans this up automatically on part disposal.
+      contextService.activateContext("net.tourbook.context.tourChart"); //$NON-NLS-1$
    }
 
    private void setupUndoContext() {

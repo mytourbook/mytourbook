@@ -828,7 +828,6 @@
          <!-- Save Tour -->
          <command
             commandId      ="command.net.tourbook.tour.SaveTour_InEditor"
-            mnemonic       ="%Command_Tour_SaveTour_Mnemonic"
             tooltip        ="%Command_Tour_SaveTour_Tooltip">
             
             <visibleWhen   checkEnabled="false">
@@ -839,7 +838,6 @@
          <!-- Restore Tour -->
          <command
             commandId      ="command.net.tourbook.tour.RestoreTour_InEditor"
-            mnemonic       ="%Command_Tour_RestoreTour_Mnemonic"
             tooltip        ="%Command_Tour_RestoreTour_Tooltip_2">
             
             <visibleWhen   checkEnabled="false">
@@ -2141,7 +2139,7 @@
          schemeId    ="net.tourbook.scheme"/>
 
 
-      <!-- Tour import/new/undo -->
+      <!-- Tour import/new/save/undo -->
    
       <key
          commandId   ="net.tourbook.command.device.importFromFile"
@@ -2154,6 +2152,12 @@
          sequence    ="%Shortcut_Key_App_NewTour"
          contextId   ="org.eclipse.ui.contexts.window"
          schemeId    ="net.tourbook.scheme"/>
+         
+      <key
+         commandId   ="command.net.tourbook.tour.SaveTour_InEditor"
+         sequence    ="%Shortcut_Key_App_SaveTour"
+         contextId   ="net.tourbook.context.tourEditor"
+         schemeId    ="net.tourbook.scheme"/>
 
       <key
          commandId   ="command.net.tourbook.tour.RestoreTour_InEditor"
@@ -2162,9 +2166,15 @@
          schemeId    ="net.tourbook.scheme"/>
          
       <key
-         commandId   ="command.net.tourbook.tour.SaveTour_InEditor"
+         commandId   ="command.net.tourbook.tour.SaveTour_InChart"
          sequence    ="%Shortcut_Key_App_SaveTour"
-         contextId   ="org.eclipse.ui.contexts.window"
+         contextId   ="net.tourbook.context.tourChart"
+         schemeId    ="net.tourbook.scheme"/>
+
+      <key
+         commandId   ="command.net.tourbook.tour.RestoreTour_InChart"
+         sequence    ="%Shortcut_Key_App_RestoreTour"
+         contextId   ="net.tourbook.context.tourChart"
          schemeId    ="net.tourbook.scheme"/>
 
 
@@ -2632,7 +2642,7 @@
    
    -->
 
-   <extension point="org.eclipse.ui.handlers">
+   <extension point="org.eclipse.ui.handlers"> 
 
       <!-- This handler is enabled/disabled in the command handler: .isEnabled() -->
       <handler

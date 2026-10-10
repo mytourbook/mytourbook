@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2025 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2026 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -23,13 +23,13 @@ import org.eclipse.jface.action.Action;
 
 class ActionToggleReadEditMode extends Action {
 
-   private final TourDataEditorView _tourPropertiesView;
+   private final TourDataEditorView _tourEditorView;
 
-   public ActionToggleReadEditMode(final TourDataEditorView tourPropertiesView) {
+   public ActionToggleReadEditMode(final TourDataEditorView tourEditorView) {
 
       super(null, AS_CHECK_BOX);
 
-      _tourPropertiesView = tourPropertiesView;
+      _tourEditorView = tourEditorView;
 
       setToolTipText(Messages.app_action_read_edit_tooltip);
 
@@ -40,6 +40,6 @@ class ActionToggleReadEditMode extends Action {
 
    @Override
    public void run() {
-      _tourPropertiesView.actionToggleReadEditMode();
+      _tourEditorView.actionToggleReadEditMode();
    }
 }

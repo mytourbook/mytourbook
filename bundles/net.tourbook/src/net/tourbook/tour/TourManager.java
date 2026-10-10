@@ -2168,6 +2168,27 @@ public class TourManager {
    }
 
    /**
+    * @return Returns <code>true</code> when the tour chart has items in the undo history
+    */
+   public static boolean isTourModified_InChart_History() {
+
+      if (_tourChartView != null) {
+
+         final IUndoContext undoContext = _tourChartView.getUndoContext();
+
+         final IOperationHistory opHistory = PlatformUI.getWorkbench().getOperationSupport().getOperationHistory();
+         final IUndoableOperation[] undoHistory = opHistory.getUndoHistory(undoContext);
+         final IUndoableOperation[] redoHistory = opHistory.getRedoHistory(undoContext);
+
+         final boolean isUndoAvailable = undoHistory.length > 0 || redoHistory.length > 0;
+
+         return isUndoAvailable;
+      }
+
+      return false;
+   }
+
+   /**
     * The user is notified with an info dialog when the tour chart is modified
     *
     * @param isOpenView
