@@ -1505,7 +1505,23 @@ public class TourChartView extends ViewPart implements
 
    void undoRedo_Execute(final int sliderFirstIndex, final int sliderLastIndex) {
 
-      undoRedo_UpdateChart(_tourData, sliderFirstIndex, sliderLastIndex, true, false);
+      final boolean isOneSlide = sliderFirstIndex == sliderLastIndex;
+
+      int sliderFirstIndexAfterAction = sliderFirstIndex;
+      int sliderLastIndexAfterAction;
+
+      if (isOneSlide) {
+
+         sliderFirstIndexAfterAction = Math.min(sliderFirstIndexAfterAction, _tourData.timeSerie.length - 1);
+         sliderLastIndexAfterAction = sliderFirstIndexAfterAction;
+
+      } else {
+
+         sliderFirstIndexAfterAction = Math.max(0, sliderFirstIndex - 1);
+         sliderLastIndexAfterAction = Math.min(sliderFirstIndexAfterAction + 1, _tourData.timeSerie.length - 1);
+      }
+
+      undoRedo_UpdateChart(_tourData, sliderFirstIndexAfterAction, sliderLastIndexAfterAction, true, false);
    }
 
    void undoRedo_Redo(final TourData tourData_Cloned_WithRemovedTimeSliced,
@@ -1514,7 +1530,10 @@ public class TourChartView extends ViewPart implements
 
       _tourData.undoRedo_RevertTourData(tourData_Cloned_WithRemovedTimeSliced, sliderFirstIndex, sliderLastIndex);
 
-      undoRedo_UpdateChart(_tourData, sliderFirstIndex, sliderLastIndex, true, false);
+      final int sliderFirstIndexAfterAction = Math.max(0, sliderFirstIndex - 1);
+      final int sliderLastIndexAfterAction = Math.min(sliderFirstIndexAfterAction + 1, _tourData.timeSerie.length - 1);
+
+      undoRedo_UpdateChart(_tourData, sliderFirstIndexAfterAction, sliderLastIndexAfterAction, true, false);
    }
 
    void undoRedo_Undo(final TourData tourData_Cloned_Before,
@@ -1541,6 +1560,15 @@ public class TourChartView extends ViewPart implements
       undoRedo_UpdateChart(_tourData, sliderFirstIndex, sliderLastIndex, isTourDirty, true);
    }
 
+   /**
+    * @param tourData
+    * @param sliderFirstIndex
+    *           Move first slider to this position
+    * @param sliderLastIndex
+    *           Move last slider to this position
+    * @param isTourDirty
+    * @param isUndo
+    */
    private void undoRedo_UpdateChart(final TourData tourData,
                                      final int sliderFirstIndex,
                                      final int sliderLastIndex,

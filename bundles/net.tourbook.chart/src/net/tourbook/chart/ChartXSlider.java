@@ -21,12 +21,15 @@ package net.tourbook.chart;
 import java.util.ArrayList;
 
 import net.tourbook.common.RectangleLong;
+import net.tourbook.common.UI;
 
 /**
  * The slider is moved on the x-axis and displays the current position in the slider label.
  */
 public class ChartXSlider {
 
+   private static final char            NL                      = UI.NEW_LINE                                       //
+   ;
    private static final int             SLIDER_TYPE_NONE        = 0;
    public static final int              SLIDER_TYPE_LEFT        = 1;
    public static final int              SLIDER_TYPE_RIGHT       = 2;
@@ -295,14 +298,14 @@ public class ChartXSlider {
    @Override
    public String toString() {
 
-      return "ChartXSlider [" //                                        //$NON-NLS-1$
+      return "ChartXSlider" + NL //                                        //$NON-NLS-1$
 
-            + "_positionRatio=" + _positionRatio + " " //               //$NON-NLS-1$ //$NON-NLS-2$
-            + "_valueIndex=" + _valueIndex + " " //                     //$NON-NLS-1$ //$NON-NLS-2$
-            + "_xxDevSliderLinePos=" + _xxDevSliderLinePos + " " //     //$NON-NLS-1$ //$NON-NLS-2$
-            + "sliderType=" + _sliderType + " " //                       //$NON-NLS-1$ //$NON-NLS-2$
+            + " _positionRatio      = " + _positionRatio + NL //           //$NON-NLS-1$
+            + " _valueIndex         = " + _valueIndex + NL //              //$NON-NLS-1$
+            + " _xxDevSliderLinePos = " + _xxDevSliderLinePos + NL //      //$NON-NLS-1$
+            + " sliderType          = " + _sliderType + NL //              //$NON-NLS-1$
 
-            + "]"; //                                                   //$NON-NLS-1$
+      ; //
    }
 
 }

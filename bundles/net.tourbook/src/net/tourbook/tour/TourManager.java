@@ -2656,16 +2656,6 @@ public class TourManager {
                                        final boolean isRemoveDistance,
                                        final boolean isAdjustTourStartTime) {
 
-      System.out.println(UI.timeStamp() + " removeTimeSlices: " + firstIndex
-
-            + " - " + lastIndex
-            + " - " + isRemoveTime
-            + " - " + isRemoveDistance
-            + " - " + isAdjustTourStartTime
-
-      );
-// TODO remove SYSTEM.OUT.PRINTLN
-
       // this must be done before the time series are modified
       tourData.removePhotos(firstIndex, lastIndex);
 

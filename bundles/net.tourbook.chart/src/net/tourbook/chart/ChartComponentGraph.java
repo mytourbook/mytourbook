@@ -8059,7 +8059,13 @@ public class ChartComponentGraph extends Canvas {
     */
    private void onKeyDown_MoveXSlider(final Event event) {
 
-      final int keyCode = event.keyCode;
+      final ChartDataXSerie xData = getXData();
+
+      if (xData == null) {
+
+         // this happened when deleting all time slices and the last was deleted
+         return;
+      }
 
       // ensure a slider is selected
       if (_selectedXSlider == null) {
@@ -8072,8 +8078,11 @@ public class ChartComponentGraph extends Canvas {
          }
       }
 
-      // toggle selected slider with the T key
+      final int keyCode = event.keyCode;
+
       if (keyCode == 't') {
+
+         // toggle selected slider
 
          _selectedXSlider = _selectedXSlider == _xSliderA ? _xSliderB : _xSliderA;
          _isSliderDirty = true;
@@ -8081,13 +8090,20 @@ public class ChartComponentGraph extends Canvas {
          redraw();
 
          return;
-      }
 
-      if (getXData() == null) {
+      } else if (keyCode == 'o') {
 
-         // this happened when deleting all time slices and the last was deleted
+         // move other slider to the same position
 
-         return;
+         final ChartXSlider otherXSlider = _selectedXSlider == _xSliderA ? _xSliderB : _xSliderA;
+         final int valueIndex = _selectedXSlider.getValuesIndex();
+
+         _hoveredValuePointIndex = -1;
+
+         moveXSlider(otherXSlider, valueIndex, false, true, true, false);
+
+         redraw();
+         setCursorStyle();
       }
 
       /*
@@ -8108,7 +8124,7 @@ public class ChartComponentGraph extends Canvas {
       valueIndexDiff *= isShift ? 10 : 1;
 
       int valueIndex = _selectedXSlider.getValuesIndex();
-      final double[] xValues = getXData().getHighValuesDouble()[0];
+      final double[] xValues = xData.getHighValuesDouble()[0];
 
       boolean isMoveSlider = false;
 

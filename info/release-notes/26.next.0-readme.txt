@@ -36,13 +36,14 @@ New / Improvements
 
 * Tour Chart
   - Delete time slices, the tour chart is now a more functional tour editor with an undo/redo feature, before only e.g. tour markers could be modified
+  - With the key "o", move the other vertical slider to the same position as the selected vertical slider
   
 
 Changes
 =======
 
 * Tour Chart
-  - Toggle active vertical slider with the keyboard is now T, before it was the Ctrl key
+  - Toggle active vertical slider with the keyboard is now "t", before it was the "Ctrl" key
   
 
 * Tour Editor

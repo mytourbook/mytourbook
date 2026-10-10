@@ -1064,11 +1064,6 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
       int deleteFirstIndex = sliderLeftIndex;
       int deleteLastIndex = sliderRightIndex;
 
-      System.out.println(UI.timeStamp() + " deleteTimeSlices: " + deleteFirstIndex + " - " + deleteLastIndex);
-//    System.out.println(UI.timeStamp() + " indexDiff: " + indexDiff);
-//    System.out.println(UI.timeStamp() + " isRemoveTime: " + isRemoveTime);
-// TODO remove SYSTEM.OUT.PRINTLN
-
       // check bounds
       if (deleteLastIndex < deleteFirstIndex) {
          deleteLastIndex = deleteFirstIndex;
@@ -5032,9 +5027,6 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
    }
 
    void selectXSliders(final SelectionChartXSliderPosition xSliderPosition) {
-
-//      System.out.println(UI.timeStamp() + " xSliderPosition: " + xSliderPosition);
-//// TODO remove SYSTEM.OUT.PRINTLN
 
       if (_tourData == null) {
          // this occurred
