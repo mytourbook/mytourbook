@@ -2574,6 +2574,7 @@ public class TourDataEditorView extends ViewPart implements
             isAdjustTourStartTime);
 
       getDataSeriesFromTourData();
+      updateMarkerMap();
 
       // update UI
       _isSetField = true;
@@ -9785,7 +9786,6 @@ public class TourDataEditorView extends ViewPart implements
       for (final TourMarker tourMarker : tourMarkers) {
          _markerMap.put(tourMarker.getSerieIndex(), tourMarker);
       }
-
    }
 
    /**

@@ -55,7 +55,8 @@ Changes
 Bugfix
 ======
   
-* 
+* Tour Editor
+  - When time slices were deleted which contained tour markers, the other tour markers positions were wrong
 
 
 Translation    
