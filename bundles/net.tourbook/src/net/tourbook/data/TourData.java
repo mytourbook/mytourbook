@@ -15671,9 +15671,10 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
    private Set<TourMarker> undoRedo_RevertTourMarkers(final TourData clonedTourData,
                                                       final int firstIndex,
                                                       final int lastIndex) {
-      // TODO Auto-generated method stub
 
       final Set<TourMarker> allTourMarkers = new HashSet<>();
+
+      allTourMarkers.addAll(clonedTourData.tourMarkers);
 
       return allTourMarkers;
    }

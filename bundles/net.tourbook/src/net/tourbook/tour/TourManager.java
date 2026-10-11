@@ -2205,8 +2205,22 @@ public class TourManager {
 
          MessageDialog.openInformation(
                Display.getCurrent().getActiveShell(),
-               "Tour chart is modified",
-               "A tour in the tour chart is modified, this tour must be saved or reverted, before other actions can be done.");
+               "Tour chart has been modified",
+               "The tour chart has been modified. Save or revert changes before performing other actions."
+         );
+
+         return true;
+
+      } else if (isTourModified_InChart_History()) {
+
+         if (isOpenView) {
+            openTourChart();
+         }
+
+         MessageDialog.openInformation(
+               Display.getCurrent().getActiveShell(),
+               "Tour chart has been modified",
+               "The tour chart's undo history must be cleared (Ctrl+R) before performing any other actions.");
 
          return true;
       }
