@@ -2206,8 +2206,7 @@ public class TourManager {
          MessageDialog.openInformation(
                Display.getCurrent().getActiveShell(),
                "Tour chart has been modified",
-               "The tour chart has been modified. Save or revert changes before performing other actions."
-         );
+               "The tour chart has been modified. Save or revert changes before performing other actions.");
 
          return true;
 
@@ -2264,24 +2263,6 @@ public class TourManager {
                Messages.TourManager_Dialog_TourEditorIsModified_Message);
 
          return true;
-      }
-
-      return false;
-   }
-
-   public static boolean isUndoHistoryAvailable_InChart() {
-
-      if (_tourChartView != null) {
-
-         final IUndoContext undoContext = _tourChartView.getUndoContext();
-
-         final IOperationHistory opHistory = PlatformUI.getWorkbench().getOperationSupport().getOperationHistory();
-         final IUndoableOperation[] undoHistory = opHistory.getUndoHistory(undoContext);
-         final IUndoableOperation[] redoHistory = opHistory.getRedoHistory(undoContext);
-
-         final boolean isUndoAvailable = undoHistory.length > 0 || redoHistory.length > 0;
-
-         return isUndoAvailable;
       }
 
       return false;
