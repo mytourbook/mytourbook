@@ -2027,6 +2027,11 @@
    <extension  point="org.eclipse.ui.contexts">
    
       <context
+         id          ="net.tourbook.context.tourChart"
+         name        ="net.tourbook.context.tourChart"
+         parentId    ="org.eclipse.ui.contexts.window"/>
+
+      <context
          id          ="net.tourbook.context.tourEditor"
          name        ="net.tourbook.context.tourEditor"
          parentId    ="org.eclipse.ui.contexts.window"/>
