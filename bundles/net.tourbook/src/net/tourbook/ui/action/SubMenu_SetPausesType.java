@@ -136,7 +136,7 @@ public class SubMenu_SetPausesType extends SubMenu {
    public void setPausesType(final boolean isSetAutoPause) {
 
       // check if the tour editor contains a modified tour
-      if (TourManager.isTourEditorModified()) {
+      if (TourManager.isTourModified()) {
          return;
       }
 

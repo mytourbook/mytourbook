@@ -129,7 +129,7 @@ public class ContributionItem_MeasurementSystem extends CustomControlContributio
                return;
             }
 
-            if (TourManager.isTourEditorModified()) {
+            if (TourManager.isTourModified()) {
 
                // prevent to change the measurement system when a tour is modified in the tour editor
                // -> select old measurement system

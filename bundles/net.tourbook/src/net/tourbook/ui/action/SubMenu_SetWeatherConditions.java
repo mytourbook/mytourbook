@@ -95,7 +95,7 @@ public class SubMenu_SetWeatherConditions extends SubMenu {
    public void setWeatherConditions(final String weatherDescription) {
 
       // check if the tour editor contains a modified tour
-      if (TourManager.isTourEditorModified()) {
+      if (TourManager.isTourModified()) {
          return;
       }
 

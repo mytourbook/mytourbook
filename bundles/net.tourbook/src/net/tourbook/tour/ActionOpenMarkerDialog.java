@@ -62,7 +62,7 @@ public class ActionOpenMarkerDialog extends Action {
                                final boolean isSaveTour,
                                final TourMarker selectedTourMarker) {
 
-      if (TourManager.isTourEditorModified()) {
+      if (TourManager.isTourModified()) {
          return;
       }
 

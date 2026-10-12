@@ -1156,7 +1156,7 @@ public class TourTags_View extends ViewPart implements ITreeViewer, ITourViewer 
    private void doSave() {
 
       // check if the tour editor contains a modified tour
-      if (TourManager.isTourEditorModified()) {
+      if (TourManager.isTourModified()) {
          return;
       }
 

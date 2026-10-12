@@ -95,7 +95,7 @@ public class ActionSetGeoPositionForGeoMarker extends SubMenu {
    private void actionRemoveAllGeoPositions() {
 
       // make sure the tour editor does not contain a modified tour
-      if (TourManager.isTourEditorModified()) {
+      if (TourManager.isTourModified()) {
          return;
       }
 
@@ -148,7 +148,7 @@ public class ActionSetGeoPositionForGeoMarker extends SubMenu {
    private void actionSetGeoPositionIntoGeoMarker(final TourMarker geoMarker) {
 
       // make sure the tour editor does not contain a modified tour
-      if (TourManager.isTourEditorModified()) {
+      if (TourManager.isTourModified()) {
          return;
       }
 

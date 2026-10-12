@@ -99,7 +99,7 @@ public class ActionLookupCommonLocation extends SubMenu {
    private void lookupMapLocaction(final int reqestZoomlevel) {
 
       // make sure the tour editor does not contain a modified tour
-      if (TourManager.isTourEditorModified()) {
+      if (TourManager.isTourModified()) {
          return;
       }
 

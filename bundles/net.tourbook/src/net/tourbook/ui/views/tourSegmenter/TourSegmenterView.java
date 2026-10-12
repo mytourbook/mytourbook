@@ -6170,7 +6170,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
    private TourData saveTour() {
 
       // check if the tour editor contains a modified tour
-      if (TourManager.isTourEditorModified()) {
+      if (TourManager.isTourModified()) {
          return null;
       }
 

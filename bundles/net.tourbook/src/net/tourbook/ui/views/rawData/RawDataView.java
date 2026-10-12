@@ -1059,7 +1059,7 @@ public class RawDataView extends ViewPart implements
    void actionMergeTours(final TourData mergeFromTour, final TourData mergeIntoTour) {
 
       // check if the tour editor contains a modified tour
-      if (TourManager.isTourEditorModified()) {
+      if (TourManager.isTourModified()) {
          return;
       }
 

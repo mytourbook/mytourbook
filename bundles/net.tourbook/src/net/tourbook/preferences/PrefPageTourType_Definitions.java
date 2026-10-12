@@ -1223,7 +1223,7 @@ public class PrefPageTourType_Definitions extends PreferencePage implements IWor
        * Ensure that a tour is NOT modified because changing the tour type needs an app restart
        * because the tour type images are DISPOSED
        */
-      if (TourManager.isTourEditorModified(false)) {
+      if (TourManager.isTourModified(false)) {
 
          _canModifyAnything = false;
 

@@ -33,7 +33,7 @@ public class ActionHandler_CreateNewTour extends AbstractHandler implements IEle
    @Override
    public Object execute(final ExecutionEvent event) throws ExecutionException {
 
-      if (TourManager.isTourEditorModified()) {
+      if (TourManager.isTourModified()) {
          return null;
       }
 

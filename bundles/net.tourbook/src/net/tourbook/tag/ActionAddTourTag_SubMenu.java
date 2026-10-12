@@ -135,7 +135,7 @@ public class ActionAddTourTag_SubMenu extends Action implements IMenuCreator, IA
       @Override
       public void run() {
 
-         if (TourManager.isTourEditorModified()) {
+         if (TourManager.isTourModified()) {
             return;
          }
 
@@ -589,7 +589,7 @@ public class ActionAddTourTag_SubMenu extends Action implements IMenuCreator, IA
    @Override
    public void run() {
 
-      if (TourManager.isTourEditorModified()) {
+      if (TourManager.isTourModified()) {
          return;
       }
 
@@ -598,7 +598,7 @@ public class ActionAddTourTag_SubMenu extends Action implements IMenuCreator, IA
 
    private void saveOrReopenTagMenu(final boolean isAddTag) {
 
-      if (TourManager.isTourEditorModified()) {
+      if (TourManager.isTourModified()) {
          return;
       }
 

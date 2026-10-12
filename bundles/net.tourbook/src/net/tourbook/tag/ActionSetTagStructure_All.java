@@ -55,7 +55,7 @@ public class ActionSetTagStructure_All extends Action implements IMenuCreator {
       public void run() {
 
          // check if the tour editor contains a modified tour
-         if (TourManager.isTourEditorModified()) {
+         if (TourManager.isTourModified()) {
             return;
          }
 

@@ -189,7 +189,7 @@ public class TagManager {
 
    /**
     * Clear all tag resources within MT and fire a tag modify event, ensure that
-    * {@link TourManager#isTourEditorModified()} <code>== false</code>
+    * {@link TourManager#isTourModified()} <code>== false</code>
     */
    public static void clearAllTagResourcesAndFireModifyEvent() {
 
@@ -244,7 +244,7 @@ public class TagManager {
    public static boolean deleteTourTag(final List<TourTag> allTags) {
 
       // ensure that a tour is NOT modified in the tour editor
-      if (TourManager.isTourEditorModified(false)) {
+      if (TourManager.isTourModified(false)) {
          return false;
       }
 
@@ -395,7 +395,7 @@ public class TagManager {
    public static boolean deleteTourTagCategory(final long categoryId, final String categoryName) {
 
       // ensure that a tour is NOT modified in the tour editor
-      if (TourManager.isTourEditorModified(false)) {
+      if (TourManager.isTourModified(false)) {
          return false;
       }
 

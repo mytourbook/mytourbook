@@ -112,7 +112,7 @@ public class ActionRenameMarkerFromRecentMarker_SubMenu extends SubMenu {
       }
 
       // make sure the tour editor does not contain a modified tour
-      if (TourManager.isTourEditorModified()) {
+      if (TourManager.isTourModified()) {
          return;
       }
 

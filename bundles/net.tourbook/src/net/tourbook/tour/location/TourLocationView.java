@@ -3408,7 +3408,7 @@ public class TourLocationView extends ViewPart implements ITourViewer {
    private void onAction_BoundingBox_Reset() {
 
       // ensure that a tour is NOT modified in the tour editor
-      if (TourManager.isTourEditorModified()) {
+      if (TourManager.isTourModified()) {
          return;
       }
 
@@ -3431,7 +3431,7 @@ public class TourLocationView extends ViewPart implements ITourViewer {
    private void onAction_BoundingBox_Resize() {
 
       // ensure that a tour is NOT modified in the tour editor
-      if (TourManager.isTourEditorModified()) {
+      if (TourManager.isTourModified()) {
          return;
       }
 
@@ -3443,7 +3443,7 @@ public class TourLocationView extends ViewPart implements ITourViewer {
    private void onAction_CombineBoundingBox() {
 
       // ensure that a tour is NOT modified in the tour editor
-      if (TourManager.isTourEditorModified()) {
+      if (TourManager.isTourModified()) {
          return;
       }
 
@@ -3549,7 +3549,7 @@ public class TourLocationView extends ViewPart implements ITourViewer {
    private void onAction_IncludeGeoPosition() {
 
       // ensure that a tour is NOT modified in the tour editor
-      if (TourManager.isTourEditorModified()) {
+      if (TourManager.isTourModified()) {
          return;
       }
 
@@ -3571,7 +3571,7 @@ public class TourLocationView extends ViewPart implements ITourViewer {
    private void onAction_RelocateBoundingBox() {
 
       // ensure that a tour is NOT modified in the tour editor
-      if (TourManager.isTourEditorModified()) {
+      if (TourManager.isTourModified()) {
          return;
       }
 
@@ -3585,7 +3585,7 @@ public class TourLocationView extends ViewPart implements ITourViewer {
    private void onAction_SetLocationIntoTour(final String locationLabel, final TourLocation tourLocation) {
 
       // ensure that a tour is NOT modified in the tour editor
-      if (TourManager.isTourEditorModified()) {
+      if (TourManager.isTourModified()) {
          return;
       }
 

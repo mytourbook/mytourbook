@@ -255,7 +255,7 @@ public class EquipmentManager {
 
    /**
     * Clear all equipment resources and tours within MT and fire a equipment modify event, ensure
-    * that {@link TourManager#isTourEditorModified()} <code>== false</code>
+    * that {@link TourManager#isTourModified()} <code>== false</code>
     */
    public static void clearAllEquipmentResourcesAndFireModifyEvent() {
 
@@ -407,7 +407,7 @@ public class EquipmentManager {
       // fix https://github.com/mytourbook/mytourbook/issues/1437
       if (isCheckTourEditor) {
 
-         if (TourManager.isTourEditorModified()) {
+         if (TourManager.isTourModified()) {
             return;
          }
       }
@@ -454,7 +454,7 @@ public class EquipmentManager {
       // fix https://github.com/mytourbook/mytourbook/issues/1437
       if (isCheckTourEditor) {
 
-         if (TourManager.isTourEditorModified()) {
+         if (TourManager.isTourModified()) {
             return;
          }
       }
@@ -488,7 +488,7 @@ public class EquipmentManager {
    public static boolean equipment_DeleteEquipment(final List<Equipment> allEquipment) {
 
       // ensure that a tour is NOT modified in the tour editor
-      if (TourManager.isTourEditorModified()) {
+      if (TourManager.isTourModified()) {
          return false;
       }
 
@@ -658,7 +658,7 @@ public class EquipmentManager {
    public static boolean equipment_DeleteParts(final List<EquipmentPart> allParts) {
 
       // ensure that a tour is NOT modified in the tour editor
-      if (TourManager.isTourEditorModified() || allParts.size() != 1) {
+      if (TourManager.isTourModified() || allParts.size() != 1) {
          return false;
       }
 
@@ -788,7 +788,7 @@ public class EquipmentManager {
       // fix https://github.com/mytourbook/mytourbook/issues/1437
       if (isCheckTourEditor) {
 
-         if (TourManager.isTourEditorModified()) {
+         if (TourManager.isTourModified()) {
             return;
          }
       }
@@ -835,7 +835,7 @@ public class EquipmentManager {
       // fix https://github.com/mytourbook/mytourbook/issues/1437
       if (isCheckTourEditor) {
 
-         if (TourManager.isTourEditorModified()) {
+         if (TourManager.isTourModified()) {
             return;
          }
       }
@@ -870,7 +870,7 @@ public class EquipmentManager {
       // fix https://github.com/mytourbook/mytourbook/issues/1437
       if (isCheckTourEditor) {
 
-         if (TourManager.isTourEditorModified()) {
+         if (TourManager.isTourModified()) {
             return;
          }
       }
@@ -1706,7 +1706,7 @@ public class EquipmentManager {
     */
    public static long setEquipmentFromTag(final Equipment equipment, final TourTag tourTag) {
 
-      if (TourManager.isTourEditorModified()) {
+      if (TourManager.isTourModified()) {
          return Long.MIN_VALUE;
       }
 

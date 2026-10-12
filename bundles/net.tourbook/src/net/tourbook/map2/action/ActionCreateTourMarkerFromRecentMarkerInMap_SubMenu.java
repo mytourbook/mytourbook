@@ -97,7 +97,7 @@ public class ActionCreateTourMarkerFromRecentMarkerInMap_SubMenu extends SubMenu
    private void actionCreateMarker(final RecentMarker recentMarker, final Event event) {
 
       // make sure the tour editor does not contain a modified tour
-      if (TourManager.isTourEditorModified()) {
+      if (TourManager.isTourModified()) {
          return;
       }
 

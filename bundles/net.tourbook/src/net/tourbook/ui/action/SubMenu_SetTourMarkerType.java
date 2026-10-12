@@ -133,7 +133,7 @@ public class SubMenu_SetTourMarkerType extends SubMenu {
 
    private void setTourMarkerType(final TourMarkerType markerType) {
 
-      if (TourManager.isTourEditorModified()) {
+      if (TourManager.isTourModified()) {
          return;
       }
 

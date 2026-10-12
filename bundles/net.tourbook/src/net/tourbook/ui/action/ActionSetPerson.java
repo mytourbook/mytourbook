@@ -58,7 +58,7 @@ public class ActionSetPerson extends Action implements IMenuCreator {
       @Override
       public void run() {
 
-         if (TourManager.isTourEditorModified()) {
+         if (TourManager.isTourModified()) {
             return;
          }
 

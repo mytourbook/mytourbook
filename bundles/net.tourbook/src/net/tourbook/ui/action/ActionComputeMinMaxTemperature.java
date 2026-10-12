@@ -53,7 +53,7 @@ public class ActionComputeMinMaxTemperature extends Action {
    public void run() {
 
       // do NOT run when tour editor contains a modified tour
-      if (TourManager.isTourEditorModified()) {
+      if (TourManager.isTourModified()) {
          return;
       }
 

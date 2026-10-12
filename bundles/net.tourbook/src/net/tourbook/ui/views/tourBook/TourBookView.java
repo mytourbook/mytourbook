@@ -466,7 +466,7 @@ public class TourBookView extends ViewPart implements
       @Override
       public void run() {
 
-         if (TourManager.isTourEditorModified()) {
+         if (TourManager.isTourModified()) {
             return;
          }
 

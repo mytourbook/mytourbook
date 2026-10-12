@@ -47,7 +47,7 @@ class ActionRenameRefTour extends Action {
 	@Override
 	public void run() {
 
-		if (TourManager.isTourEditorModified()) {
+		if (TourManager.isTourModified()) {
 			return;
 		}
 

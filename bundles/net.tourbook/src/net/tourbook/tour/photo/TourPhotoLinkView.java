@@ -398,7 +398,7 @@ public class TourPhotoLinkView extends ViewPart implements ITourProvider, ITourV
 
    private void actionCreatePhotoTour() {
 
-      if (TourManager.isTourEditorModified()) {
+      if (TourManager.isTourModified()) {
          return;
       }
 
@@ -517,7 +517,7 @@ public class TourPhotoLinkView extends ViewPart implements ITourProvider, ITourV
 
    private void actionSaveAllPhotosInTour() {
 
-      if (TourManager.isTourEditorModified()) {
+      if (TourManager.isTourModified()) {
          return;
       }
 

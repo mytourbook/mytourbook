@@ -323,7 +323,7 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
    protected Control createContents(final Composite parent) {
 
       // check: if a tour is modified in the tour editor
-      if (TourManager.isTourEditorModified()) {
+      if (TourManager.isTourModified()) {
 
          _isNoUI = true;
 

@@ -52,7 +52,7 @@ public class ActionOpenAdjustAltitudeDialog extends Action {
 
    static void doAction(final ITourProvider tourProvider, final boolean isFromEditor) {
 
-      if (TourManager.isTourEditorModified()) {
+      if (TourManager.isTourModified()) {
          return;
       }
 

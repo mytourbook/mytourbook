@@ -143,7 +143,7 @@ public class ActionSetGeoPositionForPhotoTours extends SubMenu {
    private void setGeoPosition(final int timeIndex, final TourPhoto tourPhoto) {
 
       // make sure the tour editor does not contain a modified tour
-      if (TourManager.isTourEditorModified()) {
+      if (TourManager.isTourModified()) {
          return;
       }
 

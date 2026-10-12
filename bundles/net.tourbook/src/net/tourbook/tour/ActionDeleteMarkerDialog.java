@@ -83,7 +83,7 @@ public class ActionDeleteMarkerDialog extends Action {
    private void doAction() {
 
       // check if the tour editor contains a modified tour
-      if (TourManager.isTourEditorModified()) {
+      if (TourManager.isTourModified()) {
          return;
       }
 

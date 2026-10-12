@@ -219,7 +219,7 @@ public class EquipmentMenuManager implements IActionProvider {
       @Override
       public void run() {
 
-         if (_currentInstance._isSaveTour && TourManager.isTourEditorModified()) {
+         if (_currentInstance._isSaveTour && TourManager.isTourModified()) {
             return;
          }
 
@@ -243,7 +243,7 @@ public class EquipmentMenuManager implements IActionProvider {
       @Override
       public void run() {
 
-         if (_currentInstance._isSaveTour && TourManager.isTourEditorModified()) {
+         if (_currentInstance._isSaveTour && TourManager.isTourModified()) {
             return;
          }
 
@@ -262,7 +262,7 @@ public class EquipmentMenuManager implements IActionProvider {
       @Override
       public void run() {
 
-         if (_currentInstance._isSaveTour && TourManager.isTourEditorModified()) {
+         if (_currentInstance._isSaveTour && TourManager.isTourModified()) {
             return;
          }
 
@@ -312,7 +312,7 @@ public class EquipmentMenuManager implements IActionProvider {
       @Override
       public void run() {
 
-         if (_currentInstance._isSaveTour && TourManager.isTourEditorModified()) {
+         if (_currentInstance._isSaveTour && TourManager.isTourModified()) {
             return;
          }
 
@@ -333,7 +333,7 @@ public class EquipmentMenuManager implements IActionProvider {
       @Override
       public void run() {
 
-         if (_currentInstance._isSaveTour && TourManager.isTourEditorModified()) {
+         if (_currentInstance._isSaveTour && TourManager.isTourModified()) {
             return;
          }
 

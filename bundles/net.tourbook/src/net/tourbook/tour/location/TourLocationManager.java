@@ -865,7 +865,7 @@ public class TourLocationManager {
                                           final boolean isOneAction) {
 
       // ensure that a tour is NOT modified in the tour editor
-      if (TourManager.isTourEditorModified()) {
+      if (TourManager.isTourModified()) {
          return false;
       }
 
@@ -934,7 +934,7 @@ public class TourLocationManager {
    public static boolean deleteTourLocations(final List<TourLocation> allLocations, final boolean isOneAction) {
 
       // ensure that a tour is NOT modified in the tour editor
-      if (TourManager.isTourEditorModified()) {
+      if (TourManager.isTourModified()) {
          return false;
       }
 
@@ -1693,7 +1693,7 @@ public class TourLocationManager {
                                           final boolean isSetStartLocation,
                                           final boolean isSetEndLocation) {
 
-      if (TourManager.isTourEditorModified()) {
+      if (TourManager.isTourModified()) {
          return;
       }
 
@@ -1779,7 +1779,7 @@ public class TourLocationManager {
                                        final boolean isSetStartLocation,
                                        final boolean isSetEndLocation) {
 
-      if (TourManager.isTourEditorModified()) {
+      if (TourManager.isTourModified()) {
          return;
       }
 
@@ -1849,7 +1849,7 @@ public class TourLocationManager {
                                           final boolean isSetEndLocation,
                                           final boolean isCompleteRemoval) {
 
-      if (TourManager.isTourEditorModified()) {
+      if (TourManager.isTourModified()) {
          return;
       }
 
@@ -2242,7 +2242,7 @@ public class TourLocationManager {
                                        final boolean isRemoveLocationAssoc_Start,
                                        final boolean isRemoveLocationAssoc_End) {
 
-      if (TourManager.isTourEditorModified()) {
+      if (TourManager.isTourModified()) {
          return;
       }
 
@@ -2339,7 +2339,7 @@ public class TourLocationManager {
                                        final boolean isSaveTour,
                                        final boolean isLogLocation) {
 
-      if (TourManager.isTourEditorModified()) {
+      if (TourManager.isTourModified()) {
          return;
       }
 

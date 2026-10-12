@@ -210,7 +210,7 @@ public class TourTypeMenuManager implements IActionProvider {
       // fix https://github.com/mytourbook/mytourbook/issues/1437
       if (isCheckTourEditor) {
 
-         if (TourManager.isTourEditorModified()) {
+         if (TourManager.isTourModified()) {
             return;
          }
       }

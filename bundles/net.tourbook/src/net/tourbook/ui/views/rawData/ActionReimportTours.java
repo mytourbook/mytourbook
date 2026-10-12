@@ -37,7 +37,7 @@ public class ActionReimportTours extends Action {
    public void run() {
 
       // check if the tour editor contains a modified tour
-      if (TourManager.isTourEditorModified()) {
+      if (TourManager.isTourModified()) {
          return;
       }
 

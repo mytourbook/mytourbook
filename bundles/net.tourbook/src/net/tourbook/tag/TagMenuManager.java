@@ -166,7 +166,7 @@ public class TagMenuManager implements IActionProvider {
       @Override
       public void run() {
 
-         if (_currentInstance._isSaveTour && TourManager.isTourEditorModified()) {
+         if (_currentInstance._isSaveTour && TourManager.isTourModified()) {
             return;
          }
 
@@ -200,7 +200,7 @@ public class TagMenuManager implements IActionProvider {
       @Override
       public void run() {
 
-         if (_currentInstance._isSaveTour && TourManager.isTourEditorModified()) {
+         if (_currentInstance._isSaveTour && TourManager.isTourModified()) {
             return;
          }
 
@@ -222,7 +222,7 @@ public class TagMenuManager implements IActionProvider {
       @Override
       public void run() {
 
-         if (_currentInstance._isSaveTour && TourManager.isTourEditorModified()) {
+         if (_currentInstance._isSaveTour && TourManager.isTourModified()) {
             return;
          }
 
@@ -284,7 +284,7 @@ public class TagMenuManager implements IActionProvider {
       @Override
       public void run() {
 
-         if (_currentInstance._isSaveTour && TourManager.isTourEditorModified()) {
+         if (_currentInstance._isSaveTour && TourManager.isTourModified()) {
             return;
          }
 
@@ -350,7 +350,7 @@ public class TagMenuManager implements IActionProvider {
       @Override
       public void run() {
 
-         if (_currentInstance._isSaveTour && TourManager.isTourEditorModified()) {
+         if (_currentInstance._isSaveTour && TourManager.isTourModified()) {
             return;
          }
 

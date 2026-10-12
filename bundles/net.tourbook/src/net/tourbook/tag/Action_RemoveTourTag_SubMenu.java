@@ -75,7 +75,7 @@ public class Action_RemoveTourTag_SubMenu extends Action implements IMenuCreator
       @Override
       public void run() {
 
-         if (_tagMenuMgr.isSaveTour() && TourManager.isTourEditorModified()) {
+         if (_tagMenuMgr.isSaveTour() && TourManager.isTourModified()) {
             return;
          }
 

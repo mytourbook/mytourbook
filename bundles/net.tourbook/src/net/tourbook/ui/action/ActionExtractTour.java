@@ -49,7 +49,7 @@ public class ActionExtractTour extends Action {
    public void run() {
 
       // make sure the tour editor does not contain a modified tour
-      if (TourManager.isTourEditorModified()) {
+      if (TourManager.isTourModified()) {
          return;
       }
 

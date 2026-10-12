@@ -2125,8 +2125,8 @@ public class TourManager {
     *
     * @return Returns <code>true</code> when the tour is modified in the {@link TourDataEditorView}
     */
-   public static boolean isTourEditorModified() {
-      return isTourEditorModified(true);
+   public static boolean isTourModified() {
+      return isTourModified(true);
    }
 
    /**
@@ -2139,7 +2139,7 @@ public class TourManager {
     *
     * @return Returns <code>true</code> when the tour is modified in the {@link TourDataEditorView}
     */
-   public static boolean isTourEditorModified(final boolean isOpenView) {
+   public static boolean isTourModified(final boolean isOpenView) {
 
       if (isTourModified_InEditor_WithInfo(isOpenView)) {
          return true;
@@ -3705,7 +3705,7 @@ public class TourManager {
     */
    public static void tourPhoto_Add(final PhotoGallery photoGallery) {
 
-      if (isTourEditorModified()) {
+      if (isTourModified()) {
          return;
       }
 
@@ -3801,7 +3801,7 @@ public class TourManager {
 
    public static void tourPhoto_Remove(final PaintedMapPoint hoveredMapPoint) {
 
-      if (isTourEditorModified()) {
+      if (isTourModified()) {
          return;
       }
 
@@ -3932,7 +3932,7 @@ public class TourManager {
     */
    public static void tourPhoto_Remove(final PhotoGallery photoGallery, final ITourProviderByID tourProvider) {
 
-      if (isTourEditorModified()) {
+      if (isTourModified()) {
          return;
       }
 

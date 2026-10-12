@@ -1287,7 +1287,7 @@ public class TourBlogView extends ViewPart {
 
    private void hrefActionEditMarker(final TourMarker selectedTourMarker) {
 
-      if (TourManager.isTourEditorModified()) {
+      if (TourManager.isTourModified()) {
          return;
       }
 
@@ -1308,7 +1308,7 @@ public class TourBlogView extends ViewPart {
 
    private void hrefActionEditTour() {
 
-      if (TourManager.isTourEditorModified()) {
+      if (TourManager.isTourModified()) {
          return;
       }
 

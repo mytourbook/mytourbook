@@ -461,7 +461,7 @@ public class SearchManager implements XHRHandler {
 
    private static void hrefAction_Marker_Edit(final TourData tourData, final TourMarker tourMarker) {
 
-      if (TourManager.isTourEditorModified()) {
+      if (TourManager.isTourModified()) {
          return;
       }
 
@@ -523,7 +523,7 @@ public class SearchManager implements XHRHandler {
 
    private static void hrefAction_Tour_Edit(final Long tourId) {
 
-      if (TourManager.isTourEditorModified()) {
+      if (TourManager.isTourModified()) {
          return;
       }
 

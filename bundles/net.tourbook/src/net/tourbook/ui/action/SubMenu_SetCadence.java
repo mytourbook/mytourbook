@@ -127,7 +127,7 @@ public class SubMenu_SetCadence extends SubMenu {
 
    private void setCadenceMultiplier(final float cadenceMultiplier) {
 
-      if (TourManager.isTourEditorModified()) {
+      if (TourManager.isTourModified()) {
          return;
       }
 

@@ -50,7 +50,7 @@ public class ActionEditQuick extends Action {
 
    public static void doAction(final ITourProvider tourProvider) {
 
-      if (TourManager.isTourEditorModified()) {
+      if (TourManager.isTourModified()) {
          return;
       }
 

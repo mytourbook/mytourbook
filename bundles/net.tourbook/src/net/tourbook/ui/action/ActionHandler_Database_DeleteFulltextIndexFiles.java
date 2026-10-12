@@ -33,7 +33,7 @@ public class ActionHandler_Database_DeleteFulltextIndexFiles extends AbstractHan
    public Object execute(final ExecutionEvent event) throws ExecutionException {
 
       // check if the tour editor contains a modified tour
-      if (TourManager.isTourEditorModified()) {
+      if (TourManager.isTourModified()) {
          return null;
       }
 
