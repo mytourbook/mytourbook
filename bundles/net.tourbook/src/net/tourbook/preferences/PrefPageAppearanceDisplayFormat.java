@@ -15,12 +15,19 @@
  *******************************************************************************/
 package net.tourbook.preferences;
 
+import java.time.Duration;
+
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.CommonActivator;
 import net.tourbook.common.UI;
 import net.tourbook.common.formatter.FormatManager;
+import net.tourbook.common.formatter.IValueFormatter;
 import net.tourbook.common.formatter.ValueFormat;
+import net.tourbook.common.formatter.ValueFormatter_Time_Duration;
+import net.tourbook.common.formatter.ValueFormatter_Time_HH;
+import net.tourbook.common.formatter.ValueFormatter_Time_HHMM;
+import net.tourbook.common.formatter.ValueFormatter_Time_HHMMSS;
 import net.tourbook.common.preferences.ICommonPreferences;
 
 import org.eclipse.jface.layout.GridDataFactory;
@@ -954,9 +961,7 @@ public class PrefPageAppearanceDisplayFormat extends PreferencePage implements I
    private void createUI_99_LiveUpdate(final Composite parent) {
 
       final Composite container = new Composite(parent, SWT.NONE);
-      GridDataFactory.fillDefaults()//
-            .indent(0, _pc.convertVerticalDLUsToPixels(8))
-            .applyTo(container);
+      GridDataFactory.fillDefaults().applyTo(container);
       GridLayoutFactory.fillDefaults().applyTo(container);
       {
          /*
@@ -974,6 +979,68 @@ public class PrefPageAppearanceDisplayFormat extends PreferencePage implements I
       if (_chkLiveUpdate.getSelection()) {
          saveState();
       }
+   }
+
+   /**
+    * This is used for debugging
+    */
+   @SuppressWarnings("unused")
+   private void dumpFormats() {
+
+// SET_FORMATTING_OFF
+
+      final IValueFormatter valueFormatter_Time_HH          = new ValueFormatter_Time_HH();
+      final IValueFormatter valueFormatter_Time_HHMM        = new ValueFormatter_Time_HHMM();
+      final IValueFormatter valueFormatter_Time_HHMMSS      = new ValueFormatter_Time_HHMMSS();
+      final IValueFormatter valueFormatter_Time_Duration    = new ValueFormatter_Time_Duration();
+
+      final int zero0 = 0;
+      final int value = 5;
+
+      final long durationH1 = Duration.ofDays(zero0).plusHours(zero0).plusMinutes(zero0).plusSeconds(value).getSeconds();
+      final long durationM1 = Duration.ofDays(zero0).plusHours(zero0).plusMinutes(zero0).plusSeconds(value).getSeconds();
+      final long durationS1 = Duration.ofDays(zero0).plusHours(zero0).plusMinutes(zero0).plusSeconds(value).getSeconds();
+      final long durationD1 = Duration.ofDays(zero0).plusHours(zero0).plusMinutes(value).plusSeconds(value).getSeconds();
+
+      final long durationH2 = Duration.ofDays(zero0).plusHours(zero0).plusMinutes(value).plusSeconds(value).getSeconds();
+      final long durationM2 = Duration.ofDays(zero0).plusHours(zero0).plusMinutes(value).plusSeconds(value).getSeconds();
+      final long durationS2 = Duration.ofDays(zero0).plusHours(zero0).plusMinutes(value).plusSeconds(value).getSeconds();
+      final long durationD2 = Duration.ofDays(zero0).plusHours(value).plusMinutes(value).plusSeconds(value).getSeconds();
+
+      final long durationH3 = Duration.ofDays(zero0).plusHours(value).plusMinutes(value).plusSeconds(value).getSeconds();
+      final long durationM3 = Duration.ofDays(zero0).plusHours(value).plusMinutes(value).plusSeconds(value).getSeconds();
+      final long durationS3 = Duration.ofDays(zero0).plusHours(value).plusMinutes(value).plusSeconds(value).getSeconds();
+      final long durationD3 = Duration.ofDays(value).plusHours(value).plusMinutes(value).plusSeconds(value).getSeconds();
+
+      System.out.println();
+      System.out.println("Example formats");
+      System.out.println();
+
+      System.out.println(UI.EMPTY_STRING
+
+         + " %14s".formatted(valueFormatter_Time_HH         .printLong(durationH1)) + UI.NEW_LINE
+         + " %14s".formatted(valueFormatter_Time_HHMM       .printLong(durationM1)) + UI.NEW_LINE
+         + " %14s".formatted(valueFormatter_Time_HHMMSS     .printLong(durationS1)) + UI.NEW_LINE
+         + " %14s".formatted(valueFormatter_Time_Duration   .printLong(durationD1)) + UI.NEW_LINE
+      );
+
+      System.out.println(UI.EMPTY_STRING
+
+         + " %14s".formatted(valueFormatter_Time_HH         .printLong(durationH2)) + UI.NEW_LINE
+         + " %14s".formatted(valueFormatter_Time_HHMM       .printLong(durationM2)) + UI.NEW_LINE
+         + " %14s".formatted(valueFormatter_Time_HHMMSS     .printLong(durationS2)) + UI.NEW_LINE
+         + " %14s".formatted(valueFormatter_Time_Duration   .printLong(durationD2)) + UI.NEW_LINE
+      );
+
+      System.out.println(UI.EMPTY_STRING
+
+         + " %14s".formatted(valueFormatter_Time_HH         .printLong(durationH3)) + UI.NEW_LINE
+         + " %14s".formatted(valueFormatter_Time_HHMM       .printLong(durationM3)) + UI.NEW_LINE
+         + " %14s".formatted(valueFormatter_Time_HHMMSS     .printLong(durationS3)) + UI.NEW_LINE
+         + " %14s".formatted(valueFormatter_Time_Duration   .printLong(durationD3)) + UI.NEW_LINE
+      );
+
+// SET_FORMATTING_ON
    }
 
    @Override
@@ -1731,6 +1798,8 @@ public class PrefPageAppearanceDisplayFormat extends PreferencePage implements I
        * Publish modifications
        */
       FormatManager.updateDisplayFormats();
+
+//    dumpFormats();
 
       // fire one event for all modifications
       _prefStore.setValue(ITourbookPreferences.VIEW_LAYOUT_CHANGED, Math.random());

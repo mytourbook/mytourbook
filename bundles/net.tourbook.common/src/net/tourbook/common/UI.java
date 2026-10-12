@@ -178,6 +178,7 @@ public class UI {
    public static final String       SPACE8                               = "        ";                                  //$NON-NLS-1$
    public static final String       TAB1                                 = "\t";                                        //$NON-NLS-1$
    public static final String       ZERO                                 = "0";                                         //$NON-NLS-1$
+   public static final String       ZERO2                                = "00";                                        //$NON-NLS-1$
 
    private static final String      JS_APOSTROPHE                        = "'";                                         //$NON-NLS-1$
    private static final String      JS_APOSTROPHE_REPLACEMENT            = "\\'";                                       //$NON-NLS-1$

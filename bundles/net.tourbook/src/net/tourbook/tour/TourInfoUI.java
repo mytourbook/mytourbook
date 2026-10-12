@@ -1976,6 +1976,22 @@ public class TourInfoUI implements ICanHideTooltip {
       return valueText;
    }
 
+   /**
+    * Could not find a method in the {@link PeriodFormatterBuilder} to remove the first leading 0
+    *
+    * @param valueText
+    *
+    * @return
+    */
+   private String removeLeading00(final String valueText) {
+
+      if (valueText.startsWith(UI.ZERO2)) {
+         return valueText.substring(1, valueText.length());
+      }
+
+      return valueText;
+   }
+
    private void restoreState_BeforeUI(final Composite parent) {
 
       if (_isUIEmbedded) {
@@ -2272,11 +2288,11 @@ public class TourInfoUI implements ICanHideTooltip {
          _lblMovingTime_Unit     .setVisible(isAllWithoutSeconds && isMovingWithoutDuration     && movingTime     > 0);
          _lblBreakTime_Unit      .setVisible(isAllWithoutSeconds && isBreakWithoutDuration      && breakTime      > 0);
 
-         _lblElapsedTime         .setText(removeLeading0(FormatManager.formatElapsedTime  (elapsedTime)));
-         _lblRecordedTime        .setText(removeLeading0(FormatManager.formatRecordedTime (recordedTime)));
-         _lblPausedTime          .setText(removeLeading0(FormatManager.formatPausedTime   (pausedTime)));
-         _lblMovingTime          .setText(removeLeading0(FormatManager.formatMovingTime   (movingTime)));
-         _lblBreakTime           .setText(removeLeading0(FormatManager.formatBreakTime    (breakTime)));
+         _lblElapsedTime         .setText(removeLeading00(FormatManager.formatElapsedTime  (elapsedTime)));
+         _lblRecordedTime        .setText(removeLeading00(FormatManager.formatRecordedTime (recordedTime)));
+         _lblPausedTime          .setText(removeLeading00(FormatManager.formatPausedTime   (pausedTime)));
+         _lblMovingTime          .setText(removeLeading00(FormatManager.formatMovingTime   (movingTime)));
+         _lblBreakTime           .setText(removeLeading00(FormatManager.formatBreakTime    (breakTime)));
 
 // SET_FORMATTING_ON
 
