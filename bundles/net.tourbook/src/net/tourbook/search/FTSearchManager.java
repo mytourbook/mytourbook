@@ -106,55 +106,55 @@ import org.eclipse.swt.widgets.Display;
 
 public class FTSearchManager {
 
-   private static final String                  LUCENE_INDEX_FOLDER_NAME         = "lucene-index";                       //$NON-NLS-1$
+   private static final String             LUCENE_INDEX_FOLDER_NAME         = "lucene-index";                       //$NON-NLS-1$
 
-   private static final String                  SEARCH_FIELD_DESCRIPTION         = "description";                        //$NON-NLS-1$
-   private static final String                  SEARCH_FIELD_DOC_SOURCE_INDEX    = "docSource_Index";                    //$NON-NLS-1$
-   private static final String                  SEARCH_FIELD_DOC_SOURCE_SAVED    = "docSource_Saved";                    //$NON-NLS-1$
-   private static final String                  SEARCH_FIELD_MARKER_ID           = "markerID";                           //$NON-NLS-1$
-   private static final String                  SEARCH_FIELD_TITLE               = "title";                              //$NON-NLS-1$
-   private static final String                  SEARCH_FIELD_TOUR_ID             = "tourID";                             //$NON-NLS-1$
-   private static final String                  SEARCH_FIELD_TOUR_LOCATION_START = "startLocation";                      //$NON-NLS-1$
-   private static final String                  SEARCH_FIELD_TOUR_LOCATION_END   = "endLocation";                        //$NON-NLS-1$
-   private static final String                  SEARCH_FIELD_TOUR_WEATHER        = "weather";                            //$NON-NLS-1$
-   private static final String                  SEARCH_FIELD_TIME                = "time";                               //$NON-NLS-1$
-   private static final String                  SEARCH_FIELD_WAYPOINT_ID         = "wayPointID";                         //$NON-NLS-1$
+   private static final String             SEARCH_FIELD_DESCRIPTION         = "description";                        //$NON-NLS-1$
+   private static final String             SEARCH_FIELD_DOC_SOURCE_INDEX    = "docSource_Index";                    //$NON-NLS-1$
+   private static final String             SEARCH_FIELD_DOC_SOURCE_SAVED    = "docSource_Saved";                    //$NON-NLS-1$
+   private static final String             SEARCH_FIELD_MARKER_ID           = "markerID";                           //$NON-NLS-1$
+   private static final String             SEARCH_FIELD_TITLE               = "title";                              //$NON-NLS-1$
+   private static final String             SEARCH_FIELD_TOUR_ID             = "tourID";                             //$NON-NLS-1$
+   private static final String             SEARCH_FIELD_TOUR_LOCATION_START = "startLocation";                      //$NON-NLS-1$
+   private static final String             SEARCH_FIELD_TOUR_LOCATION_END   = "endLocation";                        //$NON-NLS-1$
+   private static final String             SEARCH_FIELD_TOUR_WEATHER        = "weather";                            //$NON-NLS-1$
+   private static final String             SEARCH_FIELD_TIME                = "time";                               //$NON-NLS-1$
+   private static final String             SEARCH_FIELD_WAYPOINT_ID         = "wayPointID";                         //$NON-NLS-1$
 
-   private static final String                  LOG_CREATE_INDEX                 = "Created fulltext index: %s\t %d ms"; //$NON-NLS-1$
-   private static final String                  LOG_DELETED_INDEX                = "Deleted fulltext index: %d ms";      //$NON-NLS-1$
+   private static final String             LOG_CREATE_INDEX                 = "Created fulltext index: %s\t %d ms"; //$NON-NLS-1$
+   private static final String             LOG_DELETED_INDEX                = "Deleted fulltext index: %d ms";      //$NON-NLS-1$
 
-   private static final IPreferenceStore        _prefStore                       = TourbookPlugin.getPrefStore();
+   private static final IPreferenceStore   _prefStore                       = TourbookPlugin.getPrefStore();
 
-   static final int                             DOC_SOURCE_TOUR                  = 1;
-   static final int                             DOC_SOURCE_TOUR_MARKER           = 2;
-   static final int                             DOC_SOURCE_WAY_POINT             = 3;
+   static final int                        DOC_SOURCE_TOUR                  = 1;
+   static final int                        DOC_SOURCE_TOUR_MARKER           = 2;
+   static final int                        DOC_SOURCE_WAY_POINT             = 3;
 
-   private static final List<LookupResult>      _emptyProposal                   = new ArrayList<>();
+   private static final List<LookupResult> _emptyProposal                   = new ArrayList<>();
 
-   private static Lookup                        _suggester;
+   private static Lookup                   _suggester;
 
-   private static IndexReader                   _indexReader;
-   private static IndexSearcher                 _indexSearcher;
-   private static FSDirectory                   _infixStore;
+   private static IndexReader              _indexReader;
+   private static IndexSearcher            _indexSearcher;
+   private static FSDirectory              _infixStore;
 
-   private static TopDocs                       _topDocs;
+   private static TopDocs                  _topDocs;
 
-   private static final DefaultPassageFormatter _highlightFormatter;
+   private static DefaultPassageFormatter  _highlightFormatter;
 
-   private static boolean                       _isSearch_All;
-   private static boolean                       _isSearch_Marker;
-   private static boolean                       _isSearch_Tour;
-   private static boolean                       _isSearch_Tour_LocationStart;
-   private static boolean                       _isSearch_Tour_LocationEnd;
-   private static boolean                       _isSearch_Tour_Weather;
-   private static boolean                       _isSearch_Waypoint;
-   private static boolean                       _isShow_TitleDescription;
-   private static boolean                       _isSort_DateAscending            = false;                                // -> sort descending
+   private static boolean                  _isSearch_All;
+   private static boolean                  _isSearch_Marker;
+   private static boolean                  _isSearch_Tour;
+   private static boolean                  _isSearch_Tour_LocationStart;
+   private static boolean                  _isSearch_Tour_LocationEnd;
+   private static boolean                  _isSearch_Tour_Weather;
+   private static boolean                  _isSearch_Waypoint;
+   private static boolean                  _isShow_TitleDescription;
+   private static boolean                  _isSort_DateAscending            = false;                                // -> sort descending
 
-   private static Object                        _lastSearchText;
+   private static Object                   _lastSearchText;
 
-   private static final FieldType               fieldType_Int;
-   private static final FieldType               fieldType_Long;
+   private static final FieldType          fieldType_Int;
+   private static final FieldType          fieldType_Long;
 
    static {
 
@@ -167,28 +167,6 @@ public class FTSearchManager {
       fieldType_Long.setIndexOptions(IndexOptions.DOCS_AND_FREQS_AND_POSITIONS_AND_OFFSETS);
       fieldType_Long.setDocValuesType(DocValuesType.NUMERIC);
       fieldType_Long.freeze();
-
-      final String graphMarker_ColorDevice = UI.IS_DARK_THEME
-            ? ITourbookPreferences.GRAPH_MARKER_COLOR_DEVICE_DARK
-            : ITourbookPreferences.GRAPH_MARKER_COLOR_DEVICE;
-
-      final String cssHighlighterColor = CSS.color(PreferenceConverter.getColor(_prefStore, graphMarker_ColorDevice));
-
-      /*
-       * Create custom formatter for the highlighter, the default highlighter displays the
-       * highlighted text with bold face
-       */
-      _highlightFormatter = new DefaultPassageFormatter(
-
-            // pre tag: highlight a hit with another color
-            "<span style='color:" + cssHighlighterColor + ";'>", //$NON-NLS-1$ //$NON-NLS-2$
-
-            // post tag
-            "</span>", //$NON-NLS-1$
-
-            "... ", //$NON-NLS-1$
-
-            false);
    }
 
    /**
@@ -1700,6 +1678,31 @@ public class FTSearchManager {
 // SET_FORMATTING_ON
    }
 
+   private static void setupColors() {
+
+      final String graphMarker_ColorDevice = UI.IS_DARK_THEME
+            ? ITourbookPreferences.GRAPH_MARKER_COLOR_DEVICE_DARK
+            : ITourbookPreferences.GRAPH_MARKER_COLOR_DEVICE;
+
+      final String cssHighlighterColor = CSS.color(PreferenceConverter.getColor(_prefStore, graphMarker_ColorDevice));
+
+      /*
+       * Create custom formatter for the highlighter, the default highlighter displays the
+       * highlighted text with bold face
+       */
+      _highlightFormatter = new DefaultPassageFormatter(
+
+            // pre tag: highlight a hit with another color
+            "<span style='color:" + cssHighlighterColor + ";'>", //$NON-NLS-1$ //$NON-NLS-2$
+
+            // post tag
+            "</span>", //$NON-NLS-1$
+
+            "... ", //$NON-NLS-1$
+
+            false);
+   }
+
    /**
     * Create FT index
     *
@@ -1789,6 +1792,8 @@ public class FTSearchManager {
          // _suggester = setupSuggester_NGramAnalyzing();
 
          _suggester = setupSuggester_FreeText();
+
+         setupColors();
       }
    }
 

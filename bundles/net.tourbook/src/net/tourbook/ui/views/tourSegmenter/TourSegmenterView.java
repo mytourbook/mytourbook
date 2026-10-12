@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2025 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2026 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -127,51 +127,49 @@ import org.eclipse.ui.part.ViewPart;
  */
 public class TourSegmenterView extends ViewPart implements ITourViewer {
 
-   public static final String   ID                                                 = "net.tourbook.views.TourSegmenter";           //$NON-NLS-1$
+   public static final String  ID                                                 = "net.tourbook.views.TourSegmenter";           //$NON-NLS-1$
    //
-   private static final float   UNIT_MILE                                          = UI.UNIT_MILE;
-   private static final float   UNIT_MILE_2_NAUTICAL_MILE                          = UI.UNIT_MILE_2_NAUTICAL_MILE;
-   private static final float   UNIT_NAUTICAL_MILE                                 = UI.UNIT_NAUTICAL_MILE;
-   private static final float   UNIT_YARD                                          = UI.UNIT_YARD;
+   private static final float  UNIT_MILE                                          = UI.UNIT_MILE;
+   private static final float  UNIT_MILE_2_NAUTICAL_MILE                          = UI.UNIT_MILE_2_NAUTICAL_MILE;
+   private static final float  UNIT_NAUTICAL_MILE                                 = UI.UNIT_NAUTICAL_MILE;
+   private static final float  UNIT_YARD                                          = UI.UNIT_YARD;
    //
-   private static final boolean IS_DARK_THEME                                      = UI.isDarkTheme();
+   private static final String FORMAT_ALTITUDE_DIFF                               = "%d / %d %s";                                 //$NON-NLS-1$
    //
-   private static final String  FORMAT_ALTITUDE_DIFF                               = "%d / %d %s";                                 //$NON-NLS-1$
+   private static final int    SEGMENTER_REQUIRES_ELEVATION                       = 0x01;
+   private static final int    SEGMENTER_REQUIRES_DISTANCE                        = 0x02;
+   private static final int    SEGMENTER_REQUIRES_PULSE                           = 0x04;
+   private static final int    SEGMENTER_REQUIRES_MARKER                          = 0x08;
+   private static final int    SEGMENTER_REQUIRES_POWER                           = 0x10;
    //
-   private static final int     SEGMENTER_REQUIRES_ELEVATION                       = 0x01;
-   private static final int     SEGMENTER_REQUIRES_DISTANCE                        = 0x02;
-   private static final int     SEGMENTER_REQUIRES_PULSE                           = 0x04;
-   private static final int     SEGMENTER_REQUIRES_MARKER                          = 0x08;
-   private static final int     SEGMENTER_REQUIRES_POWER                           = 0x10;
+   private static final int    MAX_DISTANCE_SPINNER_MILE                          = 80;
+   private static final int    MAX_DISTANCE_SPINNER_NAUTICAL_MILE                 = 70;
+   private static final int    MAX_DISTANCE_SPINNER_METRIC                        = 100;
    //
-   private static final int     MAX_DISTANCE_SPINNER_MILE                          = 80;
-   private static final int     MAX_DISTANCE_SPINNER_NAUTICAL_MILE                 = 70;
-   private static final int     MAX_DISTANCE_SPINNER_METRIC                        = 100;
-   //
-   private static final String  STATE_CSV_EXPORT_PATH                              = "STATE_CSV_EXPORT_PATH";                      //$NON-NLS-1$
-   private static final String  STATE_DP_TOLERANCE_ALTITUDE_MULTIPLE_TOURS         = "STATE_DP_TOLERANCE_ALTITUDE_MULTIPLE_TOURS"; //$NON-NLS-1$
-   private static final int     STATE_DP_TOLERANCE_ALTITUDE_MULTIPLE_TOURS_DEFAULT = 100;
-   private static final String  STATE_DP_TOLERANCE_POWER                           = "STATE_DP_TOLERANCE_POWER";                   //$NON-NLS-1$
-   private static final String  STATE_DP_TOLERANCE_PULSE                           = "STATE_DP_TOLERANCE_PULSE";                   //$NON-NLS-1$
-   private static final String  STATE_MINIMUM_ALTITUDE                             = "STATE_MINIMUM_ALTITUDE";                     //$NON-NLS-1$
-   private static final String  STATE_MOUSE_WHEEL_INCREMENTER_DP                   = "STATE_MOUSE_WHEEL_INCREMENTER_DP";           //$NON-NLS-1$
-   private static final String  STATE_MOUSE_WHEEL_INCREMENTER_GRADIENT             = "STATE_MOUSE_WHEEL_INCREMENTER_GRADIENT";     //$NON-NLS-1$
-   private static final String  STATE_SELECTED_DISTANCE                            = "selectedDistance";                           //$NON-NLS-1$
-   private static final String  STATE_SELECTED_SEGMENTER_BY_USER                   = "STATE_SELECTED_SEGMENTER_BY_USER";           //$NON-NLS-1$
+   private static final String STATE_CSV_EXPORT_PATH                              = "STATE_CSV_EXPORT_PATH";                      //$NON-NLS-1$
+   private static final String STATE_DP_TOLERANCE_ALTITUDE_MULTIPLE_TOURS         = "STATE_DP_TOLERANCE_ALTITUDE_MULTIPLE_TOURS"; //$NON-NLS-1$
+   private static final int    STATE_DP_TOLERANCE_ALTITUDE_MULTIPLE_TOURS_DEFAULT = 100;
+   private static final String STATE_DP_TOLERANCE_POWER                           = "STATE_DP_TOLERANCE_POWER";                   //$NON-NLS-1$
+   private static final String STATE_DP_TOLERANCE_PULSE                           = "STATE_DP_TOLERANCE_PULSE";                   //$NON-NLS-1$
+   private static final String STATE_MINIMUM_ALTITUDE                             = "STATE_MINIMUM_ALTITUDE";                     //$NON-NLS-1$
+   private static final String STATE_MOUSE_WHEEL_INCREMENTER_DP                   = "STATE_MOUSE_WHEEL_INCREMENTER_DP";           //$NON-NLS-1$
+   private static final String STATE_MOUSE_WHEEL_INCREMENTER_GRADIENT             = "STATE_MOUSE_WHEEL_INCREMENTER_GRADIENT";     //$NON-NLS-1$
+   private static final String STATE_SELECTED_DISTANCE                            = "selectedDistance";                           //$NON-NLS-1$
+   private static final String STATE_SELECTED_SEGMENTER_BY_USER                   = "STATE_SELECTED_SEGMENTER_BY_USER";           //$NON-NLS-1$
    //
    /**
     * Initially this was an int value, with 2 it's a string.
     */
-   private static final String  STATE_SELECTED_BREAK_METHOD2                       = "selectedBreakMethod2";                       //$NON-NLS-1$
+   private static final String STATE_SELECTED_BREAK_METHOD2                       = "selectedBreakMethod2";                       //$NON-NLS-1$
    //
-   private static final String  STATE_BREAK_TIME_MIN_AVG_SPEED_AS                  = "selectedBreakTimeMinAvgSpeedAS";             //$NON-NLS-1$
-   private static final String  STATE_BREAK_TIME_MIN_SLICE_SPEED_AS                = "selectedBreakTimeMinSliceSpeedAS";           //$NON-NLS-1$
-   private static final String  STATE_BREAK_TIME_MIN_SLICE_TIME_AS                 = "selectedBreakTimeMinSliceTimeAS";            //$NON-NLS-1$
-   private static final String  STATE_BREAK_TIME_MIN_AVG_SPEED                     = "selectedBreakTimeMinAvgSpeed";               //$NON-NLS-1$
-   private static final String  STATE_BREAK_TIME_MIN_SLICE_SPEED                   = "selectedBreakTimeMinSliceSpeed";             //$NON-NLS-1$
-   private static final String  STATE_BREAK_TIME_MIN_DISTANCE_VALUE                = "selectedBreakTimeMinDistance";               //$NON-NLS-1$
-   private static final String  STATE_BREAK_TIME_MIN_TIME_VALUE                    = "selectedBreakTimeMinTime";                   //$NON-NLS-1$
-   private static final String  STATE_BREAK_TIME_SLICE_DIFF                        = "selectedBreakTimeSliceDiff";                 //$NON-NLS-1$
+   private static final String STATE_BREAK_TIME_MIN_AVG_SPEED_AS                  = "selectedBreakTimeMinAvgSpeedAS";             //$NON-NLS-1$
+   private static final String STATE_BREAK_TIME_MIN_SLICE_SPEED_AS                = "selectedBreakTimeMinSliceSpeedAS";           //$NON-NLS-1$
+   private static final String STATE_BREAK_TIME_MIN_SLICE_TIME_AS                 = "selectedBreakTimeMinSliceTimeAS";            //$NON-NLS-1$
+   private static final String STATE_BREAK_TIME_MIN_AVG_SPEED                     = "selectedBreakTimeMinAvgSpeed";               //$NON-NLS-1$
+   private static final String STATE_BREAK_TIME_MIN_SLICE_SPEED                   = "selectedBreakTimeMinSliceSpeed";             //$NON-NLS-1$
+   private static final String STATE_BREAK_TIME_MIN_DISTANCE_VALUE                = "selectedBreakTimeMinDistance";               //$NON-NLS-1$
+   private static final String STATE_BREAK_TIME_MIN_TIME_VALUE                    = "selectedBreakTimeMinTime";                   //$NON-NLS-1$
+   private static final String STATE_BREAK_TIME_SLICE_DIFF                        = "selectedBreakTimeSliceDiff";                 //$NON-NLS-1$
    //
    /*
     * Tour segmenter
@@ -3664,7 +3662,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
       defineColumn_Time_ElapsedTimeTotal();
       defineColumn_Time_Elapsed();
       defineColumn_Time_Moving();
-      defineColumn_Time_Paused();
+      defineColumn_Time_Paused_Break();
       defineColumn_Time_TimeOfDay();
 
       defineColumn_Motion_DistanceTotal();
@@ -4464,13 +4462,13 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
    }
 
    /**
-    * Column: paused time
+    * Column: Break time
     */
-   private void defineColumn_Time_Paused() {
+   private void defineColumn_Time_Paused_Break() {
 
       final ColumnDefinition colDef;
 
-      colDef = TableColumnFactory.TIME__DEVICE_PAUSED_TIME.createColumn(_columnManager, _pc);
+      colDef = TableColumnFactory.TIME__COMPUTED_BREAK_TIME.createColumn(_columnManager, _pc);
 
       colDef.setIsDefaultColumn();
       colDef.setColumnSelectionListener(_columnSortListener);
@@ -5905,20 +5903,20 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
        */
 // SET_FORMATTING_OFF
 
-      _colorCache.setColor(SEGMENTER_FILTER_1_BACKGROUND,         IS_DARK_THEME
+      _colorCache.setColor(SEGMENTER_FILTER_1_BACKGROUND,         UI.IS_DARK_THEME
                                                                      ? SEGMENTER_FILTER_1_BACKGROUND_RGB_DARK
                                                                      : SEGMENTER_FILTER_1_BACKGROUND_RGB_LIGHT);
 
-      _colorCache.setColor(SEGMENTER_FILTER_2_BACKGROUND,         IS_DARK_THEME
+      _colorCache.setColor(SEGMENTER_FILTER_2_BACKGROUND,         UI.IS_DARK_THEME
                                                                      ? SEGMENTER_FILTER_2_BACKGROUND_RGB_DARK
                                                                      : SEGMENTER_FILTER_2_BACKGROUND_RGB_LIGHT);
 
 
-      _colorCache.setColor(SEGMENTER_FILTER_1_BACKGROUND_HEADER,  IS_DARK_THEME
+      _colorCache.setColor(SEGMENTER_FILTER_1_BACKGROUND_HEADER,  UI.IS_DARK_THEME
                                                                      ? SEGMENTER_FILTER_1_BACKGROUND_RGB_HEADER_DARK
                                                                      : SEGMENTER_FILTER_1_BACKGROUND_RGB_HEADER_LIGHT);
 
-      _colorCache.setColor(SEGMENTER_FILTER_2_BACKGROUND_HEADER,  IS_DARK_THEME
+      _colorCache.setColor(SEGMENTER_FILTER_2_BACKGROUND_HEADER,  UI.IS_DARK_THEME
                                                                      ? SEGMENTER_FILTER_2_BACKGROUND_RGB_HEADER_DARK
                                                                      : SEGMENTER_FILTER_2_BACKGROUND_RGB_HEADER_LIGHT);
 
@@ -6296,13 +6294,13 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 
       } else if (value > 0) {
 
-         cell.setBackground(IS_DARK_THEME
+         cell.setBackground(UI.IS_DARK_THEME
                ? _colorCache.get(STATE_COLOR_ALTITUDE_UP_DARK)
                : _colorCache.get(STATE_COLOR_ALTITUDE_UP));
 
       } else if (value < 0) {
 
-         cell.setBackground(IS_DARK_THEME
+         cell.setBackground(UI.IS_DARK_THEME
                ? _colorCache.get(STATE_COLOR_ALTITUDE_DOWN_DARK)
                : _colorCache.get(STATE_COLOR_ALTITUDE_DOWN));
       }
@@ -6340,7 +6338,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 
    private void setStyle_ColumnTotal(final ViewerCell cell) {
 
-      cell.setForeground(IS_DARK_THEME
+      cell.setForeground(UI.IS_DARK_THEME
             ? _colorCache.get(STATE_COLOR_TOTALS_DARK)
             : _colorCache.get(STATE_COLOR_TOTALS));
    }

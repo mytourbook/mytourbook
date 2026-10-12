@@ -353,7 +353,6 @@ public class TourDataEditorView extends ViewPart implements
    //
    private static final boolean          IS_LINUX                                         = UI.IS_LINUX;
    private static final boolean          IS_OSX                                           = UI.IS_OSX;
-   private static boolean                IS_DARK_THEME                                    = UI.IS_DARK_THEME;
    /**
     * this width is used as a hint for the width of the description field, this value also
     * influences the width of the columns in this editor
@@ -3623,9 +3622,6 @@ public class TourDataEditorView extends ViewPart implements
    @Override
    public void createPartControl(final Composite parent) {
 
-      // suddenly the dark theme was not set correctly as before
-      IS_DARK_THEME = UI.IS_DARK_THEME;
-
       initUI(parent);
       createMenuManager();
 
@@ -3749,7 +3745,7 @@ public class TourDataEditorView extends ViewPart implements
 
          updateUI_BackgroundColor();
 
-         if (IS_DARK_THEME) {
+         if (UI.IS_DARK_THEME) {
 
             _foregroundColor_1stColumn_RefTour = display.getSystemColor(SWT.COLOR_YELLOW);
             _backgroundColor_1stColumn_RefTour = _backgroundColor_Default;
@@ -10118,7 +10114,7 @@ public class TourDataEditorView extends ViewPart implements
 
 // SET_FORMATTING_OFF
 
-      if (IS_DARK_THEME) {
+      if (UI.IS_DARK_THEME) {
 
          _linkDefaultTimeZone    .setBackground(_backgroundColor_Default);
          _linkEquipment          .setBackground(_backgroundColor_Default);
