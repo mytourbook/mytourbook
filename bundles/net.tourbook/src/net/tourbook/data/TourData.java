@@ -1595,6 +1595,10 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
    public float               segmentSerieTotal_Elevation_Gain;
    @Transient
    public float               segmentSerieTotal_Elevation_Loss;
+   @Transient
+   public float               segmentSerieTotal_Elevation_InBreak_Gain;
+   @Transient
+   public float               segmentSerieTotal_Elevation_InBreak_Loss;
 
    @Transient
    public float[]             segmentSerie_Speed;
@@ -7416,7 +7420,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
             segment.elevationLoss_InBreakTime = elevationInBreak_Loss;
 
             totalElevation_InBreak_Gain += elevationInBreak_Gain;
-            totalElevation_InBreak_Loss += -elevationInBreak_Loss;
+            totalElevation_InBreak_Loss += elevationInBreak_Loss;
 
             segmentSerie_Elevation_Diff[segmentIndex] = segment.altitude_Segment_Border_Diff = elevationDiff;
             segmentSerie_Elevation_GainLoss_Hour[segmentIndex] = elevationUpDownHour;
@@ -7591,6 +7595,9 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
 
       segmentSerieTotal_Elevation_Gain = totalElevation_Gain;
       segmentSerieTotal_Elevation_Loss = totalElevation_Loss;
+
+      segmentSerieTotal_Elevation_InBreak_Gain = totalElevation_InBreak_Gain;
+      segmentSerieTotal_Elevation_InBreak_Loss = totalElevation_InBreak_Loss;
 
       return allSegments;
    }
@@ -9669,7 +9676,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
 
             } else {
 
-               elevationLoss_InBreak += elevationDiff;
+               elevationLoss_InBreak -= elevationDiff;
             }
          }
 

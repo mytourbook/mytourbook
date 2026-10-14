@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2009, 2025 Wolfgang Schramm and Contributors
+ * Copyright (C) 2009, 2026 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -40,16 +40,32 @@ public class FlatGainLoss {
    @Override
    public String toString() {
 
+      final float elevationGain_WithoutBreak = elevationGain - elevationGain_InBreakTime;
+      final float elevationLoss_WithoutBreak = elevationLoss - elevationLoss_InBreakTime;
+
       return UI.EMPTY_STRING
 
-            + "ElevationGainLoss" + NL //                      //$NON-NLS-1$
+            + "FlatGainLoss" + NL //                                                      //$NON-NLS-1$
 
-            + "[" + NL //                                      //$NON-NLS-1$
+            + " timeGain                     = " + timeGain + NL //                       //$NON-NLS-1$
+            + " timeLoss                     = " + timeLoss + NL //                       //$NON-NLS-1$
+            + " timeFlat                     = " + timeFlat + NL //                       //$NON-NLS-1$
 
-            + "  elevationGain = " + elevationGain + NL //     //$NON-NLS-1$
-            + "  elevationLoss = " + elevationLoss + NL //     //$NON-NLS-1$
+            + " distanceGain                 = " + distanceGain + NL //                   //$NON-NLS-1$
+            + " distanceLoss                 = " + distanceLoss + NL //                   //$NON-NLS-1$
+            + " distanceFlat                 = " + distanceFlat + NL //                   //$NON-NLS-1$
+            + NL
 
-            + "]"; //$NON-NLS-1$
+            + " elevationGain                = " + elevationGain + NL //                  //$NON-NLS-1$
+            + " elevationGain_InBreakTime    = " + elevationGain_InBreakTime + NL //      //$NON-NLS-1$
+            + " gain without break           = " + elevationGain_WithoutBreak + NL //     //$NON-NLS-1$
+
+            + NL
+            + " elevationLoss                = " + elevationLoss + NL //                  //$NON-NLS-1$
+            + " elevationLoss_InBreakTime    = " + elevationLoss_InBreakTime + NL //      //$NON-NLS-1$
+            + " loss without break           = " + elevationLoss_WithoutBreak + NL //     //$NON-NLS-1$
+
+      ;
    }
 
 }

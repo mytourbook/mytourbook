@@ -3907,7 +3907,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 
             final TourSegment segment = (TourSegment) cell.getElement();
 
-            final double value = segment.elevationLoss_InBreakTime / UI.UNIT_VALUE_ELEVATION;
+            final double value = -segment.elevationLoss_InBreakTime / UI.UNIT_VALUE_ELEVATION;
 
             colDef.printValue_0(cell, value);
 
@@ -4626,6 +4626,12 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
    }
 
    private void enableActions_Surfing() {
+
+      // enable these actions only when the surfing segmenter is selected
+      final TourSegmenter selectedSegmenter = getSelectedSegmenter();
+      if (selectedSegmenter != null && selectedSegmenter.segmenterType != SegmenterType.Surfing) {
+         return;
+      }
 
       final boolean isTourSaved = _tourData != null && _tourData.getTourPerson() != null;
       final boolean isMultipleTours = _tourData != null && _tourData.isMultipleTours();
@@ -5413,7 +5419,6 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
          _selectedSurfingFilter = _comboSurfing_SegmenterFilter.getSelectionIndex();
 
          enableActions_Surfing();
-
       }
 
       updateUI_SegmenterBackground();
@@ -6677,6 +6682,9 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
             }
          }
       }
+
+      _elevationGain -= _tourData.segmentSerieTotal_Elevation_InBreak_Gain;
+      _elevationLoss -= _tourData.segmentSerieTotal_Elevation_InBreak_Loss;
 
       /*
        * Show altitude values not as negative values because the values are displayed left aligned
