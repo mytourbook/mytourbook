@@ -9654,7 +9654,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
 
       float elevationPrev = altitudeSerie[segmentStartIndex];
 
-      for (int serieIndex = segmentStartIndex + 1; serieIndex < segmentEndIndex; serieIndex++) {
+      for (int serieIndex = segmentStartIndex + 1; serieIndex <= segmentEndIndex; serieIndex++) {
 
          final float elevation = altitudeSerie[serieIndex];
          final boolean isBreakTime = breakTimeSerie[serieIndex];

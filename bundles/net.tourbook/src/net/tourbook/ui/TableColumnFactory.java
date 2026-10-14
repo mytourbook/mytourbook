@@ -788,28 +788,28 @@ public abstract class TableColumnFactory {
       };
 
       ALTITUDE_ELEVATION_GAIN_IN_BREAK = new TableColumnFactory() {
-         
+
          @Override
          public TableColumnDefinition createColumn(final ColumnManager columnManager,
                                                    final PixelConverter pixelConverter) {
-            
+
             final TableColumnDefinition colDef = new TableColumnDefinition(columnManager, ALTITUDE_ELEVATION_GAIN_IN_BREAK_ID, SWT.TRAIL);
-            
+
             final String unitLabel = UI.UNIT_LABEL_ELEVATION + UI.SPACE + UI.SYMBOL_ARROW_UP + UI.SPACE + UI.SYMBOL_HOURGLASS_WITH_FLOWING_SAND;
-            
+
             colDef.setColumnCategory(           Messages.ColumnFactory_Category_Altitude);
-            
-            colDef.setColumnLabel(              "Elevation gains within breaks");
+
+            colDef.setColumnLabel(              "Elevation gain within break");
             colDef.setColumnHeaderText(         unitLabel);
-            colDef.setColumnHeaderToolTipText(  "Elevation gains within breaks");
+            colDef.setColumnHeaderToolTipText(  "Elevation gain within break");
             colDef.setColumnUnit(unitLabel);
-            
+
             colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(8));
-            
+
             return colDef;
          }
       };
-      
+
       ALTITUDE_ELEVATION_LOSS_IN_BREAK = new TableColumnFactory() {
 
          @Override
@@ -822,9 +822,9 @@ public abstract class TableColumnFactory {
 
             colDef.setColumnCategory(           Messages.ColumnFactory_Category_Altitude);
 
-            colDef.setColumnLabel(              "Elevation losses within breaks");
+            colDef.setColumnLabel(              "Elevation loss within break");
             colDef.setColumnHeaderText(         unitLabel);
-            colDef.setColumnHeaderToolTipText(  "Elevation losses within breaks");
+            colDef.setColumnHeaderToolTipText(  "Elevation loss within break");
             colDef.setColumnUnit(               unitLabel);
 
             colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(8));
