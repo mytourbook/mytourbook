@@ -312,15 +312,26 @@ public class TourChartView extends ViewPart implements
             if (eventId == TourEventId.SEGMENT_LAYER_CHANGED) {
 
                TourSegmenterView tourSegmenterView = null;
+
                if (part instanceof TourSegmenterView) {
                   tourSegmenterView = (TourSegmenterView) part;
                }
 
-               if (tourSegmenterView != null && eventData instanceof TourData) {
-
-                  final TourData eventTourData = (TourData) eventData;
+               if (tourSegmenterView != null && eventData instanceof final TourData eventTourData) {
 
                   if (eventTourData.equals(_tourData)) {
+
+                     if (_tourData.segmentSerie_IsUpdateChart) {
+
+                        /*
+                         * When break time is modified, then the tour model must be recreated to
+                         * display the new break times
+                         */
+
+                        _tourData.segmentSerie_IsUpdateChart = false;
+
+                        updateChart(_tourData, true, false);
+                     }
 
                      _tourChart.updateTourSegmenter();
 

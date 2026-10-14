@@ -1537,7 +1537,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
    private int                _normalizedGeoAccuracy;
 
    /**
-    * Index of the segmented data in the data series
+    * This contains just the indices for the data series of the segmented data
     */
    @Transient
    public int[]               segmentSerieIndex;
@@ -1566,7 +1566,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
    public int                 offsetDDRecord;
 
    /*
-    * data for the tour segments
+    * Data for the tour segments
     */
    @Transient
    private int[]              segmentSerie_Time_Total;
@@ -1616,6 +1616,9 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
     */
    @Transient
    public float               segmentSerie_FlatGainLoss_Gradient     = -1;
+
+   @Transient
+   public boolean             segmentSerie_IsUpdateChart;
 
    /**
     * Keep original import file path, this is used when the tour file should be deleted.
@@ -7219,7 +7222,6 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
     * Create the tour segment list from the segment index array {@link #segmentSerieIndex}
     *
     * @param breakTimeConfig
-    * @param flatGainLoss_Gradient
     *
     * @return
     */
@@ -7243,9 +7245,9 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
       final float[] localPowerSerie = getPowerSerie();
       final boolean isPowerDataAvailable = (localPowerSerie != null) && (localPowerSerie.length > 0);
 
-      final int segmentSerieLength = segmentSerieIndex.length;
+      final int numSegments = segmentSerieIndex.length;
 
-      final ArrayList<TourSegment> tourSegments = new ArrayList<>(segmentSerieLength);
+      final ArrayList<TourSegment> allSegments = new ArrayList<>(numSegments);
       final int firstSerieIndex = segmentSerieIndex[0];
 
       /*
@@ -7275,26 +7277,26 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
             ? 0
             : tourComputedTime_Moving * 1000 / (tourDistance * UI.UNIT_VALUE_DISTANCE);
 
-      segmentSerie_Time_Elapsed = new int[segmentSerieLength];
-      segmentSerie_Time_Recorded = new int[segmentSerieLength];
-      segmentSerie_Time_Paused = new int[segmentSerieLength];
-      segmentSerie_Time_Moving = new int[segmentSerieLength];
-      segmentSerie_Time_Break = new int[segmentSerieLength];
-      segmentSerie_Time_Total = new int[segmentSerieLength];
+      segmentSerie_Time_Elapsed = new int[numSegments];
+      segmentSerie_Time_Recorded = new int[numSegments];
+      segmentSerie_Time_Paused = new int[numSegments];
+      segmentSerie_Time_Moving = new int[numSegments];
+      segmentSerie_Time_Break = new int[numSegments];
+      segmentSerie_Time_Total = new int[numSegments];
 
-      segmentSerie_Distance_Diff = new float[segmentSerieLength];
-      segmentSerie_Distance_Total = new float[segmentSerieLength];
+      segmentSerie_Distance_Diff = new float[numSegments];
+      segmentSerie_Distance_Total = new float[numSegments];
 
-      segmentSerie_Elevation_Diff = new float[segmentSerieLength];
-      segmentSerie_Elevation_GainLoss_Hour = new float[segmentSerieLength];
+      segmentSerie_Elevation_Diff = new float[numSegments];
+      segmentSerie_Elevation_GainLoss_Hour = new float[numSegments];
 
-      segmentSerie_Speed = new float[segmentSerieLength];
-      segmentSerie_Pace = new float[segmentSerieLength];
+      segmentSerie_Speed = new float[numSegments];
+      segmentSerie_Pace = new float[numSegments];
 
-      segmentSerie_Cadence = new float[segmentSerieLength];
-      segmentSerie_Gradient = new float[segmentSerieLength];
-      segmentSerie_Power = new float[segmentSerieLength];
-      segmentSerie_Pulse = new float[segmentSerieLength];
+      segmentSerie_Cadence = new float[numSegments];
+      segmentSerie_Gradient = new float[numSegments];
+      segmentSerie_Power = new float[numSegments];
+      segmentSerie_Pulse = new float[numSegments];
 
       int segmentIndex2nd = 0;
 
@@ -7307,17 +7309,19 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
       float totalDistance = 0;
       float totalElevation_Gain = 0;
       float totalElevation_Loss = 0;
+      float totalElevation_InBreak_Gain = 0;
+      float totalElevation_InBreak_Loss = 0;
 
       final boolean is2ndSerieIndex = segmentSerieIndex2nd != null;
 
       // compute segment values between tour start and tour end
-      for (int segmentIndex = 1; segmentIndex < segmentSerieLength; segmentIndex++) {
+      for (int segmentIndex = 1; segmentIndex < numSegments; segmentIndex++) {
 
          final int segmentStartIndex = segmentSerieIndex[segmentIndex - 1];
          final int segmentEndIndex = segmentSerieIndex[segmentIndex];
 
          final TourSegment segment = new TourSegment();
-         tourSegments.add(segment);
+         allSegments.add(segment);
 
          segment.sequence = segmentIndex;
 
@@ -7399,12 +7403,23 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
             final float elevationEnd = segmenterElevationSerie[segmentEndIndex];
             final float elevationDiff = elevationEnd - elevationStart;
 
-            final float altiUpDownHour = segmentTime == 0
+            final float elevationUpDownHour = segmentTime == 0
                   ? 0
                   : elevationDiff / segmentTime * 3600;
 
+            final float[] elevationInBreakTime = getElevationInBreakTime(segmentStartIndex, segmentEndIndex);
+
+            final float elevationInBreak_Gain = elevationInBreakTime[0];
+            final float elevationInBreak_Loss = elevationInBreakTime[1];
+
+            segment.elevationGain_InBreakTime = elevationInBreak_Gain;
+            segment.elevationLoss_InBreakTime = elevationInBreak_Loss;
+
+            totalElevation_InBreak_Gain += elevationInBreak_Gain;
+            totalElevation_InBreak_Loss += -elevationInBreak_Loss;
+
             segmentSerie_Elevation_Diff[segmentIndex] = segment.altitude_Segment_Border_Diff = elevationDiff;
-            segmentSerie_Elevation_GainLoss_Hour[segmentIndex] = altiUpDownHour;
+            segmentSerie_Elevation_GainLoss_Hour[segmentIndex] = elevationUpDownHour;
 
             if (elevationDiff > 0) {
 
@@ -7482,7 +7497,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
                }
             }
 
-            // end point of the current segment is the start of the next segment
+            // the end point of the current segment is the start of the next segment
             elevationStart = elevationEnd;
          }
 
@@ -7569,12 +7584,15 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
       totalSegment.altitude_Segment_Down = totalElevation_Loss;
       totalSegment.altitude_Segment_Up = totalElevation_Gain;
 
-      tourSegments.add(totalSegment);
+      totalSegment.elevationGain_InBreakTime = totalElevation_InBreak_Gain;
+      totalSegment.elevationLoss_InBreakTime = totalElevation_InBreak_Loss;
+
+      allSegments.add(totalSegment);
 
       segmentSerieTotal_Elevation_Gain = totalElevation_Gain;
       segmentSerieTotal_Elevation_Loss = totalElevation_Loss;
 
-      return tourSegments;
+      return allSegments;
    }
 
    private void createSRTMDataSerie(final boolean isUseSrtm1Values) {
@@ -9620,6 +9638,45 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
    public double getElevation_Avg() {
 
       return StreamUtils.computeAverage(getAltitudeSerie());
+   }
+
+   private float[] getElevationInBreakTime(final int segmentStartIndex, final int segmentEndIndex) {
+
+      if (altitudeSerie == null || breakTimeSerie == null) {
+         return null;
+      }
+
+      /*
+       * Computes elevation gain/loss in break times
+       */
+      float elevationGain_InBreak = 0;
+      float elevationLoss_InBreak = 0;
+
+      float elevationPrev = altitudeSerie[segmentStartIndex];
+
+      for (int serieIndex = segmentStartIndex + 1; serieIndex < segmentEndIndex; serieIndex++) {
+
+         final float elevation = altitudeSerie[serieIndex];
+         final boolean isBreakTime = breakTimeSerie[serieIndex];
+
+         if (isBreakTime) {
+
+            final float elevationDiff = elevation - elevationPrev;
+
+            if (elevationDiff >= 0) {
+
+               elevationGain_InBreak += elevationDiff;
+
+            } else {
+
+               elevationLoss_InBreak += elevationDiff;
+            }
+         }
+
+         elevationPrev = elevation;
+      }
+
+      return new float[] { elevationGain_InBreak, elevationLoss_InBreak };
    }
 
    /**

@@ -38,6 +38,9 @@ New / Improvements
   - Delete time slices, the tour chart is now a more functional tour editor with an undo/redo feature, before only e.g. tour markers could be modified
   - With the key "o", move the other vertical slider to the same position as the selected vertical slider
   
+* Tour Segmenter
+  - When the break time segmenter is selected, the tour chart displays the updated break times
+  
 
 Changes
 =======

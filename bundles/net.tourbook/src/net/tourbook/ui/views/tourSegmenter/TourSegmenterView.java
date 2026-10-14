@@ -413,6 +413,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
    private boolean                        _isSegmenterFiltered;
    private boolean                        _isShowFlatGradient;
    private boolean                        _isTourDirty        = false;
+   private boolean                        _isResetBreakTime;
    //
    private int                            _selectedSurfingFilter;
    private float                          _elevationGain;
@@ -1383,10 +1384,20 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
          return;
       }
 
+      final SegmenterType selectedSegmenterType = selectedSegmenter.segmenterType;
+
+      if (_isResetBreakTime && selectedSegmenterType != SegmenterType.ByBreakTime) {
+
+         // the previous segmenter has modified the break time series
+
+         _isResetBreakTime = false;
+
+         _tourData.segmentSerie_IsUpdateChart = true;
+         _tourData.clearComputedSeries();
+      }
+
       boolean isUpdateVisibleDataPoints = false;
       int[] forcedIndices;
-
-      final SegmenterType selectedSegmenterType = selectedSegmenter.segmenterType;
 
       switch (selectedSegmenterType) {
 
@@ -1427,7 +1438,13 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
          break;
 
       case ByBreakTime:
+
+         // reset the break time when the next time another segmenter is selected
+         _isResetBreakTime = true;
+         _tourData.segmentSerie_IsUpdateChart = true;
+
          createSegmentsBy_BreakTime();
+
          break;
 
       case ByComputedAltiUpDown:
@@ -2436,7 +2453,10 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
             // tour title
 
             _txtTitle = new Text(container, SWT.READ_ONLY);
-            GridDataFactory.fillDefaults().grab(true, false).span(4, 1).applyTo(_txtTitle);
+            GridDataFactory.fillDefaults()
+//                  .grab(true, false)
+//                  .hint(_pc.convertWidthInCharsToPixels(50), SWT.DEFAULT)
+                  .span(4, 1).applyTo(_txtTitle);
          }
          {
             // label: create segments with
@@ -3683,6 +3703,9 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
       defineColumn_Altitude_SummarizedComputed_Up();
       defineColumn_Altitude_SummarizedComputed_Down();
 
+      defineColumn_Altitude_InBreak_Up();
+      defineColumn_Altitude_InBreak_Down();
+
       defineColumn_Body_AvgPulse();
       defineColumn_Body_AvgPulse_Difference();
 
@@ -3861,6 +3884,64 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
                      : (altitudeDiff / UI.UNIT_VALUE_ELEVATION) / movingTime * 3600;
 
                colDef.printValue_0(cell, value);
+            }
+         }
+      });
+   }
+
+   /**
+    * Column: Elevation loss within the break time
+    */
+   private void defineColumn_Altitude_InBreak_Down() {
+
+      final ColumnDefinition colDef;
+
+      colDef = TableColumnFactory.ALTITUDE_ELEVATION_LOSS_IN_BREAK.createColumn(_columnManager, _pc);
+
+      colDef.setIsDefaultColumn();
+      colDef.setColumnSelectionListener(_columnSortListener);
+
+      colDef.setLabelProvider(new CellLabelProvider() {
+         @Override
+         public void update(final ViewerCell cell) {
+
+            final TourSegment segment = (TourSegment) cell.getElement();
+
+            final double value = segment.elevationLoss_InBreakTime / UI.UNIT_VALUE_ELEVATION;
+
+            colDef.printValue_0(cell, value);
+
+            if (segment.isTotal) {
+               setStyle_ColumnTotal(cell);
+            }
+         }
+      });
+   }
+
+   /**
+    * Column: Elevation gain within the break time
+    */
+   private void defineColumn_Altitude_InBreak_Up() {
+
+      final ColumnDefinition colDef;
+
+      colDef = TableColumnFactory.ALTITUDE_ELEVATION_GAIN_IN_BREAK.createColumn(_columnManager, _pc);
+
+      colDef.setIsDefaultColumn();
+      colDef.setColumnSelectionListener(_columnSortListener);
+
+      colDef.setLabelProvider(new CellLabelProvider() {
+         @Override
+         public void update(final ViewerCell cell) {
+
+            final TourSegment segment = (TourSegment) cell.getElement();
+
+            final double value = segment.elevationGain_InBreakTime / UI.UNIT_VALUE_ELEVATION;
+
+            colDef.printValue_0(cell, value);
+
+            if (segment.isTotal) {
+               setStyle_ColumnTotal(cell);
             }
          }
       });
