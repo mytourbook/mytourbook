@@ -1193,6 +1193,13 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 
                // tour chart smoothing can be modified
 
+               if (_tourData != null) {
+                  
+                  // found this clear issue after modifying the chart smoothing algorithm
+                  
+                  _tourData.clearComputedSeries();
+               }
+
                createSegments(false);
 
             } else if (tourEventId == TourEventId.UPDATE_UI) {

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2025 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2026 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -394,7 +394,7 @@ public class SmoothingUI {
    private void saveState() {
 
       // smoothing algorithm
-      _prefStore.setValue(//
+      _prefStore.setValue(
             ITourbookPreferences.GRAPH_SMOOTHING_SMOOTHING_ALGORITHM,
             getSelectedAlgorithm().algorithmId);
    }

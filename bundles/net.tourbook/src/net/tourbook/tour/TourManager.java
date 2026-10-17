@@ -100,6 +100,7 @@ import net.tourbook.ui.tourChart.TourChart;
 import net.tourbook.ui.tourChart.TourChartConfiguration;
 import net.tourbook.ui.tourChart.TourChartView;
 import net.tourbook.ui.tourChart.X_AXIS_START_TIME;
+import net.tourbook.ui.views.ISmoothingAlgorithm;
 import net.tourbook.ui.views.IWeatherProvider;
 import net.tourbook.ui.views.TourChartAnalyzerInfo;
 import net.tourbook.ui.views.collateTours.CollatedToursView;
@@ -4763,7 +4764,10 @@ public class TourManager {
       tourData.computeSpeedSeries();
       tourData.computeAltimeterGradientSerie();
 
-      computeValueClipping(tourData);
+      final String smoothingAlgo = _prefStore.getString(ITourbookPreferences.GRAPH_SMOOTHING_SMOOTHING_ALGORITHM);
+      if (smoothingAlgo.equals(ISmoothingAlgorithm.SMOOTHING_ALGORITHM_INITIAL)) {
+         computeValueClipping(tourData);
+      }
 
       /*
        * Distance

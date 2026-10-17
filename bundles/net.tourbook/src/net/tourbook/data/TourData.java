@@ -1537,16 +1537,16 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
    private int                _normalizedGeoAccuracy;
 
    /**
+    * oooo (o) DD-record // offset
+    */
+   @Transient
+   public int                 offsetDDRecord;
+
+   /**
     * This contains just the indices for the data series of the segmented data
     */
    @Transient
    public int[]               segmentSerieIndex;
-
-   /**
-    *
-    */
-   @Transient
-   public int[]               segmentSerieFilter;
 
    /**
     * 2nd Index of the segmented data in the data series.
@@ -1560,10 +1560,10 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
    public int[]               segmentSerieIndex2nd;
 
    /**
-    * oooo (o) DD-record // offset
+    *
     */
    @Transient
-   public int                 offsetDDRecord;
+   public int[]               segmentSerieFilter;
 
    /*
     * Data for the tour segments
@@ -2886,6 +2886,8 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
          computeDataSeries_NotSmoothed();
 
       } else {
+
+         // SMOOTHING_ALGORITHM_INITIAL
 
          if (deviceTimeInterval == -1) {
             computeAltimeterGradientSerieWithVariableInterval();

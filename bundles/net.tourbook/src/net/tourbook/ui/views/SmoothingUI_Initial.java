@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2016 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2026 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -39,330 +39,311 @@ import org.eclipse.ui.forms.widgets.FormToolkit;
 
 class SmoothingUI_Initial implements ISmoothingAlgorithm {
 
-	private final IPreferenceStore	_prefStore	= TourbookPlugin.getDefault().getPreferenceStore();
+   private final IPreferenceStore _prefStore = TourbookPlugin.getDefault().getPreferenceStore();
 
-	private boolean					_isUpdateUI;
+   private boolean                _isUpdateUI;
 
-	private SelectionAdapter		_defaultSelectionListener;
-	private MouseWheelListener		_defaultMouseWheelListener;
+   private SelectionAdapter       _defaultSelectionListener;
+   private MouseWheelListener     _defaultMouseWheelListener;
 
-	/*
-	 * UI controls
-	 */
-	private FormToolkit				_tk;
+   /*
+    * UI controls
+    */
+   private FormToolkit _tk;
 
-	private Button					_chkIsCustomClipSettings;
-	private Button					_chkIsCustomPaceClipping;
+   private Button      _chkIsCustomClipSettings;
+   private Button      _chkIsCustomPaceClipping;
 
-	private Label					_lblTimeClipping;
-	private Label					_lblPaceClipping;
+   private Label       _lblTimeClipping;
+   private Label       _lblPaceClipping;
 
-	private Spinner					_spinnerClipValues;
-	private Spinner					_spinnerPaceClipping;
-	private Spinner					_spinnerSpeedMinTime;
+   private Spinner     _spinnerClipValues;
+   private Spinner     _spinnerPaceClipping;
+   private Spinner     _spinnerSpeedMinTime;
 
-	SmoothingUI_Initial() {}
+   SmoothingUI_Initial() {}
 
-	@Override
-	public Composite createUI(	final SmoothingUI smoothingUI,
-								final Composite parent,
-								final FormToolkit tk,
-								final boolean isShowDescription,
-								final boolean isShowAdditionalActions) {
+   @Override
+   public Composite createUI(final SmoothingUI smoothingUI,
+                             final Composite parent,
+                             final FormToolkit tk,
+                             final boolean isShowDescription,
+                             final boolean isShowAdditionalActions) {
 
-		_tk = tk;
+      _tk = tk;
 
-		createUI_0_init(parent);
+      createUI_0_init(parent);
 
-		final Composite container = createUI_10(parent, isShowDescription);
+      final Composite container = createUI_10(parent, isShowDescription);
 
-		restoreState();
+      restoreState();
 
-		return container;
-	}
+      return container;
+   }
 
-	private void createUI_0_init(final Composite parent) {
+   private void createUI_0_init(final Composite parent) {
 
-		if (_tk == null) {
-			_tk = new FormToolkit(parent.getDisplay());
-		}
+      if (_tk == null) {
+         _tk = new FormToolkit(parent.getDisplay());
+      }
 
-		_defaultSelectionListener = new SelectionAdapter() {
-			@Override
-			public void widgetSelected(final SelectionEvent event) {
-				if (_isUpdateUI) {
-					return;
-				}
-				onChangeProperty();
-			}
-		};
+      _defaultSelectionListener = new SelectionAdapter() {
+         @Override
+         public void widgetSelected(final SelectionEvent event) {
+            if (_isUpdateUI) {
+               return;
+            }
+            onChangeProperty();
+         }
+      };
 
-		_defaultMouseWheelListener = new MouseWheelListener() {
-			@Override
-			public void mouseScrolled(final MouseEvent event) {
-				UI.adjustSpinnerValueOnMouseScroll(event);
-				onChangeProperty();
-			}
-		};
-	}
+      _defaultMouseWheelListener = new MouseWheelListener() {
+         @Override
+         public void mouseScrolled(final MouseEvent event) {
+            UI.adjustSpinnerValueOnMouseScroll(event);
+            onChangeProperty();
+         }
+      };
+   }
 
-	private Composite createUI_10(final Composite parent, final boolean isShowDescription) {
+   private Composite createUI_10(final Composite parent, final boolean isShowDescription) {
 
-		final Composite container = _tk.createComposite(parent);
-		GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
-		GridLayoutFactory.fillDefaults()//
-				.numColumns(2)
-				.applyTo(container);
-		{
-			createUI_20_GPSSpeed(container);
-			createUI_30_Clipping(container);
+      final Composite container = _tk.createComposite(parent);
+      GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
+      GridLayoutFactory.fillDefaults()
+            .numColumns(2)
+            .applyTo(container);
+      {
+         createUI_20_GPSSpeed(container);
+         createUI_30_Clipping(container);
 
-			if (isShowDescription) {
-				createUI_50_Description(container);
-			}
-		}
+         if (isShowDescription) {
+            createUI_50_Description(container);
+         }
+      }
 
-		return container;
-	}
+      return container;
+   }
 
-	private void createUI_20_GPSSpeed(final Composite container) {
+   private void createUI_20_GPSSpeed(final Composite container) {
 
-		{
-			// Label: Speed for GPS devices
-			final Label label = _tk.createLabel(container, Messages.Compute_TourValueSpeed_Title);
-			GridDataFactory.fillDefaults().span(2, 1).applyTo(label);
-		}
+      {
+         // Label: Speed for GPS devices
+         final Label label = _tk.createLabel(container, Messages.Compute_TourValueSpeed_Title);
+         GridDataFactory.fillDefaults().span(2, 1).applyTo(label);
+      }
 
-		{
-			/*
-			 * Speed &Time Slice:
-			 */
+      {
+         /*
+          * Speed &Time Slice:
+          */
 
-			// Label
-			_tk.createLabel(container, Messages.compute_tourValueSpeed_label_speedTimeSlice);
+         // Label
+         _tk.createLabel(container, Messages.compute_tourValueSpeed_label_speedTimeSlice);
 
-			final Composite valueContainer = _tk.createComposite(container);
-			GridDataFactory.fillDefaults().grab(true, false).applyTo(valueContainer);
-			GridLayoutFactory.fillDefaults().numColumns(2).applyTo(valueContainer);
-			{
-				// Combo
-				_spinnerSpeedMinTime = new Spinner(valueContainer, SWT.BORDER);
-				GridDataFactory.fillDefaults()//
-						.applyTo(_spinnerSpeedMinTime);
-				_spinnerSpeedMinTime.setMaximum(1000);
-				_spinnerSpeedMinTime.addSelectionListener(_defaultSelectionListener);
-				_spinnerSpeedMinTime.addMouseWheelListener(_defaultMouseWheelListener);
+         final Composite valueContainer = _tk.createComposite(container);
+         GridDataFactory.fillDefaults().grab(true, false).applyTo(valueContainer);
+         GridLayoutFactory.fillDefaults().numColumns(2).applyTo(valueContainer);
+         {
+            // Combo
+            _spinnerSpeedMinTime = new Spinner(valueContainer, SWT.BORDER);
+            _spinnerSpeedMinTime.setMaximum(1000);
+            _spinnerSpeedMinTime.addSelectionListener(_defaultSelectionListener);
+            _spinnerSpeedMinTime.addMouseWheelListener(_defaultMouseWheelListener);
+            GridDataFactory.fillDefaults().applyTo(_spinnerSpeedMinTime);
 
-				// label: unit
-				_tk.createLabel(valueContainer, Messages.app_unit_seconds);
-			}
-		}
-	}
+            // label: unit
+            _tk.createLabel(valueContainer, Messages.app_unit_seconds);
+         }
+      }
+   }
 
-	/**
-	 * All controlsa are disabled, this is only for info, changes have to be done in the
-	 * "Chart Properties" view.
-	 * 
-	 * @param parent
-	 */
-	private void createUI_30_Clipping(final Composite parent) {
+   /**
+    * All controlsa are disabled, this is only for info, changes have to be done in the
+    * "Chart Properties" view.
+    *
+    * @param parent
+    */
+   private void createUI_30_Clipping(final Composite parent) {
 
-		{
-			/*
-			 * is value clipping
-			 */
-			_chkIsCustomClipSettings = _tk.createButton(
-					parent,
-					Messages.TourChart_Property_check_customize_value_clipping,
-					SWT.CHECK);
-			GridDataFactory.fillDefaults()//
-					.span(2, 1)
-					.indent(0, 20)
-					.applyTo(_chkIsCustomClipSettings);
-			_chkIsCustomClipSettings.addSelectionListener(_defaultSelectionListener);
+      {
+         /*
+          * is value clipping
+          */
+         _chkIsCustomClipSettings = _tk.createButton(parent, Messages.TourChart_Property_check_customize_value_clipping, SWT.CHECK);
+         _chkIsCustomClipSettings.addSelectionListener(_defaultSelectionListener);
+         GridDataFactory.fillDefaults()
+               .span(2, 1)
+               .indent(0, 20)
+               .applyTo(_chkIsCustomClipSettings);
 
-			/*
-			 * time slice to clip values
-			 */
-			_lblTimeClipping = _tk.createLabel(parent, Messages.TourChart_Property_label_time_slices);
-			GridDataFactory.fillDefaults()//
-					.indent(16, 0)
-					.align(SWT.FILL, SWT.CENTER)
-					.applyTo(_lblTimeClipping);
+         /*
+          * time slice to clip values
+          */
+         _lblTimeClipping = _tk.createLabel(parent, Messages.TourChart_Property_label_time_slices);
+         GridDataFactory.fillDefaults()
+               .indent(16, 0)
+               .align(SWT.FILL, SWT.CENTER)
+               .applyTo(_lblTimeClipping);
 
-			_spinnerClipValues = new Spinner(parent, SWT.HORIZONTAL | SWT.BORDER);
-			_spinnerClipValues.setMaximum(100);
-			_spinnerClipValues.addSelectionListener(_defaultSelectionListener);
-			_spinnerClipValues.addMouseWheelListener(_defaultMouseWheelListener);
-		}
+         _spinnerClipValues = new Spinner(parent, SWT.HORIZONTAL | SWT.BORDER);
+         _spinnerClipValues.setMaximum(100);
+         _spinnerClipValues.addSelectionListener(_defaultSelectionListener);
+         _spinnerClipValues.addMouseWheelListener(_defaultMouseWheelListener);
+      }
 
-		{
-			/*
-			 * is pace clipping
-			 */
-			_chkIsCustomPaceClipping = _tk.createButton(
-					parent,
-					Messages.TourChart_Property_check_customize_pace_clipping,
-					SWT.CHECK);
-			GridDataFactory.fillDefaults()//
-					.span(2, 1)
-					.applyTo(_chkIsCustomPaceClipping);
-			_chkIsCustomPaceClipping.addSelectionListener(_defaultSelectionListener);
+      {
+         /*
+          * is pace clipping
+          */
+         _chkIsCustomPaceClipping = _tk.createButton(parent, Messages.TourChart_Property_check_customize_pace_clipping, SWT.CHECK);
+         _chkIsCustomPaceClipping.addSelectionListener(_defaultSelectionListener);
+         GridDataFactory.fillDefaults()
+               .span(2, 1)
+               .applyTo(_chkIsCustomPaceClipping);
 
-			/*
-			 * time slice to clip pace
-			 */
-			_lblPaceClipping = _tk.createLabel(parent, Messages.TourChart_Property_label_pace_speed);
-			GridDataFactory.fillDefaults()//
-					.indent(16, 0)
-					.align(SWT.FILL, SWT.CENTER)
-					.applyTo(_lblPaceClipping);
+         /*
+          * time slice to clip pace
+          */
+         _lblPaceClipping = _tk.createLabel(parent, Messages.TourChart_Property_label_pace_speed);
+         GridDataFactory.fillDefaults()
+               .indent(16, 0)
+               .align(SWT.FILL, SWT.CENTER)
+               .applyTo(_lblPaceClipping);
 
-			_spinnerPaceClipping = new Spinner(parent, SWT.HORIZONTAL | SWT.BORDER);
-			_spinnerPaceClipping.setMaximum(100);
-			_spinnerPaceClipping.addSelectionListener(_defaultSelectionListener);
-			_spinnerPaceClipping.addMouseWheelListener(_defaultMouseWheelListener);
-		}
-	}
+         _spinnerPaceClipping = new Spinner(parent, SWT.HORIZONTAL | SWT.BORDER);
+         _spinnerPaceClipping.setMaximum(100);
+         _spinnerPaceClipping.addSelectionListener(_defaultSelectionListener);
+         _spinnerPaceClipping.addMouseWheelListener(_defaultMouseWheelListener);
+      }
+   }
 
-	private void createUI_50_Description(final Composite container) {
-		{
+   private void createUI_50_Description(final Composite container) {
+      {
 
-			// label: The computation of the speed (and pace) value for one ...
-			final Label label = _tk.createLabel(container, Messages.compute_tourValueSpeed_label_description, SWT.WRAP);
-			GridDataFactory.fillDefaults()//
-					.span(2, 1)
-					.indent(0, 10)
-					.hint(UI.DEFAULT_DESCRIPTION_WIDTH, SWT.DEFAULT)
-					.grab(true, false)
-					.applyTo(label);
+         // label: The computation of the speed (and pace) value for one ...
+         final Label label = _tk.createLabel(container, Messages.compute_tourValueSpeed_label_description, SWT.WRAP);
+         GridDataFactory.fillDefaults()
+               .span(2, 1)
+               .indent(0, 10)
+               .hint(UI.DEFAULT_DESCRIPTION_WIDTH, SWT.DEFAULT)
+               .grab(true, false)
+               .applyTo(label);
 
-			// hint bullets
-			FormTools.createBullets(container, //
-					Messages.compute_tourValueSpeed_label_description_Hints,
-					1,
-					3,
-					UI.DEFAULT_DESCRIPTION_WIDTH,
-					null);
-		}
-	}
+         // hint bullets
+         FormTools.createBullets(container,
+               Messages.compute_tourValueSpeed_label_description_Hints,
+               1,
+               3,
+               UI.DEFAULT_DESCRIPTION_WIDTH,
+               null);
+      }
+   }
 
-	@Override
-	public void dispose() {}
+   @Override
+   public void dispose() {}
 
-	private void enableControls() {
+   private void enableControls() {
 
-		final boolean isTimeClipping = _chkIsCustomClipSettings.getSelection();
-		final boolean isPaceClipping = _chkIsCustomPaceClipping.getSelection();
+      final boolean isTimeClipping = _chkIsCustomClipSettings.getSelection();
+      final boolean isPaceClipping = _chkIsCustomPaceClipping.getSelection();
 
-		_lblPaceClipping.setEnabled(isPaceClipping);
-		_lblTimeClipping.setEnabled(isTimeClipping);
+      _lblPaceClipping.setEnabled(isPaceClipping);
+      _lblTimeClipping.setEnabled(isTimeClipping);
 
-		_spinnerClipValues.setEnabled(isTimeClipping);
-		_spinnerPaceClipping.setEnabled(isPaceClipping);
-	}
+      _spinnerClipValues.setEnabled(isTimeClipping);
+      _spinnerPaceClipping.setEnabled(isPaceClipping);
+   }
 
-	/**
-	 * Property was changed, fire a property change event
-	 */
-	private void onChangeProperty() {
-		onChangeProperty(true);
-	}
+   /**
+    * Property was changed, fire a property change event
+    */
+   private void onChangeProperty() {
+      onChangeProperty(true);
+   }
 
-	/**
-	 * Property has changed, fire an change event
-	 * 
-	 * @param isFireModifications
-	 */
-	private void onChangeProperty(final boolean isFireModifications) {
+   /**
+    * Property has changed, fire an change event
+    *
+    * @param isFireModifications
+    */
+   private void onChangeProperty(final boolean isFireModifications) {
 
-		enableControls();
+      enableControls();
 
-		// set new values in the pref store
-		saveState();
+      // set new values in the pref store
+      saveState();
 
-		if (isFireModifications) {
+      if (isFireModifications) {
 
-			// force all tours to recompute the speed
-			TourManager.getInstance().clearTourDataCache();
+         // force all tours to recompute the speed
+         TourManager.getInstance().clearTourDataCache();
 
-			// fire unique event for all changes
-			TourManager.fireEvent(TourEventId.TOUR_CHART_PROPERTY_IS_MODIFIED);
-		}
-	}
+         // fire unique event for all changes
+         TourManager.fireEvent(TourEventId.TOUR_CHART_PROPERTY_IS_MODIFIED);
+      }
+   }
 
-	@Override
-	public void performDefaults(final boolean isFireModifications) {
+   @Override
+   public void performDefaults(final boolean isFireModifications) {
 
-		_isUpdateUI = true;
-		{
-			_spinnerSpeedMinTime.setSelection(_prefStore.getDefaultInt(//
-					ITourbookPreferences.APP_DATA_SPEED_MIN_TIMESLICE_VALUE));
-		}
-		_isUpdateUI = false;
+      _isUpdateUI = true;
+      {
+         _spinnerSpeedMinTime.setSelection(_prefStore.getDefaultInt(ITourbookPreferences.APP_DATA_SPEED_MIN_TIMESLICE_VALUE));
+      }
+      _isUpdateUI = false;
 
-		onChangeProperty(isFireModifications);
-	}
+      onChangeProperty(isFireModifications);
+   }
 
-	private void restoreState() {
+   private void restoreState() {
 
-		_isUpdateUI = true;
-		{
-			_spinnerSpeedMinTime.setSelection(_prefStore.getInt(//
-					ITourbookPreferences.APP_DATA_SPEED_MIN_TIMESLICE_VALUE));
+      _isUpdateUI = true;
+      {
+// SET_FORMATTING_OFF
 
-			/*
-			 * clipping
-			 */
-			_chkIsCustomClipSettings.setSelection(_prefStore
-					.getBoolean(ITourbookPreferences.GRAPH_PROPERTY_IS_VALUE_CLIPPING));
-			_spinnerClipValues.setSelection(//
-					_prefStore.getInt(ITourbookPreferences.GRAPH_PROPERTY_VALUE_CLIPPING_TIMESLICE));
+         _spinnerSpeedMinTime    .setSelection(_prefStore.getInt(    ITourbookPreferences.APP_DATA_SPEED_MIN_TIMESLICE_VALUE));
 
-			_chkIsCustomPaceClipping.setSelection(//
-					_prefStore.getBoolean(ITourbookPreferences.GRAPH_PROPERTY_IS_PACE_CLIPPING));
-			_spinnerPaceClipping.setSelection(//
-					_prefStore.getInt(ITourbookPreferences.GRAPH_PROPERTY_PACE_CLIPPING_VALUE));
-		}
-		_isUpdateUI = false;
+         /*
+          * clipping
+          */
+         _chkIsCustomClipSettings.setSelection(_prefStore.getBoolean(ITourbookPreferences.GRAPH_PROPERTY_IS_VALUE_CLIPPING));
+         _spinnerClipValues      .setSelection(_prefStore.getInt(    ITourbookPreferences.GRAPH_PROPERTY_VALUE_CLIPPING_TIMESLICE));
 
-		enableControls();
-	}
+         _chkIsCustomPaceClipping.setSelection(_prefStore.getBoolean(ITourbookPreferences.GRAPH_PROPERTY_IS_PACE_CLIPPING));
+         _spinnerPaceClipping    .setSelection(_prefStore.getInt(    ITourbookPreferences.GRAPH_PROPERTY_PACE_CLIPPING_VALUE));
 
-	private void saveState() {
+// SET_FORMATTING_ON
+      }
+      _isUpdateUI = false;
 
-		/*
-		 * GPS time slice
-		 */
-		_prefStore.setValue(
-				ITourbookPreferences.APP_DATA_SPEED_MIN_TIMESLICE_VALUE,
-				_spinnerSpeedMinTime.getSelection());
+      enableControls();
+   }
 
-		/*
-		 * clip time slices
-		 */
-		_prefStore.setValue(
-				ITourbookPreferences.GRAPH_PROPERTY_IS_VALUE_CLIPPING,
-				_chkIsCustomClipSettings.getSelection());
-		_prefStore.setValue(
-				ITourbookPreferences.GRAPH_PROPERTY_VALUE_CLIPPING_TIMESLICE,
-				_spinnerClipValues.getSelection());
+   private void saveState() {
 
-		/*
-		 * pace clipping value in 0.1 km/h-mph
-		 */
-		_prefStore.setValue(
-				ITourbookPreferences.GRAPH_PROPERTY_IS_PACE_CLIPPING,
-				_chkIsCustomPaceClipping.getSelection());
+      /*
+       * GPS time slice
+       */
+      _prefStore.setValue(ITourbookPreferences.APP_DATA_SPEED_MIN_TIMESLICE_VALUE, _spinnerSpeedMinTime.getSelection());
 
-		_prefStore.setValue(
-				ITourbookPreferences.GRAPH_PROPERTY_PACE_CLIPPING_VALUE,
-				_spinnerPaceClipping.getSelection());
-	}
+      /*
+       * clip time slices
+       */
+      _prefStore.setValue(ITourbookPreferences.GRAPH_PROPERTY_IS_VALUE_CLIPPING, _chkIsCustomClipSettings.getSelection());
+      _prefStore.setValue(ITourbookPreferences.GRAPH_PROPERTY_VALUE_CLIPPING_TIMESLICE, _spinnerClipValues.getSelection());
 
-	@Override
-	public void updateUIFromPrefStore() {
-		restoreState();
-	}
+      /*
+       * pace clipping value in 0.1 km/h-mph
+       */
+      _prefStore.setValue(ITourbookPreferences.GRAPH_PROPERTY_IS_PACE_CLIPPING, _chkIsCustomPaceClipping.getSelection());
+      _prefStore.setValue(ITourbookPreferences.GRAPH_PROPERTY_PACE_CLIPPING_VALUE, _spinnerPaceClipping.getSelection());
+   }
+
+   @Override
+   public void updateUIFromPrefStore() {
+
+      restoreState();
+   }
 
 }
