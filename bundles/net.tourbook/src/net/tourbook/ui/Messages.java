@@ -254,6 +254,8 @@ public class Messages extends NLS {
    public static String        ColumnFactory_Elevation_AvgChange_Label;
    public static String        ColumnFactory_Elevation_AvgChange_Tooltip;
    public static String        ColumnFactory_Elevation_Diff_Tooltip;
+   public static String        ColumnFactory_Elevation_GainInBreak;
+   public static String        ColumnFactory_Elevation_LossInBreak;
    public static String        ColumnFactory_Elevation_Gain_Tooltip;
    public static String        ColumnFactory_Elevation_GainDiff_Tooltip;
    public static String        ColumnFactory_Elevation_GainDelta_Label;

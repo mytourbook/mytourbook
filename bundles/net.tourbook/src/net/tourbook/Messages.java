@@ -791,6 +791,8 @@ public class Messages extends NLS {
    public static String        Dialog_ImportConfig_Checkbox_DeviceWatching;
    public static String        Dialog_ImportConfig_Checkbox_ImportFiles;
    public static String        Dialog_ImportConfig_Checkbox_IsMountDevice;
+   public static String        Dialog_ImportConfig_Checkbox_IsPremountDevice;
+   public static String        Dialog_ImportConfig_Checkbox_IsPremountDevice_Tooltip;
    public static String        Dialog_ImportConfig_Checkbox_IsUnmountDevice;
    public static String        Dialog_ImportConfig_Checkbox_IsVerifyMountCommand;
    public static String        Dialog_ImportConfig_Checkbox_IsVerifyMountCommand_Tooltip;
@@ -1512,8 +1514,11 @@ public class Messages extends NLS {
    public static String        Import_Data_Log_MountDevice_MountCommand_IsRun_NoVerification;
    public static String        Import_Data_Log_MountDevice_MountCommand_IsRun_WithVerification;
    public static String        Import_Data_Log_MountDevice_MountCommand_IsRun_WithVerification_Error;
-   public static String        Import_Data_Log_MountDevice_MountCommandCannotBeEmpty;
-   public static String        Import_Data_Log_MountDevice_MountCommandFailed;
+   public static String        Import_Data_Log_MountDevice_MountCommand_CannotBeEmpty;
+   public static String        Import_Data_Log_MountDevice_MountCommand_Failed;
+   public static String        Import_Data_Log_MountDevice_PreMount_Failed;
+   public static String        Import_Data_Log_MountDevice_PreMount_IsEmpty;
+   public static String        Import_Data_Log_MountDevice_PreMount_Success;
    public static String        Import_Data_Log_ReimportIsInvalid_DifferentTourId_Message;
    public static String        Import_Data_Log_ReimportIsInvalid_TourNotFoundInFile_Message;
    public static String        Import_Data_Log_ReimportIsInvalid_WrongSliceNumbers;
@@ -3408,6 +3413,12 @@ public class Messages extends NLS {
    public static String        TourManager_Dialog_OutOfSyncError_Message;
    public static String        TourManager_Dialog_OutOfSyncError_Title;
    public static String        TourManager_Dialog_RemovePhoto_Message;
+   public static String        TourManager_Dialog_TourChartIsModified_ClearUndoHistory_Message;
+
+   public static String        TourManager_Dialog_TourChartIsModified_SaveOrRevert_Message;
+
+   public static String        TourManager_Dialog_TourChartIsModified_Title;
+
    public static String        TourManager_Dialog_TourEditorIsModified_Message;
    public static String        TourManager_Dialog_TourEditorIsModified_Title;
 
@@ -3547,7 +3558,22 @@ public class Messages extends NLS {
 
    public static String        Tour_Chart_Action_Dialog_DeleteTourMarkerError_Message;
    public static String        Tour_Chart_Action_Dialog_DeleteTourMarkerError_Title;
+
+   public static String        Tour_Chart_Dialog_SaveChanges_Message;
+
+   public static String        Tour_Chart_Dialog_SaveChanges_Title;
+
+   public static String        Tour_Chart_Dialog_TourIsModified_Message;
+
+   public static String        Tour_Chart_Info_UndoOperation;
+
    public static String        Tour_Chart_Label_ValuePoint_Title;
+
+   public static String Tour_Chart_Radio_CancelAndKeepChanges;
+
+   public static String Tour_Chart_Radio_DiscardChanges;
+
+   public static String Tour_Chart_Radio_SaveChanges;
 
    public static String        Tour_Compare_ViewName_ElevationComparedTour;
    public static String        Tour_Compare_ViewName_ElevationCompareTimeline;

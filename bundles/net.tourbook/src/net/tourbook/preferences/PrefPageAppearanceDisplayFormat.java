@@ -1013,31 +1013,31 @@ public class PrefPageAppearanceDisplayFormat extends PreferencePage implements I
       final long durationD3 = Duration.ofDays(value).plusHours(value).plusMinutes(value).plusSeconds(value).getSeconds();
 
       System.out.println();
-      System.out.println("Example formats");
+      System.out.println("Example formats"); //$NON-NLS-1$
       System.out.println();
 
       System.out.println(UI.EMPTY_STRING
 
-         + " %14s".formatted(valueFormatter_Time_HH         .printLong(durationH1)) + UI.NEW_LINE
-         + " %14s".formatted(valueFormatter_Time_HHMM       .printLong(durationM1)) + UI.NEW_LINE
-         + " %14s".formatted(valueFormatter_Time_HHMMSS     .printLong(durationS1)) + UI.NEW_LINE
-         + " %14s".formatted(valueFormatter_Time_Duration   .printLong(durationD1)) + UI.NEW_LINE
+         + " %14s".formatted(valueFormatter_Time_HH         .printLong(durationH1)) + UI.NEW_LINE //$NON-NLS-1$
+         + " %14s".formatted(valueFormatter_Time_HHMM       .printLong(durationM1)) + UI.NEW_LINE //$NON-NLS-1$
+         + " %14s".formatted(valueFormatter_Time_HHMMSS     .printLong(durationS1)) + UI.NEW_LINE //$NON-NLS-1$
+         + " %14s".formatted(valueFormatter_Time_Duration   .printLong(durationD1)) + UI.NEW_LINE //$NON-NLS-1$
       );
 
       System.out.println(UI.EMPTY_STRING
 
-         + " %14s".formatted(valueFormatter_Time_HH         .printLong(durationH2)) + UI.NEW_LINE
-         + " %14s".formatted(valueFormatter_Time_HHMM       .printLong(durationM2)) + UI.NEW_LINE
-         + " %14s".formatted(valueFormatter_Time_HHMMSS     .printLong(durationS2)) + UI.NEW_LINE
-         + " %14s".formatted(valueFormatter_Time_Duration   .printLong(durationD2)) + UI.NEW_LINE
+         + " %14s".formatted(valueFormatter_Time_HH         .printLong(durationH2)) + UI.NEW_LINE //$NON-NLS-1$
+         + " %14s".formatted(valueFormatter_Time_HHMM       .printLong(durationM2)) + UI.NEW_LINE //$NON-NLS-1$
+         + " %14s".formatted(valueFormatter_Time_HHMMSS     .printLong(durationS2)) + UI.NEW_LINE //$NON-NLS-1$
+         + " %14s".formatted(valueFormatter_Time_Duration   .printLong(durationD2)) + UI.NEW_LINE //$NON-NLS-1$
       );
 
       System.out.println(UI.EMPTY_STRING
 
-         + " %14s".formatted(valueFormatter_Time_HH         .printLong(durationH3)) + UI.NEW_LINE
-         + " %14s".formatted(valueFormatter_Time_HHMM       .printLong(durationM3)) + UI.NEW_LINE
-         + " %14s".formatted(valueFormatter_Time_HHMMSS     .printLong(durationS3)) + UI.NEW_LINE
-         + " %14s".formatted(valueFormatter_Time_Duration   .printLong(durationD3)) + UI.NEW_LINE
+         + " %14s".formatted(valueFormatter_Time_HH         .printLong(durationH3)) + UI.NEW_LINE //$NON-NLS-1$
+         + " %14s".formatted(valueFormatter_Time_HHMM       .printLong(durationM3)) + UI.NEW_LINE //$NON-NLS-1$
+         + " %14s".formatted(valueFormatter_Time_HHMMSS     .printLong(durationS3)) + UI.NEW_LINE //$NON-NLS-1$
+         + " %14s".formatted(valueFormatter_Time_Duration   .printLong(durationD3)) + UI.NEW_LINE //$NON-NLS-1$
       );
 
 // SET_FORMATTING_ON

@@ -149,14 +149,14 @@ import org.eclipse.ui.PlatformUI;
  */
 public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdater, ILineSelectionPainter {
 
-   static final String         TOOLBAR_GROUP_1_GRAPHS                          = "group_Graphs";                                 //$NON-NLS-1$
-   static final String         TOOLBAR_GROUP_2                                 = "group_2";                                      //$NON-NLS-1$
-   static final String         TOOLBAR_GROUP_3                                 = "group_3";                                      //$NON-NLS-1$
+   static final String         TOOLBAR_GROUP_1_GRAPHS                          = "group_Graphs";                                  //$NON-NLS-1$
+   static final String         TOOLBAR_GROUP_2                                 = "group_2";                                       //$NON-NLS-1$
+   static final String         TOOLBAR_GROUP_3                                 = "group_3";                                       //$NON-NLS-1$
 
-   private static final String COMMAND_NET_TOURBOOK_TOUR_RESTORE_TOUR_IN_CHART = "command.net.tourbook.tour.RestoreTour_InChart";
-   private static final String COMMAND_NET_TOURBOOK_TOUR_SAVE_TOUR_IN_CHART    = "command.net.tourbook.tour.SaveTour_InChart";
-   private static final String NET_TOURBOOK_VIEWS_TOUR_CHART_VIEW_REDO         = "net.tourbook.views.TourChartView.redo";
-   private static final String NET_TOURBOOK_VIEWS_TOUR_CHART_VIEW_UNDO         = "net.tourbook.views.TourChartView.undo";
+   private static final String COMMAND_NET_TOURBOOK_TOUR_RESTORE_TOUR_IN_CHART = "command.net.tourbook.tour.RestoreTour_InChart"; //$NON-NLS-1$
+   private static final String COMMAND_NET_TOURBOOK_TOUR_SAVE_TOUR_IN_CHART    = "command.net.tourbook.tour.SaveTour_InChart";    //$NON-NLS-1$
+   private static final String NET_TOURBOOK_VIEWS_TOUR_CHART_VIEW_REDO         = "net.tourbook.views.TourChartView.redo";         //$NON-NLS-1$
+   private static final String NET_TOURBOOK_VIEWS_TOUR_CHART_VIEW_UNDO         = "net.tourbook.views.TourChartView.undo";         //$NON-NLS-1$
 
 //SET_FORMATTING_OFF
 

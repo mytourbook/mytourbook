@@ -1236,7 +1236,7 @@ public class TourChartView extends ViewPart implements
 
             Messages.tour_editor_dlg_save_tour_title,
             null,
-            "The tour \"%s\" is modified in the tour chart".formatted(TourManager.getTourDateFull(_tourData)),
+            Messages.Tour_Chart_Dialog_TourIsModified_Message.formatted(TourManager.getTourDateFull(_tourData)),
 
             MessageDialog.QUESTION,
 
@@ -1400,9 +1400,9 @@ public class TourChartView extends ViewPart implements
 
             Display.getDefault().getActiveShell(),
 
-            "Tour Chart",
+            Messages.Tour_Chart_Dialog_SaveChanges_Title,
             null,
-            "The current tour\n\n\"%s\"\n\nhas been modified but not saved. Another tour is selected, what should be done?"
+            Messages.Tour_Chart_Dialog_SaveChanges_Message
 //            "Your changes to the current tour \n\n\"%s\"\n\n have not been saved. Another tour was selected, what should be done?"
 //            "You selected a new tour.\n\nDo you want to save your changes to \"%s\" ?"
                   .formatted(TourManager.getTourTitleDetailed(_tourData)),
@@ -1414,9 +1414,9 @@ public class TourChartView extends ViewPart implements
 
       final String[] allOptions = new String[] {
 
-            "&Cancel and keep changes", // 0
-            "&Save changes", // 1
-            "&Discard changes", // 2
+            Messages.Tour_Chart_Radio_CancelAndKeepChanges, // 0
+            Messages.Tour_Chart_Radio_SaveChanges, // 1
+            Messages.Tour_Chart_Radio_DiscardChanges, // 2
       };
 
       dialog.setRadioOptions(allOptions, 0);
@@ -1467,7 +1467,7 @@ public class TourChartView extends ViewPart implements
 
       // Inside an action listener or command handler
 
-      final String opLabel = "%d: Remove %d time slices".formatted(
+      final String opLabel = Messages.Tour_Chart_Info_UndoOperation.formatted(
 
             ++_undoCounter,
             sliderLastIndex - sliderFirstIndex + 1);

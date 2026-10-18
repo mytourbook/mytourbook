@@ -799,9 +799,9 @@ public abstract class TableColumnFactory {
 
             colDef.setColumnCategory(           Messages.ColumnFactory_Category_Altitude);
 
-            colDef.setColumnLabel(              "Elevation gain within break time");
+            colDef.setColumnLabel(              Messages.ColumnFactory_Elevation_GainInBreak);
             colDef.setColumnHeaderText(         unitLabel);
-            colDef.setColumnHeaderToolTipText(  "Elevation gain within break time");
+            colDef.setColumnHeaderToolTipText(  Messages.ColumnFactory_Elevation_GainInBreak);
             colDef.setColumnUnit(unitLabel);
 
             colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(8));
@@ -822,9 +822,9 @@ public abstract class TableColumnFactory {
 
             colDef.setColumnCategory(           Messages.ColumnFactory_Category_Altitude);
 
-            colDef.setColumnLabel(              "Elevation loss within break time");
+            colDef.setColumnLabel(              Messages.ColumnFactory_Elevation_LossInBreak);
             colDef.setColumnHeaderText(         unitLabel);
-            colDef.setColumnHeaderToolTipText(  "Elevation loss within break time");
+            colDef.setColumnHeaderToolTipText(  Messages.ColumnFactory_Elevation_LossInBreak);
             colDef.setColumnUnit(               unitLabel);
 
             colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(8));

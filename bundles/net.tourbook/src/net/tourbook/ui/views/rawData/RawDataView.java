@@ -5189,7 +5189,7 @@ public class RawDataView extends ViewPart implements
 
       // check pre-mount command
       if (isPremount && StringUtils.isNullOrEmpty(commandPremount)) {
-         TourLogManager.log_ERROR("Mount device: Pre-mount command cannot be empty");
+         TourLogManager.log_ERROR(Messages.Import_Data_Log_MountDevice_PreMount_IsEmpty);
          return;
       }
 
@@ -5197,7 +5197,7 @@ public class RawDataView extends ViewPart implements
 
       // check mount command
       if (StringUtils.isNullOrEmpty(commandMount)) {
-         TourLogManager.log_ERROR(Messages.Import_Data_Log_MountDevice_MountCommandCannotBeEmpty);
+         TourLogManager.log_ERROR(Messages.Import_Data_Log_MountDevice_MountCommand_CannotBeEmpty);
          return;
       }
 
@@ -5234,14 +5234,14 @@ public class RawDataView extends ViewPart implements
 
          // log error message
 
-         TourLogManager.log_ERROR("Mount device: Pre-mount command failed:\n\n%s".formatted(failedLogText));
+         TourLogManager.log_ERROR(Messages.Import_Data_Log_MountDevice_PreMount_Failed.formatted(failedLogText));
 
          return;
       }
 
       // pre-mount succeeded
 
-      TourLogManager.log_INFO("Mount device: Pre-mount command was run in %.1f s".formatted(processDuration));
+      TourLogManager.log_INFO(Messages.Import_Data_Log_MountDevice_PreMount_Success.formatted(processDuration));
    }
 
    private void mountImportDevice_3_On_Async_Mount(final ImportConfig selectedConfig, final String commandMount) {
@@ -5263,7 +5263,7 @@ public class RawDataView extends ViewPart implements
 
          // log error message
 
-         TourLogManager.log_ERROR(Messages.Import_Data_Log_MountDevice_MountCommandFailed.formatted(failedLogText));
+         TourLogManager.log_ERROR(Messages.Import_Data_Log_MountDevice_MountCommand_Failed.formatted(failedLogText));
 
          return;
       }

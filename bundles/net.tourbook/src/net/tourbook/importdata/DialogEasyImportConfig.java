@@ -1800,8 +1800,8 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements IActionRe
          UI.createSpacer_Horizontal(parent);
 
          _chkIC_IsPremountDevice = new Button(parent, SWT.CHECK);
-         _chkIC_IsPremountDevice.setText("Run this command &before the mount command");
-         _chkIC_IsPremountDevice.setToolTipText("This command can be used to initialize the mount tool");
+         _chkIC_IsPremountDevice.setText(Messages.Dialog_ImportConfig_Checkbox_IsPremountDevice);
+         _chkIC_IsPremountDevice.setToolTipText(Messages.Dialog_ImportConfig_Checkbox_IsPremountDevice_Tooltip);
          _chkIC_IsPremountDevice.addSelectionListener(_icSelectionListener);
 
          GridDataFactory.fillDefaults()
