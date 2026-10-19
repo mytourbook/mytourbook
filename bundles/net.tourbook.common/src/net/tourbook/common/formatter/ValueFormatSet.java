@@ -17,6 +17,9 @@ package net.tourbook.common.formatter;
 
 public class ValueFormatSet {
 
+   /**
+    * Formats are available with max of 3 digits
+    */
    public static ValueFormat[] Number          = new ValueFormat[] {
 
          ValueFormat.NUMBER_1_0,

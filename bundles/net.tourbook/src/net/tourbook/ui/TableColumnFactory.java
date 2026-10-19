@@ -47,7 +47,7 @@ public abstract class TableColumnFactory {
    public static final TableColumnFactory ALTITUDE_ELEVATION_LOSS_DIFF;
    public static final String             ALTITUDE_ELEVATION_LOSS_DIFF_ID                    = "ALTITUDE_ELEVATION_LOSS_DIFF_ID";                 //$NON-NLS-1$
    public static final TableColumnFactory ALTITUDE_ELEVATION_GAIN_IN_BREAK;
-   public static final String             ALTITUDE_ELEVATION_GAIN_IN_BREAK_ID                = "ALTITUDE_ELEVATION_GAIN_IN_BREAK_ID";               //$NON-NLS-1$
+   public static final String             ALTITUDE_ELEVATION_GAIN_IN_BREAK_ID                = "ALTITUDE_ELEVATION_GAIN_IN_BREAK_ID";             //$NON-NLS-1$
    public static final TableColumnFactory ALTITUDE_ELEVATION_LOSS_IN_BREAK;
    public static final String             ALTITUDE_ELEVATION_LOSS_IN_BREAK_ID                = "ALTITUDE_ELEVATION_LOSS_IN_BREAK_ID";             //$NON-NLS-1$
    public static final TableColumnFactory ALTITUDE_ELEVATION_SEGMENT_UP;
@@ -805,6 +805,10 @@ public abstract class TableColumnFactory {
             colDef.setColumnUnit(unitLabel);
 
             colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(8));
+            colDef.setValueFormats(
+                  ValueFormatSet.Number,
+                  ValueFormat.NUMBER_1_1,
+                  columnManager);
 
             return colDef;
          }
@@ -828,6 +832,10 @@ public abstract class TableColumnFactory {
             colDef.setColumnUnit(               unitLabel);
 
             colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(8));
+            colDef.setValueFormats(
+                  ValueFormatSet.Number,
+                  ValueFormat.NUMBER_1_1,
+                  columnManager);
 
             return colDef;
          }

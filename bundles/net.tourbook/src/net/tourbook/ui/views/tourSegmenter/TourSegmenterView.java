@@ -1194,9 +1194,9 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
                // tour chart smoothing can be modified
 
                if (_tourData != null) {
-                  
+
                   // found this clear issue after modifying the chart smoothing algorithm
-                  
+
                   _tourData.clearComputedSeries();
                }
 
@@ -3916,7 +3916,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 
             final double value = -segment.elevationLoss_InBreakTime / UI.UNIT_VALUE_ELEVATION;
 
-            colDef.printValue_0(cell, value);
+            colDef.printDetailValue(cell, value);
 
             if (segment.isTotal) {
                setStyle_ColumnTotal(cell);
@@ -3945,7 +3945,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 
             final double value = segment.elevationGain_InBreakTime / UI.UNIT_VALUE_ELEVATION;
 
-            colDef.printValue_0(cell, value);
+            colDef.printDetailValue(cell, value);
 
             if (segment.isTotal) {
                setStyle_ColumnTotal(cell);
