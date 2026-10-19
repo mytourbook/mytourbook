@@ -9652,7 +9652,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
    private float[] getElevationInBreakTime(final int segmentStartIndex, final int segmentEndIndex) {
 
       if (altitudeSerie == null || breakTimeSerie == null) {
-         return null;
+         return new float[] { 0, 0 };
       }
 
       /*
