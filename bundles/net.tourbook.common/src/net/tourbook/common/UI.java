@@ -141,6 +141,8 @@ import org.joda.time.format.PeriodFormatterBuilder;
 
 public class UI {
 
+   private static final String      ID                                   = "net.tourbook.common.UI";                    //$NON-NLS-1$
+
    public static final String       SYSTEM_NEW_LINE                      = System.lineSeparator();
    public static final String       SYSTEM_NEW_LINE2                     = SYSTEM_NEW_LINE + SYSTEM_NEW_LINE;
 
@@ -812,21 +814,54 @@ public class UI {
 
    public static final ImageRegistry     IMAGE_REGISTRY;
 
-   public static final int               DECORATOR_HORIZONTAL_INDENT = 2;
+   public static final int               DECORATOR_HORIZONTAL_INDENT            = 2;
 
    /**
     * Contains the value that opacity is 100% opaque
     */
    public static int                     TRANSFORM_OPACITY_MAX;
 
-   private static final GridDataFactory  _gridDataHint_Zero          = GridDataFactory.fillDefaults().hint(0, 0);
-   private static final GridDataFactory  _gridDataHint_Default       = GridDataFactory.fillDefaults().hint(SWT.DEFAULT, SWT.DEFAULT);
+   private static final GridDataFactory  _gridDataHint_Zero                     = GridDataFactory.fillDefaults().hint(0, 0);
+   private static final GridDataFactory  _gridDataHint_Default                  = GridDataFactory.fillDefaults().hint(SWT.DEFAULT, SWT.DEFAULT);
 
-   private static final IPreferenceStore _prefStore_Common           = CommonActivator.getPrefStore();
+   private static final IPreferenceStore _prefStore_Common                      = CommonActivator.getPrefStore();
+   private static final IDialogSettings  _state_UI                              = CommonActivator.getState(ID);
 
-   private static AtomicInteger          _statusMessageCounter       = new AtomicInteger();
+   public static final String            APPEARANCE_IS_APP_3D_MAP_FIX           = "APPEARANCE_IS_APP_3D_MAP_FIX";                               //$NON-NLS-1$
+   public static final boolean           APPEARANCE_IS_APP_3D_MAP_FIX_DEFAULT   = true;
+   public static final String            APPEARANCE_IS_APP_SCALING              = "APPEARANCE_IS_APP_SCALING";                                  //$NON-NLS-1$
+   public static final boolean           APPEARANCE_IS_APP_SCALING_DEFAULT      = false;
+   public static final String            APPEARANCE_APP_SCALING_PERCENT         = "APPEARANCE_APP_SCALING_PERCENT";                             //$NON-NLS-1$
+   public static final int               APPEARANCE_APP_SCALING_PERCENT_DEFAULT = 100;
+
+   private static AtomicInteger          _statusMessageCounter                  = new AtomicInteger();
 
    static {
+
+// SET_FORMATTING_OFF
+
+      /**
+       * Using the common prefstore _prefStore_Common is NOT working, now we are using a state !!!
+       */
+
+      final boolean isApp3DMapFix   = Util.getStateBoolean(_state_UI, UI.APPEARANCE_IS_APP_3D_MAP_FIX,   UI.APPEARANCE_IS_APP_3D_MAP_FIX_DEFAULT);
+      final boolean isAppScaling    = Util.getStateBoolean(_state_UI, UI.APPEARANCE_IS_APP_SCALING,      UI.APPEARANCE_IS_APP_SCALING_DEFAULT);
+      final int     appScaling      = Util.getStateInt    (_state_UI, UI.APPEARANCE_APP_SCALING_PERCENT, UI.APPEARANCE_APP_SCALING_PERCENT_DEFAULT);
+
+// SET_FORMATTING_ON
+
+      if (isAppScaling) {
+
+         System.setProperty("swt.autoScale", Integer.toString(appScaling)); //$NON-NLS-1$
+         System.setProperty("swt.autoScale.updateOnRuntime", "false"); //$NON-NLS-1$ //$NON-NLS-2$
+
+      }
+
+      if (isApp3DMapFix) {
+
+         // this fixes 2.5d + 3d map otherwise only a part of the view will display the map
+         System.setProperty("sun.java2d.uiScale.enabled", "false"); //$NON-NLS-1$ //$NON-NLS-2$
+      }
 
       /**
        * This creates a display which may contain also sleak options, otherwise sleak would not
@@ -2659,6 +2694,11 @@ public class UI {
     */
    public static String getLinkFromText(final String url) {
       return LINK_TAG_START + url + LINK_TAG_END;
+   }
+
+   public static IDialogSettings getStateUI() {
+
+      return _state_UI;
    }
 
    /**

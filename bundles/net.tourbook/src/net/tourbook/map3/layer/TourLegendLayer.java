@@ -442,10 +442,11 @@ public class TourLegendLayer extends RenderableLayer {
 
       final int legendWidth = IMapColorProvider.DEFAULT_LEGEND_GRAPHIC_WIDTH;
 
-      final int legendWidthScaled = (int) (legendWidth * UI.HIDPI_SCALING);
+      final int legendWidthScaled = Math.max(1, (int) (legendWidth * UI.HIDPI_SCALING));
       int legendHeightScaled = (int) (legendHeight * UI.HIDPI_SCALING);
 
       legendHeightScaled = Math.min(legendHeightScaled, legendMaxTop);
+      legendHeightScaled = Math.max(1, legendHeightScaled);
 
       final BufferedImage image = new BufferedImage(
             legendWidthScaled,

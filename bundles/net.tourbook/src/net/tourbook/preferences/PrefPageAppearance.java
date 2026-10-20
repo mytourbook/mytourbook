@@ -70,17 +70,22 @@ import org.eclipse.ui.PlatformUI;
 
 public class PrefPageAppearance extends PreferencePage implements IWorkbenchPreferencePage {
 
-   public static final String            ID                = "net.tourbook.preferences.PrefPageAppearance"; //$NON-NLS-1$
+   public static final String            ID                    = "net.tourbook.preferences.PrefPageAppearance"; //$NON-NLS-1$
 
-   private static final IPreferenceStore _prefStore        = TourbookPlugin.getPrefStore();
-   private static final IPreferenceStore _prefStore_Common = CommonActivator.getPrefStore();
+   private static final IPreferenceStore _prefStore            = TourbookPlugin.getPrefStore();
+   private static final IPreferenceStore _prefStore_Common     = CommonActivator.getPrefStore();
 
-   private static final IDialogSettings  _state            = TourbookPlugin.getState(TourDataEditorView.ID);
+   private static final IDialogSettings  _state                = TourbookPlugin.getState(TourDataEditorView.ID);
+   private static final IDialogSettings  _state_UI             = UI.getStateUI();
 
    private boolean                       _isShowInApp_MemoryMonitor;
    private boolean                       _isShowInApp_RestartApp;
    private boolean                       _isShowInApp_ScrambleData;
    private boolean                       _isShowInApp_ThemeSelector;
+
+   private boolean                       _isApp_3DMapFix_Restored;
+   private boolean                       _isApp_Scaling_Restored;
+   private int                           _appScaling_Restored;
 
    private int                           _hintDefaultSpinnerWidth;
    private PixelConverter                _pc;
@@ -97,6 +102,9 @@ public class PrefPageAppearance extends PreferencePage implements IWorkbenchPref
 
    private ComboViewer                   _comboViewer_DisabledIcons;
    private ComboViewer                   _comboViewer_Theme;
+
+   private ControlDecoration             _chkDecorator_3DMapFix;
+   private ControlDecoration             _chkDecorator_AppScaling;
    private ControlDecoration             _comboDecorator_DisabledIcons;
    private ControlDecoration             _comboDecorator_Theme;
 
@@ -106,25 +114,33 @@ public class PrefPageAppearance extends PreferencePage implements IWorkbenchPref
    /*
     * UI controls
     */
-   private Button  _btnResetAllToggleDialogs;
+   private Button      _btnResetAllToggleDialogs;
 
-   private Button  _chkAutoOpenTagging;
-   private Button  _chkShowInApp_ExtendedVersion;
-   private Button  _chkShowInApp_MemoryMonitor;
-   private Button  _chkShowInApp_RestartApp;
-   private Button  _chkShowInApp_ScrambleData;
-   private Button  _chkShowInApp_ThemeSelector;
-   private Button  _chkTaggingAnimation;
+   private Button      _chkApp_3DMapFix;
+   private Button      _chkApp_Scaling;
+   private Button      _chkAutoOpenTagging;
+   private Button      _chkShowInApp_ExtendedVersion;
+   private Button      _chkShowInApp_MemoryMonitor;
+   private Button      _chkShowInApp_RestartApp;
+   private Button      _chkShowInApp_ScrambleData;
+   private Button      _chkShowInApp_ThemeSelector;
+   private Button      _chkTaggingAnimation;
 
-   private Combo   _comboContentImageSize;
+   private Combo       _comboContentImageSize;
 
-   private Label   _lblAutoOpenMS;
-   private Label   _lblAutoTagDelay;
+   private Label       _lblAppScalingUnit;
+   private Label       _lblAutoOpenMS;
+   private Label       _lblAutoTagDelay;
 
-   private Spinner _spinnerAutoOpenDelay;
-   private Spinner _spinnerContentImageSize;
-   private Spinner _spinnerNotificationMessagesDuration;
-   private Spinner _spinnerRecentTags;
+   private Spinner     _spinnerAppScaling;
+   private Spinner     _spinnerAutoOpenDelay;
+   private Spinner     _spinnerContentImageSize;
+   private Spinner     _spinnerNotificationMessagesDuration;
+   private Spinner     _spinnerRecentTags;
+
+   private final Image _decorationImage = FieldDecorationRegistry.getDefault()
+         .getFieldDecoration(FieldDecorationRegistry.DEC_WARNING)
+         .getImage();
 
    public class DisabledIcons {
 
@@ -200,8 +216,63 @@ public class PrefPageAppearance extends PreferencePage implements IWorkbenchPref
             .spacing(10, 5)
 
             .applyTo(group);
-//      group.setBackground(UI.SYS_COLOR_MAGENTA);
+//      group.setBackground(UI.SYS_COLOR_GREEN);
       {
+         {
+            /*
+             * App zoom
+             */
+            {
+               UI.createLabel(group, "App scale");
+
+               final SelectionListener scalingListener = SelectionListener.widgetSelectedAdapter(
+                     selectionEvent -> onSelect_AppScaling());
+
+               final Composite containerAppScaling = new Composite(group, SWT.NONE);
+               GridDataFactory.fillDefaults().grab(true, false).applyTo(containerAppScaling);
+               GridLayoutFactory.fillDefaults().numColumns(3).applyTo(containerAppScaling);
+//               containerAppScaling.setBackground(UI.SYS_COLOR_DARK_YELLOW);
+               {
+                  _chkApp_Scaling = new Button(containerAppScaling, SWT.CHECK);
+                  _chkApp_Scaling.setText("Set app sca&ling");
+                  _chkApp_Scaling.setToolTipText(
+                        "This will set \"swt.autoScale...\" to overwrite\nthe default scaling which depends on the used monitor(s)");
+                  _chkApp_Scaling.addSelectionListener(scalingListener);
+
+                  _chkDecorator_AppScaling = new ControlDecoration(_chkApp_Scaling, SWT.TOP | SWT.LEFT);
+
+                  _spinnerAppScaling = new Spinner(containerAppScaling, SWT.BORDER);
+                  _spinnerAppScaling.setMinimum(50);
+                  _spinnerAppScaling.setMaximum(500);
+                  _spinnerAppScaling.setIncrement(10);
+                  _spinnerAppScaling.setPageIncrement(50);
+                  _spinnerAppScaling.addSelectionListener(scalingListener);
+                  _spinnerAppScaling.addMouseWheelListener(mouseEvent -> {
+                     UI.adjustSpinnerValueOnMouseScroll(mouseEvent, 10);
+                     onSelect_AppScaling();
+                  });
+
+                  GridDataFactory.fillDefaults()
+                        .hint(_hintDefaultSpinnerWidth, SWT.DEFAULT)
+                        .align(SWT.BEGINNING, SWT.CENTER)
+                        .applyTo(_spinnerAppScaling);
+
+                  _lblAppScalingUnit = UI.createLabel(containerAppScaling, UI.SYMBOL_PERCENTAGE);
+               }
+               {
+                  UI.createSpacer_Horizontal(group);
+
+                  _chkApp_3DMapFix = new Button(group, SWT.CHECK);
+                  _chkApp_3DMapFix.setText("Fix 2.5D + &3D map viewport");
+                  _chkApp_3DMapFix.setToolTipText(
+                        "This will set \"sun.java2d.uiScale.enabled=false\",\notherwise only a part of the 2.5D or 3D map is displayed.\n\nThis issue was detected on 4k displays.");
+                  _chkApp_3DMapFix.addSelectionListener(SelectionListener.widgetSelectedAdapter(
+                        selectionEvent -> onSelect_App3DMapFix()));
+
+                  _chkDecorator_3DMapFix = new ControlDecoration(_chkApp_3DMapFix, SWT.TOP | SWT.LEFT);
+               }
+            }
+         }
          {
             /*
              * Theme
@@ -498,7 +569,8 @@ public class PrefPageAppearance extends PreferencePage implements IWorkbenchPref
          _btnResetAllToggleDialogs = new Button(parent, SWT.PUSH);
          _btnResetAllToggleDialogs.setText(Messages.Pref_Appearance_Button_ResetAllToggleDialogs);
          _btnResetAllToggleDialogs.setToolTipText(Messages.Pref_Appearance_Button_ResetAllToggleDialogs_Tooltip);
-         _btnResetAllToggleDialogs.addSelectionListener(SelectionListener.widgetSelectedAdapter(selectionEvent -> onResetAllToggleDialogs()));
+         _btnResetAllToggleDialogs.addSelectionListener(SelectionListener.widgetSelectedAdapter(
+               selectionEvent -> onResetAllToggleDialogs()));
          GridDataFactory.fillDefaults()
                .align(SWT.BEGINNING, SWT.FILL)
                .applyTo(_btnResetAllToggleDialogs);
@@ -507,16 +579,24 @@ public class PrefPageAppearance extends PreferencePage implements IWorkbenchPref
 
    private void enableControls() {
 
-      final boolean isTagAutoOpen = _chkAutoOpenTagging.getSelection();
-      final boolean isEnabled = true; // eclipse 3.7 supports this feature in OSX
+// SET_FORMATTING_OFF
 
-      _chkAutoOpenTagging.setEnabled(isEnabled);
-      _chkTaggingAnimation.setEnabled(isEnabled && isTagAutoOpen);
+      final boolean isAppScaling    = _chkApp_Scaling.getSelection();
+      final boolean isTagAutoOpen   = _chkAutoOpenTagging.getSelection();
 
-      _lblAutoOpenMS.setEnabled(isEnabled && isTagAutoOpen);
-      _lblAutoTagDelay.setEnabled(isEnabled && isTagAutoOpen);
+      final boolean isEnabled       = true; // eclipse 3.7 supports this feature in OSX
 
-      _spinnerAutoOpenDelay.setEnabled(isEnabled && isTagAutoOpen);
+      _chkAutoOpenTagging     .setEnabled(isEnabled);
+      _chkTaggingAnimation    .setEnabled(isEnabled && isTagAutoOpen);
+
+      _lblAppScalingUnit      .setEnabled(isAppScaling);
+      _lblAutoOpenMS          .setEnabled(isEnabled && isTagAutoOpen);
+      _lblAutoTagDelay        .setEnabled(isEnabled && isTagAutoOpen);
+
+      _spinnerAppScaling      .setEnabled(isAppScaling);
+      _spinnerAutoOpenDelay   .setEnabled(isEnabled && isTagAutoOpen);
+
+// SET_FORMATTING_ON
    }
 
    private void fillUI() {
@@ -634,6 +714,48 @@ public class PrefPageAppearance extends PreferencePage implements IWorkbenchPref
             Messages.Pref_Appearance_Dialog_ResetAllToggleDialogs_Message);
    }
 
+   private void onSelect_App3DMapFix() {
+
+      if (_chkApp_3DMapFix.getSelection() == _isApp_3DMapFix_Restored) {
+
+         // nothing has changed
+
+         _chkDecorator_3DMapFix.hide();
+
+      } else {
+
+         // scaling is modified, a restart is required
+
+         _chkDecorator_3DMapFix.setDescriptionText("App scaling was modified, a restart is required to see the modification");
+         _chkDecorator_3DMapFix.setImage(_decorationImage);
+         _chkDecorator_3DMapFix.show();
+      }
+   }
+
+   private void onSelect_AppScaling() {
+
+      final boolean isAppScaling = _chkApp_Scaling.getSelection();
+      final int appScaling = _spinnerAppScaling.getSelection();
+
+      if (isAppScaling == _isApp_Scaling_Restored
+            && appScaling == _appScaling_Restored) {
+
+         // nothing has changed
+
+         _chkDecorator_AppScaling.hide();
+
+      } else {
+
+         // scaling is modified, a restart is required
+
+         _chkDecorator_AppScaling.setDescriptionText("App scaling was modified, a restart is required to see the modification");
+         _chkDecorator_AppScaling.setImage(_decorationImage);
+         _chkDecorator_AppScaling.show();
+      }
+
+      enableControls();
+   }
+
    private void onSelect_ImageSize_Combo() {
 
       final int selectedImageSizeIndex = getSelectedImageSizeIndex();
@@ -689,13 +811,9 @@ public class PrefPageAppearance extends PreferencePage implements IWorkbenchPref
 
          _currentDisabledIcons = selectedDisabledIcon;
 
-         final Image decorationImage = FieldDecorationRegistry.getDefault()
-               .getFieldDecoration(FieldDecorationRegistry.DEC_WARNING)
-               .getImage();
-
          // a restart is required for the theme change to take full effect
          _comboDecorator_DisabledIcons.setDescriptionText(Messages.Pref_Appearance_Dialog_RestartAfter_ChangeDisabledIcons_Message);
-         _comboDecorator_DisabledIcons.setImage(decorationImage);
+         _comboDecorator_DisabledIcons.setImage(_decorationImage);
          _comboDecorator_DisabledIcons.show();
 
       } else {
@@ -719,13 +837,9 @@ public class PrefPageAppearance extends PreferencePage implements IWorkbenchPref
          // set theme but do not save it in the pref store (2nd parameter)
          _themeEngine.setTheme(selectedTheme, false);
 
-         final Image decorationImage = FieldDecorationRegistry.getDefault()
-               .getFieldDecoration(FieldDecorationRegistry.DEC_WARNING)
-               .getImage();
-
          // a restart is required for the theme change to take full effect
          _comboDecorator_Theme.setDescriptionText(Messages.Pref_Appearance_Dialog_RestartAfterThemeChange_Message);
-         _comboDecorator_Theme.setImage(decorationImage);
+         _comboDecorator_Theme.setImage(_decorationImage);
          _comboDecorator_Theme.show();
 
       } else {
@@ -779,12 +893,12 @@ public class PrefPageAppearance extends PreferencePage implements IWorkbenchPref
 
 // SET_FORMATTING_OFF
 
-      _spinnerRecentTags                  .setSelection(_prefStore.getDefaultInt(ITourbookPreferences.APPEARANCE_NUMBER_OF_RECENT_TAGS));
-      _spinnerNotificationMessagesDuration.setSelection(_prefStore_Common.getDefaultInt(ICommonPreferences.APPEARANCE_NOTIFICATION_MESSAGES_DURATION));
+      _spinnerRecentTags                  .setSelection(_prefStore         .getDefaultInt(ITourbookPreferences.APPEARANCE_NUMBER_OF_RECENT_TAGS));
+      _spinnerNotificationMessagesDuration.setSelection(_prefStore_Common  .getDefaultInt(ICommonPreferences.APPEARANCE_NOTIFICATION_MESSAGES_DURATION));
 
       _chkAutoOpenTagging                 .setSelection(_prefStore.getDefaultBoolean(ITourbookPreferences.APPEARANCE_IS_TAGGING_AUTO_OPEN));
       _chkTaggingAnimation                .setSelection(_prefStore.getDefaultBoolean(ITourbookPreferences.APPEARANCE_IS_TAGGING_ANIMATION));
-      _spinnerAutoOpenDelay               .setSelection(_prefStore.getDefaultInt(ITourbookPreferences.APPEARANCE_TAGGING_AUTO_OPEN_DELAY));
+      _spinnerAutoOpenDelay               .setSelection(_prefStore.getDefaultInt    (ITourbookPreferences.APPEARANCE_TAGGING_AUTO_OPEN_DELAY));
 
       _chkShowInApp_ExtendedVersion       .setSelection(false);
       _chkShowInApp_MemoryMonitor         .setSelection(false);
@@ -793,6 +907,10 @@ public class PrefPageAppearance extends PreferencePage implements IWorkbenchPref
       _chkShowInApp_ThemeSelector         .setSelection(false);
 
       _comboViewer_DisabledIcons          .setSelection(new StructuredSelection(_currentDisabledIcons));
+
+      _chkApp_3DMapFix     .setSelection(UI.APPEARANCE_IS_APP_3D_MAP_FIX_DEFAULT);
+      _chkApp_Scaling      .setSelection(UI.APPEARANCE_IS_APP_SCALING_DEFAULT);
+      _spinnerAppScaling   .setSelection(UI.APPEARANCE_APP_SCALING_PERCENT_DEFAULT);
 
 // SET_FORMATTING_ON
 
@@ -817,9 +935,22 @@ public class PrefPageAppearance extends PreferencePage implements IWorkbenchPref
       boolean isRestartNow = false;
 
       /*
+       * App scaling
+       */
+      if (isRestartNow == false
+            && (_chkApp_3DMapFix.getSelection() != _isApp_3DMapFix_Restored
+                  || _chkApp_Scaling.getSelection() != _isApp_Scaling_Restored
+                  || _spinnerAppScaling.getSelection() != _appScaling_Restored)) {
+
+         // fields are modified, ask for restart
+
+         isRestartNow = requestForRestart("App scaling was modified, a restart is required to see the modification");
+      }
+
+      /*
        * Selected theme
        */
-      if (_themeEngine != null) {
+      if (isRestartNow == false && _themeEngine != null) {
 
          final ITheme selectedTheme = getSelectedTheme();
          final boolean isThemeChanged = selectedTheme != null && !selectedTheme.equals(_currentTheme);
@@ -960,6 +1091,14 @@ public class PrefPageAppearance extends PreferencePage implements IWorkbenchPref
 
 // SET_FORMATTING_OFF
 
+      _isApp_3DMapFix_Restored   = Util.getStateBoolean(_state_UI, UI.APPEARANCE_IS_APP_3D_MAP_FIX,     UI.APPEARANCE_IS_APP_3D_MAP_FIX_DEFAULT);
+      _isApp_Scaling_Restored    = Util.getStateBoolean(_state_UI, UI.APPEARANCE_IS_APP_SCALING,        UI.APPEARANCE_IS_APP_SCALING_DEFAULT);
+      _appScaling_Restored       = Util.getStateInt(    _state_UI, UI.APPEARANCE_APP_SCALING_PERCENT,   UI.APPEARANCE_APP_SCALING_PERCENT_DEFAULT);
+
+      _chkApp_3DMapFix           .setSelection(_isApp_3DMapFix_Restored);
+      _chkApp_Scaling            .setSelection(_isApp_Scaling_Restored);
+      _spinnerAppScaling         .setSelection(_appScaling_Restored);
+
       final boolean isShowExtendedVersion = _prefStore_Common.getBoolean(ICommonPreferences.APPEARANCE_IS_SHOW_EXTENDED_VERSION_IN_APP_TITLE);
 
       _isShowInApp_MemoryMonitor = _prefStore_Common.getBoolean(ICommonPreferences.APPEARANCE_IS_SHOW_MEMORY_MONITOR_IN_APP);
@@ -990,11 +1129,11 @@ public class PrefPageAppearance extends PreferencePage implements IWorkbenchPref
 
    private void saveState() {
 
-      _prefStore.setValue(ITourbookPreferences.APPEARANCE_NUMBER_OF_RECENT_TAGS,    _spinnerRecentTags.getSelection());
+      _prefStore       .setValue(ITourbookPreferences.APPEARANCE_NUMBER_OF_RECENT_TAGS,    _spinnerRecentTags.getSelection());
 
-      _prefStore.setValue(ITourbookPreferences.APPEARANCE_IS_TAGGING_AUTO_OPEN,     _chkAutoOpenTagging.getSelection());
-      _prefStore.setValue(ITourbookPreferences.APPEARANCE_IS_TAGGING_ANIMATION,     _chkTaggingAnimation.getSelection());
-      _prefStore.setValue(ITourbookPreferences.APPEARANCE_TAGGING_AUTO_OPEN_DELAY,  _spinnerAutoOpenDelay.getSelection());
+      _prefStore       .setValue(ITourbookPreferences.APPEARANCE_IS_TAGGING_AUTO_OPEN,     _chkAutoOpenTagging.getSelection());
+      _prefStore       .setValue(ITourbookPreferences.APPEARANCE_IS_TAGGING_ANIMATION,     _chkTaggingAnimation.getSelection());
+      _prefStore       .setValue(ITourbookPreferences.APPEARANCE_TAGGING_AUTO_OPEN_DELAY,  _spinnerAutoOpenDelay.getSelection());
 
       _prefStore_Common.setValue(ICommonPreferences.APPEARANCE_IS_SHOW_EXTENDED_VERSION_IN_APP_TITLE, _chkShowInApp_ExtendedVersion          .getSelection());
       _prefStore_Common.setValue(ICommonPreferences.APPEARANCE_IS_SHOW_MEMORY_MONITOR_IN_APP,         _chkShowInApp_MemoryMonitor            .getSelection());
@@ -1002,6 +1141,10 @@ public class PrefPageAppearance extends PreferencePage implements IWorkbenchPref
       _prefStore_Common.setValue(ICommonPreferences.APPEARANCE_IS_SHOW_SCRAMBLE_DATA_ACTION_IN_APP,   _chkShowInApp_ScrambleData             .getSelection());
       _prefStore_Common.setValue(ICommonPreferences.APPEARANCE_NOTIFICATION_MESSAGES_DURATION,        _spinnerNotificationMessagesDuration   .getSelection());
       _prefStore_Common.setValue(ICommonPreferences.THEME_IS_SHOW_THEME_SELECTOR_IN_APP,              _chkShowInApp_ThemeSelector            .getSelection());
+
+      _state_UI.put(UI.APPEARANCE_IS_APP_3D_MAP_FIX,     _chkApp_3DMapFix     .getSelection());
+      _state_UI.put(UI.APPEARANCE_IS_APP_SCALING,        _chkApp_Scaling      .getSelection());
+      _state_UI.put(UI.APPEARANCE_APP_SCALING_PERCENT,   _spinnerAppScaling   .getSelection());
 
 // SET_FORMATTING_ON
    }
