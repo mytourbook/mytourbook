@@ -1,10 +1,5 @@
 26.next.0                                                 ?. February 2026
 
-TRANSLATION Texts
-
-* [Tour Chart] Replaced "Command_Tour_RestoreTour_Tooltip" with "Command_Tour_RestoreTour_Tooltip_2" because now a tour can be restored partly
-               c8391aa566909c8825b61307a6c4be559d5a9e7f
-
 
 TODO's
 ======
@@ -34,32 +29,18 @@ See milestone 26.? https://github.com/mytourbook/mytourbook/milestone/29?closed=
 New / Improvements
 ==================
 
-* Tour Chart
-  - Delete time slices, the tour chart is now a more functional tour editor with an undo/redo feature, before only e.g. tour markers could be modified
-  - With the key "o", move the other vertical slider to the same position as the selected vertical slider
-  
-* Tour Segmenter
-  - When the break time segmenter is selected, the tour chart displays the updated break times
-  
+*   
 
 Changes
 =======
 
-* Tour Chart
-  - Toggle active vertical slider with the keyboard is now "t", before it was the "Ctrl" key
-  
-
-* Tour Editor
-  - When only one time slice is selected in the tour editor, then the tour chart is positioning both vertical sliders at the same position, before there was a gap of 1 time slice
-  - Changed shortcut to revert all tour modifications from Ctrl-Z to Ctrl-R, Ctrl-Z is now the undo action in the tour chart
-  
+* 
     
 
 Bugfix
 ======
   
-* Tour Editor
-  - When time slices were deleted which contained tour markers, the other tour markers positions were wrong
+* 
 
 
 Translation    
