@@ -133,7 +133,7 @@ public abstract class ActionToolbarSlideout extends ContributionItem implements 
 
    private void dispose_Toolbar() {
 
-      if (_actionToolItem != null) {
+      if (_actionToolItem != null && _actionToolItem.isDisposed() == false) {
 
          // keep selected state that later on it can be retrieved
          _stateActionSelection = _actionToolItem.getSelection();
