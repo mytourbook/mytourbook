@@ -854,7 +854,6 @@ public class UI {
 
          System.setProperty("swt.autoScale", Integer.toString(appScaling)); //$NON-NLS-1$
          System.setProperty("swt.autoScale.updateOnRuntime", "false"); //$NON-NLS-1$ //$NON-NLS-2$
-
       }
 
       if (isApp3DMapFix) {

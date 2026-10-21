@@ -168,6 +168,10 @@
 
    <extension point="org.eclipse.ui.preferencePages">
 
+      <!--
+         General
+      -->
+      
       <page
          name     ="%preference_page_general"
          id       ="net.tourbook.preferences.PrefPageGeneralId"
@@ -190,6 +194,13 @@
                id="net.tourbook.keywordReference.PrefPageTour">
             </keywordReference>
          </page>
+   
+         <page 
+            name        ="%Pref_Page_System"
+            id          ="net.tourbook.preferences.PrefPageGeneral_System"
+            class       ="net.tourbook.preferences.PrefPageGeneral_System"
+            category    ="net.tourbook.preferences.PrefPageGeneralId"
+         />
    
          <page 
             name        ="%Pref_Page_Workspace"

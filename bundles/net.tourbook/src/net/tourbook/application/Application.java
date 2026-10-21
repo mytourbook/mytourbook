@@ -19,17 +19,21 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
+import java.io.StringReader;
 import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.Properties;
 
 import net.tourbook.Messages;
 import net.tourbook.common.UI;
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.Util;
+import net.tourbook.preferences.PrefPageGeneral_System;
 
 import org.eclipse.equinox.app.IApplication;
 import org.eclipse.equinox.app.IApplicationContext;
+import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
@@ -64,11 +68,48 @@ public class Application implements IApplication {
 
    static {
 
+      setSystemProperties();
+
+      IS_INSTANCE_CHECK = System.getProperty(SYS_PROP__NO_INSTANCE_CHECK) == null;
+
       if (IS_INSTANCE_CHECK == false) {
 
          Util.logSystemProperty_IsEnabled(UI.class,
                SYS_PROP__NO_INSTANCE_CHECK,
                "A 2nd instance of MyTourbook is NOT checked"); //$NON-NLS-1$
+      }
+   }
+
+   private static void setSystemProperties() {
+
+      final IDialogSettings state = PrefPageGeneral_System.getState();
+
+      final boolean isSetSystemProperties = Util.getStateBoolean(state,
+            PrefPageGeneral_System.STATE_IS_SET_SYSTEM_PROPERTIES,
+            PrefPageGeneral_System.STATE_IS_SET_SYSTEM_PROPERTIES_DEFAULT);
+
+      if (isSetSystemProperties == false) {
+         return;
+      }
+
+      final String propertyData = Util.getStateString(state, PrefPageGeneral_System.STATE_SYSTEM_PROPERTIES, UI.EMPTY_STRING);
+
+      try {
+
+         // 2. Load the string using a StringReader
+         final Properties newProperties = new Properties();
+         try (StringReader reader = new StringReader(propertyData)) {
+            newProperties.load(reader);
+         }
+
+         // 3. Merge system properties
+         System.getProperties().putAll(newProperties);
+
+      } catch (final IOException e) {
+
+         // StringReader doesn't throw actual disk I/O errors,
+         // but the compiler requires handling IOException for .load()
+         StatusUtil.log(e);
       }
    }
 

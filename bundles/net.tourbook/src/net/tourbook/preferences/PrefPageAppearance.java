@@ -223,7 +223,7 @@ public class PrefPageAppearance extends PreferencePage implements IWorkbenchPref
              * App zoom
              */
             {
-               UI.createLabel(group, "App scale");
+               UI.createLabel(group, "Scale");
 
                final SelectionListener scalingListener = SelectionListener.widgetSelectedAdapter(
                      selectionEvent -> onSelect_AppScaling());
@@ -234,7 +234,7 @@ public class PrefPageAppearance extends PreferencePage implements IWorkbenchPref
 //               containerAppScaling.setBackground(UI.SYS_COLOR_DARK_YELLOW);
                {
                   _chkApp_Scaling = new Button(containerAppScaling, SWT.CHECK);
-                  _chkApp_Scaling.setText("Set app sca&ling");
+                  _chkApp_Scaling.setText("App sca&ling");
                   _chkApp_Scaling.setToolTipText(
                         "This will set \"swt.autoScale...\" to overwrite\nthe default scaling which depends on the used monitor(s)");
                   _chkApp_Scaling.addSelectionListener(scalingListener);
@@ -263,7 +263,7 @@ public class PrefPageAppearance extends PreferencePage implements IWorkbenchPref
                   UI.createSpacer_Horizontal(group);
 
                   _chkApp_3DMapFix = new Button(group, SWT.CHECK);
-                  _chkApp_3DMapFix.setText("Fix 2.5D + &3D map viewport");
+                  _chkApp_3DMapFix.setText("Fix 2.5D + &3D map viewport clipping");
                   _chkApp_3DMapFix.setToolTipText(
                         "This will set \"sun.java2d.uiScale.enabled=false\",\notherwise only a part of the 2.5D or 3D map is displayed.\n\nThis issue was detected on 4k displays.");
                   _chkApp_3DMapFix.addSelectionListener(SelectionListener.widgetSelectedAdapter(
