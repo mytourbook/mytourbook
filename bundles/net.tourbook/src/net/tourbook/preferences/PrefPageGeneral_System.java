@@ -15,6 +15,7 @@
  *******************************************************************************/
 package net.tourbook.preferences;
 
+import net.tourbook.Messages;
 import net.tourbook.common.CommonActivator;
 import net.tourbook.common.UI;
 import net.tourbook.common.util.Util;
@@ -90,8 +91,9 @@ public class PrefPageGeneral_System extends PreferencePage implements IWorkbench
    private void createUI_SystemProperties(final Composite parent) {
 
       _chkSetProperties = new Button(parent, SWT.CHECK);
-      _chkSetProperties.setText("Set System.setProperty(...)");
-      _chkSetProperties.setToolTipText("This can be used for features\nwhich are enabled/disable with command line parameters");
+      _chkSetProperties.setText(Messages.Pref_System_Checkbox_SetSystemProperties);
+      _chkSetProperties.setToolTipText(
+            Messages.Pref_System_Checkbox_SetSystemProperties_Tooltip);
       _chkSetProperties.addSelectionListener(SelectionListener.widgetSelectedAdapter(selectionEvent -> enableControls()));
 
       _txtProperties = new Text(parent, SWT.BORDER | SWT.WRAP | SWT.MULTI | SWT.V_SCROLL | SWT.H_SCROLL);

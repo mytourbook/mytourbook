@@ -1901,6 +1901,10 @@ public class Messages extends NLS {
    public static String        Pref_Appearance_Button_RemoveRecentTags_Tooltip;
    public static String        Pref_Appearance_Button_ResetAllToggleDialogs;
    public static String        Pref_Appearance_Button_ResetAllToggleDialogs_Tooltip;
+   public static String        Pref_Appearance_Check_3DMapFix;
+   public static String        Pref_Appearance_Check_3DMapFix_Tooltip;
+   public static String        Pref_Appearance_Check_AppScaling;
+   public static String        Pref_Appearance_Check_AppScaling_Tooltip;
    public static String        Pref_Appearance_Check_AutoOpenTagging;
    public static String        Pref_Appearance_Check_RestartAppInAppToolbar;
    public static String        Pref_Appearance_Check_ShowAppVersionQualifierInAppTitle;
@@ -1909,6 +1913,7 @@ public class Messages extends NLS {
    public static String        Pref_Appearance_Check_TaggingAnimation;
    public static String        Pref_Appearance_Combo_ImageSize_Tooltip;
    public static String        Pref_Appearance_Combo_Theme_Tooltip;
+   public static String        Pref_Appearance_Decorator_AppScalingIsModified;
    public static String        Pref_Appearance_Dialog_ResetAllToggleDialogs_Message;
    public static String        Pref_Appearance_Dialog_ResetAllToggleDialogs_Title;
    public static String        Pref_Appearance_Dialog_RestartAfter_ChangeDisabledIcons_Message;
@@ -1933,6 +1938,7 @@ public class Messages extends NLS {
    public static String        Pref_Appearance_Label_NotificationMessagesDuration_Tooltip;
    public static String        Pref_Appearance_Label_PaceAndSpeed_ComputationOption;
    public static String        Pref_Appearance_Label_PaceAndSpeed_ComputationOption_Tooltip;
+   public static String        Pref_Appearance_Label_Scale;
    public static String        Pref_Appearance_Label_Theme;
    public static String        Pref_Appearance_Label_UIFont;
    public static String        Pref_Appearance_Label_UIFontExample;
@@ -2216,6 +2222,9 @@ public class Messages extends NLS {
    public static String        Pref_Statistic_Label_Info;
 
    public static String        Pref_Swimming_Label_Info;
+
+   public static String        Pref_System_Checkbox_SetSystemProperties;
+   public static String        Pref_System_Checkbox_SetSystemProperties_Tooltip;
 
    public static String        Pref_TourDb_Dialog_TourDbSystemIsModified_Message;
    public static String        Pref_TourDb_Dialog_TourDbSystemIsModified_Title;
@@ -3569,11 +3578,11 @@ public class Messages extends NLS {
 
    public static String        Tour_Chart_Label_ValuePoint_Title;
 
-   public static String Tour_Chart_Radio_CancelAndKeepChanges;
+   public static String        Tour_Chart_Radio_CancelAndKeepChanges;
 
-   public static String Tour_Chart_Radio_DiscardChanges;
+   public static String        Tour_Chart_Radio_DiscardChanges;
 
-   public static String Tour_Chart_Radio_SaveChanges;
+   public static String        Tour_Chart_Radio_SaveChanges;
 
    public static String        Tour_Compare_ViewName_ElevationComparedTour;
    public static String        Tour_Compare_ViewName_ElevationCompareTimeline;

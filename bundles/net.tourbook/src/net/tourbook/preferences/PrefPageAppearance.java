@@ -223,7 +223,7 @@ public class PrefPageAppearance extends PreferencePage implements IWorkbenchPref
              * App zoom
              */
             {
-               UI.createLabel(group, "Scale");
+               UI.createLabel(group, Messages.Pref_Appearance_Label_Scale);
 
                final SelectionListener scalingListener = SelectionListener.widgetSelectedAdapter(
                      selectionEvent -> onSelect_AppScaling());
@@ -234,9 +234,9 @@ public class PrefPageAppearance extends PreferencePage implements IWorkbenchPref
 //               containerAppScaling.setBackground(UI.SYS_COLOR_DARK_YELLOW);
                {
                   _chkApp_Scaling = new Button(containerAppScaling, SWT.CHECK);
-                  _chkApp_Scaling.setText("App sca&ling");
+                  _chkApp_Scaling.setText(Messages.Pref_Appearance_Check_AppScaling);
                   _chkApp_Scaling.setToolTipText(
-                        "This will set \"swt.autoScale...\" to overwrite\nthe default scaling which depends on the used monitor(s)");
+                        Messages.Pref_Appearance_Check_AppScaling_Tooltip);
                   _chkApp_Scaling.addSelectionListener(scalingListener);
 
                   _chkDecorator_AppScaling = new ControlDecoration(_chkApp_Scaling, SWT.TOP | SWT.LEFT);
@@ -263,9 +263,9 @@ public class PrefPageAppearance extends PreferencePage implements IWorkbenchPref
                   UI.createSpacer_Horizontal(group);
 
                   _chkApp_3DMapFix = new Button(group, SWT.CHECK);
-                  _chkApp_3DMapFix.setText("Fix 2.5D + &3D map viewport clipping");
+                  _chkApp_3DMapFix.setText(Messages.Pref_Appearance_Check_3DMapFix);
                   _chkApp_3DMapFix.setToolTipText(
-                        "This will set \"sun.java2d.uiScale.enabled=false\",\notherwise only a part of the 2.5D or 3D map is displayed.\n\nThis issue was detected on 4k displays.");
+                        Messages.Pref_Appearance_Check_3DMapFix_Tooltip);
                   _chkApp_3DMapFix.addSelectionListener(SelectionListener.widgetSelectedAdapter(
                         selectionEvent -> onSelect_App3DMapFix()));
 
@@ -726,7 +726,7 @@ public class PrefPageAppearance extends PreferencePage implements IWorkbenchPref
 
          // scaling is modified, a restart is required
 
-         _chkDecorator_3DMapFix.setDescriptionText("App scaling was modified, a restart is required to see the modification");
+         _chkDecorator_3DMapFix.setDescriptionText(Messages.Pref_Appearance_Decorator_AppScalingIsModified);
          _chkDecorator_3DMapFix.setImage(_decorationImage);
          _chkDecorator_3DMapFix.show();
       }
@@ -748,7 +748,7 @@ public class PrefPageAppearance extends PreferencePage implements IWorkbenchPref
 
          // scaling is modified, a restart is required
 
-         _chkDecorator_AppScaling.setDescriptionText("App scaling was modified, a restart is required to see the modification");
+         _chkDecorator_AppScaling.setDescriptionText(Messages.Pref_Appearance_Decorator_AppScalingIsModified);
          _chkDecorator_AppScaling.setImage(_decorationImage);
          _chkDecorator_AppScaling.show();
       }
@@ -944,7 +944,7 @@ public class PrefPageAppearance extends PreferencePage implements IWorkbenchPref
 
          // fields are modified, ask for restart
 
-         isRestartNow = requestForRestart("App scaling was modified, a restart is required to see the modification");
+         isRestartNow = requestForRestart(Messages.Pref_Appearance_Decorator_AppScalingIsModified);
       }
 
       /*
