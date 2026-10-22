@@ -7804,6 +7804,20 @@ public class ChartComponentGraph extends Canvas {
       }
    }
 
+   void moveLeftSlider_ToStart() {
+
+      final ChartXSlider leftSlider = getLeftSlider();
+      final long xxDevLeftPosition = 0;
+
+      setXSliderValue_FromHoveredValuePoint(leftSlider);
+      leftSlider.moveToXXDevPosition(xxDevLeftPosition, true, true, true, true);
+
+      setZoomInPosition();
+
+      _isSliderDirty = true;
+      redraw();
+   }
+
    /**
     * Move left slider to the mouse down position
     */
@@ -7814,6 +7828,20 @@ public class ChartComponentGraph extends Canvas {
 
       setXSliderValue_FromHoveredValuePoint(leftSlider);
       leftSlider.moveToXXDevPosition(xxDevLeftPosition, true, true);
+
+      setZoomInPosition();
+
+      _isSliderDirty = true;
+      redraw();
+   }
+
+   void moveRightSlider_ToEnd() {
+
+      final ChartXSlider rightSlider = getRightSlider();
+      final long xxDevRightPosition = _xxDevGraphWidth;
+
+      setXSliderValue_FromHoveredValuePoint(rightSlider);
+      rightSlider.moveToXXDevPosition(xxDevRightPosition, true, true, true, true);
 
       setZoomInPosition();
 

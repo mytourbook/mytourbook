@@ -19,6 +19,9 @@ New / Improvements
   - Delete time slices, the tour chart is now a more functional tour editor with an undo/redo feature, before only e.g. tour markers could be modified
     https://github.com/mytourbook/mytourbook/issues/1755
   - With the key "o", move the other vertical slider to the same position as the selected vertical slider
+  - New actions:
+    - Move the left slider to the tour start
+    - Move the right slider to the tour end
   
 * Tour Segmenter
   - Display elevation gain/loss values within break times
