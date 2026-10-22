@@ -2773,6 +2773,8 @@ public class TourManager {
       tourData.segmentSerieIndex2nd = null;
 
       removeTimeSlices_TourMarkers(tourData, firstIndex, lastIndex, isRemoveTime);
+
+      tourData.setTourEndAndElapsedTime();
    }
 
    private static double[] removeTimeSlices_Double(final double[] dataSerie,
