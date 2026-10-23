@@ -1532,7 +1532,7 @@ public class TourChartView extends ViewPart implements
          sliderLastIndexAfterAction = Math.min(sliderFirstIndexAfterAction + 1, _tourData.timeSerie.length - 1);
       }
 
-      undoRedo_UpdateChart(_tourData, sliderFirstIndexAfterAction, sliderLastIndexAfterAction, true, false);
+      undoRedo_UpdateChart(_tourData, sliderFirstIndexAfterAction, sliderLastIndexAfterAction, true);
    }
 
    void undoRedo_Redo(final TourData tourData_Cloned_WithRemovedTimeSliced,
@@ -1544,7 +1544,7 @@ public class TourChartView extends ViewPart implements
       final int sliderFirstIndexAfterAction = Math.max(0, sliderFirstIndex - 1);
       final int sliderLastIndexAfterAction = Math.min(sliderFirstIndexAfterAction + 1, _tourData.timeSerie.length - 1);
 
-      undoRedo_UpdateChart(_tourData, sliderFirstIndexAfterAction, sliderLastIndexAfterAction, true, false);
+      undoRedo_UpdateChart(_tourData, sliderFirstIndexAfterAction, sliderLastIndexAfterAction, true);
    }
 
    void undoRedo_Undo(final TourData tourData_Cloned_Before,
@@ -1563,12 +1563,14 @@ public class TourChartView extends ViewPart implements
           * undo history is empty -> all is undone -> tour is not dirty anymore
           */
 
+// disabled because save is disabled when all is undone but it can be redone and then it should be savable!!!
+// disabled do not work ?:(         
          isTourDirty = false;
       }
 
       _tourData.undoRedo_RevertTourData(tourData_Cloned_Before, sliderFirstIndex, sliderLastIndex);
 
-      undoRedo_UpdateChart(_tourData, sliderFirstIndex, sliderLastIndex, isTourDirty, true);
+      undoRedo_UpdateChart(_tourData, sliderFirstIndex, sliderLastIndex, isTourDirty);
    }
 
    /**
@@ -1578,13 +1580,11 @@ public class TourChartView extends ViewPart implements
     * @param sliderLastIndex
     *           Move last slider to this position
     * @param isTourDirty
-    * @param isUndo
     */
    private void undoRedo_UpdateChart(final TourData tourData,
                                      final int sliderFirstIndex,
                                      final int sliderLastIndex,
-                                     final boolean isTourDirty,
-                                     final boolean isUndo) {
+                                     final boolean isTourDirty) {
 
       // any undo/redo action should notify other views that the tour is modified
       _tourChart.setForceFireModify();
@@ -1597,7 +1597,8 @@ public class TourChartView extends ViewPart implements
       setSliderPositions(
             sliderFirstIndex,
             sliderLastIndex,
-            false);
+            false // isCenterSliderPosition
+      );
 
       // update undo/redo enablement
       getViewSite().getActionBars().updateActionBars();
