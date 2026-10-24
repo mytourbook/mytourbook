@@ -48,18 +48,18 @@ public class Messages extends NLS {
 
    public static String        Error_Message_001_Default;
 
-   public static String        Month_apr;
-   public static String        Month_aug;
-   public static String        Month_dec;
-   public static String        Month_feb;
-   public static String        Month_jan;
-   public static String        Month_jul;
-   public static String        Month_jun;
-   public static String        Month_may;
-   public static String        Month_mar;
-   public static String        Month_nov;
-   public static String        Month_oct;
-   public static String        Month_sep;
+   public static String        MonthName_Shortcut_04_Apr;
+   public static String        MonthName_Shortcut_08_Aug;
+   public static String        MonthName_Shortcut_12_Dec;
+   public static String        MonthName_Shortcut_02_Feb;
+   public static String        MonthName_Shortcut_01_Jan;
+   public static String        MonthName_Shortcut_07_Jul;
+   public static String        MonthName_Shortcut_06_Jun;
+   public static String        MonthName_Shortcut_05_May;
+   public static String        MonthName_Shortcut_03_Mar;
+   public static String        MonthName_Shortcut_11_Nov;
+   public static String        MonthName_Shortcut_10_Oct;
+   public static String        MonthName_Shortcut_09_Sep;
 
    static {
       // initialize resource bundle

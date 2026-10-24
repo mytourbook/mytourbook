@@ -89,18 +89,18 @@ public class ChartComponents extends Composite {
 
    private static final String[]    _monthLabels                = {
 
-         Messages.Month_jan,
-         Messages.Month_feb,
-         Messages.Month_mar,
-         Messages.Month_apr,
-         Messages.Month_may,
-         Messages.Month_jun,
-         Messages.Month_jul,
-         Messages.Month_aug,
-         Messages.Month_sep,
-         Messages.Month_oct,
-         Messages.Month_nov,
-         Messages.Month_dec
+         Messages.MonthName_Shortcut_01_Jan,
+         Messages.MonthName_Shortcut_02_Feb,
+         Messages.MonthName_Shortcut_03_Mar,
+         Messages.MonthName_Shortcut_04_Apr,
+         Messages.MonthName_Shortcut_05_May,
+         Messages.MonthName_Shortcut_06_Jun,
+         Messages.MonthName_Shortcut_07_Jul,
+         Messages.MonthName_Shortcut_08_Aug,
+         Messages.MonthName_Shortcut_09_Sep,
+         Messages.MonthName_Shortcut_10_Oct,
+         Messages.MonthName_Shortcut_11_Nov,
+         Messages.MonthName_Shortcut_12_Dec
    };
 
    private static final String[]    _monthShortLabels           = {
