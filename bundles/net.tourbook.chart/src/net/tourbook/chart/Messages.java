@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2024 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2026 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -26,6 +26,8 @@ public class Messages extends NLS {
    public static String        Action_mouse_mode_tooltip;
    public static String        Action_mouse_mode_zoom;
 
+   public static String        Action_Move_LeftSlider_ToStart;
+   public static String        Action_Move_RightSlider_ToEnd;
    public static String        Action_move_left_slider_here;
    public static String        Action_move_right_slider_here;
    public static String        Action_move_sliders_to_border;

@@ -25,8 +25,10 @@ public class ActionMoveRightSlider_ToEnd extends Action {
 
       _chart = chart;
 
-      setText("Move Right Slider to the Tour &End");
-	}
+      setText(Messages.Action_Move_RightSlider_ToEnd);
+
+      setImageDescriptor(ChartActivator.getThemedImageDescriptor(ChartImages.XSliderTo_End));
+   }
 
 	@Override
 	public void run() {

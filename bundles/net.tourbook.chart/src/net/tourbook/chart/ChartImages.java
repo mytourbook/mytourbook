@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2021, 2025 Wolfgang Schramm and Contributors
+ * Copyright (C) 2021, 2026 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -41,6 +41,9 @@ public class ChartImages {
    public static final String Zoom_FitToWindow              = "zoom-fit-to-window.svg";               //$NON-NLS-1$
    public static final String Zoom_In                       = "zoom-in.svg";                          //$NON-NLS-1$
    public static final String Zoom_Out                      = "zoom-out.svg";                         //$NON-NLS-1$
+
+   public static final String XSliderTo_Start               = "x-slider-to-start.svg";                //$NON-NLS-1$
+   public static final String XSliderTo_End                 = "x-slider-to-end.svg";                  //$NON-NLS-1$
 
    private ChartImages() {}
 }

@@ -25,7 +25,9 @@ public class ActionMoveLeftSlider_ToStart extends Action {
 
 		_chart = chart;
 
-      setText("Move Left Slider to the Tour S&tart");
+      setText(Messages.Action_Move_LeftSlider_ToStart);
+
+      setImageDescriptor(ChartActivator.getThemedImageDescriptor(ChartImages.XSliderTo_Start));
 	}
 
 	@Override

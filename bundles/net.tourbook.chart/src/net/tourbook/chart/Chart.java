@@ -484,8 +484,8 @@ public class Chart extends ViewForm {
             menuMgr.add(new Separator());
             menuMgr.add(_action_MouseWheelMode);
             menuMgr.add(_allChartActions.get(ACTION_ID_MOVE_LEFT_SLIDER_HERE));
-            menuMgr.add(_allChartActions.get(ACTION_ID_MOVE_LEFT_SLIDER_TO_START));
             menuMgr.add(_allChartActions.get(ACTION_ID_MOVE_RIGHT_SLIDER_HERE));
+            menuMgr.add(_allChartActions.get(ACTION_ID_MOVE_LEFT_SLIDER_TO_START));
             menuMgr.add(_allChartActions.get(ACTION_ID_MOVE_RIGHT_SLIDER_TO_END));
             menuMgr.add(_allChartActions.get(ACTION_ID_MOVE_SLIDERS_TO_BORDER));
             menuMgr.add(_allChartActions.get(ACTION_ID_ZOOM_IN_TO_SLIDER));
