@@ -1,5 +1,5 @@
 /*******************************************************************************
- *  Copyright (C) 2020 Frédéric Bard and Contributors
+ *  Copyright (C) 2020, 2026 Frédéric Bard and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -37,6 +37,6 @@ class ActionEditTimeSlicesValues extends Action {
 
    @Override
    public void run() {
-      _tourDataEditor.editTimeSlicesValues();
+      _tourDataEditor.actionEditTimeSlicesValues();
    }
 }

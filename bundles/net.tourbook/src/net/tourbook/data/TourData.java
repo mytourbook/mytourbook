@@ -14409,6 +14409,29 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
    }
 
    /**
+    * Set tour end and elapsed time from the time slices, it requires that the tour start time is
+    * already set
+    *
+    * @param tourData
+    */
+   public void setTourEndAndElapsedTime() {
+
+      if (timeSerie == null) {
+         return;
+      }
+
+      final int numSlices = timeSerie.length;
+
+      long elapsedTime = 0;
+
+      if (numSlices > 0) {
+         elapsedTime = timeSerie[numSlices - 1];
+      }
+
+      setTourDeviceTime_Elapsed(elapsedTime);
+   }
+
+   /**
     * @param tourEndPlace
     *           Set tour end location text
     */
@@ -15671,8 +15694,6 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
                                        final int firstIndex,
                                        final int lastIndex) {
 
-      setTourStartTime(clonedTourData.getTourStartTime());
-
 // SET_FORMATTING_OFF
 
       tourMarkers                   = undoRedo_RevertTourMarkers(clonedTourData, firstIndex, lastIndex);
@@ -15731,6 +15752,10 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
 
 // SET_FORMATTING_ON
 
+      setTourStartTime(clonedTourData.getTourStartTime());
+      setTourEndAndElapsedTime();
+
+      clearWorldPositions();
       clearComputedSeries();
    }
 
