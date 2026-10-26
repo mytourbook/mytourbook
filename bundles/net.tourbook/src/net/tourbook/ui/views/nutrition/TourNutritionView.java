@@ -15,9 +15,6 @@
  *******************************************************************************/
 package net.tourbook.ui.views.nutrition;
 
-import static org.eclipse.swt.events.KeyListener.keyPressedAdapter;
-import static org.eclipse.swt.events.SelectionListener.widgetSelectedAdapter;
-
 import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.List;
@@ -88,6 +85,7 @@ import org.eclipse.jface.viewers.ViewerComparator;
 import org.eclipse.jface.window.Window;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ControlListener;
+import org.eclipse.swt.events.KeyListener;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.Image;
@@ -185,39 +183,38 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
 
    private final RangeContent              _quantityRange                    = new RangeContent(0.25, 10.0, 0.25, 100);
 
-   private Image                           _imageAdd                         = TourbookPlugin.getThemedImageDescriptor(Images.App_Add).createImage();
-   private Image                           _imageSearch                      = TourbookPlugin.getImageDescriptor(Images.SearchTours).createImage();
+// SET_FORMATTING_OFF
+   private Image                    _imageAdd         = TourbookPlugin.getThemedImageDescriptor(Images.App_Add)   .createImage();
+   private Image                    _imageSearch      = TourbookPlugin.getImageDescriptor(Images.SearchTours)     .createImage();
+   private Image                    _imageCheck       = TourbookPlugin.getImageDescriptor(Images.Checkbox_Checked).createImage();
+   private Image                    _imageUncheck     = TourbookPlugin.getImageDescriptor(Images.Checkbox_Uncheck).createImage();
+   private Image                    _imageYes         = CommonActivator.getImageDescriptor(CommonImages.App_Yes)  .createImage();
+// SET_FORMATTING_ON
 
-   private Image                           _imageCheck                       = TourbookPlugin.getImageDescriptor(Images.Checkbox_Checked)
-         .createImage();
-   private Image                           _imageUncheck                     = TourbookPlugin.getImageDescriptor(Images.Checkbox_Uncheck)
-         .createImage();
-   private Image                           _imageYes                         = CommonActivator.getImageDescriptor(CommonImages.App_Yes).createImage();
+   private PageBook                  _pageBook;
+   private Composite                 _pageNoData;
+   private Composite                 _pageContent;
+   private Composite                 _viewerContainer;
 
-   private PageBook                        _pageBook;
-   private Composite                       _pageNoData;
-   private Composite                       _pageContent;
-   private Composite                       _viewerContainer;
+   private boolean                   _isInUpdate;
+   private Label                     _lblCalories_Average;
+   private Label                     _lblCalories_Total;
+   private Label                     _lblCarbohydrates_Average;
+   private Label                     _lblCarbohydrates_Total;
+   private Label                     _lblFluid_Average;
+   private Label                     _lblFluid_Total;
+   private Label                     _lblSodium_Average;
+   private Label                     _lblSodium_Total;
+   private Section                   _sectionProductsList;
+   private Section                   _sectionSummary;
+   private FormToolkit               _tk;
+   private Menu                      _tableContextMenu;
 
-   private boolean                         _isInUpdate;
-   private Label                           _lblCalories_Average;
-   private Label                           _lblCalories_Total;
-   private Label                           _lblCarbohydrates_Average;
-   private Label                           _lblCarbohydrates_Total;
-   private Label                           _lblFluid_Average;
-   private Label                           _lblFluid_Total;
-   private Label                           _lblSodium_Average;
-   private Label                           _lblSodium_Total;
-   private Section                         _sectionProductsList;
-   private Section                         _sectionSummary;
-   private FormToolkit                     _tk;
-   private Menu                            _tableContextMenu;
-
-   private ActionDeleteProducts            _actionDeleteProducts;
-   private ActionEditCustomProduct         _actionEditCustomProduct;
-   private ActionOpenProductsWebsite       _actionOpenProductsWebsite;
-   private Action                          _actionTitle_RecentTourNutritionProducts;
-   private ActionUpdateProduct             _actionUpdateProduct;
+   private ActionDeleteProducts      _actionDeleteProducts;
+   private ActionEditCustomProduct   _actionEditCustomProduct;
+   private ActionOpenProductsWebsite _actionOpenProductsWebsite;
+   private Action                    _actionTitle_RecentTourNutritionProducts;
+   private ActionUpdateProduct       _actionUpdateProduct;
 
    private class ActionDeleteProducts extends Action {
 
@@ -869,12 +866,11 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
          final Button btnSearchProduct = new Button(container, SWT.NONE);
          btnSearchProduct.setText(Messages.Tour_Nutrition_Button_SearchProduct);
          btnSearchProduct.setToolTipText(Messages.Tour_Nutrition_Button_SearchProduct_Tooltip);
-         btnSearchProduct.addSelectionListener(
-               widgetSelectedAdapter(
-                     selectionEvent -> new DialogSearchProduct(
-                           Display.getCurrent().getActiveShell(),
-                           _tourData.getTourId(),
-                           _tourNutritionProductMenuManager).open()));
+         btnSearchProduct.addSelectionListener(SelectionListener.widgetSelectedAdapter(
+               selectionEvent -> new DialogSearchProduct(
+                     Display.getCurrent().getActiveShell(),
+                     _tourData.getTourId(),
+                     _tourNutritionProductMenuManager).open()));
          btnSearchProduct.setImage(_imageSearch);
          GridDataFactory.fillDefaults().align(SWT.BEGINNING, SWT.CENTER).applyTo(btnSearchProduct);
 
@@ -884,7 +880,10 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
          final Button btnAddCustomProduct = new Button(container, SWT.NONE);
          btnAddCustomProduct.setText(Messages.Tour_Nutrition_Button_AddCustomProduct);
          btnAddCustomProduct.setToolTipText(Messages.Tour_Nutrition_Button_AddCustomProduct_Tooltip);
-         btnAddCustomProduct.addSelectionListener(widgetSelectedAdapter(selectionEvent -> createOrEditCustomTourNutritionProduct(false, null)));
+         btnAddCustomProduct.addSelectionListener(SelectionListener.widgetSelectedAdapter(
+               selectionEvent -> createOrEditCustomTourNutritionProduct(
+                     false,
+                     null)));
          btnAddCustomProduct.setImage(_imageAdd);
          GridDataFactory.fillDefaults().align(SWT.BEGINNING, SWT.CENTER).applyTo(btnAddCustomProduct);
       }
@@ -921,12 +920,12 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
 
          if (event.type == SWT.MouseDoubleClick) {
 
-            onOpenProductsWebsite();
+            onDoubleClickProduct();
          }
       };
       _productsViewer.getTable().addListener(SWT.MouseDoubleClick, doubleClickListener);
 
-      _productsViewer.getTable().addKeyListener(keyPressedAdapter(keyEvent -> {
+      _productsViewer.getTable().addKeyListener(KeyListener.keyPressedAdapter(keyEvent -> {
 
          if (keyEvent.keyCode == SWT.DEL) {
             onDeleteProducts();
@@ -1448,7 +1447,7 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
 
       _pc = new PixelConverter(parent);
 
-      _columnSortListener = widgetSelectedAdapter(selectionEvent -> onSelect_SortColumn(selectionEvent));
+      _columnSortListener = SelectionListener.widgetSelectedAdapter(selectionEvent -> onSelect_SortColumn(selectionEvent));
    }
 
    private void onDeleteProducts() {
@@ -1465,6 +1464,31 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
 
       _tourData.setTourNutritionProducts(tourNutritionProducts);
       _tourData = TourManager.saveModifiedTour(_tourData);
+   }
+
+   private void onDoubleClickProduct() {
+
+      final List<String> allSelectedProductsCodes = getSelectedProductsCodes();
+
+      final boolean areSelectedProductsFromDatabase = allSelectedProductsCodes.size() > 0;
+      if (areSelectedProductsFromDatabase) {
+
+         // open food product
+
+         onOpenProductsWebsite();
+
+      } else {
+
+         // custom product
+
+         final List<TourNutritionProduct> allSelectedTourNutritionProducts = getSelectedProducts();
+         final boolean isOneCustomProduct = allSelectedTourNutritionProducts.size() == 1
+               && allSelectedTourNutritionProducts.stream().anyMatch(TourNutritionProduct::isCustomProduct);
+
+         if (isOneCustomProduct) {
+            onEditCustomProduct();
+         }
+      }
    }
 
    private void onEditCustomProduct() {
