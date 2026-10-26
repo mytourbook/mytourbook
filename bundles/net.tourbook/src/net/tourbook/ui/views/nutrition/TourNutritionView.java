@@ -91,7 +91,6 @@ import org.eclipse.swt.events.ControlListener;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.Image;
-import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
@@ -921,12 +920,6 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
       final Listener doubleClickListener = event -> {
 
          if (event.type == SWT.MouseDoubleClick) {
-
-            final Point point = new Point(event.x, event.y);
-            final ViewerCell cell = _productsViewer.getCell(point);
-            if (cell == null || cell.getColumnIndex() != 2) {
-               return;
-            }
 
             onOpenProductsWebsite();
          }
