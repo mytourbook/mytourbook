@@ -15612,15 +15612,16 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
    /**
     * This is needed for the undo/redo feature
     */
-   public TourData undoRedo_CloneData() {
+   public TourData undoRedo_Clone_TourData() {
 
       final TourData clonedTourData = new TourData();
 
       clonedTourData.setTourStartTime(getTourStartTime());
+      clonedTourData.setTourDistance(getTourDistance());
 
 // SET_FORMATTING_OFF
 
-      clonedTourData.tourMarkers                   = undoRedo_CloneTourMarkers();
+      clonedTourData.tourMarkers                   = undoRedo_Clone_TourMarkers();
 
       // clone value series
 
@@ -15679,7 +15680,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
       return clonedTourData;
    }
 
-   private Set<TourMarker> undoRedo_CloneTourMarkers() {
+   private Set<TourMarker> undoRedo_Clone_TourMarkers() {
 
       final Set<TourMarker> allClonedTourMarkers = new HashSet<>();
 
@@ -15690,11 +15691,11 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
       return allClonedTourMarkers;
    }
 
-   public void undoRedo_RevertTourData(final TourData clonedTourData) {
+   public void undoRedo_Revert_TourData(final TourData clonedTourData) {
 
 // SET_FORMATTING_OFF
 
-      tourMarkers                   = undoRedo_RevertTourMarkers(clonedTourData);
+      tourMarkers                   = undoRedo_Revert_TourMarkers(clonedTourData);
 
       // clone value series
 
@@ -15752,12 +15753,13 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
 
       setTourStartTime(clonedTourData.getTourStartTime());
       setTourEndAndElapsedTime();
+      setTourDistance(clonedTourData.getTourDistance());
 
       clearWorldPositions();
       clearComputedSeries();
    }
 
-   private Set<TourMarker> undoRedo_RevertTourMarkers(final TourData clonedTourData) {
+   private Set<TourMarker> undoRedo_Revert_TourMarkers(final TourData clonedTourData) {
 
       final Set<TourMarker> allTourMarkers = new HashSet<>();
 

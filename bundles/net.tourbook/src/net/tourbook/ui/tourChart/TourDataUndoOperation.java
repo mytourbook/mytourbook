@@ -28,8 +28,8 @@ public class TourDataUndoOperation extends AbstractOperation {
 
    private TourChartView _tourChartView;
 
-   private TourData      _tourData_Cloned_WithRemovedTimeSliced;
-   private TourData      _tourData_Cloned_Before;
+   private TourData      _tourData_Cloned_BeforeModified;
+   private TourData      _tourData_Cloned_AfterModified;
 
    /**
     * <code>-1</code> will do not set the slider position
@@ -41,39 +41,39 @@ public class TourDataUndoOperation extends AbstractOperation {
     * @param label
     *           This label will show in the menu (e.g., "Undo Modify Name")
     * @param tourChartView
-    * @param tourData_Cloned_Before
-    * @param tourData_Cloned_WithRemovedTimeSliced
+    * @param tourData_Cloned_BeforeModified
+    * @param tourData_Cloned_AfterModified
     * @param sliderFirstIndex
     * @param sliderLastIndex
     */
    public TourDataUndoOperation(final String label,
                                 final TourChartView tourChartView,
 
-                                final TourData tourData_Cloned_Before,
-                                final TourData tourData_Cloned_WithRemovedTimeSliced) {
+                                final TourData tourData_Cloned_BeforeModified,
+                                final TourData tourData_Cloned_AfterModified) {
 
       super(label);
 
       _tourChartView = tourChartView;
 
-      _tourData_Cloned_Before = tourData_Cloned_Before;
-      _tourData_Cloned_WithRemovedTimeSliced = tourData_Cloned_WithRemovedTimeSliced;
+      _tourData_Cloned_BeforeModified = tourData_Cloned_BeforeModified;
+      _tourData_Cloned_AfterModified = tourData_Cloned_AfterModified;
    }
 
    /**
     * @param label
     *           This label will show in the menu (e.g., "Undo Modify Name")
     * @param tourChartView
-    * @param tourData_Cloned_Before
-    * @param tourData_Cloned_WithRemovedTimeSliced
+    * @param tourData_Cloned_BeforeModified
+    * @param tourData_Cloned_AfterModified
     * @param sliderFirstIndex
     * @param sliderLastIndex
     */
    public TourDataUndoOperation(final String label,
                                 final TourChartView tourChartView,
 
-                                final TourData tourData_Cloned_Before,
-                                final TourData tourData_Cloned_WithRemovedTimeSliced,
+                                final TourData tourData_Cloned_BeforeModified,
+                                final TourData tourData_Cloned_AfterModified,
 
                                 final int sliderFirstIndex,
                                 final int sliderLastIndex) {
@@ -82,8 +82,8 @@ public class TourDataUndoOperation extends AbstractOperation {
 
       _tourChartView = tourChartView;
 
-      _tourData_Cloned_Before = tourData_Cloned_Before;
-      _tourData_Cloned_WithRemovedTimeSliced = tourData_Cloned_WithRemovedTimeSliced;
+      _tourData_Cloned_BeforeModified = tourData_Cloned_BeforeModified;
+      _tourData_Cloned_AfterModified = tourData_Cloned_AfterModified;
 
       _sliderFirstIndex = sliderFirstIndex;
       _sliderLastIndex = sliderLastIndex;
@@ -108,7 +108,7 @@ public class TourDataUndoOperation extends AbstractOperation {
    @Override
    public IStatus redo(final IProgressMonitor monitor, final IAdaptable info) throws ExecutionException {
 
-      _tourChartView.undoRedo_Redo(_tourData_Cloned_WithRemovedTimeSliced, _sliderFirstIndex, _sliderLastIndex);
+      _tourChartView.undoRedo_Redo(_tourData_Cloned_AfterModified, _sliderFirstIndex, _sliderLastIndex);
 
       return Status.OK_STATUS;
    }
@@ -116,7 +116,7 @@ public class TourDataUndoOperation extends AbstractOperation {
    @Override
    public IStatus undo(final IProgressMonitor monitor, final IAdaptable info) throws ExecutionException {
 
-      _tourChartView.undoRedo_Undo(_tourData_Cloned_Before, _sliderFirstIndex, _sliderLastIndex);
+      _tourChartView.undoRedo_Undo(_tourData_Cloned_BeforeModified, _sliderFirstIndex, _sliderLastIndex);
 
       return Status.OK_STATUS;
    }

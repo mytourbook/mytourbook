@@ -328,9 +328,9 @@ public class TourChartContextProvider implements IChartContextProvider, ITourPro
 
       menuMgr.add(new Separator());
       menuMgr.add(_actionOpenMarkerDialog);
-      menuMgr.add(_actionSetGeoPositionFromHereToStart);
 
       menuMgr.add(new Separator());
+      menuMgr.add(_actionSetGeoPositionFromHereToStart);
       menuMgr.add(_actionDeleteTimeSlices_RemoveTime);
       menuMgr.add(_actionDeleteTimeSlices_KeepTime);
       menuMgr.add(_actionDeleteTimeSlices_KeepTimeAndDistance);

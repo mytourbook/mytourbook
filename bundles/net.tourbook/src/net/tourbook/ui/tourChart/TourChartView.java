@@ -1580,7 +1580,7 @@ public class TourChartView extends ViewPart implements
                       final int sliderFirstIndex,
                       final int sliderLastIndex) {
 
-      _tourData.undoRedo_RevertTourData(tourData_Cloned_WithRemovedTimeSliced);
+      _tourData.undoRedo_Revert_TourData(tourData_Cloned_WithRemovedTimeSliced);
 
       int sliderFirstIndexAfterAction = -1;
       int sliderLastIndexAfterAction = -1;
@@ -1615,7 +1615,7 @@ public class TourChartView extends ViewPart implements
          isTourDirty = false;
       }
 
-      _tourData.undoRedo_RevertTourData(tourData_Cloned_Before);
+      _tourData.undoRedo_Revert_TourData(tourData_Cloned_Before);
 
       undoRedo_UpdateChart(_tourData, sliderFirstIndex, sliderLastIndex, isTourDirty);
    }
