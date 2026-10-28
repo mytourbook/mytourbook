@@ -16,12 +16,14 @@ New / Improvements
 ==================
 
 * Tour Chart
-  - Delete time slices, the tour chart is now a more functional tour editor with an undo/redo feature, before only e.g. tour markers could be modified
+  - Delete time slices, the tour chart is now a more functional tour editor with an undo/redo feature, before, only e.g. tour markers could be modified
     https://github.com/mytourbook/mytourbook/issues/1755
   - With the key "o", move the other vertical slider to the same position as the selected vertical slider
-  - New actions:
+  - Other new actions:
     - Move the left slider to the tour start
     - Move the right slider to the tour end
+    - Set the geo position from the selected time slice into all previous time sliced (until the tour start), this also supports the undo/redo feature
+      https://github.com/mytourbook/mytourbook/issues/1777
   
 * Tour Segmenter
   - Display elevation gain/loss values within break times
@@ -34,7 +36,7 @@ Changes
 
 * -vmargs
   - Command line parameters with -vmargs can cause this issue https://github.com/mytourbook/mytourbook/issues/1773 or similar issues.
-    This is fixed by these new features https://github.com/mytourbook/mytourbook/issues/1773#issuecomment-6310876191
+    This is fixed with these new features https://github.com/mytourbook/mytourbook/issues/1773#issuecomment-6310876191
 
 * Tour Chart
   - Toggle active vertical slider with the keyboard is now "t", before it was the "Ctrl" key

@@ -620,6 +620,8 @@ public class TourChartView extends ViewPart implements
    }
 
    /**
+    * Disposes the undo history
+    *
     * @return Returns the first undo operation which can be used to retrieve the first slider
     *         positions
     */
@@ -674,6 +676,15 @@ public class TourChartView extends ViewPart implements
 
    @Override
    public void doSave(final IProgressMonitor monitor) {
+
+      /**
+       * There can be issues when a tour is saved and the undo history is not clean which allows to
+       * undo changes. So we dispose the undo when a tour is saved.
+       * <p>
+       * IMPORTANT: The dispose must be called BEFORE tour is set to not dirty, that the undo
+       * actions are hidden
+       */
+      disposeUndo();
 
       _tourChart.setTourDirty(false);
 
@@ -1389,6 +1400,91 @@ public class TourChartView extends ViewPart implements
       }
    }
 
+   private void undoRedo_Action_Execute(final TourDataUndoOperation undoOperation) {
+
+      // Assign the context scope
+      undoOperation.addContext(_undoContext);
+
+      try {
+
+         // Execute via the history framework
+         final IOperationHistory opHistory = PlatformUI.getWorkbench().getOperationSupport().getOperationHistory();
+
+         /*
+          * Increase undo limit, the default is 20.
+          * .
+          * Setting this limit in setupUndoContext() did not work !!!
+          */
+         final int undoLimitRequested = 100;
+         final int undoLimit = opHistory.getLimit(_undoContext);
+
+         if (undoLimit != undoLimitRequested) {
+
+            opHistory.setLimit(_undoContext, undoLimitRequested);
+         }
+
+         // this will call undoRedo_Execute()
+         opHistory.execute(undoOperation, null, null);
+
+      } catch (final ExecutionException e) {
+
+         StatusUtil.log(e);
+      }
+   }
+
+   /**
+    * @param tourData_Cloned_Before
+    * @param tourData_Cloned_WithRemovedTimeSliced
+    * @param sliderFirstIndex
+    * @param sliderLastIndex
+    */
+   void undoRedo_ActionDeleteTimeSlice(final TourData tourData_Cloned_Before,
+                                       final TourData tourData_Cloned_WithRemovedTimeSliced,
+                                       final int sliderFirstIndex,
+                                       final int sliderLastIndex) {
+
+      // Inside an action listener or command handler
+
+      final String opLabel = Messages.Tour_Chart_Info_UndoOperation.formatted(
+
+            ++_undoCounter,
+            sliderLastIndex - sliderFirstIndex + 1);
+
+      final TourDataUndoOperation undoOperation = new TourDataUndoOperation(
+
+            opLabel,
+
+            this,
+
+            tourData_Cloned_Before, // old
+            tourData_Cloned_WithRemovedTimeSliced, // new
+
+            sliderFirstIndex,
+            sliderLastIndex);
+
+      undoRedo_Action_Execute(undoOperation);
+   }
+
+   void undoRedo_ActionSetGeoPositionToAllPrevious(final TourData tourData_Cloned_Before,
+                                                   final TourData tourData_Cloned_WithRemovedTimeSliced) {
+
+      // Inside an action listener or command handler
+
+      final String opLabel = "%d: Set geo position into time slices".formatted(++_undoCounter);
+
+      final TourDataUndoOperation undoOperation = new TourDataUndoOperation(
+
+            opLabel,
+
+            this,
+
+            tourData_Cloned_Before, // old
+            tourData_Cloned_WithRemovedTimeSliced // new
+      );
+
+      undoRedo_Action_Execute(undoOperation);
+   }
+
    /**
     * @param tourData
     *
@@ -1454,82 +1550,27 @@ public class TourChartView extends ViewPart implements
       return false;
    }
 
-   /**
-    * @param tourData_Cloned_Before
-    * @param tourData_Cloned_WithRemovedTimeSliced
-    * @param sliderFirstIndex
-    * @param sliderLastIndex
-    */
-   void undoRedo_DeleteTimeSlice(final TourData tourData_Cloned_Before,
-                                 final TourData tourData_Cloned_WithRemovedTimeSliced,
-                                 final int sliderFirstIndex,
-                                 final int sliderLastIndex) {
-
-      // Inside an action listener or command handler
-
-      final String opLabel = Messages.Tour_Chart_Info_UndoOperation.formatted(
-
-            ++_undoCounter,
-            sliderLastIndex - sliderFirstIndex + 1);
-
-      final TourDataUndoOperation undoOperation = new TourDataUndoOperation(
-
-            opLabel,
-
-            this,
-
-            tourData_Cloned_Before, // old
-            tourData_Cloned_WithRemovedTimeSliced, // new
-
-            sliderFirstIndex,
-            sliderLastIndex);
-
-      // Assign the context scope
-      undoOperation.addContext(_undoContext);
-
-      try {
-
-         // Execute via the history framework
-         final IOperationHistory opHistory = PlatformUI.getWorkbench().getOperationSupport().getOperationHistory();
-
-         /*
-          * Increase undo limit, the default is 20.
-          * .
-          * Setting this limit in setupUndoContext() did not work !!!
-          */
-         final int undoLimitRequested = 100;
-         final int undoLimit = opHistory.getLimit(_undoContext);
-
-         if (undoLimit != undoLimitRequested) {
-
-            opHistory.setLimit(_undoContext, undoLimitRequested);
-         }
-
-         // this will call undoRedo_Execute()
-         opHistory.execute(undoOperation, null, null);
-
-      } catch (final ExecutionException e) {
-
-         StatusUtil.log(e);
-      }
-   }
-
    void undoRedo_Execute(final int sliderFirstIndex, final int sliderLastIndex) {
 
-      final boolean isOneSlide = sliderFirstIndex == sliderLastIndex;
+      int sliderFirstIndexAfterAction = -1;
+      int sliderLastIndexAfterAction = -1;
 
-      int sliderFirstIndexAfterAction = sliderFirstIndex;
-      int sliderLastIndexAfterAction;
+      if (sliderFirstIndex >= 0 && sliderLastIndex >= 0) {
 
-      if (isOneSlide) {
+         final boolean isOneSlide = sliderFirstIndex == sliderLastIndex;
 
-         sliderFirstIndexAfterAction = Math.min(sliderFirstIndexAfterAction, _tourData.timeSerie.length - 1);
-         sliderLastIndexAfterAction = sliderFirstIndexAfterAction;
+         sliderFirstIndexAfterAction = sliderFirstIndex;
 
-      } else {
+         if (isOneSlide) {
 
-         sliderFirstIndexAfterAction = Math.max(0, sliderFirstIndex - 1);
-         sliderLastIndexAfterAction = Math.min(sliderFirstIndexAfterAction + 1, _tourData.timeSerie.length - 1);
+            sliderFirstIndexAfterAction = Math.min(sliderFirstIndexAfterAction, _tourData.timeSerie.length - 1);
+            sliderLastIndexAfterAction = sliderFirstIndexAfterAction;
+
+         } else {
+
+            sliderFirstIndexAfterAction = Math.max(0, sliderFirstIndex - 1);
+            sliderLastIndexAfterAction = Math.min(sliderFirstIndexAfterAction + 1, _tourData.timeSerie.length - 1);
+         }
       }
 
       undoRedo_UpdateChart(_tourData, sliderFirstIndexAfterAction, sliderLastIndexAfterAction, true);
@@ -1539,10 +1580,16 @@ public class TourChartView extends ViewPart implements
                       final int sliderFirstIndex,
                       final int sliderLastIndex) {
 
-      _tourData.undoRedo_RevertTourData(tourData_Cloned_WithRemovedTimeSliced, sliderFirstIndex, sliderLastIndex);
+      _tourData.undoRedo_RevertTourData(tourData_Cloned_WithRemovedTimeSliced);
 
-      final int sliderFirstIndexAfterAction = Math.max(0, sliderFirstIndex - 1);
-      final int sliderLastIndexAfterAction = Math.min(sliderFirstIndexAfterAction + 1, _tourData.timeSerie.length - 1);
+      int sliderFirstIndexAfterAction = -1;
+      int sliderLastIndexAfterAction = -1;
+
+      if (sliderFirstIndex >= 0 && sliderLastIndex >= 0) {
+
+         sliderFirstIndexAfterAction = Math.max(0, sliderFirstIndex - 1);
+         sliderLastIndexAfterAction = Math.min(sliderFirstIndexAfterAction + 1, _tourData.timeSerie.length - 1);
+      }
 
       undoRedo_UpdateChart(_tourData, sliderFirstIndexAfterAction, sliderLastIndexAfterAction, true);
    }
@@ -1564,11 +1611,11 @@ public class TourChartView extends ViewPart implements
           */
 
 // disabled because save is disabled when all is undone but it can be redone and then it should be savable!!!
-// disabled do not work ?:(         
+// disabled do not work ?:(
          isTourDirty = false;
       }
 
-      _tourData.undoRedo_RevertTourData(tourData_Cloned_Before, sliderFirstIndex, sliderLastIndex);
+      _tourData.undoRedo_RevertTourData(tourData_Cloned_Before);
 
       undoRedo_UpdateChart(_tourData, sliderFirstIndex, sliderLastIndex, isTourDirty);
    }
@@ -1594,11 +1641,14 @@ public class TourChartView extends ViewPart implements
             true, // isKeepMinMaxValues
             isTourDirty);
 
-      setSliderPositions(
-            sliderFirstIndex,
-            sliderLastIndex,
-            false // isCenterSliderPosition
-      );
+      if (sliderFirstIndex >= 0 && sliderLastIndex >= 0) {
+
+         setSliderPositions(
+               sliderFirstIndex,
+               sliderLastIndex,
+               false // isCenterSliderPosition
+         );
+      }
 
       // update undo/redo enablement
       getViewSite().getActionBars().updateActionBars();

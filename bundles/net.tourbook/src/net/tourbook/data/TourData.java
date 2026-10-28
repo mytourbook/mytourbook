@@ -15690,13 +15690,11 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
       return allClonedTourMarkers;
    }
 
-   public void undoRedo_RevertTourData(final TourData clonedTourData,
-                                       final int firstIndex,
-                                       final int lastIndex) {
+   public void undoRedo_RevertTourData(final TourData clonedTourData) {
 
 // SET_FORMATTING_OFF
 
-      tourMarkers                   = undoRedo_RevertTourMarkers(clonedTourData, firstIndex, lastIndex);
+      tourMarkers                   = undoRedo_RevertTourMarkers(clonedTourData);
 
       // clone value series
 
@@ -15759,9 +15757,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
       clearComputedSeries();
    }
 
-   private Set<TourMarker> undoRedo_RevertTourMarkers(final TourData clonedTourData,
-                                                      final int firstIndex,
-                                                      final int lastIndex) {
+   private Set<TourMarker> undoRedo_RevertTourMarkers(final TourData clonedTourData) {
 
       final Set<TourMarker> allTourMarkers = new HashSet<>();
 

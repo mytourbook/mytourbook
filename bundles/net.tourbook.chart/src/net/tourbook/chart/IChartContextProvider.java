@@ -1,14 +1,14 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2011  Wolfgang Schramm and Contributors
- * 
+ * Copyright (C) 2005, 2026 Wolfgang Schramm and Contributors
+ *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
  * Foundation version 2 of the License.
- * 
+ *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License along with
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
@@ -24,73 +24,74 @@ import org.eclipse.swt.widgets.Control;
  */
 public interface IChartContextProvider {
 
-	/**
-	 * Will be called when the context menu in a bar chart will be opened
-	 * 
-	 * @param hoveredBarSerieIndex
-	 *            contains the serie index for the hovered bar,<br>
-	 *            or <code>-1</code> when a bar is not hovered
-	 * @param hoveredBarValueIndex
-	 * @param chartWidget
-	 */
-	public void fillBarChartContextMenu(IMenuManager menuMgr, int hoveredBarSerieIndex, int hoveredBarValueIndex);;
+   /**
+    * Will be called when the context menu in a bar chart will be opened
+    *
+    * @param hoveredBarSerieIndex
+    *           contains the serie index for the hovered bar,<br>
+    *           or <code>-1</code> when a bar is not hovered
+    * @param hoveredBarValueIndex
+    * @param chartWidget
+    */
+   public void fillBarChartContextMenu(IMenuManager menuMgr, int hoveredBarSerieIndex, int hoveredBarValueIndex);
 
-	/**
-	 * Fills the context menu for the chart
-	 * 
-	 * @param menuMgr
-	 * @param mouseDownDevPositionY
-	 * @param mouseDownDevPositionX
-	 */
-	public void fillContextMenu(IMenuManager menuMgr, int mouseDownDevPositionX, int mouseDownDevPositionY);
+   /**
+    * Fills the context menu for the chart
+    *
+    * @param menuMgr
+    * @param mouseDownDevPositionY
+    * @param mouseDownDevPositionX
+    */
+   public void fillContextMenu(IMenuManager menuMgr, int mouseDownDevPositionX, int mouseDownDevPositionY);
 
-	/**
-	 * Fills the context menu for the chart slider
-	 * 
-	 * @param menuMgr
-	 * @param leftSlider
-	 * @param rightSlider
-	 * @return
-	 */
-	public void fillXSliderContextMenu(IMenuManager menuMgr, ChartXSlider leftSlider, ChartXSlider rightSlider);
+   /**
+    * Fills the context menu for the chart slider
+    *
+    * @param menuMgr
+    * @param slider1
+    * @param slider2
+    *
+    * @return
+    */
+   public void fillXSliderContextMenu(IMenuManager menuMgr, ChartXSlider slider1, ChartXSlider slider2);
 
-	/**
-	 * @return Returns the chart where the context menu is created
-	 */
-	public Chart getChart();
+   /**
+    * @return Returns the chart where the context menu is created
+    */
+   public Chart getChart();
 
-	/**
-	 * @return Returns the left slider
-	 */
-	public ChartXSlider getLeftSlider();
+   /**
+    * @return Returns slider 1
+    */
+   public ChartXSlider getLeftSlider();
 
-	/**
-	 * @return Returns the right slider
-	 */
-	public ChartXSlider getRightSlider();
+   /**
+    * @return Returns the slider 2
+    */
+   public ChartXSlider getRightSlider();
 
-	/**
-	 * Called when the context menu is hidden
-	 * 
-	 * @param menuEvent
-	 * @param menuParentControl
-	 *            Control which is the parent for the menu
-	 */
-	public void onHideContextMenu(MenuEvent menuEvent, Control menuParentControl);
+   /**
+    * Called when the context menu is hidden
+    *
+    * @param menuEvent
+    * @param menuParentControl
+    *           Control which is the parent for the menu
+    */
+   public void onHideContextMenu(MenuEvent menuEvent, Control menuParentControl);
 
-	/**
-	 * Called when the context menu is displayed
-	 * 
-	 * @param menuEvent
-	 * @param menuParentControl
-	 *            Control which is the parent for the menu
-	 */
-	public void onShowContextMenu(MenuEvent menuEvent, Control menuParentControl);
+   /**
+    * Called when the context menu is displayed
+    *
+    * @param menuEvent
+    * @param menuParentControl
+    *           Control which is the parent for the menu
+    */
+   public void onShowContextMenu(MenuEvent menuEvent, Control menuParentControl);
 
-	/**
-	 * @return Returns <code>true</code> when the context menu for a slider is displayed, the
-	 *         default context menu is hidden
-	 */
-	public boolean showOnlySliderContextMenu();
+   /**
+    * @return Returns <code>true</code> when the context menu for a slider is displayed, the
+    *         default context menu is hidden
+    */
+   public boolean showOnlySliderContextMenu();
 
 }

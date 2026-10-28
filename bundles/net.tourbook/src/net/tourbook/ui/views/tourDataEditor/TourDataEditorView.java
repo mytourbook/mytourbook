@@ -3437,21 +3437,22 @@ public class TourDataEditorView extends ViewPart implements
 
 // SET_FORMATTING_OFF
 
-      _actionComputeDistanceValues     = new ActionComputeDistanceValues(this);
-      _actionCreateTourMarker          = new ActionCreateTourMarker(this);
-      _actionCsvTimeSliceExport        = new ActionCSVTimeSliceExport(this);
-      _actionDeleteDistanceValues      = new ActionDeleteDistanceValues(this);
-      _actionEditTimeSlicesValues      = new ActionEditTimeSlicesValues(this);
-      _actionExtractTour               = new ActionExtractTour(this);
-      _actionExportTour                = new ActionExport(this);
-      _actionOpenAdjustAltitudeDialog  = new ActionOpenAdjustAltitudeDialog(this, true);
-      _actionOpenMarkerDialog          = new ActionOpenMarkerDialog(this, false);
-      _actionRemovePhotoGeoPosition    = new ActionRemovePhotoGeoPosition();
-      _actionSetStartDistanceTo_0      = new ActionSetStartDistanceTo0(this);
-      _actionSplitTour                 = new ActionSplitTour(this);
-      _actionToggleReadEditMode        = new ActionToggleReadEditMode(this);
-      _actionToggleRowSelectMode       = new ActionToggleRowSelectMode(this);
-      _actionViewSettings              = new ActionViewSettings();
+      _actionComputeDistanceValues           = new ActionComputeDistanceValues(this);
+      _actionCreateTourMarker                = new ActionCreateTourMarker(this);
+      _actionCsvTimeSliceExport              = new ActionCSVTimeSliceExport(this);
+      _actionDeleteDistanceValues            = new ActionDeleteDistanceValues(this);
+      _actionEditTimeSlicesValues            = new ActionEditTimeSlicesValues(this);
+      _actionExtractTour                     = new ActionExtractTour(this);
+      _actionExportTour                      = new ActionExport(this);
+      _actionOpenAdjustAltitudeDialog        = new ActionOpenAdjustAltitudeDialog(this, true);
+      _actionOpenMarkerDialog                = new ActionOpenMarkerDialog(this, false);
+      _actionRemovePhotoGeoPosition          = new ActionRemovePhotoGeoPosition();
+
+      _actionSetStartDistanceTo_0            = new ActionSetStartDistanceTo0(this);
+      _actionSplitTour                       = new ActionSplitTour(this);
+      _actionToggleReadEditMode              = new ActionToggleReadEditMode(this);
+      _actionToggleRowSelectMode             = new ActionToggleRowSelectMode(this);
+      _actionViewSettings                    = new ActionViewSettings();
 
       _actionDeleteTimeSlices_AdjustTourStartTime                 = new ActionDeleteTimeSlices_AdjustTourStartTime(this);
       _actionDeleteTimeSlices_AdjustTourStartTime_KeepOtherValues = new ActionDeleteTimeSlices_AdjustTourStartTime_KeepOtherValues(this);
@@ -7287,6 +7288,8 @@ public class TourDataEditorView extends ViewPart implements
             && isDistanceAvailable
             && _tourData.distanceSerie[0] > 0;
 
+      final boolean canEditGeoData = hasGeoData && canEdit;
+
       _actionOpenAdjustAltitudeDialog.setEnabled(isCellEditorInactive && canUseTool);
       _actionOpenMarkerDialog.setEnabled(isCellEditorInactive && canUseTool);
 
@@ -7303,8 +7306,8 @@ public class TourDataEditorView extends ViewPart implements
 
       _actionEditTimeSlicesValues.setEnabled(isCellEditorInactive && canEdit);
 
-      _actionStartLocation.setEnabled(hasGeoData && canEdit);
-      _actionEndLocation.setEnabled(hasGeoData && canEdit);
+      _actionStartLocation.setEnabled(isCellEditorInactive && canEditGeoData);
+      _actionEndLocation.setEnabled(isCellEditorInactive && canEditGeoData);
    }
 
    private void enableActions_SwimSlices() {

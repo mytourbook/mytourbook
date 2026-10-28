@@ -281,14 +281,14 @@ public class ChartComponentGraph extends Canvas {
    private ArrayList<ChartYSlider>    _ySliders;
 
    /**
-    * contextLeftSlider is set when the right mouse button was clicked and the left slider was hit
+    * This is set when the right mouse button was clicked and the left slider was hit
     */
-   private ChartXSlider               _contextLeftSlider;
+   private ChartXSlider               _contextSlider1;
 
    /**
-    * contextRightSlider is set when the right mouse button was clicked and the right slider was hit
+    * This is set when the right mouse button was clicked and the right slider was hit
     */
-   private ChartXSlider               _contextRightSlider;
+   private ChartXSlider               _contextSlider2;
 
    /**
     * cursor when the graph can be resizes
@@ -877,8 +877,8 @@ public class ChartComponentGraph extends Canvas {
       ChartXSlider slider2 = null;
 
       // reset the context slider
-      _contextLeftSlider = null;
-      _contextRightSlider = null;
+      _contextSlider1 = null;
+      _contextSlider2 = null;
 
       // check if a slider or the slider line was hit
       if (_xSliderA.getHitRectangle().contains(devX, devY)) {
@@ -898,36 +898,38 @@ public class ChartComponentGraph extends Canvas {
       }
 
       /*
-       * check if one slider was hit, when yes, the left slider is set and the right slider is null
+       * Check if one slider was hit, when yes, the left slider is set and the right slider is null
        */
       if (slider1 != null && slider2 == null) {
          // only slider 1 was hit
-         _contextLeftSlider = slider1;
+         _contextSlider1 = slider1;
          return;
       }
+
       if (slider2 != null && slider1 == null) {
          // only slider 2 was hit
-         _contextLeftSlider = slider2;
+         _contextSlider1 = slider2;
          return;
       }
 
       /*
-       * both sliders are hit
+       * Both sliders are hit
        */
       final long xSlider1Position = slider1.getHitRectangle().x;
       final long xSlider2Position = slider2.getHitRectangle().x;
 
       if (xSlider1Position == xSlider2Position) {
          // both sliders are at the same position
-         _contextLeftSlider = slider1;
+         _contextSlider1 = slider1;
          return;
       }
+
       if (xSlider1Position < xSlider2Position) {
-         _contextLeftSlider = slider1;
-         _contextRightSlider = slider2;
+         _contextSlider1 = slider1;
+         _contextSlider2 = slider2;
       } else {
-         _contextLeftSlider = slider2;
-         _contextRightSlider = slider1;
+         _contextSlider1 = slider2;
+         _contextSlider2 = slider1;
       }
    }
 
@@ -999,8 +1001,8 @@ public class ChartComponentGraph extends Canvas {
 
          _chart.fillContextMenu(
                menuManager,
-               _contextLeftSlider,
-               _contextRightSlider,
+               _contextSlider1,
+               _contextSlider2,
                _hoveredBarSerieIndex,
                _hoveredBarValueIndex,
                _devXMouseDown,

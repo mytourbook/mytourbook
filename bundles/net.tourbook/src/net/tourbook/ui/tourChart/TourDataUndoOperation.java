@@ -31,8 +31,34 @@ public class TourDataUndoOperation extends AbstractOperation {
    private TourData      _tourData_Cloned_WithRemovedTimeSliced;
    private TourData      _tourData_Cloned_Before;
 
-   private int           _sliderFirstIndex;
-   private int           _sliderLastIndex;
+   /**
+    * <code>-1</code> will do not set the slider position
+    */
+   private int           _sliderFirstIndex = -1;
+   private int           _sliderLastIndex  = -1;
+
+   /**
+    * @param label
+    *           This label will show in the menu (e.g., "Undo Modify Name")
+    * @param tourChartView
+    * @param tourData_Cloned_Before
+    * @param tourData_Cloned_WithRemovedTimeSliced
+    * @param sliderFirstIndex
+    * @param sliderLastIndex
+    */
+   public TourDataUndoOperation(final String label,
+                                final TourChartView tourChartView,
+
+                                final TourData tourData_Cloned_Before,
+                                final TourData tourData_Cloned_WithRemovedTimeSliced) {
+
+      super(label);
+
+      _tourChartView = tourChartView;
+
+      _tourData_Cloned_Before = tourData_Cloned_Before;
+      _tourData_Cloned_WithRemovedTimeSliced = tourData_Cloned_WithRemovedTimeSliced;
+   }
 
    /**
     * @param label
@@ -71,6 +97,14 @@ public class TourDataUndoOperation extends AbstractOperation {
       return Status.OK_STATUS;
    }
 
+   public int getSliderFirstIndex() {
+      return _sliderFirstIndex;
+   }
+
+   public int getSliderLastIndex() {
+      return _sliderLastIndex;
+   }
+
    @Override
    public IStatus redo(final IProgressMonitor monitor, final IAdaptable info) throws ExecutionException {
 
@@ -85,13 +119,5 @@ public class TourDataUndoOperation extends AbstractOperation {
       _tourChartView.undoRedo_Undo(_tourData_Cloned_Before, _sliderFirstIndex, _sliderLastIndex);
 
       return Status.OK_STATUS;
-   }
-
-   public int getSliderFirstIndex() {
-      return _sliderFirstIndex;
-   }
-
-   public int getSliderLastIndex() {
-      return _sliderLastIndex;
    }
 }

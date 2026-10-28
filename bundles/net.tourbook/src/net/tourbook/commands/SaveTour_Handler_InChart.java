@@ -64,7 +64,7 @@ public class SaveTour_Handler_InChart extends AbstractHandler implements IElemen
        * This method will be called from partActivated() with
        * org.eclipse.ui.commands.ICommandService.refreshElements(..)
        * <p>
-       * -> Higly complicated
+       * -> Highly complicated
        */
 
       uiElement.setIcon(_iconSaveTour);

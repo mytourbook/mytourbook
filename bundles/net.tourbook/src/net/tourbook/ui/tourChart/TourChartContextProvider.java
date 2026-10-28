@@ -51,6 +51,7 @@ import net.tourbook.ui.tourChart.action.ActionDeleteTimeSlices_KeepTime;
 import net.tourbook.ui.tourChart.action.ActionDeleteTimeSlices_KeepTimeAndDistance;
 import net.tourbook.ui.tourChart.action.ActionDeleteTimeSlices_RemoveTime;
 import net.tourbook.ui.tourChart.action.ActionRenameMarkerFromRecentMarker_SubMenu;
+import net.tourbook.ui.tourChart.action.ActionSetGeoPositionFromHereToStart;
 import net.tourbook.ui.tourChart.action.ActionSetMarkerLabelPositionMenu;
 import net.tourbook.ui.tourChart.action.ActionSetMarkerVisible;
 
@@ -87,12 +88,13 @@ public class TourChartContextProvider implements IChartContextProvider, ITourPro
    private ActionOpenPrefDialog                                       _actionPrefDialog;
    private ActionOpenTour                                             _actionOpenTour;
    private ActionRenameMarkerFromRecentMarker_SubMenu                 _actionRenameMarkerFromRecentMarker;
+   private ActionSetGeoPositionFromHereToStart                        _actionSetGeoPositionFromHereToStart;
    private ActionSetTourTypeMenu                                      _actionSetTourType;
    private ActionSetMarkerVisible                                     _actionSetMarkerVisible;
    private ActionSetMarkerLabelPositionMenu                           _actionSetMarkerPosition;
 
-   private ChartXSlider                                               _leftSlider;
-   private ChartXSlider                                               _rightSlider;
+   private ChartXSlider                                               _slider1;
+   private ChartXSlider                                               _slider2;
 
    /**
     * Provides a context menu for a tour chart
@@ -118,39 +120,39 @@ public class TourChartContextProvider implements IChartContextProvider, ITourPro
 
       _actionCreateRefTour    = new ActionCreateRefTour(tourChart);
 
-      _actionCreateMarkerFromRecentMarker = new ActionCreateMarkerFromRecentMarker_SubMenu(this);
-      _actionRenameMarkerFromRecentMarker = new ActionRenameMarkerFromRecentMarker_SubMenu(tourChart);
+      _actionCreateMarkerFromRecentMarker    = new ActionCreateMarkerFromRecentMarker_SubMenu(this);
+      _actionRenameMarkerFromRecentMarker    = new ActionRenameMarkerFromRecentMarker_SubMenu(tourChart);
 
-      _actionCreateMarkerFromSlider       = new ActionCreateMarkerFromSlider(    this, Messages.RefTour_Action_CreateMarker,      true);
-      _actionCreateMarkerFromSliderLeft   = new ActionCreateMarkerFromSlider(    this, Messages.RefTour_Action_CreateLeftMarker,  true);
-      _actionCreateMarkerFromSliderRight  = new ActionCreateMarkerFromSlider(    this, Messages.RefTour_Action_CreateRightMarker, false);
-      _actionCreateMarkerFromValuePoint   = new ActionCreateMarkerFromValuePoint(this, Messages.RefTour_Action_CreateMarker);
+      _actionCreateMarkerFromSlider          = new ActionCreateMarkerFromSlider(    this, Messages.RefTour_Action_CreateMarker,      true);
+      _actionCreateMarkerFromSliderLeft      = new ActionCreateMarkerFromSlider(    this, Messages.RefTour_Action_CreateLeftMarker,  true);
+      _actionCreateMarkerFromSliderRight     = new ActionCreateMarkerFromSlider(    this, Messages.RefTour_Action_CreateRightMarker, false);
+      _actionCreateMarkerFromValuePoint      = new ActionCreateMarkerFromValuePoint(this, Messages.RefTour_Action_CreateMarker);
 
-      _actionDeleteMarker                 = new ActionDeleteMarker(tourChart);
-      _actionSetMarkerVisible             = new ActionSetMarkerVisible(tourChart);
-      _actionSetMarkerPosition            = new ActionSetMarkerLabelPositionMenu(tourChart);
+      _actionDeleteMarker                    = new ActionDeleteMarker(tourChart);
+      _actionSetMarkerVisible                = new ActionSetMarkerVisible(tourChart);
+      _actionSetMarkerPosition               = new ActionSetMarkerLabelPositionMenu(tourChart);
 
-      _actionExportTour                   = new ActionExport(this);
+      _actionExportTour                      = new ActionExport(this);
 
-      _actionOpenMarkerDialog             = new ActionOpenMarkerDialog(this, true);
+      _actionOpenMarkerDialog                = new ActionOpenMarkerDialog(this, true);
       _actionOpenMarkerDialog.setEnabled(true);
 
-      _actionOpenAdjustAltitudeDialog     = new ActionOpenAdjustAltitudeDialog(this);
+      _actionOpenAdjustAltitudeDialog        = new ActionOpenAdjustAltitudeDialog(this);
       _actionOpenAdjustAltitudeDialog.setEnabled(true);
 
-      _actionSetTourType                  = new ActionSetTourTypeMenu(this);
+      _actionSetTourType                     = new ActionSetTourTypeMenu(this);
+      _actionSetGeoPositionFromHereToStart   = new ActionSetGeoPositionFromHereToStart(this);
 
-      _tagMenuManager                     = new TagMenuManager(this, true);
-      _tourTypeMenuManager                = new TourTypeMenuManager(this);
+      _tagMenuManager                        = new TagMenuManager(this, true);
+      _tourTypeMenuManager                   = new TourTypeMenuManager(this);
 
-      _actionPrefDialog                   = new ActionOpenPrefDialog(Messages.Tour_Action_EditChartPreferences, PrefPageAppearanceTourChart.ID);
+      _actionPrefDialog                      = new ActionOpenPrefDialog(Messages.Tour_Action_EditChartPreferences, PrefPageAppearanceTourChart.ID);
 
       _actionDeleteTimeSlices_KeepTime                            = new ActionDeleteTimeSlices_KeepTime(tourChart);
       _actionDeleteTimeSlices_AdjustTourStartTime                 = new ActionDeleteTimeSlices_AdjustTourStartTime(tourChart);
       _actionDeleteTimeSlices_AdjustTourStartTime_KeepOtherValues = new ActionDeleteTimeSlices_AdjustTourStartTime_KeepOtherValues(tourChart);
       _actionDeleteTimeSlices_KeepTimeAndDistance                 = new ActionDeleteTimeSlices_KeepTimeAndDistance(tourChart);
       _actionDeleteTimeSlices_RemoveTime                          = new ActionDeleteTimeSlices_RemoveTime(tourChart);
-
 // SET_FORMATTING_ON
    }
 
@@ -297,74 +299,88 @@ public class TourChartContextProvider implements IChartContextProvider, ITourPro
 
    @Override
    public void fillXSliderContextMenu(final IMenuManager menuMgr,
-                                      final ChartXSlider leftSlider,
-                                      final ChartXSlider rightSlider) {
+                                      final ChartXSlider slider1,
+                                      final ChartXSlider slider2) {
 
-      _leftSlider = leftSlider;
-      _rightSlider = rightSlider;
+      _slider1 = slider1;
+      _slider2 = slider2;
 
-      if (leftSlider != null || rightSlider != null) {
+      if (slider1 == null && slider2 == null) {
+         return;
+      }
 
-         // reset value point that the slider position is used
-         _actionCreateMarkerFromRecentMarker.setSerieIndex(-1);
+      // reset value point that the slider position is used
+      _actionCreateMarkerFromRecentMarker.setSerieIndex(-1);
 
-         // slider marker actions
-         if (leftSlider != null && rightSlider == null) {
+      // slider marker actions
+      if (slider1 != null && slider2 == null) {
 
-            menuMgr.add(_actionCreateMarkerFromSlider);
-            menuMgr.add(_actionCreateMarkerFromRecentMarker);
+         menuMgr.add(_actionCreateMarkerFromSlider);
+         menuMgr.add(_actionCreateMarkerFromRecentMarker);
 
-         } else {
+      } else {
 
-            menuMgr.add(_actionCreateMarkerFromSliderLeft);
-            menuMgr.add(_actionCreateMarkerFromSliderRight);
-         }
+         menuMgr.add(_actionCreateMarkerFromSliderLeft);
+         menuMgr.add(_actionCreateMarkerFromSliderRight);
+      }
 
-         menuMgr.add(_actionCreateRefTour);
+      menuMgr.add(_actionCreateRefTour);
 
-         menuMgr.add(new Separator());
-         menuMgr.add(_actionOpenMarkerDialog);
+      menuMgr.add(new Separator());
+      menuMgr.add(_actionOpenMarkerDialog);
+      menuMgr.add(_actionSetGeoPositionFromHereToStart);
 
-         menuMgr.add(new Separator());
-         menuMgr.add(_actionDeleteTimeSlices_RemoveTime);
-         menuMgr.add(_actionDeleteTimeSlices_KeepTime);
-         menuMgr.add(_actionDeleteTimeSlices_KeepTimeAndDistance);
-         menuMgr.add(_actionDeleteTimeSlices_AdjustTourStartTime);
-         menuMgr.add(_actionDeleteTimeSlices_AdjustTourStartTime_KeepOtherValues);
+      menuMgr.add(new Separator());
+      menuMgr.add(_actionDeleteTimeSlices_RemoveTime);
+      menuMgr.add(_actionDeleteTimeSlices_KeepTime);
+      menuMgr.add(_actionDeleteTimeSlices_KeepTimeAndDistance);
+      menuMgr.add(_actionDeleteTimeSlices_AdjustTourStartTime);
+      menuMgr.add(_actionDeleteTimeSlices_AdjustTourStartTime_KeepOtherValues);
 
-         /////////////////////////////////////////////////////////////////////////////
-         /////////////////////////////////////////////////////////////////////////////
 
-         /*
-          * Enable actions
-          */
-         final TourData tourData = _tourChartViewer.getTourChart().getTourData();
-         final boolean isTourSaved = tourData != null && tourData.getTourPerson() != null;
+      /////////////////////////////////////////////////////////////////////////////
+      /////////////////////////////////////////////////////////////////////////////
 
-         final boolean canCreateRefTours = tourData != null
-               && tourData.altitudeSerie != null
-               && tourData.distanceSerie != null
-               && isTourSaved;
+      /*
+       * Enable actions
+       */
+      final TourData tourData = _tourChartViewer.getTourChart().getTourData();
+      final boolean isTourSaved = tourData != null && tourData.getTourPerson() != null;
+
+      final boolean canCreateRefTours = tourData != null
+            && tourData.altitudeSerie != null
+            && tourData.distanceSerie != null
+            && isTourSaved;
+
+      // at least 2 positions are necessary to compute the distance
+      final boolean hasGeoData = //
+            tourData.latitudeSerie != null
+                  && tourData.latitudeSerie.length >= 2;
+
+      // currently only one slider is supported, so overlapped slideres are not supported
+      final boolean isOneSlider = slider1 != null && slider2 == null
+            || slider1 == null && slider2 != null;
 
 // SET_FORMATTING_OFF
 
-         _actionCreateMarkerFromSlider                               .setEnabled(isTourSaved);
-         _actionCreateMarkerFromSliderLeft                           .setEnabled(isTourSaved);
-         _actionCreateMarkerFromSliderRight                          .setEnabled(isTourSaved);
+      _actionCreateMarkerFromSlider                               .setEnabled(isTourSaved);
+      _actionCreateMarkerFromSliderLeft                           .setEnabled(isTourSaved);
+      _actionCreateMarkerFromSliderRight                          .setEnabled(isTourSaved);
 
-         _actionCreateRefTour                                        .setEnabled(canCreateRefTours);
+      _actionCreateRefTour                                        .setEnabled(canCreateRefTours);
 
-         _actionOpenMarkerDialog                                     .setEnabled(isTourSaved);
-         _actionDeleteMarker                                         .setEnabled(isTourSaved);
+      _actionOpenMarkerDialog                                     .setEnabled(isTourSaved);
+      _actionDeleteMarker                                         .setEnabled(isTourSaved);
 
-         _actionDeleteTimeSlices_RemoveTime                          .setEnabled(isTourSaved);
-         _actionDeleteTimeSlices_KeepTime                            .setEnabled(isTourSaved);
-         _actionDeleteTimeSlices_KeepTimeAndDistance                 .setEnabled(isTourSaved);
-         _actionDeleteTimeSlices_AdjustTourStartTime                 .setEnabled(isTourSaved);
-         _actionDeleteTimeSlices_AdjustTourStartTime_KeepOtherValues .setEnabled(isTourSaved);
+      _actionDeleteTimeSlices_RemoveTime                          .setEnabled(isTourSaved);
+      _actionDeleteTimeSlices_KeepTime                            .setEnabled(isTourSaved);
+      _actionDeleteTimeSlices_KeepTimeAndDistance                 .setEnabled(isTourSaved);
+      _actionDeleteTimeSlices_AdjustTourStartTime                 .setEnabled(isTourSaved);
+      _actionDeleteTimeSlices_AdjustTourStartTime_KeepOtherValues .setEnabled(isTourSaved);
+
+      _actionSetGeoPositionFromHereToStart                        .setEnabled(isTourSaved && hasGeoData && isOneSlider);
 
 // SET_FORMATTING_ON
-      }
    }
 
    @Override
@@ -374,12 +390,12 @@ public class TourChartContextProvider implements IChartContextProvider, ITourPro
 
    @Override
    public ChartXSlider getLeftSlider() {
-      return _leftSlider;
+      return _slider1;
    }
 
    @Override
    public ChartXSlider getRightSlider() {
-      return _rightSlider;
+      return _slider2;
    }
 
    @Override

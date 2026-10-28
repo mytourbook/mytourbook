@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2026 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -33,6 +33,7 @@ class ActionSetStartDistanceTo0 extends Action {
       _tourDataEditor = tourDataEditor;
 
       setText(Messages.TourEditor_Action_SetStartDistanceTo0);
+      setToolTipText("This action is enabled when the start distance is larger than 0");
    }
 
    @Override

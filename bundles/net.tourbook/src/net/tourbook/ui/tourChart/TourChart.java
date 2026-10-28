@@ -41,6 +41,7 @@ import net.tourbook.chart.ChartSyncMode;
 import net.tourbook.chart.ChartTitleSegment;
 import net.tourbook.chart.ChartTitleSegmentConfig;
 import net.tourbook.chart.ChartType;
+import net.tourbook.chart.ChartXSlider;
 import net.tourbook.chart.ChartYDataMinMaxKeeper;
 import net.tourbook.chart.GraphDrawingData;
 import net.tourbook.chart.IChartLayer;
@@ -1093,9 +1094,10 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
             isRemoveDistance,
             isAdjustTourStartTime);
 
+      // get tour data AFTER
       final TourData tourData_Cloned_WithRemovedTimeSliced = _tourData.undoRedo_CloneData();
 
-      _tourChartView.undoRedo_DeleteTimeSlice(
+      _tourChartView.undoRedo_ActionDeleteTimeSlice(
 
             tourData_Cloned_Before,
             tourData_Cloned_WithRemovedTimeSliced,
@@ -1112,6 +1114,53 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
       updateTourChart();
 
       setActionChecked(ACTION_ID_IS_GRAPH_OVERLAPPED, isItemChecked);
+   }
+
+   public void actionSetGeoPositionFromSelectedToAllPrevious(final ChartXSlider slider1, final ChartXSlider slider2) {
+
+      // check if the tour editor contains a modified tour
+      if (TourManager.isTourModified_InEditor_WithInfo(true)) {
+         return;
+      }
+
+      final ChartXSlider selectedSlider = slider1 != null ? slider1 : slider2;
+
+      if (selectedSlider == null) {
+         return;
+      }
+
+      // get tour data BEFORE
+      final TourData tourData_Cloned_BeforeModified = _tourData.undoRedo_CloneData();
+
+      final int selectedSerieIndex = selectedSlider.getValuesIndex();
+
+      final double[] latSerie = _tourData.latitudeSerie;
+      final double[] lonSerie = _tourData.longitudeSerie;
+      final float[] distanceSerie = _tourData.distanceSerie;
+
+      final double latFrom = latSerie[selectedSerieIndex];
+      final double lonFrom = lonSerie[selectedSerieIndex];
+
+      for (int serieIndex = 0; serieIndex < selectedSerieIndex; serieIndex++) {
+
+         lonSerie[serieIndex] = lonFrom;
+         latSerie[serieIndex] = latFrom;
+
+         if (distanceSerie != null) {
+            distanceSerie[serieIndex] = 0;
+         }
+      }
+
+      _tourData.clearComputedSeries();
+      _tourData.clearWorldPositions();
+
+      // get tour data AFTER
+      final TourData tourData_Cloned_AfterModified = _tourData.undoRedo_CloneData();
+
+      _tourChartView.undoRedo_ActionSetGeoPositionToAllPrevious(
+
+            tourData_Cloned_BeforeModified,
+            tourData_Cloned_AfterModified);
    }
 
    public void actionShowTourInfo(final boolean isTourInfoVisible) {

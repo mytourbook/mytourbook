@@ -395,8 +395,8 @@ public class Chart extends ViewForm {
    }
 
    void fillContextMenu(final IMenuManager menuMgr,
-                        final ChartXSlider leftSlider,
-                        final ChartXSlider rightSlider,
+                        final ChartXSlider slider1,
+                        final ChartXSlider slider2,
                         final int hoveredBarSerieIndex,
                         final int hoveredBarValueIndex,
                         final int mouseDownDevPositionX,
@@ -407,7 +407,7 @@ public class Chart extends ViewForm {
       }
 
       // check if this is slider context
-      final boolean isSliderContext = leftSlider != null || rightSlider != null;
+      final boolean isSliderContext = slider1 != null || slider2 != null;
       final boolean showOnlySliderContext = isSliderContext
             && _chartContextProvider != null
             && _chartContextProvider.showOnlySliderContextMenu();
@@ -416,7 +416,7 @@ public class Chart extends ViewForm {
          _chartContextProvider.fillContextMenu(menuMgr, mouseDownDevPositionX, mouseDownDevPositionY);
       }
 
-      fillContextMenu_ChartDefault(menuMgr, leftSlider, rightSlider, hoveredBarSerieIndex, hoveredBarValueIndex);
+      fillContextMenu_ChartDefault(menuMgr, slider1, slider2, hoveredBarSerieIndex, hoveredBarValueIndex);
 
       if (_chartContextProvider != null && showOnlySliderContext == false && _isTopMenuPosition == false) {
          menuMgr.add(new Separator());
@@ -425,8 +425,8 @@ public class Chart extends ViewForm {
    }
 
    private void fillContextMenu_ChartDefault(final IMenuManager menuMgr,
-                                             final ChartXSlider leftSlider,
-                                             final ChartXSlider rightSlider,
+                                             final ChartXSlider slider1,
+                                             final ChartXSlider slider2,
                                              final int hoveredBarSerieIndex,
                                              final int hoveredBarValueIndex) {
 
@@ -476,7 +476,7 @@ public class Chart extends ViewForm {
          if (_chartContextProvider != null) {
 
             menuMgr.add(new Separator());
-            _chartContextProvider.fillXSliderContextMenu(menuMgr, leftSlider, rightSlider);
+            _chartContextProvider.fillXSliderContextMenu(menuMgr, slider1, slider2);
          }
 
          if (_isShowZoomActions) {
