@@ -1,15 +1,9 @@
 26.11.0                                                 ?. November 2026
 
-TRANSLATION Texts
-
-* [Tour Chart] Replaced "Command_Tour_RestoreTour_Tooltip" with "Command_Tour_RestoreTour_Tooltip_2" because now a tour can be restored partly
-               c8391aa566909c8825b61307a6c4be559d5a9e7f
-
-
 All
 ===
 
-See milestone 26.? https://github.com/mytourbook/mytourbook/milestone/29?closed=1
+See milestone 26.11 https://github.com/mytourbook/mytourbook/milestone/32?closed=1
 
 
 New / Improvements
