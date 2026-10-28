@@ -1445,7 +1445,7 @@ public class TourChartView extends ViewPart implements
 
       // Inside an action listener or command handler
 
-      final String opLabel = Messages.Tour_Chart_Info_UndoOperation.formatted(
+      final String opLabel = Messages.Tour_Chart_UndoInfo_RemoveTimeSlices.formatted(
 
             ++_undoCounter,
             sliderLastIndex - sliderFirstIndex + 1);

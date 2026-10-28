@@ -3572,11 +3572,11 @@ public class Messages extends NLS {
    public static String        Tour_Chart_Dialog_SaveChanges_Message;
    public static String        Tour_Chart_Dialog_SaveChanges_Title;
    public static String        Tour_Chart_Dialog_TourIsModified_Message;
-   public static String        Tour_Chart_Info_UndoOperation;
    public static String        Tour_Chart_Label_ValuePoint_Title;
    public static String        Tour_Chart_Radio_CancelAndKeepChanges;
    public static String        Tour_Chart_Radio_DiscardChanges;
    public static String        Tour_Chart_Radio_SaveChanges;
+   public static String        Tour_Chart_UndoInfo_RemoveTimeSlices;
    public static String        Tour_Chart_UndoInfo_SetGeoPositionIntoTimeSlices;
 
    public static String        Tour_Compare_ViewName_ElevationComparedTour;
