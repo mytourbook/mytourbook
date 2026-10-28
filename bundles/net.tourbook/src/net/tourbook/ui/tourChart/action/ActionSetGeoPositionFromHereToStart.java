@@ -42,10 +42,9 @@ public class ActionSetGeoPositionFromHereToStart extends Action {
 
       if (chart instanceof final TourChart tourChart) {
 
-         tourChart.actionSetGeoPositionFromSelectedToAllPrevious(
+         tourChart.actionSetGeoPositionFromHere(
                _tourChartContextProvider.getLeftSlider(),
                _tourChartContextProvider.getRightSlider());
       }
-
    }
 }

@@ -1116,7 +1116,17 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
       setActionChecked(ACTION_ID_IS_GRAPH_OVERLAPPED, isItemChecked);
    }
 
-   public void actionSetGeoPositionFromSelectedToAllPrevious(final ChartXSlider slider1, final ChartXSlider slider2) {
+   /**
+    * It takes the geo position from the selected time slice and sets this position into all
+    * previous time slices.
+    * <p>
+    * The distance will be set to 0 in these time slices, the total distance is accordingly
+    * adjusted.
+    *
+    * @param slider1
+    * @param slider2
+    */
+   public void actionSetGeoPositionFromHere(final ChartXSlider slider1, final ChartXSlider slider2) {
 
       // check if the tour editor contains a modified tour
       if (TourManager.isTourModified_InEditor_WithInfo(true)) {
