@@ -15,6 +15,7 @@
  *******************************************************************************/
 package net.tourbook.ui.tourChart.action;
 
+import net.tourbook.Messages;
 import net.tourbook.chart.Chart;
 import net.tourbook.ui.tourChart.TourChart;
 import net.tourbook.ui.tourChart.TourChartContextProvider;
@@ -27,12 +28,11 @@ public class ActionSetGeoPositionFromHereToStart extends Action {
 
    public ActionSetGeoPositionFromHereToStart(final TourChartContextProvider tourChartContextProvider) {
 
-      super("Set &geo position from here into all previous time slices");
+      super(Messages.Tour_Action_SetGeoPositionIntoAllPreviousTimeSlices);
 
       _tourChartContextProvider = tourChartContextProvider;
 
-      setToolTipText(
-            "It takes the geo position from the selected time slice\nand sets this position into all previous time slices\nThe distance will be set to 0");
+      setToolTipText(Messages.Tour_Action_SetGeoPositionIntoAllPreviousTimeSlices_Tooltip);
    }
 
    @Override

@@ -33,7 +33,7 @@ class ActionSetStartDistanceTo0 extends Action {
       _tourDataEditor = tourDataEditor;
 
       setText(Messages.TourEditor_Action_SetStartDistanceTo0);
-      setToolTipText("This action is enabled when the start distance is larger than 0");
+      setToolTipText(Messages.TourEditor_Action_SetStartDistanceTo0_Tooltip);
    }
 
    @Override

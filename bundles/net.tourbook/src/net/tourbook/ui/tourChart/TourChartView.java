@@ -1470,7 +1470,7 @@ public class TourChartView extends ViewPart implements
 
       // Inside an action listener or command handler
 
-      final String opLabel = "%d: Set geo position into time slices".formatted(++_undoCounter);
+      final String opLabel = Messages.Tour_Chart_UndoInfo_SetGeoPositionIntoTimeSlices.formatted(++_undoCounter);
 
       final TourDataUndoOperation undoOperation = new TourDataUndoOperation(
 

@@ -3509,6 +3509,8 @@ public class Messages extends NLS {
    public static String        Tour_Action_scroll_zoomed_chart;
    public static String        Tour_Action_Select_Inbetween_Timeslices;
    public static String        Tour_Action_Select_Inbetween_Timeslices_Tooltip;
+   public static String        Tour_Action_SetGeoPositionIntoAllPreviousTimeSlices;
+   public static String        Tour_Action_SetGeoPositionIntoAllPreviousTimeSlices_Tooltip;
    public static String        Tour_Action_SetMinMaxTemperature;
    public static String        Tour_Action_SetMinMaxTemperature_Apply;
    public static String        Tour_Action_SetMinMaxTemperature_Message;
@@ -3567,22 +3569,15 @@ public class Messages extends NLS {
 
    public static String        Tour_Chart_Action_Dialog_DeleteTourMarkerError_Message;
    public static String        Tour_Chart_Action_Dialog_DeleteTourMarkerError_Title;
-
    public static String        Tour_Chart_Dialog_SaveChanges_Message;
-
    public static String        Tour_Chart_Dialog_SaveChanges_Title;
-
    public static String        Tour_Chart_Dialog_TourIsModified_Message;
-
    public static String        Tour_Chart_Info_UndoOperation;
-
    public static String        Tour_Chart_Label_ValuePoint_Title;
-
    public static String        Tour_Chart_Radio_CancelAndKeepChanges;
-
    public static String        Tour_Chart_Radio_DiscardChanges;
-
    public static String        Tour_Chart_Radio_SaveChanges;
+   public static String        Tour_Chart_UndoInfo_SetGeoPositionIntoTimeSlices;
 
    public static String        Tour_Compare_ViewName_ElevationComparedTour;
    public static String        Tour_Compare_ViewName_ElevationCompareTimeline;
@@ -3671,6 +3666,7 @@ public class Messages extends NLS {
    public static String        TourEditor_Action_RemoveSwimStyle;
    public static String        TourEditor_Action_SetAltitudeValuesFromSRTM;
    public static String        TourEditor_Action_SetStartDistanceTo0;
+   public static String        TourEditor_Action_SetStartDistanceTo0_Tooltip;
    public static String        TourEditor_Action_SetSwimStyle;
    public static String        TourEditor_Dialog_ComputeDistanceValues_Message;
    public static String        TourEditor_Dialog_ComputeDistanceValues_Title;
