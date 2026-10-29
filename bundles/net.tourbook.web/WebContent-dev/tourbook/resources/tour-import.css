@@ -266,7 +266,7 @@ a.action-button:VISITED
    xoverflow:           scroll;
 }
 
-.stateTooltipMessage /* overwrite above css */
+.stateTooltipMessage /* overwrite obove css */
 {
    left:                auto;
    min-width:           0;
