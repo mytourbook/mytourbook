@@ -1,4 +1,4 @@
-26.11.0                                                 ?. November 2026
+26.11.0                                                 2. November 2026
 
 All
 ===
@@ -9,15 +9,26 @@ See milestone 26.11 https://github.com/mytourbook/mytourbook/milestone/32?closed
 New / Improvements
 ==================
 
-* Tour Chart
-  - Delete time slices, the tour chart is now a more functional tour editor with an undo/redo feature, before, only e.g. tour markers could be modified
+* Tour Chart Editor
+  The tour chart has now two kinds of actions which can modify a tour:
+  * Previous: An action is performed, e.g. create a tour marker and the tour is saved immediately. These action are still working as before.
+  * New: Added undo/redo support for multi-step edits (e.g., deleting time slices). Tours are no longer saved after every single action.
+
+Important!
+These actions are mutually exclusive. When using the undo/redo feature, the tour must be saved before performing any actions that do not support undo/redo.
+
+  These are the first actions with undo/redo support
+  - Delete time slices
     https://github.com/mytourbook/mytourbook/issues/1755
-  - With the key "o", move the other vertical slider to the same position as the selected vertical slider
-  - Other new actions:
+  - Set the geo position from the selected time slice into all previous time sliced (until the tour start)
+    https://github.com/mytourbook/mytourbook/issues/1777
+    
+* Tour Chart
+  - New keyboard actions:
+    - Key "o": Move the other vertical slider to the same position as the selected vertical slider
+  - New context menu actions:
     - Move the left slider to the tour start
     - Move the right slider to the tour end
-    - Set the geo position from the selected time slice into all previous time sliced (until the tour start), this also supports the undo/redo feature
-      https://github.com/mytourbook/mytourbook/issues/1777
   
 * Tour Segmenter
   - Display elevation gain/loss values within break times
