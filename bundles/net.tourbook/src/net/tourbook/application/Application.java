@@ -29,6 +29,7 @@ import net.tourbook.Messages;
 import net.tourbook.common.UI;
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.Util;
+import net.tourbook.database.Derby2H2;
 import net.tourbook.preferences.PrefPageGeneral_System;
 
 import org.eclipse.equinox.app.IApplication;
@@ -150,6 +151,12 @@ public class Application implements IApplication {
       final Display display = PlatformUI.createDisplay();
 
       try {
+
+         if (Derby2H2.isMigrated() == false) {
+
+            // exit immediately
+            return IApplication.EXIT_OK;
+         }
 
          if (IS_INSTANCE_CHECK) {
 

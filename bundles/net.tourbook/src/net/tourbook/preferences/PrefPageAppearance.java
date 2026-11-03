@@ -70,13 +70,13 @@ import org.eclipse.ui.PlatformUI;
 
 public class PrefPageAppearance extends PreferencePage implements IWorkbenchPreferencePage {
 
-   public static final String            ID                    = "net.tourbook.preferences.PrefPageAppearance"; //$NON-NLS-1$
+   public static final String            ID                = "net.tourbook.preferences.PrefPageAppearance"; //$NON-NLS-1$
 
-   private static final IPreferenceStore _prefStore            = TourbookPlugin.getPrefStore();
-   private static final IPreferenceStore _prefStore_Common     = CommonActivator.getPrefStore();
+   private static final IPreferenceStore _prefStore        = TourbookPlugin.getPrefStore();
+   private static final IPreferenceStore _prefStore_Common = CommonActivator.getPrefStore();
 
-   private static final IDialogSettings  _state                = TourbookPlugin.getState(TourDataEditorView.ID);
-   private static final IDialogSettings  _state_UI             = UI.getStateUI();
+   private static final IDialogSettings  _state            = TourbookPlugin.getState(TourDataEditorView.ID);
+   private static final IDialogSettings  _state_UI         = UI.getStateUI();
 
    private boolean                       _isShowInApp_MemoryMonitor;
    private boolean                       _isShowInApp_RestartApp;
@@ -235,8 +235,7 @@ public class PrefPageAppearance extends PreferencePage implements IWorkbenchPref
                {
                   _chkApp_Scaling = new Button(containerAppScaling, SWT.CHECK);
                   _chkApp_Scaling.setText(Messages.Pref_Appearance_Check_AppScaling);
-                  _chkApp_Scaling.setToolTipText(
-                        Messages.Pref_Appearance_Check_AppScaling_Tooltip);
+                  _chkApp_Scaling.setToolTipText(Messages.Pref_Appearance_Check_AppScaling_Tooltip);
                   _chkApp_Scaling.addSelectionListener(scalingListener);
 
                   _chkDecorator_AppScaling = new ControlDecoration(_chkApp_Scaling, SWT.TOP | SWT.LEFT);
@@ -264,8 +263,7 @@ public class PrefPageAppearance extends PreferencePage implements IWorkbenchPref
 
                   _chkApp_3DMapFix = new Button(group, SWT.CHECK);
                   _chkApp_3DMapFix.setText(Messages.Pref_Appearance_Check_3DMapFix);
-                  _chkApp_3DMapFix.setToolTipText(
-                        Messages.Pref_Appearance_Check_3DMapFix_Tooltip);
+                  _chkApp_3DMapFix.setToolTipText(Messages.Pref_Appearance_Check_3DMapFix_Tooltip);
                   _chkApp_3DMapFix.addSelectionListener(SelectionListener.widgetSelectedAdapter(
                         selectionEvent -> onSelect_App3DMapFix()));
 
