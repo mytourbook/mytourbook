@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2024 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2026 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -17,6 +17,8 @@ package net.tourbook.application;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 
 import net.tourbook.Messages;
@@ -65,13 +67,15 @@ public class SplashManager {
 
    public static ImageDescriptor getImageDescriptor(final String pluginId, String path) {
 
+      if (!path.startsWith("/")) { //$NON-NLS-1$
+         path = "/" + path; //$NON-NLS-1$
+      }
+
+      final String uriPath = "platform:/plugin/" + pluginId + path;
+
       try {
 
-         if (!path.startsWith("/")) { //$NON-NLS-1$
-            path = "/" + path; //$NON-NLS-1$
-         }
-
-         URL url = new URL("platform:/plugin/" + pluginId + path); //$NON-NLS-1$
+         URL url = new URI(uriPath).toURL();
          url = FileLocator.resolve(url);
 
          return ImageDescriptor.createFromURL(url);
@@ -90,6 +94,12 @@ public class SplashManager {
                "The image {0} was not found in the bundle {1}.", //$NON-NLS-1$
                path,
                pluginId);
+         throw new RuntimeException(msg, e);
+
+      } catch (final URISyntaxException e) {
+
+         final String msg = "URISyntaxException for \"%s\"".formatted(uriPath); //$NON-NLS-1$
+
          throw new RuntimeException(msg, e);
       }
    }
@@ -228,7 +238,11 @@ public class SplashManager {
 
    public void open() {
 
-      _splashShell = createUI_SplashShell();
+      if (_splashShell == null) {
+
+         _splashShell = createUI_SplashShell();
+      }
+
       _splashShell.open();
    }
 
