@@ -15,49 +15,493 @@
  *******************************************************************************/
 package net.tourbook.database;
 
+import java.io.InputStream;
+import java.security.MessageDigest;
+import java.sql.Connection;
+import java.sql.DatabaseMetaData;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.ResultSetMetaData;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.List;
+
+import net.tourbook.Messages;
 import net.tourbook.application.SplashManager;
+import net.tourbook.application.TourbookPlugin;
+import net.tourbook.common.UI;
+import net.tourbook.common.util.StatusUtil;
+import net.tourbook.preferences.ITourbookPreferences;
+
+import org.eclipse.jface.preference.IPreferenceStore;
 
 public class Derby2H2 {
 
-   private static boolean checkYourCustomState(final SplashManager splashManager) {
+   private static final String           DERBY_DRIVER = "org.apache.derby.jdbc.EmbeddedDriver";
+   private static final String           H2_DRIVER    = "org.h2.Driver";
 
-      splashManager.setMessage("Verifying license key...");
+   private static SplashManager          _splashManager;
 
-      return false;
+   private static int                    _allRowsDiff;
+
+   private static final IPreferenceStore _prefStore   = TourbookPlugin.getPrefStore();
+
+   private static List<String> getAllDerbyTables(final Connection conn) throws SQLException {
+
+      final List<String> allTables = new ArrayList<>();
+      final String sql = "SELECT TABLENAME FROM SYS.SYSTABLES WHERE TABLETYPE = 'T'";
+
+      try (Statement stmt = conn.createStatement();
+            ResultSet rs = stmt.executeQuery(sql)) {
+
+         while (rs.next()) {
+            allTables.add(rs.getString("TABLENAME"));
+         }
+      }
+
+      return allTables;
+   }
+
+   private static int getRowCount(final Connection conn, final String tableName) throws SQLException {
+
+      final String sql = "SELECT COUNT(*) FROM " + tableName;
+
+      try (Statement stmt = conn.createStatement();
+            ResultSet rs = stmt.executeQuery(sql)) {
+
+         if (rs.next()) {
+            return rs.getInt(1);
+         }
+      }
+
+      return 0;
+   }
+
+   private static String getTableBlobChecksum(final Connection conn,
+                                              final String tableName,
+                                              final String idColumn,
+                                              final String blobColumn) throws Exception {
+
+      // Order by ID explicitly to guarantee identical streaming order between databases
+      final String sql = "SELECT " + idColumn + ", " + blobColumn + " FROM " + tableName + " ORDER BY " + idColumn;
+      final MessageDigest md = MessageDigest.getInstance("SHA-256");
+
+      try (Statement stmt = conn.createStatement();
+            ResultSet rs = stmt.executeQuery(sql)) {
+
+         final byte[] buffer = new byte[4096];
+         while (rs.next()) {
+
+            // Hash the identifier to catch missing/shuffled keys
+            md.update(rs.getString(idColumn).getBytes());
+
+            // Hash the physical stream bytes
+            try (InputStream is = rs.getBinaryStream(blobColumn)) {
+
+               if (is != null) {
+
+                  int bytesRead;
+                  while ((bytesRead = is.read(buffer)) != -1) {
+                     md.update(buffer, 0, bytesRead);
+                  }
+
+               } else {
+
+                  md.update((byte) 0); // Handle Null consistency explicitly
+               }
+            }
+         }
+      }
+
+      // Convert digest to Hex String layout
+      final byte[] digest = md.digest();
+      final StringBuilder hexString = new StringBuilder();
+      for (final byte b : digest) {
+         hexString.append(String.format("%02x", b));
+      }
+
+      return hexString.toString();
    }
 
    public static boolean isMigrated() {
 
-      final SplashManager splashManager = SplashManager.getInstance();
+      int a = 0;
+      a = 0;
+      a++;
+      if (a == 0) {
+         return true;
+      }
 
-      splashManager.open();
+      final boolean isH2 = _prefStore.getBoolean(ITourbookPreferences.TOUR_DATABASE_IS_H2);
+
+      if (isH2) {
+
+         // H2 is already setup
+
+         return true;
+      }
+
+      _splashManager = SplashManager.getInstance();
+      _splashManager.open();
+
+      _splashManager.setMessage("Migrating Derby to H2");
+
+      if (isMigrated_All()) {
+
+         // set flag that the h2 migration is done
+         _prefStore.setValue(ITourbookPreferences.TOUR_DATABASE_IS_H2, true);
+
+         return true;
+      }
+
+      return false;
+   }
+
+   private static boolean isMigrated_All() {
+
+      String derbyDatabasePath = TourDatabase.derbyDatabasePath + "/" + TourDatabase.SQL_DB_TOURBOOK;
+      String h2DatabasePath = TourDatabase.h2DatabasePath + "/" + TourDatabase.SQL_DB_TOURBOOK;
+
+      if (derbyDatabasePath.startsWith("/")) {
+         derbyDatabasePath = derbyDatabasePath.substring(1);
+      }
+      if (h2DatabasePath.startsWith("/")) {
+         h2DatabasePath = h2DatabasePath.substring(1);
+      }
+
+      final long start = System.nanoTime();
+
+      migrate_10_DerbyToH2(derbyDatabasePath, h2DatabasePath);
+
+      final long end = System.nanoTime();
+
+      System.out.println(UI.timeStamp() + " Migration duration: %7.3f ms".formatted((float) (end - start) / 1000000));
+
+      return false;
+   }
+
+   private static void migrate_10_DerbyToH2(final String derbyDatabasePath, final String h2DatabasePath) {
 
       try {
 
-         splashManager.setMessage("Migrating Derby to H2");
-         Thread.sleep(2000); // Simulate some work
+         Class.forName(DERBY_DRIVER);
+         Class.forName(H2_DRIVER);
 
-         // State 1: Checking initial configurations
-         splashManager.setMessage("Checking system prerequisites...");
-         Thread.sleep(2000); // Simulate some work
+      } catch (final Exception e) {
 
-         // 2. Perform your state check
-         final boolean isStateValid = checkYourCustomState(splashManager);
+         StatusUtil.log(e);
 
-         if (isStateValid == false) {
+         return;
+      }
 
-            splashManager.setMessage("State invalid! Shutting down application...");
-            Thread.sleep(2000); // Give the user time to read the message
+      final String derbyUrl = "jdbc:derby:" + derbyDatabasePath;
+      final String h2Url = "jdbc:h2:" + h2DatabasePath + ";AUTO_SERVER=TRUE";
 
-            return false;
+      try (Connection derbyConn = DriverManager.getConnection(derbyUrl, "USER", "USER");
+            Connection h2Conn = DriverManager.getConnection(h2Url)) {
+
+         migrate_20_CreateH2Database(h2Conn);
+         migrate_30_MigrateTableData(derbyConn, h2Conn);
+
+      } catch (final SQLException e) {
+
+         UI.showSQLException(e);
+
+      } catch (final Exception e) {
+
+         StatusUtil.log(e);
+
+      } finally {
+
+         // 3. Shutdown Derby embedded cleanly to release file locks
+         try {
+            DriverManager.getConnection("jdbc:derby:;shutdown=true");
+         } catch (final SQLException se) {
+            // Derby always throws SQLState XJ015 on successful shutdown
+         }
+      }
+   }
+
+   private static void migrate_20_CreateH2Database(final Connection h2Conn) throws SQLException {
+
+      /*
+       * Check if TOURDATA table exists
+       */
+      final DatabaseMetaData metaData = h2Conn.getMetaData();
+      final ResultSet tables = metaData.getTables(null, null, null, null);
+      while (tables.next()) {
+
+         final String tableName = tables.getString(3);
+
+         if (tableName.equalsIgnoreCase(TourDatabase.TABLE_TOUR_DATA)) {
+
+            // table exists
+
+            return;
+         }
+      }
+
+      _splashManager.setMessage(Messages.Database_Monitor_CreateDatabase);
+
+      try (Statement stmt = h2Conn.createStatement()) {
+
+         TourDatabase.getInstance().sqlStartup_42_CreateAllTables(stmt);
+
+      } catch (final SQLException e) {
+
+         UI.showSQLException(e);
+      }
+   }
+
+   private static void migrate_30_MigrateTableData(final Connection derbyConn,
+                                                   final Connection h2Conn) throws Exception {
+
+      h2Conn.setAutoCommit(false); // Enable manual transaction management
+
+      // 1. Fetch all user tables from the Derby system catalog
+      final List<String> allDerbyTableNames = getAllDerbyTables(derbyConn);
+
+      // 2. Iterate through each table and migrate its content
+      for (final String tableName : allDerbyTableNames) {
+
+         _splashManager.setMessage("Migrating table: " + tableName);
+
+         // WIPE DEFAULT DATA FROM VERSION TABLES TO ALLOW CLEAN TRANSFER
+         /*
+          * H2 tables contained 2 rows
+          */
+         if (tableName.equalsIgnoreCase("DBVERSION")
+               || tableName.equalsIgnoreCase("DB_VERSION_DATA")) {
+
+            // skip these tables because their values are set when they are created
+
+//            try (Statement clearStmt = h2Conn.createStatement()) {
+//
+//               // Disable referential constraints momentarily to drop default rows safely
+//
+//               clearStmt.execute("SET REFERENTIAL_INTEGRITY FALSE");
+//               clearStmt.execute("DELETE FROM " + tableName);
+//               clearStmt.execute("SET REFERENTIAL_INTEGRITY TRUE");
+//
+//               h2Conn.commit();
+//            }
+         } else {
+
+            migrate_40_MigrateTableData_One(derbyConn, h2Conn, tableName);
+            migrate_50_CheckData(derbyConn, h2Conn, tableName);
+         }
+      }
+
+      _splashManager.setMessage("Derby vs H2 rows diff: %d".formatted(_allRowsDiff));
+      _splashManager.setMessage("Database migration successfully completed!");
+   }
+
+   private static void migrate_40_MigrateTableData_One(final Connection srcConn,
+                                                       final Connection destConn,
+                                                       final String tableName) throws SQLException {
+
+      long lastLogTime = System.currentTimeMillis();
+
+      final String selectSql = "SELECT * FROM " + tableName;
+
+      try (Statement srcStmt = srcConn.createStatement();
+            ResultSet srcRs = srcStmt.executeQuery(selectSql)) {
+
+         final ResultSetMetaData metaData = srcRs.getMetaData();
+         final int columnCount = metaData.getColumnCount();
+
+         // 1. Extract all column names from the table structure
+         final List<String> allColumnNames = new ArrayList<>();
+         for (int i = 1; i <= columnCount; i++) {
+            allColumnNames.add(metaData.getColumnName(i));
          }
 
-      } catch (final InterruptedException e) {
+         // 2. Build an explicit, bulletproof INSERT statement specifying column names
+         // e.g., INSERT INTO TOURPERSON (ID, NAME, BIRTHDAY) VALUES (?, ?, ?)
+         final StringBuilder insertBuilder = new StringBuilder("INSERT INTO " + tableName + " (");
+         final StringBuilder valuesBuilder = new StringBuilder(" VALUES (");
 
-         e.printStackTrace();
+         for (int i = 0; i < allColumnNames.size(); i++) {
 
-      } finally {}
+            if (i > 0) {
+               insertBuilder.append(", ");
+               valuesBuilder.append(", ");
+            }
 
-      return true;
+            // Quote to handle mixed-case or reserved names safely
+            insertBuilder.append("\"").append(allColumnNames.get(i)).append("\"");
+            valuesBuilder.append("?");
+         }
+         insertBuilder.append(")").append(valuesBuilder.append(")"));
+
+         // Disable referential integrity checks during batch processing
+         try (Statement constraintStmt = destConn.createStatement()) {
+            constraintStmt.execute("SET REFERENTIAL_INTEGRITY FALSE");
+         }
+
+         try (PreparedStatement destPstmt = destConn.prepareStatement(insertBuilder.toString())) {
+            int numBatches = 0;
+
+            final int maxBatches = 500;
+
+            while (srcRs.next()) {
+               // 3. Map parameters by walking through the exact names list
+               for (int i = 1; i <= columnCount; i++) {
+                  final String colName = allColumnNames.get(i - 1);
+                  final int colType = metaData.getColumnType(i);
+
+                  switch (colType) {
+                  case java.sql.Types.BLOB:
+                  case java.sql.Types.BINARY:
+                  case java.sql.Types.VARBINARY:
+                  case java.sql.Types.LONGVARBINARY:
+                     final InputStream blobStream = srcRs.getBinaryStream(colName);
+                     if (blobStream != null) {
+                        destPstmt.setBinaryStream(i, blobStream);
+                     } else {
+                        destPstmt.setNull(i, colType);
+                     }
+                     break;
+
+                  case java.sql.Types.CLOB:
+                  case java.sql.Types.LONGVARCHAR:
+                     destPstmt.setCharacterStream(i, srcRs.getCharacterStream(colName));
+                     break;
+
+                  case java.sql.Types.INTEGER:
+                     final int intVal = srcRs.getInt(colName);
+                     if (srcRs.wasNull()) {
+                        destPstmt.setNull(i, colType);
+                     } else {
+                        destPstmt.setInt(i, intVal);
+                     }
+                     break;
+
+                  case java.sql.Types.BIGINT:
+                     final long longVal = srcRs.getLong(colName);
+                     if (srcRs.wasNull()) {
+                        destPstmt.setNull(i, colType);
+                     } else {
+                        destPstmt.setLong(i, longVal);
+                     }
+                     break;
+
+                  case java.sql.Types.BOOLEAN:
+                  case java.sql.Types.BIT:
+                     final boolean boolVal = srcRs.getBoolean(colName);
+                     if (srcRs.wasNull()) {
+                        destPstmt.setNull(i, colType);
+                     } else {
+                        destPstmt.setBoolean(i, boolVal);
+                     }
+                     break;
+
+                  case java.sql.Types.TIMESTAMP:
+                     destPstmt.setTimestamp(i, srcRs.getTimestamp(colName));
+                     break;
+
+                  case java.sql.Types.DATE:
+                     destPstmt.setDate(i, srcRs.getDate(colName));
+                     break;
+
+                  case java.sql.Types.DOUBLE:
+                  case java.sql.Types.FLOAT:
+                     final double doubleVal = srcRs.getDouble(colName);
+                     if (srcRs.wasNull()) {
+                        destPstmt.setNull(i, colType);
+                     } else {
+                        destPstmt.setDouble(i, doubleVal);
+                     }
+                     break;
+
+                  default:
+                     final Object value = srcRs.getObject(colName);
+                     if (value == null) {
+                        destPstmt.setNull(i, colType);
+                     } else {
+                        destPstmt.setObject(i, value);
+                     }
+                     break;
+                  }
+               }
+
+               destPstmt.addBatch();
+               numBatches++;
+
+               if (numBatches % maxBatches == 0) {
+
+                  final long currentTime = System.currentTimeMillis();
+                  final long timeDiff = currentTime - lastLogTime;
+
+                  // reduce logging
+                  if (timeDiff > 500) {
+
+                     lastLogTime = currentTime;
+
+                     _splashManager.setMessage("   %d rows in %s".formatted(numBatches, tableName));
+                  }
+
+                  destPstmt.executeBatch();
+                  destConn.commit();
+               }
+            }
+
+            if (numBatches % maxBatches != 0) {
+
+               _splashManager.setMessage("   %d rows in %s".formatted(numBatches, tableName));
+
+               destPstmt.executeBatch();
+               destConn.commit();
+            }
+
+         } finally {
+            // Restore constraint checking validation
+            try (Statement constraintStmt = destConn.createStatement()) {
+               constraintStmt.execute("SET REFERENTIAL_INTEGRITY TRUE");
+            }
+         }
+      }
+   }
+
+   private static void migrate_50_CheckData(final Connection derbyConn, final Connection h2Conn, final String tableName) throws Exception {
+
+      /*
+       * Quick row check
+       */
+      final int derbyRows = getRowCount(derbyConn, tableName);
+      final int h2Rows = getRowCount(h2Conn, tableName);
+
+      final int rowsDiff = h2Rows - derbyRows;
+
+      _allRowsDiff += rowsDiff;
+
+      if (rowsDiff > 0) {
+
+         _splashManager.setMessage("   Check: Derby rows: %d - H2 rows: %d                                      Rows diff: %d".formatted(
+               derbyRows,
+               h2Rows,
+               rowsDiff));
+
+      } else {
+
+         _splashManager.setMessage("   Check: Derby rows: %d - H2 rows: %d".formatted(derbyRows, h2Rows));
+      }
+
+      /*
+       * Blob check
+       */
+      if (tableName.equalsIgnoreCase("TOURDATA")) {
+
+         final String derbyHash = getTableBlobChecksum(derbyConn, "TOURDATA", "tourId", "SerieData");
+         final String h2Hash = getTableBlobChecksum(h2Conn, "TOURDATA", "tourId", "SerieData");
+
+         if (derbyHash.equals(h2Hash)) {
+            _splashManager.setMessage("   Check: ✅ TOURDATA Blobs perfectly matched via SHA-256 validation!");
+         } else {
+            _splashManager.setMessage("   Check: ❌ Critical Error: Data mismatch detected inside TOURDATA blobs!");
+         }
+      }
    }
 }

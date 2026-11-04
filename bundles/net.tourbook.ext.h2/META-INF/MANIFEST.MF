@@ -1,11 +1,10 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: H2 Database Engine
-Bundle-SymbolicName: net.tourbook.ext.h2;singleton:=true
+Bundle-SymbolicName: net.tourbook.ext.h2
+Automatic-Module-Name: net.tourbook.ext.h2
 Bundle-Version: 2.5.252
-Eclipse-BuddyPolicy: registered
 Bundle-Vendor: H2 database engine
-Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: JavaSE-21
 Bundle-ClassPath: 
  h2-2.5.252.jar
@@ -68,4 +67,3 @@ Export-Package:
  org.h2.util.json,
  org.h2.value,
  org.h2.value.lob
-Automatic-Module-Name: net.tourbook.ext.h2
