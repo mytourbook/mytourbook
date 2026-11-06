@@ -349,8 +349,6 @@ public class TourDatabase {
    private static final String DERBY_URL_COMMAND_UPGRADE_TRUE             = ";upgrade=true";                      //$NON-NLS-1$
 
    private static final String H2_DATABASE                                = "h2-database";                        //$NON-NLS-1$
-//   private static String       H2_DB_TOURBOOK_URL;
-//   private static String       H2_DRIVER_CLASS;
    //
    /**
     * ERROR XCL13: The parameter position '13' is out of range. The number of parameters for

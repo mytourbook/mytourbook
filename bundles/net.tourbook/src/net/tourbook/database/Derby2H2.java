@@ -48,23 +48,7 @@ public class Derby2H2 {
 
    private static final IPreferenceStore _prefStore   = TourbookPlugin.getPrefStore();
 
-   private static List<String> getAllDerbyTables(final Connection conn) throws SQLException {
-
-      final List<String> allTables = new ArrayList<>();
-      final String sql = "SELECT TABLENAME FROM SYS.SYSTABLES WHERE TABLETYPE = 'T'";
-
-      try (Statement stmt = conn.createStatement();
-            ResultSet rs = stmt.executeQuery(sql)) {
-
-         while (rs.next()) {
-            allTables.add(rs.getString("TABLENAME"));
-         }
-      }
-
-      return allTables;
-   }
-
-   private static int getRowCount(final Connection conn, final String tableName) throws SQLException {
+   private static int check_GetRowCount(final Connection conn, final String tableName) throws SQLException {
 
       final String sql = "SELECT COUNT(*) FROM " + tableName;
 
@@ -79,10 +63,10 @@ public class Derby2H2 {
       return 0;
    }
 
-   private static String getTableBlobChecksum(final Connection conn,
-                                              final String tableName,
-                                              final String idColumn,
-                                              final String blobColumn) throws Exception {
+   private static String check_GetTableBlobCheckSum(final Connection conn,
+                                                    final String tableName,
+                                                    final String idColumn,
+                                                    final String blobColumn) throws Exception {
 
       // Order by ID explicitly to guarantee identical streaming order between databases
       final String sql = "SELECT " + idColumn + ", " + blobColumn + " FROM " + tableName + " ORDER BY " + idColumn;
@@ -125,13 +109,32 @@ public class Derby2H2 {
       return hexString.toString();
    }
 
+   private static List<String> getAllDerbyTables(final Connection conn) throws SQLException {
+
+      final List<String> allTables = new ArrayList<>();
+      final String sql = "SELECT TABLENAME FROM SYS.SYSTABLES WHERE TABLETYPE = 'T'";
+
+      try (Statement stmt = conn.createStatement();
+            ResultSet rs = stmt.executeQuery(sql)) {
+
+         while (rs.next()) {
+            allTables.add(rs.getString("TABLENAME"));
+         }
+      }
+
+      return allTables;
+   }
+
    public static boolean isMigrated() {
+
+      ExternalDatabase.test();
 
       int a = 0;
       a = 0;
-      a++;
+//      a++;
       if (a == 0) {
-         return true;
+         return false;
+//         return true;
       }
 
       final boolean isH2 = _prefStore.getBoolean(ITourbookPreferences.TOUR_DATABASE_IS_H2);
@@ -307,9 +310,9 @@ public class Derby2H2 {
       final String selectSql = "SELECT * FROM " + tableName;
 
       try (Statement srcStmt = srcConn.createStatement();
-            ResultSet srcRs = srcStmt.executeQuery(selectSql)) {
+            ResultSet srcResultSet = srcStmt.executeQuery(selectSql)) {
 
-         final ResultSetMetaData metaData = srcRs.getMetaData();
+         final ResultSetMetaData metaData = srcResultSet.getMetaData();
          final int columnCount = metaData.getColumnCount();
 
          // 1. Extract all column names from the table structure
@@ -342,86 +345,88 @@ public class Derby2H2 {
          }
 
          try (PreparedStatement destPstmt = destConn.prepareStatement(insertBuilder.toString())) {
-            int numBatches = 0;
 
+            int numBatches = 0;
             final int maxBatches = 500;
 
-            while (srcRs.next()) {
+            while (srcResultSet.next()) {
+
                // 3. Map parameters by walking through the exact names list
-               for (int i = 1; i <= columnCount; i++) {
-                  final String colName = allColumnNames.get(i - 1);
-                  final int colType = metaData.getColumnType(i);
+               for (int columnIndex = 1; columnIndex <= columnCount; columnIndex++) {
+
+                  final String colName = allColumnNames.get(columnIndex - 1);
+                  final int colType = metaData.getColumnType(columnIndex);
 
                   switch (colType) {
                   case java.sql.Types.BLOB:
                   case java.sql.Types.BINARY:
                   case java.sql.Types.VARBINARY:
                   case java.sql.Types.LONGVARBINARY:
-                     final InputStream blobStream = srcRs.getBinaryStream(colName);
+                     final InputStream blobStream = srcResultSet.getBinaryStream(colName);
                      if (blobStream != null) {
-                        destPstmt.setBinaryStream(i, blobStream);
+                        destPstmt.setBinaryStream(columnIndex, blobStream);
                      } else {
-                        destPstmt.setNull(i, colType);
+                        destPstmt.setNull(columnIndex, colType);
                      }
                      break;
 
                   case java.sql.Types.CLOB:
                   case java.sql.Types.LONGVARCHAR:
-                     destPstmt.setCharacterStream(i, srcRs.getCharacterStream(colName));
+                     destPstmt.setCharacterStream(columnIndex, srcResultSet.getCharacterStream(colName));
                      break;
 
                   case java.sql.Types.INTEGER:
-                     final int intVal = srcRs.getInt(colName);
-                     if (srcRs.wasNull()) {
-                        destPstmt.setNull(i, colType);
+                     final int intVal = srcResultSet.getInt(colName);
+                     if (srcResultSet.wasNull()) {
+                        destPstmt.setNull(columnIndex, colType);
                      } else {
-                        destPstmt.setInt(i, intVal);
+                        destPstmt.setInt(columnIndex, intVal);
                      }
                      break;
 
                   case java.sql.Types.BIGINT:
-                     final long longVal = srcRs.getLong(colName);
-                     if (srcRs.wasNull()) {
-                        destPstmt.setNull(i, colType);
+                     final long longVal = srcResultSet.getLong(colName);
+                     if (srcResultSet.wasNull()) {
+                        destPstmt.setNull(columnIndex, colType);
                      } else {
-                        destPstmt.setLong(i, longVal);
+                        destPstmt.setLong(columnIndex, longVal);
                      }
                      break;
 
                   case java.sql.Types.BOOLEAN:
                   case java.sql.Types.BIT:
-                     final boolean boolVal = srcRs.getBoolean(colName);
-                     if (srcRs.wasNull()) {
-                        destPstmt.setNull(i, colType);
+                     final boolean boolVal = srcResultSet.getBoolean(colName);
+                     if (srcResultSet.wasNull()) {
+                        destPstmt.setNull(columnIndex, colType);
                      } else {
-                        destPstmt.setBoolean(i, boolVal);
+                        destPstmt.setBoolean(columnIndex, boolVal);
                      }
                      break;
 
                   case java.sql.Types.TIMESTAMP:
-                     destPstmt.setTimestamp(i, srcRs.getTimestamp(colName));
+                     destPstmt.setTimestamp(columnIndex, srcResultSet.getTimestamp(colName));
                      break;
 
                   case java.sql.Types.DATE:
-                     destPstmt.setDate(i, srcRs.getDate(colName));
+                     destPstmt.setDate(columnIndex, srcResultSet.getDate(colName));
                      break;
 
                   case java.sql.Types.DOUBLE:
                   case java.sql.Types.FLOAT:
-                     final double doubleVal = srcRs.getDouble(colName);
-                     if (srcRs.wasNull()) {
-                        destPstmt.setNull(i, colType);
+                     final double doubleVal = srcResultSet.getDouble(colName);
+                     if (srcResultSet.wasNull()) {
+                        destPstmt.setNull(columnIndex, colType);
                      } else {
-                        destPstmt.setDouble(i, doubleVal);
+                        destPstmt.setDouble(columnIndex, doubleVal);
                      }
                      break;
 
                   default:
-                     final Object value = srcRs.getObject(colName);
+                     final Object value = srcResultSet.getObject(colName);
                      if (value == null) {
-                        destPstmt.setNull(i, colType);
+                        destPstmt.setNull(columnIndex, colType);
                      } else {
-                        destPstmt.setObject(i, value);
+                        destPstmt.setObject(columnIndex, value);
                      }
                      break;
                   }
@@ -470,8 +475,8 @@ public class Derby2H2 {
       /*
        * Quick row check
        */
-      final int derbyRows = getRowCount(derbyConn, tableName);
-      final int h2Rows = getRowCount(h2Conn, tableName);
+      final int derbyRows = check_GetRowCount(derbyConn, tableName);
+      final int h2Rows = check_GetRowCount(h2Conn, tableName);
 
       final int rowsDiff = h2Rows - derbyRows;
 
@@ -494,8 +499,8 @@ public class Derby2H2 {
        */
       if (tableName.equalsIgnoreCase("TOURDATA")) {
 
-         final String derbyHash = getTableBlobChecksum(derbyConn, "TOURDATA", "tourId", "SerieData");
-         final String h2Hash = getTableBlobChecksum(h2Conn, "TOURDATA", "tourId", "SerieData");
+         final String derbyHash = check_GetTableBlobCheckSum(derbyConn, "TOURDATA", "tourId", "SerieData");
+         final String h2Hash = check_GetTableBlobCheckSum(h2Conn, "TOURDATA", "tourId", "SerieData");
 
          if (derbyHash.equals(h2Hash)) {
             _splashManager.setMessage("   Check: ✅ TOURDATA Blobs perfectly matched via SHA-256 validation!");

@@ -62,6 +62,7 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
        * tour database, default is embedded
        */
       store.setDefault(ITourbookPreferences.TOUR_DATABASE_IS_DERBY_EMBEDDED, true);
+      store.setDefault(ITourbookPreferences.TOUR_DATABASE_IS_EXTERNAL, false);
 
       /*
        * Regional settings

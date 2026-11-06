@@ -43,6 +43,8 @@ public interface ITourbookPreferences {
    public static final String TOUR_DATABASE_IS_DERBY_EMBEDDED = "TOUR_DATABASE_IS_DERBY_EMBEDDED"; //$NON-NLS-1$
    public static final String TOUR_DATABASE_IS_H2             = "TOUR_DATABASE_IS_H2";             //$NON-NLS-1$
 
+   public static final String TOUR_DATABASE_IS_EXTERNAL       = "TOUR_DATABASE_IS_EXTERNAL";       //$NON-NLS-1$
+
    /*
     * Notifications
     */
