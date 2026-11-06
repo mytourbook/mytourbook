@@ -127,21 +127,25 @@ public class Derby2H2 {
 
    public static boolean isMigrated() {
 
-      ExternalDatabase.test();
+//      ExternalDatabase.test();
 
       int a = 0;
       a = 0;
 //      a++;
       if (a == 0) {
-         return false;
+//         return false;
 //         return true;
       }
 
-      final boolean isH2 = _prefStore.getBoolean(ITourbookPreferences.TOUR_DATABASE_IS_H2);
+      // debug h2 migration
+      _prefStore.setValue(ITourbookPreferences.TOUR_DATABASE_IS_H2_MIGRATED, false);
+      _prefStore.setValue(ITourbookPreferences.TOUR_DATABASE_IS_H2_MIGRATED, true);
 
-      if (isH2) {
+      final boolean isH2Migrated = _prefStore.getBoolean(ITourbookPreferences.TOUR_DATABASE_IS_H2_MIGRATED);
 
-         // H2 is already setup
+      if (isH2Migrated) {
+
+         // H2 is already migrated
 
          return true;
       }
@@ -154,7 +158,7 @@ public class Derby2H2 {
       if (isMigrated_All()) {
 
          // set flag that the h2 migration is done
-         _prefStore.setValue(ITourbookPreferences.TOUR_DATABASE_IS_H2, true);
+         _prefStore.setValue(ITourbookPreferences.TOUR_DATABASE_IS_H2_MIGRATED, true);
 
          return true;
       }
@@ -164,8 +168,10 @@ public class Derby2H2 {
 
    private static boolean isMigrated_All() {
 
-      String derbyDatabasePath = TourDatabase.derbyDatabasePath + "/" + TourDatabase.SQL_DB_TOURBOOK;
-      String h2DatabasePath = TourDatabase.h2DatabasePath + "/" + TourDatabase.SQL_DB_TOURBOOK;
+      final String sqlDbTourbook = TourDatabase.SQL_DB_TOURBOOK;
+
+      String derbyDatabasePath = TourDatabase.derbyDatabasePath + "/" + sqlDbTourbook;
+      String h2DatabasePath = TourDatabase.h2DatabasePath + "/" + sqlDbTourbook;
 
       if (derbyDatabasePath.startsWith("/")) {
          derbyDatabasePath = derbyDatabasePath.substring(1);
@@ -271,25 +277,11 @@ public class Derby2H2 {
 
          _splashManager.setMessage("Migrating table: " + tableName);
 
-         // WIPE DEFAULT DATA FROM VERSION TABLES TO ALLOW CLEAN TRANSFER
-         /*
-          * H2 tables contained 2 rows
-          */
-         if (tableName.equalsIgnoreCase("DBVERSION")
-               || tableName.equalsIgnoreCase("DB_VERSION_DATA")) {
+         if (tableName.equalsIgnoreCase(TourDatabase.TABLE_DB_VERSION_DESIGN)
+               || tableName.equalsIgnoreCase(TourDatabase.TABLE_DB_VERSION_DATA)) {
 
             // skip these tables because their values are set when they are created
 
-//            try (Statement clearStmt = h2Conn.createStatement()) {
-//
-//               // Disable referential constraints momentarily to drop default rows safely
-//
-//               clearStmt.execute("SET REFERENTIAL_INTEGRITY FALSE");
-//               clearStmt.execute("DELETE FROM " + tableName);
-//               clearStmt.execute("SET REFERENTIAL_INTEGRITY TRUE");
-//
-//               h2Conn.commit();
-//            }
          } else {
 
             migrate_40_MigrateTableData_One(derbyConn, h2Conn, tableName);
@@ -462,7 +454,9 @@ public class Derby2H2 {
             }
 
          } finally {
+
             // Restore constraint checking validation
+
             try (Statement constraintStmt = destConn.createStatement()) {
                constraintStmt.execute("SET REFERENTIAL_INTEGRITY TRUE");
             }
@@ -503,9 +497,9 @@ public class Derby2H2 {
          final String h2Hash = check_GetTableBlobCheckSum(h2Conn, "TOURDATA", "tourId", "SerieData");
 
          if (derbyHash.equals(h2Hash)) {
-            _splashManager.setMessage("   Check: ✅ TOURDATA Blobs perfectly matched via SHA-256 validation!");
+            _splashManager.setMessage("   Check: TOURDATA Blobs perfectly matched via SHA-256 validation");
          } else {
-            _splashManager.setMessage("   Check: ❌ Critical Error: Data mismatch detected inside TOURDATA blobs!");
+            _splashManager.setMessage("   Check: Critical Error: Data mismatch detected inside TOURDATA blobs !");
          }
       }
    }

@@ -2229,10 +2229,10 @@ public class Messages extends NLS {
    public static String        Pref_TourDb_Dialog_TourDbSystemIsModified_Message;
    public static String        Pref_TourDb_Dialog_TourDbSystemIsModified_Title;
    public static String        Pref_TourDb_Group_TourDB;
-   public static String        Pref_TourDb_Radio_DbSystem_Embedded;
-   public static String        Pref_TourDb_Radio_DbSystem_Embedded_Tooltip;
-   public static String        Pref_TourDb_Radio_DbSystem_Server;
-   public static String        Pref_TourDb_Radio_DbSystem_Server_Tooltip;
+   public static String        Pref_TourDb_Radio_External;
+   public static String        Pref_TourDb_Radio_External_Tooltip;
+   public static String        Pref_TourDb_Radio_Internal;
+   public static String        Pref_TourDb_Radio_Internal_Tooltip;
 
    public static String        pref_tourtag_btn_new_tag;
    public static String        pref_tourtag_btn_new_tag_category;

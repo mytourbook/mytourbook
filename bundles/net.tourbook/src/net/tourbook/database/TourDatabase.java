@@ -217,8 +217,8 @@ public class TourDatabase {
     */
    private static final String TABLE_SCHEMA                               = "USER";                                                  //$NON-NLS-1$
 
-   private static final String TABLE_DB_VERSION_DESIGN                    = "DBVERSION";                                             //$NON-NLS-1$
-   private static final String TABLE_DB_VERSION_DATA                      = "DB_VERSION_DATA";                                       //$NON-NLS-1$
+   static final String         TABLE_DB_VERSION_DESIGN                    = "DBVERSION";                                             //$NON-NLS-1$
+   static final String         TABLE_DB_VERSION_DATA                      = "DB_VERSION_DATA";                                       //$NON-NLS-1$
 
    public static final String  TABLE_DEVICE_SENSOR                        = "DeviceSensor";                                          //$NON-NLS-1$
    public static final String  TABLE_DEVICE_SENSOR_VALUE                  = "DeviceSensorValue";                                     //$NON-NLS-1$
@@ -354,13 +354,13 @@ public class TourDatabase {
     * ERROR XCL13: The parameter position '13' is out of range. The number of parameters for
     * this prepared statement is '12'.
     */
-   public static final String SQL_ERROR_XCL13 = "XCL13"; //$NON-NLS-1$
+   public static final String  SQL_ERROR_XCL13                            = "XCL13";                              //$NON-NLS-1$
 
    /**
     * ERROR XCL14: The column position '3' is out of range. The number of columns for this ResultSet
     * is '2'.
     */
-   public static final String SQL_ERROR_XCL14 = "XCL14"; //$NON-NLS-1$
+   public static final String  SQL_ERROR_XCL14                            = "XCL14";                              //$NON-NLS-1$
    //
    //
    private static volatile TourDatabase                   _instance;
@@ -564,7 +564,7 @@ public class TourDatabase {
     */
    private int                                   _dbVersion_AfterDesignUpdate;
 
-   private boolean                               _isDerbyEmbedded;
+   private boolean                               _isExternal;
    private boolean                               _isChecked_DbCreated;
    private boolean                               _isChecked_UpgradeDB_Before;
    private boolean                               _isChecked_UpgradeDB_After;
@@ -974,13 +974,13 @@ public class TourDatabase {
 
    private TourDatabase() {
 
-      _isDerbyEmbedded = _prefStore.getBoolean(ITourbookPreferences.TOUR_DATABASE_IS_DERBY_EMBEDDED);
+      _isExternal = _prefStore.getBoolean(ITourbookPreferences.TOUR_DATABASE_IS_EXTERNAL);
 
 // SET_FORMATTING_OFF
 
-      if (_isDerbyEmbedded) {
+      if (_isExternal) {
 
-         // use embedded server
+         // use external server
 
          DERBY_SERVER_URL        = "jdbc:derby:"; //                                         //$NON-NLS-1$
          DERBY_DB_TOURBOOK_URL   = "jdbc:derby:" + SQL_DB_TOURBOOK; //                       //$NON-NLS-1$
@@ -988,16 +988,12 @@ public class TourDatabase {
 
       } else {
 
-         // use network server
+         // use internal server
 
          DERBY_SERVER_URL        = "jdbc:derby://localhost:1527/"; //                        //$NON-NLS-1$
          DERBY_DB_TOURBOOK_URL   = "jdbc:derby://localhost:1527/" + SQL_DB_TOURBOOK; //      //$NON-NLS-1$
          DERBY_DRIVER_CLASS      = "org.apache.derby.jdbc.ClientDriver"; //                  //$NON-NLS-1$
       }
-
-//      H2_SERVER_URL        = "jdbc:derby://localhost:1527/"; //                        //$NON-NLS-1$
-//      H2_DB_TOURBOOK_URL   = "jdbc:h2:file:" + h2DatabasePath; //    //$NON-NLS-1$
-//      H2_DRIVER_CLASS      = "org.h2.Driver"; //                                             //$NON-NLS-1$
 
 // SET_FORMATTING_ON
    }
@@ -6578,7 +6574,7 @@ public class TourDatabase {
     */
    private void sqlStartup_20_CheckServer(final SplashManager splashManager) throws Throwable {
 
-      if (_isDerbyEmbedded) {
+      if (_isExternal) {
          return;
       }
 

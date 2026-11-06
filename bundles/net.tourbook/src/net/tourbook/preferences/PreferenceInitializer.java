@@ -53,25 +53,25 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
 
       final IPreferenceStore store = TourbookPlugin.getDefault().getPreferenceStore();
 
+// SET_FORMATTING_OFF
+
       /*
        * system
        */
-      store.setDefault(ITourbookPreferences.TOUR_CACHE_SIZE, 500);
+      store.setDefault(ITourbookPreferences.TOUR_CACHE_SIZE,                     500);
 
       /*
-       * tour database, default is embedded
+       * Tour database, default is internal H2
        */
-      store.setDefault(ITourbookPreferences.TOUR_DATABASE_IS_DERBY_EMBEDDED, true);
-      store.setDefault(ITourbookPreferences.TOUR_DATABASE_IS_EXTERNAL, false);
+      store.setDefault(ITourbookPreferences.TOUR_DATABASE_IS_EXTERNAL,           false);
+      store.setDefault(ITourbookPreferences.TOUR_DATABASE_IS_H2_MIGRATED,        false);
 
       /*
        * Regional settings
        */
-      store.setDefault(ITourbookPreferences.REGIONAL_USE_CUSTOM_DECIMAL_FORMAT, false);
-      store.setDefault(ITourbookPreferences.REGIONAL_DECIMAL_SEPARATOR, UI.SYMBOL_DOT);
-      store.setDefault(ITourbookPreferences.REGIONAL_GROUP_SEPARATOR, "'"); //$NON-NLS-1$
-
-// SET_FORMATTING_OFF
+      store.setDefault(ITourbookPreferences.REGIONAL_USE_CUSTOM_DECIMAL_FORMAT,  false);
+      store.setDefault(ITourbookPreferences.REGIONAL_DECIMAL_SEPARATOR,          UI.SYMBOL_DOT);
+      store.setDefault(ITourbookPreferences.REGIONAL_GROUP_SEPARATOR, 				"'"); //$NON-NLS-1$
 
       /*
        * Statistics
