@@ -134,7 +134,7 @@ public class Derby2H2 {
 //      a++;
       if (a == 0) {
 //         return false;
-//         return true;
+         return true;
       }
 
       // debug h2 migration

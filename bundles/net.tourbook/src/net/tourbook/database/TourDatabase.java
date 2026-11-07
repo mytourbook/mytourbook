@@ -44,6 +44,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 import java.util.Set;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.ConcurrentSkipListSet;
@@ -55,7 +56,6 @@ import java.util.concurrent.ThreadPoolExecutor;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.EntityTransaction;
-import javax.persistence.Persistence;
 import javax.persistence.Query;
 
 import net.tourbook.Messages;
@@ -74,6 +74,7 @@ import net.tourbook.data.Equipment;
 import net.tourbook.data.EquipmentPart;
 import net.tourbook.data.TourBeverageContainer;
 import net.tourbook.data.TourBike;
+import net.tourbook.data.TourCompared;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourLocation;
 import net.tourbook.data.TourMarker;
@@ -81,6 +82,7 @@ import net.tourbook.data.TourMarkerType;
 import net.tourbook.data.TourNutritionProduct;
 import net.tourbook.data.TourPerson;
 import net.tourbook.data.TourPersonHRZone;
+import net.tourbook.data.TourPhoto;
 import net.tourbook.data.TourReference;
 import net.tourbook.data.TourTag;
 import net.tourbook.data.TourTagCategory;
@@ -113,6 +115,7 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IPropertyListener;
 import org.eclipse.ui.PlatformUI;
+import org.hibernate.ejb.Ejb3Configuration;
 import org.osgi.framework.Bundle;
 
 public class TourDatabase {
@@ -335,8 +338,6 @@ public class TourDatabase {
    private static final String DEFAULT_1_0                                = "1.0";                                //$NON-NLS-1$
    private static final String DEFAULT_FALSE                              = "false";                              //$NON-NLS-1$
    private static final String DEFAULT_IGNORED                            = "-1";                                 //$NON-NLS-1$
-
-   private static final String PERSISTENCE_UNIT_NAME                      = "tourdatabase";                       //$NON-NLS-1$
 
    static final String         SQL_DB_TOURBOOK                            = "tourbook";                           //$NON-NLS-1$
 
@@ -6925,14 +6926,61 @@ public class TourDatabase {
 
    private synchronized void sqlStartup_60_SetupEntityManager(final SplashManager splashManager) {
 
-      final Map<String, Object> configOverrides = new HashMap<>();
-
-      configOverrides.put("hibernate.connection.url", DERBY_DB_TOURBOOK_URL); //$NON-NLS-1$
-      configOverrides.put("hibernate.connection.driver_class", DERBY_DRIVER_CLASS); //$NON-NLS-1$
-
       splashManager.setMessage(Messages.Database_Monitor_persistent_service_task);
 
-      _emFactory = Persistence.createEntityManagerFactory(PERSISTENCE_UNIT_NAME, configOverrides);
+      final Ejb3Configuration cfg = new Ejb3Configuration();
+
+      // 1. Define EJB3 / Hibernate properties
+      final Properties props = new Properties();
+
+//SET_FORMATTING_OFF
+
+      // Database Connection Settings
+      props.put("hibernate.connection.driver_class",  DERBY_DRIVER_CLASS);
+      props.put("hibernate.connection.url",           DERBY_DB_TOURBOOK_URL);
+      props.put("hibernate.connection.username",      "User");
+      props.put("hibernate.connection.password",      "adsf");
+
+      // Hibernate Dialect and SQL tuning
+      props.put("hibernate.dialect",                  "org.hibernate.dialect.DerbyDialect");
+      props.put("hibernate.archive.autodetection",    "none");
+
+      // debug sql
+//    props.put("hibernate.show_sql",                 "true");
+//    props.put("hibernate.format_sql",               "true");
+
+      // DDL Schema generation strategies
+//    props.put("hibernate.hbm2ddl.auto",             "update");
+
+      // 2. Inject properties into the configuration instance
+      cfg.addProperties(props);
+
+      // 3. Manually register your annotated Entity classes
+      cfg.addAnnotatedClass(DeviceSensor           .class);
+      cfg.addAnnotatedClass(DeviceSensorValue      .class);
+      cfg.addAnnotatedClass(Equipment              .class);
+      cfg.addAnnotatedClass(EquipmentPart          .class);
+      cfg.addAnnotatedClass(TourBeverageContainer  .class);
+      cfg.addAnnotatedClass(TourBike               .class);
+      cfg.addAnnotatedClass(TourCompared           .class);
+      cfg.addAnnotatedClass(TourData               .class);
+      cfg.addAnnotatedClass(TourLocation           .class);
+      cfg.addAnnotatedClass(TourMarker             .class);
+      cfg.addAnnotatedClass(TourMarkerType         .class);
+      cfg.addAnnotatedClass(TourNutritionProduct   .class);
+      cfg.addAnnotatedClass(TourPerson             .class);
+      cfg.addAnnotatedClass(TourPersonHRZone       .class);
+      cfg.addAnnotatedClass(TourPhoto              .class);
+      cfg.addAnnotatedClass(TourReference          .class);
+      cfg.addAnnotatedClass(TourTag                .class);
+      cfg.addAnnotatedClass(TourTagCategory        .class);
+      cfg.addAnnotatedClass(TourType               .class);
+      cfg.addAnnotatedClass(TourWayPoint           .class);
+
+//SET_FORMATTING_ON
+
+      // 4. Build the Persistence Unit Factory
+      _emFactory = cfg.buildEntityManagerFactory();
    }
 
    /**
