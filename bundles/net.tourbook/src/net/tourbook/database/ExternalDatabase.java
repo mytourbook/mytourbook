@@ -33,7 +33,6 @@ import java.sql.SQLException;
 import java.sql.Statement;
 
 import net.tourbook.application.TourbookPlugin;
-import net.tourbook.common.UI;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.tour.TourLogManager;
 
@@ -45,26 +44,26 @@ public class ExternalDatabase {
    private static final IPreferenceStore _prefStore         = TourbookPlugin.getPrefStore();
 
    /**
-    * Folder where the externl jdbc driver jar is stored. This folder is created when a driver jar
-    * is downloaded.
+    * Subfolder in the app instance location where the externl jdbc driver jar is stored. This
+    * folder is created when a driver jar is downloaded and do not yet exist.
     */
    private static final String           FOLDER_EXTERNAL_DB = "external-db";
 
    private static Path                   _externalDbPath;
 
-// SET_FORMATTING_OFF
+   private static String                 _configConnectionUrl;
+   private static String                 _configConnectionUrl_Parameters;
+   private static String                 _configDbName;
+   private static String                 _configDbUsername;
+   private static String                 _configDbPassword;
+   private static String                 _configHibernateDialect;
+   private static String                 _configJarDownloadUrl;
+   private static String                 _configJdbcDriver;
 
-   // Source: https://mvnrepository.com/artifact/org.mariadb.jdbc/mariadb-java-client
-   //         implementation("org.mariadb.jdbc:mariadb-java-client:3.5.11")
-   private static String _jarDownloadUrl            = "https://repo1.maven.org/maven2/org/mariadb/jdbc/mariadb-java-client/3.5.11/mariadb-java-client-3.5.11.jar";
-   private static String _jdbcDriver                 = "org.mariadb.jdbc.Driver";
-   private static String _jdbcUrlWithoutDb           = "jdbc:mariadb://localhost:3306/";
-   private static String _jdbcUrlWithDb              = _jdbcUrlWithoutDb + TourDatabase.SQL_DB_TOURBOOK;
-   private static String _jdbcUrlAdditionalParameter = UI.EMPTY_STRING;
-   private static String _dbUsername                 = "mt-user";
-   private static String _dbPassword                 = "password";
-
-// SET_FORMATTING_ON
+   /**
+    * Url to connect to the tour database
+    */
+   private static String                 _connectionUrl_Concatenated;
 
    static {
 
@@ -81,7 +80,7 @@ public class ExternalDatabase {
 
       final String sql = "CREATE DATABASE IF NOT EXISTS " + TourDatabase.SQL_DB_TOURBOOK;
 
-      try (Connection conn = DriverManager.getConnection(_jdbcUrlWithoutDb, _dbUsername, _dbPassword);
+      try (Connection conn = DriverManager.getConnection(_configConnectionUrl, _configDbUsername, _configDbPassword);
             Statement stmt = conn.createStatement()) {
 
          stmt.executeUpdate(sql);
@@ -91,9 +90,77 @@ public class ExternalDatabase {
    }
 
    /**
+    * @return
+    */
+   public static boolean checkDatabaseExists() {
+
+      boolean isDbAvailable = false;
+
+      // Connect to the database server base URL (without specifying a specific database if possible)
+      try (Connection conn = DriverManager.getConnection(_configConnectionUrl, _configDbUsername, _configDbPassword)) {
+
+         TourLogManager.log_DEFAULT("Connected to sql server with: " + _configConnectionUrl);
+
+         // Get database metadata
+         final var metaData = conn.getMetaData();
+
+         // For SQL Server, MySQL, PostgreSQL, "Catalogs" usually represent the databases
+         try (ResultSet resultSet = metaData.getCatalogs()) {
+
+            while (resultSet.next()) {
+
+               // The first column contains the database/catalog name
+               final String databaseName = resultSet.getString(1);
+
+               if (databaseName.equalsIgnoreCase(_configDbName)) {
+                  isDbAvailable = true;
+                  break;
+               }
+            }
+         }
+
+         if (isDbAvailable == false) {
+
+            // Fallback for databases where schemas represent separate DB-like boundaries (e.g., Oracle)
+            try (ResultSet resultSet = metaData.getSchemas()) {
+
+               while (resultSet.next()) {
+
+                  final String schemaName = resultSet.getString(1);
+
+                  if (schemaName.equalsIgnoreCase(_configDbName)) {
+                     isDbAvailable = true;
+                     break;
+                  }
+               }
+            }
+         }
+
+      } catch (final SQLException e) {
+
+         TourLogManager.log_EXCEPTION_WithStacktrace("Connection failed or metadata unavailable", e);
+
+         return false;
+      }
+
+      if (isDbAvailable) {
+
+         TourLogManager.log_DEFAULT("Database is available: " + _configDbName);
+
+         return true;
+
+      } else {
+
+         TourLogManager.log_INFO("Database is not available: " + _configDbName);
+
+         return false;
+      }
+   }
+
+   /**
     * Download external db jar when it do not exist
     *
-    * @return Returns the local jar path or <code>null</code> when not available
+    * @return Returns the local jar file path or <code>null</code> when not available
     *
     * @throws Exception
     */
@@ -101,7 +168,7 @@ public class ExternalDatabase {
 
       try {
 
-         final URI uri = new URI(_jarDownloadUrl);
+         final URI uri = new URI(_configJarDownloadUrl);
          final Path uriPath = Paths.get(uri.getPath());
          final String jarFileName = uriPath.getFileName().toString();
 
@@ -110,37 +177,17 @@ public class ExternalDatabase {
          // check if the file already exists locally
          if (Files.exists(targetPath)) {
 
-            TourLogManager.log_DEFAULT("File exists locally: " + targetPath.toAbsolutePath());
+            TourLogManager.log_DEFAULT("Jar file exists locally: " + targetPath.toAbsolutePath());
 
             return targetPath;
          }
 
-         if (getJar_Download(_jarDownloadUrl, targetPath)) {
+         if (getJar_Download(_configJarDownloadUrl, targetPath)) {
 
             return targetPath;
          }
 
-//      } catch (final IOException e) {
-//
-//         // Catches network drops, full hard drives, permission denied errors
-//         System.err.println("Network or File error: " + e.getMessage());
-//         TourLogManager.log_EXCEPTION_WithStacktrace(e);
-//
-//      } catch (final IllegalArgumentException e) {
-//
-//         // Catches completely broken URL syntax from URI.create()
-//         System.err.println("Invalid URL syntax provided: " + e.getMessage());
-//         TourLogManager.log_EXCEPTION_WithStacktrace(e);
-//
-//      } catch (final Exception e) {
-//
-//         // Safety net for any other unexpected runtime crashes
-//         System.err.println("An unexpected error occurred: " + e.getMessage());
-//
-//         TourLogManager.log_EXCEPTION_WithStacktrace(e);
-      } finally {
-
-      }
+      } finally {}
 
       return null;
    }
@@ -171,8 +218,6 @@ public class ExternalDatabase {
                responseCode,
                connection.getResponseMessage(),
                urlString);
-
-         TourLogManager.log_ERROR(message);
 
          throw new IOException(message);
       }
@@ -206,7 +251,7 @@ public class ExternalDatabase {
             }
          }
 
-         TourLogManager.log_DEFAULT("Download complete! Saved to: " + targetPath.toAbsolutePath());
+         TourLogManager.log_DEFAULT("Download complete, saved to: " + targetPath.toAbsolutePath());
 
          return true;
 
@@ -233,58 +278,40 @@ public class ExternalDatabase {
       final URLClassLoader classLoader = new URLClassLoader(allUrls, ExternalDatabase.class.getClassLoader());
 
       // 2. Load the specific vendor driver class name
-      final Class<?> driverClass = Class.forName(_jdbcDriver, true, classLoader);
+      final Class<?> driverClass = Class.forName(_configJdbcDriver, true, classLoader);
 
       final Driver targetDriver = (Driver) driverClass.getDeclaredConstructor().newInstance();
 
       // 3. Register the driver via the Shim wrapper
       DriverManager.registerDriver(new DriverShim(targetDriver));
+
+      TourLogManager.log_DEFAULT("JDBC driver is registered: " + _configJdbcDriver);
    }
 
-   static void restoreState() {
+   private static void restoreState() {
 
 // SET_FORMATTING_OFF
 
-      _jarDownloadUrl               = _prefStore.getString(ITourbookPreferences.TOUR_DATABASE_EXTERNAL_JAR_URL);
-      _jdbcDriver                   = _prefStore.getString(ITourbookPreferences.TOUR_DATABASE_EXTERNAL_JDBC_DRIVER);
-      _jdbcUrlWithoutDb             = _prefStore.getString(ITourbookPreferences.TOUR_DATABASE_EXTERNAL_DATABASE_URL);
-      _jdbcUrlAdditionalParameter   = _prefStore.getString(ITourbookPreferences.TOUR_DATABASE_EXTERNAL_DATABASE_URL_PARAMETER);
-      _dbUsername                   = _prefStore.getString(ITourbookPreferences.TOUR_DATABASE_EXTERNAL_DATABASE_USERNAME);
-      _dbPassword                   = _prefStore.getString(ITourbookPreferences.TOUR_DATABASE_EXTERNAL_DATABASE_PASSWORD);
+      _configJarDownloadUrl            = _prefStore.getString(ITourbookPreferences.TOUR_DATABASE_EXTERNAL_JAR_DOWNLOAD_URL);
+      _configJdbcDriver                = _prefStore.getString(ITourbookPreferences.TOUR_DATABASE_EXTERNAL_JDBC_DRIVER);
+      _configConnectionUrl             = _prefStore.getString(ITourbookPreferences.TOUR_DATABASE_EXTERNAL_CONNECTION_URL_PROTOCOL);
+      _configConnectionUrl_Parameters  = _prefStore.getString(ITourbookPreferences.TOUR_DATABASE_EXTERNAL_CONNECTION_URL_PARAMETERS);
+      _configDbUsername                = _prefStore.getString(ITourbookPreferences.TOUR_DATABASE_EXTERNAL_DATABASE_USERNAME);
+      _configDbPassword                = _prefStore.getString(ITourbookPreferences.TOUR_DATABASE_EXTERNAL_DATABASE_PASSWORD);
+      _configDbName                    = _prefStore.getString(ITourbookPreferences.TOUR_DATABASE_EXTERNAL_DATABASE_NAME);
+      _configHibernateDialect          = _prefStore.getString(ITourbookPreferences.TOUR_DATABASE_EXTERNAL_HIBERNATE_DIALECT);
 
-      _jdbcUrlWithDb                = _jdbcUrlWithoutDb + TourDatabase.SQL_DB_TOURBOOK + _jdbcUrlAdditionalParameter;
+      _connectionUrl_Concatenated = _configConnectionUrl + _configDbName + _configConnectionUrl_Parameters;
 
 // SET_FORMATTING_ON
    }
 
-   static void test() {
-
-//      final boolean isExternalDb = _prefStore.getBoolean(ITourbookPreferences.TOUR_DATABASE_IS_EXTERNAL);
-
-      restoreState();
-
-      try {
-
-         final Path externalJar = getJar();
-
-         if (externalJar != null) {
-
-            registerDbDriver(externalJar);
-            checkAndCreateDb();
-            testDB();
-         }
-
-      } catch (final Exception e) {
-
-         TourLogManager.log_EXCEPTION_WithStacktrace(e);
-      }
-   }
-
    public static void testConnection() {
 
+      // get current config
       restoreState();
 
-      TourLogManager.log_TITLE("Testing connection: %s".formatted(_jdbcUrlWithDb));
+      TourLogManager.log_TITLE("Testing connection: %s".formatted(_connectionUrl_Concatenated));
 
       try {
 
@@ -293,8 +320,11 @@ public class ExternalDatabase {
          if (externalJar != null) {
 
             registerDbDriver(externalJar);
-            checkAndCreateDb();
-            testDB();
+
+            if (checkDatabaseExists()) {
+
+               testDB();
+            }
          }
 
       } catch (final Exception e) {
@@ -303,24 +333,22 @@ public class ExternalDatabase {
       }
    }
 
-   private static void testDB() {
+   private static void testDB() throws SQLException {
 
       // Connect to the database and query the version
-      try (Connection connection = DriverManager.getConnection(_jdbcUrlWithDb, _dbUsername, _dbPassword);
+      try (Connection connection = DriverManager.getConnection(_connectionUrl_Concatenated, _configDbUsername, _configDbPassword);
             Statement statement = connection.createStatement();
             ResultSet resultSet = statement.executeQuery("SELECT VERSION()")) {
 
-         TourLogManager.log_DEFAULT("Connected to the database successfully");
+         TourLogManager.log_DEFAULT("Connected successfully to the database: " + _connectionUrl_Concatenated);
 
          if (resultSet.next()) {
+
             final String dbVersion = resultSet.getString(1);
 
-            TourLogManager.log_DEFAULT("MariaDB Server Version: " + dbVersion);
+            TourLogManager.log_DEFAULT("Database server version: " + dbVersion);
          }
 
-      } catch (final SQLException e) {
-
-         TourLogManager.log_EXCEPTION_WithStacktrace("Database connection or query failed", e);
-      }
+      } finally {}
    }
 }

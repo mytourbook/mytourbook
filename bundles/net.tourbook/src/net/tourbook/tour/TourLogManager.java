@@ -65,6 +65,9 @@ public class TourLogManager {
 
    public enum AutoOpenEvent {
 
+      /**
+       * Force the log view to be opened
+       */
       EXCEPTION, //
 
       DELETE_SOMETHING, //

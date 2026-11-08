@@ -6806,6 +6806,9 @@ public class TourDatabase {
             }
          }
 
+         /*
+          * Create tables
+          */
          if (splashManager != null) {
             splashManager.setMessage(Messages.Database_Monitor_CreateDatabase);
          }
@@ -6952,10 +6955,10 @@ public class TourDatabase {
       // DDL Schema generation strategies
 //    props.put("hibernate.hbm2ddl.auto",             "update");
 
-      // 2. Inject properties into the configuration instance
+      // Inject properties into the configuration instance
       cfg.addProperties(props);
 
-      // 3. Manually register your annotated Entity classes
+      // Manually register annotated Entity classes
       cfg.addAnnotatedClass(DeviceSensor           .class);
       cfg.addAnnotatedClass(DeviceSensorValue      .class);
       cfg.addAnnotatedClass(Equipment              .class);
@@ -6979,7 +6982,7 @@ public class TourDatabase {
 
 //SET_FORMATTING_ON
 
-      // 4. Build the Persistence Unit Factory
+      // Build the Persistence Unit Factory
       _emFactory = cfg.buildEntityManagerFactory();
    }
 
