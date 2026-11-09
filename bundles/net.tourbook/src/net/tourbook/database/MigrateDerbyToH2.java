@@ -35,18 +35,26 @@ import net.tourbook.common.UI;
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.preferences.ITourbookPreferences;
 
+import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.preference.IPreferenceStore;
+import org.eclipse.swt.widgets.Display;
 
-public class Derby2H2 {
+public class MigrateDerbyToH2 {
 
-   private static final String           DERBY_DRIVER = "org.apache.derby.jdbc.EmbeddedDriver";
-   private static final String           H2_DRIVER    = "org.h2.Driver";
+   private static final String           DERBY_DRIVER       = "org.apache.derby.jdbc.EmbeddedDriver";
+   private static final String           H2_DRIVER          = "org.h2.Driver";
+
+   /**
+    * The tour db needs this version to migrate to H2, otherwise the user must update MT to 26.9 or
+    * 26.11 which is updating the db version to 63
+    */
+   private static final int              MIGRATE_DB_VERSION = 63;
 
    private static SplashManager          _splashManager;
 
    private static int                    _allRowsDiff;
 
-   private static final IPreferenceStore _prefStore   = TourbookPlugin.getPrefStore();
+   private static final IPreferenceStore _prefStore         = TourbookPlugin.getPrefStore();
 
    private static int check_GetRowCount(final Connection conn, final String tableName) throws SQLException {
 
@@ -125,35 +133,82 @@ public class Derby2H2 {
       return allTables;
    }
 
-   public static boolean isMigrated() {
+   private static boolean isDbVersionOK() {
 
-//      ExternalDatabase.test();
+      // set also the DERBY_DRIVER_CLASS
+      final TourDatabase dbInstance = TourDatabase.getInstance();
 
-      int a = 0;
-      a = 0;
-//      a++;
-      if (a == 0) {
-//         return false;
-         return true;
+      try {
+
+         // ensure derby jar is available
+         Class.forName(TourDatabase.DERBY_DRIVER_CLASS);
+
+      } catch (final ClassNotFoundException e) {
+
+         StatusUtil.showStatus(e.getMessage(), e);
+
+         return false;
       }
 
+      try (Connection conn = dbInstance.getConnection_Simple_Derby()) {
+
+         final int dbVersionDesign = dbInstance.getDbVersion(conn, TourDatabase.TABLE_DB_VERSION_DESIGN);
+         final int dbVersionData = dbInstance.getDbVersion(conn, TourDatabase.TABLE_DB_VERSION_DATA);
+
+         _splashManager.setMessage("Design Version %d - Data Version %d".formatted(dbVersionDesign, dbVersionData));
+
+         if (dbVersionDesign == MIGRATE_DB_VERSION && dbVersionData == MIGRATE_DB_VERSION) {
+
+            return true;
+         }
+
+         final String message = "You are using a version of MyTourbook which cannot migrate to the new tour database H2.\n\n"
+               + "Your database versions are %d and %d (design and data) but both versions must be 63.\n\n".formatted(dbVersionDesign, dbVersionData)
+               + "To fix this requirement, install and run MyTourbook 26.11, this will update to the correct database versions.\n\n"
+               + "After that, install and run this version and you will be happy to have a faster tour database.";
+
+         MessageDialog.openError(
+               Display.getDefault().getActiveShell(),
+               "Migrate to H2",
+               message);
+
+      } catch (final SQLException e) {
+
+         UI.showSQLException(e);
+      }
+
+      return false;
+   }
+
+   public static boolean isMigrated() {
+
       // debug h2 migration
-      _prefStore.setValue(ITourbookPreferences.TOUR_DATABASE_IS_H2_MIGRATED, false);
-      _prefStore.setValue(ITourbookPreferences.TOUR_DATABASE_IS_H2_MIGRATED, true);
+//      _prefStore.setValue(ITourbookPreferences.TOUR_DATABASE_IS_H2_MIGRATED, false);
+//      _prefStore.setValue(ITourbookPreferences.TOUR_DATABASE_IS_H2_MIGRATED, true);
 
       final boolean isH2Migrated = _prefStore.getBoolean(ITourbookPreferences.TOUR_DATABASE_IS_H2_MIGRATED);
 
       if (isH2Migrated) {
 
-         // H2 is already migrated
+         // MT is already migrated to H2
 
          return true;
       }
 
+      /*
+       * MT is not yet migrated
+       */
       _splashManager = SplashManager.getInstance();
       _splashManager.open();
 
       _splashManager.setMessage("Migrating Derby to H2");
+
+      if (isDbVersionOK() == false) {
+
+         // db versions are not valid, 63 is required
+
+         return false;
+      }
 
       if (isMigrated_All()) {
 

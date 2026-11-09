@@ -6701,103 +6701,6 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
    }
 
    /**
-    * Convert old int[] data series into float[], this was done in the previous versions in this
-    * method updateDatabase_019_to_020() but did not work in any cases
-    */
-   public void convertDataSeries() {
-
-      if (serieData.altitudeSerie != null) {
-
-         if (isDataSerieWithContent(serieData.altitudeSerie)) {
-            serieData.altitudeSerie20 = convertDataSeries_ToFloat(serieData.altitudeSerie, 0);
-         }
-
-         serieData.altitudeSerie = null;
-      }
-
-      if (serieData.cadenceSerie != null) {
-
-         if (isDataSerieWithContent(serieData.cadenceSerie)) {
-            serieData.cadenceSerie20 = convertDataSeries_ToFloat(serieData.cadenceSerie, 0);
-         }
-
-         serieData.cadenceSerie = null;
-      }
-
-      if (serieData.distanceSerie != null) {
-
-         if (isDataSerieWithContent(serieData.distanceSerie)) {
-            serieData.distanceSerie20 = convertDataSeries_ToFloat(serieData.distanceSerie, 0);
-         }
-
-         serieData.distanceSerie = null;
-      }
-
-      if (serieData.pulseSerie != null) {
-
-         if (isDataSerieWithContent(serieData.pulseSerie)) {
-            serieData.pulseSerie20 = convertDataSeries_ToFloat(serieData.pulseSerie, 0);
-         }
-
-         serieData.pulseSerie = null;
-      }
-
-      if (serieData.temperatureSerie != null) {
-
-         if (isDataSerieWithContent(serieData.temperatureSerie)) {
-            serieData.temperatureSerie20 = convertDataSeries_ToFloat(serieData.temperatureSerie, temperatureScale);
-         }
-
-         serieData.temperatureSerie = null;
-      }
-
-      /*
-       * Don't convert computed data series
-       */
-      if (serieData.speedSerie != null) {
-
-         if (isSpeedSerieFromDevice && isDataSerieWithContent(serieData.speedSerie)) {
-            serieData.speedSerie20 = convertDataSeries_ToFloat(serieData.speedSerie, 10);
-         }
-
-         serieData.speedSerie = null;
-      }
-
-      if (serieData.powerSerie != null) {
-
-         if (isPowerSerieFromDevice && isDataSerieWithContent(serieData.powerSerie)) {
-            serieData.powerSerie20 = convertDataSeries_ToFloat(serieData.powerSerie, 0);
-         }
-
-         serieData.powerSerie = null;
-      }
-
-      for (final TourMarker tourMarker : tourMarkers) {
-         tourMarker.updateDatabase_019_to_020();
-      }
-   }
-
-   private float[] convertDataSeries_ToFloat(final int[] intDataSerie, final int scale) {
-
-      if (intDataSerie == null) {
-         return null;
-      }
-
-      final float[] floatDataSerie = new float[intDataSerie.length];
-
-      for (int serieIndex = 0; serieIndex < intDataSerie.length; serieIndex++) {
-
-         final int intValue = intDataSerie[serieIndex];
-
-         floatDataSerie[serieIndex] = scale > 0
-               ? (float) intValue / scale
-               : (float) intValue;
-      }
-
-      return floatDataSerie;
-   }
-
-   /**
     * Converts all waypoints into {@link TourMarker}s when position and time are the same.
     */
    public void convertWayPoints() {
@@ -12653,24 +12556,6 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
       return tourReferences.size() > 0;
    }
 
-   /**
-    * @param dataSerie
-    *
-    * @return Returns <code>true</code> when the data serie contains at least one value which is > 0
-    */
-   private boolean isDataSerieWithContent(final int[] dataSerie) {
-
-//      return Arrays.stream(dataSerie).anyMatch(value -> value > 0);
-
-      for (final int dataValue : dataSerie) {
-         if (dataValue > 0) {
-            return true;
-         }
-      }
-
-      return false;
-   }
-
    public boolean isDistanceSensorPresent() {
       return isDistanceFromSensor == 1;
    }
@@ -12997,10 +12882,6 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
    @PostLoad
    @PostUpdate
    public void onPostLoad() {
-
-      if (TourDatabase.getDbVersionOnStartup() < 20) {
-         convertDataSeries();
-      }
 
       onPostLoad_GetDataSeries();
    }

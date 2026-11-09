@@ -29,7 +29,7 @@ import net.tourbook.Messages;
 import net.tourbook.common.UI;
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.Util;
-import net.tourbook.database.Derby2H2;
+import net.tourbook.database.MigrateDerbyToH2;
 import net.tourbook.preferences.PrefPageGeneral_System;
 
 import org.eclipse.equinox.app.IApplication;
@@ -152,9 +152,10 @@ public class Application implements IApplication {
 
       try {
 
-         if (Derby2H2.isMigrated() == false) {
+         if (MigrateDerbyToH2.isMigrated() == false) {
 
-            // exit immediately
+            // exit immediately -> there needs some user actions
+
             return IApplication.EXIT_OK;
          }
 

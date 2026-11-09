@@ -254,7 +254,7 @@ public class PrefPageTour extends PreferencePage implements IWorkbenchPreference
             }
             {
                _lblHibernateDialect = UI.createLabel(containerExternal, "Hibernate dialect");
-               _lblHibernateDialect.setToolTipText("e.g. hibernate.dialect = org.hibernate.dialect.MariaDB103Dialect");
+               _lblHibernateDialect.setToolTipText("EJB hibernate dialect, e.g. org.hibernate.dialect.MariaDB103Dialect");
                gdLabel.applyTo(_lblHibernateDialect);
 
                _txtHibernateDialect = new Text(containerExternal, SWT.BORDER);
