@@ -33,16 +33,33 @@ import net.tourbook.application.SplashManager;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.UI;
 import net.tourbook.common.util.StatusUtil;
+import net.tourbook.common.util.Util;
 import net.tourbook.preferences.ITourbookPreferences;
 
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.swt.widgets.Display;
 
 public class MigrateDerbyToH2 {
 
-   private static final String           DERBY_DRIVER       = "org.apache.derby.jdbc.EmbeddedDriver";
-   private static final String           H2_DRIVER          = "org.h2.Driver";
+   private static final String DERBY_DRIVER = "org.apache.derby.jdbc.EmbeddedDriver";
+
+   private static String       DERBY_DATABASE_FILEPATH;
+   private static String       DERBY_DB_TOURBOOK_URL;
+
+   static {
+
+      DERBY_DATABASE_FILEPATH = Platform.getInstanceLocation().getURL().getPath() + "derby-database";
+
+      String derbyTourDbFilePath = DERBY_DATABASE_FILEPATH + "/" + TourDatabase.SQL_TOUR_DB_NAME;
+
+      if (UI.IS_WIN && derbyTourDbFilePath.startsWith("/")) {
+         derbyTourDbFilePath = derbyTourDbFilePath.substring(1);
+      }
+
+      DERBY_DB_TOURBOOK_URL = "jdbc:derby:" + derbyTourDbFilePath; //$NON-NLS-1$
+   }
 
    /**
     * The tour db needs this version to migrate to H2, otherwise the user must update MT to 26.9 or
@@ -76,6 +93,9 @@ public class MigrateDerbyToH2 {
                                                     final String idColumn,
                                                     final String blobColumn) throws Exception {
 
+      long lastLogTime = System.currentTimeMillis();
+      int numBlobs = 0;
+
       // Order by ID explicitly to guarantee identical streaming order between databases
       final String sql = "SELECT " + idColumn + ", " + blobColumn + " FROM " + tableName + " ORDER BY " + idColumn;
       final MessageDigest md = MessageDigest.getInstance("SHA-256");
@@ -85,6 +105,8 @@ public class MigrateDerbyToH2 {
 
          final byte[] buffer = new byte[4096];
          while (rs.next()) {
+
+            numBlobs++;
 
             // Hash the identifier to catch missing/shuffled keys
             md.update(rs.getString(idColumn).getBytes());
@@ -103,6 +125,17 @@ public class MigrateDerbyToH2 {
 
                   md.update((byte) 0); // Handle Null consistency explicitly
                }
+            }
+
+            final long currentTime = System.currentTimeMillis();
+            final long timeDiff = currentTime - lastLogTime;
+
+            // reduce logging
+            if (timeDiff > 500) {
+
+               lastLogTime = currentTime;
+
+               _splashManager.setMessage("   Checking blobs in %s: %d".formatted(tableName, numBlobs));
             }
          }
       }
@@ -135,13 +168,10 @@ public class MigrateDerbyToH2 {
 
    private static boolean isDbVersionOK() {
 
-      // set also the DERBY_DRIVER_CLASS
-      final TourDatabase dbInstance = TourDatabase.getInstance();
-
       try {
 
          // ensure derby jar is available
-         Class.forName(TourDatabase.DERBY_DRIVER_CLASS);
+         Class.forName(DERBY_DRIVER);
 
       } catch (final ClassNotFoundException e) {
 
@@ -150,7 +180,9 @@ public class MigrateDerbyToH2 {
          return false;
       }
 
-      try (Connection conn = dbInstance.getConnection_Simple_Derby()) {
+      try (Connection conn = DriverManager.getConnection(DERBY_DB_TOURBOOK_URL, "USER", "adsf")) {
+
+         final TourDatabase dbInstance = TourDatabase.getInstance();
 
          final int dbVersionDesign = dbInstance.getDbVersion(conn, TourDatabase.TABLE_DB_VERSION_DESIGN);
          final int dbVersionData = dbInstance.getDbVersion(conn, TourDatabase.TABLE_DB_VERSION_DATA);
@@ -183,7 +215,7 @@ public class MigrateDerbyToH2 {
    public static boolean isMigrated() {
 
       // debug h2 migration
-//      _prefStore.setValue(ITourbookPreferences.TOUR_DATABASE_IS_H2_MIGRATED, false);
+      _prefStore.setValue(ITourbookPreferences.TOUR_DATABASE_IS_H2_MIGRATED, false);
 //      _prefStore.setValue(ITourbookPreferences.TOUR_DATABASE_IS_H2_MIGRATED, true);
 
       final boolean isH2Migrated = _prefStore.getBoolean(ITourbookPreferences.TOUR_DATABASE_IS_H2_MIGRATED);
@@ -223,21 +255,9 @@ public class MigrateDerbyToH2 {
 
    private static boolean isMigrated_All() {
 
-      final String sqlDbTourbook = TourDatabase.SQL_DB_TOURBOOK;
-
-      String derbyDatabasePath = TourDatabase.derbyDatabasePath + "/" + sqlDbTourbook;
-      String h2DatabasePath = TourDatabase.h2DatabasePath + "/" + sqlDbTourbook;
-
-      if (derbyDatabasePath.startsWith("/")) {
-         derbyDatabasePath = derbyDatabasePath.substring(1);
-      }
-      if (h2DatabasePath.startsWith("/")) {
-         h2DatabasePath = h2DatabasePath.substring(1);
-      }
-
       final long start = System.nanoTime();
 
-      migrate_10_DerbyToH2(derbyDatabasePath, h2DatabasePath);
+      migrate_10_DerbyToH2();
 
       final long end = System.nanoTime();
 
@@ -246,12 +266,12 @@ public class MigrateDerbyToH2 {
       return false;
    }
 
-   private static void migrate_10_DerbyToH2(final String derbyDatabasePath, final String h2DatabasePath) {
+   private static void migrate_10_DerbyToH2() {
 
       try {
 
          Class.forName(DERBY_DRIVER);
-         Class.forName(H2_DRIVER);
+         Class.forName(TourDatabase.H2_DRIVER);
 
       } catch (final Exception e) {
 
@@ -260,13 +280,10 @@ public class MigrateDerbyToH2 {
          return;
       }
 
-      final String derbyUrl = "jdbc:derby:" + derbyDatabasePath;
-      final String h2Url = "jdbc:h2:" + h2DatabasePath + ";AUTO_SERVER=TRUE";
+      try (Connection derbyConn = DriverManager.getConnection(DERBY_DB_TOURBOOK_URL, "USER", "adsf");
+            Connection h2Conn = DriverManager.getConnection(TourDatabase.H2_DB_TOUR_DB_URL)) {
 
-      try (Connection derbyConn = DriverManager.getConnection(derbyUrl, "USER", "USER");
-            Connection h2Conn = DriverManager.getConnection(h2Url)) {
-
-         migrate_20_CreateH2Database(h2Conn);
+         migrate_20_CreateH2Tables(h2Conn);
          migrate_30_MigrateTableData(derbyConn, h2Conn);
 
       } catch (final SQLException e) {
@@ -280,15 +297,28 @@ public class MigrateDerbyToH2 {
       } finally {
 
          // 3. Shutdown Derby embedded cleanly to release file locks
-         try {
-            DriverManager.getConnection("jdbc:derby:;shutdown=true");
-         } catch (final SQLException se) {
+         try (Connection conn = DriverManager.getConnection("jdbc:derby:;shutdown=true")) {
+
+         } catch (final SQLException e) {
+
             // Derby always throws SQLState XJ015 on successful shutdown
+            if ("XJ015".equals(e.getSQLState())) { //$NON-NLS-1$
+
+               _splashManager.setMessage("Derby server is shutdown"); //$NON-NLS-1$
+
+            } else {
+
+               final String sqlExceptionText = Util.getSQLExceptionText(e);
+
+               // log also the stacktrace
+               StatusUtil.log(sqlExceptionText + Util.getStackTrace(e), e);
+            }
+
          }
       }
    }
 
-   private static void migrate_20_CreateH2Database(final Connection h2Conn) throws SQLException {
+   private static void migrate_20_CreateH2Tables(final Connection h2Conn) throws SQLException {
 
       /*
        * Check if TOURDATA table exists
@@ -519,7 +549,9 @@ public class MigrateDerbyToH2 {
       }
    }
 
-   private static void migrate_50_CheckData(final Connection derbyConn, final Connection h2Conn, final String tableName) throws Exception {
+   private static void migrate_50_CheckData(final Connection derbyConn,
+                                            final Connection h2Conn,
+                                            final String tableName) throws Exception {
 
       /*
        * Quick row check
@@ -547,6 +579,8 @@ public class MigrateDerbyToH2 {
        * Blob check
        */
       if (tableName.equalsIgnoreCase("TOURDATA")) {
+
+         _splashManager.setMessage("   Checking: TOURDATA Blobs");
 
          final String derbyHash = check_GetTableBlobCheckSum(derbyConn, "TOURDATA", "tourId", "SerieData");
          final String h2Hash = check_GetTableBlobCheckSum(h2Conn, "TOURDATA", "tourId", "SerieData");

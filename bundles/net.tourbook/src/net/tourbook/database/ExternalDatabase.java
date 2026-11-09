@@ -78,15 +78,15 @@ public class ExternalDatabase {
 
    private static void checkAndCreateDb() throws SQLException {
 
-      final String sql = "CREATE DATABASE IF NOT EXISTS " + TourDatabase.SQL_DB_TOURBOOK;
-
-      try (Connection conn = DriverManager.getConnection(_configConnectionUrl, _configDbUsername, _configDbPassword);
-            Statement stmt = conn.createStatement()) {
-
-         stmt.executeUpdate(sql);
-
-         TourLogManager.log_DEFAULT("Database checked and verified/created successfully");
-      }
+//      final String sql = "CREATE DATABASE IF NOT EXISTS " + TourDatabase.SQL_DB_TOURBOOK;
+//
+//      try (Connection conn = DriverManager.getConnection(_configConnectionUrl, _configDbUsername, _configDbPassword);
+//            Statement stmt = conn.createStatement()) {
+//
+//         stmt.executeUpdate(sql);
+//
+//         TourLogManager.log_DEFAULT("Database checked and verified/created successfully");
+//      }
    }
 
    /**

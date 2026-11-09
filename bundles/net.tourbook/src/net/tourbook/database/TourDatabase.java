@@ -298,28 +298,31 @@ public class TourDatabase {
    private static final String DEFAULT_FALSE                   = "false";          //$NON-NLS-1$
    private static final String DEFAULT_IGNORED                 = "-1";             //$NON-NLS-1$
 
-   static final String         SQL_DB_TOURBOOK                 = "tourbook";       //$NON-NLS-1$
-
-   private static final String DERBY_DATABASE                  = "derby-database"; //$NON-NLS-1$
+   static final String         DERBY_DATABASE_FOLDER           = "derby-database"; //$NON-NLS-1$
+   static String               DERBY_DATABASE_FILEPATH;
    private static String       DERBY_DB_TOURBOOK_URL;
    static String               DERBY_DRIVER_CLASS;
    private static String       DERBY_SERVER_URL;
    private static final String DERBY_URL_COMMAND_CREATE_TRUE   = ";create=true";   //$NON-NLS-1$
    private static final String DERBY_URL_COMMAND_SHUTDOWN_TRUE = ";shutdown=true"; //$NON-NLS-1$
 
-   private static final String H2_DATABASE                     = "h2-database";    //$NON-NLS-1$
+   static {
+
+      DERBY_DATABASE_FILEPATH = Platform.getInstanceLocation().getURL().getPath() + DERBY_DATABASE_FOLDER;
+   }
+
    //
    /**
     * ERROR XCL13: The parameter position '13' is out of range. The number of parameters for
     * this prepared statement is '12'.
     */
-   public static final String  SQL_ERROR_XCL13                 = "XCL13";          //$NON-NLS-1$
+   public static final String SQL_ERROR_XCL13 = "XCL13"; //$NON-NLS-1$
 
    /**
     * ERROR XCL14: The column position '3' is out of range. The number of columns for this ResultSet
     * is '2'.
     */
-   public static final String  SQL_ERROR_XCL14                 = "XCL14";          //$NON-NLS-1$
+   public static final String SQL_ERROR_XCL14 = "XCL14"; //$NON-NLS-1$
    //
    //
    private static volatile TourDatabase                   _instance;
@@ -395,10 +398,31 @@ public class TourDatabase {
    private static ConcurrentSkipListSet<String>  _dbTourEndPlace;
    private static ConcurrentSkipListSet<String>  _dbTourMarkerNames;
 
-   private static final IPreferenceStore         _prefStore        = TourbookPlugin.getPrefStore();
+   private static final IPreferenceStore         _prefStore                  = TourbookPlugin.getPrefStore();
 
-   static final String                           derbyDatabasePath = Platform.getInstanceLocation().getURL().getPath() + DERBY_DATABASE;
-   static final String                           h2DatabasePath    = Platform.getInstanceLocation().getURL().getPath() + H2_DATABASE;
+   /** H2 jdbc jar driver */
+   static final String                           H2_DRIVER                   = "org.h2.Driver";                                    //$NON-NLS-1$
+
+   static final String                           H2_JDBC_CONNECTION_PROTOCOL = "jdbc:h2:";                                         //$NON-NLS-1$
+
+   /** H2 folder name in the instance location */
+   static final String                           H2_DATABASE_FOLDER_NAME     = "h2-database";                                      //$NON-NLS-1$
+
+   /** SQL tour database name */
+   static final String                           SQL_TOUR_DB_NAME            = "tourbook";                                         //$NON-NLS-1$
+
+   /** H2 db file path root, without tour db */
+   static String                                 H2_DATABASE_FILEPATH;
+
+   /** H2 jdbc connection url, without tour db */
+   static String                                 H2_DB_CONNECTION_URL;
+
+   /** H2 jdbc connection url, with tour db */
+   static String                                 H2_DB_TOUR_DB_URL;
+
+   private static String                         SQL_DB_CONNECTION_URL;
+   private static String                         SQL_DB_TOUR_DB_URL;
+   private static String                         SQL_DB_DRIVER_CLASS;
 
    private static NetworkServerControl           _server;
 
@@ -406,12 +430,22 @@ public class TourDatabase {
    private static volatile ComboPooledDataSource _pooledDataSource;
 
    private static ThreadPoolExecutor             _dbUpdateExecutor;
-   private static ArrayBlockingQueue<Long>       _dbUpdateQueue    = new ArrayBlockingQueue<>(Util.NUMBER_OF_PROCESSORS);
+   private static ArrayBlockingQueue<Long>       _dbUpdateQueue              = new ArrayBlockingQueue<>(Util.NUMBER_OF_PROCESSORS);
 
    static {
 
-      // set storage location for the database
-      System.setProperty("derby.system.home", derbyDatabasePath); //$NON-NLS-1$
+      H2_DATABASE_FILEPATH = Platform.getInstanceLocation().getURL().getPath() + H2_DATABASE_FOLDER_NAME;
+
+      if (UI.IS_WIN && H2_DATABASE_FILEPATH.startsWith("/")) {
+
+         // a leading / is causing an exception, e.g. /c:/...
+
+         H2_DATABASE_FILEPATH = H2_DATABASE_FILEPATH.substring(1);
+      }
+
+      H2_DB_CONNECTION_URL = H2_JDBC_CONNECTION_PROTOCOL + H2_DATABASE_FILEPATH + ";AUTO_SERVER=TRUE";
+
+      H2_DB_TOUR_DB_URL = H2_JDBC_CONNECTION_PROTOCOL + H2_DATABASE_FILEPATH + "/" + SQL_TOUR_DB_NAME + ";AUTO_SERVER=TRUE";
 
 // FOR DEBUGGING - START
       /*
@@ -515,7 +549,6 @@ public class TourDatabase {
     */
    private int                                   _dbVersion_BeforeDesignUpdate;
 
-   private boolean                               _isExternalDatabase;
    private boolean                               _isChecked_DbCreated;
 
    private boolean                               _isCustomFunctionSetup_AvgSpeedPace;
@@ -923,9 +956,42 @@ public class TourDatabase {
 
    private TourDatabase() {
 
-      _isExternalDatabase = _prefStore.getBoolean(ITourbookPreferences.TOUR_DATABASE_IS_EXTERNAL);
+      final boolean isExternalDatabase = _prefStore.getBoolean(ITourbookPreferences.TOUR_DATABASE_IS_EXTERNAL);
+
+      if (isExternalDatabase) {
 
 // SET_FORMATTING_OFF
+
+//       final String externalJarDownloadUrl             = _prefStore.getString(ITourbookPreferences.TOUR_DATABASE_EXTERNAL_JAR_DOWNLOAD_URL);
+         final String externalJdbcDriver                 = _prefStore.getString(ITourbookPreferences.TOUR_DATABASE_EXTERNAL_JDBC_DRIVER);
+         final String externalConnectionUrl              = _prefStore.getString(ITourbookPreferences.TOUR_DATABASE_EXTERNAL_CONNECTION_URL_PROTOCOL);
+         final String externalConnectionUrl_Parameters   = _prefStore.getString(ITourbookPreferences.TOUR_DATABASE_EXTERNAL_CONNECTION_URL_PARAMETERS);
+//       final String externalDbUsername                 = _prefStore.getString(ITourbookPreferences.TOUR_DATABASE_EXTERNAL_DATABASE_USERNAME);
+//       final String externalDbPassword                 = _prefStore.getString(ITourbookPreferences.TOUR_DATABASE_EXTERNAL_DATABASE_PASSWORD);
+         final String externalDbName                     = _prefStore.getString(ITourbookPreferences.TOUR_DATABASE_EXTERNAL_DATABASE_NAME);
+//       final String externalHibernateDialect           = _prefStore.getString(ITourbookPreferences.TOUR_DATABASE_EXTERNAL_HIBERNATE_DIALECT);
+
+         SQL_DB_CONNECTION_URL   = externalConnectionUrl;
+         SQL_DB_TOUR_DB_URL      = externalConnectionUrl + externalDbName + externalConnectionUrl_Parameters;
+         SQL_DB_DRIVER_CLASS     = externalJdbcDriver;
+
+      } else {
+
+         // H2 database
+
+         String h2DatabasePath = H2_DATABASE_FILEPATH ;
+
+         if (UI.IS_WIN && h2DatabasePath.startsWith("/")) {
+            h2DatabasePath = h2DatabasePath.substring(1);
+         }
+
+//       final String h2Url = "jdbc:h2:" + h2TourDbFilePath + ";AUTO_SERVER=TRUE";
+
+
+         SQL_DB_CONNECTION_URL   = H2_JDBC_CONNECTION_PROTOCOL;
+         SQL_DB_TOUR_DB_URL      = H2_DB_TOUR_DB_URL;
+         SQL_DB_DRIVER_CLASS     = H2_DRIVER;
+      }
 
       final boolean isEmbedded = true;
 
@@ -934,7 +1000,7 @@ public class TourDatabase {
          // use external server
 
          DERBY_SERVER_URL        = "jdbc:derby:"; //                                         //$NON-NLS-1$
-         DERBY_DB_TOURBOOK_URL   = "jdbc:derby:" + SQL_DB_TOURBOOK; //                       //$NON-NLS-1$
+         DERBY_DB_TOURBOOK_URL   = "jdbc:derby:" + SQL_TOUR_DB_NAME; //                       //$NON-NLS-1$
          DERBY_DRIVER_CLASS      = "org.apache.derby.jdbc.EmbeddedDriver"; //                //$NON-NLS-1$
 
       } else {
@@ -942,7 +1008,7 @@ public class TourDatabase {
          // use internal server
 
          DERBY_SERVER_URL        = "jdbc:derby://localhost:1527/"; //                        //$NON-NLS-1$
-         DERBY_DB_TOURBOOK_URL   = "jdbc:derby://localhost:1527/" + SQL_DB_TOURBOOK; //      //$NON-NLS-1$
+         DERBY_DB_TOURBOOK_URL   = "jdbc:derby://localhost:1527/" + SQL_TOUR_DB_NAME; //      //$NON-NLS-1$
          DERBY_DRIVER_CLASS      = "org.apache.derby.jdbc.ClientDriver"; //                  //$NON-NLS-1$
       }
 
@@ -1953,7 +2019,7 @@ public class TourDatabase {
    }
 
    public static String getDatabasePath() {
-      return derbyDatabasePath;
+      return DERBY_DATABASE_FILEPATH;
    }
 
    /**
@@ -3191,14 +3257,14 @@ public class TourDatabase {
       System.out.println(NLS.bind(Messages.Tour_Database_Update, dbVersion));
    }
 
-   private static void logDerbyCommand(final String dbUrl) {
-
-      System.out.println(net.tourbook.common.UI.timeStamp() + "[Executing Derby command] " + dbUrl); //$NON-NLS-1$
-   }
-
    private static void logDerbyInfo(final String info) {
 
       System.out.println(net.tourbook.common.UI.timeStamp() + "[Derby] " + info); //$NON-NLS-1$
+   }
+
+   private static void logSqlCommand(final String dbUrl) {
+
+      System.out.println(net.tourbook.common.UI.timeStamp() + "[Executing SQL command] " + dbUrl); //$NON-NLS-1$
    }
 
    /**
@@ -6182,21 +6248,7 @@ public class TourDatabase {
 
       final String dbUrl = DERBY_DB_TOURBOOK_URL;
 
-      logDerbyCommand(dbUrl);
-
-      return DriverManager.getConnection(dbUrl, TABLE_SCHEMA, TABLE_SCHEMA);
-   }
-
-   /**
-    * @return Returns a connection to the derby database without the pooling.
-    *
-    * @throws SQLException
-    */
-   public Connection getConnection_Simple_Derby() throws SQLException {
-
-      final String dbUrl = DERBY_DB_TOURBOOK_URL;
-
-      logDerbyCommand(dbUrl);
+      logSqlCommand(dbUrl);
 
       return DriverManager.getConnection(dbUrl, TABLE_SCHEMA, TABLE_SCHEMA);
    }
@@ -6369,37 +6421,43 @@ public class TourDatabase {
     */
    public void shutdownDatabaseServer() {
 
-      Connection conn = null;
+//      Connection conn = null;
+//
+//      try {
+//
+//         // shutdown database that all connections are closed
+//
+//      if (connection != null) {
+//         try (Statement stmt = connection.createStatement()) {
+//             // SHUTDOWN closes the database immediately
+//             // Use "SHUTDOWN COMPACT" if you want to defragment the file on exit
+//             stmt.execute("SHUTDOWN");
+//         } catch (SQLException e) {
+//             // Handle or log exception
+//         } finally {
+//             try {
+//                 if (!connection.isClosed()) {
+//                     connection.close();
+//                 }
+//             } catch (SQLException e) {
+//                 // Handle close exception
+//             }
+//         }
+//     }
+//
+//
+//      } catch (final SQLException e) {
+//
+//         final String sqlExceptionText = Util.getSQLExceptionText(e);
+//
+//         // log also the stacktrace
+//         StatusUtil.log(sqlExceptionText + Util.getStackTrace(e), e);
+//
+//      } finally {
+//
+//         Util.closeSql(conn);
+//      }
 
-      try {
-
-         // shutdown database that all connections are closed, THIS WILL ALWAYS CREATE AN EXCEPTION
-
-         // DriverManager.getConnection("jdbc:derby:;shutdown=true");
-
-         final String dbUrl_ShutDown = DERBY_SERVER_URL + DERBY_URL_COMMAND_SHUTDOWN_TRUE;
-
-         logDerbyCommand(dbUrl_ShutDown);
-
-         conn = DriverManager.getConnection(dbUrl_ShutDown, TABLE_SCHEMA, TABLE_SCHEMA);
-
-      } catch (final SQLException e) {
-
-         if ("XJ015".equals(e.getSQLState())) { //$NON-NLS-1$
-
-            logDerbyInfo("Derby server is shutdown"); //$NON-NLS-1$
-
-         } else {
-
-            final String sqlExceptionText = Util.getSQLExceptionText(e);
-
-            // log also the stacktrace
-            StatusUtil.log(sqlExceptionText + Util.getStackTrace(e), e);
-         }
-
-      } finally {
-         Util.closeSql(conn);
-      }
    }
 
    /**
@@ -6496,9 +6554,9 @@ public class TourDatabase {
     */
    private void sqlStartup_20_CheckServer(final SplashManager splashManager) throws Throwable {
 
-      if (_isExternalDatabase) {
-         return;
-      }
+//      if (_isExternalDatabase) {
+//         return;
+//      }
 
       // when the server is started, nothing is to do here
       if (_server != null) {
@@ -6649,7 +6707,7 @@ public class TourDatabase {
             }
 
             // log database path
-            logDerbyInfo("Database path: " + derbyDatabasePath); //$NON-NLS-1$
+            logDerbyInfo("Database path: " + DERBY_DATABASE_FILEPATH); //$NON-NLS-1$
          }
       };
 
@@ -6679,7 +6737,7 @@ public class TourDatabase {
 
          final String dbUrl = DERBY_DB_TOURBOOK_URL + DERBY_URL_COMMAND_CREATE_TRUE;
 
-         logDerbyCommand(dbUrl);
+         logSqlCommand(dbUrl);
 
          conn = DriverManager.getConnection(dbUrl, TABLE_SCHEMA, TABLE_SCHEMA);
 
@@ -6979,7 +7037,7 @@ public class TourDatabase {
                new Object[] {
                      currentDbVersion,
                      TOURBOOK_DB_VERSION,
-                     derbyDatabasePath });
+                     DERBY_DATABASE_FILEPATH });
 
          if ((new MessageDialog(
                splashManager.getShell(),
