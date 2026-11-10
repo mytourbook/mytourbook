@@ -15,6 +15,7 @@
  *******************************************************************************/
 package net.tourbook.database;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.security.MessageDigest;
 import java.sql.Connection;
@@ -37,7 +38,9 @@ import net.tourbook.common.util.Util;
 import net.tourbook.preferences.ITourbookPreferences;
 
 import org.eclipse.core.runtime.Platform;
+import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.MessageDialog;
+import org.eclipse.jface.preference.IPersistentPreferenceStore;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.swt.widgets.Display;
 
@@ -215,16 +218,43 @@ public class MigrateDerbyToH2 {
    public static boolean isMigrated() {
 
       // debug h2 migration
-      _prefStore.setValue(ITourbookPreferences.TOUR_DATABASE_IS_H2_MIGRATED, false);
+//      _prefStore.setValue(ITourbookPreferences.TOUR_DATABASE_IS_H2_MIGRATED, false);
 //      _prefStore.setValue(ITourbookPreferences.TOUR_DATABASE_IS_H2_MIGRATED, true);
 
-      final boolean isH2Migrated = _prefStore.getBoolean(ITourbookPreferences.TOUR_DATABASE_IS_H2_MIGRATED);
-
-      if (isH2Migrated) {
+      if (_prefStore.getBoolean(ITourbookPreferences.TOUR_DATABASE_IS_H2_MIGRATED)) {
 
          // MT is already migrated to H2
 
          return true;
+      }
+
+      /*
+       * Ask user if migration should be started
+       */
+      final String message = "This is a very special version of MyTourbook.\n\n"
+            + "Before MyTourbook is working as before, the current tour database will be migrated to the new database H2.\n\n"
+            + "The current tour database will not be modified any more but BEFORE proceeding, it is a good idea"
+            + " to have a backup of the current tour database which is located in\n\n%s\n\n".formatted(DERBY_DATABASE_FILEPATH)
+            + "Should the migration start now?";
+
+      if (new MessageDialog(
+
+            Display.getDefault().getActiveShell(),
+
+            "MyTourbook Special Startup",
+            null, // dialogTitleImage
+
+            message,
+            MessageDialog.INFORMATION,
+
+            1, // defaultIndex
+
+            "&Migrate Tour Database",
+            Messages.App_Action_Cancel
+
+      ).open() != IDialogConstants.OK_ID) {
+
+         return false;
       }
 
       /*
@@ -247,6 +277,24 @@ public class MigrateDerbyToH2 {
          // set flag that the h2 migration is done
          _prefStore.setValue(ITourbookPreferences.TOUR_DATABASE_IS_H2_MIGRATED, true);
 
+         // force save pref store to file, this is just needed when debugging
+         if (_prefStore instanceof final IPersistentPreferenceStore prefStoreWithSave) {
+            try {
+               prefStoreWithSave.save();
+            } catch (final IOException e) {
+               StatusUtil.log(e);
+            }
+         }
+
+         // ddisplay successfull migration
+         final String message2 = "The tour database was migrated successfully from Derby to H2 !\n\n"
+               + "MyTourbook is now working as before.";
+
+         MessageDialog.openInformation(
+               Display.getDefault().getActiveShell(),
+               "MyTourbook Special Startup",
+               message2);
+
          return true;
       }
 
@@ -257,16 +305,19 @@ public class MigrateDerbyToH2 {
 
       final long start = System.nanoTime();
 
-      migrate_10_DerbyToH2();
+      if (migrate_10_DerbyToH2()) {
 
-      final long end = System.nanoTime();
+         final long end = System.nanoTime();
 
-      System.out.println(UI.timeStamp() + " Migration duration: %7.3f ms".formatted((float) (end - start) / 1000000));
+         _splashManager.setMessage(" Migration duration: %7.3f ms".formatted((float) (end - start) / 1000000));
+
+         return true;
+      }
 
       return false;
    }
 
-   private static void migrate_10_DerbyToH2() {
+   private static boolean migrate_10_DerbyToH2() {
 
       try {
 
@@ -277,7 +328,7 @@ public class MigrateDerbyToH2 {
 
          StatusUtil.log(e);
 
-         return;
+         return false;
       }
 
       try (Connection derbyConn = DriverManager.getConnection(DERBY_DB_TOURBOOK_URL, "USER", "adsf");
@@ -285,6 +336,8 @@ public class MigrateDerbyToH2 {
 
          migrate_20_CreateH2Tables(h2Conn);
          migrate_30_MigrateTableData(derbyConn, h2Conn);
+
+         return true;
 
       } catch (final SQLException e) {
 
@@ -296,26 +349,11 @@ public class MigrateDerbyToH2 {
 
       } finally {
 
-         // 3. Shutdown Derby embedded cleanly to release file locks
-         try (Connection conn = DriverManager.getConnection("jdbc:derby:;shutdown=true")) {
-
-         } catch (final SQLException e) {
-
-            // Derby always throws SQLState XJ015 on successful shutdown
-            if ("XJ015".equals(e.getSQLState())) { //$NON-NLS-1$
-
-               _splashManager.setMessage("Derby server is shutdown"); //$NON-NLS-1$
-
-            } else {
-
-               final String sqlExceptionText = Util.getSQLExceptionText(e);
-
-               // log also the stacktrace
-               StatusUtil.log(sqlExceptionText + Util.getStackTrace(e), e);
-            }
-
-         }
+         // Shutdown Derby embedded cleanly to release file locks
+         shutdownDerby();
       }
+
+      return false;
    }
 
    private static void migrate_20_CreateH2Tables(final Connection h2Conn) throws SQLException {
@@ -589,6 +627,27 @@ public class MigrateDerbyToH2 {
             _splashManager.setMessage("   Check: TOURDATA Blobs perfectly matched via SHA-256 validation");
          } else {
             _splashManager.setMessage("   Check: Critical Error: Data mismatch detected inside TOURDATA blobs !");
+         }
+      }
+   }
+
+   private static void shutdownDerby() {
+
+      try (Connection conn = DriverManager.getConnection("jdbc:derby:;shutdown=true")) {
+
+      } catch (final SQLException e) {
+
+         // Derby always throws SQLState XJ015 on successful shutdown
+         if ("XJ015".equals(e.getSQLState())) { //$NON-NLS-1$
+
+            _splashManager.setMessage("Derby server is shutdown"); //$NON-NLS-1$
+
+         } else {
+
+            final String sqlExceptionText = Util.getSQLExceptionText(e);
+
+            // log also the stacktrace
+            StatusUtil.log(sqlExceptionText + Util.getStackTrace(e), e);
          }
       }
    }

@@ -152,13 +152,6 @@ public class Application implements IApplication {
 
       try {
 
-         if (MigrateDerbyToH2.isMigrated() == false) {
-
-            // exit immediately -> there needs some user actions
-
-            return IApplication.EXIT_OK;
-         }
-
          if (IS_INSTANCE_CHECK) {
 
             // instance is checked
@@ -186,6 +179,13 @@ public class Application implements IApplication {
 
             // 2. Start the background listener for subsequent instances
             startInstanceListenerThread();
+         }
+
+         if (MigrateDerbyToH2.isMigrated() == false) {
+
+            // exit immediately -> there needs some user actions
+
+            return IApplication.EXIT_OK;
          }
 
          // 3. Normal Eclipse RCP startup sequence
