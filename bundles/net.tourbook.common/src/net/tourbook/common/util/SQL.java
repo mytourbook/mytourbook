@@ -35,6 +35,8 @@ public final class SQL {
    private static final String SQL_PARAMETERS_OTHER = ", ?"; //$NON-NLS-1$
    public static final String  SQL_STRING_SEPARATOR = "'";   //$NON-NLS-1$
 
+   private static boolean      _isErrorDialogOpen   = false;
+
    public static void close(final Connection conn) {
 
       if (conn != null) {
@@ -175,27 +177,34 @@ public final class SQL {
       }
    }
 
-   public static void showException(final SQLException exception, final String sqlStatement) {
+   public static void showException(final SQLException sqlException,
+                                    final String sqlStatement) {
 
-      // log without line number that it can be easily copy/pasted into a sql tool
-      System.out.println();
-      System.out.println(sqlStatement);
+      final String stackTrace = Util.getStackTrace(sqlException);
 
-      // add line numbers
-      final String sqlStatementWithNumber = Util.addLineNumbers(sqlStatement);
+      // truncate for the message dialog
+      final String message = Util.truncateLines(stackTrace, 50);
 
-      final Display display = Display.getDefault();
-      display.asyncExec(() -> {
+      // log in app
+      StatusUtil.log(stackTrace, sqlException);
 
-         final String message = "SQL statement: " + UI.NEW_LINE2 // //$NON-NLS-1$
-               + sqlStatementWithNumber + UI.NEW_LINE2
-               + Util.getSQLExceptionText(exception);
+      if (_isErrorDialogOpen) {
 
-         // log in app
-         StatusUtil.logError(message);
-         StatusUtil.log(exception);
+         // prevent "endless" or stacked dialogs
 
-         SQLMessageDialog.openError(display.getActiveShell(), "SQL Error", message); //$NON-NLS-1$
+         return;
+      }
+
+      _isErrorDialogOpen = true;
+
+      Display.getDefault().asyncExec(() -> {
+
+         SQLMessageDialog.openError(
+               Display.getDefault().getActiveShell(),
+               "SQL Error", //$NON-NLS-1$
+               message);
+
+         _isErrorDialogOpen = false;
       });
    }
 }

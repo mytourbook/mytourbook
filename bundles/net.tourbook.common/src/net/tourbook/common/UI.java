@@ -157,6 +157,7 @@ public class UI {
 
    public static final String       COLON_SPACE                          = ": ";                                        //$NON-NLS-1$
    public static final String       COMMA_SPACE                          = ", ";                                        //$NON-NLS-1$
+   public static final String       COMMA_NEW_LINE                       = ",\n";                                       //$NON-NLS-1$
    /** This is not a real dash it's the negative sign character */
    public static final String       DASH                                 = "-";                                         //$NON-NLS-1$
    public static final String       DASH_WITH_SPACE                      = " - ";                                       //$NON-NLS-1$

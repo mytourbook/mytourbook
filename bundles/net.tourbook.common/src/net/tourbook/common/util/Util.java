@@ -3378,6 +3378,29 @@ public class Util {
       return serializeObject(object).length;
    }
 
+   public static String truncateLines(final String text, final int n) {
+
+      if (text == null || n <= 0) {
+         return "";
+      }
+
+      int index = -1;
+
+      for (int i = 0; i < n; i++) {
+         index = text.indexOf('\n', index + 1);
+         if (index == -1) {
+            return text; // The string has fewer than n lines
+         }
+      }
+
+      // Handle Windows CRLF (\r\n) cleanly so a trailing \r isn't left behind
+      if (index > 0 && text.charAt(index - 1) == '\r') {
+         index--;
+      }
+
+      return text.substring(0, index);
+   }
+
    /**
     * Waits until all task are done
     *

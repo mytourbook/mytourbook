@@ -18,9 +18,7 @@ package net.tourbook.database;
 import com.mchange.v2.c3p0.ComboPooledDataSource;
 
 import java.beans.PropertyVetoException;
-import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
-import java.net.URL;
 import java.sql.CallableStatement;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
@@ -58,7 +56,6 @@ import net.tourbook.Messages;
 import net.tourbook.application.ApplicationWorkbenchAdvisor;
 import net.tourbook.application.SplashManager;
 import net.tourbook.application.TourbookPlugin;
-import net.tourbook.common.NIO;
 import net.tourbook.common.UI;
 import net.tourbook.common.time.TimeTools;
 import net.tourbook.common.util.StatusUtil;
@@ -110,7 +107,6 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IPropertyListener;
 import org.eclipse.ui.PlatformUI;
 import org.hibernate.ejb.Ejb3Configuration;
-import org.osgi.framework.Bundle;
 
 public class TourDatabase {
 
@@ -976,9 +972,30 @@ public class TourDatabase {
             h2DatabasePath = h2DatabasePath.substring(1);
          }
 
+         // Log to standard console output.text
+         // jdbc:h2:mem:testdb;TRACE_LEVEL_SYSTEM_OUT=2
+
+         // Log to a trace file. This writes logs to a <databaseName>.trace.db file in the same directory as your database files.text
+         // jdbc:h2:file:~/testdb;TRACE_LEVEL_FILE=2
+
+
+         // H2 Trace Levels Explained
+         //
+         // Level 0. Tracing is completely disabled.
+         // Level 1. Logs errors only (this is the default setting for file tracing).
+         // Level 2. Logs errors and info messages, which includes executed SQL statements.
+         // Level 3. Logs debug details, including SQL statements along with their bound parameter values.
+         // Level 4. Delegates logging directly to SLF4J.
+
+         String logging ;
+
+         logging = ";TRACE_LEVEL_SYSTEM_OUT=3";                         //$NON-NLS-1$
+         logging = ";TRACE_LEVEL_FILE=3";                               //$NON-NLS-1$
+         logging = ";TRACE_LEVEL_SYSTEM_OUT=0;TRACE_LEVEL_FILE=2";      //$NON-NLS-1$
+
          SQL_DB_DRIVER_CLASS        = H2_DRIVER;
          SQL_DB_CONNECTION_URL      = H2_JDBC_CONNECTION_PROTOCOL;
-         SQL_DB_TOUR_DB_URL         = H2_DB_TOUR_DB_URL;
+         SQL_DB_TOUR_DB_URL         = H2_DB_TOUR_DB_URL + logging;
 
          SQL_DB_USERNAME            = UI.EMPTY_STRING;
          SQL_DB_PASSWORD            = UI.EMPTY_STRING;
@@ -6267,66 +6284,66 @@ public class TourDatabase {
 
    public void setupDerbyCustomFunctions_AvgSpeedPace() {
 
-      if (_isCustomFunctionSetup_AvgSpeedPace) {
-         return;
-      }
-
-      try (Connection conn = getInstance().getConnection();
-            Statement stmt = conn.createStatement()) {
-
-         final Bundle derbyBundle = Platform.getBundle("net.tourbook.ext.apache"); //$NON-NLS-1$
-
-         // bundleentry://26.fwk1091632842/mytourbook-derby-functions.jar
-         final URL bundleUrl = derbyBundle.getEntry("/mytourbook-derby-functions.jar"); //$NON-NLS-1$
-
-         // C:/E/e-431/eclipse/../../../DAT/MT/mytourbook/bundles/net.tourbook.ext.apache/mytourbook-derby-functions.jar
-         final String sqlCustomJarFilePath = NIO.getAbsolutePathFromBundleUrl(bundleUrl);
-
-         /*
-          * Install (replace) jar file, hints are from
-          * https://stackoverflow.com/questions/38369703/regex-in-apache-derby#answer-38369704
-          */
-         exec_IgnoreException(stmt, "CALL SQLJ.REMOVE_JAR('App.StoredProcedures', 0)"); //$NON-NLS-1$
-         exec(stmt, "CALL SQLJ.INSTALL_JAR('%s', 'App.StoredProcedures', 0)".formatted(sqlCustomJarFilePath)); //$NON-NLS-1$
-         exec(stmt, "CALL SYSCS_UTIL.SYSCS_SET_DATABASE_PROPERTY('derby.database.classpath', 'App.StoredProcedures')"); //$NON-NLS-1$
-
-         /*
-          * Replace functions
-          */
-         exec_IgnoreException(stmt, "DROP FUNCTION avgSpeed"); //$NON-NLS-1$
-         exec(stmt,
-
-               UI.EMPTY_STRING
-
-                     + "CREATE FUNCTION avgSpeed (tourTime BIGINT, tourDistance BIGINT)" + NL //                  //$NON-NLS-1$
-                     + "RETURNS REAL" + NL //                                                                     //$NON-NLS-1$
-                     + "PARAMETER STYLE JAVA" + NL //                                                             //$NON-NLS-1$
-                     + "NO SQL" + NL //                                                                           //$NON-NLS-1$
-                     + "LANGUAGE JAVA" + NL //                                                                    //$NON-NLS-1$
-                     + "EXTERNAL NAME 'net.tourbook.ext.apache.custom.DerbyCustomFunctions.avgSpeed'" + NL //     //$NON-NLS-1$
-         );
-
-         exec_IgnoreException(stmt, "DROP FUNCTION avgPace"); //$NON-NLS-1$
-         exec(stmt,
-
-               UI.EMPTY_STRING
-
-                     + "CREATE FUNCTION avgPace (tourTime BIGINT, tourDistance BIGINT)" + NL //                   //$NON-NLS-1$
-                     + "RETURNS REAL" + NL //                                                                     //$NON-NLS-1$
-                     + "PARAMETER STYLE JAVA" + NL //                                                             //$NON-NLS-1$
-                     + "NO SQL" + NL //                                                                           //$NON-NLS-1$
-                     + "LANGUAGE JAVA" + NL //                                                                    //$NON-NLS-1$
-                     + "EXTERNAL NAME 'net.tourbook.ext.apache.custom.DerbyCustomFunctions.avgPace'" + NL //      //$NON-NLS-1$
-         );
-
-         _isCustomFunctionSetup_AvgSpeedPace = true;
-
-      } catch (final SQLException e) {
-         UI.showSQLException(e);
-
-      } catch (final IOException e) {
-         StatusUtil.log(e);
-      }
+//      if (_isCustomFunctionSetup_AvgSpeedPace) {
+//         return;
+//      }
+//
+//      try (Connection conn = getInstance().getConnection();
+//            Statement stmt = conn.createStatement()) {
+//
+//         final Bundle derbyBundle = Platform.getBundle("net.tourbook.ext.apache"); //$NON-NLS-1$
+//
+//         // bundleentry://26.fwk1091632842/mytourbook-derby-functions.jar
+//         final URL bundleUrl = derbyBundle.getEntry("/mytourbook-derby-functions.jar"); //$NON-NLS-1$
+//
+//         // C:/E/e-431/eclipse/../../../DAT/MT/mytourbook/bundles/net.tourbook.ext.apache/mytourbook-derby-functions.jar
+//         final String sqlCustomJarFilePath = NIO.getAbsolutePathFromBundleUrl(bundleUrl);
+//
+//         /*
+//          * Install (replace) jar file, hints are from
+//          * https://stackoverflow.com/questions/38369703/regex-in-apache-derby#answer-38369704
+//          */
+//         exec_IgnoreException(stmt, "CALL SQLJ.REMOVE_JAR('App.StoredProcedures', 0)"); //$NON-NLS-1$
+//         exec(stmt, "CALL SQLJ.INSTALL_JAR('%s', 'App.StoredProcedures', 0)".formatted(sqlCustomJarFilePath)); //$NON-NLS-1$
+//         exec(stmt, "CALL SYSCS_UTIL.SYSCS_SET_DATABASE_PROPERTY('derby.database.classpath', 'App.StoredProcedures')"); //$NON-NLS-1$
+//
+//         /*
+//          * Replace functions
+//          */
+//         exec_IgnoreException(stmt, "DROP FUNCTION avgSpeed"); //$NON-NLS-1$
+//         exec(stmt,
+//
+//               UI.EMPTY_STRING
+//
+//                     + "CREATE FUNCTION avgSpeed (tourTime BIGINT, tourDistance BIGINT)" + NL //                  //$NON-NLS-1$
+//                     + "RETURNS REAL" + NL //                                                                     //$NON-NLS-1$
+//                     + "PARAMETER STYLE JAVA" + NL //                                                             //$NON-NLS-1$
+//                     + "NO SQL" + NL //                                                                           //$NON-NLS-1$
+//                     + "LANGUAGE JAVA" + NL //                                                                    //$NON-NLS-1$
+//                     + "EXTERNAL NAME 'net.tourbook.ext.apache.custom.DerbyCustomFunctions.avgSpeed'" + NL //     //$NON-NLS-1$
+//         );
+//
+//         exec_IgnoreException(stmt, "DROP FUNCTION avgPace"); //$NON-NLS-1$
+//         exec(stmt,
+//
+//               UI.EMPTY_STRING
+//
+//                     + "CREATE FUNCTION avgPace (tourTime BIGINT, tourDistance BIGINT)" + NL //                   //$NON-NLS-1$
+//                     + "RETURNS REAL" + NL //                                                                     //$NON-NLS-1$
+//                     + "PARAMETER STYLE JAVA" + NL //                                                             //$NON-NLS-1$
+//                     + "NO SQL" + NL //                                                                           //$NON-NLS-1$
+//                     + "LANGUAGE JAVA" + NL //                                                                    //$NON-NLS-1$
+//                     + "EXTERNAL NAME 'net.tourbook.ext.apache.custom.DerbyCustomFunctions.avgPace'" + NL //      //$NON-NLS-1$
+//         );
+//
+//         _isCustomFunctionSetup_AvgSpeedPace = true;
+//
+//      } catch (final SQLException e) {
+//         UI.showSQLException(e);
+//
+//      } catch (final IOException e) {
+//         StatusUtil.log(e);
+//      }
    }
 
    /**

@@ -58,27 +58,27 @@ import org.eclipse.swt.widgets.Display;
 
 public class NatTable_DataLoader {
 
-   private static final char                              NL                             = net.tourbook.common.UI.NEW_LINE;
+   private static final char                              NL                               = net.tourbook.common.UI.NEW_LINE;
 
-   private static final IPreferenceStore                  _prefStore                     = TourbookPlugin.getPrefStore();
+   private static final IPreferenceStore                  _prefStore                       = TourbookPlugin.getPrefStore();
 
-   private static final String                            SQL_ASCENDING                  = "ASC";                           //$NON-NLS-1$
-   private static final String                            SQL_DESCENDING                 = "DESC";                          //$NON-NLS-1$
+   private static final String                            SQL_ASCENDING                    = "ASC";                           //$NON-NLS-1$
+   private static final String                            SQL_DESCENDING                   = "DESC";                          //$NON-NLS-1$
 
-   private static final String                            SQL_DEFAULT_SORT_FIELD         = "TourStartTime";                 //$NON-NLS-1$
+   private static final String                            SQL_DEFAULT_SORT_FIELD           = "TourStartTime";                 //$NON-NLS-1$
 
    /**
     * Dummy field name for fields which currently cannot be sorted in the NatTable.
     */
-   public static final String                             FIELD_WITHOUT_SORTING          = "FIELD_WITHOUT_SORTING";         //$NON-NLS-1$
+   public static final String                             FIELD_WITHOUT_SORTING            = "FIELD_WITHOUT_SORTING";         //$NON-NLS-1$
 
-   private static int                                     FETCH_SIZE                     = 1_000;
+   private static int                                     FETCH_SIZE                       = 1_000;
 
-   private static final ExecutorService                   _loadingExecutor               = createExecuter_TourLoading();
-   private static final ExecutorService                   _rowIndexExecutor              = createExecuter_TourId_RowIndex();
+   private static final ExecutorService                   _loadingExecutor                 = createExecuter_TourLoading();
+   private static final ExecutorService                   _rowIndexExecutor                = createExecuter_TourId_RowIndex();
 
-   private ConcurrentHashMap<Integer, Integer>            _pageNumbers_Fetched           = new ConcurrentHashMap<>();
-   private ConcurrentHashMap<Integer, LazyTourLoaderItem> _pageNumbers_Loading           = new ConcurrentHashMap<>();
+   private ConcurrentHashMap<Integer, Integer>            _pageNumbers_Fetched             = new ConcurrentHashMap<>();
+   private ConcurrentHashMap<Integer, LazyTourLoaderItem> _pageNumbers_Loading             = new ConcurrentHashMap<>();
 
    /**
     * Relation between row position and tour item
@@ -86,7 +86,7 @@ public class NatTable_DataLoader {
     * Key: Row position<br>
     * Value: {@link TVITourBookTour}
     */
-   private ConcurrentHashMap<Integer, TVITourBookTour>    _fetchedTourItems              = new ConcurrentHashMap<>();
+   private ConcurrentHashMap<Integer, TVITourBookTour>    _fetchedTourItems                = new ConcurrentHashMap<>();
 
    /**
     * Relation between tour id and row position
@@ -94,15 +94,16 @@ public class NatTable_DataLoader {
     * Key: Tour ID <br>
     * Value: Row position
     */
-   private ConcurrentHashMap<Long, Integer>               _fetchedTourIndex              = new ConcurrentHashMap<>();
-   private final LinkedBlockingDeque<LazyTourLoaderItem>  _loaderWaitingQueue            = new LinkedBlockingDeque<>();
+   private ConcurrentHashMap<Long, Integer>               _fetchedTourIndex                = new ConcurrentHashMap<>();
+   private final LinkedBlockingDeque<LazyTourLoaderItem>  _loaderWaitingQueue              = new LinkedBlockingDeque<>();
 
    private String[]                                       _allSortColumnIds;
    private List<SortDirectionEnum>                        _allSortDirections;
 
-   private List<String>                                   _allSqlSortFields_OrderBy      = new ArrayList<>();
-   private List<String>                                   _allSqlSortFields_SelectFields = new ArrayList<>();
-   private List<String>                                   _allSqlSortDirections          = new ArrayList<>();
+   private List<String>                                   _allSqlSortFields_OrderBy        = new ArrayList<>();
+   private List<String>                                   _allSqlSortFields_SelectFields   = new ArrayList<>();
+   private List<String>                                   _allSqlSortFields_SelectAsFields = new ArrayList<>();
+   private List<String>                                   _allSqlSortDirections            = new ArrayList<>();
 
    /**
     * Contains all columns (also hidden columns), sorted in the order how they are displayed in the
@@ -113,7 +114,7 @@ public class NatTable_DataLoader {
    /**
     * Number of all tours for the current lazy loader
     */
-   private int                                            _numAllTourItems               = -1;
+   private int                                            _numAllTourItems                 = -1;
    private int                                            _numToursWithoutCollectionFilter;
 
    private TourBookView                                   _tourBookView;
@@ -126,7 +127,7 @@ public class NatTable_DataLoader {
     */
    private long[]                                         _allSortedTourIDs;
 
-   private SQLData                                        _tourCollectionFilter          = new SQLData();
+   private SQLData                                        _tourCollectionFilter            = new SQLData();
 
    private Runnable                                       _postFetchRunnable;
 
@@ -137,7 +138,7 @@ public class NatTable_DataLoader {
 
       createColumnHeaderData();
 
-      TourDatabase.getInstance().setupDerbyCustomFunctions_AvgSpeedPace();
+//      TourDatabase.getInstance().setupDerbyCustomFunctions_AvgSpeedPace();
    }
 
    private static ExecutorService createExecuter_TourId_RowIndex() {
@@ -242,7 +243,7 @@ public class NatTable_DataLoader {
          if (fieldIndex > 0) {
 
             // separate from previous order item
-            sb.append(UI.COMMA_SPACE + NL);
+            sb.append(UI.COMMA_NEW_LINE);
          }
 
          sb.append(fieldName + UI.SPACE + sortDirection);
@@ -251,9 +252,16 @@ public class NatTable_DataLoader {
       return sb.toString();
    }
 
-   private String createSql_Sorting_SelectFields() {
+   /**
+    * @param isBetweenOtherFields
+    *           When <code>true</code> then these fields are between other field, otherwise they are
+    *           at the end of the SELECT statement
+    *
+    * @return
+    */
+   private String createSql_Sorting_SelectAsFields(final boolean isBetweenOtherFields) {
 
-      final int numSelectFields = _allSqlSortFields_SelectFields.size();
+      final int numSelectFields = _allSqlSortFields_SelectAsFields.size();
 
       if (numSelectFields == 0) {
          return UI.EMPTY_STRING;
@@ -263,18 +271,82 @@ public class NatTable_DataLoader {
 
       for (int fieldIndex = 0; fieldIndex < numSelectFields; fieldIndex++) {
 
-         final String fieldName = _allSqlSortFields_SelectFields.get(fieldIndex);
+         final String fieldName = _allSqlSortFields_SelectAsFields.get(fieldIndex);
 
-         if (fieldIndex > 0) {
+         if (isBetweenOtherFields) {
 
-            // separate from previous field
-            sb.append(UI.COMMA_SPACE + NL);
+            if (fieldIndex > 0) {
+
+               // separate from previous SELECT item
+               sb.append(UI.COMMA_NEW_LINE);
+            }
+
+         } else {
+
+            // separate from previous SELECT item
+            sb.append(UI.COMMA_NEW_LINE);
          }
 
          sb.append(fieldName);
       }
 
-      sb.append(NL);
+      if (isBetweenOtherFields) {
+         sb.append(UI.COMMA_NEW_LINE);
+      } else {
+         sb.append(NL);
+      }
+
+      return sb.toString();
+   }
+
+   /**
+    * @param isBetweenOtherFields
+    *           When <code>true</code> then these fields are between other field, otherwise they are
+    *           at the end of the SELECT statement
+    *
+    * @return
+    */
+   private String createSql_Sorting_SelectFields_Combined(final boolean isBetweenOtherFields) {
+
+      final List<String> allSelectFields = new ArrayList<>();
+
+      allSelectFields.addAll(_allSqlSortFields_SelectFields);
+      allSelectFields.addAll(_allSqlSortFields_SelectAsFields);
+
+      final int numSelectFields = allSelectFields.size();
+
+      if (numSelectFields == 0) {
+         return UI.EMPTY_STRING;
+      }
+
+      final StringBuilder sb = new StringBuilder();
+
+      for (int fieldIndex = 0; fieldIndex < numSelectFields; fieldIndex++) {
+
+         final String fieldName = allSelectFields.get(fieldIndex);
+
+         if (isBetweenOtherFields) {
+
+            if (fieldIndex > 0) {
+
+               // separate from previous SELECT item
+               sb.append(UI.COMMA_NEW_LINE);
+            }
+
+         } else {
+
+            // separate from previous SELECT item
+            sb.append(UI.COMMA_NEW_LINE);
+         }
+
+         sb.append(fieldName);
+      }
+
+      if (isBetweenOtherFields) {
+         sb.append(UI.COMMA_NEW_LINE);
+      } else {
+         sb.append(NL);
+      }
 
       return sb.toString();
    }
@@ -292,7 +364,8 @@ public class NatTable_DataLoader {
 
       try (Connection conn = TourDatabase.getInstance().getConnection()) {
 
-         final String sqlSortFields = createSql_Sorting_SelectFields();
+         final String sqlSelectFields = createSql_Sorting_SelectFields_Combined(false);
+         final String sqlOrderByFields = createSql_Sorting_OrderBy();
 
          final AppFilter appFilter = new AppFilter(AppFilter.ANY_APP_FILTERS);
          final SQLData partFilter_AND_OR = new EquipmentPartFilter_AND_OR(EquipmentViewerType.IS_EQUIPMENT_VIEWER).getSqlData();
@@ -301,10 +374,17 @@ public class NatTable_DataLoader {
 
          sql = UI.EMPTY_STRING
 
+               + "--" + NL //                                                                            //$NON-NLS-1$
+               + NL
+               + "---------------" + NL //                                                               //$NON-NLS-1$
+               + "-- NatTable_DataLoader.fetchAllTourIds" + NL //                                        //$NON-NLS-1$
+               + "---------------" + NL //                                                               //$NON-NLS-1$
+               + NL
+
                + "SELECT" + NL //                              //$NON-NLS-1$
 
-               + "   DISTINCT TourId," + NL //                 //$NON-NLS-1$
-               + "   " + sqlSortFields //                      //$NON-NLS-1$
+               + "   DISTINCT TourId" + NL //                  //$NON-NLS-1$
+               + "   " + sqlSelectFields //                    //$NON-NLS-1$
 
                + "FROM TOURDATA AS TourData" + NL //           //$NON-NLS-1$
 
@@ -316,7 +396,7 @@ public class NatTable_DataLoader {
                + tourCollectionFilter.getSqlString() + NL
                + partFilter_NOT.getSqlString() + NL
 
-               + createSql_Sorting_OrderBy() + NL;
+               + sqlOrderByFields + NL;
 
          final PreparedStatement prepStmt = conn.prepareStatement(sql);
 
@@ -381,6 +461,13 @@ public class NatTable_DataLoader {
             final SQLData partFilter_NOT = new EquipmentPartFilter_NOT(EquipmentViewerType.IS_EQUIPMENT_VIEWER).getSqlData();
 
             sql = UI.EMPTY_STRING
+
+                  + "--" + NL //                                                                            //$NON-NLS-1$
+                  + NL
+                  + "---------------" + NL //                                                               //$NON-NLS-1$
+                  + "-- NatTable_DataLoader.fetchNumberOfTours" + NL //                                     //$NON-NLS-1$
+                  + "---------------" + NL //                                                               //$NON-NLS-1$
+                  + NL
 
                   + "SELECT COUNT(DISTINCT TourData.TourID) as NumTours" + NL //    //$NON-NLS-1$
 
@@ -489,8 +576,6 @@ public class NatTable_DataLoader {
          final SQLData partFilter_NOT = new EquipmentPartFilter_NOT(EquipmentViewerType.IS_EQUIPMENT_VIEWER).getSqlData();
          final SQLData tourCollectionFilter = _tourCollectionFilter;
 
-         final String orderBy = createSql_Sorting_OrderBy();
-
          sql = UI.EMPTY_STRING
 
                + "--" + NL //                                                                            //$NON-NLS-1$
@@ -503,6 +588,7 @@ public class NatTable_DataLoader {
                + "SELECT" + NL //                                                                  //$NON-NLS-1$
 
                + TVITourBookItem.getSQL_ALL_TOUR_FIELDS("tdFiltered", 3) + "," + NL //             //$NON-NLS-1$ //$NON-NLS-2$
+               + "   " + createSql_Sorting_SelectAsFields(true) //                                 //$NON-NLS-1$
 
                + "     tm.markerId," + NL //                                                       //$NON-NLS-1$
                + "     jtt.TourTag_TagID  AS TourTag_tagId," + NL //                               //$NON-NLS-1$
@@ -518,6 +604,7 @@ public class NatTable_DataLoader {
                + "      DISTINCT " //                                                              //$NON-NLS-1$
 
                + TVITourBookItem.getSQL_ALL_TOUR_FIELDS("TourData", 6) + NL //                     //$NON-NLS-1$
+               + "   " + createSql_Sorting_SelectAsFields(false) //                                //$NON-NLS-1$
 
                + "     FROM TOURDATA AS TourData" + NL //                                          //$NON-NLS-1$
 
@@ -529,7 +616,7 @@ public class NatTable_DataLoader {
                + tourCollectionFilter.getSqlString() + NL
                + partFilter_NOT.getSqlString() + NL
 
-               + "   " + orderBy + NL //                                                           //$NON-NLS-1$
+               + "   " + createSql_Sorting_OrderBy() + NL //                                       //$NON-NLS-1$
 
                + "   OFFSET ? ROWS FETCH NEXT ? ROWS ONLY" + NL //                                 //$NON-NLS-1$
 
@@ -540,28 +627,30 @@ public class NatTable_DataLoader {
                + "LEFT JOIN " + TourDatabase.TABLE_TOUR_NUTRITION_PRODUCT + "    AS np    ON tdFiltered.tourID = np.TourData_tourId" + NL //   //$NON-NLS-1$ //$NON-NLS-2$
                + "LEFT JOIN " + TourDatabase.JOINTABLE__TOURDATA__EQUIPMENT + "  AS te    ON tdFiltered.tourID = te.TourData_tourId" + NL //   //$NON-NLS-1$ //$NON-NLS-2$
 
-               + orderBy + NL;
+               + createSql_Sorting_OrderBy() + NL;
 
          final PreparedStatement prepStmt = conn.prepareStatement(sql);
 
          int rowIndex = loaderItem.sqlOffset;
          int nextIndex = 1;
 
+// SET_FORMATTING_OFF
+
          // set filter parameters
-         nextIndex = partFilter_AND_OR.setParameters(prepStmt, nextIndex);
-         nextIndex = appFilter.setParameters(prepStmt, nextIndex);
-         nextIndex = tourCollectionFilter.setParameters(prepStmt, nextIndex);
-         nextIndex = partFilter_NOT.setParameters(prepStmt, nextIndex);
+         nextIndex = partFilter_AND_OR    .setParameters(prepStmt, nextIndex);
+         nextIndex = appFilter            .setParameters(prepStmt, nextIndex);
+         nextIndex = tourCollectionFilter .setParameters(prepStmt, nextIndex);
+         nextIndex = partFilter_NOT       .setParameters(prepStmt, nextIndex);
 
          // set number of fetched parameters
          prepStmt.setInt(nextIndex++, rowIndex);
          prepStmt.setInt(nextIndex++, FETCH_SIZE);
 
          long prevTourId = -1;
-         HashSet<Long> allEquipmentIDs = null;
-         HashSet<Long> tagIds = null;
-         HashSet<Long> markerIds = null;
-         HashSet<Long> nutritionProductIds = null;
+         HashSet<Long> allEquipmentIDs       = null;
+         HashSet<Long> tagIds                = null;
+         HashSet<Long> markerIds             = null;
+         HashSet<Long> nutritionProductIds   = null;
 
          final ResultSet result = prepStmt.executeQuery();
          while (result.next()) {
@@ -569,8 +658,6 @@ public class NatTable_DataLoader {
             final long result_TourId = result.getLong(1);
 
             final int columnStartNumber = TVITourBookItem.SQL_ALL_OTHER_FIELDS__COLUMN_START_NUMBER;
-
-// SET_FORMATTING_OFF
 
             final Object result_MarkerId           = result.getObject(columnStartNumber);
             final Object result_TagId              = result.getObject(columnStartNumber + 1);
@@ -813,24 +900,11 @@ public class NatTable_DataLoader {
     *
     * @param sortColumnId
     *
-    * @return Returns database field
+    * @return Returns the database field or an expression
     */
    public String getSqlField_OrderBy(final String sortColumnId) {
 
-      /*
-       * Compute average speed/pace with derby custom functions
-       */
-      final String timeField = _prefStore.getBoolean(ITourbookPreferences.APPEARANCE_IS_PACEANDSPEED_FROM_RECORDED_TIME)
-            ? "tourDeviceTime_Recorded" //$NON-NLS-1$
-            : "tourComputedTime_Moving"; //$NON-NLS-1$
-
 // SET_FORMATTING_OFF
-
-      /*
-       * These functions are stored procedures from net.tourbook.ext.apache.custom.DerbyCustomFunctions
-       */
-      final String sortByAvgSpeed = "avgSpeed(" + timeField + ", tourDistance)"; //$NON-NLS-1$ //$NON-NLS-2$
-      final String sortByPace     = "avgPace("  + timeField + ", tourDistance)"; //$NON-NLS-1$ //$NON-NLS-2$
 
       switch (sortColumnId) {
 
@@ -899,8 +973,8 @@ public class NatTable_DataLoader {
       /*
        * MOTION
        */
-      case TableColumnFactory.MOTION_AVG_PACE_ID:                    return sortByPace;
-      case TableColumnFactory.MOTION_AVG_SPEED_ID:                   return sortByAvgSpeed;
+      case TableColumnFactory.MOTION_AVG_PACE_ID:                    return TableColumnFactory.MOTION_AVG_PACE_ID;
+      case TableColumnFactory.MOTION_AVG_SPEED_ID:                   return TableColumnFactory.MOTION_AVG_SPEED_ID;
       case TableColumnFactory.MOTION_DISTANCE_ID:                    return "tourDistance";           //$NON-NLS-1$
       case TableColumnFactory.MOTION_MAX_SPEED_ID:                   return "maxSpeed";               //$NON-NLS-1$
 
@@ -1008,19 +1082,19 @@ public class NatTable_DataLoader {
       /*
        * WEATHER
        */
-      case TableColumnFactory.WEATHER_AIR_QUALITY_ID:                return "weather_AirQuality"; //$NON-NLS-1$
-      case TableColumnFactory.WEATHER_CLOUDS_ID:                     return "weather_Clouds";   // an icon is displayed     //$NON-NLS-1$
-      case TableColumnFactory.WEATHER_TEMPERATURE_AVG_ID:            return "(DOUBLE(weather_Temperature_Average) / temperatureScale)"; //$NON-NLS-1$
+      case TableColumnFactory.WEATHER_AIR_QUALITY_ID:                return "weather_AirQuality";                                   //$NON-NLS-1$
+      case TableColumnFactory.WEATHER_CLOUDS_ID:                     return "weather_Clouds";   // an icon is displayed             //$NON-NLS-1$
+      case TableColumnFactory.WEATHER_TEMPERATURE_AVG_ID:            return "(CAST(weather_Temperature_Average AS DOUBLE PRECISION) / temperatureScale)"; //$NON-NLS-1$
       case TableColumnFactory.WEATHER_TEMPERATURE_AVG_COMBINED_ID:   return FIELD_WITHOUT_SORTING;
-      case TableColumnFactory.WEATHER_TEMPERATURE_AVG_DEVICE_ID:     return "(DOUBLE(weather_Temperature_Average_Device) / temperatureScale)"; //$NON-NLS-1$
-      case TableColumnFactory.WEATHER_TEMPERATURE_MIN_ID:            return "weather_Temperature_Min";                     //$NON-NLS-1$
+      case TableColumnFactory.WEATHER_TEMPERATURE_AVG_DEVICE_ID:     return "(CAST(weather_Temperature_Average_Device AS DOUBLE PRECISION) / temperatureScale)"; //$NON-NLS-1$
+      case TableColumnFactory.WEATHER_TEMPERATURE_MIN_ID:            return "weather_Temperature_Min";                              //$NON-NLS-1$
       case TableColumnFactory.WEATHER_TEMPERATURE_MIN_COMBINED_ID:   return FIELD_WITHOUT_SORTING;
-      case TableColumnFactory.WEATHER_TEMPERATURE_MIN_DEVICE_ID:     return "weather_Temperature_Min_Device";                     //$NON-NLS-1$
-      case TableColumnFactory.WEATHER_TEMPERATURE_MAX_ID:            return "weather_Temperature_Max";                     //$NON-NLS-1$
+      case TableColumnFactory.WEATHER_TEMPERATURE_MIN_DEVICE_ID:     return "weather_Temperature_Min_Device";                       //$NON-NLS-1$
+      case TableColumnFactory.WEATHER_TEMPERATURE_MAX_ID:            return "weather_Temperature_Max";                              //$NON-NLS-1$
       case TableColumnFactory.WEATHER_TEMPERATURE_MAX_COMBINED_ID:   return FIELD_WITHOUT_SORTING;
-      case TableColumnFactory.WEATHER_TEMPERATURE_MAX_DEVICE_ID:     return "weather_Temperature_Max_Device";                     //$NON-NLS-1$
-      case TableColumnFactory.WEATHER_WIND_DIRECTION_ID:             return "weather_Wind_Direction";                              //$NON-NLS-1$
-      case TableColumnFactory.WEATHER_WIND_SPEED_ID:                 return "weather_Wind_Speed";                              //$NON-NLS-1$
+      case TableColumnFactory.WEATHER_TEMPERATURE_MAX_DEVICE_ID:     return "weather_Temperature_Max_Device";                       //$NON-NLS-1$
+      case TableColumnFactory.WEATHER_WIND_DIRECTION_ID:             return "weather_Wind_Direction";                               //$NON-NLS-1$
+      case TableColumnFactory.WEATHER_WIND_SPEED_ID:                 return "weather_Wind_Speed";                                   //$NON-NLS-1$
 
       /*
        * NUTRITION
@@ -1041,7 +1115,7 @@ public class NatTable_DataLoader {
          return SQL_DEFAULT_SORT_FIELD;
       }
 
-   // SET_FORMATTING_ON
+// SET_FORMATTING_ON
    }
 
    /**
@@ -1051,13 +1125,14 @@ public class NatTable_DataLoader {
     *
     * @return Returns database field
     */
-   private String getSqlField_SelectFields(final String sortColumnId) {
+   private String getSqlField_SelectAsFields(final String sortColumnId) {
 
       final String timeField = _prefStore.getBoolean(ITourbookPreferences.APPEARANCE_IS_PACEANDSPEED_FROM_RECORDED_TIME)
             ? "tourDeviceTime_Recorded" //$NON-NLS-1$
             : "tourComputedTime_Moving"; //$NON-NLS-1$
 
-      final String speedPace_SelectFields = timeField + ", tourDistance"; //$NON-NLS-1$
+      final String sortByAvgSpeed = "(tourDistance / NULLIF(" + timeField + ", 0))"; //$NON-NLS-1$ //$NON-NLS-2$
+      final String sortByAvgPace = "(" + timeField + " / NULLIF(tourDistance, 0))"; //$NON-NLS-1$ //$NON-NLS-2$
 
 // SET_FORMATTING_OFF
 
@@ -1066,8 +1141,8 @@ public class NatTable_DataLoader {
       /*
        * MOTION
        */
-      case TableColumnFactory.MOTION_AVG_PACE_ID:        return speedPace_SelectFields;
-      case TableColumnFactory.MOTION_AVG_SPEED_ID:       return speedPace_SelectFields;
+      case TableColumnFactory.MOTION_AVG_PACE_ID:     return sortByAvgPace    + " AS " + TableColumnFactory.MOTION_AVG_PACE_ID;
+      case TableColumnFactory.MOTION_AVG_SPEED_ID:    return sortByAvgSpeed   + " AS " + TableColumnFactory.MOTION_AVG_SPEED_ID;
 
       }
 
@@ -1264,6 +1339,7 @@ public class NatTable_DataLoader {
 
       _allSqlSortFields_OrderBy.clear();
       _allSqlSortFields_SelectFields.clear();
+      _allSqlSortFields_SelectAsFields.clear();
       _allSqlSortDirections.clear();
 
       boolean isSortedByDateTime = false;
@@ -1310,16 +1386,17 @@ public class NatTable_DataLoader {
              */
             _allSqlSortFields_OrderBy.add(sqlField_OrderBy);
 
-            final String sqlField_SelectFields = getSqlField_SelectFields(sortColumnId);
-            if (sqlField_SelectFields != null) {
+            // check if there are SELECT AS fields
+            final String sqlField_SelectAsField = getSqlField_SelectAsFields(sortColumnId);
+            if (sqlField_SelectAsField != null) {
 
-               // use special "select" fields
+               // use special "SELECT ... AS ..." fields
 
-               _allSqlSortFields_SelectFields.add(sqlField_SelectFields);
+               _allSqlSortFields_SelectAsFields.add(sqlField_SelectAsField);
 
             } else {
 
-               // use "order by" fields
+               // use "ORDER BY" fields
 
                _allSqlSortFields_SelectFields.add(sqlField_OrderBy);
             }
