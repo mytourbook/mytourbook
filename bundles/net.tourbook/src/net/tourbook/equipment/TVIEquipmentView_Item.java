@@ -100,9 +100,9 @@ public abstract class TVIEquipmentView_Item extends TreeViewerItem {
             + "$i_AVG( CASE WHEN $db_AVGPULSE = 0      THEN NULL ELSE $db_AVGPULSE END)     AS Avg_AvgPulse," + NL //              9  //$NON-NLS-1$
             + "$i_AVG( CASE WHEN $db_AVGCADENCE = 0    THEN NULL ELSE $db_AVGCADENCE END)   AS Avg_AvgCadence," + NL //           10  //$NON-NLS-1$
 
-            + "$i_AVG( CASE WHEN $db_weather_Temperature_Average_Device = 0" //                                                                          //$NON-NLS-1$
-            + "  THEN NULL" //                                                                                                                           //$NON-NLS-1$
-            + "  ELSE DOUBLE($db_Weather_Temperature_Average_Device) / $db_TemperatureScale END) AS Avg_Weather_Temperature_Average_Device" + NL //  11  //$NON-NLS-1$
+            + "$i_AVG( CASE WHEN $db_weather_Temperature_Average_Device = 0" //                                                                                            //$NON-NLS-1$
+            + "  THEN NULL" //                                                                                                                                             //$NON-NLS-1$
+            + "  ELSE CAST($db_Weather_Temperature_Average_Device AS DOUBLE PRECISION) / $db_TemperatureScale END) AS Avg_Weather_Temperature_Average_Device" + NL //  11  //$NON-NLS-1$
       ;
 
 // SET_FORMATTING_ON

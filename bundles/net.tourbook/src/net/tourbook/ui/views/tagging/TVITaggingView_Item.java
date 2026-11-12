@@ -53,7 +53,7 @@ public abstract class TVITaggingView_Item extends TreeViewerItem {
             + "   AVG( CASE WHEN AVGCADENCE = 0    THEN NULL ELSE AVGCADENCE END )," + NL //             9  //$NON-NLS-1$
             + "   AVG( CASE WHEN weather_Temperature_Average_Device = 0 " //                                //$NON-NLS-1$
             + "     THEN NULL" //                                                                           //$NON-NLS-1$
-            + "     ELSE DOUBLE(weather_Temperature_Average_Device) / TemperatureScale END )," + NL //   10 //$NON-NLS-1$
+            + "     ELSE CAST(weather_Temperature_Average_Device AS DOUBLE PRECISION) / TemperatureScale END )," + NL //   10 //$NON-NLS-1$
 
             + "   SUM(TourDeviceTime_Recorded)" + NL //        11 //$NON-NLS-1$
       ;
@@ -72,7 +72,7 @@ public abstract class TVITaggingView_Item extends TreeViewerItem {
 
             + "   avgPulse," + NL //                           8  //$NON-NLS-1$
             + "   avgCadence," + NL //                         9  //$NON-NLS-1$
-            + "   (DOUBLE(weather_Temperature_Average_Device) / TemperatureScale)," + NL //     10 //$NON-NLS-1$
+            + "   (CAST(weather_Temperature_Average_Device AS DOUBLE PRECISION) / TemperatureScale)," + NL //     10 //$NON-NLS-1$
 
             + "   TourDeviceTime_Recorded" + NL //             11 //$NON-NLS-1$
       ;

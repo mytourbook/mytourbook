@@ -312,9 +312,9 @@ public abstract class TVITourBookItem extends TreeViewerItem implements ITourIte
             + "$i_MAX($db_MaxAltitude)," + NL //                                 7  //$NON-NLS-1$
             + "$i_MAX($db_MaxPulse)," + NL //                                    8  //$NON-NLS-1$
 
-            + "$i_AVG( CASE WHEN $db_AvgPulse = 0                              THEN NULL ELSE $db_AvgPulse END)," + NL //                                                           9     //$NON-NLS-1$
-            + "$i_AVG( CASE WHEN $db_AvgCadence = 0                            THEN NULL ELSE DOUBLE($db_AvgCadence) * CadenceMultiplier END)," + NL //                             10    //$NON-NLS-1$
-            + "$i_AVG( CASE WHEN $db_weather_Temperature_Average_Device = 0    THEN NULL ELSE DOUBLE($db_weather_Temperature_Average_Device) / TemperatureScale END)," + NL //      11   //$NON-NLS-1$
+            + "$i_AVG( CASE WHEN $db_AvgPulse = 0                              THEN NULL ELSE $db_AvgPulse END)," + NL //                                                                             9  //$NON-NLS-1$
+            + "$i_AVG( CASE WHEN $db_AvgCadence = 0                            THEN NULL ELSE CAST($db_AvgCadence AS DOUBLE PRECISION) * CadenceMultiplier END)," + NL //                             10 //$NON-NLS-1$
+            + "$i_AVG( CASE WHEN $db_weather_Temperature_Average_Device = 0    THEN NULL ELSE CAST($db_weather_Temperature_Average_Device AS DOUBLE PRECISION) / TemperatureScale END)," + NL //      11 //$NON-NLS-1$
             + "$i_AVG( CASE WHEN $db_Weather_Wind_Direction = 0                THEN NULL ELSE $db_Weather_Wind_Direction END)," + NL //                                             12    //$NON-NLS-1$
             + "$i_AVG( CASE WHEN $db_Weather_Wind_Speed = 0                    THEN NULL ELSE $db_Weather_Wind_Speed END)," + NL //                                                 13    //$NON-NLS-1$
             + "$i_AVG( CASE WHEN $db_RestPulse = 0                             THEN NULL ELSE $db_RestPulse END)," + NL //                                                          14    //$NON-NLS-1$
@@ -332,19 +332,19 @@ public abstract class TVITourBookItem extends TreeViewerItem implements ITourIte
 
             + "$i_SUM( CAST($db_cadenceZone_SlowTime AS BIGINT))," + NL //       22 //$NON-NLS-1$
             + "$i_SUM( CAST($db_cadenceZone_FastTime AS BIGINT))," + NL //       23 //$NON-NLS-1$
-            + "$i_AVG( CASE WHEN $db_cadenceZones_DelimiterValue = 0          THEN NULL ELSE $db_cadenceZones_DelimiterValue END)," + NL //       24 //$NON-NLS-1$
+            + "$i_AVG( CASE WHEN $db_cadenceZones_DelimiterValue = 0          THEN NULL ELSE $db_cadenceZones_DelimiterValue END)," + NL //     24 //$NON-NLS-1$
 
-            + "$i_MIN( CASE WHEN $db_weather_Temperature_Min_Device = 0       THEN NULL ELSE $db_weather_Temperature_Min_Device END)," + NL // 25 //$NON-NLS-1$
-            + "$i_MAX( CASE WHEN $db_weather_Temperature_Max_Device = 0       THEN NULL ELSE $db_weather_Temperature_Max_Device END)," + NL // 26 //$NON-NLS-1$
+            + "$i_MIN( CASE WHEN $db_weather_Temperature_Min_Device = 0       THEN NULL ELSE $db_weather_Temperature_Min_Device END)," + NL //  25 //$NON-NLS-1$
+            + "$i_MAX( CASE WHEN $db_weather_Temperature_Max_Device = 0       THEN NULL ELSE $db_weather_Temperature_Max_Device END)," + NL //  26 //$NON-NLS-1$
 
             + "$i_SUM( CAST($db_tourDeviceTime_Recorded AS BIGINT))," + NL //    27 //$NON-NLS-1$
             + "$i_SUM( CAST($db_tourDeviceTime_Paused AS BIGINT))," + NL //      28 //$NON-NLS-1$
 
-            + "$i_AVG( CASE WHEN $db_weather_Temperature_Average = 0          THEN NULL ELSE DOUBLE($db_weather_Temperature_Average) / TemperatureScale END)," + NL // 29 //$NON-NLS-1$
+            + "$i_AVG( CASE WHEN $db_weather_Temperature_Average = 0          THEN NULL ELSE CAST($db_weather_Temperature_Average AS DOUBLE PRECISION) / TemperatureScale END)," + NL // 29 //$NON-NLS-1$
 
-            + "$i_SUM( CAST($db_numberOfPassedVehicles AS BIGINT))," + NL //     30 //$NON-NLS-1$
+            + "$i_SUM( CAST($db_numberOfPassedVehicles AS BIGINT))," + NL //        30 //$NON-NLS-1$
 
-            + "$i_SUM( CAST($db_nutrition_TotalCarbohydrates AS BIGINT))" + NL //      31 //$NON-NLS-1$
+            + "$i_SUM( CAST($db_nutrition_TotalCarbohydrates AS BIGINT))" + NL //   31 //$NON-NLS-1$
       ;
 // SET_FORMATTING_ON
    }

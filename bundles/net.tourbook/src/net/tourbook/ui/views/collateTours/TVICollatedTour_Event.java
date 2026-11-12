@@ -91,7 +91,7 @@ public class TVICollatedTour_Event extends TVICollatedTour {
             + "   maxPulse," + NL //                                       18 //$NON-NLS-1$
             + "   avgPulse," + NL //                                       19 //$NON-NLS-1$
             + "   avgCadence," + NL //                                     20 //$NON-NLS-1$
-            + "   (DOUBLE(weather_Temperature_Average_Device) / temperatureScale)," + NL //     21 //$NON-NLS-1$
+            + "   (CAST(weather_Temperature_Average_Device AS DOUBLE PRECISION) / temperatureScale)," + NL //     21 //$NON-NLS-1$
             + "   startWeek," + NL //                                      22 //$NON-NLS-1$
             + "   startWeekYear," + NL //                                  23 //$NON-NLS-1$
 
