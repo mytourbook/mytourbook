@@ -97,7 +97,7 @@ public class PhotoLoadManager {
 
       final int availableProcessors = Runtime.getRuntime().availableProcessors();
 
-      System.out.println(UI.timeStamp() + "Number of processors: " + availableProcessors); //$NON-NLS-1$
+      System.out.println(UI.timeStamp() + " Number of processors: " + availableProcessors); //$NON-NLS-1$
 
       int numberOfProcessors = availableProcessors - 0; // 1 processor for HQ loading
       numberOfProcessors = Math.max(numberOfProcessors, 1);

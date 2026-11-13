@@ -15,9 +15,6 @@
  *******************************************************************************/
 package net.tourbook.database;
 
-import com.mchange.v2.c3p0.ComboPooledDataSource;
-
-import java.beans.PropertyVetoException;
 import java.lang.reflect.InvocationTargetException;
 import java.sql.CallableStatement;
 import java.sql.Connection;
@@ -408,11 +405,10 @@ public class TourDatabase {
 
 //   private static NetworkServerControl           _server;
 
-   private static volatile EntityManagerFactory  _emFactory;
-   private static volatile ComboPooledDataSource _pooledDataSource;
+   private static volatile EntityManagerFactory _emFactory;
 
-   private static ThreadPoolExecutor             _dbUpdateExecutor;
-   private static ArrayBlockingQueue<Long>       _dbUpdateQueue = new ArrayBlockingQueue<>(Util.NUMBER_OF_PROCESSORS);
+   private static ThreadPoolExecutor            _dbUpdateExecutor;
+   private static ArrayBlockingQueue<Long>      _dbUpdateQueue = new ArrayBlockingQueue<>(Util.NUMBER_OF_PROCESSORS);
 
    static {
 
@@ -6165,49 +6161,10 @@ public class TourDatabase {
 
       if (sqlStartup_10_IsSqlServerUpAndRunning()) {
          return getConnection_Pooled();
+//       return getConnection_NotPooled();
       } else {
          return null;
       }
-   }
-
-   private Connection getConnection_Pooled() throws SQLException {
-
-      if (_pooledDataSource == null) {
-
-         synchronized (DB_LOCK) {
-
-            // check again
-            if (_pooledDataSource == null) {
-
-               try {
-
-                  _pooledDataSource = new ComboPooledDataSource();
-
-                  //loads the jdbc driver
-                  _pooledDataSource.setDriverClass(SQL_DB_DRIVER_CLASS);
-                  _pooledDataSource.setJdbcUrl(SQL_DB_TOUR_DB_URL);
-                  _pooledDataSource.setUser(SQL_DB_USERNAME);
-                  _pooledDataSource.setPassword(SQL_DB_PASSWORD);
-
-                  _pooledDataSource.setMaxPoolSize(100);
-                  _pooledDataSource.setMaxStatements(100);
-                  _pooledDataSource.setMaxStatementsPerConnection(20);
-
-               } catch (final PropertyVetoException e) {
-                  StatusUtil.log(e);
-               }
-            }
-         }
-      }
-
-      Connection conn = null;
-      try {
-         conn = _pooledDataSource.getConnection();
-      } catch (final SQLException e) {
-         UI.showSQLException(e);
-      }
-
-      return conn;
    }
 
    /**
@@ -6218,11 +6175,68 @@ public class TourDatabase {
     *
     * @throws SQLException
     */
-   private Connection getConnection_Simple() throws SQLException {
+   private Connection getConnection_NotPooled() throws SQLException {
 
       logSqlCommand(SQL_DB_TOUR_DB_URL);
 
       return DriverManager.getConnection(SQL_DB_TOUR_DB_URL, SQL_DB_USERNAME, SQL_DB_PASSWORD);
+   }
+
+   /**
+    * <b>Hikari or c3p0 did NOT work with H2,</b> the tour book view did not properly update when
+    * changing the filter for recent time
+    * 
+    * @return
+    * 
+    * @throws SQLException
+    */
+   private Connection getConnection_Pooled() throws SQLException {
+
+      return null;
+
+//      if (_pooledDataSource == null) {
+//
+//         synchronized (DB_LOCK) {
+//
+//            // check again
+//            if (_pooledDataSource == null) {
+//
+//               // 1. Configure the pool
+//               final HikariConfig config = new HikariConfig();
+//
+//               // Swap this URL for any SQL server (H2, PostgreSQL, MySQL, etc.)
+//               config.setJdbcUrl(SQL_DB_TOUR_DB_URL);
+//               config.setDriverClassName(SQL_DB_DRIVER_CLASS);
+//               config.setUsername(SQL_DB_USERNAME);
+//               config.setPassword(SQL_DB_PASSWORD);
+//
+//               // 2. Pool sizing & timeouts
+//               config.setMaximumPoolSize(10); //         Max concurrent connections
+//               config.setMinimumIdle(2); //              Keep at least 2 connections ready
+//               config.setConnectionTimeout(30000); //    Wait max 30s for a connection
+//               config.setIdleTimeout(600000); //         Close idle connections after 10 mins
+//               config.setMaxLifetime(1800000); //        Recycle connections every 30 mins
+//               config.setAutoCommit(true); //            Explicitly enforce autoCommit on checkout
+//
+//               // 3. Optional: Detect connection leaks (logs a warning if not closed within 5s)
+//               config.setLeakDetectionThreshold(5000);
+//
+//               // 4. Create the DataSource (keep a single instance for your entire app)
+//               _pooledDataSource = new HikariDataSource(config);
+//            }
+//         }
+//      }
+//
+//      try {
+//
+//         return _pooledDataSource.getConnection();
+//
+//      } catch (final SQLException e) {
+//
+//         UI.showSQLException(e);
+//
+//         throw e;
+//      }
    }
 
    public int getDbVersion(final Connection conn, final String table) {
@@ -6350,6 +6364,13 @@ public class TourDatabase {
     * Shutdown database server
     */
    public void shutdownDatabaseServer() {
+
+//      if (_pooledDataSource != null) {
+//
+//         StatusUtil.logInfo("Closing pooled connections");
+//
+//         _pooledDataSource.close();
+//      }
 
 //      Connection conn = null;
 //
@@ -6490,7 +6511,7 @@ public class TourDatabase {
        * Get a connection, this also creates the database when not yet available. The embedded
        * driver displays a warning when database already exist.
        */
-      try (Connection conn = getConnection_Simple()) {
+      try (Connection conn = getConnection_NotPooled()) {
 
       } catch (final SQLException e) {
 
@@ -6513,7 +6534,7 @@ public class TourDatabase {
          return;
       }
 
-      try (Connection conn = getConnection_Simple()) {
+      try (Connection conn = getConnection_NotPooled()) {
 
          /*
           * Check if the tourdata table exists
@@ -6603,7 +6624,7 @@ public class TourDatabase {
          return false;
       }
 
-      try (Connection conn = getConnection_Simple()) {
+      try (Connection conn = getConnection_NotPooled()) {
 
          // check if the database contains the correct version
 
@@ -6724,7 +6745,7 @@ public class TourDatabase {
          return false;
       }
 
-      try (Connection conn = getConnection_Simple()) {
+      try (Connection conn = getConnection_NotPooled()) {
 
          // check if the database contains the correct version
 
@@ -6764,6 +6785,38 @@ public class TourDatabase {
       }
 
       return _isDataVersionChecked;
+   }
+
+   private void testConnection() {
+
+      final String sql = UI.EMPTY_STRING
+
+            + "SELECT SETTING_NAME, SETTING_VALUE" + NL
+            + "FROM INFORMATION_SCHEMA.SETTINGS " + NL
+            + "ORDER BY SETTING_NAME" + NL;
+
+      try (Connection conn = getConnection();
+            Statement stmt = conn.createStatement()) {
+
+         final ResultSet result = stmt.executeQuery(sql);
+
+         while (result.next()) {
+
+            final String name = result.getString(1);
+            final String value = result.getString(2);
+
+            System.out.println();
+            System.out.println();
+            System.out.println(" %s, %s".formatted(name, value));
+            System.out.println();
+// TODO remove SYSTEM.OUT.PRINTLN
+
+         }
+
+      } catch (final SQLException e) {
+
+         UI.showSQLException(e);
+      }
    }
 
    /**
@@ -6812,7 +6865,7 @@ public class TourDatabase {
       _dbDesignVersion_New = currentDbVersion;
       _dbDesignVersion_Old = currentDbVersion;
 
-      try (final Connection conn = getConnection_Simple()) {
+      try (final Connection conn = getConnection_NotPooled()) {
 
 //
 //         // 60 -> 61    26.6

@@ -1,9 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
-   <classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-21"/>
-   <classpathentry kind="con" path="org.eclipse.pde.core.requiredPlugins"/>
-   <classpathentry kind="src" path="src"/>
-   <classpathentry exported="true" kind="lib" path="c3p0-0.14.2.jar"                      sourcepath="jar-sources/c3p0-0.14.2-sources.jar"/>                   <!-- https://mvnrepository.com/artifact/com.mchange/c3p0 -->
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-21"/>
+	<classpathentry kind="con" path="org.eclipse.pde.core.requiredPlugins"/>
+	<classpathentry kind="src" path="src"/>
    <classpathentry exported="true" kind="lib" path="caffeine-3.3.1.jar"                   sourcepath="jar-sources/caffeine-3.3.1-sources.jar"/>                <!-- https://mvnrepository.com/artifact/com.github.ben-manes.caffeine/caffeine -->
    <classpathentry exported="true" kind="lib" path="commons-imaging-1.0.0-alpha6.jar"     sourcepath="jar-sources/commons-imaging-1.0.0-alpha6-sources.jar"/>  <!-- https://mvnrepository.com/artifact/org.apache.commons/commons-imaging -->
    <classpathentry exported="true" kind="lib" path="commons-io-2.21.0.jar"                sourcepath="jar-sources/commons-io-2.21.0-sources.jar"/>             <!-- https://mvnrepository.com/artifact/commons-io/commons-io -->
@@ -23,5 +22,5 @@
    <classpathentry exported="true" kind="lib" path="simplelatlng-1.4.0.jar"               sourcepath="jar-sources/simplelatlng-1.4.0-sources.jar"/>            <!-- https://mvnrepository.com/artifact/com.javadocmd/simplelatlng -->
    <classpathentry exported="true" kind="lib" path="url-detector-0.1.24.jar"/>                                                                                 <!-- https://mvnrepository.com/artifact/io.github.url-detector/url-detector -->
    <classpathentry exported="true" kind="lib" path="jsvg-2.0.0.jar"                       sourcepath="jar-sources/jsvg-2.0.0-sources.jar"/>                    <!-- https://mvnrepository.com/artifact/com.github.weisj/jsvg -->/>
-   <classpathentry kind="output" path="bin"/>
+	<classpathentry kind="output" path="bin"/>
 </classpath>
