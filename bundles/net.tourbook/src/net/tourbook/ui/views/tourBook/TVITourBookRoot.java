@@ -57,13 +57,24 @@ public class TVITourBookRoot extends TVITourBookItem {
          setChildren(allYearItems);
 
          final boolean isShowSummaryRow = tourBookView.isShowSummaryRow();
-         final String sqlGroupBy = isShowSummaryRow
 
-               // show a summary row
-               ? "GROUP BY ROLLUP(StartYear)" + NL //          //$NON-NLS-1$
+         String sqlTotal = UI.EMPTY_STRING;
 
-               // hide summary row
-               : "GROUP BY StartYear" + NL; //                 //$NON-NLS-1$
+         if (isShowSummaryRow) {
+
+            sqlTotal = UI.EMPTY_STRING
+
+                  + "   UNION ALL" + NL //                                 //$NON-NLS-1$
+
+                  + "   SELECT" + NL //                                    //$NON-NLS-1$
+                  + "      1 AS sort_order," + NL //                       //$NON-NLS-1$
+                  + "      CAST(NULL AS INTEGER) AS StartYear," + NL //    //$NON-NLS-1$
+
+                  + getSQL_SUM_COLUMNS(UI.EMPTY_STRING, 6)
+
+                  + "   FROM tdFields" + NL //                             //$NON-NLS-1$
+            ;
+         }
 
          final AppFilter appFilter = new AppFilter(AppFilter.ANY_APP_FILTERS);
          final SQLData partFilter_AND_OR = new EquipmentPartFilter_AND_OR(EquipmentViewerType.IS_EQUIPMENT_VIEWER).getSqlData();
@@ -107,12 +118,14 @@ public class TVITourBookRoot extends TVITourBookItem {
                + "      0 AS sort_order," + NL //                    //$NON-NLS-1$
                + "      StartYear," + NL //                          //$NON-NLS-1$
 
-               + getSQL_SUM_COLUMNS(UI.EMPTY_STRING, 6) //
+               + getSQL_SUM_COLUMNS(UI.EMPTY_STRING, 6)
 
                + "    FROM tdFields" + NL //                         //$NON-NLS-1$
                + "    GROUP BY StartYear" + NL //                    //$NON-NLS-1$
-               + ") AS results" + NL //                              //$NON-NLS-1$
 
+               + sqlTotal
+
+               + ") AS results" + NL //                              //$NON-NLS-1$
                + "ORDER BY " + NL //                                 //$NON-NLS-1$
                + "   sort_order, " + NL //                           //$NON-NLS-1$
                + "   StartYear" + NL //                              //$NON-NLS-1$

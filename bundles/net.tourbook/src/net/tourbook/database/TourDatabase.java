@@ -987,7 +987,7 @@ public class TourDatabase {
 
          logging = ";TRACE_LEVEL_SYSTEM_OUT=3";                         //$NON-NLS-1$
          logging = ";TRACE_LEVEL_FILE=3";                               //$NON-NLS-1$
-         logging = ";TRACE_LEVEL_SYSTEM_OUT=0;TRACE_LEVEL_FILE=2";      //$NON-NLS-1$
+         logging = ";TRACE_LEVEL_SYSTEM_OUT=0;TRACE_LEVEL_FILE=1";      //$NON-NLS-1$
 
          SQL_DB_DRIVER_CLASS        = H2_DRIVER;
          SQL_DB_CONNECTION_URL      = H2_JDBC_CONNECTION_PROTOCOL;
@@ -6160,8 +6160,7 @@ public class TourDatabase {
    public Connection getConnection() throws SQLException {
 
       if (sqlStartup_10_IsSqlServerUpAndRunning()) {
-         return getConnection_Pooled();
-//       return getConnection_NotPooled();
+         return getConnection_NotPooled();
       } else {
          return null;
       }
@@ -6185,11 +6184,12 @@ public class TourDatabase {
    /**
     * <b>Hikari or c3p0 did NOT work with H2,</b> the tour book view did not properly update when
     * changing the filter for recent time
-    * 
+    *
     * @return
-    * 
+    *
     * @throws SQLException
     */
+   @SuppressWarnings("unused")
    private Connection getConnection_Pooled() throws SQLException {
 
       return null;
