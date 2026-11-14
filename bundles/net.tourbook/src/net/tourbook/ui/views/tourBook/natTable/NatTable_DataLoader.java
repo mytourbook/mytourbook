@@ -62,15 +62,15 @@ public class NatTable_DataLoader {
 
    private static final IPreferenceStore                  _prefStore                       = TourbookPlugin.getPrefStore();
 
-   private static final String                            SQL_ASCENDING                    = "ASC";                           //$NON-NLS-1$
-   private static final String                            SQL_DESCENDING                   = "DESC";                          //$NON-NLS-1$
+   private static final String                            SQL_ASCENDING                    = "ASC";                               //$NON-NLS-1$
+   private static final String                            SQL_DESCENDING                   = "DESC";                              //$NON-NLS-1$
 
-   private static final String                            SQL_DEFAULT_SORT_FIELD           = "TourStartTime";                 //$NON-NLS-1$
+   private static final String                            SQL_DEFAULT_SORT_FIELD           = "TourStartTime";                     //$NON-NLS-1$
 
    /**
     * Dummy field name for fields which currently cannot be sorted in the NatTable.
     */
-   public static final String                             FIELD_WITHOUT_SORTING            = "FIELD_WITHOUT_SORTING";         //$NON-NLS-1$
+   public static final String                             FIELD_WITHOUT_SORTING            = "FIELD_WITHOUT_SORTING";             //$NON-NLS-1$
 
    private static int                                     FETCH_SIZE                       = 1_000;
 
@@ -101,10 +101,10 @@ public class NatTable_DataLoader {
    private List<SortDirectionEnum>                        _allSortDirections;
 
    private List<String>                                   _allSqlSortFields_OrderBy        = new ArrayList<>();
+
    private List<String>                                   _allSqlSortFields_SelectFields   = new ArrayList<>();
    private List<String>                                   _allSqlSortFields_SelectAsFields = new ArrayList<>();
    private List<String>                                   _allSqlSortDirections            = new ArrayList<>();
-
    /**
     * Contains all columns (also hidden columns), sorted in the order how they are displayed in the
     * UI.
@@ -130,6 +130,20 @@ public class NatTable_DataLoader {
    private SQLData                                        _tourCollectionFilter            = new SQLData();
 
    private Runnable                                       _postFetchRunnable;
+
+   private final SelectFields                             _nullSelectFields                = new SelectFields(0, UI.EMPTY_STRING);
+
+   private class SelectFields {
+
+      private int    numSelectFields;
+      private String sql;
+
+      public SelectFields(final int numSelectFields, final String sql) {
+
+         this.numSelectFields = numSelectFields;
+         this.sql = sql;
+      }
+   }
 
    public NatTable_DataLoader(final TourBookView tourBookView, final ColumnManager columnManager) {
 
@@ -259,12 +273,12 @@ public class NatTable_DataLoader {
     *
     * @return
     */
-   private String createSql_Sorting_SelectAsFields(final boolean isBetweenOtherFields) {
+   private SelectFields createSql_Sorting_SelectAsFields(final boolean isBetweenOtherFields) {
 
       final int numSelectFields = _allSqlSortFields_SelectAsFields.size();
 
       if (numSelectFields == 0) {
-         return UI.EMPTY_STRING;
+         return _nullSelectFields;
       }
 
       final StringBuilder sb = new StringBuilder();
@@ -296,7 +310,9 @@ public class NatTable_DataLoader {
          sb.append(NL);
       }
 
-      return sb.toString();
+      final String sql = sb.toString();
+
+      return new SelectFields(numSelectFields, sql);
    }
 
    /**
@@ -576,6 +592,9 @@ public class NatTable_DataLoader {
          final SQLData partFilter_NOT = new EquipmentPartFilter_NOT(EquipmentViewerType.IS_EQUIPMENT_VIEWER).getSqlData();
          final SQLData tourCollectionFilter = _tourCollectionFilter;
 
+         final SelectFields sql_Sorting_SelectAsFields_Between = createSql_Sorting_SelectAsFields(true);
+         final SelectFields sql_Sorting_SelectAsFields_End = createSql_Sorting_SelectAsFields(false);
+
          sql = UI.EMPTY_STRING
 
                + "--" + NL //                                                                            //$NON-NLS-1$
@@ -588,7 +607,8 @@ public class NatTable_DataLoader {
                + "SELECT" + NL //                                                                  //$NON-NLS-1$
 
                + TVITourBookItem.getSQL_ALL_TOUR_FIELDS("tdFiltered", 3) + "," + NL //             //$NON-NLS-1$ //$NON-NLS-2$
-               + "   " + createSql_Sorting_SelectAsFields(true) //                                 //$NON-NLS-1$
+
+               + "   " + sql_Sorting_SelectAsFields_Between.sql //                                 //$NON-NLS-1$
 
                + "     tm.markerId," + NL //                                                       //$NON-NLS-1$
                + "     jtt.TourTag_TagID  AS TourTag_tagId," + NL //                               //$NON-NLS-1$
@@ -604,7 +624,8 @@ public class NatTable_DataLoader {
                + "      DISTINCT " //                                                              //$NON-NLS-1$
 
                + TVITourBookItem.getSQL_ALL_TOUR_FIELDS("TourData", 6) + NL //                     //$NON-NLS-1$
-               + "   " + createSql_Sorting_SelectAsFields(false) //                                //$NON-NLS-1$
+
+               + "   " + sql_Sorting_SelectAsFields_End.sql //                                        //$NON-NLS-1$
 
                + "     FROM TOURDATA AS TourData" + NL //                                          //$NON-NLS-1$
 
@@ -657,7 +678,8 @@ public class NatTable_DataLoader {
 
             final long result_TourId = result.getLong(1);
 
-            final int columnStartNumber = TVITourBookItem.SQL_ALL_OTHER_FIELDS__COLUMN_START_NUMBER;
+            final int columnStartNumber = TVITourBookItem.SQL_ALL_OTHER_FIELDS__COLUMN_START_NUMBER
+                                        + sql_Sorting_SelectAsFields_Between.numSelectFields;
 
             final Object result_MarkerId           = result.getObject(columnStartNumber);
             final Object result_TagId              = result.getObject(columnStartNumber + 1);

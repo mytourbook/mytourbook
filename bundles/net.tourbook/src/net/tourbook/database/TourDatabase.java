@@ -987,7 +987,7 @@ public class TourDatabase {
 
          logging = ";TRACE_LEVEL_SYSTEM_OUT=3";                         //$NON-NLS-1$
          logging = ";TRACE_LEVEL_FILE=3";                               //$NON-NLS-1$
-         logging = ";TRACE_LEVEL_SYSTEM_OUT=0;TRACE_LEVEL_FILE=1";      //$NON-NLS-1$
+         logging = ";TRACE_LEVEL_SYSTEM_OUT=0;TRACE_LEVEL_FILE=2";      //$NON-NLS-1$
 
          SQL_DB_DRIVER_CLASS        = H2_DRIVER;
          SQL_DB_CONNECTION_URL      = H2_JDBC_CONNECTION_PROTOCOL;
@@ -6175,8 +6175,6 @@ public class TourDatabase {
     * @throws SQLException
     */
    private Connection getConnection_NotPooled() throws SQLException {
-
-      logSqlCommand(SQL_DB_TOUR_DB_URL);
 
       return DriverManager.getConnection(SQL_DB_TOUR_DB_URL, SQL_DB_USERNAME, SQL_DB_PASSWORD);
    }
