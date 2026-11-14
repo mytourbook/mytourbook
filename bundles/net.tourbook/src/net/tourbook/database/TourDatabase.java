@@ -529,8 +529,6 @@ public class TourDatabase {
 
    private boolean                               _isChecked_DbCreated;
 
-   private boolean                               _isCustomFunctionSetup_AvgSpeedPace;
-
    /**
     * SQL utilities.
     */
@@ -6294,74 +6292,18 @@ public class TourDatabase {
       _propertyListeners.remove(listener);
    }
 
-   public void setupDerbyCustomFunctions_AvgSpeedPace() {
-
-//      if (_isCustomFunctionSetup_AvgSpeedPace) {
-//         return;
-//      }
-//
-//      try (Connection conn = getInstance().getConnection();
-//            Statement stmt = conn.createStatement()) {
-//
-//         final Bundle derbyBundle = Platform.getBundle("net.tourbook.ext.apache"); //$NON-NLS-1$
-//
-//         // bundleentry://26.fwk1091632842/mytourbook-derby-functions.jar
-//         final URL bundleUrl = derbyBundle.getEntry("/mytourbook-derby-functions.jar"); //$NON-NLS-1$
-//
-//         // C:/E/e-431/eclipse/../../../DAT/MT/mytourbook/bundles/net.tourbook.ext.apache/mytourbook-derby-functions.jar
-//         final String sqlCustomJarFilePath = NIO.getAbsolutePathFromBundleUrl(bundleUrl);
-//
-//         /*
-//          * Install (replace) jar file, hints are from
-//          * https://stackoverflow.com/questions/38369703/regex-in-apache-derby#answer-38369704
-//          */
-//         exec_IgnoreException(stmt, "CALL SQLJ.REMOVE_JAR('App.StoredProcedures', 0)"); //$NON-NLS-1$
-//         exec(stmt, "CALL SQLJ.INSTALL_JAR('%s', 'App.StoredProcedures', 0)".formatted(sqlCustomJarFilePath)); //$NON-NLS-1$
-//         exec(stmt, "CALL SYSCS_UTIL.SYSCS_SET_DATABASE_PROPERTY('derby.database.classpath', 'App.StoredProcedures')"); //$NON-NLS-1$
-//
-//         /*
-//          * Replace functions
-//          */
-//         exec_IgnoreException(stmt, "DROP FUNCTION avgSpeed"); //$NON-NLS-1$
-//         exec(stmt,
-//
-//               UI.EMPTY_STRING
-//
-//                     + "CREATE FUNCTION avgSpeed (tourTime BIGINT, tourDistance BIGINT)" + NL //                  //$NON-NLS-1$
-//                     + "RETURNS REAL" + NL //                                                                     //$NON-NLS-1$
-//                     + "PARAMETER STYLE JAVA" + NL //                                                             //$NON-NLS-1$
-//                     + "NO SQL" + NL //                                                                           //$NON-NLS-1$
-//                     + "LANGUAGE JAVA" + NL //                                                                    //$NON-NLS-1$
-//                     + "EXTERNAL NAME 'net.tourbook.ext.apache.custom.DerbyCustomFunctions.avgSpeed'" + NL //     //$NON-NLS-1$
-//         );
-//
-//         exec_IgnoreException(stmt, "DROP FUNCTION avgPace"); //$NON-NLS-1$
-//         exec(stmt,
-//
-//               UI.EMPTY_STRING
-//
-//                     + "CREATE FUNCTION avgPace (tourTime BIGINT, tourDistance BIGINT)" + NL //                   //$NON-NLS-1$
-//                     + "RETURNS REAL" + NL //                                                                     //$NON-NLS-1$
-//                     + "PARAMETER STYLE JAVA" + NL //                                                             //$NON-NLS-1$
-//                     + "NO SQL" + NL //                                                                           //$NON-NLS-1$
-//                     + "LANGUAGE JAVA" + NL //                                                                    //$NON-NLS-1$
-//                     + "EXTERNAL NAME 'net.tourbook.ext.apache.custom.DerbyCustomFunctions.avgPace'" + NL //      //$NON-NLS-1$
-//         );
-//
-//         _isCustomFunctionSetup_AvgSpeedPace = true;
-//
-//      } catch (final SQLException e) {
-//         UI.showSQLException(e);
-//
-//      } catch (final IOException e) {
-//         StatusUtil.log(e);
-//      }
-   }
-
    /**
     * Shutdown database server
     */
    public void shutdownDatabaseServer() {
+
+      // H2 is shutting down automatically, this is from the log
+      //
+      // database: closing C:/DAT/runtime-net.mytourbook/workspace/h2-database/tourbook from shutdown hook
+      // database: disconnecting session #3
+      // database: disconnected session #3
+      // database: closing C:/DAT/runtime-net.mytourbook/workspace/h2-database/tourbook
+      // database: closed
 
 //      if (_pooledDataSource != null) {
 //

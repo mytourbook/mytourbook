@@ -151,8 +151,6 @@ public class NatTable_DataLoader {
       _columnManager = columnManager;
 
       createColumnHeaderData();
-
-//      TourDatabase.getInstance().setupDerbyCustomFunctions_AvgSpeedPace();
    }
 
    private static ExecutorService createExecuter_TourId_RowIndex() {
