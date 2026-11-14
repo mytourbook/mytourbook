@@ -592,8 +592,8 @@ public class NatTable_DataLoader {
          final SQLData partFilter_NOT = new EquipmentPartFilter_NOT(EquipmentViewerType.IS_EQUIPMENT_VIEWER).getSqlData();
          final SQLData tourCollectionFilter = _tourCollectionFilter;
 
-         final SelectFields sql_Sorting_SelectAsFields_Between = createSql_Sorting_SelectAsFields(true);
-         final SelectFields sql_Sorting_SelectAsFields_End = createSql_Sorting_SelectAsFields(false);
+         final SelectFields sqlSorting_SelectAsFields_Between = createSql_Sorting_SelectAsFields(true);
+         final SelectFields sqlSorting_SelectAsFields_End = createSql_Sorting_SelectAsFields(false);
 
          sql = UI.EMPTY_STRING
 
@@ -608,7 +608,7 @@ public class NatTable_DataLoader {
 
                + TVITourBookItem.getSQL_ALL_TOUR_FIELDS("tdFiltered", 3) + "," + NL //             //$NON-NLS-1$ //$NON-NLS-2$
 
-               + "   " + sql_Sorting_SelectAsFields_Between.sql //                                 //$NON-NLS-1$
+               + "   " + sqlSorting_SelectAsFields_Between.sql //                                 //$NON-NLS-1$
 
                + "     tm.markerId," + NL //                                                       //$NON-NLS-1$
                + "     jtt.TourTag_TagID  AS TourTag_tagId," + NL //                               //$NON-NLS-1$
@@ -625,7 +625,7 @@ public class NatTable_DataLoader {
 
                + TVITourBookItem.getSQL_ALL_TOUR_FIELDS("TourData", 6) + NL //                     //$NON-NLS-1$
 
-               + "   " + sql_Sorting_SelectAsFields_End.sql //                                        //$NON-NLS-1$
+               + "   " + sqlSorting_SelectAsFields_End.sql //                                        //$NON-NLS-1$
 
                + "     FROM TOURDATA AS TourData" + NL //                                          //$NON-NLS-1$
 
@@ -679,7 +679,7 @@ public class NatTable_DataLoader {
             final long result_TourId = result.getLong(1);
 
             final int columnStartNumber = TVITourBookItem.SQL_ALL_OTHER_FIELDS__COLUMN_START_NUMBER
-                                        + sql_Sorting_SelectAsFields_Between.numSelectFields;
+                                        + sqlSorting_SelectAsFields_Between.numSelectFields;
 
             final Object result_MarkerId           = result.getObject(columnStartNumber);
             final Object result_TagId              = result.getObject(columnStartNumber + 1);
@@ -1153,8 +1153,8 @@ public class NatTable_DataLoader {
             ? "tourDeviceTime_Recorded" //$NON-NLS-1$
             : "tourComputedTime_Moving"; //$NON-NLS-1$
 
-      final String sortByAvgSpeed = "(tourDistance / NULLIF(" + timeField + ", 0))"; //$NON-NLS-1$ //$NON-NLS-2$
-      final String sortByAvgPace = "(" + timeField + " / NULLIF(tourDistance, 0))"; //$NON-NLS-1$ //$NON-NLS-2$
+      final String sortByAvgSpeed = "(CAST (tourDistance AS float) / NULLIF(" + timeField + ", 0))"; //$NON-NLS-1$ //$NON-NLS-2$
+      final String sortByAvgPace = "(CAST (" + timeField + " AS float) / NULLIF(tourDistance, 0))"; //$NON-NLS-1$ //$NON-NLS-2$
 
 // SET_FORMATTING_OFF
 
