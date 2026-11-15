@@ -17,6 +17,9 @@ package net.tourbook.database;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.security.MessageDigest;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
@@ -46,7 +49,9 @@ import org.eclipse.swt.widgets.Display;
 
 public class MigrateDerbyToH2 {
 
-   private static final String DERBY_DRIVER = "org.apache.derby.jdbc.EmbeddedDriver";
+   private static final String DERBY_DRIVER   = "org.apache.derby.jdbc.EmbeddedDriver";
+   private static final String DERBY_PASSWORD = "adsf";
+   private static final String DERBY_USER     = "USER";
 
    private static String       DERBY_DATABASE_FILEPATH;
    private static String       DERBY_DB_TOURBOOK_URL;
@@ -183,7 +188,7 @@ public class MigrateDerbyToH2 {
          return false;
       }
 
-      try (Connection conn = DriverManager.getConnection(DERBY_DB_TOURBOOK_URL, "USER", "adsf")) {
+      try (Connection conn = DriverManager.getConnection(DERBY_DB_TOURBOOK_URL, DERBY_USER, DERBY_PASSWORD)) {
 
          final TourDatabase dbInstance = TourDatabase.getInstance();
 
@@ -215,11 +220,33 @@ public class MigrateDerbyToH2 {
       return false;
    }
 
+   /**
+    * @return Returns <code>true</code> when a Derby db is migrated or there is no Derby db at all.
+    *         Returns <code>false</code> when there is a migration error and the app should not
+    *         continue.
+    */
    public static boolean isMigrated() {
+
+      String derbyFilePath = DERBY_DATABASE_FILEPATH;
+      if (UI.IS_WIN && DERBY_DATABASE_FILEPATH.startsWith("/")) {
+         derbyFilePath = DERBY_DATABASE_FILEPATH.substring(1);
+      }
+
+      final Path derbyPath = Paths.get(derbyFilePath);
+
+      if (Files.exists(derbyPath) == false) {
+
+         // this is a new installation which do not contain a derby database
+
+         return true;
+      }
 
       // debug h2 migration
 //      _prefStore.setValue(ITourbookPreferences.TOUR_DATABASE_IS_H2_MIGRATED, false);
 //      _prefStore.setValue(ITourbookPreferences.TOUR_DATABASE_IS_H2_MIGRATED, true);
+
+      // this pref value is stored in
+      // ..\workspace\.metadata\.plugins\org.eclipse.core.runtime\.settings\net.tourbook.prefs
 
       if (_prefStore.getBoolean(ITourbookPreferences.TOUR_DATABASE_IS_H2_MIGRATED)) {
 
@@ -331,7 +358,7 @@ public class MigrateDerbyToH2 {
          return false;
       }
 
-      try (Connection derbyConn = DriverManager.getConnection(DERBY_DB_TOURBOOK_URL, "USER", "adsf");
+      try (Connection derbyConn = DriverManager.getConnection(DERBY_DB_TOURBOOK_URL, DERBY_USER, DERBY_PASSWORD);
             Connection h2Conn = DriverManager.getConnection(TourDatabase.H2_DB_TOUR_DB_URL)) {
 
          migrate_20_CreateH2Tables(h2Conn);

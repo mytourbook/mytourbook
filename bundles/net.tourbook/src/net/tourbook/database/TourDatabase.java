@@ -381,22 +381,22 @@ public class TourDatabase {
    static final String                          H2_JDBC_CONNECTION_PROTOCOL = "jdbc:h2:";                        //$NON-NLS-1$
    private static final String                  H2_EJB_HIBERNATE_DIALECT    = "org.hibernate.dialect.H2Dialect"; //$NON-NLS-1$
 
-   /** H2 folder name in the instance location */
-   static final String                          H2_DATABASE_FOLDER_NAME     = "h2-database";                     //$NON-NLS-1$
-
    /** SQL tour database name */
    static final String                          SQL_TOUR_DB_NAME            = "tourbook";                        //$NON-NLS-1$
 
-   /** H2 database file path, without tour db */
-   static String                                H2_DATABASE_FILEPATH;
+   /**
+    * External database file path, this is used just for local data, e.g. fulltext search
+    */
+   private static String                        EXTERNAL_DB_FILEPATH;
 
-   /** H2 jdbc connection url, without tour db */
-   static String                                H2_DB_CONNECTION_URL;
+   /** H2 database file path, without tour db */
+   private static String                        H2_DB_FILEPATH;
 
    /** H2 jdbc connection url, with tour db */
    static String                                H2_DB_TOUR_DB_URL;
 
-   private static String                        SQL_DB_CONNECTION_URL;
+   /** Sql database local file path, without tour db */
+   public static String                         SQL_DB_FILEPATH;
    private static String                        SQL_DB_TOUR_DB_URL;
    private static String                        SQL_DB_DRIVER_CLASS;
    private static String                        SQL_DB_USERNAME;
@@ -412,28 +412,26 @@ public class TourDatabase {
 
    static {
 
-      H2_DATABASE_FILEPATH = Platform.getInstanceLocation().getURL().getPath() + H2_DATABASE_FOLDER_NAME;
+      final String instanceLocation = Platform.getInstanceLocation().getURL().getPath();
 
-      if (UI.IS_WIN && H2_DATABASE_FILEPATH.startsWith("/")) {
+      H2_DB_FILEPATH = instanceLocation + "h2-database"; //$NON-NLS-1$
+      EXTERNAL_DB_FILEPATH = instanceLocation + "external-database"; //$NON-NLS-1$
+
+      if (UI.IS_WIN && H2_DB_FILEPATH.startsWith("/")) {
 
          // a leading / is causing an exception, e.g. /c:/...
 
-         H2_DATABASE_FILEPATH = H2_DATABASE_FILEPATH.substring(1);
+         H2_DB_FILEPATH = H2_DB_FILEPATH.substring(1);
       }
 
-      H2_DB_CONNECTION_URL = H2_JDBC_CONNECTION_PROTOCOL + H2_DATABASE_FILEPATH + ";AUTO_SERVER=TRUE";
+      H2_DB_TOUR_DB_URL = H2_JDBC_CONNECTION_PROTOCOL + H2_DB_FILEPATH + "/" + SQL_TOUR_DB_NAME + ";AUTO_SERVER=TRUE";
 
-      H2_DB_TOUR_DB_URL = H2_JDBC_CONNECTION_PROTOCOL + H2_DATABASE_FILEPATH + "/" + SQL_TOUR_DB_NAME + ";AUTO_SERVER=TRUE";
+      if (UI.IS_WIN && EXTERNAL_DB_FILEPATH.startsWith("/")) {
 
-// FOR DEBUGGING - START
-      /*
-       * Set derby debug properties, this is helpful when debugging, the log is written into
-       * derby.log
-       */
-//      System.setProperty("derby.language.logStatementText", "true");
-//      System.setProperty("derby.language.logQueryPlan", "true");
+         // a leading / is causing an exception, e.g. /c:/...
 
-// FOR DEBUGGING - END
+         EXTERNAL_DB_FILEPATH = EXTERNAL_DB_FILEPATH.substring(1);
+      }
 
       final ThreadFactory updateThreadFactory = runnable -> {
 
@@ -947,8 +945,9 @@ public class TourDatabase {
          final String externalDbName                     = _prefStore.getString(ITourbookPreferences.TOUR_DATABASE_EXTERNAL_DATABASE_NAME);
          final String externalHibernateDialect           = _prefStore.getString(ITourbookPreferences.TOUR_DATABASE_EXTERNAL_HIBERNATE_DIALECT);
 
+         SQL_DB_FILEPATH            = EXTERNAL_DB_FILEPATH;
+
          SQL_DB_DRIVER_CLASS        = externalJdbcDriver;
-         SQL_DB_CONNECTION_URL      = externalConnectionUrl;
          SQL_DB_TOUR_DB_URL         = externalConnectionUrl + externalDbName + externalConnectionUrl_Parameters;
 
          SQL_DB_USERNAME            = externalDbUsername;
@@ -960,18 +959,11 @@ public class TourDatabase {
 
          // H2 database
 
-         String h2DatabasePath = H2_DATABASE_FILEPATH ;
-
-         if (UI.IS_WIN && h2DatabasePath.startsWith("/")) {
-            h2DatabasePath = h2DatabasePath.substring(1);
-         }
-
          // Log to standard console output.text
          // jdbc:h2:mem:testdb;TRACE_LEVEL_SYSTEM_OUT=2
 
          // Log to a trace file. This writes logs to a <databaseName>.trace.db file in the same directory as your database files.text
          // jdbc:h2:file:~/testdb;TRACE_LEVEL_FILE=2
-
 
          // H2 Trace Levels Explained
          //
@@ -987,9 +979,22 @@ public class TourDatabase {
          logging = ";TRACE_LEVEL_FILE=3";                               //$NON-NLS-1$
          logging = ";TRACE_LEVEL_SYSTEM_OUT=0;TRACE_LEVEL_FILE=2";      //$NON-NLS-1$
 
+         SQL_DB_FILEPATH            = H2_DB_FILEPATH;
+
          SQL_DB_DRIVER_CLASS        = H2_DRIVER;
-         SQL_DB_CONNECTION_URL      = H2_JDBC_CONNECTION_PROTOCOL;
          SQL_DB_TOUR_DB_URL         = H2_DB_TOUR_DB_URL + logging;
+
+// + ";MODE=LEGACY";
+// this is needed propably for Hybernate 3.x otherwise
+//         07:32:36,718  WARN JDBCExceptionReporter:100 - SQL Error: 23502, SQLState: 23502
+//         07:32:36,718 ERROR JDBCExceptionReporter:101 - NULL not allowed for column "PERSONID"; SQL statement:
+//         insert into TourPerson (personId, birthDay, deviceReaderId, firstName, gender, height, hrMaxFormula, lastName, maxPulse, rawDataPath, restPulse, tourBike_bikeId, weight) values (null, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) [23502-252]
+//         javax.persistence.PersistenceException: org.hibernate.exception.ConstraintViolationException: could not insert: [net.tourbook.data.TourPerson]
+//            at org.hibernate.ejb.AbstractEntityManagerImpl.throwPersistenceException(AbstractEntityManagerImpl.java:614)
+//            at org.hibernate.ejb.AbstractEntityManagerImpl.persist(AbstractEntityManagerImpl.java:226)
+//            at net.tourbook.data.TourPerson.persist(TourPerson.java:513)
+//            at net.tourbook.preferences.PrefPagePeople.applyData(PrefPagePeople.java:254)
+
 
          SQL_DB_USERNAME            = UI.EMPTY_STRING;
          SQL_DB_PASSWORD            = UI.EMPTY_STRING;
@@ -6448,8 +6453,7 @@ public class TourDatabase {
       }
 
       /*
-       * Get a connection, this also creates the database when not yet available. The embedded
-       * driver displays a warning when database already exist.
+       * Get a connection, this also creates the database when not yet available
        */
       try (Connection conn = getConnection_NotPooled()) {
 
