@@ -17,19 +17,19 @@ package net.tourbook.data;
 
 import java.io.Serializable;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.ManyToOne;
-import javax.persistence.Transient;
-
 import net.tourbook.common.UI;
 import net.tourbook.common.util.HSLColor;
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.database.TourDatabase;
 
 import org.eclipse.swt.graphics.RGB;
+
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Transient;
 
 @Entity
 public class TourPersonHRZone implements Cloneable, Comparable<TourPersonHRZone>, Serializable {

@@ -20,15 +20,15 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import javax.persistence.EntityManager;
-import javax.persistence.Query;
-
 import net.tourbook.common.UI;
 import net.tourbook.data.Equipment;
 import net.tourbook.data.EquipmentPart;
 import net.tourbook.database.TourDatabase;
 
 import org.eclipse.jface.viewers.TreeViewer;
+
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.Query;
 
 public class TVIEquipmentView_Root extends TVIEquipmentView_Item {
 

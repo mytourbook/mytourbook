@@ -17,8 +17,6 @@ package net.tourbook.equipment;
 
 import java.util.Set;
 
-import javax.persistence.EntityManager;
-
 import net.tourbook.Messages;
 import net.tourbook.common.util.ITourViewer;
 import net.tourbook.common.util.StatusUtil;
@@ -39,6 +37,8 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
+
+import jakarta.persistence.EntityManager;
 
 public class ActionSetTourStructure extends Action implements IMenuCreator {
 

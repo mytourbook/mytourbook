@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2024 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2026 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -17,9 +17,6 @@ package net.tourbook.database;
 
 import java.util.ArrayList;
 
-import javax.persistence.EntityManager;
-import javax.persistence.Query;
-
 import net.tourbook.Messages;
 import net.tourbook.application.ContributionItem_Person;
 import net.tourbook.common.UI;
@@ -27,6 +24,9 @@ import net.tourbook.data.TourPerson;
 
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.swt.widgets.Display;
+
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.Query;
 
 public class PersonManager {
 

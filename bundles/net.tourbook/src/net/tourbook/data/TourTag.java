@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2025 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2026 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -15,26 +15,25 @@
  *******************************************************************************/
 package net.tourbook.data;
 
-import static javax.persistence.CascadeType.ALL;
-import static javax.persistence.FetchType.LAZY;
-
 import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import javax.persistence.Basic;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.ManyToMany;
-import javax.persistence.Transient;
-
 import net.tourbook.Messages;
 import net.tourbook.common.UI;
 import net.tourbook.database.FIELD_VALIDATION;
 import net.tourbook.database.TourDatabase;
+
+import jakarta.persistence.Basic;
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.ManyToMany;
+import jakarta.persistence.Transient;
 
 @Entity
 public class TourTag implements Cloneable, Comparable<Object>, Serializable {
@@ -113,7 +112,7 @@ public class TourTag implements Cloneable, Comparable<Object>, Serializable {
    /**
     * Contains all tours which are associated with this tag
     */
-   @ManyToMany(mappedBy = "tourTags", cascade = ALL, fetch = LAZY)
+   @ManyToMany(mappedBy = "tourTags", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
    private final Set<TourData> tourData  = new HashSet<>();
 
    /**

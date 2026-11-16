@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2020, 2024 Frédéric Bard
+ * Copyright (C) 2020, 2026 Frédéric Bard
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -28,8 +28,6 @@ import java.net.URLConnection;
 import java.time.ZonedDateTime;
 import java.util.HashMap;
 
-import javax.persistence.Persistence;
-
 import net.tourbook.cloud.oauth2.OAuth2Utils;
 import net.tourbook.cloud.oauth2.TokensRetrievalHandler;
 import net.tourbook.common.time.TimeTools;
@@ -41,6 +39,8 @@ import net.tourbook.device.garmin.fit.FitDataReader;
 import net.tourbook.device.gpx.GPXDeviceDataReader;
 import net.tourbook.importdata.ImportState_File;
 import net.tourbook.importdata.ImportState_Process;
+
+import jakarta.persistence.Persistence;
 
 public class Initializer {
 

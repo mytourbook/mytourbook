@@ -15,8 +15,6 @@
  *******************************************************************************/
 package net.tourbook.data;
 
-import static javax.persistence.CascadeType.ALL;
-
 import java.io.Serializable;
 import java.time.Period;
 import java.time.ZonedDateTime;
@@ -27,18 +25,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import javax.persistence.Basic;
-import javax.persistence.Entity;
-import javax.persistence.EntityManager;
-import javax.persistence.EntityTransaction;
-import javax.persistence.FetchType;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
-import javax.persistence.Transient;
-
 import net.tourbook.common.UI;
 import net.tourbook.common.time.TimeTools;
 import net.tourbook.common.util.StringUtils;
@@ -46,7 +32,18 @@ import net.tourbook.database.PersonManager;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.training.TrainingManager;
 
-import org.hibernate.annotations.Cascade;
+import jakarta.persistence.Basic;
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.EntityTransaction;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.Transient;
 
 @Entity
 public class TourPerson implements Comparable<Object>, Serializable {
@@ -152,8 +149,7 @@ public class TourPerson implements Comparable<Object>, Serializable {
    /**
     * Tour hr zones
     */
-   @OneToMany(fetch = FetchType.EAGER, cascade = ALL, mappedBy = "tourPerson")
-   @Cascade(org.hibernate.annotations.CascadeType.DELETE_ORPHAN)
+   @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "tourPerson")
    private Set<TourPersonHRZone>           hrZones                    = new HashSet<>();
 
    /**

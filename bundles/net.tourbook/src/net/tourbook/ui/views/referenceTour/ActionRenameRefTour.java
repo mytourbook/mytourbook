@@ -1,22 +1,19 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2009  Wolfgang Schramm and Contributors
- * 
+ * Copyright (C) 2005, 2026 Wolfgang Schramm and Contributors
+ *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
  * Foundation version 2 of the License.
- * 
+ *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License along with
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
 package net.tourbook.ui.views.referenceTour;
-
-import javax.persistence.EntityManager;
-import javax.persistence.EntityTransaction;
 
 import net.tourbook.Messages;
 import net.tourbook.data.TourReference;
@@ -31,10 +28,13 @@ import org.eclipse.jface.viewers.ITreeSelection;
 import org.eclipse.jface.window.Window;
 import org.eclipse.swt.widgets.Display;
 
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.EntityTransaction;
+
 class ActionRenameRefTour extends Action {
 
 	/**
-	 * 
+	 *
 	 */
 	private final ReferenceTourView	fTourCatalogView;
 
@@ -92,7 +92,8 @@ class ActionRenameRefTour extends Action {
 					} else {
 
 						Display.getCurrent().asyncExec(new Runnable() {
-							public void run() {
+							@Override
+                     public void run() {
 
 								// refresh the tree viewer and resort the ref tours
 								fTourCatalogView.reloadViewer();

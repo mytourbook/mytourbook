@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2026 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -19,8 +19,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Set;
 
-import javax.persistence.EntityManager;
-
 import net.tourbook.common.UI;
 import net.tourbook.data.TourTag;
 import net.tourbook.data.TourTagCategory;
@@ -28,6 +26,8 @@ import net.tourbook.database.TourDatabase;
 
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.swt.widgets.Tree;
+
+import jakarta.persistence.EntityManager;
 
 public class TVITaggingView_TagCategory extends TVITaggingView_Item {
 

@@ -5,7 +5,7 @@ Bundle-SymbolicName: net.tourbook.tests;singleton:=true
 Bundle-Version: 26.11.0.qualifier
 Require-Bundle: net.tourbook,
  net.tourbook.ext.jars,
- net.tourbook.ext.ejb3,
+ net.tourbook.ext.jpa,
  net.tourbook.cloud,
  org.eclipse.ui,
  net.tourbook.common,

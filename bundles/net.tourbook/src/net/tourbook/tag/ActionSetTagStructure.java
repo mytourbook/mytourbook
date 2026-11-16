@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2026 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -16,8 +16,6 @@
 package net.tourbook.tag;
 
 import java.util.ArrayList;
-
-import javax.persistence.EntityManager;
 
 import net.tourbook.Messages;
 import net.tourbook.common.util.ITourViewer;
@@ -45,6 +43,8 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.Tree;
+
+import jakarta.persistence.EntityManager;
 
 public class ActionSetTagStructure extends Action implements IMenuCreator {
 

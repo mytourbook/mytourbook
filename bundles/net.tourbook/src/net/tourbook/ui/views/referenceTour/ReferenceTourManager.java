@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2026 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -17,8 +17,6 @@ package net.tourbook.ui.views.referenceTour;
 
 import java.util.HashMap;
 
-import javax.persistence.EntityManager;
-
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.UI;
 import net.tourbook.data.TourData;
@@ -28,6 +26,8 @@ import net.tourbook.tour.TourManager;
 import net.tourbook.ui.tourChart.TourChartConfiguration;
 
 import org.eclipse.jface.dialogs.IDialogSettings;
+
+import jakarta.persistence.EntityManager;
 
 public class ReferenceTourManager {
 
@@ -159,7 +159,7 @@ public class ReferenceTourManager {
    /**
     * @param refTour
     * @return
-    */ 
+    */
    public static long setupGeoCompareRefTour_FromNative(final TourReference refTour) {
 
       _geoCompare_RefTour = refTour;

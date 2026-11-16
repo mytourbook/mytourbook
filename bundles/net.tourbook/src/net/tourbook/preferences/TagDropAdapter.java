@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2026 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -18,8 +18,6 @@ package net.tourbook.preferences;
 import java.util.ArrayList;
 import java.util.Set;
 
-import javax.persistence.EntityManager;
-
 import net.tourbook.common.util.TreeViewerItem;
 import net.tourbook.data.TourTag;
 import net.tourbook.data.TourTagCategory;
@@ -34,6 +32,8 @@ import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.ViewerDropAdapter;
 import org.eclipse.swt.dnd.TransferData;
+
+import jakarta.persistence.EntityManager;
 
 final class TagDropAdapter extends ViewerDropAdapter {
 

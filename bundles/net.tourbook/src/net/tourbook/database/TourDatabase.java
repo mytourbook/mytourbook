@@ -35,7 +35,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Properties;
 import java.util.Set;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.ConcurrentSkipListSet;
@@ -43,11 +42,6 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.ThreadPoolExecutor;
-
-import javax.persistence.EntityManager;
-import javax.persistence.EntityManagerFactory;
-import javax.persistence.EntityTransaction;
-import javax.persistence.Query;
 
 import net.tourbook.Messages;
 import net.tourbook.application.ApplicationWorkbenchAdvisor;
@@ -103,7 +97,12 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IPropertyListener;
 import org.eclipse.ui.PlatformUI;
-import org.hibernate.ejb.Ejb3Configuration;
+import org.hibernate.jpa.HibernatePersistenceConfiguration;
+
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.EntityManagerFactory;
+import jakarta.persistence.EntityTransaction;
+import jakarta.persistence.Query;
 
 public class TourDatabase {
 
@@ -977,24 +976,12 @@ public class TourDatabase {
 
          logging = ";TRACE_LEVEL_SYSTEM_OUT=3";                         //$NON-NLS-1$
          logging = ";TRACE_LEVEL_FILE=3";                               //$NON-NLS-1$
-         logging = ";TRACE_LEVEL_SYSTEM_OUT=0;TRACE_LEVEL_FILE=2";      //$NON-NLS-1$
+         logging = ";TRACE_LEVEL_SYSTEM_OUT=0;TRACE_LEVEL_FILE=1";      //$NON-NLS-1$
 
          SQL_DB_FILEPATH            = H2_DB_FILEPATH;
 
          SQL_DB_DRIVER_CLASS        = H2_DRIVER;
          SQL_DB_TOUR_DB_URL         = H2_DB_TOUR_DB_URL + logging;
-
-// + ";MODE=LEGACY";
-// this is needed propably for Hybernate 3.x otherwise
-//         07:32:36,718  WARN JDBCExceptionReporter:100 - SQL Error: 23502, SQLState: 23502
-//         07:32:36,718 ERROR JDBCExceptionReporter:101 - NULL not allowed for column "PERSONID"; SQL statement:
-//         insert into TourPerson (personId, birthDay, deviceReaderId, firstName, gender, height, hrMaxFormula, lastName, maxPulse, rawDataPath, restPulse, tourBike_bikeId, weight) values (null, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) [23502-252]
-//         javax.persistence.PersistenceException: org.hibernate.exception.ConstraintViolationException: could not insert: [net.tourbook.data.TourPerson]
-//            at org.hibernate.ejb.AbstractEntityManagerImpl.throwPersistenceException(AbstractEntityManagerImpl.java:614)
-//            at org.hibernate.ejb.AbstractEntityManagerImpl.persist(AbstractEntityManagerImpl.java:226)
-//            at net.tourbook.data.TourPerson.persist(TourPerson.java:513)
-//            at net.tourbook.preferences.PrefPagePeople.applyData(PrefPagePeople.java:254)
-
 
          SQL_DB_USERNAME            = UI.EMPTY_STRING;
          SQL_DB_PASSWORD            = UI.EMPTY_STRING;
@@ -6615,10 +6602,10 @@ public class TourDatabase {
 
       splashManager.setMessage(Messages.Database_Monitor_persistent_service_task);
 
-      final Ejb3Configuration cfg = new Ejb3Configuration();
+      final HibernatePersistenceConfiguration cfg = new HibernatePersistenceConfiguration("tourbook");
 
-      // 1. Define EJB3 / Hibernate properties
-      final Properties props = new Properties();
+      // 1. Define EJB / Hibernate properties
+      final Map<String, Object> props = new HashMap<>();
 
 //SET_FORMATTING_OFF
 
@@ -6628,46 +6615,39 @@ public class TourDatabase {
       props.put("hibernate.connection.username",      SQL_DB_USERNAME);
       props.put("hibernate.connection.password",      SQL_DB_PASSWORD);
 
-      // Hibernate Dialect and SQL tuning
-      props.put("hibernate.dialect",                  SQL_DB_HIBERNATE_DIALECT);
-      props.put("hibernate.archive.autodetection",    "none");
-
       // debug sql
 //    props.put("hibernate.show_sql",                 "true");
 //    props.put("hibernate.format_sql",               "true");
 
-      // DDL Schema generation strategies
-//    props.put("hibernate.hbm2ddl.auto",             "update");
-
       // Inject properties into the configuration instance
-      cfg.addProperties(props);
+      cfg.properties(props);
 
       // Manually register annotated Entity classes
-      cfg.addAnnotatedClass(DeviceSensor           .class);
-      cfg.addAnnotatedClass(DeviceSensorValue      .class);
-      cfg.addAnnotatedClass(Equipment              .class);
-      cfg.addAnnotatedClass(EquipmentPart          .class);
-      cfg.addAnnotatedClass(TourBeverageContainer  .class);
-      cfg.addAnnotatedClass(TourBike               .class);
-      cfg.addAnnotatedClass(TourCompared           .class);
-      cfg.addAnnotatedClass(TourData               .class);
-      cfg.addAnnotatedClass(TourLocation           .class);
-      cfg.addAnnotatedClass(TourMarker             .class);
-      cfg.addAnnotatedClass(TourMarkerType         .class);
-      cfg.addAnnotatedClass(TourNutritionProduct   .class);
-      cfg.addAnnotatedClass(TourPerson             .class);
-      cfg.addAnnotatedClass(TourPersonHRZone       .class);
-      cfg.addAnnotatedClass(TourPhoto              .class);
-      cfg.addAnnotatedClass(TourReference          .class);
-      cfg.addAnnotatedClass(TourTag                .class);
-      cfg.addAnnotatedClass(TourTagCategory        .class);
-      cfg.addAnnotatedClass(TourType               .class);
-      cfg.addAnnotatedClass(TourWayPoint           .class);
+      cfg.managedClass(DeviceSensor           .class);
+      cfg.managedClass(DeviceSensorValue      .class);
+      cfg.managedClass(Equipment              .class);
+      cfg.managedClass(EquipmentPart          .class);
+      cfg.managedClass(TourBeverageContainer  .class);
+      cfg.managedClass(TourBike               .class);
+      cfg.managedClass(TourCompared           .class);
+      cfg.managedClass(TourData               .class);
+      cfg.managedClass(TourLocation           .class);
+      cfg.managedClass(TourMarker             .class);
+      cfg.managedClass(TourMarkerType         .class);
+      cfg.managedClass(TourNutritionProduct   .class);
+      cfg.managedClass(TourPerson             .class);
+      cfg.managedClass(TourPersonHRZone       .class);
+      cfg.managedClass(TourPhoto              .class);
+      cfg.managedClass(TourReference          .class);
+      cfg.managedClass(TourTag                .class);
+      cfg.managedClass(TourTagCategory        .class);
+      cfg.managedClass(TourType               .class);
+      cfg.managedClass(TourWayPoint           .class);
 
 //SET_FORMATTING_ON
 
       // Build the Persistence Unit Factory
-      _emFactory = cfg.buildEntityManagerFactory();
+      _emFactory = cfg.createEntityManagerFactory();
    }
 
    /**
@@ -6729,38 +6709,6 @@ public class TourDatabase {
       }
 
       return _isDataVersionChecked;
-   }
-
-   private void testConnection() {
-
-      final String sql = UI.EMPTY_STRING
-
-            + "SELECT SETTING_NAME, SETTING_VALUE" + NL
-            + "FROM INFORMATION_SCHEMA.SETTINGS " + NL
-            + "ORDER BY SETTING_NAME" + NL;
-
-      try (Connection conn = getConnection();
-            Statement stmt = conn.createStatement()) {
-
-         final ResultSet result = stmt.executeQuery(sql);
-
-         while (result.next()) {
-
-            final String name = result.getString(1);
-            final String value = result.getString(2);
-
-            System.out.println();
-            System.out.println();
-            System.out.println(" %s, %s".formatted(name, value));
-            System.out.println();
-// TODO remove SYSTEM.OUT.PRINTLN
-
-         }
-
-      } catch (final SQLException e) {
-
-         UI.showSQLException(e);
-      }
    }
 
    /**
