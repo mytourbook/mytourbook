@@ -155,7 +155,7 @@ public class TourMarkerTypeManager {
                + "SELECT emTourMarker" + NL //                                                  //$NON-NLS-1$
                + " FROM " + TourMarker.class.getSimpleName() + " AS emTourMarker" + NL //       //$NON-NLS-1$ //$NON-NLS-2$
                + " WHERE emTourMarker.tourMarkerType IS NOT NULL" + NL //                       //$NON-NLS-1$
-               + "   AND emTourMarker.tourMarkerType.markerTypeID = ?" + NL //                  //$NON-NLS-1$
+               + "   AND emTourMarker.tourMarkerType.markerTypeID = ?1" + NL //                 //$NON-NLS-1$
          ;
 
          final TypedQuery<TourMarker> emQuery = em.createQuery(sql, TourMarker.class);
@@ -163,7 +163,7 @@ public class TourMarkerTypeManager {
          emQuery.setParameter(1, markerTypeID);
 
          final List<TourMarker> allTourMarker = emQuery.getResultList();
-         
+
          if (allTourMarker.size() > 0) {
 
             final EntityTransaction ts = em.getTransaction();
