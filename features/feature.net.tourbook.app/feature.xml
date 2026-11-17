@@ -7,7 +7,7 @@
       plugin="net.tourbook.branding">
 
    <description>
-      MyTourbook Application.
+      MyTourbook App
    </description>
 
    <copyright>
@@ -36,8 +36,9 @@
       <import plugin="net.tourbook.ext.rxtx_2.2"/>
       <import plugin="net.tourbook.ext.worldwind"/>
       <import plugin="net.tourbook.ext.apache"/>
-      <import plugin="net.tourbook.ext.ejb3"/>
       <import plugin="net.tourbook.ext.geoclipse"/>
+      <import plugin="net.tourbook.ext.h2"/>
+      <import plugin="net.tourbook.ext.jpa"/>
       <import plugin="org.eclipse.equinox.p2.artifact.repository"/>
       <import plugin="org.eclipse.equinox.p2.core"/>
       <import plugin="org.eclipse.equinox.p2.director"/>
@@ -55,112 +56,66 @@
 
    <plugin
          id="net.tourbook.chart"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
+         version="0.0.0"/>
 
    <plugin
          id="net.tourbook.cloud"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
+         version="0.0.0"/>
 
    <plugin
          id="net.tourbook.export"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
+         version="0.0.0"/>
 
    <plugin
          id="net.tourbook.printing"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
+         version="0.0.0"/>
 
    <plugin
          id="net.tourbook.device"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
+         version="0.0.0"/>
 
    <plugin
          id="net.tourbook.device.garmin"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
+         version="0.0.0"/>
 
    <plugin
          id="net.tourbook.device.garmin.fit"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
+         version="0.0.0"/>
 
    <plugin
          id="net.tourbook.device.nmea"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
+         version="0.0.0"/>
 
    <plugin
          id="net.tourbook.statistics"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
+         version="0.0.0"/>
 
    <plugin
          id="net.tourbook.common"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
+         version="0.0.0"/>
 
    <plugin
          id="net.tourbook.photo"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
+         version="0.0.0"/>
 
    <plugin
          id="net.tourbook"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
+         version="0.0.0"/>
 
    <plugin
          id="net.tourbook.web"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
+         version="0.0.0"/>
 
    <plugin
          id="net.tourbook.p2"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
+         version="0.0.0"/>
 
    <plugin
          id="net.tourbook.branding"
-         download-size="0"
-         install-size="0"
          version="0.0.0"/>
 
    <plugin
          id="net.tourbook.model"
-         download-size="0"
-         install-size="0"
          version="0.0.0"/>
 
 </feature>

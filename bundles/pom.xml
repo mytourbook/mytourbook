@@ -41,7 +41,8 @@
       <module>net.tourbook.ui.tests</module>
       
       <module>net.tourbook.ext.apache</module>
-      <module>net.tourbook.ext.ejb3_3.4.0</module>
+      <module>net.tourbook.ext.h2</module>
+      <module>net.tourbook.ext.jpa</module>
       <module>net.tourbook.ext.geoclipse</module>
       <module>net.tourbook.ext.jars</module>
       <module>net.tourbook.ext.jars.printing</module>

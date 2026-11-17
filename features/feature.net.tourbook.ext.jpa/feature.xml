@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<feature
+      id="feature.net.tourbook.ext.jpa"
+      label="Hibernate JPA"
+      version="7.4.15"
+      provider-name="MyTourbook"
+      plugin="net.tourbook.branding">
+
+   <description>
+      This feature contains the JPA service for MyTourbook
+   </description>
+
+   <copyright>
+      Copyright (C) 2026 Wolfgang Schramm and Contributors
+   </copyright>
+
+   <url>
+      <update label="MyTourbook Update Site" url="https://github.com/mytourbook/mytourbook.github.io/"/>
+   </url>
+
+   <plugin
+         id="net.tourbook.ext.jpa"
+         version="0.0.0"/>
+
+</feature>

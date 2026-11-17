@@ -4,7 +4,7 @@ Bundle-Name: H2 Database Engine
 Bundle-SymbolicName: net.tourbook.ext.h2
 Automatic-Module-Name: net.tourbook.ext.h2
 Bundle-Version: 2.5.252
-Bundle-Vendor: H2 database engine
+Bundle-Vendor: MyTourbook
 Bundle-RequiredExecutionEnvironment: JavaSE-21
 Bundle-ClassPath: 
  h2-2.5.252.jar

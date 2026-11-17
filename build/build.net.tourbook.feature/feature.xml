@@ -21,50 +21,32 @@
       <update label="%updateSiteName" url="https://github.com/mytourbook/mytourbook.github.io/"/>
    </url>
 
-   <includes
-         id="org.eclipse.rcp"
-         version="0.0.0"/>
+   <includes   id="org.eclipse.rcp"         						version="0.0.0"/>
 
-   <includes
-         id="feature.net.tourbook.ext.eclipse"
-         version="0.0.0"/>
+   <includes   id="feature.net.tourbook.ext.eclipse"        version="0.0.0"/>
 
    <!-- IMPORTANT: Keep that tag in a single line as it is commented out during the GitHub build -->
-   <includes id="feature.net.tourbook.ext.eclipse.nl" version="0.0.0"/>
+   <includes 	id="feature.net.tourbook.ext.eclipse.nl" 		version="0.0.0"/>
 
-   <includes
-         id="feature.net.tourbook.app"
-         version="0.0.0"/>
+   <includes   id="feature.net.tourbook.app"         			version="0.0.0"/>
 
    <!-- IMPORTANT: Keep that tag in a single line as it is commented out during the GitHub build -->
-   <includes id="feature.net.tourbook.app.nl" version="0.0.0"/>
+   <includes   id="feature.net.tourbook.app.nl"             version="0.0.0"/>
 
-   <includes
-         id="feature.net.tourbook.app.version"
-         version="0.0.0"/>
+   <includes	id="feature.net.tourbook.app.version"			version="0.0.0"/>
 
-   <includes
-         id="feature.net.tourbook.ext.derby"
-         version="0.0.0"/>
+   <includes   id="feature.net.tourbook.ext.h2"         		version="0.0.0"/>
 
-   <includes
-         id="feature.net.tourbook.ext.ejb3"
-         version="0.0.0"/>
+   <includes   id="feature.net.tourbook.ext.jpa"         	version="0.0.0"/>
 
-   <includes
-         id="feature.net.tourbook.ext.jars"
-         version="0.0.0"/>
+   <includes   id="feature.net.tourbook.ext.derby"       	version="0.0.0"/>
 
-   <includes
-         id="feature.net.tourbook.ext.rxtx"
-         version="0.0.0"/>
+   <includes   id="feature.net.tourbook.ext.jars"        	version="0.0.0"/>
 
-   <includes
-         id="feature.net.tourbook.ext.vtm"
-         version="0.0.0"/>
+   <includes   id="feature.net.tourbook.ext.rxtx"        	version="0.0.0"/>
 
-   <includes
-         id="feature.net.tourbook.ext.worldwind"
-         version="0.0.0"/>
+   <includes   id="feature.net.tourbook.ext.vtm"         	version="0.0.0"/>
+
+   <includes   id="feature.net.tourbook.ext.worldwind"   	version="0.0.0"/>
 
 </feature>
