@@ -365,6 +365,17 @@ public class MigrateDerbyToH2 {
          migrate_20_CreateH2Tables(h2Conn);
          migrate_30_MigrateTableData(derbyConn, h2Conn);
 
+         // fix
+         //
+         // org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation:
+         //                      "PUBLIC.TAGID_PK PRIMARY KEY ON PUBLIC.TOURTAG(TAGID)
+         //                      ( /* key:1 */ CAST(1 AS BIGINT), 0, 1, 'Pass', NULL, NULL)"; SQL statement:
+         //    insert into TourTag (expandType,imageFilePath,isRoot,name,notes,tagId) values (?,?,?,?,?,default) [23505-252]
+         //       at org.h2.message.DbException.getJdbcSQLException(DbException.java:520)
+         //       at org.h2.message.DbException.getJdbcSQLException(DbException.java:489)
+         //       at org.h2.message.DbException.get(DbException.java:223)
+         IdentityResetter.resetAllIdentities(h2Conn);
+
          return true;
 
       } catch (final SQLException e) {
@@ -413,43 +424,6 @@ public class MigrateDerbyToH2 {
 
          UI.showSQLException(e);
       }
-
-      // Pseudo-flow for your DB upgrade method in TourDatabase.java
-//      final String findIdentitiesSql = UI.EMPTY_STRING
-//
-//            + "SELECT" + NL //                              //$NON-NLS-1$
-//            + " TABLE_NAME," + NL //                        //$NON-NLS-1$
-//            + " COLUMN_NAME" + NL //                        //$NON-NLS-1$
-//            + "FROM INFORMATION_SCHEMA.COLUMNS" + NL //     //$NON-NLS-1$
-//            + "WHERE" + NL //                               //$NON-NLS-1$
-//            + " TABLE_SCHEMA = 'PUBLIC' AND" + NL //        //$NON-NLS-1$
-//            + " IS_IDENTITY = 'YES'" + NL //                //$NON-NLS-1$
-//      ;
-//
-//      try (Statement stmt = h2Conn.createStatement();
-//
-//            ResultSet rs = stmt.executeQuery(findIdentitiesSql)) {
-//
-//         while (rs.next()) {
-//
-//            final String table = rs.getString("TABLE_NAME");
-//            final String column = rs.getString("COLUMN_NAME");
-//
-//            try (Statement maxStmt = h2Conn.createStatement();
-//                  ResultSet maxRs = maxStmt.executeQuery("SELECT COALESCE(MAX(" + column + "), -1) + 1 FROM " + table)) {
-//
-//               if (maxRs.next()) {
-//
-//                  final long nextVal = maxRs.getLong(1);
-//
-//                  try (Statement alterStmt = h2Conn.createStatement()) {
-//                     alterStmt.execute("ALTER TABLE " + table + " ALTER COLUMN " + column + " RESTART WITH " + nextVal);
-//                  }
-//               }
-//            }
-//         }
-//      }
-
    }
 
    private static void migrate_30_MigrateTableData(final Connection derbyConn,
