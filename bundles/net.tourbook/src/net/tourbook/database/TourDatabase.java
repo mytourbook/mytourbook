@@ -32,7 +32,6 @@ import java.time.temporal.WeekFields;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -72,7 +71,6 @@ import net.tourbook.data.TourTag;
 import net.tourbook.data.TourTagCategory;
 import net.tourbook.data.TourType;
 import net.tourbook.data.TourWayPoint;
-import net.tourbook.equipment.EquipmentManager;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.search.FTSearchManager;
 import net.tourbook.tag.TagCollection;
@@ -102,7 +100,7 @@ import org.hibernate.jpa.HibernatePersistenceConfiguration;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
 import jakarta.persistence.EntityTransaction;
-import jakarta.persistence.Query;
+import jakarta.persistence.TypedQuery;
 
 public class TourDatabase {
 
@@ -1759,25 +1757,21 @@ public class TourDatabase {
             return _allTourTagCategoriesByCategory;
          }
 
-         final EntityManager em = TourDatabase.getInstance().getEntityManager();
-         if (em != null) {
+         try (final EntityManager em = TourDatabase.getInstance().getEntityManager()) {
 
-            final Query emQuery = em.createQuery(UI.EMPTY_STRING
+            final String sql = UI.EMPTY_STRING
 
-                  + "SELECT tourTagCategory" //$NON-NLS-1$
-                  + " FROM " + TourTagCategory.class.getSimpleName() + " AS tourTagCategory"); //$NON-NLS-1$ //$NON-NLS-2$
+                  + "SELECT emTourTagCategory" + NL //                                          //$NON-NLS-1$
+                  + " FROM " + TourTagCategory.class.getSimpleName() + " AS emTourTagCategory"; //$NON-NLS-1$ //$NON-NLS-2$
+
+            final TypedQuery<TourTagCategory> emQuery = em.createQuery(sql, TourTagCategory.class);
 
             _allTourTagCategoriesByCategory = new HashMap<>();
 
-            final List<?> resultList = emQuery.getResultList();
-            for (final Object result : resultList) {
+            for (final TourTagCategory tourTagCategory : emQuery.getResultList()) {
 
-               if (result instanceof final TourTagCategory tourTagCategory) {
-                  _allTourTagCategoriesByCategory.put(tourTagCategory.getCategoryId(), tourTagCategory);
-               }
+               _allTourTagCategoriesByCategory.put(tourTagCategory.getCategoryId(), tourTagCategory);
             }
-
-            em.close();
          }
       }
 
@@ -1801,30 +1795,25 @@ public class TourDatabase {
             return _allTourTagCategoriesByTag;
          }
 
-         final EntityManager em = TourDatabase.getInstance().getEntityManager();
-         if (em != null) {
+         try (final EntityManager em = TourDatabase.getInstance().getEntityManager()) {
 
-            final Query emQuery = em.createQuery(UI.EMPTY_STRING
+            final String sql = UI.EMPTY_STRING
 
-                  + "SELECT tourTagCategory" //$NON-NLS-1$
-                  + " FROM " + TourTagCategory.class.getSimpleName() + " AS tourTagCategory"); //$NON-NLS-1$ //$NON-NLS-2$
+                  + "SELECT emTourTagCategory" + NL //                                                     //$NON-NLS-1$
+                  + " FROM " + TourTagCategory.class.getSimpleName() + " AS emTourTagCategory" + NL //     //$NON-NLS-1$ //$NON-NLS-2$
+            ;
+
+            final TypedQuery<TourTagCategory> emQuery = em.createQuery(sql, TourTagCategory.class);
 
             _allTourTagCategoriesByTag = new HashMap<>();
 
-            final List<?> allTagCategories = emQuery.getResultList();
+            for (final TourTagCategory tourTagCategory : emQuery.getResultList()) {
 
-            for (final Object result : allTagCategories) {
+               for (final TourTag tag : tourTagCategory.getTourTags()) {
 
-               if (result instanceof final TourTagCategory tourTagCategory) {
-
-                  for (final TourTag tag : tourTagCategory.getTourTags()) {
-
-                     _allTourTagCategoriesByTag.put(tag.getTagId(), tourTagCategory);
-                  }
+                  _allTourTagCategoriesByTag.put(tag.getTagId(), tourTagCategory);
                }
             }
-
-            em.close();
          }
       }
 
@@ -2245,12 +2234,12 @@ public class TourDatabase {
       return _instance;
    }
 
-   @SuppressWarnings("unchecked")
    public static TagCollection getRootTags() {
 
       final long rootTagId = -1L;
 
       TagCollection rootEntry = _tagCollections.get(Long.valueOf(rootTagId));
+
       if (rootEntry != null) {
          return rootEntry;
       }
@@ -2258,43 +2247,45 @@ public class TourDatabase {
       /*
        * read root tags from the database
        */
-      final EntityManager em = TourDatabase.getInstance().getEntityManager();
 
-      if (em == null) {
-         return null;
+      try (final EntityManager em = TourDatabase.getInstance().getEntityManager()) {
+
+         rootEntry = new TagCollection();
+
+         /*
+          * Read tag categories from db
+          */
+         String sql = UI.EMPTY_STRING
+
+               + "SELECT emTourTagCategory" + NL //                                                   //$NON-NLS-1$
+               + " FROM " + TourTagCategory.class.getSimpleName() + " AS emTourTagCategory" + NL //   //$NON-NLS-1$ //$NON-NLS-2$
+               + " WHERE emTourTagCategory.isRoot=1" + NL //                                          //$NON-NLS-1$
+               + " ORDER BY emTourTagCategory.name" + NL //                                           //$NON-NLS-1$
+         ;
+
+         final TypedQuery<TourTagCategory> emQuery = em.createQuery(sql, TourTagCategory.class);
+
+         rootEntry.tourTagCategories = emQuery.getResultList();
+
+         /*
+          * Read tour tags from db
+          */
+         sql = UI.EMPTY_STRING
+
+               + "SELECT emTourTag" + NL //                                            //$NON-NLS-1$
+               + " FROM " + TourTag.class.getSimpleName() + " AS emTourTag " + NL //   //$NON-NLS-1$ //$NON-NLS-2$
+               + " WHERE emTourTag.isRoot=1" + NL //                                   //$NON-NLS-1$
+               + " ORDER BY emTourTag.name" + NL //                                    //$NON-NLS-1$
+         ;
+
+         final TypedQuery<TourTag> emTagQuery = em.createQuery(sql, TourTag.class);
+
+         rootEntry.tourTags = emTagQuery.getResultList();
+
+         _tagCollections.put(rootTagId, rootEntry);
+
+         return rootEntry;
       }
-
-      rootEntry = new TagCollection();
-
-      /*
-       * read tag categories from db
-       */
-      Query emQuery = em.createQuery(UI.EMPTY_STRING
-
-            + "SELECT ttCategory" //$NON-NLS-1$
-            + " FROM " + TourTagCategory.class.getSimpleName() + " AS ttCategory" //$NON-NLS-1$ //$NON-NLS-2$
-            + " WHERE ttCategory.isRoot=1" //$NON-NLS-1$
-            + " ORDER BY ttCategory.name"); //$NON-NLS-1$
-
-      rootEntry.tourTagCategories = (ArrayList<TourTagCategory>) emQuery.getResultList();
-
-      /*
-       * read tour tags from db
-       */
-      emQuery = em.createQuery(UI.EMPTY_STRING
-
-            + "SELECT tourTag" //$NON-NLS-1$
-            + " FROM " + TourTag.class.getSimpleName() + " AS tourTag " //$NON-NLS-1$ //$NON-NLS-2$
-            + " WHERE tourTag.isRoot=1" //$NON-NLS-1$
-            + " ORDER BY tourTag.name"); //$NON-NLS-1$
-
-      rootEntry.tourTags = (ArrayList<TourTag>) emQuery.getResultList();
-
-      em.close();
-
-      _tagCollections.put(rootTagId, rootEntry);
-
-      return rootEntry;
    }
 
    /**
@@ -2541,53 +2532,24 @@ public class TourDatabase {
 
       final List<TourBeverageContainer> beverageContainersList = new ArrayList<>();
 
-      final EntityManager entityManager = TourDatabase.getInstance().getEntityManager();
+      try (final EntityManager em = TourDatabase.getInstance().getEntityManager()) {
 
-      if (entityManager != null) {
+         final String sql = UI.EMPTY_STRING
 
-         final Query query = entityManager.createQuery(UI.EMPTY_STRING
+               + "SELECT emTourBeverageContainer" + NL //                                                         //$NON-NLS-1$
+               + " FROM " + TourBeverageContainer.class.getSimpleName() + " AS emTourBeverageContainer" + NL //   //$NON-NLS-1$
+               + " ORDER  BY emTourBeverageContainer.name" + NL //                                                //$NON-NLS-1$
+         ;
 
-               + "SELECT tourBeverageContainer" //$NON-NLS-1$
-               + " FROM TourBeverageContainer AS tourBeverageContainer " //$NON-NLS-1$
-               + " ORDER  BY tourBeverageContainer.name"); //$NON-NLS-1$
+         final TypedQuery<TourBeverageContainer> emQuery = em.createQuery(sql, TourBeverageContainer.class);
 
-         for (final Object element : query.getResultList()) {
+         for (final TourBeverageContainer tourBeverageContainer : emQuery.getResultList()) {
 
-            if (element instanceof final TourBeverageContainer tourBeverageContainer) {
-               beverageContainersList.add(tourBeverageContainer);
-            }
+            beverageContainersList.add(tourBeverageContainer);
          }
-
-         entityManager.close();
       }
 
       return beverageContainersList;
-   }
-
-   /**
-    * @return Returns all tour types in the db sorted by name
-    */
-   @SuppressWarnings("unchecked")
-   public static ArrayList<TourBike> getTourBikes() {
-
-      ArrayList<TourBike> bikeList = new ArrayList<>();
-
-      final EntityManager em = TourDatabase.getInstance().getEntityManager();
-
-      if (em != null) {
-
-         final Query emQuery = em.createQuery(UI.EMPTY_STRING
-
-               + "SELECT tourBike" //$NON-NLS-1$
-               + " FROM TourBike AS tourBike " //$NON-NLS-1$
-               + " ORDER  BY tourBike.name"); //$NON-NLS-1$
-
-         bikeList = (ArrayList<TourBike>) emQuery.getResultList();
-
-         em.close();
-      }
-
-      return bikeList;
    }
 
    /**
@@ -2599,13 +2561,12 @@ public class TourDatabase {
     */
    public static TourData getTourFromDb(final Long tourId) {
 
-      final EntityManager em = TourDatabase.getInstance().getEntityManager();
+      try (final EntityManager em = TourDatabase.getInstance().getEntityManager()) {
 
-      final TourData tourData = em.find(TourData.class, tourId);
+         final TourData tourData = em.find(TourData.class, tourId);
 
-      em.close();
-
-      return tourData;
+         return tourData;
+      }
    }
 
    public static TourLocation getTourLocation(final double latitude, final double longitude, final int zoomlevel) {
@@ -2635,26 +2596,26 @@ public class TourDatabase {
 
       synchronized (DB_LOCK) {
 
-         final EntityManager em = TourDatabase.getInstance().getEntityManager();
-         {
+         try (final EntityManager em = TourDatabase.getInstance().getEntityManager()) {
+
             final String sql = UI.EMPTY_STRING
 
-                  + "SELECT TourLocation" + NL //                                               //$NON-NLS-1$
+                  + "SELECT emTourLocation" + NL //                                                //$NON-NLS-1$
 
-                  + " FROM TourLocation AS tourLocation" + NL //                                //$NON-NLS-1$
+                  + " FROM TourLocation AS emTourLocation" + NL //                                 //$NON-NLS-1$
 
-                  + " WHERE " + NL //                                                           //$NON-NLS-1$
+                  + " WHERE " + NL //                                                              //$NON-NLS-1$
 
-                  + "   tourLocation.latitudeMinE6_Resized_Normalized  <= ? AND " + NL //    1  //$NON-NLS-1$
-                  + "   tourLocation.latitudeMaxE6_Resized_Normalized  >= ? AND " + NL //    2  //$NON-NLS-1$
+                  + "   emTourLocation.latitudeMinE6_Resized_Normalized  <= ? AND " + NL //     1  //$NON-NLS-1$
+                  + "   emTourLocation.latitudeMaxE6_Resized_Normalized  >= ? AND " + NL //     2  //$NON-NLS-1$
 
-                  + "   tourLocation.longitudeMinE6_Resized_Normalized <= ? AND " + NL //    3  //$NON-NLS-1$
-                  + "   tourLocation.longitudeMaxE6_Resized_Normalized >= ? AND " + NL //    4  //$NON-NLS-1$
+                  + "   emTourLocation.longitudeMinE6_Resized_Normalized <= ? AND " + NL //     3  //$NON-NLS-1$
+                  + "   emTourLocation.longitudeMaxE6_Resized_Normalized >= ? AND " + NL //     4  //$NON-NLS-1$
 
-                  + "   tourLocation.zoomlevel >= ?" + NL //                                 5  //$NON-NLS-1$
+                  + "   emTourLocation.zoomlevel >= ?" + NL //                                  5  //$NON-NLS-1$
             ;
 
-            final Query emQuery = em.createQuery(sql);
+            final TypedQuery<TourLocation> emQuery = em.createQuery(sql, TourLocation.class);
 
             emQuery.setParameter(1, latitudeE6_Normalized);
             emQuery.setParameter(2, latitudeE6_Normalized);
@@ -2662,24 +2623,21 @@ public class TourDatabase {
             emQuery.setParameter(4, longitudeE6_Normalized);
             emQuery.setParameter(5, zoomlevel);
 
-            try {
+            final List<TourLocation> allDbTourLocations = emQuery.getResultList();
 
-               @SuppressWarnings("unchecked")
-               final List<TourLocation> allDbTourLocations = emQuery.getResultList();
+            final int numLocations = allDbTourLocations.size();
 
-               final int numLocations = allDbTourLocations.size();
+            if (numLocations == 0) {
 
-               if (numLocations == 0) {
+               // a new location will be created
 
-                  // a new location will be created
+            } else if (numLocations == 1) {
 
-               } else if (numLocations == 1) {
+               dbTourLocation = allDbTourLocations.get(0);
 
-                  dbTourLocation = allDbTourLocations.get(0);
+            } else {
 
-               } else {
-
-                  // numLocations > 1
+               // numLocations > 1
 
 //                  for (final TourLocation dbTourLocation2 : allDbTourLocations) {
 //
@@ -2706,15 +2664,13 @@ public class TourDatabase {
 //
 //                  System.out.println("Found %d locations, using first location".formatted(allDbTourLocations.size()));
 
-                  dbTourLocation = allDbTourLocations.get(0);
-               }
-
-            } catch (final Exception e) {
-
-               StatusUtil.log(e);
+               dbTourLocation = allDbTourLocations.get(0);
             }
+
+         } catch (final Exception e) {
+
+            StatusUtil.log(e);
          }
-         em.close();
       }
 
       // set transient values
@@ -3053,37 +3009,31 @@ public class TourDatabase {
          final Map<String, DeviceSensor> allDbDeviceSensors_BySensorKey_NoDevType = new HashMap<>();
          final Map<String, DeviceSensor> allDbDeviceSensors_BySensorKey_WithDevType = new HashMap<>();
 
-         final EntityManager em = TourDatabase.getInstance().getEntityManager();
-         if (em != null) {
+         try (final EntityManager em = TourDatabase.getInstance().getEntityManager()) {
 
-            final Query emQuery = em.createQuery(UI.EMPTY_STRING
+            final String sql = UI.EMPTY_STRING
 
-                  + "SELECT DeviceSensor" //                      //$NON-NLS-1$
-                  + " FROM DeviceSensor AS DeviceSensor" //       //$NON-NLS-1$
-            );
+                  + "SELECT emDeviceSensor" + NL //                                                   //$NON-NLS-1$
+                  + " FROM " + DeviceSensor.class.getSimpleName() + " AS emDeviceSensor" + NL //      //$NON-NLS-1$
+            ;
 
-            final List<?> resultList = emQuery.getResultList();
+            final TypedQuery<DeviceSensor> emQuery = em.createQuery(sql, DeviceSensor.class);
 
-            for (final Object result : resultList) {
+            for (final DeviceSensor sensor : emQuery.getResultList()) {
 
-               if (result instanceof final DeviceSensor sensor) {
+               allDbDeviceSensors_BySensorID.put(sensor.getSensorId(), sensor);
 
-                  allDbDeviceSensors_BySensorID.put(sensor.getSensorId(), sensor);
+               final String sensorKey_WithDevType = sensor.getSensorKey_WithDevType();
+               final String sensorKey_NoDevType = sensor.getSensorKey_NoDevType();
 
-                  final String sensorKey_WithDevType = sensor.getSensorKey_WithDevType();
-                  final String sensorKey_NoDevType = sensor.getSensorKey_NoDevType();
+               if (StringUtils.hasContent(sensorKey_WithDevType)) {
+                  allDbDeviceSensors_BySensorKey_WithDevType.put(sensorKey_WithDevType.toUpperCase(), sensor);
+               }
 
-                  if (StringUtils.hasContent(sensorKey_WithDevType)) {
-                     allDbDeviceSensors_BySensorKey_WithDevType.put(sensorKey_WithDevType.toUpperCase(), sensor);
-                  }
-
-                  if (StringUtils.hasContent(sensorKey_NoDevType)) {
-                     allDbDeviceSensors_BySensorKey_NoDevType.put(sensorKey_NoDevType.toUpperCase(), sensor);
-                  }
+               if (StringUtils.hasContent(sensorKey_NoDevType)) {
+                  allDbDeviceSensors_BySensorKey_NoDevType.put(sensorKey_NoDevType.toUpperCase(), sensor);
                }
             }
-
-            em.close();
          }
 
          _allDbDeviceSensors_BySensorID = allDbDeviceSensors_BySensorID;
@@ -3092,7 +3042,6 @@ public class TourDatabase {
       }
    }
 
-   @SuppressWarnings("unchecked")
    private static void loadAllTourMarkerTypes() {
 
       synchronized (DB_LOCK) {
@@ -3106,18 +3055,16 @@ public class TourDatabase {
          final Map<Long, TourMarkerType> allDbTourMarkerTypes_ById = new HashMap<>();
          final Map<String, TourMarkerType> allDbTourMarkerTypes_ByName = new HashMap<>();
 
-         final EntityManager em = TourDatabase.getInstance().getEntityManager();
-         if (em != null) {
+         try (final EntityManager em = TourDatabase.getInstance().getEntityManager()) {
 
-            final Query emQuery = em.createQuery(UI.EMPTY_STRING
+            final String sql = UI.EMPTY_STRING
 
-                  + "SELECT TourMarkerType" + NL //                     //$NON-NLS-1$
+                  + "SELECT emTourMarkerType" + NL //                                                    //$NON-NLS-1$
+                  + " FROM " + TourMarkerType.class.getSimpleName() + " AS emTourMarkerType" + NL //     //$NON-NLS-1$ //$NON-NLS-2$
+                  + " ORDER BY emTourMarkerType.name" + NL //                                            //$NON-NLS-1$
+            ;
 
-                  + " FROM " + TourMarkerType.class.getSimpleName() + " AS tourMarkerType" + NL //    //$NON-NLS-1$ //$NON-NLS-2$
-
-                  // sort by name
-                  + " ORDER  BY tourMarkerType.name" + NL //            //$NON-NLS-1$
-            );
+            final TypedQuery<TourMarkerType> emQuery = em.createQuery(sql, TourMarkerType.class);
 
             allDbTourMarkerTypes = emQuery.getResultList();
 
@@ -3126,8 +3073,6 @@ public class TourDatabase {
                allDbTourMarkerTypes_ById.put(tourMarkerType.getId(), tourMarkerType);
                allDbTourMarkerTypes_ByName.put(tourMarkerType.getTypeName().toUpperCase(), tourMarkerType);
             }
-
-            em.close();
          }
 
          _allDbTourMarkerTypes = allDbTourMarkerTypes;
@@ -3147,25 +3092,21 @@ public class TourDatabase {
          final HashMap<Long, TourTag> allTourTags_ByTagId = new HashMap<>();
          final HashMap<String, TourTag> allTourTags_ByTagName = new HashMap<>();
 
-         final EntityManager em = TourDatabase.getInstance().getEntityManager();
-         if (em != null) {
+         try (final EntityManager em = TourDatabase.getInstance().getEntityManager()) {
 
-            final Query emQuery = em.createQuery(UI.EMPTY_STRING
+            final String sql = UI.EMPTY_STRING
 
-                  + "SELECT tourTag" //                                             //$NON-NLS-1$
-                  + " FROM " + TourTag.class.getSimpleName() + " AS tourTag"); //   //$NON-NLS-1$ //$NON-NLS-2$
+                  + "SELECT emTourTag" + NL //                                            //$NON-NLS-1$
+                  + " FROM " + TourTag.class.getSimpleName() + " AS emTourTag" + NL //    //$NON-NLS-1$ //$NON-NLS-2$
+            ;
 
-            final List<?> resultList = emQuery.getResultList();
-            for (final Object result : resultList) {
+            final TypedQuery<TourTag> emQuery = em.createQuery(sql, TourTag.class);
 
-               if (result instanceof final TourTag tourTag) {
+            for (final TourTag tourTag : emQuery.getResultList()) {
 
-                  allTourTags_ByTagId.put(tourTag.getTagId(), tourTag);
-                  allTourTags_ByTagName.put(tourTag.getTagName().toUpperCase(), tourTag);
-               }
+               allTourTags_ByTagId.put(tourTag.getTagId(), tourTag);
+               allTourTags_ByTagName.put(tourTag.getTagName().toUpperCase(), tourTag);
             }
-
-            em.close();
          }
 
          _allTourTags_ByTagId = allTourTags_ByTagId;
@@ -3173,7 +3114,6 @@ public class TourDatabase {
       }
    }
 
-   @SuppressWarnings("unchecked")
    private static void loadAllTourTypes() {
 
       synchronized (DB_LOCK) {
@@ -3187,14 +3127,16 @@ public class TourDatabase {
          final HashMap<Long, TourType> allDbTourTypes_ById = new HashMap<>();
          final HashMap<String, TourType> allDbTourTypes_ByName = new HashMap<>();
 
-         final EntityManager em = TourDatabase.getInstance().getEntityManager();
-         if (em != null) {
+         try (final EntityManager em = TourDatabase.getInstance().getEntityManager()) {
 
-            final Query emQuery = em.createQuery(UI.EMPTY_STRING
+            final String sql = UI.EMPTY_STRING
 
-                  + "SELECT tourType" //              //$NON-NLS-1$
-                  + " FROM TourType AS tourType" //   //$NON-NLS-1$
-                  + " ORDER  BY tourType.name"); //   //$NON-NLS-1$
+                  + "SELECT emTourType" + NL //                                              //$NON-NLS-1$
+                  + " FROM " + TourType.class.getSimpleName() + " AS emTourType" + NL //     //$NON-NLS-1$
+                  + " ORDER  BY emTourType.name" + NL //                                     //$NON-NLS-1$
+            ;
+
+            final TypedQuery<TourType> emQuery = em.createQuery(sql, TourType.class);
 
             allDbTourTypes = (ArrayList<TourType>) emQuery.getResultList();
 
@@ -3203,8 +3145,6 @@ public class TourDatabase {
                allDbTourTypes_ById.put(tourType.getTypeId(), tourType);
                allDbTourTypes_ByName.put(tourType.getName().toUpperCase(), tourType);
             }
-
-            em.close();
          }
 
          _allDbTourTypes = allDbTourTypes;
@@ -6714,7 +6654,7 @@ public class TourDatabase {
    /**
     * This method must be updated when the database version is updated
     */
-   private boolean updateDb__1_Design(int currentDbVersion, final SplashManager splashManager) {
+   private boolean updateDb__1_Design(final int currentDbVersion, final SplashManager splashManager) {
 
       if (_isSilentDatabaseUpdate == false) {
 
@@ -6769,11 +6709,11 @@ public class TourDatabase {
 //         if (currentDbVersion == 61) {
 //            currentDbVersion = _dbDesignVersion_New = updateDb_061_To_062(conn, splashManager);
 //         }
-
-         // 62 -> 63    26.9
-         if (currentDbVersion == 62) {
-            currentDbVersion = _dbDesignVersion_New = updateDb_062_To_063(conn, splashManager);
-         }
+//
+//         // 62 -> 63    26.9
+//         if (currentDbVersion == 62) {
+//            currentDbVersion = _dbDesignVersion_New = updateDb_062_To_063(conn, splashManager);
+//         }
 
          // update db design version number
          updateVersionNumber_10_AfterDesignUpdate(conn, _dbDesignVersion_New);
@@ -7049,83 +6989,83 @@ public class TourDatabase {
    private void updateDb_060_To_061_DataUpdate(final Connection conn,
                                                final SplashManager splashManager) throws SQLException {
 
-      final long startTime = System.currentTimeMillis();
-
-      final int dbDataVersion = 61;
-
-      if (getDbVersion(conn, TABLE_DB_VERSION_DATA) >= dbDataVersion) {
-
-         // data version is higher -> nothing to do
-         return;
-      }
-
-      EntityManager em = null;
-
-      try {
-
-         em = TourDatabase.getInstance().getEntityManager();
-
-         if (em != null) {
-
-            final Query query = em.createQuery(UI.EMPTY_STRING
-
-                  + "SELECT Equipment" + NL //                                               //$NON-NLS-1$
-                  + " FROM " + Equipment.class.getSimpleName() + " AS Equipment" + NL //     //$NON-NLS-1$ //$NON-NLS-2$
-
-                  // sort by name
-                  + " ORDER BY Equipment.brand, Equipment.model" + NL //                     //$NON-NLS-1$
-            );
-
-            final Set<String> allEquipmentTypes = new HashSet<>();
-
-            final List<?> allResults = query.getResultList();
-
-            for (final Object result : allResults) {
-
-               if (result instanceof final Equipment equipment) {
-
-                  final Set<String> allPartTypes = new HashSet<>();
-
-                  if (equipment.isCollate()) {
-
-                     allEquipmentTypes.add(equipment.getCollateID());
-
-                  } else {
-
-                     // equipment is not collated but parts can be
-
-                     // get all collated part types
-                     for (final EquipmentPart part : equipment.getParts()) {
-                        if (part.isCollate()) {
-                           allPartTypes.add(part.getPartCollateID());
-                        }
-                     }
-
-                     for (final String partType : allPartTypes) {
-
-                        EquipmentManager.updateUntilDate_Parts_OneCollateID(equipment, partType, (short) -1);
-                     }
-                  }
-               }
-            }
-
-            EquipmentManager.updateUntilDate_Equipment(allEquipmentTypes);
-         }
-
-      } finally {
-
-         if (em != null) {
-            em.close();
-         }
-      }
-
-      updateVersionNumber_20_AfterDataUpdate(conn, dbDataVersion, startTime);
+//      final long startTime = System.currentTimeMillis();
+//
+//      final int dbDataVersion = 61;
+//
+//      if (getDbVersion(conn, TABLE_DB_VERSION_DATA) >= dbDataVersion) {
+//
+//         // data version is higher -> nothing to do
+//         return;
+//      }
+//
+//      EntityManager em = null;
+//
+//      try {
+//
+//         em = TourDatabase.getInstance().getEntityManager();
+//
+//         if (em != null) {
+//
+//            final Query query = em.createQuery(UI.EMPTY_STRING
+//
+//                  + "SELECT Equipment" + NL //                                               //$NON-NLS-1$
+//                  + " FROM " + Equipment.class.getSimpleName() + " AS Equipment" + NL //     //$NON-NLS-1$ //$NON-NLS-2$
+//
+//                  // sort by name
+//                  + " ORDER BY Equipment.brand, Equipment.model" + NL //                     //$NON-NLS-1$
+//            );
+//
+//            final Set<String> allEquipmentTypes = new HashSet<>();
+//
+//            final List<?> allResults = query.getResultList();
+//
+//            for (final Object result : allResults) {
+//
+//               if (result instanceof final Equipment equipment) {
+//
+//                  final Set<String> allPartTypes = new HashSet<>();
+//
+//                  if (equipment.isCollate()) {
+//
+//                     allEquipmentTypes.add(equipment.getCollateID());
+//
+//                  } else {
+//
+//                     // equipment is not collated but parts can be
+//
+//                     // get all collated part types
+//                     for (final EquipmentPart part : equipment.getParts()) {
+//                        if (part.isCollate()) {
+//                           allPartTypes.add(part.getPartCollateID());
+//                        }
+//                     }
+//
+//                     for (final String partType : allPartTypes) {
+//
+//                        EquipmentManager.updateUntilDate_Parts_OneCollateID(equipment, partType, (short) -1);
+//                     }
+//                  }
+//               }
+//            }
+//
+//            EquipmentManager.updateUntilDate_Equipment(allEquipmentTypes);
+//         }
+//
+//      } finally {
+//
+//         if (em != null) {
+//            em.close();
+//         }
+//      }
+//
+//      updateVersionNumber_20_AfterDataUpdate(conn, dbDataVersion, startTime);
    }
-//
-//   private int updateDb_061_To_062(final Connection conn, final SplashManager splashManager) throws SQLException {
-//
-//      final int newDbVersion = 62;
-//
+
+   private int updateDb_061_To_062(final Connection conn, final SplashManager splashManager) throws SQLException {
+
+      final int newDbVersion = 62;
+
 //      logDbUpdate_Start(newDbVersion);
 //      updateMonitor(splashManager, newDbVersion);
 //
@@ -7152,30 +7092,30 @@ public class TourDatabase {
 //      }
 //
 //      logDbUpdate_End(newDbVersion);
-//
-//      return newDbVersion;
-//   }
+
+      return newDbVersion;
+   }
 
    private int updateDb_062_To_063(final Connection conn, final SplashManager splashManager) throws SQLException {
 
       final int newDbVersion = 63;
 
-      logDbUpdate_Start(newDbVersion);
-      updateMonitor(splashManager, newDbVersion);
-
-      final Statement stmt = conn.createStatement();
-      {
-
-// SET_FORMATTING_OFF
-
-         SQL.addColumn_Float(stmt, TABLE_TOUR_DATA, "nutrition_TotalCarbohydrates", DEFAULT_0); //$NON-NLS-1$
-
-// SET_FORMATTING_ON
-      }
-
-      stmt.close();
-
-      logDbUpdate_End(newDbVersion);
+//      logDbUpdate_Start(newDbVersion);
+//      updateMonitor(splashManager, newDbVersion);
+//
+//      final Statement stmt = conn.createStatement();
+//      {
+//
+//// SET_FORMATTING_OFF
+//
+//         SQL.addColumn_Float(stmt, TABLE_TOUR_DATA, "nutrition_TotalCarbohydrates", DEFAULT_0); //$NON-NLS-1$
+//
+//// SET_FORMATTING_ON
+//      }
+//
+//      stmt.close();
+//
+//      logDbUpdate_End(newDbVersion);
 
       return newDbVersion;
    }

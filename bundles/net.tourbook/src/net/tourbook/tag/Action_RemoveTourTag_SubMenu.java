@@ -21,6 +21,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import net.tourbook.Messages;
@@ -100,7 +101,7 @@ public class Action_RemoveTourTag_SubMenu extends Action implements IMenuCreator
 
    private void createTagActions(final TagCollection tagCollection, final Menu menu) {
 
-      final ArrayList<TourTag> allTourTags = tagCollection.tourTags;
+      final List<TourTag> allTourTags = tagCollection.tourTags;
       if (allTourTags == null) {
          return;
       }
@@ -211,7 +212,7 @@ public class Action_RemoveTourTag_SubMenu extends Action implements IMenuCreator
 
       // remove tags, create actions for all tags of all selected tours
 
-      final ArrayList<TourTag> sortedTags = new ArrayList<>(_selectedTags);
+      final List<TourTag> sortedTags = new ArrayList<>(_selectedTags);
       Collections.sort(sortedTags);
 
       createTagActions(new TagCollection(sortedTags), _menu);

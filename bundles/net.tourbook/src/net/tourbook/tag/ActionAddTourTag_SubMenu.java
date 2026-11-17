@@ -19,6 +19,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import net.tourbook.Images;
@@ -445,7 +446,7 @@ public class ActionAddTourTag_SubMenu extends Action implements IMenuCreator, IA
 
    private void fillMenu_20_TagActions(final TagCollection tagCollection, final Menu menu) {
 
-      final ArrayList<TourTag> allTourTags = tagCollection.tourTags;
+      final List<TourTag> allTourTags = tagCollection.tourTags;
       if (allTourTags == null) {
          return;
       }

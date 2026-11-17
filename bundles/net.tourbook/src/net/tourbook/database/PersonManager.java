@@ -26,9 +26,11 @@ import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.swt.widgets.Display;
 
 import jakarta.persistence.EntityManager;
-import jakarta.persistence.Query;
+import jakarta.persistence.TypedQuery;
 
 public class PersonManager {
+
+   private static final char              NL   = UI.NEW_LINE;
 
    private static PersonManager           _instance;
 
@@ -54,26 +56,26 @@ public class PersonManager {
       return _instance;
    }
 
-   @SuppressWarnings("unchecked")
    private static void getPeopleFromDb() {
 
       if (_people != null) {
          _people.clear();
       }
 
-      final EntityManager em = TourDatabase.getInstance().getEntityManager();
-      if (em != null) {
+      try (final EntityManager em = TourDatabase.getInstance().getEntityManager()) {
 
-         final Query emQuery = em.createQuery(//
-               //
-               "SELECT TourPerson" //$NON-NLS-1$
-                     //
-                     + (" FROM TourPerson AS TourPerson") //$NON-NLS-1$
-                     + (" ORDER BY TourPerson.lastName, TourPerson.firstName")); //$NON-NLS-1$
+         final String sql = UI.EMPTY_STRING
 
-         _people = (ArrayList<TourPerson>) emQuery.getResultList();
+               + "SELECT emTourPerson" + NL //                                               //$NON-NLS-1$
+               + " FROM " + TourPerson.class.getSimpleName() + " AS emTourPerson" + NL //    //$NON-NLS-1$
+               + " ORDER BY" + NL //                                                         //$NON-NLS-1$
+               + "   emTourPerson.lastName," + NL //                                         //$NON-NLS-1$
+               + "   emTourPerson.firstName" + NL //                                         //$NON-NLS-1$
+         ;
 
-         em.close();
+         final TypedQuery<TourPerson> emQuery = em.createQuery(sql, TourPerson.class);
+
+         _people = new ArrayList<>(emQuery.getResultList());
       }
    }
 
@@ -115,10 +117,13 @@ public class PersonManager {
       }
 
       synchronized (LOCK) {
+
          // check again
+
          if (_people != null) {
             return _people;
          }
+
          getPeopleFromDb();
       }
 

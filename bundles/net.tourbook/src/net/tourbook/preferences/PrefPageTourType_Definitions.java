@@ -95,9 +95,11 @@ import org.eclipse.ui.PlatformUI;
 
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityTransaction;
-import jakarta.persistence.Query;
+import jakarta.persistence.TypedQuery;
 
 public class PrefPageTourType_Definitions extends PreferencePage implements IWorkbenchPreferencePage, IColorTreeViewer {
+
+   private static final char                  NL                     = UI.NEW_LINE;
 
    public static final String                 ID                     = "net.tourbook.preferences.PrefPageTourType_Definitions";    //$NON-NLS-1$
 
@@ -1688,18 +1690,20 @@ public class PrefPageTourType_Definitions extends PreferencePage implements IWor
 
       boolean returnResult = false;
 
-      final EntityManager em = TourDatabase.getInstance().getEntityManager();
+      try (final EntityManager em = TourDatabase.getInstance().getEntityManager()) {
 
-      if (em != null) {
+         final String sql = UI.EMPTY_STRING
 
-         final Query query = em.createQuery(UI.EMPTY_STRING
+               + "SELECT emTourData" + NL //                                              //$NON-NLS-1$
+               + " FROM " + TourData.class.getSimpleName() + " AS emTourData" + NL //     //$NON-NLS-1$
+               + " WHERE emTourData.tourType.typeId=" + tourType.getTypeId() + NL //      //$NON-NLS-1$
+         ;
 
-               + "SELECT tourData" //$NON-NLS-1$
-               + " FROM TourData AS tourData" //$NON-NLS-1$
-               + " WHERE tourData.tourType.typeId=" + tourType.getTypeId()); //$NON-NLS-1$
+         final TypedQuery<TourData> emQuery = em.createQuery(sql, TourData.class);
 
-         final List<?> tourDataList = query.getResultList();
-         if (tourDataList.size() > 0) {
+         final List<TourData> allTourData = emQuery.getResultList();
+
+         if (allTourData.size() > 0) {
 
             final EntityTransaction ts = em.getTransaction();
 
@@ -1708,22 +1712,20 @@ public class PrefPageTourType_Definitions extends PreferencePage implements IWor
                ts.begin();
 
                // remove tour type from all tour data
-               for (final Object listItem : tourDataList) {
+               for (final TourData tourData : allTourData) {
 
-                  if (listItem instanceof TourData) {
-
-                     final TourData tourData = (TourData) listItem;
-
-                     tourData.setTourType(null);
-                     em.merge(tourData);
-                  }
+                  tourData.setTourType(null);
+                  em.merge(tourData);
                }
 
                ts.commit();
 
             } catch (final Exception e) {
+
                StatusUtil.showStatus(e);
+
             } finally {
+
                if (ts.isActive()) {
                   ts.rollback();
                }
@@ -1731,7 +1733,6 @@ public class PrefPageTourType_Definitions extends PreferencePage implements IWor
          }
 
          returnResult = true;
-         em.close();
       }
 
       return returnResult;

@@ -28,7 +28,7 @@ import net.tourbook.database.TourDatabase;
 import org.eclipse.jface.viewers.TreeViewer;
 
 import jakarta.persistence.EntityManager;
-import jakarta.persistence.Query;
+import jakarta.persistence.TypedQuery;
 
 public class TVIEquipmentView_Root extends TVIEquipmentView_Item {
 
@@ -42,16 +42,13 @@ public class TVIEquipmentView_Root extends TVIEquipmentView_Item {
    }
 
    @Override
-   @SuppressWarnings("unchecked")
    protected void fetchChildren() {
+
+      final TreeViewer equipmentViewer = getEquipmentViewer();
 
       final Map<Long, TVIEquipmentView_Equipment> allEquipmentItems = new HashMap<>();
 
-      final EntityManager em = TourDatabase.getInstance().getEntityManager();
-      {
-         if (em == null) {
-            return;
-         }
+      try (final EntityManager em = TourDatabase.getInstance().getEntityManager()) {
 
          final EquipmentViewerType viewerType = getViewerType();
          final boolean isInEqTourViewer = EquipmentViewerType.IS_EQUIPMENT_VIEWER.equals(viewerType);
@@ -76,15 +73,13 @@ public class TVIEquipmentView_Root extends TVIEquipmentView_Item {
 
          final String sql = UI.EMPTY_STRING
 
-               + "SELECT" + NL //                                                      //$NON-NLS-1$
-               + " Equipment" + NL //                                                  //$NON-NLS-1$
-               + " FROM " + Equipment.class.getSimpleName() + " AS Equipment" + NL//   //$NON-NLS-1$ //$NON-NLS-2$
+               + "SELECT emEquipment" + NL //                                             //$NON-NLS-1$
+               + " FROM " + Equipment.class.getSimpleName() + " AS emEquipment" + NL//    //$NON-NLS-1$ //$NON-NLS-2$
          ;
 
-         final Query query = em.createQuery(sql);
+         final TypedQuery<Equipment> emQuery = em.createQuery(sql, Equipment.class);
 
-         final TreeViewer equipmentViewer = getEquipmentViewer();
-         final List<Equipment> allEquipment = query.getResultList();
+         final List<Equipment> allEquipment = emQuery.getResultList();
 
          /*
           * Create all equipment top items
@@ -190,7 +185,6 @@ public class TVIEquipmentView_Root extends TVIEquipmentView_Item {
             allEquipmentItems.put(equipment.getEquipmentId(), equipmentItem);
          }
       }
-      em.close();
 
       EquipmentLoader.loadSummarizedValues_Equipment(this, allEquipmentItems);
    }

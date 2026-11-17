@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2025 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2026 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -16,6 +16,7 @@
 package net.tourbook.tag;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
 
 import net.tourbook.data.TourTag;
@@ -23,17 +24,18 @@ import net.tourbook.data.TourTagCategory;
 
 public class TagCollection {
 
-   public ArrayList<TourTagCategory> tourTagCategories;
-   public ArrayList<TourTag>         tourTags;
+   public List<TourTagCategory> tourTagCategories;
+   public List<TourTag>         tourTags;
 
    public TagCollection() {}
 
-   public TagCollection(final ArrayList<TourTag> sortedTags) {
+   public TagCollection(final List<TourTag> sortedTags) {
+      
       tourTags = sortedTags;
    }
 
    public TagCollection(final Set<TourTag> tourTagsInOneTour) {
+      
       tourTags = new ArrayList<>(tourTagsInOneTour);
    }
-
 }

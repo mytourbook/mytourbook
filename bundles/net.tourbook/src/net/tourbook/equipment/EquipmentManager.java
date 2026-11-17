@@ -87,7 +87,7 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
 
 import jakarta.persistence.EntityManager;
-import jakarta.persistence.Query;
+import jakarta.persistence.TypedQuery;
 
 public class EquipmentManager {
 
@@ -1590,36 +1590,30 @@ public class EquipmentManager {
          final List<Equipment> allEquipments_ByName = new ArrayList<>();
          final List<Equipment> allEquipments_ByCollateIdOrName = new ArrayList<>();
 
-         final EntityManager em = TourDatabase.getInstance().getEntityManager();
-         if (em != null) {
+         try (final EntityManager em = TourDatabase.getInstance().getEntityManager()) {
 
-            final Query query = em.createQuery(UI.EMPTY_STRING
+            String sql = UI.EMPTY_STRING
 
-                  + "SELECT Equipment" + NL //                                               //$NON-NLS-1$
-                  + " FROM " + Equipment.class.getSimpleName() + " AS Equipment" + NL //     //$NON-NLS-1$ //$NON-NLS-2$
+                  + "SELECT emEquipment" + NL //                                                //$NON-NLS-1$
+                  + " FROM " + Equipment.class.getSimpleName() + " AS emEquipment" + NL //      //$NON-NLS-1$ //$NON-NLS-2$
 
                   // sort by name
-                  + " ORDER BY UPPER(Equipment.brand), UPPER(Equipment.model)" + NL //       //$NON-NLS-1$
-            );
+                  + " ORDER BY UPPER(emEquipment.brand), UPPER(emEquipment.model)" + NL //      //$NON-NLS-1$
+            ;
 
-            final List<?> resultList = query.getResultList();
+            final TypedQuery<Equipment> emQuery = em.createQuery(sql, Equipment.class);
 
-            for (final Object result : resultList) {
+            for (final Equipment equipment : emQuery.getResultList()) {
 
-               if (result instanceof final Equipment equipment) {
+               allEquipments_ByID.put(equipment.getEquipmentId(), equipment);
+               allEquipments_ByName.add(equipment);
+               allEquipments_ByCollateIdOrName.add(equipment);
 
-                  allEquipments_ByID.put(equipment.getEquipmentId(), equipment);
-                  allEquipments_ByName.add(equipment);
-                  allEquipments_ByCollateIdOrName.add(equipment);
+               for (final EquipmentPart part : equipment.getParts()) {
 
-                  for (final EquipmentPart part : equipment.getParts()) {
-
-                     allParts_ByID.put(part.getPartId(), part);
-                  }
+                  allParts_ByID.put(part.getPartId(), part);
                }
             }
-
-            em.close();
          }
 
          // sort by collate ID or name

@@ -15,7 +15,7 @@
  *******************************************************************************/
 package net.tourbook.tag;
 
-import java.util.ArrayList;
+import java.util.List;
 
 import net.tourbook.common.UI;
 import net.tourbook.data.TourTag;
@@ -25,7 +25,7 @@ import net.tourbook.database.TourDatabase;
 import org.eclipse.jface.viewers.TreeViewer;
 
 import jakarta.persistence.EntityManager;
-import jakarta.persistence.Query;
+import jakarta.persistence.TypedQuery;
 
 public class TVIPrefTagRoot extends TVIPrefTagItem {
 
@@ -47,77 +47,76 @@ public class TVIPrefTagRoot extends TVIPrefTagItem {
    @Override
    protected void fetchChildren() {
 
-      final EntityManager em = TourDatabase.getInstance().getEntityManager();
+      try (final EntityManager em = TourDatabase.getInstance().getEntityManager()) {
 
-      if (em == null) {
-         return;
+         if (_isTreeLayoutHierarchical) {
+
+            getItemsHierarchical(em);
+
+         } else {
+
+            getItemsFlat(em);
+         }
       }
-
-      if (_isTreeLayoutHierarchical) {
-         getItemsHierarchical(em);
-      } else {
-         getItemsFlat(em);
-      }
-
-      em.close();
    }
 
-   @SuppressWarnings("unchecked")
    private void getItemsFlat(final EntityManager em) {
 
       /*
-       * read tour tags from db
+       * Read tour tags from db
        */
-      final Query query = em.createQuery(
-            UI.EMPTY_STRING
+      final String sql = UI.EMPTY_STRING
 
-                  + "SELECT" //$NON-NLS-1$
+            + "SELECT emTag" //$NON-NLS-1$
+            + " FROM " + TourTag.class.getSimpleName() + " AS emTag "; //$NON-NLS-1$ //$NON-NLS-2$
 
-                  + " Tag" //$NON-NLS-1$
+      final TypedQuery<TourTag> emQuery = em.createQuery(sql, TourTag.class);
 
-                  + " FROM " + TourTag.class.getSimpleName() + " AS Tag " //$NON-NLS-1$ //$NON-NLS-2$
+      final List<TourTag> allTourTags = emQuery.getResultList();
 
-      );
+      for (final TourTag tourTag : allTourTags) {
 
-      final ArrayList<TourTag> tourTags = (ArrayList<TourTag>) query.getResultList();
-
-      for (final TourTag tourTag : tourTags) {
          final TVIPrefTag tagItem = new TVIPrefTag(getTagViewer(), tourTag);
          addChild(tagItem);
       }
    }
 
-   @SuppressWarnings("unchecked")
    private void getItemsHierarchical(final EntityManager em) {
 
       /*
-       * read tour tags from db
+       * Read tour tags from db
        */
-      Query query = em.createQuery(//
-            //
-            "SELECT tag" //$NON-NLS-1$
-                  + (" FROM " + TourTag.class.getSimpleName() + " AS tag ") //$NON-NLS-1$ //$NON-NLS-2$
-                  + (" WHERE tag.isRoot = 1")); //$NON-NLS-1$
+      String sql = UI.EMPTY_STRING
 
-      final ArrayList<TourTag> tourTags = (ArrayList<TourTag>) query.getResultList();
+            + "SELECT emTag" + NL //                                            //$NON-NLS-1$
+            + " FROM " + TourTag.class.getSimpleName() + " AS emTag " + NL //   //$NON-NLS-1$ //$NON-NLS-2$
+            + " WHERE emTag.isRoot = 1" + NL; //                                //$NON-NLS-1$
 
-      for (final TourTag tourTag : tourTags) {
+      final TypedQuery<TourTag> emTagQuery = em.createQuery(sql, TourTag.class);
+
+      final List<TourTag> allTourTags = emTagQuery.getResultList();
+
+      for (final TourTag tourTag : allTourTags) {
+
          final TVIPrefTag tagItem = new TVIPrefTag(getTagViewer(), tourTag);
          addChild(tagItem);
       }
 
       /*
-       * read tag categories from db
+       * Read tag categories from db
        */
-      query = em.createQuery(//
-            //
-            "SELECT tagCategory" //$NON-NLS-1$
-                  + (" FROM " + TourTagCategory.class.getSimpleName() + " AS tagCategory") //$NON-NLS-1$ //$NON-NLS-2$
-                  + (" WHERE tagCategory.isRoot = 1")); //$NON-NLS-1$
+      sql = UI.EMPTY_STRING
 
-      final ArrayList<TourTagCategory> tourTagCategories = (ArrayList<TourTagCategory>) query.getResultList();
+            + "SELECT emTagCategory" //$NON-NLS-1$
+            + " FROM " + TourTagCategory.class.getSimpleName() + " AS emTagCategory" //$NON-NLS-1$ //$NON-NLS-2$
+            + " WHERE emTagCategory.isRoot = 1";
 
-      for (final TourTagCategory tourTagCategory : tourTagCategories) {
+      final TypedQuery<TourTagCategory> emTagCatQuery = em.createQuery(sql, TourTagCategory.class);
+
+      final List<TourTagCategory> allTourTagCategories = emTagCatQuery.getResultList();
+
+      for (final TourTagCategory tourTagCategory : allTourTagCategories) {
+
          final TVIPrefTagCategory categoryItem = new TVIPrefTagCategory(getTagViewer(), tourTagCategory);
          addChild(categoryItem);
       }

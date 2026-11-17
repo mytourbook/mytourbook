@@ -41,7 +41,7 @@ import org.eclipse.swt.widgets.Display;
 
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityTransaction;
-import jakarta.persistence.Query;
+import jakarta.persistence.TypedQuery;
 
 /**
  * Manage tour marker types
@@ -146,21 +146,24 @@ public class TourMarkerTypeManager {
 
       boolean returnResult = false;
 
-      try {
+      try (final EntityManager em = TourDatabase.getInstance().getEntityManager()) {
 
          final long markerTypeID = selectedMarkerType.getId();
 
-         final EntityManager em = TourDatabase.getInstance().getEntityManager();
+         final String sql = UI.EMPTY_STRING
 
-         final Query query = em.createQuery(UI.EMPTY_STRING
+               + "SELECT emTourMarker" + NL //                                                  //$NON-NLS-1$
+               + " FROM " + TourMarker.class.getSimpleName() + " AS emTourMarker" + NL //       //$NON-NLS-1$ //$NON-NLS-2$
+               + " WHERE emTourMarker.tourMarkerType IS NOT NULL" + NL //                       //$NON-NLS-1$
+               + "   AND emTourMarker.tourMarkerType.markerTypeID = ?" + NL //                  //$NON-NLS-1$
+         ;
 
-               + "SELECT TourMarker" //$NON-NLS-1$
-               + " FROM " + TourMarker.class.getSimpleName() + " AS tourMarker" //$NON-NLS-1$ //$NON-NLS-2$
-               + " WHERE tourMarker.tourMarkerType IS NOT NULL AND tourMarker.tourMarkerType.markerTypeID = ?"); //$NON-NLS-1$
+         final TypedQuery<TourMarker> emQuery = em.createQuery(sql, TourMarker.class);
 
-         query.setParameter(1, markerTypeID);
+         emQuery.setParameter(1, markerTypeID);
 
-         final List<?> allTourMarker = query.getResultList();
+         final List<TourMarker> allTourMarker = emQuery.getResultList();
+         
          if (allTourMarker.size() > 0) {
 
             final EntityTransaction ts = em.getTransaction();
@@ -195,7 +198,6 @@ public class TourMarkerTypeManager {
          }
 
          returnResult = true;
-         em.close();
 
       } catch (final Exception e) {
 
@@ -209,9 +211,8 @@ public class TourMarkerTypeManager {
 
       boolean returnResult = false;
 
-      try {
+      try (final EntityManager em = TourDatabase.getInstance().getEntityManager()) {
 
-         final EntityManager em = TourDatabase.getInstance().getEntityManager();
          final EntityTransaction ts = em.getTransaction();
 
          try {
@@ -238,8 +239,6 @@ public class TourMarkerTypeManager {
             } else {
                returnResult = true;
             }
-
-            em.close();
          }
 
       } catch (final Exception e) {
