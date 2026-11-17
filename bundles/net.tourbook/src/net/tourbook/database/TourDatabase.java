@@ -2606,13 +2606,13 @@ public class TourDatabase {
 
                   + " WHERE " + NL //                                                              //$NON-NLS-1$
 
-                  + "   emTourLocation.latitudeMinE6_Resized_Normalized  <= ? AND " + NL //     1  //$NON-NLS-1$
-                  + "   emTourLocation.latitudeMaxE6_Resized_Normalized  >= ? AND " + NL //     2  //$NON-NLS-1$
+                  + "   emTourLocation.latitudeMinE6_Resized_Normalized  <= ?1 AND " + NL //    1  //$NON-NLS-1$
+                  + "   emTourLocation.latitudeMaxE6_Resized_Normalized  >= ?2 AND " + NL //    2  //$NON-NLS-1$
 
-                  + "   emTourLocation.longitudeMinE6_Resized_Normalized <= ? AND " + NL //     3  //$NON-NLS-1$
-                  + "   emTourLocation.longitudeMaxE6_Resized_Normalized >= ? AND " + NL //     4  //$NON-NLS-1$
+                  + "   emTourLocation.longitudeMinE6_Resized_Normalized <= ?3 AND " + NL //    3  //$NON-NLS-1$
+                  + "   emTourLocation.longitudeMaxE6_Resized_Normalized >= ?4 AND " + NL //    4  //$NON-NLS-1$
 
-                  + "   emTourLocation.zoomlevel >= ?" + NL //                                  5  //$NON-NLS-1$
+                  + "   emTourLocation.zoomlevel >= ?5" + NL //                                 5  //$NON-NLS-1$
             ;
 
             final TypedQuery<TourLocation> emQuery = em.createQuery(sql, TourLocation.class);
