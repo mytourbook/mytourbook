@@ -49,7 +49,6 @@ import org.eclipse.swt.widgets.Display;
 
 public class MigrateDerbyToH2 {
 
-   private static final char   NL             = UI.NEW_LINE;
    private static final String DERBY_DRIVER   = "org.apache.derby.jdbc.EmbeddedDriver";
    private static final String DERBY_PASSWORD = "adsf";
    private static final String DERBY_USER     = "USER";

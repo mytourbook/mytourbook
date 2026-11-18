@@ -387,7 +387,7 @@ public class TourDatabase {
    private static String                        EXTERNAL_DB_FILEPATH;
 
    /** H2 database file path, without tour db */
-   private static String                        H2_DB_FILEPATH;
+   static String                                H2_DB_FILEPATH;
 
    /** H2 jdbc connection url, with tour db */
    static String                                H2_DB_TOUR_DB_URL;
