@@ -53,14 +53,14 @@ public class MigrateDerbyToH2 {
    private static final String DERBY_PASSWORD = "adsf";
    private static final String DERBY_USER     = "USER";
 
-   private static String       DERBY_DATABASE_FILEPATH;
+   private static String       DERBY_DATABASE_FOLDER_PATH;
    private static String       DERBY_DB_TOURBOOK_URL;
 
    static {
 
-      DERBY_DATABASE_FILEPATH = Platform.getInstanceLocation().getURL().getPath() + "derby-database";
+      DERBY_DATABASE_FOLDER_PATH = Platform.getInstanceLocation().getURL().getPath() + "derby-database";
 
-      String derbyTourDbFilePath = DERBY_DATABASE_FILEPATH + "/" + TourDatabase.SQL_TOUR_DB_NAME;
+      String derbyTourDbFilePath = DERBY_DATABASE_FOLDER_PATH + "/" + TourDatabase.SQL_TOUR_DB_NAME;
 
       if (UI.IS_WIN && derbyTourDbFilePath.startsWith("/")) {
          derbyTourDbFilePath = derbyTourDbFilePath.substring(1);
@@ -221,38 +221,41 @@ public class MigrateDerbyToH2 {
    }
 
    /**
-    * @return Returns <code>true</code> when a Derby db is migrated or there is no Derby db at all.
+    * @return Returns <code>null</code> when there is no need to migrate<br>
+    *         Returns <code>true</code> when a Derby db is migrated<br>
     *         Returns <code>false</code> when there is a migration error and the app should not
-    *         continue.
+    *         continue
     */
-   public static boolean isMigrated() {
+   public static Boolean isMigrated() {
 
-      String derbyFilePath = DERBY_DATABASE_FILEPATH;
-      if (UI.IS_WIN && DERBY_DATABASE_FILEPATH.startsWith("/")) {
-         derbyFilePath = DERBY_DATABASE_FILEPATH.substring(1);
+      final Path h2DbFile = Paths.get(TourDatabase.H2_DB_FILE_PATH + ".mv.db");
+      if (Files.exists(h2DbFile)) {
+         // when H2 database file already exists -> do nothing
+         return null;
+      }
+
+      String derbyFilePath = DERBY_DATABASE_FOLDER_PATH;
+
+      if (UI.IS_WIN && DERBY_DATABASE_FOLDER_PATH.startsWith("/")) {
+         derbyFilePath = DERBY_DATABASE_FOLDER_PATH.substring(1);
       }
 
       final Path derbyPath = Paths.get(derbyFilePath);
 
       if (Files.exists(derbyPath) == false) {
 
-         // this is a new installation which do not contain a derby database
+         // this is a new installation which do not contain a derby db or the old derby db is deleted
 
-         return true;
+         return null;
       }
-
-      // debug h2 migration
-//      _prefStore.setValue(ITourbookPreferences.TOUR_DATABASE_IS_H2_MIGRATED, false);
-//      _prefStore.setValue(ITourbookPreferences.TOUR_DATABASE_IS_H2_MIGRATED, true);
 
       // this pref value is stored in
       // ..\workspace\.metadata\.plugins\org.eclipse.core.runtime\.settings\net.tourbook.prefs
-
       if (_prefStore.getBoolean(ITourbookPreferences.TOUR_DATABASE_IS_H2_MIGRATED)) {
 
          // MT is already migrated to H2
 
-         return true;
+         return null;
       }
 
       /*
@@ -261,7 +264,7 @@ public class MigrateDerbyToH2 {
       final String message = "This is a very special version of MyTourbook.\n\n"
             + "Before MyTourbook is working as before, the current tour database will be migrated to the new database H2.\n\n"
             + "The current tour database will not be modified any more but BEFORE proceeding, it is a good idea"
-            + " to have a backup of the current tour database which is located in\n\n%s\n\n".formatted(DERBY_DATABASE_FILEPATH)
+            + " to have a backup of the current tour database which is located in\n\n%s\n\n".formatted(DERBY_DATABASE_FOLDER_PATH)
             + "Should the migration start now?";
 
       if (new MessageDialog(
@@ -313,9 +316,12 @@ public class MigrateDerbyToH2 {
             }
          }
 
-         // ddisplay successfull migration
+         // display successfull migration
          final String message2 = "The tour database was migrated successfully from Derby to H2 !\n\n"
-               + "MyTourbook is now working as before.";
+               + "The old Derby tour database files in\n\n\"%s\"\n\ncan be deleted when all is working as it should.\n\n".formatted(
+                     DERBY_DATABASE_FOLDER_PATH)
+               + "MyTourbook is now restarting to have a clean startup." //
+         ;
 
          MessageDialog.openInformation(
                Display.getDefault().getActiveShell(),
@@ -330,13 +336,13 @@ public class MigrateDerbyToH2 {
 
    private static boolean isMigrated_All() {
 
-      final long start = System.nanoTime();
+      final long start = System.currentTimeMillis();
 
       if (migrate_10_DerbyToH2()) {
 
-         final long end = System.nanoTime();
+         final long end = System.currentTimeMillis();
 
-         _splashManager.setMessage(" Migration duration: %7.3f ms".formatted((float) (end - start) / 1000000));
+         _splashManager.setMessage(" Migration duration: %7.3f s".formatted((float) (end - start) / 1000));
 
          return true;
       }

@@ -17,19 +17,25 @@ package net.tourbook.database;
 
 import de.byteholder.geoclipse.preferences.IMappingPreferences;
 
+import java.io.IOException;
+
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.font.MTFont;
+import net.tourbook.common.util.StatusUtil;
+import net.tourbook.preferences.ITourbookPreferences;
 
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.layout.GridDataFactory;
+import org.eclipse.jface.preference.IPersistentPreferenceStore;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.window.Window;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.custom.BusyIndicator;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Font;
@@ -41,10 +47,12 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
+import org.eclipse.ui.PlatformUI;
 
 public class DialogCompressH2Database extends Dialog {
 
-   private static final IDialogSettings _state = TourbookPlugin.getState("net.tourbook.database.DialogCompressH2Database");//$NON-NLS-1$
+   private static final IDialogSettings  _state     = TourbookPlugin.getState("net.tourbook.database.DialogCompressH2Database");//$NON-NLS-1$
+   private static final IPreferenceStore _prefStore = TourbookPlugin.getPrefStore();
 
    /*
     * UI controls
@@ -87,14 +95,14 @@ public class DialogCompressH2Database extends Dialog {
 
       {
          /*
-          * Button: Inplace compress
+          * Button: Compress
           */
          _btnCompress = createButton(
                parent,
                IDialogConstants.CLIENT_ID + 2,
-               Messages.App_Db_Compress_Button_CompressInplace,
+               "Com&press...",
                false);
-         _btnCompress.setToolTipText(Messages.App_Db_Compress_Button_CompressInplace_Tooltip);
+         _btnCompress.setToolTipText("Compress the H2 database");
 
          _btnCompress.addSelectionListener(new SelectionAdapter() {
             @Override
@@ -161,17 +169,15 @@ public class DialogCompressH2Database extends Dialog {
             Messages.App_Db_Compress_DialogTitle,
             null,
 
-            NLS.bind(Messages.App_Db_Compress_Dialog_ConfirmCompress_Message, TourDatabase.H2_DB_FILEPATH),
+            NLS.bind(Messages.App_Db_Compress_Dialog_ConfirmCompress_Message, TourDatabase.H2_DB_FOLDER_PATH),
 
             MessageDialog.QUESTION,
 
-            // define buttons
-            new String[] {
-                  Messages.App_Db_Compress_Button_CompressDatabase,
-                  IDialogConstants.NO_LABEL },
+            1, // default button index
 
-            // default button index
-            1);
+            // set button labels
+            "Com&press",
+            Messages.App_Action_Cancel);
 
       return messageDialog.open() == Window.OK;
    }
@@ -184,15 +190,52 @@ public class DialogCompressH2Database extends Dialog {
 
       // disable compress buttons that it cannot be run twice -> db sizes would be wrong when running more than once
       _btnCompress.setEnabled(false);
+
+      final Display display = Display.getDefault();
+
+      if (new MessageDialog(display.getActiveShell(),
+
+            Messages.App_Db_Compress_DialogTitle,
+            null, // no title image
+
+            "The database will be compressed after the next restart of MyTourbook",
+            MessageDialog.QUESTION,
+
+            1, // default index
+
+            // define buttons
+            "Restart and Com&press",
+            Messages.App_Action_Cancel
+
+      ).open() == IDialogConstants.OK_ID) {
+
+         // set flag that the h2 should be compressed
+         _prefStore.setValue(ITourbookPreferences.TOUR_DATABASE_IS_COMPRESS_H2, true);
+
+         // force save pref store to file
+         if (_prefStore instanceof final IPersistentPreferenceStore prefStoreWithSave) {
+            try {
+               prefStoreWithSave.save();
+            } catch (final IOException e) {
+               StatusUtil.log(e);
+            }
+         }
+         display.asyncExec(() -> PlatformUI.getWorkbench().restart());
+      }
    }
 
    private void updateUI_ShowInitialDbSize() {
 
-      _dialogShell.getDisplay().asyncExec(() -> {
+      final Display display = _dialogShell.getDisplay();
 
-         final String logText = H2StorageTools.inspectAll();
+      display.asyncExec(() -> {
 
-         _txtLog.setText(logText);
+         BusyIndicator.showWhile(display, () -> {
+
+            final String logText = H2StorageTools.inspectAll();
+
+            _txtLog.setText(logText);
+         });
 
          final Point dialogSize = _dialogShell.getSize();
 

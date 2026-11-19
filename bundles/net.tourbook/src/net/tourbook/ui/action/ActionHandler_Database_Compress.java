@@ -43,11 +43,13 @@ public class ActionHandler_Database_Compress extends AbstractHandler {
 
       if (isExternalDatabase) {
 
+         // an external db is not supported
+
          MessageDialog.openInformation(
 
                Display.getDefault().getActiveShell(),
                Messages.App_Db_Compress_DialogTitle,
-               "This feature is currently only available for the internal tour database, however the external database is selected.");
+               "This feature is currently available only for the internal tour database H2, however the external database is selected.");
 
          return null;
       }

@@ -373,62 +373,65 @@ public class TourDatabase {
    private static final IPreferenceStore        _prefStore                  = TourbookPlugin.getPrefStore();
 
    /** H2 jdbc jar driver */
-   static final String                          H2_DRIVER                   = "org.h2.Driver";                   //$NON-NLS-1$
-
-   static final String                          H2_JDBC_CONNECTION_PROTOCOL = "jdbc:h2:";                        //$NON-NLS-1$
-   private static final String                  H2_EJB_HIBERNATE_DIALECT    = "org.hibernate.dialect.H2Dialect"; //$NON-NLS-1$
+   static final String                          H2_DRIVER                   = "org.h2.Driver";                                    //$NON-NLS-1$
+   static final String                          H2_JDBC_CONNECTION_PROTOCOL = "jdbc:h2:";                                         //$NON-NLS-1$
+   private static final String                  H2_EJB_HIBERNATE_DIALECT    = "org.hibernate.dialect.H2Dialect";                  //$NON-NLS-1$
 
    /** SQL tour database name */
-   static final String                          SQL_TOUR_DB_NAME            = "tourbook";                        //$NON-NLS-1$
+   static final String                          SQL_TOUR_DB_NAME            = "tourbook";                                         //$NON-NLS-1$
 
-   /**
-    * External database file path, this is used just for local data, e.g. fulltext search
-    */
-   private static String                        EXTERNAL_DB_FILEPATH;
+   /** H2 database folder path, without tour db */
+   static String                                H2_DB_FOLDER_PATH;
 
-   /** H2 database file path, without tour db */
-   static String                                H2_DB_FILEPATH;
+   /** H2 database file path, with tour db */
+   static String                                H2_DB_FILE_PATH;
 
    /** H2 jdbc connection url, with tour db */
    static String                                H2_DB_TOUR_DB_URL;
 
+   /**
+    * External database folder path, this is used just for local data, e.g. fulltext search
+    */
+   private static String                        EXTERNAL_DB_FOLDER_PATH;
+
    /** Sql database local file path, without tour db */
-   public static String                         SQL_DB_FILEPATH;
+   public static String                         SQL_DB_FOLDER_PATH;
    private static String                        SQL_DB_TOUR_DB_URL;
    private static String                        SQL_DB_DRIVER_CLASS;
    private static String                        SQL_DB_USERNAME;
    private static String                        SQL_DB_PASSWORD;
    private static String                        SQL_DB_HIBERNATE_DIALECT;
 
-//   private static NetworkServerControl           _server;
-
    private static volatile EntityManagerFactory _emFactory;
 
    private static ThreadPoolExecutor            _dbUpdateExecutor;
-   private static ArrayBlockingQueue<Long>      _dbUpdateQueue = new ArrayBlockingQueue<>(Util.NUMBER_OF_PROCESSORS);
+   private static ArrayBlockingQueue<Long>      _dbUpdateQueue              = new ArrayBlockingQueue<>(Util.NUMBER_OF_PROCESSORS);
 
    static {
 
       final String instanceLocation = Platform.getInstanceLocation().getURL().getPath();
 
-      H2_DB_FILEPATH = instanceLocation + "h2-database"; //$NON-NLS-1$
-      EXTERNAL_DB_FILEPATH = instanceLocation + "external-database"; //$NON-NLS-1$
+// SET_FORMATTING_OFF
 
-      if (UI.IS_WIN && H2_DB_FILEPATH.startsWith("/")) {
+      H2_DB_FOLDER_PATH       = instanceLocation + "h2-database";             //$NON-NLS-1$
+      EXTERNAL_DB_FOLDER_PATH = instanceLocation + "external-database";       //$NON-NLS-1$
 
-         // a leading / is causing an exception, e.g. /c:/...
-
-         H2_DB_FILEPATH = H2_DB_FILEPATH.substring(1);
-      }
-
-      H2_DB_TOUR_DB_URL = H2_JDBC_CONNECTION_PROTOCOL + H2_DB_FILEPATH + "/" + SQL_TOUR_DB_NAME + ";AUTO_SERVER=TRUE";
-
-      if (UI.IS_WIN && EXTERNAL_DB_FILEPATH.startsWith("/")) {
+      if (UI.IS_WIN && H2_DB_FOLDER_PATH.startsWith("/")) {                   //$NON-NLS-1$
 
          // a leading / is causing an exception, e.g. /c:/...
-
-         EXTERNAL_DB_FILEPATH = EXTERNAL_DB_FILEPATH.substring(1);
+         H2_DB_FOLDER_PATH = H2_DB_FOLDER_PATH.substring(1);
       }
+
+      H2_DB_FILE_PATH   = H2_DB_FOLDER_PATH + "/" + SQL_TOUR_DB_NAME;                              //$NON-NLS-1$
+      H2_DB_TOUR_DB_URL = H2_JDBC_CONNECTION_PROTOCOL + H2_DB_FILE_PATH + ";AUTO_SERVER=TRUE";     //$NON-NLS-1$
+
+      if (UI.IS_WIN && EXTERNAL_DB_FOLDER_PATH.startsWith("/")) {             //$NON-NLS-1$
+
+         // a leading / is causing an exception, e.g. /c:/...
+         EXTERNAL_DB_FOLDER_PATH = EXTERNAL_DB_FOLDER_PATH.substring(1);
+      }
+
+// SET_FORMATTING_ON
 
       final ThreadFactory updateThreadFactory = runnable -> {
 
@@ -942,7 +945,7 @@ public class TourDatabase {
          final String externalDbName                     = _prefStore.getString(ITourbookPreferences.TOUR_DATABASE_EXTERNAL_DATABASE_NAME);
          final String externalHibernateDialect           = _prefStore.getString(ITourbookPreferences.TOUR_DATABASE_EXTERNAL_HIBERNATE_DIALECT);
 
-         SQL_DB_FILEPATH            = EXTERNAL_DB_FILEPATH;
+         SQL_DB_FOLDER_PATH         = EXTERNAL_DB_FOLDER_PATH;
 
          SQL_DB_DRIVER_CLASS        = externalJdbcDriver;
          SQL_DB_TOUR_DB_URL         = externalConnectionUrl + externalDbName + externalConnectionUrl_Parameters;
@@ -976,7 +979,7 @@ public class TourDatabase {
          logging = ";TRACE_LEVEL_FILE=3";                               //$NON-NLS-1$
          logging = ";TRACE_LEVEL_SYSTEM_OUT=0;TRACE_LEVEL_FILE=1";      //$NON-NLS-1$
 
-         SQL_DB_FILEPATH            = H2_DB_FILEPATH;
+         SQL_DB_FOLDER_PATH         = H2_DB_FOLDER_PATH;
 
          SQL_DB_DRIVER_CLASS        = H2_DRIVER;
          SQL_DB_TOUR_DB_URL         = H2_DB_TOUR_DB_URL + logging;

@@ -30,48 +30,93 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
+import net.tourbook.Messages;
+import net.tourbook.application.SplashManager;
 import net.tourbook.common.UI;
+import net.tourbook.common.util.StatusUtil;
 
+import org.eclipse.jface.dialogs.IDialogConstants;
+import org.eclipse.jface.dialogs.MessageDialog;
+import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Shell;
 import org.h2.mvstore.MVStoreTool;
 
 public class H2StorageTools {
 
-   public static void compactH2Database(final String dbFilePathWithoutExtension) {
+   public static void compactH2Database() {
 
-      final Path mvDbFile = Paths.get(dbFilePathWithoutExtension + ".mv.db");
-      final Path lockFile = Paths.get(dbFilePathWithoutExtension + ".lock.db");
+      final Display display = Display.getDefault();
+      final Shell shell = display.getActiveShell();
 
-      // 1. Only compact if the database already exists
+      if (new MessageDialog(shell,
+
+            Messages.App_Db_Compress_DialogTitle,
+            null, // no title image
+
+            "Compress tour database now?",
+            MessageDialog.QUESTION,
+
+            1, // default index
+
+            "Com&press Now",
+            Messages.App_Action_Cancel
+
+      ).open() != IDialogConstants.OK_ID) {
+         return;
+      }
+
+      final Path mvDbFile = Paths.get(TourDatabase.H2_DB_FILE_PATH + ".mv.db");
+      final Path lockFile = Paths.get(TourDatabase.H2_DB_FILE_PATH + ".lock.db");
+
+      // Only compact if the database already exists
       if (!Files.exists(mvDbFile)) {
          return;
       }
 
-      // 2. Abort if another MyTourbook instance or external tool currently holds the lock
+      // Abort if an external tool currently holds the lock
       if (Files.exists(lockFile)) {
-         System.out.println("H2 database is locked by another process; skipping startup compaction.");
+
+         MessageDialog.openInformation(shell,
+               Messages.App_Db_Compress_DialogTitle,
+               "H2 database is locked by another process; skipping startup compression");
+
          return;
       }
 
       try {
+
          final long sizeBeforeBytes = Files.size(mvDbFile);
          final long startTime = System.nanoTime();
 
-         // 3. Compact offline before opening any JDBC connection (safe with AUTO_SERVER=TRUE)
+         // BusyIndicator.showWhile is not working
+         final SplashManager splashManager = SplashManager.getInstance();
+         splashManager.setMessage("Compressing %s".formatted(mvDbFile));
+
+         // Compact offline before opening any JDBC connection (safe with AUTO_SERVER=TRUE)
          MVStoreTool.compact(mvDbFile.toString(), true);
 
          final long durationMs = TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - startTime);
          final long sizeAfterBytes = Files.size(mvDbFile);
          final long savedBytes = sizeBeforeBytes - sizeAfterBytes;
 
-         System.out.println("H2 compaction finished in %d ms | Before: %.2f MB | After: %.2f MB | Saved: %.2f MB".formatted(
-               durationMs,
-               sizeBeforeBytes / (1024.0 * 1024.0),
-               sizeAfterBytes / (1024.0 * 1024.0),
-               savedBytes / (1024.0 * 1024.0)));
+         final String message = UI.EMPTY_STRING
+
+               + "H2 compression finished in %d ms\n\nBefore:\t%8.2f MB\nAfter:\t%8.2f MB\nSaved:\t%8.2f MB".formatted(
+
+                     durationMs,
+                     sizeBeforeBytes / (1024.0 * 1024.0),
+                     sizeAfterBytes / (1024.0 * 1024.0),
+                     savedBytes / (1024.0 * 1024.0));
+
+         splashManager.setMessage(message);
+
+         MessageDialog.openInformation(shell,
+               Messages.App_Db_Compress_DialogTitle,
+               message);
 
       } catch (final Exception e) {
-         System.err.println("H2 startup compaction failed: " + e.getMessage());
-         e.printStackTrace();
+
+         StatusUtil.log("H2 startup compression failed: " + e.getMessage(), e);
       }
    }
 
@@ -326,16 +371,16 @@ public class H2StorageTools {
 
       final List<List<String>> rows = List.of(
 
-            List.of("Total .mv.db File Size",      formatBytes(fileSize)),
-            List.of("Tables & Indexes",            formatBytes(tablesAndIndexesBytes)),
-            List.of("BLOBs & CLOBs",               formatBytes(lobBytes)),
-            List.of("Total Active Data",           formatBytes(active)),
-            List.of("Unallocated/Dead Space",      formatBytes(deadBytes)),
+            List.of("Total .mv.db File Size",         formatBytes(fileSize)),
+            List.of("Tables & Indexes",               formatBytes(tablesAndIndexesBytes)),
+            List.of("BLOBs & CLOBs",                  formatBytes(lobBytes)),
+            List.of("Total Active Data",              formatBytes(active)),
+            List.of("Unallocated/Dead Space",         formatBytes(deadBytes)),
 
-            List.of(UI.EMPTY_STRING,               UI.EMPTY_STRING),
+            List.of(UI.EMPTY_STRING,                  UI.EMPTY_STRING),
 
-            List.of("Chunk Fill Rate",             stats.getOrDefault("info.CHUNKS_FILL_RATE", "N/A") + "%"),
-            List.of("Dead Pages", "%,d# / %,d#"   .formatted(numPages - numLivePages, numPages) ) //
+            List.of("Chunk Fill Rate",                stats.getOrDefault("info.CHUNKS_FILL_RATE", "N/A") + "%"),
+            List.of("Dead/All Pages", "%,d# / %,d#"   .formatted(numPages - numLivePages, numPages) ) //
             );
 
 // SET_FORMATTING_ON

@@ -1052,7 +1052,7 @@ public class FTSearchManager {
     */
    private static java.nio.file.Path getLuceneIndexRootPath() {
 
-      final Path osgiDbPath = new Path(TourDatabase.SQL_DB_FILEPATH);
+      final Path osgiDbPath = new Path(TourDatabase.SQL_DB_FOLDER_PATH);
       final IPath osgiIndexPath = osgiDbPath.append(LUCENE_INDEX_FOLDER_NAME);
 
       // convert osgi to java path

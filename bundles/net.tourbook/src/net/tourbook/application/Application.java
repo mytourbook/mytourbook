@@ -29,13 +29,17 @@ import net.tourbook.Messages;
 import net.tourbook.common.UI;
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.Util;
+import net.tourbook.database.H2StorageTools;
 import net.tourbook.database.MigrateDerbyToH2;
+import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.preferences.PrefPageGeneral_System;
 
 import org.eclipse.equinox.app.IApplication;
 import org.eclipse.equinox.app.IApplicationContext;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.dialogs.MessageDialog;
+import org.eclipse.jface.preference.IPersistentPreferenceStore;
+import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IWorkbench;
@@ -46,26 +50,28 @@ import org.eclipse.ui.PlatformUI;
  */
 public class Application implements IApplication {
 
-   private static final String LOCALHOST                   = "127.0.0.1";                                            //$NON-NLS-1$
-   private static final String INSTANCE_MESSAGE_SET_FOCUS  = "INSTANCE_MESSAGE_SET_FOCUS";                           //$NON-NLS-1$
+   private static final String           LOCALHOST                   = "127.0.0.1";                                            //$NON-NLS-1$
+   private static final String           INSTANCE_MESSAGE_SET_FOCUS  = "INSTANCE_MESSAGE_SET_FOCUS";                           //$NON-NLS-1$
+
+   private static final IPreferenceStore _prefStore                  = TourbookPlugin.getPrefStore();
 
    /**
     * Choose a unique, unused port
     * <p>
     * 1024 to 49151 (Registered Ports): Best for user applications and custom servers.
     */
-   private static final int    PORT                        = 37217;
+   private static final int              PORT                        = 37217;
 
-   private static ServerSocket _serverSocket;
+   private static ServerSocket           _serverSocket;
 
-   private static final String SYS_PROP__NO_INSTANCE_CHECK = "noInstanceCheck";                                      //$NON-NLS-1$
+   private static final String           SYS_PROP__NO_INSTANCE_CHECK = "noInstanceCheck";                                      //$NON-NLS-1$
 
    /**
     * When this parameter is set, then another instance of MT is not checked during the app startup
     * <p>
     * Commandline parameter: <code>-DnoInstanceCheck</code>
     */
-   private static boolean      IS_INSTANCE_CHECK           = System.getProperty(SYS_PROP__NO_INSTANCE_CHECK) == null;
+   private static boolean                IS_INSTANCE_CHECK           = System.getProperty(SYS_PROP__NO_INSTANCE_CHECK) == null;
 
    static {
 
@@ -150,6 +156,9 @@ public class Application implements IApplication {
 
       final Display display = PlatformUI.createDisplay();
 
+      // ensure that the splash can display messages
+      SplashManager.getInstance().open();
+
       try {
 
          if (IS_INSTANCE_CHECK) {
@@ -181,14 +190,43 @@ public class Application implements IApplication {
             startInstanceListenerThread();
          }
 
-         if (MigrateDerbyToH2.isMigrated() == false) {
+         final Boolean isMigrated = MigrateDerbyToH2.isMigrated();
+
+         if (isMigrated == null) {
+
+            // this is a normal startup
+
+         } else if (Boolean.TRUE.equals(isMigrated)) {
+
+            // do a clean startup
+
+            display.asyncExec(() -> PlatformUI.getWorkbench().restart());
+
+         } else if (Boolean.FALSE.equals(isMigrated)) {
 
             // exit immediately -> there needs some user actions
 
             return IApplication.EXIT_OK;
          }
 
-         // 3. Normal Eclipse RCP startup sequence
+         if (_prefStore.getBoolean(ITourbookPreferences.TOUR_DATABASE_IS_COMPRESS_H2)) {
+
+            // prevent to do it a second time
+            _prefStore.setValue(ITourbookPreferences.TOUR_DATABASE_IS_COMPRESS_H2, false);
+
+            // force save pref store to file
+            if (_prefStore instanceof final IPersistentPreferenceStore prefStoreWithSave) {
+               try {
+                  prefStoreWithSave.save();
+               } catch (final IOException e) {
+                  StatusUtil.log(e);
+               }
+            }
+
+            H2StorageTools.compactH2Database();
+         }
+
+         // Normal Eclipse RCP startup sequence
          final int returnCode = PlatformUI.createAndRunWorkbench(display, new ApplicationWorkbenchAdvisor());
 
          if (returnCode == PlatformUI.RETURN_RESTART) {
