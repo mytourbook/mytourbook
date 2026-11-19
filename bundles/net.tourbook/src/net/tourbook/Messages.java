@@ -222,26 +222,8 @@ public class Messages extends NLS {
    public static String        App_Cadence_Rpm;
    public static String        App_Cadence_Spm;
 
-   public static String        App_Db_Compress_Button_CompressByCopying;
-   public static String        App_Db_Compress_Button_CompressByCopying_Tooltip;
-   public static String        App_Db_Compress_Button_CompressDatabase;
-   public static String        App_Db_Compress_Button_CompressInplace;
-   public static String        App_Db_Compress_Button_CompressInplace_Tooltip;
    public static String        App_Db_Compress_DialogTitle;
    public static String        App_Db_Compress_Dialog_ConfirmCompress_Message;
-   public static String        App_Db_Compress_LogHeader_After;
-   public static String        App_Db_Compress_LogHeader_Before;
-   public static String        App_Db_Compress_LogHeader_Difference;
-   public static String        App_Db_Compress_LogLabel_After;
-   public static String        App_Db_Compress_LogLabel_Before;
-   public static String        App_Db_Compress_LogLabel_Difference;
-   public static String        App_Db_Compress_LogLabel_Index;
-   public static String        App_Db_Compress_LogLabel_NotUsed;
-   public static String        App_Db_Compress_LogLabel_Table;
-   public static String        App_Db_Compress_LogLabel_Totals;
-   public static String        App_Db_Compress_LogLabel_Used;
-   public static String        App_Db_Compress_Monitor_SubTask;
-   public static String        App_Db_Compress_Monitor_Task;
    public static String        app_db_consistencyCheck_checkFailed;
    public static String        app_db_consistencyCheck_checkIsOK;
    public static String        app_db_consistencyCheck_dlgTitle;

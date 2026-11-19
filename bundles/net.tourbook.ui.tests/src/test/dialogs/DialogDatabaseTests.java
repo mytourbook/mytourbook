@@ -21,6 +21,7 @@ import net.tourbook.Messages;
 import net.tourbook.common.UI;
 
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotShell;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import utils.UITest;
@@ -31,6 +32,7 @@ public class DialogDatabaseTests extends UITest {
    private static final char NL = UI.NEW_LINE;
 
    @Test
+   @Disabled // compress is completly different with H2
    void testCompressDatabase() {
 
       bot.menu("Help").menu("Compress Database...").click(); //$NON-NLS-1$ //$NON-NLS-2$
