@@ -32,16 +32,16 @@ class TourDataCache {
    private final ConcurrentHashMap<Long, TourData> _tourCache;
    private final Queue<Long>                       _fifoQueue;
 
-   private int                                     _cacheSize;
+   private int                                     _numCacheItems;
    private int                                     _cacheLowMark;
 
-   public TourDataCache(final int cacheSize) {
+   public TourDataCache(final int numCacheItems) {
 
-      _cacheSize = cacheSize;
-      _cacheLowMark = Math.max(1, cacheSize - 100);
+      _numCacheItems = numCacheItems;
+      _cacheLowMark = Math.max(1, numCacheItems - 100);
 
       _tourCache = new ConcurrentHashMap<>();
-      _fifoQueue = new ArrayBlockingQueue<>(_cacheSize);
+      _fifoQueue = new ArrayBlockingQueue<>(_numCacheItems);
    }
 
    public void clear() {
@@ -74,7 +74,7 @@ class TourDataCache {
             final int fifoQueueSize = _fifoQueue.size();
 
             // MUST test with >= otherwise a Queue full exceptions occurs
-            if (fifoQueueSize >= _cacheSize) {
+            if (fifoQueueSize >= _numCacheItems) {
 
 //               final long start = System.nanoTime();
 

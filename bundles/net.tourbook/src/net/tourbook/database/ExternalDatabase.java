@@ -56,7 +56,6 @@ public class ExternalDatabase {
    private static String                 _configDbName;
    private static String                 _configDbUsername;
    private static String                 _configDbPassword;
-   private static String                 _configHibernateDialect;
    private static String                 _configJarDownloadUrl;
    private static String                 _configJdbcDriver;
 
@@ -74,19 +73,6 @@ public class ExternalDatabase {
       }
 
       _externalDbPath = Paths.get(instanceLocation, FOLDER_EXTERNAL_DB);
-   }
-
-   private static void checkAndCreateDb() throws SQLException {
-
-//      final String sql = "CREATE DATABASE IF NOT EXISTS " + TourDatabase.SQL_DB_TOURBOOK;
-//
-//      try (Connection conn = DriverManager.getConnection(_configConnectionUrl, _configDbUsername, _configDbPassword);
-//            Statement stmt = conn.createStatement()) {
-//
-//         stmt.executeUpdate(sql);
-//
-//         TourLogManager.log_DEFAULT("Database checked and verified/created successfully");
-//      }
    }
 
    /**
@@ -299,7 +285,6 @@ public class ExternalDatabase {
       _configDbUsername                = _prefStore.getString(ITourbookPreferences.TOUR_DATABASE_EXTERNAL_DATABASE_USERNAME);
       _configDbPassword                = _prefStore.getString(ITourbookPreferences.TOUR_DATABASE_EXTERNAL_DATABASE_PASSWORD);
       _configDbName                    = _prefStore.getString(ITourbookPreferences.TOUR_DATABASE_EXTERNAL_DATABASE_NAME);
-      _configHibernateDialect          = _prefStore.getString(ITourbookPreferences.TOUR_DATABASE_EXTERNAL_HIBERNATE_DIALECT);
 
       _connectionUrl_Concatenated = _configConnectionUrl + _configDbName + _configConnectionUrl_Parameters;
 

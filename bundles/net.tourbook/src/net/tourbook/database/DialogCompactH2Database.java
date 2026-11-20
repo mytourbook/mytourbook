@@ -49,9 +49,9 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.PlatformUI;
 
-public class DialogCompressH2Database extends Dialog {
+public class DialogCompactH2Database extends Dialog {
 
-   private static final IDialogSettings  _state     = TourbookPlugin.getState("net.tourbook.database.DialogCompressH2Database");//$NON-NLS-1$
+   private static final IDialogSettings  _state     = TourbookPlugin.getState("net.tourbook.database.DialogCompactH2Database");//$NON-NLS-1$
    private static final IPreferenceStore _prefStore = TourbookPlugin.getPrefStore();
 
    /*
@@ -60,11 +60,11 @@ public class DialogCompressH2Database extends Dialog {
    private Text   _txtLog;
    private Font   _monoFont;
 
-   private Button _btnCompress;
+   private Button _btnCompact;
 
    private Shell  _dialogShell;
 
-   public DialogCompressH2Database() {
+   public DialogCompactH2Database() {
 
       super(Display.getDefault().getActiveShell());
 
@@ -80,7 +80,7 @@ public class DialogCompressH2Database extends Dialog {
       _dialogShell = shell;
 
       // set window title
-      shell.setText(Messages.App_Db_Compress_DialogTitle);
+      shell.setText(Messages.Dialog_CompactDb_Title);
 
       shell.addDisposeListener(e -> {
 
@@ -95,19 +95,19 @@ public class DialogCompressH2Database extends Dialog {
 
       {
          /*
-          * Button: Compress
+          * Button: Compact
           */
-         _btnCompress = createButton(
+         _btnCompact = createButton(
                parent,
                IDialogConstants.CLIENT_ID + 2,
-               "Com&press...",
+               "Com&pact...",
                false);
-         _btnCompress.setToolTipText("Compress the H2 database");
+         _btnCompact.setToolTipText("Compact the H2 database");
 
-         _btnCompress.addSelectionListener(new SelectionAdapter() {
+         _btnCompact.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(final SelectionEvent e) {
-               onCompress(true);
+               onCompact(true);
             }
          });
       }
@@ -162,55 +162,55 @@ public class DialogCompressH2Database extends Dialog {
       }
    }
 
-   private boolean isConfirmCompress() {
+   private boolean isConfirmCompact() {
 
       final MessageDialog messageDialog = new MessageDialog(getShell(),
 
-            Messages.App_Db_Compress_DialogTitle,
+            Messages.Dialog_CompactDb_Title,
             null,
 
-            NLS.bind(Messages.App_Db_Compress_Dialog_ConfirmCompress_Message, TourDatabase.H2_DB_FOLDER_PATH),
+            NLS.bind(Messages.Dialog_CompactDb_BackupWarning_Message, TourDatabase.H2_DB_FOLDER_PATH),
 
             MessageDialog.QUESTION,
 
             1, // default button index
 
             // set button labels
-            "Com&press",
+            "Com&pact",
             Messages.App_Action_Cancel);
 
       return messageDialog.open() == Window.OK;
    }
 
-   private void onCompress(final boolean isInplace) {
+   private void onCompact(final boolean isInplace) {
 
-      if (isConfirmCompress() == false) {
+      if (isConfirmCompact() == false) {
          return;
       }
 
-      // disable compress buttons that it cannot be run twice -> db sizes would be wrong when running more than once
-      _btnCompress.setEnabled(false);
+      // disable compact buttons that it cannot be run twice -> db sizes would be wrong when running more than once
+      _btnCompact.setEnabled(false);
 
       final Display display = Display.getDefault();
 
       if (new MessageDialog(display.getActiveShell(),
 
-            Messages.App_Db_Compress_DialogTitle,
+            Messages.Dialog_CompactDb_Title,
             null, // no title image
 
-            "The database will be compressed after the next restart of MyTourbook",
+            "The database will be compacted after the next restart of MyTourbook",
             MessageDialog.QUESTION,
 
             1, // default index
 
             // define buttons
-            "Restart and Com&press",
+            "Restart and Com&pact",
             Messages.App_Action_Cancel
 
       ).open() == IDialogConstants.OK_ID) {
 
-         // set flag that the h2 should be compressed
-         _prefStore.setValue(ITourbookPreferences.TOUR_DATABASE_IS_RUN_TOOL_COMPRESS_H2, true);
+         // set flag that the h2 should be compacted
+         _prefStore.setValue(ITourbookPreferences.TOUR_DATABASE_IS_RUN_TOOL_COMPACT_H2, true);
 
          // force save pref store to file
          if (_prefStore instanceof final IPersistentPreferenceStore prefStoreWithSave) {
@@ -232,7 +232,7 @@ public class DialogCompressH2Database extends Dialog {
 
          BusyIndicator.showWhile(display, () -> {
 
-            final String logText = H2StorageTools.inspectAll();
+            final String logText = H2CompactDatabase.inspectAll();
 
             _txtLog.setText(logText);
          });

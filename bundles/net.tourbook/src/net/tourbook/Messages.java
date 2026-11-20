@@ -222,11 +222,8 @@ public class Messages extends NLS {
    public static String        App_Cadence_Rpm;
    public static String        App_Cadence_Spm;
 
-   public static String        App_Db_Compress_DialogTitle;
-   public static String        App_Db_Compress_Dialog_ConfirmCompress_Message;
    public static String        app_db_consistencyCheck_checkFailed;
    public static String        app_db_consistencyCheck_checkIsOK;
-   public static String        app_db_consistencyCheck_dlgTitle;
 
    public static String        App_Default_PersonFirstName;
 
@@ -523,6 +520,11 @@ public class Messages extends NLS {
    public static String        Dialog_BeverageContainer_Label_Name;
    public static String        Dialog_BeverageContainer_Title_Create;
    public static String        Dialog_BeverageContainer_Title_Edit;
+
+   public static String        Dialog_CompactDb_Title;
+   public static String        Dialog_CompactDb_BackupWarning_Message;
+
+   public static String        Dialog_ConsistencyCheck_Title;
 
    public static String        Dialog_CreateTourMarkers_Button_CreateMarkers;
    public static String        Dialog_CreateTourMarkers_Button_ValidateMarkers;

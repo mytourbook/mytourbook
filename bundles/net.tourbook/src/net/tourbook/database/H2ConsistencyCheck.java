@@ -67,7 +67,7 @@ public class H2ConsistencyCheck {
 
       @Override
       public void write(final WriteBuffer buff, final Object obj) {
-         throw new UnsupportedOperationException("Read-only verification");
+         throw new UnsupportedOperationException("Read-only verification"); //$NON-NLS-1$
       }
    }
 
@@ -86,7 +86,7 @@ public class H2ConsistencyCheck {
       _splashManager.setMessage(message);
 
       MessageDialog.openInformation(Display.getDefault().getActiveShell(),
-            Messages.App_Db_Compress_DialogTitle,
+            Messages.Dialog_ConsistencyCheck_Title,
             message);
    }
 
@@ -95,7 +95,7 @@ public class H2ConsistencyCheck {
     */
    private static boolean verify_10_All() {
 
-      final Path dbFilePath = Paths.get(TourDatabase.H2_DB_FILE_PATH + ".mv.db");
+      final Path dbFilePath = Paths.get(TourDatabase.H2_DB_FILE_PATH + ".mv.db"); //$NON-NLS-1$
 
       // Stage 1: Offline MVStore page & chunk header check
       if (dbFilePath != null && Files.exists(dbFilePath)) {
@@ -164,7 +164,7 @@ public class H2ConsistencyCheck {
       int numLines = 0;
 
       try (Statement stmt = conn.createStatement();
-            ResultSet rs = stmt.executeQuery("SCRIPT NOPASSWORDS")) {
+            ResultSet rs = stmt.executeQuery("SCRIPT NOPASSWORDS")) { //$NON-NLS-1$
 
          while (rs.next()) {
 
@@ -195,7 +195,7 @@ public class H2ConsistencyCheck {
                                   COLUMN_NAME
                                 FROM INFORMATION_SCHEMA.INDEX_COLUMNS
                                 WHERE TABLE_SCHEMA NOT IN ('INFORMATION_SCHEMA', 'PG_CATALOG')
-                                """;
+                                """; //$NON-NLS-1$
 
       final List<String> scanQueries = new ArrayList<>();
 
@@ -204,11 +204,11 @@ public class H2ConsistencyCheck {
 
          while (rs.next()) {
 
-            final String schema = rs.getString("TABLE_SCHEMA");
-            final String table = rs.getString("TABLE_NAME");
-            final String column = rs.getString("COLUMN_NAME");
+            final String schema = rs.getString("TABLE_SCHEMA"); //$NON-NLS-1$
+            final String table = rs.getString("TABLE_NAME"); //$NON-NLS-1$
+            final String column = rs.getString("COLUMN_NAME"); //$NON-NLS-1$
 
-            scanQueries.add("SELECT COUNT(\"%s\") FROM \"%s\".\"%s\" WHERE \"%s\" IS NOT NULL".formatted(
+            scanQueries.add("SELECT COUNT(\"%s\") FROM \"%s\".\"%s\" WHERE \"%s\" IS NOT NULL".formatted( //$NON-NLS-1$
                   column,
                   schema,
                   table,

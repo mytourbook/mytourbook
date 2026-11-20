@@ -64,7 +64,7 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
        * Tour database, default is internal H2
        */
       store.setDefault(ITourbookPreferences.TOUR_DATABASE_IS_RUN_TOOL_CHECK_H2_CONSISTENCY,  false);
-      store.setDefault(ITourbookPreferences.TOUR_DATABASE_IS_RUN_TOOL_COMPRESS_H2,           false);
+      store.setDefault(ITourbookPreferences.TOUR_DATABASE_IS_RUN_TOOL_COMPACT_H2,            false);
       store.setDefault(ITourbookPreferences.TOUR_DATABASE_IS_EXTERNAL,                       false);
       store.setDefault(ITourbookPreferences.TOUR_DATABASE_IS_H2_MIGRATED,                    false);
 

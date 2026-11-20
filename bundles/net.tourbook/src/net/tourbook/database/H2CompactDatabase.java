@@ -39,34 +39,33 @@ import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
-import org.h2.mvstore.MVStoreTool;
 
-public class H2StorageTools {
+public class H2CompactDatabase {
 
-   public static void compressH2Database() {
+   public static void compactH2Database() {
 
       final Display display = Display.getDefault();
       final Shell shell = display.getActiveShell();
 
       if (new MessageDialog(shell,
 
-            Messages.App_Db_Compress_DialogTitle,
+            Messages.Dialog_CompactDb_Title,
             null, // no title image
 
-            "Compress tour database now?",
+            "Compact tour database now?",
             MessageDialog.QUESTION,
 
             1, // default index
 
-            "Com&press Now",
+            "Com&pact Now",
             Messages.App_Action_Cancel
 
       ).open() != IDialogConstants.OK_ID) {
          return;
       }
 
-      final Path mvDbFile = Paths.get(TourDatabase.H2_DB_FILE_PATH + ".mv.db");
-      final Path lockFile = Paths.get(TourDatabase.H2_DB_FILE_PATH + ".lock.db");
+      final Path mvDbFile = Paths.get(TourDatabase.H2_DB_FILE_PATH + ".mv.db"); //$NON-NLS-1$
+      final Path lockFile = Paths.get(TourDatabase.H2_DB_FILE_PATH + ".lock.db"); //$NON-NLS-1$
 
       // Only compact if the database already exists
       if (!Files.exists(mvDbFile)) {
@@ -77,8 +76,8 @@ public class H2StorageTools {
       if (Files.exists(lockFile)) {
 
          MessageDialog.openInformation(shell,
-               Messages.App_Db_Compress_DialogTitle,
-               "H2 database is locked by another process; skipping startup compression");
+               Messages.Dialog_CompactDb_Title,
+               "H2 database is locked by another process; skipping startup compaction");
 
          return;
       }
@@ -90,10 +89,21 @@ public class H2StorageTools {
 
          // BusyIndicator.showWhile is not working
          final SplashManager splashManager = SplashManager.getInstance();
-         splashManager.setMessage("Compressing %s".formatted(mvDbFile));
+         splashManager.setMessage("Compacting %s".formatted(mvDbFile));
 
          // Compact offline before opening any JDBC connection (safe with AUTO_SERVER=TRUE)
-         MVStoreTool.compact(mvDbFile.toString(), true);
+//         MVStoreTool.compact(mvDbFile.toString(), true);
+
+         try (Connection conn = TourDatabase.getInstance().getConnection();
+               Statement stmt = conn.createStatement()) {
+
+            stmt.execute("SHUTDOWN COMPACT"); //$NON-NLS-1$
+
+         } catch (final Exception e) {
+
+            // Log via StatusUtil if DB doesn't exist yet or is locked
+            StatusUtil.log(e);
+         }
 
          final long durationMs = TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - startTime);
          final long sizeAfterBytes = Files.size(mvDbFile);
@@ -101,7 +111,7 @@ public class H2StorageTools {
 
          final String message = UI.EMPTY_STRING
 
-               + "H2 compression finished in %d ms\n\nBefore:\t%8.2f MB\nAfter:\t%8.2f MB\nSaved:\t%8.2f MB".formatted(
+               + "H2 compation finished in %d ms\n\nBefore:\t%8.2f MB\nAfter:\t%8.2f MB\nSaved:\t%8.2f MB".formatted(
 
                      durationMs,
                      sizeBeforeBytes / (1024.0 * 1024.0),
@@ -111,19 +121,19 @@ public class H2StorageTools {
          splashManager.setMessage(message);
 
          MessageDialog.openInformation(shell,
-               Messages.App_Db_Compress_DialogTitle,
+               Messages.Dialog_CompactDb_Title,
                message);
 
       } catch (final Exception e) {
 
-         StatusUtil.log("H2 startup compression failed: " + e.getMessage(), e);
+         StatusUtil.log("H2 startup compaction failed: " + e.getMessage(), e);
       }
    }
 
    private static String formatBytes(final long bytes) {
 
       if (bytes == 0) {
-         return "";
+         return UI.EMPTY_STRING;
       }
 
       final double value = bytes / 1024.0;
@@ -131,11 +141,11 @@ public class H2StorageTools {
 
       if (rounded < 1000) {
 
-         return ">0";
+         return ">0"; //$NON-NLS-1$
 
       } else {
 
-         return "%,.0f".formatted(value);
+         return "%,.0f".formatted(value); //$NON-NLS-1$
       }
    }
 
@@ -144,16 +154,23 @@ public class H2StorageTools {
       try (Connection conn = TourDatabase.getInstance().getConnection()) {
 
          final StringBuilder sbLog = new StringBuilder();
+         final StringBuilder sbTotal = new StringBuilder();
          final Formatter logFormatter = new Formatter(sbLog);
+         final Formatter totalFormatter = new Formatter(sbTotal);
 
          final long totalTablesAndIndexesBytes = inspectAll_10_Tables(conn, logFormatter);
          final long totalLobBytes = inspectAll_20_Lobs(conn, logFormatter);
 
          inspectAll_30_Indexes(conn, logFormatter);
+         inspectAll_40_Fragmentation(conn, totalFormatter, totalTablesAndIndexesBytes, totalLobBytes);
 
-         inspectAll_40_Fragmentation(conn, logFormatter, totalTablesAndIndexesBytes, totalLobBytes);
+         final String allLogs = UI.EMPTY_STRING
 
-         return sbLog.toString();
+               // display total at the top
+               + sbTotal.toString()
+               + sbLog.toString();
+
+         return allLogs;
 
       } catch (final SQLException e) {
 
@@ -176,7 +193,7 @@ public class H2StorageTools {
                          WHERE TABLE_SCHEMA NOT IN ('INFORMATION_SCHEMA')
                            AND TABLE_TYPE = 'BASE TABLE'
                          ORDER BY TABLE_NAME ASC
-                         """;
+                         """; //$NON-NLS-1$
 
       final List<List<String>> allRows = new ArrayList<>();
       long totalRows = 0, totalData = 0, totalAll = 0;
@@ -185,10 +202,10 @@ public class H2StorageTools {
 
          while (rs.next()) {
 
-            final String table = rs.getString("TABLE_NAME");
-            final long numRows = rs.getLong("ROW_COUNT_ESTIMATE"),
-                  dataBytes = rs.getLong("DATA_BYTES"),
-                  totalBytes = rs.getLong("TOTAL_BYTES");
+            final String table = rs.getString("TABLE_NAME"); //$NON-NLS-1$
+            final long numRows = rs.getLong("ROW_COUNT_ESTIMATE"), //$NON-NLS-1$
+                  dataBytes = rs.getLong("DATA_BYTES"), //$NON-NLS-1$
+                  totalBytes = rs.getLong("TOTAL_BYTES"); //$NON-NLS-1$
 
             totalRows += numRows;
             totalData += dataBytes;
@@ -197,7 +214,7 @@ public class H2StorageTools {
             allRows.add(List.of(
 
                   table,
-                  "%,d".formatted(numRows),
+                  "%,d".formatted(numRows), //$NON-NLS-1$
 
                   formatBytes(dataBytes),
                   formatBytes(totalBytes),
@@ -207,13 +224,6 @@ public class H2StorageTools {
             );
          }
       }
-
-      final List<String> allFooter = List.of(
-
-            "TOTAL (" + allRows.size() + " tables)",
-            "%,d".formatted(totalRows),
-            formatBytes(totalData),
-            formatBytes(totalAll));
 
       final List<List<String>> allHeaders = new ArrayList<>();
 
@@ -229,7 +239,14 @@ public class H2StorageTools {
             UI.UNIT_KBYTE,
             UI.UNIT_KBYTE));
 
-      printTable(logFormatter, allHeaders, allRows, allFooter, Set.of(1, 2, 3, 4), true);
+      final List<String> allFooter = List.of(
+
+            "TOTAL (" + allRows.size() + " tables)",
+            "%,d".formatted(totalRows), //$NON-NLS-1$
+            formatBytes(totalData),
+            formatBytes(totalAll));
+
+      printTable(logFormatter, allHeaders, allRows, allFooter, Set.of(1, 2, 3, 4), false);
 
       return totalAll;
    }
@@ -245,7 +262,7 @@ public class H2StorageTools {
                              FROM INFORMATION_SCHEMA.COLUMNS
                              WHERE TABLE_SCHEMA NOT IN ('INFORMATION_SCHEMA')
                                AND DATA_TYPE IN ('BINARY LARGE OBJECT', 'CHARACTER LARGE OBJECT')
-                             """;
+                             """; //$NON-NLS-1$
 
       record LobCol(String schema, String table, String col) {}
 
@@ -265,7 +282,7 @@ public class H2StorageTools {
 
       for (final LobCol column : allColumns) {
 
-         final String sumSql = "SELECT COALESCE(SUM(OCTET_LENGTH(\"%s\")), 0) FROM \"%s\".\"%s\"".formatted(
+         final String sumSql = "SELECT COALESCE(SUM(OCTET_LENGTH(\"%s\")), 0) FROM \"%s\".\"%s\"".formatted( //$NON-NLS-1$
                column.col(),
                column.schema(),
                column.table());
@@ -307,20 +324,25 @@ public class H2StorageTools {
                          FROM INFORMATION_SCHEMA.INDEXES
                          WHERE TABLE_SCHEMA NOT IN ('INFORMATION_SCHEMA')
                          ORDER BY TABLE_NAME, INDEX_NAME
-                         """;
+                         """; //$NON-NLS-1$
+
+      long totalIndices = 0;
 
       final List<List<String>> allRows = new ArrayList<>();
       try (Statement stmt = conn.createStatement(); ResultSet rs = stmt.executeQuery(sql)) {
 
          while (rs.next()) {
 
+            final String tableName = rs.getString("TABLE_NAME"); //$NON-NLS-1$
+            final String indexName = rs.getString("INDEX_NAME"); //$NON-NLS-1$
+            final long indexBytes = rs.getLong("INDEX_BYTES"); //$NON-NLS-1$
+
+            totalIndices += indexBytes;
+
             allRows.add(List.of(
-
-                  rs.getString("TABLE_NAME"),
-                  rs.getString("INDEX_NAME"),
-                  formatBytes(rs.getLong("INDEX_BYTES"))
-
-            ));
+                  tableName,
+                  indexName,
+                  formatBytes(indexBytes)));
          }
       }
 
@@ -333,7 +355,13 @@ public class H2StorageTools {
             UI.EMPTY_STRING,
             UI.UNIT_KBYTE));
 
-      printTable(logFormatter, allHeaders, allRows, null, Set.of(2), false);
+      final List<String> allFooter = List.of(
+
+            "TOTAL (%d indices)".formatted(allRows.size()),
+            UI.EMPTY_STRING,
+            formatBytes(totalIndices));
+
+      printTable(logFormatter, allHeaders, allRows, allFooter, Set.of(2), false);
    }
 
    private static void inspectAll_40_Fragmentation(final Connection conn,
@@ -352,7 +380,7 @@ public class H2StorageTools {
                            'info.PAGE_COUNT',
                            'info.PAGE_COUNT_LIVE'
                          )
-                         """;
+                         """; //$NON-NLS-1$
 
       final Map<String, String> stats = new HashMap<>();
       try (Statement stmt = conn.createStatement(); ResultSet rs = stmt.executeQuery(sql)) {
@@ -363,9 +391,9 @@ public class H2StorageTools {
 
 // SET_FORMATTING_OFF
 
-      final long fileSize     = Long.parseLong(stats.getOrDefault("info.FILE_SIZE", "0"));
-      final long numPages     = Long.parseLong(stats.getOrDefault("info.PAGE_COUNT", "0"));
-      final long numLivePages = Long.parseLong(stats.getOrDefault("info.PAGE_COUNT_LIVE", "0"));
+      final long fileSize     = Long.parseLong(stats.getOrDefault("info.FILE_SIZE", "0")); //$NON-NLS-1$  //$NON-NLS-2$
+      final long numPages     = Long.parseLong(stats.getOrDefault("info.PAGE_COUNT", "0")); //$NON-NLS-1$ //$NON-NLS-2$
+      final long numLivePages = Long.parseLong(stats.getOrDefault("info.PAGE_COUNT_LIVE", "0")); //$NON-NLS-1$ //$NON-NLS-2$
       final long active       = tablesAndIndexesBytes + lobBytes;
       final long deadBytes    = Math.max(0, fileSize - active);
 
@@ -379,8 +407,8 @@ public class H2StorageTools {
 
             List.of(UI.EMPTY_STRING,                  UI.EMPTY_STRING),
 
-            List.of("Chunk Fill Rate",                stats.getOrDefault("info.CHUNKS_FILL_RATE", "N/A") + "%"),
-            List.of("Dead/All Pages", "%,d# / %,d#"   .formatted(numPages - numLivePages, numPages) ) //
+            List.of("Chunk Fill Rate",                stats.getOrDefault("info.CHUNKS_FILL_RATE", "N/A") + "%"), //$NON-NLS-2$  //$NON-NLS-3$  //$NON-NLS-4$
+            List.of("Dead/All Pages", "%,d# / %,d#"   .formatted(numPages - numLivePages, numPages) )  //$NON-NLS-2$
             );
 
 // SET_FORMATTING_ON
@@ -390,7 +418,7 @@ public class H2StorageTools {
       allHeaders.add(List.of("Metric", "Value"));
       allHeaders.add(List.of(UI.EMPTY_STRING, UI.UNIT_KBYTE));
 
-      printTable(logFormatter, allHeaders, rows, null, Set.of(1, 2, 3, 4, 5), false);
+      printTable(logFormatter, allHeaders, rows, null, Set.of(1, 2, 3, 4, 5), true);
    }
 
    private static void printTable(final Formatter logFormatter,
@@ -427,12 +455,12 @@ public class H2StorageTools {
 
       for (int i = 0; i < numColumns; i++) {
          if (i > 0) {
-            sb.append("   ");
+            sb.append("   "); //$NON-NLS-1$
          }
-         sb.append("%").append(allRightCols.contains(i) ? "" : "-").append(maxColumnWidth[i]).append("s");
+         sb.append("%").append(allRightCols.contains(i) ? "" : "-").append(maxColumnWidth[i]).append("s"); //$NON-NLS-1$  //$NON-NLS-2$  //$NON-NLS-3$  //$NON-NLS-4$
       }
 
-      final String formattedValues = sb.append(" %n").toString();
+      final String formattedValues = sb.append(" %n").toString(); //$NON-NLS-1$
 
       if (isFirst) {
          logFormatter.format(UI.NEW_LINE1);

@@ -17,7 +17,7 @@ package net.tourbook.ui.action;
 
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
-import net.tourbook.database.DialogCompressH2Database;
+import net.tourbook.database.DialogCompactH2Database;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.tour.TourManager;
 
@@ -28,7 +28,7 @@ import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.swt.widgets.Display;
 
-public class ActionHandler_Database_Compress extends AbstractHandler {
+public class ActionHandler_Database_Compact extends AbstractHandler {
 
    private static final IPreferenceStore _prefStore = TourbookPlugin.getPrefStore();
 
@@ -39,22 +39,20 @@ public class ActionHandler_Database_Compress extends AbstractHandler {
          return null;
       }
 
-      final boolean isExternalDatabase = _prefStore.getBoolean(ITourbookPreferences.TOUR_DATABASE_IS_EXTERNAL);
-
-      if (isExternalDatabase) {
+      if (_prefStore.getBoolean(ITourbookPreferences.TOUR_DATABASE_IS_EXTERNAL)) {
 
          // an external db is not supported
 
          MessageDialog.openInformation(
 
                Display.getDefault().getActiveShell(),
-               Messages.App_Db_Compress_DialogTitle,
+               Messages.Dialog_CompactDb_Title,
                "This feature is currently available only for the internal tour database H2, however the external database is selected.");
 
          return null;
       }
 
-      new DialogCompressH2Database().open();
+      new DialogCompactH2Database().open();
 
       return null;
    }

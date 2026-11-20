@@ -400,7 +400,6 @@ public class TourDatabase {
    private static String                        SQL_DB_DRIVER_CLASS;
    private static String                        SQL_DB_USERNAME;
    private static String                        SQL_DB_PASSWORD;
-   private static String                        SQL_DB_HIBERNATE_DIALECT;
 
    private static volatile EntityManagerFactory _emFactory;
 
@@ -943,7 +942,6 @@ public class TourDatabase {
          final String externalDbUsername                 = _prefStore.getString(ITourbookPreferences.TOUR_DATABASE_EXTERNAL_DATABASE_USERNAME);
          final String externalDbPassword                 = _prefStore.getString(ITourbookPreferences.TOUR_DATABASE_EXTERNAL_DATABASE_PASSWORD);
          final String externalDbName                     = _prefStore.getString(ITourbookPreferences.TOUR_DATABASE_EXTERNAL_DATABASE_NAME);
-         final String externalHibernateDialect           = _prefStore.getString(ITourbookPreferences.TOUR_DATABASE_EXTERNAL_HIBERNATE_DIALECT);
 
          SQL_DB_FOLDER_PATH         = EXTERNAL_DB_FOLDER_PATH;
 
@@ -952,8 +950,6 @@ public class TourDatabase {
 
          SQL_DB_USERNAME            = externalDbUsername;
          SQL_DB_PASSWORD            = externalDbPassword;
-
-         SQL_DB_HIBERNATE_DIALECT   = externalHibernateDialect;
 
       } else {
 
@@ -986,8 +982,6 @@ public class TourDatabase {
 
          SQL_DB_USERNAME            = UI.EMPTY_STRING;
          SQL_DB_PASSWORD            = UI.EMPTY_STRING;
-
-         SQL_DB_HIBERNATE_DIALECT   = H2_EJB_HIBERNATE_DIALECT;
       }
 
 // SET_FORMATTING_ON

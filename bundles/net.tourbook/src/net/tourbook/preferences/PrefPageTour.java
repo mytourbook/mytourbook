@@ -21,6 +21,7 @@ import net.tourbook.common.UI;
 import net.tourbook.database.ExternalDatabase;
 import net.tourbook.tour.TourLogManager;
 import net.tourbook.tour.TourLogManager.AutoOpenEvent;
+import net.tourbook.tour.TourManager;
 
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.layout.GridDataFactory;
@@ -71,6 +72,7 @@ public class PrefPageTour extends PreferencePage implements IWorkbenchPreference
     */
    private Spinner    _spinnerTourCacheSize;
 
+   private Button     _btnClearCache;
    private Button     _btnClearLog;
    private Button     _btnTestConnection;
    private Button     _rdoDbSystem_InternalH2;
@@ -82,7 +84,6 @@ public class PrefPageTour extends PreferencePage implements IWorkbenchPreference
    private Label      _lblConnectionUrl_Parameter;
    private Label      _lblDatabaseUsername;
    private Label      _lblDatabasePassword;
-   private Label      _lblHibernateDialect;
    private Label      _lblJdbcDriver;
    private Label      _lblJarDownloadUrl;
 
@@ -92,7 +93,6 @@ public class PrefPageTour extends PreferencePage implements IWorkbenchPreference
    private Text       _txtConnectionUrl_Parameter;
    private Text       _txtDatabaseUsername;
    private Text       _txtDatabasePassword;
-   private Text       _txtHibernateDialect;
    private Text       _txtJdbcDriver;
    private Text       _txtJarDownloadUrl;
 
@@ -252,14 +252,6 @@ public class PrefPageTour extends PreferencePage implements IWorkbenchPreference
                _txtDatabasePassword = new Text(containerExternal, SWT.BORDER);
                gdDefaultWidth.applyTo(_txtDatabasePassword);
             }
-            {
-               _lblHibernateDialect = UI.createLabel(containerExternal, "Hibernate dialect");
-               _lblHibernateDialect.setToolTipText("EJB hibernate dialect, e.g. org.hibernate.dialect.MariaDB103Dialect");
-               gdLabel.applyTo(_lblHibernateDialect);
-
-               _txtHibernateDialect = new Text(containerExternal, SWT.BORDER);
-               gdDefaultWidth.applyTo(_txtHibernateDialect);
-            }
          }
 
          final Composite containerActions = new Composite(container, SWT.NONE);
@@ -269,12 +261,14 @@ public class PrefPageTour extends PreferencePage implements IWorkbenchPreference
             _btnTestConnection = new Button(containerActions, SWT.PUSH);
             _btnTestConnection.setText("&Test Connection");
             _btnTestConnection.setToolTipText("Test connection with the current configuration");
-            _btnTestConnection.addSelectionListener(SelectionListener.widgetSelectedAdapter(selectionEvent -> actionTestConnection()));
+            _btnTestConnection.addSelectionListener(SelectionListener.widgetSelectedAdapter(
+                  selectionEvent -> actionTestConnection()));
 
             _btnClearLog = new Button(containerActions, SWT.PUSH);
             _btnClearLog.setText("Clear &Log");
             _btnClearLog.setToolTipText("Clear tour log view");
-            _btnClearLog.addSelectionListener(SelectionListener.widgetSelectedAdapter(selectionEvent -> TourLogManager.clear()));
+            _btnClearLog.addSelectionListener(SelectionListener.widgetSelectedAdapter(
+                  selectionEvent -> TourLogManager.clear()));
          }
       }
 
@@ -285,43 +279,55 @@ public class PrefPageTour extends PreferencePage implements IWorkbenchPreference
 
       final int verticalIndent = 20;
 
+      final GridDataFactory gd = GridDataFactory.fillDefaults()
+            .indent(0, verticalIndent)
+            .align(SWT.BEGINNING, SWT.CENTER);
+
       final Composite container = new Composite(parent, SWT.NONE);
       GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
-      GridLayoutFactory.swtDefaults().numColumns(2).applyTo(container);
+      GridLayoutFactory.swtDefaults().numColumns(3).applyTo(container);
       {
-         /*
-          * label: info
-          */
-         Label label = new Label(container, SWT.WRAP);
-         label.setText(Messages.Pref_Tour_Label_TourCacheSize_Info);
-         GridDataFactory.fillDefaults()
-               .hint(_defaultInfoWidth, SWT.DEFAULT)
-               .grab(true, false)
-               .span(2, 1)
-               .applyTo(label);
+         {
+            /*
+             * Info
+             */
+            final Label label = new Label(container, SWT.WRAP);
+            label.setText(Messages.Pref_Tour_Label_TourCacheSize_Info);
+            GridDataFactory.fillDefaults()
+                  .hint(_defaultInfoWidth, SWT.DEFAULT)
+                  .grab(true, false)
+                  .span(3, 1)
+                  .applyTo(label);
+         }
+         {
+            /*
+             * Cache size
+             */
+            final Label label = new Label(container, NONE);
+            label.setText(Messages.Pref_Tour_Label_TourCacheSize);
+            gd.applyTo(label);
 
-         /*
-          * label: cache size
-          */
-         label = new Label(container, NONE);
-         label.setText(Messages.Pref_Tour_Label_TourCacheSize);
-         GridDataFactory.fillDefaults()
-               .indent(0, verticalIndent)
-               .align(SWT.BEGINNING, SWT.CENTER)
-               .applyTo(label);
+            // spinner: cache size
+            _spinnerTourCacheSize = new Spinner(container, SWT.BORDER);
 
-         // spinner: cache size
-         _spinnerTourCacheSize = new Spinner(container, SWT.BORDER);
+            // cache size ==1 causes "java.lang.IllegalStateException: Queue full"
+            _spinnerTourCacheSize.setMinimum(2);
+            _spinnerTourCacheSize.setMaximum(100_000);
+            _spinnerTourCacheSize.addMouseWheelListener(_defaultMouseWheelListener);
+            GridDataFactory.fillDefaults()
+                  .indent(0, verticalIndent)
+                  .hint(_defaultSpinnerWidth, SWT.DEFAULT)
+                  .align(SWT.BEGINNING, SWT.CENTER).applyTo(_spinnerTourCacheSize);
 
-         // cache size ==1 causes "java.lang.IllegalStateException: Queue full"
-         _spinnerTourCacheSize.setMinimum(2);
-         _spinnerTourCacheSize.setMaximum(100_000);
-         _spinnerTourCacheSize.addMouseWheelListener(_defaultMouseWheelListener);
-         GridDataFactory.fillDefaults()
-               .indent(0, verticalIndent)
-               .hint(_defaultSpinnerWidth, SWT.DEFAULT)
-               .align(SWT.BEGINNING, SWT.CENTER)
-               .applyTo(_spinnerTourCacheSize);
+            /*
+             * Clear cache
+             */
+            _btnClearCache = new Button(container, SWT.PUSH);
+            _btnClearCache.setText("Clear &Tour Cache");
+            _btnClearCache.addSelectionListener(SelectionListener.widgetSelectedAdapter(
+                  selectionEvent -> TourManager.getInstance().clearTourDataCache()));
+            gd.applyTo(_btnClearCache);
+         }
       }
 
       return container;
@@ -344,7 +350,6 @@ public class PrefPageTour extends PreferencePage implements IWorkbenchPreference
       _lblDatabaseName              .setEnabled(isExternalDb);
       _lblDatabaseUsername          .setEnabled(isExternalDb);
       _lblDatabasePassword          .setEnabled(isExternalDb);
-      _lblHibernateDialect          .setEnabled(isExternalDb);
       _lblJarDownloadUrl            .setEnabled(isExternalDb);
       _lblJdbcDriver                .setEnabled(isExternalDb);
 
@@ -354,7 +359,6 @@ public class PrefPageTour extends PreferencePage implements IWorkbenchPreference
       _txtDatabaseName              .setEnabled(isExternalDb);
       _txtDatabaseUsername          .setEnabled(isExternalDb);
       _txtDatabasePassword          .setEnabled(isExternalDb);
-      _txtHibernateDialect          .setEnabled(isExternalDb);
       _txtJarDownloadUrl            .setEnabled(isExternalDb);
       _txtJdbcDriver                .setEnabled(isExternalDb);
 
@@ -479,7 +483,6 @@ public class PrefPageTour extends PreferencePage implements IWorkbenchPreference
       _txtDatabaseName              .setText(_prefStore.getString(ITourbookPreferences.TOUR_DATABASE_EXTERNAL_DATABASE_NAME));
       _txtDatabaseUsername          .setText(_prefStore.getString(ITourbookPreferences.TOUR_DATABASE_EXTERNAL_DATABASE_USERNAME));
       _txtDatabasePassword          .setText(_prefStore.getString(ITourbookPreferences.TOUR_DATABASE_EXTERNAL_DATABASE_PASSWORD));
-      _txtHibernateDialect          .setText(_prefStore.getString(ITourbookPreferences.TOUR_DATABASE_EXTERNAL_HIBERNATE_DIALECT));
       _txtJarDownloadUrl            .setText(_prefStore.getString(ITourbookPreferences.TOUR_DATABASE_EXTERNAL_JAR_DOWNLOAD_URL));
       _txtJdbcDriver                .setText(_prefStore.getString(ITourbookPreferences.TOUR_DATABASE_EXTERNAL_JDBC_DRIVER));
 
@@ -490,8 +493,8 @@ public class PrefPageTour extends PreferencePage implements IWorkbenchPreference
 
 // SET_FORMATTING_OFF
 
-      _prefStore.setValue(ITourbookPreferences.TOUR_CACHE_SIZE,                                 _spinnerTourCacheSize.getSelection());
-      _prefStore.setValue(ITourbookPreferences.TOUR_DATABASE_IS_EXTERNAL,                       _rdoDbSystem_External.getSelection());
+      _prefStore.setValue(ITourbookPreferences.TOUR_CACHE_SIZE,            _spinnerTourCacheSize.getSelection());
+      _prefStore.setValue(ITourbookPreferences.TOUR_DATABASE_IS_EXTERNAL,  _rdoDbSystem_External.getSelection());
 
 // SET_FORMATTING_ON
 
@@ -508,7 +511,6 @@ public class PrefPageTour extends PreferencePage implements IWorkbenchPreference
       _prefStore.setValue(ITourbookPreferences.TOUR_DATABASE_EXTERNAL_DATABASE_NAME,               _txtDatabaseName              .getText().trim());
       _prefStore.setValue(ITourbookPreferences.TOUR_DATABASE_EXTERNAL_DATABASE_USERNAME,           _txtDatabaseUsername          .getText().trim());
       _prefStore.setValue(ITourbookPreferences.TOUR_DATABASE_EXTERNAL_DATABASE_PASSWORD,           _txtDatabasePassword          .getText().trim());
-      _prefStore.setValue(ITourbookPreferences.TOUR_DATABASE_EXTERNAL_HIBERNATE_DIALECT,           _txtHibernateDialect          .getText().trim());
       _prefStore.setValue(ITourbookPreferences.TOUR_DATABASE_EXTERNAL_JAR_DOWNLOAD_URL,            _txtJarDownloadUrl            .getText().trim());
       _prefStore.setValue(ITourbookPreferences.TOUR_DATABASE_EXTERNAL_JDBC_DRIVER,                 _txtJdbcDriver                .getText().trim());
 

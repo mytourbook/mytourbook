@@ -2208,7 +2208,7 @@ public class TourBookView extends ViewPart implements
       contextMenu.addMenuListener(new MenuAdapter() {
          @Override
          public void menuHidden(final MenuEvent e) {
-            
+
             _tagMenuManager.onHideMenu();
             _equipmentMenuManager.onHideMenu();
          }
@@ -2218,8 +2218,8 @@ public class TourBookView extends ViewPart implements
 
             final Boolean isFlatView = _viewLayout == TourBookViewLayout.NAT_TABLE;
 
-            Point cursorLocation = Display.getCurrent().getCursorLocation();
-            
+            final Point cursorLocation = Display.getCurrent().getCursorLocation();
+
             _tagMenuManager.onShowMenu(menuEvent,
                   tree,
                   cursorLocation,
@@ -2391,7 +2391,10 @@ public class TourBookView extends ViewPart implements
          // make var to a effectively final var, otherwise an exception occurs
          final TVITourBookTour finalFirstTour = firstTourItem;
 
-         CompletableFuture.supplyAsync(() -> TourManager.getInstance().getTourData(finalFirstTour.getTourId()))
+         CompletableFuture
+
+               .supplyAsync(() -> TourManager.getInstance().getTourData(finalFirstTour.getTourId()))
+
                .thenAccept(savedTour -> {
 
                   if (savedTour != null) {
@@ -2846,7 +2849,8 @@ public class TourBookView extends ViewPart implements
 
       final ArrayList<TourData> selectedTourData = new ArrayList<>();
 
-      BusyIndicator.showWhile(_pageBook.getDisplay(), () -> TourManager.loadTourData(new ArrayList<>(tourIds), selectedTourData, false));
+      BusyIndicator.showWhile(_pageBook.getDisplay(),
+            () -> TourManager.loadTourData(new ArrayList<>(tourIds), selectedTourData, false));
 
       return selectedTourData;
    }
@@ -4418,7 +4422,7 @@ public class TourBookView extends ViewPart implements
 
                   /**
                    * <code>
-                  
+
                      Caused by: java.lang.NullPointerException
                      at org.eclipse.jface.viewers.AbstractTreeViewer.getSelection(AbstractTreeViewer.java:2956)
                      at org.eclipse.jface.viewers.StructuredViewer.handleSelect(StructuredViewer.java:1211)
@@ -4436,13 +4440,13 @@ public class TourBookView extends ViewPart implements
                      at org.eclipse.jface.viewers.AbstractTreeViewer.internalCollapseToLevel(AbstractTreeViewer.java:1586)
                      at org.eclipse.jface.viewers.AbstractTreeViewer.collapseToLevel(AbstractTreeViewer.java:751)
                      at org.eclipse.jface.viewers.AbstractTreeViewer.collapseAll(AbstractTreeViewer.java:733)
-                  
+
                      at net.tourbook.ui.views.tourBook.TourBookView$70.run(TourBookView.java:3406)
-                  
+
                      at org.eclipse.swt.widgets.RunnableLock.run(RunnableLock.java:35)
                      at org.eclipse.swt.widgets.Synchronizer.runAsyncMessages(Synchronizer.java:135)
                      ... 22 more
-                  
+
                    * </code>
                    */
 

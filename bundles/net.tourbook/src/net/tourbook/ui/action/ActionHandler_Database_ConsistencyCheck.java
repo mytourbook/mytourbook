@@ -44,11 +44,24 @@ public class ActionHandler_Database_ConsistencyCheck extends AbstractHandler {
          return null;
       }
 
+      if (_prefStore.getBoolean(ITourbookPreferences.TOUR_DATABASE_IS_EXTERNAL)) {
+
+         // an external db is not supported
+
+         MessageDialog.openInformation(
+
+               Display.getDefault().getActiveShell(),
+               Messages.Dialog_CompactDb_Title,
+               "This feature is currently available only for the internal tour database H2, however the external database is selected.");
+
+         return null;
+      }
+
       final Display display = Display.getDefault();
 
       if (new MessageDialog(display.getActiveShell(),
 
-            Messages.app_db_consistencyCheck_dlgTitle,
+            Messages.Dialog_ConsistencyCheck_Title,
             null, // no title image
 
             "The database consistency check will run after the next restart",
@@ -57,7 +70,7 @@ public class ActionHandler_Database_ConsistencyCheck extends AbstractHandler {
             1, // default index
 
             // define buttons
-            "Restart and Run &Check",
+            "Restart and &Check Consistency",
             Messages.App_Action_Cancel
 
       ).open() == IDialogConstants.OK_ID) {

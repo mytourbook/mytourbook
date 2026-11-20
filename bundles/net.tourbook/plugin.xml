@@ -1016,15 +1016,15 @@
          <!-- Database Consistency Check -->
          <command
             commandId   ="net.tourbook.command.dbTool.consistencyCheck"
-            label       ="%Command_DbTool_Consistency_Check"
-            mnemonic    ="%Command_DbTool_Consistency_Check_Mnemonic"
+            label       ="%Command_DbTool_ConsistencyCheck"
+            mnemonic    ="%Command_DbTool_ConsistencyCheck_Mnemonic"
             style       ="push"/>
 
          <!-- Database Size Info -->
          <command
             commandId   ="net.tourbook.command.DbTool.CompressDatabase"
-            label       ="%Command_DbTool_CompressDatabase"
-            mnemonic    ="%Command_DbTool_CompressDatabase_Mnemonic"
+            label       ="%Command_DbTool_CompactDatabase"
+            mnemonic    ="%Command_DbTool_CompactDatabase_Mnemonic"
             style       ="push"/>
 
          <!-- Delete Fulltext Index Files -->
@@ -1512,13 +1512,13 @@
 
       <command
          id             ="net.tourbook.command.dbTool.consistencyCheck"
-         name           ="%Command_DbTool_Consistency_Check"
+         name           ="%Command_DbTool_ConsistencyCheck"
          defaultHandler ="net.tourbook.ui.action.ActionHandler_Database_ConsistencyCheck"/>
 
       <command
          id             ="net.tourbook.command.DbTool.CompressDatabase"
-         name           ="%Command_DbTool_CompressDatabase"
-         defaultHandler ="net.tourbook.ui.action.ActionHandler_Database_Compress"/>
+         name           ="%Command_DbTool_CompactDatabase"
+         defaultHandler ="net.tourbook.ui.action.ActionHandler_Database_Compact"/>
 
       <command
          id             ="net.tourbook.command.DbTool.DeleteFulltextIndexFiles"

@@ -41,7 +41,7 @@ public interface ITourbookPreferences {
     * Tour database
     */
    public static final String TOUR_DATABASE_IS_RUN_TOOL_CHECK_H2_CONSISTENCY   = "TOUR_DATABASE_IS_RUN_TOOL_CHECK_H2_CONSISTENCY";   //$NON-NLS-1$
-   public static final String TOUR_DATABASE_IS_RUN_TOOL_COMPRESS_H2            = "TOUR_DATABASE_IS_RUN_TOOL_COMPRESS_H2";            //$NON-NLS-1$
+   public static final String TOUR_DATABASE_IS_RUN_TOOL_COMPACT_H2             = "TOUR_DATABASE_IS_RUN_TOOL_COMPACT_H2";             //$NON-NLS-1$
    public static final String TOUR_DATABASE_IS_EXTERNAL                        = "TOUR_DATABASE_IS_EXTERNAL";                        //$NON-NLS-1$
    public static final String TOUR_DATABASE_IS_H2_MIGRATED                     = "TOUR_DATABASE_IS_H2_MIGRATED";                     //$NON-NLS-1$
 
@@ -50,7 +50,6 @@ public interface ITourbookPreferences {
    public static final String TOUR_DATABASE_EXTERNAL_DATABASE_NAME             = "TOUR_DATABASE_EXTERNAL_DATABASE_NAME";             //$NON-NLS-1$
    public static final String TOUR_DATABASE_EXTERNAL_DATABASE_USERNAME         = "TOUR_DATABASE_EXTERNAL_DATABASE_USERNAME";         //$NON-NLS-1$
    public static final String TOUR_DATABASE_EXTERNAL_DATABASE_PASSWORD         = "TOUR_DATABASE_EXTERNAL_DATABASE_PASSWORD";         //$NON-NLS-1$
-   public static final String TOUR_DATABASE_EXTERNAL_HIBERNATE_DIALECT         = "TOUR_DATABASE_EXTERNAL_HIBERNATE_DIALECT";         //$NON-NLS-1$
    public static final String TOUR_DATABASE_EXTERNAL_JAR_DOWNLOAD_URL          = "TOUR_DATABASE_EXTERNAL_JAR_DOWNLOAD_URL";          //$NON-NLS-1$
    public static final String TOUR_DATABASE_EXTERNAL_JDBC_DRIVER               = "TOUR_DATABASE_EXTERNAL_JDBC_DRIVER";               //$NON-NLS-1$
 
