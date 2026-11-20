@@ -407,7 +407,7 @@
       <page id="net.tourbook.preferences.PrefPagePhoto_PathConversion"
          class="net.tourbook.preferences.PrefPagePhoto_PathConversion"
          category="net.tourbook.preferences.PrefPagePhotoID"
-         name="%PrefPage_Photo_PathConversion"/>
+         name="%Pref_Page_Photo_PathConversion"/>
         
       <!--
          Proxy
@@ -1016,8 +1016,8 @@
          <!-- Database Consistency Check -->
          <command
             commandId   ="net.tourbook.command.dbTool.consistencyCheck"
-            label       ="%command_dbtool_consistency_check"
-            mnemonic    ="%command_dbtool_consistency_check_mnemonic"
+            label       ="%Command_DbTool_Consistency_Check"
+            mnemonic    ="%Command_DbTool_Consistency_Check_Mnemonic"
             style       ="push"/>
 
          <!-- Database Size Info -->
@@ -1512,7 +1512,7 @@
 
       <command
          id             ="net.tourbook.command.dbTool.consistencyCheck"
-         name           ="%command_dbtool_consistency_check"
+         name           ="%Command_DbTool_Consistency_Check"
          defaultHandler ="net.tourbook.ui.action.ActionHandler_Database_ConsistencyCheck"/>
 
       <command
