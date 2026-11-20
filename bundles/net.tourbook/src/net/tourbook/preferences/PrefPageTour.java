@@ -329,6 +329,9 @@ public class PrefPageTour extends PreferencePage implements IWorkbenchPreference
 
    private void enableControls() {
 
+      // for now, the external db is disabled
+      _rdoDbSystem_External.setEnabled(false);
+
       final boolean isExternalDb = _rdoDbSystem_External.getSelection();
 
 // SET_FORMATTING_OFF
