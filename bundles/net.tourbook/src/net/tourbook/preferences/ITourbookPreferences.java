@@ -40,7 +40,8 @@ public interface ITourbookPreferences {
    /*
     * Tour database
     */
-   public static final String TOUR_DATABASE_IS_COMPRESS_H2                     = "TOUR_DATABASE_IS_COMPRESS_H2";                     //$NON-NLS-1$
+   public static final String TOUR_DATABASE_IS_RUN_TOOL_CHECK_H2_CONSISTENCY   = "TOUR_DATABASE_IS_RUN_TOOL_CHECK_H2_CONSISTENCY";   //$NON-NLS-1$
+   public static final String TOUR_DATABASE_IS_RUN_TOOL_COMPRESS_H2            = "TOUR_DATABASE_IS_RUN_TOOL_COMPRESS_H2";            //$NON-NLS-1$
    public static final String TOUR_DATABASE_IS_EXTERNAL                        = "TOUR_DATABASE_IS_EXTERNAL";                        //$NON-NLS-1$
    public static final String TOUR_DATABASE_IS_H2_MIGRATED                     = "TOUR_DATABASE_IS_H2_MIGRATED";                     //$NON-NLS-1$
 

@@ -43,7 +43,7 @@ import org.h2.mvstore.MVStoreTool;
 
 public class H2StorageTools {
 
-   public static void compactH2Database() {
+   public static void compressH2Database() {
 
       final Display display = Display.getDefault();
       final Shell shell = display.getActiveShell();

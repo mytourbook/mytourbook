@@ -15,105 +15,68 @@
  *******************************************************************************/
 package net.tourbook.ui.action;
 
-import java.sql.Connection;
-import java.sql.ResultSet;
+import java.io.IOException;
 
 import net.tourbook.Messages;
-import net.tourbook.common.UI;
+import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.util.StatusUtil;
-import net.tourbook.database.TourDatabase;
+import net.tourbook.preferences.ITourbookPreferences;
+import net.tourbook.tour.TourManager;
 
 import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
+import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.MessageDialog;
-import org.eclipse.osgi.util.NLS;
-import org.eclipse.swt.custom.BusyIndicator;
+import org.eclipse.jface.preference.IPersistentPreferenceStore;
+import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.ui.PlatformUI;
 
 public class ActionHandler_Database_ConsistencyCheck extends AbstractHandler {
 
-   private void checkConsistency() {
-
-      final String[] resultInfo = new String[1];
-      final String[] error = new String[1];
-
-      BusyIndicator.showWhile(Display.getCurrent(), new Runnable() {
-         @Override
-         public void run() {
-
-            final String sql = UI.EMPTY_STRING
-
-                  + "SELECT" //                                                     //$NON-NLS-1$
-
-                  + " schemaname || '.' || tablename as TableName," //              //$NON-NLS-1$
-                  + " SYSCS_UTIL.SYSCS_CHECK_TABLE(schemaname, tablename) AS OK" //$NON-NLS-1$
-
-                  + " FROM sys.sysschemas s, sys.systables t" //                    //$NON-NLS-1$
-
-                  + " WHERE s.schemaid = t.schemaid" //                             //$NON-NLS-1$
-                  + "   and t.tabletype = 'T'"; //                                  //$NON-NLS-1$
-
-            try (Connection conn = TourDatabase.getInstance().getConnection()) {
-
-               final StringBuilder sbResult = new StringBuilder();
-
-               sbResult.append(Messages.app_db_consistencyCheck_checkIsOK);
-
-               final ResultSet result = conn.prepareStatement(sql).executeQuery();
-
-               while (result.next()) {
-                  sbResult.append("1".equals(result.getString(2)) ? "✓" : "✕"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-                  sbResult.append(UI.SPACE2);
-                  sbResult.append(result.getString(1));
-                  sbResult.append(UI.NEW_LINE);
-               }
-
-               resultInfo[0] = sbResult.toString();
-
-            } catch (final Exception e) {
-
-               StatusUtil.log(e);
-
-               String message = e.getMessage();
-
-               final int maxLength = 3000;
-               if (message.length() > maxLength) {
-                  message = message.substring(0, maxLength) + "\n...\n...\n..."; //$NON-NLS-1$
-               }
-
-               error[0] = NLS.bind(Messages.app_db_consistencyCheck_checkFailed, message);
-            }
-         }
-      });
-
-      if (error[0] == null) {
-
-         MessageDialog.openInformation(
-               Display.getCurrent().getActiveShell(),
-               Messages.app_db_consistencyCheck_dlgTitle,
-               resultInfo[0]);
-      } else {
-
-         MessageDialog.openError(
-               Display.getCurrent().getActiveShell(),
-               Messages.app_db_consistencyCheck_dlgTitle,
-               error[0]);
-      }
-   }
+   private static final IPreferenceStore _prefStore = TourbookPlugin.getPrefStore();
 
    @Override
    public Object execute(final ExecutionEvent event) throws ExecutionException {
 
-      MessageDialog.openInformation(
+      if (TourManager.isTourModified()) {
+         return null;
+      }
 
-            Display.getDefault().getActiveShell(),
+      final Display display = Display.getDefault();
+
+      if (new MessageDialog(display.getActiveShell(),
+
             Messages.app_db_consistencyCheck_dlgTitle,
-            "This feature is not yet available :-(");
+            null, // no title image
 
-//      checkConsistency();
+            "The database consistency check will run after the next restart",
+            MessageDialog.QUESTION,
+
+            1, // default index
+
+            // define buttons
+            "Restart and Run &Check",
+            Messages.App_Action_Cancel
+
+      ).open() == IDialogConstants.OK_ID) {
+
+         // set flag that the h2 should be checked
+         _prefStore.setValue(ITourbookPreferences.TOUR_DATABASE_IS_RUN_TOOL_CHECK_H2_CONSISTENCY, true);
+
+         // force save pref store to file
+         if (_prefStore instanceof final IPersistentPreferenceStore prefStoreWithSave) {
+            try {
+               prefStoreWithSave.save();
+            } catch (final IOException e) {
+               StatusUtil.log(e);
+            }
+         }
+
+         display.asyncExec(() -> PlatformUI.getWorkbench().restart());
+      }
 
       return null;
    }
-
 }

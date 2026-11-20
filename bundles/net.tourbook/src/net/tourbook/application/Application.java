@@ -29,6 +29,7 @@ import net.tourbook.Messages;
 import net.tourbook.common.UI;
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.Util;
+import net.tourbook.database.H2ConsistencyCheck;
 import net.tourbook.database.H2StorageTools;
 import net.tourbook.database.MigrateDerbyToH2;
 import net.tourbook.preferences.ITourbookPreferences;
@@ -151,6 +152,18 @@ public class Application implements IApplication {
       }
    }
 
+   private void savePrefStore() {
+
+      // force save pref store to file
+      if (_prefStore instanceof final IPersistentPreferenceStore prefStoreWithSave) {
+         try {
+            prefStoreWithSave.save();
+         } catch (final IOException e) {
+            StatusUtil.log(e);
+         }
+      }
+   }
+
    @Override
    public Object start(final IApplicationContext context) throws Exception {
 
@@ -209,21 +222,24 @@ public class Application implements IApplication {
             return IApplication.EXIT_OK;
          }
 
-         if (_prefStore.getBoolean(ITourbookPreferences.TOUR_DATABASE_IS_COMPRESS_H2)) {
+         if (_prefStore.getBoolean(ITourbookPreferences.TOUR_DATABASE_IS_RUN_TOOL_COMPRESS_H2)) {
 
             // prevent to do it a second time
-            _prefStore.setValue(ITourbookPreferences.TOUR_DATABASE_IS_COMPRESS_H2, false);
+            _prefStore.setValue(ITourbookPreferences.TOUR_DATABASE_IS_RUN_TOOL_COMPRESS_H2, false);
 
-            // force save pref store to file
-            if (_prefStore instanceof final IPersistentPreferenceStore prefStoreWithSave) {
-               try {
-                  prefStoreWithSave.save();
-               } catch (final IOException e) {
-                  StatusUtil.log(e);
-               }
-            }
+            savePrefStore();
 
-            H2StorageTools.compactH2Database();
+            H2StorageTools.compressH2Database();
+         }
+
+         if (_prefStore.getBoolean(ITourbookPreferences.TOUR_DATABASE_IS_RUN_TOOL_CHECK_H2_CONSISTENCY)) {
+
+            // prevent to do it a second time
+            _prefStore.setValue(ITourbookPreferences.TOUR_DATABASE_IS_RUN_TOOL_CHECK_H2_CONSISTENCY, false);
+
+            savePrefStore();
+
+            H2ConsistencyCheck.checkH2Consistency();
          }
 
          // Normal Eclipse RCP startup sequence

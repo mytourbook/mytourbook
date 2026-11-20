@@ -210,7 +210,7 @@ public class DialogCompressH2Database extends Dialog {
       ).open() == IDialogConstants.OK_ID) {
 
          // set flag that the h2 should be compressed
-         _prefStore.setValue(ITourbookPreferences.TOUR_DATABASE_IS_COMPRESS_H2, true);
+         _prefStore.setValue(ITourbookPreferences.TOUR_DATABASE_IS_RUN_TOOL_COMPRESS_H2, true);
 
          // force save pref store to file
          if (_prefStore instanceof final IPersistentPreferenceStore prefStoreWithSave) {
