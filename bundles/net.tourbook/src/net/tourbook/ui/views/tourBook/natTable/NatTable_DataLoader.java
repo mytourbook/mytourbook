@@ -1161,8 +1161,8 @@ public class NatTable_DataLoader {
       /*
        * MOTION
        */
-      case TableColumnFactory.MOTION_AVG_PACE_ID:     return sortByAvgPace    + " AS " + TableColumnFactory.MOTION_AVG_PACE_ID;
-      case TableColumnFactory.MOTION_AVG_SPEED_ID:    return sortByAvgSpeed   + " AS " + TableColumnFactory.MOTION_AVG_SPEED_ID;
+      case TableColumnFactory.MOTION_AVG_PACE_ID:     return sortByAvgPace    + " AS " + TableColumnFactory.MOTION_AVG_PACE_ID; //$NON-NLS-1$
+      case TableColumnFactory.MOTION_AVG_SPEED_ID:    return sortByAvgSpeed   + " AS " + TableColumnFactory.MOTION_AVG_SPEED_ID; //$NON-NLS-1$
 
       }
 

@@ -1695,7 +1695,7 @@ public class PrefPageTourType_Definitions extends PreferencePage implements IWor
          final String sql = UI.EMPTY_STRING
 
                + "SELECT emTourData" + NL //                                              //$NON-NLS-1$
-               + " FROM " + TourData.class.getSimpleName() + " AS emTourData" + NL //     //$NON-NLS-1$
+               + " FROM " + TourData.class.getSimpleName() + " AS emTourData" + NL //     //$NON-NLS-1$ //$NON-NLS-2$
                + " WHERE emTourData.tourType.typeId=" + tourType.getTypeId() + NL //      //$NON-NLS-1$
          ;
 

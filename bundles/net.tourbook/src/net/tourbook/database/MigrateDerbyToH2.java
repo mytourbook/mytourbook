@@ -318,7 +318,7 @@ public class MigrateDerbyToH2 {
 
          // display successfull migration
          final String message2 = "The tour database was migrated successfully from Derby to H2 !\n\n"
-               + "The old Derby tour database files in\n\n\"%s\"\n\ncan be deleted when all is working as it should.\n\n".formatted(
+               + "The old Derby tour database files can be deleted when all is working as it should, they are located in \n\n\"%s\"\n\n".formatted(
                      DERBY_DATABASE_FOLDER_PATH)
                + "MyTourbook is now restarting to have a clean startup." //
          ;

@@ -35,41 +35,25 @@ import net.tourbook.application.SplashManager;
 import net.tourbook.common.UI;
 import net.tourbook.common.util.StatusUtil;
 
-import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 
 public class H2CompactDatabase {
 
-   public static void compactH2Database() {
+   /**
+    * @return Returns <code>true</code> when H2 was compacted
+    */
+   public static boolean compactH2Database() {
 
-      final Display display = Display.getDefault();
-      final Shell shell = display.getActiveShell();
-
-      if (new MessageDialog(shell,
-
-            Messages.Dialog_CompactDb_Title,
-            null, // no title image
-
-            "Compact tour database now?",
-            MessageDialog.QUESTION,
-
-            1, // default index
-
-            "Com&pact Now",
-            Messages.App_Action_Cancel
-
-      ).open() != IDialogConstants.OK_ID) {
-         return;
-      }
+      final Shell shell = Display.getDefault().getActiveShell();
 
       final Path mvDbFile = Paths.get(TourDatabase.H2_DB_FILE_PATH + ".mv.db"); //$NON-NLS-1$
       final Path lockFile = Paths.get(TourDatabase.H2_DB_FILE_PATH + ".lock.db"); //$NON-NLS-1$
 
       // Only compact if the database already exists
-      if (!Files.exists(mvDbFile)) {
-         return;
+      if (Files.exists(mvDbFile) == false) {
+         return false;
       }
 
       // Abort if an external tool currently holds the lock
@@ -79,23 +63,21 @@ public class H2CompactDatabase {
                Messages.Dialog_CompactDb_Title,
                "H2 database is locked by another process; skipping startup compaction");
 
-         return;
+         return false;
       }
 
       try {
 
+         final SplashManager splashManager = SplashManager.getInstance();
+
          final long sizeBeforeBytes = Files.size(mvDbFile);
          final long startTime = System.nanoTime();
 
-         // BusyIndicator.showWhile is not working
-         final SplashManager splashManager = SplashManager.getInstance();
-         splashManager.setMessage("Compacting %s".formatted(mvDbFile));
-
-         // Compact offline before opening any JDBC connection (safe with AUTO_SERVER=TRUE)
-//         MVStoreTool.compact(mvDbFile.toString(), true);
-
          try (Connection conn = TourDatabase.getInstance().getConnection();
                Statement stmt = conn.createStatement()) {
+
+            // BusyIndicator.showWhile is not working
+            splashManager.setMessage("Compacting %s".formatted(mvDbFile));
 
             stmt.execute("SHUTDOWN COMPACT"); //$NON-NLS-1$
 
@@ -111,12 +93,16 @@ public class H2CompactDatabase {
 
          final String message = UI.EMPTY_STRING
 
-               + "H2 compation finished in %d ms\n\nBefore:\t%8.2f MB\nAfter:\t%8.2f MB\nSaved:\t%8.2f MB".formatted(
+               + "H2 compaction finished in %d ms\n\nBefore:\t%8.2f MB\nAfter:\t%8.2f MB\nSaved:\t%8.2f MB\n\n".formatted(
 
                      durationMs,
                      sizeBeforeBytes / (1024.0 * 1024.0),
                      sizeAfterBytes / (1024.0 * 1024.0),
-                     savedBytes / (1024.0 * 1024.0));
+                     savedBytes / (1024.0 * 1024.0))
+
+               + "MyTourbook is now restarting to have a clean startup." //
+
+         ;
 
          splashManager.setMessage(message);
 
@@ -124,10 +110,14 @@ public class H2CompactDatabase {
                Messages.Dialog_CompactDb_Title,
                message);
 
+         return true;
+
       } catch (final Exception e) {
 
-         StatusUtil.log("H2 startup compaction failed: " + e.getMessage(), e);
+         StatusUtil.log("H2 startup compaction failed: " + e.getMessage(), e); //$NON-NLS-1$
       }
+
+      return false;
    }
 
    private static String formatBytes(final long bytes) {
@@ -241,7 +231,7 @@ public class H2CompactDatabase {
 
       final List<String> allFooter = List.of(
 
-            "TOTAL (" + allRows.size() + " tables)",
+            "TOTAL (%d tables)".formatted(allRows.size()),
             "%,d".formatted(totalRows), //$NON-NLS-1$
             formatBytes(totalData),
             formatBytes(totalAll));

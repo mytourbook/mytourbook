@@ -201,7 +201,7 @@ public class Application implements IApplication {
 
             // do a clean startup
 
-            display.asyncExec(() -> PlatformUI.getWorkbench().restart());
+            return IApplication.EXIT_RESTART;
 
          } else if (Boolean.FALSE.equals(isMigrated)) {
 
@@ -215,7 +215,12 @@ public class Application implements IApplication {
             // prevent to do it a second time
             updatePrefStore(ITourbookPreferences.TOUR_DATABASE_IS_RUN_TOOL_COMPACT_H2, false);
 
-            H2CompactDatabase.compactH2Database();
+            if (H2CompactDatabase.compactH2Database()) {
+
+               // do a clean startup
+
+               return IApplication.EXIT_RESTART;
+            }
          }
 
          if (_prefStore.getBoolean(ITourbookPreferences.TOUR_DATABASE_IS_RUN_TOOL_CHECK_H2_CONSISTENCY)) {

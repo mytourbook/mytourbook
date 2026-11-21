@@ -3381,7 +3381,7 @@ public class Util {
    public static String truncateLines(final String text, final int n) {
 
       if (text == null || n <= 0) {
-         return "";
+         return UI.EMPTY_STRING;
       }
 
       int index = -1;

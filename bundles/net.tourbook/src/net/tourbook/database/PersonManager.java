@@ -67,7 +67,7 @@ public class PersonManager {
          final String sql = UI.EMPTY_STRING
 
                + "SELECT emTourPerson" + NL //                                               //$NON-NLS-1$
-               + " FROM " + TourPerson.class.getSimpleName() + " AS emTourPerson" + NL //    //$NON-NLS-1$
+               + " FROM " + TourPerson.class.getSimpleName() + " AS emTourPerson" + NL //    //$NON-NLS-1$ //$NON-NLS-2$
                + " ORDER BY" + NL //                                                         //$NON-NLS-1$
                + "   emTourPerson.lastName," + NL //                                         //$NON-NLS-1$
                + "   emTourPerson.firstName" + NL //                                         //$NON-NLS-1$

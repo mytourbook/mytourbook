@@ -102,7 +102,7 @@ public class DialogCompactH2Database extends Dialog {
                IDialogConstants.CLIENT_ID + 2,
                "Com&pact...",
                false);
-         _btnCompact.setToolTipText("Compact the H2 database");
+         _btnCompact.setToolTipText("Compact H2 database");
 
          _btnCompact.addSelectionListener(new SelectionAdapter() {
             @Override

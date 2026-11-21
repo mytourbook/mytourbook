@@ -71,7 +71,7 @@ public class SplashManager {
          path = "/" + path; //$NON-NLS-1$
       }
 
-      final String uriPath = "platform:/plugin/" + pluginId + path;
+      final String uriPath = "platform:/plugin/" + pluginId + path; //$NON-NLS-1$
 
       try {
 

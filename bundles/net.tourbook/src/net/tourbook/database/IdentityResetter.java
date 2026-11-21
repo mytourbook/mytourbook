@@ -33,7 +33,7 @@ public class IdentityResetter {
                                  final String column,
                                  final String quote) throws SQLException {
 
-      final String sql = "SELECT COALESCE(MAX(%s%s%s), 0) + 1 FROM %s%s%s".formatted(
+      final String sql = "SELECT COALESCE(MAX(%s%s%s), 0) + 1 FROM %s%s%s".formatted( //$NON-NLS-1$
             quote,
             column,
             quote,
@@ -66,18 +66,18 @@ public class IdentityResetter {
 
       String quote = meta.getIdentifierQuoteString();
       if (quote == null || quote.isBlank()) {
-         quote = "\"";
+         quote = "\""; //$NON-NLS-1$
       }
 
       splashManager.setMessage("Resetting database identity sequences on %s (schema: %s)".formatted(product, schema));
 
       final List<String> allTables = new ArrayList<>();
 
-      try (ResultSet rs = meta.getTables(catalog, schema, "%", new String[] { "TABLE" })) {
+      try (ResultSet rs = meta.getTables(catalog, schema, "%", new String[] { "TABLE" })) { //$NON-NLS-1$ //$NON-NLS-2$
 
          while (rs.next()) {
 
-            allTables.add(rs.getString("TABLE_NAME"));
+            allTables.add(rs.getString("TABLE_NAME")); //$NON-NLS-1$
          }
       }
 
@@ -85,13 +85,13 @@ public class IdentityResetter {
 
       for (final String table : allTables) {
 
-         try (ResultSet cols = meta.getColumns(catalog, schema, table, "%")) {
+         try (ResultSet cols = meta.getColumns(catalog, schema, table, "%")) { //$NON-NLS-1$
 
             while (cols.next()) {
 
-               if ("YES".equalsIgnoreCase(cols.getString("IS_AUTOINCREMENT"))) {
+               if ("YES".equalsIgnoreCase(cols.getString("IS_AUTOINCREMENT"))) { //$NON-NLS-1$ //$NON-NLS-2$
 
-                  final String column = cols.getString("COLUMN_NAME");
+                  final String column = cols.getString("COLUMN_NAME"); //$NON-NLS-1$
                   final long nextVal = getNextId(conn, table, column, quote);
 
                   try {
@@ -144,9 +144,9 @@ public class IdentityResetter {
 
       try (Statement stmt = conn.createStatement()) {
 
-         if (productLower.contains("mariadb") || productLower.contains("mysql")) {
+         if (productLower.contains("mariadb") || productLower.contains("mysql")) { //$NON-NLS-1$ //$NON-NLS-2$
 
-            stmt.execute("ALTER TABLE %s%s%s AUTO_INCREMENT = %d".formatted(
+            stmt.execute("ALTER TABLE %s%s%s AUTO_INCREMENT = %d".formatted( //$NON-NLS-1$
                   quote,
                   table,
                   quote,
@@ -154,22 +154,22 @@ public class IdentityResetter {
 
             return true;
 
-         } else if (productLower.contains("postgresql")) {
+         } else if (productLower.contains("postgresql")) { //$NON-NLS-1$
 
             final String qualifiedTable = (schema != null && !schema.isBlank())
-                  ? "%s%s%s.%s%s%s".formatted(quote, schema, quote, quote, table, quote)
-                  : "%s%s%s".formatted(quote, table, quote);
+                  ? "%s%s%s.%s%s%s".formatted(quote, schema, quote, quote, table, quote) //$NON-NLS-1$
+                  : "%s%s%s".formatted(quote, table, quote); //$NON-NLS-1$
 
-            stmt.execute("SELECT setval(pg_get_serial_sequence('%s', '%s'), %d, false)".formatted(
+            stmt.execute("SELECT setval(pg_get_serial_sequence('%s', '%s'), %d, false)".formatted( //$NON-NLS-1$
                   qualifiedTable,
                   column,
                   nextVal));
 
             return true;
 
-         } else if (productLower.contains("h2") || productLower.contains("derby")) {
+         } else if (productLower.contains("h2") || productLower.contains("derby")) { //$NON-NLS-1$ //$NON-NLS-2$
 
-            stmt.execute("ALTER TABLE %s%s%s ALTER COLUMN %s%s%s RESTART WITH %d".formatted(
+            stmt.execute("ALTER TABLE %s%s%s ALTER COLUMN %s%s%s RESTART WITH %d".formatted( //$NON-NLS-1$
                   quote,
                   table,
                   quote,
@@ -180,11 +180,11 @@ public class IdentityResetter {
 
             return true;
 
-         } else if (productLower.contains("microsoft") || productLower.contains("sql server")) {
+         } else if (productLower.contains("microsoft") || productLower.contains("sql server")) { //$NON-NLS-1$ //$NON-NLS-2$
 
             final long reseedVal = Math.max(0L, nextVal - 1L);
 
-            stmt.execute("DBCC CHECKIDENT ('%s', RESEED, %d)".formatted(table, reseedVal));
+            stmt.execute("DBCC CHECKIDENT ('%s', RESEED, %d)".formatted(table, reseedVal)); //$NON-NLS-1$
 
             return true;
 

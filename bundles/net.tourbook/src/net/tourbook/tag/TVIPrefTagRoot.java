@@ -109,7 +109,7 @@ public class TVIPrefTagRoot extends TVIPrefTagItem {
 
             + "SELECT emTagCategory" //$NON-NLS-1$
             + " FROM " + TourTagCategory.class.getSimpleName() + " AS emTagCategory" //$NON-NLS-1$ //$NON-NLS-2$
-            + " WHERE emTagCategory.isRoot = 1";
+            + " WHERE emTagCategory.isRoot = 1"; //$NON-NLS-1$
 
       final TypedQuery<TourTagCategory> emTagCatQuery = em.createQuery(sql, TourTagCategory.class);
 

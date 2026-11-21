@@ -463,7 +463,7 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
 //		IWorkbenchPage activePage = getWindowConfigurer().getWindow().getActivePage();
 //		activePage.setEditorAreaVisible(true);
 
-// this will display the title without the DEV appendix      
+// this will display the title without the DEV appendix
 //    final IWorkbenchWindowConfigurer configurer = getWindowConfigurer();
 //
 //    configurer.setTitle(_appTitle);
@@ -584,6 +584,9 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
 //		configurer.setShowStatusLine(false);
 
       configurer.setTitle(_appTitle);
+
+      // ensure that sql constants are filled
+      TourDatabase.getInstance();
 
       prefPages_RemoveUnwantedPreferencesPages();
 
