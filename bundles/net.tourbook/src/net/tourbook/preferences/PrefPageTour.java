@@ -494,7 +494,7 @@ public class PrefPageTour extends PreferencePage implements IWorkbenchPreference
       final boolean isExternalDb = _rdoDbSystem_External.getSelection();
 
       // it happend 2 times, that this value was true but the UI was not modified :-?
-      System.err.println(UI.timeStamp() + " PrefPageTour.saveState() isExternalDb=" + isExternalDb);
+      System.err.println(UI.timeStamp() + " PrefPageTour.saveState() isExternalDb=" + isExternalDb); //$NON-NLS-1$
 // TODO remove SYSTEM.OUT.PRINTLN
 
 // SET_FORMATTING_OFF

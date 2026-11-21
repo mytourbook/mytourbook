@@ -51,8 +51,8 @@ public class ActionHandler_Database_ConsistencyCheck extends AbstractHandler {
          MessageDialog.openInformation(
 
                Display.getDefault().getActiveShell(),
-               Messages.Dialog_CompactDb_Title,
-               "This feature is currently available only for the internal tour database H2, however the external database is selected.");
+               Messages.Dialog_ConsistencyCheck_Title,
+               Messages.Dialog_ConsistencyCheck_Message_OnlyForH2);
 
          return null;
       }
@@ -64,13 +64,13 @@ public class ActionHandler_Database_ConsistencyCheck extends AbstractHandler {
             Messages.Dialog_ConsistencyCheck_Title,
             null, // no title image
 
-            "The database consistency check will run after the next restart",
+            Messages.Dialog_ConsistencyCheck_Message_AfterRestart,
             MessageDialog.QUESTION,
 
             1, // default index
 
             // define buttons
-            "Restart and &Check Consistency",
+            Messages.Dialog_ConsistencyCheck_Action_RestartAndCheck,
             Messages.App_Action_Cancel
 
       ).open() == IDialogConstants.OK_ID) {

@@ -49,20 +49,20 @@ import org.eclipse.swt.widgets.Display;
 
 public class MigrateDerbyToH2 {
 
-   private static final String DERBY_DRIVER   = "org.apache.derby.jdbc.EmbeddedDriver";
-   private static final String DERBY_PASSWORD = "adsf";
-   private static final String DERBY_USER     = "USER";
+   private static final String DERBY_DRIVER   = "org.apache.derby.jdbc.EmbeddedDriver"; //$NON-NLS-1$
+   private static final String DERBY_PASSWORD = "adsf";                                 //$NON-NLS-1$
+   private static final String DERBY_USER     = "USER";                                 //$NON-NLS-1$
 
    private static String       DERBY_DATABASE_FOLDER_PATH;
    private static String       DERBY_DB_TOURBOOK_URL;
 
    static {
 
-      DERBY_DATABASE_FOLDER_PATH = Platform.getInstanceLocation().getURL().getPath() + "derby-database";
+      DERBY_DATABASE_FOLDER_PATH = Platform.getInstanceLocation().getURL().getPath() + "derby-database"; //$NON-NLS-1$
 
-      String derbyTourDbFilePath = DERBY_DATABASE_FOLDER_PATH + "/" + TourDatabase.SQL_TOUR_DB_NAME;
+      String derbyTourDbFilePath = DERBY_DATABASE_FOLDER_PATH + "/" + TourDatabase.SQL_TOUR_DB_NAME; //$NON-NLS-1$
 
-      if (UI.IS_WIN && derbyTourDbFilePath.startsWith("/")) {
+      if (UI.IS_WIN && derbyTourDbFilePath.startsWith("/")) { //$NON-NLS-1$
          derbyTourDbFilePath = derbyTourDbFilePath.substring(1);
       }
 
@@ -83,7 +83,7 @@ public class MigrateDerbyToH2 {
 
    private static int check_GetRowCount(final Connection conn, final String tableName) throws SQLException {
 
-      final String sql = "SELECT COUNT(*) FROM " + tableName;
+      final String sql = "SELECT COUNT(*) FROM " + tableName; //$NON-NLS-1$
 
       try (Statement stmt = conn.createStatement();
             ResultSet rs = stmt.executeQuery(sql)) {
@@ -105,8 +105,8 @@ public class MigrateDerbyToH2 {
       int numBlobs = 0;
 
       // Order by ID explicitly to guarantee identical streaming order between databases
-      final String sql = "SELECT " + idColumn + ", " + blobColumn + " FROM " + tableName + " ORDER BY " + idColumn;
-      final MessageDigest md = MessageDigest.getInstance("SHA-256");
+      final String sql = "SELECT " + idColumn + ", " + blobColumn + " FROM " + tableName + " ORDER BY " + idColumn; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+      final MessageDigest md = MessageDigest.getInstance("SHA-256"); //$NON-NLS-1$
 
       try (Statement stmt = conn.createStatement();
             ResultSet rs = stmt.executeQuery(sql)) {
@@ -143,7 +143,7 @@ public class MigrateDerbyToH2 {
 
                lastLogTime = currentTime;
 
-               _splashManager.setMessage("   Checking blobs in %s: %d".formatted(tableName, numBlobs));
+               _splashManager.setMessage("   Checking blobs in %s: %d".formatted(tableName, numBlobs)); //$NON-NLS-1$
             }
          }
       }
@@ -152,7 +152,7 @@ public class MigrateDerbyToH2 {
       final byte[] digest = md.digest();
       final StringBuilder hexString = new StringBuilder();
       for (final byte b : digest) {
-         hexString.append(String.format("%02x", b));
+         hexString.append(String.format("%02x", b)); //$NON-NLS-1$
       }
 
       return hexString.toString();
@@ -161,13 +161,13 @@ public class MigrateDerbyToH2 {
    private static List<String> getAllDerbyTables(final Connection conn) throws SQLException {
 
       final List<String> allTables = new ArrayList<>();
-      final String sql = "SELECT TABLENAME FROM SYS.SYSTABLES WHERE TABLETYPE = 'T'";
+      final String sql = "SELECT TABLENAME FROM SYS.SYSTABLES WHERE TABLETYPE = 'T'"; //$NON-NLS-1$
 
       try (Statement stmt = conn.createStatement();
             ResultSet rs = stmt.executeQuery(sql)) {
 
          while (rs.next()) {
-            allTables.add(rs.getString("TABLENAME"));
+            allTables.add(rs.getString("TABLENAME")); //$NON-NLS-1$
          }
       }
 
@@ -195,22 +195,17 @@ public class MigrateDerbyToH2 {
          final int dbVersionDesign = dbInstance.getDbVersion(conn, TourDatabase.TABLE_DB_VERSION_DESIGN);
          final int dbVersionData = dbInstance.getDbVersion(conn, TourDatabase.TABLE_DB_VERSION_DATA);
 
-         _splashManager.setMessage("Design Version %d - Data Version %d".formatted(dbVersionDesign, dbVersionData));
+         _splashManager.setMessage("Design Version %d - Data Version %d".formatted(dbVersionDesign, dbVersionData)); //$NON-NLS-1$
 
          if (dbVersionDesign == MIGRATE_DB_VERSION && dbVersionData == MIGRATE_DB_VERSION) {
 
             return true;
          }
 
-         final String message = "You are using a version of MyTourbook which cannot migrate to the new tour database H2.\n\n"
-               + "Your database versions are %d and %d (design and data) but both versions must be 63.\n\n".formatted(dbVersionDesign, dbVersionData)
-               + "To fix this requirement, install and run MyTourbook 26.11, this will update to the correct database versions.\n\n"
-               + "After that, install and run this version and you will be happy to have a faster tour database.";
-
          MessageDialog.openError(
                Display.getDefault().getActiveShell(),
-               "Migrate to H2",
-               message);
+               Messages.Migrate_DerbyToH2_Dialog_Migrate_Title,
+               Messages.Migrate_DerbyToH2_Dialog_Message_WrongDbVersion.formatted(dbVersionDesign, dbVersionData));
 
       } catch (final SQLException e) {
 
@@ -228,7 +223,7 @@ public class MigrateDerbyToH2 {
     */
    public static Boolean isMigrated() {
 
-      final Path h2DbFile = Paths.get(TourDatabase.H2_DB_FILE_PATH + ".mv.db");
+      final Path h2DbFile = Paths.get(TourDatabase.H2_DB_FILE_PATH + ".mv.db"); //$NON-NLS-1$
       if (Files.exists(h2DbFile)) {
          // when H2 database file already exists -> do nothing
          return null;
@@ -236,7 +231,7 @@ public class MigrateDerbyToH2 {
 
       String derbyFilePath = DERBY_DATABASE_FOLDER_PATH;
 
-      if (UI.IS_WIN && DERBY_DATABASE_FOLDER_PATH.startsWith("/")) {
+      if (UI.IS_WIN && DERBY_DATABASE_FOLDER_PATH.startsWith("/")) { //$NON-NLS-1$
          derbyFilePath = DERBY_DATABASE_FOLDER_PATH.substring(1);
       }
 
@@ -258,28 +253,19 @@ public class MigrateDerbyToH2 {
          return null;
       }
 
-      /*
-       * Ask user if migration should be started
-       */
-      final String message = "This is a very special version of MyTourbook.\n\n"
-            + "Before MyTourbook is working as before, the current tour database will be migrated to the new database H2.\n\n"
-            + "The current tour database will not be modified any more but BEFORE proceeding, it is a good idea"
-            + " to have a backup of the current tour database which is located in\n\n%s\n\n".formatted(DERBY_DATABASE_FOLDER_PATH)
-            + "Should the migration start now?";
-
       if (new MessageDialog(
 
             Display.getDefault().getActiveShell(),
 
-            "MyTourbook Special Startup",
+            Messages.Migrate_DerbyToH2_Dialog_Migrate_Title,
             null, // dialogTitleImage
 
-            message,
+            Messages.Migrate_DerbyToH2_Dialog_Message_ConfirmMigration.formatted(DERBY_DATABASE_FOLDER_PATH),
             MessageDialog.INFORMATION,
 
             1, // defaultIndex
 
-            "&Migrate Tour Database",
+            Messages.Migrate_DerbyToH2_Action_MigrateTourDb,
             Messages.App_Action_Cancel
 
       ).open() != IDialogConstants.OK_ID) {
@@ -293,7 +279,7 @@ public class MigrateDerbyToH2 {
       _splashManager = SplashManager.getInstance();
       _splashManager.open();
 
-      _splashManager.setMessage("Migrating Derby to H2");
+      _splashManager.setMessage("Migrating Derby to H2"); //$NON-NLS-1$
 
       if (isDbVersionOK() == false) {
 
@@ -317,16 +303,10 @@ public class MigrateDerbyToH2 {
          }
 
          // display successfull migration
-         final String message2 = "The tour database was migrated successfully from Derby to H2 !\n\n"
-               + "The old Derby tour database files can be deleted when all is working as it should, they are located in \n\n\"%s\"\n\n".formatted(
-                     DERBY_DATABASE_FOLDER_PATH)
-               + "MyTourbook is now restarting to have a clean startup." //
-         ;
-
          MessageDialog.openInformation(
                Display.getDefault().getActiveShell(),
-               "MyTourbook Special Startup",
-               message2);
+               Messages.Migrate_DerbyToH2_Dialog_Migrate_Title,
+               Messages.Migrate_DerbyToH2_Dialog_Message_SuccessfulMigration.formatted(DERBY_DATABASE_FOLDER_PATH));
 
          return true;
       }
@@ -342,7 +322,7 @@ public class MigrateDerbyToH2 {
 
          final long end = System.currentTimeMillis();
 
-         _splashManager.setMessage(" Migration duration: %7.3f s".formatted((float) (end - start) / 1000));
+         _splashManager.setMessage("Migration duration: %7.3f s".formatted((float) (end - start) / 1000)); //$NON-NLS-1$
 
          return true;
       }
@@ -442,7 +422,7 @@ public class MigrateDerbyToH2 {
       // 2. Iterate through each table and migrate its content
       for (final String tableName : allDerbyTableNames) {
 
-         _splashManager.setMessage("Migrating table: " + tableName);
+         _splashManager.setMessage("Migrating table: %s".formatted(tableName)); //$NON-NLS-1$
 
          if (tableName.equalsIgnoreCase(TourDatabase.TABLE_DB_VERSION_DESIGN)
                || tableName.equalsIgnoreCase(TourDatabase.TABLE_DB_VERSION_DATA)) {
@@ -456,8 +436,8 @@ public class MigrateDerbyToH2 {
          }
       }
 
-      _splashManager.setMessage("Derby vs H2 rows diff: %d".formatted(_allRowsDiff));
-      _splashManager.setMessage("Database migration successfully completed!");
+      _splashManager.setMessage("Derby vs H2 rows diff: %d".formatted(_allRowsDiff)); //$NON-NLS-1$
+      _splashManager.setMessage("Database migration successfully completed!"); //$NON-NLS-1$
    }
 
    private static void migrate_40_MigrateTableData_One(final Connection srcConn,
@@ -466,7 +446,7 @@ public class MigrateDerbyToH2 {
 
       long lastLogTime = System.currentTimeMillis();
 
-      final String selectSql = "SELECT * FROM " + tableName;
+      final String selectSql = "SELECT * FROM " + tableName; //$NON-NLS-1$
 
       try (Statement srcStmt = srcConn.createStatement();
             ResultSet srcResultSet = srcStmt.executeQuery(selectSql)) {
@@ -482,25 +462,27 @@ public class MigrateDerbyToH2 {
 
          // 2. Build an explicit, bulletproof INSERT statement specifying column names
          // e.g., INSERT INTO TOURPERSON (ID, NAME, BIRTHDAY) VALUES (?, ?, ?)
-         final StringBuilder insertBuilder = new StringBuilder("INSERT INTO " + tableName + " (");
-         final StringBuilder valuesBuilder = new StringBuilder(" VALUES (");
+         final StringBuilder insertBuilder = new StringBuilder("INSERT INTO " + tableName + " ("); //$NON-NLS-1$ //$NON-NLS-2$
+         final StringBuilder valuesBuilder = new StringBuilder(" VALUES ("); //$NON-NLS-1$
 
          for (int i = 0; i < allColumnNames.size(); i++) {
 
             if (i > 0) {
-               insertBuilder.append(", ");
-               valuesBuilder.append(", ");
+               insertBuilder.append(", "); //$NON-NLS-1$
+               valuesBuilder.append(", "); //$NON-NLS-1$
             }
 
             // Quote to handle mixed-case or reserved names safely
-            insertBuilder.append("\"").append(allColumnNames.get(i)).append("\"");
-            valuesBuilder.append("?");
+            insertBuilder.append("\"").append(allColumnNames.get(i)).append("\""); //$NON-NLS-1$ //$NON-NLS-2$
+            valuesBuilder.append("?"); //$NON-NLS-1$
          }
-         insertBuilder.append(")").append(valuesBuilder.append(")"));
+         insertBuilder
+               .append(")") //$NON-NLS-1$
+               .append(valuesBuilder.append(")")); //$NON-NLS-1$
 
          // Disable referential integrity checks during batch processing
          try (Statement constraintStmt = destConn.createStatement()) {
-            constraintStmt.execute("SET REFERENTIAL_INTEGRITY FALSE");
+            constraintStmt.execute("SET REFERENTIAL_INTEGRITY FALSE"); //$NON-NLS-1$
          }
 
          try (PreparedStatement destPstmt = destConn.prepareStatement(insertBuilder.toString())) {
@@ -604,7 +586,7 @@ public class MigrateDerbyToH2 {
 
                      lastLogTime = currentTime;
 
-                     _splashManager.setMessage("   %d rows in %s".formatted(numBatches, tableName));
+                     _splashManager.setMessage("   %d rows in %s".formatted(numBatches, tableName)); //$NON-NLS-1$
                   }
 
                   destPstmt.executeBatch();
@@ -614,7 +596,7 @@ public class MigrateDerbyToH2 {
 
             if (numBatches % maxBatches != 0) {
 
-               _splashManager.setMessage("   %d rows in %s".formatted(numBatches, tableName));
+               _splashManager.setMessage("   %d rows in %s".formatted(numBatches, tableName)); //$NON-NLS-1$
 
                destPstmt.executeBatch();
                destConn.commit();
@@ -625,7 +607,7 @@ public class MigrateDerbyToH2 {
             // Restore constraint checking validation
 
             try (Statement constraintStmt = destConn.createStatement()) {
-               constraintStmt.execute("SET REFERENTIAL_INTEGRITY TRUE");
+               constraintStmt.execute("SET REFERENTIAL_INTEGRITY TRUE"); //$NON-NLS-1$
             }
          }
       }
@@ -647,37 +629,37 @@ public class MigrateDerbyToH2 {
 
       if (rowsDiff > 0) {
 
-         _splashManager.setMessage("   Check: Derby rows: %d - H2 rows: %d                                      Rows diff: %d".formatted(
+         _splashManager.setMessage("   Check: Derby rows: %d - H2 rows: %d                                      Rows diff: %d".formatted( //$NON-NLS-1$
                derbyRows,
                h2Rows,
                rowsDiff));
 
       } else {
 
-         _splashManager.setMessage("   Check: Derby rows: %d - H2 rows: %d".formatted(derbyRows, h2Rows));
+         _splashManager.setMessage("   Check: Derby rows: %d - H2 rows: %d".formatted(derbyRows, h2Rows)); //$NON-NLS-1$
       }
 
       /*
        * Blob check
        */
-      if (tableName.equalsIgnoreCase("TOURDATA")) {
+      if (tableName.equalsIgnoreCase("TOURDATA")) { //$NON-NLS-1$
 
-         _splashManager.setMessage("   Checking: TOURDATA Blobs");
+         _splashManager.setMessage("   Checking: TOURDATA Blobs"); //$NON-NLS-1$
 
-         final String derbyHash = check_GetTableBlobCheckSum(derbyConn, "TOURDATA", "tourId", "SerieData");
-         final String h2Hash = check_GetTableBlobCheckSum(h2Conn, "TOURDATA", "tourId", "SerieData");
+         final String derbyHash = check_GetTableBlobCheckSum(derbyConn, "TOURDATA", "tourId", "SerieData"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+         final String h2Hash = check_GetTableBlobCheckSum(h2Conn, "TOURDATA", "tourId", "SerieData"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 
          if (derbyHash.equals(h2Hash)) {
-            _splashManager.setMessage("   Check: TOURDATA Blobs perfectly matched via SHA-256 validation");
+            _splashManager.setMessage("   Check: TOURDATA Blobs perfectly matched via SHA-256 validation"); //$NON-NLS-1$
          } else {
-            _splashManager.setMessage("   Check: Critical Error: Data mismatch detected inside TOURDATA blobs !");
+            _splashManager.setMessage("   Check: Critical Error: Data mismatch detected inside TOURDATA blobs !"); //$NON-NLS-1$
          }
       }
    }
 
    private static void shutdownDerby() {
 
-      try (Connection conn = DriverManager.getConnection("jdbc:derby:;shutdown=true")) {
+      try (Connection conn = DriverManager.getConnection("jdbc:derby:;shutdown=true")) { //$NON-NLS-1$
 
       } catch (final SQLException e) {
 

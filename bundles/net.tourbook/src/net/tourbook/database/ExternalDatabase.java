@@ -47,7 +47,7 @@ public class ExternalDatabase {
     * Subfolder in the app instance location where the externl jdbc driver jar is stored. This
     * folder is created when a driver jar is downloaded and do not yet exist.
     */
-   private static final String           FOLDER_EXTERNAL_DB = "external-db";
+   private static final String           FOLDER_EXTERNAL_DB = "external-db";                //$NON-NLS-1$
 
    private static Path                   _externalDbPath;
 
@@ -68,7 +68,7 @@ public class ExternalDatabase {
 
       String instanceLocation = Platform.getInstanceLocation().getURL().getPath();
 
-      if (instanceLocation.startsWith("/")) {
+      if (instanceLocation.startsWith("/")) { //$NON-NLS-1$
          instanceLocation = instanceLocation.substring(1);
       }
 
@@ -85,7 +85,7 @@ public class ExternalDatabase {
       // Connect to the database server base URL (without specifying a specific database if possible)
       try (Connection conn = DriverManager.getConnection(_configConnectionUrl, _configDbUsername, _configDbPassword)) {
 
-         TourLogManager.log_DEFAULT("Connected to sql server with: " + _configConnectionUrl);
+         TourLogManager.log_DEFAULT("Connected to sql server with: %s".formatted(_configConnectionUrl));
 
          // Get database metadata
          final var metaData = conn.getMetaData();
@@ -124,20 +124,20 @@ public class ExternalDatabase {
 
       } catch (final SQLException e) {
 
-         TourLogManager.log_EXCEPTION_WithStacktrace("Connection failed or metadata unavailable", e);
+         TourLogManager.log_EXCEPTION_WithStacktrace("Connection failed or metadata unavailable", e); //$NON-NLS-1$
 
          return false;
       }
 
       if (isDbAvailable) {
 
-         TourLogManager.log_DEFAULT("Database is available: " + _configDbName);
+         TourLogManager.log_DEFAULT("Database is available: %s".formatted(_configDbName));
 
          return true;
 
       } else {
 
-         TourLogManager.log_INFO("Database is not available: " + _configDbName);
+         TourLogManager.log_INFO("Database is not available: %s".formatted(_configDbName));
 
          return false;
       }
@@ -163,7 +163,7 @@ public class ExternalDatabase {
          // check if the file already exists locally
          if (Files.exists(targetPath)) {
 
-            TourLogManager.log_DEFAULT("Jar file exists locally: " + targetPath.toAbsolutePath());
+            TourLogManager.log_DEFAULT("Jar file exists locally: %s".formatted(targetPath.toAbsolutePath()));
 
             return targetPath;
          }
@@ -185,13 +185,13 @@ public class ExternalDatabase {
       final Path parentDir = targetPath.getParent();
       if (parentDir != null && !Files.exists(parentDir)) {
          Files.createDirectories(parentDir);
-         TourLogManager.log_DEFAULT("Created missing directories: " + parentDir.toAbsolutePath());
+         TourLogManager.log_DEFAULT("Created missing directories: %s".formatted(parentDir.toAbsolutePath()));
       }
 
       // 3. Establish the network connection
       final URL url = URI.create(urlString).toURL();
       final HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-      connection.setRequestMethod("GET");
+      connection.setRequestMethod("GET"); //$NON-NLS-1$
 
       connection.setInstanceFollowRedirects(true);
       connection.setConnectTimeout(10000);
@@ -229,15 +229,15 @@ public class ExternalDatabase {
             if (fileSize > 0) {
                final int percent = (int) ((totalBytesRead * 100) / fileSize);
                if (percent != lastPercent) {
-                  System.out.print("\rDownloading: " + percent + "%");
+                  System.out.print("\rDownloading: %d%".formatted(percent));
                   lastPercent = percent;
                }
             } else {
-               System.out.print("\rDownloaded: " + (totalBytesRead / 1024) + " KB");
+               System.out.print("\rDownloaded: %d KB".formatted((totalBytesRead / 1024)));
             }
          }
 
-         TourLogManager.log_DEFAULT("Download complete, saved to: " + targetPath.toAbsolutePath());
+         TourLogManager.log_DEFAULT("Download complete, saved to: %s".formatted(targetPath.toAbsolutePath()));
 
          return true;
 
@@ -271,7 +271,7 @@ public class ExternalDatabase {
       // 3. Register the driver via the Shim wrapper
       DriverManager.registerDriver(new DriverShim(targetDriver));
 
-      TourLogManager.log_DEFAULT("JDBC driver is registered: " + _configJdbcDriver);
+      TourLogManager.log_DEFAULT("JDBC driver is registered: %s".formatted(_configJdbcDriver));
    }
 
    private static void restoreState() {
@@ -286,7 +286,7 @@ public class ExternalDatabase {
       _configDbPassword                = _prefStore.getString(ITourbookPreferences.TOUR_DATABASE_EXTERNAL_DATABASE_PASSWORD);
       _configDbName                    = _prefStore.getString(ITourbookPreferences.TOUR_DATABASE_EXTERNAL_DATABASE_NAME);
 
-      _connectionUrl_Concatenated = _configConnectionUrl + _configDbName + _configConnectionUrl_Parameters;
+      _connectionUrl_Concatenated      = _configConnectionUrl + _configDbName + _configConnectionUrl_Parameters;
 
 // SET_FORMATTING_ON
    }
@@ -323,15 +323,15 @@ public class ExternalDatabase {
       // Connect to the database and query the version
       try (Connection connection = DriverManager.getConnection(_connectionUrl_Concatenated, _configDbUsername, _configDbPassword);
             Statement statement = connection.createStatement();
-            ResultSet resultSet = statement.executeQuery("SELECT VERSION()")) {
+            ResultSet resultSet = statement.executeQuery("SELECT VERSION()")) { //$NON-NLS-1$
 
-         TourLogManager.log_DEFAULT("Connected successfully to the database: " + _connectionUrl_Concatenated);
+         TourLogManager.log_DEFAULT("Connected successfully to the database: %s".formatted(_connectionUrl_Concatenated));
 
          if (resultSet.next()) {
 
             final String dbVersion = resultSet.getString(1);
 
-            TourLogManager.log_DEFAULT("Database server version: " + dbVersion);
+            TourLogManager.log_DEFAULT("Database server version: %s".formatted(dbVersion));
          }
 
       } finally {}

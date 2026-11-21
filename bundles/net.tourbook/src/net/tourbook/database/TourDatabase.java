@@ -2534,7 +2534,7 @@ public class TourDatabase {
          final String sql = UI.EMPTY_STRING
 
                + "SELECT emTourBeverageContainer" + NL //                                                         //$NON-NLS-1$
-               + " FROM " + TourBeverageContainer.class.getSimpleName() + " AS emTourBeverageContainer" + NL //   //$NON-NLS-1$
+               + " FROM " + TourBeverageContainer.class.getSimpleName() + " AS emTourBeverageContainer" + NL //   //$NON-NLS-1$ //$NON-NLS-2$
                + " ORDER  BY emTourBeverageContainer.name" + NL //                                                //$NON-NLS-1$
          ;
 
@@ -3011,7 +3011,7 @@ public class TourDatabase {
             final String sql = UI.EMPTY_STRING
 
                   + "SELECT emDeviceSensor" + NL //                                                   //$NON-NLS-1$
-                  + " FROM " + DeviceSensor.class.getSimpleName() + " AS emDeviceSensor" + NL //      //$NON-NLS-1$
+                  + " FROM " + DeviceSensor.class.getSimpleName() + " AS emDeviceSensor" + NL //      //$NON-NLS-1$ //$NON-NLS-2$
             ;
 
             final TypedQuery<DeviceSensor> emQuery = em.createQuery(sql, DeviceSensor.class);
@@ -3129,7 +3129,7 @@ public class TourDatabase {
             final String sql = UI.EMPTY_STRING
 
                   + "SELECT emTourType" + NL //                                              //$NON-NLS-1$
-                  + " FROM " + TourType.class.getSimpleName() + " AS emTourType" + NL //     //$NON-NLS-1$
+                  + " FROM " + TourType.class.getSimpleName() + " AS emTourType" + NL //     //$NON-NLS-1$ //$NON-NLS-2$
                   + " ORDER  BY emTourType.name" + NL //                                     //$NON-NLS-1$
             ;
 
@@ -6539,7 +6539,7 @@ public class TourDatabase {
 
       splashManager.setMessage(Messages.Database_Monitor_persistent_service_task);
 
-      final HibernatePersistenceConfiguration cfg = new HibernatePersistenceConfiguration("tourbook");
+      final HibernatePersistenceConfiguration cfg = new HibernatePersistenceConfiguration("tourbook"); //$NON-NLS-1$
 
       // 1. Define EJB / Hibernate properties
       final Map<String, Object> props = new HashMap<>();
@@ -6547,10 +6547,10 @@ public class TourDatabase {
 //SET_FORMATTING_OFF
 
       // Database Connection Settings
-      props.put("hibernate.connection.driver_class",  SQL_DB_DRIVER_CLASS);
-      props.put("hibernate.connection.url",           SQL_DB_TOUR_DB_URL);
-      props.put("hibernate.connection.username",      SQL_DB_USERNAME);
-      props.put("hibernate.connection.password",      SQL_DB_PASSWORD);
+      props.put("hibernate.connection.driver_class",  SQL_DB_DRIVER_CLASS); //$NON-NLS-1$
+      props.put("hibernate.connection.url",           SQL_DB_TOUR_DB_URL); //$NON-NLS-1$
+      props.put("hibernate.connection.username",      SQL_DB_USERNAME); //$NON-NLS-1$
+      props.put("hibernate.connection.password",      SQL_DB_PASSWORD); //$NON-NLS-1$
 
       // debug sql
 //    props.put("hibernate.show_sql",                 "true");

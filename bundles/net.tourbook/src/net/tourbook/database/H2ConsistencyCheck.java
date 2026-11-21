@@ -81,7 +81,7 @@ public class H2ConsistencyCheck {
          System.exit(1);
       }
 
-      final String message = "H2 database integrity verified";
+      final String message = Messages.Dialog_ConsistencyCheck_Message_IsVerified;
 
       _splashManager.setMessage(message);
 
@@ -132,7 +132,7 @@ public class H2ConsistencyCheck {
     */
    private static void verify_20_MvStoreOffline(final Path dbFilePath) {
 
-      _splashManager.setMessage("Stage 1: Opens the raw MVStore in read-only mode");
+      _splashManager.setMessage(Messages.Dialog_ConsistencyCheck_Stage1_OpenStore);
 
       final MVMap.Builder<Object, Object> rawMapBuilder = new MVMap.Builder<>()
             .keyType(SkipDeserializationDataType.INSTANCE)
@@ -145,7 +145,7 @@ public class H2ConsistencyCheck {
 
          for (final String mapName : store.getMapNames()) {
 
-            _splashManager.setMessage("Stage 1: " + mapName);
+            _splashManager.setMessage(Messages.Dialog_ConsistencyCheck_Stage1.formatted(mapName));
 
             // Accessing map size traverses root/internal B-tree nodes and validates page checksums
             store.openMap(mapName, rawMapBuilder).sizeAsLong();
@@ -159,7 +159,7 @@ public class H2ConsistencyCheck {
     */
    private static void verify_30_DataAndLobs(final Connection conn) throws SQLException {
 
-      _splashManager.setMessage("Stage 2: Streams the entire database via SCRIPT without writing to disk");
+      _splashManager.setMessage(Messages.Dialog_ConsistencyCheck_Stage2_StreamDb);
 
       int numLines = 0;
 
@@ -173,7 +173,7 @@ public class H2ConsistencyCheck {
             numLines++;
 
             if (numLines % 10000 == 0) {
-               _splashManager.setMessage("Stage 2: " + numLines);
+               _splashManager.setMessage(Messages.Dialog_ConsistencyCheck_Stage2.formatted(numLines));
             }
 
          }
@@ -186,7 +186,7 @@ public class H2ConsistencyCheck {
     */
    private static void verify_40_SecondaryIndexes(final Connection conn) throws SQLException {
 
-      _splashManager.setMessage("Stage 3: Scans every user-defined secondary index");
+      _splashManager.setMessage(Messages.Dialog_ConsistencyCheck_Stage3_Scan2ndIndex);
 
       final String indexQuery = """
                                 SELECT
@@ -220,7 +220,7 @@ public class H2ConsistencyCheck {
 
          for (final String sql : scanQueries) {
 
-            _splashManager.setMessage("Stage 3: " + sql);
+            _splashManager.setMessage(Messages.Dialog_ConsistencyCheck_Stage3.formatted(sql));
 
             try (ResultSet rs = scanStmt.executeQuery(sql)) {
 

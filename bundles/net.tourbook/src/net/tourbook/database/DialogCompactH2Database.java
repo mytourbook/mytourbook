@@ -100,9 +100,9 @@ public class DialogCompactH2Database extends Dialog {
          _btnCompact = createButton(
                parent,
                IDialogConstants.CLIENT_ID + 2,
-               "Com&pact...",
+               Messages.Dialog_CompactDb_Button_Compact,
                false);
-         _btnCompact.setToolTipText("Compact H2 database");
+         _btnCompact.setToolTipText(Messages.Dialog_CompactDb_Button_Compact_Tooltip);
 
          _btnCompact.addSelectionListener(new SelectionAdapter() {
             @Override
@@ -169,14 +169,14 @@ public class DialogCompactH2Database extends Dialog {
             Messages.Dialog_CompactDb_Title,
             null,
 
-            NLS.bind(Messages.Dialog_CompactDb_BackupWarning_Message, TourDatabase.H2_DB_FOLDER_PATH),
+            NLS.bind(Messages.Dialog_CompactDb_Message_BackupWarning, TourDatabase.H2_DB_FOLDER_PATH),
 
             MessageDialog.QUESTION,
 
             1, // default button index
 
             // set button labels
-            "Com&pact",
+            Messages.Dialog_CompactDb_Action_Compact,
             Messages.App_Action_Cancel);
 
       return messageDialog.open() == Window.OK;
@@ -198,13 +198,13 @@ public class DialogCompactH2Database extends Dialog {
             Messages.Dialog_CompactDb_Title,
             null, // no title image
 
-            "The database will be compacted after the next restart of MyTourbook",
+            Messages.Dialog_CompactDb_Message_CompactAndRestart,
             MessageDialog.QUESTION,
 
             1, // default index
 
             // define buttons
-            "Restart and Com&pact",
+            Messages.Dialog_CompactDb_Action_RestartAndCompact,
             Messages.App_Action_Cancel
 
       ).open() == IDialogConstants.OK_ID) {

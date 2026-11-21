@@ -365,6 +365,29 @@ public class Messages extends NLS {
    public static String        Column_SortInfo_CanNotSort;
    public static String        Column_SortInfo_CanSort;
 
+   public static String        CompactDb_H2_Footer_TotalIndices;
+   public static String        CompactDb_H2_Footer_TotalTables;
+   public static String        CompactDb_H2_Header_Blob;
+   public static String        CompactDb_H2_Header_Column;
+   public static String        CompactDb_H2_Header_Data;
+   public static String        CompactDb_H2_Header_Index;
+   public static String        CompactDb_H2_Header_Metric;
+   public static String        CompactDb_H2_Header_Rows;
+   public static String        CompactDb_H2_Header_Size;
+   public static String        CompactDb_H2_Header_Table;
+   public static String        CompactDb_H2_Header_Total;
+   public static String        CompactDb_H2_Header_Value;
+   public static String        CompactDb_H2_Label_Blobs;
+   public static String        CompactDb_H2_Label_ChunkFillRate;
+   public static String        CompactDb_H2_Label_Pages;
+   public static String        CompactDb_H2_Label_Space;
+   public static String        CompactDb_H2_Label_TablesAndIndices;
+   public static String        CompactDb_H2_Label_TotalActiveData;
+   public static String        CompactDb_H2_Label_TotalFileSize;
+   public static String        CompactDb_H2_Message_CompactingDone;
+   public static String        CompactDb_H2_Message_CompactingFile;
+   public static String        CompactDb_H2_Message_H2DbIsLocked;
+
    public static String        Compare_Result_Action_check_selected_tours;
    public static String        Compare_Result_Action_remove_save_result;
    public static String        Compare_Result_Action_save_checked_tours;
@@ -521,9 +544,25 @@ public class Messages extends NLS {
    public static String        Dialog_BeverageContainer_Title_Create;
    public static String        Dialog_BeverageContainer_Title_Edit;
 
+   public static String        Dialog_CompactDb_Action_Compact;
+   public static String        Dialog_CompactDb_Action_RestartAndCompact;
+   public static String        Dialog_CompactDb_Button_Compact;
+   public static String        Dialog_CompactDb_Button_Compact_Tooltip;
+   public static String        Dialog_CompactDb_Message_BackupWarning;
+   public static String        Dialog_CompactDb_Message_CompactAndRestart;
+   public static String        Dialog_CompactDb_Message_OnlyForH2;
    public static String        Dialog_CompactDb_Title;
-   public static String        Dialog_CompactDb_BackupWarning_Message;
 
+   public static String        Dialog_ConsistencyCheck_Action_RestartAndCheck;
+   public static String        Dialog_ConsistencyCheck_Message_AfterRestart;
+   public static String        Dialog_ConsistencyCheck_Message_IsVerified;
+   public static String        Dialog_ConsistencyCheck_Message_OnlyForH2;
+   public static String        Dialog_ConsistencyCheck_Stage1;
+   public static String        Dialog_ConsistencyCheck_Stage1_OpenStore;
+   public static String        Dialog_ConsistencyCheck_Stage2;
+   public static String        Dialog_ConsistencyCheck_Stage2_StreamDb;
+   public static String        Dialog_ConsistencyCheck_Stage3;
+   public static String        Dialog_ConsistencyCheck_Stage3_Scan2ndIndex;
    public static String        Dialog_ConsistencyCheck_Title;
 
    public static String        Dialog_CreateTourMarkers_Button_CreateMarkers;
@@ -1715,6 +1754,12 @@ public class Messages extends NLS {
    public static String        Map_Points_LabelTime_DateTime;
    public static String        Map_Points_LabelTime_None;
    public static String        Map_Points_LabelTime_Time;
+
+   public static String        Migrate_DerbyToH2_Action_MigrateTourDb;
+   public static String        Migrate_DerbyToH2_Dialog_Message_ConfirmMigration;
+   public static String        Migrate_DerbyToH2_Dialog_Message_SuccessfulMigration;
+   public static String        Migrate_DerbyToH2_Dialog_Message_WrongDbVersion;
+   public static String        Migrate_DerbyToH2_Dialog_Migrate_Title;
 
    public static String        Model_Player_Button_MapModel_Tooltip;
    public static String        Model_Player_Button_MapModelCursor_Tooltip;

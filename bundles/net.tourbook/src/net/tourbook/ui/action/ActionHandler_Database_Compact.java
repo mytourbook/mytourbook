@@ -47,7 +47,7 @@ public class ActionHandler_Database_Compact extends AbstractHandler {
 
                Display.getDefault().getActiveShell(),
                Messages.Dialog_CompactDb_Title,
-               "This feature is currently available only for the internal tour database H2, however the external database is selected.");
+               Messages.Dialog_CompactDb_Message_OnlyForH2);
 
          return null;
       }

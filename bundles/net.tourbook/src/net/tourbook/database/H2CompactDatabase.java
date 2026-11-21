@@ -61,7 +61,7 @@ public class H2CompactDatabase {
 
          MessageDialog.openInformation(shell,
                Messages.Dialog_CompactDb_Title,
-               "H2 database is locked by another process; skipping startup compaction");
+               Messages.CompactDb_H2_Message_H2DbIsLocked);
 
          return false;
       }
@@ -77,7 +77,7 @@ public class H2CompactDatabase {
                Statement stmt = conn.createStatement()) {
 
             // BusyIndicator.showWhile is not working
-            splashManager.setMessage("Compacting %s".formatted(mvDbFile));
+            splashManager.setMessage(Messages.CompactDb_H2_Message_CompactingFile.formatted(mvDbFile));
 
             stmt.execute("SHUTDOWN COMPACT"); //$NON-NLS-1$
 
@@ -91,24 +91,15 @@ public class H2CompactDatabase {
          final long sizeAfterBytes = Files.size(mvDbFile);
          final long savedBytes = sizeBeforeBytes - sizeAfterBytes;
 
-         final String message = UI.EMPTY_STRING
-
-               + "H2 compaction finished in %d ms\n\nBefore:\t%8.2f MB\nAfter:\t%8.2f MB\nSaved:\t%8.2f MB\n\n".formatted(
-
-                     durationMs,
-                     sizeBeforeBytes / (1024.0 * 1024.0),
-                     sizeAfterBytes / (1024.0 * 1024.0),
-                     savedBytes / (1024.0 * 1024.0))
-
-               + "MyTourbook is now restarting to have a clean startup." //
-
-         ;
+         final String message = Messages.CompactDb_H2_Message_CompactingDone.formatted(
+               durationMs,
+               sizeBeforeBytes / (1024.0 * 1024.0),
+               sizeAfterBytes / (1024.0 * 1024.0),
+               savedBytes / (1024.0 * 1024.0));
 
          splashManager.setMessage(message);
 
-         MessageDialog.openInformation(shell,
-               Messages.Dialog_CompactDb_Title,
-               message);
+         MessageDialog.openInformation(shell, Messages.Dialog_CompactDb_Title, message);
 
          return true;
 
@@ -218,10 +209,10 @@ public class H2CompactDatabase {
       final List<List<String>> allHeaders = new ArrayList<>();
 
       allHeaders.add(List.of(
-            "Table",
-            "Rows",
-            "Data",
-            "Total"));
+            Messages.CompactDb_H2_Header_Table,
+            Messages.CompactDb_H2_Header_Rows,
+            Messages.CompactDb_H2_Header_Data,
+            Messages.CompactDb_H2_Header_Total));
 
       allHeaders.add(List.of(
             UI.EMPTY_STRING,
@@ -231,7 +222,7 @@ public class H2CompactDatabase {
 
       final List<String> allFooter = List.of(
 
-            "TOTAL (%d tables)".formatted(allRows.size()),
+            Messages.CompactDb_H2_Footer_TotalTables.formatted(allRows.size()),
             "%,d".formatted(totalRows), //$NON-NLS-1$
             formatBytes(totalData),
             formatBytes(totalAll));
@@ -291,7 +282,10 @@ public class H2CompactDatabase {
 
       final List<List<String>> allHeaders = new ArrayList<>();
 
-      allHeaders.add(List.of("BLOB / CLOB", "Column", "Size"));
+      allHeaders.add(List.of(
+            Messages.CompactDb_H2_Header_Blob,
+            Messages.CompactDb_H2_Header_Column,
+            Messages.CompactDb_H2_Header_Size));
 
       allHeaders.add(List.of(
             UI.EMPTY_STRING,
@@ -338,7 +332,10 @@ public class H2CompactDatabase {
 
       final List<List<String>> allHeaders = new ArrayList<>();
 
-      allHeaders.add(List.of("Table", "Index", "Size"));
+      allHeaders.add(List.of(
+            Messages.CompactDb_H2_Header_Table,
+            Messages.CompactDb_H2_Header_Index,
+            Messages.CompactDb_H2_Header_Size));
 
       allHeaders.add(List.of(
             UI.EMPTY_STRING,
@@ -347,7 +344,7 @@ public class H2CompactDatabase {
 
       final List<String> allFooter = List.of(
 
-            "TOTAL (%d indices)".formatted(allRows.size()),
+            Messages.CompactDb_H2_Footer_TotalIndices.formatted(allRows.size()),
             UI.EMPTY_STRING,
             formatBytes(totalIndices));
 
@@ -389,23 +386,23 @@ public class H2CompactDatabase {
 
       final List<List<String>> rows = List.of(
 
-            List.of("Total .mv.db File Size",         formatBytes(fileSize)),
-            List.of("Tables & Indexes",               formatBytes(tablesAndIndexesBytes)),
-            List.of("BLOBs & CLOBs",                  formatBytes(lobBytes)),
-            List.of("Total Active Data",              formatBytes(active)),
-            List.of("Unallocated/Dead Space",         formatBytes(deadBytes)),
+            List.of(Messages.CompactDb_H2_Label_TotalFileSize,       formatBytes(fileSize)),
+            List.of(Messages.CompactDb_H2_Label_TablesAndIndices,    formatBytes(tablesAndIndexesBytes)),
+            List.of(Messages.CompactDb_H2_Label_Blobs,               formatBytes(lobBytes)),
+            List.of(Messages.CompactDb_H2_Label_TotalActiveData,     formatBytes(active)),
+            List.of(Messages.CompactDb_H2_Label_Space,               formatBytes(deadBytes)),
 
             List.of(UI.EMPTY_STRING,                  UI.EMPTY_STRING),
 
-            List.of("Chunk Fill Rate",                stats.getOrDefault("info.CHUNKS_FILL_RATE", "N/A") + "%"), //$NON-NLS-2$  //$NON-NLS-3$  //$NON-NLS-4$
-            List.of("Dead/All Pages", "%,d# / %,d#"   .formatted(numPages - numLivePages, numPages) )  //$NON-NLS-2$
+            List.of(Messages.CompactDb_H2_Label_ChunkFillRate,       stats.getOrDefault("info.CHUNKS_FILL_RATE", "N/A") + "%"),  //$NON-NLS-1$//$NON-NLS-2$  //$NON-NLS-3$
+            List.of(Messages.CompactDb_H2_Label_Pages, "%,d# / %,d#" .formatted(numPages - numLivePages, numPages) ) //$NON-NLS-1$
             );
 
 // SET_FORMATTING_ON
 
       final List<List<String>> allHeaders = new ArrayList<>();
 
-      allHeaders.add(List.of("Metric", "Value"));
+      allHeaders.add(List.of(Messages.CompactDb_H2_Header_Metric, Messages.CompactDb_H2_Header_Value));
       allHeaders.add(List.of(UI.EMPTY_STRING, UI.UNIT_KBYTE));
 
       printTable(logFormatter, allHeaders, rows, null, Set.of(1, 2, 3, 4, 5), true);

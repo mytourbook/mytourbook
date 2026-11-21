@@ -69,7 +69,7 @@ public class IdentityResetter {
          quote = "\""; //$NON-NLS-1$
       }
 
-      splashManager.setMessage("Resetting database identity sequences on %s (schema: %s)".formatted(product, schema));
+      splashManager.setMessage("Resetting database identity sequences on %s (schema: %s)".formatted(product, schema)); //$NON-NLS-1$
 
       final List<String> allTables = new ArrayList<>();
 
@@ -108,12 +108,12 @@ public class IdentityResetter {
 
                         resetCount++;
 
-                        splashManager.setMessage("Reset identity %-25s.%-15s -> next ID: %d".formatted(table, column, nextVal));
+                        splashManager.setMessage("Reset identity %-25s.%-15s -> next ID: %d".formatted(table, column, nextVal)); //$NON-NLS-1$
                      }
 
                   } catch (final SQLException e) {
 
-                     splashManager.setMessage("Failed to reset identity for %s.%s to %d: %s".formatted(
+                     splashManager.setMessage("Failed to reset identity for %s.%s to %d: %s".formatted( //$NON-NLS-1$
                            table,
                            column,
                            nextVal,
@@ -128,7 +128,7 @@ public class IdentityResetter {
 
       final long elapsedMs = System.currentTimeMillis() - startTime;
 
-      splashManager.setMessage("Completed identity sequence reset: %d columns updated across %d tables in %d ms".formatted(
+      splashManager.setMessage("Completed identity sequence reset: %d columns updated across %d tables in %d ms".formatted( //$NON-NLS-1$
             resetCount,
             allTables.size(),
             elapsedMs));
@@ -190,7 +190,7 @@ public class IdentityResetter {
 
          } else {
 
-            SplashManager.getInstance().setMessage("Unsupported database dialect '%s' for identity reset on %s.%s"
+            SplashManager.getInstance().setMessage("Unsupported database dialect '%s' for identity reset on %s.%s" //$NON-NLS-1$
                   .formatted(
                         productLower,
                         table,
