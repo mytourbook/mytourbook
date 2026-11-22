@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<TourFilterProfiles Created="2023-09-27T21:36:42.813319600+02:00[Europe/Paris]" VersionMajor="23" VersionMicro="0" VersionMinor="8" VersionQualifier="qualifier" tourFilterVersion="1">
+<TourFilterProfiles Created="2026-11-22T13:54:10.481352300+01:00[Europe/Paris]" VersionMajor="26" VersionMicro="0" VersionMinor="11" VersionQualifier="qualifier" tourFilterVersion="1">
 <Profile isSelected="true" name="Tour Filter General">
 <Property comboSelectedIndex="0" fieldId="WEATHER_AIRQUALITY" fieldOperator="EQUALS" isEnabled="true"/>
 <Property fieldId="TOUR_TITLE" fieldOperator="IS_EMPTY" isEnabled="true"/>

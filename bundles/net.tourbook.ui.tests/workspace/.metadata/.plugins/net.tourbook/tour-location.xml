@@ -1,0 +1,197 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<TourLocationProfiles Created="2026-11-22T13:54:10.497383600+01:00[Europe/Paris]" VersionMajor="26" VersionMicro="0" VersionMinor="11" VersionQualifier="qualifier" tourLocationVersion="1">
+<Profile profileName="1 : State" zoomlevel="8">
+<Parts>
+<Part name="state"/>
+<Part name="OSM_NAME"/>
+</Parts>
+</Profile>
+<Profile profileName="2 : City" zoomlevel="10">
+<Parts>
+<Part name="settlementLarge"/>
+<Part name="state"/>
+<Part name="OSM_NAME"/>
+<Part name="city"/>
+</Parts>
+</Profile>
+<Profile profileName="3 : Town / Borough" zoomlevel="12">
+<Parts>
+<Part name="settlementLarge"/>
+<Part name="OSM_NAME"/>
+<Part name="town"/>
+</Parts>
+</Profile>
+<Profile profileName="4 : Village / Suburb" zoomlevel="13">
+<Parts>
+<Part name="settlementLarge"/>
+<Part name="suburb"/>
+<Part name="OSM_NAME"/>
+</Parts>
+</Profile>
+<Profile profileName="5 : Neighbourhood" zoomlevel="14">
+<Parts>
+<Part name="settlementLarge"/>
+<Part name="OSM_NAME"/>
+<Part name="neighbourhood"/>
+</Parts>
+</Profile>
+<Profile profileName="6 : Settlement" zoomlevel="15">
+<Parts>
+<Part name="settlementLarge"/>
+<Part name="settlementSmall"/>
+<Part name="OSM_NAME"/>
+</Parts>
+</Profile>
+<Profile profileName="7 : Major Street" zoomlevel="16">
+<Parts>
+<Part name="settlementLarge"/>
+<Part name="settlementSmall"/>
+<Part name="road"/>
+<Part name="OSM_NAME"/>
+</Parts>
+</Profile>
+<Profile profileName="8 : Minor Street" zoomlevel="17">
+<Parts>
+<Part name="settlementLarge"/>
+<Part name="settlementSmall"/>
+<Part name="road"/>
+<Part name="OSM_NAME"/>
+</Parts>
+</Profile>
+<Profile profileName="9 : Building" zoomlevel="18">
+<Parts>
+<Part name="CUSTOM_STREET_WITH_HOUSE_NUMBER"/>
+<Part name="settlementSmall"/>
+<Part name="OSM_NAME"/>
+</Parts>
+</Profile>
+<Profile profileName="Country, Large" zoomlevel="18">
+<Parts>
+<Part name="country"/>
+<Part name="settlementLarge"/>
+</Parts>
+</Profile>
+<Profile profileName="Country, Large, Name" zoomlevel="18">
+<Parts>
+<Part name="country"/>
+<Part name="settlementLarge"/>
+<Part name="OSM_NAME"/>
+</Parts>
+</Profile>
+<Profile profileName="Large" zoomlevel="18">
+<Parts>
+<Part name="settlementLarge"/>
+</Parts>
+</Profile>
+<Profile profileName="Large, Name" zoomlevel="18">
+<Parts>
+<Part name="settlementLarge"/>
+<Part name="OSM_NAME"/>
+</Parts>
+</Profile>
+<Profile profileName="Large, Name, Town" zoomlevel="18">
+<Parts>
+<Part name="settlementLarge"/>
+<Part name="OSM_NAME"/>
+<Part name="town"/>
+</Parts>
+</Profile>
+<Profile profileName="Large, Small" zoomlevel="18">
+<Parts>
+<Part name="settlementLarge"/>
+<Part name="settlementSmall"/>
+</Parts>
+</Profile>
+<Profile profileName="Large, Street" zoomlevel="18">
+<Parts>
+<Part name="settlementLarge"/>
+<Part name="CUSTOM_STREET_WITH_HOUSE_NUMBER"/>
+</Parts>
+</Profile>
+<Profile profileName="Large, Suburb" zoomlevel="18">
+<Parts>
+<Part name="settlementLarge"/>
+<Part name="suburb"/>
+</Parts>
+</Profile>
+<Profile profileName="Large, Village" zoomlevel="18">
+<Parts>
+<Part name="settlementLarge"/>
+<Part name="village"/>
+</Parts>
+</Profile>
+<Profile profileName="Name" zoomlevel="18">
+<Parts>
+<Part name="OSM_NAME"/>
+</Parts>
+</Profile>
+<Profile profileName="Small" zoomlevel="18">
+<Parts>
+<Part name="settlementSmall"/>
+</Parts>
+</Profile>
+<Profile profileName="Small, Name" zoomlevel="18">
+<Parts>
+<Part name="settlementSmall"/>
+<Part name="OSM_NAME"/>
+</Parts>
+</Profile>
+<Profile profileName="Small, Street" zoomlevel="18">
+<Parts>
+<Part name="settlementSmall"/>
+<Part name="CUSTOM_STREET_WITH_HOUSE_NUMBER"/>
+</Parts>
+</Profile>
+<Profile profileName="Small, Street, State" zoomlevel="18">
+<Parts>
+<Part name="settlementSmall"/>
+<Part name="CUSTOM_STREET_WITH_HOUSE_NUMBER"/>
+<Part name="state"/>
+</Parts>
+</Profile>
+<Profile profileName="State, Large, Name" zoomlevel="18">
+<Parts>
+<Part name="state"/>
+<Part name="settlementLarge"/>
+<Part name="OSM_NAME"/>
+</Parts>
+</Profile>
+<Profile profileName="State, Large, Name, Suburb" zoomlevel="18">
+<Parts>
+<Part name="state"/>
+<Part name="settlementLarge"/>
+<Part name="suburb"/>
+<Part name="OSM_NAME"/>
+</Parts>
+</Profile>
+<Profile profileName="State, Small, Name" zoomlevel="18">
+<Parts>
+<Part name="state"/>
+<Part name="settlementSmall"/>
+<Part name="OSM_NAME"/>
+</Parts>
+</Profile>
+<Profile isDefaultProfile="true" profileName="Street + House #" zoomlevel="18">
+<Parts>
+<Part name="CUSTOM_STREET_WITH_HOUSE_NUMBER"/>
+</Parts>
+</Profile>
+<Profile profileName="Street, Large" zoomlevel="18">
+<Parts>
+<Part name="CUSTOM_STREET_WITH_HOUSE_NUMBER"/>
+<Part name="settlementLarge"/>
+</Parts>
+</Profile>
+<Profile profileName="Street, Village" zoomlevel="18">
+<Parts>
+<Part name="CUSTOM_STREET_WITH_HOUSE_NUMBER"/>
+<Part name="village"/>
+</Parts>
+</Profile>
+<Profile profileName="Suburb, Neighbourhood" zoomlevel="18">
+<Parts>
+<Part name="suburb"/>
+<Part name="neighbourhood"/>
+</Parts>
+</Profile>
+</TourLocationProfiles>

@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<section name="Workbench">
+	<section name="net.tourbook.common.UI">
+	</section>
+	<section name="net.tourbook.preferences.PrefPageGeneral_System">
+	</section>
+</section>
