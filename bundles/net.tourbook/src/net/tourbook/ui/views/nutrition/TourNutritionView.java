@@ -565,6 +565,10 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
 
          } else if (property.equals(ITourbookPreferences.NUTRITION_BEVERAGECONTAINERS_HAVE_CHANGED)) {
 
+            if (_tourData == null) {
+               return;
+            }
+
             _tourBeverageContainers = TourDatabase.getTourBeverageContainers();
             refreshTourData(TourManager.getTour(_tourData.getTourId()));
 
