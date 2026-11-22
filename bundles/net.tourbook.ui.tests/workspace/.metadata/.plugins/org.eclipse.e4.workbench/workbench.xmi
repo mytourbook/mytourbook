@@ -10,6 +10,7 @@
     <persistedState key="aggregateWorkingSetId"/>
     <persistedState key="show_in_time" value="&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?>&#xD;&#xA;&lt;show_in_time/>"/>
     <tags>topLevel</tags>
+    <tags>shellMaximized</tags>
     <children xsi:type="basic:PartSashContainer" xmi:id="_mqT5cOKKEeyB59fpdb3pkQ" selectedElement="_mqT5ceKKEeyB59fpdb3pkQ" horizontal="true">
       <children xsi:type="advanced:PerspectiveStack" xmi:id="_mqT5ceKKEeyB59fpdb3pkQ" elementId="org.eclipse.ui.ide.perspectivestack" containerData="7500" selectedElement="_nYIBt-KKEeyB59fpdb3pkQ">
         <children xsi:type="advanced:Perspective" xmi:id="_nYIBt-KKEeyB59fpdb3pkQ" elementId="net.tourbook.perspective.TourBook" selectedElement="_nYIBuOKKEeyB59fpdb3pkQ" label="Tour Book" iconURI="platform:/plugin/net.tourbook/icons/tourbook-tours-perspective.png">
