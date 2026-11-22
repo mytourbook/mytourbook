@@ -26,7 +26,10 @@ import java.net.InetSocketAddress;
 import java.net.URL;
 import java.net.URLConnection;
 import java.time.ZonedDateTime;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
+import java.util.Properties;
 
 import net.tourbook.cloud.oauth2.OAuth2Utils;
 import net.tourbook.cloud.oauth2.TokensRetrievalHandler;
@@ -35,14 +38,21 @@ import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.Util;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourType;
+import net.tourbook.database.TourDatabase;
 import net.tourbook.device.garmin.fit.FitDataReader;
 import net.tourbook.device.gpx.GPXDeviceDataReader;
 import net.tourbook.importdata.ImportState_File;
 import net.tourbook.importdata.ImportState_Process;
 
-import jakarta.persistence.Persistence;
+import org.hibernate.jpa.HibernatePersistenceConfiguration;
+import org.hibernate.jpa.HibernatePersistenceProvider;
+
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.EntityManagerFactory;
 
 public class Initializer {
+
+   private static boolean _isInitDb;
 
    public static void authorizeVendor(final int callBackPort, final TokensRetrievalHandler tokensRetrievalHandler) {
 
@@ -151,7 +161,64 @@ public class Initializer {
 
    public static void initializeDatabase() {
 
-      Persistence.createEntityManagerFactory("tourdatabase").createEntityManager(); //$NON-NLS-1$
+      if (_isInitDb) {
+         return;
+      }
+
+      try {
+
+         final HibernatePersistenceConfiguration cfg = TourDatabase.getInstance().getHibernateConfiguration();
+
+         final List<String> managedClassNames = cfg.managedClasses().stream()
+               .map(Class::getName)
+               .toList();
+
+// SET_FORMATTING_OFF
+
+         final jakarta.persistence.spi.PersistenceUnitInfo pui = new jakarta.persistence.spi.PersistenceUnitInfo() {
+
+            @Override public void addTransformer(final jakarta.persistence.spi.ClassTransformer transformer) {}
+            @Override public boolean excludeUnlistedClasses()           { return true; }
+            @Override public ClassLoader getClassLoader()               { return TourDatabase.class.getClassLoader(); }
+            @Override public List<java.net.URL> getJarFileUrls()        { return Collections.emptyList(); }
+            @Override public javax.sql.DataSource getJtaDataSource()    { return null; }
+            @Override public List<String> getManagedClassNames()        { return managedClassNames; }
+            @Override public List<String> getMappingFileNames()         { return Collections.emptyList(); }
+            @Override public ClassLoader getNewTempClassLoader()        { return null; }
+            @Override public javax.sql.DataSource getNonJtaDataSource() { return null; }
+            @Override public String getPersistenceProviderClassName()   { return HibernatePersistenceProvider.class.getName(); }
+            @Override public String getPersistenceUnitName()            { return cfg.name(); }
+            @Override public java.net.URL getPersistenceUnitRootUrl()   { return null; }
+            @Override public String getPersistenceXMLSchemaVersion()    { return "3.2"; }
+            @Override public Properties getProperties() {
+               final Properties p = new Properties();
+               p.putAll(cfg.properties());
+               return p;
+            }
+            @Override public List<String> getQualifierAnnotationNames() { return Collections.emptyList(); }
+            @Override public String getScopeAnnotationName()            { return null; }
+            @Override public jakarta.persistence.SharedCacheMode getSharedCacheMode()                    { return jakarta.persistence.SharedCacheMode.UNSPECIFIED; }
+            @Override public jakarta.persistence.spi.PersistenceUnitTransactionType getTransactionType() { return jakarta.persistence.spi.PersistenceUnitTransactionType.RESOURCE_LOCAL; }
+            @Override public jakarta.persistence.ValidationMode getValidationMode()                      { return jakarta.persistence.ValidationMode.AUTO; }
+
+         };
+
+// SET_FORMATTING_ON
+
+         final EntityManagerFactory emFactory = new HibernatePersistenceProvider().createContainerEntityManagerFactory(pui, cfg.properties());
+
+         TourDatabase.getInstance().setEntityManagerFactory(emFactory);
+
+         // test entity manager
+         try (EntityManager em = TourDatabase.getInstance().getEntityManager()) {
+
+            _isInitDb = true;
+         }
+
+      } catch (final Exception e) {
+
+         e.printStackTrace();
+      }
    }
 
    public static HttpClientMock initializeHttpClientMock() {

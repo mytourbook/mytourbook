@@ -6217,8 +6217,71 @@ public class TourDatabase {
       }
    }
 
+   public HibernatePersistenceConfiguration getHibernateConfiguration() {
+
+      if (_instance == null) {
+
+         // ensure that sql constants are filled
+         TourDatabase.getInstance();
+      }
+
+      final HibernatePersistenceConfiguration cfg = new HibernatePersistenceConfiguration("tourbook"); //$NON-NLS-1$
+
+      // 1. Define EJB / Hibernate properties
+      final Map<String, Object> props = new HashMap<>();
+
+//SET_FORMATTING_OFF
+
+      // Database Connection Settings
+      props.put("hibernate.connection.driver_class",  SQL_DB_DRIVER_CLASS); //$NON-NLS-1$
+      props.put("hibernate.connection.url",           SQL_DB_TOUR_DB_URL); //$NON-NLS-1$
+      props.put("hibernate.connection.username",      SQL_DB_USERNAME); //$NON-NLS-1$
+      props.put("hibernate.connection.password",      SQL_DB_PASSWORD); //$NON-NLS-1$
+
+      // debug sql
+//    props.put("hibernate.show_sql",                 "true");
+//    props.put("hibernate.format_sql",               "true");
+
+      // Inject properties into the configuration instance
+      cfg.properties(props);
+
+      // Manually register annotated Entity classes
+      cfg.managedClass(DeviceSensor           .class);
+      cfg.managedClass(DeviceSensorValue      .class);
+      cfg.managedClass(Equipment              .class);
+      cfg.managedClass(EquipmentPart          .class);
+      cfg.managedClass(TourBeverageContainer  .class);
+      cfg.managedClass(TourBike               .class);
+      cfg.managedClass(TourCompared           .class);
+      cfg.managedClass(TourData               .class);
+      cfg.managedClass(TourLocation           .class);
+      cfg.managedClass(TourMarker             .class);
+      cfg.managedClass(TourMarkerType         .class);
+      cfg.managedClass(TourNutritionProduct   .class);
+      cfg.managedClass(TourPerson             .class);
+      cfg.managedClass(TourPersonHRZone       .class);
+      cfg.managedClass(TourPhoto              .class);
+      cfg.managedClass(TourReference          .class);
+      cfg.managedClass(TourTag                .class);
+      cfg.managedClass(TourTagCategory        .class);
+      cfg.managedClass(TourType               .class);
+      cfg.managedClass(TourWayPoint           .class);
+
+//SET_FORMATTING_ON
+
+      return cfg;
+   }
+
    public void removePropertyListener(final IPropertyListener listener) {
       _propertyListeners.remove(listener);
+   }
+
+   public void setEntityManagerFactory(final EntityManagerFactory emFactory) {
+
+      // set em factory from JUnit test
+      _emFactory = emFactory;
+
+      sqlStartup_10_IsSqlServerUpAndRunning();
    }
 
    /**
@@ -6233,51 +6296,6 @@ public class TourDatabase {
       // database: disconnected session #3
       // database: closing C:/DAT/runtime-net.mytourbook/workspace/h2-database/tourbook
       // database: closed
-
-//      if (_pooledDataSource != null) {
-//
-//         StatusUtil.logInfo("Closing pooled connections");
-//
-//         _pooledDataSource.close();
-//      }
-
-//      Connection conn = null;
-//
-//      try {
-//
-//         // shutdown database that all connections are closed
-//
-//      if (connection != null) {
-//         try (Statement stmt = connection.createStatement()) {
-//             // SHUTDOWN closes the database immediately
-//             // Use "SHUTDOWN COMPACT" if you want to defragment the file on exit
-//             stmt.execute("SHUTDOWN");
-//         } catch (SQLException e) {
-//             // Handle or log exception
-//         } finally {
-//             try {
-//                 if (!connection.isClosed()) {
-//                     connection.close();
-//                 }
-//             } catch (SQLException e) {
-//                 // Handle close exception
-//             }
-//         }
-//     }
-//
-//
-//      } catch (final SQLException e) {
-//
-//         final String sqlExceptionText = Util.getSQLExceptionText(e);
-//
-//         // log also the stacktrace
-//         StatusUtil.log(sqlExceptionText + Util.getStackTrace(e), e);
-//
-//      } finally {
-//
-//         Util.closeSql(conn);
-//      }
-
    }
 
    /**
@@ -6537,54 +6555,26 @@ public class TourDatabase {
 
    private synchronized void sqlStartup_60_SetupEntityManager(final SplashManager splashManager) {
 
+      if (_emFactory != null) {
+
+         // em factory could already be set from JUnit tests
+
+         return;
+      }
+
       splashManager.setMessage(Messages.Database_Monitor_persistent_service_task);
 
-      final HibernatePersistenceConfiguration cfg = new HibernatePersistenceConfiguration("tourbook"); //$NON-NLS-1$
+      try {
 
-      // 1. Define EJB / Hibernate properties
-      final Map<String, Object> props = new HashMap<>();
+         final HibernatePersistenceConfiguration cfg = getHibernateConfiguration();
 
-//SET_FORMATTING_OFF
+         // Build the Persistence Unit Factory
+         _emFactory = cfg.createEntityManagerFactory();
 
-      // Database Connection Settings
-      props.put("hibernate.connection.driver_class",  SQL_DB_DRIVER_CLASS); //$NON-NLS-1$
-      props.put("hibernate.connection.url",           SQL_DB_TOUR_DB_URL); //$NON-NLS-1$
-      props.put("hibernate.connection.username",      SQL_DB_USERNAME); //$NON-NLS-1$
-      props.put("hibernate.connection.password",      SQL_DB_PASSWORD); //$NON-NLS-1$
+      } catch (final Exception e) {
 
-      // debug sql
-//    props.put("hibernate.show_sql",                 "true");
-//    props.put("hibernate.format_sql",               "true");
-
-      // Inject properties into the configuration instance
-      cfg.properties(props);
-
-      // Manually register annotated Entity classes
-      cfg.managedClass(DeviceSensor           .class);
-      cfg.managedClass(DeviceSensorValue      .class);
-      cfg.managedClass(Equipment              .class);
-      cfg.managedClass(EquipmentPart          .class);
-      cfg.managedClass(TourBeverageContainer  .class);
-      cfg.managedClass(TourBike               .class);
-      cfg.managedClass(TourCompared           .class);
-      cfg.managedClass(TourData               .class);
-      cfg.managedClass(TourLocation           .class);
-      cfg.managedClass(TourMarker             .class);
-      cfg.managedClass(TourMarkerType         .class);
-      cfg.managedClass(TourNutritionProduct   .class);
-      cfg.managedClass(TourPerson             .class);
-      cfg.managedClass(TourPersonHRZone       .class);
-      cfg.managedClass(TourPhoto              .class);
-      cfg.managedClass(TourReference          .class);
-      cfg.managedClass(TourTag                .class);
-      cfg.managedClass(TourTagCategory        .class);
-      cfg.managedClass(TourType               .class);
-      cfg.managedClass(TourWayPoint           .class);
-
-//SET_FORMATTING_ON
-
-      // Build the Persistence Unit Factory
-      _emFactory = cfg.createEntityManagerFactory();
+         StatusUtil.log(e);
+      }
    }
 
    /**
