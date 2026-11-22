@@ -229,13 +229,13 @@ public class MigrateDerbyToH2 {
          return null;
       }
 
-      String derbyFilePath = DERBY_DATABASE_FOLDER_PATH;
+      String derbyFolderPath = DERBY_DATABASE_FOLDER_PATH;
 
       if (UI.IS_WIN && DERBY_DATABASE_FOLDER_PATH.startsWith("/")) { //$NON-NLS-1$
-         derbyFilePath = DERBY_DATABASE_FOLDER_PATH.substring(1);
+         derbyFolderPath = DERBY_DATABASE_FOLDER_PATH.substring(1);
       }
 
-      final Path derbyPath = Paths.get(derbyFilePath);
+      final Path derbyPath = Paths.get(derbyFolderPath);
 
       if (Files.exists(derbyPath) == false) {
 
@@ -260,7 +260,7 @@ public class MigrateDerbyToH2 {
             Messages.Migrate_DerbyToH2_Dialog_Migrate_Title,
             null, // dialogTitleImage
 
-            Messages.Migrate_DerbyToH2_Dialog_Message_ConfirmMigration.formatted(DERBY_DATABASE_FOLDER_PATH),
+            Messages.Migrate_DerbyToH2_Dialog_Message_ConfirmMigration.formatted(derbyFolderPath),
             MessageDialog.INFORMATION,
 
             1, // defaultIndex
@@ -306,7 +306,7 @@ public class MigrateDerbyToH2 {
          MessageDialog.openInformation(
                Display.getDefault().getActiveShell(),
                Messages.Migrate_DerbyToH2_Dialog_Migrate_Title,
-               Messages.Migrate_DerbyToH2_Dialog_Message_SuccessfulMigration.formatted(DERBY_DATABASE_FOLDER_PATH));
+               Messages.Migrate_DerbyToH2_Dialog_Message_SuccessfulMigration.formatted(derbyFolderPath));
 
          return true;
       }

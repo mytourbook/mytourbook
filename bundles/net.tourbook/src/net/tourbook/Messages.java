@@ -554,8 +554,8 @@ public class Messages extends NLS {
    public static String        Dialog_CompactDb_Title;
 
    public static String        Dialog_ConsistencyCheck_Action_RestartAndCheck;
-   public static String        Dialog_ConsistencyCheck_Message_AfterRestart;
    public static String        Dialog_ConsistencyCheck_Message_IsVerified;
+   public static String        Dialog_ConsistencyCheck_Message_RunAfterRestart;
    public static String        Dialog_ConsistencyCheck_Message_OnlyForH2;
    public static String        Dialog_ConsistencyCheck_Stage1;
    public static String        Dialog_ConsistencyCheck_Stage1_OpenStore;

@@ -64,7 +64,7 @@ public class ActionHandler_Database_ConsistencyCheck extends AbstractHandler {
             Messages.Dialog_ConsistencyCheck_Title,
             null, // no title image
 
-            Messages.Dialog_ConsistencyCheck_Message_AfterRestart,
+            Messages.Dialog_ConsistencyCheck_Message_RunAfterRestart,
             MessageDialog.QUESTION,
 
             1, // default index
