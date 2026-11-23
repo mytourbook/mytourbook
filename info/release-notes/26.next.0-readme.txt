@@ -34,7 +34,7 @@ New / Improvements
   - Migration requirements
     - The H2 database file path do not exist: ..\workspace\h2-database\tourbook.mv.db
     - Derby database folder exists ..\workspace\derby-database
-    - Database design and data version must be 63 which was set MT 26.11 or MT 26.9
+    - Database design and data version must be 63 which is set in Version 26.9 or 26.11
     - The pref value is not true: TOUR_DATABASE_IS_H2_MIGRATED=true which is located in
       ..\workspace\.metadata\.plugins\org.eclipse.core.runtime\.settings\net.tourbook.prefs
 
