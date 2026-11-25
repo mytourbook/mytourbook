@@ -365,25 +365,6 @@ public class Messages extends NLS {
    public static String        Column_SortInfo_CanNotSort;
    public static String        Column_SortInfo_CanSort;
 
-   public static String        CompactDb_H2_Footer_TotalIndices;
-   public static String        CompactDb_H2_Footer_TotalTables;
-   public static String        CompactDb_H2_Header_Blob;
-   public static String        CompactDb_H2_Header_Column;
-   public static String        CompactDb_H2_Header_Data;
-   public static String        CompactDb_H2_Header_Index;
-   public static String        CompactDb_H2_Header_Metric;
-   public static String        CompactDb_H2_Header_Rows;
-   public static String        CompactDb_H2_Header_Size;
-   public static String        CompactDb_H2_Header_Table;
-   public static String        CompactDb_H2_Header_Total;
-   public static String        CompactDb_H2_Header_Value;
-   public static String        CompactDb_H2_Label_Blobs;
-   public static String        CompactDb_H2_Label_ChunkFillRate;
-   public static String        CompactDb_H2_Label_Pages;
-   public static String        CompactDb_H2_Label_Space;
-   public static String        CompactDb_H2_Label_TablesAndIndices;
-   public static String        CompactDb_H2_Label_TotalActiveData;
-   public static String        CompactDb_H2_Label_TotalFileSize;
    public static String        CompactDb_H2_Message_CompactingDone;
    public static String        CompactDb_H2_Message_CompactingFile;
    public static String        CompactDb_H2_Message_H2DbIsLocked;

@@ -209,10 +209,10 @@ public class H2CompactDatabase {
       final List<List<String>> allHeaders = new ArrayList<>();
 
       allHeaders.add(List.of(
-            Messages.CompactDb_H2_Header_Table,
-            Messages.CompactDb_H2_Header_Rows,
-            Messages.CompactDb_H2_Header_Data,
-            Messages.CompactDb_H2_Header_Total));
+            "Table", //$NON-NLS-1$
+            "Rows", //$NON-NLS-1$
+            "Data", //$NON-NLS-1$
+            "Total")); //$NON-NLS-1$
 
       allHeaders.add(List.of(
             UI.EMPTY_STRING,
@@ -222,7 +222,7 @@ public class H2CompactDatabase {
 
       final List<String> allFooter = List.of(
 
-            Messages.CompactDb_H2_Footer_TotalTables.formatted(allRows.size()),
+            "TOTAL (%d tables)".formatted(allRows.size()), //$NON-NLS-1$
             "%,d".formatted(totalRows), //$NON-NLS-1$
             formatBytes(totalData),
             formatBytes(totalAll));
@@ -283,9 +283,9 @@ public class H2CompactDatabase {
       final List<List<String>> allHeaders = new ArrayList<>();
 
       allHeaders.add(List.of(
-            Messages.CompactDb_H2_Header_Blob,
-            Messages.CompactDb_H2_Header_Column,
-            Messages.CompactDb_H2_Header_Size));
+            "BLOB / CLOB", //$NON-NLS-1$
+            "Column", //$NON-NLS-1$
+            "Size")); //$NON-NLS-1$
 
       allHeaders.add(List.of(
             UI.EMPTY_STRING,
@@ -333,9 +333,9 @@ public class H2CompactDatabase {
       final List<List<String>> allHeaders = new ArrayList<>();
 
       allHeaders.add(List.of(
-            Messages.CompactDb_H2_Header_Table,
-            Messages.CompactDb_H2_Header_Index,
-            Messages.CompactDb_H2_Header_Size));
+            "Table", //$NON-NLS-1$
+            "Index", //$NON-NLS-1$
+            "Size")); //$NON-NLS-1$
 
       allHeaders.add(List.of(
             UI.EMPTY_STRING,
@@ -344,7 +344,7 @@ public class H2CompactDatabase {
 
       final List<String> allFooter = List.of(
 
-            Messages.CompactDb_H2_Footer_TotalIndices.formatted(allRows.size()),
+            "TOTAL (%d indices)".formatted(allRows.size()), //$NON-NLS-1$
             UI.EMPTY_STRING,
             formatBytes(totalIndices));
 
@@ -386,23 +386,23 @@ public class H2CompactDatabase {
 
       final List<List<String>> rows = List.of(
 
-            List.of(Messages.CompactDb_H2_Label_TotalFileSize,       formatBytes(fileSize)),
-            List.of(Messages.CompactDb_H2_Label_TablesAndIndices,    formatBytes(tablesAndIndexesBytes)),
-            List.of(Messages.CompactDb_H2_Label_Blobs,               formatBytes(lobBytes)),
-            List.of(Messages.CompactDb_H2_Label_TotalActiveData,     formatBytes(active)),
-            List.of(Messages.CompactDb_H2_Label_Space,               formatBytes(deadBytes)),
+            List.of("Total .mv.db File Size",   formatBytes(fileSize)), //$NON-NLS-1$
+            List.of("Tables & Indexes",         formatBytes(tablesAndIndexesBytes)), //$NON-NLS-1$
+            List.of("BLOBs & CLOBs",            formatBytes(lobBytes)), //$NON-NLS-1$
+            List.of("Total Active Data",        formatBytes(active)), //$NON-NLS-1$
+            List.of("Unallocated/Dead Space",   formatBytes(deadBytes)), //$NON-NLS-1$
 
             List.of(UI.EMPTY_STRING,                  UI.EMPTY_STRING),
 
-            List.of(Messages.CompactDb_H2_Label_ChunkFillRate,       stats.getOrDefault("info.CHUNKS_FILL_RATE", "N/A") + "%"),  //$NON-NLS-1$//$NON-NLS-2$  //$NON-NLS-3$
-            List.of(Messages.CompactDb_H2_Label_Pages, "%,d# / %,d#" .formatted(numPages - numLivePages, numPages) ) //$NON-NLS-1$
+            List.of("Chunk Fill Rate",stats.getOrDefault("info.CHUNKS_FILL_RATE", "N/A") + "%"),  //$NON-NLS-1$//$NON-NLS-2$  //$NON-NLS-3$ //$NON-NLS-4$
+            List.of("Dead/All Pages", "%,d# / %,d#".formatted(numPages - numLivePages, numPages) ) //$NON-NLS-1$ //$NON-NLS-2$
             );
 
 // SET_FORMATTING_ON
 
       final List<List<String>> allHeaders = new ArrayList<>();
 
-      allHeaders.add(List.of(Messages.CompactDb_H2_Header_Metric, Messages.CompactDb_H2_Header_Value));
+      allHeaders.add(List.of("Metric", "Value")); //$NON-NLS-1$ //$NON-NLS-2$
       allHeaders.add(List.of(UI.EMPTY_STRING, UI.UNIT_KBYTE));
 
       printTable(logFormatter, allHeaders, rows, null, Set.of(1, 2, 3, 4, 5), true);
