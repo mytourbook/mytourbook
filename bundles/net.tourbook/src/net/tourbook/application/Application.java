@@ -155,94 +155,85 @@ public class Application implements IApplication {
    @Override
    public Object start(final IApplicationContext context) throws Exception {
 
-      final Display display = PlatformUI.createDisplay();
-
       // ensure that the splash can display messages
       SplashManager.getInstance().open();
 
-      try {
+      if (IS_INSTANCE_CHECK) {
 
-         if (IS_INSTANCE_CHECK) {
+         // instance is checked
 
-            // instance is checked
+         // 1. Attempt to claim the port
+         final boolean isFirstInstance = checkFirstInstance();
 
-            // 1. Attempt to claim the port
-            final boolean isFirstInstance = checkFirstInstance();
+         if (isFirstInstance == false) {
 
-            if (isFirstInstance == false) {
-
-               // show message to user on the second instance before closing
-               final Shell shell = new Shell(display);
-               {
-                  MessageDialog.openInformation(shell,
-                        "MyTourbook", //$NON-NLS-1$
-                        Messages.App_Info_AnotherInstanceOfMyTourbookIsRunning);
-               }
-               shell.dispose();
-
-               // this is a duplicate instance
-               notifyFirstInstance();
-
-               // exit immediately
-               return IApplication.EXIT_OK;
+            // show message to user on the second instance before closing
+            final Shell shell = new Shell(UI.display);
+            {
+               MessageDialog.openInformation(shell,
+                     "MyTourbook", //$NON-NLS-1$
+                     Messages.App_Info_AnotherInstanceOfMyTourbookIsRunning);
             }
+            shell.dispose();
 
-            // 2. Start the background listener for subsequent instances
-            startInstanceListenerThread();
+            // this is a duplicate instance
+            notifyFirstInstance();
+
+            // exit immediately
+            return IApplication.EXIT_OK;
          }
 
-         final Boolean isMigrated = MigrateDerbyToH2.isMigrated();
+         // 2. Start the background listener for subsequent instances
+         startInstanceListenerThread();
+      }
 
-         if (isMigrated == null) {
+      final Boolean isMigrated = MigrateDerbyToH2.isMigrated();
 
-            // this is a normal startup
+      if (isMigrated == null) {
 
-         } else if (Boolean.TRUE.equals(isMigrated)) {
+         // this is a normal startup
+
+      } else if (Boolean.TRUE.equals(isMigrated)) {
+
+         // do a clean startup
+
+         return IApplication.EXIT_RESTART;
+
+      } else if (Boolean.FALSE.equals(isMigrated)) {
+
+         // exit immediately -> there needs some user actions
+
+         return IApplication.EXIT_OK;
+      }
+
+      if (_prefStore.getBoolean(ITourbookPreferences.TOUR_DATABASE_IS_RUN_TOOL_COMPACT_H2)) {
+
+         // prevent to do it a second time
+         updatePrefStore(ITourbookPreferences.TOUR_DATABASE_IS_RUN_TOOL_COMPACT_H2, false);
+
+         if (H2CompactDatabase.compactH2Database()) {
 
             // do a clean startup
 
             return IApplication.EXIT_RESTART;
-
-         } else if (Boolean.FALSE.equals(isMigrated)) {
-
-            // exit immediately -> there needs some user actions
-
-            return IApplication.EXIT_OK;
          }
+      }
 
-         if (_prefStore.getBoolean(ITourbookPreferences.TOUR_DATABASE_IS_RUN_TOOL_COMPACT_H2)) {
+      if (_prefStore.getBoolean(ITourbookPreferences.TOUR_DATABASE_IS_RUN_TOOL_CHECK_H2_CONSISTENCY)) {
 
-            // prevent to do it a second time
-            updatePrefStore(ITourbookPreferences.TOUR_DATABASE_IS_RUN_TOOL_COMPACT_H2, false);
+         // prevent to do it a second time
+         updatePrefStore(ITourbookPreferences.TOUR_DATABASE_IS_RUN_TOOL_CHECK_H2_CONSISTENCY, false);
 
-            if (H2CompactDatabase.compactH2Database()) {
+         H2ConsistencyCheck.checkH2Consistency();
+      }
 
-               // do a clean startup
+      // Normal Eclipse RCP startup sequence
+      final int returnCode = PlatformUI.createAndRunWorkbench(UI.display, new ApplicationWorkbenchAdvisor());
 
-               return IApplication.EXIT_RESTART;
-            }
-         }
-
-         if (_prefStore.getBoolean(ITourbookPreferences.TOUR_DATABASE_IS_RUN_TOOL_CHECK_H2_CONSISTENCY)) {
-
-            // prevent to do it a second time
-            updatePrefStore(ITourbookPreferences.TOUR_DATABASE_IS_RUN_TOOL_CHECK_H2_CONSISTENCY, false);
-
-            H2ConsistencyCheck.checkH2Consistency();
-         }
-
-         // Normal Eclipse RCP startup sequence
-         final int returnCode = PlatformUI.createAndRunWorkbench(display, new ApplicationWorkbenchAdvisor());
-
-         if (returnCode == PlatformUI.RETURN_RESTART) {
-            return IApplication.EXIT_RESTART;
-         } else {
-            return IApplication.EXIT_OK;
-         }
-
-      } finally {
-
-         display.dispose();
+      if (returnCode == PlatformUI.RETURN_RESTART) {
+         return IApplication.EXIT_RESTART;
+      } else {
+         return IApplication.EXIT_OK;
       }
    }
 
