@@ -287,6 +287,11 @@ public class PhotoLoadManager {
       return _waitingQueueThumb.size();
    }
 
+   /**
+    * This is called to initialize static fields at the app startup
+    */
+   public static void init() {}
+
    public static boolean isImageLoadingError(final String imageFilePath) {
       return _photoWithLoadingError.containsKey(imageFilePath);
    }

@@ -157,6 +157,7 @@ public class PhotoActivator extends AbstractUIPlugin {
       plugin = this;
 
       PhotoUI.init();
+      PhotoLoadManager.init();
    }
 
    @Override

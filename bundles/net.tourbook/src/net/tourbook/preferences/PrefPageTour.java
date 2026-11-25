@@ -172,12 +172,12 @@ public class PrefPageTour extends PreferencePage implements IWorkbenchPreference
       {
          _rdoDbSystem_InternalH2 = new Button(container, SWT.RADIO);
          _rdoDbSystem_InternalH2.setText(Messages.Pref_TourDb_Radio_Internal);
-         _rdoDbSystem_InternalH2.setToolTipText(Messages.Pref_TourDb_Radio_Internal_Tooltip);
+//       _rdoDbSystem_InternalH2.setToolTipText(Messages.Pref_TourDb_Radio_Internal_Tooltip);
          _rdoDbSystem_InternalH2.addSelectionListener(_defaultListener);
 
          _rdoDbSystem_External = new Button(container, SWT.RADIO);
          _rdoDbSystem_External.setText(Messages.Pref_TourDb_Radio_External);
-         _rdoDbSystem_External.setToolTipText(Messages.Pref_TourDb_Radio_External_Tooltip);
+//       _rdoDbSystem_External.setToolTipText(Messages.Pref_TourDb_Radio_External_Tooltip);
 
          final Composite containerExternal = new Composite(container, SWT.NONE);
          gdGrabWidth.indent(12, 0).applyTo(containerExternal);
@@ -337,8 +337,10 @@ public class PrefPageTour extends PreferencePage implements IWorkbenchPreference
 
       // for now, the external db is disabled
       _rdoDbSystem_External.setEnabled(false);
+      _rdoDbSystem_InternalH2.setEnabled(false);
 
-      final boolean isExternalDb = _rdoDbSystem_External.getSelection();
+//    final boolean isExternalDb = _rdoDbSystem_External.getSelection();
+      final boolean isExternalDb = false;
 
 // SET_FORMATTING_OFF
 
@@ -499,7 +501,6 @@ public class PrefPageTour extends PreferencePage implements IWorkbenchPreference
       // ensure external is not selected
       isExternalDb = false;
 // TODO remove SYSTEM.OUT.PRINTLN
-
 
 // SET_FORMATTING_OFF
 
