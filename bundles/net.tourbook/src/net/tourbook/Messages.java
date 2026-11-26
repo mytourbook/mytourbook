@@ -467,7 +467,6 @@ public class Messages extends NLS {
    public static String        Conconi_Chart_Label_Tour_Tooltip;
 
    public static String        Database_Monitor_CreateDatabase;
-   public static String        Database_Monitor_db_service_task;
    public static String        Database_Monitor_persistent_service_task;
    public static String        Database_Monitor_SetupLucene;
    public static String        Database_Monitor_SetupPooledConnection;
@@ -3595,8 +3594,6 @@ public class Messages extends NLS {
 
    public static String        Tour_Database_Action_CloseApp;
    public static String        Tour_Database_Action_UpdateDatabase;
-   public static String        Tour_Database_CannotConnectToDerbyServer_Message;
-   public static String        Tour_Database_CannotConnectToDerbyServer_Title;
    public static String        tour_database_computeComputedValues_resultMessage;
    public static String        tour_database_computeComputedValues_resultTitle;
    public static String        tour_database_computeComputeValues_mainTask;
@@ -3605,14 +3602,11 @@ public class Messages extends NLS {
    public static String        Tour_Database_Dialog_ConfirmUpdate_Title;
    public static String        Tour_Database_Dialog_ValidateFields_Message;
    public static String        Tour_Database_Dialog_ValidateFields_Title;
-   public static String        Tour_Database_load_all_tours;
    public static String        Tour_Database_PostUpdate;
    public static String        Tour_Database_TourSaveError;
    public static String        Tour_Database_Update;
    public static String        Tour_Database_UpdateDone;
    public static String        Tour_Database_UpdateInfo;
-   public static String        Tour_Database_Update_ModifyColumn;
-   public static String        Tour_Database_Update_Subtask;
    public static String        Tour_Database_update_tour;
    public static String        Tour_Database_Update_TourWeek;
    public static String        tour_database_version_info_message;
