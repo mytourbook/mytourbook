@@ -32,12 +32,9 @@ import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.preference.IPersistentPreferenceStore;
 import org.eclipse.jface.preference.IPreferenceStore;
-import org.eclipse.jface.window.Window;
-import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.BusyIndicator;
-import org.eclipse.swt.events.SelectionAdapter;
-import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.FontData;
 import org.eclipse.swt.graphics.Point;
@@ -103,13 +100,7 @@ public class DialogCompactH2Database extends Dialog {
                Messages.Dialog_CompactDb_Button_Compact,
                false);
          _btnCompact.setToolTipText(Messages.Dialog_CompactDb_Button_Compact_Tooltip);
-
-         _btnCompact.addSelectionListener(new SelectionAdapter() {
-            @Override
-            public void widgetSelected(final SelectionEvent e) {
-               onCompact(true);
-            }
-         });
+         _btnCompact.addSelectionListener(SelectionListener.widgetSelectedAdapter(selectionEvent -> onCompact()));
       }
 
       // create close button
@@ -162,31 +153,7 @@ public class DialogCompactH2Database extends Dialog {
       }
    }
 
-   private boolean isConfirmCompact() {
-
-      final MessageDialog messageDialog = new MessageDialog(getShell(),
-
-            Messages.Dialog_CompactDb_Title,
-            null,
-
-            NLS.bind(Messages.Dialog_CompactDb_Message_BackupWarning, TourDatabase.H2_DB_FOLDER_PATH),
-
-            MessageDialog.QUESTION,
-
-            1, // default button index
-
-            // set button labels
-            Messages.Dialog_CompactDb_Action_Compact,
-            Messages.App_Action_Cancel);
-
-      return messageDialog.open() == Window.OK;
-   }
-
-   private void onCompact(final boolean isInplace) {
-
-      if (isConfirmCompact() == false) {
-         return;
-      }
+   private void onCompact() {
 
       // disable compact buttons that it cannot be run twice -> db sizes would be wrong when running more than once
       _btnCompact.setEnabled(false);
@@ -198,7 +165,7 @@ public class DialogCompactH2Database extends Dialog {
             Messages.Dialog_CompactDb_Title,
             null, // no title image
 
-            Messages.Dialog_CompactDb_Message_CompactAndRestart,
+            Messages.Dialog_CompactDb_Message_RestartAndCompact.formatted(TourDatabase.H2_DB_FOLDER_PATH),
             MessageDialog.QUESTION,
 
             1, // default index

@@ -524,12 +524,10 @@ public class Messages extends NLS {
    public static String        Dialog_BeverageContainer_Title_Create;
    public static String        Dialog_BeverageContainer_Title_Edit;
 
-   public static String        Dialog_CompactDb_Action_Compact;
    public static String        Dialog_CompactDb_Action_RestartAndCompact;
    public static String        Dialog_CompactDb_Button_Compact;
    public static String        Dialog_CompactDb_Button_Compact_Tooltip;
-   public static String        Dialog_CompactDb_Message_BackupWarning;
-   public static String        Dialog_CompactDb_Message_CompactAndRestart;
+   public static String        Dialog_CompactDb_Message_RestartAndCompact;
    public static String        Dialog_CompactDb_Message_OnlyForH2;
    public static String        Dialog_CompactDb_Title;
 
